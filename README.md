@@ -1,6 +1,17 @@
-# README #
+# Site Den NodeJs Content Management System (CMS) #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+## Overview ##
+Site Den is a content management system built with the following tech:
+* NodeJs
+* Mongo DB
+* Express
+* Handlebars
+
+## Table of Contents ##
+1. Project Status
+1. Motivation
+    1. Becoming a Contributor
+
 
 ### What is this repository for? ###
 
