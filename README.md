@@ -8,9 +8,13 @@ Site Den is a content management system built with the following tech:
 * Handlebars
 
 ## Table of Contents ##
+1. [create an anchor](#anchors-in-markdown)
 1. Project Status
 1. Motivation
-    1. Becoming a Contributor
+    1. Become a Contributor
+1. Goals
+
+
 
 
 ### What is this repository for? ###
@@ -44,3 +48,5 @@ Use built in debug from VS Code
 
 * Repo owner or admin
 * Other community or team contact
+
+### Anchors in Markdown ###
