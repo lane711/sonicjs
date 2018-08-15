@@ -1,0 +1,7 @@
+[
+    { "name":"Home", "link": "/", "id":1, "cmsPage":true},
+    { "name":"Blog", "link": "/blog", "id":2, "cmsPage":true },
+    { "name":"Features", "link": "/features", "id":3, "cmsPage":true },
+    { "name":"Contact", "link": "/contact", "id":4, "cmsPage":true },
+    { "name":"MongoDb", "link": "/mongodb-test", "id":5, "cmsPage":false }
+]

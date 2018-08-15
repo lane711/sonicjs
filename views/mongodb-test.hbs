@@ -1,0 +1,78 @@
+<h1>MONGODB - EXERCISE</h1>
+
+<section class="insert">
+        <h3>Insert Form</h3>
+        <form action="/insert2" method="post">
+            <div class="input">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title">
+            </div>
+            <button type="submit">INSERT</button>
+        </form>
+    </section>
+
+<section class="insert">
+    <h3>Insert Data</h3>
+    <form action="/insert" method="post">
+        <div class="input">
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title">
+        </div>
+        <div class="input">
+            <label for="content">Content</label>
+            <input type="text" id="content" name="content">
+        </div>
+        <div class="input">
+            <label for="author">Author</label>
+            <input type="text" id="author" name="author">
+        </div>
+        <button type="submit">INSERT</button>
+    </form>
+</section>
+<section class="get">
+    <h3>Get Data</h3>
+    <a href="/get-data">LOAD DATA</a>
+    <div>
+        {{# each items }}
+            <article class="item">
+                <div>Title: {{ this.title }}</div>
+                <div>Content: {{ this.content }}</div>
+                <div>Author: {{ this.author }}</div>
+                <div>ID: {{ this._id }}</div>
+            </article>
+        {{/each}}
+    </div>
+</section>
+<section class="update">
+    <h3>Update Data</h3>
+    <form action="/update" method="post">
+        <div class="input">
+            <label for="id">ID</label>
+            <input type="text" id="id" name="id">
+        </div>
+        <div class="input">
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title">
+        </div>
+        <div class="input">
+            <label for="content">Content</label>
+            <input type="text" id="content" name="content">
+        </div>
+        <div class="input">
+            <label for="author">Author</label>
+            <input type="text" id="author" name="author">
+        </div>
+        <button type="submit">UPDATE</button>
+    </form>
+</section>
+</section>
+<section class="delete">
+    <h3>Delete Data</h3>
+    <form action="/delete" method="post">
+        <div class="input">
+            <label for="id">ID</label>
+            <input type="text" id="id" name="id">
+        </div>
+        <button type="submit">DELETE</button>
+    </form>
+</section>

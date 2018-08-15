@@ -1,0 +1,39 @@
+<div class="admin-top-bar">
+    <input v-model="name" type="text" name="name" id="name">
+    <button type="button" v-on:click="addPage" class="btn btn-outline-light float-right">New Page</button>
+</div>
+
+
+<script type="text/javascript">
+
+    var topBar = new Vue({
+        el: '.admin-top-bar',
+        data: {
+            name: 'My CMS Page',
+            debug: true,
+            domain: '',
+            ajaxRequest: false,
+            postResults: []
+        },
+        // define methods under the `methods` object
+        methods: {
+            addPage: function (event) {
+
+                axios.post('/admin/addPage', {
+                        title: this.name
+                    })
+                    .then(function (page) {
+                        console.log(page);
+                        var getUrl = window.location;
+                        var newUrl = getUrl.protocol + "//" + getUrl.host + page.data.slug;
+                        window.location.href = newUrl;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+
+            }
+        }
+    })
+
+</script>

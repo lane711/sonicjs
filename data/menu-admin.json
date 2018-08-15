@@ -1,0 +1,7 @@
+[
+    { "name":"Home", "link": "/admin"},
+    { "name":"Content Types", "link": "/admin/content-type" },
+    { "name":"Content", "link": "/admin/content" },
+    { "name":"Modules", "link": "/admin/modules" },
+    { "name":"Users", "link": "/admin/users" }
+]

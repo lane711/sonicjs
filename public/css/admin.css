@@ -1,0 +1,30 @@
+.admin-top-bar{
+    background-color: #07889b;
+    font-size: 11px;
+    padding: 4px 8px;
+    display: flex;
+}
+
+.admin-panel{
+    background: radial-gradient(farthest-corner at 10% 15%,#07889b,#66b9bf);
+    height:100vh;
+    padding-top: 40px;
+}
+
+.admin-panel .save-buttons{
+
+}
+
+#ap-mini-layout .preview{
+    background-color: #fff;
+    border: 1px dashed #999;
+    height:60px;
+    line-height: 60px;
+    text-align: center;
+    vertical-align: auto;
+    font-size: .5em;
+}
+
+#ap-mini-layout .row{
+    margin-bottom: 15px;
+}
