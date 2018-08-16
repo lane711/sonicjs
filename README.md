@@ -13,7 +13,7 @@ Site Den is a content management system built with the following tech:
     1. Become a Contributor
 
 
-### Project Status ###
+## Project Status ##
 Overall, the project is in an **early POC and Planning Phase**. Here is a list of features and their associated status. The features in the "Complete" section indicate parts of the application that have reached the initial POC stage. **This project should no be used in a production setting until the planned security features have been implemented.**
 
 **Complete Features**:
@@ -30,7 +30,7 @@ Overall, the project is in an **early POC and Planning Phase**. Here is a list o
 * Theme Library, collection of pre-built front end theme
 * Modules, extend capabilities AND extend/override core functionality
 
-### Goals And Motivation ###
+## Goals And Motivation ##
 In short, the goal of this project is to create a NodeJs based CMS with the flexability of Drupal and the front end editing capabilties of some of Wordpress' top page builder plugins.
 
 The audience for this CMS project in order of presidence are:
