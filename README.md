@@ -1,5 +1,7 @@
 # Site Den NodeJs Content Management System (CMS) #
 
+![Siteden Logo](https://www.dropbox.com/s/n25sixwf8ce93ho/SiteDen-nodejs-logo.png?dl=0)
+
 ## Overview ##
 Site Den is a content management system built with the following tech:
 * NodeJs
@@ -19,8 +21,8 @@ Overall, the project is in an **early POC and Planning Phase**. Here is a list o
 **Complete Features**:
 * Serve dynamic data-driven content
 * Create custom content types (ie: Pages, Menus, Blog Posts, Books, Movies, etc)
-* Create custom field types to be used as the buliding blocks for content types (ie: Textbox, Select List, Tags, Layout, etc)
-* Create content, each instance with it's own uniue URL
+* Create custom field types to be used as the building blocks for content types (ie: Textbox, Select List, Tags, Layout, etc)
+* Create content, each instance with it's own unique URL
 * Bootstrap based admin theme
 * Bootstrap based front end theme
 
@@ -31,9 +33,9 @@ Overall, the project is in an **early POC and Planning Phase**. Here is a list o
 * Modules, extend capabilities AND extend/override core functionality
 
 ## Goals And Motivation ##
-In short, the goal of this project is to create a NodeJs based CMS with the flexability of Drupal and the front end editing capabilties of some of Wordpress' top page builder plugins.
+In short, the goal of this project is to create a NodeJs based CMS with the flexibility of Drupal and the front end editing capabilities of some of Wordpress' top page builder plugins.
 
-The audience for this CMS project in order of presidence are:
+The audience for this CMS project in order of precedence are:
 1. Web Developers
 1. Web Designers
 1. Site Builders (Non-technical)
@@ -42,9 +44,9 @@ Ultimately this project will allow developers to build complex web applications,
 
 Modules can be built (using NodeJs) or added from the community repository. This allows the system to be extended not only in meeting custom requirements but also the alteration of core functionality (Similar to Drupal).
 
-I started this project because I have a recent affinity to NodeJs althoug I'm primarily a Asp.Net/C#/SQL Server developer by day. There wasn't an existing NodeJs CMS project with lofty enough goals to perhaps someday become a highly trusted web application platform/CMS.
+I started this project because I have a recent affinity to NodeJs although I'm primarily a Asp.Net/C#/SQL Server developer by day. There wasn't an existing NodeJs CMS project with lofty enough goals to perhaps someday become a highly trusted web application platform/CMS.
 
-### What is this repository for? ###
+## Contributing ##
 
 * livereload . -e 'hbs,css,js' -d 1000
 * Quick summary
@@ -54,26 +56,7 @@ I started this project because I have a recent affinity to NodeJs althoug I'm pr
 ### How do I get set up and running? ###
 
 * Summary of set up
-Make sure Mongo Db is running: `mongod`
-To run the app:
-`npm start`
-To Debug the app:
-Use built in debug from VS Code
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
-
-### Anchors in Markdown ###
+1. Make sure Mongo Db is running: `mongod`
+1. Install dependencies with `npm install`
+1. To run the app: `npm start`
+1. To Debug the app: Use built in debug from VS Code
