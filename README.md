@@ -1,6 +1,6 @@
 # Site Den NodeJs Content Management System (CMS) #
 
-![Siteden Logo](https://www.dropbox.com/s/n25sixwf8ce93ho/SiteDen-nodejs-logo.png?dl=0)
+![Image of Siteden Logo](https://kevant.com/siteden/SiteDen-nodejs-logo.png)
 
 ## Overview ##
 Site Den is a content management system built with the following tech:
