@@ -11,8 +11,8 @@ Site Den is a content management system built with the following tech:
 
 ## Table of Contents ##
 1. [Project Status](#project-status)
-1. Goals And Motivation
-    1. Become a Contributor
+1. [Goals And Motivation](#goals-and-motivation)
+1. [Setup](#setup)
 
 
 ## Project Status ##
@@ -44,19 +44,12 @@ Ultimately this project will allow developers to build complex web applications,
 
 Modules can be built (using NodeJs) or added from the community repository. This allows the system to be extended not only in meeting custom requirements but also the alteration of core functionality (Similar to Drupal).
 
-I started this project because I have a recent affinity to NodeJs although I'm primarily a Asp.Net/C#/SQL Server developer by day. There wasn't an existing NodeJs CMS project with lofty enough goals to perhaps someday become a highly trusted web application platform/CMS.
+I started this project because I have established a recent affinity to NodeJs although I'm primarily a Asp.Net/C#/SQL Server developer by day. There wasn't an existing NodeJs CMS project with lofty enough goals to perhaps someday become a highly trusted web application platform/CMS.
 
-## Contributing ##
+### Setup ###
 
-* livereload . -e 'hbs,css,js' -d 1000
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
-
-### How do I get set up and running? ###
-
-* Summary of set up
 1. Make sure Mongo Db is running: `mongod`
+1. Edit the `mongoUrl` and `dbName` setting in `/routes/mongo-dal.js`
 1. Install dependencies with `npm install`
 1. To run the app: `npm start`
-1. To Debug the app: Use built in debug from VS Code
+1. To Debug the app: Use the built in debug from VS Code
