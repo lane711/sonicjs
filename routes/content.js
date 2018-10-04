@@ -7,7 +7,16 @@ module.exports = function (app) {
     require('./field-types')(app);
 
 
-
+    app.get('/admin/content', function (req, res) {
+        mongoDAL.getContent("content", null).then(function (data) {
+            console.log(data)
+            res.render(data);
+            // res.render('admin/content/content', {
+            //     content: data,
+            //     layout: 'admin-layout.hbs'
+            // });
+        });
+    });
 
     app.post('/admin/content/add', function (req, res) {
         let formElements = req.body.formData;

@@ -122,4 +122,28 @@ module.exports = {
         });
     },
 
+    getContent: function (collection, query) {
+        return new Promise(function (resolve, reject) {
+            MongoClient.connect(mongoUrl, function (err, db) {
+                if (err) throw err;
+                var dbo = db.db(dbName);
+                let result = dbo.collection(collection).aggregate([{
+                    $lookup: {
+                        from: 'contentTypes',
+                        localField: 'contentTypeId',
+                        foreignField: '_id',
+                        as: 'contentType'
+                    }
+                }])
+                console.log(result);
+                // .toArray(function (err, res) {
+                //     if (err) throw err;
+                //     console.log(JSON.stringify(res));
+                //     resolve(res);
+                //     db.close();
+                // });
+            });
+        });
+    },
+
 };
