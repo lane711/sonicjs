@@ -127,23 +127,47 @@ module.exports = {
             MongoClient.connect(mongoUrl, function (err, db) {
                 if (err) throw err;
                 var dbo = db.db(dbName);
-                let result = dbo.collection(collection).aggregate([{
-                    $lookup: {
-                        from: 'contentTypes',
-                        localField: 'contentTypeId',
-                        foreignField: '_id',
-                        as: 'contentType'
+                let result = [];
+                dbo.collection(collection).find()
+                .forEach(
+                    function(newContent){
+                        newContent.test = 'test123';
+                        result.push(newContent);
                     }
-                }])
-                console.log(result);
-                // .toArray(function (err, res) {
-                //     if (err) throw err;
-                //     console.log(JSON.stringify(res));
-                //     resolve(res);
+                )
+                // .toArray(function (err, result) {
+                //     if (err) {
+                //         // reject(err);
+                //         throw err;
+                //     }
                 //     db.close();
+                //     // console.log(result);
+                    resolve(result);
                 // });
             });
         });
     },
+
+    // getContent: function (collection, query) {
+    //     return new Promise(function (resolve, reject) {
+    //         MongoClient.connect(mongoUrl, function (err, db) {
+    //             if (err) throw err;
+    //             var dbo = db.db(dbName);
+    //             let result = dbo.collection(collection).aggregate([{
+    //                 $lookup: {
+    //                     from: 'contentTypes',
+    //                     localField: 'contentTypeId',
+    //                     foreignField: '_id',
+    //                     as: 'contentType'
+    //                 }
+    //             }]).toArray(function (err, res) {
+    //                 if (err) throw err;
+    //                 console.log(JSON.stringify(res));
+    //                 resolve(res);
+    //                 db.close();
+    //             });
+    //         });
+    //     });
+    // },
 
 };
