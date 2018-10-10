@@ -1,0 +1,84 @@
+<div class="col-lg-12">
+  <div class="card">
+    <div class="card-header">
+      <i class="fa fa-align-justify"></i> Menus
+    </div>
+    <div class="card-body menu-list">
+      <table class="table table-responsive-sm table-striped">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Parent</th>
+            <th>Slug</th>
+            <th>Created</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each menuLinks}}
+          <tr>
+            <td>{{ this.title}}</td>
+            <td>[root]</td>
+            <td>{{ this.slug}}</td>
+            <td>{{ this.title}}</td>
+            <td>
+              <span class="badge badge-success">Active</span>
+              <button v-on:click="deletePage('{{{ this._id }}}')" class="btn btn-sm btn-danger">Delete</button>
+            </td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+      <!-- <ul class="pagination">
+              <li class="page-item">
+                <a class="page-link" href="#">Prev</a>
+              </li>
+              <li class="page-item active">
+                <a class="page-link" href="#">1</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="#">2</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="#">3</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="#">4</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="#">Next</a>
+              </li>
+            </ul> -->
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+  var menuList = new Vue({
+    el: '.menu-list',
+    data: {
+      name: '{{{ page.title }}}',
+      debug: true,
+      domain: '',
+      ajaxRequest: false,
+      postResults: []
+    },
+    // define methods under the `methods` object
+    methods: {
+      deletePage: function (id) {
+        axios.post('/admin/deletemenu', {
+            id: id
+          })
+          .then(function (page) {
+            console.log('refreshing page');
+            location.reload();
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+
+      }
+    }
+  })
+</script>

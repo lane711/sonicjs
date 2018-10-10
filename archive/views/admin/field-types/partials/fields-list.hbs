@@ -1,0 +1,138 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <i class="fa fa-align-justify"></i> Manage Fields
+
+      </div>
+      <div class="card-body">
+        <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
+
+          <table class="table table-responsive-sm table-striped">
+            <thead>
+              <tr>
+                <th>Label</th>
+                <th>Preview</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each contentType.fields}}
+              <tr>
+                <td>{{ this.label}}
+                  <br>
+                  <small>{{ this.instanceId }}</small>
+                </td>
+                <td>
+                  {{{ this.html }}}
+                </td>
+                <td>
+                  <a href="/admin/field-instance/{{this.fieldInstanceId}}?returnUrl={{../returnUrl}}" class="btn btn-sm btn-primary">
+                    <i class="fa fa-edit"></i>
+                  </a>
+                    <button v-on:click="removeField('{{{ this.fieldInstanceId }}}')" class="btn btn-sm btn-danger">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                </td>
+
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+
+
+
+        </form>
+      </div>
+      <div class="card-footer">
+        <button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#addFieldModal">
+          Add Field
+        </button>
+      </div>
+    </div>
+
+  </div>
+  <!--/.col-->
+</div>
+
+<!-- Modal -->
+<div class="modal fade admin-field-add" id="addFieldModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Field To Content Type</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <table class="table table-responsive-sm table-striped">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Preview</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each fieldTypes}}
+            <tr>
+              <td>{{ this.title}}</td>
+              <td>
+                {{{ this.generateHtml }}}
+              </td>
+              <td>
+                <button v-on:click="addField('{{{ this.id }}}')" class="btn btn-sm btn-primary">Add</button>
+              </td>
+
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  var contentTypeSave = new Vue({
+    el: '.admin-field-add',
+    data: {
+      title: '{{ contentType.title }}',
+      description: '{{ contentType.description }}',
+      debug: true,
+      domain: '',
+      ajaxRequest: false,
+      postResults: []
+    },
+    // define methods under the `methods` object
+    methods: {
+
+      addField: function (fieldTypeId) {
+
+        console.log("addfield function:" + fieldTypeId);
+        axios.post('/admin/field-types/add/{{contentType._id}}', {
+            fieldTypeId: fieldTypeId
+          })
+          .then(function (cotentType) {
+            console.log(cotentType);
+            var getUrl = window.location;
+            window.location.href = getUrl.protocol + "//" + getUrl.host + '/admin/content-types/' + cotentType.data;
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      },
+
+      removeField: function (fieldTypeId) {
+        console.log("removing:" + fieldTypeId);
+      }
+    }
+  })
+</script>

@@ -1,0 +1,73 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="card admin-content-type-add">
+      <div class="card-header">
+        <i class="fa fa-align-justify"></i> New Content Type
+      </div>
+      <div class="card-body">
+        <form v-on:submit.prevent="addContentType" method="post" enctype="multipart/form-data" class="form-horizontal">
+      
+          <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="text-input">Title</label>
+            <div class="col-md-9">
+              <input type="text" id="text-input" v-model="title" name="text-input" class="form-control" placeholder="Title">
+              <!-- <span class="help-block">This is a help text</span> -->
+            </div>
+          </div> 
+        
+          
+          <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="textarea-input">Description</label>
+            <div class="col-md-9">
+              <textarea id="textarea-input" v-model="description" name="textarea-input" rows="3" class="form-control" placeholder="Content, text or html..."></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="card-footer">
+        <button type="submit" v-on:click="addContentType" class="btn btn-primary pull-right">
+          Next</button>
+        <button type="reset" class="btn btn-danger">
+          Cancel</button>
+      </div>
+    </div>
+   
+  </div>
+  <!--/.col-->
+</div>
+
+  <script type="text/javascript">
+  
+      var contentTypeSave = new Vue({
+          el: '.admin-content-type-add',
+          data: {
+              title: '',
+              description: '',
+              debug: true,
+              domain: '',
+              ajaxRequest: false,
+              postResults: []
+          },
+          // define methods under the `methods` object
+          methods: {
+              addContentType: function (event) {
+  
+                  // console.log('title:' + this.title);
+                  axios.post('/admin/content-types/add', {
+                          title: this.title,
+                          description: this.description
+                      })
+                      .then(function (cotentTypeId) {
+                          console.log(cotentTypeId.data);
+                          var getUrl = window.location;
+                          window.location.href = getUrl.protocol + "//" + getUrl.host + '/admin/content-types/' + cotentTypeId.data;
+                      })
+                      .catch(function (error) {
+                          console.log(error);
+                      });
+  
+              }
+          }
+      })
+  
+  </script>
