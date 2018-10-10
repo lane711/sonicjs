@@ -1,0 +1,28 @@
+{
+  "name": "contentType",
+  "plural": "contentTypes",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "id": {
+      "type": "number"
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {
+    "contents": {
+      "type": "hasMany",
+      "model": "content",
+      "foreignKey": ""
+    }
+  },
+  "acls": [],
+  "methods": {}
+}
