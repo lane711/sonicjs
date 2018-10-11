@@ -11,8 +11,8 @@ const routes: Routes = [
   { path: "", component: HomeComponent },
   { path: "field-types", component: FieldTypesComponent },
   { path: "content-types", component: ContentTypesComponent },
-  { path: "content-types-edit/:test", component: ContentTypeEditComponent },
-  { path: "content/:id", component: ContentComponent }
+  { path: "content-types-edit/:id", component: ContentTypeEditComponent },
+  { path: "content", component: ContentComponent }
 ];
 
 @NgModule({
