@@ -1,0 +1,39 @@
+<nav class="sidebar-nav">
+  <ul class="nav">
+    <li class="nav-item">
+
+      <a class="nav-link" href="index.html">
+        <i class="nav-icon icon-speedometer"></i> Dashboard
+        <span class="badge badge-primary">NEW</span>
+      </a>
+    </li>
+
+    <li class="nav-title">Theme</li>
+    <li class="nav-item">
+      <a class="nav-link" href="colors.html">
+        <i class="nav-icon icon-drop"></i> Colors</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="typography.html">
+        <i class="nav-icon icon-pencil"></i> Typography</a>
+    </li>
+    <li class="nav-title">Components</li>
+    <li class="nav-item nav-dropdown">
+      <a class="nav-link" [routerLink]="['/']">
+        <i class="nav-icon icon-puzzle"></i> Home</a>
+    </li>
+    <li class="nav-item nav-dropdown">
+      <a class="nav-link" [routerLink]="['field-types']">
+        <i class="nav-icon icon-puzzle"></i> Field Types</a>
+    </li>
+    <li class="nav-item nav-dropdown">
+      <a class="nav-link" [routerLink]="['content-types']">
+        <i class="nav-icon icon-puzzle"></i> Content Types</a>
+    </li>
+    <li class="nav-item nav-dropdown">
+      <a class="nav-link" [routerLink]="['content']">
+        <i class="nav-icon icon-puzzle"></i> Content</a>
+    </li>
+  </ul>
+</nav>
+<button class="sidebar-minimizer brand-minimizer" type="button"></button>

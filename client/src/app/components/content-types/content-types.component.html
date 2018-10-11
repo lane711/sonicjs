@@ -1,0 +1,52 @@
+<ul>
+  <li *ngFor="let contentType of contentTypes">{{ contentType.name }}</li>
+</ul>
+<div class="col-lg-12">
+  <div class="card">
+    <div class="card-header">
+      <i class="fa fa-align-justify"></i> Content Type
+      <a href="/admin/content-types/add" class="btn btn-primary float-right">New Content Type</a>
+    </div>
+    <div class="card-body page-list">
+      <table class="table table-responsive-sm table-striped">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Content</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let contentType of contentTypes">
+            <td><a href="/content-types/{{contentType.id}}">{{ contentType.name}}</a></td>
+            <td>{{ contentType.description}}</td>
+            <td>
+              <span class="badge badge-success">Active</span>
+              <button class="btn btn-sm btn-danger">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- <ul class="pagination">
+                <li class="page-item">
+                  <a class="page-link" href="#">Prev</a>
+                </li>
+                <li class="page-item active">
+                  <a class="page-link" href="#">1</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#">2</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#">3</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#">4</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#">Next</a>
+                </li>
+              </ul> -->
+    </div>
+  </div>
+</div>

@@ -1,0 +1,37 @@
+<div class="col-lg-12">
+
+  <div class="card">
+    <div class="card-header">
+      <i class="fa fa-align-justify"></i> Field Types
+    </div>
+    <div class="card-body page-list">
+      <table class="table table-responsive-sm table-striped">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Desc</th>
+            <th>Preview</th>
+            <!-- <th>Actions</th> -->
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let fieldType of fieldTypes">
+            <td>{{ fieldType.name}}</td>
+            <td>{{ fieldType.desc}}</td>
+            <td>
+              <div [innerHTML]="fieldType.generateHtml() | safe: 'html'"></div>
+              <!-- <div innerHTML="{{fieldType.generateHtml()}}"></div> -->
+              <!-- <span ng-bind-html="{{fieldType.generateHtml()}}"></span> -->
+              <!-- {{ fieldType.generateHtml() }} -->
+            </td>
+            <!-- <td>
+              <span class="badge badge-success">Active</span>
+              <button v-on:click="deletePage('{{{ this._id }}}')" class="btn btn-sm btn-danger">Delete</button>
+            </td> -->
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
