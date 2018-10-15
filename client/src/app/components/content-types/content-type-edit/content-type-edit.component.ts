@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { Router, ActivatedRoute, ParamMap } from "@angular/router";
 import { switchMap } from "rxjs/operators";
+import { ContentTypesService } from "../../../services/content-types.service";
 
 @Component({
   selector: "app-content-type-edit",
@@ -8,11 +9,17 @@ import { switchMap } from "rxjs/operators";
   styleUrls: ["./content-type-edit.component.css"]
 })
 export class ContentTypeEditComponent implements OnInit {
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private contentTypesService: ContentTypesService
+  ) {}
 
-  public id;
+  public contentType;
   ngOnInit() {
-    console.log("loading ct edit");
-    this.id = this.route.snapshot.paramMap.get("id");
+    const id = this.route.snapshot.paramMap.get("id");
+    this.contentTypesService.getContentType(id).then(data => {
+      this.contentType = data;
+    });
   }
 }

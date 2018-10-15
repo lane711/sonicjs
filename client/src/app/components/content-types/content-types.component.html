@@ -18,7 +18,7 @@
         </thead>
         <tbody>
           <tr *ngFor="let contentType of contentTypes">
-            <td><a href="/content-types/{{contentType.id}}">{{ contentType.name}}</a></td>
+            <td><a [routerLink]="['/content-types', contentType.id]">{{ contentType.name}}</a></td>
             <td>{{ contentType.description}}</td>
             <td>
               <span class="badge badge-success">Active</span>
