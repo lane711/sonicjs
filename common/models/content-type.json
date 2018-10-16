@@ -21,6 +21,11 @@
       "type": "hasMany",
       "model": "content",
       "foreignKey": ""
+    },
+    "fields": {
+      "type": "hasMany",
+      "model": "contentTypeField",
+      "foreignKey": "contentTypeId"
     }
   },
   "acls": [],

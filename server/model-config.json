@@ -42,5 +42,13 @@
   "content": {
     "dataSource": "mongodb",
     "public": true
+  },
+  "fieldType": {
+    "dataSource": "mongodb",
+    "public": true
+  },
+  "contentTypeField": {
+    "dataSource": "mongodb",
+    "public": true
   }
 }

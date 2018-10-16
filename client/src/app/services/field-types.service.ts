@@ -97,7 +97,7 @@ export class FieldTypesService {
   public getCountryDropDownList(id = "notDefined", placeholder = "", css = "") {
     return (
       `<select class="form-control" name="${id}">` +
-      "<option>United State</option>" +
+      "<option>United States</option>" +
       "<option>United Kingdom</option>" +
       "<option>Canada</option>" +
       "<option>Mexico</option>" +

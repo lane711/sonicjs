@@ -1,0 +1,30 @@
+{
+  "name": "contentTypeField",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "id": {
+      "type": "number"
+    },
+    "fieldTypeId": {
+      "type": "string",
+      "required": true
+    },
+    "contentTypeId": {
+      "type": "string",
+      "required": true
+    },
+    "required": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

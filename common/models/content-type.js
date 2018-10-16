@@ -20,7 +20,6 @@ module.exports = function(Contenttype) {
   );
 
   Contenttype.getName = function(id, cb) {
-    console.log('id', id);
     Contenttype.findById(id, function(err, instance) {
       var response = 'Name of coffee shop is ' + instance.name;
       cb(null, response);
@@ -29,11 +28,51 @@ module.exports = function(Contenttype) {
   };
 
   Contenttype.remoteMethod(
-    'getName',
-    {
-      http: {path: '/getname', verb: 'get'},
-      accepts: {arg: 'id', type: 'string', http: {source: 'query'}},
-      returns: {arg: 'name', type: 'string'},
+    'getName', {
+      http: {
+        path: '/getname',
+        verb: 'get',
+      },
+      accepts: {
+        arg: 'id',
+        type: 'string',
+        http: {
+          source: 'query',
+        },
+      },
+      returns: {
+        arg: 'name',
+        type: 'string',
+      },
     }
-);
+  );
+
+  Contenttype.getContentTypeWithFields = function(id, cb) {
+    Contenttype.findById(id, {
+      include: 'fields',
+    }, function(err, instance) {
+      cb(null, instance);
+      console.log(instance);
+    });
+  };
+
+  Contenttype.remoteMethod(
+    'getContentTypeWithFields', {
+      http: {
+        path: '/getContentTypeWithFields',
+        verb: 'get',
+      },
+      accepts: {
+        arg: 'id',
+        type: 'string',
+        http: {
+          source: 'query',
+        },
+      },
+      returns: {
+        arg: 'name',
+        type: 'string',
+      },
+    }
+  );
 };
