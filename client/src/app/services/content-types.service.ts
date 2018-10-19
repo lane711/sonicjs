@@ -8,6 +8,8 @@ import { environment } from "../../environments/environment";
 export class ContentTypesService {
   constructor(private http: HttpClient) {}
 
+  public contentType;
+
   public getContentTypes() {
     return this.http.get(environment.apiUrl + "api/contentTypes").toPromise();
   }
@@ -16,7 +18,11 @@ export class ContentTypesService {
     const filter = encodeURI('{"include": "fields"}');
     return this.http
       .get(environment.apiUrl + `api/contentTypes/${id}?filter=${filter}`)
-      .toPromise();
+      .toPromise()
+      .then(data => {
+        this.contentType = data;
+        console.log(data);
+      });
   }
 
   public addField(contentTypeId, fieldType) {

@@ -46,33 +46,4 @@ module.exports = function(Contenttype) {
       },
     }
   );
-
-  Contenttype.getContentTypeWithFields = function(id, cb) {
-    Contenttype.findById(id, {
-      include: 'fields',
-    }, function(err, instance) {
-      cb(null, instance);
-      console.log(instance);
-    });
-  };
-
-  Contenttype.remoteMethod(
-    'getContentTypeWithFields', {
-      http: {
-        path: '/getContentTypeWithFields',
-        verb: 'get',
-      },
-      accepts: {
-        arg: 'id',
-        type: 'string',
-        http: {
-          source: 'query',
-        },
-      },
-      returns: {
-        arg: 'name',
-        type: 'string',
-      },
-    }
-  );
 };

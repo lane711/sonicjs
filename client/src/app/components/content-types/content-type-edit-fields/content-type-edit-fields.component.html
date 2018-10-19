@@ -18,9 +18,9 @@
             </thead>
             <tbody>
               <!-- {{#each contentType.fields}} -->
-              <tr>
+              <tr *ngFor='let field of this.contentTypesService.contentType?.fields'>
                 <td>
-                  <!-- {{ this.label}} -->
+                  {{field.id}}
                   <br>
                   <small>
                     <!-- {{ this.instanceId }} -->

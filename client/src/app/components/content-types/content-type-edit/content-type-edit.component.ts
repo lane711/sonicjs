@@ -18,9 +18,7 @@ export class ContentTypeEditComponent implements OnInit {
   public contentType;
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get("id");
-    this.contentTypesService.getContentType(id).then(data => {
-      console.log(data);
-      this.contentType = data;
-    });
+    this.contentTypesService.getContentType(id);
+    this.contentType = this.contentTypesService.contentType;
   }
 }

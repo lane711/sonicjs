@@ -14,12 +14,16 @@ export class ContentTypeEditFieldsComponent implements OnInit {
   ) {}
 
   public fieldTypes;
+  public fields;
   ngOnInit() {
     this.fieldTypes = this.fieldTypesService.getTypes();
+    // this.fields = this.contentTypesService.getContentType(
+    //   "5bb7f1784aa4d63b1ea1cfcb"
+    // );
   }
 
   public addField(event, fieldType) {
     console.log(fieldType);
-    this.contentTypesService;
+    // this.contentTypesService;
   }
 }
