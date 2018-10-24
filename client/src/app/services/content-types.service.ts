@@ -25,19 +25,37 @@ export class ContentTypesService {
       });
   }
 
+  // public async createContentType(contentType) {
+  //   // return this.http
+  //   //   .post(environment.apiUrl + `api/contentTypes/`, contentType)
+  //   //   .toPromise().then(data => {
+  //   //     this.addField(data.id, 'textBox');
+  //   //   });
+  //   let data = await this.http.post(
+  //     environment.apiUrl + `api/contentTypes/`,
+  //     contentType
+  //   );
+  //   console.log("newContentType", data);
+  //   return this.addField(data.id, "textBox").toPromise();
+  // }
+
+  async createContentTypeAsync(contentType): Promise<number> {
+    const response = await this.http
+      .post(environment.apiUrl + `api/contentTypes/`, contentType)
+      .toPromise();
+    return response;
+  }
+
   public addField(contentTypeId, fieldType) {
-    // let contentTypeId = req.params.contentTypeId;
-    //     var fieldType = {
-    //         label: 'My Label',
-    //         isRequired: false,
-    //         fieldTypeId: req.body.fieldTypeId
-    //     };
-    // mongoDAL.addDocument("fieldTypes", fieldType).then(function (newFieldType) {
-    //     //now add to contentType
-    //     this.addFieldToContentType(contentTypeId, newFieldType);
-    //     res.send(contentTypeId);
-    // });
-    //
-    // contentType.fields.push({fieldInstanceId: fieldInstanceId});
+    let field = {
+      fieldType: "string",
+      label: "string",
+      placeholder: "string",
+      required: false
+    };
+    return this.http.post(
+      environment.apiUrl + `api/contentTypes/${contentTypeId}/fields`,
+      field
+    );
   }
 }
