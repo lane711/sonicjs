@@ -23,9 +23,13 @@
       "foreignKey": ""
     },
     "fields": {
-      "type": "hasMany",
+      "type": "embedsMany",
       "model": "contentTypeField",
-      "foreignKey": "contentTypeId"
+      "property": "fieldList",
+      "options": {
+        "validate": false,
+        "forceId": false
+      }
     }
   },
   "acls": [],

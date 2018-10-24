@@ -12,5 +12,9 @@
     "name": "mongodb",
     "user": "",
     "connector": "mongodb"
+  },
+  "transient": {
+    "name": "transient",
+    "connector": "transient"
   }
 }

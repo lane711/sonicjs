@@ -48,7 +48,7 @@
     "public": true
   },
   "contentTypeField": {
-    "dataSource": "mongodb",
-    "public": true
+    "dataSource": "transient",
+    "public": false
   }
 }
