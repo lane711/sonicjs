@@ -26,4 +26,8 @@ export class ContentTypeEditFieldsComponent implements OnInit {
     console.log(fieldType);
     // this.contentTypesService;
   }
+
+  generateHtml(field) {
+    return this.fieldTypesService.generateHtml(field);
+  }
 }

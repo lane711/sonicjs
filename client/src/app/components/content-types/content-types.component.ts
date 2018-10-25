@@ -13,6 +13,10 @@ export class ContentTypesComponent implements OnInit {
   public contentTypes;
 
   ngOnInit() {
+    this.loadContentTypes();
+  }
+
+  loadContentTypes() {
     this.contentTypesService.getContentTypes().then(data => {
       this.contentTypes = data;
     });

@@ -122,4 +122,10 @@ export class FieldTypesService {
   public getSlug(id = "notDefined", placeholder = "", css = "") {
     return `<input type="text" class="form-control" placeholder="/my-url-goes-here"  name="${id}">`;
   }
+
+  public generateHtml(field) {
+    return `<input type="text" class="form-control" placeholder="/my-url-goes-here"  name="${
+      field.id
+    }">`;
+  }
 }
