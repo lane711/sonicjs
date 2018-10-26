@@ -6,41 +6,38 @@
 
       </div>
       <div class="card-body">
-        <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
+        <!-- <form action="" method="post" enctype="multipart/form-data" class="form-horizontal"> -->
 
-          <table class="table table-responsive-sm table-striped">
-            <thead>
-              <tr>
-                <th>Label</th>
-                <th>Preview</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- {{#each contentType.fields}} -->
-              <tr *ngFor='let field of this.contentTypesService.contentType?.fields'>
-                <td>
-                  {{field.label}} ({{field.fieldType}})
-                </td>
-                <td>
-                  <div [innerHTML]="this.fieldTypesService.generateHtml(field) | safe: 'html'"></div>
-                </td>
-                <td>
-                  <!-- <a href="/admin/field-instance/{{this.fieldInstanceId}}?returnUrl={{../returnUrl}}" class="btn btn-sm btn-primary">
+        <table class="table table-responsive-sm table-striped">
+          <thead>
+            <tr>
+              <th>Label</th>
+              <th>Preview</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- {{#each contentType.fields}} -->
+            <tr *ngFor='let field of this.contentTypesService.contentType?.fields'>
+              <td>
+                {{field.label}} ({{field.fieldType}})
+              </td>
+              <td>
+                <div [innerHTML]="this.fieldTypesService.generateHtml(field) | safe: 'html'"></div>
+              </td>
+              <td>
+                <!-- <a href="/admin/field-instance/{{this.fieldInstanceId}}?returnUrl={{../returnUrl}}" class="btn btn-sm btn-primary">
                     <i class="fa fa-edit"></i>
                   </a> -->
-                  <button class="btn btn-sm btn-danger">
-                    <i class="fa fa-trash"></i>
-                  </button>
-                </td>
+                <button class="btn btn-sm btn-danger">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </td>
 
-              </tr>
-            </tbody>
-          </table>
-
-
-
-        </form>
+            </tr>
+          </tbody>
+        </table>
+        <!-- </form> -->
       </div>
       <div class="card-footer">
         <button type="button" class="btn btn-success pull-right" data-toggle="modal" data-target="#addFieldModal">

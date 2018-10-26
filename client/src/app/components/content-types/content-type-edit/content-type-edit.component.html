@@ -6,25 +6,25 @@
           <i class="fa fa-align-justify"></i> Edit Content Type
         </div>
         <div class="card-body">
-          <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
+          <!-- <form action="" method="post" enctype="multipart/form-data" class="form-horizontal"> -->
 
-            <div class="form-group row">
-              <label class="col-md-3 col-form-label" for="text-input">Title</label>
-              <div class="col-md-9">
-                <input type="text" id="text-input" name="text-input" class="form-control" placeholder="Title" value="{{this.contentTypesService.contentType?.name}}">
-                <!-- <span class="help-block">This is a help text</span> -->
-              </div>
+          <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="text-input">Title</label>
+            <div class="col-md-9">
+              <input type="text" id="text-input" name="text-input" class="form-control" placeholder="Title" value="{{this.contentTypesService.contentType?.name}}">
+              <!-- <span class="help-block">This is a help text</span> -->
             </div>
+          </div>
 
 
-            <div class="form-group row">
-              <label class="col-md-3 col-form-label" for="textarea-input">Description</label>
-              <div class="col-md-9">
-                <textarea id="textarea-input" value="{{this.contentTypesService.contentType?.description}}" name=" textarea-input"
-                  rows="3" class="form-control" placeholder="Content, text or html..."></textarea>
-              </div>
+          <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="textarea-input">Description</label>
+            <div class="col-md-9">
+              <textarea id="textarea-input" value="{{this.contentTypesService.contentType?.description}}" name=" textarea-input"
+                rows="3" class="form-control" placeholder="Content, text or html..."></textarea>
             </div>
-          </form>
+          </div>
+          <!-- </form> -->
         </div>
         <div class="card-footer">
           <button type="submit" v-on:click="saveContentType" class="btn btn-primary pull-right">

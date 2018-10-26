@@ -6,7 +6,13 @@
 
       </div>
       <div class="card-body">
-        <form id="createInstanceForm" class="form-horizontal">
+        <!-- <form id="createInstanceForm" class="form-horizontal"> -->
+        <form [formGroup]="instanceForm" (ngSubmit)="createInstance()">
+          <label>
+            First Name:
+            <input type="text" formControlName="firstName">
+          </label>
+
 
           <input type="hidden" name="contentTypeId" value="{{this.contentTypesService.contentType?.id}}" />
           <table class="table table-responsive-sm table-striped">
@@ -34,7 +40,7 @@
         </form>
       </div>
       <div class="card-footer">
-        <button type="button" class="btn btn-success pull-right">
+        <button type="button" class="btn btn-success pull-right" (click)="createInstance()">
           Create Content
         </button>
       </div>

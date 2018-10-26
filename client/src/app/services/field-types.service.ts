@@ -79,7 +79,8 @@ export class FieldTypesService {
   }
 
   public getTextbox(id = "notDefined", placeholder = "", css = "") {
-    return `<input type="text" name="${id}" class="form-control" placeholder="some text">`;
+    return '<input type="text" formControlName="title">';
+    // return `<input type="text" name="${id}" formControlName="title" class="form-control" placeholder="some text">`;
   }
 
   public getTextArea(id = "notDefined", placeholder = "", css = "") {
