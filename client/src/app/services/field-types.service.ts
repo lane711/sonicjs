@@ -11,7 +11,7 @@ export class FieldTypesService {
     var fieldTypes = [
       {
         id: "dc52ae4c-cef2-4752-9ecc-cae3b8894984",
-        name: "text",
+        name: "textBox",
         desc: "Textbox",
         generateHtml: function(id = "notDefined", placeholder = "", css = "") {
           return self.getTextbox(id, placeholder, css);
@@ -124,8 +124,12 @@ export class FieldTypesService {
   }
 
   public generateHtml(field) {
-    return `<input type="text" class="form-control" placeholder="/my-url-goes-here"  name="${
-      field.id
-    }">`;
+    let baseFieldDef = this.getTypes().find(x => x.name == field.fieldType);
+    let html = baseFieldDef.generateHtml(
+      field.id,
+      field.placeholder,
+      field.css
+    );
+    return html;
   }
 }

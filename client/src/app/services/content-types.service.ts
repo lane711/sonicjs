@@ -33,12 +33,12 @@ export class ContentTypesService {
       .toPromise()
       .then(data => {
         this.contentType = data;
-        this.addFieldsToContentType(this.contentType);
+        this.processContentTypeFields(this.contentType);
         console.log(data);
       });
   }
 
-  public addFieldsToContentType(contentType) {
+  public processContentTypeFields(contentType) {
     contentType.fields.forEach(field => {
       let fieldInstance = this.fieldTypesService
         .getTypes()
@@ -57,11 +57,11 @@ export class ContentTypesService {
       .post(environment.apiUrl + `contentTypes/`, contentType)
       .toPromise();
 
-    const addField = this.addField(newContentType.id, "textBox");
+    const addField = this.addFieldToContentType(newContentType.id, "textBox");
     return newContentType;
   }
 
-  async addField(contentTypeId, fieldType): Promise<Object> {
+  async addFieldToContentType(contentTypeId, fieldType): Promise<Object> {
     let fieldData = {
       fieldType: fieldType,
       label: "Title",

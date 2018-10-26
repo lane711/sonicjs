@@ -23,7 +23,7 @@
                   {{field.label}} ({{field.fieldType}})
                 </td>
                 <td>
-                  <div [innerHTML]="generateHtml(field) | safe: 'html'"></div>
+                  <div [innerHTML]="this.fieldTypesService.generateHtml(field) | safe: 'html'"></div>
                 </td>
                 <td>
                   <!-- <a href="/admin/field-instance/{{this.fieldInstanceId}}?returnUrl={{../returnUrl}}" class="btn btn-sm btn-primary">
@@ -35,7 +35,6 @@
                 </td>
 
               </tr>
-              <!-- {{/each}} -->
             </tbody>
           </table>
 

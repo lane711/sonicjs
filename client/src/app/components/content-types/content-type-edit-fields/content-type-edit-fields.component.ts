@@ -24,10 +24,10 @@ export class ContentTypeEditFieldsComponent implements OnInit {
 
   public addField(event, fieldType) {
     console.log(fieldType);
-    // this.contentTypesService;
-  }
-
-  generateHtml(field) {
-    return this.fieldTypesService.generateHtml(field);
+    this.contentTypesService.addFieldToContentType(
+      this.contentTypesService.contentType.id,
+      fieldType.name
+    );
+    //close modal
   }
 }

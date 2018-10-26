@@ -1,3 +1,83 @@
-<p>
-  content-type-edit-create-instance works!
-</p>
+<div class="row">
+  <div class="col-md-12">
+    <div class="card admin-create-instance">
+      <div class="card-header">
+        <i class="fa fa-align-justify"></i> Create Instance
+
+      </div>
+      <div class="card-body">
+        <form id="createInstanceForm" class="form-horizontal">
+
+          <input type="hidden" name="contentTypeId" value="{{this.contentTypesService.contentType?.id}}" />
+          <table class="table table-responsive-sm table-striped">
+            <tbody>
+              <tr>
+                <td>Title</td>
+                <td>
+                  <input type="text" name="title" placeholder="Enter content title" class="form-control">
+                </td>
+              </tr>
+              <tr>
+                <td>Url</td>
+                <td>
+                  <input type="text" name="url" placeholder="Enter content url" class="form-control">
+                </td>
+              </tr>
+              <tr *ngFor='let field of this.contentTypesService.contentType?.fields'>
+                <td>{{field.label}} {{field.fieldType}}</td>
+                <td>
+                  <div [innerHTML]="this.fieldTypesService.generateHtml(field) | safe: 'html'"></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
+      <div class="card-footer">
+        <button type="button" class="btn btn-success pull-right">
+          Create Content
+        </button>
+      </div>
+    </div>
+
+  </div>
+  <!--/.col-->
+</div>
+
+
+<!-- <script type="text/javascript">
+  var addContent = new Vue({
+    el: '.admin-create-instance',
+    data: {
+      title: '',
+      description: '',
+      debug: true,
+      domain: '',
+      ajaxRequest: false,
+      postResults: []
+    },
+    // define methods under the `methods` object
+    methods: {
+      addContent: function (event) {
+
+        let formData = JSON.stringify($('#createInstanceForm').serializeArray())
+        console.log(formData);
+
+        console.log('title:');
+        axios.post('/admin/content/add', {
+            formData: formData
+          })
+          .then(function (cotentTypeId) {
+            console.log(cotentTypeId.data);
+            var getUrl = window.location;
+            window.location.href = getUrl.protocol + "//" + getUrl.host + '/admin/content-types/' +
+              cotentTypeId.data;
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+
+      }
+    }
+  });
+</script> -->
