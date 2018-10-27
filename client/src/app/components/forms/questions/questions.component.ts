@@ -1,4 +1,7 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, Input } from "@angular/core";
+import { FormGroup } from "@angular/forms";
+
+import { QuestionBase } from "../../../models/question-base";
 
 @Component({
   selector: "app-questions",

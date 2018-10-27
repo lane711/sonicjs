@@ -13,7 +13,8 @@ import { QuestionService } from "../../../services/question.service";
 export class ContentTypeEditCreateInstanceComponent implements OnInit {
   constructor(
     private contentTypesService: ContentTypesService,
-    private fieldTypesService: FieldTypesService // private questionService: QuestionService
+    private fieldTypesService: FieldTypesService,
+    private questionService: QuestionService
   ) {}
 
   questions: any[];
@@ -32,6 +33,6 @@ export class ContentTypeEditCreateInstanceComponent implements OnInit {
   }
 
   loadQuestions() {
-    // this.questions = this.questionService.getQuestions();
+    this.questions = this.questionService.getQuestions();
   }
 }
