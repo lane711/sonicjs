@@ -26,7 +26,9 @@ export class ContentTypeAddComponent implements OnInit {
     const data = await this.contentTypesService
       .createContentTypeAsync(this.contentType)
       .then(data => {
-        this.router.navigate(["/content-types", data.id]);
+        if (data) {
+          // this.router.navigate(["/content-types", data.id]);
+        }
       });
   }
 

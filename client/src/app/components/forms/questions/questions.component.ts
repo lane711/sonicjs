@@ -8,7 +8,7 @@ import { QuestionBase } from "../../../models/question-base";
   templateUrl: "./questions.component.html",
   styleUrls: ["./questions.component.css"]
 })
-export class QuestionsComponent implements OnInit {
+export class QuestionsComponent {
   constructor() {}
 
   @Input()
@@ -19,5 +19,5 @@ export class QuestionsComponent implements OnInit {
     return this.form.controls[this.question.key].valid;
   }
 
-  ngOnInit() {}
+  // ngOnInit() {}
 }

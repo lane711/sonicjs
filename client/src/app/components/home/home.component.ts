@@ -10,7 +10,7 @@ export class HomeComponent implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit() {
-    tempRedirect();
+    this.tempRedirect();
   }
 
   tempRedirect() {
