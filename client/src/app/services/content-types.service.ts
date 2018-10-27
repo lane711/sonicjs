@@ -39,11 +39,13 @@ export class ContentTypesService {
   }
 
   public processContentTypeFields(contentType) {
-    contentType.fields.forEach(field => {
-      let fieldInstance = this.fieldTypesService
-        .getTypes()
-        .find(x => x.fieldType == field.fieldType);
-    });
+    if (contentType.fields) {
+      contentType.fields.forEach(field => {
+        let fieldInstance = this.fieldTypesService
+          .getTypes()
+          .find(x => x.fieldType == field.fieldType);
+      });
+    }
 
     // field.html = systemSchema
     //   .getTypes()

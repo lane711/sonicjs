@@ -18,7 +18,7 @@ export class FormsComponent implements OnInit {
   constructor(private qcs: QuestionControlService) {}
 
   ngOnInit() {
-    console.log(this.questions);
+    console.log("questions", this.questions);
     this.form = this.qcs.toFormGroup(this.questions);
   }
 
