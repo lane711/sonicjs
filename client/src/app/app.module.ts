@@ -19,6 +19,8 @@ import { ContentTypeEditPermissionsComponent } from "./components/content-types/
 import { ContentTypeEditSettingsComponent } from "./components/content-types/content-type-edit-settings/content-type-edit-settings.component";
 import { ContentTypeEditCreateInstanceComponent } from "./components/content-types/content-type-edit-create-instance/content-type-edit-create-instance.component";
 import { ContentTypeAddComponent } from "./components/content-type-add/content-type-add.component";
+import { FormsComponent } from './components/forms/forms.component';
+import { QuestionsComponent } from './components/forms/questions/questions.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +38,9 @@ import { ContentTypeAddComponent } from "./components/content-type-add/content-t
     ContentTypeEditPermissionsComponent,
     ContentTypeEditSettingsComponent,
     ContentTypeEditCreateInstanceComponent,
-    ContentTypeAddComponent
+    ContentTypeAddComponent,
+    FormsComponent,
+    QuestionsComponent
   ],
   imports: [
     BrowserModule,

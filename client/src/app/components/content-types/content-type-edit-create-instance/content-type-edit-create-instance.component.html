@@ -6,6 +6,10 @@
 
       </div>
       <div class="card-body">
+
+        <app-dynamic-form [questions]="questions"></app-dynamic-form>
+
+
         <!-- <form id="createInstanceForm" class="form-horizontal"> -->
         <form [formGroup]="instanceForm" (ngSubmit)="createInstance()">
           <label>
