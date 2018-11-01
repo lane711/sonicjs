@@ -54,10 +54,10 @@ export class ContentTypesService {
     if (contentType.fields) {
       contentType.fields.forEach(field => {
         let control = new TextboxQuestion({
-          key: "firstName",
+          key: field.id,
           label: field.label,
-          value: "BombastoXL",
-          required: false,
+          value: "",
+          required: field.required,
           order: 1
         });
         controls.push(control);
