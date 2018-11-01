@@ -34,5 +34,16 @@ export class ContentTypeEditCreateInstanceComponent implements OnInit {
 
   loadQuestions() {
     this.questions = this.questionService.getQuestions();
+    this.contentTypesService.contentTypeSubject.subscribe(data => {
+      console.log("data.controls", data.controls);
+      // this.questions = data.controls;
+    });
+    // console.log(
+    //   "this.contentTypesService.contentType.controls",
+    //   this.contentTypesService.contentType
+    // );
+    // this.questions = this.contentTypesService.contentType.controls;
+
+    console.log(this.questions);
   }
 }

@@ -19,7 +19,8 @@ export class QuestionService {
           { key: "good", value: "Good" },
           { key: "unproven", value: "Unproven" }
         ],
-        order: 3
+        order: -1,
+        required: true
       }),
 
       new TextboxQuestion({
@@ -31,9 +32,9 @@ export class QuestionService {
       }),
 
       new TextboxQuestion({
-        key: "firstName",
-        label: "First name",
-        value: "BombastoXL",
+        key: "lastName",
+        label: "Last name",
+        value: "Camp",
         required: true,
         order: 1
       }),

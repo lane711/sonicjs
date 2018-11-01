@@ -3,7 +3,10 @@ import { HttpClient } from "@angular/common/http";
 import { environment } from "../../environments/environment";
 import { HttpHeaders, HttpErrorResponse } from "@angular/common/http";
 import { FieldTypesService } from "./field-types.service";
-
+import { QuestionBase } from "../models/question-base";
+import { TextboxQuestion } from "../models/question-textbox";
+import { DropdownQuestion } from "../models/question-dropdown";
+import { Subject } from "rxjs";
 @Injectable({
   providedIn: "root"
 })
@@ -20,6 +23,8 @@ export class ContentTypesService {
     })
   };
 
+  public contentTypeSubject = new Subject();
+
   public contentType;
 
   public getContentTypes() {
@@ -27,6 +32,11 @@ export class ContentTypesService {
   }
 
   public getContentType(id) {
+    // We subscribe to the subject
+    this.contentTypeSubject.subscribe(data => {
+      console.log("Subscriber got data >>>>> ", data);
+    });
+
     const filter = encodeURI('{"include": "fields"}');
     return this.http
       .get(environment.apiUrl + `contentTypes/${id}?filter=${filter}`)
@@ -34,24 +44,37 @@ export class ContentTypesService {
       .then(data => {
         this.contentType = data;
         this.processContentTypeFields(this.contentType);
-        console.log(data);
+        this.contentTypeSubject.next(this.contentType);
+        this.contentTypeSubject.complete();
       });
   }
 
   public processContentTypeFields(contentType) {
+    let controls: QuestionBase<any>[] = [];
+    if (contentType.fields) {
+      contentType.fields.forEach(field => {
+        let control = new TextboxQuestion({
+          key: "firstName",
+          label: field.label,
+          value: "BombastoXL",
+          required: false,
+          order: 1
+        });
+        controls.push(control);
+      });
+    }
+    contentType.controls = controls;
+    console.log(contentType);
+  }
+
+  public processContentTypeFieldsOld(contentType) {
     if (contentType.fields) {
       contentType.fields.forEach(field => {
         let fieldInstance = this.fieldTypesService
           .getTypes()
-          .find(x => x.fieldType == field.fieldType);
+          .find(x => x.name === field.fieldType);
       });
     }
-
-    // field.html = systemSchema
-    //   .getTypes()
-    //   .find(x => x.id == fieldInstance.fieldTypeId)
-    //   .generateHtml(field.fieldInstanceId);
-    // field.label = fieldInstance.label;
   }
 
   async createContentTypeAsync(contentType): Promise<Object> {
@@ -59,7 +82,7 @@ export class ContentTypesService {
       .post(environment.apiUrl + `contentTypes/`, contentType)
       .toPromise();
 
-    const addField = this.addFieldToContentType(newContentType.id, "textBox");
+    // const addField = this.addFieldToContentType(newContentType.id, "textBox");
     return newContentType;
   }
 
@@ -82,6 +105,6 @@ export class ContentTypesService {
         console.error("An error occurred:", err.error);
       });
 
-    console.log(response);
+    return "ok";
   }
 }
