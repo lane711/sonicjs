@@ -7,11 +7,11 @@
       </div>
       <div class="card-body">
 
-        <app-forms [questions]="questions"></app-forms>
+        <app-forms *ngIf="isDataAvailable" [questions]="questions"></app-forms>
 
 
         <!-- <form id="createInstanceForm" class="form-horizontal"> -->
-        <form [formGroup]="instanceForm" (ngSubmit)="createInstance()">
+        <!-- <form [formGroup]="instanceForm" (ngSubmit)="createInstance()">
           <label>
             First Name:
             <input type="text" formControlName="firstName">
@@ -41,7 +41,7 @@
               </tr>
             </tbody>
           </table>
-        </form>
+        </form> -->
       </div>
       <div class="card-footer">
         <button type="button" class="btn btn-success pull-right" (click)="createInstance()">
@@ -53,41 +53,3 @@
   </div>
   <!--/.col-->
 </div>
-
-
-<!-- <script type="text/javascript">
-  var addContent = new Vue({
-    el: '.admin-create-instance',
-    data: {
-      title: '',
-      description: '',
-      debug: true,
-      domain: '',
-      ajaxRequest: false,
-      postResults: []
-    },
-    // define methods under the `methods` object
-    methods: {
-      addContent: function (event) {
-
-        let formData = JSON.stringify($('#createInstanceForm').serializeArray())
-        console.log(formData);
-
-        console.log('title:');
-        axios.post('/admin/content/add', {
-            formData: formData
-          })
-          .then(function (cotentTypeId) {
-            console.log(cotentTypeId.data);
-            var getUrl = window.location;
-            window.location.href = getUrl.protocol + "//" + getUrl.host + '/admin/content-types/' +
-              cotentTypeId.data;
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
-
-      }
-    }
-  });
-</script> -->

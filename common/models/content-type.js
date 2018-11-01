@@ -1,7 +1,7 @@
 'use strict';
 
-module.exports = function(Contenttype) {
-  Contenttype.status = function(cb) {
+module.exports = function (Contenttype) {
+  Contenttype.status = function (cb) {
     var response = new Date();
     cb(null, response);
   };
@@ -19,11 +19,10 @@ module.exports = function(Contenttype) {
     }
   );
 
-  Contenttype.getName = function(id, cb) {
-    Contenttype.findById(id, function(err, instance) {
+  Contenttype.getName = function (id, cb) {
+    Contenttype.findById(id, function (err, instance) {
       var response = 'Name of coffee shop is ' + instance.name;
       cb(null, response);
-      console.log(response);
     });
   };
 

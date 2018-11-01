@@ -81,36 +81,3 @@
   </div>
 
 </div>
-
-<!-- <script type="text/javascript">
-  var contentTypeSave = new Vue({
-    el: '.admin-content-type-edit',
-    data: {
-      title: '{{ contentType.title }}',
-      description: '{{ contentType.description }}',
-      debug: true,
-      domain: '',
-      ajaxRequest: false,
-      postResults: []
-    },
-    // define methods under the `methods` object
-    methods: {
-      saveContentType: function (event) {
-
-        console.log('saving:' + this.title);
-        axios.post('/admin/content-types/{{contentType._id}}', {
-            title: this.title,
-            description: this.description
-          })
-          .then(function (cotentType) {
-            console.log(cotentType);
-            var getUrl = window.location;
-            window.location.href = getUrl.protocol + "//" + getUrl.host + '/admin/content-types';
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
-      }
-    }
-  })
-</script> -->

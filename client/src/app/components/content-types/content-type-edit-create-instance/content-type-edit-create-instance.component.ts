@@ -18,6 +18,7 @@ export class ContentTypeEditCreateInstanceComponent implements OnInit {
   ) {}
 
   questions: any[];
+  isDataAvailable = false;
 
   instanceForm = new FormGroup({
     title: new FormControl(),
@@ -33,17 +34,9 @@ export class ContentTypeEditCreateInstanceComponent implements OnInit {
   }
 
   loadQuestions() {
-    this.questions = this.questionService.getQuestions();
     this.contentTypesService.contentTypeSubject.subscribe(data => {
-      console.log("data.controls", data.controls);
-      // this.questions = data.controls;
+      this.questions = data.controls;
+      this.isDataAvailable = true;
     });
-    // console.log(
-    //   "this.contentTypesService.contentType.controls",
-    //   this.contentTypesService.contentType
-    // );
-    // this.questions = this.contentTypesService.contentType.controls;
-
-    console.log(this.questions);
   }
 }

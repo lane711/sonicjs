@@ -33,9 +33,9 @@ export class ContentTypesService {
 
   public getContentType(id) {
     // We subscribe to the subject
-    this.contentTypeSubject.subscribe(data => {
-      console.log("Subscriber got data >>>>> ", data);
-    });
+    // this.contentTypeSubject.subscribe(data => {
+    //   console.log("Subscriber got data >>>>> ", data);
+    // });
 
     const filter = encodeURI('{"include": "fields"}');
     return this.http
@@ -64,7 +64,6 @@ export class ContentTypesService {
       });
     }
     contentType.controls = controls;
-    console.log(contentType);
   }
 
   public processContentTypeFieldsOld(contentType) {
