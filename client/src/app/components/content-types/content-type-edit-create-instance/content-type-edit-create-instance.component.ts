@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from "@angular/core";
 import { ContentTypesService } from "../../../services/content-types.service";
 import { FieldTypesService } from "../../../services/field-types.service";
-import { FormControl, FormGroup } from "@angular/forms";
+import { FormControl, FormGroup, NgControlStatus } from "@angular/forms";
 import { QuestionService } from "../../../services/question.service";
 
 @Component({
@@ -17,7 +17,7 @@ export class ContentTypeEditCreateInstanceComponent implements OnInit {
     private questionService: QuestionService
   ) {}
 
-  questions: any[];
+  questions: any;
   isDataAvailable = false;
 
   instanceForm = new FormGroup({
@@ -25,7 +25,14 @@ export class ContentTypeEditCreateInstanceComponent implements OnInit {
     firstName: new FormControl()
   });
   ngOnInit() {
-    this.loadQuestions();
+    console.log("ContentTypeEditCreateInstanceComponent:OnInit");
+    console.log("questions", this.questions);
+
+    if (this.contentTypesService.contentType) {
+      this.setQuestions(this.contentTypesService.contentType.controls);
+    } else {
+      this.loadQuestions();
+    }
   }
 
   createInstance() {
@@ -35,8 +42,13 @@ export class ContentTypeEditCreateInstanceComponent implements OnInit {
 
   loadQuestions() {
     this.contentTypesService.contentTypeSubject.subscribe(data => {
-      this.questions = data.controls;
-      this.isDataAvailable = true;
+      console.log("ContentTypeEditCreateInstanceComponent.sub arrived:", data);
+      this.setQuestions(data.controls);
     });
+  }
+
+  setQuestions(questions) {
+    this.questions = questions;
+    this.isDataAvailable = true;
   }
 }

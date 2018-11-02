@@ -7,6 +7,7 @@ import { QuestionBase } from "../models/question-base";
 import { TextboxQuestion } from "../models/question-textbox";
 import { DropdownQuestion } from "../models/question-dropdown";
 import { Subject } from "rxjs";
+
 @Injectable({
   providedIn: "root"
 })
@@ -23,9 +24,10 @@ export class ContentTypesService {
     })
   };
 
-  public contentTypeSubject = new Subject();
+  public contentTypeSubject = new Subject<any>();
 
-  public contentType;
+  public contentType: any;
+  public contentTypeControls: any;
 
   public getContentTypes() {
     return this.http.get(environment.apiUrl + "contentTypes").toPromise();
@@ -43,8 +45,10 @@ export class ContentTypesService {
       .toPromise()
       .then(data => {
         this.contentType = data;
-        this.processContentTypeFields(this.contentType);
-        this.contentTypeSubject.next(this.contentType);
+        this.processContentTypeFields(data);
+        console.log("contentTypeSubject:Next");
+        this.contentTypeSubject.next(data);
+        console.log("contentTypeSubject:complete");
         this.contentTypeSubject.complete();
       });
   }
@@ -93,17 +97,23 @@ export class ContentTypesService {
       required: false
     };
 
-    let response = await this.http
+    return this.http
       .post(
         environment.apiUrl + `contentTypes/${contentTypeId}/fields`,
         fieldData,
         this.httpOptions
       )
-      .toPromise()
-      .catch((err: HttpErrorResponse) => {
-        console.error("An error occurred:", err.error);
-      });
+      .toPromise();
 
-    return "ok";
+    // let response = await this.http
+    //   .post(
+    //     environment.apiUrl + `contentTypes/${contentTypeId}/fields`,
+    //     fieldData,
+    //     this.httpOptions
+    //   )
+    //   .toPromise()
+    //   .catch((err: HttpErrorResponse) => {
+    //     console.error("An error occurred:", err.error);
+    //   });
   }
 }
