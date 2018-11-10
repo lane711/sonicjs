@@ -24,6 +24,9 @@ export class ContentTypesService {
     })
   };
 
+  //TODO; try below and remove isdataavilable flag
+  // public contentTypeSubject = new BehaviorSubject(this.contentType);
+
   public contentTypeSubject = new Subject<any>();
 
   public contentType: any;

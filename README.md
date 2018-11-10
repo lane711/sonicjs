@@ -83,6 +83,8 @@ I started this project because I have established a recent affinity to NodeJs al
 1. Install dependencies with `npm install`
 1. To run the app: `npm start`
 1. To Debug the app: Use the built in debug from VS Code
+1. `cd client`
+1. `ng serve`
 
 ## Sponsers
 

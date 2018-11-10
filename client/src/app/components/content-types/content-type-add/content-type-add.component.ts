@@ -23,7 +23,7 @@ export class ContentTypeAddComponent implements OnInit {
   ngOnInit() {}
 
   async createContentType() {
-    const data = await this.contentTypesService
+    const data = this.contentTypesService
       .createContentTypeAsync(this.contentType)
       .then(data => {
         if (data) {
