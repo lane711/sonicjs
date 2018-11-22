@@ -34,17 +34,24 @@ export class ContentTypeEditFieldsComponent implements OnInit {
       )
       .then(() => {
         console.log("routing to" + this.contentTypesService.contentType.id);
-        self.router.navigate([
-          "/content-types",
-          self.contentTypesService.contentType.id
-        ]);
+        self.refresh();
       });
   }
 
-  public refresh(event, fieldType) {
-    this.router.navigate([
-      "/content-types",
-      this.contentTypesService.contentType.id
-    ]);
+  public deleteField(fieldId) {
+    const self = this;
+    this.contentTypesService
+      .deleteFieldFromContentType(
+        this.contentTypesService.contentType.id,
+        fieldId
+      )
+      .then(() => {
+        self.refresh();
+      });
+  }
+
+  public refresh() {
+    //TODO: we shouldn't need to fully reload the page, just the data
+    location.reload();
   }
 }

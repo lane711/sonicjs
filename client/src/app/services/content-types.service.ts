@@ -119,4 +119,12 @@ export class ContentTypesService {
     //     console.error("An error occurred:", err.error);
     //   });
   }
+
+  async deleteFieldFromContentType(contentTypeId, fieldId): Promise<Object> {
+    return this.http
+      .delete(
+        environment.apiUrl + `contentTypes/${contentTypeId}/fields/${fieldId}`
+      )
+      .toPromise();
+  }
 }
