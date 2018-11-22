@@ -15,7 +15,9 @@ export class ContentTypesService {
   constructor(
     private http: HttpClient,
     private fieldTypesService: FieldTypesService
-  ) {}
+  ) {
+    this.onCreateContentTypeInstanceSubmit();
+  }
 
   httpOptions = {
     headers: new HttpHeaders({
@@ -28,12 +30,20 @@ export class ContentTypesService {
   // public contentTypeSubject = new BehaviorSubject(this.contentType);
 
   public contentTypeSubject = new Subject<any>();
+  public createContentTypeInstanceSubmitSubject = new Subject<any>();
 
   public contentType: any;
   public contentTypeControls: any;
+  public contentInstance: any;
 
   public getContentTypes() {
     return this.http.get(environment.apiUrl + "contentTypes").toPromise();
+  }
+
+  onCreateContentTypeInstanceSubmit() {
+    this.createContentTypeInstanceSubmitSubject.subscribe(data => {
+      console.log("formSubmittedSubject arrived:", data);
+    });
   }
 
   public getContentType(id) {

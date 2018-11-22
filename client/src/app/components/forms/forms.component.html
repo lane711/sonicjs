@@ -6,14 +6,19 @@
     </div>
 
     <div class="form-group row">
-      <button type="submit" [disabled]="!form.valid">Save</button>
+      <button type="button" class="btn btn-success" type="submit" [disabled]="!form.valid">
+        Save
+      </button>
     </div>
+
   </form>
 
   <div *ngIf="payLoad" class="form-row">
     <strong>Saved the following values</strong><br>{{payLoad}}
   </div>
 </div>
+
+
 
 
 <!-- <div class="form-horizontal">

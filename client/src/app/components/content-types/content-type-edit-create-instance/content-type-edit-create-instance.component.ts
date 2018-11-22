@@ -35,8 +35,15 @@ export class ContentTypeEditCreateInstanceComponent implements OnInit {
     }
   }
 
+  subscribeOnFormSubmit() {
+    // this.formsComponent.formSubmittedSubject.subscribe(data => {
+    //   console.log("formsComponent.formSubmittedSubject arrived:", data);
+    // });
+  }
+
   createInstance() {
     // TODO: Use EventEmitter with form value
+    console.log(this.contentTypesService.contentInstance);
     console.warn(this.instanceForm.value);
   }
 
