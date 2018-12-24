@@ -9,7 +9,7 @@ Site Den is a content management system built on the following tech stack:
 - NodeJs
 - Mongo DB
 - Express
-- Handlebars
+- Angular
 - Bootstrap 4
 
 ## Table of Contents
