@@ -42,7 +42,10 @@ export class ContentTypesService {
 
   onCreateContentTypeInstanceSubmit() {
     this.createContentTypeInstanceSubmitSubject.subscribe(data => {
-      console.log("formSubmittedSubject arrived:", data);
+      console.log("onCreateContentTypeInstanceSubmit Subject arrived:", data);
+      this.createContentTypeAsync(data).then(data => {
+        alert(data);
+      });
     });
   }
 
@@ -83,15 +86,15 @@ export class ContentTypesService {
     contentType.controls = controls;
   }
 
-  public processContentTypeFieldsOld(contentType) {
-    if (contentType.fields) {
-      contentType.fields.forEach(field => {
-        let fieldInstance = this.fieldTypesService
-          .getTypes()
-          .find(x => x.name === field.fieldType);
-      });
-    }
-  }
+  // public processContentTypeFieldsOld(contentType) {
+  //   if (contentType.fields) {
+  //     contentType.fields.forEach(field => {
+  //       let fieldInstance = this.fieldTypesService
+  //         .getTypes()
+  //         .find(x => x.name === field.fieldType);
+  //     });
+  //   }
+  // }
 
   async createContentTypeAsync(contentType): Promise<Object> {
     const newContentType = await this.http

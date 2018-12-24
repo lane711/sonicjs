@@ -15,5 +15,6 @@ export class HomeComponent implements OnInit {
 
   tempRedirect() {
     this.router.navigate(["/content-types", "5bd11e3ac34cad14b0afb0db"]);
+    this.router.navigate(["/content-types", "add"]);
   }
 }

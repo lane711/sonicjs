@@ -11,8 +11,8 @@
           <div class="form-group row">
             <label class="col-md-3 col-form-label" for="text-input">Title</label>
             <div class="col-md-9">
-              <input type="text" id="text-input" name="text-input" class="form-control" placeholder="Blog, Article, Product, etc"
-                formControl="contentType.name">
+              <!-- <input type="text" id="text-input" name="text-input" class="form-control" placeholder="Blog, Article, Product, etc"
+                formControl="contentType.name"> -->
             </div>
           </div>
 
@@ -20,11 +20,13 @@
           <div class="form-group row">
             <label class="col-md-3 col-form-label" for="textarea-input">Description</label>
             <div class="col-md-9">
-              <textarea id="textarea-input" name=" textarea-input" rows="3" class="form-control" [formControl]="contentType.description"
-                placeholder="The Blog content type is used for..."></textarea>
+              <!-- <textarea id="textarea-input" name=" textarea-input" rows="3" class="form-control" [formControl]="contentType.description"
+                placeholder="The Blog content type is used for..."></textarea> -->
             </div>
           </div>
           <!-- </form> -->
+          <hr>
+          <app-forms *ngIf="isDataAvailable" [questions]="questions" [submitHandler]="submitHandlerContentTypeAdd"></app-forms>
         </div>
         <div class="card-footer">
           <button type="submit" (click)="createContentType()" class="btn btn-primary pull-right">

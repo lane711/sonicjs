@@ -49,7 +49,7 @@ export class ContentTypeEditCreateInstanceComponent implements OnInit {
 
   loadQuestions() {
     this.contentTypesService.contentTypeSubject.subscribe(data => {
-      console.log("ContentTypeEditCreateInstanceComponent.sub arrived:", data);
+      console.log(data);
       this.setQuestions(data.controls);
     });
   }
