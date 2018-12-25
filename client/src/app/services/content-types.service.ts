@@ -102,11 +102,11 @@ export class ContentTypesService {
       .post(environment.apiUrl + `contentTypes/`, contentTypeJson)
       .toPromise();
 
-    // const addField = this.addFieldToContentType(newContentType.id, "textBox");
+    const addField = this.addFieldToContentType(newContentType, "textBox");
     return newContentType;
   }
 
-  async addFieldToContentType(contentTypeId, fieldType): Promise<Object> {
+  async addFieldToContentType(contentType, fieldType): Promise<Object> {
     let fieldData = {
       fieldType: fieldType,
       label: "Title",
@@ -114,9 +114,9 @@ export class ContentTypesService {
       required: false
     };
 
-    return this.http
+    return await this.http
       .post(
-        environment.apiUrl + `contentTypes/${contentTypeId}/fields`,
+        environment.apiUrl + `contentTypes/${contentType.id}/fields`,
         fieldData,
         this.httpOptions
       )
