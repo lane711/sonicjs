@@ -79,6 +79,7 @@ I started this project because I have established a recent affinity to NodeJs al
 ## Setup
 
 1. Make sure Mongo Db is running: `mongod`
+1. Install Angular Tools with `npm install -g @angular/cli`
 1. Edit the `mongoUrl` and `dbName` setting in `/routes/mongo-dal.js`
 1. Install dependencies with `npm install`
 1. To run the app: `npm start`

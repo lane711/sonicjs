@@ -50,7 +50,7 @@ export class ContentTypeAddComponent implements OnInit {
       console.log("payload", payload);
 
       this.contentTypesService.createContentTypeInstanceSubmitSubject.next(
-        JSON.stringify(payload)
+        payload
       );
 
       // this.contentTypesService

@@ -44,7 +44,7 @@ export class ContentTypesService {
     this.createContentTypeInstanceSubmitSubject.subscribe(data => {
       console.log("onCreateContentTypeInstanceSubmit Subject arrived:", data);
       this.createContentTypeAsync(data).then(data => {
-        alert(data);
+        //alert(data);
       });
     });
   }
@@ -97,8 +97,9 @@ export class ContentTypesService {
   // }
 
   async createContentTypeAsync(contentType): Promise<Object> {
+    let contentTypeJson = JSON.parse(contentType);
     const newContentType = await this.http
-      .post(environment.apiUrl + `contentTypes/`, contentType)
+      .post(environment.apiUrl + `contentTypes/`, contentTypeJson)
       .toPromise();
 
     // const addField = this.addFieldToContentType(newContentType.id, "textBox");
