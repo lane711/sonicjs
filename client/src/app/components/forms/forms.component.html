@@ -1,24 +1,30 @@
-<div>
+
   <form (ngSubmit)="onSubmit()" [formGroup]="form" class="form-horizontal">
+<div class="card-body">
+  <div *ngFor="let question of questions">
+    <app-questions [question]="question" [form]="form" style="width:100%"></app-questions>
+  </div></div>
+<div class="card-footer">
+  <button type="button" class="btn btn-success" type="submit" [disabled]="!form.valid" class="btn btn-primary pull-right">
+    Save
+  </button>
+  <button type="reset" (click)="back()" class="btn btn-warning">
+    Cancel</button>
+</div>
+</form>
 
-    <div *ngFor="let question of questions">
-      <app-questions [question]="question" [form]="form" style="width:100%"></app-questions>
-    </div>
-
-    <div class="form-group row">
-      <button type="button" class="btn btn-success" type="submit" [disabled]="!form.valid">
-        Save
-      </button>
-    </div>
-
-  </form>
 
   <div *ngIf="payLoad" class="form-row">
     <strong>Saved the following values</strong><br>{{payLoad}}
   </div>
-</div>
 
-
+<!-- 
+  <div class="card-footer">
+    <button type="submit" (click)="createContentType()" class="btn btn-primary pull-right">
+      Next</button>
+    <button type="reset" (click)="back()" class="btn btn-warning">
+      Cancel</button>
+  </div> -->
 
 
 <!-- <div class="form-horizontal">
