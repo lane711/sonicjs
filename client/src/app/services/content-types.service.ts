@@ -30,7 +30,8 @@ export class ContentTypesService {
   // public contentTypeSubject = new BehaviorSubject(this.contentType);
 
   public contentTypeSubject = new Subject<any>();
-  public createContentTypeInstanceSubmitSubject = new Subject<any>();
+  public contentTypeSubmitted = new Subject<any>();
+  public contentTypeCreated = new Subject<any>();
 
   public contentType: any;
   public contentTypeControls: any;
@@ -41,10 +42,11 @@ export class ContentTypesService {
   }
 
   onCreateContentTypeInstanceSubmit() {
-    this.createContentTypeInstanceSubmitSubject.subscribe(data => {
+    this.contentTypeSubmitted.subscribe(data => {
       console.log("onCreateContentTypeInstanceSubmit Subject arrived:", data);
       this.createContentTypeAsync(data).then(data => {
-        //alert(data);
+        this.contentTypeCreated.next(data);
+        return data;
       });
     });
   }

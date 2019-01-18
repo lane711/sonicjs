@@ -14,7 +14,7 @@ export class FormsComponent implements OnInit {
   @Input()
   questions: QuestionBase<any>[] = [];
   @Input()
-  submitHandler: any;
+  onSubmitHandler: any;
   form: FormGroup;
   payLoad = "";
 
@@ -30,7 +30,7 @@ export class FormsComponent implements OnInit {
   onSubmit() {
     this.payLoad = JSON.stringify(this.form.value);
     //delagate back to the calling component
-    this.submitHandler(this.payLoad);
+    this.onSubmitHandler(this.payLoad);
     // this.contentTypesService.contentInstance = JSON.stringify(this.form.value);
     // this.contentTypesService.createContentTypeInstanceSubmitSubject.next(
     //   JSON.stringify(this.form.value)

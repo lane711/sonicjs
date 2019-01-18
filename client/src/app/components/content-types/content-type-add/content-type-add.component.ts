@@ -20,7 +20,7 @@ export class ContentTypeAddComponent implements OnInit {
     new TextboxQuestion({
       key: "name",
       label: "Name",
-      required: true,
+      required: false,
       order: 1
     }),
 
@@ -30,11 +30,6 @@ export class ContentTypeAddComponent implements OnInit {
       order: 2
     }),
 
-    new TextboxQuestion({
-      key: "test",
-      label: "test",
-      order: 3
-    })
   ];
 
   constructor(
@@ -43,25 +38,23 @@ export class ContentTypeAddComponent implements OnInit {
     private router: Router
   ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+          
+    this.contentTypesService.contentTypeCreated.subscribe(data => {
+      this.router.navigate(["/content-types", data.id]);
+    });
+  }
 
-  submitHandlerContentTypeAdd(payload) {
+  onSubmitContentTypeAdd(payload) {
     if (payload) {
       console.log("payload", payload);
 
-      this.contentTypesService.createContentTypeInstanceSubmitSubject.next(
+      this.contentTypesService.contentTypeSubmitted.next(
         payload
       );
-
-      // this.contentTypesService
-      //   .createContentTypeAsync(this.contentType)
-      //   .then(data => {
-      //     if (data) {
-      //       // this.router.navigate(["/content-types", data.id]);
-      //     }
-      //   });
     }
   }
+
 
   back() {
     this.location.back();

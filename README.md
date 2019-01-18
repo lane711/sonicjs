@@ -87,6 +87,10 @@ I started this project because I have established a recent affinity to NodeJs al
 1. `cd client`
 1. `ng serve`
 
+##Debugging
+
+1. From VS Code Extension, install the Debugger for Chrome extension 
+
 ## Sponsers
 
 This Project is supported by [Surge](https://www.surgeforward.com/)
