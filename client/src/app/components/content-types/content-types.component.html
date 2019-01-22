@@ -5,6 +5,8 @@
       <a [routerLink]="['/content-types', 'add']" class="btn btn-primary float-right">New Content Type</a>
     </div>
     <div class="card-body page-list">
+        <button class="btn btn-secondary" type="button" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus.">Popover on bottom</button>
+
       <table class="table table-responsive-sm table-striped">
         <thead>
           <tr>
@@ -19,11 +21,13 @@
             <td>{{ contentType.description}}</td>
             <td>
               <span class="badge badge-success">Active</span>
+              <a class="btn btn-sm btn-primary" [routerLink]="['/content-types', contentType.id]">Edit</a>
               <button class="btn btn-sm btn-danger">Delete</button>
             </td>
           </tr>
         </tbody>
       </table>
+
       <!-- <ul class="pagination">
                 <li class="page-item">
                   <a class="page-link" href="#">Prev</a>
@@ -47,3 +51,4 @@
     </div>
   </div>
 </div>
+<script src="/assets/js/popovers.js"></script>
