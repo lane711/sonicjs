@@ -1,4 +1,4 @@
-# Visit SiteDe.com for Details, Videos & Docs
+# Visit SiteDen.com for Details, Videos & Docs
 [https://siteden.com](https://siteden.com)
 
 # Site Den NodeJs Content Management System (CMS)
