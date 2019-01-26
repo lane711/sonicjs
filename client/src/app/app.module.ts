@@ -20,6 +20,7 @@ import { ContentTypeEditSettingsComponent } from "./components/content-types/con
 import { ContentTypeEditCreateInstanceComponent } from "./components/content-types/content-type-edit-create-instance/content-type-edit-create-instance.component";
 import { FormsComponent } from "./components/forms/forms.component";
 import { QuestionsComponent } from "./components/forms/questions/questions.component";
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -44,7 +45,8 @@ import { QuestionsComponent } from "./components/forms/questions/questions.compo
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgbModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,3 +1,4 @@
+
 import { Component, OnInit } from "@angular/core";
 import { DeprecatedI18NPipesModule } from "@angular/common";
 import { ContentTypesService } from "../../services/content-types.service";
