@@ -22,4 +22,8 @@ export class ContentTypesComponent implements OnInit {
       this.contentTypes = data;
     });
   }
+
+  deleteContentType(id){
+    alert(id);
+  }
 }

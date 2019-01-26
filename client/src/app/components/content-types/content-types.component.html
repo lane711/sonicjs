@@ -5,20 +5,6 @@
       <a [routerLink]="['/content-types', 'add']" class="btn btn-primary float-right">New Content Type</a>
     </div>
     <div class="card-body page-list">
-        <button class="btn btn-secondary" type="button" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus.">Popover on bottom</button>
-
-        <p>
-          Popovers can contain any arbitrary HTML, Angular bindings and even directives!
-          Simply enclose desired content or title in a <code>&lt;ng-template&gt;</code> element.
-        </p>
-        
-        <ng-template #popContent>Hello, <b>{{name}}</b>!</ng-template>
-        <ng-template #popTitle>Fancy <b>content!!</b></ng-template>
-        <button type="button" class="btn btn-outline-secondary" [ngbPopover]="popContent" [popoverTitle]="popTitle">
-          I've got markup and bindings in my popover!
-        </button>
-
-        
       <table class="table table-responsive-sm table-striped">
         <thead>
           <tr>
@@ -29,12 +15,16 @@
         </thead>
         <tbody>
           <tr *ngFor="let contentType of contentTypes">
-            <td><a [routerLink]="['/content-types', contentType.id]">{{ contentType.name}}</a></td>
+            <td><a [routerLink]="['/content-types', contentType.id]">{{ contentType.name }}</a></td>
             <td>{{ contentType.description}}</td>
             <td>
               <span class="badge badge-success">Active</span>
               <a class="btn btn-sm btn-primary" [routerLink]="['/content-types', contentType.id]">Edit</a>
-              <button class="btn btn-sm btn-danger">Delete</button>
+
+              <ng-template #popTitle>Delete <b>{{ contentType.name }}</b>?</ng-template>
+              <ng-template #popContent><button class="btn btn-sm btn-danger" (click)="deleteContentType(contentType.id)">Confirm Delete</button></ng-template>
+              <button class="btn btn-sm btn-danger" placement="top"
+              [ngbPopover]="popContent" [popoverTitle]="popTitle">Delete</button>
             </td>
           </tr>
         </tbody>
