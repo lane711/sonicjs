@@ -136,6 +136,12 @@ export class ContentTypesService {
     //   });
   }
 
+  async deleteContentTypeAsync(contentTypeId): Promise<Object> {
+    return await this.http
+      .delete(environment.apiUrl + `contentTypes/${contentTypeId}`)
+      .toPromise();
+  }
+
   async deleteFieldFromContentType(contentTypeId, fieldId): Promise<Object> {
     return this.http
       .delete(

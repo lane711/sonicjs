@@ -2,6 +2,7 @@
 import { Component, OnInit } from "@angular/core";
 import { DeprecatedI18NPipesModule } from "@angular/common";
 import { ContentTypesService } from "../../services/content-types.service";
+import { t } from "@angular/core/src/render3";
 
 @Component({
   selector: "app-content-types",
@@ -24,6 +25,8 @@ export class ContentTypesComponent implements OnInit {
   }
 
   deleteContentType(id){
-    alert(id);
+    this.contentTypesService.deleteContentTypeAsync(id).then(x => {
+      this.loadContentTypes();
+    });
   }
 }
