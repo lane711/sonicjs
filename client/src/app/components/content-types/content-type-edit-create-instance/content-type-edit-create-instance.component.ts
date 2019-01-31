@@ -1,5 +1,7 @@
 import { Component, OnInit, Input } from "@angular/core";
 import { ContentTypesService } from "../../../services/content-types.service";
+import { ContentService } from "../../../services/content.service";
+
 import { FieldTypesService } from "../../../services/field-types.service";
 import { FormControl, FormGroup, NgControlStatus } from "@angular/forms";
 import { QuestionService } from "../../../services/question.service";
@@ -14,7 +16,8 @@ export class ContentTypeEditCreateInstanceComponent implements OnInit {
   constructor(
     private contentTypesService: ContentTypesService,
     private fieldTypesService: FieldTypesService,
-    private questionService: QuestionService
+    private questionService: QuestionService,
+    private contentService: ContentService
   ) {}
 
   questions: any;
@@ -41,7 +44,8 @@ export class ContentTypeEditCreateInstanceComponent implements OnInit {
     // });
   }
 
-  createInstance() {
+  onSubmitContentAdd() {
+    this.contentService.createContentInstance();
     // TODO: Use EventEmitter with form value
     console.log(this.contentTypesService.contentInstance);
     console.warn(this.instanceForm.value);

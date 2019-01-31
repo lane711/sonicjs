@@ -6,7 +6,7 @@
 
       </div>
       <div class="card-body">
-        <app-forms *ngIf="isDataAvailable" [questions]="questions"></app-forms>
+        <app-forms *ngIf="isDataAvailable" [questions]="questions" [onSubmitHandler]="onSubmitContentAdd"></app-forms>
 
 
         <!-- <form id="createInstanceForm" class="form-horizontal"> -->

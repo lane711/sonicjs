@@ -108,7 +108,7 @@ export class ContentTypesService {
     return newContentType;
   }
 
-  async addFieldToContentType(contentType, fieldType): Promise<Object> {
+  async addFieldToContentType(contentTypeId, fieldType): Promise<Object> {
     let fieldData = {
       fieldType: fieldType,
       label: "Title",
@@ -118,7 +118,7 @@ export class ContentTypesService {
 
     return await this.http
       .post(
-        environment.apiUrl + `contentTypes/${contentType.id}/fields`,
+        environment.apiUrl + `contentTypes/${contentTypeId}/fields`,
         fieldData,
         this.httpOptions
       )

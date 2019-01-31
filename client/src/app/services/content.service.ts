@@ -6,4 +6,8 @@ import { Injectable } from '@angular/core';
 export class ContentService {
 
   constructor() { }
+
+  public createContentInstance() {
+    console.log('creating new contnet');
+  }
 }
