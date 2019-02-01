@@ -15,6 +15,7 @@ const routes: Routes = [
   { path: "content-types/add", component: ContentTypeAddComponent },
   { path: "content-types/:id", component: ContentTypeEditComponent },
   { path: "content", component: ContentComponent }
+
 ];
 
 @NgModule({
