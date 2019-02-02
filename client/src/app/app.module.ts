@@ -21,6 +21,7 @@ import { ContentTypeEditCreateInstanceComponent } from "./components/content-typ
 import { FormsComponent } from "./components/forms/forms.component";
 import { QuestionsComponent } from "./components/forms/questions/questions.component";
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { PagesComponent } from './components/pages/pages.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     ContentTypeEditCreateInstanceComponent,
     ContentTypeAddComponent,
     FormsComponent,
-    QuestionsComponent
+    QuestionsComponent,
+    PagesComponent
   ],
   imports: [
     BrowserModule,
