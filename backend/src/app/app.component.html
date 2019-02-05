@@ -5,6 +5,8 @@
   <a class="navbar-brand" href="#">
     <img class="navbar-brand-full" src="/assets/img/siteden-nodejs-logo.png" height="40" alt="CoreUI Logo">
     <img class="navbar-brand-minimized" src="/assets/img/siteden-nodejs-logo.png" height="30" alt="CoreUI Logo">
+    {{test | safe: 'html'}}
+    <div ng-bind-html="test | safe: 'html'"></div>
   </a>
   <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button" data-toggle="sidebar-lg-show">
     <span class="navbar-toggler-icon"></span>
