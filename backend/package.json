@@ -35,6 +35,7 @@
     "popper.js": "1.14.4",
     "rxjs": "~6.2.0",
     "simple-line-icons": "2.4.1",
+    "siteden": "^1.0.0",
     "zone.js": "~0.8.26"
   },
   "devDependencies": {
