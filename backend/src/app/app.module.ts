@@ -21,6 +21,7 @@ import { FormsComponent } from "./components/forms/forms.component";
 import { QuestionsComponent } from "./components/forms/questions/questions.component";
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PagesComponent } from './components/pages/pages.component';
+import { ContentTypeEditFieldComponent } from './components/content-types/content-type-edit-field/content-type-edit-field.component';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { PagesComponent } from './components/pages/pages.component';
     ContentTypeAddComponent,
     FormsComponent,
     QuestionsComponent,
-    PagesComponent
+    PagesComponent,
+    ContentTypeEditFieldComponent
   ],
   imports: [
     BrowserModule,

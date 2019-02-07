@@ -5,8 +5,6 @@
   <a class="navbar-brand" href="#">
     <img class="navbar-brand-full" src="/assets/img/siteden-nodejs-logo.png" height="40" alt="CoreUI Logo">
     <img class="navbar-brand-minimized" src="/assets/img/siteden-nodejs-logo.png" height="30" alt="CoreUI Logo">
-    {{test | safe: 'html'}}
-    <div ng-bind-html="test | safe: 'html'"></div>
   </a>
   <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button" data-toggle="sidebar-lg-show">
     <span class="navbar-toggler-icon"></span>
@@ -146,6 +144,7 @@
     </ul>
     <!-- Tab panes-->
     <div class="tab-content">
+      <app-content-type-edit-field></app-content-type-edit-field>
       <div class="tab-pane active" id="timeline" role="tabpanel">
         <div class="list-group list-group-accent">
           <div class="list-group-item list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">Today</div>

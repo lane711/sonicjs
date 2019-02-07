@@ -11,6 +11,7 @@
         <table class="table table-responsive-sm table-striped">
           <thead>
             <tr>
+              <th>Type</th>
               <th>Label</th>
               <th>Preview</th>
               <th></th>
@@ -20,15 +21,22 @@
             <!-- {{#each contentType.fields}} -->
             <tr *ngFor='let field of this.contentTypesService.contentType?.fields'>
               <td>
-                {{field.label}} ({{field.fieldType}})
+                {{field.fieldType}}
+              </td>
+              <td>
+                  {{field.label}}
+                <!-- <input type="text" #labelInput class="form-control" placeholder="Label goes here" (blur)="saveLabel(field, labelInput.value)" value="{{field.label}}"> -->
               </td>
               <td>
                 <div [innerHTML]="this.fieldTypesService.generateHtml(field) | safe: 'html'"></div>
               </td>
               <td>
-                <!-- <a href="/admin/field-instance/{{this.fieldInstanceId}}?returnUrl={{../returnUrl}}" class="btn btn-sm btn-primary">
-                    <i class="fa fa-edit"></i>
-                  </a> -->
+                  <button (click)="goToFieldEdit(field.id)"  data-toggle="aside-menu-lg-show" class="btn btn-sm btn-success rmargin aside-menu-toggler">
+                    <i class="fa fa-pencil"></i>
+                  </button>
+                <a href="/admin/content-types/{{this.contentTypesService.contentType.id}}/fieldId/{{field.id}}" data-toggle="aside-menu-lg-show" class="btn btn-sm btn-primary rmargin aside-menu-toggler">
+                    <i class="fa fa-pencil"></i>
+                  </a>
                 <button class="btn btn-sm btn-danger" (click)="deleteField(field.id)">
                   <i class="fa fa-trash"></i>
                 </button>
@@ -37,6 +45,8 @@
             </tr>
           </tbody>
         </table>
+
+        <button _ngcontent-c0="" class="navbar-toggler aside-menu-toggler d-md-down-none" data-toggle="aside-menu-lg-show" type="button"><span _ngcontent-c0="" class="navbar-toggler-icon"><click to open</span></button>
         <!-- </form> -->
       </div>
       <div class="card-footer">

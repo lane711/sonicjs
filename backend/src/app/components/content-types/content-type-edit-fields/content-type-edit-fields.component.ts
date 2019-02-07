@@ -50,8 +50,21 @@ export class ContentTypeEditFieldsComponent implements OnInit {
       });
   }
 
+  public saveLabel(id, newLabel){
+    this.contentTypesService.getContentType(id).then(data =>{
+      console.log('updating field for:', data);
+    });
+  }
+
   public refresh() {
     //TODO: we shouldn't need to fully reload the page, just the data
     location.reload();
+  }
+
+  goToFieldEdit(fieldId){
+    this.router.navigate(
+      ['/admin/content-types/' + this.contentTypesService.contentType.id], 
+      { queryParams: { 'fieldId': fieldId } }
+  );
   }
 }

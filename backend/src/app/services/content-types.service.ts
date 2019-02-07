@@ -108,6 +108,12 @@ export class ContentTypesService {
     return newContentType;
   }
 
+  async putContentTypeAsync(contentType): Promise<Object> {
+    return this.http
+      .put(environment.apiUrl + `contentTypes/`, contentType)
+      .toPromise();
+  }
+
   async addFieldToContentType(contentTypeId, fieldType): Promise<Object> {
     let fieldData = {
       fieldType: fieldType,

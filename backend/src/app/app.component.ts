@@ -7,5 +7,4 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'client';
-  test = '<h1>injected</h1>';
 }
