@@ -29,7 +29,6 @@ export class ContentTypeAddComponent implements OnInit {
       label: "Description",
       order: 2
     }),
-
   ];
 
   constructor(

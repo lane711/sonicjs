@@ -3,4 +3,5 @@
   this will edit the field<br>
   content type: {{this.contentTypesService.contentType?.name}}<br>
   field id: {{fieldId}}
+  <app-forms *ngIf="isDataAvailable" [questions]="questions" [onSubmitHandler]="onSubmitFieldEdit"></app-forms>
 </p>

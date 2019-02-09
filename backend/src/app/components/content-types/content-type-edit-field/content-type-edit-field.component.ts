@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from "@angular/router";
 import { ContentTypesService } from "../../../services/content-types.service";
+import { TextboxQuestion } from "../../../models/question-textbox";
+import { DropdownQuestion } from "../../../models/question-dropdown";
 
 @Component({
   selector: 'app-content-type-edit-field',
@@ -14,6 +16,24 @@ export class ContentTypeEditFieldComponent implements OnInit {
   fieldId: string;
   field: any;
 
+  isDataAvailable = false;
+  questions = [
+    new TextboxQuestion({
+      key: "label",
+      label: "Label",
+      value: "my lable",
+      required: false,
+      order: 1
+    }),
+
+    new DropdownQuestion({
+      key: "isRequired",
+      label: "Required",
+      options: [{ key: "true", value: "true" }, { key: "false", value: "false" }],
+      order: 2
+    }),
+  ];
+
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
         this.fieldId = params['fieldId'];
@@ -22,7 +42,26 @@ export class ContentTypeEditFieldComponent implements OnInit {
   }
 
 loadField(fieldId){
-  console.log(this.contentTypesService.contentType);
+  this.contentTypesService.contentTypeSubject.subscribe(data => {
+    if(fieldId){
+      console.log('loadField.contentType', this.contentTypesService.contentType);
+      this.field = this.contentTypesService.contentType.fieldList.filter(field => field.id === fieldId);
+      console.log('loadField->field', this.field);
+      this.questions[0].value = this.field[0].label;
+      this.isDataAvailable = true;
+    }
+  });
+
+}
+
+onSubmitFieldEdit(payload){
+  if (payload) {
+    console.log("payload", payload);
+
+    this.contentTypesService.contentTypeSubmitted.next(
+      payload
+    );
+  }
 }
 
 }
