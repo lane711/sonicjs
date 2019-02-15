@@ -19,6 +19,7 @@
           </thead>
           <tbody>
             <!-- {{#each contentType.fields}} -->
+            <button (click)="toggleTest()" >Toggle Test</button>
             <tr *ngFor='let field of this.contentTypesService.contentType?.fields'>
               <td>
                 {{field.fieldType}}
@@ -31,12 +32,9 @@
                 <div [innerHTML]="this.fieldTypesService.generateHtml(field) | safe: 'html'"></div>
               </td>
               <td>
-                  <button (click)="goToFieldEdit(field.id)"  data-toggle="aside-menu-lg-show" class="btn btn-sm btn-success rmargin aside-menu-toggler">
+                  <button (click)="goToFieldEdit(field.id)"  data-toggle="aside-menu-lg-show" class="btn btn-sm btn-primary rmargin aside-menu-toggler">
                     <i class="fa fa-pencil"></i>
                   </button>
-                <a href="/admin/content-types/{{this.contentTypesService.contentType.id}}/fieldId/{{field.id}}" data-toggle="aside-menu-lg-show" class="btn btn-sm btn-primary rmargin aside-menu-toggler">
-                    <i class="fa fa-pencil"></i>
-                  </a>
                 <button class="btn btn-sm btn-danger" (click)="deleteField(field.id)">
                   <i class="fa fa-trash"></i>
                 </button>

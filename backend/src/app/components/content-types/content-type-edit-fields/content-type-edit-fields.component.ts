@@ -1,7 +1,9 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild, ElementRef } from "@angular/core";
 import { FieldTypesService } from "../../../services/field-types.service";
 import { ContentTypesService } from "../../../services/content-types.service";
 import { Router } from "@angular/router";
+
+declare var jQuery:any;
 
 @Component({
   selector: "app-content-type-edit-fields",
@@ -17,6 +19,13 @@ export class ContentTypeEditFieldsComponent implements OnInit {
 
   public fieldTypes;
   public fields;
+  @ViewChild('asideMenu') asideMenu:ElementRef;
+
+  toggleTest(){
+        //open modal using jQuery
+        console.log('asideMenu', this.asideMenu);
+        jQuery(this.asideMenu.nativeElement).modal('show'); 
+  }
   ngOnInit() {
     this.fieldTypes = this.fieldTypesService.getTypes();
     // this.fields = this.contentTypesService.getContentType(
