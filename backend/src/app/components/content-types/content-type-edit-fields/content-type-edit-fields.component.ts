@@ -1,6 +1,8 @@
-import { Component, OnInit, ViewChild, ElementRef } from "@angular/core";
+import { Component, OnInit} from "@angular/core";
 import { FieldTypesService } from "../../../services/field-types.service";
 import { ContentTypesService } from "../../../services/content-types.service";
+import { UiService } from "../../../services/ui.service";
+
 import { Router } from "@angular/router";
 
 declare var jQuery:any;
@@ -14,25 +16,16 @@ export class ContentTypeEditFieldsComponent implements OnInit {
   constructor(
     private fieldTypesService: FieldTypesService,
     private contentTypesService: ContentTypesService,
-    private router: Router
+    private router: Router,
+    private uiService:UiService
   ) {}
 
   public fieldTypes;
   public fields;
-  @ViewChild('asideMenu') asideMenu:ElementRef;
+  private lastFieldIdSelected: string;
 
-  toggleTest(){
-        //open modal using jQuery
-        console.log('asideMenu', this.asideMenu);
-        jQuery(this.asideMenu.nativeElement).modal('show'); 
-  }
-  
   ngOnInit() {
     this.fieldTypes = this.fieldTypesService.getTypes();
-    // this.fields = this.contentTypesService.getContentType(
-    //   "5bb7f1784aa4d63b1ea1cfcb"
-    // );
-    // this.router.navigate(["/content-types", "12"]);
   }
 
   public addField(event, fieldType) {
@@ -72,9 +65,21 @@ export class ContentTypeEditFieldsComponent implements OnInit {
   }
 
   goToFieldEdit(fieldId){
+    this.toggleSideAside(fieldId);
+    
     this.router.navigate(
       ['/admin/content-types/' + this.contentTypesService.contentType.id], 
       { queryParams: { 'fieldId': fieldId } }
-  );
+    );
+  }
+
+  toggleSideAside(fieldId){
+    this.uiService.showAside = true;
+    if(this.lastFieldIdSelected == fieldId){
+      this.uiService.showAside = false;
+      this.lastFieldIdSelected = null;
+    } else{
+      this.lastFieldIdSelected = fieldId;
+    }
   }
 }

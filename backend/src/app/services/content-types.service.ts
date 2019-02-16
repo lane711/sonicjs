@@ -71,6 +71,18 @@ export class ContentTypesService {
       });
   }
 
+  public getContentTypePromise(id) {
+    // We subscribe to the subject
+    // this.contentTypeSubject.subscribe(data => {
+    //   console.log("Subscriber got data >>>>> ", data);
+    // });
+
+    const filter = encodeURI('{"include": "fields"}');
+    return this.http
+      .get(environment.apiUrl + `contentTypes/${id}?filter=${filter}`)
+      .toPromise();
+  }
+
   public processContentTypeFields(contentType) {
     let controls: QuestionBase<any>[] = [];
     if (contentType.fields) {

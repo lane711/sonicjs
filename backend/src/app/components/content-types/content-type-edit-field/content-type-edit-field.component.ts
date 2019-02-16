@@ -19,18 +19,26 @@ export class ContentTypeEditFieldComponent implements OnInit {
   isDataAvailable = false;
   questions = [
     new TextboxQuestion({
+      key: "id",
+      label: "id",
+      value: 'this.fieldId',
+      required: false,
+      order: 1
+    }),
+
+    new TextboxQuestion({
       key: "label",
       label: "Label",
       value: "my lable",
       required: false,
-      order: 1
+      order: 2
     }),
 
     new DropdownQuestion({
       key: "isRequired",
       label: "Required",
       options: [{ key: "true", value: "true" }, { key: "false", value: "false" }],
-      order: 2
+      order: 3
     }),
   ];
 
@@ -47,7 +55,8 @@ loadField(fieldId){
       console.log('loadField.contentType', this.contentTypesService.contentType);
       this.field = this.contentTypesService.contentType.fieldList.filter(field => field.id === fieldId);
       console.log('loadField->field', this.field);
-      this.questions[0].value = this.field[0].label;
+      this.questions[0].value = fieldId;
+      this.questions[1].value = this.field[0].label;
       this.isDataAvailable = true;
     }
   });
@@ -58,9 +67,13 @@ onSubmitFieldEdit(payload){
   if (payload) {
     console.log("payload", payload);
 
-    this.contentTypesService.contentTypeSubmitted.next(
-      payload
-    );
+    let self = this;
+    this.contentTypesService.getContentTypePromise(this.contentTypesService.contentType.id).then(data =>{
+      console.log('data', data, self.fieldId);
+      let fieldToUpdate = data.fieldList.filter(f => f.id == payload.id);
+      console.log('fieldToUpdate', fieldToUpdate);
+    })
+
   }
 }
 
