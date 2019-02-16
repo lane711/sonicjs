@@ -22,6 +22,7 @@ import { QuestionsComponent } from "./components/forms/questions/questions.compo
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PagesComponent } from './components/pages/pages.component';
 import { ContentTypeEditFieldComponent } from './components/content-types/content-type-edit-field/content-type-edit-field.component';
+import { AsideMenuComponent } from './components/aside-menu/aside-menu.component';
 
 @NgModule({
   declarations: [
@@ -42,7 +43,8 @@ import { ContentTypeEditFieldComponent } from './components/content-types/conten
     FormsComponent,
     QuestionsComponent,
     PagesComponent,
-    ContentTypeEditFieldComponent
+    ContentTypeEditFieldComponent,
+    AsideMenuComponent
   ],
   imports: [
     BrowserModule,

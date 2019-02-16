@@ -26,6 +26,7 @@ export class ContentTypeEditFieldsComponent implements OnInit {
         console.log('asideMenu', this.asideMenu);
         jQuery(this.asideMenu.nativeElement).modal('show'); 
   }
+  
   ngOnInit() {
     this.fieldTypes = this.fieldTypesService.getTypes();
     // this.fields = this.contentTypesService.getContentType(
