@@ -65,14 +65,10 @@ loadField(fieldId){
 
 onSubmitFieldEdit(payload){
   if (payload) {
-    console.log("payload", payload);
+    // console.log("payload", payload);
 
     let self = this;
-    this.contentTypesService.getContentTypePromise(this.contentTypesService.contentType.id).then(data =>{
-      console.log('data', data, self.fieldId);
-      let fieldToUpdate = data.fieldList.filter(f => f.id == payload.id);
-      console.log('fieldToUpdate', fieldToUpdate);
-    })
+    this.contentTypesService.updateContentTypeField(this.contentTypesService.contentType.id, payload);
 
   }
 }

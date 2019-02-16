@@ -83,6 +83,16 @@ export class ContentTypesService {
       .toPromise();
   }
 
+  public updateContentTypeField(contentTypeId, field){
+    this.getContentTypePromise(contentTypeId).then(data =>{
+
+      console.log('field',field);
+      console.log('data', data);
+      let fieldToUpdate = data.fieldList.filter(field => field.id === field.id);
+      console.log('fieldToUpdate', fieldToUpdate);
+    })
+  }
+
   public processContentTypeFields(contentType) {
     let controls: QuestionBase<any>[] = [];
     if (contentType.fields) {
