@@ -1,8 +1,2 @@
-<p>
-  content-type-edit-field works!
-  this will edit the field<br>
-  content type: {{this.contentTypesService.contentType?.name}}<br>
-  field id: {{fieldId}}
-  <app-forms *ngIf="isDataAvailable" [questions]="this.questions" [onSubmitHandler]="onSubmitFieldEdit"></app-forms>
-  <button (click)="updateTest()">update</button>
-</p>
+<app-forms *ngIf="isDataAvailable" [questions]="this.questions" [onSubmitHandler]="onSubmitFieldEdit"></app-forms>
+

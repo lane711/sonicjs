@@ -11,7 +11,7 @@ import { DropdownQuestion } from "../../../models/question-dropdown";
 })
 export class ContentTypeEditFieldComponent implements OnInit {
 
-  constructor(private route: ActivatedRoute, private contentTypesService:ContentTypesService) { 
+  constructor(private route: ActivatedRoute, private contentTypesService: ContentTypesService) {
     // this.router.routeReuseStrategy.shouldReuseRoute = function () {
     //   return false;
     // };
@@ -56,54 +56,46 @@ export class ContentTypeEditFieldComponent implements OnInit {
     }),
   ];
 
-  ngOnInit() {    
-    console.log('on init')
-
+  ngOnInit() {
     this.contentTypesService.contentTypeSubject.subscribe(data => {
-      console.log('subscrictopn complete');
       this.fields = this.contentTypesService.contentType.fields;
-    });
-
-    this.routerSubscription = this.route.queryParams.subscribe(params => {
-      console.log('route changed');
-      this.isDataAvailable = false;
-      if(this.fields && params['fieldId']){
-        this.fieldId = params['fieldId'];
-        this.populateForm(this.fieldId);
-      }
+      this.routerSubscription = this.route.queryParams.subscribe(params => {
+        this.isDataAvailable = false;
+        if (this.fields && params['fieldId']) {
+          this.fieldId = params['fieldId'];
+          this.populateForm(this.fieldId);
+        }
+      });
     });
   }
 
   //TODO: must be a better way
-  async refreshQuestionsControl(){
+  async refreshQuestionsControl() {
     this.isDataAvailable = false;
     await this.delay(1);
     this.isDataAvailable = true;
   }
 
   async delay(ms: number) {
-    return new Promise( resolve => setTimeout(resolve, ms) );
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
-  
-  populateForm(fieldId){
-    console.log('populateForm', fieldId);
+
+  populateForm(fieldId) {
     this.field = this.fields.filter(field => field.id === fieldId)[0];
-    console.log('questions', this.questions);
     this.questions.find(q => q.key === 'contentTypeId').value = this.contentTypesService.contentType.id;
     this.questions.find(q => q.key === 'fieldId').value = this.field.id;
     this.questions.find(q => q.key === 'label').value = this.field.label;
-    console.log('label value ===>', this.questions.find(q => q.key === 'label').value);
     this.refreshQuestionsControl();
   }
 
-onSubmitFieldEdit(payload){
-  if (payload) {
-    console.log("payload", payload);
-    console.log("this.field", this.field);
-    let self = this;
-    // this.contentTypesService.updateContentTypeField(this.contentTypesService.contentType.id, payload);
+  onSubmitFieldEdit(payload) {
+    if (payload) {
+      console.log("payload", payload);
+      console.log("this.field", this.field);
+      let self = this;
+      // this.contentTypesService.updateContentTypeField(this.contentTypesService.contentType.id, payload);
 
+    }
   }
-}
 
 }
