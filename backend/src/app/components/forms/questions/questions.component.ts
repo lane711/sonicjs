@@ -9,15 +9,26 @@ import { QuestionBase } from "../../../models/question-base";
   styleUrls: ["./questions.component.css"]
 })
 export class QuestionsComponent {
-  constructor() {}
+  constructor() { }
 
   @Input()
   question: QuestionBase<any>;
   @Input()
   form: FormGroup;
+
+  showLabel = true;
+
   get isValid() {
     return this.form.controls[this.question.key].valid;
   }
 
-  // ngOnInit() {}
+  ngOnInit() {
+    this.processHidden();
+  }
+
+  processHidden() {
+    if (this.question.controlType == 'hidden') {
+      this.showLabel = false;
+    }
+  }
 }

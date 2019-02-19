@@ -19,7 +19,7 @@
           </thead>
           <tbody>
             <!-- {{#each contentType.fields}} -->
-            <tr *ngFor='let field of this.contentTypesService.contentType?.fields'>
+            <tr *ngFor='let field of this.contentTypesService.contentType?.fieldList'>
               <td>
                 {{field.fieldType}}
               </td>

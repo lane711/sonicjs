@@ -1,10 +1,12 @@
 <div [formGroup]="form" class="form-group row">
 
-  <label [attr.for]="question.key" class="col-md-3 col-form-label">{{question.label}}</label>
+  <label *ngIf="showLabel" [attr.for]="question.key" class="col-md-3 col-form-label">{{question.label}}</label>
 
   <div [ngSwitch]="question.controlType" class="col-md-9">
 
     <input *ngSwitchCase="'textbox'" [formControlName]="question.key" [id]="question.key" [type]="question.type" class="form-control">
+
+    <!-- <input *ngSwitchCase="'hidden'" [formControlName]="question.key" [id]="question.key" class='hidden' [type]="question.type" class="form-control"> -->
 
     <select [id]="question.key" *ngSwitchCase="'dropdown'" [formControlName]="question.key" class="form-control">
       <option *ngFor="let opt of question.options" [value]="opt.key">{{opt.value}}</option>

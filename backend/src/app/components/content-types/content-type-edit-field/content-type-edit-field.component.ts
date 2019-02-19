@@ -3,6 +3,7 @@ import { ActivatedRoute } from "@angular/router";
 import { ContentTypesService } from "../../../services/content-types.service";
 import { TextboxQuestion } from "../../../models/question-textbox";
 import { DropdownQuestion } from "../../../models/question-dropdown";
+import { HiddenQuestion } from '../../../models/question-hidden';
 
 @Component({
   selector: 'app-content-type-edit-field',
@@ -24,15 +25,14 @@ export class ContentTypeEditFieldComponent implements OnInit {
   isDataAvailable = false;
 
   questions = [
-    new TextboxQuestion({
+    new HiddenQuestion({
       key: "contentTypeId",
       label: "contentTypeId",
-      value: 'this.contentTypeId',
       required: false,
       order: 1
     }),
 
-    new TextboxQuestion({
+    new HiddenQuestion({
       key: "fieldId",
       label: "fieldId",
       value: 'this.fieldId',
@@ -91,9 +91,8 @@ export class ContentTypeEditFieldComponent implements OnInit {
   onSubmitFieldEdit(payload) {
     if (payload) {
       console.log("payload", payload);
-      console.log("this.field", this.field);
-      let self = this;
-      // this.contentTypesService.updateContentTypeField(this.contentTypesService.contentType.id, payload);
+
+      this.contentTypesService.updateContentTypeField(payload);
 
     }
   }

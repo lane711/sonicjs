@@ -28,7 +28,8 @@ export class FormsComponent implements OnInit {
   }
 
   onSubmit() {
-    this.payLoad = JSON.stringify(this.form.value);
+    //this.payLoad = JSON.stringify(this.form.value);
+    this.payLoad = this.form.value;
     //delagate back to the calling component
     this.onSubmitHandler(this.payLoad);
     // this.contentTypesService.contentInstance = JSON.stringify(this.form.value);

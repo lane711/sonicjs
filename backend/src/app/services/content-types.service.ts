@@ -64,10 +64,8 @@ export class ContentTypesService {
       .then(data => {
         this.contentType = data;
         this.processContentTypeFields(data);
-        // console.log("contentTypeSubject:Next");
         this.contentTypeSubject.next(data);
-        // console.log("contentTypeSubject:complete");
-        this.contentTypeSubject.complete();
+        // this.contentTypeSubject.complete();
       });
   }
 
@@ -83,13 +81,18 @@ export class ContentTypesService {
       .toPromise();
   }
 
-  public updateContentTypeField(contentTypeId, field){
-    this.getContentTypePromise(contentTypeId).then(data =>{
+  public updateContentTypeField(fieldData){
+    console.log('fieldData', fieldData);
 
-      console.log('field',field);
-      console.log('data', data);
-      let fieldToUpdate = data.fieldList.filter(field => field.id === field.id);
-      console.log('fieldToUpdate', fieldToUpdate);
+    this.getContentTypePromise(fieldData.contentTypeId).then(contentType =>{
+      let fieldToYpdate = contentType.fieldList.filter(field => field.id === fieldData.fieldId)[0].label = fieldData.label;
+      this.putContentTypeAsync(contentType).then(updateContentType =>{
+        console.log('updateContentType', updateContentType);
+        this.contentType = updateContentType;
+        // this.processContentTypeFields(updateContentType);
+        // this.contentTypeSubject.next(updateContentType);
+        // this.contentTypeSubject.complete();
+      })
     })
   }
 
