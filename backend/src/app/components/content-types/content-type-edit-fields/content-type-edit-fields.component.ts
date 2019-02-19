@@ -36,7 +36,7 @@ export class ContentTypeEditFieldsComponent implements OnInit {
         fieldType.name
       )
       .then(() => {
-        console.log("routing to" + this.contentTypesService.contentType.id);
+        // console.log("routing to" + this.contentTypesService.contentType.id);
         self.refresh();
       });
   }
@@ -55,7 +55,7 @@ export class ContentTypeEditFieldsComponent implements OnInit {
 
   public saveLabel(id, newLabel){
     this.contentTypesService.getContentType(id).then(data =>{
-      console.log('updating field for:', data);
+      // console.log('updating field for:', data);
     });
   }
 

@@ -64,9 +64,9 @@ export class ContentTypesService {
       .then(data => {
         this.contentType = data;
         this.processContentTypeFields(data);
-        console.log("contentTypeSubject:Next");
+        // console.log("contentTypeSubject:Next");
         this.contentTypeSubject.next(data);
-        console.log("contentTypeSubject:complete");
+        // console.log("contentTypeSubject:complete");
         this.contentTypeSubject.complete();
       });
   }

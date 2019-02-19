@@ -28,8 +28,8 @@ export class ContentTypeEditCreateInstanceComponent implements OnInit {
     firstName: new FormControl()
   });
   ngOnInit() {
-    console.log("ContentTypeEditCreateInstanceComponent:OnInit");
-    console.log("questions", this.questions);
+    // console.log("ContentTypeEditCreateInstanceComponent:OnInit");
+    // console.log("questions", this.questions);
 
     if (this.contentTypesService.contentType) {
       this.setQuestions(this.contentTypesService.contentType.controls);
@@ -47,13 +47,13 @@ export class ContentTypeEditCreateInstanceComponent implements OnInit {
   onSubmitContentAdd() {
     this.contentService.createContentInstance();
     // TODO: Use EventEmitter with form value
-    console.log(this.contentTypesService.contentInstance);
-    console.warn(this.instanceForm.value);
+    // console.log(this.contentTypesService.contentInstance);
+    // console.warn(this.instanceForm.value);
   }
 
   loadQuestions() {
     this.contentTypesService.contentTypeSubject.subscribe(data => {
-      console.log(data);
+      // console.log(data);
       this.setQuestions(data.controls);
     });
   }
