@@ -16,6 +16,10 @@
     "url": {
       "type": "string",
       "required": true
+    },
+    "content": {
+      "type": "Object",
+      "required": true
     }
   },
   "validations": [],

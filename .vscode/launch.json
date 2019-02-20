@@ -13,8 +13,15 @@
     {
       "type": "chrome",
       "request": "launch",
-      "name": "Client",
+      "name": "Backend Client",
       "url": "http://localhost:4200",
+      "webRoot": "${workspaceFolder}/client"
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Frontend Client",
+      "url": "http://localhost:4201",
       "webRoot": "${workspaceFolder}/client"
     }
   ]

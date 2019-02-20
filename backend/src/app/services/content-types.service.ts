@@ -70,11 +70,6 @@ export class ContentTypesService {
   }
 
   public getContentTypePromise(id) {
-    // We subscribe to the subject
-    // this.contentTypeSubject.subscribe(data => {
-    //   console.log("Subscriber got data >>>>> ", data);
-    // });
-
     const filter = encodeURI('{"include": "fields"}');
     return this.http
       .get(environment.apiUrl + `contentTypes/${id}?filter=${filter}`)
@@ -85,7 +80,8 @@ export class ContentTypesService {
     console.log('fieldData', fieldData);
 
     this.getContentTypePromise(fieldData.contentTypeId).then(contentType =>{
-      let fieldToYpdate = contentType.fieldList.filter(field => field.id === fieldData.fieldId)[0].label = fieldData.label;
+      let ct: any = contentType;
+      let fieldToYpdate = ct.fieldList.filter(field => field.id === fieldData.fieldId)[0].label = fieldData.label;
       this.putContentTypeAsync(contentType).then(updateContentType =>{
         console.log('updateContentType', updateContentType);
         this.contentType = updateContentType;
@@ -100,6 +96,7 @@ export class ContentTypesService {
     let controls: QuestionBase<any>[] = [];
     if (contentType.fields) {
       contentType.fields.forEach(field => {
+        console.log('fieldcontrol', field);
         let control = new TextboxQuestion({
           key: field.id,
           label: field.label,

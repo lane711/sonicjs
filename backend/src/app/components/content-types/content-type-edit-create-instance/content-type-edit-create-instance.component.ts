@@ -44,11 +44,8 @@ export class ContentTypeEditCreateInstanceComponent implements OnInit {
     // });
   }
 
-  onSubmitContentAdd() {
-    this.contentService.createContentInstance();
-    // TODO: Use EventEmitter with form value
-    // console.log(this.contentTypesService.contentInstance);
-    // console.warn(this.instanceForm.value);
+  onSubmitContentAdd(payload) {
+    this.contentService.createContentInstance(payload);
   }
 
   loadQuestions() {

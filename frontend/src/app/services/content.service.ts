@@ -10,6 +10,8 @@ export class ContentService {
   constructor(private http: HttpClient) { }
 
   async getContent() {
-    return this.http.get(environment.apiUrl + "contents").toPromise();
+    let url = environment.apiUrl + "contents";
+    console.log('url', url);
+    return this.http.get(url).toPromise();
   }
 }

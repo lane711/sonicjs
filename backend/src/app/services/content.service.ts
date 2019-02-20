@@ -15,7 +15,15 @@ export class ContentService {
     return this.http.get(environment.apiUrl + "contents").toPromise();
   }
 
-  public createContentInstance() {
-    console.log('creating new contnet');
+  public createContentInstance(payload) {
+    let content:any = {};
+    content.name = payload[Object.keys(payload)[0]];;
+    content.url = 'my-name';
+    content.contentTypeId = payload.contentTypeId;
+    content.content = payload;
+
+
+    console.log('createContentInstance', content);
+    return this.http.post(environment.apiUrl + "contents/", content).toPromise();
   }
 }
