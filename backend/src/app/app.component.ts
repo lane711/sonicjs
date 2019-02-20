@@ -14,11 +14,11 @@ export class AppComponent {
   constructor(
     private uiService: UiService,
     private injector: Injector,
-    private menuComponent: MenuComponent
+    // private menuComponent: MenuComponent
   ) { }
 
   ngOnInit() {
-    const elem = createCustomElement(MenuComponent, {injector: this.injector});
-    customElements.define('app-menu', elem);
+    // const elem = createCustomElement(MenuComponent, {injector: this.injector});
+    // customElements.define('app-menu', elem);
   }
 }

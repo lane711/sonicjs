@@ -45,8 +45,7 @@ import { MenuComponent } from './elements/menu/menu.component';
     QuestionsComponent,
     PagesComponent,
     ContentTypeEditFieldComponent,
-    AsideMenuComponent,
-    MenuComponent
+    AsideMenuComponent
   ],
   imports: [
     BrowserModule,
@@ -57,6 +56,6 @@ import { MenuComponent } from './elements/menu/menu.component';
   ],
   providers: [],
   bootstrap: [AppComponent],
-  entryComponents: [MenuComponent]
+  // entryComponents: [MenuComponent]
 })
 export class AppModule {}

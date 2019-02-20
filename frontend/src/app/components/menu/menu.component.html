@@ -2,6 +2,6 @@
   menu works!
 </p>
 
-<div *ngFor="let menuItem of menuItems">
-  {{menuItem.name}}
-</div>
+<ul *ngFor="let menuItem of menuItems">
+  <li><a href='{{menuItem.url}}'>{{menuItem.name}}</a></li>
+</ul>
