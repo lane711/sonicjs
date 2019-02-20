@@ -22,7 +22,6 @@ export class ContentTypeEditFieldsComponent implements OnInit {
 
   public fieldTypes;
   public fields;
-  private lastFieldIdSelected: string;
 
   ngOnInit() {
     this.fieldTypes = this.fieldTypesService.getTypes();
@@ -65,21 +64,11 @@ export class ContentTypeEditFieldsComponent implements OnInit {
   }
 
   goToFieldEdit(fieldId){
-    this.toggleSideAside(fieldId);
+    this.uiService.toggleSideAside(fieldId);
     
     this.router.navigate(
       ['/admin/content-types/' + this.contentTypesService.contentType.id], 
       { queryParams: { 'fieldId': fieldId } }
     );
-  }
-
-  toggleSideAside(fieldId){
-    this.uiService.showAside = true;
-    if(this.lastFieldIdSelected == fieldId){
-      this.uiService.showAside = false;
-      this.lastFieldIdSelected = null;
-    } else{
-      this.lastFieldIdSelected = fieldId;
-    }
   }
 }

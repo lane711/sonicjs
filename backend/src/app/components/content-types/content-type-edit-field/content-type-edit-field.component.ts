@@ -4,6 +4,7 @@ import { ContentTypesService } from "../../../services/content-types.service";
 import { TextboxQuestion } from "../../../models/question-textbox";
 import { DropdownQuestion } from "../../../models/question-dropdown";
 import { HiddenQuestion } from '../../../models/question-hidden';
+import { UiService } from "../../../services/ui.service";
 
 @Component({
   selector: 'app-content-type-edit-field',
@@ -12,10 +13,8 @@ import { HiddenQuestion } from '../../../models/question-hidden';
 })
 export class ContentTypeEditFieldComponent implements OnInit {
 
-  constructor(private route: ActivatedRoute, private contentTypesService: ContentTypesService) {
-    // this.router.routeReuseStrategy.shouldReuseRoute = function () {
-    //   return false;
-    // };
+  constructor(private route: ActivatedRoute, private uiService: UiService, private contentTypesService: ContentTypesService) {
+
   }
 
   fieldId: string;
@@ -57,6 +56,8 @@ export class ContentTypeEditFieldComponent implements OnInit {
   ];
 
   ngOnInit() {
+    console.log('init uiService', this.uiService);
+
     this.contentTypesService.contentTypeSubject.subscribe(data => {
       this.fields = this.contentTypesService.contentType.fields;
       this.routerSubscription = this.route.queryParams.subscribe(params => {
@@ -90,10 +91,7 @@ export class ContentTypeEditFieldComponent implements OnInit {
 
   onSubmitFieldEdit(payload) {
     if (payload) {
-      console.log("payload", payload);
-
       this.contentTypesService.updateContentTypeField(payload);
-
     }
   }
 
