@@ -15,6 +15,7 @@
     "@angular/common": "^6.1.10",
     "@angular/compiler": "^6.1.0",
     "@angular/core": "^6.1.10",
+    "@angular/elements": "^7.2.5",
     "@angular/forms": "^6.1.10",
     "@angular/http": "^6.1.0",
     "@angular/platform-browser": "^6.1.0",
@@ -36,7 +37,8 @@
     "rxjs": "~6.2.0",
     "simple-line-icons": "2.4.1",
     "siteden": "^1.0.0",
-    "zone.js": "~0.8.26"
+    "zone.js": "~0.8.26",
+    "document-register-element": "^1.7.2"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.8.0",

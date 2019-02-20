@@ -23,6 +23,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PagesComponent } from './components/pages/pages.component';
 import { ContentTypeEditFieldComponent } from './components/content-types/content-type-edit-field/content-type-edit-field.component';
 import { AsideMenuComponent } from './components/aside-menu/aside-menu.component';
+import { MenuComponent } from './elements/menu/menu.component';
 
 @NgModule({
   declarations: [
@@ -44,7 +45,8 @@ import { AsideMenuComponent } from './components/aside-menu/aside-menu.component
     QuestionsComponent,
     PagesComponent,
     ContentTypeEditFieldComponent,
-    AsideMenuComponent
+    AsideMenuComponent,
+    MenuComponent
   ],
   imports: [
     BrowserModule,
@@ -54,6 +56,7 @@ import { AsideMenuComponent } from './components/aside-menu/aside-menu.component
     NgbModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [MenuComponent]
 })
 export class AppModule {}
