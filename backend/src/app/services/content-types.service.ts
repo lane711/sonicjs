@@ -98,7 +98,7 @@ export class ContentTypesService {
       contentType.fields.forEach(field => {
         console.log('fieldcontrol', field);
         let control = new TextboxQuestion({
-          key: field.id,
+          key: field.systemid,
           label: field.label,
           value: "",
           required: field.required,
@@ -121,9 +121,9 @@ export class ContentTypesService {
   // }
 
   async createContentTypeAsync(contentType): Promise<Object> {
-    let contentTypeJson = JSON.parse(contentType);
+    // let contentTypeJson = JSON.parse(contentType);
     const newContentType = await this.http
-      .post(environment.apiUrl + `contentTypes/`, contentTypeJson)
+      .post(environment.apiUrl + `contentTypes/`, contentType)
       .toPromise();
 
     const addField = this.addFieldToContentType(newContentType, "textBox");

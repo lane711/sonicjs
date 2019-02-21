@@ -24,16 +24,16 @@
       </div>
       <ul class="navbar-nav navbar-nav-hover align-items-lg-center">
         <li *ngFor="let menuItem of menuItems" class="nav-item dropdown">
-          <a href='{{menuItem.url}}' class="nav-link" data-toggle="dropdown" href="#" role="button">
+          <a [routerLink]="[menuItem.url]" class="nav-link" data-toggle="dropdown" href="#" role="button">
             <i class="ni ni-collection d-lg-none"></i>
             <span class="nav-link-inner--text">{{menuItem.name}}</span>
           </a>
-          <div class="dropdown-menu">
+          <!-- <div class="dropdown-menu">
             <a href="./examples/landing.html" class="dropdown-item">Landing</a>
             <a href="./examples/profile.html" class="dropdown-item">Profile</a>
             <a href="./examples/login.html" class="dropdown-item">Login</a>
             <a href="./examples/register.html" class="dropdown-item">Register</a>
-          </div>
+          </div> -->
         </li>
       </ul>
     </div>

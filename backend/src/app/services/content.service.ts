@@ -16,9 +16,10 @@ export class ContentService {
   }
 
   public createContentInstance(payload) {
+    console.log('createContentInstance payload', payload);
     let content:any = {};
     content.name = payload[Object.keys(payload)[0]];;
-    content.url = 'my-name';
+    content.url = payload.url;
     content.contentTypeId = payload.contentTypeId;
     content.content = payload;
 

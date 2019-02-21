@@ -7,6 +7,10 @@
       "type": "string",
       "required": true
     },
+    "systemid": {
+      "type": "string",
+      "required": true
+    },
     "label": {
       "type": "string",
       "required": false

@@ -26,7 +26,7 @@ export class ContentTypeEditFieldComponent implements OnInit {
   questions = [
     new HiddenQuestion({
       key: "contentTypeId",
-      label: "contentTypeId",
+      label: "",
       required: false,
       order: 1
     }),
@@ -34,24 +34,32 @@ export class ContentTypeEditFieldComponent implements OnInit {
     new HiddenQuestion({
       key: "fieldId",
       label: "fieldId",
-      value: 'this.fieldId',
+      value: "",
       required: false,
       order: 2
     }),
 
     new TextboxQuestion({
-      key: "label",
-      label: "Label",
-      value: "my lable",
+      key: "systemId",
+      label: "System Id",
+      value: "",
       required: false,
       order: 3
+    }),
+
+    new TextboxQuestion({
+      key: "label",
+      label: "Label",
+      value: "my lablel",
+      required: false,
+      order: 4
     }),
 
     new DropdownQuestion({
       key: "isRequired",
       label: "Required",
       options: [{ key: "true", value: "true" }, { key: "false", value: "false" }],
-      order: 4
+      order: 5
     }),
   ];
 
@@ -85,6 +93,7 @@ export class ContentTypeEditFieldComponent implements OnInit {
     this.field = this.fields.filter(field => field.id === fieldId)[0];
     this.questions.find(q => q.key === 'contentTypeId').value = this.contentTypesService.contentType.id;
     this.questions.find(q => q.key === 'fieldId').value = this.field.id;
+    this.questions.find(q => q.key === 'systemId').value = this.field.systemid;
     this.questions.find(q => q.key === 'label').value = this.field.label;
     this.refreshQuestionsControl();
   }
