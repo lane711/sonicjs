@@ -32,6 +32,7 @@ export class ContentTypeEditFieldsComponent implements OnInit {
     this.contentTypesService
       .addFieldToContentType(
         this.contentTypesService.contentType.id,
+        this.contentTypesService.contentType.systemid,
         fieldType.name
       )
       .then(() => {
