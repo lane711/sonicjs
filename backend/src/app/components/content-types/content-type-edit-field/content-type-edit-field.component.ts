@@ -40,7 +40,7 @@ export class ContentTypeEditFieldComponent implements OnInit {
     }),
 
     new TextboxQuestion({
-      key: "systemId",
+      key: "systemid",
       label: "System Id",
       value: "",
       required: false,
@@ -93,7 +93,7 @@ export class ContentTypeEditFieldComponent implements OnInit {
     this.field = this.fields.filter(field => field.id === fieldId)[0];
     this.questions.find(q => q.key === 'contentTypeId').value = this.contentTypesService.contentType.id;
     this.questions.find(q => q.key === 'fieldId').value = this.field.id;
-    this.questions.find(q => q.key === 'systemId').value = this.field.systemid;
+    this.questions.find(q => q.key === 'systemid').value = this.field.systemid;
     this.questions.find(q => q.key === 'label').value = this.field.label;
     this.refreshQuestionsControl();
   }

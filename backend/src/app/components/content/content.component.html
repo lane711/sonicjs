@@ -9,6 +9,7 @@
           <thead>
             <tr>
               <th>Title</th>
+              <th>Type</th>
               <th>Content</th>
               <th>Status</th>
             </tr>
@@ -16,6 +17,7 @@
           <tbody>
             <tr *ngFor="let content of contentInstances">
               <td><a [routerLink]="['/content', content.id]">{{ content.name }}</a></td>
+              <td>{{ content.contentType }}</td>
               <td>...</td>
               <td>
                 <a href="{{ content.url }}" target="_blank" class="btn btn-sm btn-success">View</a>

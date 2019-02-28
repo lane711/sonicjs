@@ -35,7 +35,7 @@ export class FormsComponent implements OnInit {
   onSubmit() {
     //this.payLoad = JSON.stringify(this.form.value);
     this.payLoad = this.form.value;
-    console.log('onSubmit', this.payLoad);
+    console.log('onSubmit:payload', this.payLoad);
     //delagate back to the calling component
     this.onSubmitHandler(this.payLoad);
     this.uiService.showAside = false;

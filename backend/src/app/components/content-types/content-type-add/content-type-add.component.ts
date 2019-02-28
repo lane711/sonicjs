@@ -18,10 +18,17 @@ export class ContentTypeAddComponent implements OnInit {
   isDataAvailable = true;
   questions = [
     new TextboxQuestion({
+      key: "systemid",
+      label: "System Id",
+      required: false,
+      order: 1
+    }),
+
+    new TextboxQuestion({
       key: "name",
       label: "Name",
       required: false,
-      order: 1
+      order: 2
     }),
 
     new TextboxQuestion({
@@ -45,7 +52,8 @@ export class ContentTypeAddComponent implements OnInit {
 
   onSubmitContentTypeAdd(payload) {
     if (payload) {
-      // console.log("payload", payload);
+      console.log("onSubmitContentTypeAdd.payload", payload);
+      payload.systemid = payload.systemid; //HACK
 
       this.contentTypesService.contentTypeSubmitted.next(
         payload

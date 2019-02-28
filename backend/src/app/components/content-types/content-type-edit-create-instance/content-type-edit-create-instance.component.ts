@@ -45,6 +45,8 @@ export class ContentTypeEditCreateInstanceComponent implements OnInit {
   }
 
   onSubmitContentAdd(payload) {
+    console.log('onSubmitContentAdd:payload', payload);
+    payload.contentType = this.contentTypesService.contentType.systemid;
     this.contentService.createContentInstance(payload);
   }
 
