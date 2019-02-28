@@ -96,7 +96,7 @@ export class ContentTypesService {
     let controls: QuestionBase<any>[] = [];
     if (contentType.fields) {
       contentType.fields.forEach(field => {
-        console.log('fieldcontrol', field);
+        // console.log('fieldcontrol', field);
         let control = new TextboxQuestion({
           key: field.systemid,
           label: field.label,

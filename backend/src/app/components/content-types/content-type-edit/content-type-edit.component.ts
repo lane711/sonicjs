@@ -22,23 +22,23 @@ export class ContentTypeEditComponent implements OnInit {
   isDataAvailable = false;
 
   questions = [
-    new HiddenQuestion({
-      key: "contentTypeId",
-      label: "",
-      required: false,
-      order: 1
-    }),
+    // new HiddenQuestion({
+    //   key: "contentTypeId",
+    //   label: "",
+    //   required: false,
+    //   order: 1
+    // }),
 
-    new HiddenQuestion({
-      key: "fieldId",
-      label: "fieldId",
-      value: "",
-      required: false,
-      order: 2
-    }),
+    // new HiddenQuestion({
+    //   key: "fieldId",
+    //   label: "fieldId",
+    //   value: "",
+    //   required: false,
+    //   order: 2
+    // }),
 
     new TextboxQuestion({
-      key: "systemId",
+      key: "systemid",
       label: "System Id",
       value: "",
       required: false,
@@ -46,28 +46,44 @@ export class ContentTypeEditComponent implements OnInit {
     }),
 
     new TextboxQuestion({
-      key: "label",
-      label: "Label",
-      value: "my lablel",
+      key: "name",
+      label: "Name",
+      value: "",
       required: false,
       order: 4
     }),
 
-    new DropdownQuestion({
-      key: "isRequired",
-      label: "Required",
-      options: [{ key: "true", value: "true" }, { key: "false", value: "false" }],
-      order: 5
-    }),
+    // new DropdownQuestion({
+    //   key: "isRequired",
+    //   label: "Required",
+    //   options: [{ key: "true", value: "true" }, { key: "false", value: "false" }],
+    //   order: 5
+    // }),
   ];
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get("id");
-    this.contentTypesService.getContentType(id);
-    this.contentType = this.contentTypesService.contentType;
-    this.isDataAvailable = true;
+    this.contentTypesService.getContentType(id).then(data =>{
+      this.contentType = this.contentTypesService.contentType;
+      this.isDataAvailable = true;
+      this.loadFormData();
+    });
   }
 
-  onSubmitContentTypeEdit(){
+  loadFormData(){
+      this.questions.find(q => q.key === 'systemid').value = this.contentType.systemid;
+      this.questions.find(q => q.key === 'name').value = this.contentType.name;
+  }
 
+  onSubmitContentTypeEdit(payload){
+    this.contentTypesService.contentType.systemid = payload.systemid;
+    this.contentTypesService.contentType.name = payload.name;
+console.log('saving...', this.contentTypesService.contentType);
+    this.contentTypesService.putContentTypeAsync(this.contentTypesService.contentType).then(updateContentType =>{
+      console.log('updateContentType', updateContentType);
+      // this.contentType = updateContentType;
+      // this.processContentTypeFields(updateContentType);
+      // this.contentTypeSubject.next(updateContentType);
+      // this.contentTypeSubject.complete();
+    })
   }
 }

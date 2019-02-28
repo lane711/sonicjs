@@ -64,7 +64,7 @@ export class ContentTypeEditFieldComponent implements OnInit {
   ];
 
   ngOnInit() {
-    console.log('init uiService', this.uiService);
+    // console.log('init uiService', this.uiService);
 
     this.contentTypesService.contentTypeSubject.subscribe(data => {
       this.fields = this.contentTypesService.contentType.fields;
