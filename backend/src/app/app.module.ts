@@ -24,6 +24,7 @@ import { PagesComponent } from './components/pages/pages.component';
 import { ContentTypeEditFieldComponent } from './components/content-types/content-type-edit-field/content-type-edit-field.component';
 import { AsideMenuComponent } from './components/aside-menu/aside-menu.component';
 import { MenuComponent } from './elements/menu/menu.component';
+import { ContentEditComponent } from './components/content/content-edit/content-edit.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import { MenuComponent } from './elements/menu/menu.component';
     QuestionsComponent,
     PagesComponent,
     ContentTypeEditFieldComponent,
-    AsideMenuComponent
+    AsideMenuComponent,
+    ContentEditComponent
   ],
   imports: [
     BrowserModule,

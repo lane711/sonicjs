@@ -11,7 +11,7 @@
               <th>Title</th>
               <th>Type</th>
               <th>Content</th>
-              <th>Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -20,8 +20,8 @@
               <td>{{ content.contentType }}</td>
               <td>...</td>
               <td>
-                <a href="{{ content.url }}" target="_blank" class="btn btn-sm btn-success">View</a>
-                <a class="btn btn-sm btn-primary" [routerLink]="['/content-types', content.id]">Edit</a>
+                <a href="{{ content.url }}" target="_blank" class="btn btn-sm btn-success rmargin">View</a>
+                <a class="btn btn-sm btn-primary rmargin" [routerLink]="['/admin/content', content.id]">Edit</a>
   
                 <ng-template #popTitle>Delete <b>{{ content.name }}</b>?</ng-template>
                 <ng-template #popContent><button class="btn btn-sm btn-danger" (click)="deleteContent(content.id)">Confirm Delete</button></ng-template>
