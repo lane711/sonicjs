@@ -126,7 +126,7 @@ export class ContentTypesService {
       .post(environment.apiUrl + `contentTypes/`, contentType)
       .toPromise();
 
-    const addField = this.addFieldToContentType(newContentType, contentType.systemid, "textBox");
+    const addField = await this.addFieldToContentType(newContentType, contentType.systemid, "textBox");
     return newContentType;
   }
 
@@ -136,18 +136,14 @@ export class ContentTypesService {
       .toPromise();
   }
 
-  async addFieldToContentType(contentTypeId, contentTypeSystemId, fieldType): Promise<Object> {
-    let fieldData = {
-      fieldType: fieldType,
-      label: "Title",
-      placeholder: "Enter Title Text",
-      required: false
-    };
+  async addFieldToContentType(contentType, field): Promise<Object> {
+
+    console.log('adding field for ' + contentType.id, field)
 
     return await this.http
       .post(
-        environment.apiUrl + `contentTypes/${contentTypeId}/fields`,
-        fieldData,
+        environment.apiUrl + `contentTypes/${contentType.id}/fields`,
+        field,
         this.httpOptions
       )
       .toPromise();

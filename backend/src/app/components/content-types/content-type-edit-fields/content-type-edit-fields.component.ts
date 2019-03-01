@@ -2,7 +2,7 @@ import { Component, OnInit} from "@angular/core";
 import { FieldTypesService } from "../../../services/field-types.service";
 import { ContentTypesService } from "../../../services/content-types.service";
 import { UiService } from "../../../services/ui.service";
-
+import  * as shortid from 'node_modules/shortid';
 import { Router } from "@angular/router";
 
 declare var jQuery:any;
@@ -27,13 +27,21 @@ export class ContentTypeEditFieldsComponent implements OnInit {
     this.fieldTypes = this.fieldTypesService.getTypes();
   }
 
-  public addField(event, fieldType) {
+  public addField(event, field) {
     const self = this;
+console.log('addField.fieldType', field);
+    let fieldData = {
+      fieldType: field.name,
+      systemid: shortid.generate(),
+      label: "Name",
+      placeholder: "Enter Name",
+      required: false
+    };
+
     this.contentTypesService
       .addFieldToContentType(
-        this.contentTypesService.contentType.id,
-        this.contentTypesService.contentType.systemid,
-        fieldType.name
+        this.contentTypesService.contentType,
+        fieldData
       )
       .then(() => {
         // console.log("routing to" + this.contentTypesService.contentType.id);
