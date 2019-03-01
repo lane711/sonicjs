@@ -81,7 +81,10 @@ export class ContentTypesService {
 
     this.getContentTypePromise(fieldData.contentTypeId).then(contentType =>{
       let ct: any = contentType;
-      let fieldToYpdate = ct.fieldList.filter(field => field.id === fieldData.fieldId)[0].label = fieldData.label;
+      
+      ct.fieldList.filter(field => field.id === fieldData.fieldId)[0].label = fieldData.label;
+      ct.fieldList.filter(field => field.id === fieldData.fieldId)[0].systemid = fieldData.systemid;
+
       this.putContentTypeAsync(contentType).then(updateContentType =>{
         console.log('updateContentType', updateContentType);
         this.contentType = updateContentType;
