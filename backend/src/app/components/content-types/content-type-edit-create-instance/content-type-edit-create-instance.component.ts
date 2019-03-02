@@ -51,6 +51,7 @@ export class ContentTypeEditCreateInstanceComponent implements OnInit {
   }
 
   loadQuestions() {
+    console.log('loadQuestions');
     this.contentTypesService.contentTypeSubject.subscribe(data => {
       // console.log(data);
       this.setQuestions(data.controls);
@@ -58,6 +59,8 @@ export class ContentTypeEditCreateInstanceComponent implements OnInit {
   }
 
   setQuestions(questions) {
+    console.log('setQuestions');
+
     this.questions = questions;
     this.isDataAvailable = true;
   }

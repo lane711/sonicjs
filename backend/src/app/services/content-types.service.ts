@@ -76,6 +76,13 @@ export class ContentTypesService {
       .toPromise();
   }
 
+  public getContentTypeBySystemIdPromise(systemid) {
+    const filter = encodeURI(`{"include": "fields"},{"where":{"systemid":"${systemid}"}}`);
+    return this.http
+      .get(environment.apiUrl + `contentTypes?filter=${filter}`)
+      .toPromise();
+  }
+
   public updateContentTypeField(fieldData){
     console.log('fieldData', fieldData);
 
