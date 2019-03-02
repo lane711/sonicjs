@@ -129,7 +129,7 @@ export class ContentTypesService {
       .post(environment.apiUrl + `contentTypes/`, contentType)
       .toPromise();
 
-    const addField = await this.addFieldToContentType(newContentType, contentType.systemid, "textBox");
+    const addField = await this.addFieldToContentType(newContentType, "textBox");
     return newContentType;
   }
 

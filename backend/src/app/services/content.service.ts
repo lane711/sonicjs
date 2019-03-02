@@ -15,6 +15,10 @@ export class ContentService {
     return this.http.get(environment.apiUrl + "contents").toPromise();
   }
 
+  async getContentInstance(id) {
+    return this.http.get(environment.apiUrl + "contents/" + id).toPromise();
+  }
+
   public createContentInstance(payload) {
     console.log('createContentInstance payload', payload);
     let content:any = {};
