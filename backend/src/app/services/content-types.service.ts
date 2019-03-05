@@ -76,11 +76,13 @@ export class ContentTypesService {
       .toPromise();
   }
 
-  public getContentTypeBySystemIdPromise(systemid) {
-    const filter = encodeURI(`{"include": "fields"},{"where":{"systemid":"${systemid}"}}`);
-    return this.http
+  async getContentTypeBySystemIdPromise(systemid) {
+    const filter = encodeURI(`{"include": "fields","where":{"systemid":"${systemid}"}}`);
+    this.contentType = await this.http
       .get(environment.apiUrl + `contentTypes?filter=${filter}`)
       .toPromise();
+      this.processContentTypeFields(this.contentType[0]);
+      return this.contentType;
   }
 
   public updateContentTypeField(fieldData){
@@ -106,7 +108,7 @@ export class ContentTypesService {
     let controls: QuestionBase<any>[] = [];
     if (contentType.fields) {
       contentType.fields.forEach(field => {
-        // console.log('fieldcontrol', field);
+        console.log('fieldcontrol', field);
         let control = new TextboxQuestion({
           key: field.systemid,
           label: field.label,

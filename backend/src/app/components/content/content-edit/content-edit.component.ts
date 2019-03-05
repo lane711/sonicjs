@@ -18,6 +18,7 @@ export class ContentEditComponent implements OnInit {
 
   id:any;
   contentInstance: any;
+  contentType: any;
   questions: any;
   isDataAvailable = false;
 
@@ -27,19 +28,20 @@ export class ContentEditComponent implements OnInit {
   }
 
   loadContent(){
-    this.contentService.getContentInstance(this.id).then(data =>{
-      this.contentInstance = data;
+    this.contentService.getContentInstance(this.id).then(contentInstance =>{
+      this.contentInstance = contentInstance;
       console.log(this.contentInstance);
 
-      // this.contentTypesService.getContentTypeBySystemIdPromise(this.contentInstance.systemid).then(data =>{
-      //   console.log(data);
-      // });
+      this.contentTypesService.getContentTypeBySystemIdPromise(this.contentInstance.contentType).then(data =>{
+        console.log('>>>>loadContent.getContentTypeBySystemIdPromise', data);
+        this.setQuestions(data[0].controls);
+      });
 
-      if (this.contentTypesService.contentType) {
-        this.setQuestions(this.contentTypesService.contentType.controls);
-      } else {
-        this.loadQuestions();
-      }
+      // if (this.contentTypesService.contentType) {
+      //   this.setQuestions(this.contentTypesService.contentType.controls);
+      // } else {
+      //   this.loadQuestions(this.contentInstance.contentType);
+      // }
     })
   }
 
@@ -49,17 +51,16 @@ export class ContentEditComponent implements OnInit {
     this.contentService.createContentInstance(payload);
   }
 
-  loadQuestions() {
-    console.log('loadQuestions');
-    this.contentTypesService.contentTypeSubject.subscribe(data => {
-      // console.log(data);
-      this.setQuestions(data.controls);
-    });
-  }
+  // loadQuestions(contentTypeSystemId) {
+  //   console.log('loadQuestions');
+  //   this.contentTypesService.getContentTypeBySystemIdPromise(contentTypeSystemId).then(data => {
+  //     // console.log(data);
+  //     this.setQuestions(data.controls);
+  //   });
+  // }
 
   setQuestions(questions) {
     console.log('setQuestions');
-
     this.questions = questions;
     this.isDataAvailable = true;
   }
