@@ -22,27 +22,26 @@ export class ContentEditComponent implements OnInit {
   questions: any;
   isDataAvailable = false;
 
-  ngOnInit() {
+  async ngOnInit() {
     this.id = this.route.snapshot.paramMap.get("id");
-    this.loadContent();
+    this.loadContentTypeForm();
   }
 
-  loadContent(){
+   loadContentTypeForm(){
     this.contentService.getContentInstance(this.id).then(contentInstance =>{
       this.contentInstance = contentInstance;
-      console.log(this.contentInstance);
+      console.log('loadContentTypeForm.contentInstance', this.contentInstance);
 
       this.contentTypesService.getContentTypeBySystemIdPromise(this.contentInstance.contentType).then(data =>{
-        console.log('>>>>loadContent.getContentTypeBySystemIdPromise', data);
         this.setQuestions(data[0].controls);
+        this.loadContentIntoContentTypeForm();
       });
-
-      // if (this.contentTypesService.contentType) {
-      //   this.setQuestions(this.contentTypesService.contentType.controls);
-      // } else {
-      //   this.loadQuestions(this.contentInstance.contentType);
-      // }
     })
+  }
+
+  async loadContentIntoContentTypeForm(){
+    console.log('this.questions', this.questions)
+    this.contentService.loadFormDataFromMatchingPropNames(this.questions, this.contentInstance);
   }
 
   onSubmitContentAdd(payload) {
@@ -60,7 +59,7 @@ export class ContentEditComponent implements OnInit {
   // }
 
   setQuestions(questions) {
-    console.log('setQuestions');
+    console.log('setQuestions', questions);
     this.questions = questions;
     this.isDataAvailable = true;
   }

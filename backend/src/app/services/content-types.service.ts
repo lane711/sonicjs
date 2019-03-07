@@ -106,9 +106,10 @@ export class ContentTypesService {
 
   public processContentTypeFields(contentType) {
     let controls: QuestionBase<any>[] = [];
+    this.addBaseContentTypeFields(contentType, controls);
     if (contentType.fields) {
       contentType.fields.forEach(field => {
-        console.log('fieldcontrol', field);
+        // console.log('fieldcontrol', field);
         let control = new TextboxQuestion({
           key: field.systemid,
           label: field.label,
@@ -120,6 +121,17 @@ export class ContentTypesService {
       });
     }
     contentType.controls = controls;
+  }
+
+  private addBaseContentTypeFields(contentType, controls){
+    let control = new TextboxQuestion({
+      key: 'contentType',
+      label: 'Content Type',
+      value: contentType.contentType,
+      required: true,
+      order: 0
+    });
+    controls.push(control);
   }
 
   // public processContentTypeFieldsOld(contentType) {
@@ -159,17 +171,6 @@ export class ContentTypesService {
         this.httpOptions
       )
       .toPromise();
-
-    // let response = await this.http
-    //   .post(
-    //     environment.apiUrl + `contentTypes/${contentTypeId}/fields`,
-    //     fieldData,
-    //     this.httpOptions
-    //   )
-    //   .toPromise()
-    //   .catch((err: HttpErrorResponse) => {
-    //     console.error("An error occurred:", err.error);
-    //   });
   }
 
   async deleteContentTypeAsync(contentTypeId): Promise<Object> {
@@ -185,4 +186,6 @@ export class ContentTypesService {
       )
       .toPromise();
   }
+
+  
 }

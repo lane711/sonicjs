@@ -31,4 +31,24 @@ export class ContentService {
     console.log('createContentInstance', content);
     return this.http.post(environment.apiUrl + "contents/", content).toPromise();
   }
+
+  public loadFormDataFromMatchingPropNames(questions, content){
+    console.log('loadFormDataFromMatchingPropNames.questions', questions);
+    console.log('loadFormDataFromMatchingPropNames.content', content);
+
+    for (var property in content) {
+      if (content.hasOwnProperty(property)) {
+        // console.log('property', property);
+        this.populateFormField(questions, content, property);
+      }
+    }
+  }
+
+  private populateFormField(questions, content, property){
+    let questionToPopulate = questions.find(q => q.key === property)
+    // console.log('questionToPopulate', questionToPopulate);
+    if(questionToPopulate){
+      questionToPopulate.value = content[property];
+    }
+  }
 }
