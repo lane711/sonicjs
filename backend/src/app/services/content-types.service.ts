@@ -124,14 +124,26 @@ export class ContentTypesService {
   }
 
   private addBaseContentTypeFields(contentType, controls){
-    let control = new TextboxQuestion({
-      key: 'contentType',
-      label: 'Content Type',
-      value: contentType.contentType,
-      required: true,
-      order: 0
-    });
-    controls.push(control);
+    // console.log('addBaseContentTypeFields', contentType);
+    if(controls.url){
+      let controlContentType = new TextboxQuestion({
+        key: 'contentType',
+        label: 'Content Type',
+        value: contentType.contentType,
+        required: true,
+        order: 0
+      });
+      controls.push(controlContentType);
+
+      let controlId = new TextboxQuestion({
+        key: 'id',
+        label: 'Id',
+        value: contentType.id,
+        required: true,
+        order: 0
+      });
+      controls.push(controlId);
+    }
   }
 
   // public processContentTypeFieldsOld(contentType) {

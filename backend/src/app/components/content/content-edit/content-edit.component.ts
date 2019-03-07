@@ -30,7 +30,7 @@ export class ContentEditComponent implements OnInit {
    loadContentTypeForm(){
     this.contentService.getContentInstance(this.id).then(contentInstance =>{
       this.contentInstance = contentInstance;
-      console.log('loadContentTypeForm.contentInstance', this.contentInstance);
+      // console.log('loadContentTypeForm.contentInstance', this.contentInstance);
 
       this.contentTypesService.getContentTypeBySystemIdPromise(this.contentInstance.contentType).then(data =>{
         this.setQuestions(data[0].controls);
@@ -40,7 +40,7 @@ export class ContentEditComponent implements OnInit {
   }
 
   async loadContentIntoContentTypeForm(){
-    console.log('this.questions', this.questions)
+    // console.log('this.questions', this.questions)
     this.contentService.loadFormDataFromMatchingPropNames(this.questions, this.contentInstance);
   }
 
