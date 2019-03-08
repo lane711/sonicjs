@@ -158,22 +158,20 @@ export class ContentTypesService {
   // }
 
   async createContentTypeAsync(contentType): Promise<Object> {
-    // contentType.fields = [
-    //   {
-    //     "fieldType": "string",
-    //     "systemid": "string",
-    //     "label": "string",
-    //     "placeholder": "string",
-    //     "required": false,
-    //     "id": "string"
-    //   }
-    // ]
     console.log('createContentTypeAsync', contentType);
     const newContentType = await this.http
       .post(environment.apiUrl + `contentTypes/`, contentType)
       .toPromise();
 
-    // const addField = await this.addFieldToContentType(newContentType, "textBox");
+    let defaultField =  {
+        "fieldType" : "textBox", 
+        "systemid" : "url", 
+        "label" : "Url", 
+        "placeholder" : "Url", 
+        "required" : true
+    }
+    
+    const addField = await this.addFieldToContentType(newContentType, defaultField);
     return newContentType;
   }
 
