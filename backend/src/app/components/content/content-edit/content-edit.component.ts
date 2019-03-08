@@ -32,7 +32,7 @@ export class ContentEditComponent implements OnInit {
       this.contentInstance = contentInstance;
       // console.log('loadContentTypeForm.contentInstance', this.contentInstance);
 
-      this.contentTypesService.getContentTypeBySystemIdPromise(this.contentInstance.contentType).then(data =>{
+      this.contentTypesService.getContentTypeBySystemIdPromise(this.contentInstance.data.contentType).then(data =>{
         this.setQuestions(data[0].controls);
         this.loadContentIntoContentTypeForm();
       });

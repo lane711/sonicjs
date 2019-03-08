@@ -9,15 +9,11 @@
     "id": {
       "type": "number"
     },
-    "name": {
-      "type": "string",
-      "required": true
-    },
     "url": {
       "type": "string",
       "required": true
     },
-    "content": {
+    "data": {
       "type": "Object",
       "required": true
     }

@@ -10,14 +10,16 @@
             <tr>
               <th>Title</th>
               <th>Type</th>
+              <th>Url</th>
               <th>Content</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let content of contentInstances">
-              <td><a [routerLink]="['/content', content.id]">{{ content.name }}</a></td>
-              <td>{{ content.contentType }}</td>
+              <td><a [routerLink]="['/content', content.id]">{{ content.data.name }}</a></td>
+              <td>{{ content.data.contentType }}</td>
+              <td>{{ content.url }}</td>
               <td>...</td>
               <td>
                 <a href="{{ content.url }}" target="_blank" class="btn btn-sm btn-success rmargin">View</a>

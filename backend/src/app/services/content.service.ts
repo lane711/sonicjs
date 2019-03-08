@@ -22,14 +22,22 @@ export class ContentService {
   public createContentInstance(payload) {
     console.log('createContentInstance payload', payload);
     let content:any = {};
-    content.contentType = payload.contentType;
-    content.name = payload[Object.keys(payload)[0]];;
-    content.url = payload.url;
-    content.content = payload;
-
-
-    console.log('createContentInstance', content);
+    content.data = {};
+    this.processContentFields(payload, content);
+    console.log('content', content);
     return this.http.post(environment.apiUrl + "contents/", content).toPromise();
+  }
+
+  private processContentFields(payload, content){
+    for (var property in payload) {
+      if (payload.hasOwnProperty(property)) {
+        if(property == 'url'){
+          content.url = payload.url;
+          continue;
+        }
+        content.data[property] = payload[property];
+      }
+    }
   }
 
   public loadFormDataFromMatchingPropNames(questions, content){
