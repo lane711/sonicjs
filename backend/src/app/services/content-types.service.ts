@@ -82,6 +82,7 @@ export class ContentTypesService {
       .get(environment.apiUrl + `contentTypes?filter=${filter}`)
       .toPromise();
       this.processContentTypeFields(this.contentType[0]);
+      console.log('after processContentTypeFields', this.contentType)
       return this.contentType;
   }
 
@@ -91,8 +92,8 @@ export class ContentTypesService {
     this.getContentTypePromise(fieldData.contentTypeId).then(contentType =>{
       let ct: any = contentType;
       
-      ct.fieldList.filter(field => field.id === fieldData.fieldId)[0].label = fieldData.label;
-      ct.fieldList.filter(field => field.id === fieldData.fieldId)[0].systemid = fieldData.systemid;
+      ct.fields.filter(field => field.id === fieldData.fieldId)[0].label = fieldData.label;
+      ct.fields.filter(field => field.id === fieldData.fieldId)[0].systemid = fieldData.systemid;
 
       this.putContentTypeAsync(contentType).then(updateContentType =>{
         console.log('updateContentType', updateContentType);
@@ -109,7 +110,7 @@ export class ContentTypesService {
     this.addBaseContentTypeFields(contentType, controls);
     if (contentType.fields) {
       contentType.fields.forEach(field => {
-        // console.log('fieldcontrol', field);
+        console.log('fieldcontrol', field);
         let control = new TextboxQuestion({
           key: field.systemid,
           label: field.label,
@@ -157,12 +158,22 @@ export class ContentTypesService {
   // }
 
   async createContentTypeAsync(contentType): Promise<Object> {
-    // let contentTypeJson = JSON.parse(contentType);
+    // contentType.fields = [
+    //   {
+    //     "fieldType": "string",
+    //     "systemid": "string",
+    //     "label": "string",
+    //     "placeholder": "string",
+    //     "required": false,
+    //     "id": "string"
+    //   }
+    // ]
+    console.log('createContentTypeAsync', contentType);
     const newContentType = await this.http
       .post(environment.apiUrl + `contentTypes/`, contentType)
       .toPromise();
 
-    const addField = await this.addFieldToContentType(newContentType, "textBox");
+    // const addField = await this.addFieldToContentType(newContentType, "textBox");
     return newContentType;
   }
 

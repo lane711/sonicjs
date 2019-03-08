@@ -46,7 +46,12 @@ export class ContentService {
 
     for (var property in content) {
       if (content.hasOwnProperty(property)) {
-        // console.log('property', property);
+        this.populateFormField(questions, content, property);
+      }
+    }
+
+    for (var property in content.data) {
+      if (content.data.hasOwnProperty(property)) {
         this.populateFormField(questions, content, property);
       }
     }
@@ -54,9 +59,13 @@ export class ContentService {
 
   private populateFormField(questions, content, property){
     let questionToPopulate = questions.find(q => q.key === property)
-    // console.log('questionToPopulate', questionToPopulate);
+    console.log('questionToPopulate', questionToPopulate);
     if(questionToPopulate){
-      questionToPopulate.value = content[property];
+      if(property == 'url'){
+        questionToPopulate.value = content[property];
+      }else{
+        questionToPopulate.value = content.data[property];
+      }
     }
   }
 }
