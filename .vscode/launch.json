@@ -5,6 +5,17 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "type": "chrome",
+      "request": "attach",
+      "name": "Attach Karma Chrome",
+      "address": "127.0.0.1",
+      "port": 9876,
+      "pathMapping": {
+        "/": "${workspaceRoot}/backend/",
+        "/base/": "${workspaceRoot}/backend/"
+      }
+    },
+    {
       "type": "node",
       "request": "launch",
       "name": "Server",

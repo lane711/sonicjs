@@ -26,7 +26,8 @@ describe('ContentTypesService', () => {
   it('should create a new content type', () => {
     const service: ContentTypesService = TestBed.get(ContentTypesService);
     let contentType = { name: 'deleteMe'};
-    service.createContentTypeAsync(contentType);
+    var newContenType:any = service.createContentTypeAsync(contentType);
+    // expect(newContenType.name == "deleteMe").toBeTruthy();
     expect(service).toBeTruthy();
   });
 });
