@@ -50,5 +50,9 @@
   "contentTypeField": {
     "dataSource": "transient",
     "public": false
+  },
+  "e2e-test": {
+    "dataSource": "mongodb",
+    "public": true
   }
 }
