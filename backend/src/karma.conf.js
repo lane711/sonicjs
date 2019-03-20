@@ -25,13 +25,7 @@ module.exports = function (config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['ChromeDebugging'],
-    customLanuchers: {
-      ChromeDebugging: {
-        base: 'Chrome',
-        flags: ['--remote-debugging-port=9876']
-      }
-    },
+    browsers: ['Chrome'],
     singleRun: false
   });
 };
