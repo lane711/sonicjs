@@ -35,6 +35,7 @@
     "pace-progress": "1.0.2",
     "perfect-scrollbar": "1.4.0",
     "popper.js": "1.14.4",
+    "puppeteer": "^1.13.0",
     "rxjs": "~6.2.0",
     "shortid": "^2.2.14",
     "simple-line-icons": "2.4.1",

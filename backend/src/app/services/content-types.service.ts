@@ -162,6 +162,7 @@ export class ContentTypesService {
     const newContentType = await this.http
       .post(environment.apiUrl + `contentTypes/`, contentType)
       .toPromise();
+      console.log('createContentTypeAsync created!');
 
     let defaultField =  {
         "fieldType" : "textBox", 
