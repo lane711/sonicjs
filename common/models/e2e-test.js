@@ -25,9 +25,12 @@ module.exports = function(E2etest) {
         var response = new Date();
 
         (async () => {
-            const browser = await puppeteer.launch();
+            const browser = await puppeteer.launch({
+                headless:false
+            });
             const page = await browser.newPage();
-            await page.goto('http://localhost:3000/explorer/#!/e2e45test/e2e_test_status');
+            await page.goto('http://localhost:4200/admin/content-types');
+            await page.click('.clickButton');
             await page.screenshot({path: 'example.png'});
           
             await browser.close();
