@@ -19,7 +19,7 @@
           </thead>
           <tbody>
             <!-- {{#each contentType.fields}} -->
-            <tr *ngFor='let field of this.contentTypesService.contentType?.fields'>
+            <tr *ngFor='let field of this.contentTypesService.contentType?.fields; index as i'>
               <td>
                 {{field.fieldType}}
               </td>
@@ -31,7 +31,7 @@
                 <div [innerHTML]="this.fieldTypesService.generateHtml(field) | safe: 'html'"></div>
               </td>
               <td>
-                  <button (click)="goToFieldEdit(field.id)"  class="btn btn-sm btn-primary rmargin">
+                  <button (click)="goToFieldEdit(field.id)"  class="btn btn-sm btn-primary rmargin field-edit-{{i}}">
                     <i class="fa fa-pencil"></i>
                   </button>
                 <button class="btn btn-sm btn-danger" (click)="deleteField(field.id)">
@@ -46,7 +46,7 @@
         <!-- </form> -->
       </div>
       <div class="card-footer">
-        <button type="button" class="btn btn-success pull-right" data-toggle="modal" data-target="#addFieldModal">
+        <button type="button" class="btn btn-success pull-right add-field" data-toggle="modal" data-target="#addFieldModal">
           Add Field
         </button>
       </div>
@@ -86,7 +86,7 @@
                 <div [innerHTML]="fieldType.generateHtml() | safe: 'html'"></div>
               </td>
               <td>
-                <button class="btn btn-sm btn-primary" (click)="addField($event, fieldType)">Add</button>
+                <button class="btn btn-sm btn-primary {{fieldType.name}}" (click)="addField($event, fieldType)">Add</button>
                 <button class="btn btn-sm btn-primary" (click)="refresh($event, fieldType)">Refresh</button>
 
               </td>

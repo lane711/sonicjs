@@ -5,7 +5,7 @@
     <app-questions [question]="question" [form]="form" style="width:100%"></app-questions>
   </div></div>
 <div class="card-footer">
-  <button type="button" type="submit" [disabled]="!form.valid" class="btn btn-primary pull-right save">
+  <button type="button" type="submit" [disabled]="!form.valid" class="btn btn-primary pull-right save {{this.onSubmitHandler}}">
     Save
   </button>
   <button type="reset" (click)="back()" class="btn btn-warning">
