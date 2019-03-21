@@ -5,7 +5,7 @@ const { assert } = require('chai');
 
 (async () => {
     const browser = await puppeteer.launch({
-        headless:false,
+        headless:true,
         args: [`--window-size=${1080},${680}`] // new option
     });
     
@@ -51,9 +51,11 @@ const { assert } = require('chai');
     //edit field properties
     await page.focus('input[id=label]')
     await page.keyboard.type('xXxX')
-    page.$eval('.aside-menu > .save', elem => elem.click());
+    await page.$eval('.aside-menu .save', elem => elem.click());
 
-    // await browser.close();
+    //delete content type
+
+    await browser.close();
 
     
   })();
