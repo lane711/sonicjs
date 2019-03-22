@@ -1,5 +1,5 @@
-# Visit SiteDen.com for Details, Videos & Docs
-[https://siteden.com](https://siteden.com)
+# Visit SonicJs.com for Details, Videos & Docs
+[https://sonicjs.com](https://sonicjs.com)
 
 # Site Den NodeJs Content Management System (CMS)
 
