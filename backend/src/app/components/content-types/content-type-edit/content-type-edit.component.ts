@@ -2,6 +2,8 @@ import { Component, OnInit } from "@angular/core";
 import { Router, ActivatedRoute, ParamMap } from "@angular/router";
 import { switchMap } from "rxjs/operators";
 import { ContentTypesService } from "../../../services/content-types.service";
+import { UiService } from "../../../services/ui.service";
+
 import { TextboxQuestion } from "../../../models/question-textbox";
 import { DropdownQuestion } from "../../../models/question-dropdown";
 import { HiddenQuestion } from '../../../models/question-hidden';
@@ -15,7 +17,8 @@ export class ContentTypeEditComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private contentTypesService: ContentTypesService
+    private contentTypesService: ContentTypesService,
+    private uiService: UiService
   ) {}
 
   public contentType;
@@ -80,6 +83,9 @@ export class ContentTypeEditComponent implements OnInit {
 console.log('saving...', this.contentTypesService.contentType);
     this.contentTypesService.putContentTypeAsync(this.contentTypesService.contentType).then(updateContentType =>{
       console.log('updateContentType', updateContentType);
+      this.uiService.showAlertMessage = true;
+      this.uiService.showAlertMessageText = 'Content Type Saved :)';
+
       // this.contentType = updateContentType;
       // this.processContentTypeFields(updateContentType);
       // this.contentTypeSubject.next(updateContentType);

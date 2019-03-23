@@ -6,6 +6,11 @@ import { Injectable } from '@angular/core';
 export class UiService {
 
   public showAside = false;
+
+  public showAlertMessage = false;
+  public showAlertMessageText = '';
+
+
   public lastFieldIdSelected: any;
   
   constructor() { }
@@ -19,5 +24,9 @@ export class UiService {
     } else {
       this.lastFieldIdSelected = fieldId;
     }
+  }
+
+  showGrowlMessage(message){
+
   }
 }

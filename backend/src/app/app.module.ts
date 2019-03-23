@@ -25,6 +25,7 @@ import { ContentTypeEditFieldComponent } from './components/content-types/conten
 import { AsideMenuComponent } from './components/aside-menu/aside-menu.component';
 import { MenuComponent } from './elements/menu/menu.component';
 import { ContentEditComponent } from './components/content/content-edit/content-edit.component';
+import { AlertMessageComponent } from './components/alert-message/alert-message.component';
 
 @NgModule({
   declarations: [
@@ -47,7 +48,8 @@ import { ContentEditComponent } from './components/content/content-edit/content-
     PagesComponent,
     ContentTypeEditFieldComponent,
     AsideMenuComponent,
-    ContentEditComponent
+    ContentEditComponent,
+    AlertMessageComponent
   ],
   imports: [
     BrowserModule,
