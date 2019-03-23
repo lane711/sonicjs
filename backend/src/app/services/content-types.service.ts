@@ -87,13 +87,13 @@ export class ContentTypesService {
   }
 
   public updateContentTypeField(fieldData){
-    console.log('fieldData', fieldData);
+    console.log('fieldData', fieldData); 
 
     this.getContentTypePromise(fieldData.contentTypeId).then(contentType =>{
       let ct: any = contentType;
       
-      ct.fields.filter(field => field.id === fieldData.fieldId)[0].label = fieldData.label;
-      ct.fields.filter(field => field.id === fieldData.fieldId)[0].systemid = fieldData.systemid;
+      ct.fieldList.filter(field => field.id === fieldData.fieldId)[0].label = fieldData.label;
+      ct.fieldList.filter(field => field.id === fieldData.fieldId)[0].systemid = fieldData.systemid;
 
       this.putContentTypeAsync(contentType).then(updateContentType =>{
         console.log('updateContentType', updateContentType);
@@ -110,7 +110,7 @@ export class ContentTypesService {
     this.addBaseContentTypeFields(contentType, controls);
     if (contentType.fields) {
       contentType.fields.forEach(field => {
-        console.log('fieldcontrol', field);
+        // console.log('fieldcontrol', field);
         let control = new TextboxQuestion({
           key: field.systemid,
           label: field.label,
@@ -177,6 +177,7 @@ export class ContentTypesService {
   }
 
   async putContentTypeAsync(contentType): Promise<Object> {
+    console.log('putContentTypeAsync.contentType', contentType);
     return this.http
       .put(environment.apiUrl + `contentTypes/`, contentType)
       .toPromise();

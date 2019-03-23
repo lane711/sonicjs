@@ -59,7 +59,7 @@ export class ContentEditComponent implements OnInit {
   // }
 
   setQuestions(questions) {
-    console.log('setQuestions', questions);
+    // console.log('setQuestions', questions);
     this.questions = questions;
     this.isDataAvailable = true;
   }
