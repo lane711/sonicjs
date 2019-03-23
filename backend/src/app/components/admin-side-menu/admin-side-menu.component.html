@@ -3,36 +3,58 @@
     <li class="nav-item">
 
       <a class="nav-link" href="index.html">
-        <i class="nav-icon icon-speedometer"></i> Dashboard
-        <span class="badge badge-primary">NEW</span>
+        <i class="nav-icon fa fa-dashboard"></i> Dashboard
+        <!-- <span class="badge badge-primary">NEW</span> -->
       </a>
+    </li>
+
+
+    <li class="nav-title">Components</li>
+    <li class="nav-item nav-dropdown">
+      <a class="nav-link" [routerLink]="['admin']">
+        <i class="nav-icon fa fa-home"></i> Home</a>
+    </li>
+    <li class="nav-item nav-dropdown">
+      <a class="nav-link" [routerLink]="['admin/field-types']">
+        <i class="nav-icon fa fa-cube"></i> Field Types</a>
+    </li>
+    <li class="nav-item nav-dropdown">
+      <a class="nav-link" [routerLink]="['admin/content-types']">
+        <i class="nav-icon fa fa-cubes"></i> Content Types</a>
+    </li>
+    <li class="nav-item nav-dropdown">
+      <a class="nav-link" [routerLink]="['/admin/content']">
+        <i class="nav-icon fa fa-columns"></i> Content</a>
     </li>
 
     <li class="nav-title">Theme</li>
     <li class="nav-item">
       <a class="nav-link" href="colors.html">
-        <i class="nav-icon icon-drop"></i> Colors</a>
+        <i class="nav-icon fa fa-tint"></i> Colors</a>
     </li>
     <li class="nav-item">
       <a class="nav-link" href="typography.html">
-        <i class="nav-icon icon-pencil"></i> Typography</a>
+        <i class="nav-icon fa fa-font"></i> Typography</a>
     </li>
-    <li class="nav-title">Components</li>
-    <li class="nav-item nav-dropdown">
-      <a class="nav-link" [routerLink]="['admin']">
-        <i class="nav-icon icon-puzzle"></i> Home</a>
+
+    <li class="nav-title">Security</li>
+    <li class="nav-item">
+      <a class="nav-link" href="colors.html">
+        <i class="nav-icon fa fa-shield"></i> Settings</a>
     </li>
-    <li class="nav-item nav-dropdown">
-      <a class="nav-link" [routerLink]="['admin/field-types']">
-        <i class="nav-icon icon-puzzle"></i> Field Types</a>
+    <li class="nav-item">
+      <a class="nav-link" href="typography.html">
+        <i class="nav-icon fa fa-user"></i> Users</a>
     </li>
-    <li class="nav-item nav-dropdown">
-      <a class="nav-link" [routerLink]="['admin/content-types']">
-        <i class="nav-icon icon-puzzle"></i> Content Types</a>
+
+    <li class="nav-title">System</li>
+    <li class="nav-item">
+      <a class="nav-link" href="colors.html">
+        <i class="nav-icon fa fa-cog"></i> Settings</a>
     </li>
-    <li class="nav-item nav-dropdown">
-      <a class="nav-link" [routerLink]="['/admin/content']">
-        <i class="nav-icon icon-puzzle"></i> Content</a>
+    <li class="nav-item">
+      <a class="nav-link" href="typography.html">
+        <i class="nav-icon fa fa-align-justify"></i> Logs</a>
     </li>
   </ul>
 </nav>

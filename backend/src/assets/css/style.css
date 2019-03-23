@@ -11881,11 +11881,14 @@ canvas {
 }
 
 .sidebar .sidebar-minimizer {
-  position: relative;
+  position: absolute;
   -ms-flex: 0 0 50px;
   flex: 0 0 50px;
   background-color: rgba(0, 0, 0, 0.2);
   border: 0;
+  bottom: 0;
+  width: 100%;
+  height: 50px;
 }
 
 .sidebar .sidebar-minimizer::before {
