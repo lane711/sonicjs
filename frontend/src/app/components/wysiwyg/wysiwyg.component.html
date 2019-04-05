@@ -2,8 +2,20 @@
   wysiwyg works!
 </p>
 <div id="myGrid"></div>
-<script>
-$('#myGrid').gridEditor({
-  new_row_layouts: [[12], [6,6], [9,3]],
-});
+<script lang="javascript">
+$(function() {
+  alert('f1');
+});//Links to jsfiddle must be accompanied by code
+</script>
+
+
+<script lang="javascript">
+  alert("load wys");
+  "use strict";
+  $(document).ready(function () {
+    console.log('loading wtwuwyg');
+    $('#myGrid').gridEditor({
+      new_row_layouts: [[12], [6, 6], [9, 3]],
+    });
+  });
 </script>

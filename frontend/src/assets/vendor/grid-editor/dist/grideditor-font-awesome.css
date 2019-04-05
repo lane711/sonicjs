@@ -1,0 +1,44 @@
+/* Font Awesome Integration for Grid Editor
+ * (min. Version 4.0)
+ */
+.ge-canvas.ge-editing .ge-tools-drawer > a {
+  padding: 3px 5px;
+}
+.ge-canvas .glyphicon,
+.ge-mainControls .glyphicon {
+  top: 0;
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.ge-canvas .glyphicon-move:before {
+  content: "\f047";
+}
+.ge-canvas .glyphicon-minus:before {
+  content: "\f147";
+}
+.ge-canvas .glyphicon-plus:before {
+  content: "\f196";
+}
+.ge-canvas .glyphicon-cog:before {
+  content: "\f013";
+}
+.ge-canvas .glyphicon-trash:before {
+  content: "\f014";
+}
+.ge-canvas .glyphicon-plus-sign:before,
+.ge-mainControls .glyphicon-plus-sign:before {
+  content: "\f055";
+}
+.ge-mainControls .glyphicon-eye-open:before {
+  content: "\f06e";
+}
+.ge-mainControls .glyphicon-chevron-left:before {
+  content: "\f121";
+}
+.ge-mainControls .glyphicon-chevron-right {
+  display: none;
+}
