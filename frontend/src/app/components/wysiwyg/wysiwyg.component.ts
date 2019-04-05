@@ -16,11 +16,30 @@ export class WysiwygComponent implements OnInit {
   ngOnInit() {
     $(document).ready(function () {
       $('#layout-builder').gridEditor({
-        new_row_layouts: [[12], [6, 6],[4,4,4],[3,3,3,3],[9, 3],[3,9]],
+        new_row_layouts: [[12], [6, 6], [4, 4, 4], [3, 3, 3, 3], [9, 3], [3, 9]],
+        content_types: ['summernote'],
+        summernote: {
+          config: {
+            callbacks: {
+              onInit: function () {
+                var element = this;
+                console.log('init done', element);
+              }
+            }
+          }
+        }
       });
 
-      $('#summernote').summernote();
+
+
+      // $('#summernote').summernote();
     });
+  }
+
+  saveContent() {
+    // Get resulting html
+    var html = $('#layout-builder').gridEditor('getHtml');
+    console.log(html);
   }
 
 }
