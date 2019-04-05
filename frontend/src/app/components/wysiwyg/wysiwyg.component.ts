@@ -15,8 +15,8 @@ export class WysiwygComponent implements OnInit {
 
   ngOnInit() {
     $(document).ready(function () {
-      $('#myGrid').gridEditor({
-        new_row_layouts: [[12], [6, 6], [9, 3]],
+      $('#layout-builder').gridEditor({
+        new_row_layouts: [[12], [6, 6],[4,4,4],[3,3,3,3],[9, 3],[3,9]],
       });
     });
   }
