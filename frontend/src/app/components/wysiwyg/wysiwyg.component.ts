@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 declare var $: any;
 
 @Component({
@@ -9,13 +9,21 @@ declare var $: any;
 
 
 export class WysiwygComponent implements OnInit {
-
+  
+  @Input()
+  sectionId: string;
 
   constructor() { }
 
-  ngOnInit() {
+  ngOnInit(){
+    this.setupGridEditor(`#layout-builder-${this.sectionId}`);
+    // this.setupSummerNoteWYSIWYG();
+  }
+
+  setupGridEditor(gridElem){
+    console.log('gridElem',gridElem);
     $(document).ready(function () {
-      $('#layout-builder').gridEditor({
+      $(gridElem).gridEditor({
         new_row_layouts: [[12], [6, 6], [4, 4, 4], [3, 3, 3, 3], [9, 3], [3, 9]],
         content_types: ['summernote'],
         summernote: {
@@ -23,17 +31,17 @@ export class WysiwygComponent implements OnInit {
             callbacks: {
               onInit: function () {
                 var element = this;
-                console.log('init done', element);
+                console.log('init done element:', element);
               }
             }
           }
         }
       });
-
-
-
-      // $('#summernote').summernote();
     });
+  }
+  
+  setupSummerNoteWYSIWYG(){
+      $('#summernote').summernote();
   }
 
   saveContent() {

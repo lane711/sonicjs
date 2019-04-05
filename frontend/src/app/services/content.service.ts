@@ -20,4 +20,10 @@ export class ContentService {
     let url = environment.apiUrl + `contents?filter=${filter}`;
     return this.http.get(url).toPromise();
   }
+
+  async saveSection(section) {
+    const filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
+    let url = environment.apiUrl + `contents?filter=${filter}`;
+    return this.http.get(url).toPromise();
+  }
 }
