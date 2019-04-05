@@ -18,7 +18,6 @@ export class ContentService {
   async getContentByType(contentType) {
     const filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
     let url = environment.apiUrl + `contents?filter=${filter}`;
-    console.log('url', url);
     return this.http.get(url).toPromise();
   }
 }

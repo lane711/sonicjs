@@ -9,6 +9,7 @@ import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { SectionComponent } from './components/section/section.component';
 import { PageComponent } from './components/page/page.component';
+import { WysiwygComponent } from './components/wysiwyg/wysiwyg.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { PageComponent } from './components/page/page.component';
     HeaderComponent,
     FooterComponent,
     SectionComponent,
-    PageComponent
+    PageComponent,
+    WysiwygComponent
   ],
   imports: [
     BrowserModule,
