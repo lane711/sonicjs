@@ -95,6 +95,9 @@ I started this project because I have established a recent affinity to NodeJs al
 
 1. From VS Code Extension, install the Debugger for Chrome extension 
 
+## Automated Browser Testing
+`node e2e/content-types.ts`
+
 ## Sponsers
 
 This Project is supported by [Surge](https://www.surgeforward.com/)

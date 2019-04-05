@@ -5,7 +5,7 @@ const { assert } = require('chai');
 
 (async () => {
     const browser = await puppeteer.launch({
-        headless:true,
+        headless:false,
         args: [`--window-size=${1080},${680}`] // new option
     });
     
