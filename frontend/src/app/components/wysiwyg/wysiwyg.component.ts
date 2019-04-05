@@ -18,6 +18,8 @@ export class WysiwygComponent implements OnInit {
       $('#layout-builder').gridEditor({
         new_row_layouts: [[12], [6, 6],[4,4,4],[3,3,3,3],[9, 3],[3,9]],
       });
+
+      $('#summernote').summernote();
     });
   }
 
