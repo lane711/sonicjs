@@ -13,8 +13,7 @@ export class MenuComponent implements OnInit {
   public menuItems;
 
   ngOnInit() {
-    this.contentService.getContent().then(data =>{
-      console.log('getContent', data);
+    this.contentService.getContentByType('menu').then(data =>{
       this.menuItems = data;
     })
   }
