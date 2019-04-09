@@ -21,8 +21,8 @@ export class ContentService {
     return this.http.get(url).toPromise();
   }
 
-  async saveSection(section) {
-    console.log('saveSection',section)
+  async saveSection(section, payload) {
+    console.log('saveSection=>',section, payload);
     // const filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
     // let url = environment.apiUrl + `contents?filter=${filter}`;
     // return this.http.get(url).toPromise();

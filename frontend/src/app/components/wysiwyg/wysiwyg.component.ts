@@ -1,4 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { ContentService } from '../../services/content.service'
+
 declare var $: any;
 
 @Component({
@@ -13,9 +15,12 @@ export class WysiwygComponent implements OnInit {
   @Input()
   sectionId: string;
 
+  @Input()
+  onSubmitHandler: any;
+
   showSaveControls: boolean = false;
 
-  constructor() { }
+  constructor(private contentService:ContentService) { }
 
   ngOnInit(){
     // console.log('main this', this);
@@ -25,7 +30,6 @@ export class WysiwygComponent implements OnInit {
   setupJqueryFunctions(){
     $(document).ready(() => {
       this.setupGridEditor(`#layout-builder-${this.sectionId}`);
-      this.setupShowSaveControlsListener();
     });
 
   }
@@ -41,7 +45,7 @@ export class WysiwygComponent implements OnInit {
             callbacks: {
               onInit: () => {
                 var element = this;
-                console.log('init done element:', element);
+                // console.log('init done element:', element);
                 $(`.${self.sectionId}-save`).show();
               }
             }
@@ -49,35 +53,17 @@ export class WysiwygComponent implements OnInit {
         }
       });
   }
-
-  setupShowSaveControlsListener(){
-    var self = this;
-      $('.wysiwyg-header').click(() => {
-        // var self= this;
-        console.log('note-editable clicked');
-        $(`.${self.sectionId}-save2`).show();
-        self.showSaveControls = true;
-
-        self.showControls();
-      })
-  }
-
-  showControls(){
-    console.log('showControls this', this);
-    this.showSaveControls = true;
-    console.log('showControls', this.showSaveControls);
-  }
   
   setupSummerNoteWYSIWYG(){
       $('#summernote').summernote();
   }
 
-  saveContent(sectionId) {
+  onSubmit(sectionId, payload) {
     let fullSectionId = `#layout-builder-${sectionId}`
-    console.log('wysiwyg saving for ', fullSectionId);
     // Get resulting html
     var html = $(fullSectionId).gridEditor('getHtml');
-    console.log('html', html);
+    this.onSubmitHandler(sectionId, html);
+
   }
 
 }

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ContentService } from '../../services/content.service'
 
 @Component({
   selector: 'app-section',
@@ -7,9 +8,18 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SectionComponent implements OnInit {
 
-  constructor() { }
+  constructor(private contentService:ContentService) { }
 
   ngOnInit() {
+    this.contentService.saveSection('test', 'payload');
+  }
+
+  onSubmitSaveSection(sectionId, payload){
+    console.log('onSubmitSaveSection', sectionId, payload);
+    //section section info
+    console.log(this.contentService);
+    this.contentService.saveSection(sectionId, payload);
+    //link section to page object
   }
 
 }
