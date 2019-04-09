@@ -13,23 +13,31 @@ export class WysiwygComponent implements OnInit {
   @Input()
   sectionId: string;
 
+  showSaveControls: boolean = false;
+
   constructor() { }
 
   ngOnInit(){
-    this.setupGridEditor(`#layout-builder-${this.sectionId}`);
-    // this.setupSummerNoteWYSIWYG();
+    console.log('main this', this);
+    this.setupJqueryFunctions();
+  }
+
+  setupJqueryFunctions(){
+    $(document).ready(() => {
+      this.setupGridEditor(`#layout-builder-${this.sectionId}`);
+      this.setupShowSaveControlsListener(this);
+    });
+
   }
 
   setupGridEditor(gridElem){
-    console.log('gridElem',gridElem);
-    $(document).ready(function () {
       $(gridElem).gridEditor({
         new_row_layouts: [[12], [6, 6], [4, 4, 4], [3, 3, 3, 3], [9, 3], [3, 9]],
         content_types: ['summernote'],
         summernote: {
           config: {
             callbacks: {
-              onInit: function () {
+              onInit: () => {
                 var element = this;
                 console.log('init done element:', element);
               }
@@ -37,17 +45,34 @@ export class WysiwygComponent implements OnInit {
           }
         }
       });
-    });
+  }
+
+  setupShowSaveControlsListener(self){
+      $('.wysiwyg-header').click(() => {
+        // var self= this;
+        console.log('note-editable clicked');
+        this.showSaveControls = true;
+
+        this.showControls();
+      })
+  }
+
+  showControls(){
+    console.log('showControls this', this);
+    this.showSaveControls = true;
+    console.log('showControls', this.showSaveControls);
   }
   
   setupSummerNoteWYSIWYG(){
       $('#summernote').summernote();
   }
 
-  saveContent() {
+  saveContent(sectionId) {
+    let fullSectionId = `#layout-builder-${sectionId}`
+    console.log('wysiwyg saving for ', fullSectionId);
     // Get resulting html
-    var html = $('#layout-builder').gridEditor('getHtml');
-    console.log(html);
+    var html = $(fullSectionId).gridEditor('getHtml');
+    console.log('html', html);
   }
 
 }
