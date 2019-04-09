@@ -18,19 +18,21 @@ export class WysiwygComponent implements OnInit {
   constructor() { }
 
   ngOnInit(){
-    console.log('main this', this);
+    // console.log('main this', this);
     this.setupJqueryFunctions();
   }
 
   setupJqueryFunctions(){
     $(document).ready(() => {
       this.setupGridEditor(`#layout-builder-${this.sectionId}`);
-      this.setupShowSaveControlsListener(this);
+      this.setupShowSaveControlsListener();
     });
 
   }
 
   setupGridEditor(gridElem){
+    var self = this;
+
       $(gridElem).gridEditor({
         new_row_layouts: [[12], [6, 6], [4, 4, 4], [3, 3, 3, 3], [9, 3], [3, 9]],
         content_types: ['summernote'],
@@ -40,6 +42,7 @@ export class WysiwygComponent implements OnInit {
               onInit: () => {
                 var element = this;
                 console.log('init done element:', element);
+                $(`.${self.sectionId}-save`).show();
               }
             }
           }
@@ -47,13 +50,15 @@ export class WysiwygComponent implements OnInit {
       });
   }
 
-  setupShowSaveControlsListener(self){
+  setupShowSaveControlsListener(){
+    var self = this;
       $('.wysiwyg-header').click(() => {
         // var self= this;
         console.log('note-editable clicked');
-        this.showSaveControls = true;
+        $(`.${self.sectionId}-save2`).show();
+        self.showSaveControls = true;
 
-        this.showControls();
+        self.showControls();
       })
   }
 

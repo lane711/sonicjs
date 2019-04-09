@@ -1,5 +1,4 @@
 <div class='wysiwyg-header'>Section Id: {{sectionId}} [{{this.showSaveControls}}]</div>
 <div id="layout-builder-{{sectionId}}"></div>
-<button (click)="saveContent(sectionId)" *ngIf="this.showSaveControls" class="btn btn-primary">Save</button>
-<button (click)="showControls()"  class="btn btn-primary">Toggle</button>
+<button (click)="saveContent(sectionId)" class="btn btn-success hide {{sectionId}}-save">Save</button>
 <div id="summernote"></div>
