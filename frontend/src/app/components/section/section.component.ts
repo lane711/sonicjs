@@ -17,7 +17,7 @@ export class SectionComponent implements OnInit {
   onSubmitSaveSection(sectionId, payload){
     console.log('onSubmitSaveSection', sectionId, payload);
     //section section info
-    console.log(this.contentService);
+    // console.log(this.contentService);
     this.contentService.saveSection(sectionId, payload);
     //link section to page object
   }
