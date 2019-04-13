@@ -21,8 +21,14 @@ export class ContentService {
     return this.http.get(url).toPromise();
   }
 
+  async getContentByUrl(contentType, contentUrl) {
+    const filter = encodeURI(`{"where":{"url":"${contentUrl}","data.contentType":"${contentType}"}}`);
+    let url = environment.apiUrl + `contents?filter=${filter}`;
+    return this.http.get(url).toPromise();
+  }
+
   async saveSection(section, payload) {
-    console.log('saveSection=>',section, payload);
+    // console.log('saveSection=>',section, payload);
     // const filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
     // let url = environment.apiUrl + `contents?filter=${filter}`;
     // return this.http.get(url).toPromise();

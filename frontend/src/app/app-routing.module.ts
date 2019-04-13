@@ -3,7 +3,8 @@ import { Routes, RouterModule } from '@angular/router';
 import { PageComponent } from './components/page/page.component';
 
 const routes: Routes = [
-  { path: "**", component: PageComponent},
+  { path: "", component: PageComponent},
+  { path: ":contentUrl", component: PageComponent},
 ];
 
 @NgModule({

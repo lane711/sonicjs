@@ -10,10 +10,11 @@ export class MenuComponent implements OnInit {
 
   constructor(private contentService:ContentService) { }
   
-  public menuItems;
+  menuItems:any;
 
   ngOnInit() {
     this.contentService.getContentByType('menu').then(data =>{
+      console.log('menu', data);
       this.menuItems = data;
     })
   }

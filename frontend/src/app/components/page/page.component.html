@@ -1,3 +1,11 @@
-<p>
-  page works!
-</p>
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <h1 *ngIf="content">
+          {{content.data.name}}
+        </h1>
+    </div>
+  </div>
+</div>
+
+<app-section></app-section>
