@@ -16,6 +16,7 @@ export class PageComponent implements OnInit {
 
   content:any;
   contentUrl:string;
+  sections:any
 
   ngOnInit() {
     this.loadUrlParam();
@@ -34,23 +35,32 @@ export class PageComponent implements OnInit {
 
     this.router.events.subscribe((event) => {
       if(event instanceof NavigationEnd) {
-            console.log('NavigationEnd', event);
+            // console.log('NavigationEnd', event);
             this.contentUrl = event.url;
             if(this.contentUrl == '/null'){
               this.contentUrl = '/';
             }
-            console.log('contentUrl', this.contentUrl);
-            this.loadContent();
+            // console.log('contentUrl', this.contentUrl);
+            this.loadPage();
           }
     });
 
     
   }
 
-  loadContent(){
+  loadPage(){
     this.contentService.getContentByUrl("page", this.contentUrl).then(data => {
       console.log('page data', data[0]);
       this.content = data[0];
+      this.loadSections();
+    });
+  }
+
+  loadSections(){
+    console.log('layout', this.content.layout);
+    this.contentService.getContentById('5cb1547b3f6d33389f244568').then(data => {
+this.sections = data;
+console.log('sections', this.sections);
     });
   }
 

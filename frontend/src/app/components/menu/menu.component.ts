@@ -14,7 +14,7 @@ export class MenuComponent implements OnInit {
 
   ngOnInit() {
     this.contentService.getContentByType('menu').then(data =>{
-      console.log('menu', data);
+      // console.log('menu', data);
       this.menuItems = data;
     })
   }
