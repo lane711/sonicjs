@@ -28,6 +28,15 @@ export class ContentService {
     return this.http.post(environment.apiUrl + "contents/", content).toPromise();
   }
 
+  public editContentInstance(payload) {
+    console.log('createContentInstance payload', payload);
+    let content:any = {};
+    content.data = {};
+    this.processContentFields(payload, content);
+    console.log('saving existing content', content);
+    return this.http.put(environment.apiUrl + `contents/${content.id}`, content).toPromise();
+  }
+
   private processContentFields(payload, content){
     for (var property in payload) {
       if (payload.hasOwnProperty(property)) {

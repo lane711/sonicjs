@@ -44,10 +44,10 @@ export class ContentEditComponent implements OnInit {
     this.contentService.loadFormDataFromMatchingPropNames(this.questions, this.contentInstance);
   }
 
-  onSubmitContentAdd(payload) {
+  onSubmitContentEdit(payload) {
     console.log('onSubmitContentAdd:payload', payload);
     payload.contentType = this.contentTypesService.contentType.systemid;
-    this.contentService.createContentInstance(payload);
+    this.contentService.editContentInstance(payload);
   }
 
   // loadQuestions(contentTypeSystemId) {

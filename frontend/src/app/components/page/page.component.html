@@ -7,5 +7,10 @@
     </div>
   </div>
 </div>
+<div class="container" *ngIf='sections'>
+    <div class="row" *ngFor='let section of sections'>
+            <div [outerHTML]="section.data.body | safe: 'html'"></div>
+    </div>
+  </div>
 
-<app-section></app-section>
+<!-- <app-section></app-section> -->

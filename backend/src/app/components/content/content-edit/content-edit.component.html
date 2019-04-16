@@ -1,12 +1,3 @@
-<p>
-  content-edit works!
-  Load content type, generate forms fields, populate with data from content
-</p>
-<p>{{contentInstance?.id}}</p>
-<p>{{contentInstance?.contentType}}</p>
-<p>{{contentInstance?.name}}</p>
-<p>{{contentInstance?.url}}</p>
-
 <div class="row">
   <div class="col-md-12">
     <div class="card admin-create-instance">
@@ -14,7 +5,7 @@
         <i class="fa fa-align-justify"></i> Edit Content Instance
       </div>
       <div class="card-body">
-        <app-forms *ngIf="isDataAvailable" [questions]="questions" [onSubmitHandler]="onSubmitContentAdd"></app-forms>
+        <app-forms *ngIf="isDataAvailable" [questions]="questions" [onSubmitHandler]="onSubmitContentEdit" id="{{contentInstance.id}}"></app-forms>
       </div>
     </div>
   </div>

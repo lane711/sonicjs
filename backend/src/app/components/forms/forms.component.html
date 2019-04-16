@@ -1,5 +1,6 @@
 
   <form (ngSubmit)="onSubmit()" [formGroup]="form" class="form-horizontal">
+    <input name="id" id="id" type="hidden" value="{{id}}">
 <div class="card-body">
   <div *ngFor="let question of questions">
     <app-questions [question]="question" [form]="form" style="width:100%"></app-questions>

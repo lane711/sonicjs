@@ -17,12 +17,12 @@
           </thead>
           <tbody>
             <tr *ngFor="let content of contentInstances">
-              <td><a [routerLink]="['/content', content.id]">{{ content.data.name }}</a></td>
+              <td><a [routerLink]="['/admin/content', content.id]">{{ content.data.name }}</a></td>
               <td>{{ content.data.contentType }}</td>
               <td>{{ content.url }}</td>
               <td>...</td>
               <td>
-                <a href="{{ content.url }}" target="_blank" class="btn btn-sm btn-success rmargin">View</a>
+                <!-- <a href="{{ content.url }}" target="_blank" class="btn btn-sm btn-success rmargin">View</a> -->
                 <a class="btn btn-sm btn-primary rmargin" [routerLink]="['/admin/content', content.id]">Edit</a>
   
                 <ng-template #popTitle>Delete <b>{{ content.name }}</b>?</ng-template>

@@ -18,6 +18,9 @@ export class FormsComponent implements OnInit {
   questions: QuestionBase<any>[] = [];
   @Input()
   onSubmitHandler: any;
+  @Input()
+  id: any;
+
   form: FormGroup;
   payLoad = "";
 

@@ -5,6 +5,7 @@ import { HttpHeaders, HttpErrorResponse } from "@angular/common/http";
 import { FieldTypesService } from "./field-types.service";
 import { QuestionBase } from "../models/question-base";
 import { TextboxQuestion } from "../models/question-textbox";
+import { HiddenQuestion } from "../models/question-hidden";
 import { DropdownQuestion } from "../models/question-dropdown";
 import { Subject } from "rxjs";
 
@@ -110,7 +111,8 @@ export class ContentTypesService {
     this.addBaseContentTypeFields(contentType, controls);
     if (contentType.fields) {
       contentType.fields.forEach(field => {
-        // console.log('fieldcontrol', field);
+
+        console.log('fieldcontrol', field);
         let control = new TextboxQuestion({
           key: field.systemid,
           label: field.label,
@@ -118,6 +120,7 @@ export class ContentTypesService {
           required: field.required,
           order: 1
         });
+        
         controls.push(control);
       });
     }
@@ -125,8 +128,8 @@ export class ContentTypesService {
   }
 
   private addBaseContentTypeFields(contentType, controls){
-    // console.log('addBaseContentTypeFields', contentType);
-    if(controls.url){
+    console.log('addBaseContentTypeFields', contentType, controls);
+    // if(controls.url){
       let controlContentType = new TextboxQuestion({
         key: 'contentType',
         label: 'Content Type',
@@ -144,7 +147,7 @@ export class ContentTypesService {
         order: 0
       });
       controls.push(controlId);
-    }
+    // }
   }
 
   // public processContentTypeFieldsOld(contentType) {

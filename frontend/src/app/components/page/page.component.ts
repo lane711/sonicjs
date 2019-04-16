@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap, NavigationStart, NavigationEnd } from "@angular/router";
 import { ContentService } from '../../services/content.service'
+// import { SafePipe } from "./pipes/safe.pipe";
 
 @Component({
   selector: 'app-page',
@@ -58,9 +59,11 @@ export class PageComponent implements OnInit {
 
   loadSections(){
     console.log('layout', this.content.layout);
-    this.contentService.getContentById('5cb1547b3f6d33389f244568').then(data => {
+    // this.contentService.getContentById('5cb1547b3f6d33389f244568').then(data => {
+      this.contentService.getContentByType('section').then(data => {
+
 this.sections = data;
-console.log('sections', this.sections);
+console.log('section', this.sections);
     });
   }
 
