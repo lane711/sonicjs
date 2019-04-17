@@ -29,18 +29,19 @@ export class ContentService {
   }
 
   public editContentInstance(payload) {
+    let id = payload.id;
     console.log('createContentInstance payload', payload);
     let content:any = {};
     content.data = {};
     this.processContentFields(payload, content);
     console.log('saving existing content', content);
-    return this.http.put(environment.apiUrl + `contents/${content.id}`, content).toPromise();
+    return this.http.put(environment.apiUrl + `contents/${id}`, content).toPromise();
   }
 
   private processContentFields(payload, content){
     for (var property in payload) {
       if (payload.hasOwnProperty(property)) {
-        if(property == 'url'){
+        if(property == 'url' || property == 'id'){
           content.url = payload.url;
           continue;
         }

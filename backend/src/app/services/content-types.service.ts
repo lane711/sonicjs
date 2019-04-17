@@ -140,11 +140,11 @@ export class ContentTypesService {
       controls.push(controlId);
 
       let controlContentType = new TextboxQuestion({
-        key: 'contentType',
+        key: 'contentTypeId',
         label: 'Content Type',
         value: contentType.systemid,
         required: true,
-        order: 0
+        order: 1
       });
       controls.push(controlContentType);
     // }

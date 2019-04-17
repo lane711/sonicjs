@@ -46,7 +46,8 @@ export class ContentEditComponent implements OnInit {
 
   onSubmitContentEdit(payload) {
     console.log('onSubmitContentAdd:payload', payload);
-    payload.contentType = this.contentTypesService.contentType.systemid;
+    payload.contentType = payload.contentTypeId;
+    delete payload.contentTypeId;
     this.contentService.editContentInstance(payload);
   }
 
