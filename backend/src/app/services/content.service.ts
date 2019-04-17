@@ -68,9 +68,9 @@ export class ContentService {
 
   private populateFormField(questions, content, property){
     let questionToPopulate = questions.find(q => q.key === property)
-    console.log('questionToPopulate', questionToPopulate);
+    // console.log('questionToPopulate', questionToPopulate);
     if(questionToPopulate){
-      if(property == 'url'){
+      if(property == 'url' || property == 'id'){
         questionToPopulate.value = content[property];
       }else{
         questionToPopulate.value = content.data[property];
