@@ -18,7 +18,7 @@
             <td><a [routerLink]="['/admin/content-types', contentType.id]">{{ contentType.name }}</a></td>
             <td>{{ contentType.description}}</td>
             <td>
-              <a class="btn btn-sm btn-primary rmargin" [routerLink]="['/content-types', contentType.id]">Edit</a>
+              <a class="btn btn-sm btn-primary rmargin" [routerLink]="['/admin/content-types', contentType.id]">Edit</a>
 
               <ng-template #popTitle>Delete <b>{{ contentType.name }}</b>?</ng-template>
               <ng-template #popContent><button class="btn btn-sm btn-danger" (click)="deleteContentType(contentType.id)">Confirm Delete</button></ng-template>

@@ -8,6 +8,8 @@ import { TextboxQuestion } from "../models/question-textbox";
 import { HiddenQuestion } from "../models/question-hidden";
 import { DropdownQuestion } from "../models/question-dropdown";
 import { TextareaQuestion } from "../models/question-textarea";
+import { LayoutQuestion } from "../models/question-layout";
+
 
 import { Subject } from "rxjs";
 
@@ -128,6 +130,17 @@ export class ContentTypesService {
 
         if(field.fieldType == 'textarea'){
           let control = new TextareaQuestion({
+            key: field.systemid,
+            label: field.label,
+            value: "",
+            required: field.required,
+            order: 1
+          });
+          controls.push(control);
+        }
+
+        if(field.fieldType == 'layout'){
+          let control = new LayoutQuestion({
             key: field.systemid,
             label: field.label,
             value: "",

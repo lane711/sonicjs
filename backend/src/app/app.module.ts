@@ -26,6 +26,7 @@ import { AsideMenuComponent } from './components/aside-menu/aside-menu.component
 import { MenuComponent } from './elements/menu/menu.component';
 import { ContentEditComponent } from './components/content/content-edit/content-edit.component';
 import { AlertMessageComponent } from './components/alert-message/alert-message.component';
+import { LayoutComponent } from './components/forms/layout/layout.component';
 
 @NgModule({
   declarations: [
@@ -49,7 +50,8 @@ import { AlertMessageComponent } from './components/alert-message/alert-message.
     ContentTypeEditFieldComponent,
     AsideMenuComponent,
     ContentEditComponent,
-    AlertMessageComponent
+    AlertMessageComponent,
+    LayoutComponent
   ],
   imports: [
     BrowserModule,
