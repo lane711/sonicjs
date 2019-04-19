@@ -1,2 +1,22 @@
-<!-- <textarea [formGroup]="form" [formControlName]="question.key" [id]="question.key" class='hidden' rows="4" cols="50" class="form-control"></textarea> -->
-layout 6 form: 
+<div [formGroup]="form">
+    <div class="dropdown">
+        <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fa fa-plus-circle"></i> Row
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item" href="#" *ngFor="let columnOption of columnOptions" >
+            <div class="container-fluid">
+                <div class="row">
+                    <div *ngFor='let column of columnOption' class="{{column}} column-options">{{column}}</div>
+                </div>
+              </div>
+          </a>
+
+        </div>
+      </div>
+
+  <div *ngFor='let row of layout.rows' class="{{row.class}}">
+    <div *ngFor='let column of row.columns' class="{{column.class}}">{{column.class}}</div>
+  </div>
+  <textarea [formControlName]="question.key" [id]="question.key" class='hidden' rows="4" cols="50" class="form-control"></textarea>
+</div>
