@@ -7,6 +7,8 @@ import { QuestionBase } from "../models/question-base";
 import { TextboxQuestion } from "../models/question-textbox";
 import { HiddenQuestion } from "../models/question-hidden";
 import { DropdownQuestion } from "../models/question-dropdown";
+import { TextareaQuestion } from "../models/question-textarea";
+
 import { Subject } from "rxjs";
 
 @Injectable({
@@ -112,16 +114,30 @@ export class ContentTypesService {
     if (contentType.fields) {
       contentType.fields.forEach(field => {
 
-        // console.log('fieldcontrol', field);
-        let control = new TextboxQuestion({
-          key: field.systemid,
-          label: field.label,
-          value: "",
-          required: field.required,
-          order: 1
-        });
+        console.log('fieldcontrol', field);
+        if(field.fieldType == 'textBox'){
+          let control = new TextboxQuestion({
+            key: field.systemid,
+            label: field.label,
+            value: "",
+            required: field.required,
+            order: 1
+          });
+          controls.push(control);
+        }
+
+        if(field.fieldType == 'textarea'){
+          let control = new TextareaQuestion({
+            key: field.systemid,
+            label: field.label,
+            value: "",
+            required: field.required,
+            order: 1
+          });
+          controls.push(control);
+        }
         
-        controls.push(control);
+
       });
     }
     contentType.controls = controls;
@@ -130,7 +146,7 @@ export class ContentTypesService {
   private addBaseContentTypeFields(contentType, controls){
     console.log('addBaseContentTypeFields', contentType, controls);
     // if(isToBePopulatedWithExistingContent){
-      let controlId = new TextboxQuestion({
+      let controlId = new HiddenQuestion({
         key: 'id',
         label: 'Id',
         value: contentType.id,
@@ -139,7 +155,7 @@ export class ContentTypesService {
       });
       controls.push(controlId);
 
-      let controlContentType = new TextboxQuestion({
+      let controlContentType = new HiddenQuestion({
         key: 'contentTypeId',
         label: 'Content Type',
         value: contentType.systemid,

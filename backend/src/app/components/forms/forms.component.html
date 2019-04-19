@@ -3,7 +3,9 @@
     <input name="id" id="id" type="hidden" value="{{id}}">
 <div class="card-body">
   <div *ngFor="let question of questions">
+
     <app-questions [question]="question" [form]="form" style="width:100%"></app-questions>
+    
   </div></div>
 <div class="card-footer">
   <button type="button" type="submit" [disabled]="!form.valid" class="btn btn-primary pull-right save {{this.onSubmitHandler}}">
