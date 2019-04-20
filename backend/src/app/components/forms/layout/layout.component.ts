@@ -62,12 +62,9 @@ export class LayoutComponent implements OnInit {
   }
 
   onSelect(start, end) {
+    console.log(start, end);
     this.start = start;
     this.end = end;
-  }
-
-  bold() {
-    this.wrapTag('b');
   }
 
   wrapTag(tag) {
@@ -75,6 +72,13 @@ export class LayoutComponent implements OnInit {
     let toBeWrapped = this.content.substr(this.start, this.end - this.start);
     let first = this.content.substr(0, this.start);
     this.content = first + `<${tag}>` + toBeWrapped + `</${tag}>` + last;
+  }
+
+  insert(tag) {
+    let last = this.content.substr(this.end);
+    let toBeWrapped = this.content.substr(this.start, this.end - this.start);
+    let first = this.content.substr(0, this.start);
+    this.content = first + `${tag}` + toBeWrapped + last;
   }
 
 }

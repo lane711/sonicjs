@@ -1,4 +1,12 @@
 <div [formGroup]="form">
+  <div class="btn-group btn-group-toggle" data-toggle="buttons">
+    <label class="btn btn-secondary active">
+      <input type="radio" name="options" id="option1" autocomplete="off" checked> Layout
+    </label>
+    <label class="btn btn-secondary">
+      <input type="radio" name="options" id="option2" autocomplete="off"> Content
+    </label>
+  </div>
   <div class="dropdown">
     <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
       aria-haspopup="true" aria-expanded="false">
@@ -7,7 +15,7 @@
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
       <a class="dropdown-item" (click)='addRow(columnOption)' *ngFor="let columnOption of columnOptions">
         <div class="container-fluid">
-          <div class="row">
+          <div class="row no-gutters">
             <div *ngFor='let column of columnOption' class="{{column}}">
               <div class="column-options">
                 {{column}}
@@ -20,7 +28,7 @@
     </div>
   </div>
   <div class="container-fluid">
-    <div *ngFor='let row of layout.rows' class="{{row.class}}">
+    <div *ngFor='let row of layout.rows' class="{{row.class}} no-gutters">
       <div *ngFor='let column of row.columns' class="{{column.class}} column-options">{{column.class}}</div>
     </div>
   </div>
@@ -28,6 +36,7 @@
     <a (click)="wrapTag('b')" class="btn btn-secondary">B</a>
     <a (click)="wrapTag('i')" class="btn btn-secondary">I</a>
     <a (click)="wrapTag('u')" class="btn btn-secondary">U</a>
+    <a (click)="insert('<button>')" class="btn btn-secondary">btn</a>
 
   </div>
 
