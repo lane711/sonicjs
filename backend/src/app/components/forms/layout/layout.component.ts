@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { QuestionBase } from "../../../models/question-base";
 import { FormGroup } from "@angular/forms";
 import { st } from '@angular/core/src/render3';
+import { FormService} from '../../../services/form.service'
 
 @Component({
   selector: 'app-layout',
@@ -15,16 +16,16 @@ export class LayoutComponent implements OnInit {
   @Input()
   form: FormGroup;
 
-  layout: any;
   columnOptions: any;
   layoutColumnOptionsWidth = 300;
   layoutColumnOptionsHeight = 30;
   content = 'Integer posuere erat a ante venenatis dapibus posuere velit aliquet.';
   start: number;
   end: number;
-  constructor() { }
+  constructor(public formService:FormService ) {}
 
   ngOnInit() {
+    console.log('layout ques', this.question);
     // console.log('layout question', this.question);
     // console.log('layout formGroup', this.form);
     this.loadLayoutColumnOptions();
@@ -32,16 +33,18 @@ export class LayoutComponent implements OnInit {
   }
 
   processRows() {
-    this.layout = {};
-    this.layout.rows = [];
+    this.formService.layout = {};
+    this.formService.layout.rows = [];
 
     let column = { class: "col" };
 
     let row = { class: "row", columns: [column, column] };
-    this.layout.rows.push(row);
-    this.layout.rows.push(row);
+    this.formService.layout.rows.push(row);
+    this.formService.layout.rows.push(row);
 
-    console.log('layout', this.layout)
+    this.processBlocks();
+
+    console.log('layout', this.formService.layout)
   }
 
   loadLayoutColumnOptions() {
@@ -54,11 +57,17 @@ export class LayoutComponent implements OnInit {
     this.columnOptions.push(['col-4', 'col-8']);
     this.columnOptions.push(['col-9', 'col-3']);
     this.columnOptions.push(['col-8', 'col-4']);
-    this.columnOptions.push(['col-3', 'col-9']);
   }
 
   addRow(columnsToAdd) {
     console.log('columnsToAdd', columnsToAdd);
+  }
+
+  processBlocks(){
+    let blocks = [];
+    let block = {blockId : '1234-1234', propX : 'ipsum' };
+    blocks.push(block);
+    this.formService.layout.rows[0].columns[0].blocks = blocks;
   }
 
   onSelect(start, end) {

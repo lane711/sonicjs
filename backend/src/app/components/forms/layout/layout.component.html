@@ -1,4 +1,5 @@
-<div [formGroup]="form">
+<!-- <div [formGroup]="form"> -->
+  <input type="text" name="testPost" id="testPost" value="ipsume77">
   <div class="btn-group btn-group-toggle" data-toggle="buttons">
     <label class="btn btn-secondary active">
       <input type="radio" name="options" id="option1" autocomplete="off" checked> Layout
@@ -15,7 +16,7 @@
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
       <a class="dropdown-item" (click)='addRow(columnOption)' *ngFor="let columnOption of columnOptions">
         <div class="container-fluid">
-          <div class="row no-gutters">
+          <div class="row">
             <div *ngFor='let column of columnOption' class="{{column}}">
               <div class="column-options">
                 {{column}}
@@ -28,7 +29,7 @@
     </div>
   </div>
   <div class="container-fluid">
-    <div *ngFor='let row of layout.rows' class="{{row.class}} no-gutters">
+    <div *ngFor='let row of formService.layout.rows' class="{{row.class}}">
       <div *ngFor='let column of row.columns' class="{{column.class}} column-options">{{column.class}}</div>
     </div>
   </div>
@@ -40,9 +41,9 @@
 
   </div>
 
-  <textarea #t (select)="onSelect(t.selectionStart, t.selectionEnd)" [value]="content" rows="4"
+  <textarea #t (select)="onSelect(t.selectionStart, t.selectionEnd)" id="layout" [value]="content" rows="4"
     class="form-control"></textarea>
   <!-- <span>{{selectedText}}<span> -->
 
   <!-- <textarea [formControlName]="question.key" [id]="question.key" class='hidden' rows="4" cols="50" class="form-control"></textarea> -->
-</div>
+<!-- </div>  -->

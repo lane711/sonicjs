@@ -116,7 +116,7 @@ export class ContentTypesService {
     if (contentType.fields) {
       contentType.fields.forEach(field => {
 
-        console.log('fieldcontrol', field);
+        // console.log('fieldcontrol', field);
         if(field.fieldType == 'textBox'){
           let control = new TextboxQuestion({
             key: field.systemid,

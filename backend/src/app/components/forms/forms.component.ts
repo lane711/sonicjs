@@ -6,6 +6,7 @@ import { ContentTypesService } from "../../services/content-types.service";
 import { ContentService } from "../../services/content.service";
 
 import { UiService } from "../../services/ui.service";
+import { FormService } from "../../services/form.service";
 
 @Component({
   selector: "app-forms",
@@ -22,13 +23,14 @@ export class FormsComponent implements OnInit {
   id: any;
 
   form: FormGroup;
-  payLoad = "";
+  payLoad : any;
 
   constructor(
     private qcs: QuestionControlService,
     private contentTypesService: ContentTypesService,
     private contentService:ContentService,
-    private uiService: UiService
+    private uiService: UiService,
+    private formService:FormService
   ) {}
 
   ngOnInit() {
@@ -38,6 +40,8 @@ export class FormsComponent implements OnInit {
   onSubmit() {
     //this.payLoad = JSON.stringify(this.form.value);
     this.payLoad = this.form.value;
+    this.payLoad.layout = this.formService.layout;
+
     console.log('onSubmit:payload', this.payLoad);
     //delagate back to the calling component
     this.onSubmitHandler(this.payLoad);
