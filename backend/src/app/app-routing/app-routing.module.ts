@@ -10,6 +10,7 @@ import { ContentEditComponent } from "../components/content/content-edit/content
 
 import { FieldTypesComponent } from "../components/field-types/field-types.component";
 import { PagesComponent } from "../components/pages/pages.component";
+import { SandboxComponent } from "../components/sandbox/sandbox.component";
 
 const routes: Routes = [
     { path: "admin", component: HomeComponent},
@@ -21,6 +22,7 @@ const routes: Routes = [
     { path: "admin/content-types/:id/fieldId/:fieldId", component: ContentTypeEditFieldComponent },
     { path: "admin/content", component: ContentComponent },
     { path: "admin/content/:id", component: ContentEditComponent },
+    { path: "admin/sandbox", component: SandboxComponent },
     { path: "**", component: PagesComponent},
 ];
 

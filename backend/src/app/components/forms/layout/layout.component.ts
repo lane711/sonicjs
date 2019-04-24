@@ -4,7 +4,7 @@ import { FormGroup } from "@angular/forms";
 import { st } from '@angular/core/src/render3';
 import { FormService} from '../../../services/form.service'
 
-@Component({
+@Component({ 
   selector: 'app-layout',
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.css']
@@ -22,6 +22,10 @@ export class LayoutComponent implements OnInit {
   content = 'Integer posuere erat a ante venenatis dapibus posuere velit aliquet.';
   start: number;
   end: number;
+
+  vehicles: any
+
+
   constructor(public formService:FormService ) {}
 
   ngOnInit() {
@@ -41,6 +45,8 @@ export class LayoutComponent implements OnInit {
     let row = { class: "row", columns: [column, column] };
     this.formService.layout.rows.push(row);
     this.formService.layout.rows.push(row);
+    this.formService.layout.rows.push(row);
+
 
     this.processBlocks();
 
@@ -61,6 +67,9 @@ export class LayoutComponent implements OnInit {
 
   addRow(columnsToAdd) {
     console.log('columnsToAdd', columnsToAdd);
+    let row = { class: "row", columns: columnsToAdd };
+    this.formService.layout.rows.push(row);
+    console.log('rows adding', this.formService.layout.rows);
   }
 
   processBlocks(){
@@ -89,5 +98,6 @@ export class LayoutComponent implements OnInit {
     let first = this.content.substr(0, this.start);
     this.content = first + `${tag}` + toBeWrapped + last;
   }
+
 
 }

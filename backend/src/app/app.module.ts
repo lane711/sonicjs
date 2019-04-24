@@ -27,6 +27,7 @@ import { MenuComponent } from './elements/menu/menu.component';
 import { ContentEditComponent } from './components/content/content-edit/content-edit.component';
 import { AlertMessageComponent } from './components/alert-message/alert-message.component';
 import { LayoutComponent } from './components/forms/layout/layout.component';
+import { SandboxComponent } from './components/sandbox/sandbox.component';
 
 @NgModule({
   declarations: [
@@ -51,7 +52,8 @@ import { LayoutComponent } from './components/forms/layout/layout.component';
     AsideMenuComponent,
     ContentEditComponent,
     AlertMessageComponent,
-    LayoutComponent
+    LayoutComponent,
+    SandboxComponent
   ],
   imports: [
     BrowserModule,

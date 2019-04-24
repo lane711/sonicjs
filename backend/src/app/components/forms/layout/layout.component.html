@@ -1,10 +1,13 @@
 <!-- <div [formGroup]="form"> -->
   <input type="text" name="testPost" id="testPost" value="ipsume77">
   <div class="btn-group btn-group-toggle" data-toggle="buttons">
-    <label class="btn btn-secondary active">
+    <label class="btn btn-primary active">
       <input type="radio" name="options" id="option1" autocomplete="off" checked> Layout
     </label>
-    <label class="btn btn-secondary">
+    <label class="btn btn-primary">
+        <input type="radio" name="options" id="option1" autocomplete="off" checked> Preview
+      </label>
+    <label class="btn btn-primary">
       <input type="radio" name="options" id="option2" autocomplete="off"> Content
     </label>
   </div>
@@ -29,7 +32,7 @@
     </div>
   </div>
   <div class="container-fluid">
-    <div *ngFor='let row of formService.layout.rows' class="{{row.class}}">
+    <div *ngFor='let row of formService.layout.rows | async' class="{{row.class}}">
       <div *ngFor='let column of row.columns' class="{{column.class}} column-options">{{column.class}}</div>
     </div>
   </div>
@@ -43,6 +46,11 @@
 
   <textarea #t (select)="onSelect(t.selectionStart, t.selectionEnd)" id="layout" [value]="content" rows="4"
     class="form-control"></textarea>
+
+
+<div *ngFor='let vehicle of vehicles | async'>
+    {{vehicle.name}}
+</div>
   <!-- <span>{{selectedText}}<span> -->
 
   <!-- <textarea [formControlName]="question.key" [id]="question.key" class='hidden' rows="4" cols="50" class="form-control"></textarea> -->
