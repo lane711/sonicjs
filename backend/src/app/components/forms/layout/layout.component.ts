@@ -67,7 +67,20 @@ export class LayoutComponent implements OnInit {
 
   addRow(columnsToAdd) {
     console.log('columnsToAdd', columnsToAdd);
-    let row = { class: "row", columns: columnsToAdd };
+
+    let columns = [];
+    columnsToAdd.forEach(colClass => {
+      columns.push({ class: colClass })
+    });
+    // let column = { class: "col" };
+
+    // let row = { class: "row", columns: [column, column] };
+
+
+
+    let row = { class: "row", columns: columns };
+
+
     this.formService.layout.rows.push(row);
     console.log('rows adding', this.formService.layout.rows);
   }

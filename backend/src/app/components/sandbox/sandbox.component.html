@@ -1,3 +1,4 @@
-<p>
-  sandbox works!
+<p *ngFor="let car of cars">
+  {{car.name}}
 </p>
+<button (click)="addCar()">Add Car</button>

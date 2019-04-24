@@ -32,7 +32,7 @@
     </div>
   </div>
   <div class="container-fluid">
-    <div *ngFor='let row of formService.layout.rows | async' class="{{row.class}}">
+    <div *ngFor='let row of formService.layout.rows' class="{{row.class}}">
       <div *ngFor='let column of row.columns' class="{{column.class}} column-options">{{column.class}}</div>
     </div>
   </div>
@@ -48,8 +48,8 @@
     class="form-control"></textarea>
 
 
-<div *ngFor='let vehicle of vehicles | async'>
-    {{vehicle.name}}
+<div *ngFor='let row of formService.layout.rows'>
+    {{row.columns}}
 </div>
   <!-- <span>{{selectedText}}<span> -->
 
