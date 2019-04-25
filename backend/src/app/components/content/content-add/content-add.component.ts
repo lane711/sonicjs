@@ -54,8 +54,16 @@ export class ContentAddComponent implements OnInit {
 
   onSubmitContentAdd(payload) {
     console.log('onSubmitContentAdd:payload', payload);
-    payload.contentType = this.contentTypesService.contentType.systemid;
+    payload.contentType = payload.contentTypeId;
     this.contentService.createContentInstance(payload);
+    this.isFormDataAvailable = false;
+
+  }
+
+  onCancelContentAdd(payload) {
+    console.log('cancel add', payload);
+    this.isFormDataAvailable = false;
+    console.log('this.isFormDataAvailable', this.isFormDataAvailable);
   }
 
 }

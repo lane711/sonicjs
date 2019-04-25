@@ -20,6 +20,8 @@ export class FormsComponent implements OnInit {
   @Input()
   onSubmitHandler: any;
   @Input()
+  onCancelHandler: any;
+  @Input()
   id: any;
 
   form: FormGroup;
@@ -45,10 +47,16 @@ export class FormsComponent implements OnInit {
     console.log('onSubmit:payload', this.payLoad);
     //delagate back to the calling component
     this.onSubmitHandler(this.payLoad);
+
     this.uiService.showAside = false;
     // this.contentTypesService.contentInstance = JSON.stringify(this.form.value);
     // this.contentTypesService.createContentTypeInstanceSubmitSubject.next(
     //   JSON.stringify(this.form.value)
     // );
+  }
+
+  onCancel(){
+    console.log('cancel form');
+    this.onCancelHandler(this.payLoad);
   }
 }

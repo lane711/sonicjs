@@ -8,12 +8,18 @@
         <div *ngIf="!isFormDataAvailable">
           <h4>Select content type to add:</h4>
           <hr>
-          <p *ngFor="let contentType of contentTypes">
+          <span *ngFor="let contentType of contentTypes">
             <button (click)="loadContentInstanceForm(contentType.systemid)"
-              class="btn btn-success">{{contentType.name}}</button> {{contentType.description}}
-          </p>
+              class="btn btn-success rmargin">{{contentType.name}}</button>
+          </span>
         </div>
-        <app-forms *ngIf="isFormDataAvailable" [questions]="questions" [onSubmitHandler]="onSubmitContentAdd"></app-forms>
+
+
+        <button (click)="onCancelContentAdd()"
+              class="btn btn-success rmargin">cancel</button>
+
+
+        <app-forms *ngIf="isFormDataAvailable" [questions]="questions" [onCancelHandler]="onCancelContentAdd" [onSubmitHandler]="onSubmitContentAdd"></app-forms>
       </div>
     </div>
   </div>
