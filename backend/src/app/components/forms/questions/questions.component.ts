@@ -16,6 +16,10 @@ export class QuestionsComponent {
   @Input()
   form: FormGroup;
 
+  start: number;
+  end: number;
+  content = 'Integer posuere erat a ante venenatis dapibus posuere velit aliquet.';
+
   showLabel = true;
 
   get isValid() {
@@ -31,4 +35,25 @@ export class QuestionsComponent {
       this.showLabel = false;
     }
   }
+
+  onSelect(start, end) {
+    console.log(start, end);
+    this.start = start;
+    this.end = end;
+  }
+
+  wrapTag(tag) {
+    let last = this.content.substr(this.end);
+    let toBeWrapped = this.content.substr(this.start, this.end - this.start);
+    let first = this.content.substr(0, this.start);
+    this.content = first + `<${tag}>` + toBeWrapped + `</${tag}>` + last;
+  }
+
+  insert(tag) {
+    let last = this.content.substr(this.end);
+    let toBeWrapped = this.content.substr(this.start, this.end - this.start);
+    let first = this.content.substr(0, this.start);
+    this.content = first + `${tag}` + toBeWrapped + last;
+  }
+
 }

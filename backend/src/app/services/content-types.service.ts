@@ -8,6 +8,8 @@ import { TextboxQuestion } from "../models/question-textbox";
 import { HiddenQuestion } from "../models/question-hidden";
 import { DropdownQuestion } from "../models/question-dropdown";
 import { TextareaQuestion } from "../models/question-textarea";
+import { WYSIWYGQuestion } from "../models/question-wysiwyg";
+
 import { LayoutQuestion } from "../models/question-layout";
 
 
@@ -141,6 +143,17 @@ export class ContentTypesService {
 
         if(field.fieldType == 'layout'){
           let control = new LayoutQuestion({
+            key: field.systemid,
+            label: field.label,
+            value: "",
+            required: field.required,
+            order: 1
+          });
+          controls.push(control);
+        }
+
+        if(field.fieldType == 'wysiwyg'){
+          let control = new WYSIWYGQuestion({
             key: field.systemid,
             label: field.label,
             value: "",

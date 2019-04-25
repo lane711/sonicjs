@@ -19,9 +19,6 @@ export class LayoutComponent implements OnInit {
   columnOptions: any;
   layoutColumnOptionsWidth = 300;
   layoutColumnOptionsHeight = 30;
-  content = 'Integer posuere erat a ante venenatis dapibus posuere velit aliquet.';
-  start: number;
-  end: number;
 
   vehicles: any
 
@@ -43,7 +40,6 @@ export class LayoutComponent implements OnInit {
     let column = { class: "col" };
 
     let row = { class: "row", columns: [column, column] };
-    this.formService.layout.rows.push(row);
     this.formService.layout.rows.push(row);
     this.formService.layout.rows.push(row);
 
@@ -87,30 +83,18 @@ export class LayoutComponent implements OnInit {
 
   processBlocks(){
     let blocks = [];
-    let block = {blockId : '1234-1234', propX : 'ipsum' };
+    let block = {id : '1234-1234', propX : 'ipsum' };
     blocks.push(block);
-    this.formService.layout.rows[0].columns[0].blocks = blocks;
-  }
 
-  onSelect(start, end) {
-    console.log(start, end);
-    this.start = start;
-    this.end = end;
-  }
+    this.formService.layout.rows.forEach(row => {
+      row.columns.forEach(column => {
+        column.blocks = blocks;
+      });
+    });
 
-  wrapTag(tag) {
-    let last = this.content.substr(this.end);
-    let toBeWrapped = this.content.substr(this.start, this.end - this.start);
-    let first = this.content.substr(0, this.start);
-    this.content = first + `<${tag}>` + toBeWrapped + `</${tag}>` + last;
-  }
+    console.log('this.formService.layout', this.formService.layout);
 
-  insert(tag) {
-    let last = this.content.substr(this.end);
-    let toBeWrapped = this.content.substr(this.start, this.end - this.start);
-    let first = this.content.substr(0, this.start);
-    this.content = first + `${tag}` + toBeWrapped + last;
+    // this.formService.layout.rows[0].columns[0].blocks = blocks;
   }
-
 
 }

@@ -18,7 +18,7 @@
     </button>
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
       <a class="dropdown-item" (click)='addRow(columnOption)' *ngFor="let columnOption of columnOptions">
-        <div class="container-fluid">
+        <div class="container">
           <div class="row">
             <div *ngFor='let column of columnOption' class="{{column}}">
               <div class="column-options">
@@ -31,9 +31,11 @@
 
     </div>
   </div>
-  <div class="container-fluid">
+  <div class="container preview-rows">
     <div *ngFor='let row of formService.layout.rows' class="{{row.class}}">
-      <div *ngFor='let column of row.columns' class="{{column.class}} column-options">{{column.class}}</div>
+      <div *ngFor='let column of row.columns' class="{{column.class}} column-options">{{column.class}}
+        <div *ngFor='let block of column.blocks' class="block">[block id='{{block.id}}']</div>
+      </div>
     </div>
   </div>
   <div>

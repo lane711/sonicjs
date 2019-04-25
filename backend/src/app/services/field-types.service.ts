@@ -26,6 +26,14 @@ export class FieldTypesService {
         }
       },
       {
+        id: "745af640-9a62-47b8-99a2-ce3854d22dca",
+        name: "wysiwyg",
+        desc: "wysiwyg text editor",
+        generateHtml: function(id = "notDefined", placeholder = "", css = "") {
+          return self.getTextArea(id, placeholder, css);
+        }
+      },
+      {
         id: "0ba9bee2-c7ec-4245-8a2c-2eeb9fe1068b",
         name: "number",
         desc: "Number, money",

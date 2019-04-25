@@ -4,17 +4,37 @@
 
   <div [ngSwitch]="question.controlType" class="col-md-9">
 
-    <input *ngSwitchCase="'textbox'" [formControlName]="question.key" [id]="question.key" [type]="question.type" class="form-control">
+    <input *ngSwitchCase="'textbox'" [formControlName]="question.key" [id]="question.key" [type]="question.type"
+      class="form-control">
 
-    <input *ngSwitchCase="'hidden'" [formControlName]="question.key" [id]="question.key" class='hidden' type="hidden" class="form-control">
+    <input *ngSwitchCase="'hidden'" [formControlName]="question.key" [id]="question.key" class='hidden' type="hidden"
+      class="form-control">
 
-    <textarea *ngSwitchCase="'textarea'" [formControlName]="question.key" [id]="question.key" class='hidden' rows="4" cols="50" class="form-control"></textarea>
+    <textarea *ngSwitchCase="'textarea'" [formControlName]="question.key" [id]="question.key" class='hidden' rows="4"
+      cols="50" class="form-control"></textarea>
 
     <app-layout *ngSwitchCase="'layout'" [question]="question" [form]="form"></app-layout>
 
     <select [id]="question.key" *ngSwitchCase="'dropdown'" [formControlName]="question.key" class="form-control">
       <option *ngFor="let opt of question.options" [value]="opt.key">{{opt.value}}</option>
     </select>
+
+    <div *ngSwitchCase="'wysiwyg'" class="wywiwyg">
+
+      <div class="btn-group" role="group" aria-label="Basic example">
+        <button (click)="wrapTag('b')" type="button" class="btn btn-secondary">B</button>
+        <button (click)="wrapTag('i')" type="button" class="btn btn-secondary"><i>I</i></button>
+        <button (click)="wrapTag('u')" type="button" class="btn btn-secondary"><u>U</u></button>
+      </div>
+
+      <div class="btn-group" role="group" aria-label="Basic example">
+        <button (click)="insert('<button>')" type="button" class="btn btn-secondary">btn</button>
+      </div>
+
+      <textarea [formControlName]="question.key" [id]="question.key" #t
+        (select)="onSelect(t.selectionStart, t.selectionEnd)" id="layout" [value]="content" rows="4"
+        class="form-control"></textarea>
+    </div>
 
   </div>
 
