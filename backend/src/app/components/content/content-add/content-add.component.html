@@ -1,0 +1,18 @@
+<div class="row">
+    <div class="col-md-12">
+      <div class="card admin-create-instance">
+        <div class="card-header">
+          <i class="fa fa-align-justify"></i> Add Content Instance
+        </div>
+        <div class="card-body">
+          <h3>Select content type to add:</h3>
+            <p *ngFor="let contentType of contentTypes">
+                <button class="btn btn-success">{{contentType.name}}</button> {{contentType.description}}
+              </p>
+
+          <app-forms *ngIf="isDataAvailable" [questions]="questions" [onSubmitHandler]="onSubmitContentAdd" id="{{contentInstance.id}}"></app-forms>
+        </div>
+      </div>
+    </div>
+  
+  </div>
