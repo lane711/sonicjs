@@ -5,6 +5,7 @@
   "version": "0.2.0",
   "configurations": [
 
+
     {
       "type": "chrome",
       "request": "attach",
@@ -26,7 +27,7 @@
       "type": "chrome",
       "request": "launch",
       "name": "Backend Client",
-      "url": "http://localhost:4200",
+      "url": "http://localhost:4200/admin/content/add",
       "webRoot": "${workspaceFolder}/backend"
     },
     {
