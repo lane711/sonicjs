@@ -22,4 +22,10 @@ export class ContentComponent implements OnInit {
     })
   }
 
+  deleteContent(contentId){
+    this.contentService.deleteContentInstance(contentId).then(() => {
+      this.loadContent();
+    });
+  }
+
 }

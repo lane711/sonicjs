@@ -67,6 +67,10 @@ export class ContentService {
     }
   }
 
+  async deleteContentInstance(id) {
+    return this.http.delete(environment.apiUrl + "contents/" + id).toPromise();
+  }
+
   private populateFormField(questions, content, property){
     let questionToPopulate = questions.find(q => q.key === property)
     // console.log('questionToPopulate', questionToPopulate);
