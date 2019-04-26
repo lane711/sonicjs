@@ -70,7 +70,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm5/router.js");
-/* harmony import */ var _components_page_page_component__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/page/page.component */ "./src/app/components/page/page.component.ts");
+/* harmony import */ var _components_page_page_component__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! projects/sonic-core/src/lib/components/page/page.component */ "./src/app/components/page/page.component.ts");
 
 
 
@@ -164,12 +164,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm5/http.js");
 /* harmony import */ var _app_routing_module__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./app-routing.module */ "./src/app/app-routing.module.ts");
 /* harmony import */ var _app_component__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./app.component */ "./src/app/app.component.ts");
-/* harmony import */ var _components_menu_menu_component__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/menu/menu.component */ "./src/app/components/menu/menu.component.ts");
-/* harmony import */ var _components_header_header_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/header/header.component */ "./src/app/components/header/header.component.ts");
-/* harmony import */ var _components_footer_footer_component__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./components/footer/footer.component */ "./src/app/components/footer/footer.component.ts");
-/* harmony import */ var _components_section_section_component__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./components/section/section.component */ "./src/app/components/section/section.component.ts");
-/* harmony import */ var _components_page_page_component__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./components/page/page.component */ "./src/app/components/page/page.component.ts");
-/* harmony import */ var _components_wysiwyg_wysiwyg_component__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./components/wysiwyg/wysiwyg.component */ "./src/app/components/wysiwyg/wysiwyg.component.ts");
+/* harmony import */ var _components_menu_menu_component__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! projects/sonic-core/src/lib/components/menu/menu.component */ "./src/app/components/menu/menu.component.ts");
+/* harmony import */ var _components_header_header_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! projects/sonic-core/src/lib/components/header/header.component */ "./src/app/components/header/header.component.ts");
+/* harmony import */ var _components_footer_footer_component__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! projects/sonic-core/src/lib/components/footer/footer.component */ "./src/app/components/footer/footer.component.ts");
+/* harmony import */ var _components_section_section_component__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! projects/sonic-core/src/lib/components/section/section.component */ "./src/app/components/section/section.component.ts");
+/* harmony import */ var _components_page_page_component__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! projects/sonic-core/src/lib/components/page/page.component */ "./src/app/components/page/page.component.ts");
+/* harmony import */ var _components_wysiwyg_wysiwyg_component__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! projects/sonic-core/src/lib/components/wysiwyg/wysiwyg.component */ "./src/app/components/wysiwyg/wysiwyg.component.ts");
 
 
 

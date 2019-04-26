@@ -1,17 +1,17 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
-import { HomeComponent } from "../components/home/home.component";
-import { ContentTypesComponent } from "../components/content-types/content-types.component";
-import { ContentTypeAddComponent } from "../components/content-types/content-type-add/content-type-add.component";
-import { ContentTypeEditComponent } from "../components/content-types/content-type-edit/content-type-edit.component";
-import { ContentTypeEditFieldComponent } from "../components/content-types/content-type-edit-field/content-type-edit-field.component";
-import { ContentComponent } from "../components/content/content.component";
-import { ContentEditComponent } from "../components/content/content-edit/content-edit.component";
-import { ContentAddComponent } from "../components/content/content-add/content-add.component";
+import { HomeComponent } from "projects/sonic-core/src/lib/components/home/home.component";
+import { ContentTypesComponent } from "projects/sonic-core/src/lib/components/content-types/content-types.component";
+import { ContentTypeAddComponent } from "projects/sonic-core/src/lib/components/content-types/content-type-add/content-type-add.component";
+import { ContentTypeEditComponent } from "projects/sonic-core/src/lib/components/content-types/content-type-edit/content-type-edit.component";
+import { ContentTypeEditFieldComponent } from "projects/sonic-core/src/lib/components/content-types/content-type-edit-field/content-type-edit-field.component";
+import { ContentComponent } from "projects/sonic-core/src/lib/components/content/content.component";
+import { ContentEditComponent } from "projects/sonic-core/src/lib/components/content/content-edit/content-edit.component";
+import { ContentAddComponent } from "projects/sonic-core/src/lib/components/content/content-add/content-add.component";
 
-import { FieldTypesComponent } from "../components/field-types/field-types.component";
-import { PagesComponent } from "../components/pages/pages.component";
-import { SandboxComponent } from "../components/sandbox/sandbox.component";
+import { FieldTypesComponent } from "projects/sonic-core/src/lib/components/field-types/field-types.component";
+import { PagesComponent } from "projects/sonic-core/src/lib/components/pages/pages.component";
+import { SandboxComponent } from "projects/sonic-core/src/lib/components/sandbox/sandbox.component";
 
 const routes: Routes = [
     { path: "admin", component: HomeComponent},

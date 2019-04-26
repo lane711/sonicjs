@@ -18,6 +18,6 @@ export class AppComponent {
 
   ngOnInit() {
     // const elem = createCustomElement(MenuComponent, {injector: this.injector});
-    // customElements.define('app-menu', elem);
+    // customElements.define('app-menu', elem); 
   }
 }
