@@ -3,11 +3,8 @@ import { Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
-export class SonicCoreService {
+export class FormService {
 
+  public layout: any;
   constructor() { }
-
-  echo(input){
-    return input;
-  }
 }
