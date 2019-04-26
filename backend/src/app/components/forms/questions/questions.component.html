@@ -32,8 +32,10 @@
       </div>
 
       <textarea [formControlName]="question.key" [id]="question.key" #t
-        (select)="onSelect(t.selectionStart, t.selectionEnd)" id="layout" [value]="content" rows="4"
-        class="form-control"></textarea>
+        (select)="onSelect(t.selectionStart, t.selectionEnd)" id="layout" [value]="question.value" rows="4"
+        class="form-control">
+      </textarea>
+      
     </div>
 
   </div>

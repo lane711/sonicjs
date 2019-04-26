@@ -18,7 +18,7 @@ export class QuestionsComponent {
 
   start: number;
   end: number;
-  content = 'Integer posuere erat a ante venenatis dapibus posuere velit aliquet.';
+  content = '';
 
   showLabel = true;
 
@@ -27,6 +27,7 @@ export class QuestionsComponent {
   }
 
   ngOnInit() {
+    console.log('questions.comonent question:', this.question);
     this.processHidden();
   }
 

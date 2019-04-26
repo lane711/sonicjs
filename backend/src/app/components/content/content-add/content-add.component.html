@@ -10,13 +10,13 @@
           <hr>
           <span *ngFor="let contentType of contentTypes">
             <button (click)="loadContentInstanceForm(contentType.systemid)"
-              class="btn btn-success rmargin">{{contentType.name}}</button>
+              class="btn btn-success btn-lg rmargin">{{contentType.name}}</button>
           </span>
         </div>
 
 
         <button (click)="onCancelContentAdd()"
-              class="btn btn-success rmargin">cancel</button>
+              class="btn btn-success rmargin">Back</button>
 
 
         <app-forms *ngIf="isFormDataAvailable" [questions]="questions" [onCancelHandler]="onCancelContentAdd" [onSubmitHandler]="onSubmitContentAdd"></app-forms>

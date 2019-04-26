@@ -60,7 +60,7 @@ export class ContentAddComponent implements OnInit {
 
   }
 
-  onCancelContentAdd(payload) {
+  public onCancelContentAdd(payload) {
     console.log('cancel add', payload);
     this.isFormDataAvailable = false;
     console.log('this.isFormDataAvailable', this.isFormDataAvailable);
