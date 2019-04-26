@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ContentService } from "../../../services/content.service";
-import { ContentTypesService } from "../../../services/content-types.service";
+import { ContentService } from "projects/sonic-core/src/lib/services/content.service";
+import { ContentTypesService } from "projects/sonic-core/src/lib/services/content-types.service";
 
 @Component({
   selector: 'app-content-add',

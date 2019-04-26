@@ -1,10 +1,10 @@
 import { Component, OnInit, Input } from "@angular/core";
-import { ContentTypesService } from "../../../services/content-types.service";
-import { ContentService } from "../../../services/content.service";
+import { ContentTypesService } from "projects/sonic-core/src/lib/services/content-types.service";
+import { ContentService } from "projects/sonic-core/src/lib/services/content.service";
 
-import { FieldTypesService } from "../../../services/field-types.service";
+import { FieldTypesService } from "projects/sonic-core/src/lib/services/field-types.service";
 import { FormControl, FormGroup, NgControlStatus } from "@angular/forms";
-import { QuestionService } from "../../../services/question.service";
+import { QuestionService } from "projects/sonic-core/src/lib/services/question.service";
 
 @Component({
   selector: "app-content-type-edit-create-instance",

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from "@angular/router";
-import { ContentService } from '../../../services/content.service';
-import { ContentTypesService } from '../../../services/content-types.service'
+import { ContentService } from 'projects/sonic-core/src/lib/services/content.service';
+import { ContentTypesService } from 'projects/sonic-core/src/lib/services/content-types.service'
 
 @Component({
   selector: 'app-content-edit',

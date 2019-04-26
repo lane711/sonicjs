@@ -1,5 +1,5 @@
 import { Component, OnInit, Renderer2 } from '@angular/core';
-import { UiService } from '../../services/ui.service';
+import { UiService } from 'projects/sonic-core/src/lib/services/ui.service';
 
 @Component({
   selector: 'app-aside-menu',

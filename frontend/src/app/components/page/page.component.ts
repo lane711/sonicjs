@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap, NavigationStart, NavigationEnd } from "@angular/router";
-import { ContentService } from '../../services/content.service'
+import { ContentService } from 'projects/sonic-core/src/lib/services/content.service'
 // import { SafePipe } from "./pipes/safe.pipe";
 
 @Component({

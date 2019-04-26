@@ -1,12 +1,12 @@
 import { Component, OnInit } from "@angular/core";
 import { Router, ActivatedRoute, ParamMap } from "@angular/router";
 import { switchMap } from "rxjs/operators";
-import { ContentTypesService } from "../../../services/content-types.service";
-import { UiService } from "../../../services/ui.service";
+import { ContentTypesService } from "projects/sonic-core/src/lib/services/content-types.service";
+import { UiService } from "projects/sonic-core/src/lib/services/ui.service";
 
-import { TextboxQuestion } from "../../../models/question-textbox";
-import { DropdownQuestion } from "../../../models/question-dropdown";
-import { HiddenQuestion } from '../../../models/question-hidden';
+import { TextboxQuestion } from "projects/sonic-core/src/lib/models/question-textbox";
+import { DropdownQuestion } from "projects/sonic-core/src/lib/models/question-dropdown";
+import { HiddenQuestion } from 'projects/sonic-core/src/lib/models/question-hidden';
 
 @Component({
   selector: "app-content-type-edit",

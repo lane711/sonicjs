@@ -1,12 +1,12 @@
 import { Component, OnInit, Input } from "@angular/core";
-import { QuestionBase } from "../../models/question-base";
+import { QuestionBase } from "projects/sonic-core/src/lib//models/question-base";
 import { FormGroup } from "@angular/forms";
-import { QuestionControlService } from "../../services/question-control.service";
-import { ContentTypesService } from "../../services/content-types.service";
-import { ContentService } from "../../services/content.service";
+import { QuestionControlService } from "projects/sonic-core/src/lib/services/question-control.service";
+import { ContentTypesService } from "projects/sonic-core/src/lib/services/content-types.service";
+import { ContentService } from "projects/sonic-core/src/lib/services/content.service";
 
-import { UiService } from "../../services/ui.service";
-import { FormService } from "../../services/form.service";
+import { UiService } from "projects/sonic-core/src/lib/services/ui.service";
+import { FormService } from "projects/sonic-core/src/lib/services/form.service";
 
 @Component({
   selector: "app-forms",

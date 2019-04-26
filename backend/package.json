@@ -40,7 +40,6 @@
     "shortid": "^2.2.14",
     "simple-line-icons": "2.4.1",
     "siteden": "^1.0.0",
-    "sonic-core": "0.0.4",
     "zone.js": "~0.8.26"
   },
   "devDependencies": {

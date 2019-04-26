@@ -1,8 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { Location } from "@angular/common";
 import { Router } from "@angular/router";
-import { ContentTypesService } from "../../../services/content-types.service";
-import { TextboxQuestion } from "../../../models/question-textbox";
+import { ContentTypesService } from "projects/sonic-core/src/lib/services/content-types.service";
+import { TextboxQuestion } from "projects/sonic-core/src/lib/models/question-textbox";
 
 @Component({
   selector: "app-content-type-add",

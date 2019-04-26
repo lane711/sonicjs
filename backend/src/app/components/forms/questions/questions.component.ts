@@ -1,7 +1,7 @@
 import { Component, Input } from "@angular/core";
 import { FormGroup } from "@angular/forms";
 
-import { QuestionBase } from "../../../models/question-base";
+import { QuestionBase } from "projects/sonic-core/src/lib/models/question-base";
 
 @Component({
   selector: "app-questions",

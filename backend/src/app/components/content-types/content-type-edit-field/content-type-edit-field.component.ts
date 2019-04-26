@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from "@angular/router";
-import { ContentTypesService } from "../../../services/content-types.service";
-import { TextboxQuestion } from "../../../models/question-textbox";
-import { DropdownQuestion } from "../../../models/question-dropdown";
-import { HiddenQuestion } from '../../../models/question-hidden';
-import { UiService } from "../../../services/ui.service";
+import { ContentTypesService } from "projects/sonic-core/src/lib/services/content-types.service";
+import { TextboxQuestion } from "projects/sonic-core/src/lib/models/question-textbox";
+import { DropdownQuestion } from "projects/sonic-core/src/lib/models/question-dropdown";
+import { HiddenQuestion } from 'projects/sonic-core/src/lib/models/question-hidden';
+import { UiService } from "projects/sonic-core/src/lib/services/ui.service";
 
 @Component({
   selector: 'app-content-type-edit-field',
