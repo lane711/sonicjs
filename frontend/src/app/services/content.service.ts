@@ -9,33 +9,33 @@ export class ContentService {
 
   constructor(private http: HttpClient) { }
 
-  async getContent() {
-    let url = environment.apiUrl + "contents";
-    console.log('url', url);
-    return this.http.get(url).toPromise();
-  }
+  // async getContent() {
+  //   let url = environment.apiUrl + "contents";
+  //   console.log('url', url);
+  //   return this.http.get(url).toPromise();
+  // }
 
-  async getContentById(id) {
-    let url = environment.apiUrl + `contents/${id}`;
-    return this.http.get(url).toPromise();
-  }
+  // async getContentById(id) {
+  //   let url = environment.apiUrl + `contents/${id}`;
+  //   return this.http.get(url).toPromise();
+  // }
 
-  async getContentByType(contentType) {
-    const filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
-    let url = environment.apiUrl + `contents?filter=${filter}`;
-    return this.http.get(url).toPromise();
-  }
+  // async getContentByType(contentType) {
+  //   const filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
+  //   let url = environment.apiUrl + `contents?filter=${filter}`;
+  //   return this.http.get(url).toPromise();
+  // }
 
-  async getContentByUrl(contentType, contentUrl) {
-    const filter = encodeURI(`{"where":{"url":"${contentUrl}","data.contentType":"${contentType}"}}`);
-    let url = environment.apiUrl + `contents?filter=${filter}`;
-    return this.http.get(url).toPromise();
-  }
+  // async getContentByUrl(contentType, contentUrl) {
+  //   const filter = encodeURI(`{"where":{"url":"${contentUrl}","data.contentType":"${contentType}"}}`);
+  //   let url = environment.apiUrl + `contents?filter=${filter}`;
+  //   return this.http.get(url).toPromise();
+  // }
 
-  async saveSection(section, payload) {
-    // console.log('saveSection=>',section, payload);
-    // const filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
-    // let url = environment.apiUrl + `contents?filter=${filter}`;
-    // return this.http.get(url).toPromise();
-  }
+  // async saveSection(section, payload) {
+  //   // console.log('saveSection=>',section, payload);
+  //   // const filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
+  //   // let url = environment.apiUrl + `contents?filter=${filter}`;
+  //   // return this.http.get(url).toPromise();
+  // }
 }

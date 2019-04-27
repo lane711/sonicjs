@@ -4,14 +4,14 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { MenuComponent } from 'projects/sonic-core/src/lib/components/menu/menu.component';
-import { HeaderComponent } from 'projects/sonic-core/src/lib/components/header/header.component';
-import { FooterComponent } from 'projects/sonic-core/src/lib/components/footer/footer.component';
-import { SectionComponent } from 'projects/sonic-core/src/lib/components/section/section.component';
-import { PageComponent } from 'projects/sonic-core/src/lib/components/page/page.component';
-import { WysiwygComponent } from 'projects/sonic-core/src/lib/components/wysiwyg/wysiwyg.component';
+import { MenuComponent } from './components/menu/menu.component';
+import { HeaderComponent } from './components/header/header.component';
+import { FooterComponent } from './components/footer/footer.component';
+import { SectionComponent } from './components/section/section.component';
+import { PageComponent } from './components//page/page.component';
+import { WysiwygComponent } from './components/wysiwyg/wysiwyg.component';
 import { SafePipe } from "./pipes/safe.pipe";
-
+ 
 @NgModule({
   declarations: [
     AppComponent,

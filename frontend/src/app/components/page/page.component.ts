@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap, NavigationStart, NavigationEnd } from "@angular/router";
-import { ContentService } from 'projects/sonic-core/src/lib/services/content.service'
+import { SonicCoreComponent } from 'node_modules/sonic-core/src/lib/sonic-core.component';
+
 // import { SafePipe } from "./pipes/safe.pipe";
 
 @Component({
@@ -11,7 +12,7 @@ import { ContentService } from 'projects/sonic-core/src/lib/services/content.ser
 export class PageComponent implements OnInit {
 
   constructor(
-    private contentService:ContentService,
+    private contentService:SonicCoreComponent,
     private route: ActivatedRoute,
     private router: Router) { }
 
@@ -50,21 +51,21 @@ export class PageComponent implements OnInit {
   }
 
   loadPage(){
-    this.contentService.getContentByUrl("page", this.contentUrl).then(data => {
-      console.log('page data', data[0]);
-      this.content = data[0];
-      this.loadSections();
-    });
+    // this.contentService.getContentByUrl("page", this.contentUrl).then(data => {
+    //   console.log('page data', data[0]);
+    //   this.content = data[0];
+    //   this.loadSections();
+    // });
   }
 
   loadSections(){
     console.log('layout', this.content.layout);
     // this.contentService.getContentById('5cb1547b3f6d33389f244568').then(data => {
-      this.contentService.getContentByType('section').then(data => {
+      // this.contentService.getContentByType('section').then(data => {
 
-this.sections = data;
-console.log('section', this.sections);
-    });
+// this.sections = data;
+// console.log('section', this.sections);
+//     });
   }
 
 }

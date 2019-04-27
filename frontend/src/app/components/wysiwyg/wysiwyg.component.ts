@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ContentService } from 'projects/sonic-core/src/lib/services/content.service'
+// import { ContentService } from 'projects/sonic-core/src/lib/services/content.service'
 
 declare var $: any;
 
@@ -20,7 +20,9 @@ export class WysiwygComponent implements OnInit {
 
   showSaveControls: boolean = false;
 
-  constructor(private contentService:ContentService) { }
+  constructor(
+    // private contentService:ContentService
+    ) { }
 
   ngOnInit(){
     // console.log('main this', this);
@@ -67,3 +69,4 @@ export class WysiwygComponent implements OnInit {
   }
 
 }
+ 

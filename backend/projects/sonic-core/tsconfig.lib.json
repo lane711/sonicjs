@@ -17,6 +17,10 @@
       "es2015"
     ]
   },
+  "include": [
+    "./src",
+    "node_modules/@angular"
+  ],
   "angularCompilerOptions": {
     "annotateForClosureCompiler": true,
     "skipTemplateCodegen": true,

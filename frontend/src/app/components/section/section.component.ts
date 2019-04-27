@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ContentService } from 'projects/sonic-core/src/lib/services/content.service'
+import { SonicCoreComponent } from 'node_modules/sonic-core/src/lib/sonic-core.component';
 
 @Component({
   selector: 'app-section',
@@ -8,17 +8,17 @@ import { ContentService } from 'projects/sonic-core/src/lib/services/content.ser
 })
 export class SectionComponent implements OnInit {
 
-  constructor(private contentService:ContentService) { }
+  constructor(private contentService:SonicCoreComponent) { }
 
   ngOnInit() {
-    this.contentService.saveSection('test', 'payload');
+    // this.contentService.saveSection('test', 'payload');
   }
 
   onSubmitSaveSection(sectionId, payload){
     console.log('onSubmitSaveSection', sectionId, payload);
     //section section info
     // console.log(this.contentService);
-    this.contentService.saveSection(sectionId, payload);
+    // this.contentService.saveSection(sectionId, payload);
     //link section to page object
   }
 

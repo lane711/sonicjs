@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ContentService } from 'projects/sonic-core/src/lib/services/content.service'
+// import { ContentService } from 'projects/sonic-core/src/lib/services/content.service'
+import { SonicCoreComponent } from 'node_modules/sonic-core/src/lib/sonic-core.component';
 
 @Component({
   selector: 'app-menu',
@@ -8,15 +9,15 @@ import { ContentService } from 'projects/sonic-core/src/lib/services/content.ser
 })
 export class MenuComponent implements OnInit {
 
-  constructor(private contentService:ContentService) { }
+  constructor(private contentService:SonicCoreComponent) { }
   
   menuItems:any;
 
   ngOnInit() {
-    this.contentService.getContentByType('menu').then(data =>{
-      // console.log('menu', data);
-      this.menuItems = data;
-    })
+    // this.contentService.getContentByType('menu').then(data =>{
+    //   // console.log('menu', data);
+    //   this.menuItems = data;
+    // })
   }
 
 }
