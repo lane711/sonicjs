@@ -90,6 +90,7 @@ I started this project because I have established a recent affinity to NodeJs al
 1. To Debug the app: Use the built in debug from VS Code
 1. `cd client`
 1. `ng serve`
+1. `node server.js` for nodemon
 
 ##Debugging
 
