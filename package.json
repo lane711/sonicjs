@@ -11,6 +11,7 @@
     "posttest": "npm run lint"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "boostrap": "^2.0.0",
     "chai": "^4.2.0",
     "cheerio": "^1.0.0-rc.3",

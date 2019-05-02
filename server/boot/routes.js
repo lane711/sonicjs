@@ -21,8 +21,6 @@ module.exports = function (app) {
 
 
   router.get('/', function (req, res) {
-    console.log('root route');
-
     let url = req.url;
     res.send(page);
   });
