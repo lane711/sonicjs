@@ -1,4 +1,5 @@
 var fs = require('fs');
+const cheerio = require('cheerio')
 
 module.exports = {
 
@@ -18,7 +19,15 @@ module.exports = {
     },
 
     processTemplate: function (html) {
-        return html.replace('World', 'Home');
+        const $ = cheerio.load(html);
+        $('.blog-header-logo').text('Cheerio');
+        // const $ = cheerio.load('<h2 class="title">Hello world</h2>')
+ 
+        // $('h2.title').text('Hello there!')
+        // console.log($.html());
+
+
+        return $.html();
     }
 
 }

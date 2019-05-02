@@ -32,12 +32,10 @@ module.exports = function (app) {
   // });
 
   router.get('/admin', function (req, res) {
-    console.log('admin route');
     res.send(adminPage);
   });
 
   router.get('/admin/content-types', function (req, res) {
-    console.log('admin route');
     res.send(adminPage);
   });
 
