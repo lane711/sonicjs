@@ -41,9 +41,29 @@
     }
   },
   "files": {
-    "loopback#static": {
-      "params": "$!../client"
-    }
+    "loopback#static": [
+      {
+        "name": "frontend",
+        "paths": [
+          "/"
+        ],
+        "params": "$!../server/themes/base"
+      },
+      {
+        "name": "backend",
+        "paths": [
+          "/admin"
+        ],
+        "params": "$!../backend"
+      },
+      {
+        "name": "backendScripts",
+        "paths": [
+          "/admin"
+        ],
+        "params": "$!../backend/dist/client"
+      }
+    ]
   },
   "final": {
     "loopback#urlNotFound": {}

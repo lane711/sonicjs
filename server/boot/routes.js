@@ -1,37 +1,32 @@
-var fs = require('fs');
+var themes = require(__dirname + '/../themes/themes');
+var admin = require(__dirname + '/admin');
 
-module.exports = function(app) {
-    // Install a "/ping" route that returns "pong"
-  app.get('/ping', function(req, res) {
-    res.send('pong');
-  });
-};
-
-module.exports = function(app) {
-  var router = app.loopback.Router();
-  router.get('/ping2', function(req, res) {
-      res.send('pongaroo');
-    });
-  app.use(router);
-};
-
-module.exports = function(app) {
+module.exports = function (app) {
   var router = app.loopback.Router();
 
-  let page = 'my page';
-  // let clientDir = __dirname + '../../';
-  // console.log('====>clientDir', clientDir);
+  let page = '';
+  let adminPage = '';
 
-  fs.readFile( __dirname + '/../../client/index.html', function (err, data) {
-    if (err) {
-      throw err; 
-    }
-    page = data.toString();
-  });
+  (async () => {
+    page = await themes.getTheme();
+    // console.log('asunc page ==>', page);
+  })();
 
-  router.get('/', function(req, res) {
+  (async () => {
+    adminPage = await admin.loadAdmin();
+    // console.log('asunc page ==>', page);
+  })();
+
+  router.get('/', function (req, res) {
     let url = req.url;
-      res.send(page);
-    }); 
+    res.send(page);
+  });
+
+  router.get('/admin', function (req, res) {
+    let url = req.url;
+    res.send(adminPage);
+  });
+
   app.use(router);
+
 };  

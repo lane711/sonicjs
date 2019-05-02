@@ -1,0 +1,6 @@
+module.exports = {
+
+    getPages: function () {
+    }
+
+}

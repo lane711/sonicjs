@@ -91,6 +91,7 @@ I started this project because I have established a recent affinity to NodeJs al
 1. `cd client`
 1. `ng serve`
 1. `node server.js` for nodemon
+1. `ng build --deploy-url=/admin/`
 
 ##Debugging
 
