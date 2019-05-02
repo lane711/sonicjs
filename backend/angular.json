@@ -15,6 +15,7 @@
           "options": {
             "outputPath": "dist/client",
             "deployUrl": "/admin/",
+            "baseHref": "/admin/",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
