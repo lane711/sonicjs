@@ -26,12 +26,22 @@
             "styles": [
               "src/assets/css/style.css",
               "src/styles.css",
-              "node_modules/@coreui/icons/css/coreui-icons.min.css"
+              "node_modules/@coreui/icons/css/coreui-icons.min.css",
+              "node_modules/flag-icon-css/css/flag-icon.min.css",
+              "node_modules/font-awesome/css/font-awesome.min.css",
+              "node_modules/simple-line-icons/css/simple-line-icons.css",
+              "node_modules/pace-progress/themes/white/pace-theme-minimal.css"
             ],
             "scripts": [
               {
                 "input": "node_modules/document-register-element/build/document-register-element.js"
-              }
+              },
+              "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/popper.js/dist/umd/popper.min.js",
+              "node_modules/bootstrap/dist/js/bootstrap.min.js",
+              "node_modules/pace-progress/pace.min.js",
+              "node_modules/perfect-scrollbar/dist/perfect-scrollbar.min.js",
+              "node_modules/@coreui/coreui/dist/js/coreui.min.js"
             ]
           },
           "configurations": {
