@@ -13,6 +13,7 @@
   "dependencies": {
     "boostrap": "^2.0.0",
     "chai": "^4.2.0",
+    "cheerio": "^1.0.0-rc.3",
     "compression": "^1.0.3",
     "cors": "^2.5.2",
     "helmet": "^3.10.0",
