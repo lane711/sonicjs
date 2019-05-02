@@ -14,17 +14,17 @@ import { PagesComponent } from "projects/sonic-core/src/lib/components/pages/pag
 import { SandboxComponent } from "projects/sonic-core/src/lib/components/sandbox/sandbox.component";
 
 const routes: Routes = [
-    { path: "admin", component: HomeComponent},
-    { path: "admin/field-types", component: FieldTypesComponent },
-    { path: "admin/content-types", component: ContentTypesComponent },
-    { path: "admin/content-types/add", component: ContentTypeAddComponent },
-    { path: "admin/content-types/:id", component: ContentTypeEditComponent },
-    // { path: "admin/content-types/:id/fieldId/:fieldId", component: ContentTypeEditComponent },
-    { path: "admin/content-types/:id/fieldId/:fieldId", component: ContentTypeEditFieldComponent },
-    { path: "admin/content", component: ContentComponent },
-    { path: "admin/content/add", component: ContentAddComponent },
-    { path: "admin/content/:id", component: ContentEditComponent },
-    { path: "admin/sandbox", component: SandboxComponent },
+    { path: "", component: HomeComponent},
+    { path: "field-types", component: FieldTypesComponent },
+    { path: "content-types", component: ContentTypesComponent },
+    { path: "content-types/add", component: ContentTypeAddComponent },
+    { path: "content-types/:id", component: ContentTypeEditComponent },
+    // { path: "content-types/:id/fieldId/:fieldId", component: ContentTypeEditComponent },
+    { path: "content-types/:id/fieldId/:fieldId", component: ContentTypeEditFieldComponent },
+    { path: "content", component: ContentComponent },
+    { path: "content/add", component: ContentAddComponent },
+    { path: "content/:id", component: ContentEditComponent },
+    { path: "sandbox", component: SandboxComponent },
     { path: "**", component: PagesComponent},
 ];
 

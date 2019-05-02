@@ -76,7 +76,7 @@ console.log('addField.fieldType', field);
     this.uiService.toggleSideAside(fieldId);
     
     this.router.navigate(
-      ['/admin/content-types/' + this.contentTypesService.contentType.id], 
+      ['/content-types/' + this.contentTypesService.contentType.id], 
       { queryParams: { 'fieldId': fieldId } }
     );
   }

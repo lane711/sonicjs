@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-header">
       <i class="fa fa-align-justify"></i> Content Type
-      <a [routerLink]="['/admin/content-types', 'add']" class="btn btn-success float-right new-content-type">New Content Type</a>
+      <a [routerLink]="['/content-types', 'add']" class="btn btn-success float-right new-content-type">New Content Type</a>
     </div>
     <div class="card-body page-list">
       <table class="table table-responsive-sm table-striped">
@@ -15,10 +15,10 @@
         </thead>
         <tbody>
           <tr *ngFor="let contentType of contentTypes">
-            <td><a [routerLink]="['/admin/content-types', contentType.id]">{{ contentType.name }}</a></td>
+            <td><a [routerLink]="['/content-types', contentType.id]">{{ contentType.name }}</a></td>
             <td>{{ contentType.description}}</td>
             <td>
-              <a class="btn btn-sm btn-primary rmargin" [routerLink]="['/admin/content-types', contentType.id]">Edit</a>
+              <a class="btn btn-sm btn-primary rmargin" [routerLink]="['/content-types', contentType.id]">Edit</a>
 
               <ng-template #popTitle>Delete <b>{{ contentType.name }}</b>?</ng-template>
               <ng-template #popContent><button class="btn btn-sm btn-danger" (click)="deleteContentType(contentType.id)">Confirm Delete</button></ng-template>

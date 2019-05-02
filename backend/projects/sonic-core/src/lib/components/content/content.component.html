@@ -2,7 +2,7 @@
     <div class="card">
       <div class="card-header">
         <i class="fa fa-align-justify"></i> Content
-        <a [routerLink]="['/admin/content', 'add']" class="btn btn-success float-right">New Content</a>
+        <a [routerLink]="['/content', 'add']" class="btn btn-success float-right">New Content</a>
       </div>
       <div class="card-body page-list">
         <table class="table table-responsive-sm table-striped">
@@ -17,13 +17,13 @@
           </thead>
           <tbody>
             <tr *ngFor="let content of contentInstances">
-              <td><a [routerLink]="['/admin/content', content.id]">{{ content.data.name }}</a></td>
+              <td><a [routerLink]="['/content', content.id]">{{ content.data.name }}</a></td>
               <td>{{ content.data.contentType }}</td>
               <td>{{ content.url }}</td>
               <td>...</td>
               <td>
                 <!-- <a href="{{ content.url }}" target="_blank" class="btn btn-sm btn-success rmargin">View</a> -->
-                <a class="btn btn-sm btn-primary rmargin" [routerLink]="['/admin/content', content.id]">Edit</a>
+                <a class="btn btn-sm btn-primary rmargin" [routerLink]="['/content', content.id]">Edit</a>
   
                 <ng-template #popTitle>Delete <b>{{ content.name }}</b>?</ng-template>
                 <ng-template #popContent><button class="btn btn-sm btn-danger" (click)="deleteContent(content.id)">Confirm Delete</button></ng-template>

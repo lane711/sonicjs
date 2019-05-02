@@ -46,7 +46,7 @@ export class ContentTypeAddComponent implements OnInit {
 
   ngOnInit() {
     this.contentTypesService.contentTypeCreated.subscribe(data => {
-      this.router.navigate(["/admin/content-types", data.id]);
+      this.router.navigate(["/content-types", data.id]);
     });
   }
 
