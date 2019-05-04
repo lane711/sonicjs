@@ -9,7 +9,8 @@ export class PageBuilderComponent implements OnInit {
 
   constructor() { }
 
-  html = '<div>content it <b>here</b></div>'
+  html = '<!DOCTYPE html><html><body><h1>My First Heading</h1><p>My first paragraph.</p></body></html>';
+  
   ngOnInit() {
   }
 
