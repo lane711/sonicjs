@@ -1,5 +1,5 @@
 import { Component, Injector } from '@angular/core';
-import { UiService } from "projects/sonic-core/src/lib/services/ui.service";
+import { UiService } from "./services/ui.service";
 import { createCustomElement } from '@angular/elements';
 
 @Component({
