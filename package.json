@@ -11,6 +11,7 @@
     "posttest": "npm run lint"
   },
   "dependencies": {
+    "@angular/elements": "^7.2.14",
     "axios": "^0.18.0",
     "boostrap": "^2.0.0",
     "chai": "^4.2.0",
