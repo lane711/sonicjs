@@ -28,6 +28,7 @@ import { AlertMessageComponent } from './components/alert-message/alert-message.
 import { LayoutComponent } from './components/forms/layout/layout.component';
 import { SandboxComponent } from './components/sandbox/sandbox.component';
 import { ContentAddComponent } from './components/content/content-add/content-add.component';
+import { PageBuilderComponent } from './components/page-builder/page-builder.component';
 
 @NgModule({
   declarations: [
@@ -54,7 +55,8 @@ import { ContentAddComponent } from './components/content/content-add/content-ad
     AlertMessageComponent,
     LayoutComponent,
     SandboxComponent,
-    ContentAddComponent
+    ContentAddComponent,
+    PageBuilderComponent
   ],
   imports: [
     BrowserModule,

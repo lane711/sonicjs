@@ -11,6 +11,10 @@ import {
 @Pipe({
   name: "safe"
 })
+
+// usage example:
+// <div [outerHTML]="html | safe: 'html'"></div>
+
 export class SafePipe implements PipeTransform {
   constructor(protected sanitizer: DomSanitizer) {}
 

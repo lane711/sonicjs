@@ -9,6 +9,7 @@ export class PageBuilderComponent implements OnInit {
 
   constructor() { }
 
+  html = '<div>content it <b>here</b></div>'
   ngOnInit() {
   }
 
