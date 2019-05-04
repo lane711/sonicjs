@@ -28,6 +28,7 @@ import { AlertMessageComponent } from 'projects/sonic-core/src/lib/components/al
 import { LayoutComponent } from 'projects/sonic-core/src/lib/components/forms/layout/layout.component';
 import { SandboxComponent } from 'projects/sonic-core/src/lib/components/sandbox/sandbox.component';
 import { ContentAddComponent } from 'projects/sonic-core/src/lib/components/content/content-add/content-add.component';
+import { PageBuilderComponent } from './components/page-builder/page-builder.component';
 
 @NgModule({
   declarations: [
@@ -54,7 +55,8 @@ import { ContentAddComponent } from 'projects/sonic-core/src/lib/components/cont
     AlertMessageComponent,
     LayoutComponent,
     SandboxComponent,
-    ContentAddComponent
+    ContentAddComponent,
+    PageBuilderComponent
   ],
   imports: [
     BrowserModule,

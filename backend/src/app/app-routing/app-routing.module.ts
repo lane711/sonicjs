@@ -8,6 +8,7 @@ import { ContentTypeEditFieldComponent } from "projects/sonic-core/src/lib/compo
 import { ContentComponent } from "projects/sonic-core/src/lib/components/content/content.component";
 import { ContentEditComponent } from "projects/sonic-core/src/lib/components/content/content-edit/content-edit.component";
 import { ContentAddComponent } from "projects/sonic-core/src/lib/components/content/content-add/content-add.component";
+import { ContentAddComponent } from "projects/sonic-core/src/lib/components/content/content-add/content-add.component";
 
 import { FieldTypesComponent } from "projects/sonic-core/src/lib/components/field-types/field-types.component";
 import { PagesComponent } from "projects/sonic-core/src/lib/components/pages/pages.component";
@@ -24,6 +25,7 @@ const routes: Routes = [
     { path: "content", component: ContentComponent },
     { path: "content/add", component: ContentAddComponent },
     { path: "content/:id", component: ContentEditComponent },
+    { path: "content/page-builder/:id", component: ContentEditComponent },
     { path: "sandbox", component: SandboxComponent },
     { path: "**", component: PagesComponent},
 ];

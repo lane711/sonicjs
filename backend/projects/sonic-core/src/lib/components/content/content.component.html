@@ -23,7 +23,9 @@
               <td>...</td>
               <td>
                 <!-- <a href="{{ content.url }}" target="_blank" class="btn btn-sm btn-success rmargin">View</a> -->
-                <a class="btn btn-sm btn-primary rmargin" [routerLink]="['/content', content.id]">Edit</a>
+                <a class="btn btn-sm btn-primary rmargin" [routerLink]="['/page-builder', content.id]">Page Builder</a>
+
+                <a class="btn btn-sm btn-primary rmargin" [routerLink]="['/content', content.id]">Settings</a>
   
                 <ng-template #popTitle>Delete <b>{{ content.name }}</b>?</ng-template>
                 <ng-template #popContent><button class="btn btn-sm btn-danger" (click)="deleteContent(content.id)">Confirm Delete</button></ng-template>
