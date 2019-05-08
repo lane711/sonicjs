@@ -11,7 +11,7 @@ module.exports = {
 
     getTheme: async function () {
         console.log('=== content service path:' + __dirname);
-        let themePath = './common/themes/base/index.html';
+        let themePath = __dirname + '/../themes/base/index.html';
 
         return new Promise((resolve, reject) => {
             fs.readFile(themePath, "utf8", (err, data) => {
@@ -20,7 +20,7 @@ module.exports = {
                     reject(err);
                 }
                 else {
-                    console.log('data==>', data);
+                    // console.log('data==>', data);
                     this.processTemplate(data).then(html => {
                         resolve(html);
                     })

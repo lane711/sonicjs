@@ -1,13 +1,14 @@
 'use strict';
+var contentService = require(__dirname + '/../services/content.service');
 
 module.exports = function(Content) {
 
     Content.getPageById = function (id, cb) {
       Content.findById( id, function (err, instance) {
-        var response = `<!DOCTYPE html><html><body><h1>My First Heading</h1><p>My first paragraph. ${instance.data.name}</p></body></html>`;
-        console.log(instance);
-
-        cb(null, response);
+        // var response = `<!DOCTYPE html><html><body><h1>My First Heading</h1><p>My first paragraph. ${instance.data.name}</p></body></html>`;
+        contentService.getTheme().then(data => {
+          cb(null, data.name);
+        })
     });
       };
     

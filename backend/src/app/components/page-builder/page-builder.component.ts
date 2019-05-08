@@ -19,7 +19,7 @@ export class PageBuilderComponent implements OnInit {
     // this.html = '<!DOCTYPE html><html><body><h1>My First Heading</h1><p>My first paragraph.</p></body></html>';
     let page : {}  = await this.pageBuilderService.getPageById('5cb146f83f6d33389f244564');
     console.log('page777', page);
-    this.html = page.name.toString();
+    this.html = page.toString();
     // this.html = '<!DOCTYPE html><html><body><h1>My Second Heading</h1><p>My first paragraph.</p></body></html>';
 
 
