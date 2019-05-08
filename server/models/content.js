@@ -7,7 +7,7 @@ module.exports = function(Content) {
       Content.findById( id, function (err, instance) {
         // var response = `<!DOCTYPE html><html><body><h1>My First Heading</h1><p>My first paragraph. ${instance.data.name}</p></body></html>`;
         contentService.getTheme().then(data => {
-          cb(null, data.name);
+          cb(null, data);
         })
     });
       };
@@ -20,7 +20,7 @@ module.exports = function(Content) {
           },
           accepts: {arg: 'id', type: 'string', http: { source: 'query' } },
           returns: {
-            arg: 'name',
+            arg: 'html',
             type: 'string',
           },
         }
