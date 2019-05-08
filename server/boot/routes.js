@@ -1,4 +1,4 @@
-var themes = require(__dirname + '/../themes/themes');
+var themes = require(__dirname + '/../../common/themes/themes');
 var admin = require(__dirname + '/admin');
 
 module.exports = function (app) {

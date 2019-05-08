@@ -47,7 +47,7 @@
         "paths": [
           "/"
         ],
-        "params": "$!../server/themes/base"
+        "params": "$!../common/themes/base"
       },
       {
         "name": "backend",

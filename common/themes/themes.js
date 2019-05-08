@@ -2,29 +2,13 @@ var fs = require('fs');
 const cheerio = require('cheerio')
 const axios = require('axios');
 const apiUrl = 'http://localhost:3000/explorer/';
-var contentService = require(__dirname + '/../../common/services/content.service');
+var contentService = require( '../services/content.service');
 
 module.exports = {
 
     getTheme: async function () {
-        let themePath = __dirname + '/base/index.html';
-
-        return new Promise((resolve, reject) => {
-            fs.readFile(themePath, "utf8", (err, data) => {
-                if (err) reject(err);
-                else {
-                    this.contentService.processTemplate(data).then(html => {
-                            resolve(html);
-    
-                        })
-                    // this.processTemplate(data).then(html => {
-                    //     resolve(html);
-
-                    // })
-                } 
-            });
-        });
-
+      console.log('===>themes.getTheme');
+        return await contentService.getTheme();
     },
 
     // processTemplate: async function (html) {

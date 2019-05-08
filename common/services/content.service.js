@@ -5,16 +5,24 @@ const apiUrl = 'http://localhost:3000/explorer/';
 
 module.exports = {
 
+    foo: function () {
+        return 'bar';
+    },
+
     getTheme: async function () {
-        let themePath = __dirname + '/base/index.html';
+        console.log('=== content service path:' + __dirname);
+        let themePath = './common/themes/base/index.html';
 
         return new Promise((resolve, reject) => {
             fs.readFile(themePath, "utf8", (err, data) => {
-                if (err) reject(err);
+                if (err) {
+                    console.log(err);
+                    reject(err);
+                }
                 else {
+                    console.log('data==>', data);
                     this.processTemplate(data).then(html => {
                         resolve(html);
-
                     })
                 } 
             });
@@ -23,6 +31,7 @@ module.exports = {
     },
 
     processTemplate: async function (html) {
+        console.log('=== processTemplate ===')
         const $ = cheerio.load(html);
         $('.blog-header-logo').text('Cheerio');
         $('.blog-post-title').text('Cheerio Post');
