@@ -1,5 +1,7 @@
 import { Component, Injector } from '@angular/core';
 import { UiService } from "./services/ui.service";
+import { PageBuilderService } from "./services/page-builder.service";
+
 import { createCustomElement } from '@angular/elements';
 
 @Component({
@@ -13,6 +15,7 @@ export class AppComponent {
   constructor(
     private uiService: UiService,
     private injector: Injector,
+    private pageBuilderService: PageBuilderService 
     // private menuComponent: MenuComponent
   ) { }
 

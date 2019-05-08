@@ -1,4 +1,4 @@
-<header class="app-header navbar">
+<header class="app-header navbar" *ngIf="!this.pageBuilderService.isPageBuilder">
   <button class="navbar-toggler sidebar-toggler d-lg-none mr-auto" type="button" data-toggle="sidebar-show">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -92,7 +92,7 @@
     <span class="navbar-toggler-icon"></span>
   </button>
 </header>
-<div class="app-body">
+<div class="app-body" >
   <div class="sidebar">
     <app-admin-side-menu></app-admin-side-menu>
   </div>
