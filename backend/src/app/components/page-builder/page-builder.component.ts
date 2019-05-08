@@ -12,6 +12,7 @@ export class PageBuilderComponent implements OnInit {
   html = '';
   
   ngOnInit() {
+    this.pageBuilderService.isPageBuilder = true;
     this.loadPage();
   }
 
@@ -23,6 +24,10 @@ export class PageBuilderComponent implements OnInit {
     // this.html = '<!DOCTYPE html><html><body><h1>My Second Heading</h1><p>My first paragraph.</p></body></html>';
 
 
+  }
+
+  ngOnDestroy(){
+    this.pageBuilderService.isPageBuilder = false;
   }
 
 }

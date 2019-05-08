@@ -9,6 +9,8 @@ export class PageBuilderService {
 
   constructor(private http: HttpClient) { }
 
+  isPageBuilder = false;
+  
   async getPageById(id) {
     let url = `${environment.apiUrl}contents/getPageById?id=${id}`;
     console.log('url', url);
