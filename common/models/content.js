@@ -4,7 +4,7 @@ module.exports = function(Content) {
 
     Content.getPageById = function (id, cb) {
       Content.findById( id, function (err, instance) {
-        var response = "Name of coffee shop is " + instance.data.name;
+        var response = `<!DOCTYPE html><html><body><h1>My First Heading</h1><p>My first paragraph. ${instance.data.name}</p></body></html>`;
         console.log(instance);
 
         cb(null, response);

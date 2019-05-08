@@ -1,4 +1,4 @@
 <p>
   page-builder works!
 </p>
-<div [outerHTML]="html | safe: 'html'"></div>
+<div *ngIf='html' [outerHTML]="html | safe: 'html'"></div>
