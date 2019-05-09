@@ -1,1 +1,8 @@
-<div *ngIf='html' [outerHTML]="html | safe: 'html'"></div>
+<div class="pb-wrapper">
+    <div class="tools">
+        <app-page-builder-editor></app-page-builder-editor>
+    </div>
+    <div class="content">
+        <div *ngIf='html' [outerHTML]="html | safe: 'html'"></div>
+    </div>
+</div>

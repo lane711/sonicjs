@@ -1,0 +1,12 @@
+.pb-wrapper{
+    display: flex;
+    height: 100vh;
+}
+.pb-wrapper .tools {
+    flex: 0 0 auto;
+    background: #2f353a;
+  }
+  .pb-wrapper .content {
+    flex: 1 1 auto;
+    overflow: auto;
+  }

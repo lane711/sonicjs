@@ -29,6 +29,7 @@ import { LayoutComponent } from './components/forms/layout/layout.component';
 import { SandboxComponent } from './components/sandbox/sandbox.component';
 import { ContentAddComponent } from './components/content/content-add/content-add.component';
 import { PageBuilderComponent } from './components/page-builder/page-builder.component';
+import { PageBuilderEditorComponent } from './components/page-builder-editor/page-builder-editor.component';
 
 @NgModule({
   declarations: [
@@ -56,7 +57,8 @@ import { PageBuilderComponent } from './components/page-builder/page-builder.com
     LayoutComponent,
     SandboxComponent,
     ContentAddComponent,
-    PageBuilderComponent
+    PageBuilderComponent,
+    PageBuilderEditorComponent
   ],
   imports: [
     BrowserModule,
