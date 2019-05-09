@@ -1,11 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { PageBuilderService } from '../../services/page-builder.service';
 import { ActivatedRoute } from "@angular/router";
 
 @Component({
   selector: 'app-page-builder',
   templateUrl: './page-builder.component.html',
-  styleUrls: ['./page-builder.component.css']
+  styleUrls: ['./page-builder.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class PageBuilderComponent implements OnInit {
 

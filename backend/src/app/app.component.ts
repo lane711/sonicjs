@@ -12,7 +12,7 @@ import { createCustomElement } from '@angular/elements';
 })
 export class AppComponent {
   title = 'client';
-  isPageBuilder = true;
+  isPageBuilder = false;
 
   constructor(
     private uiService: UiService,

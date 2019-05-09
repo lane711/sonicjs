@@ -10,3 +10,17 @@
     flex: 1 1 auto;
     overflow: auto;
   }
+
+  /* hide/modify regular admin skin */
+  .app-header, .app-footer, .breadcrumb{
+    display: none !important;
+  }
+
+  .header-fixed .app-body {
+    margin-top: 0;
+}
+
+.sidebar-fixed .app-header + .app-body .sidebar {
+  height: 100vh;
+}
+
