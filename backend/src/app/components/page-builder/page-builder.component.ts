@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { PageBuilderService } from '../../services/page-builder.service'
+import { PageBuilderService } from '../../services/page-builder.service';
+import { ActivatedRoute } from "@angular/router";
+
 @Component({
   selector: 'app-page-builder',
   templateUrl: './page-builder.component.html',
@@ -7,13 +9,18 @@ import { PageBuilderService } from '../../services/page-builder.service'
 })
 export class PageBuilderComponent implements OnInit {
 
-  constructor(private pageBuilderService:PageBuilderService) { }
+  constructor(private pageBuilderService:PageBuilderService,
+    private route:ActivatedRoute) { }
 
   html = '';
   
   ngOnInit() {
+    console.log('page builder route', this.route.snapshot);
+
     this.pageBuilderService.isPageBuilder = true;
     this.loadPage();
+
+    this.pageBuilderService.setIsPageBuilder(true);
   }
 
   async loadPage(){
@@ -27,7 +34,8 @@ export class PageBuilderComponent implements OnInit {
   }
 
   ngOnDestroy(){
-    this.pageBuilderService.isPageBuilder = false;
+    this.pageBuilderService.setIsPageBuilder(false);
   }
+
 
 }

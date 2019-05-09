@@ -12,7 +12,7 @@ import { createCustomElement } from '@angular/elements';
 })
 export class AppComponent {
   title = 'client';
-  isPageBuilder = true;
+  isPageBuilder = false;
 
   constructor(
     private uiService: UiService,
@@ -22,16 +22,27 @@ export class AppComponent {
     // private menuComponent: MenuComponent
   ) { }
 
-  async ngOnInit() {
+  ngOnInit() {
     // let url = location.href;
     // if(url.indexOf('page-builder') > -1){
     //   this.isPageBuilder = true;
     // }
+    // console.log('page builder isPageBuilder', this.pageBuilderService.isPageBuilder);
 
+    // console.log('snap', this.route.snapshot.paramMap.get("id"))
 
-    this.route.queryParams.subscribe(params => {
-      console.log('route params', params);
-    });
+    // this.route.queryParams.subscribe(params => {
+    //   console.log('rout subs', params);
+    //   });
+
+    // this.route.queryParams.subscribe(params => {
+    //   console.log('route params', params);
+    // });
+
+    // this.pageBuilderService.isPageBuilderChanged.subscribe(data => {
+    //   console.log('app components isPageBuilderChanged', data);
+    //   this.isPageBuilder = data;
+    // });
 
   }
 }
