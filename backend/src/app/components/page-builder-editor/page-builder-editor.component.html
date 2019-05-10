@@ -8,16 +8,21 @@
             </a>
           </li>
       
-      
-          <li class="nav-title">Components</li>
+          <li class="nav-title">Template</li>
           <li class="nav-item nav-dropdown">
-            <a class="nav-link" [routerLink]="['']">
-              <i class="nav-icon fa fa-home"></i> Home</a>
+            <a class="nav-link" (click)="refresh">
+              <i class="nav-icon fa fa-home"></i> Settings</a>
+          </li>
+
+          <li class="nav-title">Page Builder</li>
+          <li class="nav-item nav-dropdown">
+            <a class="nav-link" (click)="refresh">
+              <i class="nav-icon fa fa-home"></i> Refresh</a>
           </li>
 
           <li class="nav-item nav-dropdown">
               <a class="nav-link nav-dropdown-toggle" href="#">
-              <i class="nav-icon icon-puzzle"></i> Base</a>
+              <i class="nav-icon icon-puzzle"></i> Layout</a>
               <ul class="nav-dropdown-items">
               <li class="nav-item">
               <a class="nav-link" href="base/breadcrumb.html">
@@ -77,8 +82,9 @@
               </li>
               </ul>
               </li>
-              
+
         </ul>
       </nav>
+
       <button class="sidebar-minimizer brand-minimizer" type="button"></button>
       

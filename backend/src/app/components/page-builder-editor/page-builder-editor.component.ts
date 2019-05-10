@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { PageBuilderService } from '../../services/page-builder.service';
 
 @Component({
   selector: 'app-page-builder-editor',
@@ -7,9 +8,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PageBuilderEditorComponent implements OnInit {
 
-  constructor() { }
+  constructor(private pageBuilderService: PageBuilderService) { }
 
   ngOnInit() {
+    this.loadSections();
+  }
+
+  loadSections(){
+    this.pageBuilderService.currentPageSubject.subscribe(data => {
+      console.log('loadSections', data);
+      // this.html = data.html.toString();
+    });
   }
 
 }

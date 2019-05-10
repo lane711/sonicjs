@@ -17,7 +17,7 @@
     "cheerio": "^1.0.0-rc.3",
     "compression": "^1.0.3",
     "cors": "^2.5.2",
-    "helmet": "^3.10.0",
+    "helmet": "^3.18.0",
     "loopback": "^3.22.0",
     "loopback-boot": "^2.6.5",
     "loopback-component-explorer": "^6.2.0",
