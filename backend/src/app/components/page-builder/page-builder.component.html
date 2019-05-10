@@ -2,7 +2,11 @@
     <!-- <div class="tools">
         <app-page-builder-editor></app-page-builder-editor>
     </div> -->
+    <!-- <embed src="https://google.com | safe 'html'">-->
+
+    <iframe src="http://localhost:3000" height="200" width="300"></iframe> 
+
     <div class="content">
-        <div *ngIf='html' [outerHTML]="html | safe: 'html'"></div>
+        <div *ngIf='html' [innerHTML]="html | safe: 'html'"></div>
     </div>
 </div>

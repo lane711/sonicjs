@@ -2,3 +2,8 @@
 .rmargin{
     margin-right: 12px;
 }
+
+
+.page-builder-nav{
+    display: none;
+}

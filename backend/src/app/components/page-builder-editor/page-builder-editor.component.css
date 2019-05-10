@@ -3,3 +3,7 @@
     padding: 15px 30px;
     color:#fff;
 }
+
+.page-builder-nav, .sidebar {
+    width: 260px;
+  }

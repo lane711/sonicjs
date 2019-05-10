@@ -7,10 +7,17 @@
     background: #2f353a;
   }
   .pb-wrapper .content {
-    flex: 1 1 auto;
-    overflow: auto;
+    /* flex: 1 1 auto;
+    overflow: auto; */
   }
 
+  .page-builder-nav{
+    display: block;
+}
+
+.page-builder-nav, .sidebar {
+  width: 260px;
+}
   /* hide/modify regular admin skin */
   .app-header, .app-footer, .breadcrumb{
     display: none !important;
@@ -22,5 +29,9 @@
 
 .sidebar-fixed .app-header + .app-body .sidebar {
   height: 100vh;
+}
+
+.sidebar-nav{
+  display: none;
 }
 

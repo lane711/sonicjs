@@ -11591,11 +11591,11 @@ canvas {
   flex: 1;
   overflow-x: hidden;
   overflow-y: auto;
-  width: 200px;
+  width: 260px;
 }
 
 .sidebar .nav {
-  width: 200px;
+  width: 260px;
   -ms-flex-direction: column;
   flex-direction: column;
   min-height: 100%;
@@ -12715,7 +12715,7 @@ html[dir="rtl"] .aside-menu {
   .sidebar-fixed .sidebar {
     position: fixed;
     z-index: 1019;
-    width: 200px;
+    width: 260px;
     height: 100vh;
   }
   .sidebar-fixed .app-header + .app-body .sidebar {
@@ -12804,7 +12804,7 @@ html:not([dir="rtl"]) .sidebar-show .sidebar {
 
 html:not([dir="rtl"]) .sidebar-show.sidebar-fixed .main,
 html:not([dir="rtl"]) .sidebar-show.sidebar-fixed .app-footer {
-  margin-left: 200px;
+  margin-left: 260px;
 }
 
 html:not([dir="rtl"]) .sidebar-show.sidebar-fixed.sidebar-compact .main,
@@ -13144,7 +13144,7 @@ html[dir="rtl"] .aside-menu-show.breadcrumb-fixed .breadcrumb {
   }
   html:not([dir="rtl"]) .sidebar-lg-show.sidebar-fixed .main,
   html:not([dir="rtl"]) .sidebar-lg-show.sidebar-fixed .app-footer {
-    margin-left: 200px;
+    margin-left: 260px;
   }
   html:not([dir="rtl"]) .sidebar-lg-show.sidebar-fixed.sidebar-compact .main,
   html:not([dir="rtl"]) .sidebar-lg-show.sidebar-fixed.sidebar-compact .app-footer {
@@ -13178,7 +13178,7 @@ html[dir="rtl"] .aside-menu-show.breadcrumb-fixed .breadcrumb {
   }
   html[dir="rtl"] .sidebar-lg-show.sidebar-fixed .main,
   html[dir="rtl"] .sidebar-lg-show.sidebar-fixed .app-footer {
-    margin-right: 200px;
+    margin-right: 260px;
   }
   html[dir="rtl"] .sidebar-lg-show.sidebar-fixed.sidebar-compact .main,
   html[dir="rtl"] .sidebar-lg-show.sidebar-fixed.sidebar-compact .app-footer {
