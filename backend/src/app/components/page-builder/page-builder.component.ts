@@ -14,9 +14,11 @@ export class PageBuilderComponent implements OnInit {
     private route:ActivatedRoute) { }
 
   html = '';
+  id: string;
   
   ngOnInit() {
-    console.log('page builder route', this.route.snapshot);
+    this.id = this.route.snapshot.paramMap.get("id");
+    console.log('page builder route', this.id);
 
     this.pageBuilderService.isPageBuilder = true;
     this.loadPage();
@@ -30,10 +32,10 @@ export class PageBuilderComponent implements OnInit {
 
     this.pageBuilderService.currentPageSubject.subscribe(data => {
       console.log('this.pageBuilderService.currentPageSubject', data);
-      this.html = data.html.toString();
+      this.html = data.page.data.html.toString();
     });
 
-    this.pageBuilderService.loadPageIntoSubjectById('5cb146f83f6d33389f244564');
+    this.pageBuilderService.loadPageIntoSubjectById(this.id);
 
     // this.html = '<!DOCTYPE html><html><body><h1>My Second Heading</h1><p>My first paragraph.</p></body></html>';
 

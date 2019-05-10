@@ -6,8 +6,10 @@ module.exports = function(Content) {
     Content.getPageById = function (id, cb) {
       Content.findById( id, function (err, instance) {
         // var response = `<!DOCTYPE html><html><body><h1>My First Heading</h1><p>My first paragraph. ${instance.data.name}</p></body></html>`;
-        contentService.getTheme().then(data => {
-          cb(null, data);
+        contentService.getTheme().then(html => {
+          let page = { data : instance.data};
+          page.data.html = html;
+          cb(null, page);
         })
     });
       };
@@ -20,9 +22,9 @@ module.exports = function(Content) {
           },
           accepts: {arg: 'id', type: 'string', http: { source: 'query' } },
           returns: {
-            arg: 'html',
-            type: 'string',
-          },
+            arg: 'page',
+            type: 'object',
+          }
         }
       );
 
