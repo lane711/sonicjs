@@ -31,7 +31,7 @@ module.exports = {
     },
 
     processTemplate: async function (html) {
-        console.log('=== processTemplate ===')
+        // console.log('=== processTemplate ===')
         const $ = cheerio.load(html);
         $('.blog-header-logo').text('Cheerio');
         $('.blog-post-title').text('Cheerio Post');
@@ -54,7 +54,7 @@ module.exports = {
         let menuItems = await this.getMenuItems();
         // console.log('menuItems &&&&', menuItems);
         menuItems.forEach(menuItem => {
-            console.log(menuItem.data.name);
+            // console.log(menuItem.data.name);
             let item = menuItemTemplate.replace('Menu Item', menuItem.data.name)
             navWrapper.append(item);
         });

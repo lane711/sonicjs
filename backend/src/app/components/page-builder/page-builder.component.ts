@@ -30,9 +30,9 @@ export class PageBuilderComponent implements OnInit {
     // this.html = '<!DOCTYPE html><html><body><h1>My First Heading</h1><p>My first paragraph.</p></body></html>';
     // let page : any  = await this.pageBuilderService.getPageById('5cb146f83f6d33389f244564');
 
-    this.pageBuilderService.currentPageSubject.subscribe(data => {
-      console.log('this.pageBuilderService.currentPageSubject', data);
-      this.html = data.page.data.html.toString();
+    this.pageBuilderService.currentPageSubject.subscribe(page => {
+      console.log('this.pageBuilderService.currentPageSubject', page);
+      this.html = page.data.html.toString();
     });
 
     this.pageBuilderService.loadPageIntoSubjectById(this.id);

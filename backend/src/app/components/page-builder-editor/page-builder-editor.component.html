@@ -1,90 +1,50 @@
 <nav class="page-builder-nav">
-        <ul class="nav">
-          <li class="nav-item">
-      
-            <a class="nav-link" href="/admin">
-              <i class="nav-icon fa fa-dashboard"></i> < Back
-              <!-- <span class="badge badge-primary">NEW</span> -->
-            </a>
+  <ul class="nav">
+    <li class="nav-item">
+
+      <a class="nav-link" href="/admin">
+        <i class="nav-icon fa fa-dashboard"></i>
+        < Back <!-- <span class="badge badge-primary">NEW</span> -->
+      </a>
+    </li>
+
+    <li class="nav-title">Template</li>
+    <li class="nav-item nav-dropdown">
+      <a class="nav-link" (click)="refresh">
+        <i class="nav-icon fa fa-home"></i> Settings</a>
+    </li>
+
+    <li class="nav-title">Page Builder</li>
+    <li class="nav-item nav-dropdown">
+      <a class="nav-link" (click)="refresh">
+        <i class="nav-icon fa fa-home"></i> Refresh</a>
+    </li>
+
+    <li class="nav-item nav-dropdown">
+      <a class="nav-link nav-dropdown-toggle" href="#">
+        <i class="nav-icon icon-puzzle"></i> Layout</a>
+      <ul class="nav-dropdown-items">
+        <li class="nav-item" *ngFor="let section of sections">
+            <a class="nav-link nav-dropdown-toggle" href="#">
+            <i class="nav-icon icon-puzzle"></i> Section {{section.sectionId}}</a>
+            <div class="section-edit">
+              <div>row 1</div>
+              <div>row 1</div>
+
+            </div>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" (click)='addSection()'>
+              <i class="nav-icon icon-puzzle"></i> Add Secton</a>
           </li>
-      
-          <li class="nav-title">Template</li>
-          <li class="nav-item nav-dropdown">
-            <a class="nav-link" (click)="refresh">
-              <i class="nav-icon fa fa-home"></i> Settings</a>
-          </li>
+        <li class="nav-item">
+          <a class="nav-link" (click)='saveContent()'>
+            <i class="nav-icon icon-puzzle"></i> Save</a>
+        </li>
+      </ul>
+    </li>
 
-          <li class="nav-title">Page Builder</li>
-          <li class="nav-item nav-dropdown">
-            <a class="nav-link" (click)="refresh">
-              <i class="nav-icon fa fa-home"></i> Refresh</a>
-          </li>
+  </ul>
+</nav>
 
-          <li class="nav-item nav-dropdown">
-              <a class="nav-link nav-dropdown-toggle" href="#">
-              <i class="nav-icon icon-puzzle"></i> Layout</a>
-              <ul class="nav-dropdown-items">
-              <li class="nav-item">
-              <a class="nav-link" href="base/breadcrumb.html">
-              <i class="nav-icon icon-puzzle"></i> Breadcrumb</a>
-              </li>
-              <li class="nav-item">
-              <a class="nav-link" href="base/cards.html">
-              <i class="nav-icon icon-puzzle"></i> Cards</a>
-              </li>
-              <li class="nav-item">
-              <a class="nav-link" href="base/carousel.html">
-              <i class="nav-icon icon-puzzle"></i> Carousel</a>
-              </li>
-              <li class="nav-item">
-              <a class="nav-link" href="base/collapse.html">
-              <i class="nav-icon icon-puzzle"></i> Collapse</a>
-              </li>
-              <li class="nav-item">
-              <a class="nav-link" href="base/jumbotron.html">
-              <i class="nav-icon icon-puzzle"></i> Jumbotron</a>
-              </li>
-              <li class="nav-item">
-              <a class="nav-link" href="base/list-group.html">
-              <i class="nav-icon icon-puzzle"></i> List group</a>
-              </li>
-              <li class="nav-item">
-              <a class="nav-link" href="base/navs.html">
-              <i class="nav-icon icon-puzzle"></i> Navs</a>
-              </li>
-              <li class="nav-item">
-              <a class="nav-link" href="base/pagination.html">
-              <i class="nav-icon icon-puzzle"></i> Pagination</a>
-              </li>
-              <li class="nav-item">
-              <a class="nav-link" href="base/popovers.html">
-              <i class="nav-icon icon-puzzle"></i> Popovers</a>
-              </li>
-              <li class="nav-item">
-              <a class="nav-link" href="base/progress.html">
-              <i class="nav-icon icon-puzzle"></i> Progress</a>
-              </li>
-              <li class="nav-item">
-              <a class="nav-link" href="base/scrollspy.html">
-              <i class="nav-icon icon-puzzle"></i> Scrollspy</a>
-              </li>
-              <li class="nav-item">
-              <a class="nav-link" href="base/switches.html">
-              <i class="nav-icon icon-puzzle"></i> Switches</a>
-              </li>
-              <li class="nav-item">
-              <a class="nav-link" href="base/tabs.html">
-              <i class="nav-icon icon-puzzle"></i> Tabs</a>
-              </li>
-              <li class="nav-item">
-              <a class="nav-link" href="base/tooltips.html">
-              <i class="nav-icon icon-puzzle"></i> Tooltips</a>
-              </li>
-              </ul>
-              </li>
-
-        </ul>
-      </nav>
-
-      <button class="sidebar-minimizer brand-minimizer" type="button"></button>
-      
+<button class="sidebar-minimizer brand-minimizer" type="button"></button>

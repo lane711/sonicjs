@@ -38,6 +38,16 @@ export class ContentService {
     return this.http.put(environment.apiUrl + `contents/${id}`, content).toPromise();
   }
 
+  public editPage(page) {
+    let id = page.data.id;
+    console.log('editPage payload', page);
+    let content:any = {};
+    content.data = {};
+    this.processContentFields(page.data, content);
+    console.log('saving existing content', content);
+    return this.http.put(environment.apiUrl + `contents/${id}`, content).toPromise();
+  }
+
   private processContentFields(payload, content){
     for (var property in payload) {
       if (payload.hasOwnProperty(property)) {

@@ -7,9 +7,10 @@ module.exports = function(Content) {
       Content.findById( id, function (err, instance) {
         // var response = `<!DOCTYPE html><html><body><h1>My First Heading</h1><p>My first paragraph. ${instance.data.name}</p></body></html>`;
         contentService.getTheme().then(html => {
-          let page = { data : instance.data};
-          page.data.html = html;
-          cb(null, page);
+          let data = instance.data;
+          data.id = id;
+          data.html = html;
+          cb(null, data);
         })
     });
       };
@@ -22,7 +23,7 @@ module.exports = function(Content) {
           },
           accepts: {arg: 'id', type: 'string', http: { source: 'query' } },
           returns: {
-            arg: 'page',
+            arg: 'data',
             type: 'object',
           }
         }
