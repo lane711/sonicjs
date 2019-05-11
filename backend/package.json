@@ -37,6 +37,7 @@
     "popper.js": "1.14.4",
     "puppeteer": "^1.13.0",
     "rxjs": "~6.2.0",
+    "shortcode-insert": "^1.0.2",
     "shortid": "^2.2.14",
     "simple-line-icons": "2.4.1",
     "siteden": "^1.0.0",

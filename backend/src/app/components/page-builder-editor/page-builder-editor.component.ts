@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PageBuilderService } from '../../services/page-builder.service';
 import { ContentService } from '../../services/content.service';
+import { ShortcodesService } from '../../services/shortcodes.service';
 
 @Component({
   selector: 'app-page-builder-editor',
@@ -10,7 +11,8 @@ import { ContentService } from '../../services/content.service';
 export class PageBuilderEditorComponent implements OnInit {
 
   constructor(private pageBuilderService: PageBuilderService,
-    private contentService: ContentService) { }
+    private contentService: ContentService,
+    private shortcodesService: ShortcodesService) { }
 
   sections: any;
   page: any;
@@ -47,5 +49,10 @@ console.log(b1);
     //add sections
     this.page.data.layout = [{sectionId : '123456'},{ sectionId : '345678'}];
     this.contentService.editPage(this.page);
+  }
+
+  async insertShortCode(){
+    let result = await this.shortcodesService.parseShortCode('[[BLOCK id="12344"]]');
+    console.log(result);
   }
 }
