@@ -35,14 +35,33 @@ export class PageBuilderEditorComponent implements OnInit {
     let block3 = {contentType: 'block', body : 'Nullam quis risus eget urna mollis ornare vel eu leo.'};
 
     //save blocks and get the ids
-    let b1 = await this.contentService.createContentInstance(block1);
-console.log(b1);
-    // let row1 = {class : 'col', blocks : [block1, block2]}
-    // let row2 = {class : 'col', blocks : [block3]}
+    let b1 : any = await this.contentService.createContentInstance(block1);
+    let b2 : any = await this.contentService.createContentInstance(block2);
+    let b3 : any = await this.contentService.createContentInstance(block3);
+    
+    let b1ShortCode = `[[BLOCK id="${b1.id}"]]`;
+    let b2ShortCode = `[[BLOCK id="${b2.id}"]]`;
+    let b3ShortCode = `[[BLOCK id="${b3.id}"]]`;
 
-    // let rows = [row1, row2];
+    //columns
+    let col1 = {class : 'col', content : `${b1ShortCode}${b2ShortCode}`}
+    let col2 = {class : 'col', content : `${b1ShortCode}${b3ShortCode}`}
+    let col3 = {class : 'col', content : `${b3ShortCode}`}
 
-    // let section = { title: 'Section 1', rows: rows};
+    let row1 = {class : 'row', columns : [col1, col2]}
+    let row2 = {class : 'row', columns : [col3]}
+
+    //rows
+    let rows = [row1, row2];
+
+    //section
+    let section = { title: 'Section 1', rows: rows};
+    let s1 : any = await this.contentService.createContentInstance(section);
+
+    //add to current page
+    this.page.data.layout = [s1.id];
+    this.contentService.editPage(this.page);
+
   }
 
   saveContent(){
