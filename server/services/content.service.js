@@ -1,6 +1,8 @@
 var fs = require('fs');
 const cheerio = require('cheerio')
 const axios = require('axios');
+const Shortcode = require('shortcode-insert');
+
 const apiUrl = 'http://localhost:3000/api/';
 var pageContent = '';
 
@@ -87,7 +89,7 @@ module.exports = {
           });
 
         sectionWrapper.append(pageContent);
-        console.log(pageContent);
+        // console.log(pageContent);
 
         //   console.log($.html());
 
@@ -121,14 +123,26 @@ module.exports = {
 
     processColumns: async function (row) {
         row.columns.forEach(column => {
-            console.log('column', column);
+            // console.log('column', column);
             pageContent += `<div class='${column.class}'>`;
             pageContent += `${column.content}`;
-                    // await this.getContent('', 'block')
-
+            this.processBlocks(column.content);
             pageContent += `</div>`;
 
         });
+    },
+
+    processBlocks: async function(blocks){
+        const parser = Shortcode();
+
+        parser.add('BLOCK', tag=>{ 
+            let blockId = tag.attributes.id
+            console.log('blockId:-->', blockId);
+            return blockId;
+        });
+
+        let contentBlocks = await parser.parse(blocks);
+        console.log('contentBlocks', contentBlocks);
     },
 
 
