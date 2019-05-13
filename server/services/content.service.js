@@ -2,6 +2,7 @@ var fs = require('fs');
 const cheerio = require('cheerio')
 const axios = require('axios');
 const apiUrl = 'http://localhost:3000/api/';
+var pageContent = '';
 
 module.exports = {
 
@@ -75,12 +76,19 @@ module.exports = {
         
         await this.asyncForEach(sections, async (sectionId) => {
             let section = await this.getContentById(sectionId);
-            await sectionWrapper.append(`<section>`);
+            // await sectionWrapper.append(`<section>`);
+            // await this.processRows($, sectionWrapper, section.data.rows)
+            // await sectionWrapper.append(`</section>`);
+            pageContent += `<section>`;
             await this.processRows($, sectionWrapper, section.data.rows)
-            await sectionWrapper.append(`</section>`);
+            pageContent += `</section>`;
 
             console.log(section);
           });
+
+        sectionWrapper.append(pageContent);
+        console.log(pageContent);
+
         //   console.log($.html());
 
         // asyncForEach(sectionssectionId => {
@@ -97,14 +105,30 @@ module.exports = {
 
     //TODO loop thru rows
     processRows: async function ($, sectionWrapper, rows) {
-        await sectionWrapper.append(`<div class='row'>`);
-        await this.processColumns($, sectionWrapper, rows)
-        await sectionWrapper.append(`</div>`);
+        // await sectionWrapper.append(`<div class='row'>`);
+        // await this.processColumns($, sectionWrapper, rows)
+        // await sectionWrapper.append(`</div>`);
+        // console.log('rows', rows);
+        rows.forEach(row => {
+            // console.log('row', row);
+
+            pageContent +=  `<div class='row'>`;
+            this.processColumns(row)
+            pageContent += `</div>`;
+        });
+
     },
 
-    processColumns: async function ($, sectionWrapper, rows) {
-        await sectionWrapper.append(`<div class='col'>ipsum`);
-        await sectionWrapper.append(`</div>`);
+    processColumns: async function (row) {
+        row.columns.forEach(column => {
+            console.log('column', column);
+            pageContent += `<div class='${column.class}'>`;
+            pageContent += `${column.content}`;
+                    // await this.getContent('', 'block')
+
+            pageContent += `</div>`;
+
+        });
     },
 
 
