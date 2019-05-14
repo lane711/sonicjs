@@ -42,12 +42,6 @@ module.exports = {
 
         await this.processSections($);
 
-        // const $ = cheerio.load('<h2 class="title">Hello world</h2>')
-
-        // $('h2.title').text('Hello there!')
-        // console.log($.html());
-
-
         return $.html();
     },
 
@@ -58,14 +52,10 @@ module.exports = {
         navWrapper.empty();
 
         let menuItems = await this.getMenuItems();
-        // console.log('menuItems &&&&', menuItems);
         menuItems.forEach(menuItem => {
-            // console.log(menuItem.data.name);
             let item = menuItemTemplate.replace('Menu Item', menuItem.data.name)
             navWrapper.append(item);
         });
-
-        // console.log(menuItemTemplate); 
     },
 
     processSections: async function ($) {
@@ -75,74 +65,96 @@ module.exports = {
 
         let page = await this.getContentById('5cd5af93523eac22087e4358');
         let sections = page.data.layout;
-        
+
         await this.asyncForEach(sections, async (sectionId) => {
             let section = await this.getContentById(sectionId);
-            // await sectionWrapper.append(`<section>`);
-            // await this.processRows($, sectionWrapper, section.data.rows)
-            // await sectionWrapper.append(`</section>`);
             pageContent += `<section>`;
             await this.processRows($, sectionWrapper, section.data.rows)
             pageContent += `</section>`;
 
-            console.log(section);
-          });
+            // console.log(section);
+        });
 
         sectionWrapper.append(pageContent);
-        // console.log(pageContent);
-
-        //   console.log($.html());
-
-        // asyncForEach(sectionssectionId => {
-        //     console.log(section);
-        //     //get section from db
-        //     let section = await this.getContentById(sectionId);
-        //     console.log('section==>', section);
-        //     // let item = menuItemTemplate.replace('Menu Item', menuItem.data.name)
-        //     // navWrapper.append(item);
-        // });
-
-        // console.log(menuItemTemplate);
     },
 
     //TODO loop thru rows
     processRows: async function ($, sectionWrapper, rows) {
-        // await sectionWrapper.append(`<div class='row'>`);
-        // await this.processColumns($, sectionWrapper, rows)
-        // await sectionWrapper.append(`</div>`);
-        // console.log('rows', rows);
-        rows.forEach(row => {
-            // console.log('row', row);
-
-            pageContent +=  `<div class='row'>`;
-            this.processColumns(row)
+        for (const row of rows) {
+            pageContent += `<div class='row'>`;
+            await this.processColumns(row)
             pageContent += `</div>`;
-        });
-
+        }
     },
 
     processColumns: async function (row) {
-        row.columns.forEach(column => {
-            // console.log('column', column);
+        for (const column of row.columns) {
             pageContent += `<div class='${column.class}'>`;
             pageContent += `${column.content}`;
-            this.processBlocks(column.content);
+            await this.processBlocks(column.content);
             pageContent += `</div>`;
-
-        });
+        }
     },
 
     processBlocks: async function(blocks){
         const parser = Shortcode();
 
-        parser.add('BLOCK', tag=>{ 
+        await parser.add('BLOCK', tag=>{ 
             let blockId = tag.attributes.id
-            console.log('blockId:-->', blockId);
+            console.log('in parser callback blockId:-->', blockId);
+            // this.processBlock(blockId);
             return blockId;
         });
 
-        let contentBlocks = await parser.parse(blocks);
-        console.log('contentBlocks', contentBlocks);
+        // await parser.add('BLOCK', tag=>{ // add handler for CONTENT tag
+        //     return new Promise(async (resolve, reject)=>{ // Use the id attribute of the tag to do a lookup-up
+        //         try{
+        //             let blockId = tag.attributes.id
+        //             // console.log('in parser callback blockId:-->', blockId);
+        //             // await this.processBlock(blockId);
+        //             return blockId;
+        //         }
+        //         catch(error){
+        //             console.log(error);
+        //         }
+        //     });
+        // });
+
+        parser.parse(blocks).then(blockId =>{
+            console.log('parser resolve', blockId);
+            // await this.processBlock(blockId);
+
+        })
+    },
+
+    // processBlocks: async function (blocks) {
+
+    //     let blockIds = await this.processShortCodes(blocks);
+    //     // console.log('blockIds', blockIds);
+    //     for(const blockId of blockIds){
+    //         await this.processBlock(blockId);
+    //     }
+
+    // },
+
+    processShortCodes: async function(body){
+        let shortCodes =  body.split(']][[');
+        let ids = [];
+        for(const shortCode of shortCodes){
+            console.log('1.shortCode', shortCode);
+            shortCode.replace('[[', '');
+            shortCode.replace(']]', '');
+            console.log('2.shortCode', shortCode);
+            ids.push(shortCode);
+        }
+
+        return ids;
+    },
+
+    processBlock: async function (blockId) {
+        let content = await this.getContentById(blockId);
+        // console.log('processBlock==>', content.data.body);
+        pageContent += content.data.body;
     },
 
 
@@ -160,7 +172,7 @@ module.exports = {
 
     getContentById: async function (id) {
         let url = `${apiUrl}contents/${id}`;
-        console.log('url', url);
+        // console.log('url', url);
         let page = await axios.get(url);
         page.data.html = undefined;
         // console.log('getContent', page.data);
