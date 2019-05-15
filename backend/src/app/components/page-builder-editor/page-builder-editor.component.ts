@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { PageBuilderService } from '../../services/page-builder.service';
 import { ContentService } from '../../services/content.service';
 import { ShortcodesService } from '../../services/shortcodes.service';
+import { ActivatedRoute } from "@angular/router";
 
 @Component({
   selector: 'app-page-builder-editor',
@@ -12,11 +13,21 @@ export class PageBuilderEditorComponent implements OnInit {
 
   constructor(private pageBuilderService: PageBuilderService,
     private contentService: ContentService,
-    private shortcodesService: ShortcodesService) { }
+    private shortcodesService: ShortcodesService,
+    private route:ActivatedRoute) { }
 
   sections: any;
   page: any;
+  id: any;
+
   ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+console.log('params', params);
+      });
+
+    this.id = this.route.snapshot.paramMap.get("id");
+    console.log('page builder editor route', this.id);
+
     this.loadSections();
   }
 
@@ -39,9 +50,9 @@ export class PageBuilderEditorComponent implements OnInit {
     let b2 : any = await this.contentService.createContentInstance(block2);
     let b3 : any = await this.contentService.createContentInstance(block3);
     
-    let b1ShortCode = `[[BLOCK id="${b1.id}"]]`;
-    let b2ShortCode = `[[BLOCK id="${b2.id}"]]`;
-    let b3ShortCode = `[[BLOCK id="${b3.id}"]]`;
+    let b1ShortCode = `[BLOCK id="${b1.id}"]`;
+    let b2ShortCode = `[BLOCK id="${b2.id}"]`;
+    let b3ShortCode = `[BLOCK id="${b3.id}"]`;
 
     //columns
     let col1 = {class : 'col', content : `${b1ShortCode}${b2ShortCode}`}
@@ -55,7 +66,7 @@ export class PageBuilderEditorComponent implements OnInit {
     let rows = [row1, row2];
 
     //section
-    let section = { title: 'Section 1', rows: rows};
+    let section = { title: 'Section 1', contentType: 'section', rows: rows};
     let s1 : any = await this.contentService.createContentInstance(section);
 
     //add to current page

@@ -1,10 +1,12 @@
 var fs = require('fs');
 const cheerio = require('cheerio')
 const axios = require('axios');
-const Shortcode = require('shortcode-insert');
+var ShortcodeTree = require('shortcode-tree').ShortcodeTree;
 
 const apiUrl = 'http://localhost:3000/api/';
 var pageContent = '';
+var page;
+var id;
 
 module.exports = {
 
@@ -12,8 +14,10 @@ module.exports = {
         return 'bar';
     },
 
-    getTheme: async function () {
-        console.log('=== content service path:' + __dirname);
+    getPage: async function (id, instance) {
+        this.id = id;
+        this.page = instance;
+        console.log('id',id, instance);
         let themePath = __dirname + '/../themes/base/index.html';
 
         return new Promise((resolve, reject) => {
@@ -34,6 +38,7 @@ module.exports = {
     },
 
     processTemplate: async function (html) {
+        // this.setupShortCodeParser();
         // console.log('=== processTemplate ===')
         const $ = cheerio.load(html);
         $('.blog-header-logo').text('Cheerio');
@@ -63,7 +68,8 @@ module.exports = {
         let sectionWrapper = $('.s--section').parent(); //container
         sectionWrapper.empty();
 
-        let page = await this.getContentById('5cd5af93523eac22087e4358');
+        let page = this.page; // await this.getContentById('5cd5af93523eac22087e4358');
+        console.log('processSections:page==>', page);
         let sections = page.data.layout;
 
         await this.asyncForEach(sections, async (sectionId) => {
@@ -89,6 +95,7 @@ module.exports = {
 
     processColumns: async function (row) {
         for (const column of row.columns) {
+            console.log('== column ==')
             pageContent += `<div class='${column.class}'>`;
             pageContent += `${column.content}`;
             await this.processBlocks(column.content);
@@ -97,14 +104,15 @@ module.exports = {
     },
 
     processBlocks: async function(blocks){
-        const parser = Shortcode();
+        this.processShortCodes(blocks);
+        // const parser = Shortcode();
 
-        await parser.add('BLOCK', tag=>{ 
-            let blockId = tag.attributes.id
-            console.log('in parser callback blockId:-->', blockId);
-            // this.processBlock(blockId);
-            return blockId;
-        });
+        // await parser.add('BLOCK', tag=>{ 
+        //     let blockId = tag.attributes.id
+        //     console.log('in parser callback blockId:-->', blockId);
+        //     // this.processBlock(blockId);
+        //     return blockId;
+        // });
 
         // await parser.add('BLOCK', tag=>{ // add handler for CONTENT tag
         //     return new Promise(async (resolve, reject)=>{ // Use the id attribute of the tag to do a lookup-up
@@ -120,11 +128,11 @@ module.exports = {
         //     });
         // });
 
-        parser.parse(blocks).then(blockId =>{
-            console.log('parser resolve', blockId);
-            // await this.processBlock(blockId);
+        // await parser.parse(blocks).then(blockId =>{
+        //     // console.log('parser resolve', blockId);
+        //     // await this.processBlock(blockId);
 
-        })
+        // })
     },
 
     // processBlocks: async function (blocks) {
@@ -141,22 +149,36 @@ module.exports = {
         let shortCodes =  body.split(']][[');
         let ids = [];
         for(const shortCode of shortCodes){
-            console.log('1.shortCode', shortCode);
-            shortCode.replace('[[', '');
-            shortCode.replace(']]', '');
-            console.log('2.shortCode', shortCode);
-            ids.push(shortCode);
+            var rootNode = ShortcodeTree.parse('[image id=123 src="bla.jpg" align="center"/]');
+            console.log(rootNode);
         }
 
         return ids;
     },
+
+    // setupShortCodeParser: async function(){
+    //     await parser.add('BLOCK', tag=>{ 
+    //                         try{
+    //                 let blockId = tag.attributes.id
+    //                 console.log('in parser callback blockId:-->', blockId);
+    //                 await this.processBlock(blockId);
+    //                 return blockId;
+    //             }
+    //             catch(error){
+    //                 console.log(error);
+    //             }
+    //         // let blockId = tag.attributes.id
+    //         // console.log('in parser callback blockId:-->', blockId);
+    //         // await this.processBlock(blockId);
+    //         // return blockId;
+    //     });
+    // },
 
     processBlock: async function (blockId) {
         let content = await this.getContentById(blockId);
         // console.log('processBlock==>', content.data.body);
         pageContent += content.data.body;
     },
-
 
     getContent: async function (id, contentType) {
 

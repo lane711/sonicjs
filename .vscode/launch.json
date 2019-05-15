@@ -27,7 +27,7 @@
       "type": "chrome",
       "request": "launch",
       "name": "Backend Client",
-      "url": "http://localhost:4200/admin/page-builder/5cd5af93523eac22087e4358",
+      "url": "http://localhost:4200/admin/page-builder/5cdb5cc2f744441df910f43f",
       "webRoot": "${workspaceFolder}/backend"
     }
   ]

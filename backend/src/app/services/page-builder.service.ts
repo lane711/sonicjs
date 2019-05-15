@@ -23,7 +23,9 @@ export class PageBuilderService {
 
   async loadPageIntoSubjectById(id) {
     let url = `${environment.apiUrl}contents/getPageById?id=${id}`;
+    console.log('loading page from ' + url);
     let page = await this.http.get(url).toPromise();
+    console.log('pushing page ', page);
     this.currentPageSubject.next(page);
   }
 

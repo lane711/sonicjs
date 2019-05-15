@@ -27,7 +27,7 @@
     "puppeteer": "^1.13.0",
     "rxjs": "6.3.3",
     "serve-favicon": "^2.0.1",
-    "shortcode-insert": "^1.0.2",
+    "shortcode-tree": "^1.4.14",
     "strong-error-handler": "^3.0.0"
   },
   "devDependencies": {

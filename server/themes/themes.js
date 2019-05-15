@@ -8,7 +8,7 @@ module.exports = {
 
     getTheme: async function () {
       console.log('===>themes.getTheme');
-        return await contentService.getTheme();
+        // return await contentService.getPage();
     },
 
     // processTemplate: async function (html) {

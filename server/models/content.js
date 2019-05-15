@@ -6,7 +6,7 @@ module.exports = function(Content) {
     Content.getPageById = function (id, cb) {
       Content.findById( id, function (err, instance) {
         // var response = `<!DOCTYPE html><html><body><h1>My First Heading</h1><p>My first paragraph. ${instance.data.name}</p></body></html>`;
-        contentService.getTheme().then(html => {
+        contentService.getPage(id, instance).then(html => {
           let data = instance.data;
           data.id = id;
           data.html = html;
