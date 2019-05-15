@@ -6,10 +6,10 @@ var contentService = require( '../services/content.service');
 
 module.exports = {
 
-    getTheme: async function () {
-      console.log('===>themes.getTheme');
-        // return await contentService.getPage();
-    },
+    // getTheme: async function () {
+    //   console.log('===>themes.getTheme');
+    //     return await contentService.getPage('5cdb5cc2f744441df910f43f');
+    // },
 
     // processTemplate: async function (html) {
     //     const $ = cheerio.load(html);

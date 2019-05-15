@@ -14,9 +14,21 @@ module.exports = {
         return 'bar';
     },
 
+    // getContentUrls: async function (id, instance) {
+    //     ret
+    // },
+
     getPage: async function (id, instance) {
         this.id = id;
-        this.page = instance;
+        if(instance){
+            this.page = instance;
+        }
+        else{
+            if(id){
+                this.page = await this.getContentById(id);
+            }
+            
+        }
         console.log('id',id, instance);
         let themePath = __dirname + '/../themes/base/index.html';
 
@@ -35,6 +47,9 @@ module.exports = {
             });
         });
 
+    },
+
+    getPageByUrl: async function (id, instance) {
     },
 
     processTemplate: async function (html) {
@@ -56,9 +71,12 @@ module.exports = {
         let navWrapper = $('.s--menu-item').parent();
         navWrapper.empty();
 
-        let menuItems = await this.getMenuItems();
+        let menuItems = await this.getContent('menu');
+        console.log('menuItems', menuItems);
         menuItems.forEach(menuItem => {
+            console.log('menuItem', menuItem);
             let item = menuItemTemplate.replace('Menu Item', menuItem.data.name)
+            .replace('#', menuItem.url)
             navWrapper.append(item);
         });
     },
@@ -69,19 +87,23 @@ module.exports = {
         sectionWrapper.empty();
 
         let page = this.page; // await this.getContentById('5cd5af93523eac22087e4358');
-        console.log('processSections:page==>', page);
-        let sections = page.data.layout;
+        // console.log('processSections:page==>', page);
 
-        await this.asyncForEach(sections, async (sectionId) => {
-            let section = await this.getContentById(sectionId);
-            pageContent += `<section>`;
-            await this.processRows($, sectionWrapper, section.data.rows)
-            pageContent += `</section>`;
+        if(page.data && page.data.layout){
+            let sections = page.data.layout;
 
-            // console.log(section);
-        });
+            await this.asyncForEach(sections, async (sectionId) => {
+                let section = await this.getContentById(sectionId);
+                pageContent += `<section>`;
+                await this.processRows($, sectionWrapper, section.data.rows)
+                pageContent += `</section>`;
+    
+                // console.log(section);
+            });
+    
+            sectionWrapper.append(pageContent);
+        }
 
-        sectionWrapper.append(pageContent);
     },
 
     //TODO loop thru rows
@@ -180,7 +202,7 @@ module.exports = {
         pageContent += content.data.body;
     },
 
-    getContent: async function (id, contentType) {
+    getContent: async function (contentType) {
 
         const filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
         //axios.get(apiUrl + `contents?filter=${filter}`)
@@ -192,6 +214,19 @@ module.exports = {
         return page.data;
     },
 
+    getContentByUrl: async function (pageUrl) {
+
+        const filter = encodeURI(`{"where":{"url":"${pageUrl}"}}`);
+        //axios.get(apiUrl + `contents?filter=${filter}`)
+        let url = `${apiUrl}contents?filter=${filter}`;
+        console.log('getContentByUrlurl', url);
+        let page = await axios.get(url);
+        console.log('getContentByUrl-page', page.data)
+        //now render page
+        let renderedPage = this.getPage(page.data.id, page.data)
+        return renderedPage;
+    },
+
     getContentById: async function (id) {
         let url = `${apiUrl}contents/${id}`;
         // console.log('url', url);
@@ -201,26 +236,26 @@ module.exports = {
         return page.data;
     },
 
-    getMenuItems: async function () {
-        let data;
-        let contentType = 'menu';
-        const filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
-        //axios.get(apiUrl + `contents?filter=${filter}`)
-        await axios.get('http://localhost:3000/api/contents?filter=%7B%22where%22%3A%7B%22data.contentType%22%3A%22menu%22%7D%7D')
-            .then(function (response) {
-                // handle success
-                // console.log('menu items ==>', response.data);
-                data = response.data;
-            })
-            .catch(function (error) {
-                // handle error
-                console.log(error);
-            })
-            .then(function () {
-                // always executed
-            });
-        return data;
-    },
+    // getMenuItems: async function () {
+    //     let data;
+    //     let contentType = 'menu';
+    //     const filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
+    //     //axios.get(apiUrl + `contents?filter=${filter}`)
+    //     await axios.get('http://localhost:3000/api/contents?filter=%7B%22where%22%3A%7B%22data.contentType%22%3A%22menu%22%7D%7D')
+    //         .then(function (response) {
+    //             // handle success
+    //             // console.log('menu items ==>', response.data);
+    //             data = response.data;
+    //         })
+    //         .catch(function (error) {
+    //             // handle error
+    //             console.log(error);
+    //         })
+    //         .then(function () {
+    //             // always executed
+    //         });
+    //     return data;
+    // },
 
     asyncForEach: async function (array, callback) {
         for (let index = 0; index < array.length; index++) {
