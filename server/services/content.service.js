@@ -1,7 +1,9 @@
 var fs = require('fs');
 const cheerio = require('cheerio')
 const axios = require('axios');
-var ShortcodeTree = require('shortcode-tree').ShortcodeTree;
+const ShortcodeTree = require('shortcode-tree').ShortcodeTree;
+const chalk = require('chalk');
+const log = console.log;
 
 const apiUrl = 'http://localhost:3000/api/';
 var pageContent = '';
@@ -19,17 +21,21 @@ module.exports = {
     // },
 
     getPage: async function (id, instance) {
+        if (!id) {
+            return;
+        }
+        log(chalk.green(id));
         this.id = id;
-        if(instance){
+        if (instance) {
             this.page = instance;
         }
-        else{
-            if(id){
+        else {
+            if (id) {
                 this.page = await this.getContentById(id);
             }
-            
+
         }
-        console.log('id',id, instance);
+        // console.log('id',id, instance);
         let themePath = __dirname + '/../themes/base/index.html';
 
         return new Promise((resolve, reject) => {
@@ -53,10 +59,11 @@ module.exports = {
     },
 
     processTemplate: async function (html) {
+        pageContent = ''; //reset
         // this.setupShortCodeParser();
         // console.log('=== processTemplate ===')
         const $ = cheerio.load(html);
-        $('.blog-header-logo').text('Cheerio');
+        $('.blog-header-logo').text(this.page.id);
         $('.blog-post-title').text('Cheerio Post');
         await this.processMenu($);
 
@@ -72,11 +79,11 @@ module.exports = {
         navWrapper.empty();
 
         let menuItems = await this.getContent('menu');
-        console.log('menuItems', menuItems);
+        // console.log('menuItems', menuItems);
         menuItems.forEach(menuItem => {
-            console.log('menuItem', menuItem);
+            // console.log('menuItem', menuItem);
             let item = menuItemTemplate.replace('Menu Item', menuItem.data.name)
-            .replace('#', menuItem.url)
+                .replace('#', menuItem.url)
             navWrapper.append(item);
         });
     },
@@ -89,7 +96,7 @@ module.exports = {
         let page = this.page; // await this.getContentById('5cd5af93523eac22087e4358');
         // console.log('processSections:page==>', page);
 
-        if(page.data && page.data.layout){
+        if (page.data && page.data.layout) {
             let sections = page.data.layout;
 
             await this.asyncForEach(sections, async (sectionId) => {
@@ -97,10 +104,10 @@ module.exports = {
                 pageContent += `<section>`;
                 await this.processRows($, sectionWrapper, section.data.rows)
                 pageContent += `</section>`;
-    
+
                 // console.log(section);
             });
-    
+
             sectionWrapper.append(pageContent);
         }
 
@@ -125,8 +132,8 @@ module.exports = {
         }
     },
 
-    processBlocks: async function(blocks){
-        this.processShortCodes(blocks);
+    processBlocks: async function (blocks) {
+        await this.processShortCodes(blocks);
         // const parser = Shortcode();
 
         // await parser.add('BLOCK', tag=>{ 
@@ -167,15 +174,16 @@ module.exports = {
 
     // },
 
-    processShortCodes: async function(body){
-        let shortCodes =  body.split(']][[');
-        let ids = [];
-        for(const shortCode of shortCodes){
-            var rootNode = ShortcodeTree.parse('[image id=123 src="bla.jpg" align="center"/]');
-            console.log(rootNode);
+    processShortCodes: async function (body) {
+        let bodyBlocks = ShortcodeTree.parse(body);
+        if (bodyBlocks.children) {
+            for (let bodyBlock of bodyBlocks.children) {
+                let shortcode = bodyBlock.shortcode;
+                if (shortcode.name == "BLOCK") {
+                    await this.replaceShortCode(shortcode)
+                }
+            }
         }
-
-        return ids;
     },
 
     // setupShortCodeParser: async function(){
@@ -196,10 +204,10 @@ module.exports = {
     //     });
     // },
 
-    processBlock: async function (blockId) {
+    replaceShortCode: async function (shortcode) {
+        let blockId = shortcode.properties.id;
         let content = await this.getContentById(blockId);
-        // console.log('processBlock==>', content.data.body);
-        pageContent += content.data.body;
+        pageContent = pageContent.replace(shortcode.codeText,content.data.body);
     },
 
     getContent: async function (contentType) {
@@ -207,32 +215,33 @@ module.exports = {
         const filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
         //axios.get(apiUrl + `contents?filter=${filter}`)
         let url = `${apiUrl}contents?filter=${filter}`;
-        console.log('url', url);
+        // console.log('url', url);
         let page = await axios.get(url);
         // page.data.html = 'delete this';
         // console.log('getContent', page.data);
         return page.data;
     },
 
-    getContentByUrl: async function (pageUrl) {
-
-        const filter = encodeURI(`{"where":{"url":"${pageUrl}"}}`);
-        //axios.get(apiUrl + `contents?filter=${filter}`)
-        let url = `${apiUrl}contents?filter=${filter}`;
-        console.log('getContentByUrlurl', url);
+    getContentByUrl: async function (pageUrl, contentType) {
+        // log(chalk.red('getContentByUrl', pageUrl))
+        const filter = `{"where":{"and":[{"url":"${pageUrl}"},{"data.contentType":"${contentType}"}]}}`;
+        // log(chalk.red('filter', filter));
+        const encodedFilter = encodeURI(filter);
+        let url = `${apiUrl}contents?filter=${encodedFilter}`;
+        // console.log('getContentByUrlurl', url);
         let page = await axios.get(url);
-        console.log('getContentByUrl-page', page.data)
+        // console.log('getContentByUrl:page.data', page.data[0])
         //now render page
-        let renderedPage = this.getPage(page.data.id, page.data)
+        let renderedPage = await this.getPage(page.data[0].id, page.data[0]);
         return renderedPage;
     },
 
     getContentById: async function (id) {
         let url = `${apiUrl}contents/${id}`;
-        // console.log('url', url);
+        console.log('url', url);
         let page = await axios.get(url);
         page.data.html = undefined;
-        // console.log('getContent', page.data);
+        console.log('getContent', page.data);
         return page.data;
     },
 

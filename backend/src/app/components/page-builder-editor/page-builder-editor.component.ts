@@ -50,9 +50,9 @@ console.log('params', params);
     let b2 : any = await this.contentService.createContentInstance(block2);
     let b3 : any = await this.contentService.createContentInstance(block3);
     
-    let b1ShortCode = `[BLOCK id="${b1.id}"]`;
-    let b2ShortCode = `[BLOCK id="${b2.id}"]`;
-    let b3ShortCode = `[BLOCK id="${b3.id}"]`;
+    let b1ShortCode = `[BLOCK id="${b1.id}"/]`;
+    let b2ShortCode = `[BLOCK id="${b2.id}"/]`;
+    let b3ShortCode = `[BLOCK id="${b3.id}"/]`;
 
     //columns
     let col1 = {class : 'col', content : `${b1ShortCode}${b2ShortCode}`}
