@@ -3,7 +3,9 @@ import { PageBuilderService } from '../../services/page-builder.service';
 import { ContentService } from '../../services/content.service';
 import { ShortcodesService } from '../../services/shortcodes.service';
 import { ActivatedRoute } from "@angular/router";
-import * as $ from 'jquery';
+// import * as $ from 'jquery';
+declare var $ : any;
+
 
 @Component({
   selector: 'app-page-builder-editor',
@@ -20,16 +22,19 @@ export class PageBuilderEditorComponent implements OnInit {
   sections = [];
   page: any;
   id: any;
+  Quill: any;
 
   async ngOnInit() {
     this.route.queryParams.subscribe(params => {
       console.log('params', params);
     });
 
+
     this.id = this.route.snapshot.paramMap.get("id");
     console.log('page builder editor route', this.id);
 
     await this.loadSections();
+
   }
 
   async loadSections() {
@@ -43,10 +48,56 @@ export class PageBuilderEditorComponent implements OnInit {
         this.sections.push(section);
       }
       console.log(this.sections)
+
+      //load jquery after html page has been imported
+      await this.loadJQuery();
+
     });
   }
 
-  async processColumnContent(section){
+  async loadJQuery() {
+
+    $(document).ready(function () {
+
+      var quill = new Quill('#editor-container', {
+        modules: {
+          toolbar: [
+            ['bold', 'italic'],
+            ['link', 'blockquote', 'code-block', 'image'],
+            [{ list: 'ordered' }, { list: 'bullet' }]
+          ]
+        },
+        placeholder: 'Compose an epic...',
+        theme: 'snow'
+      });
+
+      // $('#wysiwygModalTrigger').on("click", function () {
+      //   $('#wysiwygModal').appendTo("body").modal('show');
+      //   $('.ql-editor').text('load me here');
+      //   // console.log('quill', quill);
+      // });
+
+      $('.wysiwyg-save').on("click", function () {
+        console.log('saveing wysiwyg');
+        // console.log(quill.getContents())
+      });
+
+      $('span').on("click", function () {
+        var id = $(this).data("id");
+        console.log('span clicked ' + id);
+        $('#wysiwygModal').appendTo("body").modal('show');
+
+        var content = $(this).html();
+        $('.ql-editor').text(content);
+      });
+
+    });
+  }
+
+  async loadQuill() {
+  }
+
+  async processColumnContent(section) {
 
   }
 
@@ -96,7 +147,7 @@ export class PageBuilderEditorComponent implements OnInit {
     console.log(result);
   }
 
-  onContentChanged = (event) =>{
+  onContentChanged = (event) => {
     console.log(event.html);
   }
 }

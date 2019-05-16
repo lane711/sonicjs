@@ -207,7 +207,8 @@ module.exports = {
     replaceShortCode: async function (shortcode) {
         let blockId = shortcode.properties.id;
         let content = await this.getContentById(blockId);
-        pageContent = pageContent.replace(shortcode.codeText,content.data.body);
+        let newBody = `<span data-id="${blockId}">${content.data.body}</span>`;
+        pageContent = pageContent.replace(shortcode.codeText,newBody);
     },
 
     getContent: async function (contentType) {
