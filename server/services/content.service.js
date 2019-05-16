@@ -24,7 +24,7 @@ module.exports = {
         if (!id) {
             return;
         }
-        log(chalk.green(id));
+        // log(chalk.green(id));
         this.id = id;
         if (instance) {
             this.page = instance;
@@ -83,7 +83,7 @@ module.exports = {
         menuItems.forEach(menuItem => {
             // console.log('menuItem', menuItem);
             let item = menuItemTemplate.replace('Menu Item', menuItem.data.name)
-                .replace('#', menuItem.url)
+                                       .replace('#', menuItem.url)
             navWrapper.append(item);
         });
     },
@@ -124,7 +124,7 @@ module.exports = {
 
     processColumns: async function (row) {
         for (const column of row.columns) {
-            console.log('== column ==')
+            // console.log('== column ==')
             pageContent += `<div class='${column.class}'>`;
             pageContent += `${column.content}`;
             await this.processBlocks(column.content);
@@ -238,10 +238,10 @@ module.exports = {
 
     getContentById: async function (id) {
         let url = `${apiUrl}contents/${id}`;
-        console.log('url', url);
+        // console.log('url', url);
         let page = await axios.get(url);
         page.data.html = undefined;
-        console.log('getContent', page.data);
+        // console.log('getContent', page.data);
         return page.data;
     },
 

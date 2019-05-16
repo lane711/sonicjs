@@ -25,22 +25,26 @@
         <i class="nav-icon icon-puzzle"></i> Layout</a>
       <ul class="nav-dropdown-items">
         <li class="nav-item" *ngFor="let section of sections">
-            <a class="nav-link nav-dropdown-toggle" href="#">
-            <i class="nav-icon icon-puzzle"></i> Section {{section.sectionId}}</a>
-            <div class="section-edit">
-              <div>row 1</div>
-              <div>row 1</div>
-
+          <a class="nav-link nav-dropdown-toggle" href="#">
+            <i class="nav-icon icon-puzzle"></i> {{section.data.title}}</a>
+          <div class="container">
+            <div class="{{row.class}}" *ngFor="let row of section.data.rows">
+              <div class="{{column.class}}" *ngFor="let column of row.columns">
+                  <button type="button" class="btn btn-primary"> <!-- // *ngFor="let content of column.content"> -->
+                      Blocks <span class="badge badge-light">2</span>
+                    </button>
+              </div>
             </div>
+          </div>
         </li>
         <li class="nav-item">
-            <a class="nav-link" (click)='addSection()'>
-              <i class="nav-icon icon-puzzle"></i> Add Secton</a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link" (click)='insertShortCode()'>
-                <i class="nav-icon icon-puzzle"></i> Insert Shortcode</a>
-            </li>
+          <a class="nav-link" (click)='addSection()'>
+            <i class="nav-icon icon-puzzle"></i> Add Secton</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" (click)='insertShortCode()'>
+            <i class="nav-icon icon-puzzle"></i> Insert Shortcode</a>
+        </li>
         <li class="nav-item">
           <a class="nav-link" (click)='saveContent()'>
             <i class="nav-icon icon-puzzle"></i> Save</a>

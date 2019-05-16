@@ -23,7 +23,7 @@
               <td>...</td>
               <td>
                 <!-- <a href="{{ content.url }}" target="_blank" class="btn btn-sm btn-success rmargin">View</a> -->
-                <a class="btn btn-sm btn-primary rmargin" [routerLink]="['/page-builder', content.id]">Page Builder</a>
+                <a class="btn btn-sm btn-warning rmargin" *ngIf="content.data.contentType==='page'" [routerLink]="['/page-builder', content.id]">Page Builder</a>
 
                 <a class="btn btn-sm btn-primary rmargin" [routerLink]="['/content', content.id]">Settings</a>
   

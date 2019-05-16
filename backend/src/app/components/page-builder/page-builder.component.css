@@ -32,18 +32,18 @@
 }
 
 div[class^="col"]:hover {
-  margin: 20px;
+  /* margin: 20px; */
 }
 
 /* page interactions */
 
 .row:hover {
-  border: 1px dashed red;
+  background: #aaa;
   cursor: pointer;
 }
 
 div[class^="col"]:hover {
-  border: 1px dashed blue;
+  background: lightblue;
   cursor: pointer;
 }
 
