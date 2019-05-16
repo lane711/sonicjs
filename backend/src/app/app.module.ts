@@ -30,6 +30,7 @@ import { SandboxComponent } from './components/sandbox/sandbox.component';
 import { ContentAddComponent } from './components/content/content-add/content-add.component';
 import { PageBuilderComponent } from './components/page-builder/page-builder.component';
 import { PageBuilderEditorComponent } from './components/page-builder-editor/page-builder-editor.component';
+import { QuillModule } from 'ngx-quill'
 
 @NgModule({
   declarations: [
@@ -65,7 +66,8 @@ import { PageBuilderEditorComponent } from './components/page-builder-editor/pag
     AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,
-    NgbModule
+    NgbModule,
+    QuillModule
   ],
   providers: [],
   bootstrap: [AppComponent],

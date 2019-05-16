@@ -31,7 +31,9 @@
               "node_modules/flag-icon-css/css/flag-icon.min.css",
               "node_modules/font-awesome/css/font-awesome.min.css",
               "node_modules/simple-line-icons/css/simple-line-icons.css",
-              "node_modules/pace-progress/themes/white/pace-theme-minimal.css"
+              "node_modules/pace-progress/themes/white/pace-theme-minimal.css",
+              "node_modules/quill/dist/quill.bubble.css",
+              "node_modules/quill/dist/quill.snow.css"
             ],
             "scripts": [
               {
