@@ -3,6 +3,7 @@ import { PageBuilderService } from '../../services/page-builder.service';
 import { ContentService } from '../../services/content.service';
 import { ShortcodesService } from '../../services/shortcodes.service';
 import { ActivatedRoute } from "@angular/router";
+import * as $ from 'jquery';
 
 @Component({
   selector: 'app-page-builder-editor',
@@ -93,5 +94,9 @@ export class PageBuilderEditorComponent implements OnInit {
   async insertShortCode() {
     let result = await this.shortcodesService.parseShortCode('[[BLOCK id="12344"]]');
     console.log(result);
+  }
+
+  onContentChanged = (event) =>{
+    console.log(event.html);
   }
 }

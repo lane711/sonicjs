@@ -12,7 +12,7 @@
               <th>Type</th>
               <th>Url</th>
               <th>Content</th>
-              <th>Actions</th>
+              <th class='text-right'>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -21,7 +21,7 @@
               <td>{{ content.data.contentType }}</td>
               <td>{{ content.url }}</td>
               <td>...</td>
-              <td>
+              <td class='text-right'>
                 <!-- <a href="{{ content.url }}" target="_blank" class="btn btn-sm btn-success rmargin">View</a> -->
                 <a class="btn btn-sm btn-warning rmargin" *ngIf="content.data.contentType==='page'" [routerLink]="['/page-builder', content.id]">Page Builder</a>
 
