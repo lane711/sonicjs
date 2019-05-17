@@ -78,6 +78,7 @@
       </div>
       <div class="modal-body">
 
+        <input type="hidden" id="block-edit-it">
         <div id="editor-container">
           <quill-editor (change)="onContentChanged($event)" (ready)="alert('ready')"></quill-editor>
         </div>

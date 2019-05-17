@@ -4,7 +4,9 @@ import { ContentService } from '../../services/content.service';
 import { ShortcodesService } from '../../services/shortcodes.service';
 import { ActivatedRoute } from "@angular/router";
 // import * as $ from 'jquery';
-declare var $ : any;
+declare var $: any;
+import * as Quill from 'node_modules/quill/dist/quill.js';
+
 
 
 @Component({
@@ -22,7 +24,7 @@ export class PageBuilderEditorComponent implements OnInit {
   sections = [];
   page: any;
   id: any;
-  Quill: any;
+  quill: any;
 
   async ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -58,7 +60,6 @@ export class PageBuilderEditorComponent implements OnInit {
   async loadJQuery() {
 
     $(document).ready(function () {
-
       var quill = new Quill('#editor-container', {
         modules: {
           toolbar: [
@@ -77,21 +78,35 @@ export class PageBuilderEditorComponent implements OnInit {
       //   // console.log('quill', quill);
       // });
 
-      $('.wysiwyg-save').on("click", function () {
-        console.log('saveing wysiwyg');
-        // console.log(quill.getContents())
-      });
 
-      $('span').on("click", function () {
+
+      $('section span').on("click", function () {
         var id = $(this).data("id");
         console.log('span clicked ' + id);
+        $('#block-edit-it').val(id);
         $('#wysiwygModal').appendTo("body").modal('show');
 
         var content = $(this).html();
         $('.ql-editor').text(content);
       });
 
+      $('.wysiwyg-save').on("click", function () {
+
+        //         var delta = editor.getContents();
+        // var text = editor.getText();
+        // var justHtml = editor.root.innerHTML;
+        let id = $('#block-edit-it').val();
+console.log('saving ' + id);
+        let content = quill.root.innerHTML;
+        console.log(content);
+      });
     });
+  }
+
+  saveWYSIWYG() {
+    // console.log('saveing wysiwyg');
+    // let content = quill.getContents();
+    // console.log(content);
   }
 
   async loadQuill() {
