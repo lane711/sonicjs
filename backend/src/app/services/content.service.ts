@@ -28,7 +28,7 @@ export class ContentService {
     return this.http.post(environment.apiUrl + "contents/", content).toPromise();
   }
 
-  public editContentInstance(payload) {
+  public editContentInstanceWithProcessedFields(payload) {
     let id = payload.id;
     console.log('createContentInstance payload', payload);
     let content:any = {};
@@ -36,6 +36,12 @@ export class ContentService {
     this.processContentFields(payload, content);
     console.log('saving existing content', content);
     return this.http.put(environment.apiUrl + `contents/${id}`, content).toPromise();
+  }
+
+  public editContentInstance(payload) {
+    let id = payload.id;
+    console.log('putting payload', payload);
+    return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
   }
 
   public editPage(page) {

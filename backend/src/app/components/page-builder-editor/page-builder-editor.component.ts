@@ -87,26 +87,40 @@ export class PageBuilderEditorComponent implements OnInit {
         $('#wysiwygModal').appendTo("body").modal('show');
 
         var content = $(this).html();
-        $('.ql-editor').text(content);
+        $('.ql-editor').html(content);
       });
 
-      $('.wysiwyg-save').on("click", function () {
+      // $('.wysiwyg-save').on("click", function () {
 
-        //         var delta = editor.getContents();
-        // var text = editor.getText();
-        // var justHtml = editor.root.innerHTML;
-        let id = $('#block-edit-it').val();
-console.log('saving ' + id);
-        let content = quill.root.innerHTML;
-        console.log(content);
-      });
+      //   //         var delta = editor.getContents();
+      //   // var text = editor.getText();
+      //   // var justHtml = editor.root.innerHTML;
+      //   let id = $('#block-edit-it').val();
+      //   console.log('saving ' + id);
+      //   let content = quill.root.innerHTML;
+      //   let block = this.contentService.getContentInstance(id).then(block => {
+      //     console.log('editing...', block);
+
+      //   });
+
+      //   console.log(content);
+      // });
     });
   }
 
-  saveWYSIWYG() {
-    // console.log('saveing wysiwyg');
-    // let content = quill.getContents();
-    // console.log(content);
+  async saveWYSIWYG() {
+    let id = $('#block-edit-it').val();
+    console.log('saving ' + id);
+    let content = $('.ql-editor').html();
+    console.log('content', content);
+
+    //update db
+    let block = await this.contentService.getContentInstance(id) as any;
+    block.data.body = content;
+    this.contentService.editContentInstance(block);
+
+    //update screen
+    $(`span[data-id="${id}"]`).html(content);
   }
 
   async loadQuill() {

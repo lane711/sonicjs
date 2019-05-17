@@ -49,7 +49,7 @@ export class ContentEditComponent implements OnInit {
     console.log('onSubmitContentAdd:payload', payload);
     payload.contentType = payload.contentTypeId;
     delete payload.contentTypeId;
-    this.contentService.editContentInstance(payload);
+    this.contentService.editContentInstanceWithProcessedFields(payload);
   }
 
   // loadQuestions(contentTypeSystemId) {

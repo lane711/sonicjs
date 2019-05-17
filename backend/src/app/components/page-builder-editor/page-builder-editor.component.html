@@ -58,9 +58,6 @@
     </li>
 
   </ul>
-
-  <button class="nav-link" data-toggle="modal" id="wysiwygModalTrigger">
-    <i class="nav-icon icon-puzzle"></i> Open WYSIWYG</button>
 </nav>
 
 <button class="sidebar-minimizer brand-minimizer" type="button"></button>
@@ -86,7 +83,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary">Cancel</button>
-        <button type="button" class="btn btn-primary wysiwyg-save" data-dismiss="modal">Save</button>
+        <button type="button" class="btn btn-primary wysiwyg-save" (click)='saveWYSIWYG()' data-dismiss="modal">Save</button>
       </div>
     </div>
   </div>
