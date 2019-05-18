@@ -35,14 +35,25 @@ export class PageBuilderEditorComponent implements OnInit {
     this.id = this.route.snapshot.paramMap.get("id");
     console.log('page builder editor route', this.id);
 
-    await this.loadSections();
+    await this.loadSectionsSubscription();
 
   }
 
-  async loadSections() {
+  async loadSectionsSubscription() {
     this.pageBuilderService.currentPageSubject.subscribe(async page => {
       console.log('loadSections', page);
       this.page = page;
+      this.loadSections(page);
+
+      //load jquery after html page has been imported
+      await this.loadJQuery();
+
+    });
+  }
+
+  async loadSections(page) {
+    this.sections = [];
+    if (page.data.layout) {
       let sectionsIds = page.data.layout;
       for (let sectionId of sectionsIds) {
         let section = await this.contentService.getContentInstance(sectionId) as object;
@@ -50,11 +61,7 @@ export class PageBuilderEditorComponent implements OnInit {
         this.sections.push(section);
       }
       console.log(this.sections)
-
-      //load jquery after html page has been imported
-      await this.loadJQuery();
-
-    });
+    }
   }
 
   async loadJQuery() {
@@ -151,26 +158,31 @@ export class PageBuilderEditorComponent implements OnInit {
     }
     this.page.data.layout.push(s1.id);
 
-    this.contentService.editPage(this.page);
+    // this.contentService.editPage(this.page);
+    let updatedPage = await this.contentService.editContentInstance(this.page);
+
 
     //update ui
-    this.fullPageUpdate();
+    // this.fullPageUpdate();
+    this.loadSections(updatedPage);
   }
 
   async fullPageUpdate() {
-    this.pageBuilderService.loadPageIntoSubjectById(this.page.data.id);
+    this.sections = [];
+    this.pageBuilderService.loadPageIntoSubjectById(this.page.id);
   }
 
 
 
   async addRow(sectionId) {
     console.log('adding row to section: ' + sectionId);
-    let row = this.generateNewRow();
+    let row = await this.generateNewRow();
 
     let section = await this.contentService.getContentInstance(sectionId) as any;
     section.data.rows.push(row);
     this.contentService.editContentInstance(section);
 
+    this.fullPageUpdate();
   }
 
   async generateNewRow() {

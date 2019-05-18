@@ -3,59 +3,80 @@
     <li class="nav-item">
 
       <a class="nav-link" href="/admin">
-        <i class="nav-icon fa fa-dashboard"></i>
-        < Back <!-- <span class="badge badge-primary">NEW</span> -->
+        <i class="nav-icon fa fa-chevron-left"></i>
+        Back <!-- <span class="badge badge-primary">NEW</span> -->
       </a>
     </li>
 
     <li class="nav-title">Template</li>
     <li class="nav-item nav-dropdown">
-      <a class="nav-link" (click)="refresh">
-        <i class="nav-icon fa fa-home"></i> Settings</a>
+      <a class="nav-link" (click)="refresh" href="#">
+        <i class="nav-icon fa fa-gear"></i> Settings</a>
     </li>
 
     <li class="nav-title">Page Builder</li>
     <li class="nav-item nav-dropdown">
-      <a class="nav-link" (click)="refresh">
-        <i class="nav-icon fa fa-home"></i> Refresh</a>
+      <a class="nav-link" (click)="refresh" href="#">
+        <i class="nav-icon fa fa-refresh"></i> Refresh</a>
     </li>
     <li class="nav-title">Layout</li>
 
-    <li class="nav-item nav-dropdown">
-      <a class="nav-link nav-dropdown-toggle" href="#">
-        <i class="nav-icon icon-puzzle"></i> Layout</a>
+    <li class="nav-item nav-dropdown" *ngFor="let section of sections">
+      <a class="nav-link nav-dropdown-toggle">
+        <i class="nav-icon fa fa-align-justify"></i> {{section.data.title}}</a>
       <ul class="nav-dropdown-items">
-        <li class="nav-item" *ngFor="let section of sections">
-          <a class="nav-link nav-dropdown-toggle" href="#">
-            <i class="nav-icon icon-puzzle"></i> {{section.data.title}}</a>
-          <div class="container">
+        <li class="nav-item">
+          <div class="container mini-layout">
             <div class="{{row.class}}" *ngFor="let row of section.data.rows">
               <div class="{{column.class}}" *ngFor="let column of row.columns">
                 <span class="badge badge-light">Block</span>
               </div>
             </div>
             <span class="badge badge-light" (click)="addRow(section.id)">Add Row</span>
-
           </div>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" (click)='addSection()'>
-            <i class="nav-icon icon-puzzle"></i> Add Secton</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" (click)='insertShortCode()'>
-            <i class="nav-icon icon-puzzle"></i> Insert Shortcode</a>
-        </li>
-
-
-
-        <li class="nav-item">
-          <a class="nav-link" (click)='saveContent()'>
-            <i class="nav-icon icon-puzzle"></i> Save</a>
-        </li>
-
       </ul>
     </li>
+
+    <li class="nav-item">
+      <a class="nav-link" (click)='addSection()'>
+        <i class="nav-icon icon-plus"></i> Add Secton</a>
+    </li>
+
+    <!-- <li class="nav-item nav-dropdown">
+      <a class="nav-link nav-dropdown-toggle" href="#">
+        <i class="nav-icon icon-puzzle"></i> Layout</a>
+      <ul class="nav-dropdown-items"></ul>
+    <li class="nav-item" *ngFor="let section of sections">
+      <i class="nav-icon icon-puzzle"></i> {{section.data.title}}</a>
+      <div class="container">
+        <div class="{{row.class}}" *ngFor="let row of section.data.rows">
+          <div class="{{column.class}}" *ngFor="let column of row.columns">
+            <span class="badge badge-light">Block</span>
+          </div>
+        </div>
+        <span class="badge badge-light" (click)="addRow(section.id)">Add Row</span>
+
+      </div>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" (click)='addSection()'>
+        <i class="nav-icon icon-puzzle"></i> Add Secton</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" (click)='insertShortCode()'>
+        <i class="nav-icon icon-puzzle"></i> Insert Shortcode</a>
+    </li>
+
+
+
+    <li class="nav-item">
+      <a class="nav-link" (click)='saveContent()'>
+        <i class="nav-icon icon-puzzle"></i> Save</a>
+    </li>
+
+  </ul>
+  </li> -->
 
   </ul>
 </nav>
@@ -83,7 +104,8 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary wysiwyg-save" (click)='saveWYSIWYG()' data-dismiss="modal">Save</button>
+        <button type="button" class="btn btn-primary wysiwyg-save" (click)='saveWYSIWYG()'
+          data-dismiss="modal">Save</button>
       </div>
     </div>
   </div>

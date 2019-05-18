@@ -7,10 +7,8 @@ module.exports = function(Content) {
       Content.findById( id, function (err, instance) {
         // var response = `<!DOCTYPE html><html><body><h1>My First Heading</h1><p>My first paragraph. ${instance.data.name}</p></body></html>`;
         contentService.getPage(id, instance).then(html => {
-          let data = instance.data;
-          data.id = id;
-          data.html = html;
-          cb(null, data);
+          instance.data.html = html;
+          cb(null, instance);
         })
     });
       };
