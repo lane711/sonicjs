@@ -131,38 +131,61 @@ export class PageBuilderEditorComponent implements OnInit {
   }
 
   async addSection() {
-    let block1 = { contentType: 'block', body: 'Morbi leo risus, porta ac consectetur ac, vestibulum at eros.' };
-    let block2 = { contentType: 'block', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' };
-    let block3 = { contentType: 'block', body: 'Nullam quis risus eget urna mollis ornare vel eu leo.' };
 
-    //save blocks and get the ids
-    let b1: any = await this.contentService.createContentInstance(block1);
-    let b2: any = await this.contentService.createContentInstance(block2);
-    let b3: any = await this.contentService.createContentInstance(block3);
-
-    let b1ShortCode = `[BLOCK id="${b1.id}"/]`;
-    let b2ShortCode = `[BLOCK id="${b2.id}"/]`;
-    let b3ShortCode = `[BLOCK id="${b3.id}"/]`;
-
-    //columns
-    let col1 = { class: 'col', content: `${b1ShortCode}${b2ShortCode}` }
-    let col2 = { class: 'col', content: `${b1ShortCode}${b3ShortCode}` }
-    let col3 = { class: 'col', content: `${b3ShortCode}` }
-
-    let row1 = { class: 'row', columns: [col1, col2] }
-    let row2 = { class: 'row', columns: [col3] }
-
+    let row = await this.generateNewRow();
     //rows
-    let rows = [row1, row2];
+    let rows = [row];
 
     //section
-    let section = { title: 'Section 1', contentType: 'section', rows: rows };
+    let nextSectionCount = 1;
+    if (this.page.data.layout) {
+      nextSectionCount = this.page.data.layout.length + 1;
+    }
+
+    let section = { title: `Section ${nextSectionCount}`, contentType: 'section', rows: rows };
     let s1: any = await this.contentService.createContentInstance(section);
 
     //add to current page
-    this.page.data.layout = [s1.id];
+    if (!this.page.data.layout) {
+      this.page.data.layout = []
+    }
+    this.page.data.layout.push(s1.id);
+
     this.contentService.editPage(this.page);
 
+    //update ui
+    this.fullPageUpdate();
+  }
+
+  async fullPageUpdate() {
+    this.pageBuilderService.loadPageIntoSubjectById(this.page.data.id);
+  }
+
+
+
+  async addRow(sectionId) {
+    console.log('adding row to section: ' + sectionId);
+    let row = this.generateNewRow();
+
+    let section = await this.contentService.getContentInstance(sectionId) as any;
+    section.data.rows.push(row);
+    this.contentService.editContentInstance(section);
+
+  }
+
+  async generateNewRow() {
+    let block1 = { contentType: 'block', body: '<p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>' };
+
+    //save blocks and get the ids
+    let b1: any = await this.contentService.createContentInstance(block1);
+    let b1ShortCode = `[BLOCK id="${b1.id}"/]`;
+
+    //columns
+    let col1 = { class: 'col', content: `${b1ShortCode}` }
+
+    let row = { class: 'row', columns: [col1] }
+
+    return row;
   }
 
   saveContent() {

@@ -30,12 +30,11 @@
           <div class="container">
             <div class="{{row.class}}" *ngFor="let row of section.data.rows">
               <div class="{{column.class}}" *ngFor="let column of row.columns">
-                <button type="button" class="btn btn-primary">
-                  <!-- // *ngFor="let content of column.content"> -->
-                  Blocks <span class="badge badge-light">2</span>
-                </button>
+                <span class="badge badge-light">Block</span>
               </div>
             </div>
+            <span class="badge badge-light" (click)="addRow(section.id)">Add Row</span>
+
           </div>
         </li>
         <li class="nav-item">
@@ -82,7 +81,7 @@
 
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary">Cancel</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
         <button type="button" class="btn btn-primary wysiwyg-save" (click)='saveWYSIWYG()' data-dismiss="modal">Save</button>
       </div>
     </div>

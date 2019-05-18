@@ -37,14 +37,18 @@ div[class^="col"]:hover {
 
 /* page interactions */
 
-.row:hover {
-  background: #aaa;
+app-page-builder span:hover, app-page-builder p:hover{
+  background: #eee;
   cursor: pointer;
+}
+.row:hover {
+  /* background: #aaa;
+  cursor: pointer; */
 }
 
 div[class^="col"]:hover {
-  background: lightblue;
-  cursor: pointer;
+  /* background: lightblue;
+  cursor: pointer; */
 }
 
 /* hide/modify regular admin skin */
