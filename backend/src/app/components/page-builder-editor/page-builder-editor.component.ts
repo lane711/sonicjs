@@ -43,7 +43,7 @@ export class PageBuilderEditorComponent implements OnInit {
     this.pageBuilderService.currentPageSubject.subscribe(async page => {
       console.log('loadSections', page);
       this.page = page;
-      this.loadSections(page);
+      await this.loadSections(page);
 
       //load jquery after html page has been imported
       await this.loadJQuery();
@@ -95,6 +95,10 @@ export class PageBuilderEditorComponent implements OnInit {
 
         var content = $(this).html();
         $('.ql-editor').html(content);
+      });
+
+      $('.pb-section').on("click", function () {
+        $(this).toggleClass('open');
       });
 
       // $('.wysiwyg-save').on("click", function () {

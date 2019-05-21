@@ -27,7 +27,7 @@ module.exports = function (app) {
 
 //home page
   router.get('/', async function (req, res) {
-    this.page = await contentService.getPage('5cdb5cc2f744441df910f43f', null);
+    this.page = await contentService.getPage('5cdf78fe3a2cf6a3c5ff7fea', null);
     // console.log('page55', this.page);
     let url = req.url;
     // console.log('url get', url);

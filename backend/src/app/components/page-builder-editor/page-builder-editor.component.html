@@ -4,7 +4,8 @@
 
       <a class="nav-link" href="/admin">
         <i class="nav-icon fa fa-chevron-left"></i>
-        Back <!-- <span class="badge badge-primary">NEW</span> -->
+        Back
+        <!-- <span class="badge badge-primary">NEW</span> -->
       </a>
     </li>
 
@@ -21,8 +22,8 @@
     </li>
     <li class="nav-title">Layout</li>
 
-    <li class="nav-item nav-dropdown" *ngFor="let section of sections">
-      <a class="nav-link nav-dropdown-toggle">
+    <li class="nav-item nav-dropdown pb-section" *ngFor="let section of sections">
+      <a class="nav-link">
         <i class="nav-icon fa fa-align-justify"></i> {{section.data.title}}</a>
       <ul class="nav-dropdown-items">
         <li class="nav-item">
@@ -43,6 +44,41 @@
         <i class="nav-icon icon-plus"></i> Add Secton</a>
     </li>
 
+    <!-- <li class="nav-item nav-dropdown" *ngFor="let section of sections">
+      <a class="nav-link nav-dropdown-toggle" href="#">
+        <i class="nav-icon icon-list"></i> Tables</a>
+      <ul class="nav-dropdown-items">
+        <li class="nav-item">
+          <a class="nav-link" href="tables/tables.html">
+            <i class="nav-icon icon-list"></i> Standard Tables</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="tables/datatables.html">
+            <i class="nav-icon icon-list"></i> DataTables
+            <span class="badge badge-danger">PRO</span>
+          </a>
+        </li>
+      </ul>
+    </li> -->
+
+    <li class="nav-item nav-dropdown">
+      <a class="nav-link nav-dropdown-toggle" href="#">
+        <i class="nav-icon icon-list"></i> Tables 2</a>
+      <ul class="nav-dropdown-items">
+        <li class="nav-item">
+          <a class="nav-link" href="tables/tables.html">
+            <i class="nav-icon icon-list"></i> Standard Tables</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="tables/datatables.html">
+            <i class="nav-icon icon-list"></i> DataTables
+            <span class="badge badge-danger">PRO</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    
     <!-- <li class="nav-item nav-dropdown">
       <a class="nav-link nav-dropdown-toggle" href="#">
         <i class="nav-icon icon-puzzle"></i> Layout</a>
@@ -89,7 +125,7 @@
   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Edit Block 1234</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Edit Block</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
