@@ -112,14 +112,16 @@ export class PageBuilderEditorComponent implements OnInit {
         }
       });
 
-      $(".mini-layout .row:hover").on({
+      $(".mini-layout .pb-row").on({
         mouseenter: function () {
-          let sectionId = $(this).attr('id');
-          $(`section[id='${sectionId}']`).addClass('section-highlight');
+          let sectionId = $(this).closest('.pb-section').attr('id');
+          let rowIndex = $(this).index() + 1;
+          $(`section[id='${sectionId}'] .row:nth-child(${rowIndex})`).addClass('row-highlight');
         },
         mouseleave: function () {
-          let sectionId = $(this).attr('id');
-          $(`section[id='${sectionId}']`).removeClass('section-highlight');
+          let sectionId = $(this).closest('.pb-section').attr('id');
+          let rowIndex = $(this).index() + 1;
+          $(`section[id='${sectionId}'] .row:nth-child(${rowIndex})`).removeClass('row-highlight');
         }
       });
 
