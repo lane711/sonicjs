@@ -125,27 +125,7 @@ export class PageBuilderEditorComponent implements OnInit {
         }
       });
 
-      //
-
-      // $('.pb-section').on("mouseover", function () {
-
-      // });
-
-      // $('.wysiwyg-save').on("click", function () {
-
-      //   //         var delta = editor.getContents();
-      //   // var text = editor.getText();
-      //   // var justHtml = editor.root.innerHTML;
-      //   let id = $('#block-edit-it').val();
-      //   console.log('saving ' + id);
-      //   let content = quill.root.innerHTML;
-      //   let block = this.contentService.getContentInstance(id).then(block => {
-      //     console.log('editing...', block);
-
-      //   });
-
-      //   console.log(content);
-      // });
+     
     });
   }
 
@@ -219,11 +199,28 @@ export class PageBuilderEditorComponent implements OnInit {
     this.fullPageUpdate();
   }
 
-  async addColumn(sectoinId, rowIndex) {
-    console.log('adding column ', sectoinId, rowIndex);
+  async addColumn(sectionId, rowIndex) {
+    console.log('adding column ', sectionId, rowIndex);
+    let section = await this.contentService.getContentInstance(sectionId) as any;
+    console.log('secton', section);
+    let column = await this.generateNewColumn();
+    section.data.rows[rowIndex].columns.push(column);
+    console.log(section.data.rows[rowIndex].columns);
+    this.contentService.editContentInstance(section);
+
+    this.fullPageUpdate();
   }
 
   async generateNewRow() {
+
+    let col = await this.generateNewColumn();
+
+    let row = { class: 'row', columns: [col] }
+
+    return row;
+  }
+
+  async generateNewColumn() {
     let block1 = { contentType: 'block', body: '<p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>' };
 
     //save blocks and get the ids
@@ -231,11 +228,8 @@ export class PageBuilderEditorComponent implements OnInit {
     let b1ShortCode = `[BLOCK id="${b1.id}"/]`;
 
     //columns
-    let col1 = { class: 'col', content: `${b1ShortCode}` }
-
-    let row = { class: 'row', columns: [col1] }
-
-    return row;
+    let col = { class: 'col', content: `${b1ShortCode}` }
+    return col;
   }
 
   saveContent() {
