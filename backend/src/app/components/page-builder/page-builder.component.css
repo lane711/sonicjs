@@ -68,3 +68,12 @@ div[class^="col"]:hover {
 .sidebar-nav {
   display: none;
 }
+
+  /* page mods */
+  .section-highlight{
+    background: #eee;
+  }
+
+  .row-highlight{
+    background: #ccc;
+  }

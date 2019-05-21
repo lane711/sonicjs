@@ -101,7 +101,7 @@ module.exports = {
 
             await this.asyncForEach(sections, async (sectionId) => {
                 let section = await this.getContentById(sectionId);
-                pageContent += `<section>`;
+                pageContent += `<section id='${section.id}'>`;
                 await this.processRows($, sectionWrapper, section.data.rows)
                 pageContent += `</section>`;
 

@@ -13,3 +13,11 @@
     margin: 2px;
     padding: 4px;
   }
+
+  .mini-layout .row:hover{
+    background: #222;
+    cursor: pointer;
+  }
+
+
+

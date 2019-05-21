@@ -97,9 +97,37 @@ export class PageBuilderEditorComponent implements OnInit {
         $('.ql-editor').html(content);
       });
 
-      $('.pb-section').on("click", function () {
-        $(this).toggleClass('open');
+      $('.pb-section a').on("click", function () {
+        $(this).parent().toggleClass('open');
       });
+
+      $(".pb-section").on({
+        mouseenter: function () {
+          let sectionId = $(this).attr('id');
+          $(`section[id='${sectionId}']`).addClass('section-highlight');
+        },
+        mouseleave: function () {
+          let sectionId = $(this).attr('id');
+          $(`section[id='${sectionId}']`).removeClass('section-highlight');
+        }
+      });
+
+      $(".mini-layout .row:hover").on({
+        mouseenter: function () {
+          let sectionId = $(this).attr('id');
+          $(`section[id='${sectionId}']`).addClass('section-highlight');
+        },
+        mouseleave: function () {
+          let sectionId = $(this).attr('id');
+          $(`section[id='${sectionId}']`).removeClass('section-highlight');
+        }
+      });
+
+      //
+
+      // $('.pb-section').on("mouseover", function () {
+
+      // });
 
       // $('.wysiwyg-save').on("click", function () {
 
@@ -187,6 +215,10 @@ export class PageBuilderEditorComponent implements OnInit {
     this.contentService.editContentInstance(section);
 
     this.fullPageUpdate();
+  }
+
+  async addColumn(sectoinId, rowIndex) {
+    console.log('adding column ', sectoinId, rowIndex);
   }
 
   async generateNewRow() {

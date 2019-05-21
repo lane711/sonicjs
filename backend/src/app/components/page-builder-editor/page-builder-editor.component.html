@@ -22,18 +22,19 @@
     </li>
     <li class="nav-title">Layout</li>
 
-    <li class="nav-item nav-dropdown pb-section" *ngFor="let section of sections">
+    <li class="nav-item nav-dropdown pb-section" data-id="{{section.id}}" *ngFor="let section of sections">
       <a class="nav-link">
         <i class="nav-icon fa fa-align-justify"></i> {{section.data.title}}</a>
       <ul class="nav-dropdown-items">
         <li class="nav-item">
           <div class="container mini-layout">
-            <div class="{{row.class}}" *ngFor="let row of section.data.rows">
+            <div class="{{row.class}} pr-row" *ngFor="let row of section.data.rows; let irow = index">
               <div class="{{column.class}}" *ngFor="let column of row.columns">
-                <span class="badge badge-light">Block</span>
+                <span class="badge badge-primary">Block</span>
               </div>
+              <span class="badge badge-success" (click)="addColumn(section.id, irow)"><i class="nav-icon icon-plus"></i></span>
             </div>
-            <span class="badge badge-light" (click)="addRow(section.id)">Add Row</span>
+            <span class="badge badge-success" (click)="addRow(section.id)">Add Row</span>
           </div>
         </li>
       </ul>
