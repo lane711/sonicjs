@@ -24,7 +24,19 @@
 
     <li class="nav-item nav-dropdown pb-section" data-id="{{section.id}}" *ngFor="let section of sections">
       <a class="nav-link">
-        <i class="nav-icon fa fa-align-justify"></i> {{section.data.title}}</a>
+        <i class="nav-icon fa fa-align-justify"></i> {{section.data.title}}
+        <button class="badge badge-dark section-edit" [ngbPopover]="popContent" [popoverTitle]="popTitle"
+          placement="right"> <i class="nav-icon fa fa-ellipsis-h"></i></button>
+        <ng-template #popTitle>Section Options</ng-template>
+        <ng-template #popContent>
+            <button class="btn btn-sm btn-block btn-primary"><i class="nav-icon fa fa-arrows"></i></button>
+            <button class="btn btn-sm btn-block btn-secondary">Styles</button>
+          <button class="btn btn-sm btn-block btn-success">Copy</button>
+          <button class="btn btn-sm btn-block btn-warning">Remove</button>
+          <button class="btn btn-sm btn-block btn-danger" (click)="deleteSection(section.id)">Delete</button>
+        </ng-template>
+
+      </a>
       <ul class="nav-dropdown-items">
         <li class="nav-item">
           <div class="container mini-layout">
@@ -32,7 +44,8 @@
               <div class="{{column.class}}" *ngFor="let column of row.columns">
                 <span class="badge badge-primary">Block</span>
               </div>
-              <span class="badge badge-success" (click)="addColumn(section.id, irow)"><i class="nav-icon icon-plus"></i></span>
+              <span class="badge badge-success" (click)="addColumn(section.id, irow)"><i
+                  class="nav-icon icon-plus"></i></span>
             </div>
             <span class="badge badge-success" (click)="addRow(section.id)">Add Row</span>
           </div>
@@ -79,7 +92,7 @@
       </ul>
     </li>
 
-    
+
     <!-- <li class="nav-item nav-dropdown">
       <a class="nav-link nav-dropdown-toggle" href="#">
         <i class="nav-icon icon-puzzle"></i> Layout</a>

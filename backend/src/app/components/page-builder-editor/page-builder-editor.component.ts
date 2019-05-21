@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef, ViewChild } from '@angular/core';
 import { PageBuilderService } from '../../services/page-builder.service';
 import { ContentService } from '../../services/content.service';
 import { ShortcodesService } from '../../services/shortcodes.service';
@@ -45,6 +45,7 @@ export class PageBuilderEditorComponent implements OnInit {
       this.page = page;
       await this.loadSections(page);
 
+      await this.loadQuill();
       //load jquery after html page has been imported
       await this.loadJQuery();
 
@@ -67,25 +68,6 @@ export class PageBuilderEditorComponent implements OnInit {
   async loadJQuery() {
 
     $(document).ready(function () {
-      var quill = new Quill('#editor-container', {
-        modules: {
-          toolbar: [
-            ['bold', 'italic'],
-            ['link', 'blockquote', 'code-block', 'image'],
-            [{ list: 'ordered' }, { list: 'bullet' }]
-          ]
-        },
-        placeholder: 'Compose an epic...',
-        theme: 'snow'
-      });
-
-      // $('#wysiwygModalTrigger').on("click", function () {
-      //   $('#wysiwygModal').appendTo("body").modal('show');
-      //   $('.ql-editor').text('load me here');
-      //   // console.log('quill', quill);
-      // });
-
-
 
       $('section span').on("click", function () {
         var id = $(this).data("id");
@@ -97,7 +79,7 @@ export class PageBuilderEditorComponent implements OnInit {
         $('.ql-editor').html(content);
       });
 
-      $('.pb-section a').on("click", function () {
+      $('.pb-section a').not('.section-edit').on("click", function () {
         $(this).parent().toggleClass('open');
       });
 
@@ -125,8 +107,26 @@ export class PageBuilderEditorComponent implements OnInit {
         }
       });
 
-     
+
     });
+  }
+
+  async loadQuill(){
+
+    $(document).ready(function () {
+      var quill = new Quill('#editor-container', {
+        modules: {
+          // toolbar: [
+          //   ['bold', 'italic'],
+          //   ['link', 'blockquote', 'code-block', 'image'],
+          //   [{ list: 'ordered' }, { list: 'bullet' }]
+          // ]
+        },
+        placeholder: 'Compose an epic...',
+        theme: 'snow'
+      });
+    });
+
   }
 
   async saveWYSIWYG() {
@@ -142,9 +142,6 @@ export class PageBuilderEditorComponent implements OnInit {
 
     //update screen
     $(`span[data-id="${id}"]`).html(content);
-  }
-
-  async loadQuill() {
   }
 
   async processColumnContent(section) {
@@ -218,6 +215,26 @@ export class PageBuilderEditorComponent implements OnInit {
     let row = { class: 'row', columns: [col] }
 
     return row;
+  }
+
+  async deleteSection(sectionId) {
+    console.log(`deleting section ${sectionId}`);
+    // remove section from page
+
+    const index: number = this.page.data.layout.indexOf(sectionId);
+    console.log('index', index);
+    if (index !== -1) {
+      this.page.data.layout.splice(index, 1);
+    }
+
+    let updatedPage = await this.contentService.editContentInstance(this.page);
+
+    //reload sidebar
+    this.loadSections(updatedPage);
+
+    //update screen
+    $(`section[id="${sectionId}"]`).remove();
+    this.loadJQuery();
   }
 
   async generateNewColumn() {
