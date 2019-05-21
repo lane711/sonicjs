@@ -5,7 +5,6 @@ import { ShortcodesService } from '../../services/shortcodes.service';
 import { ActivatedRoute } from "@angular/router";
 // import * as $ from 'jquery';
 declare var $: any;
-import * as Quill from 'node_modules/quill/dist/quill.js';
 
 
 
@@ -24,7 +23,6 @@ export class PageBuilderEditorComponent implements OnInit {
   sections = [];
   page: any;
   id: any;
-  quill: any;
 
   async ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -45,7 +43,7 @@ export class PageBuilderEditorComponent implements OnInit {
       this.page = page;
       await this.loadSections(page);
 
-      await this.loadQuill();
+      await this.loadTinyMCE();
       //load jquery after html page has been imported
       await this.loadJQuery();
 
@@ -111,36 +109,10 @@ export class PageBuilderEditorComponent implements OnInit {
     });
   }
 
-  async loadQuill(){
-
-    var toolbarOptions = [
-      ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-      ['blockquote', 'code-block'],
-
-      [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-      [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-      [{ 'direction': 'rtl' }],                         // text direction
-
-      [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-      [ 'link', 'image', 'video', 'formula' ],          // add's image support
-      [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-      [{ 'font': [] }],
-      [{ 'align': [] }],
-
-      ['clean']                                         // remove formatting button
-  ];
+  async loadTinyMCE(){
 
     $(document).ready(function () {
-      var quill = new Quill('#editor-container', {
-        modules: {
-          toolbar: toolbarOptions
-        },
-        placeholder: 'Compose an epic...',
-        theme: 'snow'
-      });
+
     });
 
   }
