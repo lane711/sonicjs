@@ -19,5 +19,10 @@
     cursor: pointer;
   }
 
+  .section-edit .fa-ellipsis-h{
+    margin: 0;
+  }
 
-
+  .popover-header {
+    background-color: #2f353a !important;
+}

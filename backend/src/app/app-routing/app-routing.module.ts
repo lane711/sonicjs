@@ -27,7 +27,7 @@ const routes: Routes = [
     { path: "content/:id", component: ContentEditComponent },
     { path: "page-builder/:id", component: PageBuilderComponent },
     { path: "sandbox", component: SandboxComponent },
-    { path: "**", component: PagesComponent},
+    // { path: "**", component: PagesComponent},
 ];
 
 @NgModule({

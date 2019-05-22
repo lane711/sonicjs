@@ -80,8 +80,11 @@ export class PageBuilderEditorComponent implements OnInit {
         tinymce.remove(); //remove previous editor
 
         $('textarea.wysiwyg-content').tinymce({
-          selector: '#block-content'
-
+          selector: '#block-content',
+          plugins: 'print preview fullpage powerpaste searchreplace autolink directionality advcode visualblocks visualchars fullscreen image link media mediaembed template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount tinymcespellchecker a11ychecker imagetools textpattern help formatpainter permanentpen pageembed tinycomments mentions linkchecker',
+          toolbar: 'formatselect | bold italic strikethrough forecolor backcolor permanentpen formatpainter | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat | addcomment',
+          image_advtab: true,
+          base_url: '/admin/tinymceXXXX'
        });
       });
 
@@ -111,6 +114,18 @@ export class PageBuilderEditorComponent implements OnInit {
           let rowIndex = $(this).index() + 1;
           $(`section[id='${sectionId}'] .row:nth-child(${rowIndex})`).removeClass('row-highlight');
         }
+      });
+
+      //TODO: there is an occiasional bug where the user has to click twice to show popover
+      //TODO: after add/remove section, popovers no longer work (refresh required)
+      $('.section-edit').on("click", function (event) {
+        let popoverId = $(this).attr('id');
+        let popoverSelector = `#ngb-popover-${popoverId}`;
+
+        //close other popovers
+        $('.popover').not(popoverSelector).hide();
+        $(popoverSelector).show();
+        event.stopPropagation();
       });
 
 
@@ -163,7 +178,13 @@ export class PageBuilderEditorComponent implements OnInit {
 
     //update ui
     // this.fullPageUpdate();
-    this.loadSections(updatedPage);
+    // this.loadSections(updatedPage);
+    this.refreshPage(updatedPage);
+  }
+
+  async refreshPage(updatedPage){
+    await this.loadSections(updatedPage);
+    this.loadJQuery();
   }
 
   async fullPageUpdate() {
@@ -218,11 +239,12 @@ export class PageBuilderEditorComponent implements OnInit {
     let updatedPage = await this.contentService.editContentInstance(this.page);
 
     //reload sidebar
-    this.loadSections(updatedPage);
+    // this.loadSections(updatedPage);
 
     //update screen
     $(`section[id="${sectionId}"]`).remove();
-    this.loadJQuery();
+    
+    this.refreshPage(updatedPage);
   }
 
   async generateNewColumn() {
