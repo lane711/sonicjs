@@ -4,6 +4,7 @@ import { PageBuilderService } from "./services/page-builder.service";
 import { ActivatedRoute } from "@angular/router";
 
 import { createCustomElement } from '@angular/elements';
+declare var window: any;
 
 @Component({
   selector: 'app-root',
@@ -44,5 +45,13 @@ export class AppComponent {
     //   this.isPageBuilder = data;
     // });
 
+    this.setupTinyMCE();
+  }
+
+  setupTinyMCE(){
+    window.tinyMCE.overrideDefaults({
+      base_url: '/admin/tinymce/',  // Base for assets such as skins, themes and plugins
+      suffix: '.min'          // This will make Tiny load minified versions of all its assets
+    });
   }
 }

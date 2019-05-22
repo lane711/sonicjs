@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 // import { interval } from 'rxjs';
+declare var $: any;
 
 @Component({
   selector: 'app-sandbox',
@@ -28,6 +29,12 @@ export class SandboxComponent implements OnInit {
     //   this.cars.push(car);
     //   }
     // });
+
+    // window.tinyMCE.overrideDefaults({
+    //   base_url: '/admin/tinymce/',  // Base for assets such as skins, themes and plugins
+    //   suffix: '.min'          // This will make Tiny load minified versions of all its assets
+    // });
+
 
   }
 

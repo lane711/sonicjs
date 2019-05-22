@@ -22,7 +22,10 @@
             "tsConfig": "src/tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              { "glob": "**/*", "input": "node_modules/tinymce/skins", "output": "/tinymce/skins/" },
+              { "glob": "**/*", "input": "node_modules/tinymce/themes", "output": "/tinymce/themes/" },
+              { "glob": "**/*", "input": "node_modules/tinymce/plugins", "output": "/tinymce/plugins/" }
             ],
             "styles": [
               "src/assets/css/style.css",
@@ -43,6 +46,8 @@
               "node_modules/pace-progress/pace.min.js",
               "node_modules/perfect-scrollbar/dist/perfect-scrollbar.min.js",
               "node_modules/@coreui/coreui/dist/js/coreui.min.js",
+              "node_modules/tinymce/tinymce.js",
+              "node_modules/tinymce/jquery.tinymce.min.js",
               "src/assets/js/pagebuilder.js"
             ]
           },

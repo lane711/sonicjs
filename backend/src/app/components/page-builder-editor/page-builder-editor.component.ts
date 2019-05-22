@@ -5,7 +5,8 @@ import { ShortcodesService } from '../../services/shortcodes.service';
 import { ActivatedRoute } from "@angular/router";
 // import * as $ from 'jquery';
 declare var $: any;
-
+declare var tinyMCE: any;
+declare var tinymce: any;
 
 
 @Component({
@@ -23,6 +24,7 @@ export class PageBuilderEditorComponent implements OnInit {
   sections = [];
   page: any;
   id: any;
+  dataModel = "ipsum de lor";
 
   async ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -43,7 +45,6 @@ export class PageBuilderEditorComponent implements OnInit {
       this.page = page;
       await this.loadSections(page);
 
-      await this.loadTinyMCE();
       //load jquery after html page has been imported
       await this.loadJQuery();
 
@@ -74,7 +75,17 @@ export class PageBuilderEditorComponent implements OnInit {
         $('#wysiwygModal').appendTo("body").modal('show');
 
         var content = $(this).html();
-        $('.ql-editor').html(content);
+        $('textarea.wysiwyg-content').html(content);
+
+        $('textarea.wysiwyg-content').tinymce({
+          // script_url : '../js/tinymce/jscripts/tiny_mce/tiny_mce.js',
+          // theme : "advanced"
+       });
+
+       console.log('tiny loaded');
+
+      //  tinyMCE.activeEditor.setContent(content);
+
       });
 
       $('.pb-section a').not('.section-edit').on("click", function () {
@@ -109,18 +120,22 @@ export class PageBuilderEditorComponent implements OnInit {
     });
   }
 
-  async loadTinyMCE(){
+  // async loadTinyMCE(){
 
-    $(document).ready(function () {
+  //     console.log('loading tiny');
+  //     $('textarea.content').tinymce({
+  //       // script_url : '../js/tinymce/jscripts/tiny_mce/tiny_mce.js',
+  //       // theme : "advanced"
+  //    });
 
-    });
-
-  }
+  // }
 
   async saveWYSIWYG() {
     let id = $('#block-edit-it').val();
     console.log('saving ' + id);
-    let content = $('.ql-editor').html();
+
+    let content = $('textarea.wysiwyg-content').html();
+    tinymce.remove("div.editable");
     console.log('content', content);
 
     //update db
