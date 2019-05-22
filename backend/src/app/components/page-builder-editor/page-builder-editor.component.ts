@@ -77,15 +77,12 @@ export class PageBuilderEditorComponent implements OnInit {
         var content = $(this).html();
         $('textarea.wysiwyg-content').html(content);
 
+        tinymce.remove(); //remove previous editor
+
         $('textarea.wysiwyg-content').tinymce({
-          // script_url : '../js/tinymce/jscripts/tiny_mce/tiny_mce.js',
-          // theme : "advanced"
+          selector: '#block-content'
+
        });
-
-       console.log('tiny loaded');
-
-      //  tinyMCE.activeEditor.setContent(content);
-
       });
 
       $('.pb-section a').not('.section-edit').on("click", function () {
@@ -120,23 +117,11 @@ export class PageBuilderEditorComponent implements OnInit {
     });
   }
 
-  // async loadTinyMCE(){
-
-  //     console.log('loading tiny');
-  //     $('textarea.content').tinymce({
-  //       // script_url : '../js/tinymce/jscripts/tiny_mce/tiny_mce.js',
-  //       // theme : "advanced"
-  //    });
-
-  // }
-
   async saveWYSIWYG() {
     let id = $('#block-edit-it').val();
     console.log('saving ' + id);
 
     let content = $('textarea.wysiwyg-content').html();
-    tinymce.remove("div.editable");
-    console.log('content', content);
 
     //update db
     let block = await this.contentService.getContentInstance(id) as any;
