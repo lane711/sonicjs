@@ -77,14 +77,31 @@ export class PageBuilderEditorComponent implements OnInit {
         var content = $(this).html();
         $('textarea.wysiwyg-content').html(content);
 
+        // $(document).off('focusin.modal');
+        //allow user to interact with tinymcs dialogs: https://stackoverflow.com/questions/36279941/using-tinymce-in-a-modal-dialog
+        $(document).on('focusin', function(e) {
+          if ($(e.target).closest(".tox-dialog").length) {
+            e.stopImmediatePropagation();
+          }
+        });
+
+
         tinymce.remove(); //remove previous editor
+        // tinymce.baseURL = '/tinymce/';
+        // console.log('tinymce.base_url',tinymce.baseURL);
+        //plugins: 'print preview fullpage powerpaste searchreplace autolink directionality advcode visualblocks visualchars fullscreen image link media mediaembed template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount tinymcespellchecker a11ychecker imagetools textpattern help formatpainter permanentpen pageembed tinycomments mentions linkchecker',
 
         $('textarea.wysiwyg-content').tinymce({
           selector: '#block-content',
-          plugins: 'print preview fullpage powerpaste searchreplace autolink directionality advcode visualblocks visualchars fullscreen image link media mediaembed template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount tinymcespellchecker a11ychecker imagetools textpattern help formatpainter permanentpen pageembed tinycomments mentions linkchecker',
+          plugins: 'image imagetools',
           toolbar: 'formatselect | bold italic strikethrough forecolor backcolor permanentpen formatpainter | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat | addcomment',
-          image_advtab: true,
-          base_url: '/admin/tinymceXXXX'
+          image_advtab: false,
+          image_list: [
+            {title: 'My image 1', value: 'https://www.tinymce.com/my1.gif'},
+            {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
+          ],
+          images_upload_url: 'http://localhost:3000/api/uploadMedia',
+          automatic_uploads: true
        });
       });
 

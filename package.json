@@ -22,6 +22,7 @@
     "loopback": "^3.22.0",
     "loopback-boot": "^2.6.5",
     "loopback-component-explorer": "^6.2.0",
+    "loopback-component-storage": "^3.6.0",
     "loopback-connector-mongodb": "3.8.0",
     "lorem-ipsum": "^2.0.0",
     "nodemon": "^1.18.11",

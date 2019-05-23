@@ -35,6 +35,18 @@ export class SandboxComponent implements OnInit {
     //   suffix: '.min'          // This will make Tiny load minified versions of all its assets
     // });
 
+    $('textarea.wysiwyg-content').tinymce({
+      selector: '#block-content',
+      plugins: 'image imagetools',
+      toolbar: 'formatselect | bold italic strikethrough forecolor backcolor permanentpen formatpainter | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat | addcomment',
+      image_advtab: false,
+      image_list: [
+        {title: 'My image 1', value: 'https://www.tinymce.com/my1.gif'},
+        {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
+      ],
+      images_upload_url: 'postAcceptor.php',
+      automatic_uploads: false
+   });
 
   }
 
