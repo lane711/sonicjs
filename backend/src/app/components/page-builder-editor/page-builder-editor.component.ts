@@ -100,8 +100,39 @@ export class PageBuilderEditorComponent implements OnInit {
             {title: 'My image 1', value: 'https://www.tinymce.com/my1.gif'},
             {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
           ],
-          images_upload_url: 'http://localhost:3000/api/containers/container1/upload',
-          automatic_uploads: true
+          // images_upload_url: 'http://localhost:3000/api/containers/container1/upload',
+          automatic_uploads: true,
+          images_upload_handler: function (blobInfo, success, failure) {
+            var xhr, formData;
+    
+            xhr = new XMLHttpRequest();
+            xhr.withCredentials = false;
+            xhr.open('POST', "http://localhost:3000/api/containers/container1/upload");
+
+            xhr.onload = function() {
+                var json;
+    
+                if (xhr.status != 200) {
+                    failure("HTTP Error: " + xhr.status);
+                    return;
+                }
+    
+                json = JSON.parse(xhr.responseText);
+                var file = json.result.files.file[0];
+                var location = `http://localhost:3000/api/containers/${file.container}/download/${file.name}`;
+                if (!location) {
+                    failure("Invalid JSON: " + xhr.responseText);
+                    return;
+                }
+    
+                success(location);
+            };
+    
+            formData = new FormData();
+            formData.append('file', blobInfo.blob(), blobInfo.filename());
+    
+            xhr.send(formData);
+        }
        });
       });
 
