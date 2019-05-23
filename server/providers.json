@@ -1,0 +1,11 @@
+{
+  "rackspace": {
+    "username": "your-rackspace-username",
+    "apiKey": "your-rackspace-api-key",
+    "region": "DFW"
+  },
+  "amazon": {
+    "key": "your-amazon-key",
+    "keyId": "your-amazon-key-id"
+  }
+}

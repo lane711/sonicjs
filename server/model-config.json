@@ -54,5 +54,9 @@
   "e2e-test": {
     "dataSource": "mongodb",
     "public": true
+  },
+  "container": {
+    "dataSource": "storage",
+    "public": true
   }
 }
