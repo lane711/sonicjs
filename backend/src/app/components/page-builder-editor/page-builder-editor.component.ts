@@ -100,7 +100,7 @@ export class PageBuilderEditorComponent implements OnInit {
             {title: 'My image 1', value: 'https://www.tinymce.com/my1.gif'},
             {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
           ],
-          images_upload_url: 'http://localhost:3000/api/uploadMedia',
+          images_upload_url: 'http://localhost:3000/api/containers/container1/upload',
           automatic_uploads: true
        });
       });
