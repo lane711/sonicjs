@@ -10,10 +10,14 @@
     <object data="http://localhost:3000" width="400" height="300" type="text/html">
         Alternative Content
     </object> -->
-    <!-- <iframe src="http://localhost:3000" height="200" width="300"></iframe>  -->
+    <!-- <iframe src="http://localhost:3000" height="100%" width="100%"></iframe>  -->
+
+    <iframe (load)="loadPageIntoIframe()" height="100%" width="100%"></iframe> 
+
+
     <!-- <button class="btn btn-primary" type="button" (click)="refresh()">Refresh</button> -->
 
-    <div class="content">
+    <!-- <div class="content">
         <div *ngIf='html' [innerHTML]="html | safe: 'html'"></div>
-    </div>
+    </div> -->
 </div>

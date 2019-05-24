@@ -20,10 +20,10 @@ export class PageBuilderComponent implements OnInit {
     this.id = this.route.snapshot.paramMap.get("id");
     console.log('page builder route', this.id);
 
-    this.pageBuilderService.isPageBuilder = true;
+    // this.pageBuilderService.isPageBuilder = true;
     this.loadPage();
 
-    this.pageBuilderService.setIsPageBuilder(true);
+    // this.pageBuilderService.setIsPageBuilder(true);
   }
 
   async loadPage(){
@@ -40,6 +40,11 @@ export class PageBuilderComponent implements OnInit {
     // this.html = '<!DOCTYPE html><html><body><h1>My Second Heading</h1><p>My first paragraph.</p></body></html>';
 
 
+  }
+
+  async loadPageIntoIframe(){
+    console.log('loadPageIntoIframe');
+    return "ok";
   }
 
   refresh(){

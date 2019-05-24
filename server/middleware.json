@@ -76,6 +76,13 @@
           "/admin"
         ],
         "params": "$!../backend/dist/client"
+      },
+      {
+        "name": "assets",
+        "paths": [
+          "/"
+        ],
+        "params": "$!../server/assets"
       }
     ]
   },
