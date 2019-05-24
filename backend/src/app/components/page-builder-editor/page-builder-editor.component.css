@@ -14,6 +14,10 @@
     padding: 4px;
   }
 
+  .mini-layout{
+    margin: 0;
+    padding: 0;
+  }
   .mini-layout .row:hover{
     background: #222;
     cursor: pointer;
@@ -25,4 +29,20 @@
 
   .popover-header {
     background-color: #2f353a !important;
+}
+hr { 
+  display: block; 
+  height: 1px;
+  border: 0; 
+  border-top: 1px solid #ccc;
+  margin: 1em 0; 
+  padding: 0;
+}
+
+.header{
+  background: #ccc;
+  color: #222;
+  padding: 4px 0;
+  font-size: .6em;
+  padding: .5rem 1rem;
 }

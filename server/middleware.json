@@ -50,6 +50,20 @@
         "params": "$!../server/themes/base"
       },
       {
+        "name": "boostrap",
+        "paths": [
+          "/"
+        ],
+        "params": "$!../node_modules/bootstrap/dist"
+      },
+      {
+        "name": "jquery",
+        "paths": [
+          "/"
+        ],
+        "params": "$!../node_modules/jquery/dist"
+      },
+      {
         "name": "backend",
         "paths": [
           "/admin"

@@ -82,8 +82,8 @@ module.exports = {
         // console.log('menuItems', menuItems);
         menuItems.forEach(menuItem => {
             // console.log('menuItem', menuItem);
-            let item = menuItemTemplate.replace('Menu Item', menuItem.data.name)
-                                       .replace('#', menuItem.url)
+            let item = menuItemTemplate.replace("Home", menuItem.data.name)
+                .replace('#', menuItem.url)
             navWrapper.append(item);
         });
     },
@@ -101,8 +101,10 @@ module.exports = {
 
             await this.asyncForEach(sections, async (sectionId) => {
                 let section = await this.getContentById(sectionId);
-                pageContent += `<section id='${section.id}'>`;
+                pageContent += `<section id='${section.id}' class="jumbotron-fluid" style="background:grey">`;
+                pageContent += '<div class="container">';
                 await this.processRows($, sectionWrapper, section.data.rows)
+                pageContent += '</div>';
                 pageContent += `</section>`;
 
                 // console.log(section);
@@ -208,7 +210,7 @@ module.exports = {
         let blockId = shortcode.properties.id;
         let content = await this.getContentById(blockId);
         let newBody = `<span data-id="${blockId}">${content.data.body}</span>`;
-        pageContent = pageContent.replace(shortcode.codeText,newBody);
+        pageContent = pageContent.replace(shortcode.codeText, newBody);
     },
 
     getContent: async function (contentType) {
@@ -233,7 +235,10 @@ module.exports = {
         let page = await axios.get(url);
         // console.log('getContentByUrl:page.data', page.data[0])
         //now render page
-        let renderedPage = await this.getPage(page.data[0].id, page.data[0]);
+        let renderedPage = 'not found';
+        if (page.data[0]) {
+            renderedPage = await this.getPage(page.data[0].id, page.data[0]);
+        }
         return renderedPage;
     },
 

@@ -1,0 +1,16 @@
+body {
+  padding-top: 5rem;
+}
+.starter-template {
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.bg-ptrans{
+  background: #000;
+  opacity: .7;
+}
+
+body {
+  padding: 0;
+}

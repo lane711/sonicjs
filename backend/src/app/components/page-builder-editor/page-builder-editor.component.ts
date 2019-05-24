@@ -93,6 +93,7 @@ export class PageBuilderEditorComponent implements OnInit {
 
         $('textarea.wysiwyg-content').tinymce({
           selector: '#block-content',
+          height: 600,
           plugins: 'image imagetools',
           toolbar: 'formatselect | bold italic strikethrough forecolor backcolor permanentpen formatpainter | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat | addcomment',
           image_advtab: false,
@@ -320,5 +321,11 @@ export class PageBuilderEditorComponent implements OnInit {
 
   onContentChanged = (event) => {
     console.log(event.html);
+  }
+
+  setSectionBackground(sectionId, backgroundType){
+    console.log('setting ' + sectionId + ' ' + backgroundType);
+    $(`section[id='${sectionId}']`).css('background','green');
+
   }
 }
