@@ -8,7 +8,7 @@ import {
 
 @Component({
   selector: 'custom-button',
-  template: `<h1>ng6</h1><button (click)="handleClick()">{{label}}</button>`,
+  template: `<h1>pb</h1><button (click)="handleClick()">{{label}}</button>`,
   styles: [
     `
     button {
