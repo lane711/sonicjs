@@ -2,16 +2,17 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, Injector } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
 
-import { ButtonComponent } from './button/button.component';
+// import { ButtonComponent } from './button/button.component';
+import { PageBuilderComponent } from './page-builder/page-builder.component'; 
 
 @NgModule({
-  declarations: [ButtonComponent],
+  declarations: [PageBuilderComponent],
   imports: [BrowserModule],
-  entryComponents: [ButtonComponent]
+  entryComponents: [PageBuilderComponent]
 })
 export class AppModule {
   constructor(private injector: Injector) {
-    const customButton = createCustomElement(ButtonComponent, { injector });
+    const customButton = createCustomElement(PageBuilderComponent, { injector });
     customElements.define('custom-button', customButton);
   }
 
