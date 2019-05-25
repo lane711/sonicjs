@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { environment } from "../../../../../src/environments/environment";
+// import { environment } from "../environments/environment";
 import { Subject } from "rxjs";
+var environment = {apiUrl : 'http://localhost:3000/api/'};
 
 @Injectable({
   providedIn: 'root'

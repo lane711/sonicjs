@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { environment } from "../../../../../src/environments/environment";
+// import { environment } from "../environments/environment";
+var environment = {apiUrl : 'http://localhost:3000/api/'};
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,7 @@ export class ContentService {
     private http: HttpClient
   ) { }
 
+  
   async getContent() {
     return this.http.get(environment.apiUrl + "contents").toPromise();
   }

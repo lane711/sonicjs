@@ -11,13 +11,13 @@
 
     <li class="nav-title">Template</li>
     <li class="nav-item nav-dropdown">
-      <a class="nav-link" (click)="refresh" href="#">
+      <a class="nav-link"  href="#">
         <i class="nav-icon fa fa-gear"></i> Settings</a>
     </li>
 
     <li class="nav-title">Page Builder</li>
     <li class="nav-item nav-dropdown">
-      <a class="nav-link" (click)="refresh" href="#">
+      <a class="nav-link" href="#">
         <i class="nav-icon fa fa-refresh"></i> Refresh</a>
     </li>
     <li class="nav-title">Layout</li>
@@ -25,9 +25,9 @@
     <li class="nav-item nav-dropdown pb-section" data-id="{{section.id}}" *ngFor="let section of sections; let isection = index">
       <a class="nav-link">
         <i class="nav-icon fa fa-align-justify"></i> {{section.data.title}}
-        <button class="badge badge-dark section-edit" [ngbPopover]="popContent" data-id="{{isection}}" [popoverTitle]="popTitle"
+        <!-- <button class="badge badge-dark section-edit" [ngbPopover]="popContent" data-id="{{isection}}" [popoverTitle]="popTitle"
           placement="right"> <i class="nav-icon fa fa-ellipsis-h"></i>
-        </button>
+        </button> -->
         <ng-template #popTitle class="pop-title">Section Options</ng-template>
         <ng-template #popContent>
             <button class="btn btn-sm btn-block btn-primary"><i class="nav-icon fa fa-arrows"></i></button>
