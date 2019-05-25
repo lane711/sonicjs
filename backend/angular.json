@@ -180,41 +180,6 @@
           }
         }
       }
-    },
-    "sonic-core": {
-      "root": "projects/sonic-core",
-      "sourceRoot": "projects/sonic-core/src",
-      "projectType": "library",
-      "prefix": "lib",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-ng-packagr:build",
-          "options": {
-            "tsConfig": "projects/sonic-core/tsconfig.lib.json",
-            "project": "projects/sonic-core/ng-package.json"
-          }
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "projects/sonic-core/src/test.ts",
-            "tsConfig": "projects/sonic-core/tsconfig.spec.json",
-            "karmaConfig": "projects/sonic-core/karma.conf.js"
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "projects/sonic-core/tsconfig.lib.json",
-              "projects/sonic-core/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
-          }
-        }
-      }
     }
   },
   "defaultProject": "client"

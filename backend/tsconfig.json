@@ -18,18 +18,6 @@
       "dom"
     ],
     "paths": {
-      "soniccms": [
-        "dist/soniccms"
-      ],
-      "soniccms/*": [
-        "dist/soniccms/*"
-      ],
-      "sonic-core": [
-        "dist/sonic-core"
-      ],
-      "sonic-core/*": [
-        "dist/sonic-core/*"
-      ]
     }
   }
 }
