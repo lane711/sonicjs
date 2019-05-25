@@ -23,9 +23,21 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              { "glob": "**/*", "input": "node_modules/tinymce/skins", "output": "/tinymce/skins/" },
-              { "glob": "**/*", "input": "node_modules/tinymce/themes", "output": "/tinymce/themes/" },
-              { "glob": "**/*", "input": "node_modules/tinymce/plugins", "output": "/tinymce/plugins/" }
+              {
+                "glob": "**/*",
+                "input": "node_modules/tinymce/skins",
+                "output": "/tinymce/skins/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/tinymce/themes",
+                "output": "/tinymce/themes/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/tinymce/plugins",
+                "output": "/tinymce/plugins/"
+              }
             ],
             "styles": [
               "src/assets/css/style.css",
@@ -173,6 +185,41 @@
             "tsConfig": [
               "projects/soniccms/tsconfig.lib.json",
               "projects/soniccms/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "sonic-core": {
+      "root": "projects/sonic-core",
+      "sourceRoot": "projects/sonic-core/src",
+      "projectType": "library",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/sonic-core/tsconfig.lib.json",
+            "project": "projects/sonic-core/ng-package.json"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/sonic-core/src/test.ts",
+            "tsConfig": "projects/sonic-core/tsconfig.spec.json",
+            "karmaConfig": "projects/sonic-core/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/sonic-core/tsconfig.lib.json",
+              "projects/sonic-core/tsconfig.spec.json"
             ],
             "exclude": [
               "**/node_modules/**"

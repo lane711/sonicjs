@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { PageBuilderService } from '../../services/page-builder.service';
+import { PageBuilderService } from '../../../../projects/sonic-core/src/lib/services/page-builder.service';
 import { ActivatedRoute } from "@angular/router";
 
 @Component({

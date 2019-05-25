@@ -18,6 +18,12 @@
       "dom"
     ],
     "paths": {
+      "sonic-core": [
+        "dist/sonic-core"
+      ],
+      "sonic-core/*": [
+        "dist/sonic-core/*"
+      ]
     }
   }
 }

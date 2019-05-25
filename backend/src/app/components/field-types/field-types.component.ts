@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { FieldTypesService } from "../../services/field-types.service";
+import { FieldTypesService } from "../../../../projects/sonic-core/src/lib/services/field-types.service";
 
 @Component({
   selector: "app-field-types",

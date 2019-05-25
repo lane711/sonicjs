@@ -1,8 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { QuestionBase } from "../../../models/question-base";
+import { QuestionBase } from "../../../../../projects/sonic-core/src/lib/models/question-base";
 import { FormGroup } from "@angular/forms";
 import { st } from '@angular/core/src/render3';
-import { FormService} from '../../../services/form.service'
+import { FormService} from '../../../../../projects/sonic-core/src/lib/services/form.service'
 
 @Component({ 
   selector: 'app-layout',

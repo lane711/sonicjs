@@ -1,7 +1,7 @@
 import { Component, OnInit} from "@angular/core";
-import { FieldTypesService } from "../../../services/field-types.service";
-import { ContentTypesService } from "../../../services/content-types.service";
-import { UiService } from "../../../services/ui.service";
+import { FieldTypesService } from "../../../../../projects/sonic-core/src/lib/services/field-types.service";
+import { ContentTypesService } from "../../../../../projects/sonic-core/src/lib/services/content-types.service";
+import { UiService } from "../../../../../projects/sonic-core/src/lib/services/ui.service";
 import  * as shortid from 'node_modules/shortid';
 import { Router } from "@angular/router";
 

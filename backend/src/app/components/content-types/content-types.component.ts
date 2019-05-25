@@ -1,7 +1,7 @@
 
 import { Component, OnInit } from "@angular/core";
 import { DeprecatedI18NPipesModule } from "@angular/common";
-import { ContentTypesService } from "../../services/content-types.service";
+import { ContentTypesService } from "../../../../projects/sonic-core/src/lib/services/content-types.service";
 import { t } from "@angular/core/src/render3";
 
 @Component({

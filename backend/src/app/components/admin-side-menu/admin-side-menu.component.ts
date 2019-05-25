@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from "@angular/router";
-import { PageBuilderService } from "../../services/page-builder.service";
+import { PageBuilderService } from "../../../../projects/sonic-core/src/lib/services/page-builder.service";
 
 @Component({
   selector: 'app-admin-side-menu',

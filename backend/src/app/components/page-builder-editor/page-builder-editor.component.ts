@@ -1,7 +1,7 @@
 import { Component, OnInit, HostListener, ElementRef, ViewChild } from '@angular/core';
-import { PageBuilderService } from '../../services/page-builder.service';
-import { ContentService } from '../../services/content.service';
-import { ShortcodesService } from '../../services/shortcodes.service';
+import { PageBuilderService } from '../../../../projects/sonic-core/src/lib/services/page-builder.service';
+import { ContentService } from '../../../../projects/sonic-core/src/lib/services/content.service';
+import { ShortcodesService } from '../../../../projects/sonic-core/src/lib/services/shortcodes.service';
 import { ActivatedRoute } from "@angular/router";
 // import * as $ from 'jquery';
 declare var $: any;

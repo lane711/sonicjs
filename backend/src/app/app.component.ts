@@ -1,6 +1,6 @@
 import { Component, Injector } from '@angular/core';
-import { UiService } from "./services/ui.service";
-import { PageBuilderService } from "./services/page-builder.service";
+import { UiService } from "../../projects/sonic-core/src/lib/services/ui.service";
+import { PageBuilderService } from "../../projects/sonic-core/src/lib/services/page-builder.service";
 import { ActivatedRoute } from "@angular/router";
 
 import { createCustomElement } from '@angular/elements';
