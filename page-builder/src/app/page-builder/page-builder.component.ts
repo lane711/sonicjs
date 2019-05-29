@@ -3,13 +3,14 @@ import {
   Component,
   ViewEncapsulation,
   EventEmitter,
-  Output
+  Output,
+  OnInit
 } from '@angular/core';
 
 // import { PageBuilderService } from '../../../../backend/projects/sonic-core/src/lib/services/page-builder.service';
 // import { ContentService } from '../../../../projects/sonic-core/src/lib/services/content.service';
 import { ShortcodesService } from 'node_modules/sonic-core/src/lib/services/shortcodes.service';
-// import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute } from "@angular/router";
 
 declare var $: any;
 declare var tinyMCE: any;
@@ -21,10 +22,26 @@ declare var tinymce: any;
   styleUrls: ['./page-builder-editor.component.css'],
   encapsulation: ViewEncapsulation.Native
 })
-export class PageBuilderComponent {
+export class PageBuilderComponent implements OnInit {
   @Input() label = 'default label';
   @Output() action = new EventEmitter<number>();
   private clicksCt = 0;
+
+  constructor(
+    // private pageBuilderService: PageBuilderService,
+    // private contentService: ContentService,
+    private shortcodesService: ShortcodesService,
+    private route: ActivatedRoute) { }
+
+  async ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      console.log('params', params);
+    });
+
+    let id = this.route.snapshot.paramMap.get("id");
+    console.log('page builder editor route', id);
+
+  }
 
   handleClick() {
     this.clicksCt++;
