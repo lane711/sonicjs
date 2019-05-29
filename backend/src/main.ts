@@ -2,7 +2,7 @@ import { enableProdMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { AppModule } from './app/app.module';
-import { environment } from '../projects/sonic-core/src/lib/environments/environment';
+import { environment } from 'src/app/environments/environment';
 
 
 if (environment.production) {
