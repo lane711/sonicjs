@@ -27,7 +27,7 @@
     "document-register-element": "^1.7.2",
     "rxjs": "^6.0.0",
     "shortcode-insert": "^1.0.2",
-    "sonic-core": "0.0.9",
+    "sonic-core": "file:../backend/projects/sonic-core",
     "zone.js": "^0.8.26"
   },
   "devDependencies": {
@@ -35,7 +35,7 @@
     "@angular/cli": "~6.0.0",
     "@angular/compiler-cli": "^6.0.0",
     "@angular/language-service": "^6.0.0",
-    "@types/jasmine": "~2.8.6",
+    "@types/jasmine": "^2.8.16",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
     "codelyzer": "~4.2.1",

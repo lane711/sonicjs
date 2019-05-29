@@ -9,7 +9,7 @@ import { ContentComponent } from "./components/content/content.component";
 import { AdminSideMenuComponent } from "./components/admin-side-menu/admin-side-menu.component";
 import { HomeComponent } from "./components/home/home.component";
 import { FieldTypesComponent } from "./components/field-types/field-types.component";
-import { SafePipe } from "../../projects/sonic-core/src/lib/pipes/safe.pipe";
+import { SafePipe } from "./pipes/safe.pipe";
 import { ContentTypeAddComponent } from "./components/content-types/content-type-add/content-type-add.component";
 import { ContentTypeEditComponent } from "./components/content-types/content-type-edit/content-type-edit.component";
 import { ContentTypeEditFieldsComponent } from "./components/content-types/content-type-edit-fields/content-type-edit-fields.component";

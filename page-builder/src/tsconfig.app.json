@@ -3,8 +3,12 @@
   "compilerOptions": {
     "outDir": "../out-tsc/app",
     "module": "es2015",
-    "types": []
+    "types": ["jasmine"]
   },
+  "include": [
+    "../node_modules/sonic-core/src/lib/*",
+    "../src/main.ts"
+  ],
   "exclude": [
     "src/test.ts",
     "**/*.spec.ts"

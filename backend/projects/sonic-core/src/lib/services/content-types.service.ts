@@ -1,6 +1,8 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { environment } from "src/app/environments/environment";
+// import { environment } from "src/app/environments/environment";
+var environment = {apiUrl : 'http://localhost:3000/api/'};
+
 import { HttpHeaders, HttpErrorResponse } from "@angular/common/http";
 import { FieldTypesService } from "./field-types.service";
 import { QuestionBase } from "../models/question-base";
