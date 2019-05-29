@@ -1,10 +1,14 @@
 .pb-wrapper{
-width:300;
+width:300px;
 height: 100%;
 position: absolute;
 left: 0;
 top: 0;
-background: #2f353a;
+background: #eee;
+}
+
+body, .fixed-top{
+  margin-left: 300px;
 }
 
 .pbe-wrapper{

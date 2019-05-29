@@ -7,9 +7,9 @@ import {
   OnInit
 } from '@angular/core';
 
-import { PageBuilderService } from 'node_modules/sonic-core/src/lib/services/page-builder.service';
-import { ContentService } from 'node_modules/sonic-core/src/lib/services/content.service';
-import { ShortcodesService } from 'node_modules/sonic-core/src/lib/services/shortcodes.service';
+// import { PageBuilderService } from 'node_modules/sonic-core/src/lib/services/page-builder.service';
+// import { ContentService } from 'node_modules/sonic-core/src/lib/services/content.service';
+// import { ShortcodesService } from 'node_modules/sonic-core/src/lib/services/shortcodes.service';
 import { ActivatedRoute } from "@angular/router";
 
 declare var $: any;
@@ -29,7 +29,7 @@ export class PageBuilderComponent implements OnInit {
   timestamp : any;
 
   constructor(
-    private pageBuilderService: PageBuilderService,
+    // private pageBuilderService: PageBuilderService,
     // private contentService: ContentService,
     // private shortcodesService: ShortcodesService,
     private route: ActivatedRoute) { }
