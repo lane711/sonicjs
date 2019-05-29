@@ -6,6 +6,15 @@ import {
   Output
 } from '@angular/core';
 
+// import { PageBuilderService } from '../../../../backend/projects/sonic-core/src/lib/services/page-builder.service';
+// import { ContentService } from '../../../../projects/sonic-core/src/lib/services/content.service';
+import { ShortcodesService } from 'node_modules/sonic-core/src/lib/services/shortcodes.service';
+// import { ActivatedRoute } from "@angular/router";
+
+declare var $: any;
+declare var tinyMCE: any;
+declare var tinymce: any;
+
 @Component({
   selector: 'custom-button',
   templateUrl: './page-builder-editor.component.html',
