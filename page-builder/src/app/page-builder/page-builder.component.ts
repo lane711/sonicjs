@@ -27,6 +27,7 @@ export class PageBuilderComponent implements OnInit {
   dataModel = "ipsum de lor";
 
   async ngOnInit() {
+    console.log('loading page builder:init')
     this.route.queryParams.subscribe(params => {
       console.log('params', params);
     });
