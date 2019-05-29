@@ -26,6 +26,7 @@ export class PageBuilderComponent implements OnInit {
   @Input() label = 'default label';
   @Output() action = new EventEmitter<number>();
   private clicksCt = 0;
+  timestamp : any;
 
   constructor(
     // private pageBuilderService: PageBuilderService,
@@ -40,6 +41,8 @@ export class PageBuilderComponent implements OnInit {
 
     let id = this.route.snapshot.paramMap.get("id");
     console.log('page builder editor route', id);
+
+    this.timestamp = new Date().getTime();
 
   }
 
