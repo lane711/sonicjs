@@ -8,20 +8,11 @@ import {
 
 @Component({
   selector: 'custom-button',
-  template: `<h1>pb-2</h1><button (click)="handleClick()">{{label}}</button>`,
-  styles: [
-    `
-    button {
-      border: solid 3px;
-      padding: 8px 10px;
-      background: #bada55;
-      font-size: 20px;
-    }
-  `
-  ],
+  templateUrl: './page-builder-editor.component.html',
+  styleUrls: ['./page-builder-editor.component.css'],
   encapsulation: ViewEncapsulation.Native
 })
-export class ButtonComponent {
+export class PageBuilderComponent {
   @Input() label = 'default label';
   @Output() action = new EventEmitter<number>();
   private clicksCt = 0;
