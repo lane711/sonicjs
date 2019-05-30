@@ -8,9 +8,8 @@ import {
 } from '@angular/core';
 
 // import { PageBuilderService } from '../../services/page-builder.service';
-// import { ContentService } from 'node_modules/sonic-core/src/lib/services/content.service';
+import { ContentService } from '../services/content.service';
 // import { ShortcodesService } from '../../services/shortcodes.service';
-import { TempserviceService } from '../services/tempservice.service';
 import { PageBuilderService } from '../services/page-builder.service';
 
 import { ActivatedRoute } from "@angular/router";
@@ -33,9 +32,8 @@ export class PageBuilderComponent implements OnInit {
 
   constructor(
     private pageBuilderService: PageBuilderService,
-    // private contentService: ContentService,
+    private contentService: ContentService,
     // private shortcodesService: ShortcodesService,
-    private tempserviceService: TempserviceService,
     private route: ActivatedRoute) { }
 
   async ngOnInit() {
