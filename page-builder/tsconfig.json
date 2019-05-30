@@ -15,11 +15,14 @@
     "lib": [
       "es2017",
       "dom"
-    ]
+    ],
   },
   // "include": [
-  //   "node_modules/sonic-core/**/*.ts",
-  //   "src/**/*.ts",
-  //   "/Users/lanecampbell/Dev/sonicjs/backend/projects/sonic-core/src/lib/services/shortcodes.service.ts"
+  //   // "node_modules/sonic-core/src/lib/services/**/*",
+  //   "src/**/*",
+  //   // "../backend/projects/sonic-core/src/lib/services/*"
   // ],
+  // "files": [
+  //   "../backend/projects/sonic-core/src/lib/services/page-builder.service.ts"
+  // ]
 }
