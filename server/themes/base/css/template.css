@@ -14,3 +14,7 @@ body {
 body {
   padding: 0;
 }
+
+body, .fixed-top{
+  margin-left: 260px;
+}

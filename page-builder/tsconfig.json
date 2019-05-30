@@ -16,5 +16,10 @@
       "es2017",
       "dom"
     ]
-  }
+  },
+  // "include": [
+  //   "node_modules/sonic-core/**/*.ts",
+  //   "src/**/*.ts",
+  //   "/Users/lanecampbell/Dev/sonicjs/backend/projects/sonic-core/src/lib/services/shortcodes.service.ts"
+  // ],
 }
