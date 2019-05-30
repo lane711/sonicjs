@@ -1,10 +1,10 @@
-// import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 // import { Shortcode } from 'shortcode-insert';
 import  * as Shortcode from 'node_modules/shortcode-insert';
 
-// @Injectable({
-//   providedIn: 'root'
-// })
+@Injectable({
+  providedIn: 'root'
+})
 export class ShortcodesService {
 
   parser :any;

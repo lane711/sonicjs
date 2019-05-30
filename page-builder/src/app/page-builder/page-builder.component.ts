@@ -7,9 +7,8 @@ import {
   OnInit
 } from '@angular/core';
 
-// import { PageBuilderService } from '../../services/page-builder.service';
 import { ContentService } from '../services/content.service';
-// import { ShortcodesService } from '../../services/shortcodes.service';
+import { ShortcodesService } from '../services/shortcodes.service';
 import { PageBuilderService } from '../services/page-builder.service';
 
 import { ActivatedRoute } from "@angular/router";
@@ -33,7 +32,7 @@ export class PageBuilderComponent implements OnInit {
   constructor(
     private pageBuilderService: PageBuilderService,
     private contentService: ContentService,
-    // private shortcodesService: ShortcodesService,
+    private shortcodesService: ShortcodesService,
     private route: ActivatedRoute) { }
 
   async ngOnInit() {
