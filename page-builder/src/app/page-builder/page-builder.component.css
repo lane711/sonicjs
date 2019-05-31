@@ -1,3 +1,6 @@
+@import "~bootstrap/dist/css/bootstrap.min.css";
+@import "~font-awesome/css/font-awesome.min.css";
+
 .pb-wrapper{
 width:260px;
 height: 100%;
@@ -55,3 +58,8 @@ hr {
   font-size: .6em;
   padding: .5rem 1rem;
 }
+
+.nav{
+  list-style: none;
+}
+
