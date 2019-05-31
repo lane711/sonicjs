@@ -64,18 +64,18 @@
         "params": "$!../node_modules/jquery/dist"
       },
       {
-        "name": "backend",
+        "name": "admin",
         "paths": [
           "/admin"
         ],
-        "params": "$!../backend"
+        "params": "$!../admin"
       },
       {
-        "name": "backendScripts",
+        "name": "adminScripts",
         "paths": [
           "/admin"
         ],
-        "params": "$!../backend/dist/client"
+        "params": "$!../admin/dist/client"
       },
       {
         "name": "assets",

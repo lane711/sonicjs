@@ -3,7 +3,7 @@ var fs = require('fs');
 module.exports = {
 
     loadAdmin: function () {
-        let adminPath = __dirname + '/../../backend/dist/client/index.html';
+        let adminPath = __dirname + '/../../admim/dist/client/index.html';
         console.log('adminPath', adminPath);
 
         return new Promise((resolve, reject) => {

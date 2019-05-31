@@ -13,8 +13,8 @@
       "address": "127.0.0.1",
       "port": 9876,
       "pathMapping": {
-        "/": "${workspaceRoot}/backend/",
-        "/base/": "${workspaceRoot}/backend/"
+        "/": "${workspaceRoot}/admin/",
+        "/base/": "${workspaceRoot}/admin/"
       }
     },
     {
@@ -26,9 +26,9 @@
     {
       "type": "chrome",
       "request": "launch",
-      "name": "Backend Client",
+      "name": "Admin Client",
       "url": "http://localhost:4200/admin/page-builder/5cdb5cc2f744441df910f43f",
-      "webRoot": "${workspaceFolder}/backend"
+      "webRoot": "${workspaceFolder}/admin"
     }
   ]
 }

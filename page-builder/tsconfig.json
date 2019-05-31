@@ -20,9 +20,9 @@
   // "include": [
   //   // "node_modules/sonic-core/src/lib/services/**/*",
   //   "src/**/*",
-  //   // "../backend/projects/sonic-core/src/lib/services/*"
+  //   // "../admin/projects/sonic-core/src/lib/services/*"
   // ],
   // "files": [
-  //   "../backend/projects/sonic-core/src/lib/services/page-builder.service.ts"
+  //   "../admin/projects/sonic-core/src/lib/services/page-builder.service.ts"
   // ]
 }
