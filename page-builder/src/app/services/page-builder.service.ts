@@ -17,12 +17,6 @@ export class PageBuilderService {
 
   isPageBuilder = false;
   
-  async getPageById(id) {
-    let url = `${environment.apiUrl}contents/getPageById?id=${id}`;
-    console.log('url', url);
-    return this.http.get(url).toPromise();
-  }
-
   async loadPageIntoSubjectById(id) {
     let url = `${environment.apiUrl}contents/getPageById?id=${id}`;
     console.log('loading page from ' + url);

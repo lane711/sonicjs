@@ -63,6 +63,8 @@ module.exports = {
         // this.setupShortCodeParser();
         // console.log('=== processTemplate ===')
         const $ = cheerio.load(html);
+        $('#page-id').val(this.page.id);
+
         $('.blog-header-logo').text(this.page.id);
         $('.blog-post-title').text('Cheerio Post');
         await this.processMenu($);

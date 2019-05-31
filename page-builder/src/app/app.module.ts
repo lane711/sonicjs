@@ -18,8 +18,8 @@ import { PageBuilderComponent } from './page-builder/page-builder.component';
 })
 export class AppModule {
   constructor(private injector: Injector) {
-    const customButton = createCustomElement(PageBuilderComponent, { injector });
-    customElements.define('custom-button', customButton);
+    const pageBuilder = createCustomElement(PageBuilderComponent, { injector });
+    customElements.define('page-builder', pageBuilder);
   }
 
   ngDoBootstrap() {}
