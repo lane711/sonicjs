@@ -1,104 +1,106 @@
-<!-- <div class="pb-wrapper">ipsum 66 {{timestamp}}
-<a href="#" class="btn btn-success">button</a>
-</div> -->
-<nav class="page-builder-nav">
-  <ul class="nav">
-    <li class="nav-item">
+<div class="pb-wrapper">
+  <nav class="page-builder-nav">
+    <ul class="nav">
+      <li class="nav-item">
 
-      <a class="nav-link" href="/admin">
-        <i class="nav-icon fa fa-chevron-left"></i>
-        Back
-      </a>
-    </li>
+        <a class="nav-link" href="/admin">
+          <i class="nav-icon fa fa-chevron-left"></i>
+          Back
+        </a>
+      </li>
 
-    <li class="nav-title">Template</li>
-    <li class="nav-item nav-dropdown">
-      <a class="nav-link" (click)="refresh" href="#">
-        <i class="nav-icon fa fa-gear"></i> Settings</a>
-    </li>
+      <li class="nav-title">Template</li>
+      <li class="nav-item nav-dropdown">
+        <a class="nav-link" (click)="refresh" href="#">
+          <i class="nav-icon fa fa-gear"></i> Settings</a>
+      </li>
 
-    <li class="nav-title">Page Builder</li>
-    <li class="nav-item nav-dropdown">
-      <a class="nav-link" (click)="refresh" href="#">
-        <i class="nav-icon fa fa-refresh"></i> Refresh</a>
-    </li>
-    <li class="nav-title">Layout</li>
+      <li class="nav-title">Page Builder</li>
+      <li class="nav-item nav-dropdown">
+        <a class="nav-link" (click)="refresh" href="#">
+          <i class="nav-icon fa fa-refresh"></i> Refresh</a>
+      </li>
+      <li class="nav-title">Layout</li>
 
-    <li class="nav-item nav-dropdown pb-section" data-id="{{section.id}}" *ngFor="let section of sections; let isection = index">
-      <a class="nav-link">
-        <i class="nav-icon fa fa-align-justify"></i> {{section.data.title}}
-        <!-- <button class="badge badge-dark section-edit" [ngbPopover]="popContent" data-id="{{isection}}" [popoverTitle]="popTitle"
+      <li class="nav-item nav-dropdown pb-section" data-id="{{section.id}}"
+        *ngFor="let section of sections; let isection = index">
+        <a class="nav-link">
+          <i class="nav-icon fa fa-align-justify"></i> {{section.data.title}}
+          <!-- <button class="badge badge-dark section-edit" [ngbPopover]="popContent" data-id="{{isection}}" [popoverTitle]="popTitle"
           placement="right"> <i class="nav-icon fa fa-ellipsis-h"></i>
         </button> -->
-        <ng-template #popTitle class="pop-title">Section Options</ng-template>
-        <ng-template #popContent>
+          <ng-template #popTitle class="pop-title">Section Options</ng-template>
+          <ng-template #popContent>
             <button class="btn btn-sm btn-block btn-primary"><i class="nav-icon fa fa-arrows"></i></button>
             <button class="btn btn-sm btn-block btn-secondary">Edit</button>
-          <button class="btn btn-sm btn-block btn-success">Copy</button>
-          <button class="btn btn-sm btn-block btn-warning">Remove</button>
-          <button class="btn btn-sm btn-block btn-danger" (click)="deleteSection(section.id)">Delete</button>
-        </ng-template>
+            <button class="btn btn-sm btn-block btn-success">Copy</button>
+            <button class="btn btn-sm btn-block btn-warning">Remove</button>
+            <button class="btn btn-sm btn-block btn-danger" (click)="deleteSection(section.id)">Delete</button>
+          </ng-template>
 
-      </a>
-      <ul class="nav-dropdown-items">
-        <li class="nav-item">
-          <div class="container mini-layout">
+        </a>
+        <ul class="nav-dropdown-items">
+          <li class="nav-item">
+            <div class="container mini-layout">
               <div class="header">Layout</div>
-            <div class="{{row.class}} pb-row" *ngFor="let row of section.data.rows; let irow = index">
-              <div class="{{column.class}}" *ngFor="let column of row.columns">
-                <span class="badge badge-primary">Block</span>
-              </div>
-              <span class="badge badge-success" (click)="addColumn(section.id, irow)"><i
-                  class="nav-icon icon-plus"></i></span>
-            </div>
-            <span class="badge badge-success" (click)="addRow(section.id)">
-              <i class="nav-icon icon-plus"></i> Row</span>
-            <div class="header">Background</div>
-            <div class="section-editor">
-              <div class="btn-group" role="group" aria-label="Basic example">
-                  <button type="button" (click)="setSectionBackground(section.id, 'none')" class="btn btn-secondary btn-sm"><i class="fa fa-ban"></i></button>
-                  <button type="button" (click)="setSectionBackground(section.id, 'color')" class="btn btn-secondary btn-sm"><i class="fa fa-tint"></i></button>
-                  <button type="button" (click)="setSectionBackground(section.id, 'image')" class="btn btn-secondary btn-sm"><i class="fa fa-image"></i></button>
-                  <button type="button" (click)="setSectionBackground(section.id, 'video')" class="btn btn-secondary btn-sm"><i class="fa fa-film"></i></button>
+              <div class="{{row.class}} pb-row" *ngFor="let row of section.data.rows; let irow = index">
+                <div class="{{column.class}}" *ngFor="let column of row.columns">
+                  <span class="badge badge-primary">Block</span>
                 </div>
+                <span class="badge badge-success" (click)="addColumn(section.id, irow)"><i
+                    class="nav-icon icon-plus"></i></span>
+              </div>
+              <span class="badge badge-success" (click)="addRow(section.id)">
+                <i class="nav-icon icon-plus"></i> Row</span>
+              <div class="header">Background</div>
+              <div class="section-editor">
+                <div class="btn-group" role="group" aria-label="Basic example">
+                  <button type="button" (click)="setSectionBackground(section.id, 'none')"
+                    class="btn btn-secondary btn-sm"><i class="fa fa-ban"></i></button>
+                  <button type="button" (click)="setSectionBackground(section.id, 'color')"
+                    class="btn btn-secondary btn-sm"><i class="fa fa-tint"></i></button>
+                  <button type="button" (click)="setSectionBackground(section.id, 'image')"
+                    class="btn btn-secondary btn-sm"><i class="fa fa-image"></i></button>
+                  <button type="button" (click)="setSectionBackground(section.id, 'video')"
+                    class="btn btn-secondary btn-sm"><i class="fa fa-film"></i></button>
+                </div>
+              </div>
             </div>
-          </div>
-        </li>
-      </ul>
-    </li>
+          </li>
+        </ul>
+      </li>
 
-    <li class="nav-item">
-      <a class="nav-link" (click)='addSection()'>
-        <i class="nav-icon icon-plus"></i> Add Secton</a>
-    </li>
-
-
-
-    <li class="nav-item nav-dropdown">
-      <a class="nav-link nav-dropdown-toggle" href="#">
-        <i class="nav-icon icon-list"></i> Tables 2</a>
-      <ul class="nav-dropdown-items">
-        <li class="nav-item">
-          <a class="nav-link" href="tables/tables.html">
-            <i class="nav-icon icon-list"></i> Standard Tables</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="tables/datatables.html">
-            <i class="nav-icon icon-list"></i> DataTables
-            <span class="badge badge-danger">PRO</span>
-          </a>
-        </li>
-      </ul>
-    </li>
+      <li class="nav-item">
+        <a class="nav-link" (click)='addSection()'>
+          <i class="nav-icon icon-plus"></i> Add Secton</a>
+      </li>
 
 
 
+      <li class="nav-item nav-dropdown">
+        <a class="nav-link nav-dropdown-toggle" href="#">
+          <i class="nav-icon icon-list"></i> Tables 2</a>
+        <ul class="nav-dropdown-items">
+          <li class="nav-item">
+            <a class="nav-link" href="tables/tables.html">
+              <i class="nav-icon icon-list"></i> Standard Tables</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="tables/datatables.html">
+              <i class="nav-icon icon-list"></i> DataTables
+              <span class="badge badge-danger">PRO</span>
+            </a>
+          </li>
+        </ul>
+      </li>
 
-  </ul>
-</nav>
 
-<button class="sidebar-minimizer brand-minimizer" type="button"></button>
 
+
+    </ul>
+  </nav>
+  <button class="sidebar-minimizer brand-minimizer" type="button"></button>
+</div>
 <!-- Modal -->
 <div class="modal fade admin-field-add" id="wysiwygModal" tabindex="-1" role="dialog"
   aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -115,7 +117,7 @@
         <input type="hidden" id="block-edit-it">
         <div id="editor-container">
 
-            <textarea id="block-content" class="wysiwyg-content">sipum 8</textarea>
+          <textarea id="block-content" class="wysiwyg-content">sipum 8</textarea>
 
         </div>
 
