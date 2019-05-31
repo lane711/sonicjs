@@ -39,22 +39,21 @@ export class PageBuilderComponent implements OnInit {
     ) { }
 
     async ngOnInit() {
+      this.id = await this.getPageId();
 
-      console.log('pb init');
+      this.getPage();
+    }
 
-      $(document).ready(function () {
-        this.id = $('#page-id').val();
-        console.log(this.id);
-      });
-
-      await this.getPage();
-  
+    async getPageId(){
+      let id = $('#page-id').val();
+        return id;
     }
 
     async getPage() {
-      
-        this.page = await this.contentService.getPageById(this.id);
-        console.log(this.page);
+      console.log('getPage', this.id);
+        let page = await this.contentService.getPageById(this.id) as any;
+        this.page = page.data;
+        console.log('page==>', this.page);
         await this.loadSections(this.page);
   
         //load jquery after html page has been imported
@@ -70,7 +69,7 @@ export class PageBuilderComponent implements OnInit {
           await this.processColumnContent(section);
           this.sections.push(section);
         }
-        console.log(this.sections)
+        console.log('sections->', this.sections)
       }
     }
   
@@ -337,5 +336,9 @@ export class PageBuilderComponent implements OnInit {
       console.log('setting ' + sectionId + ' ' + backgroundType);
       $(`section[id='${sectionId}']`).css('background','green');
   
+    }
+
+    refresh(){
+      
     }
 }
