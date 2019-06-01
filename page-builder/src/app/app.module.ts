@@ -3,6 +3,8 @@ import { NgModule, Injector } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
 import { AppRoutingModule } from "src/app/app-routing.module";
 import { HttpClientModule } from "@angular/common/http";
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { AngularFontAwesomeModule } from 'angular-font-awesome';
 
 // import { SafePipe } from "node_modules/sonic-core/src/lib/pipes/safe.pipe";
 
@@ -12,7 +14,9 @@ import { PageBuilderComponent } from './page-builder/page-builder.component';
   declarations: [PageBuilderComponent],
   imports: [BrowserModule, 
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    NgbModule,
+    AngularFontAwesomeModule
   ],
   entryComponents: [PageBuilderComponent]
 })
