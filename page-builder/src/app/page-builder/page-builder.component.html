@@ -1,152 +1,100 @@
 <div class="pb-wrapper">
-  <a href="#" class="btn btn-danger"><i class="fa fa-plus"></i>Good</a>
   <nav class="page-builder-nav">
 
-    <p>
-      <button type="button" class="btn btn-outline-primary" (click)="isCollapsed = !isCollapsed"
-        [attr.aria-expanded]="!isCollapsed" aria-controls="collapseExample">
-        Toggle
-      </button>
-    </p>
-    <div id="collapseExample" [ngbCollapse]="isCollapsed">
-      <div class="card">
-        <div class="card-body">
-          You can collapse this card by clicking Toggle
-        </div>
-      </div>
-    </div>
 
     <ngb-tabset #t="ngbTabset">
-      <ngb-tab id="tab-selectbyid1" title="Template">
-        <ng-template ngbTabContent>
-          <p>Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro
-            synth
-            master cleanse. Mustache cliche tempor, williamsburg carles vegan helvetica. Reprehenderit butcher retro
-            keffiyeh
-            dreamcatcher synth. Cosby sweater eu banh mi, qui irure terry richardson ex squid. Aliquip placeat salvia
-            cillum
-            iphone. Seitan aliquip quis cardigan american apparel, butcher voluptate nisi qui.</p>
-        </ng-template>
-      </ngb-tab>
-      <ngb-tab id="tab-selectbyid2">
+
+      <ngb-tab id="tab-page">
         <ng-template ngbTabTitle>Page</ng-template>
-        <ng-template ngbTabContent>Food truck fixie locavore, accusamus mcsweeney's marfa nulla single-origin coffee
-          squid.
-          <p>Exercitation +1 labore velit, blog sartorial PBR leggings next level wes anderson artisan four loko
-            farm-to-table
-            craft beer twee. Qui photo booth letterpress, commodo enim craft beer mlkshk aliquip jean shorts ullamco ad
-            vinyl
-            cillum PBR. Homo nostrud organic, assumenda labore aesthetic magna delectus mollit. Keytar helvetica VHS
-            salvia
-            yr, vero magna velit sapiente labore stumptown. Vegan fanny pack odio cillum wes anderson 8-bit, sustainable
-            jean
-            shorts beard ut DIY ethical culpa terry richardson biodiesel. Art party scenester stumptown, tumblr butcher
-            vero
-            sint qui sapiente accusamus tattooed echo park.</p>
+        <ng-template ngbTabContent>
+          <ul class="nav page">
+
+              <li class="nav-title">Setting</li>
+
+            <li class="nav-item nav-dropdown">
+              <a class="nav-link" (click)="refresh" href="#">
+                <i class="nav-icon fa fa-gear"></i> Page Settings</a>
+            </li>
+
+            <li class="nav-item nav-dropdown">
+              <a class="nav-link" (click)="refresh" href="#">
+                <i class="nav-icon fa fa-refresh"></i> Refresh</a>
+            </li>
+
+            <li class="nav-title">Layout</li>
+
+            <li class="nav-item nav-dropdown pb-section" data-id="{{section.id}}"
+              *ngFor="let section of sections; let isection = index">
+              <a class="nav-link">
+                <i class="nav-icon fa fa-align-justify"></i><span>{{section.data.title}}</span>
+                <ng-template #popTitle class="pop-title">Section Options</ng-template>
+                <ng-template #popContent>
+                  <button class="btn btn-sm btn-block btn-primary"><i class="nav-icon fa fa-arrows"></i></button>
+                  <button class="btn btn-sm btn-block btn-secondary">Edit</button>
+                  <button class="btn btn-sm btn-block btn-success">Duplicate</button>
+                  <button class="btn btn-sm btn-block btn-warning">Remove</button>
+                  <button class="btn btn-sm btn-block btn-danger" (click)="deleteSection(section.id)">Delete</button>
+                </ng-template>
+                <button type="button" class="btn btn-outline-secondary pull-right"
+                  (click)="isCollapsed[isection] = !isCollapsed[isection]">
+                  <i class="nav-icon fa fa-plus"></i>
+                </button>
+
+                <button class="btn btn-outline-secondary section-edit pull-right" [ngbPopover]="popContent"
+                  data-id="{{isection}}" [popoverTitle]="popTitle" placement="right"> <i
+                    class="nav-icon fa fa-ellipsis-h"></i>
+                </button>
+
+              </a>
+
+              <div class="container mini-layout" [ngbCollapse]="isCollapsed[isection]">
+                <div class="header">Layout</div>
+                <div class="{{row.class}} pb-row" *ngFor="let row of section.data.rows; let irow = index">
+                  <div class="{{column.class}}" *ngFor="let column of row.columns">
+                    <span class="badge badge-primary">Block</span>
+                  </div>
+                  <span class="badge badge-success" (click)="addColumn(section.id, irow)"><i
+                      class="nav-icon fa fa-plus"></i></span>
+                </div>
+                <span class="badge badge-success" (click)="addRow(section.id)">
+                  <i class="nav-icon fa fa-plus"></i> Row</span>
+                <div class="header">Background</div>
+                <div class="section-editor">
+                  <div class="btn-group" role="group" aria-label="Basic example">
+                    <button type="button" (click)="setSectionBackground(section.id, 'none')"
+                      class="btn btn-secondary btn-sm"><i class="fa fa-ban"></i></button>
+                    <button type="button" (click)="setSectionBackground(section.id, 'color')"
+                      class="btn btn-secondary btn-sm"><i class="fa fa-tint"></i></button>
+                    <button type="button" (click)="setSectionBackground(section.id, 'image')"
+                      class="btn btn-secondary btn-sm"><i class="fa fa-image"></i></button>
+                    <button type="button" (click)="setSectionBackground(section.id, 'video')"
+                      class="btn btn-secondary btn-sm"><i class="fa fa-film"></i></button>
+                  </div>
+                </div>
+              </div>
+
+            </li>
+
+            <li class="nav-item">
+              <a class="btn btn-outline-success pull-right" (click)='addSection()'>
+                <i class="nav-icon fa fa-plus"></i> Add Secton</a>
+            </li>
+
+          </ul>
+
+
         </ng-template>
       </ngb-tab>
+
+      <ngb-tab id="tab-template" title="Template">
+        <ng-template ngbTabContent>
+          <p>template settings go here</p>
+        </ng-template>
+      </ngb-tab>
+
     </ngb-tabset>
 
-    <ul class="nav page">
-      <li class="nav-item">
 
-        <a class="nav-link" href="/admin">
-          <i class="nav-icon fa fa-chevron-left"></i>
-          Back
-        </a>
-      </li>
-
-      <li class="nav-title">Template</li>
-      <li class="nav-item nav-dropdown">
-        <a class="nav-link" (click)="refresh" href="#">
-          <i class="nav-icon fa fa-gear"></i> Settings</a>
-      </li>
-
-      <li class="nav-title">Page Builder</li>
-      <li class="nav-item nav-dropdown">
-        <a class="nav-link" (click)="refresh" href="#">
-          <i class="nav-icon fa fa-refresh"></i> Refresh</a>
-      </li>
-      <li class="nav-title">Layout</li>
-
-      <li class="nav-item nav-dropdown pb-section" data-id="{{section.id}}"
-        *ngFor="let section of sections; let isection = index">
-        <a class="nav-link">
-          <i class="nav-icon fa fa-align-justify"></i> {{section.data.title}}
-          <ng-template #popTitle class="pop-title">Section Options</ng-template>
-          <ng-template #popContent>
-            <button class="btn btn-sm btn-block btn-primary"><i class="nav-icon fa fa-arrows"></i></button>
-            <button class="btn btn-sm btn-block btn-secondary">Edit</button>
-            <button class="btn btn-sm btn-block btn-success">Copy</button>
-            <button class="btn btn-sm btn-block btn-warning">Remove</button>
-            <button class="btn btn-sm btn-block btn-danger" (click)="deleteSection(section.id)">Delete</button>
-          </ng-template>
-          <button type="button" class="btn btn-outline-primary pull-right" (click)="isCollapsed[isection] = !isCollapsed[isection]">
-            <i class="nav-icon fa fa-plus"></i>
-          </button>
-
-          <button class="btn btn-outline-primary section-edit pull-right" [ngbPopover]="popContent" data-id="{{isection}}"
-          [popoverTitle]="popTitle" placement="right"> <i class="nav-icon fa fa-ellipsis-h"></i>
-        </button>
-        
-        </a>
-
-            <div class="container mini-layout" [ngbCollapse]="isCollapsed[isection]">
-              <div class="header">Layout</div>
-              <div class="{{row.class}} pb-row" *ngFor="let row of section.data.rows; let irow = index">
-                <div class="{{column.class}}" *ngFor="let column of row.columns">
-                  <span class="badge badge-primary">Block</span>
-                </div>
-                <span class="badge badge-success" (click)="addColumn(section.id, irow)"><i
-                    class="nav-icon icon-plus"></i></span>
-              </div>
-              <span class="badge badge-success" (click)="addRow(section.id)">
-                <i class="nav-icon icon-plus"></i> Row</span>
-              <div class="header">Background</div>
-              <div class="section-editor">
-                <div class="btn-group" role="group" aria-label="Basic example">
-                  <button type="button" (click)="setSectionBackground(section.id, 'none')"
-                    class="btn btn-secondary btn-sm"><i class="fa fa-ban"></i></button>
-                  <button type="button" (click)="setSectionBackground(section.id, 'color')"
-                    class="btn btn-secondary btn-sm"><i class="fa fa-tint"></i></button>
-                  <button type="button" (click)="setSectionBackground(section.id, 'image')"
-                    class="btn btn-secondary btn-sm"><i class="fa fa-image"></i></button>
-                  <button type="button" (click)="setSectionBackground(section.id, 'video')"
-                    class="btn btn-secondary btn-sm"><i class="fa fa-film"></i></button>
-                </div>
-              </div>
-            </div>
-
-      </li>
-
-      <li class="nav-item">
-        <a class="nav-link" (click)='addSection()'>
-          <i class="nav-icon icon-plus"></i> Add Secton</a>
-      </li>
-
-
-
-      <li class="nav-item nav-dropdown">
-        <a class="nav-link nav-dropdown-toggle" href="#">
-          <i class="nav-icon icon-list"></i> Tables 2</a>
-        <ul class="nav-dropdown-items">
-          <li class="nav-item">
-            <a class="nav-link" href="tables/tables.html">
-              <i class="nav-icon icon-list"></i> Standard Tables</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="tables/datatables.html">
-              <i class="nav-icon icon-list"></i> DataTables
-              <span class="badge badge-danger">PRO</span>
-            </a>
-          </li>
-        </ul>
-      </li>
-
-
-
-
-    </ul>
   </nav>
   <button class="sidebar-minimizer brand-minimizer" type="button"></button>
 </div>

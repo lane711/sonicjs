@@ -32,19 +32,26 @@ export class PageBuilderComponent implements OnInit {
   dataModel = "ipsum de lor";
   public isCollapsed: boolean[] = [];
 
-
   constructor(
     private pageBuilderService: PageBuilderService,
     private contentService: ContentService,
     private shortcodesService: ShortcodesService,
     ) {
-      this.isCollapsed[0] = true;
+
      }
 
     async ngOnInit() {
+      this.collapseAllSections();
+
       this.id = await this.getPageId();
 
       this.getPage();
+    }
+
+    async collapseAllSections(){
+      for (let index = 0; index < 20; index++) {
+        this.isCollapsed[index] = true;
+      }
     }
 
     async getPageId(){
