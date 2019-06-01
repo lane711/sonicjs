@@ -39,6 +39,10 @@ background: #eee;
     margin: 0;
   }
 
+  .section-edit{
+    margin: 0 12px 0 0;
+  }
+
   .popover-header {
     background-color: #2f353a !important;
 }
@@ -63,3 +67,12 @@ hr {
   list-style: none;
 }
 
+.page .nav-link{
+  background: #fff;
+  height: 54px;
+
+}
+
+.pb-section{
+  width:100%;
+}
