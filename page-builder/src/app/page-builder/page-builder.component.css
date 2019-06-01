@@ -82,12 +82,15 @@ hr {
 }
 
 .nav-title{
-  background: #fff;
   display: block;
   width: 100%;
   padding: 6px;
-  margin: 6px 0 0 0;
+  margin: 6px 0 0 6px;
   border-radius: 2px;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 80%;
+  letter-spacing: 3px;
 }
 
 .sidebar-minimizer {
