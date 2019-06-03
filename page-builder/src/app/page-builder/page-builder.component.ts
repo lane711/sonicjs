@@ -31,6 +31,7 @@ export class PageBuilderComponent implements OnInit {
   id: any;
   dataModel = "ipsum de lor";
   public isCollapsed: boolean[] = [];
+  html:any;
 
   constructor(
     private pageBuilderService: PageBuilderService,
@@ -65,7 +66,9 @@ export class PageBuilderComponent implements OnInit {
         this.page = page.data;
         console.log('page==>', this.page);
         await this.loadSections(this.page);
-  
+        this.html = page.data.data.html;
+        console.log('html', page.data.data);
+
         //load jquery after html page has been imported
         await this.loadJQuery();
     }
@@ -85,6 +88,7 @@ export class PageBuilderComponent implements OnInit {
   
     async loadJQuery() {
   
+      console.log('loadJQuery');
       $(document).ready(function () {
   
         $('section span').on("click", function () {
@@ -163,10 +167,12 @@ export class PageBuilderComponent implements OnInit {
         $(".pb-section").on({
           mouseenter: function () {
             let sectionId = $(this).attr('id');
+            console.log('mouseenter', sectionId);
             $(`section[id='${sectionId}']`).addClass('section-highlight');
           },
           mouseleave: function () {
             let sectionId = $(this).attr('id');
+            console.log('mouseleave', sectionId);
             $(`section[id='${sectionId}']`).removeClass('section-highlight');
           }
         });

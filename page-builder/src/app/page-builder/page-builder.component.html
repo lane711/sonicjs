@@ -37,7 +37,7 @@
                 </ng-template>
                 <button type="button" class="btn btn-outline-secondary pull-right"
                   (click)="isCollapsed[isection] = !isCollapsed[isection]">
-                  <i class="nav-icon fa fa-plus"></i>
+                  <i class="nav-icon fa fa-chevron-down"></i>
                 </button>
 
                 <button class="btn btn-outline-secondary section-edit pull-right" [ngbPopover]="popContent"
@@ -97,6 +97,10 @@
 
   </nav>
   <button class="sidebar-minimizer brand-minimizer" type="button"></button>
+</div>
+
+<div class="pb-page">
+  <div *ngIf='html' [innerHTML]="html | safe: 'html'"></div>
 </div>
 <!-- Modal -->
 <div class="modal fade admin-field-add" id="wysiwygModal" tabindex="-1" role="dialog"

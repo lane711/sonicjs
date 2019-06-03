@@ -16,6 +16,10 @@ background: #F8F8F8;
     color:#fff;
 }
 
+.pb-page{
+  margin-left: 300px;
+}
+
 .page-builder-nav, .sidebar {
     width: 260px;
     padding: 6px;
@@ -79,6 +83,11 @@ hr {
 
 .pb-section{
   width:100%;
+  border: 1px inset transparent;
+}
+
+.pb-section:hover{
+  border: 1px inset #ccc;
 }
 
 .nav-title{
