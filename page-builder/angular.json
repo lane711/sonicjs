@@ -20,7 +20,7 @@
             "tsConfig": "src/tsconfig.app.json",
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": ["src/styles.css"],
-            "scripts": [
+            "scripts": ["node_modules/jquery/dist/jquery.min.js",
               {
                 "input":
                   "node_modules/document-register-element/build/document-register-element.js"

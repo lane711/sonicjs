@@ -42,11 +42,14 @@ export class PageBuilderComponent implements OnInit {
      }
 
     async ngOnInit() {
+      this.jQueryTest();
+
       this.collapseAllSections();
 
       this.id = await this.getPageId();
 
       this.getPage();
+
     }
 
     async collapseAllSections(){
@@ -64,13 +67,13 @@ export class PageBuilderComponent implements OnInit {
       console.log('getPage', this.id);
         let page = await this.contentService.getPageById(this.id) as any;
         this.page = page.data;
-        console.log('page==>', this.page);
+        // console.log('page==>', this.page);
         await this.loadSections(this.page);
         this.html = page.data.data.html;
-        console.log('html', page.data.data);
+        // console.log('html', page.data.data);
 
         //load jquery after html page has been imported
-        await this.loadJQuery();
+        // await this.loadJQuery();
     }
   
     async loadSections(page) {
@@ -82,8 +85,25 @@ export class PageBuilderComponent implements OnInit {
           await this.processColumnContent(section);
           this.sections.push(section);
         }
-        console.log('sections->', this.sections)
+        // console.log('sections->', this.sections)
       }
+    }
+
+    jQueryTest(){
+
+      window.onload = function() {
+        if (window.jQuery) {  
+            // jQuery is loaded  
+            alert("Yeah!");
+        } else {
+            // jQuery is not loaded
+            alert("Doesn't Work");
+        }
+    }
+    
+      $('.refresh').click(function(){
+        alert('ref');
+      });
     }
   
     async loadJQuery() {
@@ -91,6 +111,7 @@ export class PageBuilderComponent implements OnInit {
       console.log('loadJQuery');
       $(document).ready(function () {
   
+
         $('section span').on("click", function () {
           var id = $(this).data("id");
           console.log('span clicked ' + id);
@@ -104,7 +125,7 @@ export class PageBuilderComponent implements OnInit {
           //allow user to interact with tinymcs dialogs: https://stackoverflow.com/questions/36279941/using-tinymce-in-a-modal-dialog
           $(document).on('focusin', function(e) {
             if ($(e.target).closest(".tox-dialog").length) {
-              e.stopImmediatePropagation();
+              // e.stopImmediatePropagation();
             }
           });
   
@@ -199,7 +220,7 @@ export class PageBuilderComponent implements OnInit {
           //close other popovers
           $('.popover').not(popoverSelector).hide();
           $(popoverSelector).show();
-          event.stopPropagation();
+          // event.stopPropagation();
         });
   
   

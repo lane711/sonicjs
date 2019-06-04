@@ -30,6 +30,7 @@
     "core-js": "^2.5.4",
     "document-register-element": "^1.7.2",
     "font-awesome": "^4.7.0",
+    "jquery": "^3.4.1",
     "rxjs": "^6.0.0",
     "shortcode-insert": "^1.0.2",
     "zone.js": "^0.8.26"
