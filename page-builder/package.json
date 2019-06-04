@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --port 4201",
     "lane": "echo test",
     "build": "ng build --prod --output-hashing=none",
     "package": "cat dist/angular6-elements/{runtime,polyfills,scripts,main}.js > ../server/assets/js/elements.js",
