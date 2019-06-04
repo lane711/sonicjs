@@ -15,6 +15,6 @@ body {
   padding: 0;
 }
 
-body, .fixed-top{
+main, .fixed-top{
   margin-left: 260px;
 }

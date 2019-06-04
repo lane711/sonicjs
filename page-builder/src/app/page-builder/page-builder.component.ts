@@ -4,7 +4,12 @@ import {
   ViewEncapsulation,
   EventEmitter,
   Output,
-  OnInit
+  OnInit,
+  AfterViewInit,
+  ElementRef, 
+  ViewChild,
+  TemplateRef,
+  Renderer
 } from '@angular/core';
 
 import { ContentService } from '../services/content.service';
@@ -21,7 +26,9 @@ declare var tinymce: any;
   styleUrls: ['./page-builder.component.css'],
   encapsulation: ViewEncapsulation.Native
 })
-export class PageBuilderComponent implements OnInit {
+export class PageBuilderComponent implements OnInit, AfterViewInit {
+  @ViewChild("tref", {read: ElementRef}) tref: ElementRef;
+  @ViewChild("tpl") tpl: TemplateRef<any>;
   @Input() label = 'default label';
   @Output() action = new EventEmitter<number>();
   private clicksCt = 0;
@@ -37,6 +44,8 @@ export class PageBuilderComponent implements OnInit {
     private pageBuilderService: PageBuilderService,
     private contentService: ContentService,
     private shortcodesService: ShortcodesService,
+    private elRef:ElementRef,
+    private renderer: Renderer
     ) {
 
      }
@@ -52,6 +61,21 @@ export class PageBuilderComponent implements OnInit {
 
     }
 
+    ngAfterViewInit(): void {
+
+      let cols = this.elRef.nativeElement.querySelector('.mini-layout');
+      console.log('cols', cols);
+
+      // outputs `I am span`
+      // this.tref.nativeElement.textContent = 'my class';
+      this.tref.nativeElement.className = 'opened';
+      console.log('tref', this.tref);
+
+      // let elementRef = this.tpl.elementRef;
+      // // outputs `template bindings={}`
+      // console.log(elementRef.nativeElement.textContent);
+  }
+
     async collapseAllSections(){
       for (let index = 0; index < 20; index++) {
         this.isCollapsed[index] = true;
@@ -63,17 +87,24 @@ export class PageBuilderComponent implements OnInit {
         return id;
     }
 
+    menuToggle(event:any) {
+      this.renderer.setElementClass(event.target,"opened",true);
+      this.renderer.setElementClass(this.tref,"opened",true);
+
+  }
+
     async getPage() {
       console.log('getPage', this.id);
         let page = await this.contentService.getPageById(this.id) as any;
         this.page = page.data;
         // console.log('page==>', this.page);
         await this.loadSections(this.page);
-        this.html = page.data.data.html;
+
+        // this.html = page.data.data.html;
         // console.log('html', page.data.data);
 
         //load jquery after html page has been imported
-        // await this.loadJQuery();
+        await this.loadJQuery();
     }
   
     async loadSections(page) {
@@ -91,6 +122,8 @@ export class PageBuilderComponent implements OnInit {
 
     jQueryTest(){
 
+      // let elementList = this.elRef.nativeElement.querySelectorAll('.page-builder-nav');
+      // console.log('elementList', elementList);
     //   window.onload = function() {
     //     if (window.jQuery) {  
     //         // jQuery is loaded  
@@ -100,6 +133,7 @@ export class PageBuilderComponent implements OnInit {
     //         alert("Doesn't Work");
     //     }
     // }
+
 
       $('.refresh').click(function(){
         alert('ref');

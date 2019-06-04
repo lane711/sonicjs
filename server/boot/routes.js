@@ -19,7 +19,8 @@ module.exports = function (app) {
   })();
 
   (async () => {
-    adminPage = await admin.loadAdmin();
+    //TODO fix admin path for prod mode
+    // adminPage = await admin.loadAdmin();
     // console.log('asunc page ==>', page);
   })();
 

@@ -1,14 +1,19 @@
 var fs = require('fs');
+var path = require("path");
+const chalk = require('chalk');
 
 module.exports = {
 
     loadAdmin: function () {
-        let adminPath = __dirname + '/../../admim/dist/client/index.html';
-        console.log('adminPath', adminPath);
+        let adminPath = path.join(__dirname, '../..', '/admim/dist/client/index.html');
+        console.log('adminPath--->', adminPath);
 
         return new Promise((resolve, reject) => {
             fs.readFile(adminPath, "utf8", (err, data) => {
-                if (err) reject(err);
+                if (err){
+                    console.log(chalk.red(err));
+                   reject(err); 
+                } 
                 else resolve(data);
             });
         });

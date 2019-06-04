@@ -125,3 +125,7 @@ hr {
   background-size: 12.5px;
   transition: .3s;
 }
+
+.opened{
+  background: red;
+}
