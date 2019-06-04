@@ -91,21 +91,27 @@ export class PageBuilderComponent implements OnInit {
 
     jQueryTest(){
 
-      window.onload = function() {
-        if (window.jQuery) {  
-            // jQuery is loaded  
-            alert("Yeah!");
-        } else {
-            // jQuery is not loaded
-            alert("Doesn't Work");
-        }
-    }
-    
+    //   window.onload = function() {
+    //     if (window.jQuery) {  
+    //         // jQuery is loaded  
+    //         alert("Yeah!");
+    //     } else {
+    //         // jQuery is not loaded
+    //         alert("Doesn't Work");
+    //     }
+    // }
+
       $('.refresh').click(function(){
         alert('ref');
       });
     }
   
+    hoverRow(sectionId, show){
+      console.log('hover', sectionId, show);
+
+      $(`section[id='${sectionId}']`).addClass('section-highlight');
+    }
+
     async loadJQuery() {
   
       console.log('loadJQuery');

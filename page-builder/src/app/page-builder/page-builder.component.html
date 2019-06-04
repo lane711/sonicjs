@@ -24,7 +24,8 @@
             <li class="nav-title">Layout</li>
 
             <li class="nav-item nav-dropdown pb-section" data-id="{{section.id}}"
-              *ngFor="let section of sections; let isection = index">
+              *ngFor="let section of sections; let isection = index"
+              (mouseenter) ="hoverRow(section.id, true)"  (mouseleave) ="hoverRow(section.id, false)">
               <a class="nav-link">
                 <i class="nav-icon fa fa-align-justify"></i><span>{{section.data.title}}</span>
                 <ng-template #popTitle class="pop-title">Section Options</ng-template>
