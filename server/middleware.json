@@ -64,6 +64,20 @@
         "params": "$!../node_modules/jquery/dist"
       },
       {
+        "name": "font-awesome-fonts",
+        "paths": [
+          "/fonts"
+        ],
+        "params": "$!../node_modules/font-awesome/fonts"
+      },
+      {
+        "name": "font-awesome",
+        "paths": [
+          "/"
+        ],
+        "params": "$!../node_modules/font-awesome"
+      },
+      {
         "name": "page-builder",
         "paths": [
           "/"
