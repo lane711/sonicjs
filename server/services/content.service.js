@@ -78,9 +78,33 @@ module.exports = {
 
     processPageBuilder: async function ($) {
 
-        let pageBuilder = $('.s--page-builder');
+        let body = $('body');
+
+        //load pb root index file
+        let ui = await this.getPageBuilderUI();
+
         // console.log(pageBuilder);
-        pageBuilder.append('sip');
+        body.prepend(ui);
+    },
+
+    getPageBuilderUI: async function (){
+        let themePath = __dirname + '/../page-builder/page-builder.html';
+
+        return new Promise((resolve, reject) => {
+            fs.readFile(themePath, "utf8", (err, data) => {
+                if (err) {
+                    console.log(err);
+                    reject(err);
+                }
+                else {
+                    console.log('data==>', data);
+                    resolve(data);
+                    // this.processTemplate(data).then(html => {
+                    //     resolve(html);
+                    // })
+                }
+            });
+        });
     },
 
     processMenu: async function ($) {

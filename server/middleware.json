@@ -64,6 +64,13 @@
         "params": "$!../node_modules/jquery/dist"
       },
       {
+        "name": "page-builder",
+        "paths": [
+          "/"
+        ],
+        "params": "$!../server/page-builder"
+      },
+      {
         "name": "admin",
         "paths": [
           "/admin"
