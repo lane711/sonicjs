@@ -16,10 +16,10 @@ module.exports = {
         return 'bar';
     },
 
-    processPageBuilder: async function (html) {
-        console.log('<==processPageBuilder');
-
-        const $ = cheerio.load(html);
+    processPageBuilder: async function (page) {
+        console.log('<==processPageBuilder', page);
+        this.page = page;
+        const $ = cheerio.load(page.html);
 
         let body = $('body');
 
@@ -33,7 +33,7 @@ module.exports = {
 
     },
 
-    getPageBuilderUI: async function (){
+    getPageBuilderUI: async function () {
         let themePath = __dirname + '/../page-builder/page-builder.html';
 
         return new Promise((resolve, reject) => {
@@ -44,13 +44,51 @@ module.exports = {
                 }
                 else {
                     // console.log('data==>', data);
-                    resolve(data);
-                    // this.processTemplate(data).then(html => {
-                    //     resolve(html);
-                    // })
+                    this.processTemplate(data).then(html => {
+                        resolve(html);
+                    })
                 }
             });
         });
+    },
+
+    processTemplate: async function (html) {
+        pageContent = ''; //reset
+        // this.setupShortCodeParser();
+        // console.log('=== processTemplate ===')
+        const $ = cheerio.load(html);
+        // $('#page-id').val(this.page.id);
+
+        // $('.blog-header-logo').text(this.page.id);
+        // $('.blog-post-title').text('Cheerio Post');
+        // await this.processMenu($);
+
+        await this.processSections($);
+
+        // await this.processPageBuilder($);
+
+        return $.html();
+    },
+
+    processSections: async function ($) {
+        let sectionTemplate = $.html('.s--section');
+
+        if (this.page.data && this.page.data.layout) {
+            let sections = this.page.data.layout;
+
+            // await this.asyncForEach(sections, async (sectionId) => {
+            //     let section = await this.getContentById(sectionId);
+            //     pageContent += `<section id='${section.id}' class="jumbotron-fluid">`;
+            //     pageContent += '<div class="container">';
+            //     await this.processRows($, sectionWrapper, section.data.rows)
+            //     pageContent += '</div>';
+            //     pageContent += `</section>`;
+
+            //     // console.log(section);
+            // });
+
+            // sectionTemplate.append(pageContent);
+        }
     },
 
 }
