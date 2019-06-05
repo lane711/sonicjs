@@ -126,3 +126,7 @@ hr {
 .opened{
   background: red;
 }
+
+.hide{
+  display: none;
+}

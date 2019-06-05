@@ -1,11 +1,15 @@
 'use strict';
-var contentService = require(__dirname + '/../services/content.service');
+var path = require("path");
+
+var contentService = require(path.join(__dirname, '../', 'services/content.service'));
+
 
 module.exports = function(Content) {
 
     Content.getPageById = function (id, cb) {
       Content.findById( id, function (err, instance) {
        contentService.getPage(id, instance).then(html => {
+        //  console.log('contentService.getPage', html)
           instance.data.html = html;
           cb(null, instance);
         })
