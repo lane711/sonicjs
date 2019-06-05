@@ -48,7 +48,7 @@ module.exports = {
                 else {
                     // console.log('data==>', data);
                     this.processTemplate(data).then(html => {
-                        console.log('getPage.page-->', html);
+                        console.log('getPage.page-->', html.length);
                         this.page.html = html;
                         pageBuilderService.processPageBuilder(this.page).then(html => {
                             console.log('page-->2', html.length);

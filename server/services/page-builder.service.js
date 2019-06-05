@@ -17,7 +17,7 @@ module.exports = {
     },
 
     processPageBuilder: async function (page) {
-        console.log('<==processPageBuilder', page);
+        // console.log('<==processPageBuilder', page);
         this.page = page;
         const $ = cheerio.load(page.html);
 
@@ -72,23 +72,76 @@ module.exports = {
 
     processSections: async function ($) {
         let sectionTemplate = $.html('.s--section');
+        let sectionWrapper = $('.s--section').parent();
+        sectionWrapper.empty();
+
+        console.log('sectionTemplate', sectionTemplate);
 
         if (this.page.data && this.page.data.layout) {
             let sections = this.page.data.layout;
 
-            // await this.asyncForEach(sections, async (sectionId) => {
-            //     let section = await this.getContentById(sectionId);
-            //     pageContent += `<section id='${section.id}' class="jumbotron-fluid">`;
-            //     pageContent += '<div class="container">';
-            //     await this.processRows($, sectionWrapper, section.data.rows)
-            //     pageContent += '</div>';
-            //     pageContent += `</section>`;
+            await this.asyncForEach(sections, async (sectionId) => {
+                let section = await this.getContentById(sectionId);
+                pageContent += sectionTemplate.replace('{{section.data.title}}', section.data.title);
+                // console.log(section);
+                // pageContent += `${section.data.title}`;
+                // await this.processRows($, sectionWrapper, section.data.rows)
+ 
+                // console.log(section);
+            });
 
-            //     // console.log(section);
-            // });
-
-            // sectionTemplate.append(pageContent);
+            sectionWrapper.append(pageContent);
         }
     },
+
+    processRows: async function ($, sectionWrapper, rows) {
+        for (const row of rows) {
+            pageContent += `<div class='row'>`;
+            await this.processColumns(row)
+            pageContent += `</div>`;
+        }
+    },
+
+    processColumns: async function (row) {
+        for (const column of row.columns) {
+            // console.log('== column ==')
+            pageContent += `<div class='${column.class}'>`;
+            pageContent += `${column.content}`;
+            await this.processBlocks(column.content);
+            pageContent += `</div>`;
+        }
+    },
+
+    processBlocks: async function (blocks) {
+        await this.processShortCodes(blocks);
+    },
+
+
+    processShortCodes: async function (body) {
+        let bodyBlocks = ShortcodeTree.parse(body);
+        if (bodyBlocks.children) {
+            for (let bodyBlock of bodyBlocks.children) {
+                let shortcode = bodyBlock.shortcode;
+                if (shortcode.name == "BLOCK") {
+                    await this.replaceShortCode(shortcode)
+                }
+            }
+        }
+    },
+
+    getContentById: async function (id) {
+        let url = `${apiUrl}contents/${id}`;
+        // console.log('url', url);
+        let page = await axios.get(url);
+        page.data.html = undefined;
+        // console.log('getContent', page.data);
+        return page.data;
+    },
+
+    asyncForEach: async function (array, callback) {
+        for (let index = 0; index < array.length; index++) {
+            await callback(array[index], index, array);
+        }
+    }
 
 }
