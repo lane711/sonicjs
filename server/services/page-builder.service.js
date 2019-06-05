@@ -75,7 +75,7 @@ module.exports = {
         let sectionWrapper = $('.s--section').parent();
         sectionWrapper.empty();
 
-        console.log('sectionTemplate', sectionTemplate);
+        // console.log('sectionTemplate', sectionTemplate);
 
         if (this.page.data && this.page.data.layout) {
             let sections = this.page.data.layout;
