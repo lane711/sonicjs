@@ -1,6 +1,6 @@
 var themes = require(__dirname + '../../themes/themes');
-var contentService = require( '../services/content.service');
-var pageBuilderService = require( '../services/page-builder.service');
+var contentService = require('../services/content.service');
+var pageBuilderService = require('../services/page-builder.service');
 
 const chalk = require('chalk');
 const log = console.log;
@@ -30,15 +30,15 @@ module.exports = function (app) {
 
   app.get('/hbs', async function (req, res) {
     res.render('home');
-});
+  });
 
 
-//home page
+  //home page
   router.get('/', async function (req, res) {
     // this.page = await contentService.getPageHtml('5cdf78fe3a2cf6a3c5ff7fea', null);
     this.page = await contentService.getContentByUrl(req.url, 'page');
-console.log(this.page.data.layout.rows);
-    res.render('home', { title: this.page.data.name, rows:  this.page.data.layout.rows});
+    console.log(this.page);
+    res.render('home', { title: this.page.data.name, rows: this.page.data.layout.rows });
   });
 
 
@@ -63,17 +63,17 @@ console.log(this.page.data.layout.rows);
     res.send(adminPage);
   });
 
-  app.get('*', async function(req, res, next) {
+  app.get('*', async function (req, res, next) {
     if (req.url === '/' || req.url === '/explorer' || req.url.startsWith('/api')
-    || req.url.endsWith('.css') || req.url.endsWith('.map') || req.url.endsWith('.js') || req.url.indexOf('fonts') > -1) {
+      || req.url.endsWith('.css') || req.url.endsWith('.map') || req.url.endsWith('.js') || req.url.indexOf('fonts') > -1) {
       // log(chalk.blue(req.url));
       return next();
     }
     log(chalk.blue(req.url));
 
     this.page = await contentService.getContentByUrl(req.url, 'page');
-console.log(this.page.data.layout.rows);
-    res.render('home', { title: this.page.data.name, rows:  this.page.data.layout.rows});
+    console.log(this.page.data.layout.rows);
+    res.render('home', { title: this.page.data.name, rows: this.page.data.layout.rows });
 
   });
   // app.use('/admin', function(req, res, next) {
@@ -89,20 +89,20 @@ console.log(this.page.data.layout.rows);
   //   res.send(adminPage);
   // });
 
-// Allow from a specific host.
-// Sets "X-Frame-Options: ALLOW-FROM http://example.com".
-app.use(helmet.frameguard({
-  action: 'allow-from',
-  domain: 'http://localhost:4200'
-}))
+  // Allow from a specific host.
+  // Sets "X-Frame-Options: ALLOW-FROM http://example.com".
+  app.use(helmet.frameguard({
+    action: 'allow-from',
+    domain: 'http://localhost:4200'
+  }))
 
-// app.use(helmet.frameguard({ action: 'sameorigin' }))
-
-
-// app.use(helmet.frameguard({ action: 'allow' }))
+  // app.use(helmet.frameguard({ action: 'sameorigin' }))
 
 
-// app.use(helmet.frameguard({ action: 'sameorigin' }))
+  // app.use(helmet.frameguard({ action: 'allow' }))
+
+
+  // app.use(helmet.frameguard({ action: 'sameorigin' }))
 
 
   app.use(router);
