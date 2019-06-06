@@ -3,13 +3,19 @@
 var loopback = require('loopback');
 var boot = require('loopback-boot');
 const chalk = require('chalk');
+var express = require('express');
+var exphbs = require('express-handlebars');
 
 var app = module.exports = loopback();
 
 
-app.start = function() {
+app.start = function () {
+  //set view engine
+  app.engine('handlebars', exphbs());
+  app.set('view engine', 'handlebars');
+
   // start the web server
-  return app.listen(function() {
+  return app.listen(function () {
     app.emit('started');
     var baseUrl = app.get('url').replace(/\/$/, '');
     console.log(chalk.cyan('Website at: ', baseUrl));
@@ -24,7 +30,7 @@ app.start = function() {
 
 // Bootstrap the application, configure models, datasources and middleware.
 // Sub-apps like REST API are mounted via boot scripts.
-boot(app, __dirname, function(err) {
+boot(app, __dirname, function (err) {
   if (err) throw err;
 
   // start the server if `$ node server.js`

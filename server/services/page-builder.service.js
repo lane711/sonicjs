@@ -77,13 +77,13 @@ module.exports = {
     loadHtmlTemplates: async function($){
 
         this.columnTemplate = $.html('.s--column');
-        console.log(chalk.blue('columnTemplate-->', this.columnTemplate));
+        // console.log(chalk.blue('columnTemplate-->', this.columnTemplate));
 
         this.rowTemplate = $.html('.s--row').replace(this.columnTemplate, '[[columnTemplate]]');
-        console.log(chalk.green('rowTemplate-->', this.rowTemplate));
+        // console.log(chalk.green('rowTemplate-->', this.rowTemplate));
 
         this.sectionTemplate = $.html('.s--section').replace(this.rowTemplate, '[[rowTemplate]]');;
-        console.log(chalk.cyan('sectionTemplate-->', this.sectionTemplate));
+        // console.log(chalk.cyan('sectionTemplate-->', this.sectionTemplate));
     },
 
     processSections: async function ($) {
