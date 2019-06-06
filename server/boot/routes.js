@@ -28,6 +28,11 @@ module.exports = function (app) {
 
   // app.use(express.static(__dirname + '/public' ));
 
+  app.get('/hbs', function (req, res) {
+    res.render('home');
+});
+
+
 //home page
   router.get('/', async function (req, res) {
     this.page = await contentService.getPage('5cdf78fe3a2cf6a3c5ff7fea', null);

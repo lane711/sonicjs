@@ -10,9 +10,17 @@ var app = module.exports = loopback();
 
 
 app.start = function () {
+
   //set view engine
-  app.engine('handlebars', exphbs());
+  // app.engine('handlebars', exphbs());
+  // app.set('view engine', 'handlebars');
+  var hbs = exphbs.create({ /* config */ });
+
+  // Register `hbs.engine` with the Express app.
+  app.engine('handlebars', hbs.engine);
   app.set('view engine', 'handlebars');
+  app.set('views', __dirname + '/views');
+
 
   // start the web server
   return app.listen(function () {
