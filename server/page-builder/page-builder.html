@@ -61,8 +61,8 @@
     
                             <div class="container mini-layout" [ngbCollapse]="isCollapsed[isection]">
                                 <div class="header">Layout</div>
-                                <div class="{{row.class}} pb-row" *ngFor="let row of section.data.rows; let irow = index">
-                                    <div class="{{column.class}}" *ngFor="let column of row.columns">
+                                <div class="{{row.class}} pb-row s--row" *ngFor="let row of section.data.rows; let irow = index">
+                                    <div class="{{column.class}} s--column" *ngFor="let column of row.columns">
                                         <span class="badge badge-primary">Block</span>
                                     </div>
                                     <span class="badge badge-success" (click)="addColumn(section.id, irow)"><i

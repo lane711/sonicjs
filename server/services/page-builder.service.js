@@ -9,6 +9,9 @@ const apiUrl = 'http://localhost:3000/api/';
 var pageContent = '';
 var page;
 var id;
+var sectionTemplate = '';
+var rowTemplate = '';
+var columnTemplate = '';
 
 module.exports = {
 
@@ -58,6 +61,7 @@ module.exports = {
         // console.log('=== processTemplate ===')
         const $ = cheerio.load(html);
         // $('#page-id').val(this.page.id);
+        await this.loadHtmlTemplates($);
 
         // $('.blog-header-logo').text(this.page.id);
         // $('.blog-post-title').text('Cheerio Post');
@@ -70,10 +74,25 @@ module.exports = {
         return $.html();
     },
 
+    loadHtmlTemplates: async function($){
+
+        this.columnTemplate = $.html('.s--column');
+        console.log(chalk.blue('columnTemplate-->', this.columnTemplate));
+
+        this.rowTemplate = $.html('.s--row').replace(this.columnTemplate, '[[columnTemplate]]');
+        console.log(chalk.green('rowTemplate-->', this.rowTemplate));
+
+        this.sectionTemplate = $.html('.s--section').replace(this.rowTemplate, '[[rowTemplate]]');;
+        console.log(chalk.cyan('sectionTemplate-->', this.sectionTemplate));
+    },
+
     processSections: async function ($) {
-        let sectionTemplate = $.html('.s--section');
+
+
         let sectionWrapper = $('.s--section').parent();
         sectionWrapper.empty();
+
+
 
         // console.log('sectionTemplate', sectionTemplate);
 
@@ -82,10 +101,10 @@ module.exports = {
 
             await this.asyncForEach(sections, async (sectionId) => {
                 let section = await this.getContentById(sectionId);
-                pageContent += sectionTemplate.replace('{{section.data.title}}', section.data.title);
+                pageContent += this.sectionTemplate.replace('{{section.data.title}}', section.data.title);
                 // console.log(section);
                 // pageContent += `${section.data.title}`;
-                // await this.processRows($, sectionWrapper, section.data.rows)
+                await this.processRows($, section.data.rows)
  
                 // console.log(section);
             });
@@ -94,10 +113,12 @@ module.exports = {
         }
     },
 
-    processRows: async function ($, sectionWrapper, rows) {
+    processRows: async function ($, rows) {
+        let rowTemplate = $.html('.s--row');
+        console.log('rowTemplate', rowTemplate);
         for (const row of rows) {
-            pageContent += `<div class='row'>`;
-            await this.processColumns(row)
+            pageContent += `<div class='row'>ROW`;
+            // await this.processColumns(row)
             pageContent += `</div>`;
         }
     },
