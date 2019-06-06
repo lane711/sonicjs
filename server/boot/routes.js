@@ -28,20 +28,17 @@ module.exports = function (app) {
 
   // app.use(express.static(__dirname + '/public' ));
 
-  app.get('/hbs', function (req, res) {
+  app.get('/hbs', async function (req, res) {
     res.render('home');
 });
 
 
 //home page
   router.get('/', async function (req, res) {
-    this.page = await contentService.getPage('5cdf78fe3a2cf6a3c5ff7fea', null);
-    // console.log('page55', this.page);
-    let url = req.url;
-    // console.log('url get', url);
-
-    // console.log(this.getPage());
-    res.send(this.page);
+    // this.page = await contentService.getPageHtml('5cdf78fe3a2cf6a3c5ff7fea', null);
+    this.page = await contentService.getContentByUrl(req.url, 'page');
+console.log(this.page.data.layout.rows);
+    res.render('home', { title: this.page.data.name, rows:  this.page.data.layout.rows});
   });
 
 
@@ -72,10 +69,11 @@ module.exports = function (app) {
       // log(chalk.blue(req.url));
       return next();
     }
+    log(chalk.blue(req.url));
 
     this.page = await contentService.getContentByUrl(req.url, 'page');
-
-    res.send(this.page);
+console.log(this.page.data.layout.rows);
+    res.render('home', { title: this.page.data.name, rows:  this.page.data.layout.rows});
 
   });
   // app.use('/admin', function(req, res, next) {

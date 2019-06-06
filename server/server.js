@@ -31,7 +31,7 @@ app.start = function () {
 
     if (app.get('loopback-component-explorer')) {
       var explorerPath = app.get('loopback-component-explorer').mountPath;
-      console.log(chalk.cyan('REST API at: ', baseUrl, explorerPath));
+      console.log(chalk.cyan('REST API at: ', baseUrl + explorerPath));
     }
   });
 };

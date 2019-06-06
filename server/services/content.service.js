@@ -1,4 +1,4 @@
-var pageBuilderService = require( './/page-builder.service');
+var pageBuilderService = require('.//page-builder.service');
 var fs = require('fs');
 const cheerio = require('cheerio')
 const axios = require('axios');
@@ -21,7 +21,7 @@ module.exports = {
     //     ret
     // },
 
-    getPage: async function (id, instance) {
+    getPageHtml: async function (id, instance) {
         if (!id) {
             return;
         }
@@ -54,7 +54,7 @@ module.exports = {
                             console.log('page-->2', html.length);
                             resolve(html);
                         })
-                    
+
                     })
                 }
             });
@@ -273,15 +273,20 @@ module.exports = {
         // log(chalk.red('filter', filter));
         const encodedFilter = encodeURI(filter);
         let url = `${apiUrl}contents?filter=${encodedFilter}`;
-        // console.log('getContentByUrlurl', url);
-        let page = await axios.get(url);
-        // console.log('getContentByUrl:page.data', page.data[0])
+        console.log('getContentByUrlurl', url);
+        let pageRecord = await axios.get(url);
+        // console.log('getContentByUrl:page.data', page.data[0]);
         //now render page
-        let renderedPage = 'not found';
-        if (page.data[0]) {
-            renderedPage = await this.getPage(page.data[0].id, page.data[0]);
+        if (pageRecord.data[0]) {
+            let html = await this.getPageHtml(pageRecord.data[0].id, pageRecord.data[0]);
+            let page = pageRecord.data[0];
+            // page.data.html = html;
+            // console.log(page);
+            return page;
         }
-        return renderedPage;
+        // page.data[0].data.html = html;
+
+        return 'not found';
     },
 
     getContentById: async function (id) {
