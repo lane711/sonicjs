@@ -48,10 +48,10 @@ module.exports = {
                 else {
                     // console.log('data==>', data);
                     this.processTemplate(data).then(html => {
-                        console.log('getPage.page-->', html.length);
+                        // console.log('getPage.page-->', html.length);
                         this.page.data.body = html;
                         pageBuilderService.processPageBuilder(this.page).then(pagebuilder => {
-                            console.log('page-->2', pagebuilder.length);
+                            // console.log('page-->2', pagebuilder.length);
                             this.page.data.pagebuilder = pagebuilder;
 
                             resolve(html);
@@ -150,13 +150,13 @@ module.exports = {
                 pageContent += '</div>';
                 pageContent += `</section>`;
 
-                this.page.data.sections.push({id : sectionId, rows: rows});
+                this.page.data.sections.push({id : sectionId, title: section.data.title,  rows: rows});
 
 
-                // console.log(section);
+                // console.log('section==>', section);
             });
 
-            console.log('section====>', this.page.data.sections);
+            // console.log('section====>', this.page.data.sections);
 
 
             sectionWrapper.append(pageContent);
@@ -168,14 +168,14 @@ module.exports = {
     processRows: async function ($, sectionWrapper, rows) {
         let rowArray = [];
         for (const row of rows) {
-            console.log(chalk.red(JSON.stringify(row)));
+            // console.log(chalk.red(JSON.stringify(row)));
             pageContent += `<div class='row'>`;
             let columns = await this.processColumns(row);
             pageContent += `</div>`;
 
             rowArray.push(row);
         }
-        console.log('rowArray---->', rowArray);
+        // console.log('rowArray---->', rowArray);
         return rowArray;
     },
 
@@ -183,7 +183,7 @@ module.exports = {
         let columnArray = [];
         for (const column of row.columns) {
 
-            console.log('== column ==', column);
+            // console.log('== column ==', column);
             pageContent += `<div class='${column.class}'>`;
             pageContent += `${column.content}`;
             await this.processBlocks(column.content);
@@ -214,7 +214,7 @@ module.exports = {
         //         }
         //         catch(error){
         //             console.log(error);
-        //         }
+        //         }frowarr
         //     });
         // });
 
@@ -285,12 +285,12 @@ module.exports = {
     },
 
     getContentByUrl: async function (pageUrl, contentType) {
-        log(chalk.red('getContentByUrl', pageUrl))
+        // log(chalk.red('getContentByUrl', pageUrl))
         const filter = `{"where":{"and":[{"url":"${pageUrl}"},{"data.contentType":"${contentType}"}]}}`;
         // log(chalk.red('filter', filter));
         const encodedFilter = encodeURI(filter);
         let url = `${apiUrl}contents?filter=${encodedFilter}`;
-        console.log('getContentByUrlurl', url);
+        // console.log('getContentByUrlurl', url);
         let pageRecord = await axios.get(url);
         // console.log('getContentByUrl:page.data', page.data[0]);
         //now render page

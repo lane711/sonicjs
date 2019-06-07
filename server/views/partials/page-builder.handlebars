@@ -1,20 +1,6 @@
 <div class="pb-wrapper">
     <nav class="page-builder-nav">
 
-{{#each sections}}
-<section id="{{id}}">
-    {{#each this.rows}}
-    <div class="{{this.class}}">
-        {{#each this.columns}}
-        <div class="{{this.class}}">
-            {{this.content}}
-        </div>
-        {{/each}}
-    </div>
-    {{/each}}
-</section>
-{{/each}}
-
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active" id="page-tab" data-toggle="tab" href="#page" role="tab" aria-controls="page"
@@ -45,10 +31,11 @@
                     <li class="nav-title">Layout</li>
 
                     <div class="section-wrapper">
-                            <li class="nav-item nav-dropdown pb-section s--section" data-id="{{section.id}}"
+                        {{#each sections}}
+                        <li class="nav-item nav-dropdown pb-section s--section" data-id="{{this.id}}"
                             *ngFor="let section of sections; let isection = index">
                             <a class="nav-link">
-                                <i class="nav-icon fa fa-align-justify"></i><span>{{section.data.title}}</span>
+                                <i class="nav-icon fa fa-align-justify"></i><span>{{this.title}}</span>
                                 <!-- <ng-template #popTitle class="pop-title">Section Options</ng-template>
                                 <ng-template #popContent>
                                     <button class="btn btn-sm btn-block btn-primary"><i
@@ -63,23 +50,32 @@
                                     (click)="isCollapsed[isection] = !isCollapsed[isection]">
                                     <i class="nav-icon fa fa-chevron-down"></i>
                                 </button>
-    
-                                <button class="btn btn-outline-secondary section-edit pull-right" [ngbPopover]="popContent"
-                                    data-id="{{isection}}" [popoverTitle]="popTitle" placement="right"> <i
-                                        class="nav-icon fa fa-ellipsis-h"></i>
+
+                                <button class="btn btn-outline-secondary section-edit pull-right"
+                                    [ngbPopover]="popContent" data-id="{{isection}}" [popoverTitle]="popTitle"
+                                    placement="right"> <i class="nav-icon fa fa-ellipsis-h"></i>
                                 </button>
-    
+
                             </a>
-    
+
                             <div class="container mini-layout" [ngbCollapse]="isCollapsed[isection]">
                                 <div class="header">Layout</div>
-                                <div class="{{row.class}} pb-row s--row" *ngFor="let row of section.data.rows; let irow = index">
-                                    <div class="{{column.class}} s--column" *ngFor="let column of row.columns">
+
+                                {{#each this.rows}}
+                                <div class="{{this.class}} pb-row">
+
+                                    {{#each this.columns}}
+                                    <div class="{{this.class}}">
                                         <span class="badge badge-primary">Block</span>
                                     </div>
+                                    {{/each}}
+
                                     <span class="badge badge-success" (click)="addColumn(section.id, irow)"><i
                                             class="nav-icon fa fa-plus"></i></span>
                                 </div>
+                                {{/each}}
+
+
                                 <span class="badge badge-success" (click)="addRow(section.id)">
                                     <i class="nav-icon fa fa-plus"></i> Row</span>
                                 <div class="header">Background</div>
@@ -96,8 +92,10 @@
                                     </div>
                                 </div>
                             </div>
-    
-                        </li>                    </div>
+
+                        </li>
+                        {{/each}}
+                    </div>
 
 
 
