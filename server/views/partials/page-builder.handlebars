@@ -1,22 +1,7 @@
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
 <div class="pb-wrapper">
     <nav class="page-builder-nav">
-
-        <p>
-            <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button"
-                aria-expanded="false" aria-controls="collapseExample">
-                Link with href
-            </a>
-            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample"
-                aria-expanded="false" aria-controls="collapseExample">
-                Button with data-target
-            </button>
-        </p>
-        <div class="collapse" id="collapseExample">
-            <div class="card card-body">
-                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil
-                anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
-            </div>
-        </div>
 
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item">
@@ -63,7 +48,7 @@
                                         (click)="deleteSection(section.id)">Delete</button>
                                 </ng-template> -->
                                 <button type="button" class="btn btn-outline-secondary pull-right"
-                                    data-toggle="collapse" data-target="#1" aria-expanded="false"
+                                    data-toggle="collapse" data-target="#collapse{{this.id}}" aria-expanded="false"
                                     aria-controls="collapseExample">
                                     <i class="nav-icon fa fa-chevron-down"></i>
                                 </button>
@@ -75,7 +60,7 @@
 
                             </a>
 
-                            <div class="container mini-layout collapse" id="#1">
+                            <div class="container mini-layout collapse" id="collapse{{this.id}}">
                                 <div class="header">Layout</div>
 
                                 {{#each this.rows}}
@@ -117,7 +102,7 @@
 
 
                     <li class="nav-item">
-                        <a class="btn btn-outline-success pull-right" (click)='addSection()'>
+                        <a class="btn btn-outline-success pull-right add-section">
                             <i class="nav-icon fa fa-plus"></i> Add Secton</a>
                     </li>
 
@@ -132,6 +117,7 @@
         </div>
 
     </nav>
+
     <button class="sidebar-minimizer brand-minimizer" type="button"></button>
 </div>
 

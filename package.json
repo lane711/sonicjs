@@ -7,7 +7,7 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "start": "node .",
+    "start": "nodemon -e handlebars",
     "posttest": "npm run lint"
   },
   "dependencies": {

@@ -71,6 +71,7 @@ hr {
 
 .page .nav-link{
   height: 54px;
+  width: 246px;
 }
 
 .page .nav-link span{
@@ -80,11 +81,11 @@ hr {
 
 .pb-section{
   width:100%;
-  border: 1px inset transparent;
+  border: 1px solid transparent;
 }
 
 .pb-section:hover{
-  border: 1px inset #ccc;
+  border: 1px solid red;
 }
 
 .nav-title{
@@ -129,4 +130,20 @@ hr {
 
 .hide{
   display: none;
+}
+
+section{
+  border: 1px solid transparent;
+  }
+
+.section-highlight{
+border: 1px solid red;
+}
+
+.row{
+  border: 2px solid transparent;
+  }
+
+.row-highlight{
+border: 2px dashed green;
 }
