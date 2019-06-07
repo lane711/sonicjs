@@ -1,6 +1,23 @@
 <div class="pb-wrapper">
     <nav class="page-builder-nav">
 
+        <p>
+            <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button"
+                aria-expanded="false" aria-controls="collapseExample">
+                Link with href
+            </a>
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample"
+                aria-expanded="false" aria-controls="collapseExample">
+                Button with data-target
+            </button>
+        </p>
+        <div class="collapse" id="collapseExample">
+            <div class="card card-body">
+                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil
+                anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
+            </div>
+        </div>
+
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active" id="page-tab" data-toggle="tab" href="#page" role="tab" aria-controls="page"
@@ -32,8 +49,7 @@
 
                     <div class="section-wrapper">
                         {{#each sections}}
-                        <li class="nav-item nav-dropdown pb-section s--section" data-id="{{this.id}}"
-                            *ngFor="let section of sections; let isection = index">
+                        <li class="nav-item nav-dropdown pb-section" data-id="{{this.id}}">
                             <a class="nav-link">
                                 <i class="nav-icon fa fa-align-justify"></i><span>{{this.title}}</span>
                                 <!-- <ng-template #popTitle class="pop-title">Section Options</ng-template>
@@ -47,7 +63,8 @@
                                         (click)="deleteSection(section.id)">Delete</button>
                                 </ng-template> -->
                                 <button type="button" class="btn btn-outline-secondary pull-right"
-                                    (click)="isCollapsed[isection] = !isCollapsed[isection]">
+                                    data-toggle="collapse" data-target="#1" aria-expanded="false"
+                                    aria-controls="collapseExample">
                                     <i class="nav-icon fa fa-chevron-down"></i>
                                 </button>
 
@@ -58,7 +75,7 @@
 
                             </a>
 
-                            <div class="container mini-layout" [ngbCollapse]="isCollapsed[isection]">
+                            <div class="container mini-layout collapse" id="#1">
                                 <div class="header">Layout</div>
 
                                 {{#each this.rows}}
