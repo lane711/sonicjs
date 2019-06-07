@@ -1,3 +1,15 @@
 <h1>Example App: Home {{title}}</h1>
 
-{{#each rows}} {{class}} {{/each}}
+{{#each sections}}
+<section id="{{id}}">
+    {{#each this.rows}}
+    <div class="{{this.class}}">
+        {{#each this.columns}}
+        <div class="{{this.class}}">
+            {{this.content}}
+        </div>
+        {{/each}}
+    </div>
+    {{/each}}
+</section>
+{{/each}}

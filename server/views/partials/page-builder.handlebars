@@ -1,0 +1,154 @@
+<div class="pb-wrapper">
+    <nav class="page-builder-nav">
+
+{{#each sections}}
+<section id="{{id}}">
+    {{#each this.rows}}
+    <div class="{{this.class}}">
+        {{#each this.columns}}
+        <div class="{{this.class}}">
+            {{this.content}}
+        </div>
+        {{/each}}
+    </div>
+    {{/each}}
+</section>
+{{/each}}
+
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="page-tab" data-toggle="tab" href="#page" role="tab" aria-controls="page"
+                    aria-selected="true">Page</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="template-tab" data-toggle="tab" href="#template" role="tab"
+                    aria-controls="template" aria-selected="false">Template</a>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="page" role="tabpanel" aria-labelledby="page-tab">
+
+                <ul class="nav page">
+
+                    <li class="nav-title">Page Settings</li>
+
+                    <li class="nav-item nav-dropdown">
+                        <a class="nav-link" (click)="refresh" href="#">
+                            <i class="nav-icon fa fa-gear"></i> Page Settings</a>
+                    </li>
+
+                    <li class="nav-item nav-dropdown">
+                        <a class="nav-link refresh" (click)="refresh" href="#">
+                            <i class="nav-icon fa fa-refresh"></i> Refresh</a>
+                    </li>
+
+                    <li class="nav-title">Layout</li>
+
+                    <div class="section-wrapper">
+                            <li class="nav-item nav-dropdown pb-section s--section" data-id="{{section.id}}"
+                            *ngFor="let section of sections; let isection = index">
+                            <a class="nav-link">
+                                <i class="nav-icon fa fa-align-justify"></i><span>{{section.data.title}}</span>
+                                <!-- <ng-template #popTitle class="pop-title">Section Options</ng-template>
+                                <ng-template #popContent>
+                                    <button class="btn btn-sm btn-block btn-primary"><i
+                                            class="nav-icon fa fa-arrows"></i></button>
+                                    <button class="btn btn-sm btn-block btn-secondary">Edit</button>
+                                    <button class="btn btn-sm btn-block btn-success">Duplicate</button>
+                                    <button class="btn btn-sm btn-block btn-warning">Remove</button>
+                                    <button class="btn btn-sm btn-block btn-danger"
+                                        (click)="deleteSection(section.id)">Delete</button>
+                                </ng-template> -->
+                                <button type="button" class="btn btn-outline-secondary pull-right"
+                                    (click)="isCollapsed[isection] = !isCollapsed[isection]">
+                                    <i class="nav-icon fa fa-chevron-down"></i>
+                                </button>
+    
+                                <button class="btn btn-outline-secondary section-edit pull-right" [ngbPopover]="popContent"
+                                    data-id="{{isection}}" [popoverTitle]="popTitle" placement="right"> <i
+                                        class="nav-icon fa fa-ellipsis-h"></i>
+                                </button>
+    
+                            </a>
+    
+                            <div class="container mini-layout" [ngbCollapse]="isCollapsed[isection]">
+                                <div class="header">Layout</div>
+                                <div class="{{row.class}} pb-row s--row" *ngFor="let row of section.data.rows; let irow = index">
+                                    <div class="{{column.class}} s--column" *ngFor="let column of row.columns">
+                                        <span class="badge badge-primary">Block</span>
+                                    </div>
+                                    <span class="badge badge-success" (click)="addColumn(section.id, irow)"><i
+                                            class="nav-icon fa fa-plus"></i></span>
+                                </div>
+                                <span class="badge badge-success" (click)="addRow(section.id)">
+                                    <i class="nav-icon fa fa-plus"></i> Row</span>
+                                <div class="header">Background</div>
+                                <div class="section-editor">
+                                    <div class="btn-group" role="group" aria-label="Basic example">
+                                        <button type="button" (click)="setSectionBackground(section.id, 'none')"
+                                            class="btn btn-secondary btn-sm"><i class="fa fa-ban"></i></button>
+                                        <button type="button" (click)="setSectionBackground(section.id, 'color')"
+                                            class="btn btn-secondary btn-sm"><i class="fa fa-tint"></i></button>
+                                        <button type="button" (click)="setSectionBackground(section.id, 'image')"
+                                            class="btn btn-secondary btn-sm"><i class="fa fa-image"></i></button>
+                                        <button type="button" (click)="setSectionBackground(section.id, 'video')"
+                                            class="btn btn-secondary btn-sm"><i class="fa fa-film"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+    
+                        </li>                    </div>
+
+
+
+                    <li class="nav-item">
+                        <a class="btn btn-outline-success pull-right" (click)='addSection()'>
+                            <i class="nav-icon fa fa-plus"></i> Add Secton</a>
+                    </li>
+
+                </ul>
+
+            </div>
+            <div class="tab-pane fade" id="template" role="tabpanel" aria-labelledby="template-tab">
+
+                <p>template settings go here</p>
+
+            </div>
+        </div>
+
+    </nav>
+    <button class="sidebar-minimizer brand-minimizer" type="button"></button>
+</div>
+
+<div class="pb-page">
+    <div *ngIf='html' [innerHTML]="html | safe: 'html'"></div>
+</div>
+<!-- Modal -->
+<div class="modal fade admin-field-add" id="wysiwygModal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Block</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <input type="hidden" id="block-edit-it">
+                <div id="editor-container">
+
+                    <textarea id="block-content" class="wysiwyg-content">sipum 8</textarea>
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary wysiwyg-save" (click)='saveWYSIWYG()'
+                    data-dismiss="modal">Save</button>
+            </div>
+        </div>
+    </div>
+</div>

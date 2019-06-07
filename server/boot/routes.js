@@ -37,8 +37,8 @@ module.exports = function (app) {
   router.get('/', async function (req, res) {
     // this.page = await contentService.getPageHtml('5cdf78fe3a2cf6a3c5ff7fea', null);
     this.page = await contentService.getContentByUrl(req.url, 'page');
-    console.log('route home', this.page);
-    res.render('home', { title: this.page.data.name, rows: this.page.data.layout.rows, body: this.page.data.body });
+    console.log('route home section', this.page.data.sections);
+    res.render('home', { title: this.page.data.name, rows: this.page.data.layout.rows, sections: this.page.data.sections });
   });
 
 

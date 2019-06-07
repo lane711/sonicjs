@@ -130,6 +130,7 @@ module.exports = {
 
     processSections: async function ($) {
 
+        this.page.data.sections = [];
         let sectionWrapper = $('.s--section').parent(); //container
         sectionWrapper.empty();
 
@@ -140,15 +141,23 @@ module.exports = {
             let sections = page.data.layout;
 
             await this.asyncForEach(sections, async (sectionId) => {
+
+
                 let section = await this.getContentById(sectionId);
                 pageContent += `<section id='${section.id}' class="jumbotron-fluid">`;
                 pageContent += '<div class="container">';
-                await this.processRows($, sectionWrapper, section.data.rows)
+                let rows = await this.processRows($, sectionWrapper, section.data.rows)
                 pageContent += '</div>';
                 pageContent += `</section>`;
 
+                this.page.data.sections.push({id : sectionId, rows: rows});
+
+
                 // console.log(section);
             });
+
+            console.log('section====>', this.page.data.sections);
+
 
             sectionWrapper.append(pageContent);
         }
@@ -157,21 +166,31 @@ module.exports = {
 
     //TODO loop thru rows
     processRows: async function ($, sectionWrapper, rows) {
+        let rowArray = [];
         for (const row of rows) {
+            console.log(chalk.red(JSON.stringify(row)));
             pageContent += `<div class='row'>`;
-            await this.processColumns(row)
+            let columns = await this.processColumns(row);
             pageContent += `</div>`;
+
+            rowArray.push(row);
         }
+        console.log('rowArray---->', rowArray);
+        return rowArray;
     },
 
     processColumns: async function (row) {
+        let columnArray = [];
         for (const column of row.columns) {
-            // console.log('== column ==')
+
+            console.log('== column ==', column);
             pageContent += `<div class='${column.class}'>`;
             pageContent += `${column.content}`;
             await this.processBlocks(column.content);
             pageContent += `</div>`;
+            columnArray.push(column);
         }
+        return columnArray;
     },
 
     processBlocks: async function (blocks) {
