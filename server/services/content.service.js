@@ -21,7 +21,7 @@ module.exports = {
     //     ret
     // },
 
-    getPageHtml: async function (id, instance) {
+    getPage: async function (id, instance) {
         if (!id) {
             return;
         }
@@ -49,9 +49,11 @@ module.exports = {
                     // console.log('data==>', data);
                     this.processTemplate(data).then(html => {
                         console.log('getPage.page-->', html.length);
-                        this.page.html = html;
-                        pageBuilderService.processPageBuilder(this.page).then(html => {
-                            console.log('page-->2', html.length);
+                        this.page.data.body = html;
+                        pageBuilderService.processPageBuilder(this.page).then(pagebuilder => {
+                            console.log('page-->2', pagebuilder.length);
+                            this.page.data.pagebuilder = pagebuilder;
+
                             resolve(html);
                         })
 
@@ -70,11 +72,7 @@ module.exports = {
         // this.setupShortCodeParser();
         // console.log('=== processTemplate ===')
         const $ = cheerio.load(html);
-        $('#page-id').val(this.page.id);
 
-        $('.blog-header-logo').text(this.page.id);
-        $('.blog-post-title').text('Cheerio Post');
-        await this.processMenu($);
 
         await this.processSections($);
 
@@ -278,7 +276,7 @@ module.exports = {
         // console.log('getContentByUrl:page.data', page.data[0]);
         //now render page
         if (pageRecord.data[0]) {
-            let html = await this.getPageHtml(pageRecord.data[0].id, pageRecord.data[0]);
+            let html = await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);
             let page = pageRecord.data[0];
             // page.data.html = html;
             // console.log(page);

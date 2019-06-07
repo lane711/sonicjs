@@ -22,7 +22,7 @@ module.exports = {
     processPageBuilder: async function (page) {
         // console.log('<==processPageBuilder', page);
         this.page = page;
-        const $ = cheerio.load(page.html);
+        const $ = cheerio.load(page.data.body);
 
         let body = $('body');
 
@@ -30,9 +30,10 @@ module.exports = {
         let ui = await this.getPageBuilderUI();
 
         // console.log(pageBuilder);
-        body.prepend(ui);
+        // body.prepend(ui);
 
-        return $.html();
+        // return $.html();
+        return ui;
 
     },
 
@@ -115,7 +116,7 @@ module.exports = {
 
     processRows: async function ($, rows) {
         let rowTemplate = $.html('.s--row');
-        console.log('rowTemplate', rowTemplate);
+        // console.log('rowTemplate', rowTemplate);
         for (const row of rows) {
             pageContent += `<div class='row'>ROW`;
             // await this.processColumns(row)
