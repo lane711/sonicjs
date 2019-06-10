@@ -48,14 +48,15 @@ module.exports = {
                 else {
                     // console.log('data==>', data);
                     this.processTemplate(data).then(html => {
+                        resolve('ok');
                         // console.log('getPage.page-->', html.length);
-                        this.page.data.body = html;
-                        pageBuilderService.processPageBuilder(this.page).then(pagebuilder => {
-                            // console.log('page-->2', pagebuilder.length);
-                            this.page.data.pagebuilder = pagebuilder;
+                        // this.page.data.body = html;
+                        // pageBuilderService.processPageBuilder(this.page).then(pagebuilder => {
+                        //     // console.log('page-->2', pagebuilder.length);
+                        //     this.page.data.pagebuilder = pagebuilder;
 
-                            resolve(html);
-                        })
+                        //     resolve(html);
+                        // })
 
                     })
                 }
@@ -295,10 +296,10 @@ module.exports = {
         // console.log('getContentByUrl:page.data', page.data[0]);
         //now render page
         if (pageRecord.data[0]) {
-            let proceesedPage = await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);
+            await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);
             let page = pageRecord.data[0];
             // page.data.html = html;
-            console.log(proceesedPage);
+            console.log(page);
             return page;
         }
         // page.data[0].data.html = html;

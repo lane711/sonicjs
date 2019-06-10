@@ -127,11 +127,45 @@ async function generateNewColumn() {
     return col;
 }
 
+async function addRow(sectionId) {
+    console.log('adding row to section: ' + sectionId);
+    // let row = await this.generateNewRow();
+
+    // let section = await this.contentService.getContentInstance(sectionId) as any;
+    // section.data.rows.push(row);
+    // this.contentService.editContentInstance(section);
+
+    // this.fullPageUpdate();
+  }
+
+  async function addColumn(sectionId, rowIndex) {
+    console.log('adding column ', sectionId, rowIndex);
+    let section = await getContentInstance(sectionId);
+    console.log('secton', section);
+    let column = await generateNewColumn();
+    section.data.rows[rowIndex].columns.push(column);
+    console.log(section.data.rows[rowIndex].columns);
+    contentService.editContentInstance(section);
+
+    fullPageUpdate();
+  }
+
 createContentInstance2 = async () => {
     let res = await axios.get("https://reqres.in/api/users?page=1");
     let { data } = await res.data;
     this.setState({ users: data });
 };
+
+async function getContentInstance(id) {
+    return axios.get(`/api/contents/${id}`)
+        .then(async function (response) {
+            console.log(response);
+            return await response.data;
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+}
 
 async function createContentInstance(payload) {
     console.log('createContentInstance payload', payload);
@@ -229,4 +263,10 @@ function setupWYSIWYG() {
             xhr.send(formData);
         }
     });
+}
+
+//TODO, make this just refresh the body content with a full get
+function fullPageUpdate(){
+    console.log('refreshing page');
+    location.reload();
 }

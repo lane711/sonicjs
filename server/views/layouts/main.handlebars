@@ -25,9 +25,9 @@
 </head>
 
 <body>
-<input type="hidden" name="page-id" id="page-id" value="{{id}}">
-<!-- <page-builder></page-builder> -->
-<!-- <custom-button label="custom lane"></custom-button> -->
+  <input type="hidden" name="page-id" id="page-id" value="{{id}}">
+  <!-- <page-builder></page-builder> -->
+  <!-- <custom-button label="custom lane"></custom-button> -->
   <nav class="navbar navbar-expand-md navbar-dark bg-ptrans fixed-top">
     <a class="navbar-brand" href="#">HBS Nav</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
@@ -63,11 +63,18 @@
   </main><!-- /.container -->
 
   <footer class="blog-footer">
-    <p>Blog template built for <a href="https://getbootstrap.com/">Bootstrap</a> by <a
-        href="https://twitter.com/mdo">@mdo</a>.</p>
-    <p>
-      <a href="#">Back to top</a>
-    </p>
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <p>Blog template built for <a href="https://getbootstrap.com/">Bootstrap</a> by <a
+              href="https://twitter.com/mdo">@mdo</a>.</p>
+          <p>
+            <a href="#">Back to top</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
   </footer>
 
   <script src="jquery.min.js"></script>
@@ -79,4 +86,4 @@
 
 </body>
 
-</html> 
+</html>
