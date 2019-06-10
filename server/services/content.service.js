@@ -78,6 +78,7 @@ module.exports = {
         await this.processSections($);
 
         // await this.processPageBuilder($);
+        console.log('section content', pageContent);
 
         return $.html();
     },
@@ -269,6 +270,7 @@ module.exports = {
     replaceShortCode: async function (shortcode) {
         let blockId = shortcode.properties.id;
         let content = await this.getContentById(blockId);
+        // console.log('replaceShortCode.getContentById', content);
         let newBody = `<span data-id="${blockId}">${content.data.body}</span>`;
         pageContent = pageContent.replace(shortcode.codeText, newBody);
     },
@@ -298,7 +300,7 @@ module.exports = {
         if (pageRecord.data[0]) {
             await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);
             let page = pageRecord.data[0];
-            // page.data.html = html;
+            page.data.html = pageContent;
             console.log(page);
             return page;
         }
@@ -310,10 +312,10 @@ module.exports = {
     getContentById: async function (id) {
         let url = `${apiUrl}contents/${id}`;
         // console.log('url', url);
-        let page = await axios.get(url);
-        page.data.html = undefined;
+        let content = await axios.get(url);
+        //page.data.html = undefined;
         // console.log('getContent', page.data);
-        return page.data;
+        return content.data;
     },
 
     // getMenuItems: async function () {

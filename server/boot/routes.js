@@ -39,7 +39,7 @@ module.exports = function (app) {
     this.page = await contentService.getContentByUrl(req.url, 'page');
     // console.log('route home section', JSON.stringify(this.page));
     res.render('home', { id:this.page.id, title: this.page.data.name, rows: this.page.data.layout.rows, 
-      sections: this.page.data.sections });
+      sections: this.page.data.sections, html: this.page.data.html });
   });
 
 
