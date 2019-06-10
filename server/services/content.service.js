@@ -295,10 +295,10 @@ module.exports = {
         // console.log('getContentByUrl:page.data', page.data[0]);
         //now render page
         if (pageRecord.data[0]) {
-            let html = await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);
+            let proceesedPage = await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);
             let page = pageRecord.data[0];
             // page.data.html = html;
-            // console.log(page);
+            console.log(proceesedPage);
             return page;
         }
         // page.data[0].data.html = html;

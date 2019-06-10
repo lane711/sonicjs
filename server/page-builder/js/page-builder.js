@@ -1,9 +1,23 @@
+var page = {};
+
 $(document).ready(function () {
     setupUIHovers();
     setupClickEvents();
-    axiosTest();
+    // axiosTest();
     // SetupWYSIWYG();
+    getPage();
 });
+
+async function getPage(){
+    let pageId = $('#page-id').val();
+    // console.log('pageId', pageId);
+    axios.get(`/api/contents/${pageId}`)
+        .then(function (response) {
+            // handle success
+            page = response.data;
+            console.log(page);
+        })
+}
 
 function axiosTest() {
     console.log('running axios');
@@ -62,27 +76,28 @@ async function setupClickEvents() {
 async function addSection() {
 
     console.log('adding section');
-    let row = generateNewRow();
+    let row = await generateNewRow();
     //rows
     let rows = [row];
 
     //section
     let nextSectionCount = 1;
-    // if (this.page.data.layout) {
-    //   nextSectionCount = this.page.data.layout.length + 1;
-    // }
+    debugger;
+    if (page.data.layout) {
+      nextSectionCount = page.data.layout.length + 1;
+    }
 
-    // let section = { title: `Section ${nextSectionCount}`, contentType: 'section', rows: rows };
-    // let s1 = await createContentInstance(section);
+    let section = { title: `Section ${nextSectionCount}`, contentType: 'section', rows: rows };
+    let s1 = await createContentInstance(section);
 
-    // //add to current page
-    // if (!this.page.data.layout) {
-    //   this.page.data.layout = []
-    // }
-    // this.page.data.layout.push(s1.id);
+    //add to current page
+    if (!page.data.layout) {
+      page.data.layout = []
+    }
+    page.data.layout.push(s1.id);
 
-    // // this.contentService.editPage(this.page);
-    // let updatedPage = await editContentInstance(this.page);
+    // this.contentService.editPage(this.page);
+    let updatedPage = await editContentInstance(page);
 
 
     //update ui
@@ -91,7 +106,7 @@ async function addSection() {
     //this.refreshPage(updatedPage);
 }
 
-async function generateNewRow() {
+async function generateNewRow() { 
 
     let col = await generateNewColumn();
 
@@ -105,7 +120,6 @@ async function generateNewColumn() {
 
     //save blocks and get the ids
     let b1 = await createContentInstance(block1);
-    debugger;
     let b1ShortCode = `[BLOCK id="${b1.id}"/]`;
 
     //columns
@@ -137,14 +151,14 @@ async function createContentInstance(payload) {
 
 }
 
-function editContentInstance(payload) {
+async function editContentInstance(payload) {
     let id = payload.id;
     console.log('putting payload', payload);
     // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
-    axios.put(`/api/contents/${id}`, content)
-        .then(function (response) {
+    return axios.put(`/api/contents/${id}`, payload)
+        .then(async function (response) {
             console.log(response);
-            return response.data;
+            return await response.data;
         })
         .catch(function (error) {
             console.log(error);
