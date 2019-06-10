@@ -82,7 +82,6 @@ async function addSection() {
 
     //section
     let nextSectionCount = 1;
-    debugger;
     if (page.data.layout) {
       nextSectionCount = page.data.layout.length + 1;
     }
@@ -103,7 +102,7 @@ async function addSection() {
     //update ui
     // this.fullPageUpdate();
     // this.loadSections(updatedPage);
-    //this.refreshPage(updatedPage);
+    fullPageUpdate();
 }
 
 async function generateNewRow() { 
@@ -129,13 +128,13 @@ async function generateNewColumn() {
 
 async function addRow(sectionId) {
     console.log('adding row to section: ' + sectionId);
-    // let row = await this.generateNewRow();
+    let row = await this.generateNewRow();
 
-    // let section = await this.contentService.getContentInstance(sectionId) as any;
-    // section.data.rows.push(row);
-    // this.contentService.editContentInstance(section);
+    let section = await getContentInstance(sectionId);
+    section.data.rows.push(row);
+    editContentInstance(section);
 
-    // this.fullPageUpdate();
+    fullPageUpdate();
   }
 
   async function addColumn(sectionId, rowIndex) {
@@ -144,8 +143,8 @@ async function addRow(sectionId) {
     console.log('secton', section);
     let column = await generateNewColumn();
     section.data.rows[rowIndex].columns.push(column);
-    console.log(section.data.rows[rowIndex].columns);
-    contentService.editContentInstance(section);
+    console.log('columns', section.data.rows[rowIndex].columns);
+    editContentInstance(section);
 
     fullPageUpdate();
   }

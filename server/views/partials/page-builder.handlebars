@@ -72,13 +72,13 @@
                                     </div>
                                     {{/each}}
 
-                                    <span class="badge badge-success" onclick="addColumn('{{../../this.id}}', {{@index}})"><i
+                                    <span class="badge badge-success" onclick="addColumn('{{../this.id}}', {{@index}})"><i
                                             class="nav-icon fa fa-plus"></i></span>
                                 </div>
                                 {{/each}}
 
 
-                                <span class="badge badge-success" onclick="addRow(section.id)">
+                                <span class="badge badge-success" onclick="addRow('{{this.id}}')">
                                     <i class="nav-icon fa fa-plus"></i> Row</span>
                                 <div class="header">Background</div>
                                 <div class="section-editor">
