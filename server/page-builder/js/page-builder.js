@@ -239,8 +239,8 @@ function setupWYSIWYG() {
         $('textarea.wysiwyg-content').tinymce({
             selector: '#block-content',
             height: 600,
-            plugins: 'image imagetools',
-            toolbar: 'formatselect | bold italic strikethrough forecolor backcolor permanentpen formatpainter | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat | addcomment',
+            plugins: 'image imagetools code',
+            toolbar: 'code | formatselect | bold italic strikethrough forecolor backcolor permanentpen formatpainter | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat | addcomment',
             image_advtab: false,
             image_list: [
                 { title: 'My image 1', value: 'https://www.tinymce.com/my1.gif' },
