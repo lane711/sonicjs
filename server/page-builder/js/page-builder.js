@@ -283,6 +283,21 @@ function setupWYSIWYG() {
     });
 }
 
+async function saveWYSIWYG() {
+    let id = $('#block-edit-it').val();
+    console.log('saving ' + id);
+
+    let content = $('textarea.wysiwyg-content').html();
+
+    //update db
+    let block = await getContentInstance(id);
+    block.data.body = content;
+    editContentInstance(block);
+
+    //update screen
+    $(`span[data-id="${id}"]`).html(content);
+  }
+
 //TODO, make this just refresh the body content with a full get
 function fullPageUpdate() {
     console.log('refreshing page');
