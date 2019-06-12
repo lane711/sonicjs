@@ -21,6 +21,13 @@ module.exports = {
     //     ret
     // },
 
+    getRenderedPage: async function(req){
+        this.page = await this.getContentByUrl(req.url, 'page');
+        let menu = await this.getContent('menu');
+        return{ id:this.page.id, title: this.page.data.name, rows: this.page.data.layout.rows, 
+          sections: this.page.data.sections, html: this.page.data.html, menu: menu };
+    },
+
     getPage: async function (id, instance) {
         if (!id) {
             return;
@@ -78,7 +85,7 @@ module.exports = {
         await this.processSections($);
 
         // await this.processPageBuilder($);
-        console.log('section content', pageContent);
+        // console.log('section content', pageContent);
 
         return $.html();
     },
@@ -301,7 +308,7 @@ module.exports = {
             await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);
             let page = pageRecord.data[0];
             page.data.html = pageContent;
-            console.log(page);
+            // console.log(page);
             return page;
         }
         // page.data[0].data.html = html;

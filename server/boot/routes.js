@@ -35,11 +35,7 @@ module.exports = function (app) {
 
   //home page
   router.get('/', async function (req, res) {
-    // this.page = await contentService.getPageHtml('5cdf78fe3a2cf6a3c5ff7fea', null);
-    this.page = await contentService.getContentByUrl(req.url, 'page');
-    // console.log('route home section', JSON.stringify(this.page));
-    res.render('home', { id:this.page.id, title: this.page.data.name, rows: this.page.data.layout.rows, 
-      sections: this.page.data.sections, html: this.page.data.html });
+    res.render('home', await contentService.getRenderedPage(req));
   });
 
 
@@ -70,11 +66,8 @@ module.exports = function (app) {
       // log(chalk.blue(req.url));
       return next();
     }
-    log(chalk.blue(req.url)); 
-    this.page = await contentService.getContentByUrl(req.url, 'page');
-    console.log(this.page.data.layout.rows);
-    res.render('home', { title: this.page.data.name, rows: this.page.data.layout.rows });
 
+    res.render('home', await contentService.getRenderedPage(req));
   });
   // app.use('/admin', function(req, res, next) {
   //   console.log('admin route', req.url);
@@ -108,3 +101,4 @@ module.exports = function (app) {
   app.use(router);
 
 };  
+
