@@ -4,11 +4,11 @@ $(document).ready(function () {
     setupUIHovers();
     setupClickEvents();
     // axiosTest();
-    // SetupWYSIWYG();
+    setupWYSIWYG();
     getPage();
 });
 
-async function getPage(){
+async function getPage() {
     let pageId = $('#page-id').val();
     // console.log('pageId', pageId);
     axios.get(`/api/contents/${pageId}`)
@@ -83,7 +83,7 @@ async function addSection() {
     //section
     let nextSectionCount = 1;
     if (page.data.layout) {
-      nextSectionCount = page.data.layout.length + 1;
+        nextSectionCount = page.data.layout.length + 1;
     }
 
     let section = { title: `Section ${nextSectionCount}`, contentType: 'section', rows: rows };
@@ -91,7 +91,7 @@ async function addSection() {
 
     //add to current page
     if (!page.data.layout) {
-      page.data.layout = []
+        page.data.layout = []
     }
     page.data.layout.push(s1.id);
 
@@ -105,7 +105,7 @@ async function addSection() {
     fullPageUpdate();
 }
 
-async function generateNewRow() { 
+async function generateNewRow() {
 
     let col = await generateNewColumn();
 
@@ -135,9 +135,9 @@ async function addRow(sectionId) {
     editContentInstance(section);
 
     fullPageUpdate();
-  }
+}
 
-  async function addColumn(sectionId, rowIndex) {
+async function addColumn(sectionId, rowIndex) {
     console.log('adding column ', sectionId, rowIndex);
     let section = await getContentInstance(sectionId);
     console.log('secton', section);
@@ -147,7 +147,7 @@ async function addRow(sectionId) {
     editContentInstance(section);
 
     fullPageUpdate();
-  }
+}
 
 createContentInstance2 = async () => {
     let res = await axios.get("https://reqres.in/api/users?page=1");
@@ -213,59 +213,78 @@ function processContentFields(payload, content) {
 
 function setupWYSIWYG() {
     console.log('WYSIWYG setup');
-    tinymce.remove(); //remove previous editor
-    // tinymce.baseURL = '/tinymce/';
-    // console.log('tinymce.base_url',tinymce.baseURL);
-    //plugins: 'print preview fullpage powerpaste searchreplace autolink directionality advcode visualblocks visualchars fullscreen image link media mediaembed template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount tinymcespellchecker a11ychecker imagetools textpattern help formatpainter permanentpen pageembed tinycomments mentions linkchecker',
 
-    $('textarea.wysiwyg-content').tinymce({
-        selector: '#block-content',
-        height: 600,
-        plugins: 'image imagetools',
-        toolbar: 'formatselect | bold italic strikethrough forecolor backcolor permanentpen formatpainter | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat | addcomment',
-        image_advtab: false,
-        image_list: [
-            { title: 'My image 1', value: 'https://www.tinymce.com/my1.gif' },
-            { title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif' }
-        ],
-        // images_upload_url: 'http://localhost:3000/api/containers/container1/upload',
-        automatic_uploads: true,
-        images_upload_handler: function (blobInfo, success, failure) {
-            var xhr, formData;
+    $('section span').on("click", function () {
+        var id = $(this).data("id");
+        console.log('span clicked ' + id);
+        $('#block-edit-it').val(id);
+        $('#wysiwygModal').appendTo("body").modal('show');
 
-            xhr = new XMLHttpRequest();
-            xhr.withCredentials = false;
-            xhr.open('POST', "http://localhost:3000/api/containers/container1/upload");
+        var content = $(this).html();
+        $('textarea.wysiwyg-content').html(content);
 
-            xhr.onload = function () {
-                var json;
+        // $(document).off('focusin.modal');
+        //allow user to interact with tinymcs dialogs: https://stackoverflow.com/questions/36279941/using-tinymce-in-a-modal-dialog
+        $(document).on('focusin', function (e) {
+            if ($(e.target).closest(".tox-dialog").length) {
+                e.stopImmediatePropagation();
+            }
+        });
 
-                if (xhr.status != 200) {
-                    failure("HTTP Error: " + xhr.status);
-                    return;
-                }
+        tinymce.remove(); //remove previous editor
+        // tinymce.baseURL = '/tinymce/';
+        // console.log('tinymce.base_url',tinymce.baseURL);
+        //plugins: 'print preview fullpage powerpaste searchreplace autolink directionality advcode visualblocks visualchars fullscreen image link media mediaembed template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount tinymcespellchecker a11ychecker imagetools textpattern help formatpainter permanentpen pageembed tinycomments mentions linkchecker',
 
-                json = JSON.parse(xhr.responseText);
-                var file = json.result.files.file[0];
-                var location = `http://localhost:3000/api/containers/${file.container}/download/${file.name}`;
-                if (!location) {
-                    failure("Invalid JSON: " + xhr.responseText);
-                    return;
-                }
+        $('textarea.wysiwyg-content').tinymce({
+            selector: '#block-content',
+            height: 600,
+            plugins: 'image imagetools',
+            toolbar: 'formatselect | bold italic strikethrough forecolor backcolor permanentpen formatpainter | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat | addcomment',
+            image_advtab: false,
+            image_list: [
+                { title: 'My image 1', value: 'https://www.tinymce.com/my1.gif' },
+                { title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif' }
+            ],
+            // images_upload_url: 'http://localhost:3000/api/containers/container1/upload',
+            automatic_uploads: true,
+            images_upload_handler: function (blobInfo, success, failure) {
+                var xhr, formData;
 
-                success(location);
-            };
+                xhr = new XMLHttpRequest();
+                xhr.withCredentials = false;
+                xhr.open('POST', "http://localhost:3000/api/containers/container1/upload");
 
-            formData = new FormData();
-            formData.append('file', blobInfo.blob(), blobInfo.filename());
+                xhr.onload = function () {
+                    var json;
 
-            xhr.send(formData);
-        }
+                    if (xhr.status != 200) {
+                        failure("HTTP Error: " + xhr.status);
+                        return;
+                    }
+
+                    json = JSON.parse(xhr.responseText);
+                    var file = json.result.files.file[0];
+                    var location = `http://localhost:3000/api/containers/${file.container}/download/${file.name}`;
+                    if (!location) {
+                        failure("Invalid JSON: " + xhr.responseText);
+                        return;
+                    }
+
+                    success(location);
+                };
+
+                formData = new FormData();
+                formData.append('file', blobInfo.blob(), blobInfo.filename());
+
+                xhr.send(formData);
+            }
+        });
     });
 }
 
 //TODO, make this just refresh the body content with a full get
-function fullPageUpdate(){
+function fullPageUpdate() {
     console.log('refreshing page');
     location.reload();
 }
