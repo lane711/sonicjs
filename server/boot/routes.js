@@ -1,6 +1,7 @@
 var themes = require(__dirname + '../../themes/themes');
 var contentService = require('../services/content.service');
 var pageBuilderService = require('../services/page-builder.service');
+var cors = require('cors');
 
 const chalk = require('chalk');
 const log = console.log;
@@ -14,6 +15,8 @@ module.exports = function (app) {
   let page = '';
   let adminPage = '';
 
+  
+
   (async () => {
     // page = await themes.getTheme();
     // page = this.contentService.getPage('5cdb5cc2f744441df910f43f', null);
@@ -22,16 +25,30 @@ module.exports = function (app) {
 
   (async () => {
     //TODO fix admin path for prod mode
-    // adminPage = await admin.loadAdmin();
+    adminPage = await admin.loadAdmin();
     // console.log('asunc page ==>', page);
   })();
 
   // app.use(express.static(__dirname + '/public' ));
 
+  app.use(cors());
+
   app.get('/hbs', async function (req, res) {
     res.render('home');
   });
 
+  app.get('/test', async function (req, res) {
+    res.send('ok');
+  });
+
+  app.get('/admin', async function (req, res) {
+    res.send(adminPage);
+  });
+
+  // router.get('/admin2', function (req, res) {
+  //   console.log('admin---')
+  //   res.send(adminPage);
+  // });
 
   //home page
   router.get('/', async function (req, res) {
@@ -52,9 +69,7 @@ module.exports = function (app) {
   //   res.send(adminPage);
   // });
 
-  router.get('/admin', function (req, res) {
-    res.send(adminPage);
-  });
+
 
   router.get('/admin/content-types', function (req, res) {
     res.send(adminPage);
@@ -84,10 +99,10 @@ module.exports = function (app) {
 
   // Allow from a specific host.
   // Sets "X-Frame-Options: ALLOW-FROM http://example.com".
-  app.use(helmet.frameguard({
-    action: 'allow-from',
-    domain: 'http://localhost:4200'
-  }))
+  // app.use(helmet.frameguard({
+  //   action: 'allow-from',
+  //   domain: 'http://localhost:4200'
+  // }))
 
   // app.use(helmet.frameguard({ action: 'sameorigin' }))
 
@@ -96,6 +111,7 @@ module.exports = function (app) {
 
 
   // app.use(helmet.frameguard({ action: 'sameorigin' }))
+
 
 
   app.use(router);

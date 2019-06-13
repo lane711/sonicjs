@@ -5,7 +5,7 @@ const chalk = require('chalk');
 module.exports = {
 
     loadAdmin: function () {
-        let adminPath = path.join(__dirname, '../..', '/admim/dist/client/index.html');
+        let adminPath = path.join(__dirname, '../..', '/admin/dist/client/index.html');
         console.log('adminPath--->', adminPath);
 
         return new Promise((resolve, reject) => {
