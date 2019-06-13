@@ -24,7 +24,11 @@ module.exports = {
     getRenderedPage: async function(req){
         this.page = await this.getContentByUrl(req.url, 'page');
         let menu = await this.getContent('menu');
-        return{ id:this.page.id, title: this.page.data.name, rows: this.page.data.layout.rows, 
+        let rows = [];
+        if(this.page.data.layout){
+            rows = this.page.data.layout.rows;
+        }
+        return{ id:this.page.id, title: this.page.data.name, rows: rows, 
           sections: this.page.data.sections, html: this.page.data.html, menu: menu };
     },
 
