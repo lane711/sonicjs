@@ -31,7 +31,7 @@ module.exports = function (app) {
 
   // app.use(express.static(__dirname + '/public' ));
 
-  app.use(cors());
+  // app.use(cors());
 
   app.get('/hbs', async function (req, res) {
     res.render('home');
