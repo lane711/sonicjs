@@ -31,6 +31,7 @@ import { ContentAddComponent } from './components/content/content-add/content-ad
 import { PageBuilderComponent } from './components/page-builder/page-builder.component';
 import { PageBuilderEditorComponent } from './components/page-builder-editor/page-builder-editor.component';
 import { EditorModule } from '@tinymce/tinymce-angular';
+import { MediaComponent } from './components/media/media.component';
 
 @NgModule({
   declarations: [
@@ -59,7 +60,8 @@ import { EditorModule } from '@tinymce/tinymce-angular';
     SandboxComponent,
     ContentAddComponent,
     PageBuilderComponent,
-    PageBuilderEditorComponent
+    PageBuilderEditorComponent,
+    MediaComponent
   ],
   imports: [
     BrowserModule,

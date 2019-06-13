@@ -8,6 +8,7 @@ import { ContentTypeEditFieldComponent } from "../components/content-types/conte
 import { ContentComponent } from "../components/content/content.component";
 import { ContentEditComponent } from "../components/content/content-edit/content-edit.component";
 import { ContentAddComponent } from "../components/content/content-add/content-add.component";
+import { MediaComponent } from "../components/media/media.component";
 import { PageBuilderComponent } from "../components/page-builder/page-builder.component";
 
 import { FieldTypesComponent } from "../components/field-types/field-types.component";
@@ -25,6 +26,7 @@ const routes: Routes = [
     { path: "content", component: ContentComponent },
     { path: "content/add", component: ContentAddComponent },
     { path: "content/:id", component: ContentEditComponent },
+    { path: "media", component: MediaComponent },
     { path: "page-builder/:id", component: PageBuilderComponent },
     { path: "sandbox", component: SandboxComponent },
     // { path: "**", component: PagesComponent},
