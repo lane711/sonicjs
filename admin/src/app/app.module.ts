@@ -33,6 +33,17 @@ import { PageBuilderEditorComponent } from './components/page-builder-editor/pag
 import { EditorModule } from '@tinymce/tinymce-angular';
 import { MediaComponent } from './components/media/media.component';
 
+import { DropzoneModule } from 'ngx-dropzone-wrapper';    
+import { DROPZONE_CONFIG } from 'ngx-dropzone-wrapper';    
+import { DropzoneConfigInterface } from 'ngx-dropzone-wrapper'; 
+const DROPZONECONFIG: DropzoneConfigInterface = {    
+    
+  url: 'localhost:52367/post',    
+  maxFilesize: 100,    
+  acceptedFiles: 'image/jpg,image/png,image/jpeg/*'    
+    
+};    
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -69,9 +80,15 @@ import { MediaComponent } from './components/media/media.component';
     HttpClientModule,
     ReactiveFormsModule,
     NgbModule,
-    EditorModule
+    EditorModule,
+    DropzoneModule
   ],
-  providers: [],
+  providers: [    
+    {    
+      provide: DROPZONE_CONFIG,    
+      useValue: DROPZONECONFIG    
+    }    
+  ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
   // entryComponents: [MenuComponent]

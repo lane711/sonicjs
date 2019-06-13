@@ -6,6 +6,8 @@
     </div>
     <div class="card-body page-list">
 
+        <dropzone [config]="config" [message]="'Drag and Drop Images here'"></dropzone> 
+
       <div class="media-list pull-left" *ngFor="let media of mediaList">
         <img class="img-thumbnail" src="http://localhost:3000/api/containers/container1/download/{{ media.name }}" />
           

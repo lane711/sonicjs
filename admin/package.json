@@ -33,6 +33,7 @@
     "flag-icon-css": "3.2.0",
     "font-awesome": "4.7.0",
     "jquery": "3.3.1",
+    "ngx-dropzone-wrapper": "^8.0.0",
     "pace-progress": "1.0.2",
     "perfect-scrollbar": "1.4.0",
     "popper.js": "1.14.4",
