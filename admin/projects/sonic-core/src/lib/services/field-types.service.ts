@@ -66,6 +66,14 @@ export class FieldTypesService {
         }
       },
       {
+        id: "d0910500-bf44-4104-b724-18eae721df7a",
+        name: "imagelist",
+        desc: "Image drop down list",
+        generateHtml: function(id = "notDefined", placeholder = "", css = "") {
+          return self.getCountryDropDownList(id, placeholder, css);
+        }
+      },
+      {
         id: "34def6c2-9b99-473e-b685-2f75814a7c98",
         name: "layout",
         desc: "Bootstrap layout building",
@@ -110,6 +118,17 @@ export class FieldTypesService {
       "<option>United Kingdom</option>" +
       "<option>Canada</option>" +
       "<option>Mexico</option>" +
+      "</select>"
+    );
+  }
+
+  public getImageDropDownList(id = "notDefined", placeholder = "", css = "") {
+    return (
+      `<select class="form-control" name="${id}">` +
+      "<option>Image 1</option>" +
+      "<option>Image 2</option>" +
+      "<option>Image 3</option>" +
+      "<option>Image 4</option>" +
       "</select>"
     );
   }
