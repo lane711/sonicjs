@@ -28,6 +28,8 @@ module.exports = {
         if(this.page.data.layout){
             this.page.data.rows = this.page.data.layout.rows;
         }
+        this.page.data.siteSettings = await this.getContentTopOne('site-settings');
+        console.log('this.page.data.siteSettings', this.page.data.siteSettings);
         return{ page: this.page };
         // return{ id:this.page.id, title: this.page.data.name, rows: rows, 
         //   sections: this.page.data.sections, html: this.page.data.html, menu: menu, page: this.page };
@@ -297,6 +299,13 @@ module.exports = {
         // page.data.html = 'delete this';
         // console.log('getContent', page.data);
         return page.data;
+    },
+
+    getContentTopOne: async function (contentType) {
+
+        let results = await this.getContent(contentType);
+
+        return results[0].data;
     },
 
     getContentByUrl: async function (pageUrl, contentType) {
