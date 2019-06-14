@@ -32,7 +32,7 @@ export class MediaComponent implements OnInit {
 
   async loadMedia() {
     this.mediaList = await this.mediaService.getMedia();
-    console.log('media', this.mediaList);
+    // console.log('media', this.mediaList);
   }
 
   setupDropzone() {
@@ -41,6 +41,8 @@ export class MediaComponent implements OnInit {
   }
 
   public onUploadInit(args: any): void {
+    args.options.dictDefaultMessage = 'drop em';
+    args.options.withCredentials = false
     console.log('onUploadInit:', args);
   }
 
@@ -53,13 +55,48 @@ export class MediaComponent implements OnInit {
   }
 
   testPost() {
-    var data = new FormData();
-    data.append('image', 'http://placehold.it/300x500');
+    //use working postman example
+    // var data = new FormData();
+    // data.append('file', 'http://placehold.it/300x500');
 
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'localhost:3000/api/containers/container1/upload', true);
-    xhr.setRequestHeader('Authorization', 'Client-ID xxxxxxxxxx');
-    xhr.send(data);
+    // var xhr = new XMLHttpRequest();
+    // xhr.withCredentials = false;
+    // xhr.open('POST', 'http://localhost:3000/api/containers/container1/upload', true);
+    // // xhr.setRequestHeader('Authorization', 'Client-ID xxxxxxxxxx');
+    // xhr.send(data);
+
+
+    // var xhr, formData;
+
+    // xhr = new XMLHttpRequest();
+    // xhr.withCredentials = false;
+    // xhr.open('POST', "http://localhost:3000/api/containers/container1/upload");
+
+    // xhr.onload = function () {
+    //     var json;
+
+    //     if (xhr.status != 200) {
+    //         failure("HTTP Error: " + xhr.status);
+    //         return;
+    //     }
+
+    //     json = JSON.parse(xhr.responseText);
+    //     var file = json.result.files.file[0];
+    //     var location = `http://localhost:3000/api/containers/${file.container}/download/${file.name}`;
+    //     if (!location) {
+    //         failure("Invalid JSON: " + xhr.responseText);
+    //         return;
+    //     }
+
+    //     success(location);
+    // };
+
+    // formData = new FormData();
+    // formData.append('file', 'http://placehold.it/300x500', 'myfile.jpg');
+    // // formData.append('file', blobInfo.blob(), blobInfo.filename());
+
+    // xhr.send(formData);
+
   }
 
 }

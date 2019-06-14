@@ -38,7 +38,7 @@ import { DROPZONE_CONFIG } from 'ngx-dropzone-wrapper';
 import { DropzoneConfigInterface } from 'ngx-dropzone-wrapper'; 
 const DROPZONECONFIG: DropzoneConfigInterface = {    
     
-  url: 'localhost:3000/api/containers/container1/upload',    
+  url: 'http://localhost:3000/api/containers/container1/upload',    
   maxFilesize: 100,    
   acceptedFiles: 'image/jpg,image/png,image/jpeg/*',    
 };    
