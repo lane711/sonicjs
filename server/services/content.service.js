@@ -23,13 +23,14 @@ module.exports = {
 
     getRenderedPage: async function(req){
         this.page = await this.getContentByUrl(req.url, 'page');
-        let menu = await this.getContent('menu');
+        this.page.data.menu = await this.getContent('menu');
         let rows = [];
         if(this.page.data.layout){
-            rows = this.page.data.layout.rows;
+            this.page.data.rows = this.page.data.layout.rows;
         }
-        return{ id:this.page.id, title: this.page.data.name, rows: rows, 
-          sections: this.page.data.sections, html: this.page.data.html, menu: menu };
+        return{ page: this.page };
+        // return{ id:this.page.id, title: this.page.data.name, rows: rows, 
+        //   sections: this.page.data.sections, html: this.page.data.html, menu: menu, page: this.page };
     },
 
     getPage: async function (id, instance) {

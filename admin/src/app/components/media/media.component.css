@@ -16,3 +16,7 @@
   .img-thumbnail{
       min-width: 100px;
   }
+
+  .img-name{
+font-size: .7rem;
+  }

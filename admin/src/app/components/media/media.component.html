@@ -15,7 +15,7 @@
 
       <div class="media-list pull-left" *ngFor="let media of mediaList">
         <img class="img-thumbnail" alt="{{ media.name }}" src="http://localhost:3000/api/containers/container1/download/{{ media.name }}" />
-          
+          <div class="img-name">{{ media.name }}</div>
       </div>
         
 
@@ -52,4 +52,9 @@
     </div>
   </div>
 </div>
+<script>
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
 <script src="/assets/js/popovers.js"></script>

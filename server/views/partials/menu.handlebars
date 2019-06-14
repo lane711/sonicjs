@@ -9,7 +9,7 @@
 
     <div class="collapse navbar-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">
-            {{#each menu}}
+            {{#each page.data.menu}}
             <li class="nav-item s--menu-item">
                 <a class="nav-link" href="{{this.url}}">{{this.data.name}}</a>
             </li>
