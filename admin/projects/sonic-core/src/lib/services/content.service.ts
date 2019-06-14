@@ -21,6 +21,26 @@ export class ContentService {
     return this.http.get(environment.apiUrl + "contents/" + id).toPromise();
   }
 
+  async getImageList() {
+    let imageList = await this.http.get(environment.apiUrl + "containers/container1/files").toPromise();
+    return imageList;
+  }
+
+  async getImageListForDropDown() {
+    let imageList = await this.getImageList() as any;
+
+    var imageListForDropDown = imageList.map(obj =>{ 
+      var rObj = {key: obj.name, value: obj.name};
+      // rObj[obj.name] = obj.name;
+      return rObj;
+   });
+
+    // const imageListForDropDown = imageList.map(key => key.name, value => value.name);
+
+    console.log('imageListForDropDown', imageListForDropDown);
+    return [imageListForDropDown];
+  }
+
   public createContentInstance(payload) {
     console.log('createContentInstance payload', payload);
     let content:any = {};

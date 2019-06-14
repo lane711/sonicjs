@@ -67,10 +67,10 @@ export class FieldTypesService {
       },
       {
         id: "d0910500-bf44-4104-b724-18eae721df7a",
-        name: "imagelist",
+        name: "imageList",
         desc: "Image drop down list",
         generateHtml: function(id = "notDefined", placeholder = "", css = "") {
-          return self.getCountryDropDownList(id, placeholder, css);
+          return self.getImageDropDownList(id, placeholder, css);
         }
       },
       {

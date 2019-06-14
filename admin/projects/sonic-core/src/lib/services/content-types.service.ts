@@ -11,8 +11,9 @@ import { HiddenQuestion } from "../models/question-hidden";
 import { DropdownQuestion } from "../models/question-dropdown";
 import { TextareaQuestion } from "../models/question-textarea";
 import { WYSIWYGQuestion } from "../models/question-wysiwyg";
-
 import { LayoutQuestion } from "../models/question-layout";
+import { ContentService } from "./content.service";
+
 
 
 import { Subject } from "rxjs";
@@ -23,9 +24,11 @@ import { Subject } from "rxjs";
 export class ContentTypesService {
   constructor(
     private http: HttpClient,
-    private fieldTypesService: FieldTypesService
+    private fieldTypesService: FieldTypesService,
+    private contentService: ContentService
   ) {
     this.onCreateContentTypeInstanceSubmit();
+    this.populateImageList();
   }
 
   httpOptions = {
@@ -45,6 +48,7 @@ export class ContentTypesService {
   public contentType: any;
   public contentTypeControls: any;
   public contentInstance: any;
+  public imageListForDropDown = [];
 
   public getContentTypes() {
     return this.http.get(environment.apiUrl + "contentTypes").toPromise();
@@ -164,6 +168,19 @@ export class ContentTypesService {
           });
           controls.push(control);
         }
+
+        if(field.fieldType == 'imageList'){
+          console.log('this.imageListForDropDown', this.imageListForDropDown);
+          let control = new DropdownQuestion({
+            key: field.systemid,
+            label: field.label,
+            value: "",
+            required: field.required,
+            order: 1,
+            options: this.imageListForDropDown,
+          });
+          controls.push(control);
+        }
         
 
       });
@@ -245,6 +262,11 @@ export class ContentTypesService {
         environment.apiUrl + `contentTypes/${contentTypeId}/fields/${fieldId}`
       )
       .toPromise();
+  }
+
+  async populateImageList(){
+    let result = await this.contentService.getImageListForDropDown();
+    this.imageListForDropDown = result[0];
   }
 
   

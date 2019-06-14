@@ -27,7 +27,7 @@ export class QuestionsComponent {
   }
 
   ngOnInit() {
-    console.log('questions.comonent question:', this.question);
+    // console.log('questions.comonent question:', this.question);
     this.processHidden();
   }
 
