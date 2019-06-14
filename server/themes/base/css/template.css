@@ -34,7 +34,7 @@ section{
 }
 
 .hero{
-  height:550px;
+  height:350px;
   background-position: center;
   -webkit-background-size: cover;
   -moz-background-size: cover;
@@ -44,4 +44,6 @@ section{
 
 .hero h1{
   margin: 100px 0 0 0;
+  font-size: 5rem;
+  color: #fff;
 }
