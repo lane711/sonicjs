@@ -1,11 +1,12 @@
 var page = {};
+var imageList, tinyImageList;
 
-$(document).ready(function () {
+$(document).ready(async function () {
     setupUIHovers();
     setupClickEvents();
-    // axiosTest();
     setupWYSIWYG();
     getPage();
+    imageList = await getImageList();
 });
 
 async function getPage() {
@@ -211,10 +212,10 @@ function processContentFields(payload, content) {
 }
 
 
-function setupWYSIWYG() {
+async function setupWYSIWYG() {
     console.log('WYSIWYG setup');
 
-    $('section span').on("click", function () {
+    $('section span').on("click", async function () {
         var id = $(this).data("id");
         console.log('span clicked ' + id);
         $('#block-edit-it').val(id);
@@ -242,10 +243,7 @@ function setupWYSIWYG() {
             plugins: 'image imagetools code',
             toolbar: 'code | formatselect | bold italic strikethrough forecolor backcolor permanentpen formatpainter | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat | addcomment',
             image_advtab: false,
-            image_list: [
-                { title: 'My image 1', value: 'https://www.tinymce.com/my1.gif' },
-                { title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif' }
-            ],
+            image_list: tinyImageList,
             // images_upload_url: 'http://localhost:3000/api/containers/container1/upload',
             automatic_uploads: true,
             images_upload_handler: function (blobInfo, success, failure) {
@@ -283,6 +281,19 @@ function setupWYSIWYG() {
     });
 }
 
+async function getImageList() {
+    let imageList = await axios.get(`/api/containers/container1/files`);
+    console.log('imageList', imageList.data);
+
+
+    tinyImageList = [];
+
+    imageList.data.forEach(image => {
+        let imageItem = { title: image.name, value: `http://localhost:3000/api/containers/${image.container}/download/${image.name}` };
+        tinyImageList.push(imageItem);
+    });
+}
+
 async function saveWYSIWYG() {
     let id = $('#block-edit-it').val();
     console.log('saving ' + id);
@@ -296,7 +307,7 @@ async function saveWYSIWYG() {
 
     //update screen
     $(`span[data-id="${id}"]`).html(content);
-  }
+}
 
 //TODO, make this just refresh the body content with a full get
 function fullPageUpdate() {

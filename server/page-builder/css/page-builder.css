@@ -4,7 +4,7 @@ height: 100%;
 position: absolute;
 left: 0;
 top: 0;
-background: #F8F8F8;
+background: #2f353a;
 }
 
 .pbe-wrapper{
@@ -19,7 +19,6 @@ background: #F8F8F8;
 
 .page-builder-nav, .sidebar {
     width: 260px;
-    padding: 6px;
   }
 
   .mini-layout .row{
@@ -43,6 +42,12 @@ background: #F8F8F8;
 
   .section-edit{
     margin: 0 12px 0 0;
+    padding: 0;
+  }
+
+  .btn-util{
+    padding: 0 4px;
+    margin: 6px 0 0 0;
   }
 
   .popover-header {
@@ -58,8 +63,7 @@ hr {
 }
 
 .header{
-  background: #eee;
-  color: #222;
+  color: #fff;
   padding: 4px 0;
   font-size: .6em;
   padding: .5rem 1rem;
@@ -67,11 +71,12 @@ hr {
 
 .nav{
   list-style: none;
+  color: #fff;
 }
 
 .page .nav-link{
-  height: 54px;
-  width: 246px;
+  height: 45px;
+  width: 258px;
 }
 
 .page .nav-link span{
@@ -82,10 +87,11 @@ hr {
 .pb-section{
   width:100%;
   border: 1px solid transparent;
+  color:#fff;
 }
 
 .pb-section:hover{
-  border: 1px solid red;
+  background: #20a8d8;
 }
 
 .nav-title{
@@ -137,7 +143,7 @@ section{
   }
 
 .section-highlight{
-border: 1px solid red;
+border: 1px solid #20a8d8;
 }
 
 .row{
