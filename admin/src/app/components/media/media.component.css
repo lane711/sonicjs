@@ -3,9 +3,16 @@
     margin: 10px 10px 0 0;
 }
 
-.header {    
+.dropzone {    
     text-align: center;    
-    background:blue;    
-    color: white;    
-    font-size: 20px;    
+    background:#f8f8f8;    
+    padding: 40px;
+    margin: 10px 0 30px 0;
+    border-radius: 4px;
+    border: 4px dashed #eee;
+    text-transform: uppercase;
   }   
+
+  .img-thumbnail{
+      min-width: 100px;
+  }
