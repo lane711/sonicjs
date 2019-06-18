@@ -27,7 +27,7 @@
       "type": "chrome",
       "request": "launch",
       "name": "Admin Client",
-      "url": "http://localhost:4200/admin/page-builder/5cdb5cc2f744441df910f43f",
+      "url": "http://localhost:4200/admin/content/5d083cfedadbaea3879324fc",
       "webRoot": "${workspaceFolder}/admin"
     }
   ]

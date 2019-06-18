@@ -50,11 +50,14 @@ export class ContentService {
     return this.http.post(environment.apiUrl + "contents/", content).toPromise();
   }
 
-  public editContentInstanceWithProcessedFields(payload) {
+  public async editContentInstanceWithProcessedFields(payload) {
     let id = payload.id;
+    //need to retrieve doc from db since some page builder fields not included (layout)
+    let content = await this.getContentInstance(id);
+
     console.log('editContentInstanceWithProcessedFields payload', payload);
-    let content:any = {};
-    content.data = {};
+    // let content:any = {};
+    // content.data = {};
     this.processContentFields(payload, content);
     console.log('saving existing content', content);
     return this.http.put(environment.apiUrl + `contents/${id}`, content).toPromise();
