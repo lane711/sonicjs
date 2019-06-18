@@ -24,7 +24,7 @@ export class ContentEditComponent implements OnInit {
 
   async ngOnInit() {
     this.id = this.route.snapshot.paramMap.get("id");
-    console.log('content edit route', this.route.snapshot);
+    // console.log('content edit route', this.route.snapshot);
     this.loadContentTypeForm();
   }
 

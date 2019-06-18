@@ -170,7 +170,7 @@ export class ContentTypesService {
         }
 
         if(field.fieldType == 'imageList'){
-          console.log('this.imageListForDropDown', this.imageListForDropDown);
+          // console.log('this.imageListForDropDown', this.imageListForDropDown);
           let control = new DropdownQuestion({
             key: field.systemid,
             label: field.label,

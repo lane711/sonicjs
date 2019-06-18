@@ -37,7 +37,7 @@ export class ContentService {
 
     // const imageListForDropDown = imageList.map(key => key.name, value => value.name);
 
-    console.log('imageListForDropDown', imageListForDropDown);
+    // console.log('imageListForDropDown', imageListForDropDown);
     return [imageListForDropDown];
   }
 
@@ -52,7 +52,7 @@ export class ContentService {
 
   public editContentInstanceWithProcessedFields(payload) {
     let id = payload.id;
-    console.log('createContentInstance payload', payload);
+    console.log('editContentInstanceWithProcessedFields payload', payload);
     let content:any = {};
     content.data = {};
     this.processContentFields(payload, content);
