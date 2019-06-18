@@ -26,7 +26,6 @@ footer{
 
 section{
   margin: 40px 0;
-  padding: 40px 0;
 }
 
 .no-margin{
@@ -34,6 +33,7 @@ section{
 }
 
 .hero{
+  background-color: #333;
   height:350px;
   background-position: center;
   -webkit-background-size: cover;
@@ -43,7 +43,15 @@ section{
 }
 
 .hero h1{
-  margin: 100px 0 0 0;
+  margin: 150px 0 0 0;
   font-size: 5rem;
   color: #fff;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.hero .dark-fade{
+  background-image: linear-gradient( rgba(0,0,0,.4), rgba(0,0,0,.6));
+  width: 100%;
+  height: 100%;
 }
