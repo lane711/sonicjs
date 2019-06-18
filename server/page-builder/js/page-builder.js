@@ -11,12 +11,12 @@ $(document).ready(async function () {
 
 async function getPage() {
     let pageId = $('#page-id').val();
-    // console.log('pageId', pageId);
+    console.log('pageId', pageId);
     axios.get(`/api/contents/${pageId}`)
         .then(function (response) {
             // handle success
             page = response.data;
-            console.log(page);
+            console.log('getPage page', page);
         })
 }
 
