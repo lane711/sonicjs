@@ -3,6 +3,7 @@ var imageList, tinyImageList;
 
 $(document).ready(async function () {
     setupUIHovers();
+    setupUIClicks();
     setupClickEvents();
     setupWYSIWYG();
     getPage();
@@ -56,12 +57,85 @@ function setupUIHovers() {
         mouseenter: function () {
             let sectionId = $(this).closest('.pb-section').data('id');
             let rowIndex = $(this).index();
-            $(`section[id='${sectionId}'] .row:nth-child(${rowIndex})`).addClass('row-highlight');
+            let row = $(`section[id='${sectionId}'] .row:nth-child(${rowIndex})`);
+            row.addClass('row-highlight');
+            $('.row-button').show().appendTo(row);
         },
         mouseleave: function () {
             let sectionId = $(this).closest('.pb-section').data('id');
             let rowIndex = $(this).index();
             $(`section[id='${sectionId}'] .row:nth-child(${rowIndex})`).removeClass('row-highlight');
+        }
+    });
+
+    $(".mini-layout .pb-row .col").on({
+        mouseenter: function () {
+            let sectionId = $(this).closest('.pb-section').data('id');
+            let parentRow = $(this).closest('.row');
+            let rowIndex = $(this).parent().index();
+            let colIndex = $(this).index() + 1;
+            let col = $(`section[id='${sectionId}'] .row:nth-child(${rowIndex}) .col:nth-child(${colIndex})`);
+            col.addClass('col-highlight');
+            $('.col-button').show().appendTo(col);
+            
+        },
+        mouseleave: function () {
+            let sectionId = $(this).closest('.pb-section').data('id');
+            let parentRow = $(this).closest('.row');
+            let rowIndex = $(this).parent().index();
+            let colIndex = $(this).index() + 1;
+            $(`section[id='${sectionId}'] .row:nth-child(${rowIndex}) .col:nth-child(${colIndex})`).removeClass('col-highlight');
+        }
+    });
+
+}
+
+function setupUIClicks() {
+    console.log('hover setup');
+
+    $(".pb-section").on({
+        mouseenter: function () {
+            let sectionId = $(this).data('id');
+            $(`section[id='${sectionId}']`).addClass('section-highlight');
+        },
+        mouseleave: function () {
+            let sectionId = $(this).data('id');
+            $(`section[id='${sectionId}']`).removeClass('section-highlight');
+        }
+    });
+
+    $(".mini-layout .pb-row").on({
+        mouseenter: function () {
+            let sectionId = $(this).closest('.pb-section').data('id');
+            let rowIndex = $(this).index();
+            let row = $(`section[id='${sectionId}'] .row:nth-child(${rowIndex})`);
+            row.addClass('row-highlight');
+            $('.row-button').show().appendTo(row);
+        },
+        mouseleave: function () {
+            let sectionId = $(this).closest('.pb-section').data('id');
+            let rowIndex = $(this).index();
+            $(`section[id='${sectionId}'] .row:nth-child(${rowIndex})`).removeClass('row-highlight');
+        }
+    });
+
+    $(".mini-layout .pb-row .col").on({
+        mouseenter: function () {
+            let sectionId = $(this).closest('.pb-section').data('id');
+            let parentRow = $(this).closest('.row');
+            let rowIndex = $(this).parent().index();
+            let colIndex = $(this).index() + 1;
+            let col = $(`section[id='${sectionId}'] .row:nth-child(${rowIndex}) .col:nth-child(${colIndex})`);
+            col.addClass('col-highlight');
+            $('.col-button').show().appendTo(col);
+            
+        },
+        mouseleave: function () {
+            let sectionId = $(this).closest('.pb-section').data('id');
+            let parentRow = $(this).closest('.row');
+            let rowIndex = $(this).parent().index();
+            let colIndex = $(this).index() + 1;
+            $(`section[id='${sectionId}'] .row:nth-child(${rowIndex}) .col:nth-child(${colIndex})`).removeClass('col-highlight');
         }
     });
 
@@ -283,7 +357,7 @@ async function setupWYSIWYG() {
 
 async function getImageList() {
     let imageList = await axios.get(`/api/containers/container1/files`);
-    console.log('imageList', imageList.data);
+    // console.log('imageList', imageList.data);
 
 
     tinyImageList = [];

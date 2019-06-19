@@ -72,7 +72,8 @@
                                     </div>
                                     {{/each}}
 
-                                    <span class="badge badge-success" onclick="addColumn('{{../this.id}}', {{@index}})"><i
+                                    <span class="badge badge-success"
+                                        onclick="addColumn('{{../this.id}}', {{@index}})"><i
                                             class="nav-icon fa fa-plus"></i></span>
                                 </div>
                                 {{/each}}
@@ -97,7 +98,7 @@
 
                         </li>
                         {{/each}}
-                    </div> 
+                    </div>
 
 
 
@@ -117,6 +118,21 @@
         </div>
 
     </nav>
+
+    <!-- Row Editor Button START -->
+    <div class="btn-group row-button" role="group" aria-label="Basic example">
+        <button type="button" class="btn btn-secondary btn-sm"><i class="fa fa-ban"></i></button>
+        <button type="button" class="btn btn-secondary btn-sm"><i class="fa fa-image"></i></button>
+        <button type="button" class="btn btn-secondary btn-sm"><i class="fa fa-film"></i></button>
+    </div>
+    <!-- Row Editor Button END -->
+
+        <!-- Column Editor Button START -->
+    <div class="btn-group col-button" role="group" aria-label="Basic example">
+        <button type="button" class="btn btn-secondary btn-sm"><i class="fa fa-ban"></i></button>
+        <button type="button" class="btn btn-secondary btn-sm"><i class="fa fa-image"></i></button>
+    </div>
+    <!-- Column Editor Button END -->
 
 
     <button class="sidebar-minimizer brand-minimizer" type="button"></button>

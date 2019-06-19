@@ -37,6 +37,11 @@ font-family: Verdana, Geneva, Tahoma, sans-serif;
     cursor: pointer;
   }
 
+  .mini-layout .col:hover{
+    background: #eee;
+    cursor: pointer;
+  }
+
   .section-edit .fa-ellipsis-h{
     margin: 0;
   }
@@ -154,3 +159,35 @@ border: 1px solid #20a8d8;
 .row-highlight{
 border: 2px dashed green;
 }
+
+.col-highlight{
+  border: 2px dashed red;
+  }
+
+  .row{
+    position: relative;
+  }
+
+  .row-button, .col-button{
+    /* display: none */
+  }
+
+  .row-button{
+    position: absolute;
+    right: 0;
+    bottom: -31px;
+  }
+
+  .row-button .btn-secondary{
+    background-color: green;
+  }
+
+  .col-button{
+    position: absolute;
+    right: 0;
+    top: -31px;
+  }
+
+  .col-button .btn-secondary{
+    background-color: red;
+  }
