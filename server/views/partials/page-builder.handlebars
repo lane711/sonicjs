@@ -35,7 +35,7 @@
                     <div class="section-wrapper">
                         {{#each page.data.sections}}
                         <li class="nav-item nav-dropdown pb-section" data-id="{{this.id}}">
-                            <a class="nav-link" data-toggle="collapse" data-target="#collapse{{this.id}}" >
+                            <a class="nav-link" data-toggle="collapse" data-target="#collapse{{this.id}}">
                                 <i class="nav-icon fa fa-align-justify"></i><span>{{this.title}}</span>
                                 <!-- <ng-template #popTitle class="pop-title">Section Options</ng-template>
                                 <ng-template #popContent>
@@ -125,29 +125,38 @@
 
     </nav>
 
-    <div class="btn-group" role="group">
-        <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">
-            Dropdown
-        </button>
-        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-            <a class="dropdown-item" href="#">Dropdown link</a>
-            <a class="dropdown-item" href="#">Dropdown link</a>
-        </div>
-    </div>
-
     <!-- Row Editor Button START -->
-    <div class="btn-group row-button" role="group" aria-label="Basic example">
+    {{!-- <div class="btn-group row-button" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-secondary btn-sm"><i class="fa fa-ban"></i></button>
         <button type="button" class="btn btn-secondary btn-sm"><i class="fa fa-image"></i></button>
         <button type="button" class="btn btn-secondary btn-sm"><i class="fa fa-film"></i></button>
+    </div> --}}
+    <div class="btn-group row-button" role="group">
+        <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Edit Row
+        </button>
+        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+            <a class="dropdown-item" onclick="addColumn()"><i class="fa fa-plus"></i> Add Column</a>
+            <a class="dropdown-item" href="#"><i class="fa fa-copy"></i> Duplicate Row</a>
+        </div>
     </div>
     <!-- Row Editor Button END -->
 
     <!-- Column Editor Button START -->
-    <div class="btn-group col-button" role="group" aria-label="Basic example">
+    {{!-- <div class="btn-group col-button" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-secondary btn-sm"><i class="fa fa-ban"></i></button>
         <button type="button" class="btn btn-secondary btn-sm"><i class="fa fa-image"></i></button>
+    </div> --}}
+        <div class="btn-group col-button" role="group">
+        <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Edit Column
+        </button>
+        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+            <a class="dropdown-item" href="#"><i class="fa fa-trash"></i> Delete Column</a>
+            <a class="dropdown-item" href="#"><i class="fa fa-copy"></i> Duplicate Column</a>
+        </div>
     </div>
     <!-- Column Editor Button END -->
 

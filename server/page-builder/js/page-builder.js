@@ -1,5 +1,5 @@
 var page = {};
-var imageList, tinyImageList;
+var imageList, tinyImageList, currentSectionId, currentRow, currentRowIndex, currentColumn, currentColumnIndex;
 
 $(document).ready(async function () {
     setupUIHovers();
@@ -88,21 +88,23 @@ function setupUIClicks() {
 
     $(".mini-layout .pb-row").on({
         click: function () {
-            let sectionId = getParentSectionId($(this));
-            let rowIndex = $(this).index();
-            let row = getRow(sectionId, rowIndex).addClass('row-highlight');
-            $('.row-button').show().appendTo(row);
+            currentSectionId = getParentSectionId($(this));
+            currentRowIndex = $(this).index();
+            console.log('currentRowIndex pbrow', currentRowIndex);
+            currentRow = getRow(currentSectionId, currentRowIndex).addClass('row-highlight');
+            $('.row-button').show().appendTo(currentRow);
         }
     });
 
     $(".mini-layout .pb-row .col").on({
         click: function () {
-            let sectionId = getParentSectionId($(this));
-            let parentRow = getParentRow(this);
-            let rowIndex = $(this).parent().index();
-            let colIndex = $(this).index() + 1;
-            let col = getColumn(sectionId, rowIndex, colIndex).addClass('col-highlight');
-            $('.col-button').show().appendTo(col);
+            currentSectionId = getParentSectionId($(this));
+            currentRow = getParentRow(this);
+            currentRowIndex = $(this).parent().index();
+            console.log('currentRowIndex pbcol', currentRowIndex);
+            currentColumnIndex = $(this).index() + 1;
+            currentColumn = getColumn(currentSectionId, currentRowIndex, currentColumnIndex).addClass('col-highlight');
+            $('.col-button').show().appendTo(currentColumn);
         },
     });
 
@@ -195,13 +197,26 @@ async function addRow(sectionId) {
     fullPageUpdate();
 }
 
-async function addColumn(sectionId, rowIndex) {
-    console.log('adding column ', sectionId, rowIndex);
-    let section = await getContentInstance(sectionId);
+// async function addColumn(sectionId, rowIndex) {
+//     console.log('adding column ', sectionId, rowIndex);
+//     let section = await getContentInstance(sectionId);
+//     console.log('secton', section);
+//     let column = await generateNewColumn();
+//     section.data.rows[rowIndex].columns.push(column);
+//     console.log('columns', section.data.rows[rowIndex].columns);
+//     editContentInstance(section);
+
+//     fullPageUpdate();
+// }
+
+async function addColumn() {
+    let section = await getContentInstance(currentSectionId);
     console.log('secton', section);
+    console.log('currentRowIndex', currentRowIndex);
+
     let column = await generateNewColumn();
-    section.data.rows[rowIndex].columns.push(column);
-    console.log('columns', section.data.rows[rowIndex].columns);
+    section.data.rows[currentRowIndex -1].columns.push(column);
+    console.log('columns', section.data.rows[currentRowIndex -1].columns);
     editContentInstance(section);
 
     fullPageUpdate();

@@ -174,7 +174,7 @@ border: 2px dashed green;
 
   .row-button{
     position: absolute;
-    right: 0;
+    left: 0;
     bottom: -31px;
   }
 
@@ -184,7 +184,7 @@ border: 2px dashed green;
 
   .col-button{
     position: absolute;
-    right: 0;
+    left: 0;
     top: -31px;
   }
 
