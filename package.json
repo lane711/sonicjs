@@ -29,6 +29,7 @@
     "loopback-connector-mongodb": "3.8.0",
     "lorem-ipsum": "^2.0.0",
     "nodemon": "^1.18.11",
+    "popper.js": "^1.15.0",
     "puppeteer": "^1.13.0",
     "rxjs": "6.3.3",
     "serve-favicon": "^2.0.1",

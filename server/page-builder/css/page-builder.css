@@ -196,3 +196,7 @@ border: 2px dashed green;
     cursor: pointer;
 
   }
+
+  .btn-group .btn{
+    border-radius: 0;
+  }

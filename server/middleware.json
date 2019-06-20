@@ -64,6 +64,13 @@
         "params": "$!../node_modules/jquery/dist"
       },
       {
+        "name": "popper",
+        "paths": [
+          "/js"
+        ],
+        "params": "$!../node_modules/popper.js/dist/umd"
+      },
+      {
         "name": "tinymce",
         "paths": [
           "/js"
