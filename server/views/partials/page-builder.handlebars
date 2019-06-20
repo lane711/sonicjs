@@ -35,7 +35,7 @@
                     <div class="section-wrapper">
                         {{#each page.data.sections}}
                         <li class="nav-item nav-dropdown pb-section" data-id="{{this.id}}">
-                            <a class="nav-link">
+                            <a class="nav-link" data-toggle="collapse" data-target="#collapse{{this.id}}" >
                                 <i class="nav-icon fa fa-align-justify"></i><span>{{this.title}}</span>
                                 <!-- <ng-template #popTitle class="pop-title">Section Options</ng-template>
                                 <ng-template #popContent>
@@ -47,11 +47,11 @@
                                     <button class="btn btn-sm btn-block btn-danger"
                                         (click)="deleteSection(section.id)">Delete</button>
                                 </ng-template> -->
-                                <button type="button" class="btn btn-outline-secondary pull-right btn-util"
+                                {{!-- <button type="button" class="btn btn-outline-secondary pull-right btn-util"
                                     data-toggle="collapse" data-target="#collapse{{this.id}}" aria-expanded="false"
                                     aria-controls="collapseExample">
                                     <i class="nav-icon fa fa-chevron-down"></i>
-                                </button>
+                                </button> --}}
 
                                 <button class="btn btn-outline-secondary section-edit pull-right btn-util"
                                     [ngbPopover]="popContent" data-id="{{isection}}" [popoverTitle]="popTitle"
@@ -104,7 +104,13 @@
 
                     <li class="nav-item">
                         <a class="btn btn-outline-success pull-right add-section" onclick="addSection()">
-                            <i class="nav-icon fa fa-plus"></i> Add Secton</a>
+                            <i class="nav-icon fa fa-plus"></i>
+                            {{#if page.data.hasRows}}
+                            Add Section
+                            {{else}}
+                            Add a section to get started
+                            {{/if}}
+                        </a>
                     </li>
 
                 </ul>
@@ -119,6 +125,17 @@
 
     </nav>
 
+    <div class="btn-group" role="group">
+        <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Dropdown
+        </button>
+        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+            <a class="dropdown-item" href="#">Dropdown link</a>
+            <a class="dropdown-item" href="#">Dropdown link</a>
+        </div>
+    </div>
+
     <!-- Row Editor Button START -->
     <div class="btn-group row-button" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-secondary btn-sm"><i class="fa fa-ban"></i></button>
@@ -127,7 +144,7 @@
     </div>
     <!-- Row Editor Button END -->
 
-        <!-- Column Editor Button START -->
+    <!-- Column Editor Button START -->
     <div class="btn-group col-button" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-secondary btn-sm"><i class="fa fa-ban"></i></button>
         <button type="button" class="btn btn-secondary btn-sm"><i class="fa fa-image"></i></button>

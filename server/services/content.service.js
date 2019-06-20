@@ -25,11 +25,14 @@ module.exports = {
         this.page = await this.getContentByUrl(req.url, 'page');
         this.page.data.menu = await this.getContent('menu');
         let rows = [];
+        this.page.data.hasRows = false;
         if(this.page.data.layout){
             this.page.data.rows = this.page.data.layout.rows;
+            this.page.data.hasRows = true;
         }
         this.page.data.siteSettings = await this.getContentTopOne('site-settings');
-        console.log('this.page.data.siteSettings', this.page.data.siteSettings);
+        // console.log('this.page.data.siteSettings', this.page.data.siteSettings);
+        // console.log('getRenderedPage page', this.page);
         return{ page: this.page };
         // return{ id:this.page.id, title: this.page.data.name, rows: rows, 
         //   sections: this.page.data.sections, html: this.page.data.html, menu: menu, page: this.page };

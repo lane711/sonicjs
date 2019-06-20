@@ -40,105 +40,88 @@ function axiosTest() {
 }
 
 function setupUIHovers() {
-    console.log('hover setup');
 
     $(".pb-section").on({
         mouseenter: function () {
-            let sectionId = $(this).data('id');
+            let sectionId = getParentSectionId($(this));
             $(`section[id='${sectionId}']`).addClass('section-highlight');
         },
         mouseleave: function () {
-            let sectionId = $(this).data('id');
+            let sectionId = getParentSectionId($(this));
             $(`section[id='${sectionId}']`).removeClass('section-highlight');
         }
     });
 
     $(".mini-layout .pb-row").on({
         mouseenter: function () {
-            let sectionId = $(this).closest('.pb-section').data('id');
+            let sectionId = getParentSectionId($(this));
             let rowIndex = $(this).index();
-            let row = $(`section[id='${sectionId}'] .row:nth-child(${rowIndex})`);
-            row.addClass('row-highlight');
-            $('.row-button').show().appendTo(row);
+            getRow(sectionId, rowIndex).addClass('row-highlight');
         },
         mouseleave: function () {
-            let sectionId = $(this).closest('.pb-section').data('id');
+            let sectionId = getParentSectionId($(this));
             let rowIndex = $(this).index();
-            $(`section[id='${sectionId}'] .row:nth-child(${rowIndex})`).removeClass('row-highlight');
+            getRow(sectionId, rowIndex).removeClass('row-highlight');
         }
     });
 
     $(".mini-layout .pb-row .col").on({
         mouseenter: function () {
-            let sectionId = $(this).closest('.pb-section').data('id');
-            let parentRow = $(this).closest('.row');
+            let sectionId = getParentSectionId($(this));
+            let parentRow = getParentRow(this);
             let rowIndex = $(this).parent().index();
             let colIndex = $(this).index() + 1;
-            let col = $(`section[id='${sectionId}'] .row:nth-child(${rowIndex}) .col:nth-child(${colIndex})`);
-            col.addClass('col-highlight');
-            $('.col-button').show().appendTo(col);
-            
+            getColumn(sectionId, rowIndex, colIndex).addClass('col-highlight');
         },
         mouseleave: function () {
-            let sectionId = $(this).closest('.pb-section').data('id');
-            let parentRow = $(this).closest('.row');
+            let sectionId = getParentSectionId($(this));
+            let parentRow = getParentRow(this);
             let rowIndex = $(this).parent().index();
             let colIndex = $(this).index() + 1;
-            $(`section[id='${sectionId}'] .row:nth-child(${rowIndex}) .col:nth-child(${colIndex})`).removeClass('col-highlight');
+            getColumn(sectionId, rowIndex, colIndex).removeClass('col-highlight');
         }
     });
 
 }
 
 function setupUIClicks() {
-    console.log('hover setup');
-
-    $(".pb-section").on({
-        mouseenter: function () {
-            let sectionId = $(this).data('id');
-            $(`section[id='${sectionId}']`).addClass('section-highlight');
-        },
-        mouseleave: function () {
-            let sectionId = $(this).data('id');
-            $(`section[id='${sectionId}']`).removeClass('section-highlight');
-        }
-    });
 
     $(".mini-layout .pb-row").on({
-        mouseenter: function () {
-            let sectionId = $(this).closest('.pb-section').data('id');
+        click: function () {
+            let sectionId = getParentSectionId($(this));
             let rowIndex = $(this).index();
-            let row = $(`section[id='${sectionId}'] .row:nth-child(${rowIndex})`);
-            row.addClass('row-highlight');
+            let row = getRow(sectionId, rowIndex).addClass('row-highlight');
             $('.row-button').show().appendTo(row);
-        },
-        mouseleave: function () {
-            let sectionId = $(this).closest('.pb-section').data('id');
-            let rowIndex = $(this).index();
-            $(`section[id='${sectionId}'] .row:nth-child(${rowIndex})`).removeClass('row-highlight');
         }
     });
 
     $(".mini-layout .pb-row .col").on({
-        mouseenter: function () {
-            let sectionId = $(this).closest('.pb-section').data('id');
-            let parentRow = $(this).closest('.row');
+        click: function () {
+            let sectionId = getParentSectionId($(this));
+            let parentRow = getParentRow(this);
             let rowIndex = $(this).parent().index();
             let colIndex = $(this).index() + 1;
-            let col = $(`section[id='${sectionId}'] .row:nth-child(${rowIndex}) .col:nth-child(${colIndex})`);
-            col.addClass('col-highlight');
+            let col = getColumn(sectionId, rowIndex, colIndex).addClass('col-highlight');
             $('.col-button').show().appendTo(col);
-            
         },
-        mouseleave: function () {
-            let sectionId = $(this).closest('.pb-section').data('id');
-            let parentRow = $(this).closest('.row');
-            let rowIndex = $(this).parent().index();
-            let colIndex = $(this).index() + 1;
-            $(`section[id='${sectionId}'] .row:nth-child(${rowIndex}) .col:nth-child(${colIndex})`).removeClass('col-highlight');
-        }
     });
 
+}
+
+function getParentSectionId(el){
+    return $(el).closest('.pb-section').data('id');
+}
+
+function getRow(sectionId, rowIndex){
+    return $(`section[id='${sectionId}'] .row:nth-child(${rowIndex})`);
+}
+
+function getParentRow(el){
+    return $(el).closest('.row');
+}
+
+function getColumn(sectionId, rowIndex, colIndex){
+    return getRow(sectionId, rowIndex).find(`.col:nth-child(${colIndex})`);
 }
 
 async function setupClickEvents() {

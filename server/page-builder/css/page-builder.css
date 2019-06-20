@@ -191,3 +191,8 @@ border: 2px dashed green;
   .col-button .btn-secondary{
     background-color: red;
   }
+
+  section .col span, .pb-section .nav-link{
+    cursor: pointer;
+
+  }
