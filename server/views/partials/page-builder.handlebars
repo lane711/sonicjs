@@ -134,7 +134,7 @@
     <div class="btn-group row-button" role="group">
         <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
-            Edit Row
+            Row
         </button>
         <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
             <a class="dropdown-item" onclick="addColumn()"><i class="fa fa-plus"></i> Add Column</a>
@@ -151,7 +151,7 @@
     <div class="btn-group col-button" role="group">
         <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
-            Edit Column
+            Column
         </button>
         <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
             <a class="dropdown-item" onclick="deleteColumn()"><i class="fa fa-trash"></i> Delete Column</a>
@@ -161,14 +161,20 @@
     <!-- Column Editor Button END -->
 
     <!-- Block Editor Button START -->
-        <div class="btn-group block-button" role="group">
+    <div class="btn-group block-button" role="group">
         <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
-            Edit Block
+            Block
         </button>
         <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-            <a class="dropdown-item" onclick="deleteColumn()"><i class="fa fa-trash"></i> Delete Column</a>
-            <a class="dropdown-item" href="#"><i class="fa fa-copy"></i> Duplicate Column</a>
+            <a class="dropdown-item" onclick="addBlockNew()"><i class="fa fa-plus"></i> Add New Block</a>
+            <a class="dropdown-item" onclick="addBlockExisting()"><i class="fa fa-plus"></i> Add Existing Block</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" onclick="openWYSIWYG()"><i class="fa fa-pencil"></i> Edit Block</a>
+            <a class="dropdown-item" onclick="deleteBlock()"><i class="fa fa-trash"></i> Delete Block</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" onclick="deleteBlock()"><i class="fa fa-gear"></i> Block Settings</a>
+
         </div>
     </div>
     <!-- Block Editor Button END -->

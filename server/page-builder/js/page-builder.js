@@ -123,7 +123,7 @@ function setupUIClicks() {
             $('.col-button').show().appendTo(currentColumn);
             $('.row-button').show().appendTo(currentRow);
             $('.block-button').show().appendTo(currentColumn.children('span'));
-            currentColumn.children('span').addClass('block-edit')
+            currentColumn.children('span').addClass('block-edit');
         },
     });
 
@@ -244,6 +244,20 @@ async function addColumn() {
 async function deleteColumn() {
     let section = await getContentInstance(currentSectionId);
     section.data.rows[currentRowIndex].columns.splice(currentColumnIndex -1,1);
+
+    //TODO, delete block too
+
+    editContentInstance(section);
+
+    fullPageUpdate();
+}
+
+async function deleteBlock() {
+    let section = await getContentInstance(currentSectionId);
+    section.data.rows[currentRowIndex].columns.splice(currentColumnIndex -1,1);
+    
+    //TODO, delete block too
+
     editContentInstance(section);
 
     fullPageUpdate();
@@ -311,16 +325,16 @@ function processContentFields(payload, content) {
 }
 
 
-async function setupWYSIWYG() {
+async function openWYSIWYG() {
     console.log('WYSIWYG setup');
 
-    $('section span').on("click", async function () {
-        var id = $(this).data("id");
+    // $('section span').on("click", async function () {
+        var id = $('.block-edit').data('id');
         console.log('span clicked ' + id);
         $('#block-edit-it').val(id);
         $('#wysiwygModal').appendTo("body").modal('show');
 
-        var content = $(this).html();
+        var content = $('.block-edit p').prop('outerHTML');
         $('textarea.wysiwyg-content').html(content);
 
         // $(document).off('focusin.modal');
@@ -377,7 +391,7 @@ async function setupWYSIWYG() {
                 xhr.send(formData);
             }
         });
-    });
+    // });
 }
 
 async function getImageList() {
@@ -394,7 +408,8 @@ async function getImageList() {
 }
 
 async function saveWYSIWYG() {
-    let id = $('#block-edit-it').val();
+    debugger;
+    let id = $('.block-edit').data('id');
     console.log('saving ' + id);
 
     let content = $('textarea.wysiwyg-content').html();
@@ -405,7 +420,11 @@ async function saveWYSIWYG() {
     editContentInstance(block);
 
     //update screen
-    $(`span[data-id="${id}"]`).html(content);
+    $('.block-edit').children().first().html(content);
+    // $(`span[data-id="${id}"]`).html(content);
+
+    //re-add block edit
+    $('.block-button').show().appendTo($('.block-edit'));
 }
 
 //TODO, make this just refresh the body content with a full get
