@@ -1,106 +1,108 @@
-.pb-wrapper{
-width:260px;
-height: 100%;
-position: absolute;
-left: 0;
-top: 0;
-background: #2f353a;
-font-family: Verdana, Geneva, Tahoma, sans-serif;
+.pb-wrapper {
+  width: 260px;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: #2f353a;
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-.pbe-wrapper{
-    width: 240px;
-    padding: 15px 30px;
-    color:#fff;
+.pbe-wrapper {
+  width: 240px;
+  padding: 15px 30px;
+  color: #fff;
 }
 
-.pb-page{
+.pb-page {
   margin-left: 300px;
 }
 
 .page-builder-nav, .sidebar {
-    width: 260px;
-  }
-
-  .mini-layout .row{
-    border: 1px dashed #F8F8F8;
-    margin: 2px;
-    padding: 4px;
-  }
-
-  .mini-layout{
-    margin: 0;
-    padding: 0;
-  }
-  .mini-layout .row:hover{
-    background: #222;
-    cursor: pointer;
-  }
-
-  .mini-layout .col:hover{
-    background: #eee;
-    cursor: pointer;
-  }
-
-  .section-edit .fa-ellipsis-h{
-    margin: 0;
-  }
-
-  .section-edit{
-    margin: 0 12px 0 0;
-    padding: 0;
-  }
-
-  .btn-util{
-    padding: 0 4px;
-    margin: 6px 0 0 0;
-  }
-
-  .popover-header {
-    background-color: #2f353a !important;
+  width: 260px;
 }
-hr { 
-  display: block; 
-  height: 1px;
-  border: 0; 
-  border-top: 1px solid #ccc;
-  margin: 1em 0; 
+
+.mini-layout .row {
+  border: 1px dotted #F8F8F8;
+  margin: 2px;
+  padding: 4px;
+}
+
+.mini-layout {
+  margin: 0;
   padding: 0;
 }
 
-.header{
+.mini-layout .row:hover {
+  background: #222;
+  cursor: pointer;
+}
+
+.mini-layout .col:hover {
+  background: #eee;
+  cursor: pointer;
+}
+
+.section-edit .fa-ellipsis-h {
+  margin: 0;
+}
+
+.section-edit {
+  margin: 0 12px 0 0;
+  padding: 0;
+}
+
+.btn-util {
+  padding: 0 4px;
+  margin: 6px 0 0 0;
+}
+
+.popover-header {
+  background-color: #2f353a !important;
+}
+
+hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #ccc;
+  margin: 1em 0;
+  padding: 0;
+}
+
+.header {
   color: #fff;
   padding: 4px 0;
   font-size: .6em;
   padding: .5rem 1rem;
 }
 
-.nav{
+.nav {
   list-style: none;
   color: #fff;
 }
 
-.page .nav-link{
+.page .nav-link {
   height: 45px;
   width: 258px;
 }
 
-.page .nav-link span{
+.page .nav-link span {
   line-height: 38px;
   margin: 0 0 0 12px;
 }
 
-.pb-section{
-  width:100%;
+.pb-section {
+  width: 100%;
   border: 1px solid transparent;
-  color:#fff;
+  color: #fff;
 }
 
-.pb-section:hover{
+.pb-section:hover {
   background: #20a8d8;
 }
 
-.nav-title{
+.nav-title {
   display: block;
   width: 100%;
   padding: 6px;
@@ -136,67 +138,90 @@ hr {
   transition: .3s;
 }
 
-.opened{
-  background: red;
+.opened {
+  background: #6b5b95;
 }
 
-.hide{
+.hide {
   display: none;
 }
 
-section{
+section {
   border: 1px solid transparent;
-  }
-
-.section-highlight{
-border: 1px solid #20a8d8;
 }
 
-.row{
+.section-highlight {
+  border: 1px solid #a2b9bc;
+}
+
+.row {
   border: 2px solid transparent;
-  }
-
-.row-highlight{
-border: 2px dashed green;
 }
 
-.col-highlight{
-  border: 2px dashed red;
-  }
+.row-highlight {
+  border: 1px dotted #878f99;
+}
 
-  .row{
-    position: relative;
-  }
+.col-highlight {
+  border: 1px dotted #6b5b95 !important;
+}
 
-  .row-button, .col-button{
-    /* display: none */
-  }
+.row {
+  position: relative;
+}
 
-  .row-button{
-    position: absolute;
-    left: 0;
-    bottom: -31px;
-  }
+.row-button, .col-button {
+  /* display: none */
+}
 
-  .row-button .btn-secondary{
-    background-color: green;
-  }
+.row-button {
+  position: absolute;
+  left: -1px;
+  bottom: -31px;
+  z-index: 2;
+}
 
-  .col-button{
-    position: absolute;
-    left: 0;
-    top: -31px;
-  }
+.row-button .btn-secondary {
+  background-color: #878f99;
+}
 
-  .col-button .btn-secondary{
-    background-color: red;
-  }
+.col-button {
+  position: absolute;
+  left: -1px;
+  top: -31px;
+}
 
-  section .col span, .pb-section .nav-link{
-    cursor: pointer;
+.block-button {
+  position: absolute;
+  right: -1px;
+  bottom: -31px;
+  z-index: 2;
+}
 
-  }
+.col-button .btn-secondary {
+  background-color: #6b5b95;
+}
 
-  .btn-group .btn{
-    border-radius: 0;
-  }
+.block-button .btn-secondary {
+  background-color: #a2b9bc;
+}
+
+section .col span, .pb-section .nav-link, .dropdown-menu .dropdown-item {
+  cursor: pointer;
+}
+
+section .col {
+  border: 1px dotted transparent;
+}
+
+section .col:hover {
+  border: 1px dotted #6b5b95;
+}
+
+.btn-group .btn {
+  border-radius: 0;
+}
+
+.block-edit{
+  background-color: #a2b9bc;
+}

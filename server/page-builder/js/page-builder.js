@@ -5,7 +5,7 @@ $(document).ready(async function () {
     setupUIHovers();
     setupUIClicks();
     setupClickEvents();
-    setupWYSIWYG();
+    // setupWYSIWYG();
     getPage();
     imageList = await getImageList();
 });
@@ -105,6 +105,25 @@ function setupUIClicks() {
             currentColumnIndex = $(this).index() + 1;
             currentColumn = getColumn(currentSectionId, currentRowIndex, currentColumnIndex).addClass('col-highlight');
             $('.col-button').show().appendTo(currentColumn);
+        },
+    });
+
+    $("section .col").on({
+        click: function () {
+            $('.col-highlight').removeClass('col-highlight');
+            $('.block-edit').removeClass('block-edit');
+            currentSectionId = $(this).closest('section').data('id');
+            currentRow = $(this).closest('.row')[0];
+            $(this).closest('.row').addClass('row-highlight');
+            currentRowIndex = $(this).closest('.row').index();
+            console.log('currentRowIndex pbcol', currentRowIndex);
+            currentColumnIndex = $(this).index() + 1;
+            currentColumn = $(this);
+            currentColumn.addClass('col-highlight');
+            $('.col-button').show().appendTo(currentColumn);
+            $('.row-button').show().appendTo(currentRow);
+            $('.block-button').show().appendTo(currentColumn.children('span'));
+            currentColumn.children('span').addClass('block-edit')
         },
     });
 
@@ -215,8 +234,16 @@ async function addColumn() {
     console.log('currentRowIndex', currentRowIndex);
 
     let column = await generateNewColumn();
-    section.data.rows[currentRowIndex -1].columns.push(column);
+    section.data.rows[currentRowIndex].columns.push(column);
     console.log('columns', section.data.rows[currentRowIndex -1].columns);
+    editContentInstance(section);
+
+    fullPageUpdate();
+}
+
+async function deleteColumn() {
+    let section = await getContentInstance(currentSectionId);
+    section.data.rows[currentRowIndex].columns.splice(currentColumnIndex -1,1);
     editContentInstance(section);
 
     fullPageUpdate();

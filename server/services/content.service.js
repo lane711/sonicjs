@@ -163,7 +163,7 @@ module.exports = {
 
 
                 let section = await this.getContentById(sectionId);
-                pageContent += `<section id='${section.id}' class="jumbotron-fluid">`;
+                pageContent += `<section data-id='${section.id}' class="jumbotron-fluid">`;
                 pageContent += '<div class="container">';
                 let rows = await this.processRows($, sectionWrapper, section.data.rows)
                 pageContent += '</div>';

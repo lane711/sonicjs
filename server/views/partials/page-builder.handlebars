@@ -148,17 +148,30 @@
         <button type="button" class="btn btn-secondary btn-sm"><i class="fa fa-ban"></i></button>
         <button type="button" class="btn btn-secondary btn-sm"><i class="fa fa-image"></i></button>
     </div> --}}
-        <div class="btn-group col-button" role="group">
+    <div class="btn-group col-button" role="group">
         <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
             Edit Column
         </button>
         <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-            <a class="dropdown-item" href="#"><i class="fa fa-trash"></i> Delete Column</a>
+            <a class="dropdown-item" onclick="deleteColumn()"><i class="fa fa-trash"></i> Delete Column</a>
             <a class="dropdown-item" href="#"><i class="fa fa-copy"></i> Duplicate Column</a>
         </div>
     </div>
     <!-- Column Editor Button END -->
+
+    <!-- Block Editor Button START -->
+        <div class="btn-group block-button" role="group">
+        <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Edit Block
+        </button>
+        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+            <a class="dropdown-item" onclick="deleteColumn()"><i class="fa fa-trash"></i> Delete Column</a>
+            <a class="dropdown-item" href="#"><i class="fa fa-copy"></i> Duplicate Column</a>
+        </div>
+    </div>
+    <!-- Block Editor Button END -->
 
 
     <button class="sidebar-minimizer brand-minimizer" type="button"></button>
