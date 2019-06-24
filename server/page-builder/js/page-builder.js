@@ -408,7 +408,6 @@ async function getImageList() {
 }
 
 async function saveWYSIWYG() {
-    debugger;
     let id = $('.block-edit').data('id');
     console.log('saving ' + id);
 

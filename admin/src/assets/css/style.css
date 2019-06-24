@@ -11155,7 +11155,7 @@ canvas {
   justify-content: center;
   width: 155px;
   height: 55px;
-  padding: 0;
+  padding: 0 0 0 20px;
   margin-right: 0;
   background-color: transparent;
 }
