@@ -1,5 +1,5 @@
 var page = {};
-var imageList, tinyImageList, currentSectionId, currentRow, currentRowIndex, currentColumn, currentColumnIndex;
+var imageList, tinyImageList, currentSectionId, currentSection, currentRow, currentRowIndex, currentColumn, currentColumnIndex;
 
 $(document).ready(async function () {
     setupUIHovers();
@@ -129,19 +129,19 @@ function setupUIClicks() {
 
 }
 
-function getParentSectionId(el){
+function getParentSectionId(el) {
     return $(el).closest('.pb-section').data('id');
 }
 
-function getRow(sectionId, rowIndex){
+function getRow(sectionId, rowIndex) {
     return $(`section[id='${sectionId}'] .row:nth-child(${rowIndex})`);
 }
 
-function getParentRow(el){
+function getParentRow(el) {
     return $(el).closest('.row');
 }
 
-function getColumn(sectionId, rowIndex, colIndex){
+function getColumn(sectionId, rowIndex, colIndex) {
     return getRow(sectionId, rowIndex).find(`.col:nth-child(${colIndex})`);
 }
 
@@ -182,6 +182,24 @@ async function addSection() {
     // this.fullPageUpdate();
     // this.loadSections(updatedPage);
     fullPageUpdate();
+}
+
+async function editSection(sectionId) {
+    console.log(sectionId);
+    currentSectionRecord = await getContentInstance(sectionId);
+    currentSection = currentSectionRecord.data;
+    console.log('currentSection', currentSection);
+    $('#section-editor').text(JSON.stringify(currentSection));
+    $('#sectoinEditorModal').appendTo("body").modal('show');
+}
+
+async function saveSection() {
+    console.log(sectionId);
+    currentSectionRecord = await getContentInstance(sectionId);
+    currentSection = currentSectionRecord.data;
+    console.log('currentSection', currentSection);
+    $('#section-editor').text(JSON.stringify(currentSection));
+    $('#sectoinEditorModal').appendTo("body").modal('show');
 }
 
 async function generateNewRow() {
@@ -235,7 +253,7 @@ async function addColumn() {
 
     let column = await generateNewColumn();
     section.data.rows[currentRowIndex].columns.push(column);
-    console.log('columns', section.data.rows[currentRowIndex -1].columns);
+    console.log('columns', section.data.rows[currentRowIndex - 1].columns);
     editContentInstance(section);
 
     fullPageUpdate();
@@ -243,7 +261,7 @@ async function addColumn() {
 
 async function deleteColumn() {
     let section = await getContentInstance(currentSectionId);
-    section.data.rows[currentRowIndex].columns.splice(currentColumnIndex -1,1);
+    section.data.rows[currentRowIndex].columns.splice(currentColumnIndex - 1, 1);
 
     //TODO, delete block too
 
@@ -252,10 +270,17 @@ async function deleteColumn() {
     fullPageUpdate();
 }
 
+async function editColumnContent() {
+
+    console.log(currentSectionId);
+    // fullPageUpdate();
+
+}
+
 async function deleteBlock() {
     let section = await getContentInstance(currentSectionId);
-    section.data.rows[currentRowIndex].columns.splice(currentColumnIndex -1,1);
-    
+    section.data.rows[currentRowIndex].columns.splice(currentColumnIndex - 1, 1);
+
     //TODO, delete block too
 
     editContentInstance(section);
@@ -329,68 +354,68 @@ async function openWYSIWYG() {
     console.log('WYSIWYG setup');
 
     // $('section span').on("click", async function () {
-        var id = $('.block-edit').data('id');
-        console.log('span clicked ' + id);
-        $('#block-edit-it').val(id);
-        $('#wysiwygModal').appendTo("body").modal('show');
+    var id = $('.block-edit').data('id');
+    console.log('span clicked ' + id);
+    $('#block-edit-it').val(id);
+    $('#wysiwygModal').appendTo("body").modal('show');
 
-        var content = $('.block-edit p').prop('outerHTML');
-        $('textarea.wysiwyg-content').html(content);
+    var content = $('.block-edit p').prop('outerHTML');
+    $('textarea.wysiwyg-content').html(content);
 
-        // $(document).off('focusin.modal');
-        //allow user to interact with tinymcs dialogs: https://stackoverflow.com/questions/36279941/using-tinymce-in-a-modal-dialog
-        $(document).on('focusin', function (e) {
-            if ($(e.target).closest(".tox-dialog").length) {
-                e.stopImmediatePropagation();
-            }
-        });
+    // $(document).off('focusin.modal');
+    //allow user to interact with tinymcs dialogs: https://stackoverflow.com/questions/36279941/using-tinymce-in-a-modal-dialog
+    $(document).on('focusin', function (e) {
+        if ($(e.target).closest(".tox-dialog").length) {
+            e.stopImmediatePropagation();
+        }
+    });
 
-        tinymce.remove(); //remove previous editor
-        // tinymce.baseURL = '/tinymce/';
-        // console.log('tinymce.base_url',tinymce.baseURL);
-        //plugins: 'print preview fullpage powerpaste searchreplace autolink directionality advcode visualblocks visualchars fullscreen image link media mediaembed template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount tinymcespellchecker a11ychecker imagetools textpattern help formatpainter permanentpen pageembed tinycomments mentions linkchecker',
+    tinymce.remove(); //remove previous editor
+    // tinymce.baseURL = '/tinymce/';
+    // console.log('tinymce.base_url',tinymce.baseURL);
+    //plugins: 'print preview fullpage powerpaste searchreplace autolink directionality advcode visualblocks visualchars fullscreen image link media mediaembed template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount tinymcespellchecker a11ychecker imagetools textpattern help formatpainter permanentpen pageembed tinycomments mentions linkchecker',
 
-        $('textarea.wysiwyg-content').tinymce({
-            selector: '#block-content',
-            height: 600,
-            plugins: 'image imagetools code',
-            toolbar: 'code | formatselect | bold italic strikethrough forecolor backcolor permanentpen formatpainter | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat | addcomment',
-            image_advtab: false,
-            image_list: tinyImageList,
-            // images_upload_url: 'http://localhost:3000/api/containers/container1/upload',
-            automatic_uploads: true,
-            images_upload_handler: function (blobInfo, success, failure) {
-                var xhr, formData;
+    $('textarea.wysiwyg-content').tinymce({
+        selector: '#block-content',
+        height: 600,
+        plugins: 'image imagetools code',
+        toolbar: 'code | formatselect | bold italic strikethrough forecolor backcolor permanentpen formatpainter | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat | addcomment',
+        image_advtab: false,
+        image_list: tinyImageList,
+        // images_upload_url: 'http://localhost:3000/api/containers/container1/upload',
+        automatic_uploads: true,
+        images_upload_handler: function (blobInfo, success, failure) {
+            var xhr, formData;
 
-                xhr = new XMLHttpRequest();
-                xhr.withCredentials = false;
-                xhr.open('POST', "http://localhost:3000/api/containers/container1/upload");
+            xhr = new XMLHttpRequest();
+            xhr.withCredentials = false;
+            xhr.open('POST', "http://localhost:3000/api/containers/container1/upload");
 
-                xhr.onload = function () {
-                    var json;
+            xhr.onload = function () {
+                var json;
 
-                    if (xhr.status != 200) {
-                        failure("HTTP Error: " + xhr.status);
-                        return;
-                    }
+                if (xhr.status != 200) {
+                    failure("HTTP Error: " + xhr.status);
+                    return;
+                }
 
-                    json = JSON.parse(xhr.responseText);
-                    var file = json.result.files.file[0];
-                    var location = `http://localhost:3000/api/containers/${file.container}/download/${file.name}`;
-                    if (!location) {
-                        failure("Invalid JSON: " + xhr.responseText);
-                        return;
-                    }
+                json = JSON.parse(xhr.responseText);
+                var file = json.result.files.file[0];
+                var location = `http://localhost:3000/api/containers/${file.container}/download/${file.name}`;
+                if (!location) {
+                    failure("Invalid JSON: " + xhr.responseText);
+                    return;
+                }
 
-                    success(location);
-                };
+                success(location);
+            };
 
-                formData = new FormData();
-                formData.append('file', blobInfo.blob(), blobInfo.filename());
+            formData = new FormData();
+            formData.append('file', blobInfo.blob(), blobInfo.filename());
 
-                xhr.send(formData);
-            }
-        });
+            xhr.send(formData);
+        }
+    });
     // });
 }
 

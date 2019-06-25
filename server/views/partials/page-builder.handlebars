@@ -35,6 +35,9 @@
                     <div class="section-wrapper">
                         {{#each page.data.sections}}
                         <li class="nav-item nav-dropdown pb-section" data-id="{{this.id}}">
+
+
+
                             <a class="nav-link" data-toggle="collapse" data-target="#collapse{{this.id}}">
                                 <i class="nav-icon fa fa-align-justify"></i><span>{{this.title}}</span>
                                 <!-- <ng-template #popTitle class="pop-title">Section Options</ng-template>
@@ -61,6 +64,21 @@
                             </a>
 
                             <div class="container mini-layout collapse" id="collapse{{this.id}}">
+
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-outline-secondary add-section"
+                                        onclick="editSection('{{this.id}}')">
+                                        <i class="nav-icon fa fa-code"></i> Edit</button>
+                                    <button type="button"
+                                        class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span class="sr-only">Toggle Dropdown</span>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="#">TBD</a>
+                                    </div>
+                                </div>
+
                                 <div class="header">Layout</div>
 
                                 {{#each this.rows}}
@@ -100,9 +118,20 @@
                         {{/each}}
                     </div>
 
+                    <hr />
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-secondary add-section" onclick="addSection()">
+                            <i class="nav-icon fa fa-plus"></i> Add New Section</button>
+                        <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="#">Add Existing Section</a>
+                        </div>
+                    </div>
 
-
-                    <li class="nav-item">
+                    {{!-- <li class="nav-item">
                         <a class="btn btn-outline-success pull-right add-section" onclick="addSection()">
                             <i class="nav-icon fa fa-plus"></i>
                             {{#if page.data.hasRows}}
@@ -111,7 +140,7 @@
                             Add a section to get started
                             {{/if}}
                         </a>
-                    </li>
+                    </li> --}}
 
                 </ul>
 
@@ -138,7 +167,7 @@
         </button>
         <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
             <a class="dropdown-item" onclick="addColumn()"><i class="fa fa-plus"></i> Add Column</a>
-            <a class="dropdown-item" href="#"><i class="fa fa-copy"></i> Duplicate Row</a>
+            {{!-- <a class="dropdown-item" href="#"><i class="fa fa-copy"></i> Duplicate Row</a> --}}
         </div>
     </div>
     <!-- Row Editor Button END -->
@@ -154,14 +183,18 @@
             Column
         </button>
         <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+            <a class="dropdown-item" onclick="editColumnContent()"><i class="fa fa-pencil"></i> Edit Content</a>
             <a class="dropdown-item" onclick="deleteColumn()"><i class="fa fa-trash"></i> Delete Column</a>
-            <a class="dropdown-item" href="#"><i class="fa fa-copy"></i> Duplicate Column</a>
+            {{!-- <a class="dropdown-item" href="#"><i class="fa fa-copy"></i> Duplicate Column</a> --}}
         </div>
     </div>
     <!-- Column Editor Button END -->
 
     <!-- Block Editor Button START -->
     <div class="btn-group block-button hide" role="group">
+        <button type="button" onclick="openWYSIWYG()" class="btn btn-secondary btn-sm"><i
+                class="fa fa-pencil"></i></button>
+
         <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
             Block
@@ -174,6 +207,8 @@
             <a class="dropdown-item" onclick="deleteBlock()"><i class="fa fa-trash"></i> Delete Block</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" onclick="deleteBlock()"><i class="fa fa-gear"></i> Block Settings</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" onclick="deleteBlock()"><i class="fa fa-gear"></i> Form</a>
 
         </div>
     </div>
@@ -183,7 +218,7 @@
     <button class="sidebar-minimizer brand-minimizer" type="button"></button>
 </div>
 
-<!-- Modal -->
+<!-- WYSIWYG Modal -->
 <div class="modal fade admin-field-add" id="wysiwygModal" tabindex="-1" role="dialog"
     aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -207,6 +242,37 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary wysiwyg-save" onclick='saveWYSIWYG()'
+                    data-dismiss="modal">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Section Editor Modal -->
+<div class="modal fade" id="sectoinEditorModal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Block</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <input type="hidden" id="block-edit-it">
+                <div id="editor-container">
+
+https://github.com/josdejong/jsoneditor
+                    <textarea id="section-editor" class="section-editor">loading...</textarea>
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary wysiwyg-save" onclick='saveSection()'
                     data-dismiss="modal">Save</button>
             </div>
         </div>
