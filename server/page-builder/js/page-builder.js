@@ -1,11 +1,13 @@
 var page = {};
-var imageList, tinyImageList, currentSectionId, currentSection, currentRow, currentRowIndex, currentColumn, currentColumnIndex;
+var imageList, tinyImageList, currentSectionId, currentSection, currentRow, currentRowIndex, currentColumn,
+    currentColumnIndex, jsonEditor;
 
 $(document).ready(async function () {
     setupUIHovers();
     setupUIClicks();
     setupClickEvents();
     // setupWYSIWYG();
+    setupJsonEditor();
     getPage();
     imageList = await getImageList();
 });
@@ -189,17 +191,35 @@ async function editSection(sectionId) {
     currentSectionRecord = await getContentInstance(sectionId);
     currentSection = currentSectionRecord.data;
     console.log('currentSection', currentSection);
-    $('#section-editor').text(JSON.stringify(currentSection));
+    // $('#section-editor').text(JSON.stringify(currentSection));
+    loadJsonEditor();
     $('#sectoinEditorModal').appendTo("body").modal('show');
 }
 
+async function deleteSection(sectionId, index) {
+    console.log('delete section', sectionId, index);
+    //delete from page
+    page.data.layout.splice(index, 1);
+    await editContentInstance(page);
+
+    //delete section
+    await deleteContentInstance(sectionId);
+    fullPageUpdate();
+
+}
+
 async function saveSection() {
-    console.log(sectionId);
-    currentSectionRecord = await getContentInstance(sectionId);
-    currentSection = currentSectionRecord.data;
-    console.log('currentSection', currentSection);
-    $('#section-editor').text(JSON.stringify(currentSection));
-    $('#sectoinEditorModal').appendTo("body").modal('show');
+    var sectionData = jsonEditor.get();
+    console.log('jsonEditor', sectionData);
+    await editContentInstance(sectionData);
+    fullPageUpdate();
+
+    // console.log(sectionId);
+    // currentSectionRecord = await getContentInstance(sectionId);
+    // currentSection = currentSectionRecord.data;
+    // console.log('currentSection', currentSection);
+    // $('#section-editor').text(JSON.stringify(currentSection));
+    // $('#sectoinEditorModal').appendTo("body").modal('show');
 }
 
 async function generateNewRow() {
@@ -223,11 +243,21 @@ async function generateNewColumn() {
     return col;
 }
 
-async function addRow(sectionId) {
-    console.log('adding row to section: ' + sectionId);
+// async function addRow(sectionId) {
+//     console.log('adding row to section: ' + sectionId);
+//     let row = await this.generateNewRow();
+
+//     let section = await getContentInstance(sectionId);
+//     section.data.rows.push(row);
+//     editContentInstance(section);
+
+//     fullPageUpdate();
+// }
+
+async function addRow() {
     let row = await this.generateNewRow();
 
-    let section = await getContentInstance(sectionId);
+    let section = await getContentInstance(currentSectionId);
     section.data.rows.push(row);
     editContentInstance(section);
 
@@ -337,6 +367,19 @@ async function editContentInstance(payload) {
         });
 }
 
+async function deleteContentInstance(id) {
+    console.log('deleting content', id);
+    // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
+    return axios.delete(`/api/contents/${id}`)
+        .then(async function (response) {
+            console.log(response);
+            return await response.data;
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+}
+
 function processContentFields(payload, content) {
     for (var property in payload) {
         if (payload.hasOwnProperty(property)) {
@@ -419,6 +462,34 @@ async function openWYSIWYG() {
     // });
 }
 
+function setupJsonEditor() {
+    var container = document.getElementById("jsoneditor");
+
+    var options = {
+        mode: 'text',
+        modes: ['code', 'form', 'text', 'tree', 'view'], // allowed modes
+        onError: function (err) {
+            alert(err.toString());
+        },
+        onModeChange: function (newMode, oldMode) {
+            console.log('Mode switched from', oldMode, 'to', newMode);
+        }
+    };
+
+    jsonEditor = new JSONEditor(container, options);
+    // editor.destroy(); //reset'
+
+
+}
+
+function loadJsonEditor() {
+    var json = currentSectionRecord;
+    jsonEditor.set(json);
+
+    // get json
+    var editor = jsonEditor.get();
+}
+
 async function getImageList() {
     let imageList = await axios.get(`/api/containers/container1/files`);
     // console.log('imageList', imageList.data);
@@ -449,6 +520,9 @@ async function saveWYSIWYG() {
 
     //re-add block edit
     $('.block-button').show().appendTo($('.block-edit'));
+
+    fullPageUpdate();
+
 }
 
 //TODO, make this just refresh the body content with a full get

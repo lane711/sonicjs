@@ -22,6 +22,7 @@
     "font-awesome": "^4.7.0",
     "helmet": "^3.18.0",
     "jquery": "^3.4.1",
+    "jsoneditor": "^6.1.0",
     "loopback": "^3.22.0",
     "loopback-boot": "^2.6.5",
     "loopback-component-explorer": "^6.2.0",

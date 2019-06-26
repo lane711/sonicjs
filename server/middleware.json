@@ -71,6 +71,13 @@
         "params": "$!../node_modules/popper.js/dist/umd"
       },
       {
+        "name": "jsoneditor",
+        "paths": [
+          "/"
+        ],
+        "params": "$!../node_modules/jsoneditor/dist"
+      },
+      {
         "name": "tinymce",
         "paths": [
           "/js"
