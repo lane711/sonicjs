@@ -260,7 +260,10 @@ module.exports = {
             for (let bodyBlock of bodyBlocks.children) {
                 let shortcode = bodyBlock.shortcode;
                 if (shortcode.name == "BLOCK") {
-                    await this.replaceShortCode(shortcode)
+                    await this.replaceBlockShortCode(shortcode)
+                }
+                if (shortcode.name == "FORM") {
+                    await this.replaceFormShortCode(shortcode)
                 }
             }
         }
@@ -284,11 +287,20 @@ module.exports = {
     //     });
     // },
 
-    replaceShortCode: async function (shortcode) {
+    replaceBlockShortCode: async function (shortcode) {
         let blockId = shortcode.properties.id;
         let content = await this.getContentById(blockId);
         // console.log('replaceShortCode.getContentById', content);
         let newBody = `<span data-id="${blockId}">${content.data.body}</span>`;
+        pageContent = pageContent.replace(shortcode.codeText, newBody);
+    },
+
+
+    replaceFormShortCode: async function (shortcode) {
+        let blockId = shortcode.properties.id;
+        // let content = await this.getContentById(blockId);
+        // console.log('replaceShortCode.getContentById', content);
+        let newBody = `<span data-id="${blockId}">FORM GOES HERE</span>`;
         pageContent = pageContent.replace(shortcode.codeText, newBody);
     },
 
