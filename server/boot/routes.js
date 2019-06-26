@@ -77,7 +77,7 @@ module.exports = function (app) {
 
   app.get('*', async function (req, res, next) {
     if (req.url === '/' || req.url === '/explorer' || req.url.startsWith('/api')
-      || req.url.endsWith('.css') || req.url.endsWith('.map') || req.url.endsWith('.js') || req.url.indexOf('fonts') > -1) {
+      || req.url.endsWith('.css') || req.url.endsWith('.ico') || req.url.endsWith('.map') || req.url.endsWith('.js') || req.url.indexOf('fonts') > -1) {
       // log(chalk.blue(req.url));
       return next();
     }
