@@ -85,6 +85,25 @@ module.exports = {
     getPageByUrl: async function (id, instance) {
     },
 
+    // getSandboxPage: async function (id, instance) {
+    //     let themePath = __dirname + '/../assets/html/sandbox.html';
+
+    //     return new Promise((resolve, reject) => {
+    //         fs.readFile(themePath, "utf8", (err, data) => {
+    //             if (err) {
+    //                 console.log(err);
+    //                 reject(err);
+    //             }
+    //             else {
+    //                 console.log('data==>', data);
+    //                 this.processTemplate(data).then(html => {
+    //                     resolve('sandbox');
+    //                 })
+    //             }
+    //         });
+    //     });
+    // },
+
     processTemplate: async function (html) {
         pageContent = ''; //reset
         // this.setupShortCodeParser();

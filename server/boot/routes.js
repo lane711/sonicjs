@@ -41,6 +41,12 @@ module.exports = function (app) {
     res.send('ok');
   });
 
+  // app.get('/sandbox', async function (req, res) {
+  //   let sandbox = await contentService.getSandboxPage(req);
+  //   console.log('sandbox', sandbox);
+  //   res.render('home', await contentService.getSandboxPage(req));
+  // });
+
   app.get('/admin', async function (req, res) {
     res.send(adminPage);
   });
@@ -77,7 +83,7 @@ module.exports = function (app) {
 
   app.get('*', async function (req, res, next) {
     if (req.url === '/' || req.url === '/explorer' || req.url.startsWith('/api')
-      || req.url.endsWith('.css') || req.url.endsWith('.ico') || req.url.endsWith('.map') || req.url.endsWith('.js') || req.url.indexOf('fonts') > -1) {
+      || req.url.endsWith('.css') || req.url.endsWith('.html') || req.url.endsWith('.ico') || req.url.endsWith('.map') || req.url.endsWith('.js') || req.url.indexOf('fonts') > -1) {
       // log(chalk.blue(req.url));
       return next();
     }
