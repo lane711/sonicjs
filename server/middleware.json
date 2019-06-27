@@ -125,6 +125,13 @@
           "/"
         ],
         "params": "$!../server/assets"
+      },
+      {
+        "name": "formio",
+        "paths": [
+          "/"
+        ],
+        "params": "$!../node_modules/formiojs/dist"
       }
     ]
   },

@@ -1,4 +1,6 @@
 var pageBuilderService = require('.//page-builder.service');
+var formService = require('.//form.service');
+
 var fs = require('fs');
 const cheerio = require('cheerio')
 const axios = require('axios');
@@ -317,9 +319,9 @@ module.exports = {
 
     replaceFormShortCode: async function (shortcode) {
         let blockId = shortcode.properties.id;
-        // let content = await this.getContentById(blockId);
-        // console.log('replaceShortCode.getContentById', content);
-        let newBody = `<span data-id="${blockId}">FORM GOES HERE</span>`;
+        let form = await formService.getForm();
+        console.log('replaceFormShortCode.form', form);
+        let newBody = form;
         pageContent = pageContent.replace(shortcode.codeText, newBody);
     },
 
