@@ -11,7 +11,15 @@ const document = { getElementById: {} };
 
 module.exports = {
 
-    getForm: function () {
+    getForm: async function () {
+        let form = "<script type='text/javascript'> const components = ";
+        form += this.getFormDefinition();;
+        form += "</script>";
+        form += await this.getFormTemplate();
+        return form;
+    },
+
+    getFormTemplate: function () {
         let themePath = __dirname + '/../assets/html/form.html';
 
         return new Promise((resolve, reject) => {
@@ -27,62 +35,41 @@ module.exports = {
         });
     },
 
-    getForm2: function () {
-        let form = "<script type='text/javascript'>";
-        form += "window.onload = function () {";
-        form += this.getFormDefinition();;
-        form += "};";
-        form += "</script>";
-        form += "<div id='formio'></div>";
 
-        return form;
-    },
 
     getFormDefinition: function () {
 
-        return Formio.createForm(document.getElementById('formio'), {
-            components: [
-                {
-                    type: 'textfield',
-                    key: 'firstName',
-                    label: 'First Name',
-                    placeholder: 'Enter your first name.',
-                    input: true
-                },
-                {
-                    type: 'textfield',
-                    key: 'lastName',
-                    label: 'Last Name',
-                    placeholder: 'Enter your last name',
-                    input: true
-                },
-                {
-                    type: 'currency',
-                    key: 'cost',
-                    label: 'Cost',
-                    placeholder: 'Enter $ cost',
-                    input: true
-                },
-                {
-                    type: 'button',
-                    action: 'submit',
-                    label: 'Submit',
-                    theme: 'primary'
-                }
-            ]
-        }).then((form) => {
-            console.log('log form', form);
+        let components = [
+            {
+                type: 'textfield',
+                key: 'firstName',
+                label: 'First Name',
+                placeholder: 'Enter your first name.',
+                input: true
+            },
+            {
+                type: 'textfield',
+                key: 'lastName',
+                label: 'Last Name',
+                placeholder: 'Enter your last name',
+                input: true
+            },
+            {
+                type: 'currency',
+                key: 'cost',
+                label: 'Cost',
+                placeholder: 'Enter $ cost',
+                input: true
+            },
+            {
+                type: 'button',
+                action: 'submit',
+                label: 'Submit',
+                theme: 'primary'
+            }
+        ];
 
-            form.on('submit', function (submission) {
-                console.log('Submission was made!', submission);
-            });
-
-            // Everytime the form changes, this will fire.
-            form.on('change', function (changed) {
-                console.log('Form was changed', changed);
-            });
-
-        });
+        return components;
 
     },
 }
