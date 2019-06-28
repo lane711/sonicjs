@@ -1,5 +1,6 @@
 var pageBuilderService = require('.//page-builder.service');
 var formService = require('.//form.service');
+var dataService = require('.//data.service');
 
 var fs = require('fs');
 const cheerio = require('cheerio')
@@ -24,15 +25,28 @@ module.exports = {
     // },
 
     getRenderedPage: async function(req){
-        this.page = await this.getContentByUrl(req.url, 'page');
-        this.page.data.menu = await this.getContent('menu');
+        this.page = await dataService.getContentByUrl(req.url, 'page');
+        if (this.page.data[0]) {
+            await this.getPage(this.page.data[0].id, this.page.data[0]);
+            let page = this.page.data[0];
+            this.page.data.html = pageContent;
+        }
+
+        // if (pageRecord.data[0]) {
+        //     await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);
+        //     let page = pageRecord.data[0];
+        //     page.data.html = pageContent;
+        //     return page;
+        // }
+
+        this.page.data.menu = await dataService.getContent('menu');
         let rows = [];
         this.page.data.hasRows = false;
         if(this.page.data.layout){
             this.page.data.rows = this.page.data.layout.rows;
             this.page.data.hasRows = true;
         }
-        this.page.data.siteSettings = await this.getContentTopOne('site-settings');
+        this.page.data.siteSettings = await dataService.getContentTopOne('site-settings');
         // console.log('this.page.data.siteSettings', this.page.data.siteSettings);
         // console.log('getRenderedPage page', this.page);
         return{ page: this.page };
@@ -51,7 +65,7 @@ module.exports = {
         }
         else {
             if (id) {
-                this.page = await this.getContentById(id);
+                this.page = await dataService.getContentById(id);
             }
 
         }
@@ -158,7 +172,7 @@ module.exports = {
         let navWrapper = $('.s--menu-item').parent();
         navWrapper.empty();
 
-        let menuItems = await this.getContent('menu');
+        let menuItems = await dataService.getContent('menu');
         // console.log('menuItems', menuItems);
         menuItems.forEach(menuItem => {
             // console.log('menuItem', menuItem);
@@ -183,7 +197,7 @@ module.exports = {
             await this.asyncForEach(sections, async (sectionId) => {
 
 
-                let section = await this.getContentById(sectionId);
+                let section = await dataService.getContentById(sectionId);
                 pageContent += `<section data-id='${section.id}' class="jumbotron-fluid">`;
                 pageContent += '<div class="container">';
                 let rows = await this.processRows($, sectionWrapper, section.data.rows)
@@ -310,7 +324,7 @@ module.exports = {
 
     replaceBlockShortCode: async function (shortcode) {
         let blockId = shortcode.properties.id;
-        let content = await this.getContentById(blockId);
+        let content = await dataService.getContentById(blockId);
         // console.log('replaceShortCode.getContentById', content);
         let newBody = `<span data-id="${blockId}">${content.data.body}</span>`;
         pageContent = pageContent.replace(shortcode.codeText, newBody);
@@ -319,94 +333,16 @@ module.exports = {
 
     replaceFormShortCode: async function (shortcode) {
         let blockId = shortcode.properties.id;
-        let form = await formService.getForm();
-        console.log('replaceFormShortCode.form', form);
+        let form = await formService.getForm('contact');
+        // console.log('replaceFormShortCode.form', form);
         let newBody = form;
         pageContent = pageContent.replace(shortcode.codeText, newBody);
     },
-
-    getContent: async function (contentType) {
-
-        const filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
-        //axios.get(apiUrl + `contents?filter=${filter}`)
-        let url = `${apiUrl}contents?filter=${filter}`;
-        // console.log('url', url);
-        let page = await axios.get(url);
-        // page.data.html = 'delete this';
-        // console.log('getContent', page.data);
-        return page.data;
-    },
-
-    getContentTopOne: async function (contentType) {
-
-        let results = await this.getContent(contentType);
-
-        return results[0].data;
-    },
-
-    getContentByUrl: async function (pageUrl, contentType) {
-        // log(chalk.red('getContentByUrl', pageUrl))
-        const filter = `{"where":{"and":[{"url":"${pageUrl}"},{"data.contentType":"${contentType}"}]}}`;
-        // log(chalk.red('filter', filter));
-        const encodedFilter = encodeURI(filter);
-        let url = `${apiUrl}contents?filter=${encodedFilter}`;
-        // console.log('getContentByUrlurl', url);
-        let pageRecord = await axios.get(url);
-        // console.log('getContentByUrl:page.data', page.data[0]);
-        //now render page
-        if (pageRecord.data[0]) {
-            await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);
-            let page = pageRecord.data[0];
-            page.data.html = pageContent;
-            // console.log(page);
-            return page;
-        }
-        // page.data[0].data.html = html;
-
-        return 'not found';
-    },
-
-    getContentById: async function (id) {
-        let url = `${apiUrl}contents/${id}`;
-        // console.log('url', url);
-        let content = await axios.get(url);
-        //page.data.html = undefined;
-        // console.log('getContent', page.data);
-        return content.data;
-    },
-
-    // getMenuItems: async function () {
-    //     let data;
-    //     let contentType = 'menu';
-    //     const filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
-    //     //axios.get(apiUrl + `contents?filter=${filter}`)
-    //     await axios.get('http://localhost:3000/api/contents?filter=%7B%22where%22%3A%7B%22data.contentType%22%3A%22menu%22%7D%7D')
-    //         .then(function (response) {
-    //             // handle success
-    //             // console.log('menu items ==>', response.data);
-    //             data = response.data;
-    //         })
-    //         .catch(function (error) {
-    //             // handle error
-    //             console.log(error);
-    //         })
-    //         .then(function () {
-    //             // always executed
-    //         });
-    //     return data;
-    // },
 
     asyncForEach: async function (array, callback) {
         for (let index = 0; index < array.length; index++) {
             await callback(array[index], index, array);
         }
     }
-
-
-    // async getContentByType(contentType) {
-    //   const filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
-    //   let url = environment.apiUrl + `contents?filter=${filter}`;
-    //   return this.http.get(url).toPromise();
-    // }
 
 }
