@@ -333,7 +333,9 @@ module.exports = {
 
     replaceFormShortCode: async function (shortcode) {
         let blockId = shortcode.properties.id;
-        let form = await formService.getForm('contact');
+        let contentType = shortcode.properties.contentType;
+
+        let form = await formService.getForm(contentType);
         // console.log('replaceFormShortCode.form', form);
         let newBody = form;
         pageContent = pageContent.replace(shortcode.codeText, newBody);

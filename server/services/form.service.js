@@ -44,11 +44,12 @@ module.exports = {
         let components = [];
 
         contentTypeDef.fieldList.forEach(field => {
+            let fieldType = field.fieldType == 'textBox' ? 'textfield' : field.fieldType;
             let fieldDef = {
-                type: 'textfield',
-                key: 'firstName',
-                label: 'First Name',
-                placeholder: 'Enter your first name.',
+                type: fieldType,
+                key: field.systeid,
+                label: field.label,
+                // placeholder: 'Enter your first name.',
                 input: true
             }
             components.push(fieldDef);
