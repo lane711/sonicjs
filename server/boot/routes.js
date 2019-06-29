@@ -1,6 +1,8 @@
 var themes = require(__dirname + '../../themes/themes');
 var contentService = require('../services/content.service');
 var pageBuilderService = require('../services/page-builder.service');
+var formio = require('../services/formio.service');
+
 var cors = require('cors');
 
 const chalk = require('chalk');
@@ -15,7 +17,7 @@ module.exports = function (app) {
   let page = '';
   let adminPage = '';
 
-  
+  formio.getComponents();
 
   (async () => {
     // page = await themes.getTheme();
