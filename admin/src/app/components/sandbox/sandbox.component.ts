@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild  } from '@angular/core';
 // import { interval } from 'rxjs';
 declare var $: any;
 
@@ -9,6 +9,11 @@ declare var $: any;
 })
 export class SandboxComponent implements OnInit {
 
+  @ViewChild('json') jsonElement?: ElementRef;
+  public form: Object = {components: []};
+  onChange(event) {
+    console.log(event.form);
+  }
   constructor() { }
 
   cars: any;
@@ -37,6 +42,7 @@ export class SandboxComponent implements OnInit {
       automatic_uploads: false
    });
   }
+  
   addCar(){
       let car = { name: "Honda" };
       this.cars.push(car);

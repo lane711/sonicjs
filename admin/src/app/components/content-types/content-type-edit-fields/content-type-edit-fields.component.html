@@ -6,6 +6,30 @@
 
       </div>
       <div class="card-body">
+
+        <form-builder [form]="form" (change)="onFormioChange($event)"></form-builder>
+
+      </div>
+      <div class="card-footer">
+        <button type="button" class="btn btn-success pull-right add-field" data-toggle="modal"
+          data-target="#addFieldModal">
+          Save
+        </button>
+      </div>
+    </div>
+
+  </div>
+  <!--/.col-->
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <i class="fa fa-align-justify"></i> Manage Fields
+
+      </div>
+      <div class="card-body">
         <!-- <form action="" method="post" enctype="multipart/form-data" class="form-horizontal"> -->
 
         <table class="table table-responsive-sm table-striped">
@@ -53,57 +77,58 @@
       </div>
     </div>
 
-  </div>
-  <!--/.col-->
-</div>
 
-<!-- Modal -->
-<div class="modal fade admin-field-add" id="addFieldModal" tabindex="-1" role="dialog"
-  aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Add Field To Content Type</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
 
-        <table class="table table-responsive-sm table-striped">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Preview</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let fieldType of fieldTypes">
-              <td>
-                {{ fieldType.name }}
-              </td>
-              <td>
-                <div [innerHTML]="fieldType.generateHtml() | safe: 'html'"></div>
-              </td>
-              <td>
-                <button class="btn btn-sm btn-primary {{fieldType.name}}"
-                  (click)="addField($event, fieldType)">Add</button>
-              </td>
 
-            </tr>
-          </tbody>
-        </table>
 
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+
+    <!-- Modal -->
+    <div class="modal fade admin-field-add" id="addFieldModal" tabindex="-1" role="dialog"
+      aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Add Field To Content Type</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+
+            <table class="table table-responsive-sm table-striped">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Preview</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let fieldType of fieldTypes">
+                  <td>
+                    {{ fieldType.name }}
+                  </td>
+                  <td>
+                    <div [innerHTML]="fieldType.generateHtml() | safe: 'html'"></div>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-primary {{fieldType.name}}"
+                      (click)="addField($event, fieldType)">Add</button>
+                  </td>
+
+                </tr>
+              </tbody>
+            </table>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
-<h1>formio</h1>
+    <!-- <h1>formio</h1>
 <script src='https://unpkg.com/formiojs@latest/dist/formio.full.min.js'></script>
 <script type='text/javascript'>
 alert('load 34');
@@ -156,4 +181,4 @@ alert('load 34');
     });
   };
 </script>
-<div id='formio'></div>
+<div id='formio'></div> -->

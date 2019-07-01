@@ -1,4 +1,4 @@
-import { Component, OnInit} from "@angular/core";
+import { Component, OnInit, ElementRef, ViewChild } from "@angular/core";
 import { FieldTypesService } from "../../../../../projects/sonic-core/src/lib/services/field-types.service";
 import { ContentTypesService } from "../../../../../projects/sonic-core/src/lib/services/content-types.service";
 import { UiService } from "../../../../../projects/sonic-core/src/lib/services/ui.service";
@@ -19,6 +19,12 @@ export class ContentTypeEditFieldsComponent implements OnInit {
     private router: Router,
     private uiService:UiService
   ) {}
+
+  @ViewChild('json') jsonElement?: ElementRef;
+  public form: Object = {components: []};
+  onFormioChange(event) {
+    console.log('onFormioChange', event.form);
+  }
 
   public fieldTypes;
   public fields;

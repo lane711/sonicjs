@@ -32,6 +32,7 @@ import { PageBuilderComponent } from './components/page-builder/page-builder.com
 import { PageBuilderEditorComponent } from './components/page-builder-editor/page-builder-editor.component';
 import { EditorModule } from '@tinymce/tinymce-angular';
 import { MediaComponent } from './components/media/media.component';
+import { FormioModule } from 'angular-formio';
 
 import { DropzoneModule } from 'ngx-dropzone-wrapper';    
 import { DROPZONE_CONFIG } from 'ngx-dropzone-wrapper';    
@@ -80,6 +81,7 @@ const DROPZONECONFIG: DropzoneConfigInterface = {
     ReactiveFormsModule,
     NgbModule,
     EditorModule,
+    FormioModule,
     DropzoneModule
   ],
   providers: [    
