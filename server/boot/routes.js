@@ -17,12 +17,14 @@ module.exports = function (app) {
   let page = '';
   let adminPage = '';
 
-  formio.getComponents();
+
 
   (async () => {
     // page = await themes.getTheme();
     // page = this.contentService.getPage('5cdb5cc2f744441df910f43f', null);
     // console.log('asunc page ==>', page);
+
+
   })();
 
   (async () => {
@@ -89,6 +91,8 @@ module.exports = function (app) {
       // log(chalk.blue(req.url));
       return next();
     }
+
+    formio.getComponents();
 
     res.render('home', await contentService.getRenderedPage(req));
   });

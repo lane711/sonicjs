@@ -18,23 +18,12 @@ export class SandboxComponent implements OnInit {
     this.cars.push(car);
     this.cars.push(car);
 
-    // Create an Observable that will publish a value on an interval
-    // const secondsCounter = interval(1000);
-    // Subscribe to begin publishing values
-    // secondsCounter.subscribe(n => {
-    //   console.log(`It's been ${n} seconds since subscribing!`);
-    //   let car = { name: "Audi" };
+    // this.loadwysiwyg();
 
-    //   if(this.cars.length < 5){
-    //   this.cars.push(car);
-    //   }
-    // });
 
-    // window.tinyMCE.overrideDefaults({
-    //   base_url: '/admin/tinymce/',  // Base for assets such as skins, themes and plugins
-    //   suffix: '.min'          // This will make Tiny load minified versions of all its assets
-    // });
+  }
 
+  loadwysiwyg(){
     $('textarea.wysiwyg-content').tinymce({
       selector: '#block-content',
       plugins: 'image imagetools',
@@ -47,9 +36,7 @@ export class SandboxComponent implements OnInit {
       images_upload_url: 'postAcceptor.php',
       automatic_uploads: false
    });
-
   }
-
   addCar(){
       let car = { name: "Honda" };
       this.cars.push(car);

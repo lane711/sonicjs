@@ -15,19 +15,20 @@ const log = console.log;
 var formio = require('formio-service')();
 var Form = formio.Form;
 
-const utils = require('formiojs/utils');
+// const utils = require('formiojs/utils');
 
 
 module.exports = {
 
     getComponents: async function (contentType) {
-        let f = new Form('https://examples.form.io/example');
+        console.log('getting components');
+        let form = new Form('https://examples.form.io/example');
         // Form.components
-        console.log(f);
-        formio.loadForm().then((form) => {
+        console.log(form);
+        // formio.loadForm().then((form) => {
           FormioUtils.eachComponent(form.components, (component) => {
             console.log(component);
-          });
+        //   });
         })
 
         // var comps = utils.findComponents(form.components, {
