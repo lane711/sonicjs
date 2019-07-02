@@ -6,13 +6,13 @@
 
       </div>
       <div class="card-body">
-
-        <form-builder [form]="form" (change)="onFormioChange($event)"></form-builder>
+        <div>{{componentsJson}}</div>
+        <form-builder 
+        (change)="onFormioChange($event)" [form]="componentsJson"></form-builder>
 
       </div>
       <div class="card-footer">
-        <button type="button" class="btn btn-success pull-right add-field" data-toggle="modal"
-          data-target="#addFieldModal">
+        <button type="button" class="btn btn-success pull-right" (click)="onSave()">
           Save
         </button>
       </div>

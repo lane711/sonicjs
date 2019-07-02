@@ -2,10 +2,10 @@ import { Component, OnInit, ElementRef, ViewChild } from "@angular/core";
 import { FieldTypesService } from "../../../../../projects/sonic-core/src/lib/services/field-types.service";
 import { ContentTypesService } from "../../../../../projects/sonic-core/src/lib/services/content-types.service";
 import { UiService } from "../../../../../projects/sonic-core/src/lib/services/ui.service";
-import  * as shortid from 'node_modules/shortid';
+import * as shortid from 'node_modules/shortid';
 import { Router } from "@angular/router";
 
-declare var jQuery:any;
+declare var jQuery: any;
 
 @Component({
   selector: "app-content-type-edit-fields",
@@ -17,25 +17,82 @@ export class ContentTypeEditFieldsComponent implements OnInit {
     private fieldTypesService: FieldTypesService,
     private contentTypesService: ContentTypesService,
     private router: Router,
-    private uiService:UiService
-  ) {}
+    private uiService: UiService
+  ) { }
 
   @ViewChild('json') jsonElement?: ElementRef;
-  public form: Object = {components: []};
+  public form: Object = { components: [] };
+
   onFormioChange(event) {
-    console.log('onFormioChange', event.form);
+    this.components = event.form;
+    // console.log('onFormioChange', ev˝ent.form);
+  }
+
+  public components;
+  public componentsJson = {
+    components: [
+      {
+          type: 'textfield',
+          key: 'firstName',
+          label: 'First Name',
+          placeholder: 'Enter your first name.',
+          input: true
+      },
+      {
+          type: 'textfield',
+          key: 'lastName',
+          label: 'Last Name',
+          placeholder: 'Enter your last name',
+          input: true
+      },
+      {
+          type: 'currency',
+          key: 'cost',
+          label: 'Cost',
+          placeholder: 'Enter $ cost',
+          input: true
+      },
+      {
+          type: 'button',
+          action: 'submit',
+          label: 'Submit',
+          theme: 'primary'
+      }
+  ]
   }
 
   public fieldTypes;
   public fields;
 
+  async onSave() {
+    console.log('saving...', this.contentTypesService.contentType.id);
+    let contentType = await this.contentTypesService.getContentTypePromise(this.contentTypesService.contentType.id) as any;
+    if(this.components){
+      contentType.components = this.components;
+    }
+    await this.contentTypesService.putContentTypeAsync(contentType);
+    console.log('contentType', contentType);
+  }
+
   ngOnInit() {
+    this.loadContentType();
     this.fieldTypes = this.fieldTypesService.getTypes();
+    this.components = this.contentTypesService.contentType.components;
+    // this.componentsJson = JSON.stringify(this.components);
+    console.log('ngOnInit this.componentsJson', this.components);
+    // this.form.components = this.components
+  }
+
+  loadContentType(){
+    this.contentTypesService.contentTypeSubject.subscribe(data => {
+      console.log('loadContentType', data);
+      this.componentsJson = data.components;
+    });
   }
 
   public addField(event, field) {
     const self = this;
-console.log('addField.fieldType', field);
+    console.log('addField.fieldType', field);
     let fieldData = {
       fieldType: field.name,
       systemid: shortid.generate(),
@@ -67,8 +124,8 @@ console.log('addField.fieldType', field);
       });
   }
 
-  public saveLabel(id, newLabel){
-    this.contentTypesService.getContentType(id).then(data =>{
+  public saveLabel(id, newLabel) {
+    this.contentTypesService.getContentType(id).then(data => {
       // console.log('updating field for:', data);
     });
   }
@@ -78,11 +135,11 @@ console.log('addField.fieldType', field);
     location.reload();
   }
 
-  goToFieldEdit(fieldId){
+  goToFieldEdit(fieldId) {
     this.uiService.toggleSideAside(fieldId);
-    
+
     this.router.navigate(
-      ['/content-types/' + this.contentTypesService.contentType.id], 
+      ['/content-types/' + this.contentTypesService.contentType.id],
       { queryParams: { 'fieldId': fieldId } }
     );
   }
