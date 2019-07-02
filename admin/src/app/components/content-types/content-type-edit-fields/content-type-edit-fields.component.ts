@@ -30,35 +30,7 @@ export class ContentTypeEditFieldsComponent implements OnInit {
 
   public components;
   public componentsJson = {
-    components: [
-      {
-          type: 'textfield',
-          key: 'firstName',
-          label: 'First Name',
-          placeholder: 'Enter your first name.',
-          input: true
-      },
-      {
-          type: 'textfield',
-          key: 'lastName',
-          label: 'Last Name',
-          placeholder: 'Enter your last name',
-          input: true
-      },
-      {
-          type: 'currency',
-          key: 'cost',
-          label: 'Cost',
-          placeholder: 'Enter $ cost',
-          input: true
-      },
-      {
-          type: 'button',
-          action: 'submit',
-          label: 'Submit',
-          theme: 'primary'
-      }
-  ]
+    components: []
   }
 
   public fieldTypes;
@@ -77,7 +49,6 @@ export class ContentTypeEditFieldsComponent implements OnInit {
   ngOnInit() {
     this.loadContentType();
     this.fieldTypes = this.fieldTypesService.getTypes();
-    this.components = this.contentTypesService.contentType.components;
     // this.componentsJson = JSON.stringify(this.components);
     console.log('ngOnInit this.componentsJson', this.components);
     // this.form.components = this.components
