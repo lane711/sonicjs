@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { ContentService } from "../../../../../projects/sonic-core/src/lib/services/content.service";
 import { ContentTypesService } from "../../../../../projects/sonic-core/src/lib/services/content-types.service";
 
@@ -13,8 +13,21 @@ export class ContentAddComponent implements OnInit {
     private contentService: ContentService) { }
 
   contentTypes: any;
+  contentType: any;
   questions: any;
   isFormDataAvailable = false;
+  public components;
+  public componentsJson = {
+    components: []
+  }
+
+  @ViewChild('json') jsonElement?: ElementRef;
+  public form: Object = { components: [] };
+
+  onFormioChange(event) {
+    this.components = event.form;
+    // console.log('onFormioChange', ev˝ent.form);
+  }
 
   ngOnInit() {
     this.loadContentTypeButton();
@@ -26,15 +39,20 @@ export class ContentAddComponent implements OnInit {
     })
   }
 
-  loadContentInstanceForm(contentType){
+  loadContentInstanceForm(contentType) {
+    this.contentType = contentType;
     this.contentTypesService.getContentTypeBySystemIdPromise(contentType).then(contentType => {
+
+      console.log('loadContentInstanceForm.contentType', contentType)
+      this.componentsJson = contentType[0].components;
+
       if (contentType) {
         this.setQuestions(contentType[0].controls);
       } else {
         this.loadQuestions();
       }
     });
-    
+
   }
 
   loadQuestions() {
@@ -50,6 +68,13 @@ export class ContentAddComponent implements OnInit {
 
     this.questions = questions;
     this.isFormDataAvailable = true;
+  }
+
+  onSubmit(submission: any) {
+    console.log('onSubmit', submission); // This will print out the full submission from Form.io API.
+    let content = submission.data;
+    content.contentType = this.contentType;
+    this.contentService.createContentInstance(content);
   }
 
   onSubmitContentAdd(payload) {

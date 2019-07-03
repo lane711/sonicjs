@@ -6,6 +6,9 @@
       </div>
       <div class="card-body">
         <div *ngIf="!isFormDataAvailable">
+            <button (click)="onCancelContentAdd()"
+            class="btn btn-success rmargin">Back</button>
+            <hr>
           <h4>Select content type to add:</h4>
           <hr>
           <span *ngFor="let contentType of contentTypes">
@@ -13,13 +16,9 @@
               class="btn btn-success btn-lg rmargin">{{contentType.name}}</button>
           </span>
         </div>
+        <formio *ngIf="isFormDataAvailable" (submit)="onSubmit($event)"  [form]="componentsJson"></formio>
 
-
-        <button (click)="onCancelContentAdd()"
-              class="btn btn-success rmargin">Back</button>
-
-
-        <app-forms *ngIf="isFormDataAvailable" [questions]="questions" [onCancelHandler]="onCancelContentAdd" [onSubmitHandler]="onSubmitContentAdd"></app-forms>
+        <!-- <app-forms *ngIf="isFormDataAvailable" [questions]="questions" [onCancelHandler]="onCancelContentAdd" [onSubmitHandler]="onSubmitContentAdd"></app-forms> -->
       </div>
     </div>
   </div>
