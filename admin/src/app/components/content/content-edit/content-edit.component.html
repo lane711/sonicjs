@@ -5,7 +5,8 @@
         <i class="fa fa-align-justify"></i> Edit Content Instance
       </div>
       <div class="card-body">
-          <formio *ngIf="isDataAvailable" (submit)="onSubmit($event)"  [form]="componentsJson"></formio>
+          <formio *ngIf="isDataAvailable" (submit)="onSubmit($event)"  [form]="componentsJson"
+          [submission]="formData"></formio>
 
         <!-- <app-forms *ngIf="isDataAvailable" [questions]="questions" [onSubmitHandler]="onSubmitContentEdit" id="{{contentInstance.id}}"></app-forms> -->
       </div>

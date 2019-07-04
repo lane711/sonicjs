@@ -25,6 +25,7 @@ export class ContentEditComponent implements OnInit {
   public componentsJson = {
     components: []
   }
+  formData:any;
 
   async ngOnInit() {
     this.id = this.route.snapshot.paramMap.get("id");
@@ -36,17 +37,17 @@ export class ContentEditComponent implements OnInit {
      this.contentType = await this.contentTypesService.getContentTypeBySystemIdPromise('formiotest');
      this.componentsJson = this.contentType[0].components;
 
-    this.contentService.getContentInstance(this.id).then(contentInstance =>{
-      this.contentInstance = contentInstance;
-      console.log('--- loadContentTypeForm.contentInstance -->', this.contentInstance);
-
+     this.contentInstance = await this.contentService.getContentInstance(this.id);
+     let data = this.contentInstance.data;
+     this.formData = { data } ;
+     console.log('this.formData ', this.formData )
       this.isDataAvailable = true;
 
       // this.contentTypesService.getContentTypeBySystemIdPromise(this.contentInstance.data.contentType).then(data =>{
       //   this.setQuestions(data[0].controls);
       //   this.loadContentIntoContentTypeForm();
       // });
-    })
+    // })
   }
 
   async loadContentIntoContentTypeForm(){
