@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from "@angular/router";
 import { ContentService } from '../../../../../projects/sonic-core/src/lib/services/content.service';
 import { ContentTypesService } from '../../../../../projects/sonic-core/src/lib/services/content-types.service'
@@ -21,22 +21,31 @@ export class ContentEditComponent implements OnInit {
   contentType: any;
   questions: any;
   isDataAvailable = false;
+  public components;
+  public componentsJson = {
+    components: []
+  }
 
   async ngOnInit() {
     this.id = this.route.snapshot.paramMap.get("id");
-    // console.log('content edit route', this.route.snapshot);
+    console.log('content edit route', this.route.snapshot);
     this.loadContentTypeForm();
   }
 
-   loadContentTypeForm(){
+   async loadContentTypeForm(){
+     this.contentType = await this.contentTypesService.getContentTypeBySystemIdPromise('formiotest');
+     this.componentsJson = this.contentType[0].components;
+
     this.contentService.getContentInstance(this.id).then(contentInstance =>{
       this.contentInstance = contentInstance;
-      // console.log('loadContentTypeForm.contentInstance', this.contentInstance);
+      console.log('--- loadContentTypeForm.contentInstance -->', this.contentInstance);
 
-      this.contentTypesService.getContentTypeBySystemIdPromise(this.contentInstance.data.contentType).then(data =>{
-        this.setQuestions(data[0].controls);
-        this.loadContentIntoContentTypeForm();
-      });
+      this.isDataAvailable = true;
+
+      // this.contentTypesService.getContentTypeBySystemIdPromise(this.contentInstance.data.contentType).then(data =>{
+      //   this.setQuestions(data[0].controls);
+      //   this.loadContentIntoContentTypeForm();
+      // });
     })
   }
 
