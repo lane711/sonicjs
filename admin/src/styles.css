@@ -3,7 +3,15 @@
     margin-right: 12px;
 }
 
+.tmargin{
+    margin-top: 12px;
+}
+
 
 .page-builder-nav{
     display: none;
+}
+
+.btn .fa {
+    margin: 0 6px 0 0;
 }

@@ -23,6 +23,7 @@ export class ContentTypeEditComponent implements OnInit {
 
   public contentType;
   isDataAvailable = false;
+  shortcode;
 
   questions = [
     // new HiddenQuestion({
@@ -69,6 +70,7 @@ export class ContentTypeEditComponent implements OnInit {
       this.contentType = this.contentTypesService.contentType;
       this.isDataAvailable = true;
       this.loadFormData();
+      this.loadShortCode();
     });
   }
 
@@ -91,5 +93,9 @@ console.log('saving...', this.contentTypesService.contentType);
       // this.contentTypeSubject.next(updateContentType);
       // this.contentTypeSubject.complete();
     })
+  }
+
+  loadShortCode(){
+    this.shortcode = `[FORM contentType=\"${this.contentType.name}\"/]`;
   }
 }

@@ -34,13 +34,15 @@ export class ContentEditComponent implements OnInit {
   }
 
    async loadContentTypeForm(){
-     this.contentType = await this.contentTypesService.getContentTypeBySystemIdPromise('formiotest');
-     this.componentsJson = this.contentType[0].components;
-
      this.contentInstance = await this.contentService.getContentInstance(this.id);
      let data = this.contentInstance.data;
      this.formData = { data } ;
      console.log('this.formData ', this.formData )
+
+     this.contentType = await this.contentTypesService.getContentTypeBySystemIdPromise(this.formData.data.contentType);
+     this.componentsJson = this.contentType[0].components;
+
+  
       this.isDataAvailable = true;
 
       // this.contentTypesService.getContentTypeBySystemIdPromise(this.contentInstance.data.contentType).then(data =>{
