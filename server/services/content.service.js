@@ -48,7 +48,10 @@ module.exports = {
         }
         this.page.data.siteSettings = await dataService.getContentTopOne('site-settings');
         // console.log('this.page.data.siteSettings', this.page.data.siteSettings);
-        // console.log('getRenderedPage page', this.page);
+        // console.log('getRenderedPage page ====>', this.page.data.heroImage[0].originalName);
+        if(this.page.data.heroImage){
+            this.page.data.heroImage = this.page.data.heroImage[0].originalName;
+        }
         return{ page: this.page };
         // return{ id:this.page.id, title: this.page.data.name, rows: rows, 
         //   sections: this.page.data.sections, html: this.page.data.html, menu: menu, page: this.page };
