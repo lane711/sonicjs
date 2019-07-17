@@ -1,5 +1,7 @@
 var pageBuilderService = require('.//page-builder.service');
 var formService = require('.//form.service');
+var listService = require('.//list.service');
+
 var dataService = require('.//data.service');
 
 var fs = require('fs');
@@ -303,6 +305,9 @@ module.exports = {
                 if (shortcode.name == "FORM") {
                     await this.replaceFormShortCode(shortcode)
                 }
+                if (shortcode.name == "LIST") {
+                    await this.replaceListShortCode(shortcode)
+                }
             }
         }
     },
@@ -342,6 +347,14 @@ module.exports = {
         // console.log('replaceFormShortCode.form', form);
         let newBody = form;
         pageContent = pageContent.replace(shortcode.codeText, newBody);
+    },
+
+    replaceListShortCode: async function (shortcode) {
+        let blockId = shortcode.properties.id;
+        let contentType = shortcode.properties.contentType;
+
+        let list = await listService.getList(contentType);
+        pageContent = pageContent.replace(shortcode.codeText, list);
     },
 
     asyncForEach: async function (array, callback) {
