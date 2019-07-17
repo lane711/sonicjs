@@ -16,9 +16,21 @@ module.exports = {
 
         // var hbs = exphbs.create({ /* config */ });
 
-        var source = "<p>Hello, my name is {{name}}. I am from {{hometown}}. I have " +
-             "{{kids.length}} kids:</p>" +
-             "<ul>{{#kids}}<li>{{name}} is {{age}}</li>{{/kids}}</ul>";
+        // var source = "<p>Hello, my name is {{name}}. I am from {{hometown}}. I have " +
+        //      "{{kids.length}} kids:</p>" +
+        //      "<ul>{{#kids}}<li>{{name}} is {{age}}</li>{{/kids}}</ul>";
+
+        const hbs = handlebars.create({
+            extname      :'hbs',
+            layoutsDir   : 'path/to/layout/directory',
+            defaultLayout: 'main',
+            helpers      : 'path/to/helpers/directory',
+            partialsDir  : [
+                'path/to/partials/directory'
+            ]
+        });
+
+        var source = "{{> page-builder }}"
 var template = handlebars.compile(source);
  
 var data = { "name": "Alan", "hometown": "Somewhere, TX",
