@@ -1,0 +1,16 @@
+{{!-- <p>Hello, my name is {{name}}. I am from {{hometown}}. I have " +
+             "{{kids.length}} kids:</p>" +
+             "<ul>{{#kids}}<li>{{name}} is {{age}}</li>{{/kids}}</ul> --}}
+
+{{#each this}}
+<div class="row">
+    <div class="col">
+        <h2>{{this.title}}</h2>
+    </div>
+</div>
+<div class="row">
+    {{!-- <div class="col">{{this.data.image}}</div> --}}
+    <div class="col">{{{this.body}}}</div>
+</div>
+{{this.url}}<br>
+{{/each}}

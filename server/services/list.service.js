@@ -22,16 +22,24 @@ module.exports = {
         //     "kids": [{ "name": "Jimmy", "age": "12" }, { "name": "Sally", "age": "4" }]
         // };
         var data = await dataService.getContent(contentType);
-        console.log('getList data ====>', data);
-        var result = template(data);
 
-        console.log('resulr', result);
+        let viewModel = data.map(function(record) {
+            return {title : record.data.title,
+                body : record.data.body
+            };
+            });
+        console.log('getList data ====>', data);
+        console.log('getList viewModel ====>', viewModel);
+
+        var result = template(viewModel);
+
+        // console.log('resulr', result);
 
         return result;
     },
 
     getHandlebarsTemplate: async function (contentType) {
-        let themePath = __dirname + '/../views/partials/blog.handlebars';
+        let themePath = __dirname + `/../views/partials/${contentType}/list.handlebars`;
 
         return new Promise((resolve, reject) => {
             fs.readFile(themePath, "utf8", (err, data) => {
