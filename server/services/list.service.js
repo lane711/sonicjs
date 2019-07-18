@@ -14,35 +14,36 @@ module.exports = {
 
     getList: async function (contentType) {
 
-        // var hbs = exphbs.create({ /* config */ });
+        var source = await this.getHandlebarsTemplate(contentType);
+        var template = handlebars.compile(source);
 
-        // var source = "<p>Hello, my name is {{name}}. I am from {{hometown}}. I have " +
-        //      "{{kids.length}} kids:</p>" +
-        //      "<ul>{{#kids}}<li>{{name}} is {{age}}</li>{{/kids}}</ul>";
+        // var data = {
+        //     "name": "Alan", "hometown": "Somewhere, TX",
+        //     "kids": [{ "name": "Jimmy", "age": "12" }, { "name": "Sally", "age": "4" }]
+        // };
+        var data = await dataService.getContent(contentType);
+        console.log('getList data ====>', data);
+        var result = template(data);
 
-        const hbs = handlebars.create({
-            extname      :'hbs',
-            layoutsDir   : 'path/to/layout/directory',
-            defaultLayout: 'main',
-            helpers      : 'path/to/helpers/directory',
-            partialsDir  : [
-                'path/to/partials/directory'
-            ]
-        });
+        console.log('resulr', result);
 
-        var source = "{{> page-builder }}"
-var template = handlebars.compile(source);
- 
-var data = { "name": "Alan", "hometown": "Somewhere, TX",
-             "kids": [{"name": "Jimmy", "age": "12"}, {"name": "Sally", "age": "4"}]};
-var result = template(data);
-
-
-        let list = "list goes here";
-        // let fieldsDef = await this.getFormDefinition(contentType);
-        // form +=  JSON.stringify(fieldsDef);
-        // form += "</script>";
-        // form += await this.getFormTemplate();
         return result;
+    },
+
+    getHandlebarsTemplate: async function (contentType) {
+        let themePath = __dirname + '/../views/partials/blog.handlebars';
+
+        return new Promise((resolve, reject) => {
+            fs.readFile(themePath, "utf8", (err, data) => {
+                if (err) {
+                    console.log(err);
+                    reject(err);
+                }
+                else {
+                    // console.log('getHandlebarsTemplate==>', data);
+                    resolve(data);
+                }
+            });
+        });
     }
 }

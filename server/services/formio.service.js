@@ -21,10 +21,10 @@ var Form = formio.Form;
 module.exports = {
 
     getComponents: async function (contentType) {
-        console.log('getting components');
+        // console.log('getting components');
         let form = new Form('https://examples.form.io/example');
         // Form.components
-        console.log(form);
+        // console.log(form);
         // formio.loadForm().then((form) => {
           FormioUtils.eachComponent(form.components, (component) => {
             console.log(component);

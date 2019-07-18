@@ -1,3 +1,7 @@
-<p>Hello, my name is {{name}}. I am from {{hometown}}. I have " +
+{{!-- <p>Hello, my name is {{name}}. I am from {{hometown}}. I have " +
              "{{kids.length}} kids:</p>" +
-             "<ul>{{#kids}}<li>{{name}} is {{age}}</li>{{/kids}}</ul>
+             "<ul>{{#kids}}<li>{{name}} is {{age}}</li>{{/kids}}</ul> --}}
+
+{{#each this}}
+{{this.url}}<br>
+{{/each}}
