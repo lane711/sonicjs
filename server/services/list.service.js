@@ -23,11 +23,14 @@ module.exports = {
         // };
         var data = await dataService.getContent(contentType);
 
-        let viewModel = data.map(function(record) {
-            return {title : record.data.title,
-                body : record.data.body
+        let viewModel = data.map(function (record) {
+            return {
+                title: record.data.title,
+                body: record.data.body,
+                image: dataService.getImage(record.data.image[0]),
+                url: record.data.url
             };
-            });
+        });
         console.log('getList data ====>', data);
         console.log('getList viewModel ====>', viewModel);
 

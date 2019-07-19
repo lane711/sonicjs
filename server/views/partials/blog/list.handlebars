@@ -5,12 +5,11 @@
 {{#each this}}
 <div class="row">
     <div class="col">
-        <h2>{{this.title}}</h2>
+        <a href="{{this.url}}"><h1>{{this.title}}</h1></a>
     </div>
 </div>
 <div class="row">
-    {{!-- <div class="col">{{this.data.image}}</div> --}}
+    <div class="col"><a href="{{this.url}}">{{{this.image}}}</a></div>
     <div class="col">{{{this.body}}}</div>
 </div>
-{{this.url}}<br>
 {{/each}}

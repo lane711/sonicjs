@@ -62,6 +62,15 @@ module.exports = {
         for (let index = 0; index < array.length; index++) {
             await callback(array[index], index, array);
         }
+    },
+
+    getImageUrl: function (img) {
+        return `/api/containers/container1/download/${img.originalName}`;
+    },
+
+    getImage: function (img) {
+        let url = this.getImageUrl(img);
+        return `<img src="${url}" />`;
     }
 
 }
