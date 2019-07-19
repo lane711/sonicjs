@@ -1,4 +1,5 @@
 var dataService = require('./data.service');
+var helperService = require('./helper.service');
 
 var fs = require('fs');
 const cheerio = require('cheerio')
@@ -26,7 +27,7 @@ module.exports = {
         let viewModel = data.map(function (record) {
             return {
                 title: record.data.title,
-                body: record.data.body,
+                body: helperService.truncateString(record.data.body, 400),
                 image: dataService.getImage(record.data.image[0]),
                 url: record.data.url
             };

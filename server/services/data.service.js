@@ -70,7 +70,7 @@ module.exports = {
 
     getImage: function (img) {
         let url = this.getImageUrl(img);
-        return `<img src="${url}" />`;
+        return `<img class="img-fluid rounded" src="${url}" />`;
     }
 
 }
