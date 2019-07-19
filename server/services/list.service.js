@@ -32,8 +32,8 @@ module.exports = {
                 url: record.data.url
             };
         });
-        console.log('getList data ====>', data);
-        console.log('getList viewModel ====>', viewModel);
+        // console.log('getList data ====>', data);
+        // console.log('getList viewModel ====>', viewModel);
 
         var result = template(viewModel);
 

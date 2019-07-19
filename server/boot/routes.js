@@ -92,7 +92,7 @@ module.exports = function (app) {
       return next();
     }
 
-    formio.getComponents();
+    // formio.getComponents();
 
     res.render('home', await contentService.getRenderedPage(req));
   });
