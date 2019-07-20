@@ -37,7 +37,17 @@ module.exports = {
         return results[0].data;
     },
 
-    getContentByUrl: async function (pageUrl, contentType) {
+    getContentByUrl: async function (url) {
+        var  filter = encodeURI(`{"where":{"data.url":"${url}"}}`);
+        let apiFullUrl = `${apiUrl}contents?filter=${filter}`;
+        let record = await axios.get(apiFullUrl);
+        if (record.data[0]) {
+            return record;
+        }
+        return 'not found';
+    },
+
+    getContentByUrlAndContentType: async function (pageUrl, contentType) {
         const filter = `{"where":{"and":[{"url":"${pageUrl}"},{"data.contentType":"${contentType}"}]}}`;
         const encodedFilter = encodeURI(filter);
         let url = `${apiUrl}contents?filter=${encodedFilter}`;

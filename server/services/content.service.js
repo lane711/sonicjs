@@ -27,7 +27,7 @@ module.exports = {
     // },
 
     getRenderedPage: async function(req){
-        this.page = await dataService.getContentByUrl(req.url, 'page');
+        this.page = await dataService.getContentByUrl(req.url);
         if (this.page.data[0]) {
             await this.getPage(this.page.data[0].id, this.page.data[0]);
             let page = this.page.data[0];
