@@ -61,9 +61,9 @@ module.exports = function (app) {
   // });
 
   //home page
-  router.get('/', async function (req, res) {
-    res.render('home', await contentService.getRenderedPage(req));
-  });
+  // router.get('/', async function (req, res) {
+  //   res.render('home', await contentService.getRenderedPage(req));
+  // });
 
 
 
@@ -86,7 +86,7 @@ module.exports = function (app) {
   });
 
   app.get('*', async function (req, res, next) {
-    if (req.url === '/' || req.url === '/explorer' || req.url.startsWith('/api')
+    if ( req.url === '/explorer' || req.url.startsWith('/api')
       || req.url.endsWith('.css') || req.url.endsWith('.html') || req.url.endsWith('.ico') || req.url.endsWith('.map') || req.url.endsWith('.js') || req.url.indexOf('fonts') > -1) {
       // log(chalk.blue(req.url));
       return next();
