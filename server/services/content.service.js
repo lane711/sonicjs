@@ -1,6 +1,7 @@
 var pageBuilderService = require('.//page-builder.service');
 var formService = require('.//form.service');
 var listService = require('.//list.service');
+var menuService = require('.//menu.service');
 
 var dataService = require('.//data.service');
 
@@ -41,7 +42,7 @@ module.exports = {
         //     return page;
         // }
 
-        this.page.data.menu = await dataService.getContentByContentTypeAndTitle('menu', 'Main');
+        this.page.data.menu = await menuService.getMenu('Main');
         let rows = [];
         this.page.data.hasRows = false;
         if(this.page.data.layout){
