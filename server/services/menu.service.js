@@ -19,13 +19,19 @@ module.exports = {
 
         for (let index = 0; index < links.length; index++) {
             const item = links[index];
-            let hasChildren = this.hasChildren(links, index);
 
-            menu.push({
-                url: item.url,
-                title: item.title,
-                hasChildren: hasChildren
-            });
+            if (item.level == 0) {
+                let hasChildren = this.hasChildren(links, index);
+
+                let childLinks = this.getChildren(links, hasChildren, index);
+
+                menu.push({
+                    url: item.url,
+                    title: item.title,
+                    hasChildren: hasChildren,
+                    childLinks: childLinks
+                });
+            }
         }
 
         // menuData.data.links.forEach(item => {
@@ -36,15 +42,36 @@ module.exports = {
     },
 
     hasChildren: function (links, currentLinkIndex) {
-        if (currentLinkIndex < links.length -1) {
+        if (currentLinkIndex < links.length - 1) {
             let currentLink = links[currentLinkIndex];
             let nextLink = links[currentLinkIndex + 1];
             if (currentLink.level == 0 && nextLink.level == 1) {
                 return true;
             }
         }
-
         return false;
+    },
+
+
+    getChildren: function (links, hasChildren, currentLinkIndex) {
+        let childLinks = [];
+        if (hasChildren) {
+
+            for (let index = currentLinkIndex + 1; index < links.length; index++) {
+                let currentLink = links[index];
+                if (currentLink.level == 1) {
+                    childLinks.push({
+                        url: currentLink.url,
+                        title: currentLink.title,
+                        hasChildren: false
+                    });
+                } else {
+                    break;
+                }
+            }
+        }
+
+        return childLinks;
     }
 
 }

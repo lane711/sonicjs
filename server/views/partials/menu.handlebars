@@ -17,7 +17,9 @@
                     {{this.title}}
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="#">Action</a>
+                    {{#each this.childLinks}}
+                    <a class="dropdown-item" href="{{this.url}}">{{this.title}}</a>
+                    {{/each}}
                 </div>
             </li>
             {{else}}
