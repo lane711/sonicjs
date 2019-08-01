@@ -104,6 +104,17 @@ module.exports = {
 
     },
 
+    getBlog: async function(req){
+        let blog = await dataService.getContentByUrl(req.url);
+        if (blog.data[0]) {
+            // await this.getPage(this.page.data[0].id, this.page.data[0]);
+            // let page = this.page.data[0];
+            // this.page.data.html = pageContent;
+            return blog.data[0];
+        }
+        return 'error';
+    },
+
     getPageByUrl: async function (id, instance) {
     },
 

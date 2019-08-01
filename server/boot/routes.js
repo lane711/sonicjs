@@ -94,7 +94,13 @@ module.exports = function (app) {
 
     // formio.getComponents();
 
-    res.render('home', await contentService.getRenderedPage(req));
+    if(req.url.startsWith('/blog/')){
+      res.render('blog', await contentService.getBlog(req));
+    }
+    else{
+      res.render('home', await contentService.getRenderedPage(req));
+    }
+
   });
   // app.use('/admin', function(req, res, next) {
   //   console.log('admin route', req.url);
