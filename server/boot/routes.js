@@ -12,10 +12,13 @@ var admin = require(__dirname + '/admin');
 const helmet = require('helmet')
 
 module.exports = function (app) {
+  
   var router = app.loopback.Router();
 
   let page = '';
   let adminPage = '';
+
+  contentService.testHooks();
 
 
 

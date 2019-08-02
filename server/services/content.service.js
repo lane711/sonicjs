@@ -12,6 +12,9 @@ const ShortcodeTree = require('shortcode-tree').ShortcodeTree;
 const chalk = require('chalk');
 const log = console.log;
 
+const Hook = require('before-after-hook');
+const hook = new Hook.Singular()
+
 const apiUrl = 'http://localhost:3000/api/';
 var pageContent = '';
 var page;
@@ -19,15 +22,67 @@ var id;
 
 module.exports = {
 
-    foo: function () {
-        return 'bar';
+    testHooks: function () {
+        console.log('testing hooks');
+
+        hook.before(this.beforeHook)
+        hook.error(this.errorHook)
+        hook.after(this.afterHook)
+
+        this.getData({ id: 123 })
+
+        console.log('END testing hooks');
+
     },
+
+    // Create a hook
+    getData: function (options) {
+        console.log('getData');
+
+        return hook(this.fetchFromDatabase, options)
+            .then(this.handleData)
+            .catch(this.handleGetError)
+    },
+
+    fetchFromDatabase: function (option) {
+        console.log('fetchFromDatabase for: ' + options);
+        return {id: 123, title: 'ipsum de lor'};
+    },
+
+    handleData: function (option) {
+        console.log('handleData');
+    },
+
+    beforeHook: function (option) {
+        console.log('beforeHook');
+
+    },
+
+    errorHook: function (option) {
+        console.log('errorHook');
+
+    },
+
+    afterHook: function (option) {
+        console.log('afterHook');
+    },
+
+    // handleGetError: funciton (option){
+    //     log(chalk.blue(option));
+
+    // },
+    // register before/error/after hooks.
+    // The methods can be async or return a promise
+    // hook.before(beforeHook)
+    // hook.error(errorHook)
+    // hook.after(afterHook)
+
 
     // getContentUrls: async function (id, instance) {
     //     ret
     // },
 
-    getRenderedPage: async function(req){
+    getRenderedPage: async function (req) {
         this.page = await dataService.getContentByUrl(req.url);
         if (this.page.data[0]) {
             await this.getPage(this.page.data[0].id, this.page.data[0]);
@@ -45,17 +100,17 @@ module.exports = {
         this.page.data.menu = await menuService.getMenu('Main');
         let rows = [];
         this.page.data.hasRows = false;
-        if(this.page.data.layout){
+        if (this.page.data.layout) {
             this.page.data.rows = this.page.data.layout.rows;
             this.page.data.hasRows = true;
         }
         this.page.data.siteSettings = await dataService.getContentTopOne('site-settings');
         // console.log('this.page.data.siteSettings', this.page.data.siteSettings);
         // console.log('getRenderedPage page ====>', this.page.data.heroImage[0].originalName);
-        if(this.page.data.heroImage){
+        if (this.page.data.heroImage) {
             this.page.data.heroImage = this.page.data.heroImage[0].originalName;
         }
-        return{ page: this.page };
+        return { page: this.page };
         // return{ id:this.page.id, title: this.page.data.name, rows: rows, 
         //   sections: this.page.data.sections, html: this.page.data.html, menu: menu, page: this.page };
     },
@@ -104,13 +159,13 @@ module.exports = {
 
     },
 
-    getBlog: async function(req){
+    getBlog: async function (req) {
         let blog = await dataService.getContentByUrl(req.url);
         blog = blog.data[0]
         if (blog) {
             blog.data.menu = await menuService.getMenu('Main');
 
-            if(blog.data.image){
+            if (blog.data.image) {
                 blog.data.heroImage = blog.data.image[0].originalName;
             }
             // let page = this.page.data[0];
@@ -226,7 +281,7 @@ module.exports = {
                 pageContent += '</div>';
                 pageContent += `</section>`;
 
-                this.page.data.sections.push({id : sectionId, title: section.data.title,  rows: rows});
+                this.page.data.sections.push({ id: sectionId, title: section.data.title, rows: rows });
 
 
                 // console.log('section==>', section);
