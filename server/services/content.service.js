@@ -26,9 +26,9 @@ module.exports = {
     getRenderedPage: async function (req) {
 
         // hookGetRenderedPage.before(beforeHook)
-        hookGetRenderedPage.error(this.errorHook)
-        hookGetRenderedPage.after(this.processMenu)
-        // hookGetRenderedPage.after(afterHookBlog)
+        hookGetRenderedPage.error(this.errorHook);
+        hookGetRenderedPage.after(this.processPage);
+        hookGetRenderedPage.after(this.processMenu);
 
         let options = {req: req};
 
@@ -38,11 +38,7 @@ module.exports = {
         .catch(this.handleGetError)
 
         this.page = await dataService.getContentByUrl(req.url);
-        if (this.page.data[0]) {
-            await this.getPage(this.page.data[0].id, this.page.data[0]);
-            let page = this.page.data[0];
-            this.page.data.html = pageContent;
-        }
+
 
         // if (pageRecord.data[0]) {
         //     await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);
@@ -70,16 +66,33 @@ module.exports = {
     },
 
     getContentFromDB: async function (options) {
-        options.data = await dataService.getContentByUrl(options.req.url);
+        let contentData = await dataService.getContentByUrl(options.req.url);
+        options.data = contentData.data[0];
         return options;
     },
 
     processMenu: async function (options) {
         options.data.processMenu =  true;
+        return options;
+    },
+
+    processPage: async function (options) {
+        if (options.data) {
+            let contentData2 = await dataService.getContentByUrl(options.req.url);
+            console.log('this', this);
+
+            let test = await this.testAS(options);
+            this.id = options.data;
+            let result = await this.getPage(options);
+            let page = this.page.data[0];
+            options.data.html = pageContent;
+        }
+        return options;
     },
 
     handleData: async function (options) {
         options.data.handleData =  true;
+        return options;
     },
 
     errorHook: async function (options) {
@@ -87,18 +100,22 @@ module.exports = {
         console.log('error', options);
     },
 
-    getPage: async function (id, instance) {
-        if (!id) {
+    testAS: async function (options) {
+        return 'test';
+    },
+
+    getPage: async function (options) {
+        if (!options.data.id) {
             return;
         }
         // log(chalk.green(id));
-        this.id = id;
+        this.id = options.data.id;
         if (instance) {
-            this.page = instance;
+            this.page = options.data;
         }
         else {
             if (id) {
-                this.page = await dataService.getContentById(id);
+                this.page = await dataService.getContentById(options.data.id);
             }
 
         }
@@ -215,21 +232,21 @@ module.exports = {
     //     });
     // },
 
-    processMenu: async function ($) {
+    // processMenu: async function ($) {
 
-        let menuItemTemplate = $.html('.s--menu-item');
-        let navWrapper = $('.s--menu-item').parent();
-        navWrapper.empty();
+    //     let menuItemTemplate = $.html('.s--menu-item');
+    //     let navWrapper = $('.s--menu-item').parent();
+    //     navWrapper.empty();
 
-        let menuItems = await dataService.getContent('menu');
-        // console.log('menuItems', menuItems);
-        menuItems.forEach(menuItem => {
-            // console.log('menuItem', menuItem);
-            let item = menuItemTemplate.replace("Home", menuItem.data.name)
-                .replace('#', menuItem.url)
-            navWrapper.append(item);
-        });
-    },
+    //     let menuItems = await dataService.getContent('menu');
+    //     // console.log('menuItems', menuItems);
+    //     menuItems.forEach(menuItem => {
+    //         // console.log('menuItem', menuItem);
+    //         let item = menuItemTemplate.replace("Home", menuItem.data.name)
+    //             .replace('#', menuItem.url)
+    //         navWrapper.append(item);
+    //     });
+    // },
 
     processSections: async function ($) {
 
