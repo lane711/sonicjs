@@ -12,15 +12,11 @@ var admin = require(__dirname + '/admin');
 const helmet = require('helmet')
 
 module.exports = function (app) {
-  
+
   var router = app.loopback.Router();
 
   let page = '';
   let adminPage = '';
-
-  contentService.testHooks();
-
-
 
   (async () => {
     // page = await themes.getTheme();
@@ -89,18 +85,19 @@ module.exports = function (app) {
   });
 
   app.get('*', async function (req, res, next) {
-    if ( req.url === '/explorer' || req.url.startsWith('/api')
+    if (req.url === '/explorer' || req.url.startsWith('/api')
       || req.url.endsWith('.css') || req.url.endsWith('.html') || req.url.endsWith('.ico') || req.url.endsWith('.map') || req.url.endsWith('.js') || req.url.indexOf('fonts') > -1) {
       // log(chalk.blue(req.url));
       return next();
     }
 
     // formio.getComponents();
+    let renderedPage = await contentService.getRenderedPage(req);
 
-    if(req.url.startsWith('/blog/')){
+    if (req.url.startsWith('/blog/')) {
       res.render('blog', await contentService.getBlog(req));
     }
-    else{
+    else {
       res.render('home', await contentService.getRenderedPage(req));
     }
 
@@ -137,5 +134,5 @@ module.exports = function (app) {
 
   app.use(router);
 
-};  
+};
 

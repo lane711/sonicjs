@@ -13,7 +13,7 @@ const chalk = require('chalk');
 const log = console.log;
 
 const Hook = require('before-after-hook');
-const hook = new Hook.Singular()
+const hookGetRenderedPage = new Hook.Singular()
 
 const apiUrl = 'http://localhost:3000/api/';
 var pageContent = '';
@@ -22,67 +22,21 @@ var id;
 
 module.exports = {
 
-    testHooks: function () {
-        console.log('testing hooks');
-
-        hook.before(this.beforeHook)
-        hook.error(this.errorHook)
-        hook.after(this.afterHook)
-
-        this.getData({ id: 123 })
-
-        console.log('END testing hooks');
-
-    },
-
-    // Create a hook
-    getData: function (options) {
-        console.log('getData');
-
-        return hook(this.fetchFromDatabase, options)
-            .then(this.handleData)
-            .catch(this.handleGetError)
-    },
-
-    fetchFromDatabase: function (option) {
-        console.log('fetchFromDatabase for: ' + options);
-        return {id: 123, title: 'ipsum de lor'};
-    },
-
-    handleData: function (option) {
-        console.log('handleData');
-    },
-
-    beforeHook: function (option) {
-        console.log('beforeHook');
-
-    },
-
-    errorHook: function (option) {
-        console.log('errorHook');
-
-    },
-
-    afterHook: function (option) {
-        console.log('afterHook');
-    },
-
-    // handleGetError: funciton (option){
-    //     log(chalk.blue(option));
-
-    // },
-    // register before/error/after hooks.
-    // The methods can be async or return a promise
-    // hook.before(beforeHook)
-    // hook.error(errorHook)
-    // hook.after(afterHook)
-
-
-    // getContentUrls: async function (id, instance) {
-    //     ret
-    // },
 
     getRenderedPage: async function (req) {
+
+        // hookGetRenderedPage.before(beforeHook)
+        hookGetRenderedPage.error(this.errorHook)
+        hookGetRenderedPage.after(this.processMenu)
+        // hookGetRenderedPage.after(afterHookBlog)
+
+        let options = {req: req};
+
+        return hookGetRenderedPage(this.getContentFromDB, options)
+        .then(this.handleData)
+        // .then(handleDataBlog)
+        .catch(this.handleGetError)
+
         this.page = await dataService.getContentByUrl(req.url);
         if (this.page.data[0]) {
             await this.getPage(this.page.data[0].id, this.page.data[0]);
@@ -113,6 +67,24 @@ module.exports = {
         return { page: this.page };
         // return{ id:this.page.id, title: this.page.data.name, rows: rows, 
         //   sections: this.page.data.sections, html: this.page.data.html, menu: menu, page: this.page };
+    },
+
+    getContentFromDB: async function (options) {
+        options.data = await dataService.getContentByUrl(options.req.url);
+        return options;
+    },
+
+    processMenu: async function (options) {
+        options.data.processMenu =  true;
+    },
+
+    handleData: async function (options) {
+        options.data.handleData =  true;
+    },
+
+    errorHook: async function (options) {
+        // options.data.error =  true;
+        console.log('error', options);
     },
 
     getPage: async function (id, instance) {
