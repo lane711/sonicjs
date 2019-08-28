@@ -1,6 +1,8 @@
 var themes = require(__dirname + '../../themes/themes');
 var contentService = require('../services/content.service');
 var pageBuilderService = require('../services/page-builder.service');
+var moduleService = require('../services/module.service');
+
 var formio = require('../services/formio.service');
 
 var cors = require('cors');
@@ -22,6 +24,7 @@ module.exports = function (app) {
     // page = await themes.getTheme();
     // page = this.contentService.getPage('5cdb5cc2f744441df910f43f', null);
     // console.log('asunc page ==>', page);
+    moduleService.loadModules();
 
 
   })();

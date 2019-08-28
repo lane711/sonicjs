@@ -25,6 +25,7 @@ module.exports = {
 
     getRenderedPage: async function (req) {
 
+        //TODO: fix issue with multiple hook, getData, processData, renderData, etc
         // hookGetRenderedPage.before(beforeHook)
         hookGetRenderedPage.error(this.errorHook);
         hookGetRenderedPage.after(this.processPage);
@@ -81,7 +82,7 @@ module.exports = {
             let contentData2 = await dataService.getContentByUrl(options.req.url);
             console.log('this', this);
 
-            let test = await this.testAS(options);
+            // let test = await this.testAS(options);
             this.id = options.data;
             let result = await this.getPage(options);
             let page = this.page.data[0];
