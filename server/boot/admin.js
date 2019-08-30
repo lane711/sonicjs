@@ -6,7 +6,7 @@ module.exports = {
 
     loadAdmin: function () {
         let adminPath = path.join(__dirname, '../..', '/admin/dist/client/index.html');
-        console.log('adminPath--->', adminPath);
+        // console.log('adminPath--->', adminPath);
 
         return new Promise((resolve, reject) => {
             fs.readFile(adminPath, "utf8", (err, data) => {

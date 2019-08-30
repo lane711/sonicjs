@@ -4,7 +4,6 @@ var path = require("path");
 module.exports = {
 
     loadModules: function () {
-        console.log("loaded modules");
         this.processModules();
     },
 
@@ -14,14 +13,14 @@ module.exports = {
         this.getModuleDefinitionFiles(dir);
         // let path = __dirname + '/../modules';
         let moduleFolders = this.getModuleFolders(dir);
-        console.log('moduleFolders', moduleFolders);
+        // console.log('moduleFolders', moduleFolders);
     },
 
     getModuleFolders: function (path) {
-        console.log('fining:' + path)
+        // console.log('finding module at:' + path)
         dir.subdirs(path, function(err, subdirs) {
             if (err) throw err;
-            console.log('subdirs', subdirs);
+            // console.log('subdirs', subdirs);
         });
     },
 
@@ -31,12 +30,12 @@ module.exports = {
             exclude: /^\./
             }, function(err, content, next) {
                 if (err) throw err;
-                console.log('content:', content);
+                // console.log('content:', content);
                 next();
             },
             function(err, files){
                 if (err) throw err;
-                console.log('finished reading files:',files);
+                // console.log('finished reading files:',files);
             });
     },
 

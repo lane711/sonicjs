@@ -11,6 +11,8 @@ const axios = require('axios');
 const ShortcodeTree = require('shortcode-tree').ShortcodeTree;
 const chalk = require('chalk');
 const log = console.log;
+const EventEmitter = require('events').EventEmitter;
+var ee = new EventEmitter();
 
 const apiUrl = 'http://localhost:3000/api/';
 var pageContent = '';
@@ -28,12 +30,17 @@ module.exports = {
     // },
 
     getRenderedPage: async function(req){
+
+        ee.emit('getRenderedPagePreDataFetch', req);
+
         this.page = await dataService.getContentByUrl(req.url);
         if (this.page.data[0]) {
             await this.getPage(this.page.data[0].id, this.page.data[0]);
             let page = this.page.data[0];
             this.page.data.html = pageContent;
         }
+
+        ee.emit('getRenderedPagePostDataFetch', req);
 
         // if (pageRecord.data[0]) {
         //     await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);
@@ -43,6 +50,8 @@ module.exports = {
         // }
 
         this.page.data.menu = await menuService.getMenu('Main');
+
+
         let rows = [];
         this.page.data.hasRows = false;
         if(this.page.data.layout){
