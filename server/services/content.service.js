@@ -40,7 +40,7 @@ module.exports = {
             this.page.data.html = pageContent;
         }
 
-        ee.emit('getRenderedPagePostDataFetch', req);
+        ee.emit('getRenderedPagePostDataFetch', req, this.page);
 
         // if (pageRecord.data[0]) {
         //     await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);

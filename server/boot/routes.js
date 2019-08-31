@@ -3,6 +3,8 @@ var contentService = require('../services/content.service');
 var pageBuilderService = require('../services/page-builder.service');
 var formio = require('../services/formio.service');
 var moduleService = require('../services/module.service');
+var eventBusService = require('../services/event-bus.service');
+
 
 var cors = require('cors');
 
@@ -24,7 +26,10 @@ module.exports = function (app) {
     // page = await themes.getTheme();
     // page = this.contentService.getPage('5cdb5cc2f744441df910f43f', null);
     // console.log('asunc page ==>', page);
-    moduleService.loadModules();
+    console.log('emitting startup');
+    eventBusService.emit('startup');
+
+    // moduleService.loadModules();
 
   })();
 

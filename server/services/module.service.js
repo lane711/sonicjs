@@ -1,7 +1,28 @@
 var dir = require('node-dir');
 var path = require("path");
+var eventBusService = require('../services/event-bus.service');
+
+
+(async () => {
+    // page = await themes.getTheme();
+    // page = this.contentService.getPage('5cdb5cc2f744441df910f43f', null);
+    console.log('asunc module service ==>');
+
+    eventBusService.on('startup', function () {
+        console.log('=== startup from module service');
+
+    });
+
+    console.log('==== module service subscriptions complete ==>');
+
+
+  })();
 
 module.exports = {
+
+    loadEventSubscriptions: function () {
+        this.processModules();
+    },
 
     loadModules: function () {
         this.processModules();
