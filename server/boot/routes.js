@@ -2,9 +2,11 @@ var themes = require(__dirname + '../../themes/themes');
 var contentService = require('../services/content.service');
 var pageBuilderService = require('../services/page-builder.service');
 var formio = require('../services/formio.service');
-var moduleService = require('../services/module.service');
 var eventBusService = require('../services/event-bus.service');
 
+var moduleService = require('../services/module.service').startup();
+// const handler = new moduleService("one");
+// console.log(handler.getProject('test123'));
 
 var cors = require('cors');
 

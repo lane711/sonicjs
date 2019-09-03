@@ -2,29 +2,45 @@ var dir = require('node-dir');
 var path = require("path");
 var eventBusService = require('../services/event-bus.service');
 
+// class moduleService {
+//     constructor(projects) {
+//         // this.projects = projects;
+//         // this.getProject('test88');
+//         console.log('---> module service constructor')
+//     }
 
-(async () => {
-    // page = await themes.getTheme();
-    // page = this.contentService.getPage('5cdb5cc2f744441df910f43f', null);
-    console.log('asunc module service ==>');
-
-    eventBusService.on('startup', function () {
-        console.log('=== startup from module service');
-
-    });
-
-    console.log('==== module service subscriptions complete ==>');
+//     getProject(name) {
+//         return this.projects[name];
+//     }
+// }
 
 
-  })();
 
-module.exports = {
+// module.exports = moduleService;
 
-    loadEventSubscriptions: function () {
-        this.processModules();
-    },
+// mex.this.startup();
 
-    loadModules: function () {
+// var x = loadModules();
+
+// (async () => {
+//     // page = await themes.getTheme();
+//     // page = this.contentService.getPage('5cdb5cc2f744441df910f43f', null);
+//     console.log('asunc module service ==>');
+
+//     eventBusService.on('startup', function () {
+//         console.log('=== startup from module service');
+//         this.startup();
+//     });
+
+//     console.log('==== module service subscriptions complete ==>');
+
+
+// })();
+
+module.exports  = {
+
+    startup: function () {
+        console.log('^^^ module service startup')
         this.processModules();
     },
 
@@ -39,9 +55,9 @@ module.exports = {
 
     getModuleFolders: function (path) {
         // console.log('finding module at:' + path)
-        dir.subdirs(path, function(err, subdirs) {
+        dir.subdirs(path, function (err, subdirs) {
             if (err) throw err;
-            // console.log('subdirs', subdirs);
+            console.log('subdirs', subdirs);
         });
     },
 
@@ -49,12 +65,12 @@ module.exports = {
         dir.readFiles(path, {
             match: /module.json$/,
             exclude: /^\./
-            }, function(err, content, next) {
-                if (err) throw err;
-                // console.log('content:', content);
-                next();
-            },
-            function(err, files){
+        }, function (err, content, next) {
+            if (err) throw err;
+            // console.log('content:', content);
+            next();
+        },
+            function (err, files) {
                 if (err) throw err;
                 // console.log('finished reading files:',files);
             });
