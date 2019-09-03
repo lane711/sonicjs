@@ -1,10 +1,12 @@
 var themes = require(__dirname + '../../themes/themes');
-var contentService = require('../services/content.service');
 var pageBuilderService = require('../services/page-builder.service');
 var formio = require('../services/formio.service');
 var eventBusService = require('../services/event-bus.service');
 
 var moduleService = require('../services/module.service').startup();
+var menuService = require('../services/menu.service');
+var contentService = require('../services/content.service');
+
 // const handler = new moduleService("one");
 // console.log(handler.getProject('test123'));
 
@@ -28,7 +30,7 @@ module.exports = function (app) {
     // page = await themes.getTheme();
     // page = this.contentService.getPage('5cdb5cc2f744441df910f43f', null);
     // console.log('asunc page ==>', page);
-    console.log('emitting startup');
+    // console.log('emitting startup');
     eventBusService.emit('startup');
 
     // moduleService.loadModules();
@@ -36,6 +38,8 @@ module.exports = function (app) {
   })();
 
   (async () => {
+    await menuService.startup();
+
     //TODO fix admin path for prod mode
     adminPage = await admin.loadAdmin();
     // console.log('asunc page ==>', page);

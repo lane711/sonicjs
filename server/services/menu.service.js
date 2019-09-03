@@ -1,5 +1,6 @@
 var dataService = require('./data.service');
 var helperService = require('./helper.service');
+var eventBusService = require('./event-bus.service');
 
 var fs = require('fs');
 const cheerio = require('cheerio')
@@ -10,7 +11,17 @@ const log = console.log;
 
 
 
-module.exports = {
+module.exports = menuService = {
+
+    startup: async function () {
+        console.log('>>=== menu startup');
+
+        eventBusService.on('getRenderedPagePostDataFetch', async function (req, page) {
+            console.log('>>=== menu executing');
+            page.data.menu =  await menuService.getMenu('Main');
+
+        });
+    },
 
     getMenu: async function (menuName) {
         let menuData = await dataService.getContentByContentTypeAndTitle('menu', menuName);

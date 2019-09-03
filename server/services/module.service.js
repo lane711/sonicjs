@@ -37,11 +37,13 @@ var eventBusService = require('../services/event-bus.service');
 
 // })();
 
-module.exports  = {
+module.exports = moduleService = {
 
     startup: function () {
-        console.log('^^^ module service startup')
-        this.processModules();
+        eventBusService.once('startup', function () {
+            // console.log('>>=== startup from module service');
+            moduleService.processModules();
+        });
     },
 
     processModules: function () {
@@ -57,7 +59,7 @@ module.exports  = {
         // console.log('finding module at:' + path)
         dir.subdirs(path, function (err, subdirs) {
             if (err) throw err;
-            console.log('subdirs', subdirs);
+            // console.log('subdirs', subdirs);
         });
     },
 
