@@ -13,13 +13,25 @@ const log = console.log;
 
 module.exports = menuService = {
 
-    startup: async function () {
+    startup: function () {
         console.log('>>=== menu startup');
 
-        eventBusService.on('getRenderedPagePostDataFetch', async function (req, page) {
-            console.log('>>=== menu executing');
-            page.data.menu =  await menuService.getMenu('Main');
-            page.data.eventCount += 1;
+        eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
+
+
+                menuService.getMenu('Main').then(data=>{
+                    options.page.data.menu = data;
+            });
+
+            // await new Promise((resolve, reject) => {
+            //     console.log('>>=== menu executing');
+            //     menuService.getMenu('Main').then(data=>{
+            //         page.data.menu = data;
+            //         resolve();
+            //     });
+            //     // page.data.menu = await menuService.getMenu('Main');
+            // });
+
 
         });
     },

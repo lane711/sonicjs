@@ -33,7 +33,7 @@ module.exports = {
 
     getRenderedPage: async function(req){
 
-        eventBusService.emit('getRenderedPagePreDataFetch', req);
+        // eventBusService.emit('getRenderedPagePreDataFetch', req);
 
         this.page = await dataService.getContentByUrl(req.url);
         if (this.page.data[0]) {
@@ -43,7 +43,8 @@ module.exports = {
         }
 
         this.page.data.eventCount = 0;
-        eventBusService.emit('getRenderedPagePostDataFetch', req, this.page);
+
+        eventBusService.emit('getRenderedPagePostDataFetch', {req: req, page: this.page});
 
         // if (pageRecord.data[0]) {
         //     await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);
@@ -76,13 +77,13 @@ module.exports = {
         //     //wait
         // }
 
-        process.nextTick (function () {         //<-----
-            // event.emit("work");
-        }); 
-
         return{ page: this.page };
         // return{ id:this.page.id, title: this.page.data.name, rows: rows, 
         //   sections: this.page.data.sections, html: this.page.data.html, menu: menu, page: this.page };
+    },
+
+    invokeEmitter: async function (id, instance) {
+        return
     },
 
     getPage: async function (id, instance) {
