@@ -19,6 +19,7 @@ module.exports = menuService = {
         eventBusService.on('getRenderedPagePostDataFetch', async function (req, page) {
             console.log('>>=== menu executing');
             page.data.menu =  await menuService.getMenu('Main');
+            page.data.eventCount += 1;
 
         });
     },

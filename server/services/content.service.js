@@ -2,6 +2,8 @@ var pageBuilderService = require('.//page-builder.service');
 var formService = require('.//form.service');
 var listService = require('.//list.service');
 var menuService = require('.//menu.service');
+var helperService = require('.//helper.service');
+
 
 var dataService = require('.//data.service');
 
@@ -40,6 +42,7 @@ module.exports = {
             this.page.data.html = pageContent;
         }
 
+        this.page.data.eventCount = 0;
         eventBusService.emit('getRenderedPagePostDataFetch', req, this.page);
 
         // if (pageRecord.data[0]) {
@@ -58,12 +61,25 @@ module.exports = {
             this.page.data.rows = this.page.data.layout.rows;
             this.page.data.hasRows = true;
         }
-        this.page.data.siteSettings = await dataService.getContentTopOne('site-settings');
+        // this.page.data.siteSettings = await dataService.getContentTopOne('site-settings');
         // console.log('this.page.data.siteSettings', this.page.data.siteSettings);
         // console.log('getRenderedPage page ====>', this.page.data.heroImage[0].originalName);
-        if(this.page.data.heroImage){
-            this.page.data.heroImage = this.page.data.heroImage[0].originalName;
-        }
+        // if(this.page.data.heroImage){
+        //     this.page.data.heroImage = this.page.data.heroImage[0].originalName;
+        // }
+
+        var events = eventBusService.listeners('getRenderedPagePostDataFetch');
+        var eventCount = eventBusService.listenerCount('getRenderedPagePostDataFetch');
+
+        //wait till all events finished
+        // while (this.page.data.eventCount < eventCount) {
+        //     //wait
+        // }
+
+        process.nextTick (function () {         //<-----
+            // event.emit("work");
+        }); 
+
         return{ page: this.page };
         // return{ id:this.page.id, title: this.page.data.name, rows: rows, 
         //   sections: this.page.data.sections, html: this.page.data.html, menu: menu, page: this.page };

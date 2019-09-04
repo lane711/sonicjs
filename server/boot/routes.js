@@ -5,6 +5,8 @@ var eventBusService = require('../services/event-bus.service');
 
 var moduleService = require('../services/module.service').startup();
 var menuService = require('../services/menu.service');
+var mediaService = require('../services/media.service');
+var siteSettingsService = require('../services/site-settings.service');
 var contentService = require('../services/content.service');
 
 // const handler = new moduleService("one");
@@ -39,6 +41,8 @@ module.exports = function (app) {
 
   (async () => {
     await menuService.startup();
+    await mediaService.startup();
+    await siteSettingsService.startup();
 
     //TODO fix admin path for prod mode
     adminPage = await admin.loadAdmin();
