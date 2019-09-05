@@ -16,9 +16,9 @@ module.exports = mediaService = {
     startup: async function () {
         console.log('>>=== media startup');
 
-        eventBusService.on('getRenderedPagePostDataFetch', async function (req, page) {
+        eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
             console.log('>>=== media executing');
-            mediaService.processHeroImage(page);
+            mediaService.processHeroImage(options.page);
 
         });
     },

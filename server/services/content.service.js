@@ -69,8 +69,8 @@ module.exports = {
         //     this.page.data.heroImage = this.page.data.heroImage[0].originalName;
         // }
 
-        var events = eventBusService.listeners('getRenderedPagePostDataFetch');
-        var eventCount = eventBusService.listenerCount('getRenderedPagePostDataFetch');
+        // var events = eventBusService.listeners('getRenderedPagePostDataFetch');
+        // var eventCount = eventBusService.listenerCount('getRenderedPagePostDataFetch');
 
         //wait till all events finished
         // while (this.page.data.eventCount < eventCount) {

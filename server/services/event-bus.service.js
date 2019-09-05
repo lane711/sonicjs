@@ -17,7 +17,7 @@ module.exports = {
         console.log('>> once ' + emitterName);
     },
 
-    emit: function (emitterName, options) {
+    emit: async function (emitterName, options) {
         console.log('*** emit >> ' + emitterName);
         console.log('list', emitterList);
 
@@ -29,7 +29,7 @@ module.exports = {
             console.log('executing...' + subscriber.functionToExecute, "on " + subscriber.emitterName);
 
             try {
-                subscriber.functionToExecute(options);
+                await subscriber.functionToExecute(options);
             } catch (error) {
                 console.log('EMIT ERROR:', error);
             }
