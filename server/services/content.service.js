@@ -44,7 +44,7 @@ module.exports = {
 
         this.page.data.eventCount = 0;
 
-        eventBusService.emit('getRenderedPagePostDataFetch', {req: req, page: this.page});
+        await eventBusService.emit('getRenderedPagePostDataFetch', {req: req, page: this.page});
 
         // if (pageRecord.data[0]) {
         //     await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);
@@ -77,7 +77,7 @@ module.exports = {
         //     //wait
         // }
 
-        return{ page: this.page };
+        return { page: this.page };
         // return{ id:this.page.id, title: this.page.data.name, rows: rows, 
         //   sections: this.page.data.sections, html: this.page.data.html, menu: menu, page: this.page };
     },
