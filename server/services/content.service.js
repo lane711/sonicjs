@@ -23,14 +23,6 @@ var id;
 
 module.exports = {
 
-    foo: function () {
-        return 'bar';
-    },
-
-    // getContentUrls: async function (id, instance) {
-    //     ret
-    // },
-
     getRenderedPage: async function(req){
 
         // eventBusService.emit('getRenderedPagePreDataFetch', req);
@@ -46,44 +38,14 @@ module.exports = {
 
         await eventBusService.emit('getRenderedPagePostDataFetch', {req: req, page: this.page});
 
-        // if (pageRecord.data[0]) {
-        //     await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);
-        //     let page = pageRecord.data[0];
-        //     page.data.html = pageContent;
-        //     return page;
-        // }
-
-        // this.page.data.menu = await menuService.getMenu('Main');
-
-
         let rows = [];
         this.page.data.hasRows = false;
         if(this.page.data.layout){
             this.page.data.rows = this.page.data.layout.rows;
             this.page.data.hasRows = true;
         }
-        // this.page.data.siteSettings = await dataService.getContentTopOne('site-settings');
-        // console.log('this.page.data.siteSettings', this.page.data.siteSettings);
-        // console.log('getRenderedPage page ====>', this.page.data.heroImage[0].originalName);
-        // if(this.page.data.heroImage){
-        //     this.page.data.heroImage = this.page.data.heroImage[0].originalName;
-        // }
-
-        // var events = eventBusService.listeners('getRenderedPagePostDataFetch');
-        // var eventCount = eventBusService.listenerCount('getRenderedPagePostDataFetch');
-
-        //wait till all events finished
-        // while (this.page.data.eventCount < eventCount) {
-        //     //wait
-        // }
 
         return { page: this.page };
-        // return{ id:this.page.id, title: this.page.data.name, rows: rows, 
-        //   sections: this.page.data.sections, html: this.page.data.html, menu: menu, page: this.page };
-    },
-
-    invokeEmitter: async function (id, instance) {
-        return
     },
 
     getPage: async function (id, instance) {

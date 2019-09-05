@@ -14,12 +14,8 @@ const log = console.log;
 module.exports = siteSettingsService = {
 
     startup: async function () {
-        console.log('>>=== site setting startup');
-
         eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
-            console.log('>>=== site setting executing');
             await siteSettingsService.processSiteSettings(options.page);
-
         });
     },
 

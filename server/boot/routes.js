@@ -9,9 +9,6 @@ var mediaService = require('../services/media.service');
 var siteSettingsService = require('../services/site-settings.service');
 var contentService = require('../services/content.service');
 
-// const handler = new moduleService("one");
-// console.log(handler.getProject('test123'));
-
 var cors = require('cors');
 
 const chalk = require('chalk');
@@ -29,14 +26,7 @@ module.exports = function (app) {
 
 
   (async () => {
-    // page = await themes.getTheme();
-    // page = this.contentService.getPage('5cdb5cc2f744441df910f43f', null);
-    // console.log('asunc page ==>', page);
-    // console.log('emitting startup');
     eventBusService.emit('startup');
-
-    // moduleService.loadModules();
-
   })();
 
   (async () => {
@@ -46,12 +36,8 @@ module.exports = function (app) {
 
     //TODO fix admin path for prod mode
     adminPage = await admin.loadAdmin();
-    // console.log('asunc page ==>', page);
   })();
 
-  // app.use(express.static(__dirname + '/public' ));
-
-  // app.use(cors());
 
   app.get('/hbs', async function (req, res) {
     res.render('home');
@@ -61,41 +47,9 @@ module.exports = function (app) {
     res.send('ok');
   });
 
-  // app.get('/sandbox', async function (req, res) {
-  //   let sandbox = await contentService.getSandboxPage(req);
-  //   console.log('sandbox', sandbox);
-  //   res.render('home', await contentService.getSandboxPage(req));
-  // });
-
   app.get('/admin', async function (req, res) {
     res.send(adminPage);
   });
-
-  // router.get('/admin2', function (req, res) {
-  //   console.log('admin---')
-  //   res.send(adminPage);
-  // });
-
-  //home page
-  // router.get('/', async function (req, res) {
-  //   res.render('home', await contentService.getRenderedPage(req));
-  // });
-
-
-
-  // router.get('*', async function (req, res) {
-  //   // this.page = await contentService.getPage('5cdb5cc2f744441df910f43f', null);
-  //   // console.log('page55', this.page);
-  //   let url = req.url;
-  //   console.log('url get', url);
-  //   res.send(url);
-  // });
-
-  // router.get('/admin*', function (req, res) {
-  //   res.send(adminPage);
-  // });
-
-
 
   router.get('/admin/content-types', function (req, res) {
     res.send(adminPage);

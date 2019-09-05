@@ -1,10 +1,4 @@
-// const EventEmitter = require('events');
-// const emitter = new EventEmitter();
 var emitterList = [];
-
-// emitter.on('uncaughtException', function (err) {
-//     console.error(err);
-// });
 
 module.exports = {
 
