@@ -57,6 +57,13 @@
         "params": "$!../node_modules/bootstrap/dist"
       },
       {
+        "name": "node-modules",
+        "paths": [
+          "/node_modules"
+        ],
+        "params": "$!../node_modules"
+      },
+      {
         "name": "jquery",
         "paths": [
           "/"

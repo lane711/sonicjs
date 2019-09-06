@@ -11,6 +11,8 @@
     "posttest": "npm run lint"
   },
   "dependencies": {
+    "@coreui/coreui": "^2.1.12",
+    "@coreui/icons": "^0.4.1",
     "axios": "^0.18.0",
     "bootstrap": "^4.3.1",
     "chai": "^4.2.0",
@@ -19,6 +21,7 @@
     "compression": "^1.0.3",
     "cors": "^2.5.2",
     "express-handlebars": "^3.1.0",
+    "flag-icon-css": "^3.3.0",
     "font-awesome": "^4.7.0",
     "formio-service": "^1.4.0",
     "formiojs": "^3.22.12",
@@ -33,11 +36,14 @@
     "lorem-ipsum": "^2.0.0",
     "node-dir": "^0.1.17",
     "nodemon": "^1.18.11",
+    "pace-progress": "^1.0.2",
+    "perfect-scrollbar": "^1.4.0",
     "popper.js": "^1.15.0",
     "puppeteer": "^1.13.0",
     "rxjs": "6.3.3",
     "serve-favicon": "^2.0.1",
     "shortcode-tree": "^1.4.14",
+    "simple-line-icons": "^2.4.1",
     "strong-error-handler": "^3.0.0",
     "tinymce": "^5.0.7"
   },
