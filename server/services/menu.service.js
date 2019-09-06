@@ -14,7 +14,7 @@ const log = console.log;
 module.exports = menuService = {
 
     startup: function () {
-        console.log('>>=== menu startup');
+        // console.log('>>=== menu startup');
 
         eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
                 menuService.getMenu('Main').then(data=>{
