@@ -3,6 +3,8 @@ var pageBuilderService = require('../services/page-builder.service');
 var formio = require('../services/formio.service');
 var eventBusService = require('../services/event-bus.service');
 
+var adminService = require('../services/admin.service');
+
 var moduleService = require('../services/module.service').startup();
 var menuService = require('../services/menu.service');
 var mediaService = require('../services/media.service');
@@ -47,7 +49,7 @@ module.exports = function (app) {
     res.send('ok');
   });
 
-  app.get('/admin', async function (req, res) {
+  app.get('/admin-ng', async function (req, res) {
     res.send(adminPage);
   });
 
@@ -66,6 +68,9 @@ module.exports = function (app) {
 
     if(req.url.startsWith('/blog/')){
       res.render('blog', await contentService.getBlog(req));
+    }
+    else if(req.url.startsWith('/admin')){
+      res.render('admin',  {layout: 'admin.handlebars', model: {}});
     }
     else{
       res.render('home', await contentService.getRenderedPage(req));
