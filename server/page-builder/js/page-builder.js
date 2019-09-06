@@ -420,8 +420,23 @@ function openPageSettings() {
     //     ]
     //   });
 
-    Formio.createForm(document.getElementById('formio'), {
+    let formio = Formio.createForm(document.getElementById('formio'), {
         components: components
+      }).then(function(form) {
+        form.submission = {
+            data: {
+              url: 'Joe',
+              name: 'Smith',
+              email: 'joe@example.com'
+            }
+          };
+        form.on('submit', (submission) => {
+            debugger;
+          console.log('The form was just submitted!!!');
+        });
+        form.on('error', (errors) => {
+          console.log('We have errors!');
+        })
       });
 
     $('#pageSettingsModal').appendTo("body").modal('show');

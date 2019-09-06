@@ -58,27 +58,97 @@ module.exports = formService = {
 
         let contentTypeDef = await dataService.getContentType(contentType);
         // console.log('contentTypeDef', contentTypeDef);
-        let components = [];
+        let components = contentTypeDef.components.components;
 
-        contentTypeDef.fieldList.forEach(field => {
-            let fieldType = field.fieldType == 'textBox' ? 'textfield' : field.fieldType;
+        contentTypeDef.components.components.forEach(field => {
+            return;
+            // let fieldType = field.fieldType == 'textBox' ? 'textfield' : field.fieldType;
             let fieldDef = {
-                type: fieldType,
-                key: field.systeid,
+                type: field.type,
+                key: field.key,
                 label: field.label,
                 // placeholder: 'Enter your first name.',
+                required: field.validate.required,
                 input: true
             }
+
+            if(field.validate){
+                fieldDef/re
+            }
+
+
+
+            if(field.type == 'imageList'){
+                fieldDef.options = this.imageListForDropDown;
+                }
+
             components.push(fieldDef);
+
+            // if(field.fieldType == 'textBox'){
+            //     let control = new TextboxQuestion({
+            //       key: field.systemid,
+            //       label: field.label,
+            //       value: "",
+            //       required: field.required,
+            //       order: 1
+            //     });
+            //     controls.push(control);
+            //   }
+      
+            //   if(field.fieldType == 'textarea'){
+            //     let control = new TextareaQuestion({
+            //       key: field.systemid,
+            //       label: field.label,
+            //       value: "",
+            //       required: field.required,
+            //       order: 1
+            //     });
+            //     controls.push(control);
+            //   }
+      
+            //   if(field.fieldType == 'layout'){
+            //     let control = new LayoutQuestion({
+            //       key: field.systemid,
+            //       label: field.label,
+            //       value: "",
+            //       required: field.required,
+            //       order: 1
+            //     });
+            //     controls.push(control);
+            //   }
+      
+            //   if(field.fieldType == 'wysiwyg'){
+            //     let control = new WYSIWYGQuestion({
+            //       key: field.systemid,
+            //       label: field.label,
+            //       value: "",
+            //       required: field.required,
+            //       order: 1
+            //     });
+            //     controls.push(control);
+            //   }
+      
+            //   if(field.fieldType == 'imageList'){
+            //     // console.log('this.imageListForDropDown', this.imageListForDropDown);
+            //     let control = new DropdownQuestion({
+            //       key: field.systemid,
+            //       label: field.label,
+            //       value: "",
+            //       required: field.required,
+            //       order: 1,
+            //       options: this.imageListForDropDown,
+            //     });
+            //     controls.push(control);
+            //   }
         });
 
         //add button
-        components.push({
-            type: 'button',
-            action: 'submit',
-            label: 'Submit',
-            theme: 'primary'
-        });
+        // components.push({
+        //     type: 'button',
+        //     action: 'submit',
+        //     label: 'Submit',
+        //     theme: 'primary'
+        // });
 
         //     {
         //         type: 'textfield',
@@ -112,4 +182,27 @@ module.exports = formService = {
         return components;
 
     },
+
+    addBaseContentTypeFields: function(contentType, controls){
+        console.log('addBaseContentTypeFields', contentType, controls);
+        // if(isToBePopulatedWithExistingContent){
+          let controlId = new HiddenQuestion({
+            key: 'id',
+            label: 'Id',
+            value: contentType.id,
+            required: true,
+            order: 0
+          });
+          controls.push(controlId);
+    
+          let controlContentType = new HiddenQuestion({
+            key: 'contentTypeId',
+            label: 'Content Type',
+            value: contentType.systemid,
+            required: true,
+            order: 1
+          });
+          controls.push(controlContentType);
+        // }
+      }
 }
