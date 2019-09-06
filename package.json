@@ -31,6 +31,7 @@
     "loopback-component-storage": "^3.6.0",
     "loopback-connector-mongodb": "3.8.0",
     "lorem-ipsum": "^2.0.0",
+    "node-dir": "^0.1.17",
     "nodemon": "^1.18.11",
     "popper.js": "^1.15.0",
     "puppeteer": "^1.13.0",
