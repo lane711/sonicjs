@@ -392,7 +392,11 @@ function processContentFields(payload, content) {
     }
 }
 
+function openPageSettings() {
+    console.log('Page Settings setup');
+    $('#pageSettingsModal').appendTo("body").modal('show');
 
+}
 async function openWYSIWYG() {
     console.log('WYSIWYG setup');
 
