@@ -127,6 +127,13 @@
         "params": "$!../server/assets"
       },
       {
+        "name": "admin-assets",
+        "paths": [
+          "/admin"
+        ],
+        "params": "$!../server/views/admin/assets"
+      },
+      {
         "name": "formio",
         "paths": [
           "/"
