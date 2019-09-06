@@ -11,7 +11,7 @@ const log = console.log;
 const Formio = {};
 const document = { getElementById: {} };
 
-module.exports = {
+module.exports = formService = {
 
     // startup: function () {
     //     console.log('>>=== form service startup');
@@ -24,7 +24,7 @@ module.exports = {
     startup: async function () {
         eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
             if (options) {
-                options.page.data.editForm = getForm('page');
+                options.page.data.editForm = await formService.getForm('page');
             }
         });
     },
