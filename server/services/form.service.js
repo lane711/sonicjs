@@ -1,4 +1,5 @@
 var dataService = require('./data.service');
+var eventBusService = require('./event-bus.service');
 
 var fs = require('fs');
 const cheerio = require('cheerio')
@@ -12,10 +13,26 @@ const document = { getElementById: {} };
 
 module.exports = {
 
+    // startup: function () {
+    //     console.log('>>=== form service startup');
+
+    //     eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
+    //                 // options.page.data.editForm = getForm('page');
+    //     });
+    // },
+
+    startup: async function () {
+        eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
+            if (options) {
+                options.page.data.editForm = getForm('page');
+            }
+        });
+    },
+
     getForm: async function (contentType) {
         let form = "<script type='text/javascript'> const components = ";
         let fieldsDef = await this.getFormDefinition(contentType);
-        form +=  JSON.stringify(fieldsDef);
+        form += JSON.stringify(fieldsDef);
         form += "</script>";
         form += await this.getFormTemplate();
         return form;

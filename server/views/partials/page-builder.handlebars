@@ -301,7 +301,7 @@
                 <input type="hidden" id="block-edit-it">
                 <div id="editor-container">
 
- <script type='text/javascript'>
+ {{!-- <script type='text/javascript'>
       window.onload = function() {
         Formio.createForm(document.getElementById('formio'), {
           components: [
@@ -328,7 +328,9 @@
           ]
         });
       };
-    </script>
+    </script> --}}
+
+    {{{ page.data.editForm }}}
 
                         <div id='formio'></div>
 

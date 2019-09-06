@@ -15,7 +15,9 @@ module.exports = siteSettingsService = {
 
     startup: async function () {
         eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
-            await siteSettingsService.processSiteSettings(options.page);
+            if(options){
+                await siteSettingsService.processSiteSettings(options.page);
+            }
         });
     },
 

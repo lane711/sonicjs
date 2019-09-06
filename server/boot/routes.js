@@ -6,6 +6,7 @@ var eventBusService = require('../services/event-bus.service');
 var adminService = require('../services/admin.service');
 
 var moduleService = require('../services/module.service').startup();
+var formService = require('../services/form.service').startup();
 var menuService = require('../services/menu.service');
 var mediaService = require('../services/media.service');
 var siteSettingsService = require('../services/site-settings.service');
