@@ -10,6 +10,7 @@ $(document).ready(async function () {
     setupJsonEditor();
     getPage();
     imageList = await getImageList();
+    setupPageSettings();
 });
 
 async function getPage() {
@@ -392,8 +393,13 @@ function processContentFields(payload, content) {
     }
 }
 
-function openPageSettings() {
-    console.log('Page Settings setup');
+async function openPageSettings() {
+    $('#pageSettingsModal').appendTo("body").modal('show');
+}
+
+async function setupPageSettings(){
+    let pageId = $('#page-id').val();
+    // let page = await getContentInstance(pageId);
 
     // Formio.createForm(document.getElementById('formio'), {
     //     components: [
@@ -420,27 +426,28 @@ function openPageSettings() {
     //     ]
     //   });
 
+    debugger;
     let formio = Formio.createForm(document.getElementById('formio'), {
         components: components
-      }).then(function(form) {
+    }).then(function (form) {
         form.submission = {
-            data: {
-              url: 'Joe',
-              name: 'Smith',
-              email: 'joe@example.com'
-            }
-          };
+            data: this.page.data
+        };
         form.on('submit', (submission) => {
             debugger;
-          console.log('The form was just submitted!!!');
+
+
+            // for(var name in submission.data) {
+            //     var value = submission.data[name];
+            //     page.data[name] = value;
+            // }
         });
         form.on('error', (errors) => {
-          console.log('We have errors!');
+            console.log('We have errors!');
         })
-      });
+    });
 
-    $('#pageSettingsModal').appendTo("body").modal('show');
-
+    console.log('page settings loaded')
 }
 async function openWYSIWYG() {
     console.log('WYSIWYG setup');

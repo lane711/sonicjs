@@ -22,7 +22,7 @@ module.exports = mediaService = {
     },
 
     processHeroImage: async function (page) {
-        if (page.data.heroImage) {
+        if (page.data.heroImage[0]) {
             page.data.heroImage = page.data.heroImage[0].originalName;
         }
     }
