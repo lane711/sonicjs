@@ -393,7 +393,7 @@ function processContentFields(payload, content) {
     }
 }
 
-async function openPageSettings() {
+async function openForm(action, contentType) {
     $('#pageSettingsModal').appendTo("body").modal('show');
 }
 
@@ -426,7 +426,7 @@ async function setupPageSettings(){
     //     ]
     //   });
 
-    debugger;
+    // debugger;
     let formio = Formio.createForm(document.getElementById('formio'), {
         components: components
     }).then(function (form) {
@@ -434,6 +434,8 @@ async function setupPageSettings(){
             data: this.page.data
         };
         form.on('submit', (submission) => {
+            console.log('submission ->', submission);
+            //TODO: copy logic from admin app to save data
             debugger;
 
 

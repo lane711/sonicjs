@@ -44,7 +44,12 @@ module.exports = {
         if (record.data[0]) {
             return record;
         }
-        return 'not found';
+
+        let notFound = { data: {} };
+        notFound.data.title = "Not Found";
+        notFound.data.body = "Not Found";
+        notFound.url = url;
+        return notFound;
     },
 
     getContentByContentTypeAndTitle: async function (contentType, title) {

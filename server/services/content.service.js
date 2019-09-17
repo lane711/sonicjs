@@ -23,11 +23,15 @@ var id;
 
 module.exports = {
 
-    getRenderedPage: async function(req){
+    getRenderedPage: async function (req) {
 
         // eventBusService.emit('getRenderedPagePreDataFetch', req);
 
         this.page = await dataService.getContentByUrl(req.url);
+        if (!this.page || this.page.data.title == "Not Found") {
+            //not found
+            return { page: this.page };
+        }
         if (this.page.data[0]) {
             await this.getPage(this.page.data[0].id, this.page.data[0]);
             let page = this.page.data[0];
@@ -36,11 +40,11 @@ module.exports = {
 
         this.page.data.eventCount = 0;
 
-        await eventBusService.emit('getRenderedPagePostDataFetch', {req: req, page: this.page});
+        await eventBusService.emit('getRenderedPagePostDataFetch', { req: req, page: this.page });
 
         let rows = [];
         this.page.data.hasRows = false;
-        if(this.page.data.layout){
+        if (this.page.data.layout) {
             this.page.data.rows = this.page.data.layout.rows;
             this.page.data.hasRows = true;
         }
@@ -92,13 +96,13 @@ module.exports = {
 
     },
 
-    getBlog: async function(req){
+    getBlog: async function (req) {
         let blog = await dataService.getContentByUrl(req.url);
         blog = blog.data[0]
         if (blog) {
             blog.data.menu = await menuService.getMenu('Main');
 
-            if(blog.data.image){
+            if (blog.data.image) {
                 blog.data.heroImage = blog.data.image[0].originalName;
             }
             // let page = this.page.data[0];
@@ -214,7 +218,7 @@ module.exports = {
                 pageContent += '</div>';
                 pageContent += `</section>`;
 
-                this.page.data.sections.push({id : sectionId, title: section.data.title,  rows: rows});
+                this.page.data.sections.push({ id: sectionId, title: section.data.title, rows: rows });
 
 
                 // console.log('section==>', section);

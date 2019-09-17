@@ -5,6 +5,10 @@
 
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item">
+                <a class="nav-link" id="add-tab" data-toggle="tab" href="#add" role="tab" aria-controls="add"
+                    aria-selected="true"><i class="fa fa-plus"></i></a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link active" id="page-tab" data-toggle="tab" href="#page" role="tab" aria-controls="page"
                     aria-selected="true">Page</a>
             </li>
@@ -14,6 +18,12 @@
             </li>
         </ul>
         <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
+
+                <button type="button" onclick="openForm('add','page')" class="btn btn-secondary" data-dismiss="modal">Add Page</button>
+
+            </div>
+
             <div class="tab-pane fade show active" id="page" role="tabpanel" aria-labelledby="page-tab">
 
                 <ul class="nav page">
@@ -21,7 +31,7 @@
                     <li class="nav-title">Page Settings</li>
 
                     <li class="nav-item nav-dropdown">
-                        <a class="nav-link" onclick="openPageSettings()">
+                        <a class="nav-link" onclick="openForm('edit','current')">
                             <i class="nav-icon fa fa-gear"></i> Page Settings</a>
                     </li>
 
@@ -77,7 +87,8 @@
                                         <span class="sr-only">Toggle Dropdown</span>
                                     </button>
                                     <div class="dropdown-menu">
-                                        <a class="dropdown-item" onclick="deleteSection('{{this.id}}', {{@index}})">Delete Section</a>
+                                        <a class="dropdown-item"
+                                            onclick="deleteSection('{{this.id}}', {{@index}})">Delete Section</a>
                                     </div>
                                 </div>
 
@@ -170,7 +181,7 @@
             <a class="dropdown-item" onclick="addColumn()"><i class="fa fa-plus"></i> Add Column</a>
             <a class="dropdown-item" onclick="addRow()"><i class="fa fa-plus"></i> Add Row</a>
 
-            
+
             {{!-- <a class="dropdown-item" href="#"><i class="fa fa-copy"></i> Duplicate Row</a> --}}
         </div>
     </div>
@@ -301,46 +312,45 @@
                 <input type="hidden" id="block-edit-it">
                 <div id="editor-container">
 
- {{!-- <script type='text/javascript'>
-      window.onload = function() {
-        Formio.createForm(document.getElementById('formio'), {
-          components: [
-            {
-              type: 'textfield',
-              key: 'firstName',
-              label: 'First Name',
-              placeholder: 'Enter your first name.',
-              input: true
-            },
-            {
-              type: 'textfield',
-              key: 'lastName',
-              label: 'Last Name',
-              placeholder: 'Enter your last name',
-              input: true
-            },
-            {
-              type: 'button',
-              action: 'submit',
-              label: 'Submit',
-              theme: 'primary'
-            }
-          ]
-        });
-      };
-    </script> --}}
+                    {{!-- <script type='text/javascript'>
+                        window.onload = function () {
+                            Formio.createForm(document.getElementById('formio'), {
+                                components: [
+                                    {
+                                        type: 'textfield',
+                                        key: 'firstName',
+                                        label: 'First Name',
+                                        placeholder: 'Enter your first name.',
+                                        input: true
+                                    },
+                                    {
+                                        type: 'textfield',
+                                        key: 'lastName',
+                                        label: 'Last Name',
+                                        placeholder: 'Enter your last name',
+                                        input: true
+                                    },
+                                    {
+                                        type: 'button',
+                                        action: 'submit',
+                                        label: 'Submit',
+                                        theme: 'primary'
+                                    }
+                                ]
+                            });
+                        };
+                    </script> --}}
 
-    {{{ page.data.editForm }}}
+                    {{{ page.data.editForm }}}
 
-                        <div id='formio'></div>
+                    <div id='formio'></div>
 
                 </div>
 
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary page-settings-save"
-                    data-dismiss="modal">Save</button>
+                <button type="button" class="btn btn-primary page-settings-save" data-dismiss="modal">Save</button>
             </div>
         </div>
     </div>
