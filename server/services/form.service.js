@@ -30,8 +30,9 @@ module.exports = formService = {
     },
 
     getForm: async function (contentType) {
-        let form = "<script type='text/javascript'> const components = ";
         let fieldsDef = await this.getFormDefinition(contentType);
+
+        let form = "<script type='text/javascript'> const components = ";
         form += JSON.stringify(fieldsDef);
         form += "</script>";
         form += await this.getFormTemplate();
