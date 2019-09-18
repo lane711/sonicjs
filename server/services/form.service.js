@@ -24,13 +24,13 @@ module.exports = formService = {
     startup: async function () {
         eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
             if (options) {
-                options.page.data.editForm = await formService.getForm('page');
+                options.page.data.editForm = await formService.getForm(options.page);
             }
         });
     },
 
-    getForm: async function (contentType) {
-        let fieldsDef = await this.getFormDefinition(contentType);
+    getForm: async function (content) {
+        let fieldsDef = await this.getFormDefinition(content);
 
         let form = "<script type='text/javascript'> const components = ";
         form += JSON.stringify(fieldsDef);
@@ -55,11 +55,13 @@ module.exports = formService = {
         });
     },
 
-    getFormDefinition: async function (contentType) {
+    getFormDefinition: async function (content) {
 
-        let contentTypeDef = await dataService.getContentType(contentType);
+        let contentTypeDef = await dataService.getContentType(content.data.contentType);
         // console.log('contentTypeDef', contentTypeDef);
         let components = contentTypeDef.components.components;
+
+        this.addBaseContentTypeFields(content.id, content.data.contentType, components);
 
         contentTypeDef.components.components.forEach(field => {
             return;
@@ -184,26 +186,43 @@ module.exports = formService = {
 
     },
 
-    addBaseContentTypeFields: function(contentType, controls){
-        console.log('addBaseContentTypeFields', contentType, controls);
+    addBaseContentTypeFields: function(id, contentType, controls){
+        // console.log('addBaseContentTypeFields', contentType, controls);
+
+        controls.push({
+                    type: 'textfield',
+                    key: 'id',
+                    label: 'id',
+                    defaultValue: id,
+                    input: true
+                  });
+
+                //   controls.push({
+                //     type: 'textfield',
+                //     key: 'contentTypeId',
+                //     label: 'contentTypeId',
+                //     defaultValue: contentType,
+                //     input: true
+                //   });
+
         // if(isToBePopulatedWithExistingContent){
-          let controlId = new HiddenQuestion({
-            key: 'id',
-            label: 'Id',
-            value: contentType.id,
-            required: true,
-            order: 0
-          });
-          controls.push(controlId);
+        //   let controlId = new HiddenQuestion({
+        //     key: 'id',
+        //     label: 'Id',
+        //     value: contentType.id,
+        //     required: true,
+        //     order: 0
+        //   });
+        //   controls.push(controlId);
     
-          let controlContentType = new HiddenQuestion({
-            key: 'contentTypeId',
-            label: 'Content Type',
-            value: contentType.systemid,
-            required: true,
-            order: 1
-          });
-          controls.push(controlContentType);
+        //   let controlContentType = new HiddenQuestion({
+        //     key: 'contentTypeId',
+        //     label: 'Content Type',
+        //     value: contentType.systemid,
+        //     required: true,
+        //     order: 1
+        //   });
+        //   controls.push(controlContentType);
         // }
       }
 }

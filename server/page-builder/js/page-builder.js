@@ -442,16 +442,19 @@ async function setupPageSettings(){
 
     console.log('this.page.data==>', this.page.data);
 
-    let formio = await Formio.createForm(document.getElementById('formio'), {
+    let formio = Formio.createForm(document.getElementById('formio'), {
         components: components
-    }).then(function (form) {
+    }).then(async function (form) {
         form.submission = {
             data: this.page.data
         };
-        form.on('submit', (submission) => {
+        form.on('submit', async function(submission) {
             console.log('submission ->', submission);
             //TODO: copy logic from admin app to save data
-            debugger;
+            let entity = {id: submission.data.id, url: submission.data.url, data: submission.data}
+            await editContentInstance(entity);
+            fullPageUpdate();
+            // debugger;
 
 
             // for(var name in submission.data) {
