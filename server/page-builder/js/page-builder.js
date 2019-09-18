@@ -382,16 +382,20 @@ async function deleteContentInstance(id) {
         });
 }
 
-function processContentFields(payload, content) {
-    for (var property in payload) {
-        if (payload.hasOwnProperty(property)) {
-            if (property == 'url' || property == 'id') {
-                content.url = payload.url;
-                continue;
-            }
-            content.data[property] = payload[property];
-        }
-    }
+// function processContentFields(payload, content) {
+//     for (var property in payload) {
+//         if (payload.hasOwnProperty(property)) {
+//             if (property == 'url' || property == 'id') {
+//                 content.url = payload.url;
+//                 continue;
+//             }
+//             content.data[property] = payload[property];
+//         }
+//     }
+// }
+
+function processContentFields(payload){
+    return {id: payload.id, url: payload.url, data: payload};
 }
 
 async function openForm(action, contentType) {
@@ -451,7 +455,8 @@ async function setupPageSettings(){
         form.on('submit', async function(submission) {
             console.log('submission ->', submission);
             //TODO: copy logic from admin app to save data
-            let entity = {id: submission.data.id, url: submission.data.url, data: submission.data}
+            // let entity = {id: submission.data.id, url: submission.data.url, data: submission.data}
+            let entity = processContentFields(submission.data)
             await editContentInstance(entity);
             fullPageUpdate();
             // debugger;
