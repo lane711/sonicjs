@@ -34,7 +34,7 @@ module.exports = {
         }
         if (this.page.data[0]) {
             await this.getPage(this.page.data[0].id, this.page.data[0]);
-            let page = this.page.data[0];
+            // this.page = this.page.data;
             this.page.data.html = pageContent;
         }
 

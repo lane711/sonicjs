@@ -8,8 +8,9 @@ $(document).ready(async function () {
     setupClickEvents();
     // setupWYSIWYG();
     setupJsonEditor();
-    getPage();
+    await getPage();
     imageList = await getImageList();
+    // setTimeout(setupPageSettings, 1);
     setupPageSettings();
 });
 
@@ -19,7 +20,7 @@ async function getPage() {
     axios.get(`/api/contents/${pageId}`)
         .then(function (response) {
             // handle success
-            page = response.data;
+            this.page = response.data;
             console.log('getPage page', page);
         })
 }
@@ -398,6 +399,7 @@ async function openForm(action, contentType) {
 }
 
 async function setupPageSettings(){
+    console.log('setupPageSettings');
     let pageId = $('#page-id').val();
     // let page = await getContentInstance(pageId);
 
@@ -427,7 +429,20 @@ async function setupPageSettings(){
     //   });
 
     // debugger;
-    let formio = Formio.createForm(document.getElementById('formio'), {
+    if(!this.page.data){
+        debugger;
+        console.log('no data');
+        alert('no data');
+
+        while (!this.page.data) {
+            //wait till there is data
+            console.log('now data is ready');
+        }
+    }
+
+    console.log('this.page.data==>', this.page.data);
+
+    let formio = await Formio.createForm(document.getElementById('formio'), {
         components: components
     }).then(function (form) {
         form.submission = {
