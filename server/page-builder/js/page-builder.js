@@ -11,7 +11,7 @@ $(document).ready(async function () {
     await getPage();
     imageList = await getImageList();
     // setTimeout(setupPageSettings, 1);
-    setupPageSettings();
+    // setupPageSettings();
 });
 
 async function getPage() {
@@ -337,11 +337,27 @@ async function getContentInstance(id) {
         });
 }
 
+async function getContentByContentTypeAndTitle(contentType, title) {
+    const filter = `{"where":{"and":[{"data.title":"${title}"},{"data.contentType":"${contentType}"}]}}`;
+    const encodedFilter = encodeURI(filter);
+    let url = `/api/contents?filter=${encodedFilter}`;
+    return axios.get(url)
+        .then(async function (record) {
+            if (record.data[0]) {
+                return record.data[0];
+            }
+            return 'not found';
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+}
+
 async function createContentInstance(payload) {
     console.log('createContentInstance payload', payload);
     let content = {};
-    content.data = {};
-    this.processContentFields(payload, content);
+    content.data = payload;
+    // this.processContentFields(payload, content);
     console.log('content', content);
     // return this.http.post("/api/contents/", content).toPromise();
     return axios.post('/api/contents/', content)
@@ -356,6 +372,7 @@ async function createContentInstance(payload) {
 }
 
 async function editContentInstance(payload) {
+    debugger;
     let id = payload.id;
     console.log('putting payload', payload);
     // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
@@ -394,15 +411,16 @@ async function deleteContentInstance(id) {
 //     }
 // }
 
-function processContentFields(payload){
-    return {id: payload.id, url: payload.url, data: payload};
+function processContentFields(payload) {
+    return { id: payload.id, data: payload };
 }
 
 async function openForm(action, contentType) {
+    await setupPageSettings(action, contentType);
     $('#pageSettingsModal').appendTo("body").modal('show');
 }
 
-async function setupPageSettings(){
+async function setupPageSettings(action, contentType) {
     console.log('setupPageSettings');
     let pageId = $('#page-id').val();
     // let page = await getContentInstance(pageId);
@@ -433,8 +451,8 @@ async function setupPageSettings(){
     //   });
 
     // debugger;
-    if(!this.page.data){
-        debugger;
+    if (!this.page.data) {
+        // debugger;
         console.log('no data');
         alert('no data');
 
@@ -446,19 +464,44 @@ async function setupPageSettings(){
 
     console.log('this.page.data==>', this.page.data);
 
+    let formValuesToLoad = {};
+    let componentsToLoad = components;
+    // debugger;
+    if (action == 'edit' && contentType == 'current') {
+        formValuesToLoad = this.page.data;
+    }
+
+    if (action == 'add') {
+        // components.find(({ key }) => key === 'id' ).remove();
+        componentsToLoad = components.filter(e => e.key !== 'id')
+    }
+
     let formio = Formio.createForm(document.getElementById('formio'), {
-        components: components
+        components: componentsToLoad
     }).then(async function (form) {
         form.submission = {
-            data: this.page.data
+            data: formValuesToLoad
         };
-        form.on('submit', async function(submission) {
+        form.on('submit', async function (submission) {
             console.log('submission ->', submission);
             //TODO: copy logic from admin app to save data
             // let entity = {id: submission.data.id, url: submission.data.url, data: submission.data}
-            let entity = processContentFields(submission.data)
-            await editContentInstance(entity);
-            fullPageUpdate();
+            if (action == 'add') {
+                // debugger;
+                //need create default block, etc
+                submission.data.contentType = contentType;
+                await createContentInstance(submission.data);
+                await postProcessNewContent(submission.data);
+                await redirect(submission.data.url);
+            }
+            else {
+                //editing current
+                // debugger;
+                let entity = processContentFields(submission.data)
+                await editContentInstance(entity);
+                fullPageUpdate();
+            }
+
             // debugger;
 
 
@@ -606,8 +649,38 @@ async function saveWYSIWYG() {
 
 }
 
+async function postProcessNewContent(content) {
+    debugger;
+    if (content.contentType == 'page') {
+        if (content.includeInMenu) {
+            //add to existing main menu
+            // await editContentInstance(entity);
+            let mainMenu = await getContentByContentTypeAndTitle('menu', 'Main')
+            let meniItem = {
+                url: content.url,
+                title: content.name,
+                active: true,
+                level: "0"
+            }
+            mainMenu.data.links.push(meniItem);
+            await editContentInstance(mainMenu);
+        }
+    }
+}
+
 //TODO, make this just refresh the body content with a full get
 function fullPageUpdate() {
     console.log('refreshing page');
     location.reload();
 }
+
+async function redirect(url) {
+    // debugger;
+    console.log('redirecting page');
+    // window.location.href = url;
+    window.location.replace(url);
+    return false;
+}
+
+
+
