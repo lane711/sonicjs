@@ -54,14 +54,14 @@ module.exports = function (app) {
     res.send(adminPage);
   });
 
-  router.get('/admin/content-types', function (req, res) {
-    res.send(adminPage);
-  });
+  // router.get('/admin/content-types', function (req, res) {
+  //   res.send(adminPage);
+  // });
 
   app.get('*', async function (req, res, next) {
-    if ( req.url === '/explorer' || req.url.startsWith('/api')
-      || req.url.endsWith('.css') || req.url.endsWith('.html') || req.url.endsWith('.ico') || req.url.endsWith('.map') 
-      || req.url.endsWith('.jpg') || req.url.endsWith('.png') || req.url.endsWith('.svg') 
+    if (req.url === '/explorer' || req.url.startsWith('/api')
+      || req.url.endsWith('.css') || req.url.endsWith('.html') || req.url.endsWith('.ico') || req.url.endsWith('.map')
+      || req.url.endsWith('.jpg') || req.url.endsWith('.png') || req.url.endsWith('.svg')
       || req.url.endsWith('.js') || req.url.indexOf('fonts') > -1 || req.url.indexOf('.woff') > -1) {
       // log(chalk.blue(req.url));
       return next();
@@ -69,13 +69,20 @@ module.exports = function (app) {
 
     // formio.getComponents();
 
-    if(req.url.startsWith('/blog/')){
+    if (req.url.startsWith('/blog/')) {
       res.render('blog', await contentService.getBlog(req));
     }
-    else if(req.url.startsWith('/admin')){
-      res.render('admin',  {layout: 'admin.handlebars', model: {}});
+    else if (req.url.startsWith('/admin')) {
+      var path = req.url.split("/");
+      var viewName = "admin-dashboard";
+      if (path[2]) {
+        viewName = "admin-" + path[2];
+      }
+
+      res.render(viewName, { layout: 'admin.handlebars', model: {} });
+
     }
-    else{
+    else {
       res.render('home', await contentService.getRenderedPage(req));
     }
 
@@ -112,5 +119,5 @@ module.exports = function (app) {
 
   app.use(router);
 
-};  
+};
 
