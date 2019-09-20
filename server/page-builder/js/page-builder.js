@@ -372,7 +372,7 @@ async function createContentInstance(payload) {
 }
 
 async function editContentInstance(payload) {
-    debugger;
+    // debugger;
     let id = payload.id;
     console.log('putting payload', payload);
     // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
@@ -650,7 +650,7 @@ async function saveWYSIWYG() {
 }
 
 async function postProcessNewContent(content) {
-    debugger;
+    // debugger;
     if (content.contentType == 'page') {
         if (content.includeInMenu) {
             //add to existing main menu
