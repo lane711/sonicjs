@@ -32,6 +32,13 @@ module.exports = {
         return contentTypeRecord.data[0];
     },
 
+    getContentTypes: async function () {
+        let url = `${apiUrl}contentTypes`;
+        let contentTypes = await axios.get(url);
+        // console.log('contentTypeRecord.data', contentTypeRecord.data[0]);
+        return contentTypes.data;
+    },
+
     getContentTopOne: async function (contentType) {
         let results = await this.getContent(contentType);
         return results[0].data;

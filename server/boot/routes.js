@@ -83,6 +83,10 @@ module.exports = function (app) {
         data = await adminService.getContent()
       }
 
+      if(viewName == "admin-content-types"){
+        data = await dataService.getContentTypes()
+      }
+
       if(viewName == "admin-site-settings"){
         data = await dataService.getContentTopOne('site-settings');
       }
