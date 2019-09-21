@@ -72,11 +72,19 @@ module.exports = function (app) {
       res.render('blog', await contentService.getBlog(req));
     }
     else if (req.url.startsWith('/admin')) {
-      var path = req.url.split("/");
-      var viewName = "admin-dashboard";
+      let path = req.url.split("/");
+      let viewName = "admin-dashboard";
+      let param ="";
       if (path[2]) {
         viewName = "admin-" + path[2];
       }
+      if (path[3]) {
+        viewName += "-" + path[3];
+      }
+      if (path[4]) {
+        param = path[4];
+      }
+
       let data = {};
 
       if(viewName == "admin-content"){
@@ -85,6 +93,10 @@ module.exports = function (app) {
 
       if(viewName == "admin-content-types"){
         data = await dataService.getContentTypes()
+      }
+
+      if(viewName == "admin-content-types-edit"){
+        data = await dataService.getContentType(param)
       }
 
       if(viewName == "admin-site-settings"){

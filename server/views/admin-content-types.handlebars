@@ -16,11 +16,11 @@
                 <tbody>
                     {{#each data}}
                     <tr>
-                        <td><a [routerLink]="['/content-types', contentType.id]">{{ this.name }}</a></td>
+                        <td><a href="/admin/content-types/edit/{{ this.systemid }}">{{ this.name }}</a></td>
                         <td>{{ contentType.description}}</td>
                         <td>
-                            <a class="btn btn-sm btn-primary rmargin"
-                                [routerLink]="['/content-types', contentType.id]">Edit</a>
+                            {{!-- <a class="btn btn-sm btn-primary rmargin"
+                                [routerLink]="['/content-types', contentType.id]">Edit</a> --}}
 
                             <ng-template #popTitle>Delete <b>{{ contentType.name }}</b>?</ng-template>
                             <ng-template #popContent><button class="btn btn-sm btn-danger"
