@@ -1,1 +1,44 @@
-content for admin
+<div class="col-lg-12">
+    <div class="card">
+      <div class="card-header">
+        <i class="fa fa-align-justify"></i> Content
+        <a href="#" class="btn btn-success float-right">New Content</a>
+      </div>
+      <div class="card-body page-list">
+        <table class="table table-responsive-sm table-striped">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Type</th>
+              <th>Url</th>
+              <th>Content</th>
+              <th class='text-right'>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+                {{#each data}}
+            <tr>
+              <td><a href="{{ this.data.url }}">{{ this.data.name }}</a></td>
+              <td>{{ this.data.contentType }}</td>
+              <td>{{ this.data.url }}</td>
+              <td>...</td>
+              <td class='text-right'>
+                {{!-- <!-- <a href="{{ content.url }}" target="_blank" class="btn btn-sm btn-success rmargin">View</a> -->
+                <a class="btn btn-sm btn-warning rmargin" *ngIf="content.data.contentType==='page'" [routerLink]="['/page-builder', content.id]">Page Builder</a>
+
+                <a class="btn btn-sm btn-primary rmargin" [routerLink]="['/content', content.id]">Settings</a>
+  
+                <ng-template #popTitle>Delete <b>{{ content.name }}</b>?</ng-template>
+                <ng-template #popContent><button class="btn btn-sm btn-danger" (click)="deleteContent(content.id)">Confirm Delete</button></ng-template>
+                <button class="btn btn-sm btn-danger" placement="top"
+                [ngbPopover]="popContent" [popoverTitle]="popTitle">Delete</button> --}}
+              </td>
+            </tr>
+              {{/each}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script src="/assets/js/popovers.js"></script>
+  

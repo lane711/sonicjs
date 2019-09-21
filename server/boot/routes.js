@@ -2,9 +2,8 @@ var themes = require(__dirname + '../../themes/themes');
 var pageBuilderService = require('../services/page-builder.service');
 var formio = require('../services/formio.service');
 var eventBusService = require('../services/event-bus.service');
-
 var adminService = require('../services/admin.service');
-
+var dataService = require('../services/data.service');
 var moduleService = require('../services/module.service').startup();
 var formService = require('../services/form.service').startup();
 var menuService = require('../services/menu.service');
@@ -78,8 +77,17 @@ module.exports = function (app) {
       if (path[2]) {
         viewName = "admin-" + path[2];
       }
+      let data = {};
 
-      res.render(viewName, { layout: 'admin.handlebars', model: {} });
+      if(viewName == "admin-content"){
+        data = await adminService.getContent()
+      }
+
+      if(viewName == "admin-site-settings"){
+        data = await dataService.getContentTopOne('site-settings');
+      }
+
+      res.render(viewName, { layout: 'admin.handlebars', data: data });
 
     }
     else {
