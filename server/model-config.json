@@ -14,37 +14,37 @@
     ]
   },
   "User": {
-    "dataSource": "mongodb"
+    "dataSource": "db"
   },
   "AccessToken": {
-    "dataSource": "mongodb",
+    "dataSource": "db",
     "public": false
   },
   "ACL": {
-    "dataSource": "mongodb",
+    "dataSource": "db",
     "public": false
   },
   "RoleMapping": {
-    "dataSource": "mongodb",
+    "dataSource": "db",
     "public": false,
     "options": {
       "strictObjectIDCoercion": true
     }
   },
   "Role": {
-    "dataSource": "mongodb",
+    "dataSource": "db",
     "public": false
   },
   "contentType": {
-    "dataSource": "mongodb",
+    "dataSource": "db",
     "public": true
   },
   "content": {
-    "dataSource": "mongodb",
+    "dataSource": "db",
     "public": true
   },
   "fieldType": {
-    "dataSource": "mongodb",
+    "dataSource": "db",
     "public": true
   },
   "contentTypeField": {
@@ -52,7 +52,7 @@
     "public": false
   },
   "e2e-test": {
-    "dataSource": "mongodb",
+    "dataSource": "db",
     "public": true
   },
   "container": {
