@@ -1,13 +1,14 @@
 {
   "db": {
     "name": "db",
-    "connector": "memory"
+    "connector": "memory",
+    "file":"data.json"
   },
   "mongodb": {
     "host": "localhost",
     "port": 27017,
-    "url": "mongodb://localhost:27017/siteden",
-    "database": "siteden",
+    "url": "mongodb://localhost:27017/sonicjs",
+    "database": "sonicjs",
     "password": "",
     "name": "mongodb",
     "user": "",
