@@ -1,40 +1,44 @@
 <script type='text/javascript'>
 
-// const components = [
-//                     {
-//                         type: 'textfield',
-//                         key: 'firstName',
-//                         label: 'First Name',
-//                         placeholder: 'Enter your first name.',
-//                         input: true
-//                     },
-//                     {
-//                         type: 'textfield',
-//                         key: 'lastName',
-//                         label: 'Last Name',
-//                         placeholder: 'Enter your last name',
-//                         input: true
-//                     },
-//                     {
-//                         type: 'currency',
-//                         key: 'cost',
-//                         label: 'Cost',
-//                         placeholder: 'Enter $ cost',
-//                         input: true
-//                     },
-//                     {
-//                         type: 'button',
-//                         action: 'submit',
-//                         label: 'Submit',
-//                         theme: 'primary'
-//                     }
-//                 ]
-                
+    // const components = [
+    //                     {
+    //                         type: 'textfield',
+    //                         key: 'firstName',
+    //                         label: 'First Name',
+    //                         placeholder: 'Enter your first name.',
+    //                         input: true
+    //                     },
+    //                     {
+    //                         type: 'textfield',
+    //                         key: 'lastName',
+    //                         label: 'Last Name',
+    //                         placeholder: 'Enter your last name',
+    //                         input: true
+    //                     },
+    //                     {
+    //                         type: 'currency',
+    //                         key: 'cost',
+    //                         label: 'Cost',
+    //                         placeholder: 'Enter $ cost',
+    //                         input: true
+    //                     },
+    //                     {
+    //                         type: 'button',
+    //                         action: 'submit',
+    //                         label: 'Submit',
+    //                         theme: 'primary'
+    //                     }
+    //                 ]
+
     window.onload = function () {
         Formio.createForm(document.getElementById('formio'), {
             components: components
         }).then((form) => {
             console.log('log form', form);
+
+            form.submission = {
+                data: formValuesToLoad
+            };
 
             form.on('submit', function (submission) {
                 console.log('Submission was made!', submission);

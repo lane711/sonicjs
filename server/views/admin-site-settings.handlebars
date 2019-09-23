@@ -5,8 +5,12 @@
         <i class="fa fa-align-justify"></i> Edit Site Settings
       </div>
       <div class="card-body">
-          <formio *ngIf="isDataAvailable" (submit)="onSubmit($event)"  [form]="componentsJson"
-          [submission]="formData"></formio>
+
+                    {{{ data.editForm }}}
+
+                    {{!-- <div id='formio'></div> --}}
+
+
       </div>
     </div>
   </div>

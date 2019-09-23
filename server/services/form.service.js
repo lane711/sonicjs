@@ -35,6 +35,10 @@ module.exports = formService = {
         let form = "<script type='text/javascript'> const components = ";
         form += JSON.stringify(fieldsDef);
         form += "</script>";
+        form += "<script type='text/javascript'> const formValuesToLoad = ";
+        form += JSON.stringify(content.data);
+        form += "</script>";
+        
         form += await this.getFormTemplate();
         return form;
     },
