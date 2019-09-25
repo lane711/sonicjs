@@ -689,7 +689,7 @@ async function setupFormBuilder(contentType) {
 }
 
 async function onContentTypeSave() {
-    debugger;
+    // debugger;
     console.log('contentTypeComponents', contentTypeComponents);
     contentType.components = contentTypeComponents;
     await editContentType(contentType);
