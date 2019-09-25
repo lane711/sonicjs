@@ -1,4 +1,5 @@
 var page = {};
+
 var imageList, tinyImageList, currentSectionId, currentSection, currentRow, currentRowIndex, currentColumn,
     currentColumnIndex, jsonEditor;
 
@@ -7,22 +8,25 @@ $(document).ready(async function () {
     setupUIClicks();
     setupClickEvents();
     // setupWYSIWYG();
-    setupJsonEditor();
+    // setupJsonEditor();
     await getPage();
     imageList = await getImageList();
     // setTimeout(setupPageSettings, 1);
     // setupPageSettings();
+    setupFormBuilder('page');
 });
 
 async function getPage() {
     let pageId = $('#page-id').val();
-    console.log('pageId', pageId);
-    axios.get(`/api/contents/${pageId}`)
-        .then(function (response) {
-            // handle success
-            this.page = response.data;
-            console.log('getPage page', page);
-        })
+    if (pageId) {
+        console.log('pageId', pageId);
+        axios.get(`/api/contents/${pageId}`)
+            .then(function (response) {
+                // handle success
+                this.page = response.data;
+                console.log('getPage page', page);
+            })
+    }
 }
 
 function axiosTest() {
@@ -375,6 +379,18 @@ async function editContentInstance(payload) {
     // debugger;
     let id = payload.id;
     console.log('putting payload', payload);
+    if (payload.id) {
+        delete payload.id;
+    }
+    if (payload.data.id) {
+        delete payload.data.id;
+    }
+    // let data = {};
+    // if(payload.data){
+    //     data = payload.data;
+    // }else{
+    //     data = payload;
+    // }
     // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
     return axios.put(`/api/contents/${id}`, payload)
         .then(async function (response) {
@@ -517,6 +533,74 @@ async function setupPageSettings(action, contentType) {
 
     console.log('page settings loaded')
 }
+
+async function setupFormBuilder(contentType) {
+
+    console.log('setupFormBuilder', contentType)
+    let componentsToLoad = [
+        {
+            type: 'textfield',
+            key: 'firstName',
+            label: 'First Name',
+            placeholder: 'Enter your first name.',
+            input: true
+        },
+        {
+            type: 'textfield',
+            key: 'lastName',
+            label: 'Last Name',
+            placeholder: 'Enter your last name',
+            input: true
+        },
+        {
+            type: 'button',
+            action: 'submit',
+            label: 'Submit',
+            theme: 'primary'
+        }
+    ]
+    // debugger;
+    let formio = Formio.createForm(document.getElementById('formBuilder'), {
+        components: componentsToLoad
+    }).then(async function (form) {
+        form.submission = {
+            // data: formValuesToLoad
+        };
+        form.on('submit', async function (submission) {
+            console.log('submission ->', submission);
+            //TODO: copy logic from admin app to save data
+            // let entity = {id: submission.data.id, url: submission.data.url, data: submission.data}
+            if (action == 'add') {
+                // debugger;
+                //need create default block, etc
+                submission.data.contentType = contentType;
+                await createContentInstance(submission.data);
+                await postProcessNewContent(submission.data);
+                await redirect(submission.data.url);
+            }
+            else {
+                //editing current
+                // debugger;
+                let entity = processContentFields(submission.data)
+                await editContentInstance(entity);
+                fullPageUpdate();
+            }
+
+            // debugger;
+
+
+            // for(var name in submission.data) {
+            //     var value = submission.data[name];
+            //     page.data[name] = value;
+            // }
+        });
+        form.on('error', (errors) => {
+            console.log('We have errors!');
+        })
+    });
+
+}
+
 async function openWYSIWYG() {
     console.log('WYSIWYG setup');
 
@@ -588,6 +672,7 @@ async function openWYSIWYG() {
 
 function setupJsonEditor() {
     var container = document.getElementById("jsoneditor");
+    if (!container) return;
 
     var options = {
         mode: 'text',
