@@ -27,9 +27,15 @@
   <link href="/admin/css/style.css" rel="stylesheet">
   <link href="/vendors/pace-progress/css/pace.min.css" rel="stylesheet">
     <link href="/jsoneditor.min.css" rel="stylesheet">
+      <link href="/formio.full.min.css" rel="stylesheet">
+
 </head>
 
 <body class="app header-fixed sidebar-fixed aside-menu-fixed sidebar-lg-show">
+
+    <input type="hidden" name="contentId" id="contentId" value="{{data.contentId}}">
+    <input type="hidden" name="contentTypeId" id="contentTypeId" value="{{data.contentTypeId}}">
+
   <header class="app-header navbar">
     <button class="navbar-toggler sidebar-toggler d-lg-none mr-auto" type="button" data-toggle="sidebar-show">
       <span class="navbar-toggler-icon"></span>
@@ -151,6 +157,11 @@
               <i class="nav-icon fa fa-cubes"></i> Content Types</a>
           </li>
 
+                    <li class="nav-item">
+            <a class="nav-link" href="/admin/modules">
+              <i class="nav-icon fa fa-th"></i> Modules</a>
+          </li>
+
 
           <li class="nav-title">Theme</li>
           <li class="nav-item">
@@ -159,7 +170,7 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/admin/typography">
-              <i class="nav-icon icon-pencil"></i> Typography</a>
+              <i class="nav-icon fa fa-font"></i> Typography</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/admin/menus">
@@ -184,6 +195,14 @@
           <li class="nav-item">
             <a class="nav-link" href="/admin/logs">
               <i class="nav-icon fa fa-bars"></i> Logs</a>
+          </li>
+                    <li class="nav-item">
+            <a class="nav-link" href="/admin/sandbox">
+              <i class="nav-icon fa fa-bars"></i> Sandbox</a>
+          </li>
+                              <li class="nav-item">
+            <a class="nav-link" href="/sandbox">
+              <i class="nav-icon fa fa-bars"></i> Sandbox (blank)</a>
           </li>
           {{!-- 
             <li class="nav-title">Components</li>

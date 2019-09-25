@@ -1,4 +1,6 @@
 var page = {};
+var contentType;
+var contentTypeComponents;
 
 var imageList, tinyImageList, currentSectionId, currentSection, currentRow, currentRowIndex, currentColumn,
     currentColumnIndex, jsonEditor;
@@ -9,14 +11,16 @@ $(document).ready(async function () {
     setupClickEvents();
     // setupWYSIWYG();
     // setupJsonEditor();
-    await getPage();
+    await setPage();
+    await setContentType();
     imageList = await getImageList();
     // setTimeout(setupPageSettings, 1);
     // setupPageSettings();
-    setupFormBuilder('page');
+
+    setupFormBuilder(contentType);
 });
 
-async function getPage() {
+async function setPage() {
     let pageId = $('#page-id').val();
     if (pageId) {
         console.log('pageId', pageId);
@@ -26,6 +30,14 @@ async function getPage() {
                 this.page = response.data;
                 console.log('getPage page', page);
             })
+    }
+}
+
+async function setContentType() {
+    // debugger;
+    let contentTypeId = $('#contentTypeId').val();
+    if (contentTypeId) {
+        this.contentType = await getContentType(contentTypeId);
     }
 }
 
@@ -341,6 +353,22 @@ async function getContentInstance(id) {
         });
 }
 
+async function getContentType(systemId) {
+    const filter = `{"systemid":"${systemId}"}`;
+    const encodedFilter = encodeURI(filter);
+    let url = `/api/contentTypes?filter=${encodedFilter}`;
+    return axios.get(url)
+        .then(async function (record) {
+            if (record.data[0]) {
+                return record.data[0];
+            }
+            return 'not found';
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+}
+
 async function getContentByContentTypeAndTitle(contentType, title) {
     const filter = `{"where":{"and":[{"data.title":"${title}"},{"data.contentType":"${contentType}"}]}}`;
     const encodedFilter = encodeURI(filter);
@@ -536,69 +564,272 @@ async function setupPageSettings(action, contentType) {
 
 async function setupFormBuilder(contentType) {
 
-    console.log('setupFormBuilder', contentType)
-    let componentsToLoad = [
-        {
-            type: 'textfield',
-            key: 'firstName',
-            label: 'First Name',
-            placeholder: 'Enter your first name.',
-            input: true
-        },
-        {
-            type: 'textfield',
-            key: 'lastName',
-            label: 'Last Name',
-            placeholder: 'Enter your last name',
-            input: true
-        },
-        {
-            type: 'button',
-            action: 'submit',
-            label: 'Submit',
-            theme: 'primary'
-        }
-    ]
     // debugger;
-    let formio = Formio.createForm(document.getElementById('formBuilder'), {
-        components: componentsToLoad
-    }).then(async function (form) {
-        form.submission = {
-            // data: formValuesToLoad
-        };
-        form.on('submit', async function (submission) {
-            console.log('submission ->', submission);
-            //TODO: copy logic from admin app to save data
-            // let entity = {id: submission.data.id, url: submission.data.url, data: submission.data}
-            if (action == 'add') {
-                // debugger;
-                //need create default block, etc
-                submission.data.contentType = contentType;
-                await createContentInstance(submission.data);
-                await postProcessNewContent(submission.data);
-                await redirect(submission.data.url);
-            }
-            else {
-                //editing current
-                // debugger;
-                let entity = processContentFields(submission.data)
-                await editContentInstance(entity);
-                fullPageUpdate();
-            }
+    let comp = [
+        {
+            "label": "Url",
+            "allowMultipleMasks": false,
+            "showWordCount": false,
+            "showCharCount": false,
+            "tableView": true,
+            "alwaysEnabled": false,
+            "type": "textfield",
+            "input": true,
+            "key": "url",
+            "defaultValue": "",
+            "validate": {
+                "required": true,
+                "customMessage": "",
+                "json": ""
+            },
+            "conditional": {
+                "show": "",
+                "when": "",
+                "json": ""
+            },
+            "widget": {
+                "type": ""
+            },
+            "reorder": false,
+            "inputFormat": "plain",
+            "encrypted": false,
+            "properties": {
 
-            // debugger;
+            },
+            "customConditional": "",
+            "logic": [
+
+            ]
+        },
+        {
+            "label": "Name",
+            "allowMultipleMasks": false,
+            "showWordCount": false,
+            "showCharCount": false,
+            "tableView": true,
+            "alwaysEnabled": false,
+            "type": "textfield",
+            "input": true,
+            "key": "name",
+            "defaultValue": "",
+            "validate": {
+                "required": true,
+                "customMessage": "",
+                "json": ""
+            },
+            "conditional": {
+                "show": "",
+                "when": "",
+                "json": ""
+            },
+            "widget": {
+                "type": ""
+            },
+            "reorder": false,
+            "inputFormat": "plain",
+            "encrypted": false,
+            "properties": {
+
+            },
+            "customConditional": "",
+            "logic": [
+
+            ]
+        },
+        {
+            "label": "Include in Menu",
+            "shortcut": "",
+            "mask": false,
+            "tableView": true,
+            "alwaysEnabled": false,
+            "type": "checkbox",
+            "input": true,
+            "key": "includeInMenu",
+            "defaultValue": true,
+            "validate": {
+                "customMessage": "",
+                "json": ""
+            },
+            "conditional": {
+                "show": "",
+                "when": "",
+                "json": ""
+            },
+            "encrypted": false,
+            "reorder": false,
+            "properties": {
+
+            },
+            "customConditional": "",
+            "logic": [
+
+            ]
+        },
+        {
+            "label": "Hero Image",
+            "mask": false,
+            "tableView": true,
+            "alwaysEnabled": false,
+            "type": "file",
+            "input": true,
+            "key": "heroImage",
+            "defaultValue": [
+
+            ],
+            "validate": {
+                "customMessage": "",
+                "json": ""
+            },
+            "conditional": {
+                "show": "",
+                "when": "",
+                "json": ""
+            },
+            "storage": "url",
+            "dir": "",
+            "fileNameTemplate": "",
+            "webcam": false,
+            "fileTypes": [
+                {
+                    "label": "",
+                    "value": ""
+                }
+            ],
+            "encrypted": false,
+            "properties": {
+
+            },
+            "customConditional": "",
+            "logic": [
+
+            ],
+            "url": "http://localhost:3000/api/containers/container1/upload",
+            "options": "",
+            "reorder": false,
+            "webcamSize": ""
+        },
+        {
+            "type": "button",
+            "label": "Submit",
+            "key": "submit",
+            "disableOnInvalid": true,
+            "theme": "primary",
+            "input": true,
+            "tableView": true
+        }
+    ];
+    console.log('setupFormBuilder', contentType)
+    let componentsToLoad = {
+        components: comp,
+        // display: "form",
+        // page: 0
+    }
+
+    // debugger;
+    // (change)="onFormioChange($event)"
+
+    if (!contentType) {
+        //new content type
+        // debugger;
+        Formio.builder(document.getElementById('formBuilder'), null)
+            .then(async function (form) {
+                form.on('submit', async function (submission) {
+                    //             debugger;
+                    console.log('submission ->', submission);
+                });
+                form.on('change', async function (event) {
+                    // debugger;
+                    if (event.components) {
+                        contentTypeComponents = event.components;
+                        console.log('event ->', event);
+                    }
+                });
+            });
+
+        return;
+    } else {
+        let contentTypeDef = await getContentType(contentType);
+        return;
+    }
+    // Formio.builder(document.getElementById('formBuilder'), componentsToLoad)
+    //     .then(async function (form) {
+    //         form.on('submit', async function (submission) {
+    //             debugger;
+    //             console.log('submission ->', submission);
+    //             //TODO: copy logic from admin app to save data
+    //             // let entity = {id: submission.data.id, url: submission.data.url, data: submission.data}
+    //             if (action == 'add') {
+    //                 // debugger;
+    //                 //need create default block, etc
+    //                 // submission.data.contentType = contentType;
+    //                 // await createContentInstance(submission.data);
+    //                 // await postProcessNewContent(submission.data);
+    //                 // await redirect(submission.data.url);
+    //             }
+    //             else {
+    //                 //editing current
+    //                 // debugger;
+    //                 // let entity = processContentFields(submission.data)
+    //                 // await editContentInstance(entity);
+    //                 // fullPageUpdate();
+    //             }
+
+    //             // debugger;
 
 
-            // for(var name in submission.data) {
-            //     var value = submission.data[name];
-            //     page.data[name] = value;
-            // }
-        });
-        form.on('error', (errors) => {
-            console.log('We have errors!');
-        })
-    });
+    //             // for(var name in submission.data) {
+    //             //     var value = submission.data[name];
+    //             //     page.data[name] = value;
+    //             // }
+    //         });;
 
+    // let formio = Formio.createForm(document.getElementById('formBuilder'), {
+    //     components: componentsToLoad
+    // }).then(async function (form) {
+    //     form.submission = {
+    //         // data: formValuesToLoad
+    //     };
+    //     form.on('submit', async function (submission) {
+    //         console.log('submission ->', submission);
+    //         //TODO: copy logic from admin app to save data
+    //         // let entity = {id: submission.data.id, url: submission.data.url, data: submission.data}
+    //         if (action == 'add') {
+    //             // debugger;
+    //             //need create default block, etc
+    //             submission.data.contentType = contentType;
+    //             await createContentInstance(submission.data);
+    //             await postProcessNewContent(submission.data);
+    //             await redirect(submission.data.url);
+    //         }
+    //         else {
+    //             //editing current
+    //             // debugger;
+    //             let entity = processContentFields(submission.data)
+    //             await editContentInstance(entity);
+    //             fullPageUpdate();
+    //         }
+
+    //         // debugger;
+
+
+    //         // for(var name in submission.data) {
+    //         //     var value = submission.data[name];
+    //         //     page.data[name] = value;
+    //         // }
+    //     });
+    //     form.on('error', (errors) => {
+    //         console.log('We have errors!');
+    //     })
+    // });
+
+}
+
+async function onContentTypeSave() {
+    console.log('contentTypeComponents', contentTypeComponents);
+}
+
+async function openNewContentTypeModal(){
+    $('#newContentTypeModal').appendTo("body").modal('show');
 }
 
 async function openWYSIWYG() {

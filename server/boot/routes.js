@@ -47,6 +47,16 @@ module.exports = function (app) {
     res.render('home');
   });
 
+  app.get('/sandbox', async function (req, res) {
+    let data = {};
+    res.render('sandbox', { layout: 'blank.handlebars', data: data });
+  });
+
+  app.get('/admin/sandbox', async function (req, res) {
+    let data = {};
+    res.render('sandbox', { layout: 'admin.handlebars', data: data });
+  });
+
   app.get('/test', async function (req, res) {
     res.send('ok');
   });
@@ -98,7 +108,7 @@ module.exports = function (app) {
       }
 
       if(viewName == "admin-content-types-edit"){
-        data = await dataService.getContentType(param)
+        data.contentTypeId = param; //await dataService.getContentType(param)
       }
 
       if(viewName == "admin-site-settings"){

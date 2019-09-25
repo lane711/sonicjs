@@ -5,39 +5,8 @@
         <div class="card-header">
           <i class="fa fa-align-justify edit-content-type"></i> Edit {{ this.data.name }}
         </div>
+        details heresshould be indented
 
-            {{!-- <script type='text/javascript'>
-      window.onload = function() {
-        
-        Formio.createForm(document.getElementById('formio'), {
-  components: [
-    {
-      type: 'textfield',
-      key: 'firstName',
-      label: 'First Name',
-      placeholder: 'Enter your first name.',
-      input: true
-    },
-    {
-      type: 'textfield',
-      key: 'lastName',
-      label: 'Last Name',
-      placeholder: 'Enter your last name',
-      input: true
-    },
-    {
-      type: 'button',
-      action: 'submit',
-      label: 'Submit',
-      theme: 'primary'
-    }
-  ]
-});
-
-      };
-    </script> --}}
-
-    <div id='formBuilder'></div>
       </div>
 
     </div>
@@ -46,7 +15,8 @@
 
   <ul class="nav nav-tabs" id="myTab" role="tablist">
     <li class="nav-item">
-      <a class="nav-link active" id="home-tab" data-toggle="tab" href="#fields" role="tab" aria-controls="home" aria-selected="true">Fields</a>
+      <a class="nav-link active" id="home-tab" data-toggle="tab" href="#fields" role="tab" aria-controls="home"
+        aria-selected="true">Fields</a>
     </li>
     <li class="nav-item">
       <a class="nav-link " id="shortcode-tab" data-toggle="tab" href="#shortcode" role="tab" aria-controls="shortcode"
@@ -72,7 +42,33 @@
   <div class="tab-content" id="myTabContent">
 
     <div class="tab-pane fade show active" id="fields" role="tabpanel" aria-labelledby="home-tab">
-      <app-content-type-edit-fields></app-content-type-edit-fields>
+
+
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-header">
+              <i class="fa fa-align-justify"></i> Manage Fields
+
+            </div>
+            <div class="card-body">
+
+              <div id='formBuilder'></div>
+
+            </div>
+            <div class="card-footer">
+              <button type="button" class="btn btn-success pull-right" onclick="onContentTypeSave()">
+                Save
+              </button>
+            </div>
+          </div>
+
+        </div>
+        <!--/.col-->
+      </div>
+
+
     </div>
     <div class="tab-pane fade show" id="shortcode" role="tabpanel" aria-labelledby="shortcode-tab">
       <div class='shortcode'><span>Shortcode: </span>{{shortcode}}</div>
