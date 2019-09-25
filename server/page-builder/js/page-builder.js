@@ -354,7 +354,7 @@ async function getContentInstance(id) {
 }
 
 async function getContentType(systemId) {
-    const filter = `{"systemid":"${systemId}"}`;
+    const filter = `{"where":{"systemid":"${systemId}"}}`;
     const encodedFilter = encodeURI(filter);
     let url = `/api/contentTypes?filter=${encodedFilter}`;
     return axios.get(url)
@@ -421,6 +421,32 @@ async function editContentInstance(payload) {
     // }
     // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
     return axios.put(`/api/contents/${id}`, payload)
+        .then(async function (response) {
+            console.log(response);
+            return await response.data;
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+}
+
+async function editContentType(payload) {
+    // debugger;
+    let id = payload.id;
+    console.log('putting payload', payload);
+    if (payload.id) {
+        delete payload.id;
+    }
+
+    // let data = {};
+    // if(payload.data){
+    //     data = payload.data;
+    // }else{
+    //     data = payload;
+    // }
+    // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
+    // debugger;
+    return axios.put(`/api/contentTypes/${id}`, payload)
         .then(async function (response) {
             console.log(response);
             return await response.data;
@@ -565,192 +591,30 @@ async function setupPageSettings(action, contentType) {
 async function setupFormBuilder(contentType) {
 
     // debugger;
-    let comp = [
-        {
-            "label": "Url",
-            "allowMultipleMasks": false,
-            "showWordCount": false,
-            "showCharCount": false,
-            "tableView": true,
-            "alwaysEnabled": false,
-            "type": "textfield",
-            "input": true,
-            "key": "url",
-            "defaultValue": "",
-            "validate": {
-                "required": true,
-                "customMessage": "",
-                "json": ""
-            },
-            "conditional": {
-                "show": "",
-                "when": "",
-                "json": ""
-            },
-            "widget": {
-                "type": ""
-            },
-            "reorder": false,
-            "inputFormat": "plain",
-            "encrypted": false,
-            "properties": {
-
-            },
-            "customConditional": "",
-            "logic": [
-
-            ]
-        },
-        {
-            "label": "Name",
-            "allowMultipleMasks": false,
-            "showWordCount": false,
-            "showCharCount": false,
-            "tableView": true,
-            "alwaysEnabled": false,
-            "type": "textfield",
-            "input": true,
-            "key": "name",
-            "defaultValue": "",
-            "validate": {
-                "required": true,
-                "customMessage": "",
-                "json": ""
-            },
-            "conditional": {
-                "show": "",
-                "when": "",
-                "json": ""
-            },
-            "widget": {
-                "type": ""
-            },
-            "reorder": false,
-            "inputFormat": "plain",
-            "encrypted": false,
-            "properties": {
-
-            },
-            "customConditional": "",
-            "logic": [
-
-            ]
-        },
-        {
-            "label": "Include in Menu",
-            "shortcut": "",
-            "mask": false,
-            "tableView": true,
-            "alwaysEnabled": false,
-            "type": "checkbox",
-            "input": true,
-            "key": "includeInMenu",
-            "defaultValue": true,
-            "validate": {
-                "customMessage": "",
-                "json": ""
-            },
-            "conditional": {
-                "show": "",
-                "when": "",
-                "json": ""
-            },
-            "encrypted": false,
-            "reorder": false,
-            "properties": {
-
-            },
-            "customConditional": "",
-            "logic": [
-
-            ]
-        },
-        {
-            "label": "Hero Image",
-            "mask": false,
-            "tableView": true,
-            "alwaysEnabled": false,
-            "type": "file",
-            "input": true,
-            "key": "heroImage",
-            "defaultValue": [
-
-            ],
-            "validate": {
-                "customMessage": "",
-                "json": ""
-            },
-            "conditional": {
-                "show": "",
-                "when": "",
-                "json": ""
-            },
-            "storage": "url",
-            "dir": "",
-            "fileNameTemplate": "",
-            "webcam": false,
-            "fileTypes": [
-                {
-                    "label": "",
-                    "value": ""
-                }
-            ],
-            "encrypted": false,
-            "properties": {
-
-            },
-            "customConditional": "",
-            "logic": [
-
-            ],
-            "url": "http://localhost:3000/api/containers/container1/upload",
-            "options": "",
-            "reorder": false,
-            "webcamSize": ""
-        },
-        {
-            "type": "button",
-            "label": "Submit",
-            "key": "submit",
-            "disableOnInvalid": true,
-            "theme": "primary",
-            "input": true,
-            "tableView": true
-        }
-    ];
-    console.log('setupFormBuilder', contentType)
-    let componentsToLoad = {
-        components: comp,
-        // display: "form",
-        // page: 0
-    }
-
-    // debugger;
     // (change)="onFormioChange($event)"
-
-    if (!contentType) {
-        //new content type
-        // debugger;
-        Formio.builder(document.getElementById('formBuilder'), null)
-            .then(async function (form) {
-                form.on('submit', async function (submission) {
-                    //             debugger;
-                    console.log('submission ->', submission);
-                });
-                form.on('change', async function (event) {
-                    // debugger;
-                    if (event.components) {
-                        contentTypeComponents = event.components;
-                        console.log('event ->', event);
-                    }
-                });
-            });
-
-        return;
-    } else {
-        let contentTypeDef = await getContentType(contentType);
+    let formDiv = $('#formBuilder');
+    if (!formDiv.length) {
         return;
     }
+
+    Formio.builder(document.getElementById('formBuilder'), null)
+        .then(async function (form) {
+            form.setForm({
+                components:contentType.components
+            });
+            form.on('submit', async function (submission) {
+                //             debugger;
+                console.log('submission ->', submission);
+            });
+            form.on('change', async function (event) {
+                // debugger;
+                if (event.components) {
+                    contentTypeComponents = event.components;
+                    console.log('event ->', event);
+                }
+            });
+        });
+
     // Formio.builder(document.getElementById('formBuilder'), componentsToLoad)
     //     .then(async function (form) {
     //         form.on('submit', async function (submission) {
@@ -825,10 +689,13 @@ async function setupFormBuilder(contentType) {
 }
 
 async function onContentTypeSave() {
+    debugger;
     console.log('contentTypeComponents', contentTypeComponents);
+    contentType.components = contentTypeComponents;
+    await editContentType(contentType);
 }
 
-async function openNewContentTypeModal(){
+async function openNewContentTypeModal() {
     $('#newContentTypeModal').appendTo("body").modal('show');
 }
 

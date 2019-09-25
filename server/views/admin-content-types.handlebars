@@ -1,39 +1,39 @@
 <div class="col-lg-12">
-    <div class="card">
-        <div class="card-header">
-            <i class="fa fa-align-justify"></i> Content Type
-            <a href="JavaScript:Void(0);" onclick="openNewContentTypeModal()" class="btn btn-success float-right new-content-type">New Content Type</a>
-        </div>
-        <div class="card-body page-list">
-            <table class="table table-responsive-sm table-striped">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Content</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{#each data}}
-                    <tr>
-                        <td><a href="/admin/content-types/edit/{{ this.systemid }}">{{ this.name }}</a></td>
-                        <td>{{ contentType.description}}</td>
-                        <td>
-                            <a class="btn btn-sm btn-primary rmargin"
-                                href="/admin/content-types/edit/{{ this.systemid }}">Edit</a>
+  <div class="card">
+    <div class="card-header">
+      <i class="fa fa-align-justify"></i> Content Type
+      <a href="javascript:void(0)" onclick="openNewContentTypeModal()"
+        class="btn btn-success float-right new-content-type">New Content Type</a>
+    </div>
+    <div class="card-body page-list">
+      <table class="table table-responsive-sm table-striped">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Content</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each data}}
+          <tr>
+            <td><a href="/admin/content-types/edit/{{ this.systemid }}">{{ this.title }}</a></td>
+            <td>{{ contentType.description}}</td>
+            <td>
+              <a class="btn btn-sm btn-primary rmargin" href="/admin/content-types/edit/{{ this.systemid }}">Edit</a>
 
-                            <ng-template #popTitle>Delete <b>{{ contentType.name }}</b>?</ng-template>
-                            <ng-template #popContent><button class="btn btn-sm btn-danger"
-                                    (click)="deleteContentType(contentType.id)">Confirm Delete</button></ng-template>
-                            <button class="btn btn-sm btn-danger" placement="top" [ngbPopover]="popContent"
-                                [popoverTitle]="popTitle">Delete</button>
-                        </td>
-                    </tr>
-                    {{/each}}
-                </tbody>
-            </table>
+              <ng-template #popTitle>Delete <b>{{ contentType.name }}</b>?</ng-template>
+              <ng-template #popContent><button class="btn btn-sm btn-danger"
+                  (click)="deleteContentType(contentType.id)">Confirm Delete</button></ng-template>
+              <button class="btn btn-sm btn-danger" placement="top" [ngbPopover]="popContent"
+                [popoverTitle]="popTitle">Delete</button>
+            </td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
 
-            <!-- <ul class="pagination">
+      <!-- <ul class="pagination">
                 <li class="page-item">
                   <a class="page-link" href="#">Prev</a>
                 </li>
@@ -53,32 +53,77 @@
                   <a class="page-link" href="#">Next</a>
                 </li>
               </ul> -->
-        </div>
     </div>
+  </div>
 </div>
 <script src="/assets/js/popovers.js"></script>
 
 <!-- Section Editor Modal -->
 <div class="modal fade" id="newContentTypeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">New Content Type</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">New Content Type</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
 
-               new content type here
+        <script type='text/javascript'>
+          window.onload = function () {
+            Formio.createForm(document.getElementById('createContentTypeForm'), {
+              components: [
+                {
+                  type: 'textfield',
+                  key: 'title',
+                  label: 'Content Type Title',
+                  placeholder: 'Enter the title of your new content type (ie: Blog, News, Public Service).',
+                  input: true
+                },
+                {
+                  type: 'textfield',
+                  key: 'systemid',
+                  label: 'systemid',
+                  placeholder: 'Enter the slug to be used as the system id (ie: blog, news, public-service)',
+                  input: true
+                },
+                {
+                  type: 'button',
+                  action: 'submit',
+                  label: 'Create',
+                  theme: 'primary'
+                }
+              ]
+            })
+              .then(async function (form) {
+                form.on('submit', async function (submission) {
+                  //             debugger;
+                  console.log('submission ->', submission);
+debugger;
+                  axios.put(`/api/contentTypes/`, submission.data)
+                    .then(async function (response) {
+                      console.log(response);
+                      return await response.data;
+                    })
+                    .catch(function (error) {
+                      console.log(error);
+                    });
 
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-success wysiwyg-save" onclick='saveNewContentType()'
-                    data-dismiss="modal">Create</button>
-            </div>
-        </div>
+                });
+              });
+          }
+        </script>
+
+        <div id="createContentTypeForm"></div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-success wysiwyg-save" onclick='saveNewContentType()'
+          data-dismiss="modal">Create</button>
+      </div>
     </div>
+  </div>
 </div>
