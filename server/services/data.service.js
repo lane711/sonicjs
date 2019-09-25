@@ -41,7 +41,7 @@ module.exports = {
 
     getContentTopOne: async function (contentType) {
         let results = await this.getContent(contentType);
-        return results[0].data;
+        return results[0];
     },
 
     getContentByUrl: async function (url) {

@@ -102,7 +102,7 @@ module.exports = function (app) {
       }
 
       if(viewName == "admin-site-settings"){
-        data.data = await dataService.getContentTopOne('site-settings');
+        data = await dataService.getContentTopOne('site-settings');
         data.editForm = await formService.getForm(data);
       }
 

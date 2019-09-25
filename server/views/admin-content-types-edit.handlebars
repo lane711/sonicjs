@@ -5,7 +5,39 @@
         <div class="card-header">
           <i class="fa fa-align-justify edit-content-type"></i> Edit {{ this.data.name }}
         </div>
-            <app-forms *ngIf="isDataAvailable" [questions]="this.questions" [onSubmitHandler]="onSubmitContentTypeEdit"></app-forms>
+
+            {{!-- <script type='text/javascript'>
+      window.onload = function() {
+        
+        Formio.createForm(document.getElementById('formio'), {
+  components: [
+    {
+      type: 'textfield',
+      key: 'firstName',
+      label: 'First Name',
+      placeholder: 'Enter your first name.',
+      input: true
+    },
+    {
+      type: 'textfield',
+      key: 'lastName',
+      label: 'Last Name',
+      placeholder: 'Enter your last name',
+      input: true
+    },
+    {
+      type: 'button',
+      action: 'submit',
+      label: 'Submit',
+      theme: 'primary'
+    }
+  ]
+});
+
+      };
+    </script> --}}
+
+    <div id='formBuilder'></div>
       </div>
 
     </div>

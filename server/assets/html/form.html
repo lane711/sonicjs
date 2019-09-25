@@ -30,7 +30,7 @@
     //                     }
     //                 ]
 
-    window.onload = function () {
+    window.onload = async function () {
         Formio.createForm(document.getElementById('formio'), {
             components: components
         }).then((form) => {
@@ -40,8 +40,12 @@
                 data: formValuesToLoad
             };
 
-            form.on('submit', function (submission) {
+            form.on('submit', async function (submission) {
                 console.log('Submission was made!', submission);
+
+                let entity = processContentFields(submission.data)
+                await editContentInstance(entity);
+
             });
 
             // Everytime the form changes, this will fire.
