@@ -458,11 +458,26 @@ async function editContentType(payload) {
 
 async function deleteContentInstance(id) {
     console.log('deleting content', id);
+    debugger;
     // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
     return axios.delete(`/api/contents/${id}`)
         .then(async function (response) {
             console.log(response);
             return await response.data;
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+}
+
+async function deleteContentType(id) {
+    debugger;
+    console.log('deleting content', id);
+    // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
+    axios.delete(`/api/contentTypes/${id}`)
+        .then(async function (response) {
+            console.log(response);
+            redirect('/admin/content-types')
         })
         .catch(function (error) {
             console.log(error);
@@ -600,7 +615,7 @@ async function setupFormBuilder(contentType) {
     Formio.builder(document.getElementById('formBuilder'), null)
         .then(async function (form) {
             form.setForm({
-                components:contentType.components
+                components: contentType.components
             });
             form.on('submit', async function (submission) {
                 //             debugger;

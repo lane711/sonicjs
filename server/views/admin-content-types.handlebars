@@ -22,11 +22,25 @@
             <td>
               <a class="btn btn-sm btn-primary rmargin" href="/admin/content-types/edit/{{ this.systemid }}">Edit</a>
 
-              <ng-template #popTitle>Delete <b>{{ contentType.name }}</b>?</ng-template>
+              <button class="btn btn-sm btn-danger" type="button" data-toggle="collapse"
+                data-target="#collapse{{ this.systemid }}" aria-expanded="false" aria-controls="collapseExample">
+                Delete
+              </button>
+              <div class="collapse" style="margin: 12px 0 0; max-width:300px;" id="collapse{{ this.systemid }}">
+                <div class="card card-body">
+                  <a class='btn btn-sm btn-danger' href="#" onclick='deleteContentType({{ this.id }})'>Confirm Delete {{ this.title }}?</a> </div>
+              </div>
+
+              {{!-- <button type="button" class="btn btn-sm btn-danger" data-toggle="popover" 
+ title="Delete Content Type {{ this.title }}" data-html="true"
+data-content="<a class='btn btn-sm btn-danger' onclick='deleteContentType({{ this.id }})' >Confirm Delete?</a>">Delete</button> --}}
+
+
+              {{!-- <ng-template #popTitle>Delete <b>{{ contentType.name }}</b>?</ng-template>
               <ng-template #popContent><button class="btn btn-sm btn-danger"
                   (click)="deleteContentType(contentType.id)">Confirm Delete</button></ng-template>
               <button class="btn btn-sm btn-danger" placement="top" [ngbPopover]="popContent"
-                [popoverTitle]="popTitle">Delete</button>
+                [popoverTitle]="popTitle">Delete</button> --}}
             </td>
           </tr>
           {{/each}}
@@ -56,7 +70,7 @@
     </div>
   </div>
 </div>
-<script src="/assets/js/popovers.js"></script>
+
 
 <!-- Section Editor Modal -->
 <div class="modal fade" id="newContentTypeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
@@ -101,7 +115,7 @@
                 form.on('submit', async function (submission) {
                   //             debugger;
                   console.log('submission ->', submission);
-debugger;
+                  debugger;
                   axios.put(`/api/contentTypes/`, submission.data)
                     .then(async function (response) {
                       console.log(response);
