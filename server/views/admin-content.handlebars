@@ -25,10 +25,11 @@
             <td>{{ this.data.url }}</td>
             <td>...</td>
             <td class='text-right'>
+              <a href="/admin/content/edit/{{ this.data.contentType }}/{{ this.id }}" class="btn btn-sm btn-primary rmargin">Edit</a>
+
               {{!-- <!-- <a href="{{ content.url }}" target="_blank" class="btn btn-sm btn-success rmargin">View</a> -->
                 <a class="btn btn-sm btn-warning rmargin" *ngIf="content.data.contentType==='page'" [routerLink]="['/page-builder', content.id]">Page Builder</a>
 
-                <a class="btn btn-sm btn-primary rmargin" [routerLink]="['/content', content.id]">Settings</a>
   
                 <ng-template #popTitle>Delete <b>{{ content.name }}</b>?</ng-template>
                 <ng-template #popContent><button class="btn btn-sm btn-danger" (click)="deleteContent(content.id)">Confirm Delete</button></ng-template>
@@ -55,10 +56,10 @@
         </button>
       </div>
       <div class="modal-body">
-<h5>Select a content type to add:</h5>
+        <h5>Select a content type to add:</h5>
         {{#each data.contentTypes}}
         <a class='btn btn-success' href="/admin/content/edit/{{ this.systemid }}">
-        {{ this.title }}</a>
+          {{ this.title }}</a>
         {{/each}}
       </div>
     </div>
