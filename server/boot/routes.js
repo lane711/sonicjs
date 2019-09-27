@@ -104,6 +104,10 @@ module.exports = function (app) {
         data.contentTypes = await dataService.getContentTypes()
       }
 
+      if(viewName == "admin-content-edit"){
+        data.editForm = await formService.getForm(param, null);
+      }
+
       if(viewName == "admin-content-types"){
         data = await dataService.getContentTypes()
       }

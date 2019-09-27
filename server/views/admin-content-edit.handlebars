@@ -1,148 +1,17 @@
-<div>
-  <div class="row">
-    <div class="col-md-12">
-      <div class="card admin-content-type-edit">
-        <div class="card-header">
-          <i class="fa fa-align-justify edit-content-type"></i> Edit {{ this.data.title }}
-        </div>
+<div class="row">
+  <div class="col-md-12">
+    <div class="card admin-create-instance">
+      <div class="card-header">
+        <i class="fa fa-align-justify"></i> Edit Content
+      </div>
+      <div class="card-body">
 
-        <div class="card-body">
+                    {{{ data.editForm }}}
 
-          <script type='text/javascript'>
-            window.onload = function () {
-              Formio.createForm(document.getElementById('createContentTypeForm'), {
-                components: [
-                  {
-                    type: 'textfield',
-                    key: 'id',
-                    label: 'Id',
-                    input: false
-                  },
-                  {
-                    type: 'textfield',
-                    key: 'title',
-                    label: 'Content Type Title',
-                    placeholder: 'Enter the title of your new content type (ie: Blog, News, Public Service).',
-                    input: true
-                  },
-                  {
-                    type: 'textfield',
-                    key: 'systemid',
-                    label: 'SystemId',
-                    placeholder: 'Enter the slug to be used as the system id (ie: blog, news, public-service)',
-                    input: true
-                  },
-                  {
-                    type: 'button',
-                    action: 'submit',
-                    label: 'Save Title & SystemId',
-                    theme: 'primary'
-                  }
-                ]
-              })
-                .then(async function (form) {
-                  form.submission = {
-                    data: { id: contentType.id, title: contentType.title, systemid: contentType.systemid }
-                  };
-                  form.on('submit', async function (submission) {
-                    //             debugger;
-                    console.log('submission ->', submission);
-                    axios.put(`/api/contentTypes/`, submission.data)
-                      .then(async function (response) {
-                        console.log(response);
-                        //return await response.data;
-                        
-                        window.location.replace('/admin/content-types/edit/' + submission.data.systemid);
-                      })
-                      .catch(function (error) {
-                        console.log(error);
-                      });
+                    {{!-- <div id='formio'></div> --}}
 
-                  });
-                });
-            }
-          </script>
-
-          <div id="createContentTypeForm"></div>
-        </div>
 
       </div>
-
-    </div>
-    <!--/.col-->
-  </div>
-
-  <ul class="nav nav-tabs" id="myTab" role="tablist">
-    <li class="nav-item">
-      <a class="nav-link active" id="home-tab" data-toggle="tab" href="#fields" role="tab" aria-controls="home"
-        aria-selected="true">Fields</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link " id="shortcode-tab" data-toggle="tab" href="#shortcode" role="tab" aria-controls="shortcode"
-        aria-selected="false">Shortcode</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link " id="profile-tab" data-toggle="tab" href="#views" role="tab" aria-controls="profile"
-        aria-selected="false">Views</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link " id="profile-tab" data-toggle="tab" href="#permissions" role="tab" aria-controls="profile"
-        aria-selected="false">Permissions</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" id="contact-tab" data-toggle="tab" href="#settings" role="tab" aria-controls="contact"
-        aria-selected="false">Settings</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" id="contact-tab" data-toggle="tab" href="#create" role="tab" aria-controls="contact"
-        aria-selected="false">Create Instance</a>
-    </li>
-  </ul>
-  <div class="tab-content" id="myTabContent">
-
-    <div class="tab-pane fade show active" id="fields" role="tabpanel" aria-labelledby="home-tab">
-
-
-
-      <div class="row">
-        <div class="col-md-12">
-          <div class="card">
-            <div class="card-header">
-              <i class="fa fa-align-justify"></i> Manage Fields
-
-            </div>
-            <div class="card-body">
-
-              <div id='formBuilder'></div>
-
-            </div>
-            <div class="card-footer">
-              <button type="button" class="btn btn-success pull-right" onclick="onContentTypeSave()">
-                Save Fields
-              </button>
-            </div>
-          </div>
-
-        </div>
-        <!--/.col-->
-      </div>
-
-
-    </div>
-    <div class="tab-pane fade show" id="shortcode" role="tabpanel" aria-labelledby="shortcode-tab">
-      <div class='shortcode'><span>Shortcode: </span>{{shortcode}}</div>
-    </div>
-    <div class="tab-pane fade show" id="views" role="tabpanel" aria-labelledby="profile-tab">
-      <app-content-type-edit-views></app-content-type-edit-views>
-    </div>
-    <div class="tab-pane fade show" id="permissions" role="tabpanel" aria-labelledby="profile-tab">
-      <app-content-type-edit-permissions></app-content-type-edit-permissions>
-    </div>
-    <div class="tab-pane fade show" id="settings" role="tabpanel" aria-labelledby="contact-tab">
-      <app-content-type-edit-settings></app-content-type-edit-settings>
-    </div>
-    <div class="tab-pane fade show" id="create" role="tabpanel" aria-labelledby="home-tab">
-      <app-content-type-edit-create-instance></app-content-type-edit-create-instance>
     </div>
   </div>
 

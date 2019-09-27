@@ -36,16 +36,22 @@
         }).then((form) => {
             console.log('log form', form);
 
-            form.submission = {
-                data: formValuesToLoad
-            };
+            if (formValuesToLoad) {
+                form.submission = {
+                    data: formValuesToLoad
+                };
+            }
 
             form.on('submit', async function (submission) {
                 console.log('Submission was made!', submission);
-
+                debugger;
                 let entity = processContentFields(submission.data)
-                await editContentInstance(entity);
-
+                if (submission.data.id) {
+                    await editContentInstance(entity);
+                }
+                else {
+                    await createContentInstance(entity);
+                }
             });
 
             // Everytime the form changes, this will fire.

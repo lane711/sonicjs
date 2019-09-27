@@ -24,21 +24,36 @@ module.exports = formService = {
     startup: async function () {
         eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
             if (options) {
-                options.page.data.editForm = await formService.getForm(options.page);
+                options.page.data.editForm = await formService.getForm(options.page.contentTypeId, options.page);
             }
         });
     },
 
-    getForm: async function (content) {
-        let fieldsDef = await this.getFormDefinition(content);
+    getForm: async function (contentTypeId, content) {
+        let contentType;
+        if (content) {
+            contentType = await dataService.getContentType(content.data.contentType);
+        } else if (contentTypeId) {
+            contentType = await dataService.getContentType(contentTypeId);
+        }
+
+        let fieldsDef = await this.getFormDefinition(contentType, content);
 
         let form = "<script type='text/javascript'> const components = ";
         form += JSON.stringify(fieldsDef);
         form += "</script>";
+
+
         form += "<script type='text/javascript'> const formValuesToLoad = ";
-        form += JSON.stringify(content.data);
+        if (content) {
+            form += JSON.stringify(content.data);
+        }
+        else {
+            form += "{}";
+        }
         form += "</script>";
-        
+
+
         form += await this.getFormTemplate();
         return form;
     },
@@ -59,155 +74,45 @@ module.exports = formService = {
         });
     },
 
-    getFormDefinition: async function (content) {
+    getFormDefinition: async function (contentType, content) {
 
-        let contentTypeDef = await dataService.getContentType(content.data.contentType);
+        // let contentTypeDef = await dataService.getContentType(content.data.contentType);
         // console.log('contentTypeDef', contentTypeDef);
-        let components = contentTypeDef.components;
+        let components = contentType.components;
 
-        this.addBaseContentTypeFields(content.id, content.data.contentType, components);
-
-        contentTypeDef.components.forEach(field => {
-            return;
-            // let fieldType = field.fieldType == 'textBox' ? 'textfield' : field.fieldType;
-            let fieldDef = {
-                type: field.type,
-                key: field.key,
-                label: field.label,
-                // placeholder: 'Enter your first name.',
-                required: field.validate.required,
+        if (content) {
+            this.addBaseContentTypeFields(content.id, content.data.contentType, components);
+        } else{
+            components.push({
+                type: 'textfield',
+                key: 'contentType',
+                label: 'contentType',
+                defaultValue: contentType.systemid,
                 input: true
-            }
-
-            if(field.validate){
-                fieldDef/re
-            }
-
-
-
-            if(field.type == 'imageList'){
-                fieldDef.options = this.imageListForDropDown;
-                }
-
-            components.push(fieldDef);
-
-            // if(field.fieldType == 'textBox'){
-            //     let control = new TextboxQuestion({
-            //       key: field.systemid,
-            //       label: field.label,
-            //       value: "",
-            //       required: field.required,
-            //       order: 1
-            //     });
-            //     controls.push(control);
-            //   }
-      
-            //   if(field.fieldType == 'textarea'){
-            //     let control = new TextareaQuestion({
-            //       key: field.systemid,
-            //       label: field.label,
-            //       value: "",
-            //       required: field.required,
-            //       order: 1
-            //     });
-            //     controls.push(control);
-            //   }
-      
-            //   if(field.fieldType == 'layout'){
-            //     let control = new LayoutQuestion({
-            //       key: field.systemid,
-            //       label: field.label,
-            //       value: "",
-            //       required: field.required,
-            //       order: 1
-            //     });
-            //     controls.push(control);
-            //   }
-      
-            //   if(field.fieldType == 'wysiwyg'){
-            //     let control = new WYSIWYGQuestion({
-            //       key: field.systemid,
-            //       label: field.label,
-            //       value: "",
-            //       required: field.required,
-            //       order: 1
-            //     });
-            //     controls.push(control);
-            //   }
-      
-            //   if(field.fieldType == 'imageList'){
-            //     // console.log('this.imageListForDropDown', this.imageListForDropDown);
-            //     let control = new DropdownQuestion({
-            //       key: field.systemid,
-            //       label: field.label,
-            //       value: "",
-            //       required: field.required,
-            //       order: 1,
-            //       options: this.imageListForDropDown,
-            //     });
-            //     controls.push(control);
-            //   }
-        });
-
-        //add button
-        // components.push({
-        //     type: 'button',
-        //     action: 'submit',
-        //     label: 'Submit',
-        //     theme: 'primary'
-        // });
-
-        //     {
-        //         type: 'textfield',
-        //         key: 'firstName',
-        //         label: 'First Name',
-        //         placeholder: 'Enter your first name.',
-        //         input: true
-        //     },
-        //     {
-        //         type: 'textfield',
-        //         key: 'lastName',
-        //         label: 'Last Name',
-        //         placeholder: 'Enter your last name',
-        //         input: true
-        //     },
-        //     {
-        //         type: 'currency',
-        //         key: 'cost',
-        //         label: 'Cost',
-        //         placeholder: 'Enter $ cost',
-        //         input: true
-        //     },
-        //     {
-        //         type: 'button',
-        //         action: 'submit',
-        //         label: 'Submit',
-        //         theme: 'primary'
-        //     }
-        // ];
+            });
+        }
 
         return components;
-
     },
 
-    addBaseContentTypeFields: function(id, contentType, controls){
+    addBaseContentTypeFields: function (id, contentType, controls) {
         // console.log('addBaseContentTypeFields', contentType, controls);
 
         controls.push({
-                    type: 'textfield',
-                    key: 'id',
-                    label: 'id',
-                    defaultValue: id,
-                    input: true
-                  });
+            type: 'textfield',
+            key: 'id',
+            label: 'id',
+            defaultValue: id,
+            input: true
+        });
 
-                //   controls.push({
-                //     type: 'textfield',
-                //     key: 'contentTypeId',
-                //     label: 'contentTypeId',
-                //     defaultValue: contentType,
-                //     input: true
-                //   });
+        //   controls.push({
+        //     type: 'textfield',
+        //     key: 'contentTypeId',
+        //     label: 'contentTypeId',
+        //     defaultValue: contentType,
+        //     input: true
+        //   });
 
         // if(isToBePopulatedWithExistingContent){
         //   let controlId = new HiddenQuestion({
@@ -218,7 +123,7 @@ module.exports = formService = {
         //     order: 0
         //   });
         //   controls.push(controlId);
-    
+
         //   let controlContentType = new HiddenQuestion({
         //     key: 'contentTypeId',
         //     label: 'Content Type',
@@ -228,5 +133,5 @@ module.exports = formService = {
         //   });
         //   controls.push(controlContentType);
         // }
-      }
+    }
 }
