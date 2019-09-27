@@ -6,7 +6,7 @@
     "RoleMapping": 1,
     "Role": 1,
     "contentType": 11,
-    "content": 8,
+    "content": 10,
     "fieldType": 1,
     "e2e-test": 1
   },
@@ -27,7 +27,9 @@
       "2": "{\"data\":{\"item\":[{\"url\":\"/Home\",\"title\":\"Home\",\"active\":true,\"level\":\"0\"},{\"url\":\"/About\",\"title\":\"About\",\"active\":true,\"level\":\"0\"}],\"submit\":true,\"contentType\":\"menu\"},\"id\":2}",
       "3": "{\"url\":\"/\",\"data\":{\"title\":\"Home\",\"includeInMenu\":true,\"herImage\":[],\"submit\":true,\"contentType\":\"page\"},\"id\":3}",
       "6": "{\"data\":{\"data\":{\"ipsum\":\"df\",\"count\":5,\"submit\":true}},\"id\":6}",
-      "7": "{\"data\":{\"data\":{\"url\":\"1\",\"title\":\"2\",\"body\":\"3\",\"contentType\":\"news2\",\"submit\":true}},\"id\":7}"
+      "7": "{\"data\":{\"data\":{\"url\":\"1\",\"title\":\"2\",\"body\":\"3\",\"contentType\":\"news2\",\"submit\":true}},\"id\":7}",
+      "8": "{\"data\":{\"data\":{\"url\":\"123\",\"title\":\"qweqwe\",\"body\":\"asdds\",\"contentType\":\"news2\",\"submit\":true}},\"id\":8}",
+      "9": "{\"data\":{\"url\":\"sdf\",\"title\":\"ffds\",\"body\":\"f\",\"contentType\":\"news2\",\"submit\":true},\"id\":9}"
     },
     "fieldType": {},
     "e2e-test": {}

@@ -386,13 +386,16 @@ async function getContentByContentTypeAndTitle(contentType, title) {
 }
 
 async function createContentInstance(payload) {
-    console.log('createContentInstance payload', payload);
-    let content = {};
-    content.data = payload;
+    // console.log('createContentInstance payload', payload);
+    // let content = {};
+    // content.data = payload;
     // this.processContentFields(payload, content);
-    console.log('content', content);
+    console.log('payload', payload);
+    if (payload.id) {
+        delete payload.id;
+    }
     // return this.http.post("/api/contents/", content).toPromise();
-    return axios.post('/api/contents/', content)
+    return axios.post('/api/contents/', payload)
         .then(async function (response) {
             console.log(response);
             return await response.data;

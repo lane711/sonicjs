@@ -44,7 +44,7 @@
 
             form.on('submit', async function (submission) {
                 console.log('Submission was made!', submission);
-                debugger;
+                // debugger;
                 let entity = processContentFields(submission.data)
                 if (submission.data.id) {
                     await editContentInstance(entity);
