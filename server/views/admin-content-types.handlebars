@@ -115,11 +115,11 @@ data-content="<a class='btn btn-sm btn-danger' onclick='deleteContentType({{ thi
                 form.on('submit', async function (submission) {
                   //             debugger;
                   console.log('submission ->', submission);
-                  debugger;
                   axios.put(`/api/contentTypes/`, submission.data)
                     .then(async function (response) {
                       console.log(response);
-                      return await response.data;
+                          window.location.replace('/admin/content-types/edit/' +  submission.data.systemid);
+
                     })
                     .catch(function (error) {
                       console.log(error);

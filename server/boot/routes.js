@@ -101,6 +101,7 @@ module.exports = function (app) {
 
       if(viewName == "admin-content"){
         data = await adminService.getContent()
+        data.contentTypes = await dataService.getContentTypes()
       }
 
       if(viewName == "admin-content-types"){

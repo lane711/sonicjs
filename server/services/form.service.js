@@ -63,11 +63,11 @@ module.exports = formService = {
 
         let contentTypeDef = await dataService.getContentType(content.data.contentType);
         // console.log('contentTypeDef', contentTypeDef);
-        let components = contentTypeDef.components.components;
+        let components = contentTypeDef.components;
 
         this.addBaseContentTypeFields(content.id, content.data.contentType, components);
 
-        contentTypeDef.components.components.forEach(field => {
+        contentTypeDef.components.forEach(field => {
             return;
             // let fieldType = field.fieldType == 'textBox' ? 'textfield' : field.fieldType;
             let fieldDef = {

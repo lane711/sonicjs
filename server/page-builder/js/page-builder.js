@@ -471,7 +471,6 @@ async function deleteContentInstance(id) {
 }
 
 async function deleteContentType(id) {
-    debugger;
     console.log('deleting content', id);
     // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
     axios.delete(`/api/contentTypes/${id}`)
