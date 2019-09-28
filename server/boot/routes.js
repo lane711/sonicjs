@@ -118,7 +118,7 @@ module.exports = function (app) {
 
       if(viewName == "admin-site-settings"){
         data = await dataService.getContentTopOne('site-settings');
-        data.editForm = await formService.getForm(data);
+        data.editForm = await formService.getForm('site-settings', data);
       }
 
       res.render(viewName, { layout: 'admin.handlebars', data: data });
