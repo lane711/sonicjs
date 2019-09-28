@@ -92,6 +92,13 @@
         "params": "$!../node_modules/tinymce"
       },
       {
+        "name": "vendors",
+        "paths": [
+          "/vendors"
+        ],
+        "params": "$!../server/assets/vendors"
+      },
+      {
         "name": "font-awesome-fonts",
         "paths": [
           "/fonts"
