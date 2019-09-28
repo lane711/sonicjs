@@ -25,5 +25,11 @@ module.exports = mediaService = {
         if (page.data.heroImage[0]) {
             page.data.heroImage = page.data.heroImage[0].originalName;
         }
-    }
+    },
+
+    getMedia: async function (contentType) {
+        let url = `/api/containers/container1/files`;
+        let page = await axios.get(url);
+        return page.data;
+    },
 }
