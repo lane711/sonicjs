@@ -1,12 +1,12 @@
 var dir = require('node-dir');
 var path = require("path");
 var eventBusService = require('../services/event-bus.service');
-
+var moduleDefinitions = [];
 module.exports = moduleService = {
 
     startup: function () {
-        eventBusService.once('startup', function () {
-            // console.log('>>=== startup from module service');
+        eventBusService.on('startup', function () {
+            console.log('>>=== startup from module service');
             moduleService.processModules();
         });
     },
@@ -14,27 +14,39 @@ module.exports = moduleService = {
     processModules: function () {
         let dir = path.resolve(__dirname, '..', 'modules');
 
-        this.getModuleDefinitionFiles(dir);
-        let moduleFolders = this.getModuleFolders(dir);
+        moduleDefinitions = this.getModuleDefinitionFiles(dir);
+        // let moduleFolders = this.getModuleFolders(dir);
     },
 
-    getModuleFolders: function (path) {
-        dir.subdirs(path, function (err, subdirs) {
-            if (err) throw err;
-        });
+    getModules: async function () {
+        return moduleDefinitions;
     },
 
-    getModuleDefinitionFiles: function (path) {
-        dir.readFiles(path, {
+    // getModuleFolders: function (path) {
+    //     dir.subdirs(path, function (err, subdirs) {
+    //         if (err) throw err;
+    //     });
+    // },
+
+    getModuleDefinitionFiles: async function (path) {
+        let moduleList = [];
+        await dir.readFiles(path, {
             match: /module.json$/,
             exclude: /^\./
         }, function (err, content, next) {
             if (err) throw err;
+            console.log('content', content);
+            let moduleDef = JSON.parse(content);
+            moduleList.push(moduleDef);
             next();
         },
             function (err, files) {
                 if (err) throw err;
+                console.log('files', files);
+                moduleDefinitions = moduleList;
+                return moduleList;
             });
+
     },
 
 }

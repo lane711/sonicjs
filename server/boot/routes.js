@@ -28,11 +28,6 @@ module.exports = function (app) {
   let adminPage = '';
 
 
-
-  (async () => {
-    eventBusService.emit('startup');
-  })();
-
   (async () => {
     await menuService.startup();
     await mediaService.startup();
@@ -40,6 +35,9 @@ module.exports = function (app) {
 
     //TODO fix admin path for prod mode
     adminPage = await admin.loadAdmin();
+
+    eventBusService.emit('startup');
+
   })();
 
 
@@ -114,6 +112,10 @@ module.exports = function (app) {
 
       if(viewName == "admin-content-types-edit"){
         data.contentTypeId = param; //await dataService.getContentType(param)
+      }
+
+      if(viewName == "admin-modules"){
+        data = await moduleService.getModules();
       }
 
       if(viewName == "admin-media"){
