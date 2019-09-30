@@ -1,3 +1,13 @@
 #formBuilder .card {
     margin-bottom: 0;
 }
+
+.card .dropzone{
+    margin: 0 0 60px;
+    border: 4px dashed #c8ced3;
+    background: #f0f3f5;
+}
+
+.card .dropzone span{
+    font-size: 2rem;
+}

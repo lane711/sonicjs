@@ -116,6 +116,10 @@ module.exports = function (app) {
         data.contentTypeId = param; //await dataService.getContentType(param)
       }
 
+      if(viewName == "admin-media"){
+        data = await mediaService.getMedia()
+      }
+
       if(viewName == "admin-site-settings"){
         data = await dataService.getContentTopOne('site-settings');
         data.editForm = await formService.getForm('site-settings', data);

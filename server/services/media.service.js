@@ -27,9 +27,17 @@ module.exports = mediaService = {
         }
     },
 
-    getMedia: async function (contentType) {
-        let url = `/api/containers/container1/files`;
-        let page = await axios.get(url);
-        return page.data;
+    getMedia: async function () {
+        let url = 'http://localhost:3000/api/containers/container1/files';
+        return axios.get(url)
+        .then(async function (record) {
+            if (record.data) {
+                return record.data;
+            }
+            return 'not found';
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
     },
 }
