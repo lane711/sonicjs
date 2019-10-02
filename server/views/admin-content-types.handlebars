@@ -31,6 +31,19 @@
                   <a class='btn btn-sm btn-danger' href="#" onclick='deleteContentType({{ this.id }})'>Confirm Delete {{ this.title }}?</a> </div>
               </div>
 
+
+              <a tabindex="0"
+   class="btn btn-sm btn-danger" 
+   role="button" 
+   data-html="true" 
+   data-toggle="popover" 
+   data-trigger="focus" 
+   title="Delete <b>{{ this.data.title }}</b> Forever?" 
+   data-content="<a href='/contentType/{{ this.id }}' 
+   class='btn btn-sm btn-danger rmargin'>Confirm Delete</a>
+">Delete</a>
+
+
               {{!-- <button type="button" class="btn btn-sm btn-danger" data-toggle="popover" 
  title="Delete Content Type {{ this.title }}" data-html="true"
 data-content="<a class='btn btn-sm btn-danger' onclick='deleteContentType({{ this.id }})' >Confirm Delete?</a>">Delete</button> --}}

@@ -5,7 +5,7 @@
     "ACL": 1,
     "RoleMapping": 1,
     "Role": 1,
-    "contentType": 11,
+    "contentType": 12,
     "content": 10,
     "fieldType": 1,
     "e2e-test": 1
@@ -24,8 +24,7 @@
     "content": {
       "1": "{\"id\":1,\"data\":{\"fontDefault\":\"Roboto\",\"fontHeaders\":\"Lato\",\"url\":\"\",\"contentType\":\"site-settings\",\"submit\":true}}",
       "2": "{\"data\":{\"item\":[{\"url\":\"/Home\",\"title\":\"Home\",\"active\":true,\"level\":\"0\"},{\"url\":\"/About\",\"title\":\"About\",\"active\":true,\"level\":\"0\"}],\"submit\":true,\"contentType\":\"menu\"},\"id\":2}",
-      "3": "{\"url\":\"/\",\"data\":{\"title\":\"Home\",\"includeInMenu\":true,\"herImage\":[],\"submit\":true,\"contentType\":\"page\"},\"id\":3}",
-      "9": "{\"data\":{\"url\":\"sdf\",\"title\":\"ffds\",\"body\":\"f\",\"contentType\":\"news2\",\"submit\":true},\"id\":9}"
+      "3": "{\"url\":\"/\",\"data\":{\"title\":\"Home\",\"includeInMenu\":true,\"herImage\":[],\"submit\":true,\"contentType\":\"page\"},\"id\":3}"
     },
     "fieldType": {},
     "e2e-test": {}
