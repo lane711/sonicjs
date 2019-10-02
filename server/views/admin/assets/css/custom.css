@@ -11,3 +11,19 @@
 .card .dropzone span{
     font-size: 2rem;
 }
+
+.field-types-list button{
+    margin: 0 12px 12px 0;
+}
+
+.field-types-list button i.fa{
+    margin: 0 6px 0 0;
+}
+
+.field-types-list h2{
+    margin: 30px 0 20px 0;
+}
+
+.hide{
+    display: none;
+}

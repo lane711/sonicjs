@@ -6,7 +6,7 @@ module.exports = moduleService = {
 
     startup: function () {
         eventBusService.on('startup', function () {
-            console.log('>>=== startup from module service');
+            // console.log('>>=== startup from module service');
             moduleService.processModules();
         });
     },
@@ -35,14 +35,14 @@ module.exports = moduleService = {
             exclude: /^\./
         }, function (err, content, next) {
             if (err) throw err;
-            console.log('content', content);
+            // console.log('content', content);
             let moduleDef = JSON.parse(content);
             moduleList.push(moduleDef);
             next();
         },
             function (err, files) {
                 if (err) throw err;
-                console.log('files', files);
+                // console.log('files', files);
                 moduleDefinitions = moduleList;
                 return moduleList;
             });
