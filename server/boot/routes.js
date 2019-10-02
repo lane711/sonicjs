@@ -122,6 +122,10 @@ module.exports = function (app) {
         data = await mediaService.getMedia()
       }
 
+      if(viewName == "admin-menus"){
+        data = await dataService.getContentByContentType('menu')
+      }
+
       if(viewName == "admin-site-settings"){
         data = await dataService.getContentTopOne('site-settings');
         data.editForm = await formService.getForm('site-settings', data);

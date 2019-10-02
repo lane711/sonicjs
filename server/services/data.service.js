@@ -59,6 +59,17 @@ module.exports = {
         return notFound;
     },
 
+    getContentByContentType: async function (contentType) {
+        var  filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
+        let apiFullUrl = `${apiUrl}contents?filter=${filter}`;
+        let record = await axios.get(apiFullUrl);
+        if (record.data) {
+            return record.data;
+        }
+
+        return notFound;
+    },
+    
     getContentByContentTypeAndTitle: async function (contentType, title) {
         const filter = `{"where":{"and":[{"data.title":"${title}"},{"data.contentType":"${contentType}"}]}}`;
         const encodedFilter = encodeURI(filter);
