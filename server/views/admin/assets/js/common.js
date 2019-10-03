@@ -10,8 +10,7 @@ $(document).ready(async function () {
       btns[i].onclick = async function (event) {
         event.preventDefault();
         //delete content
-        debugger;
-        if(!this.href) return;
+        if (!this.href) return;
 
         var typeToDelete = getPathParts(this.href, 1);
         var idToDelete = getPathParts(this.href, 0);
@@ -33,9 +32,17 @@ $(document).ready(async function () {
 
   });
 
-  function getPathParts(path, positionFromLast){
+  function getPathParts(path, positionFromLast) {
     var parts = path.split('/');
     return parts[parts.length - (positionFromLast + 1)];
   }
 
+
 });
+
+function wait(ms) {
+  var d = new Date();
+  var d2 = null;
+  do { d2 = new Date(); }
+  while (d2 - d < ms);
+}

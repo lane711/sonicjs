@@ -1,8 +1,11 @@
 $(document).ready(async function () {
 
-  let form = document.getElementById('formBuilder');
+  let form = document.getElementById('formBuilderFT');
   if (form) {
-    await Formio.builder();
+    await Formio.builder(form);
+
+    wait(0);
+    console.log('gen');
 
     function generateButtonList(container, dest) {
       // debugger;
