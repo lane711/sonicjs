@@ -173,7 +173,7 @@ async function setupClickEvents() {
 }
 
 async function addSection() {
-
+debugger;
     console.log('adding section');
     let row = await generateNewRow();
     //rows
@@ -393,6 +393,11 @@ async function createContentInstance(payload) {
     console.log('payload', payload);
     if (payload.id) {
         delete payload.id;
+    }
+
+    if(!payload.data){
+        let temp = { data: payload};
+        payload = temp;
     }
     // return this.http.post("/api/contents/", content).toPromise();
     return axios.post('/api/contents/', payload)

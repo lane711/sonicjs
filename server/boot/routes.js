@@ -108,7 +108,10 @@ module.exports = function (app) {
       }
 
       if(viewName == "admin-content-edit"){
-        let content = await dataService.getContentById(param2);
+        let content = null;
+        if(param2){
+          content = await dataService.getContentById(param2);
+        }
         data.editForm = await formService.getForm(param1, content);
       }
 
