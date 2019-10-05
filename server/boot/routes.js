@@ -84,7 +84,9 @@ module.exports = function (app) {
     else if (req.url.startsWith('/admin')) {
       let path = req.url.split("/");
       let viewName = "admin-dashboard";
-      let param ="";
+      let param1 = null;
+      let param2 = null;
+
       if (path[2]) {
         viewName = "admin-" + path[2];
       }
@@ -92,7 +94,10 @@ module.exports = function (app) {
         viewName += "-" + path[3];
       }
       if (path[4]) {
-        param = path[4];
+        param1 = path[4];
+      }
+      if (path[5]) {
+        param2 = path[5];
       }
 
       let data = {};
@@ -103,7 +108,8 @@ module.exports = function (app) {
       }
 
       if(viewName == "admin-content-edit"){
-        data.editForm = await formService.getForm(param, null);
+        let content = await dataService.getContentById(param2);
+        data.editForm = await formService.getForm(param1, content);
       }
 
       if(viewName == "admin-content-types"){
@@ -111,7 +117,7 @@ module.exports = function (app) {
       }
 
       if(viewName == "admin-content-types-edit"){
-        data.contentTypeId = param; //await dataService.getContentType(param)
+        data.contentTypeId = param1; //await dataService.getContentType(param)
       }
 
       if(viewName == "admin-modules"){
