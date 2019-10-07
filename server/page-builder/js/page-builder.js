@@ -10,7 +10,7 @@ $(document).ready(async function () {
     setupUIClicks();
     setupClickEvents();
     // setupWYSIWYG();
-    // setupJsonEditor();
+    setupJsonEditor();
     await setPage();
     await setContentType();
     imageList = await getImageList();
