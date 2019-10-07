@@ -23,6 +23,6 @@ module.exports = siteSettingsService = {
 
     processSiteSettings: async function (page) {
         var siteSettings =  await dataService.getContentTopOne('site-settings');
-        page.data.siteSettings = siteSettings;
+        page.data.siteSettings = siteSettings.data;
     }
 }
