@@ -173,7 +173,6 @@ async function setupClickEvents() {
 }
 
 async function addSection() {
-debugger;
     console.log('adding section');
     let row = await generateNewRow();
     //rows
@@ -295,13 +294,14 @@ async function addRow() {
 // }
 
 async function addColumn() {
+    debugger;
     let section = await getContentInstance(currentSectionId);
     console.log('secton', section);
     console.log('currentRowIndex', currentRowIndex);
 
     let column = await generateNewColumn();
     section.data.rows[currentRowIndex].columns.push(column);
-    console.log('columns', section.data.rows[currentRowIndex - 1].columns);
+    console.log('columns', section.data.rows[currentRowIndex].columns);
     editContentInstance(section);
 
     fullPageUpdate();
