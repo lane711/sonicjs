@@ -148,6 +148,16 @@ module.exports = function (app) {
         data.editForm = await formService.getForm('site-settings', data);
       }
 
+      if (viewName == "admin-site-settings-colors") {
+        data = await dataService.getContentTopOne('site-settings-colors');
+        data.editForm = await formService.getForm('site-settings-colors', data);
+      }
+
+      if (viewName == "admin-site-settings-typography") {
+        data = await dataService.getContentTopOne('site-settings');
+        data.editForm = await formService.getForm('site-settings', data);
+      }
+
       res.render(viewName, { layout: 'admin.handlebars', data: data });
 
     }
