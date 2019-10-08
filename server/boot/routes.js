@@ -12,6 +12,7 @@ var menuService = require('../services/menu.service');
 var mediaService = require('../services/media.service');
 var siteSettingsService = require('../services/site-settings.service');
 var contentService = require('../services/content.service');
+var cssService = require('../services/css.service');
 
 var cors = require('cors');
 
@@ -65,7 +66,8 @@ module.exports = function (app) {
 
   app.get('/css/generated.css', async function (req, res) {
     res.set('Content-Type', 'text/css');
-    res.send('body {background:lightblue;}');
+    let css = await cssService.getGeneratedCss();
+    res.send(css);
   });
 
   // router.get('/admin/content-types', function (req, res) {
