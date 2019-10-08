@@ -1,3 +1,5 @@
+## Sonicjs looks like it might have promise? Give me a star! 
+
 # Visit SonicJs.com for Details, Videos & Docs
 [https://sonicjs.com](https://sonicjs.com)
 
