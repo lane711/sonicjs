@@ -22,6 +22,7 @@
     "cheerio": "^1.0.0-rc.3",
     "compression": "^1.0.3",
     "cors": "^2.5.2",
+    "css": "^2.2.4",
     "express-handlebars": "^3.1.0",
     "flag-icon-css": "^3.3.0",
     "font-awesome": "^4.7.0",

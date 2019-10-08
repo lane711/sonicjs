@@ -1,7 +1,7 @@
 var dataService = require('./data.service');
 var helperService = require('./helper.service');
 var eventBusService = require('./event-bus.service');
-
+const css = require('css');
 const axios = require('axios');
 
 
@@ -16,8 +16,11 @@ module.exports = cssService = {
     },
 
     getGeneratedCss: async function () {
-        let css = 'body {background:lightblue;}';
-        return css;
+
+        var ast = css.parse('body {background:lightblue;}');
+
+        let cssFile = css.stringify(ast);
+        return cssFile; 
     }
 
 }
