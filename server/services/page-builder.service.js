@@ -87,69 +87,69 @@ module.exports = {
         // console.log(chalk.cyan('sectionTemplate-->', this.sectionTemplate));
     },
 
-    processSections: async function ($) {
+    // processSections: async function ($) {
 
 
-        let sectionWrapper = $('.s--section').parent();
-        sectionWrapper.empty();
+    //     let sectionWrapper = $('.s--section').parent();
+    //     sectionWrapper.empty();
 
 
 
-        // console.log('sectionTemplate', sectionTemplate);
+    //     // console.log('sectionTemplate', sectionTemplate);
 
-        if (this.page.data && this.page.data.layout) {
-            let sections = this.page.data.layout;
+    //     if (this.page.data && this.page.data.layout) {
+    //         let sections = this.page.data.layout;
 
-            await this.asyncForEach(sections, async (sectionId) => {
-                let section = await this.getContentById(sectionId);
-                pageContent += this.sectionTemplate.replace('{{section.data.title}}', section.data.title);
-                // console.log(section);
-                // pageContent += `${section.data.title}`;
-                await this.processRows($, section.data.rows)
+    //         await this.asyncForEach(sections, async (sectionId) => {
+    //             let section = await this.getContentById(sectionId);
+    //             pageContent += this.sectionTemplate.replace('{{section.data.title}}', section.data.title);
+    //             // console.log(section);
+    //             // pageContent += `${section.data.title}`;
+    //             await this.processRows($, section.data.rows)
  
-                // console.log(section);
-            });
+    //             // console.log(section);
+    //         });
 
-            sectionWrapper.append(pageContent);
-        }
-    },
+    //         sectionWrapper.append(pageContent);
+    //     }
+    // },
 
-    processRows: async function ($, rows) {
-        let rowTemplate = $.html('.s--row');
-        // console.log('rowTemplate', rowTemplate);
-        for (const row of rows) {
-            pageContent += `<div class='row'>ROW`;
-            // await this.processColumns(row)
-            pageContent += `</div>`;
-        }
-    },
+    // processRows: async function ($, rows) {
+    //     let rowTemplate = $.html('.s--row');
+    //     // console.log('rowTemplate', rowTemplate);
+    //     for (const row of rows) {
+    //         pageContent += `<div class='row'>ROW`;
+    //         // await this.processColumns(row)
+    //         pageContent += `</div>`;
+    //     }
+    // },
 
-    processColumns: async function (row) {
-        for (const column of row.columns) {
-            // console.log('== column ==')
-            pageContent += `<div class='${column.class}'>`;
-            pageContent += `${column.content}`;
-            await this.processBlocks(column.content);
-            pageContent += `</div>`;
-        }
-    },
+    // processColumns: async function (row) {
+    //     for (const column of row.columns) {
+    //         // console.log('== column ==')
+    //         pageContent += `<div class='${column.class}'>`;
+    //         pageContent += `${column.content}`;
+    //         await this.processBlocks(column.content);
+    //         pageContent += `</div>`;
+    //     }
+    // },
 
-    processBlocks: async function (blocks) {
-        await this.processShortCodes(blocks);
-    },
+    // processBlocks: async function (blocks) {
+    //     await this.processShortCodes(blocks);
+    // },
 
 
-    processShortCodes: async function (body) {
-        let bodyBlocks = ShortcodeTree.parse(body);
-        if (bodyBlocks.children) {
-            for (let bodyBlock of bodyBlocks.children) {
-                let shortcode = bodyBlock.shortcode;
-                if (shortcode.name == "BLOCK") {
-                    await this.replaceShortCode(shortcode)
-                }
-            }
-        }
-    },
+    // processShortCodes: async function (body) {
+    //     let bodyBlocks = ShortcodeTree.parse(body);
+    //     if (bodyBlocks.children) {
+    //         for (let bodyBlock of bodyBlocks.children) {
+    //             let shortcode = bodyBlock.shortcode;
+    //             if (shortcode.name == "BLOCK") {
+    //                 await this.replaceShortCode(shortcode)
+    //             }
+    //         }
+    //     }
+    // },
 
     getContentById: async function (id) {
         let url = `${apiUrl}contents/${id}`;
