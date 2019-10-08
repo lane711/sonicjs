@@ -112,15 +112,15 @@
 
 
                                 <div class="header">Background</div>
-                                <div class="section-editor">
+                                <div class="section-background-editor">
                                     <div class="btn-group" role="group" aria-label="Basic example">
-                                        <button type="button" (click)="setSectionBackground(section.id, 'none')"
+                                        <button type="button" data-type="none" data-section-id="{{this.id}}"
                                             class="btn btn-secondary btn-sm"><i class="fa fa-ban"></i></button>
-                                        <button type="button" (click)="setSectionBackground(section.id, 'color')"
+                                        <button type="button" data-type="color" data-section-id="{{this.id}}"
                                             class="btn btn-secondary btn-sm"><i class="fa fa-tint"></i></button>
-                                        <button type="button" (click)="setSectionBackground(section.id, 'image')"
+                                        <button type="button" data-type="image" data-section-id="{{this.id}}"
                                             class="btn btn-secondary btn-sm"><i class="fa fa-image"></i></button>
-                                        <button type="button" (click)="setSectionBackground(section.id, 'video')"
+                                        <button type="button" data-type="video" data-section-id="{{this.id}}"
                                             class="btn btn-secondary btn-sm"><i class="fa fa-film"></i></button>
                                     </div>
                                 </div>

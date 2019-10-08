@@ -36,7 +36,7 @@
       "24": "{\"data\":{\"title\":\"Test\",\"url\":\"/test\",\"submit\":true,\"contentType\":\"page\"},\"id\":24}",
       "25": "{\"id\":25,\"data\":{\"title\":\"About\",\"url\":\"/about\",\"submit\":true,\"contentType\":\"page\",\"layout\":[27]}}",
       "26": "{\"id\":26,\"data\":{\"contentType\":\"block\",\"body\":\"<p style=\\\"padding-left: 40px;\\\">Morbi leo risus, porta ac consectetur ac, vestibulum at eros.&nbsp;</p>\"}}",
-      "27": "{\"id\":27,\"data\":{\"title\":\"Section 1\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[BLOCK id=\\\"26\\\"/]\"},{\"class\":\"col\",\"content\":\"[BLOCK id=\\\"29\\\"/]\"}]}]}}",
+      "27": "{\"id\":27,\"data\":{\"title\":\"Section 1\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[BLOCK id=\\\"26\\\"/]\"},{\"class\":\"col\",\"content\":\"[BLOCK id=\\\"29\\\"/]\"}]}],\"background\":{\"type\":\"image\",\"color\":\"#ebebeb\"}}}",
       "28": "{\"data\":{\"contentType\":\"block\",\"body\":\"<p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>\"},\"id\":28}",
       "29": "{\"data\":{\"contentType\":\"block\",\"body\":\"<p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>\"},\"id\":29}"
     },
