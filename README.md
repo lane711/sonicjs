@@ -79,19 +79,13 @@ Modules can be built (using NodeJs) or added from the community repository. This
 
 I started this project because I have established a recent affinity to NodeJs although I'm primarily a Asp.Net/C#/SQL Server developer by day. There wasn't an existing NodeJs CMS project with lofty enough goals to perhaps someday become a highly trusted web application platform/CMS.
 
-## Setup
+## Quickstart Setup
 
-1. Make sure Mongo Db is running: `mongod`
-1. Install Angular Tools with `npm install -g @angular/cli`
-1. Install Loopback Tools with `npm install -g loopback-cli`
-1. Edit the `mongoUrl` and `dbName` setting in `/routes/mongo-dal.js`
+1. Clone this repo `git clone https://github.com/lane711/sonicjs.git`
 1. Install dependencies with `npm install`
 1. To run the app: `npm start`
-1. To Debug the app: Use the built in debug from VS Code
-1. `cd client`
-1. `ng serve`
-1. `node server.js` for nodemon
-1. `ng build --deploy-url=/admin/`
+
+Note: you don't need to use any database for local development, Loopback is configured to use a file based database (just json files).
 
 ##Debugging
 
