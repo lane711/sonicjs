@@ -170,7 +170,26 @@ async function setupClickEvents() {
     // $('.add-section').on("click", async function () {
     //     await addSection();
     // });
+    setupSectionBackgroundEvents();
 }
+
+async function setupSectionBackgroundEvents(){
+    $('.section-background-editor button').on("click", async function () {
+        let backgroundSetting = $(this).data('type');
+        let sectionId = $(this).data('section-id');
+
+        currentSectionRecord = await getContentInstance(sectionId);
+        currentSectionRecord.data.background = { "type" : backgroundSetting};
+        setDefaultBackgroundSetting(currentSectionRecord);
+        
+
+        editContentInstance(currentSectionRecord);
+    });}
+
+    async function setDefaultBackgroundSetting(currentSectionRecord){
+        currentSectionRecord.data.background.color = "#ebebeb";
+    }
+
 
 async function addSection() {
     console.log('adding section');
