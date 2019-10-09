@@ -48,7 +48,8 @@
     "shortcode-tree": "^1.4.14",
     "simple-line-icons": "^2.4.1",
     "strong-error-handler": "^3.0.0",
-    "tinymce": "^5.0.7"
+    "tinymce": "^5.0.7",
+    "vanilla-picker": "^2.10.0"
   },
   "devDependencies": {
     "eslint": "^3.17.1",

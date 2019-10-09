@@ -18,6 +18,7 @@ $(document).ready(async function () {
     // setupPageSettings();
 
     setupFormBuilder(contentType);
+    setupColorPicker();
 });
 
 async function setPage() {
@@ -889,6 +890,15 @@ async function postProcessNewContent(content) {
             await editContentInstance(mainMenu);
         }
     }
+}
+
+
+async function setupColorPicker(){
+    var parent = document.querySelector('#parent');
+    // var parent = $('.color-picker input');
+
+    // debugger;
+    var picker = new Picker({parent: parent, popup: 'bottom'});
 }
 
 //TODO, make this just refresh the body content with a full get
