@@ -174,22 +174,58 @@ async function setupClickEvents() {
     setupSectionBackgroundEvents();
 }
 
-async function setupSectionBackgroundEvents(){
+async function getCurrentSection() {
+    currentSectionRecord = await getContentInstance(currentSectionId);
+    return currentSectionRecord;
+}
+
+async function setupSectionBackgroundEvents() {
     $('.section-background-editor button').on("click", async function () {
         let backgroundSetting = $(this).data('type');
-        let sectionId = $(this).data('section-id');
+        currentSectionId = $(this).data('section-id');
 
-        currentSectionRecord = await getContentInstance(sectionId);
-        currentSectionRecord.data.background = { "type" : backgroundSetting};
-        setDefaultBackgroundSetting(currentSectionRecord);
-        
+        currentSectionRecord = await getCurrentSection();
+        currentSectionRecord.data.background = { "type": backgroundSetting };
+        // setDefaultBackgroundSetting(currentSectionRecord);
+        showBackgroundTypeOptions(backgroundSetting);
 
         editContentInstance(currentSectionRecord);
-    });}
+    });
+}
 
-    async function setDefaultBackgroundSetting(currentSectionRecord){
-        currentSectionRecord.data.background.color = "#ebebeb";
-    }
+async function setDefaultBackgroundSetting(currentSectionRecord, color) {
+    currentSectionRecord.data.background.color = color;
+}
+
+async function showBackgroundTypeOptions(backgroundSetting) {
+    $('[id^=background-]').hide();
+    $('#background-' + backgroundSetting).show();
+}
+
+async function setupColorPicker() {
+    var parent = document.querySelector('#backgroundColorPreview');
+    // var parent = $('#background-color-preview');
+
+    // var parent = $('.color-picker input');
+
+    // debugger;
+    var picker = new Picker({ parent: parent, popup: 'bottom' });
+
+    picker.onChange = function (color) {
+        parent.style.background = color.rgbaString;
+        $('section[data-id=27]').css('background-color', getHtmlHex(color.hex));
+    };
+
+    picker.onDone = async function (color) {
+        currentSectionRecord = await getCurrentSection();
+        setDefaultBackgroundSetting(currentSectionRecord, getHtmlHex(color.hex));
+        editContentInstance(currentSectionRecord);
+    };
+}
+
+function getHtmlHex(hex){
+    return hex.substring(0,7);
+}
 
 
 async function addSection() {
@@ -415,8 +451,8 @@ async function createContentInstance(payload) {
         delete payload.id;
     }
 
-    if(!payload.data){
-        let temp = { data: payload};
+    if (!payload.data) {
+        let temp = { data: payload };
         payload = temp;
     }
     // return this.http.post("/api/contents/", content).toPromise();
@@ -892,14 +928,6 @@ async function postProcessNewContent(content) {
     }
 }
 
-
-async function setupColorPicker(){
-    var parent = document.querySelector('#parent');
-    // var parent = $('.color-picker input');
-
-    // debugger;
-    var picker = new Picker({parent: parent, popup: 'bottom'});
-}
 
 //TODO, make this just refresh the body content with a full get
 function fullPageUpdate() {

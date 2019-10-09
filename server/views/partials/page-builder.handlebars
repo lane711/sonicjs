@@ -20,7 +20,8 @@
         <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
 
-                <button type="button" onclick="openForm('add','page')" class="btn btn-secondary" data-dismiss="modal">Add Page</button>
+                <button type="button" onclick="openForm('add','page')" class="btn btn-secondary"
+                    data-dismiss="modal">Add Page</button>
 
             </div>
 
@@ -123,6 +124,19 @@
                                         <button type="button" data-type="video" data-section-id="{{this.id}}"
                                             class="btn btn-secondary btn-sm"><i class="fa fa-film"></i></button>
                                     </div>
+                                </div>
+
+                                <div id="background-color" class="hide">
+                                    <div id="backgroundColorPreview"></div>
+                                    {{!-- <input type="text" name="background-color-value" /> --}}
+                                </div>
+
+                                <div id="background-image" class="hide">
+                                    bg image options
+                                </div>
+
+                                <div id="background-video" class="hide">
+                                    bg video options
                                 </div>
                             </div>
 
@@ -356,4 +370,4 @@
     </div>
 </div>
 
-  <script src="/node_modules/vanilla-picker/dist/vanilla-picker.min.js"></script>
+<script src="/node_modules/vanilla-picker/dist/vanilla-picker.min.js"></script>

@@ -225,3 +225,9 @@ section .col:hover {
 .block-edit{
   background-color: #a2b9bc;
 }
+
+#backgroundColorPreview{
+  width: 100px;
+  height: 30px;
+  border: 1px solid #fff;
+}
