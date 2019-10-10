@@ -17,10 +17,29 @@ module.exports = cssService = {
 
     getGeneratedCss: async function () {
 
-        var ast = css.parse('body {background:lightblue;}');
+        var cssString = 'body {background:lightblue;}';
+        cssString = await this.processSections(cssString)
+        var ast = css.parse(cssString);
 
         let cssFile = css.stringify(ast);
-        return cssFile; 
+        return cssFile;
+    },
+
+    processSections: async function (cssString) {
+
+        let sections = await dataService.getContentByContentType('section')
+        sections.forEach(section => {
+            if (section.data.background) {
+                if (section.data.background.type === 'color') {
+                    let color = section.data.background.color;
+                    cssString += ` section[data-id="${section.id}"]{background-color:${color}}`
+                }
+            }
+        });
+
+        return cssString;
     }
+
+
 
 }

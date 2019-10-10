@@ -18,7 +18,6 @@ $(document).ready(async function () {
     // setupPageSettings();
 
     setupFormBuilder(contentType);
-    setupColorPicker();
 });
 
 async function setPage() {
@@ -183,11 +182,12 @@ async function setupSectionBackgroundEvents() {
     $('.section-background-editor button').on("click", async function () {
         let backgroundSetting = $(this).data('type');
         currentSectionId = $(this).data('section-id');
+        setupColorPicker(currentSectionId);
 
         currentSectionRecord = await getCurrentSection();
         currentSectionRecord.data.background = { "type": backgroundSetting };
         // setDefaultBackgroundSetting(currentSectionRecord);
-        showBackgroundTypeOptions(backgroundSetting);
+        showBackgroundTypeOptions(backgroundSetting, currentSectionId);
 
         editContentInstance(currentSectionRecord);
     });
@@ -197,13 +197,15 @@ async function setDefaultBackgroundSetting(currentSectionRecord, color) {
     currentSectionRecord.data.background.color = color;
 }
 
-async function showBackgroundTypeOptions(backgroundSetting) {
+async function showBackgroundTypeOptions(backgroundSetting, sectionId) {
     $('[id^=background-]').hide();
-    $('#background-' + backgroundSetting).show();
+    let selector = `[id='background-${backgroundSetting}'],[data-id='${sectionId}']`;
+    $(selector).show();
 }
 
-async function setupColorPicker() {
-    var parent = document.querySelector('#backgroundColorPreview');
+async function setupColorPicker(currentSectionId) {
+    debugger;
+    var parent = document.querySelector(`#backgroundColorPreview-${currentSectionId}`);
     // var parent = $('#background-color-preview');
 
     // var parent = $('.color-picker input');
@@ -213,7 +215,7 @@ async function setupColorPicker() {
 
     picker.onChange = function (color) {
         parent.style.background = color.rgbaString;
-        $('section[data-id=27]').css('background-color', getHtmlHex(color.hex));
+        $(`section[data-id="${currentSectionId}"]`).css('background-color', getHtmlHex(color.hex));
     };
 
     picker.onDone = async function (color) {
@@ -224,7 +226,8 @@ async function setupColorPicker() {
 }
 
 function getHtmlHex(hex){
-    return hex.substring(0,7);
+    return hex;
+    // return hex.substring(0,7);
 }
 
 

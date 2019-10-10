@@ -126,16 +126,17 @@
                                     </div>
                                 </div>
 
-                                <div id="background-color" class="hide">
-                                    <div id="backgroundColorPreview"></div>
+                                <div id="background-color" data-section-id="{{this.id}}" class="hide">
+                                    bg:
+                                    <div id="backgroundColorPreview-{{this.id}}" data-section-id="{{this.id}}"></div>
                                     {{!-- <input type="text" name="background-color-value" /> --}}
                                 </div>
 
-                                <div id="background-image" class="hide">
+                                <div id="background-image" data-section-id="{{this.id}}" class="hide">
                                     bg image options
                                 </div>
 
-                                <div id="background-video" class="hide">
+                                <div id="background-video" data-section-id="{{this.id}}" class="hide">
                                     bg video options
                                 </div>
                             </div>
@@ -369,5 +370,3 @@
         </div>
     </div>
 </div>
-
-<script src="/node_modules/vanilla-picker/dist/vanilla-picker.min.js"></script>
