@@ -247,6 +247,14 @@ async function setupColorPicker(currentSectionId) {
         }
     });
 
+    pickr.on('change', (color, instance) => {
+        // debugger;
+        console.log('change', color, instance);
+        $(`section[data-id="${currentSectionId}"]`).css('background-color', color.toHEXA());
+    }).on('save', (color, instance) => {
+        console.log('save', color, instance);
+    });
+
 
     var parent = document.querySelector(`#backgroundColorPreview-${currentSectionId}`);
     // var parent = $('#background-color-preview');
@@ -254,18 +262,18 @@ async function setupColorPicker(currentSectionId) {
     // var parent = $('.color-picker input');
 
     // debugger;
-    var picker = new Picker({ parent: parent, popup: 'bottom' });
+    // var picker = new Picker({ parent: parent, popup: 'bottom' });
 
-    picker.onChange = function (color) {
-        parent.style.background = color.rgbaString;
-        $(`section[data-id="${currentSectionId}"]`).css('background-color', getHtmlHex(color.hex));
-    };
+    // picker.onChange = function (color) {
+    //     parent.style.background = color.rgbaString;
+    //     $(`section[data-id="${currentSectionId}"]`).css('background-color', getHtmlHex(color.hex));
+    // };
 
-    picker.onDone = async function (color) {
-        currentSectionRecord = await getCurrentSection();
-        setDefaultBackgroundSetting(currentSectionRecord, getHtmlHex(color.hex));
-        editContentInstance(currentSectionRecord);
-    };
+    // picker.onDone = async function (color) {
+    //     currentSectionRecord = await getCurrentSection();
+    //     setDefaultBackgroundSetting(currentSectionRecord, getHtmlHex(color.hex));
+    //     editContentInstance(currentSectionRecord);
+    // };
 }
 
 function getHtmlHex(hex){
