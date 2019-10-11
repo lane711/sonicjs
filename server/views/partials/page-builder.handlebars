@@ -1,4 +1,4 @@
-  <link href="/node_modules/@simonwep/pickr/dist/themes/nano.min.css" rel="stylesheet">
+<link href="/node_modules/@simonwep/pickr/dist/themes/nano.min.css" rel="stylesheet">
 
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
@@ -175,8 +175,8 @@
 
             </div>
             <div class="tab-pane fade" id="template" role="tabpanel" aria-labelledby="template-tab">
-
-                <p>template settings go here</p>
+<span>Global CSS</span>
+                <div id="editor">{{{ page.data.editor.css }}}</div>
 
             </div>
         </div>
@@ -374,3 +374,9 @@
 </div>
 
 <script src="/node_modules/@simonwep/pickr/dist/pickr.min.js"></script>
+<script src="/node_modules/ace-builds/src-min-noconflict/ace.js"></script>
+<script>
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.session.setMode("ace/mode/javascript");
+</script>

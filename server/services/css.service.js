@@ -1,5 +1,7 @@
 var dataService = require('./data.service');
 var helperService = require('./helper.service');
+var fileService = require('./file.service');
+
 var eventBusService = require('./event-bus.service');
 const css = require('css');
 const axios = require('axios');
@@ -8,11 +10,11 @@ const axios = require('axios');
 module.exports = cssService = {
 
     startup: async function () {
-        // eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
-        //     if (options) {
-        //         await mediaService.processHeroImage(options.page);
-        //     }
-        // });
+        eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
+            if (options) {
+                await cssService.getCssFile(options.page);
+            }
+        });
     },
 
     getGeneratedCss: async function () {
@@ -38,7 +40,13 @@ module.exports = cssService = {
         });
 
         return cssString;
-    }
+    },
+
+    getCssFile: async function (page) {
+        //get template.css
+        let cssString = await fileService.getFile('themes/base/css/template.css');
+        page.data.editor = { "css" : cssString} ;
+    },
 
 
 

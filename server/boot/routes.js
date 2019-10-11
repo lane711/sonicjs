@@ -13,6 +13,8 @@ var mediaService = require('../services/media.service');
 var siteSettingsService = require('../services/site-settings.service');
 var contentService = require('../services/content.service');
 var cssService = require('../services/css.service');
+cssService.startup();
+
 
 var cors = require('cors');
 
@@ -162,7 +164,8 @@ module.exports = function (app) {
 
     }
     else {
-      res.render('home', await contentService.getRenderedPage(req));
+      var page = await contentService.getRenderedPage(req);
+      res.render('home', page);
     }
 
   });
