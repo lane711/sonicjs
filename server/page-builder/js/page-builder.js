@@ -18,6 +18,7 @@ $(document).ready(async function () {
     // setupPageSettings();
 
     setupFormBuilder(contentType);
+    setupACEEditor();
 });
 
 async function setPage() {
@@ -208,7 +209,7 @@ async function setupColorPicker(currentSectionId) {
     const pickr = Pickr.create({
         el: `#backgroundColorPreview-${currentSectionId}`,
         theme: 'nano', // or 'monolith', or 'nano'
-    
+
         swatches: [
             'rgba(244, 67, 54, 1)',
             'rgba(233, 30, 99, 0.95)',
@@ -225,14 +226,14 @@ async function setupColorPicker(currentSectionId) {
             'rgba(255, 235, 59, 0.95)',
             'rgba(255, 193, 7, 1)'
         ],
-    
+
         components: {
-    
+
             // Main components
             preview: true,
             opacity: true,
             hue: true,
-    
+
             // Input / output Options
             interaction: {
                 hex: false,
@@ -276,7 +277,7 @@ async function setupColorPicker(currentSectionId) {
     // };
 }
 
-function getHtmlHex(hex){
+function getHtmlHex(hex) {
     return hex;
     // return hex.substring(0,7);
 }
@@ -995,6 +996,48 @@ async function redirect(url) {
     // window.location.href = url;
     window.location.replace(url);
     return false;
+}
+
+async function writeFile(container, file) {
+    let formData = new FormData();
+    formData.append('file', file);
+
+    axios.post(`/api/containers/${container}/upload`,
+        formData,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }
+    ).then(function () {
+        console.log('SUCCESS!!');
+    })
+        .catch(function () {
+            console.log('FAILURE!!');
+        });
+
+}
+
+async function setupACEEditor() {
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.session.setMode("ace/mode/css");
+    editor.getSession().on('change', function () {
+        update()
+    });
+
+    function update() //writes in <div> with id=output
+    {
+        var val = editor.getSession().getValue();
+        console.log(val);
+        $('#templateCss').html(val);
+    }
+
+    $('#save-global-css').click(function () {
+        let cssContent = editor.getSession().getValue();
+        let file = new File([cssContent], "template.css", {type:"text/css"})
+        writeFile('css', file)
+    });
 }
 
 

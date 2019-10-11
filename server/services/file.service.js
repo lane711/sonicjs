@@ -33,9 +33,21 @@ module.exports = fileService = {
                 else resolve(data);
             });
         });
+    },
 
-        let jumbotronStyle = "background:pink;"
-        page.data.jumbotronStyle = jumbotronStyle;
+    writeFile: async function (filePath, fileContent) {
+        let fullPath = path.join(__dirname, '../', filePath);
+        // console.log('adminPath--->', adminPath);
+
+        return new Promise((resolve, reject) => {
+            fs.writeFile(fullPath, fileContent, (err, data) => {
+                if (err){
+                    console.log(chalk.red(err));
+                   reject(err); 
+                } 
+                else resolve(data);
+            });
+        });
     },
 
 }

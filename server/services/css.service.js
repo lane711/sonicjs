@@ -44,7 +44,7 @@ module.exports = cssService = {
 
     getCssFile: async function (page) {
         //get template.css
-        let cssString = await fileService.getFile('themes/base/css/template.css');
+        let cssString = await fileService.getFile('storage/css/template.css');
         page.data.editor = { "css" : cssString} ;
     },
 
