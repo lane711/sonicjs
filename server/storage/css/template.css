@@ -1,6 +1,7 @@
 body {
   padding-top: 5rem;
   background: #ebebeb;
+  padding: 0;
 }
 
 .starter-template {
@@ -11,10 +12,6 @@ body {
 .bg-ptrans {
   background: #000;
   opacity: .9;
-}
-
-body {
-  padding: 0;
 }
 
 main, .fixed-top, footer {

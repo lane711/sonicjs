@@ -18,7 +18,8 @@ $(document).ready(async function () {
     // setupPageSettings();
 
     setupFormBuilder(contentType);
-    setupACEEditor();
+    await setupACEEditor();
+    beatifyACECss();
 });
 
 async function setPage() {
@@ -1028,11 +1029,20 @@ async function setupACEEditor() {
     editor.session.setOption('enableLiveAutocompletion', true)
 
 
-
-
-    editor.getSession().on('change', function () {
-        update()
+    editor.getSession().on('loaded', function () {
+        console.log('on blur')
+        var beautify = ace.require("ace/ext/beautify"); // get reference to extension
+        var editor = ace.edit("editor"); // get reference to editor
+        beautify.beautify(editor.session);
     });
+
+    // editor.getSession().on('change', function () {
+    //     update()
+
+    //     // var beautify = ace.require("ace/ext/beautify"); // get reference to extension
+    //     // var editor = ace.edit("editor"); // get reference to editor
+    //     // beautify.beautify(editor.session);    
+    // });
 
     function update() //writes in <div> with id=output
     {
@@ -1043,9 +1053,15 @@ async function setupACEEditor() {
 
     $('#save-global-css').click(function () {
         let cssContent = editor.getSession().getValue();
-        let file = new File([cssContent], "template.css", {type:"text/css"})
+        let file = new File([cssContent], "template.css", { type: "text/css" })
         writeFile('css', file)
     });
+}
+
+async function beatifyACECss(){
+    var beautify = ace.require("ace/ext/beautify"); // get reference to extension
+    var editor = ace.edit("editor"); // get reference to editor
+    beautify.beautify(editor.session);
 }
 
 

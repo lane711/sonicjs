@@ -5,6 +5,8 @@ var fileService = require('./file.service');
 var eventBusService = require('./event-bus.service');
 const css = require('css');
 const axios = require('axios');
+var csstree = require('css-tree');
+var cssbeautify = require('cssbeautify');
 
 
 module.exports = cssService = {
@@ -45,7 +47,12 @@ module.exports = cssService = {
     getCssFile: async function (page) {
         //get template.css
         let cssString = await fileService.getFile('storage/css/template.css');
-        page.data.editor = { "css" : cssString} ;
+        //parse the css
+        var ast = csstree.parse(cssString);
+        let cleanCss = csstree.generate(ast);
+        let beatifulCss = cssbeautify(cleanCss);
+
+        page.data.editor = { "css" : beatifulCss} ;
     },
 
 
