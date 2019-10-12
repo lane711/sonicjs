@@ -19,7 +19,7 @@ module.exports = cssService = {
 
     getGeneratedCss: async function () {
 
-        var cssString = 'body {background:lightblue;}';
+        var cssString = '';// 'body {background:lightblue;}';
         cssString = await this.processSections(cssString)
         var ast = css.parse(cssString);
 

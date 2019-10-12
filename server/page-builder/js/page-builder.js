@@ -1022,6 +1022,14 @@ async function setupACEEditor() {
     var editor = ace.edit("editor");
     editor.setTheme("ace/theme/monokai");
     editor.session.setMode("ace/mode/css");
+    // editor.session.setDocument("ace/mode/css");
+    editor.session.setTabSize(0);
+    editor.session.setUseSoftTabs(false);
+    editor.session.setOption('enableLiveAutocompletion', true)
+
+
+
+
     editor.getSession().on('change', function () {
         update()
     });
