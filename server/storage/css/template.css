@@ -2,7 +2,11 @@ body {
 padding-top: 5rem;
 background: #ebebeb;
 padding: 0;
-font-size:1.4rem;
+font-size: 1.4rem
+}
+
+h1, h2, h3, h4{
+    margin: 1.8rem 0 2.0rem;
 }
 
 .starter-template {
