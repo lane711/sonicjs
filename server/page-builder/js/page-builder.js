@@ -834,15 +834,15 @@ async function openNewContentTypeModal() {
 
 async function openWYSIWYG() {
     console.log('WYSIWYG setup');
-
     // $('section span').on("click", async function () {
     var id = $('.block-edit').data('id');
     console.log('span clicked ' + id);
     $('#block-edit-it').val(id);
     $('#wysiwygModal').appendTo("body").modal('show');
 
-    var content = $('.block-edit p').prop('outerHTML');
-    $('textarea.wysiwyg-content').html(content);
+    var content = await getContentInstance(id);
+
+    $('textarea.wysiwyg-content').html(content.data.body);
 
     // $(document).off('focusin.modal');
     //allow user to interact with tinymcs dialogs: https://stackoverflow.com/questions/36279941/using-tinymce-in-a-modal-dialog
@@ -1024,30 +1024,30 @@ async function setupACEEditor() {
     editor.setTheme("ace/theme/monokai");
     editor.session.setMode("ace/mode/css");
     // editor.session.setDocument("ace/mode/css");
-    editor.session.setTabSize(0);
-    editor.session.setUseSoftTabs(false);
-    editor.session.setOption('enableLiveAutocompletion', true)
+    // editor.session.setTabSize(0);
+    // editor.session.setUseSoftTabs(false);
+    // editor.session.setOption('enableLiveAutocompletion', true)
 
 
-    editor.getSession().on('loaded', function () {
-        console.log('on blur')
-        var beautify = ace.require("ace/ext/beautify"); // get reference to extension
-        var editor = ace.edit("editor"); // get reference to editor
-        beautify.beautify(editor.session);
-    });
-
-    // editor.getSession().on('change', function () {
-    //     update()
-
-    //     // var beautify = ace.require("ace/ext/beautify"); // get reference to extension
-    //     // var editor = ace.edit("editor"); // get reference to editor
-    //     // beautify.beautify(editor.session);    
+    // editor.getSession().on('loaded', function () {
+    //     console.log('on blur')
+    //     var beautify = ace.require("ace/ext/beautify"); // get reference to extension
+    //     var editor = ace.edit("editor"); // get reference to editor
+    //     beautify.beautify(editor.session);
     // });
+
+    editor.getSession().on('change', function () {
+        update()
+
+        // var beautify = ace.require("ace/ext/beautify"); // get reference to extension
+        // var editor = ace.edit("editor"); // get reference to editor
+        // beautify.beautify(editor.session);    
+    });
 
     function update() //writes in <div> with id=output
     {
         var val = editor.getSession().getValue();
-        console.log(val);
+        // console.log(val);
         $('#templateCss').html(val);
     }
 
