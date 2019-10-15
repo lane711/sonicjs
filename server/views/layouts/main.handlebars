@@ -35,8 +35,14 @@
   <link href="/css/bootstrap.min.css" rel="stylesheet">
 
   <!-- Custom styles for this template -->
-  {{!-- <link href="/css/template.css" rel="stylesheet"> --}}
+  {{#unless page.data.showPageBuilder}}
+  <link href="/api/containers/css/download/template.css" rel="stylesheet">
+  {{/unless}}
+  
+  {{#if page.data.showPageBuilder}}
   <link href="/css/page-builder.css" rel="stylesheet">
+  {{/if}}
+
   <link href="/css/font-awesome.css" rel="stylesheet">
   <link href="/jsoneditor.min.css" rel="stylesheet">
   {{!-- <link href="/css/generated.css" rel="stylesheet"> --}}
@@ -53,7 +59,9 @@
 
   <main role="main">
 
+    {{#if page.data.showPageBuilder}}
     {{> page-builder }}
+    {{/if}}
 
     {{{body}}}
 

@@ -49,6 +49,8 @@ module.exports = {
             this.page.data.hasRows = true;
         }
 
+        this.page.data.showPageBuilder = false;
+
         return { page: this.page };
     },
 
