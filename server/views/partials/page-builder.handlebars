@@ -1,4 +1,11 @@
+<link href="/node_modules/@simonwep/pickr/dist/themes/nano.min.css" rel="stylesheet">
+
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+
+<style type="text/css" id="templateCss">
+    {{{ page.data.editor.css }}}
+</style>
 
 <div class="pb-wrapper">
     <nav class="page-builder-nav">
@@ -20,7 +27,8 @@
         <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
 
-                <button type="button" onclick="openForm('add','page')" class="btn btn-secondary" data-dismiss="modal">Add Page</button>
+                <button type="button" onclick="openForm('add','page')" class="btn btn-secondary"
+                    data-dismiss="modal">Add Page</button>
 
             </div>
 
@@ -112,17 +120,31 @@
 
 
                                 <div class="header">Background</div>
-                                <div class="section-editor">
+                                <div class="section-background-editor">
                                     <div class="btn-group" role="group" aria-label="Basic example">
-                                        <button type="button" (click)="setSectionBackground(section.id, 'none')"
+                                        <button type="button" data-type="none" data-section-id="{{this.id}}"
                                             class="btn btn-secondary btn-sm"><i class="fa fa-ban"></i></button>
-                                        <button type="button" (click)="setSectionBackground(section.id, 'color')"
+                                        <button type="button" data-type="color" data-section-id="{{this.id}}"
                                             class="btn btn-secondary btn-sm"><i class="fa fa-tint"></i></button>
-                                        <button type="button" (click)="setSectionBackground(section.id, 'image')"
+                                        <button type="button" data-type="image" data-section-id="{{this.id}}"
                                             class="btn btn-secondary btn-sm"><i class="fa fa-image"></i></button>
-                                        <button type="button" (click)="setSectionBackground(section.id, 'video')"
+                                        <button type="button" data-type="video" data-section-id="{{this.id}}"
                                             class="btn btn-secondary btn-sm"><i class="fa fa-film"></i></button>
                                     </div>
+                                </div>
+
+                                <div id="background-color" data-section-id="{{this.id}}" class="hide">
+                                    bg:
+                                    <div id="backgroundColorPreview-{{this.id}}" data-section-id="{{this.id}}"></div>
+                                    {{!-- <input type="text" name="background-color-value" /> --}}
+                                </div>
+
+                                <div id="background-image" data-section-id="{{this.id}}" class="hide">
+                                    bg image options
+                                </div>
+
+                                <div id="background-video" data-section-id="{{this.id}}" class="hide">
+                                    bg video options
                                 </div>
                             </div>
 
@@ -158,8 +180,8 @@
 
             </div>
             <div class="tab-pane fade" id="template" role="tabpanel" aria-labelledby="template-tab">
-
-                <p>template settings go here</p>
+                <button id="save-global-css" class="btn btn-success btn-small">Save Glocal CSS</button>
+                <div id="editor">{{{page.data.editor.css}}}</div>
 
             </div>
         </div>
@@ -355,3 +377,7 @@
         </div>
     </div>
 </div>
+
+<script src="/node_modules/@simonwep/pickr/dist/pickr.min.js"></script>
+<script src="/node_modules/ace-builds/src-min-noconflict/ace.js"></script>
+<script src="/node_modules/ace-builds/src-min-noconflict/ext-beautify.js"></script>

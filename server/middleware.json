@@ -153,6 +153,13 @@
           "/"
         ],
         "params": "$!../node_modules/formiojs/dist"
+      },
+      {
+        "name": "managed css",
+        "paths": [
+          "/css"
+        ],
+        "params": "$!../api/containers/css"
       }
     ]
   },

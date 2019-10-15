@@ -18,6 +18,7 @@ $(document).ready(async function () {
     // setupPageSettings();
 
     setupFormBuilder(contentType);
+    await setupACEEditor();
 });
 
 async function setPage() {
@@ -173,22 +174,113 @@ async function setupClickEvents() {
     setupSectionBackgroundEvents();
 }
 
-async function setupSectionBackgroundEvents(){
+async function getCurrentSection() {
+    currentSectionRecord = await getContentInstance(currentSectionId);
+    return currentSectionRecord;
+}
+
+async function setupSectionBackgroundEvents() {
     $('.section-background-editor button').on("click", async function () {
         let backgroundSetting = $(this).data('type');
-        let sectionId = $(this).data('section-id');
+        currentSectionId = $(this).data('section-id');
+        setupColorPicker(currentSectionId);
 
-        currentSectionRecord = await getContentInstance(sectionId);
-        currentSectionRecord.data.background = { "type" : backgroundSetting};
-        setDefaultBackgroundSetting(currentSectionRecord);
-        
+        currentSectionRecord = await getCurrentSection();
+        currentSectionRecord.data.background = { "type": backgroundSetting };
+        // setDefaultBackgroundSetting(currentSectionRecord);
+        showBackgroundTypeOptions(backgroundSetting, currentSectionId);
 
         editContentInstance(currentSectionRecord);
-    });}
+    });
+}
 
-    async function setDefaultBackgroundSetting(currentSectionRecord){
-        currentSectionRecord.data.background.color = "#ebebeb";
-    }
+async function setDefaultBackgroundSetting(currentSectionRecord, color) {
+    currentSectionRecord.data.background.color = color;
+}
+
+async function showBackgroundTypeOptions(backgroundSetting, sectionId) {
+    $('[id^=background-]').hide();
+    let selector = `[id='background-${backgroundSetting}'],[data-id='${sectionId}']`;
+    $(selector).show();
+}
+
+async function setupColorPicker(currentSectionId) {
+
+    const pickr = Pickr.create({
+        el: `#backgroundColorPreview-${currentSectionId}`,
+        theme: 'nano', // or 'monolith', or 'nano'
+
+        swatches: [
+            'rgba(244, 67, 54, 1)',
+            'rgba(233, 30, 99, 0.95)',
+            'rgba(156, 39, 176, 0.9)',
+            'rgba(103, 58, 183, 0.85)',
+            'rgba(63, 81, 181, 0.8)',
+            'rgba(33, 150, 243, 0.75)',
+            'rgba(3, 169, 244, 0.7)',
+            'rgba(0, 188, 212, 0.7)',
+            'rgba(0, 150, 136, 0.75)',
+            'rgba(76, 175, 80, 0.8)',
+            'rgba(139, 195, 74, 0.85)',
+            'rgba(205, 220, 57, 0.9)',
+            'rgba(255, 235, 59, 0.95)',
+            'rgba(255, 193, 7, 1)'
+        ],
+
+        components: {
+
+            // Main components
+            preview: true,
+            opacity: true,
+            hue: true,
+
+            // Input / output Options
+            interaction: {
+                hex: false,
+                rgba: false,
+                hsla: false,
+                hsva: false,
+                cmyk: false,
+                input: true,
+                clear: true,
+                save: true
+            }
+        }
+    });
+
+    pickr.on('change', (color, instance) => {
+        // debugger;
+        console.log('change', color, instance);
+        $(`section[data-id="${currentSectionId}"]`).css('background-color', color.toHEXA());
+    }).on('save', (color, instance) => {
+        console.log('save', color, instance);
+    });
+
+
+    var parent = document.querySelector(`#backgroundColorPreview-${currentSectionId}`);
+    // var parent = $('#background-color-preview');
+
+    // var parent = $('.color-picker input');
+
+    // debugger;
+    // var picker = new Picker({ parent: parent, popup: 'bottom' });
+
+    // picker.onChange = function (color) {
+    //     parent.style.background = color.rgbaString;
+    //     $(`section[data-id="${currentSectionId}"]`).css('background-color', getHtmlHex(color.hex));
+    // };
+
+    // picker.onDone = async function (color) {
+    //     currentSectionRecord = await getCurrentSection();
+    //     setDefaultBackgroundSetting(currentSectionRecord, getHtmlHex(color.hex));
+    //     editContentInstance(currentSectionRecord);
+    // };
+}
+
+function getHtmlHex(hex) {
+    return hex;
+    // return hex.substring(0,7);
+}
 
 
 async function addSection() {
@@ -414,8 +506,8 @@ async function createContentInstance(payload) {
         delete payload.id;
     }
 
-    if(!payload.data){
-        let temp = { data: payload};
+    if (!payload.data) {
+        let temp = { data: payload };
         payload = temp;
     }
     // return this.http.post("/api/contents/", content).toPromise();
@@ -741,15 +833,15 @@ async function openNewContentTypeModal() {
 
 async function openWYSIWYG() {
     console.log('WYSIWYG setup');
-
     // $('section span').on("click", async function () {
     var id = $('.block-edit').data('id');
     console.log('span clicked ' + id);
     $('#block-edit-it').val(id);
     $('#wysiwygModal').appendTo("body").modal('show');
 
-    var content = $('.block-edit p').prop('outerHTML');
-    $('textarea.wysiwyg-content').html(content);
+    var content = await getContentInstance(id);
+
+    $('textarea.wysiwyg-content').html(content.data.body);
 
     // $(document).off('focusin.modal');
     //allow user to interact with tinymcs dialogs: https://stackoverflow.com/questions/36279941/using-tinymce-in-a-modal-dialog
@@ -891,6 +983,7 @@ async function postProcessNewContent(content) {
     }
 }
 
+
 //TODO, make this just refresh the body content with a full get
 function fullPageUpdate() {
     console.log('refreshing page');
@@ -903,6 +996,76 @@ async function redirect(url) {
     // window.location.href = url;
     window.location.replace(url);
     return false;
+}
+
+async function writeFile(container, file) {
+    let formData = new FormData();
+    formData.append('file', file);
+
+    axios.post(`/api/containers/${container}/upload`,
+        formData,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }
+    ).then(function () {
+        console.log('SUCCESS!!');
+    })
+        .catch(function () {
+            console.log('FAILURE!!');
+        });
+
+}
+
+async function setupACEEditor() {
+    if($('#editor').length === 0){
+        return;
+    }
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.session.setMode("ace/mode/css");
+    // editor.session.setDocument("ace/mode/css");
+    // editor.session.setTabSize(0);
+    // editor.session.setUseSoftTabs(false);
+    // editor.session.setOption('enableLiveAutocompletion', true)
+
+
+    // editor.getSession().on('loaded', function () {
+    //     console.log('on blur')
+    //     var beautify = ace.require("ace/ext/beautify"); // get reference to extension
+    //     var editor = ace.edit("editor"); // get reference to editor
+    //     beautify.beautify(editor.session);
+    // });
+
+    editor.getSession().on('change', function () {
+        update()
+
+        // var beautify = ace.require("ace/ext/beautify"); // get reference to extension
+        // var editor = ace.edit("editor"); // get reference to editor
+        // beautify.beautify(editor.session);    
+    });
+
+    function update() //writes in <div> with id=output
+    {
+        var val = editor.getSession().getValue();
+        // console.log(val);
+        $('#templateCss').html(val);
+    }
+
+    $('#save-global-css').click(function () {
+        let cssContent = editor.getSession().getValue();
+        let file = new File([cssContent], "template.css", { type: "text/css" })
+        writeFile('css', file)
+    });
+
+    beatifyACECss();
+}
+
+async function beatifyACECss(){
+    var beautify = ace.require("ace/ext/beautify"); // get reference to extension
+    var editor = ace.edit("editor"); // get reference to editor
+    beautify.beautify(editor.session);
 }
 
 

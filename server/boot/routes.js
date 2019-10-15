@@ -12,6 +12,9 @@ var menuService = require('../services/menu.service');
 var mediaService = require('../services/media.service');
 var siteSettingsService = require('../services/site-settings.service');
 var contentService = require('../services/content.service');
+var cssService = require('../services/css.service');
+cssService.startup();
+
 
 var cors = require('cors');
 
@@ -63,6 +66,12 @@ module.exports = function (app) {
     res.send(adminPage);
   });
 
+  app.get('/css/generated.css', async function (req, res) {
+    res.set('Content-Type', 'text/css');
+    let css = await cssService.getGeneratedCss();
+    res.send(css);
+  });
+
   // router.get('/admin/content-types', function (req, res) {
   //   res.send(adminPage);
   // });
@@ -73,7 +82,8 @@ module.exports = function (app) {
       || req.url.endsWith('.jpg') || req.url.endsWith('.png') || req.url.endsWith('.svg')
       || req.url.endsWith('.js') || req.url.indexOf('fonts') > -1 || req.url.indexOf('.woff') > -1) {
       // log(chalk.blue(req.url));
-      return next();
+
+        return next();
     }
 
     // formio.getComponents();
@@ -102,40 +112,50 @@ module.exports = function (app) {
 
       let data = {};
 
-      if(viewName == "admin-content"){
+      if (viewName == "admin-content") {
         data = await adminService.getContent()
         data.contentTypes = await dataService.getContentTypes()
       }
 
-      if(viewName == "admin-content-edit"){
+      if (viewName == "admin-content-edit") {
         let content = null;
-        if(param2){
+        if (param2) {
           content = await dataService.getContentById(param2);
         }
         data.editForm = await formService.getForm(param1, content);
       }
 
-      if(viewName == "admin-content-types"){
+      if (viewName == "admin-content-types") {
         data = await dataService.getContentTypes()
       }
 
-      if(viewName == "admin-content-types-edit"){
+      if (viewName == "admin-content-types-edit") {
         data.contentTypeId = param1; //await dataService.getContentType(param)
       }
 
-      if(viewName == "admin-modules"){
+      if (viewName == "admin-modules") {
         data = await moduleService.getModules();
       }
 
-      if(viewName == "admin-media"){
+      if (viewName == "admin-media") {
         data = await mediaService.getMedia()
       }
 
-      if(viewName == "admin-menus"){
+      if (viewName == "admin-menus") {
         data = await dataService.getContentByContentType('menu')
       }
 
-      if(viewName == "admin-site-settings"){
+      if (viewName == "admin-site-settings") {
+        data = await dataService.getContentTopOne('site-settings');
+        data.editForm = await formService.getForm('site-settings', data);
+      }
+
+      if (viewName == "admin-site-settings-colors") {
+        data = await dataService.getContentTopOne('site-settings-colors');
+        data.editForm = await formService.getForm('site-settings-colors', data);
+      }
+
+      if (viewName == "admin-site-settings-typography") {
         data = await dataService.getContentTopOne('site-settings');
         data.editForm = await formService.getForm('site-settings', data);
       }
@@ -144,7 +164,8 @@ module.exports = function (app) {
 
     }
     else {
-      res.render('home', await contentService.getRenderedPage(req));
+      var page = await contentService.getRenderedPage(req);
+      res.render('home', page);
     }
 
   });

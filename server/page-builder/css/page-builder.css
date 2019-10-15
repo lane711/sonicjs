@@ -18,6 +18,10 @@
   margin-left: 300px;
 }
 
+main, .fixed-top, footer {
+  margin-left: 260px
+}
+
 .page-builder-nav, .sidebar {
   width: 260px;
 }
@@ -222,6 +226,17 @@ section .col:hover {
   border-radius: 0;
 }
 
-.block-edit{
+.block-edit {
   background-color: #a2b9bc;
+}
+
+#backgroundColorPreview {
+  width: 100px;
+  height: 30px;
+  border: 1px solid #fff;
+}
+
+.ace_editor {
+  width: 255px;
+  height: 85vh;
 }
