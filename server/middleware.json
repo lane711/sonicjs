@@ -43,119 +43,102 @@
   "files": {
     "loopback#static": [
       {
-        "name": "frontend",
         "paths": [
           "/"
         ],
         "params": "$!../server/themes/base"
       },
       {
-        "name": "boostrap",
         "paths": [
           "/"
         ],
         "params": "$!../node_modules/bootstrap/dist"
       },
       {
-        "name": "node-modules",
         "paths": [
           "/node_modules"
         ],
         "params": "$!../node_modules"
       },
       {
-        "name": "jquery",
         "paths": [
           "/"
         ],
         "params": "$!../node_modules/jquery/dist"
       },
       {
-        "name": "popper",
         "paths": [
           "/js"
         ],
         "params": "$!../node_modules/popper.js/dist/umd"
       },
       {
-        "name": "jsoneditor",
         "paths": [
           "/"
         ],
         "params": "$!../node_modules/jsoneditor/dist"
       },
       {
-        "name": "tinymce",
         "paths": [
           "/js"
         ],
         "params": "$!../node_modules/tinymce"
       },
       {
-        "name": "vendors",
         "paths": [
           "/vendors"
         ],
         "params": "$!../server/assets/vendors"
       },
       {
-        "name": "font-awesome-fonts",
         "paths": [
           "/fonts"
         ],
         "params": "$!../node_modules/font-awesome/fonts"
       },
       {
-        "name": "font-awesome",
         "paths": [
           "/"
         ],
         "params": "$!../node_modules/font-awesome"
       },
       {
-        "name": "page-builder",
         "paths": [
           "/"
         ],
         "params": "$!../server/page-builder"
       },
       {
-        "name": "admin",
         "paths": [
           "/admin"
         ],
         "params": "$!../admin"
       },
       {
-        "name": "adminScripts",
         "paths": [
           "/admin"
         ],
         "params": "$!../admin/dist/client"
       },
       {
-        "name": "assets",
         "paths": [
           "/"
         ],
         "params": "$!../server/assets"
       },
       {
-        "name": "admin-assets",
         "paths": [
           "/admin"
         ],
         "params": "$!../server/views/admin/assets"
       },
       {
-        "name": "formio",
         "paths": [
           "/"
         ],
         "params": "$!../node_modules/formiojs/dist"
       },
       {
-        "name": "managed css",
         "paths": [
           "/css"
         ],

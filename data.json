@@ -1,7 +1,7 @@
 {
   "ids": {
-    "User": 1,
-    "AccessToken": 1,
+    "User": 2,
+    "AccessToken": 2,
     "ACL": 1,
     "RoleMapping": 1,
     "Role": 1,
@@ -11,8 +11,12 @@
     "e2e-test": 1
   },
   "models": {
-    "User": {},
-    "AccessToken": {},
+    "User": {
+      "1": "{\"password\":\"$2a$10$OedeRu4Fy0YllNmCOeeGxuonbYqiai/fp1bs7NzetN.QENxfWMmS2\",\"email\":\"lane@sonicls.com\",\"id\":1}"
+    },
+    "AccessToken": {
+      "91CdCGp70l19BBoImQaB6078AwFIDoT0A6oBpwh9bH4SOBKZKEcsejwXsDLV4iy8": "{\"id\":\"91CdCGp70l19BBoImQaB6078AwFIDoT0A6oBpwh9bH4SOBKZKEcsejwXsDLV4iy8\",\"ttl\":1209600,\"created\":\"2019-10-15T20:31:47.464Z\",\"userId\":1}"
+    },
     "ACL": {},
     "RoleMapping": {},
     "Role": {},
