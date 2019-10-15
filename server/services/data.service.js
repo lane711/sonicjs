@@ -113,7 +113,7 @@ module.exports = {
     },
 
     getImageUrl: function (img) {
-        return `/api/containers/container1/download/${img.originalName}`;
+        return `/api/containers/files/download/${img.originalName}`;
     },
 
     getImage: function (img) {

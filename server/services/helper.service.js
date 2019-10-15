@@ -21,13 +21,15 @@ var Form = formio.Form;
 module.exports = {
 
     truncateString: function (body, length) {
-        return (body.length > length) ? body.substr(0, length-1) + '&hellip;' : body;
+        if (body) {
+            return (body.length > length) ? body.substr(0, length - 1) + '&hellip;' : body;
+        }
     },
 
     sleep: function (ms) {
-        return new Promise(resolve=>{
-            setTimeout(resolve,ms)
+        return new Promise(resolve => {
+            setTimeout(resolve, ms)
         })
     },
-   
+
 }

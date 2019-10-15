@@ -19,7 +19,6 @@ $(document).ready(async function () {
 
     setupFormBuilder(contentType);
     await setupACEEditor();
-    beatifyACECss();
 });
 
 async function setPage() {
@@ -1020,6 +1019,9 @@ async function writeFile(container, file) {
 }
 
 async function setupACEEditor() {
+    if($('#editor').length === 0){
+        return;
+    }
     var editor = ace.edit("editor");
     editor.setTheme("ace/theme/monokai");
     editor.session.setMode("ace/mode/css");
@@ -1056,6 +1058,8 @@ async function setupACEEditor() {
         let file = new File([cssContent], "template.css", { type: "text/css" })
         writeFile('css', file)
     });
+
+    beatifyACECss();
 }
 
 async function beatifyACECss(){
