@@ -49,7 +49,7 @@ module.exports = {
             this.page.data.hasRows = true;
         }
 
-        this.page.data.showPageBuilder = false;
+        this.page.data.showPageBuilder = true;
 
         return { page: this.page };
     },
