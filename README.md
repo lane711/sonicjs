@@ -1,5 +1,3 @@
-## Like'n whatcha see so far? Give me a star! 
-
 # Visit SonicJs.com for Details, Videos & Docs
 [https://sonicjs.com](https://sonicjs.com)
 
