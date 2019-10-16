@@ -16,7 +16,7 @@
     "@coreui/icons": "^0.4.1",
     "@simonwep/pickr": "^1.4.3",
     "ace-builds": "^1.4.6",
-    "axios": "^0.18.0",
+    "axios": "^0.18.1",
     "bootstrap": "^4.3.1",
     "chai": "^4.2.0",
     "chalk": "^2.4.2",

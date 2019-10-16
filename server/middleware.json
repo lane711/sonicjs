@@ -142,7 +142,19 @@
         "paths": [
           "/css"
         ],
-        "params": "$!../api/containers/css"
+        "params": "$!../server/storage/css"
+      },
+      {
+        "paths": [
+          "/js"
+        ],
+        "params": "$!../server/storage/js"
+      },
+      {
+        "paths": [
+          "/files"
+        ],
+        "params": "$!../server/storage/files"
       }
     ]
   },
