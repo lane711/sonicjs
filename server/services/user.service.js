@@ -52,6 +52,10 @@ module.exports = userService = {
         // });
 
         return menu;
+    },
+
+    isAuthenticated: async function () {
+        return false;
     }
 
 }

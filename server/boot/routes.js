@@ -14,6 +14,7 @@ var siteSettingsService = require('../services/site-settings.service');
 var contentService = require('../services/content.service');
 var cssService = require('../services/css.service');
 cssService.startup();
+var userService = require('../services/user.service');
 
 
 var cors = require('cors');
@@ -83,7 +84,7 @@ module.exports = function (app) {
       || req.url.endsWith('.js') || req.url.indexOf('fonts') > -1 || req.url.indexOf('.woff') > -1) {
       // log(chalk.blue(req.url));
 
-        return next();
+      return next();
     }
 
     // formio.getComponents();
@@ -91,7 +92,12 @@ module.exports = function (app) {
     if (req.url.startsWith('/blog/')) {
       res.render('blog', await contentService.getBlog(req));
     }
+    else if (req.url.startsWith('/admin') && !await userService.isAuthenticated()) {
+      let data = {};
+      res.render('admin-login', { layout: 'login.handlebars', data: data });
+    }
     else if (req.url.startsWith('/admin')) {
+      //
       let path = req.url.split("/");
       let viewName = "admin-dashboard";
       let param1 = null;
