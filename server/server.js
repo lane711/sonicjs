@@ -21,6 +21,9 @@ app.start = function () {
   app.set('view engine', 'handlebars');
   app.set('views', __dirname + '/views');
 
+  // app.use(loopback.token({ model: app.models.accessToken }));
+  app.use(loopback.token());
+
 
   // start the web server
   return app.listen(function () {

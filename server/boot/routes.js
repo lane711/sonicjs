@@ -26,6 +26,8 @@ var admin = require(__dirname + '/admin');
 const helmet = require('helmet')
 
 module.exports = function (app) {
+  var User = app.models.User;
+
   var router = app.loopback.Router();
 
   let page = '';
