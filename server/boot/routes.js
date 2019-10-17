@@ -60,32 +60,26 @@ module.exports = function (app) {
             userId: err.details.userId
           });
         } else {
-
           res.redirectTo()
-          // res.render('response', {
-          //   title: 'Login failed. Wrong username or password',
-          //   content: err,
-          //   redirectTo: '/',
-          //   redirectToLinkText: 'Please login again',
-          // });
         }
         return;
       }
 
       //set cookie
-      res.cookie('sonicjs_access_token', token.id, { signed: true , maxAge: 300000 });
-      // res.set('X-Access-Token', token.id);
-      res.send("ok");
-      // res.render('token', {
-      //   email: req.body.email,
-      //   accessToken: token.id
-      // });
+      res.cookie('sonicjs_access_token', token.id, { signed: true , maxAge: 30000000 });
+      let referer = req.headers.referer;
+      res.redirect(referer);
+    });
+  });
 
-      // res.render('home', {
-      //   email: req.body.email,
-      //   accessToken: token.id,
-      //   redirectUrl: '/api/users/change-password?access_token=' + token.id
-      // });
+  //log a user out
+  app.get('/logout', function(req, res, next) {
+    var token = req.signedCookies.sonicjs_access_token;
+    if (!token) return res.sendStatus(401);
+    user.logout(token, function(err) {
+      if (err) return next(err);
+      res.clearCookie('sonicjs_access_token');
+      res.redirect('/');
     });
   });
 
@@ -136,7 +130,7 @@ module.exports = function (app) {
     if (req.url.startsWith('/blog/')) {
       res.render('blog', await contentService.getBlog(req));
     }
-    else if (req.url.startsWith('/admin') && !await userService.isAuthenticated()) {
+    else if (req.url.startsWith('/admin') && !await userService.isAuthenticated(req)) {
       let data = {};
       res.render('admin-login', { layout: 'login.handlebars', data: data });
     }

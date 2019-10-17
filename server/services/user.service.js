@@ -54,7 +54,11 @@ module.exports = userService = {
         return menu;
     },
 
-    isAuthenticated: async function () {
+    isAuthenticated: async function (req) {
+        var authCookie = req.signedCookies.sonicjs_access_token;
+        if(authCookie){
+            return true;
+        }
         return false;
     }
 
