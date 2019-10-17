@@ -2,23 +2,23 @@
 
 $(document).ready(function(){
 
-    $('.btn-login').click(function(){
-        let email = $('#email').val();
-        let password = $('#password').val();
+    // $('.btn-login').click(function(){
+    //     let email = $('#email').val();
+    //     let password = $('#password').val();
 
-        axios.post('http://localhost:3000/api/users/login', {
-            email: email,
-            password: password
-          })
-          .then(function (response) {
-            $('.alert-login ').hide();
-            console.log(response.data.id);
-          })
-          .catch(function (error) {
-              $('.alert-login ').show();
-              $('.alert-login ').html(error.message);
-            console.log(error);
-          });
+    //     axios.post('http://localhost:3000/api/users/login', {
+    //         email: email,
+    //         password: password
+    //       })
+    //       .then(function (response) {
+    //         $('.alert-login ').hide();
+    //         console.log(response.data.id);
+    //       })
+    //       .catch(function (error) {
+    //           $('.alert-login ').show();
+    //           $('.alert-login ').html(error.message);
+    //         console.log(error);
+    //       });
 
-    });
+    // });
 });

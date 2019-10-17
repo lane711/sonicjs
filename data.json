@@ -1,7 +1,7 @@
 {
   "ids": {
-    "User": 4,
-    "AccessToken": 6,
+    "User": 5,
+    "AccessToken": 8,
     "ACL": 1,
     "RoleMapping": 1,
     "Role": 1,
@@ -14,14 +14,17 @@
     "User": {
       "1": "{\"password\":\"$2a$10$OedeRu4Fy0YllNmCOeeGxuonbYqiai/fp1bs7NzetN.QENxfWMmS2\",\"email\":\"lane@sonicjs.com\",\"id\":1}",
       "2": "{\"password\":\"$2a$10$Mnf2swo5h/ffO9thRqkPWe9riqjA8YVnR/k1Eg2mOYxsxu328inBq\",\"email\":\"test@test.com\",\"id\":2}",
-      "3": "{\"password\":\"$2a$10$0wVdWtXJjblZlfjppCYkx.UhnpgUsIlKA075Bn1AejeFh4/Xs2B.W\",\"email\":\"test2323@test.com\",\"id\":3}"
+      "3": "{\"password\":\"$2a$10$0wVdWtXJjblZlfjppCYkx.UhnpgUsIlKA075Bn1AejeFh4/Xs2B.W\",\"email\":\"test2323@test.com\",\"id\":3}",
+      "4": "{\"password\":\"$2a$10$dcZLY/U9QsBUz3m3fMUYnOZPacT7uE3sjxeireP56i8fHpl7yhpvm\",\"email\":\"lane1@sonicjs.com\",\"id\":4}"
     },
     "AccessToken": {
       "91CdCGp70l19BBoImQaB6078AwFIDoT0A6oBpwh9bH4SOBKZKEcsejwXsDLV4iy8": "{\"id\":\"91CdCGp70l19BBoImQaB6078AwFIDoT0A6oBpwh9bH4SOBKZKEcsejwXsDLV4iy8\",\"ttl\":1209600,\"created\":\"2019-10-15T20:31:47.464Z\",\"userId\":1}",
       "jkeotDMIGP4yEAP6ng9stu94lZZC7Z9p64HHjComWBIFwb141YMILX3bEzWT37BF": "{\"id\":\"jkeotDMIGP4yEAP6ng9stu94lZZC7Z9p64HHjComWBIFwb141YMILX3bEzWT37BF\",\"ttl\":1209600,\"created\":\"2019-10-16T17:06:20.680Z\",\"userId\":1}",
       "odyQPdLBU1USMcUuX0L7fdExEFa6igXZHMocHpnv7DHNGmloj3jLUr4WNaKUVXqC": "{\"id\":\"odyQPdLBU1USMcUuX0L7fdExEFa6igXZHMocHpnv7DHNGmloj3jLUr4WNaKUVXqC\",\"ttl\":1209600,\"created\":\"2019-10-16T17:08:13.342Z\",\"userId\":1}",
       "gmWBMjAD68S1Tx8fGtdCD87ZTTSEE4anYdUmBitfarbUelQdaFJ2LHPAgCU28wHS": "{\"id\":\"gmWBMjAD68S1Tx8fGtdCD87ZTTSEE4anYdUmBitfarbUelQdaFJ2LHPAgCU28wHS\",\"ttl\":1209600,\"created\":\"2019-10-16T17:10:43.045Z\",\"userId\":1}",
-      "E9utU3jAt2fLSB8IsLNLAgU8ASxTT6GBfSK8iaM72hW7NkgM2vgPzPs8awF9bmXt": "{\"id\":\"E9utU3jAt2fLSB8IsLNLAgU8ASxTT6GBfSK8iaM72hW7NkgM2vgPzPs8awF9bmXt\",\"ttl\":1209600,\"created\":\"2019-10-16T20:18:24.807Z\",\"userId\":1}"
+      "E9utU3jAt2fLSB8IsLNLAgU8ASxTT6GBfSK8iaM72hW7NkgM2vgPzPs8awF9bmXt": "{\"id\":\"E9utU3jAt2fLSB8IsLNLAgU8ASxTT6GBfSK8iaM72hW7NkgM2vgPzPs8awF9bmXt\",\"ttl\":1209600,\"created\":\"2019-10-16T20:18:24.807Z\",\"userId\":1}",
+      "qMR0ysdgGDwb1q2oHfE3GQxj1FkDMx1oeIIVS3pxJ8ctAA2hBuPetYS3HFcgrHCo": "{\"id\":\"qMR0ysdgGDwb1q2oHfE3GQxj1FkDMx1oeIIVS3pxJ8ctAA2hBuPetYS3HFcgrHCo\",\"ttl\":1209600,\"created\":\"2019-10-17T02:57:33.772Z\",\"userId\":1}",
+      "WrCx1LvWoMUxKSLxfWQvJ3KATdqT0oD0KH6dpHLpH5mNvdFD8keATEgaW1aYiShc": "{\"id\":\"WrCx1LvWoMUxKSLxfWQvJ3KATdqT0oD0KH6dpHLpH5mNvdFD8keATEgaW1aYiShc\",\"ttl\":1209600,\"created\":\"2019-10-17T02:59:12.579Z\",\"userId\":1}"
     },
     "ACL": {},
     "RoleMapping": {},

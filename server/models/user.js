@@ -12,9 +12,10 @@ var senderAddress = 'ldc0618@gmail.com';
 
 module.exports = function (User) {
 
-  User.beforeRemote('create', function (context, user, next) {
-    let x = 1;
-  });
+  // User.beforeRemote('create', function (context, user, next) {
+  //   let x = 1;
+  //   // next();
+  // });
 
   //send verification email after registration
   User.afterRemote('create', function (context, user, next) {
@@ -28,19 +29,19 @@ module.exports = function (User) {
       user: user
     };
 
-    user.verify(options, function (err, response) {
-      if (err) {
-        User.deleteById(user.id);
-        return next(err);
-      }
-      context.res.render('response', {
-        title: 'Signed up successfully',
-        content: 'Please check your email and click on the verification link ' +
-          'before logging in.',
-        redirectTo: '/',
-        redirectToLinkText: 'Log in'
-      });
-    });
+    // user.verify(options, function (err, response) {
+    //   if (err) {
+    //     User.deleteById(user.id);
+    //     return next(err);
+    //   }
+    //   context.res.render('response', {
+    //     title: 'Signed up successfully',
+    //     content: 'Please check your email and click on the verification link ' +
+    //       'before logging in.',
+    //     redirectTo: '/',
+    //     redirectToLinkText: 'Log in'
+    //   });
+    // });
   });
 
   // Method to render

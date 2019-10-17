@@ -26,8 +26,6 @@ var admin = require(__dirname + '/admin');
 const helmet = require('helmet')
 
 module.exports = function (app) {
-  var User = app.models.User;
-
   var router = app.loopback.Router();
 
   let page = '';
@@ -46,6 +44,41 @@ module.exports = function (app) {
 
   })();
 
+  //log a user in
+  var user = app.models.User;
+  app.post('/login', function (req, res) {
+    let email = req.body.email;
+    user.login({
+      email: req.body.email,
+      password: req.body.password
+    }, 'user', function (err, token) {
+      if (err) {
+        if (err.details && err.code === 'LOGIN_FAILED_EMAIL_NOT_VERIFIED') {
+          res.render('reponseToTriggerEmail', {
+            title: 'Login failed',
+            content: err,
+            redirectToEmail: '/api/users/' + err.details.userId + '/verify',
+            redirectTo: '/',
+            redirectToLinkText: 'Click here',
+            userId: err.details.userId
+          });
+        } else {
+          res.render('response', {
+            title: 'Login failed. Wrong username or password',
+            content: err,
+            redirectTo: '/',
+            redirectToLinkText: 'Please login again',
+          });
+        }
+        return;
+      }
+      res.render('home', {
+        email: req.body.email,
+        accessToken: token.id,
+        redirectUrl: '/api/users/change-password?access_token=' + token.id
+      });
+    });
+  });
 
   app.get('/hbs', async function (req, res) {
     res.render('home');

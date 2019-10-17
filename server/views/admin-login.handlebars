@@ -17,30 +17,38 @@
 
             <div class="alert alert-login alert-danger hide" role="alert"></div>
 
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <span class="input-group-text">
-                  <i class="icon-user"></i>
-                </span>
+            <form action="/login" method="post">
+
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="icon-user"></i>
+                  </span>
+                </div>
+                <input class="form-control" id="email" name="emamil" type="text" placeholder="Email">
               </div>
-              <input class="form-control" id="email" type="text" placeholder="Email">
-            </div>
-            <div class="input-group mb-4">
-              <div class="input-group-prepend">
-                <span class="input-group-text">
-                  <i class="icon-lock"></i>
-                </span>
+              <div class="input-group mb-4">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="icon-lock"></i>
+                  </span>
+                </div>
+                <input class="form-control" id="password" name="password" type="password" placeholder="Password">
               </div>
-              <input class="form-control" id="password" type="password" placeholder="Password">
-            </div>
-            <div class="row">
-              <div class="col-6">
-                <button class="btn btn-login px-4" type="button">Login</button>
+              <div class="row">
+                <div class="col-6">
+                  <button class="btn btn-login px-4" type="submit">Login</button>
+
+                          <input type="submit" value="Login2"/>
+
+                </div>
+                <div class="col-6 text-right">
+                  <button class="btn btn-link btn-link-login px-0" type="button">Forgot password?</button>
+                </div>
               </div>
-              <div class="col-6 text-right">
-                <button class="btn btn-link btn-link-login px-0" type="button">Forgot password?</button>
-              </div>
-            </div>
+
+            </form>
+
           </div>
         </div>
         <div class="card text-white bg-login py-5 d-md-down-none" style="width:44%">

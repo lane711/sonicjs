@@ -4,7 +4,7 @@
   "idInjection": true,
   "properties": {},
   "restrictResetPasswordTokenScope": true,
-  "emailVerificationRequired": true,
+  "emailVerificationRequired": false,
   "validations": [],
   "relations": {},
   "acls": [

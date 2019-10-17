@@ -5,6 +5,7 @@ var boot = require('loopback-boot');
 const chalk = require('chalk');
 var express = require('express');
 var exphbs = require('express-handlebars');
+var bodyParser = require('body-parser');
 
 var app = module.exports = loopback();
 
@@ -20,6 +21,9 @@ app.start = function () {
   app.engine('handlebars', hbs.engine);
   app.set('view engine', 'handlebars');
   app.set('views', __dirname + '/views');
+
+  // configure body parser
+  app.use(bodyParser.urlencoded({ extended: true }));
 
   // app.use(loopback.token({ model: app.models.accessToken }));
   app.use(loopback.token());
