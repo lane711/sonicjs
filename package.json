@@ -33,7 +33,6 @@
     "font-awesome": "^4.7.0",
     "formio-service": "^1.4.0",
     "formiojs": "^3.22.12",
-    "helmet": "^3.18.0",
     "jquery": "^3.4.1",
     "jsoneditor": "^6.1.0",
     "loopback": "^3.22.0",
