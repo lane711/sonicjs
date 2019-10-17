@@ -3,6 +3,7 @@ var formService = require('.//form.service');
 var listService = require('.//list.service');
 var menuService = require('.//menu.service');
 var helperService = require('.//helper.service');
+var userService = require('.//user.service');
 
 
 var dataService = require('.//data.service');
@@ -49,7 +50,7 @@ module.exports = {
             this.page.data.hasRows = true;
         }
 
-        this.page.data.showPageBuilder = true;
+        this.page.data.showPageBuilder = await userService.isAuthenticated(req);
 
         return { page: this.page };
     },
