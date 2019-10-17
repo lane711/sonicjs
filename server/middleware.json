@@ -12,11 +12,22 @@
       }
     }
   },
+  "session:before": {
+    "cookie-parser": {
+      "params": "${cookieSecret}"
+    }
+  },
   "session": {},
-  "auth": {},
+  "auth": {
+    "loopback#token": {}
+  },
   "parse": {
     "body-parser#json": {},
-    "body-parser#urlencoded": {"params": { "extended": true }}
+    "body-parser#urlencoded": {
+      "params": {
+        "extended": true
+      }
+    }
   },
   "routes": {
     "loopback#rest": {

@@ -8,9 +8,19 @@ var config = require('../../server/config.json');
 var path = require('path');
 
 //Replace this address with your actual address
-var senderAddress = 'ldc0618@gmail.com';
+var senderAddress = 'test@test.com';
 
 module.exports = function (User) {
+
+  User.afterRemote('login', function(ctx){
+    ctx.res.cookie('access_token', ctx.result.id, { signed: true, maxAge: ctx.result.ttl * 1000 });
+    return Promise.resolve();
+  });
+
+  User.afterRemote('logout', function(ctx){
+    ctx.res.clearCookie('access_token');
+    return Promise.resolve();
+  });
 
   // User.beforeRemote('create', function (context, user, next) {
   //   let x = 1;

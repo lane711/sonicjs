@@ -45,7 +45,6 @@ module.exports = function (app) {
   //log a user in
   var user = app.models.User;
   app.post('/login', function (req, res) {
-    let email = req.body.email;
     user.login({
       email: req.body.email,
       password: req.body.password
@@ -61,20 +60,32 @@ module.exports = function (app) {
             userId: err.details.userId
           });
         } else {
-          res.render('response', {
-            title: 'Login failed. Wrong username or password',
-            content: err,
-            redirectTo: '/',
-            redirectToLinkText: 'Please login again',
-          });
+
+          res.redirectTo()
+          // res.render('response', {
+          //   title: 'Login failed. Wrong username or password',
+          //   content: err,
+          //   redirectTo: '/',
+          //   redirectToLinkText: 'Please login again',
+          // });
         }
         return;
       }
-      res.render('home', {
-        email: req.body.email,
-        accessToken: token.id,
-        redirectUrl: '/api/users/change-password?access_token=' + token.id
-      });
+
+      //set cookie
+      res.cookie('sonicjs_access_token', token.id, { signed: true , maxAge: 300000 });
+      // res.set('X-Access-Token', token.id);
+      res.send("ok");
+      // res.render('token', {
+      //   email: req.body.email,
+      //   accessToken: token.id
+      // });
+
+      // res.render('home', {
+      //   email: req.body.email,
+      //   accessToken: token.id,
+      //   redirectUrl: '/api/users/change-password?access_token=' + token.id
+      // });
     });
   });
 
