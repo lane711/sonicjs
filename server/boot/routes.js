@@ -25,7 +25,9 @@ var admin = require(__dirname + '/admin');
 
 module.exports = function (app) {
 
-  res.send('ello');
+  app.get('/', async function (req, res) {
+    res.send('ok');
+  });  
   
   var router = app.loopback.Router();
 
