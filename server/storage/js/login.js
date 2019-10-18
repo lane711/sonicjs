@@ -6,7 +6,7 @@ $(document).ready(function(){
     //     let email = $('#email').val();
     //     let password = $('#password').val();
 
-    //     axios.post('http://localhost:3000/api/users/login', {
+    //     axios.post('/api/users/login', {
     //         email: email,
     //         password: password
     //       })

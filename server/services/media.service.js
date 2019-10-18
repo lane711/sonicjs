@@ -31,7 +31,7 @@ module.exports = mediaService = {
     },
 
     getMedia: async function () {
-        let url = 'http://localhost:3000/api/containers/container1/files';
+        let url = '/api/containers/container1/files';
         return axios.get(url)
         .then(async function (record) {
             if (record.data) {

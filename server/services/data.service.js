@@ -8,7 +8,7 @@ const ShortcodeTree = require('shortcode-tree').ShortcodeTree;
 const chalk = require('chalk');
 const log = console.log;
 
-const apiUrl = 'http://localhost:3000/api/';
+const apiUrl = '/api/';
 var pageContent = '';
 var page;
 var id;

@@ -17,7 +17,7 @@ const log = console.log;
 var eventBusService = require('./event-bus.service');
 
 
-const apiUrl = 'http://localhost:3000/api/';
+const apiUrl = '/api/';
 var pageContent = '';
 var page;
 var id;

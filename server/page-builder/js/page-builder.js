@@ -863,14 +863,13 @@ async function openWYSIWYG() {
         toolbar: 'code | formatselect | bold italic strikethrough forecolor backcolor permanentpen formatpainter | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat | addcomment',
         image_advtab: false,
         image_list: tinyImageList,
-        // images_upload_url: 'http://localhost:3000/api/containers/container1/upload',
         automatic_uploads: true,
         images_upload_handler: function (blobInfo, success, failure) {
             var xhr, formData;
 
             xhr = new XMLHttpRequest();
             xhr.withCredentials = false;
-            xhr.open('POST', "http://localhost:3000/api/containers/container1/upload");
+            xhr.open('POST', "/api/containers/container1/upload");
 
             xhr.onload = function () {
                 var json;
@@ -882,7 +881,7 @@ async function openWYSIWYG() {
 
                 json = JSON.parse(xhr.responseText);
                 var file = json.result.files.file[0];
-                var location = `http://localhost:3000/api/containers/${file.container}/download/${file.name}`;
+                var location = `/api/containers/${file.container}/download/${file.name}`;
                 if (!location) {
                     failure("Invalid JSON: " + xhr.responseText);
                     return;
@@ -937,7 +936,7 @@ async function getImageList() {
     tinyImageList = [];
 
     imageList.data.forEach(image => {
-        let imageItem = { title: image.name, value: `http://localhost:3000/api/containers/${image.container}/download/${image.name}` };
+        let imageItem = { title: image.name, value: `/api/containers/${image.container}/download/${image.name}` };
         tinyImageList.push(imageItem);
     });
 }

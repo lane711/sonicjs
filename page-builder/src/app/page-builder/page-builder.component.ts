@@ -192,7 +192,7 @@ export class PageBuilderComponent implements OnInit, AfterViewInit {
       
               xhr = new XMLHttpRequest();
               xhr.withCredentials = false;
-              xhr.open('POST', "http://localhost:3000/api/containers/container1/upload");
+              xhr.open('POST', "/api/containers/container1/upload");
   
               xhr.onload = function() {
                   var json;
@@ -204,7 +204,7 @@ export class PageBuilderComponent implements OnInit, AfterViewInit {
       
                   json = JSON.parse(xhr.responseText);
                   var file = json.result.files.file[0];
-                  var location = `http://localhost:3000/api/containers/${file.container}/download/${file.name}`;
+                  var location = `/api/containers/${file.container}/download/${file.name}`;
                   if (!location) {
                       failure("Invalid JSON: " + xhr.responseText);
                       return;

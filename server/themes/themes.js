@@ -1,7 +1,7 @@
 var fs = require('fs');
 const cheerio = require('cheerio')
 const axios = require('axios');
-const apiUrl = 'http://localhost:3000/explorer/';
+const apiUrl = '/explorer/';
 var contentService = require( '../services/content.service');
 
 module.exports = {
@@ -47,7 +47,7 @@ module.exports = {
     //     let contentType = 'menu';
     //     const filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
     //     //axios.get(apiUrl + `contents?filter=${filter}`)
-    //     await axios.get('http://localhost:3000/api/contents?filter=%7B%22where%22%3A%7B%22data.contentType%22%3A%22menu%22%7D%7D')
+    //     await axios.get('/api/contents?filter=%7B%22where%22%3A%7B%22data.contentType%22%3A%22menu%22%7D%7D')
     //     .then(function (response) {
     //       // handle success
     //         // console.log('menu items ==>', response.data);
