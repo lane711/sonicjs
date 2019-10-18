@@ -23,7 +23,7 @@ module.exports = formService = {
 
     startup: async function () {
         eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
-            if (options) {
+            if (options && options.page) {
                 options.page.data.editForm = await formService.getForm(options.page.contentTypeId, options.page);
             }
         });

@@ -13,7 +13,7 @@ module.exports = cssService = {
 
     startup: async function () {
         eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
-            if (options) {
+            if (options && options.page) {
                 await cssService.getCssFile(options.page);
             }
         });

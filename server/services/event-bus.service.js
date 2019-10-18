@@ -17,9 +17,12 @@ module.exports = {
 
         //TODO: ordering
 
+        //filter by current emiiterName
+        let emitters = emitterList.filter(x => x.emitterName === emitterName);
+
         //execute the functions
-        for (let index = 0; index < emitterList.length; index++) {
-            let subscriber = emitterList[index];
+        for (let index = 0; index < emitters.length; index++) {
+            let subscriber = emitters[index];
             // console.log('executing...' + subscriber.functionToExecute, "on " + subscriber.emitterName);
 
             try {

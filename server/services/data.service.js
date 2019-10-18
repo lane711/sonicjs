@@ -1,3 +1,5 @@
+var eventBusService = require('./event-bus.service');
+var globalService = require('./global.service');
 var pageBuilderService = require('./page-builder.service');
 var formService = require('./form.service');
 
@@ -12,29 +14,45 @@ const apiUrl = '/api/';
 var pageContent = '';
 var page;
 var id;
+var axiosInstance;
+
+(async () => {
+    // if(baseUrl){
+    //     axiosInstance = axios.create({ baseURL: baseUrl });
+    // }
+  })();
 
 module.exports = {
 
-  
+    startup: async function () {
+        eventBusService.on('requestBegin', async function (options) {
+            console.log('data service startup')
+            if(options){
+                let baseUrl = globalService.getBaseUrl();
+                console.log('data service ' + baseUrl)
+                axiosInstance = axios.create({ baseURL: baseUrl });
+            }
+        });
+    },
 
     getContent: async function (contentType) {
         const filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
         let url = `${apiUrl}contents?filter=${filter}`;
-        let page = await axios.get(url);
+        let page = await axiosInstance.get(url);
         return page.data;
     },
 
     getContentType: async function (contentType) {
         const filter = encodeURI(`{"where":{"systemid":"${contentType}"}}`);
         let url = `${apiUrl}contentTypes?filter=${filter}`;
-        let contentTypeRecord = await axios.get(url);
+        let contentTypeRecord = await axiosInstance.get(url);
         // console.log('contentTypeRecord.data', contentTypeRecord.data[0]);
         return contentTypeRecord.data[0];
     },
 
     getContentTypes: async function () {
         let url = `${apiUrl}contentTypes`;
-        let contentTypes = await axios.get(url);
+        let contentTypes = await axiosInstance.get(url);
         // console.log('contentTypeRecord.data', contentTypeRecord.data[0]);
         return contentTypes.data;
     },
@@ -47,7 +65,8 @@ module.exports = {
     getContentByUrl: async function (url) {
         var  filter = encodeURI(`{"where":{"data.url":"${url}"}}`);
         let apiFullUrl = `${apiUrl}contents?filter=${filter}`;
-        let record = await axios.get(apiFullUrl);
+        // var instance = axios.create({ baseURL: 'http://localhost:3018' });
+        let record = await axiosInstance.get(apiFullUrl);
         if (record.data[0]) {
             return record;
         }
@@ -62,7 +81,7 @@ module.exports = {
     getContentByContentType: async function (contentType) {
         var  filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
         let apiFullUrl = `${apiUrl}contents?filter=${filter}`;
-        let record = await axios.get(apiFullUrl);
+        let record = await axiosInstance.get(apiFullUrl);
         if (record.data) {
             return record.data;
         }
@@ -74,7 +93,7 @@ module.exports = {
         const filter = `{"where":{"and":[{"data.title":"${title}"},{"data.contentType":"${contentType}"}]}}`;
         const encodedFilter = encodeURI(filter);
         let url = `${apiUrl}contents?filter=${encodedFilter}`;
-        let pageRecord = await axios.get(url);
+        let pageRecord = await axiosInstance.get(url);
         if (pageRecord.data[0]) {
             return pageRecord.data[0];
             // await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);
@@ -89,7 +108,7 @@ module.exports = {
         const filter = `{"where":{"and":[{"url":"${pageUrl}"},{"data.contentType":"${contentType}"}]}}`;
         const encodedFilter = encodeURI(filter);
         let url = `${apiUrl}contents?filter=${encodedFilter}`;
-        let pageRecord = await axios.get(url);
+        let pageRecord = await axiosInstance.get(url);
         if (pageRecord.data[0]) {
             return pageRecord;
             // await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);
@@ -102,7 +121,7 @@ module.exports = {
 
     getContentById: async function (id) {
         let url = `${apiUrl}contents/${id}`;
-        let content = await axios.get(url);
+        let content = await axiosInstance.get(url);
         return content.data;
     },
 

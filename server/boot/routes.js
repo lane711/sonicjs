@@ -1,9 +1,12 @@
+var eventBusService = require('../services/event-bus.service');
+var globalService = require('../services/global.service');
+globalService.startup();
 var themes = require(__dirname + '../../themes/themes');
 var pageBuilderService = require('../services/page-builder.service');
 var formio = require('../services/formio.service');
-var eventBusService = require('../services/event-bus.service');
 var adminService = require('../services/admin.service');
 var dataService = require('../services/data.service');
+dataService.startup();
 var moduleService = require('../services/module.service')
 moduleService.startup();
 var formService = require('../services/form.service')
@@ -23,6 +26,7 @@ const log = console.log;
 
 var admin = require(__dirname + '/admin');
 
+
 module.exports = function (app) {
 
   // app.get('/', async function (req, res) {
@@ -39,11 +43,7 @@ module.exports = function (app) {
     await menuService.startup();
     await mediaService.startup();
     await siteSettingsService.startup();
-
-    //TODO fix admin path for prod mode
-    // adminPage = await admin.loadAdmin();
-
-    eventBusService.emit('startup');
+    await eventBusService.emit('startup');
 
   })();
 
@@ -106,10 +106,6 @@ module.exports = function (app) {
     res.send('ok');
   });
 
-  app.get('/admin-ng', async function (req, res) {
-    res.send(adminPage);
-  });
-
   app.get('/css/generated.css', async function (req, res) {
     res.set('Content-Type', 'text/css');
     let css = await cssService.getGeneratedCss();
@@ -121,6 +117,8 @@ module.exports = function (app) {
   // });
 
   app.get('*', async function (req, res, next) {
+
+
     if (req.url === '/explorer' || req.url.startsWith('/api')
       || req.url.endsWith('.css') || req.url.endsWith('.html') || req.url.endsWith('.ico') || req.url.endsWith('.map')
       || req.url.endsWith('.jpg') || req.url.endsWith('.png') || req.url.endsWith('.svg')
@@ -129,6 +127,8 @@ module.exports = function (app) {
 
       return next();
     }
+
+    await eventBusService.emit('requestBegin', { req: req, res: res });
 
     // formio.getComponents();
 
