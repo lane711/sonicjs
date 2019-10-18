@@ -128,7 +128,8 @@ module.exports = function (app) {
     // formio.getComponents();
 
     if (req.url.startsWith('/blog/')) {
-      res.render('blog', await contentService.getBlog(req));
+      let page = await contentService.getBlog(req);
+      res.render('blog', page);
     }
     else if (req.url.startsWith('/admin') && !await userService.isAuthenticated(req)) {
       let data = {};

@@ -9,6 +9,8 @@
 
     <div class="collapse navbar-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">
+                        {{ log page }}
+
             {{#each page.data.menu}}
             {{#if hasChildren}}
             <li class="nav-item dropdown">

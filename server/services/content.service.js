@@ -110,7 +110,7 @@ module.exports = {
             }
             // let page = this.page.data[0];
             // this.page.data.html = pageContent;
-            return blog;
+            return { page: blog };
         }
         return 'error';
     },
