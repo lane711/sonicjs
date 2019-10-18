@@ -1,1 +1,0 @@
-This is the core library for SonicJs Node MEAN CMS https://sonicjs.com
