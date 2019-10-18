@@ -24,6 +24,9 @@ const log = console.log;
 var admin = require(__dirname + '/admin');
 
 module.exports = function (app) {
+
+  res.send('ello');
+  
   var router = app.loopback.Router();
 
   let page = '';
