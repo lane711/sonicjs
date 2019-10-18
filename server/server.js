@@ -5,6 +5,7 @@ var boot = require('loopback-boot');
 const chalk = require('chalk');
 var express = require('express');
 var exphbs = require('express-handlebars');
+// var bodyParser = require('body-parser');
 
 var app = module.exports = loopback();
 
@@ -20,6 +21,24 @@ app.start = function () {
   app.engine('handlebars', hbs.engine);
   app.set('view engine', 'handlebars');
   app.set('views', __dirname + '/views');
+
+
+  // Parse URL-encoded bodies (as sent by HTML forms)
+  // app.use(express.urlencoded());
+  // app.use(express.bodyParser());
+
+
+    // configure body parser
+    // app.use(bodyParser.urlencoded({ extended: true }));
+
+
+
+
+  // Parse JSON bodies (as sent by API clients)
+  app.use(express.json());
+
+  // app.use(loopback.token({ model: app.models.accessToken }));
+  app.use(loopback.token());
 
 
   // start the web server
@@ -45,3 +64,4 @@ boot(app, __dirname, function (err) {
   if (require.main === module)
     app.start();
 });
+

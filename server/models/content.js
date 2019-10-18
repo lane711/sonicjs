@@ -6,6 +6,10 @@ var contentService = require(path.join(__dirname, '../', 'services/content.servi
 
 module.exports = function(Content) {
 
+  Content.beforeRemote('create', function (context, user, next) {
+    let x = 1;
+  });
+
     Content.getPageById = function (id, cb) {
       Content.findById( id, function (err, instance) {
        contentService.getPage(id, instance).then(html => {

@@ -14,7 +14,7 @@ var siteSettingsService = require('../services/site-settings.service');
 var contentService = require('../services/content.service');
 var cssService = require('../services/css.service');
 cssService.startup();
-
+var userService = require('../services/user.service');
 
 var cors = require('cors');
 
@@ -22,7 +22,6 @@ const chalk = require('chalk');
 const log = console.log;
 
 var admin = require(__dirname + '/admin');
-const helmet = require('helmet')
 
 module.exports = function (app) {
   var router = app.loopback.Router();
@@ -43,6 +42,46 @@ module.exports = function (app) {
 
   })();
 
+  //log a user in
+  var user = app.models.User;
+  app.post('/login', function (req, res) {
+    user.login({
+      email: req.body.email,
+      password: req.body.password
+    }, 'user', function (err, token) {
+      if (err) {
+        if (err.details && err.code === 'LOGIN_FAILED_EMAIL_NOT_VERIFIED') {
+          res.render('reponseToTriggerEmail', {
+            title: 'Login failed',
+            content: err,
+            redirectToEmail: '/api/users/' + err.details.userId + '/verify',
+            redirectTo: '/',
+            redirectToLinkText: 'Click here',
+            userId: err.details.userId
+          });
+        } else {
+          res.redirectTo()
+        }
+        return;
+      }
+
+      //set cookie
+      res.cookie('sonicjs_access_token', token.id, { signed: true , maxAge: 30000000 });
+      let referer = req.headers.referer;
+      res.redirect(referer);
+    });
+  });
+
+  //log a user out
+  app.get('/logout', function(req, res, next) {
+    var token = req.signedCookies.sonicjs_access_token;
+    if (!token) return res.sendStatus(401);
+    user.logout(token, function(err) {
+      if (err) return next(err);
+      res.clearCookie('sonicjs_access_token');
+      res.redirect('/');
+    });
+  });
 
   app.get('/hbs', async function (req, res) {
     res.render('home');
@@ -83,15 +122,21 @@ module.exports = function (app) {
       || req.url.endsWith('.js') || req.url.indexOf('fonts') > -1 || req.url.indexOf('.woff') > -1) {
       // log(chalk.blue(req.url));
 
-        return next();
+      return next();
     }
 
     // formio.getComponents();
 
     if (req.url.startsWith('/blog/')) {
-      res.render('blog', await contentService.getBlog(req));
+      let page = await contentService.getBlog(req);
+      res.render('blog', page);
+    }
+    else if (req.url.startsWith('/admin') && !await userService.isAuthenticated(req)) {
+      let data = {};
+      res.render('admin-login', { layout: 'login.handlebars', data: data });
     }
     else if (req.url.startsWith('/admin')) {
+      //
       let path = req.url.split("/");
       let viewName = "admin-dashboard";
       let param1 = null;
@@ -169,35 +214,6 @@ module.exports = function (app) {
     }
 
   });
-  // app.use('/admin', function(req, res, next) {
-  //   console.log('admin route', req.url);
-  //   res.send(adminPage);
-  // });
-
-  // app.use(/\/((?!admin).)*/, function(){
-  //   return "ok";
-  // });
-
-  // app.get('*', function(req, res){
-  //   res.send(adminPage);
-  // });
-
-  // Allow from a specific host.
-  // Sets "X-Frame-Options: ALLOW-FROM http://example.com".
-  // app.use(helmet.frameguard({
-  //   action: 'allow-from',
-  //   domain: 'http://localhost:4200'
-  // }))
-
-  // app.use(helmet.frameguard({ action: 'sameorigin' }))
-
-
-  // app.use(helmet.frameguard({ action: 'allow' }))
-
-
-  // app.use(helmet.frameguard({ action: 'sameorigin' }))
-
-
 
   app.use(router);
 
