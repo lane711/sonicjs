@@ -25,9 +25,9 @@ var admin = require(__dirname + '/admin');
 
 module.exports = function (app) {
 
-  app.get('/', async function (req, res) {
-    res.send('ok');
-  });  
+  // app.get('/', async function (req, res) {
+  //   res.send('ok');
+  // });  
   
   var router = app.loopback.Router();
 
@@ -41,7 +41,7 @@ module.exports = function (app) {
     await siteSettingsService.startup();
 
     //TODO fix admin path for prod mode
-    adminPage = await admin.loadAdmin();
+    // adminPage = await admin.loadAdmin();
 
     eventBusService.emit('startup');
 
