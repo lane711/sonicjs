@@ -26,10 +26,10 @@ module.exports = {
 
     startup: async function () {
         eventBusService.on('requestBegin', async function (options) {
-            console.log('data service startup')
+            // console.log('data service startup')
             if(options){
                 let baseUrl = globalService.getBaseUrl();
-                console.log('data service ' + baseUrl)
+                // console.log('data service ' + baseUrl)
                 axiosInstance = axios.create({ baseURL: baseUrl });
             }
         });
