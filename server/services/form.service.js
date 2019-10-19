@@ -84,7 +84,7 @@ module.exports = formService = {
             this.addBaseContentTypeFields(content.id, content.data.contentType, components);
         } else{
             components.push({
-                type: 'hiddenfield',
+                type: 'textfield',
                 key: 'contentType',
                 label: 'contentType',
                 defaultValue: contentType.systemid,
@@ -99,7 +99,7 @@ module.exports = formService = {
         // console.log('addBaseContentTypeFields', contentType, controls);
 
         controls.push({
-            type: 'hiddenfield',
+            type: 'textfield',
             key: 'id',
             label: 'id',
             defaultValue: id,
