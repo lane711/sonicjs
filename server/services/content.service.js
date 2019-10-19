@@ -189,7 +189,7 @@ module.exports = {
         let navWrapper = $('.s--menu-item').parent();
         navWrapper.empty();
 
-        let menuItems = await dataService.getContent('menu');
+        let menuItems = await dataService.getContentByType('menu');
         // console.log('menuItems', menuItems);
         menuItems.forEach(menuItem => {
             // console.log('menuItem', menuItem);

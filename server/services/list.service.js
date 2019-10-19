@@ -22,7 +22,7 @@ module.exports = {
         //     "name": "Alan", "hometown": "Somewhere, TX",
         //     "kids": [{ "name": "Jimmy", "age": "12" }, { "name": "Sally", "age": "4" }]
         // };
-        var data = await dataService.getContent(contentType);
+        var data = await dataService.getContentByType(contentType);
 
         let viewModel = data.map(function (record) {
             return {

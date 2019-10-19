@@ -8,7 +8,7 @@ const axios = require('axios');
 const ShortcodeTree = require('shortcode-tree').ShortcodeTree;
 const chalk = require('chalk');
 const log = console.log;
-
+var axiosInstance;
 
 
 module.exports = mediaService = {
@@ -17,6 +17,15 @@ module.exports = mediaService = {
         eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
             if (options && options.page) {
                 await mediaService.processHeroImage(options.page);
+            }
+        });
+
+        eventBusService.on('requestBegin', async function (options) {
+            // console.log('data service startup')
+            if(options){
+                let baseUrl = globalService.getBaseUrl();
+                // console.log('data service ' + baseUrl)
+                axiosInstance = axios.create({ baseURL: baseUrl });
             }
         });
     },
@@ -32,7 +41,7 @@ module.exports = mediaService = {
 
     getMedia: async function () {
         let url = '/api/containers/container1/files';
-        return axios.get(url)
+        return axiosInstance.get(url)
         .then(async function (record) {
             if (record.data) {
                 return record.data;

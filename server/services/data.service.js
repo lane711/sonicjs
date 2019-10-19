@@ -35,7 +35,13 @@ module.exports = {
         });
     },
 
-    getContent: async function (contentType) {
+    getContent: async function () {
+        let url = `${apiUrl}contents`;
+        let page = await axiosInstance.get(url);
+        return page.data;
+    },
+
+    getContentByType: async function (contentType) {
         const filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
         let url = `${apiUrl}contents?filter=${filter}`;
         let page = await axiosInstance.get(url);
@@ -58,7 +64,7 @@ module.exports = {
     },
 
     getContentTopOne: async function (contentType) {
-        let results = await this.getContent(contentType);
+        let results = await this.getContentByType(contentType);
         return results[0];
     },
 
