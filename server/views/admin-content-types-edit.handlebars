@@ -45,9 +45,8 @@
                     data: { id: contentType.id, title: contentType.title, systemid: contentType.systemid }
                   };
                   form.on('submit', async function (submission) {
-                    debugger;
-                    console.log('submission ->', submission);
-                    axios.put(`/api/contentTypes/`, submission.data)
+                    var accessToken = '{{ this.accessToken }}';
+                    axios.put(`/api/contentTypes?access_token=${accessToken}`, submission.data)
                       .then(async function (response) {
                         console.log(response);
                         //return await response.data;
