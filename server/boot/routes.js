@@ -210,7 +210,9 @@ module.exports = function (app) {
         data.editForm = await formService.getForm('site-settings', data);
       }
 
-      res.render(viewName, { layout: 'admin.handlebars', data: data });
+      let accessToken = await userService.getToken(req)
+
+      res.render(viewName, { layout: 'admin.handlebars', data: data,  accessToken: accessToken });
 
     }
     else {

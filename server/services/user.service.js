@@ -55,11 +55,15 @@ module.exports = userService = {
     },
 
     isAuthenticated: async function (req) {
-        var authCookie = req.signedCookies.sonicjs_access_token;
+        var authCookie = this.getToken(req);
         if(authCookie){
             return true;
         }
         return false;
+    },
+
+    getToken: async function (req) {
+        return req.signedCookies.sonicjs_access_token;
     }
 
 }

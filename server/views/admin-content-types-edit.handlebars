@@ -45,7 +45,7 @@
                     data: { id: contentType.id, title: contentType.title, systemid: contentType.systemid }
                   };
                   form.on('submit', async function (submission) {
-                    //             debugger;
+                    debugger;
                     console.log('submission ->', submission);
                     axios.put(`/api/contentTypes/`, submission.data)
                       .then(async function (response) {
