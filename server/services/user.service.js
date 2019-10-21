@@ -55,7 +55,7 @@ module.exports = userService = {
     },
 
     isAuthenticated: async function (req) {
-        var authCookie = this.getToken(req);
+        var authCookie = await this.getToken(req);
         if(authCookie){
             return true;
         }
