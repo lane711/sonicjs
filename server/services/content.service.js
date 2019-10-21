@@ -49,9 +49,7 @@ module.exports = {
             this.page.data.rows = this.page.data.layout.rows;
             this.page.data.hasRows = true;
         }
-
-        this.page.data.showPageBuilder = await userService.isAuthenticated(req);
-
+        
         return { page: this.page };
     },
 
@@ -108,6 +106,9 @@ module.exports = {
             if (blog.data.image) {
                 blog.data.heroImage = blog.data.image[0].originalName;
             }
+
+            await eventBusService.emit('getRenderedPagePostDataFetch', { req: req, page: blog });
+
             // let page = this.page.data[0];
             // this.page.data.html = pageContent;
             return { page: blog };

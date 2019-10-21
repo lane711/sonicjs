@@ -18,9 +18,7 @@ module.exports = menuService = {
 
         eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
             if (options) {
-                menuService.getMenu('Main').then(data => {
-                    options.page.data.menu = data;
-                })
+                options.page.data.menu = await menuService.getMenu('Main');
             }
         });
     },

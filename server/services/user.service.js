@@ -16,13 +16,11 @@ module.exports = userService = {
     startup: function () {
         // console.log('>>=== menu startup');
 
-        // eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
-        //     if (options) {
-        //         menuService.getMenu('Main').then(data => {
-        //             options.page.data.menu = data;
-        //         })
-        //     }
-        // });
+        eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
+            if (options) {
+                options.page.data.showPageBuilder = await userService.isAuthenticated(req);
+            }
+        });
     },
 
     getUsers: async function (menuName) {
