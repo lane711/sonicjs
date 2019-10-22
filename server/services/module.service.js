@@ -42,8 +42,15 @@ module.exports = moduleService = {
         },
             function (err, files) {
                 if (err) throw err;
-                // console.log('files', files);
+
+                moduleList.sort(function(a, b){
+                    if(a.title < b.title) { return -1; }
+                    if(a.title > b.title) { return 1; }
+                    return 0;
+                })
+
                 moduleDefinitions = moduleList;
+
                 return moduleList;
             });
 
