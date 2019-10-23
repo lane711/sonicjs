@@ -1,11 +1,13 @@
 var page = {};
 var contentType;
 var contentTypeComponents;
+var axiosInstance;
 
 var imageList, tinyImageList, currentSectionId, currentSection, currentRow, currentRowIndex, currentColumn,
     currentColumnIndex, jsonEditor;
 
 $(document).ready(async function () {
+    await setupAxiosInstance();
     setupUIHovers();
     setupUIClicks();
     setupClickEvents();
@@ -21,11 +23,26 @@ $(document).ready(async function () {
     await setupACEEditor();
 });
 
+async function setupAxiosInstance() {
+
+    let baseUrl = window.location.protocol + "//" + window.location.host + "/";
+    let token = $('#token').val();
+
+    const defaultOptions = {
+        headers: {
+            Authorization: `${token}`
+        },
+        baseUrl: baseUrl
+    }
+
+    axiosInstance = axios.create(defaultOptions);
+}
+
 async function setPage() {
     let pageId = $('#page-id').val();
     if (pageId) {
         console.log('pageId', pageId);
-        axios.get(`/api/contents/${pageId}`)
+        axiosInstance.get(`/api/contents/${pageId}`)
             .then(function (response) {
                 // handle success
                 this.page = response.data;
@@ -44,7 +61,7 @@ async function setContentType() {
 
 function axiosTest() {
     console.log('running axios');
-    axios.get('/api/contents')
+    axiosInstance.get('/api/contents')
         .then(function (response) {
             // handle success
             console.log(response);
@@ -448,13 +465,13 @@ async function deleteBlock() {
 }
 
 createContentInstance2 = async () => {
-    let res = await axios.get("https://reqres.in/api/users?page=1");
+    let res = await axiosInstance.get("https://reqres.in/api/users?page=1");
     let { data } = await res.data;
     this.setState({ users: data });
 };
 
 async function getContentInstance(id) {
-    return axios.get(`/api/contents/${id}`)
+    return axiosInstance.get(`/api/contents/${id}`)
         .then(async function (response) {
             console.log(response);
             return await response.data;
@@ -468,7 +485,7 @@ async function getContentType(systemId) {
     const filter = `{"where":{"systemid":"${systemId}"}}`;
     const encodedFilter = encodeURI(filter);
     let url = `/api/contentTypes?filter=${encodedFilter}`;
-    return axios.get(url)
+    return axiosInstance.get(url)
         .then(async function (record) {
             if (record.data[0]) {
                 return record.data[0];
@@ -484,7 +501,7 @@ async function getContentByContentTypeAndTitle(contentType, title) {
     const filter = `{"where":{"and":[{"data.title":"${title}"},{"data.contentType":"${contentType}"}]}}`;
     const encodedFilter = encodeURI(filter);
     let url = `/api/contents?filter=${encodedFilter}`;
-    return axios.get(url)
+    return axiosInstance.get(url)
         .then(async function (record) {
             if (record.data[0]) {
                 return record.data[0];
@@ -511,7 +528,7 @@ async function createContentInstance(payload) {
         payload = temp;
     }
     // return this.http.post("/api/contents/", content).toPromise();
-    return axios.post('/api/contents/', payload)
+    return axiosInstance.post('/api/contents/', payload)
         .then(async function (response) {
             console.log(response);
             return await response.data;
@@ -523,7 +540,7 @@ async function createContentInstance(payload) {
 }
 
 async function editContentInstance(payload) {
-    // debugger;
+    debugger;
     let id = payload.id;
     console.log('putting payload', payload);
     if (payload.id) {
@@ -539,7 +556,8 @@ async function editContentInstance(payload) {
     //     data = payload;
     // }
     // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
-    return axios.put(`/api/contents/${id}`, payload)
+    console.log(axiosInstance);
+    return axiosInstance.put(`/api/contents/${id}`, payload)
         .then(async function (response) {
             console.log(response);
             return await response.data;
@@ -565,7 +583,7 @@ async function editContentType(payload) {
     // }
     // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
     // debugger;
-    return axios.put(`/api/contentTypes/${id}`, payload)
+    return axiosInstance.put(`/api/contentTypes/${id}`, payload)
         .then(async function (response) {
             console.log(response);
             return await response.data;
@@ -578,7 +596,7 @@ async function editContentType(payload) {
 async function deleteContentInstance(id) {
     console.log('deleting content', id);
     // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
-    return axios.delete(`/api/contents/${id}`)
+    return axiosInstance.delete(`/api/contents/${id}`)
         .then(async function (response) {
             console.log(response);
             return await response.data;
@@ -591,7 +609,7 @@ async function deleteContentInstance(id) {
 async function deleteContentType(id) {
     console.log('deleting content', id);
     // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
-    axios.delete(`/api/contentTypes/${id}`)
+    axiosInstance.delete(`/api/contentTypes/${id}`)
         .then(async function (response) {
             console.log(response);
             redirect('/admin/content-types')
@@ -929,7 +947,7 @@ function loadJsonEditor() {
 }
 
 async function getImageList() {
-    let imageList = await axios.get(`/api/containers/container1/files`);
+    let imageList = await axiosInstance.get(`/api/containers/container1/files`);
     // console.log('imageList', imageList.data);
 
 
@@ -1001,7 +1019,7 @@ async function writeFile(container, file) {
     let formData = new FormData();
     formData.append('file', file);
 
-    axios.post(`/api/containers/${container}/upload`,
+    axiosInstance.post(`/api/containers/${container}/upload`,
         formData,
         {
             headers: {
@@ -1018,7 +1036,7 @@ async function writeFile(container, file) {
 }
 
 async function setupACEEditor() {
-    if($('#editor').length === 0){
+    if ($('#editor').length === 0) {
         return;
     }
     var editor = ace.edit("editor");
@@ -1061,7 +1079,7 @@ async function setupACEEditor() {
     beatifyACECss();
 }
 
-async function beatifyACECss(){
+async function beatifyACECss() {
     var beautify = ace.require("ace/ext/beautify"); // get reference to extension
     var editor = ace.edit("editor"); // get reference to editor
     beautify.beautify(editor.session);

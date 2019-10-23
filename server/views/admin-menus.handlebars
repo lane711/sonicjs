@@ -17,7 +17,7 @@
         <tbody>
           {{#each data}}
           <tr>
-            <td><a href="/admin/content/edit/{{this.contentType}}/{{ this.systemid }}">{{ this.title }}</a></td>
+            <td><a href="/admin/content/edit/{{this.data.contentType}}/{{ this.id }}">{{ this.data.title }}</a></td>
             <td>{{ contentType.description}}</td>
             <td>
               <a class="btn btn-sm btn-primary rmargin" 
