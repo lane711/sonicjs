@@ -519,7 +519,7 @@ async function createContentInstance(payload) {
     // content.data = payload;
     // this.processContentFields(payload, content);
     console.log('payload', payload);
-    if (payload.id) {
+    if (payload.id || 'id' in payload) {
         delete payload.id;
     }
 
@@ -527,6 +527,7 @@ async function createContentInstance(payload) {
         let temp = { data: payload };
         payload = temp;
     }
+
     // return this.http.post("/api/contents/", content).toPromise();
     return axiosInstance.post('/api/contents/', payload)
         .then(async function (response) {

@@ -84,7 +84,7 @@ module.exports = function (app) {
     user.logout(token, function(err) {
       if (err) return next(err);
       res.clearCookie('sonicjs_access_token');
-      res.redirect('/');
+      res.redirect('/admin');
     });
   });
 
