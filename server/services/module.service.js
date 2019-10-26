@@ -9,6 +9,12 @@ module.exports = moduleService = {
             // console.log('>>=== startup from module service');
             moduleService.processModules();
         });
+
+        eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
+            if (options) {
+                options.page.data.modules = moduleDefinitions;
+            }
+        });
     },
 
     processModules: function () {

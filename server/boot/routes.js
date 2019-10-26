@@ -43,6 +43,8 @@ module.exports = function (app) {
     await menuService.startup();
     await mediaService.startup();
     await siteSettingsService.startup();
+    await userService.startup();
+
     await eventBusService.emit('startup');
 
   })();

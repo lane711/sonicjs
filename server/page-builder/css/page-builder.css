@@ -202,6 +202,10 @@ section {
   z-index: 2;
 }
 
+.module-button {
+  right: 105px;
+}
+
 .col-button .btn-secondary {
   background-color: #6b5b95;
 }
@@ -222,7 +226,7 @@ section .col:hover {
   border: 1px dotted #6b5b95;
 }
 
-.btn-group .btn {
+.block-edit .btn {
   border-radius: 0;
 }
 

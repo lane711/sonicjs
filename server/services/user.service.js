@@ -14,13 +14,13 @@ const log = console.log;
 module.exports = userService = {
 
     startup: function () {
-        // console.log('>>=== menu startup');
 
         eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
             if (options) {
-                options.page.data.showPageBuilder = await userService.isAuthenticated(req);
+                options.page.data.showPageBuilder = await userService.isAuthenticated(options.req);
             }
         });
+        
     },
 
     getUsers: async function (menuName) {
