@@ -52,7 +52,6 @@ async function setPage() {
 }
 
 async function setContentType() {
-    // debugger;
     let contentTypeId = $('#contentTypeId').val();
     if (contentTypeId) {
         this.contentType = await getContentType(contentTypeId);

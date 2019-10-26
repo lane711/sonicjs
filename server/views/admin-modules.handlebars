@@ -19,10 +19,10 @@
         <tbody>
           {{#each data}}
           <tr>
-            <td><a href="/admin/content-types/edit/{{ this.title }}">{{ this.title }}</a></td>
+            <td><a href="/admin/modules/edit/{{ this.systemid }}">{{ this.title }}</a></td>
             <td>{{ this.version}}</td>
             <td>
-              <a class="btn btn-sm btn-primary rmargin" href="/admin/content-types/edit/{{ this.systemid }}">Edit</a>
+              <a class="btn btn-sm btn-primary rmargin" href="/admin/modules/edit/{{ this.systemid }}">Edit</a>
 
               <button class="btn btn-sm btn-danger" type="button" data-toggle="collapse"
                 data-target="#collapse{{ this.systemid }}" aria-expanded="false" aria-controls="collapseExample">

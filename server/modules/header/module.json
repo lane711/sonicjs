@@ -1,5 +1,5 @@
 {
     "title": "Core - Header",
-    "systemid": "header",
+    "systemid": "module-header",
     "version" : "0.0.0.1"
 }

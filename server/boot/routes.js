@@ -182,11 +182,15 @@ module.exports = function (app) {
       }
 
       if (viewName == "admin-content-types-edit") {
-        data.contentTypeId = param1; //await dataService.getContentType(param)
+        data.contentTypeId = param1;
       }
 
       if (viewName == "admin-modules") {
         data = await moduleService.getModules();
+      }
+
+      if (viewName == "admin-modules-edit") {
+        data.contentTypeId = param1;
       }
 
       if (viewName == "admin-media") {
