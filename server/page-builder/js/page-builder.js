@@ -981,6 +981,12 @@ async function saveWYSIWYG() {
 
 }
 
+async function addModule(systemid) {
+console.log('adding ' + systemid);
+$('#moduleSettingsModal').appendTo("body").modal('show');
+
+}
+
 async function postProcessNewContent(content) {
     // debugger;
     if (content.contentType == 'page') {
