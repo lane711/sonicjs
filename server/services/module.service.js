@@ -2,12 +2,13 @@ var dir = require('node-dir');
 var path = require("path");
 var eventBusService = require('../services/event-bus.service');
 var moduleDefinitions = [];
+
 module.exports = moduleService = {
 
     startup: function () {
-        eventBusService.on('startup', function () {
+        eventBusService.on('startup', async function () {
             // console.log('>>=== startup from module service');
-            moduleService.processModules();
+            await moduleService.processModules();
         });
 
         eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
@@ -17,12 +18,12 @@ module.exports = moduleService = {
         });
     },
 
-    processModules: function () {
+    processModules: async function () {
         let dir = path.resolve(__dirname, '..', 'modules');
 
-        moduleDefinitions = this.getModuleDefinitionFiles(dir);
-        // let moduleFolders = this.getModuleFolders(dir);
-    },
+        await this.getModuleDefinitionFiles(dir);
+
+        },
 
     getModules: async function () {
         return moduleDefinitions;
@@ -34,6 +35,13 @@ module.exports = moduleService = {
     //     });
     // },
 
+    
+    loadModuleServices: async function (moduleDefinitionsList) {
+        moduleDefinitionsList.forEach(moduleDefinition => {
+            let moduleService = moduleDefinition;
+        });
+    },
+
     getModuleDefinitionFiles: async function (path) {
         let moduleList = [];
         await dir.readFiles(path, {
@@ -43,11 +51,16 @@ module.exports = moduleService = {
             if (err) throw err;
             // console.log('content', content);
             let moduleDef = JSON.parse(content);
+            moduleDef.mainService = path;
             moduleList.push(moduleDef);
             next();
         },
             function (err, files) {
                 if (err) throw err;
+
+                //TODO: remove the above callback
+                //get module.json one line at a time
+                // then use the path to determine the mainService.js
 
                 moduleList.sort(function(a, b){
                     if(a.title < b.title) { return -1; }
@@ -56,6 +69,8 @@ module.exports = moduleService = {
                 })
 
                 moduleDefinitions = moduleList;
+
+                moduleService.loadModuleServices(moduleList);
 
                 return moduleList;
             });

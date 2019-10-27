@@ -49,7 +49,7 @@ module.exports = {
             this.page.data.rows = this.page.data.layout.rows;
             this.page.data.hasRows = true;
         }
-        
+
         return { page: this.page };
     },
 
@@ -310,10 +310,17 @@ module.exports = {
     // },
 
     processShortCodes: async function (body) {
-        let bodyBlocks = ShortcodeTree.parse(body);
-        if (bodyBlocks.children) {
-            for (let bodyBlock of bodyBlocks.children) {
+        let parsedBlock = ShortcodeTree.parse(body);
+
+
+        if (parsedBlock.children) {
+            for (let bodyBlock of parsedBlock.children) {
                 let shortcode = bodyBlock.shortcode;
+
+                //new way:
+                eventBusService.emit('beginProcessModule', { req: req, shortcode: shortcode });
+
+                //old way, TODO: refac
                 if (shortcode.name == "BLOCK") {
                     await this.replaceBlockShortCode(shortcode)
                 }
