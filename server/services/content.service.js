@@ -4,6 +4,7 @@ var listService = require('.//list.service');
 var menuService = require('.//menu.service');
 var helperService = require('.//helper.service');
 var userService = require('.//user.service');
+var globalService = require('.//global.service');
 
 
 var dataService = require('.//data.service');
@@ -18,7 +19,6 @@ var eventBusService = require('./event-bus.service');
 
 
 const apiUrl = '/api/';
-var pageContent = '';
 var page;
 var id;
 var req;
@@ -38,7 +38,7 @@ module.exports = {
         if (this.page.data[0]) {
             await this.getPage(this.page.data[0].id, this.page.data[0]);
             // this.page = this.page.data;
-            this.page.data.html = pageContent;
+            this.page.data.html = globalService.pageContent;
         }
 
         this.page.data.eventCount = 0;
@@ -112,7 +112,7 @@ module.exports = {
             await eventBusService.emit('getRenderedPagePostDataFetch', { req: req, page: blog });
 
             // let page = this.page.data[0];
-            // this.page.data.html = pageContent;
+            // this.page.data.html = globalService.pageContent;
             return { page: blog };
         }
         return 'error';
@@ -141,7 +141,7 @@ module.exports = {
     // },
 
     processTemplate: async function (html) {
-        pageContent = ''; //reset
+        globalService.pageContent = ''; //reset
         // this.setupShortCodeParser();
         // console.log('=== processTemplate ===')
         const $ = cheerio.load(html);
@@ -150,7 +150,7 @@ module.exports = {
         await this.processSections($);
 
         // await this.processPageBuilder($);
-        // console.log('section content', pageContent);
+        // console.log('section content', globalService.pageContent);
 
         return $.html();
     },
@@ -218,13 +218,13 @@ module.exports = {
 
 
                 let section = await dataService.getContentById(sectionId);
-                pageContent += `<section data-id='${section.id}' class="jumbotron-fluid">`;
-                pageContent += '<div class="overlay">';
-                pageContent += '<div class="container">';
+                globalService.pageContent += `<section data-id='${section.id}' class="jumbotron-fluid">`;
+                globalService.pageContent += '<div class="overlay">';
+                globalService.pageContent += '<div class="container">';
                 let rows = await this.processRows($, sectionWrapper, section.data.rows)
-                pageContent += '</div>';
-                pageContent += '</div>';
-                pageContent += `</section>`;
+                globalService.pageContent += '</div>';
+                globalService.pageContent += '</div>';
+                globalService.pageContent += `</section>`;
 
                 this.page.data.sections.push({ id: sectionId, title: section.data.title, rows: rows });
 
@@ -235,7 +235,7 @@ module.exports = {
             // console.log('section====>', this.page.data.sections);
 
 
-            sectionWrapper.append(pageContent);
+            sectionWrapper.append(globalService.pageContent);
         }
 
     },
@@ -245,9 +245,9 @@ module.exports = {
         let rowArray = [];
         for (const row of rows) {
             // console.log(chalk.red(JSON.stringify(row)));
-            pageContent += `<div class='row'>`;
+            globalService.pageContent += `<div class='row'>`;
             let columns = await this.processColumns(row);
-            pageContent += `</div>`;
+            globalService.pageContent += `</div>`;
 
             rowArray.push(row);
         }
@@ -260,10 +260,10 @@ module.exports = {
         for (const column of row.columns) {
 
             // console.log('== column ==', column);
-            pageContent += `<div class='${column.class}'>`;
-            pageContent += `${column.content}`;
+            globalService.pageContent += `<div class='${column.class}'>`;
+            globalService.pageContent += `${column.content}`;
             await this.processBlocks(column.content);
-            pageContent += `</div>`;
+            globalService.pageContent += `</div>`;
             columnArray.push(column);
         }
         return columnArray;
@@ -320,7 +320,7 @@ module.exports = {
                 let shortcode = bodyBlock.shortcode;
 
                 //new way:
-                eventBusService.emit('beginProcessModule', { req: this.req, pageContent: pageContent, shortcode: shortcode });
+                eventBusService.emit('beginProcessModule', { req: this.req, shortcode: shortcode });
 
                 //old way, TODO: refac
                 if (shortcode.name == "BLOCK") {
@@ -359,7 +359,7 @@ module.exports = {
         let content = await dataService.getContentById(blockId);
         // console.log('replaceShortCode.getContentById', content);
         let newBody = `<span data-id="${blockId}">${content.data.body}</span>`;
-        pageContent = pageContent.replace(shortcode.codeText, newBody);
+        globalService.pageContent = globalService.pageContent.replace(shortcode.codeText, newBody);
     },
 
 
@@ -370,7 +370,7 @@ module.exports = {
         let form = await formService.getForm(contentType);
         // console.log('replaceFormShortCode.form', form);
         let newBody = form;
-        pageContent = pageContent.replace(shortcode.codeText, newBody);
+        globalService.pageContent = globalService.pageContent.replace(shortcode.codeText, newBody);
     },
 
     replaceListShortCode: async function (shortcode) {
@@ -378,7 +378,7 @@ module.exports = {
         let contentType = shortcode.properties.contentType;
 
         let list = await listService.getList(contentType);
-        pageContent = pageContent.replace(shortcode.codeText, list);
+        globalService.pageContent = globalService.pageContent.replace(shortcode.codeText, list);
     },
 
     asyncForEach: async function (array, callback) {

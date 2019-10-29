@@ -1,5 +1,6 @@
  var dataService = require('../../../services/data.service');
 var eventBusService = require('../../../services/event-bus.service');
+var globalService = require('../../../services/global.service');
 
 
 
@@ -9,7 +10,7 @@ module.exports = mainService = {
         eventBusService.on('beginProcessModule', async function (options) {
             console.log('hello from hello')
 
-            options.pageContent = 'lane was here';
+            globalService.pageContent = 'lane was here';
             if (options && options.page) {
                 options.page.data.editForm = await formService.getForm(options.page.contentTypeId, options.page);
             }
