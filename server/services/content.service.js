@@ -21,11 +21,13 @@ const apiUrl = '/api/';
 var pageContent = '';
 var page;
 var id;
+var req;
 
 module.exports = {
 
     getRenderedPage: async function (req) {
 
+        this.req = req;
         // eventBusService.emit('getRenderedPagePreDataFetch', req);
 
         this.page = await dataService.getContentByUrl(req.url);
@@ -318,7 +320,7 @@ module.exports = {
                 let shortcode = bodyBlock.shortcode;
 
                 //new way:
-                // eventBusService.emit('beginProcessModule', { req: req, shortcode: shortcode });
+                eventBusService.emit('beginProcessModule', { req: this.req, pageContent: pageContent, shortcode: shortcode });
 
                 //old way, TODO: refac
                 if (shortcode.name == "BLOCK") {

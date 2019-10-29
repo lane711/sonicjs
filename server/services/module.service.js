@@ -39,7 +39,8 @@ module.exports = moduleService = {
     
     loadModuleServices: async function (moduleList) {
         moduleList.forEach(moduleDef => {
-            require(moduleDef.mainService)
+            let m = require(moduleDef.mainService);
+            m.startup();
         });
     },
 
@@ -50,10 +51,6 @@ module.exports = moduleService = {
             exclude: /^\./
         }, function (err, content, next) {
             if (err) throw err;
-            // console.log('content', content);
-            // let moduleDef = JSON.parse(content);
-            // moduleDef.mainService = path;
-            // moduleList.push(moduleDef);
             next();
         },
             function (err, files) {
@@ -66,9 +63,6 @@ module.exports = moduleService = {
                     moduleDef.mainService = `${path}\/${moduleFolder}\/services\/main.js`;
                     moduleList.push(moduleDef);
                 });
-                //TODO: remove the above callback
-                //get module.json one line at a time
-                // then use the path to determine the mainService.js
 
                 moduleList.sort(function(a, b){
                     if(a.title < b.title) { return -1; }
