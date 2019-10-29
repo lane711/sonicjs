@@ -318,7 +318,7 @@ module.exports = {
                 let shortcode = bodyBlock.shortcode;
 
                 //new way:
-                eventBusService.emit('beginProcessModule', { req: req, shortcode: shortcode });
+                // eventBusService.emit('beginProcessModule', { req: req, shortcode: shortcode });
 
                 //old way, TODO: refac
                 if (shortcode.name == "BLOCK") {

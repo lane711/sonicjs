@@ -1,5 +1,5 @@
 {
-    "title": "Core - Menu",
-    "systemid": "module-core-menu",
+    "title": "Menu",
+    "systemid": "module-menu",
     "version" : "0.0.0.1"
 }

@@ -1,5 +1,6 @@
 var dir = require('node-dir');
 var path = require("path");
+var fs = require('fs');
 var eventBusService = require('../services/event-bus.service');
 var moduleDefinitions = [];
 
@@ -36,9 +37,9 @@ module.exports = moduleService = {
     // },
 
     
-    loadModuleServices: async function (moduleDefinitionsList) {
-        moduleDefinitionsList.forEach(moduleDefinition => {
-            let moduleService = moduleDefinition;
+    loadModuleServices: async function (moduleList) {
+        moduleList.forEach(moduleDef => {
+            require(moduleDef.mainService)
         });
     },
 
@@ -50,14 +51,21 @@ module.exports = moduleService = {
         }, function (err, content, next) {
             if (err) throw err;
             // console.log('content', content);
-            let moduleDef = JSON.parse(content);
-            moduleDef.mainService = path;
-            moduleList.push(moduleDef);
+            // let moduleDef = JSON.parse(content);
+            // moduleDef.mainService = path;
+            // moduleList.push(moduleDef);
             next();
         },
             function (err, files) {
                 if (err) throw err;
 
+                files.forEach(file => {
+                    let raw = fs.readFileSync(file);
+                    let moduleDef = JSON.parse(raw);
+                    let moduleFolder = moduleDef.systemid.replace('module-', '');
+                    moduleDef.mainService = `${path}\/${moduleFolder}\/services\/main.js`;
+                    moduleList.push(moduleDef);
+                });
                 //TODO: remove the above callback
                 //get module.json one line at a time
                 // then use the path to determine the mainService.js
