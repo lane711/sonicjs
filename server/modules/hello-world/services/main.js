@@ -1,4 +1,4 @@
- var dataService = require('../../../services/data.service');
+var dataService = require('../../../services/data.service');
 var eventBusService = require('../../../services/event-bus.service');
 var globalService = require('../../../services/global.service');
 
@@ -7,13 +7,17 @@ var globalService = require('../../../services/global.service');
 module.exports = mainService = {
 
     startup: async function () {
-        eventBusService.on('beginProcessModule', async function (options) {
-            console.log('hello from hello')
+        eventBusService.on('beginProcessModuleShortCode', async function (options) {
 
-            globalService.pageContent = 'lane was here';
-            if (options && options.page) {
-                options.page.data.editForm = await formService.getForm(options.page.contentTypeId, options.page);
+            if (options.shortcode.name === 'MODULE-HELLO-WORLD') {
+                let blockId = options.shortcode.properties.id;
+                let contentType = options.shortcode.properties.contentType;
+
+                // let form = await formService.getForm(contentType);
+
+                globalService.pageContent = globalService.pageContent.replace(options.shortcode.codeText, 'processed module view here');
             }
+
         });
     },
 
