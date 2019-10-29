@@ -1,4 +1,6 @@
 var dataService = require('./data.service');
+var viewService = require('./view.service');
+
 var helperService = require('./helper.service');
 
 var fs = require('fs');
@@ -15,13 +17,6 @@ module.exports = {
 
     getList: async function (contentType) {
 
-        var source = await this.getHandlebarsTemplate(contentType);
-        var template = handlebars.compile(source);
-
-        // var data = {
-        //     "name": "Alan", "hometown": "Somewhere, TX",
-        //     "kids": [{ "name": "Jimmy", "age": "12" }, { "name": "Sally", "age": "4" }]
-        // };
         var data = await dataService.getContentByType(contentType);
 
         let viewModel = data.map(function (record) {
@@ -32,30 +27,10 @@ module.exports = {
                 url: record.data.url
             };
         });
-        // console.log('getList data ====>', data);
-        // console.log('getList viewModel ====>', viewModel);
 
-        var result = template(viewModel);
-
-        // console.log('resulr', result);
+        var result = await viewService.getProccessedView(contentType, viewModel);
 
         return result;
     },
 
-    getHandlebarsTemplate: async function (contentType) {
-        let themePath = __dirname + `/../views/partials/${contentType}/list.handlebars`;
-
-        return new Promise((resolve, reject) => {
-            fs.readFile(themePath, "utf8", (err, data) => {
-                if (err) {
-                    console.log(err);
-                    reject(err);
-                }
-                else {
-                    // console.log('getHandlebarsTemplate==>', data);
-                    resolve(data);
-                }
-            });
-        });
-    }
 }
