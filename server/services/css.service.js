@@ -33,10 +33,9 @@ module.exports = cssService = {
     },
 
     getCssLinks: async function (options) {
-
+        options.page.data.cssLinks = [];
         globalService.moduleCssFiles.forEach(link => {
             options.page.data.cssLinks += `<link href="${link}" rel="stylesheet">`;
-
         });
     },
 
@@ -63,7 +62,7 @@ module.exports = cssService = {
         let cleanCss = csstree.generate(ast);
         let beatifulCss = cssbeautify(cleanCss);
 
-        page.data.editor = { "css" : beatifulCss} ;
+        page.data.editor = { "css": beatifulCss };
     },
 
 

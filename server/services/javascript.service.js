@@ -33,9 +33,9 @@ module.exports = javascriptService = {
 
     getJsLinks: async function (options) {
 
+        options.page.data.jsLinks = [];
         globalService.moduleJsFiles.forEach(link => {
             options.page.data.jsLinks += `<script src="${link}"></script>`;
-
         });
     },
 
