@@ -35,7 +35,7 @@ module.exports = cssService = {
     getCssLinks: async function (options) {
 
         globalService.moduleCssFiles.forEach(link => {
-            options.page.cssLinks += `<link href="${link}" rel="stylesheet">`;
+            options.page.data.cssLinks += `<link href="${link}" rel="stylesheet">`;
 
         });
     },

@@ -120,9 +120,16 @@ module.exports = moduleService = {
 
                 files.forEach(file => {
                     if (file.indexOf('assets/js') > -1) {
-                        globalService.moduleJsFiles.push(file);
+                        let link = file.substr(file.indexOf('/server/') + 7, file.length);
+                        globalService.moduleJsFiles.push(link);
                     }
                 });
+
+                // files.forEach(file => {
+                //     if (file.indexOf('assets/js') > -1) {
+                //         globalService.moduleJsFiles.push(file);
+                //     }
+                // });
 
             });
     },

@@ -17,10 +17,12 @@ var siteSettingsService = require('../services/site-settings.service');
 var contentService = require('../services/content.service');
 var cssService = require('../services/css.service');
 cssService.startup();
+var javascriptService = require('../services/javascript.service');
+javascriptService.startup();
 var userService = require('../services/user.service');
 
+const path = require("path");
 var cors = require('cors');
-
 const chalk = require('chalk');
 const log = console.log;
 
@@ -120,6 +122,13 @@ module.exports = function (app) {
 
   app.get('*', async function (req, res, next) {
 
+    //for modules css/js files
+    if((req.url.endsWith('.css') || req.url.endsWith('.js')) && req.url.startsWith('/modules/')){
+      let cssFile = path.join(__dirname, '..', req.url);
+      // res.set('Content-Type', 'text/css');
+      res.sendFile(cssFile);
+      return;
+    }
 
     if (req.url === '/explorer' || req.url.startsWith('/api')
       || req.url.endsWith('.css') || req.url.endsWith('.html') || req.url.endsWith('.ico') || req.url.endsWith('.map')
