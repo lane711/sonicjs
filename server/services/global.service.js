@@ -2,6 +2,9 @@ var eventBusService = require('./event-bus.service');
    
 var baseUrl;
 var pageContent;
+var moduleDefinitions = [];
+var moduleCssFiles = [];
+var moduleJsFiles = [];
 
 module.exports = globalService = {
 

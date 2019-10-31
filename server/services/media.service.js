@@ -52,4 +52,10 @@ module.exports = mediaService = {
             console.log(error);
         });
     },
+
+    addMediaUrl: async function (mediaList) {
+        mediaList.forEach(media => {
+            media.data.url = `/api/containers/container1/download/${media.data.file}`;
+        });
+    }
 }

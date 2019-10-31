@@ -110,6 +110,17 @@ module.exports = {
         return 'not found';
     },
 
+    getContentByContentTypeAndTag: async function (contentType, tag) {
+        const filter = `{"where":{"and":[{"data.tags":{"regexp": "${tag}"}},{"data.contentType":"${contentType}"}]}}`;
+        const encodedFilter = encodeURI(filter);
+        let url = `${apiUrl}contents?filter=${encodedFilter}`;
+        let pageRecord = await axiosInstance.get(url);
+        if (pageRecord.data) {
+            return pageRecord.data;
+        }
+        return 'not found';
+    },
+
     getContentByUrlAndContentType: async function (contentType, pageUrl) {
         const filter = `{"where":{"and":[{"url":"${pageUrl}"},{"data.contentType":"${contentType}"}]}}`;
         const encodedFilter = encodeURI(filter);

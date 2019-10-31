@@ -1,6 +1,8 @@
 var dataService = require('./data.service');
 var helperService = require('./helper.service');
 var fileService = require('./file.service');
+var moduleService = require('./module.service');
+var globalService = require('./global.service');
 
 var eventBusService = require('./event-bus.service');
 const css = require('css');
@@ -15,6 +17,7 @@ module.exports = cssService = {
         eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
             if (options && options.page) {
                 await cssService.getCssFile(options.page);
+                await cssService.getCssLinks(options);
             }
         });
     },
@@ -27,6 +30,14 @@ module.exports = cssService = {
 
         let cssFile = css.stringify(ast);
         return cssFile;
+    },
+
+    getCssLinks: async function (options) {
+
+        globalService.moduleCssFiles.forEach(link => {
+            options.page.cssLinks += `<link href="${link}" rel="stylesheet">`;
+
+        });
     },
 
     processSections: async function (cssString) {

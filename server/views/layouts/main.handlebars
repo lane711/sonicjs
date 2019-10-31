@@ -38,13 +38,17 @@
   {{#unless page.data.showPageBuilder}}
   <link href="/api/containers/css/download/template.css" rel="stylesheet">
   {{/unless}}
-  
+
   {{#if page.data.showPageBuilder}}
   <link href="/css/page-builder.css" rel="stylesheet">
   {{/if}}
 
   <link href="/css/font-awesome.css" rel="stylesheet">
   <link href="/jsoneditor.min.css" rel="stylesheet">
+  <link href="/node_modules/photoswipe/dist/photoswipe.css" rel="stylesheet">
+  <link href="/node_modules/photoswipe/dist/default-skin/default-skin.css" rel="stylesheet">
+  {{{page.cssLinks}}}
+
   {{!-- <link href="/css/generated.css" rel="stylesheet"> --}}
 
   {{!-- <link href="/formio.full.min.css" rel="stylesheet"> --}}
@@ -85,7 +89,7 @@
   <script src="/js/jquery.tinymce.min.js"></script>
   <script src="/jsoneditor.min.js"></script>
   <script src="/formio.full.min.js"></script>
-
+  {{{jsLinks}}}
 
 </body>
 
