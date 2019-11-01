@@ -103,6 +103,7 @@ module.exports = formService = {
             key: 'id',
             label: 'id',
             defaultValue: id,
+            hidden: true,
             input: true
         });
 

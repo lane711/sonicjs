@@ -7,7 +7,7 @@
         <a href="{{this.data.url}}" itemprop="contentUrl" data-size="600x400">
             <img src="{{this.data.url}}" class="thumbnail" itemprop="thumbnail" alt="Image description" />
         </a>
-        <figcaption itemprop="caption description">Image caption</figcaption>
+        <figcaption class="title" itemprop="caption description">{{this.data.title}}<span class="description">{{this.data.description}}</span></figcaption>
     </figure>
 
     {{/each}}

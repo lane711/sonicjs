@@ -32,7 +32,7 @@ module.exports = moduleService = {
     },
 
     getModules: async function () {
-        return moduleDefinitions;
+        return globalService.moduleDefinitions;
     },
 
     // getModuleFolders: function (path) {
