@@ -8,7 +8,7 @@
         <div class="card-body page-list">
 
 
-            <form action="/api/containers/container1/upload" class="dropzone" id="my-awesome-dropzone"></form>
+            <form class="dropzone2" id="sonicjs-dropzone"></form>
 
             <div class="row">
                 {{#each data}}
@@ -16,8 +16,8 @@
 
                 <div class="col-md-3">
                     <div class="thumbnail">
-                        <a href="/api/containers/container1/download/{{ this.name }}">
-                            <img src="/api/containers/container1/download/{{ this.name }}"
+                        <a href="/api/containers/files/download/{{ this.name }}">
+                            <img src="/api/containers/files/download/{{ this.name }}"
                                 style="width:100%">
                             <div class="caption">
                                 <p>{{this.name}}</p>

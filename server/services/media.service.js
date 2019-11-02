@@ -40,7 +40,7 @@ module.exports = mediaService = {
     },
 
     getMedia: async function () {
-        let url = '/api/containers/container1/files';
+        let url = '/api/containers/files/files';
         return axiosInstance.get(url)
         .then(async function (record) {
             if (record.data) {
@@ -55,7 +55,7 @@ module.exports = mediaService = {
 
     addMediaUrl: async function (mediaList) {
         mediaList.forEach(media => {
-            media.data.url = `/api/containers/container1/download/${media.data.file}`;
+            media.data.url = `/api/containers/files/download/${media.data.file}`;
         });
     }
 }

@@ -2,13 +2,14 @@
     margin-bottom: 0;
 }
 
-.card .dropzone{
+.card .dropzone2{
     margin: 0 0 60px;
     border: 4px dashed #c8ced3;
     background: #f0f3f5;
+    height: 100px;
 }
 
-.card .dropzone span{
+.card .dropzone2 span{
     font-size: 2rem;
 }
 

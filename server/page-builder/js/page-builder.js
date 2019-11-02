@@ -21,6 +21,7 @@ $(document).ready(async function () {
 
     setupFormBuilder(contentType);
     await setupACEEditor();
+    await setupDropZone();
 });
 
 async function setupAxiosInstance() {
@@ -1082,6 +1083,21 @@ async function setupACEEditor() {
     });
 
     beatifyACECss();
+}
+
+async function setupDropZone(){
+    Dropzone.autoDiscover = false;
+
+    $("#sonicjs-dropzone").dropzone({
+        url: "/api/containers/files/upload",
+        addRemoveLinks : true,
+        maxFilesize: 5,
+        dictDefaultMessage: '<span class="text-center"><span class="font-lg visible-xs-block visible-sm-block visible-lg-block"><span class="font-lg"><i class="fa fa-caret-right text-danger"></i> Drop files <span class="font-xs">to upload</span></span><span>&nbsp&nbsp<h4 class="display-inline"> (Or Click)</h4></span>',
+        dictResponseError: 'Error uploading file!',
+        headers: {
+            'Authorization': $('#token').val()
+        }
+    });
 }
 
 async function beatifyACECss() {
