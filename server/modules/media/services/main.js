@@ -17,8 +17,9 @@ module.exports = mediaMainService = {
                 let viewPath = __dirname + `/../views/main.handlebars`;
                 let viewModel = await dataService.getContentById(id);
                 let files = await dataService.getContentByContentTypeAndTag('media', viewModel.data.tags);
-                await mediaService.addMediaUrl(files);
-                viewModel.data.files = files;
+                let sortedFiles = files.sort((a, b) => (a.data.sortOrder > b.data.sortOrder) ? 1 : -1)
+                await mediaService.addMediaUrl(sortedFiles);
+                viewModel.data.files = sortedFiles;
                 let proccessedHtml = await mediaMainService.processView(contentType, viewModel, viewPath);
 
                 globalService.pageContent = globalService.pageContent.replace(options.shortcode.codeText, proccessedHtml);

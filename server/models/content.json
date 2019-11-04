@@ -20,6 +20,9 @@
   },
   "validations": [],
   "relations": {},
+  "scope": {
+    "order": "data.sort"
+  },
   "acls": [
     {
       "accessType": "WRITE",

@@ -111,6 +111,7 @@ module.exports = {
     },
 
     getContentByContentTypeAndTag: async function (contentType, tag) {
+        //TODO: add {"order":"data.sort ASC"},
         const filter = `{"where":{"and":[{"data.tags":{"regexp": "${tag}"}},{"data.contentType":"${contentType}"}]}}`;
         const encodedFilter = encodeURI(filter);
         let url = `${apiUrl}contents?filter=${encodedFilter}`;
