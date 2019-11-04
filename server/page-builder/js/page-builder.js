@@ -464,12 +464,6 @@ async function deleteBlock() {
     fullPageUpdate();
 }
 
-createContentInstance2 = async () => {
-    let res = await axiosInstance.get("https://reqres.in/api/users?page=1");
-    let { data } = await res.data;
-    this.setState({ users: data });
-};
-
 async function getContentInstance(id) {
     return axiosInstance.get(`/api/contents/${id}`)
         .then(async function (response) {
@@ -982,8 +976,8 @@ async function saveWYSIWYG() {
 }
 
 async function addModule(systemid) {
-console.log('adding ' + systemid);
-$('#moduleSettingsModal').appendTo("body").modal('show');
+    console.log('adding ' + systemid);
+    $('#moduleSettingsModal').appendTo("body").modal('show');
 
 }
 
@@ -1085,19 +1079,62 @@ async function setupACEEditor() {
     beatifyACECss();
 }
 
-async function setupDropZone(){
+async function setupDropZone() {
+
     Dropzone.autoDiscover = false;
 
-    $("#sonicjs-dropzone").dropzone({
-        url: "/api/containers/files/upload",
-        addRemoveLinks : true,
-        maxFilesize: 5,
-        dictDefaultMessage: '<span class="text-center"><span class="font-lg visible-xs-block visible-sm-block visible-lg-block"><span class="font-lg"><i class="fa fa-caret-right text-danger"></i> Drop files <span class="font-xs">to upload</span></span><span>&nbsp&nbsp<h4 class="display-inline"> (Or Click)</h4></span>',
-        dictResponseError: 'Error uploading file!',
-        headers: {
-            'Authorization': $('#token').val()
-        }
-    });
+    var myDropzone = $("#sonicjs-dropzone").dropzone(
+        {
+            url: "/api/containers/files/upload",
+            addRemoveLinks: true,
+            maxFilesize: 5,
+            dictDefaultMessage: '<span class="text-center"><span class="font-lg visible-xs-block visible-sm-block visible-lg-block"><span class="font-lg"><i class="fa fa-caret-right text-danger"></i> Drop files <span class="font-xs">to upload</span></span><span>&nbsp&nbsp<h4 class="display-inline"> (Or Click)</h4></span>',
+            dictResponseError: 'Error uploading file!',
+            headers: {
+                'Authorization': $('#token').val()
+            },
+            accept: async function (file, done) {
+                let title = file.name.replace(/\.[^/.]+$/, "")
+                let payload = {
+                    data: {
+                        title: title,
+                        file: file.name,
+                        contentType: 'media'
+                    }
+                }
+                await createContentInstance(payload);
+                done();
+            }
+        });
+
+    // debugger;
+    // Dropzone.options.myDropzone = {
+    //     paramName: "file", // The name that will be used to transfer the file
+    //     maxFilesize: 2, // MB
+    //     accept: function(file, done) {
+    //       if (file.name == "justinbieber.jpg") {
+    //         done("Naha, you don't.");
+    //       }
+    //       else { done(); }
+    //     }
+    //   };
+
+    // Dropzone.autoDiscover = false;
+
+    // let sonicDropzone = $("#sonicjs-dropzone").dropzone({
+    //     url: "/api/containers/files/upload",
+    //     addRemoveLinks : true,
+    //     maxFilesize: 5,
+    //     dictDefaultMessage: '<span class="text-center"><span class="font-lg visible-xs-block visible-sm-block visible-lg-block"><span class="font-lg"><i class="fa fa-caret-right text-danger"></i> Drop files <span class="font-xs">to upload</span></span><span>&nbsp&nbsp<h4 class="display-inline"> (Or Click)</h4></span>',
+    //     dictResponseError: 'Error uploading file!',
+    //     headers: {
+    //         'Authorization': $('#token').val()
+    //     }
+    // });
+
+    // sonicDropzone.on("complete", function (file) {
+    //     debugger;
+    // });
 }
 
 async function beatifyACECss() {
