@@ -6,7 +6,7 @@
     "RoleMapping": 1,
     "Role": 1,
     "contentType": 23,
-    "content": 105,
+    "content": 106,
     "fieldType": 2,
     "e2e-test": 2
   },
@@ -48,8 +48,7 @@
       "1PSP7WfoIoxMTxmO3T8oPuukXpbDmg72CEsfSAIG5xpYWO7JCFKf7e4j260EYLJF": "{\"id\":\"1PSP7WfoIoxMTxmO3T8oPuukXpbDmg72CEsfSAIG5xpYWO7JCFKf7e4j260EYLJF\",\"ttl\":1209600,\"created\":\"2019-10-26T15:05:29.785Z\",\"userId\":1}",
       "KgnoSG5HDsV4ZEyQfopYYUCOmthZTkONIkZMhPQO8mFxijBgnKvkMeiHwNZS9XHO": "{\"id\":\"KgnoSG5HDsV4ZEyQfopYYUCOmthZTkONIkZMhPQO8mFxijBgnKvkMeiHwNZS9XHO\",\"ttl\":1209600,\"created\":\"2019-10-27T01:13:53.014Z\",\"userId\":1}",
       "IJcc89b9guEvdPjYKzSXs6SuV5ULpR8uUQmvGFNpfwaqVYLuBnzZzmBBfuoAlkC3": "{\"id\":\"IJcc89b9guEvdPjYKzSXs6SuV5ULpR8uUQmvGFNpfwaqVYLuBnzZzmBBfuoAlkC3\",\"ttl\":1209600,\"created\":\"2019-10-29T21:42:59.047Z\",\"userId\":1}",
-      "PiJHnVj95KPnUNKZM48V5G5niVA2ugV7fDjaB6hzE8p3VKRj5udLadNBF6kt1m4I": "{\"id\":\"PiJHnVj95KPnUNKZM48V5G5niVA2ugV7fDjaB6hzE8p3VKRj5udLadNBF6kt1m4I\",\"ttl\":1209600,\"created\":\"2019-11-01T22:46:57.562Z\",\"userId\":1}",
-      "YhmnL421Gqq9pXzJOvxzadCt5h7b8OBxYvqKHd1s9JDbPm3FlE7b0CKqnyhLg1S4": "{\"id\":\"YhmnL421Gqq9pXzJOvxzadCt5h7b8OBxYvqKHd1s9JDbPm3FlE7b0CKqnyhLg1S4\",\"ttl\":1209600,\"created\":\"2019-11-05T00:43:07.086Z\",\"userId\":1}"
+      "PiJHnVj95KPnUNKZM48V5G5niVA2ugV7fDjaB6hzE8p3VKRj5udLadNBF6kt1m4I": "{\"id\":\"PiJHnVj95KPnUNKZM48V5G5niVA2ugV7fDjaB6hzE8p3VKRj5udLadNBF6kt1m4I\",\"ttl\":1209600,\"created\":\"2019-11-01T22:46:57.562Z\",\"userId\":1}"
     },
     "ACL": {},
     "RoleMapping": {},
@@ -142,7 +141,8 @@
       "101": "{\"id\":101,\"data\":{\"title\":\"NodeJs CMS - Field Types\",\"description\":\"Field types are the building blocks of content types and allow you to custom tailor the content editing forms used to manage site content.\",\"file\":\"NodeJs CMS - Field Types.png\",\"sortOrder\":12,\"contentType\":\"media\",\"createdOn\":1572896418218,\"tags\":\"Home\",\"submit\":true}}",
       "102": "{\"data\":{\"title\":\"Test 1\",\"heroTitle\":\"sdf\",\"pageCssClass\":\"sdf\",\"url\":\"/sdf\",\"contentType\":\"page\",\"submit\":true,\"createdOn\":1572915883474},\"id\":102}",
       "103": "{\"data\":{\"title\":\"wty\",\"heroTitle\":\"erty\",\"pageCssClass\":\"erty\",\"url\":\"rety\",\"contentType\":\"page\",\"submit\":true,\"createdOn\":1572916781772},\"id\":103}",
-      "104": "{\"data\":{\"title\":\"wty\",\"heroTitle\":\"erty\",\"pageCssClass\":\"erty\",\"url\":\"rety\",\"contentType\":\"page\",\"submit\":true,\"createdOn\":1572916946858},\"id\":104}"
+      "104": "{\"data\":{\"title\":\"wty\",\"heroTitle\":\"erty\",\"pageCssClass\":\"erty\",\"url\":\"rety\",\"contentType\":\"page\",\"submit\":true,\"createdOn\":1572916946858},\"id\":104}",
+      "105": "{\"data\":{\"name\":\"wdf\",\"email2\":\"wf@sd.com\",\"message\":\"kjhwdf\",\"contentType\":\"contact\",\"submit\":true,\"createdOn\":1572923726106},\"id\":105}"
     },
     "fieldType": {
       "1": "{\"name\":\"string\",\"renderFunction\":\"string\",\"id\":1}"
