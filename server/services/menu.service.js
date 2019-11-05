@@ -39,6 +39,7 @@ module.exports = menuService = {
                 menu.push({
                     url: item.url,
                     title: item.title,
+                    active: item.active,
                     hasChildren: hasChildren,
                     childLinks: childLinks
                 });
