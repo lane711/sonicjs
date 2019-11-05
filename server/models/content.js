@@ -1,4 +1,5 @@
 'use strict';
+var eventBusService = require('../services/event-bus.service');
 var path = require("path");
 
 var contentService = require(path.join(__dirname, '../', 'services/content.service'));
@@ -10,13 +11,16 @@ module.exports = function (Content) {
   //   let x = 1;
   // });
 
-  Content.observe('before save', function filterProperties(ctx, next) {
+  Content.observe('before save', async function filterProperties(ctx, next) {
     if (ctx.options && ctx.options.skipPropertyFilter) return next();
     if (ctx.instance && ctx.instance.data) {
       var date = + new Date()
       ctx.instance.data.createdOn = date;
       ctx.instance.data.updatedOn = undefined;
     }
+
+    await eventBusService.emit('beforeSave', { instance: ctx.instance.data });
+
 
     next();
   });

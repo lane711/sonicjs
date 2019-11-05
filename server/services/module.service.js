@@ -12,6 +12,7 @@ module.exports = moduleService = {
         eventBusService.on('startup', async function () {
             // console.log('>>=== startup from module service');
             await moduleService.processModules();
+
         });
 
         eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
@@ -43,10 +44,13 @@ module.exports = moduleService = {
 
 
     loadModuleServices: async function (moduleList) {
-        moduleList.forEach(moduleDef => {
+        moduleList.forEach(async function(moduleDef){
             let m = require(moduleDef.mainService);
-            m.startup();
+            await m.startup();
         });
+
+        eventBusService.emit('modulesLoaded');
+
     },
 
     getModuleDefinitionFiles: async function (path) {
@@ -58,7 +62,7 @@ module.exports = moduleService = {
             if (err) throw err;
             next();
         },
-            function (err, files) {
+            async function (err, files) {
                 if (err) throw err;
 
                 files.forEach(file => {
@@ -77,7 +81,7 @@ module.exports = moduleService = {
 
                 globalService.moduleDefinitions = moduleList;
 
-                moduleService.loadModuleServices(moduleList);
+                await moduleService.loadModuleServices(moduleList);
 
                 return moduleList;
             });

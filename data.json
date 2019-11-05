@@ -6,7 +6,7 @@
     "RoleMapping": 1,
     "Role": 1,
     "contentType": 23,
-    "content": 102,
+    "content": 105,
     "fieldType": 2,
     "e2e-test": 2
   },
@@ -139,7 +139,10 @@
       "98": "{\"id\":98,\"data\":{\"title\":\"NodeJs CMS - Edit Content\",\"description\":\"Once your content types are defined, use the automatically generated content edit forms to manage site content.\",\"file\":\"NodeJs CMS - Edit Content.png\",\"contentType\":\"media\",\"createdOn\":1572896213359,\"tags\":\"Home\",\"sortOrder\":10,\"submit\":true}}",
       "99": "{\"data\":{\"title\":\"NodeJs CMS - Content Manager\",\"file\":\"NodeJs CMS - Content Manager.png\",\"contentType\":\"media\",\"createdOn\":1572886676759},\"id\":99}",
       "100": "{\"id\":100,\"data\":{\"title\":\"NodeJs CMS - Dashboard\",\"description\":\"Your admin dashboard can be setup to display site KPIs.\",\"file\":\"NodeJs CMS - Dashboard.png\",\"contentType\":\"media\",\"createdOn\":1572896288991,\"tags\":\"Home\",\"sortOrder\":1,\"submit\":true}}",
-      "101": "{\"id\":101,\"data\":{\"title\":\"NodeJs CMS - Field Types\",\"description\":\"Field types are the building blocks of content types and allow you to custom tailor the content editing forms used to manage site content.\",\"file\":\"NodeJs CMS - Field Types.png\",\"sortOrder\":12,\"contentType\":\"media\",\"createdOn\":1572896418218,\"tags\":\"Home\",\"submit\":true}}"
+      "101": "{\"id\":101,\"data\":{\"title\":\"NodeJs CMS - Field Types\",\"description\":\"Field types are the building blocks of content types and allow you to custom tailor the content editing forms used to manage site content.\",\"file\":\"NodeJs CMS - Field Types.png\",\"sortOrder\":12,\"contentType\":\"media\",\"createdOn\":1572896418218,\"tags\":\"Home\",\"submit\":true}}",
+      "102": "{\"data\":{\"title\":\"Test 1\",\"heroTitle\":\"sdf\",\"pageCssClass\":\"sdf\",\"url\":\"/sdf\",\"contentType\":\"page\",\"submit\":true,\"createdOn\":1572915883474},\"id\":102}",
+      "103": "{\"data\":{\"title\":\"wty\",\"heroTitle\":\"erty\",\"pageCssClass\":\"erty\",\"url\":\"rety\",\"contentType\":\"page\",\"submit\":true,\"createdOn\":1572916781772},\"id\":103}",
+      "104": "{\"data\":{\"title\":\"wty\",\"heroTitle\":\"erty\",\"pageCssClass\":\"erty\",\"url\":\"rety\",\"contentType\":\"page\",\"submit\":true,\"createdOn\":1572916946858},\"id\":104}"
     },
     "fieldType": {
       "1": "{\"name\":\"string\",\"renderFunction\":\"string\",\"id\":1}"
