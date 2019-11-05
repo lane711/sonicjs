@@ -2,6 +2,7 @@ var dataService = require('../../../services/data.service');
 var eventBusService = require('../../../services/event-bus.service');
 var globalService = require('../../../services/global.service');
 var viewService = require('../../../services/view.service');
+var emailService = require('../../../services/email.service');
 
 
 
@@ -12,28 +13,16 @@ module.exports = contactUsMainService = {
 
             if (options.instance.contentType === 'contact') {
 
-                var helper = require('sendgrid').mail;
-                var from_email = new helper.Email('ldc0618@gmail.com');
-                var to_email = new helper.Email('ldc0618@gmail.com');
-                var subject = 'Hello World from the SendGrid Node.js Library!';
-                var content = new helper.Content('text/plain', 'Hello, Email!');
-                var mail = new helper.Mail(from_email, subject, to_email, content);
+                let contact = options.instance;
 
-                var sg = require('sendgrid')(process.env.SENDGRID_API_KEY);
-                var request = sg.emptyRequest({
-                    method: 'POST',
-                    path: '/v3/mail/send',
-                    body: mail.toJSON(),
-                });
+                //confirmation to user
+                let body = `Hi ${contact.name}, \n\nThanks for reaching out. We'll get back to you ASAP.\n\nFor your reference, here was your message:\n${contact.message}`
+                emailService.sendEmail(contact.email, 'admin@sonicjs.com', 'SoncisJs Message Recieved', body);
 
-                sg.API(request, function (error, response) {
-                    if(error){
-                        console.log(error);
-                    }
-                    console.log(response.statusCode);
-                    console.log(response.body);
-                    console.log(response.headers);
-                });
+                //admin notification
+                let adminBody = `${contact.name} (${contact.email}) wrote: \n\n${contact.message}`
+                emailService.sendEmail('admin@sonicjs.com', contact.email, 'SoncisJs Contact', adminBody);
+
 
             }
             // if (options.shortcode.name === 'MODULE-HELLO-WORLD') {
