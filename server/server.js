@@ -1,4 +1,6 @@
 'use strict';
+require('dotenv').config()
+console.log(`Your port is ${process.env.PORT}`); // 8626
 
 var loopback = require('loopback');
 var boot = require('loopback-boot');

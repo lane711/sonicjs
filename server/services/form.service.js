@@ -37,10 +37,17 @@ module.exports = formService = {
             contentType = await dataService.getContentType(contentTypeId);
         }
 
-        let fieldsDef = await this.getFormDefinition(contentType, content);
+        let name = `${contentType.systemid}Form`;
+        let settings = await this.getFormSettings(contentType, content);
+        let components = await this.getFormComponents(contentType, content);
+        const formJSON = {
+            "components": components,
+            "name": name,
+            "settings": settings
+        }
 
-        let form = "<script type='text/javascript'> const components = ";
-        form += JSON.stringify(fieldsDef);
+        let form = "<script type='text/javascript'> const formJSON = ";
+        form += JSON.stringify(formJSON);
         form += "</script>";
 
 
@@ -74,7 +81,16 @@ module.exports = formService = {
         });
     },
 
-    getFormDefinition: async function (contentType, content) {
+    getFormSettings: async function (contentType, content) {
+        let settings = {};
+        settings.recaptcha = {
+            "isEnabled": "true", 
+            "siteKey": process.env.RECAPTCHA_SITE_KEY
+        }
+            return settings;
+    },
+
+    getFormComponents: async function (contentType, content) {
 
         // let contentTypeDef = await dataService.getContentType(content.data.contentType);
         // console.log('contentTypeDef', contentTypeDef);
@@ -88,6 +104,7 @@ module.exports = formService = {
                 key: 'contentType',
                 label: 'contentType',
                 defaultValue: contentType.systemid,
+                hidden: true,
                 input: true
             });
         }

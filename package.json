@@ -29,6 +29,7 @@
     "css": "^2.2.4",
     "css-tree": "^1.0.0-alpha.35",
     "cssbeautify": "^0.3.1",
+    "dotenv": "^8.2.0",
     "express-handlebars": "^3.1.0",
     "flag-icon-css": "^3.3.0",
     "font-awesome": "^4.7.0",

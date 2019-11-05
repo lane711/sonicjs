@@ -16,7 +16,7 @@ module.exports = contactUsMainService = {
                 let contact = options.instance;
 
                 //confirmation to user
-                let body = `Hi ${contact.name}, \n\nThanks for reaching out. We'll get back to you ASAP.\n\nFor your reference, here was your message:\n${contact.message}`
+                let body = `Hi ${contact.name}, \n\nThanks for reaching out. We'll get back to you ASAP.\n\nFor your reference, here was your message:\n\n${contact.message}`
                 emailService.sendEmail(contact.email, 'admin@sonicjs.com', 'SoncisJs Message Recieved', body);
 
                 //admin notification

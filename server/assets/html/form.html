@@ -31,9 +31,7 @@
     //                 ]
 
     window.onload = async function () {
-        Formio.createForm(document.getElementById('formio'), {
-            components: components
-        }).then((form) => {
+        Formio.createForm(document.getElementById('formio'), formJSON).then((form) => {
             console.log('log form', form);
 
             if (formValuesToLoad) {
