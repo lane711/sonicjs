@@ -153,6 +153,11 @@ module.exports = function (app) {
     }
     else if (req.url.startsWith('/admin')) {
       //
+
+      if(process.env.MODE !== 'dev'){
+        res.send(401);
+      }
+
       let path = req.url.split("/");
       let viewName = "admin-dashboard";
       let param1 = null;
