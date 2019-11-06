@@ -148,6 +148,11 @@ module.exports = function (app) {
       res.render('blog', page);
     }
     else if (req.url.startsWith('/admin') && !await userService.isAuthenticated(req)) {
+
+      if(process.env.MODE !== 'dev'){
+        res.send(401);
+      }
+      
       let data = {};
       res.render('admin-login', { layout: 'login.handlebars', data: data });
     }
