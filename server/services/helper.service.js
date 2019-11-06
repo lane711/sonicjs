@@ -1,4 +1,5 @@
 var dataService = require('./data.service');
+var sanitizeHtml = require('sanitize-html');
 
 var fs = require('fs');
 const cheerio = require('cheerio')
@@ -22,7 +23,13 @@ module.exports = {
 
     truncateString: function (body, length) {
         if (body) {
-            return (body.length > length) ? body.substr(0, length - 1) + '&hellip;' : body;
+
+            let cleanHtml = sanitizeHtml(body, {
+                allowedTags: [],
+                allowedAttributes: false
+              });
+
+            return (cleanHtml.length > length) ? cleanHtml.substr(0, length - 1) + '&hellip;' : cleanHtml;
         }
     },
 

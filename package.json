@@ -51,6 +51,7 @@
     "popper.js": "^1.15.0",
     "puppeteer": "^1.13.0",
     "rxjs": "6.3.3",
+    "sanitize-html": "^1.20.1",
     "sendgrid": "^5.2.3",
     "serve-favicon": "^2.0.1",
     "shortcode-tree": "^1.4.14",
