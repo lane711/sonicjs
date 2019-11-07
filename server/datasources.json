@@ -18,7 +18,7 @@
     "name": "storage",
     "connector": "loopback-component-storage",
     "provider": "amazon",
-    "key": "5Q1D9z+7umWD+U9gnBOGLXe96IP8PqgIkUnNUlll",
-    "keyId": "AKIA4Z244B6XMXH2TSX2"
+    "key": "change",
+    "keyId": "change"
   }
 }
