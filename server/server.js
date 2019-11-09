@@ -10,6 +10,7 @@ var exphbs = require('express-handlebars');
 
 var app = module.exports = loopback();
 
+setupAmazonS3Storage(app);
 
 app.start = function () {
 
@@ -29,8 +30,8 @@ app.start = function () {
   // app.use(express.bodyParser());
 
 
-    // configure body parser
-    // app.use(bodyParser.urlencoded({ extended: true }));
+  // configure body parser
+  // app.use(bodyParser.urlencoded({ extended: true }));
 
 
 
@@ -40,6 +41,7 @@ app.start = function () {
 
   // app.use(loopback.token({ model: app.models.accessToken }));
   app.use(loopback.token());
+
 
 
   // start the web server
@@ -55,6 +57,18 @@ app.start = function () {
     }
   });
 };
+
+function setupAmazonS3Storage(app) {
+  var ds = loopback.createDataSource({
+    name: 'storage',
+    connector: require('loopback-component-storage'),
+    provider: 'amazon',
+    key: process.env.AMAZONKEY,
+    keyId: process.env.AMAZONKEYID
+  });
+  var container = ds.createModel('container');
+  app.model(container, true);
+}
 
 // Bootstrap the application, configure models, datasources and middleware.
 // Sub-apps like REST API are mounted via boot scripts.

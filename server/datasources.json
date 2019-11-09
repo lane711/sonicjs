@@ -13,12 +13,5 @@
     "connector": "loopback-component-storage",
     "provider": "filesystem",
     "root": "./server/storage"
-  },
-  "storage": {
-    "name": "storage",
-    "connector": "loopback-component-storage",
-    "provider": "amazon",
-    "key": "change",
-    "keyId": "change"
   }
 }
