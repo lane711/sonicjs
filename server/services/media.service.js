@@ -22,7 +22,7 @@ module.exports = mediaService = {
 
         eventBusService.on('requestBegin', async function (options) {
             // console.log('data service startup')
-            if(options){
+            if (options) {
                 let baseUrl = globalService.getBaseUrl();
                 // console.log('data service ' + baseUrl)
                 axiosInstance = axios.create({ baseURL: baseUrl });
@@ -40,22 +40,23 @@ module.exports = mediaService = {
     },
 
     getMedia: async function () {
-        let url = '/api/containers/files/files';
+        let url = '/api/containers/sonicjscom/files';
         return axiosInstance.get(url)
-        .then(async function (record) {
-            if (record.data) {
-                return record.data;
-            }
-            return 'not found';
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
+            .then(async function (record) {
+                if (record.data) {
+                    await mediaService.addMediaUrl(record.data);
+                    return record.data;
+                }
+                return 'not found';
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
     },
 
     addMediaUrl: async function (mediaList) {
         mediaList.forEach(media => {
-            media.data.url = `/api/containers/files/download/${media.data.file}`;
+            media.url = `/api/containers/files/download/${media.name}`;
         });
     }
 }
