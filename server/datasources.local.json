@@ -1,0 +1,17 @@
+{
+  "db": {
+    "name": "db",
+    "connector": "memory",
+    "file": "data.json"
+  },
+  "transient": {
+    "name": "transient",
+    "connector": "transient"
+  },
+  "storageFile": {
+    "name": "storageFile",
+    "connector": "loopback-component-storage",
+    "provider": "filesystem",
+    "root": "./server/storage"
+  }
+}
