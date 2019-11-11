@@ -1,9 +1,14 @@
-# Visit SonicJs.com for Details, Videos & Docs
+
+![Image of SonicJs Logo](https://sonicjs.com/api/containers/files/download/sonicjs-logo.svg)
+
+# SonicJS is a Modern Open Source NodeJs Based Content Management System
+
+## Visit SonicJs.com for Details, Videos & Docs
 [https://sonicjs.com](https://sonicjs.com)
 
 # Site Den NodeJs Content Management System (CMS)
 
-![Image of Siteden Logo](https://kevant.com/siteden/SiteDen-nodejs-logo.png)
+
 
 ## Overview
 
