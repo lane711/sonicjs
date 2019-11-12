@@ -1,5 +1,5 @@
 
-![Image of SonicJs Logo](https://sonicjs.com/api/containers/files/download/sonicjs-logo.svg)
+![Image of SonicJs Logo](https://sonicjs.com/api/containers/files/download/sonicjs-logo-dark.svg)
 [https://sonicjs.com](https://sonicjs.com)
 
 # SonicJS is a Modern Open Source NodeJs Based Content Management System
