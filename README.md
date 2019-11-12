@@ -36,15 +36,15 @@
 ## Table of Contents
 
 1. [Getting Started](#getting-started)
+1. [Quick Intro](#quick-intro)
+1. [Free Forever](#free-forever)
 1. [Screen Shots](#screen-shots)
-1. [Project Status](#project-status)
-1. [Goals And Motivation](#goals-and-motivation)
-1. [Setup](#setup)
+1. [Goals, Motivation & Principals](#goals-motivation-and-principals)
 1. [Sponsors](#sponsors)
 
 ## Getting Started
 
-### Pre-requisits
+### Pre-requisites
 You just need NodeJs installed. No other setup is needed.
 
 ### Setup Steps
@@ -126,6 +126,9 @@ If you are interested in reading more about me or the goals and motivation of th
 1. From Visual Studio Code, make sure the standard debugger for Chrome extension is installed.
 1. Hit "Play"
 
+## Goals, Motivation & Principals
+
+Coming soon...
 
 ## Sponsors
 
