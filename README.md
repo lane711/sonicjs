@@ -1,39 +1,112 @@
 
 ![Image of SonicJs Logo](https://sonicjs.com/api/containers/files/download/sonicjs-logo.svg)
+[https://sonicjs.com](https://sonicjs.com)
 
 # SonicJS is a Modern Open Source NodeJs Based Content Management System
 
-## Visit SonicJs.com for Details, Videos & Docs
-[https://sonicjs.com](https://sonicjs.com)
+![SonicJs Nodejs CMS Admin Dashboard](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Dashboard.png)
 
-# Site Den NodeJs Content Management System (CMS)
+## Visit https://sonicjs.com for Details, Videos & Docs
 
-
+# SonicJs NodeJs Content Management System (CMS)
 
 ## Overview
 
-Site Den is a content management system built on the following tech stack:
+### SonicJs is 100% javascript based and completely REST API driven CMS built on the following tech stack:
 
 - NodeJs
-- Mongo DB
 - Express
-- Angular
 - Bootstrap 4
+
+### SonicJs supports many common databases including: 
+- MongoDB
+- MySQL
+- SQL Server
+- Cloudant
+- DashDB 
+- DB2
+- Informix
+- Oracle
+- PostgreSQL
+- Redis
+- SQLite3
+- Flat File (Json)
+- In-Memory
 
 ## Table of Contents
 
+1. [Getting Started](#getting-started)
 1. [Screen Shots](#screen-shots)
 1. [Project Status](#project-status)
 1. [Goals And Motivation](#goals-and-motivation)
 1. [Setup](#setup)
 1. [Sponsers](#sponsers)
 
+## Getting Started
+
+### Pre-requisits
+You just need NodeJs installed. No other setup is needed.
+
+### Setup Steps
+
+When you first setup SonicJs locally, the default database is set to use the Flat File (Json) database. This can be used throughout your development process and even in production for site that are mainly read-heavy.
+
+Follow these steps and you should be go to go:
+
+1. Clone the repo: `git clone https://github.com/lane711/sonicjs.git`
+1. Install the dependencies: `npm install`
+1. Run it: `npm start`
+
+You should see the following message in your console:
+- Website at:  http://localhost:3018
+- Admin console at:  http://localhost:3018/admin
+- REST API at:  http://localhost:3018/explorer
+
+
+## A Quick Intro to SonicJs
+SonicJs is similar to Drupal CMS in that it is highly configurable. You can build your own content types using a drag and drop style form editor. All basic CRUD operations are generated on the fly by the framework. Unlike other NodeJs CMS', such as KeystoneJs, SonicJs does not generate code (a good thing!). It has a very powerful runtime engine that is built with both performance and flexbility in mind.
+
+SonicJs can handle most common website building use-cases with ease, but it also positioned to be an enterprise application framework/platform enabling developers to start custom web application projects with a solid foundation. This can help significantly reduce the overall effort required for your project.
+
+SonicJs is also 100% REST API based and therefor a great choice if you are looking for a **Headless CMS**. All of the content types that you create in the admin interface are instantly exposted as REST end points. There is no need to restart the application as required in other NodeJs based Headless CMS like Strapi or Butter CMS.
+
+SonicJs is built with love from Orange County California.
+
+## Free Forever
+If you are considering using SonicJs for your next web project, its important to know that it shall remain free forever. If you are interested in reading more about me or the goals and motivation of the project, please check out the "about" page here: https://sonicjs.com/about
+
 ## Screen Shots
 
 Manage Content Types:
 
-![Manage Content Types](https://kevant.com/siteden/content-types.png)
+![Manage Content Types](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Content%20Types.png)
 
+![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Content%20Type%20Edit.png)
+
+![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Edit%20Content.png)
+
+![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Field%20Types.png)
+
+![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Front%20End%20Page%20Settings.png)
+
+![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Front%20End%20WYSIWYG%20Editor.png)
+
+![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Menu%20Management.png)
+
+![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Front%20End%20CSS%20Editing.png)
+
+![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Media%20Manager.png)
+
+![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Module%20Management.png)
+
+![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Front%20End%20Json%20Editor.png)
+
+![](https://sonicjs.com/api/containers/files/download/NodeJS%20CMS%20-%20API%20Explorer.png)
+
+![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS-%20API%20Data%20Explorer.png)
+
+![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Back%20End%20Login.png
+)
 Adding a Field to a Content Type:
 
 ![Add Field to Content Type](https://kevant.com/siteden/add-fields-to-content-type.png)
@@ -92,13 +165,14 @@ I started this project because I have established a recent affinity to NodeJs al
 
 Note: you don't need to use any database for local development, Loopback is configured to use a file based database (just json files).
 
-##Debugging
+## Debugging
 
-1. From VS Code Extension, install the Debugger for Chrome extension 
+1. From VS Code, install the standard debugger for Chrome extension 
+1. Hit "Play"
 
 ## Automated Browser Testing
 `node e2e/content-types.ts`
 
-## Sponsers
+## Sponsors
 
 This Project is supported by [Surge](https://www.surgeforward.com/)
