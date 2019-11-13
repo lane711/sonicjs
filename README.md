@@ -39,7 +39,8 @@
 1. [Quick Intro](#quick-intro)
 1. [Free Forever](#free-forever)
 1. [Screen Shots](#screen-shots)
-1. [Goals, Motivation & Principals](#goals-motivation-and-principals)
+1. [Goals, Motivation & Principals](#goals-motivation-&-principals)
+1. [Credits](#credits)
 1. [Sponsors](#sponsors)
 
 ## Getting Started
@@ -126,9 +127,17 @@ If you are interested in reading more about me or the goals and motivation of th
 1. From Visual Studio Code, make sure the standard debugger for Chrome extension is installed.
 1. Hit "Play"
 
-## Goals, Motivation & Principals
+## Goals, Motivation and Principals
 
 Coming soon...
+
+## Credits
+
+SonicJs uses a number of open source packages, tools, etc but there are a couple of them that I wanted to make special mention of:
+1. Loopback - An awesome NodeJs based ORM helping to support much of the heavy lifting in SonicJs' data tier.
+1. CoreUI - a truly great open source admin theme. 
+1. Formio - a rock solid form builder with loads of advanced functionality.
+1. Axios - a brilliant library for interacting with REST end points.
 
 ## Sponsors
 
