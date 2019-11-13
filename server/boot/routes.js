@@ -139,6 +139,10 @@ module.exports = function (app) {
       return next();
     }
 
+    if(process.env.MODE == 'production'){
+      console.log(`serving: ${req.url}`);
+    }
+    
     await eventBusService.emit('requestBegin', { req: req, res: res });
 
     // formio.getComponents();
