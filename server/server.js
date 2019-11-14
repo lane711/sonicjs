@@ -1,5 +1,7 @@
 'use strict';
-require('dotenv').config()
+const fs = require('fs')
+initEnvFile();
+require('dotenv').config();
 
 var loopback = require('loopback');
 var boot = require('loopback-boot');
@@ -55,6 +57,22 @@ app.start = function () {
     }
   });
 };
+
+function initEnvFile() {
+  const path = './.env'
+
+  try {
+    if (!fs.existsSync(path)) {
+      //create default env file
+      fs.copyFile('.env-default', '.env', (err) => {
+        if (err) throw err;
+        console.log('.env-default was copied to .env');
+      });
+    }
+  } catch(err) {
+    console.error(err)
+  }
+}
 
 // Bootstrap the application, configure models, datasources and middleware.
 // Sub-apps like REST API are mounted via boot scripts.

@@ -11,6 +11,7 @@
 *.tgz
 *.xml
 *.env
+*.env-backup
 .DS_Store
 .idea
 .project
