@@ -12,8 +12,6 @@
           <tr>
             <th>Title</th>
             <th>Type</th>
-            <th>Url</th>
-            <th>Content</th>
             <th class='text-right'>Actions</th>
           </tr>
         </thead>
@@ -22,8 +20,6 @@
           <tr>
             <td><a href="{{ this.data.url }}">{{ this.data.title }}</a></td>
             <td>{{ this.data.contentType }}</td>
-            <td>{{ this.data.url }}</td>
-            <td>...</td>
             <td class='text-right'>
               <a href="/admin/content/edit/{{ this.data.contentType }}/{{ this.id }}" class="btn btn-sm btn-primary rmargin">Edit</a>
 

@@ -36,7 +36,8 @@ module.exports = {
     },
 
     getContent: async function () {
-        let url = `${apiUrl}contents`;
+        const filter = encodeURI(`{"order":"data.createdOn DESC"}`);
+        let url = `${apiUrl}contents?filter=${filter}`;
         let page = await axiosInstance.get(url);
         return page.data;
     },
