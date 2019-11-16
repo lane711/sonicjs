@@ -5,6 +5,7 @@ var themes = require(__dirname + '../../themes/themes');
 var pageBuilderService = require('../services/page-builder.service');
 var formio = require('../services/formio.service');
 var adminService = require('../services/admin.service');
+adminService.startup();
 var dataService = require('../services/data.service');
 dataService.startup();
 var moduleService = require('../services/module.service')
@@ -34,7 +35,7 @@ module.exports = function (app) {
   // app.get('/', async function (req, res) {
   //   res.send('ok');
   // });  
-  
+
   var router = app.loopback.Router();
 
   let page = '';
@@ -51,9 +52,25 @@ module.exports = function (app) {
 
   })();
 
+  app.get('/register', async function (req, res) {
+    let data = { registerMessage: "<b>admin</b>" };
+    res.render('admin-register', { layout: 'login.handlebars', data: data });
+    return;
+  });
+
+  app.post('/register', function (req, res) {
+    var user = app.models.User;
+    user.create({ email: req.body.email, password: req.body.password }, function (err, userInstance) {
+      console.log(userInstance);
+      globalService.isAdminUserCreated = true;
+      res.redirect('/admin'); // /admin will show the login
+      return;
+    });
+  });
+
   //log a user in
-  var user = app.models.User;
   app.post('/login', function (req, res) {
+    var user = app.models.User;
     user.login({
       email: req.body.email,
       password: req.body.password
@@ -68,24 +85,28 @@ module.exports = function (app) {
             redirectToLinkText: 'Click here',
             userId: err.details.userId
           });
-        } else {
+        } else if(err.code ==='USERNAME_EMAIL_REQUIRED'){
+          res.redirect('/login');
+        }
+        else {
           res.redirectTo()
         }
         return;
       }
 
       //set cookie
-      res.cookie('sonicjs_access_token', token.id, { signed: true , maxAge: 30000000 });
+      res.cookie('sonicjs_access_token', token.id, { signed: true, maxAge: 30000000 });
       let referer = req.headers.referer;
       res.redirect(referer);
     });
   });
 
   //log a user out
-  app.get('/logout', function(req, res, next) {
+  app.get('/logout', function (req, res, next) {
+    var user = app.models.User;
     var token = req.signedCookies.sonicjs_access_token;
     if (!token) return res.sendStatus(401);
-    user.logout(token, function(err) {
+    user.logout(token, function (err) {
       if (err) return next(err);
       res.clearCookie('sonicjs_access_token');
       res.redirect('/admin');
@@ -122,8 +143,14 @@ module.exports = function (app) {
 
   app.get('*', async function (req, res, next) {
 
+    if (!globalService.isAdminUserCreated && (req.url === '/' || req.url === '/admin')) {
+      //brand new site, admin accounts needs to be created
+      res.redirect('/register');
+      return;
+    }
+
     //for modules css/js files
-    if((req.url.endsWith('.css') || req.url.endsWith('.js')) && req.url.startsWith('/modules/')){
+    if ((req.url.endsWith('.css') || req.url.endsWith('.js')) && req.url.startsWith('/modules/')) {
       let cssFile = path.join(__dirname, '..', req.url);
       // res.set('Content-Type', 'text/css');
       res.sendFile(cssFile);
@@ -139,10 +166,10 @@ module.exports = function (app) {
       return next();
     }
 
-    if(process.env.MODE == 'production'){
+    if (process.env.MODE == 'production') {
       console.log(`serving: ${req.url}`);
     }
-    
+
     await eventBusService.emit('requestBegin', { req: req, res: res });
 
     // formio.getComponents();
@@ -153,17 +180,17 @@ module.exports = function (app) {
     }
     else if (req.url.startsWith('/admin') && !await userService.isAuthenticated(req)) {
 
-      if(process.env.MODE !== 'dev'){
+      if (process.env.MODE !== 'dev') {
         res.send(401);
       }
-      
+
       let data = {};
       res.render('admin-login', { layout: 'login.handlebars', data: data });
     }
     else if (req.url.startsWith('/admin')) {
       //
 
-      if(process.env.MODE !== 'dev'){
+      if (process.env.MODE !== 'dev') {
         res.send(401);
       }
 
@@ -241,7 +268,7 @@ module.exports = function (app) {
 
       let accessToken = await userService.getToken(req)
 
-      res.render(viewName, { layout: 'admin.handlebars', data: data,  accessToken: accessToken });
+      res.render(viewName, { layout: 'admin.handlebars', data: data, accessToken: accessToken });
 
     }
     else {

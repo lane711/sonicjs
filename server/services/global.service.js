@@ -6,8 +6,13 @@ var moduleDefinitions = [];
 var moduleCssFiles = [];
 var moduleJsFiles = [];
 
+// var isAdminUserCreated = false;
+// module.exports.globalService.isAdminUserCreated = isAdminUserCreated;
+// 
+
 module.exports = globalService = {
 
+    isAdminUserCreated: false,
 
     startup: async function () {
         eventBusService.on('requestBegin', async function (options) {
@@ -23,3 +28,4 @@ module.exports = globalService = {
     }
 
 }
+
