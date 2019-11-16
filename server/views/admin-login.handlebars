@@ -15,6 +15,24 @@
             <h1>Login</h1>
             <p class="text-muted">Sign In to your account</p>
 
+            {{#if data.error }}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              <strong>Oh snap!</strong> {{{ data.error }}}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            {{/if}}
+
+            {{#if data.message }}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+              <strong>Oh yeah!</strong> {{{ data.message }}}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            {{/if}}
+
             <div class="alert alert-login alert-danger hide" role="alert"></div>
 
             <form action="/login" method="post">

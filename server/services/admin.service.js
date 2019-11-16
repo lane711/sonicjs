@@ -25,9 +25,9 @@ module.exports = adminService = {
 
         this.checkIfAdminAccountIsCreated();
 
-        eventBusService.on('requestBegin', async function (options) {
-            adminService.checkIfAdminAccountIsCreated();
-        });
+        // eventBusService.on('requestBegin', async function (options) {
+        //     adminService.checkIfAdminAccountIsCreated();
+        // });
     },
 
     checkIfAdminAccountIsCreated: async function () {

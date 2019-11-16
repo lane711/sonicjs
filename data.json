@@ -1,7 +1,7 @@
 {
   "ids": {
-    "User": 1,
-    "AccessToken": 55,
+    "User": 0,
+    "AccessToken": 57,
     "ACL": 1,
     "RoleMapping": 1,
     "Role": 1,
@@ -11,9 +11,7 @@
     "e2e-test": 2
   },
   "models": {
-    "User": {
-      "0": "{\"password\":\"$2a$10$eRP6mbiZS9uHByazREzd2ODiQuLHozupXBwhTGE9uuUYVBYF3Lcw2\",\"email\":\"a@a.com\",\"id\":0}"
-    },
+    "User": {},
     "AccessToken": {},
     "ACL": {},
     "RoleMapping": {},

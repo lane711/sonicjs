@@ -21,12 +21,13 @@ cssService.startup();
 var javascriptService = require('../services/javascript.service');
 javascriptService.startup();
 var userService = require('../services/user.service');
+var helperService = require('../services/helper.service');
 
 const path = require("path");
 var cors = require('cors');
 const chalk = require('chalk');
 const log = console.log;
-
+const url = require('url');
 var admin = require(__dirname + '/admin');
 
 
@@ -63,7 +64,8 @@ module.exports = function (app) {
     user.create({ email: req.body.email, password: req.body.password }, function (err, userInstance) {
       console.log(userInstance);
       globalService.isAdminUserCreated = true;
-      res.redirect('/admin'); // /admin will show the login
+      let message = encodeURI(`Account created successfully. Please login`);
+      res.redirect(`/admin?message=${message}`); // /admin will show the login
       return;
     });
   });
@@ -71,6 +73,8 @@ module.exports = function (app) {
   //log a user in
   app.post('/login', function (req, res) {
     var user = app.models.User;
+    let referer = req.headers.referer;
+
     user.login({
       email: req.body.email,
       password: req.body.password
@@ -85,18 +89,15 @@ module.exports = function (app) {
             redirectToLinkText: 'Click here',
             userId: err.details.userId
           });
-        } else if(err.code ==='USERNAME_EMAIL_REQUIRED'){
-          res.redirect('/login');
-        }
-        else {
-          res.redirectTo()
+        } else if(err.code){
+          let urlToRedirect = helperService.urlAppendParam(referer,'error',err.message);
+          res.redirect(urlToRedirect);
         }
         return;
       }
 
       //set cookie
       res.cookie('sonicjs_access_token', token.id, { signed: true, maxAge: 30000000 });
-      let referer = req.headers.referer;
       res.redirect(referer);
     });
   });
@@ -184,7 +185,15 @@ module.exports = function (app) {
         res.send(401);
       }
 
+
+      let qsParams = url.parse(req.url,true).query;
       let data = {};
+      if(qsParams.error){
+        data.error = qsParams.error;
+      }
+      if(qsParams.message){
+        data.message = qsParams.message;
+      }
       res.render('admin-login', { layout: 'login.handlebars', data: data });
     }
     else if (req.url.startsWith('/admin')) {

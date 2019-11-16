@@ -33,6 +33,14 @@ module.exports = {
         }
     },
 
+    urlAppendParam: function (url, paramName, paramValue) {
+        let baseUrl = url;
+        if(url.indexOf('?') > -1){
+            baseUrl = url.substring(0, url.indexOf('?'));
+        }
+        return `${baseUrl}?${paramName}=${paramValue}`;
+    },
+
     sleep: function (ms) {
         return new Promise(resolve => {
             setTimeout(resolve, ms)
