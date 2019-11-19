@@ -22,6 +22,7 @@ var javascriptService = require('../services/javascript.service');
 javascriptService.startup();
 var userService = require('../services/user.service');
 var helperService = require('../services/helper.service');
+var sharedService = require('../services/shared.service');
 
 const path = require("path");
 var cors = require('cors');
@@ -44,6 +45,7 @@ module.exports = function (app) {
 
 
   (async () => {
+    console.log(sharedService.test());
     await menuService.startup();
     await mediaService.startup();
     await siteSettingsService.startup();

@@ -151,6 +151,12 @@
           "/files"
         ],
         "params": "$!../server/storage/files"
+      },
+      {
+        "paths": [
+          "/services"
+        ],
+        "params": "$!../server/services"
       }
     ]
   },
