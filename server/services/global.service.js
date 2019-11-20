@@ -13,6 +13,7 @@ var moduleJsFiles = [];
 module.exports = globalService = {
 
     isAdminUserCreated: false,
+    axiosInstance: undefined,
 
     startup: async function () {
         eventBusService.on('requestBegin', async function (options) {

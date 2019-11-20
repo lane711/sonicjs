@@ -11,7 +11,9 @@ const log = console.log;
 const Formio = {};
 const document = { getElementById: {} };
 
-module.exports = formService = {
+(function(exports){
+
+// module.exports = formService = {
 
     // startup: function () {
     //     console.log('>>=== form service startup');
@@ -21,15 +23,15 @@ module.exports = formService = {
     //     });
     // },
 
-    startup: async function () {
+    exports.startup = async function () {
         eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
             if (options && options.page) {
-                options.page.data.editForm = await formService.getForm(options.page.contentTypeId, options.page);
+                options.page.data.editForm = await exports.getForm(options.page.contentTypeId, options.page);
             }
         });
     },
 
-    getForm: async function (contentTypeId, content) {
+    exports.getForm = async function (contentTypeId, content) {
         let contentType;
         if (content) {
             contentType = await dataService.getContentType(content.data.contentType);
@@ -65,7 +67,7 @@ module.exports = formService = {
         return form;
     },
 
-    getFormTemplate: async function () {
+    exports.getFormTemplate = async function () {
         let themePath = __dirname + '/../assets/html/form.html';
 
         return new Promise((resolve, reject) => {
@@ -81,7 +83,7 @@ module.exports = formService = {
         });
     },
 
-    getFormSettings: async function (contentType, content) {
+    exports.getFormSettings = async function (contentType, content) {
         let settings = {};
         settings.recaptcha = {
             "isEnabled": "true", 
@@ -90,7 +92,7 @@ module.exports = formService = {
             return settings;
     },
 
-    getFormComponents: async function (contentType, content) {
+    exports.getFormComponents = async function (contentType, content) {
 
         // let contentTypeDef = await dataService.getContentType(content.data.contentType);
         // console.log('contentTypeDef', contentTypeDef);
@@ -112,7 +114,7 @@ module.exports = formService = {
         return components;
     },
 
-    addBaseContentTypeFields: function (id, contentType, controls) {
+    exports.addBaseContentTypeFields = function (id, contentType, controls) {
         // console.log('addBaseContentTypeFields', contentType, controls);
 
         controls.push({
@@ -152,4 +154,5 @@ module.exports = formService = {
         //   controls.push(controlContentType);
         // }
     }
-}
+// }
+})(typeof exports === 'undefined'? this['formService']={}: exports);
