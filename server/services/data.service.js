@@ -1,4 +1,5 @@
-if (require) {
+//check if running in node (and not the browser)
+if (typeof module !== 'undefined' && module.exports) {
     var eventBusService = require('./event-bus.service');
     var globalService = require('./global.service');
     var pageBuilderService = require('./page-builder.service');
