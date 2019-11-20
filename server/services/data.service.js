@@ -16,15 +16,10 @@ var page;
 var id;
 var axiosInstance;
 
-(async () => {
-    // if(baseUrl){
-    //     axiosInstance = axios.create({ baseURL: baseUrl });
-    // }
-  })();
+(function(exports){
 
-module.exports = {
 
-    startup: async function () {
+    exports.startup =  async function () {
         eventBusService.on('requestBegin', async function (options) {
             // console.log('data service startup')
             if(options){
@@ -35,21 +30,21 @@ module.exports = {
         });
     },
 
-    getContent: async function () {
+    exports.getContent = async function () {
         const filter = encodeURI(`{"order":"data.createdOn DESC"}`);
         let url = `${apiUrl}contents?filter=${filter}`;
         let page = await axiosInstance.get(url);
         return page.data;
     },
 
-    getContentByType: async function (contentType) {
+    exports.getContentByType = async function (contentType) {
         const filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
         let url = `${apiUrl}contents?filter=${filter}`;
         let page = await axiosInstance.get(url);
         return page.data;
     },
 
-    getContentType: async function (contentType) {
+    exports.getContentType = async function (contentType) {
         const filter = encodeURI(`{"where":{"systemid":"${contentType}"}}`);
         let url = `${apiUrl}contentTypes?filter=${filter}`;
         let contentTypeRecord = await axiosInstance.get(url);
@@ -57,19 +52,19 @@ module.exports = {
         return contentTypeRecord.data[0];
     },
 
-    getContentTypes: async function () {
+    exports.getContentTypes = async function () {
         let url = `${apiUrl}contentTypes`;
         let contentTypes = await axiosInstance.get(url);
         // console.log('contentTypeRecord.data', contentTypeRecord.data[0]);
         return contentTypes.data;
     },
 
-    getContentTopOne: async function (contentType) {
+    exports.getContentTopOne = async function (contentType) {
         let results = await this.getContentByType(contentType);
         return results[0];
     },
 
-    getContentByUrl: async function (url) {
+    exports.getContentByUrl = async function (url) {
         var  filter = encodeURI(`{"where":{"data.url":"${url}"}}`);
         let apiFullUrl = `${apiUrl}contents?filter=${filter}`;
         // var instance = axios.create({ baseURL: 'http://localhost:3018' });
@@ -85,7 +80,7 @@ module.exports = {
         return notFound;
     },
 
-    getContentByContentType: async function (contentType) {
+    exports.getContentByContentType = async function (contentType) {
         var  filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
         let apiFullUrl = `${apiUrl}contents?filter=${filter}`;
         let record = await axiosInstance.get(apiFullUrl);
@@ -96,7 +91,7 @@ module.exports = {
         return notFound;
     },
     
-    getContentByContentTypeAndTitle: async function (contentType, title) {
+    exports.getContentByContentTypeAndTitle = async function (contentType, title) {
         const filter = `{"where":{"and":[{"data.title":"${title}"},{"data.contentType":"${contentType}"}]}}`;
         const encodedFilter = encodeURI(filter);
         let url = `${apiUrl}contents?filter=${encodedFilter}`;
@@ -111,7 +106,7 @@ module.exports = {
         return 'not found';
     },
 
-    getContentByContentTypeAndTag: async function (contentType, tag) {
+    exports.getContentByContentTypeAndTag = async function (contentType, tag) {
         //TODO: add {"order":"data.sort ASC"},
         const filter = `{"where":{"and":[{"data.tags":{"regexp": "${tag}"}},{"data.contentType":"${contentType}"}]}}`;
         const encodedFilter = encodeURI(filter);
@@ -123,7 +118,7 @@ module.exports = {
         return 'not found';
     },
 
-    getContentByUrlAndContentType: async function (contentType, pageUrl) {
+    exports.getContentByUrlAndContentType = async function (contentType, pageUrl) {
         const filter = `{"where":{"and":[{"url":"${pageUrl}"},{"data.contentType":"${contentType}"}]}}`;
         const encodedFilter = encodeURI(filter);
         let url = `${apiUrl}contents?filter=${encodedFilter}`;
@@ -138,25 +133,26 @@ module.exports = {
         return 'not found';
     },
 
-    getContentById: async function (id) {
+    exports.getContentById = async function (id) {
         let url = `${apiUrl}contents/${id}`;
         let content = await axiosInstance.get(url);
         return content.data;
     },
 
-    asyncForEach: async function (array, callback) {
+    exports.asyncForEach = async function (array, callback) {
         for (let index = 0; index < array.length; index++) {
             await callback(array[index], index, array);
         }
     },
 
-    getImageUrl: function (img) {
+    exports.getImageUrl = function (img) {
         return `/api/containers/files/download/${img.originalName}`;
     },
 
-    getImage: function (img) {
+    exports.getImage = function (img) {
         let url = this.getImageUrl(img);
         return `<img class="img-fluid rounded" src="${url}" />`;
     }
 
-}
+
+})(typeof exports === 'undefined'? this['sharedService']={}: exports);

@@ -45,7 +45,6 @@ module.exports = function (app) {
 
 
   (async () => {
-    console.log(sharedService.test());
     await menuService.startup();
     await mediaService.startup();
     await siteSettingsService.startup();

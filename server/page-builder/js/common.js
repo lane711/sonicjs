@@ -1,7 +1,7 @@
 $(document).ready(async function () {
 
   
-    alert(mymodule.test());
+    console.log('share service test: ' + sharedService.test());
   
   
   });

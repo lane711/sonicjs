@@ -6,4 +6,4 @@
         return 'hello world'
     };
 
-})(typeof exports === 'undefined'? this['mymodule']={}: exports);
+})(typeof exports === 'undefined'? this['sharedService']={}: exports);
