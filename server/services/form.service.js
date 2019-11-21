@@ -1,4 +1,6 @@
+isBackEndMode = false;
 if (typeof module !== 'undefined' && module.exports) {
+    isBackEndMode = true;
     var dataService = require('./data.service');
     var eventBusService = require('./event-bus.service');
 
@@ -70,26 +72,32 @@ if (typeof module !== 'undefined' && module.exports) {
         },
 
         exports.getFormTemplate = async function () {
-            let themePath = __dirname + '/../assets/html/form.html';
+            if (isBackEndMode) {
+                let themePath = __dirname + '/../assets/html/form.html';
 
-            return new Promise((resolve, reject) => {
-                fs.readFile(themePath, "utf8", (err, data) => {
-                    if (err) {
-                        console.log(err);
-                        reject(err);
-                    }
-                    else {
-                        resolve(data);
-                    }
+                return new Promise((resolve, reject) => {
+                    fs.readFile(themePath, "utf8", (err, data) => {
+                        if (err) {
+                            console.log(err);
+                            reject(err);
+                        }
+                        else {
+                            resolve(data);
+                        }
+                    });
                 });
-            });
+            } else {
+                //TODO get template from front end
+            }
         },
 
         exports.getFormSettings = async function (contentType, content) {
             let settings = {};
-            settings.recaptcha = {
-                "isEnabled": "true",
-                "siteKey": process.env.RECAPTCHA_SITE_KEY
+            if (isBackEndMode) {
+                settings.recaptcha = {
+                    "isEnabled": "true",
+                    "siteKey": process.env.RECAPTCHA_SITE_KEY
+                }
             }
             return settings;
         },

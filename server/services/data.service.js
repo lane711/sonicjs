@@ -11,6 +11,9 @@ if (typeof module !== 'undefined' && module.exports) {
     var ShortcodeTree = require('shortcode-tree').ShortcodeTree;
     var chalk = require('chalk');
     var log = console.log;
+} else {
+    var globalService = {};
+    globalService.axiosInstance = axios.create({ baseURL: 'http://localhost:3018/' });
 }
 
 (function (exports) {
