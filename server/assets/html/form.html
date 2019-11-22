@@ -30,8 +30,9 @@
     //                     }
     //                 ]
 
-    window.onload = async function () {
-        Formio.createForm(document.getElementById('formio'), formJSON).then((form) => {
+    loadModuleSettingForm = async function () {
+        debugger;
+        Formio.createForm(document.getElementById('formio2'), formJSON).then((form) => {
             console.log('log form', form);
 
             if (formValuesToLoad) {
@@ -61,4 +62,4 @@
     };
 </script>
 
-<div id='formio'></div>
+<div id='formio2'></div>

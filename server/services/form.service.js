@@ -13,6 +13,9 @@ if (typeof module !== 'undefined' && module.exports) {
 
     const Formio = {};
     const document = { getElementById: {} };
+} else {
+    var globalService = {};
+    globalService.axiosInstance = axios.create({ baseURL: 'http://localhost:3018/' });
 }
 
 (function (exports) {
@@ -66,29 +69,34 @@ if (typeof module !== 'undefined' && module.exports) {
             }
             form += "</script>";
 
-
-            form += await this.getFormTemplate();
+            let template = await this.getFormTemplate();
+            form += template;
             return form;
         },
 
         exports.getFormTemplate = async function () {
             if (isBackEndMode) {
-                let themePath = __dirname + '/../assets/html/form.html';
-
-                return new Promise((resolve, reject) => {
-                    fs.readFile(themePath, "utf8", (err, data) => {
-                        if (err) {
-                            console.log(err);
-                            reject(err);
-                        }
-                        else {
-                            resolve(data);
-                        }
-                    });
-                });
+                return this.getFormTemplateFileSystem();
             } else {
-                //TODO get template from front end
+                let template = await globalService.axiosInstance.get('/html/form.html');
+                return template.data;
             }
+        },
+
+        exports.getFormTemplateFileSystem = async function () {
+            return new Promise((resolve, reject) => {
+                let themeFilePath = __dirname + `/../assets/html/form.html'`;
+                fs.readFile(themeFilePath, "utf8", (err, data) => {
+                    if (err) {
+                        console.log(err);
+                        reject(err);
+                    }
+                    else {
+                        resolve(data);
+                    }
+                });
+            });
+
         },
 
         exports.getFormSettings = async function (contentType, content) {

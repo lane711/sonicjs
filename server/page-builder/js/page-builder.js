@@ -976,7 +976,8 @@ async function saveWYSIWYG() {
 
 async function addModule(systemid) {
     let form = await formService.getForm(systemid);
-    console.log('adding ' + systemid);
+    $('#moduleSettingsFormio').html(form);
+    loadModuleSettingForm();
     $('#moduleSettingsModal').appendTo("body").modal('show');
 
 }
