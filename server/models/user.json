@@ -2,18 +2,18 @@
   "name": "user",
   "base": "User",
   "idInjection": true,
-  "properties": {},
   "restrictResetPasswordTokenScope": true,
   "emailVerificationRequired": false,
+  "properties": {},
   "validations": [],
   "relations": {},
   "acls": [
     {
+      "accessType": "READ",
       "principalType": "ROLE",
       "principalId": "$everyone",
-      "accessType": "READ",
       "permission": "ALLOW"
     }
   ],
-  "methods": []
+  "methods": {}
 }

@@ -38,7 +38,7 @@ if (typeof module !== 'undefined' && module.exports) {
         });
     },
 
-        exports.getForm = async function (contentTypeId, content) {
+        exports.getForm = async function (contentTypeId, content, formHtml) {
             let contentType;
             if (content) {
                 contentType = await dataService.getContentType(content.data.contentType);
@@ -69,8 +69,13 @@ if (typeof module !== 'undefined' && module.exports) {
             }
             form += "</script>";
 
-            let template = await this.getFormTemplate();
-            form += template;
+            if(formHtml){
+                form += formHtml;
+            }else{
+                let template = await this.getFormTemplate();
+                form += template;
+            }
+
             return form;
         },
 

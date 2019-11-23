@@ -30,15 +30,6 @@ module.exports = viewService = {
         return result;
     },
 
-    getProccessedViewFromHtml: async function (templateHtml, viewModel) {
-
-        var template = handlebars.compile(templateHtml);
-
-        var result = template(viewModel);
-
-        return result;
-    },
-
     getHandlebarsTemplateForContentType: async function (contentType, viewPath) {
         let path = __dirname + `/../views/partials/${contentType}/list.handlebars`;
 

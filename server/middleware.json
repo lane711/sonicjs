@@ -17,7 +17,6 @@
       "params": "${cookieSecret}"
     }
   },
-  "session": {},
   "auth": {
     "loopback#token": {}
   },

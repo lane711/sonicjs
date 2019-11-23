@@ -640,28 +640,28 @@ async function setupPageSettings(action, contentType) {
     // let page = await getContentInstance(pageId);
 
     // Formio.createForm(document.getElementById('formio'), {
-        let components=  [
-          {
+    let components = [
+        {
             type: 'textfield',
             key: 'firstName',
             label: 'First Name',
             placeholder: 'Enter your first name.',
             input: true
-          },
-          {
+        },
+        {
             type: 'textfield',
             key: 'lastName',
             label: 'Last Name',
             placeholder: 'Enter your last name',
             input: true
-          },
-          {
+        },
+        {
             type: 'button',
             action: 'submit',
             label: 'Submit',
             theme: 'primary'
-          }
-        ];
+        }
+    ];
 
     // debugger;
     if (!this.page.data) {
@@ -975,9 +975,16 @@ async function saveWYSIWYG() {
 }
 
 async function addModule(systemid) {
-    let form = await formService.getForm(systemid);
-    $('#moduleSettingsFormio').html(form);
-    loadModuleSettingForm();
+    debugger;
+    const viewModel = encodeURI(`{"data": {"onFormSubmitFunction":"doThis()"}}`);
+    const viewPath = encodeURI(`/assets/html/form.html`);
+
+    let form = await axiosInstance.get(`api/views/getProceedView?viewModel=${viewModel}&viewPath=${viewPath}`)
+
+    let form = await formService.getForm(systemid, undefined, form.data.data);
+
+    $('#moduleSettingsFormio').html(form.data.data);
+    // loadModuleSettingForm();
     $('#moduleSettingsModal').appendTo("body").modal('show');
 
 }
