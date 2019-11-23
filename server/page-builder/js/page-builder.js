@@ -975,18 +975,22 @@ async function saveWYSIWYG() {
 }
 
 async function addModule(systemid) {
-    debugger;
-    const viewModel = encodeURI(`{"data": {"onFormSubmitFunction":"doThis()"}}`);
+    // debugger;
+    const viewModel = encodeURI(`{"data": {"onFormSubmitFunction":"addModuletoColumn(submission)"}}`);
     const viewPath = encodeURI(`/assets/html/form.html`);
 
-    let form = await axiosInstance.get(`api/views/getProceedView?viewModel=${viewModel}&viewPath=${viewPath}`)
+    let formHtml = await axiosInstance.get(`api/views/getProceedView?viewModel=${viewModel}&viewPath=${viewPath}`)
 
-    let form = await formService.getForm(systemid, undefined, form.data.data);
+    let form = await formService.getForm(systemid, undefined, formHtml.data.data);
 
-    $('#moduleSettingsFormio').html(form.data.data);
-    // loadModuleSettingForm();
+    $('#moduleSettingsFormio').html(form);
+    loadModuleSettingForm();
     $('#moduleSettingsModal').appendTo("body").modal('show');
 
+}
+
+async function addModuletoColumn(submission) {
+    console.log('adding module to column', submission);
 }
 
 async function postProcessNewContent(content) {
