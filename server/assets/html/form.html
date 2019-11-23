@@ -1,38 +1,8 @@
 <script type='text/javascript'>
 
-    // const components = [
-    //                     {
-    //                         type: 'textfield',
-    //                         key: 'firstName',
-    //                         label: 'First Name',
-    //                         placeholder: 'Enter your first name.',
-    //                         input: true
-    //                     },
-    //                     {
-    //                         type: 'textfield',
-    //                         key: 'lastName',
-    //                         label: 'Last Name',
-    //                         placeholder: 'Enter your last name',
-    //                         input: true
-    //                     },
-    //                     {
-    //                         type: 'currency',
-    //                         key: 'cost',
-    //                         label: 'Cost',
-    //                         placeholder: 'Enter $ cost',
-    //                         input: true
-    //                     },
-    //                     {
-    //                         type: 'button',
-    //                         action: 'submit',
-    //                         label: 'Submit',
-    //                         theme: 'primary'
-    //                     }
-    //                 ]
-
     loadModuleSettingForm = async function () {
-        debugger;
-        Formio.createForm(document.getElementById('formio2'), formJSON).then((form) => {
+        // debugger;
+        Formio.createForm(document.getElementById('formio'), formJSON).then((form) => {
             console.log('log form', form);
 
             if (formValuesToLoad) {
@@ -42,8 +12,9 @@
             }
 
             form.on('submit', async function (submission) {
+                {{ onFormSubmitFunction }}
                 console.log('Submission was made!', submission);
-                // debugger;
+                debugger;
                 let entity = processContentFields(submission.data)
                 if (submission.data.id) {
                     await editContentInstance(entity);
@@ -60,6 +31,14 @@
 
         });
     };
+
+    window.onload = async function () {
+        debugger;
+        if (typeof module === 'undefined') {
+            loadModuleSettingForm();
+        }
+    }
+
 </script>
 
-<div id='formio2'></div>
+<div id='formio'></div>

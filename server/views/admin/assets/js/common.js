@@ -43,9 +43,6 @@ $(document).ready(async function () {
   } 
   );
 
-  alert(mymodule.test());
-
-
 });
 
 function wait(ms) {

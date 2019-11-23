@@ -1,12 +1,12 @@
 {
   "ids": {
     "User": 1,
-    "AccessToken": 61,
+    "AccessToken": 62,
     "ACL": 1,
     "RoleMapping": 1,
     "Role": 1,
     "contentType": 23,
-    "content": 123,
+    "content": 124,
     "fieldType": 2,
     "e2e-test": 2
   },
@@ -18,7 +18,8 @@
       "n7bkpr21Taf0GCOGmE58QCmSzy0y7k9CrpFeCZiGTl8roFeHpqGBuwyjGY8BaomG": "{\"id\":\"n7bkpr21Taf0GCOGmE58QCmSzy0y7k9CrpFeCZiGTl8roFeHpqGBuwyjGY8BaomG\",\"ttl\":1209600,\"created\":\"2019-11-19T02:06:56.792Z\",\"userId\":0}",
       "CS5ijIg0iLT2KG4fs0Rz27BiGD6y2SR0bL9YZ7Q2XFuQ3TOaAClB6FD0WCEisouP": "{\"id\":\"CS5ijIg0iLT2KG4fs0Rz27BiGD6y2SR0bL9YZ7Q2XFuQ3TOaAClB6FD0WCEisouP\",\"ttl\":1209600,\"created\":\"2019-11-19T20:43:56.269Z\",\"userId\":0}",
       "OHWgvFdlkguvj2OoNUxd60H1a4fgskfDDmuXLqPDCzYYLnD4lpJGRjWq9eknR7UJ": "{\"id\":\"OHWgvFdlkguvj2OoNUxd60H1a4fgskfDDmuXLqPDCzYYLnD4lpJGRjWq9eknR7UJ\",\"ttl\":1209600,\"created\":\"2019-11-21T02:26:22.057Z\",\"userId\":0}",
-      "h8JFuizTjcui96qbZGAAOTMoxG13HQnv6eBbAm14TIKYtKR7qdIDDfed1zWuqOJV": "{\"id\":\"h8JFuizTjcui96qbZGAAOTMoxG13HQnv6eBbAm14TIKYtKR7qdIDDfed1zWuqOJV\",\"ttl\":1209600,\"created\":\"2019-11-22T02:09:22.826Z\",\"userId\":0}"
+      "h8JFuizTjcui96qbZGAAOTMoxG13HQnv6eBbAm14TIKYtKR7qdIDDfed1zWuqOJV": "{\"id\":\"h8JFuizTjcui96qbZGAAOTMoxG13HQnv6eBbAm14TIKYtKR7qdIDDfed1zWuqOJV\",\"ttl\":1209600,\"created\":\"2019-11-22T02:09:22.826Z\",\"userId\":0}",
+      "TbvSSCv9gyncWxwU1kNcQrBVfVplh2o7aGfykTXxHI6OWyuVYf8jiNpy7g2YjKnA": "{\"id\":\"TbvSSCv9gyncWxwU1kNcQrBVfVplh2o7aGfykTXxHI6OWyuVYf8jiNpy7g2YjKnA\",\"ttl\":1209600,\"created\":\"2019-11-23T00:46:52.991Z\",\"userId\":0}"
     },
     "ACL": {},
     "RoleMapping": {},
@@ -120,7 +121,8 @@
       "119": "{\"id\":119,\"data\":{\"title\":\"Section 1\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[BLOCK id=\\\"118\\\"/]\"},{\"class\":\"col\",\"content\":\"[BLOCK id=\\\"122\\\"/]\"}]}],\"createdOn\":1574214388011}}",
       "120": "{\"id\":120,\"data\":{\"contentType\":\"block\",\"body\":\"<p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. 444</p>\",\"createdOn\":1574215962577}}",
       "121": "{\"data\":{\"title\":\"Section 2\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[BLOCK id=\\\"120\\\"/]\"}]}],\"createdOn\":1574214360441},\"id\":121}",
-      "122": "{\"data\":{\"contentType\":\"block\",\"body\":\"<p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>\",\"createdOn\":1574214387979},\"id\":122}"
+      "122": "{\"data\":{\"contentType\":\"block\",\"body\":\"<p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>\",\"createdOn\":1574214387979},\"id\":122}",
+      "123": "{\"data\":{\"firstName\":\"LaneX\",\"contentType\":\"module-hello-world\",\"submit\":true,\"createdOn\":1574391940932},\"id\":123}"
     },
     "fieldType": {
       "1": "{\"name\":\"string\",\"renderFunction\":\"string\",\"id\":1}"

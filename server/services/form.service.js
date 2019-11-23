@@ -74,6 +74,11 @@ if (typeof module !== 'undefined' && module.exports) {
             return form;
         },
 
+        exports.getTemplate = async function () {
+            let template = await this.getFormTemplate();
+
+        },
+
         exports.getFormTemplate = async function () {
             if (isBackEndMode) {
                 return this.getFormTemplateFileSystem();
@@ -85,7 +90,7 @@ if (typeof module !== 'undefined' && module.exports) {
 
         exports.getFormTemplateFileSystem = async function () {
             return new Promise((resolve, reject) => {
-                let themeFilePath = __dirname + `/../assets/html/form.html'`;
+                let themeFilePath = __dirname + '/../assets/html/form.html';
                 fs.readFile(themeFilePath, "utf8", (err, data) => {
                     if (err) {
                         console.log(err);

@@ -989,13 +989,13 @@ async function postProcessNewContent(content) {
             //add to existing main menu
             // await editContentInstance(entity);
             let mainMenu = await getContentByContentTypeAndTitle('menu', 'Main')
-            let meniItem = {
+            let menuItem = {
                 url: content.url,
                 title: content.name,
                 active: true,
                 level: "0"
             }
-            mainMenu.data.links.push(meniItem);
+            mainMenu.data.links.push(menuItem);
             await editContentInstance(mainMenu);
         }
     }
