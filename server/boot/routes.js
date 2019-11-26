@@ -234,7 +234,7 @@ module.exports = function (app) {
         if (param2) {
           content = await dataService.getContentById(param2);
         }
-        data.editForm = await formService.getForm(param1, content);
+        data.editForm = await formService.getForm(param1, content, "submitContent(submission)");
       }
 
       if (viewName == "admin-content-types") {

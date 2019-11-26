@@ -981,7 +981,7 @@ async function addModule(systemid) {
 
     let formHtml = await axiosInstance.get(`api/views/getProceedView?viewModel=${viewModel}&viewPath=${viewPath}`)
 
-    let form = await formService.getForm(systemid, undefined, formHtml.data.data);
+    let form = await formService.getForm(systemid, undefined, "addModuleToColumn(submission)");
 
     $('#moduleSettingsFormio').html(form);
     loadModuleSettingForm();

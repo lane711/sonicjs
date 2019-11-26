@@ -37,12 +37,12 @@ if (typeof module !== 'undefined' && module.exports) {
     exports.startup = async function () {
         eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
             if (options && options.page) {
-                options.page.data.editForm = await exports.getForm(options.page.contentTypeId, options.page);
+                options.page.data.editForm = await exports.getForm(options.page.contentTypeId, null,  "submitContent(submission)");
             }
         });
     },
 
-        exports.getForm = async function (contentTypeId, content, formHtml2) {
+        exports.getForm = async function (contentTypeId, content, onFormSubmitFunction) {
             // const viewModel = encodeURI(`{"data": {"onFormSubmitFunction":"addModuletoColumn(submission)"}}`);
             // const viewPath = encodeURI(`/assets/html/form.html`);
             // let formHtml = await axiosInstance.get(`api/views/getProceedView?viewModel=${viewModel}&viewPath=${viewPath}`)
@@ -79,7 +79,7 @@ if (typeof module !== 'undefined' && module.exports) {
             // form += "</script>";
 
             let data = { viewModel: {}, viewPath: '/assets/html/form.html' };
-            data.viewModel.onFormSubmitFunction = "addModuleToColumn(submission)";
+            data.viewModel.onFormSubmitFunction = onFormSubmitFunction;
             data.viewModel.formJSON = formJSON;
             data.viewModel.formValuesToLoad = content.data;
             data.viewPath = '/assets/html/form.html';

@@ -5,7 +5,7 @@ const formJSON = {{{ formJSON }}}
 const formValuesToLoad = {{{ formValuesToLoad }}}
 
     loadModuleSettingForm = async function () {
-        debugger;
+        // debugger;
         Formio.createForm(document.getElementById('formio'), formJSON).then((form) => {
             console.log('log form', form);
 
@@ -37,7 +37,7 @@ const formValuesToLoad = {{{ formValuesToLoad }}}
     };
 
     window.onload = async function () {
-        debugger;
+        // debugger;
         if (typeof module === 'undefined') {
             loadModuleSettingForm();
         }
