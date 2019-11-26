@@ -3,13 +3,16 @@ var viewService = require('../services/view.service');
 
 module.exports = function (View) {
 
-    View.getProceedView = async function (contentType, viewModel, viewPath, cb) {
+    View.getProceedView = async function (body, cb) {
 
-        let viewServerPath = __dirname + '/..' + viewPath;
-        if(viewModel){
-            viewModel = JSON.parse(viewModel);
-        }
-        let processedView = await viewService.getProccessedView(contentType, viewModel, viewServerPath)
+        let viewServerPath = __dirname + '/..' + body.data.viewPath;
+        // if(body.data.viewModel){
+        //     viewModel = JSON.parse(body.data.viewModel);
+        // }
+        body.data.viewModel.formJSON = JSON.stringify(body.data.viewModel.formJSON );
+        body.data.viewModel.formValuesToLoad = JSON.stringify(body.data.viewModel.formValuesToLoad );
+
+        let processedView = await viewService.getProccessedView(body.data.contentType, body.data.viewModel, viewServerPath)
 
         cb(null, processedView);
     };
@@ -18,11 +21,9 @@ module.exports = function (View) {
         'getProceedView', {
         http: {
             path: '/getProceedView',
-            verb: 'get',
+            verb: 'post',
         },
-        accepts: [{ arg: 'contentType', type: 'string', http: { source: 'query' } },
-        { arg: 'viewModel', type: 'string', http: { source: 'query' } },
-        { arg: 'viewPath', type: 'string', http: { source: 'query' } }],
+        accepts: { arg: 'data', type: 'object', http: { source: 'body' }},
         returns: {
             arg: 'data',
             type: 'object',

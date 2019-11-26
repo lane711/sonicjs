@@ -7,6 +7,8 @@ if (typeof module !== 'undefined' && module.exports) {
     var fs = require('fs');
     const cheerio = require('cheerio')
     const axios = require('axios');
+    var axiosInstance = axios.create({ baseURL: 'http://localhost:3018/' });
+
     const ShortcodeTree = require('shortcode-tree').ShortcodeTree;
     const chalk = require('chalk');
     const log = console.log;
@@ -14,8 +16,10 @@ if (typeof module !== 'undefined' && module.exports) {
     const Formio = {};
     const document = { getElementById: {} };
 } else {
-    var globalService = {};
-    globalService.axiosInstance = axios.create({ baseURL: 'http://localhost:3018/' });
+    // var globalService = {};
+    // globalService.axiosInstance = axios.create({ baseURL: 'http://localhost:3018/' });
+    axiosInstance = axios.create({ baseURL: 'http://localhost:3018/' });
+    const axios = axios.create({ baseURL: 'http://localhost:3018/' });
 }
 
 (function (exports) {
@@ -38,7 +42,11 @@ if (typeof module !== 'undefined' && module.exports) {
         });
     },
 
-        exports.getForm = async function (contentTypeId, content, formHtml) {
+        exports.getForm = async function (contentTypeId, content, formHtml2) {
+            // const viewModel = encodeURI(`{"data": {"onFormSubmitFunction":"addModuletoColumn(submission)"}}`);
+            // const viewPath = encodeURI(`/assets/html/form.html`);
+            // let formHtml = await axiosInstance.get(`api/views/getProceedView?viewModel=${viewModel}&viewPath=${viewPath}`)
+
             let contentType;
             if (content) {
                 contentType = await dataService.getContentType(content.data.contentType);
@@ -55,23 +63,40 @@ if (typeof module !== 'undefined' && module.exports) {
                 "settings": settings
             }
 
-            let form = "<script type='text/javascript'> const formJSON = ";
-            form += JSON.stringify(formJSON);
-            form += "</script>";
+            let form ="";
+            // let form = "<script type='text/javascript'> const formJSON = ";
+            // form += JSON.stringify(formJSON);
+            // form += "</script>";
 
 
-            form += "<script type='text/javascript'> const formValuesToLoad = ";
-            if (content) {
-                form += JSON.stringify(content.data);
-            }
-            else {
-                form += "{}";
-            }
-            form += "</script>";
+            // form += "<script type='text/javascript'> const formValuesToLoad = ";
+            // if (content) {
+            //     form += JSON.stringify(content.data);
+            // }
+            // else {
+            //     form += "{}";
+            // }
+            // form += "</script>";
 
-            if(formHtml){
-                form += formHtml;
-            }else{
+            let data = { viewModel: {}, viewPath: '/assets/html/form.html' };
+            data.viewModel.onFormSubmitFunction = "addModuleToColumn(submission)";
+            data.viewModel.formJSON = formJSON;
+            data.viewModel.formValuesToLoad = content.data;
+            data.viewPath = '/assets/html/form.html';
+            data.contentType = '';
+            // let strViewModelData = JSON.stringify(viewModelData);
+            // const viewModel = encodeURI(strViewModelData);
+            // const viewPath = encodeURI(`/assets/html/form.html`);
+            // let formHtml = await axiosInstance.post(`/api/views/getProceedView?viewModel=${viewModel}&viewPath=${viewPath}`)
+            let formHtml = await axiosInstance.post(`/api/views/getProceedView`,
+                {
+                    data: data,
+                });
+
+
+            if (formHtml) {
+                form += formHtml.data.data;
+            } else {
                 let template = await this.getFormTemplate();
                 form += template;
             }

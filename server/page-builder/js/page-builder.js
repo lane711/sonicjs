@@ -976,7 +976,7 @@ async function saveWYSIWYG() {
 
 async function addModule(systemid) {
     // debugger;
-    const viewModel = encodeURI(`{"data": {"onFormSubmitFunction":"addModuletoColumn(submission)"}}`);
+    const viewModel = encodeURI(`{"data": {"onFormSubmitFunction":"addModuleToColumn(submission)"}}`);
     const viewPath = encodeURI(`/assets/html/form.html`);
 
     let formHtml = await axiosInstance.get(`api/views/getProceedView?viewModel=${viewModel}&viewPath=${viewPath}`)

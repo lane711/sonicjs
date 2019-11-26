@@ -1,7 +1,11 @@
 <script type='text/javascript'>
 
+const formJSON = {{{ formJSON }}}
+
+const formValuesToLoad = {{{ formValuesToLoad }}}
+
     loadModuleSettingForm = async function () {
-        // debugger;
+        debugger;
         Formio.createForm(document.getElementById('formio'), formJSON).then((form) => {
             console.log('log form', form);
 
@@ -12,7 +16,7 @@
             }
 
             form.on('submit', async function (submission) {
-                {{ data.onFormSubmitFunction }}
+                {{ onFormSubmitFunction }}
                 // console.log('Submission was made!', submission);
                 // debugger;
                 // let entity = processContentFields(submission.data)
