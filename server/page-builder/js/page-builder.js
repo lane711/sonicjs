@@ -976,10 +976,12 @@ async function saveWYSIWYG() {
 
 async function addModule(systemid) {
     // debugger;
-    const viewModel = encodeURI(`{"data": {"onFormSubmitFunction":"addModuleToColumn(submission)"}}`);
-    const viewPath = encodeURI(`/assets/html/form.html`);
+    // const viewModel = encodeURI(`{"data": {"onFormSubmitFunction":"addModuleToColumn(submission)"}}`);
+    // const viewPath = encodeURI(`/assets/html/form.html`);
 
-    let formHtml = await axiosInstance.get(`api/views/getProceedView?viewModel=${viewModel}&viewPath=${viewPath}`)
+    
+
+    // let formHtml = await axiosInstance.get(`api/views/getProceedView?viewModel=${viewModel}&viewPath=${viewPath}`)
 
     let form = await formService.getForm(systemid, undefined, "addModuleToColumn(submission)");
 
@@ -989,8 +991,21 @@ async function addModule(systemid) {
 
 }
 
-async function addModuletoColumn(submission) {
+async function addModuleToColumn(submission) {
     console.log('adding module to column', submission);
+    //create short code and add to column
+}
+
+async function submitContent(submission) {
+    console.log('Submission was made!', submission);
+    // debugger;
+    let entity = processContentFields(submission.data)
+    if (submission.data.id) {
+        await editContentInstance(entity);
+    }
+    else {
+        await createContentInstance(entity);
+    }
 }
 
 async function postProcessNewContent(content) {

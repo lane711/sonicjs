@@ -16,10 +16,12 @@ if (typeof module !== 'undefined' && module.exports) {
     const Formio = {};
     const document = { getElementById: {} };
 } else {
+    // debugger;
     // var globalService = {};
     // globalService.axiosInstance = axios.create({ baseURL: 'http://localhost:3018/' });
-    axiosInstance = axios.create({ baseURL: 'http://localhost:3018/' });
-    const axios = axios.create({ baseURL: 'http://localhost:3018/' });
+    // const axios = require('axios');
+    var axiosInstance = axios.create({ baseURL: 'http://localhost:3018/' });
+    // const axios = axios.create({ baseURL: 'http://localhost:3018/' });
 }
 
 (function (exports) {
@@ -47,11 +49,14 @@ if (typeof module !== 'undefined' && module.exports) {
             // const viewPath = encodeURI(`/assets/html/form.html`);
             // let formHtml = await axiosInstance.get(`api/views/getProceedView?viewModel=${viewModel}&viewPath=${viewPath}`)
 
+            // debugger;
             let contentType;
             if (content) {
                 contentType = await dataService.getContentType(content.data.contentType);
             } else if (contentTypeId) {
                 contentType = await dataService.getContentType(contentTypeId);
+            } else{
+                return;
             }
 
             let name = `${contentType.systemid}Form`;
@@ -78,10 +83,11 @@ if (typeof module !== 'undefined' && module.exports) {
             // }
             // form += "</script>";
 
+            // debugger;
             let data = { viewModel: {}, viewPath: '/assets/html/form.html' };
             data.viewModel.onFormSubmitFunction = onFormSubmitFunction;
             data.viewModel.formJSON = formJSON;
-            data.viewModel.formValuesToLoad = content.data;
+            data.viewModel.formValuesToLoad = (content && content.data) ? content.data : {};
             data.viewPath = '/assets/html/form.html';
             data.contentType = '';
             // let strViewModelData = JSON.stringify(viewModelData);

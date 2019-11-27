@@ -16,16 +16,9 @@ const formValuesToLoad = {{{ formValuesToLoad }}}
             }
 
             form.on('submit', async function (submission) {
+                
                 {{ onFormSubmitFunction }}
-                // console.log('Submission was made!', submission);
-                // debugger;
-                // let entity = processContentFields(submission.data)
-                // if (submission.data.id) {
-                //     await editContentInstance(entity);
-                // }
-                // else {
-                //     await createContentInstance(entity);
-                // }
+
             });
 
             // Everytime the form changes, this will fire.
