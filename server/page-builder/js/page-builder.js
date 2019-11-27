@@ -993,8 +993,29 @@ async function addModule(systemid) {
 
 async function addModuleToColumn(submission) {
     console.log('adding module to column', submission);
-    //create short code and add to column
-    // ie: [MODULE-HELLO-WORLD id="123"]
+
+    //handling adding module def to db
+    let entity = processContentFields(submission.data);
+    let processedEntity;
+    if (submission.data.id) {
+        processedEntity = await editContentInstance(entity);
+    }
+    else {
+        processedEntity = await createContentInstance(entity);
+    }
+
+    // generate short code ie: [MODULE-HELLO-WORLD id="123"]
+    let args = { id: processedEntity.id };
+    let moduleInstanceShortCode = sharedService.generateShortCode(submission.data.contentType, args);
+
+    //add the shortCode to the column
+    let section = await getContentInstance(currentSectionId);
+    let column = section.data.rows[currentRowIndex].columns[currentColumnIndex -1];
+    column.content += moduleInstanceShortCode;
+    editContentInstance(section);
+
+    fullPageUpdate();
+
 }
 
 async function submitContent(submission) {
