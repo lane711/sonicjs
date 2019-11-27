@@ -994,6 +994,7 @@ async function addModule(systemid) {
 async function addModuleToColumn(submission) {
     console.log('adding module to column', submission);
     //create short code and add to column
+    // ie: [MODULE-HELLO-WORLD id="123"]
 }
 
 async function submitContent(submission) {

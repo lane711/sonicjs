@@ -122,7 +122,7 @@
       "118": "{\"data\":{\"contentType\":\"block\",\"body\":\"<p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>\",\"createdOn\":1574129630495},\"id\":118}",
       "119": "{\"id\":119,\"data\":{\"title\":\"Section 1\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[BLOCK id=\\\"118\\\"/]\"},{\"class\":\"col\",\"content\":\"[BLOCK id=\\\"122\\\"/]\"}]}],\"createdOn\":1574214388011}}",
       "120": "{\"id\":120,\"data\":{\"contentType\":\"block\",\"body\":\"<p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. 444</p>\",\"createdOn\":1574215962577}}",
-      "121": "{\"data\":{\"title\":\"Section 2\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[BLOCK id=\\\"120\\\"/]\"}]}],\"createdOn\":1574214360441},\"id\":121}",
+      "121": "{\"id\":121,\"data\":{\"title\":\"Section 2\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[BLOCK id=\\\"120\\\"/][MODULE-HELLO-WORLD id=\\\"123\\\" /]\"}]}],\"createdOn\":1574830386265}}",
       "122": "{\"data\":{\"contentType\":\"block\",\"body\":\"<p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>\",\"createdOn\":1574214387979},\"id\":122}",
       "123": "{\"data\":{\"firstName\":\"LaneX\",\"contentType\":\"module-hello-world\",\"submit\":true,\"createdOn\":1574391940932},\"id\":123}"
     },
