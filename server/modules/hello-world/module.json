@@ -1,5 +1,6 @@
 {
     "title": "Hello World",
     "systemid": "module-hello-world",
-    "version" : "0.0.0.1"
+    "version" : "0.0.0.1",
+    "canBeAddedToColumn": "true"
 }

@@ -263,7 +263,7 @@
                 <i class="fa fa-plus"></i> Module</button>
             </button>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="btnGroupDropModules">
-                {{#each page.data.modules}}
+                {{#each page.data.modulesForColumns}}
                 <a class="dropdown-item" onclick="addModule('{{this.systemid}}')"><i class="fa fa-plus"></i>
                     {{this.title}}</a>
                 {{/each}}

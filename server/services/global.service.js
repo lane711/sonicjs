@@ -3,6 +3,7 @@ var eventBusService = require('./event-bus.service');
 var baseUrl;
 var pageContent;
 var moduleDefinitions = [];
+var moduleDefinitionsForColumns = [];
 var moduleCssFiles = [];
 var moduleJsFiles = [];
 

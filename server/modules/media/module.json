@@ -1,5 +1,6 @@
 {
     "title": "Media",
     "systemid": "module-media",
-    "version" : "0.0.0.1"
+    "version" : "0.0.0.1",
+    "canBeAddedToColumn": "true"
 }

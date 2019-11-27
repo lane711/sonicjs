@@ -18,6 +18,7 @@ module.exports = moduleService = {
         eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
             if (options) {
                 options.page.data.modules = globalService.moduleDefinitions;
+                options.page.data.modulesForColumns = globalService.moduleDefinitionsForColumns;
             }
         });
     },
@@ -79,7 +80,11 @@ module.exports = moduleService = {
                     return 0;
                 })
 
+                let moduleDefinitionsForColumns = moduleList
+
                 globalService.moduleDefinitions = moduleList;
+                globalService.moduleDefinitionsForColumns = moduleList.filter(x => x.canBeAddedToColumn == "true");
+
 
                 await moduleService.loadModuleServices(moduleList);
 
