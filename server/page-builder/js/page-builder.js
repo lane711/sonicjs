@@ -15,6 +15,7 @@ $(document).ready(async function () {
     setupJsonEditor();
     await setPage();
     await setContentType();
+    setupJsonEditorContentTypeRaw();
     imageList = await getImageList();
     // setTimeout(setupPageSettings, 1);
     // setupPageSettings();
@@ -927,8 +928,31 @@ function setupJsonEditor() {
 
     jsonEditor = new JSONEditor(container, options);
     // editor.destroy(); //reset'
+}
 
+function setupJsonEditorContentTypeRaw() {
+    var containerRaw = document.getElementById("jsoneditorRaw");
+    if (!containerRaw) return;
 
+    var options = {
+        mode: 'text',
+        modes: ['code', 'form', 'text', 'tree', 'view'], // allowed modes
+        onError: function (err) {
+            alert(err.toString());
+        },
+        onModeChange: function (newMode, oldMode) {
+            console.log('Mode switched from', oldMode, 'to', newMode);
+        }
+    };
+
+    const jsonEditorRaw = new JSONEditor(containerRaw, options);
+    
+    // set json
+    const initialJson = this.contentType;
+    jsonEditorRaw.set(initialJson)
+
+    // get json
+    const updatedJson = jsonEditorRaw.get();
 }
 
 function loadJsonEditor() {

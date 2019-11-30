@@ -243,6 +243,7 @@ module.exports = function (app) {
 
       if (viewName == "admin-content-types-edit") {
         data.contentTypeId = param1;
+        data.raw = await dataService.getContentType(param1);
       }
 
       if (viewName == "admin-modules") {
