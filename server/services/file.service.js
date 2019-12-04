@@ -36,7 +36,7 @@ module.exports = fileService = {
     },
 
     writeFile: async function (filePath, fileContent) {
-        let fullPath = path.join(__dirname, '../', filePath);
+        let fullPath = path.join(__dirname, filePath);
         // console.log('adminPath--->', adminPath);
 
         return new Promise((resolve, reject) => {

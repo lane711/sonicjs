@@ -46,7 +46,7 @@ module.exports = moduleService = {
 
 
     loadModuleServices: async function (moduleList) {
-        moduleList.forEach(async function(moduleDef){
+        moduleList.forEach(async function (moduleDef) {
             let m = require(moduleDef.mainService);
             await m.startup();
         });
@@ -145,11 +145,13 @@ module.exports = moduleService = {
     },
 
     createModule: async function (moduleDefinitionFile) {
+        let basePath = `../../server/modules/${moduleDefinitionFile.systemid}`;
+
         //create dir
-        fileService.createDirectory(`../../server/modules/${moduleDefinitionFile.systemid}`);
+        fileService.createDirectory(`${basePath}`);
 
         //create module def file
-        fileService.writeFile(`/server/modules/${moduleDefinitionFile.systemid}/module.json`, moduleDefinitionFile);
+        fileService.writeFile(`${basePath}/module.json`, moduleDefinitionFile);
 
         //create other folders
 
