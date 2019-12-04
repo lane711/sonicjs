@@ -40,12 +40,13 @@
                   };
                   form.on('submit', async function (submission) {
                     var accessToken = '{{ this.accessToken }}';
-                    axios.put(`/api/modules?access_token=${accessToken}`, submission.data)
+                    debugger;
+                    axios.post(`/api/modules?access_token=${accessToken}`, submission.data)
                       .then(async function (response) {
                         console.log(response);
                         //return await response.data;
                         
-                        window.location.replace('/admin/content-types/edit/' + submission.data.systemid);
+                        window.location.replace('/admin/modules/edit/' + submission.data.systemid);
                       })
                       .catch(function (error) {
                         console.log(error);

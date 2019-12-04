@@ -181,7 +181,8 @@ module.exports = moduleService = {
         //create module def file
         fileService.writeFile(`${basePath}/module.json`, JSON.stringify(moduleDefinitionFile, null, 2));
 
-        //create folders
+        //create content type
+        // TODO
 
 
 
