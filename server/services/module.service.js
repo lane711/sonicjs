@@ -3,6 +3,7 @@ var path = require("path");
 var fs = require('fs');
 var eventBusService = require('../services/event-bus.service');
 var globalService = require('../services/global.service');
+var fileService = require('../services/file.service');
 
 
 
@@ -142,5 +143,16 @@ module.exports = moduleService = {
 
             });
     },
+
+    createModule: async function (moduleDefinitionFile) {
+        //create dir
+        fileService.createDirectory(`../../server/modules/${moduleDefinitionFile.systemid}`);
+
+        //create module def file
+        fileService.writeFile(`/server/modules/${moduleDefinitionFile.systemid}/module.json`, moduleDefinitionFile);
+
+        //create other folders
+
+    }
 
 }

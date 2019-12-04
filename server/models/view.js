@@ -14,7 +14,7 @@ module.exports = function (View) {
 
         let processedView = await viewService.getProccessedView(body.data.contentType, body.data.viewModel, viewServerPath)
 
-        cb(null, processedView);
+        return processedView;
     };
 
     View.remoteMethod(

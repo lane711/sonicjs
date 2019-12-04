@@ -50,4 +50,11 @@ module.exports = fileService = {
         });
     },
 
+    createDirectory: async function (directoryRelativePath) {
+        let dirPath = path.join(__dirname, directoryRelativePath);
+        if (!fs.existsSync(dirPath)){
+            fs.mkdirSync(dirPath);
+        }
+    },
+
 }

@@ -63,5 +63,9 @@
   "view": {
     "dataSource": null,
     "public": true
+  },
+  "module": {
+    "dataSource": null,
+    "public": true
   }
 }
