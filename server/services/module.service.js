@@ -73,7 +73,7 @@ module.exports = moduleService = {
                     let raw = fs.readFileSync(file);
                     let moduleDef = JSON.parse(raw);
                     let moduleFolder = moduleDef.systemid.replace('module-', '');
-                    moduleDef.mainService = `${path}\/${moduleFolder}\/services\/main.js`;
+                    moduleDef.mainService = `${path}\/${moduleFolder}\/services\/${moduleFolder}-main-service.js`;
                     moduleList.push(moduleDef);
                 });
 
@@ -149,20 +149,39 @@ module.exports = moduleService = {
     createModule: async function (moduleDefinitionFile) {
         let basePath = `../../server/modules/${moduleDefinitionFile.systemid}`;
 
-        //create dir
+        //create base dir
         fileService.createDirectory(`${basePath}`);
 
-        //create module def file
-        fileService.writeFile(`${basePath}/module.json`, JSON.stringify(moduleDefinitionFile, null, 2));
+        //create sub folders
+        fileService.createDirectory(`${basePath}/services`);
+        fileService.createDirectory(`${basePath}/views`);
+        fileService.createDirectory(`${basePath}/assets`);
+        fileService.createDirectory(`${basePath}/assets/css`);
+        fileService.createDirectory(`${basePath}/assets/img`);
+        fileService.createDirectory(`${basePath}/assets/js`);
+
+        //create default assets
+        let defaultCssFile = `/* Css File for Module: ${moduleDefinitionFile.systemid} */`;
+        fileService.writeFile(`${basePath}/assets/css/${moduleDefinitionFile.systemid}-module.css`, defaultCssFile);
+
+        let defaultJsFile = `// JS File for Module: ${moduleDefinitionFile.systemid}`;
+        fileService.writeFile(`${basePath}/assets/js/${moduleDefinitionFile.systemid}-module.js`, defaultJsFile);
+
+        //create default view
+        let defaultViewFile = `<div>Hello to you {{ data.firstName }} from the ${moduleDefinitionFile.title} module!</div>`;
+        fileService.writeFile(`${basePath}/views/${moduleDefinitionFile.systemid}-main.handlebars`, defaultViewFile);
 
         //create main.js file
-        moduleDefinitionFile.systemidUpperCase = _.upperCase(moduleDefinitionFile.systemid);
+        moduleDefinitionFile.systemidUpperCase = moduleDefinitionFile.systemid.toUpperCase();
         moduleDefinitionFile.systemidCamelCase = _.camelCase(moduleDefinitionFile.systemid);
         let mainServiceFilePath = path.join(__dirname, '../views/js_templates/module-default-main-service.js');
         var mainServiceFile = await viewService.getProccessedView(null, moduleDefinitionFile, mainServiceFilePath);
-        fileService.writeFile(`${basePath}/module.json`, JSON.stringify(mainServiceFile, null, 2));
+        fileService.writeFile(`${basePath}/services/${moduleDefinitionFile.systemid}-main-service.js`, mainServiceFile);
+        
+        //create module def file
+        fileService.writeFile(`${basePath}/module.json`, JSON.stringify(moduleDefinitionFile, null, 2));
 
-        //create assets folders
+        //create folders
 
 
 

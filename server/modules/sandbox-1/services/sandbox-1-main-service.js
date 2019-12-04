@@ -1,19 +1,16 @@
 var dataService = require('../../../services/data.service');
 var eventBusService = require('../../../services/event-bus.service');
 var globalService = require('../../../services/global.service');
-var viewService = require('../../../services/view.service');
 
-
-
-module.exports = helloWorldMainService = {
+module.exports = sandbox1MainService = {
 
     startup: async function () {
         eventBusService.on('beginProcessModuleShortCode', async function (options) {
 
-            if (options.shortcode.name === 'MODULE-HELLO-WORLD') {
+            if (options.shortcode.name === 'MODULE-SANDBOX-1') {
                 let id = options.shortcode.properties.id;
                 let contentType = options.shortcode.properties.contentType;
-                let viewPath = __dirname + `/../views/main.handlebars`;
+                let viewPath = __dirname + `/../views/sandbox-1-main.handlebars`;
                 let viewModel = await dataService.getContentById(id);
                 let proccessedHtml = await helloWorldMainService.processView(contentType, viewModel, viewPath);
 
