@@ -1,1 +1,6 @@
-[object Object]
+{
+  "title": "Sandbox 1",
+  "systemid": "sandbox-1",
+  "version": "0.0.0.1",
+  "canBeAddedToColumn": "true"
+}

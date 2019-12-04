@@ -1,9 +1,11 @@
 var dir = require('node-dir');
 var path = require("path");
 var fs = require('fs');
+var _ = require('lodash');
 var eventBusService = require('../services/event-bus.service');
 var globalService = require('../services/global.service');
 var fileService = require('../services/file.service');
+var viewService = require('../services/view.service');
 
 
 
@@ -151,9 +153,19 @@ module.exports = moduleService = {
         fileService.createDirectory(`${basePath}`);
 
         //create module def file
-        fileService.writeFile(`${basePath}/module.json`, moduleDefinitionFile);
+        fileService.writeFile(`${basePath}/module.json`, JSON.stringify(moduleDefinitionFile, null, 2));
 
-        //create other folders
+        //create main.js file
+        moduleDefinitionFile.systemidUpperCase = _.upperCase(moduleDefinitionFile.systemid);
+        moduleDefinitionFile.systemidCamelCase = _.camelCase(moduleDefinitionFile.systemid);
+        let mainServiceFilePath = path.join(__dirname, '../views/js_templates/module-default-main-service.js');
+        var mainServiceFile = await viewService.getProccessedView(null, moduleDefinitionFile, mainServiceFilePath);
+        fileService.writeFile(`${basePath}/module.json`, JSON.stringify(mainServiceFile, null, 2));
+
+        //create assets folders
+
+
+
 
     }
 

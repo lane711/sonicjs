@@ -43,6 +43,7 @@
     "formiojs": "^3.22.12",
     "jquery": "^3.4.1",
     "jsoneditor": "^6.1.0",
+    "lodash": "^4.17.15",
     "loopback": "^3.22.0",
     "loopback-boot": "^2.6.5",
     "loopback-component-explorer": "^6.2.0",
