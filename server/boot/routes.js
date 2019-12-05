@@ -36,7 +36,9 @@ module.exports = function (app) {
 
   // app.get('/', async function (req, res) {
   //   res.send('ok');
-  // });  
+  // }); 
+
+
 
   var router = app.loopback.Router();
 
@@ -90,8 +92,8 @@ module.exports = function (app) {
             redirectToLinkText: 'Click here',
             userId: err.details.userId
           });
-        } else if(err.code){
-          let urlToRedirect = helperService.urlAppendParam(referer,'error',err.message);
+        } else if (err.code) {
+          let urlToRedirect = helperService.urlAppendParam(referer, 'error', err.message);
           res.redirect(urlToRedirect);
         }
         return;
@@ -145,6 +147,12 @@ module.exports = function (app) {
 
   app.get('*', async function (req, res, next) {
 
+    if (req.signedCookies.sonicjs_access_token) {
+      globalService.authToken = req.signedCookies.sonicjs_access_token;
+    } else {
+      globalService.authToken = undefined;
+    }
+
     if (!globalService.isAdminUserCreated && (req.url === '/' || req.url === '/admin')) {
       //brand new site, admin accounts needs to be created
       res.redirect('/register');
@@ -187,12 +195,12 @@ module.exports = function (app) {
       }
 
 
-      let qsParams = url.parse(req.url,true).query;
+      let qsParams = url.parse(req.url, true).query;
       let data = {};
-      if(qsParams.error){
+      if (qsParams.error) {
         data.error = qsParams.error;
       }
-      if(qsParams.message){
+      if (qsParams.message) {
         data.message = qsParams.message;
       }
       res.render('admin-login', { layout: 'login.handlebars', data: data });

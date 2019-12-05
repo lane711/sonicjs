@@ -23,7 +23,7 @@ module.exports = mediaService = {
         eventBusService.on('requestBegin', async function (options) {
             // console.log('data service startup')
             if(options){
-                let baseUrl = globalService.getBaseUrl();
+                let baseUrl = globalService.baseUrl;
                 // console.log('data service ' + baseUrl)
                 axiosInstance = axios.create({ baseURL: baseUrl });
             }

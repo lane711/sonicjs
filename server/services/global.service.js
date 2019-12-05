@@ -17,6 +17,7 @@ module.exports = globalService = {
     isAdminUserCreated: false,
     axiosInstance: undefined,
     baseUrl: undefined,
+    authToken: undefined,
 
     startup: async function () {
         eventBusService.on('requestBegin', async function (options) {

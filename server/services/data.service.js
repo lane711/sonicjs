@@ -28,7 +28,16 @@ if (typeof module !== 'undefined' && module.exports) {
         eventBusService.on('requestBegin', async function (options) {
             // console.log('data service startup')
             if (options) {
-                axiosInstance = axios.create({ baseURL: globalService.baseUrl });
+                const defaultOptions = {
+                    headers: {
+                        Authorization: globalService.authToken
+                    },
+                    baseURL: globalService.baseUrl
+                }
+            
+                axiosInstance = axios.create(defaultOptions);
+
+                // axiosInstance = axios.create({ baseURL: globalService.baseUrl });
             }
         });
     },
@@ -36,7 +45,15 @@ if (typeof module !== 'undefined' && module.exports) {
         exports.getAxios = async function () {
             //TODO add auth
             if (!axiosInstance) {
-                axiosInstance = axios.create({ baseURL: globalService.baseUrl });
+                const defaultOptions = {
+                    headers: {
+                        Authorization: globalService.authToken
+                    },
+                    baseURL: globalService.baseUrl
+                }
+                axiosInstance = axios.create(defaultOptions);
+
+                // axiosInstance = axios.create({ baseURL: globalService.baseUrl });
             }
             return axiosInstance;
         },
@@ -87,7 +104,7 @@ if (typeof module !== 'undefined' && module.exports) {
             let apiFullUrl = `${apiUrl}contents?filter=${filter}`;
             // var instance = axios.create({ baseURL: 'http://localhost:3018' });
             let record = await axiosInstance.get(apiFullUrl);
-            if (record.data[0]) {
+            if (record.data[0] && record.data.length > 0) {
                 return record;
             }
 
