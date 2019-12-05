@@ -1,7 +1,7 @@
 var eventBusService = require('./event-bus.service');
 var os = require("os");
 
-var baseUrl;
+// var baseUrl;
 var pageContent;
 var moduleDefinitions = [];
 var moduleDefinitionsForColumns = [];
@@ -16,6 +16,7 @@ module.exports = globalService = {
 
     isAdminUserCreated: false,
     axiosInstance: undefined,
+    baseUrl: undefined,
 
     startup: async function () {
         eventBusService.on('requestBegin', async function (options) {

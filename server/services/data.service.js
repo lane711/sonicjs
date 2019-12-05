@@ -35,8 +35,9 @@ if (typeof module !== 'undefined' && module.exports) {
     },
 
         exports.getAxios = async function () {
+            //TODO add auth
             if (!axiosInstance) {
-                axiosInstance = axios.create({ baseURL: globalService.getBaseUrl() });
+                axiosInstance = axios.create({ baseURL: globalService.baseUrl });
             }
             return axiosInstance;
         },
@@ -72,7 +73,8 @@ if (typeof module !== 'undefined' && module.exports) {
 
         exports.createContentType = async function (contentType) {
             let url = `${apiUrl}contentTypes`;
-            let contentTypes = await this.getAxios().put(url, contentType);
+            let axios2 = await this.getAxios();
+            let contentTypes = await axios2.post(url, contentType);
             return contentTypes.data;
         },
 

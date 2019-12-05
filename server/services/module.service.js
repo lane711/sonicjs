@@ -72,10 +72,12 @@ module.exports = moduleService = {
 
                 files.forEach(file => {
                     let raw = fs.readFileSync(file);
-                    let moduleDef = JSON.parse(raw);
-                    let moduleFolder = moduleDef.systemid.replace('module-', '');
-                    moduleDef.mainService = `${path}\/${moduleFolder}\/services\/${moduleFolder}-main-service.js`;
-                    moduleList.push(moduleDef);
+                    if (raw && raw.length > 0) {
+                        let moduleDef = JSON.parse(raw);
+                        let moduleFolder = moduleDef.systemid.replace('module-', '');
+                        moduleDef.mainService = `${path}\/${moduleFolder}\/services\/${moduleFolder}-main-service.js`;
+                        moduleList.push(moduleDef);
+                    }
                 });
 
                 moduleList.sort(function (a, b) {
@@ -178,12 +180,12 @@ module.exports = moduleService = {
         let mainServiceFilePath = path.join(__dirname, '../views/js_templates/module-default-main-service.js');
         var mainServiceFile = await viewService.getProccessedView(null, moduleDefinitionFile, mainServiceFilePath);
         fileService.writeFile(`${basePath}/services/${moduleDefinitionFile.systemid}-main-service.js`, mainServiceFile);
-        
+
         //create module def file
         fileService.writeFile(`${basePath}/module.json`, JSON.stringify(moduleDefinitionFile, null, 2));
 
         //create content type
-        let moduleContentType = { title: moduleDefinitionFile.title, systemid: moduleDefinitionFile.systemid};
+        let moduleContentType = { title: moduleDefinitionFile.title, systemid: moduleDefinitionFile.systemid };
         let ct = await dataService.createContentType(moduleContentType);
 
 
