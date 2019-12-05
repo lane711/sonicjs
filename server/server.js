@@ -2,6 +2,7 @@
 const fs = require('fs')
 initEnvFile();
 require('dotenv').config();
+var globalService = require('./services/global.service');
 
 var loopback = require('loopback');
 var boot = require('loopback-boot');
@@ -14,6 +15,8 @@ var app = module.exports = loopback();
 
 
 app.start = function () {
+
+
 
   //set view engine
   // app.engine('handlebars', exphbs());
@@ -47,10 +50,14 @@ app.start = function () {
   // start the web server
   return app.listen(function () {
     app.emit('started');
+    
     var baseUrl = app.get('url').replace(/\/$/, '');
+    globalService.baseUrl = baseUrl;
+
     console.log(chalk.cyan('Website at: ', baseUrl));
     console.log(chalk.cyan('Admin console at: ', baseUrl + '/admin'));
 
+    
     if (app.get('loopback-component-explorer')) {
       var explorerPath = app.get('loopback-component-explorer').mountPath;
       console.log(chalk.cyan('REST API at: ', baseUrl + explorerPath));

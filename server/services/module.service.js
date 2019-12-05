@@ -6,6 +6,7 @@ var eventBusService = require('../services/event-bus.service');
 var globalService = require('../services/global.service');
 var fileService = require('../services/file.service');
 var viewService = require('../services/view.service');
+var dataService = require('../services/data.service');
 
 
 
@@ -182,7 +183,8 @@ module.exports = moduleService = {
         fileService.writeFile(`${basePath}/module.json`, JSON.stringify(moduleDefinitionFile, null, 2));
 
         //create content type
-        // TODO
+        let moduleContentType = { title: moduleDefinitionFile.title, systemid: moduleDefinitionFile.systemid};
+        let ct = await dataService.createContentType(moduleContentType);
 
 
 
