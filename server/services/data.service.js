@@ -28,8 +28,7 @@ if (typeof module !== 'undefined' && module.exports) {
         eventBusService.on('requestBegin', async function (options) {
             // console.log('data service startup')
             if (options) {
-                let baseUrl = globalService.getBaseUrl();
-                axiosInstance = axios.create({ baseURL: baseUrl });
+                axiosInstance = axios.create({ baseURL: globalService.baseUrl });
             }
         });
     },

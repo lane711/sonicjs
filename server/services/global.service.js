@@ -28,7 +28,7 @@ module.exports = globalService = {
     },
 
     getBaseUrl: function () {
-        return baseUrl;
+        return globalService.baseUrl;
     }
 
 }
