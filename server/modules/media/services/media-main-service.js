@@ -14,7 +14,7 @@ module.exports = mediaMainService = {
             if (options.shortcode.name === 'MODULE-MEDIA') {
                 let id = options.shortcode.properties.id;
                 let contentType = options.shortcode.properties.contentType;
-                let viewPath = __dirname + `/../views/main.handlebars`;
+                let viewPath = __dirname + `/../views/media-main.handlebars`;
                 let viewModel = await dataService.getContentById(id);
                 let files = await dataService.getContentByContentTypeAndTag('media', viewModel.data.tags);
                 let sortedFiles = files.sort((a, b) => (a.data.sortOrder > b.data.sortOrder) ? 1 : -1)
