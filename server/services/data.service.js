@@ -34,7 +34,7 @@ if (typeof module !== 'undefined' && module.exports) {
                     },
                     baseURL: globalService.baseUrl
                 }
-            
+
                 axiosInstance = axios.create(defaultOptions);
 
                 // axiosInstance = axios.create({ baseURL: globalService.baseUrl });
@@ -89,9 +89,17 @@ if (typeof module !== 'undefined' && module.exports) {
 
         exports.createContentType = async function (contentType) {
             let url = `${apiUrl}contentTypes`;
-            let axios2 = await this.getAxios();
-            let contentTypes = await axios2.post(url, contentType);
-            return contentTypes.data;
+            // let contentTypes = await axiosInstance.post(url, contentType);
+            let ax = await this.getAxios();
+            ax.post(url, contentType)
+                .then(async function (response) {
+                    console.log(response);
+                    resolve(response.data);
+                })
+                .catch(function (error) {
+                    console.log(error.response.data);
+                    resolve(error);
+                });
         },
 
         exports.getContentTopOne = async function (contentType) {
@@ -103,7 +111,8 @@ if (typeof module !== 'undefined' && module.exports) {
             var filter = encodeURI(`{"where":{"data.url":"${url}"}}`);
             let apiFullUrl = `${apiUrl}contents?filter=${filter}`;
             // var instance = axios.create({ baseURL: 'http://localhost:3018' });
-            let record = await axiosInstance.get(apiFullUrl);
+            let ax = await this.getAxios();
+            let record = await ax.get(apiFullUrl);
             if (record.data[0] && record.data.length > 0) {
                 return record;
             }

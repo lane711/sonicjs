@@ -26,6 +26,12 @@
                     placeholder: 'Enter the slug to be used as the system id (ie: service-list, news-feed, public-service)',
                     input: true
                   },
+                                    {
+                    type: 'checkbox',
+                    key: 'canBeAddedToColumn',
+                    label: 'Can Be Added To Column',
+                    input: true
+                  },
                   {
                     type: 'button',
                     action: 'submit',
@@ -36,11 +42,10 @@
               })
                 .then(async function (form) {
                   form.submission = {
-                    data: { title: 'Sandbox', systemid: 'sandbox' }
+                    data: { title: 'Sandbox', systemid: 'sandbox', canBeAddedToColumn: true }
                   };
                   form.on('submit', async function (submission) {
                     var accessToken = '{{ this.accessToken }}';
-                    debugger;
                     axios.post(`/api/modules?access_token=${accessToken}`, submission.data)
                       .then(async function (response) {
                         console.log(response);

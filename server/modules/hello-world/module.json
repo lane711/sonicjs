@@ -1,0 +1,8 @@
+{
+  "title": "Hello World",
+  "systemid": "hello-world",
+  "version": "0.0.0.1",
+  "canBeAddedToColumn": "true",
+  "systemidUpperCase": "HELLO-WORLD",
+  "systemidCamelCase": "helloWorld"
+}

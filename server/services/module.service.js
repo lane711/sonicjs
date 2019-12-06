@@ -139,13 +139,6 @@ module.exports = moduleService = {
                         globalService.moduleJsFiles.push(link);
                     }
                 });
-
-                // files.forEach(file => {
-                //     if (file.indexOf('assets/js') > -1) {
-                //         globalService.moduleJsFiles.push(file);
-                //     }
-                // });
-
             });
     },
 
@@ -185,7 +178,7 @@ module.exports = moduleService = {
         fileService.writeFile(`${basePath}/module.json`, JSON.stringify(moduleDefinitionFile, null, 2));
 
         //create content type
-        let moduleContentType = { title: moduleDefinitionFile.title, systemid: moduleDefinitionFile.systemid };
+        let moduleContentType = { title: moduleDefinitionFile.title, systemid: moduleDefinitionFile.systemid, canBeAddedToColumn: moduleDefinitionFile.canBeAddedToColumn };
         let ct = await dataService.createContentType(moduleContentType);
 
 
