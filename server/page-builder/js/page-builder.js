@@ -1016,6 +1016,7 @@ async function addModule(systemid) {
 }
 
 async function addModuleToColumn(submission) {
+    debugger;
     console.log('adding module to column', submission);
 
     //handling adding module def to db
@@ -1030,7 +1031,7 @@ async function addModuleToColumn(submission) {
 
     // generate short code ie: [MODULE-HELLO-WORLD id="123"]
     let args = { id: processedEntity.id };
-    let moduleInstanceShortCode = sharedService.generateShortCode(submission.data.contentType, args);
+    let moduleInstanceShortCode = sharedService.generateShortCode(`MODULE-${submission.data.contentType}`, args);
 
     //add the shortCode to the column
     let section = await getContentInstance(currentSectionId);

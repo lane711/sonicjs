@@ -42,7 +42,7 @@
               })
                 .then(async function (form) {
                   form.submission = {
-                    data: { title: 'Sandbox', systemid: 'sandbox', canBeAddedToColumn: true }
+                    data: { canBeAddedToColumn: true }
                   };
                   form.on('submit', async function (submission) {
                     var accessToken = '{{ this.accessToken }}';

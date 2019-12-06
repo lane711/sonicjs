@@ -1,6 +1,6 @@
 var eventBusService = require('../services/event-bus.service');
 var globalService = require('../services/global.service');
-globalService.startup();
+// globalService.startup();
 var themes = require(__dirname + '../../themes/themes');
 var pageBuilderService = require('../services/page-builder.service');
 var formio = require('../services/formio.service');

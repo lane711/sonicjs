@@ -29,10 +29,12 @@ if (typeof module !== 'undefined' && module.exports) {
             // console.log('data service startup')
             if (options) {
                 const defaultOptions = {
-                    headers: {
-                        Authorization: globalService.authToken
-                    },
+                    headers: {},
                     baseURL: globalService.baseUrl
+                }
+
+                if(globalService.authToken){
+                    defaultOptions.headers.Authorization = globalService.authToken;
                 }
 
                 axiosInstance = axios.create(defaultOptions);
@@ -42,15 +44,18 @@ if (typeof module !== 'undefined' && module.exports) {
         });
     },
 
-        exports.getAxios = async function () {
+        exports.getAxios = function () {
             //TODO add auth
             if (!axiosInstance) {
                 const defaultOptions = {
-                    headers: {
-                        Authorization: globalService.authToken
-                    },
+                    headers: {},
                     baseURL: globalService.baseUrl
                 }
+
+                if(globalService.authToken){
+                    defaultOptions.headers.Authorization = globalService.authToken;
+                }
+
                 axiosInstance = axios.create(defaultOptions);
 
                 // axiosInstance = axios.create({ baseURL: globalService.baseUrl });
@@ -61,37 +66,36 @@ if (typeof module !== 'undefined' && module.exports) {
         exports.getContent = async function () {
             const filter = encodeURI(`{"order":"data.createdOn DESC"}`);
             let url = `${apiUrl}contents?filter=${filter}`;
-            let page = await axiosInstance.get(url);
+            let page = await this.getAxios().get(url);
             return page.data;
         },
 
         exports.getContentByType = async function (contentType) {
             const filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
             let url = `${apiUrl}contents?filter=${filter}`;
-            let page = await axiosInstance.get(url);
+            let page = await this.getAxios().get(url);
             return page.data;
         },
 
         exports.getContentType = async function (contentType) {
             const filter = encodeURI(`{"where":{"systemid":"${contentType}"}}`);
             let url = `${apiUrl}contentTypes?filter=${filter}`;
-            let contentTypeRecord = await axiosInstance.get(url);
+            let contentTypeRecord = await this.getAxios().get(url);
             // console.log('contentTypeRecord.data', contentTypeRecord.data[0]);
             return contentTypeRecord.data[0];
         },
 
         exports.getContentTypes = async function () {
             let url = `${apiUrl}contentTypes`;
-            let contentTypes = await axiosInstance.get(url);
+            let contentTypes = await this.getAxios().get(url);
             // console.log('contentTypeRecord.data', contentTypeRecord.data[0]);
             return contentTypes.data;
         },
 
         exports.createContentType = async function (contentType) {
             let url = `${apiUrl}contentTypes`;
-            // let contentTypes = await axiosInstance.post(url, contentType);
-            let ax = await this.getAxios();
-            ax.post(url, contentType)
+            // let contentTypes = await this.getAxios().post(url, contentType);
+            this.getAxios().post(url, contentType)
                 .then(async function (response) {
                     console.log(response);
                     resolve(response.data);
@@ -111,8 +115,7 @@ if (typeof module !== 'undefined' && module.exports) {
             var filter = encodeURI(`{"where":{"data.url":"${url}"}}`);
             let apiFullUrl = `${apiUrl}contents?filter=${filter}`;
             // var instance = axios.create({ baseURL: 'http://localhost:3018' });
-            let ax = await this.getAxios();
-            let record = await ax.get(apiFullUrl);
+            let record = await this.getAxios().get(apiFullUrl);
             if (record.data[0] && record.data.length > 0) {
                 return record;
             }
@@ -127,7 +130,7 @@ if (typeof module !== 'undefined' && module.exports) {
         exports.getContentByContentType = async function (contentType) {
             var filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
             let apiFullUrl = `${apiUrl}contents?filter=${filter}`;
-            let record = await axiosInstance.get(apiFullUrl);
+            let record = await this.getAxios().get(apiFullUrl);
             if (record.data) {
                 return record.data;
             }
@@ -139,7 +142,7 @@ if (typeof module !== 'undefined' && module.exports) {
             const filter = `{"where":{"and":[{"data.title":"${title}"},{"data.contentType":"${contentType}"}]}}`;
             const encodedFilter = encodeURI(filter);
             let url = `${apiUrl}contents?filter=${encodedFilter}`;
-            let pageRecord = await axiosInstance.get(url);
+            let pageRecord = await this.getAxios().get(url);
             if (pageRecord.data[0]) {
                 return pageRecord.data[0];
                 // await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);
@@ -155,7 +158,7 @@ if (typeof module !== 'undefined' && module.exports) {
             const filter = `{"where":{"and":[{"data.tags":{"regexp": "${tag}"}},{"data.contentType":"${contentType}"}]}}`;
             const encodedFilter = encodeURI(filter);
             let url = `${apiUrl}contents?filter=${encodedFilter}`;
-            let pageRecord = await axiosInstance.get(url);
+            let pageRecord = await this.getAxios().get(url);
             if (pageRecord.data) {
                 return pageRecord.data;
             }
@@ -166,7 +169,7 @@ if (typeof module !== 'undefined' && module.exports) {
             const filter = `{"where":{"and":[{"url":"${pageUrl}"},{"data.contentType":"${contentType}"}]}}`;
             const encodedFilter = encodeURI(filter);
             let url = `${apiUrl}contents?filter=${encodedFilter}`;
-            let pageRecord = await axiosInstance.get(url);
+            let pageRecord = await this.getAxios().get(url);
             if (pageRecord.data[0]) {
                 return pageRecord;
                 // await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);
@@ -179,7 +182,7 @@ if (typeof module !== 'undefined' && module.exports) {
 
         exports.getContentById = async function (id) {
             let url = `${apiUrl}contents/${id}`;
-            let content = await axiosInstance.get(url);
+            let content = await this.getAxios().get(url);
             return content.data;
         },
 

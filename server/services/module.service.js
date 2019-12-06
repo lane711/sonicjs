@@ -178,7 +178,12 @@ module.exports = moduleService = {
         fileService.writeFile(`${basePath}/module.json`, JSON.stringify(moduleDefinitionFile, null, 2));
 
         //create content type
-        let moduleContentType = { title: moduleDefinitionFile.title, systemid: moduleDefinitionFile.systemid, canBeAddedToColumn: moduleDefinitionFile.canBeAddedToColumn };
+        let moduleContentType = { title: `Module - ${moduleDefinitionFile.title}`, systemid: moduleDefinitionFile.systemid, 
+            canBeAddedToColumn: moduleDefinitionFile.canBeAddedToColumn, components: [] };
+            moduleContentType.components.push({label: "First Name", type: "textfield",
+                input: true, key: "firstName", validate: {required:true}});
+            moduleContentType.components.push({label: "Submit", type: "button",
+                input: true, key: "submit", theme: "primary"});
         let ct = await dataService.createContentType(moduleContentType);
 
 
