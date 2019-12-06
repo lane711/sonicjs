@@ -182,7 +182,7 @@ section {
 .row-button {
   position: absolute;
   left: -1px;
-  bottom: -31px;
+  bottom: -29px;
   z-index: 2;
 }
 
@@ -192,14 +192,14 @@ section {
 
 .col-button {
   position: absolute;
-  left: -1px;
-  top: -31px;
+  left: -2px;
+  top: -34px;
 }
 
 .block-button {
   position: absolute;
   right: -1px;
-  bottom: -31px;
+  bottom: -29px;
   z-index: 2;
 }
 
@@ -227,8 +227,9 @@ section .col:hover {
   border: 1px dotted #6b5b95;
 }
 
-.block-edit .btn {
+.section-editor-button .btn {
   border-radius: 0;
+  border: 0;
 }
 
 .block-edit {

@@ -1,6 +1,7 @@
 var dataService = require('../../../services/data.service');
 var eventBusService = require('../../../services/event-bus.service');
 var globalService = require('../../../services/global.service');
+var contentService = require('../../../services/content.service');
 
 module.exports = featureBoxMainService = {
 
@@ -12,9 +13,11 @@ module.exports = featureBoxMainService = {
                 let contentType = options.shortcode.properties.contentType;
                 let viewPath = __dirname + `/../views/feature-box-main.handlebars`;
                 let viewModel = await dataService.getContentById(id);
-                let proccessedHtml = await helloWorldMainService.processView(contentType, viewModel, viewPath);
+                var proccessedHtml = { id: id,  body: await helloWorldMainService.processView(contentType, viewModel, viewPath) };
 
-                globalService.pageContent = globalService.pageContent.replace(options.shortcode.codeText, proccessedHtml);
+                eventBusService.emit("afterProcessModuleShortCodeProccessedHtml", proccessedHtml);
+
+                globalService.pageContent = globalService.pageContent.replace(options.shortcode.codeText, proccessedHtml.body);
             }
 
         });

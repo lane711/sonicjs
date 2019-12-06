@@ -23,7 +23,15 @@ var page;
 var id;
 var req;
 
-module.exports = {
+module.exports = contentService = {
+
+    startup: async function () {
+        eventBusService.on('afterProcessModuleShortCodeProccessedHtml', async function (proccessedHtml) {
+            if(proccessedHtml){
+                contentService.wrapBlockInModuleDiv(proccessedHtml);
+            }
+        });
+    },
 
     getRenderedPage: async function (req) {
 
@@ -334,6 +342,10 @@ module.exports = {
                 }
             }
         }
+    },
+
+    wrapBlockInModuleDiv: function (proccessedHtml) {
+        proccessedHtml.body = `<div class="module" data-id="${proccessedHtml.id}">${proccessedHtml.body}</div>`
     },
 
     // setupShortCodeParser: async function(){

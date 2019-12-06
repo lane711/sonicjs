@@ -147,7 +147,7 @@ function setupUIClicks() {
         },
     });
 
-    $("section .col").on({
+    $("section .row > *").on({
         click: function () {
             $('.col-highlight').removeClass('col-highlight');
             $('.block-edit').removeClass('block-edit');

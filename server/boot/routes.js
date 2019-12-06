@@ -16,6 +16,7 @@ var menuService = require('../services/menu.service');
 var mediaService = require('../services/media.service');
 var siteSettingsService = require('../services/site-settings.service');
 var contentService = require('../services/content.service');
+contentService.startup();
 var cssService = require('../services/css.service');
 cssService.startup();
 var javascriptService = require('../services/javascript.service');
