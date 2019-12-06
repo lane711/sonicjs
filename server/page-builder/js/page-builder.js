@@ -1016,7 +1016,7 @@ async function addModule(systemid) {
 }
 
 async function addModuleToColumn(submission) {
-    debugger;
+    // debugger;
     console.log('adding module to column', submission);
 
     //handling adding module def to db
