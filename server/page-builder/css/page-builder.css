@@ -1,11 +1,12 @@
 .pb-wrapper {
   width: 260px;
   height: 100%;
-  position: absolute;
+  position: fixed;
   left: 0;
   top: 0;
   background: #2f353a;
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 13px;
 }
 
 .pbe-wrapper {
@@ -243,4 +244,13 @@ section .col:hover {
 .ace_editor {
   width: 255px;
   height: 85vh;
+}
+
+.section-wrapper{
+  margin: 0 0 20px;
+}
+
+.btn-group.btn-section {
+  width: 100%;
+  margin: 0 1rem;
 }
