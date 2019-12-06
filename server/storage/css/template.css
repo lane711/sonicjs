@@ -101,7 +101,7 @@ background-attachment: fixed;
 background-size: cover
 }
 
-nav {
+nav.navbar {
 height: 80px
 }
 
@@ -109,7 +109,7 @@ height: 80px
 margin-right: 40px
 }
 
-nav a:not(.github-corner) {
+nav.navbar a:not(.github-corner) {
 font-size: 20px;
 color: #584E4A;
 position: relative;
@@ -121,7 +121,7 @@ text-decoration: none
 color: #F1F2F2
 }
 
-nav a:before,nav a:after {
+nav.navbar a:before,nav a:after {
 content: '';
 position: absolute;
 bottom: 2px;
@@ -131,7 +131,7 @@ height: 2px;
 background-color: #FFC503
 }
 
-nav a:before {
+nav.navbar a:before {
 opacity: 0;
 -webkit-transform: translateY(-8px);
 transform: translateY(-8px);
@@ -140,7 +140,7 @@ transition: transform 0s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0s;
 transition: transform 0s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0s,-webkit-transform 0s cubic-bezier(0.175,0.885,0.32,1.275)
 }
 
-nav a:after {
+nav.navbar a:after {
 opacity: 0;
 -webkit-transform: translateY(4px);
 transform: translateY(4px);
@@ -149,19 +149,19 @@ transition: transform 0.2s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0.2s;
 transition: transform 0.2s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0.2s,-webkit-transform 0.2s cubic-bezier(0.175,0.885,0.32,1.275)
 }
 
-nav a:hover:before,nav a:hover:after,nav a:focus:before,nav a:focus:after {
+nav.navbar a:hover:before,nav.navbar a:hover:after,nav.navbar a:focus:before,nav.navbar a:focus:after {
 opacity: 1;
 -webkit-transform: translateY(0);
 transform: translateY(0)
 }
 
-nav a:hover:before,nav a:focus:before {
+nav.navbar a:hover:before,nav.navbar a:focus:before {
 transition: opacity 0.2s,-webkit-transform 0.2s cubic-bezier(0.175,0.885,0.32,1.275);
 transition: transform 0.2s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0.2s;
 transition: transform 0.2s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0.2s,-webkit-transform 0.2s cubic-bezier(0.175,0.885,0.32,1.275)
 }
 
-nav a:hover:after,nav a:focus:after {
+nav.navbar a:hover:after,nav.navbar a:focus:after {
 transition: opacity 0s 0.2s,-webkit-transform 0s 0.2s cubic-bezier(0.175,0.885,0.32,1.275);
 transition: transform 0s 0.2s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0s 0.2s;
 transition: transform 0s 0.2s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0s 0.2s,-webkit-transform 0s 0.2s cubic-bezier(0.175,0.885,0.32,1.275)
