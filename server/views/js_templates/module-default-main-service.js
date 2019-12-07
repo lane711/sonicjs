@@ -7,7 +7,7 @@ module.exports = {{ systemidCamelCase }}MainService = {
     startup: async function () {
         eventBusService.on('beginProcessModuleShortCode', async function (options) {
 
-            if (options.shortcode.name === 'MODULE-{{ systemidUpperCase }}') {
+            if (options.shortcode.name === '{{ systemidUpperCase }}') {
                 let id = options.shortcode.properties.id;
                 let contentType = options.shortcode.properties.contentType;
                 let viewPath = __dirname + `/../views/{{ systemid }}-main.handlebars`;

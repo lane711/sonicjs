@@ -162,8 +162,18 @@ function setupUIClicks() {
             currentColumn.addClass('col-highlight');
             $('.col-button').show().appendTo(currentColumn);
             $('.row-button').show().appendTo(currentRow);
-            $('.block-button').show().appendTo(currentColumn.children('.module'));
-            currentColumn.children('.module').addClass('block-edit');
+            // $('.block-button').show().appendTo(currentColumn.children('.module'));
+            // currentColumn.children('.module').addClass('block-edit');
+        },
+    });
+
+    $("section .row .module").on({
+        click: function () {
+            let moduleDiv = $(this).closest('.module');
+            moduleId = moduleDiv.data('id');
+            console.log('moduleId', moduleId);            
+            $('.block-button').show().appendTo(moduleDiv);
+            // currentColumn.children('.module').addClass('block-edit');
         },
     });
 
@@ -1032,7 +1042,7 @@ async function addModuleToColumn(submission) {
 
     // generate short code ie: [MODULE-HELLO-WORLD id="123"]
     let args = { id: processedEntity.id };
-    let moduleInstanceShortCode = sharedService.generateShortCode(`MODULE-${submission.data.contentType}`, args);
+    let moduleInstanceShortCode = sharedService.generateShortCode(`${submission.data.contentType}`, args);
 
     //add the shortCode to the column
     let section = await getContentInstance(currentSectionId);

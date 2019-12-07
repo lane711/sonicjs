@@ -149,12 +149,10 @@ module.exports = moduleService = {
             let viewPath = path.join(__dirname, `/../modules/${options.shortcode.name}/views/${options.shortcode.name}-main.handlebars`);
             let viewModel = await dataService.getContentById(id);
             var proccessedHtml = { id: id,  body: await this.processView(contentType, viewModel, viewPath) };
-            console.log('processModuleInColumn->proccessedHtml ', proccessedHtml )
 
-            // eventBusService.emit("afterProcessModuleShortCodeProccessedHtml", proccessedHtml);
+            eventBusService.emit("afterProcessModuleShortCodeProccessedHtml", proccessedHtml);
 
             globalService.pageContent = globalService.pageContent.replace(options.shortcode.codeText, proccessedHtml.body);
-        console.log('processModuleInColumn->globalService.pageContent ', globalService.pageContent )
         }
     },
 

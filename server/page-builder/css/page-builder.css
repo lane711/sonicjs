@@ -164,11 +164,11 @@ section {
 }
 
 .row-highlight {
-  border: 1px dotted #878f99;
+  border: 1px dotted yellowgreen;
 }
 
 .col-highlight {
-  border: 1px dotted #6b5b95 !important;
+  border: 1px dotted crimson !important;
 }
 
 .row {
@@ -187,7 +187,7 @@ section {
 }
 
 .row-button .btn-secondary {
-  background-color: #878f99;
+  background-color: yellowgreen;
 }
 
 .col-button {
@@ -199,7 +199,7 @@ section {
 .block-button {
   position: absolute;
   right: -1px;
-  bottom: -29px;
+  top: 0;
   z-index: 2;
 }
 
@@ -208,11 +208,11 @@ section {
 }
 
 .col-button .btn-secondary {
-  background-color: #6b5b95;
+  background-color: crimson;
 }
 
 .block-button .btn-secondary {
-  background-color: #a2b9bc;
+  background-color: slateblue;
 }
 
 section .col span, .pb-section .nav-link, .dropdown-menu .dropdown-item {
@@ -247,7 +247,7 @@ section .col:hover {
   height: 85vh;
 }
 
-.section-wrapper{
+.section-wrapper {
   margin: 0 0 20px;
 }
 
