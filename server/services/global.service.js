@@ -36,17 +36,22 @@
 
 
 
-(function(exports){
+(function (exports) {
 
     var isAdminUserCreated = false;
     var axiosInstance;
     var baseUrl;
     var authToken;
+    var pageContent = 'temp';
+    var moduleDefinitions = [];
+    var moduleDefinitionsForColumns = [];
+    var moduleCssFiles = [];
+    var moduleJsFiles = [];
 
     // your code goes here
 
-   exports.test = function(){
+    exports.test = function () {
         return 'hello world'
     };
 
-})(typeof exports === 'undefined'? this['globalService']={}: exports);
+})(typeof exports === 'undefined' ? this['globalService'] = {} : exports);

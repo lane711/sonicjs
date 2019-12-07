@@ -149,6 +149,7 @@ function setupUIClicks() {
 
     $("section .row > *").on({
         click: function () {
+            // debugger;
             $('.col-highlight').removeClass('col-highlight');
             $('.block-edit').removeClass('block-edit');
             currentSectionId = $(this).closest('section').data('id');
@@ -161,8 +162,8 @@ function setupUIClicks() {
             currentColumn.addClass('col-highlight');
             $('.col-button').show().appendTo(currentColumn);
             $('.row-button').show().appendTo(currentRow);
-            $('.block-button').show().appendTo(currentColumn.children('span'));
-            currentColumn.children('span').addClass('block-edit');
+            $('.block-button').show().appendTo(currentColumn.children('.module'));
+            currentColumn.children('.module').addClass('block-edit');
         },
     });
 
