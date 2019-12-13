@@ -199,7 +199,7 @@ section {
 .block-button {
   position: absolute;
   right: -1px;
-  top: 0;
+  top: -5px;
   z-index: 2;
 }
 
@@ -254,4 +254,8 @@ section .col:hover {
 .btn-group.btn-section {
   width: 100%;
   margin: 0 1rem;
+}
+
+.module{
+  position: relative;
 }

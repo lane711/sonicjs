@@ -145,10 +145,10 @@ module.exports = moduleService = {
     processModuleInColumn: async function (options) {
         if (options.shortcode.name === options.moduleName.toUpperCase()) {
             let id = options.shortcode.properties.id;
-            let contentType = options.shortcode.properties.contentType;
+            let contentType = options.moduleName;
             let viewPath = path.join(__dirname, `/../modules/${options.shortcode.name}/views/${options.shortcode.name}-main.handlebars`);
             let viewModel = await dataService.getContentById(id);
-            var proccessedHtml = { id: id,  body: await this.processView(contentType, viewModel, viewPath) };
+            var proccessedHtml = { id: id, contentType: contentType,  body: await this.processView(contentType, viewModel, viewPath) };
 
             eventBusService.emit("afterProcessModuleShortCodeProccessedHtml", proccessedHtml);
 

@@ -345,7 +345,7 @@ module.exports = contentService = {
     },
 
     wrapBlockInModuleDiv: function (proccessedHtml) {
-        proccessedHtml.body = `<div class="module" data-id="${proccessedHtml.id}">${proccessedHtml.body}</div>`
+        proccessedHtml.body = `<div class="module" data-id="${proccessedHtml.id}" data-content-type="${proccessedHtml.contentType}">${proccessedHtml.body}</div>`
     },
 
     // setupShortCodeParser: async function(){

@@ -4,7 +4,7 @@ var contentTypeComponents;
 var axiosInstance;
 
 var imageList, tinyImageList, currentSectionId, currentSection, currentRow, currentRowIndex, currentColumn,
-    currentColumnIndex, jsonEditor;
+    currentColumnIndex, currentModuleId, currentModuleContentType, jsonEditor;
 
 $(document).ready(async function () {
     await setupAxiosInstance();
@@ -170,8 +170,10 @@ function setupUIClicks() {
     $("section .row .module").on({
         click: function () {
             let moduleDiv = $(this).closest('.module');
-            moduleId = moduleDiv.data('id');
-            console.log('moduleId', moduleId);            
+            currentModuleId = moduleDiv.data('id');
+            currentModuleContentType = moduleDiv.data('content-type');
+
+            console.log('moduleId', currentModuleId);            
             $('.block-button').show().appendTo(moduleDiv);
             // currentColumn.children('.module').addClass('block-edit');
         },
@@ -1010,6 +1012,7 @@ async function saveWYSIWYG() {
 }
 
 async function addModule(systemid) {
+    console.log('adding module to column: ' + systemid);
     // debugger;
     // const viewModel = encodeURI(`{"data": {"onFormSubmitFunction":"addModuleToColumn(submission)"}}`);
     // const viewPath = encodeURI(`/assets/html/form.html`);
@@ -1017,6 +1020,19 @@ async function addModule(systemid) {
     
 
     // let formHtml = await axiosInstance.get(`api/views/getProceedView?viewModel=${viewModel}&viewPath=${viewPath}`)
+
+    let form = await formService.getForm(systemid, undefined, "addModuleToColumn(submission)");
+
+    $('#moduleSettingsFormio').html(form);
+    loadModuleSettingForm();
+    $('#moduleSettingsModal').appendTo("body").modal('show');
+
+}
+
+async function editModule() {
+    console.log('editing module: ' +  currentModuleId, currentModuleContentType);
+
+
 
     let form = await formService.getForm(systemid, undefined, "addModuleToColumn(submission)");
 
