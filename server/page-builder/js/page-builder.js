@@ -1032,9 +1032,10 @@ async function addModule(systemid) {
 async function editModule() {
     console.log('editing module: ' +  currentModuleId, currentModuleContentType);
 
+    let data = await getContentInstance(currentModuleId);
 
 
-    let form = await formService.getForm(systemid, undefined, "addModuleToColumn(submission)");
+    let form = await formService.getForm(currentModuleContentType, data, "editContentInstance(submission)");
 
     $('#moduleSettingsFormio').html(form);
     loadModuleSettingForm();
