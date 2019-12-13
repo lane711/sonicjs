@@ -129,7 +129,7 @@ If you are interested in reading more about me or the goals and motivation of th
 
 ## Goals, Motivation and Principals
 
-Coming soon...
+Please see here: https://sonicjs.com/about
 
 ## Credits
 
