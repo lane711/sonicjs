@@ -127,7 +127,7 @@ If you are interested in reading more about me or the goals and motivation of th
 1. From Visual Studio Code, make sure the standard debugger for Chrome extension is installed.
 1. Hit "Play"
 
-## Goals, Motivation and Principals
+## Goals, Motivation & Principals
 
 Please see here: https://sonicjs.com/about
 
