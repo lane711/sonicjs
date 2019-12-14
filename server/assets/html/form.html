@@ -1,17 +1,17 @@
 <script type='text/javascript'>
 
-const formJSON = {{{ formJSON }}}
+const formJSON_{{ random }} = {{{ formJSON }}}
 
-const formValuesToLoad = {{{ formValuesToLoad }}}
+const formValuesToLoad_{{ random }} = {{{ formValuesToLoad }}}
 
     loadModuleSettingForm = async function () {
         // debugger;
-        Formio.createForm(document.getElementById('formio'), formJSON).then((form) => {
+        Formio.createForm(document.getElementById('formio'), formJSON_{{ random }}).then((form) => {
             console.log('log form', form);
 
-            if (formValuesToLoad) {
+            if (formValuesToLoad_{{ random }}) {
                 form.submission = {
-                    data: formValuesToLoad
+                    data: formValuesToLoad_{{ random }}
                 };
             }
 

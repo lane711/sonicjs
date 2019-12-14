@@ -88,6 +88,7 @@ if (typeof module !== 'undefined' && module.exports) {
             data.viewModel.onFormSubmitFunction = onFormSubmitFunction;
             data.viewModel.formJSON = formJSON;
             data.viewModel.formValuesToLoad = (content && content.data) ? content.data : {};
+            data.viewModel.random = helperService.generateRandomString(8);
             data.viewPath = '/assets/html/form.html';
             data.contentType = '';
             // let strViewModelData = JSON.stringify(viewModelData);

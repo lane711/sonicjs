@@ -1012,6 +1012,7 @@ async function saveWYSIWYG() {
 }
 
 async function addModule(systemid) {
+    cleanModal();
     console.log('adding module to column: ' + systemid);
     // debugger;
     // const viewModel = encodeURI(`{"data": {"onFormSubmitFunction":"addModuleToColumn(submission)"}}`);
@@ -1030,6 +1031,8 @@ async function addModule(systemid) {
 }
 
 async function editModule() {
+    cleanModal();
+
     console.log('editing module: ' +  currentModuleId, currentModuleContentType);
 
     let data = await getContentInstance(currentModuleId);
@@ -1040,6 +1043,11 @@ async function editModule() {
     $('#moduleSettingsFormio').html(form);
     loadModuleSettingForm();
     $('#moduleSettingsModal').appendTo("body").modal('show');
+
+}
+
+async function cleanModal(){
+    $('#moduleSettingsFormio').empty();
 
 }
 
