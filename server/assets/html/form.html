@@ -6,7 +6,7 @@ const formValuesToLoad_{{ random }} = {{{ formValuesToLoad }}}
 
     loadModuleSettingForm = async function () {
         // debugger;
-        Formio.createForm(document.getElementById('formio'), formJSON_{{ random }}).then((form) => {
+        Formio.createForm(document.getElementById('formio_{{ random }}'), formJSON_{{ random }}).then((form) => {
             console.log('log form', form);
 
             if (formValuesToLoad_{{ random }}) {
@@ -38,4 +38,4 @@ const formValuesToLoad_{{ random }} = {{{ formValuesToLoad }}}
 
 </script>
 
-<div id='formio'></div>
+<div id='formio_{{ random }}'></div>

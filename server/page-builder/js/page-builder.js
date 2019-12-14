@@ -549,12 +549,14 @@ async function createContentInstance(payload) {
 }
 
 async function editContentInstance(payload) {
+    debugger;
     let id = payload.id;
     console.log('putting payload', payload);
     if (payload.id) {
         delete payload.id;
     }
     if (payload.data.id) {
+        id = payload.data.id;
         delete payload.data.id;
     }
     // let data = {};
@@ -1040,6 +1042,7 @@ async function editModule() {
 
     let form = await formService.getForm(currentModuleContentType, data, "editContentInstance(submission)");
 
+    $('#dynamicModelTitle').text(`Settings: ${currentModuleContentType} (Id:${currentModuleId})`);
     $('#moduleSettingsFormio').html(form);
     loadModuleSettingForm();
     $('#moduleSettingsModal').appendTo("body").modal('show');
