@@ -436,7 +436,7 @@ async function addRow() {
 // }
 
 async function addColumn() {
-    debugger;
+    // debugger;
     let section = await getContentInstance(currentSectionId);
     console.log('secton', section);
     console.log('currentRowIndex', currentRowIndex);
@@ -549,7 +549,6 @@ async function createContentInstance(payload) {
 }
 
 async function editContentInstance(payload) {
-    debugger;
     let id = payload.id;
     console.log('putting payload', payload);
     if (payload.id) {
@@ -1002,6 +1001,7 @@ async function saveWYSIWYG() {
     block.data.body = content;
     editContentInstance(block);
 
+
     //update screen
     $('.block-edit').children().first().html(content);
     // $(`span[data-id="${id}"]`).html(content);
@@ -1040,8 +1040,7 @@ async function editModule() {
     let data = await getContentInstance(currentModuleId);
 
 
-    let form = await formService.getForm(currentModuleContentType, data, "editContentInstance(submission)");
-
+    let form = await formService.getForm(currentModuleContentType, data, "await editContentInstance(submission); fullPageUpdate();");
     $('#dynamicModelTitle').text(`Settings: ${currentModuleContentType} (Id:${currentModuleId})`);
     $('#moduleSettingsFormio').html(form);
     loadModuleSettingForm();
