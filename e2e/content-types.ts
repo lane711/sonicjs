@@ -15,7 +15,18 @@ const { assert } = require('chai');
         height: 680
     });
 
-    await page.goto('http://localhost:4200/admin/content-types');
+    await page.goto('http://localhost:3018/admin/content-types');
+
+    //login
+    await page.focus('input[id=email]')
+    await page.keyboard.type('a@a.com')
+
+    await page.focus('input[id=password]')
+    await page.keyboard.type('tiger44')
+
+    await page.click('#login-submit');
+
+
 
     //create new content type
     await page.click('.new-content-type');
