@@ -164,12 +164,13 @@ section {
 }
 
 .row-highlight {
-  border: 1px dotted yellowgreen;
+  box-shadow: 0 0 0 1px yellowgreen !important;
+  outline: dashed 1px darkgreen !important;
 }
 
 .col-highlight {
-  box-shadow: 0 0 0 1px #000 !important;
-  outline: dashed 1px #fff !important;
+  box-shadow: 0 0 0 1px crimson !important;
+  outline: dashed 1px darkred !important;
 }
 
 .row {

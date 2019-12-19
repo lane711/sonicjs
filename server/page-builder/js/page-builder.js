@@ -462,6 +462,13 @@ async function deleteColumn() {
     fullPageUpdate();
 }
 
+async function deleteRow() {
+    let section = await getContentInstance(currentSectionId);
+    section.data.rows.splice(currentRowIndex - 1, 1);
+    editContentInstance(section);
+    fullPageUpdate();
+}
+
 async function editColumnContent() {
 
     console.log(currentSectionId);
