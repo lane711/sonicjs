@@ -271,3 +271,12 @@ section .col:hover {
 .module{
   position: relative;
 }
+
+.empty-column{
+  font-size: .7em;
+  color: #777;
+  display: block;
+  text-align: center;
+  margin: 50px 0;
+  
+}

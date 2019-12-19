@@ -400,7 +400,7 @@ async function generateNewColumn() {
 
     //columns
     // let col = { class: 'col', content: `${b1ShortCode}` }
-    let col = { class: 'col', content: `empty row` }
+    let col = { class: 'col', content: `` }
     return col;
 }
 

@@ -270,7 +270,12 @@ module.exports = contentService = {
             // console.log('== column ==', column);
             globalService.pageContent += `<div class='${column.class}'>`;
             globalService.pageContent += `${column.content}`;
+            if(column.content){
             await this.processBlocks(column.content);
+            }else{
+                globalService.pageContent += `<span class="empty-column">empty column</spam>`;
+
+            }
             globalService.pageContent += `</div>`;
             columnArray.push(column);
         }
