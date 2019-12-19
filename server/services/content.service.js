@@ -27,7 +27,7 @@ module.exports = contentService = {
 
     startup: async function () {
         eventBusService.on('afterProcessModuleShortCodeProccessedHtml', async function (proccessedHtml) {
-            if(proccessedHtml){
+            if (proccessedHtml) {
                 contentService.wrapBlockInModuleDiv(proccessedHtml);
             }
         });
@@ -328,17 +328,19 @@ module.exports = contentService = {
                 let shortcode = bodyBlock.shortcode;
 
                 //new way:
-                await eventBusService.emit('beginProcessModuleShortCode', { req: this.req, shortcode: shortcode });
+                if (shortcode) {
+                    await eventBusService.emit('beginProcessModuleShortCode', { req: this.req, shortcode: shortcode });
 
-                //old way, TODO: refac
-                if (shortcode.name == "BLOCK") {
-                    await this.replaceBlockShortCode(shortcode)
-                }
-                if (shortcode.name == "FORM") {
-                    await this.replaceFormShortCode(shortcode)
-                }
-                if (shortcode.name == "LIST") {
-                    await this.replaceListShortCode(shortcode)
+                    //old way, TODO: refac
+                    if (shortcode.name == "BLOCK") {
+                        await this.replaceBlockShortCode(shortcode)
+                    }
+                    if (shortcode.name == "FORM") {
+                        await this.replaceFormShortCode(shortcode)
+                    }
+                    if (shortcode.name == "LIST") {
+                        await this.replaceListShortCode(shortcode)
+                    }
                 }
             }
         }

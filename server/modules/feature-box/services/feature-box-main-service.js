@@ -7,8 +7,11 @@ module.exports = featureBoxMainService = {
 
     startup: async function () {
         eventBusService.on('beginProcessModuleShortCode', async function (options) {
-            options.moduleName = 'feature-box';
-            await moduleService.processModuleInColumn(options);
+            if (options.shortcode.name === 'FEATURE-BOX') {
+
+                options.moduleName = 'feature-box';
+                await moduleService.processModuleInColumn(options);
+            }
         });
     }
 
