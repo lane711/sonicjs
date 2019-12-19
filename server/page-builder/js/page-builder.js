@@ -400,7 +400,7 @@ async function generateNewColumn() {
 
     //columns
     // let col = { class: 'col', content: `${b1ShortCode}` }
-    let col = { class: 'col', content: `` }
+    let col = { class: 'col', content: `empty row` }
     return col;
 }
 
@@ -464,7 +464,8 @@ async function deleteColumn() {
 
 async function deleteRow() {
     let section = await getContentInstance(currentSectionId);
-    section.data.rows.splice(currentRowIndex - 1, 1);
+    debugger;
+    section.data.rows.splice(currentRowIndex, 1);
     editContentInstance(section);
     fullPageUpdate();
 }
