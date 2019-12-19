@@ -161,6 +161,7 @@ function setupUIClicks() {
             currentColumn = $(this);
             currentColumn.addClass('col-highlight');
             $('.col-button').show().appendTo(currentColumn);
+            $('.add-module').show().appendTo(currentColumn);
             $('.row-button').show().appendTo(currentRow);
             // $('.block-button').show().appendTo(currentColumn.children('.module'));
             // currentColumn.children('.module').addClass('block-edit');
@@ -174,7 +175,7 @@ function setupUIClicks() {
             currentModuleContentType = moduleDiv.data('content-type');
 
             console.log('moduleId', currentModuleId);            
-            $('.block-button').show().appendTo(moduleDiv);
+            $('.edit-module').show().appendTo(moduleDiv);
             // currentColumn.children('.module').addClass('block-edit');
         },
     });
@@ -391,14 +392,15 @@ async function generateNewRow() {
 }
 
 async function generateNewColumn() {
-    let block1 = { contentType: 'block', body: '<p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>' };
+    // let block1 = { contentType: 'block', body: '<p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>' };
 
-    //save blocks and get the ids
-    let b1 = await createContentInstance(block1);
-    let b1ShortCode = `[BLOCK id="${b1.id}"/]`;
+    // //save blocks and get the ids
+    // let b1 = await createContentInstance(block1);
+    // let b1ShortCode = `[BLOCK id="${b1.id}"/]`;
 
     //columns
-    let col = { class: 'col', content: `${b1ShortCode}` }
+    // let col = { class: 'col', content: `${b1ShortCode}` }
+    let col = { class: 'col', content: `` }
     return col;
 }
 

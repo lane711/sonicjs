@@ -168,7 +168,8 @@ section {
 }
 
 .col-highlight {
-  border: 1px dotted crimson !important;
+  box-shadow: 0 0 0 1px #000 !important;
+  outline: dashed 1px #fff !important;
 }
 
 .row {
@@ -196,7 +197,13 @@ section {
   top: -34px;
 }
 
-.block-button {
+.add-module {
+  position: absolute;
+  left: 115px;
+  top: -34px;
+}
+
+.edit-module {
   position: absolute;
   right: -1px;
   top: -5px;
@@ -211,8 +218,12 @@ section {
   background-color: crimson;
 }
 
-.block-button .btn-secondary {
+.add-module .btn-secondary {
   background-color: slateblue;
+}
+
+.edit-module .btn-secondary {
+  background-color: skyblue;
 }
 
 section .col span, .pb-section .nav-link, .dropdown-menu .dropdown-item {
