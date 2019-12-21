@@ -172,3 +172,11 @@ border-bottom: 2px solid #999;
 margin: 0 0 40px;
 padding:0 0 40px;
 }
+
+a.black{
+    color:#212529;
+}
+
+.footer p{
+    font-size: .7em;
+}

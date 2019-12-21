@@ -10,7 +10,7 @@ module.exports = textMainService = {
 
             if (options.shortcode.name === 'TEXT') {
 
-                options.moduleName = 'feature-box';
+                options.moduleName = 'text';
                 await moduleService.processModuleInColumn(options);
             }
         });

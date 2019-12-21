@@ -9,7 +9,7 @@ module.exports = htmlMainService = {
 
                 if (options.shortcode.name === 'HTML') {
 
-                    options.moduleName = 'feature-box';
+                    options.moduleName = 'html';
                     await moduleService.processModuleInColumn(options);
                 }
 
