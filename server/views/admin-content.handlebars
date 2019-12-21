@@ -7,13 +7,12 @@
       </button>
     </div>
     <div class="card-body page-list">
-      <table class="table table-responsive-sm table-striped">
+      <table class="table table-responsive-sm table-striped" id="admin-content">
         <thead>
           <tr>
             <th>Title</th>
             <th>Type</th>
-            <th>Url</th>
-            <th>Content</th>
+            <th>Created</th>
             <th class='text-right'>Actions</th>
           </tr>
         </thead>
@@ -22,19 +21,13 @@
           <tr>
             <td><a href="{{ this.data.url }}">{{ this.data.title }}</a></td>
             <td>{{ this.data.contentType }}</td>
-            <td>{{ this.data.url }}</td>
-            <td>...</td>
+            <td>{{ this.data.createdOn }}</td>
             <td class='text-right'>
-              <a href="/admin/content/edit/{{ this.data.contentType }}/{{ this.id }}" class="btn btn-sm btn-primary rmargin">Edit</a>
+              <a href="/admin/content/edit/{{ this.data.contentType }}/{{ this.id }}"
+                class="btn btn-sm btn-primary rmargin">Edit</a>
 
-<a tabindex="0"
-   class="btn btn-sm btn-danger" 
-   role="button" 
-   data-html="true" 
-   data-toggle="popover" 
-   data-trigger="focus" 
-   title="Delete <b>{{ this.data.title }}</b> Forever?" 
-   data-content="<a href='/content/{{ this.id }}' 
+              <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
+                data-trigger="focus" title="Delete <b>{{ this.data.title }}</b> Forever?" data-content="<a href='/content/{{ this.id }}' 
    class='btn btn-sm btn-danger rmargin'>Confirm Delete</a>
 ">Delete</a>
 

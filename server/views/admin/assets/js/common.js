@@ -37,6 +37,11 @@ $(document).ready(async function () {
     return parts[parts.length - (positionFromLast + 1)];
   }
 
+  $('#admin-content').DataTable(
+    {
+      "order": [[ 2, "desc" ]]
+  } 
+  );
 
 });
 

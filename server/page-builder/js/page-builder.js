@@ -4,7 +4,7 @@ var contentTypeComponents;
 var axiosInstance;
 
 var imageList, tinyImageList, currentSectionId, currentSection, currentRow, currentRowIndex, currentColumn,
-    currentColumnIndex, jsonEditor;
+    currentColumnIndex, currentModuleId, currentModuleContentType, jsonEditor;
 
 $(document).ready(async function () {
     await setupAxiosInstance();
@@ -15,6 +15,7 @@ $(document).ready(async function () {
     setupJsonEditor();
     await setPage();
     await setContentType();
+    setupJsonEditorContentTypeRaw();
     imageList = await getImageList();
     // setTimeout(setupPageSettings, 1);
     // setupPageSettings();
@@ -146,8 +147,9 @@ function setupUIClicks() {
         },
     });
 
-    $("section .col").on({
+    $("section .row > *").on({
         click: function () {
+            // debugger;
             $('.col-highlight').removeClass('col-highlight');
             $('.block-edit').removeClass('block-edit');
             currentSectionId = $(this).closest('section').data('id');
@@ -159,9 +161,22 @@ function setupUIClicks() {
             currentColumn = $(this);
             currentColumn.addClass('col-highlight');
             $('.col-button').show().appendTo(currentColumn);
+            $('.add-module').show().appendTo(currentColumn);
             $('.row-button').show().appendTo(currentRow);
-            $('.block-button').show().appendTo(currentColumn.children('span'));
-            currentColumn.children('span').addClass('block-edit');
+            // $('.block-button').show().appendTo(currentColumn.children('.module'));
+            // currentColumn.children('.module').addClass('block-edit');
+        },
+    });
+
+    $("section .row .module").on({
+        click: function () {
+            let moduleDiv = $(this).closest('.module');
+            currentModuleId = moduleDiv.data('id');
+            currentModuleContentType = moduleDiv.data('content-type');
+
+            console.log('moduleId', currentModuleId);            
+            $('.edit-module').show().appendTo(moduleDiv);
+            // currentColumn.children('.module').addClass('block-edit');
         },
     });
 
@@ -377,14 +392,15 @@ async function generateNewRow() {
 }
 
 async function generateNewColumn() {
-    let block1 = { contentType: 'block', body: '<p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>' };
+    // let block1 = { contentType: 'block', body: '<p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>' };
 
-    //save blocks and get the ids
-    let b1 = await createContentInstance(block1);
-    let b1ShortCode = `[BLOCK id="${b1.id}"/]`;
+    // //save blocks and get the ids
+    // let b1 = await createContentInstance(block1);
+    // let b1ShortCode = `[BLOCK id="${b1.id}"/]`;
 
     //columns
-    let col = { class: 'col', content: `${b1ShortCode}` }
+    // let col = { class: 'col', content: `${b1ShortCode}` }
+    let col = { class: 'col', content: `` }
     return col;
 }
 
@@ -422,7 +438,7 @@ async function addRow() {
 // }
 
 async function addColumn() {
-    debugger;
+    // debugger;
     let section = await getContentInstance(currentSectionId);
     console.log('secton', section);
     console.log('currentRowIndex', currentRowIndex);
@@ -443,6 +459,14 @@ async function deleteColumn() {
 
     editContentInstance(section);
 
+    fullPageUpdate();
+}
+
+async function deleteRow() {
+    let section = await getContentInstance(currentSectionId);
+    debugger;
+    section.data.rows.splice(currentRowIndex, 1);
+    editContentInstance(section);
     fullPageUpdate();
 }
 
@@ -541,6 +565,7 @@ async function editContentInstance(payload) {
         delete payload.id;
     }
     if (payload.data.id) {
+        id = payload.data.id;
         delete payload.data.id;
     }
     // let data = {};
@@ -640,29 +665,28 @@ async function setupPageSettings(action, contentType) {
     // let page = await getContentInstance(pageId);
 
     // Formio.createForm(document.getElementById('formio'), {
-    //     components: [
-    //       {
-    //         type: 'textfield',
-    //         key: 'firstName',
-    //         label: 'First Name',
-    //         placeholder: 'Enter your first name.',
-    //         input: true
-    //       },
-    //       {
-    //         type: 'textfield',
-    //         key: 'lastName',
-    //         label: 'Last Name',
-    //         placeholder: 'Enter your last name',
-    //         input: true
-    //       },
-    //       {
-    //         type: 'button',
-    //         action: 'submit',
-    //         label: 'Submit',
-    //         theme: 'primary'
-    //       }
-    //     ]
-    //   });
+    let components = [
+        {
+            type: 'textfield',
+            key: 'firstName',
+            label: 'First Name',
+            placeholder: 'Enter your first name.',
+            input: true
+        },
+        {
+            type: 'textfield',
+            key: 'lastName',
+            label: 'Last Name',
+            placeholder: 'Enter your last name',
+            input: true
+        },
+        {
+            type: 'button',
+            action: 'submit',
+            label: 'Submit',
+            theme: 'primary'
+        }
+    ];
 
     // debugger;
     if (!this.page.data) {
@@ -928,8 +952,31 @@ function setupJsonEditor() {
 
     jsonEditor = new JSONEditor(container, options);
     // editor.destroy(); //reset'
+}
 
+function setupJsonEditorContentTypeRaw() {
+    var containerRaw = document.getElementById("jsoneditorRaw");
+    if (!containerRaw) return;
 
+    var options = {
+        mode: 'text',
+        modes: ['code', 'form', 'text', 'tree', 'view'], // allowed modes
+        onError: function (err) {
+            alert(err.toString());
+        },
+        onModeChange: function (newMode, oldMode) {
+            console.log('Mode switched from', oldMode, 'to', newMode);
+        }
+    };
+
+    const jsonEditorRaw = new JSONEditor(containerRaw, options);
+    
+    // set json
+    const initialJson = this.contentType;
+    jsonEditorRaw.set(initialJson)
+
+    // get json
+    const updatedJson = jsonEditorRaw.get();
 }
 
 function loadJsonEditor() {
@@ -964,6 +1011,7 @@ async function saveWYSIWYG() {
     block.data.body = content;
     editContentInstance(block);
 
+
     //update screen
     $('.block-edit').children().first().html(content);
     // $(`span[data-id="${id}"]`).html(content);
@@ -976,9 +1024,83 @@ async function saveWYSIWYG() {
 }
 
 async function addModule(systemid) {
-    console.log('adding ' + systemid);
+    cleanModal();
+    console.log('adding module to column: ' + systemid);
+    // debugger;
+    // const viewModel = encodeURI(`{"data": {"onFormSubmitFunction":"addModuleToColumn(submission)"}}`);
+    // const viewPath = encodeURI(`/assets/html/form.html`);
+
+    
+
+    // let formHtml = await axiosInstance.get(`api/views/getProceedView?viewModel=${viewModel}&viewPath=${viewPath}`)
+
+    let form = await formService.getForm(systemid, undefined, "addModuleToColumn(submission)");
+
+    $('#moduleSettingsFormio').html(form);
+    loadModuleSettingForm();
     $('#moduleSettingsModal').appendTo("body").modal('show');
 
+}
+
+async function editModule() {
+    cleanModal();
+
+    console.log('editing module: ' +  currentModuleId, currentModuleContentType);
+
+    let data = await getContentInstance(currentModuleId);
+
+
+    let form = await formService.getForm(currentModuleContentType, data, "await editContentInstance(submission); fullPageUpdate();");
+    $('#dynamicModelTitle').text(`Settings: ${currentModuleContentType} (Id:${currentModuleId})`);
+    $('#moduleSettingsFormio').html(form);
+    loadModuleSettingForm();
+    $('#moduleSettingsModal').appendTo("body").modal('show');
+
+}
+
+async function cleanModal(){
+    $('#moduleSettingsFormio').empty();
+
+}
+
+async function addModuleToColumn(submission) {
+    // debugger;
+    console.log('adding module to column', submission);
+
+    //handling adding module def to db
+    let entity = processContentFields(submission.data);
+    let processedEntity;
+    if (submission.data.id) {
+        processedEntity = await editContentInstance(entity);
+    }
+    else {
+        processedEntity = await createContentInstance(entity);
+    }
+
+    // generate short code ie: [MODULE-HELLO-WORLD id="123"]
+    let args = { id: processedEntity.id };
+    let moduleInstanceShortCode = sharedService.generateShortCode(`${submission.data.contentType}`, args);
+
+    //add the shortCode to the column
+    let section = await getContentInstance(currentSectionId);
+    let column = section.data.rows[currentRowIndex].columns[currentColumnIndex -1];
+    column.content += moduleInstanceShortCode;
+    editContentInstance(section);
+
+    fullPageUpdate();
+
+}
+
+async function submitContent(submission) {
+    console.log('Submission was made!', submission);
+    // debugger;
+    let entity = processContentFields(submission.data)
+    if (submission.data.id) {
+        await editContentInstance(entity);
+    }
+    else {
+        await createContentInstance(entity);
+    }
 }
 
 async function postProcessNewContent(content) {
@@ -988,13 +1110,13 @@ async function postProcessNewContent(content) {
             //add to existing main menu
             // await editContentInstance(entity);
             let mainMenu = await getContentByContentTypeAndTitle('menu', 'Main')
-            let meniItem = {
+            let menuItem = {
                 url: content.url,
                 title: content.name,
                 active: true,
                 level: "0"
             }
-            mainMenu.data.links.push(meniItem);
+            mainMenu.data.links.push(menuItem);
             await editContentInstance(mainMenu);
         }
     }

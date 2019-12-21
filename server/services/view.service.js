@@ -2,11 +2,7 @@ var dataService = require('./data.service');
 var helperService = require('./helper.service');
 
 var fs = require('fs');
-const cheerio = require('cheerio')
-const axios = require('axios');
-const ShortcodeTree = require('shortcode-tree').ShortcodeTree;
-const chalk = require('chalk');
-const log = console.log;
+
 
 var handlebars = require('handlebars');
 

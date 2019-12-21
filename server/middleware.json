@@ -17,7 +17,6 @@
       "params": "${cookieSecret}"
     }
   },
-  "session": {},
   "auth": {
     "loopback#token": {}
   },
@@ -151,6 +150,12 @@
           "/files"
         ],
         "params": "$!../server/storage/files"
+      },
+      {
+        "paths": [
+          "/services"
+        ],
+        "params": "$!../server/services"
       }
     ]
   },

@@ -1,64 +1,41 @@
 <script type='text/javascript'>
 
-    // const components = [
-    //                     {
-    //                         type: 'textfield',
-    //                         key: 'firstName',
-    //                         label: 'First Name',
-    //                         placeholder: 'Enter your first name.',
-    //                         input: true
-    //                     },
-    //                     {
-    //                         type: 'textfield',
-    //                         key: 'lastName',
-    //                         label: 'Last Name',
-    //                         placeholder: 'Enter your last name',
-    //                         input: true
-    //                     },
-    //                     {
-    //                         type: 'currency',
-    //                         key: 'cost',
-    //                         label: 'Cost',
-    //                         placeholder: 'Enter $ cost',
-    //                         input: true
-    //                     },
-    //                     {
-    //                         type: 'button',
-    //                         action: 'submit',
-    //                         label: 'Submit',
-    //                         theme: 'primary'
-    //                     }
-    //                 ]
+const formJSON_{{ random }} = {{{ formJSON }}}
 
-    window.onload = async function () {
-        Formio.createForm(document.getElementById('formio'), formJSON).then((form) => {
+const formValuesToLoad_{{ random }} = {{{ formValuesToLoad }}}
+
+    loadModuleSettingForm = async function () {
+        // debugger;
+        Formio.createForm(document.getElementById('formio_{{ random }}'), formJSON_{{ random }}).then((form) => {
             console.log('log form', form);
 
-            if (formValuesToLoad) {
+            if (formValuesToLoad_{{ random }}) {
                 form.submission = {
-                    data: formValuesToLoad
+                    data: formValuesToLoad_{{ random }}
                 };
             }
 
             form.on('submit', async function (submission) {
-                console.log('Submission was made!', submission);
-                // debugger;
-                let entity = processContentFields(submission.data)
-                if (submission.data.id) {
-                    await editContentInstance(entity);
-                }
-                else {
-                    await createContentInstance(entity);
-                }
+
+                {{ onFormSubmitFunction }}
+
             });
 
             // Everytime the form changes, this will fire.
-            form.on('change', function (changed) {
-                console.log('Form was changed', changed);
-            });
+            // form.on('change', function (changed) {
+            //     console.log('Form was changed', changed);
+            // });
 
         });
     };
+
+    window.onload = async function () {
+        // debugger;
+        if (typeof module === 'undefined') {
+            loadModuleSettingForm();
+        }
+    }
+
 </script>
 
-<div id='formio'></div>
+<div id='formio_{{ random }}'></div>

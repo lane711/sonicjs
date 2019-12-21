@@ -36,7 +36,7 @@ module.exports = fileService = {
     },
 
     writeFile: async function (filePath, fileContent) {
-        let fullPath = path.join(__dirname, '../', filePath);
+        let fullPath = path.join(__dirname, filePath);
         // console.log('adminPath--->', adminPath);
 
         return new Promise((resolve, reject) => {
@@ -48,6 +48,13 @@ module.exports = fileService = {
                 else resolve(data);
             });
         });
+    },
+
+    createDirectory: async function (directoryRelativePath) {
+        let dirPath = path.join(__dirname, directoryRelativePath);
+        if (!fs.existsSync(dirPath)){
+            fs.mkdirSync(dirPath);
+        }
     },
 
 }

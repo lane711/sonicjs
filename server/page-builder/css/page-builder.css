@@ -1,11 +1,12 @@
 .pb-wrapper {
   width: 260px;
   height: 100%;
-  position: absolute;
+  position: fixed;
   left: 0;
   top: 0;
   background: #2f353a;
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 13px;
 }
 
 .pbe-wrapper {
@@ -163,11 +164,13 @@ section {
 }
 
 .row-highlight {
-  border: 1px dotted #878f99;
+  box-shadow: 0 0 0 1px yellowgreen !important;
+  outline: dashed 1px darkgreen !important;
 }
 
 .col-highlight {
-  border: 1px dotted #6b5b95 !important;
+  box-shadow: 0 0 0 1px crimson !important;
+  outline: dashed 1px darkred !important;
 }
 
 .row {
@@ -181,37 +184,47 @@ section {
 .row-button {
   position: absolute;
   left: -1px;
-  bottom: -31px;
+  bottom: -29px;
   z-index: 2;
 }
 
 .row-button .btn-secondary {
-  background-color: #878f99;
+  background-color: yellowgreen;
 }
 
 .col-button {
   position: absolute;
-  left: -1px;
-  top: -31px;
+  left: -2px;
+  top: -34px;
 }
 
-.block-button {
+.add-module {
+  position: absolute;
+  left: 115px;
+  top: -34px;
+}
+
+.edit-module {
   position: absolute;
   right: -1px;
-  bottom: -31px;
+  top: -5px;
   z-index: 2;
 }
 
 .module-button {
-  right: 105px;
+  right: 32px;
 }
 
 .col-button .btn-secondary {
-  background-color: #6b5b95;
+  background-color: crimson;
 }
 
-.block-button .btn-secondary {
-  background-color: #a2b9bc;
+.add-module .btn-secondary {
+  background-color: slateblue;
+}
+
+.edit-module .btn-secondary {
+  background-color: skyblue;
 }
 
 section .col span, .pb-section .nav-link, .dropdown-menu .dropdown-item {
@@ -226,8 +239,9 @@ section .col:hover {
   border: 1px dotted #6b5b95;
 }
 
-.block-edit .btn {
+.section-editor-button .btn {
   border-radius: 0;
+  border: 0;
 }
 
 .block-edit {
@@ -243,4 +257,26 @@ section .col:hover {
 .ace_editor {
   width: 255px;
   height: 85vh;
+}
+
+.section-wrapper {
+  margin: 0 0 20px;
+}
+
+.btn-group.btn-section {
+  width: 100%;
+  margin: 0 1rem;
+}
+
+.module{
+  position: relative;
+}
+
+.empty-column{
+  font-size: .7em;
+  color: #777;
+  display: block;
+  text-align: center;
+  margin: 50px 0;
+  
 }

@@ -23,7 +23,15 @@ var page;
 var id;
 var req;
 
-module.exports = {
+module.exports = contentService = {
+
+    startup: async function () {
+        eventBusService.on('afterProcessModuleShortCodeProccessedHtml', async function (proccessedHtml) {
+            if (proccessedHtml) {
+                contentService.wrapBlockInModuleDiv(proccessedHtml);
+            }
+        });
+    },
 
     getRenderedPage: async function (req) {
 
@@ -262,7 +270,12 @@ module.exports = {
             // console.log('== column ==', column);
             globalService.pageContent += `<div class='${column.class}'>`;
             globalService.pageContent += `${column.content}`;
+            if(column.content){
             await this.processBlocks(column.content);
+            }else{
+                globalService.pageContent += `<span class="empty-column">empty column</spam>`;
+
+            }
             globalService.pageContent += `</div>`;
             columnArray.push(column);
         }
@@ -320,20 +333,26 @@ module.exports = {
                 let shortcode = bodyBlock.shortcode;
 
                 //new way:
-                await eventBusService.emit('beginProcessModuleShortCode', { req: this.req, shortcode: shortcode });
+                if (shortcode) {
+                    await eventBusService.emit('beginProcessModuleShortCode', { req: this.req, shortcode: shortcode });
 
-                //old way, TODO: refac
-                if (shortcode.name == "BLOCK") {
-                    await this.replaceBlockShortCode(shortcode)
-                }
-                if (shortcode.name == "FORM") {
-                    await this.replaceFormShortCode(shortcode)
-                }
-                if (shortcode.name == "LIST") {
-                    await this.replaceListShortCode(shortcode)
+                    //old way, TODO: refac
+                    if (shortcode.name == "BLOCK") {
+                        await this.replaceBlockShortCode(shortcode)
+                    }
+                    if (shortcode.name == "FORM") {
+                        await this.replaceFormShortCode(shortcode)
+                    }
+                    if (shortcode.name == "LIST") {
+                        await this.replaceListShortCode(shortcode)
+                    }
                 }
             }
         }
+    },
+
+    wrapBlockInModuleDiv: function (proccessedHtml) {
+        proccessedHtml.body = `<div class="module" data-id="${proccessedHtml.id}" data-content-type="${proccessedHtml.contentType}">${proccessedHtml.body}</div>`
     },
 
     // setupShortCodeParser: async function(){

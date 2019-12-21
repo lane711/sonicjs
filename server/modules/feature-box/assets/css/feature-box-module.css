@@ -1,0 +1,19 @@
+/* Css File for Module: feature-box */
+
+.feature-box {
+    text-align: center;
+    /* background: #fff; */
+    padding: 40px;
+}
+
+.feature-box .icon {
+    font-size: 100px;
+    text-shadow: 1px 1px rgba(255,255,255,0.8);
+}
+
+.feature-box .title {
+    font-size: 1.3em;
+    font-weight: bold;
+    margin: 20px 0 30px;
+    text-shadow: 1px 1px rgba(255,255,255,0.8);
+}

@@ -59,5 +59,13 @@
   "container": {
     "dataSource": "storage",
     "public": true
+  },
+  "view": {
+    "dataSource": null,
+    "public": true
+  },
+  "module": {
+    "dataSource": null,
+    "public": true
   }
 }
