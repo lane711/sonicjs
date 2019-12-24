@@ -146,7 +146,7 @@ module.exports = moduleService = {
         if (options.shortcode.name === options.moduleName.toUpperCase()) {
             let id = options.shortcode.properties.id;
             let contentType = options.moduleName;
-            let viewPath = path.join(__dirname, `/../modules/${options.shortcode.name}/views/${options.shortcode.name}-main.handlebars`);
+            let viewPath = path.join(__dirname, `/../modules/${contentType}/views/${contentType}-main.handlebars`);
             let viewModel = await dataService.getContentById(id);
             var proccessedHtml = { id: id, contentType: contentType,  body: await this.processView(contentType, viewModel, viewPath) };
 
