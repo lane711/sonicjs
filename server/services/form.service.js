@@ -3,6 +3,7 @@ if (typeof module !== 'undefined' && module.exports) {
     isBackEndMode = true;
     var dataService = require('./data.service');
     var eventBusService = require('./event-bus.service');
+    var helperService = require('./helper.service');
 
     var fs = require('fs');
     const cheerio = require('cheerio')
