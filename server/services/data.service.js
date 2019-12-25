@@ -13,7 +13,6 @@ if (typeof module !== 'undefined' && module.exports) {
     var log = console.log;
 } else {
     // var globalService = {};
-    // axiosInstance = axios.create({ baseURL: 'http://localhost:3018/' });
 }
 
 (function (exports) {
@@ -114,7 +113,6 @@ if (typeof module !== 'undefined' && module.exports) {
         exports.getContentByUrl = async function (url) {
             var filter = encodeURI(`{"where":{"data.url":"${url}"}}`);
             let apiFullUrl = `${apiUrl}contents?filter=${filter}`;
-            // var instance = axios.create({ baseURL: 'http://localhost:3018' });
             let record = await this.getAxios().get(apiFullUrl);
             if (record.data[0] && record.data.length > 0) {
                 return record;

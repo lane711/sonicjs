@@ -1,14 +1,16 @@
 isBackEndMode = false;
+var axiosInstance;
+
 if (typeof module !== 'undefined' && module.exports) {
     isBackEndMode = true;
     var dataService = require('./data.service');
     var eventBusService = require('./event-bus.service');
     var helperService = require('./helper.service');
+    var globalService = require('./global.service');
 
     var fs = require('fs');
     const cheerio = require('cheerio')
-    const axios = require('axios');
-    var axiosInstance = axios.create({ baseURL: 'http://localhost:3018/' });
+    var axios = require('axios');
 
     const ShortcodeTree = require('shortcode-tree').ShortcodeTree;
     const chalk = require('chalk');
@@ -17,15 +19,32 @@ if (typeof module !== 'undefined' && module.exports) {
     const Formio = {};
     const document = { getElementById: {} };
 } else {
-    // debugger;
-    // var globalService = {};
-    // globalService.axiosInstance = axios.create({ baseURL: 'http://localhost:3018/' });
-    // const axios = require('axios');
-    var axiosInstance = axios.create({ baseURL: 'http://localhost:3018/' });
-    // const axios = axios.create({ baseURL: 'http://localhost:3018/' });
+
+    // const defaultOptions = {
+    //     headers: {},
+    //     baseURL: globalService.baseUrl
+    // }
+
+    // if(globalService.authToken){
+    //     defaultOptions.headers.Authorization = globalService.authToken;
+    // }
+
+    // axiosInstance = axios.create(defaultOptions);
+
 }
 
 (function (exports) {
+
+    // const defaultOptions = {
+    //     headers: {},
+    //     baseURL: globalService.baseUrl
+    // }
+
+    // if(globalService.authToken){
+    //     defaultOptions.headers.Authorization = globalService.authToken;
+    // }
+
+    // axiosInstance = axios.create(defaultOptions);
 
     // module.exports = formService = {
 
@@ -38,6 +57,25 @@ if (typeof module !== 'undefined' && module.exports) {
     // },
 
     exports.startup = async function () {
+
+        eventBusService.on('requestBegin', async function (options) {
+            // console.log('data service startup')
+            if (options) {
+                const defaultOptions = {
+                    headers: {},
+                    baseURL: globalService.baseUrl
+                }
+
+                if(globalService.authToken){
+                    defaultOptions.headers.Authorization = globalService.authToken;
+                }
+
+                axiosInstance = axios.create(defaultOptions);
+
+                // axiosInstance = axios.create({ baseURL: globalService.baseUrl });
+            }
+        });
+
         eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
             if (options && options.page) {
                 options.page.data.editForm = await exports.getForm(options.page.contentTypeId, null,  "submitContent(submission)");
