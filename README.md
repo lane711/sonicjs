@@ -76,7 +76,7 @@ SonicJs is built with love from Orange County California.
 ## Free Forever
 If you are considering using SonicJs for your next web project, its important to know that it shall remain free forever (again similar to Drupal). Be wary of "free" open source solutions being built by start-ups or established companies that haven't made this same "free forever" commitment. 
 
-If you are interested in reading more about me or the goals and motivation of the project, please check out the "about" page here: https://sonicjs.com/about. Also, if you've actually read down this far and happen to be a in generous mood, would you mind given the project a star? Thanks in advance!
+If you are interested in reading more about me or the goals and motivation of the project, please check out the "about" page here: https://sonicjs.com/about. Also, if you've actually read down this far and happen to be a in generous mood, &#x1F34F;**would you mind given the project a star?**&#x1F34F; Thanks in advance!
 
 ## Screen Shots
 
@@ -127,9 +127,9 @@ If you are interested in reading more about me or the goals and motivation of th
 1. From Visual Studio Code, make sure the standard debugger for Chrome extension is installed.
 1. Hit "Play"
 
-## Goals, Motivation and Principals
+## Goals, Motivation & Principals
 
-Coming soon...
+Please see here: https://sonicjs.com/about
 
 ## Credits
 
