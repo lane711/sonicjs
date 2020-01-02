@@ -24,10 +24,9 @@ module.exports = contactUsMainService = {
                 return;
             }
 
-            // options.viewModel.data.form = await formService.getForm('contact', undefined, "addModuleToColumn(submission)");
-            options.viewModel.data.form = "<script type='text/javascript'>alert('df');</script>"
+            options.viewModel.data.form  = await formService.getForm('contact', undefined, "submitForm(submission)");
 
-            console.log('contact module after view model', options.viewModel);
+            // console.log('contact module after view model', options.viewModel);
 
         });
 

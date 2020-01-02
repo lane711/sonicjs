@@ -142,6 +142,10 @@ module.exports = function (app) {
     res.send(css);
   });
 
+  app.post('/form-submission', function (req, res) {
+    console.log(req.body.data);
+  });
+
   // router.get('/admin/content-types', function (req, res) {
   //   res.send(adminPage);
   // });
