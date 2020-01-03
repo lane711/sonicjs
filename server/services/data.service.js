@@ -216,10 +216,10 @@ if (typeof module !== 'undefined' && module.exports) {
             }
         
             // return this.http.post("/api/contents/", content).toPromise();
-            return this.getAxios().post('/api/contents/', payload)
-                .then(async function (response) {
+            this.getAxios().post('/api/contents/', payload)
+                .then(function (response) {
                     console.log(response);
-                    return await response.data;
+                    return response.data;
                 })
                 .catch(function (error) {
                     console.log(error);

@@ -1,8 +1,9 @@
 var dataService = require('../../../services/data.service');
 var eventBusService = require('../../../services/event-bus.service');
 var globalService = require('../../../services/global.service');
-var formService = require('../../../services/form.service')
-var dataService = require('../../../services/data.service')
+var formService = require('../../../services/form.service');
+var dataService = require('../../../services/data.service');
+var emailService = require('../../../services/email.service')
 
 module.exports = contactUsMainService = {
 
@@ -41,16 +42,16 @@ module.exports = contactUsMainService = {
             await dataService.createContentInstance(options);
 
             // send the emails
-            //confirmation to user
             let contact = options.data;
 
+            //confirmation to user
             let body = `Hi ${contact.name}, \n\nThanks for reaching out. We'll get back to you ASAP.\n\nFor your reference, here was your message:\n${contact.message}`
-            emailService.sendEmail(contact.email, 'admin@sonicjs.com', 'SoncisJs Message Received', body);
+            await emailService.sendEmail(contact.email, 'admin@sonicjs.com', 'SoncisJs Message Received', body);
 
 
             //admin notification
             let adminBody = `${contact.name} (${contact.email}) wrote: \n\n${contact.message}`
-            emailService.sendEmail('admin@sonicjs.com', contact.email, 'SoncisJs Contact', adminBody);
+            await emailService.sendEmail('admin@sonicjs.com', contact.email, 'SoncisJs Contact', adminBody);
 
         });
 
