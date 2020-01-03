@@ -178,6 +178,55 @@ if (typeof module !== 'undefined' && module.exports) {
             return 'not found';
         },
 
+
+        exports.editContentInstance = async function (payload) {
+            let id = payload.id;
+            console.log('putting payload', payload);
+            if (payload.id) {
+                delete payload.id;
+            }
+            if (payload.data && payload.data.id) {
+                id = payload.data.id;
+                delete payload.data.id;
+            }
+
+            return this.getAxios().put(`/api/contents/${id}`, payload)
+                .then(async function (response) {
+                    console.log(response);
+                    return await response.data;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+
+        exports.createContentInstance = async function (payload) {
+            // console.log('createContentInstance payload', payload);
+            // let content = {};
+            // content.data = payload;
+            // this.processContentFields(payload, content);
+            console.log('payload', payload);
+            if (payload.id || 'id' in payload) {
+                delete payload.id;
+            }
+        
+            if (!payload.data) {
+                let temp = { data: payload };
+                payload = temp;
+            }
+        
+            // return this.http.post("/api/contents/", content).toPromise();
+            return this.getAxios().post('/api/contents/', payload)
+                .then(async function (response) {
+                    console.log(response);
+                    return await response.data;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        
+        }
+
         exports.getContentById = async function (id) {
             let url = `${apiUrl}contents/${id}`;
             let content = await this.getAxios().get(url);

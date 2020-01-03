@@ -14,6 +14,8 @@ function submitForm(submission) {
   axios({
     method: 'post',
     url: '/form-submission',
-    data: submission
+    data: {
+      data: submission
+    }
   });
 }
