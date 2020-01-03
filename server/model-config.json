@@ -14,26 +14,26 @@
     ]
   },
   "User": {
-    "dataSource": "db",
+    "dataSource": "db-user",
     "public": true
   },
   "AccessToken": {
-    "dataSource": "db",
+    "dataSource": "db-user",
     "public": false
   },
   "ACL": {
-    "dataSource": "db",
+    "dataSource": "db-user",
     "public": false
   },
   "RoleMapping": {
-    "dataSource": "db",
+    "dataSource": "db-user",
     "public": false,
     "options": {
       "strictObjectIDCoercion": true
     }
   },
   "Role": {
-    "dataSource": "db",
+    "dataSource": "db-user",
     "public": false
   },
   "contentType": {

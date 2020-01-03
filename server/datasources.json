@@ -4,6 +4,11 @@
     "connector": "memory",
     "file": "data.json"
   },
+  "db-user": {
+    "name": "db",
+    "connector": "memory",
+    "file": "data-user.json"
+  },
   "transient": {
     "name": "transient",
     "connector": "transient"
