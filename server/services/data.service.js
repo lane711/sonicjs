@@ -32,7 +32,7 @@ if (typeof module !== 'undefined' && module.exports) {
                     baseURL: globalService.baseUrl
                 }
 
-                if(globalService.authToken){
+                if (globalService.authToken) {
                     defaultOptions.headers.Authorization = globalService.authToken;
                 }
 
@@ -51,7 +51,7 @@ if (typeof module !== 'undefined' && module.exports) {
                     baseURL: globalService.baseUrl
                 }
 
-                if(globalService.authToken){
+                if (globalService.authToken) {
                     defaultOptions.headers.Authorization = globalService.authToken;
                 }
 
@@ -178,11 +178,66 @@ if (typeof module !== 'undefined' && module.exports) {
             return 'not found';
         },
 
-        exports.getContentById = async function (id) {
-            let url = `${apiUrl}contents/${id}`;
-            let content = await this.getAxios().get(url);
-            return content.data;
+
+        exports.editContentInstance = async function (payload) {
+            let id = payload.id;
+            console.log('putting payload', payload);
+            if (payload.id) {
+                delete payload.id;
+            }
+            if (payload.data && payload.data.id) {
+                id = payload.data.id;
+                delete payload.data.id;
+            }
+
+            return this.getAxios().put(`/api/contents/${id}`, payload)
+                .then(async function (response) {
+                    console.log(response);
+                    return await response.data;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         },
+
+        exports.createContentInstance = async function (payload) {
+            // console.log('createContentInstance payload', payload);
+            // let content = {};
+            // content.data = payload;
+            // this.processContentFields(payload, content);
+            console.log('payload', payload);
+            if (payload.id || 'id' in payload) {
+                delete payload.id;
+            }
+
+            if (!payload.data) {
+                let temp = { data: payload };
+                payload = temp;
+            }
+
+            // return this.http.post("/api/contents/", content).toPromise();
+            this.getAxios().post('/api/contents/', payload)
+                .then(function (response) {
+                    console.log(response);
+                    return response.data;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+
+        }
+
+    exports.getContentById = async function (id) {
+        let url = `${apiUrl}contents/${id}`;
+        return this.getAxios().get(url)
+            .then(function (content) {
+                // console.log('getContentById', content.data);
+                return content.data;
+            })
+            .catch(function (error) {
+                console.log('getContentById ERROR', error);
+            })
+    },
 
         exports.asyncForEach = async function (array, callback) {
             for (let index = 0; index < array.length; index++) {

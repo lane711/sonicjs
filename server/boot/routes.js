@@ -142,6 +142,13 @@ module.exports = function (app) {
     res.send(css);
   });
 
+  app.post('/form-submission', async function (req, res) {
+    console.log(req.body.data);
+
+    await eventBusService.emit("afterFormSubmit", req.body.data);
+
+  });
+
   // router.get('/admin/content-types', function (req, res) {
   //   res.send(adminPage);
   // });

@@ -224,24 +224,19 @@ module.exports = contentService = {
 
             await this.asyncForEach(sections, async (sectionId) => {
 
-
                 let section = await dataService.getContentById(sectionId);
-                globalService.pageContent += `<section data-id='${section.id}' class="jumbotron-fluid">`;
-                globalService.pageContent += '<div class="overlay">';
-                globalService.pageContent += '<div class="container">';
-                let rows = await this.processRows($, sectionWrapper, section.data.rows)
-                globalService.pageContent += '</div>';
-                globalService.pageContent += '</div>';
-                globalService.pageContent += `</section>`;
+                if (section) {
+                    globalService.pageContent += `<section data-id='${section.id}' class="jumbotron-fluid">`;
+                    globalService.pageContent += '<div class="overlay">';
+                    globalService.pageContent += '<div class="container">';
+                    let rows = await this.processRows($, sectionWrapper, section.data.rows)
+                    globalService.pageContent += '</div>';
+                    globalService.pageContent += '</div>';
+                    globalService.pageContent += `</section>`;
 
-                this.page.data.sections.push({ id: sectionId, title: section.data.title, rows: rows });
-
-
-                // console.log('section==>', section);
+                    this.page.data.sections.push({ id: sectionId, title: section.data.title, rows: rows });
+                }
             });
-
-            // console.log('section====>', this.page.data.sections);
-
 
             sectionWrapper.append(globalService.pageContent);
         }
@@ -270,9 +265,9 @@ module.exports = contentService = {
             // console.log('== column ==', column);
             globalService.pageContent += `<div class='${column.class}'>`;
             globalService.pageContent += `${column.content}`;
-            if(column.content){
-            await this.processBlocks(column.content);
-            }else{
+            if (column.content) {
+                await this.processBlocks(column.content);
+            } else {
                 globalService.pageContent += `<span class="empty-column">empty column</spam>`;
 
             }

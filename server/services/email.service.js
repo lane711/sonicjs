@@ -21,6 +21,10 @@ module.exports = fileService = {
                 var content = new helper.Content('text/plain', body);
                 var mail = new helper.Mail(from_email, subject, to_email, content);
 
+                if(!process.env.SENDGRID_API_KEY){
+                    throw ('SENDGRID_API_KEY not set!');
+                }
+
                 var sg = require('sendgrid')(process.env.SENDGRID_API_KEY);
                 var request = sg.emptyRequest({
                     method: 'POST',
