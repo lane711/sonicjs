@@ -33,7 +33,7 @@ module.exports = adminService = {
     checkIfAdminAccountIsCreated: async function () {
         var User = loopback.User;
 
-        await User.findById(0, function (err, adminUser) {
+        await User.findById(1, function (err, adminUser) {
             if (err) {
                 console.log(err);
             }
