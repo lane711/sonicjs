@@ -32,7 +32,7 @@ if (typeof module !== 'undefined' && module.exports) {
                     baseURL: globalService.baseUrl
                 }
 
-                if(globalService.authToken){
+                if (globalService.authToken) {
                     defaultOptions.headers.Authorization = globalService.authToken;
                 }
 
@@ -51,7 +51,7 @@ if (typeof module !== 'undefined' && module.exports) {
                     baseURL: globalService.baseUrl
                 }
 
-                if(globalService.authToken){
+                if (globalService.authToken) {
                     defaultOptions.headers.Authorization = globalService.authToken;
                 }
 
@@ -209,12 +209,12 @@ if (typeof module !== 'undefined' && module.exports) {
             if (payload.id || 'id' in payload) {
                 delete payload.id;
             }
-        
+
             if (!payload.data) {
                 let temp = { data: payload };
                 payload = temp;
             }
-        
+
             // return this.http.post("/api/contents/", content).toPromise();
             this.getAxios().post('/api/contents/', payload)
                 .then(function (response) {
@@ -224,21 +224,20 @@ if (typeof module !== 'undefined' && module.exports) {
                 .catch(function (error) {
                     console.log(error);
                 });
-        
+
         }
 
-        exports.getContentById = async function (id) {
-            let url = `${apiUrl}contents/${id}`;
-            this.getAxios().get(url)
-            .then(function (response) {
-                console.log(response);
-                return response.data;
+    exports.getContentById = async function (id) {
+        let url = `${apiUrl}contents/${id}`;
+        return this.getAxios().get(url)
+            .then(function (content) {
+                // console.log('getContentById', content.data);
+                return content.data;
             })
             .catch(function (error) {
-                console.log('getContentById ERROR', id, error);
-                return undefined;
-            });
-        },
+                console.log('getContentById ERROR', error);
+            })
+    },
 
         exports.asyncForEach = async function (array, callback) {
             for (let index = 0; index < array.length; index++) {

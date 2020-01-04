@@ -224,7 +224,6 @@ module.exports = contentService = {
 
             await this.asyncForEach(sections, async (sectionId) => {
 
-
                 let section = await dataService.getContentById(sectionId);
                 if (section) {
                     globalService.pageContent += `<section data-id='${section.id}' class="jumbotron-fluid">`;
@@ -238,9 +237,6 @@ module.exports = contentService = {
                     this.page.data.sections.push({ id: sectionId, title: section.data.title, rows: rows });
                 }
             });
-
-            // console.log('section====>', this.page.data.sections);
-
 
             sectionWrapper.append(globalService.pageContent);
         }
