@@ -229,8 +229,15 @@ if (typeof module !== 'undefined' && module.exports) {
 
         exports.getContentById = async function (id) {
             let url = `${apiUrl}contents/${id}`;
-            let content = await this.getAxios().get(url);
-            return content.data;
+            this.getAxios().get(url)
+            .then(function (response) {
+                console.log(response);
+                return response.data;
+            })
+            .catch(function (error) {
+                console.log('getContentById ERROR', id, error);
+                return undefined;
+            });
         },
 
         exports.asyncForEach = async function (array, callback) {
