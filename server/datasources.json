@@ -5,7 +5,7 @@
     "file": "data.json"
   },
   "db-user": {
-    "name": "db",
+    "name": "db-user",
     "connector": "memory",
     "file": "data-user.json"
   },
