@@ -47,7 +47,7 @@
                 ]
               })
                 .then(async function (form) {
-                  debugger;
+
                   form.submission = {
                     data: { id: contentType.id, title: contentType.title, systemid: contentType.systemid, canBeAddedToColumn: contentType.canBeAddedToColumn }
                   };
@@ -58,7 +58,7 @@
                         console.log(response);
                         //return await response.data;
 
-                        window.location.replace('/admin/content-types/edit/' + submission.data.systemid);
+                        window.location.replace('/admin/modules/edit/' + submission.data.systemid);
                       })
                       .catch(function (error) {
                         console.log(error);
