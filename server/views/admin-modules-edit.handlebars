@@ -39,6 +39,12 @@
                     input: true
                   },
                   {
+                    type: 'checkbox',
+                    key: 'singleInstance',
+                    label: 'Single Instance Per Site',
+                    input: true
+                  },
+                  {
                     type: 'button',
                     action: 'submit',
                     label: 'Save Title & SystemId',
@@ -49,11 +55,14 @@
                 .then(async function (form) {
 
                   form.submission = {
-                    data: { id: contentType.id, title: contentType.title, systemid: contentType.systemid, canBeAddedToColumn: contentType.canBeAddedToColumn }
+                    data: {
+                      id: contentType.id, title: contentType.title, systemid: contentType.systemid, canBeAddedToColumn: contentType.canBeAddedToColumn,
+                      singleInstance: contentType.singleInstance
+                    }
                   };
                   form.on('submit', async function (submission) {
                     var accessToken = '{{ this.accessToken }}';
-                    axios.put(`/api/contentTypes?access_token=${accessToken}`, submission.data)
+                    axios.put(`/api/modules?access_token=${accessToken}`, submission.data)
                       .then(async function (response) {
                         console.log(response);
                         //return await response.data;

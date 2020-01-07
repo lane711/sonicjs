@@ -152,7 +152,7 @@ module.exports = moduleService = {
             options.viewModel = viewModel;
             await eventBusService.emit("afterProcessModuleShortCodeProccessedViewModel", options);
 
-            var proccessedHtml = { id: id, contentType: contentType,  body: await this.processView(contentType, viewModel, viewPath) };
+            var proccessedHtml = { id: id, contentType: contentType, body: await this.processView(contentType, viewModel, viewPath) };
 
             await eventBusService.emit("afterProcessModuleShortCodeProccessedHtml", proccessedHtml);
 
@@ -202,17 +202,25 @@ module.exports = moduleService = {
         fileService.writeFile(`${basePath}/module.json`, JSON.stringify(moduleDefinitionFile, null, 2));
 
         //create content type
-        let moduleContentType = { title: `Module - ${moduleDefinitionFile.title}`, systemid: moduleDefinitionFile.systemid, 
-            canBeAddedToColumn: moduleDefinitionFile.canBeAddedToColumn, components: [] };
-            moduleContentType.components.push({label: "First Name", type: "textfield",
-                input: true, key: "firstName", validate: {required:true}});
-            moduleContentType.components.push({label: "Submit", type: "button",
-                input: true, key: "submit", theme: "primary"});
+        let moduleContentType = {
+            title: `Module - ${moduleDefinitionFile.title}`, systemid: moduleDefinitionFile.systemid,
+            canBeAddedToColumn: moduleDefinitionFile.canBeAddedToColumn, components: []
+        };
+        moduleContentType.components.push({
+            label: "First Name", type: "textfield",
+            input: true, key: "firstName", validate: { required: true }
+        });
+        moduleContentType.components.push({
+            label: "Submit", type: "button",
+            input: true, key: "submit", theme: "primary"
+        });
         let ct = await dataService.createContentType(moduleContentType);
 
+    },
 
-
-
+    updateModule: async function (moduleDefinitionFile) {
+        let basePath = `../../server/modules/${moduleDefinitionFile.systemid}`;
+        fileService.writeFile(`${basePath}/module.json`, JSON.stringify(moduleDefinitionFile, null, 2));
     }
 
 }
