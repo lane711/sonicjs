@@ -23,16 +23,17 @@ module.exports = googleAnalyticsMainService = {
     },
 
     addHeaderJs: async function (options) {
-        let googleAnalyticUSCode = '12344';
-        options.page.data.headerJs = `  <script async="" src="https://www.googletagmanager.com/gtag/js?id=${googleAnalyticUSCode}"></script>
-        <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag() { dataLayer.push(arguments); }
-          gtag('js', new Date());
-      
-          gtag('config', '${googleAnalyticUSCode}');
-        </script>`;
-
+        let googleAnalyticSettings = await dataService.getContentTopOne('google-analytics');
+        if (options.req.hostname === googleAnalyticSettings.data.enableOnDomain) {
+            options.page.data.headerJs = `<script async src="https://www.googletagmanager.com/gtag/js?id=${googleAnalyticSettings.data.googleAnalyticsUACode}"></script>
+                <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag() { dataLayer.push(arguments); }
+                gtag('js', new Date());
+            
+                gtag('config', '${googleAnalyticSettings.data.googleAnalyticsUACode}');
+                </script>`;
+        }
     },
 
 }
