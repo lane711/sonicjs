@@ -2,7 +2,6 @@
   "title": "Google Analytics",
   "systemid": "google-analytics",
   "version": "0.0.0.1",
-  "canBeAddedToColumn": "false",
-  "systemidUpperCase": "GOOGLE-ANALYTICS",
-  "systemidCamelCase": "googleAnalytics"
+  "canBeAddedToColumn": false,
+  "singleInstance": true
 }

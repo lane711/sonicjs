@@ -268,6 +268,8 @@ module.exports = function (app) {
 
       if (viewName == "admin-modules-edit") {
         data.contentTypeId = param1;
+        data.moduleDef = await moduleService.getModuleDefinitionFile(param1);
+
       }
 
       if (viewName == "admin-media") {

@@ -58,6 +58,12 @@ module.exports = moduleService = {
 
     },
 
+    getModuleDefinitionFile: async function (systemid) {
+        let basePath = `../server/modules/${systemid}`;
+        let file = await fileService.getFile(`${basePath}/module.json`);
+        return file;
+    },
+
     getModuleDefinitionFiles: async function (path) {
         let moduleList = [];
         await dir.readFiles(path, {

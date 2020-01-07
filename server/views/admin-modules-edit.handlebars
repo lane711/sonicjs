@@ -3,21 +3,16 @@
     <div class="col-md-12">
       <div class="card admin-content-type-edit">
         <div class="card-header">
-          <i class="fa fa-align-justify edit-content-type"></i> Edit {{ this.data.title }}
+          <i class="fa fa-align-justify edit-content-type"></i> Edit Module: {{ this.data.moduleDef.title }}
         </div>
 
         <div class="card-body">
 
           <script type='text/javascript'>
+          let moduleDef = {{{ this.data.moduleDef }}};
             window.onload = function () {
-              Formio.createForm(document.getElementById('createContentTypeForm'), {
+              Formio.createForm(document.getElementById('moduleDefForm'), {
                 components: [
-                  {
-                    type: 'textfield',
-                    key: 'id',
-                    label: 'Id',
-                    input: false
-                  },
                   {
                     type: 'textfield',
                     key: 'title',
@@ -56,8 +51,8 @@
 
                   form.submission = {
                     data: {
-                      id: contentType.id, title: contentType.title, systemid: contentType.systemid, canBeAddedToColumn: contentType.canBeAddedToColumn,
-                      singleInstance: contentType.singleInstance
+                      title: moduleDef.title, systemid: moduleDef.systemid, canBeAddedToColumn: moduleDef.canBeAddedToColumn,
+                      singleInstance: moduleDef.singleInstance
                     }
                   };
                   form.on('submit', async function (submission) {
@@ -78,7 +73,7 @@
             }
           </script>
 
-          <div id="createContentTypeForm"></div>
+          <div id="moduleDefForm"></div>
         </div>
 
       </div>
