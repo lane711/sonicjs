@@ -33,6 +33,12 @@
                     input: true
                   },
                   {
+                    type: 'checkbox',
+                    key: 'canBeAddedToColumn',
+                    label: 'Can Be Added To Column',
+                    input: true
+                  },
+                  {
                     type: 'button',
                     action: 'submit',
                     label: 'Save Title & SystemId',
@@ -41,8 +47,9 @@
                 ]
               })
                 .then(async function (form) {
+                  debugger;
                   form.submission = {
-                    data: { id: contentType.id, title: contentType.title, systemid: contentType.systemid }
+                    data: { id: contentType.id, title: contentType.title, systemid: contentType.systemid, canBeAddedToColumn: contentType.canBeAddedToColumn }
                   };
                   form.on('submit', async function (submission) {
                     var accessToken = '{{ this.accessToken }}';
@@ -50,7 +57,7 @@
                       .then(async function (response) {
                         console.log(response);
                         //return await response.data;
-                        
+
                         window.location.replace('/admin/content-types/edit/' + submission.data.systemid);
                       })
                       .catch(function (error) {
