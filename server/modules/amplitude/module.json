@@ -1,0 +1,7 @@
+{
+  "title": "Amplitude",
+  "systemid": "amplitude",
+  "version": "0.0.0.1",
+  "canBeAddedToColumn": false,
+  "singleInstance": true
+}

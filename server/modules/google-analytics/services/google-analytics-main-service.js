@@ -25,7 +25,7 @@ module.exports = googleAnalyticsMainService = {
     addHeaderJs: async function (options) {
         let googleAnalyticSettings = await dataService.getContentTopOne('google-analytics');
         if (options.req.hostname === googleAnalyticSettings.data.enableOnDomain) {
-            options.page.data.headerJs = `<script async src="https://www.googletagmanager.com/gtag/js?id=${googleAnalyticSettings.data.googleAnalyticsUACode}"></script>
+            options.page.data.headerJs += `<script async src="https://www.googletagmanager.com/gtag/js?id=${googleAnalyticSettings.data.googleAnalyticsUACode}"></script>
                 <script>
                 window.dataLayer = window.dataLayer || [];
                 function gtag() { dataLayer.push(arguments); }
