@@ -20,41 +20,9 @@ if (typeof module !== 'undefined' && module.exports) {
     const document = { getElementById: {} };
 } else {
 
-    // const defaultOptions = {
-    //     headers: {},
-    //     baseURL: globalService.baseUrl
-    // }
-
-    // if(globalService.authToken){
-    //     defaultOptions.headers.Authorization = globalService.authToken;
-    // }
-
-    // axiosInstance = axios.create(defaultOptions);
-
 }
 
 (function (exports) {
-
-    // const defaultOptions = {
-    //     headers: {},
-    //     baseURL: globalService.baseUrl
-    // }
-
-    // if(globalService.authToken){
-    //     defaultOptions.headers.Authorization = globalService.authToken;
-    // }
-
-    // axiosInstance = axios.create(defaultOptions);
-
-    // module.exports = formService = {
-
-    // startup: function () {
-    //     console.log('>>=== form service startup');
-
-    //     eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
-    //                 // options.page.data.editForm = getForm('page');
-    //     });
-    // },
 
     exports.startup = async function () {
 
@@ -66,8 +34,8 @@ if (typeof module !== 'undefined' && module.exports) {
                     baseURL: globalService.baseUrl
                 }
 
-                if(globalService.authToken){
-                    defaultOptions.headers.Authorization = globalService.authToken;
+                if (options.req.signedCookies.sonicjs_access_token) {
+                    defaultOptions.headers.Authorization = options.req.signedCookies.sonicjs_access_token;
                 }
 
                 axiosInstance = axios.create(defaultOptions);

@@ -1,6 +1,7 @@
 var dataService = require('./data.service');
 var helperService = require('./helper.service');
 var eventBusService = require('./event-bus.service');
+var globalService = require('./global.service');
 
 var fs = require('fs');
 const cheerio = require('cheerio')
@@ -20,7 +21,7 @@ module.exports = userService = {
                 options.page.data.showPageBuilder = await userService.isAuthenticated(options.req);
             }
         });
-        
+
     },
 
     getUsers: async function (menuName) {
@@ -52,9 +53,33 @@ module.exports = userService = {
         return menu;
     },
 
+
+    getCurrentUserId: async function (req) {
+
+        let tokenInfo = await globalService.AccessToken.findById(req.signedCookies.sonicjs_access_token);
+        if(tokenInfo.userId){
+            return tokenInfo.userId;
+        }
+    },
+
+    // getCurrentUserId: async function (req) {
+
+    //     return globalService.AccessToken.findById(req.signedCookies.sonicjs_access_token, async function (err, user) {
+    //         if (err) {
+    //             return -1;
+    //         }
+    //         console.log('internal:' + user.userId);
+    //         return user.userId;
+    //     });
+    //     return 5;
+    // },
+
+    getCurrentUser: async function (req) {
+    },
+
     isAuthenticated: async function (req) {
         var authCookie = await this.getToken(req);
-        if(authCookie){
+        if (authCookie) {
             return true;
         }
         return false;

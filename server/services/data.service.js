@@ -32,8 +32,8 @@ if (typeof module !== 'undefined' && module.exports) {
                     baseURL: globalService.baseUrl
                 }
 
-                if (globalService.authToken) {
-                    defaultOptions.headers.Authorization = globalService.authToken;
+                if (options.req.signedCookies.sonicjs_access_token) {
+                    defaultOptions.headers.Authorization = options.req.signedCookies.sonicjs_access_token;
                 }
 
                 axiosInstance = axios.create(defaultOptions);
@@ -51,8 +51,8 @@ if (typeof module !== 'undefined' && module.exports) {
                     baseURL: globalService.baseUrl
                 }
 
-                if (globalService.authToken) {
-                    defaultOptions.headers.Authorization = globalService.authToken;
+                if (options.req.signedCookies.sonicjs_access_token) {
+                    defaultOptions.headers.Authorization = options.req.signedCookies.sonicjs_access_token;
                 }
 
                 axiosInstance = axios.create(defaultOptions);

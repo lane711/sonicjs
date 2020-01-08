@@ -31,6 +31,8 @@ const chalk = require('chalk');
 const log = console.log;
 const url = require('url');
 var admin = require(__dirname + '/admin');
+var Amplitude = require('amplitude')
+var amplitude = new Amplitude('00c9db8d087f1737021c841bcdbc2b41')
 
 
 module.exports = function (app) {
@@ -56,6 +58,11 @@ module.exports = function (app) {
     await eventBusService.emit('startup');
 
   })();
+
+  app.get('*', async function (req, res, next) {
+    globalService.AccessToken = app.models.AccessToken;
+    next();
+  });
 
   app.get('/register', async function (req, res) {
     let data = { registerMessage: "<b>admin</b>" };
@@ -100,6 +107,13 @@ module.exports = function (app) {
         return;
       }
 
+      //amp
+      var data = {
+        event_type: 'LOGIN', // required
+        user_id: req.body.email, // only required if device id is not passed in
+      }
+      amplitude.track(data)
+
       //set cookie
       res.cookie('sonicjs_access_token', token.id, { signed: true, maxAge: 30000000 });
       res.redirect(referer);
@@ -113,6 +127,14 @@ module.exports = function (app) {
     if (!token) return res.sendStatus(401);
     user.logout(token, function (err) {
       if (err) return next(err);
+
+      //amp
+      var data = {
+        event_type: 'LOGOUT', // required
+        user_id: 'req.body.email', // only required if device id is not passed in
+      }
+      amplitude.track(data);
+
       res.clearCookie('sonicjs_access_token');
       res.redirect('/admin');
     });
@@ -136,6 +158,51 @@ module.exports = function (app) {
     res.send('ok');
   });
 
+  app.get('/session-test', async function (req, res) {
+    var token = req.signedCookies.sonicjs_access_token;
+    if (req.session.views) {
+      req.session.views++
+      res.setHeader('Content-Type', 'text/html')
+      res.write('<p>views: ' + req.session.views + '</p>')
+      res.write('<p>expires in: ' + (req.session.cookie.maxAge / 1000) + 's</p>')
+      res.end()
+    } else {
+      req.session.views = 1
+      res.end('welcome to the session demo. refresh!')
+    }
+  });
+
+  app.get('/session-details', async function (req, res) {
+    var token = req.signedCookies.sonicjs_access_token;
+    let userId = await userService.getCurrentUserId(req);
+    console.log('getCurrentUserId:' + userId);
+
+      res.send(`userId:${userId}`);
+
+  });
+
+  // .findForRequest(req, {}, function (aux, accesstoken) {
+  //   // console.log(aux, accesstoken);
+  //   if (accesstoken == undefined) {
+  //     res.status(401);
+  //     res.send({
+  //       'Error': 'Unauthorized',
+  //       'Message': 'You need to be authenticated to access this endpoint'
+  //     });
+  //   } else {
+  //     var UserModel = app.models.user;
+  //     UserModel.findById(accesstoken.userId, function (err, user) {
+  //       // show current user logged in your console
+  //       console.log(user);
+  //       // setup http response
+  //       res.status(200);
+  //       // if you want to check the json in real time in the browser
+  //       res.json(user);
+  //     });
+  //   }
+  // });
+  // });
+
   app.get('/css/generated.css', async function (req, res) {
     res.set('Content-Type', 'text/css');
     let css = await cssService.getGeneratedCss();
@@ -154,12 +221,6 @@ module.exports = function (app) {
   // });
 
   app.get('*', async function (req, res, next) {
-
-    if (req.signedCookies.sonicjs_access_token) {
-      globalService.authToken = req.signedCookies.sonicjs_access_token;
-    } else {
-      globalService.authToken = undefined;
-    }
 
     if (!globalService.isAdminUserCreated && (req.url === '/' || req.url === '/admin')) {
       //brand new site, admin accounts needs to be created

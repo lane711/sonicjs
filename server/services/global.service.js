@@ -41,12 +41,12 @@
     var isAdminUserCreated = false;
     var axiosInstance;
     var baseUrl;
-    var authToken;
     var pageContent = 'temp';
     var moduleDefinitions = [];
     var moduleDefinitionsForColumns = [];
     var moduleCssFiles = [];
     var moduleJsFiles = [];
+    var AccessToken;
 
     // your code goes here
 
