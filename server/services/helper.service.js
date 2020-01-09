@@ -24,14 +24,14 @@
     exports.truncateString = function (body, length) {
         if (body) {
 
-            let cleanHtml = body.substring(0,450);;
+            let cleanHtml = body.substring(0, 450);;
             // if(sanitizeHtml){
             //     cleanHtml = sanitizeHtml(body, {
             //         allowedTags: [],
             //         allowedAttributes: false
             //     });
             // }
-            
+
 
             return (cleanHtml.length > length) ? cleanHtml.substr(0, length - 1) + '&hellip;' : cleanHtml;
         }
@@ -59,6 +59,14 @@
                 result += characters.charAt(Math.floor(Math.random() * charactersLength));
             }
             return result;
+        },
+
+        exports.getCookie = function (name) {
+            var value = "; " + document.cookie;
+            var parts = value.split("; " + name + "=");
+            if (parts.length == 2) {
+                return parts.pop().split(";").shift();
+            }
         }
 
 })(typeof exports === 'undefined' ? this['helperService'] = {} : exports);

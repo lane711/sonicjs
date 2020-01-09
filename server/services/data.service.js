@@ -50,9 +50,10 @@ if (typeof module !== 'undefined' && module.exports) {
                     headers: {},
                     baseURL: globalService.baseUrl
                 }
-
-                if (options.req.signedCookies.sonicjs_access_token) {
-                    defaultOptions.headers.Authorization = options.req.signedCookies.sonicjs_access_token;
+                
+                let token = helperService.getCookie('sonicjs_access_token');
+                if (token) {
+                    defaultOptions.headers.Authorization = token;
                 }
 
                 axiosInstance = axios.create(defaultOptions);
