@@ -14,6 +14,9 @@ module.exports = amplitudeMainService = {
 
     addHeaderJs: async function (options) {
         let amplitudeSettings = await dataService.getContentTopOne('amplitude');
+        if(!options.page.data.headerJs){
+            options.page.data.headerJs = '';
+        }
         options.page.data.headerJs += amplitudeSettings.data.amplitudeTrackingCode;
 
         let params = {};
