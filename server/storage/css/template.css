@@ -177,6 +177,16 @@ a.black{
     color:#212529;
 }
 
+.footer{
+border-top: 1px solid #fff;
+padding: 30px 0 0;
+
+}
+
 .footer p{
     font-size: .7em;
+}
+
+.under-menu-spacer{
+    height: 80px;
 }
