@@ -121,17 +121,21 @@ module.exports = function (app) {
   });
 
   //log a user out
-  app.get('/logout', function (req, res, next) {
+  app.get('/logout', async function (req, res, next) {
     var user = app.models.User;
     var token = req.signedCookies.sonicjs_access_token;
+    let currentUser = await userService.getCurrentUser(req);
     if (!token) return res.sendStatus(401);
-    user.logout(token, function (err) {
-      if (err) return next(err);
+    user.logout(token, async function (err) {
+      if (err) {
+        //user already logged out
+        res.redirect('/admin');
+      }
 
       //amp
       var data = {
         event_type: 'LOGOUT', // required
-        user_id: 'req.body.email', // only required if device id is not passed in
+        user_id: currentUser.email
       }
       amplitude.track(data);
 
@@ -175,33 +179,14 @@ module.exports = function (app) {
   app.get('/session-details', async function (req, res) {
     var token = req.signedCookies.sonicjs_access_token;
     let userId = await userService.getCurrentUserId(req);
-    console.log('getCurrentUserId:' + userId);
+    let user = await userService.getCurrentUser(req);
 
-      res.send(`userId:${userId}`);
+    console.log('getCurrentUser:' + user);
+
+    res.send(`userId:${userId}`);
 
   });
 
-  // .findForRequest(req, {}, function (aux, accesstoken) {
-  //   // console.log(aux, accesstoken);
-  //   if (accesstoken == undefined) {
-  //     res.status(401);
-  //     res.send({
-  //       'Error': 'Unauthorized',
-  //       'Message': 'You need to be authenticated to access this endpoint'
-  //     });
-  //   } else {
-  //     var UserModel = app.models.user;
-  //     UserModel.findById(accesstoken.userId, function (err, user) {
-  //       // show current user logged in your console
-  //       console.log(user);
-  //       // setup http response
-  //       res.status(200);
-  //       // if you want to check the json in real time in the browser
-  //       res.json(user);
-  //     });
-  //   }
-  // });
-  // });
 
   app.get('/css/generated.css', async function (req, res) {
     res.set('Content-Type', 'text/css');
@@ -275,7 +260,10 @@ module.exports = function (app) {
       res.render('admin-login', { layout: 'login.handlebars', data: data });
     }
     else if (req.url.startsWith('/admin')) {
-      //
+      
+      if(!req.signedCookies.sonicjs_access_token){
+        //user not logged in
+      }
 
       if (process.env.MODE !== 'dev') {
         res.send(401);

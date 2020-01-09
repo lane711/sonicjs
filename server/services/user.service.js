@@ -2,7 +2,8 @@ var dataService = require('./data.service');
 var helperService = require('./helper.service');
 var eventBusService = require('./event-bus.service');
 var globalService = require('./global.service');
-
+var loopback = require('loopback');
+var app = loopback();
 var fs = require('fs');
 const cheerio = require('cheerio')
 const axios = require('axios');
@@ -55,31 +56,30 @@ module.exports = userService = {
 
 
     getCurrentUserId: async function (req) {
-
-        let tokenInfo = await globalService.AccessToken.findById(req.signedCookies.sonicjs_access_token);
-        if(tokenInfo.userId){
-            return tokenInfo.userId;
+        if (req.signedCookies && req.signedCookies.sonicjs_access_token) {
+            let tokenInfo = await globalService.AccessToken.findById(req.signedCookies.sonicjs_access_token);
+            if (tokenInfo && tokenInfo.userId) {
+                return tokenInfo.userId;
+            }
         }
     },
 
-    // getCurrentUserId: async function (req) {
-
-    //     return globalService.AccessToken.findById(req.signedCookies.sonicjs_access_token, async function (err, user) {
-    //         if (err) {
-    //             return -1;
-    //         }
-    //         console.log('internal:' + user.userId);
-    //         return user.userId;
-    //     });
-    //     return 5;
-    // },
-
     getCurrentUser: async function (req) {
+        var User = loopback.User;
+        let a = app;
+        let userId = await userService.getCurrentUserId(req);
+        if (userId) {
+            let user = await User.findById(userId);
+            if (user) {
+                return user;
+            }
+        }
     },
 
     isAuthenticated: async function (req) {
         var authCookie = await this.getToken(req);
-        if (authCookie) {
+        let userId = await userService.getCurrentUserId(req);
+        if (authCookie && userId) {
             return true;
         }
         return false;
