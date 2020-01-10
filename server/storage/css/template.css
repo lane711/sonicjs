@@ -190,3 +190,10 @@ padding: 30px 0 0;
 .under-menu-spacer{
     height: 80px;
 }
+
+.bottom-white-border{
+    border-bottom: 1px #fff solid;
+    padding: 20px 0;
+    margin: 0 0 20px;
+
+}
