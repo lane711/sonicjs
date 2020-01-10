@@ -254,7 +254,7 @@ section .col:hover {
   border: 1px solid #fff;
 }
 
-.ace_editor {
+#editor.ace_editor {
   width: 255px;
   height: 85vh;
 }
