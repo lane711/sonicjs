@@ -229,7 +229,15 @@ module.exports = contentService = {
                     globalService.pageContent += `<section data-id='${section.id}' class="jumbotron-fluid">`;
                     globalService.pageContent += '<div class="overlay">';
                     globalService.pageContent += '<div class="container">';
-                    let rows = await this.processRows($, sectionWrapper, section.data.rows)
+                    let rows;
+                    if (section.data.content) {
+                        //content will contain full layout
+                        globalService.pageContent += `${section.data.content}`;
+                        await this.processBlocks(section.data.content);
+                    } else {
+                        //use page builder rows for layout
+                        rows = await this.processRows($, sectionWrapper, section.data.rows)
+                    }
                     globalService.pageContent += '</div>';
                     globalService.pageContent += '</div>';
                     globalService.pageContent += `</section>`;
