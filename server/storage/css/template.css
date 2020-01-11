@@ -101,7 +101,7 @@ background-attachment: fixed;
 background-size: cover
 }
 
-nav.navbar {
+nav.navbar.drop-link {
 height: 80px
 }
 
@@ -121,7 +121,7 @@ text-decoration: none
 color: #F1F2F2
 }
 
-nav.navbar a:before,nav a:after {
+nav.navbar .main a:before,nav .main a:after {
 content: '';
 position: absolute;
 bottom: 2px;
@@ -131,7 +131,7 @@ height: 2px;
 background-color: #FFC503
 }
 
-nav.navbar a:before {
+nav.navbar.drop-link .main a:before {
 opacity: 0;
 -webkit-transform: translateY(-8px);
 transform: translateY(-8px);
@@ -140,7 +140,7 @@ transition: transform 0s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0s;
 transition: transform 0s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0s,-webkit-transform 0s cubic-bezier(0.175,0.885,0.32,1.275)
 }
 
-nav.navbar a:after {
+nav.navbar.drop-link a:after {
 opacity: 0;
 -webkit-transform: translateY(4px);
 transform: translateY(4px);
@@ -149,19 +149,19 @@ transition: transform 0.2s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0.2s;
 transition: transform 0.2s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0.2s,-webkit-transform 0.2s cubic-bezier(0.175,0.885,0.32,1.275)
 }
 
-nav.navbar a:hover:before,nav.navbar a:hover:after,nav.navbar a:focus:before,nav.navbar a:focus:after {
+nav.navbar.drop-link a:hover:before,nav.navbar.drop-link a:hover:after,nav.navbar.drop-link a:focus:before,nav.navbar.drop-link a:focus:after {
 opacity: 1;
 -webkit-transform: translateY(0);
 transform: translateY(0)
 }
 
-nav.navbar a:hover:before,nav.navbar a:focus:before {
+nav.navbar.drop-link a:hover:before,nav.navbar.drop-link a:focus:before {
 transition: opacity 0.2s,-webkit-transform 0.2s cubic-bezier(0.175,0.885,0.32,1.275);
 transition: transform 0.2s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0.2s;
 transition: transform 0.2s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0.2s,-webkit-transform 0.2s cubic-bezier(0.175,0.885,0.32,1.275)
 }
 
-nav.navbar a:hover:after,nav.navbar a:focus:after {
+nav.navbar.drop-link a:hover:after,nav.navbar.drop-link a:focus:after {
 transition: opacity 0s 0.2s,-webkit-transform 0s 0.2s cubic-bezier(0.175,0.885,0.32,1.275);
 transition: transform 0s 0.2s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0s 0.2s;
 transition: transform 0s 0.2s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0s 0.2s,-webkit-transform 0s 0.2s cubic-bezier(0.175,0.885,0.32,1.275)
