@@ -1,4 +1,19 @@
 /* Css File for Module: wiki */
+.doc-tree, .doc-tree li{
+list-style: none;
+}
+.doc-tree ul{
+    padding-left: 12px;
+    }
+
+.doc-tree a{
+    color: #333;
+    font-size: .8em;
+}
+.doc-tree li > ul a{
+    color: #666;
+    font-size: .7em;
+    }
 .doc-html{
     width:100%;
     height: 200px;
