@@ -174,7 +174,7 @@ function setupUIClicks() {
             currentModuleId = moduleDiv.data('id');
             currentModuleContentType = moduleDiv.data('content-type');
 
-            console.log('moduleId', currentModuleId);            
+            console.log('moduleId', currentModuleId);
             $('.edit-module').show().appendTo(moduleDiv);
             // currentColumn.children('.module').addClass('block-edit');
         },
@@ -970,7 +970,7 @@ function setupJsonEditorContentTypeRaw() {
     };
 
     const jsonEditorRaw = new JSONEditor(containerRaw, options);
-    
+
     // set json
     const initialJson = this.contentType;
     jsonEditorRaw.set(initialJson)
@@ -1030,7 +1030,7 @@ async function addModule(systemid) {
     // const viewModel = encodeURI(`{"data": {"onFormSubmitFunction":"addModuleToColumn(submission)"}}`);
     // const viewPath = encodeURI(`/assets/html/form.html`);
 
-    
+
 
     // let formHtml = await axiosInstance.get(`api/views/getProceedView?viewModel=${viewModel}&viewPath=${viewPath}`)
 
@@ -1045,7 +1045,7 @@ async function addModule(systemid) {
 async function editModule() {
     cleanModal();
 
-    console.log('editing module: ' +  currentModuleId, currentModuleContentType);
+    console.log('editing module: ' + currentModuleId, currentModuleContentType);
 
     let data = await getContentInstance(currentModuleId);
 
@@ -1058,7 +1058,7 @@ async function editModule() {
 
 }
 
-async function cleanModal(){
+async function cleanModal() {
     $('#moduleSettingsFormio').empty();
 
 }
@@ -1083,7 +1083,7 @@ async function addModuleToColumn(submission) {
 
     //add the shortCode to the column
     let section = await getContentInstance(currentSectionId);
-    let column = section.data.rows[currentRowIndex].columns[currentColumnIndex -1];
+    let column = section.data.rows[currentRowIndex].columns[currentColumnIndex - 1];
     column.content += moduleInstanceShortCode;
     editContentInstance(section);
 
@@ -1260,9 +1260,11 @@ async function setupDropZone() {
 }
 
 async function beatifyACECss() {
-    var beautify = ace.require("ace/ext/beautify"); // get reference to extension
-    var editor = ace.edit("editor"); // get reference to editor
-    beautify.beautify(editor.session);
+    if (ace.require) {
+        var beautify = ace.require("ace/ext/beautify"); // get reference to extension
+        var editor = ace.edit("editor"); // get reference to editor
+        beautify.beautify(editor.session);
+    }
 }
 
 

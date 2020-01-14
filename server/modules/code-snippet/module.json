@@ -1,0 +1,8 @@
+{
+  "title": "Code Snippet",
+  "systemid": "code-snippet",
+  "version": "0.0.0.1",
+  "canBeAddedToColumn": "true",
+  "systemidUpperCase": "CODE-SNIPPET",
+  "systemidCamelCase": "codeSnippet"
+}
