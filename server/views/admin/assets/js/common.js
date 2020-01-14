@@ -51,3 +51,4 @@ function wait(ms) {
   do { d2 = new Date(); }
   while (d2 - d < ms);
 }
+

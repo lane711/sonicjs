@@ -19,3 +19,14 @@ function submitForm(submission) {
     }
   });
 }
+
+function slugify(Text) {
+  let slug = Text
+    .toLowerCase()
+    .replace(/[^\w ]+/g, '')
+    .replace(/ +/g, '-')
+    ;
+
+  console.log(slug);
+  return slug;
+}
