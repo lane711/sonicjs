@@ -20,22 +20,6 @@
     }
   },
   "validations": [],
-  "relations": {
-    "contents": {
-      "type": "hasMany",
-      "model": "content",
-      "foreignKey": ""
-    },
-    "fields": {
-      "type": "embedsMany",
-      "model": "contentTypeField",
-      "property": "fieldList",
-      "options": {
-        "validate": false,
-        "forceId": false
-      }
-    }
-  },
   "acls": [
     {
       "accessType": "WRITE",
