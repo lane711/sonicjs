@@ -1,0 +1,8 @@
+{
+  "title": "Title",
+  "systemid": "title",
+  "version": "0.0.0.1",
+  "canBeAddedToColumn": "true",
+  "systemidUpperCase": "TITLE",
+  "systemidCamelCase": "title"
+}
