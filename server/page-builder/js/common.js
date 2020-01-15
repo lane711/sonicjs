@@ -20,13 +20,11 @@ function submitForm(submission) {
   });
 }
 
-function slugify(Text) {
-  let slug = Text
+function slugify(text) {
+  let slug = text
     .toLowerCase()
     .replace(/[^\w ]+/g, '')
-    .replace(/ +/g, '-')
-    ;
+    .replace(/ +/g, '-');
 
-  console.log(slug);
   return slug;
 }

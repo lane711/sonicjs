@@ -256,7 +256,7 @@ module.exports = contentService = {
         let rowArray = [];
         for (const row of rows) {
             // console.log(chalk.red(JSON.stringify(row)));
-            globalService.pageContent += `<div class='row'>`;
+            globalService.pageContent += `<div class='${row.class}''>`;
             let columns = await this.processColumns(row);
             globalService.pageContent += `</div>`;
 
