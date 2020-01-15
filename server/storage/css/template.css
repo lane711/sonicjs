@@ -198,10 +198,12 @@ a.black {
 
 /* doc tree */
 .doc-menu{
-border-bottom: 1pm #fff solid;
+border-bottom: 1px #fff solid;
+padding: 0 0 20px 0;
 }
 
 .doc-tree-wrapper{
+    margin: 25px 0 0;
     position: fixed;
 }
 
@@ -209,6 +211,10 @@ border-bottom: 1pm #fff solid;
     list-style: none;
     position: relative;
 }
+
+.doc-tree > li{
+    margin: 10px 0 0;
+} 
 
 .doc-tree ul {
     padding-left: 12px;
