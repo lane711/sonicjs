@@ -210,6 +210,7 @@ padding: 0 0 20px 0;
 .doc-tree, .doc-tree li {
     list-style: none;
     position: relative;
+    padding: 0;
 }
 
 .doc-tree > li{

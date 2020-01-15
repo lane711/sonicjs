@@ -23,6 +23,7 @@ $(document).ready(async function () {
     setupFormBuilder(contentType);
     await setupACEEditor();
     await setupDropZone();
+    setupSortable();
 });
 
 async function setupAxiosInstance() {
@@ -1182,7 +1183,7 @@ async function setupACEEditor() {
 
         // var beautify = ace.require("ace/ext/beautify"); // get reference to extension
         // var editor = ace.edit("editor"); // get reference to editor
-        // beautify.beautify(editor.session);    
+        // beautify.beautify(editor.session);
     });
 
     function update() //writes in <div> with id=output
@@ -1265,6 +1266,32 @@ async function beatifyACECss() {
         var editor = ace.edit("editor"); // get reference to editor
         beautify.beautify(editor.session);
     }
+}
+
+async function setupSortable(){
+  var el = document.getElementById('main');
+  var el1 = document.getElementsByClassName('items');
+
+var sortable = new Sortable(el, {
+
+      // Element dragging ended
+      onEnd: function (/**Event*/evt) {
+        var itemEl = evt.item;  // dragged HTMLElement
+        evt.to;    // target list
+        evt.from;  // previous list
+        evt.oldIndex;  // element's old index within old parent
+        evt.newIndex;  // element's new index within new parent
+        evt.oldDraggableIndex; // element's old index within old parent, only counting draggable elements
+        evt.newDraggableIndex; // element's new index within new parent, only counting draggable elements
+        evt.clone // the clone element
+        evt.pullMode;  // when item is in another sortable: `"clone"` if cloning, `true` if moving
+        console.log('el:',itemEl,'from:',evt.from, 'to:',evt.to);
+    },
+
+
+
+});
+
 }
 
 

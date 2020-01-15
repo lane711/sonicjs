@@ -227,6 +227,10 @@ section {
   background-color: skyblue;
 }
 
+.module:hover{
+  box-shadow:0px 0px 0px 1px #777 inset;
+}
+
 section .col span, .pb-section .nav-link, .dropdown-menu .dropdown-item {
   cursor: pointer;
 }
@@ -278,5 +282,14 @@ section .col:hover {
   display: block;
   text-align: center;
   margin: 10px 0;
-  
+
 }
+
+/* sortable */
+.sortable-chosen{
+background: pink;
+}
+
+.sortable-ghost{
+  background: skyblue;
+  }

@@ -271,7 +271,7 @@ module.exports = contentService = {
         for (const column of row.columns) {
 
             // console.log('== column ==', column);
-            globalService.pageContent += `<div class='${column.class}'>`;
+            globalService.pageContent += `<div id='${column.id}' class='${column.class}'>`;
             globalService.pageContent += `${column.content}`;
             if (column.content) {
                 await this.processBlocks(column.content);
@@ -289,7 +289,7 @@ module.exports = contentService = {
         await this.processShortCodes(blocks);
         // const parser = Shortcode();
 
-        // await parser.add('BLOCK', tag=>{ 
+        // await parser.add('BLOCK', tag=>{
         //     let blockId = tag.attributes.id
         //     console.log('in parser callback blockId:-->', blockId);
         //     // this.processBlock(blockId);
@@ -359,7 +359,7 @@ module.exports = contentService = {
     },
 
     // setupShortCodeParser: async function(){
-    //     await parser.add('BLOCK', tag=>{ 
+    //     await parser.add('BLOCK', tag=>{
     //                         try{
     //                 let blockId = tag.attributes.id
     //                 console.log('in parser callback blockId:-->', blockId);
