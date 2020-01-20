@@ -194,8 +194,8 @@ if (typeof module !== 'undefined' && module.exports) {
 
             return this.getAxios().put(`/api/contents/${id}`, payload)
                 .then(async function (response) {
-                    console.log(response);
-                    return await response.data;
+                    // console.log(response);
+                    return response.data;
                 })
                 .catch(function (error) {
                     console.log(error);

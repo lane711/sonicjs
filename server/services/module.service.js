@@ -158,7 +158,7 @@ module.exports = moduleService = {
             options.viewModel = viewModel;
             await eventBusService.emit("afterProcessModuleShortCodeProccessedViewModel", options);
 
-            var proccessedHtml = { id: id, contentType: contentType, body: await this.processView(contentType, viewModel, viewPath) };
+            var proccessedHtml = { id: id, contentType: contentType, shortCode: options.shortcode, body: await this.processView(contentType, viewModel, viewPath) };
 
             await eventBusService.emit("afterProcessModuleShortCodeProccessedHtml", proccessedHtml);
 

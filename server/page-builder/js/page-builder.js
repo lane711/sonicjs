@@ -1359,8 +1359,6 @@ async function setupSortableColum(el) {
 }
 
 async function updateModuleSort(shortCode, event) {
-
-
   //source
   let sourceSectionHtml = $(event.from)[0].closest("section");
   let sourceSectionId = sourceSectionHtml.dataset.id;
@@ -1371,13 +1369,24 @@ async function updateModuleSort(shortCode, event) {
 
   //destination
   // debugger;
-  let destinationSectionId = $(event.to)[0].closest("section").dataset.id;
+  let destinationSectionHtml = $(event.to)[0].closest("section");
+  let destinationSectionId = destinationSectionHtml.dataset.id;
   let destinationRow = $(event.to)[0].closest(".row");
   let destinationRowIndex = $(destinationRow).index();
   let destinationColumn = $(event.to)[0].closest('div[class^="col"]');
   let destinationColumnIndex = $(destinationColumn).index();
 
-  let payload = { data : {}};
+  //get destination list of modules in their updated sort order
+  let destinationModules = $(destinationColumn)
+    .find(".module")
+    .toArray()
+    .map(function(div) {
+      let shortCodeData = { id: div.dataset.id, module: div.dataset.module };
+      return shortCodeData;
+    });
+  console.log("destinationModules", destinationModules);
+
+  let payload = { data: {} };
   payload.data.sourceSectionId = sourceSectionId;
   payload.data.sourceRowIndex = sourceRowIndex;
   payload.data.sourceColumnIndex = sourceColumnIndex;
@@ -1386,9 +1395,10 @@ async function updateModuleSort(shortCode, event) {
   payload.data.destinationRowIndex = destinationRowIndex;
   payload.data.destinationColumnIndex = destinationColumnIndex;
   payload.data.destinationModuleIndex = event.newIndex;
+  payload.data.destinationModules = destinationModules;
 
   // debugger;
-    return axiosInstance
+  return axiosInstance
     .post("/pb-update-module-sort", payload)
     .then(async function(response) {
       console.log(response);

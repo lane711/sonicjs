@@ -169,12 +169,15 @@ module.exports = function(app) {
     let newContent = content.replace(shortCodeToRemove.shortcode.codeText, "");
     sourceSection.data.rows[data.sourceRowIndex].columns[data.sourceColumnIndex].content = newContent;
     console.log('newContent',newContent);
-    // await dataService.editContentInstance(sourceSection);
+    await dataService.editContentInstance(sourceSection);
 
     //regen the destination
     let destinationSection = await dataService.getContentById(data.destinationSectionId);
-    let destinationContent = destinationSection.data.rows[data.destinationRowIndex].columns[data.destinationColumnIndex].content;
-    let shortCodesInDestinationColumn = ShortcodeTree.parse(destinationContent);
+
+    let updatedDestinationContent = sharedService.generateShortCodeList(data.destinationModules);
+    console.log("updatedDestinationContent", updatedDestinationContent);
+    destinationSection.data.rows[data.destinationRowIndex].columns[data.destinationColumnIndex].content = updatedDestinationContent;
+    await dataService.editContentInstance(destinationSection);
 
     //get list of modules order AFTER drop and just recreate the whole list based on that
 

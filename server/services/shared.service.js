@@ -17,4 +17,12 @@
         return sc;
     };
 
+    exports.generateShortCodeList = function(list){
+      let shortCodeList = "";
+      list.forEach(shortCode => {
+        shortCodeList += this.generateShortCode(shortCode.module, {id: shortCode.id});
+      });
+      return shortCodeList;
+  };
+
 })(typeof exports === 'undefined'? this['sharedService']={}: exports);
