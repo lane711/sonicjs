@@ -4,6 +4,7 @@ if (typeof module !== 'undefined' && module.exports) {
     var globalService = require('./global.service');
     var pageBuilderService = require('./page-builder.service');
     var formService = require('./form.service');
+    var helperService = require('./helper.service');
 
     var axios = require('axios');
     var fs = require('fs');
@@ -50,7 +51,7 @@ if (typeof module !== 'undefined' && module.exports) {
                     headers: {},
                     baseURL: globalService.baseUrl
                 }
-                
+
                 let token = helperService.getCookie('sonicjs_access_token');
                 if (token) {
                     defaultOptions.headers.Authorization = token;

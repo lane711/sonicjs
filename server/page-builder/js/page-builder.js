@@ -1387,7 +1387,7 @@ async function updateModuleSort(shortCode, event) {
   payload.data.destinationColumnIndex = destinationColumnIndex;
   payload.data.destinationModuleIndex = event.newIndex;
 
-  debugger;
+  // debugger;
     return axiosInstance
     .post("/pb-update-module-sort", payload)
     .then(async function(response) {

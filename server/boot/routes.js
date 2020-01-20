@@ -24,6 +24,7 @@ javascriptService.startup();
 var userService = require("../services/user.service");
 var helperService = require("../services/helper.service");
 var sharedService = require("../services/shared.service");
+const ShortcodeTree = require('shortcode-tree').ShortcodeTree;
 
 const path = require("path");
 var cors = require("cors");
@@ -157,12 +158,25 @@ module.exports = function(app) {
     let data = req.body.data;
     console.log(data);
 
-    let sourceSection = await dataService.getContentInstance(sourceSectionId);
+    let sourceSection = await dataService.getContentById(data.sourceSectionId);
+    let content = sourceSection.data.rows[data.sourceRowIndex].columns[data.sourceColumnIndex].content;
+    console.log('content',content);
+
     // remove shortcode from the source column
-    // debugger;
-    // let shortCodeToRemove =
-    let content = sourceSection.rows[data.sourceRowIndex].columns[data.sourceColumnIndex].content();
-    let parsedBlock = ShortcodeTree.parse(content);
+    let shortCodesInColumn = ShortcodeTree.parse(content);
+    let shortCodeToRemove = shortCodesInColumn.children[data.sourceModuleIndex];
+    console.log('shortCodeToRemove',shortCodeToRemove);
+    let newContent = content.replace(shortCodeToRemove.shortcode.codeText, "");
+    sourceSection.data.rows[data.sourceRowIndex].columns[data.sourceColumnIndex].content = newContent;
+    console.log('newContent',newContent);
+    // await dataService.editContentInstance(sourceSection);
+
+    //regen the destination
+    let destinationSection = await dataService.getContentById(data.destinationSectionId);
+    let destinationContent = destinationSection.data.rows[data.destinationRowIndex].columns[data.destinationColumnIndex].content;
+    let shortCodesInDestinationColumn = ShortcodeTree.parse(destinationContent);
+
+    //get list of modules order AFTER drop and just recreate the whole list based on that
 
 
     res.send(`ok`);
