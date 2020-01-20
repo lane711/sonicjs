@@ -13,7 +13,8 @@ var imageList,
   currentColumnIndex,
   currentModuleId,
   currentModuleContentType,
-  jsonEditor;
+  jsonEditor,
+  ShortcodeTree;
 
 $(document).ready(async function() {
   await setupAxiosInstance();
@@ -1326,35 +1327,74 @@ async function beatifyACECss() {
 }
 
 async function setupSortable() {
-  var el = document.getElementById("main");
-  var el1 = document.getElementsByClassName("items");
+  let columnsList = $('main div[class^="col"]');
+  var columns = jQuery.makeArray(columnsList);
+
+  console.log("columns", columns);
+  columns.forEach(column => {
+    setupSortableColum(column);
+  });
+}
+
+async function setupSortableColum(el) {
+  // var el = document.getElementById("main");
+  // var el = document.getElementsByClassName("col-md-9")[0];
 
   var sortable = new Sortable(el, {
     // Element dragging ended
-    onEnd: function(/**Event*/ evt) {
-      var itemEl = evt.item; // dragged HTMLElement
-      evt.to; // target list
-      evt.from; // previous list
-      evt.oldIndex; // element's old index within old parent
-      evt.newIndex; // element's new index within new parent
-      evt.oldDraggableIndex; // element's old index within old parent, only counting draggable elements
-      evt.newDraggableIndex; // element's new index within new parent, only counting draggable elements
-      evt.clone; // the clone element
-      evt.pullMode; // when item is in another sortable: `"clone"` if cloning, `true` if moving
-      updateModuleSort(itemEl, evt.oldIndex, evt.newIndex);
+    group: "shared",
+    onEnd: function(/**Event*/ event) {
+      var itemEl = event.item; // dragged HTMLElement
+      event.to; // target list
+      event.from; // previous list
+      event.oldIndex; // element's old index within old parent
+      event.newIndex; // element's new index within new parent
+      event.oldDraggableIndex; // element's old index within old parent, only counting draggable elements
+      event.newDraggableIndex; // element's new index within new parent, only counting draggable elements
+      event.clone; // the clone element
+      event.pullMode; // when item is in another sortable: `"clone"` if cloning, `true` if moving
+      updateModuleSort(itemEl, event);
     }
   });
 }
 
-async function updateModuleSort(shortCode, oldIndex, newIndex) {
-    debugger;
+async function updateModuleSort(shortCode, event) {
 
-let sectionId = $(shortCode)[0].closest('section').dataset.id;
-// let sectionId = sectionEl.attr('data-id');
 
-let section = await getContentInstance(sectionId);
+  //source
+  let sourceSectionHtml = $(event.from)[0].closest("section");
+  let sourceSectionId = sourceSectionHtml.dataset.id;
+  let sourceRow = $(event.from)[0].closest(".row");
+  let sourceRowIndex = $(sourceRow).index();
+  let sourceColumn = $(event.from)[0].closest('div[class^="col"]');
+  let sourceColumnIndex = $(sourceColumn).index();
 
-let rowIndex = getParentRow($(shortCode)).index();
-let columnIndex = 0;
-  console.log("el:", shortCode, "from:", oldIndex, "to:", newIndex);
+  //destination
+  // debugger;
+  let destinationSectionId = $(event.to)[0].closest("section").dataset.id;
+  let destinationRow = $(event.to)[0].closest(".row");
+  let destinationRowIndex = $(destinationRow).index();
+  let destinationColumn = $(event.to)[0].closest('div[class^="col"]');
+  let destinationColumnIndex = $(destinationColumn).index();
+
+  let payload = { data : {}};
+  payload.data.sourceSectionId = sourceSectionId;
+  payload.data.sourceRowIndex = sourceRowIndex;
+  payload.data.sourceColumnIndex = sourceColumnIndex;
+  payload.data.sourceModuleIndex = event.oldIndex;
+  payload.data.destinationSectionId = destinationSectionId;
+  payload.data.destinationRowIndex = destinationRowIndex;
+  payload.data.destinationColumnIndex = destinationColumnIndex;
+  payload.data.destinationModuleIndex = event.newIndex;
+
+  debugger;
+    return axiosInstance
+    .post("/pb-update-module-sort", payload)
+    .then(async function(response) {
+      console.log(response);
+      return await response.data;
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
 }
