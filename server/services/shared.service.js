@@ -9,7 +9,7 @@
         if(args){
 
             for (var key in args) {
-                console.log(' name=' + key + ' value=' + args[key]);
+                // console.log(' name=' + key + ' value=' + args[key]);
                 sc += ` ${key}="${args[key]}"`;
              }
         }
