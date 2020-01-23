@@ -187,17 +187,16 @@ if (typeof module !== "undefined" && module.exports) {
         delete payload.data.id;
       }
 
-      let putPromise = this.getAxios()
-        .put(`/api/contents/${id}`, payload)
-        .then(async function(response) {
-          console.log(response.data);
-          // return response.data;
-        })
-        .catch(function(error) {
-          console.log(error);
-        });
+      return this.getAxios().put(`/api/contents/${id}`, payload);
+        // .then(async function(response) {
+        //   // console.log(response.data);
+        //   // return response.data;
+        // })
+        // .catch(function(error) {
+        //   console.log(error);
+        // });
 
-        return putPromise;
+        // return putPromise;
     }),
     (exports.createContentInstance = async function(payload) {
       // console.log('createContentInstance payload', payload);

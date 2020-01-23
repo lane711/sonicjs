@@ -176,7 +176,7 @@ module.exports = function(app) {
       sourceSection.data.rows[data.sourceRowIndex].columns[
         data.sourceColumnIndex
       ].content = newContent;
-      console.log("newContent", newContent);
+      // console.log("newContent", newContent);
       await dataService.editContentInstance(sourceSection);
     }
 
@@ -188,7 +188,7 @@ module.exports = function(app) {
     let updatedDestinationContent = sharedService.generateShortCodeList(
       data.destinationModules
     );
-    console.log("updatedDestinationContent", updatedDestinationContent);
+    // console.log("updatedDestinationContent", updatedDestinationContent);
     destinationSection.data.rows[data.destinationRowIndex].columns[
       data.destinationColumnIndex
     ].content = updatedDestinationContent;
