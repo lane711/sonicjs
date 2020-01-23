@@ -12,6 +12,7 @@ var imageList,
   currentColumn,
   currentColumnIndex,
   currentModuleId,
+  currentModuleIndex,
   currentModuleContentType,
   jsonEditor,
   ShortcodeTree;
@@ -205,9 +206,10 @@ function setupUIClicks() {
   $("section .row .module").on({
     click: function() {
 
-      debugger;
+      // debugger;
       let moduleDiv = $(this).closest(".module");
       currentModuleId = moduleDiv.data("id");
+      currentModuleIndex = $(moduleDiv).index();
       currentModuleContentType = moduleDiv.data("content-type");
       currentSection = $(this)[0].closest("section");
       currentSectionId = currentSection.dataset.id;
@@ -1143,22 +1145,29 @@ async function copyModule() {
   debugger;
   let source = await getModuleHierarchy(moduleDiv);
 
+  let payload = { data: {} };
+  payload.data.sectionId = currentSectionId;
+  payload.data.rowIndex = currentRowIndex
+  payload.data.columnIndex = currentColumnIndex;
+  payload.data.moduleId= currentModuleId;
+  payload.data.moduleIndex = currentModuleIndex;
 
-  let data = await getContentInstance(currentModuleId);
+  // payload.data.destinationSectionId = destinationSectionId;
+  // payload.data.destinationRowIndex = destinationRowIndex;
+  // payload.data.destinationColumnIndex = destinationColumnIndex;
+  // payload.data.destinationModuleIndex = event.newIndex;
+  // payload.data.destinationModules = destinationModules;
 
-  // let form = await formService.getForm(
-  //   currentModuleContentType,
-  //   data,
-  //   "await editContentInstance(submission); fullPageUpdate();"
-  // );
-  // $("#dynamicModelTitle").text(
-  //   `Settings: ${currentModuleContentType} (Id:${currentModuleId})`
-  // );
-  // $("#moduleSettingsFormio").html(form);
-  // loadModuleSettingForm();
-  // $("#moduleSettingsModal")
-  //   .appendTo("body")
-  //   .modal("show");
+  return axiosInstance
+    .post("/admin/pb-update-module-copy", payload)
+    .then(async function(response) {
+      console.log(response);
+      fullPageUpdate();
+      // return await response.data;
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
 }
 
 async function cleanModal() {

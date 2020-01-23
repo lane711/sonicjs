@@ -162,12 +162,12 @@ module.exports = function(app) {
       sourceSection.data.rows[data.sourceRowIndex].columns[
         data.sourceColumnIndex
       ].content;
-    console.log("content", content);
+    // console.log("content", content);
 
     // remove shortcode from the source column
     let shortCodesInColumn = ShortcodeTree.parse(content);
     let shortCodeToRemove = shortCodesInColumn.children[data.sourceModuleIndex];
-    console.log("shortCodeToRemove", shortCodeToRemove);
+    // console.log("shortCodeToRemove", shortCodeToRemove);
     if (shortCodeToRemove && shortCodeToRemove.shortcode) {
       let newContent = content.replace(
         shortCodeToRemove.shortcode.codeText,
@@ -196,6 +196,51 @@ module.exports = function(app) {
 
     res.send(`ok`);
     // return;
+  });
+
+  app.post("/admin/pb-update-module-copy", async function(req, res) {
+    let data = req.body.data;
+    console.log(data);
+
+    let sourceSection = await dataService.getContentById(data.sourceSectionId);
+    let content =
+      sourceSection.data.rows[data.sourceRowIndex].columns[
+        data.sourceColumnIndex
+      ].content;
+    console.log("content", content);
+
+    // // remove shortcode from the source column
+    // let shortCodesInColumn = ShortcodeTree.parse(content);
+    // let shortCodeToRemove = shortCodesInColumn.children[data.sourceModuleIndex];
+    // console.log("shortCodeToRemove", shortCodeToRemove);
+    // if (shortCodeToRemove && shortCodeToRemove.shortcode) {
+    //   let newContent = content.replace(
+    //     shortCodeToRemove.shortcode.codeText,
+    //     ""
+    //   );
+    //   sourceSection.data.rows[data.sourceRowIndex].columns[
+    //     data.sourceColumnIndex
+    //   ].content = newContent;
+    //   // console.log("newContent", newContent);
+    //   await dataService.editContentInstance(sourceSection);
+    // }
+
+    // //regen the destination
+    // let destinationSection = await dataService.getContentById(
+    //   data.destinationSectionId
+    // );
+
+    // let updatedDestinationContent = sharedService.generateShortCodeList(
+    //   data.destinationModules
+    // );
+    // // console.log("updatedDestinationContent", updatedDestinationContent);
+    // destinationSection.data.rows[data.destinationRowIndex].columns[
+    //   data.destinationColumnIndex
+    // ].content = updatedDestinationContent;
+    // let r = await dataService.editContentInstance(destinationSection);
+
+    // res.send(`ok`);
+    // // return;
   });
 
   app.get("/hbs", async function(req, res) {
