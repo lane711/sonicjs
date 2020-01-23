@@ -153,7 +153,7 @@ module.exports = function(app) {
     });
   });
 
-  app.post("/pb-update-module-sort", async function(req, res) {
+  app.post("/admin/pb-update-module-sort", async function(req, res) {
     let data = req.body.data;
     console.log(data);
 
@@ -192,9 +192,7 @@ module.exports = function(app) {
     destinationSection.data.rows[data.destinationRowIndex].columns[
       data.destinationColumnIndex
     ].content = updatedDestinationContent;
-    await dataService.editContentInstance(destinationSection);
-
-    //get list of modules order AFTER drop and just recreate the whole list based on that
+    let r = await dataService.editContentInstance(destinationSection);
 
     res.send(`ok`);
     // return;

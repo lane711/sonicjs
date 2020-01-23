@@ -204,9 +204,19 @@ function setupUIClicks() {
 
   $("section .row .module").on({
     click: function() {
+
+      debugger;
       let moduleDiv = $(this).closest(".module");
       currentModuleId = moduleDiv.data("id");
       currentModuleContentType = moduleDiv.data("content-type");
+      currentSection = $(this)[0].closest("section");
+      currentSectionId = currentSection.dataset.id;
+      currentRow = $(this)[0].closest(".row");
+      currentRowIndex = $(currentRow).index();
+      currentColumn = $(this)[0].closest('div[class^="col"]');
+      currentColumnIndex = $(currentColumn).index();
+
+
 
       console.log("moduleId", currentModuleId);
       $(".edit-module")
@@ -1122,6 +1132,35 @@ async function editModule() {
     .modal("show");
 }
 
+async function copyModule() {
+
+
+  console.log("copying module: " + currentModuleId, currentModuleContentType);
+  //need index and column
+
+  let moduleDiv = $(`.module[data-id='${currentModuleId}'`);
+
+  debugger;
+  let source = await getModuleHierarchy(moduleDiv);
+
+
+  let data = await getContentInstance(currentModuleId);
+
+  // let form = await formService.getForm(
+  //   currentModuleContentType,
+  //   data,
+  //   "await editContentInstance(submission); fullPageUpdate();"
+  // );
+  // $("#dynamicModelTitle").text(
+  //   `Settings: ${currentModuleContentType} (Id:${currentModuleId})`
+  // );
+  // $("#moduleSettingsFormio").html(form);
+  // loadModuleSettingForm();
+  // $("#moduleSettingsModal")
+  //   .appendTo("body")
+  //   .modal("show");
+}
+
 async function cleanModal() {
   $("#moduleSettingsFormio").empty();
 }
@@ -1358,14 +1397,35 @@ async function setupSortableColum(el) {
   });
 }
 
+async function getModuleHierarchy(element) {
+
+  let sourceSectionHtml = $(element)[0].closest("section");
+  let sourceSectionId = sourceSectionHtml.dataset.id;
+  let sourceRow = $(element)[0].closest(".row");
+  let sourceRowIndex = $(sourceRow).index();
+  let sourceColumn = $(element)[0].closest('div[class^="col"]');
+  let sourceColumnIndex = $(sourceColumn).index();
+
+  return {
+    sourceSectionHtml: sourceSectionHtml,
+    sourceSectionId: sourceSectionId,
+    sourceRow: sourceRow,
+    sourceRowIndex: sourceRowIndex,
+    sourceColumn: sourceColumn,
+    sourceColumnIndex: sourceColumnIndex
+  };
+
+}
+
 async function updateModuleSort(shortCode, event) {
   //source
-  let sourceSectionHtml = $(event.from)[0].closest("section");
-  let sourceSectionId = sourceSectionHtml.dataset.id;
-  let sourceRow = $(event.from)[0].closest(".row");
-  let sourceRowIndex = $(sourceRow).index();
-  let sourceColumn = $(event.from)[0].closest('div[class^="col"]');
-  let sourceColumnIndex = $(sourceColumn).index();
+  let source = await getModuleHierarchy(event.from);
+  // let sourceSectionHtml = $(event.from)[0].closest("section");
+  // let sourceSectionId = sourceSectionHtml.dataset.id;
+  // let sourceRow = $(event.from)[0].closest(".row");
+  // let sourceRowIndex = $(sourceRow).index();
+  // let sourceColumn = $(event.from)[0].closest('div[class^="col"]');
+  // let sourceColumnIndex = $(sourceColumn).index();
 
   //destination
   // debugger;
@@ -1387,9 +1447,9 @@ async function updateModuleSort(shortCode, event) {
   console.log("destinationModules", destinationModules);
 
   let payload = { data: {} };
-  payload.data.sourceSectionId = sourceSectionId;
-  payload.data.sourceRowIndex = sourceRowIndex;
-  payload.data.sourceColumnIndex = sourceColumnIndex;
+  payload.data.sourceSectionId = source.sourceSectionId;
+  payload.data.sourceRowIndex = source.sourceRowIndex;
+  payload.data.sourceColumnIndex = source.sourceColumnIndex;
   payload.data.sourceModuleIndex = event.oldIndex;
   payload.data.destinationSectionId = destinationSectionId;
   payload.data.destinationRowIndex = destinationRowIndex;
@@ -1399,7 +1459,7 @@ async function updateModuleSort(shortCode, event) {
 
   // debugger;
   return axiosInstance
-    .post("/pb-update-module-sort", payload)
+    .post("/admin/pb-update-module-sort", payload)
     .then(async function(response) {
       console.log(response);
       return await response.data;
