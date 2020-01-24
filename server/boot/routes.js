@@ -202,12 +202,39 @@ module.exports = function(app) {
     let data = req.body.data;
     console.log(data);
 
-    let sourceSection = await dataService.getContentById(data.sourceSectionId);
+    let section = await dataService.getContentById(data.sectionId);
     let content =
-      sourceSection.data.rows[data.sourceRowIndex].columns[
-        data.sourceColumnIndex
-      ].content;
+      section.data.rows[data.rowIndex].columns[data.columnIndex].content;
     console.log("content", content);
+
+    //copy module
+    let moduleToCopy = await dataService.getContentById(data.moduleId);
+    let newModule = await dataService.createContentInstance(moduleToCopy);
+
+    let sectionColumn =
+      section.data.rows[data.rowIndex].columns[data.columnIndex];
+
+    let shortCodesInColumn = ShortcodeTree.parse(sectionColumn.content);
+
+    // generate short code ie: [MODULE-HELLO-WORLD id="123"]
+    let args = { id: newModule.id };
+    let moduleInstanceShortCodeText = sharedService.generateShortCode(
+      `${newModule.data.contentType}`,
+      args
+    );
+
+    let moduleInstanceShortCode = ShortcodeTree.parse(moduleInstanceShortCodeText);
+
+
+    shortCodesInColumn.children.splice(
+      data.moduleIndex,
+      0,
+      moduleInstanceShortCode[0]
+    );
+
+    let moduleInstanceUpdatedShortCode = ShortcodeTree.parse(shortCodesInColumn.children);
+
+    section.data.rows[data.rowIndex].columns[data.columnIndex].content = moduleInstanceUpdatedShortCode;
 
     // // remove shortcode from the source column
     // let shortCodesInColumn = ShortcodeTree.parse(content);

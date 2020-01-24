@@ -227,15 +227,18 @@ if (typeof module !== "undefined" && module.exports) {
       }
 
       // return this.http.post("/api/contents/", content).toPromise();
+      return new Promise((resolve, reject) => {
       this.getAxios()
         .post("/api/contents/", payload)
-        .then(function(response) {
-          console.log(response);
-          return response.data;
+        .then(async function(response) {
+          // console.log("ok", response.data);
+          resolve(response.data);
         })
         .catch(function(error) {
-          console.log(error);
+          console.log('err');
+          reject(error);
         });
+      });
     });
 
   (exports.getContentById = async function(id) {

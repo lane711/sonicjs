@@ -1142,7 +1142,7 @@ async function copyModule() {
 
   let moduleDiv = $(`.module[data-id='${currentModuleId}'`);
 
-  debugger;
+  // debugger;
   let source = await getModuleHierarchy(moduleDiv);
 
   let payload = { data: {} };
