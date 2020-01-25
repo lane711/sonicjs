@@ -1148,7 +1148,7 @@ async function copyModule() {
   let payload = { data: {} };
   payload.data.sectionId = currentSectionId;
   payload.data.rowIndex = currentRowIndex
-  payload.data.columnIndex = currentColumnIndex;
+  payload.data.columnIndex = currentColumnIndex -1;
   payload.data.moduleId= currentModuleId;
   payload.data.moduleIndex = currentModuleIndex;
 
@@ -1161,6 +1161,7 @@ async function copyModule() {
   return axiosInstance
     .post("/admin/pb-update-module-copy", payload)
     .then(async function(response) {
+      debugger;
       console.log(response);
       fullPageUpdate();
       // return await response.data;

@@ -25,6 +25,7 @@ var userService = require("../services/user.service");
 var helperService = require("../services/helper.service");
 var sharedService = require("../services/shared.service");
 const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
+let ShortcodeFormatter = require("shortcode-tree").ShortcodeFormatter;
 
 const path = require("path");
 var cors = require("cors");
@@ -223,50 +224,23 @@ module.exports = function(app) {
       args
     );
 
-    let moduleInstanceShortCode = ShortcodeTree.parse(moduleInstanceShortCodeText);
+    let moduleInstanceShortCode = ShortcodeTree.parse(moduleInstanceShortCodeText).children[0];
 
 
     shortCodesInColumn.children.splice(
-      data.moduleIndex,
+      data.moduleIndex + 1,
       0,
-      moduleInstanceShortCode[0]
+      moduleInstanceShortCode
     );
 
-    let moduleInstanceUpdatedShortCode = ShortcodeTree.parse(shortCodesInColumn.children);
+    let newShortCodeContent = sharedService.generateContentFromShortcodeList(shortCodesInColumn);
 
-    section.data.rows[data.rowIndex].columns[data.columnIndex].content = moduleInstanceUpdatedShortCode;
 
-    // // remove shortcode from the source column
-    // let shortCodesInColumn = ShortcodeTree.parse(content);
-    // let shortCodeToRemove = shortCodesInColumn.children[data.sourceModuleIndex];
-    // console.log("shortCodeToRemove", shortCodeToRemove);
-    // if (shortCodeToRemove && shortCodeToRemove.shortcode) {
-    //   let newContent = content.replace(
-    //     shortCodeToRemove.shortcode.codeText,
-    //     ""
-    //   );
-    //   sourceSection.data.rows[data.sourceRowIndex].columns[
-    //     data.sourceColumnIndex
-    //   ].content = newContent;
-    //   // console.log("newContent", newContent);
-    //   await dataService.editContentInstance(sourceSection);
-    // }
+    section.data.rows[data.rowIndex].columns[data.columnIndex].content = newShortCodeContent;
 
-    // //regen the destination
-    // let destinationSection = await dataService.getContentById(
-    //   data.destinationSectionId
-    // );
+    let result = await dataService.editContentInstance(section);
 
-    // let updatedDestinationContent = sharedService.generateShortCodeList(
-    //   data.destinationModules
-    // );
-    // // console.log("updatedDestinationContent", updatedDestinationContent);
-    // destinationSection.data.rows[data.destinationRowIndex].columns[
-    //   data.destinationColumnIndex
-    // ].content = updatedDestinationContent;
-    // let r = await dataService.editContentInstance(destinationSection);
-
-    // res.send(`ok`);
+    res.send(`ok`);
     // // return;
   });
 
