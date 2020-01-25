@@ -1171,6 +1171,43 @@ async function copyModule() {
     });
 }
 
+async function deleteModule() {
+
+
+  console.log("deleting module: " + currentModuleId, currentModuleContentType);
+  //need index and column
+
+  let moduleDiv = $(`.module[data-id='${currentModuleId}'`);
+
+  // debugger;
+  let source = await getModuleHierarchy(moduleDiv);
+
+  let payload = { data: {} };
+  payload.data.sectionId = currentSectionId;
+  payload.data.rowIndex = currentRowIndex
+  payload.data.columnIndex = currentColumnIndex -1;
+  payload.data.moduleId= currentModuleId;
+  payload.data.moduleIndex = currentModuleIndex;
+
+  // payload.data.destinationSectionId = destinationSectionId;
+  // payload.data.destinationRowIndex = destinationRowIndex;
+  // payload.data.destinationColumnIndex = destinationColumnIndex;
+  // payload.data.destinationModuleIndex = event.newIndex;
+  // payload.data.destinationModules = destinationModules;
+
+  return axiosInstance
+    .post("/admin/pb-update-module-delete", payload)
+    .then(async function(response) {
+      // debugger;
+      console.log(response);
+      fullPageUpdate();
+      // return await response.data;
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+}
+
 async function cleanModal() {
   $("#moduleSettingsFormio").empty();
 }

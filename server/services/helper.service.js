@@ -59,7 +59,7 @@
       return result;
     }),
     (exports.getCookie = function(name) {
-      debugger;
+      // debugger;
       if (document && document.cookie) {
         var value = "; " + document.cookie;
         var parts = value.split("; " + name + "=");
