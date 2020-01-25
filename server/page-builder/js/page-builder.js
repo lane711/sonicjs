@@ -1161,7 +1161,7 @@ async function copyModule() {
   return axiosInstance
     .post("/admin/pb-update-module-copy", payload)
     .then(async function(response) {
-      debugger;
+      // debugger;
       console.log(response);
       fullPageUpdate();
       // return await response.data;
