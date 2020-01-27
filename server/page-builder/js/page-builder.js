@@ -205,7 +205,6 @@ function setupUIClicks() {
 
   $("section .row .module").on({
     click: function() {
-
       // debugger;
       let moduleDiv = $(this).closest(".module");
       currentModuleId = moduleDiv.data("id");
@@ -217,8 +216,6 @@ function setupUIClicks() {
       currentRowIndex = $(currentRow).index();
       currentColumn = $(this)[0].closest('div[class^="col"]');
       currentColumnIndex = $(currentColumn).index();
-
-
 
       console.log("moduleId", currentModuleId);
       $(".edit-module")
@@ -1135,8 +1132,6 @@ async function editModule() {
 }
 
 async function copyModule() {
-
-
   console.log("copying module: " + currentModuleId, currentModuleContentType);
   //need index and column
 
@@ -1147,9 +1142,9 @@ async function copyModule() {
 
   let payload = { data: {} };
   payload.data.sectionId = currentSectionId;
-  payload.data.rowIndex = currentRowIndex
-  payload.data.columnIndex = currentColumnIndex -1;
-  payload.data.moduleId= currentModuleId;
+  payload.data.rowIndex = currentRowIndex;
+  payload.data.columnIndex = currentColumnIndex - 1;
+  payload.data.moduleId = currentModuleId;
   payload.data.moduleIndex = currentModuleIndex;
 
   // payload.data.destinationSectionId = destinationSectionId;
@@ -1172,8 +1167,6 @@ async function copyModule() {
 }
 
 async function deleteModule() {
-
-
   console.log("deleting module: " + currentModuleId, currentModuleContentType);
   //need index and column
 
@@ -1184,9 +1177,9 @@ async function deleteModule() {
 
   let payload = { data: {} };
   payload.data.sectionId = currentSectionId;
-  payload.data.rowIndex = currentRowIndex
-  payload.data.columnIndex = currentColumnIndex -1;
-  payload.data.moduleId= currentModuleId;
+  payload.data.rowIndex = currentRowIndex;
+  payload.data.columnIndex = currentColumnIndex - 1;
+  payload.data.moduleId = currentModuleId;
   payload.data.moduleIndex = currentModuleIndex;
 
   // payload.data.destinationSectionId = destinationSectionId;
@@ -1426,26 +1419,27 @@ async function setupSortableColum(el) {
   // var el = document.getElementById("main");
   // var el = document.getElementsByClassName("col-md-9")[0];
 
-  var sortable = new Sortable(el, {
-    // Element dragging ended
-    group: "shared",
-    onEnd: function(/**Event*/ event) {
-      var itemEl = event.item; // dragged HTMLElement
-      event.to; // target list
-      event.from; // previous list
-      event.oldIndex; // element's old index within old parent
-      event.newIndex; // element's new index within new parent
-      event.oldDraggableIndex; // element's old index within old parent, only counting draggable elements
-      event.newDraggableIndex; // element's new index within new parent, only counting draggable elements
-      event.clone; // the clone element
-      event.pullMode; // when item is in another sortable: `"clone"` if cloning, `true` if moving
-      updateModuleSort(itemEl, event);
-    }
-  });
+  if (typeof Sortable !== 'undefined') {
+    var sortable = new Sortable(el, {
+      // Element dragging ended
+      group: "shared",
+      onEnd: function(/**Event*/ event) {
+        var itemEl = event.item; // dragged HTMLElement
+        event.to; // target list
+        event.from; // previous list
+        event.oldIndex; // element's old index within old parent
+        event.newIndex; // element's new index within new parent
+        event.oldDraggableIndex; // element's old index within old parent, only counting draggable elements
+        event.newDraggableIndex; // element's new index within new parent, only counting draggable elements
+        event.clone; // the clone element
+        event.pullMode; // when item is in another sortable: `"clone"` if cloning, `true` if moving
+        updateModuleSort(itemEl, event);
+      }
+    });
+  }
 }
 
 async function getModuleHierarchy(element) {
-
   let sourceSectionHtml = $(element)[0].closest("section");
   let sourceSectionId = sourceSectionHtml.dataset.id;
   let sourceRow = $(element)[0].closest(".row");
@@ -1461,7 +1455,6 @@ async function getModuleHierarchy(element) {
     sourceColumn: sourceColumn,
     sourceColumnIndex: sourceColumnIndex
   };
-
 }
 
 async function updateModuleSort(shortCode, event) {
