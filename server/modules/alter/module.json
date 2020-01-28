@@ -1,0 +1,8 @@
+{
+  "title": "Alert",
+  "systemid": "alter",
+  "version": "0.0.0.1",
+  "canBeAddedToColumn": "true",
+  "systemidUpperCase": "ALTER",
+  "systemidCamelCase": "alter"
+}
