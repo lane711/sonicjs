@@ -20,7 +20,7 @@ module.exports = contactUsMainService = {
 
         });
 
-        eventBusService.on('afterProcessModuleShortCodeProccessedViewModel', async function (options) {
+        eventBusService.on('alterModuleViewModule', async function (options) {
 
             if (options.shortcode.name !== 'CONTACT-US') {
                 return;

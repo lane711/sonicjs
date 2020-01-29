@@ -14,6 +14,19 @@ module.exports = wikiMainService = {
             }
 
         });
+
+        eventBusService.on('alterModuleViewModule', async function (options) {
+
+          if (options.shortcode.name !== 'WIKI') {
+              return;
+          }
+
+          options.viewModel.data.menu = "Lane"
+
+          // console.log('contact module after view model', options.viewModel);
+
+      });
+
     },
 
 }

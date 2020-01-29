@@ -60,6 +60,8 @@ module.exports = contentService = {
             this.page.data.hasRows = true;
         }
 
+        await eventBusService.emit('preRender', { req: req, page: this.page });
+
         return { page: this.page };
     },
 
@@ -233,10 +235,10 @@ module.exports = contentService = {
                     if (section.data.content) {
                         //content will contain full layout
                         globalService.pageContent += `${section.data.content}`;
-                        await this.processBlocks(section.data.content);
+                        await this.processShortCodes(section, section.data.content);
                     } else {
                         //use page builder rows for layout
-                        rows = await this.processRows($, sectionWrapper, section.data.rows)
+                        rows = await this.processRows(section, $, sectionWrapper, section.data.rows)
                     }
                     globalService.pageContent += '</div>';
                     globalService.pageContent += '</div>';
@@ -252,82 +254,45 @@ module.exports = contentService = {
     },
 
     //TODO loop thru rows
-    processRows: async function ($, sectionWrapper, rows) {
+    processRows: async function (section, $, sectionWrapper, rows) {
         let rowArray = [];
+        let rowIndex = 0;
         for (const row of rows) {
-            // console.log(chalk.red(JSON.stringify(row)));
+          // console.log(chalk.red(JSON.stringify(row)));
             globalService.pageContent += `<div class='${row.class}''>`;
-            let columns = await this.processColumns(row);
+            let columns = await this.processColumns(section, row, rowIndex);
             globalService.pageContent += `</div>`;
 
             rowArray.push(row);
+            rowIndex++;
         }
         // console.log('rowArray---->', rowArray);
         return rowArray;
     },
 
-    processColumns: async function (row) {
+    processColumns: async function (section, row, rowIndex) {
         let columnArray = [];
+        let columnIndex = 0
         for (const column of row.columns) {
 
             // console.log('== column ==', column);
+
             globalService.pageContent += `<div id='${column.id}' class='${column.class}'>`;
             globalService.pageContent += `${column.content}`;
             if (column.content) {
-                await this.processBlocks(column.content);
+                await this.processShortCodes(section, column.content, rowIndex, columnIndex);
             } else {
                 globalService.pageContent += `<span class="empty-column">empty column</spam>`;
 
             }
             globalService.pageContent += `</div>`;
             columnArray.push(column);
+            columnIndex++;
         }
         return columnArray;
     },
 
-    processBlocks: async function (blocks) {
-        await this.processShortCodes(blocks);
-        // const parser = Shortcode();
-
-        // await parser.add('BLOCK', tag=>{
-        //     let blockId = tag.attributes.id
-        //     console.log('in parser callback blockId:-->', blockId);
-        //     // this.processBlock(blockId);
-        //     return blockId;
-        // });
-
-        // await parser.add('BLOCK', tag=>{ // add handler for CONTENT tag
-        //     return new Promise(async (resolve, reject)=>{ // Use the id attribute of the tag to do a lookup-up
-        //         try{
-        //             let blockId = tag.attributes.id
-        //             // console.log('in parser callback blockId:-->', blockId);
-        //             // await this.processBlock(blockId);
-        //             return blockId;
-        //         }
-        //         catch(error){
-        //             console.log(error);
-        //         }frowarr
-        //     });
-        // });
-
-        // await parser.parse(blocks).then(blockId =>{
-        //     // console.log('parser resolve', blockId);
-        //     // await this.processBlock(blockId);
-
-        // })
-    },
-
-    // processBlocks: async function (blocks) {
-
-    //     let blockIds = await this.processShortCodes(blocks);
-    //     // console.log('blockIds', blockIds);
-    //     for(const blockId of blockIds){
-    //         await this.processBlock(blockId);
-    //     }
-
-    // },
-
-    processShortCodes: async function (body) {
+    processShortCodes: async function (section, body, rowIndex, columnIndex) {
         let parsedBlock = ShortcodeTree.parse(body);
 
 
@@ -337,7 +302,7 @@ module.exports = contentService = {
 
                 //new way:
                 if (shortcode) {
-                    await eventBusService.emit('beginProcessModuleShortCode', { req: this.req, shortcode: shortcode });
+                    await eventBusService.emit('beginProcessModuleShortCode', { section: section, req: this.req, shortcode: shortcode, rowIndex: rowIndex, columnIndex: columnIndex });
 
                     //old way, TODO: refac
                     if (shortcode.name == "BLOCK") {
