@@ -1,3 +1,28 @@
+(function(exports) {
+  var isAdminUserCreated = false;
+  var axiosInstance;
+  var baseUrl;
+  var pageContent = "temp";
+  var moduleDefinitions = [];
+  var moduleDefinitionsForColumns = [];
+  var moduleCssFiles = [];
+  var moduleJsFiles = [];
+  var AccessToken;
+
+  // your code goes here
+
+  exports.test = function() {
+    return "hello world";
+  };
+
+  exports.asyncForEach = async function (array, callback) {
+    for (let index = 0; index < array.length; index++) {
+        await callback(array[index], index, array);
+    }
+}
+
+})(typeof exports === "undefined" ? (this["globalService"] = {}) : exports);
+
 // var eventBusService = require('./event-bus.service');
 // var os = require("os");
 
@@ -10,7 +35,7 @@
 
 // // var isAdminUserCreated = false;
 // // module.exports.globalService.isAdminUserCreated = isAdminUserCreated;
-// // 
+// //
 
 // module.exports = globalService = {
 
@@ -36,22 +61,3 @@
 
 
 
-(function (exports) {
-
-    var isAdminUserCreated = false;
-    var axiosInstance;
-    var baseUrl;
-    var pageContent = 'temp';
-    var moduleDefinitions = [];
-    var moduleDefinitionsForColumns = [];
-    var moduleCssFiles = [];
-    var moduleJsFiles = [];
-    var AccessToken;
-
-    // your code goes here
-
-    exports.test = function () {
-        return 'hello world'
-    };
-
-})(typeof exports === 'undefined' ? this['globalService'] = {} : exports);

@@ -20,7 +20,7 @@ module.exports = contactUsMainService = {
 
         });
 
-        eventBusService.on('alterModuleViewModule', async function (options) {
+        eventBusService.on('postModuleGetData', async function (options) {
 
             if (options.shortcode.name !== 'CONTACT-US') {
                 return;

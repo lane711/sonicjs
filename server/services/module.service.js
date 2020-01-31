@@ -155,8 +155,10 @@ module.exports = moduleService = {
             let viewPath = path.join(__dirname, `/../modules/${contentType}/views/${contentType}-main.handlebars`);
             let viewModel = await dataService.getContentById(id);
 
+
             options.viewModel = viewModel;
-            await eventBusService.emit("alterModuleViewModule", options);
+
+            await eventBusService.emit("postModuleGetData", options);
 
             var proccessedHtml = { id: id, contentType: contentType, shortCode: options.shortcode, body: await this.processView(contentType, viewModel, viewPath) };
 
