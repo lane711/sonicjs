@@ -20,6 +20,7 @@ const apiUrl = "/api/";
 var page;
 var id;
 var req;
+var modulesToDelayProcessing = [];
 
 module.exports = contentService = {
   startup: async function() {
@@ -156,6 +157,7 @@ module.exports = contentService = {
     const $ = cheerio.load(html);
 
     await this.processSections($);
+    await this.processDelayedModules();
 
     // await this.processPageBuilder($);
     // console.log('section content', globalService.pageContent);
@@ -302,8 +304,6 @@ module.exports = contentService = {
   processShortCodes: async function(section, body, rowIndex, columnIndex) {
     let parsedBlock = ShortcodeTree.parse(body);
 
-    let modulesToDelayProcessing = [];
-
     if (parsedBlock.children) {
       for (let bodyBlock of parsedBlock.children) {
         let shortcode = bodyBlock.shortcode;
@@ -337,15 +337,19 @@ module.exports = contentService = {
         }
       }
 
-      for (let shortcode of modulesToDelayProcessing) {
-        await eventBusService.emit("beginProcessModuleShortCode", {
-          section: section,
-          req: this.req,
-          shortcode: shortcode,
-          rowIndex: rowIndex,
-          columnIndex: columnIndex
-        });
-      }
+
+    }
+  },
+
+  processDelayedModules: async function() {
+    for (let shortcode of modulesToDelayProcessing) {
+      await eventBusService.emit("beginProcessModuleShortCode", {
+        section: undefined,
+        req: this.req,
+        shortcode: shortcode,
+        rowIndex: 0,
+        columnIndex: 0
+      });
     }
   },
 

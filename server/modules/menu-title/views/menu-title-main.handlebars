@@ -1,1 +1,7 @@
-<div>Hello to you {{ data.firstName }} from the Menu - Title module!</div>
+<ul>
+  {{#each data.headerTags}}
+  <li class="{{this.headerLevel }}">
+    <a href="/docs#{{this.slug }}">{{this.text }}</a>
+  </li>
+  {{/each}}
+</ul>
