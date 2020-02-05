@@ -350,7 +350,7 @@ module.exports = contentService = {
         }
       }
 
-      console.log("done regular modules");
+      // console.log("done regular modules");
     }
   },
 
@@ -366,8 +366,8 @@ module.exports = contentService = {
         columnIndex: 0
       });
     }
-    console.log("done delayed modules");
-    console.log("================");
+    // console.log("done delayed modules");
+    // console.log("================");
 
   },
 

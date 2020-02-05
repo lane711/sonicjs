@@ -21,6 +21,7 @@ function submitForm(submission) {
 }
 
 function slugify(text) {
+  // console.log('slug', text);
   let slug = text
     .toLowerCase()
     .replace(/[^\w ]+/g, '')

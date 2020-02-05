@@ -7,10 +7,10 @@ var titleModules = [];
 
 module.exports = menuTitleMainService = {
   startup: async function() {
-    console.log('--> startup on menuTitleMainService');
+    // console.log('--> startup on menuTitleMainService');
 
     eventBusService.on("postProcessPage", async function(options) {
-        console.log('resetting titeModules');
+        // console.log('resetting titeModules');
         titleModules = [];
 
     });
@@ -41,7 +41,7 @@ module.exports = menuTitleMainService = {
       if (options.shortcode.name === 'MENU-TITLE') {
 
         //now we should have a complete list of title modules
-          console.log('postModuleGetData',titleModules.length);
+          // console.log('postModuleGetData',titleModules.length);
 
           options.viewModel.data.headerTags = titleModules;
 
