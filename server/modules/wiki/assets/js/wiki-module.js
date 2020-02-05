@@ -1,6 +1,6 @@
 // JS File for Module: wiki
 $(document).ready(async function () {
-    setupACEEditor1();
+    // setupACEEditor1();
 });
 // async function setupACEEditor1() {
 

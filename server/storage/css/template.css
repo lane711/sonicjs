@@ -1,6 +1,6 @@
 body {
 padding-top: 5rem;
-background: #ebebeb;
+background: #F8F8F8	;
 padding: 0;
 font-size: 1.4rem
 }
@@ -264,23 +264,3 @@ margin: 0 10px 0 0
   font-size: 1.1rem;
 }
 
-div[data-module="MENU-TITLE"] {
-  margin: 25px 0 0;
-  position: fixed
-  }
-
-div[data-module="MENU-TITLE"] ul{
-  list-style: none;
-  margin: 0;
-  padding: 10px 0;
-}
-
-div[data-module="MENU-TITLE"] .li-h1{
-  padding: 20px 0 0 0;
-  font-size: 18px;
-}
-
-div[data-module="MENU-TITLE"] .li-h2{
-  font-size: 14px;
-  padding: 0 0 0  20px;
-}
