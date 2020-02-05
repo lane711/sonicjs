@@ -19,9 +19,13 @@ module.exports = menuTitleMainService = {
       if (options.shortcode.name === "MENU-TITLE") {
         //TODO: don't process shortcode so that it can be processed after target columns has been built
         options.moduleName = "menu-title";
+
+        // console.log('beginProcessModuleShortCodeDelayed',titleModules.length);
+        // options.viewModel = {data : {headerTags: titleModules}};
+        // console.log('tags', options.viewModel.data.headerTags);
+
         await moduleService.processModuleInColumn(options);
-        console.log('startup',titleModules.length);
-        options.viewModel.data.headerTags = titleModules;
+
 
       }
     });
@@ -39,7 +43,7 @@ module.exports = menuTitleMainService = {
         //now we should have a complete list of title modules
           console.log('postModuleGetData',titleModules.length);
 
-          // options.viewModel.data.headerTags = titleModules;
+          options.viewModel.data.headerTags = titleModules;
 
           // var headerTagsArr = Array.from(titleModules);
           // const names = titleModules.map(item => item.text)
