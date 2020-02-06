@@ -421,9 +421,9 @@ module.exports = function(app) {
         //user not logged in
       }
 
-      if (process.env.MODE !== "dev") {
-        res.send(401);
-      }
+      // if (process.env.MODE !== "dev") {
+      //   res.send(401);
+      // }
 
       let path = req.url.split("/");
       let viewName = "admin-dashboard";
