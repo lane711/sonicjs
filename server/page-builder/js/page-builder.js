@@ -54,11 +54,11 @@ async function setupAxiosInstance() {
 async function setPage() {
   let pageId = $("#page-id").val();
   if (pageId) {
-    console.log("pageId", pageId);
+    // console.log("pageId", pageId);
     axiosInstance.get(`/api/contents/${pageId}`).then(function(response) {
       // handle success
       this.page = response.data;
-      console.log("getPage page", page);
+      // console.log("getPage page", page);
     });
   }
 }
@@ -497,7 +497,7 @@ async function addColumn() {
 
   let column = await generateNewColumn();
   section.data.rows[currentRowIndex].columns.push(column);
-  console.log("columns", section.data.rows[currentRowIndex].columns);
+  // console.log("columns", section.data.rows[currentRowIndex].columns);
   editContentInstance(section);
 
   fullPageUpdate();
@@ -1409,7 +1409,7 @@ async function setupSortable() {
   let columnsList = $('main div[class^="col"]');
   var columns = jQuery.makeArray(columnsList);
 
-  console.log("columns", columns);
+  // console.log("columns", columns);
   columns.forEach(column => {
     setupSortableColum(column);
   });
