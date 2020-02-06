@@ -403,9 +403,9 @@ module.exports = function(app) {
       req.url.startsWith("/admin") &&
       !(await userService.isAuthenticated(req))
     ) {
-      // if (process.env.MODE !== "dev") {
-      //   res.send(401);
-      // }
+      if (process.env.MODE !== "dev") {
+        res.send(401);
+      }
 
       let qsParams = url.parse(req.url, true).query;
       let data = {};
@@ -421,9 +421,9 @@ module.exports = function(app) {
         //user not logged in
       }
 
-      // if (process.env.MODE !== "dev") {
-      //   res.send(401);
-      // }
+      if (process.env.MODE !== "dev") {
+        res.send(401);
+      }
 
       let path = req.url.split("/");
       let viewName = "admin-dashboard";
