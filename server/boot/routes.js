@@ -224,8 +224,9 @@ module.exports = function(app) {
       args
     );
 
-    let moduleInstanceShortCode = ShortcodeTree.parse(moduleInstanceShortCodeText).children[0];
-
+    let moduleInstanceShortCode = ShortcodeTree.parse(
+      moduleInstanceShortCodeText
+    ).children[0];
 
     shortCodesInColumn.children.splice(
       data.moduleIndex + 1,
@@ -233,10 +234,13 @@ module.exports = function(app) {
       moduleInstanceShortCode
     );
 
-    let newShortCodeContent = sharedService.generateContentFromShortcodeList(shortCodesInColumn);
+    let newShortCodeContent = sharedService.generateContentFromShortcodeList(
+      shortCodesInColumn
+    );
 
-
-    section.data.rows[data.rowIndex].columns[data.columnIndex].content = newShortCodeContent;
+    section.data.rows[data.rowIndex].columns[
+      data.columnIndex
+    ].content = newShortCodeContent;
 
     let result = await dataService.editContentInstance(section);
 
@@ -245,15 +249,12 @@ module.exports = function(app) {
   });
 
   app.post("/admin/pb-update-module-delete", async function(req, res) {
-
     let data = req.body.data;
     console.log(data);
 
     let section = await dataService.getContentById(data.sectionId);
     let content =
-      section.data.rows[data.rowIndex].columns[
-        data.columnIndex
-      ].content;
+      section.data.rows[data.rowIndex].columns[data.columnIndex].content;
     // console.log("content", content);
 
     // remove shortcode from the source column
@@ -287,7 +288,6 @@ module.exports = function(app) {
     // let r = await dataService.editContentInstance(destinationSection);
 
     res.send(`ok`);
-
   });
 
   app.get("/hbs", async function(req, res) {
@@ -403,9 +403,9 @@ module.exports = function(app) {
       req.url.startsWith("/admin") &&
       !(await userService.isAuthenticated(req))
     ) {
-      if (process.env.MODE !== "dev") {
-        res.send(401);
-      }
+      // if (process.env.MODE !== "dev") {
+      //   res.send(401);
+      // }
 
       let qsParams = url.parse(req.url, true).query;
       let data = {};
