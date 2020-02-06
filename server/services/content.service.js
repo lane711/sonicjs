@@ -25,7 +25,7 @@ var modulesToDelayProcessing = [];
 module.exports = contentService = {
   startup: async function() {
     eventBusService.on(
-      "afterProcessModuleShortCodeProccessedHtml",
+      "postProcessModuleShortCodeProccessedHtml",
       async function(proccessedHtml) {
         if (proccessedHtml) {
           contentService.wrapBlockInModuleDiv(proccessedHtml);

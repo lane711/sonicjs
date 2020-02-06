@@ -162,7 +162,7 @@ module.exports = moduleService = {
 
             var proccessedHtml = { id: id, contentType: contentType, shortCode: options.shortcode, body: await this.processView(contentType, viewModel, viewPath) };
 
-            await eventBusService.emit("afterProcessModuleShortCodeProccessedHtml", proccessedHtml);
+            await eventBusService.emit("postProcessModuleShortCodeProccessedHtml", proccessedHtml);
 
             globalService.pageContent = globalService.pageContent.replace(options.shortcode.codeText, proccessedHtml.body);
         }

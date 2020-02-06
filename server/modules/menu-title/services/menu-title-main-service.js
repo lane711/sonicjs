@@ -44,6 +44,7 @@ module.exports = menuTitleMainService = {
           // console.log('postModuleGetData',titleModules.length);
 
           options.viewModel.data.headerTags = titleModules;
+          options.viewModel.data.pageUrl = options.req.path;
 
           // var headerTagsArr = Array.from(titleModules);
           // const names = titleModules.map(item => item.text)

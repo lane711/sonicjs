@@ -167,9 +167,11 @@ transition: transform 0s 0.2s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0s 0.
 transition: transform 0s 0.2s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0s 0.2s,-webkit-transform 0s 0.2s cubic-bezier(0.175,0.885,0.32,1.275)
 }
 
+@media ( max-width: 767px) {
 .navbar-nav{
   background: #111;
   padding: 0 20px;
+}
 }
 
 .blog .details {
