@@ -353,9 +353,11 @@ module.exports = function(app) {
       !globalService.isAdminUserCreated &&
       (req.url === "/" || req.url === "/admin")
     ) {
-      //brand new site, admin accounts needs to be created
-      res.redirect("/register");
-      return;
+      if (process.env.MODE === "dev") {
+        //brand new site, admin accounts needs to be created
+        res.redirect("/register");
+        return;
+      }
     }
 
     //for modules css/js files
