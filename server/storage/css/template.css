@@ -80,7 +80,7 @@ section.hero {
   padding: 0
 }
 
-.home section.hero {
+section.hero {
   height: auto;
   text-align: center;
   background-color: #ff0000;
