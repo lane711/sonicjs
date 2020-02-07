@@ -9,6 +9,10 @@ h1, h2, h3, h4 {
   margin: 1.8rem 0 2.0rem
 }
 
+a.white{
+  color: #fff;
+}
+
 .starter-template {
   padding: 3rem 1.5rem;
   text-align: center
