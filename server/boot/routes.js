@@ -3,7 +3,7 @@ var globalService = require("../services/global.service");
 // globalService.startup();
 var themes = require(__dirname + "../../themes/themes");
 var pageBuilderService = require("../services/page-builder.service");
-var formio = require("../services/formio.service");
+// var formio = require("../services/formio.service");
 var adminService = require("../services/admin.service");
 adminService.startup();
 var dataService = require("../services/data.service");
