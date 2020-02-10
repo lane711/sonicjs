@@ -307,3 +307,51 @@ background:#fff;
 		background-position: 0% 50%;
 	}
 }
+
+/* Side Panel */
+.pb-side-panel{
+  position: absolute;
+  right: 0;
+  width: 50vw;
+  height: 100vh;
+  z-index: 9999;
+  background: #fff;
+  border-left: 1px solid #666;
+}
+
+.pb-side-panel h5{
+  background: #666;
+  color:#fff;
+  padding: 20px 20px 0 20px;
+  height: 69px;
+}
+
+.pb-side-panel.close{
+  display: none;
+  /* width: 0vw;
+  opacity: 0;
+  transition: width .5s, visibility 1s; */
+}
+
+.pb-side-panel .handle{
+  position: relative;
+
+}
+
+.pb-side-panel .handle span{
+  font-size: 40px;
+  background: #fff;
+  border: 1px solid #666;
+  border-right: 1px solid #fff;
+  position: absolute;
+  left: -60px;
+  top: 70px;
+  width: 60px;
+  padding-left: 16px;
+  cursor: pointer;
+}
+
+/* .pb-side-panel.close .handle span{
+  display: none;
+} */
+

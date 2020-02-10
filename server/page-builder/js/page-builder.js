@@ -35,6 +35,7 @@ $(document).ready(async function() {
   await setupACEEditor();
   await setupDropZone();
   setupSortable();
+  setupSidePanel();
 });
 
 async function setupAxiosInstance() {
@@ -1110,7 +1111,8 @@ async function addModule(systemid) {
 }
 
 async function editModule() {
-  cleanModal();
+  // cleanModal();
+  showSidePanel();
 
   console.log("editing module: " + currentModuleId, currentModuleContentType);
 
@@ -1507,4 +1509,15 @@ async function updateModuleSort(shortCode, event) {
     .catch(function(error) {
       console.log(error);
     });
+}
+
+function setupSidePanel(){
+  console.log('setup side panel')
+  $('.pb-side-panel .handle span').click(function(){
+    $('.pb-side-panel').addClass('close');
+  })
+}
+
+function showSidePanel(){
+  $('.pb-side-panel').removeClass('close');
 }
