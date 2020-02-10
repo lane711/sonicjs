@@ -1126,11 +1126,14 @@ async function editModule() {
   $("#dynamicModelTitle").text(
     `Settings: ${currentModuleContentType} (Id:${currentModuleId})`
   );
-  $("#moduleSettingsFormio").html(form);
+
+  // $("#moduleSettingsFormio").html(form);
+  $(".pb-side-panel .content").html(form);
+
   loadModuleSettingForm();
-  $("#moduleSettingsModal")
-    .appendTo("body")
-    .modal("show");
+  // $("#moduleSettingsModal")
+  //   .appendTo("body")
+  //   .modal("show");
 }
 
 async function copyModule() {
@@ -1515,9 +1518,11 @@ function setupSidePanel(){
   console.log('setup side panel')
   $('.pb-side-panel .handle span').click(function(){
     $('.pb-side-panel').addClass('close');
+    $('.pb-side-panel-modal-backdrop').addClass('close');
   })
 }
 
 function showSidePanel(){
+  $('.pb-side-panel-modal-backdrop').removeClass('close');
   $('.pb-side-panel').removeClass('close');
 }

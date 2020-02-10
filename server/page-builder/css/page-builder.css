@@ -227,8 +227,8 @@ section {
   background-color: skyblue;
 }
 
-.module:hover{
-  box-shadow:0px 0px 0px 1px #777 inset;
+.module:hover {
+  box-shadow: 0px 0px 0px 1px #777 inset;
 }
 
 section .col span, .pb-section .nav-link, .dropdown-menu .dropdown-item {
@@ -272,86 +272,110 @@ section .col:hover {
   margin: 0 1rem;
 }
 
-.module{
+.module {
   position: relative;
 }
 
-.empty-column{
+.empty-column {
   font-size: .7em;
   color: #777;
   display: block;
   text-align: center;
   margin: 10px 0;
-
 }
 
 /* sortable */
-.sortable-chosen{
-background:#fff;
+
+.sortable-chosen {
+  background: #fff;
 }
 
-.sortable-ghost{
-	background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-	background-size: 400% 400%;
+.sortable-ghost {
+  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background-size: 400% 400%;
   animation: gradient-sortable-ghost 1s ease infinite;
 }
 
 @keyframes gradient-sortable-ghost {
-	0% {
-		background-position: 0% 50%;
-	}
-	50% {
-		background-position: 100% 50%;
-	}
-	100% {
-		background-position: 0% 50%;
-	}
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* Side Panel */
-.pb-side-panel{
-  position: absolute;
+
+.pb-side-panel {
+  position: fixed;
   right: 0;
+  top: 0;
+  bottom: 0;
   width: 50vw;
-  height: 100vh;
-  z-index: 9999;
+  /* height: 100vh; */
+  z-index: 1030;
   background: #fff;
   border-left: 1px solid #666;
 }
 
-.pb-side-panel h5{
+.pb-side-panel .content {
+  padding: 20px;
+}
+
+.pb-side-panel h5 {
   background: #666;
-  color:#fff;
+  color: #fff;
   padding: 20px 20px 0 20px;
   height: 69px;
 }
 
-.pb-side-panel.close{
+.pb-side-panel.close {
   display: none;
   /* width: 0vw;
   opacity: 0;
   transition: width .5s, visibility 1s; */
 }
 
-.pb-side-panel .handle{
+.pb-side-panel .handle {
   position: relative;
-
 }
 
-.pb-side-panel .handle span{
+.pb-side-panel .handle span {
   font-size: 40px;
   background: #fff;
   border: 1px solid #666;
   border-right: 1px solid #fff;
   position: absolute;
   left: -60px;
-  top: 70px;
+  top: 68px;
   width: 60px;
   padding-left: 16px;
   cursor: pointer;
 }
 
+.pb-side-panel-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1020;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
+  opacity: .5;
+}
+
+.pb-side-panel-modal-backdrop.close {
+  display: none;
+}
+
+.ck-balloon-panel {
+  z-index: 1040 !important;
+}
+
 /* .pb-side-panel.close .handle span{
   display: none;
 } */
-
