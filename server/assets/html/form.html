@@ -6,6 +6,7 @@ const formValuesToLoad_{{ random }} = {{{ formValuesToLoad }}}
 
     loadModuleSettingForm = async function () {
         // debugger;
+        Formio.icons = 'fontawesome';
         Formio.createForm(document.getElementById('formio_{{ random }}'), formJSON_{{ random }}).then((form) => {
             console.log('log form', form);
 

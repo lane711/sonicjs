@@ -822,6 +822,7 @@ async function setupFormBuilder(contentType) {
     return;
   }
 
+  Formio.icons = 'fontawesome';
   Formio.builder(document.getElementById("formBuilder"), null).then(
     async function(form) {
       form.setForm({
