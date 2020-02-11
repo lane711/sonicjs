@@ -1090,13 +1090,7 @@ async function saveWYSIWYG() {
 }
 
 async function addModule(systemid) {
-  cleanModal();
-  console.log("adding module to column: " + systemid);
-  // debugger;
-  // const viewModel = encodeURI(`{"data": {"onFormSubmitFunction":"addModuleToColumn(submission)"}}`);
-  // const viewPath = encodeURI(`/assets/html/form.html`);
-
-  // let formHtml = await axiosInstance.get(`api/views/getProceedView?viewModel=${viewModel}&viewPath=${viewPath}`)
+  showSidePanel();
 
   let form = await formService.getForm(
     systemid,
@@ -1104,11 +1098,12 @@ async function addModule(systemid) {
     "addModuleToColumn(submission)"
   );
 
-  $("#moduleSettingsFormio").html(form);
+  $(".pb-side-panel .content").html(form);
+
   loadModuleSettingForm();
-  $("#moduleSettingsModal")
-    .appendTo("body")
-    .modal("show");
+  // $("#moduleSettingsModal")
+  //   .appendTo("body")
+  //   .modal("show");
 }
 
 async function editModule() {
