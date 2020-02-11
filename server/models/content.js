@@ -73,6 +73,7 @@ module.exports = function (Content) {
     }
   }
   );
+
   // CoffeeShop.getName = function(shopId, cb) {
   //   CoffeeShop.findById( shopId, function (err, instance) {
   //       var response = "Name of coffee shop is " + instance.name;

@@ -1,7 +1,7 @@
 {
   "ids": {
     "contentType": 41,
-    "content": 405,
+    "content": 406,
     "fieldType": 2,
     "e2e-test": 2
   },
@@ -394,7 +394,8 @@
       "401": "{\"data\":{\"title\":\"Donec id elit non \",\"description\":\"<p>Donec id elit non mi porta gravida at eget metus. <a href=\\\"/text\\\">Nullam id dolor</a> id nibh ultricies vehicula ut id elit. Vestibulum id ligula porta felis euismod semper. Vestibulum id ligula porta felis euismod semper. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec id elit non mi porta gravida at eget metus.</p>\",\"contentType\":\"junk\",\"submit\":true,\"createdOn\":1581121809812},\"id\":401}",
       "402": "{\"id\":402,\"data\":{\"body\":\"<p><br>My <i>html</i> <strong>module</strong> with a <a href=\\\"/contact\\\">link</a></p>\",\"contentType\":\"html\",\"createdOn\":1581361254133,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-480,\"referrer\":\"http://localhost:3018/sandbox3\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36\",\"pathName\":\"/sandbox3\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
       "403": "{\"data\":{\"level\":\"warning\",\"alertCopy\":\"<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum id ligula porta felis euismod semper. <strong>Aenean</strong> eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>\",\"contentType\":\"alter\",\"submit\":true,\"createdOn\":1581386135707},\"id\":403}",
-      "404": "{\"data\":{\"level\":\"danger\",\"alertCopy\":\"<p>Aenean eu leo quam. <a href=\\\"/abc\\\">Pellentesque</a> ornare sem lacinia quam venenatis vestibulum. Nullam id dolor id nibh ultricies vehicula ut id elit. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Cras mattis consectetur purus sit amet fermentum.</p>\",\"contentType\":\"alert\",\"submit\":true,\"createdOn\":1581389177630},\"id\":404}"
+      "404": "{\"id\":404,\"data\":{\"level\":\"danger\",\"alertCopy\":\"<p>Aenean eu leo quam. <a href=\\\"/abc\\\">Pellentesque</a> ornare sem lacinia quam venenatis vestibulum. Nullam id dolor id nibh ultricies vehicula ut id elit. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Cras mattis consectetur purus sit amet fermentum.</p>\",\"contentType\":\"alert\",\"createdOn\":1581440309788,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-480,\"referrer\":\"\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36\",\"pathName\":\"/sandbox3\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
+      "405": "{\"data\":{\"title\":\"-92730image63\",\"file\":\"-92730image63.jpeg\",\"contentType\":\"media\",\"createdOn\":1581439631021},\"id\":405}"
     },
     "fieldType": {
       "1": "{\"name\":\"string\",\"renderFunction\":\"string\",\"id\":1}"
