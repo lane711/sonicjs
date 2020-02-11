@@ -15,7 +15,7 @@ module.exports = formattingService = {
       element.data.createdOnFormatted = moment(day).format('YYYY-MM-DD, h:mm:ss a');
       }
       else{
-        element.data.createdOnFormatted('1900-01-01, 12:00:00 am')
+        element.data.createdOnFormatted = '1900-01-01, 12:00:00 am';
       }
     });
   }

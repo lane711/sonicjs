@@ -2,14 +2,14 @@ var dataService = require('../../../services/data.service');
 var eventBusService = require('../../../services/event-bus.service');
 var globalService = require('../../../services/global.service');
 
-module.exports = alterMainService = {
+module.exports = alertMainService = {
 
     startup: async function () {
         eventBusService.on('beginProcessModuleShortCode', async function (options) {
 
-            if (options.shortcode.name === 'ALTER') {
+            if (options.shortcode.name === 'ALERT') {
 
-                options.moduleName = 'alter';
+                options.moduleName = 'alert';
                 await moduleService.processModuleInColumn(options);
             }
 
