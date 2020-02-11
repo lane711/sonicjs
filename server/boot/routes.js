@@ -402,7 +402,7 @@ module.exports = function(app) {
       let page = await contentService.getBlog(req);
       res.render("blog", page);
     } else if (
-      req.url.startsWith("/admin") &&
+      (req.url == "/admin" || req.url.startsWith("/admin/")) &&
       !(await userService.isAuthenticated(req))
     ) {
       if (process.env.MODE !== "dev") {
@@ -418,7 +418,7 @@ module.exports = function(app) {
         data.message = qsParams.message;
       }
       res.render("admin-login", { layout: "login.handlebars", data: data });
-    } else if (req.url.startsWith("/admin")) {
+    } else if (req.url == "/admin" || req.url.startsWith("/admin/")) {
       if (!req.signedCookies.sonicjs_access_token) {
         //user not logged in
       }
