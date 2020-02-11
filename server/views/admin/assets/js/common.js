@@ -40,7 +40,7 @@ $(document).ready(async function () {
   $('#admin-content').DataTable(
     {
       "order": [[ 2, "desc" ]]
-  } 
+  }
   );
 
 });

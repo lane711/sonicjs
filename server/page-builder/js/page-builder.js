@@ -1516,7 +1516,7 @@ async function updateModuleSort(shortCode, event) {
 }
 
 function setupSidePanel(){
-  console.log('setup side panel')
+  // console.log('setup side panel')
   $('.pb-side-panel .handle span').click(function(){
     $('.pb-side-panel').addClass('close');
     $('.pb-side-panel-modal-backdrop').addClass('close');

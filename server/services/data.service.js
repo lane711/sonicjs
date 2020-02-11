@@ -5,6 +5,7 @@ if (typeof module !== "undefined" && module.exports) {
   var pageBuilderService = require("./page-builder.service");
   var formService = require("./form.service");
   var helperService = require("./helper.service");
+  var formattingService = require("./formatting.service");
 
   var axios = require("axios");
   var fs = require("fs");
@@ -66,6 +67,7 @@ if (typeof module !== "undefined" && module.exports) {
       const filter = encodeURI(`{"order":"data.createdOn DESC"}`);
       let url = `${apiUrl}contents?filter=${filter}`;
       let page = await this.getAxios().get(url);
+      formattingService.formatDates(page.data);
       return page.data;
     }),
     (exports.getContentByType = async function(contentType) {

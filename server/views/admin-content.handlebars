@@ -21,20 +21,20 @@
           <tr>
             <td><a href="{{ this.data.url }}">{{ this.data.title }}</a></td>
             <td>{{ this.data.contentType }}</td>
-            <td>{{ this.data.createdOn }}</td>
+            <td>{{ this.data.createdOnFormatted }}</td>
             <td class='text-right'>
               <a href="/admin/content/edit/{{ this.data.contentType }}/{{ this.id }}"
                 class="btn btn-sm btn-primary rmargin">Edit</a>
 
               <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
-                data-trigger="focus" title="Delete <b>{{ this.data.title }}</b> Forever?" data-content="<a href='/content/{{ this.id }}' 
+                data-trigger="focus" title="Delete <b>{{ this.data.title }}</b> Forever?" data-content="<a href='/content/{{ this.id }}'
    class='btn btn-sm btn-danger rmargin'>Confirm Delete</a>
 ">Delete</a>
 
               {{!-- <!-- <a href="{{ content.url }}" target="_blank" class="btn btn-sm btn-success rmargin">View</a> -->
                 <a class="btn btn-sm btn-warning rmargin" *ngIf="content.data.contentType==='page'" [routerLink]="['/page-builder', content.id]">Page Builder</a>
 
-  
+
                 <ng-template #popTitle>Delete <b>{{ content.name }}</b>?</ng-template>
                 <ng-template #popContent><button class="btn btn-sm btn-danger" (click)="deleteContent(content.id)">Confirm Delete</button></ng-template>
                 <button class="btn btn-sm btn-danger" placement="top"
