@@ -1,40 +1,44 @@
-var dataService = require('../../../services/data.service');
-var eventBusService = require('../../../services/event-bus.service');
-var globalService = require('../../../services/global.service');
-var jimp = require(jimp);
+var dataService = require("../../../services/data.service");
+var eventBusService = require("../../../services/event-bus.service");
+var globalService = require("../../../services/global.service");
+var jimp = require("jimp");
+var path = require("path");
+const fs = require('fs')
 
 module.exports = imageProcessingMainService = {
+  startup: async function() {
+    eventBusService.on("beginProcessModuleShortCode", async function(options) {
+      if (options.shortcode.name === "IMAGE-PROCESSING") {
+        options.moduleName = "image-processing";
+        await moduleService.processModuleInColumn(options);
+      }
+    });
 
-    startup: async function () {
-        eventBusService.on('beginProcessModuleShortCode', async function (options) {
+    eventBusService.on("requestBegin", async function(options) {
+      if (options.req.url.startsWith("/images/")) {
 
-            if (options.shortcode.name === 'IMAGE-PROCESSING') {
+        globalService.isRequestAlreadyHandled = true;
 
-                options.moduleName = 'image-processing';
-                await moduleService.processModuleInColumn(options);
-            }
+        // Read the image.
+        let fileName = options.req.path.replace('/images/','');
+        let width = options.req.query.width;
+        let imagePath = path.join(__dirname, "../../..", `/storage/files/${fileName}`);
+        let newImagePath = `server/storage/files/width-${width}/${fileName}`;
 
-        });
-
-        eventBusService.on('requestBegin', async function (options) {
-
-          if(options.req.url.startsWith("/images/")){
-            console.log('processing image...');
-            globalService.isRequestAlreadyHandled = true;
-
-            // Read the image.
-	const image = await jimp.read('../../storage/files/newyork.jpeg');
-
-	// Resize the image to width 150 and auto height.
-	await image.resize(150, jimp.AUTO);
-
-	// Save and overwrite the image
-  await image.writeAsync('test/image.png');
-
-            options.res.send(200);
+        try {
+          if (!fs.existsSync(newImagePath)) {
+            //file does not exist
+            console.log('create file');
+            const image = await jimp.read(imagePath);
+            await image.resize(parseInt(width), jimp.AUTO);
+            let img = await image.writeAsync(newImagePath);
           }
-      });
+        } catch(err) {
+          console.error(err)
+        }
 
-    },
-
-}
+        options.res.sendFile(newImagePath, {root: './'})
+      }
+    });
+  }
+};
