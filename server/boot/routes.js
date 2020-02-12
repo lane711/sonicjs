@@ -396,7 +396,11 @@ module.exports = function(app) {
 
     await eventBusService.emit("requestBegin", { req: req, res: res });
 
-    // formio.getComponents();
+    if(globalService.isRequestAlreadyHandled){
+      globalService.isRequestAlreadyHandled = false; //reset
+      return;
+    }
+
 
     if (req.url.startsWith("/blog/")) {
       let page = await contentService.getBlog(req);

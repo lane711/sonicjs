@@ -3,10 +3,11 @@
 
 module.exports = function(Container) {
 
-//   Container.afterRemote('*', function(ctx, file, next) {
-//     console.log('file has been saved', ctx);
-//     next();
-//   });
+  // Container.beforeRemote('*', function(ctx, file, next) {
+  //   let width = ctx.req.query.width;
+  //   console.log('file has been saved', width, file);
+  //   next();
+  // });
 
 //   Container.observe('findOrCreate', async function filterProperties(ctx, next) {
 //     // if (ctx.options && ctx.options.skipPropertyFilter) return next();

@@ -8,6 +8,8 @@
   var moduleCssFiles = [];
   var moduleJsFiles = [];
   var AccessToken;
+  var isRequestAlreadyHandled = false;
+
 
   // your code goes here
 
