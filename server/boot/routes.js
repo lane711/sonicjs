@@ -349,6 +349,14 @@ module.exports = function(app) {
   // });
 
   app.get("*", async function(req, res, next) {
+
+    await eventBusService.emit("requestBegin", { req: req, res: res });
+
+    if(globalService.isRequestAlreadyHandled){
+      globalService.isRequestAlreadyHandled = false; //reset
+      return;
+    }
+
     if (
       !globalService.isAdminUserCreated &&
       (req.url === "/" || req.url === "/admin")
@@ -393,14 +401,6 @@ module.exports = function(app) {
     if (process.env.MODE == "production") {
       console.log(`serving: ${req.url}`);
     }
-
-    await eventBusService.emit("requestBegin", { req: req, res: res });
-
-    if(globalService.isRequestAlreadyHandled){
-      globalService.isRequestAlreadyHandled = false; //reset
-      return;
-    }
-
 
     if (req.url.startsWith("/blog/")) {
       let page = await contentService.getBlog(req);

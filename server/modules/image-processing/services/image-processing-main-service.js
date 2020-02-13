@@ -20,7 +20,8 @@ module.exports = imageProcessingMainService = {
         globalService.isRequestAlreadyHandled = true;
 
         // Read the image.
-        let fileName = options.req.path.replace('/images/','');
+        let filePath = decodeURIComponent(options.req.path);
+        let fileName = filePath.replace('/images/','');
         let width = options.req.query.width;
         let imagePath = path.join(__dirname, "../../..", `/storage/files/${fileName}`);
         let newImagePath = `server/storage/files/width-${width}/${fileName}`;
@@ -28,7 +29,6 @@ module.exports = imageProcessingMainService = {
         try {
           if (!fs.existsSync(newImagePath)) {
             //file does not exist
-            console.log('create file');
             const image = await jimp.read(imagePath);
             await image.resize(parseInt(width), jimp.AUTO);
             let img = await image.writeAsync(newImagePath);
