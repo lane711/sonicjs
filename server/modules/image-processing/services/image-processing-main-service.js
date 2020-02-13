@@ -23,13 +23,20 @@ module.exports = imageProcessingMainService = {
         let filePath = decodeURIComponent(options.req.path);
         let fileName = filePath.replace('/images/','');
         let width = options.req.query.width;
+
         let imagePath = path.join(__dirname, "../../..", `/storage/files/${fileName}`);
         let newImagePath = `server/storage/files/width-${width}/${fileName}`;
+
+        if(!width){
+          let originalImagePath = `server/storage/files/${fileName}`;
+          options.res.sendFile(originalImagePath, {root: './'})
+        }
 
         try {
           if (!fs.existsSync(newImagePath)) {
             //file does not exist
             const image = await jimp.read(imagePath);
+            image.quality(100);
             await image.resize(parseInt(width), jimp.AUTO);
             let img = await image.writeAsync(newImagePath);
           }
