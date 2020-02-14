@@ -349,12 +349,16 @@ module.exports = function(app) {
   // });
 
   app.get("*", async function(req, res, next) {
-
     await eventBusService.emit("requestBegin", { req: req, res: res });
 
-    if(globalService.isRequestAlreadyHandled){
-      globalService.isRequestAlreadyHandled = false; //reset
+    if (req.isRequestAlreadyHandled) {
+      //modules can set the req.isRequestAlreadyHandled to true if they
+      //have already fully handled the request including the response.
       return;
+    }
+
+    if (req.url.startsWith("/images/")) {
+      console.log("continuing request");
     }
 
     if (

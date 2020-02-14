@@ -57,6 +57,7 @@ module.exports = mediaService = {
     addMediaUrl: async function (mediaList) {
         mediaList.forEach(media => {
             media.data.url = `/api/containers/files/download/${media.data.file}`;
+            media.data.thumbUrl = `/images/${media.data.file}?width=240`;
         });
     }
 }

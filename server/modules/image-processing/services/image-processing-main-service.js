@@ -17,7 +17,7 @@ module.exports = imageProcessingMainService = {
     eventBusService.on("requestBegin", async function(options) {
       if (options.req.url.startsWith("/images/")) {
 
-        globalService.isRequestAlreadyHandled = true;
+        options.req.isRequestAlreadyHandled = true;
 
         // Read the image.
         let filePath = decodeURIComponent(options.req.path);
@@ -35,6 +35,7 @@ module.exports = imageProcessingMainService = {
         try {
           if (!fs.existsSync(newImagePath)) {
             //file does not exist
+            console.log(`creating ${fileName} at width: ${width}`);
             const image = await jimp.read(imagePath);
             image.quality(100);
             await image.resize(parseInt(width), jimp.AUTO);
