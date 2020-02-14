@@ -376,6 +376,10 @@ section .col:hover {
   z-index: 1040 !important;
 }
 
+.content .nav-tabs{
+  margin: 0 0 20px ;
+}
+
 /* .pb-side-panel.close .handle span{
   display: none;
 } */

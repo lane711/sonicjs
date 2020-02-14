@@ -1098,7 +1098,7 @@ async function addModule(systemid) {
     "addModuleToColumn(submission)"
   );
 
-  $(".pb-side-panel .content").html(form);
+  $(".pb-side-panel #main").html(form);
 
   loadModuleSettingForm();
   // $("#moduleSettingsModal")
@@ -1124,7 +1124,7 @@ async function editModule() {
   );
 
   // $("#moduleSettingsFormio").html(form);
-  $(".pb-side-panel .content").html(form);
+  $(".pb-side-panel #main").html(form);
 
   loadModuleSettingForm();
   // $("#moduleSettingsModal")
