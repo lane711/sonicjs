@@ -455,7 +455,6 @@ module.exports = function(app) {
       }
 
       let data = {};
-      data.breadCrumbs = await breadcrumbsService.getAdminBreadcrumbs(req);
 
       if (viewName == "admin-content") {
         data = await dataService.getContent();
@@ -516,6 +515,7 @@ module.exports = function(app) {
       }
 
       let accessToken = await userService.getToken(req);
+      data.breadCrumbs = await breadcrumbsService.getAdminBreadcrumbs(req);
 
       res.render(viewName, {
         layout: "admin.handlebars",
