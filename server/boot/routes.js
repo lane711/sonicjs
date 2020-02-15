@@ -24,6 +24,7 @@ javascriptService.startup();
 var userService = require("../services/user.service");
 var helperService = require("../services/helper.service");
 var sharedService = require("../services/shared.service");
+var breadcrumbsService = require("../services/breadcrumbs.service");
 const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 let ShortcodeFormatter = require("shortcode-tree").ShortcodeFormatter;
 
@@ -454,6 +455,7 @@ module.exports = function(app) {
       }
 
       let data = {};
+      data.breadCrumbs = await breadcrumbsService.getAdminBreadcrumbs(req);
 
       if (viewName == "admin-content") {
         data = await dataService.getContent();
