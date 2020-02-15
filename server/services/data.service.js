@@ -67,7 +67,8 @@ if (typeof module !== "undefined" && module.exports) {
       const filter = encodeURI(`{"order":"data.createdOn DESC"}`);
       let url = `${apiUrl}contents?filter=${filter}`;
       let page = await this.getAxios().get(url);
-      formattingService.formatDates(page.data);
+      await formattingService.formatDates(page.data);
+      await formattingService.formatTitles(page.data);
       return page.data;
     }),
     (exports.getContentByType = async function(contentType) {
