@@ -822,7 +822,7 @@ async function setupFormBuilder(contentType) {
     return;
   }
 
-  Formio.icons = 'fontawesome';
+  Formio.icons = "fontawesome";
   Formio.builder(document.getElementById("formBuilder"), null).then(
     async function(form) {
       form.setForm({
@@ -1098,12 +1098,9 @@ async function addModule(systemid) {
     "addModuleToColumn(submission)"
   );
 
-  $(".pb-side-panel #main").html(form);
+  $("#dynamicModelTitle").text(`New: ${systemid}`);
 
-  loadModuleSettingForm();
-  // $("#moduleSettingsModal")
-  //   .appendTo("body")
-  //   .modal("show");
+  loadModuleTabs(form, systemid);
 }
 
 async function editModule() {
@@ -1123,13 +1120,23 @@ async function editModule() {
     `Settings: ${currentModuleContentType} (Id:${currentModuleId})`
   );
 
-  // $("#moduleSettingsFormio").html(form);
+  loadModuleTabs(form, currentModuleContentType);
+}
+
+async function loadModuleTabs(form, systemid) {
   $(".pb-side-panel #main").html(form);
 
-  loadModuleSettingForm();
-  // $("#moduleSettingsModal")
-  //   .appendTo("body")
-  //   .modal("show");
+  let settingsForm = await formService.getForm(
+    "module-settings",
+    undefined,
+    "await editContentInstance(submission); fullPageUpdate();"
+  );
+  $(".pb-side-panel #settings").html(settingsForm);
+
+  let funcNameMain = "loadModuleSettingForm_" + systemid + "()";
+  eval(funcNameMain);
+
+  loadModuleSettingForm_modulesettings();
 }
 
 async function copyModule() {
@@ -1420,7 +1427,7 @@ async function setupSortableColum(el) {
   // var el = document.getElementById("main");
   // var el = document.getElementsByClassName("col-md-9")[0];
 
-  if (typeof Sortable !== 'undefined') {
+  if (typeof Sortable !== "undefined") {
     var sortable = new Sortable(el, {
       // Element dragging ended
       group: "shared",
@@ -1510,15 +1517,15 @@ async function updateModuleSort(shortCode, event) {
     });
 }
 
-function setupSidePanel(){
+function setupSidePanel() {
   // console.log('setup side panel')
-  $('.pb-side-panel .handle span').click(function(){
-    $('.pb-side-panel').addClass('close');
-    $('.pb-side-panel-modal-backdrop').addClass('close');
-  })
+  $(".pb-side-panel .handle span").click(function() {
+    $(".pb-side-panel").addClass("close");
+    $(".pb-side-panel-modal-backdrop").addClass("close");
+  });
 }
 
-function showSidePanel(){
-  $('.pb-side-panel-modal-backdrop').removeClass('close');
-  $('.pb-side-panel').removeClass('close');
+function showSidePanel() {
+  $(".pb-side-panel-modal-backdrop").removeClass("close");
+  $(".pb-side-panel").removeClass("close");
 }

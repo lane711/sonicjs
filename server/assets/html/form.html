@@ -4,7 +4,7 @@ const formJSON_{{ random }} = {{{ formJSON }}}
 
 const formValuesToLoad_{{ random }} = {{{ formValuesToLoad }}}
 
-    loadModuleSettingForm = async function () {
+    loadModuleSettingForm_{{ contentTypeId }} = async function () {
         // debugger;
         Formio.icons = 'fontawesome';
         Formio.createForm(document.getElementById('formio_{{ random }}'), formJSON_{{ random }}).then((form) => {
@@ -35,7 +35,8 @@ const formValuesToLoad_{{ random }} = {{{ formValuesToLoad }}}
     window.onload = async function () {
         // debugger;
         if (typeof module === 'undefined') {
-            loadModuleSettingForm();
+          console.log('loadModuleSettingForm from form.thml')
+            loadModuleSettingForm_{{ contentTypeId }}();
         }
     }
 
