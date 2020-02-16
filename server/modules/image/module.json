@@ -1,0 +1,8 @@
+{
+  "title": "Image",
+  "systemid": "image",
+  "version": "0.0.0.1",
+  "canBeAddedToColumn": "true",
+  "systemidUpperCase": "IMAGE",
+  "systemidCamelCase": "image"
+}
