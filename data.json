@@ -1,7 +1,7 @@
 {
   "ids": {
     "contentType": 42,
-    "content": 422,
+    "content": 423,
     "fieldType": 2,
     "e2e-test": 2
   },
@@ -412,7 +412,8 @@
       "418": "{\"id\":418,\"data\":{\"body\":\"<p>Now, let's dig in a bit to our module and make some changes. Currently the output of our module looks like this:</p>\",\"contentType\":\"html\",\"createdOn\":1581872315886,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-480,\"referrer\":\"http://localhost:3018/docs/developers-guide\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.106 Safari/537.36\",\"pathName\":\"/docs/developers-guide\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
       "419": "{\"id\":419,\"data\":{\"title\":\"Sandbox 4\",\"showHero\":true,\"heroTitle\":\"Sandbox\",\"pageCssClass\":\"\",\"autoGenerateUrl\":true,\"url\":\"/sandbox-4\",\"metaTitle\":\"\",\"metaDescription\":\"\",\"contentType\":\"page\",\"submit\":true,\"createdOn\":1581873001009,\"layout\":[420]}}",
       "420": "{\"id\":420,\"data\":{\"title\":\"Section 1\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[HELLO-WORLD id=\\\"421\\\"]\"}]}],\"createdOn\":1581873013664}}",
-      "421": "{\"data\":{\"firstName\":\"Bozo\",\"contentType\":\"hello-world\",\"submit\":true,\"createdOn\":1581873013635},\"id\":421}"
+      "421": "{\"data\":{\"firstName\":\"Bozo\",\"contentType\":\"hello-world\",\"submit\":true,\"createdOn\":1581873013635},\"id\":421}",
+      "422": "{\"data\":{\"title\":\"node.js cms hello world part 1\",\"file\":\"node.js cms hello world part 1.png\",\"contentType\":\"media\",\"createdOn\":1581873166449},\"id\":422}"
     },
     "fieldType": {
       "1": "{\"name\":\"string\",\"renderFunction\":\"string\",\"id\":1}"
