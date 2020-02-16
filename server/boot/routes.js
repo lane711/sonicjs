@@ -295,7 +295,7 @@ module.exports = function(app) {
     res.render("home");
   });
 
-  app.get("/sandbox", async function(req, res) {
+  app.get("/zsandbox", async function(req, res) {
     let data = {};
     res.render("sandbox", { layout: "blank.handlebars", data: data });
   });
@@ -305,7 +305,7 @@ module.exports = function(app) {
     res.render("sandbox", { layout: "admin.handlebars", data: data });
   });
 
-  app.get("/test", async function(req, res) {
+  app.get("/ztest", async function(req, res) {
     res.send("ok");
   });
 
