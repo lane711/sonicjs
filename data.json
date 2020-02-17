@@ -1,7 +1,7 @@
 {
   "ids": {
     "contentType": 43,
-    "content": 425,
+    "content": 426,
     "fieldType": 2,
     "e2e-test": 2
   },
@@ -412,11 +412,12 @@
       "417": "{\"id\":417,\"data\":{\"headerLevel\":\"h2\",\"position\":\"left\",\"text\":\"Hello World Part 2\",\"slug\":\"hello-world-part-2\",\"contentType\":\"title\",\"createdOn\":1581872244982,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-480,\"referrer\":\"http://localhost:3018/docs/developers-guide\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.106 Safari/537.36\",\"pathName\":\"/docs/developers-guide\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
       "418": "{\"id\":418,\"data\":{\"body\":\"<p>Now, let's dig in a bit to our module and make some changes. Currently the output of our module looks like this:</p>\",\"contentType\":\"html\",\"createdOn\":1581872315886,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-480,\"referrer\":\"http://localhost:3018/docs/developers-guide\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.106 Safari/537.36\",\"pathName\":\"/docs/developers-guide\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
       "419": "{\"id\":419,\"data\":{\"title\":\"Sandbox 4\",\"showHero\":true,\"heroTitle\":\"Sandbox\",\"pageCssClass\":\"\",\"autoGenerateUrl\":true,\"url\":\"/sandbox-4\",\"metaTitle\":\"\",\"metaDescription\":\"\",\"contentType\":\"page\",\"submit\":true,\"createdOn\":1581873001009,\"layout\":[420]}}",
-      "420": "{\"id\":420,\"data\":{\"title\":\"Section 1\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[HELLO-WORLD id=\\\"421\\\"][IMAGE id=\\\"424\\\"]\"}]}],\"createdOn\":1581972753914}}",
+      "420": "{\"id\":420,\"data\":{\"title\":\"Section 1\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[HELLO-WORLD id=\\\"421\\\"][IMAGE id=\\\"424\\\"][IMAGE id=\\\"425\\\"]\"}]}],\"createdOn\":1581979096993}}",
       "421": "{\"data\":{\"firstName\":\"Bozo\",\"contentType\":\"hello-world\",\"submit\":true,\"createdOn\":1581873013635},\"id\":421}",
       "422": "{\"data\":{\"title\":\"node.js cms hello world part 1\",\"file\":\"node.js cms hello world part 1.png\",\"contentType\":\"media\",\"createdOn\":1581873166449},\"id\":422}",
       "423": "{\"id\":423,\"data\":{\"fileName\":\"node.js cms hello world part 1.png\",\"retinaSupport\":true,\"thumbnailWidth\":300,\"onClick\":\"photoSwipe\",\"css\":\"\",\"contentType\":\"image\",\"createdOn\":1581874524737,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-480,\"referrer\":\"http://localhost:3018/docs/developers-guide\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.106 Safari/537.36\",\"pathName\":\"/docs/developers-guide\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
-      "424": "{\"data\":{\"fileName\":\"node.js cms hello world part 1.png\",\"retinaSupport\":true,\"thumbnailWidth\":300,\"onClick\":\"photoSwipe\",\"css\":\"\",\"contentType\":\"image\",\"submit\":true,\"createdOn\":1581972753875},\"id\":424}"
+      "424": "{\"data\":{\"fileName\":\"node.js cms hello world part 1.png\",\"retinaSupport\":true,\"thumbnailWidth\":300,\"onClick\":\"photoSwipe\",\"css\":\"\",\"contentType\":\"image\",\"submit\":true,\"createdOn\":1581972753875},\"id\":424}",
+      "425": "{\"id\":425,\"data\":{\"fileName\":\"-232050image4.jpeg\",\"retinaSupport\":true,\"thumbnailWidth\":300,\"onClick\":\"photoSwipe\",\"css\":\"\",\"contentType\":\"image\",\"createdOn\":1581979123095,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-480,\"referrer\":\"http://localhost:3018/sandbox-4\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.106 Safari/537.36\",\"pathName\":\"/sandbox-4\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}"
     },
     "fieldType": {
       "1": "{\"name\":\"string\",\"renderFunction\":\"string\",\"id\":1}"

@@ -1,4 +1,4 @@
-<div class="home-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+{{!-- <div class="home-gallery" itemscope itemtype="http://schema.org/ImageGallery">
 
   <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
     <a href="/images/{{ data.fileName }}" itemprop="contentUrl" data-size="1280x1000">
@@ -9,4 +9,8 @@
         class="description">desc 1</span></figcaption>
   </figure>
 
-</div>
+</div> --}}
+
+<a data-fancybox="gallery" href="/images/{{ data.fileName }}">
+    <img src="/images/{{ data.fileName }}?width={{ data.thumbnailWidth }}">
+</a>
