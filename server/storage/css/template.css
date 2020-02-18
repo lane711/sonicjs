@@ -313,3 +313,8 @@ top: -100px
 .docs body {
 font-size: 1.1rem
 }
+
+[data-fancybox] {
+  margin: 0 0 20px 0;
+  display: inline-block ;
+}
