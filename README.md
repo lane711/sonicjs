@@ -106,38 +106,92 @@ Also, if you've actually read down this far and happen to be a in generous mood,
 </p>
 
 ### Edit Content with Automagically Generated Forms:
-![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Edit%20Content.png)
+
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Edit%20Content.png?width=600" width="300px" alt="Edit Content with Automagically Generated Forms" />
+  </a>
+</p>
 
 ### Build Advanced Forms with over 20 Field Types
-![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Field%20Types.png)
+
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Field%20Types.png?width=600" width="300px" alt="Field Types" />
+  </a>
+</p>
 
 ### Edit Content Properties From the Front End
-![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Front%20End%20Page%20Settings.png)
+
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20Page%20Settings.png?width=600" width="300px" alt="Front End Content Editing" />
+  </a>
+</p>
 
 ### Front End WYSIWYG Editor
-![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Front%20End%20WYSIWYG%20Editor.png)
+
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20WYSIWYG%20Editor.png?width=600" width="300px" alt="Front End WYSIWYG Editor" />
+  </a>
+</p>
 
 ### Menu Manager
-![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Menu%20Management.png)
+
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Menu%20Management.png?width=600" width="300px" alt="Menu Manager" />
+  </a>
+</p>
 
 ### Real Time CSS Editor
-![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Front%20End%20CSS%20Editing.png)
+
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20CSS%20Editing.png?width=600" width="300px" alt="Real Time CSS Editor" />
+  </a>
+</p>
 
 ### Built In Media Server
-![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Media%20Manager.png)
+
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Media%20Manager.png?width=600" width="300px" alt="Built In Media Server" />
+  </a>
+</p>
 
 ### Module Management
-![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Module%20Management.png)
+
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Module%20Management.png?width=600" width="300px" alt="Module Management" />
+  </a>
+</p>
 
 ### Front End Json Editor
-![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Front%20End%20Json%20Editor.png)
+
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20Json%20Editor.png?width=600" width="300px" alt="Front End Json Editor" />
+  </a>
+</p>
 
 ### Swagger API Explorer
-![](https://sonicjs.com/api/containers/files/download/NodeJS%20CMS%20-%20API%20Explorer.png)
+
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20API%20Explorer.png?width=600" width="300px" alt="Swagger API Explorer" />
+  </a>
+</p>
 
 ### Back End Login
-![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Back%20End%20Login.png
-)
+
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Back%20End%20Login.png?width=600" width="300px" alt="Back End Login" />
+  </a>
+</p>
 
 ## Debugging
 
