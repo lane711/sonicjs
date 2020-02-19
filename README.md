@@ -37,6 +37,9 @@
 - Flat File (Json)
 - In-Memory
 
+### Why SonicJs
+There are thousands of CMS out there and several already built on the modern JAM stack (JavaScript, API & Markup). I was looking for a solid Node.js based CMS suitable as a foundation for enterprise application development. It didn't exist. For a detailed description of why SonicJs was started, please see the <a href="https://sonicjs.com/about">about page</a>.
+
 ## Table of Contents
 
 1. [Getting Started](#getting-started)
@@ -88,17 +91,19 @@ Also, if you've actually read down this far and happen to be a in generous mood,
 
 ### Manage Content Types:
 
-![Manage Content Types](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Content%20Types.png)
-
 <p align="center">
   <a href="https://sonicjs.com">
-    <img src="https://sonicjs.com/images/NodeJs%20CMS%20-%20Content%20Types.png?width=600" width="300px" alt="Manage Content Types" />
+    <img src="https://sonicjs.com/images/Node.js CMS - Content Type Edit.png?width=600" width="300px" alt="Manage Content Types" />
   </a>
 </p>
 
 ### Drag and Drop Form Builder:
 
-![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Content%20Type%20Edit.png)
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="Drag and Drop Form Builder" />
+  </a>
+</p>
 
 ### Edit Content with Automagically Generated Forms:
 ![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Edit%20Content.png)
