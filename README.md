@@ -88,6 +88,12 @@ If you are interested in reading more about me or the goals and motivation of th
 
 ![Manage Content Types](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Content%20Types.png)
 
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/NodeJs%20CMS%20-%20Content%20Types.png?width=600" width="300px" alt="Manage Content Types" />
+  </a>
+</p>
+
 ### Drag and Drop Form Builder:
 
 ![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Content%20Type%20Edit.png)
