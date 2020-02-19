@@ -4,7 +4,7 @@
 
 # SonicJS is a Modern Open Source NodeJs Based Content Management System
 
-![SonicJs Nodejs CMS Admin Dashboard](https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600)
+![SonicJs Nodejs CMS Admin Dashboard](https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600  | width=100)
 
 ## Visit https://sonicjs.com for Details, Videos & Docs
 
