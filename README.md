@@ -85,7 +85,7 @@ If you are considering using SonicJs for your next web project, its important to
 
 If you are interested in reading more about me or the goals and motivation of the project, please check out the "about" page here: https://sonicjs.com/about.
 
-Also, if you've actually read down this far and happen to be a in generous mood, &#x1F34F;**would you mind given the project a star?**&#x1F34F; Thanks in advance!
+Also, if you've actually read down this far and happen to be a in generous mood, `:star:` :star: **would you mind given the project a star?**&#x1F34F; Thanks in advance!
 
 ## Screen Shots
 
