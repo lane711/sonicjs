@@ -4,7 +4,7 @@
 
 # SonicJS is a Modern Open Source NodeJs Based Content Management System
 
-![SonicJs Nodejs CMS Admin Dashboard](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Dashboard.png)
+![SonicJs Nodejs CMS Admin Dashboard](https://sonicjs.com/images/Node.js CMS - Content Type Edit.png?width=600)
 
 ## Visit https://sonicjs.com for Details, Videos & Docs
 
@@ -18,12 +18,12 @@
 - Express
 - Bootstrap 4
 
-### SonicJs supports many common databases including: 
+### SonicJs supports many common databases including:
 - MongoDB
 - MySQL
 - SQL Server
 - Cloudant
-- DashDB 
+- DashDB
 - DB2
 - Informix
 - Oracle
@@ -74,7 +74,7 @@ SonicJs is also 100% REST API based and therefor a great choice if you are looki
 SonicJs is built with love from Orange County California.
 
 ## Free Forever
-If you are considering using SonicJs for your next web project, its important to know that it shall remain free forever (again similar to Drupal). Be wary of "free" open source solutions being built by start-ups or established companies that haven't made this same "free forever" commitment. 
+If you are considering using SonicJs for your next web project, its important to know that it shall remain free forever (again similar to Drupal). Be wary of "free" open source solutions being built by start-ups or established companies that haven't made this same "free forever" commitment.
 
 If you are interested in reading more about me or the goals and motivation of the project, please check out the "about" page here: https://sonicjs.com/about. Also, if you've actually read down this far and happen to be a in generous mood, &#x1F34F;**would you mind given the project a star?**&#x1F34F; Thanks in advance!
 
@@ -135,7 +135,7 @@ Please see here: https://sonicjs.com/about
 
 SonicJs uses a number of open source packages, tools, etc but there are a couple of them that I wanted to make special mention of:
 1. Loopback - An awesome NodeJs based ORM helping to support much of the heavy lifting in SonicJs' data tier.
-1. CoreUI - a truly great open source admin theme. 
+1. CoreUI - a truly great open source admin theme.
 1. Formio - a rock solid form builder with loads of advanced functionality.
 1. Axios - a brilliant library for interacting with REST end points.
 
