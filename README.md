@@ -37,7 +37,7 @@
 - Flat File (Json)
 - In-Memory
 
-### Why SonicJs
+### Why SonicJs?
 There are thousands of CMS out there and several already built on the modern JAM stack (JavaScript, API & Markup). I was looking for a solid Node.js based CMS suitable as a foundation for enterprise application development. It didn't exist. For a detailed description of why SonicJs was started, please see the <a href="https://sonicjs.com/about">about page</a>.
 
 ## Table of Contents
