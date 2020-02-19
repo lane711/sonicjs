@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://sonicjs.com">
-    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="Ghost" />
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="SonicJs Nodejs CMS Admin Dashboard" />
   </a>
 </p>
 
