@@ -10,7 +10,8 @@ module.exports = function(Module) {
             "title": body.title,
             "systemid": body.systemid,
             "version" : "0.0.0.1",
-            "canBeAddedToColumn": "true"
+            "canBeAddedToColumn": "true",
+            "enabled": "true"
         }
 
         moduleService.createModule(moduleDefinitionFile);
@@ -40,6 +41,7 @@ module.exports = function(Module) {
             "title": body.title,
             "systemid": body.systemid,
             "version" : "0.0.0.1",
+            "enabled": body.enabled,
             "canBeAddedToColumn": body.canBeAddedToColumn,
             "singleInstance": body.singleInstance
         }

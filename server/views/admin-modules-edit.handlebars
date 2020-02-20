@@ -9,7 +9,7 @@
         <div class="card-body">
 
           <script type='text/javascript'>
-          let moduleDef = {{{ this.data.moduleDef }}};
+            let moduleDef = {{{ this.data.moduleDef }}};
             window.onload = function () {
               Formio.createForm(document.getElementById('moduleDefForm'), {
                 components: [
@@ -25,6 +25,12 @@
                     key: 'systemid',
                     label: 'SystemId',
                     placeholder: 'Enter the slug to be used as the system id (ie: blog, news, public-service)',
+                    input: true
+                  },
+                  {
+                    type: 'checkbox',
+                    key: 'enabled',
+                    label: 'Enabled',
                     input: true
                   },
                   {
@@ -51,7 +57,7 @@
 
                   form.submission = {
                     data: {
-                      title: moduleDef.title, systemid: moduleDef.systemid, canBeAddedToColumn: moduleDef.canBeAddedToColumn,
+                      title: moduleDef.title, systemid: moduleDef.systemid, enabled: moduleDef.enabled, canBeAddedToColumn: moduleDef.canBeAddedToColumn,
                       singleInstance: moduleDef.singleInstance
                     }
                   };

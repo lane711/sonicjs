@@ -26,7 +26,13 @@
                     placeholder: 'Enter the slug to be used as the system id (ie: service-list, news-feed, public-service)',
                     input: true
                   },
-                                    {
+                  {
+                    type: 'checkbox',
+                    key: 'enabled',
+                    label: 'Enabled',
+                    input: true
+                  },
+                  {
                     type: 'checkbox',
                     key: 'canBeAddedToColumn',
                     label: 'Can Be Added To Column',
@@ -50,7 +56,7 @@
                       .then(async function (response) {
                         console.log(response);
                         //return await response.data;
-                        
+
                         window.location.replace('/admin/modules/edit/' + submission.data.systemid);
                       })
                       .catch(function (error) {
