@@ -2,7 +2,7 @@
   "title": "Feature Box",
   "systemid": "feature-box",
   "version": "0.0.0.1",
-  "canBeAddedToColumn": "true",
-  "systemidUpperCase": "FEATURE-BOX",
-  "systemidCamelCase": "featureBox"
+  "enabled": true,
+  "canBeAddedToColumn": true,
+  "singleInstance": false
 }

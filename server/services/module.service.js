@@ -50,8 +50,10 @@ module.exports = moduleService = {
 
     loadModuleServices: async function (moduleList) {
         moduleList.forEach(async function (moduleDef) {
+          if(moduleDef.enabled === undefined || moduleDef.enabled === true){
             let m = require(moduleDef.mainService);
             await m.startup();
+          }
         });
 
         eventBusService.emit('modulesLoaded');

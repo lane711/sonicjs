@@ -1,5 +1,8 @@
 {
-    "title": "Keep Alive",
-    "systemid": "module-keep-alive",
-    "version" : "0.0.0.1"
+  "title": "Keep Alive",
+  "systemid": "keep-alive",
+  "version": "0.0.0.1",
+  "enabled": false,
+  "canBeAddedToColumn": false,
+  "singleInstance": false
 }

@@ -2,7 +2,7 @@
   "title": "Menu - Title",
   "systemid": "menu-title",
   "version": "0.0.0.1",
-  "canBeAddedToColumn": "true",
-  "systemidUpperCase": "MENU-TITLE",
-  "systemidCamelCase": "menuTitle"
+  "enabled": true,
+  "canBeAddedToColumn": true,
+  "singleInstance": false
 }
