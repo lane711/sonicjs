@@ -34,8 +34,6 @@ const chalk = require("chalk");
 const log = console.log;
 const url = require("url");
 var admin = require(__dirname + "/admin");
-var Amplitude = require("amplitude");
-var amplitude = new Amplitude("00c9db8d087f1737021c841bcdbc2b41");
 
 module.exports = function(app) {
   // app.get('/', async function (req, res) {
@@ -119,7 +117,6 @@ module.exports = function(app) {
           event_type: "LOGIN", // required
           user_id: req.body.email // only required if device id is not passed in
         };
-        amplitude.track(data);
 
         //set cookie
         res.cookie("sonicjs_access_token", token.id, {
@@ -148,7 +145,6 @@ module.exports = function(app) {
         event_type: "LOGOUT", // required
         user_id: currentUser.email
       };
-      amplitude.track(data);
 
       res.clearCookie("sonicjs_access_token");
       res.redirect("/admin");
