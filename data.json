@@ -1,7 +1,7 @@
 {
   "ids": {
     "contentType": 45,
-    "content": 446,
+    "content": 447,
     "fieldType": 2,
     "e2e-test": 2
   },
@@ -439,7 +439,8 @@
       "442": "{\"id\":442,\"data\":{\"body\":\"<p>In conclusion, we updated the data model for our module using the drag and drop form editor and then updated the view to use our new data field.&nbsp;</p><p>Hopefully you are beginning to see the power and flexibility of SonicJs as a content management system.</p><p>Next, we'll take a look at SonicJs' ultimately power tool; Hooks!</p>\",\"contentType\":\"html\",\"createdOn\":1582084646340,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-480,\"referrer\":\"http://localhost:3018/docs/developers-guide\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.106 Safari/537.36\",\"pathName\":\"/docs/developers-guide\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
       "443": "{\"data\":{\"headerLevel\":\"h2\",\"position\":\"left\",\"text\":\"Hello World Part 3\",\"slug\":\"hello-world-part-3\",\"contentType\":\"title\",\"submit\":true,\"createdOn\":1582084763736},\"id\":443}",
       "444": "{\"id\":444,\"data\":{\"body\":\"<p>Now, let's add a <strong>hook</strong> and add some simple business logic to our module.</p><p>Coming Soon...</p>\",\"contentType\":\"html\",\"createdOn\":1582085167618,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-480,\"referrer\":\"http://localhost:3018/docs/developers-guide\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.106 Safari/537.36\",\"pathName\":\"/docs/developers-guide\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
-      "445": "{\"data\":{\"clientId\":\"307f2a135778b6fc1ea8111a1c59edd69c3826db\",\"contentType\":\"smartlook\",\"submit\":true,\"createdOn\":1582172584734},\"id\":445}"
+      "445": "{\"data\":{\"clientId\":\"307f2a135778b6fc1ea8111a1c59edd69c3826db\",\"contentType\":\"smartlook\",\"submit\":true,\"createdOn\":1582172584734},\"id\":445}",
+      "446": "{\"id\":446,\"data\":{\"clientId\":\"4e479879c864f14281f4bc81d868fe28\",\"contentType\":\"mixpanel\",\"createdOn\":1582258162526,\"submit\":true}}"
     },
     "fieldType": {
       "1": "{\"name\":\"string\",\"renderFunction\":\"string\",\"id\":1}"
