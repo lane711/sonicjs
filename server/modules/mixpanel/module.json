@@ -1,0 +1,9 @@
+{
+  "title": "Mixpanel",
+  "systemid": "mixpanel",
+  "version": "0.0.0.1",
+  "canBeAddedToColumn": "true",
+  "enabled": "true",
+  "systemidUpperCase": "MIXPANEL",
+  "systemidCamelCase": "mixpanel"
+}
