@@ -128,7 +128,7 @@ module.exports = function(app) {
 
         mixPanelService.setPeople(req.body.email);
 
-        mixPanelService.trackEvent("LOGIN", { email: req.body.email });
+        mixPanelService.trackEvent("LOGIN", req, { email: req.body.email });
         res.redirect(referer);
       }
     );
@@ -360,6 +360,8 @@ module.exports = function(app) {
       return;
     }
 
+    var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
     if (req.url.startsWith("/images/")) {
       console.log("continuing request");
     }
@@ -519,7 +521,7 @@ module.exports = function(app) {
       let accessToken = await userService.getToken(req);
       data.breadCrumbs = await breadcrumbsService.getAdminBreadcrumbs(req);
 
-      mixPanelService.trackEvent("PAGE_LOAD", 'a@a.com', { page: viewName });
+      mixPanelService.trackEvent("PAGE_LOAD_ADMIN", req, { page: req.url, ip: ip });
 
       res.render(viewName, {
         layout: "admin.handlebars",
@@ -528,7 +530,7 @@ module.exports = function(app) {
       });
     } else {
       var page = await contentService.getRenderedPage(req);
-      mixPanelService.trackEvent("PAGE_LOAD", { page: page.page.data.title });
+      mixPanelService.trackEvent("PAGE_LOAD", req,  { page: page.page.data.title, ip: ip  });
 
       res.render("home", page);
     }

@@ -1,7 +1,7 @@
 var dataService = require("../../../services/data.service");
 var eventBusService = require("../../../services/event-bus.service");
 var globalService = require("../../../services/global.service");
-var Mixpanel = require('mixpanel');
+var Mixpanel = require("mixpanel");
 var mixpanel;
 
 module.exports = mixpanelMainService = {
@@ -16,18 +16,59 @@ module.exports = mixpanelMainService = {
   },
 
   init: async function(options) {
-    mixpanel = Mixpanel.init('4e479879c864f14281f4bc81d868fe28');
+    mixpanel = Mixpanel.init("4e479879c864f14281f4bc81d868fe28");
   },
 
   setPeople: async function(email) {
+
+    if (!mixpanelMainService.trackingEnabled()) {
+      return;
+    }
+
     mixpanel.people.set({
       $email: email,
       $distinct_id: email,
-      $created: (new Date()).toISOString(),
-  });  },
+      $created: new Date().toISOString()
+    });
+  },
 
-  trackEvent: async function(eventName, email, data) {
-    mixpanel.track(eventName, {distinct_id: email, data: data });
+  trackEvent: async function(eventName, req, data) {
+
+    let enabled = await mixpanelMainService.trackingEnabled();
+    if (!enabled) {
+      return;
+    }
+
+    let email;
+    let currentUser = await userService.getCurrentUser(req);
+    if (currentUser) {
+      email = currentUser.email;
+    }
+
+    console.log("mix", email, data);
+
+    mixpanel.track(eventName, {
+      $email: email,
+      distinct_id: email,
+      data: data
+    });
+
+    if (email) {
+      if (eventName === "PAGE_LOAD") {
+        mixpanel.people.increment(email, "page_viewed");
+      } else if (eventName === "PAGE_LOAD_ADMIN") {
+        mixpanel.people.increment(email, "page_viewed_admin");
+      }
+    }
+  },
+
+  trackingEnabled: async function() {
+    if (
+      process.env.LOCAL_ANALYTICS === "false"
+    ) {
+      return false;
+    }
+    return true;
   },
 
   addHeaderJs: async function(options) {
@@ -46,7 +87,6 @@ module.exports = mixpanelMainService = {
       //       for(h=0;h<l.length;h++)c(e,l[h]);var f="set set_once union unset remove delete".split(" ");e.get_group=function(){function a(c){b[c]=function(){call2_args=arguments;call2=[c].concat(Array.prototype.slice.call(call2_args,0));e.push([d,call2])}}for(var b={},d=["get_group"].concat(Array.prototype.slice.call(arguments,0)),c=0;c<f.length;c++)a(f[c]);return b};a._i.push([b,d,g])};a.__SV=1.2;b=c.createElement("script");b.type="text/javascript";b.async=!0;b.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?
       //       MIXPANEL_CUSTOM_LIB_URL:"file:"===c.location.protocol&&"//cdn4.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn4.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn4.mxpnl.com/libs/mixpanel-2-latest.min.js";d=c.getElementsByTagName("script")[0];d.parentNode.insertBefore(b,d)}})(document,window.mixpanel||[]);
       //       mixpanel.init('${mixpanelSettings.data.clientId}');</script><!-- end Mixpanel -->`;
-
       // options.page.data.headerJs += script;
     }
   }
