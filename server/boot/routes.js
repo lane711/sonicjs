@@ -25,6 +25,8 @@ var userService = require("../services/user.service");
 var helperService = require("../services/helper.service");
 var sharedService = require("../services/shared.service");
 var breadcrumbsService = require("../services/breadcrumbs.service");
+var mixPanelService = require("../modules/mixpanel/services/mixpanel-main-service");
+
 const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 let ShortcodeFormatter = require("shortcode-tree").ShortcodeFormatter;
 
@@ -123,6 +125,10 @@ module.exports = function(app) {
           signed: true,
           maxAge: 30000000
         });
+
+        mixPanelService.setPeople(req.body.email);
+
+        mixPanelService.trackEvent("LOGIN", { email: req.body.email });
         res.redirect(referer);
       }
     );
@@ -513,6 +519,8 @@ module.exports = function(app) {
       let accessToken = await userService.getToken(req);
       data.breadCrumbs = await breadcrumbsService.getAdminBreadcrumbs(req);
 
+      mixPanelService.trackEvent("PAGE_LOAD", 'a@a.com', { page: viewName });
+
       res.render(viewName, {
         layout: "admin.handlebars",
         data: data,
@@ -520,6 +528,8 @@ module.exports = function(app) {
       });
     } else {
       var page = await contentService.getRenderedPage(req);
+      mixPanelService.trackEvent("PAGE_LOAD", { page: page.page.data.title });
+
       res.render("home", page);
     }
   });
