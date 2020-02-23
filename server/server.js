@@ -9,6 +9,7 @@ var boot = require('loopback-boot');
 const chalk = require('chalk');
 var express = require('express');
 var exphbs = require('express-handlebars');
+var Handlebars = require('handlebars');
 // var bodyParser = require('body-parser');
 
 var app = module.exports = loopback();
@@ -50,19 +51,22 @@ app.start = function () {
   // start the web server
   return app.listen(function () {
     app.emit('started');
-    
+
     var baseUrl = app.get('url').replace(/\/$/, '');
     globalService.baseUrl = baseUrl;
 
     console.log(chalk.cyan('Website at: ', baseUrl));
     console.log(chalk.cyan('Admin console at: ', baseUrl + '/admin'));
 
-    
+
     if (app.get('loopback-component-explorer')) {
       var explorerPath = app.get('loopback-component-explorer').mountPath;
       console.log(chalk.cyan('REST API at: ', baseUrl + explorerPath));
     }
+
   });
+
+
 };
 
 function initEnvFile() {

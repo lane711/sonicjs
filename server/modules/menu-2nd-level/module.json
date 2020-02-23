@@ -1,0 +1,8 @@
+{
+  "title": "Menu - 2nd Level",
+  "systemid": "menu-2nd-level",
+  "version": "0.0.0.1",
+  "enabled": true,
+  "canBeAddedToColumn": false,
+  "singleInstance": false
+}
