@@ -1,1 +1,11 @@
 /* Css File for Module: menu-2nd-level */
+
+.doc-nav {
+  top: 80px;
+  background-color: #fff !important;
+  border-bottom: 1px solid #999;
+}
+
+.doc-nav a{
+  text-transform: capitalize;
+}

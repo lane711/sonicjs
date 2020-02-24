@@ -30,13 +30,13 @@ module.exports = menu2ndLevelMainService = {
       return result;
     });
 
-    Handlebars.registerHelper("menuHelper", function(originalMenu) {
+    // Handlebars.registerHelper("menuHelper", function(originalMenu) {
 
 
-      console.log("result", result);
+    //   console.log("result", result);
 
-      return originalMenu;
-    });
+    //   return originalMenu;
+    // });
 
     eventBusService.on("beginProcessModuleShortCode", async function(options) {
       if (options.shortcode.name === "MENU-2ND-LEVEL") {
