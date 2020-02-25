@@ -4,10 +4,25 @@ var globalService = require("../../../services/global.service");
 var Handlebars = require("handlebars");
 var viewService = require("../../../services/view.service");
 const path = require("path");
+var menu;
 
 module.exports = menu2ndLevelMainService = {
   startup: async function() {
-    //register hbs helper
+
+    eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
+      if (options) {
+          menu = options.page.data.menu;
+      }
+  });
+
+
+    menu2ndLevelMainService.registerHelper();
+
+  },
+
+  registerHelper: async function(){
+
+    let amplitudeSettings = await dataService.getContentTopOne("menu2ndLevel");
 
     let viewModel = [
       { title: "title", link: "/whatever" },
@@ -23,26 +38,10 @@ module.exports = menu2ndLevelMainService = {
     var result = await viewService.getProccessedView("", viewModel, viewPath);
 
     Handlebars.registerHelper("postMenuHelper", function() {
-
-
       console.log("result", result);
 
       return result;
     });
-
-    // Handlebars.registerHelper("menuHelper", function(originalMenu) {
-
-
-    //   console.log("result", result);
-
-    //   return originalMenu;
-    // });
-
-    eventBusService.on("beginProcessModuleShortCode", async function(options) {
-      if (options.shortcode.name === "MENU-2ND-LEVEL") {
-        options.moduleName = "menu-2nd-level";
-        await moduleService.processModuleInColumn(options);
-      }
-    });
   }
+
 };

@@ -20,8 +20,11 @@
             <td><a href="/admin/content/edit/{{this.data.contentType}}/{{ this.id }}">{{ this.data.title }}</a></td>
             <td>{{ contentType.description}}</td>
             <td>
-              <a class="btn btn-sm btn-primary rmargin" 
+              <a class="btn btn-sm btn-primary rmargin"
               href="/admin/content/edit/{{this.data.contentType}}/{{ this.id }}">Edit</a>
+
+                <a class="btn btn-sm btn-primary rmargin"
+              href="/admin/menus/edit/{{ this.id }}">Edit 2</a>
 
               <button class="btn btn-sm btn-danger" type="button" data-toggle="collapse"
                 data-target="#collapse{{ this.systemid }}" aria-expanded="false" aria-controls="collapseExample">

@@ -7,5 +7,5 @@
 }
 
 .doc-nav a{
-  text-transform: capitalize;
+  text-transform: capitalize !important;
 }
