@@ -6,13 +6,128 @@
       </div>
       <div class="card-body">
 
+    <style type="text/css">
+      .ui-menu {
+        width: 180px;
+        font-size: 63%;
+      }
+      .ui-menu kbd {
+        /* Keyboard shortcuts for ui-contextmenu titles */
+        float: right;
+      }
+      /* custom alignment (set by 'renderColumns'' event) */
+      td.alignRight {
+        text-align: right;
+      }
+      td.alignCenter {
+        text-align: center;
+      }
+      td input[type="input"] {
+        width: 40px;
+      }
+    </style>
 
 
-        <p>
-          <a id="button1" href="#">Toggle 'The Hobbit'</a>
-        </p>
-        <div id="tree"></div>
-        <div id="statusLine">Fancytree Demo - Click any node!</div>
+
+
+
+ <h1>
+      Example: tree grid with keyboard navigation, DnD, and editing
+      capabilites
+    </h1>
+    <div class="description">
+      Bringing it all together: this sample combines different extensions
+      and custom events to implement an editable tree grid:
+      <ul>
+        <li>'ext-dnd' to re-order nodes using drag-and-drop.</li>
+        <li>
+          'ext-table' + 'ext-gridnav' to implement a tree grid.<br />
+          Try <kbd>UP / DOWN / LEFT / RIGHT</kbd>, <kbd>TAB</kbd>,
+          <kbd>Shift+TAB</kbd>
+          to navigate between grid cells. Note that embedded input
+          controls remain functional.
+        </li>
+        <li>
+          'ext-edit': inline editing.<br />
+          Try <kbd>F2</kbd> to rename a node.<br />
+          <kbd>Ctrl+N</kbd>, <kbd>Ctrl+Shift+N</kbd> to add nodes
+          (Quick-enter: add new nodes until [enter] is hit on an empty
+          title).
+        </li>
+        <li>
+          Extended keyboard shortcuts:<br />
+          <kbd>Ctrl+C</kbd>, <kbd>Ctrl+X</kbd>, <kbd>Ctrl+V</kbd> for
+          copy/paste,<br />
+          <kbd>Ctrl+UP</kbd>, <kbd>Ctrl+DOWN</kbd>,
+          <kbd>Ctrl+LEFT</kbd>, <kbd>Ctrl+RIGHT</kbd>
+          to move nodes around and change indentation.<br>
+          (On macOS, add <kbd>Shift</kbd> to the keystrokes.)
+        </li>
+        <li>
+          3rd-party
+          <a href="https://github.com/mar10/jquery-ui-contextmenu"
+            >contextmenu</a
+          >
+          for additional edit commands
+        </li>
+      </ul>
+    </div>
+    <div>
+      <label for="skinswitcher">Skin:</label>
+      <select id="skinswitcher"></select>
+    </div>
+
+    <h1>Table Tree</h1>
+    <div>
+      <label>Fake input:<input id="input1"/></label>
+    </div>
+    <table id="tree">
+      <colgroup>
+        <col width="30px" />
+        <col width="50px" />
+        <col width="350px" />
+        <col width="50px" />
+        <col width="50px" />
+        <col width="30px" />
+        <col width="30px" />
+        <col width="50px" />
+      </colgroup>
+      <thead>
+        <tr>
+          <th></th>
+          <th>#</th>
+          <th></th>
+          <th>Ed1</th>
+          <th>Ed2</th>
+          <th>Rb1</th>
+          <th>Rb2</th>
+          <th>Cb</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Define a row template for all invariant markup: -->
+        <tr>
+          <td class="alignCenter"></td>
+          <td></td>
+          <td></td>
+          <td><input name="input1" type="input" /></td>
+          <td><input name="input2" type="input" /></td>
+          <td class="alignCenter">
+            <input name="cb1" type="checkbox" />
+          </td>
+          <td class="alignCenter">
+            <input name="cb2" type="checkbox" />
+          </td>
+          <td>
+            <select name="sel1" id="">
+              <option value="a">A</option>
+              <option value="b">B</option>
+            </select>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
 
 
 
