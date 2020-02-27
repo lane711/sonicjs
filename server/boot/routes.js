@@ -502,6 +502,9 @@ module.exports = function(app) {
       if (viewName == "admin-menus-edit") {
         if (param1) {
           data = await dataService.getContentById(param1);
+          if(data.data.links){
+            data.data.linksString = JSON.stringify(data.data.links);
+          }
         }
       }
 
