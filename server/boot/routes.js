@@ -360,7 +360,7 @@ module.exports = function(app) {
       return;
     }
 
-    var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    var ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
 
     if (req.url.startsWith("/images/")) {
       console.log("continuing request");
@@ -500,9 +500,10 @@ module.exports = function(app) {
       }
 
       if (viewName == "admin-menus-edit") {
-        data.contentTypeId = param1;
-        data.raw = await dataService.getContentType(param1);
+        if (param1) {
+          data = await dataService.getContentById(param1);
         }
+      }
 
       if (viewName == "admin-menus") {
         data = await dataService.getContentByContentType("menu");
@@ -526,7 +527,10 @@ module.exports = function(app) {
       let accessToken = await userService.getToken(req);
       data.breadCrumbs = await breadcrumbsService.getAdminBreadcrumbs(req);
 
-      mixPanelService.trackEvent("PAGE_LOAD_ADMIN", req, { page: req.url, ip: ip });
+      mixPanelService.trackEvent("PAGE_LOAD_ADMIN", req, {
+        page: req.url,
+        ip: ip
+      });
 
       res.render(viewName, {
         layout: "admin.handlebars",
@@ -535,7 +539,10 @@ module.exports = function(app) {
       });
     } else {
       var page = await contentService.getRenderedPage(req);
-      mixPanelService.trackEvent("PAGE_LOAD", req,  { page: page.page.data.title, ip: ip  });
+      mixPanelService.trackEvent("PAGE_LOAD", req, {
+        page: page.page.data.title,
+        ip: ip
+      });
 
       res.render("home", page);
     }
