@@ -503,6 +503,10 @@ module.exports = function(app) {
         data = await dataService.getContentByContentType("menu");
       }
 
+      if (viewName == "admin-menus-edit") {
+        data = await dataService.getContentByContentType("menu");
+      }
+
       if (viewName == "admin-site-settings") {
         data = await dataService.getContentTopOne("site-settings");
         data.editForm = await formService.getForm("site-settings", data);
