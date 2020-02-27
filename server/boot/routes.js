@@ -499,11 +499,12 @@ module.exports = function(app) {
         data = await mediaService.getMedia();
       }
 
-      if (viewName == "admin-menus") {
-        data = await dataService.getContentByContentType("menu");
-      }
-
       if (viewName == "admin-menus-edit") {
+        data.contentTypeId = param1;
+        data.raw = await dataService.getContentType(param1);
+        }
+
+      if (viewName == "admin-menus") {
         data = await dataService.getContentByContentType("menu");
       }
 
