@@ -5,8 +5,20 @@
     </div>
     <div class="card-body page-list">
 
+      <input id="id" type="hidden" value="{{data.id}}">
 
-<input name="id" type="hidden" value="{{data.id}}">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4">
+            <div id="menuTree"></div>
+          </div>
+          <div class="col-md-8">
+            <div id="menuTreeForm"></div>
+          </div>
+        </div>
+      </div>
+
+
       {{!-- <div id="menuTree">
         <ul>
           <li>Root node
@@ -24,13 +36,12 @@
         </ul>
       </div> --}}
 
-      <div id="menuTree"></div>
 
-      <button id="addNode">Add Node</button>
+      <button class="btn btn-success add-node" id="addNode">Add Node</button>
 
-
+      <hr>
       <div class="form-group has-feedback formio-component formio-component-button formio-component-submit  form-group">
-        <button name="data[submit]" type="submit" class="btn btn-primary btn-md" lang="en" id="save">Submit</button>
+        <button name="data[submit]" type="submit" class="btn btn-primary btn-md" lang="en" id="save">Save</button>
       </div>
 
 
@@ -38,6 +49,6 @@
   </div>
 </div>
 <script>
-  var menuData = {{{data.data.linksString}}}
+  var menuData = {{{ data.data.linksString }}}
 
 </script>

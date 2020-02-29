@@ -40,14 +40,25 @@ $(document).ready(async function() {
 
   });
 
-  $("#menuTree").on("changed.jstree", function(e, data) {
+  $("#menuTree").on("changed.jstree", async function(e, data) {
     console.log(data.selected);
 
-    var v = $("#menuTree")
-      .jstree(true)
-      .get_json("#", { flat: true });
-    var mytext = JSON.stringify(v);
-    console.log(mytext);
+    let form = await formService.getForm(
+      'menu',
+      undefined,
+      "addModuleToColumn(submission)"
+    );
+
+    // debugger;
+
+    $("#menuTreeForm").html(form);
+
+    formInit();
+    // var v = $("#menuTree")
+    //   .jstree(true)
+    //   .get_json("#", { flat: true });
+    // var mytext = JSON.stringify(v);
+    // console.log(mytext);
   });
 
   $("#addNode").on("click", function() {
@@ -63,8 +74,15 @@ $(document).ready(async function() {
       .jstree(true)
       .get_json("#", { flat: true });
 
+      debugger;
+      links[0].data.url = '/my-url-data';
+
       var menu = {data: {title: 'Main 1', contentType: 'menu', links: links}}
-debugger;
+
+      let id = $('#id').val();
+      if(id){
+        menu.data.id = id;
+      }
       submitContent(menu);
   });
 
