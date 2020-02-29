@@ -1,4 +1,8 @@
 $(document).ready(async function() {
+  if (!$("#menuTree").length) {
+    return;
+  }
+
   $.jstree.defaults.core.data;
   $.jstree.defaults.core.check_callback = true;
 
@@ -8,44 +12,44 @@ $(document).ready(async function() {
       data: menuData
     },
 
-        dnd : {
+    dnd: {
+      drop_finish: function() {
+        alert("DROP");
+      },
 
-            "drop_finish" : function () {
+      drag_check: function(data) {
+        if (data.r.attr("id") == "phtml_1") {
+          return false;
+        }
 
-                alert("DROP");
-
-            },
-
-            "drag_check" : function (data) {
-
-                if(data.r.attr("id") == "phtml_1") {
-
-                    return false;
-
-                }
-
-                return {
-
-                    after : false,
-                    before : false,
-                    inside : true
-                };
-            },
-            "drag_finish" : function (data) {
-                alert("DRAG OK");
-            }
-        },
-        "plugins" : ["dnd" ]
-
-
+        return {
+          after: false,
+          before: false,
+          inside: true
+        };
+      },
+      drag_finish: function(data) {
+        alert("DRAG OK");
+      }
+    },
+    plugins: ["dnd"]
   });
 
   $("#menuTree").on("changed.jstree", async function(e, data) {
-    console.log(data.selected);
+    if(!data.selected) {return;}
+
+    let content = {};
+    if (data && data.node && data.node.data) {
+      content = {data: data.node.data}
+    }else{
+      return;
+    }
+
+    // debugger;
 
     let form = await formService.getForm(
-      'menu',
-      undefined,
+      "menu",
+      content,
       "addModuleToColumn(submission)"
     );
 
@@ -62,7 +66,9 @@ $(document).ready(async function() {
   });
 
   $("#addNode").on("click", function() {
-    let randomId = Math.random().toString(36).slice(2)
+    let randomId = Math.random()
+      .toString(36)
+      .slice(2);
     var parent = "#";
     var node = { id: randomId, text: "Hello world" };
     let newId = $("#menuTree").jstree("create_node", parent, node, "last");
@@ -70,20 +76,37 @@ $(document).ready(async function() {
   });
 
   $("#save").on("click", function() {
-    var links = $("#menuTree")
-      .jstree(true)
-      .get_json("#", { flat: true });
 
-      debugger;
-      links[0].data.url = '/my-url-data';
+      updateTreeData();
 
-      var menu = {data: {title: 'Main 1', contentType: 'menu', links: links}}
-
-      let id = $('#id').val();
-      if(id){
-        menu.data.id = id;
-      }
-      submitContent(menu);
   });
 
+
+
 });
+
+function updateTreeData(formData){
+
+  var selectedNode = $("#menuTree").jstree("get_selected",true);
+
+  var links = $("#menuTree")
+    .jstree(true)
+    .get_json("#", { flat: true });
+
+  // debugger;
+
+  links[0].data = formData.data;
+
+  var menu = { data: { title: "Main 1", contentType: "menu", links: links } };
+
+  let id = $("#id").val();
+  if (id) {
+    menu.data.id = id;
+  }
+  submitContent(menu);
+}
+
+function formChanged(formData){
+  console.log('jstree formData',formData);
+  updateTreeData(formData);
+}

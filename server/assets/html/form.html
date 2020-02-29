@@ -25,10 +25,13 @@ const formValuesToLoad_{{ random }} = {{{ formValuesToLoad }}}
 
             });
 
-            // Everytime the form changes, this will fire.
-            // form.on('change', function (changed) {
-            //     console.log('Form was changed', changed);
-            // });
+            form.on('change', function (changed) {
+              // console.log('form.html changed', changed)
+              // debugger;
+              if (typeof formChanged != "undefined") {
+                  formChanged(changed);
+                }
+            });
 
         });
     };
