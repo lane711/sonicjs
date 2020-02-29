@@ -95,7 +95,10 @@ function updateTreeData(formData){
 
   // debugger;
 
-  links[0].data = formData.data;
+  // let obj = objArray.find(obj => obj.id == 3);
+  links.find(obj => obj.id == selectedNode[0].id).data = formData.data;
+  $('#menuTree').jstree('rename_node', selectedNode[0], formData.data.title);
+  selectedNode[0].text = formData.data.title;
 
   var menu = { data: { title: "Main 1", contentType: "menu", links: links } };
 
