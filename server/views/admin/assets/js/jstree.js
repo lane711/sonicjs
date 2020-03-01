@@ -81,7 +81,9 @@ $(document).ready(async function() {
 
   });
 
-
+  $( "#menuMainEdit" ).on("change", "#title", function() {
+    console.log('title change')
+  });
 
 });
 
@@ -100,7 +102,8 @@ function updateTreeData(formData){
   $('#menuTree').jstree('rename_node', selectedNode[0], formData.data.title);
   selectedNode[0].text = formData.data.title;
 
-  var menu = { data: { title: "Main 1", contentType: "menu", links: links } };
+  let menuTitle = $( "#menuMainEdit #title" ).val();
+  var menu = { data: { title: menuTitle, contentType: "menu", links: links } };
 
   let id = $("#id").val();
   if (id) {

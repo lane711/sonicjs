@@ -10,9 +10,34 @@
       <div class="container">
         <div class="row">
           <div class="col-md-4">
+
+            <script type='text/javascript'>
+              window.onload = function () {
+                console.log('loading menuMainEdit form')
+                Formio.createForm(document.getElementById('menuMainEdit'), {
+                  components: [
+                    {
+                      type: 'textfield',
+                      key: 'title',
+                      label: 'Menu Title',
+                      placeholder: 'ie: Main, Sidebar, Footer',
+                      input: true
+                    }
+                  ]
+                })
+                  .then(async function (form) {
+
+                  });
+              }
+            </script>
+
+            <div id="menuMainEdit"></div>
+            <hr>
+
             <div id="menuTree"></div>
           </div>
-          <div class="col-md-8">
+          <div class="col-md-8 menu-edit-right">
+
             <div id="menuTreeForm"></div>
           </div>
         </div>
