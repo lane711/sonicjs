@@ -110,6 +110,9 @@ function updateTreeData(formData){
 }
 
 function formChanged(formData){
+  if (!$( "#menuTree" ).length) {
+    return;
+  }
   console.log('jstree formData',formData);
   updateTreeData(formData);
 }

@@ -613,6 +613,7 @@ async function createContentInstance(payload) {
 }
 
 async function editContentInstance(payload) {
+  // debugger;
   let id = payload.id;
   console.log("putting payload", payload);
   if (payload.id) {
@@ -629,15 +630,19 @@ async function editContentInstance(payload) {
   //     data = payload;
   // }
   // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
+
   console.log(axiosInstance);
   return axiosInstance
     .put(`/api/contents/${id}`, payload)
     .then(async function(response) {
-      console.log(response);
+      // debugger;
+      console.log('editContentInstance', response);
+      // resolve(response.data);
       return await response.data;
     })
     .catch(function(error) {
-      console.log(error);
+      debugger;
+      console.log('editContentInstance', error);
     });
 }
 
@@ -656,7 +661,7 @@ async function editContentType(payload) {
   //     data = payload;
   // }
   // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
-  // debugger;
+  debugger;
   return axiosInstance
     .put(`/api/contentTypes/${id}`, payload)
     .then(async function(response) {
