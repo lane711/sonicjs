@@ -32,16 +32,28 @@ $(document).ready(async function() {
         alert("DRAG OK");
       }
     },
-    plugins: ["dnd"]
+
+    "types" : {
+      "default" : {
+        "icon" : "fa fa-chevron-right"
+      },
+      "demo" : {
+        "icon" : "fa fa-home"
+      }
+    },
+
+    plugins: ["dnd","types"]
   });
 
   $("#menuTree").on("changed.jstree", async function(e, data) {
-    if(!data.selected) {return;}
+    if (!data.selected) {
+      return;
+    }
 
     let content = {};
     if (data && data.node && data.node.data) {
-      content = {data: data.node.data}
-    }else{
+      content = { data: data.node.data };
+    } else {
       return;
     }
 
@@ -63,7 +75,25 @@ $(document).ready(async function() {
     //   .get_json("#", { flat: true });
     // var mytext = JSON.stringify(v);
     // console.log(mytext);
+
+    //select first node in tree on load:
+
+
+
+    // $('#menuTree').jstree("select_node", '#6e0ylrz3jei', true);
+
   });
+
+  $('#menuTree').bind("loaded.jstree", function(e, data) {
+    // debugger;
+    $(this).jstree("open_all");
+    // $('#menuTree').jstree('select_node', 'ul > li:first');
+    // $('#menuTree').jstree('select_node', 'someNodeId');
+    $("#menuTree").jstree().deselect_all(true);
+
+    $('#menuTree').jstree('select_node', '.jstree-container-ul li:first');
+
+})
 
   $("#addNode").on("click", function() {
     let randomId = Math.random()
@@ -76,46 +106,47 @@ $(document).ready(async function() {
   });
 
   $("#save").on("click", function() {
-
-      updateTreeData();
-
+    updateTreeData();
   });
 
-  $( "#menuMainEdit" ).on("change", "#title", function() {
-    console.log('title change')
+  $("#menuMainEdit").on("change", "#title", function() {
+    updateTreeData();
   });
-
 });
 
-function updateTreeData(formData){
-
-  var selectedNode = $("#menuTree").jstree("get_selected",true);
+function updateTreeData(formData) {
+  var selectedNode = $("#menuTree").jstree("get_selected", true);
 
   var links = $("#menuTree")
     .jstree(true)
     .get_json("#", { flat: true });
 
+
   // debugger;
 
   // let obj = objArray.find(obj => obj.id == 3);
-  links.find(obj => obj.id == selectedNode[0].id).data = formData.data;
-  $('#menuTree').jstree('rename_node', selectedNode[0], formData.data.title);
-  selectedNode[0].text = formData.data.title;
+  if (selectedNode && formData) {
+    links.find(obj => obj.id == selectedNode[0].id).data = formData.data;
+    $("#menuTree").jstree("rename_node", selectedNode[0], formData.data.title);
+    selectedNode[0].text = formData.data.title;
+  }
 
-  let menuTitle = $( "#menuMainEdit #title" ).val();
+  let menuTitle = $("#menuMainEdit #title").val();
   var menu = { data: { title: menuTitle, contentType: "menu", links: links } };
 
   let id = $("#id").val();
   if (id) {
     menu.data.id = id;
   }
+
+  // debugger;
   submitContent(menu);
 }
 
-function formChanged(formData){
-  if (!$( "#menuTree" ).length) {
+function formChanged(formData) {
+  if (!$("#menuTree").length) {
     return;
   }
-  console.log('jstree formData',formData);
+  console.log("jstree formData", formData);
   updateTreeData(formData);
 }
