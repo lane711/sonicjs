@@ -1,4 +1,15 @@
 $(document).ready(async function() {
+  $(".new-menu").click(async function() {
+    let links = [{ id: "home", parent: "#", text: "Home" }];
+    var menu = {
+      data: { title: "New Menu", contentType: "menu", links: links }
+    };
+
+    // debugger;
+    await submitContent(menu);
+    fullPageUpdate();
+  });
+
   if (!$("#menuTree").length) {
     return;
   }
@@ -33,16 +44,16 @@ $(document).ready(async function() {
       }
     },
 
-    "types" : {
-      "default" : {
-        "icon" : "fa fa-chevron-right"
+    types: {
+      default: {
+        icon: "fa fa-chevron-right"
       },
-      "demo" : {
-        "icon" : "fa fa-home"
+      demo: {
+        icon: "fa fa-home"
       }
     },
 
-    plugins: ["dnd","types"]
+    plugins: ["dnd", "types"]
   });
 
   $("#menuTree").on("changed.jstree", async function(e, data) {
@@ -57,7 +68,7 @@ $(document).ready(async function() {
       return;
     }
 
-    // debugger;
+    debugger;
 
     let form = await formService.getForm(
       "menu",
@@ -70,30 +81,19 @@ $(document).ready(async function() {
     $("#menuTreeForm").html(form);
 
     formInit();
-    // var v = $("#menuTree")
-    //   .jstree(true)
-    //   .get_json("#", { flat: true });
-    // var mytext = JSON.stringify(v);
-    // console.log(mytext);
-
-    //select first node in tree on load:
-
-
-
-    // $('#menuTree').jstree("select_node", '#6e0ylrz3jei', true);
-
   });
 
-  $('#menuTree').bind("loaded.jstree", function(e, data) {
+  $("#menuTree").bind("loaded.jstree", function(e, data) {
     // debugger;
     $(this).jstree("open_all");
     // $('#menuTree').jstree('select_node', 'ul > li:first');
     // $('#menuTree').jstree('select_node', 'someNodeId');
-    $("#menuTree").jstree().deselect_all(true);
+    $("#menuTree")
+      .jstree()
+      .deselect_all(true);
 
-    $('#menuTree').jstree('select_node', '.jstree-container-ul li:first');
-
-})
+    $("#menuTree").jstree("select_node", ".jstree-container-ul li:first");
+  });
 
   $("#addNode").on("click", function() {
     let randomId = Math.random()
@@ -121,11 +121,11 @@ function updateTreeData(formData) {
     .jstree(true)
     .get_json("#", { flat: true });
 
-
-  // debugger;
+  debugger;
 
   // let obj = objArray.find(obj => obj.id == 3);
   if (selectedNode && formData) {
+    //update tree text via form value
     links.find(obj => obj.id == selectedNode[0].id).data = formData.data;
     $("#menuTree").jstree("rename_node", selectedNode[0], formData.data.title);
     selectedNode[0].text = formData.data.title;
