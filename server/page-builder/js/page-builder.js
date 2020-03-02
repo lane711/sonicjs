@@ -15,7 +15,8 @@ var imageList,
   currentModuleIndex,
   currentModuleContentType,
   jsonEditor,
-  ShortcodeTree;
+  ShortcodeTree,
+  jsonEditorRaw;
 
 $(document).ready(async function() {
   await setupAxiosInstance();
@@ -27,6 +28,7 @@ $(document).ready(async function() {
   await setPage();
   await setContentType();
   setupJsonEditorContentTypeRaw();
+  setupJsonRawSave();
   imageList = await getImageList();
   // setTimeout(setupPageSettings, 1);
   // setupPageSettings();
@@ -636,13 +638,13 @@ async function editContentInstance(payload) {
     .put(`/api/contents/${id}`, payload)
     .then(async function(response) {
       // debugger;
-      console.log('editContentInstance', response);
+      console.log("editContentInstance", response);
       // resolve(response.data);
       return await response.data;
     })
     .catch(function(error) {
       debugger;
-      console.log('editContentInstance', error);
+      console.log("editContentInstance", error);
     });
 }
 
@@ -827,7 +829,7 @@ async function setupFormBuilder(contentType) {
     return;
   }
 
-  Formio.icons = 'fontawesome';
+  Formio.icons = "fontawesome";
   Formio.builder(document.getElementById("formBuilder"), null).then(
     async function(form) {
       form.setForm({
@@ -1035,12 +1037,12 @@ function setupJsonEditorContentTypeRaw() {
     }
   };
 
-  const jsonEditorRaw = new JSONEditor(containerRaw, options);
+  jsonEditorRaw = new JSONEditor(containerRaw, options);
 
   // set json
-  if(this.contentType){
+  if (this.contentType) {
     initialJson = this.contentType;
-  } else if(formValuesToLoad){
+  } else if (formValuesToLoad) {
     initialJson = formValuesToLoad;
   }
 
@@ -1056,6 +1058,21 @@ function loadJsonEditor() {
 
   // get json
   var editor = jsonEditor.get();
+}
+
+function setupJsonRawSave() {
+  $("#saveRawJson").on("click", function() {
+
+    console.log("json save");
+    let contentId = $("#contentId").val();
+
+    var json = {data :jsonEditorRaw.get()};
+    json.data.id = contentId;
+
+    // debugger;
+
+    submitContent(json);
+  });
 }
 
 async function getImageList() {
@@ -1247,6 +1264,7 @@ async function addModuleToColumn(submission) {
 }
 
 async function submitContent(submission) {
+  debugger;
   console.log("Submission was made!", submission);
   let entity = processContentFields(submission.data);
   if (submission.data.id) {
@@ -1429,7 +1447,7 @@ async function setupSortableColum(el) {
   // var el = document.getElementById("main");
   // var el = document.getElementsByClassName("col-md-9")[0];
 
-  if (typeof Sortable !== 'undefined') {
+  if (typeof Sortable !== "undefined") {
     var sortable = new Sortable(el, {
       // Element dragging ended
       group: "shared",
@@ -1519,15 +1537,15 @@ async function updateModuleSort(shortCode, event) {
     });
 }
 
-function setupSidePanel(){
+function setupSidePanel() {
   // console.log('setup side panel')
-  $('.pb-side-panel .handle span').click(function(){
-    $('.pb-side-panel').addClass('close');
-    $('.pb-side-panel-modal-backdrop').addClass('close');
-  })
+  $(".pb-side-panel .handle span").click(function() {
+    $(".pb-side-panel").addClass("close");
+    $(".pb-side-panel-modal-backdrop").addClass("close");
+  });
 }
 
-function showSidePanel(){
-  $('.pb-side-panel-modal-backdrop').removeClass('close');
-  $('.pb-side-panel').removeClass('close');
+function showSidePanel() {
+  $(".pb-side-panel-modal-backdrop").removeClass("close");
+  $(".pb-side-panel").removeClass("close");
 }

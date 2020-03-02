@@ -475,6 +475,7 @@ module.exports = function(app) {
           content,
           "submitContent(submission)"
         );
+        data.contentId = param2;
       }
 
       if (viewName == "admin-content-types") {
