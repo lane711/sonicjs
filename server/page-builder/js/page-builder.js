@@ -1038,7 +1038,12 @@ function setupJsonEditorContentTypeRaw() {
   const jsonEditorRaw = new JSONEditor(containerRaw, options);
 
   // set json
-  const initialJson = this.contentType;
+  if(this.contentType){
+    initialJson = this.contentType;
+  } else if(formValuesToLoad){
+    initialJson = formValuesToLoad;
+  }
+
   jsonEditorRaw.set(initialJson);
 
   // get json
