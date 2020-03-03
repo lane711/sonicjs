@@ -103,8 +103,18 @@ $(document).ready(async function() {
 
   });
 
-  $("#save").on("click", function() {
+  $("#deleteNode").on("click", function() {
+
+    let id = $("#menuTreeForm #id").val();
+
+    $("#menuTree").jstree().delete_node([id]);
+
     updateTreeData();
+
+    $("#menuTree").jstree("select_node", ".jstree-container-ul li:first");
+
+
+
   });
 
   $("#menuMainEdit").on("change", "#title", function() {
