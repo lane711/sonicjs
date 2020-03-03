@@ -127,7 +127,7 @@ function updateTreeData(formData) {
 
   var links = $("#menuTree")
     .jstree(true)
-    .get_json("#", { flat: true });
+    .get_json("#", { flat: false });
 
   // debugger;
 
