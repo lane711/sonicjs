@@ -1264,7 +1264,7 @@ async function addModuleToColumn(submission) {
 }
 
 async function submitContent(submission) {
-  debugger;
+  // debugger;
   console.log("Submission was made!", submission);
   let entity = processContentFields(submission.data);
   if (submission.data.id) {

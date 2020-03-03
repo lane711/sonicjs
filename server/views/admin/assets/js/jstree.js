@@ -23,27 +23,6 @@ $(document).ready(async function() {
       data: menuData
     },
 
-    dnd: {
-      drop_finish: function() {
-        alert("DROP");
-      },
-
-      drag_check: function(data) {
-        if (data.r.attr("id") == "phtml_1") {
-          return false;
-        }
-
-        return {
-          after: false,
-          before: false,
-          inside: true
-        };
-      },
-      drag_finish: function(data) {
-        alert("DRAG OK");
-      }
-    },
-
     types: {
       default: {
         icon: "fa fa-chevron-right"
@@ -55,6 +34,13 @@ $(document).ready(async function() {
 
     plugins: ["dnd", "types"]
   });
+
+  $(document).on('dnd_stop.vakata', function (e, data) {
+    console.log('done dnd');
+    updateTreeData();
+    $("#menuTree").jstree("open_all");
+
+});
 
   $("#menuTree").on("changed.jstree", async function(e, data) {
     if (!data.selected) {
@@ -68,7 +54,7 @@ $(document).ready(async function() {
       return;
     }
 
-    debugger;
+    // debugger;
 
     let form = await formService.getForm(
       "menu",
@@ -78,9 +64,12 @@ $(document).ready(async function() {
 
     // debugger;
 
+    $("#menuTreeForm").empty();
     $("#menuTreeForm").html(form);
 
     formInit();
+
+    $("#menuTreeForm #title").focus();
   });
 
   $("#menuTree").bind("loaded.jstree", function(e, data) {
@@ -100,9 +89,18 @@ $(document).ready(async function() {
       .toString(36)
       .slice(2);
     var parent = "#";
-    var node = { id: randomId, text: "Hello world" };
+    var node = { id: randomId, text: "New Link", data: { id: randomId, title: "New Link", url: '/', showInMenu: true } };
     let newId = $("#menuTree").jstree("create_node", parent, node, "last");
-    console.log(newId);
+    // console.log(newId);
+    updateTreeData();
+
+    //select new node
+    $("#menuTree")
+    .jstree()
+    .deselect_all(true);
+
+  $("#menuTree").jstree("select_node", ".jstree-container-ul li:last");
+
   });
 
   $("#save").on("click", function() {
@@ -121,7 +119,7 @@ function updateTreeData(formData) {
     .jstree(true)
     .get_json("#", { flat: true });
 
-  debugger;
+  // debugger;
 
   // let obj = objArray.find(obj => obj.id == 3);
   if (selectedNode && formData) {
@@ -147,6 +145,6 @@ function formChanged(formData) {
   if (!$("#menuTree").length) {
     return;
   }
-  console.log("jstree formData", formData);
+  // console.log("jstree formData", formData);
   updateTreeData(formData);
 }
