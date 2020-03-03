@@ -26,31 +26,34 @@ module.exports = menuService = {
     getMenu: async function (menuName) {
         let menuData = await dataService.getContentByContentTypeAndTitle('menu', menuName);
         let links = menuData.data.links;
-        let menu = [];
 
-        for (let index = 0; index < links.length; index++) {
-            const item = links[index];
+        return links;
 
-            if (item.level == 0) {
-                let hasChildren = this.hasChildren(links, index);
+        // let menu = [];
 
-                let childLinks = this.getChildren(links, hasChildren, index);
+        // for (let index = 0; index < links.length; index++) {
+        //     const item = links[index];
 
-                menu.push({
-                    url: item.url,
-                    title: item.title,
-                    active: item.active,
-                    hasChildren: hasChildren,
-                    childLinks: childLinks
-                });
-            }
-        }
+        //     if (item.level == 0) {
+        //         let hasChildren = this.hasChildren(links, index);
 
-        // menuData.data.links.forEach(item => {
-        //     menu.push({url: item.url});
-        // });
+        //         let childLinks = this.getChildren(links, hasChildren, index);
 
-        return menu;
+        //         menu.push({
+        //             url: item.url,
+        //             title: item.title,
+        //             active: item.active,
+        //             hasChildren: hasChildren,
+        //             childLinks: childLinks
+        //         });
+        //     }
+        // }
+
+        // // menuData.data.links.forEach(item => {
+        // //     menu.push({url: item.url});
+        // // });
+
+        // return menu;
     },
 
     hasChildren: function (links, currentLinkIndex) {

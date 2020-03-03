@@ -8,11 +8,11 @@
     </button>
 
     <div class="collapse navbar-collapse" id="mainNavbar" >
-        <ul class="navbar-nav mr-auto main">
+        {{!-- <ul class="navbar-nav mr-auto main">
             {{!-- {{ log page }} --}}
-
+{{!-
             {{#each page.data.menu}}
-            {{#if active}}
+            {{!-- {{#if active}}
             {{#if hasChildren}}
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="{{this.url}}" id="navbarDropdown" role="button"
@@ -31,13 +31,15 @@
             </li>
             {{/if}}
             {{/if}}
-            {{/each}}
-        </ul>
+            {{/each}} --}}
+        {{!-- </ul> --}}
 
-        {{!-- <ul class="navbar-nav mr-auto">
+        <ul class="navbar-nav mr-auto">
+          {{#each page.data.menu}}
             <li class="nav-item active">
-                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                <a class="nav-link" href="{{this.data.url}}">{{this.data.title}} <span class="sr-only">(current)</span></a>
             </li>
+            {{/each}}
             <li class="nav-item">
                 <a class="nav-link" href="#">Link</a>
             </li>
@@ -56,7 +58,7 @@
             <li class="nav-item">
                 <a class="nav-link disabled" href="#">Disabled</a>
             </li>
-        </ul> --}}
+        </ul>
 
         {{!-- <form class="form-inline my-2 my-lg-0">
             <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
