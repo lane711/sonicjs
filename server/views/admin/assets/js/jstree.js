@@ -123,29 +123,20 @@ $(document).ready(async function() {
 });
 
 function updateTreeData(formData) {
-  var selectedNode = $("#menuTree").jstree("get_selected", true);
+  var selectedNode = $("#menuTree").jstree("get_selected", true)[0];
 
-  var linksFlat = $("#menuTree")
-    .jstree(true)
-    .get_json("#", { flat: true });
-
-  // debugger;
-
-  // let obj = objArray.find(obj => obj.id == 3);
   if (selectedNode && formData) {
-    //update tree text via form value
-    let selectedNodeId = selectedNode[0].id;
-    linksFlat.find(obj => obj.id == selectedNodeId).data = formData.data;
-    $("#menuTree").jstree("rename_node", selectedNode[0], formData.data.title);
-    selectedNode[0].text = formData.data.title;
+    selectedNode.text = formData.data.title;
+    selectedNode.data = formData.data;
+    $("#menuTree").jstree("set_text", selectedNode, formData.data.title);
   }
 
+  // debugger;
   let menuTitle = $("#menuMainEdit #title").val();
 
   var links = $("#menuTree")
   .jstree(true)
   .get_json("#", { flat: false });
-
 
   var menu = { data: { title: menuTitle, contentType: "menu", links: links } };
 
@@ -154,7 +145,6 @@ function updateTreeData(formData) {
     menu.data.id = id;
   }
 
-  // debugger;
   submitContent(menu);
 }
 
