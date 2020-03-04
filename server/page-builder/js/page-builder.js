@@ -74,7 +74,7 @@ async function setContentType() {
 }
 
 function axiosTest() {
-  console.log("running axios");
+  // console.log("running axios");
   axiosInstance
     .get("/api/contents")
     .then(function(response) {
@@ -87,7 +87,7 @@ function axiosTest() {
     })
     .finally(function() {
       // always executed
-      console.log("done axios");
+      // console.log("done axios");
     });
 }
 
@@ -545,7 +545,7 @@ async function getContentInstance(id) {
   return axiosInstance
     .get(`/api/contents/${id}`)
     .then(async function(response) {
-      console.log(response);
+      // console.log(response);
       return await response.data;
     })
     .catch(function(error) {

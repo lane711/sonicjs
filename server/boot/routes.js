@@ -330,7 +330,7 @@ module.exports = function(app) {
     let userId = await userService.getCurrentUserId(req);
     let user = await userService.getCurrentUser(req);
 
-    console.log("getCurrentUser:" + user);
+    // console.log("getCurrentUser:" + user);
 
     res.send(`userId:${userId}`);
   });
@@ -342,8 +342,8 @@ module.exports = function(app) {
   });
 
   app.post("/form-submission", async function(req, res) {
-    console.log(req.body.data);
-
+    // console.log(req.body.data);
+//
     await eventBusService.emit("afterFormSubmit", req.body.data);
   });
 
@@ -363,7 +363,7 @@ module.exports = function(app) {
     var ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
 
     if (req.url.startsWith("/images/")) {
-      console.log("continuing request");
+      // console.log("continuing request");
     }
 
     if (

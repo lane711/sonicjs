@@ -253,7 +253,7 @@ if (typeof module !== "undefined" && module.exports) {
         return content.data;
       })
       .catch(function(error) {
-        console.log("getContentById ERROR", error);
+        console.log(`getContentById ERROR, Id:${id}`, error);
       });
   }),
     (exports.asyncForEach = async function(array, callback) {

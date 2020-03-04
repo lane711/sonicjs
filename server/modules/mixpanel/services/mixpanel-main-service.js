@@ -45,7 +45,7 @@ module.exports = mixpanelMainService = {
       email = currentUser.email;
     }
 
-    console.log("mix", email, data);
+    // console.log("mix", email, data);
 
     mixpanel.track(eventName, {
       $email: email,
