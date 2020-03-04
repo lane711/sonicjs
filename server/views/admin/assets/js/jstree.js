@@ -125,21 +125,28 @@ $(document).ready(async function() {
 function updateTreeData(formData) {
   var selectedNode = $("#menuTree").jstree("get_selected", true);
 
-  var links = $("#menuTree")
+  var linksFlat = $("#menuTree")
     .jstree(true)
-    .get_json("#", { flat: false });
+    .get_json("#", { flat: true });
 
   // debugger;
 
   // let obj = objArray.find(obj => obj.id == 3);
   if (selectedNode && formData) {
     //update tree text via form value
-    links.find(obj => obj.id == selectedNode[0].id).data = formData.data;
+    let selectedNodeId = selectedNode[0].id;
+    linksFlat.find(obj => obj.id == selectedNodeId).data = formData.data;
     $("#menuTree").jstree("rename_node", selectedNode[0], formData.data.title);
     selectedNode[0].text = formData.data.title;
   }
 
   let menuTitle = $("#menuMainEdit #title").val();
+
+  var links = $("#menuTree")
+  .jstree(true)
+  .get_json("#", { flat: false });
+
+
   var menu = { data: { title: menuTitle, contentType: "menu", links: links } };
 
   let id = $("#id").val();
