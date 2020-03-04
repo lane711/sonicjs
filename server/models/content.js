@@ -22,7 +22,7 @@ module.exports = function (Content) {
     await eventBusService.emit('beforeSave', { instance: ctx.instance.data });
 
 
-    next();
+    // next();
   });
 
   Content.getPageById = function (id, cb) {

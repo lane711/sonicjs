@@ -4,7 +4,10 @@ const formJSON_{{ random }} = {{{ formJSON }}}
 
 const formValuesToLoad_{{ random }} = {{{ formValuesToLoad }}}
 
-    loadModuleSettingForm = async function () {
+//used for json explorer
+var formValuesToLoad = {{{ formValuesToLoad }}}
+
+    form_{{ random }} = async function () {
         // debugger;
         Formio.icons = 'fontawesome';
         Formio.createForm(document.getElementById('formio_{{ random }}'), formJSON_{{ random }}).then((form) => {
@@ -18,16 +21,20 @@ const formValuesToLoad_{{ random }} = {{{ formValuesToLoad }}}
 
             form.on('submit', async function (submission) {
 
-                amplitude.getInstance().logEvent('FORM_SUBMIT');
+                // amplitude.getInstance().logEvent('FORM_SUBMIT');
+                analyticsTrackEvent({event: 'FORM_SUBMIT', data: submission.data});
 
                 {{ onFormSubmitFunction }}
 
             });
 
-            // Everytime the form changes, this will fire.
-            // form.on('change', function (changed) {
-            //     console.log('Form was changed', changed);
-            // });
+            form.on('change', function (changed) {
+              // console.log('form.html changed', changed)
+              // debugger;
+              if (typeof formChanged != "undefined") {
+                  formChanged(changed);
+                }
+            });
 
         });
     };
@@ -35,8 +42,12 @@ const formValuesToLoad_{{ random }} = {{{ formValuesToLoad }}}
     window.onload = async function () {
         // debugger;
         if (typeof module === 'undefined') {
-            loadModuleSettingForm();
+          formInit();
         }
+    }
+
+    function formInit(){
+      form_{{ random }}();
     }
 
 </script>

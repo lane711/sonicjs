@@ -43,3 +43,11 @@
 .red{
   color: #f86c6b;
 }
+
+.add-node{
+  margin: 20px 0 0;
+}
+
+.menu-edit-right{
+  border-left: 1px solid rgba(0, 0, 0, 0.1)
+}

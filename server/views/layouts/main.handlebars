@@ -51,10 +51,6 @@
   <link href="/formio.full.min.css" rel="stylesheet">
   {{{page.data.cssLinks}}}
 
-  {{!-- <link href="/css/generated.css" rel="stylesheet"> --}}
-
-  {{!-- <link href="/formio.full.min.css" rel="stylesheet"> --}}
-
   <base href="/">
 
   {{{ page.data.headerJs }}}
@@ -63,7 +59,7 @@
 
 <body>
   <input type="hidden" name="page-id" id="page-id" value="{{page.id}}">
-  {{> menu }}
+  {{> menu level='1'}}
 
   <main role="main">
 
@@ -105,6 +101,7 @@
   <script src="/services/helper.service.js"></script>
   <script src="/services/data.service.js"></script>
   <script src="/services/form.service.js"></script>
+  <script src="/services/analytics.service.js"></script>
   <script src="/js/page-builder.js"></script>
 
 

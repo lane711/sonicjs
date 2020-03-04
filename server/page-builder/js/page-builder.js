@@ -15,7 +15,8 @@ var imageList,
   currentModuleIndex,
   currentModuleContentType,
   jsonEditor,
-  ShortcodeTree;
+  ShortcodeTree,
+  jsonEditorRaw;
 
 $(document).ready(async function() {
   await setupAxiosInstance();
@@ -27,6 +28,7 @@ $(document).ready(async function() {
   await setPage();
   await setContentType();
   setupJsonEditorContentTypeRaw();
+  setupJsonRawSave();
   imageList = await getImageList();
   // setTimeout(setupPageSettings, 1);
   // setupPageSettings();
@@ -72,7 +74,7 @@ async function setContentType() {
 }
 
 function axiosTest() {
-  console.log("running axios");
+  // console.log("running axios");
   axiosInstance
     .get("/api/contents")
     .then(function(response) {
@@ -85,7 +87,7 @@ function axiosTest() {
     })
     .finally(function() {
       // always executed
-      console.log("done axios");
+      // console.log("done axios");
     });
 }
 
@@ -543,7 +545,7 @@ async function getContentInstance(id) {
   return axiosInstance
     .get(`/api/contents/${id}`)
     .then(async function(response) {
-      console.log(response);
+      // console.log(response);
       return await response.data;
     })
     .catch(function(error) {
@@ -613,6 +615,7 @@ async function createContentInstance(payload) {
 }
 
 async function editContentInstance(payload) {
+  // debugger;
   let id = payload.id;
   console.log("putting payload", payload);
   if (payload.id) {
@@ -629,15 +632,19 @@ async function editContentInstance(payload) {
   //     data = payload;
   // }
   // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
+
   console.log(axiosInstance);
   return axiosInstance
     .put(`/api/contents/${id}`, payload)
     .then(async function(response) {
-      console.log(response);
+      // debugger;
+      console.log("editContentInstance", response);
+      // resolve(response.data);
       return await response.data;
     })
     .catch(function(error) {
-      console.log(error);
+      debugger;
+      console.log("editContentInstance", error);
     });
 }
 
@@ -656,7 +663,7 @@ async function editContentType(payload) {
   //     data = payload;
   // }
   // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
-  // debugger;
+  debugger;
   return axiosInstance
     .put(`/api/contentTypes/${id}`, payload)
     .then(async function(response) {
@@ -822,7 +829,7 @@ async function setupFormBuilder(contentType) {
     return;
   }
 
-  Formio.icons = 'fontawesome';
+  Formio.icons = "fontawesome";
   Formio.builder(document.getElementById("formBuilder"), null).then(
     async function(form) {
       form.setForm({
@@ -1030,10 +1037,15 @@ function setupJsonEditorContentTypeRaw() {
     }
   };
 
-  const jsonEditorRaw = new JSONEditor(containerRaw, options);
+  jsonEditorRaw = new JSONEditor(containerRaw, options);
 
   // set json
-  const initialJson = this.contentType;
+  if (this.contentType) {
+    initialJson = this.contentType;
+  } else if (formValuesToLoad) {
+    initialJson = formValuesToLoad;
+  }
+
   jsonEditorRaw.set(initialJson);
 
   // get json
@@ -1046,6 +1058,21 @@ function loadJsonEditor() {
 
   // get json
   var editor = jsonEditor.get();
+}
+
+function setupJsonRawSave() {
+  $("#saveRawJson").on("click", function() {
+
+    console.log("json save");
+    let contentId = $("#contentId").val();
+
+    var json = {data :jsonEditorRaw.get()};
+    json.data.id = contentId;
+
+    // debugger;
+
+    submitContent(json);
+  });
 }
 
 async function getImageList() {
@@ -1237,8 +1264,8 @@ async function addModuleToColumn(submission) {
 }
 
 async function submitContent(submission) {
-  console.log("Submission was made!", submission);
   // debugger;
+  console.log("Submission was made!", submission);
   let entity = processContentFields(submission.data);
   if (submission.data.id) {
     await editContentInstance(entity);
@@ -1420,7 +1447,7 @@ async function setupSortableColum(el) {
   // var el = document.getElementById("main");
   // var el = document.getElementsByClassName("col-md-9")[0];
 
-  if (typeof Sortable !== 'undefined') {
+  if (typeof Sortable !== "undefined") {
     var sortable = new Sortable(el, {
       // Element dragging ended
       group: "shared",
@@ -1510,15 +1537,15 @@ async function updateModuleSort(shortCode, event) {
     });
 }
 
-function setupSidePanel(){
+function setupSidePanel() {
   // console.log('setup side panel')
-  $('.pb-side-panel .handle span').click(function(){
-    $('.pb-side-panel').addClass('close');
-    $('.pb-side-panel-modal-backdrop').addClass('close');
-  })
+  $(".pb-side-panel .handle span").click(function() {
+    $(".pb-side-panel").addClass("close");
+    $(".pb-side-panel-modal-backdrop").addClass("close");
+  });
 }
 
-function showSidePanel(){
-  $('.pb-side-panel-modal-backdrop').removeClass('close');
-  $('.pb-side-panel').removeClass('close');
+function showSidePanel() {
+  $(".pb-side-panel-modal-backdrop").removeClass("close");
+  $(".pb-side-panel").removeClass("close");
 }
