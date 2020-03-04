@@ -51,6 +51,7 @@ module.exports = contentService = {
     }
 
     this.page.data.eventCount = 0;
+    this.page.data.headerJs = "";
 
     await eventBusService.emit("getRenderedPagePostDataFetch", {
       req: req,

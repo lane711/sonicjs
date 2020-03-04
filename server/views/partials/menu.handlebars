@@ -10,14 +10,21 @@
   <div class="collapse navbar-collapse" id="mainNavbar">
 
     <ul class="navbar-nav mr-auto">
+                  {{!-- {{log (eq level "1")}} --}}
+
+
       {{#each page.data.menu}}
-      <li class="nav-item {{#if children}}dropdown{{/if}}">
-        <a class="nav-link {{#if children}}dropdown-toggle{{/if}}" href="{{this.data.url}}"
-          {{#if children}}data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{/if}}>
+
+
+      {{!-- {{log ../level}} --}}
+{{log this}}
+      <li class="nav-item {{#if this.showChildren}}dropdown{{/if}}">
+        <a class="nav-link {{#if this.showChildren}}dropdown-toggle{{/if}}" href="{{this.data.url}}"
+          {{#if this.showChildren}}data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{/if}}>
           {{this.data.title}}
           <span class="sr-only">(current)</span></a>
 
-        {{#if children}}
+        {{#if this.showChildren}}
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
           {{#each this.children}}
           <a class="dropdown-item" href="{{this.data.url}}">{{this.data.title}}</a>
