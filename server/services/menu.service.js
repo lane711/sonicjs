@@ -17,11 +17,14 @@ module.exports = menuService = {
       if (options) {
         let menuData = await menuService.getMenu("Main");
         menuData.forEach(menuItem => {
+          //has children?
           if (menuItem.children.length > 0 && menuItem.data.showChildren){
              menuItem.showChildren = true;
           }else{
             menuItem.showChildren = false;
           }
+
+          menuItem.isActive = menuItem.data.url === options.req.path;
         });
         options.page.data.menu = menuData;
       }

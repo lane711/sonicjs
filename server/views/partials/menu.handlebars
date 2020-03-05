@@ -13,7 +13,7 @@
 
     <ul class="navbar-nav mr-auto">
       {{#each page.data.menu}}
-      <li class="nav-item {{#if this.showChildren}}dropdown{{/if}}">
+      <li class="nav-item {{#if this.isActive}}active{{/if}} {{#if this.showChildren}}dropdown{{/if}}">
         <a class="nav-link {{#if this.showChildren}}dropdown-toggle{{/if}}" href="{{this.data.url}}"
           {{#if this.showChildren}}data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{/if}}>
           {{this.data.title}}
@@ -41,16 +41,14 @@
 
 {{#if (eq level "2")}}
 
-<nav class="navbar navbar-expand-md navbar-dark bg-ptrans fixed-top drop-link" style="top:80px">
-  <a class="navbar-brand" href="/">
-    <img src="/api/containers/files/download/sonicjs-logo.svg" alt="" width="200">
-  </a>
+<nav class="navbar navbar-expand-md navbar-light fixed-top" style="top:80px">
+
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavbar"
     aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
 
-  <div class="collapse navbar-collapse" id="mainNavbar">
+  <div class="collapse navbar-collapse" id="subNavbar">
 
     <ul class="navbar-nav mr-auto">
       {{#each page.data.menu}}
@@ -67,11 +65,11 @@
           {{/each}}
         </div>
         {{/if}}
-
       </li>
       {{/each}}
     </ul>
   </div>
+
 </nav>
 
 {{/if}}
