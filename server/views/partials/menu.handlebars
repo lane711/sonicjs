@@ -11,7 +11,7 @@
 
   <div class="collapse navbar-collapse" id="mainNavbar">
 
-    <ul class="navbar-nav mr-auto">
+    <ul class="navbar-nav mr-auto main">
       {{#each page.data.menu}}
       <li class="nav-item {{#if this.isActive}}active{{/if}} {{#if this.showChildren}}dropdown{{/if}}">
         <a class="nav-link {{#if this.showChildren}}dropdown-toggle{{/if}}" href="{{this.data.url}}"
