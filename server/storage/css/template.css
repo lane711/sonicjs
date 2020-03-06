@@ -345,7 +345,3 @@ a.black {
 .b-margin-40 {
   margin-bottom: 40px;
 }
-
-nav.navbar.drop-link a:after {
-  opacity: 1;
-}
