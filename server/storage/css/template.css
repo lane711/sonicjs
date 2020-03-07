@@ -346,6 +346,8 @@ a.black {
   margin-bottom: 40px;
 }
 
-.navbar.level-2{
+.navbar.fixed-top.level-2{
   background-color: #F1F2F2;
+  top:80px;
+  border-bottom: 1px solid #fff;
 }
