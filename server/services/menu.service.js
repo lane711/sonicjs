@@ -17,6 +17,15 @@ module.exports = menuService = {
       if (options) {
         let menuData = await menuService.getMenu("Main");
         menuData.forEach(menuItem => {
+          menuItem.isActive = menuItem.data.url === options.req.path;
+
+          menuItem.children.forEach(subMenuItem => {
+            //if child is active, set parent active too
+            if (subMenuItem.data.url === options.req.path) {
+              menuItem.isActive = true;
+            }
+          });
+
           //has children?
           if (menuItem.children.length > 0 && menuItem.data.showChildren) {
             menuItem.showChildren = true;
@@ -24,19 +33,24 @@ module.exports = menuService = {
             menuItem.showChildren = false;
           }
 
-          menuItem.isActive = menuItem.data.url === options.req.path;
+          // menuItem.isActive = options.req.path.startsWith(menuItem.data.url);
         });
         options.page.data.menu = menuData;
         options.page.data.menuSecondLevel = menuService.processSecondLevel(
-          menuData
+          menuData,
+          options.req.path
         );
       }
     });
   },
 
-  processSecondLevel: function(menuData) {
+  processSecondLevel: function(menuData, url) {
     let activeNode = menuData.find(x => x.isActive === true);
     if (activeNode.children.length > 0) {
+      activeNode.children.forEach(menuItem => {
+        menuItem.isActive = menuItem.data.url === url;
+      });
+
       return activeNode.children;
     }
   },

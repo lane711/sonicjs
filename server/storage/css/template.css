@@ -347,7 +347,12 @@ a.black {
 }
 
 .navbar.fixed-top.level-2{
-  background-color: #F1F2F2;
+  background-color: #fff;
   top:80px;
-  border-bottom: 1px solid #fff;
+  border-bottom: 1px solid #333;
 }
+
+.navbar.fixed-top.level-2 .nav-item.active{
+  text-decoration: underline;
+}
+

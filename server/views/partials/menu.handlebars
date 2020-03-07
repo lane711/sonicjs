@@ -41,8 +41,49 @@
 
 {{#if (eq level "2")}}
 
-<nav id="navbar-level-2" class="navbar bg-light fixed-top level-2">
+<nav class="navbar navbar-expand-md navbar-light fixed-top drop-link level-2" style="top:80px">
+  <a class="navbar-brand" href="/docs">
+    Documentation
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-level-2"
+    aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbar-level-2">
+
+    <ul class="navbar-nav mr-auto main">
+      {{#each page.data.menuSecondLevel}}
+      <li class="nav-item {{#if this.isActive}}active{{/if}} {{#if this.showChildren}}dropdown{{/if}}">
+        <a class="nav-link {{#if this.showChildren}}dropdown-toggle{{/if}}" href="{{this.data.url}}"
+          {{#if this.showChildren}}data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{/if}}>
+          {{this.data.title}}
+          <span class="sr-only">(current)</span></a>
+
+        {{#if this.showChildren}}
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          {{#each this.children}}
+          <a class="dropdown-item" href="{{this.data.url}}">{{this.data.title}}</a>
+          {{/each}}
+        </div>
+        {{/if}}
+
+      </li>
+      {{/each}}
+    </ul>
+
+  </div>
+</nav>
+
+
+
+{{!-- <nav id="navbar-level-2" class="navbar bg-light navbar-expand-md fixed-top level-2">
   <div class="container">
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-level-2"
+    aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
     <ul class="nav nav-pills offset-md-3">
       {{#each page.data.menuSecondLevel}}
@@ -54,10 +95,10 @@
 
     </ul>
   </div>
-</nav>
+</nav> --}}
 
-{{!-- <nav class="navbar navbar-expand-md navbar-light fixed-top level-2" style="top:80px">
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavbar"
+{{!-- <nav id="navbar-level-2" class="navbar navbar-expand-md navbar-light fixed-top level-2" style="top:80px">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-level-2"
     aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
