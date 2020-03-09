@@ -40,9 +40,10 @@
 
 
 {{#if (eq level "2")}}
-
-<nav class="navbar navbar-expand-md navbar-light fixed-top drop-link level-2" style="top:80px">
-  <a class="navbar-brand" href="/docs">
+{{#if page.data.menuSecondLevel}}
+<nav class="navbar navbar-expand-md navbar-light sticky-top level-2" style="top:80px">
+  <div class="container">
+  <a class="navbar-brand d-block d-sm-none" href="/docs">
     Documentation
   </a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-level-2"
@@ -50,7 +51,7 @@
     <span class="navbar-toggler-icon"></span>
   </button>
 
-  <div class="collapse navbar-collapse" id="navbar-level-2">
+  <div class="collapse navbar-collapse offset-md-3" id="navbar-level-2">
 
     <ul class="navbar-nav mr-auto main">
       {{#each page.data.menuSecondLevel}}
@@ -72,6 +73,7 @@
       {{/each}}
     </ul>
 
+  </div>
   </div>
 </nav>
 
@@ -127,4 +129,5 @@
   </div>
 </nav> --}}
 
+{{/if}}
 {{/if}}

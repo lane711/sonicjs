@@ -28,7 +28,12 @@ a.white {
 
 .bg-ptrans {
   background: #000;
-  opacity: .9
+}
+
+@media (min-width:768px) {
+  .bg-ptrans {
+    opacity: .9
+  }
 }
 
 footer {
@@ -146,7 +151,7 @@ nav.navbar a:not(.github-corner) {
   color: #F1F2F2
 }
 
-nav.navbar .main a:before, nav .main a:after {
+nav.navbar.drop-link .main a:before, nav.drop-link .main a:after {
   content: '';
   position: absolute;
   bottom: 2px;
@@ -193,9 +198,10 @@ nav.navbar.drop-link a:hover:after, nav.navbar.drop-link a:focus:after {
 }
 
 @media (max-width:767px) {
-  .navbar-nav {
+  .navbar-dark .navbar-nav {
     background: #111;
-    padding: 0 20px
+    padding: 0 20px;
+    z-index: 999999999;
   }
 }
 
@@ -346,13 +352,19 @@ a.black {
   margin-bottom: 40px;
 }
 
-.navbar.fixed-top.level-2{
+.navbar.sticky-top.level-2{
   background-color: #fff;
   top:80px;
   border-bottom: 1px solid #333;
 }
 
-.navbar.fixed-top.level-2 .nav-item.active{
-  text-decoration: underline;
+.navbar.sticky-top.level-2 .nav-item.active{
+  /* text-decoration: underline; */
+  background-color: #FFC503;
+  color:#fff;
+}
+
+.navbar.sticky-top.level-2 .nav-item.active a{
+  color:#fff;
 }
 
