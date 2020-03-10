@@ -1,12 +1,17 @@
-{{log this}}
+{{!-- {{log this}} --}}
 {{#each this.list}}
-<div class="row">
-    <div class="col-12">
-        <a href="{{this.url}}"><h1>{{this.data.title}}</h1></a>
-    </div>
+
+<div class="card mb-4">
+  <a href="{{this.url}}"><img class="card-img-top" src="{{this.image}}" alt="Card image cap"></a>
+  <div class="card-body">
+    <h2 class="card-title">{{this.title}}</h2>
+    <p class="card-text">{{this.body}}</p>
+    <a href="{{this.url}}" class="btn btn-primary">Read More →</a>
+  </div>
+  <div class="card-footer text-muted">
+    Posted on January 1, 2017 by
+    <a href="#">Douglas Campbell, SonicJs Founder</a>
+  </div>
 </div>
-<div class="row details">
-    <div class="col-4"><a href="{{this.url}}">{{{this.image}}}</a></div>
-    <div class="col-8">{{{this.body}}}</div>
-</div>
+
 {{/each}}

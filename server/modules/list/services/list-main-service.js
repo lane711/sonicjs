@@ -1,6 +1,9 @@
 var dataService = require('../../../services/data.service');
 var eventBusService = require('../../../services/event-bus.service');
 var globalService = require('../../../services/global.service');
+var helperService = require('../../../services/helper.service');
+var formatService = require('../../../services/formatting.service');
+
 
 module.exports = listMainService = {
 
@@ -14,7 +17,18 @@ module.exports = listMainService = {
               let contentType = moduleData.data.contentType;
               let viewModel = moduleData;
 
-              let list = await dataService.getContentByType(contentType);
+              let listRaw = await dataService.getContentByType(contentType);
+
+              listRaw = listRaw.filter(x => x.data.title);
+              let list = listRaw.map(function (record) {
+                return {
+                    title: record.data.title,
+                    body: formatService.stripHtmlTags(helperService.truncateString(record.data.body, 400)),
+                    image: record.data.image ? dataService.getImageUrl(record.data.image[0]) : undefined,
+                    url: record.data.url
+                };
+            });
+
               viewModel.list = list;
               let viewPath = __dirname + `/../views/list-main.handlebars`;
 
