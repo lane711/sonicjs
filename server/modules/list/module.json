@@ -2,8 +2,7 @@
   "title": "List",
   "systemid": "list",
   "version": "0.0.0.1",
-  "canBeAddedToColumn": "true",
-  "enabled": "true",
-  "systemidUpperCase": "LIST",
-  "systemidCamelCase": "list"
+  "enabled": true,
+  "canBeAddedToColumn": true,
+  "singleInstance": false
 }

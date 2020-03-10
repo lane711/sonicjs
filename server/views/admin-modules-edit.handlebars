@@ -63,9 +63,10 @@
                   };
                   form.on('submit', async function (submission) {
                     var accessToken = '{{ this.accessToken }}';
+                    debugger;
                     axios.put(`/api/modules?access_token=${accessToken}`, submission.data)
                       .then(async function (response) {
-                        console.log(response);
+                        console.log('edit module', response);
                         //return await response.data;
 
                         window.location.replace('/admin/modules/edit/' + submission.data.systemid);

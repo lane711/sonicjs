@@ -94,10 +94,10 @@ module.exports = moduleService = {
                     return 0;
                 })
 
-                let moduleDefinitionsForColumns = moduleList
+                let moduleDefinitionsForColumns = moduleList;
 
                 globalService.moduleDefinitions = moduleList;
-                globalService.moduleDefinitionsForColumns = moduleList.filter(x => x.canBeAddedToColumn == "true");
+                globalService.moduleDefinitionsForColumns = moduleList.filter(x => x.canBeAddedToColumn == true);
 
 
                 await moduleService.loadModuleServices(moduleList);
