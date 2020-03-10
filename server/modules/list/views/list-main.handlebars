@@ -2,15 +2,15 @@
 {{#each this.list}}
 
 <div class="card mb-4">
-  <a href="{{this.url}}"><img class="card-img-top" src="{{this.image}}" alt="Card image cap"></a>
+  <a href="{{this.data.url}}"><img class="card-img-top" src="{{this.data.image}}" alt="{{this.data.title}}"></a>
   <div class="card-body">
-    <h2 class="card-title">{{this.title}}</h2>
-    <p class="card-text">{{this.body}}</p>
-    <a href="{{this.url}}" class="btn btn-primary">Read More →</a>
+    <h2 class="card-title">{{this.data.title}}</h2>
+    <p class="card-text">{{this.data.body}}</p>
+    <a href="{{this.data.url}}" class="btn btn-primary">Read More →</a>
   </div>
   <div class="card-footer text-muted">
-    Posted on January 1, 2017 by
-    <a href="#">Douglas Campbell, SonicJs Founder</a>
+    {{this.data.createdOnFormatted}} by
+    <a href="#">Lane C., SonicJs Founder</a>
   </div>
 </div>
 
