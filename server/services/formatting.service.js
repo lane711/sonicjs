@@ -1,12 +1,16 @@
 var moment = require("moment");
 
 module.exports = formattingService = {
-  formatDates: async function(data) {
+  formatDates: async function(data, dateOnly = false) {
+    let dateFormat = dateOnly
+      ? "YYYY-MM-DD"
+      : "YYYY-MM-DD, h:mm:ss a";
+
     data.forEach(element => {
       if (element.data.createdOn) {
         var day = moment(element.data.createdOn);
         element.data.createdOnFormatted = moment(day).format(
-          "YYYY-MM-DD, h:mm:ss a"
+          dateFormat
         );
       } else {
         element.data.createdOnFormatted = "1900-01-01, 12:00:00 am";

@@ -32,7 +32,7 @@ module.exports = listMainService = {
           };
         });
 
-        await formattingService.formatDates(list);
+        await formattingService.formatDates(list, true);
 
         viewModel.list = list;
         let viewPath = __dirname + `/../views/list-main.handlebars`;
