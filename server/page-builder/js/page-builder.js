@@ -663,7 +663,7 @@ async function editContentType(payload) {
   //     data = payload;
   // }
   // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
-  debugger;
+  // debugger;
   return axiosInstance
     .put(`/api/contentTypes/${id}`, payload)
     .then(async function(response) {

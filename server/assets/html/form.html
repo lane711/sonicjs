@@ -7,6 +7,10 @@ const formValuesToLoad_{{ random }} = {{{ formValuesToLoad }}}
 //used for json explorer
 var formValuesToLoad = {{{ formValuesToLoad }}}
 
+    loadModuleSettingForm = async function (){
+      return form_{{ random }}();
+    }
+
     form_{{ random }} = async function () {
         // debugger;
         Formio.icons = 'fontawesome';
