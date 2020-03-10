@@ -339,15 +339,15 @@ module.exports = contentService = {
           });
 
           //old way, TODO: refac
-          if (shortcode.name == "BLOCK") {
-            await this.replaceBlockShortCode(shortcode);
-          }
-          if (shortcode.name == "FORM") {
-            await this.replaceFormShortCode(shortcode);
-          }
-          if (shortcode.name == "LIST") {
-            await this.replaceListShortCode(shortcode);
-          }
+          // if (shortcode.name == "BLOCK") {
+          //   await this.replaceBlockShortCode(shortcode);
+          // }
+          // if (shortcode.name == "FORM") {
+          //   await this.replaceFormShortCode(shortcode);
+          // }
+          // if (shortcode.name == "LIST") {
+          //   await this.replaceListShortCode(shortcode);
+          // }
         }
       }
 

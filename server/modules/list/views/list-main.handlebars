@@ -1,1 +1,12 @@
-<div>Hello to you {{ data.firstName }} from the List module!</div>
+{{log this}}
+{{#each this.list}}
+<div class="row">
+    <div class="col-12">
+        <a href="{{this.url}}"><h1>{{this.data.title}}</h1></a>
+    </div>
+</div>
+<div class="row details">
+    <div class="col-4"><a href="{{this.url}}">{{{this.image}}}</a></div>
+    <div class="col-8">{{{this.body}}}</div>
+</div>
+{{/each}}
