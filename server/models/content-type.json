@@ -20,6 +20,7 @@
     }
   },
   "validations": [],
+  "relations": {},
   "acls": [
     {
       "accessType": "WRITE",
