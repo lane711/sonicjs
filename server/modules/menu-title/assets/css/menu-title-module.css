@@ -1,7 +1,7 @@
 /* Css File for Module: menu-title */
 div[data-module="MENU-TITLE"] {
   margin: 25px 0 0;
-  position: fixed
+  /* position: fixed */
   }
 
 div[data-module="MENU-TITLE"] ul{
