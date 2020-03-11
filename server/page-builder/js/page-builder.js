@@ -821,6 +821,13 @@ async function setupPageSettings(action, contentType) {
   console.log("page settings loaded");
 }
 
+function getBaseUrl(){
+  var url = window.location.href;
+  var arr = url.split("/");
+  var result = arr[0] + "//" + arr[2]
+  return result;
+}
+
 async function setupFormBuilder(contentType) {
   // debugger;
   // (change)="onFormioChange($event)"
@@ -830,6 +837,9 @@ async function setupFormBuilder(contentType) {
   }
 
   Formio.icons = "fontawesome";
+  Formio.setProjectUrl(getBaseUrl() + '/api');
+  Formio.setBaseUrl('http://localhost:3018/base');
+
   Formio.builder(document.getElementById("formBuilder"), null).then(
     async function(form) {
       form.setForm({
@@ -1131,6 +1141,7 @@ async function addModule(systemid) {
 }
 
 async function editModule() {
+  // debugger;
   // cleanModal();
   showSidePanel();
 
@@ -1141,13 +1152,27 @@ async function editModule() {
   let form = await formService.getForm(
     currentModuleContentType,
     data,
-    "await editContentInstance(submission); fullPageUpdate();"
+    "await editModuleSave(submission);"
   );
+
   $("#dynamicModelTitle").text(
     `Settings: ${currentModuleContentType} (Id:${currentModuleId})`
   );
 
   loadModuleTabs(form, currentModuleContentType);
+}
+
+async function editModuleSettingsSave(submission){
+  //add settings to
+  debugger;
+  await editContentInstance(submission);
+  fullPageUpdate();
+}
+
+async function editModuleSave(submission){
+  debugger;
+  await editContentInstance(submission);
+  fullPageUpdate();
 }
 
 async function loadModuleTabs(form, systemid) {
@@ -1156,8 +1181,9 @@ async function loadModuleTabs(form, systemid) {
   let settingsForm = await formService.getForm(
     "module-settings",
     undefined,
-    "await editContentInstance(submission); fullPageUpdate();"
+    "editModuleSettingsSave(submission);"
   );
+
   $(".pb-side-panel #settings").html(settingsForm);
 
   let funcNameMain = "loadModuleSettingForm_" + systemid + "()";

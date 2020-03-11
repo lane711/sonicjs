@@ -4,6 +4,10 @@ const formJSON_{{ random }} = {{{ formJSON }}}
 
 const formValuesToLoad_{{ random }} = {{{ formValuesToLoad }}}
 
+loadModuleSettingForm_{{ contentTypeId }} = async function () {
+  console.log('load setting form');
+  form_{{ random }}();
+}
 //used for json explorer
 var formValuesToLoad = {{{ formValuesToLoad }}}
 
