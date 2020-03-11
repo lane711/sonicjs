@@ -2,7 +2,7 @@
   "title": "Contact Us",
   "systemid": "contact-us",
   "version": "0.0.0.1",
-  "canBeAddedToColumn": "true",
-  "systemidUpperCase": "CONTACT-US",
-  "systemidCamelCase": "contactUs"
+  "enabled": true,
+  "canBeAddedToColumn": true,
+  "singleInstance": false
 }

@@ -2,7 +2,7 @@
   "title": "Wiki",
   "systemid": "wiki",
   "version": "0.0.0.1",
-  "canBeAddedToColumn": "true",
-  "systemidUpperCase": "WIKI",
-  "systemidCamelCase": "wiki"
+  "enabled": true,
+  "canBeAddedToColumn": true,
+  "singleInstance": false
 }

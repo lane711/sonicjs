@@ -2,7 +2,7 @@
   "title": "Image Processing",
   "systemid": "image-processing",
   "version": "0.0.0.1",
-  "canBeAddedToColumn": "true",
-  "systemidUpperCase": "IMAGE-PROCESSING",
-  "systemidCamelCase": "imageProcessing"
+  "enabled": true,
+  "canBeAddedToColumn": false,
+  "singleInstance": true
 }

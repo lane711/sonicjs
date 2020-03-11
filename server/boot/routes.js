@@ -24,6 +24,9 @@ javascriptService.startup();
 var userService = require("../services/user.service");
 var helperService = require("../services/helper.service");
 var sharedService = require("../services/shared.service");
+var breadcrumbsService = require("../services/breadcrumbs.service");
+var mixPanelService = require("../modules/mixpanel/services/mixpanel-main-service");
+
 const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 let ShortcodeFormatter = require("shortcode-tree").ShortcodeFormatter;
 
@@ -33,8 +36,6 @@ const chalk = require("chalk");
 const log = console.log;
 const url = require("url");
 var admin = require(__dirname + "/admin");
-var Amplitude = require("amplitude");
-var amplitude = new Amplitude("00c9db8d087f1737021c841bcdbc2b41");
 
 module.exports = function(app) {
   // app.get('/', async function (req, res) {
@@ -118,13 +119,16 @@ module.exports = function(app) {
           event_type: "LOGIN", // required
           user_id: req.body.email // only required if device id is not passed in
         };
-        amplitude.track(data);
 
         //set cookie
         res.cookie("sonicjs_access_token", token.id, {
           signed: true,
           maxAge: 30000000
         });
+
+        mixPanelService.setPeople(req.body.email);
+
+        mixPanelService.trackEvent("LOGIN", req, { email: req.body.email });
         res.redirect(referer);
       }
     );
@@ -147,7 +151,6 @@ module.exports = function(app) {
         event_type: "LOGOUT", // required
         user_id: currentUser.email
       };
-      amplitude.track(data);
 
       res.clearCookie("sonicjs_access_token");
       res.redirect("/admin");
@@ -294,7 +297,7 @@ module.exports = function(app) {
     res.render("home");
   });
 
-  app.get("/sandbox", async function(req, res) {
+  app.get("/zsandbox", async function(req, res) {
     let data = {};
     res.render("sandbox", { layout: "blank.handlebars", data: data });
   });
@@ -304,7 +307,7 @@ module.exports = function(app) {
     res.render("sandbox", { layout: "admin.handlebars", data: data });
   });
 
-  app.get("/test", async function(req, res) {
+  app.get("/ztest", async function(req, res) {
     res.send("ok");
   });
 
@@ -327,7 +330,7 @@ module.exports = function(app) {
     let userId = await userService.getCurrentUserId(req);
     let user = await userService.getCurrentUser(req);
 
-    console.log("getCurrentUser:" + user);
+    // console.log("getCurrentUser:" + user);
 
     res.send(`userId:${userId}`);
   });
@@ -339,8 +342,8 @@ module.exports = function(app) {
   });
 
   app.post("/form-submission", async function(req, res) {
-    console.log(req.body.data);
-
+    // console.log(req.body.data);
+//
     await eventBusService.emit("afterFormSubmit", req.body.data);
   });
 
@@ -357,8 +360,10 @@ module.exports = function(app) {
       return;
     }
 
+    var ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+
     if (req.url.startsWith("/images/")) {
-      console.log("continuing request");
+      // console.log("continuing request");
     }
 
     if (
@@ -470,6 +475,7 @@ module.exports = function(app) {
           content,
           "submitContent(submission)"
         );
+        data.contentId = param2;
       }
 
       if (viewName == "admin-content-types") {
@@ -494,6 +500,15 @@ module.exports = function(app) {
         data = await mediaService.getMedia();
       }
 
+      if (viewName == "admin-menus-edit") {
+        if (param1) {
+          data = await dataService.getContentById(param1);
+          if(data.data.links){
+            data.data.linksString = JSON.stringify(data.data.links);
+          }
+        }
+      }
+
       if (viewName == "admin-menus") {
         data = await dataService.getContentByContentType("menu");
       }
@@ -514,6 +529,12 @@ module.exports = function(app) {
       }
 
       let accessToken = await userService.getToken(req);
+      data.breadCrumbs = await breadcrumbsService.getAdminBreadcrumbs(req);
+
+      mixPanelService.trackEvent("PAGE_LOAD_ADMIN", req, {
+        page: req.url,
+        ip: ip
+      });
 
       res.render(viewName, {
         layout: "admin.handlebars",
@@ -522,6 +543,11 @@ module.exports = function(app) {
       });
     } else {
       var page = await contentService.getRenderedPage(req);
+      mixPanelService.trackEvent("PAGE_LOAD", req, {
+        page: page.page.data.title,
+        ip: ip
+      });
+
       res.render("home", page);
     }
   });

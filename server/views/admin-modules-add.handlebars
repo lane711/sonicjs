@@ -26,7 +26,13 @@
                     placeholder: 'Enter the slug to be used as the system id (ie: service-list, news-feed, public-service)',
                     input: true
                   },
-                                    {
+                  {
+                    type: 'checkbox',
+                    key: 'enabled',
+                    label: 'Enabled',
+                    input: true
+                  },
+                  {
                     type: 'checkbox',
                     key: 'canBeAddedToColumn',
                     label: 'Can Be Added To Column',
@@ -48,9 +54,9 @@
                     var accessToken = '{{ this.accessToken }}';
                     axios.post(`/api/modules?access_token=${accessToken}`, submission.data)
                       .then(async function (response) {
-                        console.log(response);
+                        console.log('add module', response);
                         //return await response.data;
-                        
+
                         window.location.replace('/admin/modules/edit/' + submission.data.systemid);
                       })
                       .catch(function (error) {

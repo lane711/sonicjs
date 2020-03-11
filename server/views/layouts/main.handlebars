@@ -47,12 +47,9 @@
   <link href="/jsoneditor.min.css" rel="stylesheet">
   <link href="/node_modules/photoswipe/dist/photoswipe.css" rel="stylesheet">
   <link href="/node_modules/photoswipe/dist/default-skin/default-skin.css" rel="stylesheet">
+  <link href="/node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css" rel="stylesheet">
   <link href="/formio.full.min.css" rel="stylesheet">
   {{{page.data.cssLinks}}}
-
-  {{!-- <link href="/css/generated.css" rel="stylesheet"> --}}
-
-  {{!-- <link href="/formio.full.min.css" rel="stylesheet"> --}}
 
   <base href="/">
 
@@ -62,7 +59,10 @@
 
 <body>
   <input type="hidden" name="page-id" id="page-id" value="{{page.id}}">
-  {{> menu }}
+
+  {{> menu level='1'}}
+
+  {{> menu level='2'}}
 
   <main role="main">
 
@@ -96,6 +96,7 @@
   <script src="/formio.full.min.js"></script>
   <script src="/node_modules/photoswipe/dist/photoswipe.min.js"></script>
   <script src="/node_modules/photoswipe/dist/photoswipe-ui-default.min.js"></script>
+  <script src="/node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.js"></script>
   <script src="/vendors/dropzone/dropzone.min.js"></script>
   <script src="/js/common.js"></script>
   <script src="/services/shared.service.js"></script>
@@ -103,10 +104,13 @@
   <script src="/services/helper.service.js"></script>
   <script src="/services/data.service.js"></script>
   <script src="/services/form.service.js"></script>
+  <script src="/services/analytics.service.js"></script>
   <script src="/js/page-builder.js"></script>
 
 
   {{{page.data.jsLinks}}}
+
+  {{> photoswipe }}
 
 </body>
 

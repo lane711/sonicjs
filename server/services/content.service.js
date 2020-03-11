@@ -26,9 +26,9 @@ module.exports = contentService = {
   startup: async function() {
     eventBusService.on(
       "postProcessModuleShortCodeProccessedHtml",
-      async function(proccessedHtml) {
-        if (proccessedHtml) {
-          contentService.wrapBlockInModuleDiv(proccessedHtml);
+      async function(options) {
+        if (options) {
+          contentService.wrapBlockInModuleDiv(options.proccessedHtml, options.viewModel);
         }
       }
     );
@@ -51,6 +51,7 @@ module.exports = contentService = {
     }
 
     this.page.data.eventCount = 0;
+    this.page.data.headerJs = "";
 
     await eventBusService.emit("getRenderedPagePostDataFetch", {
       req: req,
@@ -338,15 +339,15 @@ module.exports = contentService = {
           });
 
           //old way, TODO: refac
-          if (shortcode.name == "BLOCK") {
-            await this.replaceBlockShortCode(shortcode);
-          }
-          if (shortcode.name == "FORM") {
-            await this.replaceFormShortCode(shortcode);
-          }
-          if (shortcode.name == "LIST") {
-            await this.replaceListShortCode(shortcode);
-          }
+          // if (shortcode.name == "BLOCK") {
+          //   await this.replaceBlockShortCode(shortcode);
+          // }
+          // if (shortcode.name == "FORM") {
+          //   await this.replaceFormShortCode(shortcode);
+          // }
+          // if (shortcode.name == "LIST") {
+          //   await this.replaceListShortCode(shortcode);
+          // }
         }
       }
 
@@ -371,7 +372,7 @@ module.exports = contentService = {
 
   },
 
-  wrapBlockInModuleDiv: function(proccessedHtml) {
+  wrapBlockInModuleDiv: function(proccessedHtml, viewModel) {
     proccessedHtml.body = `<div class="module" data-id="${proccessedHtml.id}" data-module="${proccessedHtml.shortCode.name}" data-content-type="${proccessedHtml.contentType}">${proccessedHtml.body}</div>`;
   },
 

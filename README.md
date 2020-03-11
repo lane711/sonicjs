@@ -4,7 +4,11 @@
 
 # SonicJS is a Modern Open Source NodeJs Based Content Management System
 
-![SonicJs Nodejs CMS Admin Dashboard](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Dashboard.png)
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="SonicJs Nodejs CMS Admin Dashboard" />
+  </a>
+</p>
 
 ## Visit https://sonicjs.com for Details, Videos & Docs
 
@@ -18,12 +22,12 @@
 - Express
 - Bootstrap 4
 
-### SonicJs supports many common databases including: 
+### SonicJs supports many common databases including:
 - MongoDB
 - MySQL
 - SQL Server
 - Cloudant
-- DashDB 
+- DashDB
 - DB2
 - Informix
 - Oracle
@@ -32,6 +36,9 @@
 - SQLite3
 - Flat File (Json)
 - In-Memory
+
+### Why SonicJs?
+There are thousands of CMS out there and several already built on the modern JAM stack (JavaScript, API & Markup). I was looking for a solid Node.js based CMS suitable as a foundation for enterprise application development. It didn't exist. For a detailed description of why SonicJs was started, please see the <a href="https://sonicjs.com/about">about page</a>.
 
 ## Table of Contents
 
@@ -69,58 +76,122 @@ SonicJs is similar to Drupal CMS in that it is highly configurable. You can buil
 
 SonicJs can handle most common website building use-cases with ease, but it also positioned to be an enterprise application framework/platform enabling developers to start custom web application projects with a solid foundation. This can help significantly reduce the overall effort required for your project.
 
-SonicJs is also 100% REST API based and therefor a great choice if you are looking for a **Headless CMS** for your mobile app or IoT project. All of the content types that you create in the admin interface are instantly exposed as REST end points. There is no need to restart the application as required in other NodeJs based Headless CMS like Strapi or Butter CMS.
+SonicJs is also 100% REST API based and therefor a great choice if you are looking for a **Headless CMS** for your mobile app or IoT project. All of the content types that you create in the admin interface are instantly exposed as REST end points. There is no need to restart the application as required in other NodeJs based Headless.
 
 SonicJs is built with love from Orange County California.
 
 ## Free Forever
-If you are considering using SonicJs for your next web project, its important to know that it shall remain free forever (again similar to Drupal). Be wary of "free" open source solutions being built by start-ups or established companies that haven't made this same "free forever" commitment. 
+If you are considering using SonicJs for your next web project, its important to know that it shall remain free forever (again similar to Drupal). Be wary of "free" open source solutions being built by start-ups or established companies that haven't made this same "free forever" commitment.
 
-If you are interested in reading more about me or the goals and motivation of the project, please check out the "about" page here: https://sonicjs.com/about. Also, if you've actually read down this far and happen to be a in generous mood, &#x1F34F;**would you mind given the project a star?**&#x1F34F; Thanks in advance!
+If you are interested in reading more about me or the goals and motivation of the project, please check out the "about" page here: https://sonicjs.com/about.
+
+Also, if you've actually read down this far and happen to be a in generous mood, :star::star::star::star::star: **would you mind given the project a star?**:star::star::star::star::star: Thanks in advance!
 
 ## Screen Shots
 
 ### Manage Content Types:
 
-![Manage Content Types](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Content%20Types.png)
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js CMS - Content Type Edit.png?width=600" width="300px" alt="Manage Content Types" />
+  </a>
+</p>
 
 ### Drag and Drop Form Builder:
 
-![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Content%20Type%20Edit.png)
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="Drag and Drop Form Builder" />
+  </a>
+</p>
 
 ### Edit Content with Automagically Generated Forms:
-![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Edit%20Content.png)
+
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Edit%20Content.png?width=600" width="300px" alt="Edit Content with Automagically Generated Forms" />
+  </a>
+</p>
 
 ### Build Advanced Forms with over 20 Field Types
-![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Field%20Types.png)
+
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Field%20Types.png?width=600" width="300px" alt="Field Types" />
+  </a>
+</p>
 
 ### Edit Content Properties From the Front End
-![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Front%20End%20Page%20Settings.png)
+
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20Page%20Settings.png?width=600" width="300px" alt="Front End Content Editing" />
+  </a>
+</p>
 
 ### Front End WYSIWYG Editor
-![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Front%20End%20WYSIWYG%20Editor.png)
+
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20WYSIWYG%20Editor.png?width=600" width="300px" alt="Front End WYSIWYG Editor" />
+  </a>
+</p>
 
 ### Menu Manager
-![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Menu%20Management.png)
+
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Menu%20Management.png?width=600" width="300px" alt="Menu Manager" />
+  </a>
+</p>
 
 ### Real Time CSS Editor
-![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Front%20End%20CSS%20Editing.png)
+
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20CSS%20Editing.png?width=600" width="300px" alt="Real Time CSS Editor" />
+  </a>
+</p>
 
 ### Built In Media Server
-![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Media%20Manager.png)
+
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Media%20Manager.png?width=600" width="300px" alt="Built In Media Server" />
+  </a>
+</p>
 
 ### Module Management
-![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Module%20Management.png)
+
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Module%20Management.png?width=600" width="300px" alt="Module Management" />
+  </a>
+</p>
 
 ### Front End Json Editor
-![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Front%20End%20Json%20Editor.png)
+
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20Json%20Editor.png?width=600" width="300px" alt="Front End Json Editor" />
+  </a>
+</p>
 
 ### Swagger API Explorer
-![](https://sonicjs.com/api/containers/files/download/NodeJS%20CMS%20-%20API%20Explorer.png)
+
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20API%20Explorer.png?width=600" width="300px" alt="Swagger API Explorer" />
+  </a>
+</p>
 
 ### Back End Login
-![](https://sonicjs.com/api/containers/files/download/NodeJs%20CMS%20-%20Back%20End%20Login.png
-)
+
+<p align="center">
+  <a href="https://sonicjs.com">
+    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Back%20End%20Login.png?width=600" width="300px" alt="Back End Login" />
+  </a>
+</p>
 
 ## Debugging
 
@@ -135,7 +206,7 @@ Please see here: https://sonicjs.com/about
 
 SonicJs uses a number of open source packages, tools, etc but there are a couple of them that I wanted to make special mention of:
 1. Loopback - An awesome NodeJs based ORM helping to support much of the heavy lifting in SonicJs' data tier.
-1. CoreUI - a truly great open source admin theme. 
+1. CoreUI - a truly great open source admin theme.
 1. Formio - a rock solid form builder with loads of advanced functionality.
 1. Axios - a brilliant library for interacting with REST end points.
 

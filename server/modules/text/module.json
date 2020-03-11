@@ -2,7 +2,7 @@
   "title": "Text",
   "systemid": "text",
   "version": "0.0.0.1",
-  "canBeAddedToColumn": "true",
-  "systemidUpperCase": "TEXT",
-  "systemidCamelCase": "text"
+  "enabled": true,
+  "canBeAddedToColumn": true,
+  "singleInstance": false
 }

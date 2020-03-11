@@ -2,7 +2,7 @@
   "title": "Alert",
   "systemid": "alert",
   "version": "0.0.0.1",
-  "canBeAddedToColumn": "true",
-  "systemidUpperCase": "ALERT",
-  "systemidCamelCase": "alert"
+  "enabled": true,
+  "canBeAddedToColumn": true,
+  "singleInstance": false
 }

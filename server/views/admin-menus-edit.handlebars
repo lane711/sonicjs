@@ -1,0 +1,65 @@
+<div class="col-lg-12">
+  <div class="card">
+    <div class="card-header">
+      <i class="fa fa-align-justify"></i> Menu: {{data.data.title}} (Id:{{data.id}})
+    </div>
+    <div class="card-body page-list">
+
+      <input id="id" type="hidden" value="{{data.id}}">
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4">
+
+            <script type='text/javascript'>
+              window.onload = function () {
+                console.log('loading menuMainEdit form')
+                let title = '{{data.data.title}}';
+                Formio.createForm(document.getElementById('menuMainEdit'), {
+                  components: [
+                    {
+                      type: 'textfield',
+                      key: 'title',
+                      label: 'Menu Title',
+                      placeholder: 'ie: Main, Sidebar, Footer',
+                      input: true
+                    }
+                  ]
+                })
+                  .then(async function (form) {
+                    form.submission = {
+                      data: {
+                        title: title
+                      }
+                    };
+                  });
+              }
+            </script>
+
+            <div id="menuMainEdit"></div>
+            <hr>
+
+            <div id="menuTree"></div>
+
+            <button class="btn btn-success add-node" id="addNode">Add Node</button>
+
+          </div>
+          <div class="col-md-8 menu-edit-right">
+            <h3>Edit Node</h3>
+            <hr>
+            <div id="menuTreeForm"></div>
+            <hr>
+            <button class="btn btn-danger add-node pull-right" id="deleteNode">Delete Node</button>
+
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+</div>
+<script>
+  var menuData = {{{ data.data.linksString }}}
+
+</script>

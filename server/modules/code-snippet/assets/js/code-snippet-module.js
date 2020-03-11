@@ -13,7 +13,7 @@ async function setupACEForSnippets() {
 
         let codeSnippet = $(codeSnippetObj);
         let type = codeSnippet.data('type');
-        console.log(type, codeSnippet);
+        // console.log(type, codeSnippet);
 
         var editor = ace.edit(codeSnippetObj);
         editor.setTheme("ace/theme/chrome");
