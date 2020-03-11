@@ -20,4 +20,23 @@ module.exports = function(Form) {
     }
   );
 
+  Form.nestedForms = function (cb) {
+    let forms = [{id: '123', title: 'my form'},{id: '324', title: 'my form 2'}]
+    cb(null, forms);
+  };
+
+  Form.remoteMethod(
+    'nestedForms', {
+      http: {
+        path: '/nestedForms',
+        verb: 'get',
+      },
+      returns: {
+        arg: 'status',
+        type: 'string',
+      },
+    }
+  );
+
+
 };

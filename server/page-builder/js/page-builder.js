@@ -830,7 +830,7 @@ async function setupFormBuilder(contentType) {
   }
 
   Formio.icons = "fontawesome";
-  Formio.setProjectUrl(getBaseUrl() + '/api');
+  Formio.setProjectUrl(getBaseUrl() + '/api/forms/nestedForms');
   // Formio.setBaseUrl('http://localhost:3018/base');
 
   Formio.builder(document.getElementById("formBuilder"), null).then(
