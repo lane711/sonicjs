@@ -68,7 +68,7 @@
     "dataSource": null,
     "public": true
   },
-  "form": {
+  "formio": {
     "dataSource": null,
     "public": true
   }

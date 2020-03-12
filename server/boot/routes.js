@@ -297,6 +297,19 @@ module.exports = function(app) {
     res.render("home");
   });
 
+  app.get("/nested-forms-list*", async function(req, res) {
+    let forms = [{_id: '123', type: 'form', title: 'my form'},{_id: '324', type: 'form', title: 'my form 2'}]
+    res.send(forms);
+  });
+
+  app.get("/form/*", async function(req, res) {
+    let contentType = await dataService.getContentType('page');
+    let form = await formService.getFormJson(contentType);
+    res.send(form);
+  });
+
+
+
   app.get("/zsandbox", async function(req, res) {
     let data = {};
     res.render("sandbox", { layout: "blank.handlebars", data: data });

@@ -14,6 +14,8 @@ var formValuesToLoad = {{{ formValuesToLoad }}}
     form_{{ random }} = async function () {
         // debugger;
         Formio.icons = 'fontawesome';
+        formService.setFormApiUrls(Formio);
+
         Formio.createForm(document.getElementById('formio_{{ random }}'), formJSON_{{ random }}).then((form) => {
             console.log('log form', form);
 

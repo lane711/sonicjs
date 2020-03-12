@@ -1,5 +1,5 @@
 {
-  "name": "form",
+  "name": "formio",
   "base": "Model",
   "idInjection": true,
   "options": {
