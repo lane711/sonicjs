@@ -374,7 +374,7 @@ module.exports = contentService = {
   wrapBlockInModuleDiv: function(proccessedHtml, viewModel) {
     let wrapperCss = "module";
     if (viewModel.data.settings && viewModel.data.settings.data.wrapperCss) {
-      wrapperCss += viewModel.data.settings.data.wrapperCss;
+      wrapperCss += " " + viewModel.data.settings.data.wrapperCss;
     }
 
     let wrapperStyles = "";
