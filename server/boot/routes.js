@@ -312,7 +312,8 @@ module.exports = function(app) {
   });
 
   app.get("/form/*", async function(req, res) {
-    let contentType = await dataService.getContentType("page");
+    let moduleSystemId = req.path.replace('/form/','')
+    let contentType = await dataService.getContentType(moduleSystemId);
     let form = await formService.getFormJson(contentType);
     res.send(form);
   });
