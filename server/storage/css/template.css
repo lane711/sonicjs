@@ -32,7 +32,7 @@ a.white {
 
 @media (min-width:768px) {
   .bg-ptrans {
-    opacity: .9
+    opacity: .95
   }
 }
 
