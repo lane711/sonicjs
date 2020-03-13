@@ -372,3 +372,6 @@ a.black {
   font-size: .7em;
 }
 
+.sticky-top{
+  position: sticky !important;
+}
