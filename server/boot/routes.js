@@ -26,7 +26,7 @@ var helperService = require("../services/helper.service");
 var sharedService = require("../services/shared.service");
 var breadcrumbsService = require("../services/breadcrumbs.service");
 var mixPanelService = require("../modules/mixpanel/services/mixpanel-main-service");
-
+var _ = require('underscore');
 const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 let ShortcodeFormatter = require("shortcode-tree").ShortcodeFormatter;
 
@@ -298,17 +298,24 @@ module.exports = function(app) {
   });
 
   app.get("/nested-forms-list*", async function(req, res) {
-    let forms = [{_id: '123', type: 'form', title: 'my form'},{_id: '324', type: 'form', title: 'my form 2'}]
-    res.send(forms);
+    let contentTypesRaw = await dataService.getContentTypes();
+    let contentTypes = contentTypesRaw.map(function(contentType) {
+      return {
+        _id: contentType.systemid,
+        type: "form",
+        title: contentType.title
+      };
+    });
+    let sorted = _.sortBy(contentTypes, 'title');
+
+    res.send(sorted);
   });
 
   app.get("/form/*", async function(req, res) {
-    let contentType = await dataService.getContentType('page');
+    let contentType = await dataService.getContentType("page");
     let form = await formService.getFormJson(contentType);
     res.send(form);
   });
-
-
 
   app.get("/zsandbox", async function(req, res) {
     let data = {};
@@ -356,7 +363,7 @@ module.exports = function(app) {
 
   app.post("/form-submission", async function(req, res) {
     // console.log(req.body.data);
-//
+    //
     await eventBusService.emit("afterFormSubmit", req.body.data);
   });
 
@@ -516,7 +523,7 @@ module.exports = function(app) {
       if (viewName == "admin-menus-edit") {
         if (param1) {
           data = await dataService.getContentById(param1);
-          if(data.data.links){
+          if (data.data.links) {
             data.data.linksString = JSON.stringify(data.data.links);
           }
         }

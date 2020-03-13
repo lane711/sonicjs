@@ -60,7 +60,7 @@
     }),
     (exports.getCookie = function(name) {
       // debugger;
-      if (document && document.cookie) {
+      if (typeof document !== 'undefined' && document && document.cookie) {
         var value = "; " + document.cookie;
         var parts = value.split("; " + name + "=");
         if (parts.length == 2) {

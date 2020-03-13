@@ -81,7 +81,7 @@ if (typeof module !== "undefined" && module.exports) {
       //   name: name,
       //   settings: settings
       // };
-debugger;
+// debugger;
       const formJSON = await exports.getFormJson(contentType, content);
 
       let form = "";
@@ -240,7 +240,6 @@ debugger;
     (exports.setFormApiUrls = async function(Formio) {
       Formio.setProjectUrl(sharedService.getBaseUrl() + '/nested-forms-list');
       Formio.setBaseUrl(sharedService.getBaseUrl() + '/nested-forms-get');
-      debugger;
     });
   // }
 })(typeof exports === "undefined" ? (this["formService"] = {}) : exports);
