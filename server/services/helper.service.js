@@ -30,7 +30,7 @@
       // }
 
       return cleanHtml.length > length
-        ? cleanHtml.substr(0, length - 1) + "&hellip;"
+        ? cleanHtml.substr(0, length - 1) + "..."
         : cleanHtml;
     }
   }),
