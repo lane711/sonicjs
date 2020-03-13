@@ -500,7 +500,8 @@ module.exports = function(app) {
       }
 
       if (viewName == "admin-content-types") {
-        data = await dataService.getContentTypes();
+        let dataRaw = await dataService.getContentTypes();
+        data = _.sortBy(dataRaw, 'title');
       }
 
       if (viewName == "admin-content-types-edit") {
