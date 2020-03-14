@@ -651,6 +651,10 @@ async function editContentInstance(payload) {
 async function editContentType(payload) {
   // debugger;
   let id = payload.id;
+  if(!id){
+    return;
+  }
+
   console.log("putting payload", payload);
   if (payload.id) {
     delete payload.id;
@@ -668,7 +672,11 @@ async function editContentType(payload) {
     .put(`/api/contentTypes/${id}`, payload)
     .then(async function(response) {
       console.log(response);
-      return await response.data;
+      // debugger;
+      //reload editor
+      let contentType = await response.data;
+      contentType.id = id;
+      setupFormBuilder(contentType);
     })
     .catch(function(error) {
       console.log(error);
@@ -828,6 +836,7 @@ async function setupFormBuilder(contentType) {
   if (!formDiv.length) {
     return;
   }
+  formDiv.empty();
 
   Formio.icons = "fontawesome";
   formService.setFormApiUrls(Formio);
@@ -922,10 +931,14 @@ async function setupFormBuilder(contentType) {
 }
 
 async function onContentTypeSave() {
-  // debugger;
-  console.log("contentTypeComponents", contentTypeComponents);
-  contentType.components = contentTypeComponents;
-  await editContentType(contentType);
+  if (contentTypeComponents) {
+    console.log("contentTypeComponents", contentTypeComponents);
+    contentType.components = contentTypeComponents;
+    if(!contentType.id){
+      contentType.id = $('#createContentTypeForm #id').val();
+    }
+    await editContentType(contentType);
+  }
 }
 
 async function openNewContentTypeModal() {
@@ -1064,11 +1077,10 @@ function loadJsonEditor() {
 
 function setupJsonRawSave() {
   $("#saveRawJson").on("click", function() {
-
     console.log("json save");
     let contentId = $("#contentId").val();
 
-    var json = {data :jsonEditorRaw.get()};
+    var json = { data: jsonEditorRaw.get() };
     json.data.id = contentId;
 
     // debugger;
