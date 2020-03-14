@@ -26,7 +26,7 @@ var helperService = require("../services/helper.service");
 var sharedService = require("../services/shared.service");
 var breadcrumbsService = require("../services/breadcrumbs.service");
 var mixPanelService = require("../modules/mixpanel/services/mixpanel-main-service");
-var _ = require('underscore');
+var _ = require("underscore");
 const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 let ShortcodeFormatter = require("shortcode-tree").ShortcodeFormatter;
 
@@ -58,6 +58,13 @@ module.exports = function(app) {
 
   app.get("*", async function(req, res, next) {
     globalService.AccessToken = app.models.AccessToken;
+
+    // Update a value in the cookie so that the set-cookie will be sent.
+    // Only changes every minute so that it's not sent with every request.
+    if (req.session) {
+      req.session.nowInMinutes = Math.floor(Date.now() / 60e3);
+    }
+
     next();
   });
 
@@ -306,13 +313,13 @@ module.exports = function(app) {
         title: contentType.title
       };
     });
-    let sorted = _.sortBy(contentTypes, 'title');
+    let sorted = _.sortBy(contentTypes, "title");
 
     res.send(sorted);
   });
 
   app.get("/form/*", async function(req, res) {
-    let moduleSystemId = req.path.replace('/form/','')
+    let moduleSystemId = req.path.replace("/form/", "");
     let contentType = await dataService.getContentType(moduleSystemId);
     let form = await formService.getFormJson(contentType);
     res.send(form);
@@ -501,7 +508,7 @@ module.exports = function(app) {
 
       if (viewName == "admin-content-types") {
         let dataRaw = await dataService.getContentTypes();
-        data = _.sortBy(dataRaw, 'title');
+        data = _.sortBy(dataRaw, "title");
       }
 
       if (viewName == "admin-content-types-edit") {
