@@ -1159,7 +1159,7 @@ async function editModule() {
   let form = await formService.getForm(
     currentModuleContentType,
     data,
-    "await editContentInstance(submission); fullPageUpdate();"
+    "await editContentInstance(submission);"
   );
   $("#dynamicModelTitle").text(
     `Settings: ${currentModuleContentType} (Id:${currentModuleId})`
