@@ -640,7 +640,8 @@ async function editContentInstance(payload) {
       // debugger;
       console.log("editContentInstance", response);
       // resolve(response.data);
-      return await response.data;
+      // return await response.data;
+      fullPageUpdate();
     })
     .catch(function(error) {
       debugger;
