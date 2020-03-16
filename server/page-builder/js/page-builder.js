@@ -1167,7 +1167,6 @@ async function editModule() {
 
   // $("#moduleSettingsFormio").html(form);
   $(".pb-side-panel #main").html(form);
-
   loadModuleSettingForm();
   // $("#moduleSettingsModal")
   //   .appendTo("body")
