@@ -145,7 +145,7 @@ function updateTreeData(formData) {
     menu.data.id = id;
   }
 
-  submitContent(menu);
+  submitContent(menu, false);
 }
 
 function formChanged(formData) {
