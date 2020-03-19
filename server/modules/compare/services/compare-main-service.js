@@ -14,6 +14,18 @@ module.exports = compareMainService = {
             }
 
         });
+
+        eventBusService.on('postModuleGetData', async function (options) {
+
+          if (options.shortcode.name !== 'COMPARE') {
+              return;
+          }
+
+          let width = options.viewModel.data.thumbnailWidth;
+          options.viewModel.data.thumbnailWidthRetina = width *2;
+
+      });
+
     },
 
 }
