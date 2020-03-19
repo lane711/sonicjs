@@ -46,7 +46,7 @@ module.exports = menuService = {
 
   processSecondLevel: function(menuData, url) {
     let activeNode = menuData.find(x => x.isActive === true);
-    if (activeNode.children.length > 0) {
+    if (activeNode && activeNode.children && activeNode.children.length > 0) {
       activeNode.children.forEach(menuItem => {
         menuItem.isActive = menuItem.data.url === url;
       });
