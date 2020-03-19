@@ -614,7 +614,7 @@ async function createContentInstance(payload) {
     });
 }
 
-async function editContentInstance(payload) {
+async function editContentInstance(payload, refresh) {
   // debugger;
   let id = payload.id;
   console.log("putting payload", payload);
@@ -641,7 +641,9 @@ async function editContentInstance(payload) {
       console.log("editContentInstance", response);
       // resolve(response.data);
       // return await response.data;
-      fullPageUpdate();
+      if(refresh){
+        fullPageUpdate();
+      }
     })
     .catch(function(error) {
       debugger;
@@ -1277,12 +1279,12 @@ async function addModuleToColumn(submission) {
   fullPageUpdate();
 }
 
-async function submitContent(submission) {
+async function submitContent(submission, refresh = true) {
   // debugger;
   console.log("Submission was made!", submission);
   let entity = processContentFields(submission.data);
   if (submission.data.id) {
-    await editContentInstance(entity);
+    await editContentInstance(entity, refresh);
   } else {
     await createContentInstance(entity);
   }
