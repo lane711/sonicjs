@@ -1,3 +1,16 @@
+
+<table>
+{{#data.matrix}}
+  <tr>
+    {{#this.columns}}
+    <td>{{this}}</td>
+    {{/this.columns}}
+  </tr>
+{{/data.matrix}}
+</table>
+
+
+<hr>
 <div>Hello to you {{ data.firstName }} from the Compare module!</div>
 {{#each data.compareItems}}
 {{this.data.productName}}<br>
