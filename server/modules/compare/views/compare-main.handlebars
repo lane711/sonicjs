@@ -1,1 +1,28 @@
 <div>Hello to you {{ data.firstName }} from the Compare module!</div>
+{{#each data.compareItems}}
+{{this.data.productName}}<br>
+{{/each}}
+<hr>
+<table>
+  {{#data.contentType}}
+  <tr>
+    <td>{{this.label}}</td>
+  </tr>
+
+  {{#this.components}}
+  <tr>
+    <td><small> - {{this.label}}</small></td>
+  </tr>
+  {{/this.components}}
+
+  {{/data.contentType}}
+</table>
+<hr>
+
+<table>
+  {{#data.compareItems}}
+  <tr>
+    <td>{{this.data.productName}}</td>
+  </tr>
+  {{/data.compareItems}}
+</table>

@@ -1,7 +1,7 @@
 {
   "ids": {
     "contentType": 51,
-    "content": 485,
+    "content": 487,
     "fieldType": 2,
     "e2e-test": 2
   },
@@ -474,7 +474,9 @@
       "481": "{\"id\":481,\"data\":{\"title\":\"Compare Node.js CMS\",\"showHero\":true,\"heroTitle\":\"Compare Node.js CMS\",\"pageCssClass\":\"compare\",\"autoGenerateUrl\":true,\"url\":\"/compare-nodejs-cms\",\"metaTitle\":\"Compare Node.js CMS\",\"metaDescription\":\"Comparison of several top Node.js based CMS. Compare by Features, Price, Performance, Database Support\",\"contentType\":\"page\",\"submit\":true,\"createdOn\":1584628998592,\"layout\":[483]}}",
       "482": "{\"data\":{\"title\":\"Compare Node.js CMS\",\"showHero\":true,\"heroTitle\":\"Compare Node.js CMS\",\"pageCssClass\":\"compare\",\"autoGenerateUrl\":true,\"url\":\"/compare-nodejs-cms\",\"metaTitle\":\"Compare Node.js CMS\",\"metaDescription\":\"Comparison of several top Node.js based CMS. Compare by Features, Price, Performance, Database Support\",\"contentType\":\"page\",\"submit\":true,\"createdOn\":1584628967127},\"id\":482}",
       "483": "{\"id\":483,\"data\":{\"title\":\"Section 1\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[COMPARE id=\\\"484\\\"]\"}]}],\"createdOn\":1584633806636}}",
-      "484": "{\"data\":{\"viewName\":\"default\",\"contentType\":\"compare\",\"submit\":true,\"createdOn\":1584633806601},\"id\":484}"
+      "484": "{\"data\":{\"viewName\":\"default\",\"contentType\":\"compare\",\"submit\":true,\"createdOn\":1584633806601},\"id\":484}",
+      "485": "{\"data\":{\"productName\":\"SonicJs\",\"contentType\":\"compare-item\",\"technology\":\"\",\"submit\":true,\"dragAndDropPageBuilder\":false,\"dragAndDropLayoutManager\":false,\"flatFileJson\":false,\"mongoDb\":false,\"sqlServer\":false,\"mySql\":false,\"basicControls\":{\"textbox\":false,\"password\":false,\"number\":false},\"layout\":{\"fieldSet\":false,\"well\":false,\"columns\":false,\"table\":false},\"createdOn\":1584651656253},\"id\":485}",
+      "486": "{\"data\":{\"productName\":\"KeystoneJs\",\"contentType\":\"compare-item\",\"technology\":\"\",\"submit\":true,\"dragAndDropPageBuilder\":false,\"dragAndDropLayoutManager\":false,\"flatFileJson\":false,\"mongoDb\":false,\"sqlServer\":false,\"mySql\":false,\"basicControls\":{\"textbox\":false,\"password\":false,\"number\":false},\"layout\":{\"fieldSet\":false,\"well\":false,\"columns\":false,\"table\":false},\"createdOn\":1584651830275},\"id\":486}"
     },
     "fieldType": {
       "1": "{\"name\":\"string\",\"renderFunction\":\"string\",\"id\":1}"
