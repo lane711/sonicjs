@@ -38,9 +38,22 @@ module.exports = compareMainService = {
 
       // console.log(group.label);
       group.components.forEach(element => {
-
+        let rowAlreadyProcessed = false;
         let row = { columns: [] };
-        row.columns.push('--' + element.label);
+        if (element.label === "Field Set") {
+          let fieldSet = element.components[0];
+          row.columns.push("--" + fieldSet.label);
+          rows.push(row);
+          rowAlreadyProcessed = true;
+          //now need another row for child components
+          fieldSet.values.forEach(fieldSetValue => {
+            let row = { columns: [] };
+            row.columns.push("----" + fieldSetValue.label);
+            rows.push(row);
+          });
+        } else {
+          row.columns.push("--" + element.label);
+        }
 
         //add columns for compare items
         compareItems.forEach(complareItem => {
@@ -48,7 +61,9 @@ module.exports = compareMainService = {
           row.columns.push(column);
         });
 
-        rows.push(row);
+        if (!rowAlreadyProcessed) {
+          rows.push(row);
+        }
 
         // if (element.components) {
         //   // let row = { columns: [] };
@@ -64,7 +79,6 @@ module.exports = compareMainService = {
         //   rows.push(row);
 
         // }
-
       });
     });
     return rows;
