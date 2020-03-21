@@ -41,22 +41,29 @@ module.exports = compareMainService = {
 
         let row = { columns: [] };
         row.columns.push('--' + element.label);
+
+        //add columns for compare items
+        compareItems.forEach(complareItem => {
+          let column = complareItem.data[element.key];
+          row.columns.push(column);
+        });
+
         rows.push(row);
 
-        if (element.components) {
-          let row = { columns: [] };
-          // element.components.forEach(subElement => {
-          //   row.columns.push(subElement.label);
+        // if (element.components) {
+        //   // let row = { columns: [] };
+        //   element.components.forEach(subElement => {
+        //     row.columns.push(subElement.label);
 
-          //   //find matching compare item row
-          //   compareItems.forEach(complareItem => {
-          //     let column = complareItem.data[element.key];
-          //     row.columns.push(column);
-          //   });
-          // });
-          rows.push(row);
+        //     //find matching compare item row
+        //     compareItems.forEach(complareItem => {
+        //       let column = complareItem.data[element.key];
+        //       row.columns.push(column);
+        //     });
+        //   });
+        //   rows.push(row);
 
-        }
+        // }
 
       });
     });
