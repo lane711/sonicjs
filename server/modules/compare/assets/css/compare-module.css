@@ -1,1 +1,6 @@
 /* Css File for Module: compare */
+table.compare td{
+  background-color: blueviolet;
+  margin: 2px;
+  border: 1px #fff solid;
+}

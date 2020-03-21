@@ -24,6 +24,7 @@ module.exports = compareMainService = {
       options.viewModel.data.contentType = tabs;
 
       let matrix = compareMainService.getMatrixData(tabs, compareItems);
+      console.log(matrix);
       options.viewModel.data.matrix = matrix;
     });
   },
@@ -33,27 +34,31 @@ module.exports = compareMainService = {
     contentType.forEach(group => {
       let row = { columns: [] };
       row.columns.push(group.label);
+      rows.push(row);
+
       // console.log(group.label);
       group.components.forEach(element => {
-        // console.log("->" + element.label);
+
+        let row = { columns: [] };
+        row.columns.push('--' + element.label);
+        rows.push(row);
 
         if (element.components) {
           let row = { columns: [] };
-          element.components.forEach(subElement => {
-            row.columns.push(subElement.label);
+          // element.components.forEach(subElement => {
+          //   row.columns.push(subElement.label);
 
-            //find matching compare item row
-            compareItems.forEach(complareItem => {
-              let column = complareItem.data[element.key];
-              row.columns.push(column);
-            });
-          });
+          //   //find matching compare item row
+          //   compareItems.forEach(complareItem => {
+          //     let column = complareItem.data[element.key];
+          //     row.columns.push(column);
+          //   });
+          // });
           rows.push(row);
 
         }
 
       });
-      rows.push(row);
     });
     return rows;
   }
