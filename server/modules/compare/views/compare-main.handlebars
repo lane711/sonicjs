@@ -1,12 +1,15 @@
-
 <table class="compare">
-{{#data.matrix}}
+  {{#data.matrix}}
   <tr>
     {{#this.columns}}
-    <td>{{this}}</td>
+    {{#if this.colspan}}
+      <td colspan={{this.colspan}}>{{this.text}}</td>
+    {{else}}
+      <td>{{this.text}}</td>
+    {{/if}}
     {{/this.columns}}
   </tr>
-{{/data.matrix}}
+  {{/data.matrix}}
 </table>
 
 

@@ -1,7 +1,7 @@
 {
   "ids": {
     "contentType": 51,
-    "content": 487,
+    "content": 488,
     "fieldType": 2,
     "e2e-test": 2
   },
@@ -473,10 +473,11 @@
       "480": "{\"id\":480,\"data\":{\"headerLevel\":\"h1\",\"position\":\"center\",\"text\":\"Why is SonicJs a Great Choice as a Headless CMS?\",\"slug\":\"why-is-sonicjs-a-great-choice-as-a-headless-cms\",\"contentType\":\"title\",\"createdOn\":1584501425199,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-420,\"referrer\":\"http://localhost:3018/nodejs-headless-cms\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36\",\"pathName\":\"/nodejs-headless-cms\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
       "481": "{\"id\":481,\"data\":{\"title\":\"Compare Node.js CMS\",\"showHero\":true,\"heroTitle\":\"Compare Node.js CMS\",\"pageCssClass\":\"compare\",\"autoGenerateUrl\":true,\"url\":\"/compare-nodejs-cms\",\"metaTitle\":\"Compare Node.js CMS\",\"metaDescription\":\"Comparison of several top Node.js based CMS. Compare by Features, Price, Performance, Database Support\",\"contentType\":\"page\",\"submit\":true,\"createdOn\":1584628998592,\"layout\":[483]}}",
       "482": "{\"data\":{\"title\":\"Compare Node.js CMS\",\"showHero\":true,\"heroTitle\":\"Compare Node.js CMS\",\"pageCssClass\":\"compare\",\"autoGenerateUrl\":true,\"url\":\"/compare-nodejs-cms\",\"metaTitle\":\"Compare Node.js CMS\",\"metaDescription\":\"Comparison of several top Node.js based CMS. Compare by Features, Price, Performance, Database Support\",\"contentType\":\"page\",\"submit\":true,\"createdOn\":1584628967127},\"id\":482}",
-      "483": "{\"id\":483,\"data\":{\"title\":\"Section 1\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[COMPARE id=\\\"484\\\"]\"}]}],\"createdOn\":1584633806636}}",
+      "483": "{\"id\":483,\"data\":{\"title\":\"Section 1\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[COMPARE id=\\\"484\\\"]\"}]}],\"createdOn\":1585089823443}}",
       "484": "{\"data\":{\"viewName\":\"default\",\"contentType\":\"compare\",\"submit\":true,\"createdOn\":1584633806601},\"id\":484}",
-      "485": "{\"id\":485,\"data\":{\"productName\":\"SonicJs\",\"contentType\":\"compare-item\",\"technology\":\"\",\"dragAndDropPageBuilder\":false,\"dragAndDropLayoutManager\":false,\"flatFileJson\":true,\"mongoDb\":true,\"sqlServer\":true,\"mySql\":false,\"basicControls\":{\"textbox\":false,\"password\":true,\"number\":false},\"layout\":{\"fieldSet\":false,\"well\":true,\"columns\":false,\"table\":true},\"createdOn\":1584975276379,\"submit\":true}}",
-      "486": "{\"id\":486,\"data\":{\"productName\":\"KeystoneJs\",\"contentType\":\"compare-item\",\"technology\":\"\",\"dragAndDropPageBuilder\":false,\"dragAndDropLayoutManager\":false,\"flatFileJson\":false,\"mongoDb\":false,\"sqlServer\":false,\"mySql\":false,\"basicControls\":{\"textbox\":true,\"password\":false,\"number\":false},\"layout\":{\"fieldSet\":false,\"well\":false,\"columns\":false,\"table\":false},\"createdOn\":1584977188725,\"submit\":true}}"
+      "485": "{\"id\":485,\"data\":{\"productName\":\"SonicJs\",\"contentType\":\"compare-item\",\"technology\":\"Node.js\",\"dragAndDropPageBuilder\":false,\"dragAndDropLayoutManager\":false,\"flatFileJson\":true,\"mongoDb\":true,\"sqlServer\":true,\"mySql\":false,\"basicControls\":{\"textbox\":false,\"password\":true,\"number\":false},\"layout\":{\"fieldSet\":false,\"well\":true,\"columns\":false,\"table\":true},\"createdOn\":1585087998719,\"submit\":true}}",
+      "486": "{\"id\":486,\"data\":{\"productName\":\"KeystoneJs\",\"contentType\":\"compare-item\",\"technology\":\"Node.js\",\"dragAndDropPageBuilder\":false,\"dragAndDropLayoutManager\":false,\"flatFileJson\":false,\"mongoDb\":false,\"sqlServer\":false,\"mySql\":false,\"basicControls\":{\"textbox\":true,\"password\":false,\"number\":false},\"layout\":{\"fieldSet\":false,\"well\":false,\"columns\":false,\"table\":false},\"createdOn\":1585087971803,\"submit\":true}}",
+      "487": "{\"data\":{\"productName\":\"Wordpress\",\"contentType\":\"compare-item\",\"technology\":\"PHP\",\"submit\":true,\"dragAndDropPageBuilder\":false,\"dragAndDropLayoutManager\":false,\"flatFileJson\":false,\"mongoDb\":false,\"sqlServer\":false,\"mySql\":false,\"basicControls\":{\"textbox\":false,\"password\":false,\"number\":false},\"layout\":{\"fieldSet\":false,\"well\":false,\"columns\":false,\"table\":false},\"createdOn\":1585087930208},\"id\":487}"
     },
     "fieldType": {
       "1": "{\"name\":\"string\",\"renderFunction\":\"string\",\"id\":1}"

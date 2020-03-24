@@ -30,10 +30,11 @@ module.exports = compareMainService = {
   },
 
   getMatrixData: function(contentType, compareItems) {
+    let colspanCount = compareItems.length +1;
     let rows = [];
     contentType.forEach(group => {
       let row = { columns: [] };
-      row.columns.push(group.label);
+      this.addCell(row, group.label, true, colspanCount);
       rows.push(row);
 
       // console.log(group.label);
@@ -42,32 +43,34 @@ module.exports = compareMainService = {
         let row = { columns: [] };
         if (element.label === "Field Set") {
           var fieldSet = element.components[0];
-          row.columns.push("--" + fieldSet.label);
+          this.addCell(row, "--1" + fieldSet.label);
           rows.push(row);
           rowAlreadyProcessed = true;
           //now need another row for child components
           fieldSet.values.forEach(fieldSetValue => {
             let row = { columns: [] };
-            row.columns.push("----" + fieldSetValue.label);
+            this.addCell(row, "----" + fieldSetValue.label);
 
             //add columns for compare items
             compareItems.forEach(complareItem => {
               let fieldSet = element.components[0];
               var fieldSetKey = fieldSet.key;
               let column = complareItem.data[fieldSetKey][fieldSetValue.value];
-              row.columns.push(column);
+              if(column != undefined){
+              this.addCell(row, column);
+              }
             });
 
             rows.push(row);
           });
         } else {
-          row.columns.push("--" + element.label);
+          this.addCell(row, "--2" + element.label);
         }
 
         //add columns for compare items
         compareItems.forEach(complareItem => {
           let column = complareItem.data[element.key];
-          row.columns.push(column);
+          this.addCell(row, column);
         });
 
         if (!rowAlreadyProcessed) {
@@ -77,5 +80,13 @@ module.exports = compareMainService = {
       });
     });
     return rows;
+  },
+
+  addCell: function(row, column, colspan = false, colspanCount = 0) {
+    let cell = {text: column};
+    if(colspan){
+      cell.colspan = colspanCount;
+    }
+    row.columns.push(cell);
   }
 };
