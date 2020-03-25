@@ -35,3 +35,7 @@ table.compare .green {
 table.compare .red {
   color: #f86c6b;
 }
+
+table.compare .yellow {
+  color: #ffc107;
+}

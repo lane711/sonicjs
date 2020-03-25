@@ -95,6 +95,12 @@ module.exports = compareMainService = {
     cssClass = ""
   ) {
     let cell = { text: column };
+
+    if(column.data && column.data.contentType === 'compare-item-boolean'){
+      cell.text = column.data.support;
+      cell.notes = column.data.notes;
+    }
+
     if (colspan) {
       cell.colspan = colspanCount;
     }
@@ -102,12 +108,16 @@ module.exports = compareMainService = {
       cell.cssClass = cssClass;
     }
 
-    if (column === true || column === false) {
+    if (column === true || cell.text === "true") {
       cell.text = '<i class="fa fa-check green"></i>';
     }
 
-    if (column === false) {
+    if (column === false  || cell.text === "false") {
       cell.text = '<i class="fa fa-times red"></i>';
+    }
+
+    if (cell.text === "partial") {
+      cell.text = '<i class="fa fa-minus-square yellow"></i>';
     }
 
     row.columns.push(cell);

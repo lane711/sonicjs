@@ -5,7 +5,7 @@
     {{#if this.colspan}}
       <td class="{{this.cssClass}}" colspan={{this.colspan}}>{{this.text}}</td>
     {{else}}
-      <td class="{{this.cssClass}}">{{{this.text}}}</td>
+      <td class="{{this.cssClass}}">{{{this.text}}}{{{this.notes}}}</td>
     {{/if}}
     {{/this.columns}}
   </tr>
