@@ -1,6 +1,34 @@
 /* Css File for Module: compare */
-table.compare td{
-  background-color: blueviolet;
-  margin: 2px;
+
+table.compare td {
+  /* background-color: blueviolet; */
+  /* margin: 2px;
   border: 1px #fff solid;
+  text-align: center; */
+}
+
+table.compare .main-group {
+  margin: 10px 0;
+  font-weight: bold;
+}
+
+table.compare .main-group {
+  text-align: center;
+}
+
+table.compare .category {
+  text-align: left;
+}
+
+table.compare .sub-category {
+  text-align: left;
+  padding-left: 20px;
+}
+
+table.compare .green {
+  color: #4dbd74;
+}
+
+table.compare .red {
+  color: #f86c6b;
 }

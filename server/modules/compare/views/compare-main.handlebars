@@ -1,11 +1,11 @@
-<table class="compare">
+<table class="table table-striped compare">
   {{#data.matrix}}
   <tr>
     {{#this.columns}}
     {{#if this.colspan}}
-      <td colspan={{this.colspan}}>{{this.text}}</td>
+      <td class="{{this.cssClass}}" colspan={{this.colspan}}>{{this.text}}</td>
     {{else}}
-      <td>{{this.text}}</td>
+      <td class="{{this.cssClass}}">{{{this.text}}}</td>
     {{/if}}
     {{/this.columns}}
   </tr>

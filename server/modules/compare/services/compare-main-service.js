@@ -30,11 +30,11 @@ module.exports = compareMainService = {
   },
 
   getMatrixData: function(contentType, compareItems) {
-    let colspanCount = compareItems.length +1;
+    let colspanCount = compareItems.length + 1;
     let rows = [];
     contentType.forEach(group => {
       let row = { columns: [] };
-      this.addCell(row, group.label, true, colspanCount);
+      this.addCell(row, group.label, true, colspanCount, 'main-group');
       rows.push(row);
 
       // console.log(group.label);
@@ -43,50 +43,63 @@ module.exports = compareMainService = {
         let row = { columns: [] };
         if (element.label === "Field Set") {
           var fieldSet = element.components[0];
-          this.addCell(row, "--1" + fieldSet.label);
+          this.addCell(row, fieldSet.label, true, colspanCount, 'category');
           rows.push(row);
           rowAlreadyProcessed = true;
           //now need another row for child components
           fieldSet.values.forEach(fieldSetValue => {
             let row = { columns: [] };
-            this.addCell(row, "----" + fieldSetValue.label);
+            this.addCell(row, fieldSetValue.label, false, 0, 'sub-category');
 
             //add columns for compare items
             compareItems.forEach(complareItem => {
               let fieldSet = element.components[0];
               var fieldSetKey = fieldSet.key;
               let column = complareItem.data[fieldSetKey][fieldSetValue.value];
-              if(column != undefined){
-              this.addCell(row, column);
+              if (column != undefined) {
+                this.addCell(row, column);
               }
             });
 
             rows.push(row);
           });
         } else {
-          this.addCell(row, "--2" + element.label);
+          this.addCell(row, element.label, false, 0, 'category');
         }
 
         //add columns for compare items
         compareItems.forEach(complareItem => {
-          let column = complareItem.data[element.key];
-          this.addCell(row, column);
+          if (element.label !== "Field Set") {
+            let column = complareItem.data[element.key];
+            this.addCell(row, column);
+          }
         });
 
         if (!rowAlreadyProcessed) {
           rows.push(row);
         }
-
       });
     });
     return rows;
   },
 
-  addCell: function(row, column, colspan = false, colspanCount = 0) {
-    let cell = {text: column};
-    if(colspan){
+  addCell: function(row, column, colspan = false, colspanCount = 0, cssClass = "") {
+    let cell = { text: column };
+    if (colspan) {
       cell.colspan = colspanCount;
     }
+    if(cssClass){
+      cell.cssClass = cssClass;
+    }
+
+    if(column === true || column === false){
+      cell.text = '<i class="fa fa-check green"></i>';
+    }
+
+    if(column === false){
+      cell.text = '<i class="fa fa-times red"></i>';
+    }
+
     row.columns.push(cell);
   }
 };
