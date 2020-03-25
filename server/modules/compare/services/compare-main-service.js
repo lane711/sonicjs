@@ -120,6 +120,10 @@ module.exports = compareMainService = {
       cell.text = '<div><i class="fa fa-minus-square yellow"></i><i class="fa fa-comment"></i></div>';
     }
 
+    if (cell.text === "plannedTrue") {
+      cell.text = '<div><i class="fa fa-check light-green"></i></i><i class="fa fa-comment"></i></div>';
+    }
+
     row.columns.push(cell);
   }
 };

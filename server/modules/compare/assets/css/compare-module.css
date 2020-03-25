@@ -11,8 +11,9 @@ table.compare td {
 }
 
 table.compare .main-group {
-  padding: 20px 0;
+  padding: 14px 0;
   font-weight: bold;
+  font-size: 1.1rem;;
 }
 
 table.compare .main-group {
@@ -30,6 +31,10 @@ table.compare .sub-category {
 
 table.compare .green {
   color: #4dbd74;
+}
+
+table.compare .light-green {
+  color: #a0dbb5;
 }
 
 table.compare .red {
