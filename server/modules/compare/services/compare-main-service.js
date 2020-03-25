@@ -34,7 +34,7 @@ module.exports = compareMainService = {
     let rows = [];
     contentType.forEach(group => {
       let row = { columns: [] };
-      this.addCell(row, group.label, true, colspanCount, 'main-group');
+      this.addCell(row, group.label, true, colspanCount, "main-group");
       rows.push(row);
 
       // console.log(group.label);
@@ -43,13 +43,13 @@ module.exports = compareMainService = {
         let row = { columns: [] };
         if (element.label === "Field Set") {
           var fieldSet = element.components[0];
-          this.addCell(row, fieldSet.label, true, colspanCount, 'category');
+          this.addCell(row, fieldSet.label, true, colspanCount, "category");
           rows.push(row);
           rowAlreadyProcessed = true;
           //now need another row for child components
           fieldSet.values.forEach(fieldSetValue => {
             let row = { columns: [] };
-            this.addCell(row, fieldSetValue.label, false, 0, 'sub-category');
+            this.addCell(row, fieldSetValue.label, false, 0, "sub-category");
 
             //add columns for compare items
             compareItems.forEach(complareItem => {
@@ -64,7 +64,11 @@ module.exports = compareMainService = {
             rows.push(row);
           });
         } else {
-          this.addCell(row, element.label, false, 0, 'category');
+          if (element.label == "Content") {
+            rowAlreadyProcessed = true;
+          } else {
+            this.addCell(row, element.label, false, 0, "category");
+          }
         }
 
         //add columns for compare items
@@ -83,20 +87,26 @@ module.exports = compareMainService = {
     return rows;
   },
 
-  addCell: function(row, column, colspan = false, colspanCount = 0, cssClass = "") {
+  addCell: function(
+    row,
+    column,
+    colspan = false,
+    colspanCount = 0,
+    cssClass = ""
+  ) {
     let cell = { text: column };
     if (colspan) {
       cell.colspan = colspanCount;
     }
-    if(cssClass){
+    if (cssClass) {
       cell.cssClass = cssClass;
     }
 
-    if(column === true || column === false){
+    if (column === true || column === false) {
       cell.text = '<i class="fa fa-check green"></i>';
     }
 
-    if(column === false){
+    if (column === false) {
       cell.text = '<i class="fa fa-times red"></i>';
     }
 

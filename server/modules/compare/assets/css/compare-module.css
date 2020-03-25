@@ -1,10 +1,13 @@
 /* Css File for Module: compare */
+table.compare{
+  font-size: 14px;
+}
 
 table.compare td {
   /* background-color: blueviolet; */
   /* margin: 2px;
-  border: 1px #fff solid;
-  text-align: center; */
+  border: 1px #fff solid;*/
+  text-align: center;
 }
 
 table.compare .main-group {
@@ -22,7 +25,7 @@ table.compare .category {
 
 table.compare .sub-category {
   text-align: left;
-  padding-left: 20px;
+  padding-left: 30px;
 }
 
 table.compare .green {
