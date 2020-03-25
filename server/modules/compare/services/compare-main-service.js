@@ -117,7 +117,7 @@ module.exports = compareMainService = {
     }
 
     if (cell.text === "partial") {
-      cell.text = '<i class="fa fa-minus-square yellow"></i>';
+      cell.text = '<div><i class="fa fa-minus-square yellow"></i><i class="fa fa-comment"></i></div>';
     }
 
     row.columns.push(cell);

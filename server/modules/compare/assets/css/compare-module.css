@@ -11,7 +11,7 @@ table.compare td {
 }
 
 table.compare .main-group {
-  margin: 10px 0;
+  padding: 20px 0;
   font-weight: bold;
 }
 
@@ -38,4 +38,8 @@ table.compare .red {
 
 table.compare .yellow {
   color: #ffc107;
+}
+
+table.compare i{
+  font-size: 26px;
 }
