@@ -117,11 +117,17 @@ module.exports = compareMainService = {
     }
 
     if (cell.text === "partial") {
-      cell.text = '<div><i class="fa fa-minus-square yellow"></i><i class="fa fa-comment"></i></div>';
+      cell.text = '<i class="fa fa-minus-square yellow"></i>';
     }
 
     if (cell.text === "plannedTrue") {
-      cell.text = '<div><i class="fa fa-check light-green"></i></i><i class="fa fa-comment"></i></div>';
+      cell.text = '<i class="fa fa-check light-green"></i>';
+    }
+
+    if (cell.notes) {
+      let notesClean = cell.notes.replace(/"/g, "'");
+      console.log(notesClean);
+      cell.notes = `<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="${notesClean}"><i class="fa fa-comment"></i></button>`;
     }
 
     row.columns.push(cell);

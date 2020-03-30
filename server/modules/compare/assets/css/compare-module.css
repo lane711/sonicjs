@@ -10,6 +10,11 @@ table.compare td {
   text-align: center;
 }
 
+table.compare td{
+  /* display: inline-block;
+  text-align: left; */
+}
+
 table.compare .main-group {
   padding: 14px 0;
   font-weight: bold;
@@ -47,4 +52,8 @@ table.compare .yellow {
 
 table.compare i{
   font-size: 26px;
+}
+
+.tooltip-inner {
+  text-align: left;
 }
