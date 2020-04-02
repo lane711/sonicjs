@@ -264,7 +264,7 @@ module.exports = moduleService = {
     let moduleContentType = {
       title: `Module - ${moduleDefinitionFile.title}`,
       systemid: moduleDefinitionFile.systemid,
-      canBeAddedToColumn: moduleDefinitionFile.canBeAddedToColumn,
+      canBeAddedToColumn: moduleDefinitionFile.canBeAddedToColumn ? true : false,
       components: []
     };
     moduleContentType.components.push({
