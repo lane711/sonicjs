@@ -1139,7 +1139,7 @@ async function addModule(systemid) {
   let form = await formService.getForm(
     systemid,
     undefined,
-    "addModuleToColumn(submission)"
+    "addModuleToColumn(submission, true)"
   );
 
   $(".pb-side-panel #main").html(form);
@@ -1161,7 +1161,7 @@ async function editModule() {
   let form = await formService.getForm(
     currentModuleContentType,
     data,
-    "await editContentInstance(submission);"
+    "await editContentInstance(submission, true);"
   );
   $("#dynamicModelTitle").text(
     `Settings: ${currentModuleContentType} (Id:${currentModuleId})`
