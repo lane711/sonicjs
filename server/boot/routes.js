@@ -441,7 +441,11 @@ module.exports = function(app) {
 
     if (req.url.startsWith("/blog/")) {
       let page = await contentService.getBlog(req);
-      res.render("blog", page);
+      if (page === "error") {
+        res.sendStatus(404);
+      } else {
+        res.render("blog", page);
+      }
     } else if (
       (req.url == "/admin" || req.url.startsWith("/admin/")) &&
       !(await userService.isAuthenticated(req))
