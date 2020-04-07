@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="{{ page.data.metaDescription }}">
-  <meta name="author" content="">
+  <meta name="generator" content="SonicJs">
   <link rel="icon" href="/img/favicon.ico">
 
   <title>{{page.data.metaTitle}}</title>
@@ -32,7 +32,7 @@
   </style>
 
   <!-- Bootstrap core CSS -->
-  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <!-- Custom styles for this template -->
   {{#unless page.data.showPageBuilder}}
@@ -43,12 +43,12 @@
   <link href="/css/page-builder.css" rel="stylesheet">
   {{/if}}
 
-  <link href="/css/font-awesome.css" rel="stylesheet">
-  <link href="/jsoneditor.min.css" rel="stylesheet">
+  <link href="/node_modules/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  <link href="/node_modules/jsoneditor/dist/jsoneditor.min.js" rel="stylesheet">
   <link href="/node_modules/photoswipe/dist/photoswipe.css" rel="stylesheet">
   <link href="/node_modules/photoswipe/dist/default-skin/default-skin.css" rel="stylesheet">
   <link href="/node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css" rel="stylesheet">
-  <link href="/formio.full.min.css" rel="stylesheet">
+  <link href="/node_modules/formiojs/dist/formio.form.min.css" rel="stylesheet">
   {{{page.data.cssLinks}}}
 
   <base href="/">

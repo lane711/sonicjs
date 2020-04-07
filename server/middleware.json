@@ -47,57 +47,9 @@
       },
       {
         "paths": [
-          "/"
-        ],
-        "params": "$!../node_modules/bootstrap/dist"
-      },
-      {
-        "paths": [
-          "/node_modules"
-        ],
-        "params": "$!../node_modules"
-      },
-      {
-        "paths": [
-          "/"
-        ],
-        "params": "$!../node_modules/jquery/dist"
-      },
-      {
-        "paths": [
-          "/js"
-        ],
-        "params": "$!../node_modules/popper.js/dist/umd"
-      },
-      {
-        "paths": [
-          "/"
-        ],
-        "params": "$!../node_modules/jsoneditor/dist"
-      },
-      {
-        "paths": [
-          "/js"
-        ],
-        "params": "$!../node_modules/tinymce"
-      },
-      {
-        "paths": [
           "/vendors"
         ],
         "params": "$!../server/assets/vendors"
-      },
-      {
-        "paths": [
-          "/fonts"
-        ],
-        "params": "$!../node_modules/font-awesome/fonts"
-      },
-      {
-        "paths": [
-          "/"
-        ],
-        "params": "$!../node_modules/font-awesome"
       },
       {
         "paths": [
@@ -131,12 +83,6 @@
       },
       {
         "paths": [
-          "/"
-        ],
-        "params": "$!../node_modules/formiojs/dist"
-      },
-      {
-        "paths": [
           "/css"
         ],
         "params": "$!../server/storage/css"
@@ -158,6 +104,12 @@
           "/services"
         ],
         "params": "$!../server/services"
+      },
+      {
+        "paths": [
+          "/node_modules"
+        ],
+        "params": "$!../node_modules"
       }
     ]
   },
