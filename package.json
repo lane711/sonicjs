@@ -70,7 +70,8 @@
     "simple-line-icons": "^2.4.1",
     "sortablejs": "^1.10.2",
     "strong-error-handler": "^3.0.0",
-    "tinymce": "^5.0.7"
+    "tinymce": "^5.0.7",
+    "uglify-js": "^3.8.1"
   },
   "devDependencies": {
     "eslint": "^3.17.1",
