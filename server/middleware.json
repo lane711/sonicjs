@@ -77,6 +77,12 @@
       },
       {
         "paths": [
+          "/js"
+        ],
+        "params": "$!../server/assets/js"
+      },
+      {
+        "paths": [
           "/admin"
         ],
         "params": "$!../server/views/admin/assets"

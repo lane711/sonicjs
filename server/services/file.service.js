@@ -28,8 +28,8 @@ module.exports = fileService = {
             fs.readFile(adminPath, "utf8", (err, data) => {
                 if (err){
                     console.log(chalk.red(err));
-                   reject(err); 
-                } 
+                   reject(err);
+                }
                 else resolve(data);
             });
         });
@@ -43,8 +43,8 @@ module.exports = fileService = {
             fs.writeFile(fullPath, fileContent, (err, data) => {
                 if (err){
                     console.log(chalk.red(err));
-                   reject(err); 
-                } 
+                   reject(err);
+                }
                 else resolve(data);
             });
         });
@@ -56,5 +56,10 @@ module.exports = fileService = {
             fs.mkdirSync(dirPath);
         }
     },
+
+    fileExists: async function(path){
+      let dirPath = path.join(__dirname, path);
+      return await fs.exists(dirPath);
+    }
 
 }
