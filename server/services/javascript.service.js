@@ -73,8 +73,7 @@ module.exports = javascriptService = {
 
   createCombinedJsFile: async function (minifiedJs) {
     let path = '/assets/js/combined.js';
-    let e = await fileService.fileExists(path);
-    if(!(await fileService.fileExists(path))){
+    if(!(fileService.fileExists(path))){
       fileService.writeFile("../assets/js/combined.js", minifiedJs);
     }
   },

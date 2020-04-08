@@ -57,9 +57,9 @@ module.exports = fileService = {
         }
     },
 
-    fileExists: async function(path){
-      let dirPath = path.join(__dirname, path);
-      return await fs.exists(dirPath);
+    fileExists: function(filePath){
+      let dirPath = path.join(__dirname.replace('services',''), filePath);
+      return fs.existsSync(dirPath);
     }
 
 }
