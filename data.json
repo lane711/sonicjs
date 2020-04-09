@@ -1,7 +1,7 @@
 {
   "ids": {
     "contentType": 51,
-    "content": 501,
+    "content": 502,
     "fieldType": 2,
     "e2e-test": 2
   },
@@ -490,7 +490,8 @@
       "497": "{\"id\":497,\"data\":{\"title\":\"Section 5\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[TITLE id=\\\"491\\\"]\"}]},{\"class\":\"row\",\"columns\":[{\"class\":\"col-md-4\",\"content\":\"[TEXT id=\\\"496\\\"]\"},{\"class\":\"col-md-8\",\"content\":\"[HTML id=\\\"492\\\"]\"}]}],\"createdOn\":1585769011405}}",
       "498": "{\"data\":{\"level\":\"warning\",\"alertCopy\":\"<p>ipsum de lotr</p>\",\"contentType\":\"alert\",\"submit\":true,\"createdOn\":1585790079013},\"id\":498}",
       "499": "{\"data\":{\"title\":\"-92771image127\",\"file\":\"-92771image127.jpeg\",\"contentType\":\"media\",\"createdOn\":1586394494498},\"id\":499}",
-      "500": "{\"id\":500,\"data\":{\"title\":\"js-back-end\",\"type\":\"js\",\"area\":\"backEnd\",\"paths\":[{\"path\":\"/mp-path.js\"},{\"path\":\"/lkjsdf.js\"}],\"contentType\":\"asset\",\"createdOn\":1586402892003,\"submit\":true}}"
+      "500": "{\"id\":500,\"data\":{\"title\":\"js-back-end\",\"type\":\"js\",\"area\":\"backEnd\",\"paths\":[{\"path\":\"/mp-path.js\"},{\"path\":\"/lkjsdf.js\"}],\"contentType\":\"asset\",\"createdOn\":1586402892003,\"submit\":true}}",
+      "501": "{\"id\":501,\"data\":{\"title\":\"js-front-end\",\"type\":\"js\",\"area\":\"frontEnd\",\"paths\":[{\"path\":\"/node_modules/jquery/dist/jquery.min.js\"},{\"path\":\"/node_modules/ace-builds/src-min-noconflict/ace.js\"}],\"contentType\":\"asset\",\"createdOn\":1586444592491,\"submit\":true}}"
     },
     "fieldType": {
       "1": "{\"name\":\"string\",\"renderFunction\":\"string\",\"id\":1}"

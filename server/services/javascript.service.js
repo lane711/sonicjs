@@ -37,7 +37,22 @@ module.exports = javascriptService = {
   },
 
   getJsAssets: async function (options) {
-    let assets = await dataService.getContentByContentTypeAndTitle('asset','js-back-end')
+    let paths = [];
+    if(globalService.isBackEnd){
+      let assets = await dataService.getContentByContentTypeAndTitle('asset','js-back-end')
+      this.addPaths(options, assets.data.paths);
+    }
+
+    if(globalService.isFrontEnd){
+      let assets = await dataService.getContentByContentTypeAndTitle('asset','js-front-end')
+      this.addPaths(options, assets.data.paths);
+    }
+  },
+
+  addPaths: function (options, paths) {
+    paths.forEach(path => {
+      options.page.data.jsLinks.push(path);
+    });
   },
 
   processJsLinksForDevMode: async function (options) {
@@ -57,10 +72,19 @@ module.exports = javascriptService = {
   processJsLinksForProdMode: async function (options) {
     var jsCode = "";
 
+    //add module js files
     await globalService.asyncForEach(
       globalService.moduleJsFiles,
       async (link) => {
         let fileContent = await fileService.getFile(link);
+        jsCode += fileContent + "\n";
+      }
+    );
+
+    await globalService.asyncForEach(
+      options.page.data.jsLinks,
+      async (link) => {
+        let fileContent = await fileService.getFile(link.path, true);
         jsCode += fileContent + "\n";
       }
     );

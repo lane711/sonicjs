@@ -20,9 +20,13 @@ module.exports = fileService = {
     //     });
     // },
 
-    getFile: async function (filePath) {
-        let adminPath = path.join(__dirname, '../', filePath);
-        // console.log('adminPath--->', adminPath);
+    getFile: async function (filePath, root = false) {
+      let adminPath = "";
+      if(root){
+        adminPath = path.join(__dirname, '../../', filePath);
+      }else{
+        adminPath = path.join(__dirname, '../', filePath);
+      }
 
         return new Promise((resolve, reject) => {
             fs.readFile(adminPath, "utf8", (err, data) => {

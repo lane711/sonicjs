@@ -25,20 +25,17 @@
     }
   };
 
-  exports.setAreaMode = async function (isAdmin = false, isFrontEnd = false, isAuthenticated = false) {
-    if(isAdmin){
-       isFrontEnd = false;
-       isPageBuilder = false;
-       return;
-    }
+  exports.setAreaMode = function (
+    isBackEnd = false,
+    isFrontEnd = false,
+    isAuthenticated = false
+  ) {
 
-    if(isFrontEnd){
-       isAdmin = false;
-       isPageBuilder = isAuthenticated;
-    }
+    this.isBackEnd = isBackEnd;
+    this.isFrontEnd = isFrontEnd;
+    this.isPageBuilder = isFrontEnd && isAuthenticated;
 
   };
-
 })(typeof exports === "undefined" ? (this["globalService"] = {}) : exports);
 
 // var eventBusService = require('./event-bus.service');
