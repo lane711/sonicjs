@@ -34,6 +34,9 @@ module.exports = javascriptService = {
   },
 
   processJsLinksForDevMode: async function (options) {
+    return;
+    if (process.env.MODE === "prod") return;
+
     await globalService.asyncForEach(
       globalService.moduleJsFiles,
       async (link) => {
