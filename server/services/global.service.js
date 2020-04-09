@@ -1,4 +1,4 @@
-(function(exports) {
+(function (exports) {
   var isAdminUserCreated = false;
   var axiosInstance;
   var baseUrl;
@@ -9,19 +9,35 @@
   var moduleJsFiles = [];
   var AccessToken;
   var isRequestAlreadyHandled = false;
-
+  var isBackEnd = false;
+  var isFrontEnd = false;
+  var isPageBuilder = false;
 
   // your code goes here
 
-  exports.test = function() {
+  exports.test = function () {
     return "hello world";
   };
 
   exports.asyncForEach = async function (array, callback) {
     for (let index = 0; index < array.length; index++) {
-        await callback(array[index], index, array);
+      await callback(array[index], index, array);
     }
-}
+  };
+
+  exports.setAreaMode = async function (isAdmin = false, isFrontEnd = false, isAuthenticated = false) {
+    if(isAdmin){
+       isFrontEnd = false;
+       isPageBuilder = false;
+       return;
+    }
+
+    if(isFrontEnd){
+       isAdmin = false;
+       isPageBuilder = isAuthenticated;
+    }
+
+  };
 
 })(typeof exports === "undefined" ? (this["globalService"] = {}) : exports);
 
@@ -60,6 +76,3 @@
 //     }
 
 // }
-
-
-

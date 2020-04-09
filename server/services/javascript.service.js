@@ -1,6 +1,7 @@
 var globalService = require("./global.service");
 var eventBusService = require("./event-bus.service");
 var fileService = require("./file.service");
+var dataService = require("./data.service");
 
 var UglifyJS = require("uglify-es");
 
@@ -28,9 +29,15 @@ module.exports = javascriptService = {
   getJsLinks: async function (options) {
     options.page.data.jsLinks = [];
 
+    await this.getJsAssets(options);
+
     await this.processJsLinksForDevMode(options);
 
     await this.processJsLinksForProdMode(options);
+  },
+
+  getJsAssets: async function (options) {
+    let assets = await dataService.getContentByContentTypeAndTitle('asset','js-back-end')
   },
 
   processJsLinksForDevMode: async function (options) {

@@ -473,6 +473,8 @@ module.exports = function(app) {
         res.send(401);
       }
 
+      globalService.setAreaMode(true, false, true);
+
       let path = req.url.split("/");
       let viewName = "admin-dashboard";
       let param1 = null;
@@ -576,6 +578,8 @@ module.exports = function(app) {
         accessToken: accessToken
       });
     } else {
+      let isAuthenticated = await userService.isAuthenticated(req);
+      globalService.setAreaMode(false, true, isAuthenticated);
       var page = await contentService.getRenderedPage(req);
       mixPanelService.trackEvent("PAGE_LOAD", req, {
         page: page.page.data.title,
