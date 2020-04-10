@@ -28,6 +28,8 @@ module.exports = javascriptService = {
 
   getJsLinks: async function (options) {
     options.page.data.jsLinks = [];
+    options.page.data.jsLinksList = [];
+
 
     await this.getJsAssets(options);
 
@@ -51,26 +53,41 @@ module.exports = javascriptService = {
 
   addPaths: function (options, paths) {
     paths.forEach(path => {
-      options.page.data.jsLinks.push(path);
+      options.page.data.jsLinksList.push(path);
     });
   },
 
   processJsLinksForDevMode: async function (options) {
-    return;
+    // return;
     if (process.env.MODE === "prod") return;
+
+    await globalService.asyncForEach(
+      options.page.data.jsLinksList,
+      async (link) => {
+        options.page.data.jsLinks += `<script src="${link.path}"></script>`;
+      }
+    );
 
     await globalService.asyncForEach(
       globalService.moduleJsFiles,
       async (link) => {
         options.page.data.jsLinks += `<script src="${link}"></script>`;
-        //get file path
-        let fileContent = await fileService.getFile(link);
       }
     );
   },
 
   processJsLinksForProdMode: async function (options) {
+    return;
     var jsCode = "";
+
+    await globalService.asyncForEach(
+      options.page.data.jsLinks,
+      async (link) => {
+        options.page.data.jsLinks += `<script src="${link.path}"></script>`;
+        let fileContent = await fileService.getFile(link.path, true);
+        jsCode += fileContent + "\n";
+      }
+    );
 
     //add module js files
     await globalService.asyncForEach(
@@ -81,24 +98,7 @@ module.exports = javascriptService = {
       }
     );
 
-    await globalService.asyncForEach(
-      options.page.data.jsLinks,
-      async (link) => {
-        let fileContent = await fileService.getFile(link.path, true);
-        jsCode += fileContent + "\n";
-      }
-    );
-
-    var minifiedCss = UglifyJS.minify(jsCode, {
-      // compress: {
-      //   dead_code: true,
-      //   global_defs: {
-      //     DEBUG: false,
-      //   },
-      // },
-    });
-
-    await this.createCombinedJsFile(minifiedCss.code);
+    await this.createCombinedJsFile(jsCode);
 
     let version = 1;
     options.page.data.jsLinks += `<script src="/js/combined.js?v=${version}"></script>`;
@@ -108,6 +108,16 @@ module.exports = javascriptService = {
   createCombinedJsFile: async function (minifiedJs) {
     let path = '/assets/js/combined.js';
     if(!(fileService.fileExists(path))){
+
+      var minifiedCss = UglifyJS.minify(jsCode, {
+        compress: {
+          dead_code: true,
+          global_defs: {
+            DEBUG: false,
+          },
+        },
+      });
+
       fileService.writeFile("../assets/js/combined.js", minifiedJs);
     }
   },
