@@ -49,12 +49,24 @@ module.exports = javascriptService = {
       let assets = await dataService.getContentByContentTypeAndTitle('asset','js-front-end')
       this.addPaths(options, assets.data.paths);
     }
+
+    //add module js files
+    await globalService.asyncForEach(
+      globalService.moduleJsFiles,
+      async (path) => {
+        this.addPath(options, {path: path});
+      }
+    );
   },
 
   addPaths: function (options, paths) {
     paths.forEach(path => {
-      options.page.data.jsLinksList.push(path);
+      this.addPath(options, path);
     });
+  },
+
+  addPath: function (options, path) {
+      options.page.data.jsLinksList.push(path);
   },
 
   processJsLinksForDevMode: async function (options) {
@@ -68,32 +80,18 @@ module.exports = javascriptService = {
       }
     );
 
-    await globalService.asyncForEach(
-      globalService.moduleJsFiles,
-      async (link) => {
-        options.page.data.jsLinks += `<script src="${link}"></script>`;
-      }
-    );
   },
 
   processJsLinksForProdMode: async function (options) {
-    return;
+    // return;
+        if (process.env.MODE !== "prod") return;
+
     var jsCode = "";
 
     await globalService.asyncForEach(
-      options.page.data.jsLinks,
+      options.page.data.jsLinksList,
       async (link) => {
-        options.page.data.jsLinks += `<script src="${link.path}"></script>`;
         let fileContent = await fileService.getFile(link.path, true);
-        jsCode += fileContent + "\n";
-      }
-    );
-
-    //add module js files
-    await globalService.asyncForEach(
-      globalService.moduleJsFiles,
-      async (link) => {
-        let fileContent = await fileService.getFile(link);
         jsCode += fileContent + "\n";
       }
     );
