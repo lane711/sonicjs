@@ -77,6 +77,12 @@
       },
       {
         "paths": [
+          "/"
+        ],
+        "params": "$!../node_modules/ace-builds/src-min-noconflict"
+      },
+      {
+        "paths": [
           "/js"
         ],
         "params": "$!../server/assets/js"
