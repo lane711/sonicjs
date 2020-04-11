@@ -53,7 +53,7 @@
       },
       {
         "paths": [
-          "/"
+          "/page-builder"
         ],
         "params": "$!../server/page-builder"
       },
@@ -80,6 +80,12 @@
           "/js"
         ],
         "params": "$!../server/assets/js"
+      },
+      {
+        "paths": [
+          "/assets"
+        ],
+        "params": "$!../server/assets"
       },
       {
         "paths": [

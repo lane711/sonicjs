@@ -70,8 +70,8 @@ module.exports = javascriptService = {
   },
 
   processJsLinksForDevMode: async function (options) {
-    // return;
-    if (process.env.MODE === "prod") return;
+    return;
+    // if (process.env.MODE === "prod") return;
 
     await globalService.asyncForEach(
       options.page.data.jsLinksList,
@@ -84,14 +84,15 @@ module.exports = javascriptService = {
 
   processJsLinksForProdMode: async function (options) {
     // return;
-        if (process.env.MODE !== "prod") return;
+        // if (process.env.MODE !== "prod") return;
 
     var jsCode = "";
 
     await globalService.asyncForEach(
       options.page.data.jsLinksList,
       async (link) => {
-        let fileContent = await fileService.getFile(link.path, true);
+        let root = link.path.startsWith('/node_modules');
+        let fileContent = await fileService.getFile(link.path, root);
         jsCode += fileContent + "\n";
       }
     );
@@ -103,11 +104,11 @@ module.exports = javascriptService = {
 
   },
 
-  createCombinedJsFile: async function (minifiedJs) {
+  createCombinedJsFile: async function (jsCode) {
     let path = '/assets/js/combined.js';
     if(!(fileService.fileExists(path))){
 
-      var minifiedCss = UglifyJS.minify(jsCode, {
+      var minifiedJs = UglifyJS.minify(jsCode, {
         compress: {
           dead_code: true,
           global_defs: {
@@ -116,7 +117,7 @@ module.exports = javascriptService = {
         },
       });
 
-      fileService.writeFile("../assets/js/combined.js", minifiedJs);
+      fileService.writeFile("../assets/js/combined.js", minifiedJs.code);
     }
   },
 
