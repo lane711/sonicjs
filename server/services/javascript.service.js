@@ -20,9 +20,10 @@ module.exports = javascriptService = {
       if (process.env.MODE !== "production") return;
 
       if (options.req.url.startsWith("/js/combined-")) {
-        let jsFile = path.join(__dirname, "..", "/assets/js/combined.js");
         let version = options.req.query.v;
         let appVersion = globalService.getAppVersion();
+        let jsFileName = `combined-${appVersion}.js`;
+        let jsFile = path.join(__dirname, "..", `/assets/js/${jsFileName}`);
 
         options.res.setHeader("Cache-Control", "public, max-age=2592000");
         options.res.setHeader(
@@ -95,7 +96,7 @@ module.exports = javascriptService = {
   },
 
   processJsLinksForDevMode: async function (options) {
-    if (process.env.MODE === "production") return;
+    // if (process.env.MODE === "production") return;
 
     await globalService.asyncForEach(
       options.page.data.jsLinksList,
@@ -106,6 +107,7 @@ module.exports = javascriptService = {
   },
 
   processJsLinksForProdMode: async function (options) {
+    return;
     if (process.env.MODE !== "production") return;
 
     var jsCode = "";

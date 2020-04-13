@@ -1,3 +1,4 @@
+
 (function (exports) {
   var isAdminUserCreated = false;
   var axiosInstance;
@@ -13,9 +14,14 @@
   var isFrontEnd = false;
   var isPageBuilder = false;
 
-  const path = require("path");
 
-  // your code goes here
+  if (typeof module !== "undefined" && module.exports) {
+    const path = require("path");
+
+  } else {
+    //client version
+  }
+
 
   exports.test = function () {
     return "hello world";
