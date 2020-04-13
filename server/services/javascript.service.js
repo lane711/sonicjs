@@ -17,7 +17,7 @@ module.exports = javascriptService = {
 
     eventBusService.on("requestBegin", async function (options) {
       //handle combined js file
-      if (process.env.MODE !== "prod") return;
+      if (process.env.MODE !== "production") return;
 
       if (options.req.url.startsWith("/js/combined-")) {
         let jsFile = path.join(__dirname, "..", "/assets/js/combined.js");
@@ -95,7 +95,7 @@ module.exports = javascriptService = {
   },
 
   processJsLinksForDevMode: async function (options) {
-    if (process.env.MODE === "prod") return;
+    if (process.env.MODE === "production") return;
 
     await globalService.asyncForEach(
       options.page.data.jsLinksList,
@@ -106,7 +106,7 @@ module.exports = javascriptService = {
   },
 
   processJsLinksForProdMode: async function (options) {
-    if (process.env.MODE !== "prod") return;
+    if (process.env.MODE !== "production") return;
 
     var jsCode = "";
 
