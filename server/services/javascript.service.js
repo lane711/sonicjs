@@ -15,22 +15,25 @@ module.exports = javascriptService = {
       }
     });
 
-    eventBusService.on("requestBegin", async function(options) {
+    eventBusService.on("requestBegin", async function (options) {
+      //handle combined js file
+      if (process.env.MODE !== "prod") return;
 
-      if(options.req.url.startsWith("/js/combined-")){
-        let jsFile = path.join(__dirname, "..", '/assets/js/combined.js');
+      if (options.req.url.startsWith("/js/combined-")) {
+        let jsFile = path.join(__dirname, "..", "/assets/js/combined.js");
         let version = options.req.query.v;
         let appVersion = globalService.getAppVersion();
 
         options.res.setHeader("Cache-Control", "public, max-age=2592000");
-        options.res.setHeader("Expires", new Date(Date.now() + 2592000000).toUTCString());
+        options.res.setHeader(
+          "Expires",
+          new Date(Date.now() + 2592000000).toUTCString()
+        );
         options.res.sendFile(jsFile);
         options.req.isRequestAlreadyHandled = true;
         return;
       }
-
     });
-
   },
 
   // getGeneratedCss: async function () {
@@ -47,7 +50,6 @@ module.exports = javascriptService = {
     options.page.data.jsLinks = [];
     options.page.data.jsLinksList = [];
 
-
     await this.getJsAssets(options);
 
     await this.processJsLinksForDevMode(options);
@@ -57,13 +59,19 @@ module.exports = javascriptService = {
 
   getJsAssets: async function (options) {
     let paths = [];
-    if(globalService.isBackEnd){
-      let assets = await dataService.getContentByContentTypeAndTitle('asset','js-back-end')
+    if (globalService.isBackEnd) {
+      let assets = await dataService.getContentByContentTypeAndTitle(
+        "asset",
+        "js-back-end"
+      );
       this.addPaths(options, assets.data.paths);
     }
 
-    if(globalService.isFrontEnd){
-      let assets = await dataService.getContentByContentTypeAndTitle('asset','js-front-end')
+    if (globalService.isFrontEnd) {
+      let assets = await dataService.getContentByContentTypeAndTitle(
+        "asset",
+        "js-front-end"
+      );
       this.addPaths(options, assets.data.paths);
     }
 
@@ -71,24 +79,23 @@ module.exports = javascriptService = {
     await globalService.asyncForEach(
       globalService.moduleJsFiles,
       async (path) => {
-        this.addPath(options, {path: path});
+        this.addPath(options, { path: path });
       }
     );
   },
 
   addPaths: function (options, paths) {
-    paths.forEach(path => {
+    paths.forEach((path) => {
       this.addPath(options, path);
     });
   },
 
   addPath: function (options, path) {
-      options.page.data.jsLinksList.push(path);
+    options.page.data.jsLinksList.push(path);
   },
 
   processJsLinksForDevMode: async function (options) {
-    return;
-    // if (process.env.MODE === "prod") return;
+    if (process.env.MODE === "prod") return;
 
     await globalService.asyncForEach(
       options.page.data.jsLinksList,
@@ -96,19 +103,17 @@ module.exports = javascriptService = {
         options.page.data.jsLinks += `<script src="${link.path}"></script>`;
       }
     );
-
   },
 
   processJsLinksForProdMode: async function (options) {
-    // return;
-        // if (process.env.MODE !== "prod") return;
+    if (process.env.MODE !== "prod") return;
 
     var jsCode = "";
 
     await globalService.asyncForEach(
       options.page.data.jsLinksList,
       async (link) => {
-        let root = link.path.startsWith('/node_modules');
+        let root = link.path.startsWith("/node_modules");
         let fileContent = await fileService.getFile(link.path, root);
         jsCode += fileContent + "\n";
       }
@@ -121,13 +126,11 @@ module.exports = javascriptService = {
 
     let version = 1;
     options.page.data.jsLinks += `<script src="/js/${jsFileName}"></script>`;
-
   },
 
   createCombinedJsFile: async function (jsCode, jsFileName) {
     let path = `/assets/js/${jsFileName}`;
-    if(!(fileService.fileExists(path))){
-
+    if (!fileService.fileExists(path)) {
       var minifiedJs = UglifyJS.minify(jsCode, {
         compress: {
           dead_code: true,
