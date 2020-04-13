@@ -132,12 +132,7 @@ module.exports = javascriptService = {
     let path = `/assets/js/${jsFileName}`;
     if (!fileService.fileExists(path)) {
       var minifiedJs = UglifyJS.minify(jsCode, {
-        compress: {
-          dead_code: true,
-          global_defs: {
-            DEBUG: false,
-          },
-        },
+        compress: false,
       });
 
       fileService.writeFile(`../assets/js/${jsFileName}`, minifiedJs.code);
