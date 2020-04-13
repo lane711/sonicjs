@@ -2,7 +2,7 @@ var globalService = require("./global.service");
 var eventBusService = require("./event-bus.service");
 var fileService = require("./file.service");
 var dataService = require("./data.service");
-
+const path = require("path");
 var UglifyJS = require("uglify-es");
 
 module.exports = javascriptService = {
@@ -14,6 +14,23 @@ module.exports = javascriptService = {
         await javascriptService.getJsLinks(options);
       }
     });
+
+    eventBusService.on("requestBegin", async function(options) {
+
+      if(options.req.url.startsWith("/js/combined-")){
+        let jsFile = path.join(__dirname, "..", '/assets/js/combined.js');
+        let version = options.req.query.v;
+        let appVersion = globalService.getAppVersion();
+
+        options.res.setHeader("Cache-Control", "public, max-age=2592000");
+        options.res.setHeader("Expires", new Date(Date.now() + 2592000000).toUTCString());
+        options.res.sendFile(jsFile);
+        options.req.isRequestAlreadyHandled = true;
+        return;
+      }
+
+    });
+
   },
 
   // getGeneratedCss: async function () {
@@ -97,15 +114,18 @@ module.exports = javascriptService = {
       }
     );
 
-    await this.createCombinedJsFile(jsCode);
+    let appVersion = globalService.getAppVersion();
+    let jsFileName = `combined-${appVersion}.js`;
+
+    await this.createCombinedJsFile(jsCode, jsFileName);
 
     let version = 1;
-    options.page.data.jsLinks += `<script src="/js/combined.js?v=${version}"></script>`;
+    options.page.data.jsLinks += `<script src="/js/${jsFileName}"></script>`;
 
   },
 
-  createCombinedJsFile: async function (jsCode) {
-    let path = '/assets/js/combined.js';
+  createCombinedJsFile: async function (jsCode, jsFileName) {
+    let path = `/assets/js/${jsFileName}`;
     if(!(fileService.fileExists(path))){
 
       var minifiedJs = UglifyJS.minify(jsCode, {
@@ -117,7 +137,7 @@ module.exports = javascriptService = {
         },
       });
 
-      fileService.writeFile("../assets/js/combined.js", minifiedJs.code);
+      fileService.writeFile(`../assets/js/${jsFileName}`, minifiedJs.code);
     }
   },
 

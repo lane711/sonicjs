@@ -432,12 +432,6 @@ module.exports = function(app) {
       req.url.indexOf(".woff") > -1
     ) {
       // log(chalk.blue(req.url));
-      if(req.url.startsWith("/js/combined.js?")){
-        let jsFile = path.join(__dirname, "..", '/assets/js/combined.js');
-        let version = req.query.v;
-        res.sendFile(jsFile);
-        return;
-      }
 
       return next();
     }

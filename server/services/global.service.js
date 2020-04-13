@@ -13,10 +13,20 @@
   var isFrontEnd = false;
   var isPageBuilder = false;
 
+  const path = require("path");
+
   // your code goes here
 
   exports.test = function () {
     return "hello world";
+  };
+
+  exports.getAppVersion = function () {
+    let packageJsonPath = path.join(__dirname, "../..", 'package.json');
+    var pjson = require(packageJsonPath);
+    if (pjson) {
+      return pjson.version;
+    }
   };
 
   exports.asyncForEach = async function (array, callback) {
@@ -30,11 +40,9 @@
     isFrontEnd = false,
     isAuthenticated = false
   ) {
-
     this.isBackEnd = isBackEnd;
     this.isFrontEnd = isFrontEnd;
     this.isPageBuilder = isFrontEnd && isAuthenticated;
-
   };
 })(typeof exports === "undefined" ? (this["globalService"] = {}) : exports);
 
