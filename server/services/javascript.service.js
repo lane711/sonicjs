@@ -96,7 +96,7 @@ module.exports = javascriptService = {
   },
 
   processJsLinksForDevMode: async function (options) {
-    // if (process.env.MODE === "production") return;
+    if (process.env.MODE === "production") return;
 
     await globalService.asyncForEach(
       options.page.data.jsLinksList,
@@ -107,7 +107,6 @@ module.exports = javascriptService = {
   },
 
   processJsLinksForProdMode: async function (options) {
-    return;
     if (process.env.MODE !== "production") return;
 
     var jsCode = "";

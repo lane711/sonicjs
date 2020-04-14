@@ -1,4 +1,3 @@
-
 (function (exports) {
   var isAdminUserCreated = false;
   var axiosInstance;
@@ -13,22 +12,21 @@
   var isBackEnd = false;
   var isFrontEnd = false;
   var isPageBuilder = false;
-
+  var path;
 
   if (typeof module !== "undefined" && module.exports) {
-    const path = require("path");
 
   } else {
     //client version
   }
-
 
   exports.test = function () {
     return "hello world";
   };
 
   exports.getAppVersion = function () {
-    let packageJsonPath = path.join(__dirname, "../..", 'package.json');
+    const path = require("path");
+    let packageJsonPath = path.join(__dirname, "../..", "package.json");
     var pjson = require(packageJsonPath);
     if (pjson) {
       return pjson.version;
