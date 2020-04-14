@@ -4,14 +4,16 @@ var fileService = require("./file.service");
 var dataService = require("./data.service");
 const path = require("path");
 var UglifyJS = require("uglify-es");
+var assetType = "";
 
-module.exports = javascriptService = {
+module.exports = assetService = {
   startup: async function () {
     eventBusService.on("getRenderedPagePostDataFetch", async function (
       options
     ) {
       if (options && options.page) {
-        await javascriptService.getJsLinks(options);
+        await assetService.getLinks(options, 'js');
+        await assetService.getLinks(options, 'css');
       }
     });
 
@@ -19,51 +21,51 @@ module.exports = javascriptService = {
       //handle combined js file
       if (process.env.MODE !== "production") return;
 
-      if (options.req.url.startsWith("/js/combined-")) {
-        let version = options.req.query.v;
+      if (
+        options.req.url.startsWith("/js/combined-") ||
+        options.req.url.startsWith("/css/combined-")
+      ) {
+        this.assetType = options.req.url.includes("/js/") ? "js" : "css";
         let appVersion = globalService.getAppVersion();
-        let jsFileName = `combined-${appVersion}.js`;
-        let jsFile = path.join(__dirname, "..", `/assets/js/${jsFileName}`);
+        let fileName = `combined-${appVersion}.${this.assetType}`;
+        let file = path.join(
+          __dirname,
+          "..",
+          `/assets/${this.assetType}/${fileName}`
+        );
 
         options.res.setHeader("Cache-Control", "public, max-age=2592000");
         options.res.setHeader(
           "Expires",
           new Date(Date.now() + 2592000000).toUTCString()
         );
-        options.res.sendFile(jsFile);
+        options.res.sendFile(file);
         options.req.isRequestAlreadyHandled = true;
         return;
       }
     });
   },
 
-  // getGeneratedCss: async function () {
-
-  //     var cssString = '';// 'body {background:lightblue;}';
-  //     cssString = await this.processSections(cssString)
-  //     var ast = css.parse(cssString);
-
-  //     let cssFile = css.stringify(ast);
-  //     return cssFile;
-  // },
-
-  getJsLinks: async function (options) {
-    options.page.data.jsLinks = [];
+  getLinks: async function (options, assetType) {
+    this.assetType = assetType;
+    options.page.data.links = {};
+    options.page.data.links[this.assetType] = [];
     options.page.data.jsLinksList = [];
+    options.page.data.cssLinksList = [];
 
-    await this.getJsAssets(options);
+    await this.getAssets(options);
 
-    await this.processJsLinksForDevMode(options);
+    await this.processLinksForDevMode(options);
 
-    await this.processJsLinksForProdMode(options);
+    await this.processLinksForProdMode(options);
   },
 
-  getJsAssets: async function (options) {
+  getAssets: async function (options) {
     let paths = [];
     if (globalService.isBackEnd) {
       let assets = await dataService.getContentByContentTypeAndTitle(
         "asset",
-        "js-back-end"
+        `${this.assetType}-back-end`
       );
       this.addPaths(options, assets.data.paths);
     }
@@ -71,18 +73,20 @@ module.exports = javascriptService = {
     if (globalService.isFrontEnd) {
       let assets = await dataService.getContentByContentTypeAndTitle(
         "asset",
-        "js-front-end"
+        `${this.assetType}-front-end`
       );
       this.addPaths(options, assets.data.paths);
     }
 
     //add module js files
-    await globalService.asyncForEach(
-      globalService.moduleJsFiles,
-      async (path) => {
-        this.addPath(options, { path: path });
-      }
-    );
+    if (this.assetType === "js") {
+      await globalService.asyncForEach(
+        globalService.moduleJsFiles,
+        async (path) => {
+          this.addPath(options, { path: path });
+        }
+      );
+    }
   },
 
   addPaths: function (options, paths) {
@@ -92,10 +96,15 @@ module.exports = javascriptService = {
   },
 
   addPath: function (options, path) {
+    if (this.assetType === "js") {
     options.page.data.jsLinksList.push(path);
+    }
+    if (this.assetType === "css") {
+      options.page.data.cssLinksList.push(path);
+      }
   },
 
-  processJsLinksForDevMode: async function (options) {
+  processLinksForDevMode: async function (options) {
     if (process.env.MODE === "production") return;
 
     await globalService.asyncForEach(
@@ -106,7 +115,7 @@ module.exports = javascriptService = {
     );
   },
 
-  processJsLinksForProdMode: async function (options) {
+  processLinksForProdMode: async function (options) {
     if (process.env.MODE !== "production") return;
 
     var jsCode = "";
@@ -122,11 +131,13 @@ module.exports = javascriptService = {
 
     let appVersion = globalService.getAppVersion();
     let jsFileName = `combined-${appVersion}.js`;
+    let cssFileName = `combined-${appVersion}.css`;
 
     await this.createCombinedJsFile(jsCode, jsFileName);
 
     let version = 1;
     options.page.data.jsLinks += `<script src="/js/${jsFileName}"></script>`;
+    options.page.data.cssLinks += `<link href="/css/${cssFileName}" rel="stylesheet">`;
   },
 
   createCombinedJsFile: async function (jsCode, jsFileName) {
@@ -139,30 +150,4 @@ module.exports = javascriptService = {
       fileService.writeFile(`../assets/js/${jsFileName}`, minifiedJs.code);
     }
   },
-
-  // processSections: async function (cssString) {
-
-  //     let sections = await dataService.getContentByContentType('section')
-  //     sections.forEach(section => {
-  //         if (section.data.background) {
-  //             if (section.data.background.type === 'color') {
-  //                 let color = section.data.background.color;
-  //                 cssString += ` section[data-id="${section.id}"]{background-color:${color}}`
-  //             }
-  //         }
-  //     });
-
-  //     return cssString;
-  // },
-
-  // getJsFile: async function (page) {
-  //     //get template.css
-  //     let cssString = await fileService.getFile('storage/css/template.css');
-  //     //parse the css
-  //     var ast = csstree.parse(cssString);
-  //     let cleanCss = csstree.generate(ast);
-  //     let beatifulCss = cssbeautify(cleanCss);
-
-  //     page.data.editor = { "css" : beatifulCss} ;
-  // },
 };
