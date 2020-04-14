@@ -70,6 +70,8 @@ module.exports = contentService = {
 
     await eventBusService.emit("preRender", { req: req, page: this.page });
 
+    this.page.data.appVersion = globalService.getAppVersion;
+
     return { page: this.page };
   },
 
