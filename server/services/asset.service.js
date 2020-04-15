@@ -88,11 +88,22 @@ module.exports = assetService = {
         }
       );
     }
+
+    //add module css files
+    if (this.assetType === "css") {
+      await globalService.asyncForEach(
+        globalService.moduleCssFiles,
+        async (path) => {
+          this.addPath(options, { path: path });
+        }
+      );
+    }
   },
 
   addPaths: function (options, paths) {
     paths.forEach((path) => {
-      let skipAsset = (path.pageBuilderOnly && !options.page.data.showPageBuilder);
+      let skipAsset =
+        path.pageBuilderOnly && !options.page.data.showPageBuilder;
       if (!skipAsset) {
         this.addPath(options, path);
       }
