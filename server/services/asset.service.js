@@ -92,7 +92,10 @@ module.exports = assetService = {
 
   addPaths: function (options, paths) {
     paths.forEach((path) => {
-      this.addPath(options, path);
+      let skipAsset = (path.pageBuilderOnly && !options.page.data.showPageBuilder);
+      if (!skipAsset) {
+        this.addPath(options, path);
+      }
     });
   },
 
@@ -106,7 +109,6 @@ module.exports = assetService = {
     await globalService.asyncForEach(
       options.page.data.links[this.assetType],
       async (link) => {
-
         if (this.assetType === "js") {
           options.page.data.jsLinks += `<script src="${link.path}"></script>`;
         }
@@ -114,7 +116,6 @@ module.exports = assetService = {
         if (this.assetType === "css") {
           options.page.data.cssLinks += `<link href="${link.path}" rel="stylesheet">`;
         }
-
       }
     );
   },

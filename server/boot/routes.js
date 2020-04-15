@@ -20,7 +20,6 @@ contentService.startup();
 var cssService = require("../services/css.service");
 cssService.startup();
 var assetService = require("../services/asset.service");
-assetService.startup();
 var userService = require("../services/user.service");
 var helperService = require("../services/helper.service");
 var sharedService = require("../services/shared.service");
@@ -52,6 +51,7 @@ module.exports = function(app) {
     await mediaService.startup();
     await siteSettingsService.startup();
     await userService.startup();
+    await assetService.startup();
 
     await eventBusService.emit("startup");
   })();
