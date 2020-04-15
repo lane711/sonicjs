@@ -12,8 +12,11 @@ module.exports = assetService = {
       options
     ) {
       if (options && options.page) {
-        await assetService.getLinks(options, 'js');
-        await assetService.getLinks(options, 'css');
+        options.page.data.jsLinks = "";
+        options.page.data.cssLinks = "";
+
+        await assetService.getLinks(options, "js");
+        await assetService.getLinks(options, "css");
       }
     });
 
@@ -50,8 +53,6 @@ module.exports = assetService = {
     this.assetType = assetType;
     options.page.data.links = {};
     options.page.data.links[this.assetType] = [];
-    options.page.data.jsLinksList = [];
-    options.page.data.cssLinksList = [];
 
     await this.getAssets(options);
 
@@ -96,21 +97,24 @@ module.exports = assetService = {
   },
 
   addPath: function (options, path) {
-    if (this.assetType === "js") {
-    options.page.data.jsLinksList.push(path);
-    }
-    if (this.assetType === "css") {
-      options.page.data.cssLinksList.push(path);
-      }
+    options.page.data.links[this.assetType].push(path);
   },
 
   processLinksForDevMode: async function (options) {
     if (process.env.MODE === "production") return;
 
     await globalService.asyncForEach(
-      options.page.data.jsLinksList,
+      options.page.data.links[this.assetType],
       async (link) => {
-        options.page.data.jsLinks += `<script src="${link.path}"></script>`;
+
+        if (this.assetType === "js") {
+          options.page.data.jsLinks += `<script src="${link.path}"></script>`;
+        }
+
+        if (this.assetType === "css") {
+          options.page.data.cssLinks += `<link href="${link.path}" rel="stylesheet">`;
+        }
+
       }
     );
   },
@@ -121,7 +125,7 @@ module.exports = assetService = {
     var jsCode = "";
 
     await globalService.asyncForEach(
-      options.page.data.jsLinksList,
+      options.page.data.links[this.assetType],
       async (link) => {
         let root = link.path.startsWith("/node_modules");
         let fileContent = await fileService.getFile(link.path, root);
