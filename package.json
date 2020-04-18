@@ -32,6 +32,7 @@
     "css": "^2.2.4",
     "css-tree": "^1.0.0-alpha.35",
     "cssbeautify": "^0.3.1",
+    "csso": "^4.0.3",
     "datatables.net": "^1.10.20",
     "datatables.net-autofill": "^2.3.4",
     "datatables.net-autofill-bs4": "^2.3.4",
