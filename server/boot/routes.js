@@ -451,9 +451,9 @@ module.exports = function(app) {
       (req.url == "/admin" || req.url.startsWith("/admin/")) &&
       !(await userService.isAuthenticated(req))
     ) {
-      if (process.env.MODE !== "dev") {
-        res.send(401);
-      }
+      // if (process.env.MODE !== "dev") {
+      //   res.send(401);
+      // }
 
       let qsParams = url.parse(req.url, true).query;
       let data = {};
@@ -469,9 +469,9 @@ module.exports = function(app) {
         //user not logged in
       }
 
-      if (process.env.MODE !== "dev") {
-        res.send(401);
-      }
+      // if (process.env.MODE !== "dev") {
+      //   res.send(401);
+      // }
 
       globalService.setAreaMode(true, false, true);
 

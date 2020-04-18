@@ -31,7 +31,7 @@ module.exports = assetService = {
       ) {
         this.assetType = options.req.url.includes("/js/") ? "js" : "css";
         let appVersion = globalService.getAppVersion();
-        let fileName = `combined-${appVersion}.${this.assetType}`;
+        let fileName = this.getCombinedFileName();
         let file = path.join(
           __dirname,
           "..",
@@ -148,6 +148,7 @@ module.exports = assetService = {
           link.path = '/storage/css/template.css';
         }
         let fileContentRaw = await fileService.getFile(link.path, root);
+        console.log(`Adding Path: ${link.path } -- Size: ${fileContentRaw.length}`);
         fileContent += fileContentRaw + "\n";
       }
     );
