@@ -1,6 +1,6 @@
 {
   "name": "sonicjs-cms",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "main": "server/server.js",
   "engines": {
     "node": ">=4 <12.9.2"
