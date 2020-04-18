@@ -1345,6 +1345,7 @@ async function setupACEEditor() {
   if ($("#editor").length === 0) {
     return;
   }
+
   var editor = ace.edit("editor");
   editor.setTheme("ace/theme/monokai");
   editor.session.setMode("ace/mode/css");
