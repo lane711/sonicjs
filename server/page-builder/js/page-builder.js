@@ -1443,7 +1443,7 @@ async function setupDropZone() {
 }
 
 async function beatifyACECss() {
-  if (ace.require) {
+  if (typeof ace !== 'undefined') {
     var beautify = ace.require("ace/ext/beautify"); // get reference to extension
     var editor = ace.edit("editor"); // get reference to editor
     beautify.beautify(editor.session);
