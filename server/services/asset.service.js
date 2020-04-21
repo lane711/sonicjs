@@ -17,9 +17,8 @@ module.exports = assetService = {
         options.page.data.jsLinks = "";
         options.page.data.cssLinks = "";
 
-        if (process.env.MODE !== "production") return;
 
-        if (!assetService.doesAssetFilesExist()) {
+        if (!assetService.doesAssetFilesExist() || process.env.MODE !== "production") {
           await assetService.getLinks(options, "js");
           await assetService.getLinks(options, "css");
         }else{
