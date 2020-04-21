@@ -47,7 +47,7 @@ module.exports = contentService = {
 
     let cachedPage = cacheService.getCache().get(req.url);
     if (cachedPage !== undefined) {
-      console.log('returning from cache');
+      // console.log('returning from cache');
       return { page: cachedPage };
     }
     else{
@@ -87,7 +87,7 @@ module.exports = contentService = {
 
     let cache = cacheService.getCache();
     success = cache.set(req.url, this.page);
-    console.log(success);
+    // console.log(success);
 
     return { page: this.page };
   },

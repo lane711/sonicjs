@@ -1,6 +1,4 @@
-if (process.env.MODE == "production") {
-  const NodeCache = require("node-cache");
-}
+const NodeCache = require("node-cache");
 var cache;
 
 module.exports = cacheService = {
@@ -11,7 +9,7 @@ module.exports = cacheService = {
   },
 
   getCache: function () {
-    if (process.env.MODE == "production") {
+    if (process.env.MODE === "production") {
       return this.cache;
     }
 
