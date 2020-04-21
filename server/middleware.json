@@ -107,6 +107,12 @@
       },
       {
         "paths": [
+          "/css"
+        ],
+        "params": "$!../node_modules/bootstrap/dist/css"
+      },
+      {
+        "paths": [
           "/js"
         ],
         "params": "$!../server/storage/js"
