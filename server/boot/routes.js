@@ -1,5 +1,7 @@
 var eventBusService = require("../services/event-bus.service");
 var globalService = require("../services/global.service");
+var cacheService = require("../services/cache.service");
+
 // globalService.startup();
 var themes = require(__dirname + "../../themes/themes");
 var pageBuilderService = require("../services/page-builder.service");
@@ -47,6 +49,7 @@ module.exports = function(app) {
   let adminPage = "";
 
   (async () => {
+    await cacheService.startup();
     await menuService.startup();
     await mediaService.startup();
     await siteSettingsService.startup();

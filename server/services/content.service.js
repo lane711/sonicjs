@@ -5,6 +5,7 @@ var menuService = require(".//menu.service");
 var helperService = require(".//helper.service");
 var userService = require(".//user.service");
 var globalService = require(".//global.service");
+var cacheService = require(".//cache.service");
 
 var dataService = require(".//data.service");
 
@@ -22,11 +23,14 @@ var id;
 var req;
 var modulesToDelayProcessing = [];
 
+const NodeCache = require("node-cache");
+const myCache = new NodeCache();
+
 module.exports = contentService = {
-  startup: async function() {
+  startup: async function () {
     eventBusService.on(
       "postProcessModuleShortCodeProccessedHtml",
-      async function(options) {
+      async function (options) {
         if (options) {
           contentService.wrapBlockInModuleDiv(
             options.proccessedHtml,
@@ -37,9 +41,15 @@ module.exports = contentService = {
     );
   },
 
-  getRenderedPage: async function(req) {
+  getRenderedPage: async function (req) {
     this.req = req;
     // eventBusService.emit('getRenderedPagePreDataFetch', req);
+
+    let cachedPage = cacheService.getCache().get(req.url);
+    if (cachedPage !== undefined) {
+      console.log('returning from cache');
+      return { page: cachedPage };
+    }
 
     this.page = await dataService.getContentByUrl(req.url);
     if (!this.page || this.page.data.title == "Not Found") {
@@ -58,7 +68,7 @@ module.exports = contentService = {
 
     await eventBusService.emit("getRenderedPagePostDataFetch", {
       req: req,
-      page: this.page
+      page: this.page,
     });
 
     let rows = [];
@@ -72,10 +82,14 @@ module.exports = contentService = {
 
     this.page.data.appVersion = globalService.getAppVersion;
 
+    let cache = cacheService.getCache();
+    success = cache.set(req.url, this.page);
+    console.log(success);
+
     return { page: this.page };
   },
 
-  getPage: async function(id, instance) {
+  getPage: async function (id, instance) {
     if (!id) {
       return;
     }
@@ -98,7 +112,7 @@ module.exports = contentService = {
           reject(err);
         } else {
           // console.log('data==>', data);
-          this.processTemplate(data).then(html => {
+          this.processTemplate(data).then((html) => {
             resolve("ok");
             // console.log('getPage.page-->', html.length);
             // this.page.data.body = html;
@@ -114,7 +128,7 @@ module.exports = contentService = {
     });
   },
 
-  getBlog: async function(req) {
+  getBlog: async function (req) {
     let blog = await dataService.getContentByUrl(req.url);
     blog = blog.data[0];
     if (blog) {
@@ -126,7 +140,7 @@ module.exports = contentService = {
 
       await eventBusService.emit("getRenderedPagePostDataFetch", {
         req: req,
-        page: blog
+        page: blog,
       });
 
       // let page = this.page.data[0];
@@ -136,7 +150,7 @@ module.exports = contentService = {
     return "error";
   },
 
-  getPageByUrl: async function(id, instance) {},
+  getPageByUrl: async function (id, instance) {},
 
   // getSandboxPage: async function (id, instance) {
   //     let themePath = __dirname + '/../assets/html/sandbox.html';
@@ -157,7 +171,7 @@ module.exports = contentService = {
   //     });
   // },
 
-  processTemplate: async function(html) {
+  processTemplate: async function (html) {
     globalService.pageContent = ""; //reset
     // this.setupShortCodeParser();
     // console.log('=== processTemplate ===')
@@ -203,14 +217,14 @@ module.exports = contentService = {
   //     });
   // },
 
-  processMenu: async function($) {
+  processMenu: async function ($) {
     let menuItemTemplate = $.html(".s--menu-item");
     let navWrapper = $(".s--menu-item").parent();
     navWrapper.empty();
 
     let menuItems = await dataService.getContentByType("menu");
     // console.log('menuItems', menuItems);
-    menuItems.forEach(menuItem => {
+    menuItems.forEach((menuItem) => {
       // console.log('menuItem', menuItem);
       let item = menuItemTemplate
         .replace("Home", menuItem.data.name)
@@ -219,7 +233,7 @@ module.exports = contentService = {
     });
   },
 
-  processSections: async function($) {
+  processSections: async function ($) {
     await eventBusService.emit("preProcessSections");
 
     this.page.data.sections = [];
@@ -232,7 +246,7 @@ module.exports = contentService = {
     if (page.data && page.data.layout) {
       let sections = page.data.layout;
 
-      await this.asyncForEach(sections, async sectionId => {
+      await this.asyncForEach(sections, async (sectionId) => {
         let section = await dataService.getContentById(sectionId);
         if (section) {
           globalService.pageContent += `<section data-id='${section.id}' class="jumbotron-fluid">`;
@@ -259,7 +273,7 @@ module.exports = contentService = {
           this.page.data.sections.push({
             id: sectionId,
             title: section.data.title,
-            rows: rows
+            rows: rows,
           });
         }
       });
@@ -269,7 +283,7 @@ module.exports = contentService = {
   },
 
   //TODO loop thru rows
-  processRows: async function(section, $, sectionWrapper, rows) {
+  processRows: async function (section, $, sectionWrapper, rows) {
     let rowArray = [];
     let rowIndex = 0;
 
@@ -288,7 +302,7 @@ module.exports = contentService = {
     return rowArray;
   },
 
-  processColumns: async function(section, row, rowIndex) {
+  processColumns: async function (section, row, rowIndex) {
     let columnArray = [];
     let columnIndex = 0;
 
@@ -316,7 +330,7 @@ module.exports = contentService = {
     return columnArray;
   },
 
-  processShortCodes: async function(section, body, rowIndex, columnIndex) {
+  processShortCodes: async function (section, body, rowIndex, columnIndex) {
     let parsedBlock = ShortcodeTree.parse(body);
 
     await eventBusService.emit("preProcessModuleShortCode");
@@ -337,7 +351,7 @@ module.exports = contentService = {
             req: this.req,
             shortcode: shortcode,
             rowIndex: rowIndex,
-            columnIndex: columnIndex
+            columnIndex: columnIndex,
           });
 
           //old way, TODO: refac
@@ -359,21 +373,21 @@ module.exports = contentService = {
 
   //loop thru again to support modules that need delayed processing
   //ei: module B needs module A to process first so that it can use the data generated by module A
-  processDelayedModules: async function() {
+  processDelayedModules: async function () {
     for (let shortcode of modulesToDelayProcessing) {
       await eventBusService.emit("beginProcessModuleShortCodeDelayed", {
         section: undefined,
         req: this.req,
         shortcode: shortcode,
         rowIndex: 0,
-        columnIndex: 0
+        columnIndex: 0,
       });
     }
     // console.log("done delayed modules");
     // console.log("================");
   },
 
-  wrapBlockInModuleDiv: function(proccessedHtml, viewModel) {
+  wrapBlockInModuleDiv: function (proccessedHtml, viewModel) {
     let wrapperCss = "module";
     if (viewModel.data.settings && viewModel.data.settings.data.wrapperCss) {
       wrapperCss += " " + viewModel.data.settings.data.wrapperCss;
@@ -404,7 +418,7 @@ module.exports = contentService = {
   //     });
   // },
 
-  replaceBlockShortCode: async function(shortcode) {
+  replaceBlockShortCode: async function (shortcode) {
     let blockId = shortcode.properties.id;
     let content = await dataService.getContentById(blockId);
     // console.log('replaceShortCode.getContentById', content);
@@ -415,7 +429,7 @@ module.exports = contentService = {
     );
   },
 
-  replaceFormShortCode: async function(shortcode) {
+  replaceFormShortCode: async function (shortcode) {
     let blockId = shortcode.properties.id;
     let contentType = shortcode.properties.contentType;
 
@@ -428,7 +442,7 @@ module.exports = contentService = {
     );
   },
 
-  replaceListShortCode: async function(shortcode) {
+  replaceListShortCode: async function (shortcode) {
     let blockId = shortcode.properties.id;
     let contentType = shortcode.properties.contentType;
 
@@ -439,9 +453,9 @@ module.exports = contentService = {
     );
   },
 
-  asyncForEach: async function(array, callback) {
+  asyncForEach: async function (array, callback) {
     for (let index = 0; index < array.length; index++) {
       await callback(array[index], index, array);
     }
-  }
+  },
 };
