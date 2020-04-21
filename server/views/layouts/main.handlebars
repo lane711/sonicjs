@@ -40,9 +40,6 @@
   <link href="/api/containers/css/download/template.css" rel="stylesheet">
   {{/unless}}
 
-  {{#if page.data.showPageBuilder}}
-  <link href="/page-builder/css/page-builder.css" rel="stylesheet">
-  {{/if}}
 
   <link href="/node_modules/font-awesome/css/font-awesome.min.css" rel="stylesheet">
   <link href="/node_modules/jsoneditor/dist/jsoneditor.min.js" rel="stylesheet">
@@ -51,9 +48,13 @@
   <link href="/node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css" rel="stylesheet">
   <link href="/node_modules/formiojs/dist/formio.form.min.css" rel="stylesheet"> --}}
 
-    {{!-- <link type="text/css" href="/css/combined-0.0.8.css" rel="stylesheet"> --}}
+  {{!-- <link type="text/css" href="/css/combined-0.0.8.css" rel="stylesheet"> --}}
 
   {{{page.data.cssLinks}}}
+
+  {{#if page.data.showPageBuilder}}
+  <link href="/page-builder/css/page-builder.css" rel="stylesheet">
+  {{/if}}
 
   <base href="/">
 
@@ -91,7 +92,7 @@
     </div>
   </footer>
 
-{{! js links here }}
+  {{! js links here }}
   {{{page.data.jsLinks}}}
 
   {{!-- <script src="/node_modules/jquery/dist/jquery.min.js"></script>

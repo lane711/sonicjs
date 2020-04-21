@@ -16,7 +16,7 @@ module.exports = assetService = {
         options.page.data.jsLinks = "";
         options.page.data.cssLinks = "";
 
-        // await assetService.getLinks(options, "js");
+        await assetService.getLinks(options, "js");
         await assetService.getLinks(options, "css");
       }
     });
