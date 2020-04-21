@@ -3,14 +3,21 @@ var cache;
 
 module.exports = cacheService = {
   startup: function () {
-    this.cache = new NodeCache({ stdTTL: 100, checkperiod: 120 });
+    this.cache = new NodeCache({ stdTTL: 60 * 60, checkperiod: 600 });
   },
 
   getCache: function () {
-    return this.cache;
-  },
+    if (process.env.MODE == "production") {
+      return this.cache;
+    }
 
-  test: function () {
-    return 'ok';
-  },
+    function get(){
+      return undefined;
+    }
+    function set(){
+      return undefined;
+    }
+    return { get, set };
+  }
+
 };
