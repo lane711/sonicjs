@@ -16,7 +16,7 @@ module.exports = assetService = {
         options.page.data.jsLinks = "";
         options.page.data.cssLinks = "";
 
-        await assetService.getLinks(options, "js");
+        // await assetService.getLinks(options, "js");
         await assetService.getLinks(options, "css");
       }
     });
@@ -31,7 +31,7 @@ module.exports = assetService = {
       ) {
         this.assetType = options.req.url.includes("/js/") ? "js" : "css";
         let appVersion = globalService.getAppVersion();
-        let fileName = this.getCombinedFileName();
+        let fileName = assetService.getCombinedFileName(this.assetType);
         let file = path.join(
           __dirname,
           "..",
@@ -150,23 +150,24 @@ module.exports = assetService = {
         let fileContentRaw = await fileService.getFile(link.path, root);
         console.log(`Adding Path: ${link.path } -- Size: ${fileContentRaw.length}`);
         fileContent += fileContentRaw + "\n";
+        console.log(`fileContent Size: ${fileContent.length}`);
       }
     );
 
     let appVersion = globalService.getAppVersion();
-    let fileName = this.getCombinedFileName();
+    let fileName = this.getCombinedFileName(this.assetType);
 
     if (this.assetType === "js") {
       options.page.data.jsLinks += `<script src="/js/${fileName}"></script>`;
-      await this.createCombinedJsFile(fileContent, fileName);
+      await this.createCombinedFile(fileContent, fileName);
     }
     if (this.assetType === "css") {
       options.page.data.cssLinks += `<link href="/css/${fileName}" rel="stylesheet">`;
-      await this.createCombinedJsFile(fileContent, fileName);
+      await this.createCombinedFile(fileContent, fileName);
     }
   },
 
-  createCombinedJsFile: async function (fileContent, fileName) {
+  createCombinedFile: async function (fileContent, fileName) {
     let path = this.getAssetPath(fileName);
     let minifiedAsset = "";
     if (!fileService.fileExists(path)) {
@@ -177,7 +178,7 @@ module.exports = assetService = {
         }).code;
       }
         if (this.assetType === "css") {
-          minifiedAsset = csso.minify(fileContent).css;
+          minifiedAsset = fileContent; // csso.minify(fileContent).css;
         }
 
         fileService.writeFile(
@@ -191,9 +192,9 @@ module.exports = assetService = {
        return `/assets/${this.assetType}/${fileName}`;
     },
 
-    getCombinedFileName: function () {
+    getCombinedFileName: function (assetType) {
       let appVersion = globalService.getAppVersion();
-      return `combined-${appVersion}.${this.assetType}`;
+      return `combined-${appVersion}.${assetType}`;
    }
 
 };
