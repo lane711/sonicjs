@@ -1,4 +1,4 @@
-(function(exports) {
+(function (exports) {
   var isAdminUserCreated = false;
   var axiosInstance;
   var baseUrl;
@@ -9,20 +9,45 @@
   var moduleJsFiles = [];
   var AccessToken;
   var isRequestAlreadyHandled = false;
+  var isBackEnd = false;
+  var isFrontEnd = false;
+  var isPageBuilder = false;
+  var path;
 
+  if (typeof module !== "undefined" && module.exports) {
 
-  // your code goes here
+  } else {
+    //client version
+  }
 
-  exports.test = function() {
+  exports.test = function () {
     return "hello world";
+  };
+
+  exports.getAppVersion = function () {
+    const path = require("path");
+    let packageJsonPath = path.join(__dirname, "../..", "package.json");
+    var pjson = require(packageJsonPath);
+    if (pjson) {
+      return pjson.version;
+    }
   };
 
   exports.asyncForEach = async function (array, callback) {
     for (let index = 0; index < array.length; index++) {
-        await callback(array[index], index, array);
+      await callback(array[index], index, array);
     }
-}
+  };
 
+  exports.setAreaMode = function (
+    isBackEnd = false,
+    isFrontEnd = false,
+    isAuthenticated = false
+  ) {
+    this.isBackEnd = isBackEnd;
+    this.isFrontEnd = isFrontEnd;
+    this.isPageBuilder = isFrontEnd && isAuthenticated;
+  };
 })(typeof exports === "undefined" ? (this["globalService"] = {}) : exports);
 
 // var eventBusService = require('./event-bus.service');
@@ -60,6 +85,3 @@
 //     }
 
 // }
-
-
-

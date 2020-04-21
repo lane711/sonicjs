@@ -47,61 +47,13 @@
       },
       {
         "paths": [
-          "/"
-        ],
-        "params": "$!../node_modules/bootstrap/dist"
-      },
-      {
-        "paths": [
-          "/node_modules"
-        ],
-        "params": "$!../node_modules"
-      },
-      {
-        "paths": [
-          "/"
-        ],
-        "params": "$!../node_modules/jquery/dist"
-      },
-      {
-        "paths": [
-          "/js"
-        ],
-        "params": "$!../node_modules/popper.js/dist/umd"
-      },
-      {
-        "paths": [
-          "/"
-        ],
-        "params": "$!../node_modules/jsoneditor/dist"
-      },
-      {
-        "paths": [
-          "/js"
-        ],
-        "params": "$!../node_modules/tinymce"
-      },
-      {
-        "paths": [
           "/vendors"
         ],
         "params": "$!../server/assets/vendors"
       },
       {
         "paths": [
-          "/fonts"
-        ],
-        "params": "$!../node_modules/font-awesome/fonts"
-      },
-      {
-        "paths": [
-          "/"
-        ],
-        "params": "$!../node_modules/font-awesome"
-      },
-      {
-        "paths": [
-          "/"
+          "/page-builder"
         ],
         "params": "$!../server/page-builder"
       },
@@ -125,21 +77,39 @@
       },
       {
         "paths": [
+          "/"
+        ],
+        "params": "$!../node_modules/ace-builds/src-min-noconflict"
+      },
+      {
+        "paths": [
+          "/js"
+        ],
+        "params": "$!../server/assets/js"
+      },
+      {
+        "paths": [
+          "/assets"
+        ],
+        "params": "$!../server/assets"
+      },
+      {
+        "paths": [
           "/admin"
         ],
         "params": "$!../server/views/admin/assets"
       },
       {
         "paths": [
-          "/"
+          "/css"
         ],
-        "params": "$!../node_modules/formiojs/dist"
+        "params": "$!../server/storage/css"
       },
       {
         "paths": [
           "/css"
         ],
-        "params": "$!../server/storage/css"
+        "params": "$!../node_modules/bootstrap/dist/css"
       },
       {
         "paths": [
@@ -158,6 +128,18 @@
           "/services"
         ],
         "params": "$!../server/services"
+      },
+      {
+        "paths": [
+          "/node_modules"
+        ],
+        "params": "$!../node_modules"
+      },
+      {
+        "paths": [
+          "/fonts"
+        ],
+        "params": "$!../node_modules/font-awesome/fonts"
       }
     ]
   },
