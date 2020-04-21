@@ -1,9 +1,13 @@
-const NodeCache = require("node-cache");
+if (process.env.MODE == "production") {
+  const NodeCache = require("node-cache");
+}
 var cache;
 
 module.exports = cacheService = {
   startup: function () {
-    this.cache = new NodeCache({ stdTTL: 60 * 60, checkperiod: 600 });
+    if (process.env.MODE == "production") {
+      this.cache = new NodeCache({ stdTTL: 60 * 60, checkperiod: 600 });
+    }
   },
 
   getCache: function () {
@@ -11,13 +15,8 @@ module.exports = cacheService = {
       return this.cache;
     }
 
-    function get(){
-      return undefined;
-    }
-    function set(){
-      return undefined;
-    }
+    function get() {}
+    function set() {}
     return { get, set };
-  }
-
+  },
 };
