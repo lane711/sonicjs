@@ -53,6 +53,12 @@
       },
       {
         "paths": [
+          "/"
+        ],
+        "params": "$!../server/assets/text"
+      },
+      {
+        "paths": [
           "/page-builder"
         ],
         "params": "$!../server/page-builder"

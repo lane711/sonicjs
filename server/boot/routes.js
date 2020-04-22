@@ -429,6 +429,7 @@ module.exports = function(app) {
       req.url.endsWith(".jpg") ||
       req.url.endsWith(".png") ||
       req.url.endsWith(".svg") ||
+      req.url.endsWith(".txt") ||
       req.url.endsWith(".js") ||
       req.url.indexOf(".js?") > -1 ||
       req.url.indexOf("fonts") > -1 ||

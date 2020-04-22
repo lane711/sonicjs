@@ -1,0 +1,9 @@
+# Group 1
+User-agent: *
+Disallow: /admin/
+Disallow: /api/
+Disallow: /explorer/
+
+# Group 2
+User-agent: *
+Allow: /
