@@ -408,6 +408,7 @@ module.exports = function(app) {
       }
     }
 
+
     //for modules css/js files
     if (
       (req.url.endsWith(".css") || req.url.endsWith(".js")) &&
