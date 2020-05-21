@@ -1,3 +1,4 @@
+# PLEASE STAR THIS PROJECT !!! :)
 
 ![Image of SonicJs Logo](https://sonicjs.com/api/containers/files/download/sonicjs-logo-dark.svg)
 [https://sonicjs.com](https://sonicjs.com)
