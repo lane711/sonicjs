@@ -22,3 +22,5 @@ npm-debug.log
 admin/e2e/puppeteer/screenshots/*.png
 server/storage/container1/*
 data-user.json
+sonicjscom-deploy.sh
+

@@ -1,5 +1,7 @@
 var eventBusService = require("../services/event-bus.service");
 var globalService = require("../services/global.service");
+var cacheService = require("../services/cache.service");
+
 // globalService.startup();
 var themes = require(__dirname + "../../themes/themes");
 var pageBuilderService = require("../services/page-builder.service");
@@ -19,8 +21,7 @@ var contentService = require("../services/content.service");
 contentService.startup();
 var cssService = require("../services/css.service");
 cssService.startup();
-var javascriptService = require("../services/javascript.service");
-javascriptService.startup();
+var assetService = require("../services/asset.service");
 var userService = require("../services/user.service");
 var helperService = require("../services/helper.service");
 var sharedService = require("../services/shared.service");
@@ -48,10 +49,12 @@ module.exports = function(app) {
   let adminPage = "";
 
   (async () => {
+    await cacheService.startup();
     await menuService.startup();
     await mediaService.startup();
     await siteSettingsService.startup();
     await userService.startup();
+    await assetService.startup();
 
     await eventBusService.emit("startup");
   })();
@@ -405,6 +408,7 @@ module.exports = function(app) {
       }
     }
 
+
     //for modules css/js files
     if (
       (req.url.endsWith(".css") || req.url.endsWith(".js")) &&
@@ -426,7 +430,9 @@ module.exports = function(app) {
       req.url.endsWith(".jpg") ||
       req.url.endsWith(".png") ||
       req.url.endsWith(".svg") ||
+      req.url.endsWith(".txt") ||
       req.url.endsWith(".js") ||
+      req.url.indexOf(".js?") > -1 ||
       req.url.indexOf("fonts") > -1 ||
       req.url.indexOf(".woff") > -1
     ) {
@@ -441,7 +447,11 @@ module.exports = function(app) {
 
     if (req.url.startsWith("/blog/")) {
       let page = await contentService.getBlog(req);
-      res.render("blog", page);
+      if (page === "error") {
+        res.sendStatus(404);
+      } else {
+        res.render("blog", page);
+      }
     } else if (
       (req.url == "/admin" || req.url.startsWith("/admin/")) &&
       !(await userService.isAuthenticated(req))
@@ -467,6 +477,8 @@ module.exports = function(app) {
       if (process.env.MODE !== "dev") {
         res.send(401);
       }
+
+      globalService.setAreaMode(true, false, true);
 
       let path = req.url.split("/");
       let viewName = "admin-dashboard";
@@ -571,6 +583,8 @@ module.exports = function(app) {
         accessToken: accessToken
       });
     } else {
+      let isAuthenticated = await userService.isAuthenticated(req);
+      globalService.setAreaMode(false, true, isAuthenticated);
       var page = await contentService.getRenderedPage(req);
       mixPanelService.trackEvent("PAGE_LOAD", req, {
         page: page.page.data.title,

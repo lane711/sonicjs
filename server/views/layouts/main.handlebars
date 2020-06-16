@@ -5,7 +5,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="{{ page.data.metaDescription }}">
-  <meta name="author" content="">
+  <meta name="generator" content="SonicJs">
+  <meta name="version" content="{{ page.data.appVersion }}">
   <link rel="icon" href="/img/favicon.ico">
 
   <title>{{page.data.metaTitle}}</title>
@@ -32,24 +33,28 @@
   </style>
 
   <!-- Bootstrap core CSS -->
-  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  {{!-- <link href="/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <!-- Custom styles for this template -->
   {{#unless page.data.showPageBuilder}}
   <link href="/api/containers/css/download/template.css" rel="stylesheet">
   {{/unless}}
 
-  {{#if page.data.showPageBuilder}}
-  <link href="/css/page-builder.css" rel="stylesheet">
-  {{/if}}
 
-  <link href="/css/font-awesome.css" rel="stylesheet">
-  <link href="/jsoneditor.min.css" rel="stylesheet">
+  <link href="/node_modules/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  <link href="/node_modules/jsoneditor/dist/jsoneditor.min.js" rel="stylesheet">
   <link href="/node_modules/photoswipe/dist/photoswipe.css" rel="stylesheet">
   <link href="/node_modules/photoswipe/dist/default-skin/default-skin.css" rel="stylesheet">
   <link href="/node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css" rel="stylesheet">
-  <link href="/formio.full.min.css" rel="stylesheet">
+  <link href="/node_modules/formiojs/dist/formio.form.min.css" rel="stylesheet"> --}}
+
+  {{!-- <link type="text/css" href="/css/combined-0.0.8.css" rel="stylesheet"> --}}
+
   {{{page.data.cssLinks}}}
+
+  {{#if page.data.showPageBuilder}}
+  <link href="/page-builder/css/page-builder.css" rel="stylesheet">
+  {{/if}}
 
   <base href="/">
 
@@ -80,24 +85,30 @@
         <div class="col">
           <p>Powered by <a href="https://sonicjs.com">SonicJs Node CMS</a></p>
         </div>
+        <div class="col text-right">
+          <p>© 2020, SonicJS. All rights reserved.</p>
+        </div>
       </div>
     </div>
   </footer>
 
-  <script src="jquery.min.js"></script>
+  {{! js links here }}
+  {{{page.data.jsLinks}}}
+
+  {{!-- <script src="/node_modules/jquery/dist/jquery.min.js"></script>
   <script src="/node_modules/ace-builds/src-min-noconflict/ace.js"></script>
   <script src="/node_modules/ace-builds/src-min-noconflict/ext-beautify.js"></script>
   <script src="/node_modules/axios/dist/axios.min.js"></script>
-  <script src="/js/popper.js"></script>
-  <script src="/js/bootstrap.min.js"></script>
-  <script src="/js/tinymce.min.js"></script>
-  <script src="/js/jquery.tinymce.min.js"></script>
-  <script src="/jsoneditor.min.js"></script>
-  <script src="/formio.full.min.js"></script>
+  <script src="/node_modules/popper.js/dist/popper.js"></script>
+  <script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script src="/node_modules/tinymce/tinymce.min.js"></script>
+  <script src="/node_modules/tinymce/jquery.tinymce.min.js"></script>
+  <script src="/node_modules/jsoneditor/dist/jsoneditor.min.js"></script>
+  <script src="/node_modules/formiojs/dist/formio.full.min.js"></script>
   <script src="/node_modules/photoswipe/dist/photoswipe.min.js"></script>
   <script src="/node_modules/photoswipe/dist/photoswipe-ui-default.min.js"></script>
   <script src="/node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.js"></script>
-  <script src="/vendors/dropzone/dropzone.min.js"></script>
+  <script src="/node_modules/dropzone/dist/min/dropzone.min.js"></script>
   <script src="/js/common.js"></script>
   <script src="/services/shared.service.js"></script>
   <script src="/services/global.service.js"></script>
@@ -105,10 +116,7 @@
   <script src="/services/data.service.js"></script>
   <script src="/services/form.service.js"></script>
   <script src="/services/analytics.service.js"></script>
-  <script src="/js/page-builder.js"></script>
-
-
-  {{{page.data.jsLinks}}}
+  <script src="/js/page-builder.js"></script>--}}
 
   {{> photoswipe }}
 

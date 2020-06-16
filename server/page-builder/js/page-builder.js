@@ -1139,7 +1139,7 @@ async function addModule(systemid) {
   let form = await formService.getForm(
     systemid,
     undefined,
-    "addModuleToColumn(submission)"
+    "addModuleToColumn(submission, true)"
   );
 
   $(".pb-side-panel #main").html(form);
@@ -1161,7 +1161,7 @@ async function editModule() {
   let form = await formService.getForm(
     currentModuleContentType,
     data,
-    "await editContentInstance(submission);"
+    "await editContentInstance(submission, true);"
   );
   $("#dynamicModelTitle").text(
     `Settings: ${currentModuleContentType} (Id:${currentModuleId})`
@@ -1345,6 +1345,7 @@ async function setupACEEditor() {
   if ($("#editor").length === 0) {
     return;
   }
+
   var editor = ace.edit("editor");
   editor.setTheme("ace/theme/monokai");
   editor.session.setMode("ace/mode/css");
@@ -1442,7 +1443,7 @@ async function setupDropZone() {
 }
 
 async function beatifyACECss() {
-  if (ace.require) {
+  if (typeof ace !== 'undefined') {
     var beautify = ace.require("ace/ext/beautify"); // get reference to extension
     var editor = ace.edit("editor"); // get reference to editor
     beautify.beautify(editor.session);
