@@ -210,7 +210,3 @@ SonicJs uses a number of open source packages, tools, etc but there are a couple
 1. CoreUI - a truly great open source admin theme.
 1. Formio - a rock solid form builder with loads of advanced functionality.
 1. Axios - a brilliant library for interacting with REST end points.
-
-## Sponsors
-
-This Project is supported by [Surge](https://www.surgeforward.com/)
