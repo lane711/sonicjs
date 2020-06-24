@@ -38,7 +38,7 @@ const log = console.log;
 const url = require("url");
 var admin = require(__dirname + "/admin");
 
-module.exports = function(app) {
+module.exports = function (app) {
   // app.get('/', async function (req, res) {
   //   res.send('ok');
   // });
@@ -59,7 +59,7 @@ module.exports = function(app) {
     await eventBusService.emit("startup");
   })();
 
-  app.get("*", async function(req, res, next) {
+  app.get("*", async function (req, res, next) {
     globalService.AccessToken = app.models.AccessToken;
 
     // Update a value in the cookie so that the set-cookie will be sent.
@@ -71,17 +71,17 @@ module.exports = function(app) {
     next();
   });
 
-  app.get("/register", async function(req, res) {
+  app.get("/register", async function (req, res) {
     let data = { registerMessage: "<b>admin</b>" };
     res.render("admin-register", { layout: "login.handlebars", data: data });
     return;
   });
 
-  app.post("/register", function(req, res) {
+  app.post("/register", function (req, res) {
     var user = app.models.User;
     user.create(
       { email: req.body.email, password: req.body.password },
-      function(err, userInstance) {
+      function (err, userInstance) {
         console.log(userInstance);
         globalService.isAdminUserCreated = true;
         let message = encodeURI(`Account created successfully. Please login`);
@@ -92,17 +92,17 @@ module.exports = function(app) {
   });
 
   //log a user in
-  app.post("/login", function(req, res) {
+  app.post("/login", function (req, res) {
     var user = app.models.User;
     let referer = req.headers.referer;
 
     user.login(
       {
         email: req.body.email,
-        password: req.body.password
+        password: req.body.password,
       },
       "user",
-      function(err, token) {
+      function (err, token) {
         if (err) {
           if (err.details && err.code === "LOGIN_FAILED_EMAIL_NOT_VERIFIED") {
             res.render("reponseToTriggerEmail", {
@@ -111,7 +111,7 @@ module.exports = function(app) {
               redirectToEmail: "/api/users/" + err.details.userId + "/verify",
               redirectTo: "/",
               redirectToLinkText: "Click here",
-              userId: err.details.userId
+              userId: err.details.userId,
             });
           } else if (err.code) {
             let urlToRedirect = helperService.urlAppendParam(
@@ -127,30 +127,33 @@ module.exports = function(app) {
         //amp
         var data = {
           event_type: "LOGIN", // required
-          user_id: req.body.email // only required if device id is not passed in
+          user_id: req.body.email, // only required if device id is not passed in
         };
 
         //set cookie
         res.cookie("sonicjs_access_token", token.id, {
           signed: true,
-          maxAge: 30000000
+          maxAge: 30000000,
         });
 
         mixPanelService.setPeople(req.body.email);
 
         mixPanelService.trackEvent("LOGIN", req, { email: req.body.email });
+        if (referer.includes("/admin?")) {
+          referer = "/admin";
+        }
         res.redirect(referer);
       }
     );
   });
 
   //log a user out
-  app.get("/logout", async function(req, res, next) {
+  app.get("/logout", async function (req, res, next) {
     var user = app.models.User;
     var token = req.signedCookies.sonicjs_access_token;
     let currentUser = await userService.getCurrentUser(req);
     if (!token) return res.sendStatus(401);
-    user.logout(token, async function(err) {
+    user.logout(token, async function (err) {
       if (err) {
         //user already logged out
         res.redirect("/admin");
@@ -159,7 +162,7 @@ module.exports = function(app) {
       //amp
       var data = {
         event_type: "LOGOUT", // required
-        user_id: currentUser.email
+        user_id: currentUser.email,
       };
 
       res.clearCookie("sonicjs_access_token");
@@ -167,7 +170,7 @@ module.exports = function(app) {
     });
   });
 
-  app.post("/admin/pb-update-module-sort", async function(req, res) {
+  app.post("/admin/pb-update-module-sort", async function (req, res) {
     let data = req.body.data;
     console.log(data);
 
@@ -212,7 +215,7 @@ module.exports = function(app) {
     // return;
   });
 
-  app.post("/admin/pb-update-module-copy", async function(req, res) {
+  app.post("/admin/pb-update-module-copy", async function (req, res) {
     let data = req.body.data;
     console.log(data);
 
@@ -261,7 +264,7 @@ module.exports = function(app) {
     // // return;
   });
 
-  app.post("/admin/pb-update-module-delete", async function(req, res) {
+  app.post("/admin/pb-update-module-delete", async function (req, res) {
     let data = req.body.data;
     console.log(data);
 
@@ -303,17 +306,17 @@ module.exports = function(app) {
     res.send(`ok`);
   });
 
-  app.get("/hbs", async function(req, res) {
+  app.get("/hbs", async function (req, res) {
     res.render("home");
   });
 
-  app.get("/nested-forms-list*", async function(req, res) {
+  app.get("/nested-forms-list*", async function (req, res) {
     let contentTypesRaw = await dataService.getContentTypes();
-    let contentTypes = contentTypesRaw.map(function(contentType) {
+    let contentTypes = contentTypesRaw.map(function (contentType) {
       return {
         _id: contentType.systemid,
         type: "form",
-        title: contentType.title
+        title: contentType.title,
       };
     });
     let sorted = _.sortBy(contentTypes, "title");
@@ -321,28 +324,28 @@ module.exports = function(app) {
     res.send(sorted);
   });
 
-  app.get("/form/*", async function(req, res) {
+  app.get("/form/*", async function (req, res) {
     let moduleSystemId = req.path.replace("/form/", "");
     let contentType = await dataService.getContentType(moduleSystemId);
     let form = await formService.getFormJson(contentType);
     res.send(form);
   });
 
-  app.get("/zsandbox", async function(req, res) {
+  app.get("/zsandbox", async function (req, res) {
     let data = {};
     res.render("sandbox", { layout: "blank.handlebars", data: data });
   });
 
-  app.get("/admin/sandbox", async function(req, res) {
+  app.get("/admin/sandbox", async function (req, res) {
     let data = {};
     res.render("sandbox", { layout: "admin.handlebars", data: data });
   });
 
-  app.get("/ztest", async function(req, res) {
+  app.get("/ztest", async function (req, res) {
     res.send("ok");
   });
 
-  app.get("/session-test", async function(req, res) {
+  app.get("/session-test", async function (req, res) {
     var token = req.signedCookies.sonicjs_access_token;
     if (req.session.views) {
       req.session.views++;
@@ -356,7 +359,7 @@ module.exports = function(app) {
     }
   });
 
-  app.get("/session-details", async function(req, res) {
+  app.get("/session-details", async function (req, res) {
     var token = req.signedCookies.sonicjs_access_token;
     let userId = await userService.getCurrentUserId(req);
     let user = await userService.getCurrentUser(req);
@@ -366,13 +369,13 @@ module.exports = function(app) {
     res.send(`userId:${userId}`);
   });
 
-  app.get("/css/generated.css", async function(req, res) {
+  app.get("/css/generated.css", async function (req, res) {
     res.set("Content-Type", "text/css");
     let css = await cssService.getGeneratedCss();
     res.send(css);
   });
 
-  app.post("/form-submission", async function(req, res) {
+  app.post("/form-submission", async function (req, res) {
     // console.log(req.body.data);
     //
     await eventBusService.emit("afterFormSubmit", req.body.data);
@@ -382,7 +385,7 @@ module.exports = function(app) {
   //   res.send(adminPage);
   // });
 
-  app.get("*", async function(req, res, next) {
+  app.get("*", async function (req, res, next) {
     await eventBusService.emit("requestBegin", { req: req, res: res });
 
     if (req.isRequestAlreadyHandled) {
@@ -407,7 +410,6 @@ module.exports = function(app) {
         return;
       }
     }
-
 
     //for modules css/js files
     if (
@@ -453,7 +455,9 @@ module.exports = function(app) {
         res.render("blog", page);
       }
     } else if (
-      (req.url == "/admin" || req.url.startsWith("/admin/")) &&
+      (req.url == "/admin" ||
+        req.url.startsWith("/admin/") ||
+        req.url.startsWith("/admin?")) &&
       !(await userService.isAuthenticated(req))
     ) {
       if (process.env.MODE !== "dev") {
@@ -574,13 +578,13 @@ module.exports = function(app) {
 
       mixPanelService.trackEvent("PAGE_LOAD_ADMIN", req, {
         page: req.url,
-        ip: ip
+        ip: ip,
       });
 
       res.render(viewName, {
         layout: "admin.handlebars",
         data: data,
-        accessToken: accessToken
+        accessToken: accessToken,
       });
     } else {
       let isAuthenticated = await userService.isAuthenticated(req);
@@ -588,7 +592,7 @@ module.exports = function(app) {
       var page = await contentService.getRenderedPage(req);
       mixPanelService.trackEvent("PAGE_LOAD", req, {
         page: page.page.data.title,
-        ip: ip
+        ip: ip,
       });
 
       res.render("home", page);
