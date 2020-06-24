@@ -153,6 +153,7 @@ module.exports = function (app) {
     var token = req.signedCookies.sonicjs_access_token;
     let currentUser = await userService.getCurrentUser(req);
     if (!token) return res.sendStatus(401);
+    cd;
     user.logout(token, async function (err) {
       if (err) {
         //user already logged out
