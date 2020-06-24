@@ -3,7 +3,7 @@ $(document).ready(async function () {
 
   // console.log('share service test: ' + sharedService.test());
 
-
+  setupToolTips();
 });
 
 
@@ -28,4 +28,12 @@ function slugify(text) {
     .replace(/ +/g, '-');
 
   return slug;
+}
+
+function setupToolTips(){
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip({
+      html:true
+    });
+  })
 }
