@@ -1,9 +1,11 @@
+## If you find the project promising:
 # PLEASE STAR THIS PROJECT !!! :)
+### It will help spread the word so that I can start to generate feedback. Thanks in advance!
 
 ![Image of SonicJs Logo](https://sonicjs.com/api/containers/files/download/sonicjs-logo-dark.svg)
 [https://sonicjs.com](https://sonicjs.com)
 
-# SonicJS is a Modern Open Source NodeJs Based Content Management System
+# SonicJS is a Modern Open Source "Free Forever" NodeJs Based Content Management System
 
 <p align="center">
   <a href="https://sonicjs.com">
