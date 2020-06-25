@@ -9,13 +9,15 @@ var viewService = require("../services/view.service");
 var dataService = require("../services/data.service");
 
 module.exports = moduleService = {
-  startup: function() {
-    eventBusService.on("startup", async function() {
+  startup: function () {
+    eventBusService.on("startup", async function () {
       // console.log('>>=== startup from module service');
       await moduleService.processModules();
     });
 
-    eventBusService.on("getRenderedPagePostDataFetch", async function(options) {
+    eventBusService.on("getRenderedPagePostDataFetch", async function (
+      options
+    ) {
       if (options) {
         options.page.data.modules = globalService.moduleDefinitions;
         options.page.data.modulesForColumns =
@@ -24,7 +26,7 @@ module.exports = moduleService = {
     });
   },
 
-  processModules: async function() {
+  processModules: async function () {
     let dir = path.resolve(__dirname, "..", "modules");
 
     await this.getModuleDefinitionFiles(dir);
@@ -32,7 +34,7 @@ module.exports = moduleService = {
     await this.getModuleJs(dir);
   },
 
-  getModules: async function() {
+  getModules: async function () {
     return globalService.moduleDefinitions;
   },
 
@@ -42,8 +44,8 @@ module.exports = moduleService = {
   //     });
   // },
 
-  loadModuleServices: async function(moduleList) {
-    moduleList.forEach(async function(moduleDef) {
+  loadModuleServices: async function (moduleList) {
+    moduleList.forEach(async function (moduleDef) {
       if (moduleDef.enabled === undefined || moduleDef.enabled === true) {
         let m = require(moduleDef.mainService);
         await m.startup();
@@ -53,28 +55,28 @@ module.exports = moduleService = {
     eventBusService.emit("modulesLoaded");
   },
 
-  getModuleDefinitionFile: async function(systemid) {
+  getModuleDefinitionFile: async function (systemid) {
     let basePath = `../server/modules/${systemid}`;
     let file = await fileService.getFile(`${basePath}/module.json`);
     return file;
   },
 
-  getModuleDefinitionFiles: async function(path) {
+  getModuleDefinitionFiles: async function (path) {
     let moduleList = [];
     await dir.readFiles(
       path,
       {
         match: /module.json$/,
-        exclude: /^\./
+        exclude: /^\./,
       },
-      function(err, content, next) {
+      function (err, content, next) {
         if (err) throw err;
         next();
       },
-      async function(err, files) {
+      async function (err, files) {
         if (err) throw err;
 
-        files.forEach(file => {
+        files.forEach((file) => {
           let raw = fs.readFileSync(file);
           if (raw && raw.length > 0) {
             let moduleDef = JSON.parse(raw);
@@ -84,7 +86,7 @@ module.exports = moduleService = {
           }
         });
 
-        moduleList.sort(function(a, b) {
+        moduleList.sort(function (a, b) {
           if (a.title < b.title) {
             return -1;
           }
@@ -98,7 +100,7 @@ module.exports = moduleService = {
 
         globalService.moduleDefinitions = moduleList;
         globalService.moduleDefinitionsForColumns = moduleList.filter(
-          x => x.canBeAddedToColumn == true
+          (x) => x.canBeAddedToColumn == true
         );
 
         await moduleService.loadModuleServices(moduleList);
@@ -108,49 +110,49 @@ module.exports = moduleService = {
     );
   },
 
-  getModuleCss: async function(path) {
+  getModuleCss: async function (path) {
     await dir.readFiles(
       path,
       {
         match: /.css$/,
-        exclude: /^\./
+        exclude: /^\./,
       },
-      function(err, content, next) {
+      function (err, content, next) {
         if (err) throw err;
         next();
       },
-      function(err, files) {
+      function (err, files) {
         if (err) throw err;
 
         globalService.moduleCssFiles = [];
 
-        files.forEach(file => {
-          let link = file.substr(file.indexOf("/server/") + 7, file.length);
+        files.forEach((file) => {
+          let link = file.substr(file.indexOf("server") + 7, file.length);
           globalService.moduleCssFiles.push(link);
         });
       }
     );
   },
 
-  getModuleJs: async function(path) {
+  getModuleJs: async function (path) {
     await dir.readFiles(
       path,
       {
         match: /.js$/,
-        exclude: /^\./
+        exclude: /^\./,
       },
-      function(err, content, next) {
+      function (err, content, next) {
         if (err) throw err;
         next();
       },
-      function(err, files) {
+      function (err, files) {
         if (err) throw err;
 
         globalService.moduleJsFiles = [];
 
-        files.forEach(file => {
+        files.forEach((file) => {
           if (file.indexOf("assets/js") > -1) {
-            let link = file.substr(file.indexOf("/server/") + 7, file.length);
+            let link = file.substr(file.indexOf("server") + 7, file.length);
             globalService.moduleJsFiles.push(link);
           }
         });
@@ -158,7 +160,7 @@ module.exports = moduleService = {
     );
   },
 
-  processModuleInColumn: async function(options) {
+  processModuleInColumn: async function (options) {
     if (options.shortcode.name === options.moduleName.toUpperCase()) {
       let id = options.shortcode.properties.id;
       let contentType = options.moduleName;
@@ -176,12 +178,12 @@ module.exports = moduleService = {
         id: id,
         contentType: contentType,
         shortCode: options.shortcode,
-        body: await this.processView(contentType, viewModel, viewPath)
+        body: await this.processView(contentType, viewModel, viewPath),
       };
 
       await eventBusService.emit("postProcessModuleShortCodeProccessedHtml", {
         proccessedHtml: proccessedHtml,
-        viewModel: viewModel
+        viewModel: viewModel,
       });
 
       globalService.pageContent = globalService.pageContent.replace(
@@ -191,7 +193,7 @@ module.exports = moduleService = {
     }
   },
 
-  processView: async function(contentType, viewModel, viewPath) {
+  processView: async function (contentType, viewModel, viewPath) {
     var result = await viewService.getProccessedView(
       contentType,
       viewModel,
@@ -201,7 +203,7 @@ module.exports = moduleService = {
     return result;
   },
 
-  createModule: async function(moduleDefinitionFile) {
+  createModule: async function (moduleDefinitionFile) {
     let basePath = `../../server/modules/${moduleDefinitionFile.systemid}`;
 
     //create base dir
@@ -264,31 +266,33 @@ module.exports = moduleService = {
     let moduleContentType = {
       title: `Module - ${moduleDefinitionFile.title}`,
       systemid: moduleDefinitionFile.systemid,
-      canBeAddedToColumn: moduleDefinitionFile.canBeAddedToColumn ? true : false,
-      components: []
+      canBeAddedToColumn: moduleDefinitionFile.canBeAddedToColumn
+        ? true
+        : false,
+      components: [],
     };
     moduleContentType.components.push({
       label: "First Name",
       type: "textfield",
       input: true,
       key: "firstName",
-      validate: { required: true }
+      validate: { required: true },
     });
     moduleContentType.components.push({
       label: "Submit",
       type: "button",
       input: true,
       key: "submit",
-      theme: "primary"
+      theme: "primary",
     });
     let ct = await dataService.createContentType(moduleContentType);
   },
 
-  updateModule: async function(moduleDefinitionFile) {
+  updateModule: async function (moduleDefinitionFile) {
     let basePath = `../../server/modules/${moduleDefinitionFile.systemid}`;
     fileService.writeFile(
       `${basePath}/module.json`,
       JSON.stringify(moduleDefinitionFile, null, 2)
     );
-  }
+  },
 };
