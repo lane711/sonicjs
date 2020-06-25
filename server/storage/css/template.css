@@ -231,7 +231,7 @@ a.black {
 
 .footer {
   border-top: 1px solid #fff;
-  padding: 30px 0 0
+  padding: 15px 0 0
 }
 
 .footer p {
@@ -384,4 +384,21 @@ a.black {
 
 .footer .social a {
   font-size: 40px;
+}
+
+.footer .social a {
+  font-size: 30px;
+}
+
+.footer .social ul {
+  list-style: none;
+}
+
+.footer .social li {
+  display: inline;
+  margin: 0 20px;
+}
+
+.footer .footer-top-margin {
+  margin-top: 15px;
 }
