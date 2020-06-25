@@ -1,5 +1,5 @@
-## If you find the project promising:
-# PLEASE STAR THIS PROJECT !!! :)
+### If you find the project promising:
+### PLEASE STAR THIS PROJECT !!! :)
 ### It will help spread the word so that I can start to generate feedback. Thanks in advance!
 
 ![Image of SonicJs Logo](https://sonicjs.com/api/containers/files/download/sonicjs-logo-dark.svg)
