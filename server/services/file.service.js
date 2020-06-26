@@ -71,6 +71,7 @@ module.exports = fileService = {
 
   fileExists: function (filePath) {
     let dirPath = path.join(__dirname.replace("services", ""), filePath);
-    return fs.existsSync(dirPath);
+    let fileExist = fs.existsSync(dirPath);
+    return fileExist;
   },
 };

@@ -17,14 +17,20 @@ module.exports = assetService = {
         options.page.data.jsLinks = "";
         options.page.data.cssLinks = "";
 
-
-        if (!assetService.doesAssetFilesExist() || process.env.MODE !== "production") {
+        if (
+          !(await assetService.doesAssetFilesExist()) ||
+          process.env.MODE !== "production"
+        ) {
           await assetService.getLinks(options, "js");
           await assetService.getLinks(options, "css");
-        }else{
+        } else {
           //add combined assets
-          options.page.data.jsLinks = `<script src="/js/${assetService.getCombinedFileName('js')}"></script>`;
-          options.page.data.cssLinks = `<link href="/css/${assetService.getCombinedFileName('css')}" rel="stylesheet">`;
+          options.page.data.jsLinks = `<script src="/js/${assetService.getCombinedFileName(
+            "js"
+          )}"></script>`;
+          options.page.data.cssLinks = `<link href="/css/${assetService.getCombinedFileName(
+            "css"
+          )}" rel="stylesheet">`;
         }
       }
     });
@@ -39,11 +45,13 @@ module.exports = assetService = {
       ) {
         this.assetType = options.req.url.includes("/js/") ? "js" : "css";
         let appVersion = globalService.getAppVersion();
-        let fileName = assetService.getCombinedFileName(
-          this.assetType
-        );
+        let fileName = assetService.getCombinedFileName(this.assetType);
 
-        let file = path.join(__dirname, "..", assetService.getCombinedAssetPath(this.assetType, fileName));
+        let file = path.join(
+          __dirname,
+          "..",
+          assetService.getCombinedAssetPath(this.assetType, fileName)
+        );
 
         options.res.setHeader("Cache-Control", "public, max-age=2592000");
         options.res.setHeader(
@@ -58,8 +66,8 @@ module.exports = assetService = {
   },
 
   doesAssetFilesExist: async function (fileName) {
-    let cssPath = this.getAssetPath(this.getCombinedFileName('css'));
-    let jsPath = this.getAssetPath(this.getCombinedFileName('js'));
+    let cssPath = this.getAssetPath(this.getCombinedFileName("css"));
+    let jsPath = this.getAssetPath(this.getCombinedFileName("js"));
     return fileService.fileExists(cssPath) && fileService.fileExists(cssPath);
   },
 
