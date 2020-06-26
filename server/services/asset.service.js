@@ -17,13 +17,9 @@ module.exports = assetService = {
         options.page.data.jsLinks = "";
         options.page.data.cssLinks = "";
 
-        if (
-          !(await assetService.doesAssetFilesExist()) ||
-          process.env.MODE !== "production"
-        ) {
-          await assetService.getLinks(options, "js");
-          await assetService.getLinks(options, "css");
-        } else {
+        let assetFilesExist = await assetService.doesAssetFilesExist();
+
+        if (assetFilesExist && process.env.MODE === "production") {
           //add combined assets
           options.page.data.jsLinks = `<script src="/js/${assetService.getCombinedFileName(
             "js"
@@ -31,6 +27,9 @@ module.exports = assetService = {
           options.page.data.cssLinks = `<link href="/css/${assetService.getCombinedFileName(
             "css"
           )}" rel="stylesheet">`;
+        } else {
+          await assetService.getLinks(options, "js");
+          await assetService.getLinks(options, "css");
         }
       }
     });
@@ -208,7 +207,7 @@ module.exports = assetService = {
   },
 
   getAssetPath: function (fileName) {
-    return `/assets/${this.assetType}/${fileName}`;
+    return `/assets/${fileName.split(".").pop()}/${fileName}`;
   },
 
   getCombinedFileName: function (assetType) {
