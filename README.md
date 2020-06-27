@@ -87,7 +87,7 @@ There are thousands of CMS out there and several already built on the modern JAM
 1. [Authors](#authors)
 1. [License](#license)
 1. [Acknowledgments](#acknowledgments)
-1. [Video Overview + Demo](#video)
+1. [Video Overview + Demo](#video-overview--demo)
 
 ## Getting Started
 
@@ -192,4 +192,4 @@ SonicJs is written entirely in Javascript. It uses a number of open source tools
 
 ## Video Overview + Demo
 
-See here for several videos to get you up and running quickly. [See Videos](https://sonicjs.com/docs)
+See here for several videos to get you up and running quickly. [Overview and Demo Videos](https://sonicjs.com/docs)
