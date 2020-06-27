@@ -15,13 +15,26 @@
   </a>
 </p>
 
+<table>
+  <tr>
+    <td>First Screen Page</td>
+     <td>Holiday Mention</td>
+     <td>Present day in purple and selected day in pink</td>
+  </tr>
+  <tr>
+    <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="SonicJs Nodejs CMS Admin Dashboard" /></td>
+    <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="SonicJs Nodejs CMS Admin Dashboard" /></td>
+    <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="SonicJs Nodejs CMS Admin Dashboard" /></td>
+  </tr>
+ </table>
+
 ## Visit https://sonicjs.com for Details, Videos & Docs
 
 # SonicJs NodeJs Content Management System (CMS)
 
 ## Overview
 
-### SonicJs is a 100% javascript based and completely REST API driven CMS built on the following tech stack:
+### SonicJs is a 100% javascript based, REST API driven CMS/Framework built on the following tech stack:
 
 - NodeJs
 - Express
@@ -29,19 +42,7 @@
 
 ### SonicJs supports many common databases including:
 
-- MongoDB
-- MySQL
-- SQL Server
-- Cloudant
-- DashDB
-- DB2
-- Informix
-- Oracle
-- PostgreSQL
-- Redis
-- SQLite3
-- Flat File (Json)
-- In-Memory
+- MongoDB, MySQL, SQL Server, Cloudant, DashDB, DB2, Informix, Oracle, PostgreSQL, Redis, SQLite3, Flat File (Json), In-Memory
 
 ### Why SonicJs?
 
@@ -70,6 +71,7 @@ When you first setup SonicJs locally, the default database is set to use the Fla
 Follow these steps and you should be good to go:
 
 1. Clone the repo: `git clone https://github.com/lane711/sonicjs.git`
+1. Change to created folder `cd sonicjs`
 1. Install the dependencies: `npm install`
 1. Run it: `npm start`
 
@@ -218,7 +220,7 @@ Interested in contributing to SonicJs? Any and all help is welcome! Please read 
 
 ## Deployment
 
-Deployment is basically the same as any regular Node.js/Express project. The project has successfully been deployed to Heroku, NodeChef, Amazon EC2 and others. I recommend using a process manager like PM2 or similar of you are deploying on a self managed server (like EC2).
+Deployment is basically the same as any regular Node.js/Express project. The project has successfully been deployed to Heroku, NodeChef, Amazon EC2 and others. I recommend using a process manager like PM2 or similar if you are deploying on a self managed server (like EC2).
 
 ## Versioning
 
