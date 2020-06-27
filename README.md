@@ -15,19 +15,6 @@
   </a>
 </p>
 
-<table>
-  <tr>
-    <td>First Screen Page</td>
-     <td>Holiday Mention</td>
-     <td>Present day in purple and selected day in pink</td>
-  </tr>
-  <tr>
-    <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="SonicJs Nodejs CMS Admin Dashboard" /></td>
-    <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="SonicJs Nodejs CMS Admin Dashboard" /></td>
-    <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="SonicJs Nodejs CMS Admin Dashboard" /></td>
-  </tr>
- </table>
-
 ## Visit https://sonicjs.com for Details, Videos & Docs
 
 # SonicJs NodeJs Content Management System (CMS)
@@ -101,53 +88,28 @@ Also, if you've actually read down this far and happen to be a in generous mood,
 
 ## Screen Shots
 
-### Manage Content Types:
-
-<p align="center">
-  <a href="https://sonicjs.com">
-    <img src="https://sonicjs.com/images/Node.js CMS - Content Type Edit.png?width=600" width="300px" alt="Manage Content Types" />
-  </a>
-</p>
-
-### Drag and Drop Form Builder:
-
-<p align="center">
-  <a href="https://sonicjs.com">
-    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="Drag and Drop Form Builder" />
-  </a>
-</p>
-
-### Edit Content with Automagically Generated Forms:
-
-<p align="center">
-  <a href="https://sonicjs.com">
-    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Edit%20Content.png?width=600" width="300px" alt="Edit Content with Automagically Generated Forms" />
-  </a>
-</p>
-
-### Build Advanced Forms with over 20 Field Types
-
-<p align="center">
-  <a href="https://sonicjs.com">
-    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Field%20Types.png?width=600" width="300px" alt="Field Types" />
-  </a>
-</p>
-
-### Edit Content Properties From the Front End
-
-<p align="center">
-  <a href="https://sonicjs.com">
-    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20Page%20Settings.png?width=600" width="300px" alt="Front End Content Editing" />
-  </a>
-</p>
-
-### Front End WYSIWYG Editor
-
-<p align="center">
-  <a href="https://sonicjs.com">
-    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20WYSIWYG%20Editor.png?width=600" width="300px" alt="Front End WYSIWYG Editor" />
-  </a>
-</p>
+<table>
+  <tr>
+    <td>Manage Content Types</td>
+     <td>Drag and Drop Form Builder</td>
+     <td>Edit Content with Automagically Generated Forms</td>
+  </tr>
+  <tr>
+    <td><img src="https://sonicjs.com/images/Node.js CMS - Content Type Edit.png?width=600" width="300px" alt="Manage Content Types" /></td>
+    <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="Drag and Drop Form Builder" /></td>
+    <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Edit%20Content.png?width=600" width="300px" alt="Edit Content with Automagically Generated Forms" /></td>
+  </tr>
+    <tr>
+    <td>Build Advanced Forms with over 20 Field Types</td>
+     <td>Edit Content Properties From the Front End</td>
+     <td>Front End WYSIWYG Editor</td>
+  </tr>
+  <tr>
+    <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="Drag and Drop Form Builder" /></td>
+    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20Page%20Settings.png?width=600" width="300px" alt="Front End Content Editing" /></td>
+    <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20WYSIWYG%20Editor.png?width=600" width="300px" alt="Front End WYSIWYG Editor" /></td>
+  </tr>
+ </table>
 
 ### Menu Manager
 
