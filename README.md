@@ -109,55 +109,27 @@ Also, if you've actually read down this far and happen to be a in generous mood,
     <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20Page%20Settings.png?width=600" width="300px" alt="Front End Content Editing" /></td>
     <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20WYSIWYG%20Editor.png?width=600" width="300px" alt="Front End WYSIWYG Editor" /></td>
   </tr>
+      <tr>
+    <td>Menu Manager</td>
+     <td>Real Time CSS Editor</td>
+     <td>Built In Media Server</td>
+  </tr>
+  <tr>
+    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Menu%20Management.png?width=600" width="300px" alt="Menu Manager" /></td>
+    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20CSS%20Editing.png?width=600" width="300px" alt="Real Time CSS Editor" /></td>
+    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Media%20Manager.png?width=600" width="300px" alt="Built In Media Server" /></td>
+  </tr>
+        <tr>
+    <td>Module Management</td>
+     <td>Front End Json Editor</td>
+     <td>Swagger API Explorer</td>
+  </tr>
+  <tr>
+    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Module%20Management.png?width=600" width="300px" alt="Module Management" /></td>
+    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20Json%20Editor.png?width=600" width="300px" alt="Front End Json Editor" /></td>
+    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20API%20Explorer.png?width=600" width="300px" alt="Swagger API Explorer" /></td>
+  </tr>
  </table>
-
-### Menu Manager
-
-<p align="center">
-  <a href="https://sonicjs.com">
-    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Menu%20Management.png?width=600" width="300px" alt="Menu Manager" />
-  </a>
-</p>
-
-### Real Time CSS Editor
-
-<p align="center">
-  <a href="https://sonicjs.com">
-    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20CSS%20Editing.png?width=600" width="300px" alt="Real Time CSS Editor" />
-  </a>
-</p>
-
-### Built In Media Server
-
-<p align="center">
-  <a href="https://sonicjs.com">
-    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Media%20Manager.png?width=600" width="300px" alt="Built In Media Server" />
-  </a>
-</p>
-
-### Module Management
-
-<p align="center">
-  <a href="https://sonicjs.com">
-    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Module%20Management.png?width=600" width="300px" alt="Module Management" />
-  </a>
-</p>
-
-### Front End Json Editor
-
-<p align="center">
-  <a href="https://sonicjs.com">
-    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20Json%20Editor.png?width=600" width="300px" alt="Front End Json Editor" />
-  </a>
-</p>
-
-### Swagger API Explorer
-
-<p align="center">
-  <a href="https://sonicjs.com">
-    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20API%20Explorer.png?width=600" width="300px" alt="Swagger API Explorer" />
-  </a>
-</p>
 
 ### Back End Login
 
