@@ -79,14 +79,15 @@ There are thousands of CMS out there and several already built on the modern JAM
 1. [Getting Started](#getting-started)
 1. [Quick Intro](#quick-intro)
 1. [Free Forever](#free-forever)
-1. [Screen Shots](#screen-shots)
-1. [Goals, Motivation And Principals](#goals-motivation-&-principals)
-1. [Contributing - Get Involved!](#contributing-get-involved!)
+1. [Goals, Motivation And Principals](#goals-motivation-and-principals)
+1. [Contributing - Get Involved!](#contributing---get-involved)
 1. [Deployment](#deployment)
+1. [Example](#examples)
 1. [Versioning](#versioning)
 1. [Authors](#authors)
 1. [License](#license)
 1. [Acknowledgments](#acknowledgments)
+1. [Video Overview + Demo](#video)
 
 ## Getting Started
 
@@ -117,13 +118,13 @@ SonicJs is similar to Drupal CMS in that it is highly configurable. You can buil
 
 SonicJs can handle most common website building use-cases with ease, but it also positioned to be an enterprise application framework/platform enabling developers to start custom web application projects with a solid foundation. This can help significantly reduce the overall effort required for your project.
 
-SonicJs is also 100% REST API based and therefor a great choice if you are looking for a **Headless CMS** for your mobile app or IoT project. All of the content types that you create in the admin interface are instantly exposed as REST end points. There is no need to restart the application as required in other NodeJs based Headless.
+SonicJs is also 100% REST API based and therefor a great choice if you are looking for a **Headless CMS** for your mobile app or IoT project. All of the content types that you create in the admin interface are instantly exposed as REST end points. There is no need to restart the application as required in other NodeJs based Headless CMS.
 
 SonicJs is built with love from Orange County California.
 
 ## Free Forever
 
-If you are considering using SonicJs for your next web project, its important to know that it shall remain free forever (again similar to Drupal). Be wary of "free" open source solutions being built by start-ups or established companies that haven't made this same "free forever" commitment.
+If you are considering using SonicJs for your next web project, its important to know that it shall remain free forever (again similar to Drupal). Be wary of other "free" Node.js open source CMS solutions being built by start-ups or established companies that haven't made this same "free forever" commitment.
 
 If you are interested in reading more about me or the goals and motivation of the project, please check out the "about" page here: https://sonicjs.com/about.
 
@@ -162,6 +163,10 @@ Interested in contributing to SonicJs? Any and all help is welcome! Please read 
 
 Deployment is basically the same as any regular Node.js/Express project. The project has successfully been deployed to Heroku, NodeChef, Amazon EC2 and others. I recommend using a process manager like PM2 or similar if you are deploying on a self managed server (like EC2).
 
+## Example
+
+Presently, the only in-production implementations that I know about (aside from sonicjs.com) are internal company applications. If you have an example you'd like to share, please contact me [here.](https://sonicjs.com/contact) and I'll be happy to list it here.
+
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags).
@@ -184,4 +189,7 @@ SonicJs is written entirely in Javascript. It uses a number of open source tools
 1. Loopback - An awesome NodeJs based ORM helping to support much of the heavy lifting in SonicJs' data tier.
 1. CoreUI - a truly great open source admin theme.
 1. Formio - a rock solid form builder with loads of advanced functionality.
-1. Axios - a brilliant library for interacting with REST end points.
+
+## Video Overview + Demo
+
+See here for several videos to get you up and running quickly. [See Videos](https://sonicjs.com/docs)
