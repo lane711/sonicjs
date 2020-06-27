@@ -9,11 +9,50 @@
 
 # SonicJS is a Modern Open Source "Free Forever" NodeJs Based Content Management System
 
-<p align="center">
-  <a href="https://sonicjs.com">
-    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="SonicJs Nodejs CMS Admin Dashboard" />
-  </a>
-</p>
+## Screen Shots
+
+<table>
+  <tr>
+    <td>Manage Content Types</td>
+     <td>Drag and Drop Form Builder</td>
+     <td>Edit Content with Automagically Generated Forms</td>
+  </tr>
+  <tr>
+    <td><img src="https://sonicjs.com/images/Node.js CMS - Content Type Edit.png?width=600" width="300px" alt="Manage Content Types" /></td>
+    <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="Drag and Drop Form Builder" /></td>
+    <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Edit%20Content.png?width=600" width="300px" alt="Edit Content with Automagically Generated Forms" /></td>
+  </tr>
+    <tr>
+    <td>Build Advanced Forms with over 20 Field Types</td>
+     <td>Edit Content Properties From the Front End</td>
+     <td>Front End WYSIWYG Editor</td>
+  </tr>
+  <tr>
+    <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="Drag and Drop Form Builder" /></td>
+    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20Page%20Settings.png?width=600" width="300px" alt="Front End Content Editing" /></td>
+    <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20WYSIWYG%20Editor.png?width=600" width="300px" alt="Front End WYSIWYG Editor" /></td>
+  </tr>
+      <tr>
+    <td>Menu Manager</td>
+     <td>Real Time CSS Editor</td>
+     <td>Built In Media Server</td>
+  </tr>
+  <tr>
+    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Menu%20Management.png?width=600" width="300px" alt="Menu Manager" /></td>
+    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20CSS%20Editing.png?width=600" width="300px" alt="Real Time CSS Editor" /></td>
+    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Media%20Manager.png?width=600" width="300px" alt="Built In Media Server" /></td>
+  </tr>
+        <tr>
+    <td>Module Management</td>
+     <td>Front End Json Editor</td>
+     <td>Swagger API Explorer</td>
+  </tr>
+  <tr>
+    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Module%20Management.png?width=600" width="300px" alt="Module Management" /></td>
+    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20Json%20Editor.png?width=600" width="300px" alt="Front End Json Editor" /></td>
+    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20API%20Explorer.png?width=600" width="300px" alt="Swagger API Explorer" /></td>
+  </tr>
+ </table>
 
 ## Visit https://sonicjs.com for Details, Videos & Docs
 
@@ -85,59 +124,6 @@ If you are considering using SonicJs for your next web project, its important to
 If you are interested in reading more about me or the goals and motivation of the project, please check out the "about" page here: https://sonicjs.com/about.
 
 Also, if you've actually read down this far and happen to be a in generous mood, :star::star::star::star::star: **would you mind given the project a star?**:star::star::star::star::star: Thanks in advance!
-
-## Screen Shots
-
-<table>
-  <tr>
-    <td>Manage Content Types</td>
-     <td>Drag and Drop Form Builder</td>
-     <td>Edit Content with Automagically Generated Forms</td>
-  </tr>
-  <tr>
-    <td><img src="https://sonicjs.com/images/Node.js CMS - Content Type Edit.png?width=600" width="300px" alt="Manage Content Types" /></td>
-    <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="Drag and Drop Form Builder" /></td>
-    <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Edit%20Content.png?width=600" width="300px" alt="Edit Content with Automagically Generated Forms" /></td>
-  </tr>
-    <tr>
-    <td>Build Advanced Forms with over 20 Field Types</td>
-     <td>Edit Content Properties From the Front End</td>
-     <td>Front End WYSIWYG Editor</td>
-  </tr>
-  <tr>
-    <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="Drag and Drop Form Builder" /></td>
-    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20Page%20Settings.png?width=600" width="300px" alt="Front End Content Editing" /></td>
-    <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20WYSIWYG%20Editor.png?width=600" width="300px" alt="Front End WYSIWYG Editor" /></td>
-  </tr>
-      <tr>
-    <td>Menu Manager</td>
-     <td>Real Time CSS Editor</td>
-     <td>Built In Media Server</td>
-  </tr>
-  <tr>
-    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Menu%20Management.png?width=600" width="300px" alt="Menu Manager" /></td>
-    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20CSS%20Editing.png?width=600" width="300px" alt="Real Time CSS Editor" /></td>
-    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Media%20Manager.png?width=600" width="300px" alt="Built In Media Server" /></td>
-  </tr>
-        <tr>
-    <td>Module Management</td>
-     <td>Front End Json Editor</td>
-     <td>Swagger API Explorer</td>
-  </tr>
-  <tr>
-    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Module%20Management.png?width=600" width="300px" alt="Module Management" /></td>
-    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20Json%20Editor.png?width=600" width="300px" alt="Front End Json Editor" /></td>
-    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20API%20Explorer.png?width=600" width="300px" alt="Swagger API Explorer" /></td>
-  </tr>
- </table>
-
-### Back End Login
-
-<p align="center">
-  <a href="https://sonicjs.com">
-    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Back%20End%20Login.png?width=600" width="300px" alt="Back End Login" />
-  </a>
-</p>
 
 ## Debugging
 
