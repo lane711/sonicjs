@@ -80,6 +80,7 @@ There are thousands of CMS out there and several already built on the modern JAM
 1. [Quick Intro](#quick-intro)
 1. [Free Forever](#free-forever)
 1. [Goals, Motivation And Principals](#goals-motivation-and-principals)
+1. [Support](#support)
 1. [Contributing - Get Involved!](#contributing---get-involved)
 1. [Deployment](#deployment)
 1. [Examples](#examples)
@@ -154,6 +155,10 @@ Please see here for a full explanation: https://sonicjs.com/about, however here 
 - 100% REST Based
 - No "Fighting"
 - Development Should be Fun
+
+## Support
+
+Please feel free to create an issue here in github or email me using the contact form [here](https://sonicjs.com/contact). I'll make every attempt to get back to you quickly and help answers and questions you may have.
 
 ## Contributing - Get Involved!
 
