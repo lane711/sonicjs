@@ -82,7 +82,7 @@ There are thousands of CMS out there and several already built on the modern JAM
 1. [Goals, Motivation And Principals](#goals-motivation-and-principals)
 1. [Contributing - Get Involved!](#contributing---get-involved)
 1. [Deployment](#deployment)
-1. [Example](#examples)
+1. [Examples](#examples)
 1. [Versioning](#versioning)
 1. [Authors](#authors)
 1. [License](#license)
@@ -163,7 +163,7 @@ Interested in contributing to SonicJs? Any and all help is welcome! Please read 
 
 Deployment is basically the same as any regular Node.js/Express project. The project has successfully been deployed to Heroku, NodeChef, Amazon EC2 and others. I recommend using a process manager like PM2 or similar if you are deploying on a self managed server (like EC2).
 
-## Example
+## Examples
 
 Presently, the only in-production implementations that I know about (aside from sonicjs.com) are internal company applications. If you have an example you'd like to share, please contact me [here.](https://sonicjs.com/contact) and I'll be happy to list it here.
 
