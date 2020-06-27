@@ -80,9 +80,13 @@ There are thousands of CMS out there and several already built on the modern JAM
 1. [Quick Intro](#quick-intro)
 1. [Free Forever](#free-forever)
 1. [Screen Shots](#screen-shots)
-1. [Goals, Motivation & Principals](#goals-motivation-&-principals)
-1. [Credits](#credits)
-1. [Sponsors](#sponsors)
+1. [Goals, Motivation And Principals](#goals-motivation-&-principals)
+1. [Contributing - Get Involved!](#contributing-get-involved!)
+1. [Deployment](#deployment)
+1. [Versioning](#versioning)
+1. [Authors](#authors)
+1. [License](#license)
+1. [Acknowledgments](#acknowledgments)
 
 ## Getting Started
 
@@ -130,9 +134,25 @@ Also, if you've actually read down this far and happen to be a in generous mood,
 1. From Visual Studio Code, make sure the standard debugger for Chrome extension is installed.
 1. Hit "Play"
 
-## Goals, Motivation & Principals
+## Goals, Motivation And Principals
 
-Please see here: https://sonicjs.com/about
+Please see here for a full explanation: https://sonicjs.com/about, however here is a high level list of SonicJs' guiding principals:
+
+- Why Did I Start SonicJs?
+- So is SonicJs just a Node.js based clone of Drupal?
+- Free Forever
+- One Module per Feature
+- UI/UX Continuity
+- Hooks/ the Event Emitter Pattern
+- Light Weight Core
+- Extensibility
+- Convention over Configuration
+- Minimal Learning Curve
+- KISS
+- Do it Right the First Time
+- 100% REST Based
+- No "Fighting"
+- Development Should be Fun
 
 ## Contributing - Get Involved!
 
