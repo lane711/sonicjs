@@ -1,5 +1,7 @@
 ### If you find the project promising:
+
 ### :star: PLEASE STAR THIS PROJECT :star: !!! :)
+
 ### It will help spread the word so that I can start to generate developer feedback. Thanks in advance!
 
 ![Image of SonicJs Logo](https://sonicjs.com/api/containers/files/download/sonicjs-logo-dark.svg)
@@ -26,6 +28,7 @@
 - Bootstrap 4
 
 ### SonicJs supports many common databases including:
+
 - MongoDB
 - MySQL
 - SQL Server
@@ -41,6 +44,7 @@
 - In-Memory
 
 ### Why SonicJs?
+
 There are thousands of CMS out there and several already built on the modern JAM stack (JavaScript, API & Markup). I was looking for a solid Node.js based CMS suitable as a foundation for enterprise application development. It didn't exist. For a detailed description of why SonicJs was started, please see the <a href="https://sonicjs.com/about">about page</a>.
 
 ## Table of Contents
@@ -56,6 +60,7 @@ There are thousands of CMS out there and several already built on the modern JAM
 ## Getting Started
 
 ### Pre-requisites
+
 You just need NodeJs installed. No other setup is needed.
 
 ### Setup Steps
@@ -69,12 +74,13 @@ Follow these steps and you should be good to go:
 1. Run it: `npm start`
 
 You should see the following message in your console:
-- Website at:  http://localhost:3018
-- Admin console at:  http://localhost:3018/admin
-- REST API at:  http://localhost:3018/explorer
 
+- Website at: http://localhost:3018
+- Admin console at: http://localhost:3018/admin
+- REST API at: http://localhost:3018/explorer
 
 ## A Quick Intro to SonicJs
+
 SonicJs is similar to Drupal CMS in that it is highly configurable. You can build your own content types using a drag and drop style form editor. All basic CRUD operations are generated on the fly by the framework. Unlike other NodeJs CMS', such as KeystoneJs, SonicJs does not generate code (a good thing!). It has a very powerful runtime engine that is built with both performance and flexibility in mind.
 
 SonicJs can handle most common website building use-cases with ease, but it also positioned to be an enterprise application framework/platform enabling developers to start custom web application projects with a solid foundation. This can help significantly reduce the overall effort required for your project.
@@ -84,6 +90,7 @@ SonicJs is also 100% REST API based and therefor a great choice if you are looki
 SonicJs is built with love from Orange County California.
 
 ## Free Forever
+
 If you are considering using SonicJs for your next web project, its important to know that it shall remain free forever (again similar to Drupal). Be wary of "free" open source solutions being built by start-ups or established companies that haven't made this same "free forever" commitment.
 
 If you are interested in reading more about me or the goals and motivation of the project, please check out the "about" page here: https://sonicjs.com/about.
@@ -205,9 +212,33 @@ Also, if you've actually read down this far and happen to be a in generous mood,
 
 Please see here: https://sonicjs.com/about
 
-## Credits
+## Contributing - Get Involved!
 
-SonicJs uses a number of open source packages, tools, etc but there are a couple of them that I wanted to make special mention of:
+Interested in contributing to SonicJs? Any and all help is welcome! Please read [CONTRIBUTING.md](https://github.com/lane711/sonicjs/blob/master/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+
+## Deployment
+
+Deployment is basically the same as any regular Node.js/Express project. The project has successfully been deployed to Heroku, NodeChef, Amazon EC2 and others. I recommend using a process manager like PM2 or similar of you are deploying on a self managed server (like EC2).
+
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags).
+
+## Authors
+
+- **Lane Campbell** - _Initial work_ - [SonicJs](https://sonicjs.com)
+- **[Your name here]** - _Future SonicJs Core Developer_ - [SonicJs](https://sonicjs.com)
+
+See also the list of [contributors](https://github.com/lane711/sonicjs/graphs/contributors) who participated in this project.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](https://github.com/lane711/sonicjs/blob/master/LICENSE) file for details
+
+## Acknowledgments
+
+SonicJs is written entirely in Javascript. It uses a number of open source tools, utilities, etc but there are a few of them that I wanted to make special mention of:
+
 1. Loopback - An awesome NodeJs based ORM helping to support much of the heavy lifting in SonicJs' data tier.
 1. CoreUI - a truly great open source admin theme.
 1. Formio - a rock solid form builder with loads of advanced functionality.
