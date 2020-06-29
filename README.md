@@ -1,3 +1,11 @@
+<!-- <a href="https://circleci.com/gh/lane711/sonicjs">
+        <img src="https://circleci.com/gh/lane711/sonicjs.svg?style=svg" alt="Build Status" />
+    </a> -->
+
+<a href="https://github.com/lane711/sonicjs/releases">
+        <img src="https://img.shields.io/github/package-json/v/lane711/sonicjs" alt="Latest release" />
+    </a>
+
 ### If you find the project promising:
 
 ### :star: PLEASE STAR THIS PROJECT :star: !!! :)
