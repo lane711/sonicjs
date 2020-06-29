@@ -1,10 +1,14 @@
-<!-- <a href="https://circleci.com/gh/lane711/sonicjs">
+<a href="https://circleci.com/gh/lane711/sonicjs">
         <img src="https://circleci.com/gh/lane711/sonicjs.svg?style=svg" alt="Build Status" />
-    </a> -->
+    </a>
 
 <a href="https://github.com/lane711/sonicjs/releases">
         <img src="https://img.shields.io/github/package-json/v/lane711/sonicjs" alt="Latest release" />
     </a>
+
+  <a href="https://www.paypal.me/sonicjs">
+      <img src="https://img.shields.io/badge/Donate-PayPal-green.svg" alt="Donate" />
+  </a>
 
 ### If you find the project promising:
 
