@@ -1,9 +1,0 @@
-{
-  "title": "Blog",
-  "systemid": "blog",
-  "version": "0.0.0.1",
-  "canBeAddedToColumn": "true",
-  "enabled": "true",
-  "systemidUpperCase": "BLOG",
-  "systemidCamelCase": "blog"
-}

@@ -1,8 +1,0 @@
-{
-  "title": "Google Analytics",
-  "systemid": "google-analytics",
-  "version": "0.0.0.1",
-  "enabled": true,
-  "canBeAddedToColumn": false,
-  "singleInstance": true
-}

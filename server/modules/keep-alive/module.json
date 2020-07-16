@@ -1,8 +1,0 @@
-{
-  "title": "Keep Alive",
-  "systemid": "keep-alive",
-  "version": "0.0.0.1",
-  "enabled": false,
-  "canBeAddedToColumn": false,
-  "singleInstance": false
-}
