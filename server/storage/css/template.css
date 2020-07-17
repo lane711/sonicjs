@@ -411,3 +411,16 @@ a.black {
 .page404 h1 {
   font-size: 100px;
 }
+
+.open-admin {
+  text-align: center;
+}
+
+.open-admin a {
+  color: #fff;
+  padding: 12px 0;
+}
+
+.open-admin a:hover {
+  background-color: #000;
+}
