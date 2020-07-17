@@ -1,7 +1,7 @@
 {
   "name": "content",
   "base": "PersistedModel",
-  "idInjection": true,
+  "idInjection": false,
   "options": {
     "validateUpsert": true
   },
@@ -10,7 +10,8 @@
   },
   "properties": {
     "id": {
-      "type": "number"
+      "type": "string",
+      "defaultFn": "uuidv4"
     },
     "url": {
       "type": "string",
