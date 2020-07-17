@@ -591,6 +591,12 @@ module.exports = function (app) {
       let isAuthenticated = await userService.isAuthenticated(req);
       globalService.setAreaMode(false, true, isAuthenticated);
       var page = await contentService.getRenderedPage(req);
+
+      if (page.page.data.title === "Not Found") {
+        res.render("404", page);
+        return;
+      }
+
       mixPanelService.trackEvent("PAGE_LOAD", req, {
         page: page.page.data.title,
         ip: ip,

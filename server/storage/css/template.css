@@ -402,3 +402,12 @@ a.black {
 .footer .footer-top-margin {
   margin-top: 15px;
 }
+
+.page404 {
+  margin: 200px;
+  text-align: center;
+}
+
+.page404 h1 {
+  font-size: 100px;
+}

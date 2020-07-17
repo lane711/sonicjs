@@ -49,16 +49,12 @@ module.exports = contentService = {
     if (cachedPage !== undefined) {
       // console.log('returning from cache');
       return { page: cachedPage };
-    }
-    else{
-      console.log('no cache');
+    } else {
+      console.log("no cache");
     }
 
     this.page = await dataService.getContentByUrl(req.url);
-    if (!this.page || this.page.data.title == "Not Found") {
-      //not found
-      return { page: this.page };
-    }
+
     if (this.page.data[0]) {
       await this.getPage(this.page.data[0].id, this.page.data[0]);
       await eventBusService.emit("postProcessPage");
@@ -73,6 +69,12 @@ module.exports = contentService = {
       req: req,
       page: this.page,
     });
+
+    //handle 404
+    if (!this.page || this.page.data.title == "Not Found") {
+      //not found
+      return { page: this.page };
+    }
 
     let rows = [];
     this.page.data.hasRows = false;
