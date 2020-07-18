@@ -8,6 +8,7 @@
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 13px;
   transition: left 1s;
+  z-index: 1;
 }
 
 .pbe-wrapper {
