@@ -414,13 +414,14 @@ a.black {
 
 .open-admin {
   text-align: center;
+  height: 34px;
 }
 
 .open-admin a {
   color: #fff;
-  padding: 12px 0;
+  padding: 12px 4px;
 }
 
 .open-admin a:hover {
-  background-color: #000;
+  /* background-color: #000; */
 }
