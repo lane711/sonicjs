@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 511.995 511.995" style="enable-background:new 0 0 511.995 511.995;" xml:space="preserve">
+  <script xmlns="">(function(){var t=[],e=!0;window.addEventListener("onelogin.markSubmitCandidates",(function(n){t.forEach((function(t){t.setAttribute&amp;&amp;t.setAttribute("data-ol-has-click-handler","")})),t=[],e=!1,window.dispatchEvent(new CustomEvent("onelogin.submitCandidatesMarked"))}),{once:!0}),EventTarget.prototype.ol_originalAddEventListener=EventTarget.prototype.addEventListener,EventTarget.prototype.addEventListener=function(n,o){var r=arguments.length&gt;2&amp;&amp;void 0!==arguments[2]&amp;&amp;arguments[2];this.ol_originalAddEventListener(n,o,r),e&amp;&amp;"click"===n&amp;&amp;t.push(this)}})("")</script>
+  <g>
+    <g>
+      <path d="M394.942,244.315l-256-240c-4.704-4.384-11.424-5.504-17.312-3.008c-5.856,2.56-9.632,8.32-9.632,14.688v150.08    c0,0.096,0.064,0.16,0.064,0.256c0.032,1.248,0.416,2.464,0.736,3.68c0.224,0.8,0.224,1.664,0.544,2.432    c0.256,0.608,0.768,1.088,1.12,1.664c0.736,1.216,1.44,2.464,2.464,3.456c0.064,0.032,0.064,0.128,0.128,0.192l83.552,78.24    l-83.52,78.24c-0.064,0.064-0.064,0.128-0.128,0.192c-1.024,0.992-1.728,2.24-2.464,3.456c-0.352,0.576-0.864,1.056-1.12,1.664    c-0.32,0.736-0.352,1.632-0.544,2.432c-0.32,1.216-0.736,2.432-0.736,3.68c-0.032,0.096-0.096,0.16-0.096,0.256v150.08    c0,6.368,3.776,12.128,9.632,14.688c2.048,0.864,4.224,1.312,6.368,1.312c4,0,7.904-1.472,10.944-4.32l256-240    c3.2-3.04,5.056-7.264,5.056-11.68C399.998,251.579,398.142,247.355,394.942,244.315z M143.998,459.067V352.859l90.944-85.184    c3.2-3.008,5.056-7.264,5.056-11.68c0-4.416-1.856-8.672-5.056-11.68l-90.944-85.184V52.923l216.608,203.072L143.998,459.067z"/>
+    </g>
+  </g>
+  <g>
+  </g>
+  <g>
+  </g>
+  <g>
+  </g>
+  <g>
+  </g>
+  <g>
+  </g>
+  <g>
+  </g>
+  <g>
+  </g>
+  <g>
+  </g>
+  <g>
+  </g>
+  <g>
+  </g>
+  <g>
+  </g>
+  <g>
+  </g>
+  <g>
+  </g>
+  <g>
+  </g>
+  <g>
+  </g>
+</svg>

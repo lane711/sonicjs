@@ -7,6 +7,7 @@
   background: #2f353a;
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 13px;
+  transition: left 1s;
 }
 
 .pbe-wrapper {
@@ -129,7 +130,7 @@ hr {
   height: 50px;
 }
 
-.sidebar-minimizer::before {
+.sidebar-minimizer:before {
   position: absolute;
   top: 0;
   right: 0;
@@ -141,6 +142,25 @@ hr {
   background-position: center;
   background-size: 12.5px;
   transition: .3s;
+}
+
+.sidebar-expander {
+  position: absolute;
+  top: calc(50% - 30px);
+  left: -60px;
+  width: 60px;
+  height: 60px;
+  background-image: url("/img/right-arrow.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 60px;
+  background-color: transparent;
+  border: 0;
+  transition: left 2s;
+}
+
+.sidebar-expander:focus {
+  outline: 0;
 }
 
 .opened {
@@ -376,8 +396,8 @@ section .col:hover {
   z-index: 1040 !important;
 }
 
-.content .nav-tabs{
-  margin: 0 0 20px ;
+.content .nav-tabs {
+  margin: 0 0 20px;
 }
 
 /* .pb-side-panel.close .handle span{

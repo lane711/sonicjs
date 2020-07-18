@@ -47,6 +47,7 @@
     "formiojs": "^3.29.8",
     "jimp": "^0.9.3",
     "jquery": "^3.4.1",
+    "js-cookie": "^2.2.1",
     "jsoneditor": "^6.1.0",
     "jstree": "^3.3.9",
     "lodash": "^4.17.15",
