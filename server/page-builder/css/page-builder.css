@@ -22,7 +22,8 @@
 }
 
 main, .fixed-top, footer {
-  margin-left: 260px
+  margin-left: 260px;
+  transition: margin-left 1s;
 }
 
 .page-builder-nav, .sidebar {
