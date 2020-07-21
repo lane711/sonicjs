@@ -150,9 +150,12 @@ function removeAllHighlights() {
   $(".row-highlight").removeClass("row-highlight");
   $(".col-highlight").removeClass("col-highlight");
   $(".block-edit").removeClass("block-edit");
+  $("html").removeClass("pb");
 }
 
 function setupUIClicks() {
+  $("html").addClass("pb");
+
   $(".mini-layout .pb-row").on({
     click: function () {
       currentSectionId = getParentSectionId($(this));
