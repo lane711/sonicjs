@@ -77,6 +77,12 @@ module.exports = function (app) {
     return;
   });
 
+  app.get("/install", async function (req, res) {
+    let data = { registerMessage: "<b>admin</b>" };
+    res.render("admin-install", { layout: "login.handlebars", data: data });
+    return;
+  });
+
   app.post("/register", function (req, res) {
     var user = app.models.User;
     user.create(
