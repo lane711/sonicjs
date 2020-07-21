@@ -18,7 +18,7 @@ var imageList,
   ShortcodeTree,
   jsonEditorRaw;
 
-$(document).ready(async function() {
+$(document).ready(async function () {
   await setupAxiosInstance();
   setupUIHovers();
   setupUIClicks();
@@ -38,6 +38,7 @@ $(document).ready(async function() {
   await setupDropZone();
   setupSortable();
   setupSidePanel();
+  setupAdminMenuMinimizer();
 });
 
 async function setupAxiosInstance() {
@@ -46,9 +47,9 @@ async function setupAxiosInstance() {
 
   const defaultOptions = {
     headers: {
-      Authorization: `${token}`
+      Authorization: `${token}`,
     },
-    baseUrl: baseUrl
+    baseUrl: baseUrl,
   };
 
   axiosInstance = axios.create(defaultOptions);
@@ -58,7 +59,7 @@ async function setPage() {
   let pageId = $("#page-id").val();
   if (pageId) {
     // console.log("pageId", pageId);
-    axiosInstance.get(`/api/contents/${pageId}`).then(function(response) {
+    axiosInstance.get(`/api/contents/${pageId}`).then(function (response) {
       // handle success
       this.page = response.data;
       // console.log("getPage page", page);
@@ -77,15 +78,15 @@ function axiosTest() {
   // console.log("running axios");
   axiosInstance
     .get("/api/contents")
-    .then(function(response) {
+    .then(function (response) {
       // handle success
       console.log(response);
     })
-    .catch(function(error) {
+    .catch(function (error) {
       // handle error
       console.log(error);
     })
-    .finally(function() {
+    .finally(function () {
       // always executed
       // console.log("done axios");
     });
@@ -93,73 +94,65 @@ function axiosTest() {
 
 function setupUIHovers() {
   $(".pb-section").on({
-    mouseenter: function() {
+    mouseenter: function () {
       let sectionId = getParentSectionId($(this));
       $(`section[id='${sectionId}']`).addClass("section-highlight");
     },
-    mouseleave: function() {
+    mouseleave: function () {
       let sectionId = getParentSectionId($(this));
       $(`section[id='${sectionId}']`).removeClass("section-highlight");
-    }
+    },
   });
 
   $(".mini-layout .pb-row").on({
-    mouseenter: function() {
+    mouseenter: function () {
       let sectionId = getParentSectionId($(this));
       let rowIndex = $(this).index();
       getRow(sectionId, rowIndex).addClass("row-highlight");
     },
-    mouseleave: function() {
+    mouseleave: function () {
       let sectionId = getParentSectionId($(this));
       let rowIndex = $(this).index();
       getRow(sectionId, rowIndex).removeClass("row-highlight");
-    }
+    },
   });
 
   $(".mini-layout .pb-row .col").on({
-    mouseenter: function() {
+    mouseenter: function () {
       let sectionId = getParentSectionId($(this));
       let parentRow = getParentRow(this);
-      let rowIndex = $(this)
-        .parent()
-        .index();
+      let rowIndex = $(this).parent().index();
       let colIndex = $(this).index() + 1;
       getColumn(sectionId, rowIndex, colIndex).addClass("col-highlight");
     },
-    mouseleave: function() {
+    mouseleave: function () {
       let sectionId = getParentSectionId($(this));
       let parentRow = getParentRow(this);
-      let rowIndex = $(this)
-        .parent()
-        .index();
+      let rowIndex = $(this).parent().index();
       let colIndex = $(this).index() + 1;
       getColumn(sectionId, rowIndex, colIndex).removeClass("col-highlight");
-    }
+    },
   });
 }
 
 function setupUIClicks() {
   $(".mini-layout .pb-row").on({
-    click: function() {
+    click: function () {
       currentSectionId = getParentSectionId($(this));
       currentRowIndex = $(this).index();
       console.log("currentRowIndex pbrow", currentRowIndex);
       currentRow = getRow(currentSectionId, currentRowIndex).addClass(
         "row-highlight"
       );
-      $(".row-button")
-        .show()
-        .appendTo(currentRow);
-    }
+      $(".row-button").show().appendTo(currentRow);
+    },
   });
 
   $(".mini-layout .pb-row .col").on({
-    click: function() {
+    click: function () {
       currentSectionId = getParentSectionId($(this));
       currentRow = getParentRow(this);
-      currentRowIndex = $(this)
-        .parent()
-        .index();
+      currentRowIndex = $(this).parent().index();
       console.log("currentRowIndex pbcol", currentRowIndex);
       currentColumnIndex = $(this).index() + 1;
       currentColumn = getColumn(
@@ -167,47 +160,33 @@ function setupUIClicks() {
         currentRowIndex,
         currentColumnIndex
       ).addClass("col-highlight");
-      $(".col-button")
-        .show()
-        .appendTo(currentColumn);
-    }
+      $(".col-button").show().appendTo(currentColumn);
+    },
   });
 
   $("section .row > *").on({
-    click: function() {
+    click: function () {
       // debugger;
       $(".col-highlight").removeClass("col-highlight");
       $(".block-edit").removeClass("block-edit");
-      currentSectionId = $(this)
-        .closest("section")
-        .data("id");
+      currentSectionId = $(this).closest("section").data("id");
       currentRow = $(this).closest(".row")[0];
-      $(this)
-        .closest(".row")
-        .addClass("row-highlight");
-      currentRowIndex = $(this)
-        .closest(".row")
-        .index();
+      $(this).closest(".row").addClass("row-highlight");
+      currentRowIndex = $(this).closest(".row").index();
       console.log("currentRowIndex pbcol", currentRowIndex);
       currentColumnIndex = $(this).index() + 1;
       currentColumn = $(this);
       currentColumn.addClass("col-highlight");
-      $(".col-button")
-        .show()
-        .appendTo(currentColumn);
-      $(".add-module")
-        .show()
-        .appendTo(currentColumn);
-      $(".row-button")
-        .show()
-        .appendTo(currentRow);
+      $(".col-button").show().appendTo(currentColumn);
+      $(".add-module").show().appendTo(currentColumn);
+      $(".row-button").show().appendTo(currentRow);
       // $('.block-button').show().appendTo(currentColumn.children('.module'));
       // currentColumn.children('.module').addClass('block-edit');
-    }
+    },
   });
 
   $("section .row .module").on({
-    click: function() {
+    click: function () {
       // debugger;
       let moduleDiv = $(this).closest(".module");
       currentModuleId = moduleDiv.data("id");
@@ -221,18 +200,14 @@ function setupUIClicks() {
       currentColumnIndex = $(currentColumn).index();
 
       console.log("moduleId", currentModuleId);
-      $(".edit-module")
-        .show()
-        .appendTo(moduleDiv);
+      $(".edit-module").show().appendTo(moduleDiv);
       // currentColumn.children('.module').addClass('block-edit');
-    }
+    },
   });
 }
 
 function getParentSectionId(el) {
-  return $(el)
-    .closest(".pb-section")
-    .data("id");
+  return $(el).closest(".pb-section").data("id");
 }
 
 function getRow(sectionId, rowIndex) {
@@ -261,7 +236,7 @@ async function getCurrentSection() {
 }
 
 async function setupSectionBackgroundEvents() {
-  $(".section-background-editor button").on("click", async function() {
+  $(".section-background-editor button").on("click", async function () {
     let backgroundSetting = $(this).data("type");
     currentSectionId = $(this).data("section-id");
     setupColorPicker(currentSectionId);
@@ -304,7 +279,7 @@ async function setupColorPicker(currentSectionId) {
       "rgba(139, 195, 74, 0.85)",
       "rgba(205, 220, 57, 0.9)",
       "rgba(255, 235, 59, 0.95)",
-      "rgba(255, 193, 7, 1)"
+      "rgba(255, 193, 7, 1)",
     ],
 
     components: {
@@ -322,9 +297,9 @@ async function setupColorPicker(currentSectionId) {
         cmyk: false,
         input: true,
         clear: true,
-        save: true
-      }
-    }
+        save: true,
+      },
+    },
   });
 
   pickr
@@ -382,7 +357,7 @@ async function addSection() {
   let section = {
     title: `Section ${nextSectionCount}`,
     contentType: "section",
-    rows: rows
+    rows: rows,
   };
   let s1 = await createContentInstance(section);
 
@@ -408,9 +383,7 @@ async function editSection(sectionId) {
   console.log("currentSection", currentSection);
   // $('#section-editor').text(JSON.stringify(currentSection));
   loadJsonEditor();
-  $("#sectoinEditorModal")
-    .appendTo("body")
-    .modal("show");
+  $("#sectoinEditorModal").appendTo("body").modal("show");
 }
 
 async function deleteSection(sectionId, index) {
@@ -544,11 +517,11 @@ async function deleteBlock() {
 async function getContentInstance(id) {
   return axiosInstance
     .get(`/api/contents/${id}`)
-    .then(async function(response) {
+    .then(async function (response) {
       // console.log(response);
       return await response.data;
     })
-    .catch(function(error) {
+    .catch(function (error) {
       console.log(error);
     });
 }
@@ -559,13 +532,13 @@ async function getContentType(systemId) {
   let url = `/api/contentTypes?filter=${encodedFilter}`;
   return axiosInstance
     .get(url)
-    .then(async function(record) {
+    .then(async function (record) {
       if (record.data[0]) {
         return record.data[0];
       }
       return "not found";
     })
-    .catch(function(error) {
+    .catch(function (error) {
       console.log(error);
     });
 }
@@ -576,13 +549,13 @@ async function getContentByContentTypeAndTitle(contentType, title) {
   let url = `/api/contents?filter=${encodedFilter}`;
   return axiosInstance
     .get(url)
-    .then(async function(record) {
+    .then(async function (record) {
       if (record.data[0]) {
         return record.data[0];
       }
       return "not found";
     })
-    .catch(function(error) {
+    .catch(function (error) {
       console.log(error);
     });
 }
@@ -605,11 +578,11 @@ async function createContentInstance(payload) {
   // return this.http.post("/api/contents/", content).toPromise();
   return axiosInstance
     .post("/api/contents/", payload)
-    .then(async function(response) {
+    .then(async function (response) {
       console.log(response);
       return await response.data;
     })
-    .catch(function(error) {
+    .catch(function (error) {
       console.log(error);
     });
 }
@@ -636,16 +609,16 @@ async function editContentInstance(payload, refresh) {
   console.log(axiosInstance);
   return axiosInstance
     .put(`/api/contents/${id}`, payload)
-    .then(async function(response) {
+    .then(async function (response) {
       // debugger;
       console.log("editContentInstance", response);
       // resolve(response.data);
       // return await response.data;
-      if(refresh){
+      if (refresh) {
         fullPageUpdate();
       }
     })
-    .catch(function(error) {
+    .catch(function (error) {
       debugger;
       console.log("editContentInstance", error);
     });
@@ -654,7 +627,7 @@ async function editContentInstance(payload, refresh) {
 async function editContentType(payload) {
   // debugger;
   let id = payload.id;
-  if(!id){
+  if (!id) {
     return;
   }
 
@@ -673,7 +646,7 @@ async function editContentType(payload) {
   // debugger;
   return axiosInstance
     .put(`/api/contentTypes/${id}`, payload)
-    .then(async function(response) {
+    .then(async function (response) {
       console.log(response);
       // debugger;
       //reload editor
@@ -681,7 +654,7 @@ async function editContentType(payload) {
       contentType.id = id;
       setupFormBuilder(contentType);
     })
-    .catch(function(error) {
+    .catch(function (error) {
       console.log(error);
     });
 }
@@ -691,11 +664,11 @@ async function deleteContentInstance(id) {
   // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
   return axiosInstance
     .delete(`/api/contents/${id}`)
-    .then(async function(response) {
+    .then(async function (response) {
       console.log(response);
       return await response.data;
     })
-    .catch(function(error) {
+    .catch(function (error) {
       console.log(error);
     });
 }
@@ -705,11 +678,11 @@ async function deleteContentType(id) {
   // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
   axiosInstance
     .delete(`/api/contentTypes/${id}`)
-    .then(async function(response) {
+    .then(async function (response) {
       console.log(response);
       redirect("/admin/content-types");
     })
-    .catch(function(error) {
+    .catch(function (error) {
       console.log(error);
     });
 }
@@ -732,9 +705,7 @@ function processContentFields(payload) {
 
 async function openForm(action, contentType) {
   await setupPageSettings(action, contentType);
-  $("#pageSettingsModal")
-    .appendTo("body")
-    .modal("show");
+  $("#pageSettingsModal").appendTo("body").modal("show");
 }
 
 async function setupPageSettings(action, contentType) {
@@ -749,21 +720,21 @@ async function setupPageSettings(action, contentType) {
       key: "firstName",
       label: "First Name",
       placeholder: "Enter your first name.",
-      input: true
+      input: true,
     },
     {
       type: "textfield",
       key: "lastName",
       label: "Last Name",
       placeholder: "Enter your last name",
-      input: true
+      input: true,
     },
     {
       type: "button",
       action: "submit",
       label: "Submit",
-      theme: "primary"
-    }
+      theme: "primary",
+    },
   ];
 
   // debugger;
@@ -789,16 +760,16 @@ async function setupPageSettings(action, contentType) {
 
   if (action == "add") {
     // components.find(({ key }) => key === 'id' ).remove();
-    componentsToLoad = components.filter(e => e.key !== "id");
+    componentsToLoad = components.filter((e) => e.key !== "id");
   }
 
   let formio = Formio.createForm(document.getElementById("formio"), {
-    components: componentsToLoad
-  }).then(async function(form) {
+    components: componentsToLoad,
+  }).then(async function (form) {
     form.submission = {
-      data: formValuesToLoad
+      data: formValuesToLoad,
     };
-    form.on("submit", async function(submission) {
+    form.on("submit", async function (submission) {
       console.log("submission ->", submission);
       //TODO: copy logic from admin app to save data
       // let entity = {id: submission.data.id, url: submission.data.url, data: submission.data}
@@ -824,7 +795,7 @@ async function setupPageSettings(action, contentType) {
       //     page.data[name] = value;
       // }
     });
-    form.on("error", errors => {
+    form.on("error", (errors) => {
       console.log("We have errors!");
     });
   });
@@ -845,15 +816,15 @@ async function setupFormBuilder(contentType) {
   formService.setFormApiUrls(Formio);
 
   Formio.builder(document.getElementById("formBuilder"), null).then(
-    async function(form) {
+    async function (form) {
       form.setForm({
-        components: contentType.components
+        components: contentType.components,
       });
-      form.on("submit", async function(submission) {
+      form.on("submit", async function (submission) {
         //             debugger;
         console.log("submission ->", submission);
       });
-      form.on("change", async function(event) {
+      form.on("change", async function (event) {
         // debugger;
         if (event.components) {
           contentTypeComponents = event.components;
@@ -937,17 +908,15 @@ async function onContentTypeSave() {
   if (contentTypeComponents) {
     console.log("contentTypeComponents", contentTypeComponents);
     contentType.components = contentTypeComponents;
-    if(!contentType.id){
-      contentType.id = $('#createContentTypeForm #id').val();
+    if (!contentType.id) {
+      contentType.id = $("#createContentTypeForm #id").val();
     }
     await editContentType(contentType);
   }
 }
 
 async function openNewContentTypeModal() {
-  $("#newContentTypeModal")
-    .appendTo("body")
-    .modal("show");
+  $("#newContentTypeModal").appendTo("body").modal("show");
 }
 
 async function openWYSIWYG() {
@@ -956,9 +925,7 @@ async function openWYSIWYG() {
   var id = $(".block-edit").data("id");
   console.log("span clicked " + id);
   $("#block-edit-it").val(id);
-  $("#wysiwygModal")
-    .appendTo("body")
-    .modal("show");
+  $("#wysiwygModal").appendTo("body").modal("show");
 
   var content = await getContentInstance(id);
 
@@ -966,7 +933,7 @@ async function openWYSIWYG() {
 
   // $(document).off('focusin.modal');
   //allow user to interact with tinymcs dialogs: https://stackoverflow.com/questions/36279941/using-tinymce-in-a-modal-dialog
-  $(document).on("focusin", function(e) {
+  $(document).on("focusin", function (e) {
     if ($(e.target).closest(".tox-dialog").length) {
       e.stopImmediatePropagation();
     }
@@ -986,14 +953,14 @@ async function openWYSIWYG() {
     image_advtab: false,
     image_list: tinyImageList,
     automatic_uploads: true,
-    images_upload_handler: function(blobInfo, success, failure) {
+    images_upload_handler: function (blobInfo, success, failure) {
       var xhr, formData;
 
       xhr = new XMLHttpRequest();
       xhr.withCredentials = false;
       xhr.open("POST", "/api/containers/container1/upload");
 
-      xhr.onload = function() {
+      xhr.onload = function () {
         var json;
 
         if (xhr.status != 200) {
@@ -1016,7 +983,7 @@ async function openWYSIWYG() {
       formData.append("file", blobInfo.blob(), blobInfo.filename());
 
       xhr.send(formData);
-    }
+    },
   });
   // });
 }
@@ -1028,12 +995,12 @@ function setupJsonEditor() {
   var options = {
     mode: "text",
     modes: ["code", "form", "text", "tree", "view"], // allowed modes
-    onError: function(err) {
+    onError: function (err) {
       alert(err.toString());
     },
-    onModeChange: function(newMode, oldMode) {
+    onModeChange: function (newMode, oldMode) {
       console.log("Mode switched from", oldMode, "to", newMode);
-    }
+    },
   };
 
   jsonEditor = new JSONEditor(container, options);
@@ -1047,12 +1014,12 @@ function setupJsonEditorContentTypeRaw() {
   var options = {
     mode: "text",
     modes: ["code", "form", "text", "tree", "view"], // allowed modes
-    onError: function(err) {
+    onError: function (err) {
       alert(err.toString());
     },
-    onModeChange: function(newMode, oldMode) {
+    onModeChange: function (newMode, oldMode) {
       console.log("Mode switched from", oldMode, "to", newMode);
-    }
+    },
   };
 
   jsonEditorRaw = new JSONEditor(containerRaw, options);
@@ -1079,7 +1046,7 @@ function loadJsonEditor() {
 }
 
 function setupJsonRawSave() {
-  $("#saveRawJson").on("click", function() {
+  $("#saveRawJson").on("click", function () {
     console.log("json save");
     let contentId = $("#contentId").val();
 
@@ -1098,10 +1065,10 @@ async function getImageList() {
 
   tinyImageList = [];
 
-  imageList.data.forEach(image => {
+  imageList.data.forEach((image) => {
     let imageItem = {
       title: image.name,
-      value: `/api/containers/${image.container}/download/${image.name}`
+      value: `/api/containers/${image.container}/download/${image.name}`,
     };
     tinyImageList.push(imageItem);
   });
@@ -1119,16 +1086,11 @@ async function saveWYSIWYG() {
   editContentInstance(block);
 
   //update screen
-  $(".block-edit")
-    .children()
-    .first()
-    .html(content);
+  $(".block-edit").children().first().html(content);
   // $(`span[data-id="${id}"]`).html(content);
 
   //re-add block edit
-  $(".block-button")
-    .show()
-    .appendTo($(".block-edit"));
+  $(".block-button").show().appendTo($(".block-edit"));
 
   fullPageUpdate();
 }
@@ -1199,13 +1161,13 @@ async function copyModule() {
 
   return axiosInstance
     .post("/admin/pb-update-module-copy", payload)
-    .then(async function(response) {
+    .then(async function (response) {
       // debugger;
       console.log(response);
       fullPageUpdate();
       // return await response.data;
     })
-    .catch(function(error) {
+    .catch(function (error) {
       console.log(error);
     });
 }
@@ -1234,13 +1196,13 @@ async function deleteModule() {
 
   return axiosInstance
     .post("/admin/pb-update-module-delete", payload)
-    .then(async function(response) {
+    .then(async function (response) {
       // debugger;
       console.log(response);
       fullPageUpdate();
       // return await response.data;
     })
-    .catch(function(error) {
+    .catch(function (error) {
       console.log(error);
     });
 }
@@ -1301,7 +1263,7 @@ async function postProcessNewContent(content) {
         url: content.url,
         title: content.name,
         active: true,
-        level: "0"
+        level: "0",
       };
       mainMenu.data.links.push(menuItem);
       await editContentInstance(mainMenu);
@@ -1330,13 +1292,13 @@ async function writeFile(container, file) {
   axiosInstance
     .post(`/api/containers/${container}/upload`, formData, {
       headers: {
-        "Content-Type": "multipart/form-data"
-      }
+        "Content-Type": "multipart/form-data",
+      },
     })
-    .then(function() {
+    .then(function () {
       console.log("SUCCESS!!");
     })
-    .catch(function() {
+    .catch(function () {
       console.log("FAILURE!!");
     });
 }
@@ -1361,7 +1323,7 @@ async function setupACEEditor() {
   //     beautify.beautify(editor.session);
   // });
 
-  editor.getSession().on("change", function() {
+  editor.getSession().on("change", function () {
     update();
 
     // var beautify = ace.require("ace/ext/beautify"); // get reference to extension
@@ -1376,7 +1338,7 @@ async function setupACEEditor() {
     $("#templateCss").html(val);
   }
 
-  $("#save-global-css").click(function() {
+  $("#save-global-css").click(function () {
     let cssContent = editor.getSession().getValue();
     let file = new File([cssContent], "template.css", { type: "text/css" });
     writeFile("css", file);
@@ -1396,20 +1358,20 @@ async function setupDropZone() {
       '<span class="text-center"><span class="font-lg visible-xs-block visible-sm-block visible-lg-block"><span class="font-lg"><i class="fa fa-caret-right text-danger"></i> Drop files <span class="font-xs">to upload</span></span><span>&nbsp&nbsp<h4 class="display-inline"> (Or Click)</h4></span>',
     dictResponseError: "Error uploading file!",
     headers: {
-      Authorization: $("#token").val()
+      Authorization: $("#token").val(),
     },
-    accept: async function(file, done) {
+    accept: async function (file, done) {
       let title = file.name.replace(/\.[^/.]+$/, "");
       let payload = {
         data: {
           title: title,
           file: file.name,
-          contentType: "media"
-        }
+          contentType: "media",
+        },
       };
       await createContentInstance(payload);
       done();
-    }
+    },
   });
 
   // debugger;
@@ -1443,7 +1405,7 @@ async function setupDropZone() {
 }
 
 async function beatifyACECss() {
-  if (typeof ace !== 'undefined') {
+  if (typeof ace !== "undefined") {
     var beautify = ace.require("ace/ext/beautify"); // get reference to extension
     var editor = ace.edit("editor"); // get reference to editor
     beautify.beautify(editor.session);
@@ -1455,7 +1417,7 @@ async function setupSortable() {
   var columns = jQuery.makeArray(columnsList);
 
   // console.log("columns", columns);
-  columns.forEach(column => {
+  columns.forEach((column) => {
     setupSortableColum(column);
   });
 }
@@ -1468,7 +1430,7 @@ async function setupSortableColum(el) {
     var sortable = new Sortable(el, {
       // Element dragging ended
       group: "shared",
-      onEnd: function(/**Event*/ event) {
+      onEnd: function (/**Event*/ event) {
         var itemEl = event.item; // dragged HTMLElement
         event.to; // target list
         event.from; // previous list
@@ -1479,7 +1441,7 @@ async function setupSortableColum(el) {
         event.clone; // the clone element
         event.pullMode; // when item is in another sortable: `"clone"` if cloning, `true` if moving
         updateModuleSort(itemEl, event);
-      }
+      },
     });
   }
 }
@@ -1498,7 +1460,7 @@ async function getModuleHierarchy(element) {
     sourceRow: sourceRow,
     sourceRowIndex: sourceRowIndex,
     sourceColumn: sourceColumn,
-    sourceColumnIndex: sourceColumnIndex
+    sourceColumnIndex: sourceColumnIndex,
   };
 }
 
@@ -1525,7 +1487,7 @@ async function updateModuleSort(shortCode, event) {
   let destinationModules = $(destinationColumn)
     .find(".module")
     .toArray()
-    .map(function(div) {
+    .map(function (div) {
       let shortCodeData = { id: div.dataset.id, module: div.dataset.module };
       return shortCodeData;
     });
@@ -1545,18 +1507,18 @@ async function updateModuleSort(shortCode, event) {
   // debugger;
   return axiosInstance
     .post("/admin/pb-update-module-sort", payload)
-    .then(async function(response) {
+    .then(async function (response) {
       console.log(response);
       return await response.data;
     })
-    .catch(function(error) {
+    .catch(function (error) {
       console.log(error);
     });
 }
 
 function setupSidePanel() {
   // console.log('setup side panel')
-  $(".pb-side-panel .handle span").click(function() {
+  $(".pb-side-panel .handle span").click(function () {
     $(".pb-side-panel").addClass("close");
     $(".pb-side-panel-modal-backdrop").addClass("close");
   });
@@ -1565,4 +1527,41 @@ function setupSidePanel() {
 function showSidePanel() {
   $(".pb-side-panel-modal-backdrop").removeClass("close");
   $(".pb-side-panel").removeClass("close");
+}
+
+function setupAdminMenuMinimizer() {
+  $(".pb-wrapper .sidebar-minimizer").click(function () {
+    Cookies.set("showSidebar", false);
+    toggleSidebar(false);
+  });
+
+  $(".sidebar-expander").click(function () {
+    Cookies.set("showSidebar", true);
+    toggleSidebar(true);
+  });
+
+  if (isEditMode() === "true") {
+    toggleSidebar(true);
+  } else {
+    toggleSidebar(false);
+  }
+}
+
+function toggleSidebar(showSidebar) {
+  if (showSidebar) {
+    //opening
+    $(".pb-wrapper").css("left", "0");
+    $("main, .fixed-top, footer").css("margin-left", "260px");
+    $(".sidebar-expander").css("left", "-60px");
+  } else {
+    //closing
+    $(".pb-wrapper").css("left", "-260px");
+    $("main, .fixed-top, footer").css("margin-left", "0");
+    $(".sidebar-expander").css("left", "0");
+  }
+}
+
+function isEditMode() {
+  let isEditMode = Cookies.get("showSidebar");
+  return isEditMode;
 }

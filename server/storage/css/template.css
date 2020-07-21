@@ -425,3 +425,22 @@ a.black {
 .open-admin a:hover {
   /* background-color: #000; */
 }
+
+.sidebar-expander {
+  position: absolute;
+  top: calc(50% - 30px);
+  left: -60px;
+  width: 60px;
+  height: 60px;
+  background-image: url("/img/right-arrow.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 60px;
+  background-color: transparent;
+  border: 0;
+  transition: left 2s;
+}
+
+.sidebar-expander:focus {
+  outline: 0;
+}
