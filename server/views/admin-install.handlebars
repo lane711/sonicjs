@@ -1,36 +1,76 @@
-<div class="container">
+<div class="container install">
 
   <div class="row justify-content-center">
     <div class="col-md-8 logo-center">
-      <a class="navbar-brand" href="/">
+      <a class="navbar-brand" href="#">
         <img src="/api/containers/files/download/sonicjs-logo-white.svg" alt="" width="600">
       </a>
     </div>
   </div>
   <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-md-10">
 
       <form action="/register" method="post">
 
         <div class="card mx-4">
           <div class="card-body p-4">
-            <h1>Install</h1>
+            <h1>Install SonicJs</h1>
             <p class="text-muted">Let's get you all setup</p>
             <label>
               Select your database
             </label>
-            <div class="input-group mb-3">
+            <div class="input-group mb-10">
 
-              <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                <label class="btn btn-secondary active">
-                  <input type="radio" name="options" id="option1" autocomplete="off" checked> Flat File
-                </label>
-                <label class="btn btn-secondary">
-                  <input type="radio" name="options" id="option2" autocomplete="off"> Mongo
-                </label>
-                <label class="btn btn-secondary">
-                  <input type="radio" name="options" id="option3" autocomplete="off"> MySQL
-                </label>
+              <div class="nav flex-column nav-pills col-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                <a class="nav-link active" id="v-pills-flat-tab" data-toggle="pill" href="#v-pills-flat" role="tab"
+                  aria-controls="v-pills-flat" aria-selected="true">Flat File</a>
+                <a class="nav-link" id="v-pills-mongo-tab" data-toggle="pill" href="#v-pills-mongo" role="tab"
+                  aria-controls="v-pills-mongo" aria-selected="false">Mongo</a>
+                <a class="nav-link" id="v-pills-messages-tab" data-toggle="pill" href="#v-pills-messages" role="tab"
+                  aria-controls="v-pills-messages" aria-selected="false">MySQL</a>
+                <a class="nav-link" id="v-pills-settings-tab" data-toggle="pill" href="#v-pills-settings" role="tab"
+                  aria-controls="v-pills-settings" aria-selected="false">SQL Server</a>
+                <a class="nav-link" id="v-pills-settings-tab" data-toggle="pill" href="#v-pills-settings" role="tab"
+                  aria-controls="v-pills-settings" aria-selected="false">PostgreSQL</a>
+                <a class="nav-link" id="v-pills-settings-tab" data-toggle="pill" href="#v-pills-settings" role="tab"
+                  aria-controls="v-pills-settings" aria-selected="false">Oracle</a>
+                <a class="nav-link" id="v-pills-settings-tab" data-toggle="pill" href="#v-pills-settings" role="tab"
+                  aria-controls="v-pills-settings" aria-selected="false">Redis</a>
+                <a class="nav-link" id="v-pills-settings-tab" data-toggle="pill" href="#v-pills-settings" role="tab"
+                  aria-controls="v-pills-settings" aria-selected="false">SQLLite3</a>
+                <a class="nav-link" id="v-pills-settings-tab" data-toggle="pill" href="#v-pills-settings" role="tab"
+                  aria-controls="v-pills-settings" aria-selected="false">In-Memory</a>
+                <a class="nav-link" id="v-pills-settings-tab" data-toggle="pill" href="#v-pills-settings" role="tab"
+                  aria-controls="v-pills-settings" aria-selected="false">Other</a>
+              </div>
+              <div class="tab-content col-9" id="v-pills-tabContent">
+                <div class="tab-pane fade show active" id="v-pills-flat" role="tabpanel"
+                  aria-labelledby="v-pills-flat-tab">
+                  <p>A flat file database is a simple json file(s) that stores site data. See a sample <a
+                      target="_blank" href="https://github.com/lane711/sonicjs/blob/master/data.json">here</a>.</p>
+                  <ul>
+                    <li>Benefits:</li>
+                    <ul>
+                      <li>Source control your data (optional)</li>
+                      <li>Easy to deploy</li>
+                      <li>Good option for read-only website (even large sites)</li>
+                      <li>Good option if you are just evaluating SonicJs and want to get setup quickly</li>
+                      <li>Highly scalable performance (data is cached in SonicJs by default)</li>
+                      <li>You can optionally split your database into multiple json files</li>
+                    </ul>
+                    <li>Drawbacks:</li>
+                    <ul>
+                      <li>Not recommended for websites with database writes (potential data loss)</li>
+                      <li>Possibility of data getting lost in source control merges</li>
+                    </ul>
+                  </ul>
+                </div>
+                <div class="tab-pane fade" id="v-pills-mongo" role="tabpanel" aria-labelledby="v-pills-mongo-tab">
+                  Mongo</div>
+                <div class="tab-pane fade" id="v-pills-messages" role="tabpanel" aria-labelledby="v-pills-messages-tab">
+                  ...</div>
+                <div class="tab-pane fade" id="v-pills-settings" role="tabpanel" aria-labelledby="v-pills-settings-tab">
+                  ...</div>
               </div>
 
             </div>
