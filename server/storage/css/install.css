@@ -1,3 +1,7 @@
 .install .tab-content {
   color: #212529;
 }
+
+.install .form-control {
+  color: #000;
+}
