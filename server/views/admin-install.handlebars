@@ -23,9 +23,9 @@
             <div class="input-group mb-10">
 
               <div class="nav flex-column nav-pills col-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                <a class="nav-link" id="v-pills-flat-tab" data-toggle="pill" href="#v-pills-flat" role="tab"
+                <a class="nav-link active" id="v-pills-flat-tab" data-toggle="pill" href="#v-pills-flat" role="tab"
                   aria-controls="v-pills-flat" aria-selected="true">Flat File</a>
-                <a class="nav-link active" id="v-pills-mongo-tab" data-toggle="pill" href="#v-pills-mongo" role="tab"
+                <a class="nav-link" id="v-pills-mongo-tab" data-toggle="pill" href="#v-pills-mongo" role="tab"
                   aria-controls="v-pills-mongo" aria-selected="false">Mongo</a>
                 <a class="nav-link" id="v-pills-mysql-tab" data-toggle="pill" href="#v-pills-mysql" role="tab"
                   aria-controls="v-pills-mysql" aria-selected="false">MySQL</a>
@@ -44,8 +44,10 @@
                 <a class="nav-link" id="v-pills-other-tab" data-toggle="pill" href="#v-pills-other" role="tab"
                   aria-controls="v-pills-other" aria-selected="false">Other</a>
               </div>
+
               <div class="tab-content col-9" id="v-pills-tabContent">
-                <div class="tab-pane fade" id="v-pills-flat" role="tabpanel" aria-labelledby="v-pills-flat-tab">
+                <div class="tab-pane fade show active" id="v-pills-flat" role="tabpanel"
+                  aria-labelledby="v-pills-flat-tab">
                   <h3>Flat File</h3>
                   <hr>
                   <p>A flat file database is a simple json file(s) that stores site data. See a sample <a
@@ -67,8 +69,7 @@
                     </ul>
                   </ul>
                 </div>
-                <div class="tab-pane fade show active" id="v-pills-mongo" role="tabpanel"
-                  aria-labelledby="v-pills-mongo-tab">
+                <div class="tab-pane fade" id="v-pills-mongo" role="tabpanel" aria-labelledby="v-pills-mongo-tab">
                   <h3>Mongo</h3>
                   <hr>
                   <div class="form-group">
@@ -76,8 +77,8 @@
                     <input type="text" class="form-control" id="host" placeholder="localhost" value="localhost">
                   </div>
                   <div class="form-group">
-                    <label for="port">Port</label>
-                    <input type="text" class="form-control" id="port" placeholder="27017" value="27017">
+                    <label for="dbport">Port</label>
+                    <input type="text" class="form-control" id="dbport" placeholder="27017" value="27017">
                   </div>
                   <div class="form-group">
                     <label for="url">Url</label>
@@ -105,24 +106,26 @@
                   </div>
 
                 </div>
+                <div class="tab-pane fade" id="v-pills-mysql" role="tabpanel" aria-labelledby="v-pills-mysql-tab">
+                  MySQL</div>
+                <div class="tab-pane fade" id="v-pills-sqlserver" role="tabpanel"
+                  aria-labelledby="v-pills-sqlserver-tab">
+                  SQL Server</div>
+                <div class="tab-pane fade" id="v-pills-postgresql" role="tabpanel"
+                  aria-labelledby="v-pills-postgresql-tab">
+                  PostgreSQL</div>
+                <div class="tab-pane fade" id="v-pills-oracle" role="tabpanel" aria-labelledby="v-pills-oracle-tab">
+                  Oracle</div>
+                <div class="tab-pane fade" id="v-pills-redis" role="tabpanel" aria-labelledby="v-pills-redis-tab">
+                  Redis</div>
+                <div class="tab-pane fade" id="v-pills-sqllite3" role="tabpanel" aria-labelledby="v-pills-sqllite3-tab">
+                  SQLite3</div>
+                <div class="tab-pane fade" id="v-pills-inmemory" role="tabpanel" aria-labelledby="v-pills-inmemory-tab">
+                  In Memory</div>
+                <div class="tab-pane fade" id="v-pills-other" role="tabpanel" aria-labelledby="v-pills-other-tab">
+                  Other</div>
               </div>
-              <div class="tab-pane fade" id="v-pills-mysql" role="tabpanel" aria-labelledby="v-pills-mysql-tab">
-                MySQL</div>
-              <div class="tab-pane fade" id="v-pills-sqlserver" role="tabpanel" aria-labelledby="v-pills-sqlserver-tab">
-                SQL Server</div>
-              <div class="tab-pane fade" id="v-pills-postgresql" role="tabpanel"
-                aria-labelledby="v-pills-postgresql-tab">
-                PostgreSQL</div>
-              <div class="tab-pane fade" id="v-pills-oracle" role="tabpanel" aria-labelledby="v-pills-oracle-tab">
-                Oracle</div>
-              <div class="tab-pane fade" id="v-pills-redis" role="tabpanel" aria-labelledby="v-pills-redis-tab">
-                Redis</div>
-              <div class="tab-pane fade" id="v-pills-sqllite3" role="tabpanel" aria-labelledby="v-pills-sqllite3-tab">
-                SQLite3</div>
-              <div class="tab-pane fade" id="v-pills-inmemory" role="tabpanel" aria-labelledby="v-pills-inmemory-tab">
-                In Memory</div>
-              <div class="tab-pane fade" id="v-pills-other" role="tabpanel" aria-labelledby="v-pills-other-tab">
-                Other</div>
+
             </div>
 
           </div>
