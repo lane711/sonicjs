@@ -1,5 +1,6 @@
 var inquirer = require("inquirer");
-const { exec } = require("child_process");
+// const { exec } = require("child_process");
+var exec = require("child_process").exec;
 
 inquirer
   .prompt([
@@ -18,13 +19,34 @@ inquirer
         "Redis",
         "SQLite3",
         "In-Memory",
-        "Other...",
+        "Cassandra",
+        "Cloudant",
+        "DashDB",
+        "Db2",
+        "DB2 iSeries",
+        "Informix",
+        "OpenAPI",
       ],
     },
   ])
   .then((answers) => {
     console.log(answers);
-    exec("npm --version");
+    // exec("npm install loopback-connector-mongodb --save");
+
+    var cmd = exec("npm install loopback-connector-mongodb --save", function (
+      err,
+      stdout,
+      stderr
+    ) {
+      if (err) {
+        // handle error
+      }
+      console.log(stdout);
+    });
+
+    dir.on("exit", function (code) {
+      // return value from "npm build"
+    });
   })
   .catch((error) => {
     if (error.isTtyError) {
