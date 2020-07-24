@@ -23,7 +23,7 @@ inquirer
         "Cloudant",
         "DashDB",
         "Db2",
-        "DB2 iSeries",
+        { name: "DB2 iSeries", value: "DB2iSeries" },
         "Informix",
         "OpenAPI",
       ],
@@ -31,8 +31,9 @@ inquirer
   ])
   .then((answers) => {
     console.log(answers);
-    // exec("npm install loopback-connector-mongodb --save");
-
+    let dbType = answers.database.replace(" ", "").toLower();
+    console.log(dbType);
+    return;
     var cmd = exec("npm install loopback-connector-mongodb --save", function (
       err,
       stdout,
