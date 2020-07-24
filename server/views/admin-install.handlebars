@@ -10,8 +10,8 @@
   <div class="row justify-content-center">
     <div class="col-md-10">
 
-      <form action="/register" method="post">
-
+      <form action="/install-connection-check" method="post">
+        <input type="hidden" name="databaseType" value="mongo">
         <div class="card mx-4">
           <div class="card-body p-4">
             <h1>Install SonicJs</h1>
@@ -74,24 +74,26 @@
                   <hr>
                   <div class="form-group">
                     <label for="host">Host</label>
-                    <input type="text" class="form-control" id="host" placeholder="localhost" value="localhost">
+                    <input type="text" name="host" class="form-control" id="host" placeholder="localhost"
+                      value="localhost">
                   </div>
                   <div class="form-group">
                     <label for="dbport">Port</label>
-                    <input type="text" class="form-control" id="dbport" placeholder="27017" value="27017">
+                    <input type="text" name="port" class="form-control" id="dbport" placeholder="27017" value="27017">
                   </div>
                   <div class="form-group">
                     <label for="url">Url</label>
-                    <input type="text" class="form-control" id="url" placeholder="mongodb://localhost:27017/sonicjs"
-                      value="mongodb://localhost:27017/sonicjs">
+                    <input type="text" class="form-control" name="url" id="url"
+                      placeholder="mongodb://localhost:27017/sonicjs" value="mongodb://localhost:27017/sonicjs">
                   </div>
                   <div class="form-group">
                     <label for="database">Database</label>
-                    <input type="text" class="form-control" id="database" placeholder="sonicjs" value="sonicjs">
+                    <input type="text" class="form-control" name="databaseName" id="database" placeholder="sonicjs"
+                      value="sonicjs">
                   </div>
                   <div class="form-group">
                     <label for="user">User</label>
-                    <input type="text" class="form-control" id="user" placeholder="optional">
+                    <input type="text" class="form-control" name="user" id="user" placeholder="optional">
                   </div>
                   <div class="form-group" style="margin-bottom: 0;">
                     <label for="password">Password</label>
@@ -134,7 +136,7 @@
 
             <div class="row">
               <div class="col-12">
-                <button class="btn btn-block btn-success" type="submit">Next</button>
+                <button id="btn-check-connection" class="btn btn-block btn-success" type="submit">Next</button>
               </div>
             </div>
 

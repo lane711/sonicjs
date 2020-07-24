@@ -8,6 +8,7 @@ var pageBuilderService = require("../services/page-builder.service");
 // var formio = require("../services/formio.service");
 var adminService = require("../services/admin.service");
 adminService.startup();
+var installerService = require("../services/installer.service");
 var dataService = require("../services/data.service");
 dataService.startup();
 var moduleService = require("../services/module.service");
@@ -49,6 +50,7 @@ module.exports = function (app) {
   let adminPage = "";
 
   (async () => {
+    await installerService.startup(app);
     await cacheService.startup();
     await menuService.startup();
     await mediaService.startup();
@@ -77,11 +79,20 @@ module.exports = function (app) {
     return;
   });
 
-  app.get("/install", async function (req, res) {
-    let data = { registerMessage: "<b>admin</b>" };
-    res.render("admin-install", { layout: "login.handlebars", data: data });
-    return;
-  });
+  // app.get("/install", async function (req, res) {
+  //   let data = { registerMessage: "<b>admin</b>" };
+  //   res.render("admin-install", { layout: "login.handlebars", data: data });
+  //   return;
+  // });
+
+  // app.post("/install-connection-check", async function (req, res) {
+  //   //TODO, make sure db not already setup
+  //   let data = req.body;
+  //   console.log(data);
+  //   let message = "Testing database connection, hang tight...";
+  //   res.redirect(`/install?message=${message}`); // /admin will show the login
+  //   return;
+  // });
 
   app.post("/register", function (req, res) {
     var user = app.models.User;
