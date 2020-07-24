@@ -18,5 +18,64 @@
     "connector": "loopback-component-storage",
     "provider": "filesystem",
     "root": "./server/storage"
+  },
+  "mongo": {
+    "host": "",
+    "port": 0,
+    "url": "",
+    "database": "",
+    "password": "",
+    "name": "mongo",
+    "user": "",
+    "connector": "mongodb"
+  },
+  "sqlserver": {
+    "host": "",
+    "port": 0,
+    "url": "",
+    "database": "",
+    "password": "",
+    "name": "sqlserver",
+    "user": "",
+    "connector": "mssql"
+  },
+  "mysql": {
+    "host": "",
+    "port": 0,
+    "url": "",
+    "database": "",
+    "password": "",
+    "name": "mysql",
+    "user": "",
+    "connector": "mysql"
+  },
+  "postgresql": {
+    "host": "",
+    "port": 0,
+    "url": "",
+    "database": "",
+    "password": "",
+    "name": "postgresql",
+    "user": "",
+    "connector": "postgresql"
+  },
+  "redis": {
+    "host": "",
+    "port": 0,
+    "url": "",
+    "password": "",
+    "name": "redis",
+    "db": 0,
+    "connector": "kv-redis"
+  },
+  "oracle": {
+    "host": "",
+    "port": 0,
+    "database": "",
+    "password": "",
+    "name": "oracle",
+    "tns": "",
+    "user": "",
+    "connector": "oracle"
   }
 }
