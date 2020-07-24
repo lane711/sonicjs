@@ -8,6 +8,7 @@
   "scripts": {
     "lint": "eslint .",
     "start": "nodemon -e handlebars,js,css,html",
+    "postinstall": "node install.js",
     "posttest": "npm run lint"
   },
   "dependencies": {
