@@ -7,7 +7,7 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "start": "nodemon -e handlebars,js,css,html",
+    "start": "nodemon --watch server/datasources.json -e handlebars,js,css,html",
     "posttest": "npm run lint"
   },
   "dependencies": {
@@ -59,7 +59,6 @@
     "loopback-connector-mongodb": "3.8.0",
     "loopback-connector-mssql": "^3.8.0",
     "loopback-connector-mysql": "^5.4.4",
-    "loopback-connector-oracle": "^4.5.2",
     "loopback-connector-postgresql": "^3.9.1",
     "lorem-ipsum": "^2.0.0",
     "mixpanel": "^0.11.0",

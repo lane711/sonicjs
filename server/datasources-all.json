@@ -1,0 +1,81 @@
+{
+  "db": {
+    "name": "db",
+    "connector": "memory",
+    "file": "data.json"
+  },
+  "db-user": {
+    "name": "db-user",
+    "connector": "memory",
+    "file": "data-user.json"
+  },
+  "transient": {
+    "name": "transient",
+    "connector": "transient"
+  },
+  "storage": {
+    "name": "storage",
+    "connector": "loopback-component-storage",
+    "provider": "filesystem",
+    "root": "./server/storage"
+  },
+  "mongodb": {
+    "host": "localhost",
+    "port": 27017,
+    "url": "mongodb://localhost:27017/sonicjs",
+    "database": "sonicjs",
+    "password": "",
+    "name": "mongodb",
+    "user": "",
+    "connector": "mongodb"
+  },
+  "sqlserver": {
+    "host": "",
+    "port": 0,
+    "url": "",
+    "database": "",
+    "password": "",
+    "name": "sqlserver",
+    "user": "",
+    "connector": "mssql"
+  },
+  "mysql": {
+    "host": "",
+    "port": 0,
+    "url": "",
+    "database": "",
+    "password": "",
+    "name": "mysql",
+    "user": "",
+    "connector": "mysql"
+  },
+  "postgresql": {
+    "host": "",
+    "port": 0,
+    "url": "",
+    "database": "",
+    "password": "",
+    "name": "postgresql",
+    "user": "",
+    "connector": "postgresql"
+  },
+  "redis": {
+    "host": "",
+    "port": 0,
+    "url": "",
+    "password": "",
+    "name": "redis",
+    "db": 0,
+    "connector": "kv-redis"
+  },
+  "oracle": {
+    "host": "",
+    "port": 0,
+    "database": "",
+    "password": "",
+    "name": "oracle",
+    "tns": "",
+    "user": "",
+    "connector": "oracle"
+  }
+}
