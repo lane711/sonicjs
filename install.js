@@ -1,6 +1,7 @@
 var inquirer = require("inquirer");
 var ui = new inquirer.ui.BottomBar();
 var exec = require("child_process").exec;
+const fs = require("fs");
 
 inquirer
   .prompt([
@@ -96,17 +97,36 @@ function getDBConfig(dbType) {
     .prompt([
       {
         name: "host",
-        message: "MongoDB Host?",
+        message: "MongoDB Host:",
         default: "localhost",
       },
       {
         name: "port",
-        message: "MongoDB Port?",
+        message: "MongoDB Port:",
         default: "27017",
+      },
+      {
+        name: "url",
+        message: "MongoDB Url:",
+        default: "mongodb://localhost:27017",
+      },
+      {
+        name: "database",
+        message: "MongoDB Database Name:",
+        default: "sonicjs",
+      },
+      {
+        name: "user",
+        message: "MongoDB User:",
+      },
+      {
+        name: "password",
+        message: "MongoDB Port:",
       },
     ])
     .then((answers) => {
-      console.log(answers);
+      answers.connector = "mongodb";
+      writeConfig(answers);
       // Use user feedback for... whatever!!
     })
     .catch((error) => {
@@ -116,4 +136,27 @@ function getDBConfig(dbType) {
         // Something else when wrong
       }
     });
+}
+
+function writeConfig(config) {
+  // console.log(config);
+  let data = fs.readFileSync("server/datasources.json");
+  let configFile = JSON.parse(data);
+  console.log(configFile);
+
+  //remove db and db-user
+  delete configFile.db;
+  delete configFile["db-user"];
+
+  //add new config
+  configFile.db = config;
+  console.log(configFile);
+
+  //write new config
+  let newConfigFile = JSON.stringify(configFile, null, 2);
+
+  fs.writeFile("server/datasources.json", newConfigFile, (err) => {
+    if (err) throw err;
+    console.log("Data written to file");
+  });
 }
