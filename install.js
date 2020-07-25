@@ -11,9 +11,9 @@ inquirer
       name: "database",
       choices: [
         "Flat File",
-        "Mongo",
+        "MongoDB",
         "MySQL",
-        "SQL Server",
+        { name: "SQL Server", value: "mssql" },
         "PostgreSQL",
         "Oracle",
         "Redis",
@@ -24,17 +24,17 @@ inquirer
         "DashDB",
         "Db2",
         { name: "DB2 iSeries", value: "DB2iSeries" },
+        { name: "DB2 for z/OS", value: "db2z" },
         "Informix",
         "OpenAPI",
       ],
     },
   ])
   .then((answers) => {
-    console.log(answers);
+    console.log("Installing database drivers. This may take up to a minute...");
     let dbType = answers.database.replace(" ", "").toLower();
-    console.log(dbType);
-    return;
-    var cmd = exec("npm install loopback-connector-mongodb --save", function (
+
+    var cmd = exec(`npm install loopback-connector-${dbType} --save`, function (
       err,
       stdout,
       stderr
