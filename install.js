@@ -1,5 +1,5 @@
 var inquirer = require("inquirer");
-// const { exec } = require("child_process");
+var ui = new inquirer.ui.BottomBar();
 var exec = require("child_process").exec;
 
 inquirer
@@ -31,9 +31,23 @@ inquirer
     },
   ])
   .then((answers) => {
-    console.log("Installing database drivers. This may take up to a minute...");
-    let dbType = answers.database.replace(" ", "").toLower();
+    // console.log(answers);
 
+    let dbType = answers.database.toLowerCase();
+    // installDBDriver(dbType);
+    getDBConfig(dbType);
+  })
+  .catch((error) => {
+    console.log(error);
+    if (error.isTtyError) {
+      // Prompt couldn't be rendered in the current environment
+    } else {
+      // Something else when wrong
+    }
+  });
+
+function installDBDriver(dbType) {
+  if (doesRequireInstallation(dbType)) {
     var cmd = exec(`npm install loopback-connector-${dbType} --save`, function (
       err,
       stdout,
@@ -41,18 +55,65 @@ inquirer
     ) {
       if (err) {
         // handle error
+        console.log(`Error has occurred: ${err}`);
       }
       console.log(stdout);
     });
 
     dir.on("exit", function (code) {
       // return value from "npm build"
+      // console.log(`Installing successful. Now run "npm start"`);
     });
-  })
-  .catch((error) => {
-    if (error.isTtyError) {
-      // Prompt couldn't be rendered in the current environment
-    } else {
-      // Something else when wrong
-    }
-  });
+  } else {
+    console.log(`Installing successful. Now run "npm start"`);
+  }
+}
+
+function doesRequireInstallation(dbType) {
+  if (dbType === "flat file" || dbType === "in-memory") {
+    return false;
+  }
+  return true;
+}
+
+function getDBConfig(dbType) {
+  if (!doesRequireInstallation(dbType)) {
+    return;
+  }
+
+  // "host": "localhost",
+  // "port": 27017,
+  // "url": "mongodb://localhost:27017/sonicjs",
+  // "database": "sonicjs",
+  // "password": "",
+  // "name": "mongodb",
+  // "user": "",
+  ui.log.write(
+    "Press [enter] if you want to accepts the default value or type your own."
+  );
+
+  inquirer
+    .prompt([
+      {
+        name: "host",
+        message: "MongoDB Host?",
+        default: "localhost",
+      },
+      {
+        name: "port",
+        message: "MongoDB Port?",
+        default: "27017",
+      },
+    ])
+    .then((answers) => {
+      console.log(answers);
+      // Use user feedback for... whatever!!
+    })
+    .catch((error) => {
+      if (error.isTtyError) {
+        // Prompt couldn't be rendered in the current environment
+      } else {
+        // Something else when wrong
+      }
+    });
+}
