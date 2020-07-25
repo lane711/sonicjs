@@ -125,6 +125,7 @@ function getDBConfig(dbType) {
       },
     ])
     .then((answers) => {
+      answers.name = "db";
       answers.connector = "mongodb";
       writeConfig(answers);
       // Use user feedback for... whatever!!
@@ -157,6 +158,6 @@ function writeConfig(config) {
 
   fs.writeFile("server/datasources.json", newConfigFile, (err) => {
     if (err) throw err;
-    console.log("Data written to file");
+    console.log("Config file updated (server/datasources.json)");
   });
 }
