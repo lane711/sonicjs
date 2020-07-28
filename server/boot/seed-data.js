@@ -1,21 +1,29 @@
-module.exports = function(app) {
-//   console.log('starting migration 1');
-//   app.dataSources.mongodb.automigrate('contentType', function(err) {
-//     if (err) throw err;
+module.exports = function (app) {
+  app.dataSources.db.automigrate();
 
-//     app.models.contentType.create([{
-//       name: 'Bel Cafe',
-//       city: 'Vancouver',
-//     }, {
-//         name: 'Three Bees Coffee House',
-//         city: 'San Mateo',
-//       }, {
-//         name: 'Caffe Artigiano',
-//         city: 'Vancouver',
-//       }], function(err, coffeeShops) {
-//       if (err) throw err;
+  // app.dataSources.mongo.automigrate("contentType", function (err) {
+  //   if (err) throw err;
 
-//       console.log('Models created: \n', coffeeShops);
-//     });
-//   });
+  //   app.models.contentType.create(
+  //     [
+  //       {
+  //         systemid: "news6",
+  //         title: "News Article 6",
+  //         submit: "true",
+  //         testAttr: "ipsum de lor 6",
+  //       },
+  //       {
+  //         systemid: "news9",
+  //         title: "News Article 9",
+  //         submit: "true",
+  //         testAttr: "ipsum de lor 9",
+  //       },
+  //     ],
+  //     function (err, coffeeShops) {
+  //       if (err) throw err;
+
+  //       console.log("Models created: \n", coffeeShops);
+  //     }
+  //   );
+  // });
 };

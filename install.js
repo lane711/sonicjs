@@ -108,7 +108,7 @@ function getDBConfig(dbType) {
       {
         name: "url",
         message: "MongoDB Url:",
-        default: "mongodb://localhost:27017",
+        default: "mongodb://localhost:27017/sonicjs",
       },
       {
         name: "database",
