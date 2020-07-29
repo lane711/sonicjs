@@ -143,7 +143,7 @@ function writeConfig(config) {
   // console.log(config);
   let data = fs.readFileSync("server/datasources.json");
   let configFile = JSON.parse(data);
-  console.log(configFile);
+  // console.log(configFile);
 
   //remove db and db-user
   delete configFile.db;
@@ -151,7 +151,7 @@ function writeConfig(config) {
 
   //add new config
   configFile.primary = config;
-  console.log(configFile);
+  // console.log(configFile);
 
   //write new config
   let newConfigFile = JSON.stringify(configFile, null, 2);
