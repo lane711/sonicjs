@@ -1,1 +1,17 @@
-// use this file to overwrite the main datasources.json file for local development
+{
+  "primary": {
+    "name": "primary",
+    "connector": "memory",
+    "file": "server/data/data.json"
+  },
+  "transient": {
+    "name": "transient",
+    "connector": "transient"
+  },
+  "storage": {
+    "name": "storage",
+    "connector": "loopback-component-storage",
+    "provider": "filesystem",
+    "root": "./server/storage"
+  }
+}

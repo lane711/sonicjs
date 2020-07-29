@@ -150,7 +150,7 @@ function writeConfig(config) {
   delete configFile["db-user"];
 
   //add new config
-  configFile.db = config;
+  configFile.primary = config;
   console.log(configFile);
 
   //write new config

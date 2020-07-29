@@ -14,38 +14,38 @@
     ]
   },
   "User": {
-    "dataSource": "db-user",
+    "dataSource": "primary",
     "public": true
   },
   "AccessToken": {
-    "dataSource": "db-user",
+    "dataSource": "primary",
     "public": false
   },
   "ACL": {
-    "dataSource": "db-user",
+    "dataSource": "primary",
     "public": false
   },
   "RoleMapping": {
-    "dataSource": "db-user",
+    "dataSource": "primary",
     "public": false,
     "options": {
       "strictObjectIDCoercion": true
     }
   },
   "Role": {
-    "dataSource": "db-user",
+    "dataSource": "primary",
     "public": false
   },
   "contentType": {
-    "dataSource": "db",
+    "dataSource": "primary",
     "public": true
   },
   "content": {
-    "dataSource": "db",
+    "dataSource": "primary",
     "public": true
   },
   "fieldType": {
-    "dataSource": "db",
+    "dataSource": "primary",
     "public": true
   },
   "contentTypeField": {
@@ -53,7 +53,7 @@
     "public": false
   },
   "e2e-test": {
-    "dataSource": "db",
+    "dataSource": "primary",
     "public": true
   },
   "container": {

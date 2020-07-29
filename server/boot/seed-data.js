@@ -1,9 +1,7 @@
 module.exports = function (app) {
-  app.dataSources.db.automigrate();
-
+  // app.dataSources.primary.automigrate();
   // app.dataSources.mongo.automigrate("contentType", function (err) {
   //   if (err) throw err;
-
   //   app.models.contentType.create(
   //     [
   //       {
@@ -21,7 +19,6 @@ module.exports = function (app) {
   //     ],
   //     function (err, coffeeShops) {
   //       if (err) throw err;
-
   //       console.log("Models created: \n", coffeeShops);
   //     }
   //   );

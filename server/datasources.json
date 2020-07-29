@@ -1,13 +1,8 @@
 {
-  "db": {
-    "name": "db",
+  "primary": {
+    "name": "primary",
     "connector": "memory",
-    "file": "data.json"
-  },
-  "db-user": {
-    "name": "db-user",
-    "connector": "memory",
-    "file": "data-user.json"
+    "file": "server/data/data.json"
   },
   "transient": {
     "name": "transient",
