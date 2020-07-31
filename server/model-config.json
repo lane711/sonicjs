@@ -44,17 +44,9 @@
     "dataSource": "primary",
     "public": true
   },
-  "fieldType": {
-    "dataSource": "primary",
-    "public": true
-  },
   "contentTypeField": {
     "dataSource": "transient",
     "public": false
-  },
-  "e2e-test": {
-    "dataSource": "primary",
-    "public": true
   },
   "container": {
     "dataSource": "storage",
