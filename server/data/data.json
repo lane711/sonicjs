@@ -1,9 +1,7 @@
 {
   "ids": {
     "contentType": 53,
-    "content": 524,
-    "fieldType": 2,
-    "e2e-test": 2
+    "content": 524
   },
   "models": {
     "contentType": {
@@ -514,12 +512,6 @@
       "521": "{\"data\":{\"body\":\"<p>Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Curabitur blandit tempus porttitor. Nulla vitae elit libero, a pharetra augue. Etiam porta sem malesuada magna mollis euismod. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. &nbsp;</p>\",\"contentType\":\"html\",\"submit\":true,\"createdOn\":1595295698394},\"id\":521}",
       "522": "{\"id\":522,\"data\":{\"body\":\"<p>Cras pattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Sed posuere consectetur est at lobortis.<br>&nbsp;</p>\",\"contentType\":\"html\",\"createdOn\":1595295726559,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-420,\"referrer\":\"http://localhost:3018/test-20\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36\",\"pathName\":\"/test-20\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
       "523": "{\"data\":{\"body\":\"<p>Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Sed posuere consectetur est at lobortis. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Etiam porta sem malesuada magna mollis euismod. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Cras mattis consectetur purus sit amet fermentum.<br>&nbsp;</p>\",\"contentType\":\"html\",\"submit\":true,\"createdOn\":1595301533662},\"id\":523}"
-    },
-    "fieldType": {
-      "1": "{\"name\":\"string\",\"renderFunction\":\"string\",\"id\":1}"
-    },
-    "e2e-test": {
-      "1": "{\"title\":\"string\",\"TimeStamp\":\"2019-10-26T00:27:27.503Z\",\"isPassed\":true,\"id\":1}"
     }
   }
 }
