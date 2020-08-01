@@ -44,10 +44,6 @@
     "dataSource": "primary",
     "public": true
   },
-  "contentTypeField": {
-    "dataSource": "transient",
-    "public": false
-  },
   "container": {
     "dataSource": "storage",
     "public": true
