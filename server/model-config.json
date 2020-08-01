@@ -14,34 +14,34 @@
     ]
   },
   "User": {
-    "dataSource": "primary",
+    "dataSource": "db-user",
     "public": true
   },
   "AccessToken": {
-    "dataSource": "primary",
+    "dataSource": "db-user",
     "public": false
   },
   "ACL": {
-    "dataSource": "primary",
+    "dataSource": "db-user",
     "public": false
   },
   "RoleMapping": {
-    "dataSource": "primary",
+    "dataSource": "db-user",
     "public": false,
     "options": {
       "strictObjectIDCoercion": true
     }
   },
   "Role": {
-    "dataSource": "primary",
+    "dataSource": "db-user",
     "public": false
   },
   "contentType": {
-    "dataSource": "primary",
+    "dataSource": "db",
     "public": true
   },
   "content": {
-    "dataSource": "primary",
+    "dataSource": "db",
     "public": true
   },
   "container": {
