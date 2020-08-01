@@ -10,16 +10,18 @@ const chalk = require("chalk");
 const log = console.log;
 
 module.exports = menuService = {
-  startup: function() {
+  startup: function () {
     // console.log('>>=== menu startup');
 
-    eventBusService.on("getRenderedPagePostDataFetch", async function(options) {
+    eventBusService.on("getRenderedPagePostDataFetch", async function (
+      options
+    ) {
       if (options) {
         let menuData = await menuService.getMenu("Main");
-        menuData.forEach(menuItem => {
+        menuData.forEach((menuItem) => {
           menuItem.isActive = menuItem.data.url === options.req.path;
 
-          menuItem.children.forEach(subMenuItem => {
+          menuItem.children.forEach((subMenuItem) => {
             //if child is active, set parent active too
             if (subMenuItem.data.url === options.req.path) {
               menuItem.isActive = true;
@@ -44,10 +46,10 @@ module.exports = menuService = {
     });
   },
 
-  processSecondLevel: function(menuData, url) {
-    let activeNode = menuData.find(x => x.isActive === true);
+  processSecondLevel: function (menuData, url) {
+    let activeNode = menuData.find((x) => x.isActive === true);
     if (activeNode && activeNode.children && activeNode.children.length > 0) {
-      activeNode.children.forEach(menuItem => {
+      activeNode.children.forEach((menuItem) => {
         menuItem.isActive = menuItem.data.url === url;
       });
 
@@ -55,7 +57,7 @@ module.exports = menuService = {
     }
   },
 
-  getMenu: async function(menuName) {
+  getMenu: async function (menuName) {
     let menuData = await dataService.getContentByContentTypeAndTitle(
       "menu",
       menuName
@@ -91,7 +93,7 @@ module.exports = menuService = {
     // return menu;
   },
 
-  hasChildren: function(links, currentLinkIndex) {
+  hasChildren: function (links, currentLinkIndex) {
     if (currentLinkIndex < links.length - 1) {
       let currentLink = links[currentLinkIndex];
       let nextLink = links[currentLinkIndex + 1];
@@ -102,7 +104,7 @@ module.exports = menuService = {
     return false;
   },
 
-  getChildren: function(links, hasChildren, currentLinkIndex) {
+  getChildren: function (links, hasChildren, currentLinkIndex) {
     let childLinks = [];
     if (hasChildren) {
       for (let index = currentLinkIndex + 1; index < links.length; index++) {
@@ -111,7 +113,7 @@ module.exports = menuService = {
           childLinks.push({
             url: currentLink.url,
             title: currentLink.title,
-            hasChildren: false
+            hasChildren: false,
           });
         } else {
           break;
@@ -120,5 +122,5 @@ module.exports = menuService = {
     }
 
     return childLinks;
-  }
+  },
 };

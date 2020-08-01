@@ -294,14 +294,16 @@ module.exports = contentService = {
 
     await eventBusService.emit("preProcessRows");
 
-    for (const row of rows) {
-      // console.log(chalk.red(JSON.stringify(row)));
-      globalService.pageContent += `<div class='${row.class}''>`;
-      let columns = await this.processColumns(section, row, rowIndex);
-      globalService.pageContent += `</div>`;
+    if (rows) {
+      for (const row of rows) {
+        // console.log(chalk.red(JSON.stringify(row)));
+        globalService.pageContent += `<div class='${row.class}''>`;
+        let columns = await this.processColumns(section, row, rowIndex);
+        globalService.pageContent += `</div>`;
 
-      rowArray.push(row);
-      rowIndex++;
+        rowArray.push(row);
+        rowIndex++;
+      }
     }
     // console.log('rowArray---->', rowArray);
     return rowArray;
