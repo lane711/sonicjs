@@ -1,6 +1,6 @@
 {
-  "db": {
-    "name": "db",
+  "primary": {
+    "name": "primary",
     "connector": "memory",
     "file": "server/data/data.json"
   },
