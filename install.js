@@ -88,7 +88,7 @@ function reCopyDatasourcesJson() {
   );
 
   console.log(
-    "Success: datasources.json and datasources.local.json configured to use flat file database"
+    "\nSuccess: datasources.json and datasources.local.json configured to use flat file database\n"
   );
 }
 
