@@ -1,6 +1,9 @@
 const fs = require("fs");
 
 module.exports = function (app) {
+  if (!(process.env.RUN_NEW_SITE_MIGRATION === "TRUE")) {
+    return;
+  }
   // return;
   // app.dataSources.primary.automigrate();
   let dataRaw = fs.readFileSync("server/data/data.json");
@@ -16,52 +19,50 @@ module.exports = function (app) {
       contentTypeObjs[key],
     ]);
 
-    // let testObj = { title: "rest", systemid: "test" };
-    // app.models.contentType.create(testObj, function (err, newInstance) {
-    //   if (err) throw err;
-    //   console.log("Models created: \n", newInstance);
-    // });
-
     contentTypes.forEach((contentType) => {
       console.log(contentType);
       let objString = contentType[1];
       let obj = JSON.parse(objString);
 
-      let newContentType = { title: obj.title, systemid: obj.systemid };
+      let newContentType = {
+        title: obj.title,
+        systemid: obj.systemid,
+        components: obj.components,
+      };
 
-      delete obj.id;
-      delete obj.__proto__;
-      // let newO = Object.create(obj);
       app.models.contentType.create(newContentType, function (
         err,
         newInstance
       ) {
         if (err) throw err;
-        console.log("Models created: \n", newInstance);
+        console.log("Content type created:", newInstance);
       });
     });
+  });
 
-    // console.log(result);
+  app.dataSources.primary.automigrate("content", function (err) {
+    if (err) throw err;
 
-    // let contentTypes = JSON.parse(contentTypeString);
-    // console.log(contentType);
-    // app.models.contentType.create([data.models.contentType], function (
-    //   err,
-    //   contentType
-    // ) {
-    //   if (err) throw err;
-    //   console.log("Models created: \n", coffeeShops);
-    // });
+    let contentObjs = data.models.content;
 
-    // user.create(
-    //   { email: req.body.email, password: req.body.password },
-    //   function (err, userInstance) {
-    //     console.log(userInstance);
-    //     globalService.isAdminUserCreated = true;
-    //     let message = encodeURI(`Account created successfully. Please login`);
-    //     res.redirect(`/admin?message=${message}`); // /admin will show the login
-    //     return;
-    //   }
-    // );
+    var contents = Object.keys(contentObjs).map((key) => [
+      Number(key),
+      contentObjs[key],
+    ]);
+
+    contents.forEach((content) => {
+      console.log(content);
+      let objString = content[1];
+      let obj = JSON.parse(objString);
+
+      let newContent = {
+        data: obj.data,
+      };
+
+      app.models.content.create(newContent, function (err, newInstance) {
+        if (err) throw err;
+        console.log("Content created:", newInstance);
+      });
+    });
   });
 };
