@@ -74,17 +74,13 @@ module.exports = async function (app) {
   async function setEnvVarToEnsureMigrationDoesNotRunAgain() {
     let sourcePath = path.join(__dirname, "../..", ".env");
 
-    // process.env.RUN_NEW_SITE_MIGRATION = "FALSE";
-
     fs.readFile(sourcePath, "utf8", function (err, data) {
       if (err) {
         return console.log(err);
       }
-      console.log(parse(data));
       let parsedFile = parse(data);
       parsedFile.RUN_NEW_SITE_MIGRATION = "FALSE";
       fs.writeFileSync(sourcePath, stringify(parsedFile));
-      console.log(stringify(parsedFile));
     });
   }
 };
