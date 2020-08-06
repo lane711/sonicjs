@@ -1,6 +1,10 @@
 const fs = require("fs");
+const { parse, stringify } = require("envfile");
+const path = require("path");
 
-module.exports = function (app) {
+module.exports = async function (app) {
+  await setEnvVarToEnsureMigrationDoesNotRunAgain();
+
   if (!(process.env.RUN_NEW_SITE_MIGRATION === "TRUE")) {
     return;
   }
@@ -62,7 +66,25 @@ module.exports = function (app) {
       app.models.content.create(newContent, function (err, newInstance) {
         if (err) throw err;
         console.log("Content created:", newInstance);
+        setEnvVarToEnsureMigrationDoesNotRunAgain();
       });
     });
   });
+
+  async function setEnvVarToEnsureMigrationDoesNotRunAgain() {
+    let sourcePath = path.join(__dirname, "../..", ".env");
+
+    // process.env.RUN_NEW_SITE_MIGRATION = "FALSE";
+
+    fs.readFile(sourcePath, "utf8", function (err, data) {
+      if (err) {
+        return console.log(err);
+      }
+      console.log(parse(data));
+      let parsedFile = parse(data);
+      parsedFile.RUN_NEW_SITE_MIGRATION = "FALSE";
+      fs.writeFileSync(sourcePath, stringify(parsedFile));
+      console.log(stringify(parsedFile));
+    });
+  }
 };
