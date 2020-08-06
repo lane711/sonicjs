@@ -35,8 +35,8 @@ inquirer
     // console.log(answers);
 
     let dbType = answers.database.toLowerCase();
-    // installDBDriver(dbType);
-    getDBConfig(dbType);
+    installDBDriver(dbType);
+    // getDBConfig(dbType); //temp bypass for dev only
   })
   .catch((error) => {
     console.log(error);
@@ -66,6 +66,7 @@ function installDBDriver(dbType) {
       // console.log(`Installing successful. Now run "npm start"`);
     });
   } else {
+    reCopyDatasourcesJson();
     console.log(`Installing successful. Now run "npm start"`);
   }
 }
@@ -75,6 +76,20 @@ function doesRequireInstallation(dbType) {
     return false;
   }
   return true;
+}
+
+function reCopyDatasourcesJson() {
+  fs.createReadStream("server/datasources.original.json").pipe(
+    fs.createWriteStream("server/datasources.json")
+  );
+
+  fs.createReadStream("server/datasources.original.json").pipe(
+    fs.createWriteStream("server/datasources.local.json")
+  );
+
+  console.log(
+    "Success: datasources.json and datasources.local.json configured to use flat file database"
+  );
 }
 
 function getDBConfig(dbType) {
@@ -141,7 +156,7 @@ function getDBConfig(dbType) {
 
 function writeConfig(config) {
   // console.log(config);
-  let data = fs.readFileSync("server/datasources.json");
+  let data = fs.readFileSync("server/datasources.original.json");
   let configFile = JSON.parse(data);
   // console.log(configFile);
 
