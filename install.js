@@ -36,7 +36,6 @@ inquirer
 
     let dbType = answers.database.toLowerCase();
     installDBDriver(dbType);
-    getDBConfig(dbType);
   })
   .catch((error) => {
     console.log(error);
@@ -64,6 +63,10 @@ function installDBDriver(dbType) {
       }
       console.log(stdout);
       ui.log.write(`Success! Drivers installed for ${dbType}.`);
+
+      ui.log.write(`\nNow let's connect to your ${dbType} database.\n\n`);
+
+      getDBConfig(dbType);
     });
 
     // dir.on("exit", function (code) {
@@ -110,7 +113,7 @@ function getDBConfig(dbType) {
   // "name": "mongodb",
   // "user": "",
   ui.log.write(
-    "Press [enter] if you want to accepts the default value or type your own."
+    "Press [enter] if you want to accepts the default value or type your own value."
   );
 
   inquirer
