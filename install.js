@@ -36,7 +36,7 @@ inquirer
 
     let dbType = answers.database.toLowerCase();
     installDBDriver(dbType);
-    // getDBConfig(dbType); //temp bypass for dev only
+    getDBConfig(dbType);
   })
   .catch((error) => {
     console.log(error);
@@ -49,6 +49,10 @@ inquirer
 
 function installDBDriver(dbType) {
   if (doesRequireInstallation(dbType)) {
+    ui.log.write(
+      `\nInstalling drivers for ${dbType}. This may take up to a minute...\n`
+    );
+
     var cmd = exec(`npm install loopback-connector-${dbType} --save`, function (
       err,
       stdout,
@@ -59,12 +63,13 @@ function installDBDriver(dbType) {
         console.log(`Error has occurred: ${err}`);
       }
       console.log(stdout);
+      ui.log.write(`Success! Drivers installed for ${dbType}.`);
     });
 
-    dir.on("exit", function (code) {
-      // return value from "npm build"
-      // console.log(`Installing successful. Now run "npm start"`);
-    });
+    // dir.on("exit", function (code) {
+    //   // return value from "npm build"
+    //   // console.log(`Installing successful. Now run "npm start"`);
+    // });
   } else {
     reCopyDatasourcesJson();
     console.log(`Installing successful. Now run "npm start"`);
