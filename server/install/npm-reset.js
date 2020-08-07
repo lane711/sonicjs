@@ -136,5 +136,9 @@ async function setEnvVarToEnsureMigrationWillRunAgain() {
     parsedFile.RUN_NEW_SITE_MIGRATION = "TRUE";
 
     fs.writeFileSync(sourcePath, stringify(parsedFile));
+
+    console.log(
+      "INPORTANT: you must manually delete the node_module folder to fully reset the install."
+    );
   });
 }
