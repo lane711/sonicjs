@@ -77,7 +77,7 @@ function installDBDriver(dbType) {
     //flat file
     reCopyDatasourcesJson();
     resetDataJson();
-    console.log(`Installing successful. Now run "npm start"`);
+    showInstallationSuccessfulMessage();
   }
 }
 
@@ -102,7 +102,7 @@ function reCopyDatasourcesJson() {
   );
 }
 
-function getDBConfig(dbType) {
+async function getDBConfig(dbType) {
   if (!doesRequireInstallation(dbType)) {
     return;
   }
@@ -118,7 +118,7 @@ function getDBConfig(dbType) {
     "Press [enter] if you want to accepts the default value or type your own value."
   );
 
-  inquirer
+  await inquirer
     .prompt([
       {
         name: "host",
@@ -149,11 +149,15 @@ function getDBConfig(dbType) {
         message: "MongoDB Port:",
       },
     ])
-    .then((answers) => {
+    .then(async (answers) => {
       answers.name = "db";
       answers.connector = "mongodb";
-      writeConfig(answers);
-      // Use user feedback for... whatever!!
+      await writeConfig(answers);
+
+      setTimeout(function () {
+        //delay hack
+        showInstallationSuccessfulMessage();
+      }, 500);
     })
     .catch((error) => {
       if (error.isTtyError) {
@@ -170,7 +174,11 @@ function resetDataJson() {
   );
 }
 
-function writeConfig(config) {
+function showInstallationSuccessfulMessage() {
+  ui.log.write(`\nInstallation successful. Now run "npm start"`);
+}
+
+async function writeConfig(config) {
   // console.log(config);
   let data = fs.readFileSync("server/datasources.original.json");
   let configFile = JSON.parse(data);
