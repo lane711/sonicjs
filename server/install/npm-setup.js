@@ -154,11 +154,11 @@ async function getDBConfig(dbType) {
       },
       {
         name: "password",
-        message: "MongoDB Port:",
+        message: "MongoDB User Password:",
       },
     ])
     .then(async (answers) => {
-      answers.name = "db";
+      answers.name = "primary";
       answers.connector = "mongodb";
       await writeConfig(answers);
 
@@ -183,7 +183,7 @@ function resetDataJson() {
 }
 
 function showInstallationSuccessfulMessage() {
-  ui.log.write(`\nInstallation successful.\n\nNow run "npm start"`);
+  ui.log.write(`\nInstallation successful!\n\nNow run "npm start"`);
 }
 
 async function writeConfig(config) {
@@ -205,6 +205,11 @@ async function writeConfig(config) {
 
   fs.writeFile("server/datasources.json", newConfigFile, (err) => {
     if (err) throw err;
-    console.log("Config file updated (server/datasources.json)");
+    console.log("\nConfig file updated (server/datasources.json)");
+  });
+
+  fs.writeFile("server/datasources.local.json", newConfigFile, (err) => {
+    if (err) throw err;
+    console.log("\nConfig file updated (server/datasources.local.json)");
   });
 }

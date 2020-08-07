@@ -1,8 +1,13 @@
 {
   "primary": {
+    "host": "localhost",
+    "port": "27017",
+    "url": "mongodb://localhost:27017/sonicjs",
+    "database": "sonicjs",
+    "user": "",
+    "password": "",
     "name": "primary",
-    "connector": "memory",
-    "file": "server/data/data.json"
+    "connector": "mongodb"
   },
   "transient": {
     "name": "transient",

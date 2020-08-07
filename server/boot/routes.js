@@ -82,7 +82,7 @@ module.exports = function (app) {
     user.create(
       { email: req.body.email, password: req.body.password },
       function (err, userInstance) {
-        console.log(userInstance);
+        // console.log(userInstance);
         globalService.isAdminUserCreated = true;
         let message = encodeURI(`Account created successfully. Please login`);
         res.redirect(`/admin?message=${message}`); // /admin will show the login

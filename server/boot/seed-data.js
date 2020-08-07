@@ -9,7 +9,7 @@ module.exports = async function (app) {
     return;
   }
 
-  if (app.dataSources.primary.connector == "memory") {
+  if (app.dataSources.primary.connector === "memory") {
     return;
   }
   // return;
