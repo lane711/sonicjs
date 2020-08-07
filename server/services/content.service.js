@@ -50,7 +50,7 @@ module.exports = contentService = {
       // console.log('returning from cache');
       return { page: cachedPage };
     } else {
-      console.log("no cache");
+      // console.log("no cache");
     }
 
     this.page = await dataService.getContentByUrl(req.url);

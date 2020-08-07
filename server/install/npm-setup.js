@@ -106,7 +106,7 @@ function reCopyDatasourcesJson() {
   );
 
   console.log(
-    "\nSuccess: datasources.json and datasources.local.json configured to use flat file database\n"
+    "\nSuccess!\n\nInfo: datasources.json and datasources.local.json configured to use flat file database."
   );
 }
 
@@ -183,7 +183,7 @@ function resetDataJson() {
 }
 
 function showInstallationSuccessfulMessage() {
-  ui.log.write(`\nInstallation successful. Now run "npm start"`);
+  ui.log.write(`\nInstallation successful.\n\nNow run "npm start"`);
 }
 
 async function writeConfig(config) {
