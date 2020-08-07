@@ -73,6 +73,7 @@ module.exports = async function (app) {
         if (err) throw err;
         console.log("Content created:", newInstance);
         setEnvVarToEnsureMigrationDoesNotRunAgain();
+        console.log("Success! Initial data migration complete.");
       });
     });
   });
