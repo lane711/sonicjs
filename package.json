@@ -11,7 +11,8 @@
     "start": "nodemon -e handlebars,js,css,html",
     "postinstall": "node server/install/npm-post-install.js",
     "setup": "node server/install/npm-setup.js",
-    "posttest": "npm run lint"
+    "posttest": "npm run lint",
+    "reset": "node server/install/npm-reset.js"
   },
   "dependencies": {
     "@coreui/coreui": "^2.1.12",

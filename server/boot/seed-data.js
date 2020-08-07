@@ -9,9 +9,11 @@ module.exports = async function (app) {
     return;
   }
 
-  if (app.dataSources.primary.connector === "memory") {
+  if (app.dataSources.primary.connector.name === "memory") {
     return;
   }
+
+  console.log("Info: running seed-data.js to seed database.");
   // return;
   // app.dataSources.primary.automigrate();
   let dataRaw = fs.readFileSync("server/data/data.json");
