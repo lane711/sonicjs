@@ -80,7 +80,7 @@
     "simple-line-icons": "^2.4.1",
     "sortablejs": "^1.10.2",
     "strong-error-handler": "^3.0.0",
-    "tinymce": "^5.0.7",
+    "tinymce": "^5.2.2",
     "uglify-es": "^3.3.9"
   },
   "devDependencies": {
