@@ -74,7 +74,9 @@ function installDBDriver(dbType) {
     //   // console.log(`Installing successful. Now run "npm start"`);
     // });
   } else {
+    //flat file
     reCopyDatasourcesJson();
+    resetDataJson();
     console.log(`Installing successful. Now run "npm start"`);
   }
 }
@@ -160,6 +162,12 @@ function getDBConfig(dbType) {
         // Something else when wrong
       }
     });
+}
+
+function resetDataJson() {
+  fs.createReadStream("server/data/data.original.json").pipe(
+    fs.createWriteStream("server/data/data.json")
+  );
 }
 
 function writeConfig(config) {

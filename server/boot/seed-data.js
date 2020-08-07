@@ -8,6 +8,10 @@ module.exports = async function (app) {
   if (!(process.env.RUN_NEW_SITE_MIGRATION === "TRUE")) {
     return;
   }
+
+  if (app.dataSources.primary.connector == "memory") {
+    return;
+  }
   // return;
   // app.dataSources.primary.automigrate();
   let dataRaw = fs.readFileSync("server/data/data.json");
