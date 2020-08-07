@@ -3,12 +3,20 @@ var ui = new inquirer.ui.BottomBar();
 var exec = require("child_process").exec;
 const fs = require("fs");
 
+console.log(`Last Step: Let's install the SonicJs database.\n\n`);
+
+console.log(`███████╗ ██████╗ ███╗   ██╗██╗ ██████╗     ██╗███████╗
+██╔════╝██╔═══██╗████╗  ██║██║██╔════╝     ██║██╔════╝
+███████╗██║   ██║██╔██╗ ██║██║██║          ██║███████╗
+╚════██║██║   ██║██║╚██╗██║██║██║     ██   ██║╚════██║
+███████║╚██████╔╝██║ ╚████║██║╚██████╗╚█████╔╝███████║
+╚══════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚════╝ ╚══════╝
+                                                      `);
 inquirer
   .prompt([
     {
       type: "list",
-      message:
-        "\n\nLet's get SonicJs up and running!\n\nWhich database would you like to use?",
+      message: "Which database would you like to use?",
       name: "database",
       choices: [
         "Flat File",

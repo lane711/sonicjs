@@ -7,5 +7,5 @@ console.log(`███████╗ ██████╗ ███╗   █�
 ╚══════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚════╝ ╚══════╝
                                                       `);
 console.log(
-  `Last Step: Let's install the database.\n\nPlease run:\n\n"node server/install/install.js"\n\n`
+  `Last Step: You need to install the SonicJs database.\n\nPlease run:\n\n"npm run setup"\n\n`
 );

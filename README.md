@@ -117,8 +117,8 @@ Follow these steps and you should be good to go:
 1. Clone the repo: `git clone https://github.com/lane711/sonicjs.git`
 1. Change to created folder `cd sonicjs`
 1. Install the dependencies: `npm install`
-1. Run the install script: `node install.js` and follow the prompts
-1. Run it: `npm start`
+1. Run the setup script to install the database: `npm run setup` and follow the prompts
+1. Run it with: `npm start`
 
 You should see the following message in your console:
 

@@ -10,6 +10,7 @@
     "prestart": "node server/install/npm-pre-start.js",
     "start": "nodemon -e handlebars,js,css,html",
     "postinstall": "node server/install/npm-post-install.js",
+    "setup": "node server/install/npm-setup.js",
     "posttest": "npm run lint"
   },
   "dependencies": {
