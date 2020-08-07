@@ -2,6 +2,10 @@ var inquirer = require("inquirer");
 var ui = new inquirer.ui.BottomBar();
 var exec = require("child_process").exec;
 const fs = require("fs");
+var path = require("path");
+const { parse, stringify } = require("envfile");
+
+var debug = false; //typeof v8debug === "object";
 
 console.log(
   `WARNING: Running this reset will restore all data and configuration to \nits default state (to what they were right after you cloned the repo).\n\n`
@@ -14,42 +18,53 @@ console.log(`███████╗ ██████╗ ███╗   █�
 ███████║╚██████╔╝██║ ╚████║██║╚██████╗╚█████╔╝███████║
 ╚══════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚════╝ ╚══════╝
                                                       `);
-inquirer
-  .prompt([
-    {
-      type: "list",
-      message: "Reset All Data and Configuration?",
-      name: "reset",
-      choices: [
-        { name: "No", value: "false" },
-        { name: "Yes (ALL DATA WILL BE LOST!)", value: "true" },
-      ],
-    },
-  ])
-  .then((answers) => {
-    let doReset = aanswers.reset;
 
-    console.log(doReset);
+if (debug) {
+  performReset();
+} else {
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        message: "Reset All Data and Configuration?",
+        name: "reset",
+        choices: [
+          { name: "No", value: "false" },
+          { name: "Yes (ALL DATA WILL BE LOST!)", value: "true" },
+        ],
+      },
+    ])
+    .then((answers) => {
+      let doReset = answers.reset;
 
-    if (doReset == true) {
-      reCopyDatasourcesJson();
-      resetDataJson();
-      setEnvVarToEnsureMigrationWillRunAgain();
-      writeConfig();
-      deleteNodeModules();
-      showResetSuccessfulMessage();
-    }
+      // console.log(doReset);
 
-    // installDBDriver(dbType);
-  })
-  .catch((error) => {
-    console.log(error);
-    if (error.isTtyError) {
-      // Prompt couldn't be rendered in the current environment
-    } else {
-      // Something else when wrong
-    }
-  });
+      if (doReset == "true") {
+        performReset();
+      } else {
+        console.log("Reset canceled.");
+      }
+
+      // installDBDriver(dbType);
+    })
+    .catch((error) => {
+      console.log(error);
+      if (error.isTtyError) {
+        // Prompt couldn't be rendered in the current environment
+      } else {
+        // Something else when wrong
+      }
+    });
+}
+
+function performReset() {
+  reCopyDatasourcesJson();
+  resetDataJson();
+  setEnvVarToEnsureMigrationWillRunAgain();
+  writeConfig();
+  // deleteNodeModules();
+  // showResetSuccessfulMessage();
+}
 
 function reCopyDatasourcesJson() {
   fs.createReadStream("server/datasources.original.json").pipe(
@@ -77,9 +92,9 @@ function resetDataJson() {
   );
 }
 
-function showResetSuccessfulMessage() {
-  ui.log.write(`\nReset successful!\n\nNow run "npm start"`);
-}
+// function showResetSuccessfulMessage() {
+//   ui.log.write(`\nReset successful!\n\nNow run "npm run setup"`);
+// }
 
 async function writeConfig() {
   // console.log(config);
@@ -113,11 +128,13 @@ async function setEnvVarToEnsureMigrationWillRunAgain() {
   let sourcePath = path.join(__dirname, "../..", ".env");
 
   fs.readFile(sourcePath, "utf8", function (err, data) {
+    console.log(data);
     if (err) {
       return console.log(err);
     }
     let parsedFile = parse(data);
     parsedFile.RUN_NEW_SITE_MIGRATION = "TRUE";
+
     fs.writeFileSync(sourcePath, stringify(parsedFile));
   });
 }

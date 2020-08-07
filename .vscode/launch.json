@@ -28,6 +28,12 @@
       "program": "${workspaceFolder}/install.js"
     },
     {
+      "type": "node",
+      "request": "launch",
+      "name": "Reset",
+      "program": "${workspaceFolder}/server/install/npm-reset.js"
+    },
+    {
       "type": "chrome",
       "request": "launch",
       "name": "Admin Client",
