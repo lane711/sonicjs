@@ -15,68 +15,78 @@ module.exports = async function (app) {
 
   console.log("Info: running seed-data.js to seed database.");
   // return;
-  // app.dataSources.primary.automigrate();
+  console.log(">>>>>>automigrate start");
+  app.dataSources.primary.automigrate();
+  console.log(">>>>automigrate end");
+
   let dataRaw = fs.readFileSync("server/data/data.json");
   let data = JSON.parse(dataRaw);
 
-  app.dataSources.primary.automigrate("contentType", function (err) {
-    if (err) throw err;
+  migrateContentTypes(app);
+  migrateContent(app);
 
-    let contentTypeObjs = data.models.contentType;
+  function migrateContentTypes(app) {
+    app.dataSources.primary.automigrate("contentType", function (err) {
+      if (err) throw err;
 
-    var contentTypes = Object.keys(contentTypeObjs).map((key) => [
-      Number(key),
-      contentTypeObjs[key],
-    ]);
+      let contentTypeObjs = data.models.contentType;
 
-    contentTypes.forEach((contentType) => {
-      console.log(contentType);
-      let objString = contentType[1];
-      let obj = JSON.parse(objString);
+      var contentTypes = Object.keys(contentTypeObjs).map((key) => [
+        Number(key),
+        contentTypeObjs[key],
+      ]);
 
-      let newContentType = {
-        title: obj.title,
-        systemid: obj.systemid,
-        components: obj.components,
-      };
+      contentTypes.forEach((contentType) => {
+        console.log(contentType);
+        let objString = contentType[1];
+        let obj = JSON.parse(objString);
 
-      app.models.contentType.create(newContentType, function (
-        err,
-        newInstance
-      ) {
-        if (err) throw err;
-        console.log("Content type created:", newInstance);
+        let newContentType = {
+          title: obj.title,
+          systemid: obj.systemid,
+          components: obj.components,
+        };
+
+        app.models.contentType.create(newContentType, function (
+          err,
+          newInstance
+        ) {
+          if (err) throw err;
+          console.log("Content type created:", newInstance);
+        });
       });
     });
-  });
+  }
 
-  app.dataSources.primary.automigrate("content", function (err) {
-    if (err) throw err;
+  function migrateContent(app) {
+    app.dataSources.primary.automigrate("content", function (err) {
+      if (err) throw err;
 
-    let contentObjs = data.models.content;
+      let contentObjs = data.models.content;
 
-    var contents = Object.keys(contentObjs).map((key) => [
-      Number(key),
-      contentObjs[key],
-    ]);
+      var contents = Object.keys(contentObjs).map((key) => [
+        Number(key),
+        contentObjs[key],
+      ]);
 
-    contents.forEach((content) => {
-      console.log(content);
-      let objString = content[1];
-      let obj = JSON.parse(objString);
+      contents.forEach((content) => {
+        console.log(content);
+        let objString = content[1];
+        let obj = JSON.parse(objString);
 
-      let newContent = {
-        data: obj.data,
-      };
+        let newContent = {
+          data: obj.data,
+        };
 
-      app.models.content.create(newContent, function (err, newInstance) {
-        if (err) throw err;
-        console.log("Content created:", newInstance);
-        setEnvVarToEnsureMigrationDoesNotRunAgain();
-        console.log("Success! Initial data migration complete.");
+        app.models.content.create(newContent, function (err, newInstance) {
+          if (err) throw err;
+          console.log("Content created:", newInstance);
+          setEnvVarToEnsureMigrationDoesNotRunAgain();
+          console.log("Success! Initial data migration complete.");
+        });
       });
     });
-  });
+  }
 
   async function setEnvVarToEnsureMigrationDoesNotRunAgain() {
     let sourcePath = path.join(__dirname, "../..", ".env");
