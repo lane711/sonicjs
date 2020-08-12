@@ -14,16 +14,16 @@ module.exports = async function (app) {
   }
 
   console.log("Info: running seed-data.js to seed database.");
-  // return;
-  console.log(">>>>>>automigrate start");
-  app.dataSources.primary.automigrate();
-  console.log(">>>>automigrate end");
 
   let dataRaw = fs.readFileSync("server/data/data.json");
   let data = JSON.parse(dataRaw);
 
   migrateContentTypes(app);
   migrateContent(app);
+
+  console.log(">>>>>>automigrate start");
+  app.dataSources.primary.automigrate();
+  console.log(">>>>automigrate end");
 
   function migrateContentTypes(app) {
     app.dataSources.primary.automigrate("contentType", function (err) {
@@ -44,7 +44,7 @@ module.exports = async function (app) {
         let newContentType = {
           title: obj.title,
           systemid: obj.systemid,
-          components: obj.components,
+          data: { components: obj.components },
         };
 
         app.models.contentType.create(newContentType, function (

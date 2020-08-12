@@ -17,6 +17,10 @@
     "title": {
       "type": "string",
       "required": true
+    },
+    "data": {
+      "type": "Object",
+      "required": true
     }
   },
   "validations": [],
