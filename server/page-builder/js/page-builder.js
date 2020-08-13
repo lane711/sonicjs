@@ -838,7 +838,7 @@ async function setupFormBuilder(contentType) {
   Formio.builder(document.getElementById("formBuilder"), null).then(
     async function (form) {
       form.setForm({
-        components: contentType.components,
+        components: contentType.data.components,
       });
       form.on("submit", async function (submission) {
         //             debugger;
@@ -927,7 +927,7 @@ async function setupFormBuilder(contentType) {
 async function onContentTypeSave() {
   if (contentTypeComponents) {
     console.log("contentTypeComponents", contentTypeComponents);
-    contentType.components = contentTypeComponents;
+    contentType.data.components = contentTypeComponents;
     if (!contentType.id) {
       contentType.id = $("#createContentTypeForm #id").val();
     }

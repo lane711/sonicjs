@@ -271,14 +271,14 @@ module.exports = moduleService = {
         : false,
       components: [],
     };
-    moduleContentType.components.push({
+    moduleContentType.data.components.push({
       label: "First Name",
       type: "textfield",
       input: true,
       key: "firstName",
       validate: { required: true },
     });
-    moduleContentType.components.push({
+    moduleContentType.data.components.push({
       label: "Submit",
       type: "button",
       input: true,

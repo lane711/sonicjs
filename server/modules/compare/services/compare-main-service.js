@@ -3,15 +3,15 @@ var eventBusService = require("../../../services/event-bus.service");
 var globalService = require("../../../services/global.service");
 
 module.exports = compareMainService = {
-  startup: async function() {
-    eventBusService.on("beginProcessModuleShortCode", async function(options) {
+  startup: async function () {
+    eventBusService.on("beginProcessModuleShortCode", async function (options) {
       if (options.shortcode.name === "COMPARE") {
         options.moduleName = "compare";
         await moduleService.processModuleInColumn(options);
       }
     });
 
-    eventBusService.on("postModuleGetData", async function(options) {
+    eventBusService.on("postModuleGetData", async function (options) {
       if (options.shortcode.name !== "COMPARE") {
         return;
       }
@@ -20,7 +20,7 @@ module.exports = compareMainService = {
       options.viewModel.data.compareItems = compareItems;
 
       let contentType = await dataService.getContentType("compare-item");
-      let tabs = contentType.components[0].components;
+      let tabs = contentType.data.components[0].components;
       options.viewModel.data.contentType = tabs;
 
       let matrix = compareMainService.getMatrixData(tabs, compareItems);
@@ -29,16 +29,16 @@ module.exports = compareMainService = {
     });
   },
 
-  getMatrixData: function(contentType, compareItems) {
+  getMatrixData: function (contentType, compareItems) {
     let colspanCount = compareItems.length + 1;
     let rows = [];
-    contentType.forEach(group => {
+    contentType.forEach((group) => {
       let row = { columns: [] };
       this.addCell(row, group.label, true, colspanCount, "main-group");
       rows.push(row);
 
       // console.log(group.label);
-      group.components.forEach(element => {
+      group.components.forEach((element) => {
         let rowAlreadyProcessed = false;
         let row = { columns: [] };
         if (element.label === "Field Set") {
@@ -47,12 +47,12 @@ module.exports = compareMainService = {
           rows.push(row);
           rowAlreadyProcessed = true;
           //now need another row for child components
-          fieldSet.values.forEach(fieldSetValue => {
+          fieldSet.values.forEach((fieldSetValue) => {
             let row = { columns: [] };
             this.addCell(row, fieldSetValue.label, false, 0, "sub-category");
 
             //add columns for compare items
-            compareItems.forEach(complareItem => {
+            compareItems.forEach((complareItem) => {
               let fieldSet = element.components[0];
               var fieldSetKey = fieldSet.key;
               let column = complareItem.data[fieldSetKey][fieldSetValue.value];
@@ -72,7 +72,7 @@ module.exports = compareMainService = {
         }
 
         //add columns for compare items
-        compareItems.forEach(complareItem => {
+        compareItems.forEach((complareItem) => {
           if (element.label !== "Field Set") {
             let column = complareItem.data[element.key];
             this.addCell(row, column);
@@ -87,7 +87,7 @@ module.exports = compareMainService = {
     return rows;
   },
 
-  addCell: function(
+  addCell: function (
     row,
     column,
     colspan = false,
@@ -96,7 +96,7 @@ module.exports = compareMainService = {
   ) {
     let cell = { text: column };
 
-    if(column.data && column.data.contentType === 'compare-item-boolean'){
+    if (column.data && column.data.contentType === "compare-item-boolean") {
       cell.text = column.data.support;
       cell.notes = column.data.notes;
     }
@@ -112,7 +112,7 @@ module.exports = compareMainService = {
       cell.text = '<i class="fa fa-check green"></i>';
     }
 
-    if (column === false  || cell.text === "false") {
+    if (column === false || cell.text === "false") {
       cell.text = '<i class="fa fa-times red"></i>';
     }
 
@@ -131,5 +131,5 @@ module.exports = compareMainService = {
     }
 
     row.columns.push(cell);
-  }
+  },
 };
