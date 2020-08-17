@@ -614,7 +614,7 @@ async function editContentInstance(payload, refresh) {
   if (payload.id) {
     delete payload.id;
   }
-  if (payload.data.id) {
+  if (payload.data && payload.data.id) {
     id = payload.data.id;
     delete payload.data.id;
   }
@@ -933,6 +933,23 @@ async function onContentTypeSave() {
     }
     await editContentType(contentType);
   }
+}
+
+async function onContentTypeRawSave() {
+  debugger;
+  var contentType = jsonEditorRaw.get();
+  console.log("jsonEditor", contentType);
+  await editContentInstance(contentType);
+  fullPageUpdate();
+
+  // if (contentTypeComponents) {
+  //   console.log("contentTypeComponents", contentTypeComponents);
+  //   contentType.data.components = contentTypeComponents;
+  //   if (!contentType.id) {
+  //     contentType.id = $("#createContentTypeForm #id").val();
+  //   }
+  //   await editContentType(contentType);
+  // }
 }
 
 async function openNewContentTypeModal() {
