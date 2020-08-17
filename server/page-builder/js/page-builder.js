@@ -626,7 +626,7 @@ async function editContentInstance(payload, refresh) {
   // }
   // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
 
-  console.log(axiosInstance);
+  console.log(payload);
   return axiosInstance
     .put(`/api/contents/${id}`, payload)
     .then(async function (response) {
@@ -936,10 +936,9 @@ async function onContentTypeSave() {
 }
 
 async function onContentTypeRawSave() {
-  debugger;
   var contentType = jsonEditorRaw.get();
   console.log("jsonEditor", contentType);
-  await editContentInstance(contentType);
+  await editContentType(contentType);
   fullPageUpdate();
 
   // if (contentTypeComponents) {
