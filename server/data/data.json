@@ -2,21 +2,18 @@
   "ids": {
     "contentType": 53,
     "content": 21,
-    "User": 4,
-    "AccessToken": 12,
+    "User": 2,
+    "AccessToken": 13,
     "ACL": 1,
     "RoleMapping": 1,
     "Role": 1
   },
   "models": {
     "User": {
-      "3": "{\"password\":\"$2a$10$tWfpTn2o/7JhmRB3Gh8iCusjiOlL4pFJwXfnqyKDmjZubVuCDIkfK\",\"email\":\"a@a.com\",\"id\":3}"
+      "1": "{\"password\":\"$2a$10$CUhz2xrGRBqprmAWZoNtiOW1zNAJSpdPVXM7l6Kwdp8JFTv9z3mIK\",\"email\":\"a@a.com\",\"id\":1}"
     },
     "AccessToken": {
-      "YWsqUz3vRvzKxnB3SuUJPXVIsU8B9VCxERB63e4DbtyDyR7ikOka07Q9cAIJvLFs": "{\"id\":\"YWsqUz3vRvzKxnB3SuUJPXVIsU8B9VCxERB63e4DbtyDyR7ikOka07Q9cAIJvLFs\",\"ttl\":1209600,\"created\":\"2020-08-13T01:10:46.644Z\",\"userId\":3}",
-      "t3aAOkeZSc1MFrD4GUdSFJlfXp66msKAeMvPVWveL7HouBWyUosM23Q6jDwpqvRk": "{\"id\":\"t3aAOkeZSc1MFrD4GUdSFJlfXp66msKAeMvPVWveL7HouBWyUosM23Q6jDwpqvRk\",\"ttl\":1209600,\"created\":\"2020-08-15T02:05:23.115Z\",\"userId\":3}",
-      "JhwUx3NG1wQxSukiAEJr8m44Dcwwmymh7lVKFckPsNvFrTxKrBVz5SaHGWzybHw3": "{\"id\":\"JhwUx3NG1wQxSukiAEJr8m44Dcwwmymh7lVKFckPsNvFrTxKrBVz5SaHGWzybHw3\",\"ttl\":1209600,\"created\":\"2020-08-17T14:24:47.740Z\",\"userId\":3}",
-      "AFcKJ3kbHf5rdwDJ2QRqScJpbvPYTq3QX4fakzNUiLDctAv520gTU83LdydFu3Wq": "{\"id\":\"AFcKJ3kbHf5rdwDJ2QRqScJpbvPYTq3QX4fakzNUiLDctAv520gTU83LdydFu3Wq\",\"ttl\":1209600,\"created\":\"2020-08-18T01:48:01.790Z\",\"userId\":3}"
+      "1DSrsH9wAAoBxnkSbHDK95bBFnNK1p3zYq7tFOuJzvO5RrxrxHRpYCC0yedjB5pR": "{\"id\":\"1DSrsH9wAAoBxnkSbHDK95bBFnNK1p3zYq7tFOuJzvO5RrxrxHRpYCC0yedjB5pR\",\"ttl\":1209600,\"created\":\"2020-08-18T02:31:41.733Z\",\"userId\":1}"
     },
     "ACL": {},
     "RoleMapping": {},
@@ -64,7 +61,7 @@
       "15": "{\"id\":15,\"data\":{\"title\":\"js-front-end\",\"paths\":[{\"path\":\"/assets/js/startup.js\",\"pageBuilderOnly\":false},{\"path\":\"/node_modules/jquery/dist/jquery.min.js\",\"pageBuilderOnly\":false},{\"path\":\"/node_modules/js-cookie/src/js.cookie.js\",\"pageBuilderOnly\":false},{\"path\":\"/node_modules/ace-builds/src-min-noconflict/ace.js\",\"pageBuilderOnly\":false},{\"path\":\"/node_modules/ace-builds/src-min-noconflict/ext-beautify.js\",\"pageBuilderOnly\":false},{\"path\":\"/node_modules/axios/dist/axios.min.js\",\"pageBuilderOnly\":false},{\"path\":\"/node_modules/popper.js/dist/umd/popper.min.js\",\"pageBuilderOnly\":false},{\"path\":\"/node_modules/bootstrap/dist/js/bootstrap.min.js\",\"pageBuilderOnly\":false},{\"path\":\"/node_modules/tinymce/tinymce.min.js\",\"pageBuilderOnly\":false},{\"path\":\"/node_modules/tinymce/jquery.tinymce.min.js\",\"pageBuilderOnly\":false},{\"path\":\"/node_modules/jsoneditor/dist/jsoneditor.min.js\",\"pageBuilderOnly\":false},{\"path\":\"/node_modules/formiojs/dist/formio.full.min.js\",\"pageBuilderOnly\":false},{\"path\":\"/node_modules/photoswipe/dist/photoswipe.min.js\",\"pageBuilderOnly\":false},{\"path\":\"/node_modules/photoswipe/dist/photoswipe-ui-default.min.js\",\"pageBuilderOnly\":false},{\"path\":\"/node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.js\",\"pageBuilderOnly\":false},{\"path\":\"/node_modules/dropzone/dist/min/dropzone.min.js\",\"pageBuilderOnly\":false},{\"path\":\"/assets/js/common.js\",\"pageBuilderOnly\":false},{\"path\":\"/services/shared.service.js\",\"pageBuilderOnly\":false},{\"path\":\"/services/global.service.js\",\"pageBuilderOnly\":false},{\"path\":\"/services/helper.service.js\",\"pageBuilderOnly\":false},{\"path\":\"/services/data.service.js\",\"pageBuilderOnly\":false},{\"path\":\"/services/form.service.js\",\"pageBuilderOnly\":false},{\"path\":\"/services/analytics.service.js\",\"pageBuilderOnly\":false},{\"path\":\"/page-builder/js/page-builder.js\",\"pageBuilderOnly\":true}],\"type\":\"js\",\"area\":\"frontEnd\",\"contentType\":\"asset\",\"createdOn\":1595043649950,\"submit\":true}}",
       "16": "{\"id\":16,\"data\":{\"title\":\"css-front-end\",\"paths\":[{\"path\":\"/node_modules/bootstrap/dist/css/bootstrap.min.css\",\"pageBuilderOnly\":false},{\"path\":\"/api/containers/css/download/template.css\",\"pageBuilderOnly\":false},{\"path\":\"/node_modules/font-awesome/css/font-awesome.min.css\",\"pageBuilderOnly\":false},{\"path\":\"/node_modules/photoswipe/dist/photoswipe.css\",\"pageBuilderOnly\":false},{\"path\":\"/node_modules/photoswipe/dist/default-skin/default-skin.css\",\"pageBuilderOnly\":false},{\"path\":\"/node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css\",\"pageBuilderOnly\":false},{\"path\":\"/node_modules/formiojs/dist/formio.form.min.css\",\"pageBuilderOnly\":false},{\"path\":\"/node_modules/jsoneditor/dist/jsoneditor.min.css\",\"pageBuilderOnly\":false}],\"type\":\"css\",\"area\":\"frontEnd\",\"contentType\":\"asset\",\"createdOn\":1587526518542,\"submit\":true}}",
       "17": "{\"id\":17,\"data\":{\"googleAnalyticsUACode\":\"UA-132867068-1\",\"enableOnDomain\":\"sonicjs.com\",\"contentType\":\"google-analytics\",\"createdOn\":1578369048378,\"submit\":true}}",
-      "19": "{\"id\":19,\"data\":{\"title\":\"Section 1\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[HTML id=\\\"20\\\"]\"}]}],\"createdOn\":1596252480286}}",
+      "19": "{\"id\":19,\"data\":{\"title\":\"Section 1\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[HTML id=\\\"20\\\"]\"}]}],\"createdOn\":1597717940719},\"systemid\":\"section\"}",
       "20": "{\"data\":{\"body\":\"<p>Hello World! This is an html module.<br>&nbsp;</p>\",\"contentType\":\"html\",\"submit\":true,\"createdOn\":1596252480253},\"id\":20}"
     }
   }
