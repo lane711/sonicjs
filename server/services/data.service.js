@@ -17,20 +17,20 @@ if (typeof module !== "undefined" && module.exports) {
   // var globalService = {};
 }
 
-(function(exports) {
+(function (exports) {
   var apiUrl = "/api/";
   var pageContent = "";
   var page;
   var id;
   var axiosInstance;
 
-  (exports.startup = async function() {
-    eventBusService.on("requestBegin", async function(options) {
+  (exports.startup = async function () {
+    eventBusService.on("requestBegin", async function (options) {
       // console.log('data service startup')
       if (options) {
         const defaultOptions = {
           headers: {},
-          baseURL: globalService.baseUrl
+          baseURL: globalService.baseUrl,
         };
 
         if (options.req.signedCookies.sonicjs_access_token) {
@@ -44,12 +44,12 @@ if (typeof module !== "undefined" && module.exports) {
       }
     });
   }),
-    (exports.getAxios = function() {
+    (exports.getAxios = function () {
       //TODO add auth
       if (!axiosInstance) {
         const defaultOptions = {
           headers: {},
-          baseURL: globalService.baseUrl
+          baseURL: globalService.baseUrl,
         };
 
         let token = helperService.getCookie("sonicjs_access_token");
@@ -63,7 +63,7 @@ if (typeof module !== "undefined" && module.exports) {
       }
       return axiosInstance;
     }),
-    (exports.getContent = async function() {
+    (exports.getContent = async function () {
       const filter = encodeURI(`{"order":"data.createdOn DESC"}`);
       let url = `${apiUrl}contents?filter=${filter}`;
       let page = await this.getAxios().get(url);
@@ -71,7 +71,7 @@ if (typeof module !== "undefined" && module.exports) {
       await formattingService.formatTitles(page.data);
       return page.data;
     }),
-    (exports.getContentByType = async function(contentType) {
+    (exports.getContentByType = async function (contentType) {
       const filter = encodeURI(
         `{"where":{"data.contentType":"${contentType}"}}`
       );
@@ -79,38 +79,38 @@ if (typeof module !== "undefined" && module.exports) {
       let page = await this.getAxios().get(url);
       return page.data;
     }),
-    (exports.getContentType = async function(contentType) {
+    (exports.getContentType = async function (contentType) {
       const filter = encodeURI(`{"where":{"systemid":"${contentType}"}}`);
       let url = `${apiUrl}contentTypes?filter=${filter}`;
       let contentTypeRecord = await this.getAxios().get(url);
       // console.log('contentTypeRecord.data', contentTypeRecord.data[0]);
       return contentTypeRecord.data[0];
     }),
-    (exports.getContentTypes = async function() {
+    (exports.getContentTypes = async function () {
       let url = `${apiUrl}contentTypes`;
       let contentTypes = await this.getAxios().get(url);
       // console.log('contentTypeRecord.data', contentTypeRecord.data[0]);
       return contentTypes.data;
     }),
-    (exports.createContentType = async function(contentType) {
+    (exports.createContentType = async function (contentType) {
       let url = `${apiUrl}contentTypes`;
       // let contentTypes = await this.getAxios().post(url, contentType);
       this.getAxios()
         .post(url, contentType)
-        .then(async function(response) {
+        .then(async function (response) {
           console.log(response);
           resolve(response.data);
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error.response.data);
           resolve(error);
         });
     }),
-    (exports.getContentTopOne = async function(contentType) {
+    (exports.getContentTopOne = async function (contentType) {
       let results = await this.getContentByType(contentType);
       return results[0];
     }),
-    (exports.getContentByUrl = async function(url) {
+    (exports.getContentByUrl = async function (url) {
       var filter = encodeURI(`{"where":{"data.url":"${url}"}}`);
       let apiFullUrl = `${apiUrl}contents?filter=${filter}`;
       let record = await this.getAxios().get(apiFullUrl);
@@ -124,7 +124,7 @@ if (typeof module !== "undefined" && module.exports) {
       notFound.url = url;
       return notFound;
     }),
-    (exports.getContentByContentType = async function(contentType) {
+    (exports.getContentByContentType = async function (contentType) {
       var filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
       let apiFullUrl = `${apiUrl}contents?filter=${filter}`;
       let record = await this.getAxios().get(apiFullUrl);
@@ -134,7 +134,7 @@ if (typeof module !== "undefined" && module.exports) {
 
       return notFound;
     }),
-    (exports.getContentByContentTypeAndTitle = async function(
+    (exports.getContentByContentTypeAndTitle = async function (
       contentType,
       title
     ) {
@@ -143,7 +143,23 @@ if (typeof module !== "undefined" && module.exports) {
       let url = `${apiUrl}contents?filter=${encodedFilter}`;
       let pageRecord = await this.getAxios().get(url);
       if (pageRecord.data[0]) {
-        return pageRecord.data[0];
+        //HACK: workaround for loopback bug - lb should filter based on the above filter input
+        if (
+          pageRecord.data[0].title === title &&
+          pageRecord.data[0].contentType === contentType
+        ) {
+          return pageRecord.data[0];
+        } else {
+          //filter in code per HACK
+          let record = pageRecord.data.filter(
+            (record) => record.contentType == contentType
+          );
+          // .filter((x) => x.contentType == contentType);
+          //(record) => record.title == title
+          if (record) {
+            return record;
+          }
+        }
         // await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);
         // let page = pageRecord.data[0];
         // page.data.html = pageContent;
@@ -151,7 +167,7 @@ if (typeof module !== "undefined" && module.exports) {
       }
       return "not found";
     }),
-    (exports.getContentByContentTypeAndTag = async function(contentType, tag) {
+    (exports.getContentByContentTypeAndTag = async function (contentType, tag) {
       //TODO: add {"order":"data.sort ASC"},
       const filter = `{"where":{"and":[{"data.tags":{"regexp": "${tag}"}},{"data.contentType":"${contentType}"}]}}`;
       const encodedFilter = encodeURI(filter);
@@ -162,7 +178,7 @@ if (typeof module !== "undefined" && module.exports) {
       }
       return "not found";
     }),
-    (exports.getContentByUrlAndContentType = async function(
+    (exports.getContentByUrlAndContentType = async function (
       contentType,
       pageUrl
     ) {
@@ -179,7 +195,7 @@ if (typeof module !== "undefined" && module.exports) {
       }
       return "not found";
     }),
-    (exports.editContentInstance = async function(payload) {
+    (exports.editContentInstance = async function (payload) {
       let id = payload.id;
       // console.log('putting payload', payload);
       if (payload.id) {
@@ -191,30 +207,30 @@ if (typeof module !== "undefined" && module.exports) {
       }
 
       return new Promise((resolve, reject) => {
-        this.getAxios().put(`/api/contents/${id}`, payload)
-        .then(async function(response) {
-          // console.log("ok", response.data);
-          resolve(response.data);
-        })
-        .catch(function(error) {
-          console.log('err');
-          reject(error);
-        });
-
-    });
+        this.getAxios()
+          .put(`/api/contents/${id}`, payload)
+          .then(async function (response) {
+            // console.log("ok", response.data);
+            resolve(response.data);
+          })
+          .catch(function (error) {
+            console.log("err");
+            reject(error);
+          });
+      });
 
       // return this.getAxios().put(`/api/contents/${id}`, payload);
-        // .then(async function(response) {
-        //   // console.log(response.data);
-        //   // return response.data;
-        // })
-        // .catch(function(error) {
-        //   console.log(error);
-        // });
+      // .then(async function(response) {
+      //   // console.log(response.data);
+      //   // return response.data;
+      // })
+      // .catch(function(error) {
+      //   console.log(error);
+      // });
 
-        // return putPromise;
+      // return putPromise;
     }),
-    (exports.createContentInstance = async function(payload) {
+    (exports.createContentInstance = async function (payload) {
       // console.log('createContentInstance payload', payload);
       // let content = {};
       // content.data = payload;
@@ -231,40 +247,40 @@ if (typeof module !== "undefined" && module.exports) {
 
       // return this.http.post("/api/contents/", content).toPromise();
       return new Promise((resolve, reject) => {
-      this.getAxios()
-        .post("/api/contents/", payload)
-        .then(async function(response) {
-          // console.log("ok", response.data);
-          resolve(response.data);
-        })
-        .catch(function(error) {
-          console.log('err');
-          reject(error);
-        });
+        this.getAxios()
+          .post("/api/contents/", payload)
+          .then(async function (response) {
+            // console.log("ok", response.data);
+            resolve(response.data);
+          })
+          .catch(function (error) {
+            console.log("err");
+            reject(error);
+          });
       });
     });
 
-  (exports.getContentById = async function(id) {
+  (exports.getContentById = async function (id) {
     let url = `${apiUrl}contents/${id}`;
     return this.getAxios()
       .get(url)
-      .then(function(content) {
+      .then(function (content) {
         // console.log('getContentById', content.data);
         return content.data;
       })
-      .catch(function(error) {
+      .catch(function (error) {
         console.log(`getContentById ERROR, Id:${id}`, error);
       });
   }),
-    (exports.asyncForEach = async function(array, callback) {
+    (exports.asyncForEach = async function (array, callback) {
       for (let index = 0; index < array.length; index++) {
         await callback(array[index], index, array);
       }
     }),
-    (exports.getImageUrl = function(img) {
+    (exports.getImageUrl = function (img) {
       return `/api/containers/files/download/${img.originalName}`;
     }),
-    (exports.getImage = function(img) {
+    (exports.getImage = function (img) {
       let url = this.getImageUrl(img);
       return `<img class="img-fluid rounded" src="${url}" />`;
     });
