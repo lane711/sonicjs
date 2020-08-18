@@ -1,8 +1,13 @@
 {
   "primary": {
     "name": "primary",
-    "connector": "memory",
-    "file": "server/data/data.json"
+    "connector": "mysql",
+    "url": "",
+    "host": "127.0.0.1",
+    "port": 3306,
+    "user": "root",
+    "password": "",
+    "database": "sonicjs"
   },
   "transient": {
     "name": "transient",

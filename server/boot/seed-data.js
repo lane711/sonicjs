@@ -3,8 +3,6 @@ const { parse, stringify } = require("envfile");
 const path = require("path");
 
 module.exports = async function (app) {
-  await setEnvVarToEnsureMigrationDoesNotRunAgain();
-
   if (!(process.env.RUN_NEW_SITE_MIGRATION === "TRUE")) {
     return;
   }
@@ -18,11 +16,17 @@ module.exports = async function (app) {
   let dataRaw = fs.readFileSync("server/data/data.json");
   let data = JSON.parse(dataRaw);
 
+  console.log(">>>>>>automigrate start");
+
   migrateContentTypes(app);
   migrateContent(app);
 
-  console.log(">>>>>>automigrate start");
-  app.dataSources.primary.automigrate();
+  app.dataSources.primary.automigrate("AccessToken");
+  app.dataSources.primary.automigrate("ACL");
+  app.dataSources.primary.automigrate("Role");
+  app.dataSources.primary.automigrate("RoleMapping");
+  app.dataSources.primary.automigrate("User");
+
   console.log(">>>>automigrate end");
 
   function migrateContentTypes(app) {
@@ -41,10 +45,12 @@ module.exports = async function (app) {
         let objString = contentType[1];
         let obj = JSON.parse(objString);
 
+        console.log(obj);
+
         let newContentType = {
           title: obj.title,
           systemid: obj.systemid,
-          data: { components: obj.components },
+          data: obj.data,
         };
 
         app.models.contentType.create(newContentType, function (
@@ -53,6 +59,10 @@ module.exports = async function (app) {
         ) {
           if (err) throw err;
           console.log("Content type created:", newInstance);
+
+          if (newContentType.systemid === "asset") {
+            setEnvVarToEnsureMigrationDoesNotRunAgain();
+          }
         });
       });
     });
