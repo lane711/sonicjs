@@ -64,12 +64,31 @@ if (typeof module !== "undefined" && module.exports) {
       return axiosInstance;
     }),
     (exports.getContent = async function () {
-      const filter = encodeURI(`{"order":"data.createdOn DESC"}`);
+      //HACK removing sort bc LB not working with RDMS
+      const filter = ""; //encodeURI(`{"order":"data.createdOn DESC"}`);
+
       let url = `${apiUrl}contents?filter=${filter}`;
       let page = await this.getAxios().get(url);
       await formattingService.formatDates(page.data);
       await formattingService.formatTitles(page.data);
       return page.data;
+    }),
+    (exports.getContentAdmin = async function () {
+      //HACK removing sort bc LB not working with RDMS
+      const filter = ""; //encodeURI(`{"order":"data.createdOn DESC"}`);
+
+      let url = `${apiUrl}contents?filter=${filter}`;
+      let page = await this.getAxios().get(url);
+      await formattingService.formatDates(page.data);
+      await formattingService.formatTitles(page.data);
+
+      //filter out content type that should not appear in admin content list
+      let data = page.data
+        .filter((x) => x.data.contentType !== "menu")
+        .filter((x) => x.data.contentType !== "section")
+        .filter((x) => x.data.contentType !== "site-settings");
+
+      return data;
     }),
     (exports.getContentByType = async function (contentType) {
       const filter = encodeURI(
@@ -143,7 +162,7 @@ if (typeof module !== "undefined" && module.exports) {
       let url = `${apiUrl}contents?filter=${encodedFilter}`;
       let pageRecord = await this.getAxios().get(url);
       if (pageRecord.data[0]) {
-        //HACK: workaround for loopback bug - lb should filter based on the above filter input
+        //HACK: workaround for loopback bug - lb should filter based on the above filter input, but doesn't for RDBMS
         if (
           pageRecord.data[0].title === title &&
           pageRecord.data[0].contentType === contentType
