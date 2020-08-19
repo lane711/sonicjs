@@ -151,13 +151,12 @@ if (typeof module !== "undefined" && module.exports) {
           return pageRecord.data[0];
         } else {
           //filter in code per HACK
-          let record = pageRecord.data.filter(
-            (record) => record.contentType == contentType
-          );
-          // .filter((x) => x.contentType == contentType);
-          //(record) => record.title == title
-          if (record) {
-            return record;
+          let record = pageRecord.data
+            .filter((c) => c.data.contentType == contentType)
+            .filter((c) => c.data.title == title);
+
+          if (record && record[0]) {
+            return record[0];
           }
         }
         // await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);
