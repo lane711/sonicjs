@@ -506,7 +506,7 @@ module.exports = function (app) {
       let data = {};
 
       if (viewName == "admin-content") {
-        data = await dataService.getContent();
+        data = await dataService.getContentAdmin();
         data.contentTypes = await dataService.getContentTypes();
       }
 

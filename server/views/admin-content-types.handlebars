@@ -22,22 +22,16 @@
             <td>
               <a class="btn btn-sm btn-primary rmargin" href="/admin/content-types/edit/{{ this.systemid }}">Edit</a>
 
-   
 
 
-              <a tabindex="0"
-   class="btn btn-sm btn-danger" 
-   role="button" 
-   data-html="true" 
-   data-toggle="popover" 
-   data-trigger="focus" 
-   title="Delete <b>{{ this.data.title }}</b> Forever?" 
-   data-content="<a href='/contentType/{{ this.id }}' 
+
+              <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
+                data-trigger="focus" title="Delete <b>{{ this.data.title }}</b> Forever?" data-content="<a href='/contentType/{{ this.id }}'
    class='btn btn-sm btn-danger rmargin'>Confirm Delete</a>
 ">Delete</a>
 
 
-              {{!-- <button type="button" class="btn btn-sm btn-danger" data-toggle="popover" 
+              {{!-- <button type="button" class="btn btn-sm btn-danger" data-toggle="popover"
  title="Delete Content Type {{ this.title }}" data-html="true"
 data-content="<a class='btn btn-sm btn-danger' onclick='deleteContentType({{ this.id }})' >Confirm Delete?</a>">Delete</button> --}}
 
@@ -119,11 +113,12 @@ data-content="<a class='btn btn-sm btn-danger' onclick='deleteContentType({{ thi
             })
               .then(async function (form) {
                 form.on('submit', async function (submission) {
+                  debugger;
                   var accessToken = '{{ this.accessToken }}';
-                  axios.put(`/api/contentTypes?access_token=${accessToken}`, submission.data)
+                  axios.post(`/api/contentTypes?access_token=${accessToken}`, submission.data)
                     .then(async function (response) {
                       console.log(response);
-                          window.location.replace('/admin/content-types/edit/' +  submission.data.systemid);
+                      window.location.replace('/admin/content-types/edit/' + submission.data.systemid);
 
                     })
                     .catch(function (error) {
