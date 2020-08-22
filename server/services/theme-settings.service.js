@@ -22,7 +22,7 @@ module.exports = themeSettingsService = {
 
   processThemeSettings: async function (page) {
     var themeSettings = await dataService.getContentTopOne("theme-settings");
-    console.log("themeSettings", themeSettings);
+    // console.log("themeSettings", themeSettings);
     page.data.themeSettings = themeSettings.data;
   },
 };

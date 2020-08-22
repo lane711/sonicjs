@@ -75,6 +75,10 @@ if (typeof module !== "undefined" && module.exports) {
         return;
       }
 
+      if (!onFormSubmitFunction) {
+        onFormSubmitFunction = "editContentInstance(submission,true)";
+      }
+
       // let name = `${contentType.systemid}Form`;
       // let settings = await this.getFormSettings(contentType, content);
       // let components = await this.getFormComponents(contentType, content);

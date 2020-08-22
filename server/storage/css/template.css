@@ -48,6 +48,11 @@ section {
   padding: 20px 0
 }
 
+body nav.navbar a.navbar-brand {
+  color: white;
+  font-size: 1.3em;
+}
+
 .no-margin {
   margin: 0
 }

@@ -1,7 +1,8 @@
 {{#if (eq level "1")}}
 
 <nav class="navbar navbar-expand-md navbar-dark bg-ptrans fixed-top drop-link">
-  <a class="navbar-brand" href="/">
+  <a class="navbar-brand"
+    style="font-size:{{ page.data.themeSettings.fontSize }}; color:{{ page.data.themeSettings.fontColor }}" href="/">
     {{#if (eq page.data.siteSettings.logoType "image")}}
     <img src="/api/containers/files/download/sonicjs-logo.svg" alt="" width="200">
     {{/if}}
