@@ -131,36 +131,12 @@ if (typeof module !== "undefined" && module.exports) {
       return results[0];
     }),
     (exports.getContentByUrl = async function (url) {
-      // var filter = encodeURI(`{"where":{"data.url":"${url}"}}`);
-      // let apiFullUrl = `${apiUrl}contents?filter=${filter}`;
-
-      let contentModel = loopback.getModel("content");
-      var Content = loopback.Content;
-
-      contentModel.findOne({ where: { "data.url": url } }, function (
-        err,
-        content
-      ) {
-        if (err) {
-          console.log(err);
-        }
-        console.log("find:", content);
-      });
-
-      // await contentModel.findById(1, function (err, content) {
-      //   if (err) {
-      //     console.log(err);
-      //   }
-      //   console.log(content);
-      // });
-
-      // var filter = encodeURI(`[where][data.url]":"${url}"}}`);
-
-      // let apiFullUrl = `${apiUrl}contents?filter=${filter}`;
-      // let record = await this.getAxios().get(apiFullUrl);
-      // if (record.data[0] && record.data.length > 0) {
-      //   return record;
-      // }
+      var filter = encodeURI(`{"where":{"data.url":"${url}"}}`);
+      let apiFullUrl = `${apiUrl}contents?filter=${filter}`;
+      let record = await this.getAxios().get(apiFullUrl);
+      if (record.data[0] && record.data.length > 0) {
+        return record;
+      }
 
       let notFound = { data: {} };
       notFound.data.title = "Not Found";
