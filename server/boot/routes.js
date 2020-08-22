@@ -17,6 +17,7 @@ formService.startup();
 var menuService = require("../services/menu.service");
 var mediaService = require("../services/media.service");
 var siteSettingsService = require("../services/site-settings.service");
+var themeSettingsService = require("../services/theme-settings.service");
 var contentService = require("../services/content.service");
 contentService.startup();
 var cssService = require("../services/css.service");
@@ -53,6 +54,7 @@ module.exports = function (app) {
     await menuService.startup();
     await mediaService.startup();
     await siteSettingsService.startup();
+    await themeSettingsService.startup();
     await userService.startup();
     await assetService.startup();
 

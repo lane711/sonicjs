@@ -175,7 +175,7 @@ if (typeof module !== "undefined" && module.exports) {
     (exports.getFormComponents = async function (contentType, content) {
       // let contentTypeDef = await dataService.getContentType(content.data.contentType);
       // console.log('contentTypeDef', contentTypeDef);
-      debugger;
+      // debugger;
       let components = contentType.data.components;
 
       if (content) {
@@ -184,7 +184,7 @@ if (typeof module !== "undefined" && module.exports) {
           content.data.contentType,
           components
         );
-      } else {
+      } else if (components) {
         components.push({
           type: "textfield",
           key: "contentType",

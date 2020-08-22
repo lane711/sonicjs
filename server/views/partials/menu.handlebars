@@ -5,8 +5,8 @@
     {{#if (eq page.data.siteSettings.logoType "image")}}
     <img src="/api/containers/files/download/sonicjs-logo.svg" alt="" width="200">
     {{/if}}
-    {{#if (eq page.data.siteSettings.logoType "text")}}
-    {{ page.data.siteSettings.logoTitle }}
+    {{#if (eq page.data.themeSettings.logoType "text")}}
+    {{ page.data.themeSettings.logoTitle }}
     {{/if}}
   </a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavbar"
