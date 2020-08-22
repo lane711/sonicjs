@@ -564,6 +564,11 @@ module.exports = function (app) {
         data.editForm = await formService.getForm("site-settings", data);
       }
 
+      if (viewName == "admin-theme-settings") {
+        data = await dataService.getContentTopOne("theme-settings");
+        data.editForm = await formService.getForm("theme-settings", data);
+      }
+
       if (viewName == "admin-site-settings-colors") {
         data = await dataService.getContentTopOne("site-settings-colors");
         data.editForm = await formService.getForm("site-settings-colors", data);
