@@ -113,8 +113,8 @@ data-content="<a class='btn btn-sm btn-danger' onclick='deleteContentType({{ thi
             })
               .then(async function (form) {
                 form.on('submit', async function (submission) {
-                  debugger;
                   var accessToken = '{{ this.accessToken }}';
+                  submission.data.data = {};
                   axios.post(`/api/contentTypes?access_token=${accessToken}`, submission.data)
                     .then(async function (response) {
                       console.log(response);
@@ -133,11 +133,11 @@ data-content="<a class='btn btn-sm btn-danger' onclick='deleteContentType({{ thi
         <div id="createContentTypeForm"></div>
 
       </div>
-      <div class="modal-footer">
+      {{!-- <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
         <button type="button" class="btn btn-success wysiwyg-save" onclick='saveNewContentType()'
           data-dismiss="modal">Create</button>
-      </div>
+      </div> --}}
     </div>
   </div>
 </div>
