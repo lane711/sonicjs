@@ -614,7 +614,7 @@ async function editContentInstance(payload, refresh) {
   if (payload.id) {
     delete payload.id;
   }
-  if (payload.data.id) {
+  if (payload.data && payload.data.id) {
     id = payload.data.id;
     delete payload.data.id;
   }
@@ -626,7 +626,7 @@ async function editContentInstance(payload, refresh) {
   // }
   // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
 
-  console.log(axiosInstance);
+  console.log(payload);
   return axiosInstance
     .put(`/api/contents/${id}`, payload)
     .then(async function (response) {
@@ -838,7 +838,7 @@ async function setupFormBuilder(contentType) {
   Formio.builder(document.getElementById("formBuilder"), null).then(
     async function (form) {
       form.setForm({
-        components: contentType.components,
+        components: contentType.data.components,
       });
       form.on("submit", async function (submission) {
         //             debugger;
@@ -927,12 +927,28 @@ async function setupFormBuilder(contentType) {
 async function onContentTypeSave() {
   if (contentTypeComponents) {
     console.log("contentTypeComponents", contentTypeComponents);
-    contentType.components = contentTypeComponents;
+    contentType.data.components = contentTypeComponents;
     if (!contentType.id) {
       contentType.id = $("#createContentTypeForm #id").val();
     }
     await editContentType(contentType);
   }
+}
+
+async function onContentTypeRawSave() {
+  var contentType = jsonEditorRaw.get();
+  console.log("jsonEditor", contentType);
+  await editContentType(contentType);
+  fullPageUpdate();
+
+  // if (contentTypeComponents) {
+  //   console.log("contentTypeComponents", contentTypeComponents);
+  //   contentType.data.components = contentTypeComponents;
+  //   if (!contentType.id) {
+  //     contentType.id = $("#createContentTypeForm #id").val();
+  //   }
+  //   await editContentType(contentType);
+  // }
 }
 
 async function openNewContentTypeModal() {

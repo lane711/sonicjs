@@ -1,5 +1,6 @@
 //check if running in node (and not the browser)
 if (typeof module !== "undefined" && module.exports) {
+  var loopback = require("loopback");
   var eventBusService = require("./event-bus.service");
   var globalService = require("./global.service");
   var pageBuilderService = require("./page-builder.service");
@@ -64,7 +65,9 @@ if (typeof module !== "undefined" && module.exports) {
       return axiosInstance;
     }),
     (exports.getContent = async function () {
-      const filter = encodeURI(`{"order":"data.createdOn DESC"}`);
+      //HACK removing sort bc LB not working with RDMS
+      const filter = ""; //encodeURI(`{"order":"data.createdOn DESC"}`);
+
       let url = `${apiUrl}contents?filter=${filter}`;
       let page = await this.getAxios().get(url);
       await formattingService.formatDates(page.data);
@@ -84,7 +87,7 @@ if (typeof module !== "undefined" && module.exports) {
       let data = page.data
         .filter((x) => x.data.contentType !== "menu")
         .filter((x) => x.data.contentType !== "section")
-        .filter((x) => x.data.contentType.indexOf("-setting") === -1);
+        .filter((x) => x.data.contentType !== "site-settings");
 
       return data;
     }),
@@ -128,12 +131,36 @@ if (typeof module !== "undefined" && module.exports) {
       return results[0];
     }),
     (exports.getContentByUrl = async function (url) {
-      var filter = encodeURI(`{"where":{"data.url":"${url}"}}`);
-      let apiFullUrl = `${apiUrl}contents?filter=${filter}`;
-      let record = await this.getAxios().get(apiFullUrl);
-      if (record.data[0] && record.data.length > 0) {
-        return record;
-      }
+      // var filter = encodeURI(`{"where":{"data.url":"${url}"}}`);
+      // let apiFullUrl = `${apiUrl}contents?filter=${filter}`;
+
+      let contentModel = loopback.getModel("content");
+      var Content = loopback.Content;
+
+      contentModel.findOne({ where: { "data.url": url } }, function (
+        err,
+        content
+      ) {
+        if (err) {
+          console.log(err);
+        }
+        console.log("find:", content);
+      });
+
+      // await contentModel.findById(1, function (err, content) {
+      //   if (err) {
+      //     console.log(err);
+      //   }
+      //   console.log(content);
+      // });
+
+      // var filter = encodeURI(`[where][data.url]":"${url}"}}`);
+
+      // let apiFullUrl = `${apiUrl}contents?filter=${filter}`;
+      // let record = await this.getAxios().get(apiFullUrl);
+      // if (record.data[0] && record.data.length > 0) {
+      //   return record;
+      // }
 
       let notFound = { data: {} };
       notFound.data.title = "Not Found";
@@ -160,7 +187,22 @@ if (typeof module !== "undefined" && module.exports) {
       let url = `${apiUrl}contents?filter=${encodedFilter}`;
       let pageRecord = await this.getAxios().get(url);
       if (pageRecord.data[0]) {
-        return pageRecord.data[0];
+        //HACK: workaround for loopback bug - lb should filter based on the above filter input, but doesn't for RDBMS
+        if (
+          pageRecord.data[0].title === title &&
+          pageRecord.data[0].contentType === contentType
+        ) {
+          return pageRecord.data[0];
+        } else {
+          //filter in code per HACK
+          let record = pageRecord.data
+            .filter((c) => c.data.contentType == contentType)
+            .filter((c) => c.data.title == title);
+
+          if (record && record[0]) {
+            return record[0];
+          }
+        }
         // await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);
         // let page = pageRecord.data[0];
         // page.data.html = pageContent;

@@ -21,14 +21,14 @@ if (typeof module !== "undefined" && module.exports) {
 } else {
 }
 
-(function(exports) {
-  (exports.startup = async function() {
-    eventBusService.on("requestBegin", async function(options) {
+(function (exports) {
+  (exports.startup = async function () {
+    eventBusService.on("requestBegin", async function (options) {
       // console.log('data service startup')
       if (options) {
         const defaultOptions = {
           headers: {},
-          baseURL: globalService.baseUrl
+          baseURL: globalService.baseUrl,
         };
 
         if (options.req.signedCookies.sonicjs_access_token) {
@@ -42,7 +42,9 @@ if (typeof module !== "undefined" && module.exports) {
       }
     });
 
-    eventBusService.on("getRenderedPagePostDataFetch", async function(options) {
+    eventBusService.on("getRenderedPagePostDataFetch", async function (
+      options
+    ) {
       if (options && options.page) {
         options.page.data.editForm = await exports.getForm(
           options.page.contentTypeId,
@@ -52,7 +54,7 @@ if (typeof module !== "undefined" && module.exports) {
       }
     });
   }),
-    (exports.getForm = async function(
+    (exports.getForm = async function (
       contentTypeId,
       content,
       onFormSubmitFunction
@@ -81,7 +83,7 @@ if (typeof module !== "undefined" && module.exports) {
       //   name: name,
       //   settings: settings
       // };
-// debugger;
+      // debugger;
       const formJSON = await exports.getFormJson(contentType, content);
 
       let form = "";
@@ -112,7 +114,7 @@ if (typeof module !== "undefined" && module.exports) {
       // const viewPath = encodeURI(`/assets/html/form.html`);
       // let formHtml = await axiosInstance.post(`/api/views/getProceedView?viewModel=${viewModel}&viewPath=${viewPath}`)
       let formHtml = await axiosInstance.post(`/api/views/getProceedView`, {
-        data: data
+        data: data,
       });
 
       if (formHtml) {
@@ -124,24 +126,22 @@ if (typeof module !== "undefined" && module.exports) {
 
       return form;
     }),
-
-    (exports.getFormJson = async function(contentType, content) {
+    (exports.getFormJson = async function (contentType, content) {
       let name = `${contentType.systemid}Form`;
       let settings = await this.getFormSettings(contentType, content);
       let components = await this.getFormComponents(contentType, content);
       const formJSON = {
         components: components,
         name: name,
-        settings: settings
+        settings: settings,
       };
 
       return formJSON;
     }),
-
-    (exports.getTemplate = async function() {
+    (exports.getTemplate = async function () {
       let template = await this.getFormTemplate();
     }),
-    (exports.getFormTemplate = async function() {
+    (exports.getFormTemplate = async function () {
       if (isBackEndMode) {
         return this.getFormTemplateFileSystem();
       } else {
@@ -149,7 +149,7 @@ if (typeof module !== "undefined" && module.exports) {
         return template.data;
       }
     }),
-    (exports.getFormTemplateFileSystem = async function() {
+    (exports.getFormTemplateFileSystem = async function () {
       return new Promise((resolve, reject) => {
         let themeFilePath = __dirname + "/../assets/html/form.html";
         fs.readFile(themeFilePath, "utf8", (err, data) => {
@@ -162,20 +162,21 @@ if (typeof module !== "undefined" && module.exports) {
         });
       });
     }),
-    (exports.getFormSettings = async function(contentType, content) {
+    (exports.getFormSettings = async function (contentType, content) {
       let settings = {};
       if (isBackEndMode) {
         settings.recaptcha = {
           isEnabled: "true",
-          siteKey: process.env.RECAPTCHA_SITE_KEY
+          siteKey: process.env.RECAPTCHA_SITE_KEY,
         };
       }
       return settings;
     }),
-    (exports.getFormComponents = async function(contentType, content) {
+    (exports.getFormComponents = async function (contentType, content) {
       // let contentTypeDef = await dataService.getContentType(content.data.contentType);
       // console.log('contentTypeDef', contentTypeDef);
-      let components = contentType.components;
+      debugger;
+      let components = contentType.data.components;
 
       if (content) {
         this.addBaseContentTypeFields(
@@ -190,13 +191,13 @@ if (typeof module !== "undefined" && module.exports) {
           label: "contentType",
           defaultValue: contentType.systemid,
           hidden: true,
-          input: true
+          input: true,
         });
       }
 
       return components;
     }),
-    (exports.addBaseContentTypeFields = function(id, contentType, controls) {
+    (exports.addBaseContentTypeFields = function (id, contentType, controls) {
       // console.log('addBaseContentTypeFields', contentType, controls);
 
       controls.push({
@@ -205,7 +206,7 @@ if (typeof module !== "undefined" && module.exports) {
         label: "id",
         defaultValue: id,
         hidden: true,
-        input: true
+        input: true,
       });
 
       //   controls.push({
@@ -237,9 +238,9 @@ if (typeof module !== "undefined" && module.exports) {
       // }
     });
 
-    (exports.setFormApiUrls = async function(Formio) {
-      Formio.setProjectUrl(sharedService.getBaseUrl() + '/nested-forms-list');
-      Formio.setBaseUrl(sharedService.getBaseUrl() + '/nested-forms-get');
-    });
+  exports.setFormApiUrls = async function (Formio) {
+    Formio.setProjectUrl(sharedService.getBaseUrl() + "/nested-forms-list");
+    Formio.setBaseUrl(sharedService.getBaseUrl() + "/nested-forms-get");
+  };
   // }
 })(typeof exports === "undefined" ? (this["formService"] = {}) : exports);
