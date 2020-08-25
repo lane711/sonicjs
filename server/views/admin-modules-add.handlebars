@@ -56,8 +56,15 @@
                       .then(async function (response) {
                         console.log('add module', response);
                         //return await response.data;
+                        function redirectToPage() {
+                          //window.location.replace('/admin/modules/edit/' + submission.data.systemid);
+                          window.location.replace('/admin/modules');
 
-                        window.location.replace('/admin/modules/edit/' + submission.data.systemid);
+                        }
+
+                        //HACK: requires app restart
+                        setTimeout(redirectToPage, 2000);
+
                       })
                       .catch(function (error) {
                         console.log(error);
