@@ -62,7 +62,6 @@
     "loopback-component-explorer": "^6.2.0",
     "loopback-component-storage": "^3.6.0",
     "loopback-connector-mongodb": "^3.9.2",
-    "loopback-connector-mysql": "^5.4.4",
     "lorem-ipsum": "^2.0.0",
     "mixpanel": "^0.11.0",
     "moment": "^2.24.0",
