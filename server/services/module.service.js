@@ -269,7 +269,7 @@ module.exports = moduleService = {
       canBeAddedToColumn: moduleDefinitionFile.canBeAddedToColumn
         ? true
         : false,
-      components: [],
+      data: { components: [] },
     };
     moduleContentType.data.components.push({
       label: "First Name",

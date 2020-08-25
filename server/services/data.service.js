@@ -118,12 +118,12 @@ if (typeof module !== "undefined" && module.exports) {
       this.getAxios()
         .post(url, contentType)
         .then(async function (response) {
-          console.log(response);
-          resolve(response.data);
+          // console.log(response);
+          return response.data;
         })
         .catch(function (error) {
           console.log(error.response.data);
-          resolve(error);
+          return error;
         });
     }),
     (exports.getContentTopOne = async function (contentType) {
