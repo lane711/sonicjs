@@ -1,53 +1,81 @@
 #formBuilder .card {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
-.card .dropzone2{
-    margin: 0 0 60px;
-    border: 4px dashed #c8ced3;
-    background: #f0f3f5;
-    height: 100px;
-    font-size: 2rem;
-    color:#73818f;
-    text-align: center;
-    padding: 20px;
+.card .dropzone2 {
+  margin: 0 0 60px;
+  border: 4px dashed #c8ced3;
+  background: #f0f3f5;
+  height: 100px;
+  font-size: 2rem;
+  color: #73818f;
+  text-align: center;
+  padding: 20px;
 }
 
-.card .dropzone2 span{
-    font-size: 2rem;
+.card .dropzone2 span {
+  font-size: 2rem;
 }
 
-.field-types-list button{
-    margin: 0 12px 12px 0;
+.field-types-list button {
+  margin: 0 12px 12px 0;
 }
 
-.field-types-list button i.fa{
-    margin: 0 6px 0 0;
+.field-types-list button i.fa {
+  margin: 0 6px 0 0;
 }
 
-.field-types-list h2{
-    margin: 30px 0 20px 0;
+.field-types-list h2 {
+  margin: 30px 0 20px 0;
 }
 
-.hide{
-    display: none;
+.hide {
+  display: none;
 }
 
-#newContentModal .btn{
+#newContentModal .btn {
   margin: 0 10px 10px 0;
 }
 
-.green{
+.green {
   color: #4dbd74;
 }
-.red{
+
+.red {
   color: #f86c6b;
 }
 
-.add-node{
+.add-node {
   margin: 20px 0 0;
 }
 
-.menu-edit-right{
+.menu-edit-right {
   border-left: 1px solid rgba(0, 0, 0, 0.1)
+}
+
+.image-module-wrapper .form-control {
+  height: 114px;
+}
+
+.image-module-list-item .img {
+  height: 106px;
+  margin: 0 0 6px 0;
+  display: block;
+  float: left;
+}
+
+.image-module-list-item .img img {
+  height: 100px;
+  float: left;
+  margin: 0;
+  padding: 0;
+}
+
+.image-module-list-item .name {
+  float: left;
+  margin: 37px 0 0 20px;
+}
+
+.image-module-wrapper .choices__list--dropdown .choices__item {
+  height: 120px;
 }

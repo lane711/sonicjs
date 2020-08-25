@@ -3,8 +3,9 @@
 <nav class="navbar navbar-expand-md navbar-dark bg-ptrans fixed-top drop-link">
   <a class="navbar-brand"
     style="font-size:{{ page.data.themeSettings.fontSize }}; color:{{ page.data.themeSettings.fontColor }}" href="/">
-    {{#if (eq page.data.siteSettings.logoType "image")}}
-    <img src="/api/containers/files/download/sonicjs-logo.svg" alt="" width="200">
+    {{#if (eq page.data.themeSettings.logoType "image")}}
+
+    <img src="/images/{{ page.data.themeSettings.fileName}}" alt="" width="{{ page.data.themeSettings.imageWidth}}">
     {{/if}}
     {{#if (eq page.data.themeSettings.logoType "text")}}
     {{ page.data.themeSettings.logoTitle }}
