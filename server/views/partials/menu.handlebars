@@ -4,8 +4,9 @@
   <a class="navbar-brand"
     style="font-size:{{ page.data.themeSettings.fontSize }}; color:{{ page.data.themeSettings.fontColor }}" href="/">
     {{#if (eq page.data.themeSettings.logoType "image")}}
-
-    <img src="/images/{{ page.data.themeSettings.fileName}}" alt="" width="{{ page.data.themeSettings.imageWidth}}">
+    <div style="{{ page.data.themeSettings.imageStyle}}"> <img src="/images/{{ page.data.themeSettings.fileName}}"
+        alt="" width="{{ page.data.themeSettings.imageWidth}}">
+    </div>
     {{/if}}
     {{#if (eq page.data.themeSettings.logoType "text")}}
     {{ page.data.themeSettings.logoTitle }}
