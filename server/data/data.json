@@ -9,13 +9,8 @@
     "Role": 1
   },
   "models": {
-    "User": {
-      "2": "{\"password\":\"$2a$10$mVPDDtBHJCBA9zyiiFRNR.QFyiLhdbIeeRiYCDwky8sB2rFLZe8Tm\",\"email\":\"a@a.com\",\"id\":2}"
-    },
-    "AccessToken": {
-      "5FTkopbdnUjzzgkqnSGopSksVa1S8RAWbgjpe5MABvBhmwerYY2Fq7EUoiWB5IMX": "{\"id\":\"5FTkopbdnUjzzgkqnSGopSksVa1S8RAWbgjpe5MABvBhmwerYY2Fq7EUoiWB5IMX\",\"ttl\":1209600,\"created\":\"2020-08-26T02:51:15.702Z\",\"userId\":2}",
-      "FjVGJoccFAdwNt37Lq9s64uDtworoIq18ITrS0x7HIHDObmtjzW8vd9kzfxU6SCH": "{\"id\":\"FjVGJoccFAdwNt37Lq9s64uDtworoIq18ITrS0x7HIHDObmtjzW8vd9kzfxU6SCH\",\"ttl\":1209600,\"created\":\"2020-08-26T21:10:00.115Z\",\"userId\":2}"
-    },
+    "User": {},
+    "AccessToken": {},
     "ACL": {},
     "RoleMapping": {},
     "Role": {},
