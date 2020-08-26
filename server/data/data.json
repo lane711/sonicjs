@@ -9,15 +9,8 @@
     "Role": 1
   },
   "models": {
-    "User": {
-      "1": "{\"password\":\"$2a$10$CUhz2xrGRBqprmAWZoNtiOW1zNAJSpdPVXM7l6Kwdp8JFTv9z3mIK\",\"email\":\"a@a.com\",\"id\":1}"
-    },
-    "AccessToken": {
-      "1DSrsH9wAAoBxnkSbHDK95bBFnNK1p3zYq7tFOuJzvO5RrxrxHRpYCC0yedjB5pR": "{\"id\":\"1DSrsH9wAAoBxnkSbHDK95bBFnNK1p3zYq7tFOuJzvO5RrxrxHRpYCC0yedjB5pR\",\"ttl\":1209600,\"created\":\"2020-08-18T02:31:41.733Z\",\"userId\":1}",
-      "oDH1EnnkwVmOAvS39tMjdpS8Wmm2rGmLapXkF0HMv8CDr4tLFAM1NJiWx9XxeAgx": "{\"id\":\"oDH1EnnkwVmOAvS39tMjdpS8Wmm2rGmLapXkF0HMv8CDr4tLFAM1NJiWx9XxeAgx\",\"ttl\":1209600,\"created\":\"2020-08-22T02:40:41.172Z\",\"userId\":1}",
-      "CD8VjG12kbVEj0DYB42kTPBdpXCMeH0tqAr3myZADuTJXeBykjB7ksbSzgcXlbki": "{\"id\":\"CD8VjG12kbVEj0DYB42kTPBdpXCMeH0tqAr3myZADuTJXeBykjB7ksbSzgcXlbki\",\"ttl\":1209600,\"created\":\"2020-08-25T01:51:39.310Z\",\"userId\":1}",
-      "zAvdum8VaHiR4Jwz2JUV9iPK44IiqYHehQ5zYbs5NCpVdAc0UOnq7lbptM2r0yUG": "{\"id\":\"zAvdum8VaHiR4Jwz2JUV9iPK44IiqYHehQ5zYbs5NCpVdAc0UOnq7lbptM2r0yUG\",\"ttl\":1209600,\"created\":\"2020-08-25T16:20:01.749Z\",\"userId\":1}"
-    },
+    "User": {},
+    "AccessToken": {},
     "ACL": {},
     "RoleMapping": {},
     "Role": {},
