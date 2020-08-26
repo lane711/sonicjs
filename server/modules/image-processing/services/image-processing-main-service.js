@@ -6,15 +6,15 @@ var path = require("path");
 const fs = require("fs");
 
 module.exports = imageProcessingMainService = {
-  startup: async function() {
-    eventBusService.on("beginProcessModuleShortCode", async function(options) {
+  startup: async function () {
+    eventBusService.on("beginProcessModuleShortCode", async function (options) {
       if (options.shortcode.name === "IMAGE-PROCESSING") {
         options.moduleName = "image-processing";
         await moduleService.processModuleInColumn(options);
       }
     });
 
-    eventBusService.on("requestBegin", async function(options) {
+    eventBusService.on("requestBegin", async function (options) {
       if (options.req.url.startsWith("/images/")) {
         let filePath = decodeURIComponent(options.req.path);
 
@@ -26,8 +26,19 @@ module.exports = imageProcessingMainService = {
 
         // Read the image.
         let fileName = filePath.replace("/images/", "");
-        let width = options.req.query.width;
-        let height = options.req.query.height;
+        let width =
+          options.req.query.width === "0" ? undefined : options.req.query.width;
+        let height =
+          options.req.query.height === "0"
+            ? undefined
+            : options.req.query.height;
+
+        if (!width && !height) {
+          //send original image
+          //should redirect
+          options.res.redirect(`/api/containers/files/download/${fileName}`);
+          return;
+        }
 
         let imagePath = path.join(
           __dirname,
@@ -71,10 +82,10 @@ module.exports = imageProcessingMainService = {
     });
 
     function isSupportedImageType(filePath) {
-      let extension = filePath.split('.').pop();
+      let extension = filePath.split(".").pop();
       var supportedImageTypes = ["jpg", "jpeg", "png", "gif", "bmp"];
       var isSupportedImageType = supportedImageTypes.includes(extension, 0);
       return isSupportedImageType;
     }
-  }
+  },
 };
