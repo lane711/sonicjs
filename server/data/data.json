@@ -1,7 +1,7 @@
 {
   "ids": {
     "contentType": 58,
-    "content": 44,
+    "content": 45,
     "User": 4,
     "AccessToken": 19,
     "ACL": 1,
@@ -66,7 +66,7 @@
       "21": "{\"id\":21,\"data\":{\"logoType\":\"image\",\"logoTitle\":\"Acme Widgets\",\"fontSize\":\"24px\",\"fontColor\":\"#fff\",\"fileName\":\"PngItem_4852378.png\",\"imageWidth\":\"120px\",\"imageStyle\":\"\",\"contentType\":\"theme-settings\",\"createdOn\":1598372945447,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-420,\"referrer\":\"http://localhost:3018/admin/theme-settings\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36\",\"pathName\":\"/admin/theme-settings\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
       "22": "{\"id\":22,\"data\":{\"fileName\":\"-151639image8.png\",\"retinaSupport\":true,\"thumbnailWidth\":200,\"onClick\":\"photoSwipe\",\"css\":\"\",\"contentType\":\"image\",\"createdOn\":1598323096156,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-420,\"referrer\":\"http://localhost:3018/\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36\",\"pathName\":\"/\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
       "23": "{\"data\":{\"title\":\"PngItem_4852378\",\"file\":\"PngItem_4852378.png\",\"contentType\":\"media\",\"createdOn\":1598323491244},\"id\":23}",
-      "24": "{\"id\":24,\"data\":{\"title\":\"Modules\",\"showHero\":true,\"heroTitle\":\"This is an optional page hero section\",\"pageCssClass\":\"\",\"autoGenerateUrl\":true,\"url\":\"/modules\",\"metaTitle\":\"Modules in SonicJs\",\"metaDescription\":\"This is an example page showing the common modules that come with SonicJs\",\"contentType\":\"page\",\"submit\":true,\"createdOn\":1598411739831,\"layout\":[25,27,29,31,34,37,40,42]}}",
+      "24": "{\"id\":24,\"data\":{\"title\":\"Modules\",\"showHero\":true,\"heroTitle\":\"This is an optional page hero section\",\"pageCssClass\":\"\",\"autoGenerateUrl\":true,\"url\":\"/modules\",\"metaTitle\":\"Modules in SonicJs\",\"metaDescription\":\"This is an example page showing the common modules that come with SonicJs\",\"contentType\":\"page\",\"submit\":true,\"createdOn\":1598490577043,\"layout\":[25,27,29,31,34,37,40,42,44]}}",
       "25": "{\"id\":25,\"data\":{\"title\":\"Section 1\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[TEXT id=\\\"26\\\"]\"}]}],\"createdOn\":1598410999120}}",
       "26": "{\"data\":{\"body\":\"This is a page section with a simple text module.\",\"css\":\"\",\"contentType\":\"text\",\"submit\":true,\"createdOn\":1598410999092},\"id\":26}",
       "27": "{\"id\":27,\"data\":{\"title\":\"Section 2\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[ALERT id=\\\"28\\\"]\"}]}],\"createdOn\":1598411056353}}",
@@ -85,7 +85,8 @@
       "40": "{\"id\":40,\"data\":{\"title\":\"Section 7\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[HTML id=\\\"41\\\"]\"}]}],\"createdOn\":1598411703654}}",
       "41": "{\"id\":41,\"data\":{\"body\":\"<h3><strong>This is the html module</strong>.&nbsp;</h3><p>It can be used to display rich text.</p>\",\"contentType\":\"html\",\"createdOn\":1598411733518,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-420,\"referrer\":\"http://localhost:3018/modules\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36\",\"pathName\":\"/modules\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
       "42": "{\"id\":42,\"data\":{\"title\":\"Section 8\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[IMAGE id=\\\"43\\\"]\"}]}],\"createdOn\":1598411770633}}",
-      "43": "{\"data\":{\"fileName\":\"-140875image23.jpeg\",\"retinaSupport\":true,\"thumbnailWidth\":0,\"onClick\":\"showFullImage\",\"css\":\"\",\"contentType\":\"image\",\"submit\":true,\"createdOn\":1598411770570},\"id\":43}"
+      "43": "{\"id\":43,\"data\":{\"fileName\":\"apple-light.jpeg\",\"retinaSupport\":true,\"thumbnailWidth\":0,\"onClick\":\"showFullImage\",\"css\":\"\",\"contentType\":\"image\",\"createdOn\":1598490596034,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-420,\"referrer\":\"http://localhost:3018/modules\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36\",\"pathName\":\"/modules\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
+      "44": "{\"data\":{\"title\":\"Section 9\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"\"}]}],\"createdOn\":1598490577023},\"id\":44}"
     }
   }
 }
