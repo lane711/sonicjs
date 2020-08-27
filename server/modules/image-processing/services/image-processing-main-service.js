@@ -71,7 +71,6 @@ module.exports = imageProcessingMainService = {
             } else {
               await image.resize(jimp.AUTO, parseInt(height));
             }
-            console.log("attempting write:" + newImagePath);
             let img = await image.writeAsync(newImagePath);
           }
         } catch (err) {

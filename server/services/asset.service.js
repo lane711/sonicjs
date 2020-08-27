@@ -5,7 +5,6 @@ var dataService = require("./data.service");
 const path = require("path");
 var UglifyJS = require("uglify-es");
 var csso = require("csso");
-var assetType = "";
 var fileName = {};
 
 module.exports = assetService = {
@@ -42,14 +41,14 @@ module.exports = assetService = {
         options.req.url.startsWith("/js/combined-") ||
         options.req.url.startsWith("/css/combined-")
       ) {
-        this.assetType = options.req.url.includes("/js/") ? "js" : "css";
+        let assetType = options.req.url.includes("/js/") ? "js" : "css";
         let appVersion = globalService.getAppVersion();
-        let fileName = assetService.getCombinedFileName(this.assetType);
+        let fileName = assetService.getCombinedFileName(assetType);
 
         let file = path.join(
           __dirname,
           "..",
-          assetService.getCombinedAssetPath(this.assetType, fileName)
+          assetService.getCombinedAssetPath(assetType, fileName)
         );
 
         options.res.setHeader("Cache-Control", "public, max-age=2592000");
@@ -75,23 +74,22 @@ module.exports = assetService = {
   },
 
   getLinks: async function (options, assetType) {
-    this.assetType = assetType;
     options.page.data.links = {};
-    options.page.data.links[this.assetType] = [];
+    options.page.data.links[assetType] = [];
 
-    await this.getAssets(options);
+    await this.getAssets(options, assetType);
 
-    await this.processLinksForProdMode(options);
+    await this.processLinksForProdMode(options, assetType);
 
-    await this.processLinksForDevMode(options);
+    await this.processLinksForDevMode(options, assetType);
   },
 
-  getAssets: async function (options) {
+  getAssets: async function (options, assetType) {
     let paths = [];
     if (globalService.isBackEnd) {
       let assets = await dataService.getContentByContentTypeAndTitle(
         "asset",
-        `${this.assetType}-back-end`
+        `${assetType}-back-end`
       );
       this.addPaths(options, assets.data.paths);
     }
@@ -99,70 +97,74 @@ module.exports = assetService = {
     if (globalService.isFrontEnd) {
       let assets = await dataService.getContentByContentTypeAndTitle(
         "asset",
-        `${this.assetType}-front-end`
+        `${assetType}-front-end`
       );
-      this.addPaths(options, assets.data.paths);
+      this.addPaths(options, assets.data.paths, assetType);
     }
 
     //add module js files
-    if (this.assetType === "js") {
+    if (assetType === "js") {
       await globalService.asyncForEach(
         globalService.moduleJsFiles,
         async (path) => {
-          this.addPath(options, { path: path });
+          this.addPath(options, { path: path }, assetType);
         }
       );
     }
 
     //add module css files
-    if (this.assetType === "css") {
+    if (assetType === "css") {
       await globalService.asyncForEach(
         globalService.moduleCssFiles,
         async (path) => {
-          this.addPath(options, { path: path });
+          this.addPath(options, { path: path }, assetType);
         }
       );
     }
   },
 
-  addPaths: function (options, paths) {
+  addPaths: function (options, paths, assetType) {
     paths.forEach((path) => {
       let skipAsset =
         path.pageBuilderOnly && !options.page.data.showPageBuilder;
       if (!skipAsset) {
-        this.addPath(options, path);
+        this.addPath(options, path, assetType);
       }
     });
   },
 
-  addPath: function (options, path) {
-    options.page.data.links[this.assetType].push(path);
+  addPath: function (options, path, assetType) {
+    try {
+      options.page.data.links[assetType].push(path);
+    } catch (error) {
+      console.log(error);
+    }
   },
 
-  processLinksForDevMode: async function (options) {
+  processLinksForDevMode: async function (options, assetType) {
     if (process.env.MODE === "production") return;
 
     await globalService.asyncForEach(
-      options.page.data.links[this.assetType],
+      options.page.data.links[assetType],
       async (link) => {
-        if (this.assetType === "js") {
+        if (assetType === "js") {
           options.page.data.jsLinks += `<script src="${link.path}"></script>`;
         }
 
-        if (this.assetType === "css") {
+        if (assetType === "css") {
           options.page.data.cssLinks += `<link href="${link.path}" rel="stylesheet">`;
         }
       }
     );
   },
 
-  processLinksForProdMode: async function (options) {
+  processLinksForProdMode: async function (options, assetType) {
     if (process.env.MODE !== "production") return;
 
     let fileContent = "";
 
     await globalService.asyncForEach(
-      options.page.data.links[this.assetType],
+      options.page.data.links[assetType],
       async (link) => {
         let root = link.path.startsWith("/node_modules");
         if (link.path.includes("/api/containers/css/download/template.css")) {
@@ -178,12 +180,12 @@ module.exports = assetService = {
     );
 
     let appVersion = globalService.getAppVersion();
-    let fileName = this.getCombinedFileName(this.assetType);
+    let fileName = this.getCombinedFileName(assetType);
 
-    if (this.assetType === "js") {
+    if (assetType === "js") {
       await this.createCombinedFile(fileContent, fileName);
     }
-    if (this.assetType === "css") {
+    if (assetType === "css") {
       await this.createCombinedFile(fileContent, fileName);
     }
   },
@@ -193,12 +195,12 @@ module.exports = assetService = {
     let minifiedAsset = "";
     if (!fileService.fileExists(path)) {
       console.log(`Generating Asset: ${path}`);
-      if (this.assetType === "js") {
+      if (assetType === "js") {
         minifiedAsset = UglifyJS.minify(fileContent, {
           compress: false,
         }).code;
       }
-      if (this.assetType === "css") {
+      if (assetType === "css") {
         minifiedAsset = csso.minify(fileContent).css;
       }
 
