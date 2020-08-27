@@ -1,7 +1,7 @@
 {
   "ids": {
     "contentType": 58,
-    "content": 47,
+    "content": 48,
     "User": 4,
     "AccessToken": 19,
     "ACL": 1,
@@ -67,7 +67,7 @@
       "22": "{\"id\":22,\"data\":{\"fileName\":\"-151639image8.png\",\"retinaSupport\":true,\"thumbnailWidth\":200,\"onClick\":\"photoSwipe\",\"css\":\"\",\"contentType\":\"image\",\"createdOn\":1598323096156,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-420,\"referrer\":\"http://localhost:3018/\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36\",\"pathName\":\"/\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
       "23": "{\"data\":{\"title\":\"PngItem_4852378\",\"file\":\"PngItem_4852378.png\",\"contentType\":\"media\",\"createdOn\":1598323491244},\"id\":23}",
       "24": "{\"id\":24,\"data\":{\"title\":\"Modules\",\"showHero\":true,\"heroTitle\":\"This is an optional page hero section\",\"pageCssClass\":\"\",\"autoGenerateUrl\":true,\"url\":\"/modules\",\"metaTitle\":\"Modules in SonicJs\",\"metaDescription\":\"This is an example page showing the common modules that come with SonicJs\",\"contentType\":\"page\",\"submit\":true,\"createdOn\":1598490577043,\"layout\":[25,27,29,31,34,37,40,42,44]}}",
-      "25": "{\"id\":25,\"data\":{\"title\":\"Section 1\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[TEXT id=\\\"26\\\"]\"}]}],\"createdOn\":1598410999120}}",
+      "25": "{\"id\":25,\"data\":{\"title\":\"Section 1\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[TITLE id=\\\"47\\\"][TEXT id=\\\"26\\\"]\"}]}],\"createdOn\":1598498729014}}",
       "26": "{\"data\":{\"body\":\"This is a page section with a simple text module.\",\"css\":\"\",\"contentType\":\"text\",\"submit\":true,\"createdOn\":1598410999092},\"id\":26}",
       "27": "{\"id\":27,\"data\":{\"title\":\"Section 2\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[ALERT id=\\\"28\\\"]\"}]}],\"createdOn\":1598411056353}}",
       "28": "{\"data\":{\"level\":\"warning\",\"alertCopy\":\"<p>This is the alert module. You can use it to display info, warnings, success messages, errors, etc</p>\",\"contentType\":\"alert\",\"submit\":true,\"createdOn\":1598411056324},\"id\":28}",
@@ -88,7 +88,8 @@
       "43": "{\"id\":43,\"data\":{\"fileName\":\"accessories.jpeg\",\"retinaSupport\":true,\"thumbnailWidth\":0,\"onClick\":\"showFullImage\",\"css\":\"\",\"contentType\":\"image\",\"createdOn\":1598492794635,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-420,\"referrer\":\"http://localhost:3018/modules\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36\",\"pathName\":\"/modules\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
       "44": "{\"id\":44,\"data\":{\"title\":\"Section 9\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[TEXT id=\\\"46\\\"][YOUTUBE id=\\\"45\\\"]\"}]}],\"createdOn\":1598498006204}}",
       "45": "{\"id\":45,\"data\":{\"videoId\":\"2NjOTokx0JU\",\"contentType\":\"youtube\",\"createdOn\":1598497991986,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-420,\"referrer\":\"http://localhost:3018/modules\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36\",\"pathName\":\"/modules\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
-      "46": "{\"id\":46,\"data\":{\"body\":\"Below is the Youtube module. Just enter the video id in the module settings\",\"css\":\"\",\"contentType\":\"text\",\"createdOn\":1598498030920,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-420,\"referrer\":\"http://localhost:3018/modules\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36\",\"pathName\":\"/modules\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}"
+      "46": "{\"id\":46,\"data\":{\"body\":\"Below is the Youtube module. Just enter the video id in the module settings\",\"css\":\"\",\"contentType\":\"text\",\"createdOn\":1598498030920,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-420,\"referrer\":\"http://localhost:3018/modules\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36\",\"pathName\":\"/modules\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
+      "47": "{\"data\":{\"headerLevel\":\"h1\",\"position\":\"center\",\"text\":\"This page provides examples of the modules that you can add to your pages\",\"slug\":\"this-page-provides-examples-of-the-modules-that-you-can-add-to-your-pages\",\"contentType\":\"title\",\"submit\":true,\"createdOn\":1598498726512},\"id\":47}"
     }
   }
 }
