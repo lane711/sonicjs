@@ -91,7 +91,7 @@ module.exports = assetService = {
         "asset",
         `${assetType}-back-end`
       );
-      this.addPaths(options, assets.data.paths);
+      this.addPaths(options, assets.data.paths, assetType);
     }
 
     if (globalService.isFrontEnd) {
@@ -183,14 +183,14 @@ module.exports = assetService = {
     let fileName = this.getCombinedFileName(assetType);
 
     if (assetType === "js") {
-      await this.createCombinedFile(fileContent, fileName);
+      await this.createCombinedFile(fileContent, fileName, assetType);
     }
     if (assetType === "css") {
-      await this.createCombinedFile(fileContent, fileName);
+      await this.createCombinedFile(fileContent, fileName, assetType);
     }
   },
 
-  createCombinedFile: async function (fileContent, fileName) {
+  createCombinedFile: async function (fileContent, fileName, assetType) {
     let path = this.getAssetPath(fileName);
     let minifiedAsset = "";
     if (!fileService.fileExists(path)) {
