@@ -520,7 +520,7 @@ async function deleteRow() {
 
 async function editColumnContent() {
   console.log(currentSectionId);
-  // fullPageUpdate();
+  editSection(currentSectionId);
 }
 
 async function deleteBlock() {
