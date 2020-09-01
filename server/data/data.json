@@ -2,15 +2,19 @@
   "ids": {
     "contentType": 58,
     "content": 48,
-    "User": 1,
-    "AccessToken": 20,
+    "User": 2,
+    "AccessToken": 21,
     "ACL": 1,
     "RoleMapping": 1,
     "Role": 1
   },
   "models": {
-    "User": {},
-    "AccessToken": {},
+    "User": {
+      "1": "{\"password\":\"$2a$10$JL60EmOeGdlLUKiNTjH0gO72aXC9yW224sGJ46qn6caAtlRSwwH76\",\"email\":\"a@a.com\",\"id\":1}"
+    },
+    "AccessToken": {
+      "ee4APSV3plNbJngAOt9H6OVvMam7cQ2HZfNJTfoKSmrtga12pyYTtMaOy8C8biYc": "{\"id\":\"ee4APSV3plNbJngAOt9H6OVvMam7cQ2HZfNJTfoKSmrtga12pyYTtMaOy8C8biYc\",\"ttl\":1209600,\"created\":\"2020-09-01T03:58:17.597Z\",\"userId\":1}"
+    },
     "ACL": {},
     "RoleMapping": {},
     "Role": {},

@@ -17,6 +17,10 @@
     "dataSource": "primary",
     "public": true
   },
+  "user": {
+    "dataSource": "primary",
+    "public": true
+  },
   "AccessToken": {
     "dataSource": "primary",
     "public": false
