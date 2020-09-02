@@ -11,16 +11,16 @@ var path = require("path");
 var senderAddress = "test@test.com";
 
 module.exports = function (User) {
-  function clearBaseACLs(ModelType, ModelConfig) {
-    console.log("clear ACLs");
-    ModelType.settings.acls.length = 0;
-    ModelConfig.acls.forEach(function (r) {
-      console.log(r);
-      ModelType.settings.acls.push(r);
-    });
-  }
+  // function clearBaseACLs(ModelType, ModelConfig) {
+  //   console.log("clear ACLs");
+  //   ModelType.settings.acls.length = 0;
+  //   ModelConfig.acls.forEach(function (r) {
+  //     console.log(r);
+  //     ModelType.settings.acls.push(r);
+  //   });
+  // }
 
-  clearBaseACLs(User, require("./user.json"));
+  // clearBaseACLs(User, require("./user.json"));
 
   console.log("ACLs reset");
 
