@@ -584,7 +584,11 @@ module.exports = function (app) {
 
       if (viewName == "admin-users") {
         data = await userService.getUsers();
-        // data.editForm = await formService.getForm("user", data);
+        data.editForm = await formService.getForm(
+          "user",
+          undefined,
+          "submitUser(submission,true)"
+        );
       }
 
       let accessToken = await userService.getToken(req);

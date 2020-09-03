@@ -1288,6 +1288,17 @@ async function submitContent(submission, refresh = true) {
   }
 }
 
+async function submitUser(submission, refresh = true) {
+  // debugger;
+  console.log("Submission was made!", submission);
+  // let entity = processContentFields(submission.data);
+  // if (submission.data.id) {
+  //   await editContentInstance(entity, refresh);
+  // } else {
+  //   await createContentInstance(entity);
+  // }
+}
+
 async function postProcessNewContent(content) {
   // debugger;
   if (content.contentType == "page") {
@@ -1602,4 +1613,38 @@ function toggleSidebar(showSidebar) {
 function isEditMode() {
   let isEditMode = Cookies.get("showSidebar");
   return isEditMode;
+}
+
+async function addUser() {
+  console.log("adding section");
+  let row = await generateNewRow();
+  //rows
+  let rows = [row];
+
+  //section
+  let nextSectionCount = 1;
+  if (page.data.layout) {
+    nextSectionCount = page.data.layout.length + 1;
+  }
+
+  let section = {
+    title: `Section ${nextSectionCount}`,
+    contentType: "section",
+    rows: rows,
+  };
+  let s1 = await createContentInstance(section);
+
+  //add to current page
+  if (!page.data.layout) {
+    page.data.layout = [];
+  }
+  page.data.layout.push(s1.id);
+
+  // this.contentService.editPage(this.page);
+  let updatedPage = await editContentInstance(page);
+
+  //update ui
+  // this.fullPageUpdate();
+  // this.loadSections(updatedPage);
+  fullPageUpdate();
 }
