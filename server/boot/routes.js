@@ -582,6 +582,11 @@ module.exports = function (app) {
         data.editForm = await formService.getForm("site-settings", data);
       }
 
+      if (viewName == "admin-users") {
+        data = await userService.getUsers();
+        // data.editForm = await formService.getForm("user", data);
+      }
+
       let accessToken = await userService.getToken(req);
       data.breadCrumbs = await breadcrumbsService.getAdminBreadcrumbs(req);
 

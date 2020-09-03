@@ -24,36 +24,11 @@ module.exports = userService = {
     });
   },
 
-  getUsers: async function (menuName) {
-    let menuData = await dataService.getContentByContentTypeAndTitle(
-      "menu",
-      menuName
-    );
-    let links = menuData.data.links;
-    let menu = [];
-
-    for (let index = 0; index < links.length; index++) {
-      const item = links[index];
-
-      if (item.level == 0) {
-        let hasChildren = this.hasChildren(links, index);
-
-        let childLinks = this.getChildren(links, hasChildren, index);
-
-        menu.push({
-          url: item.url,
-          title: item.title,
-          hasChildren: hasChildren,
-          childLinks: childLinks,
-        });
-      }
-    }
-
-    // menuData.data.links.forEach(item => {
-    //     menu.push({url: item.url});
-    // });
-
-    return menu;
+  getUsers: async function () {
+    var userModel = loopback.getModel("user");
+    let users = await userModel.find();
+    console.log(users);
+    return users;
   },
 
   getCurrentUserId: async function (req) {

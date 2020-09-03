@@ -9,7 +9,7 @@
       <table class="table table-responsive-sm table-striped">
         <thead>
           <tr>
-            <th>Title</th>
+            <th>Email</th>
             <th>Content</th>
             <th>Status</th>
           </tr>
@@ -17,7 +17,7 @@
         <tbody>
           {{#each data}}
           <tr>
-            <td><a href="/admin/content-types/edit/{{ this.systemid }}">{{ this.title }}</a></td>
+            <td><a href="/admin/content-types/edit/{{ this.systemid }}">{{ this.email }}</a></td>
             <td>{{ contentType.description}}</td>
             <td>
               <a class="btn btn-sm btn-primary rmargin" href="/admin/content-types/edit/{{ this.systemid }}">Edit</a>
@@ -25,14 +25,8 @@
 
 
 
-              <a tabindex="0"
-   class="btn btn-sm btn-danger"
-   role="button"
-   data-html="true"
-   data-toggle="popover"
-   data-trigger="focus"
-   title="Delete <b>{{ this.data.title }}</b> Forever?"
-   data-content="<a href='/contentType/{{ this.id }}'
+              <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
+                data-trigger="focus" title="Delete <b>{{ this.data.title }}</b> Forever?" data-content="<a href='/contentType/{{ this.id }}'
    class='btn btn-sm btn-danger rmargin'>Confirm Delete</a>
 ">Delete</a>
 
@@ -124,7 +118,7 @@ data-content="<a class='btn btn-sm btn-danger' onclick='deleteContentType({{ thi
                   axios.put(`/api/contentTypes/`, submission.data)
                     .then(async function (response) {
                       console.log(response);
-                          window.location.replace('/admin/content-types/edit/' +  submission.data.systemid);
+                      window.location.replace('/admin/content-types/edit/' + submission.data.systemid);
 
                     })
                     .catch(function (error) {
