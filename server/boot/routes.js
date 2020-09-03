@@ -1,3 +1,4 @@
+var loopback = require("loopback");
 var eventBusService = require("../services/event-bus.service");
 var globalService = require("../services/global.service");
 var cacheService = require("../services/cache.service");
@@ -80,7 +81,7 @@ module.exports = function (app) {
   });
 
   app.post("/register", function (req, res) {
-    var user = app.models.User;
+    var user = loopback.getModel("user");
     user.create(
       { email: req.body.email, password: req.body.password },
       function (err, userInstance) {

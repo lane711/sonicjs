@@ -28,9 +28,9 @@ module.exports = adminService = {
   },
 
   checkIfAdminAccountIsCreated: async function () {
-    var User = loopback.User;
+    var user = loopback.getModel("user");
 
-    await User.findById(1, function (err, adminUser) {
+    await user.findById(1, function (err, adminUser) {
       if (err) {
         console.log(err);
       }
