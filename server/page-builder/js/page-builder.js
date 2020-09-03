@@ -379,7 +379,7 @@ async function addSection() {
     contentType: "section",
     rows: rows,
   };
-  let s1 = await createContentInstance(section);
+  let s1 = await createInstance(section);
 
   //add to current page
   if (!page.data.layout) {
@@ -443,7 +443,7 @@ async function generateNewColumn() {
   // let block1 = { contentType: 'block', body: '<p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>' };
 
   // //save blocks and get the ids
-  // let b1 = await createContentInstance(block1);
+  // let b1 = await createInstance(block1);
   // let b1ShortCode = `[BLOCK id="${b1.id}"/]`;
 
   //columns
@@ -580,8 +580,8 @@ async function getContentByContentTypeAndTitle(contentType, title) {
     });
 }
 
-async function createContentInstance(payload) {
-  // console.log('createContentInstance payload', payload);
+async function createInstance(payload, contentType = "contents") {
+  // console.log('createInstance payload', payload);
   // let content = {};
   // content.data = payload;
   // this.processContentFields(payload, content);
@@ -597,7 +597,7 @@ async function createContentInstance(payload) {
 
   // return this.http.post("/api/contents/", content).toPromise();
   return axiosInstance
-    .post("/api/contents/", payload)
+    .post(`/api/${contentType}/`, payload)
     .then(async function (response) {
       console.log(response);
       return await response.data;
@@ -797,7 +797,7 @@ async function setupPageSettings(action, contentType) {
         // debugger;
         //need create default block, etc
         submission.data.contentType = contentType;
-        await createContentInstance(submission.data);
+        await createInstance(submission.data);
         await postProcessNewContent(submission.data);
         await redirect(submission.data.url);
       } else {
@@ -865,7 +865,7 @@ async function setupFormBuilder(contentType) {
   //                 // debugger;
   //                 //need create default block, etc
   //                 // submission.data.contentType = contentType;
-  //                 // await createContentInstance(submission.data);
+  //                 // await createInstance(submission.data);
   //                 // await postProcessNewContent(submission.data);
   //                 // await redirect(submission.data.url);
   //             }
@@ -899,7 +899,7 @@ async function setupFormBuilder(contentType) {
   //             // debugger;
   //             //need create default block, etc
   //             submission.data.contentType = contentType;
-  //             await createContentInstance(submission.data);
+  //             await createInstance(submission.data);
   //             await postProcessNewContent(submission.data);
   //             await redirect(submission.data.url);
   //         }
@@ -1257,7 +1257,7 @@ async function addModuleToColumn(submission) {
   if (submission.data.id) {
     processedEntity = await editContentInstance(entity);
   } else {
-    processedEntity = await createContentInstance(entity);
+    processedEntity = await createInstance(entity);
   }
 
   // generate short code ie: [MODULE-HELLO-WORLD id="123"]
@@ -1284,19 +1284,25 @@ async function submitContent(submission, refresh = true) {
   if (submission.data.id) {
     await editContentInstance(entity, refresh);
   } else {
-    await createContentInstance(entity);
+    await createInstance(entity);
   }
 }
 
 async function submitUser(submission, refresh = true) {
   // debugger;
   console.log("Submission was made!", submission);
-  // let entity = processContentFields(submission.data);
-  // if (submission.data.id) {
-  //   await editContentInstance(entity, refresh);
-  // } else {
-  //   await createContentInstance(entity);
-  // }
+  let entity = processContentFields(submission.data);
+  entity.email = submission.data.email;
+  entity.password = submission.data.password;
+  delete entity.data.email;
+  delete entity.data.password;
+
+  debugger;
+  if (submission.data.id) {
+    await editContentInstance(entity, refresh);
+  } else {
+    await createInstance(entity, "users");
+  }
 }
 
 async function postProcessNewContent(content) {
@@ -1416,7 +1422,7 @@ async function setupDropZone() {
           contentType: "media",
         },
       };
-      await createContentInstance(payload);
+      await createInstance(payload);
       done();
     },
   });
@@ -1632,7 +1638,7 @@ async function addUser() {
     contentType: "section",
     rows: rows,
   };
-  let s1 = await createContentInstance(section);
+  let s1 = await createInstance(section);
 
   //add to current page
   if (!page.data.layout) {
