@@ -636,6 +636,9 @@ async function editInstance(payload, refresh, contentType = "contents") {
     }
   }
 
+  if (contentType === "user") {
+    contentType = "users";
+  }
   console.log(payload);
   return axiosInstance
     .put(`/api/${contentType}/${id}`, payload)
@@ -1093,15 +1096,19 @@ function loadJsonEditor() {
 
 function setupJsonRawSave() {
   $("#saveRawJson").on("click", function () {
+    debugger;
+    let rawData = jsonEditorRaw.get();
     console.log("json save");
     let contentId = $("#contentId").val();
+    let json = rawData;
+    let refresh = true;
+    if (rawData.contentType !== "user") {
+      json = { data: rawData };
+      json.data.id = contentId;
+      refresh = false;
+    }
 
-    var json = { data: jsonEditorRaw.get() };
-    json.data.id = contentId;
-
-    // debugger;
-
-    submitContent(json);
+    submitContent(json, refresh, json.contentType);
   });
 }
 
@@ -1295,10 +1302,10 @@ async function submitContent(
   debugger;
   console.log("Submission was made!", submission);
   let entity = submission.data;
-  if (contentType !== "users") {
+  if (!contentType.startsWith("user")) {
     entity = processContentFields(submission.data);
   }
-  if (submission.data.id) {
+  if (submission.id || submission.data.id) {
     await editInstance(entity, refresh, contentType);
   } else {
     await createInstance(entity, true, contentType);
