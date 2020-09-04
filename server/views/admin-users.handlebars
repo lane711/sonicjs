@@ -1,74 +1,115 @@
 <div class="col-lg-12">
-  <div class="card">
-    <div class="card-header">
-      <i class="fa fa-align-justify"></i> Users
-      <a href="javascript:void(0)" onclick="openNewContentTypeModal()"
-        class="btn btn-success float-right new-content-type">New User</a>
-    </div>
-    <div class="card-body page-list">
-      <table class="table table-responsive-sm table-striped">
-        <thead>
-          <tr>
-            <th>Email</th>
-            <th>Content</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {{#each data}}
-          <tr>
-            <td><a href="/admin/content-types/edit/{{ this.systemid }}">{{ this.email }}</a></td>
-            <td>{{ contentType.description}}</td>
-            <td>
-              <a class="btn btn-sm btn-primary rmargin" href="/admin/content-types/edit/{{ this.systemid }}">Edit</a>
 
 
 
 
-              <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
-                data-trigger="focus" title="Delete <b>{{ this.data.title }}</b> Forever?" data-content="<a href='/contentType/{{ this.id }}'
+
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="home-tab" data-toggle="tab" href="#fields" role="tab" aria-controls="home"
+        aria-selected="true">Users</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="raw-tab" data-toggle="tab" href="#raw" role="tab" aria-controls="raw"
+        aria-selected="true">Roles</a>
+    </li>
+
+  </ul>
+  <div class="tab-content" id="myTabContent">
+
+    <div class="tab-pane fade show active" id="fields" role="tabpanel" aria-labelledby="home-tab">
+
+      <div class="card">
+        <div class="card-header">
+          <i class="fa fa-align-justify"></i> Users
+          <a href="javascript:void(0)" onclick="openNewContentTypeModal()"
+            class="btn btn-success float-right new-content-type">New User</a>
+        </div>
+        <div class="card-body page-list">
+          <table class="table table-responsive-sm table-striped">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each data.users}}
+              <tr>
+                <td><a href="/admin/content-types/edit/{{ this.systemid }}">{{ this.email }}</a></td>
+                <td>{{ contentType.description}}</td>
+                <td>
+                  <a class="btn btn-sm btn-primary rmargin"
+                    href="/admin/content-types/edit/{{ this.systemid }}">Edit</a>
+
+
+                  <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
+                    data-trigger="focus" title="Delete <b>{{ this.data.title }}</b> Forever?" data-content="<a href='/contentType/{{ this.id }}'
    class='btn btn-sm btn-danger rmargin'>Confirm Delete</a>
 ">Delete</a>
 
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
 
-              {{!-- <button type="button" class="btn btn-sm btn-danger" data-toggle="popover"
- title="Delete Content Type {{ this.title }}" data-html="true"
-data-content="<a class='btn btn-sm btn-danger' onclick='deleteContentType({{ this.id }})' >Confirm Delete?</a>">Delete</button> --}}
 
+        </div>
+      </div>
 
-              {{!-- <ng-template #popTitle>Delete <b>{{ contentType.name }}</b>?</ng-template>
-              <ng-template #popContent><button class="btn btn-sm btn-danger"
-                  (click)="deleteContentType(contentType.id)">Confirm Delete</button></ng-template>
-              <button class="btn btn-sm btn-danger" placement="top" [ngbPopover]="popContent"
-                [popoverTitle]="popTitle">Delete</button> --}}
-            </td>
-          </tr>
-          {{/each}}
-        </tbody>
-      </table>
-
-      <!-- <ul class="pagination">
-                <li class="page-item">
-                  <a class="page-link" href="#">Prev</a>
-                </li>
-                <li class="page-item active">
-                  <a class="page-link" href="#">1</a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#">2</a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#">3</a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#">4</a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#">Next</a>
-                </li>
-              </ul> -->
     </div>
+    <div class="tab-pane fade show" id="raw" role="tabpanel" aria-labelledby="raw-tab">
+
+      <div class="card">
+        <div class="card-header">
+          <i class="fa fa-align-justify"></i> Roles
+          <a href="javascript:void(0)" onclick="openNewContentTypeModal()"
+            class="btn btn-success float-right new-content-type">New Role</a>
+        </div>
+        <div class="card-body page-list">
+          <table class="table table-responsive-sm table-striped">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each data.roles}}
+              <tr>
+                <td><a href="/admin/content-types/edit/{{ this.systemid }}">{{ this.name }}</a></td>
+                <td>
+                  <a class="btn btn-sm btn-primary rmargin"
+                    href="/admin/content-types/edit/{{ this.systemid }}">Edit</a>
+
+
+                  <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
+                    data-trigger="focus" title="Delete <b>{{ this.data.title }}</b> Forever?" data-content="<a href='/contentType/{{ this.id }}'
+   class='btn btn-sm btn-danger rmargin'>Confirm Delete</a>
+">Delete</a>
+
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+
+
+        </div>
+      </div>
+
+
+
+    </div>
+
   </div>
+
+
+
+
+
 </div>
 
 
@@ -78,7 +119,7 @@ data-content="<a class='btn btn-sm btn-danger' onclick='deleteContentType({{ thi
   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">New Content Type</h5>
+        <h5 class="modal-title" id="exampleModalLabel">New User</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>

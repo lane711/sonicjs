@@ -34,7 +34,7 @@
   },
   "Role": {
     "dataSource": "primary",
-    "public": false
+    "public": true
   },
   "contentType": {
     "dataSource": "primary",
