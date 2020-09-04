@@ -76,7 +76,7 @@ if (typeof module !== "undefined" && module.exports) {
       }
 
       if (!onFormSubmitFunction) {
-        onFormSubmitFunction = "editContentInstance(submission,true)";
+        onFormSubmitFunction = "editInstance(submission,true)";
       }
 
       // let name = `${contentType.systemid}Form`;

@@ -266,7 +266,7 @@ async function setupSectionBackgroundEvents() {
     // setDefaultBackgroundSetting(currentSectionRecord);
     showBackgroundTypeOptions(backgroundSetting, currentSectionId);
 
-    editContentInstance(currentSectionRecord);
+    editInstance(currentSectionRecord);
   });
 }
 
@@ -353,7 +353,7 @@ async function setupColorPicker(currentSectionId) {
   // picker.onDone = async function (color) {
   //     currentSectionRecord = await getCurrentSection();
   //     setDefaultBackgroundSetting(currentSectionRecord, getHtmlHex(color.hex));
-  //     editContentInstance(currentSectionRecord);
+  //     editInstance(currentSectionRecord);
   // };
 }
 
@@ -388,7 +388,7 @@ async function addSection() {
   page.data.layout.push(s1.id);
 
   // this.contentService.editPage(this.page);
-  let updatedPage = await editContentInstance(page);
+  let updatedPage = await editInstance(page);
 
   //update ui
   // this.fullPageUpdate();
@@ -410,7 +410,7 @@ async function deleteSection(sectionId, index) {
   console.log("delete section", sectionId, index);
   //delete from page
   page.data.layout.splice(index, 1);
-  await editContentInstance(page);
+  await editInstance(page);
 
   //delete section
   await deleteContentInstance(sectionId);
@@ -420,7 +420,7 @@ async function deleteSection(sectionId, index) {
 async function saveSection() {
   var sectionData = jsonEditor.get();
   console.log("jsonEditor", sectionData);
-  await editContentInstance(sectionData);
+  await editInstance(sectionData);
   fullPageUpdate();
 
   // console.log(sectionId);
@@ -458,7 +458,7 @@ async function generateNewColumn() {
 
 //     let section = await getContentInstance(sectionId);
 //     section.data.rows.push(row);
-//     editContentInstance(section);
+//     editInstance(section);
 
 //     fullPageUpdate();
 // }
@@ -468,7 +468,7 @@ async function addRow() {
 
   let section = await getContentInstance(currentSectionId);
   section.data.rows.push(row);
-  editContentInstance(section);
+  editInstance(section);
 
   fullPageUpdate();
 }
@@ -480,7 +480,7 @@ async function addRow() {
 //     let column = await generateNewColumn();
 //     section.data.rows[rowIndex].columns.push(column);
 //     console.log('columns', section.data.rows[rowIndex].columns);
-//     editContentInstance(section);
+//     editInstance(section);
 
 //     fullPageUpdate();
 // }
@@ -494,7 +494,7 @@ async function addColumn() {
   let column = await generateNewColumn();
   section.data.rows[currentRowIndex].columns.push(column);
   // console.log("columns", section.data.rows[currentRowIndex].columns);
-  editContentInstance(section);
+  editInstance(section);
 
   fullPageUpdate();
 }
@@ -505,7 +505,7 @@ async function deleteColumn() {
 
   //TODO, delete block too
 
-  editContentInstance(section);
+  editInstance(section);
 
   fullPageUpdate();
 }
@@ -514,7 +514,7 @@ async function deleteRow() {
   let section = await getContentInstance(currentSectionId);
   debugger;
   section.data.rows.splice(currentRowIndex, 1);
-  editContentInstance(section);
+  editInstance(section);
   fullPageUpdate();
 }
 
@@ -529,7 +529,7 @@ async function deleteBlock() {
 
   //TODO, delete block too
 
-  editContentInstance(section);
+  editInstance(section);
 
   fullPageUpdate();
 }
@@ -580,7 +580,11 @@ async function getContentByContentTypeAndTitle(contentType, title) {
     });
 }
 
-async function createInstance(payload, contentType = "contents") {
+async function createInstance(
+  payload,
+  refresh = false,
+  contentType = "contents"
+) {
   // console.log('createInstance payload', payload);
   // let content = {};
   // content.data = payload;
@@ -590,7 +594,7 @@ async function createInstance(payload, contentType = "contents") {
     delete payload.id;
   }
 
-  if (!payload.data) {
+  if (!payload.data && contentType !== "users") {
     let temp = { data: payload };
     payload = temp;
   }
@@ -600,6 +604,11 @@ async function createInstance(payload, contentType = "contents") {
     .post(`/api/${contentType}/`, payload)
     .then(async function (response) {
       console.log(response);
+
+      if (refresh) {
+        fullPageUpdate();
+      }
+
       return await response.data;
     })
     .catch(function (error) {
@@ -607,8 +616,8 @@ async function createInstance(payload, contentType = "contents") {
     });
 }
 
-async function editContentInstance(payload, refresh) {
-  // debugger;
+async function editInstance(payload, refresh, contentType = "contents") {
+  debugger;
   let id = payload.id;
   console.log("putting payload", payload);
   if (payload.id) {
@@ -618,20 +627,21 @@ async function editContentInstance(payload, refresh) {
     id = payload.data.id;
     delete payload.data.id;
   }
-  // let data = {};
-  // if(payload.data){
-  //     data = payload.data;
-  // }else{
-  //     data = payload;
-  // }
-  // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
+  if (contentType === "users") {
+    if (payload.data && payload.data.password) {
+      payload.password = payload.data.password;
+    }
+    if (payload.data && payload.data.email) {
+      payload.email = payload.data.email;
+    }
+  }
 
   console.log(payload);
   return axiosInstance
-    .put(`/api/contents/${id}`, payload)
+    .put(`/api/${contentType}/${id}`, payload)
     .then(async function (response) {
       // debugger;
-      console.log("editContentInstance", response);
+      console.log("editInstance", response);
       // resolve(response.data);
       // return await response.data;
       if (refresh) {
@@ -640,7 +650,7 @@ async function editContentInstance(payload, refresh) {
     })
     .catch(function (error) {
       debugger;
-      console.log("editContentInstance", error);
+      console.log("editInstance", error);
     });
 }
 
@@ -804,7 +814,7 @@ async function setupPageSettings(action, contentType) {
         //editing current
         // debugger;
         let entity = processContentFields(submission.data);
-        await editContentInstance(entity);
+        await editInstance(entity);
         fullPageUpdate();
       }
 
@@ -873,7 +883,7 @@ async function setupFormBuilder(contentType) {
   //                 //editing current
   //                 // debugger;
   //                 // let entity = processContentFields(submission.data)
-  //                 // await editContentInstance(entity);
+  //                 // await editInstance(entity);
   //                 // fullPageUpdate();
   //             }
 
@@ -907,7 +917,7 @@ async function setupFormBuilder(contentType) {
   //             //editing current
   //             // debugger;
   //             let entity = processContentFields(submission.data)
-  //             await editContentInstance(entity);
+  //             await editInstance(entity);
   //             fullPageUpdate();
   //         }
 
@@ -1119,7 +1129,7 @@ async function saveWYSIWYG() {
   //update db
   let block = await getContentInstance(id);
   block.data.body = content;
-  editContentInstance(block);
+  editInstance(block);
 
   //update screen
   $(".block-edit").children().first().html(content);
@@ -1159,7 +1169,7 @@ async function editModule() {
   let form = await formService.getForm(
     currentModuleContentType,
     data,
-    "await editContentInstance(submission, true);"
+    "await editInstance(submission, true);"
   );
   $("#dynamicModelTitle").text(
     `Settings: ${currentModuleContentType} (Id:${currentModuleId})`
@@ -1255,7 +1265,7 @@ async function addModuleToColumn(submission) {
   let entity = processContentFields(submission.data);
   let processedEntity;
   if (submission.data.id) {
-    processedEntity = await editContentInstance(entity);
+    processedEntity = await editInstance(entity);
   } else {
     processedEntity = await createInstance(entity);
   }
@@ -1272,45 +1282,52 @@ async function addModuleToColumn(submission) {
   let column =
     section.data.rows[currentRowIndex].columns[currentColumnIndex - 1];
   column.content += moduleInstanceShortCode;
-  editContentInstance(section);
+  editInstance(section);
 
   fullPageUpdate();
 }
 
-async function submitContent(submission, refresh = true) {
-  // debugger;
-  console.log("Submission was made!", submission);
-  let entity = processContentFields(submission.data);
-  if (submission.data.id) {
-    await editContentInstance(entity, refresh);
-  } else {
-    await createInstance(entity);
-  }
-}
-
-async function submitUser(submission, refresh = true) {
-  // debugger;
-  console.log("Submission was made!", submission);
-  let entity = processContentFields(submission.data);
-  entity.email = submission.data.email;
-  entity.password = submission.data.password;
-  delete entity.data.email;
-  delete entity.data.password;
-
+async function submitContent(
+  submission,
+  refresh = true,
+  contentType = "content"
+) {
   debugger;
+  console.log("Submission was made!", submission);
+  let entity = submission.data;
+  if (contentType !== "users") {
+    entity = processContentFields(submission.data);
+  }
   if (submission.data.id) {
-    await editContentInstance(entity, refresh);
+    await editInstance(entity, refresh, contentType);
   } else {
-    await createInstance(entity, "users");
+    await createInstance(entity, true, contentType);
   }
 }
+
+// async function submitUser(submission, refresh = true) {
+//   // debugger;
+//   console.log("Submission was made!", submission);
+//   let entity = processContentFields(submission.data);
+//   entity.email = submission.data.email;
+//   entity.password = submission.data.password;
+//   delete entity.data.email;
+//   delete entity.data.password;
+
+//   debugger;
+//   if (submission.data.id) {
+//     await editInstance(entity, refresh);
+//   } else {
+//     await createInstance(entity, "users");
+//   }
+// }
 
 async function postProcessNewContent(content) {
   // debugger;
   if (content.contentType == "page") {
     if (content.includeInMenu) {
       //add to existing main menu
-      // await editContentInstance(entity);
+      // await editInstance(entity);
       let mainMenu = await getContentByContentTypeAndTitle("menu", "Main");
       let menuItem = {
         url: content.url,
@@ -1319,7 +1336,7 @@ async function postProcessNewContent(content) {
         level: "0",
       };
       mainMenu.data.links.push(menuItem);
-      await editContentInstance(mainMenu);
+      await editInstance(mainMenu);
     }
   }
 }
@@ -1647,7 +1664,7 @@ async function addUser() {
   page.data.layout.push(s1.id);
 
   // this.contentService.editPage(this.page);
-  let updatedPage = await editContentInstance(page);
+  let updatedPage = await editInstance(page);
 
   //update ui
   // this.fullPageUpdate();

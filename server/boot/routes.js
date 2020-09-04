@@ -198,7 +198,7 @@ module.exports = function (app) {
         data.sourceColumnIndex
       ].content = newContent;
       // console.log("newContent", newContent);
-      await dataService.editContentInstance(sourceSection);
+      await dataService.editInstance(sourceSection);
     }
 
     //regen the destination
@@ -213,7 +213,7 @@ module.exports = function (app) {
     destinationSection.data.rows[data.destinationRowIndex].columns[
       data.destinationColumnIndex
     ].content = updatedDestinationContent;
-    let r = await dataService.editContentInstance(destinationSection);
+    let r = await dataService.editInstance(destinationSection);
 
     res.send(`ok`);
     // return;
@@ -262,7 +262,7 @@ module.exports = function (app) {
       data.columnIndex
     ].content = newShortCodeContent;
 
-    let result = await dataService.editContentInstance(section);
+    let result = await dataService.editInstance(section);
 
     res.send(`ok`);
     // // return;
@@ -290,7 +290,7 @@ module.exports = function (app) {
         data.columnIndex
       ].content = newContent;
       // console.log("newContent", newContent);
-      await dataService.editContentInstance(section);
+      await dataService.editInstance(section);
     }
 
     //regen the destination
@@ -305,7 +305,7 @@ module.exports = function (app) {
     // destinationSection.data.rows[data.destinationRowIndex].columns[
     //   data.destinationColumnIndex
     // ].content = updatedDestinationContent;
-    // let r = await dataService.editContentInstance(destinationSection);
+    // let r = await dataService.editInstance(destinationSection);
 
     res.send(`ok`);
   });
@@ -586,7 +586,7 @@ module.exports = function (app) {
         data.editForm = await formService.getForm(
           "user",
           undefined,
-          "submitUser(submission,true)"
+          "submitContent(submission,true,'users')"
         );
         let users = await userService.getUsers();
         let roles = await userService.getRoles();
@@ -605,7 +605,7 @@ module.exports = function (app) {
         data.editForm = await formService.getForm(
           "user",
           user,
-          "submitContent(submission)"
+          'submitContent(submission, true, "users")'
         );
       }
 
