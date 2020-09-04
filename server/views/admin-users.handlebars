@@ -37,7 +37,7 @@
             <tbody>
               {{#each data.users}}
               <tr>
-                <td><a href="/admin/content-types/edit/{{ this.systemid }}">{{ this.email }}</a></td>
+                <td><a href="/admin/user/edit/{{ this.id }}">{{ this.email }}</a></td>
                 <td>{{ contentType.description}}</td>
                 <td>
                   <a class="btn btn-sm btn-primary rmargin"
@@ -79,7 +79,7 @@
             <tbody>
               {{#each data.roles}}
               <tr>
-                <td><a href="/admin/content-types/edit/{{ this.systemid }}">{{ this.name }}</a></td>
+                <td><a href="/admin/roles/edit/{{ this.id }}">{{ this.name }}</a></td>
                 <td>
                   <a class="btn btn-sm btn-primary rmargin"
                     href="/admin/content-types/edit/{{ this.systemid }}">Edit</a>

@@ -31,6 +31,13 @@ module.exports = userService = {
     return users;
   },
 
+  getUser: async function (id) {
+    var userModel = loopback.getModel("user");
+    let user = await userModel.findById(id);
+    console.log(user);
+    return user;
+  },
+
   getRoles: async function () {
     var roleModel = loopback.getModel("Role");
     let roles = await roleModel.find();

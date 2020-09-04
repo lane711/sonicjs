@@ -595,6 +595,20 @@ module.exports = function (app) {
         console.log(data);
       }
 
+      if (viewName == "admin-user-edit") {
+        let user = { id: param1 };
+        if (param1) {
+          let userRecord = await userService.getUser(param1);
+          user.data = userRecord.__data;
+          user.data.contentType = "user";
+        }
+        data.editForm = await formService.getForm(
+          "user",
+          user,
+          "submitContent(submission)"
+        );
+      }
+
       let accessToken = await userService.getToken(req);
       data.breadCrumbs = await breadcrumbsService.getAdminBreadcrumbs(req);
 
