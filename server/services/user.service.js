@@ -34,7 +34,6 @@ module.exports = userService = {
   getUser: async function (id) {
     var userModel = loopback.getModel("user");
     let user = await userModel.findById(id);
-    console.log(user);
     return user;
   },
 

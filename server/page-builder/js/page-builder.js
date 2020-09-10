@@ -617,9 +617,37 @@ async function createInstance(
 }
 
 async function editInstance(payload, refresh, contentType = "contents") {
-  debugger;
   let id = payload.id;
   console.log("putting payload", payload);
+  if (payload.id) {
+    delete payload.id;
+  }
+  if (payload.data && payload.data.id) {
+    id = payload.data.id;
+    delete payload.data.id;
+  }
+
+  if (contentType === "user") {
+    contentType = "users";
+  }
+  return axiosInstance
+    .put(`/api/${contentType}/${id}`, payload)
+    .then(async function (response) {
+      // debugger;
+      console.log("editInstance", response);
+      // resolve(response.data);
+      // return await response.data;
+      if (refresh) {
+        fullPageUpdate();
+      }
+    })
+    .catch(function (error) {
+      console.log("editInstance", error);
+    });
+}
+
+async function editInstanceUser(payload, refresh, contentType = "contents") {
+  let id = payload.id;
   if (payload.id) {
     delete payload.id;
   }
@@ -639,7 +667,7 @@ async function editInstance(payload, refresh, contentType = "contents") {
   if (contentType === "user") {
     contentType = "users";
   }
-  console.log(payload);
+  //update user
   return axiosInstance
     .put(`/api/${contentType}/${id}`, payload)
     .then(async function (response) {
@@ -1299,14 +1327,19 @@ async function submitContent(
   refresh = true,
   contentType = "content"
 ) {
-  debugger;
+  // debugger;
   console.log("Submission was made!", submission);
   let entity = submission.data ?? submission;
   if (!contentType.startsWith("user")) {
     entity = processContentFields(submission.data);
   }
   if (submission.id || submission.data.id) {
-    await editInstance(entity, refresh, contentType);
+    if (contentType.startsWith("user")) {
+      await editInstanceUser(entity, refresh, contentType);
+    }
+    else{
+      await editInstance(entity, refresh, contentType);
+    }
   } else {
     await createInstance(entity, true, contentType);
   }

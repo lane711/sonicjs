@@ -27,7 +27,7 @@
   },
   "RoleMapping": {
     "dataSource": "primary",
-    "public": false,
+    "public": true,
     "options": {
       "strictObjectIDCoercion": true
     }

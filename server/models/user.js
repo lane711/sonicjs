@@ -6,6 +6,7 @@
 
 var config = require('../../server/config.json');
 var path = require('path');
+var loopback = require("loopback");
 
 //Replace this address with your actual address
 var senderAddress = 'test@test.com';
@@ -52,6 +53,32 @@ module.exports = function (User) {
     //     redirectToLinkText: 'Log in'
     //   });
     // });
+  });
+
+  User.afterRemote('*', function (context, user, next) {
+
+    //map roles
+if(context.method.name === 'replaceById'){
+  var roleMappingModel = loopback.getModel("RoleMapping");
+  roleMappingModel.upsertWithWhere(
+    {
+      "principalType": "user",
+      "principalId": 1,
+      "roleId": 1
+    },{
+      "principalType": "user",
+      "principalId": 1,
+      "roleId": 1
+    },
+    function (err, rmInstance) {
+      console.log(rmInstance);
+
+    }
+  );
+}
+    console.log('after user update', context);
+
+    next();
   });
 
   // Method to render
