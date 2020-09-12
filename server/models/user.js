@@ -84,7 +84,7 @@ module.exports = function (User) {
           principalType: "user",
           principalId: user.id,
         },
-        function (err, info) {
+        function(err, info) {
           if (err) {
             console.log(err);
           }
