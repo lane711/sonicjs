@@ -58,6 +58,21 @@ module.exports = function (User) {
     // });
   });
 
+  // User.beforeRemote('saveOptions', function(ctx, unused, next) {
+  //   if (!ctx.args.options.accessToken) return next();
+  //   User.findById(ctx.args.options.accessToken.userId, function(err, user) {
+  //     if (err) return next(err);
+  //     ctx.args.options.currentUser = user;
+  //     next();
+  //   });
+  // })
+
+  // User.beforeRemote("*", function (ctx, next) {
+  //   if (context.method.name === "replaceById") {
+  //   }
+  //   next();
+  // });
+
   User.afterRemote("*", function (context, user, next) {
     //map roles
     if (context.method.name === "replaceById") {
@@ -69,8 +84,8 @@ module.exports = function (User) {
           principalType: "user",
           principalId: user.id,
         },
-        function(err, info) {
-          if(err){
+        function (err, info) {
+          if (err) {
             console.log(err);
           }
           console.log(info);
@@ -93,7 +108,7 @@ module.exports = function (User) {
             principalId: user.id,
             roleId: role,
           },
-          function(err, info) {
+          function (err, info) {
             console.log(info);
           }
         );
