@@ -592,7 +592,7 @@ module.exports = function (app) {
         let roles = await userService.getRoles();
         data.users = users;
         data.roles = roles;
-        console.log(data);
+        // console.log(data);
       }
 
       if (viewName == "admin-user-edit") {
