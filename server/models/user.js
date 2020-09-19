@@ -8,29 +8,25 @@ var config = require("../../server/config.json");
 var path = require("path");
 var loopback = require("loopback");
 const { forEach } = require("lodash");
-const modelUtils = require('./model-utils');
+const modelUtils = require("./model-utils");
 
 //Replace this address with your actual address
 var senderAddress = "test@test.com";
 
-module.exports = function (user) {
-  // modelUtils.clearBaseACLs(user, require('./user.json'));
-
-}
 module.exports = function (User) {
-
-    // modelUtils.clearBaseACLs(User, require('./user.json'));
-
+  modelUtils.clearBaseACLs(User, require("./user.json"));
 
   User.afterRemote("login", function (ctx) {
     ctx.res.cookie("access_token", ctx.result.id, {
       signed: true,
       maxAge: ctx.result.ttl * 1000,
     });
+    console.log("user logged in:", ctx.result.id);
     return Promise.resolve();
   });
 
   User.afterRemote("logout", function (ctx) {
+    console.log("logging out");
     ctx.res.clearCookie("access_token");
     return Promise.resolve();
   });
@@ -93,7 +89,7 @@ module.exports = function (User) {
           principalType: "user",
           principalId: user.id,
         },
-        function(err, info) {
+        function (err, info) {
           if (err) {
             console.log(err);
           }
