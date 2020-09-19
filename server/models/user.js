@@ -8,11 +8,20 @@ var config = require("../../server/config.json");
 var path = require("path");
 var loopback = require("loopback");
 const { forEach } = require("lodash");
+const modelUtils = require('./model-utils');
 
 //Replace this address with your actual address
 var senderAddress = "test@test.com";
 
+module.exports = function (user) {
+  // modelUtils.clearBaseACLs(user, require('./user.json'));
+
+}
 module.exports = function (User) {
+
+    // modelUtils.clearBaseACLs(User, require('./user.json'));
+
+
   User.afterRemote("login", function (ctx) {
     ctx.res.cookie("access_token", ctx.result.id, {
       signed: true,
