@@ -227,7 +227,7 @@ if (typeof module !== "undefined" && module.exports) {
 
       return new Promise((resolve, reject) => {
         this.getAxios()
-          .put(`/api/contents/${id}`, payload)
+          .put(`/api/content/${id}`, payload)
           .then(async function (response) {
             // console.log("ok", response.data);
             resolve(response.data);
@@ -238,16 +238,6 @@ if (typeof module !== "undefined" && module.exports) {
           });
       });
 
-      // return this.getAxios().put(`/api/contents/${id}`, payload);
-      // .then(async function(response) {
-      //   // console.log(response.data);
-      //   // return response.data;
-      // })
-      // .catch(function(error) {
-      //   console.log(error);
-      // });
-
-      // return putPromise;
     }),
     (exports.createContentInstance = async function (payload) {
       // console.log('createContentInstance payload', payload);
@@ -264,10 +254,9 @@ if (typeof module !== "undefined" && module.exports) {
         payload = temp;
       }
 
-      // return this.http.post("/api/contents/", content).toPromise();
       return new Promise((resolve, reject) => {
         this.getAxios()
-          .post("/api/contents/", payload)
+          .post("/api/content/", payload)
           .then(async function (response) {
             // console.log("ok", response.data);
             resolve(response.data);

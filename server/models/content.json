@@ -1,5 +1,6 @@
 {
   "name": "content",
+  "plural": "content",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {

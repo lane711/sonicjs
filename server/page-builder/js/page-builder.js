@@ -59,7 +59,7 @@ async function setPage() {
   let pageId = $("#page-id").val();
   if (pageId) {
     // console.log("pageId", pageId);
-    axiosInstance.get(`/api/contents/${pageId}`).then(function (response) {
+    axiosInstance.get(`/api/content/${pageId}`).then(function (response) {
       // handle success
       this.page = response.data;
       // console.log("getPage page", page);
@@ -77,7 +77,7 @@ async function setContentType() {
 function axiosTest() {
   // console.log("running axios");
   axiosInstance
-    .get("/api/contents")
+    .get("/api/content")
     .then(function (response) {
       // handle success
       console.log(response);
@@ -536,7 +536,7 @@ async function deleteBlock() {
 
 async function getContentInstance(id) {
   return axiosInstance
-    .get(`/api/contents/${id}`)
+    .get(`/api/content/${id}`)
     .then(async function (response) {
       // console.log(response);
       return await response.data;
@@ -566,7 +566,7 @@ async function getContentType(systemId) {
 async function getContentByContentTypeAndTitle(contentType, title) {
   const filter = `{"where":{"and":[{"data.title":"${title}"},{"data.contentType":"${contentType}"}]}}`;
   const encodedFilter = encodeURI(filter);
-  let url = `/api/contents?filter=${encodedFilter}`;
+  let url = `/api/content?filter=${encodedFilter}`;
   return axiosInstance
     .get(url)
     .then(async function (record) {
@@ -599,7 +599,7 @@ async function createInstance(
     payload = temp;
   }
 
-  // return this.http.post("/api/contents/", content).toPromise();
+  // return this.http.post("/api/content/", content).toPromise();
   return axiosInstance
     .post(`/api/${contentType}/`, payload)
     .then(async function (response) {
@@ -724,7 +724,7 @@ async function deleteContentInstance(id) {
   console.log("deleting content", id);
   // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
   return axiosInstance
-    .delete(`/api/contents/${id}`)
+    .delete(`/api/content/${id}`)
     .then(async function (response) {
       console.log(response);
       return await response.data;
