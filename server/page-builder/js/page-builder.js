@@ -703,7 +703,7 @@ async function editContentType(payload) {
   // }else{
   //     data = payload;
   // }
-  // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
+  // return this.http.put(environment.apiUrl + `content/${id}`, payload).toPromise();
   // debugger;
   return axiosInstance
     .put(`/api/contentTypes/${id}`, payload)
@@ -722,7 +722,7 @@ async function editContentType(payload) {
 
 async function deleteContentInstance(id) {
   console.log("deleting content", id);
-  // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
+  // return this.http.put(environment.apiUrl + `content/${id}`, payload).toPromise();
   return axiosInstance
     .delete(`/api/content/${id}`)
     .then(async function (response) {
@@ -736,7 +736,7 @@ async function deleteContentInstance(id) {
 
 async function deleteContentType(id) {
   console.log("deleting content", id);
-  // return this.http.put(environment.apiUrl + `contents/${id}`, payload).toPromise();
+  // return this.http.put(environment.apiUrl + `content/${id}`, payload).toPromise();
   axiosInstance
     .delete(`/api/contentTypes/${id}`)
     .then(async function (response) {

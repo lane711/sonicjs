@@ -68,7 +68,7 @@ if (typeof module !== "undefined" && module.exports) {
       //HACK removing sort bc LB not working with RDMS
       const filter = ""; //encodeURI(`{"order":"data.createdOn DESC"}`);
 
-      let url = `${apiUrl}contents?filter=${filter}`;
+      let url = `${apiUrl}content?filter=${filter}`;
       let page = await this.getAxios().get(url);
       await formattingService.formatDates(page.data);
       await formattingService.formatTitles(page.data);
@@ -78,7 +78,7 @@ if (typeof module !== "undefined" && module.exports) {
       //HACK removing sort bc LB not working with RDMS
       const filter = ""; //encodeURI(`{"order":"data.createdOn DESC"}`);
 
-      let url = `${apiUrl}contents?filter=${filter}`;
+      let url = `${apiUrl}content?filter=${filter}`;
       let page = await this.getAxios().get(url);
       await formattingService.formatDates(page.data);
       await formattingService.formatTitles(page.data);
@@ -95,7 +95,7 @@ if (typeof module !== "undefined" && module.exports) {
       const filter = encodeURI(
         `{"where":{"data.contentType":"${contentType}"}}`
       );
-      let url = `${apiUrl}contents?filter=${filter}`;
+      let url = `${apiUrl}content?filter=${filter}`;
       let page = await this.getAxios().get(url);
       return page.data;
     }),
@@ -132,7 +132,7 @@ if (typeof module !== "undefined" && module.exports) {
     }),
     (exports.getContentByUrl = async function (url) {
       var filter = encodeURI(`{"where":{"data.url":"${url}"}}`);
-      let apiFullUrl = `${apiUrl}contents?filter=${filter}`;
+      let apiFullUrl = `${apiUrl}content?filter=${filter}`;
       let record = await this.getAxios().get(apiFullUrl);
       if (record.data[0] && record.data.length > 0) {
         return record;
@@ -146,7 +146,7 @@ if (typeof module !== "undefined" && module.exports) {
     }),
     (exports.getContentByContentType = async function (contentType) {
       var filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
-      let apiFullUrl = `${apiUrl}contents?filter=${filter}`;
+      let apiFullUrl = `${apiUrl}content?filter=${filter}`;
       let record = await this.getAxios().get(apiFullUrl);
       if (record.data) {
         return record.data;
@@ -160,7 +160,7 @@ if (typeof module !== "undefined" && module.exports) {
     ) {
       const filter = `{"where":{"and":[{"data.title":"${title}"},{"data.contentType":"${contentType}"}]}}`;
       const encodedFilter = encodeURI(filter);
-      let url = `${apiUrl}contents?filter=${encodedFilter}`;
+      let url = `${apiUrl}content?filter=${encodedFilter}`;
       let pageRecord = await this.getAxios().get(url);
       if (pageRecord.data[0]) {
         //HACK: workaround for loopback bug - lb should filter based on the above filter input, but doesn't for RDBMS
@@ -190,7 +190,7 @@ if (typeof module !== "undefined" && module.exports) {
       //TODO: add {"order":"data.sort ASC"},
       const filter = `{"where":{"and":[{"data.tags":{"regexp": "${tag}"}},{"data.contentType":"${contentType}"}]}}`;
       const encodedFilter = encodeURI(filter);
-      let url = `${apiUrl}contents?filter=${encodedFilter}`;
+      let url = `${apiUrl}content?filter=${encodedFilter}`;
       let pageRecord = await this.getAxios().get(url);
       if (pageRecord.data) {
         return pageRecord.data;
@@ -203,7 +203,7 @@ if (typeof module !== "undefined" && module.exports) {
     ) {
       const filter = `{"where":{"and":[{"url":"${pageUrl}"},{"data.contentType":"${contentType}"}]}}`;
       const encodedFilter = encodeURI(filter);
-      let url = `${apiUrl}contents?filter=${encodedFilter}`;
+      let url = `${apiUrl}content?filter=${encodedFilter}`;
       let pageRecord = await this.getAxios().get(url);
       if (pageRecord.data[0]) {
         return pageRecord;
@@ -269,7 +269,7 @@ if (typeof module !== "undefined" && module.exports) {
     });
 
   (exports.getContentById = async function (id) {
-    let url = `${apiUrl}contents/${id}`;
+    let url = `${apiUrl}content/${id}`;
     return this.getAxios()
       .get(url)
       .then(function (content) {

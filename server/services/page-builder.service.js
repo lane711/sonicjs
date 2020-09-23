@@ -106,7 +106,7 @@ module.exports = {
     //             // console.log(section);
     //             // pageContent += `${section.data.title}`;
     //             await this.processRows($, section.data.rows)
- 
+
     //             // console.log(section);
     //         });
 
@@ -152,7 +152,7 @@ module.exports = {
     // },
 
     getContentById: async function (id) {
-        let url = `${apiUrl}contents/${id}`;
+        let url = `${apiUrl}content/${id}`;
         // console.log('url', url);
         let page = await axios.get(url);
         page.data.html = undefined;
