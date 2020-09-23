@@ -1,5 +1,6 @@
 {
   "name": "user",
+  "plural": "user",
   "base": "User",
   "idInjection": true,
   "restrictResetPasswordTokenScope": true,

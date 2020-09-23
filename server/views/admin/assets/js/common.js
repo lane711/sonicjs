@@ -25,6 +25,11 @@ $(document).ready(async function () {
             location.reload();
           }
 
+          if (typeToDelete == "user") {
+            await deleteUser(idToDelete);
+            location.reload();
+          }
+
         }
 
       };
