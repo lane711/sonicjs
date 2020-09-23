@@ -44,6 +44,12 @@ module.exports = userService = {
     return roles;
   },
 
+  getRole: async function (id) {
+    var roleModel = loopback.getModel("Role");
+    let role = await roleModel.findById(id);
+    return role;
+  },
+
   getCurrentUserId: async function (req) {
     if (req.signedCookies && req.signedCookies.sonicjs_access_token) {
       let tokenInfo = await globalService.AccessToken.findById(

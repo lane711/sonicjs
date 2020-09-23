@@ -1009,6 +1009,10 @@ async function openNewContentTypeModal() {
   $("#newContentTypeModal").appendTo("body").modal("show");
 }
 
+async function openNewRoleModal() {
+  $("#newRoleModal").appendTo("body").modal("show");
+}
+
 async function openWYSIWYG() {
   console.log("WYSIWYG setup");
   // $('section span').on("click", async function () {

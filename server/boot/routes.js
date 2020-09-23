@@ -588,6 +588,11 @@ module.exports = function (app) {
           undefined,
           "submitContent(submission,true,'users')"
         );
+        // data.editFormRole = await formService.getForm(
+        //   "role",
+        //   undefined,
+        //   "submitContent(submission,true,'users')"
+        // );
         let users = await userService.getUsers();
         let roles = await userService.getRoles();
         data.users = users;
@@ -606,6 +611,20 @@ module.exports = function (app) {
           "user",
           user,
           'submitContent(submission, true, "users")'
+        );
+      }
+
+      if (viewName == "admin-role-edit") {
+        let role = { id: param1 };
+        if (param1) {
+          let roleRecord = await userService.getRole(param1);
+          role.data = roleRecord.__data;
+          role.data.contentType = "Role";
+        }
+        data.editForm = await formService.getForm(
+          "Role",
+          role,
+          'submitContent(submission, true, "Role")'
         );
       }
 
