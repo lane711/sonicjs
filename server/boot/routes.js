@@ -608,6 +608,20 @@ module.exports = function (app) {
         );
       }
 
+      if (viewName == "admin-role-edit") {
+        let role = { id: param1 };
+        if (param1) {
+          let roleRecord = await userService.getRole(param1);
+          role.data = roleRecord.__data;
+          role.data.contentType = "Role";
+        }
+        data.editForm = await formService.getForm(
+          "role",
+          role,
+          'submitContent(submission, true, "Role")'
+        );
+      }
+
       if (viewName == "admin-user-edit") {
         let user = { id: param1 };
         if (param1) {
@@ -619,20 +633,6 @@ module.exports = function (app) {
           "user",
           user,
           'submitContent(submission, true, "users")'
-        );
-      }
-
-      if (viewName == "admin-role-edit") {
-        let role = { id: param1 };
-        if (param1) {
-          let roleRecord = await userService.getRole(param1);
-          role.data = roleRecord.__data;
-          role.data.contentType = "Role";
-        }
-        data.editForm = await formService.getForm(
-          "Role",
-          role,
-          'submitContent(submission, true, "Role")'
         );
       }
 

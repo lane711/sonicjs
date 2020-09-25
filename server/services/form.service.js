@@ -67,7 +67,7 @@ if (typeof module !== "undefined" && module.exports) {
       let contentType;
       if (content && content.data.contentType) {
         contentType = await dataService.getContentType(
-          content.data.contentType
+          content.data.contentType.toLowerCase()
         );
       } else if (contentTypeId) {
         contentType = await dataService.getContentType(contentTypeId);
