@@ -46,8 +46,8 @@ module.exports = {
     //     let data;
     //     let contentType = 'menu';
     //     const filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
-    //     //axios.get(apiUrl + `contents?filter=${filter}`)
-    //     await axios.get('/api/contents?filter=%7B%22where%22%3A%7B%22data.contentType%22%3A%22menu%22%7D%7D')
+    //     //axios.get(apiUrl + `content?filter=${filter}`)
+    //     await axios.get('/api/content?filter=%7B%22where%22%3A%7B%22data.contentType%22%3A%22menu%22%7D%7D')
     //     .then(function (response) {
     //       // handle success
     //         // console.log('menu items ==>', response.data);
@@ -68,7 +68,7 @@ module.exports = {
 
       // async getContentByType(contentType) {
   //   const filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
-  //   let url = environment.apiUrl + `contents?filter=${filter}`;
+  //   let url = environment.apiUrl + `content?filter=${filter}`;
   //   return this.http.get(url).toPromise();
   // }
 

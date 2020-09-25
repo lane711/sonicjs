@@ -583,7 +583,7 @@ async function getContentByContentTypeAndTitle(contentType, title) {
 async function createInstance(
   payload,
   refresh = false,
-  contentType = "contents"
+  contentType = "content"
 ) {
   // console.log('createInstance payload', payload);
   // let content = {};
@@ -616,7 +616,7 @@ async function createInstance(
     });
 }
 
-async function editInstance(payload, refresh, contentType = "contents") {
+async function editInstance(payload, refresh, contentType = "content") {
   let id = payload.id;
   console.log("putting payload", payload);
   if (payload.id) {
@@ -646,7 +646,7 @@ async function editInstance(payload, refresh, contentType = "contents") {
     });
 }
 
-async function editInstanceUser(payload, refresh, contentType = "contents") {
+async function editInstanceUser(payload, refresh, contentType = "content") {
   let id = payload.id;
   if (payload.id) {
     delete payload.id;
