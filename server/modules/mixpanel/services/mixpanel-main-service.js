@@ -34,6 +34,10 @@ module.exports = mixpanelMainService = {
 
   trackEvent: async function(eventName, req, data) {
 
+    if(!mixpanel){
+      return;
+    }
+
     let enabled = await mixpanelMainService.trackingEnabled();
     if (!enabled) {
       return;

@@ -599,6 +599,14 @@ async function createInstance(
     payload = temp;
   }
 
+  if (contentType === "Role") {
+    // let temp = { data: payload };
+    // payload = temp;
+    contentType = "Roles";
+    payload = payload.data;
+
+  }
+
   // return this.http.post("/api/content/", content).toPromise();
   return axiosInstance
     .post(`/api/${contentType}/`, payload)
@@ -753,6 +761,20 @@ async function deleteUser(id) {
   // return this.http.put(environment.apiUrl + `content/${id}`, payload).toPromise();
   axiosInstance
     .delete(`/api/user/${id}`)
+    .then(async function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+}
+
+async function deleteRole(id) {
+  // debugger;
+  console.log("deleting role", id);
+  // return this.http.put(environment.apiUrl + `content/${id}`, payload).toPromise();
+  axiosInstance
+    .delete(`/api/Roles/${id}`)
     .then(async function (response) {
       console.log(response);
     })
@@ -1353,8 +1375,7 @@ async function submitContent(
   if (submission.id || submission.data.id) {
     if (contentType.startsWith("user")) {
       await editInstanceUser(entity, refresh, contentType);
-    }
-    else{
+    } else {
       await editInstance(entity, refresh, contentType);
     }
   } else {
@@ -1657,7 +1678,7 @@ function showSidePanel() {
 }
 
 function setupAdminMenuMinimizer() {
-  if(globalService.isBackEnd()){
+  if (globalService.isBackEnd()) {
     return;
   }
 

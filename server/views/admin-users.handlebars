@@ -64,7 +64,7 @@
       <div class="card">
         <div class="card-header">
           <i class="fa fa-align-justify"></i> Roles
-          <a href="javascript:void(0)" onclick="openNewRoleModal()"
+          <a href="/admin/role/new"
             class="btn btn-success float-right new-content-type">New Role</a>
         </div>
         <div class="card-body page-list">
@@ -85,7 +85,7 @@
 
 
                   <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
-                    data-trigger="focus" title="Delete <b>{{ this.data.title }}</b> Forever?" data-content="<a href='/contentType/{{ this.id }}'
+                    data-trigger="focus" title="Delete <b>{{ this.data.title }}</b> Forever?" data-content="<a href='/Role/{{ this.id }}'
    class='btn btn-sm btn-danger rmargin'>Confirm Delete</a>
 ">Delete</a>
 
@@ -150,7 +150,7 @@
       </div>
       <div class="modal-body">
 
-        {{{ data.editFormRole }}}
+        {{!-- {{{ data.editFormRole }}} --}}
 
       </div>
       {{!-- <div class="modal-footer">
