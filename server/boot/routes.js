@@ -583,16 +583,16 @@ module.exports = function (app) {
       }
 
       if (viewName == "admin-users") {
-        data.editForm = await formService.getForm(
+        data.editFormUser = await formService.getForm(
           "user",
           undefined,
-          "submitContent(submission,true,'users')"
+          "submitContent(submission,true,'user')"
         );
-        // data.editFormRole = await formService.getForm(
-        //   "role",
-        //   undefined,
-        //   "submitContent(submission,true,'users')"
-        // );
+        data.editFormRole = await formService.getForm(
+          "role",
+          undefined,
+          "submitContent(submission,true,'role')"
+        );
         let users = await userService.getUsers();
         let roles = await userService.getRoles();
         data.users = users;

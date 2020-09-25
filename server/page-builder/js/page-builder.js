@@ -1657,6 +1657,10 @@ function showSidePanel() {
 }
 
 function setupAdminMenuMinimizer() {
+  if(globalService.isBackEnd()){
+    return;
+  }
+
   $(".pb-wrapper .sidebar-minimizer").click(function () {
     Cookies.set("showSidebar", false);
     toggleSidebar(false);

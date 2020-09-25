@@ -20,8 +20,8 @@
     //client version
   }
 
-  exports.test = function () {
-    return "hello world";
+  exports.isBackEnd = function () {
+    return window.location.pathname.startsWith('/admin');
   };
 
   exports.getAppVersion = function () {
