@@ -589,12 +589,13 @@ async function createInstance(
   // let content = {};
   // content.data = payload;
   // this.processContentFields(payload, content);
+  debugger;
   console.log("payload", payload);
   if (payload.id || "id" in payload) {
     delete payload.id;
   }
 
-  if (!payload.data && contentType !== "users") {
+  if (!payload.data && contentType !== "user") {
     let temp = { data: payload };
     payload = temp;
   }
@@ -672,9 +673,6 @@ async function editInstanceUser(payload, refresh, contentType = "content") {
     }
   }
 
-  if (contentType === "user") {
-    contentType = "users";
-  }
   //update user
   return axiosInstance
     .put(`/api/${contentType}/${id}`, payload)
@@ -688,7 +686,7 @@ async function editInstanceUser(payload, refresh, contentType = "content") {
       }
     })
     .catch(function (error) {
-      debugger;
+      // debugger;
       console.log("editInstance", error);
     });
 }
@@ -1371,6 +1369,10 @@ async function submitContent(
   let entity = submission.data ?? submission;
   if (!contentType.startsWith("user")) {
     entity = processContentFields(submission.data);
+  }
+  if (contentType.toLowerCase().startsWith("role")) {
+    contentType = "Roles";
+    entity = submission.data;
   }
   if (submission.id || submission.data.id) {
     if (contentType.startsWith("user")) {

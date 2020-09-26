@@ -38,7 +38,7 @@
               {{#each data.users}}
               <tr>
                 <td><a href="/admin/user/edit/{{ this.id }}">{{ this.email }}</a></td>
-                <td>{{ contentType.description}}</td>
+                <td>{{ this.firstName }} {{ this.lastName }}</td>
                 <td>
                   <a class="btn btn-sm btn-primary rmargin" href="/admin/user/edit/{{ this.id }}">Edit</a>
 
@@ -64,14 +64,14 @@
       <div class="card">
         <div class="card-header">
           <i class="fa fa-align-justify"></i> Roles
-          <a href="/admin/role/new"
-            class="btn btn-success float-right new-content-type">New Role</a>
+          <a href="/admin/role/new" class="btn btn-success float-right new-content-type">New Role</a>
         </div>
         <div class="card-body page-list">
           <table class="table table-responsive-sm table-striped">
             <thead>
               <tr>
                 <th>Name</th>
+                <th>Description</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -79,9 +79,9 @@
               {{#each data.roles}}
               <tr>
                 <td><a href="/admin/role/edit/{{ this.id }}">{{ this.name }}</a></td>
+                <td>{{ this.description }}</td>
                 <td>
-                  <a class="btn btn-sm btn-primary rmargin"
-                    href="/admin/role/edit/{{ this.id }}">Edit</a>
+                  <a class="btn btn-sm btn-primary rmargin" href="/admin/role/edit/{{ this.id }}">Edit</a>
 
 
                   <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"

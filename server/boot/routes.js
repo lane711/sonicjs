@@ -111,7 +111,7 @@ module.exports = function (app) {
             res.render("reponseToTriggerEmail", {
               title: "Login failed",
               content: err,
-              redirectToEmail: "/api/users/" + err.details.userId + "/verify",
+              redirectToEmail: "/api/user/" + err.details.userId + "/verify",
               redirectTo: "/",
               redirectToLinkText: "Click here",
               userId: err.details.userId,
@@ -618,7 +618,7 @@ module.exports = function (app) {
         data.editForm = await formService.getForm(
           "role",
           role,
-          'submitContent(submission, true, "Role")'
+          'submitContent(submission, true, "Roles")'
         );
       }
 
@@ -632,7 +632,7 @@ module.exports = function (app) {
         data.editForm = await formService.getForm(
           "user",
           user,
-          'submitContent(submission, true, "users")'
+          'submitContent(submission, true, "user")'
         );
       }
 
