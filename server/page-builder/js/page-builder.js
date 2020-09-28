@@ -589,7 +589,7 @@ async function createInstance(
   // let content = {};
   // content.data = payload;
   // this.processContentFields(payload, content);
-  debugger;
+  // debugger;
   console.log("payload", payload);
   if (payload.id || "id" in payload) {
     delete payload.id;

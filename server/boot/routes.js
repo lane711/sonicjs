@@ -586,7 +586,7 @@ module.exports = function (app) {
         data.editFormUser = await formService.getForm(
           "user",
           undefined,
-          "submitContent(submission,true,'user')"
+          "await submitContent(submission,true,'user');"
         );
         // data.editFormRole = await formService.getForm(
         //   "role",
@@ -604,7 +604,7 @@ module.exports = function (app) {
         data.editForm = await formService.getForm(
           "role",
           undefined,
-          "submitContent(submission,true,'Role')"
+          "submitContent(submission,true,'Role');"
         );
       }
 
@@ -618,7 +618,7 @@ module.exports = function (app) {
         data.editForm = await formService.getForm(
           "role",
           role,
-          'submitContent(submission, true, "Roles")'
+          'submitContent(submission, true, "Roles");'
         );
       }
 
@@ -632,7 +632,7 @@ module.exports = function (app) {
         data.editForm = await formService.getForm(
           "user",
           user,
-          'submitContent(submission, true, "user")'
+          'submitContent(submission, true, "user");'
         );
       }
 

@@ -61,6 +61,7 @@ module.exports = function (User) {
     //     redirectToLinkText: 'Log in'
     //   });
     // });
+    next();
   });
 
   // User.beforeRemote('saveOptions', function(ctx, unused, next) {
@@ -93,7 +94,7 @@ module.exports = function (User) {
           if (err) {
             console.log(err);
           }
-          console.log(info);
+          // console.log(info);
         }
       );
 
@@ -114,12 +115,12 @@ module.exports = function (User) {
             roleId: role,
           },
           function (err, info) {
-            console.log(info);
+            // console.log(info);
           }
         );
       });
     }
-    console.log("after user update", context);
+    // console.log("after user update", context);
 
     next();
   });
