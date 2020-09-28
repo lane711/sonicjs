@@ -79,3 +79,7 @@
 .image-module-wrapper .choices__list--dropdown .choices__item {
   height: 120px;
 }
+
+.tab-content{
+  margin-bottom: 1.5rem;
+}
