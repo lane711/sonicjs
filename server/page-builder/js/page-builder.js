@@ -600,10 +600,7 @@ async function createInstance(
     payload = temp;
   }
 
-  if (contentType === "Role") {
-    // let temp = { data: payload };
-    // payload = temp;
-    contentType = "Roles";
+  if (contentType === "Roles") {
     payload = payload.data;
 
   }

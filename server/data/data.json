@@ -2,16 +2,15 @@
   "ids": {
     "contentType": 60,
     "content": 58,
-    "user": 23,
+    "user": 25,
     "AccessToken": 44,
     "ACL": 1,
-    "RoleMapping": 39,
-    "Role": 9
+    "RoleMapping": 41,
+    "Role": 11
   },
   "models": {
     "user": {
       "1": "{\"id\":1,\"password\":\"$2a$10$l7yGt1pBQiHlqCVQNFBOruPRaOPszh288HORit2QPEmJXyMMs/Vdm\",\"email\":\"a@a.com\",\"emailVerified\":false,\"firstName\":\"John\",\"lastName\":\"Smith\",\"roles\":[1],\"contentType\":\"user\",\"submit\":true}",
-      "2": "{\"id\":2,\"password\":\"$2a$10$6BTJkREziVQ4tbOSfn/lGek4ywIUIcYiUU.TlF12F.kxG.tY1Qjna\",\"email\":\"b@b.com\",\"emailVerified\":false,\"firstName\":\"Jay2\",\"lastName\":\"Freely\",\"roles\":[],\"data\":{\"firstName\":\"dgb\",\"lastName\":\"vbn\",\"emailVerified\":false,\"contentType\":\"user\",\"submit\":true},\"contentType\":\"user\",\"submit\":true}",
       "3": "{\"id\":3,\"password\":\"$2a$10$uyqHkkZRzLzTp0Eam1Wg2ueH59uoWPoPvCQH/4Db9iAuF7XUc/9Ki\",\"email\":\"c@c.com\",\"data\":{\"firstName\":\"Joe \",\"lastName\":\"Smith\",\"email\":\"c@c.com\",\"password\":\"$2a$10$uyqHkkZRzLzTp0Eam1Wg2ueH59uoWPoPvCQH/4Db9iAuF7XUc/9Ki\",\"emailVerified\":false,\"data\":{\"firstName\":\"\",\"lastName\":\"\",\"email\":\"c@c.com\",\"password\":\"$2a$10$uyqHkkZRzLzTp0Eam1Wg2ueH59uoWPoPvCQH/4Db9iAuF7XUc/9Ki\",\"emailVerified\":false,\"data\":{\"firstName\":\"ergdfg\",\"lastName\":\"sdfgg\",\"emailVerified\":false,\"contentType\":\"user\",\"submit\":true},\"contentType\":\"user\",\"submit\":true},\"contentType\":\"user\",\"submit\":true}}",
       "4": "{\"password\":\"$2a$10$IcZ1ZXzcA63ZL5i5SfWh4OW8YQu4n8g2OJIsgRwgIJZo/aiIkLsrm\",\"email\":\"d@d.com\",\"data\":{\"firstName\":\"Joe\",\"lastName\":\"Smith\",\"emailVerified\":true,\"contentType\":\"user\",\"submit\":true},\"id\":4}",
       "6": "{\"id\":6,\"password\":\"$2a$10$MED.gIC7TqBxhhXv08ALmOf2fSqmDprj0yUsDaSMn9eMQkDqcQMGy\",\"email\":\"f@f.com\",\"emailVerified\":false,\"firstName\":\"a\",\"lastName\":\"b\",\"roles\":[1,2],\"data\":{\"firstName\":\"Ex\",\"lastName\":\"Fro\",\"emailVerified\":true,\"contentType\":\"user\",\"submit\":true},\"contentType\":\"user\",\"submit\":true}",
@@ -26,7 +25,9 @@
       "19": "{\"password\":\"$2a$10$Bsh1z9SWqnXEECp1bxEyfOmcnHrKBlHTK7uFfHW5hy7j51cecPiFe\",\"email\":\"sdf@sdf.com\",\"emailVerified\":false,\"firstName\":\"\",\"lastName\":\"\",\"roles\":[],\"contentType\":\"user\",\"submit\":true,\"id\":19}",
       "20": "{\"password\":\"$2a$10$9MPpxPOjBsXvwcI/1z6IGuoC1MKCrEyriGMPDfBMdzslsQvvUS1Qu\",\"email\":\"df@dfg.com\",\"emailVerified\":false,\"firstName\":\"\",\"lastName\":\"\",\"roles\":[],\"contentType\":\"user\",\"submit\":true,\"id\":20}",
       "21": "{\"password\":\"$2a$10$XN0PLrPauhh26K7ghy12TeFACuNaCIuper0s8xSBhwmx/q4cpe0Rm\",\"email\":\"sdfdg@sdf.com\",\"emailVerified\":false,\"firstName\":\"\",\"lastName\":\"\",\"roles\":[],\"contentType\":\"user\",\"submit\":true,\"id\":21}",
-      "22": "{\"password\":\"$2a$10$v2ap8UmuX1n.dGrfohaLS.LLSGyCFOK8B4ynKT6jpC27.ObgV/chK\",\"email\":\"sdf@sdflj.com\",\"emailVerified\":false,\"firstName\":\"\",\"lastName\":\"\",\"roles\":[],\"contentType\":\"user\",\"submit\":true,\"id\":22}"
+      "22": "{\"password\":\"$2a$10$v2ap8UmuX1n.dGrfohaLS.LLSGyCFOK8B4ynKT6jpC27.ObgV/chK\",\"email\":\"sdf@sdflj.com\",\"emailVerified\":false,\"firstName\":\"\",\"lastName\":\"\",\"roles\":[],\"contentType\":\"user\",\"submit\":true,\"id\":22}",
+      "23": "{\"password\":\"$2a$10$MCMYOekUj8NKMGxx8kcsfe4BDDQmbQvOhWjftB8DWIWHW/AeoqVpW\",\"email\":\"sdflj@lgdfg.com\",\"emailVerified\":false,\"firstName\":\"\",\"lastName\":\"\",\"roles\":[],\"contentType\":\"user\",\"submit\":true,\"id\":23}",
+      "24": "{\"password\":\"$2a$10$q3aFxmKAzfrO8euTx7AsNe9npezBLu.MJ9Rz5rohpQtWLCsKTrOwC\",\"email\":\"sdf3@kjsdf.com\",\"emailVerified\":false,\"firstName\":\"\",\"lastName\":\"\",\"roles\":[10],\"contentType\":\"user\",\"submit\":true,\"id\":24}"
     },
     "AccessToken": {
       "QUUmpOPaR8MbPdZDN7EgEzA2wHOxzjFsvBUHzKuaR9DnWz8hBf56ZNq5e3vhN3pW": "{\"id\":\"QUUmpOPaR8MbPdZDN7EgEzA2wHOxzjFsvBUHzKuaR9DnWz8hBf56ZNq5e3vhN3pW\",\"ttl\":1209600,\"created\":\"2020-09-03T02:21:06.057Z\",\"userId\":1}",
@@ -51,7 +52,9 @@
       "27": "{\"principalType\":\"user\",\"principalId\":\"6\",\"roleId\":1,\"id\":27}",
       "28": "{\"principalType\":\"user\",\"principalId\":\"6\",\"roleId\":2,\"id\":28}",
       "37": "{\"principalType\":\"user\",\"principalId\":\"12\",\"roleId\":2,\"id\":37}",
-      "38": "{\"principalType\":\"user\",\"principalId\":\"12\",\"roleId\":1,\"id\":38}"
+      "38": "{\"principalType\":\"user\",\"principalId\":\"12\",\"roleId\":1,\"id\":38}",
+      "39": "{\"principalType\":\"user\",\"principalId\":\"2\",\"roleId\":1,\"id\":39}",
+      "40": "{\"principalType\":\"user\",\"principalId\":\"2\",\"roleId\":2,\"id\":40}"
     },
     "Role": {
       "1": "{\"id\":1,\"name\":\"admin\",\"description\":\"The admin role can perform all operations.\",\"created\":\"2020-09-12T02:20:32.331Z\",\"modified\":\"2020-09-12T02:20:32.331Z\",\"contentType\":\"Role\",\"submit\":true}",
