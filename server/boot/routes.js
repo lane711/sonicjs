@@ -83,7 +83,7 @@ module.exports = function (app) {
   app.post("/register", function (req, res) {
     var user = loopback.getModel("user");
     user.create(
-      { email: req.body.email, password: req.body.password },
+      { email: req.body.email, password: req.body.password, roles: [1] },
       function (err, userInstance) {
         // console.log(userInstance);
         globalService.isAdminUserCreated = true;

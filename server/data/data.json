@@ -2,18 +2,17 @@
   "ids": {
     "contentType": 60,
     "content": 58,
-    "user": 25,
-    "AccessToken": 44,
+    "user": 1,
+    "AccessToken": 1,
     "ACL": 1,
-    "RoleMapping": 41,
-    "Role": 11
+    "RoleMapping": 1,
+    "Role": 3
   },
   "models": {
     "user": {},
     "AccessToken": {},
     "ACL": {},
-    "RoleMapping": {
-      "20": "{\"principalType\":\"user\",\"principalId\":\"1\",\"roleId\":1,\"id\":20}"},
+    "RoleMapping": {},
     "Role": {
       "1": "{\"id\":1,\"name\":\"admin\",\"description\":\"The admin role can perform all operations.\",\"created\":\"2020-09-12T02:20:32.331Z\",\"modified\":\"2020-09-12T02:20:32.331Z\",\"contentType\":\"Role\",\"submit\":true}",
       "2": "{\"id\":2,\"name\":\"editor\",\"description\":\"The editor role can manage content, but not access administrative functions.\",\"created\":\"2020-09-12T02:20:38.153Z\",\"modified\":\"2020-09-12T02:20:38.153Z\",\"contentType\":\"Role\",\"submit\":true}"
@@ -91,6 +90,7 @@
       "44": "{\"id\":44,\"data\":{\"title\":\"Section 9\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[TEXT id=\\\"46\\\"][YOUTUBE id=\\\"45\\\"]\"}]}],\"createdOn\":1598498006204}}",
       "45": "{\"id\":45,\"data\":{\"videoId\":\"2NjOTokx0JU\",\"contentType\":\"youtube\",\"createdOn\":1598497991986,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-420,\"referrer\":\"http://localhost:3018/modules\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36\",\"pathName\":\"/modules\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
       "46": "{\"id\":46,\"data\":{\"body\":\"Below is the Youtube module. Just enter the video id in the module settings\",\"css\":\"\",\"contentType\":\"text\",\"createdOn\":1598498030920,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-420,\"referrer\":\"http://localhost:3018/modules\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36\",\"pathName\":\"/modules\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
-      "47": "{\"data\":{\"headerLevel\":\"h1\",\"position\":\"center\",\"text\":\"This page provides examples of the modules that you can add to your pages\",\"slug\":\"this-page-provides-examples-of-the-modules-that-you-can-add-to-your-pages\",\"contentType\":\"title\",\"submit\":true,\"createdOn\":1598498726512},\"id\":47}",    }
+      "47": "{\"data\":{\"headerLevel\":\"h1\",\"position\":\"center\",\"text\":\"This page provides examples of the modules that you can add to your pages\",\"slug\":\"this-page-provides-examples-of-the-modules-that-you-can-add-to-your-pages\",\"contentType\":\"title\",\"submit\":true,\"createdOn\":1598498726512},\"id\":47}"
+    }
   }
 }
