@@ -9,53 +9,11 @@
     "Role": 11
   },
   "models": {
-    "user": {
-      "1": "{\"id\":1,\"password\":\"$2a$10$l7yGt1pBQiHlqCVQNFBOruPRaOPszh288HORit2QPEmJXyMMs/Vdm\",\"email\":\"a@a.com\",\"emailVerified\":false,\"firstName\":\"John\",\"lastName\":\"Smith\",\"roles\":[1],\"contentType\":\"user\",\"submit\":true}",
-      "3": "{\"id\":3,\"password\":\"$2a$10$uyqHkkZRzLzTp0Eam1Wg2ueH59uoWPoPvCQH/4Db9iAuF7XUc/9Ki\",\"email\":\"c@c.com\",\"data\":{\"firstName\":\"Joe \",\"lastName\":\"Smith\",\"email\":\"c@c.com\",\"password\":\"$2a$10$uyqHkkZRzLzTp0Eam1Wg2ueH59uoWPoPvCQH/4Db9iAuF7XUc/9Ki\",\"emailVerified\":false,\"data\":{\"firstName\":\"\",\"lastName\":\"\",\"email\":\"c@c.com\",\"password\":\"$2a$10$uyqHkkZRzLzTp0Eam1Wg2ueH59uoWPoPvCQH/4Db9iAuF7XUc/9Ki\",\"emailVerified\":false,\"data\":{\"firstName\":\"ergdfg\",\"lastName\":\"sdfgg\",\"emailVerified\":false,\"contentType\":\"user\",\"submit\":true},\"contentType\":\"user\",\"submit\":true},\"contentType\":\"user\",\"submit\":true}}",
-      "4": "{\"password\":\"$2a$10$IcZ1ZXzcA63ZL5i5SfWh4OW8YQu4n8g2OJIsgRwgIJZo/aiIkLsrm\",\"email\":\"d@d.com\",\"data\":{\"firstName\":\"Joe\",\"lastName\":\"Smith\",\"emailVerified\":true,\"contentType\":\"user\",\"submit\":true},\"id\":4}",
-      "6": "{\"id\":6,\"password\":\"$2a$10$MED.gIC7TqBxhhXv08ALmOf2fSqmDprj0yUsDaSMn9eMQkDqcQMGy\",\"email\":\"f@f.com\",\"emailVerified\":false,\"firstName\":\"a\",\"lastName\":\"b\",\"roles\":[1,2],\"data\":{\"firstName\":\"Ex\",\"lastName\":\"Fro\",\"emailVerified\":true,\"contentType\":\"user\",\"submit\":true},\"contentType\":\"user\",\"submit\":true}",
-      "10": "{\"password\":\"$2a$10$g7Q6/pHXGNq4QD/MYCo4P.lyN4FueX/vbtSLdcwSzRoZsMH3X2uji\",\"email\":\"as@s.com\",\"emailVerified\":false,\"firstName\":\"a\",\"lastName\":\"s\",\"roles\":[1],\"contentType\":\"user\",\"submit\":true,\"id\":10}",
-      "11": "{\"password\":\"$2a$10$mufmHy1isXFywr7xEgRgh.duMm4H6OV0amPxLUjT.PDioPZp8QfJq\",\"email\":\"ss@ss.com\",\"emailVerified\":false,\"firstName\":\"dfg\",\"lastName\":\"dfgfgrtrt\",\"roles\":[2],\"contentType\":\"user\",\"submit\":true,\"id\":11}",
-      "12": "{\"id\":12,\"password\":\"$2a$10$3Ix6coBHpml8F1NHjANFFOIMK26iXfF5p0Ki23TcjeNCNLK2m9xN2\",\"email\":\"gg4@gg.com\",\"emailVerified\":false,\"firstName\":\"asdf4\",\"lastName\":\"sdfert44\",\"roles\":[2,1],\"contentType\":\"user\",\"submit\":true}",
-      "14": "{\"password\":\"$2a$10$BXvmed02cjubqdRHLIkAnukdPHUpocQi0IoZ4jR/uGyf3N1stE2H2\",\"email\":\"sdf@lsdjf.com\",\"emailVerified\":false,\"firstName\":\"asdqew\",\"lastName\":\"ad\",\"roles\":[1,2],\"contentType\":\"user\",\"submit\":true,\"id\":14}",
-      "15": "{\"password\":\"$2a$10$6F7jzD/l2blVGkFXb3wCT.H7EYLiNaoG/itmBp7WvFAfsUc7Bg7i.\",\"email\":\"vbn@lj.vom\",\"emailVerified\":false,\"firstName\":\"vCv\",\"lastName\":\"vxcv\",\"roles\":[],\"contentType\":\"user\",\"submit\":true,\"id\":15}",
-      "16": "{\"password\":\"$2a$10$oFAF64p9gOOmlhfFucqKA.Md3sMurVyVgZBN7M6n5aDmsnteUEckm\",\"email\":\"sf@dsf.com\",\"emailVerified\":false,\"firstName\":\"sdf\",\"lastName\":\"sfd\",\"roles\":[],\"contentType\":\"user\",\"submit\":true,\"id\":16}",
-      "17": "{\"password\":\"$2a$10$yT6Q66Ago6QNKqfjNciBk.VyQ.oT3OwMQNoRW.43covWc24cv/Pwi\",\"email\":\"fdf@sdf.com\",\"emailVerified\":false,\"firstName\":\"sdf\",\"lastName\":\"sdf\",\"roles\":[],\"contentType\":\"user\",\"submit\":true,\"id\":17}",
-      "18": "{\"password\":\"$2a$10$t/lFDSpwxzM28A9e87mQZ..bBFWzvkzb9ckp6wLEHPiOLwZplcD9S\",\"email\":\"a@asdhj.com\",\"emailVerified\":false,\"firstName\":\"\",\"lastName\":\"\",\"roles\":[],\"contentType\":\"user\",\"submit\":true,\"id\":18}",
-      "19": "{\"password\":\"$2a$10$Bsh1z9SWqnXEECp1bxEyfOmcnHrKBlHTK7uFfHW5hy7j51cecPiFe\",\"email\":\"sdf@sdf.com\",\"emailVerified\":false,\"firstName\":\"\",\"lastName\":\"\",\"roles\":[],\"contentType\":\"user\",\"submit\":true,\"id\":19}",
-      "20": "{\"password\":\"$2a$10$9MPpxPOjBsXvwcI/1z6IGuoC1MKCrEyriGMPDfBMdzslsQvvUS1Qu\",\"email\":\"df@dfg.com\",\"emailVerified\":false,\"firstName\":\"\",\"lastName\":\"\",\"roles\":[],\"contentType\":\"user\",\"submit\":true,\"id\":20}",
-      "21": "{\"password\":\"$2a$10$XN0PLrPauhh26K7ghy12TeFACuNaCIuper0s8xSBhwmx/q4cpe0Rm\",\"email\":\"sdfdg@sdf.com\",\"emailVerified\":false,\"firstName\":\"\",\"lastName\":\"\",\"roles\":[],\"contentType\":\"user\",\"submit\":true,\"id\":21}",
-      "22": "{\"password\":\"$2a$10$v2ap8UmuX1n.dGrfohaLS.LLSGyCFOK8B4ynKT6jpC27.ObgV/chK\",\"email\":\"sdf@sdflj.com\",\"emailVerified\":false,\"firstName\":\"\",\"lastName\":\"\",\"roles\":[],\"contentType\":\"user\",\"submit\":true,\"id\":22}",
-      "23": "{\"password\":\"$2a$10$MCMYOekUj8NKMGxx8kcsfe4BDDQmbQvOhWjftB8DWIWHW/AeoqVpW\",\"email\":\"sdflj@lgdfg.com\",\"emailVerified\":false,\"firstName\":\"\",\"lastName\":\"\",\"roles\":[],\"contentType\":\"user\",\"submit\":true,\"id\":23}",
-      "24": "{\"password\":\"$2a$10$q3aFxmKAzfrO8euTx7AsNe9npezBLu.MJ9Rz5rohpQtWLCsKTrOwC\",\"email\":\"sdf3@kjsdf.com\",\"emailVerified\":false,\"firstName\":\"\",\"lastName\":\"\",\"roles\":[10],\"contentType\":\"user\",\"submit\":true,\"id\":24}"
-    },
-    "AccessToken": {
-      "QUUmpOPaR8MbPdZDN7EgEzA2wHOxzjFsvBUHzKuaR9DnWz8hBf56ZNq5e3vhN3pW": "{\"id\":\"QUUmpOPaR8MbPdZDN7EgEzA2wHOxzjFsvBUHzKuaR9DnWz8hBf56ZNq5e3vhN3pW\",\"ttl\":1209600,\"created\":\"2020-09-03T02:21:06.057Z\",\"userId\":1}",
-      "U5mtpzfEiw3ztp2owEcOd1jYvZguocjXXIuIEgFgFEFoospYI1r1C1CqJFFML0yB": "{\"id\":\"U5mtpzfEiw3ztp2owEcOd1jYvZguocjXXIuIEgFgFEFoospYI1r1C1CqJFFML0yB\",\"ttl\":1209600,\"created\":\"2020-09-04T00:48:00.675Z\",\"userId\":1}",
-      "OseUpzs6ScWizLpVPOeB2HQmPzdbSmwQXC0wilJyWUaWs08A6iAPxH4AuFXONbEC": "{\"id\":\"OseUpzs6ScWizLpVPOeB2HQmPzdbSmwQXC0wilJyWUaWs08A6iAPxH4AuFXONbEC\",\"ttl\":1209600,\"created\":\"2020-09-09T23:57:10.216Z\",\"userId\":1}",
-      "zmMMzxXZPwO0Qb4nu7Qe0JqNq0wSASIIIcRQCO81r1zAnK1NzqygADVpsyiAdlNO": "{\"id\":\"zmMMzxXZPwO0Qb4nu7Qe0JqNq0wSASIIIcRQCO81r1zAnK1NzqygADVpsyiAdlNO\",\"ttl\":1209600,\"created\":\"2020-09-19T01:18:47.086Z\",\"userId\":1}",
-      "O7p1ziOElly8HhQ3TYqIMJBpMxr0YVBe7N6x4nxMTsY6UzKmUjCDC8NDbvcNAh9a": "{\"id\":\"O7p1ziOElly8HhQ3TYqIMJBpMxr0YVBe7N6x4nxMTsY6UzKmUjCDC8NDbvcNAh9a\",\"ttl\":1209600,\"created\":\"2020-09-21T22:00:27.759Z\",\"userId\":1}",
-      "ngeONWd5fWN6SsUtWwO1HZux4wF6OVigvqHQh5IDRC6BahKGjrQqrsfhjYHX9yyx": "{\"id\":\"ngeONWd5fWN6SsUtWwO1HZux4wF6OVigvqHQh5IDRC6BahKGjrQqrsfhjYHX9yyx\",\"ttl\":1209600,\"created\":\"2020-09-22T19:28:10.160Z\",\"userId\":1}",
-      "R7mIiPfUU8FRb98EkcWwYIL3kZ8HSdfBLxOUvCGbJJNvXq5gcnTCWhlbzq6GIHOh": "{\"id\":\"R7mIiPfUU8FRb98EkcWwYIL3kZ8HSdfBLxOUvCGbJJNvXq5gcnTCWhlbzq6GIHOh\",\"ttl\":1209600,\"created\":\"2020-09-22T19:28:22.928Z\",\"userId\":1}",
-      "ZxmQAbXs49SrK8EUo9LKZXQnLsbLC3VyE6wEvcJPqwGwWXnP1F9qABkfzaEqM1uc": "{\"id\":\"ZxmQAbXs49SrK8EUo9LKZXQnLsbLC3VyE6wEvcJPqwGwWXnP1F9qABkfzaEqM1uc\",\"ttl\":1209600,\"created\":\"2020-09-25T02:01:38.790Z\",\"userId\":1}",
-      "0iW6XofzibPoGdvrifZL4mZGFz2Lvvi8yAaprbHZ6krB491tPq0uqUBrKlCWXvvD": "{\"id\":\"0iW6XofzibPoGdvrifZL4mZGFz2Lvvi8yAaprbHZ6krB491tPq0uqUBrKlCWXvvD\",\"ttl\":1209600,\"created\":\"2020-09-25T16:27:43.231Z\",\"userId\":1}",
-      "eZSJpkYg8RxVS5xRnXUhHXPBkhLK8FFxNbUaWeYCClwRgdpB11VvNCq8TcY5AEIw": "{\"id\":\"eZSJpkYg8RxVS5xRnXUhHXPBkhLK8FFxNbUaWeYCClwRgdpB11VvNCq8TcY5AEIw\",\"ttl\":1209600,\"created\":\"2020-09-25T16:45:35.489Z\",\"userId\":1}",
-      "CJ0nxUKwi0JTdGEbHkQDkiUjszzekHRIIfwc0wESwn6Eg87WExuS9vSViGvDt2DD": "{\"id\":\"CJ0nxUKwi0JTdGEbHkQDkiUjszzekHRIIfwc0wESwn6Eg87WExuS9vSViGvDt2DD\",\"ttl\":1209600,\"created\":\"2020-09-26T01:21:23.115Z\",\"userId\":1}",
-      "RdwWZDiTKBVmoNJFB0ffFLH8YUIYJUsSBvbmlDskX40Hrr83iTnFfU0pMwsMQwaO": "{\"id\":\"RdwWZDiTKBVmoNJFB0ffFLH8YUIYJUsSBvbmlDskX40Hrr83iTnFfU0pMwsMQwaO\",\"ttl\":1209600,\"created\":\"2020-09-28T16:16:43.261Z\",\"userId\":1}"
-    },
+    "user": {},
+    "AccessToken": {},
     "ACL": {},
     "RoleMapping": {
-      "11": "{\"principalType\":\"user\",\"principalId\":\"7\",\"roleId\":2,\"id\":11}",
-      "20": "{\"principalType\":\"user\",\"principalId\":\"1\",\"roleId\":1,\"id\":20}",
-      "22": "{\"principalType\":\"user\",\"principalId\":\"9\",\"roleId\":2,\"id\":22}",
-      "25": "{\"principalType\":\"user\",\"principalId\":\"8\",\"roleId\":1,\"id\":25}",
-      "27": "{\"principalType\":\"user\",\"principalId\":\"6\",\"roleId\":1,\"id\":27}",
-      "28": "{\"principalType\":\"user\",\"principalId\":\"6\",\"roleId\":2,\"id\":28}",
-      "37": "{\"principalType\":\"user\",\"principalId\":\"12\",\"roleId\":2,\"id\":37}",
-      "38": "{\"principalType\":\"user\",\"principalId\":\"12\",\"roleId\":1,\"id\":38}",
-      "39": "{\"principalType\":\"user\",\"principalId\":\"2\",\"roleId\":1,\"id\":39}",
-      "40": "{\"principalType\":\"user\",\"principalId\":\"2\",\"roleId\":2,\"id\":40}"
-    },
+      "20": "{\"principalType\":\"user\",\"principalId\":\"1\",\"roleId\":1,\"id\":20}"},
     "Role": {
       "1": "{\"id\":1,\"name\":\"admin\",\"description\":\"The admin role can perform all operations.\",\"created\":\"2020-09-12T02:20:32.331Z\",\"modified\":\"2020-09-12T02:20:32.331Z\",\"contentType\":\"Role\",\"submit\":true}",
       "2": "{\"id\":2,\"name\":\"editor\",\"description\":\"The editor role can manage content, but not access administrative functions.\",\"created\":\"2020-09-12T02:20:38.153Z\",\"modified\":\"2020-09-12T02:20:38.153Z\",\"contentType\":\"Role\",\"submit\":true}"
@@ -133,11 +91,6 @@
       "44": "{\"id\":44,\"data\":{\"title\":\"Section 9\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[TEXT id=\\\"46\\\"][YOUTUBE id=\\\"45\\\"]\"}]}],\"createdOn\":1598498006204}}",
       "45": "{\"id\":45,\"data\":{\"videoId\":\"2NjOTokx0JU\",\"contentType\":\"youtube\",\"createdOn\":1598497991986,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-420,\"referrer\":\"http://localhost:3018/modules\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36\",\"pathName\":\"/modules\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
       "46": "{\"id\":46,\"data\":{\"body\":\"Below is the Youtube module. Just enter the video id in the module settings\",\"css\":\"\",\"contentType\":\"text\",\"createdOn\":1598498030920,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-420,\"referrer\":\"http://localhost:3018/modules\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36\",\"pathName\":\"/modules\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
-      "47": "{\"data\":{\"headerLevel\":\"h1\",\"position\":\"center\",\"text\":\"This page provides examples of the modules that you can add to your pages\",\"slug\":\"this-page-provides-examples-of-the-modules-that-you-can-add-to-your-pages\",\"contentType\":\"title\",\"submit\":true,\"createdOn\":1598498726512},\"id\":47}",
-      "53": "{\"id\":53,\"data\":{\"title\":\"2 Forms\",\"showHero\":true,\"heroTitle\":\"\",\"pageCssClass\":\"\",\"autoGenerateUrl\":true,\"url\":\"/2-forms\",\"metaTitle\":\"\",\"metaDescription\":\"\",\"contentType\":\"page\",\"submit\":true,\"createdOn\":1601051429778,\"layout\":[54]}}",
-      "54": "{\"id\":54,\"data\":{\"title\":\"Section 1\",\"contentType\":\"section\",\"rows\":[{\"class\":\"row\",\"columns\":[{\"class\":\"col\",\"content\":\"[CONTACT-US id=\\\"55\\\"]\"},{\"class\":\"col\",\"content\":\"[CONTACT-US id=\\\"56\\\"]\"}]}],\"createdOn\":1601051473102}}",
-      "55": "{\"data\":{\"formContentType\":\"contact\",\"adminEmail\":\"\",\"sendGridKey\":\"process.env.SENDGRID_API_KEY\",\"contentType\":\"contact-us\",\"submit\":true,\"createdOn\":1601051462096},\"id\":55}",
-      "56": "{\"data\":{\"formContentType\":\"contact\",\"adminEmail\":\"\",\"sendGridKey\":\"process.env.SENDGRID_API_KEY\",\"contentType\":\"contact-us\",\"submit\":true,\"createdOn\":1601051473076},\"id\":56}"
-    }
+      "47": "{\"data\":{\"headerLevel\":\"h1\",\"position\":\"center\",\"text\":\"This page provides examples of the modules that you can add to your pages\",\"slug\":\"this-page-provides-examples-of-the-modules-that-you-can-add-to-your-pages\",\"contentType\":\"title\",\"submit\":true,\"createdOn\":1598498726512},\"id\":47}",    }
   }
 }
