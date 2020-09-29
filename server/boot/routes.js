@@ -86,6 +86,22 @@ module.exports = function (app) {
       { email: req.body.email, password: req.body.password, roles: [1] },
       function (err, userInstance) {
         // console.log(userInstance);
+
+        //map admin role
+        var roleMappingModel = loopback.getModel("RoleMapping");
+        roleMappingModel.upsertWithWhere(
+          {
+            principalType: "user",
+            principalId: userInstance.id,
+            roleId: "admin",
+          },
+          function (err, info) {
+            if (err) {
+              console.log(info);
+            }
+          }
+        );
+
         globalService.isAdminUserCreated = true;
         let message = encodeURI(`Account created successfully. Please login`);
         res.redirect(`/admin?message=${message}`); // /admin will show the login
