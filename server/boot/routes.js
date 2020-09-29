@@ -92,7 +92,12 @@ module.exports = function (app) {
         roleMappingModel.upsertWithWhere(
           {
             principalType: "user",
-            principalId: userInstance.id,
+            principalId: 1,
+            roleId: "admin",
+          },
+          {
+            principalType: "user",
+            principalId: 1,
             roleId: "admin",
           },
           function (err, info) {

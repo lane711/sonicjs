@@ -107,12 +107,12 @@ module.exports = function (User) {
           {
             principalType: "user",
             principalId: user.id,
-            roleId: role,
+            roleId: 1,
           },
           {
             principalType: "user",
             principalId: user.id,
-            roleId: role,
+            roleId: 1,
           },
           function (err, info) {
             // console.log(info);
