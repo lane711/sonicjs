@@ -5,14 +5,17 @@
     "user": 1,
     "AccessToken": 1,
     "ACL": 1,
-    "RoleMapping": 1,
+    "RoleMapping": 3,
     "Role": 3
   },
   "models": {
     "user": {},
     "AccessToken": {},
     "ACL": {},
-    "RoleMapping": {},
+    "RoleMapping": {
+      "1": "{\"principalType\":\"user\",\"principalId\":\"1\",\"roleId\":null,\"id\":1}",
+      "2": "{\"principalType\":\"user\",\"principalId\":\"1\",\"roleId\":null,\"id\":2}"
+    },
     "Role": {
       "1": "{\"id\":1,\"name\":\"admin\",\"description\":\"The admin role can perform all operations.\",\"created\":\"2020-09-12T02:20:32.331Z\",\"modified\":\"2020-09-12T02:20:32.331Z\",\"contentType\":\"Role\",\"submit\":true}",
       "2": "{\"id\":2,\"name\":\"editor\",\"description\":\"The editor role can manage content, but not access administrative functions.\",\"created\":\"2020-09-12T02:20:38.153Z\",\"modified\":\"2020-09-12T02:20:38.153Z\",\"contentType\":\"Role\",\"submit\":true}"
