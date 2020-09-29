@@ -12,6 +12,7 @@
     "postinstall": "node server/install/npm-post-install.js",
     "setup": "node server/install/npm-setup.js",
     "posttest": "npm run lint",
+    "test": "node_modules/.bin/cypress open",
     "reset": "node server/install/npm-reset.js"
   },
   "dependencies": {

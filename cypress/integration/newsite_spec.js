@@ -5,6 +5,8 @@ describe("new site", function () {
 
   before(() => {
     //clear admin user
+    //TODO: create an endpoint that resets all data - replace data.json with data.original.json
+
   })
 
   it("new site should redirect to register page", function () {
