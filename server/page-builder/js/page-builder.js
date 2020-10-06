@@ -610,8 +610,10 @@ async function createInstance(
     .post(`/api/${contentType}/`, payload)
     .then(async function (response) {
       console.log(response);
-
-      if (refresh) {
+// debugger;
+      if(response.data.data.contentType === 'page'){
+        window.location.href = response.data.data.url;
+      } else if (refresh) {
         fullPageUpdate();
       }
 
@@ -857,7 +859,7 @@ async function setupPageSettings(action, contentType) {
     let form = await formService.getForm(
       'page',
       undefined,
-      "addModuleToColumn(submission, true)"
+      "await submitContent(submission);"
     );
 
     $("#formio").html(form);
@@ -1334,7 +1336,7 @@ async function submitContent(
   refresh = true,
   contentType = "content"
 ) {
-  // debugger;
+  debugger;
   console.log("Submission was made!", submission);
   let entity = submission.data ?? submission;
   if (!contentType.startsWith("user")) {
