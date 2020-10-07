@@ -9,6 +9,9 @@ const css = require("css");
 const axios = require("axios");
 var csstree = require("css-tree");
 var cssbeautify = require("cssbeautify");
+const path = require("path");
+var isTemplateCssProcessed = false;
+
 
 module.exports = cssService = {
   startup: async function () {
@@ -19,25 +22,60 @@ module.exports = cssService = {
         await cssService.getCssFile(options.page);
         // await cssService.getCssLinks(options);
       }
+
+      if(!isTemplateCssProcessed){
+        //runs once at statup
+        console.log('regen template css')
+        isTemplateCssProcessed = true;
+
+        await cssService.processTemplateCss();
+      }
     });
+
+
+
+    // eventBusService.on("requestBegin", async function (options) {
+    //   //handle combined js file
+    //   // if (process.env.MODE !== "production") return;
+
+    //   if (
+    //     options.req.url === ("/css-processed/template.css")
+    //   ) {
+    //     console.log('css processed')
+
+    //     let file = path.join(
+    //       __dirname,
+    //       "..",
+    //       "storage/css/template.css"
+    //     );
+
+    //     console.log('file', file);
+
+    //     options.res.setHeader("Cache-Control", "public, max-age=2592000");
+    //     options.res.setHeader(
+    //       "Expires",
+    //       new Date(Date.now() + 2592000000).toUTCString()
+    //     );
+    //     options.res.sendFile(file);
+    //     options.req.isRequestAlreadyHandled = true;
+    //     return;
+    //   }
+    // });
+
   },
 
-  // getGeneratedCss: async function () {
+  processTemplateCss: async function () {
 
-  //     var cssString = '';// 'body {background:lightblue;}';
-  //     cssString = await this.processSections(cssString)
-  //     var ast = css.parse(cssString);
+let originalFilePath = "storage/css/template.css";
+let originalFile = await fileService.getFile(originalFilePath);
+console.log(originalFile);
+    let processedFilePath = "../storage/css/template-processed.css";
 
-  //     let cssFile = css.stringify(ast);
-  //     return cssFile;
-  // },
+          console.log('processing template css', processedFilePath);
 
-  // getCssLinks: async function (options) {
-  //     options.page.data.cssLinks = [];
-  //     globalService.moduleCssFiles.forEach(link => {
-  //         options.page.data.cssLinks += `<link href="${link}" rel="stylesheet">`;
-  //     });
-  // },
+    fileService.writeFile(processedFilePath, originalFile);
+},
+
 
   // processSections: async function (cssString) {
 
