@@ -610,8 +610,10 @@ async function createInstance(
     .post(`/api/${contentType}/`, payload)
     .then(async function (response) {
       console.log(response);
-
-      if (refresh) {
+// debugger;
+      if(response.data.data.contentType === 'page'){
+        window.location.href = response.data.data.url;
+      } else if (refresh) {
         fullPageUpdate();
       }
 
@@ -689,7 +691,7 @@ async function editInstanceUser(payload, refresh, contentType = "content") {
 }
 
 async function editContentType(payload) {
-  // debugger;
+  debugger;
   let id = payload.id;
   if (!id) {
     return;
@@ -854,43 +856,16 @@ async function setupPageSettings(action, contentType) {
     componentsToLoad = components.filter((e) => e.key !== "id");
   }
 
-  let formio = Formio.createForm(document.getElementById("formio"), {
-    components: componentsToLoad,
-  }).then(async function (form) {
-    form.submission = {
-      data: formValuesToLoad,
-    };
-    form.on("submit", async function (submission) {
-      console.log("submission ->", submission);
-      //TODO: copy logic from admin app to save data
-      // let entity = {id: submission.data.id, url: submission.data.url, data: submission.data}
-      if (action == "add") {
-        // debugger;
-        //need create default block, etc
-        submission.data.contentType = contentType;
-        await createInstance(submission.data);
-        await postProcessNewContent(submission.data);
-        await redirect(submission.data.url);
-      } else {
-        //editing current
-        // debugger;
-        let entity = processContentFields(submission.data);
-        await editInstance(entity);
-        fullPageUpdate();
-      }
+    let form = await formService.getForm(
+      'page',
+      undefined,
+      "await submitContent(submission);"
+    );
 
-      // debugger;
+    $("#formio").html(form);
+    loadModuleSettingForm();
 
-      // for(var name in submission.data) {
-      //     var value = submission.data[name];
-      //     page.data[name] = value;
-      // }
-    });
-    form.on("error", (errors) => {
-      console.log("We have errors!");
-    });
-  });
-
+  $("#genericModal").appendTo("body").modal("show");
   console.log("page settings loaded");
 }
 
