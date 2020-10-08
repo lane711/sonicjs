@@ -16,7 +16,8 @@
                     type: 'textfield',
                     key: 'id',
                     label: 'Id',
-                    input: false
+                    input: false,
+                    disabled: true
                   },
                   {
                     type: 'textfield',
@@ -41,23 +42,17 @@
                 ]
               })
                 .then(async function (form) {
+
                   form.submission = {
-                    data: { id: contentType.id, title: contentType.title, systemid: contentType.systemid }
+                    data: { id: {{ data.raw.id }}, title: '{{ data.raw.title }}', systemid: '{{ data.raw.systemid }}' }
                   };
-                  form.on('submit', async function (submission) {
-                    var accessToken = '{{ this.accessToken }}';
-                    axios.put(`/api/contentTypes?access_token=${accessToken}`, submission.data)
-                      .then(async function (response) {
-                        console.log(response);
-                        //return await response.data;
+            form.on('submit', async function (submission) {
+              submission.id = submission.data.id;
+              submission.systemid = submission.data.systemid;
+              submission.title = submission.data.title;
 
-                        window.location.replace('/admin/content-types/edit/' + submission.data.systemid);
-                      })
-                      .catch(function (error) {
-                        console.log(error);
-                      });
-
-                  });
+              editContentType(submission);
+            });
                 });
             }
           </script>

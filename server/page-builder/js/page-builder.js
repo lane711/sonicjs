@@ -691,7 +691,7 @@ async function editInstanceUser(payload, refresh, contentType = "content") {
 }
 
 async function editContentType(payload) {
-  // debugger;
+  debugger;
   let id = payload.id;
   if (!id) {
     return;
