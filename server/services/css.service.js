@@ -69,7 +69,7 @@ module.exports = cssService = {
 
     let viewModel = await dataService.getContentTopOne("site-settings-colors");
 
-    console.log("processing template css data", viewModel);
+    // console.log("processing template css data", viewModel);
     let cssPath = path.join(__dirname, "..", "storage/css/template.css");
     let processCssString = await viewService.getProccessedView(
       "site-settings-colors",

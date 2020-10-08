@@ -1,6 +1,6 @@
 body {
   padding-top: 5rem;
-  background: orange;
+  background: #F8F8F8;
   padding: 0;
   font-size: 1.4rem
 }
@@ -27,12 +27,12 @@ a.white {
 }
 
 .bg-ptrans {
-  background: #333;
+  background: #000;
 }
 
 @media (min-width:768px) {
   .bg-ptrans {
-    opacity: .5
+    opacity: .95
   }
 }
 

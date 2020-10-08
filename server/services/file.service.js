@@ -50,7 +50,7 @@ module.exports = fileService = {
 
   writeFile: async function (filePath, fileContent) {
     let fullPath = path.join(__dirname, filePath);
-    console.log('fullPath--->', fullPath);
+    // console.log('fullPath--->', fullPath);
 
     return new Promise((resolve, reject) => {
       fs.writeFile(fullPath, fileContent, (err, data) => {
