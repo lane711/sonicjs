@@ -1,6 +1,6 @@
 body {
   padding-top: 5rem;
-  background: #F8F8F8;
+  background: {{bodyBackground}};
   padding: 0;
   font-size: 1.4rem
 }
@@ -27,12 +27,12 @@ a.white {
 }
 
 .bg-ptrans {
-  background: #000
+  background: {{headerBackground}};
 }
 
 @media (min-width:768px) {
   .bg-ptrans {
-    opacity: .95
+    opacity: {{headerOpacity}}
   }
 }
 

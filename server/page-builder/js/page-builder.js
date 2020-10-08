@@ -1336,7 +1336,7 @@ async function submitContent(
   refresh = true,
   contentType = "content"
 ) {
-  debugger;
+  // debugger;
   console.log("Submission was made!", submission);
   let entity = submission.data ?? submission;
   if (!contentType.startsWith("user")) {

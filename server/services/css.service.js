@@ -3,6 +3,7 @@ var helperService = require("./helper.service");
 var fileService = require("./file.service");
 var moduleService = require("./module.service");
 var globalService = require("./global.service");
+var viewService = require("./view.service");
 
 var eventBusService = require("./event-bus.service");
 const css = require("css");
@@ -11,7 +12,6 @@ var csstree = require("css-tree");
 var cssbeautify = require("cssbeautify");
 const path = require("path");
 var isTemplateCssProcessed = false;
-
 
 module.exports = cssService = {
   startup: async function () {
@@ -22,17 +22,15 @@ module.exports = cssService = {
         await cssService.getCssFile(options.page);
         // await cssService.getCssLinks(options);
       }
-
-      if(!isTemplateCssProcessed){
-        //runs once at statup
-        console.log('regen template css')
-        isTemplateCssProcessed = true;
-
-        await cssService.processTemplateCss();
-      }
     });
 
+    if (!isTemplateCssProcessed) {
+      //runs once at statup
+      console.log("regen template css");
+      isTemplateCssProcessed = true;
 
+      await cssService.processTemplateCss();
+    }
 
     // eventBusService.on("requestBegin", async function (options) {
     //   //handle combined js file
@@ -61,21 +59,27 @@ module.exports = cssService = {
     //     return;
     //   }
     // });
-
   },
 
   processTemplateCss: async function () {
-
-let originalFilePath = "storage/css/template.css";
-let originalFile = await fileService.getFile(originalFilePath);
-console.log(originalFile);
+    let originalFilePath = "storage/css/template.css";
+    let originalFile = await fileService.getFile(originalFilePath);
+    // console.log(originalFile);
     let processedFilePath = "../storage/css/template-processed.css";
 
-          console.log('processing template css', processedFilePath);
+    let viewModel = await dataService.getContentTopOne("site-settings-colors");
 
-    fileService.writeFile(processedFilePath, originalFile);
-},
+    console.log("processing template css data", viewModel);
+    let cssPath = path.join(__dirname, "..", "storage/css/template.css");
+    let processCssString = await viewService.getProccessedView(
+      "site-settings-colors",
+      viewModel.data,
+      cssPath
+    );
 
+    // console.log(processCssString);
+    fileService.writeFile(processedFilePath, processCssString);
+  },
 
   // processSections: async function (cssString) {
 
