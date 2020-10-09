@@ -15,15 +15,16 @@ describe("new site", function () {
     cy.contains('Create your admin account');
   });
 
-  it("register form validation", function () {
-    cy.visit('http://localhost:3018/');
+  // it("register form validation", function () {
+  //   cy.visit('http://localhost:3018/');
 
 
-    cy.contains('Create Account').click();
+  //   cy.contains('Create Account').click();
 
-    cy.get('[type="email"]').then(($input) => {
-      expect($input[0].validationMessage).to.eq('I expect an email!')
-    })
+  //   cy.get('[type="email"]').then(($input) => {
+  //     expect($input[0].validationMessage).to.eq('I expect an email!')
+  //   })
 
-  });
+  // });
 });
+
