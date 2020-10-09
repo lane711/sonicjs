@@ -1,6 +1,7 @@
 const { expect } = require("chai");
 const { iteratee } = require("lodash");
-const baseUrl = 'http://localhost:3018';
+var common = require("../support/index");
+
 
 describe("new site", function () {
 
@@ -15,7 +16,8 @@ describe("new site", function () {
   //   logout();
   // });
 
-  it("all admin pages should load", function () {
+  it("All admin pages should load", function () {
+
     login();
 
     adminPageVerify('./admin', 'Traffic');
@@ -51,8 +53,18 @@ describe("new site", function () {
     logout();
   });
 
+  it("Content CRUD", function () {
+
+    login();
+
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content`);
+    cy.contains('New Content').click()
+
+    logout();
+  });
+
   function login(){
-    cy.visit('http://localhost:3018/admin');
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin`);
     cy.contains('Login');
 
     cy.get('[type="email"]').type('a@a.com');
@@ -66,7 +78,7 @@ describe("new site", function () {
   }
 
   function adminPageVerify(url, textToVerify){
-    cy.visit(`${baseUrl}/${url}`);
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/${url}`);
     cy.contains(textToVerify);
   }
 
