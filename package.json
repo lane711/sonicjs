@@ -8,7 +8,7 @@
   "scripts": {
     "lint": "eslint .",
     "prestart": "node server/install/npm-pre-start.js",
-    "start": "nodemon -e handlebars,js,css,html --ignore 'template-processed.css'",
+    "start": "nodemon -e handlebars,js,css,html --ignore 'template-processed.css' --ignore '*_spec.js'",
     "postinstall": "node server/install/npm-post-install.js",
     "setup": "node server/install/npm-setup.js",
     "posttest": "npm run lint",
