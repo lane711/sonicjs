@@ -9,11 +9,11 @@ describe("new site", function () {
 
   })
 
-  it("new site should redirect to register page", function () {
-    cy.visit('http://localhost:3018/');
-    cy.contains('Register');
-    cy.contains('Create your admin account');
-  });
+  // it("new site should redirect to register page", function () {
+  //   cy.visit('http://localhost:3018/');
+  //   cy.contains('Register');
+  //   cy.contains('Create your admin account');
+  // });
 
   // it("register form validation", function () {
   //   cy.visit('http://localhost:3018/');

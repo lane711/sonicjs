@@ -6,6 +6,19 @@ describe("Admin Content Types", function () {
     cy.SonicJs.login();
   });
 
+  after(() => {
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
+    let deleteButtonPattern = '[aria-label*="Delete Cypress CT"]';
+
+    cy.get(deleteButtonPattern).then((button) => {
+      if (button) {
+        cy.get(deleteButtonPattern).first().click();
+        cy.wait(500);
+        cy.contains("Confirm Delete").click();
+      }
+    });
+  });
+
   it("Content type create", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
     cy.contains("New Content Type").click();
@@ -23,17 +36,19 @@ describe("Admin Content Types", function () {
   });
 
   it("Content type edit", function () {
-
-    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types/edit/cypress-content-type`);
-    cy.get('input[name="data[title]"]').type(' EDITED');
+    cy.visit(
+      `${cy.SonicJs.getBaseUrl()}/admin/content-types/edit/cypress-content-type`
+    );
+    cy.get('input[name="data[title]"]').type(" EDITED");
     // cy.wait(3000);
 
-    cy.contains('Save Title & SystemId').click();
+    cy.contains("Save Title & SystemId").click();
 
     cy.wait(1000);
-    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types/edit/cypress-content-type`);
-    cy.contains('Cypress CT EDITED');
-
+    cy.visit(
+      `${cy.SonicJs.getBaseUrl()}/admin/content-types/edit/cypress-content-type`
+    );
+    cy.contains("Cypress CT EDITED");
   });
 
   it("Content type delete", function () {

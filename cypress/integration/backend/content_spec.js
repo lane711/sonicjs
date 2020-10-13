@@ -47,7 +47,7 @@ describe("Admin Content", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content`);
     cy.get('input[type="search"]').type('Cypress Test Page');
     cy.contains('Delete').first().click();
-    cy.wait(500);
+    cy.wait(1000);
     cy.contains('Confirm Delete').click();
 
     cy.url().should('include', '/admin/content');
