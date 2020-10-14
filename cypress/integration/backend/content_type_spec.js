@@ -10,8 +10,9 @@ describe("Admin Content Types", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
     let deleteButtonPattern = '[aria-label*="Delete Cypress CT"]';
 
-    cy.get(deleteButtonPattern).then((button) => {
-      if (button) {
+    cy.get("body").then(($body) => {
+      if ($body.find(deleteButtonPattern).length > 0) {
+        //evaluates as true
         cy.get(deleteButtonPattern).first().click();
         cy.wait(500);
         cy.contains("Confirm Delete").click();
