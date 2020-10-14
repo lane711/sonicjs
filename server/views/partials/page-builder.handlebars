@@ -39,7 +39,7 @@
     <div class="tab-content" id="myTabContent">
       <div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
 
-        <button type="button" onclick="openForm('add','page')" class="btn btn-secondary" data-dismiss="modal">Add
+        <button type="button" id="btn-add-page" onclick="openForm('add','page')" class="btn btn-secondary" data-dismiss="modal">Add
           Page</button>
 
       </div>
@@ -51,7 +51,7 @@
           <li class="nav-title">Page Settings</li>
 
           <li class="nav-item nav-dropdown">
-            <a class="nav-link white" target="_blank" href="/admin/content/edit/page/{{page.id}}">
+            <a class="nav-link white" onclick="return openForm('edit','page')" href="javascript:void(0);">
               <i class="nav-icon fa fa-gear"></i> Page Settings</a>
           </li>
 

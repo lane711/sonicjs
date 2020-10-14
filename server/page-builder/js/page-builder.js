@@ -602,7 +602,6 @@ async function createInstance(
 
   if (contentType === "Roles") {
     payload = payload.data;
-
   }
 
   // return this.http.post("/api/content/", content).toPromise();
@@ -610,8 +609,8 @@ async function createInstance(
     .post(`/api/${contentType}/`, payload)
     .then(async function (response) {
       console.log(response);
-// debugger;
-      if(response.data.data.contentType === 'page'){
+      // debugger;
+      if (response.data.data.contentType === "page") {
         window.location.href = response.data.data.url;
       } else if (refresh) {
         fullPageUpdate();
@@ -645,7 +644,9 @@ async function editInstance(payload, refresh, contentType = "content") {
       console.log("editInstance", response);
       // resolve(response.data);
       // return await response.data;
-      if (refresh) {
+      if (response.data.data.contentType === "page") {
+        window.location.href = response.data.data.url;
+      } else if (refresh) {
         fullPageUpdate();
       }
     })
@@ -680,7 +681,10 @@ async function editInstanceUser(payload, refresh, contentType = "content") {
       console.log("editInstance", response);
       // resolve(response.data);
       // return await response.data;
-      if (refresh) {
+      debugger;
+      if (response.data.data.url) {
+        fullPageUpdate(response.data.data.url);
+      } else if (refresh) {
         fullPageUpdate();
       }
     })
@@ -807,6 +811,8 @@ async function setupPageSettings(action, contentType) {
   // let page = await getContentInstance(pageId);
 
   // Formio.createForm(document.getElementById('formio'), {
+  // debugger;
+
   let components = [
     {
       type: "textfield",
@@ -847,23 +853,32 @@ async function setupPageSettings(action, contentType) {
   let formValuesToLoad = {};
   let componentsToLoad = components;
   // debugger;
-  if (action == "edit" && contentType == "current") {
-    formValuesToLoad = this.page.data;
+
+  let form = undefined;
+
+  if (action == "edit" && contentType) {
+    formValuesToLoad = this.page;
+
+    form = await formService.getForm(
+      contentType,
+      formValuesToLoad,
+      "await submitContent(submission);"
+    );
   }
 
   if (action == "add") {
     // components.find(({ key }) => key === 'id' ).remove();
     componentsToLoad = components.filter((e) => e.key !== "id");
-  }
 
-    let form = await formService.getForm(
-      'page',
+    form = await formService.getForm(
+      "page",
       undefined,
       "await submitContent(submission);"
     );
+  }
 
-    $("#formio").html(form);
-    loadModuleSettingForm();
+  $("#formio").html(form);
+  loadModuleSettingForm();
 
   $("#genericModal").appendTo("body").modal("show");
   console.log("page settings loaded");
@@ -1394,9 +1409,14 @@ async function postProcessNewContent(content) {
 }
 
 //TODO, make this just refresh the body content with a full get
-function fullPageUpdate() {
+function fullPageUpdate(url = undefined) {
+  debugger;
   console.log("refreshing page");
-  location.reload();
+  if (url) {
+    window.location.replace(url);
+  } else {
+    location.reload();
+  }
 }
 
 async function redirect(url) {
