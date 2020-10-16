@@ -17,4 +17,4 @@ workflows:
   build-and-test:
     jobs:
       - build-and-test
-        version:12.18.3
+        version: 12.18.3
