@@ -10,6 +10,7 @@ jobs:
       - node/with-cache:
           steps:
             - run: npm --version
+            - run: node --version
             - run: npm install
             - run: npm start
             - run: npm test
@@ -17,4 +18,3 @@ workflows:
   build-and-test:
     jobs:
       - build-and-test
-        version: 12.18.3
