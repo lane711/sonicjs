@@ -30,11 +30,12 @@ module.exports = adminService = {
   checkIfAdminAccountIsCreated: async function () {
     var user = loopback.getModel("user");
 
-    await user.findById(1, function (err, adminUser) {
+    //the must be at least one account
+    await user.find({limit: 1}, function (err, adminUser) {
       if (err) {
         console.log(err);
       }
-      if (adminUser) {
+      if (adminUser && adminUser.length > 0) {
         globalService.isAdminUserCreated = true;
       } else {
         globalService.isAdminUserCreated = false;
