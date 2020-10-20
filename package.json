@@ -53,7 +53,7 @@
     "formiojs": "^3.29.8",
     "inquirer": "^7.3.3",
     "jimp": "^0.9.3",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "js-cookie": "^2.2.1",
     "jsoneditor": "^6.1.0",
     "jstree": "^3.3.9",
