@@ -14,7 +14,7 @@ module.exports = fileService = {
 
 
     sendEmail: async function (from, to, subject, body) {
-       
+
         var helper = require('sendgrid').mail;
                 var from_email = new helper.Email(from);
                 var to_email = new helper.Email(to);;
