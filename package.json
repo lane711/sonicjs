@@ -58,7 +58,7 @@
     "jsoneditor": "^6.1.0",
     "jstree": "^3.3.9",
     "lodash": "^4.17.15",
-    "loopback": "^3.22.0",
+    "loopback": "^3.25.1",
     "loopback-boot": "^2.6.5",
     "loopback-component-explorer": "^6.2.0",
     "loopback-component-storage": "^3.6.0",
