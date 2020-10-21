@@ -1,5 +1,5 @@
 var globalService = require("./global.service");
-var eventBusService = require("./event-bus.service");
+var eventBusService = require("./emitter.service");
 var fileService = require("./file.service");
 var dataService = require("./data.service");
 const path = require("path");

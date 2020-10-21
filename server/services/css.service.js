@@ -5,7 +5,7 @@ var moduleService = require("./module.service");
 var globalService = require("./global.service");
 var viewService = require("./view.service");
 
-var eventBusService = require("./event-bus.service");
+var eventBusService = require("./emitter.service");
 const css = require("css");
 const axios = require("axios");
 var csstree = require("css-tree");

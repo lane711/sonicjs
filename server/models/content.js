@@ -1,5 +1,5 @@
 'use strict';
-var eventBusService = require('../services/event-bus.service');
+var eventBusService = require('../services/emitter.service');
 var path = require("path");
 
 var contentService = require(path.join(__dirname, '../', 'services/content.service'));

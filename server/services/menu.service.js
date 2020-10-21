@@ -1,6 +1,6 @@
 var dataService = require("./data.service");
 var helperService = require("./helper.service");
-var eventBusService = require("./event-bus.service");
+var eventBusService = require("./emitter.service");
 
 var fs = require("fs");
 const cheerio = require("cheerio");

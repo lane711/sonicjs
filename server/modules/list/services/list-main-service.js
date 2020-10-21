@@ -1,5 +1,5 @@
 var dataService = require("../../../services/data.service");
-var eventBusService = require("../../../services/event-bus.service");
+var eventBusService = require("../../../services/emitter.service");
 var globalService = require("../../../services/global.service");
 var helperService = require("../../../services/helper.service");
 var formatService = require("../../../services/formatting.service");

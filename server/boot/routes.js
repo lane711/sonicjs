@@ -1,5 +1,5 @@
 var loopback = require("loopback");
-var eventBusService = require("../services/event-bus.service");
+var eventBusService = require("../services/emitter.service");
 var globalService = require("../services/global.service");
 var cacheService = require("../services/cache.service");
 

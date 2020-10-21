@@ -4,7 +4,7 @@ var axiosInstance;
 if (typeof module !== "undefined" && module.exports) {
   isBackEndMode = true;
   var dataService = require("./data.service");
-  var eventBusService = require("./event-bus.service");
+  var eventBusService = require("./emitter.service");
   var helperService = require("./helper.service");
   var globalService = require("./global.service");
 

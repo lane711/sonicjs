@@ -12,7 +12,7 @@ const axios = require("axios");
 const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 const chalk = require("chalk");
 const log = console.log;
-var eventBusService = require("./event-bus.service");
+var eventBusService = require("./emitter.service");
 
 var loopback = require("loopback");
 var app = loopback();

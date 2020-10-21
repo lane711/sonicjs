@@ -50,7 +50,7 @@
   };
 })(typeof exports === "undefined" ? (this["globalService"] = {}) : exports);
 
-// var eventBusService = require('./event-bus.service');
+// var eventBusService = require('./emitter.service');
 // var os = require("os");
 
 // // var baseUrl;
