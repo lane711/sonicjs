@@ -14,7 +14,7 @@ var emitterList = [];
   };
 
   exports.emit = async function (emitterName, options) {
-    console.log('*** emit >> ' + emitterName);
+    // console.log('*** emit >> ' + emitterName);
     // console.log('list', emitterList);
 
     //TODO: ordering

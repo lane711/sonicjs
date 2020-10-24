@@ -64,7 +64,7 @@ if (typeof module !== "undefined" && module.exports) {
       // let formHtml = await axiosInstance.get(`api/views/getProceedView?viewModel=${viewModel}&viewPath=${viewPath}`)
 
       console.log('getForm', contentTypeId, content, onFormSubmitFunction);
-      debugger;
+      // debugger;
       let contentType;
       if (content && content.data.contentType) {
         contentType = await dataService.getContentType(

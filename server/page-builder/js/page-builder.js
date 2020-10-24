@@ -871,7 +871,7 @@ async function setupPageSettings(action, contentType) {
     // components.find(({ key }) => key === 'id' ).remove();
     componentsToLoad = components.filter((e) => e.key !== "id");
 
-    debugger;
+    // debugger;
 
     form = await formService.getForm(
       "page",

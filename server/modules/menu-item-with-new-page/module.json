@@ -3,7 +3,9 @@
   "systemid": "menu-item-with-new-page",
   "version": "0.0.0.1",
   "canBeAddedToColumn": true,
-  "enabled": "true",
+  "enabled": true,
   "systemidUpperCase": "MENU-ITEM-WITH-NEW-PAGE",
   "systemidCamelCase": "menuItemWithNewPage"
 }
+
+

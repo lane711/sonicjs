@@ -12,7 +12,19 @@ module.exports = menuItemWithNewPageMainService = {
                 options.moduleName = 'menu-item-with-new-page';
                 await moduleService.processModuleInColumn(options);
             }
+        });
 
+        console.log('ssss');
+        emitterService.on("getFormPostContentType", async function (options) {
+          console.log("newItemWithNewPage", options);
+
+          let checkBox = {
+            label: "Create Menu Item",
+            type: "checkbox" ,
+            key:'createMenuItem',
+            defaultValue: true
+          };
+          options.data.components.push(checkBox);
         });
     },
 
