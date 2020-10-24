@@ -77,6 +77,8 @@ if (typeof module !== "undefined" && module.exports) {
         return;
       }
 
+      emitterService.emit('getFormPostContentType', contentType);
+
       if (!onFormSubmitFunction) {
         onFormSubmitFunction = "editInstance(submission,true)";
       }
