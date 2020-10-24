@@ -1,6 +1,6 @@
 var dataService = require("./data.service");
 var helperService = require("./helper.service");
-var eventBusService = require("./emitter.service");
+var emitterService = require("./emitter.service");
 
 var fs = require("fs");
 const cheerio = require("cheerio");
@@ -13,7 +13,7 @@ module.exports = menuService = {
   startup: function () {
     // console.log('>>=== menu startup');
 
-    eventBusService.on("getRenderedPagePostDataFetch", async function (
+    emitterService.on("getRenderedPagePostDataFetch", async function (
       options
     ) {
       if (options) {

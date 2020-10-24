@@ -1,6 +1,6 @@
 var dataService = require("./data.service");
 var helperService = require("./helper.service");
-var eventBusService = require("./emitter.service");
+var emitterService = require("./emitter.service");
 var globalService = require("./global.service");
 var loopback = require("loopback");
 var app = loopback();
@@ -13,7 +13,7 @@ const log = console.log;
 
 module.exports = userService = {
   startup: function () {
-    eventBusService.on("getRenderedPagePostDataFetch", async function (
+    emitterService.on("getRenderedPagePostDataFetch", async function (
       options
     ) {
       if (options) {

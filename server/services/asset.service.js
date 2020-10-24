@@ -1,5 +1,5 @@
 var globalService = require("./global.service");
-var eventBusService = require("./emitter.service");
+var emitterService = require("./emitter.service");
 var fileService = require("./file.service");
 var dataService = require("./data.service");
 const path = require("path");
@@ -9,7 +9,7 @@ var fileName = {};
 
 module.exports = assetService = {
   startup: async function () {
-    eventBusService.on("getRenderedPagePostDataFetch", async function (
+    emitterService.on("getRenderedPagePostDataFetch", async function (
       options
     ) {
       if (options && options.page) {
@@ -33,7 +33,7 @@ module.exports = assetService = {
       }
     });
 
-    eventBusService.on("requestBegin", async function (options) {
+    emitterService.on("requestBegin", async function (options) {
       //handle combined js file
       if (process.env.MODE !== "production") return;
 

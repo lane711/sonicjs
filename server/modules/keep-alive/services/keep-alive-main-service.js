@@ -1,5 +1,5 @@
 var dataService = require('../../../services/data.service');
-var eventBusService = require('../../../services/emitter.service');
+var emitterService = require('../../../services/emitter.service');
 var globalService = require('../../../services/global.service');
 var viewService = require('../../../services/view.service');
 var https = require("https");
@@ -8,7 +8,7 @@ var https = require("https");
 module.exports = keepAliveMainService = {
 
     startup: async function () {
-        eventBusService.on('modulesLoaded', async function () {
+        emitterService.on('modulesLoaded', async function () {
 
             setInterval(function () {
                 https.get('https://sonicjs.herokuapp.com/');

@@ -12,7 +12,7 @@ const axios = require("axios");
 const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 const chalk = require("chalk");
 const log = console.log;
-var eventBusService = require("./emitter.service");
+var emitterService = require("./emitter.service");
 
 var loopback = require("loopback");
 var app = loopback();
@@ -22,7 +22,7 @@ module.exports = adminService = {
   startup: async function () {
     this.checkIfAdminAccountIsCreated();
 
-    // eventBusService.on('requestBegin', async function (options) {
+    // emitterService.on('requestBegin', async function (options) {
     //     adminService.checkIfAdminAccountIsCreated();
     // });
   },

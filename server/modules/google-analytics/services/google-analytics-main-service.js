@@ -1,11 +1,11 @@
 var dataService = require('../../../services/data.service');
-var eventBusService = require('../../../services/emitter.service');
+var emitterService = require('../../../services/emitter.service');
 var globalService = require('../../../services/global.service');
 
 module.exports = googleAnalyticsMainService = {
 
     startup: async function () {
-        // eventBusService.on('beginProcessModuleShortCode', async function (options) {
+        // emitterService.on('beginProcessModuleShortCode', async function (options) {
 
         //     if (options.shortcode.name === 'GOOGLE-ANALYTICS') {
 
@@ -15,7 +15,7 @@ module.exports = googleAnalyticsMainService = {
 
         // });
 
-        eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
+        emitterService.on('getRenderedPagePostDataFetch', async function (options) {
             if (options && options.page) {
                 await googleAnalyticsMainService.addHeaderJs(options);
             }

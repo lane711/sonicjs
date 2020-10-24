@@ -1,5 +1,5 @@
 var loopback = require("loopback");
-var eventBusService = require("../services/emitter.service");
+var emitterService = require("../services/emitter.service");
 var globalService = require("../services/global.service");
 var cacheService = require("../services/cache.service");
 
@@ -59,7 +59,7 @@ module.exports = function (app) {
     await userService.startup();
     await assetService.startup();
 
-    await eventBusService.emit("startup");
+    await emitterService.emit("startup");
   })();
 
   app.get("*", async function (req, res, next) {
@@ -403,7 +403,7 @@ module.exports = function (app) {
   app.post("/form-submission", async function (req, res) {
     // console.log(req.body.data);
     //
-    await eventBusService.emit("afterFormSubmit", req.body.data);
+    await emitterService.emit("afterFormSubmit", req.body.data);
   });
 
   // router.get('/admin/content-types', function (req, res) {
@@ -411,7 +411,7 @@ module.exports = function (app) {
   // });
 
   app.get("*", async function (req, res, next) {
-    await eventBusService.emit("requestBegin", { req: req, res: res });
+    await emitterService.emit("requestBegin", { req: req, res: res });
 
     if (req.isRequestAlreadyHandled) {
       //modules can set the req.isRequestAlreadyHandled to true if they

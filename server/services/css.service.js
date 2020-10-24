@@ -5,7 +5,7 @@ var moduleService = require("./module.service");
 var globalService = require("./global.service");
 var viewService = require("./view.service");
 
-var eventBusService = require("./emitter.service");
+var emitterService = require("./emitter.service");
 const css = require("css");
 const axios = require("axios");
 var csstree = require("css-tree");
@@ -15,7 +15,7 @@ var isTemplateCssProcessed = false;
 
 module.exports = cssService = {
   startup: async function () {
-    eventBusService.on("getRenderedPagePostDataFetch", async function (
+    emitterService.on("getRenderedPagePostDataFetch", async function (
       options
     ) {
       if (options && options.page) {
@@ -32,7 +32,7 @@ module.exports = cssService = {
       await cssService.processTemplateCss();
     }
 
-    // eventBusService.on("requestBegin", async function (options) {
+    // emitterService.on("requestBegin", async function (options) {
     //   //handle combined js file
     //   // if (process.env.MODE !== "production") return;
 

@@ -1,11 +1,11 @@
 var dataService = require('../../../services/data.service');
-var eventBusService = require('../../../services/emitter.service');
+var emitterService = require('../../../services/emitter.service');
 var globalService = require('../../../services/global.service');
 
 module.exports = blogMainService = {
 
     startup: async function () {
-        eventBusService.on('beginProcessModuleShortCode', async function (options) {
+        emitterService.on('beginProcessModuleShortCode', async function (options) {
 
             if (options.shortcode.name === 'BLOG') {
 

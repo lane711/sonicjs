@@ -2,7 +2,7 @@ var dir = require("node-dir");
 var path = require("path");
 var fs = require("fs");
 var _ = require("lodash");
-var eventBusService = require("../services/emitter.service");
+var emitterService = require("../services/emitter.service");
 var globalService = require("../services/global.service");
 var fileService = require("../services/file.service");
 var viewService = require("../services/view.service");
@@ -10,12 +10,12 @@ var dataService = require("../services/data.service");
 
 module.exports = moduleService = {
   startup: function () {
-    eventBusService.on("startup", async function () {
+    emitterService.on("startup", async function () {
       // console.log('>>=== startup from module service');
       await moduleService.processModules();
     });
 
-    eventBusService.on("getRenderedPagePostDataFetch", async function (
+    emitterService.on("getRenderedPagePostDataFetch", async function (
       options
     ) {
       if (options) {
@@ -52,7 +52,7 @@ module.exports = moduleService = {
       }
     });
 
-    eventBusService.emit("modulesLoaded");
+    emitterService.emit("modulesLoaded");
   },
 
   getModuleDefinitionFile: async function (systemid) {
@@ -172,7 +172,7 @@ module.exports = moduleService = {
 
       options.viewModel = viewModel;
 
-      await eventBusService.emit("postModuleGetData", options);
+      await emitterService.emit("postModuleGetData", options);
 
       var proccessedHtml = {
         id: id,
@@ -181,7 +181,7 @@ module.exports = moduleService = {
         body: await this.processView(contentType, viewModel, viewPath),
       };
 
-      await eventBusService.emit("postProcessModuleShortCodeProccessedHtml", {
+      await emitterService.emit("postProcessModuleShortCodeProccessedHtml", {
         proccessedHtml: proccessedHtml,
         viewModel: viewModel,
       });

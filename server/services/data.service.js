@@ -1,7 +1,7 @@
 //check if running in node (and not the browser)
 if (typeof module !== "undefined" && module.exports) {
   var loopback = require("loopback");
-  var eventBusService = require("./emitter.service");
+  var emitterService = require("./emitter.service");
   var globalService = require("./global.service");
   var pageBuilderService = require("./page-builder.service");
   var formService = require("./form.service");
@@ -26,7 +26,7 @@ if (typeof module !== "undefined" && module.exports) {
   var axiosInstance;
 
   (exports.startup = async function () {
-    eventBusService.on("requestBegin", async function (options) {
+    emitterService.on("requestBegin", async function (options) {
       // console.log('data service startup')
       if (options) {
         const defaultOptions = {

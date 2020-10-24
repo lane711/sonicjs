@@ -1,17 +1,17 @@
 var dataService = require("../../../services/data.service");
-var eventBusService = require("../../../services/emitter.service");
+var emitterService = require("../../../services/emitter.service");
 var globalService = require("../../../services/global.service");
 
 module.exports = compareMainService = {
   startup: async function () {
-    eventBusService.on("beginProcessModuleShortCode", async function (options) {
+    emitterService.on("beginProcessModuleShortCode", async function (options) {
       if (options.shortcode.name === "COMPARE") {
         options.moduleName = "compare";
         await moduleService.processModuleInColumn(options);
       }
     });
 
-    eventBusService.on("postModuleGetData", async function (options) {
+    emitterService.on("postModuleGetData", async function (options) {
       if (options.shortcode.name !== "COMPARE") {
         return;
       }

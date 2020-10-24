@@ -17,7 +17,7 @@ module.exports = function(Container) {
 //     //   ctx.instance.data.updatedOn = undefined;
 //     // }
 
-//     // await eventBusService.emit('beforeSave', { instance: ctx.instance.data });
+//     // await emitterService.emit('beforeSave', { instance: ctx.instance.data });
 // console.log(ctx);
 
 //     next();

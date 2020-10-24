@@ -4,7 +4,7 @@ var axiosInstance;
 if (typeof module !== "undefined" && module.exports) {
   isBackEndMode = true;
   var dataService = require("./data.service");
-  var eventBusService = require("./emitter.service");
+  var emitterService = require("./emitter.service");
   var helperService = require("./helper.service");
   var globalService = require("./global.service");
 
@@ -23,7 +23,7 @@ if (typeof module !== "undefined" && module.exports) {
 
 (function (exports) {
   (exports.startup = async function () {
-    eventBusService.on("requestBegin", async function (options) {
+    emitterService.on("requestBegin", async function (options) {
       // console.log('data service startup')
       if (options) {
         const defaultOptions = {
@@ -42,7 +42,7 @@ if (typeof module !== "undefined" && module.exports) {
       }
     });
 
-    eventBusService.on("getRenderedPagePostDataFetch", async function (
+    emitterService.on("getRenderedPagePostDataFetch", async function (
       options
     ) {
       if (options && options.page) {
@@ -63,7 +63,8 @@ if (typeof module !== "undefined" && module.exports) {
       // const viewPath = encodeURI(`/assets/html/form.html`);
       // let formHtml = await axiosInstance.get(`api/views/getProceedView?viewModel=${viewModel}&viewPath=${viewPath}`)
 
-      // debugger;
+      console.log('getForm', contentTypeId, content, onFormSubmitFunction);
+      debugger;
       let contentType;
       if (content && content.data.contentType) {
         contentType = await dataService.getContentType(
@@ -71,6 +72,7 @@ if (typeof module !== "undefined" && module.exports) {
         );
       } else if (contentTypeId) {
         contentType = await dataService.getContentType(contentTypeId);
+
       } else {
         return;
       }

@@ -859,6 +859,7 @@ async function setupPageSettings(action, contentType) {
   if (action == "edit" && contentType) {
     formValuesToLoad = this.page;
 
+
     form = await formService.getForm(
       contentType,
       formValuesToLoad,
@@ -869,6 +870,8 @@ async function setupPageSettings(action, contentType) {
   if (action == "add") {
     // components.find(({ key }) => key === 'id' ).remove();
     componentsToLoad = components.filter((e) => e.key !== "id");
+
+    debugger;
 
     form = await formService.getForm(
       "page",

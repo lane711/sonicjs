@@ -1,10 +1,10 @@
 var dataService = require("../../../services/data.service");
-var eventBusService = require("../../../services/emitter.service");
+var emitterService = require("../../../services/emitter.service");
 var globalService = require("../../../services/global.service");
 
 module.exports = smartlookMainService = {
   startup: async function () {
-    eventBusService.on("getRenderedPagePostDataFetch", async function (
+    emitterService.on("getRenderedPagePostDataFetch", async function (
       options
     ) {
       if (options && options.page) {

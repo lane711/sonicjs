@@ -1,5 +1,5 @@
 'use strict';
-var eventBusService = require('../services/emitter.service');
+var emitterService = require('../services/emitter.service');
 var path = require("path");
 
 var contentService = require(path.join(__dirname, '../', 'services/content.service'));
@@ -19,7 +19,7 @@ module.exports = function (Content) {
       ctx.instance.data.updatedOn = undefined;
     }
 
-    await eventBusService.emit('beforeSave', { instance: ctx.instance.data });
+    await emitterService.emit('beforeSave', { instance: ctx.instance.data });
 
 
     // next();

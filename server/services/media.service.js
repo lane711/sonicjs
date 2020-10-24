@@ -1,6 +1,6 @@
 var dataService = require('./data.service');
 var helperService = require('./helper.service');
-var eventBusService = require('./emitter.service');
+var emitterService = require('./emitter.service');
 var globalService = require('./global.service');
 
 var fs = require('fs');
@@ -15,13 +15,13 @@ var axiosInstance;
 module.exports = mediaService = {
 
     startup: async function () {
-        eventBusService.on('getRenderedPagePostDataFetch', async function (options) {
+        emitterService.on('getRenderedPagePostDataFetch', async function (options) {
             if (options && options.page) {
                 await mediaService.processHeroImage(options.page);
             }
         });
 
-        eventBusService.on('requestBegin', async function (options) {
+        emitterService.on('requestBegin', async function (options) {
             // console.log('data service startup')
             if(options){
                 let baseUrl = globalService.baseUrl;

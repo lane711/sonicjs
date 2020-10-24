@@ -1,5 +1,5 @@
 var dataService = require('../../../services/data.service');
-var eventBusService = require('../../../services/emitter.service');
+var emitterService = require('../../../services/emitter.service');
 var globalService = require('../../../services/global.service');
 var viewService = require('../../../services/view.service');
 var mediaService = require('../../../services/media.service');
@@ -9,7 +9,7 @@ var mediaService = require('../../../services/media.service');
 module.exports = mediaMainService = {
 
     startup: async function () {
-        eventBusService.on('beginProcessModuleShortCode', async function (options) {
+        emitterService.on('beginProcessModuleShortCode', async function (options) {
 
             if (options.shortcode.name === 'MODULE-MEDIA') {
                 let id = options.shortcode.properties.id;

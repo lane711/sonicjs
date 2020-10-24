@@ -1,5 +1,5 @@
 var dataService = require("../../../services/data.service");
-var eventBusService = require("../../../services/emitter.service");
+var emitterService = require("../../../services/emitter.service");
 var globalService = require("../../../services/global.service");
 
 var sourceColumnId = undefined;
@@ -9,13 +9,13 @@ module.exports = menuTitleMainService = {
   startup: async function() {
     // console.log('--> startup on menuTitleMainService');
 
-    eventBusService.on("postProcessPage", async function(options) {
+    emitterService.on("postProcessPage", async function(options) {
         // console.log('resetting titeModules');
         titleModules = [];
 
     });
 
-    eventBusService.on("beginProcessModuleShortCodeDelayed", async function(options) {
+    emitterService.on("beginProcessModuleShortCodeDelayed", async function(options) {
       if (options.shortcode.name === "MENU-TITLE") {
         //TODO: don't process shortcode so that it can be processed after target columns has been built
         options.moduleName = "menu-title";
@@ -30,7 +30,7 @@ module.exports = menuTitleMainService = {
       }
     });
 
-    eventBusService.on('postModuleGetData', async function (options) {
+    emitterService.on('postModuleGetData', async function (options) {
 
       if (options.shortcode.name === 'TITLE') {
 
@@ -58,7 +58,7 @@ module.exports = menuTitleMainService = {
 
   });
 
-    // eventBusService.on("postModuleGetData", async function(options) {
+    // emitterService.on("postModuleGetData", async function(options) {
     //   if (options.shortcode.name !== "TITLE") {
     //     return;
     //   }
@@ -78,7 +78,7 @@ module.exports = menuTitleMainService = {
     //   globalService.pageContent;
     // });
 
-    eventBusService.on("preRender", async function(options) {
+    emitterService.on("preRender", async function(options) {
       let x = sourceColumnId;
       globalService.pageContent;
     });
