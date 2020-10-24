@@ -237,7 +237,6 @@ if (typeof module !== "undefined" && module.exports) {
             reject(error);
           });
       });
-
     }),
     (exports.createContentInstance = async function (payload) {
       // console.log('createContentInstance payload', payload);
