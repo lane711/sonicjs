@@ -41,7 +41,7 @@ module.exports = function(Module) {
             "title": body.title,
             "systemid": body.systemid,
             "version" : "0.0.0.1",
-            "enabled": body.enabled,
+            "enabled": body.enabled === "true" ? true : false,
             "canBeAddedToColumn": body.canBeAddedToColumn,
             "singleInstance": body.singleInstance
         }
