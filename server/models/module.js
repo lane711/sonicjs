@@ -11,7 +11,7 @@ module.exports = function(Module) {
             "systemid": body.systemid,
             "version" : "0.0.0.1",
             "canBeAddedToColumn": true,
-            "enabled": "true"
+            "enabled": body.enabled === "true" ? true : false
         }
 
         moduleService.createModule(moduleDefinitionFile);
