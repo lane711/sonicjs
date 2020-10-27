@@ -1,6 +1,46 @@
 'use strict';
+var emitterService = require('../services/emitter.service');
 
 module.exports = function (Contenttype) {
+
+  Contenttype.observe('loaded', async function filterProperties(ctx, next) {
+    // if (ctx.options && ctx.options.skipPropertyFilter) return next();
+    // if (ctx.instance && ctx.instance.data) {
+    //   var date = + new Date()
+    //   ctx.instance.data.createdOn = date;
+    //   ctx.instance.data.updatedOn = undefined;
+    // }
+
+    if(ctx.data){
+      // The data property exists when saving a new model instance.  No instance property.
+    }
+
+    if(ctx.instance){
+      // instance exists when querying data from the database.  No data property.  It's either one or the other
+    }
+
+    await emitterService.emit('contentTypeLoaded', ctx.data );
+
+    console.log('content type loaded');
+
+
+    // next();
+  });
+
+  // Contenttype.observe('before save', async function filterProperties(ctx, next) {
+  //   // if (ctx.options && ctx.options.skipPropertyFilter) return next();
+  //   // if (ctx.instance && ctx.instance.data) {
+  //   //   var date = + new Date()
+  //   //   ctx.instance.data.createdOn = date;
+  //   //   ctx.instance.data.updatedOn = undefined;
+  //   // }
+
+  //   await emitterService.emit('contentTypeBeforeSave', { instance: ctx.instance.data });
+
+
+  //   next();
+  // });
+
   Contenttype.status = function (cb) {
     var response = new Date();
     cb(null, response);
@@ -46,5 +86,5 @@ module.exports = function (Contenttype) {
     }
   );
 
-  
+
 };

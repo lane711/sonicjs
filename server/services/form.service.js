@@ -63,7 +63,7 @@ if (typeof module !== "undefined" && module.exports) {
       // const viewPath = encodeURI(`/assets/html/form.html`);
       // let formHtml = await axiosInstance.get(`api/views/getProceedView?viewModel=${viewModel}&viewPath=${viewPath}`)
 
-      console.log('getForm', contentTypeId, content, onFormSubmitFunction);
+      // console.log('getForm', contentTypeId, content, onFormSubmitFunction);
       // debugger;
       let contentType;
       if (content && content.data.contentType) {

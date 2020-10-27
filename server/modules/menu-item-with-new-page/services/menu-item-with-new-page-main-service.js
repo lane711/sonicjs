@@ -6,48 +6,9 @@ if (typeof module !== "undefined" && module.exports) {
   // var globalService = {};
 }
 
-// module.exports = menuItemWithNewPageMainService = {
-
-//     startup: async function () {
-//         emitterService.on('beginProcessModuleShortCode', async function (options) {
-
-//             if (options.shortcode.name === 'MENU-ITEM-WITH-NEW-PAGE') {
-
-//                 options.moduleName = 'menu-item-with-new-page';
-//                 await moduleService.processModuleInColumn(options);
-//             }
-//         });
-
-//         // require('../assets/js/menu-item-with-new-page-module');
-//         menuItemWithNewPageMainService.setupEmiiter();
-
-//     },
-
-//     setupEmiiter: function(){
-//       emitterService.on("getFormPostContentType", async function (options) {
-//         console.log("newItemWithNewPage", options);
-
-//         let checkBox = {
-//           label: "Create Menu Item",
-//           type: "checkbox" ,
-//           key:'createMenuItem',
-//           defaultValue: true
-//         };
-//         options.data.components.push(checkBox);
-//       });
-//     }
-
-//     menuItemWithNewPageMainService.setupEmiiter();
-
-// }
-
 (function (exports) {
 
-  // console.log(this);
-
-  (exports.startup = async function () {
-
-
+  exports.startup = async function () {
     emitterService.on("beginProcessModuleShortCode", async function (options) {
       if (options.shortcode.name === "MENU-ITEM-WITH-NEW-PAGE") {
         options.moduleName = "menu-item-with-new-page";
@@ -55,47 +16,20 @@ if (typeof module !== "undefined" && module.exports) {
       }
     });
 
-    // setupEmiiter();
+    emitterService.on("contentTypeLoaded", async function (options) {
 
-    // require('../assets/js/menu-item-with-new-page-module');
-    // menuItemWithNewPageMainService.setupEmiiter();
-  }),
+      let checkBox = {
+        label: "Create Menu Item",
+        type: "checkbox",
+        key: "createMenuItem",
+        defaultValue: true,
+      };
 
-    (exports.setupEmiiter = function () {
-      emitterService.on("getFormPostContentType", async function (options) {
-        console.log("newItemWithNewPage", options);
-
-        let checkBox = {
-          label: "Create Menu Item",
-          type: "checkbox",
-          key: "createMenuItem",
-          defaultValue: true,
-        };
-        options.data.components.push(checkBox);
-      });
+      options.data.components.push(checkBox);
     });
 
-    // menuItemWithNewPageMainService.setupEmiiter();
 })(
   typeof exports === "undefined"
     ? (this["menuItemWithNewPageMainService"] = {})
     : exports
 );
-
-menuItemWithNewPageMainService.setupEmiiter();
-// (function (exports) {
-//   // emitterService.on("getFormPostContentType", async function (options) {
-//   //   console.log("newItemWithNewPage", options);
-
-//   //   let checkBox = {
-//   //     label: "Create Menu Item",
-//   //     type: "checkbox" ,
-//   //     key:'createMenuItem',
-//   //     defaultValue: true
-//   //   };
-//   //   options.data.components.push(checkBox);
-//   // });
-//   exports.DoSomething = function () {};
-// })(
-//   typeof exports === "undefined" ? (this["newItemWithNewPage"] = {}) : exports
-// );
