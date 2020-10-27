@@ -1,7 +1,7 @@
 {
   "ids": {
     "contentType": 66,
-    "content": 59,
+    "content": 60,
     "user": 2,
     "AccessToken": 65,
     "ACL": 1,
@@ -156,7 +156,8 @@
       "45": "{\"id\":45,\"data\":{\"videoId\":\"2NjOTokx0JU\",\"contentType\":\"youtube\",\"createdOn\":1598497991986,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-420,\"referrer\":\"http://localhost:3018/modules\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36\",\"pathName\":\"/modules\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
       "46": "{\"id\":46,\"data\":{\"body\":\"Below is the Youtube module. Just enter the video id in the module settings\",\"css\":\"\",\"contentType\":\"text\",\"createdOn\":1598498030920,\"submit\":true},\"metadata\":{\"timezone\":\"America/Los_Angeles\",\"offset\":-420,\"referrer\":\"http://localhost:3018/modules\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36\",\"pathName\":\"/modules\",\"onLine\":true},\"state\":\"submitted\",\"saved\":false}",
       "47": "{\"data\":{\"headerLevel\":\"h1\",\"position\":\"center\",\"text\":\"This page provides examples of the modules that you can add to your pages\",\"slug\":\"this-page-provides-examples-of-the-modules-that-you-can-add-to-your-pages\",\"contentType\":\"title\",\"submit\":true,\"createdOn\":1598498726512},\"id\":47}",
-      "48": "{\"id\":48,\"data\":{\"bodyBackground\":\"#F8F8F8\",\"headerBackground\":\"#000\",\"headerOpacity\":\".95\",\"background\":\"green\",\"header\":\"#555555\",\"contentType\":\"site-settings-colors\",\"createdOn\":1602119522916,\"submit\":true}}"
+      "48": "{\"id\":48,\"data\":{\"bodyBackground\":\"#F8F8F8\",\"headerBackground\":\"#000\",\"headerOpacity\":\".95\",\"background\":\"green\",\"header\":\"#555555\",\"contentType\":\"site-settings-colors\",\"createdOn\":1602119522916,\"submit\":true}}",
+      "59": "{\"id\":59,\"data\":{\"title\":\"test menu item\",\"showHero\":true,\"heroTitle\":\"\",\"pageCssClass\":\"\",\"autoGenerateUrl\":true,\"url\":\"/test-menu-item\",\"metaTitle\":\"\",\"metaDescription\":\"\",\"createMenuItem\":true,\"contentType\":\"page\",\"createdOn\":1603765176476,\"submit\":true}}"
     }
   }
 }
