@@ -26,19 +26,27 @@ if (typeof module !== "undefined" && module.exports) {
     });
 
     emitterService.on("contentSaved", async function (options) {
-      if(options.createMenuItem){
+      if (options.contentType === 'page' && options.createMenuItem) {
+        let randomId = Math.random().toString(36).slice(2);
+        var parent = "#";
+        var node = {
+          id: randomId,
+          text: "New Link",
+          data: { id: randomId, title: options.title, url: options.url, showInMenu: true },
+        };
 
+        let menu = await dataService.getContentTopOne('menu');
+
+
+        menu.data.links.push(node);
         //      "13": "{\"id\":13,\"data\":{\"title\":\"Main\",\"contentType\":\"menu\",\"links\":[{\"id\":\"6e0ylrz3jei\",\"text\":\"Home\",\"icon\":\"fa fa-chevron-right\",\"li_attr\":{\"id\":\"6e0ylrz3jei\"},\"a_attr\":{\"href\":\"#\",\"id\":\"6e0ylrz3jei_anchor\"},\"state\":{\"loaded\":true,\"opened\":true,\"selected\":false,\"disabled\":false},\"data\":{\"id\":\"6e0ylrz3jei\",\"title\":\"Home\",\"url\":\"/\",\"showInMenu\":true,\"showChildren\":false},\"children\":[],\"type\":\"default\"},{\"id\":\"okfjjqsageb\",\"text\":\"Modules\",\"icon\":\"fa fa-chevron-right\",\"li_attr\":{\"id\":\"okfjjqsageb\"},\"a_attr\":{\"href\":\"#\",\"id\":\"okfjjqsageb_anchor\"},\"state\":{\"loaded\":true,\"opened\":false,\"selected\":true,\"disabled\":false},\"data\":{\"id\":\"okfjjqsageb\",\"title\":\"Modules\",\"url\":\"/modules\",\"showInMenu\":false,\"showChildren\":false},\"children\":[],\"type\":\"default\"}],\"createdOn\":1598410945868}}",
 
-let menuItem = {
+        dataService.editInstance(menu);
 
-}
 
-//add menu item to main menu
+        //add menu item to main menu
       }
     });
-
-
   };
 })(
   typeof exports === "undefined"
