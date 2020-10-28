@@ -33,11 +33,12 @@ if (typeof module !== "undefined" && module.exports) {
           id: randomId,
           text: "New Link",
           data: { id: randomId, title: options.title, url: options.url, showInMenu: true },
+          children: []
         };
 
         let menu = await dataService.getContentTopOne('menu');
 
-        var updatedMenu = { data: { title: menuTitle, contentType: "menu", links: links } };
+        var updatedMenu = { data: { title: menu.data.title, contentType: "menu", links: menu.data.links } };
 
 
         updatedMenu.data.links.push(node);
