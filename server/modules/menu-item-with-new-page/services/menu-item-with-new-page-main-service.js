@@ -37,8 +37,10 @@ if (typeof module !== "undefined" && module.exports) {
 
         let menu = await dataService.getContentTopOne('menu');
 
+        var updatedMenu = { data: { title: menuTitle, contentType: "menu", links: links } };
 
-        menu.data.links.push(node);
+
+        updatedMenu.data.links.push(node);
         //      "13": "{\"id\":13,\"data\":{\"title\":\"Main\",\"contentType\":\"menu\",\"links\":[{\"id\":\"6e0ylrz3jei\",\"text\":\"Home\",\"icon\":\"fa fa-chevron-right\",\"li_attr\":{\"id\":\"6e0ylrz3jei\"},\"a_attr\":{\"href\":\"#\",\"id\":\"6e0ylrz3jei_anchor\"},\"state\":{\"loaded\":true,\"opened\":true,\"selected\":false,\"disabled\":false},\"data\":{\"id\":\"6e0ylrz3jei\",\"title\":\"Home\",\"url\":\"/\",\"showInMenu\":true,\"showChildren\":false},\"children\":[],\"type\":\"default\"},{\"id\":\"okfjjqsageb\",\"text\":\"Modules\",\"icon\":\"fa fa-chevron-right\",\"li_attr\":{\"id\":\"okfjjqsageb\"},\"a_attr\":{\"href\":\"#\",\"id\":\"okfjjqsageb_anchor\"},\"state\":{\"loaded\":true,\"opened\":false,\"selected\":true,\"disabled\":false},\"data\":{\"id\":\"okfjjqsageb\",\"title\":\"Modules\",\"url\":\"/modules\",\"showInMenu\":false,\"showChildren\":false},\"children\":[],\"type\":\"default\"}],\"createdOn\":1598410945868}}",
 
         dataService.editInstance(menu);
