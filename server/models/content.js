@@ -25,6 +25,14 @@ module.exports = function (Content) {
     // next();
   });
 
+  Content.observe('after save', async function filterProperties(ctx, next) {
+
+    await emitterService.emit('contentSaved', ctx.instance.data );
+
+
+    // next();
+  });
+
   Content.getPageById = function (id, cb) {
     Content.findById(id, function (err, instance) {
       contentService.getPage(id, instance).then(html => {
