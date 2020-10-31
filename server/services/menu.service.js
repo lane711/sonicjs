@@ -123,4 +123,28 @@ module.exports = menuService = {
 
     return childLinks;
   },
+
+  addMenuItem: async function (url, linkText) {
+    let randomId = Math.random().toString(36).slice(2);
+    var parent = "#";
+    var node = {
+      id: randomId,
+      text: linkText,
+      data: { id: randomId, title: linkText, url: url, showInMenu: true },
+      children: []
+    };
+
+    let menu = await dataService.getContentTopOne('menu');
+
+    var updatedMenu = { data: { title: menu.data.title, contentType: "menu", links: menu.data.links } };
+
+    let linkAlreadyExists = updatedMenu.data.links.filter(x => x.data.url == url).length > 0;
+
+    if(!linkAlreadyExists){
+      updatedMenu.data.links.push(node);
+      dataService.editInstance(menu);
+    }
+
+  },
+
 };
