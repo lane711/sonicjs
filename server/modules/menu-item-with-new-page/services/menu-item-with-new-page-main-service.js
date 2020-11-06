@@ -18,6 +18,7 @@ if (typeof module !== "undefined" && module.exports) {
     });
 
     emitterService.on("contentTypeLoaded", async function (options) {
+      if(options.systemid !== 'page') return;
       let checkBox = {
         label: "Create Menu Item",
         type: "checkbox",
