@@ -14,7 +14,7 @@
             <script type='text/javascript'>
               window.onload = function () {
                 console.log('loading menuMainEdit form')
-                let title = '{{data.data.title}}';
+                let menuTitle = '{{data.data.title}}';
                 Formio.createForm(document.getElementById('menuMainEdit'), {
                   components: [
                     {
@@ -29,7 +29,7 @@
                   .then(async function (form) {
                     form.submission = {
                       data: {
-                        title: title
+                        title: menuTitle
                       }
                     };
                   });
