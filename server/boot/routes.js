@@ -361,6 +361,16 @@ module.exports = function (app) {
     res.render("sandbox", { layout: "blank.handlebars", data: data });
   });
 
+  app.get("/theme1", async function (req, res) {
+    let data = {};
+    res.render("sandbox", { layout: "theme1.handlebars", data: data });
+  });
+
+  app.get("/theme2", async function (req, res) {
+    let data = {};
+    res.render("sandbox", { layout: "theme2.handlebars", data: data });
+  });
+
   app.get("/admin/sandbox", async function (req, res) {
     let data = {};
     res.render("sandbox", { layout: "admin.handlebars", data: data });

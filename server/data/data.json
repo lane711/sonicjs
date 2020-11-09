@@ -2,17 +2,23 @@
   "ids": {
     "contentType": 61,
     "content": 49,
-    "user": 1,
-    "AccessToken": 1,
+    "user": 2,
+    "AccessToken": 2,
     "ACL": 1,
-    "RoleMapping": 1,
+    "RoleMapping": 2,
     "Role": 3
   },
   "models": {
-    "user": {},
-    "AccessToken": {},
+    "user": {
+      "1": "{\"password\":\"$2a$10$3YP/Tc904IlWWNq5W8/xauUuAvayQ9/Kk9HrHcHMHv./vpZZEfXh6\",\"email\":\"a@a.com\",\"roles\":[1],\"id\":1}"
+    },
+    "AccessToken": {
+      "CcJ9BIEfkOxjiIm8lRzgRUCW4fWUm3FD9pse7ssNJBEzyQWXba5OUDYWS2EOrwYr": "{\"id\":\"CcJ9BIEfkOxjiIm8lRzgRUCW4fWUm3FD9pse7ssNJBEzyQWXba5OUDYWS2EOrwYr\",\"ttl\":1209600,\"created\":\"2020-11-09T16:58:43.409Z\",\"userId\":1}"
+    },
     "ACL": {},
-    "RoleMapping": {},
+    "RoleMapping": {
+      "1": "{\"principalType\":\"user\",\"principalId\":\"1\",\"roleId\":null,\"id\":1}"
+    },
     "Role": {
       "1": "{\"id\":1,\"name\":\"admin\",\"description\":\"The admin role can perform all operations.\",\"created\":\"2020-09-12T02:20:32.331Z\",\"modified\":\"2020-09-12T02:20:32.331Z\",\"contentType\":\"Role\",\"submit\":true}",
       "2": "{\"id\":2,\"name\":\"editor\",\"description\":\"The editor role can manage content, but not access administrative functions.\",\"created\":\"2020-09-12T02:20:38.153Z\",\"modified\":\"2020-09-12T02:20:38.153Z\",\"contentType\":\"Role\",\"submit\":true}"
