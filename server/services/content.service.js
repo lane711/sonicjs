@@ -108,29 +108,31 @@ module.exports = contentService = {
       }
     }
     // console.log('id',id, instance);
-    let themePath = __dirname + "/../themes/base/index.html";
 
-    return new Promise((resolve, reject) => {
-      fs.readFile(themePath, "utf8", (err, data) => {
-        if (err) {
-          console.log(err);
-          reject(err);
-        } else {
-          // console.log('data==>', data);
-          this.processTemplate(data).then((html) => {
-            resolve("ok");
-            // console.log('getPage.page-->', html.length);
-            // this.page.data.body = html;
-            // pageBuilderService.processPageBuilder(this.page).then(pagebuilder => {
-            //     // console.log('page-->2', pagebuilder.length);
-            //     this.page.data.pagebuilder = pagebuilder;
+    return await this.processTemplate();
+    // let themePath = __dirname + "/../themes/base/index.html";
 
-            //     resolve(html);
-            // })
-          });
-        }
-      });
-    });
+    // return new Promise((resolve, reject) => {
+    //   fs.readFile(themePath, "utf8", (err, data) => {
+    //     if (err) {
+    //       console.log(err);
+    //       reject(err);
+    //     } else {
+    //       // console.log('data==>', data);
+    //       this.processTemplate(data).then((html) => {
+    //         resolve("ok");
+    //         // console.log('getPage.page-->', html.length);
+    //         // this.page.data.body = html;
+    //         // pageBuilderService.processPageBuilder(this.page).then(pagebuilder => {
+    //         //     // console.log('page-->2', pagebuilder.length);
+    //         //     this.page.data.pagebuilder = pagebuilder;
+
+    //         //     resolve(html);
+    //         // })
+    //       });
+    //     }
+    //   });
+    // });
   },
 
   getBlog: async function (req) {
@@ -176,11 +178,11 @@ module.exports = contentService = {
   //     });
   // },
 
-  processTemplate: async function (html) {
+  processTemplate: async function () {
     globalService.pageContent = ""; //reset
     // this.setupShortCodeParser();
     // console.log('=== processTemplate ===')
-    const $ = cheerio.load(html);
+    const $ = cheerio.load("");
 
     await this.processSections($);
     await this.processDelayedModules();
