@@ -4,7 +4,7 @@ var globalService = require("../services/global.service");
 var cacheService = require("../services/cache.service");
 
 // globalService.startup();
-var themes = require(__dirname + "../../themes/themes");
+// var themes = require(__dirname + "../../themes/themes");
 var pageBuilderService = require("../services/page-builder.service");
 // var formio = require("../services/formio.service");
 var adminService = require("../services/admin.service");
@@ -39,6 +39,8 @@ const chalk = require("chalk");
 const log = console.log;
 const url = require("url");
 var admin = require(__dirname + "/admin");
+
+const theme = `${process.env.THEME}.handlebars`
 
 module.exports = function (app) {
   // app.get('/', async function (req, res) {
@@ -363,7 +365,7 @@ module.exports = function (app) {
 
   app.get("/theme1", async function (req, res) {
     let data = {};
-    res.render("sandbox", { layout: "theme1.handlebars", data: data });
+    res.render("sandbox", { layout: theme, data: data });
   });
 
   app.get("/theme2", async function (req, res) {
@@ -695,7 +697,9 @@ module.exports = function (app) {
         ip: ip,
       });
 
-      res.render("home", page);
+      res.render("home", { layout: theme, page });
+      // res.render("sandbox", { layout: theme, data: data });
+
     }
   });
 

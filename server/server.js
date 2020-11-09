@@ -1,5 +1,6 @@
 'use strict';
 const fs = require('fs')
+const path = require("path");
 initEnvFile();
 require('dotenv').config();
 var globalService = require('./services/global.service');
@@ -23,12 +24,21 @@ app.start = function () {
   //set view engine
   // app.engine('handlebars', exphbs());
   // app.set('view engine', 'handlebars');
-  var hbs = exphbs.create({ /* config */ });
+
+  let themeDirectory = path.join(__dirname, "/themes", process.env.THEME);
+  console.log('themeDirectory', themeDirectory);
+  ///Users/lanecampbell/Dev/sonicjs/server/themes/theme1/theme1.handlebars
+  // app.set('layoutsDir', themeDirectory);
+
+  var hbs = exphbs.create({
+    layoutsDir: path.join(themeDirectory)
+  });
 
   // Register `hbs.engine` with the Express app.
   app.engine('handlebars', hbs.engine);
   app.set('view engine', 'handlebars');
   app.set('views', __dirname + '/views');
+
 
 
   // Parse URL-encoded bodies (as sent by HTML forms)
