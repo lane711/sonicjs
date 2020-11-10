@@ -697,9 +697,12 @@ module.exports = function (app) {
         ip: ip,
       });
 
+      let pageData = page.page;
+      pageData.data.id = pageData.id;
+
       // res.render("home", page);
 
-      res.render("home", { layout: theme, page });
+      res.render("home", { layout: 'dark/dark', data: pageData.data });
       // res.render("sandbox", { layout: theme, data: data });
 
     }

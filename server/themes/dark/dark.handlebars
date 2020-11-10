@@ -1,23 +1,25 @@
 <!doctype html>
-<html lang="en" class="{{page.data.pageCssClass}}">
+<html lang="en" class="{{data.pageCssClass}}">
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="{{ page.data.metaDescription }}">
+  <meta name="description" content="{{ data.metaDescription }}">
   <meta name="generator" content="SonicJs">
-  <meta name="version" content="{{ page.data.appVersion }}">
+  <meta name="version" content="{{ data.appVersion }}">
   <link rel="icon" href="/img/favicon.ico">
 
-  <title>{{page.data.metaTitle}}</title>
+  <title>{{data.metaTitle}}</title>
+
+{{log data}}
 
   <!-- Web Fonts -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family={{page.data.siteSettings.fontHeaders}}">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family={{page.data.siteSettings.fontDefault}}">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family={{data.siteSettings.fontHeaders}}">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family={{data.siteSettings.fontDefault}}">
   <style>
     body,
     p {
-      font-family: '{{page.data.siteSettings.fontDefault}}',
+      font-family: '{{data.siteSettings.fontDefault}}',
       serif !important;
     }
 
@@ -27,7 +29,7 @@
     h4,
     h5,
     h6 {
-      font-family: '{{page.data.siteSettings.fontHeaders}}',
+      font-family: '{{data.siteSettings.fontHeaders}}',
       serif;
     }
   </style>
@@ -36,7 +38,7 @@
   {{!-- <link href="/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <!-- Custom styles for this template -->
-  {{#unless page.data.showPageBuilder}}
+  {{#unless data.showPageBuilder}}
   <link href="/api/containers/css/download/template.css" rel="stylesheet">
   {{/unless}}
 
@@ -50,9 +52,9 @@
 
   {{!-- <link type="text/css" href="/css/combined-0.0.8.css" rel="stylesheet"> --}}
 
-  {{{page.data.cssLinks}}}
+  {{{data.cssLinks}}}
 
-  {{#if page.data.showPageBuilder}}
+  {{#if data.showPageBuilder}}
   <link href="/page-builder/css/page-builder.css" rel="stylesheet">
   {{/if}}
 
@@ -60,7 +62,7 @@
 
   <base href="/">
 
-  {{{ page.data.headerJs }}}
+  {{{ data.headerJs }}}
 
 </head>
 
@@ -73,7 +75,7 @@
 
   <main role="main">
 
-    {{#if page.data.showPageBuilder}}
+    {{#if data.showPageBuilder}}
     {{> page-builder }}
     {{/if}}
 
@@ -85,7 +87,7 @@
     <div class="container">
       <div class="row">
         <div class="col footer-top-margin">
-          <p>-- Powered by <a href="https://sonicjs.com">SonicJs Node CMS</a></p>
+          <p>Powered by <a href="https://sonicjs.com">SonicJs Node CMS</a></p>
         </div>
         <div class="col social text-center">
           <ul>
@@ -105,7 +107,7 @@
   </footer>
 
   {{! js links here }}
-  {{{page.data.jsLinks}}}
+  {{{data.jsLinks}}}
 
   {{!-- <script src="/node_modules/jquery/dist/jquery.min.js"></script>
   <script src="/node_modules/ace-builds/src-min-noconflict/ace.js"></script>

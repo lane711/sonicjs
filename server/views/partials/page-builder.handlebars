@@ -5,7 +5,7 @@
   {
       {
         {
-        page.data.editor.css
+        data.editor.css
       }
     }
   }
@@ -63,7 +63,7 @@
           <li class="nav-title">Layout</li>
 
           <div class="section-wrapper">
-            {{#each page.data.sections}}
+            {{#each data.sections}}
             <li class="nav-item nav-dropdown pb-section" data-id="{{this.id}}">
 
 
@@ -179,7 +179,7 @@
           {{!-- <li class="nav-item">
                         <a class="btn btn-outline-success pull-right add-section" onclick="addSection()">
                             <i class="nav-icon fa fa-plus"></i>
-                            {{#if page.data.hasRows}}
+                            {{#if data.hasRows}}
                             Add Section
                             {{else}}
                             Add a section to get started
@@ -193,7 +193,7 @@
       <div class="tab-pane fade" id="template" role="tabpanel" aria-labelledby="template-tab">
         <button style="margin:10px" id="save-global-css" class="btn btn-success btn-sm ml-1 mt-1"><i
             class="nav-icon fa fa-save"></i> Save Global CSS</button>
-        <div id="editor">{{{ page.data.editor.css }}}</div>
+        <div id="editor">{{{ data.editor.css }}}</div>
 
       </div>
     </div>
@@ -279,7 +279,7 @@
         <i class="fa fa-plus"></i> Module</button>
       </button>
       <div class="dropdown-menu dropdown-menu-right" aria-labelledby="btnGroupDropModules">
-        {{#each page.data.modulesForColumns}}
+        {{#each data.modulesForColumns}}
         <a class="dropdown-item" onclick="addModule('{{this.systemid}}')"><i class="fa fa-plus"></i>
           {{this.title}}</a>
         {{/each}}

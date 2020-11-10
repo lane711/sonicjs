@@ -25,7 +25,7 @@ app.start = function () {
   // app.engine('handlebars', exphbs());
   // app.set('view engine', 'handlebars');
 
-  let themeDirectory = path.join(__dirname, "/themes", process.env.THEME);
+  let themeDirectory = path.join(__dirname, "/themes");
   console.log('themeDirectory', themeDirectory);
   ///Users/lanecampbell/Dev/sonicjs/server/themes/theme1/theme1.handlebars
   // app.set('layoutsDir', themeDirectory);
@@ -38,6 +38,8 @@ app.start = function () {
   app.engine('handlebars', hbs.engine);
   app.set('view engine', 'handlebars');
   app.set('views', __dirname + '/views');
+
+  // app.set('view options', { layout: 'dark/dark' });
 
 
 

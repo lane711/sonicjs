@@ -2,14 +2,14 @@
 
 <nav class="navbar navbar-expand-md navbar-dark bg-ptrans fixed-top drop-link">
   <a class="navbar-brand"
-    style="font-size:{{ page.data.themeSettings.fontSize }}; color:{{ page.data.themeSettings.fontColor }}" href="/">
-    {{#if (eq page.data.themeSettings.logoType "image")}}
-    <div style="{{ page.data.themeSettings.imageStyle}}"> <img src="/images/{{ page.data.themeSettings.fileName}}"
-        alt="" width="{{ page.data.themeSettings.imageWidth}}">
+    style="font-size:{{ data.themeSettings.fontSize }}; color:{{ data.themeSettings.fontColor }}" href="/">
+    {{#if (eq data.themeSettings.logoType "image")}}
+    <div style="{{ data.themeSettings.imageStyle}}"> <img src="/images/{{ data.themeSettings.fileName}}"
+        alt="" width="{{ data.themeSettings.imageWidth}}">
     </div>
     {{/if}}
-    {{#if (eq page.data.themeSettings.logoType "text")}}
-    {{ page.data.themeSettings.logoTitle }}
+    {{#if (eq data.themeSettings.logoType "text")}}
+    {{ data.themeSettings.logoTitle }}
     {{/if}}
   </a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavbar"
@@ -20,7 +20,7 @@
   <div class="collapse navbar-collapse" id="mainNavbar">
 
     <ul class="navbar-nav mr-auto main">
-      {{#each page.data.menu}}
+      {{#each data.menu}}
       <li class="nav-item {{#if this.isActive}}active{{/if}} {{#if this.showChildren}}dropdown{{/if}}">
         <a class="nav-link {{#if this.showChildren}}dropdown-toggle{{/if}}" href="{{this.data.url}}"
           {{#if this.showChildren}}data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{/if}}>
@@ -48,7 +48,7 @@
 
 
 {{#if (eq level "2")}}
-{{#if page.data.menuSecondLevel}}
+{{#if data.menuSecondLevel}}
 <nav class="navbar navbar-expand-md navbar-light sticky-top level-2" style="top:80px">
   <div class="container">
     <a class="navbar-brand d-block d-sm-none" href="/docs">
@@ -62,7 +62,7 @@
     <div class="collapse navbar-collapse offset-md-3" id="navbar-level-2">
 
       <ul class="navbar-nav mr-auto main">
-        {{#each page.data.menuSecondLevel}}
+        {{#each data.menuSecondLevel}}
         <li class="nav-item {{#if this.isActive}}active{{/if}} {{#if this.showChildren}}dropdown{{/if}}">
           <a class="nav-link {{#if this.showChildren}}dropdown-toggle{{/if}}" href="{{this.data.url}}"
             {{#if this.showChildren}}data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{/if}}>
