@@ -701,7 +701,7 @@ module.exports = function (app) {
       let pageData = page.page;
       pageData.data.id = pageData.id;
 
-      res.render("home", { layout: `front-end/${frontEndTheme}/${frontEndTheme}`, data: pageData.data });
+      res.render("main", { layout: `front-end/${frontEndTheme}/${frontEndTheme}`, data: pageData.data });
     }
   });
 

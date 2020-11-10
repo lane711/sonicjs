@@ -6,6 +6,7 @@ const path = require("path");
 var UglifyJS = require("uglify-es");
 var csso = require("csso");
 var fileName = {};
+const frontEndTheme = `${process.env.FRONT_END_THEME}`
 
 module.exports = assetService = {
   startup: async function () {
@@ -168,7 +169,7 @@ module.exports = assetService = {
       async (link) => {
         let root = link.path.startsWith("/node_modules");
         if (link.path.includes("/api/containers/css/download/template.css")) {
-          link.path = "/storage/css/template.css";
+          link.path = `themes/front-end/${frontEndTheme}/css/template.css`;
         }
         let fileContentRaw = await fileService.getFile(link.path, root);
         console.log(
