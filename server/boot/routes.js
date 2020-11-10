@@ -40,7 +40,8 @@ const log = console.log;
 const url = require("url");
 var admin = require(__dirname + "/admin");
 
-const theme = `${process.env.THEME}.handlebars`
+const frontEndTheme = `${process.env.FRONT_END_THEME}`
+const adminTheme = `${process.env.ADMIN_THEME}`
 
 module.exports = function (app) {
   // app.get('/', async function (req, res) {
@@ -78,7 +79,7 @@ module.exports = function (app) {
 
   app.get("/register", async function (req, res) {
     let data = { registerMessage: "<b>admin</b>" };
-    res.render("admin-register", { layout: "login.handlebars", data: data });
+    res.render("admin-register", { layout: `${theme}/login.handlebars`, data: data });
     return;
   });
 
@@ -509,7 +510,7 @@ module.exports = function (app) {
       if (qsParams.message) {
         data.message = qsParams.message;
       }
-      res.render("admin-login", { layout: "login.handlebars", data: data });
+      res.render("admin-login", { layout: `${theme}/login.handlebars`, data: data });
     } else if (req.url == "/admin" || req.url.startsWith("/admin/")) {
       if (!req.signedCookies.sonicjs_access_token) {
         //user not logged in
@@ -678,7 +679,7 @@ module.exports = function (app) {
       });
 
       res.render(viewName, {
-        layout: "admin.handlebars",
+        layout: `admin/${adminTheme}/${adminTheme}`,
         data: data,
         accessToken: accessToken,
       });
@@ -700,11 +701,7 @@ module.exports = function (app) {
       let pageData = page.page;
       pageData.data.id = pageData.id;
 
-      // res.render("home", page);
-
-      res.render("home", { layout: 'dark/dark', data: pageData.data });
-      // res.render("sandbox", { layout: theme, data: data });
-
+      res.render("home", { layout: `front-end/${frontEndTheme}/${frontEndTheme}`, data: pageData.data });
     }
   });
 
