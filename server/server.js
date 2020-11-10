@@ -25,19 +25,26 @@ app.start = function () {
   // app.engine('handlebars', exphbs());
   // app.set('view engine', 'handlebars');
 
-  let themeDirectory = path.join(__dirname, "/themes");
+  let themeDirectory = path.join(__dirname, 'themes');
   console.log('themeDirectory', themeDirectory);
+
+  ///Users/lanecampbell/Dev/sonicjs/server/themes/front-end/dark/partials
+  let partialsDirs = path.join(__dirname, 'themes', 'front-end', 'dark', 'partials');
+  console.log('partialsDirs', partialsDirs);
+
   ///Users/lanecampbell/Dev/sonicjs/server/themes/theme1/theme1.handlebars
   // app.set('layoutsDir', themeDirectory);
 
   var hbs = exphbs.create({
-    layoutsDir: path.join(themeDirectory)
+    layoutsDir: path.join(themeDirectory),
+    partialsDir: partialsDirs
   });
 
   // Register `hbs.engine` with the Express app.
   app.engine('handlebars', hbs.engine);
   app.set('view engine', 'handlebars');
   app.set('views', __dirname + '/views');
+
 
   // app.set('view options', { layout: 'dark/dark' });
 
@@ -78,8 +85,6 @@ app.start = function () {
           return Array.prototype.slice.call(arguments, 0, -1).some(Boolean);
       }
   });
-
-
 
   // Parse JSON bodies (as sent by API clients)
   app.use(express.json());
