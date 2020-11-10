@@ -697,6 +697,8 @@ module.exports = function (app) {
         ip: ip,
       });
 
+      // res.render("home", page);
+
       res.render("home", { layout: theme, page });
       // res.render("sandbox", { layout: theme, data: data });
 
