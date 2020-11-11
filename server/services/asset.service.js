@@ -129,6 +129,7 @@ module.exports = assetService = {
   },
 
   getThemeAssets: function(){
+    //TODO: convert to yaml
     var themeConfig = require(path.join(__dirname, '..', 'themes', 'front-end', frontEndTheme,  `${frontEndTheme}.config.json`));
     console.log(themeConfig);
   },
