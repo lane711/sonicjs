@@ -2,17 +2,22 @@
   "ids": {
     "contentType": 61,
     "content": 49,
-    "user": 1,
-    "AccessToken": 1,
+    "user": 2,
+    "AccessToken": 2,
     "ACL": 1,
-    "RoleMapping": 1,
+    "RoleMapping": 3,
     "Role": 3
   },
   "models": {
-    "user": {},
+    "user": {
+      "1": "{\"password\":\"$2a$10$3IXvE0QuG7zjGybM3p7j2.DCIWjoGByX2/OO9.XaR2c32tn8p8NtS\",\"email\":\"a@a.com\",\"roles\":[1],\"id\":1}"
+    },
     "AccessToken": {},
     "ACL": {},
-    "RoleMapping": {},
+    "RoleMapping": {
+      "1": "{\"principalType\":\"user\",\"principalId\":\"1\",\"roleId\":null,\"id\":1}",
+      "2": "{\"principalType\":\"user\",\"principalId\":\"1\",\"roleId\":null,\"id\":2}"
+    },
     "Role": {
       "1": "{\"id\":1,\"name\":\"admin\",\"description\":\"The admin role can perform all operations.\",\"created\":\"2020-09-12T02:20:32.331Z\",\"modified\":\"2020-09-12T02:20:32.331Z\",\"contentType\":\"Role\",\"submit\":true}",
       "2": "{\"id\":2,\"name\":\"editor\",\"description\":\"The editor role can manage content, but not access administrative functions.\",\"created\":\"2020-09-12T02:20:38.153Z\",\"modified\":\"2020-09-12T02:20:38.153Z\",\"contentType\":\"Role\",\"submit\":true}"

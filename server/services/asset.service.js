@@ -6,31 +6,44 @@ const path = require("path");
 var UglifyJS = require("uglify-es");
 var csso = require("csso");
 var fileName = {};
+var piler = require("piler");
+var clientJs = piler.createJSManager();
+var clientCss = piler.createCSSManager();
 
 module.exports = assetService = {
   startup: async function () {
     emitterService.on("getRenderedPagePostDataFetch", async function (
       options
     ) {
-      if (options && options.page) {
-        options.page.data.jsLinks = "";
-        options.page.data.cssLinks = "";
 
-        let assetFilesExist = await assetService.doesAssetFilesExist();
+      let path1 = path.join(__dirname, "..", "storage/css/template.css");
+      console.log(path1)
+      clientCss.addFile(path1);
+      clientJs.addUrl("http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js");
+      clientJs.addFile(path.join(__dirname, "..", "server/assets/js/startup.js"));
 
-        if (assetFilesExist && process.env.MODE === "production") {
-          //add combined assets
-          options.page.data.jsLinks = `<script src="/js/${assetService.getCombinedFileName(
-            "js"
-          )}"></script>`;
-          options.page.data.cssLinks = `<link href="/css/${assetService.getCombinedFileName(
-            "css"
-          )}" rel="stylesheet">`;
-        } else {
-          await assetService.getLinks(options, "js");
-          await assetService.getLinks(options, "css");
-        }
-      }
+      options.page.data.jsLinks = clientJs.renderTags();
+      options.page.data.cssLinks  = clientCss.renderTags();
+
+      // if (options && options.page) {
+      //   options.page.data.jsLinks = "";
+      //   options.page.data.cssLinks = "";
+
+      //   let assetFilesExist = await assetService.doesAssetFilesExist();
+
+      //   if (assetFilesExist && process.env.MODE === "production") {
+      //     //add combined assets
+      //     options.page.data.jsLinks = `<script src="/js/${assetService.getCombinedFileName(
+      //       "js"
+      //     )}"></script>`;
+      //     options.page.data.cssLinks = `<link href="/css/${assetService.getCombinedFileName(
+      //       "css"
+      //     )}" rel="stylesheet">`;
+      //   } else {
+      //     await assetService.getLinks(options, "js");
+      //     await assetService.getLinks(options, "css");
+      //   }
+      // }
     });
 
     emitterService.on("requestBegin", async function (options) {

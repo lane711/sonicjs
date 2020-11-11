@@ -10,6 +10,8 @@ const chalk = require('chalk');
 var express = require('express');
 var exphbs = require('express-handlebars');
 var Handlebars = require('handlebars');
+var piler = require("piler");
+const path = require("path");
 
 // var bodyParser = require('body-parser');
 
@@ -68,6 +70,7 @@ app.start = function () {
   });
 
 
+  setupPilerAssetManagement(app);
 
   // Parse JSON bodies (as sent by API clients)
   app.use(express.json());
@@ -93,6 +96,29 @@ app.start = function () {
     }
   });
 };
+
+function setupPilerAssetManagement(app){
+  console.log('loading piler');
+  var clientjs = piler.createJSManager();
+  var clientcss = piler.createCSSManager();
+
+  clientjs.bind(app);
+  clientcss.bind(app);
+
+  // clientcss.addFile(path.join(__dirname, "..", "storage/css/template.css"));
+
+  // clientjs.addUrl("http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js");
+  // clientjs.addFile(__dirname + "/client/hello.js");
+
+  //if dev
+  // clientjs.liveUpdate(clientcss);
+
+  clientjs.addOb({ VERSION: "1.0.0" });
+
+clientjs.addExec(function() {
+    alert("Hello browser" + window.navigator.appVersion);
+});
+}
 
 function initEnvFile() {
   const path = './.env'
