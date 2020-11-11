@@ -678,7 +678,7 @@ module.exports = function (app) {
         ip: ip,
       });
 
-      res.render(viewName, {
+      res.render(`admin/${adminTheme}/views/${viewName}`, {
         layout: `admin/${adminTheme}/${adminTheme}`,
         data: data,
         accessToken: accessToken,
