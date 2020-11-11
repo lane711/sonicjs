@@ -1,7 +1,7 @@
-assets
-  js
-    1.js
-    2.js
-  css
-    1.css
-    2.css
+assets:
+  js:
+    - 1.js
+    - 2.js
+  css:
+    - 1.css
+    - 2.css

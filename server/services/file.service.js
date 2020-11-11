@@ -9,6 +9,7 @@ const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 const chalk = require("chalk");
 const log = console.log;
 var path = require("path");
+const YAML = require("yaml");
 
 module.exports = fileService = {
   // startup: async function () {
@@ -46,6 +47,12 @@ module.exports = fileService = {
       adminPath = path.join(__dirname, "../", filePath);
     }
     return adminPath;
+  },
+
+  getYamlConfig: async function (path) {
+    let yamlFile = await this.getFileSync(path);
+    let parsedFile = YAML.parse(yamlFile);
+    return parsedFile;
   },
 
   writeFile: async function (filePath, fileContent) {

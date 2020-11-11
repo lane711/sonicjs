@@ -26,11 +26,11 @@ app.start = function () {
   // app.set('view engine', 'handlebars');
 
   let themeDirectory = path.join(__dirname, 'themes');
-  console.log('themeDirectory', themeDirectory);
+  // console.log('themeDirectory', themeDirectory);
 
   ///Users/lanecampbell/Dev/sonicjs/server/themes/front-end/dark/partials
   let partialsDirs = path.join(__dirname, 'themes', 'front-end', 'dark', 'partials');
-  console.log('partialsDirs', partialsDirs);
+  // console.log('partialsDirs', partialsDirs);
 
   ///Users/lanecampbell/Dev/sonicjs/server/themes/theme1/theme1.handlebars
   // app.set('layoutsDir', themeDirectory);

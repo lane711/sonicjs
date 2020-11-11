@@ -510,7 +510,7 @@ module.exports = function (app) {
       if (qsParams.message) {
         data.message = qsParams.message;
       }
-      res.render("admin-login", { layout: `${theme}/login.handlebars`, data: data });
+      res.render("admin-login", { layout: `front-end/${frontEndTheme}/login.handlebars`, data: data });
     } else if (req.url == "/admin" || req.url.startsWith("/admin/")) {
       if (!req.signedCookies.sonicjs_access_token) {
         //user not logged in

@@ -128,9 +128,9 @@ module.exports = assetService = {
     }
   },
 
-  getThemeAssets: function(){
+  getThemeAssets: async function(){
     //TODO: convert to yaml
-    var themeConfig = require(path.join(__dirname, '..', 'themes', 'front-end', frontEndTheme,  `${frontEndTheme}.config.json`));
+    var themeConfig = await fileService.getYamlConfig(path.join('themes', 'front-end', frontEndTheme,  `${frontEndTheme}.config.yml`));
     console.log(themeConfig);
   },
 

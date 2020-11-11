@@ -82,7 +82,8 @@
     "sortablejs": "^1.10.2",
     "strong-error-handler": "^3.0.0",
     "tinymce": "^5.0.7",
-    "uglify-es": "^3.3.9"
+    "uglify-es": "^3.3.9",
+    "yaml": "^1.10.0"
   },
   "devDependencies": {
     "cypress": "^5.4.0",
