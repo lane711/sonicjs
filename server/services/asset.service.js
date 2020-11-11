@@ -7,6 +7,7 @@ var UglifyJS = require("uglify-es");
 var csso = require("csso");
 var fileName = {};
 const frontEndTheme = `${process.env.FRONT_END_THEME}`
+const adminTheme = `${process.env.ADMIN_THEME}`
 
 module.exports = assetService = {
   startup: async function () {
@@ -92,6 +93,7 @@ module.exports = assetService = {
         "asset",
         `${assetType}-back-end`
       );
+      let asset2 = this.getThemeAssets();
       this.addPaths(options, assets.data.paths, assetType);
     }
 
@@ -100,6 +102,8 @@ module.exports = assetService = {
         "asset",
         `${assetType}-front-end`
       );
+      let asset2 = this.getThemeAssets();
+
       this.addPaths(options, assets.data.paths, assetType);
     }
 
@@ -122,6 +126,11 @@ module.exports = assetService = {
         }
       );
     }
+  },
+
+  getThemeAssets: function(){
+    var themeConfig = require(path.join(__dirname, '..', 'themes', 'front-end', frontEndTheme,  `${frontEndTheme}.config.json`));
+    console.log(themeConfig);
   },
 
   addPaths: function (options, paths, assetType) {
