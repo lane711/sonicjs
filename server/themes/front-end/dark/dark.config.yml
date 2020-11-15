@@ -1,7 +1,6 @@
 assets:
   js:
-    - /assets/js/startup.js:
-       isPageBuilder: true
+    - /assets/js/startup.js
     - /node_modules/jquery/dist/jquery.min.js
     - /node_modules/js-cookie/src/js.cookie.js
     - /node_modules/ace-builds/src-min-noconflict/ace.js
@@ -28,7 +27,7 @@ assets:
         isPageBuilder: true
   css:
     - /node_modules/bootstrap/dist/css/bootstrap.min.css
-    - /css/template-processed.css
+    - /themes/front-end/{{frontEndTheme}}/css/template-processed.css
     - /node_modules/font-awesome/css/font-awesome.min.css
     - /node_modules/photoswipe/dist/photoswipe.css
     - /node_modules/photoswipe/dist/default-skin/default-skin.css

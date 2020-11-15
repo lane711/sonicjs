@@ -29,8 +29,8 @@ module.exports = assetService = {
             "css"
           )}" rel="stylesheet">`;
         } else {
-          await assetService.getLinks(options, "js");
           await assetService.getLinks(options, "css");
+          await assetService.getLinks(options, "js");
         }
       }
     });
@@ -148,11 +148,16 @@ module.exports = assetService = {
   },
 
   addPath: function (options, path, assetType) {
+    this.processPathForVariables(path)
     try {
       options.page.data.links[assetType].push(path);
     } catch (error) {
       console.log(error);
     }
+  },
+
+  processPathForVariables: function (path) {
+    path.path = path.path.replace('{{frontEndTheme}}', frontEndTheme);
   },
 
   processLinksForDevMode: async function (options, assetType) {
