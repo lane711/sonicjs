@@ -142,7 +142,7 @@ module.exports = assetService = {
       }
       let skipAsset = typeOfRecord === 'object'  && !options.page.data.showPageBuilder;
       if (!skipAsset) {
-        this.addPath(options, path, assetType);
+        this.addPath(options, {path: path}, assetType);
       }
     });
   },
