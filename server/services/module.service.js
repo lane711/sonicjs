@@ -244,7 +244,7 @@ module.exports = moduleService = {
     );
     let mainServiceFilePath = path.join(
       __dirname,
-      "../views/js_templates/module-default-main-service.js"
+      "../server/assets/module-default-main-service.js"
     );
     var mainServiceFile = await viewService.getProccessedView(
       null,
