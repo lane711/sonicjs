@@ -689,7 +689,9 @@ module.exports = function (app) {
       var page = await contentService.getRenderedPage(req);
 
       if (page.page.data.title === "Not Found") {
-        res.render("404", page);
+        // res.render("404", page);
+        res.render(`front-end/${frontEndTheme}/layouts/404`, { layout: `front-end/${frontEndTheme}/${frontEndTheme}` });
+
         return;
       }
 

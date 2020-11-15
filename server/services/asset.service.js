@@ -98,13 +98,13 @@ module.exports = assetService = {
     }
 
     if (globalService.isFrontEnd) {
-      let assets = await dataService.getContentByContentTypeAndTitle(
-        "asset",
-        `${assetType}-front-end`
-      );
-      let asset2 = this.getThemeAssets();
+      // let assets = await dataService.getContentByContentTypeAndTitle(
+      //   "asset",
+      //   `${assetType}-front-end`
+      // );
+      let assets = await this.getThemeAssets();
 
-      this.addPaths(options, assets.data.paths, assetType);
+      this.addPaths(options, assets[assetType], assetType);
     }
 
     //add module js files
@@ -131,13 +131,16 @@ module.exports = assetService = {
   getThemeAssets: async function(){
     //TODO: convert to yaml
     var themeConfig = await fileService.getYamlConfig(path.join('themes', 'front-end', frontEndTheme,  `${frontEndTheme}.config.yml`));
-    console.log(themeConfig);
+    return themeConfig.assets;
   },
 
   addPaths: function (options, paths, assetType) {
     paths.forEach((path) => {
-      let skipAsset =
-        path.pageBuilderOnly && !options.page.data.showPageBuilder;
+      let typeOfRecord = typeof(path);
+      if(typeOfRecord === 'object'){
+        path = Object.keys(path)[0];
+      }
+      let skipAsset = typeOfRecord === 'object'  && !options.page.data.showPageBuilder;
       if (!skipAsset) {
         this.addPath(options, path, assetType);
       }

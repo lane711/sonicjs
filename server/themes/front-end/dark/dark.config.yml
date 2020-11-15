@@ -1,7 +1,37 @@
 assets:
   js:
-    - 1.js
-    - 2.js
+    - /assets/js/startup.js:
+       isPageBuilder: true
+    - /node_modules/jquery/dist/jquery.min.js
+    - /node_modules/js-cookie/src/js.cookie.js
+    - /node_modules/ace-builds/src-min-noconflict/ace.js
+    - /node_modules/ace-builds/src-min-noconflict/ext-beautify.js
+    - /node_modules/axios/dist/axios.min.js
+    - /node_modules/popper.js/dist/umd/popper.min.js
+    - /node_modules/bootstrap/dist/js/bootstrap.min.js
+    - /node_modules/tinymce/tinymce.min.js
+    - /node_modules/tinymce/jquery.tinymce.min.js
+    - /node_modules/jsoneditor/dist/jsoneditor.min.js
+    - /node_modules/formiojs/dist/formio.full.min.js
+    - /node_modules/photoswipe/dist/photoswipe.min.js
+    - /node_modules/photoswipe/dist/photoswipe-ui-default.min.js
+    - /node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.js
+    - /node_modules/dropzone/dist/min/dropzone.min.js
+    - /assets/js/common.js
+    - /services/shared.service.js
+    - /services/global.service.js
+    - /services/helper.service.js
+    - /services/data.service.js
+    - /services/form.service.js
+    - /services/analytics.service.js
+    - /page-builder/js/page-builder.js:
+        isPageBuilder: true
   css:
-    - 1.css
-    - 2.css
+    - /node_modules/bootstrap/dist/css/bootstrap.min.css
+    - /css/template-processed.css
+    - /node_modules/font-awesome/css/font-awesome.min.css
+    - /node_modules/photoswipe/dist/photoswipe.css
+    - /node_modules/photoswipe/dist/default-skin/default-skin.css
+    - /node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css
+    - /node_modules/formiojs/dist/formio.form.min.css
+    - /node_modules/jsoneditor/dist/jsoneditor.min.css
