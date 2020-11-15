@@ -137,6 +137,12 @@
       },
       {
         "paths": [
+          "/themes"
+        ],
+        "params": "$!../server/themes"
+      },
+      {
+        "paths": [
           "/node_modules"
         ],
         "params": "$!../node_modules"
