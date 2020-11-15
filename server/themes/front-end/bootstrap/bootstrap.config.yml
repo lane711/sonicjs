@@ -3,7 +3,8 @@ bootstrap-version:
 assets:
   js:
     - /assets/js/startup.js
-    - /themes/front-end/{{frontEndTheme}}/bootstrap.bundle.js
+    - /themes/front-end/{{frontEndTheme}}/js/bootstrap.bundle.min.js
+    - /node_modules/jquery/dist/jquery.min.js
     - /assets/js/common.js
     - /services/shared.service.js
     - /services/global.service.js

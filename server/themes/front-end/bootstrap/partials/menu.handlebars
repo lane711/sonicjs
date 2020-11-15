@@ -1,5 +1,4 @@
-{{#if (eq level "1")}}
-
+{{!--
 <nav class="navbar navbar-expand-md navbar-dark bg-ptrans fixed-top drop-link">
   <a class="navbar-brand"
     style="font-size:{{ data.themeSettings.fontSize }}; color:{{ data.themeSettings.fontColor }}" href="/">
@@ -42,48 +41,55 @@
     {{> menu-github}}
 
   </div>
-</nav>
-
-{{/if}}
+</nav> --}}
 
 
-{{#if (eq level "2")}}
-{{#if data.menuSecondLevel}}
-<nav class="navbar navbar-expand-md navbar-light sticky-top level-2" style="top:80px">
-  <div class="container">
-    <a class="navbar-brand d-block d-sm-none" href="/docs">
-      Documentation
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-level-2"
-      aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
 
-    <div class="collapse navbar-collapse offset-md-3" id="navbar-level-2">
+  <header>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+      <a class="navbar-brand" href="#">Fixed navbar</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+        aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+          </li>
 
-      <ul class="navbar-nav mr-auto main">
-        {{#each data.menuSecondLevel}}
-        <li class="nav-item {{#if this.isActive}}active{{/if}} {{#if this.showChildren}}dropdown{{/if}}">
-          <a class="nav-link {{#if this.showChildren}}dropdown-toggle{{/if}}" href="{{this.data.url}}"
-            {{#if this.showChildren}}data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{/if}}>
-            {{this.data.title}}
-            <span class="sr-only">(current)</span></a>
+                {{#each data.menu}}
+      <li class="nav-item {{#if this.isActive}}active{{/if}} {{#if this.showChildren}}dropdown{{/if}}">
+        <a class="nav-link {{#if this.showChildren}}dropdown-toggle{{/if}}" href="{{this.data.url}}"
+          {{#if this.showChildren}}data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{/if}}>
+          {{this.data.title}}
+          <span class="sr-only">(current)</span></a>
 
-          {{#if this.showChildren}}
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            {{#each this.children}}
-            <a class="dropdown-item" href="{{this.data.url}}">{{this.data.title}}</a>
-            {{/each}}
-          </div>
-          {{/if}}
+        {{#if this.showChildren}}
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          {{#each this.children}}
+          <a class="dropdown-item" href="{{this.data.url}}">{{this.data.title}}</a>
+          {{/each}}
+        </div>
+        {{/if}}
 
-        </li>
-        {{/each}}
-      </ul>
+      </li>
+      {{/each}}
 
-    </div>
-  </div>
-</nav>
 
-{{/if}}
-{{/if}}
+        </ul>
+        <form class="form-inline mt-2 mt-md-0">
+          <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+      </div>
+    </nav>
+  </header>
+
