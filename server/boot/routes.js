@@ -510,7 +510,7 @@ module.exports = function (app) {
       if (qsParams.message) {
         data.message = qsParams.message;
       }
-      res.render("admin-login", { layout: `front-end/${frontEndTheme}/login.handlebars`, data: data });
+      res.render("admin/shared-views/admin-login", { layout: `front-end/${frontEndTheme}/login.handlebars`, data: data });
     } else if (req.url == "/admin" || req.url.startsWith("/admin/")) {
       if (!req.signedCookies.sonicjs_access_token) {
         //user not logged in
@@ -701,7 +701,7 @@ module.exports = function (app) {
       let pageData = page.page;
       pageData.data.id = pageData.id;
 
-      res.render("main", { layout: `front-end/${frontEndTheme}/${frontEndTheme}`, data: pageData.data });
+      res.render(`front-end/${frontEndTheme}/${frontEndTheme}`, { layout: `front-end/${frontEndTheme}/${frontEndTheme}`, data: pageData.data });
     }
   });
 

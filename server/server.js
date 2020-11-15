@@ -30,6 +30,7 @@ app.start = function () {
   let partialsDirs = [
     path.join(__dirname, "themes", "front-end", frontEndTheme, "partials"),
     path.join(__dirname, "themes", "admin", adminTheme, "partials"),
+    path.join(__dirname, "themes", "admin", "shared-partials"),
   ];
   // console.log('partialsDirs', partialsDirs);
 
