@@ -1,0 +1,22 @@
+bootstrap-version:
+  4.5.2
+assets:
+  js:
+    - /assets/js/startup.js
+    - /themes/front-end/{{frontEndTheme}}/bootstrap.bundle.js
+    - /assets/js/common.js
+    - /services/shared.service.js
+    - /services/global.service.js
+    - /services/helper.service.js
+    - /services/data.service.js
+    - /services/form.service.js
+    - /services/analytics.service.js
+    - /page-builder/js/page-builder.js:
+        isPageBuilder: true
+  css:
+    - /themes/front-end/{{frontEndTheme}}/css/bootstrap.min.css
+    - /themes/front-end/{{frontEndTheme}}/css/sticky-footer-navbar.css
+    - /themes/front-end/{{frontEndTheme}}/css/template-processed.css
+    - /node_modules/font-awesome/css/font-awesome.min.css
+    - /node_modules/formiojs/dist/formio.form.min.css
+    - /node_modules/jsoneditor/dist/jsoneditor.min.css
