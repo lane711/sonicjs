@@ -1,0 +1,89 @@
+{{#if (eq level "1")}}
+
+<nav class="navbar navbar-expand-md navbar-dark bg-ptrans fixed-top drop-link">
+  <a class="navbar-brand"
+    style="font-size:{{ data.themeSettings.fontSize }}; color:{{ data.themeSettings.fontColor }}" href="/">
+    {{#if (eq data.themeSettings.logoType "image")}}
+    <div style="{{ data.themeSettings.imageStyle}}"> <img src="/images/{{ data.themeSettings.fileName}}"
+        alt="" width="{{ data.themeSettings.imageWidth}}">
+    </div>
+    {{/if}}
+    {{#if (eq data.themeSettings.logoType "text")}}
+    {{ data.themeSettings.logoTitle }}
+    {{/if}}
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavbar"
+    aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="mainNavbar">
+
+    <ul class="navbar-nav mr-auto main">
+      {{#each data.menu}}
+      <li class="nav-item {{#if this.isActive}}active{{/if}} {{#if this.showChildren}}dropdown{{/if}}">
+        <a class="nav-link {{#if this.showChildren}}dropdown-toggle{{/if}}" href="{{this.data.url}}"
+          {{#if this.showChildren}}data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{/if}}>
+          {{this.data.title}}
+          <span class="sr-only">(current)</span></a>
+
+        {{#if this.showChildren}}
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          {{#each this.children}}
+          <a class="dropdown-item" href="{{this.data.url}}">{{this.data.title}}</a>
+          {{/each}}
+        </div>
+        {{/if}}
+
+      </li>
+      {{/each}}
+    </ul>
+
+    {{> menu-github}}
+
+  </div>
+</nav>
+
+{{/if}}
+
+
+{{#if (eq level "2")}}
+{{#if data.menuSecondLevel}}
+<nav class="navbar navbar-expand-md navbar-light sticky-top level-2" style="top:80px">
+  <div class="container">
+    <a class="navbar-brand d-block d-sm-none" href="/docs">
+      Documentation
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-level-2"
+      aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse offset-md-3" id="navbar-level-2">
+
+      <ul class="navbar-nav mr-auto main">
+        {{#each data.menuSecondLevel}}
+        <li class="nav-item {{#if this.isActive}}active{{/if}} {{#if this.showChildren}}dropdown{{/if}}">
+          <a class="nav-link {{#if this.showChildren}}dropdown-toggle{{/if}}" href="{{this.data.url}}"
+            {{#if this.showChildren}}data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{/if}}>
+            {{this.data.title}}
+            <span class="sr-only">(current)</span></a>
+
+          {{#if this.showChildren}}
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            {{#each this.children}}
+            <a class="dropdown-item" href="{{this.data.url}}">{{this.data.title}}</a>
+            {{/each}}
+          </div>
+          {{/if}}
+
+        </li>
+        {{/each}}
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+{{/if}}
+{{/if}}
