@@ -40,7 +40,7 @@ const log = console.log;
 const url = require("url");
 var admin = require(__dirname + "/admin");
 
-const frontEndTheme = `${process.env.FRONT_END_THEME}`
+var frontEndTheme = `${process.env.FRONT_END_THEME}`
 const adminTheme = `${process.env.ADMIN_THEME}`
 
 module.exports = function (app) {
@@ -702,6 +702,8 @@ module.exports = function (app) {
 
       let pageData = page.page;
       pageData.data.id = pageData.id;
+
+      frontEndTheme = 'bootstrap';
 
       res.render(`front-end/${frontEndTheme}/layouts/main`, { layout: `front-end/${frontEndTheme}/${frontEndTheme}`, data: pageData.data });
     }

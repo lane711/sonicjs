@@ -1,4 +1,4 @@
-body {
+/* body {
   padding-top: 5rem;
   background: {{bodyBackground}};
   padding: 0;
@@ -18,7 +18,7 @@ h1, h2, h3, h4 {
   -o-background-size: cover;
   background-size: cover
 } */
-
+/*
 .hero h1 {
   font-size: 5vw;
   color: #fff;

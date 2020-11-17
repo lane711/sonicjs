@@ -6,14 +6,12 @@ const path = require("path");
 var UglifyJS = require("uglify-es");
 var csso = require("csso");
 var fileName = {};
-const frontEndTheme = `${process.env.FRONT_END_THEME}`
-const adminTheme = `${process.env.ADMIN_THEME}`
+var frontEndTheme = `${process.env.FRONT_END_THEME}`;
+const adminTheme = `${process.env.ADMIN_THEME}`;
 
 module.exports = assetService = {
   startup: async function () {
-    emitterService.on("getRenderedPagePostDataFetch", async function (
-      options
-    ) {
+    emitterService.on("getRenderedPagePostDataFetch", async function (options) {
       if (options && options.page) {
         options.page.data.jsLinks = "";
         options.page.data.cssLinks = "";
@@ -126,29 +124,49 @@ module.exports = assetService = {
         }
       );
     }
+
+    // add css for current theme
+    // if (assetType === "css") {
+    //   this.addPath(
+    //     options,
+    //     {
+    //       path: `/themes/front-end/cerulean/css/template-processed.css`,
+    //     },
+    //     assetType
+    //   );
+    // }
   },
 
-  getThemeAssets: async function(){
+  getThemeAssets: async function () {
     //TODO: convert to yaml
-    var themeConfig = await fileService.getYamlConfig(path.join('themes', 'front-end', frontEndTheme,  `${frontEndTheme}.config.yml`));
+    frontEndTheme = "bootstrap";
+    var themeConfig = await fileService.getYamlConfig(
+      path.join(
+        "themes",
+        "front-end",
+        frontEndTheme,
+        `${frontEndTheme}.config.yml`
+      )
+    );
     return themeConfig.assets;
   },
 
   addPaths: function (options, paths, assetType) {
     paths.forEach((path) => {
-      let typeOfRecord = typeof(path);
-      if(typeOfRecord === 'object'){
+      let typeOfRecord = typeof path;
+      if (typeOfRecord === "object") {
         path = Object.keys(path)[0];
       }
-      let skipAsset = typeOfRecord === 'object'  && !options.page.data.showPageBuilder;
+      let skipAsset =
+        typeOfRecord === "object" && !options.page.data.showPageBuilder;
       if (!skipAsset) {
-        this.addPath(options, {path: path}, assetType);
+        this.addPath(options, { path: path }, assetType);
       }
     });
   },
 
   addPath: function (options, path, assetType) {
-    this.processPathForVariables(path)
+    this.processPathForVariables(path);
     try {
       options.page.data.links[assetType].push(path);
     } catch (error) {
@@ -157,7 +175,7 @@ module.exports = assetService = {
   },
 
   processPathForVariables: function (path) {
-    path.path = path.path.replace('{{frontEndTheme}}', frontEndTheme);
+    path.path = path.path.replace("{{frontEndTheme}}", frontEndTheme);
   },
 
   processLinksForDevMode: async function (options, assetType) {
@@ -187,7 +205,7 @@ module.exports = assetService = {
       async (link) => {
         let root = link.path.startsWith("/node_modules");
         if (link.path.includes("/api/containers/css/download/template.css")) {
-          link.path = `themes/front-end/${frontEndTheme}/css/template.css`;
+          link.path = `themes/front-end/${frontEndTheme}/css/template-processed.css`;
         }
         let fileContentRaw = await fileService.getFile(link.path, root);
         console.log(

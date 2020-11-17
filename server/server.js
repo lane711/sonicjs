@@ -28,6 +28,7 @@ app.start = function () {
 
   ///Users/lanecampbell/Dev/sonicjs/server/themes/front-end/dark/partials
   let partialsDirs = [
+    path.join(__dirname, "themes", "front-end", "bootstrap", "partials"),
     path.join(__dirname, "themes", "front-end", frontEndTheme, "partials"),
     path.join(__dirname, "themes", "admin", adminTheme, "partials"),
     path.join(__dirname, "themes", "admin", "shared-partials"),
