@@ -109,9 +109,9 @@ $(document).ready(async function () {
     $("#menuTree").jstree("select_node", ".jstree-container-ul li:first");
   });
 
-  $("#menuMainEdit").on("change", "#title", function () {
-    updateTreeData();
-  });
+  // $("#menuMainEdit").on("change", "#title", function () {
+  //   updateTreeData();
+  // });
 });
 
 function updateTreeData(formData) {
@@ -147,3 +147,30 @@ function formChanged(formData) {
   // console.log("jstree formData", formData);
   updateTreeData(formData);
 }
+
+function loadMenuTitleForm() {
+  console.log('loading menuMainEdit form')
+  let menuTitle = $('#menuTitle').val();
+  Formio.createForm(document.getElementById('menuMainEdit'), {
+    components: [
+      {
+        type: 'textfield',
+        key: 'title',
+        label: 'Menu Title',
+        placeholder: 'ie: Main, Sidebar, Footer',
+        input: true
+      }
+    ]
+  })
+    .then(function (form) {
+      form.submission = {
+        data: {
+          title: menuTitle
+        }
+      };
+    });
+}
+
+$(document).ready(function () {
+  loadMenuTitleForm();
+})

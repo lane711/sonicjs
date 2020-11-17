@@ -11,30 +11,8 @@
         <div class="row">
           <div class="col-md-4">
 
-            <script type='text/javascript'>
-              window.onload = function () {
-                console.log('loading menuMainEdit form')
-                let menuTitle = '{{data.data.title}}';
-                Formio.createForm(document.getElementById('menuMainEdit'), {
-                  components: [
-                    {
-                      type: 'textfield',
-                      key: 'title',
-                      label: 'Menu Title',
-                      placeholder: 'ie: Main, Sidebar, Footer',
-                      input: true
-                    }
-                  ]
-                })
-                  .then(async function (form) {
-                    form.submission = {
-                      data: {
-                        title: menuTitle
-                      }
-                    };
-                  });
-              }
-            </script>
+{{ log data.data }}
+            <input type="hidden" id="menuTitle" value="{{data.data.title}}"" />
 
             <div id="menuMainEdit"></div>
             <hr>
