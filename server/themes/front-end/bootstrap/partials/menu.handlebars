@@ -104,7 +104,7 @@
           </div>
         </li>
 
-{{ log data.menu }}
+{{!-- {{ log data.menu }} --}}
         {{#each data.menu}}
         <li class="nav-item {{#if this.isActive}}active{{/if}} {{#if this.showChildren}}dropdown{{/if}}">
           <a class="nav-link {{#if this.showChildren}}dropdown-toggle{{/if}}" href="{{this.data.url}}"

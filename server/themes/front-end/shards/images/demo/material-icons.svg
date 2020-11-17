@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="165px" height="165px" viewBox="0 0 165 165" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 47 (45396) - http://www.bohemiancoding.com/sketch -->
+    <title>material icons logo</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Demo-Page" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Desktop-HD" transform="translate(-502.000000, -3768.000000)">
+            <g id="Icons" transform="translate(-2.000000, 3384.000000)">
+                <g id="Card" transform="translate(427.000000, 384.000000)">
+                    <g id="Material-Icons">
+                        <g id="material-icons-logo" transform="translate(77.000000, 0.000000)">
+                            <circle id="Oval" fill="#2979FF" fill-rule="nonzero" cx="82.5" cy="82.5" r="82.5"></circle>
+                            <rect id="Rectangle-path" transform="translate(82.500000, 82.500000) rotate(180.000000) translate(-82.500000, -82.500000) " x="0" y="0" width="165" height="165"></rect>
+                            <circle id="Oval" fill="#40C4FF" fill-rule="nonzero" cx="83" cy="83" r="55"></circle>
+                            <circle id="Oval" fill="#FFFFFF" fill-rule="nonzero" cx="82.5" cy="82.5" r="27.5"></circle>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
