@@ -139,7 +139,7 @@ module.exports = assetService = {
 
   getThemeAssets: async function () {
     //TODO: convert to yaml
-    frontEndTheme = "bootstrap";
+    // frontEndTheme = "bootstrap";
     var themeConfig = await fileService.getYamlConfig(
       path.join(
         "themes",
