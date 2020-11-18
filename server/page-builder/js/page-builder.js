@@ -1413,7 +1413,7 @@ async function postProcessNewContent(content) {
 
 //TODO, make this just refresh the body content with a full get
 function fullPageUpdate(url = undefined) {
-  debugger;
+  // debugger;
   console.log("refreshing page");
   if (url) {
     window.location.replace(url);

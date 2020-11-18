@@ -45,7 +45,72 @@
 
 {{!-- ============== --}}
 
-<div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
+<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+  <h5 class="my-0 mr-md-auto font-weight-normal">Company name</h5>
+  <nav class="my-2 my-md-0 mr-md-3">
+
+    <ul class="nav justify-content-end">
+      {{!-- <li class="nav-item">
+        <a class="nav-link active" href="#">Active</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Link</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Link</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+      </li> --}}
+
+      {{#each data.menu}}
+      <li class="nav-item {{#if this.isActive}}active{{/if}} {{#if this.showChildren}}dropdown{{/if}}">
+        <a class="nav-link {{#if this.showChildren}}dropdown-toggle{{/if}}" href="{{this.data.url}}"
+          {{#if this.showChildren}}data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{/if}}>
+          {{this.data.title}}
+          <span class="sr-only">(current)</span></a>
+
+        {{#if this.showChildren}}
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          {{#each this.children}}
+          <a class="dropdown-item" href="{{this.data.url}}">{{this.data.title}}</a>
+          {{/each}}
+        </div>
+        {{/if}}
+      </li>
+      {{/each}}
+      </li>
+    </ul>
+
+    {{!-- <a class="p-2 text-dark" href="#">Features</a>
+    <a class="p-2 text-dark" href="#">Enterprise</a>
+    <a class="p-2 text-dark" href="#">Support</a>
+    <a class="p-2 text-dark" href="#">Pricing</a>
+    <ul class="navbar-nav mr-auto main">
+    {{#each data.menu}}
+    <li class="nav-item {{#if this.isActive}}active{{/if}} {{#if this.showChildren}}dropdown{{/if}}">
+      <a class="nav-link {{#if this.showChildren}}dropdown-toggle{{/if}}" href="{{this.data.url}}"
+        {{#if this.showChildren}}data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{/if}}>
+        {{this.data.title}}
+        <span class="sr-only">(current)</span></a>
+
+      {{#if this.showChildren}}
+      <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+        {{#each this.children}}
+        <a class="dropdown-item" href="{{this.data.url}}">{{this.data.title}}</a>
+        {{/each}}
+      </div>
+      {{/if}}
+
+    </li>
+    {{/each}} --}}
+    </ul>
+  </nav>
+  <a class="btn btn-outline-primary" href="#">Sign up</a>
+</div>
+
+{{!--
+<div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary mb-4">
   <div class="container">
     <a href="../" class="navbar-brand">Bootswatch</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
@@ -105,7 +170,7 @@
         </li>
 
 {{!-- {{ log data.menu }} --}}
-        {{#each data.menu}}
+{{!-- {{#each data.menu}}
         <li class="nav-item {{#if this.isActive}}active{{/if}} {{#if this.showChildren}}dropdown{{/if}}">
           <a class="nav-link {{#if this.showChildren}}dropdown-toggle{{/if}}" href="{{this.data.url}}"
             {{#if this.showChildren}}data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{/if}}>
@@ -126,4 +191,4 @@
       </ul>
     </div>
   </div>
-</div>
+</div> --}}

@@ -39,7 +39,8 @@
     <div class="tab-content" id="myTabContent">
       <div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
 
-        <button type="button" id="btn-add-page" onclick="openForm('add','page')" class="btn btn-success btn-sm ml-1 mt-1" data-dismiss="modal">Add
+        <button type="button" id="btn-add-page" onclick="openForm('add','page')"
+          class="btn btn-success btn-sm ml-1 mt-1" data-dismiss="modal">Add
           Page</button>
 
       </div>
@@ -51,7 +52,8 @@
           <li class="nav-title">Page Settings</li>
 
           <li class="nav-item nav-dropdown">
-            <a class="nav-link white" id="page-settings" onclick="return openForm('edit','page')" href="javascript:void(0);">
+            <a class="nav-link white" id="page-settings" onclick="return openForm('edit','page')"
+              href="javascript:void(0);">
               <i class="nav-icon fa fa-gear"></i> Page Settings</a>
           </li>
 
@@ -291,7 +293,11 @@
 
 
   <button class="sidebar-minimizer brand-minimizer" type="button"></button>
+
+
 </div>
+
+  <button class="sidebar-expander" id="sidebar-expander" type="button"></button>
 
 <!-- WYSIWYG Modal -->
 <div class="modal fade admin-field-add" id="wysiwygModal" tabindex="-1" role="dialog"
