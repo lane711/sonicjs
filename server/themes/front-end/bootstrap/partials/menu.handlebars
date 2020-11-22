@@ -46,7 +46,21 @@
 {{!-- ============== --}}
 
 <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
-  <h5 class="my-0 mr-md-auto font-weight-normal">Company name</h5>
+
+  {{#if (eq data.themeSettings.logoType "text")}}
+  <h5 class="my-0 mr-md-auto font-weight-normal">{{ data.themeSettings.logoTitle }}</h5>
+  {{/if}}
+
+  {{#if (eq data.themeSettings.logoType "image")}}
+  <div style="{{ data.themeSettings.imageStyle}}" class="mr-md-auto">
+    <img src="/images/{{ data.themeSettings.fileName}}" alt=""
+      width="{{ data.themeSettings.imageWidth}}">
+  </div>
+  {{/if}}
+
+    {{!-- <h5 class="my-0 mr-md-auto font-weight-normal">{{ data.themeSettings.logoTitle }}</h5> --}}
+
+
   <nav class="my-2 my-md-0 mr-md-3">
 
     <ul class="nav justify-content-end">
