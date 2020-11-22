@@ -17,9 +17,9 @@ module.exports = assetService = {
         options.page.data.jsLinks = "";
         options.page.data.cssLinks = "";
 
-        let assetFilesExist = await assetService.doesAssetFilesExist();
+        if (process.env.MODE === "production") {
+          let assetFilesExist = await assetService.doesAssetFilesExist();
 
-        if (assetFilesExist && process.env.MODE === "production") {
           //add combined assets
           options.page.data.jsLinks = `<script src="/js/${assetService.getCombinedFileName(
             "js"
