@@ -7,6 +7,7 @@ var UglifyJS = require("uglify-es");
 var csso = require("csso");
 var fileName = {};
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
+var frontEndThemeBootswatch = `${process.env.FRONT_END_THEME_BOOTSWATCH}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
 
 module.exports = assetService = {
@@ -126,15 +127,15 @@ module.exports = assetService = {
     }
 
     // add css for current theme
-    // if (assetType === "css") {
-    //   this.addPath(
-    //     options,
-    //     {
-    //       path: `/themes/front-end/cerulean/css/template-processed.css`,
-    //     },
-    //     assetType
-    //   );
-    // }
+    if (assetType === "css") {
+      this.addPath(
+        options,
+        {
+          path: `/node_modules/bootswatch/dist/${frontEndThemeBootswatch}/bootstrap.min.css`,
+        },
+        assetType
+      );
+    }
   },
 
   getThemeAssets: async function () {
