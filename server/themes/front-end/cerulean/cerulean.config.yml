@@ -1,6 +1,0 @@
-base: bootstrap
-
-assets:
-  js:
-  css:
-    - /themes/front-end/{{frontEndTheme}}/css/template-processed.css

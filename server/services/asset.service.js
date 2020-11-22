@@ -128,13 +128,15 @@ module.exports = assetService = {
 
     // add css for current theme
     if (assetType === "css") {
-      this.addPath(
-        options,
-        {
-          path: `/node_modules/bootswatch/dist/${frontEndThemeBootswatch}/bootstrap.min.css`,
-        },
-        assetType
-      );
+      if (frontEndThemeBootswatch) {
+        this.addPath(
+          options,
+          {
+            path: `/node_modules/bootswatch/dist/${frontEndThemeBootswatch}/bootstrap.min.css`,
+          },
+          assetType
+        );
+      }
     }
   },
 
