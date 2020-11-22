@@ -104,6 +104,19 @@ module.exports = assetService = {
       let assets = await this.getThemeAssets();
 
       this.addPaths(options, assets[assetType], assetType);
+
+      // add css for current theme
+      if (assetType === "css") {
+        if (frontEndThemeBootswatch) {
+          this.addPath(
+            options,
+            {
+              path: `/node_modules/bootswatch/dist/${frontEndThemeBootswatch}/bootstrap.min.css`,
+            },
+            assetType
+          );
+        }
+      }
     }
 
     //add module js files
@@ -124,19 +137,6 @@ module.exports = assetService = {
           this.addPath(options, { path: path }, assetType);
         }
       );
-    }
-
-    // add css for current theme
-    if (assetType === "css") {
-      if (frontEndThemeBootswatch) {
-        this.addPath(
-          options,
-          {
-            path: `/node_modules/bootswatch/dist/${frontEndThemeBootswatch}/bootstrap.min.css`,
-          },
-          assetType
-        );
-      }
     }
   },
 
