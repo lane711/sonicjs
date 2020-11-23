@@ -20,6 +20,15 @@ module.exports = assetService = {
         if (process.env.MODE === "production") {
           let assetFilesExist = await assetService.doesAssetFilesExist();
 
+          if(process.env.REBUILD_ASSETS === 'TRUE' || !assetFilesExist){
+            //rebuild the assets before delivering
+            await assetService.getLinks(options, "css");
+            await assetService.getLinks(options, "js");
+
+            //file will now exist, so no need to rebuild
+            process.env.REBUILD_ASSETS = 'FALSE'
+          }
+
           //add combined assets
           options.page.data.jsLinks = `<script src="/js/${assetService.getCombinedFileName(
             "js"
