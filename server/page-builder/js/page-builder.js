@@ -70,7 +70,7 @@ async function setPage() {
 async function setContentType() {
   let contentTypeId = $("#contentTypeId").val();
   if (contentTypeId) {
-    this.contentType = await getContentType(contentTypeId);
+    this.contentType = await dataService.getContentType(contentTypeId);
   }
 }
 
@@ -540,23 +540,6 @@ async function getContentInstance(id) {
     .then(async function (response) {
       // console.log(response);
       return await response.data;
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-}
-
-async function getContentType(systemId) {
-  const filter = `{"where":{"systemid":"${systemId}"}}`;
-  const encodedFilter = encodeURI(filter);
-  let url = `/api/contentTypes?filter=${encodedFilter}`;
-  return axiosInstance
-    .get(url)
-    .then(async function (record) {
-      if (record.data[0]) {
-        return record.data[0];
-      }
-      return "not found";
     })
     .catch(function (error) {
       console.log(error);
