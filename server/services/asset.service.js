@@ -37,6 +37,7 @@ module.exports = assetService = {
             "css"
           )}" rel="stylesheet">`;
         } else {
+          await fileService.updateEnvFileVariable('REBUILD_ASSETS', 'TRUE');
           await assetService.getLinks(options, "css");
           await assetService.getLinks(options, "js");
         }

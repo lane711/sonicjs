@@ -90,8 +90,6 @@ module.exports = fileService = {
     let parsedFile = parse(envFile);
     parsedFile[variableName] = variableValue;
     let envFileContent = stringify(parsedFile)
-    await this.writeFile('../.env', envFileContent);
-    // fs.writeFileSync('./.env', envfile.stringifySync(parsedFile))
-
+    await this.writeFile('../../.env', envFileContent);
   },
 };
