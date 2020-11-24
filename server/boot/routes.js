@@ -79,7 +79,7 @@ module.exports = function (app) {
 
   app.get("/register", async function (req, res) {
     let data = { registerMessage: "<b>admin</b>" };
-    res.render("admin-register", { layout: `${theme}/login.handlebars`, data: data });
+    res.render("admin/shared-views/admin-register", { layout: `front-end/${frontEndTheme}/login.handlebars`, data: data });
     return;
   });
 
