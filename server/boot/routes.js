@@ -500,6 +500,7 @@ module.exports = function (app) {
     ) {
       if (process.env.MODE !== "dev") {
         res.send(401);
+        return;
       }
 
       let qsParams = url.parse(req.url, true).query;
