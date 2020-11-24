@@ -47,7 +47,7 @@
     "datatables.net-buttons-bs4": "^1.6.1",
     "dotenv": "^8.2.0",
     "dropzone": "^5.7.0",
-    "envfile": "^6.12.0",
+    "envfile": "^6.14.0",
     "express-handlebars": "^3.1.0",
     "flag-icon-css": "^3.3.0",
     "font-awesome": "^4.7.0",

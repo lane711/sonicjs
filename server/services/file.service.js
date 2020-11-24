@@ -10,6 +10,7 @@ const chalk = require("chalk");
 const log = console.log;
 var path = require("path");
 const YAML = require("yaml");
+const { parse, stringify } = require('envfile')
 
 module.exports = fileService = {
   // startup: async function () {
@@ -80,5 +81,17 @@ module.exports = fileService = {
     let dirPath = path.join(__dirname.replace("services", ""), filePath);
     let fileExist = fs.existsSync(dirPath);
     return fileExist;
+  },
+
+  updateEnvFileVariable: async function (variableName, variableValue) {
+    process.env.REBUILD_ASSETS = 'FALSE'
+
+    let envFile = await this.getFileSync('.env', true);
+    let parsedFile = parse(envFile);
+    parsedFile[variableName] = variableValue;
+    let envFileContent = stringify(parsedFile)
+    await this.writeFile('../.env', envFileContent);
+    // fs.writeFileSync('./.env', envfile.stringifySync(parsedFile))
+
   },
 };

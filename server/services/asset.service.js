@@ -26,7 +26,7 @@ module.exports = assetService = {
             await assetService.getLinks(options, "js");
 
             //file will now exist, so no need to rebuild
-            process.env.REBUILD_ASSETS = 'FALSE'
+            await fileService.updateEnvFileVariable('REBUILD_ASSETS', 'FALSE');
           }
 
           //add combined assets
