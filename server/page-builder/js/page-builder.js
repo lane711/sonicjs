@@ -972,6 +972,7 @@ async function setupFormBuilder(contentType) {
 }
 
 async function onContentTypeSave() {
+  debugger;
   if (contentTypeComponents) {
     console.log("contentTypeComponents", contentTypeComponents);
     contentType.data.components = contentTypeComponents;

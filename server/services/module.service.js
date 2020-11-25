@@ -132,6 +132,7 @@ module.exports = moduleService = {
           if (file.indexOf("models") > -1) {
             let contentTypeRaw =  fileService.getFileSync(file, false, true);
             let contentType = JSON.parse(contentTypeRaw);
+            contentType.filePath = file;
             globalService.moduleContentTypes.push(contentType);
           }
         });

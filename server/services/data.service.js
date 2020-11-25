@@ -111,7 +111,7 @@ if (typeof module !== "undefined" && module.exports) {
         );
         return contentTypeDef;
       } else {
-        debugger;
+        // debugger;
         ///api/contentTypes/getContentTypeConfig
         let url = `${apiUrl}contentTypes/getContentTypeConfig?systemid=${contentType}`;
         let contentTypeConfig = await this.getAxios().get(url);
