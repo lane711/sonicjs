@@ -100,11 +100,23 @@ if (typeof module !== "undefined" && module.exports) {
       return page.data;
     }),
     (exports.getContentType = async function (contentType) {
-      const filter = encodeURI(`{"where":{"systemid":"${contentType}"}}`);
-      let url = `${apiUrl}contentTypes?filter=${filter}`;
-      let contentTypeRecord = await this.getAxios().get(url);
-      // console.log('contentTypeRecord.data', contentTypeRecord.data[0]);
-      return contentTypeRecord.data[0];
+      // const filter = encodeURI(`{"where":{"systemid":"${contentType}"}}`);
+      // let url = `${apiUrl}contentTypes?filter=${filter}`;
+      // let contentTypeRecord = await this.getAxios().get(url);
+      // // console.log('contentTypeRecord.data', contentTypeRecord.data[0]);
+      // return contentTypeRecord.data[0];
+      if (typeof module !== "undefined" && module.exports) {
+        let contentTypeDef = globalService.moduleContentTypes.filter(
+          (x) => x.systemid === contentType
+        );
+        return contentTypeDef;
+      } else {
+        debugger;
+        ///api/contentTypes/getContentTypeConfig
+        let url = `${apiUrl}contentTypes/getContentTypeConfig?systemid=${contentType}`;
+        let contentTypeConfig = await this.getAxios().get(url);
+        return contentTypeConfig.data.data;
+      }
     }),
     (exports.getContentTypes = async function () {
       let url = `${apiUrl}contentTypes`;

@@ -1,6 +1,6 @@
 {
   "id": 29,
-  "systemid": "hello-world",
+  "systemid": "hello-world-config",
   "title": "Module - Hello World",
   "data": {
     "components": [

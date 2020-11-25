@@ -7,6 +7,7 @@
   var moduleDefinitionsForColumns = [];
   var moduleCssFiles = [];
   var moduleJsFiles = [];
+  var moduleContentTypes = [];
   var AccessToken;
   var isRequestAlreadyHandled = false;
   var isBackEnd = false;

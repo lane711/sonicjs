@@ -32,6 +32,8 @@ module.exports = moduleService = {
     await this.getModuleDefinitionFiles(dir);
     await this.getModuleCss(dir);
     await this.getModuleJs(dir);
+    await this.getModuleContentTypes(dir);
+
   },
 
   getModules: async function () {
@@ -110,6 +112,38 @@ module.exports = moduleService = {
     );
   },
 
+  getModuleContentTypes: async function (path) {
+    await dir.readFiles(
+      path,
+      {
+        match: /.json$/,
+        exclude: /^\./,
+      },
+      function (err, content, next) {
+        if (err) throw err;
+        next();
+      },
+      function (err, files) {
+        if (err) throw err;
+
+        globalService.moduleContentTypes = [];
+
+        files.forEach((file) => {
+          if (file.indexOf("models") > -1) {
+            let contentTypeRaw =  fileService.getFileSync(file, false, true);
+            let contentType = JSON.parse(contentTypeRaw);
+            globalService.moduleContentTypes.push(contentType);
+          }
+        });
+      }
+    );
+  },
+
+  getModuleContentType: async function (contentTypeSystemId) {
+    let config = await globalService.moduleContentTypes.filter(x => x.systemid === contentTypeSystemId);
+    return config[0];
+  },
+
   getModuleCss: async function (path) {
     await dir.readFiles(
       path,
@@ -159,6 +193,7 @@ module.exports = moduleService = {
       }
     );
   },
+
 
   processModuleInColumn: async function (options) {
     if (options.shortcode.name === options.moduleName.toUpperCase()) {

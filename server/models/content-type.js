@@ -1,5 +1,7 @@
 'use strict';
 var emitterService = require('../services/emitter.service');
+var moduleSerivce = require('../services/module.service');
+
 
 module.exports = function (Contenttype) {
 
@@ -58,6 +60,32 @@ module.exports = function (Contenttype) {
       returns: {
         arg: 'name',
         type: 'string',
+      },
+    }
+  );
+
+  Contenttype.getContentTypeConfig = async function (systemid, cb) {
+    let obj = await moduleSerivce.getModuleContentType(systemid)
+    return obj;
+    // cb(null, obj);
+  };
+
+  Contenttype.remoteMethod(
+    'getContentTypeConfig', {
+      http: {
+        path: '/getContentTypeConfig',
+        verb: 'get',
+      },
+      accepts: {
+        arg: 'systemid',
+        type: 'string',
+        http: {
+          source: 'query',
+        },
+      },
+      returns: {
+        arg: 'data',
+        type: 'object',
       },
     }
   );

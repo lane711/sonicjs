@@ -10,7 +10,7 @@ const chalk = require("chalk");
 const log = console.log;
 var path = require("path");
 const YAML = require("yaml");
-const { parse, stringify } = require('envfile')
+const { parse, stringify } = require("envfile");
 
 module.exports = fileService = {
   // startup: async function () {
@@ -34,8 +34,12 @@ module.exports = fileService = {
     });
   },
 
-  getFileSync: async function (filePath, root = false) {
-    let adminPath = this.getFilePath(filePath, root);
+  getFileSync: function (filePath, root = false, systemRoot = false) {
+    if (systemRoot) {
+      adminPath = filePath;
+    } else {
+      let adminPath = this.getFilePath(filePath, root);
+    }
     let content = fs.readFileSync(adminPath, "utf8");
     return content;
   },
@@ -51,7 +55,7 @@ module.exports = fileService = {
   },
 
   getYamlConfig: async function (path) {
-    let yamlFile = await this.getFileSync(path);
+    let yamlFile = await this.getFile(path);
     let parsedFile = YAML.parse(yamlFile);
     return parsedFile;
   },
@@ -84,12 +88,12 @@ module.exports = fileService = {
   },
 
   updateEnvFileVariable: async function (variableName, variableValue) {
-    process.env.REBUILD_ASSETS = 'FALSE'
+    process.env.REBUILD_ASSETS = "FALSE";
 
-    let envFile = await this.getFileSync('.env', true);
+    let envFile = await this.getFile(".env", true);
     let parsedFile = parse(envFile);
     parsedFile[variableName] = variableValue;
-    let envFileContent = stringify(parsedFile)
-    await this.writeFile('../../.env', envFileContent);
+    let envFileContent = stringify(parsedFile);
+    await this.writeFile("../../.env", envFileContent);
   },
 };
