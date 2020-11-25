@@ -1,5 +1,6 @@
 'use strict';
 var moduleService = require('../services/module.service');
+var fileService = require('../services/file.service');
 
 module.exports = function(Module) {
 
@@ -66,4 +67,46 @@ module.exports = function(Module) {
     }
     );
 
+    Module.getContentTypeConfig = async function (systemid, cb) {
+      let obj = await moduleService.getModuleContentType(systemid);
+      return obj;
+      // cb(null, obj);
+    };
+
+    Module.remoteMethod("getContentTypeConfig", {
+      http: {
+        path: "/getContentTypeConfig",
+        verb: "get",
+      },
+      accepts: {
+        arg: "systemid",
+        type: "string",
+        http: {
+          source: "query",
+        },
+      },
+      returns: {
+        arg: "data",
+        type: "object",
+      },
+    });
+
+    Module.updateJsonFile = async function (data, cb) {
+      console.log('updateJsonFile', data);
+      let obj = await fileService.writeFile(data.filePath, JSON.stringify(data));
+      return 'ok';
+    };
+
+    Module.remoteMethod("updateJsonFile", {
+      http: {
+        path: "/updateJsonFile",
+        verb: "put",
+      },
+      accepts: { arg: "data", type: "object", http: { source: "body" } },
+      description: "Updates an existing content type",
+      returns: {
+        arg: "data",
+        type: "object",
+      },
+    });
 };

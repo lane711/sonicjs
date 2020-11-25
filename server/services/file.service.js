@@ -11,6 +11,8 @@ const log = console.log;
 var path = require("path");
 const YAML = require("yaml");
 const { parse, stringify } = require("envfile");
+var appRoot = require('app-root-path');
+
 
 module.exports = fileService = {
   // startup: async function () {
@@ -61,7 +63,8 @@ module.exports = fileService = {
   },
 
   writeFile: async function (filePath, fileContent) {
-    let fullPath = path.join(__dirname, filePath);
+
+    let fullPath = path.join(this.getRootAppPath(), filePath);
     // console.log('fullPath--->', fullPath);
 
     return new Promise((resolve, reject) => {
@@ -85,6 +88,10 @@ module.exports = fileService = {
     let dirPath = path.join(__dirname.replace("services", ""), filePath);
     let fileExist = fs.existsSync(dirPath);
     return fileExist;
+  },
+
+  getRootAppPath: function () {
+    return appRoot.path;
   },
 
   updateEnvFileVariable: async function (variableName, variableValue) {

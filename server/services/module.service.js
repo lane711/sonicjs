@@ -145,6 +145,12 @@ module.exports = moduleService = {
     return config[0];
   },
 
+  updateModuleContentType: async function (contentTypeDef) {
+    let path = contentTypeDef.filePath;
+    // let config = await globalService.moduleContentTypes.filter(x => x.systemid === contentTypeSystemId);
+    // return config[0];
+  },
+
   getModuleCss: async function (path) {
     await dir.readFiles(
       path,
@@ -240,7 +246,7 @@ module.exports = moduleService = {
   },
 
   createModule: async function (moduleDefinitionFile) {
-    let basePath = `../../server/modules/${moduleDefinitionFile.systemid}`;
+    let basePath = `/server/modules/${moduleDefinitionFile.systemid}`;
 
     //create base dir
     fileService.createDirectory(`${basePath}`);

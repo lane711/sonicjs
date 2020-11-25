@@ -698,7 +698,7 @@ async function editContentType(payload) {
   // return this.http.put(environment.apiUrl + `content/${id}`, payload).toPromise();
   // debugger;
   return axiosInstance
-    .put(`/api/contentTypes/${id}`, payload)
+    .put(`/api/modules/updateJsonFile`, payload)
     .then(async function (response) {
       console.log(response);
       // debugger;
@@ -972,7 +972,7 @@ async function setupFormBuilder(contentType) {
 }
 
 async function onContentTypeSave() {
-  debugger;
+  // debugger;
   if (contentTypeComponents) {
     console.log("contentTypeComponents", contentTypeComponents);
     contentType.data.components = contentTypeComponents;

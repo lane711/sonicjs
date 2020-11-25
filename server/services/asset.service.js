@@ -254,7 +254,7 @@ module.exports = assetService = {
         minifiedAsset = csso.minify(fileContent).css;
       }
 
-      fileService.writeFile(`../${path}`, minifiedAsset);
+      fileService.writeFile(`${path}`, minifiedAsset);
     }
   },
 

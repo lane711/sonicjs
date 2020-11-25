@@ -66,7 +66,7 @@ module.exports = cssService = {
     let originalFilePath = `themes/front-end/${frontEndTheme}/css/template.css`;
     let originalFile = await fileService.getFile(originalFilePath);
     // console.log(originalFile);
-    let processedFilePath = `../themes/front-end/${frontEndTheme}/css/template-processed.css`
+    let processedFilePath = `/server/themes/front-end/${frontEndTheme}/css/template-processed.css`
 
     let viewModel = await dataService.getContentTopOne("site-settings-colors");
 
