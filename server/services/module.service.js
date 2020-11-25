@@ -7,6 +7,7 @@ var globalService = require("../services/global.service");
 var fileService = require("../services/file.service");
 var viewService = require("../services/view.service");
 var dataService = require("../services/data.service");
+var appRoot = require('app-root-path');
 
 module.exports = moduleService = {
   startup: function () {
@@ -132,8 +133,8 @@ module.exports = moduleService = {
           if (file.indexOf("models") > -1) {
             let contentTypeRaw =  fileService.getFileSync(file, false, true);
             let contentType = JSON.parse(contentTypeRaw);
-            contentType.filePath = file;
-            globalService.moduleContentTypes.push(contentType);
+            let contentTypeInfo = {filePath : file.replace(appRoot.path, ''), systemid : contentType.systemid};
+            globalService.moduleContentTypes.push(contentTypeInfo);
           }
         });
       }
@@ -141,8 +142,9 @@ module.exports = moduleService = {
   },
 
   getModuleContentType: async function (contentTypeSystemId) {
-    let config = await globalService.moduleContentTypes.filter(x => x.systemid === contentTypeSystemId);
-    return config[0];
+    let configInfo = await globalService.moduleContentTypes.filter(x => x.systemid === contentTypeSystemId);
+    let config = fileService.getFileSync(configInfo[0].filePath);
+    return config;
   },
 
   updateModuleContentType: async function (contentTypeDef) {

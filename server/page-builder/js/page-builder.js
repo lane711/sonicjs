@@ -678,16 +678,16 @@ async function editInstanceUser(payload, refresh, contentType = "content") {
 }
 
 async function editContentType(payload) {
-  debugger;
-  let id = payload.id;
-  if (!id) {
-    return;
-  }
+  // debugger;
+  // let id = payload.id;
+  // if (!id) {
+  //   return;
+  // }
 
-  console.log("putting payload", payload);
-  if (payload.id) {
-    delete payload.id;
-  }
+  // console.log("putting payload", payload);
+  // if (payload.id) {
+  //   delete payload.id;
+  // }
 
   // let data = {};
   // if(payload.data){
@@ -884,6 +884,7 @@ async function setupFormBuilder(contentType) {
 
   Formio.builder(document.getElementById("formBuilder"), null).then(
     async function (form) {
+      // debugger;
       form.setForm({
         components: contentType.data.components,
       });
