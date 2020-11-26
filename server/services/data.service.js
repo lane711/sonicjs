@@ -113,7 +113,7 @@ if (typeof module !== "undefined" && module.exports) {
 
       let url = `${apiUrl}modules/getModuleContentTypes`;
       let contentTypes = await this.getAxios().get(url);
-      return contentTypes.data;
+      return contentTypes.data.data;
     }),
     (exports.createContentType = async function (contentType) {
       let url = `${apiUrl}contentTypes`;
