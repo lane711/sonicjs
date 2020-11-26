@@ -37,10 +37,11 @@ module.exports = fileService = {
   },
 
   getFileSync: function (filePath, root = false, systemRoot = false) {
+    let adminPath = "";
     if (systemRoot) {
       adminPath = filePath;
     } else {
-      let adminPath = this.getFilePath(filePath, root);
+      adminPath = this.getFilePath(filePath, root);
     }
     let content = fs.readFileSync(adminPath, "utf8");
     return content;

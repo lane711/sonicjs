@@ -1,8 +1,8 @@
 {
-  "id": 29,
-  "filePath": "/server/modules/hello-world-config/models/hello-world-config.json",
-  "systemid": "hello-world-config",
-  "title": "Module - Hello World Config",
+  "id": 99,
+  "filePath": "/server/modules/hello-world/models/hello-world.json",
+  "systemid": "hello-world",
+  "title": "Module - Hello World",
   "data": {
     "components": [
       {

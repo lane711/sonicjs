@@ -33,7 +33,7 @@ module.exports = moduleService = {
     await this.getModuleDefinitionFiles(dir);
     await this.getModuleCss(dir);
     await this.getModuleJs(dir);
-    await this.getModuleContentTypes(dir);
+    await this.getModuleContentTypesConfigs(dir);
 
   },
 
@@ -113,7 +113,7 @@ module.exports = moduleService = {
     );
   },
 
-  getModuleContentTypes: async function (path) {
+  getModuleContentTypesConfigs: async function (path) {
     await dir.readFiles(
       path,
       {
@@ -127,14 +127,14 @@ module.exports = moduleService = {
       function (err, files) {
         if (err) throw err;
 
-        globalService.moduleContentTypes = [];
+        globalService.moduleContentTypeConfigs = [];
 
         files.forEach((file) => {
           if (file.indexOf("models") > -1) {
             let contentTypeRaw =  fileService.getFileSync(file, false, true);
             let contentType = JSON.parse(contentTypeRaw);
             let contentTypeInfo = {filePath : file.replace(appRoot.path, ''), systemid : contentType.systemid};
-            globalService.moduleContentTypes.push(contentTypeInfo);
+            globalService.moduleContentTypeConfigs.push(contentTypeInfo);
           }
         });
       }
@@ -142,15 +142,24 @@ module.exports = moduleService = {
   },
 
   getModuleContentType: async function (contentTypeSystemId) {
-    let configInfo = await globalService.moduleContentTypes.filter(x => x.systemid === contentTypeSystemId);
+    let configInfo = await globalService.moduleContentTypeConfigs.filter(x => x.systemid === contentTypeSystemId);
     let config = fileService.getFileSync(configInfo[0].filePath);
     return config;
   },
 
+  getModuleContentTypes: async function () {
+    let configInfos = await globalService.moduleContentTypeConfigs;
+    let configs = [];
+    configInfos.forEach(configInfo => {
+      let config = fileService.getFileSync(configInfo.filePath, true, false);
+      let configObj = JSON.parse(config);
+      configs.push(configObj);
+    });
+    return configs;
+  },
+
   updateModuleContentType: async function (contentTypeDef) {
     let path = contentTypeDef.filePath;
-    // let config = await globalService.moduleContentTypes.filter(x => x.systemid === contentTypeSystemId);
-    // return config[0];
   },
 
   getModuleCss: async function (path) {

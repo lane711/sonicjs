@@ -107,9 +107,12 @@ if (typeof module !== "undefined" && module.exports) {
       return contentTypeObj;
     }),
     (exports.getContentTypes = async function () {
-      let url = `${apiUrl}contentTypes`;
+      // let url = `${apiUrl}contentTypes`;
+      // let contentTypes = await this.getAxios().get(url);
+      // return contentTypes.data;
+
+      let url = `${apiUrl}modules/getModuleContentTypes`;
       let contentTypes = await this.getAxios().get(url);
-      // console.log('contentTypeRecord.data', contentTypeRecord.data[0]);
       return contentTypes.data;
     }),
     (exports.createContentType = async function (contentType) {

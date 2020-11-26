@@ -91,8 +91,34 @@ module.exports = function(Module) {
       },
     });
 
+
+    Module.getModuleContentTypes = async function (cb) {
+      let obj = await moduleService.getModuleContentTypes();
+      return obj;
+      // cb(null, obj);
+    };
+
+    Module.remoteMethod("getModuleContentTypes", {
+      http: {
+        path: "/getModuleContentTypes",
+        verb: "get",
+      },
+      accepts: {
+        arg: "systemid",
+        type: "string",
+        http: {
+          source: "query",
+        },
+      },
+      returns: {
+        arg: "data",
+        type: "object",
+      },
+    });
+
+
     Module.updateJsonFile = async function (data, cb) {
-      console.log('updateJsonFile', data);
+      // console.log('updateJsonFile', data);
       let obj = await fileService.writeFile(data.filePath, JSON.stringify(data));
       return 'ok';
     };
