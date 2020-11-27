@@ -705,7 +705,7 @@ async function editContentType(payload) {
       //reload editor
       let contentType = await response.data;
       contentType.id = id;
-      setupFormBuilder(contentType);
+      // setupFormBuilder(contentType);
     })
     .catch(function (error) {
       console.log(error);

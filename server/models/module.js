@@ -118,9 +118,9 @@ module.exports = function(Module) {
 
 
     Module.updateJsonFile = async function (data, cb) {
-      // console.log('updateJsonFile', data);
-      let obj = await fileService.writeFile(data.filePath, JSON.stringify(data));
-      return 'ok';
+      let obj = JSON.stringify(data);
+      await fileService.writeFile(data.filePath, obj);
+      return data;
     };
 
     Module.remoteMethod("updateJsonFile", {

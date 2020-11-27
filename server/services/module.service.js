@@ -143,7 +143,7 @@ module.exports = moduleService = {
 
   getModuleContentType: async function (contentTypeSystemId) {
     let configInfo = await globalService.moduleContentTypeConfigs.filter(x => x.systemid === contentTypeSystemId);
-    let config = fileService.getFileSync(configInfo[0].filePath);
+    let config = fileService.getFileSync(configInfo[0].filePath, true, false);
     return config;
   },
 
