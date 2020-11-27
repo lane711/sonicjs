@@ -10,6 +10,7 @@
         <thead>
           <tr>
             <th>Title</th>
+            <th>Module</th>
             <th>Content</th>
             <th>Status</th>
           </tr>
@@ -20,6 +21,7 @@
           {{#each data}}
           <tr>
             <td><a href="/admin/content-types/edit/{{ this.systemid }}">{{ this.title }}</a></td>
+            <td><a href="/admin/modules/edit/{{ this.moduleSystemid }}">{{ this.module }}</a></td>
             <td>{{ contentType.description}}</td>
             <td>
               <a class="btn btn-sm btn-primary rmargin" href="/admin/content-types/edit/{{ this.systemid }}">Edit</a>
@@ -28,7 +30,8 @@
 
 
               <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
-                data-trigger="focus" aria-label="Delete {{ this.title }}" title="Delete <b>{{ this.title }}</b> Forever?" data-content="<a href='/contentType/{{ this.id }}'
+                data-trigger="focus" aria-label="Delete {{ this.title }}"
+                title="Delete <b>{{ this.title }}</b> Forever?" data-content="<a href='/contentType/{{ this.id }}'
    class='btn btn-sm btn-danger rmargin'>Confirm Delete</a>
 ">Delete</a>
 
