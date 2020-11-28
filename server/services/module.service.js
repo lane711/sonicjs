@@ -133,6 +133,7 @@ module.exports = moduleService = {
           if (file.indexOf("models") > -1) {
             let contentTypeRaw =  fileService.getFileSync(file, false, true);
             let contentType = JSON.parse(contentTypeRaw);
+            console.log(contentType);
             let contentTypeInfo = {filePath : file.replace(appRoot.path, ''), systemid : contentType.systemid};
             globalService.moduleContentTypeConfigs.push(contentTypeInfo);
           }

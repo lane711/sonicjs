@@ -94,6 +94,7 @@ module.exports = function(Module) {
 
     Module.getModuleContentTypes = async function (cb) {
       let obj = await moduleService.getModuleContentTypes();
+      console.log(obj);
       return obj;
       // cb(null, obj);
     };
