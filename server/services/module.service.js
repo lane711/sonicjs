@@ -7,7 +7,7 @@ var globalService = require("../services/global.service");
 var fileService = require("../services/file.service");
 var viewService = require("../services/view.service");
 var dataService = require("../services/data.service");
-var appRoot = require('app-root-path');
+var appRoot = require("app-root-path");
 
 module.exports = moduleService = {
   startup: function () {
@@ -16,9 +16,7 @@ module.exports = moduleService = {
       await moduleService.processModules();
     });
 
-    emitterService.on("getRenderedPagePostDataFetch", async function (
-      options
-    ) {
+    emitterService.on("getRenderedPagePostDataFetch", async function (options) {
       if (options) {
         options.page.data.modules = globalService.moduleDefinitions;
         options.page.data.modulesForColumns =
@@ -34,7 +32,6 @@ module.exports = moduleService = {
     await this.getModuleCss(dir);
     await this.getModuleJs(dir);
     await this.getModuleContentTypesConfigs(dir);
-
   },
 
   getModules: async function () {
@@ -131,11 +128,18 @@ module.exports = moduleService = {
 
         files.forEach((file) => {
           if (file.indexOf("models") > -1) {
-            let contentTypeRaw =  fileService.getFileSync(file, false, true);
-            let contentType = JSON.parse(contentTypeRaw);
-            console.log(contentType);
-            let contentTypeInfo = {filePath : file.replace(appRoot.path, ''), systemid : contentType.systemid};
-            globalService.moduleContentTypeConfigs.push(contentTypeInfo);
+            let contentTypeRaw = fileService.getFileSync(file, false, true);
+            if (contentTypeRaw) {
+              let contentType = JSON.parse(contentTypeRaw);
+              // console.log(contentType);
+              let contentTypeInfo = {
+                filePath: file.replace(appRoot.path, ""),
+                systemid: contentType.systemid,
+              };
+              globalService.moduleContentTypeConfigs.push(contentTypeInfo);
+            }else{
+              console.log('error on ' + file);
+            }
           }
         });
       }
@@ -143,7 +147,9 @@ module.exports = moduleService = {
   },
 
   getModuleContentType: async function (contentTypeSystemId) {
-    let configInfo = await globalService.moduleContentTypeConfigs.filter(x => x.systemid === contentTypeSystemId);
+    let configInfo = await globalService.moduleContentTypeConfigs.filter(
+      (x) => x.systemid === contentTypeSystemId
+    );
     let config = fileService.getFileSync(configInfo[0].filePath, true, false);
     return config;
   },
@@ -151,7 +157,7 @@ module.exports = moduleService = {
   getModuleContentTypes: async function () {
     let configInfos = await globalService.moduleContentTypeConfigs;
     let configs = [];
-    configInfos.forEach(configInfo => {
+    configInfos.forEach((configInfo) => {
       let config = fileService.getFileSync(configInfo.filePath, true, false);
       let configObj = JSON.parse(config);
       configs.push(configObj);
@@ -212,7 +218,6 @@ module.exports = moduleService = {
       }
     );
   },
-
 
   processModuleInColumn: async function (options) {
     if (options.shortcode.name === options.moduleName.toUpperCase()) {
