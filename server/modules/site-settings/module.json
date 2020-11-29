@@ -1,6 +1,6 @@
 {
-  "title": "Menu - Title",
-  "systemid": "menu-title",
+  "title": "Site Settings",
+  "systemid": "site-settings",
   "version": "0.0.0.1",
   "enabled": true,
   "canBeAddedToColumn": true,

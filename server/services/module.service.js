@@ -61,6 +61,15 @@ module.exports = moduleService = {
     return file;
   },
 
+  getModuleContentTypesAdmin: async function (systemid) {
+    let basePath =  `${appRoot.path}/server/modules/${systemid}/models`;
+    // let file = await fileService.getFile(`${basePath}/module.json`);
+    // return file;
+    let moduleContentTypesAdmin = globalService.moduleContentTypeConfigs.filter(x => x.filePath.indexOf(`modules/${systemid}/models`) > -1);
+    let moduleContentTypes = await moduleService.getModuleContentTypesConfigs(basePath);
+    return moduleContentTypes;
+  },
+
   getModuleDefinitionFiles: async function (path) {
     let moduleList = [];
     await dir.readFiles(
