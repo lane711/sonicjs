@@ -3,9 +3,10 @@
     <div class="col-md-12">
       <div class="card admin-content-type-edit">
         <div class="card-header">
-          <i class="fa fa-align-justify edit-content-type"></i> Edit Module: {{ this.data.moduleDef.title }}
+          <i class="fa fa-align-justify edit-content-type"></i> Edit Module: {{ data.moduleDef.title }}
         </div>
 
+{{ log data}}
         <div class="card-body">
 
           <script type='text/javascript'>
@@ -92,7 +93,7 @@
     <ul class="nav nav-tabs" id="myTab" role="tablist">
     <li class="nav-item">
       <a class="nav-link active" id="home-tab" data-toggle="tab" href="#fields" role="tab" aria-controls="home"
-        aria-selected="true">Fields</a>
+        aria-selected="true">Content Types</a>
     </li>
     <li class="nav-item">
       <a class="nav-link" id="raw-tab" data-toggle="tab" href="#raw" role="tab" aria-controls="raw"
@@ -127,7 +128,7 @@
 
   <div class="card">
     <div class="card-header">
-      <i class="fa fa-align-justify"></i> Content Type
+      <i class="fa fa-align-justify"></i> Content Types
       <a href="javascript:void(0)" onclick="loadCreateContentTypeForm(); openNewContentTypeModal()"
         class="btn btn-success float-right new-content-type">New Content Type</a>
     </div>
@@ -151,9 +152,6 @@
                     <td>
                       <a class="btn btn-sm btn-primary rmargin"
                         href="/admin/content-types/edit/{{ this.systemid }}">Edit</a>
-
-
-
 
                       <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
                         data-trigger="focus" aria-label="Delete {{ this.title }}"
@@ -249,8 +247,14 @@
                 {
                   type: 'textfield',
                   key: 'systemid',
-                  label: 'systemid',
+                  label: 'System Id',
                   placeholder: 'Enter the slug to be used as the system id (ie: blog, news, public-service)',
+                  input: true
+                },
+                                {
+                  type: 'textfield',
+                  key: 'moduleSystemid',
+                  label: 'Module System Id',
                   input: true
                 },
                 {
@@ -260,11 +264,18 @@
                   theme: 'primary'
                 }
               ]
+
+
             })
               .then(async function (form) {
+
+                form.submission = {
+                      data: {moduleSystemid: "{{ data.moduleDef.systemid }}"}
+                  };
+
                 form.on('submit', async function (submission) {
                   var accessToken = '{{ this.accessToken }}';
-                  submission.data.data = {};
+                  submission.data.data = {moduleSystemid : "test"};
                   axios.post(`/api/contentTypes?access_token=${accessToken}`, submission.data)
                     .then(async function (response) {
                       console.log(response);

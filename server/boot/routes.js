@@ -579,7 +579,7 @@ module.exports = function (app) {
         data.moduleSystemId = param1;
         data.contentTypes = await moduleService.getModuleContentTypesAdmin(param1);
         data.contentTypeId = param1;
-        data.moduleDef = await moduleService.getModuleDefinitionFile(param1);
+        data.moduleDef = await moduleService.getModuleDefinition(param1);
       }
 
       if (viewName == "admin-media") {

@@ -55,6 +55,11 @@ module.exports = moduleService = {
     emitterService.emit("modulesLoaded");
   },
 
+  getModuleDefinition: async function (systemid) {
+    let file = await moduleService.getModuleDefinitionFile(systemid);
+    return JSON.parse(file)
+  },
+
   getModuleDefinitionFile: async function (systemid) {
     let basePath = `../server/modules/${systemid}`;
     let file = await fileService.getFile(`${basePath}/module.json`);
