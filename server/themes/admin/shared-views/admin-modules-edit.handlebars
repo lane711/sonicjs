@@ -90,7 +90,11 @@
 
   <ul class="nav nav-tabs" id="myTab" role="tablist">
     <li class="nav-item">
-      <a class="nav-link active" id="home-tab" data-toggle="tab" href="#fields" role="tab" aria-controls="home"
+      <li class="nav-item">
+      <a class="nav-link active" id="shortcode-tab" data-toggle="tab" href="#shortcode" role="tab" aria-controls="shortcode"
+        aria-selected="false">Content Types</a>
+    </li>
+      <a class="nav-link" id="home-tab" data-toggle="tab" href="#fields" role="tab" aria-controls="home"
         aria-selected="true">Fields</a>
     </li>
     {{!-- <li class="nav-item">
@@ -145,9 +149,7 @@
 
 
     </div>
-    <div class="tab-pane fade show" id="shortcode" role="tabpanel" aria-labelledby="shortcode-tab">
-      <div class='shortcode'><span>Shortcode: </span>{{shortcode}}</div>
-    </div>
+
     <div class="tab-pane fade show" id="views" role="tabpanel" aria-labelledby="profile-tab">
       <app-content-type-edit-views></app-content-type-edit-views>
     </div>

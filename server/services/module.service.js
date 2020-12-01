@@ -66,7 +66,20 @@ module.exports = moduleService = {
     // let file = await fileService.getFile(`${basePath}/module.json`);
     // return file;
     let moduleContentTypesAdmin = globalService.moduleContentTypeConfigs.filter(x => x.filePath.indexOf(`modules/${systemid}/models`) > -1);
-    let moduleContentTypes = await moduleService.getModuleContentTypesConfigs(basePath);
+
+    let moduleContentTypes = [];
+
+    for (let index = 0; index < moduleContentTypesAdmin.length; index++) {
+      const ct = moduleContentTypesAdmin[index];
+      let cty = await moduleService.getModuleContentType(ct.systemid);
+      let contentType = JSON.parse(cty);
+      moduleContentTypes.push(contentType);
+    }
+    // moduleContentTypesAdmin.forEach(contentTypeSystemId => {
+    //   let ct = await moduleService.getModuleContentType(contentTypeSystemId);
+    //   moduleContentTypes.push(ct);
+    // });
+    // let moduleContentTypes = await moduleService.getModuleContentTypesConfigs(basePath);
     return moduleContentTypes;
   },
 
