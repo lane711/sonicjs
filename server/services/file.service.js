@@ -12,6 +12,7 @@ var path = require("path");
 const YAML = require("yaml");
 const { parse, stringify } = require("envfile");
 var appRoot = require('app-root-path');
+const glob = require('glob');
 
 
 module.exports = fileService = {
@@ -45,6 +46,12 @@ module.exports = fileService = {
     }
     let content = fs.readFileSync(adminPath, "utf8");
     return content;
+  },
+
+  getFilesSearchSync: function (dir, pattern){
+    const files = glob.sync(path.join(dir + pattern));
+    return files;
+
   },
 
   getFilePath: function (filePath, root = false) {

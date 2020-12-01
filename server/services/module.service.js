@@ -30,10 +30,6 @@ module.exports = moduleService = {
   processModules: async function () {
     let moduleDir = path.resolve(__dirname, "..", "modules");
 
-    const files = glob.sync(moduleDir + '/**/module.json');
-console.log(files);
-console.log('next');
-
     await this.getModuleDefinitionFiles(moduleDir);
     await this.getModuleCss(moduleDir);
     await this.getModuleJs(moduleDir);
@@ -98,107 +94,69 @@ console.log('next');
 
   getModuleDefinitionFiles: async function (path) {
 
-
-    // glob.sync(path + '/**/module.json', {}, (err, files)=>{
-    //   console.log(files)
-    // })
-
+    const files = fileService.getFilesSearchSync(path, '/**/module.json');
 
     let moduleList = [];
-    await dir.readFiles(
-      path,
-      {
-        match: /module.json$/,
-        exclude: /^\./,
-      },
-      function (err, content, next) {
-        if (err) throw err;
-        next();
-      },
-      async function (err, files) {
-        if (err) throw err;
 
-        files.forEach((file) => {
-          let raw = fs.readFileSync(file);
-          if (raw && raw.length > 0) {
-            let moduleDef = JSON.parse(raw);
-            let moduleFolder = moduleDef.systemid.replace("module-", "");
-            moduleDef.mainService = `${path}\/${moduleFolder}\/services\/${moduleFolder}-main-service.js`;
-            moduleList.push(moduleDef);
-          }
-        });
-
-        moduleList.sort(function (a, b) {
-          if (a.title < b.title) {
-            return -1;
-          }
-          if (a.title > b.title) {
-            return 1;
-          }
-          return 0;
-        });
-
-        let moduleDefinitionsForColumns = moduleList;
-
-        globalService.moduleDefinitions = moduleList;
-        globalService.moduleDefinitionsForColumns = moduleList.filter(
-          (x) => x.canBeAddedToColumn == true
-        );
-
-        await moduleService.loadModuleServices(moduleList);
-
-        return moduleList;
+    files.forEach((file) => {
+      let raw = fs.readFileSync(file);
+      if (raw && raw.length > 0) {
+        let moduleDef = JSON.parse(raw);
+        let moduleFolder = moduleDef.systemid.replace("module-", "");
+        moduleDef.mainService = `${path}\/${moduleFolder}\/services\/${moduleFolder}-main-service.js`;
+        moduleList.push(moduleDef);
       }
+    });
+
+    moduleList.sort(function (a, b) {
+      if (a.title < b.title) {
+        return -1;
+      }
+      if (a.title > b.title) {
+        return 1;
+      }
+      return 0;
+    });
+
+    let moduleDefinitionsForColumns = moduleList;
+
+    globalService.moduleDefinitions = moduleList;
+    globalService.moduleDefinitionsForColumns = moduleList.filter(
+      (x) => x.canBeAddedToColumn == true
     );
+
+    await moduleService.loadModuleServices(moduleList);
+
+    return moduleList;
+
   },
 
   getModuleContentTypesConfigs: async function (path) {
     let moduleCount = 0;
 
-    console.log('path',path);
+    const files = fileService.getFilesSearchSync(path, '/**/*.json');
 
-//     var files2 = dir.files(path, {sync:true});
-// console.log(files2);
+    globalService.moduleContentTypeConfigs = [];
 
-    await dir.readFiles(
-      path,
-      {
-        sync: true,
-        match: /.json$/,
-        exclude: /^\./,
-      },
-      function (err, content, next) {
-        if (err) throw err;
-        next();
-      },
-      function (err, files) {
-        if (err) throw err;
-
-        globalService.moduleContentTypeConfigs = [];
-
-        files.forEach((file) => {
-          if (file.indexOf("models") > -1) {
-            moduleCount++;
-            let contentTypeRaw = fileService.getFileSync(file, false, true);
-            if (contentTypeRaw) {
-              let contentType = JSON.parse(contentTypeRaw);
-              // console.log(contentType);
-              let contentTypeInfo = {
-                filePath: file.replace(appRoot.path, ""),
-                systemid: contentType.systemid,
-              };
-              globalService.moduleContentTypeConfigs.push(contentTypeInfo);
-            } else {
-              console.log("error on " + file);
-            }
-          }
-        });
-        return moduleCount;
-
+    files.forEach((file) => {
+      if (file.indexOf("models") > -1) {
+        moduleCount++;
+        let contentTypeRaw = fileService.getFileSync(file, false, true);
+        if (contentTypeRaw) {
+          let contentType = JSON.parse(contentTypeRaw);
+          // console.log(contentType);
+          let contentTypeInfo = {
+            filePath: file.replace(appRoot.path, ""),
+            systemid: contentType.systemid,
+          };
+          globalService.moduleContentTypeConfigs.push(contentTypeInfo);
+        } else {
+          console.log("error on " + file);
+        }
       }
-    );
-    // console.log(`${moduleCount} modules loaded`);
-    // return moduleCount;
+    });
+    return moduleCount;
+
   },
 
   getModuleContentType: async function (contentTypeSystemId) {
