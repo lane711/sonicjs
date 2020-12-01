@@ -147,7 +147,7 @@ module.exports = function(Module) {
           "moduleSystemid" : body.moduleSystemid
       }
 
-      let newContentType = moduleService.createModuleContentType(moduleDefinitionFile);
+      let newContentType = await moduleService.createModuleContentType(moduleDefinitionFile);
 
       return newContentType;
   };

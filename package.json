@@ -53,6 +53,7 @@
     "flag-icon-css": "^3.3.0",
     "font-awesome": "^4.7.0",
     "formiojs": "^3.29.8",
+    "glob": "^7.1.6",
     "inquirer": "^7.3.3",
     "jimp": "^0.9.3",
     "jquery": "^3.4.1",

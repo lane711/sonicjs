@@ -278,7 +278,7 @@
                   axios.post(`/api/modules/createModuleContentType?access_token=${accessToken}`, submission.data)
                     .then(async function (response) {
                       console.log(response);
-                      window.location.replace('/admin/modules/edit/' + submission.data.systemid);
+                      window.location.replace('/admin/modules/edit/' + response.data.data.moduleSystemid);
 
                     })
                     .catch(function (error) {

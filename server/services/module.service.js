@@ -2,6 +2,8 @@ var dir = require("node-dir");
 var path = require("path");
 var fs = require("fs");
 var _ = require("lodash");
+const glob = require('glob');
+
 var emitterService = require("../services/emitter.service");
 var globalService = require("../services/global.service");
 var fileService = require("../services/file.service");
@@ -26,12 +28,16 @@ module.exports = moduleService = {
   },
 
   processModules: async function () {
-    let dir = path.resolve(__dirname, "..", "modules");
+    let moduleDir = path.resolve(__dirname, "..", "modules");
 
-    await this.getModuleDefinitionFiles(dir);
-    await this.getModuleCss(dir);
-    await this.getModuleJs(dir);
-    await this.getModuleContentTypesConfigs(dir);
+    const files = glob.sync(moduleDir + '/**/module.json');
+console.log(files);
+console.log('next');
+
+    await this.getModuleDefinitionFiles(moduleDir);
+    await this.getModuleCss(moduleDir);
+    await this.getModuleJs(moduleDir);
+    await this.getModuleContentTypesConfigs(moduleDir);
   },
 
   getModules: async function () {
@@ -57,7 +63,7 @@ module.exports = moduleService = {
 
   getModuleDefinition: async function (systemid) {
     let file = await moduleService.getModuleDefinitionFile(systemid);
-    return JSON.parse(file)
+    return JSON.parse(file);
   },
 
   getModuleDefinitionFile: async function (systemid) {
@@ -91,6 +97,13 @@ module.exports = moduleService = {
   },
 
   getModuleDefinitionFiles: async function (path) {
+
+
+    // glob.sync(path + '/**/module.json', {}, (err, files)=>{
+    //   console.log(files)
+    // })
+
+
     let moduleList = [];
     await dir.readFiles(
       path,
@@ -140,9 +153,17 @@ module.exports = moduleService = {
   },
 
   getModuleContentTypesConfigs: async function (path) {
+    let moduleCount = 0;
+
+    console.log('path',path);
+
+//     var files2 = dir.files(path, {sync:true});
+// console.log(files2);
+
     await dir.readFiles(
       path,
       {
+        sync: true,
         match: /.json$/,
         exclude: /^\./,
       },
@@ -157,6 +178,7 @@ module.exports = moduleService = {
 
         files.forEach((file) => {
           if (file.indexOf("models") > -1) {
+            moduleCount++;
             let contentTypeRaw = fileService.getFileSync(file, false, true);
             if (contentTypeRaw) {
               let contentType = JSON.parse(contentTypeRaw);
@@ -171,8 +193,12 @@ module.exports = moduleService = {
             }
           }
         });
+        return moduleCount;
+
       }
     );
+    // console.log(`${moduleCount} modules loaded`);
+    // return moduleCount;
   },
 
   getModuleContentType: async function (contentTypeSystemId) {
@@ -202,14 +228,15 @@ module.exports = moduleService = {
   },
 
   createModuleContentType: async function (contentTypeDef) {
-    console.log('creating content type', contentTypeDef)
-    contentTypeDef.filePath = `/server/modules/${contentTypeDef.moduleSystemid}/models/${contentTypeDef.systemid}.json`
-    contentTypeDef.data = {components: []};
-    fileService.writeFile(
-      contentTypeDef.filePath ,
-      JSON.stringify(contentTypeDef)
-    );
-    //TODO need to restart app
+    console.log("creating content type", contentTypeDef);
+    contentTypeDef.filePath = `/server/modules/${contentTypeDef.moduleSystemid}/models/${contentTypeDef.systemid}.json`;
+    contentTypeDef.data = { components: [] };
+    let contentTypeDefObj = JSON.stringify(contentTypeDef);
+    fileService.writeFile(contentTypeDef.filePath, contentTypeDefObj);
+    //reload modules
+    await moduleService.processModules();
+
+    return contentTypeDef;
   },
 
   getModuleCss: async function (path) {
