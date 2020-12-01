@@ -2,6 +2,8 @@
   "id": 16,
   "systemid": "contact",
   "title": "Contact",
+  "module": "Contact Us",
+  "moduleSystemid": "contact-us",
   "data": {
     "components": [
       {

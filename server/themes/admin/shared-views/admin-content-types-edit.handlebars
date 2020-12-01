@@ -3,62 +3,9 @@
     <div class="col-md-12">
       <div class="card admin-content-type-edit">
         <div class="card-header">
-          <i class="fa fa-align-justify edit-content-type"></i> Edit {{ this.data.title }}
+          <i class="fa fa-align-justify edit-content-type"></i> Edit {{ data.raw.title }} ({{ data.raw.systemid }} )
         </div>
 
-        <div class="card-body">
-
-          <script type='text/javascript'>
-            window.onload = function () {
-              Formio.createForm(document.getElementById('createContentTypeForm'), {
-                components: [
-                  {
-                    type: 'textfield',
-                    key: 'id',
-                    label: 'Id',
-                    input: false,
-                    disabled: true
-                  },
-                  {
-                    type: 'textfield',
-                    key: 'title',
-                    label: 'Content Type Title',
-                    placeholder: 'Enter the title of your new content type (ie: Blog, News, Public Service).',
-                    input: true
-                  },
-                  {
-                    type: 'textfield',
-                    key: 'systemid',
-                    label: 'SystemId',
-                    placeholder: 'Enter the slug to be used as the system id (ie: blog, news, public-service)',
-                    input: true
-                  },
-                  {
-                    type: 'button',
-                    action: 'submit',
-                    label: 'Save Title & SystemId',
-                    theme: 'primary'
-                  }
-                ]
-              })
-                .then(async function (form) {
-
-                  form.submission = {
-                    data: { id: {{ data.raw.id }}, title: '{{ data.raw.title }}', systemid: '{{ data.raw.systemid }}' }
-                  };
-            form.on('submit', async function (submission) {
-              submission.id = submission.data.id;
-              submission.systemid = submission.data.systemid;
-              submission.title = submission.data.title;
-
-              editContentType(submission);
-            });
-                });
-            }
-          </script>
-
-          <div id="createContentTypeForm"></div>
-        </div>
 
       </div>
 
