@@ -1,4 +1,3 @@
-var dir = require("node-dir");
 var path = require("path");
 var fs = require("fs");
 var _ = require("lodash");
@@ -198,53 +197,31 @@ module.exports = moduleService = {
   },
 
   getModuleCss: async function (path) {
-    await dir.readFiles(
-      path,
-      {
-        match: /.css$/,
-        exclude: /^\./,
-      },
-      function (err, content, next) {
-        if (err) throw err;
-        next();
-      },
-      function (err, files) {
-        if (err) throw err;
 
-        globalService.moduleCssFiles = [];
+    const files = fileService.getFilesSearchSync(path, '/**/*.css');
 
-        files.forEach((file) => {
-          let link = file.substr(file.indexOf("server") + 6, file.length);
-          globalService.moduleCssFiles.push(link);
-        });
-      }
-    );
+    globalService.moduleCssFiles = [];
+
+    files.forEach((file) => {
+      let link = file.substr(file.indexOf("server") + 6, file.length);
+      globalService.moduleCssFiles.push(link);
+    });
+
   },
 
   getModuleJs: async function (path) {
-    await dir.readFiles(
-      path,
-      {
-        match: /.js$/,
-        exclude: /^\./,
-      },
-      function (err, content, next) {
-        if (err) throw err;
-        next();
-      },
-      function (err, files) {
-        if (err) throw err;
 
-        globalService.moduleJsFiles = [];
+    const files = fileService.getFilesSearchSync(path, '/**/*.css');
 
-        files.forEach((file) => {
-          if (file.indexOf("assets/js") > -1) {
-            let link = file.substr(file.indexOf("server") + 6, file.length);
-            globalService.moduleJsFiles.push(link);
-          }
-        });
+    globalService.moduleJsFiles = [];
+
+    files.forEach((file) => {
+      if (file.indexOf("assets/js") > -1) {
+        let link = file.substr(file.indexOf("server") + 6, file.length);
+        globalService.moduleJsFiles.push(link);
       }
-    );
+    });
+
   },
 
   processModuleInColumn: async function (options) {

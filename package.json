@@ -70,7 +70,6 @@
     "mixpanel": "^0.11.0",
     "moment": "^2.24.0",
     "node-cache": "^5.1.0",
-    "node-dir": "^0.1.17",
     "nodemon": "^1.18.11",
     "pace-progress": "^1.0.2",
     "perfect-scrollbar": "^1.4.0",
