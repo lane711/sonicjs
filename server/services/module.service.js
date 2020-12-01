@@ -62,10 +62,12 @@ module.exports = moduleService = {
   },
 
   getModuleContentTypesAdmin: async function (systemid) {
-    let basePath =  `${appRoot.path}/server/modules/${systemid}/models`;
+    let basePath = `${appRoot.path}/server/modules/${systemid}/models`;
     // let file = await fileService.getFile(`${basePath}/module.json`);
     // return file;
-    let moduleContentTypesAdmin = globalService.moduleContentTypeConfigs.filter(x => x.filePath.indexOf(`modules/${systemid}/models`) > -1);
+    let moduleContentTypesAdmin = globalService.moduleContentTypeConfigs.filter(
+      (x) => x.filePath.indexOf(`modules/${systemid}/models`) > -1
+    );
 
     let moduleContentTypes = [];
 
@@ -159,8 +161,8 @@ module.exports = moduleService = {
                 systemid: contentType.systemid,
               };
               globalService.moduleContentTypeConfigs.push(contentTypeInfo);
-            }else{
-              console.log('error on ' + file);
+            } else {
+              console.log("error on " + file);
             }
           }
         });
@@ -172,8 +174,11 @@ module.exports = moduleService = {
     let configInfo = await globalService.moduleContentTypeConfigs.filter(
       (x) => x.systemid === contentTypeSystemId
     );
-    let config = fileService.getFileSync(configInfo[0].filePath, true, false);
-    return config;
+    if (configInfo[0]) {
+      let config = fileService.getFileSync(configInfo[0].filePath, true, false);
+      return config;
+    }
+    return {};
   },
 
   getModuleContentTypes: async function () {

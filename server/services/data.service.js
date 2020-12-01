@@ -100,6 +100,7 @@ if (typeof module !== "undefined" && module.exports) {
       return page.data;
     }),
     (exports.getContentType = async function (contentType) {
+      // console.log('getting content type ' + contentType);
       let url = `${apiUrl}modules/getContentTypeConfig?systemid=${contentType}`;
       let contentTypeConfig = await this.getAxios().get(url);
       let contentTypeObj =JSON.parse(contentTypeConfig.data.data);
