@@ -201,6 +201,17 @@ module.exports = moduleService = {
     let path = contentTypeDef.filePath;
   },
 
+  createModuleContentType: async function (contentTypeDef) {
+    console.log('creating content type', contentTypeDef)
+    contentTypeDef.filePath = `/server/modules/${contentTypeDef.moduleSystemid}/models/${contentTypeDef.systemid}.json`
+    contentTypeDef.data = {components: []};
+    fileService.writeFile(
+      contentTypeDef.filePath ,
+      JSON.stringify(contentTypeDef)
+    );
+    //TODO need to restart app
+  },
+
   getModuleCss: async function (path) {
     await dir.readFiles(
       path,

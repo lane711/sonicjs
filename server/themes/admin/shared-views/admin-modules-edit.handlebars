@@ -275,11 +275,10 @@
 
                 form.on('submit', async function (submission) {
                   var accessToken = '{{ this.accessToken }}';
-                  submission.data.data = {moduleSystemid : "test"};
-                  axios.post(`/api/contentTypes?access_token=${accessToken}`, submission.data)
+                  axios.post(`/api/modules/createModuleContentType?access_token=${accessToken}`, submission.data)
                     .then(async function (response) {
                       console.log(response);
-                      window.location.replace('/admin/content-types/edit/' + submission.data.systemid);
+                      window.location.replace('/admin/modules/edit/' + submission.data.systemid);
 
                     })
                     .catch(function (error) {

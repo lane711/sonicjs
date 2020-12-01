@@ -136,4 +136,34 @@ module.exports = function(Module) {
         type: "object",
       },
     });
+
+
+    //create module content type
+    Module.createModuleContentType = async function (body, cb) {
+
+      let moduleDefinitionFile = {
+          "title": body.title,
+          "systemid": body.systemid,
+          "moduleSystemid" : body.moduleSystemid
+      }
+
+      let newContentType = moduleService.createModuleContentType(moduleDefinitionFile);
+
+      return newContentType;
+  };
+
+  Module.remoteMethod(
+      'createModuleContentType', {
+      http: {
+          path: '/createModuleContentType',
+          verb: 'post',
+      },
+      accepts: { arg: 'data', type: 'object', http: { source: 'body' }},
+      description: 'Creates a new module content type',
+      returns: {
+          arg: 'data',
+          type: 'object',
+      }
+  }
+  );
 };
