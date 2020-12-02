@@ -1,6 +1,7 @@
 "use strict";
 var moduleService = require("../services/module.service");
 var fileService = require("../services/file.service");
+var emitterService = require("../services/emitter.service");
 
 module.exports = function (Module) {
   //create
@@ -61,9 +62,11 @@ module.exports = function (Module) {
   });
 
   Module.getContentTypeConfig = async function (systemid, cb) {
-    let obj = await moduleService.getModuleContentType(systemid);
-    return obj;
-    // cb(null, obj);
+    let contentType = await moduleService.getModuleContentType(systemid);
+
+    await emitterService.emit("contentTypeLoaded", contentType);
+
+    return contentType;
   };
 
   Module.remoteMethod("getContentTypeConfig", {

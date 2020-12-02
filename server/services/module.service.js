@@ -79,8 +79,7 @@ module.exports = moduleService = {
 
     for (let index = 0; index < moduleContentTypesAdmin.length; index++) {
       const ct = moduleContentTypesAdmin[index];
-      let cty = await moduleService.getModuleContentType(ct.systemid);
-      let contentType = JSON.parse(cty);
+      let contentType = await moduleService.getModuleContentType(ct.systemid);
       moduleContentTypes.push(contentType);
     }
     // moduleContentTypesAdmin.forEach(contentTypeSystemId => {
@@ -164,7 +163,8 @@ module.exports = moduleService = {
     );
     if (configInfo[0]) {
       let config = fileService.getFileSync(configInfo[0].filePath, true, false);
-      return config;
+      let contentType = JSON.parse(config);
+      return contentType;
     }
     return {};
   },
