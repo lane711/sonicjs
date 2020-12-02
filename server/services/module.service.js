@@ -189,7 +189,7 @@ module.exports = moduleService = {
     contentTypeDef.filePath = `/server/modules/${contentTypeDef.moduleSystemid}/models/${contentTypeDef.systemid}.json`;
     contentTypeDef.data = { components: [] };
     let contentTypeDefObj = JSON.stringify(contentTypeDef);
-    fileService.writeFile(contentTypeDef.filePath, contentTypeDefObj);
+    await fileService.writeFile(contentTypeDef.filePath, contentTypeDefObj);
     //reload modules
     await moduleService.processModules();
 
