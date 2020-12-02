@@ -2,6 +2,7 @@
   "id": 57,
   "systemid": "theme-settings",
   "title": "Theme Settings",
+  "moduleSystemid": "theme-settings",
   "data": {
     "components": [
       {

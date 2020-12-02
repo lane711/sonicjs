@@ -2,6 +2,7 @@
   "id": 8,
   "systemid": "site-settings",
   "title": "Site Settings",
+  "moduleSystemid": "site-settings",
   "data": {
     "components": [
       {

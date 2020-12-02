@@ -2,6 +2,7 @@
   "id": 14,
   "systemid": "site-settings-typography",
   "title": "Site Settings Typography",
+  "moduleSystemid": "site-settings",
   "data": {
     "components": [
       {

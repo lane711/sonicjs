@@ -2,6 +2,7 @@
   "id": 51,
   "systemid": "compare-item-boolean",
   "title": "Compare Item Boolean",
+  "moduleSystemid": "compare-item-boolean",
   "data": {
     "components": [
       {

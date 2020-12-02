@@ -2,6 +2,7 @@
   "id": 42,
   "systemid": "image",
   "title": "Module - Image",
+  "moduleSystemid": "image",
   "data": {
     "components": [
       {

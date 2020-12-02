@@ -2,6 +2,7 @@
   "id": 15,
   "systemid": "site-settings-colors",
   "title": "Site Settings Colors",
+  "moduleSystemid": "site-settings",
   "data": {
     "components": [
       {

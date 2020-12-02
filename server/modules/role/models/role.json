@@ -2,6 +2,7 @@
   "id": 59,
   "systemid": "role",
   "title": "Role",
+  "moduleSystemid": "role",
   "data": {
     "components": [
       {

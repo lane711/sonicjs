@@ -2,6 +2,7 @@
   "id": 44,
   "systemid": "mixpanel",
   "title": "Module - Mixpanel",
+  "moduleSystemid": "mixpanel",
   "data": {
     "components": [
       {

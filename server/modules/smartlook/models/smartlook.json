@@ -2,6 +2,7 @@
   "id": 43,
   "systemid": "smartlook",
   "title": "Module - Smartlook",
+  "moduleSystemid": "smartlook",
   "data": {
     "components": [
       {

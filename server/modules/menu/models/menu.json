@@ -2,6 +2,7 @@
   "id": 13,
   "systemid": "menu",
   "title": "Menu",
+  "moduleSystemid": "menu",
   "data": {
     "components": [
       {

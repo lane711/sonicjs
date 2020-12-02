@@ -1,7 +1,8 @@
 {
   "id": 21,
   "systemid": "module-media",
-  "title": "Module - Media",
+  "title": "Media",
+  "moduleSystemid": "media",
   "data": {
     "components": [
       {

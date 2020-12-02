@@ -2,6 +2,7 @@
   "id": 12,
   "systemid": "page",
   "title": "Page",
+  "moduleSystemid": "page",
   "data": {
     "components": [
       {

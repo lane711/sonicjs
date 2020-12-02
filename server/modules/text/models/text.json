@@ -2,6 +2,7 @@
   "id": 32,
   "systemid": "text",
   "title": "Module - Text",
+  "moduleSystemid": "text",
   "data": {
     "components": [
       {

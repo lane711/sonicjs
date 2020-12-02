@@ -2,6 +2,7 @@
   "id": 34,
   "systemid": "google-analytics",
   "title": "Module - Google Analytics",
+  "moduleSystemid": "google-analytics",
   "data": {
     "components": [
       {

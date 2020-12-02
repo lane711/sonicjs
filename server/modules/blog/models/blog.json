@@ -3,6 +3,7 @@
   "systemid": "blog",
   "title": "Blog",
   "filePath": "server/modules/blog/model/blog.json",
+  "moduleSystemid": "blog",
   "data": {
     "components": [
       {

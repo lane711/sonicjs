@@ -2,6 +2,7 @@
   "id": 50,
   "systemid": "compare-item",
   "title": "Compare Item",
+  "moduleSystemid": "compare-item",
   "data": {
     "components": [
       {

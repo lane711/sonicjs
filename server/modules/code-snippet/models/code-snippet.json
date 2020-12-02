@@ -1,7 +1,8 @@
 {
   "id": 37,
   "systemid": "code-snippet",
-  "title": "Module - Code Snippet",
+  "title": "Code Snippet",
+  "moduleSystemid": "code-snippet",
   "data": {
     "components": [
       {
