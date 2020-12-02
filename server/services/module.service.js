@@ -196,6 +196,18 @@ module.exports = moduleService = {
     return contentTypeDef;
   },
 
+  deleteModuleContentType: async function (moduleContentTypeSystemid) {
+    console.log("deleting content type", moduleContentTypeSystemid);
+    let filePath = await fileService.getFilesSearchSync(`${appRoot}/server/modules/`,`/**/*${moduleContentTypeSystemid}.json`)
+
+    fileService.deleteFile(filePath[0]);
+
+    //reload modules
+    await moduleService.processModules();
+  },
+
+
+
   getModuleCss: async function (path) {
 
     const files = fileService.getFilesSearchSync(path, '/**/*.css');

@@ -111,4 +111,8 @@ module.exports = fileService = {
     let envFileContent = stringify(parsedFile);
     await this.writeFile("../../.env", envFileContent);
   },
+
+  deleteFile: function (filePath) {
+    fs.unlinkSync(filePath);
+  },
 };

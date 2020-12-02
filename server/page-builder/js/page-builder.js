@@ -730,10 +730,10 @@ async function deleteContentType(id) {
   console.log("deleting content", id);
   // return this.http.put(environment.apiUrl + `content/${id}`, payload).toPromise();
   axiosInstance
-    .delete(`/api/contentTypes/${id}`)
+    .post(`/api/modules/deleteModuleContentType/`, { systemid: id})
     .then(async function (response) {
       console.log(response);
-      redirect("/admin/content-types");
+      // redirect("/admin/content-types");
     })
     .catch(function (error) {
       console.log(error);

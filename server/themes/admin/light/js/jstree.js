@@ -149,8 +149,9 @@ function formChanged(formData) {
 }
 
 function loadMenuTitleForm() {
-  console.log('loading menuMainEdit form')
+  // console.log('loading menuMainEdit form')
   let menuTitle = $('#menuTitle').val();
+  if(!menuTitle) return;
   Formio.createForm(document.getElementById('menuMainEdit'), {
     components: [
       {
