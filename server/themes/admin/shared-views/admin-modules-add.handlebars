@@ -24,7 +24,8 @@
                     key: 'systemid',
                     label: 'SystemId',
                     placeholder: 'Enter the slug to be used as the system id (ie: service-list, news-feed, public-service)',
-                    input: true
+                    input: true,
+                    calculateValue: "value = slugify(data.title);",
                   },
                   {
                     type: 'checkbox',

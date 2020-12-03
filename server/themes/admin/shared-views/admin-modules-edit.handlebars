@@ -6,7 +6,7 @@
           <i class="fa fa-align-justify edit-content-type"></i> Edit Module: {{ data.moduleDef.title }}
         </div>
 
-{{ log data}}
+        {{ log data}}
         <div class="card-body">
 
           <script type='text/javascript'>
@@ -64,7 +64,7 @@
                   };
                   form.on('submit', async function (submission) {
                     var accessToken = '{{ this.accessToken }}';
-                    axios.put(`/api/modules?access_token=${accessToken}`, submission.data)
+                    axios.put(`/api/modules/updateJsonFile?access_token=${accessToken}`, submission.data)
                       .then(async function (response) {
                         console.log('edit module', response);
                         //return await response.data;
@@ -90,7 +90,7 @@
   </div>
 
 
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
     <li class="nav-item">
       <a class="nav-link active" id="home-tab" data-toggle="tab" href="#fields" role="tab" aria-controls="home"
         aria-selected="true">Content Types</a>
@@ -126,47 +126,47 @@
 
 
 
-  <div class="card">
-    <div class="card-header">
-      <i class="fa fa-align-justify"></i> Content Types
-      <a href="javascript:void(0)" onclick="loadCreateContentTypeForm(); openNewContentTypeModal()"
-        class="btn btn-success float-right new-content-type">New Content Type</a>
-    </div>
-    <div class="card-body page-list">
+      <div class="card">
+        <div class="card-header">
+          <i class="fa fa-align-justify"></i> Content Types
+          <a href="javascript:void(0)" onclick="loadCreateContentTypeForm(); openNewContentTypeModal()"
+            class="btn btn-success float-right new-content-type">New Content Type</a>
+        </div>
+        <div class="card-body page-list">
 
-              <table class="table table-responsive-sm table-striped">
-                <thead>
-                  <tr>
-                    <th>Title</th>
-                    <th>Module</th>
-                    <th>Edit</th>
-                  </tr>
-                </thead>
-                <tbody>
+          <table class="table table-responsive-sm table-striped">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Module</th>
+                <th>Edit</th>
+              </tr>
+            </thead>
+            <tbody>
 
-                  {{!-- {{log data}} --}}
-                  {{#each data.contentTypes}}
-                  <tr>
-                    <td><a href="/admin/content-types/edit/{{ this.systemid }}">{{ this.title }}</a></td>
-                    <td><a href="/admin/modules/edit/{{ this.moduleSystemid }}">{{ this.moduleSystemid }}</a></td>
-                    <td>
-                      <a class="btn btn-sm btn-primary rmargin"
-                        href="/admin/content-types/edit/{{ this.systemid }}">Edit</a>
+              {{!-- {{log data}} --}}
+              {{#each data.contentTypes}}
+              <tr>
+                <td><a href="/admin/content-types/edit/{{ this.systemid }}">{{ this.title }}</a></td>
+                <td><a href="/admin/modules/edit/{{ this.moduleSystemid }}">{{ this.moduleSystemid }}</a></td>
+                <td>
+                  <a class="btn btn-sm btn-primary rmargin"
+                    href="/admin/content-types/edit/{{ this.systemid }}">Edit</a>
 
-                      <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
-                        data-trigger="focus" aria-label="Delete {{ this.title }}"
-                        title="Delete <b>{{ this.title }}</b> Forever?" data-content="<a href='
+                  <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
+                    data-trigger="focus" aria-label="Delete {{ this.title }}"
+                    title="Delete <b>{{ this.title }}</b> Forever?" data-content="<a href='
                         /contentType/{{ this.systemid }}' class='btn btn-sm btn-danger rmargin'>Confirm Delete</a>
                       ">Delete</a>
 
-                    </td>
-                  </tr>
-                  {{/each}}
-                </tbody>
-              </table>
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
 
-    </div>
-  </div>
+        </div>
+      </div>
 
 
     </div>
@@ -220,84 +220,85 @@
 
 
 
-<!-- Section Editor Modal -->
-<div class="modal fade" id="newContentTypeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">New Content Type</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
+  <!-- Section Editor Modal -->
+  <div class="modal fade" id="newContentTypeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">New Content Type</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
 
-        <script type='text/javascript'>
-          function loadCreateContentTypeForm () {
-            Formio.createForm(document.getElementById('createContentTypeForm'), {
-              components: [
-                {
-                  type: 'textfield',
-                  key: 'title',
-                  label: 'Content Type Title',
-                  placeholder: 'Enter the title of your new content type (ie: Blog, News, Public Service).',
-                  input: true
-                },
-                {
-                  type: 'textfield',
-                  key: 'systemid',
-                  label: 'System Id',
-                  placeholder: 'Enter the slug to be used as the system id (ie: blog, news, public-service)',
-                  input: true
-                },
-                                {
-                  type: 'textfield',
-                  key: 'moduleSystemid',
-                  label: 'Module System Id',
-                  input: true
-                },
-                {
-                  type: 'button',
-                  action: 'submit',
-                  label: 'Create',
-                  theme: 'primary'
-                }
-              ]
+          <script type='text/javascript'>
+            function loadCreateContentTypeForm() {
+              Formio.createForm(document.getElementById('createContentTypeForm'), {
+                components: [
+                  {
+                    type: 'textfield',
+                    key: 'title',
+                    label: 'Content Type Title',
+                    placeholder: 'Enter the title of your new content type (ie: Blog, News, Public Service).',
+                    input: true
+                  },
+                  {
+                    type: 'textfield',
+                    key: 'systemid',
+                    label: 'System Id',
+                    placeholder: 'Enter the slug to be used as the system id (ie: blog, news, public-service)',
+                    input: true,
+                    calculateValue: "value = slugify(data.title);",
+                  },
+                  {
+                    type: 'textfield',
+                    key: 'moduleSystemid',
+                    label: 'Module System Id',
+                    input: true
+                  },
+                  {
+                    type: 'button',
+                    action: 'submit',
+                    label: 'Create',
+                    theme: 'primary'
+                  }
+                ]
 
 
-            })
-              .then(async function (form) {
+              })
+                .then(async function (form) {
 
-                form.submission = {
-                      data: {moduleSystemid: "{{ data.moduleDef.systemid }}"}
+                  form.submission = {
+                    data: { moduleSystemid: "{{ data.moduleDef.systemid }}" }
                   };
 
-                form.on('submit', async function (submission) {
-                  var accessToken = '{{ this.accessToken }}';
-                  axios.post(`/api/modules/createModuleContentType?access_token=${accessToken}`, submission.data)
-                    .then(async function (response) {
-                      console.log(response);
-                      window.location.replace('/admin/modules/edit/' + response.data.data.moduleSystemid);
+                  form.on('submit', async function (submission) {
+                    var accessToken = '{{ this.accessToken }}';
+                    axios.post(`/api/modules/createModuleContentType?access_token=${accessToken}`, submission.data)
+                      .then(async function (response) {
+                        console.log(response);
+                        window.location.replace('/admin/modules/edit/' + response.data.data.moduleSystemid);
 
-                    })
-                    .catch(function (error) {
-                      console.log(error);
-                    });
+                      })
+                      .catch(function (error) {
+                        console.log(error);
+                      });
 
+                  });
                 });
-              });
-          }
-        </script>
+            }
+          </script>
 
-        <div id="createContentTypeForm"></div>
+          <div id="createContentTypeForm"></div>
 
-      </div>
-      {{!-- <div class="modal-footer">
+        </div>
+        {{!-- <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
         <button type="button" class="btn btn-success wysiwyg-save" onclick='saveNewContentType()'
           data-dismiss="modal">Create</button>
       </div> --}}
+      </div>
     </div>
   </div>
-</div>
