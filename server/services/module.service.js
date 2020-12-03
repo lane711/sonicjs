@@ -1,7 +1,7 @@
 var path = require("path");
 var fs = require("fs");
 var _ = require("lodash");
-const glob = require('glob');
+const glob = require("glob");
 
 var emitterService = require("../services/emitter.service");
 var globalService = require("../services/global.service");
@@ -91,8 +91,7 @@ module.exports = moduleService = {
   },
 
   getModuleDefinitionFiles: async function (path) {
-
-    const files = fileService.getFilesSearchSync(path, '/**/module.json');
+    const files = fileService.getFilesSearchSync(path, "/**/module.json");
 
     let moduleList = [];
 
@@ -126,13 +125,12 @@ module.exports = moduleService = {
     await moduleService.loadModuleServices(moduleList);
 
     return moduleList;
-
   },
 
   getModuleContentTypesConfigs: async function (path) {
     let moduleCount = 0;
 
-    const files = fileService.getFilesSearchSync(path, '/**/*.json');
+    const files = fileService.getFilesSearchSync(path, "/**/*.json");
 
     globalService.moduleContentTypeConfigs = [];
 
@@ -154,7 +152,6 @@ module.exports = moduleService = {
       }
     });
     return moduleCount;
-
   },
 
   getModuleContentType: async function (contentTypeSystemId) {
@@ -187,6 +184,8 @@ module.exports = moduleService = {
   createModuleContentType: async function (contentTypeDef) {
     console.log("creating content type", contentTypeDef);
     contentTypeDef.filePath = `/server/modules/${contentTypeDef.moduleSystemid}/models/${contentTypeDef.systemid}.json`;
+    contentTypeDef.title =
+      contentTypeDef.title ?? contentTypeDef.moduleSystemid;
     contentTypeDef.data = { components: [] };
     let contentTypeDefObj = JSON.stringify(contentTypeDef);
     await fileService.writeFile(contentTypeDef.filePath, contentTypeDefObj);
@@ -198,7 +197,10 @@ module.exports = moduleService = {
 
   deleteModuleContentType: async function (moduleContentTypeSystemid) {
     console.log("deleting content type", moduleContentTypeSystemid);
-    let filePath = await fileService.getFilesSearchSync(`${appRoot}/server/modules/`,`/**/*${moduleContentTypeSystemid}.json`)
+    let filePath = await fileService.getFilesSearchSync(
+      `${appRoot.path}/server/modules/`,
+      `/**/*${moduleContentTypeSystemid}.json`
+    );
 
     fileService.deleteFile(filePath[0]);
 
@@ -206,11 +208,8 @@ module.exports = moduleService = {
     await moduleService.processModules();
   },
 
-
-
   getModuleCss: async function (path) {
-
-    const files = fileService.getFilesSearchSync(path, '/**/*.css');
+    const files = fileService.getFilesSearchSync(path, "/**/*.css");
 
     globalService.moduleCssFiles = [];
 
@@ -218,12 +217,10 @@ module.exports = moduleService = {
       let link = file.substr(file.indexOf("server") + 6, file.length);
       globalService.moduleCssFiles.push(link);
     });
-
   },
 
   getModuleJs: async function (path) {
-
-    const files = fileService.getFilesSearchSync(path, '/**/*.css');
+    const files = fileService.getFilesSearchSync(path, "/**/*.css");
 
     globalService.moduleJsFiles = [];
 
@@ -233,7 +230,6 @@ module.exports = moduleService = {
         globalService.moduleJsFiles.push(link);
       }
     });
-
   },
 
   processModuleInColumn: async function (options) {
@@ -287,6 +283,7 @@ module.exports = moduleService = {
 
     //create sub folders
     fileService.createDirectory(`${basePath}/services`);
+    fileService.createDirectory(`${basePath}/models`);
     fileService.createDirectory(`${basePath}/views`);
     fileService.createDirectory(`${basePath}/assets`);
     fileService.createDirectory(`${basePath}/assets/css`);
@@ -319,8 +316,8 @@ module.exports = moduleService = {
       moduleDefinitionFile.systemid
     );
     let mainServiceFilePath = path.join(
-      __dirname,
-      "../server/assets/module-default-main-service.js"
+      appRoot.path,
+      "/server/assets/js/module-default-main-service.js"
     );
     var mainServiceFile = await viewService.getProccessedView(
       null,
@@ -361,7 +358,13 @@ module.exports = moduleService = {
       key: "submit",
       theme: "primary",
     });
-    let ct = await dataService.createContentType(moduleContentType);
+    // let ct = await dataService.createContentType(moduleContentType);
+    let contentTypeDef = {
+      moduleSystemid: moduleDefinitionFile.systemid,
+      systemid: moduleDefinitionFile.systemid,
+      title: moduleDefinitionFile.title,
+    };
+    await moduleService.createModuleContentType(contentTypeDef);
   },
 
   updateModule: async function (moduleDefinitionFile) {

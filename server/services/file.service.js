@@ -86,7 +86,7 @@ module.exports = fileService = {
   },
 
   createDirectory: async function (directoryRelativePath) {
-    let dirPath = path.join(__dirname, directoryRelativePath);
+    let dirPath = path.join(appRoot.path, directoryRelativePath);
     if (!fs.existsSync(dirPath)) {
       fs.mkdirSync(dirPath);
     }
