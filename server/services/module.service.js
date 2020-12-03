@@ -27,7 +27,7 @@ module.exports = moduleService = {
   },
 
   processModules: async function () {
-    let moduleDir = path.resolve(__dirname, "..", "modules");
+    let moduleDir = path.join(appRoot.path, "/server/modules");
 
     await this.getModuleDefinitionFiles(moduleDir);
     await this.getModuleCss(moduleDir);

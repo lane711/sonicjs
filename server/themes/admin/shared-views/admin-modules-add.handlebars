@@ -48,7 +48,7 @@
               })
                 .then(async function (form) {
                   form.submission = {
-                    data: { canBeAddedToColumn: true }
+                    data: { canBeAddedToColumn: true, enabled: true }
                   };
                   form.on('submit', async function (submission) {
                     var accessToken = '{{ this.accessToken }}';

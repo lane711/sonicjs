@@ -10,7 +10,7 @@
         <div class="card-body">
 
           <script type='text/javascript'>
-            let moduleDef = {{{ this.data.moduleDef }}};
+            let moduleDef = {{{ json data.moduleDef }}};
             window.onload = function () {
               Formio.createForm(document.getElementById('moduleDefForm'), {
                 components: [

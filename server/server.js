@@ -82,6 +82,9 @@ app.start = function () {
     or: function () {
       return Array.prototype.slice.call(arguments, 0, -1).some(Boolean);
     },
+    json: function(context){
+      return JSON.stringify(context);
+    },
   });
 
   // Parse JSON bodies (as sent by API clients)
