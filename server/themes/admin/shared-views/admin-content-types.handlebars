@@ -90,52 +90,7 @@ data-content="<a class='btn btn-sm btn-danger' onclick='deleteContentType({{ thi
       </div>
       <div class="modal-body">
 
-        <script type='text/javascript'>
-          window.onload = function () {
-            Formio.createForm(document.getElementById('createContentTypeForm'), {
-              components: [
-                {
-                  type: 'textfield',
-                  key: 'title',
-                  label: 'Content Type Title',
-                  placeholder: 'Enter the title of your new content type (ie: Blog, News, Public Service).',
-                  input: true
-                },
-                {
-                  type: 'textfield',
-                  key: 'systemid',
-                  label: 'systemid',
-                  placeholder: 'Enter the slug to be used as the system id (ie: blog, news, public-service)',
-                  input: true
-                },
-                {
-                  type: 'button',
-                  action: 'submit',
-                  label: 'Create',
-                  theme: 'primary'
-                }
-              ]
-            })
-              .then(async function (form) {
-                form.on('submit', async function (submission) {
-                  var accessToken = '{{ this.accessToken }}';
-                  submission.data.data = {};
-                  axios.post(`/api/contentTypes?access_token=${accessToken}`, submission.data)
-                    .then(async function (response) {
-                      console.log(response);
-                      window.location.replace('/admin/content-types/edit/' + submission.data.systemid);
-
-                    })
-                    .catch(function (error) {
-                      console.log(error);
-                    });
-
-                });
-              });
-          }
-        </script>
-
-        <div id="createContentTypeForm"></div>
+        <h6>To create a new content type, first select a <a href='/admin/modules/'>module</a>, then add a new content type to it.</h6>
 
       </div>
       {{!-- <div class="modal-footer">
