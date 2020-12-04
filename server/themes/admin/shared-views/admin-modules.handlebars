@@ -32,26 +32,11 @@
             <td class="text-center">
               <a class="btn btn-sm btn-primary rmargin" href="/admin/modules/edit/{{ this.systemid }}">Edit</a>
 
-              <button class="btn btn-sm btn-danger" type="button" data-toggle="collapse"
-                data-target="#collapse{{ this.systemid }}" aria-expanded="false" aria-controls="collapseExample">
-                Delete
-              </button>
-              <div class="collapse" style="margin: 12px 0 0; max-width:300px;" id="collapse{{ this.systemid }}">
-                <div class="card card-body">
-                  <a class='btn btn-sm btn-danger' href="#" onclick='deleteContentType({{ this.id }})'>Confirm Delete
-                    {{ this.title }}?</a> </div>
-              </div>
-
-              {{!-- <button type="button" class="btn btn-sm btn-danger" data-toggle="popover"
- title="Delete Content Type {{ this.title }}" data-html="true"
-data-content="<a class='btn btn-sm btn-danger' onclick='deleteContentType({{ this.id }})' >Confirm Delete?</a>">Delete</button> --}}
-
-
-              {{!-- <ng-template #popTitle>Delete <b>{{ contentType.name }}</b>?</ng-template>
-              <ng-template #popContent><button class="btn btn-sm btn-danger"
-                  (click)="deleteContentType(contentType.id)">Confirm Delete</button></ng-template>
-              <button class="btn btn-sm btn-danger" placement="top" [ngbPopover]="popContent"
-                [popoverTitle]="popTitle">Delete</button> --}}
+ <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
+                data-trigger="focus" aria-label="Delete {{ this.title }}"
+                title="Delete <b>{{ this.title }}</b> Forever?" data-content="<a href='/module/{{ this.systemid }}'
+   class='btn btn-sm btn-danger rmargin custom-delete'>Confirm Delete</a>
+">Delete</a>
             </td>
           </tr>
           {{/each}}

@@ -296,5 +296,10 @@ if (typeof module !== "undefined" && module.exports) {
     (exports.getImage = function (img) {
       let url = this.getImageUrl(img);
       return `<img class="img-fluid rounded" src="${url}" />`;
+    }),
+    (exports.deleteModule = async function (moduleSystemid) {
+      let url = `${apiUrl}modules/deleteModule`;
+      let objToDelete = { moduleSystemid: moduleSystemid };
+      await this.getAxios().post(url, objToDelete);
     });
 })(typeof exports === "undefined" ? (this["dataService"] = {}) : exports);

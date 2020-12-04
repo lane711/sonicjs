@@ -292,48 +292,6 @@ module.exports = function (app) {
     // // return;
   });
 
-  app.post("/admin/pb-update-module-delete", async function (req, res) {
-    let data = req.body.data;
-    console.log(data);
-
-    let section = await dataService.getContentById(data.sectionId);
-    let content =
-      section.data.rows[data.rowIndex].columns[data.columnIndex].content;
-    // console.log("content", content);
-
-    // remove shortcode from the source column
-    let shortCodesInColumn = ShortcodeTree.parse(content);
-    let shortCodeToRemove = shortCodesInColumn.children[data.moduleIndex];
-    // console.log("shortCodeToRemove", shortCodeToRemove);
-    if (shortCodeToRemove && shortCodeToRemove.shortcode) {
-      let newContent = content.replace(
-        shortCodeToRemove.shortcode.codeText,
-        ""
-      );
-      section.data.rows[data.rowIndex].columns[
-        data.columnIndex
-      ].content = newContent;
-      // console.log("newContent", newContent);
-      await dataService.editInstance(section);
-    }
-
-    //regen the destination
-    // let destinationSection = await dataService.getContentById(
-    //   data.destinationSectionId
-    // );
-
-    // let updatedDestinationContent = sharedService.generateShortCodeList(
-    //   data.destinationModules
-    // );
-    // console.log("updatedDestinationContent", updatedDestinationContent);
-    // destinationSection.data.rows[data.destinationRowIndex].columns[
-    //   data.destinationColumnIndex
-    // ].content = updatedDestinationContent;
-    // let r = await dataService.editInstance(destinationSection);
-
-    res.send(`ok`);
-  });
-
   app.get("/hbs", async function (req, res) {
     res.render("home");
   });

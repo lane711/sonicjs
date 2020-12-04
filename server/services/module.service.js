@@ -339,9 +339,8 @@ module.exports = moduleService = {
     let moduleContentType = {
       title: `Module - ${moduleDefinitionFile.title}`,
       systemid: moduleDefinitionFile.systemid,
-      canBeAddedToColumn: moduleDefinitionFile.canBeAddedToColumn
-        ? true
-        : false,
+      canBeAddedToColumn: moduleDefinitionFile.canBeAddedToColumn,
+      enabled: moduleDefinitionFile.enabled,
       data: { components: [] },
     };
     moduleContentType.data.components.push({
@@ -373,5 +372,17 @@ module.exports = moduleService = {
       `${basePath}/module.json`,
       JSON.stringify(moduleDefinitionFile, null, 2)
     );
+  },
+
+  deleteModule: async function (moduleSystemid) {
+    if (moduleSystemid) {
+      let modulePath = path.join(
+        appRoot.path,
+        `/server/modules/${moduleSystemid}`
+      );
+      await fileService.deleteDirectory(modulePath);
+      await moduleService.processModules();
+    }
+    return true;
   },
 };

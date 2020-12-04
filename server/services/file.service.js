@@ -115,4 +115,8 @@ module.exports = fileService = {
   deleteFile: function (filePath) {
     fs.unlinkSync(filePath);
   },
+
+  deleteDirectory: function(directoryPath){
+    return fs.rmdirSync(directoryPath, { recursive: true });
+  }
 };

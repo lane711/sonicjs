@@ -5,13 +5,12 @@ $(document).ready(async function () {
   })
 
   $('table').on('shown.bs.popover', function () {
-    var btns = document.getElementsByClassName("btn-danger");
+    var btns = document.getElementsByClassName("custom-delete");
     for (var i = 0; i < btns.length; i++) {
       btns[i].onclick = async function (event) {
         event.preventDefault();
         //delete content
         if (!this.href) return;
-
         var typeToDelete = getPathParts(this.href, 1);
         var idToDelete = getPathParts(this.href, 0);
         if (idToDelete) {
@@ -33,6 +32,11 @@ $(document).ready(async function () {
 
           if (typeToDelete == "Role") {
             await deleteRole(idToDelete);
+            location.reload();
+          }
+
+          if (typeToDelete == "module") {
+            await dataService.deleteModule(idToDelete);
             location.reload();
           }
 

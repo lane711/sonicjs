@@ -10,8 +10,8 @@ module.exports = function (Module) {
       title: body.title,
       systemid: body.systemid,
       version: "0.0.0.1",
-      canBeAddedToColumn: true,
-      enabled: body.enabled === "true" ? true : false,
+      canBeAddedToColumn: body.canBeAddedToColumn,
+      enabled: body.enabled,
     };
 
     moduleService.createModule(moduleDefinitionFile);
@@ -159,26 +159,47 @@ module.exports = function (Module) {
     },
   });
 
-    //delete module content type
-    Module.deleteModuleContentType = async function (body, cb) {
+  //delete module content type
+  Module.deleteModuleContentType = async function (body, cb) {
+    let newContentType = await moduleService.deleteModuleContentType(
+      body.systemid
+    );
 
-      let newContentType = await moduleService.deleteModuleContentType(
-        body.systemid
-      );
+    return newContentType;
+  };
 
-      return newContentType;
-    };
+  Module.remoteMethod("deleteModule", {
+    http: {
+      path: "/deleteModuleContentType",
+      verb: "post",
+    },
+    accepts: { arg: "data", type: "object", http: { source: "body" } },
+    description: "Creates a new module content type",
+    returns: {
+      arg: "data",
+      type: "object",
+    },
+  });
 
-    Module.remoteMethod("deleteModuleContentType", {
-      http: {
-        path: "/deleteModuleContentType",
-        verb: "post",
-      },
-      accepts: { arg: "data", type: "object", http: { source: "body" } },
-      description: "Creates a new module content type",
-      returns: {
-        arg: "data",
-        type: "object",
-      },
-    });
+  //delete module
+  Module.deleteModule = async function (body, cb) {
+    let status = await moduleService.deleteModule(
+      body.moduleSystemid
+    );
+
+    return status;
+  };
+
+  Module.remoteMethod("deleteModule", {
+    http: {
+      path: "/deleteModule",
+      verb: "post",
+    },
+    accepts: { arg: "data", type: "object", http: { source: "body" } },
+    description: "Creates a new module content type",
+    returns: {
+      arg: "data",
+      type: "object",
+    },
+  });
 };
