@@ -6,8 +6,8 @@ const path = require("path");
 var UglifyJS = require("uglify-es");
 var csso = require("csso");
 var fileName = {};
-var frontEndTheme = `${process.env.FRONT_END_THEME}`;
-var frontEndThemeBootswatch = `${process.env.FRONT_END_THEME_BOOTSWATCH}`;
+const frontEndTheme = `${process.env.FRONT_END_THEME}`;
+const frontEndThemeBootswatch = `${process.env.FRONT_END_THEME_BOOTSWATCH}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
 
 module.exports = assetService = {
@@ -151,10 +151,8 @@ module.exports = assetService = {
   },
 
   getThemeAssets: async function () {
-    //TODO: convert to yaml
-    // frontEndTheme = "bootstrap";
     var themeConfig = await fileService.getYamlConfig(
-      `/server/themes/front-end/frontEndTheme/${frontEndTheme}.config.yml`
+      `/server/themes/front-end/${frontEndTheme}/${frontEndTheme}.config.yml`
     );
     return themeConfig.assets;
   },
