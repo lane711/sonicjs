@@ -27,7 +27,7 @@ module.exports = cssService = {
 
     if (!isTemplateCssProcessed) {
       //runs once at statup
-      console.log("regen template css");
+      // console.log("regen template css");
       isTemplateCssProcessed = true;
 
       await cssService.processTemplateCss();
@@ -63,7 +63,7 @@ module.exports = cssService = {
   },
 
   processTemplateCss: async function () {
-    let originalFilePath = `themes/front-end/${frontEndTheme}/css/template.css`;
+    let originalFilePath = `/server/themes/front-end/${frontEndTheme}/css/template.css`;
     let originalFile = await fileService.getFile(originalFilePath);
     // console.log(originalFile);
     let processedFilePath = `/server/themes/front-end/${frontEndTheme}/css/template-processed.css`
@@ -71,7 +71,7 @@ module.exports = cssService = {
     let viewModel = await dataService.getContentTopOne("site-settings-colors");
 
     // console.log("processing template css data", viewModel);
-    let cssPath = path.join(__dirname, "..", originalFilePath);
+    let cssPath = path.join(originalFilePath);
     let processCssString = await viewService.getProccessedView(
       "site-settings-colors",
       viewModel.data,
@@ -99,7 +99,7 @@ module.exports = cssService = {
 
   getCssFile: async function (page) {
     //get template.css
-    let cssString = await fileService.getFile(`themes/front-end/${frontEndTheme}/css/template.css`);
+    let cssString = await fileService.getFile(`/server/themes/front-end/${frontEndTheme}/css/template.css`);
     //parse the css
     var ast = csstree.parse(cssString);
     let cleanCss = csstree.generate(ast);

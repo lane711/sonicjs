@@ -154,12 +154,7 @@ module.exports = assetService = {
     //TODO: convert to yaml
     // frontEndTheme = "bootstrap";
     var themeConfig = await fileService.getYamlConfig(
-      path.join(
-        "themes",
-        "front-end",
-        frontEndTheme,
-        `${frontEndTheme}.config.yml`
-      )
+      `/server/themes/front-end/frontEndTheme/${frontEndTheme}.config.yml`
     );
     return themeConfig.assets;
   },
@@ -220,7 +215,7 @@ module.exports = assetService = {
         if (link.path.includes("/api/containers/css/download/template.css")) {
           link.path = `themes/front-end/${frontEndTheme}/css/template-processed.css`;
         }
-        let fileContentRaw = await fileService.getFile(link.path, root);
+        let fileContentRaw = await fileService.getFile(link.path);
         console.log(
           `Adding Path: ${link.path} -- Size: ${fileContentRaw.length}`
         );

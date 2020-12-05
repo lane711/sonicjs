@@ -11,9 +11,8 @@ const log = console.log;
 var path = require("path");
 const YAML = require("yaml");
 const { parse, stringify } = require("envfile");
-var appRoot = require('app-root-path');
-const glob = require('glob');
-
+var appRoot = require("app-root-path");
+const glob = require("glob");
 
 module.exports = fileService = {
   // startup: async function () {
@@ -24,11 +23,11 @@ module.exports = fileService = {
   //     });
   // },
 
-  getFile: async function (filePath, root = false) {
-    let adminPath = this.getFilePath(filePath, root);
+  getFile: async function (relativeFilePath) {
+    let filePath = path.join(appRoot.path, relativeFilePath);
 
     return new Promise((resolve, reject) => {
-      fs.readFile(adminPath, "utf8", (err, data) => {
+      fs.readFile(filePath, "utf8", (err, data) => {
         if (err) {
           console.log(chalk.red(err));
           reject(err);
@@ -37,21 +36,27 @@ module.exports = fileService = {
     });
   },
 
-  getFileSync: function (filePath, root = false, systemRoot = false) {
-    let adminPath = "";
-    if (systemRoot) {
-      adminPath = filePath;
-    } else {
-      adminPath = this.getFilePath(filePath, root);
-    }
-    let content = fs.readFileSync(adminPath, "utf8");
+  getFileSync: function (relativeFilePath) {
+    let filePath = path.join(appRoot.path, relativeFilePath);
+
+    let content = fs.readFileSync(filePath, "utf8");
     return content;
   },
 
-  getFilesSearchSync: function (dir, pattern){
+  getFilesSearchSync: function (dir, pattern) {
     const files = glob.sync(path.join(dir + pattern));
-    return files;
+    let filesRelative = fileService.convertFullPathToRelative(files);
+    return filesRelative;
+  },
 
+  convertFullPathToRelative: function (files) {
+    let filesRelative = [];
+
+    files.forEach((file) => {
+      filesRelative.push(file.replace(appRoot.path, ""));
+    });
+
+    return filesRelative;
   },
 
   getFilePath: function (filePath, root = false) {
@@ -71,7 +76,6 @@ module.exports = fileService = {
   },
 
   writeFile: async function (filePath, fileContent) {
-
     let fullPath = path.join(this.getRootAppPath(), filePath);
     // console.log('fullPath--->', fullPath);
 
@@ -105,7 +109,7 @@ module.exports = fileService = {
   updateEnvFileVariable: async function (variableName, variableValue) {
     process.env.REBUILD_ASSETS = "FALSE";
 
-    let envFile = await this.getFile(".env", true);
+    let envFile = await this.getFile(".env");
     let parsedFile = parse(envFile);
     parsedFile[variableName] = variableValue;
     let envFileContent = stringify(parsedFile);
@@ -116,7 +120,7 @@ module.exports = fileService = {
     fs.unlinkSync(filePath);
   },
 
-  deleteDirectory: function(directoryPath){
+  deleteDirectory: function (directoryPath) {
     return fs.rmdirSync(directoryPath, { recursive: true });
-  }
+  },
 };

@@ -59,12 +59,7 @@ if (typeof module !== "undefined" && module.exports) {
       content,
       onFormSubmitFunction
     ) {
-      // const viewModel = encodeURI(`{"data": {"onFormSubmitFunction":"addModuletoColumn(submission)"}}`);
-      // const viewPath = encodeURI(`/assets/html/form.html`);
-      // let formHtml = await axiosInstance.get(`api/views/getProceedView?viewModel=${viewModel}&viewPath=${viewPath}`)
 
-      // console.log('getForm', contentTypeId, content, onFormSubmitFunction);
-      // debugger;
       let contentType;
       if (content && content.data.contentType) {
         contentType = await dataService.getContentType(
@@ -109,18 +104,14 @@ if (typeof module !== "undefined" && module.exports) {
       // form += "</script>";
 
       // debugger;
-      let data = { viewModel: {}, viewPath: "/assets/html/form.html" };
+      let data = { viewModel: {}, viewPath: "/server/assets/html/form.html" };
       data.viewModel.onFormSubmitFunction = onFormSubmitFunction;
       data.viewModel.formJSON = formJSON;
       data.viewModel.formValuesToLoad =
         content && content.data ? content.data : {};
       data.viewModel.random = helperService.generateRandomString(8);
-      data.viewPath = "/assets/html/form.html";
+      data.viewPath = "/server/assets/html/form.html";
       data.contentType = "";
-      // let strViewModelData = JSON.stringify(viewModelData);
-      // const viewModel = encodeURI(strViewModelData);
-      // const viewPath = encodeURI(`/assets/html/form.html`);
-      // let formHtml = await axiosInstance.post(`/api/views/getProceedView?viewModel=${viewModel}&viewPath=${viewPath}`)
       let formHtml = await axiosInstance.post(`/api/views/getProceedView`, {
         data: data,
       });
@@ -159,7 +150,7 @@ if (typeof module !== "undefined" && module.exports) {
     }),
     (exports.getFormTemplateFileSystem = async function () {
       return new Promise((resolve, reject) => {
-        let themeFilePath = __dirname + "/../assets/html/form.html";
+        let themeFilePath = "/server/assets/html/form.html";
         fs.readFile(themeFilePath, "utf8", (err, data) => {
           if (err) {
             console.log(err);

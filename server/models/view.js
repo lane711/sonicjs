@@ -5,7 +5,7 @@ module.exports = function (View) {
 
     View.getProceedView = async function (body, cb) {
 
-        let viewServerPath = __dirname + '/..' + body.data.viewPath;
+        let viewServerPath = body.data.viewPath;
         // if(body.data.viewModel){
         //     viewModel = JSON.parse(body.data.viewModel);
         // }

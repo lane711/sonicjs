@@ -1,7 +1,8 @@
 var dataService = require('./data.service');
 var helperService = require('./helper.service');
+var fileService = require('./file.service');
 
-var fs = require('fs');
+// var fs = require('fs');
 
 
 var handlebars = require('handlebars');
@@ -10,6 +11,8 @@ var handlebars = require('handlebars');
 module.exports = viewService = {
 
     getProccessedView: async function (contentType, viewModel, viewPath) {
+
+      // return;
 
         var source = await viewService.getHandlebarsTemplateForContentType(contentType, viewPath);
         var template = handlebars.compile(source);
@@ -31,27 +34,30 @@ module.exports = viewService = {
     },
 
     getHandlebarsTemplateForContentType: async function (contentType, viewPath) {
-        let path = __dirname + `/../views/partials/${contentType}/list.handlebars`;
+        // let filePath = `/../views/partials/${contentType}/list.handlebars`;
+console.log('viee path', viewPath);
+        let file = fileService.getFileSync(viewPath);
+        return file;
 
-        if(viewPath){
-            path = viewPath;
-        }
+        // if(viewPath){
+        //     path = viewPath;
+        // }
 
-        return await viewService.getHandlebarsTemplate(path);
+        // return await viewService.getHandlebarsTemplate(path);
     },
 
-    getHandlebarsTemplate: async function (path) {
+    // getHandlebarsTemplate: async function (path) {
 
-        return new Promise((resolve, reject) => {
-            fs.readFile(path, "utf8", (err, data) => {
-                if (err) {
-                    console.log(err);
-                    reject(err);
-                }
-                else {
-                    resolve(data);
-                }
-            });
-        });
-    }
+    //     return new Promise((resolve, reject) => {
+    //         fs.readFile(path, "utf8", (err, data) => {
+    //             if (err) {
+    //                 console.log(err);
+    //                 reject(err);
+    //             }
+    //             else {
+    //                 resolve(data);
+    //             }
+    //         });
+    //     });
+    // }
 }

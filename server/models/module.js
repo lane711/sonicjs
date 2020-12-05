@@ -114,9 +114,9 @@ module.exports = function (Module) {
 
   Module.updateJsonFile = async function (data, cb) {
     let obj = JSON.stringify(data);
-    let def = await moduleService.getModuleDefinitionFile(data.systemid);
+    let moduleDef = await moduleService.getModuleDefinitionFileWithPath(data.systemid);
     //TODO need coorect file path to pass in
-    await fileService.writeFile(data.filePath, obj);
+    await fileService.writeFile(moduleDef.filePath, moduleDef);
     return data;
   };
 

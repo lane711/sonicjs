@@ -67,6 +67,14 @@ module.exports = moduleService = {
     return file;
   },
 
+  getModuleDefinitionFileWithPath: async function (systemid) {
+    let basePath = `/server/modules/${systemid}`;
+    let file = await fileService.getFile(`${basePath}/module.json`);
+    let moduleDef = JSON.parse(file);
+    moduleDef.filePath = basePath;
+    return moduleDef;
+  },
+
   getModuleContentTypesAdmin: async function (systemid) {
     let basePath = `${appRoot.path}/server/modules/${systemid}/models`;
     // let file = await fileService.getFile(`${basePath}/module.json`);
@@ -96,7 +104,7 @@ module.exports = moduleService = {
     let moduleList = [];
 
     files.forEach((file) => {
-      let raw = fs.readFileSync(file);
+      let raw = fileService.getFileSync(file);// fs.readFileSync(file);
       if (raw && raw.length > 0) {
         let moduleDef = JSON.parse(raw);
         let moduleFolder = moduleDef.systemid.replace("module-", "");
@@ -137,7 +145,7 @@ module.exports = moduleService = {
     files.forEach((file) => {
       if (file.indexOf("models") > -1) {
         moduleCount++;
-        let contentTypeRaw = fileService.getFileSync(file, false, true);
+        let contentTypeRaw = fileService.getFileSync(file);
         if (contentTypeRaw) {
           let contentType = JSON.parse(contentTypeRaw);
           // console.log(contentType);
@@ -159,7 +167,7 @@ module.exports = moduleService = {
       (x) => x.systemid === contentTypeSystemId
     );
     if (configInfo[0]) {
-      let config = fileService.getFileSync(configInfo[0].filePath, true, false);
+      let config = fileService.getFileSync(configInfo[0].filePath);
       let contentType = JSON.parse(config);
       return contentType;
     }
@@ -170,7 +178,7 @@ module.exports = moduleService = {
     let configInfos = await globalService.moduleContentTypeConfigs;
     let configs = [];
     configInfos.forEach((configInfo) => {
-      let config = fileService.getFileSync(configInfo.filePath, true, false);
+      let config = fileService.getFileSync(configInfo.filePath);
       let configObj = JSON.parse(config);
       configs.push(configObj);
     });

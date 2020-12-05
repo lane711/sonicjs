@@ -10,7 +10,7 @@ const chalk = require('chalk');
 const log = console.log;
 var path = require("path");
 
-module.exports = fileService = {
+module.exports = emailService = {
 
 
     sendEmail: async function (from, to, subject, body) {
