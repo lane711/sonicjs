@@ -1,6 +1,6 @@
 //check if running in node (and not the browser)
 if (typeof module !== "undefined" && module.exports) {
-  var loopback = require("loopback");
+  // var loopback = require("loopback");
   var emitterService = require("./emitter.service");
   var globalService = require("./global.service");
   var pageBuilderService = require("./page-builder.service");
@@ -10,7 +10,6 @@ if (typeof module !== "undefined" && module.exports) {
 
   var axios = require("axios");
   var fs = require("fs");
-  var cheerio = require("cheerio");
   var ShortcodeTree = require("shortcode-tree").ShortcodeTree;
   var chalk = require("chalk");
   var log = console.log;

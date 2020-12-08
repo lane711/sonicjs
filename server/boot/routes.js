@@ -49,7 +49,7 @@ module.exports = function appRoutes (app) {
   //   res.send('ok');
   // });
 
-  var router = app.loopback.Router();
+  // var router = app.loopback.Router();
 
   let page = "";
   let adminPage = "";
@@ -92,24 +92,24 @@ module.exports = function appRoutes (app) {
         // console.log(userInstance);
 
         //map admin role
-        var roleMappingModel = loopback.getModel("RoleMapping");
-        roleMappingModel.upsertWithWhere(
-          {
-            principalType: "user",
-            principalId: 1,
-            roleId: "admin",
-          },
-          {
-            principalType: "user",
-            principalId: 1,
-            roleId: "admin",
-          },
-          function (err, info) {
-            if (err) {
-              console.log(info);
-            }
-          }
-        );
+        // var roleMappingModel = loopback.getModel("RoleMapping");
+        // roleMappingModel.upsertWithWhere(
+        //   {
+        //     principalType: "user",
+        //     principalId: 1,
+        //     roleId: "admin",
+        //   },
+        //   {
+        //     principalType: "user",
+        //     principalId: 1,
+        //     roleId: "admin",
+        //   },
+        //   function (err, info) {
+        //     if (err) {
+        //       console.log(info);
+        //     }
+        //   }
+        // );
 
         globalService.isAdminUserCreated = true;
         let message = encodeURI(`Account created successfully. Please login`);

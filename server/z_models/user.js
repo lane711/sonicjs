@@ -6,7 +6,7 @@
 
 var config = require("../../server/config.json");
 var path = require("path");
-var loopback = require("loopback");
+// var loopback = require("loopback");
 const { forEach } = require("lodash");
 const modelUtils = require("./model-utils");
 
@@ -81,45 +81,45 @@ module.exports = function (User) {
 
   User.afterRemote("*", function (context, user, next) {
     //map roles
-    if (context.method.name === "replaceById") {
-      var roleMappingModel = loopback.getModel("RoleMapping");
+    // if (context.method.name === "replaceById") {
+    //   var roleMappingModel = loopback.getModel("RoleMapping");
 
-      //clear existing roles
-      roleMappingModel.destroyAll(
-        {
-          principalType: "user",
-          principalId: user.id,
-        },
-        function (err, info) {
-          if (err) {
-            console.log(err);
-          }
-          // console.log(info);
-        }
-      );
+    //   //clear existing roles
+    //   roleMappingModel.destroyAll(
+    //     {
+    //       principalType: "user",
+    //       principalId: user.id,
+    //     },
+    //     function (err, info) {
+    //       if (err) {
+    //         console.log(err);
+    //       }
+    //       // console.log(info);
+    //     }
+    //   );
 
-      if (!user.roles) {
-        return;
-      }
+    //   if (!user.roles) {
+    //     return;
+    //   }
 
-      user.roles.forEach((role) => {
-        roleMappingModel.upsertWithWhere(
-          {
-            principalType: "user",
-            principalId: user.id,
-            roleId: 1,
-          },
-          {
-            principalType: "user",
-            principalId: user.id,
-            roleId: 1,
-          },
-          function (err, info) {
-            // console.log(info);
-          }
-        );
-      });
-    }
+    //   user.roles.forEach((role) => {
+    //     roleMappingModel.upsertWithWhere(
+    //       {
+    //         principalType: "user",
+    //         principalId: user.id,
+    //         roleId: 1,
+    //       },
+    //       {
+    //         principalType: "user",
+    //         principalId: user.id,
+    //         roleId: 1,
+    //       },
+    //       function (err, info) {
+    //         // console.log(info);
+    //       }
+    //     );
+    //   });
+    // }
     // console.log("after user update", context);
 
     next();
