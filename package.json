@@ -1,0 +1,30 @@
+{
+  "name": "graphqlserver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/utkarshp21/graphql-server-setup.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/utkarshp21/graphql-server-setup/issues"
+  },
+  "homepage": "https://github.com/utkarshp21/graphql-server-setup#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "express-graphql": "^0.7.1",
+    "graphql": "^14.7.0",
+    "graphql-request": "^3.3.0",
+    "graphql-type-json": "^0.3.2",
+    "mongoose": "^5.11.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
+}
