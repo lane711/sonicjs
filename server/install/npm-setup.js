@@ -160,6 +160,7 @@ async function getDBConfig(dbType) {
       },
     ])
     .then(async (answers) => {
+      console.log('answers',answers);
       answers.name = "primary";
       answers.connector = "mongodb";
       await writeConfig(answers);

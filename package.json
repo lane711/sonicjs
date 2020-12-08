@@ -33,6 +33,7 @@
     "graphql": "^14.7.0",
     "graphql-request": "^3.3.0",
     "graphql-type-json": "^0.3.2",
+    "inquirer": "^7.3.3",
     "lodash": "^4.17.20",
     "mixpanel": "^0.13.0",
     "moment": "^2.29.1",
