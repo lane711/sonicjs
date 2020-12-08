@@ -60,22 +60,24 @@ function installDBDriver(dbType) {
       `\nInstalling drivers for ${dbType}. This may take up to a minute...\n`
     );
 
-    var cmd = exec(`npm install loopback-connector-${dbType} --save`, function (
-      err,
-      stdout,
-      stderr
-    ) {
-      if (err) {
-        // handle error
-        console.log(`Error has occurred: ${err}`);
-      }
-      console.log(stdout);
-      ui.log.write(`Success! Drivers installed for ${dbType}.`);
+    // var cmd = exec(`npm install loopback-connector-${dbType} --save`, function (
+    //   err,
+    //   stdout,
+    //   stderr
+    // ) {
+    //   if (err) {
+    //     // handle error
+    //     console.log(`Error has occurred: ${err}`);
+    //   }
+    //   console.log(stdout);
+    //   ui.log.write(`Success! Drivers installed for ${dbType}.`);
 
-      ui.log.write(`\nNow let's connect to your ${dbType} database.\n\n`);
+    //   ui.log.write(`\nNow let's connect to your ${dbType} database.\n\n`);
 
-      getDBConfig(dbType);
-    });
+    //   getDBConfig(dbType);
+    // });
+
+    getDBConfig(dbType);
 
     // dir.on("exit", function (code) {
     //   // return value from "npm build"

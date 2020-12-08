@@ -18,7 +18,7 @@ if (typeof module !== "undefined" && module.exports) {
   var log = console.log;
 } else {
   // var globalService = {};
-  const { request, gql } = require("graphql-request");
+  // const { request, gql } = require("graphql-request");
 
 }
 
@@ -48,6 +48,18 @@ if (typeof module !== "undefined" && module.exports) {
         // axiosInstance = axios.create({ baseURL: globalService.baseUrl });
       }
     });
+  }),
+  (exports.executeGraphqlQuery = async function (query) {
+    const endpoint = `${globalService.baseUrl}/graphql`;
+ 
+    const graphQLClient = new GraphQLClient(endpoint, {
+      headers: {
+        authorization: 'Bearer MY_TOKEN',
+      },
+    })
+  
+    const data = graphQLClient.request(query)
+    return data;
   }),
     (exports.getAxios = function () {
       //TODO add auth
@@ -97,26 +109,20 @@ if (typeof module !== "undefined" && module.exports) {
     }),
     (exports.getContentByType = async function (contentType) {
 
-      const endpoint = 'http://localhost:3019/graphql';
- 
-      const graphQLClient = new GraphQLClient(endpoint, {
-        headers: {
-          authorization: 'Bearer MY_TOKEN',
-        },
-      })
+
      
       const query = gql`
       {
-        contents {
+        contents (contentTypeId : "${contentType}") {
           contentTypeId
           data
         }
       }
       `
-     
-      const data = await graphQLClient.request(query)
-      console.log(JSON.stringify(data, undefined, 2))
+      
+     let data = await this.executeGraphqlQuery(query);
 
+     return data;
       // const query = gql`
       //   {
       //     contents {

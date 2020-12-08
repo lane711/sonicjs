@@ -25,7 +25,7 @@
       "type": "node",
       "request": "launch",
       "name": "Install",
-      "program": "${workspaceFolder}/install.js"
+      "program": "${workspaceFolder}/server/install/npm-setup.js"
     },
     {
       "type": "node",
