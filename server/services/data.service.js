@@ -12,9 +12,14 @@ if (typeof module !== "undefined" && module.exports) {
   var fs = require("fs");
   var ShortcodeTree = require("shortcode-tree").ShortcodeTree;
   var chalk = require("chalk");
+  // const { request, gql } = require("graphql-request");
+  var { GraphQLClient, gql, request } = require('graphql-request');
+
   var log = console.log;
 } else {
   // var globalService = {};
+  const { request, gql } = require("graphql-request");
+
 }
 
 (function (exports) {
@@ -91,12 +96,46 @@ if (typeof module !== "undefined" && module.exports) {
       return data;
     }),
     (exports.getContentByType = async function (contentType) {
-      const filter = encodeURI(
-        `{"where":{"data.contentType":"${contentType}"}}`
-      );
-      let url = `${apiUrl}content?filter=${filter}`;
-      let page = await this.getAxios().get(url);
-      return page.data;
+
+      const endpoint = 'http://localhost:3019/graphql';
+ 
+      const graphQLClient = new GraphQLClient(endpoint, {
+        headers: {
+          authorization: 'Bearer MY_TOKEN',
+        },
+      })
+     
+      const query = gql`
+      {
+        contents {
+          contentTypeId
+          data
+        }
+      }
+      `
+     
+      const data = await graphQLClient.request(query)
+      console.log(JSON.stringify(data, undefined, 2))
+
+      // const query = gql`
+      //   {
+      //     contents {
+      //       contentTypeId
+      //       data
+      //     }
+      //   }
+      // `;
+
+      // request("http://localhost:3000/graphql", query).then((data) => {
+      //   console.log('data;',data);
+      // });
+
+      // const filter = encodeURI(
+      //   `{"where":{"data.contentType":"${contentType}"}}`
+      // );
+      // let url = `${apiUrl}content?filter=${filter}`;
+      // let page = await this.getAxios().get(url);
+      // return page.data;
     }),
     (exports.getContentType = async function (contentType) {
       // console.log('getting content type ' + contentType);

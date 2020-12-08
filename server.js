@@ -1,9 +1,17 @@
+const fs = require("fs");
+initEnvFile();
+require("dotenv").config();
 const express = require("express");
 const graphqlHTTP = require("express-graphql");
 const schema = require("./server/schema/schema");
 const app = express();
 const { request, gql } = require("graphql-request");
-const routes = require("./server/boot/routes.js");
+const path = require("path");
+const chalk = require("chalk");
+// var express = require("express");
+var exphbs = require("express-handlebars");
+var Handlebars = require("handlebars");
+var globalService = require("./server/services/global.service");
 
 const mongoose = require("mongoose");
 
@@ -62,18 +70,10 @@ app.get("/", async function (req, res) {
 // -------------------
 
 // "use strict";
-const fs = require("fs");
-const path = require("path");
-initEnvFile();
-require("dotenv").config();
-var globalService = require("./server/services/global.service");
 
 // var loopback = require("loopback");
 // var boot = require("loopback-boot");
-const chalk = require("chalk");
-// var express = require("express");
-var exphbs = require("express-handlebars");
-var Handlebars = require("handlebars");
+
 // const { start } = require("repl");
 
 const frontEndTheme = `${process.env.FRONT_END_THEME}`
@@ -174,6 +174,8 @@ function start () {
   //   // }
   // });
 
+
+
   app.listen(3019, () => {
     var baseUrl = 'http://localhost:3019'; //app.get("url").replace(/\/$/, "");
     globalService.baseUrl = baseUrl;
@@ -181,6 +183,8 @@ function start () {
     console.log(chalk.cyan("Website at: ", baseUrl));
     console.log(chalk.cyan("Admin console at: ", baseUrl + "/admin"));
     console.log(chalk.cyan("GraphQL API at: ", baseUrl + "/graphql"));
+
+    const routes = require("./server/boot/routes.js");
 
 });
 

@@ -19,7 +19,7 @@
       "type": "node",
       "request": "launch",
       "name": "Server",
-      "program": "${workspaceFolder}/server/server.js"
+      "program": "${workspaceFolder}/server.js"
     },
     {
       "type": "node",
