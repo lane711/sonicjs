@@ -3,6 +3,7 @@ const graphqlHTTP = require("express-graphql");
 const schema = require("./server/schema/schema");
 const app = express();
 const { request, gql } = require("graphql-request");
+const routes = require("./server/boot/routes.js");
 
 const mongoose = require("mongoose");
 

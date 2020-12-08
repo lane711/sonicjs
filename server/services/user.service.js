@@ -5,7 +5,6 @@ var globalService = require("./global.service");
 var loopback = require("loopback");
 var app = loopback();
 var fs = require("fs");
-const cheerio = require("cheerio");
 const axios = require("axios");
 const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 const chalk = require("chalk");

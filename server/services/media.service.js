@@ -4,7 +4,6 @@ var emitterService = require('./emitter.service');
 var globalService = require('./global.service');
 
 var fs = require('fs');
-const cheerio = require('cheerio')
 const axios = require('axios');
 const ShortcodeTree = require('shortcode-tree').ShortcodeTree;
 const chalk = require('chalk');

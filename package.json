@@ -25,7 +25,8 @@
     "graphql": "^14.7.0",
     "graphql-request": "^3.3.0",
     "graphql-type-json": "^0.3.2",
-    "mongoose": "^5.11.4"
+    "mongoose": "^5.11.4",
+    "node-cache": "^5.1.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.6"

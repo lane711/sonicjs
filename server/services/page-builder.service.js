@@ -1,5 +1,4 @@
 var fs = require('fs');
-const cheerio = require('cheerio')
 const axios = require('axios');
 const ShortcodeTree = require('shortcode-tree').ShortcodeTree;
 const chalk = require('chalk');
@@ -48,32 +47,32 @@ module.exports = {
                 }
                 else {
                     // console.log('data==>', data);
-                    this.processTemplate(data).then(html => {
-                        resolve(html);
-                    })
+                    // this.processTemplate(data).then(html => {
+                    //     resolve(html);
+                    // })
                 }
             });
         });
     },
 
-    processTemplate: async function (html) {
-        pageContent = ''; //reset
-        // this.setupShortCodeParser();
-        // console.log('=== processTemplate ===')
-        const $ = cheerio.load(html);
-        // $('#page-id').val(this.page.id);
-        await this.loadHtmlTemplates($);
+    // processTemplate: async function (html) {
+    //     pageContent = ''; //reset
+    //     // this.setupShortCodeParser();
+    //     // console.log('=== processTemplate ===')
+    //     const $ = cheerio.load(html);
+    //     // $('#page-id').val(this.page.id);
+    //     await this.loadHtmlTemplates($);
 
-        // $('.blog-header-logo').text(this.page.id);
-        // $('.blog-post-title').text('Cheerio Post');
-        // await this.processMenu($);
+    //     // $('.blog-header-logo').text(this.page.id);
+    //     // $('.blog-post-title').text('Cheerio Post');
+    //     // await this.processMenu($);
 
-        await this.processSections($);
+    //     await this.processSections($);
 
-        // await this.processPageBuilder($);
+    //     // await this.processPageBuilder($);
 
-        return $.html();
-    },
+    //     return $.html();
+    // },
 
     loadHtmlTemplates: async function($){
 

@@ -9,8 +9,7 @@ if (typeof module !== "undefined" && module.exports) {
   var globalService = require("./global.service");
 
   var fs = require("fs");
-  const cheerio = require("cheerio");
-  var axios = require("axios");
+    var axios = require("axios");
 
   const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
   const chalk = require("chalk");

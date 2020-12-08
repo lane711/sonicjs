@@ -1,4 +1,5 @@
-var loopback = require("loopback");
+console.log('loading routes.js');
+// var loopback = require("loopback");
 var emitterService = require("../services/emitter.service");
 var globalService = require("../services/global.service");
 var cacheService = require("../services/cache.service");
@@ -43,7 +44,7 @@ var admin = require(__dirname + "/admin");
 var frontEndTheme = `${process.env.FRONT_END_THEME}`
 const adminTheme = `${process.env.ADMIN_THEME}`
 
-module.exports = function (app) {
+module.exports = function appRoutes (app) {
   // app.get('/', async function (req, res) {
   //   res.send('ok');
   // });
