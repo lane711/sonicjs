@@ -24,8 +24,8 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Install",
-      "program": "${workspaceFolder}/server/install/npm-setup.js"
+      "name": "Seed",
+      "program": "${workspaceFolder}/server/boot/seed-data.js"
     },
     {
       "type": "node",
