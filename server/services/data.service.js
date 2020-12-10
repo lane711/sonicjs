@@ -122,7 +122,7 @@ if (typeof module !== "undefined" && module.exports) {
       
      let data = await this.executeGraphqlQuery(query);
 
-     return data;
+     return data.contents;
       // const query = gql`
       //   {
       //     contents {

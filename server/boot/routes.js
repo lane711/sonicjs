@@ -44,7 +44,7 @@ var admin = require(__dirname + "/admin");
 var frontEndTheme = `${process.env.FRONT_END_THEME}`
 const adminTheme = `${process.env.ADMIN_THEME}`
 
-module.exports = function appRoutes (app) {
+exports.loadRoutes = function (app) {
   // app.get('/', async function (req, res) {
   //   res.send('ok');
   // });
@@ -67,7 +67,8 @@ module.exports = function appRoutes (app) {
   })();
 
   app.get("*", async function (req, res, next) {
-    globalService.AccessToken = app.models.AccessToken;
+    //TODO: https://stackabuse.com/authentication-and-authorization-with-jwts-in-express-js/
+    globalService.AccessToken = 'todo-access-token';
 
     // Update a value in the cookie so that the set-cookie will be sent.
     // Only changes every minute so that it's not sent with every request.
@@ -669,5 +670,4 @@ module.exports = function appRoutes (app) {
     }
   });
 
-  app.use(router);
 };

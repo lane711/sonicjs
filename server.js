@@ -12,6 +12,7 @@ const chalk = require("chalk");
 var exphbs = require("express-handlebars");
 var Handlebars = require("handlebars");
 var globalService = require("./server/services/global.service");
+const routes = require("./server/boot/routes.js");
 
 const mongoose = require("mongoose");
 
@@ -174,7 +175,7 @@ function start () {
   //   // }
   // });
 
-
+  routes.loadRoutes(app);
 
   app.listen(3019, () => {
     var baseUrl = 'http://localhost:3019'; //app.get("url").replace(/\/$/, "");
@@ -184,7 +185,7 @@ function start () {
     console.log(chalk.cyan("Admin console at: ", baseUrl + "/admin"));
     console.log(chalk.cyan("GraphQL API at: ", baseUrl + "/graphql"));
 
-    const routes = require("./server/boot/routes.js");
+    
 
 });
 
