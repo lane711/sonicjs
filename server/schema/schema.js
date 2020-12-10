@@ -1,5 +1,4 @@
 const graphql = require("graphql");
-const Book = require("../models/book");
 const User = require("../models/user");
 const Content = require("../models/content");
 const { GraphQLJSONObject } = require('graphql-type-json');
@@ -19,33 +18,15 @@ const {
 //these object types and describes how it can reach into the graph to interact with
 //the data to retrieve or mutate the data
 
-const BookType = new GraphQLObjectType({
-  name: "Book",
-  //We are wrapping fields in the function as we dont want to execute this ultil
-  //everything is inilized. For example below code will throw error UserType not
-  //found if not wrapped in a function
-  fields: () => ({
-    id: { type: GraphQLID },
-    name: { type: GraphQLString },
-    pages: { type: GraphQLInt },
-    user: {
-      type: UserType,
-      resolve(parent, args) {
-        return User.findById(parent.userId);
-      },
-    },
-  }),
-});
-
 const UserType = new GraphQLObjectType({
   name: "User",
   fields: () => ({
     id: { type: GraphQLID },
     email: { type: GraphQLString },
     book: {
-      type: new GraphQLList(BookType),
+      type: new GraphQLList(UserType),
       resolve(parent, args) {
-        return Book.find({ userId: parent.id });
+        return User.find({ userId: parent.id });
       },
     },
   }),
@@ -81,24 +62,24 @@ const ContentType = new GraphQLObjectType({
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
   fields: {
-    book: {
-      type: BookType,
-      //argument passed by the user while making the query
-      args: { id: { type: GraphQLID } },
-      resolve(parent, args) {
-        //Here we define how to get data from database source
+    // book: {
+    //   type: BookType,
+    //   //argument passed by the user while making the query
+    //   args: { id: { type: GraphQLID } },
+    //   resolve(parent, args) {
+    //     //Here we define how to get data from database source
 
-        //this will return the book with id passed in argument
-        //by the user
-        return Book.findById(args.id);
-      },
-    },
-    books: {
-      type: new GraphQLList(BookType),
-      resolve(parent, args) {
-        return Book.find({});
-      },
-    },
+    //     //this will return the book with id passed in argument
+    //     //by the user
+    //     return Book.findById(args.id);
+    //   },
+    // },
+    // books: {
+    //   type: new GraphQLList(BookType),
+    //   resolve(parent, args) {
+    //     return Book.find({});
+    //   },
+    // },
     user: {
       type: UserType,
       args: { id: { type: GraphQLID } },
@@ -152,22 +133,22 @@ const Mutation = new GraphQLObjectType({
         return user.save();
       },
     },
-    addBook: {
-      type: BookType,
-      args: {
-        name: { type: new GraphQLNonNull(GraphQLString) },
-        pages: { type: new GraphQLNonNull(GraphQLInt) },
-        userId: { type: new GraphQLNonNull(GraphQLID) },
-      },
-      resolve(parent, args) {
-        let book = new Book({
-          name: args.name,
-          pages: args.pages,
-          userId: args.userId,
-        });
-        return book.save();
-      },
-    },
+    // addBook: {
+    //   type: BookType,
+    //   args: {
+    //     name: { type: new GraphQLNonNull(GraphQLString) },
+    //     pages: { type: new GraphQLNonNull(GraphQLInt) },
+    //     userId: { type: new GraphQLNonNull(GraphQLID) },
+    //   },
+    //   resolve(parent, args) {
+    //     let book = new Book({
+    //       name: args.name,
+    //       pages: args.pages,
+    //       userId: args.userId,
+    //     });
+    //     return book.save();
+    //   },
+    // },
 
     addContent: {
       type: ContentType,

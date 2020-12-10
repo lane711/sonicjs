@@ -30,7 +30,7 @@ if (typeof module !== "undefined" && module.exports) {
           baseURL: globalService.baseUrl,
         };
 
-        if (options.req.signedCookies.sonicjs_access_token) {
+        if (options.req.signedCookies && options.req.signedCookies.sonicjs_access_token) {
           defaultOptions.headers.Authorization =
             options.req.signedCookies.sonicjs_access_token;
         }

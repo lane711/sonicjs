@@ -88,15 +88,15 @@ function start () {
   // app.engine('handlebars', exphbs());
   // app.set('view engine', 'handlebars');
 
-  let themeDirectory = path.join(__dirname, "themes");
+  let themeDirectory = path.join(__dirname, "server/themes");
   // console.log('themeDirectory', themeDirectory);
 
   ///Users/lanecampbell/Dev/sonicjs/server/themes/front-end/dark/partials
   let partialsDirs = [
-    path.join(__dirname, "themes", "front-end", "bootstrap", "partials"),
-    path.join(__dirname, "themes", "front-end", frontEndTheme, "partials"),
-    path.join(__dirname, "themes", "admin", adminTheme, "partials"),
-    path.join(__dirname, "themes", "admin", "shared-partials"),
+    path.join(__dirname, "server/themes", "front-end", "bootstrap", "partials"),
+    path.join(__dirname, "server/themes", "front-end", frontEndTheme, "partials"),
+    path.join(__dirname, "server/themes", "admin", adminTheme, "partials"),
+    path.join(__dirname, "server/themes", "admin", "shared-partials"),
   ];
   // console.log('partialsDirs', partialsDirs);
 
@@ -111,7 +111,7 @@ function start () {
   // Register `hbs.engine` with the Express app.
   app.engine("handlebars", hbs.engine);
   app.set("view engine", "handlebars");
-  app.set("views", __dirname + "/themes");
+  app.set("views", __dirname + "/server/themes");
 
   // app.set('view options', { layout: 'dark/dark' });
 
