@@ -8,19 +8,65 @@ var fs = require("fs");
 const axios = require("axios");
 const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 const chalk = require("chalk");
-const log = console.log;
+var { GraphQLClient, gql, request } = require("graphql-request");
+var frontEndTheme = `${process.env.FRONT_END_THEME}`;
+const adminTheme = `${process.env.ADMIN_THEME}`;
 
 module.exports = userService = {
-  startup: function () {
-    emitterService.on("getRenderedPagePostDataFetch", async function (
-      options
-    ) {
+  startup: async function () {
+    emitterService.on("getRenderedPagePostDataFetch", async function (options) {
       if (options) {
         options.page.data.showPageBuilder = await userService.isAuthenticated(
           options.req
         );
       }
     });
+
+    emitterService.on("requestBegin", async function (options) {
+      if (options.req.url === "/register") {
+        options.req.isRequestAlreadyHandled = true;
+        let data = { registerMessage: "<b>admin</b>" };
+        options.res.render("admin/shared-views/admin-register", {
+          layout: `front-end/${frontEndTheme}/login.handlebars`,
+          data: data,
+        });
+
+        // options.res.sendFile(file);
+        // options.req.isRequestAlreadyHandled = true;
+        // return;
+      }
+    });
+
+    emitterService.on("postBegin", async function (options) {
+      if (options.req.url === "/register") {
+        // var user = loopback.getModel("user");
+        let email = options.req.body.email;
+        let password = options.req.body.password;
+        let passwordConfirm = options.req.body.passwordConfirm;
+
+        let newUser = await userService.createUser(email, password);
+
+        globalService.isAdminUserCreated = true;
+        let message = encodeURI(`Account created successfully. Please login`);
+        res.redirect(`/admin?message=${message}`); // /admin will show the login
+        return;
+      }
+    });
+  },
+
+  createUser: async function (email, password) {
+    const query = gql`
+    mutation{
+      addUser(email:"${email}", password:"${password}"){
+        email
+        id
+      }
+    }
+      `;
+
+    let data = await dataService.executeGraphqlQuery(query);
+
+    return data.contents;
   },
 
   // getUsers: async function () {

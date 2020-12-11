@@ -44,7 +44,7 @@ var admin = require(__dirname + "/admin");
 var frontEndTheme = `${process.env.FRONT_END_THEME}`
 const adminTheme = `${process.env.ADMIN_THEME}`
 
-exports.loadRoutes = function (app) {
+exports.loadRoutes = async function (app) {
   // app.get('/', async function (req, res) {
   //   res.send('ok');
   // });
@@ -79,46 +79,49 @@ exports.loadRoutes = function (app) {
     next();
   });
 
-  app.get("/register", async function (req, res) {
-    let data = { registerMessage: "<b>admin</b>" };
-    res.render("admin/shared-views/admin-register", { layout: `front-end/${frontEndTheme}/login.handlebars`, data: data });
-    return;
-  });
+  // await emitterService.emit("loadRoutes", { app: app });
 
-  app.post("/register", function (req, res) {
-    var user = loopback.getModel("user");
-    user.create(
-      { email: req.body.email, password: req.body.password, roles: [1] },
-      function (err, userInstance) {
-        // console.log(userInstance);
 
-        //map admin role
-        // var roleMappingModel = loopback.getModel("RoleMapping");
-        // roleMappingModel.upsertWithWhere(
-        //   {
-        //     principalType: "user",
-        //     principalId: 1,
-        //     roleId: "admin",
-        //   },
-        //   {
-        //     principalType: "user",
-        //     principalId: 1,
-        //     roleId: "admin",
-        //   },
-        //   function (err, info) {
-        //     if (err) {
-        //       console.log(info);
-        //     }
-        //   }
-        // );
+  // app.get("/register", async function (req, res) {
+  //   let data = { registerMessage: "<b>admin</b>" };
+  //   res.render("admin/shared-views/admin-register", { layout: `front-end/${frontEndTheme}/login.handlebars`, data: data });
+  //   return;
+  // });
 
-        globalService.isAdminUserCreated = true;
-        let message = encodeURI(`Account created successfully. Please login`);
-        res.redirect(`/admin?message=${message}`); // /admin will show the login
-        return;
-      }
-    );
-  });
+  // app.post("/register", function (req, res) {
+  //   // var user = loopback.getModel("user");
+  //   user.create(
+  //     { email: req.body.email, password: req.body.password, roles: [1] },
+  //     function (err, userInstance) {
+  //       // console.log(userInstance);
+
+  //       //map admin role
+  //       // var roleMappingModel = loopback.getModel("RoleMapping");
+  //       // roleMappingModel.upsertWithWhere(
+  //       //   {
+  //       //     principalType: "user",
+  //       //     principalId: 1,
+  //       //     roleId: "admin",
+  //       //   },
+  //       //   {
+  //       //     principalType: "user",
+  //       //     principalId: 1,
+  //       //     roleId: "admin",
+  //       //   },
+  //       //   function (err, info) {
+  //       //     if (err) {
+  //       //       console.log(info);
+  //       //     }
+  //       //   }
+  //       // );
+
+  //       globalService.isAdminUserCreated = true;
+  //       let message = encodeURI(`Account created successfully. Please login`);
+  //       res.redirect(`/admin?message=${message}`); // /admin will show the login
+  //       return;
+  //     }
+  //   );
+  // });
 
   //log a user in
   app.post("/login", function (req, res) {
@@ -382,6 +385,10 @@ exports.loadRoutes = function (app) {
   // router.get('/admin/content-types', function (req, res) {
   //   res.send(adminPage);
   // });
+
+  app.post("*", async function (req, res, next) {
+    await emitterService.emit("postBegin", { req: req, res: res });
+  });
 
   app.get("*", async function (req, res, next) {
     await emitterService.emit("requestBegin", { req: req, res: res });

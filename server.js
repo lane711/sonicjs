@@ -14,12 +14,13 @@ var Handlebars = require("handlebars");
 var globalService = require("./server/services/global.service");
 const routes = require("./server/boot/routes.js");
 var appRoot = require("app-root-path");
+var bodyParser = require("body-parser");
 
 const mongoose = require("mongoose");
 
 mongoose.connect(process.env.MONGODB_URL, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
 });
 
 mongoose.connection.once("open", () => {
@@ -68,7 +69,6 @@ app.use(
 //   console.log("Listening on port 3000");
 // });
 
-
 // -------------------
 
 // "use strict";
@@ -78,34 +78,46 @@ app.use(
 
 // const { start } = require("repl");
 
-const frontEndTheme = `${process.env.FRONT_END_THEME}`
-const adminTheme = `${process.env.ADMIN_THEME}`
-// var bodyParser = require('body-parser');
+const frontEndTheme = `${process.env.FRONT_END_THEME}`;
+const adminTheme = `${process.env.ADMIN_THEME}`;
 
 // var app = (module.exports = loopback());
 
-function start () {
+function start() {
   //set view engine
   // app.engine('handlebars', exphbs());
   // app.set('view engine', 'handlebars');
 
-    //serve static files
-    console.log('===>root', __dirname);
-    // app.use(express.static('server'))
-    app.use(express.static('server/storage/css'))
-    // app.use('/node_modules', express.static(__dirname + '/node_modules'))
-    app.use('/themes', express.static(path.join(appRoot.path, 'server/themes')));
+  //serve static files
+  console.log("===>root", __dirname);
+  // app.use(express.static('server'))
+  app.use(express.static("server/storage/css"));
+  // app.use('/node_modules', express.static(__dirname + '/node_modules'))
+  app.use("/themes", express.static(path.join(appRoot.path, "server/themes")));
 
-    app.use('/node_modules', express.static(path.join(appRoot.path, 'node_modules')));
-    app.use('/vendors', express.static(path.join(appRoot.path, 'server/assets/vendors')));
-    app.use('/css', express.static(path.join(appRoot.path, 'server/storage/css')));
-    app.use('/js', express.static(path.join(appRoot.path, 'server/storage/js')));
-    app.use('/js', express.static(path.join(appRoot.path, 'server/storage/files')));
-    app.use('/api/containers/files/download', express.static(path.join(appRoot.path, 'server/storage/files')));
+  app.use(
+    "/node_modules",
+    express.static(path.join(appRoot.path, "node_modules"))
+  );
+  app.use(
+    "/vendors",
+    express.static(path.join(appRoot.path, "server/assets/vendors"))
+  );
+  app.use(
+    "/css",
+    express.static(path.join(appRoot.path, "server/storage/css"))
+  );
+  app.use("/js", express.static(path.join(appRoot.path, "server/storage/js")));
+  app.use(
+    "/js",
+    express.static(path.join(appRoot.path, "server/storage/files"))
+  );
+  app.use(
+    "/api/containers/files/download",
+    express.static(path.join(appRoot.path, "server/storage/files"))
+  );
 
-    
-    app.use('/public', express.static('server/public'))
-
+  app.use("/public", express.static("server/public"));
 
   let themeDirectory = path.join(__dirname, "server/themes");
   // console.log('themeDirectory', themeDirectory);
@@ -113,7 +125,13 @@ function start () {
   ///Users/lanecampbell/Dev/sonicjs/server/themes/front-end/dark/partials
   let partialsDirs = [
     path.join(__dirname, "server/themes", "front-end", "bootstrap", "partials"),
-    path.join(__dirname, "server/themes", "front-end", frontEndTheme, "partials"),
+    path.join(
+      __dirname,
+      "server/themes",
+      "front-end",
+      frontEndTheme,
+      "partials"
+    ),
     path.join(__dirname, "server/themes", "admin", adminTheme, "partials"),
     path.join(__dirname, "server/themes", "admin", "shared-partials"),
   ];
@@ -141,6 +159,12 @@ function start () {
   // configure body parser
   // app.use(bodyParser.urlencoded({ extended: true }));
 
+  // parse application/x-www-form-urlencoded
+  app.use(bodyParser.urlencoded({ extended: false }));
+
+  // parse application/json
+  app.use(bodyParser.json());
+
   Handlebars.registerHelper({
     eq: function (v1, v2) {
       return v1 === v2;
@@ -166,16 +190,13 @@ function start () {
     or: function () {
       return Array.prototype.slice.call(arguments, 0, -1).some(Boolean);
     },
-    json: function(context){
+    json: function (context) {
       return JSON.stringify(context);
     },
   });
 
   // Parse JSON bodies (as sent by API clients)
   app.use(express.json());
-
-
-
 
   // app.use(loopback.token({ model: app.models.accessToken }));
   // app.use(loopback.token());
@@ -200,18 +221,14 @@ function start () {
   routes.loadRoutes(app);
 
   app.listen(3019, () => {
-    var baseUrl = 'http://localhost:3019'; //app.get("url").replace(/\/$/, "");
+    var baseUrl = "http://localhost:3019"; //app.get("url").replace(/\/$/, "");
     globalService.baseUrl = baseUrl;
 
     console.log(chalk.cyan("Website at: ", baseUrl));
     console.log(chalk.cyan("Admin console at: ", baseUrl + "/admin"));
     console.log(chalk.cyan("GraphQL API at: ", baseUrl + "/graphql"));
-
-    
-
-});
-
-};
+  });
+}
 
 function initEnvFile() {
   const path = "./.env";
@@ -228,6 +245,5 @@ function initEnvFile() {
     console.error(err);
   }
 }
-
 
 start();

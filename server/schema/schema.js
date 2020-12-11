@@ -125,10 +125,13 @@ const Mutation = new GraphQLObjectType({
       args: {
         //GraphQLNonNull make these field required
         email: { type: new GraphQLNonNull(GraphQLString) },
+        password: { type: new GraphQLNonNull(GraphQLString) },
+
       },
       resolve(parent, args) {
         let user = new User({
           email: args.email,
+          parent: args.password
         });
         return user.save();
       },
