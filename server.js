@@ -97,7 +97,13 @@ function start () {
     app.use('/themes', express.static(path.join(appRoot.path, 'server/themes')));
 
     app.use('/node_modules', express.static(path.join(appRoot.path, 'node_modules')));
+    app.use('/vendors', express.static(path.join(appRoot.path, 'server/assets/vendors')));
+    app.use('/css', express.static(path.join(appRoot.path, 'server/storage/css')));
+    app.use('/js', express.static(path.join(appRoot.path, 'server/storage/js')));
+    app.use('/js', express.static(path.join(appRoot.path, 'server/storage/files')));
+    app.use('/api/containers/files/download', express.static(path.join(appRoot.path, 'server/storage/files')));
 
+    
     app.use('/public', express.static('server/public'))
 
 
