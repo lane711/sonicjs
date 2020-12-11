@@ -13,6 +13,7 @@ var exphbs = require("express-handlebars");
 var Handlebars = require("handlebars");
 var globalService = require("./server/services/global.service");
 const routes = require("./server/boot/routes.js");
+var appRoot = require("app-root-path");
 
 const mongoose = require("mongoose");
 
@@ -38,9 +39,9 @@ app.use(
   })
 );
 
-app.get("/", async function (req, res) {
-  res.send('ok');
-});
+// app.get("/", async function (req, res) {
+//   res.send('ok');
+// });
 
 // app.get("/", async function (req, res) {
 //   const query = gql`
@@ -87,6 +88,18 @@ function start () {
   //set view engine
   // app.engine('handlebars', exphbs());
   // app.set('view engine', 'handlebars');
+
+    //serve static files
+    console.log('===>root', __dirname);
+    // app.use(express.static('server'))
+    app.use(express.static('server/storage/css'))
+    // app.use('/node_modules', express.static(__dirname + '/node_modules'))
+    app.use('/themes', express.static(path.join(appRoot.path, 'server/themes')));
+
+    app.use('/node_modules', express.static(path.join(appRoot.path, 'node_modules')));
+
+    app.use('/public', express.static('server/public'))
+
 
   let themeDirectory = path.join(__dirname, "server/themes");
   // console.log('themeDirectory', themeDirectory);
@@ -154,6 +167,9 @@ function start () {
 
   // Parse JSON bodies (as sent by API clients)
   app.use(express.json());
+
+
+
 
   // app.use(loopback.token({ model: app.models.accessToken }));
   // app.use(loopback.token());
