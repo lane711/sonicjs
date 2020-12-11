@@ -124,60 +124,60 @@ exports.loadRoutes = async function (app) {
   // });
 
   //log a user in
-  app.post("/login", function (req, res) {
-    var user = app.models.User;
-    let referer = req.headers.referer;
+  // app.post("/login", function (req, res) {
+  //   var user = app.models.User;
+  //   let referer = req.headers.referer;
 
-    user.login(
-      {
-        email: req.body.email,
-        password: req.body.password,
-      },
-      "user",
-      function (err, token) {
-        if (err) {
-          if (err.details && err.code === "LOGIN_FAILED_EMAIL_NOT_VERIFIED") {
-            res.render("reponseToTriggerEmail", {
-              title: "Login failed",
-              content: err,
-              redirectToEmail: "/api/user/" + err.details.userId + "/verify",
-              redirectTo: "/",
-              redirectToLinkText: "Click here",
-              userId: err.details.userId,
-            });
-          } else if (err.code) {
-            let urlToRedirect = helperService.urlAppendParam(
-              referer,
-              "error",
-              err.message
-            );
-            res.redirect(urlToRedirect);
-          }
-          return;
-        }
+  //   user.login(
+  //     {
+  //       email: req.body.email,
+  //       password: req.body.password,
+  //     },
+  //     "user",
+  //     function (err, token) {
+  //       if (err) {
+  //         if (err.details && err.code === "LOGIN_FAILED_EMAIL_NOT_VERIFIED") {
+  //           res.render("reponseToTriggerEmail", {
+  //             title: "Login failed",
+  //             content: err,
+  //             redirectToEmail: "/api/user/" + err.details.userId + "/verify",
+  //             redirectTo: "/",
+  //             redirectToLinkText: "Click here",
+  //             userId: err.details.userId,
+  //           });
+  //         } else if (err.code) {
+  //           let urlToRedirect = helperService.urlAppendParam(
+  //             referer,
+  //             "error",
+  //             err.message
+  //           );
+  //           res.redirect(urlToRedirect);
+  //         }
+  //         return;
+  //       }
 
-        //amp
-        var data = {
-          event_type: "LOGIN", // required
-          user_id: req.body.email, // only required if device id is not passed in
-        };
+  //       //amp
+  //       var data = {
+  //         event_type: "LOGIN", // required
+  //         user_id: req.body.email, // only required if device id is not passed in
+  //       };
 
-        //set cookie
-        res.cookie("sonicjs_access_token", token.id, {
-          signed: true,
-          maxAge: 30000000,
-        });
+  //       //set cookie
+  //       res.cookie("sonicjs_access_token", token.id, {
+  //         signed: true,
+  //         maxAge: 30000000,
+  //       });
 
-        mixPanelService.setPeople(req.body.email);
+  //       mixPanelService.setPeople(req.body.email);
 
-        mixPanelService.trackEvent("LOGIN", req, { email: req.body.email });
-        if (referer.includes("/admin?")) {
-          referer = "/admin";
-        }
-        res.redirect(referer);
-      }
-    );
-  });
+  //       mixPanelService.trackEvent("LOGIN", req, { email: req.body.email });
+  //       if (referer.includes("/admin?")) {
+  //         referer = "/admin";
+  //       }
+  //       res.redirect(referer);
+  //     }
+  //   );
+  // });
 
   //log a user out
   app.get("/logout", async function (req, res, next) {

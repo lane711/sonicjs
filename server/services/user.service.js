@@ -52,6 +52,94 @@ module.exports = userService = {
         return;
       }
     });
+
+
+    emitterService.on("requestBegin", async function (options) {
+      if (options.req.url === "/login") {
+        options.req.isRequestAlreadyHandled = true;
+
+        // res.render("admin/shared-views/admin-login", { layout: `front-end/${frontEndTheme}/login.handlebars`, data: data });
+
+
+        let data = { registerMessage: "<b>admin</b>" };
+        options.res.render("admin/shared-views/admin-login", {
+          layout: `front-end/${frontEndTheme}/login.handlebars`,
+          data: data,
+        });
+
+        // options.res.sendFile(file);
+        // options.req.isRequestAlreadyHandled = true;
+        // return;
+      }
+    });
+
+
+    emitterService.on("postBegin", async function (options) {
+
+      if (options.req.url === "/login") {
+
+        let email = options.req.body.email;
+        let password = options.req.body.password;
+        console.log(email, password);
+
+        // var user = app.models.User;
+        let referer = req.headers.referer;
+    
+      //   user.login(
+      //     {
+      //       email: req.body.email,
+      //       password: req.body.password,
+      //     },
+      //     "user",
+      //     function (err, token) {
+      //       if (err) {
+      //         if (err.details && err.code === "LOGIN_FAILED_EMAIL_NOT_VERIFIED") {
+      //           res.render("reponseToTriggerEmail", {
+      //             title: "Login failed",
+      //             content: err,
+      //             redirectToEmail: "/api/user/" + err.details.userId + "/verify",
+      //             redirectTo: "/",
+      //             redirectToLinkText: "Click here",
+      //             userId: err.details.userId,
+      //           });
+      //         } else if (err.code) {
+      //           let urlToRedirect = helperService.urlAppendParam(
+      //             referer,
+      //             "error",
+      //             err.message
+      //           );
+      //           res.redirect(urlToRedirect);
+      //         }
+      //         return;
+      //       }
+    
+      //       //amp
+      //       var data = {
+      //         event_type: "LOGIN", // required
+      //         user_id: req.body.email, // only required if device id is not passed in
+      //       };
+    
+      //       //set cookie
+      //       res.cookie("sonicjs_access_token", token.id, {
+      //         signed: true,
+      //         maxAge: 30000000,
+      //       });
+    
+      //       mixPanelService.setPeople(req.body.email);
+    
+      //       mixPanelService.trackEvent("LOGIN", req, { email: req.body.email });
+      //       if (referer.includes("/admin?")) {
+      //         referer = "/admin";
+      //       }
+      //       res.redirect(referer);
+      //     }
+      //   );
+
+      }
+
+      
+    });
+
   },
 
   createUser: async function (email, password) {
