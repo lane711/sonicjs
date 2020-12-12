@@ -1,4 +1,4 @@
-console.log('loading routes.js');
+console.log("loading routes.js");
 // var loopback = require("loopback");
 var emitterService = require("../services/emitter.service");
 var globalService = require("../services/global.service");
@@ -26,6 +26,8 @@ var cssService = require("../services/css.service");
 cssService.startup();
 var assetService = require("../services/asset.service");
 var userService = require("../services/user.service");
+var authService = require("../services/auth.service");
+
 var helperService = require("../services/helper.service");
 var sharedService = require("../services/shared.service");
 var breadcrumbsService = require("../services/breadcrumbs.service");
@@ -41,8 +43,8 @@ const log = console.log;
 const url = require("url");
 var admin = require(__dirname + "/admin");
 
-var frontEndTheme = `${process.env.FRONT_END_THEME}`
-const adminTheme = `${process.env.ADMIN_THEME}`
+var frontEndTheme = `${process.env.FRONT_END_THEME}`;
+const adminTheme = `${process.env.ADMIN_THEME}`;
 
 exports.loadRoutes = async function (app) {
   // app.get('/', async function (req, res) {
@@ -61,6 +63,7 @@ exports.loadRoutes = async function (app) {
     await siteSettingsService.startup();
     await themeSettingsService.startup();
     await userService.startup();
+    await authService.startup(app);
     await assetService.startup();
 
     await emitterService.emit("startup");
@@ -68,7 +71,7 @@ exports.loadRoutes = async function (app) {
 
   app.get("*", async function (req, res, next) {
     //TODO: https://stackabuse.com/authentication-and-authorization-with-jwts-in-express-js/
-    globalService.AccessToken = 'todo-access-token';
+    globalService.AccessToken = "todo-access-token";
 
     // Update a value in the cookie so that the set-cookie will be sent.
     // Only changes every minute so that it's not sent with every request.
@@ -80,7 +83,6 @@ exports.loadRoutes = async function (app) {
   });
 
   // await emitterService.emit("loadRoutes", { app: app });
-
 
   // app.get("/register", async function (req, res) {
   //   let data = { registerMessage: "<b>admin</b>" };
@@ -388,6 +390,10 @@ exports.loadRoutes = async function (app) {
 
   app.post("*", async function (req, res, next) {
     await emitterService.emit("postBegin", { req: req, res: res });
+
+    if (!req.isRequestAlreadyHandled) {
+      next();
+    }
   });
 
   app.get("*", async function (req, res, next) {
@@ -428,7 +434,9 @@ exports.loadRoutes = async function (app) {
     }
 
     if (
-      req.url === "/explorer" ||
+      req.url === "/graphql" ||
+      req.url === "/login" ||
+      req.url === "/register" ||
       req.url.startsWith("/api") ||
       req.url.endsWith(".css") ||
       req.url.endsWith(".html") ||
@@ -478,7 +486,10 @@ exports.loadRoutes = async function (app) {
       if (qsParams.message) {
         data.message = qsParams.message;
       }
-      res.render("admin/shared-views/admin-login", { layout: `front-end/${frontEndTheme}/login.handlebars`, data: data });
+      res.render("admin/shared-views/admin-login", {
+        layout: `front-end/${frontEndTheme}/login.handlebars`,
+        data: data,
+      });
     } else if (req.url == "/admin" || req.url.startsWith("/admin/")) {
       if (!req.signedCookies.sonicjs_access_token) {
         //user not logged in
@@ -544,7 +555,9 @@ exports.loadRoutes = async function (app) {
 
       if (viewName == "admin-modules-edit") {
         data.moduleSystemId = param1;
-        data.contentTypes = await moduleService.getModuleContentTypesAdmin(param1);
+        data.contentTypes = await moduleService.getModuleContentTypesAdmin(
+          param1
+        );
         data.contentTypeId = param1;
         data.moduleDef = await moduleService.getModuleDefinition(param1);
       }
@@ -660,7 +673,9 @@ exports.loadRoutes = async function (app) {
 
       if (page.page.data.title === "Not Found") {
         // res.render("404", page);
-        res.render(`front-end/${frontEndTheme}/layouts/404`, { layout: `front-end/${frontEndTheme}/${frontEndTheme}` });
+        res.render(`front-end/${frontEndTheme}/layouts/404`, {
+          layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
+        });
 
         return;
       }
@@ -673,8 +688,10 @@ exports.loadRoutes = async function (app) {
       let pageData = page.page;
       pageData.data.id = pageData.id;
 
-      res.render(`front-end/${frontEndTheme}/layouts/main`, { layout: `front-end/${frontEndTheme}/${frontEndTheme}`, data: pageData.data });
+      res.render(`front-end/${frontEndTheme}/layouts/main`, {
+        layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
+        data: pageData.data,
+      });
     }
   });
-
 };

@@ -82,7 +82,11 @@ const RootQuery = new GraphQLObjectType({
     // },
     user: {
       type: UserType,
-      args: { id: { type: GraphQLID } },
+      args: { 
+        id: { type: GraphQLID },
+        email: { type: GraphQLString },
+        password: { type: GraphQLString },
+      },
       resolve(parent, args) {
         return User.findById(args.id);
       },
@@ -126,12 +130,15 @@ const Mutation = new GraphQLObjectType({
         //GraphQLNonNull make these field required
         email: { type: new GraphQLNonNull(GraphQLString) },
         password: { type: new GraphQLNonNull(GraphQLString) },
-
       },
       resolve(parent, args) {
+        let now = new Date();
         let user = new User({
           email: args.email,
-          parent: args.password
+          password: args.password,
+          createdOn: now,
+          updatedOn: now,
+          realm: ["default"]
         });
         return user.save();
       },
