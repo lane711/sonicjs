@@ -434,9 +434,9 @@ exports.loadRoutes = async function (app) {
     }
 
     if (
-      req.url === "/graphql" ||
-      req.url === "/login" ||
-      req.url === "/register" ||
+      req.url.startsWith("/graphql") ||
+      req.url.startsWith("/login") ||
+      req.url.startsWith("/register") ||
       req.url.startsWith("/api") ||
       req.url.endsWith(".css") ||
       req.url.endsWith(".html") ||

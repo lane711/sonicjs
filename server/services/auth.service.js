@@ -26,23 +26,22 @@ module.exports = authService = {
       }
     });
 
-    // passport.use(
-    //   new LocalStrategy(function (email, password, done) {
-    //     let loginUser = userService.loginUser(email, password);
+    passport.use(
+      new LocalStrategy(function (email, password, done) {
+        let loginUser = userService.loginUser(email, password);
 
-    //     if (err) {
-    //       return done(err);
-    //     }
-    //     if (!loginUser) {
-    //       return done(null, false, { message: "Incorrect username." });
-    //     }
-    //     if (!loginUser.validPassword(password)) {
-    //       return done(null, false, { message: "Incorrect password." });
-    //     }
-    //     return done(null, user);
-
-    //   })
-    // );
+        if (err) {
+          return done(err);
+        }
+        if (!loginUser) {
+          return done(null, false, { message: "Incorrect username." });
+        }
+        if (!loginUser.validPassword(password)) {
+          return done(null, false, { message: "Incorrect password." });
+        }
+        return done(null, user);
+      })
+    );
 
     app.get("/register", async function (req, res) {
       let data = { registerMessage: "<b>admin</b>" };
@@ -63,10 +62,9 @@ module.exports = authService = {
 
       globalService.isAdminUserCreated = true;
       let message = encodeURI(`Account created successfully. Please login`);
-      res.redirect(`/admin?message=${message}`); // /admin will show the login
+      res.redirect(`/login?message=${message}`); // /admin will show the login
       return;
     });
-
 
     app.get("/login", async function (req, res) {
       let data = { registerMessage: "<b>admin</b>" };
@@ -82,6 +80,18 @@ module.exports = authService = {
       // `req.user` contains the authenticated user.
       res.redirect("/users/" + req.user.username);
     });
+
+    app.get(
+      "/api/users/me",
+      passport.authenticate("local", { session: false }),
+      function (req, res) {
+        res.json({ id: req.user.id, username: req.user.username });
+      }
+    );
+
+    // app.post("/login", function (req, res) {
+    //   console.log('login post');
+    // });
 
     // log a user in
     // app.post("/login", function (req, res) {

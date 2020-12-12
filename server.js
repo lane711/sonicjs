@@ -15,6 +15,13 @@ var globalService = require("./server/services/global.service");
 const routes = require("./server/boot/routes.js");
 var appRoot = require("app-root-path");
 var bodyParser = require("body-parser");
+var cookieParser = require('cookie-parser')
+const expressSession = require('express-session')({
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: false
+});
+const passport = require('passport');
 
 const mongoose = require("mongoose");
 
@@ -195,8 +202,16 @@ function start() {
     },
   });
 
-  // Parse JSON bodies (as sent by API clients)
-  app.use(express.json());
+
+  
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(expressSession);
+
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 
   // app.use(loopback.token({ model: app.models.accessToken }));
   // app.use(loopback.token());

@@ -23,6 +23,7 @@ const UserType = new GraphQLObjectType({
   fields: () => ({
     id: { type: GraphQLID },
     email: { type: GraphQLString },
+    password: { type: GraphQLString },
     book: {
       type: new GraphQLList(UserType),
       resolve(parent, args) {
