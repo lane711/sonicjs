@@ -22,7 +22,7 @@ const UserType = new GraphQLObjectType({
   name: "User",
   fields: () => ({
     id: { type: GraphQLID },
-    email: { type: GraphQLString },
+    username: { type: GraphQLString },
     password: { type: GraphQLString },
     book: {
       type: new GraphQLList(UserType),
@@ -85,7 +85,7 @@ const RootQuery = new GraphQLObjectType({
       type: UserType,
       args: { 
         id: { type: GraphQLID },
-        email: { type: GraphQLString },
+        username: { type: GraphQLString },
         password: { type: GraphQLString },
       },
       resolve(parent, args) {
@@ -129,13 +129,13 @@ const Mutation = new GraphQLObjectType({
       type: UserType,
       args: {
         //GraphQLNonNull make these field required
-        email: { type: new GraphQLNonNull(GraphQLString) },
+        username: { type: new GraphQLNonNull(GraphQLString) },
         password: { type: new GraphQLNonNull(GraphQLString) },
       },
       resolve(parent, args) {
         let now = new Date();
         let user = new User({
-          email: args.email,
+          username: args.username,
           password: args.password,
           createdOn: now,
           updatedOn: now,

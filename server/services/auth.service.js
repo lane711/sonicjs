@@ -12,6 +12,7 @@ const chalk = require("chalk");
 var { GraphQLClient, gql, request } = require("graphql-request");
 var passport = require("passport"),
   LocalStrategy = require("passport-local").Strategy;
+const connectEnsureLogin = require('connect-ensure-login');
 
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
@@ -26,22 +27,22 @@ module.exports = authService = {
       }
     });
 
-    passport.use(
-      new LocalStrategy(function (email, password, done) {
-        let loginUser = userService.loginUser(email, password);
+    // passport.use(
+    //   new LocalStrategy(function (email, password, done) {
+    //     let loginUser = userService.loginUser(email, password);
 
-        if (err) {
-          return done(err);
-        }
-        if (!loginUser) {
-          return done(null, false, { message: "Incorrect username." });
-        }
-        if (!loginUser.validPassword(password)) {
-          return done(null, false, { message: "Incorrect password." });
-        }
-        return done(null, user);
-      })
-    );
+    //     if (err) {
+    //       return done(err);
+    //     }
+    //     if (!loginUser) {
+    //       return done(null, false, { message: "Incorrect username." });
+    //     }
+    //     if (!loginUser.validPassword(password)) {
+    //       return done(null, false, { message: "Incorrect password." });
+    //     }
+    //     return done(null, user);
+    //   })
+    // );
 
     app.get("/register", async function (req, res) {
       let data = { registerMessage: "<b>admin</b>" };
@@ -66,28 +67,65 @@ module.exports = authService = {
       return;
     });
 
+    //TODO: https://www.sitepoint.com/local-authentication-using-passport-node-js/
+    app.post('/login', (req, res, next) => {
+      passport.authenticate('local',
+      (err, user, info) => {
+        if (err) {
+          return next(err);
+        }
+    
+        if (!user) {
+          return res.redirect('/login?info=' + info);
+        }
+    
+        req.logIn(user, function(err) {
+          if (err) {
+            return next(err);
+          }
+    
+          return res.redirect('/');
+        });
+    
+      })(req, res, next);
+    });
+    
+    // app.get('/login',
+    //   (req, res) => res.sendFile('html/login.html',
+    //   { root: __dirname })
+    // );
+    
+    app.get('/',
+      connectEnsureLogin.ensureLoggedIn(),
+      (req, res) => res.sendFile('html/index.html', {root: __dirname})
+    );
+    
+    app.get('/private',
+      connectEnsureLogin.ensureLoggedIn(),
+      (req, res) => res.sendFile('html/private.html', {root: __dirname})
+    );
+    
+    app.get('/user',
+      connectEnsureLogin.ensureLoggedIn(),
+      (req, res) => res.send({user: req.user})
+    );
+
     app.get("/login", async function (req, res) {
       let data = { registerMessage: "<b>admin</b>" };
       res.render("admin/shared-views/admin-login", {
         layout: `front-end/${frontEndTheme}/login.handlebars`,
         data: data,
       });
-      return;
+      // return;
     });
 
-    app.post("/login", passport.authenticate("local"), function (req, res) {
-      // If this function gets called, authentication was successful.
-      // `req.user` contains the authenticated user.
-      res.redirect("/users/" + req.user.username);
-    });
+    // app.post("/login", passport.authenticate("local"), function (req, res) {
+    //   // If this function gets called, authentication was successful.
+    //   // `req.user` contains the authenticated user.
+    //   res.redirect("/users/" + req.user.username);
+    // });
 
-    app.get(
-      "/api/users/me",
-      passport.authenticate("local", { session: false }),
-      function (req, res) {
-        res.json({ id: req.user.id, username: req.user.username });
-      }
-    );
+
 
     // app.post("/login", function (req, res) {
     //   console.log('login post');
