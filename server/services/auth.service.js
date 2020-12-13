@@ -12,7 +12,7 @@ const chalk = require("chalk");
 var { GraphQLClient, gql, request } = require("graphql-request");
 var passport = require("passport"),
   LocalStrategy = require("passport-local").Strategy;
-const connectEnsureLogin = require("connect-ensure-login");
+const connectEnsureLogin = require('connect-ensure-login');
 
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
@@ -27,7 +27,22 @@ module.exports = authService = {
       }
     });
 
+    // passport.use(
+    //   new LocalStrategy(function (email, password, done) {
+    //     let loginUser = userService.loginUser(email, password);
 
+    //     if (err) {
+    //       return done(err);
+    //     }
+    //     if (!loginUser) {
+    //       return done(null, false, { message: "Incorrect username." });
+    //     }
+    //     if (!loginUser.validPassword(password)) {
+    //       return done(null, false, { message: "Incorrect password." });
+    //     }
+    //     return done(null, user);
+    //   })
+    // );
 
     app.get("/register", async function (req, res) {
       let data = { registerMessage: "<b>admin</b>" };
@@ -52,6 +67,49 @@ module.exports = authService = {
       return;
     });
 
+    //TODO: https://www.sitepoint.com/local-authentication-using-passport-node-js/
+    app.post('/login', (req, res, next) => {
+      passport.authenticate('local',
+      (err, user, info) => {
+        if (err) {
+          return next(err);
+        }
+    
+        if (!user) {
+          return res.redirect('/login?info=' + info);
+        }
+    
+        req.logIn(user, function(err) {
+          if (err) {
+            return next(err);
+          }
+    
+          return res.redirect('/user');
+        });
+    
+      })(req, res, next);
+    });
+    
+    // app.get('/login',
+    //   (req, res) => res.sendFile('html/login.html',
+    //   { root: __dirname })
+    // );
+    
+    app.get('/',
+      connectEnsureLogin.ensureLoggedIn(),
+      (req, res) => res.sendFile('html/index.html', {root: __dirname})
+    );
+    
+    app.get('/private',
+      connectEnsureLogin.ensureLoggedIn(),
+      (req, res) => res.sendFile('html/private.html', {root: __dirname})
+    );
+    
+    app.get('/user',
+      connectEnsureLogin.ensureLoggedIn(),
+      (req, res) => res.send({user: req.user})
+    );
+
     app.get("/login", async function (req, res) {
       let data = { registerMessage: "<b>admin</b>" };
       res.render("admin/shared-views/admin-login", {
@@ -61,55 +119,10 @@ module.exports = authService = {
       // return;
     });
 
-    //TODO: https://www.sitepoint.com/local-authentication-using-passport-node-js/
-    app.post("/login", (req, res, next) => {
-      passport.authenticate("local", (err, user, info) => {
-        if (err) {
-          return next(err);
-        }
-
-        if (!user) {
-          return res.redirect("/login?message=" + info);
-        }
-
-        req.logIn(user, function (err) {
-          if (err) {
-            return next(err);
-          }
-
-          return res.redirect("/admin");
-        });
-      })(req, res, next);
-    });
-
-    // app.use(session({
-    //   cookie : {
-    //     maxAge: 3600000 // see below
-    //   },
-    //   store : new MongoStore()
-    // });
-    
-    // app.use(passport.session());
-
-    app.get("/", connectEnsureLogin.ensureLoggedIn(), (req, res) =>
-      res.sendFile("html/index.html", { root: __dirname })
-    );
-
-    app.get("/private", connectEnsureLogin.ensureLoggedIn(), (req, res) => {
-      res.send("ok");
-      res.end();
-      req.isRequestAlreadyHandled = true;
-    });
-
-    app.get("/user", (req, res) =>
-      res.send({ user: req.user })
-    );
-
     app.get("/logout", connectEnsureLogin.ensureLoggedIn(), (req, res) => {
       req.logout();
       res.redirect("/");
     });
-
 
 
     // app.post("/login", passport.authenticate("local"), function (req, res) {
@@ -117,6 +130,8 @@ module.exports = authService = {
     //   // `req.user` contains the authenticated user.
     //   res.redirect("/users/" + req.user.username);
     // });
+
+
 
     // app.post("/login", function (req, res) {
     //   console.log('login post');
