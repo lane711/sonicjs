@@ -10,6 +10,7 @@ const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 const chalk = require("chalk");
 var { GraphQLClient, gql, request } = require("graphql-request");
 const crypto = require('crypto')
+const User = require("../models/user");
 
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
@@ -25,22 +26,26 @@ module.exports = userService = {
     });
   },
 
-  createUser: async function (email, password) {
-    let passwordHash = crypto.createHash('md5').update('password').digest("hex")
+  createUser: async function (username, password) {
 
-    const query = gql`
-    mutation{
-      addUser(email:"${email}", password:"${passwordHash}"){
-        email
-        id
-      }
-    }
-      `;
+    User.register({ username: username, active: false }, password);
+    // let passwordHash = crypto.createHash('md5').update('password').digest("hex")
 
-    let data = await dataService.executeGraphqlQuery(query);
+    // const query = gql`
+    // mutation{
+    //   addUser(email:"${email}", password:"${passwordHash}"){
+    //     email
+    //     id
+    //   }
+    // }
+    //   `;
 
-    return data.contents;
+    // let data = await dataService.executeGraphqlQuery(query);
+
+    // return data.contents;
   },
+
+  
 
   loginUser: async function (email, password) {
     const query = gql`

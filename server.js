@@ -16,24 +16,45 @@ const routes = require("./server/boot/routes.js");
 var appRoot = require("app-root-path");
 var bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
-const expressSession = require("express-session")({
-  secret: "secret",
-  resave: false,
-  saveUninitialized: false,
-});
-const passport = require("passport");
-
 const mongoose = require("mongoose");
+const User = require("./server/models/user");
+const passport = require("passport");
+const session = require("express-session");
+const MongoStore = require('connect-mongo')(session);
 
 mongoose.connect(process.env.MONGODB_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-const User = require("./server/models/user");
+
+
 
 mongoose.connection.once("open", () => {
   console.log("conneted to database");
+
+
 });
+
+
+// app.use(session({
+//   store: new MongoStore({ mongooseConnection: mongoose.connection })
+// }));
+
+//TODO: https://medium.com/swlh/set-up-an-express-js-app-with-passport-js-and-mongodb-for-password-authentication-6ea05d95335c
+// app.use(
+//   session({
+//     secret: "secret",
+//     resave: false,
+//     saveUninitialized: true,
+//     store: new MongoStore({ mongooseConnection: mongoose.connection }),
+//   })
+// );
+// const expressSession = require("express-session")({
+//   secret: "secret",
+//   resave: false,
+//   saveUninitialized: true,
+//   store: new MongoStore({mongooseConnection: mongoose.connection})
+// });
 
 //This route will be used as an endpoint to interact with Graphql,
 //All queries will go through this route.
@@ -205,7 +226,7 @@ function start() {
 
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
-  app.use(expressSession);
+  // app.use(session);
 
   passport.use(User.createStrategy());
 
@@ -216,6 +237,13 @@ function start() {
 
   app.use(passport.initialize());
   app.use(passport.session());
+
+//     app.use(session({
+//       secret: 'my-secret2',
+//       resave: false,
+//       saveUninitialized: true,
+//     // store: new MongoStore({ mongooseConnection: mongoose.connection }),
+// }));
 
   // app.use(loopback.token({ model: app.models.accessToken }));
   // app.use(loopback.token());

@@ -5,6 +5,7 @@ var menuService = require(".//menu.service");
 var helperService = require(".//helper.service");
 var dataService = require(".//data.service");
 var globalService = require(".//global.service");
+const connectEnsureLogin = require("connect-ensure-login");
 
 var fs = require("fs");
 const axios = require("axios");
@@ -18,12 +19,21 @@ var emitterService = require("./emitter.service");
 // var User = loopback.User;
 
 module.exports = adminService = {
-  startup: async function () {
+  startup: async function (app) {
     this.checkIfAdminAccountIsCreated();
 
     // emitterService.on('requestBegin', async function (options) {
     //     adminService.checkIfAdminAccountIsCreated();
     // });
+
+    app.get("/admin", connectEnsureLogin.ensureLoggedIn(), (req, res) => {
+      res.send({ user: req.user });
+      //         res.end();
+      // req.isRequestAlreadyHandled = true;
+    });
+
+
+
   },
 
   checkIfAdminAccountIsCreated: async function () {

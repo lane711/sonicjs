@@ -9,7 +9,7 @@ var cacheService = require("../services/cache.service");
 var pageBuilderService = require("../services/page-builder.service");
 // var formio = require("../services/formio.service");
 var adminService = require("../services/admin.service");
-adminService.startup();
+
 var dataService = require("../services/data.service");
 dataService.startup();
 var moduleService = require("../services/module.service");
@@ -47,6 +47,9 @@ var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
 
 exports.loadRoutes = async function (app) {
+
+  authService.startup(app);
+  adminService.startup(app);
   // app.get('/', async function (req, res) {
   //   res.send('ok');
   // });
@@ -63,7 +66,6 @@ exports.loadRoutes = async function (app) {
     await siteSettingsService.startup();
     await themeSettingsService.startup();
     await userService.startup();
-    await authService.startup(app);
     await assetService.startup();
 
     await emitterService.emit("startup");
@@ -411,16 +413,16 @@ exports.loadRoutes = async function (app) {
       // console.log("continuing request");
     }
 
-    if (
-      !globalService.isAdminUserCreated &&
-      (req.url === "/" || req.url === "/admin")
-    ) {
-      if (process.env.MODE === "dev") {
-        //brand new site, admin accounts needs to be created
-        res.redirect("/register");
-        return;
-      }
-    }
+    // if (
+    //   !globalService.isAdminUserCreated &&
+    //   (req.url === "/" || req.url === "/admin")
+    // ) {
+    //   if (process.env.MODE === "dev") {
+    //     //brand new site, admin accounts needs to be created
+    //     res.redirect("/register");
+    //     return;
+    //   }
+    // }
 
     //for modules css/js files
     if (
@@ -467,30 +469,32 @@ exports.loadRoutes = async function (app) {
       } else {
         res.render("blog", page);
       }
-    } else if (
-      (req.url == "/admin" ||
-        req.url.startsWith("/admin/") ||
-        req.url.startsWith("/admin?")) &&
-      !(await userService.isAuthenticated(req))
-    ) {
-      if (process.env.MODE !== "dev") {
-        res.send(401);
-        return;
-      }
+    } 
+    // else if (
+    //   (req.url == "/admin" ||
+    //     req.url.startsWith("/admin/") ||
+    //     req.url.startsWith("/admin?")) &&
+    //   !(await userService.isAuthenticated(req))
+    // ) {
+    //   if (process.env.MODE !== "dev") {
+    //     res.send(401);
+    //     return;
+    //   }
 
-      let qsParams = url.parse(req.url, true).query;
-      let data = {};
-      if (qsParams.error) {
-        data.error = qsParams.error;
-      }
-      if (qsParams.message) {
-        data.message = qsParams.message;
-      }
-      res.render("admin/shared-views/admin-login", {
-        layout: `front-end/${frontEndTheme}/login.handlebars`,
-        data: data,
-      });
-    } else if (req.url == "/admin" || req.url.startsWith("/admin/")) {
+    //   let qsParams = url.parse(req.url, true).query;
+    //   let data = {};
+    //   if (qsParams.error) {
+    //     data.error = qsParams.error;
+    //   }
+    //   if (qsParams.message) {
+    //     data.message = qsParams.message;
+    //   }
+    //   res.render("admin/shared-views/admin-login", {
+    //     layout: `front-end/${frontEndTheme}/login.handlebars`,
+    //     data: data,
+    //   });
+    // } 
+    else if (req.url == "/admin" || req.url.startsWith("/admin/")) {
       if (!req.signedCookies.sonicjs_access_token) {
         //user not logged in
       }
