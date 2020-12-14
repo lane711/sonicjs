@@ -16,13 +16,14 @@ const routes = require("./server/boot/routes.js");
 var appRoot = require("app-root-path");
 var bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
+const frontEndTheme = `${process.env.FRONT_END_THEME}`;
+const adminTheme = `${process.env.ADMIN_THEME}`;
 const expressSession = require("express-session")({
   secret: "secret",
   resave: false,
   saveUninitialized: false,
 });
 const passport = require("passport");
-
 const mongoose = require("mongoose");
 
 mongoose.connect(process.env.MONGODB_URL, {
@@ -86,9 +87,6 @@ app.use(
 
 // const { start } = require("repl");
 
-const frontEndTheme = `${process.env.FRONT_END_THEME}`;
-const adminTheme = `${process.env.ADMIN_THEME}`;
-
 // var app = (module.exports = loopback());
 
 function start() {
@@ -97,66 +95,9 @@ function start() {
   // app.set('view engine', 'handlebars');
 
   //serve static files
-  console.log("===>root", __dirname);
+  // console.log("===>root", __dirname);
   // app.use(express.static('server'))
-  app.use(express.static("server/storage/css"));
-  // app.use('/node_modules', express.static(__dirname + '/node_modules'))
-  app.use("/themes", express.static(path.join(appRoot.path, "server/themes")));
-
-  app.use(
-    "/node_modules",
-    express.static(path.join(appRoot.path, "node_modules"))
-  );
-  app.use(
-    "/vendors",
-    express.static(path.join(appRoot.path, "server/assets/vendors"))
-  );
-  app.use(
-    "/css",
-    express.static(path.join(appRoot.path, "server/storage/css"))
-  );
-  app.use("/js", express.static(path.join(appRoot.path, "server/storage/js")));
-  app.use(
-    "/js",
-    express.static(path.join(appRoot.path, "server/storage/files"))
-  );
-  app.use(
-    "/api/containers/files/download",
-    express.static(path.join(appRoot.path, "server/storage/files"))
-  );
-
-  app.use("/public", express.static("server/public"));
-
-  let themeDirectory = path.join(__dirname, "server/themes");
-  // console.log('themeDirectory', themeDirectory);
-
-  ///Users/lanecampbell/Dev/sonicjs/server/themes/front-end/dark/partials
-  let partialsDirs = [
-    path.join(__dirname, "server/themes", "front-end", "bootstrap", "partials"),
-    path.join(
-      __dirname,
-      "server/themes",
-      "front-end",
-      frontEndTheme,
-      "partials"
-    ),
-    path.join(__dirname, "server/themes", "admin", adminTheme, "partials"),
-    path.join(__dirname, "server/themes", "admin", "shared-partials"),
-  ];
-  // console.log('partialsDirs', partialsDirs);
-
-  ///Users/lanecampbell/Dev/sonicjs/server/themes/theme1/theme1.handlebars
-  // app.set('layoutsDir', themeDirectory);
-
-  var hbs = exphbs.create({
-    layoutsDir: path.join(themeDirectory),
-    partialsDir: partialsDirs,
-  });
-
-  // Register `hbs.engine` with the Express app.
-  app.engine("handlebars", hbs.engine);
-  app.set("view engine", "handlebars");
-  app.set("views", __dirname + "/server/themes");
+  setupAssets(app);
 
   // app.set('view options', { layout: 'dark/dark' });
 
@@ -173,35 +114,7 @@ function start() {
   // parse application/json
   app.use(bodyParser.json());
 
-  Handlebars.registerHelper({
-    eq: function (v1, v2) {
-      return v1 === v2;
-    },
-    ne: function (v1, v2) {
-      return v1 !== v2;
-    },
-    lt: function (v1, v2) {
-      return v1 < v2;
-    },
-    gt: function (v1, v2) {
-      return v1 > v2;
-    },
-    lte: function (v1, v2) {
-      return v1 <= v2;
-    },
-    gte: function (v1, v2) {
-      return v1 >= v2;
-    },
-    and: function () {
-      return Array.prototype.slice.call(arguments).every(Boolean);
-    },
-    or: function () {
-      return Array.prototype.slice.call(arguments, 0, -1).some(Boolean);
-    },
-    json: function (context) {
-      return JSON.stringify(context);
-    },
-  });
+  setupHandlebars(app);
 
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
@@ -246,6 +159,8 @@ function start() {
     console.log(chalk.cyan("Website at: ", baseUrl));
     console.log(chalk.cyan("Admin console at: ", baseUrl + "/admin"));
     console.log(chalk.cyan("GraphQL API at: ", baseUrl + "/graphql"));
+
+    app.emit("started");
   });
 }
 
@@ -263,6 +178,101 @@ function initEnvFile() {
   } catch (err) {
     console.error(err);
   }
+}
+
+function setupHandlebars(app) {
+  let themeDirectory = path.join(__dirname, "server/themes");
+  // console.log('themeDirectory', themeDirectory);
+
+  ///Users/lanecampbell/Dev/sonicjs/server/themes/front-end/dark/partials
+  let partialsDirs = [
+    path.join(__dirname, "server/themes", "front-end", "bootstrap", "partials"),
+    path.join(
+      __dirname,
+      "server/themes",
+      "front-end",
+      frontEndTheme,
+      "partials"
+    ),
+    path.join(__dirname, "server/themes", "admin", adminTheme, "partials"),
+    path.join(__dirname, "server/themes", "admin", "shared-partials"),
+  ];
+  // console.log('partialsDirs', partialsDirs);
+
+  ///Users/lanecampbell/Dev/sonicjs/server/themes/theme1/theme1.handlebars
+  // app.set('layoutsDir', themeDirectory);
+
+  var hbs = exphbs.create({
+    layoutsDir: path.join(themeDirectory),
+    partialsDir: partialsDirs,
+  });
+
+  // Register `hbs.engine` with the Express app.
+  app.engine("handlebars", hbs.engine);
+  app.set("view engine", "handlebars");
+  app.set("views", __dirname + "/server/themes");
+
+  setupHandlebarsHelpers();
+}
+
+function setupHandlebarsHelpers() {
+  Handlebars.registerHelper({
+    eq: function (v1, v2) {
+      return v1 === v2;
+    },
+    ne: function (v1, v2) {
+      return v1 !== v2;
+    },
+    lt: function (v1, v2) {
+      return v1 < v2;
+    },
+    gt: function (v1, v2) {
+      return v1 > v2;
+    },
+    lte: function (v1, v2) {
+      return v1 <= v2;
+    },
+    gte: function (v1, v2) {
+      return v1 >= v2;
+    },
+    and: function () {
+      return Array.prototype.slice.call(arguments).every(Boolean);
+    },
+    or: function () {
+      return Array.prototype.slice.call(arguments, 0, -1).some(Boolean);
+    },
+    json: function (context) {
+      return JSON.stringify(context);
+    },
+  });
+}
+
+function setupAssets(app) {
+  app.use(express.static("server/storage/css"));
+  // app.use('/node_modules', express.static(__dirname + '/node_modules'))
+  app.use("/themes", express.static(path.join(appRoot.path, "server/themes")));
+
+  app.use(
+    "/node_modules",
+    express.static(path.join(appRoot.path, "node_modules"))
+  );
+  app.use(
+    "/vendors",
+    express.static(path.join(appRoot.path, "server/assets/vendors"))
+  );
+  app.use(
+    "/css",
+    express.static(path.join(appRoot.path, "server/storage/css"))
+  );
+  app.use("/js", express.static(path.join(appRoot.path, "server/storage/js")));
+  app.use(
+    "/js",
+    express.static(path.join(appRoot.path, "server/storage/files"))
+  );
+  app.use(
+    "/api/containers/files/download",
+    express.static(path.join(appRoot.path, "server/storage/files"))
+  );
 }
 
 start();
