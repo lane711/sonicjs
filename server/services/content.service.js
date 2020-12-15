@@ -54,8 +54,8 @@ module.exports = contentService = {
 
     this.page = await dataService.getContentByUrl(req.url);
 
-    if (this.page.data[0]) {
-      await this.getPage(this.page.data[0].id, this.page.data[0]);
+    if (this.page.data) {
+      await this.getPage(this.page.id, this.page.data);
       await emitterService.emit("postProcessPage");
 
       this.page.data.html = globalService.pageContent;

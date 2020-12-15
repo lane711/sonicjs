@@ -190,6 +190,7 @@ if (typeof module !== "undefined" && module.exports) {
       const query = gql`
         {
           contents(contentTypeId: "page") {
+            id
             contentTypeId
             data
           }
@@ -199,7 +200,7 @@ if (typeof module !== "undefined" && module.exports) {
       let data = await this.executeGraphqlQuery(query);
 
       if (data.contents) {
-        return data.contents;
+        return data.contents[0];
       }
 
       let notFound = { data: {} };
