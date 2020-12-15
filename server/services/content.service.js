@@ -103,6 +103,7 @@ module.exports = contentService = {
       this.page = instance;
     } else {
       if (id) {
+        //TODO convert to graphql
         this.page = await dataService.getContentById(id);
       }
     }
@@ -181,9 +182,9 @@ module.exports = contentService = {
     globalService.pageContent = ""; //reset
     // this.setupShortCodeParser();
     // console.log('=== processTemplate ===')
-    const $ = cheerio.load("");
+    // const $ = cheerio.load("");
 
-    await this.processSections($);
+    await this.processSections();
     await this.processDelayedModules();
 
     // await this.processPageBuilder($);
@@ -223,7 +224,7 @@ module.exports = contentService = {
   //     });
   // },
 
-  processMenu: async function ($) {
+  processMenu: async function () {
     let menuItemTemplate = $.html(".s--menu-item");
     let navWrapper = $(".s--menu-item").parent();
     navWrapper.empty();
@@ -239,7 +240,7 @@ module.exports = contentService = {
     });
   },
 
-  processSections: async function ($) {
+  processSections: async function () {
     await emitterService.emit("preProcessSections");
 
     this.page.data.sections = [];
@@ -267,7 +268,6 @@ module.exports = contentService = {
             //use page builder rows for layout
             rows = await this.processRows(
               section,
-              $,
               sectionWrapper,
               section.data.rows
             );
@@ -289,7 +289,7 @@ module.exports = contentService = {
   },
 
   //TODO loop thru rows
-  processRows: async function (section, $, sectionWrapper, rows) {
+  processRows: async function (section, sectionWrapper, rows) {
     let rowArray = [];
     let rowIndex = 0;
 
