@@ -111,14 +111,13 @@ module.exports = userService = {
   //   }
   // },
 
-  // isAuthenticated: async function (req) {
-  //   var authCookie = await this.getToken(req);
-  //   let userId = await userService.getCurrentUserId(req);
-  //   if (authCookie && userId) {
-  //     return true;
-  //   }
-  //   return false;
-  // },
+  isAuthenticated: async function (req) {
+    console.log('user account', req.user);
+    if(req.user.username){
+      return true;
+    }
+    return false;
+  },
 
   // getToken: async function (req) {
   //   return req.signedCookies.sonicjs_access_token;

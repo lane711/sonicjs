@@ -13,13 +13,12 @@ if (typeof module !== "undefined" && module.exports) {
   var ShortcodeTree = require("shortcode-tree").ShortcodeTree;
   var chalk = require("chalk");
   // const { request, gql } = require("graphql-request");
-  var { GraphQLClient, gql, request } = require('graphql-request');
+  var { GraphQLClient, gql, request } = require("graphql-request");
 
   var log = console.log;
 } else {
   // var globalService = {};
   // const { request, gql } = require("graphql-request");
-
 }
 
 (function (exports) {
@@ -38,7 +37,10 @@ if (typeof module !== "undefined" && module.exports) {
           baseURL: globalService.baseUrl,
         };
 
-        if (options.req.signedCookies && options.req.signedCookies.sonicjs_access_token) {
+        if (
+          options.req.signedCookies &&
+          options.req.signedCookies.sonicjs_access_token
+        ) {
           defaultOptions.headers.Authorization =
             options.req.signedCookies.sonicjs_access_token;
         }
@@ -49,18 +51,18 @@ if (typeof module !== "undefined" && module.exports) {
       }
     });
   }),
-  (exports.executeGraphqlQuery = async function (query) {
-    const endpoint = `${globalService.baseUrl}/graphql`;
- 
-    const graphQLClient = new GraphQLClient(endpoint, {
-      headers: {
-        authorization: 'Bearer MY_TOKEN',
-      },
-    })
-  
-    const data = graphQLClient.request(query)
-    return data;
-  }),
+    (exports.executeGraphqlQuery = async function (query) {
+      const endpoint = `${globalService.baseUrl}/graphql`;
+
+      const graphQLClient = new GraphQLClient(endpoint, {
+        headers: {
+          authorization: "Bearer MY_TOKEN",
+        },
+      });
+
+      const data = graphQLClient.request(query);
+      return data;
+    }),
     (exports.getAxios = function () {
       //TODO add auth
       if (!axiosInstance) {
@@ -108,9 +110,6 @@ if (typeof module !== "undefined" && module.exports) {
       return data;
     }),
     (exports.getContentByType = async function (contentType) {
-
-
-     
       const query = gql`
       {
         contents (contentTypeId : "${contentType}") {
@@ -118,11 +117,11 @@ if (typeof module !== "undefined" && module.exports) {
           data
         }
       }
-      `
-      
-     let data = await this.executeGraphqlQuery(query);
+      `;
 
-     return data.contents;
+      let data = await this.executeGraphqlQuery(query);
+
+      return data.contents;
       // const query = gql`
       //   {
       //     contents {
@@ -181,11 +180,26 @@ if (typeof module !== "undefined" && module.exports) {
       return results[0];
     }),
     (exports.getContentByUrl = async function (url) {
-      var filter = encodeURI(`{"where":{"data.url":"${url}"}}`);
-      let apiFullUrl = `${apiUrl}content?filter=${filter}`;
-      let record = await this.getAxios().get(apiFullUrl);
-      if (record.data[0] && record.data.length > 0) {
-        return record;
+      // var filter = encodeURI(`{"where":{"data.url":"${url}"}}`);
+      // let apiFullUrl = `${apiUrl}content?filter=${filter}`;
+      // let record = await this.getAxios().get(apiFullUrl);
+      // if (record.data[0] && record.data.length > 0) {
+      //   return record;
+      // }
+
+      const query = gql`
+        {
+          contents(contentTypeId: "page") {
+            contentTypeId
+            data
+          }
+        }
+      `;
+
+      let data = await this.executeGraphqlQuery(query);
+
+      if (data.contents) {
+        return data.contents;
       }
 
       let notFound = { data: {} };

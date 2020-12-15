@@ -90,15 +90,6 @@ module.exports = authService = {
       })(req, res, next);
     });
     
-    // app.get('/login',
-    //   (req, res) => res.sendFile('html/login.html',
-    //   { root: __dirname })
-    // );
-    
-    app.get('/',
-      connectEnsureLogin.ensureLoggedIn(),
-      (req, res) => res.sendFile('html/index.html', {root: __dirname})
-    );
     
     app.get('/private',
       connectEnsureLogin.ensureLoggedIn(),

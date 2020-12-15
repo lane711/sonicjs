@@ -112,10 +112,13 @@ const RootQuery = new GraphQLObjectType({
     },
     contents: {
         type: new GraphQLList(ContentType),
-        args: { contentTypeId: { type: GraphQLString } },
+        args: { 
+          contentTypeId: { type: GraphQLString } ,
+          url: { type: GraphQLString }
+      },
 
         resolve(parent, args) {
-          return Content.find({contentTypeId:args.contentTypeId});
+          return Content.find({contentTypeId:args.contentTypeId, url:args.url});
         },
       },
   },
