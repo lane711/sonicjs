@@ -1,7 +1,7 @@
 const graphql = require("graphql");
 const User = require("../models/user");
 const Content = require("../models/content");
-const { GraphQLJSONObject } = require('graphql-type-json');
+const { GraphQLJSONObject } = require("graphql-type-json");
 
 const {
   GraphQLObjectType,
@@ -83,7 +83,7 @@ const RootQuery = new GraphQLObjectType({
     // },
     user: {
       type: UserType,
-      args: { 
+      args: {
         id: { type: GraphQLID },
         username: { type: GraphQLString },
         password: { type: GraphQLString },
@@ -111,16 +111,40 @@ const RootQuery = new GraphQLObjectType({
       },
     },
     contents: {
-        type: new GraphQLList(ContentType),
-        args: { 
-          contentTypeId: { type: GraphQLString } ,
-          url: { type: GraphQLString }
+      type: new GraphQLList(ContentType),
+      args: {
+        contentTypeId: { type: GraphQLString },
+        url: { type: GraphQLString },
       },
 
-        resolve(parent, args) {
-          return Content.find({contentTypeId:args.contentTypeId, url:args.url});
-        },
+      resolve(parent, args) {
+        return Content.find({
+          contentTypeId: args.contentTypeId,
+          url: args.url,
+        });
       },
+    },
+    contentByUrl: {
+      type: ContentType,
+      args: {
+        url: { type: GraphQLString },
+      },
+
+      resolve(parent, args) {
+        return Content.findOne({
+          url: args.url,
+        });
+      },
+    },
+    contentById: {
+      type: ContentType,
+      args: {
+        id: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        return Content.findById(args.id);
+      },
+    },
   },
 });
 
@@ -142,7 +166,7 @@ const Mutation = new GraphQLObjectType({
           password: args.password,
           createdOn: now,
           updatedOn: now,
-          realm: ["default"]
+          realm: ["default"],
         });
         return user.save();
       },
@@ -169,7 +193,7 @@ const Mutation = new GraphQLObjectType({
       args: {
         contentTypeId: { type: new GraphQLNonNull(GraphQLString) },
         data: {
-          type: new GraphQLNonNull(GraphQLJSONObject)
+          type: new GraphQLNonNull(GraphQLJSONObject),
         },
         createdByUserId: { type: new GraphQLNonNull(GraphQLID) },
         lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },

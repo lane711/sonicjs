@@ -189,7 +189,7 @@ if (typeof module !== "undefined" && module.exports) {
 
       const query = gql`
         {
-          contents(contentTypeId: "page") {
+          contentByUrl(url: "${url}") {
             id
             contentTypeId
             data
@@ -333,16 +333,31 @@ if (typeof module !== "undefined" && module.exports) {
     });
 
   (exports.getContentById = async function (id) {
-    let url = `${apiUrl}content/${id}`;
-    return this.getAxios()
-      .get(url)
-      .then(function (content) {
-        // console.log('getContentById', content.data);
-        return content.data;
-      })
-      .catch(function (error) {
-        console.log(`getContentById ERROR, Id:${id}`, error);
-      });
+    // let url = `${apiUrl}content/${id}`;
+    // return this.getAxios()
+    //   .get(url)
+    //   .then(function (content) {
+    //     // console.log('getContentById', content.data);
+    //     return content.data;
+    //   })
+    //   .catch(function (error) {
+    //     console.log(`getContentById ERROR, Id:${id}`, error);
+    //   });
+
+    const query = gql`
+    {
+      contentById(id: "${id}") {
+        contentTypeId
+        data
+        id
+      }
+    }
+  `;
+
+  let data = await this.executeGraphqlQuery(query);
+
+  return data;
+
   }),
     (exports.asyncForEach = async function (array, callback) {
       for (let index = 0; index < array.length; index++) {
