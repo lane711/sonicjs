@@ -4,6 +4,8 @@ require("dotenv").config();
 const express = require("express");
 const graphqlHTTP = require("express-graphql");
 const schema = require("./server/schema/schema");
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
 const app = express();
 const { request, gql } = require("graphql-request");
 const path = require("path");
@@ -18,11 +20,7 @@ var bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
 const frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
-const expressSession = require("express-session")({
-  secret: "secret",
-  resave: false,
-  saveUninitialized: false,
-});
+
 const passport = require("passport");
 const mongoose = require("mongoose");
 
@@ -36,16 +34,30 @@ mongoose.connection.once("open", () => {
   console.log("conneted to database");
 });
 
+// require("express-session")({
+//   secret: "secret",
+//   resave: false,
+//   saveUninitialized: false,
+//   store: new MongoStore({ mongooseConnection: mongoose.connection })
+// });
+
+app.use(session({
+  secret: 'foo',
+  store: new MongoStore({ mongooseConnection: mongoose.connection })
+}));
+
 setupGraphQL(app);
 
 function start() {
+
+
+
   setupAssets(app);
 
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
   setupHandlebars(app);
 
-  app.use(expressSession);
 
   passport.use(User.createStrategy());
   passport.serializeUser(User.serializeUser());
