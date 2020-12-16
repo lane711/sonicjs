@@ -1,6 +1,6 @@
 {
   "title": "Site Settings",
-  "systemid": "site-settings",
+  "systemId": "site-settings",
   "version": "0.0.0.1",
   "enabled": true,
   "canBeAddedToColumn": true,

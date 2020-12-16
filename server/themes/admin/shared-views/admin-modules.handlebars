@@ -19,7 +19,7 @@
         <tbody>
           {{#each data}}
           <tr>
-            <td><a href="/admin/modules/edit/{{ this.systemid }}">{{ this.title }}</a></td>
+            <td><a href="/admin/modules/edit/{{ this.systemId }}">{{ this.title }}</a></td>
             <td class="text-center">
               {{#if this.enabled}}
               <i class="fa fa-check green"></i>
@@ -30,11 +30,11 @@
             </td>
             <td class="text-center">{{ this.version}}</td>
             <td class="text-center">
-              <a class="btn btn-sm btn-primary rmargin" href="/admin/modules/edit/{{ this.systemid }}">Edit</a>
+              <a class="btn btn-sm btn-primary rmargin" href="/admin/modules/edit/{{ this.systemId }}">Edit</a>
 
  <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
                 data-trigger="focus" aria-label="Delete {{ this.title }}"
-                title="Delete <b>{{ this.title }}</b> Forever?" data-content="<a href='/module/{{ this.systemid }}'
+                title="Delete <b>{{ this.title }}</b> Forever?" data-content="<a href='/module/{{ this.systemId }}'
    class='btn btn-sm btn-danger rmargin custom-delete'>Confirm Delete</a>
 ">Delete</a>
             </td>

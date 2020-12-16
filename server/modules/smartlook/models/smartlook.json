@@ -1,8 +1,8 @@
 {
   "id": 43,
-  "systemid": "smartlook",
+  "systemId": "smartlook",
   "title": "Module - Smartlook",
-  "moduleSystemid": "smartlook",
+  "moduleSystemId": "smartlook",
   "data": {
     "components": [
       {

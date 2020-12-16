@@ -9,7 +9,7 @@ module.exports = {{ systemidCamelCase }}MainService = {
 
             if (options.shortcode.name === '{{ systemidUpperCase }}') {
 
-                options.moduleName = '{{ systemid }}';
+                options.moduleName = '{{ systemId }}';
                 await moduleService.processModuleInColumn(options);
             }
 

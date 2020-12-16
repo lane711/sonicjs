@@ -1,8 +1,8 @@
 {
   "id": 8,
-  "systemid": "site-settings",
+  "systemId": "site-settings",
   "title": "Site Settings",
-  "moduleSystemid": "site-settings",
+  "moduleSystemId": "site-settings",
   "data": {
     "components": [
       {

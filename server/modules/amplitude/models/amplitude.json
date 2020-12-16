@@ -1,8 +1,8 @@
 {
   "id": 35,
-  "systemid": "amplitude",
+  "systemId": "amplitude",
   "title": "Amplitude",
-  "moduleSystemid": "amplitude",
+  "moduleSystemId": "amplitude",
   "data": {
     "components": [
       {

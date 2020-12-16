@@ -10,7 +10,7 @@
     "id": {
       "type": "number"
     },
-    "systemid": {
+    "systemId": {
       "type": "string",
       "required": true
     },

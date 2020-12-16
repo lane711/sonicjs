@@ -1,8 +1,8 @@
 {
   "id": 50,
-  "systemid": "compare-item",
+  "systemId": "compare-item",
   "title": "Compare Item",
-  "moduleSystemid": "compare-item",
+  "moduleSystemId": "compare-item",
   "data": {
     "components": [
       {

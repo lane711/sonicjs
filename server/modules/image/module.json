@@ -1,6 +1,6 @@
 {
   "title": "Image",
-  "systemid": "image",
+  "systemId": "image",
   "version": "0.0.0.1",
   "enabled": true,
   "canBeAddedToColumn": true,

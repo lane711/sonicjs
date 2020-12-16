@@ -1,8 +1,8 @@
 {
   "id": 57,
-  "systemid": "theme-settings",
+  "systemId": "theme-settings",
   "title": "Theme Settings",
-  "moduleSystemid": "theme-settings",
+  "moduleSystemId": "theme-settings",
   "data": {
     "components": [
       {

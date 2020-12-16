@@ -23,7 +23,7 @@
                   },
                   {
                     type: 'textfield',
-                    key: 'systemid',
+                    key: 'systemId',
                     label: 'SystemId',
                     placeholder: 'Enter the slug to be used as the system id (ie: blog, news, public-service)',
                     input: true
@@ -58,7 +58,7 @@
 
                   form.submission = {
                     data: {
-                      title: moduleDef.title, systemid: moduleDef.systemid, enabled: moduleDef.enabled, canBeAddedToColumn: moduleDef.canBeAddedToColumn,
+                      title: moduleDef.title, systemId: moduleDef.systemId, enabled: moduleDef.enabled, canBeAddedToColumn: moduleDef.canBeAddedToColumn,
                       singleInstance: moduleDef.singleInstance
                     }
                   };
@@ -69,7 +69,7 @@
                         console.log('edit module', response);
                         //return await response.data;
 
-                        window.location.replace('/admin/modules/edit/' + submission.data.systemid);
+                        window.location.replace('/admin/modules/edit/' + submission.data.systemId);
                       })
                       .catch(function (error) {
                         console.log(error);
@@ -147,16 +147,16 @@
               {{!-- {{log data}} --}}
               {{#each data.contentTypes}}
               <tr>
-                <td><a href="/admin/content-types/edit/{{ this.systemid }}">{{ this.title }}</a></td>
-                <td><a href="/admin/modules/edit/{{ this.moduleSystemid }}">{{ this.moduleSystemid }}</a></td>
+                <td><a href="/admin/content-types/edit/{{ this.systemId }}">{{ this.title }}</a></td>
+                <td><a href="/admin/modules/edit/{{ this.moduleSystemId }}">{{ this.moduleSystemId }}</a></td>
                 <td>
                   <a class="btn btn-sm btn-primary rmargin"
-                    href="/admin/content-types/edit/{{ this.systemid }}">Edit</a>
+                    href="/admin/content-types/edit/{{ this.systemId }}">Edit</a>
 
                   <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
                     data-trigger="focus" aria-label="Delete {{ this.title }}"
                     title="Delete <b>{{ this.title }}</b> Forever?" data-content="<a href='
-                        /contentType/{{ this.systemid }}' class='btn btn-sm btn-danger rmargin'>Confirm Delete</a>
+                        /contentType/{{ this.systemId }}' class='btn btn-sm btn-danger rmargin'>Confirm Delete</a>
                       ">Delete</a>
 
                 </td>
@@ -246,7 +246,7 @@
                   },
                   {
                     type: 'textfield',
-                    key: 'systemid',
+                    key: 'systemId',
                     label: 'System Id',
                     placeholder: 'Enter the slug to be used as the system id (ie: blog, news, public-service)',
                     input: true,
@@ -254,7 +254,7 @@
                   },
                   {
                     type: 'textfield',
-                    key: 'moduleSystemid',
+                    key: 'moduleSystemId',
                     label: 'Module System Id',
                     input: true
                   },
@@ -271,7 +271,7 @@
                 .then(async function (form) {
 
                   form.submission = {
-                    data: { moduleSystemid: "{{ data.moduleDef.systemid }}" }
+                    data: { moduleSystemId: "{{ data.moduleDef.systemId }}" }
                   };
 
                   form.on('submit', async function (submission) {
@@ -279,7 +279,7 @@
                     axios.post(`/api/modules/createModuleContentType?access_token=${accessToken}`, submission.data)
                       .then(async function (response) {
                         console.log(response);
-                        window.location.replace('/admin/modules/edit/' + response.data.data.moduleSystemid);
+                        window.location.replace('/admin/modules/edit/' + response.data.data.moduleSystemId);
 
                       })
                       .catch(function (error) {

@@ -77,7 +77,7 @@ if (typeof module !== "undefined" && module.exports) {
         onFormSubmitFunction = "editInstance(submission,true)";
       }
 
-      // let name = `${contentType.systemid}Form`;
+      // let name = `${contentType.systemId}Form`;
       // let settings = await this.getFormSettings(contentType, content);
       // let components = await this.getFormComponents(contentType, content);
       // const formJSON = {
@@ -125,7 +125,7 @@ if (typeof module !== "undefined" && module.exports) {
       return form;
     }),
     (exports.getFormJson = async function (contentType, content) {
-      let name = `${contentType.systemid}Form`;
+      let name = `${contentType.systemId}Form`;
       let settings = await this.getFormSettings(contentType, content);
       let components = await this.getFormComponents(contentType, content);
       const formJSON = {
@@ -187,7 +187,7 @@ if (typeof module !== "undefined" && module.exports) {
           type: "textfield",
           key: "contentType",
           label: "contentType",
-          defaultValue: contentType.systemid,
+          defaultValue: contentType.systemId,
           hidden: true,
           input: true,
         });
@@ -228,7 +228,7 @@ if (typeof module !== "undefined" && module.exports) {
       //   let controlContentType = new HiddenQuestion({
       //     key: 'contentTypeId',
       //     label: 'Content Type',
-      //     value: contentType.systemid,
+      //     value: contentType.systemId,
       //     required: true,
       //     order: 1
       //   });

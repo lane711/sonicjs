@@ -1,8 +1,8 @@
 {
   "id": 52,
-  "systemid": "youtube",
+  "systemId": "youtube",
   "title": "Module - Youtube",
-  "moduleSystemid": "youtube",
+  "moduleSystemId": "youtube",
   "data": {
     "components": [
       {

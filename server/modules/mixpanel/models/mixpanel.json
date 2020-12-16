@@ -1,8 +1,8 @@
 {
   "id": 44,
-  "systemid": "mixpanel",
+  "systemId": "mixpanel",
   "title": "Module - Mixpanel",
-  "moduleSystemid": "mixpanel",
+  "moduleSystemId": "mixpanel",
   "data": {
     "components": [
       {

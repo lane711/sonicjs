@@ -1,8 +1,8 @@
 {
   "id": 34,
-  "systemid": "google-analytics",
+  "systemId": "google-analytics",
   "title": "Module - Google Analytics",
-  "moduleSystemid": "google-analytics",
+  "moduleSystemId": "google-analytics",
   "data": {
     "components": [
       {

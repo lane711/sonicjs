@@ -1,6 +1,6 @@
 {
   "title": "Hello World",
-  "systemid": "hello-world",
+  "systemId": "hello-world",
   "version": "0.0.0.1",
   "enabled": true,
   "canBeAddedToColumn": true,

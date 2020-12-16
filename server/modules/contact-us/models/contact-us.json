@@ -1,10 +1,10 @@
 {
   "id": 33,
-  "systemid": "contact-us",
+  "systemId": "contact-us",
   "title": "Contact Us Settings",
   "filePath": "/server/modules/contact-us/models/contact-us.json",
   "module": "Contact Us",
-  "moduleSystemid": "contact-us",
+  "moduleSystemId": "contact-us",
   "data": {
     "components": [
       {

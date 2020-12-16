@@ -1,8 +1,8 @@
 {
   "id": 30,
-  "systemid": "feature-box",
+  "systemId": "feature-box",
   "title": "Module - Feature Box",
-  "moduleSystemid": "feature-box",
+  "moduleSystemId": "feature-box",
   "data": {
     "components": [
       {

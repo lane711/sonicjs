@@ -1,6 +1,6 @@
 {
   "title": "Menu Item With New Page",
-  "systemid": "menu-item-with-new-page",
+  "systemId": "menu-item-with-new-page",
   "version": "0.0.0.1",
   "canBeAddedToColumn": true,
   "enabled": true,

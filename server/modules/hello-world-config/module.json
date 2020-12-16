@@ -1,6 +1,6 @@
 {
   "title": "Hello World Config",
-  "systemid": "hello-world-config",
+  "systemId": "hello-world-config",
   "version": "0.0.0.1",
   "enabled": true,
   "canBeAddedToColumn": true,

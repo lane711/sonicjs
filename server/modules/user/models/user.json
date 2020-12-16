@@ -1,8 +1,8 @@
 {
   "id": 58,
-  "systemid": "user",
+  "systemId": "user",
   "title": "User",
-  "moduleSystemid": "user",
+  "moduleSystemId": "user",
   "data": {
     "components": [
       {

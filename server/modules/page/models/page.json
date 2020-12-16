@@ -1,8 +1,8 @@
 {
   "id": 12,
-  "systemid": "page",
+  "systemId": "page",
   "title": "Page",
-  "moduleSystemid": "page",
+  "moduleSystemId": "page",
   "data": {
     "components": [
       {

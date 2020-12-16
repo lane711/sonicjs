@@ -26,7 +26,7 @@ describe("Admin Content Types", function () {
     cy.get('input[name="data[title]"]').type("Cypress CT");
     // cy.wait(5000);
 
-    cy.get('input[name="data[systemid]"]').type("cypress-content-type");
+    cy.get('input[name="data[systemId]"]').type("cypress-content-type");
     cy.contains("Create").click();
     cy.contains("Cypress CT");
     //

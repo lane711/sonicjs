@@ -1,8 +1,8 @@
 {
   "id": 40,
-  "systemid": "menu-title",
+  "systemId": "menu-title",
   "title": "Module - Menu - Title",
-  "moduleSystemid": "menu-title",
+  "moduleSystemId": "menu-title",
   "data": {
     "components": [
       {

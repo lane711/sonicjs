@@ -1,8 +1,8 @@
 {
   "id": 39,
-  "systemid": "alert",
+  "systemId": "alert",
   "title": "Alert",
-  "moduleSystemid": "alert",
+  "moduleSystemId": "alert",
   "data": {
     "components": [
       {

@@ -144,7 +144,7 @@ if (typeof module !== "undefined" && module.exports) {
     }),
     (exports.getContentType = async function (contentType) {
       // console.log('getting content type ' + contentType);
-      let url = `${apiUrl}modules/getContentTypeConfig?systemid=${contentType}`;
+      let url = `${apiUrl}modules/getContentTypeConfig?systemId=${contentType}`;
       let contentTypeConfig = await this.getAxios().get(url);
 
       // console.log(contentTypeConfig);
@@ -153,13 +153,19 @@ if (typeof module !== "undefined" && module.exports) {
       return contentTypeConfig.data.data;
     }),
     (exports.getContentTypes = async function () {
-      // let url = `${apiUrl}contentTypes`;
-      // let contentTypes = await this.getAxios().get(url);
-      // return contentTypes.data;
+      const query = gql`
+        {
+          contentTypes{
+            data
+          }
+        }
+      `;
 
-      let url = `${apiUrl}modules/getModuleContentTypes`;
-      let contentTypes = await this.getAxios().get(url);
-      return contentTypes.data.data;
+      let data = await this.executeGraphqlQuery(query);
+
+      if (data.contentTypes) {
+        return data.contentTypes;
+      }
     }),
     (exports.createContentType = async function (contentType) {
       let url = `${apiUrl}contentTypes`;
@@ -375,9 +381,9 @@ if (typeof module !== "undefined" && module.exports) {
       let url = this.getImageUrl(img);
       return `<img class="img-fluid rounded" src="${url}" />`;
     }),
-    (exports.deleteModule = async function (moduleSystemid) {
+    (exports.deleteModule = async function (moduleSystemId) {
       let url = `${apiUrl}modules/deleteModule`;
-      let objToDelete = { moduleSystemid: moduleSystemid };
+      let objToDelete = { moduleSystemId: moduleSystemId };
       await this.getAxios().post(url, objToDelete);
     });
 })(typeof exports === "undefined" ? (this["dataService"] = {}) : exports);

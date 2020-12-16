@@ -1,9 +1,9 @@
 {
   "id": 46,
-  "systemid": "blog",
+  "systemId": "blog",
   "title": "Blog",
   "filePath": "server/modules/blog/model/blog.json",
-  "moduleSystemid": "blog",
+  "moduleSystemId": "blog",
   "data": {
     "components": [
       {

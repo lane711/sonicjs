@@ -1,8 +1,8 @@
 {
   "id": 42,
-  "systemid": "image",
+  "systemId": "image",
   "title": "Module - Image",
-  "moduleSystemid": "image",
+  "moduleSystemId": "image",
   "data": {
     "components": [
       {

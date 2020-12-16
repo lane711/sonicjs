@@ -309,7 +309,7 @@ exports.loadRoutes = async function (app) {
     let contentTypesRaw = await dataService.getContentTypes();
     let contentTypes = contentTypesRaw.map(function (contentType) {
       return {
-        _id: contentType.systemid,
+        _id: contentType.systemId,
         type: "form",
         title: contentType.title,
       };

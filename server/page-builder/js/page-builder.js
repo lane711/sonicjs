@@ -730,7 +730,7 @@ async function deleteContentType(id) {
   console.log("deleting content", id);
   // return this.http.put(environment.apiUrl + `content/${id}`, payload).toPromise();
   axiosInstance
-    .post(`/api/modules/deleteModuleContentType/`, { systemid: id})
+    .post(`/api/modules/deleteModuleContentType/`, { systemId: id})
     .then(async function (response) {
       console.log(response);
       // redirect("/admin/content-types");
@@ -1188,11 +1188,11 @@ async function saveWYSIWYG() {
   fullPageUpdate();
 }
 
-async function addModule(systemid) {
+async function addModule(systemId) {
   showSidePanel();
 
   let form = await formService.getForm(
-    systemid,
+    systemId,
     undefined,
     "addModuleToColumn(submission, true)"
   );

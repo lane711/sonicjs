@@ -1,8 +1,8 @@
 {
   "id": 14,
-  "systemid": "site-settings-typography",
+  "systemId": "site-settings-typography",
   "title": "Site Settings Typography",
-  "moduleSystemid": "site-settings",
+  "moduleSystemId": "site-settings",
   "data": {
     "components": [
       {

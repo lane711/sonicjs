@@ -1,8 +1,8 @@
 {
   "id": 31,
-  "systemid": "html",
+  "systemId": "html",
   "title": "Module - Html",
-  "moduleSystemid": "html",
+  "moduleSystemId": "html",
   "data": {
     "components": [
       {

@@ -1,8 +1,8 @@
 {
   "id": 32,
-  "systemid": "text",
+  "systemId": "text",
   "title": "Module - Text",
-  "moduleSystemid": "text",
+  "moduleSystemId": "text",
   "data": {
     "components": [
       {

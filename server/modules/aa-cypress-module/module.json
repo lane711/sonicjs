@@ -1,6 +1,6 @@
 {
   "title": "AA Cypress Module",
-  "systemid": "aa-cypress-module",
+  "systemId": "aa-cypress-module",
   "version": "0.0.0.1",
   "canBeAddedToColumn": true,
   "enabled": true,

@@ -8,7 +8,7 @@ module.exports = function (Module) {
   Module.create = async function (body, cb) {
     let moduleDefinitionFile = {
       title: body.title,
-      systemid: body.systemid,
+      systemId: body.systemId,
       version: "0.0.0.1",
       canBeAddedToColumn: body.canBeAddedToColumn,
       enabled: body.enabled,
@@ -36,7 +36,7 @@ module.exports = function (Module) {
   Module.update = async function (body, cb) {
     let moduleDefinitionFile = {
       title: body.title,
-      systemid: body.systemid,
+      systemId: body.systemId,
       version: "0.0.0.1",
       enabled: body.enabled === "true" ? true : false,
       canBeAddedToColumn: body.canBeAddedToColumn,
@@ -61,8 +61,8 @@ module.exports = function (Module) {
     },
   });
 
-  Module.getContentTypeConfig = async function (systemid, cb) {
-    let contentType = await moduleService.getModuleContentType(systemid);
+  Module.getContentTypeConfig = async function (systemId, cb) {
+    let contentType = await moduleService.getModuleContentType(systemId);
 
     await emitterService.emit("contentTypeLoaded", contentType);
 
@@ -75,7 +75,7 @@ module.exports = function (Module) {
       verb: "get",
     },
     accepts: {
-      arg: "systemid",
+      arg: "systemId",
       type: "string",
       http: {
         source: "query",
@@ -100,7 +100,7 @@ module.exports = function (Module) {
       verb: "get",
     },
     accepts: {
-      arg: "systemid",
+      arg: "systemId",
       type: "string",
       http: {
         source: "query",
@@ -114,7 +114,7 @@ module.exports = function (Module) {
 
   Module.updateJsonFile = async function (data, cb) {
     let obj = JSON.stringify(data);
-    let moduleDef = await moduleService.getModuleDefinitionFileWithPath(data.systemid);
+    let moduleDef = await moduleService.getModuleDefinitionFileWithPath(data.systemId);
     //TODO need coorect file path to pass in
     await fileService.writeFile(moduleDef.filePath, moduleDef);
     return data;
@@ -137,8 +137,8 @@ module.exports = function (Module) {
   Module.createModuleContentType = async function (body, cb) {
     let moduleDefinitionFile = {
       title: body.title,
-      systemid: body.systemid,
-      moduleSystemid: body.moduleSystemid,
+      systemId: body.systemId,
+      moduleSystemId: body.moduleSystemId,
     };
 
     let newContentType = await moduleService.createModuleContentType(
@@ -164,7 +164,7 @@ module.exports = function (Module) {
   //delete module content type
   Module.deleteModuleContentType = async function (body, cb) {
     let newContentType = await moduleService.deleteModuleContentType(
-      body.systemid
+      body.systemId
     );
 
     return newContentType;
@@ -186,7 +186,7 @@ module.exports = function (Module) {
   //delete module
   Module.deleteModule = async function (body, cb) {
     let status = await moduleService.deleteModule(
-      body.moduleSystemid
+      body.moduleSystemId
     );
 
     return status;

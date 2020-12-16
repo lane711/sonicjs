@@ -2,6 +2,7 @@ const graphql = require("graphql");
 const User = require("../models/user");
 const Content = require("../models/content");
 const { GraphQLJSONObject } = require("graphql-type-json");
+const moduleService = require("../services/module.service");
 
 const {
   GraphQLObjectType,
@@ -56,6 +57,23 @@ const ContentType = new GraphQLObjectType({
     },
   }),
 });
+
+const ContentTypeType = new GraphQLObjectType({
+  name: "ContentType",
+  fields: () => ({
+    title: { type: GraphQLString },
+    systemId: { type: GraphQLString },
+    data: { type: GraphQLJSONObject },
+    filePath: { type: GraphQLString },
+    moduleSystemId: { type: GraphQLString },
+  }),
+});
+
+// data:{components: Array(0)}
+// filePath:'/server/modules/aa-cypress-module/models/aa-cypress-module.json'
+// moduleSystemId:'aa-cypress-module'
+// systemId:'aa-cypress-module'
+// title:'AA Cypress Module'
 
 //RootQuery describe how users can use the graph and grab data.
 //E.g Root query to get all Users, get all books, get a particular
@@ -138,6 +156,14 @@ const RootQuery = new GraphQLObjectType({
           contentTypeId: args.contentTypeId,
           url: args.url,
         });
+      },
+    },
+
+    contentTypes: {
+      type: new GraphQLList(ContentTypeType),
+      resolve(parent, args) {
+        console.log('getting mdules');
+        return moduleService.getModuleContentTypes();
       },
     },
   },

@@ -1,6 +1,6 @@
 {
   "title": "Mixpanel",
-  "systemid": "mixpanel",
+  "systemId": "mixpanel",
   "version": "0.0.0.1",
   "enabled": true,
   "canBeAddedToColumn": false,

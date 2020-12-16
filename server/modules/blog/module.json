@@ -1,6 +1,6 @@
 {
   "title": "Blog",
-  "systemid": "blog",
+  "systemId": "blog",
   "version": "0.0.0.1",
   "canBeAddedToColumn": "true",
   "enabled": "true",

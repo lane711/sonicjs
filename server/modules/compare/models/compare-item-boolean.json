@@ -1,8 +1,8 @@
 {
   "id": 51,
-  "systemid": "compare-item-boolean",
+  "systemId": "compare-item-boolean",
   "title": "Compare Item Boolean",
-  "moduleSystemid": "compare-item-boolean",
+  "moduleSystemId": "compare-item-boolean",
   "data": {
     "components": [
       {

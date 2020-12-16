@@ -49,7 +49,7 @@ module.exports = async function (app) {
 
         let newContentType = {
           title: obj.title,
-          systemid: obj.systemid,
+          systemId: obj.systemId,
           data: obj.data,
         };
 
@@ -60,7 +60,7 @@ module.exports = async function (app) {
           if (err) throw err;
           console.log("Content type created:", newInstance);
 
-          if (newContentType.systemid === "asset") {
+          if (newContentType.systemId === "asset") {
             setEnvVarToEnsureMigrationDoesNotRunAgain();
           }
         });
