@@ -69,12 +69,6 @@ const ContentTypeType = new GraphQLObjectType({
   }),
 });
 
-// data:{components: Array(0)}
-// filePath:'/server/modules/aa-cypress-module/models/aa-cypress-module.json'
-// moduleSystemId:'aa-cypress-module'
-// systemId:'aa-cypress-module'
-// title:'AA Cypress Module'
-
 //RootQuery describe how users can use the graph and grab data.
 //E.g Root query to get all Users, get all books, get a particular
 //book or get a particular User.

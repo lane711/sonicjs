@@ -156,6 +156,10 @@ if (typeof module !== "undefined" && module.exports) {
       const query = gql`
         {
           contentTypes{
+            title
+            systemId
+            moduleSystemId
+            filePath
             data
           }
         }
