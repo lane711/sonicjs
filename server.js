@@ -190,6 +190,18 @@ function setupAssets(app) {
     express.static(path.join(appRoot.path, "server/storage/files"))
   );
   app.use(
+    "/services",
+    express.static(path.join(appRoot.path, "server/services"))
+  );
+  app.use(
+    "/page-builder",
+    express.static(path.join(appRoot.path, "server/page-builder"))
+  );
+  app.use(
+    "/assets",
+    express.static(path.join(appRoot.path, "server/assets"))
+  );
+  app.use(
     "/api/containers/files/download",
     express.static(path.join(appRoot.path, "server/storage/files"))
   );
