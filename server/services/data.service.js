@@ -143,14 +143,23 @@ if (typeof module !== "undefined" && module.exports) {
       // return page.data;
     }),
     (exports.getContentType = async function (contentType) {
-      // console.log('getting content type ' + contentType);
-      let url = `${apiUrl}modules/getContentTypeConfig?systemId=${contentType}`;
-      let contentTypeConfig = await this.getAxios().get(url);
+      const query = gql`
+        {
+          contentType(systemId:"${contentType}") {
+            title
+            systemId
+            moduleSystemId
+            filePath
+            data
+          }
+        }
+      `;
 
-      // console.log(contentTypeConfig);
-      // let contentTypeObj =JSON.parse(contentTypeConfig.data.data);
-      // debugger;
-      return contentTypeConfig.data.data;
+      let data = await this.executeGraphqlQuery(query);
+
+      if (data.contentType) {
+        return data.contentType;
+      }
     }),
     (exports.getContentTypes = async function () {
       const query = gql`

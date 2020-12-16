@@ -118,17 +118,7 @@ const RootQuery = new GraphQLObjectType({
         contentTypeId: { type: GraphQLString },
         url: { type: GraphQLString },
       },
-
-      // args: {
-      //   id: { type: GraphQLID },
-      //   url: { type: GraphQLString },
-      // },
-
       resolve(parent, args) {
-        //Here we define how to get data from database source
-
-        //this will return the book with id passed in argument
-        //by the user
         if (args.id) {
           return Content.findById(args.id);
         } else if (args.url) {
@@ -156,8 +146,17 @@ const RootQuery = new GraphQLObjectType({
     contentTypes: {
       type: new GraphQLList(ContentTypeType),
       resolve(parent, args) {
-        console.log('getting mdules');
         return moduleService.getModuleContentTypes();
+      },
+    },
+
+    contentType: {
+      type: ContentTypeType,
+      args: {
+        systemId: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        return moduleService.getModuleContentType(args.systemId);
       },
     },
   },
