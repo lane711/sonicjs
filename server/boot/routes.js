@@ -41,7 +41,7 @@ var cors = require("cors");
 const chalk = require("chalk");
 const log = console.log;
 const url = require("url");
-var admin = require(__dirname + "/admin");
+// var admin = require(__dirname + "/admin");
 
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
@@ -495,9 +495,9 @@ exports.loadRoutes = async function (app) {
     //   });
     // } 
     else if (req.url == "/admin" || req.url.startsWith("/admin/")) {
-      if (!req.signedCookies.sonicjs_access_token) {
-        //user not logged in
-      }
+      // if (!req.signedCookies.sonicjs_access_token) {
+      //   //user not logged in
+      // }
 
       if (process.env.MODE !== "dev") {
         res.send(401);
@@ -657,7 +657,7 @@ exports.loadRoutes = async function (app) {
         );
       }
 
-      let accessToken = await userService.getToken(req);
+      let accessToken = 'fakeToken' ;//await userService.getToken(req);
       data.breadCrumbs = await breadcrumbsService.getAdminBreadcrumbs(req);
 
       mixPanelService.trackEvent("PAGE_LOAD_ADMIN", req, {

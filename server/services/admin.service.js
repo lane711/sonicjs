@@ -26,11 +26,11 @@ module.exports = adminService = {
     //     adminService.checkIfAdminAccountIsCreated();
     // });
 
-    app.get("/admin", connectEnsureLogin.ensureLoggedIn(), (req, res) => {
-      res.send({ user: req.user });
-      //         res.end();
-      // req.isRequestAlreadyHandled = true;
-    });
+    // app.get("/admin", connectEnsureLogin.ensureLoggedIn(), (req, res) => {
+    //   res.send({ user: req.user });
+    //   //         res.end();
+    //   // req.isRequestAlreadyHandled = true;
+    // });
 
 
 
