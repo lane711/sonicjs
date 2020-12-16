@@ -354,10 +354,17 @@ if (typeof module !== "undefined" && module.exports) {
     }
   `;
 
-  let data = await this.executeGraphqlQuery(query);
+    try {
+    } catch (error) {}
 
-  return data.contentById;
-
+    this.executeGraphqlQuery(query)
+      .then((data) => {
+        return data.contentById;
+      })
+      .catch((err) => {
+        console.log(err);
+        return "";
+      });
   }),
     (exports.asyncForEach = async function (array, callback) {
       for (let index = 0; index < array.length; index++) {

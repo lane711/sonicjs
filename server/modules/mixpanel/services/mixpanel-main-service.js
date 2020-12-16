@@ -44,10 +44,10 @@ module.exports = mixpanelMainService = {
     }
 
     let email;
-    let currentUser = await userService.getCurrentUser(req);
-    if (currentUser) {
-      email = currentUser.email;
-    }
+    // let currentUser = await userService.getCurrentUser(req);
+    // if (currentUser) {
+    //   email = currentUser.email;
+    // }
 
     // console.log("mix", email, data);
 
