@@ -10,6 +10,7 @@ var cacheService = require(".//cache.service");
 var dataService = require(".//data.service");
 
 var fs = require("fs");
+const cheerio = require("cheerio");
 const axios = require("axios");
 const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 const chalk = require("chalk");
@@ -98,15 +99,15 @@ module.exports = contentService = {
       return;
     }
     // log(chalk.green(id));
-    this.id = id;
-    if (instance) {
-      this.page = instance;
-    } else {
-      if (id) {
-        //TODO convert to graphql
-        this.page = await dataService.getContentById(id);
-      }
-    }
+    // this.id = id;
+    // if (instance) {
+    //   this.page = instance;
+    // } else {
+    //   if (id) {
+    //     //TODO convert to graphql
+    //     this.page = await dataService.getContentById(id);
+    //   }
+    // }
     // console.log('id',id, instance);
 
     return await this.processTemplate();
@@ -182,9 +183,9 @@ module.exports = contentService = {
     globalService.pageContent = ""; //reset
     // this.setupShortCodeParser();
     // console.log('=== processTemplate ===')
-    // const $ = cheerio.load("");
+    const $ = cheerio.load("");
 
-    await this.processSections();
+    await this.processSections($);
     await this.processDelayedModules();
 
     // await this.processPageBuilder($);
@@ -240,7 +241,7 @@ module.exports = contentService = {
     });
   },
 
-  processSections: async function () {
+  processSections: async function ($) {
     await emitterService.emit("preProcessSections");
 
     this.page.data.sections = [];
