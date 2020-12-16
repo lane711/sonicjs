@@ -101,13 +101,29 @@ const RootQuery = new GraphQLObjectType({
     content: {
       type: ContentType,
       //argument passed by the user while making the query
-      args: { id: { type: GraphQLID } },
+      args: {
+        id: { type: GraphQLID },
+        contentTypeId: { type: GraphQLString },
+        url: { type: GraphQLString },
+      },
+
+      // args: {
+      //   id: { type: GraphQLID },
+      //   url: { type: GraphQLString },
+      // },
+
       resolve(parent, args) {
         //Here we define how to get data from database source
 
         //this will return the book with id passed in argument
         //by the user
-        return Content.findById(args.id);
+        if (args.id) {
+          return Content.findById(args.id);
+        } else if (args.url) {
+          return Content.findOne({
+            url: args.url,
+          });
+        }
       },
     },
     contents: {
@@ -122,27 +138,6 @@ const RootQuery = new GraphQLObjectType({
           contentTypeId: args.contentTypeId,
           url: args.url,
         });
-      },
-    },
-    contentByUrl: {
-      type: ContentType,
-      args: {
-        url: { type: GraphQLString },
-      },
-
-      resolve(parent, args) {
-        return Content.findOne({
-          url: args.url,
-        });
-      },
-    },
-    contentById: {
-      type: ContentType,
-      args: {
-        id: { type: GraphQLString },
-      },
-      resolve(parent, args) {
-        return Content.findById(args.id);
       },
     },
   },

@@ -189,7 +189,7 @@ if (typeof module !== "undefined" && module.exports) {
 
       const query = gql`
         {
-          contentByUrl(url: "${url}") {
+          content(url: "${url}") {
             id
             contentTypeId
             data
@@ -199,8 +199,8 @@ if (typeof module !== "undefined" && module.exports) {
 
       let data = await this.executeGraphqlQuery(query);
 
-      if (data.contentByUrl) {
-        return data.contentByUrl;
+      if (data.content) {
+        return data.content;
       }
 
       let notFound = { data: {} };
@@ -346,7 +346,7 @@ if (typeof module !== "undefined" && module.exports) {
 
     const query = gql`
     {
-      contentById(id: "${id}") {
+      content(id: "${id}") {
         contentTypeId
         data
         id
@@ -354,12 +354,9 @@ if (typeof module !== "undefined" && module.exports) {
     }
   `;
 
-    try {
-    } catch (error) {}
-
     this.executeGraphqlQuery(query)
       .then((data) => {
-        return data.contentById;
+        return data.content;
       })
       .catch((err) => {
         console.log(err);
