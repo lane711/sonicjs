@@ -29,7 +29,7 @@ $(document).ready(async function () {
   await setContentType();
   setupJsonEditorContentTypeRaw();
   setupJsonRawSave();
-  imageList = await getImageList();
+  // imageList = await getImageList();
   // setTimeout(setupPageSettings, 1);
   // setupPageSettings();
 
@@ -70,7 +70,6 @@ async function setPage() {
 async function setContentType() {
   let contentTypeId = $("#contentTypeId").val();
   if (contentTypeId) {
-    debugger;
     this.contentType = await dataService.getContentType(contentTypeId);
   }
 }
@@ -1154,7 +1153,9 @@ function setupJsonRawSave() {
 }
 
 async function getImageList() {
-  let imageList = await axiosInstance.get(`/api/containers/container1/files`);
+
+  let imageList = await dataService.getFiles();
+  // let imageList = await axiosInstance.get(`/api/containers/container1/files`);
   // console.log('imageList', imageList.data);
 
   tinyImageList = [];
@@ -1162,7 +1163,7 @@ async function getImageList() {
   imageList.data.forEach((image) => {
     let imageItem = {
       title: image.name,
-      value: `/api/containers/${image.container}/download/${image.name}`,
+      filePath: `/api/containers/${image.container}/download/${image.name}`,
     };
     tinyImageList.push(imageItem);
   });

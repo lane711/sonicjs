@@ -162,7 +162,7 @@ if (typeof module !== "undefined" && module.exports) {
       // }
 
       let result = await this.getAxios().post(apiUrl, {
-          query: `
+        query: `
             {
                 contentType(systemId:"${contentType}") {
                   title
@@ -198,23 +198,40 @@ if (typeof module !== "undefined" && module.exports) {
       // debugger;
     }),
     (exports.getContentTypes = async function () {
-      const query = gql`
-        {
-          contentTypes {
-            title
-            systemId
-            moduleSystemId
-            filePath
-            data
-          }
-        }
-      `;
+      // const query = gql`
+      //   {
+      //     contentTypes {
+      //       title
+      //       systemId
+      //       moduleSystemId
+      //       filePath
+      //       data
+      //     }
+      //   }
+      // `;
 
-      let data = await this.executeGraphqlQuery(query);
+      // let data = await this.executeGraphqlQuery(query);
 
-      if (data.contentTypes) {
-        return data.contentTypes;
-      }
+      // if (data.contentTypes) {
+      //   return data.contentTypes;
+      // }
+
+      let result = await this.getAxios().post(apiUrl, {
+        query: `
+          {
+              {
+                  contentTypes {
+                    title
+                    systemId
+                    moduleSystemId
+                    filePath
+                    data
+                  }
+                }
+          `,
+      });
+
+      return result.data.data.contentTypes;
     }),
     (exports.createContentType = async function (contentType) {
       let url = `${apiUrl}contentTypes`;
@@ -242,20 +259,37 @@ if (typeof module !== "undefined" && module.exports) {
       //   return record;
       // }
 
-      const query = gql`
-        {
-          content(url: "${url}") {
-            id
-            contentTypeId
-            data
-          }
-        }
-      `;
+      // const query = gql`
+      //   {
+      //     content(url: "${url}") {
+      //       id
+      //       contentTypeId
+      //       data
+      //     }
+      //   }
+      // `;
 
-      let data = await this.executeGraphqlQuery(query);
+      // let data = await this.executeGraphqlQuery(query);
 
-      if (data.content) {
-        return data.content;
+      // if (data.content) {
+      //   return data.content;
+      // }
+
+      let result = await this.getAxios().post(apiUrl, {
+        query: `
+          {
+            {
+              content(url: "${url}") {
+                id
+                contentTypeId
+                data
+              }
+            }
+          `,
+      });
+
+      if (result.data.data.content) {
+        return result.data.data.content;
       }
 
       let notFound = { data: {} };
@@ -434,5 +468,9 @@ if (typeof module !== "undefined" && module.exports) {
       let url = `${apiUrl}modules/deleteModule`;
       let objToDelete = { moduleSystemId: moduleSystemId };
       await this.getAxios().post(url, objToDelete);
+    }),
+    (exports.getFiles = async function () {
+      let files = [{title:'my image', filePath: '/images/test123.png'}];
+      return files;
     });
 })(typeof exports === "undefined" ? (this["dataService"] = {}) : exports);
