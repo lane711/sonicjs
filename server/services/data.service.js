@@ -22,7 +22,7 @@ if (typeof module !== "undefined" && module.exports) {
 }
 
 (function (exports) {
-  var apiUrl = "/api/";
+  var apiUrl = "/graphql/";
   var pageContent = "";
   var page;
   var id;
@@ -143,28 +143,64 @@ if (typeof module !== "undefined" && module.exports) {
       // return page.data;
     }),
     (exports.getContentType = async function (contentType) {
-      const query = gql`
-        {
-          contentType(systemId:"${contentType}") {
-            title
-            systemId
-            moduleSystemId
-            filePath
-            data
-          }
-        }
-      `;
+      // const query = gql`
+      //   {
+      //     contentType(systemId:"${contentType}") {
+      //       title
+      //       systemId
+      //       moduleSystemId
+      //       filePath
+      //       data
+      //     }
+      //   }
+      // `;
 
-      let data = await this.executeGraphqlQuery(query);
+      // let data = await this.executeGraphqlQuery(query);
 
-      if (data.contentType) {
-        return data.contentType;
-      }
+      // if (data.contentType) {
+      //   return data.contentType;
+      // }
+
+      let result = await this.getAxios().post(apiUrl, {
+          query: `
+            {
+                contentType(systemId:"${contentType}") {
+                  title
+                  systemId
+                  moduleSystemId
+                  filePath
+                  data
+                }
+              }
+            `,
+      });
+
+      return result.data.data.contentType;
+
+      // let result = await axios({
+      //   url: apiUrl,
+      //   method: 'post',
+      //   data: {
+      //     query: `
+      //       {
+      //           contentType(systemId:"${contentType}") {
+      //             title
+      //             systemId
+      //             moduleSystemId
+      //             filePath
+      //             data
+      //           }
+      //         }
+      //       `
+      //   }
+      // })
+
+      // debugger;
     }),
     (exports.getContentTypes = async function () {
       const query = gql`
         {
-          contentTypes{
+          contentTypes {
             title
             systemId
             moduleSystemId
