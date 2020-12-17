@@ -84,28 +84,45 @@ if (typeof module !== "undefined" && module.exports) {
     }),
     (exports.getContent = async function () {
       //HACK removing sort bc LB not working with RDMS
-      const filter = ""; //encodeURI(`{"order":"data.createdOn DESC"}`);
+      // const filter = ""; //encodeURI(`{"order":"data.createdOn DESC"}`);
 
-      let url = `${apiUrl}content?filter=${filter}`;
-      let page = await this.getAxios().get(url);
-      await formattingService.formatDates(page.data);
-      await formattingService.formatTitles(page.data);
-      return page.data;
+      // let url = `${apiUrl}content?filter=${filter}`;
+      // let page = await this.getAxios().get(url);
+
+      let result = await this.getAxios().post(apiUrl, {
+        query: `
+        {
+          contents{
+            id
+            contentTypeId
+            data
+          }
+          }
+          `,
+      });
+
+      if (result.data.data.contents) {
+        let content = result.data.data.contents;
+        await formattingService.formatDates(content);
+        await formattingService.formatTitles(content);
+        return content;
+      }
     }),
     (exports.getContentAdmin = async function () {
+      let contents = await this.getContent();
       //HACK removing sort bc LB not working with RDMS
-      const filter = ""; //encodeURI(`{"order":"data.createdOn DESC"}`);
+      // const filter = ""; //encodeURI(`{"order":"data.createdOn DESC"}`);
 
-      let url = `${apiUrl}content?filter=${filter}`;
-      let page = await this.getAxios().get(url);
-      await formattingService.formatDates(page.data);
-      await formattingService.formatTitles(page.data);
+      // let url = `${apiUrl}content?filter=${filter}`;
+      // let page = await this.getAxios().get(url);
+      // await formattingService.formatDates(page.data);
+      // await formattingService.formatTitles(page.data);
 
       //filter out content type that should not appear in admin content list
-      let data = page.data
-        .filter((x) => x.data.contentType !== "menu")
-        .filter((x) => x.data.contentType !== "section")
-        .filter((x) => x.data.contentType !== "site-settings");
+      let data = contents
+        .filter((x) => x.contentTypeId !== "menu")
+        .filter((x) => x.contentTypeId !== "section")
+        .filter((x) => x.contentTypeId !== "site-settings");
 
       return data;
     }),
@@ -218,16 +235,15 @@ if (typeof module !== "undefined" && module.exports) {
 
       let result = await this.getAxios().post(apiUrl, {
         query: `
-          {
-              {
-                  contentTypes {
-                    title
-                    systemId
-                    moduleSystemId
-                    filePath
-                    data
-                  }
-                }
+        {
+          contentTypes {
+            title
+            systemId
+            moduleSystemId
+            filePath
+            data
+          }
+        }
           `,
       });
 
@@ -470,7 +486,7 @@ if (typeof module !== "undefined" && module.exports) {
       await this.getAxios().post(url, objToDelete);
     }),
     (exports.getFiles = async function () {
-      let files = [{title:'my image', filePath: '/images/test123.png'}];
+      let files = [{ title: "my image", filePath: "/images/test123.png" }];
       return files;
     });
 })(typeof exports === "undefined" ? (this["dataService"] = {}) : exports);

@@ -136,10 +136,14 @@ const RootQuery = new GraphQLObjectType({
       },
 
       resolve(parent, args) {
-        return Content.find({
-          contentTypeId: args.contentTypeId,
-          url: args.url,
-        });
+        if (args.contentTypeId || args.url) {
+          return Content.find({
+            contentTypeId: args.contentTypeId,
+            url: args.url,
+          });
+        } else{
+          return Content.find({});
+        }
       },
     },
 
