@@ -126,10 +126,11 @@ function setupHandlebars(app) {
   var hbs = exphbs.create({
     layoutsDir: path.join(themeDirectory),
     partialsDir: partialsDirs,
+    extname: '.hbs'
   });
 
-  app.engine("handlebars", hbs.engine);
-  app.set("view engine", "handlebars");
+  app.engine(".hbs", hbs.engine);
+  app.set("view engine", ".hbs");
   app.set("views", __dirname + "/server/themes");
 
   setupHandlebarsHelpers();
