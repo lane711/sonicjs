@@ -19,11 +19,11 @@
         <tbody>
           {{#each data}}
           <tr>
-            <td><a href="/admin/content/edit/{{ this.data.contentType }}/{{ this.id }}">{{ this.data.title }}</a></td>
-            <td>{{ this.data.contentType }}</td>
+            <td><a href="/admin/content/edit/{{ this.contentTypeId }}/{{ this.id }}">{{ this.data.title }}</a></td>
+            <td>{{ this.contentTypeId }}</td>
             <td>{{ this.data.createdOnFormatted }}</td>
             <td class='text-right'>
-              <a href="/admin/content/edit/{{ this.data.contentType }}/{{ this.id }}"
+              <a href="/admin/content/edit/{{ this.contentTypeId }}/{{ this.id }}"
                 class="btn btn-sm btn-primary rmargin">Edit</a>
 
               <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
