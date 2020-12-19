@@ -69,6 +69,21 @@ const ContentTypeType = new GraphQLObjectType({
   }),
 });
 
+const FileType = new GraphQLObjectType({
+  name: "FileType",
+  fields: () => ({
+    filePath: { type: GraphQLString },
+    fileContent: { type: GraphQLString },
+  }),
+});
+
+class FileData {
+  constructor(filePath, fileContent) {
+    this.filePath = filePath;
+    this.fileContent = fileContent;
+  }
+}
+
 //RootQuery describe how users can use the graph and grab data.
 //E.g Root query to get all Users, get all books, get a particular
 //book or get a particular User.
@@ -141,7 +156,7 @@ const RootQuery = new GraphQLObjectType({
             contentTypeId: args.contentTypeId,
             url: args.url,
           });
-        } else{
+        } else {
           return Content.find({});
         }
       },
@@ -224,6 +239,27 @@ const Mutation = new GraphQLObjectType({
           lastUpdatedByUserId: args.lastUpdatedByUserId,
         });
         return content.save();
+      },
+    },
+
+    updateFile: {
+      type: FileType,
+      args: {
+        filePath: { type: new GraphQLNonNull(GraphQLString) },
+        fileContent: { type: new GraphQLNonNull(GraphQLString) },
+        // data: {
+        //   type: new GraphQLNonNull(GraphQLJSONObject),
+        // },
+        // createdByUserId: { type: new GraphQLNonNull(GraphQLID) },
+        // lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
+      },
+      resolve(parent, args) {
+        console.log("file-->", args.filePath, args.fileContent);
+        // let file = new FileType();
+        // file.filePath = args.filePath;
+        let fileData = new FileData(args.filePath, args.fileContent);
+        
+        return fileData;
       },
     },
   },
