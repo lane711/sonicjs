@@ -33,7 +33,7 @@ module.exports = userService = {
 
     // const query = gql`
     // mutation{
-    //   addUser(email:"${email}", password:"${passwordHash}"){
+    //   userCreate(email:"${email}", password:"${passwordHash}"){
     //     email
     //     id
     //   }
@@ -50,7 +50,7 @@ module.exports = userService = {
   loginUser: async function (email, password) {
     const query = gql`
       mutation{
-        addUser(email:"${email}", password:"${password}"){
+        userCreate(email:"${email}", password:"${password}"){
           email
           id
         }

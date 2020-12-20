@@ -4,6 +4,7 @@ const Content = require("../models/content");
 const { GraphQLJSONObject } = require("graphql-type-json");
 const moduleService = require("../services/module.service");
 
+
 const {
   GraphQLObjectType,
   GraphQLString,
@@ -185,7 +186,7 @@ const RootQuery = new GraphQLObjectType({
 const Mutation = new GraphQLObjectType({
   name: "Mutation",
   fields: {
-    addUser: {
+    userCreate: {
       type: UserType,
       args: {
         //GraphQLNonNull make these field required
@@ -221,7 +222,7 @@ const Mutation = new GraphQLObjectType({
     //   },
     // },
 
-    addContent: {
+    contentCreate: {
       type: ContentType,
       args: {
         contentTypeId: { type: new GraphQLNonNull(GraphQLString) },
@@ -242,7 +243,7 @@ const Mutation = new GraphQLObjectType({
       },
     },
 
-    updateFile: {
+    fileUpdate: {
       type: FileType,
       args: {
         filePath: { type: new GraphQLNonNull(GraphQLString) },

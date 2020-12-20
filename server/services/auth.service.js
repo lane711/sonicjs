@@ -322,7 +322,7 @@ module.exports = authService = {
   createUser: async function (email, password) {
     const query = gql`
     mutation{
-      addUser(email:"${email}", password:"${password}"){
+      userCreate(email:"${email}", password:"${password}"){
         email
         id
       }

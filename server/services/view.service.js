@@ -35,7 +35,6 @@ module.exports = viewService = {
 
     getHandlebarsTemplateForContentType: async function (contentType, viewPath) {
         // let filePath = `/../views/partials/${contentType}/list.handlebars`;
-console.log('viee path', viewPath);
         let file = fileService.getFileSync(viewPath);
         return file;
 

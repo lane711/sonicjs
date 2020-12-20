@@ -31,7 +31,7 @@ mongoose.connect(process.env.MONGODB_URL, {
 const User = require("./server/models/user");
 
 mongoose.connection.once("open", () => {
-  console.log("conneted to database");
+  console.log(chalk.green("Connected to Database"));
 });
 
 // require("express-session")({
