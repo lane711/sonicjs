@@ -1,6 +1,8 @@
 const graphql = require("graphql");
 const User = require("./models/user");
 const Content = require("./models/content");
+const Tag = require("./models/tag");
+
 const { GraphQLJSONObject } = require("graphql-type-json");
 const moduleService = require("../services/module.service");
 
@@ -30,6 +32,23 @@ const UserType = new GraphQLObjectType({
       type: new GraphQLList(UserType),
       resolve(parent, args) {
         return User.find({ userId: parent.id });
+      },
+    },
+  }),
+});
+
+const TagType = new GraphQLObjectType({
+  name: "Tag",
+  fields: () => ({
+    id: { type: GraphQLID },
+    title: { type: GraphQLString },
+    url: { type: GraphQLString },
+    createdOn: { type: GraphQLJSONObject },
+    updatedOn: { type: GraphQLJSONObject },
+    content: {
+      type: new GraphQLList(ContentType),
+      resolve(parent, args) {
+        return Content.find({ content: parent.id });
       },
     },
   }),
@@ -226,6 +245,30 @@ const Mutation = new GraphQLObjectType({
     //     return book.save();
     //   },
     // },
+
+
+    //tag mutations
+    tagCreate: {
+      type: TagType,
+      args: {
+        //GraphQLNonNull make these field required
+        title: { type: new GraphQLNonNull(GraphQLString) },
+        url: { type: new GraphQLNonNull(GraphQLString) },
+        createdByUserId: { type: new GraphQLNonNull(GraphQLID) },
+        lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
+      },
+      resolve(parent, args) {
+        let now = new Date();
+        let tag = new Tag({
+          title: args.title,
+          url: args.url,
+          createdOn: now,
+          updatedOn: now,
+          realm: ["default"],
+        });
+        return tag.save();
+      },
+    },
 
     //content mutations
     contentCreate: {
