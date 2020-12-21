@@ -28,7 +28,7 @@ mongoose.connect(process.env.MONGODB_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-const User = require("./server/models/user");
+const User = require("./server/schema/models/user");
 
 mongoose.connection.once("open", () => {
   console.log(chalk.green("Connected to Database"));

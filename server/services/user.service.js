@@ -10,7 +10,7 @@ const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 const chalk = require("chalk");
 var { GraphQLClient, gql, request } = require("graphql-request");
 const crypto = require('crypto')
-const User = require("../models/user");
+const User = require("../schema/models/user");
 
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;

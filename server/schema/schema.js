@@ -1,6 +1,6 @@
 const graphql = require("graphql");
-const User = require("../models/user");
-const Content = require("../models/content");
+const User = require("./models/user");
+const Content = require("./models/content");
 const { GraphQLJSONObject } = require("graphql-type-json");
 const moduleService = require("../services/module.service");
 

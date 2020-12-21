@@ -8,7 +8,12 @@ const contentSchema = new Schema({
     lastUpdatedByUserId: String,
     createdOn: Date,
     updatedOn: Date,
-    url: String
+    url: {
+        type: String,
+        required: true,
+        index: true,
+        unique: true,
+    }
 });
 
 module.exports = mongoose.model('Content', contentSchema);
