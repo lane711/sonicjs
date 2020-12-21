@@ -7,7 +7,8 @@ const contentSchema = new Schema({
     createdByUserId: String,
     lastUpdatedByUserId: String,
     createdOn: Date,
-    updatedOn: Date
+    updatedOn: Date,
+    url: String
 });
 
 module.exports = mongoose.model('Content', contentSchema);

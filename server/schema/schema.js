@@ -44,6 +44,9 @@ const ContentType = new GraphQLObjectType({
     id: { type: GraphQLID },
     contentTypeId: { type: GraphQLString },
     data: { type: GraphQLJSONObject },
+    url: { type: GraphQLJSONObject },
+    createdOn: { type: GraphQLJSONObject },
+    updatedOn: { type: GraphQLJSONObject },
     createdByUserId: {
       type: UserType,
       resolve(parent, args) {
@@ -186,6 +189,8 @@ const RootQuery = new GraphQLObjectType({
 const Mutation = new GraphQLObjectType({
   name: "Mutation",
   fields: {
+
+    //user mutations
     userCreate: {
       type: UserType,
       args: {
@@ -222,7 +227,34 @@ const Mutation = new GraphQLObjectType({
     //   },
     // },
 
+    //content mutations
     contentCreate: {
+      type: ContentType,
+      args: {
+        url: { type: new GraphQLNonNull(GraphQLString) },
+        contentTypeId: { type: new GraphQLNonNull(GraphQLString) },
+        data: {
+          type: new GraphQLNonNull(GraphQLJSONObject),
+        },
+        createdByUserId: { type: new GraphQLNonNull(GraphQLID) },
+        lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
+      },
+      resolve(parent, args) {
+        let now = new Date();
+        let content = new Content({
+          contentTypeId: args.contentTypeId,
+          data: args.data,
+          url: args.url,
+          createdByUserId: args.createdByUserId,
+          createdOn: now,
+          lastUpdatedByUserId: args.lastUpdatedByUserId,
+          updatedOn: now
+        });
+        return content.save();
+      },
+    },
+
+    contentUpdate: {
       type: ContentType,
       args: {
         contentTypeId: { type: new GraphQLNonNull(GraphQLString) },
@@ -233,16 +265,15 @@ const Mutation = new GraphQLObjectType({
         lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
       },
       resolve(parent, args) {
-        let content = new Content({
-          contentTypeId: args.contentTypeId,
-          data: args.data,
-          createdByUserId: args.createdByUserId,
-          lastUpdatedByUserId: args.lastUpdatedByUserId,
-        });
+        let content = Content.findById(parent.userId);
         return content.save();
       },
     },
 
+
+
+
+    //file mutations
     fileUpdate: {
       type: FileType,
       args: {
