@@ -155,6 +155,7 @@ const RootQuery = new GraphQLObjectType({
         id: { type: GraphQLID },
         contentTypeId: { type: GraphQLString },
         url: { type: GraphQLString },
+        data: {type: GraphQLString}
       },
       resolve(parent, args) {
         if (args.id) {
@@ -163,7 +164,11 @@ const RootQuery = new GraphQLObjectType({
           return Content.findOne({
             url: args.url,
           });
-        }
+        } else if (args.data) {
+        return Content.find({
+          data: {name: "my data 5"},
+        });
+      }
       },
     },
     contents: {
@@ -171,6 +176,7 @@ const RootQuery = new GraphQLObjectType({
       args: {
         contentTypeId: { type: GraphQLString },
         url: { type: GraphQLString },
+        data: { type: GraphQLJSONObject },
       },
 
       resolve(parent, args) {
@@ -179,7 +185,19 @@ const RootQuery = new GraphQLObjectType({
             contentTypeId: args.contentTypeId,
             url: args.url,
           });
-        } else {
+        } else if (args.data){
+          console.log(args.data);
+          let query = `{"data.${args.data.attr}":"${args.data.val}"}`
+          query = "{ \"data.name\": \"my data 5\" }"
+          let qParsed = JSON.parse(query);
+          console.log(qParsed);
+          // Mongoose.connection.db.collection('contents').find().toArray((err,results) => { 
+          //   console.log('err',err);
+          //   console.log(results); 
+          // });
+          return Content.find({ 'data.name': 'my data 5'});
+        } 
+        else {
           return Content.find({});
         }
       },
