@@ -53,6 +53,14 @@ const TagType = new GraphQLObjectType({
   }),
 });
 
+const TagRefType = new GraphQLObjectType({
+  name: "TagRefType",
+  fields: () => ({
+    contentId: { type: GraphQLString },
+    tagId: { type: GraphQLString },
+  }),
+});
+
 const ContentType = new GraphQLObjectType({
   name: "Content",
   //We are wrapping fields in the function as we dont want to execute this ultil
@@ -275,6 +283,24 @@ const Mutation = new GraphQLObjectType({
           realm: ["default"],
         });
         return tag.save();
+      },
+    },
+
+    tagAddToContent: {
+      type: TagRefType,
+      args: {
+        contentId: { type: new GraphQLNonNull(GraphQLString) },
+        tagId: { type: new GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parent, args) {
+        console.log('ref', args);
+
+        return Content.findByIdAndUpdate(
+          args.contentId,
+          { $push: { tags: args.tagId } },
+          { new: true, useFindAndModify: false }
+        );
+
       },
     },
 
