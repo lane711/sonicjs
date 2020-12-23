@@ -6,7 +6,6 @@ const Tag = require("./models/tag");
 const { GraphQLJSONObject } = require("graphql-type-json");
 const moduleService = require("../services/module.service");
 
-
 const {
   GraphQLObjectType,
   GraphQLString,
@@ -155,7 +154,7 @@ const RootQuery = new GraphQLObjectType({
         id: { type: GraphQLID },
         contentTypeId: { type: GraphQLString },
         url: { type: GraphQLString },
-        data: {type: GraphQLString}
+        data: { type: GraphQLString },
       },
       resolve(parent, args) {
         if (args.id) {
@@ -165,10 +164,10 @@ const RootQuery = new GraphQLObjectType({
             url: args.url,
           });
         } else if (args.data) {
-        return Content.find({
-          data: {name: "my data 5"},
-        });
-      }
+          return Content.find({
+            data: { name: "my data 5" },
+          });
+        }
       },
     },
     contents: {
@@ -185,19 +184,12 @@ const RootQuery = new GraphQLObjectType({
             contentTypeId: args.contentTypeId,
             url: args.url,
           });
-        } else if (args.data){
-          console.log(args.data);
-          let query = `{"data.${args.data.attr}":"${args.data.val}"}`
-          query = "{ \"data.name\": \"my data 5\" }"
-          let qParsed = JSON.parse(query);
-          console.log(qParsed);
-          // Mongoose.connection.db.collection('contents').find().toArray((err,results) => { 
-          //   console.log('err',err);
-          //   console.log(results); 
-          // });
-          return Content.find({ 'data.name': 'my data 5'});
-        } 
-        else {
+        } else if (args.data) {
+          var query = {};
+          query["data." + args.data.attr] = args.data.val;
+          console.log("query", query);
+          return Content.find(query);
+        } else {
           return Content.find({});
         }
       },
@@ -226,7 +218,6 @@ const RootQuery = new GraphQLObjectType({
 const Mutation = new GraphQLObjectType({
   name: "Mutation",
   fields: {
-
     //user mutations
     userCreate: {
       type: UserType,
@@ -263,7 +254,6 @@ const Mutation = new GraphQLObjectType({
     //     return book.save();
     //   },
     // },
-
 
     //tag mutations
     tagCreate: {
@@ -309,7 +299,7 @@ const Mutation = new GraphQLObjectType({
           createdByUserId: args.createdByUserId,
           createdOn: now,
           lastUpdatedByUserId: args.lastUpdatedByUserId,
-          updatedOn: now
+          updatedOn: now,
         });
         return content.save();
       },
@@ -331,9 +321,6 @@ const Mutation = new GraphQLObjectType({
       },
     },
 
-
-
-
     //file mutations
     fileUpdate: {
       type: FileType,
@@ -351,7 +338,7 @@ const Mutation = new GraphQLObjectType({
         // let file = new FileType();
         // file.filePath = args.filePath;
         let fileData = new FileData(args.filePath, args.fileContent);
-        
+
         return fileData;
       },
     },
