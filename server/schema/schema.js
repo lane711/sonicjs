@@ -58,6 +58,7 @@ const TagRefType = new GraphQLObjectType({
   fields: () => ({
     contentId: { type: GraphQLString },
     tagId: { type: GraphQLString },
+    status: { type: GraphQLString },
   }),
 });
 
@@ -295,11 +296,26 @@ const Mutation = new GraphQLObjectType({
       resolve(parent, args) {
         console.log('ref', args);
 
-        return Content.findByIdAndUpdate(
+        //TODO: only add it not already exists
+        let tagDoc = Tag.findByIdAndUpdate(
+          args.tagId,
+          { $push: { contents: args.contentId } },
+          { new: true, useFindAndModify: false }
+        );
+        tagDoc.exec();
+
+        let contentDoc = Content.findByIdAndUpdate(
           args.contentId,
           { $push: { tags: args.tagId } },
           { new: true, useFindAndModify: false }
         );
+        contentDoc.exec();
+
+        let tagRef = {};
+        tagRef.contentId = args.contentId;
+        tagRef.tagId = args.tagId;
+        tagRef.status = 'success';
+        return tagRef;
 
       },
     },
