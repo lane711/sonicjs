@@ -5,6 +5,7 @@ const Tag = require("./models/tag");
 
 const { GraphQLJSONObject } = require("graphql-type-json");
 const moduleService = require("../services/module.service");
+const { data } = require("jquery");
 
 const {
   GraphQLObjectType,
@@ -44,10 +45,10 @@ const TagType = new GraphQLObjectType({
     url: { type: GraphQLString },
     createdOn: { type: GraphQLJSONObject },
     updatedOn: { type: GraphQLJSONObject },
-    content: {
+    contents: {
       type: new GraphQLList(ContentType),
       resolve(parent, args) {
-        return Content.find({ content: parent.id });
+        return Content.find({ tags: parent.id });
       },
     },
   }),
@@ -185,6 +186,7 @@ const RootQuery = new GraphQLObjectType({
         contentTypeId: { type: GraphQLString },
         url: { type: GraphQLString },
         data: { type: GraphQLJSONObject },
+        tag: {type: GraphQLString }
       },
 
       resolve(parent, args) {
@@ -198,7 +200,13 @@ const RootQuery = new GraphQLObjectType({
           query["data." + args.data.attr] = args.data.val;
           console.log("query", query);
           return Content.find(query);
-        } else {
+        } else if (args.tag){
+          let contentsQuery = Tag.findById(args.tag);//.populate("contents");
+let contents = contentsQuery.exec();
+console.log(contents);
+return contents;
+        }
+          else {
           return Content.find({});
         }
       },
@@ -218,6 +226,23 @@ const RootQuery = new GraphQLObjectType({
       },
       resolve(parent, args) {
         return moduleService.getModuleContentType(args.systemId);
+      },
+    },
+
+    tags: {
+      type: new GraphQLList(TagType),
+      resolve(parent, args) {
+        return Tag.find({}).populate('contents');
+      },
+    },
+
+    tag: {
+      type: TagType,
+      args: {
+        id: { type: GraphQLID },
+      },
+      resolve(parent, args) {
+        return Tag.findById(args.id).populate('contents');
       },
     },
   },
