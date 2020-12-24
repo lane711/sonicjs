@@ -294,9 +294,7 @@ const Mutation = new GraphQLObjectType({
         tagId: { type: new GraphQLNonNull(GraphQLString) },
       },
       resolve(parent, args) {
-        console.log('ref', args);
-
-        //TODO: only add it not already exists
+        //TODO: only add if not already exists
         let tagDoc = Tag.findByIdAndUpdate(
           args.tagId,
           { $push: { contents: args.contentId } },
@@ -316,7 +314,6 @@ const Mutation = new GraphQLObjectType({
         tagRef.tagId = args.tagId;
         tagRef.status = 'success';
         return tagRef;
-
       },
     },
 
