@@ -696,7 +696,7 @@ async function editContentType(payload) {
   //     data = payload;
   // }
   // return this.http.put(environment.apiUrl + `content/${id}`, payload).toPromise();
-  // debugger;
+  debugger;
   return axiosInstance
     .put(`/api/modules/updateJsonFile`, payload)
     .then(async function (response) {

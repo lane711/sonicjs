@@ -186,7 +186,7 @@ const RootQuery = new GraphQLObjectType({
         contentTypeId: { type: GraphQLString },
         url: { type: GraphQLString },
         data: { type: GraphQLJSONObject },
-        tag: {type: GraphQLString }
+        tag: { type: GraphQLString },
       },
 
       resolve(parent, args) {
@@ -200,13 +200,12 @@ const RootQuery = new GraphQLObjectType({
           query["data." + args.data.attr] = args.data.val;
           console.log("query", query);
           return Content.find(query);
-        } else if (args.tag){
-          let contentsQuery = Tag.findById(args.tag);//.populate("contents");
-let contents = contentsQuery.exec();
-console.log(contents);
-return contents;
-        }
-          else {
+        } else if (args.tag) {
+          let contentsQuery = Tag.findById(args.tag); //.populate("contents");
+          let contents = contentsQuery.exec();
+          console.log(contents);
+          return contents;
+        } else {
           return Content.find({});
         }
       },
@@ -232,7 +231,7 @@ return contents;
     tags: {
       type: new GraphQLList(TagType),
       resolve(parent, args) {
-        return Tag.find({}).populate('contents');
+        return Tag.find({}).populate("contents");
       },
     },
 
@@ -242,7 +241,7 @@ return contents;
         id: { type: GraphQLID },
       },
       resolve(parent, args) {
-        return Tag.findById(args.id).populate('contents');
+        return Tag.findById(args.id).populate("contents");
       },
     },
   },
@@ -337,7 +336,7 @@ const Mutation = new GraphQLObjectType({
         let tagRef = {};
         tagRef.contentId = args.contentId;
         tagRef.tagId = args.tagId;
-        tagRef.status = 'success';
+        tagRef.status = "success";
         return tagRef;
       },
     },
@@ -382,6 +381,24 @@ const Mutation = new GraphQLObjectType({
       resolve(parent, args) {
         let content = Content.findById(parent.userId);
         return content.save();
+      },
+    },
+
+    // content type mutations
+    contentTypeUpdate: {
+      type: ContentTypeType,
+      args: {
+        title: { type: new GraphQLNonNull(GraphQLString) },
+        systemId: { type: new GraphQLNonNull(GraphQLString) },
+        moduleSystemId: { type: new GraphQLNonNull(GraphQLString) },
+        filePath: { type: new GraphQLNonNull(GraphQLString) },
+        data: {type: new GraphQLNonNull(GraphQLJSONObject), },
+        lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
+      },
+      resolve(parent, args) {
+        console.log('contentTypeUpdate', args);
+        // let content = Content.findById(parent.userId);
+        // return content.save();
       },
     },
 
