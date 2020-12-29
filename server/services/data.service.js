@@ -194,6 +194,7 @@ if (typeof module !== "undefined" && module.exports) {
       return result.data.data.contentTypes;
     }),
     (exports.contentTypeUpdate = async function (contentType) {
+      debugger;
       let result = await this.getAxios().post(apiUrl, {
         query: `
         mutation{

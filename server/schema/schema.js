@@ -392,13 +392,16 @@ const Mutation = new GraphQLObjectType({
         systemId: { type: new GraphQLNonNull(GraphQLString) },
         moduleSystemId: { type: new GraphQLNonNull(GraphQLString) },
         filePath: { type: GraphQLString },
-        data: {type: new GraphQLNonNull(GraphQLJSONObject), },
+        data: {
+          type: new GraphQLNonNull(GraphQLJSONObject),
+        },        
         lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
       },
       resolve(parent, args) {
         console.log('contentTypeUpdate', args);
-        let contentType = moduleService.moduleContentTypeUpdate(args);
-        return contentType
+        moduleService.contentTypeUpdate(args).then(data => {
+          return data;
+        })
       },
     },
 

@@ -98,7 +98,7 @@ module.exports = moduleService = {
     return moduleContentTypes;
   },
 
-  moduleContentTypeUpdate: async function (moduleContentType) {
+  contentTypeUpdate: async function (moduleContentType) {
     let moduleDef = await moduleService.getModuleDefinitionFileWithPath(
       moduleContentType.systemId
     );
