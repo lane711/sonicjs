@@ -69,9 +69,10 @@ module.exports = moduleService = {
 
   getModuleDefinitionFileWithPath: async function (systemId) {
     let basePath = `/server/modules/${systemId}`;
-    let file = await fileService.getFile(`${basePath}/module.json`);
+    let filePath = `${basePath}/module.json`
+    let file = await fileService.getFile(filePath);
     let moduleDef = JSON.parse(file);
-    moduleDef.filePath = basePath;
+    moduleDef.filePath = filePath;
     return moduleDef;
   },
 
@@ -111,7 +112,8 @@ module.exports = moduleService = {
     moduleDef.canBeAddedToColumn = moduleContentType.canBeAddedToColumn;
     moduleDef.canBeAddedToColumn = moduleContentType.canBeAddedToColumn;
 
-    await fileService.writeFile(moduleDef.filePath, moduleContentType);
+    let moduleDefString = JSON.stringify(moduleDef);
+    await fileService.writeFile(moduleDef.filePath, moduleDefString);
 
     return moduleDef;
   },

@@ -1,9 +1,8 @@
 {
-  "title": "AA Cypress Module",
+  "title": "mutCheck",
   "systemId": "aa-cypress-module",
   "version": "0.0.0.1",
-  "canBeAddedToColumn": true,
-  "enabled": true,
-  "systemidUpperCase": "AA-CYPRESS-MODULE",
-  "systemidCamelCase": "aaCypressModule"
+  "singleInstance": false,
+  "filePath": "/server/modules/aa-cypress-module/module.json",
+  "data": { "name": "55", "prop": "ipsum de lor" }
 }
