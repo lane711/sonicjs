@@ -306,7 +306,7 @@ exports.loadRoutes = async function (app) {
   });
 
   app.get("/nested-forms-list*", async function (req, res) {
-    let contentTypesRaw = await dataService.getContentTypes();
+    let contentTypesRaw = await dataService.contentTypesGet();
     let contentTypes = contentTypesRaw.map(function (contentType) {
       return {
         _id: contentType.systemId,
@@ -321,7 +321,7 @@ exports.loadRoutes = async function (app) {
 
   app.get("/form/*", async function (req, res) {
     let moduleSystemId = req.path.replace("/form/", "");
-    let contentType = await dataService.getContentType(moduleSystemId);
+    let contentType = await dataService.contentTypeGet(moduleSystemId);
     let form = await formService.getFormJson(contentType);
     res.send(form);
   });
@@ -527,7 +527,7 @@ exports.loadRoutes = async function (app) {
 
       if (viewName == "admin-content") {
         data = await dataService.getContentAdmin();
-        data.contentTypes = await dataService.getContentTypes();
+        data.contentTypes = await dataService.contentTypesGet();
       }
 
       if (viewName == "admin-content-edit") {
@@ -544,13 +544,13 @@ exports.loadRoutes = async function (app) {
       }
 
       if (viewName == "admin-content-types") {
-        let dataRaw = await dataService.getContentTypes();
+        let dataRaw = await dataService.contentTypesGet();
         data = _.sortBy(dataRaw, "title");
       }
 
       if (viewName == "admin-content-types-edit") {
         data.contentTypeId = param1;
-        data.raw = await dataService.getContentType(param1);
+        data.raw = await dataService.contentTypeGet(param1);
       }
 
       if (viewName == "admin-modules") {

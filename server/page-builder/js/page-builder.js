@@ -70,7 +70,7 @@ async function setPage() {
 async function setContentType() {
   let contentTypeId = $("#contentTypeId").val();
   if (contentTypeId) {
-    this.contentType = await dataService.getContentType(contentTypeId);
+    this.contentType = await dataService.contentTypeGet(contentTypeId);
   }
 }
 
@@ -678,38 +678,7 @@ async function editInstanceUser(payload, refresh, contentType = "content") {
 }
 
 async function editContentType(payload) {
-  // debugger;
-  // let id = payload.id;
-  // if (!id) {
-  //   return;
-  // }
-
-  // console.log("putting payload", payload);
-  // if (payload.id) {
-  //   delete payload.id;
-  // }
-
-  // let data = {};
-  // if(payload.data){
-  //     data = payload.data;
-  // }else{
-  //     data = payload;
-  // }
-  // return this.http.put(environment.apiUrl + `content/${id}`, payload).toPromise();
-  debugger;
-  return axiosInstance
-    .put(`/api/modules/updateJsonFile`, payload)
-    .then(async function (response) {
-      console.log(response);
-      // debugger;
-      //reload editor
-      let contentType = await response.data;
-      contentType.id = id;
-      // setupFormBuilder(contentType);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+  dataService.contentTypeUpdate(payload);
 }
 
 async function deleteContentInstance(id) {

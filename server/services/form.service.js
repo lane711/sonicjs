@@ -61,11 +61,11 @@ if (typeof module !== "undefined" && module.exports) {
 
       let contentType;
       if (content && content.data.contentType) {
-        contentType = await dataService.getContentType(
+        contentType = await dataService.contentTypeGet(
           content.data.contentType.toLowerCase()
         );
       } else if (contentTypeId) {
-        contentType = await dataService.getContentType(contentTypeId);
+        contentType = await dataService.contentTypeGet(contentTypeId);
 
       } else {
         return;
@@ -171,7 +171,7 @@ if (typeof module !== "undefined" && module.exports) {
       return settings;
     }),
     (exports.getFormComponents = async function (contentType, content) {
-      // let contentTypeDef = await dataService.getContentType(content.data.contentType);
+      // let contentTypeDef = await dataService.contentTypeGet(content.data.contentType);
       // console.log('contentTypeDef', contentTypeDef);
       // debugger;
       let components = contentType.data.components;

@@ -159,25 +159,7 @@ if (typeof module !== "undefined" && module.exports) {
       // let page = await this.getAxios().get(url);
       // return page.data;
     }),
-    (exports.getContentType = async function (contentType) {
-      // const query = gql`
-      //   {
-      //     contentType(systemId:"${contentType}") {
-      //       title
-      //       systemId
-      //       moduleSystemId
-      //       filePath
-      //       data
-      //     }
-      //   }
-      // `;
-
-      // let data = await this.executeGraphqlQuery(query);
-
-      // if (data.contentType) {
-      //   return data.contentType;
-      // }
-
+    (exports.contentTypeGet = async function (contentType) {
       let result = await this.getAxios().post(apiUrl, {
         query: `
             {
@@ -193,46 +175,8 @@ if (typeof module !== "undefined" && module.exports) {
       });
 
       return result.data.data.contentType;
-
-      // let result = await axios({
-      //   url: apiUrl,
-      //   method: 'post',
-      //   data: {
-      //     query: `
-      //       {
-      //           contentType(systemId:"${contentType}") {
-      //             title
-      //             systemId
-      //             moduleSystemId
-      //             filePath
-      //             data
-      //           }
-      //         }
-      //       `
-      //   }
-      // })
-
-      // debugger;
     }),
-    (exports.getContentTypes = async function () {
-      // const query = gql`
-      //   {
-      //     contentTypes {
-      //       title
-      //       systemId
-      //       moduleSystemId
-      //       filePath
-      //       data
-      //     }
-      //   }
-      // `;
-
-      // let data = await this.executeGraphqlQuery(query);
-
-      // if (data.contentTypes) {
-      //   return data.contentTypes;
-      // }
-
+    (exports.contentTypesGet = async function () {
       let result = await this.getAxios().post(apiUrl, {
         query: `
         {
@@ -248,6 +192,23 @@ if (typeof module !== "undefined" && module.exports) {
       });
 
       return result.data.data.contentTypes;
+    }),
+    (exports.contentTypeUpdate = async function (contentType) {
+      let result = await this.getAxios().post(apiUrl, {
+        query: `
+        mutation{
+          contentTypeUpdate( 
+            title:"${contentType.title}", 
+            moduleSystemId:"${contentType.moduleSystemId}", 
+            systemId:"${contentType.systemId}", 
+            data:${contentType.data}){
+              title
+          }
+        }
+            `,
+      });
+
+      return result.data.data.contentType;
     }),
     (exports.createContentType = async function (contentType) {
       let url = `${apiUrl}contentTypes`;

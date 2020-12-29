@@ -19,7 +19,7 @@ module.exports = compareMainService = {
       let compareItems = await dataService.getContentByType("compare-item");
       options.viewModel.data.compareItems = compareItems;
 
-      let contentType = await dataService.getContentType("compare-item");
+      let contentType = await dataService.contentTypeGet("compare-item");
       let tabs = contentType.data.components[0].components;
       options.viewModel.data.contentType = tabs;
 

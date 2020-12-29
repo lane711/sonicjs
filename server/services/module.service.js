@@ -98,13 +98,31 @@ module.exports = moduleService = {
     return moduleContentTypes;
   },
 
+  moduleContentTypeUpdate: async function (moduleContentType) {
+    let moduleDef = await moduleService.getModuleDefinitionFileWithPath(
+      moduleContentType.systemId
+    );
+
+    moduleDef.canBeAddedToColumn = moduleContentType.canBeAddedToColumn;
+    moduleDef.enabled = moduleContentType.enabled;
+    moduleDef.systemId = moduleContentType.systemId;
+    moduleDef.title = moduleContentType.title;
+    moduleDef.data = moduleContentType.data;
+    moduleDef.canBeAddedToColumn = moduleContentType.canBeAddedToColumn;
+    moduleDef.canBeAddedToColumn = moduleContentType.canBeAddedToColumn;
+
+    await fileService.writeFile(moduleDef.filePath, moduleContentType);
+
+    return moduleDef;
+  },
+
   getModuleDefinitionFiles: async function (path) {
     const files = fileService.getFilesSearchSync(path, "/**/module.json");
 
     let moduleList = [];
 
     files.forEach((file) => {
-      let raw = fileService.getFileSync(file);// fs.readFileSync(file);
+      let raw = fileService.getFileSync(file); // fs.readFileSync(file);
       if (raw && raw.length > 0) {
         let moduleDef = JSON.parse(raw);
         let moduleFolder = moduleDef.systemId.replace("module-", "");
