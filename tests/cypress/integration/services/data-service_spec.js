@@ -20,30 +20,32 @@ describe("Page Builder", function () {
 
   it("Load Content Types", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
-    cy.wait(1000);
+    // cy.wait(1000);
     cy.window().then((win) => {
-
       win.dataService.contentTypesGet().then((data) => {
         cy.log(JSON.stringify(data));
       });
     });
+  });
 
-    // cy.get("#sidebar-expander").click();
-    // cy.contains("Template").should("be.visible");
-    // cy.get("#add-tab").click();
-    // cy.get("#btn-add-page").click();
-    // cy.get('input[name="data[title]').type("Cypress PB Test");
-    // cy.get('input[name="data[url]').should("have.value", "/cypress-pb-test");
-    // cy.get('input[name="data[heroTitle]"]').type("Cypress Hero");
-    // cy.get('input[name="data[pageCssClass]"]').type("cypress-pb-test");
-    // cy.get('input[name="data[metaTitle]"]').type("Cypress Meta Title");
-    // cy.get('textarea[name="data[metaDescription]"]').type(
-    //   "Cypress Meta Description"
-    // );
-    // cy.contains("Submit").click();
+  it("Update Content Type", function () {
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
+    // cy.wait(1000);
+    cy.window().then((win) => {
+      
+      let contentTypeToUpdate = {
+        title: "mutCheck",
+        moduleSystemId: "aa-cypress-module",
+        systemId: "aa-cypress-module",
+        data: {
+          components: [{ name: "55", prop: "ipsum de lor" }],
+        },
+      };
 
-    // cy.contains('Cypress Hero');
-    // cy.url().should('include', '/cypress-test-page');
+      win.dataService.contentTypeUpdate(contentTypeToUpdate).then((data) => {
+        cy.log(JSON.stringify(data));
+      });
+    });
   });
 
   // it("Content edit", function () {

@@ -24,7 +24,7 @@ if (typeof module !== "undefined" && module.exports) {
     baseURL: globalService.baseUrl,
   };
   let newAxiosInstance = axios.create(defaultOptions);
-  console.log('newAxiosInstance', newAxiosInstance);
+  console.log("newAxiosInstance", newAxiosInstance);
 }
 
 (function (exports) {
@@ -85,8 +85,7 @@ if (typeof module !== "undefined" && module.exports) {
           defaultOptions.headers.Authorization = token;
         }
 
-        axiosInstance= axios.create(defaultOptions);
-
+        axiosInstance = axios.create(defaultOptions);
       }
       // debugger;
       return axiosInstance;
@@ -203,9 +202,28 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.contentTypes;
     }),
+    (exports.queryfy = function (obj) {
+      // Make sure we don't alter integers.
+      if (typeof obj === "number") {
+        return obj;
+      }
+
+      if (Array.isArray(obj)) {
+        const props = obj.map((value) => `${queryfy(value)}`).join(",");
+        return `[${props}]`;
+      }
+
+      if (typeof obj === "object") {
+        const props = Object.keys(obj)
+          .map((key) => `${key}:${queryfy(obj[key])}`)
+          .join(",");
+        return `{${props}}`;
+      }
+
+      return JSON.stringify(obj);
+    }),
     (exports.contentTypeUpdate = async function (contentType) {
       let components = JSON.stringify(contentType.data);
-      debugger;
 
       let result = await this.getAxios().post(apiUrl, {
         query: `
@@ -214,7 +232,7 @@ if (typeof module !== "undefined" && module.exports) {
             title:"${contentType.title}", 
             moduleSystemId:"${contentType.moduleSystemId}", 
             systemId:"${contentType.systemId}", 
-            data:{${contentType.data}}){
+            data:"""${components}"""){
               title
           }
         }

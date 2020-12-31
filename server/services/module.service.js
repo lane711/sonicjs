@@ -100,7 +100,7 @@ module.exports = moduleService = {
   },
 
   contentTypeUpdate: async function (moduleContentType) {
-    let moduleDef = await moduleService.getModuleDefinitionFileWithPath(
+    let moduleDef = await this.getModuleContentType(
       moduleContentType.systemId
     );
 
