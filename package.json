@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "start:dev": "nodemon server.js -e handlebars,js,css,html --ignore 'template-processed.css' --ignore '*_spec.js'",
-    "test": "npx cypress open"
+    "test": "npx cypress run --spec tests/cypresss/integration/**/*-spec.js"
   },
   "repository": {
     "type": "git",
@@ -26,6 +26,7 @@
     "axios": "^0.21.0",
     "bootstrap": "^4.5.3",
     "bootswatch": "^4.5.3",
+    "chai": "^4.2.0",
     "chalk": "^4.1.0",
     "chart.js": "^2.9.4",
     "cheerio": "^1.0.0-rc.3",

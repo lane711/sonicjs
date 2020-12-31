@@ -395,7 +395,7 @@ const Mutation = new GraphQLObjectType({
         data: {
           type: new GraphQLNonNull(GraphQLJSONObject),
         },        
-        lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
+        // lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
       },
       resolve(parent, args) {
         console.log('contentTypeUpdate', args);

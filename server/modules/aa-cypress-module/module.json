@@ -1,8 +1,1 @@
-{
-  "title": "mutCheck",
-  "systemId": "aa-cypress-module",
-  "version": "0.0.0.1",
-  "singleInstance": false,
-  "filePath": "/server/modules/aa-cypress-module/module.json",
-  "data": { "name": "55", "prop": "ipsum de lor" }
-}
+{"title":"mutCheck","systemId":"aa-cypress-module","version":"0.0.0.1","singleInstance":false,"filePath":"/server/modules/aa-cypress-module/module.json","data":{"components":[{"name":"55","prop":"ipsum de lor"}]}}

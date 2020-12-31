@@ -19,6 +19,12 @@ if (typeof module !== "undefined" && module.exports) {
 } else {
   // var globalService = {};
   // const { request, gql } = require("graphql-request");
+  const defaultOptions = {
+    headers: {},
+    baseURL: globalService.baseUrl,
+  };
+  let newAxiosInstance = axios.create(defaultOptions);
+  console.log('newAxiosInstance', newAxiosInstance);
 }
 
 (function (exports) {
@@ -65,7 +71,10 @@ if (typeof module !== "undefined" && module.exports) {
     }),
     (exports.getAxios = function () {
       //TODO add auth
+      // debugger;
       if (!axiosInstance) {
+        // if (true) {
+
         const defaultOptions = {
           headers: {},
           baseURL: globalService.baseUrl,
@@ -76,10 +85,10 @@ if (typeof module !== "undefined" && module.exports) {
           defaultOptions.headers.Authorization = token;
         }
 
-        axiosInstance = axios.create(defaultOptions);
+        axiosInstance= axios.create(defaultOptions);
 
-        // axiosInstance = axios.create({ baseURL: globalService.baseUrl });
       }
+      // debugger;
       return axiosInstance;
     }),
     (exports.getContent = async function () {
@@ -160,6 +169,7 @@ if (typeof module !== "undefined" && module.exports) {
       // return page.data;
     }),
     (exports.contentTypeGet = async function (contentType) {
+      // debugger;
       let result = await this.getAxios().post(apiUrl, {
         query: `
             {
@@ -194,7 +204,9 @@ if (typeof module !== "undefined" && module.exports) {
       return result.data.data.contentTypes;
     }),
     (exports.contentTypeUpdate = async function (contentType) {
+      let components = JSON.stringify(contentType.data);
       debugger;
+
       let result = await this.getAxios().post(apiUrl, {
         query: `
         mutation{
@@ -202,7 +214,7 @@ if (typeof module !== "undefined" && module.exports) {
             title:"${contentType.title}", 
             moduleSystemId:"${contentType.moduleSystemId}", 
             systemId:"${contentType.systemId}", 
-            data:${contentType.data}){
+            data:{${contentType.data}}){
               title
           }
         }

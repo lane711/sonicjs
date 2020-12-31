@@ -25,4 +25,6 @@ server/storage/files/height*
 server/storage/files/width*
 data-user.json
 sonicjscom-deploy.sh
+tests/cypress/screenshots
+tests/cypress/videos
 
