@@ -3,29 +3,30 @@ const { iteratee } = require("lodash");
 
 describe("Page Builder", function () {
   beforeEach(() => {
-    cy.SonicJs.login();
+    // cy.SonicJs.login();
   });
 
   after(() => {
-    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content`);
-    let deleteButtonPattern = '[aria-label*="Cypress PB Test"]';
-
-    cy.get("body").then(($body) => {
-      if ($body.find(deleteButtonPattern).length > 0) {
-        cy.get(deleteButtonPattern).first().click();
-        cy.wait(500);
-        cy.contains("Confirm Delete").click();
-      }
-    });
+    // cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content`);
+    // let deleteButtonPattern = '[aria-label*="Cypress PB Test"]';
+    // cy.get("body").then(($body) => {
+    //   if ($body.find(deleteButtonPattern).length > 0) {
+    //     cy.get(deleteButtonPattern).first().click();
+    //     cy.wait(500);
+    //     cy.contains("Confirm Delete").click();
+    //   }
+    // });
   });
 
-  it("Update Content Type", function () {
-    cy.visit(`${cy.SonicJs.getBaseUrl()}`);
+  it("Load Content Types", function () {
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
+    cy.wait(1000);
     cy.window().then((win) => {
-      // call whatever you want on your app's window
-      // so your app methods must be exposed somehow
-      alert('test 111')
-    })
+
+      win.dataService.contentTypesGet().then((data) => {
+        cy.log(JSON.stringify(data));
+      });
+    });
 
     // cy.get("#sidebar-expander").click();
     // cy.contains("Template").should("be.visible");

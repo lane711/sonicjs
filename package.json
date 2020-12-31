@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "start:dev": "nodemon server.js -e handlebars,js,css,html --ignore 'template-processed.css' --ignore '*_spec.js'",
-    "test": "npx cypress run --spec tests/cypresss/integration/**/*-spec.js"
+    "test": "cypress run --spec tests/cypresss/integration/**/*-spec.js"
   },
   "repository": {
     "type": "git",
