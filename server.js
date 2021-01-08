@@ -24,11 +24,13 @@ const adminTheme = `${process.env.ADMIN_THEME}`;
 const passport = require("passport");
 const mongoose = require("mongoose");
 
+mongoose.set('useCreateIndex', true);
 mongoose.connect(process.env.MONGODB_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 const User = require("./server/schema/models/user");
+
 
 mongoose.connection.once("open", () => {
   console.log(chalk.green("Connected to Database"));
