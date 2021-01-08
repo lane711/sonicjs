@@ -190,9 +190,12 @@ const RootQuery = new GraphQLObjectType({
       },
 
       resolve(parent, args) {
-        if (args.contentTypeId || args.url) {
+        if (args.contentTypeId) {
           return Content.find({
             contentTypeId: args.contentTypeId,
+          });
+        } else if (args.url) {
+          return Content.find({
             url: args.url,
           });
         } else if (args.data) {
@@ -395,16 +398,16 @@ const Mutation = new GraphQLObjectType({
         data: { type: new GraphQLNonNull(GraphQLString) },
         // data: {
         //   type: new GraphQLNonNull(GraphQLJSONObject),
-        // },        
+        // },
         // lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
       },
       resolve(parent, args) {
         let dataObj = JSON.parse(args.data);
         args.data = dataObj;
-        console.log('contentTypeUpdate', args);
-        moduleService.contentTypeUpdate(args).then(data => {
+        console.log("contentTypeUpdate", args);
+        moduleService.contentTypeUpdate(args).then((data) => {
           return data;
-        })
+        });
       },
     },
 
