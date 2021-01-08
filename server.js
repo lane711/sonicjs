@@ -33,7 +33,7 @@ const User = require("./server/schema/models/user");
 
 
 mongoose.connection.once("open", () => {
-  console.log(chalk.green("Connected to Database"));
+  console.log(chalk.green(`Connected to Database: ${process.env.MONGODB_URL}`));
 });
 
 
@@ -46,7 +46,9 @@ mongoose.connection.once("open", () => {
 
 app.use(session({
   secret: 'foo',
-  store: new MongoStore({ mongooseConnection: mongoose.connection })
+  store: new MongoStore({ mongooseConnection: mongoose.connection }),
+  resave: true,
+  saveUninitialized: true
 }));
 
 setupGraphQL(app);
