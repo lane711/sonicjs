@@ -9,7 +9,7 @@ if (typeof module !== "undefined" && module.exports) {
   var globalService = require("./global.service");
 
   var fs = require("fs");
-    var axios = require("axios");
+  var axios = require("axios");
 
   const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
   const chalk = require("chalk");
@@ -30,7 +30,10 @@ if (typeof module !== "undefined" && module.exports) {
           baseURL: globalService.baseUrl,
         };
 
-        if (options.req.signedCookies && options.req.signedCookies.sonicjs_access_token) {
+        if (
+          options.req.signedCookies &&
+          options.req.signedCookies.sonicjs_access_token
+        ) {
           defaultOptions.headers.Authorization =
             options.req.signedCookies.sonicjs_access_token;
         }
@@ -41,9 +44,7 @@ if (typeof module !== "undefined" && module.exports) {
       }
     });
 
-    emitterService.on("getRenderedPagePostDataFetch", async function (
-      options
-    ) {
+    emitterService.on("getRenderedPagePostDataFetch", async function (options) {
       if (options && options.page) {
         options.page.data.editForm = await exports.getForm(
           options.page.contentTypeId,
@@ -58,7 +59,6 @@ if (typeof module !== "undefined" && module.exports) {
       content,
       onFormSubmitFunction
     ) {
-
       let contentType;
       if (content && content.data.contentType) {
         contentType = await dataService.contentTypeGet(
@@ -66,7 +66,6 @@ if (typeof module !== "undefined" && module.exports) {
         );
       } else if (contentTypeId) {
         contentType = await dataService.contentTypeGet(contentTypeId);
-
       } else {
         return;
       }
@@ -105,18 +104,25 @@ if (typeof module !== "undefined" && module.exports) {
       // debugger;
       let data = { viewModel: {}, viewPath: "/server/assets/html/form.html" };
       data.viewModel.onFormSubmitFunction = onFormSubmitFunction;
-      data.viewModel.formJSON = formJSON;
-      data.viewModel.formValuesToLoad =
-        content && content.data ? content.data : {};
+      data.viewModel.formJSON = JSON.stringify(formJSON);
+      let formValuesToLoad = content && content.data ? content.data : {};
+      data.viewModel.formValuesToLoad = JSON.stringify(formValuesToLoad);
       data.viewModel.random = helperService.generateRandomString(8);
       data.viewPath = "/server/assets/html/form.html";
       data.contentType = "";
-      let formHtml = await axiosInstance.post(`/api/views/getProceedView`, {
-        data: data,
-      });
+
+      // let formHtml = await axiosInstance.post(`/api/views/getProceedView`, {
+      //   data: data,
+      // });
+
+      let formHtml = await viewService.getProccessedView(
+        "",
+        data.viewModel,
+        data.viewPath
+      );
 
       if (formHtml) {
-        form += formHtml.data.data;
+        form += formHtml;
       } else {
         let template = await this.getFormTemplate();
         form += template;

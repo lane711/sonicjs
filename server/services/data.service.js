@@ -148,7 +148,6 @@ if (typeof module !== "undefined" && module.exports) {
 
       // return data.contents;
 
-
       let result = await this.getAxios().post(apiUrl, {
         query: `
         {
@@ -436,24 +435,40 @@ if (typeof module !== "undefined" && module.exports) {
     //     console.log(`getContentById ERROR, Id:${id}`, error);
     //   });
 
-    const query = gql`
-    {
-      content(id: "${id}") {
-        contentTypeId
-        data
-        id
-      }
-    }
-  `;
+    //   const query = gql`
+    //   {
+    //     content(id: "${id}") {
+    //       contentTypeId
+    //       data
+    //       id
+    //     }
+    //   }
+    // `;
 
-    this.executeGraphqlQuery(query)
-      .then((data) => {
-        return data.content;
-      })
-      .catch((err) => {
-        console.log(err);
-        return "";
-      });
+    //   this.executeGraphqlQuery(query)
+    //     .then((data) => {
+    //       return data.content;
+    //     })
+    //     .catch((err) => {
+    //       console.log(err);
+    //       return "";
+    //     });
+
+    let result = await this.getAxios().post(apiUrl, {
+      query: `
+        {
+          content(id: "${id}") {
+            contentTypeId
+            data
+            id
+          }
+        }
+          `,
+    });
+
+    if (result.data.data.content) {
+      return result.data.data.content;
+    }
   }),
     (exports.asyncForEach = async function (array, callback) {
       for (let index = 0; index < array.length; index++) {
