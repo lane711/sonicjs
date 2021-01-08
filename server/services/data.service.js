@@ -135,37 +135,31 @@ if (typeof module !== "undefined" && module.exports) {
       return data;
     }),
     (exports.getContentByType = async function (contentType) {
-      const query = gql`
-      {
-        contents (contentTypeId : "${contentType}") {
-          contentTypeId
-          data
-        }
-      }
-      `;
-
-      let data = await this.executeGraphqlQuery(query);
-
-      return data.contents;
       // const query = gql`
-      //   {
-      //     contents {
-      //       contentTypeId
-      //       data
-      //     }
+      // {
+      //   contents (contentTypeId : "${contentType}") {
+      //     contentTypeId
+      //     data
       //   }
+      // }
       // `;
 
-      // request("http://localhost:3000/graphql", query).then((data) => {
-      //   console.log('data;',data);
-      // });
+      // let data = await this.executeGraphqlQuery(query);
 
-      // const filter = encodeURI(
-      //   `{"where":{"data.contentType":"${contentType}"}}`
-      // );
-      // let url = `${apiUrl}content?filter=${filter}`;
-      // let page = await this.getAxios().get(url);
-      // return page.data;
+      // return data.contents;
+
+
+      let result = await this.getAxios().post(apiUrl, {
+        query: `
+        {
+          contents (contentTypeId : "${contentType}") {
+            contentTypeId
+            data
+          }
+            `,
+      });
+
+      return result.data.data.contents;
     }),
     (exports.contentTypeGet = async function (contentType) {
       // debugger;
