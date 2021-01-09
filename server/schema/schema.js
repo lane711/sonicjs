@@ -383,27 +383,12 @@ const Mutation = new GraphQLObjectType({
         // lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
       },
       resolve(parent, args) {
-        Content.findByIdAndUpdate(
-          args.id,
-          { data: args.data },
-          function (err, content) {
-            if (err) {
-              console.log('content update error:' + err);
-            } else {
-              console.log("Content updated : ", content.data);
-              // return content;
-            }
-          }
-        );
+        let contentDoc = Content.findByIdAndUpdate(args.id, {
+          data: args.data,
+        });
+        contentDoc.exec();
 
-        return 'ok';
-        // let contentDoc = Content.findByIdAndUpdate(args.id, {
-        //   data: args.data,
-        // });
-        // contentDoc.exec();
-
-        // let content = Content.findById(args.id);
-        // return content;
+        return contentDoc;
       },
     },
 
