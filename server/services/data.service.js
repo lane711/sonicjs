@@ -382,16 +382,32 @@ if (typeof module !== "undefined" && module.exports) {
       }
 
       return new Promise((resolve, reject) => {
-        this.getAxios()
-          .put(`/api/content/${id}`, payload)
-          .then(async function (response) {
-            // console.log("ok", response.data);
-            resolve(response.data);
-          })
-          .catch(function (error) {
-            console.log("err");
-            reject(error);
-          });
+
+        return this.getAxios().post(apiUrl, {
+          query: `
+          mutation{
+            content( 
+              title:"${contentType.title}", 
+              moduleSystemId:"${contentType.moduleSystemId}", 
+              systemId:"${contentType.systemId}", 
+              data:"""${components}"""){
+                title
+            }
+          }
+              `,
+        });
+
+
+        // this.getAxios()
+        //   .put(`/api/content/${id}`, payload)
+        //   .then(async function (response) {
+        //     // console.log("ok", response.data);
+        //     resolve(response.data);
+        //   })
+        //   .catch(function (error) {
+        //     console.log("err");
+        //     reject(error);
+        //   });
       });
     }),
     (exports.createContentInstance = async function (payload) {
@@ -467,6 +483,10 @@ if (typeof module !== "undefined" && module.exports) {
     });
 
     if (result.data.data.content) {
+      //copy id and contentType into data for form builder
+      result.data.data.content.data.id = result.data.data.content.id;
+      result.data.data.content.data.contentType = result.data.data.content.contentTypeId;
+
       return result.data.data.content;
     }
   }),

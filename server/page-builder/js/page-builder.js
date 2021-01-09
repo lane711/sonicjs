@@ -620,6 +620,7 @@ async function editInstance(payload, refresh, contentType = "content") {
   if (contentType === "user") {
     contentType = "users";
   }
+  debugger;
   return axiosInstance
     .put(`/api/${contentType}/${id}`, payload)
     .then(async function (response) {
@@ -1275,7 +1276,6 @@ async function submitContent(
   refresh = true,
   contentType = "content"
 ) {
-  // debugger;
   console.log("Submission was made!", submission);
   let entity = submission.data ?? submission;
   if (!contentType.startsWith("user")) {

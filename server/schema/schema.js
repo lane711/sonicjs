@@ -371,19 +371,39 @@ const Mutation = new GraphQLObjectType({
       },
     },
 
+    //TODO: fix content update
     contentUpdate: {
       type: ContentType,
       args: {
-        contentTypeId: { type: new GraphQLNonNull(GraphQLString) },
+        id: { type: new GraphQLNonNull(GraphQLString) },
         data: {
           type: new GraphQLNonNull(GraphQLJSONObject),
         },
-        createdByUserId: { type: new GraphQLNonNull(GraphQLID) },
-        lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
+        // createdByUserId: { type: new GraphQLNonNull(GraphQLID) },
+        // lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
       },
       resolve(parent, args) {
-        let content = Content.findById(parent.userId);
-        return content.save();
+        Content.findByIdAndUpdate(
+          args.id,
+          { data: args.data },
+          function (err, content) {
+            if (err) {
+              console.log('content update error:' + err);
+            } else {
+              console.log("Content updated : ", content.data);
+              // return content;
+            }
+          }
+        );
+
+        return 'ok';
+        // let contentDoc = Content.findByIdAndUpdate(args.id, {
+        //   data: args.data,
+        // });
+        // contentDoc.exec();
+
+        // let content = Content.findById(args.id);
+        // return content;
       },
     },
 
