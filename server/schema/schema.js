@@ -377,12 +377,14 @@ const Mutation = new GraphQLObjectType({
       args: {
         id: { type: new GraphQLNonNull(GraphQLString) },
         data: {
-          type: new GraphQLNonNull(GraphQLJSONObject),
+          type: new GraphQLNonNull(GraphQLString),
         },
         // createdByUserId: { type: new GraphQLNonNull(GraphQLID) },
         // lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
       },
       resolve(parent, args) {
+        let dataObj = JSON.parse(args.data);
+        args.data = dataObj;
         let contentDoc = Content.findByIdAndUpdate(args.id, {
           data: args.data,
         });

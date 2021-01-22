@@ -381,22 +381,22 @@ if (typeof module !== "undefined" && module.exports) {
         delete payload.data.id;
       }
 
+      let data = JSON.stringify(payload.data);
+
+      let query = `
+      mutation{
+        contentUpdate( 
+          id:"${id}", 
+          data:"""${data}"""){
+            id
+        }
+      }
+          `;
+
       return new Promise((resolve, reject) => {
-
         return this.getAxios().post(apiUrl, {
-          query: `
-          mutation{
-            content( 
-              title:"${contentType.title}", 
-              moduleSystemId:"${contentType.moduleSystemId}", 
-              systemId:"${contentType.systemId}", 
-              data:"""${components}"""){
-                title
-            }
-          }
-              `,
+          query: query,
         });
-
 
         // this.getAxios()
         //   .put(`/api/content/${id}`, payload)
@@ -485,7 +485,8 @@ if (typeof module !== "undefined" && module.exports) {
     if (result.data.data.content) {
       //copy id and contentType into data for form builder
       result.data.data.content.data.id = result.data.data.content.id;
-      result.data.data.content.data.contentType = result.data.data.content.contentTypeId;
+      result.data.data.content.data.contentType =
+        result.data.data.content.contentTypeId;
 
       return result.data.data.content;
     }

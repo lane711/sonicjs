@@ -607,36 +607,38 @@ async function createInstance(
 }
 
 async function editInstance(payload, refresh, contentType = "content") {
-  let id = payload.id;
-  console.log("putting payload", payload);
-  if (payload.id) {
-    delete payload.id;
-  }
-  if (payload.data && payload.data.id) {
-    id = payload.data.id;
-    delete payload.data.id;
-  }
+
+  // let id = payload.id;
+  // console.log("putting payload", payload);
+  // if (payload.id) {
+  //   delete payload.id;
+  // }
+  // if (payload.data && payload.data.id) {
+  //   id = payload.data.id;
+  //   delete payload.data.id;
+  // }
 
   if (contentType === "user") {
     contentType = "users";
   }
-  debugger;
-  return axiosInstance
-    .put(`/api/${contentType}/${id}`, payload)
-    .then(async function (response) {
-      // debugger;
-      console.log("editInstance", response);
-      // resolve(response.data);
-      // return await response.data;
-      if (response.data.data.contentType === "page") {
-        window.location.href = response.data.data.url;
-      } else if (refresh) {
-        fullPageUpdate();
-      }
-    })
-    .catch(function (error) {
-      console.log("editInstance", error);
-    });
+  // debugger;
+  return dataService.editInstance(payload);
+  // return axiosInstance
+  //   .put(`/api/${contentType}/${id}`, payload)
+  //   .then(async function (response) {
+  //     // debugger;
+  //     console.log("editInstance", response);
+  //     // resolve(response.data);
+  //     // return await response.data;
+  //     if (response.data.data.contentType === "page") {
+  //       window.location.href = response.data.data.url;
+  //     } else if (refresh) {
+  //       fullPageUpdate();
+  //     }
+  //   })
+  //   .catch(function (error) {
+  //     console.log("editInstance", error);
+  //   });
 }
 
 async function editInstanceUser(payload, refresh, contentType = "content") {
