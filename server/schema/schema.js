@@ -351,10 +351,9 @@ const Mutation = new GraphQLObjectType({
         url: { type: new GraphQLNonNull(GraphQLString) },
         contentTypeId: { type: new GraphQLNonNull(GraphQLString) },
         data: {
-          type: new GraphQLNonNull(GraphQLJSONObject),
+          type: new GraphQLNonNull(GraphQLString),
         },
         createdByUserId: { type: new GraphQLNonNull(GraphQLID) },
-        lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
       },
       resolve(parent, args) {
         let now = new Date();
@@ -364,7 +363,7 @@ const Mutation = new GraphQLObjectType({
           url: args.url,
           createdByUserId: args.createdByUserId,
           createdOn: now,
-          lastUpdatedByUserId: args.lastUpdatedByUserId,
+          lastUpdatedByUserId: args.createdByUserId,
           updatedOn: now,
         });
         return content.save();

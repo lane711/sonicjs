@@ -587,27 +587,41 @@ async function createInstance(
     payload = payload.data;
   }
 
-  // return this.http.post("/api/content/", content).toPromise();
-  return axiosInstance
-    .post(`/api/${contentType}/`, payload)
+  await dataService
+    .createContentInstance(payload)
     .then(async function (response) {
-      console.log(response);
       // debugger;
-      if (response.data.data.contentType === "page") {
-        window.location.href = response.data.data.url;
+      console.log("editInstance", response);
+      // resolve(response.data);
+      // return await response.data;
+      if (response.contentTypeId === "page" && !globalService.isBackEnd()) {
+        window.location.href = response.url;
       } else if (refresh) {
         fullPageUpdate();
       }
-
-      return await response.data;
     })
     .catch(function (error) {
-      console.log(error);
+      console.log("editInstance", error);
     });
+  // return axiosInstance
+  //   .post(`/api/${contentType}/`, payload)
+  //   .then(async function (response) {
+  //     console.log(response);
+  //     // debugger;
+  //     if (response.data.data.contentType === "page") {
+  //       window.location.href = response.data.data.url;
+  //     } else if (refresh) {
+  //       fullPageUpdate();
+  //     }
+
+  //     return await response.data;
+  //   })
+  //   .catch(function (error) {
+  //     console.log(error);
+  //   });
 }
 
 async function editInstance(payload, refresh, contentType = "content") {
-
   // let id = payload.id;
   // console.log("putting payload", payload);
   // if (payload.id) {
@@ -622,7 +636,8 @@ async function editInstance(payload, refresh, contentType = "content") {
     contentType = "users";
   }
   // debugger;
-  dataService.editInstance(payload)
+  dataService
+    .editInstance(payload)
     .then(async function (response) {
       // debugger;
       console.log("editInstance", response);
@@ -700,7 +715,7 @@ async function deleteContentType(id) {
   console.log("deleting content", id);
   // return this.http.put(environment.apiUrl + `content/${id}`, payload).toPromise();
   axiosInstance
-    .post(`/api/modules/deleteModuleContentType/`, { systemId: id})
+    .post(`/api/modules/deleteModuleContentType/`, { systemId: id })
     .then(async function (response) {
       console.log(response);
       // redirect("/admin/content-types");
@@ -811,7 +826,6 @@ async function setupPageSettings(action, contentType) {
 
   if (action == "edit" && contentType) {
     formValuesToLoad = this.page;
-
 
     form = await formService.getForm(
       contentType,
@@ -1123,7 +1137,6 @@ function setupJsonRawSave() {
 }
 
 async function getImageList() {
-
   let imageList = await dataService.getFiles();
   // let imageList = await axiosInstance.get(`/api/containers/container1/files`);
   // console.log('imageList', imageList.data);

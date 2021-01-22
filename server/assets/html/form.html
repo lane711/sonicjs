@@ -27,7 +27,6 @@
 
               form.on('submit', async function (submission) {
 
-                  // amplitude.getInstance().logEvent('FORM_SUBMIT');
                   analyticsTrackEvent({event: 'FORM_SUBMIT', data: submission.data});
 
                   {{{ onFormSubmitFunction }}}

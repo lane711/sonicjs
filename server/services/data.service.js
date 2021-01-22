@@ -406,28 +406,62 @@ if (typeof module !== "undefined" && module.exports) {
       // let content = {};
       // content.data = payload;
       // this.processContentFields(payload, content);
-      console.log("payload", payload);
-      if (payload.id || "id" in payload) {
-        delete payload.id;
-      }
+      // console.log("payload", payload);
+      // if (payload.id || "id" in payload) {
+      //   delete payload.id;
+      // }
 
-      if (!payload.data) {
-        let temp = { data: payload };
-        payload = temp;
-      }
+      // if (!payload.data) {
+      //   let temp = { data: payload };
+      //   payload = temp;
+      // }
 
-      return new Promise((resolve, reject) => {
-        this.getAxios()
-          .post("/api/content/", payload)
-          .then(async function (response) {
-            // console.log("ok", response.data);
-            resolve(response.data);
-          })
-          .catch(function (error) {
-            console.log("err");
-            reject(error);
-          });
+      let url = '/something'
+
+      let query = `
+      mutation{
+        contentCreate( 
+          contentTypeId:"${payload.data.contentType}", 
+          url:"${url}", 
+          createdByUserId:"5fd834ec29f419535f049803"
+          data:"""${JSON.stringify(payload.data)}"""){
+            id
+            url
+            contentTypeId
+        }
+      }
+          `;
+
+
+          // # mutation{
+          //   #   contentCreate(contentTypeId:"junk", createdByUserId:"5fce47cc9131954036b6e476", 
+          //   #     lastUpdatedByUserId:"5fce47cc9131954036b6e476", url:"/should-be-unique",
+          //   #   	data:{name: "54565", prop:"ipsum de lor"}){
+          //   # 			data
+          //   #     	contentTypeId
+          //   #     id
+          //   #     createdOn
+          //   #   }
+          //   # }
+
+      let result = await this.getAxios().post(apiUrl, {
+        query: query,
       });
+
+      return result.data.data.contentCreate;
+
+      // return new Promise((resolve, reject) => {
+      //   this.getAxios()
+      //     .post("/api/content/", payload)
+      //     .then(async function (response) {
+      //       // console.log("ok", response.data);
+      //       resolve(response.data);
+      //     })
+      //     .catch(function (error) {
+      //       console.log("err");
+      //       reject(error);
+      //     });
+      // });
     });
 
   (exports.getContentById = async function (id) {

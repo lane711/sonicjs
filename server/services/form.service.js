@@ -190,13 +190,14 @@ if (typeof module !== "undefined" && module.exports) {
         );
       } else if (components) {
         components.push({
-          type: "textfield",
+          type: "hidden",
           key: "contentType",
           label: "contentType",
           defaultValue: contentType.systemId,
-          hidden: true,
+          hidden: false,
           input: true,
         });
+
       }
 
       return components;
