@@ -622,23 +622,21 @@ async function editInstance(payload, refresh, contentType = "content") {
     contentType = "users";
   }
   // debugger;
-  return dataService.editInstance(payload);
-  // return axiosInstance
-  //   .put(`/api/${contentType}/${id}`, payload)
-  //   .then(async function (response) {
-  //     // debugger;
-  //     console.log("editInstance", response);
-  //     // resolve(response.data);
-  //     // return await response.data;
-  //     if (response.data.data.contentType === "page") {
-  //       window.location.href = response.data.data.url;
-  //     } else if (refresh) {
-  //       fullPageUpdate();
-  //     }
-  //   })
-  //   .catch(function (error) {
-  //     console.log("editInstance", error);
-  //   });
+  dataService.editInstance(payload)
+    .then(async function (response) {
+      // debugger;
+      console.log("editInstance", response);
+      // resolve(response.data);
+      // return await response.data;
+      if (response.contentTypeId === "page" && !globalService.isBackEnd()) {
+        window.location.href = response.url;
+      } else if (refresh) {
+        fullPageUpdate();
+      }
+    })
+    .catch(function (error) {
+      console.log("editInstance", error);
+    });
 }
 
 async function editInstanceUser(payload, refresh, contentType = "content") {

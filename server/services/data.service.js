@@ -389,26 +389,17 @@ if (typeof module !== "undefined" && module.exports) {
           id:"${id}", 
           data:"""${data}"""){
             id
+            url
+            contentTypeId
         }
       }
           `;
 
-      return new Promise((resolve, reject) => {
-        return this.getAxios().post(apiUrl, {
-          query: query,
-        });
-
-        // this.getAxios()
-        //   .put(`/api/content/${id}`, payload)
-        //   .then(async function (response) {
-        //     // console.log("ok", response.data);
-        //     resolve(response.data);
-        //   })
-        //   .catch(function (error) {
-        //     console.log("err");
-        //     reject(error);
-        //   });
+      let result = await this.getAxios().post(apiUrl, {
+        query: query,
       });
+
+      return result.data.data.contentUpdate;
     }),
     (exports.createContentInstance = async function (payload) {
       // console.log('createContentInstance payload', payload);
