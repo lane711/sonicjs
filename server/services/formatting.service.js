@@ -1,7 +1,13 @@
-var moment = require("moment");
+//check if running in node (and not the browser)
+if (typeof module !== "undefined" && module.exports) {
+  var moment = require("moment");
+} 
 
-module.exports = formattingService = {
-  formatDates: async function (data, dateOnly = false) {
+(function(exports) {
+
+
+
+  (exports.formatDates = async function (data, dateOnly = false) {
     let dateFormat = dateOnly ? "YYYY-MM-DD" : "YYYY-MM-DD, h:mm:ss a";
 
     data.forEach((element) => {
@@ -14,9 +20,9 @@ module.exports = formattingService = {
         }
       }
     });
-  },
+  }),
 
-  formatTitles: async function (data) {
+  (exports.formatTitles = async function (data) {
     let length = 50;
     data.forEach((element) => {
       if (element.data) {
@@ -39,11 +45,15 @@ module.exports = formattingService = {
         }
       }
     });
-  },
+  }),
 
-  stripHtmlTags: function (str) {
+
+  (exports.stripHtmlTags = function (str) {
     if (str === null || str === "") return false;
     else str = str.toString();
     return str.replace(/<[^>]*>/g, "");
-  },
-};
+  })
+
+
+
+})(typeof exports === "undefined" ? (this["formattingService"] = {}) : exports);

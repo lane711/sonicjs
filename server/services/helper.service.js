@@ -79,11 +79,18 @@
     
       return slug;
     });
-    (exports.generateSlugFromContent = function(content) {
-      debugger;
+    (exports.generateSlugFromContent = function(content, includePrecedingSlash = false, makeUnique = false) {
       let copy = content.title ?? content.body ?? content.alertCopy ?? content.contentType;
       let copyClean = formattingService.stripHtmlTags(copy)
       let slug = helperService.slugify(copy);
+
+      if(includePrecedingSlash === true){
+        slug = `/${slug}`;
+      }
+
+      if(makeUnique === true){
+        slug = `${slug}-${helperService.generateRandomString(6)}`
+      }
     
       return slug;
     });

@@ -20,6 +20,7 @@ assets:
     - /services/shared.service.js
     - /services/global.service.js
     - /services/helper.service.js
+    - /services/formatting.service.js
     - /services/data.service.js
     - /services/form.service.js
     - /services/analytics.service.js

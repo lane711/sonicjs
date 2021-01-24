@@ -416,7 +416,7 @@ if (typeof module !== "undefined" && module.exports) {
       //   payload = temp;
       // }
 
-      let url = generateSlugFromContent(payload.data)
+      let url = helperService.generateSlugFromContent(payload.data, true, true)
 
       let query = `
       mutation{
