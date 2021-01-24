@@ -357,6 +357,8 @@ const Mutation = new GraphQLObjectType({
       },
       resolve(parent, args) {
         let now = new Date();
+        let dataObj = JSON.parse(args.data);
+        args.data = dataObj;
         let content = new Content({
           contentTypeId: args.contentTypeId,
           data: args.data,
