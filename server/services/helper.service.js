@@ -70,6 +70,23 @@
         }
       }
     });
+    (exports.slugify = function(text) {
+      // console.log('slug', text);
+      let slug = text
+        .toLowerCase()
+        .replace(/[^\w ]+/g, "")
+        .replace(/ +/g, "-");
+    
+      return slug;
+    });
+    (exports.generateSlugFromContent = function(content) {
+      debugger;
+      let copy = content.title ?? content.body ?? content.alertCopy ?? content.contentType;
+      let copyClean = formattingService.stripHtmlTags(copy)
+      let slug = helperService.slugify(copy);
+    
+      return slug;
+    });
 })(typeof exports === "undefined" ? (this["helperService"] = {}) : exports);
 
 // (function (exports) {
@@ -91,3 +108,5 @@
 //     };
 
 // })(typeof exports === 'undefined' ? this['globalService'] = {} : exports);
+
+

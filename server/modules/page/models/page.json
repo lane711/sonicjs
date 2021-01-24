@@ -365,7 +365,7 @@
         "validate": {
           "customMessage": "",
           "json": "",
-          "custom": "value = '/' + slugify(data.title)",
+          "custom": "value = '/' + helperService.slugify(data.title)",
           "required": false,
           "customPrivate": false,
           "minLength": "",
@@ -385,7 +385,7 @@
         "properties": {},
         "customConditional": "",
         "logic": [],
-        "calculateValue": "if(data.autoGenerateUrl){\nvalue = '/' + slugify(data.title)\n} else{\nvalue = data.url;\n}",
+        "calculateValue": "if(data.autoGenerateUrl){\nvalue = '/' + helperService.slugify(data.title)\n} else{\nvalue = data.url;\n}",
         "widget": {
           "type": "",
           "format": "yyyy-MM-dd hh:mm a",

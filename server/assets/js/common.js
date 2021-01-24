@@ -17,16 +17,6 @@ function submitForm(submission) {
   });
 }
 
-function slugify(text) {
-  // console.log('slug', text);
-  let slug = text
-    .toLowerCase()
-    .replace(/[^\w ]+/g, "")
-    .replace(/ +/g, "-");
-
-  return slug;
-}
-
 function setupToolTips() {
   $(function () {
     $('[data-toggle="tooltip"]').tooltip({

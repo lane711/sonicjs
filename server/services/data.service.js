@@ -416,7 +416,7 @@ if (typeof module !== "undefined" && module.exports) {
       //   payload = temp;
       // }
 
-      let url = '/something'
+      let url = generateSlugFromContent(payload.data)
 
       let query = `
       mutation{

@@ -325,9 +325,9 @@
         "properties": {},
         "customConditional": "",
         "logic": [],
-        "calculateValue": "value = slugify(data.text)",
+        "calculateValue": "value = helperService.slugify(data.text)",
         "refreshOn": "text",
-        "customDefaultValue": "value = slugify(data.text);",
+        "customDefaultValue": "value = helperService.slugify(data.text);",
         "widget": {
           "type": "",
           "format": "yyyy-MM-dd hh:mm a",
