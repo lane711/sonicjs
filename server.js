@@ -37,15 +37,8 @@ mongoose.connection.once("open", () => {
 });
 
 
-// require("express-session")({
-//   secret: "secret",
-//   resave: false,
-//   saveUninitialized: false,
-//   store: new MongoStore({ mongooseConnection: mongoose.connection })
-// });
-
 app.use(session({
-  secret: 'foo',
+  secret: process.env.SESSION_SECRET,
   store: new MongoStore({ mongooseConnection: mongoose.connection }),
   resave: true,
   saveUninitialized: true
@@ -55,14 +48,11 @@ setupGraphQL(app);
 
 function start() {
 
-
-
   setupAssets(app);
 
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
   setupHandlebars(app);
-
 
   passport.use(User.createStrategy());
   passport.serializeUser(User.serializeUser());

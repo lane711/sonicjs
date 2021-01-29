@@ -104,8 +104,18 @@ if (typeof module !== "undefined" && module.exports) {
             id
             contentTypeId
             data
+            createdByUserId {
+              id
+              username
+            }
+            createdOn
+            lastUpdatedByUserId {
+              id
+              username
+            }	
+            updatedOn
           }
-          }
+        }
           `,
       });
 

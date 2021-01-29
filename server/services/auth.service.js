@@ -83,6 +83,8 @@ module.exports = authService = {
           if (err) {
             return next(err);
           }
+
+          req.session.userId = user.id;
     
           return res.redirect(req.session.returnTo);
         });
