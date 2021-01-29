@@ -74,7 +74,7 @@ module.exports = authService = {
         if (err) {
           return next(err);
         }
-    
+
         if (!user) {
           return res.redirect('/login?info=' + info);
         }
@@ -84,7 +84,7 @@ module.exports = authService = {
             return next(err);
           }
     
-          return res.redirect('/user');
+          return res.redirect(req.session.returnTo);
         });
     
       })(req, res, next);
@@ -104,7 +104,7 @@ module.exports = authService = {
     app.get("/login", async function (req, res) {
       let data = { registerMessage: "<b>admin</b>" };
       res.render("admin/shared-views/admin-login", {
-        layout: `front-end/${frontEndTheme}/login.handlebars`,
+        layout: `front-end/${frontEndTheme}/login.hbs`,
         data: data,
       });
       // return;

@@ -233,7 +233,7 @@ const RootQuery = new GraphQLObjectType({
 
     tags: {
       type: new GraphQLList(TagType),
-      resolve(parent, args) {
+      resolve(parent, args, context) {
         return Tag.find({}).populate("contents");
       },
     },
