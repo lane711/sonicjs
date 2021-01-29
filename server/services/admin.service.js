@@ -28,186 +28,184 @@ module.exports = adminService = {
       "/admin*",
       connectEnsureLogin.ensureLoggedIn(),
       async function (req, res) {
-        if (req.url == "/admin" || req.url.startsWith("/admin/")) {
-          // if (!req.signedCookies.sonicjs_access_token) {
-          //   //user not logged in
-          // }
+        // if (!req.signedCookies.sonicjs_access_token) {
+        //   //user not logged in
+        // }
 
-          if (process.env.MODE !== "dev") {
-            res.send(401);
-          }
-
-          globalService.setAreaMode(true, false, true);
-
-          let path = req.url.split("/");
-          let viewName = "admin-dashboard";
-          let param1 = null;
-          let param2 = null;
-
-          if (path[2]) {
-            viewName = "admin-" + path[2];
-          }
-          if (path[3]) {
-            viewName += "-" + path[3];
-          }
-          if (path[4]) {
-            param1 = path[4];
-          }
-          if (path[5]) {
-            param2 = path[5];
-          }
-
-          let data = {};
-
-          if (viewName == "admin-content") {
-            data = await dataService.getContentAdmin();
-            data.contentTypes = await dataService.contentTypesGet();
-          }
-
-          if (viewName == "admin-content-edit") {
-            let content = null;
-            if (param2) {
-              content = await dataService.getContentById(param2);
-            }
-            data.editForm = await formService.getForm(
-              param1,
-              content,
-              "submitContent(submission)"
-            );
-            data.contentId = param2;
-          }
-
-          if (viewName == "admin-content-types") {
-            let dataRaw = await dataService.contentTypesGet();
-            data = _.sortBy(dataRaw, "title");
-          }
-
-          if (viewName == "admin-content-types-edit") {
-            data.contentTypeId = param1;
-            data.raw = await dataService.contentTypeGet(param1);
-          }
-
-          if (viewName == "admin-modules") {
-            data = await moduleService.getModules();
-          }
-
-          if (viewName == "admin-modules-edit") {
-            data.moduleSystemId = param1;
-            data.contentTypes = await moduleService.getModuleContentTypesAdmin(
-              param1
-            );
-            data.contentTypeId = param1;
-            data.moduleDef = await moduleService.getModuleDefinition(param1);
-          }
-
-          if (viewName == "admin-media") {
-            data = await mediaService.getMedia();
-          }
-
-          if (viewName == "admin-menus-edit") {
-            if (param1) {
-              data = await dataService.getContentById(param1);
-              if (data.data.links) {
-                data.data.linksString = JSON.stringify(data.data.links);
-              }
-            }
-          }
-
-          if (viewName == "admin-menus") {
-            data = await dataService.getContentByContentType("menu");
-          }
-
-          if (viewName == "admin-site-settings") {
-            data = await dataService.getContentTopOne("site-settings");
-            data.editForm = await formService.getForm("site-settings", data);
-          }
-
-          if (viewName == "admin-theme-settings") {
-            data = await dataService.getContentTopOne("theme-settings");
-            data.editForm = await formService.getForm("theme-settings", data);
-          }
-
-          if (viewName == "admin-site-settings-colors") {
-            data = await dataService.getContentTopOne("site-settings-colors");
-            data.editForm = await formService.getForm(
-              "site-settings-colors",
-              data
-            );
-          }
-
-          if (viewName == "admin-site-settings-typography") {
-            data = await dataService.getContentTopOne("site-settings");
-            data.editForm = await formService.getForm("site-settings", data);
-          }
-
-          if (viewName == "admin-users") {
-            data.editFormUser = await formService.getForm(
-              "user",
-              undefined,
-              "await submitContent(submission,true,'user');"
-            );
-            // data.editFormRole = await formService.getForm(
-            //   "role",
-            //   undefined,
-            //   "submitContent(submission,true,'role')"
-            // );
-            let users = await userService.getUsers();
-            let roles = await userService.getRoles();
-            data.users = users;
-            data.roles = roles;
-            // console.log(data);
-          }
-
-          if (viewName == "admin-role-new") {
-            data.editForm = await formService.getForm(
-              "role",
-              undefined,
-              "submitContent(submission,true,'Role');"
-            );
-          }
-
-          if (viewName == "admin-role-edit") {
-            let role = { id: param1 };
-            if (param1) {
-              let roleRecord = await userService.getRole(param1);
-              role.data = roleRecord.__data;
-              role.data.contentType = "Role";
-            }
-            data.editForm = await formService.getForm(
-              "role",
-              role,
-              'submitContent(submission, true, "Roles");'
-            );
-          }
-
-          if (viewName == "admin-user-edit") {
-            let user = { id: param1 };
-            if (param1) {
-              let userRecord = await userService.getUser(param1);
-              user.data = userRecord.__data;
-              user.data.contentType = "user";
-            }
-            data.editForm = await formService.getForm(
-              "user",
-              user,
-              'submitContent(submission, true, "user");'
-            );
-          }
-
-          let accessToken = "fakeToken"; //await userService.getToken(req);
-          data.breadCrumbs = await breadcrumbsService.getAdminBreadcrumbs(req);
-
-          // mixPanelService.trackEvent("PAGE_LOAD_ADMIN", req, {
-          //   page: req.url,
-          //   ip: ip,
-          // });
-
-          res.render(`admin/shared-views/${viewName}`, {
-            layout: `admin/${adminTheme}/${adminTheme}`,
-            data: data,
-            accessToken: accessToken,
-          });
+        if (process.env.MODE !== "dev") {
+          res.send(401);
         }
+
+        globalService.setAreaMode(true, false, true);
+
+        let path = req.url.split("/");
+        let viewName = "admin-dashboard";
+        let param1 = null;
+        let param2 = null;
+
+        if (path[2]) {
+          viewName = "admin-" + path[2];
+        }
+        if (path[3]) {
+          viewName += "-" + path[3];
+        }
+        if (path[4]) {
+          param1 = path[4];
+        }
+        if (path[5]) {
+          param2 = path[5];
+        }
+
+        let data = {};
+
+        if (viewName == "admin-content") {
+          data = await dataService.getContentAdmin();
+          data.contentTypes = await dataService.contentTypesGet();
+        }
+
+        if (viewName == "admin-content-edit") {
+          let content = null;
+          if (param2) {
+            content = await dataService.getContentById(param2);
+          }
+          data.editForm = await formService.getForm(
+            param1,
+            content,
+            "submitContent(submission)"
+          );
+          data.contentId = param2;
+        }
+
+        if (viewName == "admin-content-types") {
+          let dataRaw = await dataService.contentTypesGet();
+          data = _.sortBy(dataRaw, "title");
+        }
+
+        if (viewName == "admin-content-types-edit") {
+          data.contentTypeId = param1;
+          data.raw = await dataService.contentTypeGet(param1);
+        }
+
+        if (viewName == "admin-modules") {
+          data = await moduleService.getModules();
+        }
+
+        if (viewName == "admin-modules-edit") {
+          data.moduleSystemId = param1;
+          data.contentTypes = await moduleService.getModuleContentTypesAdmin(
+            param1
+          );
+          data.contentTypeId = param1;
+          data.moduleDef = await moduleService.getModuleDefinition(param1);
+        }
+
+        if (viewName == "admin-media") {
+          data = await mediaService.getMedia();
+        }
+
+        if (viewName == "admin-menus-edit") {
+          if (param1) {
+            data = await dataService.getContentById(param1);
+            if (data.data.links) {
+              data.data.linksString = JSON.stringify(data.data.links);
+            }
+          }
+        }
+
+        if (viewName == "admin-menus") {
+          data = await dataService.getContentByContentType("menu");
+        }
+
+        if (viewName == "admin-site-settings") {
+          data = await dataService.getContentTopOne("site-settings");
+          data.editForm = await formService.getForm("site-settings", data);
+        }
+
+        if (viewName == "admin-theme-settings") {
+          data = await dataService.getContentTopOne("theme-settings");
+          data.editForm = await formService.getForm("theme-settings", data);
+        }
+
+        if (viewName == "admin-site-settings-colors") {
+          data = await dataService.getContentTopOne("site-settings-colors");
+          data.editForm = await formService.getForm(
+            "site-settings-colors",
+            data
+          );
+        }
+
+        if (viewName == "admin-site-settings-typography") {
+          data = await dataService.getContentTopOne("site-settings");
+          data.editForm = await formService.getForm("site-settings", data);
+        }
+
+        if (viewName == "admin-users") {
+          data.editFormUser = await formService.getForm(
+            "user",
+            undefined,
+            "await submitContent(submission,true,'user');"
+          );
+          // data.editFormRole = await formService.getForm(
+          //   "role",
+          //   undefined,
+          //   "submitContent(submission,true,'role')"
+          // );
+          let users = await userService.getUsers();
+          let roles = await userService.getRoles();
+          data.users = users;
+          data.roles = roles;
+          // console.log(data);
+        }
+
+        if (viewName == "admin-role-new") {
+          data.editForm = await formService.getForm(
+            "role",
+            undefined,
+            "submitContent(submission,true,'Role');"
+          );
+        }
+
+        if (viewName == "admin-role-edit") {
+          let role = { id: param1 };
+          if (param1) {
+            let roleRecord = await userService.getRole(param1);
+            role.data = roleRecord.__data;
+            role.data.contentType = "Role";
+          }
+          data.editForm = await formService.getForm(
+            "role",
+            role,
+            'submitContent(submission, true, "Roles");'
+          );
+        }
+
+        if (viewName == "admin-user-edit") {
+          let user = { id: param1 };
+          if (param1) {
+            let userRecord = await userService.getUser(param1);
+            user.data = userRecord.__data;
+            user.data.contentType = "user";
+          }
+          data.editForm = await formService.getForm(
+            "user",
+            user,
+            'submitContent(submission, true, "user");'
+          );
+        }
+
+        let accessToken = "fakeToken"; //await userService.getToken(req);
+        data.breadCrumbs = await breadcrumbsService.getAdminBreadcrumbs(req);
+
+        // mixPanelService.trackEvent("PAGE_LOAD_ADMIN", req, {
+        //   page: req.url,
+        //   ip: ip,
+        // });
+
+        res.render(`admin/shared-views/${viewName}`, {
+          layout: `admin/${adminTheme}/${adminTheme}`,
+          data: data,
+          accessToken: accessToken,
+        });
       }
     );
   },
