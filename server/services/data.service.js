@@ -426,7 +426,7 @@ if (typeof module !== "undefined" && module.exports) {
       //   payload = temp;
       // }
 
-      let url = helperService.generateSlugFromContent(payload.data, true, true)
+      let url = helperService.generateSlugFromContent(payload.data, true, true);
 
       let query = `
       mutation{
@@ -442,17 +442,16 @@ if (typeof module !== "undefined" && module.exports) {
       }
           `;
 
-
-          // # mutation{
-          //   #   contentCreate(contentTypeId:"junk", createdByUserId:"5fce47cc9131954036b6e476", 
-          //   #     lastUpdatedByUserId:"5fce47cc9131954036b6e476", url:"/should-be-unique",
-          //   #   	data:{name: "54565", prop:"ipsum de lor"}){
-          //   # 			data
-          //   #     	contentTypeId
-          //   #     id
-          //   #     createdOn
-          //   #   }
-          //   # }
+      // # mutation{
+      //   #   contentCreate(contentTypeId:"junk", createdByUserId:"5fce47cc9131954036b6e476",
+      //   #     lastUpdatedByUserId:"5fce47cc9131954036b6e476", url:"/should-be-unique",
+      //   #   	data:{name: "54565", prop:"ipsum de lor"}){
+      //   # 			data
+      //   #     	contentTypeId
+      //   #     id
+      //   #     createdOn
+      //   #   }
+      //   # }
 
       let result = await this.getAxios().post(apiUrl, {
         query: query,
@@ -526,6 +525,24 @@ if (typeof module !== "undefined" && module.exports) {
       return result.data.data.content;
     }
   }),
+    (exports.fileUpdate = async function (filePath, fileContent) {
+      let fileContentString = JSON.stringify(fileContent);
+      let result = await this.getAxios().post(apiUrl, {
+        query: `
+      mutation{
+        fileUpdate( 
+          filePath:"${filePath}", 
+          fileContent:"""${fileContentString}"""
+          )
+          { 
+            filePath 
+          }
+      }
+          `,
+      });
+
+      return result.data.data.fileUpdate;
+    }),
     (exports.asyncForEach = async function (array, callback) {
       for (let index = 0; index < array.length; index++) {
         await callback(array[index], index, array);

@@ -63,17 +63,22 @@
                     }
                   };
                   form.on('submit', async function (submission) {
-                    var accessToken = '{{ this.accessToken }}';
-                    axios.put(`/api/modules/updateJsonFile?access_token=${accessToken}`, submission.data)
-                      .then(async function (response) {
-                        console.log('edit module', response);
-                        //return await response.data;
+                    // debugger;
+                    let filePath = `server/modules/${submission.data.systemId}/module.json`;
+                    await dataService.fileUpdate(filePath, submission.data)
+                    window.location.replace('/admin/modules/edit/' + submission.data.systemId);
 
-                        window.location.replace('/admin/modules/edit/' + submission.data.systemId);
-                      })
-                      .catch(function (error) {
-                        console.log(error);
-                      });
+                    // var accessToken = '{{ this.accessToken }}';
+                    // axios.put(`/api/modules/updateJsonFile?access_token=${accessToken}`, submission.data)
+                    //   .then(async function (response) {
+                    //     console.log('edit module', response);
+                    //     //return await response.data;
+
+                    //     window.location.replace('/admin/modules/edit/' + submission.data.systemId);
+                    //   })
+                    //   .catch(function (error) {
+                    //     console.log(error);
+                    //   });
 
                   });
                 });

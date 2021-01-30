@@ -6,6 +6,7 @@ const Tag = require("./models/tag");
 const { GraphQLJSONObject } = require("graphql-type-json");
 const moduleService = require("../services/module.service");
 const { data } = require("jquery");
+const fileService = require("../services/file.service");
 
 const {
   GraphQLObjectType,
@@ -426,18 +427,10 @@ const Mutation = new GraphQLObjectType({
       args: {
         filePath: { type: new GraphQLNonNull(GraphQLString) },
         fileContent: { type: new GraphQLNonNull(GraphQLString) },
-        // data: {
-        //   type: new GraphQLNonNull(GraphQLJSONObject),
-        // },
-        // createdByUserId: { type: new GraphQLNonNull(GraphQLID) },
-        // lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
       },
       resolve(parent, args) {
-        console.log("file-->", args.filePath, args.fileContent);
-        // let file = new FileType();
-        // file.filePath = args.filePath;
+        fileService.writeFile(args.filePath, args.fileContent);
         let fileData = new FileData(args.filePath, args.fileContent);
-
         return fileData;
       },
     },
