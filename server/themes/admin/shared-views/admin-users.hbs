@@ -36,8 +36,9 @@
             </thead>
             <tbody>
               {{#each data.users}}
+              {{ log this }}
               <tr>
-                <td><a href="/admin/user/edit/{{ this.id }}">{{ this.email }}</a></td>
+                <td><a href="/admin/user/edit/{{ this.id }}">{{ this.username }}</a></td>
                 <td>{{ this.firstName }} {{ this.lastName }}</td>
                 <td class="text-right">
                   <a class="btn btn-sm btn-primary rmargin" href="/admin/user/edit/{{ this.id }}">Edit</a>

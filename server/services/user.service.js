@@ -9,7 +9,7 @@ const axios = require("axios");
 const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 const chalk = require("chalk");
 var { GraphQLClient, gql, request } = require("graphql-request");
-const crypto = require('crypto')
+const crypto = require("crypto");
 const User = require("../schema/models/user");
 
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
@@ -27,7 +27,6 @@ module.exports = userService = {
   },
 
   createUser: async function (username, password) {
-
     User.register({ username: username, active: false }, password);
     // let passwordHash = crypto.createHash('md5').update('password').digest("hex")
 
@@ -45,8 +44,6 @@ module.exports = userService = {
     // return data.contents;
   },
 
-  
-
   loginUser: async function (email, password) {
     const query = gql`
       mutation{
@@ -62,25 +59,52 @@ module.exports = userService = {
     return data.contents;
   },
 
-  // getUsers: async function () {
-  //   var userModel = loopback.getModel("user");
-  //   let users = await userModel.find();
-  //   // console.log(users);
-  //   return users;
-  // },
+  getUsers: async function () {
+    const query = gql`
+      {
+        users {
+          id
+          username
+          password
+        }
+      }
+    `;
 
-  // getUser: async function (id) {
-  //   var userModel = loopback.getModel("user");
-  //   let user = await userModel.findById(id);
-  //   return user;
-  // },
+    let data = await dataService.executeGraphqlQuery(query);
 
-  // getRoles: async function () {
-  //   var roleModel = loopback.getModel("Role");
-  //   let roles = await roleModel.find();
-  //   // console.log(users);
-  //   return roles;
-  // },
+    return data.users;
+  },
+
+  getUser: async function (id) {
+    const query = gql`
+    {
+      user(id:"${id}"){
+        id
+        username
+      }
+      }
+        `;
+
+    let data = await dataService.executeGraphqlQuery(query);
+
+    return data.user;
+  },
+
+  getRoles: async function () {
+    const query = gql`
+    {
+      roles {
+        id
+        username
+        password
+      }
+    }
+  `;
+
+  let data = await dataService.executeGraphqlQuery(query);
+
+  return data.users;
+  },
 
   // getRole: async function (id) {
   //   var roleModel = loopback.getModel("Role");
@@ -112,8 +136,8 @@ module.exports = userService = {
   // },
 
   isAuthenticated: async function (req) {
-    console.log('user account', req.user);
-    if(req.user && req.user.username){
+    console.log("user account", req.user);
+    if (req.user && req.user.username) {
       return true;
     }
     return false;

@@ -7,6 +7,8 @@ var dataService = require(".//data.service");
 var globalService = require(".//global.service");
 const connectEnsureLogin = require("connect-ensure-login");
 var dataService = require(".//data.service");
+var userService = require(".//user.service");
+
 var emitterService = require("./emitter.service");
 
 var fs = require("fs");
@@ -153,7 +155,7 @@ module.exports = adminService = {
           //   "submitContent(submission,true,'role')"
           // );
           let users = await userService.getUsers();
-          let roles = await userService.getRoles();
+          let roles = []; //await userService.getRoles();
           data.users = users;
           data.roles = roles;
           // console.log(data);
