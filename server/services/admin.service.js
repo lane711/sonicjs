@@ -8,6 +8,7 @@ var globalService = require(".//global.service");
 const connectEnsureLogin = require("connect-ensure-login");
 var dataService = require(".//data.service");
 var userService = require(".//user.service");
+var breadcrumbsService = require("../services/breadcrumbs.service");
 
 var emitterService = require("./emitter.service");
 

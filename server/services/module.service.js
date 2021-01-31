@@ -110,6 +110,7 @@ module.exports = moduleService = {
     moduleDef.data = moduleContentType.data;
     moduleDef.canBeAddedToColumn = moduleContentType.canBeAddedToColumn;
     moduleDef.canBeAddedToColumn = moduleContentType.canBeAddedToColumn;
+    moduleDef.filePath = `/server/modules/${moduleDef.moduleSystemId}/models/${moduleDef.systemId}.json`
 
     let moduleDefString = JSON.stringify(moduleDef);
     await fileService.writeFile(moduleDef.filePath, moduleDefString);

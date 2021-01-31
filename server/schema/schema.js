@@ -248,6 +248,13 @@ const RootQuery = new GraphQLObjectType({
         return Tag.findById(args.id).populate("contents");
       },
     },
+
+    medias: {
+      type: new GraphQLList(FileType),
+      resolve(parent, args, context) {
+        return Tag.find({}).populate("contents");
+      },
+    },
   },
 });
 

@@ -228,7 +228,6 @@ if (typeof module !== "undefined" && module.exports) {
     }),
     (exports.contentTypeUpdate = async function (contentType) {
       let components = JSON.stringify(contentType.data);
-
       let result = await this.getAxios().post(apiUrl, {
         query: `
         mutation{
