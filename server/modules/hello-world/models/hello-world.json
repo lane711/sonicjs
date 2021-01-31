@@ -2,7 +2,7 @@
   "id": 99,
   "filePath": "/server/modules/hello-world/models/hello-world.json",
   "systemId": "hello-world",
-  "title": "Module - Hello World",
+  "title": "Hello World",
   "module":"Hello World",
   "moduleSystemId":"hello-world",
   "data": {
