@@ -289,7 +289,6 @@ if (typeof module !== "undefined" && module.exports) {
 
       let result = await this.getAxios().post(apiUrl, {
         query: `
-          {
             {
               content(url: "${url}") {
                 id

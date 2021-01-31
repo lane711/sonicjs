@@ -437,7 +437,7 @@ a.black {
   left: -60px;
   width: 60px;
   height: 60px;
-  background-image: url("/img/right-arrow.svg");
+  background-image: url("/assets/img/right-arrow.svg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 60px;
