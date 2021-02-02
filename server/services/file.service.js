@@ -43,6 +43,12 @@ module.exports = fileService = {
     return content;
   },
 
+  getFilesSync: function (relativeDir) {
+    let files = fs.readdirSync(path.join(appRoot.path + relativeDir));
+    // let filesRelative = fileService.convertFullPathToRelative(files);
+    return files;
+  },
+
   getFilesSearchSync: function (dir, pattern) {
     const files = glob.sync(path.join(dir + pattern));
     let filesRelative = fileService.convertFullPathToRelative(files);

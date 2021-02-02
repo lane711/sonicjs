@@ -7,6 +7,7 @@ const { GraphQLJSONObject } = require("graphql-type-json");
 const moduleService = require("../services/module.service");
 const { data } = require("jquery");
 const fileService = require("../services/file.service");
+const mediaService = require("../services/media.service");
 
 const {
   GraphQLObjectType,
@@ -107,6 +108,13 @@ const FileType = new GraphQLObjectType({
   fields: () => ({
     filePath: { type: GraphQLString },
     fileContent: { type: GraphQLString },
+  }),
+});
+
+const MediaType = new GraphQLObjectType({
+  name: "MediaType",
+  fields: () => ({
+    filePath: { type: GraphQLString },
   }),
 });
 
@@ -249,10 +257,10 @@ const RootQuery = new GraphQLObjectType({
       },
     },
 
-    medias: {
-      type: new GraphQLList(FileType),
+    media: {
+      type: new GraphQLList(MediaType),
       resolve(parent, args, context) {
-        return Tag.find({}).populate("contents");
+        return mediaService.getMedia();
       },
     },
   },

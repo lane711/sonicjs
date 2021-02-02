@@ -7,6 +7,7 @@ var fs = require('fs');
 const axios = require('axios');
 const ShortcodeTree = require('shortcode-tree').ShortcodeTree;
 const chalk = require('chalk');
+const fileService = require('./file.service');
 const log = console.log;
 var axiosInstance;
 
@@ -40,17 +41,25 @@ module.exports = mediaService = {
     },
 
     getMedia: async function () {
-        let url = '/api/containers/files/files';
-        return axiosInstance.get(url)
-        .then(async function (record) {
-            if (record.data) {
-                return record.data;
-            }
-            return 'not found';
-        })
-        .catch(function (error) {
-            console.log(error);
+
+        let mediaFilesList = fileService.getFilesSync('/server/assets/uploads');
+
+        let media = mediaFilesList.map(function(media) {
+            return {filePath: media};
         });
+
+        return media;
+        // let url = '/api/containers/files/files';
+        // return axiosInstance.get(url)
+        // .then(async function (record) {
+        //     if (record.data) {
+        //         return record.data;
+        //     }
+        //     return 'not found';
+        // })
+        // .catch(function (error) {
+        //     console.log(error);
+        // });
     },
 
     addMediaUrl: async function (mediaList) {
