@@ -115,7 +115,6 @@ $(document).ready(async function () {
 });
 
 function updateTreeData(formData) {
-  debugger;
   var selectedNode = $("#menuTree").jstree("get_selected", true)[0];
 
   if (selectedNode && formData) {
@@ -125,7 +124,7 @@ function updateTreeData(formData) {
   }
 
   // debugger;
-  let menuTitle = $("#menuMainEdit #title").val();
+  let menuTitle = $("#menuMainEdit #title-title").val();
 
   var links = $("#menuTree").jstree(true).get_json("#", { flat: false });
 
@@ -158,6 +157,7 @@ function loadMenuTitleForm() {
       {
         type: 'textfield',
         key: 'title',
+        id: 'title', 
         label: 'Menu Title',
         placeholder: 'ie: Main, Sidebar, Footer',
         input: true
