@@ -100,7 +100,7 @@ $(document).ready(async function () {
   });
 
   $("#deleteNode").on("click", function () {
-    let id = $("#menuTreeForm #id").val();
+    let id = $("#menuTreeForm input[id$='-id']").val();
 
     $("#menuTree").jstree().delete_node([id]);
 
