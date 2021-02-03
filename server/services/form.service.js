@@ -115,7 +115,8 @@ if (typeof module !== "undefined" && module.exports) {
       //   data: data,
       // });
 
-      let formHtml = await viewService.getProccessedView(
+      // debugger;
+      let formHtml = await dataService.getView(
         "",
         data.viewModel,
         data.viewPath

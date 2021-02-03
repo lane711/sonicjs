@@ -19,7 +19,7 @@ module.exports = keepAliveMainService = {
     },
 
     // processView: async function (contentType, viewModel, viewPath) {
-    //     var result = await viewService.getProccessedView(contentType, viewModel, viewPath);
+    //     var result = await viewService.getProcessedView(contentType, viewModel, viewPath);
 
     //     return result;
     // }

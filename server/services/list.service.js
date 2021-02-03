@@ -27,7 +27,7 @@ module.exports = {
             };
         });
 
-        var result = await viewService.getProccessedView(contentType, viewModel);
+        var result = await viewService.getProcessedView(contentType, viewModel);
 
         return result;
     },

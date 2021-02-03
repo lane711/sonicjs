@@ -55,7 +55,7 @@ module.exports = listMainService = {
   },
 
   processView: async function(contentType, viewModel, viewPath) {
-    var result = await viewService.getProccessedView(
+    var result = await viewService.getProcessedView(
       contentType,
       viewModel,
       viewPath

@@ -72,7 +72,7 @@ module.exports = cssService = {
 
     // console.log("processing template css data", viewModel);
     let cssPath = path.join(originalFilePath);
-    let processCssString = await viewService.getProccessedView(
+    let processCssString = await viewService.getProcessedView(
       "site-settings-colors",
       viewModel.data,
       cssPath

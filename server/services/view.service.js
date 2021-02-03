@@ -10,11 +10,12 @@ var handlebars = require('handlebars');
 
 module.exports = viewService = {
 
-    getProccessedView: async function (contentType, viewModel, viewPath) {
+    getProcessedView: function (contentType, viewModel, viewPath) {
+        // debugger;
 
       // return;
 
-        var source = await viewService.getHandlebarsTemplateForContentType(contentType, viewPath);
+        var source = viewService.getHandlebarsTemplateForContentType(contentType, viewPath);
         var template = handlebars.compile(source);
 
         // var data = await dataService.getContentByType(contentType);
@@ -33,7 +34,7 @@ module.exports = viewService = {
         return result;
     },
 
-    getHandlebarsTemplateForContentType: async function (contentType, viewPath) {
+    getHandlebarsTemplateForContentType: function (contentType, viewPath) {
         // let filePath = `/../views/partials/${contentType}/list.handlebars`;
         let file = fileService.getFileSync(viewPath);
         return file;

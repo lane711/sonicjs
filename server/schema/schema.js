@@ -8,6 +8,7 @@ const moduleService = require("../services/module.service");
 const { data } = require("jquery");
 const fileService = require("../services/file.service");
 const mediaService = require("../services/media.service");
+const viewService = require("../services/view.service");
 
 const {
   GraphQLObjectType,
@@ -115,6 +116,13 @@ const MediaType = new GraphQLObjectType({
   name: "MediaType",
   fields: () => ({
     filePath: { type: GraphQLString },
+  }),
+});
+
+const ViewType = new GraphQLObjectType({
+  name: "ViewType",
+  fields: () => ({
+    html: { type: GraphQLString },
   }),
 });
 
@@ -261,6 +269,19 @@ const RootQuery = new GraphQLObjectType({
       type: new GraphQLList(MediaType),
       resolve(parent, args, context) {
         return mediaService.getMedia();
+      },
+    },
+
+    view: {
+      type: ViewType,
+      args: {
+        contentType: { type: GraphQLString },
+        viewModel: { type: GraphQLString },
+        viewPath: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        let html = viewService.getProcessedView(args.contentType, JSON.parse(args.viewModel), args.viewPath);
+        return {html: html};
       },
     },
   },

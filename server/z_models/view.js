@@ -12,7 +12,7 @@ module.exports = function (View) {
         body.data.viewModel.formJSON = JSON.stringify(body.data.viewModel.formJSON );
         body.data.viewModel.formValuesToLoad = JSON.stringify(body.data.viewModel.formValuesToLoad );
 
-        let processedView = await viewService.getProccessedView(body.data.contentType, body.data.viewModel, viewServerPath)
+        let processedView = await viewService.getProcessedView(body.data.contentType, body.data.viewModel, viewServerPath)
 
         return processedView;
     };

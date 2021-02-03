@@ -309,12 +309,29 @@ if (typeof module !== "undefined" && module.exports) {
       return notFound;
     }),
     (exports.getContentByContentType = async function (contentType) {
-      var filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
-      let apiFullUrl = `${apiUrl}content?filter=${filter}`;
-      let record = await this.getAxios().get(apiFullUrl);
-      if (record.data) {
-        return record.data;
+
+      let result = await this.getAxios().post(apiUrl, {
+        query: `
+            {
+              contents(contentTypeId: "${contentType}") {
+                id
+                contentTypeId
+                data
+              }
+            }
+          `,
+      });
+
+      if (result.data.data.contents) {
+        return result.data.data.contents;
       }
+
+      // var filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
+      // let apiFullUrl = `${apiUrl}content?filter=${filter}`;
+      // let record = await this.getAxios().get(apiFullUrl);
+      // if (record.data) {
+      //   return record.data;
+      // }
 
       return notFound;
     }),
@@ -540,6 +557,35 @@ if (typeof module !== "undefined" && module.exports) {
       });
 
       return result.data.data.fileUpdate;
+    }),
+    (exports.getView = async function (contentType, viewModel, viewPath) {
+
+      let result = await this.getAxios().post(apiUrl, {
+        query: `
+        {
+          view(
+            contentType:"${contentType}",
+            viewModel: """${JSON.stringify(viewModel)}""",
+            viewPath:"${viewPath}"
+          ) {
+          html
+        }
+      }
+          `,
+      });
+
+      if (result.data.data.view.html) {
+        return result.data.data.view.html;
+      }
+
+      // var filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
+      // let apiFullUrl = `${apiUrl}content?filter=${filter}`;
+      // let record = await this.getAxios().get(apiFullUrl);
+      // if (record.data) {
+      //   return record.data;
+      // }
+
+      return notFound;
     }),
     (exports.asyncForEach = async function (array, callback) {
       for (let index = 0; index < array.length; index++) {

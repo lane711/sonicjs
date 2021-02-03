@@ -291,7 +291,7 @@ module.exports = moduleService = {
   },
 
   processView: async function (contentType, viewModel, viewPath) {
-    var result = await viewService.getProccessedView(
+    var result = await viewService.getProcessedView(
       contentType,
       viewModel,
       viewPath
@@ -344,7 +344,7 @@ module.exports = moduleService = {
       appRoot.path,
       "/server/assets/js/module-default-main-service.js"
     );
-    var mainServiceFile = await viewService.getProccessedView(
+    var mainServiceFile = await viewService.getProcessedView(
       null,
       moduleDefinitionFile,
       mainServiceFilePath

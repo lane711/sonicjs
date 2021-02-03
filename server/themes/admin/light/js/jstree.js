@@ -115,6 +115,7 @@ $(document).ready(async function () {
 });
 
 function updateTreeData(formData) {
+  debugger;
   var selectedNode = $("#menuTree").jstree("get_selected", true)[0];
 
   if (selectedNode && formData) {
