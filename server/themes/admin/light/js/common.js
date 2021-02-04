@@ -5,6 +5,7 @@ $(document).ready(async function () {
   })
 
   $('table').on('shown.bs.popover', function () {
+    // debugger;
     var btns = document.getElementsByClassName("custom-delete");
     for (var i = 0; i < btns.length; i++) {
       btns[i].onclick = async function (event) {

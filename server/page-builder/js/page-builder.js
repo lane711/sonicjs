@@ -698,17 +698,7 @@ async function editContentType(payload) {
 }
 
 async function deleteContentInstance(id) {
-  console.log("deleting content", id);
-  // return this.http.put(environment.apiUrl + `content/${id}`, payload).toPromise();
-  return axiosInstance
-    .delete(`/api/content/${id}`)
-    .then(async function (response) {
-      console.log(response);
-      return await response.data;
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+  dataService.contentDelete(id);
 }
 
 async function deleteContentType(id) {

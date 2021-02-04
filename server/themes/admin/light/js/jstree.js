@@ -1,6 +1,36 @@
 $(document).ready(async function () {
   $(".new-menu").click(async function () {
-    let links = [{ id: "home", parent: "#", text: "Home" }];
+    debugger;
+    let id = helperService.generateRandomString(11);
+    let links = [{
+      "id" : id, 
+      "text" : "New Link", 
+      "icon" : "fa fa-chevron-right", 
+      "li_attr" : {
+          "id" : id
+      }, 
+      "a_attr" : {
+          "href" : "#", 
+          "id" : `${id}_anchor`
+      }, 
+      "state" : {
+          "loaded" : true, 
+          "opened" : false, 
+          "selected" : true, 
+          "disabled" : false
+      }, 
+      "data" : {
+          "id" : id, 
+          "title" : "Home", 
+          "url" : "/", 
+          "showInMenu" : true, 
+          "showChildren" : false
+      }, 
+      "children" : [
+
+      ], 
+      "type" : "default"
+  }];
     var menu = {
       data: { title: "New Menu", contentType: "menu", links: links },
     };

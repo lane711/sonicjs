@@ -309,7 +309,6 @@ if (typeof module !== "undefined" && module.exports) {
       return notFound;
     }),
     (exports.getContentByContentType = async function (contentType) {
-
       let result = await this.getAxios().post(apiUrl, {
         query: `
             {
@@ -427,20 +426,6 @@ if (typeof module !== "undefined" && module.exports) {
       return result.data.data.contentUpdate;
     }),
     (exports.createContentInstance = async function (payload) {
-      // console.log('createContentInstance payload', payload);
-      // let content = {};
-      // content.data = payload;
-      // this.processContentFields(payload, content);
-      // console.log("payload", payload);
-      // if (payload.id || "id" in payload) {
-      //   delete payload.id;
-      // }
-
-      // if (!payload.data) {
-      //   let temp = { data: payload };
-      //   payload = temp;
-      // }
-
       let url = helperService.generateSlugFromContent(payload.data, true, true);
 
       let query = `
@@ -457,36 +442,30 @@ if (typeof module !== "undefined" && module.exports) {
       }
           `;
 
-      // # mutation{
-      //   #   contentCreate(contentTypeId:"junk", createdByUserId:"5fce47cc9131954036b6e476",
-      //   #     lastUpdatedByUserId:"5fce47cc9131954036b6e476", url:"/should-be-unique",
-      //   #   	data:{name: "54565", prop:"ipsum de lor"}){
-      //   # 			data
-      //   #     	contentTypeId
-      //   #     id
-      //   #     createdOn
-      //   #   }
-      //   # }
-
       let result = await this.getAxios().post(apiUrl, {
         query: query,
       });
 
       return result.data.data.contentCreate;
-
-      // return new Promise((resolve, reject) => {
-      //   this.getAxios()
-      //     .post("/api/content/", payload)
-      //     .then(async function (response) {
-      //       // console.log("ok", response.data);
-      //       resolve(response.data);
-      //     })
-      //     .catch(function (error) {
-      //       console.log("err");
-      //       reject(error);
-      //     });
-      // });
     });
+
+  exports.contentDelete = async function (id) {
+
+    let query = `
+      mutation{
+        contentDelete( 
+          id:"${id}"){
+            id
+          }
+      }
+          `;
+
+    let result = await this.getAxios().post(apiUrl, {
+      query: query,
+    });
+
+    return result.data.data.contentCreate;
+  };
 
   (exports.getContentById = async function (id) {
     // let url = `${apiUrl}content/${id}`;
@@ -559,7 +538,6 @@ if (typeof module !== "undefined" && module.exports) {
       return result.data.data.fileUpdate;
     }),
     (exports.getView = async function (contentType, viewModel, viewPath) {
-
       let result = await this.getAxios().post(apiUrl, {
         query: `
         {

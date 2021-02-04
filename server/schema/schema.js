@@ -433,6 +433,16 @@ const Mutation = new GraphQLObjectType({
       },
     },
 
+    contentDelete: {
+      type: ContentType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parent, args) {
+        return Content.findByIdAndDelete(args.id);
+      },
+    },
+
     // content type mutations
     contentTypeUpdate: {
       type: ContentTypeType,
