@@ -149,16 +149,8 @@ module.exports = adminService = {
             undefined,
             "await submitContent(submission,true,'user');"
           );
-          data.editFormRole = await formService.getForm(
-            "role",
-            undefined,
-            "submitContent(submission,true,'role')"
-          );
           let users = await userService.getUsers();
-          let roles = await userService.getRoles();
           data.users = users;
-          data.roles = roles;
-          // console.log(data);
         }
 
         if (viewName == "admin-roles") {
