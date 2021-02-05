@@ -262,20 +262,28 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.contentType;
     }),
-    (exports.createContentType = async function (contentType) {
-      let url = `${apiUrl}contentTypes`;
-      // let contentTypes = await this.getAxios().post(url, contentType);
-      this.getAxios()
-        .post(url, contentType)
-        .then(async function (response) {
-          // console.log(response);
-          return response.data;
-        })
-        .catch(function (error) {
-          console.log(error.response.data);
-          return error;
-        });
+
+    (exports.contentTypeCreate = async function (contentType) {
+
+      let query =`
+      mutation{
+        contentTypeCreate( 
+          title:"${contentType.title}", 
+          moduleSystemId:"${contentType.moduleSystemId}", 
+          systemId:"${contentType.systemId}")
+          {
+            title
+        }
+      }
+          `;
+      let result = await this.getAxios().post(apiUrl, {
+        query: query,
+      });
+
+      return result.data.data.contentType;
     }),
+
+
     (exports.getContentTopOne = async function (contentType) {
       let results = await this.getContentByType(contentType);
       return results[0];

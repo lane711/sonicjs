@@ -488,9 +488,7 @@ const Mutation = new GraphQLObjectType({
         moduleSystemId: { type: new GraphQLNonNull(GraphQLString) },
       },
       resolve(parent, args) {
-        moduleService.createModuleContentType(args).then((data) => {
-          return data;
-        });
+        return moduleService.createModuleContentType(args);
       },
     },
 

@@ -281,16 +281,9 @@
 
                   form.on('submit', async function (submission) {
                     var accessToken = '{{ this.accessToken }}';
-                    axios.post(`/api/modules/createModuleContentType?access_token=${accessToken}`, submission.data)
-                      .then(async function (response) {
-                        console.log(response);
-                        window.location.replace('/admin/modules/edit/' + response.data.data.moduleSystemId);
-
-                      })
-                      .catch(function (error) {
-                        console.log(error);
-                      });
-
+                    dataService.contentTypeCreate(submission.data).then(() =>{
+                      fullPageUpdate();
+                    })
                   });
                 });
             }
