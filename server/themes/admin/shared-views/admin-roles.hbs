@@ -1,31 +1,33 @@
 <div class="col-lg-12">
 
+
   <div class="card">
     <div class="card-header">
-      <i class="fa fa-align-justify"></i> Users
-      <a href="javascript:void(0)" onclick="openNewContentTypeModal()"
-        class="btn btn-success float-right new-content-type">New User</a>
+      <i class="fa fa-align-justify"></i> Roles
+      <a href="javascript:void(0)" onclick="openNewRoleModal()"
+        class="btn btn-success float-right new-content-type">New Role</a>
     </div>
     <div class="card-body page-list">
       <table class="table table-responsive-sm table-striped">
         <thead>
           <tr>
-            <th>Email</th>
             <th>Name</th>
+            <th>Description</th>
             <th class="text-right">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {{#each data.users}}
+          {{#each data.roles}}
+          {{ log this}}
           <tr>
-            <td><a href="/admin/user/edit/{{ this.id }}">{{ this.username }}</a></td>
-            <td>{{ this.firstName }} {{ this.lastName }}</td>
+            <td><a href="/admin/role/edit/{{ this.id }}">{{ this.data.title }}</a></td>
+            <td>{{ this.data.description }}</td>
             <td class="text-right">
-              <a class="btn btn-sm btn-primary rmargin" href="/admin/user/edit/{{ this.id }}">Edit</a>
+              <a class="btn btn-sm btn-primary rmargin" href="/admin/role/edit/{{ this.id }}">Edit</a>
 
 
               <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
-                data-trigger="focus" title="Delete <b>{{ this.data.title }}</b> Forever?" data-content="<a href='/user/{{ this.id }}'
+                data-trigger="focus" title="Delete <b>{{ this.data.name }}</b> Forever?" data-content="<a href='/Role/{{ this.id }}'
 class='btn btn-sm btn-danger rmargin'>Confirm Delete</a>
 ">Delete</a>
 
@@ -38,24 +40,23 @@ class='btn btn-sm btn-danger rmargin'>Confirm Delete</a>
 
     </div>
   </div>
+
+
 </div>
 
 
-<!-- New User Modal -->
-<div class="modal fade" id="newContentTypeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+<!-- New Role Modal -->
+<div class="modal fade" id="newRoleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">New User</h5>
+        <h5 class="modal-title" id="exampleModalLabel">New Role</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-
-        {{{ data.editFormUser }}}
-
       </div>
     </div>
   </div>
