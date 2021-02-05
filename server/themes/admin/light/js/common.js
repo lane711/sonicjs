@@ -32,7 +32,7 @@ $(document).ready(async function () {
           }
 
           if (typeToDelete == "Role") {
-            await deleteRole(idToDelete);
+            await deleteContentInstance(idToDelete);
             location.reload();
           }
 

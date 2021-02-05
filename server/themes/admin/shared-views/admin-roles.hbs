@@ -28,7 +28,7 @@
 
               <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
                 data-trigger="focus" title="Delete <b>{{ this.data.name }}</b> Forever?" data-content="<a href='/Role/{{ this.id }}'
-class='btn btn-sm btn-danger rmargin'>Confirm Delete</a>
+class='btn btn-sm btn-danger rmargin custom-delete'>Confirm Delete</a>
 ">Delete</a>
 
             </td>
@@ -57,6 +57,9 @@ class='btn btn-sm btn-danger rmargin'>Confirm Delete</a>
         </button>
       </div>
       <div class="modal-body">
+
+        {{{ data.editFormRole }}}
+
       </div>
     </div>
   </div>

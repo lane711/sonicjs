@@ -704,6 +704,7 @@ async function editContentType(payload) {
 }
 
 async function deleteContentInstance(id) {
+  debugger;
   dataService.contentDelete(id);
 }
 
@@ -733,32 +734,6 @@ async function deleteUser(id) {
       console.log(error);
     });
 }
-
-async function deleteRole(id) {
-  // debugger;
-  console.log("deleting role", id);
-  // return this.http.put(environment.apiUrl + `content/${id}`, payload).toPromise();
-  axiosInstance
-    .delete(`/api/Roles/${id}`)
-    .then(async function (response) {
-      console.log(response);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-}
-
-// function processContentFields(payload, content) {
-//     for (var property in payload) {
-//         if (payload.hasOwnProperty(property)) {
-//             if (property == 'url' || property == 'id') {
-//                 content.url = payload.url;
-//                 continue;
-//             }
-//             content.data[property] = payload[property];
-//         }
-//     }
-// }
 
 function processContentFields(payload) {
   return { id: payload.id, data: payload };
