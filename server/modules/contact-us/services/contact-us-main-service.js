@@ -36,7 +36,7 @@ module.exports = contactUsMainService = {
       }
 
       // save the form
-      await dataService.createContentInstance(options);
+      await dataService.contentCreate(options);
 
       // send the emails
       let contact = options.data;

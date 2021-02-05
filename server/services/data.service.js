@@ -90,6 +90,24 @@ if (typeof module !== "undefined" && module.exports) {
       // debugger;
       return axiosInstance;
     }),
+
+    (exports.userCreate = async function (email, password) {
+      debugger;
+      const query = `
+      mutation{
+        userCreate(email:"${email}", password:"${password}"){
+          email
+          id
+        }
+      }
+        `;
+  
+      let data = await dataService.executeGraphqlQuery(query);
+  
+      return data.contents;
+    });
+
+
     (exports.getContent = async function () {
       //HACK removing sort bc LB not working with RDMS
       // const filter = ""; //encodeURI(`{"order":"data.createdOn DESC"}`);
@@ -425,7 +443,7 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.contentUpdate;
     }),
-    (exports.createContentInstance = async function (payload) {
+    (exports.contentCreate = async function (payload) {
       let url = helperService.generateSlugFromContent(payload.data, true, true);
 
       let query = `
@@ -559,7 +577,7 @@ if (typeof module !== "undefined" && module.exports) {
       // var filter = encodeURI(`{"where":{"data.contentType":"${contentType}"}}`);
       // let apiFullUrl = `${apiUrl}content?filter=${filter}`;
       // let record = await this.getAxios().get(apiFullUrl);
-      // if (record.data) {
+      // if (record.data) { p
       //   return record.data;
       // }
 

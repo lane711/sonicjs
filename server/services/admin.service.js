@@ -19,7 +19,6 @@ const chalk = require("chalk");
 const log = console.log;
 var _ = require("underscore");
 
-
 const adminTheme = `${process.env.ADMIN_THEME}`;
 // var loopback = require("loopback");
 // var app = loopback();
@@ -150,13 +149,13 @@ module.exports = adminService = {
             undefined,
             "await submitContent(submission,true,'user');"
           );
-          // data.editFormRole = await formService.getForm(
-          //   "role",
-          //   undefined,
-          //   "submitContent(submission,true,'role')"
-          // );
+          data.editFormRole = await formService.getForm(
+            "role",
+            undefined,
+            "submitContent(submission,true,'role')"
+          );
           let users = await userService.getUsers();
-          let roles = []; //await userService.getRoles();
+          let roles = await userService.getRoles();
           data.users = users;
           data.roles = roles;
           // console.log(data);
@@ -166,21 +165,18 @@ module.exports = adminService = {
           data.editForm = await formService.getForm(
             "role",
             undefined,
-            "submitContent(submission,true,'Role');"
+            "submitContent(submission,true,'role');"
           );
         }
 
         if (viewName == "admin-role-edit") {
-          let role = { id: param1 };
-          if (param1) {
-            let roleRecord = await userService.getRole(param1);
-            role.data = roleRecord.__data;
-            role.data.contentType = "Role";
-          }
+          let roleId = param1 ;
+          let role = await dataService.getContentById(roleId);
+
           data.editForm = await formService.getForm(
             "role",
             role,
-            'submitContent(submission, true, "Roles");'
+            'submitContent(submission, true, "role");'
           );
         }
 

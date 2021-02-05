@@ -36,7 +36,6 @@
             </thead>
             <tbody>
               {{#each data.users}}
-              {{ log this }}
               <tr>
                 <td><a href="/admin/user/edit/{{ this.id }}">{{ this.username }}</a></td>
                 <td>{{ this.firstName }} {{ this.lastName }}</td>
@@ -65,7 +64,8 @@
       <div class="card">
         <div class="card-header">
           <i class="fa fa-align-justify"></i> Roles
-          <a href="/admin/role/new" class="btn btn-success float-right new-content-type">New Role</a>
+          <a href="javascript:void(0)" onclick="openNewRoleModal()"
+            class="btn btn-success float-right new-content-type">New Role</a>
         </div>
         <div class="card-body page-list">
           <table class="table table-responsive-sm table-striped">
@@ -78,15 +78,16 @@
             </thead>
             <tbody>
               {{#each data.roles}}
+              {{ log this}}
               <tr>
-                <td><a href="/admin/role/edit/{{ this.id }}">{{ this.name }}</a></td>
-                <td>{{ this.description }}</td>
+                <td><a href="/admin/role/edit/{{ this.id }}">{{ this.data.title }}</a></td>
+                <td>{{ this.data.description }}</td>
                 <td class="text-right">
                   <a class="btn btn-sm btn-primary rmargin" href="/admin/role/edit/{{ this.id }}">Edit</a>
 
 
                   <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
-                    data-trigger="focus" title="Delete <b>{{ this.data.title }}</b> Forever?" data-content="<a href='/Role/{{ this.id }}'
+                    data-trigger="focus" title="Delete <b>{{ this.data.name }}</b> Forever?" data-content="<a href='/Role/{{ this.id }}'
    class='btn btn-sm btn-danger rmargin'>Confirm Delete</a>
 ">Delete</a>
 
@@ -151,7 +152,7 @@
       </div>
       <div class="modal-body">
 
-        {{!-- {{{ data.editFormRole }}} --}}
+        {{{ data.editFormRole }}}
 
       </div>
       {{!-- <div class="modal-footer">

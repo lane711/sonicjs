@@ -91,19 +91,10 @@ module.exports = userService = {
   },
 
   getRoles: async function () {
-    const query = gql`
-    {
-      roles {
-        id
-        username
-        password
-      }
-    }
-  `;
 
-  let data = await dataService.executeGraphqlQuery(query);
+  let data = await dataService.getContentByContentType('role');
 
-  return data.users;
+  return data;
   },
 
   // getRole: async function (id) {

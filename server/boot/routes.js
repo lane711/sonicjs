@@ -262,7 +262,7 @@ exports.loadRoutes = async function (app) {
 
     //copy module
     let moduleToCopy = await dataService.getContentById(data.moduleId);
-    let newModule = await dataService.createContentInstance(moduleToCopy);
+    let newModule = await dataService.contentCreate(moduleToCopy);
 
     let sectionColumn =
       section.data.rows[data.rowIndex].columns[data.columnIndex];

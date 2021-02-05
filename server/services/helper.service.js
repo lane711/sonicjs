@@ -80,6 +80,7 @@
       return slug;
     });
     (exports.generateSlugFromContent = function(content, includePrecedingSlash = false, makeUnique = false) {
+      // debugger;
       let copy = content.title ?? content.body ?? content.alertCopy ?? content.contentType;
       let copyClean = formattingService.stripHtmlTags(copy)
       let slug = helperService.slugify(copy);

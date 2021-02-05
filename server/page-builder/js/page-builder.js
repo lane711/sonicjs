@@ -587,22 +587,28 @@ async function createInstance(
     payload = payload.data;
   }
 
-  await dataService
-    .createContentInstance(payload)
-    .then(async function (response) {
-      // debugger;
-      console.log("editInstance", response);
-      // resolve(response.data);
-      // return await response.data;
-      if (response.contentTypeId === "page" && !globalService.isBackEnd()) {
-        window.location.href = response.url;
-      } else if (refresh) {
-        fullPageUpdate();
-      }
-    })
-    .catch(function (error) {
-      console.log("editInstance", error);
-    });
+  let entity = await dataService.contentCreate(payload);
+
+  if (entity.contentTypeId === "page" && !globalService.isBackEnd()) {
+    window.location.href = entity.url;
+  } else if (refresh) {
+    fullPageUpdate();
+  }
+
+  // .then(async function (response) {
+  //   // debugger;
+  //   console.log("editInstance", response);
+  //   // resolve(response.data);
+  //   // return await response.data;
+  //   if (response.contentTypeId === "page" && !globalService.isBackEnd()) {
+  //     window.location.href = response.url;
+  //   } else if (refresh) {
+  //     fullPageUpdate();
+  //   }
+  // })
+  // .catch(function (error) {
+  //   console.log("editInstance", error);
+  // });
   // return axiosInstance
   //   .post(`/api/${contentType}/`, payload)
   //   .then(async function (response) {
@@ -1284,10 +1290,10 @@ async function submitContent(
   if (!contentType.startsWith("user")) {
     entity = processContentFields(submission.data);
   }
-  if (contentType.toLowerCase().startsWith("role")) {
-    contentType = "Roles";
-    entity = submission.data;
-  }
+  // if (contentType.toLowerCase().startsWith("role")) {
+  //   contentType = "Roles";
+  //   entity = submission.data;
+  // }
   if (submission.id || submission.data.id) {
     if (contentType.startsWith("user")) {
       await editInstanceUser(entity, refresh, contentType);
@@ -1295,7 +1301,11 @@ async function submitContent(
       await editInstance(entity, refresh, contentType);
     }
   } else {
-    await createInstance(entity, true, contentType);
+    if (contentType === "user") {
+      await dataService.userCreate(entity.email, entity.password);
+    } else {
+      await createInstance(entity, true, contentType);
+    }
   }
 }
 
