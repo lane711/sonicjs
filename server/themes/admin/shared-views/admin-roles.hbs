@@ -18,7 +18,6 @@
         </thead>
         <tbody>
           {{#each data.roles}}
-          {{ log this}}
           <tr>
             <td><a href="/admin/role/edit/{{ this.id }}">{{ this.data.title }}</a></td>
             <td>{{ this.data.description }}</td>

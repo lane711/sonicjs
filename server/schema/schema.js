@@ -300,15 +300,18 @@ const Mutation = new GraphQLObjectType({
         password: { type: new GraphQLNonNull(GraphQLString) },
       },
       resolve(parent, args) {
-        let now = new Date();
-        let user = new User({
-          username: args.username,
-          password: args.password,
-          createdOn: now,
-          updatedOn: now,
-          realm: ["default"],
-        });
-        return user.save();
+        // let now = new Date();
+        // let user = new User({
+        //   username: args.username,
+        //   password: args.password,
+        //   createdOn: now,
+        //   updatedOn: now,
+        //   realm: ["default"],
+        // });
+        let newUser = User.register({ username: args.username, active: false }, args.password);
+
+        return newUser;
+        // return user.save();
       },
     },
     // addBook: {
