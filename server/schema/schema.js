@@ -280,8 +280,12 @@ const RootQuery = new GraphQLObjectType({
         viewPath: { type: GraphQLString },
       },
       resolve(parent, args) {
-        let html = viewService.getProcessedView(args.contentType, JSON.parse(args.viewModel), args.viewPath);
-        return {html: html};
+        let html = viewService.getProcessedView(
+          args.contentType,
+          JSON.parse(args.viewModel),
+          args.viewPath
+        );
+        return { html: html };
       },
     },
   },
@@ -300,6 +304,51 @@ const Mutation = new GraphQLObjectType({
         password: { type: new GraphQLNonNull(GraphQLString) },
       },
       resolve(parent, args) {
+        let now = new Date();
+        let user = new User({
+          username: args.username,
+          password: args.password,
+          createdOn: now,
+          updatedOn: now,
+          realm: ["default"],
+          profile: { firstName: "Lane" },
+        });
+        user.save();
+
+        let newUser = User.register(
+          { username: args.username, active: false },
+          args.password
+        ).then((user) => {
+          let userRecord = User.findById(user.id);
+          userRecord.profile = { prop: "ipsum" };
+          userRecord.save();
+        });
+
+        return newUser;
+        // return user.save();
+      },
+    },
+    userUpdate: {
+      type: UserType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLID) },
+        password: { type: GraphQLString },
+        profile: {
+          type: new GraphQLNonNull(GraphQLString),
+        },
+      },
+      resolve(parent, args) {
+        let profileObj = JSON.parse(args.profile);
+
+        let userDoc = User.findByIdAndUpdate(args.id, { 
+          lastLoginOn: new Date(),
+          profile: profileObj
+        });
+        userDoc.exec();
+
+        // userRecord.profile = { prop: "ipsum" };
+        // return userRecord.save();
+
         // let now = new Date();
         // let user = new User({
         //   username: args.username,
@@ -307,10 +356,17 @@ const Mutation = new GraphQLObjectType({
         //   createdOn: now,
         //   updatedOn: now,
         //   realm: ["default"],
+        //   profile: {firstName: 'Lane'}
         // });
-        let newUser = User.register({ username: args.username, active: false }, args.password);
+        // user.save();
 
-        return newUser;
+        // let newUser = User.register({ username: args.username, active: false }, args.password).then(user =>{
+        //   let userRecord = User.findById(user.id);
+        //   userRecord.profile = {prop:'ipsum'};
+        //   userRecord.save();
+        // })
+
+        // return newUser;
         // return user.save();
       },
     },
