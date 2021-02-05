@@ -480,6 +480,20 @@ const Mutation = new GraphQLObjectType({
     },
 
     // content type mutations
+    contentTypeCreate: {
+      type: ContentTypeType,
+      args: {
+        title: { type: new GraphQLNonNull(GraphQLString) },
+        systemId: { type: new GraphQLNonNull(GraphQLString) },
+        moduleSystemId: { type: new GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parent, args) {
+        moduleService.createModuleContentType(args).then((data) => {
+          return data;
+        });
+      },
+    },
+
     contentTypeUpdate: {
       type: ContentTypeType,
       args: {
