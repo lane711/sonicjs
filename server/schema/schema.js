@@ -304,24 +304,29 @@ const Mutation = new GraphQLObjectType({
         password: { type: new GraphQLNonNull(GraphQLString) },
       },
       resolve(parent, args) {
-        let now = new Date();
-        let user = new User({
-          username: args.username,
-          password: args.password,
-          createdOn: now,
-          updatedOn: now,
-          realm: ["default"],
-          profile: { firstName: "Lane" },
-        });
-        user.save();
+        // let now = new Date();
+        // let user = new User({
+        //   username: args.username,
+        //   password: args.password,
+        //   createdOn: now,
+        //   updatedOn: now,
+        //   realm: ["default"],
+        //   profile: { firstName: "Lane" },
+        // });
+        // user.save();
 
         let newUser = User.register(
           { username: args.username, active: false },
           args.password
         ).then((user) => {
-          let userRecord = User.findById(user.id);
-          userRecord.profile = { prop: "ipsum" };
-          userRecord.save();
+          // let userRecord = User.findById(user.id);
+          // userRecord.profile = { prop: "ipsum" };
+          // userRecord.save();
+
+          // let userRecord = User.findByIdAndUpdate(
+          //   args.tagId, {profile: {prop: "ipsum"}}
+          // );
+          // userRecord.exec();
         });
 
         return newUser;

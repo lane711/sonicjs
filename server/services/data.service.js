@@ -90,33 +90,33 @@ if (typeof module !== "undefined" && module.exports) {
       // debugger;
       return axiosInstance;
     }),
-
     (exports.userCreate = async function (email, password) {
       debugger;
-      const query = `
-      mutation{
-        userCreate(email:"${email}", password:"${password}"){
-          email
-          id
-        }
-      }
-        `;
-  
-      let data = await dataService.executeGraphqlQuery(query);
-  
-      return data.contents;
-    });
-
-
-    (exports.getContent = async function () {
-      //HACK removing sort bc LB not working with RDMS
-      // const filter = ""; //encodeURI(`{"order":"data.createdOn DESC"}`);
-
-      // let url = `${apiUrl}content?filter=${filter}`;
-      // let page = await this.getAxios().get(url);
 
       let result = await this.getAxios().post(apiUrl, {
         query: `
+          mutation{
+            userCreate(username:"${email}", password:"${password}")
+            {
+              username
+              id
+            }
+          }
+              `,
+      });
+
+      return result.userCreate;
+    });
+
+  (exports.getContent = async function () {
+    //HACK removing sort bc LB not working with RDMS
+    // const filter = ""; //encodeURI(`{"order":"data.createdOn DESC"}`);
+
+    // let url = `${apiUrl}content?filter=${filter}`;
+    // let page = await this.getAxios().get(url);
+
+    let result = await this.getAxios().post(apiUrl, {
+      query: `
         {
           contents{
             id
@@ -135,15 +135,15 @@ if (typeof module !== "undefined" && module.exports) {
           }
         }
           `,
-      });
+    });
 
-      if (result.data.data.contents) {
-        let content = result.data.data.contents;
-        await formattingService.formatDates(content);
-        await formattingService.formatTitles(content);
-        return content;
-      }
-    }),
+    if (result.data.data.contents) {
+      let content = result.data.data.contents;
+      await formattingService.formatDates(content);
+      await formattingService.formatTitles(content);
+      return content;
+    }
+  }),
     (exports.getContentAdmin = async function () {
       let contents = await this.getContent();
       //HACK removing sort bc LB not working with RDMS
@@ -262,10 +262,8 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.contentType;
     }),
-
     (exports.contentTypeCreate = async function (contentType) {
-
-      let query =`
+      let query = `
       mutation{
         contentTypeCreate( 
           title:"${contentType.title}", 
@@ -282,8 +280,6 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.contentType;
     }),
-
-
     (exports.getContentTopOne = async function (contentType) {
       let results = await this.getContentByType(contentType);
       return results[0];
@@ -476,7 +472,6 @@ if (typeof module !== "undefined" && module.exports) {
     });
 
   exports.contentDelete = async function (id) {
-
     let query = `
       mutation{
         contentDelete( 

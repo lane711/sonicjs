@@ -145,7 +145,7 @@ module.exports = adminService = {
 
         if (viewName == "admin-users") {
           data.editFormUser = await formService.getForm(
-            "user",
+            "user-register",
             undefined,
             "await submitContent(submission,true,'user');"
           );
@@ -187,14 +187,16 @@ module.exports = adminService = {
           let user = { id: param1 };
           if (param1) {
             let userRecord = await userService.getUser(param1);
-            user.data = userRecord.__data;
-            user.data.contentType = "user";
+            // user.profile = userRecord.profile ? userRecord.profile : {};
+            // user.data.contentType = "user";
+
+            data.editForm = await formService.getForm(
+              "user",
+              userRecord,
+              'submitContent(submission, true, "user");'
+            );
           }
-          data.editForm = await formService.getForm(
-            "user",
-            user,
-            'submitContent(submission, true, "user");'
-          );
+
         }
 
         let accessToken = "fakeToken"; //await userService.getToken(req);
