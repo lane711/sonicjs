@@ -322,7 +322,6 @@ const Mutation = new GraphQLObjectType({
           // let userRecord = User.findById(user.id);
           // userRecord.profile = { prop: "ipsum" };
           // userRecord.save();
-
           // let userRecord = User.findByIdAndUpdate(
           //   args.tagId, {profile: {prop: "ipsum"}}
           // );
@@ -338,16 +337,34 @@ const Mutation = new GraphQLObjectType({
       args: {
         id: { type: new GraphQLNonNull(GraphQLID) },
         password: { type: GraphQLString },
-        profile: {
+        data: {
           type: new GraphQLNonNull(GraphQLString),
         },
       },
       resolve(parent, args) {
-        let profileObj = JSON.parse(args.profile);
+        let profileObj = JSON.parse(args.data);
+        if (profileObj.password !== "_temp_password") {
+          //password has been updated
+          User.findByUsername(profileObj.email).then(
+            function (user) {
+              if (user) {
+                user.setPassword(profileObj.password, function () {
+                  user.save();
+                  console.log("password reset successful");
+                });
+              } else {
+                console.log("This user does not exist");
+              }
+            },
+            function (err) {
+              console.error(err);
+            }
+          );
+        }
 
-        let userDoc = User.findByIdAndUpdate(args.id, { 
+        let userDoc = User.findByIdAndUpdate(args.id, {
           lastLoginOn: new Date(),
-          profile: profileObj
+          profile: profileObj,
         });
         userDoc.exec();
       },

@@ -661,42 +661,43 @@ async function editInstance(payload, refresh, contentType = "content") {
 }
 
 async function editInstanceUser(payload, refresh, contentType = "content") {
-  let id = payload.id;
-  if (payload.id) {
-    delete payload.id;
-  }
-  if (payload.data && payload.data.id) {
-    id = payload.data.id;
-    delete payload.data.id;
-  }
-  if (contentType === "users") {
-    if (payload.data && payload.data.password) {
-      payload.password = payload.data.password;
-    }
-    if (payload.data && payload.data.email) {
-      payload.email = payload.data.email;
-    }
-  }
+  // let id = payload.id;
+  // if (payload.id) {
+  //   delete payload.id;
+  // }
+  // if (payload.data && payload.data.id) {
+  //   id = payload.data.id;
+  //   delete payload.data.id;
+  // }
+  // if (contentType === "users") {
+  //   if (payload.data && payload.data.password) {
+  //     payload.password = payload.data.password;
+  //   }
+  //   if (payload.data && payload.data.email) {
+  //     payload.email = payload.data.email;
+  //   }
+  // }
 
+  await dataService.userUpdate(payload);
   //update user
-  return axiosInstance
-    .put(`/api/${contentType}/${id}`, payload)
-    .then(async function (response) {
-      // debugger;
-      console.log("editInstance", response);
-      // resolve(response.data);
-      // return await response.data;
-      debugger;
-      if (response.data.data.url) {
-        fullPageUpdate(response.data.data.url);
-      } else if (refresh) {
-        fullPageUpdate();
-      }
-    })
-    .catch(function (error) {
-      // debugger;
-      console.log("editInstance", error);
-    });
+  // return axiosInstance
+  //   .put(`/api/${contentType}/${id}`, payload)
+  //   .then(async function (response) {
+  //     // debugger;
+  //     console.log("editInstance", response);
+  //     // resolve(response.data);
+  //     // return await response.data;
+  //     debugger;
+  //     if (response.data.data.url) {
+  //       fullPageUpdate(response.data.data.url);
+  //     } else if (refresh) {
+  //       fullPageUpdate();
+  //     }
+  //   })
+  //   .catch(function (error) {
+  //     // debugger;
+  //     console.log("editInstance", error);
+  //   });
 }
 
 async function editContentType(payload) {
