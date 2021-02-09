@@ -16,7 +16,7 @@ var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
 
 module.exports = userService = {
-  startup: async function () {
+  startup: async function (app) {
     emitterService.on("getRenderedPagePostDataFetch", async function (options) {
       if (options) {
         options.page.data.showPageBuilder = await userService.isAuthenticated(
@@ -24,6 +24,14 @@ module.exports = userService = {
         );
       }
     });
+
+    app.get("/api-admin/roles", async function (req, res) {
+      let data = await dataService.rolesGet();
+      let roles = data.map(r => {
+        return {id: r.id, name: r.data.title};
+      });
+      res.send(roles);
+    })
   },
 
   createUser: async function (username, password) {

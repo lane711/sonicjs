@@ -64,7 +64,7 @@ exports.loadRoutes = async function (app) {
     await mediaService.startup();
     await siteSettingsService.startup();
     await themeSettingsService.startup();
-    await userService.startup();
+    await userService.startup(app);
     await assetService.startup();
 
     await emitterService.emit("startup");

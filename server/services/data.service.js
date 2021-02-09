@@ -128,6 +128,24 @@ if (typeof module !== "undefined" && module.exports) {
     return result.data.data.contentType;
   }),
 
+  (exports.rolesGet = async function () {
+
+    let result = await this.getAxios().post(apiUrl, {
+      query: `
+      {
+        roles {
+          id
+          data
+        }
+      }
+        `,
+    });
+
+    if (result.data.data.roles) {
+      return result.data.data.roles;
+    }
+  }),
+
     (exports.getContent = async function () {
       //HACK removing sort bc LB not working with RDMS
       // const filter = ""; //encodeURI(`{"order":"data.createdOn DESC"}`);
