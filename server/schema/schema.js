@@ -174,6 +174,18 @@ const RootQuery = new GraphQLObjectType({
         return User.find({});
       },
     },
+    roles: {
+      type: new GraphQLList(ContentType),
+      resolve(parent, args) {
+        let data = Content.find({
+          contentTypeId: "role",
+        });
+
+        return data.map(function (r) {
+          return r.id;
+        });
+      },
+    },
     content: {
       type: ContentType,
       //argument passed by the user while making the query

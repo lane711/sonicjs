@@ -705,7 +705,7 @@ async function editContentType(payload) {
 }
 
 async function deleteContentInstance(id) {
-  debugger;
+  // debugger;
   dataService.contentDelete(id);
 }
 
