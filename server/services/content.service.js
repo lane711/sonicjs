@@ -87,6 +87,8 @@ module.exports = contentService = {
 
     this.page.data.appVersion = globalService.getAppVersion;
 
+    this.page.data.metaTitle = this.page.data.metaTitle ? this.page.data.metaTitle  : this.page.data.title;
+
     let cache = cacheService.getCache();
     success = cache.set(req.url, this.page);
     // console.log(success);

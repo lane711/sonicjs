@@ -1346,18 +1346,21 @@ async function writeFile(container, file) {
   let formData = new FormData();
   formData.append("file", file);
 
-  axiosInstance
-    .post(`/api/containers/${container}/upload`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    })
-    .then(function () {
-      console.log("SUCCESS!!");
-    })
-    .catch(function () {
-      console.log("FAILURE!!");
-    });
+  debugger;
+  await dataService.fileUpdate(file, container);
+
+  // axiosInstance
+  //   .post(`/api/containers/${container}/upload`, formData, {
+  //     headers: {
+  //       "Content-Type": "multipart/form-data",
+  //     },
+  //   })
+  //   .then(function () {
+  //     console.log("SUCCESS!!");
+  //   })
+  //   .catch(function () {
+  //     console.log("FAILURE!!");
+  //   });
 }
 
 async function setupACEEditor() {
@@ -1395,10 +1398,14 @@ async function setupACEEditor() {
     $("#templateCss").html(val);
   }
 
-  $("#save-global-css").click(function () {
+  $("#save-global-css").click(async function () {
+    debugger;
     let cssContent = editor.getSession().getValue();
-    let file = new File([cssContent], "template.css", { type: "text/css" });
-    writeFile("css", file);
+    
+    // let file = new File([cssContent], "template.css", { type: "text/css" });
+    await dataService.fileUpdate('/server/themes/front-end/bootstrap/css/template.css', cssContent);
+
+    // writeFile("css", file);
   });
 
   beatifyACECss();
