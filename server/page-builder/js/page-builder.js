@@ -462,7 +462,7 @@ async function generateNewColumn() {
 async function addRow() {
   let row = await this.generateNewRow();
 
-  let section = await getContentInstance(currentSectionId);
+  let section = await dataService.getContentById(currentSectionId);
   section.data.rows.push(row);
   editInstance(section);
 
@@ -482,8 +482,8 @@ async function addRow() {
 // }
 
 async function addColumn() {
-  // debugger;
-  let section = await getContentInstance(currentSectionId);
+  debugger;
+  let section = await dataService.getContentById(currentSectionId);
   console.log("secton", section);
   console.log("currentRowIndex", currentRowIndex);
 
@@ -496,7 +496,7 @@ async function addColumn() {
 }
 
 async function deleteColumn() {
-  let section = await getContentInstance(currentSectionId);
+  let section = await dataService.getContentById(currentSectionId);
   section.data.rows[currentRowIndex].columns.splice(currentColumnIndex - 1, 1);
 
   //TODO, delete block too
@@ -507,7 +507,7 @@ async function deleteColumn() {
 }
 
 async function deleteRow() {
-  let section = await getContentInstance(currentSectionId);
+  let section = await dataService.getContentById(currentSectionId);
   debugger;
   section.data.rows.splice(currentRowIndex, 1);
   editInstance(section);
@@ -520,7 +520,7 @@ async function editColumnContent() {
 }
 
 async function deleteBlock() {
-  let section = await getContentInstance(currentSectionId);
+  let section = await dataService.getContentById(currentSectionId);
   section.data.rows[currentRowIndex].columns.splice(currentColumnIndex - 1, 1);
 
   //TODO, delete block too
