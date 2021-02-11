@@ -135,7 +135,7 @@ module.exports = userService = {
   // },
 
   isAuthenticated: async function (req) {
-    console.log("user account", req.user);
+    // console.log("user account", req.user);
     if (req.user && req.user.username) {
       return true;
     }

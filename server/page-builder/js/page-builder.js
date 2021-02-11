@@ -246,7 +246,7 @@ async function setupClickEvents() {
 }
 
 async function getCurrentSection() {
-  currentSectionRecord = await getContentInstance(currentSectionId);
+  currentSectionRecord = await dataService.getContentById(currentSectionId);
   return currentSectionRecord;
 }
 
@@ -394,7 +394,7 @@ async function addSection() {
 
 async function editSection(sectionId) {
   console.log(sectionId);
-  currentSectionRecord = await getContentInstance(sectionId);
+  currentSectionRecord = await dataService.getContentById(sectionId);
   currentSection = currentSectionRecord.data;
   console.log("currentSection", currentSection);
   // $('#section-editor').text(JSON.stringify(currentSection));
@@ -420,7 +420,7 @@ async function saveSection() {
   fullPageUpdate();
 
   // console.log(sectionId);
-  // currentSectionRecord = await getContentInstance(sectionId);
+  // currentSectionRecord = await dataService.getContentById(sectionId);
   // currentSection = currentSectionRecord.data;
   // console.log('currentSection', currentSection);
   // $('#section-editor').text(JSON.stringify(currentSection));
@@ -452,7 +452,7 @@ async function generateNewColumn() {
 //     console.log('adding row to section: ' + sectionId);
 //     let row = await this.generateNewRow();
 
-//     let section = await getContentInstance(sectionId);
+//     let section = await dataService.getContentById(sectionId);
 //     section.data.rows.push(row);
 //     editInstance(section);
 
@@ -471,7 +471,7 @@ async function addRow() {
 
 // async function addColumn(sectionId, rowIndex) {
 //     console.log('adding column ', sectionId, rowIndex);
-//     let section = await getContentInstance(sectionId);
+//     let section = await dataService.getContentById(sectionId);
 //     console.log('secton', section);
 //     let column = await generateNewColumn();
 //     section.data.rows[rowIndex].columns.push(column);
@@ -750,7 +750,7 @@ async function openForm(action, contentType) {
 async function setupPageSettings(action, contentType) {
   console.log("setupPageSettings");
   let pageId = $("#page-id").val();
-  // let page = await getContentInstance(pageId);
+  // let page = await dataService.getContentById(pageId);
 
   // Formio.createForm(document.getElementById('formio'), {
   // debugger;
@@ -974,7 +974,7 @@ async function openWYSIWYG() {
   $("#block-edit-it").val(id);
   $("#wysiwygModal").appendTo("body").modal("show");
 
-  var content = await getContentInstance(id);
+  var content = await dataService.getContentById(id);
 
   $("textarea.wysiwyg-content").html(content.data.body);
 
@@ -1133,7 +1133,7 @@ async function saveWYSIWYG() {
   let content = $("textarea.wysiwyg-content").html();
 
   //update db
-  let block = await getContentInstance(id);
+  let block = await dataService.getContentById(id);
   block.data.body = content;
   editInstance(block);
 
@@ -1170,7 +1170,7 @@ async function editModule() {
 
   console.log("editing module: " + currentModuleId, currentModuleContentType);
 
-  let data = await getContentInstance(currentModuleId);
+  let data = await dataService.getContentById(currentModuleId);
 
   let form = await formService.getForm(
     currentModuleContentType,
