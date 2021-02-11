@@ -398,33 +398,9 @@ if (typeof module !== "undefined" && module.exports) {
       contentType,
       title
     ) {
-      const filter = `{"where":{"and":[{"data.title":"${title}"},{"data.contentType":"${contentType}"}]}}`;
-      const encodedFilter = encodeURI(filter);
-      let url = `${apiUrl}content?filter=${encodedFilter}`;
-      let pageRecord = await this.getAxios().get(url);
-      if (pageRecord.data[0]) {
-        //HACK: workaround for loopback bug - lb should filter based on the above filter input, but doesn't for RDBMS
-        if (
-          pageRecord.data[0].title === title &&
-          pageRecord.data[0].contentType === contentType
-        ) {
-          return pageRecord.data[0];
-        } else {
-          //filter in code per HACK
-          let record = pageRecord.data
-            .filter((c) => c.data.contentType == contentType)
-            .filter((c) => c.data.title == title);
-
-          if (record && record[0]) {
-            return record[0];
-          }
-        }
-        // await this.getPage(pageRecord.data[0].id, pageRecord.data[0]);
-        // let page = pageRecord.data[0];
-        // page.data.html = pageContent;
-        // return page;
-      }
-      return "not found";
+      let allOfContentType = await this.getContentByContentType(contentType);
+      let contentByTitle = allOfContentType.filter(c => c.data.title === title)[0];
+      return contentByTitle;
     }),
     (exports.getContentByContentTypeAndTag = async function (contentType, tag) {
       //TODO: add {"order":"data.sort ASC"},
