@@ -1346,9 +1346,7 @@ async function writeFile(container, file) {
   let formData = new FormData();
   formData.append("file", file);
 
-  debugger;
-  await dataService.fileUpdate(file, container);
-
+  alert('not implemented');
   // axiosInstance
   //   .post(`/api/containers/${container}/upload`, formData, {
   //     headers: {
@@ -1399,7 +1397,6 @@ async function setupACEEditor() {
   }
 
   $("#save-global-css").click(async function () {
-    debugger;
     let cssContent = editor.getSession().getValue();
     
     // let file = new File([cssContent], "template.css", { type: "text/css" });

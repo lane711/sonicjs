@@ -65,7 +65,7 @@
                   form.on('submit', async function (submission) {
                     // debugger;
                     let filePath = `server/modules/${submission.data.systemId}/module.json`;
-                    await dataService.fileUpdate(filePath, submission.data)
+                    await dataService.fileUpdate(filePath, JSON.stringify(submission.data))
                     window.location.replace('/admin/modules/edit/' + submission.data.systemId);
 
                     // var accessToken = '{{ this.accessToken }}';

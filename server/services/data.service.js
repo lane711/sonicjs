@@ -557,13 +557,12 @@ if (typeof module !== "undefined" && module.exports) {
     }
   }),
     (exports.fileUpdate = async function (filePath, fileContent) {
-      let fileContentString = JSON.stringify(fileContent);
       let result = await this.getAxios().post(apiUrl, {
         query: `
       mutation{
         fileUpdate( 
           filePath:"${filePath}", 
-          fileContent:"""${fileContentString}"""
+          fileContent:"""${fileContent}"""
           )
           { 
             filePath 
