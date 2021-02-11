@@ -462,13 +462,15 @@ if (typeof module !== "undefined" && module.exports) {
       return result.data.data.contentUpdate;
     }),
     (exports.contentCreate = async function (payload) {
-      let url = helperService.generateSlugFromContent(payload.data, true, true);
+      if(payload.data.contentType !== 'page'){
+        payload.data.url = helperService.generateSlugFromContent(payload.data, true, true);
+      }
 
       let query = `
       mutation{
         contentCreate( 
           contentTypeId:"${payload.data.contentType}", 
-          url:"${url}", 
+          url:"${payload.data.url}", 
           createdByUserId:"5fd834ec29f419535f049803"
           data:"""${JSON.stringify(payload.data)}"""){
             id

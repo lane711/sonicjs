@@ -58,12 +58,7 @@ async function setupAxiosInstance() {
 async function setPage() {
   let pageId = $("#page-id").val();
   if (pageId) {
-    // console.log("pageId", pageId);
-    axiosInstance.get(`/api/content/${pageId}`).then(function (response) {
-      // handle success
-      this.page = response.data;
-      // console.log("getPage page", page);
-    });
+    this.page = await dataService.getContentById(pageId);
   }
 }
 
@@ -363,6 +358,7 @@ function getHtmlHex(hex) {
 }
 
 async function addSection() {
+  // debugger;
   console.log("adding section");
   let row = await generateNewRow();
   //rows
@@ -393,7 +389,7 @@ async function addSection() {
   //update ui
   // this.fullPageUpdate();
   // this.loadSections(updatedPage);
-  fullPageUpdate();
+  // fullPageUpdate();
 }
 
 async function editSection(sectionId) {
@@ -590,10 +586,12 @@ async function createInstance(
   let entity = await dataService.contentCreate(payload);
 
   if (entity.contentTypeId === "page" && !globalService.isBackEnd()) {
-    window.location.href = entity.url;
+    window.location.href = payload.data.url;
   } else if (refresh) {
     fullPageUpdate();
   }
+
+  return entity;
 
   // .then(async function (response) {
   //   // debugger;
@@ -650,7 +648,11 @@ async function editInstance(payload, refresh, contentType = "content") {
       // resolve(response.data);
       // return await response.data;
       if (response.contentTypeId === "page" && !globalService.isBackEnd()) {
+        if(response.url){
         window.location.href = response.url;
+        }else{
+          fullPageUpdate();
+        }
       } else if (refresh) {
         fullPageUpdate();
       }
