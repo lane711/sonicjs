@@ -1249,7 +1249,7 @@ async function addModuleToColumn(submission) {
   );
 
   //add the shortCode to the column
-  let section = await getContentInstance(currentSectionId);
+  let section = await dataService.getContentById(currentSectionId);
   let column =
     section.data.rows[currentRowIndex].columns[currentColumnIndex - 1];
   column.content += moduleInstanceShortCode;
