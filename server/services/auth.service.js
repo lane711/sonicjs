@@ -47,7 +47,7 @@ module.exports = authService = {
     app.get("/register", async function (req, res) {
       let data = { registerMessage: "<b>admin</b>" };
       res.render("admin/shared-views/admin-register", {
-        layout: `front-end/${frontEndTheme}/login.handlebars`,
+        layout: `front-end/${frontEndTheme}/login.hbs`,
         data: data,
       });
       return;
