@@ -68,5 +68,53 @@ module.exports = installService = {
       let record = await dataService.contentCreate(data);
       console.log("created themeSettings:", record);
     }
+
+    // let mainMenu = await dataService.getContentByType("menu");
+    let mainMenu = await menuService.getMenu("Main")
+    if (!mainMenu) {
+      let data = {
+        data: {
+          contentType: "main-menu",
+          url: "/main-menu",
+          title: "Main", 
+          contentType : "menu", 
+          links : [
+              {
+                  "id" : "NQ6YeBCClIQ", 
+                  "text" : "Home", 
+                  "icon" : "fa fa-chevron-right", 
+                  "li_attr" : {
+                      "id" : "NQ6YeBCClIQ"
+                  }, 
+                  "a_attr" : {
+                      "href" : "#", 
+                      "id" : "NQ6YeBCClIQ_anchor"
+                  }, 
+                  "state" : {
+                      "loaded" : true, 
+                      "opened" : false, 
+                      "selected" : true, 
+                      "disabled" : false
+                  }, 
+                  "data" : {
+                      "id" : "NQ6YeBCClIQ", 
+                      "title" : "Home", 
+                      "url" : "/", 
+                      "showInMenu" : true, 
+                      "showChildren" : false
+                  }, 
+                  "children" : [
+  
+                  ], 
+                  "type" : "default"
+              }
+          ]
+        },
+      };
+      let record = await dataService.contentCreate(data);
+      console.log("created main menu:", record);
+    }
+
+
   },
 };

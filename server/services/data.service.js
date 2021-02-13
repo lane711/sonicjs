@@ -396,10 +396,12 @@ if (typeof module !== "undefined" && module.exports) {
       title
     ) {
       let allOfContentType = await this.getContentByContentType(contentType);
-      let contentByTitle = allOfContentType.filter(
-        (c) => c.data.title === title
-      )[0];
-      return contentByTitle;
+      if (allOfContentType) {
+        let contentByTitle = allOfContentType.filter(
+          (c) => c.data.title === title
+        )[0];
+        return contentByTitle;
+      }
     }),
     (exports.getContentByContentTypeAndTag = async function (contentType, tag) {
       //TODO: add {"order":"data.sort ASC"},
@@ -463,7 +465,10 @@ if (typeof module !== "undefined" && module.exports) {
     (exports.contentCreate = async function (payload) {
       if (payload.data.contentType !== "page") {
         if (
-          !(payload.data.contentType.indexOf("settings") > -1 && payload.data.url)
+          !(
+            payload.data.contentType.indexOf("settings") > -1 &&
+            payload.data.url
+          )
         ) {
           payload.data.url = helperService.generateSlugFromContent(
             payload.data,

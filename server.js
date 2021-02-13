@@ -37,8 +37,7 @@ const User = require("./server/schema/models/user");
 
 
 mongoose.connection.once("open", () => {
-  console.log(chalk.green(`Connected to Database: ${process.env.MONGODB_URL}`));
-  //check install
+  console.log(chalk.green(`Successfully connected to database!`));
   installService.checkInstallation();
 });
 

@@ -12,9 +12,7 @@ module.exports = menuService = {
   startup: function () {
     // console.log('>>=== menu startup');
 
-    emitterService.on("getRenderedPagePostDataFetch", async function (
-      options
-    ) {
+    emitterService.on("getRenderedPagePostDataFetch", async function (options) {
       if (options) {
         let menuData = await menuService.getMenu("Main");
         menuData.forEach((menuItem) => {
@@ -61,10 +59,11 @@ module.exports = menuService = {
       "menu",
       menuName
     );
-    let links = menuData.data.links;
+    if (menuData) {
+      let links = menuData.data.links;
 
-    return links;
-
+      return links;
+    }
     // let menu = [];
 
     // for (let index = 0; index < links.length; index++) {
@@ -130,20 +129,25 @@ module.exports = menuService = {
       id: randomId,
       text: linkText,
       data: { id: randomId, title: linkText, url: url, showInMenu: true },
-      children: []
+      children: [],
     };
 
-    let menu = await dataService.getContentTopOne('menu');
+    let menu = await dataService.getContentTopOne("menu");
 
-    var updatedMenu = { data: { title: menu.data.title, contentType: "menu", links: menu.data.links } };
+    var updatedMenu = {
+      data: {
+        title: menu.data.title,
+        contentType: "menu",
+        links: menu.data.links,
+      },
+    };
 
-    let linkAlreadyExists = updatedMenu.data.links.filter(x => x.data.url == url).length > 0;
+    let linkAlreadyExists =
+      updatedMenu.data.links.filter((x) => x.data.url == url).length > 0;
 
-    if(!linkAlreadyExists){
+    if (!linkAlreadyExists) {
       updatedMenu.data.links.push(node);
       dataService.editInstance(menu);
     }
-
   },
-
 };
