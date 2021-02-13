@@ -127,11 +127,9 @@ if (typeof module !== "undefined" && module.exports) {
 
     return result.data.data.contentType;
   }),
-
-  (exports.rolesGet = async function () {
-
-    let result = await this.getAxios().post(apiUrl, {
-      query: `
+    (exports.rolesGet = async function () {
+      let result = await this.getAxios().post(apiUrl, {
+        query: `
       {
         roles {
           id
@@ -139,13 +137,12 @@ if (typeof module !== "undefined" && module.exports) {
         }
       }
         `,
-    });
+      });
 
-    if (result.data.data.roles) {
-      return result.data.data.roles;
-    }
-  }),
-
+      if (result.data.data.roles) {
+        return result.data.data.roles;
+      }
+    }),
     (exports.getContent = async function () {
       //HACK removing sort bc LB not working with RDMS
       // const filter = ""; //encodeURI(`{"order":"data.createdOn DESC"}`);
@@ -399,7 +396,9 @@ if (typeof module !== "undefined" && module.exports) {
       title
     ) {
       let allOfContentType = await this.getContentByContentType(contentType);
-      let contentByTitle = allOfContentType.filter(c => c.data.title === title)[0];
+      let contentByTitle = allOfContentType.filter(
+        (c) => c.data.title === title
+      )[0];
       return contentByTitle;
     }),
     (exports.getContentByContentTypeAndTag = async function (contentType, tag) {
@@ -462,8 +461,16 @@ if (typeof module !== "undefined" && module.exports) {
       return result.data.data.contentUpdate;
     }),
     (exports.contentCreate = async function (payload) {
-      if(payload.data.contentType !== 'page'){
-        payload.data.url = helperService.generateSlugFromContent(payload.data, true, true);
+      if (payload.data.contentType !== "page") {
+        if (
+          !(payload.data.contentType.indexOf("settings") > -1 && payload.data.url)
+        ) {
+          payload.data.url = helperService.generateSlugFromContent(
+            payload.data,
+            true,
+            true
+          );
+        }
       }
 
       let query = `

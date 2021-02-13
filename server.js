@@ -14,6 +14,8 @@ const chalk = require("chalk");
 var exphbs = require("express-handlebars");
 var Handlebars = require("handlebars");
 var globalService = require("./server/services/global.service");
+var installService = require("./server/services/install.service");
+
 const routes = require("./server/boot/routes.js");
 var appRoot = require("app-root-path");
 var bodyParser = require("body-parser");
@@ -23,6 +25,8 @@ const adminTheme = `${process.env.ADMIN_THEME}`;
 
 const passport = require("passport");
 const mongoose = require("mongoose");
+
+
 
 mongoose.set('useCreateIndex', true);
 mongoose.connect(process.env.MONGODB_URL, {
@@ -34,6 +38,8 @@ const User = require("./server/schema/models/user");
 
 mongoose.connection.once("open", () => {
   console.log(chalk.green(`Connected to Database: ${process.env.MONGODB_URL}`));
+  //check install
+  installService.checkInstallation();
 });
 
 
