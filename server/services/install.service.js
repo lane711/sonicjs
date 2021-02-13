@@ -30,7 +30,43 @@ module.exports = installService = {
         },
       };
       let record = await dataService.contentCreate(data);
+      console.log("created siteSettingsColors:", record);
     }
-    console.log("siteSettingsColors", siteSettingsColors);
+
+    let siteSettings = await dataService.getContentByType("site-settings");
+    if (siteSettings.length === 0) {
+      let data = {
+        data: {
+          contentType: "site-settings",
+          url: "/site-settings",
+          logoType: "text",
+          logoTitle: "My Site",
+          fontDefault: "Lato",
+          fontHeaders: "Roboto",
+          homePageId: "1",
+        },
+      };
+      let record = await dataService.contentCreate(data);
+      console.log("created siteSettings:", record);
+    }
+
+    let themeSettings = await dataService.getContentByType("theme-settings");
+    if (themeSettings.length === 0) {
+      let data = {
+        data: {
+          contentType: "theme-settings",
+          url: "/theme-settings",
+          logoType: "image",
+          logoTitle: "Acme Widgets",
+          fontSize: "24px",
+          fontColor: "#fff",
+          fileName: "temp-logo.png",
+          imageWidth: "120px",
+          imageStyle: "",
+        },
+      };
+      let record = await dataService.contentCreate(data);
+      console.log("created themeSettings:", record);
+    }
   },
 };
