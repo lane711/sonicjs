@@ -466,7 +466,7 @@ if (typeof module !== "undefined" && module.exports) {
       if (payload.data.contentType !== "page") {
         if (
           !(
-            payload.data.contentType.indexOf("settings") > -1 &&
+            (payload.data.contentType.indexOf("settings") > -1 || payload.data.contentType === ("menu")) &&
             payload.data.url
           )
         ) {
