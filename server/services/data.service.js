@@ -462,14 +462,9 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.contentUpdate;
     }),
-    (exports.contentCreate = async function (payload) {
+    (exports.contentCreate = async function (payload, autoGenerateUrl = true) {
       if (payload.data.contentType !== "page") {
-        if (
-          !(
-            (payload.data.contentType.indexOf("settings") > -1 || payload.data.contentType === ("menu")) &&
-            payload.data.url
-          )
-        ) {
+        if (autoGenerateUrl){
           payload.data.url = helperService.generateSlugFromContent(
             payload.data,
             true,

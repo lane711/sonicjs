@@ -29,7 +29,7 @@ module.exports = installService = {
           submit: true,
         },
       };
-      let record = await dataService.contentCreate(data);
+      let record = await dataService.contentCreate(data, false);
       console.log("created siteSettingsColors:", record);
     }
 
@@ -46,7 +46,7 @@ module.exports = installService = {
           homePageId: "1",
         },
       };
-      let record = await dataService.contentCreate(data);
+      let record = await dataService.contentCreate(data, false);
       console.log("created siteSettings:", record);
     }
 
@@ -65,8 +65,22 @@ module.exports = installService = {
           imageStyle: "",
         },
       };
-      let record = await dataService.contentCreate(data);
+      let record = await dataService.contentCreate(data, false);
       console.log("created themeSettings:", record);
+    }
+
+    let googleAnalytics = await dataService.getContentByType("google-analytics");
+    if (googleAnalytics.length === 0) {
+      let data = {
+        data: {
+          contentType: "google-analytics",
+          url: "/google-analytics",
+          "googleAnalyticsUACode" : "UA-132867068-1", 
+          "enableOnDomain" : "sonicjs.com", 
+        },
+      };
+      let record = await dataService.contentCreate(data, false);
+      console.log("created googleAnalytics:", record);
     }
 
     // let mainMenu = await dataService.getContentByType("menu");
@@ -111,7 +125,7 @@ module.exports = installService = {
           ]
         },
       };
-      let record = await dataService.contentCreate(data);
+      let record = await dataService.contentCreate(data, false);
       console.log("created main menu:", record);
     }
 
