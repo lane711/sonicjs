@@ -20,6 +20,7 @@ const routes = require("./server/boot/routes.js");
 var appRoot = require("app-root-path");
 var bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
+const port = `${process.env.PORT}`;
 const frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
 
@@ -67,8 +68,8 @@ function start() {
 
   routes.loadRoutes(app);
 
-  app.listen(3019, () => {
-    var baseUrl = "http://localhost:3019";
+  app.listen(port, () => {
+    var baseUrl = `http://localhost:${port}`;
     globalService.baseUrl = baseUrl;
 
     console.log(chalk.cyan("Website at: ", baseUrl));
