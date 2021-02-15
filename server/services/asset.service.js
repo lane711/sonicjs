@@ -20,13 +20,13 @@ module.exports = assetService = {
         if (process.env.MODE === "production") {
           let assetFilesExist = await assetService.doesAssetFilesExist();
 
-          if(process.env.REBUILD_ASSETS === 'TRUE' || !assetFilesExist){
+          if (process.env.REBUILD_ASSETS === "TRUE" || !assetFilesExist) {
             //rebuild the assets before delivering
             await assetService.getLinks(options, "css");
             await assetService.getLinks(options, "js");
 
             //file will now exist, so no need to rebuild
-            await fileService.updateEnvFileVariable('REBUILD_ASSETS', 'FALSE');
+            await fileService.updateEnvFileVariable("REBUILD_ASSETS", "FALSE");
           }
 
           //add combined assets
@@ -37,7 +37,7 @@ module.exports = assetService = {
             "css"
           )}" rel="stylesheet">`;
         } else {
-          await fileService.updateEnvFileVariable('REBUILD_ASSETS', 'TRUE');
+          await fileService.updateEnvFileVariable("REBUILD_ASSETS", "TRUE");
           await assetService.getLinks(options, "css");
           await assetService.getLinks(options, "js");
         }
@@ -211,14 +211,18 @@ module.exports = assetService = {
       async (link) => {
         let root = link.path.startsWith("/node_modules");
         if (link.path.includes("/api/containers/css/download/template.css")) {
-          link.path = `themes/front-end/${frontEndTheme}/css/template-processed.css`;
+          link.path = `server/themes/front-end/${frontEndTheme}/css/template-processed.css`;
         }
         let fileContentRaw = await fileService.getFile(link.path);
-        console.log(
-          `Adding Path: ${link.path} -- Size: ${fileContentRaw.length}`
-        );
-        fileContent += fileContentRaw + "\n";
-        console.log(`fileContent Size: ${fileContent.length}`);
+        if (fileContentRaw) {
+          console.log(
+            `Adding Path: ${link.path} -- Size: ${fileContentRaw.length}`
+          );
+          fileContent += fileContentRaw + "\n";
+          console.log(`fileContent Size: ${fileContent.length}`);
+        } else{
+          console.log('Error retrieving ' + link.path);
+        }
       }
     );
 

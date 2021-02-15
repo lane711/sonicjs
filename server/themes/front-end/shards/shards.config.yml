@@ -52,7 +52,7 @@ assets:
     # - /node_modules/bootstrap/dist/css/bootstrap.min.css
     - /themes/front-end/shards/css/shards.min.css
     - /themes/front-end/shards/css/shards-demo.min.css
-    - /themes/front-end/{{frontEndTheme}}/css/template-processed.css
+    - /server/themes/front-end/{{frontEndTheme}}/css/template-processed.css
     # - /node_modules/font-awesome/css/font-awesome.min.css
     # - /node_modules/photoswipe/dist/photoswipe.css
     # - /node_modules/photoswipe/dist/default-skin/default-skin.css

@@ -46,7 +46,6 @@ const url = require("url");
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 
 exports.loadRoutes = async function (app) {
-
   authService.startup(app);
   adminService.startup(app);
   // app.get('/', async function (req, res) {
@@ -461,33 +460,30 @@ exports.loadRoutes = async function (app) {
       console.log(`serving: ${req.url}`);
     }
 
+    let isAuthenticated = await userService.isAuthenticated(req);
+    globalService.setAreaMode(false, true, isAuthenticated);
+    var page = await contentService.getRenderedPage(req);
 
-else {
-      let isAuthenticated = await userService.isAuthenticated(req);
-      globalService.setAreaMode(false, true, isAuthenticated);
-      var page = await contentService.getRenderedPage(req);
-
-      if (page.page.data.title === "Not Found") {
-        // res.render("404", page);
-        res.render(`front-end/${frontEndTheme}/layouts/404`, {
-          layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
-        });
-
-        return;
-      }
-
-      mixPanelService.trackEvent("PAGE_LOAD", req, {
-        page: page.page.data.title,
-        ip: ip,
-      });
-
-      let pageData = page.page;
-      pageData.data.id = pageData.id;
-
-      res.render(`front-end/${frontEndTheme}/layouts/main`, {
+    if (page.page.data.title === "Not Found") {
+      // res.render("404", page);
+      res.render(`front-end/${frontEndTheme}/layouts/404`, {
         layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
-        data: pageData.data,
       });
+
+      return;
     }
+
+    mixPanelService.trackEvent("PAGE_LOAD", req, {
+      page: page.page.data.title,
+      ip: ip,
+    });
+
+    let pageData = page.page;
+    pageData.data.id = pageData.id;
+
+    res.render(`front-end/${frontEndTheme}/layouts/main`, {
+      layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
+      data: pageData.data,
+    });
   });
 };

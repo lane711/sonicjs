@@ -242,8 +242,8 @@ module.exports = moduleService = {
     globalService.moduleCssFiles = [];
 
     files.forEach((file) => {
-      let link = file.substr(file.indexOf("server") + 6, file.length);
-      globalService.moduleCssFiles.push(link);
+      // let link = file.substr(file.indexOf("server") + 6, file.length);
+      globalService.moduleCssFiles.push(file);
     });
   },
 
@@ -254,8 +254,8 @@ module.exports = moduleService = {
 
     files.forEach((file) => {
       if (file.indexOf("assets/js") > -1) {
-        let link = file.substr(file.indexOf("server") + 6, file.length);
-        globalService.moduleJsFiles.push(link);
+        // let link = file.substr(file.indexOf("server") + 6, file.length);
+        globalService.moduleJsFiles.push(file);
       }
     });
   },
