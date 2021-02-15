@@ -36,9 +36,9 @@ module.exports = adminService = {
         //   //user not logged in
         // }
 
-        if (process.env.MODE !== "dev") {
-          res.send(401);
-        }
+        // if (process.env.MODE !== "dev") {
+        //   res.send(401);
+        // }
 
         globalService.setAreaMode(true, false, true);
 
