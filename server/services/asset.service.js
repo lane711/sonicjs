@@ -30,10 +30,10 @@ module.exports = assetService = {
           }
 
           //add combined assets
-          options.page.data.jsLinks = `<script src="/js/${assetService.getCombinedFileName(
+          options.page.data.jsLinks = `<script src="/assets/js/${assetService.getCombinedFileName(
             "js"
           )}"></script>`;
-          options.page.data.cssLinks = `<link href="/css/${assetService.getCombinedFileName(
+          options.page.data.cssLinks = `<link href="/assets/css/${assetService.getCombinedFileName(
             "css"
           )}" rel="stylesheet">`;
         } else {
@@ -49,8 +49,8 @@ module.exports = assetService = {
       if (process.env.MODE !== "production") return;
 
       if (
-        options.req.url.startsWith("/js/combined-") ||
-        options.req.url.startsWith("/css/combined-")
+        options.req.url.startsWith("/assets/js/combined-") ||
+        options.req.url.startsWith("/assets/css/combined-")
       ) {
         let assetType = options.req.url.includes("/js/") ? "js" : "css";
         let appVersion = globalService.getAppVersion();
@@ -220,8 +220,8 @@ module.exports = assetService = {
           );
           fileContent += fileContentRaw + "\n";
           console.log(`fileContent Size: ${fileContent.length}`);
-        } else{
-          console.log('Error retrieving ' + link.path);
+        } else {
+          console.log("Error retrieving " + link.path);
         }
       }
     );
@@ -229,12 +229,7 @@ module.exports = assetService = {
     let appVersion = globalService.getAppVersion();
     let fileName = this.getCombinedFileName(assetType);
 
-    if (assetType === "js") {
-      await this.createCombinedFile(fileContent, fileName, assetType);
-    }
-    if (assetType === "css") {
-      await this.createCombinedFile(fileContent, fileName, assetType);
-    }
+    await this.createCombinedFile(fileContent, fileName, assetType);
   },
 
   createCombinedFile: async function (fileContent, fileName, assetType) {
@@ -246,6 +241,7 @@ module.exports = assetService = {
         minifiedAsset = UglifyJS.minify(fileContent, {
           compress: false,
         }).code;
+
       }
       if (assetType === "css") {
         minifiedAsset = csso.minify(fileContent).css;
@@ -256,7 +252,7 @@ module.exports = assetService = {
   },
 
   getAssetPath: function (fileName) {
-    return `/assets/${fileName.split(".").pop()}/${fileName}`;
+    return `/server/assets/${fileName.split(".").pop()}/${fileName}`;
   },
 
   getCombinedFileName: function (assetType) {

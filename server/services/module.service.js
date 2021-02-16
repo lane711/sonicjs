@@ -62,13 +62,15 @@ module.exports = moduleService = {
   },
 
   getModuleDefinitionFile: async function (systemId) {
-    let file = await fileService.getFile(`server/modules/${systemId}/module.json`);
+    let file = await fileService.getFile(
+      `server/modules/${systemId}/module.json`
+    );
     return file;
   },
 
   getModuleDefinitionFileWithPath: async function (systemId) {
     let basePath = `/server/modules/${systemId}`;
-    let filePath = `${basePath}/module.json`
+    let filePath = `${basePath}/module.json`;
     let file = await fileService.getFile(filePath);
     let moduleDef = JSON.parse(file);
     moduleDef.filePath = filePath;
@@ -99,9 +101,7 @@ module.exports = moduleService = {
   },
 
   contentTypeUpdate: async function (moduleContentType) {
-    let moduleDef = await this.getModuleContentType(
-      moduleContentType.systemId
-    );
+    let moduleDef = await this.getModuleContentType(moduleContentType.systemId);
 
     moduleDef.canBeAddedToColumn = moduleContentType.canBeAddedToColumn;
     moduleDef.enabled = moduleContentType.enabled;
@@ -110,7 +110,7 @@ module.exports = moduleService = {
     moduleDef.data = moduleContentType.data;
     moduleDef.canBeAddedToColumn = moduleContentType.canBeAddedToColumn;
     moduleDef.canBeAddedToColumn = moduleContentType.canBeAddedToColumn;
-    moduleDef.filePath = `/server/modules/${moduleDef.moduleSystemId}/models/${moduleDef.systemId}.json`
+    moduleDef.filePath = `/server/modules/${moduleDef.moduleSystemId}/models/${moduleDef.systemId}.json`;
 
     let moduleDefString = JSON.stringify(moduleDef);
     await fileService.writeFile(moduleDef.filePath, moduleDefString);
@@ -212,8 +212,9 @@ module.exports = moduleService = {
   createModuleContentType: async function (contentTypeDef) {
     console.log("creating content type", contentTypeDef);
     contentTypeDef.filePath = `/server/modules/${contentTypeDef.moduleSystemId}/models/${contentTypeDef.systemId}.json`;
-    contentTypeDef.title =
-      contentTypeDef.title ?? contentTypeDef.moduleSystemId;
+    contentTypeDef.title = contentTypeDef.title
+      ? contentTypeDef.title
+      : contentTypeDef.moduleSystemId;
     contentTypeDef.data = { components: [] };
     let contentTypeDefObj = JSON.stringify(contentTypeDef);
     await fileService.writeFile(contentTypeDef.filePath, contentTypeDefObj);

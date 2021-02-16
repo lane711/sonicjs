@@ -1264,7 +1264,7 @@ async function submitContent(
   contentType = "content"
 ) {
   console.log("Submission was made!", submission);
-  let entity = submission.data ?? submission;
+  let entity = submission.data ? submission.data : submission;
   if (!contentType.startsWith("user")) {
     entity = processContentFields(submission.data);
   }
