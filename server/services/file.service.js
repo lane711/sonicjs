@@ -96,6 +96,7 @@ module.exports = fileService = {
   },
 
   fileExists: function (filePath) {
+    console.log('--> fileExists', filePath);
     let dirPath = path.join(appRoot.path, filePath);
     let fileExist = fs.existsSync(dirPath);
     return fileExist;
