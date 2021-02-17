@@ -100,11 +100,15 @@ function initEnvFile() {
     if (!fs.existsSync(path)) {
       //create default env file
       fs.copyFile(".env-default", ".env", (err) => {
-        if (err) throw err;
+        if (err) {
+          console.log('initEnvFile error');
+          throw err;
+        }
         console.log(".env-default was copied to .env");
       });
     }
   } catch (err) {
+    console.log('initEnvFile catch error');
     console.error(err);
   }
 }
