@@ -80,7 +80,7 @@ module.exports = assetService = {
     console.log('doesAssetFilesExist', fileName);
     let cssPath = this.getAssetPath(this.getCombinedFileName("css"));
     let jsPath = this.getAssetPath(this.getCombinedFileName("js"));
-    return fileService.fileExists(cssPath) && fileService.fileExists(cssPath);
+    return fileService.fileExists(cssPath) && fileService.fileExists(jsPath);
   },
 
   getCombinedAssetPath: function (assetType, fileName) {
