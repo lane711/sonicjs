@@ -56,6 +56,8 @@ module.exports = assetService = {
         let appVersion = globalService.getAppVersion();
         let fileName = assetService.getCombinedFileName(assetType);
 
+        console.log('prod asset', assetType, appVersion, fileName);
+
         let file = path.join(
           __dirname,
           "..",
