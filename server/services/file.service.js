@@ -83,7 +83,7 @@ module.exports = fileService = {
 
   writeFile: async function (filePath, fileContent) {
     let fullPath = path.join(this.getRootAppPath(), filePath);
-    // console.log('fullPath--->', fullPath);
+    console.log('==> writeFile - fullPath--->', fullPath);
 
     await fsPromise.writeFile(fullPath, fileContent);
   },
@@ -113,7 +113,7 @@ module.exports = fileService = {
     let parsedFile = parse(envFile);
     parsedFile[variableName] = variableValue;
     let envFileContent = stringify(parsedFile);
-    await this.writeFile("../../.env", envFileContent);
+    await this.writeFile(".env", envFileContent);
   },
 
   deleteFile: function (filePath) {
