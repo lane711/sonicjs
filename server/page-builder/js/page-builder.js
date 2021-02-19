@@ -1366,6 +1366,7 @@ async function setupACEEditor() {
     return;
   }
 
+  ace.config.set('basePath', '/node_modules/ace-builds/src-min-noconflict') 
   var editor = ace.edit("editor");
   editor.setTheme("ace/theme/monokai");
   editor.session.setMode("ace/mode/css");

@@ -243,8 +243,8 @@ module.exports = moduleService = {
     globalService.moduleCssFiles = [];
 
     files.forEach((file) => {
-      // let link = file.substr(file.indexOf("server") + 6, file.length);
-      globalService.moduleCssFiles.push(file);
+      let link = file.substr(file.indexOf("server") + 6, file.length);
+      globalService.moduleCssFiles.push(link);
     });
   },
 

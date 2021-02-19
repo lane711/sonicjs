@@ -1,7 +1,7 @@
 bootstrap-version: 4.5.3
 assets:
   js:
-    - /server/assets/js/startup.js
+    - /assets/js/startup.js
     - /node_modules/jquery/dist/jquery.min.js
     - /node_modules/js-cookie/src/js.cookie.js
     - /node_modules/ace-builds/src-min-noconflict/ace.js
@@ -15,19 +15,19 @@ assets:
     - /node_modules/photoswipe/dist/photoswipe-ui-default.min.js
     - /node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.js
     - /node_modules/dropzone/dist/min/dropzone.min.js
-    - /server/assets/js/common.js
-    - /server/services/shared.service.js
-    - /server/services/global.service.js
-    - /server/services/helper.service.js
-    - /server/services/formatting.service.js
-    - /server/services/data.service.js
-    - /server/services/form.service.js
-    - /server/services/analytics.service.js
-    - /server/page-builder/js/page-builder.js:
+    - /assets/js/common.js
+    - /services/shared.service.js
+    - /services/global.service.js
+    - /services/helper.service.js
+    - /services/formatting.service.js
+    - /services/data.service.js
+    - /services/form.service.js
+    - /services/analytics.service.js
+    - /page-builder/js/page-builder.js:
         isPageBuilder: true
   css:
     - /node_modules/bootstrap/dist/css/bootstrap.min.css
-    - /server/themes/front-end/{{frontEndTheme}}/css/template-processed.css
+    - /themes/front-end/{{frontEndTheme}}/css/template-processed.css
     - /node_modules/font-awesome/css/font-awesome.min.css
     - /node_modules/photoswipe/dist/photoswipe.css
     - /node_modules/photoswipe/dist/default-skin/default-skin.css

@@ -215,6 +215,10 @@ function setupAssets(app) {
     "/assets/fonts",
     express.static(path.join(appRoot.path, "node_modules/font-awesome/fonts"))
   );
+  app.use(
+    "/",
+    express.static(path.join(appRoot.path, "/node_modules/ace-builds/src-min-noconflict"))
+  );
 }
 
 start();

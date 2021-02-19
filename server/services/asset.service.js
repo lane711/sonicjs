@@ -18,6 +18,7 @@ module.exports = assetService = {
         options.page.data.cssLinks = "";
 
         if (process.env.MODE === "production") {
+          //TODO: cache this
           let assetFilesExist = await assetService.doesAssetFilesExist();
 
           if (process.env.REBUILD_ASSETS === "TRUE" || !assetFilesExist) {
@@ -215,6 +216,9 @@ module.exports = assetService = {
         let root = link.path.startsWith("/node_modules");
         if (link.path.includes("/api/containers/css/download/template.css")) {
           link.path = `server/themes/front-end/${frontEndTheme}/css/template-processed.css`;
+        }
+        if(!link.path.startsWith('/node_modules')){
+          link.path = '/server' + link.path;
         }
         let fileContentRaw = await fileService.getFile(link.path);
         if (fileContentRaw) {
