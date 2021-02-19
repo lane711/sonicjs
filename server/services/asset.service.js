@@ -229,6 +229,7 @@ module.exports = assetService = {
       }
     );
 
+
     let appVersion = globalService.getAppVersion();
     let fileName = this.getCombinedFileName(assetType);
 
