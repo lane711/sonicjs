@@ -76,11 +76,10 @@
 
 - NodeJs
 - Express
+- GraphQL
 - Bootstrap 4
+- MongoDB
 
-### SonicJs supports many common databases including:
-
-- MongoDB, MySQL, SQL Server, Cloudant, DashDB, DB2, Informix, Oracle, PostgreSQL, Redis, SQLite3, Flat File (Json), In-Memory
 
 ### Why SonicJs?
 
@@ -106,25 +105,28 @@ There are thousands of CMS out there and several already built on the modern JAM
 
 ### Pre-requisites
 
-You just need NodeJs installed. No other setup is needed.
+You will need NodeJs installed and access to a MongoDB database. Its recommended that you setup MongoDB locally as it will run very fast, but you can also sign up for a free MongoDB database at Mlab: https://mlab.com/
 
 ### Setup Steps
 
-When you first setup SonicJs locally, the default database is set to use the Flat File (Json) database. This can be used throughout your development process and even in production for sites that are primarily read-heavy.
+Assuming that you have a MongoDB database ready to go, setup takes < 2 minutes.
 
 Follow these steps and you should be good to go:
 
 1. Clone the repo: `git clone https://github.com/lane711/sonicjs.git`
 1. Change to created folder `cd sonicjs`
 1. Install the dependencies: `npm install`
-1. Run the setup script to install the database: `npm run setup` and follow the prompts
 1. Run it with: `npm start`
+
+Note: you can also start the app with `npm run dev` to run with Nodemon change detection enabled.
 
 You should see the following message in your console:
 
 - Website at: http://localhost:3018
 - Admin console at: http://localhost:3018/admin
-- REST API at: http://localhost:3018/explorer
+- GraphQL API at: http://localhost:3018/graphql
+
+From the home page, click on the "Sign Up" link to create your initial admin account.
 
 ## A Quick Intro to SonicJs
 
@@ -132,7 +134,7 @@ SonicJs is similar to Drupal CMS in that it is highly configurable. You can buil
 
 SonicJs can handle most common website building use-cases with ease, but it also positioned to be an enterprise application framework/platform enabling developers to start custom web application projects with a solid foundation. This can help significantly reduce the overall effort required for your project.
 
-SonicJs is also 100% REST API based and therefor a great choice if you are looking for a **Headless CMS** for your mobile app or IoT project. All of the content types that you create in the admin interface are instantly exposed as REST end points. There is no need to restart the application as required in other NodeJs based Headless CMS.
+ SonicJs is also 100% GraphQL API based and therefor a great choice if you are looking for a **Headless CMS** for your mobile app or IoT project. All of the content types that you create in the admin interface are instantly exposed as GraphQL end points. There is no need to restart the application as required in other NodeJs based Headless CMS.
 
 SonicJs is built with love from Orange County California.
 
@@ -165,7 +167,7 @@ Please see here for a full explanation: https://sonicjs.com/about, however here 
 - Minimal Learning Curve
 - KISS
 - Do it Right the First Time
-- 100% REST Based
+- 100% Gra Based
 - No "Fighting"
 - Development Should be Fun
 
@@ -200,13 +202,6 @@ See also the list of [contributors](https://github.com/lane711/sonicjs/graphs/co
 
 This project is licensed under the MIT License - see the [LICENSE.md](https://github.com/lane711/sonicjs/blob/master/LICENSE) file for details
 
-## Acknowledgments
-
-SonicJs is written entirely in Javascript. It uses a number of open source tools, utilities, etc but there are a few of them that I wanted to make special mention of:
-
-1. Loopback - An awesome NodeJs based ORM helping to support much of the heavy lifting in SonicJs' data tier.
-1. CoreUI - a truly great open source admin theme.
-1. Formio - a rock solid form builder with loads of advanced functionality.
 
 ## Video Overview + Demo
 
