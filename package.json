@@ -25,7 +25,7 @@
     "@fancyapps/fancybox": "^3.5.7",
     "@simonwep/pickr": "^1.8.0",
     "app-root-path": "^3.0.0",
-    "axios": "^0.21.0",
+    "axios": "^0.21.1",
     "bootstrap": "^4.5.3",
     "bootswatch": "^4.5.3",
     "chai": "^4.2.0",
