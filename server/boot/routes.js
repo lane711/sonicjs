@@ -1,4 +1,3 @@
-console.log("loading routes.js");
 // var loopback = require("loopback");
 var emitterService = require("../services/emitter.service");
 var globalService = require("../services/global.service");

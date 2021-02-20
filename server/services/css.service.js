@@ -12,13 +12,11 @@ var csstree = require("css-tree");
 var cssbeautify = require("cssbeautify");
 const path = require("path");
 var isTemplateCssProcessed = false;
-const frontEndTheme = `${process.env.FRONT_END_THEME}`
+const frontEndTheme = `${process.env.FRONT_END_THEME}`;
 
 module.exports = cssService = {
   startup: async function () {
-    emitterService.on("getRenderedPagePostDataFetch", async function (
-      options
-    ) {
+    emitterService.on("getRenderedPagePostDataFetch", async function (options) {
       if (options && options.page) {
         await cssService.getCssFile(options.page);
         // await cssService.getCssLinks(options);
@@ -66,20 +64,22 @@ module.exports = cssService = {
     let originalFilePath = `/server/themes/front-end/${frontEndTheme}/css/template.css`;
     let originalFile = await fileService.getFile(originalFilePath);
     // console.log(originalFile);
-    let processedFilePath = `/server/themes/front-end/${frontEndTheme}/css/template-processed.css`
+    let processedFilePath = `/server/themes/front-end/${frontEndTheme}/css/template-processed.css`;
 
     let viewModel = await dataService.getContentTopOne("site-settings-colors");
 
     // console.log("processing template css data", viewModel);
-    let cssPath = path.join(originalFilePath);
-    let processCssString = await viewService.getProcessedView(
-      "site-settings-colors",
-      viewModel.data,
-      cssPath
-    );
+    if (viewModel) {
+      let cssPath = path.join(originalFilePath);
+      let processCssString = await viewService.getProcessedView(
+        "site-settings-colors",
+        viewModel.data,
+        cssPath
+      );
 
-    // console.log(processCssString);
-    fileService.writeFile(processedFilePath, processCssString);
+      // console.log(processCssString);
+      fileService.writeFile(processedFilePath, processCssString);
+    }
   },
 
   // processSections: async function (cssString) {
@@ -99,7 +99,9 @@ module.exports = cssService = {
 
   getCssFile: async function (page) {
     //get template.css
-    let cssString = await fileService.getFile(`/server/themes/front-end/${frontEndTheme}/css/template.css`);
+    let cssString = await fileService.getFile(
+      `/server/themes/front-end/${frontEndTheme}/css/template.css`
+    );
     //parse the css
     var ast = csstree.parse(cssString);
     let cleanCss = csstree.generate(ast);

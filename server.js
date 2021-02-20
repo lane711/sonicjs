@@ -13,6 +13,7 @@ const chalk = require("chalk");
 // var express = require("express");
 var exphbs = require("express-handlebars");
 var Handlebars = require("handlebars");
+var logSymbols = require('log-symbols');
 var globalService = require("./server/services/global.service");
 var installService = require("./server/services/install.service");
 
@@ -37,9 +38,10 @@ mongoose.connect(process.env.MONGODB_URL, {
 const User = require("./server/schema/models/user");
 
 
-mongoose.connection.once("open", () => {
-  console.log(chalk.green(`Successfully connected to database!`));
-  installService.checkInstallation();
+mongoose.connection.once("open", async () => {
+  console.log(logSymbols.success, 'Successfully connected to database!');
+
+  await installService.checkInstallation();
 });
 
 

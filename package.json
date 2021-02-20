@@ -67,6 +67,7 @@
     "jsoneditor": "^9.1.5",
     "jstree": "^3.3.10",
     "lodash": "^4.17.20",
+    "log-symbols": "^4.0.0",
     "mixpanel": "^0.13.0",
     "moment": "^2.29.1",
     "mongoose": "^5.11.4",

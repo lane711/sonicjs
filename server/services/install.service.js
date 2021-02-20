@@ -1,16 +1,21 @@
 var dataService = require("./data.service");
 var helperService = require("./helper.service");
 var fileService = require("./file.service");
+var logSymbols = require('log-symbols');
 
 module.exports = installService = {
   checkInstallation: async function () {
-    console.log("checking install");
+    console.log(logSymbols.info, 'Checking Install...');
 
-    installService.checkDefaultContent();
+    await installService.checkDefaultContent();
+
+    console.log(logSymbols.success, 'Install Verified!');
+
   },
 
   checkDefaultContent: async function () {
-    console.log("checking default content");
+    console.log(logSymbols.info, 'Checking Base Content...');
+
 
     let siteSettingsColors = await dataService.getContentByType(
       "site-settings-colors"
@@ -129,6 +134,24 @@ module.exports = installService = {
       console.log("created main menu:", record);
     }
 
+    let page = await dataService.getContentByType("page");
+    if (page.length === 0) {
+      let data = {
+        data: {
+          contentType: "page",
+          url: "/",
+          title : "Home", 
+          showHero : false, 
+          heroTitle : "", 
+          pageCssClass : "", 
+          autoGenerateUrl : false, 
+        },
+      };
+      let record = await dataService.contentCreate(data, false);
+      console.log("created default page:", record);
+    }
+
+    console.log(logSymbols.success, 'Base Content Verified!');
 
   },
 };

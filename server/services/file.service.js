@@ -83,8 +83,6 @@ module.exports = fileService = {
 
   writeFile: async function (filePath, fileContent) {
     let fullPath = path.join(this.getRootAppPath(), filePath);
-    console.log('==> writeFile - fullPath--->', fullPath);
-
     await fsPromise.writeFile(fullPath, fileContent);
   },
 
@@ -96,7 +94,6 @@ module.exports = fileService = {
   },
 
   fileExists: function (filePath) {
-    console.log('--> fileExists', filePath);
     let dirPath = path.join(appRoot.path, filePath);
     let fileExist = fs.existsSync(dirPath);
     return fileExist;
