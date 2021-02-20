@@ -72,7 +72,7 @@
 
 ## Overview
 
-### SonicJs is a 100% javascript based, REST API driven CMS/Framework built on the following tech stack:
+### SonicJs is a 100% javascript based, GraphQL API driven CMS/Framework built on the following tech stack:
 
 - NodeJs
 - Express
