@@ -19,6 +19,7 @@ const {
   GraphQLList,
   GraphQLNonNull,
   GraphQLInputObjectType,
+  GraphQLBoolean,
 } = graphql;
 
 //Schema defines data on the Graph like object types(book type), relation between
@@ -126,6 +127,16 @@ const ViewType = new GraphQLObjectType({
   }),
 });
 
+const ModuleType = new GraphQLObjectType({
+  name: "ModuleType",
+  fields: () => ({
+    title: { type: GraphQLString },
+    systemId: { type: GraphQLString },
+    enabled: { type: GraphQLBoolean },
+    canBeAddedToColumn: { type: GraphQLString },
+  }),
+});
+
 class FileData {
   constructor(filePath, fileContent) {
     this.filePath = filePath;
@@ -176,7 +187,7 @@ const RootQuery = new GraphQLObjectType({
     },
     roles: {
       type: new GraphQLList(ContentType),
-      async resolve (parent, args) {
+      async resolve(parent, args) {
         return Content.find({
           contentTypeId: "role",
         });
@@ -459,7 +470,9 @@ const Mutation = new GraphQLObjectType({
         createdByUserId: { type: GraphQLID },
       },
       resolve(parent, args, context) {
-        let userId = context.session.userId ? context.session.userId : args.createdByUserId;
+        let userId = context.session.userId
+          ? context.session.userId
+          : args.createdByUserId;
         let now = new Date();
         let dataObj = JSON.parse(args.data);
         args.data = dataObj;
@@ -556,6 +569,20 @@ const Mutation = new GraphQLObjectType({
         fileService.writeFile(args.filePath, args.fileContent);
         let fileData = new FileData(args.filePath, args.fileContent);
         return fileData;
+      },
+    },
+
+    // module type mutations
+    moduleTypeCreate: {
+      type: ModuleType,
+      args: {
+        title: { type: new GraphQLNonNull(GraphQLString) },
+        enabled: { type: new GraphQLNonNull(GraphQLBoolean) },
+        systemId: { type: new GraphQLNonNull(GraphQLString) },
+        canBeAddedToColumn: { type: new GraphQLNonNull(GraphQLBoolean) },
+      },
+      resolve(parent, args) {
+        return moduleService.createModule(args);
       },
     },
   },
