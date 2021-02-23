@@ -167,7 +167,7 @@ Please see here for a full explanation: https://sonicjs.com/about, however here 
 - Minimal Learning Curve
 - KISS
 - Do it Right the First Time
-- 100% Gra Based
+- 100% GraphQL Based
 - No "Fighting"
 - Development Should be Fun
 
