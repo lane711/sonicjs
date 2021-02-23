@@ -1,0 +1,8 @@
+{
+  "title": "mutCheck2",
+  "enabled": true,
+  "systemId": "junk-test",
+  "canBeAddedToColumn": true,
+  "systemidUpperCase": "JUNK-TEST",
+  "systemidCamelCase": "junkTest"
+}

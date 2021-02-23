@@ -341,10 +341,8 @@ module.exports = moduleService = {
     moduleDefinitionFile.systemidCamelCase = _.camelCase(
       moduleDefinitionFile.systemId
     );
-    let mainServiceFilePath = path.join(
-      appRoot.path,
-      "/server/assets/js/module-default-main-service.js"
-    );
+    let mainServiceFilePath = "/server/assets/js/module-default-main-service.js"
+    
     var mainServiceFile = await viewService.getProcessedView(
       null,
       moduleDefinitionFile,
