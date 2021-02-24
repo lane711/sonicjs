@@ -626,7 +626,6 @@ if (typeof module !== "undefined" && module.exports) {
       await this.getAxios().post(url, objToDelete);
     }),
     (exports.moduleCreate = async function (payload) {
-      debugger;
       let result = await this.getAxios().post(apiUrl, {
         query: `
         mutation{
