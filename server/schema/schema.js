@@ -494,6 +494,7 @@ const Mutation = new GraphQLObjectType({
       type: ContentType,
       args: {
         id: { type: new GraphQLNonNull(GraphQLString) },
+        url: { type: new GraphQLNonNull(GraphQLString) },
         data: {
           type: new GraphQLNonNull(GraphQLString),
         },
@@ -504,6 +505,7 @@ const Mutation = new GraphQLObjectType({
         let dataObj = JSON.parse(args.data);
         args.data = dataObj;
         let contentDoc = Content.findByIdAndUpdate(args.id, {
+          url: args.url,
           data: args.data,
         });
         contentDoc.exec();

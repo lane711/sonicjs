@@ -448,6 +448,7 @@ if (typeof module !== "undefined" && module.exports) {
       mutation{
         contentUpdate( 
           id:"${id}", 
+          url:"${payload.data.url}", 
           data:"""${data}"""){
             id
             url
@@ -463,7 +464,7 @@ if (typeof module !== "undefined" && module.exports) {
       return result.data.data.contentUpdate;
     }),
     (exports.contentCreate = async function (payload, autoGenerateUrl = true) {
-      if (payload.data.contentType !== "page") {
+      if (payload.data.contentType !== "page" && payload.data.contentType !== "blog") {
         if (autoGenerateUrl){
           payload.data.url = helperService.generateSlugFromContent(
             payload.data,
