@@ -334,7 +334,7 @@ module.exports = moduleService = {
     //create default view
     let defaultViewFile = `<div>Hello to you {{ data.firstName }} from the ${moduleDefinitionFile.title} module!</div>`;
     fileService.writeFile(
-      `${basePath}/views/${moduleDefinitionFile.systemId}-main.handlebars`,
+      `${basePath}/views/${moduleDefinitionFile.systemId}-main.hbs`,
       defaultViewFile
     );
 
