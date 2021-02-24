@@ -52,24 +52,9 @@
                     data: { canBeAddedToColumn: true, enabled: true }
                   };
                   form.on('submit', async function (submission) {
-                    var accessToken = '{{ this.accessToken }}';
-                    axios.post(`/api/modules?access_token=${accessToken}`, submission.data)
-                      .then(async function (response) {
-                        console.log('add module', response);
-                        //return await response.data;
-                        function redirectToPage() {
-                          //window.location.replace('/admin/modules/edit/' + submission.data.systemId);
-                          window.location.replace('/admin/modules');
 
-                        }
-
-                        //HACK: requires app restart
-                        setTimeout(redirectToPage, 2000);
-
-                      })
-                      .catch(function (error) {
-                        console.log(error);
-                      });
+                    await dataService.moduleCreate(submission);
+                    window.location.replace('/admin/modules');
 
                   });
                 });

@@ -303,6 +303,8 @@ module.exports = moduleService = {
 
   createModule: async function (moduleDefinitionFile) {
     let basePath = `/server/modules/${moduleDefinitionFile.systemId}`;
+    
+    moduleDefinitionFile.version = "0.0.0.1";
 
     //create base dir
     fileService.createDirectory(`${basePath}`);

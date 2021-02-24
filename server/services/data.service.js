@@ -625,6 +625,29 @@ if (typeof module !== "undefined" && module.exports) {
       let objToDelete = { moduleSystemId: moduleSystemId };
       await this.getAxios().post(url, objToDelete);
     }),
+    (exports.moduleCreate = async function (payload) {
+      debugger;
+      let result = await this.getAxios().post(apiUrl, {
+        query: `
+        mutation{
+          moduleTypeCreate(
+            title:"${payload.data.title}", 
+            enabled:${payload.data.enabled}, 
+            systemId:"${payload.data.systemId}", 
+            canBeAddedToColumn: ${payload.data.canBeAddedToColumn}
+            )
+          {		
+            title
+            enabled
+            systemId
+            canBeAddedToColumn
+          }
+        }
+          `,
+      });
+
+      return result.data.data.fileUpdate;
+    }),
     (exports.getFiles = async function () {
       let files = [{ title: "my image", filePath: "/images/test123.png" }];
       return files;
