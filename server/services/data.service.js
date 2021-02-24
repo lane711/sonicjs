@@ -613,8 +613,8 @@ if (typeof module !== "undefined" && module.exports) {
         await callback(array[index], index, array);
       }
     }),
-    (exports.getImageUrl = function (img) {
-      return `/api/containers/files/download/${img.originalName}`;
+    (exports.getImageUrl = function (fileName) {
+      return `/assets/uploads/${fileName}`;
     }),
     (exports.getImage = function (img) {
       let url = this.getImageUrl(img);

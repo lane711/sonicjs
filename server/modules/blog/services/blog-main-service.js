@@ -48,8 +48,8 @@ module.exports = blogMainService = {
               body: formatService.stripHtmlTags(
                 helperService.truncateString(record.data.body, 400)
               ),
-              image: record.data.image
-                ? dataService.getImageUrl(record.data.image[0])
+              image: record.data.fileName
+                ? dataService.getImageUrl(record.data.fileName)
                 : undefined,
               url: record.data.url,
               createdOn: record.data.createdOn
@@ -64,7 +64,7 @@ module.exports = blogMainService = {
         // let sortedFiles = files.sort((a, b) => (a.data.sortOrder > b.data.sortOrder) ? 1 : -1)
         // await mediaService.addMediaUrl(sortedFiles);
         // viewModel.data.files = sortedFiles;
-        let proccessedHtml = await mediaMainService.processView(
+        let processedHtml = await mediaMainService.processView(
           contentType,
           viewModel,
           viewPath
@@ -72,14 +72,14 @@ module.exports = blogMainService = {
 
         globalService.pageContent = globalService.pageContent.replace(
           options.shortcode.codeText,
-          proccessedHtml
+          processedHtml
         );
       }
     });
   },
 
   processView: async function(contentType, viewModel, viewPath) {
-    var result = await viewService.getProccessedView(
+    var result = await viewService.getProcessedView(
       contentType,
       viewModel,
       viewPath
