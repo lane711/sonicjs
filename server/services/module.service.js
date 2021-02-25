@@ -261,12 +261,12 @@ module.exports = moduleService = {
     });
   },
 
-  processModuleInColumn: async function (options) {
+  processModuleInColumn: async function (options, viewModel) {
     if (options.shortcode.name === options.moduleName.toUpperCase()) {
       let id = options.shortcode.properties.id;
       let contentType = options.moduleName;
       let viewPath = `/server/modules/${contentType}/views/${contentType}-main.hbs`;
-      let viewModel = await dataService.getContentById(id);
+      viewModel = viewModel ? viewModel : await dataService.getContentById(id);
 
       options.viewModel = viewModel;
 

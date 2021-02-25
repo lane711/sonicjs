@@ -1,0 +1,9 @@
+{
+  "title": "Blog Details",
+  "enabled": true,
+  "systemId": "blog-details",
+  "canBeAddedToColumn": true,
+  "version": "0.0.0.1",
+  "systemidUpperCase": "BLOG-DETAILS",
+  "systemidCamelCase": "blogDetails"
+}

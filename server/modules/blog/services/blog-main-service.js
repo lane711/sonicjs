@@ -8,12 +8,14 @@ module.exports = blogMainService = {
   startup: async function() {
     emitterService.on("beginProcessModuleShortCode", async function(options) {
 
-      if (options.shortcode.name === "BLOG") {
+
+      if (options.shortcode.name === "BLOG-SETTINGS") {
         options.moduleName = 'blog';
+        options.shortcode.name = 'BLOG'
 
         let id = options.shortcode.properties.id;
         let moduleData = await dataService.getContentById(id);
-        let contentType = moduleData.data.contentType;
+        let contentType = 'blog';
         let viewModel = moduleData;
 
         let listRaw = await dataService.getContentByType(contentType);
