@@ -53,6 +53,14 @@ module.exports = contentService = {
       // console.log("no cache");
     }
 
+    // let url = req.url;
+    // if(url.indexOf('/blog/') === 0){
+    //   url = '/blog-details';
+    // }
+
+    await emitterService.emit("preProcessPageUrlLookup", req);
+
+
     this.page = await dataService.getContentByUrl(req.url);
 
     if (this.page.data) {
