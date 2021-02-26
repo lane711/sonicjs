@@ -69,7 +69,7 @@ if (typeof module !== "undefined" && module.exports) {
       } else if (contentTypeId) {
         contentType = await dataService.contentTypeGet(contentTypeId);
         //show settings version of content type if exist
-        if(returnModuleSettings){
+        if(returnModuleSettings && returnModuleSettings.systemId){
           const settingContentType = await dataService.contentTypeGet(`${contentTypeId}-settings`);
           if(settingContentType){
             contentType = settingContentType;
