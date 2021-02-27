@@ -1,0 +1,9 @@
+{
+  "title": "Menu Accordion",
+  "enabled": true,
+  "systemId": "menu-accordion",
+  "canBeAddedToColumn": true,
+  "version": "0.0.0.1",
+  "systemidUpperCase": "MENU-ACCORDION",
+  "systemidCamelCase": "menuAccordion"
+}

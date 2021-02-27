@@ -1,0 +1,77 @@
+/* Css File for Module: menu-accordion */
+  
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  
+  .nav li {
+    border-bottom: 1px solid #eee;
+  }
+  
+  .nav li a {
+    font-size: 14px;
+  }
+  
+  #accordionMenu {
+    max-width: 300px;
+  }
+  
+  .panel-body {
+    padding: 0;
+  }
+  
+  .panel-group .panel+.panel {
+    margin-top: 0;
+    border-top: 0;
+  }
+  
+  .panel-group .panel {
+    border-radius: 0;
+  }
+  
+  .panel-default>.panel-heading {
+    color: #333;
+    background-color: #fff;
+    border-color: #e4e5e7;
+    padding: 0;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  .panel-default>.panel-heading a {
+    display: block;
+    padding: 10px 15px;
+    text-decoration: none;
+  }
+  
+  .panel-default>.panel-heading a:after {
+    content: "";
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    font-family: 'Glyphicons Halflings';
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    float: right;
+    transition: transform .25s linear;
+    -webkit-transition: -webkit-transform .25s linear;
+  }
+  
+  .panel-default>.panel-heading a[aria-expanded="true"] {
+    background-color: #eee;
+  }
+  
+  .panel-default>.panel-heading a[aria-expanded="true"]:after {
+    content: "\e113";
+  }
+  
+  .panel-default>.panel-heading a[aria-expanded="false"]:after {
+    content: "\e114";
+  }
