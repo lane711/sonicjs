@@ -1,4 +1,4 @@
-{{ log data }}
+<!-- {{ log data }} -->
 
 <div
   class="panel-group accordion-menu-module"
@@ -31,9 +31,9 @@
     >
       <div class="panel-body">
         <ul class="nav">
-          <!-- {{log this.children }} -->
+          {{log this.children }}
           {{#each this.children}}
-          <li><a href="{{this.url}}">{{this.text}}</a></li>
+          <li><a href="{{this.data.url}}">{{this.text}}</a></li>
           {{/each}}
         </ul>
       </div>
