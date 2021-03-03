@@ -59,8 +59,8 @@ module.exports = fileService = {
     let filesRelative = [];
 
     files.forEach((file) => {
-      filesRelative.push(file.replace(appRoot.path, ""));
-    });
+      const root = appRoot.path.split(path.sep).join(path.posix.sep);
+      filesRelative.push(file.replace(root, ""));    });
 
     return filesRelative;
   },
