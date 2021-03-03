@@ -1,0 +1,9 @@
+{
+  "title": "Page Templates",
+  "enabled": true,
+  "systemId": "page-templates",
+  "canBeAddedToColumn": false,
+  "version": "0.0.0.1",
+  "systemidUpperCase": "PAGE-TEMPLATES",
+  "systemidCamelCase": "pageTemplates"
+}
