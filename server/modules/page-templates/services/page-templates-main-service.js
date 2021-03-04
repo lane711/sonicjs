@@ -14,6 +14,12 @@ module.exports = pageTemplatesMainService = {
             }
 
         });
+
+        emitterService.on("preProcessPageUrlLookup", async function (req) {
+            if (req.url.indexOf("/docs/") === 0) {
+              req.url = "/doc-details";
+            }
+          });
     },
 
 }
