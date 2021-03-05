@@ -53,17 +53,24 @@ module.exports = contentService = {
       // console.log("no cache");
     }
 
-    // let url = req.url;
-    // if(url.indexOf('/blog/') === 0){
-    //   url = '/blog-details';
-    // }
-
     await emitterService.emit("preProcessPageUrlLookup", req);
-
 
     this.page = await dataService.getContentByUrl(req.url);
 
     if (this.page.data) {
+
+      //page templates
+      if(this.page.data.pageTemplate){
+        // console.log(this.page.data.pageTemplate)
+        // let pageTemplate = await dataService.getContentById(this.page.data.pageTemplate);
+        // console.log(pageTemplate)
+        // let processedTemplate = await this.getPage(pageTemplate.id, pageTemplate.data);
+
+        //merge data?
+
+      }
+
+
       await this.getPage(this.page.id, this.page.data);
       await emitterService.emit("postProcessPage");
 
@@ -108,42 +115,9 @@ module.exports = contentService = {
     if (!id) {
       return;
     }
-    // log(chalk.green(id));
-    // this.id = id;
-    // if (instance) {
-    //   this.page = instance;
-    // } else {
-    //   if (id) {
-    //     //TODO convert to graphql
-    //     this.page = await dataService.getContentById(id);
-    //   }
-    // }
-    // console.log('id',id, instance);
 
     return await this.processTemplate();
-    // let themePath = __dirname + "/../themes/base/index.html";
 
-    // return new Promise((resolve, reject) => {
-    //   fs.readFile(themePath, "utf8", (err, data) => {
-    //     if (err) {
-    //       console.log(err);
-    //       reject(err);
-    //     } else {
-    //       // console.log('data==>', data);
-    //       this.processTemplate(data).then((html) => {
-    //         resolve("ok");
-    //         // console.log('getPage.page-->', html.length);
-    //         // this.page.data.body = html;
-    //         // pageBuilderService.processPageBuilder(this.page).then(pagebuilder => {
-    //         //     // console.log('page-->2', pagebuilder.length);
-    //         //     this.page.data.pagebuilder = pagebuilder;
-
-    //         //     resolve(html);
-    //         // })
-    //       });
-    //     }
-    //   });
-    // });
   },
 
   getBlog: async function (req) {
@@ -170,70 +144,18 @@ module.exports = contentService = {
 
   getPageByUrl: async function (id, instance) {},
 
-  // getSandboxPage: async function (id, instance) {
-  //     let themePath = __dirname + '/../assets/html/sandbox.html';
-
-  //     return new Promise((resolve, reject) => {
-  //         fs.readFile(themePath, "utf8", (err, data) => {
-  //             if (err) {
-  //                 console.log(err);
-  //                 reject(err);
-  //             }
-  //             else {
-  //                 console.log('data==>', data);
-  //                 this.processTemplate(data).then(html => {
-  //                     resolve('sandbox');
-  //                 })
-  //             }
-  //         });
-  //     });
-  // },
 
   processTemplate: async function () {
     globalService.pageContent = ""; //reset
-    // this.setupShortCodeParser();
-    // console.log('=== processTemplate ===')
     const $ = cheerio.load("");
 
     await this.processSections($);
     await this.processDelayedModules();
 
-    // await this.processPageBuilder($);
-    // console.log('section content', globalService.pageContent);
 
     return $.html();
   },
 
-  // processPageBuilder: async function ($) {
-
-  //     let body = $('body');
-
-  //     //load pb root index file
-  //     let ui = await this.getPageBuilderUI();
-
-  //     // console.log(pageBuilder);
-  //     body.prepend(ui);
-  // },
-
-  // getPageBuilderUI: async function (){
-  //     let themePath = __dirname + '/../page-builder/page-builder.html';
-
-  //     return new Promise((resolve, reject) => {
-  //         fs.readFile(themePath, "utf8", (err, data) => {
-  //             if (err) {
-  //                 console.log(err);
-  //                 reject(err);
-  //             }
-  //             else {
-  //                 // console.log('data==>', data);
-  //                 resolve(data);
-  //                 // this.processTemplate(data).then(html => {
-  //                 //     resolve(html);
-  //                 // })
-  //             }
-  //         });
-  //     });
-  // },
 
   processMenu: async function () {
     let menuItemTemplate = $.html(".s--menu-item");
@@ -391,8 +313,6 @@ module.exports = contentService = {
         columnIndex: 0,
       });
     }
-    // console.log("done delayed modules");
-    // console.log("================");
   },
 
   wrapBlockInModuleDiv: function (proccessedHtml, viewModel) {
@@ -408,23 +328,6 @@ module.exports = contentService = {
     proccessedHtml.body = `<div class="${wrapperCss}" style="${wrapperStyles}" data-id="${proccessedHtml.id}" data-module="${proccessedHtml.shortCode.name}" data-content-type="${proccessedHtml.contentType}">${proccessedHtml.body}</div>`;
   },
 
-  // setupShortCodeParser: async function(){
-  //     await parser.add('BLOCK', tag=>{
-  //                         try{
-  //                 let blockId = tag.attributes.id
-  //                 console.log('in parser callback blockId:-->', blockId);
-  //                 await this.processBlock(blockId);
-  //                 return blockId;
-  //             }
-  //             catch(error){
-  //                 console.log(error);
-  //             }
-  //         // let blockId = tag.attributes.id
-  //         // console.log('in parser callback blockId:-->', blockId);
-  //         // await this.processBlock(blockId);
-  //         // return blockId;
-  //     });
-  // },
 
   replaceBlockShortCode: async function (shortcode) {
     let blockId = shortcode.properties.id;

@@ -19,7 +19,10 @@
       "type": "node",
       "request": "launch",
       "name": "Server",
-      "program": "${workspaceFolder}/server.js"
+      "program": "${workspaceFolder}/server.js",
+      "skipFiles": [
+        "<node_internals>/**/*.js"
+      ]   
     },
     {
       "type": "node",
