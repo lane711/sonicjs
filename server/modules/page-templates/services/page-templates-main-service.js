@@ -13,7 +13,9 @@ module.exports = pageTemplatesMainService = {
                 options.moduleName = 'page-templates';
 
                 let data = await dataService.getContentByUrl(options.req.originalUrl);
-                // let page = await contentService.getPage(data.id, data);
+                let page = await contentService.getPage(data.id, data);
+
+                console.log('template->', page);
                 await moduleService.processModuleInColumn(options);
             }
 

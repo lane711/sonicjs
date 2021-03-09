@@ -23,8 +23,6 @@ module.exports = menuAccordionMainService = {
 
             if (options.shortcode.name === 'MENU-ACCORDION') {
       
-              //TODO: how to delay processing of the module until after the module list is populated?
-                // titleModules.push(options.viewModel.data);
                 let menuToDisplay = options.viewModel.data.menuTitle;
                 let menuData = await menuService.getMenu(menuToDisplay);
                 options.viewModel.data.menuData = menuData;
