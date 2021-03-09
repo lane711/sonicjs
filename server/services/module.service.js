@@ -284,7 +284,7 @@ module.exports = moduleService = {
         viewModel: viewModel,
       });
 
-      globalService.pageContent = globalService.pageContent.replace(
+      options.page.data.html = options.page.data.html.replace(
         options.shortcode.codeText,
         proccessedHtml.body
       );

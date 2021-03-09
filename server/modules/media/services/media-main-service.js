@@ -22,7 +22,7 @@ module.exports = mediaMainService = {
                 viewModel.data.files = sortedFiles;
                 let proccessedHtml = await mediaMainService.processView(contentType, viewModel, viewPath);
 
-                globalService.pageContent = globalService.pageContent.replace(options.shortcode.codeText, proccessedHtml);
+                options.page.data.html = options.page.data.html.replace(options.shortcode.codeText, proccessedHtml);
             }
 
         });
