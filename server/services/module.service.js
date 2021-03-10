@@ -266,9 +266,7 @@ module.exports = moduleService = {
       let id = options.shortcode.properties.id;
       let contentType = options.moduleName;
       let viewPath = `/server/modules/${contentType}/views/${contentType}-main.hbs`;
-      viewModel = viewModel ? viewModel : await dataService.getContentById(id);
-
-      options.viewModel = viewModel;
+      options.viewModel = viewModel ? viewModel : await dataService.getContentById(id);
 
       await emitterService.emit("postModuleGetData", options);
 
@@ -276,12 +274,12 @@ module.exports = moduleService = {
         id: id,
         contentType: contentType,
         shortCode: options.shortcode,
-        body: await this.processView(contentType, viewModel, viewPath),
+        body: await this.processView(contentType, options.viewModel, viewPath),
       };
 
       await emitterService.emit("postProcessModuleShortCodeProccessedHtml", {
         proccessedHtml: proccessedHtml,
-        viewModel: viewModel,
+        viewModel: options.viewModel,
       });
 
       options.page.data.html = options.page.data.html.replace(

@@ -114,7 +114,9 @@ module.exports = contentService = {
       return;
     }
 
-    return await this.processTemplate(page);
+    await this.processTemplate(page);
+
+    return page.data.html;
   },
 
   getBlog: async function (req) {
@@ -143,12 +145,12 @@ module.exports = contentService = {
 
   processTemplate: async function (page) {
     page.data.html = ""; //reset
-    const $ = cheerio.load("");
+    // const $ = cheerio.load("");
 
-    await this.processSections($, page);
+    await this.processSections(page);
     await this.processDelayedModules();
 
-    return $.html();
+    // return $.html();
   },
 
   processMenu: async function () {
@@ -167,12 +169,12 @@ module.exports = contentService = {
     });
   },
 
-  processSections: async function ($, page) {
+  processSections: async function (page) {
     await emitterService.emit("preProcessSections");
 
     page.data.sections = [];
-    let sectionWrapper = $(".s--section").parent(); //container
-    sectionWrapper.empty();
+    // let sectionWrapper = $(".s--section").parent(); //container
+    // sectionWrapper.empty();
 
     // let page = page; // await this.getContentById('5cd5af93523eac22087e4358');
     // console.log('processSections:page==>', page);
@@ -196,7 +198,6 @@ module.exports = contentService = {
             rows = await this.processRows(
               page,
               section,
-              sectionWrapper,
               section.data.rows
             );
           }
@@ -212,12 +213,12 @@ module.exports = contentService = {
         }
       });
 
-      sectionWrapper.append(page.data.html);
+      // sectionWrapper.append(page.data.html);
     }
   },
 
   //TODO loop thru rows
-  processRows: async function (page, section, sectionWrapper, rows) {
+  processRows: async function (page, section, rows) {
     let rowArray = [];
     let rowIndex = 0;
 

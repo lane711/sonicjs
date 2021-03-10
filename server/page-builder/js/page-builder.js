@@ -1250,6 +1250,10 @@ async function addModuleToColumn(submission) {
     args
   );
 
+
+//if page uses a template, we need to attach the comtent to the selected region of the template
+console.log('attach to region');
+
   //add the shortCode to the column
   let section = await dataService.getContentById(currentSectionId);
   let column =

@@ -461,9 +461,9 @@ exports.loadRoutes = async function (app) {
 
     let isAuthenticated = await userService.isAuthenticated(req);
     globalService.setAreaMode(false, true, isAuthenticated);
-    var page = await contentService.getRenderedPage(req);
+    var {page} = await contentService.getRenderedPage(req);
 
-    if (page.page.data.title === "Not Found") {
+    if (page.data.title === "Not Found") {
       // res.render("404", page);
       res.render(`front-end/${frontEndTheme}/layouts/404`, {
         layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
@@ -473,16 +473,15 @@ exports.loadRoutes = async function (app) {
     }
 
     mixPanelService.trackEvent("PAGE_LOAD", req, {
-      page: page.page.data.title,
+      page: page.data.title,
       ip: ip,
     });
 
-    let pageData = page.page;
-    pageData.data.id = pageData.id;
+    await emitterService.emit("preRenderTemplate", options={page, req});
 
     res.render(`front-end/${frontEndTheme}/layouts/main`, {
       layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
-      data: pageData.data,
+      data: page.data,
     });
   });
 };
