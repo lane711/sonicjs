@@ -216,7 +216,6 @@ function setupUIClicks() {
 
       console.log("moduleId", currentModuleId);
       $(".edit-module").show().appendTo(moduleDiv);
-      // currentColumn.children('.module').addClass('block-edit');
     },
   });
 }
@@ -648,9 +647,9 @@ async function editInstance(payload, refresh, contentType = "content") {
       // resolve(response.data);
       // return await response.data;
       if (response.contentTypeId === "page" && !globalService.isBackEnd()) {
-        if(response.url){
-        window.location.href = response.url;
-        }else{
+        if (response.url) {
+          window.location.href = response.url;
+        } else {
           fullPageUpdate();
         }
       } else if (refresh) {
@@ -1250,16 +1249,22 @@ async function addModuleToColumn(submission) {
     args
   );
 
-
-//if page uses a template, we need to attach the comtent to the selected region of the template
-console.log('attach to region');
-
-  //add the shortCode to the column
-  let section = await dataService.getContentById(currentSectionId);
-  let column =
-    section.data.rows[currentRowIndex].columns[currentColumnIndex - 1];
-  column.content += moduleInstanceShortCode;
-  editInstance(section);
+  if (page.data.pageTemplate) {
+    let regionModule = $(currentColumn[0].children).filter(function () {
+      return $(this).attr("data-module") == "PAGE-TEMPLATES";
+    })[0];
+    let regionId = $(regionModule).attr('data-id');
+    //.find("div").attr('data-module') === 'PAGE-TEMPLATES';
+    //if page uses a template, we need to attach the comtent to the selected region of the template
+    console.log("attach to region");
+  } else {
+    //add the shortCode to the column
+    let section = await dataService.getContentById(currentSectionId);
+    let column =
+      section.data.rows[currentRowIndex].columns[currentColumnIndex - 1];
+    column.content += moduleInstanceShortCode;
+    editInstance(section);
+  }
 
   fullPageUpdate();
 }
@@ -1352,7 +1357,7 @@ async function writeFile(container, file) {
   let formData = new FormData();
   formData.append("file", file);
 
-  alert('not implemented');
+  alert("not implemented");
   // axiosInstance
   //   .post(`/api/containers/${container}/upload`, formData, {
   //     headers: {
@@ -1372,7 +1377,7 @@ async function setupACEEditor() {
     return;
   }
 
-  ace.config.set('basePath', '/node_modules/ace-builds/src-min-noconflict') 
+  ace.config.set("basePath", "/node_modules/ace-builds/src-min-noconflict");
   var editor = ace.edit("editor");
   editor.setTheme("ace/theme/monokai");
   editor.session.setMode("ace/mode/css");
@@ -1405,9 +1410,12 @@ async function setupACEEditor() {
 
   $("#save-global-css").click(async function () {
     let cssContent = editor.getSession().getValue();
-    
+
     // let file = new File([cssContent], "template.css", { type: "text/css" });
-    await dataService.fileUpdate('/server/themes/front-end/bootstrap/css/template.css', cssContent);
+    await dataService.fileUpdate(
+      "/server/themes/front-end/bootstrap/css/template.css",
+      cssContent
+    );
 
     // writeFile("css", file);
   });
