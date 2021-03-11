@@ -1233,8 +1233,19 @@ async function addModuleToColumn(submission) {
   // debugger;
   console.log("adding module to column", submission);
 
-  //handling adding module def to db
   let entity = processContentFields(submission.data);
+
+  if (page.data.pageTemplate) {
+    let regionModule = $(currentColumn[0].children).filter(function () {
+      return $(this).attr("data-module") == "PAGE-TEMPLATES";
+    })[0];
+    let pageTemplateRegion = $(regionModule).attr('data-id');
+    //if page uses a template, we need to attach the content to the selected region of the template
+    entity.data.pageTemplateRegion = pageTemplateRegion;
+    console.log("attach to region");
+  } 
+
+  //handling adding module def to db
   let processedEntity;
   if (submission.data.id) {
     processedEntity = await editInstance(entity);
@@ -1250,13 +1261,8 @@ async function addModuleToColumn(submission) {
   );
 
   if (page.data.pageTemplate) {
-    let regionModule = $(currentColumn[0].children).filter(function () {
-      return $(this).attr("data-module") == "PAGE-TEMPLATES";
-    })[0];
-    let regionId = $(regionModule).attr('data-id');
-    //.find("div").attr('data-module') === 'PAGE-TEMPLATES';
-    //if page uses a template, we need to attach the comtent to the selected region of the template
     console.log("attach to region");
+    //save in a 
   } else {
     //add the shortCode to the column
     let section = await dataService.getContentById(currentSectionId);
