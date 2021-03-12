@@ -1289,7 +1289,7 @@ async function addModuleToColumn(submission) {
 
   let entity = processContentFields(submission.data);
 
-  if (page.data.pageTemplate) {
+  if (page.data.pageTemplate && page.data.pageTemplate !== 'none') {
     let regionModule = $(currentColumn[0].children).filter(function () {
       return $(this).attr("data-module") == "PAGE-TEMPLATES";
     })[0];
@@ -1314,7 +1314,7 @@ async function addModuleToColumn(submission) {
     args
   );
 
-  if (page.data.pageTemplate) {
+  if (page.data.pageTemplate && page.data.pageTemplate !== 'none') {
     console.log("attach to region");
     //save in a
   } else {
