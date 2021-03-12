@@ -3,6 +3,8 @@ const axios = require('axios');
 const ShortcodeTree = require('shortcode-tree').ShortcodeTree;
 const chalk = require('chalk');
 const log = console.log;
+var emitterService = require("./emitter.service");
+var dataService = require("./data.service");
 
 const apiUrl = '/api/';
 var pageContent = '';
@@ -12,11 +14,63 @@ var sectionTemplate = '';
 var rowTemplate = '';
 var columnTemplate = '';
 
-module.exports = {
-
-    foo: function () {
-        return 'bar';
+module.exports = pageBuilderService = {
+    startup: async function (app) {
+      emitterService.on("getRenderedPagePostDataFetch", async function (options) {
+        if (options) {
+          options.page.data.showPageBuilder = await userService.isAuthenticated(
+            options.req
+          );
+        }
+      });
+  
+      app.post("/admin/pb-update-module-delete", async function (req, res) {
+        let data = req.body.data;
+        console.log(data);
+    
+        let section = await dataService.getContentById(data.sectionId);
+        let content =
+          section.data.rows[data.rowIndex].columns[data.columnIndex].content;
+        // console.log("content", content);
+    
+        // remove shortcode from the source column
+        let shortCodesInColumn = ShortcodeTree.parse(content);
+        let shortCodeToRemove = shortCodesInColumn.children[data.moduleIndex];
+        // console.log("shortCodeToRemove", shortCodeToRemove);
+        if (shortCodeToRemove && shortCodeToRemove.shortcode) {
+          let newContent = content.replace(
+            shortCodeToRemove.shortcode.codeText,
+            ""
+          );
+          section.data.rows[data.rowIndex].columns[
+            data.columnIndex
+          ].content = newContent;
+          // console.log("newContent", newContent);
+          await dataService.editInstance(section);
+        }
+    
+        //regen the destination
+        // let destinationSection = await dataService.getContentById(
+        //   data.destinationSectionId
+        // );
+    
+        // let updatedDestinationContent = sharedService.generateShortCodeList(
+        //   data.destinationModules
+        // );
+        // console.log("updatedDestinationContent", updatedDestinationContent);
+        // destinationSection.data.rows[data.destinationRowIndex].columns[
+        //   data.destinationColumnIndex
+        // ].content = updatedDestinationContent;
+        // let r = await dataService.editInstance(destinationSection);
+    
+        res.send(`ok`);
+      })
     },
+// module.exports = {
+
+//     foo: function () {
+//         return 'bar';
+//     },
 
     processPageBuilder: async function (page) {
         // console.log('<==processPageBuilder', page);

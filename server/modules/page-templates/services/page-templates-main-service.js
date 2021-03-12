@@ -38,7 +38,7 @@ module.exports = pageTemplatesMainService = {
 
         if (options.page.data.isPageTemplate) {
           //we are viewing the template page itself
-          // options.viewModel.data.html = '<div>PAGE TEMPLATE REGION</div>';
+          options.viewModel.data.html = '<div>PAGE TEMPLATE REGION</div>';
 
           // let data = await dataService.getContentByUrl(options.req.originalUrl);
           // if(options.page.date.pageTempateRegions){

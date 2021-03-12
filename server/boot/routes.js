@@ -64,6 +64,7 @@ exports.loadRoutes = async function (app) {
     await themeSettingsService.startup();
     await userService.startup(app);
     await assetService.startup();
+    await pageBuilderService.startup(app);
 
     await emitterService.emit("startup");
   })();

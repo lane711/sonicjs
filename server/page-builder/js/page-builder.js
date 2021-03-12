@@ -1190,6 +1190,60 @@ async function editModule() {
   //   .modal("show");
 }
 
+async function deleteModule() {
+  showSidePanel();
+
+  let data = await dataService.getContentById(currentModuleId);
+
+  $("#dynamicModelTitle").text(
+    `Delete: ${currentModuleContentType} (Id:${currentModuleId}) ?`
+  );
+
+  let confirmDeleteButton =
+    '<div><button onclick="deleteModuleConfirm()" class="btn btn-danger">Confirm Delete</button></div>';
+  let dataPreview = `<div class="delete-data-preview""><textarea>${JSON.stringify(
+    data,
+    null,
+    4
+  )}</textarea></div>`;
+
+  $(".pb-side-panel #main").html(confirmDeleteButton + dataPreview);
+}
+
+async function deleteModuleConfirm() {
+  console.log("deleteing module: " + currentModuleId, currentModuleContentType);
+
+  let moduleDiv = $(`.module[data-id='${currentModuleId}'`);
+
+  // debugger;
+  let source = await getModuleHierarchy(moduleDiv);
+
+  let payload = { data: {} };
+  payload.data.sectionId = currentSectionId;
+  payload.data.rowIndex = currentRowIndex;
+  payload.data.columnIndex = currentColumnIndex - 1;
+  payload.data.moduleId = currentModuleId;
+  payload.data.moduleIndex = currentModuleIndex;
+
+  // payload.data.destinationSectionId = destinationSectionId;
+  // payload.data.destinationRowIndex = destinationRowIndex;
+  // payload.data.destinationColumnIndex = destinationColumnIndex;
+  // payload.data.destinationModuleIndex = event.newIndex;
+  // payload.data.destinationModules = destinationModules;
+
+  return axiosInstance
+    .post("/admin/pb-update-module-delete", payload)
+    .then(async function (response) {
+      // debugger;
+      console.log(response);
+      fullPageUpdate();
+      // return await response.data;
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+}
+
 async function copyModule() {
   console.log("copying module: " + currentModuleId, currentModuleContentType);
   //need index and column
@@ -1239,11 +1293,11 @@ async function addModuleToColumn(submission) {
     let regionModule = $(currentColumn[0].children).filter(function () {
       return $(this).attr("data-module") == "PAGE-TEMPLATES";
     })[0];
-    let pageTemplateRegion = $(regionModule).attr('data-id');
+    let pageTemplateRegion = $(regionModule).attr("data-id");
     //if page uses a template, we need to attach the content to the selected region of the template
     entity.data.pageTemplateRegion = pageTemplateRegion;
     console.log("attach to region");
-  } 
+  }
 
   //handling adding module def to db
   let processedEntity;
@@ -1262,7 +1316,7 @@ async function addModuleToColumn(submission) {
 
   if (page.data.pageTemplate) {
     console.log("attach to region");
-    //save in a 
+    //save in a
   } else {
     //add the shortCode to the column
     let section = await dataService.getContentById(currentSectionId);

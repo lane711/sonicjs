@@ -322,12 +322,12 @@ module.exports = contentService = {
 
   wrapBlockInModuleDiv: function (proccessedHtml, viewModel) {
     let wrapperCss = "module";
-    if (viewModel.data.settings && viewModel.data.settings.data.wrapperCss) {
+    if (viewModel && viewModel.data.settings && viewModel.data.settings.data.wrapperCss) {
       wrapperCss += " " + viewModel.data.settings.data.wrapperCss;
     }
 
     let wrapperStyles = "";
-    if (viewModel.data.settings && viewModel.data.settings.data.wrapperStyles) {
+    if (viewModel && viewModel.data.settings && viewModel.data.settings.data.wrapperStyles) {
       wrapperStyles = viewModel.data.settings.data.wrapperStyles;
     }
     proccessedHtml.body = `<div class="${wrapperCss}" style="${wrapperStyles}" data-id="${proccessedHtml.id}" data-module="${proccessedHtml.shortCode.name}" data-content-type="${proccessedHtml.contentType}">${proccessedHtml.body}</div>`;
@@ -346,9 +346,8 @@ module.exports = contentService = {
     let contentType = shortcode.properties.contentType;
 
     let form = await formService.getForm(contentType);
-    // console.log('replaceFormShortCode.form', form);
-    let newBody = form;
-    page.data.html = page.data.html.replace(shortcode.codeText, newBody);
+
+    page.data.html = page.data.html.replace(shortcode.codeText, form);
   },
 
   replaceListShortCode: async function (page, shortcode) {
