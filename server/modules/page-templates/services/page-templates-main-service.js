@@ -14,7 +14,6 @@ module.exports = pageTemplatesMainService = {
 
     emitterService.on("postModuleGetData", async function (options) {
       if (options.shortcode.name === "PAGE-TEMPLATES") {
-
         // let basePage = await dataService.getContentByUrl(
         //   options.req.originalUrl
         // );
@@ -23,24 +22,29 @@ module.exports = pageTemplatesMainService = {
         //   // let data = await dataService.getContentByUrl(options.req.originalUrl);
         //   if (basePage.data.pageTemplateRegions) {
 
-          let regionId = options.viewModel.data.id
-            let body = options.page.data.pageTemplateRegions.filter(r => r.regionId === regionId);
-            // options.page.data.html = body[0].shortCodes;
-            if(body){
-            await contentService.processShortCodes(
-              options.page,
-              "s0",
-              body[0].shortCodes,
-              0,
-              0
-            );
+        let regionId = options.viewModel.data.id;
+        let body = options.page.data.pageTemplateRegions.filter(
+          (r) => r.regionId === regionId
+        );
+        // options.page.data.html = body[0].shortCodes;
+        if (body) {
+          await contentService.processShortCodes(
+            options.page,
+            "s0",
+            body[0].shortCodes,
+            0,
+            0
+          );
 
-            // options.viewModel.data.html = options.page.data.html;
-      }
+          options.viewModel.data.templateHtml = options.page.data.currentShortCodeHtml.body;
+        }
+
+        // if (options.page.data.isPageTemplate) {
+          //we are viewing the template page itself
+          // options.viewModel.data.html = '<div>PAGE TEMPLATE REGION</div>';
+        // }
         //   }
         // }
-
-
       }
     });
 
@@ -52,8 +56,10 @@ module.exports = pageTemplatesMainService = {
 
     emitterService.on("preProcessSections", async function (page) {
       // check is page is using a template
-      if(page.data.pageTemplate && page.data.pageTemplate !== 'none'){
-        let templatePage = await dataService.getContentById(page.data.pageTemplate);
+      if (page.data.pageTemplate && page.data.pageTemplate !== "none") {
+        let templatePage = await dataService.getContentById(
+          page.data.pageTemplate
+        );
         page.data.layout = templatePage.data.layout;
       }
       // let basePage = await dataService.getContentByUrl(options.req.originalUrl);

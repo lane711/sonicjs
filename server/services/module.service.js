@@ -277,6 +277,8 @@ module.exports = moduleService = {
         body: await this.processView(contentType, options.viewModel, viewPath),
       };
 
+      options.page.data.currentShortCodeHtml = proccessedHtml;
+
       await emitterService.emit("postProcessModuleShortCodeProccessedHtml", {
         proccessedHtml: proccessedHtml,
         viewModel: options.viewModel,
