@@ -8,6 +8,10 @@ module.exports = pageTemplatesMainService = {
     emitterService.on("beginProcessModuleShortCode", async function (options) {
       if (options.shortcode.name === "PAGE-TEMPLATES") {
         options.moduleName = "page-templates";
+
+        //reset html for current page template region
+        options.page.data.currentShortCodeHtml = "";
+
         await moduleService.processModuleInColumn(options);
       }
     });
@@ -22,29 +26,30 @@ module.exports = pageTemplatesMainService = {
         //   // let data = await dataService.getContentByUrl(options.req.originalUrl);
         //   if (basePage.data.pageTemplateRegions) {
 
-        let regionId = options.viewModel.data.id;
-        let body = options.page.data.pageTemplateRegions.filter(
-          (r) => r.regionId === regionId
-        );
-        // options.page.data.html = body[0].shortCodes;
-        if (body) {
-          await contentService.processShortCodes(
-            options.page,
-            "s0",
-            body[0].shortCodes,
-            0,
-            0
+        if (options.page.data.pageTemplateRegions) {
+          let regionId = options.viewModel.data.id;
+          let body = options.page.data.pageTemplateRegions.filter(
+            (r) => r.regionId === regionId
           );
+          // options.page.data.html = body[0].shortCodes;
+          if (body) {
+            await contentService.processShortCodes(
+              options.page,
+              "s0",
+              body[0].shortCodes,
+              0,
+              0
+            );
 
-          options.viewModel.data.templateHtml = options.page.data.currentShortCodeHtml.body;
+            options.viewModel.data.html =
+              options.page.data.currentShortCodeHtml;
+          }
         }
 
-        // if (options.page.data.isPageTemplate) {
+        if (options.page.data.isPageTemplate) {
           //we are viewing the template page itself
-          // options.viewModel.data.html = '<div>PAGE TEMPLATE REGION</div>';
-        // }
-        //   }
-        // }
+          options.viewModel.data.html += "<div>PAGE TEMPLATE REGION</div>";
+        }
       }
     });
 

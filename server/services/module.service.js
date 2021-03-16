@@ -266,27 +266,35 @@ module.exports = moduleService = {
       let id = options.shortcode.properties.id;
       let contentType = options.moduleName;
       let viewPath = `/server/modules/${contentType}/views/${contentType}-main.hbs`;
-      options.viewModel = viewModel ? viewModel : await dataService.getContentById(id);
+      options.viewModel = viewModel
+        ? viewModel
+        : await dataService.getContentById(id);
 
       await emitterService.emit("postModuleGetData", options);
 
-      var proccessedHtml = {
+      var processedHtml = {
         id: id,
         contentType: contentType,
         shortCode: options.shortcode,
         body: await this.processView(contentType, options.viewModel, viewPath),
       };
 
-      options.page.data.currentShortCodeHtml = proccessedHtml;
+      //for template based pages
+      if (options.page.data.currentShortCodeHtml) {
+        options.page.data.currentShortCodeHtml += processedHtml.body;
+      } else {
+        options.page.data.currentShortCodeHtml = processedHtml.body;
+      }
 
-      await emitterService.emit("postProcessModuleShortCodeProccessedHtml", {
-        proccessedHtml: proccessedHtml,
+
+      await emitterService.emit("postProcessModuleShortCodeProcessedHtml", {
+        processedHtml: processedHtml,
         viewModel: options.viewModel,
       });
 
       options.page.data.html = options.page.data.html.replace(
         options.shortcode.codeText,
-        proccessedHtml.body
+        processedHtml.body
       );
     }
   },
@@ -303,7 +311,7 @@ module.exports = moduleService = {
 
   createModule: async function (moduleDefinitionFile) {
     let basePath = `/server/modules/${moduleDefinitionFile.systemId}`;
-    
+
     moduleDefinitionFile.version = "0.0.0.1";
 
     //create base dir
@@ -343,8 +351,9 @@ module.exports = moduleService = {
     moduleDefinitionFile.systemidCamelCase = _.camelCase(
       moduleDefinitionFile.systemId
     );
-    let mainServiceFilePath = "/server/assets/js/module-default-main-service.js"
-    
+    let mainServiceFilePath =
+      "/server/assets/js/module-default-main-service.js";
+
     var mainServiceFile = await viewService.getProcessedView(
       null,
       moduleDefinitionFile,

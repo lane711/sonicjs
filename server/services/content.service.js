@@ -29,11 +29,11 @@ const myCache = new NodeCache();
 module.exports = contentService = {
   startup: async function () {
     emitterService.on(
-      "postProcessModuleShortCodeProccessedHtml",
+      "postProcessModuleShortCodeprocessedHtml",
       async function (options) {
         if (options) {
           contentService.wrapBlockInModuleDiv(
-            options.proccessedHtml,
+            options.processedHtml,
             options.viewModel
           );
         }
@@ -320,7 +320,7 @@ module.exports = contentService = {
     }
   },
 
-  wrapBlockInModuleDiv: function (proccessedHtml, viewModel) {
+  wrapBlockInModuleDiv: function (processedHtml, viewModel) {
     let wrapperCss = "module";
     if (viewModel && viewModel.data.settings && viewModel.data.settings.data.wrapperCss) {
       wrapperCss += " " + viewModel.data.settings.data.wrapperCss;
@@ -330,7 +330,7 @@ module.exports = contentService = {
     if (viewModel && viewModel.data.settings && viewModel.data.settings.data.wrapperStyles) {
       wrapperStyles = viewModel.data.settings.data.wrapperStyles;
     }
-    proccessedHtml.body = `<div class="${wrapperCss}" style="${wrapperStyles}" data-id="${proccessedHtml.id}" data-module="${proccessedHtml.shortCode.name}" data-content-type="${proccessedHtml.contentType}">${proccessedHtml.body}</div>`;
+    processedHtml.body = `<div class="${wrapperCss}" style="${wrapperStyles}" data-id="${processedHtml.id}" data-module="${processedHtml.shortCode.name}" data-content-type="${processedHtml.contentType}">${processedHtml.body}</div>`;
   },
 
   replaceBlockShortCode: async function (page, shortcode) {
