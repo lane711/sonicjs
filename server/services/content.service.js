@@ -170,7 +170,7 @@ module.exports = contentService = {
   },
 
   processSections: async function (page) {
-    await emitterService.emit("preProcessSections");
+    await emitterService.emit("preProcessSections", page);
 
     page.data.sections = [];
     // let sectionWrapper = $(".s--section").parent(); //container
