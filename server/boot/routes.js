@@ -480,6 +480,8 @@ exports.loadRoutes = async function (app) {
 
     await emitterService.emit("preRenderTemplate", options={page, req});
 
+    page.data.id = page.id;
+    
     res.render(`front-end/${frontEndTheme}/layouts/main`, {
       layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
       data: page.data,

@@ -10,9 +10,12 @@ module.exports = pageTemplatesMainService = {
         options.moduleName = "page-templates";
 
         //reset html for current page template region
-        options.page.data.currentShortCodeHtml = "";
+        // options.viewModel.data.html = "<div>PAGE TEMPLATE REGION</div>";
+
+        options.page.data.currentShortCodeHtml = `<div data-id="${options.shortcode.properties.id}" data-module="PAGE-TEMPLATES">PAGE TEMPLATE REGION</div>`;
 
         await moduleService.processModuleInColumn(options);
+
       }
     });
 
@@ -46,10 +49,10 @@ module.exports = pageTemplatesMainService = {
           }
         }
 
-        if (options.page.data.isPageTemplate) {
-          //we are viewing the template page itself
-          options.viewModel.data.html += "<div>PAGE TEMPLATE REGION</div>";
-        }
+        // if (options.page.data.isPageTemplate) {
+        //   //we are viewing the template page itself
+        //   options.viewModel.data.html = "<div>PAGE TEMPLATE REGION</div>";
+        // }
       }
     });
 
