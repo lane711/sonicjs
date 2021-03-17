@@ -29,7 +29,7 @@ const myCache = new NodeCache();
 module.exports = contentService = {
   startup: async function () {
     emitterService.on(
-      "postProcessModuleShortCodeprocessedHtml",
+      "postProcessModuleShortCodeProcessedHtml",
       async function (options) {
         if (options) {
           contentService.wrapBlockInModuleDiv(
