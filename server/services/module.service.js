@@ -8,6 +8,8 @@ var globalService = require("../services/global.service");
 var fileService = require("../services/file.service");
 var viewService = require("../services/view.service");
 var dataService = require("../services/data.service");
+var formattingService = require("../services/formatting.service");
+
 var appRoot = require("app-root-path");
 
 module.exports = moduleService = {
@@ -281,11 +283,20 @@ module.exports = moduleService = {
 
       //for template based pages
       if (options.page.data.currentShortCodeHtml) {
-        options.page.data.currentShortCodeHtml += processedHtml.body;
-      } else {
-        options.page.data.currentShortCodeHtml = processedHtml.body;
-      }
 
+        let wrappedDiv = formattingService.generateModuleDivWrapper(
+          options.shortcode.properties.id,
+          "module",
+          "",
+          options.shortcode.name,
+          contentType,
+          processedHtml.body
+        );
+
+        options.page.data.currentShortCodeHtml += wrappedDiv;
+        // } else {
+        //   options.page.data.currentShortCodeHtml = wrappedDiv;
+      }
 
       await emitterService.emit("postProcessModuleShortCodeProcessedHtml", {
         processedHtml: processedHtml,

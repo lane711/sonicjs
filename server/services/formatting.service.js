@@ -49,4 +49,10 @@ if (typeof module !== "undefined" && module.exports) {
       else str = str.toString();
       return str.replace(/<[^>]*>/g, "");
     });
+    (exports.generateModuleDivWrapper = function(id, wrapperCss, wrapperStyles, shortCodeName, contentType, body){
+      if(shortCodeName === 'PAGE-TEMPLATES'){
+        wrapperCss = 'page-template-region';
+      }
+      return `<div class="${wrapperCss}" style="${wrapperStyles}" data-id="${id}" data-module="${shortCodeName}" data-content-type="${contentType}">${body}</div>`;
+    });
 })(typeof exports === "undefined" ? (this["formattingService"] = {}) : exports);

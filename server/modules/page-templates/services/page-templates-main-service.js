@@ -15,7 +15,6 @@ module.exports = pageTemplatesMainService = {
         options.page.data.currentShortCodeHtml = `<div data-id="${options.shortcode.properties.id}" data-module="PAGE-TEMPLATES">PAGE TEMPLATE REGION</div>`;
 
         await moduleService.processModuleInColumn(options);
-
       }
     });
 
@@ -44,10 +43,25 @@ module.exports = pageTemplatesMainService = {
               0
             );
 
-            options.viewModel.data.html =
-              options.page.data.currentShortCodeHtml;
+            // var processedHtml ={
+            //   id: "123",
+            //   shortCode: { name: "ALERT" },
+            //   contentType: "ALERT",
+            //   body: options.page.data.currentShortCodeHtml,
+            // };
+
+            // await emitterService.emit(
+            //   "postProcessModuleShortCodeProcessedHtml",
+            //   {
+            //     processedHtml: processedHtml,
+            //     viewModel: options.viewModel,
+            //   }
+            // );
           }
         }
+
+        options.viewModel.data.html = options.page.data.currentShortCodeHtml;
+        // options.viewModel.data.html = processedHtml.body;
 
         // if (options.page.data.isPageTemplate) {
         //   //we are viewing the template page itself

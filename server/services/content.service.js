@@ -6,6 +6,7 @@ var helperService = require(".//helper.service");
 var userService = require(".//user.service");
 var globalService = require(".//global.service");
 var cacheService = require(".//cache.service");
+var formattingService = require(".//formatting.service");
 
 var dataService = require(".//data.service");
 
@@ -195,11 +196,7 @@ module.exports = contentService = {
             await this.processShortCodes(section, section.data.content);
           } else {
             //use page builder rows for layout
-            rows = await this.processRows(
-              page,
-              section,
-              section.data.rows
-            );
+            rows = await this.processRows(page, section, section.data.rows);
           }
           page.data.html += "</div>";
           page.data.html += "</div>";
@@ -298,6 +295,18 @@ module.exports = contentService = {
             rowIndex: rowIndex,
             columnIndex: columnIndex,
           });
+
+          // if (wrapWithModuleDiv) {
+          //   var processedHtml = {
+          //     id: shortcode.properties.id,
+          //     shortCode: shortcode,
+          //     contentType: shortcode.name,
+          //     body: options.page.data.currentShortCodeHtml,
+          //   };
+
+          //   contentService.wrapBlockInModuleDiv(processedHtml, undefined);
+          //   page.data.currentShortCodeHtml = processedHtml;
+          // }
         }
       }
 
@@ -322,15 +331,23 @@ module.exports = contentService = {
 
   wrapBlockInModuleDiv: function (processedHtml, viewModel) {
     let wrapperCss = "module";
-    if (viewModel && viewModel.data.settings && viewModel.data.settings.data.wrapperCss) {
+    if (
+      viewModel &&
+      viewModel.data.settings &&
+      viewModel.data.settings.data.wrapperCss
+    ) {
       wrapperCss += " " + viewModel.data.settings.data.wrapperCss;
     }
 
     let wrapperStyles = "";
-    if (viewModel && viewModel.data.settings && viewModel.data.settings.data.wrapperStyles) {
+    if (
+      viewModel &&
+      viewModel.data.settings &&
+      viewModel.data.settings.data.wrapperStyles
+    ) {
       wrapperStyles = viewModel.data.settings.data.wrapperStyles;
     }
-    processedHtml.body = `<div class="${wrapperCss}" style="${wrapperStyles}" data-id="${processedHtml.id}" data-module="${processedHtml.shortCode.name}" data-content-type="${processedHtml.contentType}">${processedHtml.body}</div>`;
+    processedHtml.body = formattingService.generateModuleDivWrapper(processedHtml.id, wrapperCss, wrapperStyles, processedHtml.shortCode.name, processedHtml.contentType, processedHtml.body);
   },
 
   replaceBlockShortCode: async function (page, shortcode) {
