@@ -12,7 +12,7 @@ module.exports = pageTemplatesMainService = {
         //reset html for current page template region
         // options.viewModel.data.html = "<div>PAGE TEMPLATE REGION</div>";
 
-        options.page.data.currentShortCodeHtml = '';// `<div data-id="${options.shortcode.properties.id}" data-module="PAGE-TEMPLATES">PAGE TEMPLATE REGION</div>`;
+        // options.page.data.currentShortCodeHtml = '';// `<div data-id="${options.shortcode.properties.id}" data-module="PAGE-TEMPLATES">PAGE TEMPLATE REGION</div>`;
 
         await moduleService.processModuleInColumn(options);
       }

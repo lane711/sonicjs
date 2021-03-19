@@ -1289,7 +1289,8 @@ async function addModuleToColumn(submission) {
 
   let entity = processContentFields(submission.data);
 
-  let isPageUsingTemplate = page.data.pageTemplate && page.data.pageTemplate !== 'none';
+  let isPageUsingTemplate =
+    page.data.pageTemplate && page.data.pageTemplate !== "none";
 
   let pageTemplateRegion;
   if (isPageUsingTemplate) {
@@ -1297,7 +1298,6 @@ async function addModuleToColumn(submission) {
       return $(this).attr("data-module") == "PAGE-TEMPLATES";
     })[0];
     pageTemplateRegion = $(regionModule).attr("data-id");
-
   }
 
   //handling adding module def to db
@@ -1318,24 +1318,35 @@ async function addModuleToColumn(submission) {
   if (isPageUsingTemplate) {
     //if page uses a template, we need to attach the content to the selected region of the template
 
-      //   "pageTemplateRegions" : [
-  //     {
-  //         "regionId" : "6041b84ff36e7aaaeb6b2b56", 
-  //         "shortCodes" : "[ALERT id=\"604af4dc1a7b9ad72248a1ee\"][ALERT id=\"60484fd1cf4ee0d203cce651\"]"
-  //     }, 
-  //     {
-  //         "regionId" : "604b9516e1035d12050fffea", 
-  //         "shortCodes" : "[ALERT id=\"6048e3a709efbd0683296f40\"][ALERT id=\"60484f8dcf4ee0d203cce650\"]"
-  //     }
-  // ]
+    //   "pageTemplateRegions" : [
+    //     {
+    //         "regionId" : "6041b84ff36e7aaaeb6b2b56",
+    //         "shortCodes" : "[ALERT id=\"604af4dc1a7b9ad72248a1ee\"][ALERT id=\"60484fd1cf4ee0d203cce651\"]"
+    //     },
+    //     {
+    //         "regionId" : "604b9516e1035d12050fffea",
+    //         "shortCodes" : "[ALERT id=\"6048e3a709efbd0683296f40\"][ALERT id=\"60484f8dcf4ee0d203cce650\"]"
+    //     }
+    // ]
 
-    if(page.data.pageTemplateRegions){
-      let region = page.data.pageTemplateRegions.filter(r => r.regionId === pageTemplateRegion);
-      region[0].shortCodes += moduleInstanceShortCode;
+    if (page.data.pageTemplateRegions) {
+      let region = page.data.pageTemplateRegions.filter(
+        (r) => r.regionId === pageTemplateRegion
+      );
+      if (region && region.length > 0) {
+        region[0].shortCodes += moduleInstanceShortCode;
+      } else {
+        page.data.pageTemplateRegions.push({
+          regionId: pageTemplateRegion,
+          shortCodes: moduleInstanceShortCode,
+        });
+      }
+
       //save entire page, not just the section
-      editInstance(page)
+      editInstance(page);
+
+      console.log("attach to region");
     }
-    console.log("attach to region");
     //save in a
   } else {
     //add the shortCode to the column
