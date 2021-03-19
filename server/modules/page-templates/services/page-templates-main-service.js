@@ -12,7 +12,7 @@ module.exports = pageTemplatesMainService = {
         //reset html for current page template region
         // options.viewModel.data.html = "<div>PAGE TEMPLATE REGION</div>";
 
-        options.page.data.currentShortCodeHtml = `<div data-id="${options.shortcode.properties.id}" data-module="PAGE-TEMPLATES">PAGE TEMPLATE REGION</div>`;
+        options.page.data.currentShortCodeHtml = '';// `<div data-id="${options.shortcode.properties.id}" data-module="PAGE-TEMPLATES">PAGE TEMPLATE REGION</div>`;
 
         await moduleService.processModuleInColumn(options);
       }
@@ -34,7 +34,7 @@ module.exports = pageTemplatesMainService = {
             (r) => r.regionId === regionId
           );
           // options.page.data.html = body[0].shortCodes;
-          if (body) {
+          if (body && body.length > 0) {
             await contentService.processShortCodes(
               options.page,
               "s0",
