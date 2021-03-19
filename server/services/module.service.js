@@ -283,17 +283,19 @@ module.exports = moduleService = {
 
       //for template based pages
       if (options.page.data.pageTemplate) {
-
-        // let wrappedDiv = formattingService.generateModuleDivWrapper(
-        //   options.shortcode.properties.id,
-        //   "module",
-        //   "",
-        //   options.shortcode.name,
-        //   contentType,
-        //   processedHtml.body
-        // );
-
-        options.page.data.currentShortCodeHtml += processedHtml.body;
+        if (options.shortcode.name !== "PAGE-TEMPLATES") {
+          let wrappedDiv = formattingService.generateModuleDivWrapper(
+            options.shortcode.properties.id,
+            "module",
+            "",
+            options.shortcode.name,
+            contentType,
+            processedHtml.body
+          );
+          options.page.data.currentShortCodeHtml += wrappedDiv;
+        } else {
+          options.page.data.currentShortCodeHtml += processedHtml.body;
+        }
       }
 
       await emitterService.emit("postProcessModuleShortCodeProcessedHtml", {
