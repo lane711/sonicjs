@@ -2,6 +2,7 @@ var dataService = require("../../../services/data.service");
 var emitterService = require("../../../services/emitter.service");
 var globalService = require("../../../services/global.service");
 var contentService = require("../../../services/content.service");
+var formattingService = require("../../../services/formatting.service");
 
 module.exports = pageTemplatesMainService = {
   startup: async function () {
@@ -10,9 +11,16 @@ module.exports = pageTemplatesMainService = {
         options.moduleName = "page-templates";
 
         //reset html for current page template region
-        // options.viewModel.data.html = "<div>PAGE TEMPLATE REGION</div>";
+        let ptDiv = formattingService.generateModuleDivWrapper(
+          options.shortcode.properties.id,
+          "module",
+          "",
+          options.shortcode.name,
+          options.shortcode.name,
+          "PAGE TEMPLATE REGION"
+        );
 
-        // options.page.data.currentShortCodeHtml = '';// `<div data-id="${options.shortcode.properties.id}" data-module="PAGE-TEMPLATES">PAGE TEMPLATE REGION</div>`;
+        options.page.data.currentShortCodeHtml = `<div data-id="${options.shortcode.properties.id}" data-module="PAGE-TEMPLATES">PAGE TEMPLATE REGION</div>`;
 
         await moduleService.processModuleInColumn(options);
       }

@@ -51,8 +51,9 @@ if (typeof module !== "undefined" && module.exports) {
     });
     (exports.generateModuleDivWrapper = function(id, wrapperCss, wrapperStyles, shortCodeName, contentType, body){
       if(shortCodeName === 'PAGE-TEMPLATES'){
+        return body;
         wrapperCss = 'page-template-region';
-        body = 'TEMPLATE REGION'
+        // body = 'TEMPLATE REGION'
       }
       return `<div class="${wrapperCss}" style="${wrapperStyles}" data-id="${id}" data-module="${shortCodeName}" data-content-type="${contentType}">${body}</div>`;
     });

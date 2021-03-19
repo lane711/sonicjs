@@ -284,16 +284,16 @@ module.exports = moduleService = {
       //for template based pages
       if (options.page.data.pageTemplate) {
 
-        let wrappedDiv = formattingService.generateModuleDivWrapper(
-          options.shortcode.properties.id,
-          "module",
-          "",
-          options.shortcode.name,
-          contentType,
-          processedHtml.body
-        );
+        // let wrappedDiv = formattingService.generateModuleDivWrapper(
+        //   options.shortcode.properties.id,
+        //   "module",
+        //   "",
+        //   options.shortcode.name,
+        //   contentType,
+        //   processedHtml.body
+        // );
 
-        options.page.data.currentShortCodeHtml += wrappedDiv;
+        options.page.data.currentShortCodeHtml += processedHtml.body;
       }
 
       await emitterService.emit("postProcessModuleShortCodeProcessedHtml", {
