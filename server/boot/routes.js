@@ -205,99 +205,6 @@ exports.loadRoutes = async function (app) {
     });
   });
 
-  app.post("/admin/pb-update-module-sort", async function (req, res) {
-    let data = req.body.data;
-    console.log(data);
-
-    let sourceSection = await dataService.getContentById(data.sourceSectionId);
-    let content =
-      sourceSection.data.rows[data.sourceRowIndex].columns[
-        data.sourceColumnIndex
-      ].content;
-    // console.log("content", content);
-
-    // remove shortcode from the source column
-    let shortCodesInColumn = ShortcodeTree.parse(content);
-    let shortCodeToRemove = shortCodesInColumn.children[data.sourceModuleIndex];
-    // console.log("shortCodeToRemove", shortCodeToRemove);
-    if (shortCodeToRemove && shortCodeToRemove.shortcode) {
-      let newContent = content.replace(
-        shortCodeToRemove.shortcode.codeText,
-        ""
-      );
-      sourceSection.data.rows[data.sourceRowIndex].columns[
-        data.sourceColumnIndex
-      ].content = newContent;
-      // console.log("newContent", newContent);
-      await dataService.editInstance(sourceSection);
-    }
-
-    //regen the destination
-    let destinationSection = await dataService.getContentById(
-      data.destinationSectionId
-    );
-
-    let updatedDestinationContent = sharedService.generateShortCodeList(
-      data.destinationModules
-    );
-    // console.log("updatedDestinationContent", updatedDestinationContent);
-    destinationSection.data.rows[data.destinationRowIndex].columns[
-      data.destinationColumnIndex
-    ].content = updatedDestinationContent;
-    let r = await dataService.editInstance(destinationSection);
-
-    res.send(`ok`);
-    // return;
-  });
-
-  app.post("/admin/pb-update-module-copy", async function (req, res) {
-    let data = req.body.data;
-    console.log(data);
-
-    let section = await dataService.getContentById(data.sectionId);
-    let content =
-      section.data.rows[data.rowIndex].columns[data.columnIndex].content;
-    console.log("content", content);
-
-    //copy module
-    let moduleToCopy = await dataService.getContentById(data.moduleId);
-    let newModule = await dataService.contentCreate(moduleToCopy);
-
-    let sectionColumn =
-      section.data.rows[data.rowIndex].columns[data.columnIndex];
-
-    let shortCodesInColumn = ShortcodeTree.parse(sectionColumn.content);
-
-    // generate short code ie: [MODULE-HELLO-WORLD id="123"]
-    let args = { id: newModule.id };
-    let moduleInstanceShortCodeText = sharedService.generateShortCode(
-      `${newModule.data.contentType}`,
-      args
-    );
-
-    let moduleInstanceShortCode = ShortcodeTree.parse(
-      moduleInstanceShortCodeText
-    ).children[0];
-
-    shortCodesInColumn.children.splice(
-      data.moduleIndex + 1,
-      0,
-      moduleInstanceShortCode
-    );
-
-    let newShortCodeContent = sharedService.generateContentFromShortcodeList(
-      shortCodesInColumn
-    );
-
-    section.data.rows[data.rowIndex].columns[
-      data.columnIndex
-    ].content = newShortCodeContent;
-
-    let result = await dataService.editInstance(section);
-
-    res.send(`ok`);
-    // // return;
-  });
 
   app.get("/hbs", async function (req, res) {
     res.render("home");
@@ -462,7 +369,7 @@ exports.loadRoutes = async function (app) {
 
     let isAuthenticated = await userService.isAuthenticated(req);
     globalService.setAreaMode(false, true, isAuthenticated);
-    var {page} = await contentService.getRenderedPage(req);
+    var { page } = await contentService.getRenderedPage(req);
 
     if (page.data.title === "Not Found") {
       // res.render("404", page);
@@ -478,10 +385,10 @@ exports.loadRoutes = async function (app) {
       ip: ip,
     });
 
-    await emitterService.emit("preRenderTemplate", options={page, req});
+    await emitterService.emit("preRenderTemplate", (options = { page, req }));
 
     page.data.id = page.id;
-    
+
     res.render(`front-end/${frontEndTheme}/layouts/main`, {
       layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
       data: page.data,

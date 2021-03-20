@@ -1214,6 +1214,7 @@ async function deleteModuleConfirm() {
   console.log("deleteing module: " + currentModuleId, currentModuleContentType);
 
   let moduleDiv = $(`.module[data-id='${currentModuleId}'`);
+  let { isPageUsingTemplate, pageTemplateRegion } = getPageTemplateRegion(page, currentColumn[0]);
 
   // debugger;
   let source = await getModuleHierarchy(moduleDiv);
@@ -1224,6 +1225,10 @@ async function deleteModuleConfirm() {
   payload.data.columnIndex = currentColumnIndex - 1;
   payload.data.moduleId = currentModuleId;
   payload.data.moduleIndex = currentModuleIndex;
+  payload.data.isPageUsingTemplate = isPageUsingTemplate;
+  payload.data.pageTemplateRegion = pageTemplateRegion;
+  payload.data.pageId = page.id;
+
 
   // payload.data.destinationSectionId = destinationSectionId;
   // payload.data.destinationRowIndex = destinationRowIndex;
@@ -1282,6 +1287,22 @@ async function copyModule() {
 async function cleanModal() {
   $("#moduleSettingsFormio").empty();
 }
+ 
+function getPageTemplateRegion(page, destinationColumn){
+
+  let isPageUsingTemplate =
+  page.data.pageTemplate && page.data.pageTemplate !== "none";
+
+
+  let pageTemplateRegion;
+  if (isPageUsingTemplate) {
+    let regionModule = $(destinationColumn.children).filter(function () {
+      return $(this).attr("data-module") == "PAGE-TEMPLATES";
+    })[0];
+    pageTemplateRegion = $(regionModule).attr("data-id");
+  }
+  return {isPageUsingTemplate, pageTemplateRegion };
+}
 
 async function addModuleToColumn(submission) {
   // debugger;
@@ -1289,16 +1310,10 @@ async function addModuleToColumn(submission) {
 
   let entity = processContentFields(submission.data);
 
-  let isPageUsingTemplate =
-    page.data.pageTemplate && page.data.pageTemplate !== "none";
+  // let isPageUsingTemplate =
+  //   page.data.pageTemplate && page.data.pageTemplate !== "none";
 
-  let pageTemplateRegion;
-  if (isPageUsingTemplate) {
-    let regionModule = $(currentColumn[0].children).filter(function () {
-      return $(this).attr("data-module") == "PAGE-TEMPLATES";
-    })[0];
-    pageTemplateRegion = $(regionModule).attr("data-id");
-  }
+  let { isPageUsingTemplate, pageTemplateRegion } = getPageTemplateRegion(page, currentColumn[0]);
 
   //handling adding module def to db
   let processedEntity;
@@ -1317,18 +1332,6 @@ async function addModuleToColumn(submission) {
 
   if (isPageUsingTemplate) {
     //if page uses a template, we need to attach the content to the selected region of the template
-
-    //   "pageTemplateRegions" : [
-    //     {
-    //         "regionId" : "6041b84ff36e7aaaeb6b2b56",
-    //         "shortCodes" : "[ALERT id=\"604af4dc1a7b9ad72248a1ee\"][ALERT id=\"60484fd1cf4ee0d203cce651\"]"
-    //     },
-    //     {
-    //         "regionId" : "604b9516e1035d12050fffea",
-    //         "shortCodes" : "[ALERT id=\"6048e3a709efbd0683296f40\"][ALERT id=\"60484f8dcf4ee0d203cce650\"]"
-    //     }
-    // ]
-
     if (page.data.pageTemplateRegions) {
       let region = page.data.pageTemplateRegions.filter(
         (r) => r.regionId === pageTemplateRegion
@@ -1632,6 +1635,11 @@ async function getModuleHierarchy(element) {
 }
 
 async function updateModuleSort(shortCode, event) {
+
+  let destinationColumn = $(event.to)[0].closest('div[class^="col"]');
+
+  let {isPageUsingTemplate, pageTemplateRegion } = getPageTemplateRegion(page, destinationColumn);
+
   //source
   let source = await getModuleHierarchy(event.from);
   // let sourceSectionHtml = $(event.from)[0].closest("section");
@@ -1647,7 +1655,6 @@ async function updateModuleSort(shortCode, event) {
   let destinationSectionId = destinationSectionHtml.dataset.id;
   let destinationRow = $(event.to)[0].closest(".row");
   let destinationRowIndex = $(destinationRow).index();
-  let destinationColumn = $(event.to)[0].closest('div[class^="col"]');
   let destinationColumnIndex = $(destinationColumn).index();
 
   //get destination list of modules in their updated sort order
@@ -1661,6 +1668,7 @@ async function updateModuleSort(shortCode, event) {
   console.log("destinationModules", destinationModules);
 
   let payload = { data: {} };
+  payload.data.pageId = page.id;
   payload.data.sourceSectionId = source.sourceSectionId;
   payload.data.sourceRowIndex = source.sourceRowIndex;
   payload.data.sourceColumnIndex = source.sourceColumnIndex;
@@ -1670,6 +1678,9 @@ async function updateModuleSort(shortCode, event) {
   payload.data.destinationColumnIndex = destinationColumnIndex;
   payload.data.destinationModuleIndex = event.newIndex;
   payload.data.destinationModules = destinationModules;
+  payload.data.isPageUsingTemplate = isPageUsingTemplate;
+  payload.data.pageTemplateRegion = pageTemplateRegion;
+
 
   // debugger;
   return axiosInstance
