@@ -27,28 +27,32 @@ module.exports = pageBuilderService = {
 
     app.post("/admin/pb-update-module-delete", async function (req, res) {
       let data = req.body.data;
-      console.log(data);
+      // console.log(data);
 
       if (data.isPageUsingTemplate && data.pageTemplateRegion) {
         let page = await dataService.getContentById(data.pageId);
 
-        // let updatedDestinationContent = sharedService.generateShortCodeList(
-        //   data.destinationModules
-        // );
-
         let region = page.data.pageTemplateRegions.filter(
           (r) => r.regionId === data.pageTemplateRegion
-        );
+        )[0];
 
-        // if (region && region.length > 0) {
-        //   region[0].shortCodes = updatedDestinationContent;
-        // } else {
-        //   page.data.pageTemplateRegions.push({
-        //     regionId: pageTemplateRegion,
-        //     shortCodes: updatedDestinationContent,
-        //   });
-        // }
+        let shortCodesInColumn = ShortcodeTree.parse(region.shortCodes);
+        let shortCodeToRemove =
+          shortCodesInColumn.children[data.moduleIndex - 1];
+        // console.log("shortCodeToRemove", shortCodeToRemove);
+        if (shortCodeToRemove && shortCodeToRemove.shortcode) {
+          let newRegionShortCodes = region.shortCodes.replace(
+            shortCodeToRemove.shortcode.codeText,
+            ""
+          );
+          region.shortCodes = newRegionShortCodes;
+        }
 
+        if (data.deleteContent) {
+          await dataService.contentDelete(
+            shortCodeToRemove.shortcode.properties.id
+          );
+        }
         await dataService.editInstance(page);
       } else {
         let section = await dataService.getContentById(data.sectionId);

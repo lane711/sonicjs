@@ -1200,7 +1200,15 @@ async function deleteModule() {
   );
 
   let confirmDeleteButton =
-    '<div><button onclick="deleteModuleConfirm()" class="btn btn-danger">Confirm Delete</button></div>';
+    `<div class="btn-group">
+    <button type="button" onclick="deleteModuleConfirm(true)" class="btn btn-danger">Delete Content and Remove from Column</button>
+    <button type="button" class="btn btn-danger dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <span class="sr-only">Toggle Dropdown</span>
+    </button>
+    <div class="dropdown-menu">
+      <a class="dropdown-item" onclick="deleteModuleConfirm(false)" href="#">Remove From Column Only</a>
+    </div>
+  </div>`;
   let dataPreview = `<div class="delete-data-preview""><textarea>${JSON.stringify(
     data,
     null,
@@ -1210,7 +1218,7 @@ async function deleteModule() {
   $(".pb-side-panel #main").html(confirmDeleteButton + dataPreview);
 }
 
-async function deleteModuleConfirm() {
+async function deleteModuleConfirm(deleteContent = false) {
   console.log("deleteing module: " + currentModuleId, currentModuleContentType);
 
   let moduleDiv = $(`.module[data-id='${currentModuleId}'`);
@@ -1228,7 +1236,7 @@ async function deleteModuleConfirm() {
   payload.data.isPageUsingTemplate = isPageUsingTemplate;
   payload.data.pageTemplateRegion = pageTemplateRegion;
   payload.data.pageId = page.id;
-
+  payload.data.deleteContent = deleteContent;
 
   // payload.data.destinationSectionId = destinationSectionId;
   // payload.data.destinationRowIndex = destinationRowIndex;
