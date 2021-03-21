@@ -1232,6 +1232,8 @@ async function deleteModuleConfirm(deleteContent = false) {
   payload.data.rowIndex = currentRowIndex;
   payload.data.columnIndex = currentColumnIndex - 1;
   payload.data.moduleId = currentModuleId;
+
+  //need to ignore template regions 
   payload.data.moduleIndex = currentModuleIndex;
   payload.data.isPageUsingTemplate = isPageUsingTemplate;
   payload.data.pageTemplateRegion = pageTemplateRegion;

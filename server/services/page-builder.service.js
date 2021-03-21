@@ -37,22 +37,25 @@ module.exports = pageBuilderService = {
         )[0];
 
         let shortCodesInColumn = ShortcodeTree.parse(region.shortCodes);
-        let shortCodeToRemove =
-          shortCodesInColumn.children[data.moduleIndex - 1];
-        // console.log("shortCodeToRemove", shortCodeToRemove);
+
+        let shortCodeToRemove = shortCodesInColumn.children.filter(
+          (s) => s.shortcode.properties.id === data.moduleId
+        )[0];
+
         if (shortCodeToRemove && shortCodeToRemove.shortcode) {
           let newRegionShortCodes = region.shortCodes.replace(
             shortCodeToRemove.shortcode.codeText,
             ""
           );
           region.shortCodes = newRegionShortCodes;
+
+          if (data.deleteContent) {
+            await dataService.contentDelete(
+              shortCodeToRemove.shortcode.properties.id
+            );
+          }
         }
 
-        if (data.deleteContent) {
-          await dataService.contentDelete(
-            shortCodeToRemove.shortcode.properties.id
-          );
-        }
         await dataService.editInstance(page);
       } else {
         let section = await dataService.getContentById(data.sectionId);
