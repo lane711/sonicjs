@@ -290,7 +290,8 @@ module.exports = moduleService = {
             "",
             options.shortcode.name,
             contentType,
-            processedHtml.body
+            processedHtml.body,
+            true
           );
           options.page.data.currentShortCodeHtml += wrappedDiv;
         } else {

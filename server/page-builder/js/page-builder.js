@@ -1660,7 +1660,7 @@ async function updateModuleSort(shortCode, event) {
   // let sourceColumnIndex = $(sourceColumn).index();
 
   //destination
-  // debugger;
+  debugger;
   let destinationSectionHtml = $(event.to)[0].closest("section");
   let destinationSectionId = destinationSectionHtml.dataset.id;
   let destinationRow = $(event.to)[0].closest(".row");
@@ -1669,7 +1669,7 @@ async function updateModuleSort(shortCode, event) {
 
   //get destination list of modules in their updated sort order
   let destinationModules = $(destinationColumn)
-    .find(".module")
+    .find("[data-template-region='true']")
     .toArray()
     .map(function (div) {
       let shortCodeData = { id: div.dataset.id, module: div.dataset.module };
@@ -1690,6 +1690,8 @@ async function updateModuleSort(shortCode, event) {
   payload.data.destinationModules = destinationModules;
   payload.data.isPageUsingTemplate = isPageUsingTemplate;
   payload.data.pageTemplateRegion = pageTemplateRegion;
+  payload.data.sourcePageTemplateRegion = pageTemplateRegion;
+
 
 
   // debugger;

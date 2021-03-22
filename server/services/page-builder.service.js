@@ -147,9 +147,8 @@ module.exports = pageBuilderService = {
           data.destinationColumnIndex
         ].content = updatedDestinationContent;
         let r = await dataService.editInstance(destinationSection);
-
-        res.send(`ok`);
       }
+      res.send(`ok`);
     });
 
     app.post("/admin/pb-update-module-copy", async function (req, res) {
