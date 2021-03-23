@@ -106,7 +106,12 @@ module.exports = pageBuilderService = {
           });
         }
 
-        await dataService.editInstance(page);
+        //moving between regions, need to remove from source
+        if(data.sourcePageTemplateRegion !== data.destinationPageTemplateRegion){
+
+        }
+
+        // await dataService.editInstance(page);
       } else {
         let sourceSection = await dataService.getContentById(
           data.sourceSectionId

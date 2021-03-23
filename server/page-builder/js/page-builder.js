@@ -1298,24 +1298,34 @@ async function cleanModal() {
   $("#moduleSettingsFormio").empty();
 }
  
-function getPageTemplateRegion(page, destinationColumn){
+function getPageTemplateRegion(page, destinationColumn, sourceColumn){
 
   let isPageUsingTemplate =
   page.data.pageTemplate && page.data.pageTemplate !== "none";
 
 
-  let pageTemplateRegion;
+  let sourcePageTemplateRegion;
+  let destinationPageTemplateRegion;
+
   if (isPageUsingTemplate) {
-    let regionModule = $(destinationColumn.children).filter(function () {
+
+    let sourceRegionModule = $(sourceColumn.children).filter(function () {
       return $(this).attr("data-module") == "PAGE-TEMPLATES";
     })[0];
-    pageTemplateRegion = $(regionModule).attr("data-id");
+    sourcePageTemplateRegion = $(sourceRegionModule).attr("data-id");
+
+    let destinationRegionModule = $(destinationColumn.children).filter(function () {
+      return $(this).attr("data-module") == "PAGE-TEMPLATES";
+    })[0];
+    destinationPageTemplateRegion = $(destinationRegionModule).attr("data-id");
+
+
   }
-  return {isPageUsingTemplate, pageTemplateRegion };
+  return {isPageUsingTemplate, sourcePageTemplateRegion, destinationPageTemplateRegion };
 }
 
 async function addModuleToColumn(submission) {
-  // debugger;
+  debugger;
   console.log("adding module to column", submission);
 
   let entity = processContentFields(submission.data);
@@ -1323,7 +1333,7 @@ async function addModuleToColumn(submission) {
   // let isPageUsingTemplate =
   //   page.data.pageTemplate && page.data.pageTemplate !== "none";
 
-  let { isPageUsingTemplate, pageTemplateRegion } = getPageTemplateRegion(page, currentColumn[0]);
+  let { isPageUsingTemplate, sourcePageTemplateRegion, destinationPageTemplateRegion  } = getPageTemplateRegion(page, currentColumn[0], currentColumn[0]);
 
   //handling adding module def to db
   let processedEntity;
@@ -1344,13 +1354,13 @@ async function addModuleToColumn(submission) {
     //if page uses a template, we need to attach the content to the selected region of the template
     if (page.data.pageTemplateRegions) {
       let region = page.data.pageTemplateRegions.filter(
-        (r) => r.regionId === pageTemplateRegion
+        (r) => r.regionId === destinationPageTemplateRegion
       );
       if (region && region.length > 0) {
         region[0].shortCodes += moduleInstanceShortCode;
       } else {
         page.data.pageTemplateRegions.push({
-          regionId: pageTemplateRegion,
+          regionId: destinationPageTemplateRegion,
           shortCodes: moduleInstanceShortCode,
         });
       }
@@ -1646,21 +1656,17 @@ async function getModuleHierarchy(element) {
 
 async function updateModuleSort(shortCode, event) {
 
+  debugger;
+
+  let sourceColumn = $(event.from)[0].closest('div[class^="col"]');
   let destinationColumn = $(event.to)[0].closest('div[class^="col"]');
 
-  let {isPageUsingTemplate, pageTemplateRegion } = getPageTemplateRegion(page, destinationColumn);
+  let { isPageUsingTemplate, sourcePageTemplateRegion, destinationPageTemplateRegion } = getPageTemplateRegion(page, sourceColumn, destinationColumn);
 
   //source
   let source = await getModuleHierarchy(event.from);
-  // let sourceSectionHtml = $(event.from)[0].closest("section");
-  // let sourceSectionId = sourceSectionHtml.dataset.id;
-  // let sourceRow = $(event.from)[0].closest(".row");
-  // let sourceRowIndex = $(sourceRow).index();
-  // let sourceColumn = $(event.from)[0].closest('div[class^="col"]');
-  // let sourceColumnIndex = $(sourceColumn).index();
 
   //destination
-  debugger;
   let destinationSectionHtml = $(event.to)[0].closest("section");
   let destinationSectionId = destinationSectionHtml.dataset.id;
   let destinationRow = $(event.to)[0].closest(".row");
@@ -1689,10 +1695,8 @@ async function updateModuleSort(shortCode, event) {
   payload.data.destinationModuleIndex = event.newIndex;
   payload.data.destinationModules = destinationModules;
   payload.data.isPageUsingTemplate = isPageUsingTemplate;
-  payload.data.pageTemplateRegion = pageTemplateRegion;
-  payload.data.sourcePageTemplateRegion = pageTemplateRegion;
-
-
+  payload.data.sourcePageTemplateRegion = sourcePageTemplateRegion;
+  payload.data.destinationPageTemplateRegion = destinationPageTemplateRegion;
 
   // debugger;
   return axiosInstance
