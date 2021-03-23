@@ -1298,7 +1298,7 @@ async function cleanModal() {
   $("#moduleSettingsFormio").empty();
 }
  
-function getPageTemplateRegion(page, destinationColumn, sourceColumn){
+function getPageTemplateRegion(page, sourceColumn, destinationColumn){
 
   let isPageUsingTemplate =
   page.data.pageTemplate && page.data.pageTemplate !== "none";
@@ -1309,6 +1309,7 @@ function getPageTemplateRegion(page, destinationColumn, sourceColumn){
 
   if (isPageUsingTemplate) {
 
+    // debugger;
     let sourceRegionModule = $(sourceColumn.children).filter(function () {
       return $(this).attr("data-module") == "PAGE-TEMPLATES";
     })[0];
@@ -1656,7 +1657,7 @@ async function getModuleHierarchy(element) {
 
 async function updateModuleSort(shortCode, event) {
 
-  debugger;
+  // debugger;
 
   let sourceColumn = $(event.from)[0].closest('div[class^="col"]');
   let destinationColumn = $(event.to)[0].closest('div[class^="col"]');
