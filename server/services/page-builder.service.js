@@ -83,8 +83,11 @@ module.exports = pageBuilderService = {
       res.send(`ok`);
     });
 
-    upsertPageRegion = function(page, destinationPageTemplateRegion, updatedDestinationContent){
-
+    upsertPageRegion = function (
+      page,
+      destinationPageTemplateRegion,
+      updatedDestinationContent
+    ) {
       let region = page.data.pageTemplateRegions.filter(
         (r) => r.regionId === destinationPageTemplateRegion
       );
@@ -110,28 +113,31 @@ module.exports = pageBuilderService = {
           data.destinationModules
         );
 
-        upsertPageRegion(page, data.destinationPageTemplateRegion, updatedDestinationContent);
-
+        upsertPageRegion(
+          page,
+          data.destinationPageTemplateRegion,
+          updatedDestinationContent
+        );
 
         //moving between regions, need to remove from source
-        if(data.sourcePageTemplateRegion !== data.destinationPageTemplateRegion){
-
-
+        if (
+          data.sourcePageTemplateRegion !== data.destinationPageTemplateRegion
+        ) {
           let sourceRegion = page.data.pageTemplateRegions.filter(
             (r) => r.regionId === data.sourcePageTemplateRegion
           );
 
-          let shortCodesInColumn = ShortcodeTree.parse(sourceRegion[0].shortCodes);
+          let shortCodesInColumn = ShortcodeTree.parse(
+            sourceRegion[0].shortCodes
+          );
           let shortCodeToRemove =
             shortCodesInColumn.children[data.sourceModuleIndex];
           // console.log("shortCodeToRemove", shortCodeToRemove);
 
-
-          let updatedDestinationContent = sourceRegion[0].shortCodes = sourceRegion[0].shortCodes.replace(
+          let updatedDestinationContent = (sourceRegion[0].shortCodes = sourceRegion[0].shortCodes.replace(
             shortCodesInColumn.text,
             ""
-          );
-
+          ));
         }
 
         await dataService.editInstance(page);
@@ -146,20 +152,22 @@ module.exports = pageBuilderService = {
         // console.log("content", content);
 
         // remove shortcode from the source column
-        let shortCodesInColumn = ShortcodeTree.parse(content);
-        let shortCodeToRemove =
-          shortCodesInColumn.children[data.sourceModuleIndex];
-        // console.log("shortCodeToRemove", shortCodeToRemove);
-        if (shortCodeToRemove && shortCodeToRemove.shortcode) {
-          let newContent = content.replace(
-            shortCodeToRemove.shortcode.codeText,
-            ""
-          );
-          sourceSection.data.rows[data.sourceRowIndex].columns[
-            data.sourceColumnIndex
-          ].content = newContent;
-          // console.log("newContent", newContent);
-          await dataService.editInstance(sourceSection);
+        if (data.sourceSectionId !== data.destinationSectionId) {
+          let shortCodesInColumn = ShortcodeTree.parse(content);
+          let shortCodeToRemove =
+            shortCodesInColumn.children[data.sourceModuleIndex];
+          // console.log("shortCodeToRemove", shortCodeToRemove);
+          if (shortCodeToRemove && shortCodeToRemove.shortcode) {
+            let newContent = content.replace(
+              shortCodeToRemove.shortcode.codeText,
+              ""
+            );
+            sourceSection.data.rows[data.sourceRowIndex].columns[
+              data.sourceColumnIndex
+            ].content = newContent;
+            // console.log("newContent", newContent);
+            await dataService.editInstance(sourceSection);
+          }
         }
 
         //regen the destination
@@ -175,7 +183,7 @@ module.exports = pageBuilderService = {
           data.destinationColumnIndex
         ].content = updatedDestinationContent;
 
-        // let r = await dataService.editInstance(destinationSection);
+        let r = await dataService.editInstance(destinationSection);
       }
       res.send(`ok`);
     });

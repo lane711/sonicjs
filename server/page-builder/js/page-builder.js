@@ -1675,14 +1675,15 @@ async function updateModuleSort(shortCode, event) {
   let destinationColumnIndex = $(destinationColumn).index();
 
   //get destination list of modules in their updated sort order
-  let destinationModules = $(destinationColumn)
-    .find("[data-template-region='true']")
+  let destinationModules;
+  let destinationModuleFilter = isPageUsingTemplate ? "[data-template-region='true']" : ".module";
+  destinationModules = $(destinationColumn)
+    .find(destinationModuleFilter)
     .toArray()
     .map(function (div) {
       let shortCodeData = { id: div.dataset.id, module: div.dataset.module };
       return shortCodeData;
     });
-  console.log("destinationModules", destinationModules);
 
   let payload = { data: {} };
   payload.data.pageId = page.id;
