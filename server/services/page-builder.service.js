@@ -60,7 +60,9 @@ module.exports = pageBuilderService = {
 
         // remove shortcode from the source column
         let shortCodesInColumn = ShortcodeTree.parse(content);
-        shortCodeToRemove = shortCodesInColumn.children.filter(x => x.shortcode.properties.id === data.moduleId)[0];
+        shortCodeToRemove = shortCodesInColumn.children.filter(
+          (x) => x.shortcode.properties.id === data.moduleId
+        )[0];
         // console.log("shortCodeToRemove", shortCodeToRemove);
         if (shortCodeToRemove && shortCodeToRemove.shortcode) {
           let newContent = content.replace(
@@ -134,13 +136,16 @@ module.exports = pageBuilderService = {
 
           //moduleBeingMovedId
 
-          let shortCodeToRemove = shortCodesInColumn.children.filter(s => s.shortcode.properties.id === data.moduleBeingMovedId);
+          let shortCodeToRemove = shortCodesInColumn.children.filter(
+            (s) => s.shortcode.properties.id === data.moduleBeingMovedId
+          )[0]
           // console.log("shortCodeToRemove", shortCodeToRemove);
 
-          let updatedDestinationContent = (sourceRegion[0].shortCodes = sourceRegion[0].shortCodes.replace(
-            shortCodesInColumn.text,
+          let shortCodeToRemoveText = shortCodeToRemove.shortcode.codeText;
+          sourceRegion[0].shortCodes = sourceRegion[0].shortCodes.replace(
+            shortCodeToRemoveText,
             ""
-          ));
+          );
         }
 
         await dataService.editInstance(page);
