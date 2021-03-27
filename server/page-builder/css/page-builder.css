@@ -415,3 +415,9 @@ section {
   width:100%;
   height:400px;
 }
+
+.page-template-region{
+  border: 6px dashed grey;
+  text-align: center;
+  line-height: 40px;
+}

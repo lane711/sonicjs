@@ -20,9 +20,11 @@ module.exports = pageTemplatesMainService = {
           "PAGE TEMPLATE REGION"
         );
 
-        options.page.data.currentShortCodeHtml = `<div data-id="${options.shortcode.properties.id}" data-module="PAGE-TEMPLATES">PAGE TEMPLATE REGION</div>`;
+        options.page.data.currentShortCodeHtml = `<div class="module page-template-region mb-2" data-id="${options.shortcode.properties.id}" data-module="PAGE-TEMPLATES">PAGE TEMPLATE REGION START</div>`;
 
         await moduleService.processModuleInColumn(options);
+
+
       }
     });
 
@@ -67,6 +69,7 @@ module.exports = pageTemplatesMainService = {
             // );
           }
         }
+        options.page.data.currentShortCodeHtml += `<div class="module page-template-region mt-2" data-id="${options.shortcode.properties.id}" data-module="PAGE-TEMPLATES">PAGE TEMPLATE REGION END</div>`;
 
         options.viewModel.data.html = options.page.data.currentShortCodeHtml;
         // options.viewModel.data.html = processedHtml.body;

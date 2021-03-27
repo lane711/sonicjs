@@ -76,7 +76,7 @@ const ContentType = new GraphQLObjectType({
     id: { type: GraphQLID },
     contentTypeId: { type: GraphQLString },
     data: { type: GraphQLJSONObject },
-    url: { type: GraphQLJSONObject },
+    url: { type: GraphQLString },
     createdOn: { type: GraphQLJSONObject },
     updatedOn: { type: GraphQLJSONObject },
     createdByUserId: {

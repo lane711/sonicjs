@@ -27,6 +27,7 @@ module.exports = pageBuilderService = {
 
     app.post("/admin/pb-update-module-delete", async function (req, res) {
       let data = req.body.data;
+      let shortCodeToRemove;
       // console.log(data);
 
       if (data.isPageUsingTemplate && data.pageTemplateRegion) {
@@ -38,7 +39,7 @@ module.exports = pageBuilderService = {
 
         let shortCodesInColumn = ShortcodeTree.parse(region.shortCodes);
 
-        let shortCodeToRemove = shortCodesInColumn.children.filter(
+        shortCodeToRemove = shortCodesInColumn.children.filter(
           (s) => s.shortcode.properties.id === data.moduleId
         )[0];
 
@@ -48,12 +49,6 @@ module.exports = pageBuilderService = {
             ""
           );
           region.shortCodes = newRegionShortCodes;
-
-          if (data.deleteContent) {
-            await dataService.contentDelete(
-              shortCodeToRemove.shortcode.properties.id
-            );
-          }
         }
 
         await dataService.editInstance(page);
@@ -65,7 +60,7 @@ module.exports = pageBuilderService = {
 
         // remove shortcode from the source column
         let shortCodesInColumn = ShortcodeTree.parse(content);
-        let shortCodeToRemove = shortCodesInColumn.children[data.moduleIndex];
+        shortCodeToRemove = shortCodesInColumn.children.filter(x => x.shortcode.properties.id === data.moduleId)[0];
         // console.log("shortCodeToRemove", shortCodeToRemove);
         if (shortCodeToRemove && shortCodeToRemove.shortcode) {
           let newContent = content.replace(
@@ -78,6 +73,12 @@ module.exports = pageBuilderService = {
           // console.log("newContent", newContent);
           await dataService.editInstance(section);
         }
+      }
+
+      if (data.deleteContent) {
+        await dataService.contentDelete(
+          shortCodeToRemove.shortcode.properties.id
+        );
       }
 
       res.send(`ok`);
@@ -130,8 +131,10 @@ module.exports = pageBuilderService = {
           let shortCodesInColumn = ShortcodeTree.parse(
             sourceRegion[0].shortCodes
           );
-          let shortCodeToRemove =
-            shortCodesInColumn.children[data.sourceModuleIndex];
+
+          //moduleBeingMovedId
+
+          let shortCodeToRemove = shortCodesInColumn.children.filter(s => s.shortcode.properties.id === data.moduleBeingMovedId);
           // console.log("shortCodeToRemove", shortCodeToRemove);
 
           let updatedDestinationContent = (sourceRegion[0].shortCodes = sourceRegion[0].shortCodes.replace(
@@ -152,22 +155,20 @@ module.exports = pageBuilderService = {
         // console.log("content", content);
 
         // remove shortcode from the source column
-        if (data.sourceSectionId !== data.destinationSectionId) {
-          let shortCodesInColumn = ShortcodeTree.parse(content);
-          let shortCodeToRemove =
-            shortCodesInColumn.children[data.sourceModuleIndex];
-          // console.log("shortCodeToRemove", shortCodeToRemove);
-          if (shortCodeToRemove && shortCodeToRemove.shortcode) {
-            let newContent = content.replace(
-              shortCodeToRemove.shortcode.codeText,
-              ""
-            );
-            sourceSection.data.rows[data.sourceRowIndex].columns[
-              data.sourceColumnIndex
-            ].content = newContent;
-            // console.log("newContent", newContent);
-            await dataService.editInstance(sourceSection);
-          }
+        let shortCodesInColumn = ShortcodeTree.parse(content);
+        let shortCodeToRemove =
+          shortCodesInColumn.children[data.sourceModuleIndex];
+        // console.log("shortCodeToRemove", shortCodeToRemove);
+        if (shortCodeToRemove && shortCodeToRemove.shortcode) {
+          let newContent = content.replace(
+            shortCodeToRemove.shortcode.codeText,
+            ""
+          );
+          sourceSection.data.rows[data.sourceRowIndex].columns[
+            data.sourceColumnIndex
+          ].content = newContent;
+          // console.log("newContent", newContent);
+          await dataService.editInstance(sourceSection);
         }
 
         //regen the destination

@@ -1326,7 +1326,7 @@ function getPageTemplateRegion(page, sourceColumn, destinationColumn){
 }
 
 async function addModuleToColumn(submission) {
-  debugger;
+  // debugger;
   console.log("adding module to column", submission);
 
   let entity = processContentFields(submission.data);
@@ -1659,6 +1659,7 @@ async function updateModuleSort(shortCode, event) {
 
   // debugger;
 
+  let moduleBeingMovedId = event.item.dataset.id;
   let sourceColumn = $(event.from)[0].closest('div[class^="col"]');
   let destinationColumn = $(event.to)[0].closest('div[class^="col"]');
 
@@ -1699,12 +1700,14 @@ async function updateModuleSort(shortCode, event) {
   payload.data.isPageUsingTemplate = isPageUsingTemplate;
   payload.data.sourcePageTemplateRegion = sourcePageTemplateRegion;
   payload.data.destinationPageTemplateRegion = destinationPageTemplateRegion;
+  payload.data.moduleBeingMovedId = moduleBeingMovedId;
 
   // debugger;
   return axiosInstance
     .post("/admin/pb-update-module-sort", payload)
     .then(async function (response) {
       console.log(response);
+      fullPageUpdate();
       return await response.data;
     })
     .catch(function (error) {
