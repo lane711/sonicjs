@@ -1678,6 +1678,10 @@ async function updateModuleSort(shortCode, event) {
   //get destination list of modules in their updated sort order
   let destinationModules;
   let destinationModuleFilter = isPageUsingTemplate ? "[data-template-region='true']" : ".module";
+
+    debugger;
+
+
   destinationModules = $(destinationColumn)
     .find(destinationModuleFilter)
     .toArray()
