@@ -1,6 +1,6 @@
 cy.SonicJs = {
   getBaseUrl: () => {
-    return "http://localhost:3019";
+    return "http://localhost:3018";
   },
 
   login: () => {

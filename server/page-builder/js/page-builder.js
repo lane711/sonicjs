@@ -584,8 +584,13 @@ async function createInstance(
 
   let entity = await dataService.contentCreate(payload);
 
-  if (entity.contentTypeId === "page" && !globalService.isBackEnd()) {
-    window.location.href = payload.data.url;
+  if (entity.contentTypeId === "page") {
+    let isBackEnd = globalService.isBackEnd();
+    if (isBackEnd) {
+      window.location.href = `/admin/content/edit/page/${entity.id}`;
+    } else {
+      window.location.href = payload.data.url;
+    }
   } else if (refresh) {
     fullPageUpdate();
   }
@@ -1199,8 +1204,7 @@ async function deleteModule() {
     `Delete: ${currentModuleContentType} (Id:${currentModuleId}) ?`
   );
 
-  let confirmDeleteButton =
-    `<div class="btn-group">
+  let confirmDeleteButton = `<div class="btn-group">
     <button type="button" onclick="deleteModuleConfirm(true)" class="btn btn-danger">Delete Content and Remove from Column</button>
     <button type="button" class="btn btn-danger dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       <span class="sr-only">Toggle Dropdown</span>
@@ -1222,7 +1226,10 @@ async function deleteModuleConfirm(deleteContent = false) {
   console.log("deleteing module: " + currentModuleId, currentModuleContentType);
 
   let moduleDiv = $(`.module[data-id='${currentModuleId}'`);
-  let { isPageUsingTemplate, pageTemplateRegion } = getPageTemplateRegion(page, currentColumn[0]);
+  let { isPageUsingTemplate, pageTemplateRegion } = getPageTemplateRegion(
+    page,
+    currentColumn[0]
+  );
 
   // debugger;
   let source = await getModuleHierarchy(moduleDiv);
@@ -1233,7 +1240,7 @@ async function deleteModuleConfirm(deleteContent = false) {
   payload.data.columnIndex = currentColumnIndex - 1;
   payload.data.moduleId = currentModuleId;
 
-  //need to ignore template regions 
+  //need to ignore template regions
   payload.data.moduleIndex = currentModuleIndex;
   payload.data.isPageUsingTemplate = isPageUsingTemplate;
   payload.data.pageTemplateRegion = pageTemplateRegion;
@@ -1297,32 +1304,33 @@ async function copyModule() {
 async function cleanModal() {
   $("#moduleSettingsFormio").empty();
 }
- 
-function getPageTemplateRegion(page, sourceColumn, destinationColumn){
 
+function getPageTemplateRegion(page, sourceColumn, destinationColumn) {
   let isPageUsingTemplate =
-  page.data.pageTemplate && page.data.pageTemplate !== "none";
-
+    page.data.pageTemplate && page.data.pageTemplate !== "none";
 
   let sourcePageTemplateRegion;
   let destinationPageTemplateRegion;
 
   if (isPageUsingTemplate) {
-
     // debugger;
     let sourceRegionModule = $(sourceColumn.children).filter(function () {
       return $(this).attr("data-module") == "PAGE-TEMPLATES";
     })[0];
     sourcePageTemplateRegion = $(sourceRegionModule).attr("data-id");
 
-    let destinationRegionModule = $(destinationColumn.children).filter(function () {
-      return $(this).attr("data-module") == "PAGE-TEMPLATES";
-    })[0];
+    let destinationRegionModule = $(destinationColumn.children).filter(
+      function () {
+        return $(this).attr("data-module") == "PAGE-TEMPLATES";
+      }
+    )[0];
     destinationPageTemplateRegion = $(destinationRegionModule).attr("data-id");
-
-
   }
-  return {isPageUsingTemplate, sourcePageTemplateRegion, destinationPageTemplateRegion };
+  return {
+    isPageUsingTemplate,
+    sourcePageTemplateRegion,
+    destinationPageTemplateRegion,
+  };
 }
 
 async function addModuleToColumn(submission) {
@@ -1334,7 +1342,11 @@ async function addModuleToColumn(submission) {
   // let isPageUsingTemplate =
   //   page.data.pageTemplate && page.data.pageTemplate !== "none";
 
-  let { isPageUsingTemplate, sourcePageTemplateRegion, destinationPageTemplateRegion  } = getPageTemplateRegion(page, currentColumn[0], currentColumn[0]);
+  let {
+    isPageUsingTemplate,
+    sourcePageTemplateRegion,
+    destinationPageTemplateRegion,
+  } = getPageTemplateRegion(page, currentColumn[0], currentColumn[0]);
 
   //handling adding module def to db
   let processedEntity;
@@ -1389,6 +1401,7 @@ async function submitContent(
   refresh = true,
   contentType = "content"
 ) {
+  // debugger;
   console.log("Submission was made!", submission);
   let entity = submission.data ? submission.data : submission;
   if (!contentType.startsWith("user")) {
@@ -1656,14 +1669,17 @@ async function getModuleHierarchy(element) {
 }
 
 async function updateModuleSort(shortCode, event) {
-
   // debugger;
 
   let moduleBeingMovedId = event.item.dataset.id;
   let sourceColumn = $(event.from)[0].closest('div[class^="col"]');
   let destinationColumn = $(event.to)[0].closest('div[class^="col"]');
 
-  let { isPageUsingTemplate, sourcePageTemplateRegion, destinationPageTemplateRegion } = getPageTemplateRegion(page, sourceColumn, destinationColumn);
+  let {
+    isPageUsingTemplate,
+    sourcePageTemplateRegion,
+    destinationPageTemplateRegion,
+  } = getPageTemplateRegion(page, sourceColumn, destinationColumn);
 
   //source
   let source = await getModuleHierarchy(event.from);
@@ -1677,10 +1693,11 @@ async function updateModuleSort(shortCode, event) {
 
   //get destination list of modules in their updated sort order
   let destinationModules;
-  let destinationModuleFilter = isPageUsingTemplate ? "[data-template-region='true']" : ".module";
+  let destinationModuleFilter = isPageUsingTemplate
+    ? "[data-template-region='true']"
+    : ".module";
 
-    debugger;
-
+  debugger;
 
   destinationModules = $(destinationColumn)
     .find(destinationModuleFilter)
