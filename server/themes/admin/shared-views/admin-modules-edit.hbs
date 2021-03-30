@@ -63,22 +63,9 @@
                     }
                   };
                   form.on('submit', async function (submission) {
-                    // debugger;
-                    let filePath = `server/modules/${submission.data.systemId}/module.json`;
-                    await dataService.fileUpdate(filePath, JSON.stringify(submission.data))
+
+                    await dataService.moduleEdit(submission);
                     window.location.replace('/admin/modules/edit/' + submission.data.systemId);
-
-                    // var accessToken = '{{ this.accessToken }}';
-                    // axios.put(`/api/modules/updateJsonFile?access_token=${accessToken}`, submission.data)
-                    //   .then(async function (response) {
-                    //     console.log('edit module', response);
-                    //     //return await response.data;
-
-                    //     window.location.replace('/admin/modules/edit/' + submission.data.systemId);
-                    //   })
-                    //   .catch(function (error) {
-                    //     console.log(error);
-                    //   });
 
                   });
                 });

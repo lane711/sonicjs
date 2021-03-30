@@ -663,6 +663,32 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.fileUpdate;
     }),
+
+    (exports.moduleEdit = async function (payload) {
+
+      let result = await this.getAxios().post(apiUrl, {
+        query: `
+        mutation{
+          moduleTypeUpdate(
+            title:"${payload.data.title}", 
+            enabled:${payload.data.enabled}, 
+            systemId:"${payload.data.systemId}", 
+            canBeAddedToColumn: ${payload.data.canBeAddedToColumn},
+            singleInstance: ${payload.data.singleInstance}
+            )
+          {		
+            title
+            enabled
+            systemId
+            canBeAddedToColumn
+          }
+        }
+          `,
+      });
+
+      return result.data.data;;
+    }),
+
     (exports.getFiles = async function () {
       let files = [{ title: "my image", filePath: "/images/test123.png" }];
       return files;

@@ -414,11 +414,12 @@ module.exports = moduleService = {
   },
 
   updateModule: async function (moduleDefinitionFile) {
-    let basePath = `../../server/modules/${moduleDefinitionFile.systemId}`;
-    fileService.writeFile(
+    let basePath = `server/modules/${moduleDefinitionFile.systemId}`;
+    await fileService.writeFile(
       `${basePath}/module.json`,
       JSON.stringify(moduleDefinitionFile, null, 2)
     );
+    await moduleService.processModules();
   },
 
   deleteModule: async function (moduleSystemId) {

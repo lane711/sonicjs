@@ -7,7 +7,7 @@ const { GraphQLJSONObject } = require("graphql-type-json");
 const moduleService = require("../services/module.service");
 const { data } = require("jquery");
 const fileService = require("../services/file.service");
-const mediaService = require("../services/media.service");
+const medi=ervice = require("../services/media.service");
 const viewService = require("../services/view.service");
 
 const {
@@ -595,6 +595,20 @@ const Mutation = new GraphQLObjectType({
       },
       resolve(parent, args) {
         return moduleService.deleteModule(args.systemId);
+      },
+    },
+
+    moduleTypeUpdate: {
+      type: ModuleType,
+      args: {
+        title: { type: new GraphQLNonNull(GraphQLString) },
+        enabled: { type: new GraphQLNonNull(GraphQLBoolean) },
+        systemId: { type: new GraphQLNonNull(GraphQLString) },
+        canBeAddedToColumn: { type: new GraphQLNonNull(GraphQLBoolean) },
+        singleInstance: { type: new GraphQLNonNull(GraphQLBoolean) },
+      },
+      resolve(parent, args) {
+        return moduleService.updateModule(args);
       },
     },
 
