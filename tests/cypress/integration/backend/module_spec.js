@@ -53,10 +53,10 @@ describe("Admin Modules", function () {
     cy.contains("AA Cypress Module EDITED");
   });
 
-  // it("Content type delete", function () {
-  //   cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/modules`);
-  //   cy.get('[aria-label="Delete AA Cypress Module"]').first().click();
-  //   cy.wait(500);
-  //   cy.contains("Confirm Delete").click();
-  // });
+  it("Content type delete", function () {
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/modules`);
+    cy.get('[aria-label="Delete AA Cypress Module EDITED"]').first().click();
+    cy.wait(500);
+    cy.contains("Confirm Delete").click();
+  });
 });
