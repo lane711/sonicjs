@@ -623,9 +623,23 @@ if (typeof module !== "undefined" && module.exports) {
       return `<img class="img-fluid rounded" src="${url}" />`;
     }),
     (exports.deleteModule = async function (moduleSystemId) {
-      let url = `${apiUrl}modules/deleteModule`;
-      let objToDelete = { moduleSystemId: moduleSystemId };
-      await this.getAxios().post(url, objToDelete);
+      // debugger;
+      // let url = `${apiUrl}modules/deleteModule`;
+      // let objToDelete = { moduleSystemId: moduleSystemId };
+      // await this.getAxios().post(url, objToDelete);
+
+      let query = `
+      mutation{
+        moduleTypeDelete( 
+          systemId:"${moduleSystemId}")
+          { systemId }
+      }
+          `;
+
+      let result = await this.getAxios().post(apiUrl, {
+        query: query,
+      });
+
     }),
     (exports.moduleCreate = async function (payload) {
       let result = await this.getAxios().post(apiUrl, {

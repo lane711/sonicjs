@@ -587,6 +587,17 @@ const Mutation = new GraphQLObjectType({
         return moduleService.createModule(args);
       },
     },
+
+    moduleTypeDelete: {
+      type: ModuleType,
+      args: {
+        systemId: { type: new GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parent, args) {
+        return moduleService.deleteModule(args.systemId);
+      },
+    },
+
   },
 });
 
