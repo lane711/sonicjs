@@ -19,7 +19,7 @@ describe("Admin Content Types", function () {
     // });
   });
 
-  it.skip("Content type create should  user to module", function () {
+  it("Content type create should  user to module", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
     cy.contains("New Content Type").click();
     cy.wait(500);
@@ -106,7 +106,7 @@ describe("Admin Content Types", function () {
   });
 
 
-  it.skip("Content type edit raw data", function () {
+  it("Content type edit raw data", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/modules`);
 
     cy.contains("AA Cypress Module Content Type").click();
@@ -144,10 +144,10 @@ describe("Admin Content Types", function () {
     cy.contains("AA Cypress Module Content Type RAW EDIT");
   });
 
-  // it("Content type delete", function () {
-  //   cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
-  //   cy.get('[aria-label="Delete Cypress CT EDITED"]').first().click();
-  //   cy.wait(500);
-  //   cy.contains("Confirm Delete").click();
-  // });
+  it("Content type delete", function () {
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
+    cy.get('[aria-label="Delete AA Cypress Module Content Type RAW EDIT"]').first().click();
+    cy.wait(500);
+    cy.contains("Confirm Delete").click();
+  });
 });
