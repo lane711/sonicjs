@@ -233,7 +233,11 @@ module.exports = moduleService = {
       `/**/*${moduleContentTypeSystemid}.json`
     );
 
-    fileService.deleteFile(filePath[0]);
+    let fullPath = path.join(
+      appRoot.path,
+      filePath[0]
+    )
+    fileService.deleteFile(fullPath);
 
     //reload modules
     await moduleService.processModules();

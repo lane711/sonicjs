@@ -7,55 +7,147 @@ describe("Admin Content Types", function () {
   });
 
   after(() => {
-    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
-    let deleteButtonPattern = '[aria-label*="Delete Cypress CT"]';
-
-    cy.get("body").then(($body) => {
-      if ($body.find(deleteButtonPattern).length > 0) {
-        //evaluates as true
-        cy.get(deleteButtonPattern).first().click();
-        cy.wait(500);
-        cy.contains("Confirm Delete").click();
-      }
-    });
+    // cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
+    // let deleteButtonPattern = '[aria-label*="Delete Cypress CT"]';
+    // cy.get("body").then(($body) => {
+    //   if ($body.find(deleteButtonPattern).length > 0) {
+    //     //evaluates as true
+    //     cy.get(deleteButtonPattern).first().click();
+    //     cy.wait(500);
+    //     cy.contains("Confirm Delete").click();
+    //   }
+    // });
   });
 
-  it("Content type create", function () {
+  it.skip("Content type create should  user to module", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
     cy.contains("New Content Type").click();
-    cy.get('input[name="data[title]"]').type("Cypress CT");
-    // cy.wait(5000);
-
-    cy.get('input[name="data[systemId]"]').type("cypress-content-type");
-    cy.contains("Create").click();
-    cy.contains("Cypress CT");
-    //
-    cy.url().should(
-      "include",
-      "/admin/content-types/edit/cypress-content-type"
-    );
+    cy.wait(500);
+    cy.contains("To create a new content type,");
   });
 
-  it("Content type edit", function () {
-    cy.visit(
-      `${cy.SonicJs.getBaseUrl()}/admin/content-types/edit/cypress-content-type`
-    );
-    cy.get('input[name="data[title]"]').type(" EDITED");
-    // cy.wait(3000);
+  it("Content type create via new module", function () {
+    //first create a module
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/modules`);
+    cy.contains("New Module").click();
+    cy.get('input[name="data[title]"]').type("AA Cypress Module Content Type");
+    cy.wait(500); //wait for system id function to run
 
-    cy.contains("Save Title & SystemId").click();
+    cy.contains("Create Module").click();
+    cy.wait(500);
+
+    cy.contains("AA Cypress Module Content Type");
+  });
+
+  it("Content type create to existing module", function () {
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/modules`);
+
+    cy.contains("AA Cypress Module Content Type").click();
+
+    cy.contains('New Content Type').click();
+
+    cy.wait(500);
+
+    cy.get('#createContentTypeForm input[name="data[title]"]').type("AA Cypress Module Content Type 2");
+
+    cy.wait(500);
+
+    cy.get('#createContentTypeForm button').click();
+
+    cy.contains('AA Cypress Module Content Type 2');
+
+  });
+
+  it("Content type delete content type from module page", function () {
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/modules/edit/aa-cypress-module-content-type`);
+
+    cy.contains("AA Cypress Module Content Type").click();
+
+    cy.contains('New Content Type').click();
+
+    cy.wait(500);
+
+    cy.get('#createContentTypeForm input[name="data[title]"]').type("AA Cypress Module Content Type 2");
+
+    cy.wait(500);
+
+    cy.get('#createContentTypeForm button').click();
+
+    cy.contains('AA Cypress Module Content Type 2');
+
+    cy.wait(500);
+
+    cy.contains('Delete').first().click();
 
     cy.wait(1000);
-    cy.visit(
-      `${cy.SonicJs.getBaseUrl()}/admin/content-types/edit/cypress-content-type`
-    );
-    cy.contains("Cypress CT EDITED");
+
+    cy.contains('Confirm Delete').click();
+
+    cy.contains('AA Cypress Module Content Type 2').should('not.exist');
+
+
   });
 
-  it("Content type delete", function () {
-    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
-    cy.get('[aria-label="Delete Cypress CT EDITED"]').first().click();
+  it.skip("Content type add field via drag and drop", function () {
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/modules`);
+
+    cy.contains("AA Cypress Module Content Type").click();
+
+    cy.get('[aria-label="content-type-aa-cypress-module-content-type"]')
+      .first()
+      .click();
+
+    cy.contains("Edit AA Cypress Module Content Type");
+
     cy.wait(500);
-    cy.contains("Confirm Delete").click();
+
+    //TODO: add drag and drop
+
   });
+
+
+  it.skip("Content type edit raw data", function () {
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/modules`);
+
+    cy.contains("AA Cypress Module Content Type").click();
+
+    cy.get('[aria-label="content-type-aa-cypress-module-content-type"]')
+      .first()
+      .click();
+
+    cy.contains("Edit AA Cypress Module Content Type");
+
+    cy.contains("Raw").click();
+
+    cy.contains("Manage Fields");
+
+    cy.wait(500);
+
+    cy.get(".jsoneditor-text")
+      .invoke("val")
+      .then((rawText) => {
+        let json = JSON.parse(rawText);
+        json.title = "AA Cypress Module Content Type RAW EDIT";
+        cy.log(json);
+        cy.get(".jsoneditor-text").clear();
+        cy.get(".jsoneditor-text").click();
+        cy.wait(500);
+        cy.get(".jsoneditor-text").type(JSON.stringify(json), {
+          parseSpecialCharSequences: false,
+        });
+      });
+
+    cy.contains("Save Json").click();
+
+    cy.wait(1000);
+
+    cy.contains("AA Cypress Module Content Type RAW EDIT");
+  });
+
+  // it("Content type delete", function () {
+  //   cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
+  //   cy.get('[aria-label="Delete Cypress CT EDITED"]').first().click();
+  //   cy.wait(500);
+  //   cy.contains("Confirm Delete").click();
+  // });
 });

@@ -297,6 +297,23 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.contentType;
     }),
+
+    (exports.contentTypeDelete = async function (contentType) {
+      let components = JSON.stringify(contentType.data);
+      let result = await this.getAxios().post(apiUrl, {
+        query: `
+        mutation{
+          contentTypeDelete( 
+            systemId:"${contentType}"){
+              title
+          }
+        }
+            `,
+      });
+
+      return result.data.data.contentType;
+    }),
+
     (exports.contentTypeCreate = async function (contentType) {
       let query = `
       mutation{

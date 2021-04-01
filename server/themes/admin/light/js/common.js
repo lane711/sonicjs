@@ -22,7 +22,7 @@ $(document).ready(async function () {
           }
 
           if (typeToDelete == "contentType") {
-            await deleteContentType(idToDelete);
+            await dataService.contentTypeDelete(idToDelete);
             location.reload();
           }
 

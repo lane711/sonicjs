@@ -560,6 +560,18 @@ const Mutation = new GraphQLObjectType({
       },
     },
 
+    contentTypeDelete: {
+      type: ContentTypeType,
+      args: {
+        systemId: { type: new GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parent, args) {
+        moduleService.deleteModuleContentType(args.systemId).then((data) => {
+          return data;
+        });
+      },
+    },
+
     //file mutations
     fileUpdate: {
       type: FileType,

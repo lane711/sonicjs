@@ -139,7 +139,7 @@
               {{!-- {{log data}} --}}
               {{#each data.contentTypes}}
               <tr>
-                <td><a href="/admin/content-types/edit/{{ this.systemId }}">{{ this.title }}</a></td>
+                <td aria-label="content-type-{{ this.systemId }}"><a href="/admin/content-types/edit/{{ this.systemId }}">{{ this.title }}</a></td>
                 <td><a href="/admin/modules/edit/{{ this.moduleSystemId }}">{{ this.moduleSystemId }}</a></td>
                 <td>
                   <a class="btn btn-sm btn-primary rmargin"
@@ -148,7 +148,7 @@
                   <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
                     data-trigger="focus" aria-label="Delete {{ this.title }}"
                     title="Delete <b>{{ this.title }}</b> Forever?" data-content="<a href='
-                        /contentType/{{ this.systemId }}' class='btn btn-sm btn-danger rmargin'>Confirm Delete</a>
+                        /contentType/{{ this.systemId }}' class='btn btn-sm btn-danger rmargin custom-delete'>Confirm Delete</a>
                       ">Delete</a>
 
                 </td>
