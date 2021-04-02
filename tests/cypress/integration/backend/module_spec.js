@@ -6,6 +6,22 @@ describe("Admin Modules", function () {
     cy.SonicJs.login();
   });
 
+  before(() => {
+    // cy.SonicJs.login();
+
+    //cleanup if previosu delete failed
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/modules`);
+
+    cy.get("body").then($body => {
+      if ($body.find('[aria-label*="AA Cypress"]').length > 0) {   
+        cy.get('[aria-label*="AA Cypress"]').first().click();
+        cy.wait(500);
+        cy.contains("Confirm Delete").click();
+      }
+  });
+
+  });
+
   after(() => {
     // cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
     // let deleteButtonPattern = '[aria-label*="Delete Cypress CT"]';
@@ -32,6 +48,9 @@ describe("Admin Modules", function () {
     //   "include",
     //   "/admin/modules"
     // );
+
+    cy.wait(1000); //wait for system id function to run
+
 
     cy.contains("AA Cypress Module");
 
