@@ -2,7 +2,6 @@
   var isAdminUserCreated = false;
   var axiosInstance;
   var baseUrl;
-  var pageContent = "temp";
   var moduleDefinitions = [];
   var moduleDefinitionsForColumns = [];
   var moduleCssFiles = [];

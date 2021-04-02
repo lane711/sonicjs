@@ -63,22 +63,9 @@
                     }
                   };
                   form.on('submit', async function (submission) {
-                    // debugger;
-                    let filePath = `server/modules/${submission.data.systemId}/module.json`;
-                    await dataService.fileUpdate(filePath, JSON.stringify(submission.data))
+
+                    await dataService.moduleEdit(submission);
                     window.location.replace('/admin/modules/edit/' + submission.data.systemId);
-
-                    // var accessToken = '{{ this.accessToken }}';
-                    // axios.put(`/api/modules/updateJsonFile?access_token=${accessToken}`, submission.data)
-                    //   .then(async function (response) {
-                    //     console.log('edit module', response);
-                    //     //return await response.data;
-
-                    //     window.location.replace('/admin/modules/edit/' + submission.data.systemId);
-                    //   })
-                    //   .catch(function (error) {
-                    //     console.log(error);
-                    //   });
 
                   });
                 });
@@ -104,7 +91,7 @@
       <a class="nav-link" id="raw-tab" data-toggle="tab" href="#raw" role="tab" aria-controls="raw"
         aria-selected="true">Raw</a>
     </li>
-    <li class="nav-item">
+    <!-- <li class="nav-item">
       <a class="nav-link " id="shortcode-tab" data-toggle="tab" href="#shortcode" role="tab" aria-controls="shortcode"
         aria-selected="false">Shortcode</a>
     </li>
@@ -123,7 +110,7 @@
     <li class="nav-item">
       <a class="nav-link" id="contact-tab" data-toggle="tab" href="#create" role="tab" aria-controls="contact"
         aria-selected="false">Create Instance</a>
-    </li>
+    </li> -->
   </ul>
   <div class="tab-content" id="myTabContent">
 
@@ -152,7 +139,7 @@
               {{!-- {{log data}} --}}
               {{#each data.contentTypes}}
               <tr>
-                <td><a href="/admin/content-types/edit/{{ this.systemId }}">{{ this.title }}</a></td>
+                <td aria-label="content-type-{{ this.systemId }}"><a href="/admin/content-types/edit/{{ this.systemId }}">{{ this.title }}</a></td>
                 <td><a href="/admin/modules/edit/{{ this.moduleSystemId }}">{{ this.moduleSystemId }}</a></td>
                 <td>
                   <a class="btn btn-sm btn-primary rmargin"
@@ -161,7 +148,7 @@
                   <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
                     data-trigger="focus" aria-label="Delete {{ this.title }}"
                     title="Delete <b>{{ this.title }}</b> Forever?" data-content="<a href='
-                        /contentType/{{ this.systemId }}' class='btn btn-sm btn-danger rmargin'>Confirm Delete</a>
+                        /contentType/{{ this.systemId }}' class='btn btn-sm btn-danger rmargin custom-delete'>Confirm Delete</a>
                       ">Delete</a>
 
                 </td>

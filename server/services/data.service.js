@@ -297,6 +297,23 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.contentType;
     }),
+
+    (exports.contentTypeDelete = async function (contentType) {
+      let components = JSON.stringify(contentType.data);
+      let result = await this.getAxios().post(apiUrl, {
+        query: `
+        mutation{
+          contentTypeDelete( 
+            systemId:"${contentType}"){
+              title
+          }
+        }
+            `,
+      });
+
+      return result.data.data.contentType;
+    }),
+
     (exports.contentTypeCreate = async function (contentType) {
       let query = `
       mutation{
@@ -448,6 +465,7 @@ if (typeof module !== "undefined" && module.exports) {
       mutation{
         contentUpdate( 
           id:"${id}", 
+          url:"${payload.data.url}", 
           data:"""${data}"""){
             id
             url
@@ -463,7 +481,7 @@ if (typeof module !== "undefined" && module.exports) {
       return result.data.data.contentUpdate;
     }),
     (exports.contentCreate = async function (payload, autoGenerateUrl = true) {
-      if (payload.data.contentType !== "page") {
+      if (payload.data.contentType !== "page" && payload.data.contentType !== "blog") {
         if (autoGenerateUrl){
           payload.data.url = helperService.generateSlugFromContent(
             payload.data,
@@ -549,6 +567,7 @@ if (typeof module !== "undefined" && module.exports) {
             contentTypeId
             data
             id
+            url
           }
         }
           `,
@@ -613,20 +632,33 @@ if (typeof module !== "undefined" && module.exports) {
         await callback(array[index], index, array);
       }
     }),
-    (exports.getImageUrl = function (img) {
-      return `/api/containers/files/download/${img.originalName}`;
+    (exports.getImageUrl = function (fileName) {
+      return `/assets/uploads/${fileName}`;
     }),
     (exports.getImage = function (img) {
       let url = this.getImageUrl(img);
       return `<img class="img-fluid rounded" src="${url}" />`;
     }),
     (exports.deleteModule = async function (moduleSystemId) {
-      let url = `${apiUrl}modules/deleteModule`;
-      let objToDelete = { moduleSystemId: moduleSystemId };
-      await this.getAxios().post(url, objToDelete);
+      // debugger;
+      // let url = `${apiUrl}modules/deleteModule`;
+      // let objToDelete = { moduleSystemId: moduleSystemId };
+      // await this.getAxios().post(url, objToDelete);
+
+      let query = `
+      mutation{
+        moduleTypeDelete( 
+          systemId:"${moduleSystemId}")
+          { systemId }
+      }
+          `;
+
+      let result = await this.getAxios().post(apiUrl, {
+        query: query,
+      });
+
     }),
     (exports.moduleCreate = async function (payload) {
-      debugger;
       let result = await this.getAxios().post(apiUrl, {
         query: `
         mutation{
@@ -648,6 +680,32 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.fileUpdate;
     }),
+
+    (exports.moduleEdit = async function (payload) {
+
+      let result = await this.getAxios().post(apiUrl, {
+        query: `
+        mutation{
+          moduleTypeUpdate(
+            title:"${payload.data.title}", 
+            enabled:${payload.data.enabled}, 
+            systemId:"${payload.data.systemId}", 
+            canBeAddedToColumn: ${payload.data.canBeAddedToColumn},
+            singleInstance: ${payload.data.singleInstance}
+            )
+          {		
+            title
+            enabled
+            systemId
+            canBeAddedToColumn
+          }
+        }
+          `,
+      });
+
+      return result.data.data;;
+    }),
+
     (exports.getFiles = async function () {
       let files = [{ title: "my image", filePath: "/images/test123.png" }];
       return files;

@@ -6,6 +6,22 @@ describe("Admin Modules", function () {
     cy.SonicJs.login();
   });
 
+  before(() => {
+    // cy.SonicJs.login();
+
+    //cleanup if previosu delete failed
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/modules`);
+
+    cy.get("body").then($body => {
+      if ($body.find('[aria-label*="AA Cypress"]').length > 0) {   
+        cy.get('[aria-label*="AA Cypress"]').first().click();
+        cy.wait(500);
+        cy.contains("Confirm Delete").click();
+      }
+  });
+
+  });
+
   after(() => {
     // cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
     // let deleteButtonPattern = '[aria-label*="Delete Cypress CT"]';
@@ -24,7 +40,7 @@ describe("Admin Modules", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/modules`);
     cy.contains("New Module").click();
     cy.get('input[name="data[title]"]').type("AA Cypress Module");
-    // cy.wait(5000);
+    cy.wait(500); //wait for system id function to run
 
     cy.contains("Create Module").click();
     //
@@ -32,6 +48,9 @@ describe("Admin Modules", function () {
     //   "include",
     //   "/admin/modules"
     // );
+
+    cy.wait(1000); //wait for system id function to run
+
 
     cy.contains("AA Cypress Module");
 
@@ -53,10 +72,10 @@ describe("Admin Modules", function () {
     cy.contains("AA Cypress Module EDITED");
   });
 
-  // it("Content type delete", function () {
-  //   cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/modules`);
-  //   cy.get('[aria-label="Delete AA Cypress Module"]').first().click();
-  //   cy.wait(500);
-  //   cy.contains("Confirm Delete").click();
-  // });
+  it("Content type delete", function () {
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/modules`);
+    cy.get('[aria-label="Delete AA Cypress Module EDITED"]').first().click();
+    cy.wait(500);
+    cy.contains("Confirm Delete").click();
+  });
 });

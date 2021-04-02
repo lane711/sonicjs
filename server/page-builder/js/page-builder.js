@@ -216,7 +216,6 @@ function setupUIClicks() {
 
       console.log("moduleId", currentModuleId);
       $(".edit-module").show().appendTo(moduleDiv);
-      // currentColumn.children('.module').addClass('block-edit');
     },
   });
 }
@@ -585,8 +584,13 @@ async function createInstance(
 
   let entity = await dataService.contentCreate(payload);
 
-  if (entity.contentTypeId === "page" && !globalService.isBackEnd()) {
-    window.location.href = payload.data.url;
+  if (entity.contentTypeId === "page") {
+    let isBackEnd = globalService.isBackEnd();
+    if (isBackEnd) {
+      window.location.href = `/admin/content/edit/page/${entity.id}`;
+    } else {
+      window.location.href = payload.data.url;
+    }
   } else if (refresh) {
     fullPageUpdate();
   }
@@ -648,9 +652,9 @@ async function editInstance(payload, refresh, contentType = "content") {
       // resolve(response.data);
       // return await response.data;
       if (response.contentTypeId === "page" && !globalService.isBackEnd()) {
-        if(response.url){
-        window.location.href = response.url;
-        }else{
+        if (response.url) {
+          window.location.href = response.url;
+        } else {
           fullPageUpdate();
         }
       } else if (refresh) {
@@ -1153,7 +1157,8 @@ async function addModule(systemId) {
   let form = await formService.getForm(
     systemId,
     undefined,
-    "addModuleToColumn(submission, true)"
+    "addModuleToColumn(submission, true)",
+    true
   );
 
   $(".pb-side-panel #main").html(form);
@@ -1175,7 +1180,8 @@ async function editModule() {
   let form = await formService.getForm(
     currentModuleContentType,
     data,
-    "await editInstance(submission, true);"
+    "await editInstance(submission, true);",
+    true
   );
   $("#dynamicModelTitle").text(
     `Settings: ${currentModuleContentType} (Id:${currentModuleId})`
@@ -1187,6 +1193,77 @@ async function editModule() {
   // $("#moduleSettingsModal")
   //   .appendTo("body")
   //   .modal("show");
+}
+
+async function deleteModule() {
+  showSidePanel();
+
+  let data = await dataService.getContentById(currentModuleId);
+
+  $("#dynamicModelTitle").text(
+    `Delete: ${currentModuleContentType} (Id:${currentModuleId}) ?`
+  );
+
+  let confirmDeleteButton = `<div class="btn-group">
+    <button type="button" onclick="deleteModuleConfirm(true)" class="btn btn-danger">Delete Content and Remove from Column</button>
+    <button type="button" class="btn btn-danger dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <span class="sr-only">Toggle Dropdown</span>
+    </button>
+    <div class="dropdown-menu">
+      <a class="dropdown-item" onclick="deleteModuleConfirm(false)" href="#">Remove From Column Only</a>
+    </div>
+  </div>`;
+  let dataPreview = `<div class="delete-data-preview""><textarea>${JSON.stringify(
+    data,
+    null,
+    4
+  )}</textarea></div>`;
+
+  $(".pb-side-panel #main").html(confirmDeleteButton + dataPreview);
+}
+
+async function deleteModuleConfirm(deleteContent = false) {
+  console.log("deleteing module: " + currentModuleId, currentModuleContentType);
+
+  let moduleDiv = $(`.module[data-id='${currentModuleId}'`);
+  let { isPageUsingTemplate, pageTemplateRegion } = getPageTemplateRegion(
+    page,
+    currentColumn[0]
+  );
+
+  // debugger;
+  let source = await getModuleHierarchy(moduleDiv);
+
+  let payload = { data: {} };
+  payload.data.sectionId = currentSectionId;
+  payload.data.rowIndex = currentRowIndex;
+  payload.data.columnIndex = currentColumnIndex - 1;
+  payload.data.moduleId = currentModuleId;
+
+  //need to ignore template regions
+  payload.data.moduleIndex = currentModuleIndex;
+  payload.data.isPageUsingTemplate = isPageUsingTemplate;
+  payload.data.pageTemplateRegion = pageTemplateRegion;
+  payload.data.pageId = page.id;
+  payload.data.deleteContent = deleteContent;
+
+  // payload.data.destinationSectionId = destinationSectionId;
+  // payload.data.destinationRowIndex = destinationRowIndex;
+  // payload.data.destinationColumnIndex = destinationColumnIndex;
+  // payload.data.destinationModuleIndex = event.newIndex;
+  // payload.data.destinationModules = destinationModules;
+
+  return axiosInstance
+    .post("/admin/pb-update-module-delete", payload)
+    .then(async function (response) {
+      // debugger;
+      console.log(response);
+      fullPageUpdate();
+      // return await response.data;
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
 }
 
 async function copyModule() {
@@ -1228,12 +1305,50 @@ async function cleanModal() {
   $("#moduleSettingsFormio").empty();
 }
 
+function getPageTemplateRegion(page, sourceColumn, destinationColumn) {
+  let isPageUsingTemplate =
+    page.data.pageTemplate && page.data.pageTemplate !== "none";
+
+  let sourcePageTemplateRegion;
+  let destinationPageTemplateRegion;
+
+  if (isPageUsingTemplate) {
+    // debugger;
+    let sourceRegionModule = $(sourceColumn.children).filter(function () {
+      return $(this).attr("data-module") == "PAGE-TEMPLATES";
+    })[0];
+    sourcePageTemplateRegion = $(sourceRegionModule).attr("data-id");
+
+    let destinationRegionModule = $(destinationColumn.children).filter(
+      function () {
+        return $(this).attr("data-module") == "PAGE-TEMPLATES";
+      }
+    )[0];
+    destinationPageTemplateRegion = $(destinationRegionModule).attr("data-id");
+  }
+  return {
+    isPageUsingTemplate,
+    sourcePageTemplateRegion,
+    destinationPageTemplateRegion,
+  };
+}
+
 async function addModuleToColumn(submission) {
   // debugger;
   console.log("adding module to column", submission);
 
-  //handling adding module def to db
   let entity = processContentFields(submission.data);
+
+  // let isPageUsingTemplate =
+  //   page.data.pageTemplate && page.data.pageTemplate !== "none";
+
+  let {
+    isPageUsingTemplate,
+    sourcePageTemplateRegion,
+    destinationPageTemplateRegion,
+  } = getPageTemplateRegion(page, currentColumn[0], currentColumn[0]);
+
+  //handling adding module def to db
   let processedEntity;
   if (submission.data.id) {
     processedEntity = await editInstance(entity);
@@ -1248,12 +1363,35 @@ async function addModuleToColumn(submission) {
     args
   );
 
-  //add the shortCode to the column
-  let section = await dataService.getContentById(currentSectionId);
-  let column =
-    section.data.rows[currentRowIndex].columns[currentColumnIndex - 1];
-  column.content += moduleInstanceShortCode;
-  editInstance(section);
+  if (isPageUsingTemplate) {
+    //if page uses a template, we need to attach the content to the selected region of the template
+    if (page.data.pageTemplateRegions) {
+      let region = page.data.pageTemplateRegions.filter(
+        (r) => r.regionId === destinationPageTemplateRegion
+      );
+      if (region && region.length > 0) {
+        region[0].shortCodes += moduleInstanceShortCode;
+      } else {
+        page.data.pageTemplateRegions.push({
+          regionId: destinationPageTemplateRegion,
+          shortCodes: moduleInstanceShortCode,
+        });
+      }
+
+      //save entire page, not just the section
+      editInstance(page);
+
+      console.log("attach to region");
+    }
+    //save in a
+  } else {
+    //add the shortCode to the column
+    let section = await dataService.getContentById(currentSectionId);
+    let column =
+      section.data.rows[currentRowIndex].columns[currentColumnIndex - 1];
+    column.content += moduleInstanceShortCode;
+    editInstance(section);
+  }
 
   fullPageUpdate();
 }
@@ -1263,6 +1401,7 @@ async function submitContent(
   refresh = true,
   contentType = "content"
 ) {
+  // debugger;
   console.log("Submission was made!", submission);
   let entity = submission.data ? submission.data : submission;
   if (!contentType.startsWith("user")) {
@@ -1346,7 +1485,7 @@ async function writeFile(container, file) {
   let formData = new FormData();
   formData.append("file", file);
 
-  alert('not implemented');
+  alert("not implemented");
   // axiosInstance
   //   .post(`/api/containers/${container}/upload`, formData, {
   //     headers: {
@@ -1366,7 +1505,7 @@ async function setupACEEditor() {
     return;
   }
 
-  ace.config.set('basePath', '/node_modules/ace-builds/src-min-noconflict') 
+  ace.config.set("basePath", "/node_modules/ace-builds/src-min-noconflict");
   var editor = ace.edit("editor");
   editor.setTheme("ace/theme/monokai");
   editor.session.setMode("ace/mode/css");
@@ -1399,9 +1538,12 @@ async function setupACEEditor() {
 
   $("#save-global-css").click(async function () {
     let cssContent = editor.getSession().getValue();
-    
+
     // let file = new File([cssContent], "template.css", { type: "text/css" });
-    await dataService.fileUpdate('/server/themes/front-end/bootstrap/css/template.css', cssContent);
+    await dataService.fileUpdate(
+      "/server/themes/front-end/bootstrap/css/template.css",
+      cssContent
+    );
 
     // writeFile("css", file);
   });
@@ -1527,35 +1669,46 @@ async function getModuleHierarchy(element) {
 }
 
 async function updateModuleSort(shortCode, event) {
+  // debugger;
+
+  let moduleBeingMovedId = event.item.dataset.id;
+  let sourceColumn = $(event.from)[0].closest('div[class^="col"]');
+  let destinationColumn = $(event.to)[0].closest('div[class^="col"]');
+
+  let {
+    isPageUsingTemplate,
+    sourcePageTemplateRegion,
+    destinationPageTemplateRegion,
+  } = getPageTemplateRegion(page, sourceColumn, destinationColumn);
+
   //source
   let source = await getModuleHierarchy(event.from);
-  // let sourceSectionHtml = $(event.from)[0].closest("section");
-  // let sourceSectionId = sourceSectionHtml.dataset.id;
-  // let sourceRow = $(event.from)[0].closest(".row");
-  // let sourceRowIndex = $(sourceRow).index();
-  // let sourceColumn = $(event.from)[0].closest('div[class^="col"]');
-  // let sourceColumnIndex = $(sourceColumn).index();
 
   //destination
-  // debugger;
   let destinationSectionHtml = $(event.to)[0].closest("section");
   let destinationSectionId = destinationSectionHtml.dataset.id;
   let destinationRow = $(event.to)[0].closest(".row");
   let destinationRowIndex = $(destinationRow).index();
-  let destinationColumn = $(event.to)[0].closest('div[class^="col"]');
   let destinationColumnIndex = $(destinationColumn).index();
 
   //get destination list of modules in their updated sort order
-  let destinationModules = $(destinationColumn)
-    .find(".module")
+  let destinationModules;
+  let destinationModuleFilter = isPageUsingTemplate
+    ? "[data-template-region='true']"
+    : ".module";
+
+  debugger;
+
+  destinationModules = $(destinationColumn)
+    .find(destinationModuleFilter)
     .toArray()
     .map(function (div) {
       let shortCodeData = { id: div.dataset.id, module: div.dataset.module };
       return shortCodeData;
     });
-  console.log("destinationModules", destinationModules);
 
   let payload = { data: {} };
+  payload.data.pageId = page.id;
   payload.data.sourceSectionId = source.sourceSectionId;
   payload.data.sourceRowIndex = source.sourceRowIndex;
   payload.data.sourceColumnIndex = source.sourceColumnIndex;
@@ -1565,12 +1718,17 @@ async function updateModuleSort(shortCode, event) {
   payload.data.destinationColumnIndex = destinationColumnIndex;
   payload.data.destinationModuleIndex = event.newIndex;
   payload.data.destinationModules = destinationModules;
+  payload.data.isPageUsingTemplate = isPageUsingTemplate;
+  payload.data.sourcePageTemplateRegion = sourcePageTemplateRegion;
+  payload.data.destinationPageTemplateRegion = destinationPageTemplateRegion;
+  payload.data.moduleBeingMovedId = moduleBeingMovedId;
 
   // debugger;
   return axiosInstance
     .post("/admin/pb-update-module-sort", payload)
     .then(async function (response) {
       console.log(response);
+      fullPageUpdate();
       return await response.data;
     })
     .catch(function (error) {

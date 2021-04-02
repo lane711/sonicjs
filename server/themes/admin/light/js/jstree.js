@@ -155,10 +155,11 @@ function updateTreeData(formData) {
 
   // debugger;
   let menuTitle = $("#menuMainEdit #title-title").val();
+  let menuUrl = $("#menuMainEdit #url-url").val();
 
   var links = $("#menuTree").jstree(true).get_json("#", { flat: false });
 
-  var menu = { data: { title: menuTitle, contentType: "menu", links: links } };
+  var menu = { data: { title: menuTitle, contentType: "menu", links: links, url: menuUrl} };
 
   let id = $("#id").val();
   if (id) {
@@ -181,6 +182,8 @@ function formChanged(formData) {
 function loadMenuTitleForm() {
   // console.log('loading menuMainEdit form')
   let menuTitle = $('#menuTitle').val();
+  let menuUrl = $('#menuUrl').val();
+
   if(!menuTitle) return;
   Formio.createForm(document.getElementById('menuMainEdit'), {
     components: [
@@ -191,13 +194,22 @@ function loadMenuTitleForm() {
         label: 'Menu Title',
         placeholder: 'ie: Main, Sidebar, Footer',
         input: true
+      },
+      {
+        type: 'textfield',
+        key: 'url',
+        id: 'url', 
+        label: 'Menu Url',
+        placeholder: 'ie: /main-menu',
+        input: true
       }
     ]
   })
     .then(function (form) {
       form.submission = {
         data: {
-          title: menuTitle
+          title: menuTitle,
+          url: menuUrl
         }
       };
     });

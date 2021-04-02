@@ -14,7 +14,7 @@ describe("Admin Content", function () {
 
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content`);
     cy.contains('New Content').click();
-    cy.contains('Page').click();
+    cy.get('[data-content-type="page"]').click();
     cy.get('input[name="data[title]"]').type('Cypress Test Page');
     cy.get('input[name="data[url]').should('have.value', '/cypress-test-page');
     cy.get('input[name="data[heroTitle]"]').type('Cypress Hero');
@@ -24,7 +24,7 @@ describe("Admin Content", function () {
     cy.contains('Submit').click();
 
     cy.contains('Cypress Hero');
-    cy.url().should('include', '/cypress-test-page');
+    cy.url().should('include', '/admin/content/edit/page/');
 
   });
 

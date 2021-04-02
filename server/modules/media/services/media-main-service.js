@@ -20,9 +20,9 @@ module.exports = mediaMainService = {
                 let sortedFiles = files.sort((a, b) => (a.data.sortOrder > b.data.sortOrder) ? 1 : -1)
                 await mediaService.addMediaUrl(sortedFiles);
                 viewModel.data.files = sortedFiles;
-                let proccessedHtml = await mediaMainService.processView(contentType, viewModel, viewPath);
+                let processedHtml = await mediaMainService.processView(contentType, viewModel, viewPath);
 
-                globalService.pageContent = globalService.pageContent.replace(options.shortcode.codeText, proccessedHtml);
+                options.page.data.html = options.page.data.html.replace(options.shortcode.codeText, processedHtml);
             }
 
         });

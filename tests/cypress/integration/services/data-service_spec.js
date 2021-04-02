@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { iteratee } = require("lodash");
 
-describe("Page Builder", function () {
+describe("Data Service", function () {
   beforeEach(() => {
     // cy.SonicJs.login();
   });
@@ -18,17 +18,55 @@ describe("Page Builder", function () {
     // });
   });
 
-  it("Load Content Types", function () {
-    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
-    // cy.wait(1000);
+  it.skip("Test calling js function", async function () {
+    cy.visit(`${cy.SonicJs.getBaseUrl()}`);
+    cy.wait(1000);
+
+    cy.log('win ->');
+
     cy.window().then((win) => {
-      win.dataService.contentTypesGet().then((data) => {
-        cy.log(JSON.stringify(data));
-      });
+      cy.log(win.testFunction('echo1'));
+      // let data = win.dataService.contentTypesGet();
+
+      // cy.log(data);
+
+      // win.dataService.contentTypesGet().then((data) => {
+      //   cy.log('data ->');
+      //   cy.log(JSON.stringify(data));
+      // });
     });
+
+    // cy.log(dataService);
+    // cy.wait(1000);
+    // cy.window().then((win) => {
+    //   win.dataService.contentTypesGet().then((data) => {
+    //     cy.log(JSON.stringify(data));
+    //   });
+    // });
   });
 
-  it("Update Content Type", function () {
+  it.skip("Load Content Types", function () {
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin`);
+    cy.wait(1000);
+
+    // cy.window().then(win => win.dataService.contentTypesGet()) // this works
+
+    cy.window().then(win => {
+      cy.wait(1000);
+
+      win.dataService.contentTypesGet()
+    });
+
+    // cy.log(dataService);
+    // cy.wait(1000);
+    // cy.window().then((win) => {
+    //   win.dataService.contentTypesGet().then((data) => {
+    //     cy.log(JSON.stringify(data));
+    //   });
+    // });
+  });
+
+  it.skip("Update Content Type", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
     // cy.wait(1000);
     cy.window().then((win) => {

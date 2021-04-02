@@ -6,6 +6,7 @@ var helperService = require(".//helper.service");
 var userService = require(".//user.service");
 var globalService = require(".//global.service");
 var cacheService = require(".//cache.service");
+var formattingService = require(".//formatting.service");
 
 var dataService = require(".//data.service");
 
@@ -29,11 +30,11 @@ const myCache = new NodeCache();
 module.exports = contentService = {
   startup: async function () {
     emitterService.on(
-      "postProcessModuleShortCodeProccessedHtml",
+      "postProcessModuleShortCodeProcessedHtml",
       async function (options) {
         if (options) {
           contentService.wrapBlockInModuleDiv(
-            options.proccessedHtml,
+            options.processedHtml,
             options.viewModel
           );
         }
@@ -53,89 +54,70 @@ module.exports = contentService = {
       // console.log("no cache");
     }
 
-    this.page = await dataService.getContentByUrl(req.url);
+    await emitterService.emit("preProcessPageUrlLookup", req);
 
-    if (this.page.data) {
-      await this.getPage(this.page.id, this.page.data);
+    let page = await dataService.getContentByUrl(req.url);
+
+    if (page.data) {
+      //page templates
+      if (page.data.pageTemplate) {
+        // console.log(page.data.pageTemplate)
+        // let pageTemplate = await dataService.getContentById(page.data.pageTemplate);
+        // console.log(pageTemplate)
+        // let processedTemplate = await this.getPage(pageTemplate.id, pageTemplate.data);
+        //merge data?
+      }
+
+      await this.getPage(page.id, page);
       await emitterService.emit("postProcessPage");
 
-      this.page.data.html = globalService.pageContent;
+      // page.data.html = page.data.html;
     }
 
-    this.page.data.eventCount = 0;
-    this.page.data.headerJs = "";
+    page.data.eventCount = 0;
+    page.data.headerJs = "";
 
     await emitterService.emit("getRenderedPagePostDataFetch", {
       req: req,
-      page: this.page,
+      page: page,
     });
 
     //handle 404
-    if (!this.page || this.page.data.title == "Not Found") {
+    if (!page || page.data.title == "Not Found") {
       //not found
-      return { page: this.page };
+      return { page: page };
     }
 
     let rows = [];
-    this.page.data.hasRows = false;
-    if (this.page.data.layout) {
-      this.page.data.rows = this.page.data.layout.rows;
-      this.page.data.hasRows = true;
+    page.data.hasRows = false;
+    if (page.data.layout) {
+      page.data.rows = page.data.layout.rows;
+      page.data.hasRows = true;
     }
 
-    await emitterService.emit("preRender", { req: req, page: this.page });
+    await emitterService.emit("preRender", { req: req, page: page });
 
-    this.page.data.appVersion = globalService.getAppVersion;
+    page.data.appVersion = globalService.getAppVersion;
 
-    this.page.data.metaTitle = this.page.data.metaTitle ? this.page.data.metaTitle  : this.page.data.title;
+    page.data.metaTitle = page.data.metaTitle
+      ? page.data.metaTitle
+      : page.data.title;
 
     let cache = cacheService.getCache();
-    success = cache.set(req.url, this.page);
+    success = cache.set(req.url, page);
     // console.log(success);
 
-    return { page: this.page };
+    return { page: page };
   },
 
-  getPage: async function (id, instance) {
+  getPage: async function (id, page) {
     if (!id) {
       return;
     }
-    // log(chalk.green(id));
-    // this.id = id;
-    // if (instance) {
-    //   this.page = instance;
-    // } else {
-    //   if (id) {
-    //     //TODO convert to graphql
-    //     this.page = await dataService.getContentById(id);
-    //   }
-    // }
-    // console.log('id',id, instance);
 
-    return await this.processTemplate();
-    // let themePath = __dirname + "/../themes/base/index.html";
+    await this.processTemplate(page);
 
-    // return new Promise((resolve, reject) => {
-    //   fs.readFile(themePath, "utf8", (err, data) => {
-    //     if (err) {
-    //       console.log(err);
-    //       reject(err);
-    //     } else {
-    //       // console.log('data==>', data);
-    //       this.processTemplate(data).then((html) => {
-    //         resolve("ok");
-    //         // console.log('getPage.page-->', html.length);
-    //         // this.page.data.body = html;
-    //         // pageBuilderService.processPageBuilder(this.page).then(pagebuilder => {
-    //         //     // console.log('page-->2', pagebuilder.length);
-    //         //     this.page.data.pagebuilder = pagebuilder;
-
-    //         //     resolve(html);
-    //         // })
-    //       });
-    //     }
-    //   });
-    // });
+    return page.data.html;
   },
 
   getBlog: async function (req) {
@@ -153,8 +135,8 @@ module.exports = contentService = {
         page: blog,
       });
 
-      // let page = this.page.data[0];
-      // this.page.data.html = globalService.pageContent;
+      // let page = page.data[0];
+      // page.data.html = page.data.html;
       return { page: blog };
     }
     return "error";
@@ -162,70 +144,15 @@ module.exports = contentService = {
 
   getPageByUrl: async function (id, instance) {},
 
-  // getSandboxPage: async function (id, instance) {
-  //     let themePath = __dirname + '/../assets/html/sandbox.html';
+  processTemplate: async function (page) {
+    page.data.html = ""; //reset
+    // const $ = cheerio.load("");
 
-  //     return new Promise((resolve, reject) => {
-  //         fs.readFile(themePath, "utf8", (err, data) => {
-  //             if (err) {
-  //                 console.log(err);
-  //                 reject(err);
-  //             }
-  //             else {
-  //                 console.log('data==>', data);
-  //                 this.processTemplate(data).then(html => {
-  //                     resolve('sandbox');
-  //                 })
-  //             }
-  //         });
-  //     });
-  // },
-
-  processTemplate: async function () {
-    globalService.pageContent = ""; //reset
-    // this.setupShortCodeParser();
-    // console.log('=== processTemplate ===')
-    const $ = cheerio.load("");
-
-    await this.processSections($);
+    await this.processSections(page);
     await this.processDelayedModules();
 
-    // await this.processPageBuilder($);
-    // console.log('section content', globalService.pageContent);
-
-    return $.html();
+    // return $.html();
   },
-
-  // processPageBuilder: async function ($) {
-
-  //     let body = $('body');
-
-  //     //load pb root index file
-  //     let ui = await this.getPageBuilderUI();
-
-  //     // console.log(pageBuilder);
-  //     body.prepend(ui);
-  // },
-
-  // getPageBuilderUI: async function (){
-  //     let themePath = __dirname + '/../page-builder/page-builder.html';
-
-  //     return new Promise((resolve, reject) => {
-  //         fs.readFile(themePath, "utf8", (err, data) => {
-  //             if (err) {
-  //                 console.log(err);
-  //                 reject(err);
-  //             }
-  //             else {
-  //                 // console.log('data==>', data);
-  //                 resolve(data);
-  //                 // this.processTemplate(data).then(html => {
-  //                 //     resolve(html);
-  //                 // })
-  //             }
-  //         });
-  //     });
-  // },
 
   processMenu: async function () {
     let menuItemTemplate = $.html(".s--menu-item");
@@ -243,14 +170,14 @@ module.exports = contentService = {
     });
   },
 
-  processSections: async function ($) {
-    await emitterService.emit("preProcessSections");
+  processSections: async function (page) {
+    await emitterService.emit("preProcessSections", page);
 
-    this.page.data.sections = [];
-    let sectionWrapper = $(".s--section").parent(); //container
-    sectionWrapper.empty();
+    page.data.sections = [];
+    // let sectionWrapper = $(".s--section").parent(); //container
+    // sectionWrapper.empty();
 
-    let page = this.page; // await this.getContentById('5cd5af93523eac22087e4358');
+    // let page = page; // await this.getContentById('5cd5af93523eac22087e4358');
     // console.log('processSections:page==>', page);
 
     if (page.data && page.data.layout) {
@@ -259,27 +186,23 @@ module.exports = contentService = {
       await this.asyncForEach(sections, async (sectionId) => {
         let section = await dataService.getContentById(sectionId);
         if (section) {
-          globalService.pageContent += `<section data-id='${section.id}' class="jumbotron-fluid">`;
-          globalService.pageContent += '<div class="overlay">';
-          globalService.pageContent += '<div class="container">';
+          page.data.html += `<section data-id='${section.id}' class="jumbotron-fluid">`;
+          page.data.html += '<div class="overlay">';
+          page.data.html += '<div class="container">';
           let rows;
           if (section.data.content) {
             //content will contain full layout
-            globalService.pageContent += `${section.data.content}`;
+            page.data.html += `${section.data.content}`;
             await this.processShortCodes(section, section.data.content);
           } else {
             //use page builder rows for layout
-            rows = await this.processRows(
-              section,
-              sectionWrapper,
-              section.data.rows
-            );
+            rows = await this.processRows(page, section, section.data.rows);
           }
-          globalService.pageContent += "</div>";
-          globalService.pageContent += "</div>";
-          globalService.pageContent += `</section>`;
+          page.data.html += "</div>";
+          page.data.html += "</div>";
+          page.data.html += `</section>`;
 
-          this.page.data.sections.push({
+          page.data.sections.push({
             id: sectionId,
             title: section.data.title,
             rows: rows,
@@ -287,12 +210,12 @@ module.exports = contentService = {
         }
       });
 
-      sectionWrapper.append(globalService.pageContent);
+      // sectionWrapper.append(page.data.html);
     }
   },
 
   //TODO loop thru rows
-  processRows: async function (section, sectionWrapper, rows) {
+  processRows: async function (page, section, rows) {
     let rowArray = [];
     let rowIndex = 0;
 
@@ -301,9 +224,9 @@ module.exports = contentService = {
     if (rows) {
       for (const row of rows) {
         // console.log(chalk.red(JSON.stringify(row)));
-        globalService.pageContent += `<div class='${row.class}''>`;
-        let columns = await this.processColumns(section, row, rowIndex);
-        globalService.pageContent += `</div>`;
+        page.data.html += `<div class='${row.class}''>`;
+        let columns = await this.processColumns(page, section, row, rowIndex);
+        page.data.html += `</div>`;
 
         rowArray.push(row);
         rowIndex++;
@@ -313,7 +236,7 @@ module.exports = contentService = {
     return rowArray;
   },
 
-  processColumns: async function (section, row, rowIndex) {
+  processColumns: async function (page, section, row, rowIndex) {
     let columnArray = [];
     let columnIndex = 0;
 
@@ -322,26 +245,33 @@ module.exports = contentService = {
     for (const column of row.columns) {
       // console.log('== column ==', column);
 
-      globalService.pageContent += `<div id='${column.id}' class='${column.class}'>`;
-      globalService.pageContent += `${column.content}`;
+      page.data.html += `<div id='${column.id}' class='${column.class}'>`;
+      page.data.html += `${column.content}`;
       if (column.content) {
         await this.processShortCodes(
+          page,
           section,
           column.content,
           rowIndex,
           columnIndex
         );
       } else {
-        globalService.pageContent += `<span class="empty-column">empty column</spam>`;
+        page.data.html += `<span class="empty-column">empty column</spam>`;
       }
-      globalService.pageContent += `</div>`;
+      page.data.html += `</div>`;
       columnArray.push(column);
       columnIndex++;
     }
     return columnArray;
   },
 
-  processShortCodes: async function (section, body, rowIndex, columnIndex) {
+  processShortCodes: async function (
+    page,
+    section,
+    body,
+    rowIndex,
+    columnIndex
+  ) {
     let parsedBlock = ShortcodeTree.parse(body);
 
     await emitterService.emit("preProcessModuleShortCode");
@@ -358,12 +288,25 @@ module.exports = contentService = {
           }
 
           await emitterService.emit("beginProcessModuleShortCode", {
+            page: page,
             section: section,
             req: this.req,
             shortcode: shortcode,
             rowIndex: rowIndex,
             columnIndex: columnIndex,
           });
+
+          // if (wrapWithModuleDiv) {
+          //   var processedHtml = {
+          //     id: shortcode.properties.id,
+          //     shortCode: shortcode,
+          //     contentType: shortcode.name,
+          //     body: options.page.data.currentShortCodeHtml,
+          //   };
+
+          //   contentService.wrapBlockInModuleDiv(processedHtml, undefined);
+          //   page.data.currentShortCodeHtml = processedHtml;
+          // }
         }
       }
 
@@ -376,6 +319,7 @@ module.exports = contentService = {
   processDelayedModules: async function () {
     for (let shortcode of modulesToDelayProcessing) {
       await emitterService.emit("beginProcessModuleShortCodeDelayed", {
+        page: page,
         section: undefined,
         req: this.req,
         shortcode: shortcode,
@@ -383,74 +327,52 @@ module.exports = contentService = {
         columnIndex: 0,
       });
     }
-    // console.log("done delayed modules");
-    // console.log("================");
   },
 
-  wrapBlockInModuleDiv: function (proccessedHtml, viewModel) {
+  wrapBlockInModuleDiv: function (processedHtml, viewModel) {
     let wrapperCss = "module";
-    if (viewModel.data.settings && viewModel.data.settings.data.wrapperCss) {
+    if (
+      viewModel &&
+      viewModel.data.settings &&
+      viewModel.data.settings.data.wrapperCss
+    ) {
       wrapperCss += " " + viewModel.data.settings.data.wrapperCss;
     }
 
     let wrapperStyles = "";
-    if (viewModel.data.settings && viewModel.data.settings.data.wrapperStyles) {
+    if (
+      viewModel &&
+      viewModel.data.settings &&
+      viewModel.data.settings.data.wrapperStyles
+    ) {
       wrapperStyles = viewModel.data.settings.data.wrapperStyles;
     }
-    proccessedHtml.body = `<div class="${wrapperCss}" style="${wrapperStyles}" data-id="${proccessedHtml.id}" data-module="${proccessedHtml.shortCode.name}" data-content-type="${proccessedHtml.contentType}">${proccessedHtml.body}</div>`;
+    processedHtml.body = formattingService.generateModuleDivWrapper(processedHtml.id, wrapperCss, wrapperStyles, processedHtml.shortCode.name, processedHtml.contentType, processedHtml.body);
   },
 
-  // setupShortCodeParser: async function(){
-  //     await parser.add('BLOCK', tag=>{
-  //                         try{
-  //                 let blockId = tag.attributes.id
-  //                 console.log('in parser callback blockId:-->', blockId);
-  //                 await this.processBlock(blockId);
-  //                 return blockId;
-  //             }
-  //             catch(error){
-  //                 console.log(error);
-  //             }
-  //         // let blockId = tag.attributes.id
-  //         // console.log('in parser callback blockId:-->', blockId);
-  //         // await this.processBlock(blockId);
-  //         // return blockId;
-  //     });
-  // },
-
-  replaceBlockShortCode: async function (shortcode) {
+  replaceBlockShortCode: async function (page, shortcode) {
     let blockId = shortcode.properties.id;
     let content = await dataService.getContentById(blockId);
     // console.log('replaceShortCode.getContentById', content);
     let newBody = `<span data-id="${blockId}">${content.data.body}</span>`;
-    globalService.pageContent = globalService.pageContent.replace(
-      shortcode.codeText,
-      newBody
-    );
+    page.data.html = page.data.html.replace(shortcode.codeText, newBody);
   },
 
-  replaceFormShortCode: async function (shortcode) {
+  replaceFormShortCode: async function (page, shortcode) {
     let blockId = shortcode.properties.id;
     let contentType = shortcode.properties.contentType;
 
     let form = await formService.getForm(contentType);
-    // console.log('replaceFormShortCode.form', form);
-    let newBody = form;
-    globalService.pageContent = globalService.pageContent.replace(
-      shortcode.codeText,
-      newBody
-    );
+
+    page.data.html = page.data.html.replace(shortcode.codeText, form);
   },
 
-  replaceListShortCode: async function (shortcode) {
+  replaceListShortCode: async function (page, shortcode) {
     let blockId = shortcode.properties.id;
     let contentType = shortcode.properties.contentType;
 
     let list = await listService.getList(contentType);
-    globalService.pageContent = globalService.pageContent.replace(
-      shortcode.codeText,
-      list
-    );
+    page.data.html = page.data.html.replace(shortcode.codeText, list);
   },
 
   asyncForEach: async function (array, callback) {

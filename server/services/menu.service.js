@@ -6,11 +6,9 @@ var fs = require("fs");
 const axios = require("axios");
 const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 const chalk = require("chalk");
-const log = console.log;
 
 module.exports = menuService = {
   startup: function () {
-    // console.log('>>=== menu startup');
 
     emitterService.on("getRenderedPagePostDataFetch", async function (options) {
       if (options) {

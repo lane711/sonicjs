@@ -7,7 +7,7 @@ const { GraphQLJSONObject } = require("graphql-type-json");
 const moduleService = require("../services/module.service");
 const { data } = require("jquery");
 const fileService = require("../services/file.service");
-const mediaService = require("../services/media.service");
+const medi=ervice = require("../services/media.service");
 const viewService = require("../services/view.service");
 
 const {
@@ -76,7 +76,7 @@ const ContentType = new GraphQLObjectType({
     id: { type: GraphQLID },
     contentTypeId: { type: GraphQLString },
     data: { type: GraphQLJSONObject },
-    url: { type: GraphQLJSONObject },
+    url: { type: GraphQLString },
     createdOn: { type: GraphQLJSONObject },
     updatedOn: { type: GraphQLJSONObject },
     createdByUserId: {
@@ -494,6 +494,7 @@ const Mutation = new GraphQLObjectType({
       type: ContentType,
       args: {
         id: { type: new GraphQLNonNull(GraphQLString) },
+        url: { type: new GraphQLNonNull(GraphQLString) },
         data: {
           type: new GraphQLNonNull(GraphQLString),
         },
@@ -504,6 +505,7 @@ const Mutation = new GraphQLObjectType({
         let dataObj = JSON.parse(args.data);
         args.data = dataObj;
         let contentDoc = Content.findByIdAndUpdate(args.id, {
+          url: args.url,
           data: args.data,
         });
         contentDoc.exec();
@@ -558,6 +560,18 @@ const Mutation = new GraphQLObjectType({
       },
     },
 
+    contentTypeDelete: {
+      type: ContentTypeType,
+      args: {
+        systemId: { type: new GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parent, args) {
+        moduleService.deleteModuleContentType(args.systemId).then((data) => {
+          return data;
+        });
+      },
+    },
+
     //file mutations
     fileUpdate: {
       type: FileType,
@@ -585,6 +599,31 @@ const Mutation = new GraphQLObjectType({
         return moduleService.createModule(args);
       },
     },
+
+    moduleTypeDelete: {
+      type: ModuleType,
+      args: {
+        systemId: { type: new GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parent, args) {
+        return moduleService.deleteModule(args.systemId);
+      },
+    },
+
+    moduleTypeUpdate: {
+      type: ModuleType,
+      args: {
+        title: { type: new GraphQLNonNull(GraphQLString) },
+        enabled: { type: new GraphQLNonNull(GraphQLBoolean) },
+        systemId: { type: new GraphQLNonNull(GraphQLString) },
+        canBeAddedToColumn: { type: new GraphQLNonNull(GraphQLBoolean) },
+        singleInstance: { type: new GraphQLNonNull(GraphQLBoolean) },
+      },
+      resolve(parent, args) {
+        return moduleService.updateModule(args);
+      },
+    },
+
   },
 });
 

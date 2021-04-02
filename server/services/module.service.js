@@ -8,6 +8,8 @@ var globalService = require("../services/global.service");
 var fileService = require("../services/file.service");
 var viewService = require("../services/view.service");
 var dataService = require("../services/data.service");
+var formattingService = require("../services/formatting.service");
+
 var appRoot = require("app-root-path");
 
 module.exports = moduleService = {
@@ -231,7 +233,11 @@ module.exports = moduleService = {
       `/**/*${moduleContentTypeSystemid}.json`
     );
 
-    fileService.deleteFile(filePath[0]);
+    let fullPath = path.join(
+      appRoot.path,
+      filePath[0]
+    )
+    fileService.deleteFile(fullPath);
 
     //reload modules
     await moduleService.processModules();
@@ -261,32 +267,50 @@ module.exports = moduleService = {
     });
   },
 
-  processModuleInColumn: async function (options) {
+  processModuleInColumn: async function (options, viewModel) {
     if (options.shortcode.name === options.moduleName.toUpperCase()) {
       let id = options.shortcode.properties.id;
       let contentType = options.moduleName;
       let viewPath = `/server/modules/${contentType}/views/${contentType}-main.hbs`;
-      let viewModel = await dataService.getContentById(id);
-
-      options.viewModel = viewModel;
+      options.viewModel = viewModel
+        ? viewModel
+        : await dataService.getContentById(id);
 
       await emitterService.emit("postModuleGetData", options);
 
-      var proccessedHtml = {
+      var processedHtml = {
         id: id,
         contentType: contentType,
         shortCode: options.shortcode,
-        body: await this.processView(contentType, viewModel, viewPath),
+        body: await this.processView(contentType, options.viewModel, viewPath),
       };
 
-      await emitterService.emit("postProcessModuleShortCodeProccessedHtml", {
-        proccessedHtml: proccessedHtml,
-        viewModel: viewModel,
+      //for template based pages
+      if (options.page.data.pageTemplate) {
+        if (options.shortcode.name !== "PAGE-TEMPLATES") {
+          let wrappedDiv = formattingService.generateModuleDivWrapper(
+            options.shortcode.properties.id,
+            "module",
+            "",
+            options.shortcode.name,
+            contentType,
+            processedHtml.body,
+            true
+          );
+          options.page.data.currentShortCodeHtml += wrappedDiv;
+        } else {
+          options.page.data.currentShortCodeHtml += processedHtml.body;
+        }
+      }
+
+      await emitterService.emit("postProcessModuleShortCodeProcessedHtml", {
+        processedHtml: processedHtml,
+        viewModel: options.viewModel,
       });
 
-      globalService.pageContent = globalService.pageContent.replace(
+      options.page.data.html = options.page.data.html.replace(
         options.shortcode.codeText,
-        proccessedHtml.body
+        processedHtml.body
       );
     }
   },
@@ -303,7 +327,7 @@ module.exports = moduleService = {
 
   createModule: async function (moduleDefinitionFile) {
     let basePath = `/server/modules/${moduleDefinitionFile.systemId}`;
-    
+
     moduleDefinitionFile.version = "0.0.0.1";
 
     //create base dir
@@ -343,8 +367,9 @@ module.exports = moduleService = {
     moduleDefinitionFile.systemidCamelCase = _.camelCase(
       moduleDefinitionFile.systemId
     );
-    let mainServiceFilePath = "/server/assets/js/module-default-main-service.js"
-    
+    let mainServiceFilePath =
+      "/server/assets/js/module-default-main-service.js";
+
     var mainServiceFile = await viewService.getProcessedView(
       null,
       moduleDefinitionFile,
@@ -393,11 +418,12 @@ module.exports = moduleService = {
   },
 
   updateModule: async function (moduleDefinitionFile) {
-    let basePath = `../../server/modules/${moduleDefinitionFile.systemId}`;
-    fileService.writeFile(
+    let basePath = `server/modules/${moduleDefinitionFile.systemId}`;
+    await fileService.writeFile(
       `${basePath}/module.json`,
       JSON.stringify(moduleDefinitionFile, null, 2)
     );
+    await moduleService.processModules();
   },
 
   deleteModule: async function (moduleSystemId) {

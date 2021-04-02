@@ -58,29 +58,10 @@ module.exports = menuTitleMainService = {
 
   });
 
-    // emitterService.on("postModuleGetData", async function(options) {
-    //   if (options.shortcode.name !== "TITLE") {
-    //     return;
-    //   }
-
-    //   sourceColumnId = options.viewModel.data.sourceColumnId;
-    //   let sourceColumn = await menuTitleMainService.findColumnByHtmlId(
-    //     options.section,
-    //     sourceColumnId
-    //   );
-    //   console.log("sourceColumn", sourceColumn);
-    //   let content =
-    //     options.section.data.rows[options.rowIndex].columns[options.columnIndex]
-    //       .content;
-    //   options.viewModel.data.menu = "Lane";
-
-    //   // console.log('contact module after view model', options.viewModel);
-    //   globalService.pageContent;
-    // });
 
     emitterService.on("preRender", async function(options) {
       let x = sourceColumnId;
-      globalService.pageContent;
+      options.page.data.html;
     });
   },
 

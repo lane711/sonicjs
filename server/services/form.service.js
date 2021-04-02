@@ -57,8 +57,10 @@ if (typeof module !== "undefined" && module.exports) {
     (exports.getForm = async function (
       contentTypeId,
       content,
-      onFormSubmitFunction
+      onFormSubmitFunction,
+      returnModuleSettings = false
     ) {
+
       let contentType;
       if (content && content.data.contentType) {
         contentType = await dataService.contentTypeGet(
@@ -66,6 +68,13 @@ if (typeof module !== "undefined" && module.exports) {
         );
       } else if (contentTypeId) {
         contentType = await dataService.contentTypeGet(contentTypeId);
+        //show settings version of content type if exist
+        if(returnModuleSettings && returnModuleSettings.systemId){
+          const settingContentType = await dataService.contentTypeGet(`${contentTypeId}-settings`);
+          if(settingContentType){
+            contentType = settingContentType;
+          }
+        }
       } else {
         return;
       }

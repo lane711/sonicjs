@@ -75,12 +75,12 @@ module.exports = menuTitleMainService = {
     //   options.viewModel.data.menu = "Lane";
 
     //   // console.log('contact module after view model', options.viewModel);
-    //   globalService.pageContent;
+    //   options.page.data.html;
     // });
 
     emitterService.on("preRender", async function(options) {
       let x = sourceColumnId;
-      globalService.pageContent;
+      options.page.data.html;
     });
   },
 
