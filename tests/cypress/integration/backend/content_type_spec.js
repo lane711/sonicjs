@@ -149,5 +149,16 @@ describe("Admin Content Types", function () {
     cy.get('[aria-label="Delete AA Cypress Module Content Type RAW EDIT"]').first().click();
     cy.wait(500);
     cy.contains("Confirm Delete").click();
+    cy.wait(500);
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
+    cy.get('[aria-label="Delete AA Cypress Module Content Type RAW EDIT"]').should('not.exist');
+
+    //mow delete test module
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/modules`);
+    cy.get('[aria-label="Delete AA Cypress Module Content Type"]').first().click();
+    cy.wait(500);
+    cy.contains("Confirm Delete").click();
+    cy.get('[aria-label="Delete AA Cypress Module Content Type"]').should('not.exist');
+
   });
 });

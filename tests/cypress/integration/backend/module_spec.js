@@ -73,9 +73,9 @@ describe("Admin Modules", function () {
   });
 
   it("Content type delete", function () {
-    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/modules`);
-    cy.get('[aria-label="Delete AA Cypress Module EDITED"]').first().click();
-    cy.wait(500);
-    cy.contains("Confirm Delete").click();
+      cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/modules`);
+      cy.get('[aria-label="Delete AA Cypress Module EDITED"]').first().click();
+      cy.wait(500);
+      cy.contains("Confirm Delete").click();
   });
 });
