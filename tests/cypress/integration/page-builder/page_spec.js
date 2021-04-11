@@ -25,6 +25,7 @@ describe("Page Builder", function () {
     cy.contains("Template").should("be.visible");
     cy.get("#add-tab").click();
     cy.get("#btn-add-page").click();
+    cy.wait(1000);
     cy.get('input[name="data[title]').type("Cypress PB Test");
     cy.get('input[name="data[url]').should("have.value", "/cypress-pb-test");
     cy.get('input[name="data[heroTitle]"]').type("Cypress Hero");

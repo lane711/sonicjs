@@ -16,7 +16,7 @@ module.exports = mixpanelMainService = {
   },
 
   init: async function(options) {
-    mixpanel = Mixpanel.init("4e479879c864f14281f4bc81d868fe28");
+    mixpanel = Mixpanel.init("02789a7317a3ecd565a8863a79ca6802");
   },
 
   setPeople: async function(email) {
@@ -44,10 +44,7 @@ module.exports = mixpanelMainService = {
     }
 
     let email;
-    // let currentUser = await userService.getCurrentUser(req);
-    // if (currentUser) {
-    //   email = currentUser.email;
-    // }
+    email = await mixpanelMainService.getEmail(req);
 
     // console.log("mix", email, data);
 
@@ -63,6 +60,12 @@ module.exports = mixpanelMainService = {
       } else if (eventName === "PAGE_LOAD_ADMIN") {
         mixpanel.people.increment(email, "page_viewed_admin");
       }
+    }
+  },
+
+  getEmail: async function(req){
+    if (req.user && req.user.username) {
+      return req.user.username;
     }
   },
 
