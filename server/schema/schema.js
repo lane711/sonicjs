@@ -573,6 +573,19 @@ const Mutation = new GraphQLObjectType({
     },
 
     //file mutations
+    fileCreate: {
+      type: FileType,
+      args: {
+        filePath: { type: new GraphQLNonNull(GraphQLString) },
+        fileContent: { type: new GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parent, args) {
+        fileService.writeFile(args.filePath, args.fileContent);
+        let fileData = new FileData(args.filePath, args.fileContent);
+        return fileData;
+      },
+    },
+
     fileUpdate: {
       type: FileType,
       args: {
