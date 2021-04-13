@@ -212,7 +212,7 @@ module.exports = moduleService = {
   },
 
   createModuleContentType: async function (contentTypeDef) {
-    console.log("creating content type", contentTypeDef);
+    // console.log("creating content type", contentTypeDef);
     contentTypeDef.filePath = `/server/modules/${contentTypeDef.moduleSystemId}/models/${contentTypeDef.systemId}.json`;
     contentTypeDef.title = contentTypeDef.title
       ? contentTypeDef.title
@@ -255,14 +255,14 @@ module.exports = moduleService = {
   },
 
   getModuleJs: async function (path) {
-    const files = fileService.getFilesSearchSync(path, "/**/*.css");
+    const files = fileService.getFilesSearchSync(path, "/**/*.js");
 
     globalService.moduleJsFiles = [];
 
     files.forEach((file) => {
       if (file.indexOf("assets/js") > -1) {
-        // let link = file.substr(file.indexOf("server") + 6, file.length);
-        globalService.moduleJsFiles.push(file);
+        let link = file.substr(file.indexOf("server") + 6, file.length);
+        globalService.moduleJsFiles.push(link);
       }
     });
   },
