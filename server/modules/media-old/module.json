@@ -1,7 +1,8 @@
 {
-  "title": "Media",
+  "title": "Media old",
+  "systemId": "media-old",
+  "version": "0.0.0.1",
   "enabled": true,
-  "systemId": "media",
   "canBeAddedToColumn": true,
   "singleInstance": false
 }
