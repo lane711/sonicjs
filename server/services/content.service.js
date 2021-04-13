@@ -186,7 +186,7 @@ module.exports = contentService = {
       await this.asyncForEach(sections, async (sectionId) => {
         let section = await dataService.getContentById(sectionId);
         if (section) {
-          page.data.html += `<section data-id='${section.id}' class="jumbotron-fluid">`;
+          page.data.html += `<section data-id='${section.id}' class="${section.data.cssClass} jumbotron-fluid">`;
           page.data.html += '<div class="overlay">';
           page.data.html += '<div class="container">';
           let rows;
