@@ -599,6 +599,23 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.fileUpdate;
     }),
+    (exports.fileCreate = async function (filePath, fileContent) {
+      let result = await this.getAxios().post(apiUrl, {
+        query: `
+      mutation{
+        fileCreate( 
+          filePath:"${filePath}", 
+          fileContent:"""${fileContent}"""
+          )
+          { 
+            filePath 
+          }
+      }
+          `,
+      });
+
+      return result.data.data.fileUpdate;
+    }),
     (exports.getView = async function (contentType, viewModel, viewPath) {
       let result = await this.getAxios().post(apiUrl, {
         query: `

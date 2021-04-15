@@ -1555,7 +1555,7 @@ async function setupDropZone() {
   Dropzone.autoDiscover = false;
 
   var myDropzone = $("#sonicjs-dropzone").dropzone({
-    url: "/api/containers/files/upload",
+    url: "/",
     addRemoveLinks: true,
     maxFilesize: 5,
     dictDefaultMessage:
@@ -1564,16 +1564,28 @@ async function setupDropZone() {
     headers: {
       Authorization: $("#token").val(),
     },
-    accept: async function (file, done) {
-      let title = file.name.replace(/\.[^/.]+$/, "");
-      let payload = {
-        data: {
-          title: title,
-          file: file.name,
-          contentType: "media",
-        },
+    addedfile: function(file) {
+      var _this=this,
+          reader = new FileReader();
+      reader.onload = async function(event) {
+          base64content = event.target.result;
+          console.log(base64content);
+          await dataService.fileCreate(file.name, base64content);
+          _this.processQueue()
       };
-      await createInstance(payload);
+      reader.readAsDataURL(file);
+  },
+    accept: async function (file, done) {
+      // let title = file.name.replace(/\.[^/.]+$/, "");
+      // let payload = {
+      //   data: {
+      //     title: title,
+      //     file: file.name,
+      //     contentType: "media",
+      //   },
+      // };
+      // debugger;
+      // await createInstance(payload);
       done();
     },
   });
