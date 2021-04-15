@@ -93,7 +93,9 @@ module.exports = pageTemplatesMainService = {
         let templatePage = await dataService.getContentById(
           page.data.pageTemplate
         );
-        page.data.layout = templatePage.data.layout;
+        if(templatePage){
+          page.data.layout = templatePage.data.layout;
+        }
       }
       // let basePage = await dataService.getContentByUrl(options.req.originalUrl);
       // page.data.sections = [];
