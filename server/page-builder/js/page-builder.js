@@ -1557,7 +1557,7 @@ async function setupDropZone() {
   var myDropzone = $("#sonicjs-dropzone").dropzone({
     url: "/",
     addRemoveLinks: true,
-    maxFilesize: 5,
+    maxFilesize: 100,
     dictDefaultMessage:
       '<span class="text-center"><span class="font-lg visible-xs-block visible-sm-block visible-lg-block"><span class="font-lg"><i class="fa fa-caret-right text-danger"></i> Drop files <span class="font-xs">to upload</span></span><span>&nbsp&nbsp<h4 class="display-inline"> (Or Click)</h4></span>',
     dictResponseError: "Error uploading file!",
@@ -1571,54 +1571,29 @@ async function setupDropZone() {
           base64content = event.target.result;
           console.log(base64content);
           await dataService.fileCreate(`/server/assets/uploads/${file.name}`, base64content);
+          await createMediaRecord(file);
           _this.processQueue();
           fullPageUpdate();
       };
       reader.readAsDataURL(file);
   },
     accept: async function (file, done) {
-      // let title = file.name.replace(/\.[^/.]+$/, "");
-      // let payload = {
-      //   data: {
-      //     title: title,
-      //     file: file.name,
-      //     contentType: "media",
-      //   },
-      // };
-      // debugger;
-      // await createInstance(payload);
       done();
     },
   });
 
-  // debugger;
-  // Dropzone.options.myDropzone = {
-  //     paramName: "file", // The name that will be used to transfer the file
-  //     maxFilesize: 2, // MB
-  //     accept: function(file, done) {
-  //       if (file.name == "justinbieber.jpg") {
-  //         done("Naha, you don't.");
-  //       }
-  //       else { done(); }
-  //     }
-  //   };
-
-  // Dropzone.autoDiscover = false;
-
-  // let sonicDropzone = $("#sonicjs-dropzone").dropzone({
-  //     url: "/api/containers/files/upload",
-  //     addRemoveLinks : true,
-  //     maxFilesize: 5,
-  //     dictDefaultMessage: '<span class="text-center"><span class="font-lg visible-xs-block visible-sm-block visible-lg-block"><span class="font-lg"><i class="fa fa-caret-right text-danger"></i> Drop files <span class="font-xs">to upload</span></span><span>&nbsp&nbsp<h4 class="display-inline"> (Or Click)</h4></span>',
-  //     dictResponseError: 'Error uploading file!',
-  //     headers: {
-  //         'Authorization': $('#token').val()
-  //     }
-  // });
-
-  // sonicDropzone.on("complete", function (file) {
-  //     debugger;
-  // });
+  async function createMediaRecord(file){
+      let title = file.name.replace(/\.[^/.]+$/, "");
+      let payload = {
+        data: {
+          title: title,
+          file: file.name,
+          contentType: "media",
+        },
+      };
+      debugger;
+      await createInstance(payload);
+  }
 }
 
 async function beatifyACECss() {
