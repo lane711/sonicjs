@@ -52,6 +52,7 @@ app.use(session({
   saveUninitialized: true
 }));
 
+app.use(bodyParser.json({limit: '100mb'}));
 setupGraphQL(app);
 
 function start() {
@@ -59,7 +60,6 @@ function start() {
   setupAssets(app);
 
   app.use(bodyParser.urlencoded({ extended: false }));
-  app.use(bodyParser.json());
   setupHandlebars(app);
 
   passport.use(User.createStrategy());

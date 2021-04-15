@@ -600,8 +600,8 @@ if (typeof module !== "undefined" && module.exports) {
       return result.data.data.fileUpdate;
     }),
     (exports.fileCreate = async function (filePath, fileContent) {
-      let result = await this.getAxios().post(apiUrl, {
-        query: `
+
+      let query = `
       mutation{
         fileCreate( 
           filePath:"${filePath}", 
@@ -611,7 +611,11 @@ if (typeof module !== "undefined" && module.exports) {
             filePath 
           }
       }
-          `,
+          `;
+          let contentLength = fileContent.length;
+          
+      let result = await this.getAxios().post(apiUrl, {
+        query: query,
       });
 
       return result.data.data.fileUpdate;

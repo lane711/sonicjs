@@ -85,9 +85,10 @@ module.exports = fileService = {
   writeFile: async function (filePath, fileContent) {
     let fullPath = path.join(this.getRootAppPath(), filePath);
     if (filePath.match(/.(jpg|jpeg|png|gif)$/i)) {
-      console.log('creating image ' + filePath);
-      fileContent = fileContent.split(',')[1];
-      await fsPromise.writeFile(fullPath, fileContent, 'base64');
+      if (fileContent.indexOf(",") > -1) {
+        fileContent = fileContent.split(",")[1];
+      }
+      await fsPromise.writeFile(fullPath, fileContent, "base64");
     } else {
       await fsPromise.writeFile(fullPath, fileContent);
     }

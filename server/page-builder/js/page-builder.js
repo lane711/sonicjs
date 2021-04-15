@@ -1570,8 +1570,9 @@ async function setupDropZone() {
       reader.onload = async function(event) {
           base64content = event.target.result;
           console.log(base64content);
-          await dataService.fileCreate(file.name, base64content);
-          _this.processQueue()
+          await dataService.fileCreate(`/server/assets/uploads/${file.name}`, base64content);
+          _this.processQueue();
+          fullPageUpdate();
       };
       reader.readAsDataURL(file);
   },
