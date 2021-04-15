@@ -115,6 +115,7 @@ Follow these steps and you should be good to go:
 
 1. Clone the repo: `git clone https://github.com/lane711/sonicjs.git`
 1. Change to created folder `cd sonicjs`
+1. Validate the MONGODB_URL value the .env-default file (located in the root directory) 
 1. Install the dependencies: `npm install`
 1. Run it with: `npm start`
 
