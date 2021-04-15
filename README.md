@@ -135,7 +135,7 @@ SonicJs is similar to Drupal CMS in that it is highly configurable. You can buil
 
 SonicJs can handle most common website building use-cases with ease, but it also positioned to be an enterprise application framework/platform enabling developers to start custom web application projects with a solid foundation. This can help significantly reduce the overall effort required for your project.
 
- SonicJs is also 100% GraphQL API based and therefor a great choice if you are looking for a **Headless CMS** for your mobile app or IoT project. All of the content types that you create in the admin interface are instantly exposed as GraphQL end points. There is no need to restart the application as required in other NodeJs based Headless CMS.
+ SonicJs is also 100% GraphQL API based and therefore a great choice if you are looking for a **Headless CMS** for your mobile app or IoT project. All of the content types that you create in the admin interface are instantly exposed as GraphQL end points. There is no need to restart the application as required in other NodeJs based Headless CMS.
 
 SonicJs is built with love from Orange County California.
 
