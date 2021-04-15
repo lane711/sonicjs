@@ -1564,35 +1564,37 @@ async function setupDropZone() {
     headers: {
       Authorization: $("#token").val(),
     },
-    addedfile: function(file) {
-      var _this=this,
-          reader = new FileReader();
-      reader.onload = async function(event) {
-          base64content = event.target.result;
-          console.log(base64content);
-          await dataService.fileCreate(`/server/assets/uploads/${file.name}`, base64content);
-          await createMediaRecord(file);
-          _this.processQueue();
-          fullPageUpdate();
+    addedfile: function (file) {
+      var _this = this,
+        reader = new FileReader();
+      reader.onload = async function (event) {
+        base64content = event.target.result;
+        console.log(base64content);
+        await dataService.fileCreate(
+          `/server/assets/uploads/${file.name}`,
+          base64content
+        );
+        await createMediaRecord(file);
+        _this.processQueue();
+        fullPageUpdate();
       };
       reader.readAsDataURL(file);
-  },
+    },
     accept: async function (file, done) {
       done();
     },
   });
 
-  async function createMediaRecord(file){
-      let title = file.name.replace(/\.[^/.]+$/, "");
-      let payload = {
-        data: {
-          title: title,
-          file: file.name,
-          contentType: "media",
-        },
-      };
-      debugger;
-      await createInstance(payload);
+  async function createMediaRecord(file) {
+    let title = file.name.replace(/\.[^/.]+$/, "");
+    let payload = {
+      data: {
+        title: title,
+        file: file.name,
+        contentType: "media",
+      },
+    };
+    await createInstance(payload);
   }
 }
 
@@ -1812,4 +1814,11 @@ async function addUser() {
   // this.fullPageUpdate();
   // this.loadSections(updatedPage);
   fullPageUpdate();
+}
+
+async function setupAdminMediaFormImage() {
+  let fileName = $('input[name="data[file]"]').val();
+  if (fileName) {
+    $(".admin-form-media-image").attr("src", `/assets/uploads/${fileName}`);
+  }
 }

@@ -45,7 +45,7 @@ module.exports = mediaService = {
         let mediaFilesList = fileService.getFilesSync('/server/assets/uploads');
 
         let media = mediaFilesList.map(function(media) {
-            return {filePath: media};
+            return {filePath: media, id:id};
         });
 
         return media;

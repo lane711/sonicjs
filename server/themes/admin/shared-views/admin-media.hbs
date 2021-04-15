@@ -12,11 +12,11 @@
 
             <div class="row">
                 {{#each data}}
-
+{{ log this}}
 
                 <div class="col-md-3">
                     <div class="thumbnail">
-                        <a href="/assets/uploads/{{ this.filePath }}">
+                        <a href="/admin/content/edit/media/{{ this.id }}">
                             <img src="/assets/uploads/{{ this.filePath }}"
                                 style="width:100%">
                             <div class="caption">
