@@ -60,7 +60,8 @@ module.exports = fileService = {
 
     files.forEach((file) => {
       const root = appRoot.path.split(path.sep).join(path.posix.sep);
-      filesRelative.push(file.replace(root, ""));    });
+      filesRelative.push(file.replace(root, ""));
+    });
 
     return filesRelative;
   },
@@ -83,7 +84,11 @@ module.exports = fileService = {
 
   writeFile: async function (filePath, fileContent) {
     let fullPath = path.join(this.getRootAppPath(), filePath);
-    await fsPromise.writeFile(fullPath, fileContent);
+    if (filePath.indexOf(".png") > -1) {
+      await fsPromise.writeFile(fullPath, fileContent, 'base64');
+    } else {
+      await fsPromise.writeFile(fullPath, fileContent);
+    }
   },
 
   createDirectory: async function (directoryRelativePath) {

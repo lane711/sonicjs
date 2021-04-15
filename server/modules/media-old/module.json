@@ -2,7 +2,7 @@
   "title": "Media old",
   "systemId": "media-old",
   "version": "0.0.0.1",
-  "enabled": true,
+  "enabled": false,
   "canBeAddedToColumn": true,
   "singleInstance": false
 }
