@@ -84,7 +84,7 @@ module.exports = fileService = {
 
   writeFile: async function (filePath, fileContent) {
     let fullPath = path.join(this.getRootAppPath(), filePath);
-    if (filePath.indexOf(".png") > -1) {
+    if (filePath.match(/.(jpg|jpeg|png|gif)$/i)) {
       await fsPromise.writeFile(fullPath, fileContent, 'base64');
     } else {
       await fsPromise.writeFile(fullPath, fileContent);
