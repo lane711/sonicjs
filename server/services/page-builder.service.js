@@ -25,6 +25,13 @@ module.exports = pageBuilderService = {
       }
     });
 
+
+    app.get("/api/page-templates", async function (req, res) {
+      let data = await dataService.getPageTemplates();
+      console.log(data);
+      res.json(data);
+    });
+
     app.post("/admin/pb-update-module-delete", async function (req, res) {
       let data = req.body.data;
       let shortCodeToRemove;

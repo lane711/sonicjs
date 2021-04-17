@@ -171,6 +171,7 @@ if (typeof module !== "undefined" && module.exports) {
         }
           `,
       });
+      
 
       if (result.data.data.contents) {
         let content = result.data.data.contents;
@@ -178,6 +179,7 @@ if (typeof module !== "undefined" && module.exports) {
         await formattingService.formatTitles(content);
         return content;
       }
+      
     }),
     (exports.getContentAdmin = async function () {
       let contents = await this.getContent();
@@ -215,6 +217,7 @@ if (typeof module !== "undefined" && module.exports) {
         query: `
         {
           contents (contentTypeId : "${contentType}") {
+            id
             contentTypeId
             data
           }
@@ -223,6 +226,16 @@ if (typeof module !== "undefined" && module.exports) {
       });
 
       return result.data.data.contents;
+    }),
+    (exports.getPageTemplates = async function () {
+      let pages = await this.getContentByType("page");
+
+      //filter out content type that should not appear in admin content list
+      let data = pages.filter((x) => x.data.isPageTemplate);
+
+      // data.push({ id: 0, data: {title: "None" }});
+
+      return data;
     }),
     (exports.contentTypeGet = async function (contentType) {
       // debugger;
@@ -297,7 +310,6 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.contentType;
     }),
-
     (exports.contentTypeDelete = async function (contentType) {
       let components = JSON.stringify(contentType.data);
       let result = await this.getAxios().post(apiUrl, {
@@ -313,7 +325,6 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.contentType;
     }),
-
     (exports.contentTypeCreate = async function (contentType) {
       let query = `
       mutation{
@@ -481,8 +492,11 @@ if (typeof module !== "undefined" && module.exports) {
       return result.data.data.contentUpdate;
     }),
     (exports.contentCreate = async function (payload, autoGenerateUrl = true) {
-      if (payload.data.contentType !== "page" && payload.data.contentType !== "blog") {
-        if (autoGenerateUrl){
+      if (
+        payload.data.contentType !== "page" &&
+        payload.data.contentType !== "blog"
+      ) {
+        if (autoGenerateUrl) {
           payload.data.url = helperService.generateSlugFromContent(
             payload.data,
             true,
@@ -600,7 +614,6 @@ if (typeof module !== "undefined" && module.exports) {
       return result.data.data.fileUpdate;
     }),
     (exports.fileCreate = async function (filePath, fileContent) {
-
       let query = `
       mutation{
         fileCreate( 
@@ -612,8 +625,8 @@ if (typeof module !== "undefined" && module.exports) {
           }
       }
           `;
-          let contentLength = fileContent.length;
-          
+      let contentLength = fileContent.length;
+
       let result = await this.getAxios().post(apiUrl, {
         query: query,
       });
@@ -677,7 +690,6 @@ if (typeof module !== "undefined" && module.exports) {
       let result = await this.getAxios().post(apiUrl, {
         query: query,
       });
-
     }),
     (exports.moduleCreate = async function (payload) {
       let result = await this.getAxios().post(apiUrl, {
@@ -701,9 +713,7 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.fileUpdate;
     }),
-
     (exports.moduleEdit = async function (payload) {
-
       let result = await this.getAxios().post(apiUrl, {
         query: `
         mutation{
@@ -724,9 +734,8 @@ if (typeof module !== "undefined" && module.exports) {
           `,
       });
 
-      return result.data.data;;
+      return result.data.data;
     }),
-
     (exports.getFiles = async function () {
       let files = [{ title: "my image", filePath: "/images/test123.png" }];
       return files;

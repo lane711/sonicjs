@@ -402,6 +402,7 @@ async function editSection(sectionId) {
 }
 
 async function deleteSection(sectionId, index) {
+  debugger;
   console.log("delete section", sectionId, index);
   //delete from page
   page.data.layout.splice(index, 1);
@@ -1334,13 +1335,7 @@ function getPageTemplateRegion(page, sourceColumn, destinationColumn) {
 }
 
 async function addModuleToColumn(submission) {
-  // debugger;
-  console.log("adding module to column", submission);
-
   let entity = processContentFields(submission.data);
-
-  // let isPageUsingTemplate =
-  //   page.data.pageTemplate && page.data.pageTemplate !== "none";
 
   let {
     isPageUsingTemplate,
@@ -1365,6 +1360,11 @@ async function addModuleToColumn(submission) {
 
   if (isPageUsingTemplate) {
     //if page uses a template, we need to attach the content to the selected region of the template
+    if (!page.data.pageTemplateRegions) {
+      //add empty region for new page
+      page.data.pageTemplateRegions = [];
+    }
+
     if (page.data.pageTemplateRegions) {
       let region = page.data.pageTemplateRegions.filter(
         (r) => r.regionId === destinationPageTemplateRegion
@@ -1380,8 +1380,6 @@ async function addModuleToColumn(submission) {
 
       //save entire page, not just the section
       editInstance(page);
-
-      console.log("attach to region");
     }
     //save in a
   } else {
@@ -1557,7 +1555,7 @@ async function setupDropZone() {
   var myDropzone = $("#sonicjs-dropzone").dropzone({
     url: "/",
     addRemoveLinks: true,
-    maxFilesize: 100,
+    maxFilesize: 5,
     dictDefaultMessage:
       '<span class="text-center"><span class="font-lg visible-xs-block visible-sm-block visible-lg-block"><span class="font-lg"><i class="fa fa-caret-right text-danger"></i> Drop files <span class="font-xs">to upload</span></span><span>&nbsp&nbsp<h4 class="display-inline"> (Or Click)</h4></span>',
     dictResponseError: "Error uploading file!",
@@ -1574,28 +1572,54 @@ async function setupDropZone() {
           `/server/assets/uploads/${file.name}`,
           base64content
         );
-        await createMediaRecord(file);
         _this.processQueue();
         fullPageUpdate();
       };
       reader.readAsDataURL(file);
     },
     accept: async function (file, done) {
+      // let title = file.name.replace(/\.[^/.]+$/, "");
+      // let payload = {
+      //   data: {
+      //     title: title,
+      //     file: file.name,
+      //     contentType: "media",
+      //   },
+      // };
+      // debugger;
+      // await createInstance(payload);
       done();
     },
   });
 
-  async function createMediaRecord(file) {
-    let title = file.name.replace(/\.[^/.]+$/, "");
-    let payload = {
-      data: {
-        title: title,
-        file: file.name,
-        contentType: "media",
-      },
-    };
-    await createInstance(payload);
-  }
+  // debugger;
+  // Dropzone.options.myDropzone = {
+  //     paramName: "file", // The name that will be used to transfer the file
+  //     maxFilesize: 2, // MB
+  //     accept: function(file, done) {
+  //       if (file.name == "justinbieber.jpg") {
+  //         done("Naha, you don't.");
+  //       }
+  //       else { done(); }
+  //     }
+  //   };
+
+  // Dropzone.autoDiscover = false;
+
+  // let sonicDropzone = $("#sonicjs-dropzone").dropzone({
+  //     url: "/api/containers/files/upload",
+  //     addRemoveLinks : true,
+  //     maxFilesize: 5,
+  //     dictDefaultMessage: '<span class="text-center"><span class="font-lg visible-xs-block visible-sm-block visible-lg-block"><span class="font-lg"><i class="fa fa-caret-right text-danger"></i> Drop files <span class="font-xs">to upload</span></span><span>&nbsp&nbsp<h4 class="display-inline"> (Or Click)</h4></span>',
+  //     dictResponseError: 'Error uploading file!',
+  //     headers: {
+  //         'Authorization': $('#token').val()
+  //     }
+  // });
+
+  // sonicDropzone.on("complete", function (file) {
+  //     debugger;
+  // });
 }
 
 async function beatifyACECss() {
@@ -1814,11 +1838,4 @@ async function addUser() {
   // this.fullPageUpdate();
   // this.loadSections(updatedPage);
   fullPageUpdate();
-}
-
-async function setupAdminMediaFormImage() {
-  let fileName = $('input[name="data[file]"]').val();
-  if (fileName) {
-    $(".admin-form-media-image").attr("src", `/assets/uploads/${fileName}`);
-  }
 }
