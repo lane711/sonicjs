@@ -402,6 +402,7 @@ async function editSection(sectionId) {
 }
 
 async function deleteSection(sectionId, index) {
+  debugger;
   console.log("delete section", sectionId, index);
   //delete from page
   page.data.layout.splice(index, 1);
@@ -1334,13 +1335,7 @@ function getPageTemplateRegion(page, sourceColumn, destinationColumn) {
 }
 
 async function addModuleToColumn(submission) {
-  // debugger;
-  console.log("adding module to column", submission);
-
   let entity = processContentFields(submission.data);
-
-  // let isPageUsingTemplate =
-  //   page.data.pageTemplate && page.data.pageTemplate !== "none";
 
   let {
     isPageUsingTemplate,
@@ -1365,6 +1360,11 @@ async function addModuleToColumn(submission) {
 
   if (isPageUsingTemplate) {
     //if page uses a template, we need to attach the content to the selected region of the template
+    if (!page.data.pageTemplateRegions) {
+      //add empty region for new page
+      page.data.pageTemplateRegions = [];
+    }
+
     if (page.data.pageTemplateRegions) {
       let region = page.data.pageTemplateRegions.filter(
         (r) => r.regionId === destinationPageTemplateRegion
@@ -1380,8 +1380,6 @@ async function addModuleToColumn(submission) {
 
       //save entire page, not just the section
       editInstance(page);
-
-      console.log("attach to region");
     }
     //save in a
   } else {
@@ -1564,18 +1562,21 @@ async function setupDropZone() {
     headers: {
       Authorization: $("#token").val(),
     },
-    addedfile: function(file) {
-      var _this=this,
-          reader = new FileReader();
-      reader.onload = async function(event) {
-          base64content = event.target.result;
-          console.log(base64content);
-          await dataService.fileCreate(`/server/assets/uploads/${file.name}`, base64content);
-          _this.processQueue();
-          fullPageUpdate();
+    addedfile: function (file) {
+      var _this = this,
+        reader = new FileReader();
+      reader.onload = async function (event) {
+        base64content = event.target.result;
+        console.log(base64content);
+        await dataService.fileCreate(
+          `/server/assets/uploads/${file.name}`,
+          base64content
+        );
+        _this.processQueue();
+        fullPageUpdate();
       };
       reader.readAsDataURL(file);
-  },
+    },
     accept: async function (file, done) {
       // let title = file.name.replace(/\.[^/.]+$/, "");
       // let payload = {
