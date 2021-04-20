@@ -1,0 +1,19 @@
+.focus-on-success {
+  .shape {
+    position: absolute;
+
+    &-triangle {
+      left: 5%;
+      top: 0;
+      transform: translate(100%, -15%) rotate(65deg);
+
+      div {
+        @include triangle-variant(
+          250px,
+          theme-color(primary),
+          theme-color(primary)
+        );
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+#stripes {
+  background: linear-gradient(30deg, #a6ffcb 15%, #05d5ff 30%, $color-stripe-1 86%); //linear-gradient(150deg, $color-stripe-1 15%, #05d5ff 70%, #a6ffcb 94%);
+
+  :nth-child(1) {
+    clip-path: polygon(0 0, 100% 0%, 100% 100%, 0% 60%);
+  }
+
+  :nth-child(2) {
+    clip-path: polygon(0 0, 100% 0%, 100% 100%, 0% 74%);
+  }
+
+  :nth-child(3) {
+    clip-path: polygon(0 0, 100% 0, 100% 70%, 0 5%);
+  }
+
+  :nth-child(4) {
+    clip-path: polygon(0 0, 100% 23%, 100% 100%, 0% 77%);
+  }
+
+  :nth-child(5) {
+    clip-path: polygon(0 0, 100% 23%, 100% 100%, 0% 80%);
+  }
+}

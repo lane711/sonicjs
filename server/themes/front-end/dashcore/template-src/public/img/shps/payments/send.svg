@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59.02 82.43">
+	<defs>
+		<style>.cls-1,.cls-4{fill:#D5F0FF;}.cls-1,.cls-3{stroke:#f4f8fb;stroke-miterlimit:10;stroke-width:2px;}.cls-2{fill:#BCD4FF;}.cls-3,.cls-6{fill:#fff;}.cls-5{fill:#f4f8fb;}</style>
+	</defs>
+	<title>send</title>
+	<g id="Capa_2" data-name="Capa 2">
+		<g id="OBJECTS">
+			<path class="cls-1" d="M36.06,1.5H8.36C4.57,1.5,1.5,4.27,1.5,7.69V74.75c0,3.42,3.07,6.19,6.86,6.19h27.7c3.79,0,6.86-2.77,6.86-6.19V7.69C42.92,4.27,39.85,1.5,36.06,1.5Z"/>
+			<path class="cls-2" d="M25.89,8a.74.74,0,0,1-.77.7H19.17A.74.74,0,0,1,18.4,8h0a.74.74,0,0,1,.78-.7h5.94a.74.74,0,0,1,.77.7Z"/>
+			<ellipse class="cls-2" cx="22.18" cy="4.8" rx="0.84" ry="0.75"/>
+			<ellipse class="cls-2" cx="16.24" cy="8" rx="0.84" ry="0.76"/>
+			<ellipse class="cls-1" cx="22.59" cy="74.78" rx="3.21" ry="2.9"/>
+			<rect class="cls-3" x="6.1" y="13.85" width="32.09" height="53.69"/>
+			<path class="cls-1" d="M20.07,22.6a1.92,1.92,0,0,1,2.09-1.7l33.25,0a1.93,1.93,0,0,1,2.09,1.69l0,20.17a1.92,1.92,0,0,1-2.09,1.7l-33.25,0a1.92,1.92,0,0,1-2.09-1.69Z"/>
+			<ellipse class="cls-4" cx="31.24" cy="36.95" rx="2.94" ry="2.6"/>
+			<ellipse class="cls-5" cx="27.28" cy="36.95" rx="2.94" ry="2.6"/>
+			<rect class="cls-6" x="24.97" y="25.49" width="28.66" height="3.95"/>
+			<rect class="cls-5" x="38.79" y="35.49" width="14.25" height="4.06"/>
+		</g>
+	</g>
+</svg>

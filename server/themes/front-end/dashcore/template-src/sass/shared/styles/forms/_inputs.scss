@@ -1,0 +1,94 @@
+/* 8.2 Inputs ======================================================= */
+.form-control {
+  color: $body-color;
+  border-color: $input-border-color;
+
+  &.form-control-rounded {
+    border-radius: $input-border-rounded;
+  }
+
+  &::placeholder {
+    opacity: 0.5;
+    font-size: $font-size-sm;
+  }
+}
+
+select[multiple],
+textarea {
+  &.form-control {
+    &.form-control-rounded {
+      padding-left: 1rem;
+      border-radius: 1rem;
+    }
+  }
+}
+
+.control-label {
+  color: $input-placeholder-color;
+}
+
+.control {
+  position: relative;
+  z-index: 1;
+  vertical-align: top;
+
+  .form-control {
+    position: relative;
+    display: block;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .control-label {
+    display: inline-block;
+    user-select: none;
+    transition: all 0.3s ease-in-out;
+    //color: $input-placeholder-color;
+    font-weight: $font-weight-normal;
+  }
+
+  select {
+    appearance: none;
+  }
+
+  .toggler {
+    position: absolute;
+    top: 50%;
+    margin-top: -4px;
+    right: 10px;
+    line-height: 1;
+    z-index: 1;
+  }
+}
+
+.label-content {
+  position: relative;
+  display: block;
+  padding: 1.6em 0;
+  width: 100%;
+}
+
+
+.input-group {
+  .btn {
+    box-shadow: none;
+  }
+
+  &:hover {
+    .btn-contrast, .btn-light {
+      border-color: darken($input-border-color, 18%);
+    }
+  }
+
+  .btn-contrast, .btn-light {
+    border-color: $input-border-color;
+  }
+
+  .form-control {
+    &:focus {
+      box-shadow: none;
+    }
+  }
+}

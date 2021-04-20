@@ -1,0 +1,158 @@
+/* Wizard styles ~~~~~~~~~~~~~~~~~~~~~~~ */
+%theme-circle-nav {
+  content: "";
+  position: absolute;
+  height: 3px;
+  top: 50%;
+  background-color: $border-color;
+  width: 50%;
+}
+
+.wizard {
+  &.sw-main {
+    .step-content {
+      background-color: transparent;
+    }
+
+    .sw-toolbar {
+      background: transparent;
+    }
+
+    > ul.step-anchor {
+      background: transparent;
+    }
+
+    // The wizard adds the nav-tabs class to the nav, we'll need to overrides the nav-tabs template added styles
+    .nav-tabs {
+      .nav-link {
+        letter-spacing: 1px;
+        padding: $nav-link-padding-y $nav-link-padding-x !important;
+
+        i {
+          font-size: $font-size-base;
+        }
+      }
+    }
+  }
+}
+
+.sw-theme-circles {
+  > ul.step-anchor {
+    &:before {
+      content: none;
+      //height: 3px;
+      //background-color: $wz-circle-bg-color;
+      //border-radius: 2px;
+    }
+
+    > li {
+      margin-top: 60px;
+      margin-left: 0;
+      padding-left: 40px;
+      position: relative;
+
+      > a {
+        position: relative;
+        border: none;
+        background: $wz-circle-bg-color;
+        padding: 0;
+        box-shadow: none !important;
+        @include center-flex(center);
+        flex-direction: column;
+
+        &:hover {
+          background: darken($wz-circle-bg-color, 5%);
+        }
+
+        > {
+          small,
+          .small,
+          .desc {
+            position: absolute;
+            bottom: -1.75rem;
+            color: #ccc;
+          }
+        }
+      }
+
+      &:before {
+        @extend %theme-circle-nav;
+        left: 0;
+      }
+
+      &:last-of-type {
+        padding-right: 40px;
+
+        &:after {
+          @extend %theme-circle-nav;
+          right: 0;
+        }
+      }
+
+      &.clickable > a:hover {
+        color: $wz-circle-bg-color-active !important;
+      }
+
+      &.active,
+      &.done {
+        &:before,
+        &:last-of-type:after {
+          background-color: $wz-circle-bg-color-active;
+        }
+      }
+
+      &.active > a {
+        color: #fff;
+        background: $wz-circle-bg-color-active;
+
+        > {
+          small,
+          .small,
+          .desc {
+            color: $wz-circle-bg-color-active;
+          }
+        }
+      }
+
+      &.done > a {
+        box-shadow: 0 0 0 2px $wz-circle-bg-color-active !important;
+        color: $wz-circle-bg-color-done;
+        background: #fff;
+
+        > {
+          small,
+          .small,
+          .desc {
+            color: $wz-circle-bg-color-done;
+          }
+        }
+      }
+
+      &.danger > a {
+        box-shadow: 0 0 0 2px $danger !important;
+        color: #fff;
+        background: $danger;
+
+        > {
+          small,
+          .small,
+          .desc {
+            color: $danger;
+          }
+        }
+      }
+
+      &.disabled > a {
+        color: #eee !important;
+
+        &:hover {
+          color: #eee !important;
+        }
+      }
+
+      @include media-breakpoint-up($grid-float-breakpoint) {
+        margin-top: 0;
+      }
+    }
+  }
+}

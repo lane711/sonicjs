@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="layer_x5F_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
+	 y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:url(#shape_x5F_1_1_);}
+</style>
+<linearGradient id="shape_x5F_1_1_" gradientUnits="userSpaceOnUse" x1="30.06" y1="25" x2="100.03" y2="25">
+	<stop  offset="0" style="stop-color:#4b62d2"/>
+	<stop  offset="1" style="stop-color:#5924ce"/>
+</linearGradient>
+<path id="shape_x5F_1" class="st0" d="M100,0v50L32.8,10.4l-0.6-0.3L32,10c-1.2-0.9-2-2.5-2-4.3V0H100z"/>
+</svg>

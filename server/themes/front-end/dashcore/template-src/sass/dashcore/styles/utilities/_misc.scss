@@ -1,0 +1,29 @@
+/* ==========================================================================
+    [9. CUSTOM]
+========================================================================== */
+
+$big-mockup-width: 920px;
+
+p {
+  margin: 1rem 0;
+}
+
+.logo {
+  max-width: 180px;
+}
+
+.swiper-container {
+  .swiper-pagination-top {
+    bottom: auto;
+    top: 0;
+  }
+}
+
+hr[class*="bg"] {
+  border-top: 0;
+  height: 1px;
+}
+
+.nav-process {
+  min-height: 60px;
+}

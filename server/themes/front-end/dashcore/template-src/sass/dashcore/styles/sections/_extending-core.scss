@@ -1,0 +1,45 @@
+.extending-core {
+  .shape-background {
+    &.shape-left {
+      left: -320px;
+      box-shadow: 0 0 60px 0 rgba($ext-core-shape-main-shadow, 0.05);
+      max-width: 100%;
+    }
+  }
+
+  .icons-wrapper {
+    min-height: 460px;
+    margin-top: 3rem;
+
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      margin-top: 0;
+    }
+  }
+
+  .floating {
+    $durations: (3.6, 3.4, 3.8, 2.8, 4.2, 3.2, 4, 1.8);
+
+    @for $i from 1 through 8 {
+      &:nth-child(#{$i}) {
+        animation-duration: nth($durations, $i) + s;
+      }
+    }
+  }
+
+  .shape {
+    position: absolute;
+
+    &-circle {
+      bottom: 0;
+      right: 0;
+
+      div {
+        @include circle-variant(450px, $ec-circle-bg-color);
+      }
+    }
+  }
+
+  //@include media-breakpoint-down($grid-float-breakpoint-max) {
+  //  overflow: hidden;
+  //}
+}

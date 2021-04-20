@@ -1,0 +1,12 @@
+@mixin arrow-variant($size) {
+  position: relative;
+
+  &:after {
+    pointer-events: none;
+    position: absolute;
+    content: "";
+    height: $size;
+    width: $size;
+    transform: rotate(45deg);
+  }
+}

@@ -1,0 +1,270 @@
+// Font
+$font-family-complementary: $font-family-base !default;
+$bubbles-horizontal-min-height: 460px !default;
+
+// [ NAVIGATION ]
+$navigation-dropdown-item-bg-color: $color-secondary !default;
+$navigation-btn-outline-color: $white !default;
+$navbar-min-height: 90px !default;
+$navbar-font-size: 0.9rem !default;
+$navbar-background-color: $white !default;
+$navbar-text-color: $body-color !default;
+$navbar-text-color-hover: $color-5 !default;
+$navbar-text-color-dark: $color-4-dark-5x !default;
+$navbar-text-color-dark-hover: darken($navbar-text-color-dark, 15%) !default;
+
+$navbar-fixed-top-background-color: transparent !default;
+$navbar-fixed-text-color: $white !default;
+$navbar-fixed-text-color-hover: $gray-200 !default;
+$navbar-fixed-text-color-active: $gray-500 !default;
+
+$navbar-sticky-background-color: $white !default;
+$navbar-sticky-text-color: $color-5-light !default;
+$navbar-sticky-text-color-hover: $color-1 !default;
+
+$navbar-side-width: 250px !default;
+$navbar-side-background-color: $white !default;
+$navbar-side-text-color: $color-1 !default;
+$navbar-side-text-color-hover: $gray-300 !default;
+$navbar-side-border-color: $border-color !default;
+
+$nav-pills-light-link-active-bg: $white !default;
+$nav-pills-light-link-active-color: $color-5-dark !default;
+$nav-pills-light-link-active-shadow-bg: $color-5-light-3x !default;
+
+// [HEADING]
+$smart-business-heading-bg-color: $color-5-light-5x !default; //lighten($color-6, 1.3138%) !default;
+
+// -----------------
+$auxiliary: #fe2983 !default;
+$beluga-light-4x: #d3d4d5 !default;
+$beluga-light-5x: #edf4f8 !default; // #f9fbfd
+$ibiza-blue: #007cb7 !default;
+
+$light-shape-color: $beluga-light-5x !default;
+$light-shape-color-2: $beluga-light-4x !default;
+
+$app-landing-2-shapes-map: (
+  default: (
+    (
+      top: 0,
+      left: 70,
+      height: 140,
+      width: 400,
+      attrs: (
+        "background-image":
+          linear-gradient(
+            45deg,
+            theme-color("primary") 35%,
+            theme-color("secondary") 110%
+          )
+      )
+    ),
+    (
+      top: 0,
+      left: 65,
+      height: 100,
+      width: 300,
+      attrs: (
+        "background-image":
+          linear-gradient(
+            90deg,
+            theme-color("primary") 0,
+            theme-color("secondary") 100%
+          )
+      )
+    ),
+    (
+      top: 0,
+      left: 80,
+      height: 200,
+      width: 600,
+      attrs: (
+        "background-image":
+          linear-gradient(
+            90deg,
+            theme-color("primary") 0,
+            theme-color("secondary") 100%
+          )
+      )
+    ),
+    (
+      top: 82,
+      left: 85,
+      height: 150,
+      width: 150
+        /*,
+      attrs: (
+        "background-image":
+          linear-gradient(
+            90deg,
+            $light-shape-color-2 0,
+            $light-shape-color 100%
+          )
+      )*/
+    )
+  ),
+  md: (
+    (
+      left: 25
+    ),
+    (
+      left: 55
+    )
+  ),
+  lg: (
+    (
+      left: 35
+    ),
+    (
+      left: 45
+    )
+  ),
+  xl: (
+    (
+      left: 45
+    ),
+    (
+      left: 65
+    )
+  )
+) !default;
+$app-landing-2-shapes-count: length($app-landing-2-shapes-map) !default;
+
+$app-landing-2--ring-1-width: 4px !default;
+$app-landing-2--ring-1-color: $white !default;
+
+$app-landing-2--ring-2-width: 1px !default;
+$app-landing-2--ring-2-color: $white !default;
+
+// Stripe menu navigation
+$st-link-color: $color-1-dark-2x !default; //darken($color-primary, 20%) !default;
+$st-link-color-hover: $color-1-dark-2x !default;
+$st-dropdown-bg-color: $white !default;
+$st-dropdown-shadow-color: $color-4-dark-5x !default; // 50, 50, 93
+$st-alt-bg-color: $gray-200 !default; //#f6f9fc !default;
+$st-dropdown-arrow-shadow-color: $gray-700 !default; //#525f7f !default;
+$st-link-title-color: $color-dark !default; // color-5
+
+// Match these with the one in js file
+$st-dropdown-initial-width: 520px !default;
+$st-dropdown-initial-height: 400px !default;
+
+// [ PRICING ]
+$price-table-accent-bg-color: $border-color !default; //darken($body-bg, 4%) !default !default;
+$price-value-font-size: $font-size-large !default;
+$price-table-body-bg: $price-table-accent-bg-color !default;
+$price-border-color: $border-color !default;
+$price-include-color: #6aa74c !default;
+$price-strike-color: #767676 !default;
+
+$pricing-slider-selection-color: $color-primary !default;
+$pricing-slider-handle-bg-color: $color-contrast !default;
+
+// table
+$price-plan-thead-bg-color: $color-light !default;
+$price-plan-thead-color: $color-primary !default;
+$price-plan-thead-border-color: $gray-400 !default;
+$price-plan-ribbon-bg-color: $color-1-light-3x !default;
+$price-plan-ribbon-color: $white !default;
+
+// [ SECTIONS ]
+
+// Automate Social
+$automate-social-heading-bg-color: $color-5-light-5x !default;
+$automate-social-container-padding: 12rem !default;
+$automate-social-shape-main-bg-color: $color-primary !default;
+$automate-social-shape-main-shadow: rgba($color-secondary, 0.15) !default;
+
+// Stripes
+$color-stripe-1: $color-primary !default;
+
+// Extending Core
+$ext-core-shape-main-shadow: $color-secondary !default;
+
+// Features-carousel
+$fc-nav-next-hover-color: $color-info !default;
+$fc-swiper-container-padding-y: 2.5rem !default;
+
+// Speech-bubbles
+$speech-bg-color: $color-primary !default;
+
+// Shapes
+$shape-background-bg-color: $gray-100 !default; //200
+
+// Rounded -split
+$rounded-split-bg-color: $white !default;
+$rounded-split-box-shadow: rgba($color-1-dark-5x, 0.05) !default;
+
+// Wizard
+$wz-circle-bg-color: $border-color !default;
+$wz-circle-bg-color-active: $color-primary !default;
+$wz-circle-bg-color-done: $color-2 !default;
+
+// Tabs
+$nav-tab-disabled-color: $gray-400 !default;
+$nav-tab-color-hover: $nav-tab-active-border-color !default;
+$nav-tab-border-size: 1px !default;
+
+$nav-tab-outline-radius: 5rem !default;
+$nav-tab-outline-breakpoint: 390px !default;
+$nav-tab-outline-border-color: $color-primary !default;
+$nav-tab-link-color-active: $color-contrast !default;
+
+// Why us
+$why-us-shape-background-bg-color: $color-1-light-4x !default;
+$why-us-icon-list-border-color: $color-info !default;
+
+// Testimonials
+$singl-testimonial-img-decorated-bg-color: $color-primary !default;
+
+$singl-testimonial-reviews-nav-color: $body-color !default;
+$singl-testimonial-reviews-nav-bg-color: $color-light !default;
+$singl-testimonial-reviews-nav-color-hover: $color-contrast !default;
+$singl-testimonial-reviews-nav-bg-color-hover: $color-primary !default;
+
+$shape-testimonial-blockquote-color-mobile: $body-color !default;
+$shape-testimonial-blockquote-color: $color-contrast !default;
+
+// Path Success
+$path-success-shape-ring-border-color: $color-light !default;
+
+// Why people Love Us
+$wplu--circle1-bg-color: $color-alternate !default;
+$wplu--circle2-bg-color: rgba($color-alternate, 0.8) !default;
+$wplu--circle3-bg-color: $color-alternate !default;
+$wplu--circle4-bg-color: $color-primary !default;
+$wplu--triangle-bg-color: $color-info !default;
+$wplu--triangle2-bg-color: $color-primary !default;
+$wplu--pattern-dots: $gray-300 !default;
+
+// App Safe
+$safe-circle-bg-color: $color-1-light-2x !default;
+$safe-ring-bg-color: $gray-200 !default;
+$safe-dots-bg-color: $gray-300 !default;
+
+// Integrations Header
+$integrations-dots-bg-color: $gray-300 !default;
+$integrations-square3-bg-color: $color-primary !default;
+$integrations-circle1-bg-color: $color-alternate !default;
+$integrations-circle2-bg-color: $gray-200 !default;
+
+// How it Works
+$hiw-circle-bg-color: linear-gradient(to bottom, $gray-200, $gray-100) !default;
+$hiw-ring-bg-color: $color-primary !default;
+
+// Technology Stack
+$ts-circle-bg-color: linear-gradient(
+  to bottom,
+  $color-1,
+  $color-1-light
+) !default;
+
+// Extending Core
+$ec-circle-bg-color: linear-gradient(to bottom, $gray-200, $gray-100) !default;
+
+// Why choose Us
+$wcu-pipe-dots-color: $gray-200 !default;
+
+// Utilities
+$cutout-color: #ffffff;

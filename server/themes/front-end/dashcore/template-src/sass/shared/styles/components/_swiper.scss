@@ -1,0 +1,27 @@
+.swiper-pagination {
+  &.highlight-active {
+    .swiper-pagination-bullet {
+      will-change: width;
+      transition: width .3s ease-in-out;
+    }
+
+    .swiper-pagination-bullet-active {
+      width: 18px;
+      border-radius: 4px;
+    }
+  }
+}
+
+[class^='swiper-button'] {
+  &-prev { }
+
+  &-next { }
+
+  &.rounded-circle {
+    background-image: none;
+    width: 3rem;
+    height: 3rem;
+    outline: none;
+    @include center-flex();
+  }
+}

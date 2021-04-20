@@ -1,0 +1,227 @@
+.app-landing-2-header {
+  .head-line-2 {
+    display: block;
+
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      display: inline;
+    }
+  }
+
+  .background-shape-main {
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 100px;
+    transform: translate(80%, -30%) rotate(-35deg);
+    background-image: linear-gradient(45deg, theme-color("primary") 40%, theme-color("secondary") 100%);
+
+    @include media-breakpoint-up(md) {
+      height: 150%;
+      transform: translate(25%, -25%) skewY(30deg);
+    }
+
+    @include media-breakpoint-up(lg) {
+      transform: translate(20%, -30%) skewY(30deg);
+    }
+
+    @include media-breakpoint-up(xl) {
+      transform: translate(30%, -10%) skewY(30deg);
+    }
+  }
+
+  .animation {
+    &-shape {
+      position: absolute;
+      display: flex;
+
+      &.shape {
+        &-triangle {
+          top: 80%;
+          left: 0;
+          animation-duration: 12s;
+
+          div {
+            opacity: 0.1;
+            @include triangle-variant(90px, theme-color("primary"));
+          }
+        }
+
+        &-cross {
+          top: 20%;
+          left: 75%;
+
+          div {
+            @include cross-variant(20px, 3px, $white); //alternate
+          }
+        }
+      }
+    }
+  }
+
+  .static {
+    &-shape {
+      position: absolute;
+
+      &.shape {
+        &-circle {
+          top: 0;
+          right: 0;
+          opacity: 0.2;
+
+          &-1 {
+            transform: translate3d(25%, -25%, 0);
+
+            div {
+              @include circle-variant(500px, rgba($white, 0.5));
+            }
+          }
+
+          &-2 {
+            transform: translate3d(25%, -25%, 0);
+
+            div {
+              @include circle-variant(300px, rgba($white, 0.25));
+            }
+          }
+        }
+
+        &-ring {
+          left: 53%;
+          top: 30%;
+
+          &-1 {
+            transform: translate3d(-50%, -50%, 0);
+            .animation {
+              @include ring-variant(
+                20px,
+                $app-landing-2--ring-1-width,
+                $app-landing-2--ring-1-color
+              );
+              animation-duration: 45s;
+            }
+          }
+
+          &-2 {
+            transform: translate3d(-15%, -15%, 0);
+            .animation {
+              @include ring-variant(
+                20px,
+                $app-landing-2--ring-2-width,
+                $app-landing-2--ring-2-color
+              );
+              animation-duration: 60s;
+            }
+          }
+
+          .animation {
+            border-style: dashed;
+          }
+        }
+      }
+
+      &.pattern {
+        &-dots {
+          &-1 {
+            top: 0;
+            left: 0;
+            width: 150px;
+            height: 20%;
+            @include pattern-dots(3px, 30px, rgba(#000, 0.1));
+          }
+
+          &-2 {
+            bottom: 15px;
+            right: 25%;
+            width: 155px;
+            height: 40%;
+            @include pattern-dots(2px, 20px, rgba(#000, 0.1));
+          }
+        }
+      }
+    }
+  }
+
+  .shape {
+    position: absolute;
+
+    @each $breakpoint, $styles in $app-landing-2-shapes-map {
+      @include media-breakpoint-up(#{$breakpoint}) {
+        @for $i from 1 through length($styles) {
+          $style: nth($styles, $i);
+
+          &:nth-child(#{$i}) {
+            $top: map-get($style, top);
+            $left: map-get($style, left);
+            $width: map-get($style, width);
+            $height: map-get($style, height);
+            $attrs: map-get($style, attrs);
+
+            @if $top {
+              top: $top / 100 * 100%;
+            }
+            @if $left {
+              left: $left / 100 * 100%;
+            }
+            @if $width {
+              width: $width * 1px;
+            }
+            @if $height {
+              height: $height * 1px;
+            }
+
+            @each $attr, $value in $attrs {
+              &[data-aos] {
+                &:before {
+                  #{$attr}: #{$value};
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    &[data-aos] {
+      &:before {
+        content: "";
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba($gray-100, 0.05);
+        transform: rotate(-55deg);
+        position: absolute;
+        border-radius: 100px;
+      }
+    }
+  }
+
+  .hero-form {
+    form {
+      position: relative;
+      margin-top: 2rem;
+
+      .btn {
+        border-radius: $border-radius;
+        margin: 0;
+        height: 60px;
+        right: 5px;
+        border: none;
+        color: $white;
+        transition: all 0.4s;
+        z-index: 4;
+        @include center(y);
+      }
+
+      .form-control {
+        width: 100%;
+        position: relative;
+        border-radius: $border-radius;
+        height: 70px;
+        line-height: 70px;
+        padding: 0 180px 0 30px;
+        border: none;
+      }
+    }
+  }
+}

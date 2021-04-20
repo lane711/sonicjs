@@ -1,0 +1,18 @@
+.input-group-register {
+  position: relative;
+
+  label {
+    position: absolute;
+    bottom: -4px;
+    margin-bottom: 0;
+  }
+
+  .form-control {
+    padding: 2.5rem;
+  }
+
+  .btn {
+    @include center(y);
+    right: 15px;
+  }
+}

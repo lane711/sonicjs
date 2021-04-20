@@ -1,0 +1,15 @@
+.pricing {
+  .pricing-value {
+    .price {
+      &:before {
+        left: auto;
+        right: -15px;
+      }
+
+      &:after {
+        position: relative;
+        content: "/mo";
+      }
+    }
+  }
+}

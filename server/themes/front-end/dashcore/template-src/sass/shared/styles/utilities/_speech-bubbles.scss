@@ -1,0 +1,44 @@
+.speech-bubble {
+  position: relative;
+  background: $speech-bg-color;
+  border-radius: 0.4em;
+  padding: 0.25rem 0.5rem;
+
+  &:before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-top-color: $speech-bg-color;
+    border-bottom: 0;
+    margin-left: -10px;
+    margin-bottom: -10px;
+  }
+
+  &:after {
+    content: "";
+    width: 6px;
+    height: 6px;
+    animation: pulse 0.5s linear infinite alternate;
+    background-color: $speech-bg-color;
+    position: absolute;
+    bottom: -20px;
+    border-radius: 50%;
+    border: 1px solid $speech-bg-color;
+    padding: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@include keyframes(pulse) {
+  0% {
+    box-shadow: 0 0 8px 2px $speech-bg-color;
+  }
+  100% {
+    box-shadow: 0 0 20px 2px $speech-bg-color;
+  }
+}

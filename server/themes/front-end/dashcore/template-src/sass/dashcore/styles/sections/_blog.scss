@@ -1,0 +1,51 @@
+.card-blog {
+  .author-picture {
+    position: absolute;
+    transform: translateY(-100%);
+    background-color: #fff;
+    padding: 3px;
+  }
+}
+
+.blog-single-header {
+  display: flex;
+  background-size: auto 315px;
+  background-position: center 5rem;
+
+  .container {
+    margin-top: 18rem;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.blog-quote {
+  margin-top: 3em;
+  margin-bottom: 3em;
+  padding: 0 4rem;
+  position: relative;
+
+  &:before {
+    font-size: $font-size-large;
+    opacity: 0.2;
+    left: 0;
+    top: 0;
+  }
+
+  p {
+    font-size: $font-size-medium;
+    line-height: 1.3em;
+    font-weight: $font-weight-light;
+  }
+}
+
+.blog-post {
+  h4 {
+    margin-top: 2.5rem;
+  }
+
+  p {
+    letter-spacing: 0.5px;
+    margin: 1.25rem 0;
+  }
+}

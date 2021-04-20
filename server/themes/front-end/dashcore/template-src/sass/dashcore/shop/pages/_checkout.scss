@@ -1,0 +1,26 @@
+$accent-checkout: $color-alternate;
+
+.checkout-header {
+  .navbar {
+    justify-content: start;
+    padding-left: 0;
+    padding-bottom: 0;
+
+    .nav-link {
+      //color: $custom-green-light-4x;
+      //opacity: .8;
+      font-weight: $font-weight-normal;
+      padding: .875rem 1rem;
+
+      &:hover {
+        color: $accent-checkout;
+        //opacity: 1;
+      }
+
+      &.active {
+        box-shadow: inset 0 -2px 0 0 $accent-checkout;
+        color: $accent-checkout;
+      }
+    }
+  }
+}

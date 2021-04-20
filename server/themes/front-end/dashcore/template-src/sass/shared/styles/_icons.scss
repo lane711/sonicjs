@@ -1,0 +1,61 @@
+.icon {
+  margin-left: 5px;
+  margin-right: 15px;
+  padding: 0;
+  display: inline-block;
+  text-align: center;
+  transition: all 0.3s ease-in-out;
+
+  &.logo {
+    max-width: 80px;
+  }
+
+  i {
+    margin: 0;
+  }
+}
+
+img {
+  &.icon {
+    max-width: 54px;
+  }
+}
+
+.icon-xs {
+  @include icon-size($font-size-tiny);
+}
+
+.icon-sm {
+  @include icon-size($font-size-small);
+}
+.icon-md {
+  @include icon-size($font-size-medium);
+}
+.icon-lg {
+  @include icon-size($font-size-large);
+}
+.icon-xl {
+  @include icon-size($font-size-extra-large);
+}
+.icon-xxl {
+  @include icon-size($font-size-xx-large);
+}
+.icon-l {
+  @include icon-size($font-size-lg);
+}
+
+.icon-2l {
+  @include icon-size($font-size-lg * 2);
+}
+.icon-2xl {
+  @include icon-size($font-size-extra-large * 2);
+}
+.icon-2xxl {
+  @include icon-size($font-size-xx-large * 2);
+}
+
+@each $i, $color in $theme-colors {
+  .stroke-#{$i} {
+    stroke: $color;
+  }
+}

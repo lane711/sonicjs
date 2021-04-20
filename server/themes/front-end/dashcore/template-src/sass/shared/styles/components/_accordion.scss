@@ -1,0 +1,90 @@
+[data-toggle="collapse"] {
+  .angle {
+    transition: transform 0.3s ease;
+    margin-right: 0.5rem;
+  }
+
+  &.collapsed {
+    .angle {
+      transform: rotate(-90deg);
+    }
+  }
+}
+
+.accordion {
+  .card {
+    border: 1px solid $border-color;
+  }
+
+  .card-header {
+    border-bottom: none;
+    background-color: $accordion-header-bg-color;
+
+    .btn {
+      &:active,
+      &:focus {
+        box-shadow: none;
+      }
+    }
+
+    .card-title {
+      padding-right: 0;
+      padding-left: 0;
+    }
+  }
+
+  .card-title {
+    margin-bottom: 0;
+  }
+
+  &:not(.accordion-collapsed) {
+    .card {
+      border-bottom: 1px solid $border-color !important;
+    }
+  }
+
+  &.accordion-clean {
+    .card {
+      border-bottom: 1px solid $border-color;
+    }
+
+    .card-header {
+      background-color: #fff;
+      //border-bottom: none;
+    }
+  }
+
+  &.accordion-collapsed {
+    .card {
+      border-bottom: none;
+    }
+
+    //&.accordion-clean {
+    .card:last-of-type {
+      border-bottom: 1px solid $border-color;
+    }
+    //}
+  }
+
+  @each $color, $value in $theme-colors {
+    &.accordion-#{$color} {
+      .card {
+        border-color: $value;
+      }
+
+      .card-header {
+        background-color: $value;
+
+        .card-title {
+          color: color-yiq($value);
+        }
+      }
+
+      &:not(.accordion-collapsed) {
+        .card {
+          border-bottom: 1px solid $value !important;
+        }
+      }
+    }
+  }
+}

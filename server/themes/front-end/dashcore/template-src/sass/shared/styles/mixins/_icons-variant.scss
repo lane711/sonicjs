@@ -1,0 +1,36 @@
+@mixin icon-size($size) {
+    width: $size;
+    height: $size;
+    //line-height: $size;
+
+    //font-size: $size * .35;
+}
+
+@mixin icon-variant($color, $background) {
+    $border: darken($background, 5%);
+    $active-background: darken($background, 10%);
+    $active-border: darken($border, 12%);
+
+    color: $color;
+    background-color: $background;
+    border-color: $border;
+
+    &:hover {
+        color: $color;
+        background-color: $active-background;
+        border-color: $active-border;
+    }
+}
+
+@mixin icon-outline-variant($color, $color-hover: #fff) {
+    color: $color;
+    background-image: none;
+    background-color: transparent;
+    border-color: $color;
+
+    &:hover {
+        color: $color-hover;
+        background-color: $color;
+        border-color: $color;
+    }
+}

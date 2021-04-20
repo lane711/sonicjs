@@ -1,0 +1,31 @@
+.divider-shape {
+    overflow: hidden;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    line-height: 0;
+    direction: ltr;
+    bottom: -1px; // bottom
+
+    svg {
+        overflow: hidden;
+        display: block;
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+
+        width: calc(159% + 1.3px);
+        height: 433px;
+    }
+
+    .shape-fill {
+        transform-origin: center;
+        transform: rotateY(0deg);
+    }
+}
+
+.overlay {
+    .divider-shape {
+        z-index: 1;
+    }
+}

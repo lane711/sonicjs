@@ -1,0 +1,41 @@
+@include keyframes(fade-out) {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@include keyframes(bubble-v) {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-$bubbles-horizontal-min-height);
+  }
+}
+
+@include keyframes(bubble-left-v) {
+  0% {
+    margin-bottom: 0;
+    opacity: .1;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    margin-bottom: $bubbles-horizontal-min-height;
+    opacity: 1;
+    left: 0;
+  }
+}
+
+@include keyframes(shake-v) {
+  0% {
+    margin-left: 0;
+  }
+  100% {
+    margin-left: 50px;
+  }
+}

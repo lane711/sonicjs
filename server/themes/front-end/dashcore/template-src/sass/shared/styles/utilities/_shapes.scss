@@ -1,0 +1,114 @@
+.shape-wrapper {
+  position: absolute;
+  overflow: hidden;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.main-shape-wrapper {
+  position: relative;
+}
+
+.shape-left,
+.shape-right,
+.shape-center,
+.shape-top {
+  position: absolute;
+  max-width: 560px;
+}
+
+.transparentize {
+  opacity: 0.035;
+}
+
+.shape-left {
+  left: 0;
+  top: 200px;
+
+  &.shape-rounded {
+    top: 0;
+    transform: translate3d(-15%, -1%, 0) rotate(28deg) scale(1.4);
+  }
+}
+
+.shape-right {
+  right: 0;
+  left: 51vw;
+  top: 90px;
+  //z-index: -1;
+
+  &.w-50 {
+    max-width: 50%;
+    left: 47vw;
+  }
+}
+
+.shape-center {
+  @include center(x);
+}
+
+.shape-fill {
+  fill: #000000;
+
+  @each $i, $color in $theme-colors {
+    &.shape-fill-#{$i} {
+      fill: $color;
+    }
+  }
+}
+
+.shape-stroke {
+  fill: none;
+  stroke: #6146d7;
+  stroke-width: 2px;
+
+  @each $i, $color in $theme-colors {
+    &.shape-stroke-#{$i} {
+      stroke: darken($color, 10%);
+    }
+  }
+}
+
+.divider-shape svg {
+  &.shape {
+    &-waves {
+      height: 100px;
+
+      @include media-breakpoint-up($grid-float-breakpoint) {
+        height: 133px;
+      }
+    }
+  }
+}
+
+.shape-background {
+  background-color: $shape-background-bg-color;
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 120px;
+  z-index: -1;
+
+  &.shape-right {
+    transform: rotate(-45deg);
+    top: 0;
+    left: 180%;
+
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      left: 120%;
+    }
+
+    @include media-breakpoint-up(lg) {
+      left: 88%;
+    }
+  }
+
+  &.shape-left {
+    transform: rotate(-43deg);
+    left: -669px;
+    max-width: 750px;
+    top: -182px;
+  }
+}

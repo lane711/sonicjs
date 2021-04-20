@@ -1,0 +1,45 @@
+/* 7.1 General styles ======================================================= */
+
+.pricing {
+  p {
+    line-height: 1.5em;
+  }
+
+  .pricing-value {
+    font-family: $font-family-complementary;
+    font-size: $price-value-font-size;
+
+    .price {
+      position: relative;
+
+      &:before,
+      &:after {
+        font-size: 0.35em;
+        font-weight: $font-weight-light;
+        font-style: italic;
+      }
+
+      &:before {
+        position: absolute;
+        content: "$";
+        top: 10px;
+        left: -15px;
+      }
+
+      &:after {
+        position: relative;
+        content: "/mo";
+      }
+
+      &.yearly {
+        &:after {
+          content: "/yr";
+        }
+      }
+    }
+  }
+}
+
+.odometer-inside {
+  display: inline;
+}

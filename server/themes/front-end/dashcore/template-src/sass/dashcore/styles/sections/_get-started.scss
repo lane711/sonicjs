@@ -1,0 +1,53 @@
+.get-started {
+  .floating-box {
+
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      position: absolute;
+      top: 75%;
+      transform: translate(-50%, -50%);
+      left: 50%;
+      max-width: 592px;
+      width: 90%;
+    }
+
+    @include media-breakpoint-up(lg) {
+      top: auto;
+      transform: none;
+      width: 60%;
+      left: 0;
+      bottom: 1.5%;
+    }
+
+    @include media-breakpoint-up(xl) {
+      width: 50%;
+    }
+  }
+
+  .play-video {
+    display: none;
+
+    @include media-breakpoint-up(lg) {
+      position: absolute;
+      height: 10em;
+      z-index: 1;
+      bottom: 14.5%;
+      right: 6.5%;
+      width: 10em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  .browser {
+    display: none;
+
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      display: block;
+    }
+
+    @include media-breakpoint-up(lg) {
+      width: 80%;
+    }
+  }
+}

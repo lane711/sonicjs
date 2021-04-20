@@ -1,0 +1,37 @@
+.shape {
+  &-divider {
+    position: absolute;
+    pointer-events: none;
+
+    &-bottom {
+      right: 0;
+      bottom: 0;
+      left: 0;
+      transform: scale(2);
+
+      > * {
+        transform-origin: top center;
+      }
+
+      @include media-breakpoint-up($grid-float-breakpoint) {
+        transform: scale(1);
+      }
+    }
+
+    &-fluid-x > * {
+      width: 100%;
+      height: auto;
+    }
+
+    &-fluid-y > * {
+      width: auto;
+      height: 100%;
+    }
+
+    // all direct children should be svg elements
+    svg {
+      fill: currentColor;
+      transform: scale(2);
+    }
+  }
+}

@@ -1,0 +1,31 @@
+/* 2.8 Responsive ======================================================= */
+
+.img-responsive {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.row {
+    &.gap-y {
+        margin-top: ($grid-gutter-width / -2);
+        margin-bottom: ($grid-gutter-width / -2);
+
+         > .col,
+         > [class*="col-"] {
+             padding-top: ($grid-gutter-width / 2);
+             padding-bottom: ($grid-gutter-width / 2);
+         }
+    }
+
+    &.gap-2x {
+        margin: ($grid-gutter-width / -2) * 2;
+        margin: ($grid-gutter-width / -2) * 2;
+
+        > .col,
+        > [class*="col-"] {
+            padding: ($grid-gutter-width / 2) * 2;
+            padding: ($grid-gutter-width / 2) * 2;
+        }
+    }
+}

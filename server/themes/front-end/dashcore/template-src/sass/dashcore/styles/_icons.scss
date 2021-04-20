@@ -1,0 +1,23 @@
+/* 5.3 Icons ======================================================= */
+.list-icon {
+    list-style-type: none;
+
+    li {
+        > * {
+            display: table-cell;
+        }
+
+        i {
+            padding-right: 15px;
+        }
+    }
+}
+
+.icon-block {
+    padding: $padding-default * .25;
+    margin-bottom: $padding-default * .25;
+
+    p {
+        margin-top: 10px;
+    }
+}

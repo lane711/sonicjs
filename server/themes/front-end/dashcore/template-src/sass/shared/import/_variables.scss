@@ -1,0 +1,150 @@
+// [ FONTS ]
+$font-family-complementary: $font-family-base !default;
+$font-family-handwritten: "Caveat", cursive, $font-family-base !default;
+
+// [ Updated to Bootstrap 4 fix ]
+$grid-float-breakpoint: md;
+$grid-float-breakpoint-max: sm;
+
+// [ DEFAULTS ]
+$striped-bg-color: $color-5-light-5x;
+$striped-bg-color-hover: $color-5-light-4x;
+
+// [ INPUTS ]
+$input-border-rounded: 10rem;
+$padding-default: 60px !default;
+
+$strike-color: $color-5-light-3x;
+$paragraph-margin-default: 1.5rem !default;
+$color-primary: $color-primary !default;
+$color-primary-inverse: $white !default;
+$swiper-border-color: $color-5-dark-5x; //$color-5;
+
+// [ SIZES ]
+// fonts
+$font-size-tiny: $font-size-base * 0.75;
+$font-size-small: $font-size-base * 0.875;
+$font-size-regular: $font-size-base;
+$font-size-medium: $font-size-base * 1.75;
+$font-size-large: $font-size-base * 3.25;
+$font-size-extra-large: $font-size-base * 4.5;
+$font-size-xx-large: $font-size-base * 6.5;
+$font-size-section-heading: 2.875rem;
+
+// arrows - for background edges
+$arrow-size: 30px;
+$arrow-pos: (-$arrow-size / 2) + 2;
+
+// [ SECTION ]
+$section-padding: $padding-default * 1.5;
+
+// buttons 2.875
+$btn-font-color: $white !default;
+$btn-text-transform: uppercase;
+$btn-sizes: () !default;
+$btn-sizes: map-merge(
+  (
+    "xs": 0.125rem,
+    "sm": 0.25rem,
+    "md": 0.375rem,
+    "lg": 0.5rem,
+    "xl": 0.625rem
+  ),
+  $btn-sizes
+);
+
+// navs
+$nav-tab-active-border-color: $color-primary;
+$navbar-header-height: 70px;
+
+$nav-tabs-font-size: $btn-font-size;
+$nav-tabs-font-weight: $btn-font-weight;
+
+$nav-color-process: $color-primary;
+$nav-process-dot-size: 0.375rem;
+$nav-process-circle-link-color: $color-contrast;
+
+// mobile devices
+$jacks-bg-color: #e3e8eb;
+
+$browser-action-color-1: #f44;
+$browser-action-color-2: #9b3;
+$browser-action-color-3: #fb5;
+$browser-action-size: 0.5em;
+$iphone-bg-color: $color-contrast;
+
+// design for iphone-x
+$x-scaling: 0.65;
+$x-border-width: 15px * $x-scaling;
+$x-phone-width: 375px * $x-scaling;
+$x-border-radius: 40px * $x-scaling;
+$x-notch-width: 209px * $x-scaling;
+$x-notch-height: 35px * $x-scaling;
+$x-notch-border-radius: 20px * $x-scaling;
+$x-dark-bg: $color-5-dark-5x; //#152975;
+$x-light-bg: $gray-200; //#f2f2f5;
+
+// gradients
+$gradients-map: (
+  (
+    purple: $color-1-light-2x,
+    variants: (
+      blue: $color-2-dark,
+      dark: $color-1-dark,
+      navy: $color-1-dark-5x
+    )
+  ),
+  (
+    blue: $color-2-dark,
+    variants: (
+      purple: $color-1-light-2x,
+      dark: $color-2-dark-3x,
+      navy: $color-1-dark-5x
+    )
+  ),
+  (
+    navy: $color-1-dark-5x,
+    variants: (
+      purple: $color-1-light-2x,
+      blue: $color-2-dark
+    )
+  ),
+  (
+    primary: $color-primary,
+    variants: (
+      dark: $color-1-dark-5x,
+      light: $color-1-light-2x
+    )
+  )
+);
+
+// [ COOKIE LAW ]
+$cc-banner-message-bg-color: $color-2-dark;
+
+// [ TYPE ]
+$heading-line-bg-color: $color-primary;
+
+// [ OVERLAY ]
+$overlay-color: #27333e;
+$overlay-rgba: 0.6;
+$inner-overlay-gradient-bg-start: $color-1-light-3x;
+$inner-overlay-gradient-bg-end: $color-info;
+
+// [ FORMS ]
+
+// Checkboxes
+$check-radio-default-check-border-color: $color-primary;
+
+// [ TABLES ]
+$table-responsive-title-color: $color-secondary;
+
+// [ PROGRESS ]
+$bars-height: 100px;
+$bars-bg-color: $color-info;
+$bars-margin: $padding-default / 2;
+$bars-margin-top: $bars-margin / 2;
+$bars-bar-color: $color-2-dark-2x;
+$bars-bar-bg: rgba($bars-bar-color, 0.3);
+
+// [ ACCORDION ]
+$accordion-header-bg-color: $color-light;

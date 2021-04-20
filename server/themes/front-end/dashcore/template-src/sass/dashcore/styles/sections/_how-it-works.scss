@@ -1,0 +1,24 @@
+.how-it-works {
+  .mockup {
+    display: flex;
+    justify-content: center;
+  }
+
+  .shape {
+    position: absolute;
+
+    &-circle {
+      @include circle-variant(50%, $hiw-circle-bg-color);
+    }
+
+    &-ring {
+      right: 0;
+      top: 50%;
+
+      div {
+        transform: translate3d(50%, 0, 0);
+        @include ring-variant(150px, 10px, $hiw-ring-bg-color);
+      }
+    }
+  }
+}

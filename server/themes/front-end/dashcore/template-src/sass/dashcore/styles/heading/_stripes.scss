@@ -1,0 +1,47 @@
+#stripes {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(150deg, $color-stripe-1 15%, #05d5ff 70%, #a6ffcb 94%);
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(12, 1fr);
+
+  :nth-child(1) {
+    grid-area: 1 / 1 / span 4 / span 2;
+    background-color: $color-stripe-1;
+    clip-path: polygon(0 0, 100% 0%, 100% 60%, 0% 100%);
+  }
+
+  :nth-child(2) {
+    grid-area: 1 / 3 / span 3 / span 2;
+    background-color: #4553ff;
+    clip-path: polygon(0 0, 100% 0%, 100% 74%, 0% 100%);
+    transform: translateY(-30px);
+  }
+
+  :nth-child(3) {
+    grid-area: 1 / 5 / span 2 / span 2;
+    background-color: #4f40ff;
+    clip-path: polygon(0 0, 100% 0, 99% 5%, 0 70%);
+  }
+
+  :nth-child(4) {
+    grid-area: 3 / 11 / span 3 / span 2;
+    clip-path: polygon(0 23%, 100% 0%, 100% 77%, 0% 100%);
+    background-color: #0dcfff;
+  }
+
+  :nth-child(5) {
+    grid-area: 8 / 1 / span 5 / span 4;
+    clip-path: polygon(0 23%, 100% 0%, 100% 80%, 0% 100%);
+    transform: translateY(10px);
+    background-color: #1fa2ff;
+  }
+
+  + .container {
+    padding-bottom: 11rem;
+  }
+}

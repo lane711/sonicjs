@@ -1,0 +1,9 @@
+.promo-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.promo-block {
+  flex: 1 0 auto;
+  min-height: 260px;
+}

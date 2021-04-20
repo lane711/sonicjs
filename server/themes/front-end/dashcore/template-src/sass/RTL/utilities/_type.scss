@@ -1,0 +1,9 @@
+.handwritten {
+  &.highlight {
+    &:before {
+      margin-right: -1.5rem;
+      margin-left: 0;
+      transform: rotate3d(0, 1, 0, 145deg);
+    }
+  }
+}

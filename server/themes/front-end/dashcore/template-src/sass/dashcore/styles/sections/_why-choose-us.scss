@@ -1,0 +1,59 @@
+.why-choose-us {
+  .section-heading {
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      margin-bottom: 120px;
+    }
+
+    p.lead {
+      width: 70%;
+    }
+  }
+
+  .browser {
+    transform: translate(40%, -10%) rotate3d(0.342, -0.94, 0, 22deg)
+      rotateZ(7deg);
+    width: 380px;
+    bottom: 0;
+
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      bottom: auto;
+      width: 780px;
+    }
+  }
+
+  .iphone {
+    transform: translate(-20%, 10%) rotate3d(0.5, 0.866, 0, 16deg)
+      rotateZ(-7deg);
+
+    @include media-breakpoint-down($grid-float-breakpoint-max) {
+      width: 60%;
+      margin-right: 0;
+      margin-left: 0;
+    }
+  }
+
+  .list-item {
+    @include padding-y();
+  }
+
+  .icon-shape {
+    min-width: 80px;
+  }
+
+  .shapes-container {
+    z-index: 2;
+  }
+
+  .pattern {
+    position: absolute;
+
+    &-dots {
+      bottom: 7rem;
+      left: 60%;
+      width: 50%;
+      height: 155px;
+      transform: rotate(-10deg);
+      @include pattern-dots(2px, 20px, $wcu-pipe-dots-color);
+    }
+  }
+}

@@ -1,0 +1,50 @@
+.features-carousel {
+  background-color: $smart-business-heading-bg-color;
+
+  .swiper-container {
+    padding-top: $fc-swiper-container-padding-y;
+    padding-bottom: $fc-swiper-container-padding-y;
+
+    @include media-breakpoint-up(sm) {
+      &:after {
+        content: "";
+        display: block;
+        position: absolute;
+        top: $fc-swiper-container-padding-y;
+        width: 25%;
+        z-index: 2;
+        left: 75%;
+        bottom: 0;
+        background: linear-gradient(
+          to left,
+          $smart-business-heading-bg-color 10%,
+          rgba($smart-business-heading-bg-color, 0.1)
+        );
+      }
+    }
+  }
+
+  .features-nav-next {
+    position: absolute;
+    top: 0;
+    right: 5px;
+    margin: 0;
+    z-index: 3;
+    cursor: pointer;
+    padding-right: 1rem;
+
+    .features-nav-icon {
+      display: inline-block;
+      transform: translateX(0);
+      transition: all 0.4s ease-out;
+    }
+
+    &:hover {
+      color: $fc-nav-next-hover-color;
+
+      .features-nav-icon {
+        transform: translateX(1rem);
+      }
+    }
+  }
+}

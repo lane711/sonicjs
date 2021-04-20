@@ -1,0 +1,36 @@
+.mfp-content,
+.popup-wrapper {
+  height: 100%;
+}
+
+.mfp-container {
+  padding: 0;
+}
+
+.popup-wrapper {
+  position: relative;
+}
+
+.mfp-iframe-holder .mfp-close {
+  top: 0;
+  right: 0;
+  background-color: $black;
+}
+
+@include media-breakpoint-up($grid-float-breakpoint) {
+  .mfp-content ,
+  .popup-wrapper {
+    height: auto;
+  }
+
+  .popup-wrapper {
+    padding: 20px 30px;
+    margin: 0 auto;
+  }
+
+  .mfp-iframe-holder .mfp-close {
+    top: -40px;
+    right: -6px;
+    background-color: transparent;
+  }
+}

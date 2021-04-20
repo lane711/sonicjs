@@ -1,0 +1,25 @@
+$icon-width: 4rem;
+
+.alert-icon {
+  border-width: 0;
+  border-radius: 0;
+  border-left-width: $icon-width;
+
+  .icon {
+    width: $icon-width;
+    position: absolute;
+    left: -$icon-width;
+    color: #fff;
+    font-size: 1.5rem;
+    text-align: center;
+  }
+}
+
+.alert-thin {
+  border-left-width: 5px;
+}
+
+.alert-outline,
+.alert-thin {
+  background-color: transparent;
+}

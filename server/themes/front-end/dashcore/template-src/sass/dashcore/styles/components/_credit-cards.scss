@@ -1,0 +1,101 @@
+.credit-card {
+  overflow: hidden;
+
+  .shape {
+    position: absolute;
+    z-index: 1;
+  }
+
+  .card-body {
+    z-index: 1;
+  }
+
+  .safe-digit {
+    @include icon-size($font-size-tiny * 0.7);
+    border-radius: 50%;
+    background-color: $gray-500;
+    margin-right: 3px;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+
+  &-st1 {
+    .shape {
+      &-1 {
+        left: 25%;
+        top: 0;
+        transform: translateY(-65%);
+
+        div {
+          opacity: 0.4;
+          height: 250px;
+          width: 350px;
+          background: $gray-300;
+          border-radius: 50%;
+        }
+      }
+
+      &-2 {
+        left: 15%;
+        top: 0;
+        transform: translateY(-70%);
+
+        div {
+          opacity: 0.3;
+          @include circle-variant(250px, $gray-300);
+        }
+      }
+    }
+  }
+
+  &-st2 {
+    .shape {
+      &-1 {
+        right: 0;
+        top: 50%;
+        transform: translate(-20%, -50%);
+
+        div {
+          opacity: 0.7;
+          @include diamond-variant(50px, $gray-200);
+        }
+      }
+
+      &-2 {
+        right: 0;
+        top: 50%;
+        transform: translate(-30%, -50%);
+
+        div {
+          opacity: 0.5;
+          @include diamond-variant(60px, $gray-200);
+        }
+      }
+    }
+  }
+
+  &-st3 {
+    .shape {
+      &-1 {
+        left: 0;
+        right: 0;
+        height: 50%;
+        top: 50%;
+        background-color: $gray-200;
+        opacity: 0.6;
+      }
+
+      &-2 {
+        left: 0;
+        top: 0;
+        transform: translate(-50%, -50%);
+
+        div {
+          @include ring-variant(125px, 2px, $gray-300);
+        }
+      }
+    }
+  }
+}

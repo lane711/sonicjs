@@ -1,0 +1,86 @@
+/* 2.6 Overlay ======================================================= */
+.overlay {
+  position: relative;
+
+  &:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: rgba($overlay-color, $overlay-rgba);
+    opacity: 1;
+    z-index: 0;
+  }
+
+  [class^="container"],
+  > .content {
+    position: relative;
+    z-index: 1;
+  }
+
+  @each $c, $color in $theme-colors {
+    &.overlay-#{$c} {
+      &:after {
+        background-color: rgba($color, $overlay-rgba);
+      }
+
+      @for $a from 1 through 9 {
+        $transparency: $a * 0.1;
+
+        &.alpha-#{$a} {
+          &:after {
+            background-color: rgba($color, $transparency);
+          }
+        }
+      }
+    }
+  }
+}
+
+.inner-overlay {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  z-index: -1;
+
+  // could be placed on overlay file, with gradient css class.
+  &.gradient {
+    background-image: linear-gradient(
+      -48deg,
+      $inner-overlay-gradient-bg-start 25%,
+      $inner-overlay-gradient-bg-end 100%
+    );
+  }
+}
+
+.zoom-image {
+  position: relative;
+  overflow: hidden;
+  backface-visibility: hidden;
+
+  img {
+    max-width: 100%;
+    transition: transform 2s ease;
+  }
+
+  &.overlay:after {
+    transition: opacity 1.5s ease-out;
+  }
+
+  &:hover {
+    &.overlay {
+      &:after {
+        opacity: 0;
+      }
+    }
+
+    img {
+      transform: scale(1.3) rotate(10deg);
+    }
+  }
+}

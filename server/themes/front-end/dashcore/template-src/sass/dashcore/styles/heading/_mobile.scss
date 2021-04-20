@@ -1,0 +1,11 @@
+.header {
+    .mobile-swiper-pagination {
+        left: 0;
+        bottom: 1.5rem;
+        width: 100% !important;
+
+        .swiper-pagination-bullet {
+            margin: 0 4px;
+        }
+    }
+}

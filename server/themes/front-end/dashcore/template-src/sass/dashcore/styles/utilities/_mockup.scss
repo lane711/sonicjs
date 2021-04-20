@@ -1,0 +1,39 @@
+/* 5.2 Mockups ======================================================= */
+
+.mockup-wrapper {
+  position: relative;
+}
+
+.mockup {
+  position: relative;
+  margin: 0 auto;
+  max-width: 255px;
+
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+.cutout {
+  position: relative;
+
+  &.bottom-right {
+    @include angled-edge("inside bottom", "upper right", $cutout-color, 30);
+  }
+
+  &.bottom-left {
+    @include angled-edge("inside bottom", "upper left", $cutout-color, 30);
+  }
+
+  &.x2 {
+    &.bottom-right {
+      @include angled-edge("inside bottom", "upper right", $cutout-color, 60);
+    }
+
+    &.bottom-left {
+      @include angled-edge("inside bottom", "upper left", $cutout-color, 60);
+    }
+  }
+}

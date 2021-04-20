@@ -1,0 +1,17 @@
+.st-nav {
+  .st-nav-section {
+    &.st-nav-secondary {
+      margin-right: auto;
+      margin-left: 0;
+    }
+  }
+
+  .st-dropdown-content-group {
+    text-align: right;
+  }
+
+  .st-popup-close-button {
+    right: auto;
+    left: 0;
+  }
+}

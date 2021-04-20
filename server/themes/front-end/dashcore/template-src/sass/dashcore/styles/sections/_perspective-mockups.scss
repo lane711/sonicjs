@@ -1,0 +1,133 @@
+$rotate-md: 12deg;
+$mock-xl-width: 829px;
+$device-margin: 50px;
+
+.lightweight-template .learn-more {
+  margin-bottom: 18rem;
+}
+
+.perspective-mockups {
+  pointer-events: none;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  left: 50%;
+  margin-left: 85px;
+  transform: scale(.5) rotate($rotate-md) translateX(-50%);
+  transform-origin: 0 20%;
+  z-index: 3;
+
+  > div {
+    margin: 0 50px;
+  }
+
+  .ipad {
+    max-width: 100%;
+  }
+
+  &.hidden-preload {
+    visibility: hidden;
+  }
+
+  .phone-big {
+    display: none;
+  }
+
+  .phone-small {
+    order: -1;
+    width: 225px;
+  }
+
+  .tablet {
+    &.landscape {
+      width: 512px;
+      margin: 0;
+    }
+
+    &.portrait {
+      width: 450px;
+      margin-top: 0;
+    }
+  }
+}
+
+@include media-breakpoint-up(sm) {
+  .perspective-mockups {
+    margin-left: 0;
+  }
+}
+
+@include media-breakpoint-up($grid-float-breakpoint) {
+  .lightweight-template .learn-more {
+    margin-bottom: 0;
+  }
+
+  .perspective-mockups {
+    flex-wrap: wrap;
+    width: 512px;
+    //margin-left: -50px;
+    top: 215px;
+    transform: rotate($rotate-md);
+    transform-origin: 100% 100%;
+
+    &.hidden-preload {
+      visibility: visible;
+    }
+
+    .tablet {
+      margin: 0!important;
+      max-width: 100%;
+
+      &.portrait {
+        display: none;
+      }
+
+      &.landscape {
+        transform: translateX(25%);
+        width: 512px;
+      }
+    }
+
+    .phone-small {
+      margin: 0 0 50px 176px;
+    }
+  }
+}
+
+@include media-breakpoint-up(xl) {
+  .perspective-mockups {
+    width: $mock-xl-width;
+    margin-left: -10px;
+    top: 100px;
+
+    > div {
+      margin: 0 auto;
+    }
+
+    .tablet {
+      &.landscape {
+        align-self: flex-end;
+        margin-right: 50px;
+        transform: translateX(0);
+      }
+
+      &.portrait {
+        //height: 675px;
+        display: flex;
+        width: 450px;
+        margin-top: 50px !important;
+      }
+    }
+
+    .phone-big {
+      //height: 553px;
+      display: flex;
+      width: 267px;
+    }
+
+    .phone-small {
+      order: 0;
+      margin: 50px 50px 0 0;
+    }
+  }
+}

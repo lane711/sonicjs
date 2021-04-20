@@ -1,0 +1,161 @@
+/* 2.1 Background ======================================================= */
+.image-background {
+  position: relative;
+  background-attachment: scroll;
+  background-position: center center;
+  background-repeat: no-repeat;
+
+  &.cover {
+    background-size: cover;
+  }
+
+  &.contain {
+    background-size: contain;
+  }
+
+  &.left-bottom {
+    background-position: 0 bottom;
+  }
+
+  &.center-top {
+    background-position: center top;
+  }
+
+  &.center-bottom {
+    background-position: center bottom;
+  }
+
+  &.p100-top {
+    background-position: 100% top;
+  }
+
+  &.p100-bottom {
+    background-position: 100% bottom;
+  }
+}
+
+.parallax {
+  position: static;
+
+  &,
+  &.blurred:before {
+    background-attachment: fixed;
+  }
+
+  &.blurred:before {
+    position: absolute;
+  }
+}
+
+@each $i, $color in $theme-colors {
+  $from-color: lighten($color, 0.75);
+
+  .bg-#{$i} {
+    &.edge {
+      &.bottom-left {
+        @include angled-edge("outside bottom", "lower left", $color, 250);
+      }
+
+      &.bottom-right {
+        @include angled-edge("outside bottom", "lower right", $color, 250);
+      }
+
+      &.top-left {
+        @include angled-edge("outside top", "upper left", $color, 250);
+      }
+
+      &.top-right {
+        @include angled-edge("outside top", "upper right", $color, 250);
+      }
+    }
+
+    &.arrow {
+      &:after {
+        background-color: $color;
+      }
+    }
+
+    @for $a from 1 through 9 {
+      $alpha-color: rgba($color, ($a * 0.1));
+
+      &.alpha-#{$a} {
+        background-color: $alpha-color !important;
+      }
+    }
+  }
+
+  .bg-#{$i}-gradient {
+    background: linear-gradient($from-color, $color);
+  }
+
+  .bg-#{$i}-gradient-start {
+    background: $from-color;
+  }
+}
+
+// fir for links on dark background
+.bg-dark, .bg-darker {
+  a {
+    color: $text-muted;
+
+    @include hover {
+      color: lighten($text-muted, 15%);
+    }
+  }
+}
+
+.arrow {
+  @include arrow-variant($arrow-size);
+
+  &.top,
+  &.bottom {
+    &:after {
+      margin-left: -15px;
+      left: 50%;
+      border-radius: 10px 5px;
+    }
+  }
+
+  &.left,
+  &.right {
+    &:after {
+      top: 50%;
+      margin-top: -15px;
+      border-radius: 5px 10px;
+    }
+  }
+
+  @each $prop in (top, right, bottom, left) {
+    &.#{$prop} {
+      &:after {
+        #{$prop}: $arrow-pos;
+      }
+    }
+  }
+}
+
+.zoom-background {
+  position: relative;
+  overflow: hidden;
+  backface-visibility: hidden;
+
+  .image-background {
+    transition: transform 2s ease;
+  }
+
+  .overlay:after {
+    transition: opacity 1.5s ease-out;
+  }
+
+  &:hover {
+    &.overlay {
+      &:after {
+        opacity: 0;
+      }
+    }
+
+    .image-background {
+      transform: scale(1.3) rotate(10deg);
+    }
+  }
+}

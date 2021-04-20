@@ -1,0 +1,18 @@
+/* 5.2 Mockups ======================================================= */
+
+.mockup-wrapper {
+    position: relative;
+}
+
+.mockup {
+    position: relative;
+    margin: 0 auto;
+    max-width: 255px;
+
+    img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+    }
+}
+

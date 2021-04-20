@@ -1,0 +1,165 @@
+// Import the theme palette to enable the colors when overriding
+@import "palette";
+
+// Bootstrap variables
+//
+// Override Bootstrap variables here to suite your theme.
+// Copy variables you want to customize from node_modules/bootstrap/scss/_variables.scss
+
+// Color system
+
+$primary: $color-primary !default;
+$secondary: $color-secondary !default;
+$success: $color-success !default;
+$info: $color-info !default;
+$warning: $color-warning !default;
+$danger: $color-danger !default;
+$light: $gray-100 !default;
+$dark: $gray-900 !default;
+$gray: $color-gray;
+$gray-light: $color-gray-light;
+
+$theme-colors: () !default;
+$theme-colors: (
+  gray: $gray,
+  gray-light: $gray-light,
+  alternate: $color-alternate,
+  contrast: $color-contrast,
+  darker: $color-darker,
+  black: $color-black
+);
+
+// Spacing
+//
+// Control the default styling of most Bootstrap elements by modifying these
+// variables. Mostly focused on spacing.
+// You can add more entries to the $spacers map, should you need more variation.
+
+$spacer: 1rem !default;
+
+$spacers: () !default;
+$spacers: (
+  6: (
+    $spacer * 6
+  ),
+  7: (
+    $spacer * 7
+  ),
+  8: (
+    $spacer * 8
+  ),
+  9: (
+    $spacer * 9
+  ),
+  10: (
+    $spacer * 12
+  ),
+  11: (
+    $spacer * 14
+  ),
+  12: (
+    $spacer * 16
+  ),
+  13: (
+    $spacer * 18
+  ),
+  14: (
+    $spacer * 20
+  ),
+  15: (
+    $spacer * 22
+  )
+);
+
+// Body
+//
+// Settings for the `<body>` element.
+
+$body-color: $color-5-light !default;
+
+// Links
+//
+// Style anchor elements.
+
+$link-color: $color-info !default;
+
+// Grid containers
+//
+// Define the maximum width of `.container` for different screen sizes.
+
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1260px
+) !default;
+
+// Components
+//
+// Define common padding and border radius sizes and more.
+$border-color: $gray-300 !default;
+$border-radius: 0.25rem !default;
+
+// Options
+//
+// Quickly modify global styling by enabling or disabling optional features.
+//$enable-shadows: true;
+//$enable-gradients: true;
+$enable-responsive-font-sizes: true !default;
+
+// Typography
+//
+// Font, line-height, and color for body text, headings, and more.
+$font-family-base: "Poppins", sans-serif !default;
+
+$font-size-base: 1rem !default; // Assumes the browser default, typically `16px`
+
+$font-weight-lighter: 100 !default;
+$font-weight-light: 300 !default;
+$font-weight-normal: 400 !default;
+$font-weight-semi-bold: 500 !default;
+$font-weight-bold: 700 !default;
+$font-weight-bolder: 800 !default;
+
+$font-weight-base: $font-weight-light !default;
+
+$headings-font-family: $font-size-base !default;
+$headings-font-weight: $font-weight-normal !default;
+$headings-font-color: $color-primary !default;
+$headings-margin-bottom: 0.75rem !default;
+
+// Buttons + Forms
+//
+// Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
+$input-btn-font-family: $font-family-base !default;
+
+// Buttons
+//
+// For each of Bootstrap's buttons, define text, background, and border color.
+
+$btn-padding-y: 0.5rem !default;
+$btn-padding-x: 1.25rem !default;
+$btn-font-size: 0.75rem !default;
+$btn-font-weight: $font-weight-normal !default;
+$btn-font-size-sm: 0.65rem !default;
+
+// Forms
+$input-color: $gray-700 !default;
+$input-border-color: $gray-400 !default;
+$input-color-focus: $gray-900 !default;
+
+// Custom Forms - Some overrides for Bootstrap default custom forms
+$custom-switch-width: 2.5rem !default;
+$custom-switch-indicator-size: 1rem !default;
+$custom-switch-indicator-border-radius: $custom-switch-indicator-size / 2 !default;
+
+$custom-switch-height: 1.375rem !default;
+$custom-switch-spacing: ($custom-switch-height - $custom-switch-indicator-size) /
+  2 !default;
+//$custom-switch-indicator-bg: $white !default;
+//$custom-switch-indicator-active-bg: $white !default;
+
+// Breadcrumbs
+
+$breadcrumb-bg: transparent !default;
+$breadcrumb-divider: quote(">") !default;

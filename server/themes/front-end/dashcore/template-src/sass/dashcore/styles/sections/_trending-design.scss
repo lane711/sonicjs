@@ -1,0 +1,12 @@
+.trending-design {
+  .shape {
+    position: absolute;
+
+    &-square {
+      left: 55%;
+      top: 0;
+      transform: translate(100%, -15%) rotate(65deg);
+      @include square-variant(350px, 30px, theme-color(primary));
+    }
+  }
+}

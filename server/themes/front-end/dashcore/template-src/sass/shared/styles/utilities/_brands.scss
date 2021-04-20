@@ -1,0 +1,5 @@
+@each $name, $color in $brand-colors {
+  .brand-#{$name} {
+    @include button-hover($color, $color);
+  }
+}

@@ -1,0 +1,85 @@
+/* Animated bars ======================================================= */
+
+.progress {
+  &.progress-sl {
+    height: 1px;
+  }
+
+  &.progress-ty {
+    height: 2px;
+  }
+
+  &.progress-xs {
+    height: 4px;
+  }
+
+  &.progress-sm {
+    height: 6px;
+  }
+
+  &.progress-md {
+    height: 12px;
+  }
+
+  @each $i, $color in $theme-colors {
+    &.progress-#{$i} {
+      background-color: rgba($color, 0.3);
+
+      .progress-bar {
+        background-color: $color;
+      }
+    }
+  }
+}
+
+.animate-bars {
+  .progress-bars {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+
+    p {
+      font-size: $font-size-small;
+    }
+
+    &.progress-vertical {
+      height: $bars-height;
+      @include center-flex(space-around);
+
+      p {
+        margin-top: 0;
+        margin-left: 1rem;
+      }
+
+      li {
+        height: $bars-height;
+        width: 8px;
+      }
+
+      .progress,
+      .progress-bar {
+        bottom: 0;
+        position: absolute;
+        width: 8px;
+      }
+    }
+
+    &.progress-horizontal {
+      width: 100%;
+
+      p {
+        margin-top: 0;
+        margin-bottom: 6px;
+        @include center-flex(space-between);
+      }
+
+      li + li {
+        margin-top: 1.5rem;
+      }
+    }
+
+    li {
+      position: relative;
+    }
+  }
+}

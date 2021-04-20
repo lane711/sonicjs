@@ -1,0 +1,64 @@
+/* 2.2 Border ======================================================= */
+$input-border-rounded-half: $input-border-rounded / 2;
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @include media-breakpoint-up($breakpoint) {
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+    @each $prop, $abbrev in (top: t, right: r, bottom: b, left: l) {
+      .b#{$infix}-#{$abbrev} {
+        border-#{$prop}: 1px solid $border-color;
+      }
+    }
+  }
+}
+
+@each $i, $color in $theme-colors {
+  .b-#{$i} {
+    border-color: $color !important;
+  }
+
+  .shadow-#{$i} {
+    box-shadow: 0 1px 10px rgba($color, 0.4) !important;
+  }
+}
+
+.shadow {
+  box-shadow: 0 1px 9px 1px rgba(0, 0, 0, 0.15);
+}
+
+.drop-shadow {
+  filter: drop-shadow(5px 5px 10px rgba(0, 0, 0, 0.25));
+}
+
+.shadow-box {
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.shadow-hover {
+  transition: box-shadow 0.3s ease;
+  @include hover-shadow(#000, 15px, 0.15);
+}
+
+.rounded-circle-left {
+  border-top-left-radius: $input-border-rounded-half;
+  border-bottom-left-radius: $input-border-rounded-half;
+}
+
+.rounded-circle-right {
+  border-top-right-radius: $input-border-rounded-half;
+  border-bottom-right-radius: $input-border-rounded-half;
+}
+
+.border-input {
+  border: 1px solid $input-border-color;
+}
+
+.bw-2 {
+  border-width: 2px;
+}
+
+.rounded-top-0 {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}

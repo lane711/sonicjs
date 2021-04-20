@@ -1,0 +1,401 @@
+/* 3.1 Navigation base styles ======================================================= */
+main {
+  transition: transform 0.4s ease 0s;
+}
+
+.navigation {
+  background-color: $navbar-side-background-color;
+  min-height: $navbar-min-height;
+  transition: all 0.3s ease 0s;
+
+  // need to include this so I do not need to mess with the default bootstrap behavior
+  @include media-breakpoint-down($grid-float-breakpoint-max) {
+    .container {
+      display: flex;
+      width: 100%;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+
+    .dropdown-item {
+      &:before {
+        content: "";
+        background-color: $navigation-dropdown-item-bg-color;
+        padding: 3px;
+        left: 0;
+        border-radius: 50%;
+        opacity: 0.5;
+      }
+    }
+
+    .dropdown-item {
+      &:before {
+        position: absolute;
+        top: 12px;
+      }
+    }
+
+    .dropdown-heading {
+      padding-left: 0 !important;
+    }
+  }
+
+  .navbar-toggler {
+    align-self: center;
+
+    .icon-bar {
+      transform: rotate(0deg);
+      background-color: $navbar-side-text-color;
+      transition: all 0.35s ease-in-out;
+      display: block;
+      width: 30px;
+      height: 2px;
+
+      + .icon-bar {
+        margin-top: 6px;
+      }
+
+      &:hover {
+        background-color: $navbar-side-text-color-hover;
+      }
+    }
+  }
+
+  .dropdown-heading {
+    margin: 0;
+    padding: (2 * $dropdown-item-padding-y) $dropdown-item-padding-x;
+    font-weight: $font-weight-bold;
+    position: relative;
+  }
+
+  // make the navigation full height on mobile
+  &.fixed-top {
+    .navbar-collapse {
+      height: 100vh;
+    }
+  }
+
+  &.navbar-expanded {
+    &.sidebar-left {
+      .collapse {
+        left: 0;
+      }
+
+      .navbar-toggler,
+      .navbar-brand,
+       main {
+        transform: translateX($navbar-side-width);
+      }
+    }
+
+    &.sidebar-right {
+      .collapse {
+        right: 0;
+      }
+
+      .navbar-toggler,
+      .navbar-brand,
+       main {
+        transform: translateX(-$navbar-side-width);
+      }
+    }
+
+    .icon-bar {
+      &:nth-child(1) {
+        transform: rotate(-225deg);
+      }
+
+      &:nth-child(2) {
+        transform: translateX(-40px);
+        opacity: 0;
+      }
+
+      &:nth-child(3) {
+        transform: translateY(-15px) rotate(225deg);
+      }
+    }
+  }
+
+  &.sidebar-left {
+    .collapse {
+      left: -$navbar-side-width;
+      border-right: 1px solid $navbar-side-border-color;
+    }
+  }
+
+  &.sidebar-right {
+    .collapse {
+      right: -$navbar-side-width;
+      border-left: 1px solid $navbar-side-border-color;
+    }
+
+    .navbar-toggler {
+      order: 2;
+    }
+
+    .navbar-brand {
+      order: 1;
+    }
+  }
+
+  .collapse {
+    transition: left 0.4s ease 0s;
+    background-color: $navbar-side-background-color;
+    width: $navbar-side-width;
+    position: fixed;
+    margin: 0;
+    top: 0;
+    bottom: 0;
+    display: block;
+
+    @include media-breakpoint-down($grid-float-breakpoint-max) {
+      overflow-y: auto;
+    }
+  }
+
+  .logo {
+    max-height: 60px;
+  }
+
+  .dropdown-menu {
+    font-size: 0.875rem;
+    padding: ($dropdown-padding-y * 2) 0;
+    border: none;
+
+    .dropdown-item {
+      color: lighten($body-color, 4.25%);
+      position: relative;
+
+      &.disabled {
+        opacity: 0.4;
+      }
+    }
+  }
+
+  .sidebar-brand {
+    padding: 1rem;
+  }
+
+  .nav-link {
+    color: $navbar-side-text-color;
+    font-family: $font-family-complementary;
+    font-size: $navbar-font-size;
+    font-weight: $font-weight-bold;
+    transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out,
+      opacity 0.3s ease-in-out;
+    text-decoration: none;
+    letter-spacing: 1px;
+    // text-transform: uppercase;
+    padding: 1rem;
+
+    i {
+      display: inline-block;
+      margin-right: 15px;
+    }
+
+    // invert colors when active
+    &.active,
+    &:hover {
+      @include media-breakpoint-down($grid-float-breakpoint-max) {
+        background: $navbar-side-text-color;
+      }
+
+      color: $navbar-side-background-color;
+    }
+  }
+
+  &.navbar-sticky {
+    position: fixed !important;
+    background-color: $navbar-sticky-background-color;
+    left: 0;
+    top: 0;
+    right: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.11);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.11);
+    min-height: $navbar-min-height;
+    z-index: 1030;
+    transition: all 0.6s ease-in-out;
+  }
+
+  &,
+  &.navbar-sticky {
+    .btn-outline {
+      @include button-outline-variant($navbar-side-text-color);
+      @include hover-shadow($navbar-side-text-color);
+    }
+
+    .btn-solid {
+      @include button-variant($navbar-side-text-color, $navbar-side-text-color);
+      @include hover-shadow($navbar-side-text-color);
+    }
+  }
+
+  &.navbar-sticky {
+    .logo {
+      display: none;
+
+      &.logo-sticky {
+        display: block !important;
+
+        + .logo {
+          display: none !important;
+        }
+      }
+    }
+  }
+
+  @include media-breakpoint-up($grid-float-breakpoint) {
+    background-color: $navbar-background-color;
+    padding: 0;
+
+    &:not(.fixed-top) {
+      position: static;
+      top: -$navbar-min-height;
+    }
+
+    &.fixed-top {
+      background-color: $navbar-fixed-top-background-color;
+
+      .navbar-collapse {
+        height: auto;
+      }
+
+      .nav-link {
+        color: $navbar-fixed-text-color;
+
+        &.active,
+        &:hover {
+          color: $navbar-fixed-text-color-hover;
+        }
+      }
+    }
+
+    &.navbar-sticky {
+      // position: fixed;
+      background-color: $navbar-sticky-background-color;
+      top: 0;
+
+      .nav-link {
+        color: $navbar-sticky-text-color;
+
+        &.active,
+        &:hover {
+          //background-color: $navbar-sticky-background-color;
+          color: $navbar-sticky-text-color-hover;
+        }
+      }
+    }
+
+    &.navbar-expanded {
+      .navbar-toggler,
+      .navbar-brand,
+       main {
+        transform: translateX(0) !important;
+      }
+    }
+
+    &.sidebar-left .collapse {
+      left: 0;
+      border-right: none;
+    }
+
+    &.sidebar-right .collapse {
+      right: 0;
+      border-left: none;
+    }
+
+    &.sidebar-right .navbar-brand {
+      order: 0;
+    }
+
+    &.dark-link {
+      .nav-link {
+        color: $navbar-text-color-dark;
+        opacity: 0.7;
+
+        &.active,
+        &:hover {
+          opacity: 1;
+          color: $navbar-text-color-dark-hover;
+        }
+      }
+
+      .btn-outline {
+        @include button-outline-variant($navbar-side-text-color);
+      }
+
+      .btn-solid {
+        @include button-variant(
+          $navbar-side-text-color,
+          $navbar-side-text-color
+        );
+      }
+    }
+
+    .collapse {
+      position: relative;
+      width: auto;
+      background: transparent;
+    }
+
+    .nav-link {
+      color: $navbar-text-color;
+      padding-left: 1.25rem !important;
+      padding-right: 1.25rem !important;
+
+      i {
+        display: none;
+      }
+
+      &.active,
+      &:hover {
+        //background-color: $navbar-background-color;
+        color: $navbar-text-color-hover;
+      }
+    }
+
+    .dropdown {
+      &.show {
+        //.dropdown-menu {
+        //visibility: visible;
+        //}
+
+        .dropdown-toggle {
+          color: $navbar-fixed-text-color-active; //$navbar-fixed-text-color-hover;
+        }
+      }
+    }
+
+    .sidebar-brand {
+      display: none;
+    }
+
+    .btn-outline {
+      @include button-outline-variant($navigation-btn-outline-color);
+      color: $navigation-btn-outline-color;
+    }
+
+    .btn-solid {
+      @include button-variant(
+        $navigation-btn-outline-color,
+        $navigation-btn-outline-color
+      );
+    }
+
+    .dropdown-menu {
+      margin-top: -10px;
+      border: 1px solid $border-color;
+      min-width: 100%; // takes the parent width
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.075%);
+      //transition: all .3s ease;
+      //visibility: hidden;
+      //display: block;
+    }
+
+    &.navbar-sticky {
+      .dropdown-menu {
+        margin-top: -3px;
+      }
+    }
+  }
+}

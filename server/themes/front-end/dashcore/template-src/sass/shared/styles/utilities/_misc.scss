@@ -1,0 +1,84 @@
+/* 2.5 Misc ======================================================= */
+
+blockquote {
+  position: relative;
+
+  .quote {
+    opacity: 0.5;
+    font-size: $font-size-medium;
+    position: absolute;
+    left: -16px;
+    top: -16px;
+  }
+
+  &.team-quote {
+    .quote {
+      left: 0;
+      top: -8px;
+    }
+  }
+}
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @include media-breakpoint-up($breakpoint) {
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+    .fullscreen#{$infix} {
+      min-height: 100vh;
+    }
+  }
+}
+
+.rounded-split {
+  overflow: hidden;
+
+  &:after {
+    content: "";
+    position: absolute;
+    background-color: $rounded-split-bg-color;
+    z-index: 0;
+    border-radius: 50%;
+    transform: translate3d(90%, -25%, 0);
+    height: 200%;
+    width: 100%;
+    box-shadow: 0 0 25px 3px $rounded-split-box-shadow;
+  }
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+@each $prop in (x, y) {
+  .overflow-#{$prop} {
+    overflow-#{$prop}: auto;
+  }
+  .overflow-#{$prop}-hidden {
+    overflow-#{$prop}: hidden;
+  }
+}
+
+@for $a from 1 through 9 {
+  .op-#{$a} {
+    opacity: $a * 0.1;
+  }
+
+  .w-#{$a * 10} {
+    width: $a * 10%;
+  }
+
+  .w-#{$a * 10}px {
+    width: $a * 10px;
+  }
+}
+
+.arrow-down {
+  position: relative;
+  margin: 0 auto;
+  text-align: center;
+  animation: jump 5s infinite;
+}
+
+.no-action {
+  pointer-events: none;
+}

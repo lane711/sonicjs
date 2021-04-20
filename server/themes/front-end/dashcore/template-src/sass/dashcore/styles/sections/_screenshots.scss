@@ -1,0 +1,62 @@
+/* 6.6 Screenshots ======================================================= */
+
+.screenshots {
+  .swiper-container {
+    padding: 3.58rem 0 6rem 0;
+    display: flex;
+    align-items: center;
+
+    .mobile-device {
+      max-width: 240px;
+      position: absolute;
+      left: 0;
+      right: 0;
+
+      .screen {
+        width: 212px;
+        height: 460px;
+      }
+
+      &.iphone-x {
+        .notch {
+          z-index: 2;
+        }
+
+        &:before,
+        &:after {
+          z-index: 3;
+        }
+      }
+    }
+
+    .swiper-slide {
+      transform: scale(0.75);
+      opacity: 0.6;
+      transition: all 0.3s ease;
+
+      img {
+        border-radius: $x-border-radius / 2;
+        box-shadow: 0 0 8px 5px rgba(0, 0, 0, 0.015);
+      }
+    }
+
+    .swiper-slide-prev,
+    .swiper-slide-next {
+      transform: scale(0.85);
+      opacity: 0.85;
+    }
+
+    .swiper-slide-active {
+      border-radius: $x-border-radius / 2;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      border: 1px solid $border-color;
+      z-index: 100;
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    > .swiper-pagination-bullets {
+      bottom: 4rem;
+    }
+  }
+}

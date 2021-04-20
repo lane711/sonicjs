@@ -1,0 +1,276 @@
+/* 2.3 Devices ======================================================= */
+.iphone,
+.iphone-x,
+.ipad {
+  border: 1px solid $border-color;
+  margin: 0 auto;
+  position: relative;
+
+  &:before,
+  &:after {
+    content: "";
+    position: absolute;
+  }
+
+  &:before {
+    width: 45px;
+    height: 4px;
+    left: 0;
+    right: 0;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+    border-radius: 30px;
+  }
+
+  &:after {
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.03);
+    display: block;
+    border-radius: 50%;
+  }
+
+  .screen {
+    margin: 0 auto;
+    overflow: hidden;
+
+    img {
+      max-width: 100%;
+    }
+  }
+}
+
+.iphone,
+.ipad {
+  background: $iphone-bg-color;
+  max-width: 255px;
+  border-radius: 36px;
+  padding: 55px 0;
+  box-shadow: inset 0 4px 10px 1px $iphone-bg-color,
+    inset 0 0 6px 0 rgba(66, 77, 86, 0.5), 0 2px 0 #aeb5bb,
+    0 20px 50px -25px rgba(0, 0, 0, 0.5);
+
+  /* speaker */
+  &:before {
+    background: $jacks-bg-color;
+    margin: -25px auto 0;
+  }
+
+  /* camera */
+  &:after {
+    top: 30px;
+    margin-left: -45px;
+    background: $jacks-bg-color;
+  }
+
+  .screen {
+    width: 90%;
+
+    img {
+      box-shadow: 0 0 0 1px rgba(0, 17, 53, 0.16);
+    }
+  }
+
+  .button {
+    //position: absolute;
+    //left: 50%;
+    box-shadow: 0 0 1px 2px $jacks-bg-color inset;
+    border: 1px solid $border-color;
+    border-radius: 50%;
+    bottom: 1.75%;
+    height: 0;
+    //margin-left: -18px;
+    padding-top: 36px;
+    width: 36px;
+    @include center(x);
+  }
+
+  &.small {
+    max-width: 185px;
+    border-radius: 26px;
+    padding: 45px 0;
+
+    &:before {
+      width: 35px;
+    }
+
+    &:after {
+      top: 20px;
+    }
+
+    .button {
+      width: 28px;
+      padding-top: 28px;
+      margin-left: -8px;
+    }
+  }
+
+  &.landscape {
+    padding: 1rem 3rem;
+
+    &:before,
+    &:after {
+      left: 16%;
+      //margin-top: 125px;
+      @include center(y);
+    }
+
+    .button {
+      left: 100%;
+      //margin-bottom: 100px;
+      margin-left: -50px;
+      @include center(y);
+    }
+  }
+}
+
+.ipad {
+  &:before {
+    content: none;
+  }
+
+  &.portrait {
+    &:after {
+      margin-left: 0;
+      @include center(x);
+    }
+  }
+}
+
+.iphone-x {
+  background: $x-dark-bg;
+  max-width: $x-phone-width;
+  border-radius: $x-border-radius;
+  padding: $x-border-width;
+  box-shadow: inset 0 0 6px 0 rgba(66, 77, 86, 0.5), 0 1px 0 #aeb5bb,
+    0 20px 50px -25px rgba(0, 0, 0, 0.5);
+
+  &:before,
+  &:after {
+    background-color: lighten($x-dark-bg, 6.25%);
+    z-index: 1;
+  }
+
+  /* speaker */
+  &:before {
+    margin: 0 auto;
+  }
+
+  /* camera */
+  &:after {
+    top: 8px;
+    margin-left: 33px;
+  }
+
+  .screen {
+    border-radius: $x-border-radius / 2;
+
+    img {
+      box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.015);
+    }
+  }
+
+  .notch {
+    position: absolute;
+    border-radius: $x-notch-border-radius;
+    width: $x-notch-width;
+    height: $x-notch-height;
+    transform: translateX(-50%);
+    background-color: $x-dark-bg;
+    top: 0;
+    left: 50%;
+  }
+
+  &.light {
+    background-color: $x-light-bg;
+
+    .notch {
+      background-color: $x-light-bg;
+    }
+
+    &:before,
+    &:after {
+      background-color: $jacks-bg-color;
+    }
+  }
+}
+
+.device-twin {
+  width: 100%;
+  display: flex;
+  position: relative;
+
+  .mockup {
+    box-shadow: inset 0 4px 10px 1px #ffffff,
+      inset 0 0 6px 0 rgba(66, 77, 86, 0.5),
+      0 20px 50px -25px rgba(0, 0, 0, 0.5), 0 0 1px rgba(0, 0, 0, 0.1);
+
+    max-width: 210px;
+  }
+
+  @include media-breakpoint-up($grid-float-breakpoint) {
+    .phone {
+      transition: all 0.4s ease;
+
+      &.front {
+        &:hover {
+          transform: rotate(2deg) translate3d(0, -8px, 0);
+        }
+      }
+
+      &.absolute {
+        margin-top: -30px;
+
+        &:hover {
+          transform: rotate(-2deg) translate3d(-10px, 0, 0);
+        }
+      }
+    }
+  }
+}
+
+.browser {
+  background: linear-gradient(#fff 1%, #eef1f3 10%);
+  position: relative;
+  padding-top: 2em;
+  border-radius: 0.4em;
+
+  &:before {
+    display: block;
+    position: absolute;
+    content: "";
+    top: 0.75em;
+    left: 1em;
+    width: $browser-action-size;
+    height: $browser-action-size;
+    border-radius: 50%;
+    background: $browser-action-color-1;
+    box-shadow: 0 0 0 1px $browser-action-color-1,
+      1.5em 0 0 1px $browser-action-color-2, 3em 0 0 1px $browser-action-color-3;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  &.shadow {
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.09);
+  }
+
+  &.border {
+    border: 1px solid $border-color;
+  }
+}
+
+.fade-bottom {
+  &:after {
+    background: linear-gradient(rgba(255, 255, 255, 0), #fff 70%, #fff);
+    bottom: -25px;
+    content: "";
+    display: block;
+    height: 85px;
+    left: 0;
+    position: absolute;
+    right: 0;
+  }
+}

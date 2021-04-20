@@ -1,0 +1,13 @@
+.bubbles-wrapper {
+  position: relative;
+
+  .icon {
+    position: absolute;
+    will-change: transform,opacity;
+    margin: 0;
+  }
+
+  .bubble {
+    animation: bubble-animate-v 8s linear infinite;
+  }
+}

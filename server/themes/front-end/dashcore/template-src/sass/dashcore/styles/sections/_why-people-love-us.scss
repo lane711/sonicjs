@@ -1,0 +1,112 @@
+.why-people-love-us {
+  .bubble {
+    z-index: 1;
+    position: absolute;
+    max-width: 60%;
+
+    &-left {
+      top: 18%;
+    }
+
+    &-right {
+      right: $grid-gutter-width;
+      top: 64%;
+    }
+
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      max-width: 50%;
+
+      &-left {
+        top: 21%;
+      }
+
+      &-right {
+        right: $grid-gutter-width * 2;
+      }
+    }
+  }
+
+  .shape {
+    position: absolute;
+
+    &-circle {
+      &-1 {
+        left: 7%;
+        top: 60%;
+
+        div {
+          @include circle-variant(150px, $wplu--circle1-bg-color);
+        }
+
+        @include media-breakpoint-up($grid-float-breakpoint) {
+          left: 25%;
+          top: 5%;
+        }
+      }
+
+      &-2 {
+        left: 60%;
+        top: 70%;
+
+        div {
+          @include circle-variant(120px, $wplu--circle2-bg-color);
+        }
+
+        @include media-breakpoint-up($grid-float-breakpoint) {
+          left: 22%;
+          top: 23%;
+        }
+      }
+
+      &-3 {
+        left: 40%;
+        top: 78%;
+
+        div {
+          @include circle-variant(120px, $wplu--circle3-bg-color);
+        }
+      }
+
+      &-4 {
+        left: 25%;
+        top: 70%;
+
+        div {
+          @include circle-variant(50px, $wplu--circle4-bg-color);
+        }
+      }
+    }
+
+    &-triangle {
+      top: 80%;
+      right: 0;
+
+      div {
+        opacity: 0.15;
+        @include triangle-variant(
+          95px,
+          $wplu--triangle-bg-color,
+          $wplu--triangle2-bg-color
+        );
+        animation-duration: 50s;
+      }
+    }
+
+    &.pattern {
+      &-dots {
+        &-1 {
+          bottom: 0;
+          left: 20%;
+          width: 200px;
+          height: 30%;
+          @include pattern-dots(2px, 20px, $wplu--pattern-dots);
+
+          @include media-breakpoint-up($grid-float-breakpoint) {
+            bottom: 20%;
+            height: 50%;
+          }
+        }
+      }
+    }
+  }
+}

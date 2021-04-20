@@ -1,0 +1,140 @@
+.pricing-table {
+  .pricing-table-tabs {
+    width: 100%;
+
+    label {
+      width: 33.33%;
+      padding: 12px 6px;
+      @include text-truncate();
+    }
+  }
+
+  .pricing-details {
+    margin-top: 0;
+  }
+
+  table {
+    margin-top: 0;
+    margin-bottom: 0;
+
+    th, td {
+      padding: 10px 15px;
+      vertical-align: middle !important;
+      //border: 1px solid $table-border-color;
+    }
+
+    th {
+      background-color: theme-color(light);
+      font-weight: normal;
+    }
+
+    td {
+      text-align: center;
+    }
+
+    thead {
+      th {
+        text-align: center;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        background-color: $price-plan-thead-bg-color;
+        color: $price-plan-thead-color;
+        border-color: $price-plan-thead-border-color;
+
+        &.title {
+          color: $body-color;
+
+          &.clear {
+            background-color: $white;
+            border-top-color: $white;
+            border-left-color: $white;
+            border-bottom-color: $table-border-color;
+          }
+        }
+      }
+    }
+
+    tbody {
+      &.pricing-details {
+        th {
+          background-color: transparent;
+        }
+      }
+    }
+
+    tfoot {
+      font-size: 0.8em;
+
+      td {
+        border: 0;
+      }
+    }
+
+    .pricing-prev {
+      float: left;
+    }
+
+    .pricing-next {
+      float: right;
+    }
+
+    .visible-cell {
+      transition: all 0.3s;
+    }
+  }
+
+  .show-annually {
+    display: none;
+  }
+
+  .yearly-display {
+    .show-annually {
+      display: block;
+    }
+  }
+
+  @include media-breakpoint-down($grid-float-breakpoint-max) {
+    table {
+      .expand-mobile {
+        th, td {
+          display: none;
+        }
+      }
+
+      td[headers*='ph-'] {
+        display: none;
+      }
+
+      tbody {
+        th {
+          width: 0;
+        }
+      }
+    }
+  }
+
+  .ribbon {
+    width: 100px;
+    height: 50px;
+    font-size: 10px;
+    text-align: center;
+    color: $price-plan-ribbon-color;
+    font-weight: bold;
+    box-shadow: 0 2px 3px rgba(136, 136, 136, 0.25);
+    background: $price-plan-ribbon-bg-color; //#4dbe3b;
+    transform: rotate(45deg) translate(0, -50%);
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 1rem .5rem;
+    transform-origin: 50% 100%;
+  }
+}
+
+.visible-cell {
+  display: table-cell!important;
+}
+
+.visible-block, .visible-cell {
+  visibility: visible!important;
+}

@@ -1,0 +1,210 @@
+.alter2-header {
+  .head-line-2 {
+    display: block;
+
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      display: inline;
+    }
+  }
+
+  .background-shape-main {
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    transform: translate(85%, -30%) rotate(-35deg);
+    background-image: linear-gradient(45deg, $auxiliary 0, theme-color("primary") 35%, theme-color("secondary") 110%);
+
+    @include media-breakpoint-up(md) {
+      height: 115%;
+      transform: translate(35%, -30%) rotate(-35deg);
+    }
+
+    @include media-breakpoint-up(lg) {
+      height: 130%;
+    }
+
+    @include media-breakpoint-up(xl) {
+      height: 190%;
+    }
+  }
+
+  .animation {
+    &-shape {
+      position: absolute;
+      display: flex;
+
+      &.shape {
+        &-ring {
+          top: 75%;
+          left: 25%;
+
+          &:after {
+            content: '';
+            @include ring-variant(10px, 5px, theme-color("primary"));
+          }
+        }
+
+        &-circle {
+          &-1 {
+            top: 60%;
+            left: 30%;
+
+            &:after {
+              content: '';
+              @include circle-variant(5px, rgba(theme-color("alternate"), 0.3));
+            }
+          }
+
+          &-2 {
+            top: 30%;
+            left: 75%;
+            animation-duration: 15s;
+
+            &:after {
+              content: '';
+              @include circle-variant(15px, rgba(theme-color("light"), 0.3));
+            }
+          }
+
+        }
+
+        &-triangle {
+          top: 50%;
+          left: 50%;
+          animation-duration: 12s;
+
+          div {
+            opacity: .1;
+            @include triangle-variant(30px, theme-color("primary"));
+          }
+        }
+
+        &-diamond {
+          top: 35%;
+          left: 55%;
+
+          div {
+            opacity: .5;
+            @include diamond-variant(10px, theme-color("alternate"));
+          }
+        }
+
+        &-heart {
+          top: 35%;
+          left: 15%;
+          animation-duration: 15s;
+
+          div {
+            opacity: .5;
+            @include heart-variant(30px, 25px, theme-color("alternate"));
+          }
+        }
+      }
+    }
+  }
+
+  .static {
+    &-shape {
+      position: absolute;
+
+      &.shape {
+        &-circle {
+          top: 0;
+          right: 0;
+          opacity: .2;
+
+          &-1 {
+            transform: translate3d(25%, -25%, 0);
+
+            div {
+              @include circle-variant(500px, rgba($white, .5));
+            }
+          }
+
+          &-2 {
+            transform: translate3d(25%, -25%, 0);
+
+            div {
+              @include circle-variant(300px, rgba($white, .25));
+            }
+          }
+        }
+
+        &-ring {
+          &-1 {
+            @include ring-variant(40px, 15px, theme-color("alternate"));
+            top: 35%;
+            left: 0;
+            transform: translateX(-50%);
+          }
+
+          &-2 {
+            @include ring-variant(60px, 15px, rgba($white, .5));
+            top: 20%;
+            right: 0;
+            transform: translateX(50%);
+          }
+        }
+      }
+
+      &.pattern {
+        &-dots {
+          &-1 {
+            top: 0;
+            left: 0;
+            width: 150px;
+            height: 20%;
+            @include pattern-dots(3px, 30px, rgba(#000, .1));
+          }
+        }
+      }
+    }
+  }
+
+  .shape {
+    position: absolute;
+
+    @each $breakpoint, $styles in $alter2-shapes-map {
+      @include media-breakpoint-up(#{$breakpoint}) {
+        @for $i from 1 through length($styles) {
+          $style: nth($styles, $i);
+
+          &:nth-child(#{$i}) {
+            $top: map-get($style, top);
+            $left: map-get($style, left);
+            $width: map-get($style, width);
+            $height: map-get($style, height);
+            $attrs: map-get($style, attrs);
+
+            @if $top { top: $top / 100 * 100%; }
+            @if $left { left: $left / 100 * 100%; }
+            @if $width { width: $width * 1px; }
+            @if $height { height: $height * 1px; }
+
+            @each $attr, $value in $attrs {
+              &[data-aos] {
+                &:before {
+                  #{$attr}: #{$value};
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    &[data-aos] {
+      &:before {
+        content: '';
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: #000;
+        transform: rotate(55deg);
+        position: absolute;
+        border-radius: 50px;
+      }
+    }
+  }
+}

@@ -1,0 +1,257 @@
+.automate-social-header {
+  background-color: $automate-social-heading-bg-color;
+
+  .container {
+    padding-top: $automate-social-container-padding;
+    padding-bottom: $automate-social-container-padding / 2;
+
+    // try md
+    @include media-breakpoint-up(lg) {
+      padding-bottom: $automate-social-container-padding * 2;
+    }
+  }
+
+  .shape-background {
+    z-index: 0;
+    opacity: 0.2;
+  }
+
+  .shape-main {
+    bottom: 0;
+    opacity: 1;
+    width: 170%;
+    height: 150%;
+    background-color: $automate-social-shape-main-bg-color;
+    transform-origin: 0 100%;
+    transform: translate(20%, 0) rotate(-30deg);
+    position: absolute;
+
+    &.shadow {
+      background-color: $automate-social-shape-main-shadow;
+      transform: translate(19%, 10px) rotate(-30deg);
+    }
+
+    @include media-breakpoint-up(md) {
+      width: 140%;
+    }
+
+    @include media-breakpoint-up(lg) {
+      bottom: -40px;
+      width: 120%;
+    }
+
+    @include media-breakpoint-up(xl) {
+      width: 110%;
+    }
+  }
+
+  //test this
+  .rounded-stripe {
+    width: 100%;
+    background-color: #8abcfe;
+    /* border-radius: 40px; */
+    height: 20%;
+    transform-origin: 0 100%;
+    opacity: 1;
+    transform: translate(20%, 0) rotate(-30deg);
+    bottom: -40px;
+    position: absolute;
+  }
+
+  .shape-top {
+    top: 0;
+    background-image: linear-gradient(-57deg, #5634d0 0%, #4a61d1 100%);
+    transform: rotate(30deg) translate3D(-45%, -45%, 0);
+    max-height: 560px;
+    box-shadow: 0 0 25px 50px rgba(#4a61d1, 0.5);
+  }
+
+  .shape-right {
+    background-image: linear-gradient(-57deg, #5634d0 0%, #4a61d1 100%);
+    left: 93%;
+  }
+
+  .main-shape-wrapper {
+    width: 90%;
+
+    @include media-breakpoint-down(md) {
+      @include center(x, relative);
+    }
+
+    @include media-breakpoint-up(lg) {
+      @include center(y);
+      right: 0;
+      width: 50%;
+    }
+
+    @include media-breakpoint-up(xl) {
+      transform: translateY(-50%) scale(0.75); // translateY is needed to not override transform from lower resolutions and keep the shape centered
+    }
+  }
+
+  .main-background {
+    @media (min-width: 1601px) {
+      transform: translate3d(0, -3%, 0);
+    }
+  }
+
+  .bubbles-wrapper {
+    .bubble {
+      //animation: bubble-left-v 10s linear infinite, shake 2s ease-in-out infinite;
+      $animations-map: (
+        (
+          bottom: 45,
+          left: 2,
+          animation-duration: 10
+        ),
+        (
+          bottom: 40,
+          left: 12,
+          animation-duration: 6.7
+        ),
+        (
+          bottom: 56,
+          left: 14,
+          animation-duration: 8.8
+        ),
+        (
+          bottom: 51,
+          left: 20,
+          animation-duration: 6.8
+        ),
+        (
+          bottom: 65,
+          left: 30,
+          animation-duration: 9.5
+        ),
+        (
+          bottom: 44,
+          left: 30,
+          animation-duration: 8.7
+        ),
+        (
+          bottom: 80,
+          left: 40,
+          animation-duration: 7.5
+        ),
+        (
+          bottom: 55,
+          left: 38,
+          animation-duration: 10
+        ),
+        (
+          bottom: 50,
+          left: 1,
+          animation-duration: 6.4
+        ),
+        (
+          bottom: 55,
+          left: 12,
+          animation-duration: 8.2
+        ),
+        (
+          bottom: 60,
+          left: 14,
+          animation-duration: 6.4
+        ),
+        (
+          bottom: 60,
+          left: 18,
+          animation-duration: 7.8
+        ),
+        (
+          bottom: 70,
+          left: 20,
+          animation-duration: 9.2
+        ),
+        (
+          bottom: 75,
+          left: 45,
+          animation-duration: 12.2
+        ),
+        (
+          bottom: 50,
+          left: 50,
+          animation-duration: 9.8
+        ),
+        (
+          bottom: 68,
+          left: 34,
+          animation-duration: 10.6
+        )
+      );
+
+      // number of bubbles: 16
+      @for $i from 1 through length($animations-map) {
+        $style: nth($animations-map, $i);
+
+        &:nth-child(#{$i}) {
+          animation: floating
+            #{map-get($style, animation-duration) /
+            3}s
+            ease-in-out
+            infinite
+            alternate;
+          bottom: map-get($style, bottom) / 100 * 100%;
+          left: map-get($style, left) / 100 * 100%;
+
+          @include media-breakpoint-up(lg) {
+            animation: bubble-left-v #{map-get($style, animation-duration)}s
+                linear infinite,
+              shake-v 2s ease-in-out infinite alternate;
+            bottom: 50%;
+          }
+        }
+      }
+    }
+  }
+
+  .form {
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      width: 90%;
+    }
+  }
+
+  .input-group-register {
+    .form-control {
+      padding: 1.5rem 0 1.5rem 1.5rem;
+    }
+
+    .btn {
+      right: 5px;
+    }
+
+    label.error {
+      color: #fff;
+      background-color: #dc3545;
+      border-radius: 15px;
+      padding: 0 15px;
+    }
+  }
+
+  // style the carousel when it's placed right after the header
+  + .features-carousel {
+    .container {
+      @each $breakpoint, $container-max-width in $container-max-widths {
+        @include media-breakpoint-up($breakpoint) {
+          > .cards-wrapper {
+            width: $container-max-width - 30;
+          }
+        }
+      }
+
+      @include media-breakpoint-up(lg) {
+        padding-bottom: 16rem;
+
+        > .cards-wrapper {
+          position: absolute;
+          transform: translateY(-50%);
+        }
+      }
+    }
+
+    .logo {
+      min-height: 48px;
+    }
+  }
+}

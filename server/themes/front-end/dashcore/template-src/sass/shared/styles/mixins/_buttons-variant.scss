@@ -1,0 +1,34 @@
+@mixin btn {
+  transition: all 0.3s ease;
+  text-decoration: none;
+  font-family: $btn-font-family;
+  font-weight: $btn-font-weight;
+  white-space: normal;
+  line-height: 1.5;
+
+  // create a map for holding font-size, border-radius, padding of different buttons sizes
+  //padding: 0.5rem 1.25rem;
+  //font-size: $btn-font-size;
+  //border-radius: 0.25rem;
+}
+
+@mixin hover-shadow($shadow, $blur: 10px, $opacity: .4) {
+  @include hover {
+    box-shadow: 0 1px $blur rgba($shadow, $opacity) !important;
+  }
+}
+
+@mixin button-hover($background, $border) {
+  @include button-variant($background, $border);
+  @include hover-shadow($background);
+}
+
+@mixin button-outline-hover($color) {
+  @include button-outline-variant($color);
+  @include hover-shadow($color);
+}
+
+@mixin circle-button-variant($size) {
+  width: $size;
+  height: $size;
+}

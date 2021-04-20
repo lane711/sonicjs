@@ -1,0 +1,31 @@
+/* 2.4 Lists ======================================================= */
+
+.list {
+  li + li {
+    padding-top: 10px;
+  }
+
+  &.list-striped {
+    li {
+      &:nth-of-type(2n + 1) {
+        background-color: lighten($table-active-bg, 25%);
+      }
+    }
+  }
+
+  &.list-bordered {
+    li {
+      border-top: 1px solid $border-color;
+
+      &:last-child {
+        border-bottom: 1px solid $border-color;
+      }
+    }
+  }
+
+  &.list-inline {
+    li {
+      display: inline-block;
+    }
+  }
+}

@@ -1,0 +1,29 @@
+.animation {
+  position: relative;
+  transform-style: preserve-3d;
+
+  &--clockwise {
+    @include animation(clockwise, 30s);
+  }
+
+  &--anti-clockwise {
+    @include animation(anti-clockwise, 30s);
+  }
+
+  &--rotating {
+    @include animation(rotating, 15s);
+  }
+
+  &--rotating-diagonal {
+    @include animation(rotating-diagonal, 15s, linear, infinite, alternate);
+  }
+
+  &--rotating-clockwise {
+    @include animation(rotating-clockwise, 15s);
+  }
+}
+
+.typed-cursor {
+  opacity: 1;
+  animation: blink 0.7s infinite;
+}

@@ -1,0 +1,56 @@
+$appheader-container-padding: 12rem;
+
+.app-landing-header {
+  //background-color: $v6-heading-bg-color;
+
+  .container {
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      padding-bottom: $appheader-container-padding;
+    }
+  }
+
+  .shape-background {
+    z-index: 0;
+    //opacity: 0.20;
+  }
+
+  .shape-main {
+    bottom: 0;
+    //opacity: 1;
+    width: 100%;
+    height: 200%;
+    transform-origin: 0 100%;
+    transform: translate(65%, -20%) rotate(-60deg);
+    position: absolute;
+
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      transform: translate(50%, 0) rotate(-60deg);
+    }
+
+    @include media-breakpoint-up(lg) {
+      //bottom: -40px;
+      //width: 120%;
+    }
+
+    @include media-breakpoint-up(xl) {
+      //width: 100%;
+    }
+  }
+
+  .shape-top {
+    transform-origin: 0 100%;
+    transform: translate(80%, -60%) rotate(-60deg);
+    left: 50%;
+  }
+
+  .iphone-x {
+    @include media-breakpoint-up(xl) {
+      @include iphone-x-size(.85);
+    }
+  }
+
+  .screen-highlight {
+    right: 0;
+    bottom: 21.75%;
+  }
+}

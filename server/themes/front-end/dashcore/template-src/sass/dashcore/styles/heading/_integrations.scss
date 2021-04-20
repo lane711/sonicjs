@@ -1,0 +1,163 @@
+$sheet-real-size: 2152px;
+$sheet-real-icon-size: 304px;
+$sheet-icons-in-row: 7;
+$sheet-scale: 0.5;
+
+$sheet-bg-size: $sheet-real-size * $sheet-scale;
+$bubble-size: $sheet-real-icon-size * $sheet-scale;
+$bubble-icon-size: $bubble-size + 2; // 154px;
+$bubbles-wrapper-height: 600px;
+
+.integrations-header {
+  .container {
+    padding-bottom: $bubbles-wrapper-height;
+  }
+
+  .background-shape-main {
+    bottom: 0;
+    width: 100%;
+    height: 200%;
+    border-radius: 100px;
+    transform: translate(0, -45%) rotate(-12deg);
+    background-image: linear-gradient(45deg, theme-color("light") 40%, theme-color("secondary") 100%);
+
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      transform: translate(0, -70%) rotate(-12deg);
+    }
+  }
+
+  .bubbles-wrap {
+    z-index: 2;
+    overflow: hidden;
+    height: $bubbles-wrapper-height;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .bubbles-container {
+    position: relative;
+  }
+
+  .bubble {
+    position: absolute;
+    width: $bubble-size;
+    height: $bubble-size;
+    border-radius: 50%;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 3px 10px rgba(0, 0, 0, 0.1);
+
+    background-image: url(../img/integration/spritesheet.png);
+    background-size: $sheet-bg-size $sheet-bg-size;
+
+    $row: 0;
+    $col: 0;
+    @for $i from 1 through 42 {
+      &.bubble-#{$i} {
+        background-position: (-$bubble-icon-size * $col)
+          (-$bubble-icon-size * $row);
+      }
+
+      @if $i % $sheet-icons-in-row == 0 {
+        $row: $row + 1;
+        $col: 0;
+      } @else {
+        $col: $col + 1;
+      }
+    }
+  }
+
+  .shape {
+    position: absolute;
+    z-index: 1;
+    display: none;
+
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      display: block;
+    }
+
+    &-circle {
+      &-1 {
+        left: 2%;
+        top: 5%;
+
+        div {
+          @include circle-variant(20px, $integrations-circle1-bg-color);
+        }
+      }
+
+      &-2 {
+        left: 14%;
+        top: 18%;
+        z-index: 1;
+
+        div {
+          opacity: 0;
+          @include circle-variant(250px, $integrations-circle2-bg-color);
+
+          @include media-breakpoint-up(xl) {
+            opacity: 0.5;
+          }
+        }
+      }
+    }
+
+    &-ring {
+      &-1 {
+        left: 0;
+        top: 0;
+        transform: translate(-25%, -25%);
+
+        div {
+          opacity: 0.15;
+          @include ring-variant(280px, 50px, $integrations-dots-bg-color);
+        }
+      }
+    }
+
+    &-square {
+      transform: rotate(45deg);
+
+      &-1 {
+        right: 0;
+        top: 20%;
+
+        div {
+          @include square-variant(150px, 10px, $integrations-dots-bg-color);
+        }
+      }
+
+      &-2 {
+        right: 0;
+        top: 30%;
+
+        div {
+          @include square-variant(50px, 5px, $integrations-dots-bg-color);
+        }
+      }
+
+      &-3 {
+        left: 0;
+        top: 5%;
+
+        div {
+          @include square-variant(50px, 5px, $integrations-square3-bg-color);
+        }
+      }
+    }
+
+    &.pattern {
+      z-index: 0;
+
+      &-dots {
+        bottom: 20rem;
+        right: 0;
+        width: 50%;
+        height: 155px;
+        transform: rotate(-12deg);
+
+        @include pattern-dots(2px, 20px, $integrations-dots-bg-color);
+      }
+    }
+  }
+}

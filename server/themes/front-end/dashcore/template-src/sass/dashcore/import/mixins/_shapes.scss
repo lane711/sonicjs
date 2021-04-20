@@ -1,0 +1,127 @@
+@mixin circle-variant($size: 15px, $background: transparent) {
+  width: $size;
+  height: $size;
+  background: $background;
+  border-radius: 50%;
+  margin: 0;
+}
+
+@mixin triangle-variant(
+  $size,
+  $background: transparent,
+  $background2: transparent
+) {
+  position: relative;
+
+  background-color: $background;
+  @if $background2 != transparent {
+    background: linear-gradient(45deg, $background 0, $background2 100%);
+  }
+  text-align: left;
+  transform: rotate(-60deg) skewX(-30deg) scale(1, 0.866);
+
+  &:before,
+  &:after {
+    content: "";
+    position: absolute;
+    background-color: inherit;
+    @if $background2 != transparent {
+      background: inherit;
+    }
+  }
+
+  &,
+  &:before,
+  &:after {
+    width: $size;
+    height: $size;
+    border-top-right-radius: 30%;
+  }
+
+  &:before {
+    transform: rotate(-135deg) skewX(-45deg) scale(1.414, 0.707)
+      translate(0, -50%);
+  }
+
+  &:after {
+    transform: rotate(135deg) skewY(-45deg) scale(0.707, 1.414) translate(50%);
+  }
+}
+
+@mixin ring-variant($radius, $stroke: 10px, $background: transparent) {
+  @include square-variant($radius * 2, $stroke, $background);
+  border-radius: 50%;
+}
+
+@mixin diamond-variant($size, $background: transparent) {
+  width: 0;
+  height: 0;
+  border: $size solid transparent;
+  border-bottom-color: $background;
+  position: relative;
+  top: -$size;
+
+  &:after {
+    content: "";
+    width: 0;
+    height: 0;
+    position: absolute;
+    left: -$size;
+    top: $size;
+    border: $size solid transparent;
+    border-top-color: $background;
+  }
+}
+
+@mixin square-variant($size, $stroke: 10px, $background: transparent) {
+  width: $size;
+  height: $size;
+  border: $stroke solid $background;
+}
+
+@mixin heart-variant($width, $height, $background: transparent) {
+  $half-width: $width / 2;
+  $half-height: $height / 2;
+
+  position: relative;
+  width: $width;
+  height: $height;
+
+  &:before,
+  &:after {
+    position: absolute;
+    content: "";
+    top: 0;
+    left: $half-width;
+    width: $half-width;
+    height: $height;
+    background: $background;
+    border-radius: $half-width $half-width 0 0;
+    transform: rotate(-45deg);
+    transform-origin: 0 100%;
+  }
+
+  &:after {
+    left: 0;
+    transform: rotate(45deg);
+    transform-origin: 100% 100%;
+  }
+}
+
+@mixin cross-variant($size, $line-height, $background: transparent) {
+  position: relative;
+  background: $background;
+  width: $line-height;
+  height: $size;
+
+  &:after {
+    content: "";
+    position: absolute;
+    background: $background;
+    height: $line-height;
+    left: 50%;
+    top: 50%;
+    width: $size;
+    transform: translate(-50%, -50%);
+  }
+}

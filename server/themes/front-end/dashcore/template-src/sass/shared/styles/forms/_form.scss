@@ -1,0 +1,117 @@
+/* 4.1 Form ======================================================= */
+$input-icon-right-gap: 2.5rem;
+
+form, .form {
+    &[data-response-message-animation] {
+        &,
+        + .response-message {
+            transition: transform .3s ease-in, opacity .3s ease-out;
+        }
+
+        &.submitted + .response-message {
+            z-index: 1;
+            opacity: 1;
+            position: relative;
+        }
+
+        &.submitted,
+        + .response-message {
+            opacity: 0;
+            position: absolute;
+            top: 0;
+        }
+
+        + .response-message {
+            z-index: -1;
+        }
+    }
+
+    &[data-response-message-animation="slide-in-up"] {
+        &.submitted + .response-message {
+            transform: translateY(0);
+        }
+
+        &.submitted,
+        + .response-message {
+            transform: translateY(100%);
+        }
+    }
+
+    &[data-response-message-animation="slide-in-left"] {
+        &.submitted + .response-message {
+            transform: translateX(0);
+        }
+
+        &.submitted,
+        + .response-message {
+            transform: translateX(100%);
+        }
+    }
+
+    &.cozy {
+        .form-group {
+            margin-bottom: $padding-default * .5;
+        }
+    }
+
+    .form-group {
+        label.error {
+            color: theme-color("danger");
+            font-size: $font-size-small;
+        }
+
+        &.has-icon {
+            display: flex;
+            align-items: center;
+            position: relative;
+
+            .form-control {
+                order: 1;
+                padding-right: $input-icon-right-gap;
+                flex: 0 0 100%;
+
+                &.is-valid {
+                    + .icon {
+                        color: theme-color("success");
+                    }
+                }
+
+                &.is-invalid {
+                    + .icon {
+                        color: theme-color("danger");
+                    }
+                }
+            }
+
+            .icon {
+                order: 2;
+                //transform: translateX(-$input-icon-right-gap);
+                margin-right: 15px;
+                margin-left: 12px;
+                position: absolute;
+                right: 0;
+            }
+
+            &.icon-left {
+                .form-control {
+                    order: 2;
+                    padding-left: $input-icon-right-gap;
+                    padding-right: 0;
+                    //transform: translateX(-$input-icon-right-gap);
+                }
+
+                .icon {
+                    order: 1;
+                    //transform: translateX(0);
+                    left: 5px;
+                    right: auto;
+                }
+            }
+        }
+    }
+
+    .error {
+        font-size: $font-size-small;
+        color: $danger;
+    }
+}

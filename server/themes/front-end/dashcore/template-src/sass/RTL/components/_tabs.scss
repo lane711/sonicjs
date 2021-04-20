@@ -1,0 +1,15 @@
+.nav-tabs {
+  &.nav-rounded {
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      .nav-link {
+        &:first-child {
+          border-radius: 0 $nav-tab-outline-radius $nav-tab-outline-radius 0;
+        }
+
+        &:last-child {
+          border-radius: $nav-tab-outline-radius 0 0 $nav-tab-outline-radius;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,133 @@
+/* 4.2 Buttons ======================================================= */
+
+button {
+  &:focus {
+    outline: none;
+  }
+}
+
+.btn {
+  @include btn();
+
+  .icon {
+    margin-right: 8px;
+  }
+}
+
+.btn-link {
+  box-shadow: none;
+  cursor: pointer;
+}
+
+//@each $size, $value in $btn-sizes {
+//  .btn-#{$size} {
+//    @include button-size(
+//      $value,
+//      $value * 2,
+//      $value * 2,
+//      $btn-line-height,
+//      $btn-border-radius
+//    );
+//  }
+//}
+
+.btn-rounded {
+  border-radius: $input-border-rounded;
+}
+
+.btn-circle {
+  @include circle-button-variant(3rem);
+
+  padding: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+
+  @each $size, $value in $btn-sizes {
+    &.btn-#{$size} {
+      @include circle-button-variant($value * 8);
+      font-size: ($value * 3) - 0.125rem;
+    }
+  }
+}
+
+.btn-download {
+  min-width: 200px;
+  text-align: left;
+  display: flex !important;
+  align-items: center;
+
+  p {
+    margin-top: 0;
+    margin-bottom: 0;
+    line-height: 1.45;
+  }
+
+  .small {
+    margin-top: -2px;
+    display: block;
+  }
+}
+
+.input-group {
+  .btn {
+    &:not(:first-child) {
+      margin-left: -1px;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  }
+}
+
+@each $color, $value in $theme-colors {
+  .btn-#{$color},
+  .btn-outline-#{$color} {
+    @include hover-shadow($value);
+  }
+}
+
+.ajax-button {
+  position: relative;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .btn-status {
+    transition: transform 0.3s ease;
+    position: absolute;
+    transform: scaleX(0);
+  }
+
+  .loading {
+    font-size: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    padding: 0;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+    background-color: transparent !important;
+    animation: fa-spin 2s infinite linear;
+    box-shadow: none;
+    outline: 0;
+
+    @each $i, $color in $theme-colors {
+      &.btn-#{$i} {
+        border-top: 1px solid $color;
+        border-right: 1px solid $color;
+      }
+    }
+
+    &.loading-end {
+      opacity: 0;
+      transform: rotate(0deg) scale(0) !important;
+    }
+  }
+
+  .done {
+    transform: scaleX(1);
+  }
+}

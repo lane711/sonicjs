@@ -1,0 +1,34 @@
+$axis-values: x, y, xy;
+
+@mixin center($axis: x, $position: absolute) {
+    position: $position;
+
+    @if ($axis == x) {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    @else if ($axis == y) {
+        top: 50%;
+        transform: translateY(-50%);
+    } @else {
+        left: 50%;
+        top: 50%;
+        transform: translate3d(-50%, -50%, 0);
+    }
+}
+
+@mixin center-flex($justify: center) {
+    display: flex;
+    align-items: center;
+    justify-content: $justify;
+}
+
+@mixin padding-y($size: 1rem) {
+    padding-top: $size;
+    padding-bottom: $size;
+}
+
+@mixin padding-x($size: 1rem) {
+    padding-left: $size;
+    padding-right: $size;
+}

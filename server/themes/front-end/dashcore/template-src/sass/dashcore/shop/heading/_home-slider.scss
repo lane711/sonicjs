@@ -1,0 +1,30 @@
+.shop-home-slider {
+  [class^='swiper-button'] {
+    top: 0;
+  }
+
+  @include media-breakpoint-up($grid-float-breakpoint) {
+    [class^='swiper-button'] {
+      opacity: 0;
+      transition: all .3s ease-in-out;
+      top: 50%;
+    }
+
+    .swiper-button {
+      &-prev {
+        transform: translateX(-100%);
+      }
+
+      &-next {
+        transform: translateX(100%);
+      }
+    }
+
+    &:hover {
+      [class^='swiper-button'] {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+  }
+}

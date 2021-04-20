@@ -1,0 +1,180 @@
+.nav-tabs {
+  .nav-link {
+    letter-spacing: 1.2px;
+    font-size: $nav-tabs-font-size;
+    font-weight: $nav-tabs-font-weight;
+    @include padding-y(1.5rem);
+
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      &:hover {
+        background-color: transparent;
+      }
+    }
+
+    &.disabled,
+    [disabled] {
+      color: $nav-tab-disabled-color !important;
+    }
+
+    &.active {
+      color: $nav-tab-active-border-color;
+    }
+  }
+
+  &.tabs-clean {
+    .nav-link {
+      border-color: transparent;
+
+      .icon {
+        transform: scale(0.95);
+        transition: transform 0.3s linear;
+        margin: auto;
+      }
+
+      &.active {
+        //** active
+        border-bottom-color: $nav-tab-active-border-color;
+
+        .icon {
+          transform: scale(1.25);
+        }
+      }
+    }
+  }
+
+  &.tabs-bordered {
+    .nav-link {
+      &.active {
+        border-top: 2px solid $nav-tab-active-border-color;
+      }
+    }
+  }
+
+  &.nav-outlined {
+    justify-content: space-between;
+    border-bottom: none;
+
+    @include media-breakpoint-up(sm) {
+      justify-content: center;
+    }
+
+    .nav-link {
+      border: 1px solid $nav-tab-outline-border-color;
+      text-align: center;
+      justify-content: center;
+      margin-top: 0.5rem;
+      color: $nav-tab-outline-border-color;
+
+      @include media-breakpoint-up(sm) {
+        + .nav-link {
+          margin-left: -1px;
+        }
+      }
+
+      @include media-breakpoint-up($grid-float-breakpoint) {
+        margin-top: 0;
+        padding: 0.25rem 1.25rem;
+      }
+
+      &.active {
+        background-color: $nav-tab-outline-border-color;
+        color: $nav-tab-link-color-active;
+      }
+
+      &:last-child {
+        border-right: 1px solid $nav-tab-outline-border-color;
+      }
+    }
+
+    &.nav-rounded {
+      .nav-link {
+        border-radius: $nav-tab-outline-radius;
+        margin-right: 0.5rem;
+      }
+
+      @include media-breakpoint-up($grid-float-breakpoint) {
+        .nav-link {
+          border-radius: 0;
+          margin-right: 0;
+
+          &:first-child {
+            border-radius: $nav-tab-outline-radius 0 0 $nav-tab-outline-radius;
+          }
+
+          &:last-child {
+            border-radius: 0 $nav-tab-outline-radius $nav-tab-outline-radius 0;
+          }
+        }
+      }
+    }
+  }
+
+  @include media-breakpoint-up($grid-float-breakpoint) {
+    &.slide {
+      + .tab-content {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow: hidden;
+        //overflow-x: hidden;
+
+        > .tab-pane {
+          transform: translateX(100%);
+          transition: transform 0.3s ease-in-out;
+          margin-right: -100%;
+          display: block;
+          opacity: 0;
+          flex: 1;
+
+          &.active {
+            transform: translateX(0);
+            opacity: 1;
+            margin-right: 0;
+          }
+        }
+      }
+    }
+  }
+
+  @each $color, $value in $theme-colors {
+    &.nav-tabs-#{$color} {
+      .nav-link {
+        &.active {
+          color: $value;
+        }
+      }
+
+      &.tabs-clean {
+        .nav-link {
+          &.active {
+            border-bottom-color: $value;
+          }
+        }
+      }
+
+      &.tabs-bordered {
+        .nav-link {
+          &.active {
+            border-top-color: $value !important;
+          }
+        }
+      }
+
+      &.nav-outlined {
+        .nav-link {
+          border-color: $value;
+          color: $value;
+
+          &.active {
+            background-color: $value;
+            color: $nav-tab-link-color-active;
+          }
+
+          &:last-child {
+            border-right-color: $value;
+          }
+        }
+      }
+    }
+  }
+}

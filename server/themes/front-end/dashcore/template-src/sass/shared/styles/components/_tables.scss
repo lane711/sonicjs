@@ -1,0 +1,75 @@
+.table {
+  thead th {
+    border-bottom: 1px solid $border-color;
+  }
+
+  th,
+  td {
+    border-color: $border-color;
+  }
+}
+
+.table-striped {
+  tbody tr:nth-of-type(odd) {
+    background-color: $striped-bg-color;
+  }
+}
+
+.table-hover {
+  tbody tr {
+    @include hover {
+      background-color: $striped-bg-color-hover;
+    }
+  }
+}
+
+@include media-breakpoint-down($grid-float-breakpoint-max) {
+  .table-responsive {
+    /* Force table to not be like tables anymore */
+    thead,
+    tbody,
+    th,
+    tr {
+      display: block;
+    }
+
+    /* Hide table headers (but not display: none;, for accessibility) */
+    thead tr {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+
+    tr {
+      border: 1px solid $border-color;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Behave like a "row" */
+    td {
+      border: none;
+      border-bottom: 1px solid $border-color;
+      position: relative;
+      //padding-left: 50%;
+      white-space: normal;
+      text-align: left;
+
+      display: flex;
+      align-items: flex-start;
+      flex-direction: column;
+
+      &:before {
+        /* Top/left values mimic padding */
+        white-space: nowrap;
+        text-align: left;
+        font-weight: bold;
+        content: attr(data-title); /* Label the data */
+
+        font-size: $font-size-small;
+        padding-bottom: 0.5rem;
+        color: $table-responsive-title-color;
+        opacity: 0.5;
+      }
+    }
+  }
+}

@@ -1,0 +1,25 @@
+.advanced-automation-solution {
+  background: linear-gradient(-135deg, #53f 25%, #05d5ff 100%);
+
+  &:before {
+    content: '';
+    position: absolute;
+    width: 150%;
+    height: 600px;
+    left: 50%;
+    top: 65%;
+    transform: translate3d(-50%, 10%, 0);
+    background-color: #fff;
+    z-index: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 0 10px rgba(255,255,255,0.5), 0 0 125px 15px rgba(255,255,255,0.5);
+
+    @include media-breakpoint-up(sm) {
+      top: 55%;
+    }
+
+    @include media-breakpoint-up(lg) {
+      top: 50%;
+    }
+  }
+}

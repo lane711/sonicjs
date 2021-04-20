@@ -1,0 +1,54 @@
+/* 2.10 Text ======================================================= */
+
+.italic {
+  font-style: italic !important;
+}
+.underline {
+  text-decoration: underline !important;
+}
+.dotted {
+  border-bottom: 1px dotted;
+}
+.strike-through,
+s {
+  text-decoration: line-through !important;
+  color: $strike-color;
+  font-weight: $font-weight-light;
+}
+.text-wrap {
+  white-space: normal !important;
+}
+
+.bold,
+strong {
+  font-weight: $font-weight-bold !important;
+}
+.semi-bold {
+  font-weight: $font-weight-semi-bold !important;
+}
+.thin {
+  font-weight: $font-weight-lighter !important;
+}
+.light {
+  font-weight: $font-weight-light !important;
+}
+.regular {
+  font-weight: $font-weight-normal !important;
+}
+.extra-bold {
+  font-weight: $font-weight-bolder !important;
+}
+
+// Responsive text wrapping
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @include media-breakpoint-up($breakpoint) {
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+    .text#{$infix}-nowrap {
+      white-space: nowrap !important;
+    }
+    .text#{$infix}-wrap {
+      white-space: normal !important;
+    }
+  }
+}

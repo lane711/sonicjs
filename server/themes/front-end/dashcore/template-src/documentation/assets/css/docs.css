@@ -1,0 +1,250 @@
+/*!
+ * DashCore - Software and Startup HTML Template
+ * Documentation
+ */
+
+body {
+    overflow-x: hidden;
+    font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    padding-top: 50px;
+    font-size: 16px;
+    font-weight: 300;
+    color: #333;
+}
+
+.navbar-brand img {
+    height: 30px;
+}
+
+a,
+a:hover,
+a:focus,
+a:active,
+a.active {
+    outline: 0;
+    color: #18B295;
+    text-decoration: none;
+}
+
+a[data-toggle="collapse"]:hover {
+     color: #0090BC;
+ }
+
+a[data-toggle="collapse"]:before {
+     margin-right: 20px;
+     display: inline-block;
+     font: normal normal normal 14px/1 FontAwesome;
+     font-size: inherit;
+     text-rendering: auto;
+     -webkit-font-smoothing: antialiased;
+     -moz-osx-font-smoothing: grayscale;
+
+     content: '\f062';
+ }
+
+a.collapsed[data-toggle="collapse"]:before {
+     content: '\f063';
+ }
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 20px 0 30px 0;
+    font-weight: 400;
+}
+
+h3 a[data-toggle="collapse"] {
+    color: #333;
+}
+
+h3 a[data-toggle="collapse"]:hover {
+    color: #3f3f3f;
+}
+
+.bold {
+    font-weight: 700;
+}
+.italic { font-style: italic; }
+
+header {
+    text-align: center;
+    color: #fff;
+    background-image: url(../img/mesh.svg);
+    position: relative;
+}
+
+header:before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%; width: 100%;
+    z-index: 0;
+    background: rgba(123, 104, 238, 0.9);
+}
+
+header .container {
+    padding-top: 120px;
+    padding-bottom: 120px;
+}
+
+header a {
+    color: #cbc4f8;
+}
+
+header a:hover,
+header a:active,
+header a:focus {
+    color: #f3f1fd;
+}
+
+section#thanks .container {
+    padding: 40px 0;
+}
+
+section .container > div {
+    padding-bottom: 40px;
+}
+
+section p {
+    text-align: justify;
+    line-height: 24px;
+    margin-bottom: 15px;
+}
+
+footer {
+    color: #fff;
+    padding: 25px 0;
+    background-color: #233140;
+}
+
+.scroll-top {
+    z-index: 1049;
+    position: fixed;
+    right: 2%;
+    bottom: 2%;
+    width: 50px;
+    height: 50px;
+    opacity: 0.4;
+    -webkit-transition: all .3s;
+    -moz-transition: all .3s;
+    transition: all .3s;
+}
+
+.scroll-top:hover {
+    opacity: 1.0;
+}
+
+.scroll-top .btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 100%;
+    line-height: 30px;
+    font-size: 1.5em;
+}
+
+.scroll-top .btn:focus {
+    outline: 0;
+}
+
+.list li {
+    list-style-type: none;
+    margin: 10px 0;
+}
+
+.list-folder li:before,
+.list-code li:before,
+.list-files li:before,
+.list-img li:before {
+    font-family: FontAwesome;
+    font-size: 1.5em;
+    padding: 0 10px 0 0;
+}
+
+.list-folder li:before,
+.list-code li.folder:before {
+    content: "\f07b";
+    color: #FDE12C;
+}
+
+.list-folder li.open:before,
+.list-code li.folder.open:before{
+    content: "\f07c";
+    color: #EAB908;
+}
+
+.list-folder li.file:before {
+    content: "\f016";
+    color: #985f0d;
+}
+
+.list-files li:before,
+.list-code li:before {
+    color: #23527c;
+}
+
+.list-files li:before {
+    content: "\f016";
+}
+
+.list-code li:before {
+    content: "\f1c9";
+}
+.list-img li:before {
+     color: #286090;
+     content: "\f1c5";
+}
+
+.attention {
+    background: #fcf8e3;
+    padding: 10px 15px;
+    display: inline-block;
+    position: relative;
+    border-left: 55px solid #f0ad4e;
+}
+
+.attention:before {
+    font-family: FontAwesome;
+    font-size: 25px;
+    content: "\f071";
+    color: #fff;
+    width: 40px;
+    position: absolute;
+    left: -40px;
+}
+
+.information {
+    background: #E7EEF6;
+    padding: 10px 15px;
+    display: inline-block;
+    position: relative;
+    border-left: 55px solid #0186D5;
+}
+
+.information:before {
+    font-family: FontAwesome;
+    font-size: 25px;
+    content: "\f05a";
+    color: #fff;
+    width: 40px;
+    position: absolute;
+    left: -40px;
+}
+
+.prettyprint .linenums > li {
+    list-style-type: decimal !important;
+    color: #ccc;
+}
+
+.prettyprint .linenums > li.L4,
+.prettyprint .linenums > li.L9 {
+    color: #000;
+}
+
+.img-responsive {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}

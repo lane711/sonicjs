@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>DashCore - Startup, App & Software HTML Template</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="DashCore, Bootstrap4 Software & SAAS HTML Template">
+    <meta name="author" content="5studios.net">
+    <link rel="icon" href="favicon.ico">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+
+    <!-- build:css assets/css/style.css -->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/css/docs.css" rel="stylesheet">
+    <link href="assets/css/prettify.css" rel="stylesheet">
+    <link href="assets/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <!-- endbuild -->
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body id="page-top" class="index">
+    <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#"><img class="logo" src="assets/img/logo.png" alt="DashCore" /></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-main-collapse" aria-controls="navbar-main-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbar-main-collapse">
+            <ul class="navbar-nav ml-auto">
+                <li class="hidden">
+                    <a href="#page-top"></a>
+                </li>
+                <li class="page-scroll nav-item">
+                    <a href="#files" class="nav-link">Files</a>
+                </li>
+                <li class="page-scroll nav-item">
+                    <a href="#html" class="nav-link">HTML</a>
+                </li>
+                <li class="page-scroll nav-item">
+                    <a href="#scss" class="nav-link">SCSS</a>
+                </li>
+                <li class="page-scroll nav-item">
+                    <a href="#scripts" class="nav-link">Scripts</a>
+                </li>
+                <li class="page-scroll nav-item">
+                    <a href="#customize" class="nav-link">Customize</a>
+                </li>
+                <li class="page-scroll nav-item">
+                    <a href="#credits" class="nav-link">Credits</a>
+                </li>
+            </ul>
+        </div>
+        </div>
+    </nav>
+
+    <header>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="display-3">Documentation <small class="bold"> v2.0.2</small></h1>
+
+                    <ul class="nav nav-fill">
+                        <li class="nav-item">
+                            <a href="http://www.5studios.net">5Studios.net</a>
+                        </li>
+                        <li class="nav-item">
+                            08.13.2019
+                        </li>
+                        <li class="nav-item">
+                            <a href="mailto(support@5studios.net)">support@5studios.net</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="thanks">
+        <div class="container">
+            <h4>Thank you for purchasing our template.</h4>
+            <p><span class="bold">DashCore</span> is a Bootstrap 4.x HTML Template ready to showcase your <span class="bold">SaaS, Startup and Software</span> solution. The download includes the complete source files including HTML, CSS, and JavaScript as well as SCSS stylesheets for easy customization.</p>
+            <p>If you have any questions that are beyond the scope of this help file,
+                please feel free to email us via our <a href="http://www.5studios.net#contact" target="_blank">user page contact form</a>, or write direct to
+                <a href="mailto(support@5studios.net)">support@5studios.net</a>, please include your purchase code in order for us to verify you. <b>Thank you so much !!!</b>
+            </p>
+        </div>
+    </section>
+
+    <section id="files">
+        <div class="container">
+            <h2><a data-toggle="collapse" href="#files-structure">Files Structure</a></h2>
+
+            <div id="files-structure" class="collapse show">
+                <p>The template is organized in the following way:</p>
+                <ul class="list list-folder">
+                    <li><b>Compiler</b> - Simple gulp task to compile SASS into CSS.</li>
+                    <li><b>Documentation</b> - Contains full documentation of the template. What you are reading ;)</li>
+                    <li class="open"><b>HTML</b> - Main files of the template. This is what you're going to copy on your server.
+                        <ul class="list list-folder">
+                            <li><b>css</b> - All stylesheets for the template.</li>
+                            <li><b>fonts</b> - Icons fonts used.</li>
+                            <li><b>img</b> - Images for the template.</li>
+                            <li><b>js</b> - Javascript files (plugins and Main template script file).</li>
+                            <li><b>srv</b> - PHP code for forms submission used in template.</li>
+                        </ul>
+                    </li>
+                    <li><b>SASS</b> - Complete SCSS source files.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="html">
+        <div class="container">
+            <h2><a data-toggle="collapse" href="#html-structure">HTML Structure</a></h2>
+
+            <div id="html-structure" class="collapse show">
+                <p>This template is based on <a href="https://html5boilerplate.com/" target="_blank">HTML5 boilerplate</a> structure and the latest version of Twitter Bootstrap framework (4.0 Beta).
+                    Please visit <a href="http://www.getbootstrap.com" target="_blank">http://www.getbootstrap.com</a> if you want to learn more about Bootstrap and it components.
+                </p>
+                <p>The general HTML structure appears in the following format:</p>
+
+                <?prettify linenums=1?>
+                <pre class="prettyprint lang-html linenums=10">
+&lt;nav class="navbar navbar-expand-md navigation sidebar-left"&gt;
+    &lt;section class="container"&gt;
+        &lt;!-- MENU ITEMS --&gt;
+    &lt;/section&gt;
+&lt;/nav&gt;
+
+&lt;main&gt;
+    &lt;header class="heading"&gt;
+        &lt;div class="container"&gt;
+            &lt;!-- HEADING CONTENT --&gt;
+        &lt;/div&gt;
+    &lt;/header&gt;
+&lt;/main&gt;
+
+&lt;footer&gt;
+    &lt;div class="container"&gt;
+        &lt;!-- FOOTER CONTENT --&gt;
+    &lt;/div&gt;
+&lt;/footer&gt;
+                </pre>
+            </div>
+        </div>
+    </section>
+
+    <section id="scss">
+        <div class="container">
+            <h2><a data-toggle="collapse" href="#scss-structure">SCSS Structure</a></h2>
+
+            <div id="scss-structure" class="collapse show">
+                <p>This template uses <a href="http://sass-lang.com/" target="_blank">SCSS</a> for stylesheets. For more information about SCSS, visit <a href="http://sass-lang.com/guide">http://sass-lang.com/guide</a>.</p>
+                <p>Template SCSS files are located in the <b>/SASS</b> directory. Vendor CSS files are located in the <b>/html/css</b> directory.</p>
+                <p>We need to compile SCSS files to CSS to make them usable. All compiled files are located in the <b>/css</b> folder.</p>
+                <p>All SCSS files are separated by component types for easy customization.
+                    There is a main file for the theme <code>style.scss</code> file which has references to all <b>.scss</b> files that compose the theme.
+                    Those files use <a href="https://getbootstrap.com" target="_blank">Bootstrap</a> variables and mixins in order to compile to CSS.</p>
+                <p>You can modify those files to include additional style or remove any unwanted reference, one use case could be to leave the variation of a section you like and remove references to the others.</p>
+                <p class="attention">Do not remove references to Bootstrap and FontAwesome components as it will not compile.</p>
+
+                <pre class="prettyprint lang-css linenums">
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/variables";
+@import "font-awesome/web-fonts-with-css/scss/variables";
+@import "angled-edges/angled-edges";
+
+// Import core stuff
+@import "style/variables";
+@import "style/reset";
+@import "style/__mixins";
+@import "style/__navigation";
+@import "style/__forms";
+@import "style/__utilities";
+
+// Import styles
+//@import "style/loader";
+@import "style/mockup";
+@import "style/icons";
+@import "style/__section";
+@import "style/__pricing";
+@import "style/__heading";
+@import "style/custom";
+            </pre>
+            </div>
+        </div>
+    </section>
+
+    <section id="scripts">
+        <div class="container">
+            <h2><a data-toggle="collapse" href="#scripts-structure">Scripts</a></h2>
+
+            <div id="scripts-structure" class="collapse show">
+                <h3><a data-toggle="collapse" href="#scripts-javascript" class="collapsed">Javascript</a></h3>
+                <div id="scripts-javascript" class="collapse collapsed" data-parent="#scripts-structure">
+                    <p>This template uses several JS files. Those files are loaded at the bottom of the page to increase the site speed and rendering.</p>
+                    <p>Some of the javascript files used are:</p>
+                    <ul class="list list-code">
+                        <li><b>jquery.js</b> - Javascript framework library. Used for almost every javascript code.</li>
+                        <li><b>bootstrap.js</b> - Bootstrap framework functions.</li>
+                        <li><b>main.js</b> - Contains all the scripts we are using in the template. Please take a look at this file as it has comments in it to get detailed understanding of this.</li>
+                    </ul>
+                    <p class="information page-scroll">Please refer to <a href="#credits">Credits</a> section to see the complete list of js files.</p>
+                </div>
+
+                <h3><a data-toggle="collapse" href="#scripts-server" class="collapsed">Server side</a></h3>
+                <div id="scripts-server" class="collapse collapsed" data-parent="#scripts-structure">
+                    <p>We use some PHP scripts to process the submission of the forms on the template</p>
+                    <ul class="list list-code">
+                        <li class="folder open"><b>srv</b> - Contains all components we use to process the requests
+                            <ul class="list list-code">
+                                <li class="folder"><b>components</b> - Contains the core components we use</li>
+                                <li class="folder"><b>integration</b> - Contains the main class to interact with <a href="http://mailchimp.com/" target="_blank">MailChimp</a> API</li>
+                                <li class="folder"><b>models</b> - We use OOP in php, here are the models of each form in the template</li>
+
+                                <li><b>contact</b> - Contains the logic for the submission of Contact Form</li>
+                                <li><b>subscribe</b> - Contains the logic for the submission of Subscribe Form</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <p>Every form in the HTML has an <code>action</code> attribute with the path relative to the PHP file which will process it</p>
+                    <pre class="prettyprint lang-html linenums">
+&lt;form id="form-contact" action="srv/contact.php" data-response-message-animation="slide-in-up"&gt;
+    ...
+&lt;/form&gt;
+                    </pre>
+                    <p>By default we left it this way, you can move the files to another location or rename them as you like, if you do that don't forget to update the <code>action</code> attribute to reflect your changes. Please refer to the
+                        <a href="#custom-forms">forms</a> section for additional details on the file structure and PHP code</p>
+                </div>
+
+                <h3><a data-toggle="collapse" href="#scripts-mailchimp" class="collapsed">MailChimp</a></h3>
+                <div id="scripts-mailchimp" class="collapse collapsed" data-parent="#scripts-structure">
+                    <p>
+                        We use <b>MailChimp API 3.0</b> to connect to the service, our implementation only include
+                        <a href="http://developer.mailchimp.com/documentation/mailchimp/reference/lists/members/" target="_blank">Adding a member to a list</a>,
+                        for this sake we create a class in <code>/srv/integration/MailChimp.php</code> file.
+                    </p>
+                    <p>We implement this class to make the subscription process in <code>subscribe.php</code>. There you must provide <b>API_KEY</b> and <b>LIST_ID</b>
+                    with your own. We assume you know how to get those values.</p>
+
+                    <pre class="prettyprint lang-php linenums">
+define("LIST_ID", "[YOUR LIST ID]");
+define("API_KEY", "[YOUR API KEY]");
+                    </pre>
+                    <p>This is the only change needed to make the script to work.</p>
+                </div>
+
+                <h3><a data-toggle="collapse" href="#scripts-cookielaw" class="collapsed">Cookie-Law</a></h3>
+                <div id="scripts-cookielaw" class="collapse collapsed" data-parent="#scripts-structure">
+                    <p>
+                        We use <a href="https://cookieconsent.insites.com/" target="_blank">Cookie consent</a>, plugin to help you comply with the hideous EU Cookie Law and not make you want to hurt yourself in the process.
+                    </p>
+                    <p>If you're planning to use the plugin, we encourage you to read its documentation page <a href="https://cookieconsent.insites.com/documentation/about-cookie-consent/" target="_blank">here</a>.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="customize">
+        <div class="container">
+            <h2><a data-toggle="collapse" href="#customization">Customization</a></h2>
+
+            <div id="customization" class="collapse show">
+                <p>We explain how easy is to customize the template through HTML, SCSS or JS changes to suit your needs.</p>
+
+                <h3><a data-toggle="collapse" href="#custom-fonts" class="collapsed">Fonts</a></h3>
+                <div id="custom-fonts" class="collapse collapsed" aria-expanded="false">
+                    <p>We use Google <b>Open Sans</b> and <b>Lato</b> fonts by default.</p>
+                    <p>To change the embedded font, open the HTML page you want and locate the <b>head</b> section and change the font as you wish. Make sure to change the font names in CSS files as well.</p>
+                    <pre class="prettyprint lang-css linenums">
+&lt;link href="https://fonts.googleapis.com/css?family=Lato:300,400|Open+Sans:300,400,700" rel="stylesheet"&gt;
+                    </pre>
+
+                    <p>Once you have changed the font, look for <code>$font-family-template</code> and <code>$font-family-complementary</code> variable in <b>/SCSS/_variables.scss</b> and adjust properly.</p>
+                    <pre class="prettyprint lang-css linenums">
+$font-family-template: "Open Sans", $font-family-base;
+$font-family-complementary: "Lato", "Open Sans", $font-family-template;
+                    </pre>
+                </div>
+
+                <h3><a data-toggle="collapse" href="#custom-color-scheme" class="collapsed">Color scheme</a></h3>
+                <div id="custom-color-scheme" class="collapse collapsed">
+                    <p>This template is ready to use any colors scheme, for wich we use SCSS to create colors pallete and process the CSS dynamically and show your colors right away.</p>
+                    <p>You change your colors scheme in <code>/SCSS/_variables.scss</code>.</p>
+                    <p>We use 6 main colors for each scheme which can be completely customized to fit your needs.</p>
+                    <p>To include your own colors just change variables to your values and compile.</p>
+                    <pre class="prettyprint lang-css linenums">
+$color-1: #ffffff !default;
+$color-2: #646f79 !default;
+$color-3: #7b68ee !default;
+$color-4: #028fff !default;
+$color-5: #143350 !default;
+$color-6: #f4f8fb !default;
+            </pre>
+                </div>
+
+                <h3><a data-toggle="collapse" href="#custom-overlay" class="collapsed">Overlay</a></h3>
+                <div id="custom-overlay" class="collapse collapsed">
+                    <h4>Overlay</h4>
+                    <p>In addition to the image cover background, each section may include an overlay. There are so many colors of overlays as defined in the colors scheme, all named by its index (.overlay-1, .overlay-2, .overlay-3 and so on).
+                        You can choose the level of opacity 10 to 90 by using the <code>alpha-?</code> css class.
+                    </p>
+                    <p>Make sure you have included <code>.overlay</code> class.</p>
+                    <pre class="prettyprint lang-html linenums">
+&lt;div class="overlay overlay-4 alpha-9"&gt;
+    &lt;!-- CONTENT HERE --&gt;
+&lt;/div&gt;
+                    </pre>
+                </div>
+
+                <h3><a data-toggle="collapse" href="#custom-forms" class="collapsed">Forms</a></h3>
+                <div id="custom-forms" class="collapse collapsed">
+                    <p>DashCore comes with fully functional form submission. Every form has an <code>action</code> attribute, this is the script which will process the form in server side. We have set up those scripts in <code>srv</code> folder.</p>
+
+                    <pre class="prettyprint lang-html linenums">
+&lt;form action="srv/subscribe.php" class="form form-subscribe" method="post" data-response-message-animation="slide-in-left"&gt;
+    &lt;input type="text" name="Contact[fullName]"/&gt;
+    ...
+&lt;/form&gt;
+
+&lt;div class="response-message"&gt;
+    &lt;h4 class="bold">&lt;i class="icon font-md inline fa-envelope-o">&lt;/i&gt;One last step!!!&lt;/h4&gt;
+    &lt;small>To complete the subscription process, please click the link in the email we just sent you.&lt;/small&gt;
+&lt;/div>
+                    </pre>
+
+                    <p>The name of the inputs should be in array format, for example: <code>Contact[fullName]</code>, this way is easier to read on the server, and bind the values into the corresponding model.
+                    The value inside the squared brackets is the name of the attribute in your model, it is case sensitive.</p>
+
+                    <p>Each script has references to the core libraries we have developed.</p>
+                    <pre class="prettyprint lang-php linenums">
+// srv/suscribe.php
+include('./integration/MailChimp.php');
+include('./models/SubscribeModel.php');
+                    </pre>
+
+                    <pre class="prettyprint lang-php linenums">
+// srv/models/SubscribeModel.php
+namespace models;
+
+include __DIR__ . '/../components/Model.php';
+use components\Model;
+                    </pre>
+
+                    <p>All of these references are located relatively to the scripts. You can change the location of the files or rename them, by doing this you must update the files to reflect your changes.</p>
+                    <p>Note how each file has <code>include</code> statements, and how the <code>path</code> is relative to its container, this way PHP knows where to find those references.</p>
+
+                    <h4>data-response-message-animation</h4>
+                    <p class="information">Advice <code>response-message-animation="slide-in-left"</code> in the <code>form</code> tag.</p>
+                    <p>This attribute indicates the notification message animation should be when a response is available. If the attribute is present you must provide an element with <code>response-message</code> css class next to the form.</p>
+                    <p>When the response is available the message will replace the form with the animation you indicated. At this time only <code>slide-in-left</code> animation is available, but you can create your owns. <code>__forms.scss</code> is where you may want to create the animations for your forms</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="special-elements">
+        <div class="container">
+            <h2><a data-toggle="collapse" href="#special-topics">Special Topics</a></h2>
+
+            <div id="special-topics" class="collapse show">
+                <p>As long as we improve and extend the template, some topics may need extra explanation in order for you to fully customize them.</p>
+                <h3>Perspective Mockups - saas.html variation</h3>
+
+                <p>We use the button pointed out bellow as a reference to relocate the page header mockups when the page is viewed on mobile devices.</p>
+
+                <div class="row">
+                    <div class="col-md-8">
+                        <figure class="card">
+                            <img src="assets/img/variations/saas/desktop.png" class="img-responsive" alt="">
+                            <div class="card-body">
+                                <p class="small bold italic">Perspective mockups for desktop</p>
+                            </div>
+                        </figure>
+                    </div>
+
+                    <div class="col-md-4">
+                        <figure class="card">
+                            <img src="assets/img/variations/saas/mobile.png" class="img-responsive" alt="">
+                            <div class="card-body">
+                                <p class="small bold italic">Perspective mockups for mobile devices</p>
+                            </div>
+                        </figure>
+                    </div>
+                </div>
+
+                <p>There are several considerations you must attend when customizing this variation</p>
+                <ul class="list">
+                    <li>
+                        <h6>Removing the <span class="bold">Learn More</span> button</h6>
+                        <p>
+                            If you would want to remove the <code>.learn-more</code> button, you will need to add another element, preferable within the same section and/or position as the button was.
+                            This is because this element is used as a reference for relocating the mockups.
+                        </p>
+                        <figure class="card">
+                            <img src="assets/img/variations/saas/top-reference-code.png" class="img-responsive" alt="">
+                            <div class="card-body">
+                                <p class="small bold italic">Code snippet to reposition the perspective-mockups</p>
+                            </div>
+                        </figure>
+                        <p>The code snippets above shows how the <code>.learn-more</code> button is used as a reference to reposition the mockups, so if removed the code will break on line 52</p>
+                    </li>
+                    <li>
+                        <h6>Changing the button css class</h6>
+                        <p>If you change the default css class for this button, please be sure to change it on the javascript as well thus the element can be found and avoid any error or misbehavior.</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="credits">
+        <div class="container">
+            <h2><a data-toggle="collapse" href="#credits-list">Credits</a></h2>
+
+            <div id="credits-list" class="collapse show">
+                <p>The following resources were used to create this template. We are much obligated to their developers.</p>
+                <h3>Scripts</h3>
+                <ul class="list">
+                    <li><a href="http://jquery.com" target="_blank">jQuery</a> for almost everything written in javascript.</li>
+                    <li><a href="http://getbootstrap.com" target="_blank">Bootstrap framework</a> for user interface interactions.</li>
+                    <li><a href="http://jqueryvalidation.org" target="_blank">jQuery validation plugin</a> to validate contact form submission.</li>
+                    <li><a href="http://gsgd.co.uk/sandbox/jquery/easing">jQuery easing</a> for smooth scrolling effects.</li>
+                    <li><a href="https://github.com/nolimits4web/Swiper.git">Swiper</a> for image slider elements.</li>
+                    <li><a href="git://github.com/michalsnik/aos.git">AOS</a> for animate elements when scrolling.</li>
+                    <li><a href="https://github.com/seiyria/bootstrap-slider">Bootstrap slider</a>, included in pricing sections.</li>
+                </ul>
+
+                <h3>CSS</h3>
+                <ul class="list">
+                    <li><a href="http://getbootstrap.com">Bootstrap framework</a> for CSS styles and SASS integration.</li>
+                    <li><a href="http://fortawesome.github.io/Font-Awesome/">Font Awesome</a> awesome icons font.</li>
+                </ul>
+
+                <h3>Images</h3>
+                <p>Any Images or logos used in previews are not included in this item or final purchase and you need to contact authors to get permission in case you want to use them in your commercial or non-commercial projects.</p>
+                <p>For some of them we are allowed to make reference, in case you wanted to use them in your design</p>
+                <ul class="list">
+                    <li><a href="https://pixabay.com" target="_blank">Pixabay</a> for the images you see across sections.</li>
+                    <li><a href="https://svgporn.com" target="_blank">SVGPorn</a> for the logos.</li>
+                </ul>
+
+                <h3>Icons</h3>
+                <p>The SVG icons you saw in the preview were taken from <a href="https://www.flaticon.com">https://flaticon.com</a>, those icons free to download with attribution, we used the ones in the following links.</p>
+                <ul class="list">
+                    <li>
+                        <a href="https://www.flaticon.com/packs/digital-marketing-10" target="_blank">Digital Marketing</a>
+                    </li>
+                    <li>
+                        <a href="http://www.gsfdcy.com/bubbles-wallpapers.html" target="_blank">Backgrounds</a>
+                    </li>
+                    <li>
+                        <a href="https://www.flaticon.com/packs/business-seo" target="_blank">SEO</a>
+                    </li>
+                    <li>
+                        <a href="https://es.pngtree.com/freepng/dotted-world-map_2494352.html" target="_blank">Worldmap</a>
+                    </li>
+
+                    <a href='https://www.freepik.com/free-vector/flat-colorful-frame-background_1618035.htm'>Designed by Freepik</a>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <footer class="text-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    Copyright &copy; <a href="http://www.5studios.net">5studios.net</a> 2018
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="scroll-top page-scroll visible-xs visible-sm">
+        <a class="btn btn-primary" href="#page-top">
+            <i class="fa fa-angle-up"></i>
+        </a>
+    </div>
+
+    <!-- build:js assets/js/lib.js -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/popper.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/jquery.easing.min.js"></script>
+    <script src="assets/js/prettify.js"></script>
+    <script src="assets/js/main.js"></script>
+    <!-- endbuild -->
+</body>
+
+</html>

@@ -1,0 +1,126 @@
+/* 6.4 Testimonials ======================================================= */
+.singl-testimonial {
+  .image-background + .text {
+    margin-bottom: 3rem;
+
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      margin-bottom: 0;
+    }
+  }
+
+  .image-background {
+    min-height: 390px;
+  }
+
+  .testimonial-img {
+    max-width: 70%;
+
+    &.decorated {
+      position: relative;
+
+      &:before {
+        position: absolute;
+        content: "";
+        width: 50%;
+        height: 50%;
+        top: 0;
+        left: 0;
+        background-color: $singl-testimonial-img-decorated-bg-color;
+        transform: translate3d(-25%, -25%, 0);
+        z-index: -1;
+        border-radius: $border-radius;
+      }
+    }
+  }
+
+  .user-review {
+    overflow: hidden;
+    transform: translateY(-20%);
+
+    @include media-breakpoint-up(lg) {
+      transform: translate(-25%, 25%);
+    }
+
+    blockquote {
+      &:before {
+        transform: translate(-70%, 0);
+        font-size: 6rem;
+        opacity: 0.3;
+      }
+
+      @include media-breakpoint-up(lg) {
+        font-size: $lead-font-size;
+      }
+    }
+
+    .shape-wrapper {
+      z-index: -1;
+    }
+
+    .svg-review-bottom {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      transform: translateX(-45%);
+
+      &.back {
+        transform: translate(-49%, -1%) scale(1.1);
+        z-index: 0;
+      }
+
+      &.left {
+        transform: rotate(-45deg) translate(-146%, -143%) scale(1.7);
+        z-index: -1;
+      }
+    }
+  }
+
+  .reviews-navigation {
+    position: absolute;
+    top: 90%;
+    right: 0;
+    display: flex;
+    z-index: 1;
+    margin-top: 2rem;
+
+    .reviews-nav {
+      cursor: pointer;
+      background-color: $singl-testimonial-reviews-nav-bg-color-hover;
+      color: $singl-testimonial-reviews-nav-color-hover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+
+      @include media-breakpoint-up(lg) {
+        background-color: $singl-testimonial-reviews-nav-bg-color;
+        color: $singl-testimonial-reviews-nav-color;
+
+        &:hover {
+          background-color: $singl-testimonial-reviews-nav-bg-color-hover;
+          color: $singl-testimonial-reviews-nav-color-hover;
+        }
+      }
+    }
+
+    .reviews-nav-prev {
+      margin-right: 2rem;
+    }
+
+    @include media-breakpoint-down(md) {
+      width: 100%;
+      justify-content: center;
+    }
+
+    @include media-breakpoint-up(lg) {
+      top: 10px;
+      right: 13%;
+    }
+  }
+}
+
+.signature {
+  max-width: 140px;
+}

@@ -1,0 +1,115 @@
+/* 6.1 General styles ======================================================= */
+section,
+.section {
+  position: relative;
+
+  [class^="container"] {
+    padding-top: $section-padding / 2;
+    padding-bottom: $section-padding / 2;
+    position: relative;
+
+    &.bring-to-front {
+      z-index: 9;
+    }
+
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      padding-top: $section-padding;
+      padding-bottom: $section-padding;
+    }
+  }
+
+  .container-wide {
+    overflow-x: hidden;
+
+    .row {
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+  }
+
+  &.shadow {
+    z-index: 1;
+  }
+}
+
+.section-heading {
+  margin-bottom: $padding-default;
+  position: relative;
+
+  h2 {
+    margin-top: 0;
+    margin-bottom: 0; //($padding-default / 2);
+    font-weight: $font-weight-normal;
+    font-size: $font-size-section-heading;
+  }
+
+  p {
+    font-weight: $font-weight-light;
+  }
+}
+
+.partners {
+  img {
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      opacity: 0.5;
+      transform: scale(0.8);
+      transition: all 0.3s ease-in-out;
+
+      &:hover {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  }
+}
+
+.centered-screen {
+  position: relative;
+
+  .screen-highlight {
+    bottom: 45px;
+  }
+
+  .message {
+    bottom: 130px;
+    z-index: 1;
+  }
+}
+
+.off-left-background {
+  background-position: 20px 20px;
+  background-size: 60px;
+
+  @include media-breakpoint-up($grid-float-breakpoint) {
+    background-position: -60px 20px;
+    background-size: contain;
+    //transform: translate3d(0, 0, 0);
+    //transition: all 0.4s ease;
+
+    &:hover {
+      background-position: -30px 0px;
+      //transform: translate3d(0, -10px, 0); // lift the card up
+    }
+  }
+}
+
+.send-and-receive {
+  .off-left-background {
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      background-position: -30px 20px;
+
+      &:hover {
+        background-position: -10px 0px;
+      }
+    }
+  }
+}
+
+.lift-hover {
+  transform: translate3d(0, 0, 0);
+  transition: all .4s ease;
+
+  &:hover {
+    transform:translate3d(0, -10px, 0);
+  }
+}

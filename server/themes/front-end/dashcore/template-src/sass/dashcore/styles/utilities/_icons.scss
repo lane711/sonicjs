@@ -1,0 +1,82 @@
+/* 5.3 Icons ======================================================= */
+.icon-shape {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .shape,
+  .shape-lg {
+    max-width: $font-size-large;
+  }
+
+  .shape-xl {
+    max-width: $font-size-extra-large;
+  }
+
+  .shape-xxl {
+    max-width: $font-size-xx-large;
+  }
+
+  .icon {
+    margin: 0;
+  }
+}
+
+.list-icon {
+  list-style-type: none;
+
+  li {
+    > * {
+      display: table-cell;
+    }
+
+    i {
+      padding-right: 15px;
+    }
+  }
+}
+
+.icon-block {
+  padding: $padding-default * 0.25;
+  margin-bottom: $padding-default * 0.25;
+
+  p {
+    margin-top: 10px;
+  }
+}
+
+.icon-anime {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  width: 90px;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+
+  .icon {
+    margin: 0;
+  }
+
+  .shape {
+    width: 50%;
+    height: 100%;
+    z-index: -1;
+    padding: 1.5rem 0;
+    margin-left: -25%;
+
+    &.circle {
+      border-radius: 50%;
+    }
+
+    &.outlined {
+      border-style: solid;
+    }
+  }
+
+  @include media-breakpoint-up($grid-float-breakpoint) {
+    margin-right: 0;
+    margin-left: 0;
+  }
+}

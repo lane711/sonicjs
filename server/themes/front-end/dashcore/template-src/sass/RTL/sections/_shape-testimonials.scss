@@ -1,0 +1,19 @@
+.shape-testimonials {
+  blockquote {
+    text-align: right;
+
+    .quote {
+      left: auto;
+      right: 0;
+    }
+  }
+
+  .shape-wrapper {
+    .shape {
+      @include media-breakpoint-up($grid-float-breakpoint) {
+        transform: translateX(0);
+        //righleft: 50%;
+      }
+    }
+  }
+}

@@ -1,0 +1,79 @@
+/* ==========================================================================
+    [5. GENERAL CONTENT STYLES]
+========================================================================== */
+
+/* 5.1 Page Loader ======================================================= */
+
+$split-time: 0.9s;
+
+.pace {
+  pointer-events: none;
+  user-select: none;
+
+  .pace-progress {
+    display: none;
+  }
+}
+
+.pace-inactive {
+  display: none;
+}
+
+body {
+  &:not(.pace-done) {
+    main,
+    .navigation {
+      opacity: 0;
+    }
+  }
+
+  &.pace-done {
+    .page-loader {
+      opacity: 0;
+      visibility: hidden;
+
+      img {
+        display: none;
+      }
+    }
+  }
+}
+
+.page-loader {
+  height: 100vh;
+  width: 100%;
+  position: fixed;
+  z-index: 1000;
+  margin: 0;
+  transition: opacity 0.2s linear ($split-time * 0.5),
+    visibility 0.2s linear ($split-time * 0.5);
+  background-color: #102040;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .container {
+    .logo {
+      display: block;
+      margin: auto;
+      max-width: 150px;
+    }
+  }
+}
+
+@keyframes fading-logo {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.fading-logo {
+  animation: fading-logo normal 4.5s infinite ease-in-out;
+  // transition: opacity .5s ease;
+}

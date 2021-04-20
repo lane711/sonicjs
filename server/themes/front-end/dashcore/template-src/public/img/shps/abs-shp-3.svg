@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1013.1px" height="722.4px" viewBox="-170.5 -29.7 1013.1 722.4" enable-background="new -170.5 -29.7 1013.1 722.4" xml:space="preserve">
+	<path fill-rule="evenodd" clip-rule="evenodd" fill="#F9F9F9" d="M375.4,607.6c-34.8-29.1-8-75.7-1.7-88.4c4-8.1,9.8-15.7,16.1-23c10.2-11.9,21.4-23.2,31.8-35c6.7-7.6,13-15.4,17.7-23.8c6.5-11.8,9.6-23.8,9.6-35.9c0-5.8-0.9-11.5-1.9-17.2c-1.1-6.1-3.2-11.8-5.1-17.6c-2-6-4.6-11.8-6.9-17.7c-1.7-4.4-3.3-8.8-5-13.2c-2.1-5.4-3.7-10.9-5-16.5c-2.7-11.1-3.9-22.5-1.7-34.3c2.2-11.8,8.2-22.8,17.5-33.1c13.2-14.6,30.3-25.6,49.7-34.6c15-6.9,30.5-12.9,46.9-15.7c86.3-14.7,117.7,21.8,147.8-38.3c25.7-51.8,201.1,200.1,147.3,353.3C778.5,669.8,667.6,376,678.8,585.9S410.2,636.6,375.4,607.6z"/>
+	<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="856.2407" y1="82.1597" x2="-211.8662" y2="412.1927">
+		<stop  offset="0" style="stop-color:#7941FF"/>
+		<stop  offset="1" style="stop-color:#A984FF"/>
+	</linearGradient>
+	<path fill-rule="evenodd" clip-rule="evenodd" fill="url(#SVGID_1_)" d="M-145.4,629.8c-49.9-41.7-11.5-108.6-2.5-126.9c3-6.1,193.5-71.5,216.2-168.1c20.7-88.3-446.3,373-120-215.6c200.5-361.6,347.1,65.4,553.1-58.3c135.2-81.2,86.7,304.9,9.4,438.3c-80,138-155.6-45.6-265.2-31.5C80.2,488.7-115.4,654.9-145.4,629.8z"/>
+	<g>
+		<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="267.4756" y1="-64.0631" x2="-83.5595" y2="596.0029">
+			<stop  offset="0" style="stop-color:#7941FF"/>
+			<stop  offset="1" style="stop-color:#A984FF"/>
+		</linearGradient>
+		<path fill-rule="evenodd" clip-rule="evenodd" fill="url(#SVGID_2_)" d="M299.7,256c0.1-63.3-25.3-161-60.6-244.7C146.1-41,54.8-71.4-51.7,120.7c-63.9,115.3-97.4,190.3-110.1,237c0.8,14.9-1.3,30.6-5.4,46.6c14.4,87.9,250.3-131.4,235.5-68.1c-1.6,7-4.1,13.7-7.4,20.4C149.9,300.2,299.5,411.5,299.7,256z"/>
+	</g>
+</svg>

@@ -1,0 +1,41 @@
+.wallet {
+  max-width: 330px;
+  margin: 0 auto;
+  position: relative;
+
+  &,
+  .card {
+    border: 0;
+    border-radius: $border-radius * 4;
+  }
+
+  .card-details {
+    border-top-right-radius: $border-radius * 6;
+    border-top-left-radius: $border-radius * 6;
+  }
+
+  .btn-place-order {
+    border-radius: 0 0 $border-radius * 4 $border-radius * 4;
+  }
+}
+
+.smart-wallet {
+  .shape {
+    position: absolute;
+    z-index: 1;
+
+    &.pattern {
+      z-index: 0;
+
+      &-dots {
+        bottom: 20rem;
+        left: 55%;
+        width: 250px;
+        height: 50%;
+        transform: translateX(100%);
+
+        @include pattern-dots(2px, 20px, $gray-300);
+      }
+    }
+  }
+}

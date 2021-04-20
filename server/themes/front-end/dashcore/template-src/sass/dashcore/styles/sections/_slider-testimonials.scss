@@ -1,0 +1,71 @@
+.slider-testimonials {
+  .swiper-button {
+    background-image: none;
+    border-radius: 50%;
+    background-color: $white;
+    width: 3rem;
+    height: 3rem;
+    outline: none;
+    @include center-flex();
+
+    &-prev {
+      left: 0;
+      top: 100%;
+
+      @include media-breakpoint-up($grid-float-breakpoint) {
+        top: 50%;
+        transform: translateX(-50%);
+      }
+    }
+
+    &-next {
+      right: 0;
+      top: 0;
+
+      @include media-breakpoint-up($grid-float-breakpoint) {
+        top: 50%;
+        transform: translateX(50%);
+      }
+    }
+  }
+
+  .image-background {
+    max-height: 500px;
+
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      max-height: 580px;
+    }
+
+    @include media-breakpoint-up(xl) {
+      max-height: 500px;
+    }
+  }
+
+  .card-body {
+    padding: 4rem 2.5rem;
+  }
+
+  .divider {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    transform-origin: 100% 0;
+    transform: rotate(-90deg);
+    display: none;
+
+
+    div {
+      @include angled-edge("outside top", "upper right", $white, 150);
+    }
+
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      width: 200%;
+      display: block;
+    }
+
+    @include media-breakpoint-up(lg) {
+      width: 150%;
+    }
+  }
+}

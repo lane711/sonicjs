@@ -1,0 +1,76 @@
+.smart-business-header {
+  background-color: $smart-business-heading-bg-color;
+
+  .container {
+    padding-top: 12rem;
+    padding-bottom: 6rem;
+
+    @include media-breakpoint-up(lg) {
+      padding-bottom: 12rem;
+    }
+  }
+
+  .shape-background {
+    z-index: 0;
+    opacity: 0.2;
+  }
+
+  .shape-top {
+    top: 0;
+    background-image: linear-gradient(-57deg, #4a61d1 0%, #5c52d5 100%);
+    transform: rotate(30deg) translate3D(-45%, -45%, 0);
+    max-height: 560px;
+  }
+
+  .shape-right {
+    background-image: linear-gradient(-57deg, #5634d0 0%, #4a61d1 100%);
+    left: 93%;
+  }
+
+  .main-shape-wrapper {
+    width: 60%;
+
+    @include media-breakpoint-down(md) {
+      @include center(x, relative);
+    }
+
+    @include media-breakpoint-up(lg) {
+      @include center(y);
+      right: 0;
+      width: 40%;
+    }
+
+    @include media-breakpoint-up(xl) {
+      transform: translateY(-50%) scale(0.75); // translateY is needed to not override transform from lower resolutions and keep the shape centered
+    }
+  }
+
+  .main-background {
+    @media (min-width: 1601px) {
+      transform: translate3d(0, -3%, 0);
+    }
+  }
+
+  .anim {
+    position: absolute;
+    width: 15%;
+    max-width: 80px;
+
+    &.anim-1 {
+      top: 56%;
+      right: 5%;
+      animation-duration: 3.4s;
+    }
+
+    &.anim-2 {
+      top: 10%;
+      right: 58%;
+    }
+
+    &.anim-3 {
+      top: 33%;
+      right: 22%;
+      animation-duration: 3.8s;
+    }
+  }
+}

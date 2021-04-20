@@ -1,0 +1,32 @@
+{
+  "name": "dashcore",
+  "version": "1.0.2",
+  "description": "DashCore - Software, Startup & SAAS HTML5 Templae + Dashboard",
+  "main": "",
+  "scripts": {
+    "build": "gulp sass",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "5studios.net",
+  "devDependencies": {
+    "del": "^3.0.0",
+    "gulp": "^4.0.0",
+    "gulp-autoprefixer": "^6.0.0",
+    "gulp-clean-css": "^4.0.0",
+    "gulp-rename": "^1.4.0",
+    "gulp-sass": "^4.0.2"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "homepage": "http://www.5studios.net",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.7.2",
+    "angled-edges": "^2.0.0",
+    "bootstrap": "^4.3.1"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ]
+}

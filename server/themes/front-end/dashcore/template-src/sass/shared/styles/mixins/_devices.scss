@@ -1,0 +1,24 @@
+@mixin iphone-x-size ($scale) {
+  $border-width: 15px * $scale;
+  $phone-width: 375px * $scale;
+  $border-radius: 40px * $scale;
+  $notch-width: 209px * $scale;
+  $notch-height: 35px * $scale;
+  $notch-border-radius: 20px * $scale;
+  
+  max-width: $phone-width;
+  border-radius: $border-radius;
+  padding: $border-width;
+
+  .screen {
+    img {
+      border-radius: $border-radius / 2;
+    }
+  }
+
+  .notch {
+    border-radius: $notch-border-radius;
+    width: $notch-width;
+    height: $notch-height;
+  }
+}

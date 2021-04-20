@@ -1,0 +1,5 @@
+@mixin pattern-dots($dot-size, $dot-gap, $dot-color: $white, $bg-color: transparent) {
+  background-color: $bg-color;
+  background-image: radial-gradient($dot-color $dot-size, transparent $dot-size);
+  background-size: $dot-gap $dot-gap;
+}

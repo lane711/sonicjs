@@ -1,0 +1,40 @@
+.app-safety {
+  .shape {
+    position: absolute;
+
+    &-circle {
+      left: 5%;
+      top: 65%;
+
+      div {
+        @include circle-variant(100px, $safe-circle-bg-color);
+      }
+
+      @include media-breakpoint-up($grid-float-breakpoint) {
+        left: 15%;
+        top: 5%;
+      }
+    }
+
+    &-ring {
+      left: 50%;
+      top: 25%;
+      transform: translate(25%, 0);
+
+      div {
+        opacity: 0.15;
+        @include ring-variant(280px, 50px, $safe-ring-bg-color);
+      }
+    }
+
+    &.pattern {
+      &-dots {
+        bottom: 0;
+        right: 25%;
+        width: 200px;
+        height: 50%;
+        @include pattern-dots(3px, 30px, $safe-dots-bg-color);
+      }
+    }
+  }
+}

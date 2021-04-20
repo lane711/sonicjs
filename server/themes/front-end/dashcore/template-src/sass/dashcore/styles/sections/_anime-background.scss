@@ -1,0 +1,138 @@
+.anime-background {
+  .shape-main {
+    position: absolute !important;
+    top: 0;
+    bottom: 0;
+    z-index: 0;
+    width: 100%;
+    transform-style: preserve-3d;
+
+    &.left {
+      transform: skew(0deg, 2deg);
+      background-image: linear-gradient(
+        45deg,
+        $gray-300 0,
+        $gray-200 35%,
+        $gray-100 100%
+      );
+    }
+
+    &.right {
+      transform: skew(0deg, -2deg);
+      background-image: linear-gradient(
+        -45deg,
+        $gray-300 0,
+        $gray-200 35%,
+        $gray-100 100%
+      );
+    }
+
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      width: 90%;
+    }
+  }
+
+  @include media-breakpoint-up($grid-float-breakpoint) {
+    [class^="container"] {
+      padding-top: 9rem;
+      padding-bottom: 9rem;
+    }
+  }
+}
+
+.with-promo {
+  .shape {
+    position: absolute;
+  }
+
+  .mockup {
+    max-width: 285px;
+  }
+
+  .promo-box {
+    border: none;
+    z-index: 2;
+
+    .circle-icon {
+      position: absolute;
+    }
+
+    &.bottom-left {
+      left: 0;
+      bottom: 0;
+
+      + .shapes-container {
+        .shape {
+          &.pattern {
+            z-index: 0;
+
+            &-dots {
+              top: 0;
+              right: 0;
+              width: 200px;
+              height: 70%;
+              transform: translate(50%, -30%);
+
+              @include pattern-dots(2px, 15px, $gray-300);
+            }
+          }
+        }
+      }
+
+      .circle-icon {
+        top: 0;
+        right: 0;
+        transform: translate(50%, -50%);
+      }
+    }
+
+    &.top-right {
+      bottom: 0;
+      right: 0;
+
+      + .shapes-container {
+        .shape {
+          &.pattern {
+            z-index: 0;
+
+            &-dots {
+              top: 0;
+              left: 0;
+              width: 200px;
+              height: 70%;
+              transform: translate(-50%, -30%);
+
+              @include pattern-dots(2px, 15px, $gray-300);
+            }
+          }
+        }
+      }
+
+      .circle-icon {
+        left: 0;
+        top: 0;
+        transform: translate(-50%, -50%);
+      }
+    }
+
+    p {
+      margin: 0;
+    }
+
+    @include media-breakpoint-up($grid-float-breakpoint) {
+      position: absolute;
+
+      &.bottom-left {
+        transform: translate(-50%, 50%);
+      }
+
+      &.top-right {
+        transform: translate(50%, 50%);
+      }
+    }
+  }
+
+  .shapes-container {
+    z-index: -1;
+  }
+}

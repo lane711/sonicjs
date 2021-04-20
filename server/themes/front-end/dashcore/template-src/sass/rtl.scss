@@ -1,0 +1,24 @@
+// User predefined variables, will overwrite any predefined variable
+@import "user/variables";
+
+// For compatibility and sharing of styles with another themes of ours
+@import "shared/import";
+
+// Importing of any local variable|function|mixins that should be globally accessed
+@import "dashcore/import";
+
+// Bootstrap imports
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
+
+// RTL specific styles
+[dir="rtl"] {
+  @import "RTL/utilities";
+  @import "RTL/navigation";
+  @import "RTL/components";
+  @import "RTL/forms";
+  @import "RTL/heading";
+  @import "RTL/pricing";
+  @import "RTL/sections";
+}

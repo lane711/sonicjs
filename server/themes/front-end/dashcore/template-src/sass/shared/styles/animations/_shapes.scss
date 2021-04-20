@@ -1,0 +1,20 @@
+.anim {
+  position: absolute;
+}
+
+.floating {
+  animation: floating 4s ease-in-out infinite;
+  filter: none;
+}
+
+@include keyframes (floating) {
+  from {
+    transform: translate(0, 0px);
+  }
+  65% {
+    transform: translate(0, 10px);
+  }
+  to {
+    transform: translate(0, -0px);
+  }
+}

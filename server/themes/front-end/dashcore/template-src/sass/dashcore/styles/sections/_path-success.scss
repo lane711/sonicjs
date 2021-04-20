@@ -1,0 +1,14 @@
+.path-success {
+  .shape-ring {
+    border-radius: 50%;
+    height: 920px;
+    width: 920px;
+    border: 100px solid $path-success-shape-ring-border-color;
+    max-width: none;
+    margin-right: -25%;
+
+    @include media-breakpoint-up(xl) {
+      margin-right: 0;
+    }
+  }
+}

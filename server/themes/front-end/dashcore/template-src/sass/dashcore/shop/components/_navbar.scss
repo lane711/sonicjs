@@ -1,0 +1,45 @@
+// Top banner
+
+.top-banner {
+  @include center-flex(space-between);
+  padding: $topbanner-padding-y 0;
+  font-size: $topbanner-font-size;
+
+  > .container,
+  > .container-fluid {
+    @include center-flex(space-between);
+  }
+
+  .top-banner-text,
+  .top-banner-link {
+    display: inline-block;
+    margin-bottom: 0;
+    text-decoration: none !important;
+
+    > i {
+      margin-right: .375rem;
+      font-size: 1.15em;
+      vertical-align: middle;
+    }
+  }
+}
+
+// White links against a dark background
+.top-banner-dark {
+  .top-banner-text,
+  .top-banner-link {
+    color: $topbanner-dark-color;
+
+    > i { color: $topbanner-dark-icon-color; }
+
+    &.text-muted,
+    > .text-muted { color: $topbanner-dark-muted-color !important; }
+  }
+
+  .top-banner-link {
+    &:hover { color: $topbanner-dark-hover-color; }
+    &.active { color: $topbanner-dark-active-color; }
+  }
+
+  .show .top-banner-link { color: $topbanner-dark-active-color; }
+}

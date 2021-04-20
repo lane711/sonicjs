@@ -1,0 +1,50 @@
+/**
+  SOCIAL MEDIA HEADING
+   ====================
+**/
+.header {
+  &.social-media-heading {
+    position: relative;
+
+    .container {
+      //padding-top: 18rem;
+
+      @include media-breakpoint-up(sm) {
+        //padding-top: 20rem;
+      }
+    }
+
+    .social-bg-shape {
+      bottom: 20%;
+
+      @include media-breakpoint-up(sm) {
+        bottom: 10%;
+      }
+
+      @include media-breakpoint-up(md) {
+        max-width: 70%;
+        right: 0;
+      }
+
+      @include media-breakpoint-up(lg) {
+        top: 0;
+      }
+
+      @include media-breakpoint-up(xl) {
+        top: -100px;
+        right: -100px;
+      }
+    }
+
+    .social-image {
+      @include media-breakpoint-up(md) {
+        max-width: 80%;
+      }
+
+      @include media-breakpoint-up(lg) {
+        max-width: 100%;
+      }
+    }
+
+  }
+}

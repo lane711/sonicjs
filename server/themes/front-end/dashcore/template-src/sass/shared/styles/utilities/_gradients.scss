@@ -1,0 +1,33 @@
+.gradient {
+  background-color: transparent;
+
+  @each $gradient-definition in $gradients-map {
+    $keys: map-keys($gradient-definition);
+
+    $base-name: nth($keys, 1);
+    $base-color: map-get($gradient-definition, $base-name);
+
+    $variants: map-get($gradient-definition, nth($keys, 2));
+
+    @each $variant-name, $variant-color in $variants {
+      &.gradient-#{$base-name}-#{$variant-name} {
+        @include make-gradient($base-color, $variant-color);
+
+        &.overlay {
+          @for $alpha from 1 through 9 {
+            $transparency: $alpha * 0.1;
+
+            &.alpha-#{$alpha} {
+              &:after {
+                @include make-gradient(
+                  rgba($base-color, $transparency),
+                  rgba($variant-color, $transparency)
+                );
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

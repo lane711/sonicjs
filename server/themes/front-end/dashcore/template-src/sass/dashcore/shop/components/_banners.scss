@@ -1,0 +1,48 @@
+.banner {
+  overflow: hidden;
+  position: relative;
+
+  .shape {
+    position: absolute;
+  }
+
+  .bring-to-front {
+    z-index: 1;
+  }
+}
+
+.banner-right-image {
+  .shape {
+    &-circle {
+      top: 0;
+      right: 0;
+      opacity: 0.2;
+      transform: translate3d(25%, -25%, 0);
+
+      div {
+        @include circle-variant(500px, rgba($color-gray-dark, 0.5));
+      }
+    }
+  }
+}
+
+.banner-shapes {
+  .shape {
+    &-ring {
+      &-1 {
+        transform: translate3d(-50%, -50%, 0);
+        @include ring-variant(90px, 25px, $color-primary);
+      }
+
+      &-2 {
+        transform: translate3d(50%, 50%, 0);
+        @include ring-variant(100px, 30px, $color-success);
+      }
+
+      &-3 {
+        transform: translate3d(50%, 50%, 0);
+        @include ring-variant(60px, 5px, $color-success);
+      }
+    }
+  }
+}

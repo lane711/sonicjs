@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 76.87 85.26">
+	<defs>
+		<style>.cls-1{fill:#D5F0FF;}.cls-2,.cls-3{fill:none;}.cls-2,.cls-3,.cls-4{stroke:#f4f8fb;stroke-width:2px;}.cls-2{stroke-miterlimit:10;}.cls-3,.cls-4{stroke-linecap:round;stroke-linejoin:round;}.cls-4{fill:#fff;}</style>
+	</defs>
+	<title>get</title>
+	<g id="Capa_2" data-name="Capa 2">
+		<g id="OBJECTS">
+			<circle class="cls-1" cx="36.72" cy="36.72" r="35.22" transform="translate(-1.2 1.24) rotate(-1.91)"/>
+			<circle class="cls-2" cx="36.72" cy="36.72" r="35.22" transform="translate(-1.2 1.24) rotate(-1.91)"/>
+			<ellipse class="cls-3" cx="36.72" cy="36.72" rx="16.96" ry="35.22" transform="translate(-1.2 1.24) rotate(-1.91)"/>
+			<path class="cls-3" d="M10.24,59.94c6.33-4,16-6.75,27-7.11s20.85,1.72,27.43,5.3"/>
+			<path class="cls-3" d="M61.9,12.09a63.47,63.47,0,0,1-25.83,6.69c-9.72.32-20-1.68-26.47-4.53"/>
+			<line class="cls-3" x1="1.74" y1="37.89" x2="71.71" y2="35.55"/>
+			<line class="cls-3" x1="35.55" y1="1.52" x2="35.55" y2="71.92"/>
+			<polygon class="cls-4" points="75.37 68.71 75.32 41.73 73.12 43.5 70.74 41.6 70.69 41.6 68.35 43.49 66 41.61 65.89 41.61 63.58 43.47 61.26 41.62 61.09 41.62 58.81 43.46 56.52 41.63 56.29 41.63 54.05 43.44 51.77 41.64 51.5 41.64 49.28 43.43 47.03 41.65 46.7 41.65 44.51 43.41 42.3 41.66 42.13 41.66 42.15 56.66 42.13 56.66 42.18 83.63 44.37 81.86 46.76 83.76 46.8 83.76 49.14 81.88 51.5 83.75 51.6 83.75 53.91 81.89 56.24 83.74 56.4 83.74 58.68 81.91 60.98 83.73 61.2 83.73 63.45 81.92 65.72 83.72 66 83.72 68.22 81.94 70.46 83.72 70.8 83.72 72.98 81.95 75.2 83.71 75.37 83.71 75.34 68.71 75.37 68.71"/>
+			<rect class="cls-1" x="45.48" y="49.7" width="26.57" height="1.46" transform="translate(-0.09 0.11) rotate(-0.11)"/>
+			<rect class="cls-1" x="45.49" y="53.87" width="26.57" height="1.46" transform="translate(-0.1 0.1) rotate(-0.1)"/>
+			<rect class="cls-1" x="45.51" y="58.04" width="26.57" height="1.46" transform="translate(-0.11 0.11) rotate(-0.11)"/>
+			<rect class="cls-1" x="45.52" y="62.22" width="26.57" height="1.46" transform="translate(-0.11 0.1) rotate(-0.1)"/>
+			<rect class="cls-1" x="45.53" y="66.39" width="26.57" height="1.45" transform="translate(-0.11 0.1) rotate(-0.09)"/>
+		</g>
+	</g>
+</svg>

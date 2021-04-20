@@ -1,0 +1,52 @@
+/* 2.9 Spacing ======================================================= */
+
+$k-spacers: (
+    6: ($spacer * 6),
+    7: ($spacer * 7),
+    8: ($spacer * 8),
+    9: ($spacer * 9),
+    10: ($spacer * 12),
+    11: ($spacer * 14),
+    12: ($spacer * 16),
+    13: ($spacer * 18),
+    14: ($spacer * 20),
+    15: ($spacer * 22)
+);
+
+// Margin and Padding
+@each $breakpoint in map-keys($grid-breakpoints) {
+    @include media-breakpoint-up($breakpoint) {
+        $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+        @each $prop, $abbrev in (margin: m, padding: p) {
+            @each $size, $length in $k-spacers {
+                .#{$abbrev}t#{$infix}-#{$size} { #{$prop}-top:    $length !important; }
+                .#{$abbrev}r#{$infix}-#{$size} { #{$prop}-right:  $length !important; }
+                .#{$abbrev}b#{$infix}-#{$size} { #{$prop}-bottom: $length !important; }
+                .#{$abbrev}l#{$infix}-#{$size} { #{$prop}-left:   $length !important; }
+                .#{$abbrev}x#{$infix}-#{$size} {
+                    #{$prop}-right: $length !important;
+                    #{$prop}-left:  $length !important;
+                }
+                .#{$abbrev}y#{$infix}-#{$size} {
+                    #{$prop}-top:    $length !important;
+                    #{$prop}-bottom: $length !important;
+                }
+                .#{$abbrev}#{$infix}-#{$size}  { #{$prop}:        $length !important; }
+            }
+        }
+    }
+}
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+    @include media-breakpoint-up($breakpoint) {
+        $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+        @each $prop, $abbrev in (margin: m, padding: p) {
+            @each $size, $length in map-merge($spacers, $k-spacers) {
+                .#{$abbrev}t#{$infix}-#{$size}n { #{$prop}-top:    -$length !important; }
+                .#{$abbrev}b#{$infix}-#{$size}n { #{$prop}-bottom: -$length !important; }
+            }
+        }
+    }
+}

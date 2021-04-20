@@ -1,0 +1,41 @@
+.perspective-mockups {
+  left: 0;
+
+  .tablet {
+    &.landscape {
+      @include media-breakpoint-up($grid-float-breakpoint) {
+        transform: translateX(10%);
+      }
+
+      @include media-breakpoint-up(lg) {
+        transform: translateX(25%);
+      }
+
+      @include media-breakpoint-up(xl) {
+        transform: translateX(0);
+      }
+    }
+  }
+
+  @include media-breakpoint-up($grid-float-breakpoint) {
+    transform: rotate(-12deg) translateX(-60%);
+    transform-origin: 0 100%;
+  }
+
+  @include media-breakpoint-up(lg) {
+    transform: rotate(-12deg) translateX(-30%);
+  }
+
+  @include media-breakpoint-up(xl) {
+    //transform: rotate(-12deg) translateX(-50%);
+    left: 7%;
+
+    .phone-small {
+      margin: 50px 0 0 50px;
+    }
+  }
+
+  @media (min-width: 1678px) {
+    transform: rotate(-12deg);
+  }
+}

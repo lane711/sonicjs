@@ -1,0 +1,190 @@
+// Color system
+
+// Overwriten Bootstrap
+$white: #ffffff !default;
+$gray-100: #f9fbfd !default;
+$gray-200: #f1f4f8 !default;
+$gray-300: #d9e2ef !default;
+$gray-400: #c6d3e6 !default;
+$gray-500: #abbcd5 !default;
+$gray-600: #869ab8 !default;
+$gray-700: #506690 !default;
+$gray-800: #384c74 !default;
+$gray-900: #2b354f !default;
+$black: #161c2d !default;
+
+// DashCore Colors
+
+// [ MANUALLY GENERATED PALETTE ]
+// This is done manual to allow the designer to have full control over the colors used
+// You could use of course your own strategy, note the names are used across the all .scss files
+
+$color-auxiliary-dark: #af0087 !default;
+$color-auxiliary: #f200c2 !default;
+$color-auxiliary-light: #d000a4 !default;
+$color-auxiliary-light-2x: #ff0080 !default;
+$color-auxiliary-light-3x: #dc0065 !default;
+$color-auxiliary-light-4x: #c1002b !default;
+$color-auxiliary-light-5x: #ff001b !default;
+
+// Color-1: #5F4B8B
+$color-1-dark-5x: $black; //#001a3e; // #00006f
+$color-1-dark-4x: #13007a;
+$color-1-dark-3x: #30138e;
+$color-1-dark-2x: #3f179a;
+$color-1-dark: #4f2ca9;
+$color-1: #5533ff;
+$color-1-light: #8053ff;
+$color-1-light-2x: #a772ff; // color-3
+$color-1-light-3x: #cd92ff;
+$color-1-light-4x: #f4b4ff;
+$color-1-light-5x: #ffd4ff;
+
+// Color-2
+$color-2-dark-5x: #001f4f;
+$color-2-dark-4x: #00295c;
+$color-2-dark-3x: #00447b;
+$color-2-dark-2x: #00619b;
+$color-2-dark: #0083dd; // color-4
+$color-2: #00a0e0;
+$color-2-light: #47aae2;
+$color-2-light-2x: #67b4e5;
+$color-2-light-3x: #80bfe7;
+$color-2-light-4x: #97c9e9;
+$color-2-light-5x: #c0deed;
+
+// Color-3
+$color-3-dark-5x: #00200f;
+$color-3-dark-4x: #003128;
+$color-3-dark-3x: #005448;
+$color-3-dark-2x: #007a6b;
+$color-3-dark: #00a190;
+$color-3: #00c9b7;
+$color-3-light: #47cfbe;
+$color-3-light-2x: #67d4c5;
+$color-3-light-3x: #80dacc;
+$color-3-light-4x: #ade4db;
+$color-3-light-5x: #d5eeea;
+
+// Color-4
+$color-4-dark-5x: #002b48; // color-5
+$color-4-dark-4x: #084166;
+$color-4-dark-3x: #004867;
+$color-4-dark-2x: #006787;
+$color-4-dark: #0087a9;
+$color-4: #00a9cc;
+$color-4-light: #5f9ed2;
+$color-4-light-2x: #009cf7;
+$color-4-light-3x: #7bb0df;
+$color-4-light-4x: #95c2ec;
+$color-4-light-5x: #afd4fa;
+
+// Color-5
+$color-5-dark-5x: #131d2d;
+$color-5-dark-4x: #27333e;
+$color-5-dark-3x: #323b4e;
+$color-5-dark-2x: #3d4256;
+$color-5-dark: #40495d;
+$color-5: #4f586c;
+$color-5-light: #6d768b; // color-2
+$color-5-light-2x: #8d96ac;
+$color-5-light-3x: #b7c0d7;
+$color-5-light-4x: #dce3e7;
+$color-5-light-5x: #edf4f8; // color-6
+
+// Color-6 - Alternate
+$color-6-dark-5x: #8c5101;
+$color-6-dark-4x: #a15f06;
+$color-6-dark-3x: #b76e0c;
+$color-6-dark-2x: #ce7e13;
+$color-6-dark: #e48e1a;
+$color-6: #fc9e21;
+$color-6-light: #feab47;
+$color-6-light-2x: #feb868;
+$color-6-light-3x: #fdc586;
+$color-6-light-4x: #fad2a4;
+$color-6-light-5x: #f5dfc3;
+
+// [ MAIN THEME COLORS ]
+
+// To set Bootstrap color system
+$color-primary: $color-1 !default;
+$color-secondary: $gray-700 !default;
+$color-success: $color-3 !default;
+$color-info: $color-2-dark !default;
+$color-warning: $color-6-light-2x !default;
+$color-danger: $color-auxiliary-light-4x !default;
+$color-light: $gray-100 !default;
+$color-dark: $gray-900 !default;
+$color-gray-light: $gray-400 !default;
+$color-gray: $gray-600 !default;
+$color-gray-dark: $gray-800 !default;
+
+// New colors added to theme-colors
+$color-alternate: $color-6 !default;
+$color-contrast: $white !default;
+$color-darker: $color-1-dark-5x !default;
+$color-black: $black !default;
+
+// [ SOCIAL COLORS ]
+$facebook: #3b5998 !default;
+$google: #dd4b39 !default;
+$gplus: #dd4b39 !default;
+$twitter: #00aced !default;
+$linkedin: #007bb6 !default;
+$pinterest: #cb2027 !default;
+$git: #666666 !default;
+$tumblr: #32506d !default;
+$vimeo: #aad450 !default;
+$youtube: #bb0000 !default;
+$flickr: #ff0084 !default;
+$reddit: #ff4500 !default;
+$dribbble: #ea4c89 !default;
+$skype: #00aff0 !default;
+$instagram: #517fa4 !default;
+$lastfm: #c3000d !default;
+$soundcloud: #ff8800 !default;
+$behance: #1769ff !default;
+$envato: #82b541 !default;
+$medium: #00ab6c !default;
+$spotify: #1db954 !default;
+$quora: #a82400 !default;
+$xing: #026466 !default;
+$snapchat: #fffc00 !default;
+$telegram: #0088cc !default;
+$whatsapp: #075e54 !default;
+$rss: #f26522 !default;
+
+$brand-colors: () !default;
+$brand-colors: map-merge(
+  (
+    "facebook": $facebook,
+    "google": $google,
+    "gplus": $gplus,
+    "twitter": $twitter,
+    "linkedin": $linkedin,
+    "pinterest": $pinterest,
+    "git": $git,
+    "tumblr": $tumblr,
+    "vimeo": $vimeo,
+    "youtube": $youtube,
+    "flickr": $flickr,
+    "reddit": $reddit,
+    "dribbble": $dribbble,
+    "skype": $skype,
+    "instagram": $instagram,
+    "lastfm": $lastfm,
+    "soundcloud": $soundcloud,
+    "behance": $behance,
+    "envato": $envato,
+    "medium": $medium,
+    "spotify": $spotify,
+    "quora": $quora,
+    "xing": $xing,
+    "snapchat": $snapchat,
+    "telegram": $telegram,
+    "whatsapp": $whatsapp,
+    "rss": $rss
+  ),
+  $brand-colors
+);
