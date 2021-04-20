@@ -1,0 +1,29 @@
+.bg-primary {
+background-color: #000!important;opacity: {
+{headerOpacity
+}}}
+
+.navbar {
+box-shadow: 0 0 25px rgba(40,47,60,.05),0 20px 25px rgba(40,47,60,.05),0 3px 4px rgba(40,47,60,.05)
+}
+
+.card {
+background-color: #fff;
+border: none;
+border-radius: .625rem;
+box-shadow: 0 0.46875rem 2.1875rem rgba(90,97,105,.1),0 0.9375rem 1.40625rem rgba(90,97,105,.1),0 0.25rem 0.53125rem rgba(90,97,105,.12),0 0.125rem 0.1875rem rgba(90,97,105,.1)!important
+}
+
+body {
+  background-image: linear-gradient(#efefef, #fff);
+}
+
+html {
+    height: 100%;
+}
+body {
+    height: 100%;
+    margin: 0;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
