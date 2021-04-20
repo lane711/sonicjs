@@ -41,38 +41,34 @@ module.exports = mediaService = {
   getMedia: async function () {
     let mediaFilesList = fileService.getFilesSync("/server/assets/uploads");
 
-    let mediaRecords = await dataService.getContentByType("media");
-    let media = mediaFilesList.map(function (fileName) {
-      let mediaRecord = mediaRecords.filter((x) => x.data.file === fileName)[0];
-      if (!mediaRecord) {
-        //create the media record - the user has uploaded files
-        let title = fileName.replace(/\.[^/.]+$/, "");
-        let payload = {
-          data: {
-            title: title,
-            file: fileName,
-            contentType: "media",
-          },
-        };
-        // debugger;
-        mediaRecord = dataService.contentCreate(payload);
-      }
-      return mediaRecord;
-      // return {fileName: fileName};
-    });
+    let mediaRecords = await dataService.getContentByType("media") || [];
 
-    return media;
-    // let url = '/api/containers/files/files';
-    // return axiosInstance.get(url)
-    // .then(async function (record) {
-    //     if (record.data) {
-    //         return record.data;
-    //     }
-    //     return 'not found';
-    // })
-    // .catch(function (error) {
-    //     console.log(error);
-    // });
+    if (mediaRecords.length !== mediaFilesList.length) {
+      for (let index = 0; index < mediaFilesList.length; index++) {
+        const fileName = mediaFilesList[index];
+
+        let mediaRecord = mediaRecords.filter((x) => x.data.file === fileName)[0];
+        if (!mediaRecord) {
+          //create the media record - the user has uploaded files
+          let title = fileName.replace(/\.[^/.]+$/, "");
+          let payload = {
+            data: {
+              title: title,
+              file: fileName,
+              contentType: "media",
+            },
+          };
+          // debugger;
+          mediaRecord = await dataService.contentCreate(payload);
+          // mediaRecords.push(mediaRecord);
+        }
+
+      }
+      //re-get list 
+      mediaRecords = await dataService.getContentByType("media");
+    }
+
+    return mediaRecords;
   },
 
   addMediaUrl: async function (mediaList) {
