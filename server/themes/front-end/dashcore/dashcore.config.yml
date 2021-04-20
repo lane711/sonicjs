@@ -5,6 +5,42 @@ assets:
     - /node_modules/jquery/dist/jquery.min.js
     - /node_modules/js-cookie/src/js.cookie.js
     - /themes/front-end/{{frontEndTheme}}/js/01.cookie-consent-util.js
+    - /themes/front-end/{{frontEndTheme}}/js/02.1.cookie-consent-themes.js
+    - /themes/front-end/{{frontEndTheme}}/js/02.2.cookie-consent-custom-css.js
+    - /themes/front-end/{{frontEndTheme}}/js/02.3.cookie-consent-informational.js
+    - /themes/front-end/{{frontEndTheme}}/js/02.4.cookie-consent-opt-out.js
+    - /themes/front-end/{{frontEndTheme}}/js/02.5.cookie-consent-opt-in.js
+    - /themes/front-end/{{frontEndTheme}}/js/02.6.cookie-consent-location.js
+    - /themes/front-end/{{frontEndTheme}}/js/card.js
+    - /themes/front-end/{{frontEndTheme}}/js/counterup2.js
+    - /themes/front-end/{{frontEndTheme}}/js/index.js
+    - /themes/front-end/{{frontEndTheme}}/js/noframework.waypoints.js
+    - /themes/front-end/{{frontEndTheme}}/js/odometer.min.js
+    - /themes/front-end/{{frontEndTheme}}/js/prism.js
+    - /themes/front-end/{{frontEndTheme}}/js/simplebar.js
+    - /themes/front-end/{{frontEndTheme}}/js/swiper.js
+    - /themes/front-end/{{frontEndTheme}}/js/popper.js
+    - /themes/front-end/{{frontEndTheme}}/js/jquery.js
+    - /themes/front-end/{{frontEndTheme}}/js/jquery.easing.min.js
+    - /themes/front-end/{{frontEndTheme}}/js/jquery.validate.js
+    - /themes/front-end/{{frontEndTheme}}/js/jquery.smartWizard.js
+    - /themes/front-end/{{frontEndTheme}}/js/plugins/jquery.animatebar.js
+    - /themes/front-end/{{frontEndTheme}}/js/feather.min.js
+    - /themes/front-end/{{frontEndTheme}}/js/bootstrap.js
+    - /themes/front-end/{{frontEndTheme}}/js/aos.js
+    - /themes/front-end/{{frontEndTheme}}/js/typed.js
+    - /themes/front-end/{{frontEndTheme}}/js/jquery.magnific-popup.js
+    - /themes/front-end/{{frontEndTheme}}/js/cookieconsent.min.js
+    - /themes/front-end/{{frontEndTheme}}/js/common-script.js
+    - /themes/front-end/{{frontEndTheme}}/js/forms.js
+    - /themes/front-end/{{frontEndTheme}}/js/stripe-bubbles.js
+    - /themes/front-end/{{frontEndTheme}}/js/stripe-menu.js
+    - /themes/front-end/{{frontEndTheme}}/js/cc.js
+    - /themes/front-end/{{frontEndTheme}}/js/pricing.js
+    - /themes/front-end/{{frontEndTheme}}/js/shop.js
+    - /themes/front-end/{{frontEndTheme}}/js/svg.js
+    - /themes/front-end/{{frontEndTheme}}/js/site.js
+    - /themes/front-end/{{frontEndTheme}}/js/03.demo.js
     - /node_modules/ace-builds/src-min-noconflict/ace.js
     - /node_modules/ace-builds/src-min-noconflict/ext-beautify.js
     - /node_modules/axios/dist/axios.min.js
