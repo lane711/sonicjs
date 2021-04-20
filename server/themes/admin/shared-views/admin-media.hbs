@@ -13,11 +13,10 @@
             <div class="row">
                 {{#each data}}
 
-
                 <div class="col-md-3">
                     <div class="thumbnail">
-                        <a href="/assets/uploads/{{ this.filePath }}">
-                            <img src="/assets/uploads/{{ this.filePath }}"
+                        <a href="/admin/content/edit/media/{{ this.id }}">
+                            <img src="/assets/uploads/{{ this.data.file }}"
                                 style="width:100%">
                             <div class="caption">
                                 <p>{{this.name}}</p>
@@ -25,7 +24,6 @@
                         </a>
                     </div>
                 </div>
-
 
                 {{/each}}
             </div>

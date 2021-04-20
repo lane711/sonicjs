@@ -13,6 +13,8 @@ var { GraphQLClient, gql, request } = require("graphql-request");
 var passport = require("passport"),
   LocalStrategy = require("passport-local").Strategy;
 const connectEnsureLogin = require('connect-ensure-login');
+const url = require('url');
+const querystring = require('querystring');
 
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
@@ -95,20 +97,28 @@ module.exports = authService = {
     
       })(req, res, next);
     });
-    
-    
+
+
     app.get('/private',
       connectEnsureLogin.ensureLoggedIn(),
-      (req, res) => res.sendFile('html/private.html', {root: __dirname})
+      (req, res) => res.sendFile('html/private.html', { root: __dirname })
     );
-    
+
     app.get('/user',
       connectEnsureLogin.ensureLoggedIn(),
-      (req, res) => res.send({user: req.user})
+      (req, res) => res.send({ user: req.user })
     );
 
     app.get("/login", async function (req, res) {
       let data = { registerMessage: "<b>admin</b>" };
+
+      let parsedUrl = url.parse(req.url);
+      let parsedQs = querystring.parse(parsedUrl.query);
+      if (parsedQs && parsedQs.message) {
+        data.message = parsedQs.message;
+
+      }
+
       res.render("admin/shared-views/admin-login", {
         layout: `front-end/${frontEndTheme}/login.hbs`,
         data: data,

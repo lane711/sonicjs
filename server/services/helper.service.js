@@ -17,7 +17,16 @@
 
 // const utils = require('formiojs/utils');
 
-(function(exports) {
+(function (exports) {
+
+  if (typeof module !== "undefined" && module.exports) {
+    var helperService = require("./helper.service");
+
+  } else {
+    //client version
+  }
+
+
   (exports.truncateString = function(body, length) {
     if (body) {
       let cleanHtml = body.substring(0, 450);
@@ -85,7 +94,7 @@
       if(!copy) copy = content.alertCopy;
       if(!copy) copy = content.contentType;
 
-      let copyClean =  formattingService.stripHtmlTags(copy)
+      // let copyClean =  formattingService.stripHtmlTags(copy)
       let slug = helperService.slugify(copy);
 
       if(includePrecedingSlash === true){
