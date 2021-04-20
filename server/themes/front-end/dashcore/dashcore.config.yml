@@ -2,7 +2,6 @@ bootstrap-version: 4.5.3
 assets:
   js:
     - /assets/js/startup.js
-    - /node_modules/jquery/dist/jquery.min.js
     - /node_modules/js-cookie/src/js.cookie.js
     - /themes/front-end/{{frontEndTheme}}/js/01.cookie-consent-util.js
     - /themes/front-end/{{frontEndTheme}}/js/02.1.cookie-consent-themes.js
@@ -63,7 +62,6 @@ assets:
     - /page-builder/js/page-builder.js:
         isPageBuilder: true
   css:
-    - /node_modules/bootstrap/dist/css/bootstrap.min.css
     - /themes/front-end/{{frontEndTheme}}/css/template-processed.css
     - /themes/front-end/{{frontEndTheme}}/css/all.css
     - /themes/front-end/{{frontEndTheme}}/css/aos.css
@@ -77,7 +75,6 @@ assets:
     - /themes/front-end/{{frontEndTheme}}/css/smart_wizard_theme_dots.css
     - /themes/front-end/{{frontEndTheme}}/css/swiper.css
     - /themes/front-end/{{frontEndTheme}}/css/theme.css
-    - /node_modules/font-awesome/css/font-awesome.min.css
     - /node_modules/photoswipe/dist/photoswipe.css
     - /node_modules/photoswipe/dist/default-skin/default-skin.css
     - /node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css
