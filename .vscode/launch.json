@@ -5,6 +5,15 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "type": "node",
+      "request": "launch",
+      "name": "Server",
+      "program": "${workspaceFolder}/server.js",
+      "skipFiles": [
+        "<node_internals>/**/*.js"
+      ]   
+    },
+    {
       "type": "chrome",
       "request": "attach",
       "name": "Attach Karma Chrome",
@@ -14,15 +23,6 @@
         "/": "${workspaceRoot}/admin/",
         "/base/": "${workspaceRoot}/admin/"
       }
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Server",
-      "program": "${workspaceFolder}/server.js",
-      "skipFiles": [
-        "<node_internals>/**/*.js"
-      ]   
     },
     {
       "type": "node",

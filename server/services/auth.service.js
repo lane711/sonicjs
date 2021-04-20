@@ -86,7 +86,11 @@ module.exports = authService = {
 
           req.session.userId = user.id;
     
-          return res.redirect(req.session.returnTo);
+          if(!req.session.returnTo){
+            return res.redirect('/admin');
+          }else{
+            return res.redirect(req.session.returnTo);
+          }
         });
     
       })(req, res, next);
