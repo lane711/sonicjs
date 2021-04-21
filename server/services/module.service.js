@@ -266,11 +266,13 @@ module.exports = moduleService = {
   },
 
   getModuleViewFile: async function (options) {
-    let viewPath = `/server/modules/${options.contentType}/views/${options.contentType}-main.hbs`;
+    //see if theme level override exists
 
-    let themeViewPath = `/server/themes/front-end/${frontEndTheme}/modules/${options.contentType}/views/${options.contentType}-main.hbs`;
+    let viewPath = `/server/modules/${options.moduleName}/views/${options.moduleName}-main.hbs`;
 
-    if(this.fileService.fileExists(themeViewPath)){
+    let themeViewPath = `/server/themes/front-end/${frontEndTheme}/modules/${options.moduleName}/views/${options.moduleName}-main.hbs`;
+
+    if (await fileService.fileExists(themeViewPath)) {
       viewPath = themeViewPath;
     }
     return viewPath;
@@ -280,8 +282,7 @@ module.exports = moduleService = {
     if (options.shortcode.name === options.moduleName.toUpperCase()) {
       let id = options.shortcode.properties.id;
       let contentType = options.moduleName;
-      //see if theme level override exists
-      let viewPath = this.getModuleViewFile();
+      let viewPath = await this.getModuleViewFile(options);
       options.viewModel = viewModel
         ? viewModel
         : await dataService.getContentById(id);
