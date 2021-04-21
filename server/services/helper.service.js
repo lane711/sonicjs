@@ -95,14 +95,15 @@
       if(!copy) copy = content.contentType;
 
       // let copyClean =  formattingService.stripHtmlTags(copy)
-      let slug = helperService.slugify(copy);
+
+      let slug = this ? this.slugify(copy) : slugify(copy);
 
       if(includePrecedingSlash === true){
         slug = `/${slug}`;
       }
 
       if(makeUnique === true){
-        slug = `${slug}-${helperService.generateRandomString(6)}`
+        slug = `${slug}-${this.generateRandomString(6)}`
       }
 
       return slug;
