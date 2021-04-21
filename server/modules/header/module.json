@@ -1,0 +1,9 @@
+{
+  "title": "Header",
+  "enabled": true,
+  "systemId": "header",
+  "canBeAddedToColumn": true,
+  "version": "0.0.0.1",
+  "systemidUpperCase": "HEADER",
+  "systemidCamelCase": "header"
+}

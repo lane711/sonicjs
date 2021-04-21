@@ -11,6 +11,7 @@ var dataService = require("../services/data.service");
 var formattingService = require("../services/formatting.service");
 
 var appRoot = require("app-root-path");
+var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 
 module.exports = moduleService = {
   startup: function () {
@@ -233,10 +234,7 @@ module.exports = moduleService = {
       `/**/*${moduleContentTypeSystemid}.json`
     );
 
-    let fullPath = path.join(
-      appRoot.path,
-      filePath[0]
-    )
+    let fullPath = path.join(appRoot.path, filePath[0]);
     fileService.deleteFile(fullPath);
 
     //reload modules
@@ -267,11 +265,23 @@ module.exports = moduleService = {
     });
   },
 
+  getModuleViewFile: async function (options) {
+    let viewPath = `/server/modules/${options.contentType}/views/${options.contentType}-main.hbs`;
+
+    let themeViewPath = `/server/themes/front-end/${frontEndTheme}/modules/${options.contentType}/views/${options.contentType}-main.hbs`;
+
+    if(this.fileService.fileExists(themeViewPath)){
+      viewPath = themeViewPath;
+    }
+    return viewPath;
+  },
+
   processModuleInColumn: async function (options, viewModel) {
     if (options.shortcode.name === options.moduleName.toUpperCase()) {
       let id = options.shortcode.properties.id;
       let contentType = options.moduleName;
-      let viewPath = `/server/modules/${contentType}/views/${contentType}-main.hbs`;
+      //see if theme level override exists
+      let viewPath = this.getModuleViewFile();
       options.viewModel = viewModel
         ? viewModel
         : await dataService.getContentById(id);
