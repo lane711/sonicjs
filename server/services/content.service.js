@@ -186,27 +186,26 @@ module.exports = contentService = {
       await this.asyncForEach(sections, async (sectionId) => {
         let section = await dataService.getContentById(sectionId);
         if (section) {
-          page.data.html += `<section data-id='${section.id}' class="${section.data.cssClass} jumbotron-fluid">`;
-          page.data.html += '<div class="overlay">';
-          page.data.html += '<div class="container">';
-          let rows;
           if (section.data.content) {
-            //content will contain full layout
+            //process raw column without rows and columns
             page.data.html += `${section.data.content}`;
-            await this.processShortCodes(section, section.data.content);
+            await this.processShortCodes(page, section, section.data.content);
           } else {
-            //use page builder rows for layout
+            page.data.html += `<section data-id='${section.id}' class="${section.data.cssClass} jumbotron-fluid">`;
+            page.data.html += '<div class="overlay">';
+            page.data.html += '<div class="container">';
+            let rows;
             rows = await this.processRows(page, section, section.data.rows);
-          }
-          page.data.html += "</div>";
-          page.data.html += "</div>";
-          page.data.html += `</section>`;
+            page.data.html += "</div>";
+            page.data.html += "</div>";
+            page.data.html += `</section>`;
 
-          page.data.sections.push({
-            id: sectionId,
-            title: section.data.title,
-            rows: rows,
-          });
+            page.data.sections.push({
+              id: sectionId,
+              title: section.data.title,
+              rows: rows,
+            });
+          }
         }
       });
 
@@ -347,7 +346,14 @@ module.exports = contentService = {
     ) {
       wrapperStyles = viewModel.data.settings.data.wrapperStyles;
     }
-    processedHtml.body = formattingService.generateModuleDivWrapper(processedHtml.id, wrapperCss, wrapperStyles, processedHtml.shortCode.name, processedHtml.contentType, processedHtml.body);
+    processedHtml.body = formattingService.generateModuleDivWrapper(
+      processedHtml.id,
+      wrapperCss,
+      wrapperStyles,
+      processedHtml.shortCode.name,
+      processedHtml.contentType,
+      processedHtml.body
+    );
   },
 
   replaceBlockShortCode: async function (page, shortcode) {

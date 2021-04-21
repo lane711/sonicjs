@@ -402,7 +402,7 @@ async function editSection(sectionId) {
 }
 
 async function deleteSection(sectionId, index) {
-  debugger;
+  // debugger;
   console.log("delete section", sectionId, index);
   //delete from page
   page.data.layout.splice(index, 1);
