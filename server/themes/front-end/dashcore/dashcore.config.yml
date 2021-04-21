@@ -43,8 +43,6 @@ assets:
     - /node_modules/ace-builds/src-min-noconflict/ace.js
     - /node_modules/ace-builds/src-min-noconflict/ext-beautify.js
     - /node_modules/axios/dist/axios.min.js
-    - /node_modules/popper.js/dist/umd/popper.min.js
-    - /node_modules/bootstrap/dist/js/bootstrap.min.js
     - /node_modules/jsoneditor/dist/jsoneditor.min.js
     - /node_modules/formiojs/dist/formio.full.min.js
     - /node_modules/photoswipe/dist/photoswipe.min.js
