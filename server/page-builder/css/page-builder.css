@@ -396,6 +396,7 @@ section {
   background-color: transparent;
   border: 0;
   transition: left 2s;
+  z-index: 999;
 }
 
 .sidebar-expander:focus {
