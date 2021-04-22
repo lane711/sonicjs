@@ -1,39 +1,15 @@
-<h1>{{ data.tags }}</h1>
-<h1>{{ data.mediaList }}</h1>
-
 <div
 class="modal-popup popup-gallery grid-of-images"
 data-type="gallery"
 data-image='{"verticalFit": true}'
 data-zoom="300"
 >
+{{#each data.galleryImages }}
 <a
-  href="https://picsum.photos/800/600/?image=997"
-  title="Some nice title to show"
-  ><img src="https://picsum.photos/75/75/?image=997" /></a
-><a
-  href="https://picsum.photos/800/600/?image=977"
-  title="Some nice title to show"
-  ><img src="https://picsum.photos/75/75/?image=977" /></a
-><a
-  href="https://picsum.photos/800/600/?image=976"
-  title="Some nice title to show"
-  ><img src="https://picsum.photos/75/75/?image=976" /></a
-><a
-  href="https://picsum.photos/800/600/?image=1074"
-  title="Some nice title to show"
-  ><img src="https://picsum.photos/75/75/?image=1074" /></a
-><a
-  href="https://picsum.photos/800/600/?image=874"
-  title="Some nice title to show"
-  ><img src="https://picsum.photos/75/75/?image=874" /></a
-><a
-  href="https://picsum.photos/800/600/?image=937"
-  title="Some nice title to show"
-  ><img src="https://picsum.photos/75/75/?image=937" /></a
-><a
-  href="https://picsum.photos/800/600/?image=1072"
-  title="Some nice title to show"
-  ><img src="https://picsum.photos/75/75/?image=1072"
-/></a>
+  href="/assets/uploads/{{ this.select.file}}"
+  title="<b>{{ this.title}}</b> {{ this.body}}"
+  ><img src="/assets/uploads/{{ this.select.file}}" /></a
+>
+{{/each}}
+
 </div>
