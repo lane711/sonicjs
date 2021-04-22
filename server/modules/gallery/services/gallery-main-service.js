@@ -15,15 +15,15 @@ module.exports = galleryMainService = {
 
         });
 
-        emitterService.on("postModuleGetData", async function (options) {
-            if (options.shortcode.name !== "GALLERY") {
-              return;
-            }
+        // emitterService.on("postModuleGetData", async function (options) {
+        //     if (options.shortcode.name !== "GALLERY") {
+        //       return;
+        //     }
       
-            let mediaList = await dataService.getContentByContentTypeAndTag('media', options.viewModel.data.tags);
-            options.viewModel.data.mediaList = [{file:'testfile.png'}];
+        //     let mediaList = await dataService.getContentByContentTypeAndTag('media', options.viewModel.data.tags);
+        //     options.viewModel.data.mediaList = [{file:'testfile.png'}];
 
-          });
+        //   });
     },
 
 }

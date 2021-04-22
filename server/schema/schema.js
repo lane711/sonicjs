@@ -116,7 +116,8 @@ const FileType = new GraphQLObjectType({
 const MediaType = new GraphQLObjectType({
   name: "MediaType",
   fields: () => ({
-    filePath: { type: GraphQLString },
+    id: { type: GraphQLString },
+    data: { type: GraphQLJSONObject },
   }),
 });
 
