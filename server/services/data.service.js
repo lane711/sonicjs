@@ -432,15 +432,13 @@ if (typeof module !== "undefined" && module.exports) {
       }
     }),
     (exports.getContentByContentTypeAndTag = async function (contentType, tag) {
-      //TODO: add {"order":"data.sort ASC"},
-      const filter = `{"where":{"and":[{"data.tags":{"regexp": "${tag}"}},{"data.contentType":"${contentType}"}]}}`;
-      const encodedFilter = encodeURI(filter);
-      let url = `${apiUrl}content?filter=${encodedFilter}`;
-      let pageRecord = await this.getAxios().get(url);
-      if (pageRecord.data) {
-        return pageRecord.data;
+      let allOfContentType = await this.getContentByContentType(contentType);
+      if (allOfContentType) {
+        let contentByTag = allOfContentType.filter(
+          (x) => x.data.tags === tag
+        );
+        return contentByTag;
       }
-      return "not found";
     }),
     (exports.getContentByUrlAndContentType = async function (
       contentType,
