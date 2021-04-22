@@ -14,7 +14,6 @@ dataService.startup();
 var moduleService = require("../services/module.service");
 moduleService.startup();
 var formService = require("../services/form.service");
-formService.startup();
 var menuService = require("../services/menu.service");
 var mediaService = require("../services/media.service");
 var siteSettingsService = require("../services/site-settings.service");
@@ -47,6 +46,7 @@ var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 exports.loadRoutes = async function (app) {
   authService.startup(app);
   adminService.startup(app);
+  formService.startup(app);
   // app.get('/', async function (req, res) {
   //   res.send('ok');
   // });

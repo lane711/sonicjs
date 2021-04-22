@@ -21,7 +21,7 @@ if (typeof module !== "undefined" && module.exports) {
 }
 
 (function (exports) {
-  (exports.startup = async function () {
+  (exports.startup = async function (app) {
     emitterService.on("requestBegin", async function (options) {
       // console.log('data service startup')
       if (options) {
@@ -53,6 +53,11 @@ if (typeof module !== "undefined" && module.exports) {
         );
       }
     });
+
+    app.get("/form", async function (req, res) {
+      res.send('form ok');
+    })
+
   }),
     (exports.getForm = async function (
       contentTypeId,
