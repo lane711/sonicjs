@@ -23,17 +23,14 @@ $(document).ready(async function () {
   setupUIHovers();
   setupUIClicks();
   setupClickEvents();
-  // setupWYSIWYG();
   setupJsonEditor();
   await setPage();
   await setContentType();
   setupJsonEditorContentTypeRaw();
   setupJsonRawSave();
-  // imageList = await getImageList();
-  // setTimeout(setupPageSettings, 1);
-  // setupPageSettings();
 
-  setupFormBuilder(contentType);
+
+  // setupFormBuilder(contentType);
   await setupACEEditor();
   await setupDropZone();
   setupSortable();
@@ -1562,35 +1559,38 @@ async function setupDropZone() {
     headers: {
       Authorization: $("#token").val(),
     },
-    addedfile: function(file) {
-      var _this=this,
-          reader = new FileReader();
-      reader.onload = async function(event) {
-          base64content = event.target.result;
-          console.log(base64content);
-          await dataService.fileCreate(`/server/assets/uploads/${file.name}`, base64content);
-          await createMediaRecord(file);
-          _this.processQueue();
-          fullPageUpdate();
+    addedfile: function (file) {
+      var _this = this,
+        reader = new FileReader();
+      reader.onload = async function (event) {
+        base64content = event.target.result;
+        console.log(base64content);
+        await dataService.fileCreate(
+          `/server/assets/uploads/${file.name}`,
+          base64content
+        );
+        await createMediaRecord(file);
+        _this.processQueue();
+        fullPageUpdate();
       };
       reader.readAsDataURL(file);
-  },
+    },
     accept: async function (file, done) {
       done();
     },
   });
 
-  async function createMediaRecord(file){
-      let title = file.name.replace(/\.[^/.]+$/, "");
-      let payload = {
-        data: {
-          title: title,
-          file: file.name,
-          contentType: "media",
-        },
-      };
-      debugger;
-      await createInstance(payload);
+  async function createMediaRecord(file) {
+    let title = file.name.replace(/\.[^/.]+$/, "");
+    let payload = {
+      data: {
+        title: title,
+        file: file.name,
+        contentType: "media",
+      },
+    };
+    debugger;
+    await createInstance(payload);
   }
 }
 
@@ -1813,8 +1813,14 @@ async function addUser() {
 }
 
 async function setupAdminMediaFormImage() {
-  let fileName = $('input[name="data[file]"]').val();
-  if (fileName) {
-    $(".admin-form-media-image").attr("src", `/assets/uploads/${fileName}`);
+  if (
+    window.location.href.indexOf(
+      "admin/content/edit/media/"
+    ) > 0
+  ) {
+    let fileName = $('input[name="data[file]"]').val();
+    if (fileName) {
+      $(".admin-form-media-image").attr("src", `/assets/uploads/${fileName}`);
+    }
   }
 }

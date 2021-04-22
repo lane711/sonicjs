@@ -56,7 +56,7 @@
     "express-session": "^1.17.1",
     "flag-icon-css": "^3.5.0",
     "font-awesome": "^4.7.0",
-    "formiojs": "^4.12.3",
+    "formiojs": "^4.13.0",
     "graphql": "^14.7.0",
     "graphql-request": "^3.3.0",
     "graphql-type-json": "^0.3.2",
