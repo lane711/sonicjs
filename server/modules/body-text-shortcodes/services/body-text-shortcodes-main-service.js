@@ -1,20 +1,50 @@
-var dataService = require('../../../services/data.service');
-var emitterService = require('../../../services/emitter.service');
-var globalService = require('../../../services/global.service');
+var dataService = require("../../../services/data.service");
+var emitterService = require("../../../services/emitter.service");
+var globalService = require("../../../services/global.service");
+var moduleService = require("../../../services/module.service");
+const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 
 module.exports = bodyTextShortcodesMainService = {
+  startup: async function () {
+    emitterService.on("postModuleGetData", async function (options) {
 
-    startup: async function () {
-        emitterService.on('beginProcessModuleShortCode', async function (options) {
+        if(options.viewModel.data.body){
 
-            if (options.shortcode.name === 'BODY-TEXT-SHORTCODES') {
+            let parsedBlock = ShortcodeTree.parse(options.viewModel.data.body);
+        
+            if (parsedBlock.children) {
+              for (let bodyBlock of parsedBlock.children) {
+                if(bodyBlock.shortcode){
 
-                options.moduleName = 'body-text-shortcodes';
-                await moduleService.processModuleInColumn(options);
+                        let id = bodyBlock.shortcode.properties.id;
+                        let contentType = bodyBlock.shortcode.name.toLowerCase();
+                        let viewPath = await moduleService.getModuleViewFile(contentType);
+                        let viewModel = await dataService.getContentById(id);
+                  
+                        var processedHtml = {
+                          id: id,
+                          contentType: contentType,
+                          shortCode: options.shortcode,
+                          body: await moduleService.processView(contentType, viewModel, viewPath),
+                        };
+                  
+                  
+                        options.viewModel.data.body = options.viewModel.data.body.replace(
+                            bodyBlock.shortcode.codeText,
+                          processedHtml.body
+                        );
+                      
+        
+                    // options.viewModel.data.body = 'hello' + options.viewModel.data.body;
+
+                }
+              }
             }
+            // await moduleService.processModuleInColumn(options, options.viewModel)
 
-        });
-    },
 
-}
+        }
 
+    });
+  },
+};
