@@ -30,7 +30,7 @@ $(document).ready(async function () {
   setupJsonRawSave();
 
 
-  // setupFormBuilder(contentType);
+  setupFormBuilder(contentType);
   await setupACEEditor();
   await setupDropZone();
   setupSortable();
