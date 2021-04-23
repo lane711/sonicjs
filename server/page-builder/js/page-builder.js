@@ -479,7 +479,7 @@ async function addRow() {
 // }
 
 async function addColumn() {
-  debugger;
+  // debugger;
   let section = await dataService.getContentById(currentSectionId);
   console.log("secton", section);
   console.log("currentRowIndex", currentRowIndex);

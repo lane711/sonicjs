@@ -192,7 +192,7 @@ module.exports = contentService = {
             await this.processShortCodes(page, section, section.data.content);
           } else {
             page.data.html += `<section data-id='${section.id}' class="${section.data.cssClass} jumbotron-fluid">`;
-            page.data.html += '<div class="overlay">';
+            page.data.html += '<div class="section-overlay">';
             page.data.html += '<div class="container">';
             let rows;
             rows = await this.processRows(page, section, section.data.rows);
