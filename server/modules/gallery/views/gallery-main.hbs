@@ -26,118 +26,22 @@
       <div class="cards-wrapper">
           <div class="swiper-container" data-sw-show-items="4" data-sw-autoplay="3500" data-sw-loop="true" data-sw-nav-arrows=".features-nav" data-sw-breakpoints='{"1024": {"slidesPerView": 4,"spaceBetween": 40},"992": {"slidesPerView": 4,"spaceBetween": 15},"768": {"slidesPerView": 4.5,"spaceBetween": 15},"576": {"slidesPerView": 1.5,"spaceBetween": 10}}'>
               <div class="swiper-wrapper px-1">
+
+                {{#each data.galleryImages }}
+
                   <div class="swiper-slide px-2 px-sm-1">
                       <div class="card border-0 shadow">
                           <div class="card-body">
-                              <div class="logo mx-auto my-3"><img src="img/v8/icons/1.svg" class="img-responsive" alt=""></div>
+                              <div class="logo mx-auto my-3"><img src="/assets/uploads/{{ this.select.file}}" class="img-responsive" alt=""></div>
                               <hr class="w-50 mx-auto my-3">
-                              <p class="bold mt-4">Social Integration</p>
-                              <p class="regular small text-secondary">Consequuntur ea sapiente ut</p>
-                          </div>
-                          <div class="card-footer d-flex align-items-center justify-content-around">
-                              <div class="roi">
-                                  <p class="text-darker lead bold mb-0">1.5k</p>
-                                  <p class="text-secondary small mt-0">New subscribers</p>
-                              </div><a href="javascript:;"><i class="fas fa-info-circle fa-2x"></i></a>
+                              <p class="bold mt-4">{{ this.title}}</p>
+                              <p class="regular small text-secondary">{{ this.body}}</p>
                           </div>
                       </div>
                   </div>
-                  <div class="swiper-slide px-2 px-sm-1">
-                      <div class="card border-0 shadow">
-                          <div class="card-body">
-                              <div class="logo mx-auto my-3"><img src="img/v8/icons/2.svg" class="img-responsive" alt=""></div>
-                              <hr class="w-50 mx-auto my-3">
-                              <p class="bold mt-4">Design Strategy</p>
-                              <p class="regular small text-secondary">Alias eum expedita illo rem!</p>
-                          </div>
-                          <div class="card-footer d-flex align-items-center justify-content-around">
-                              <div class="roi">
-                                  <p class="text-darker lead bold mb-0">1.5k</p>
-                                  <p class="text-secondary small mt-0">New subscribers</p>
-                              </div><a href="javascript:;"><i class="fas fa-info-circle fa-2x"></i></a>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="swiper-slide px-2 px-sm-1">
-                      <div class="card border-0 shadow">
-                          <div class="card-body">
-                              <div class="logo mx-auto my-3"><img src="img/v8/icons/3.svg" class="img-responsive" alt=""></div>
-                              <hr class="w-50 mx-auto my-3">
-                              <p class="bold mt-4">Save Money</p>
-                              <p class="regular small text-secondary">Consectetur adipisicing elit</p>
-                          </div>
-                          <div class="card-footer d-flex align-items-center justify-content-around">
-                              <div class="roi">
-                                  <p class="text-darker lead bold mb-0">1.5k</p>
-                                  <p class="text-secondary small mt-0">New subscribers</p>
-                              </div><a href="javascript:;"><i class="fas fa-info-circle fa-2x"></i></a>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="swiper-slide px-2 px-sm-1">
-                      <div class="card border-0 shadow">
-                          <div class="card-body">
-                              <div class="logo mx-auto my-3"><img src="img/v8/icons/4.svg" class="img-responsive" alt=""></div>
-                              <hr class="w-50 mx-auto my-3">
-                              <p class="bold mt-4">Business Brain</p>
-                              <p class="regular small text-secondary">Rem repellendus rerum, vel!</p>
-                          </div>
-                          <div class="card-footer d-flex align-items-center justify-content-around">
-                              <div class="roi">
-                                  <p class="text-darker lead bold mb-0">1.5k</p>
-                                  <p class="text-secondary small mt-0">New subscribers</p>
-                              </div><a href="javascript:;"><i class="fas fa-info-circle fa-2x"></i></a>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="swiper-slide px-2 px-sm-1">
-                      <div class="card border-0 shadow">
-                          <div class="card-body">
-                              <div class="logo mx-auto my-3"><img src="img/v8/icons/5.svg" class="img-responsive" alt=""></div>
-                              <hr class="w-50 mx-auto my-3">
-                              <p class="bold mt-4">Worldwide Support</p>
-                              <p class="regular small text-secondary">Consectetur adipisicing elit</p>
-                          </div>
-                          <div class="card-footer d-flex align-items-center justify-content-around">
-                              <div class="roi">
-                                  <p class="text-darker lead bold mb-0">1.5k</p>
-                                  <p class="text-secondary small mt-0">New subscribers</p>
-                              </div><a href="javascript:;"><i class="fas fa-info-circle fa-2x"></i></a>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="swiper-slide px-2 px-sm-1">
-                      <div class="card border-0 shadow">
-                          <div class="card-body">
-                              <div class="logo mx-auto my-3"><img src="img/v8/icons/6.svg" class="img-responsive" alt=""></div>
-                              <hr class="w-50 mx-auto my-3">
-                              <p class="bold mt-4">Social Settings</p>
-                              <p class="regular small text-secondary">Facilis numquam odio sit amet.</p>
-                          </div>
-                          <div class="card-footer d-flex align-items-center justify-content-around">
-                              <div class="roi">
-                                  <p class="text-darker lead bold mb-0">1.5k</p>
-                                  <p class="text-secondary small mt-0">New subscribers</p>
-                              </div><a href="javascript:;"><i class="fas fa-info-circle fa-2x"></i></a>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="swiper-slide px-2 px-sm-1">
-                      <div class="card border-0 shadow">
-                          <div class="card-body">
-                              <div class="logo mx-auto my-3"><img src="img/v8/icons/7.svg" class="img-responsive" alt=""></div>
-                              <hr class="w-50 mx-auto my-3">
-                              <p class="bold mt-4">Insightful Statistics</p>
-                              <p class="regular small text-secondary">facere quasi rem suscipit!</p>
-                          </div>
-                          <div class="card-footer d-flex align-items-center justify-content-around">
-                              <div class="roi">
-                                  <p class="text-darker lead bold mb-0">1.5k</p>
-                                  <p class="text-secondary small mt-0">New subscribers</p>
-                              </div><a href="javascript:;"><i class="fas fa-info-circle fa-2x"></i></a>
-                          </div>
-                      </div>
-                  </div>
+
+                  {{/each}}
+
               </div><!-- Add Arrows -->
               <div class="text-primary features-nav features-nav-next"><span class="text-uppercase small">Next</span> <i class="features-nav-icon fas fa-long-arrow-alt-right"></i></div>
           </div>
