@@ -1,4 +1,23 @@
 /* Css File for Module: gallery */
+.popup-gallery{
+margin: 80px 0 0;
+}
+
 .grid-of-images img{
-    max-height: 60px;
+    max-height: 120px;
+    margin: 0 20px 20px 0;
+}
+
+.gallery-container {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .gallery-container div{
+    width:100%;
+}
+
+.gallery-container img{
+    max-height: 120px;
+
 }
