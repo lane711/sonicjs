@@ -20696,8 +20696,8 @@ section,
         width: 50%; } }
     @media (min-width: 1200px) {
       .automate-social-header .main-shape-wrapper {
-        -webkit-transform: translateY(-50%) scale(0.75);
-                transform: translateY(-50%) scale(0.75); } }
+        -webkit-transform: translateY(-61%) scale(0.65);
+                transform: translateY(-61%) scale(0.65); } }
   @media (min-width: 1601px) {
     .automate-social-header .main-background {
       -webkit-transform: translate3d(0, -3%, 0);

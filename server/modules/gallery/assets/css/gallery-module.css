@@ -1,6 +1,6 @@
 /* Css File for Module: gallery */
 .popup-gallery{
-margin: 80px 0 0;
+
 }
 
 .grid-of-images img{
@@ -32,4 +32,8 @@ margin: 80px 0 0;
 
 .mfp-title i{
     margin: 0 12px;
+}
+
+.card {
+    height: 390px;
 }
