@@ -1,52 +1,128 @@
-{{ log data.view }}
-
 {{#if (eq data.view "lightbox")}}
 
 <div class="gallery-container">
-
   {{#each data.galleryImages }}
   <div>
-<a
-  href="/assets/uploads/{{ this.select.file}}"
-  title="<b>{{ this.title}}</b> {{ this.body}}"
-  ><img src="/assets/uploads/{{ this.select.file}}" /></a
->
-</div>
-{{/each}}
-
+    <a
+      href="/assets/uploads/{{ this.select.file }}"
+      title="<b>{{ this.title }}</b> {{ this.body }}"
+      ><img src="/assets/uploads/{{ this.select.file }}"
+    /></a>
+  </div>
+  {{/each}}
 </div>
 {{/if}}
-
-
 
 {{#if (eq data.view "swipper")}}
 
 <section class="section features-carousel b-b">
   <div class="container pt-0">
-      <div class="cards-wrapper">
-          <div class="swiper-container" data-sw-show-items="4" data-sw-autoplay="3500" data-sw-loop="true" data-sw-nav-arrows=".features-nav" data-sw-breakpoints='{"1024": {"slidesPerView": 4,"spaceBetween": 40},"992": {"slidesPerView": 4,"spaceBetween": 15},"768": {"slidesPerView": 4.5,"spaceBetween": 15},"576": {"slidesPerView": 1.5,"spaceBetween": 10}}'>
-              <div class="swiper-wrapper px-1">
+    <div class="cards-wrapper">
+      <div
+        class="swiper-container"
+        data-sw-show-items="4"
+        data-sw-autoplay="3500"
+        data-sw-loop="true"
+        data-sw-nav-arrows=".features-nav"
+        data-sw-breakpoints='{"1024": {"slidesPerView": 4,"spaceBetween": 40},"992": {"slidesPerView": 4,"spaceBetween": 15},"768": {"slidesPerView": 4.5,"spaceBetween": 15},"576": {"slidesPerView": 1.5,"spaceBetween": 10}}'
+      >
+        <div
+          class="swiper-wrapper px-1 modal-popup popup-gallery"
+          data-type="gallery"
+          data-image='{"verticalFit": true}'
+          data-zoom="300"
+        >
+          {{#each data.galleryImages }}
 
-                {{#each data.galleryImages }}
-
-                  <div class="swiper-slide px-2 px-sm-1">
-                      <div class="card border-0 shadow">
-                          <div class="card-body">
-                              <div class="logo mx-auto my-3"><img src="/assets/uploads/{{ this.select.file}}" class="img-responsive" alt=""></div>
-                              <hr class="w-50 mx-auto my-3">
-                              <p class="bold mt-4">{{ this.title}}</p>
-                              <p class="regular small text-secondary">{{ this.body}}</p>
-                          </div>
-                      </div>
+          <div class="swiper-slide px-2 px-sm-1">
+            <a
+              href="/assets/uploads/{{ this.select.file }}"
+              title="<b>Node.js CMS - {{ this.title }}</b> <i class='fas fa-long-arrow-alt-right'></i>{{ this.body }}"
+            >
+              <div class="card border-0 shadow">
+                <div class="card-body">
+                  <div class="logo mx-auto my-3">
+                    <img
+                      src="/assets/uploads/{{ this.select.file }}"
+                      class="img-responsive"
+                      alt=""
+                    />
                   </div>
-
-                  {{/each}}
-
-              </div><!-- Add Arrows -->
-              <div class="text-primary features-nav features-nav-next"><span class="text-uppercase small">Next</span> <i class="features-nav-icon fas fa-long-arrow-alt-right"></i></div>
+                  <hr class="w-50 mx-auto my-3" />
+                  <p class="bold mt-4">{{ this.title }}</p>
+                  <p class="regular small text-secondary">
+                    {{ this.body }}
+                  </p>
+                </div>
+              </div>
+            </a>
           </div>
+
+          {{/each}}
+        </div>
+        <!-- Add Arrows -->
+        <div class="text-primary features-nav features-nav-next">
+          <span class="text-uppercase small">Next</span>
+          <i class="features-nav-icon fas fa-long-arrow-alt-right"></i>
+        </div>
       </div>
+    </div>
   </div>
-</section><!-- ./Get Started -->
+</section>
+<!-- ./Get Started -->
 
 {{/if}}
+
+<section class="section b-b">
+  <div class="container">
+    <div class="section-heading text-center">
+      <h2 id="examples">Lightbox gallery</h2>
+      <p class="lead">
+        You may put any HTML content in each gallery item and mix content types.
+        In this example lazy-loading of images is enabled for the next image
+        based on move direction.
+      </p>
+    </div>
+    <div class="row">
+      <div class="col-md-8 mx-auto text-center">
+        <div
+          class="modal-popup popup-gallery grid-of-images"
+          data-type="gallery"
+          data-image='{"verticalFit": true}'
+          data-zoom="300"
+        >
+          <a
+            href="https://picsum.photos/800/600/?image=997"
+            title="Some nice title to show"
+            ><img src="https://picsum.photos/75/75/?image=997"
+          /></a>
+          <a
+            href="https://picsum.photos/800/600/?image=977"
+            title="Some nice title to show"
+            ><img src="https://picsum.photos/75/75/?image=977" /></a
+          ><a
+            href="https://picsum.photos/800/600/?image=976"
+            title="Some nice title to show"
+            ><img src="https://picsum.photos/75/75/?image=976" /></a
+          ><a
+            href="https://picsum.photos/800/600/?image=1074"
+            title="Some nice title to show"
+            ><img src="https://picsum.photos/75/75/?image=1074" /></a
+          ><a
+            href="https://picsum.photos/800/600/?image=874"
+            title="Some nice title to show"
+            ><img src="https://picsum.photos/75/75/?image=874" /></a
+          ><a
+            href="https://picsum.photos/800/600/?image=937"
+            title="Some nice title to show"
+            ><img src="https://picsum.photos/75/75/?image=937" /></a
+          ><a
+            href="https://picsum.photos/800/600/?image=1072"
+            title="Some nice title to show"
+            ><img src="https://picsum.photos/75/75/?image=1072"
+          /></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
