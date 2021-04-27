@@ -78,6 +78,7 @@
     "passport-local-mongoose": "^6.0.1",
     "perfect-scrollbar": "^1.5.0",
     "popper.js": "^1.16.1",
+    "sendgrid": "^5.2.3",
     "shortcode-tree": "^1.4.14",
     "simple-line-icons": "^2.5.5",
     "sortablejs": "^1.13.0",
