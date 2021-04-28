@@ -1,5 +1,19 @@
-.dark-fade{
-    background-image: url(/assets/uploads/waves.jpeg);
-        background-image: -webkit-gradient(linear, left bottom, right top, from(#a772ff), to(#0083dd));
-        background-image: linear-gradient(to right top, #a772ff, #0083dd);
-    }
+.dark-fade {
+  background-image: url(/assets/uploads/waves.jpeg);
+  background-image: -webkit-gradient(
+    linear,
+    left bottom,
+    right top,
+    from(#a772ff),
+    to(#0083dd)
+  );
+  background-image: linear-gradient(to right top, #a772ff, #0083dd);
+}
+
+.about h1{
+    margin-bottom: 45px;
+  }
+
+.about [data-module="HTML"] {
+  margin-bottom: 90px;
+}
