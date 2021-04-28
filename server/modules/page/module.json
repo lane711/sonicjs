@@ -1,0 +1,8 @@
+{
+  "title": "Page",
+  "systemId": "page",
+  "version": "0.0.0.1",
+  "enabled": true,
+  "canBeAddedToColumn": true,
+  "singleInstance": false
+}
