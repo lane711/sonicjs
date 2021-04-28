@@ -297,7 +297,7 @@ module.exports = moduleService = {
       };
 
       //for template based pages
-      if (options.page.data.pageTemplate) {
+      if (options.page && options.page.data.pageTemplate) {
         if (options.shortcode.name !== "PAGE-TEMPLATES") {
           let wrappedDiv = formattingService.generateModuleDivWrapper(
             options.shortcode.properties.id,
