@@ -1,15 +1,16 @@
 {{#if data.showHero}}
-<section class="jumbotron-fluid hero no-margin">
-    <div class="dark-fade">
-        <div class='container'>
-            <div class='row'>
-                <div class='col'>
-                    <h1>{{data.heroTitle}}</h1>
-                </div>
-            </div>
+<header class="page header text-contrast overlay gradient gradient-purple-blue alpha-8 image-background cover" style="background-image: url('../img/bg/waves.jpg')">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <h1 class="display-4 text-contrast mb-4 mt-4">{{data.heroTitle}}</h1>
+          <!-- <p class="lead text-contrast">
+            {{data.heroSubTitle}}
+          </p> -->
         </div>
+      </div>
     </div>
-</section>
+  </header>
 {{/if}}
 {{#unless data.showHero}}
 <div class="under-menu-spacer"></div>
