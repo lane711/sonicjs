@@ -17,6 +17,7 @@ module.exports = bodyTextShortcodesMainService = {
                 if(bodyBlock.shortcode){
 
                         let id = bodyBlock.shortcode.properties.id;
+                        if(!id) continue;
                         let contentType = bodyBlock.shortcode.name.toLowerCase();
                         let viewPath = await moduleService.getModuleViewFile(contentType);
                         let viewModel = await dataService.getContentById(id);
