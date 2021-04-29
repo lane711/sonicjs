@@ -17,3 +17,7 @@
 .about [data-module="HTML"] {
   margin-bottom: 90px;
 }
+
+main{
+  background-color: #f9fbfd !important
+}

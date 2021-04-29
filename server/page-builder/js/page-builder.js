@@ -1683,7 +1683,6 @@ async function updateModuleSort(shortCode, event) {
     ? "[data-template-region='true']"
     : ".module";
 
-  debugger;
 
   destinationModules = $(destinationColumn)
     .find(destinationModuleFilter)

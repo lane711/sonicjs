@@ -1,0 +1,9 @@
+{
+  "title": "Spacer",
+  "enabled": true,
+  "systemId": "spacer",
+  "canBeAddedToColumn": true,
+  "version": "0.0.0.1",
+  "systemidUpperCase": "SPACER",
+  "systemidCamelCase": "spacer"
+}
