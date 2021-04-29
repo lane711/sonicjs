@@ -34,16 +34,9 @@ module.exports = bodyTextShortcodesMainService = {
                             bodyBlock.shortcode.codeText,
                           processedHtml.body
                         );
-                      
-        
-                    // options.viewModel.data.body = 'hello' + options.viewModel.data.body;
-
                 }
               }
             }
-            // await moduleService.processModuleInColumn(options, options.viewModel)
-
-
         }
 
     });

@@ -8,16 +8,16 @@ var emailService = require("../../../services/email.service");
 module.exports = contactUsMainService = {
   startup: async function () {
     emitterService.on("beginProcessModuleShortCode", async function (options) {
-      if (options.shortcode.name !== "CONTACT-US") {
+      if (options.shortcode.name !== "CONTACT") {
         return;
       }
 
-      options.moduleName = "contact-us";
+      options.moduleName = "contact";
       await moduleService.processModuleInColumn(options);
     });
 
     emitterService.on("postModuleGetData", async function (options) {
-      if (options.shortcode.name !== "CONTACT-US") {
+      if (options.shortcode.name !== "CONTACT") {
         return;
       }
 

@@ -67,14 +67,17 @@ if (typeof module !== "undefined" && module.exports) {
     ) {
 
       let contentType;
+      // debugger;
       if (content && content.data.contentType) {
         contentType = await dataService.contentTypeGet(
           content.data.contentType.toLowerCase()
         );
       } else if (contentTypeId) {
         contentType = await dataService.contentTypeGet(contentTypeId);
+        // let  contentTypeSettings = await dataService.contentTypeGet(`${contentTypeId}-settings`);
+        // contentType = contentTypeSettings ?? contentType;
         //show settings version of content type if exist
-        if(returnModuleSettings && returnModuleSettings.systemId){
+        if(returnModuleSettings){
           const settingContentType = await dataService.contentTypeGet(`${contentTypeId}-settings`);
           if(settingContentType){
             contentType = settingContentType;

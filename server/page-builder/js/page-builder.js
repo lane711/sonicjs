@@ -1349,9 +1349,14 @@ async function addModuleToColumn(submission) {
   }
 
   // generate short code ie: [MODULE-HELLO-WORLD id="123"]
+  // debugger;
   let args = { id: processedEntity.id };
+  let contentType = submission.data.contentType;
+  if(contentType.indexOf('-settings') > -1){
+    contentType = contentType.replace('-settings', '');
+  }
   let moduleInstanceShortCode = sharedService.generateShortCode(
-    `${submission.data.contentType}`,
+    `${contentType}`,
     args
   );
 
