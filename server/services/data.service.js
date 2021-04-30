@@ -664,8 +664,8 @@ if (typeof module !== "undefined" && module.exports) {
         await callback(array[index], index, array);
       }
     }),
-    (exports.getImageUrl = function (fileName) {
-      return `/assets/uploads/${fileName}`;
+    (exports.getImageUrl = function (file) {
+      return `/assets/uploads/${file.file}`;
     }),
     (exports.getImage = function (img) {
       let url = this.getImageUrl(img);

@@ -13,11 +13,11 @@ var axiosInstance;
 
 module.exports = mediaService = {
   startup: async function () {
-    emitterService.on("getRenderedPagePostDataFetch", async function (options) {
-      if (options && options.page) {
-        await mediaService.processHeroImage(options.page);
-      }
-    });
+    // emitterService.on("getRenderedPagePostDataFetch", async function (options) {
+    //   if (options && options.page) {
+    //     await mediaService.processHeroImage(options.page);
+    //   }
+    // });
 
     emitterService.on("requestBegin", async function (options) {
       // console.log('data service startup')

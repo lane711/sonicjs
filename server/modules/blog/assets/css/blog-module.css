@@ -1,1 +1,4 @@
 /* Css File for Module: blog */
+.card-blog a img{
+    height: 60px;
+}

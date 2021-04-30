@@ -1,8 +1,9 @@
-{{!-- {{log this}} --}}
-{{#each this.list}}
+{{#each data.list}}
 
-<div class="card mb-4 my-4">
-  <a href="{{this.data.url}}"><img class="card-img-top" src="{{this.data.image}}" alt="{{this.data.title}}"></a>
+<!-- <div class="card mb-4 my-4">
+  <a href="{{this.data.url}}">
+    <img class="card-img-top" src="{{this.data.image}}" alt="{{this.data.title}}">
+  </a>
   <div class="card-body">
     <a href="{{this.data.url}}"><h2 class="card-title">{{this.data.title}}</h2></a>
     <p class="card-text">{{this.data.body}}</p>
@@ -12,6 +13,38 @@
     {{this.data.createdOnFormatted}} by
     <a href="#">Lane C., SonicJs Founder</a>
   </div>
+</div> -->
+
+<div class="card card-blog shadow-box shadow-hover border-0">
+  <a href="{{this.data.url}}"
+    ><img
+      class="card-img-topX img-responsive"
+      src="{{this.data.image}}"
+      alt=""
+  /></a>
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between">
+      <div class="author d-flex align-items-center">
+        <img
+          class="author-picture rounded-circle icon-md shadow-box"
+          src="../img/avatar/user.png"
+          alt="..."
+        />
+        <p class="small bold my-0">Lane C., SonicJs Founder</p>
+      </div>
+
+    </div>
+    <hr />
+    <p class="card-title regular">
+      <a href="{{this.data.url}}">{{this.data.title}}</a>
+    </p>
+    <p class="card-text text-secondary">
+      {{this.data.body}}
+    </p>
+    <p class="bold small text-secondary my-0"><small>{{this.data.createdOnFormatted}}</small></p>
+  </div>
 </div>
 
 {{/each}}
+
+
