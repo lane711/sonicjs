@@ -3,17 +3,17 @@ var emitterService = require("../../../services/emitter.service");
 var globalService = require("../../../services/global.service");
 
 module.exports = blogDetailsMainService = {
+
   startup: async function () {
+
+    blogData = {};  
+
     emitterService.on("beginProcessModuleShortCode", async function (options) {
-      if (options.shortcode.name === "BLOG-DETAILS-SETTINGS") {
+      if (options.shortcode.name === "BLOG-DETAILS") {
         options.moduleName = "blog-details";
-        options.shortcode.name = "BLOG-DETAILS";
 
         //get blog record
-        const blog  = await dataService.getContentByUrl(options.req.originalUrl);
-        // const blog = await dataService.getContentTopOne("blog");
-
-        let viewModel = blog;
+        const viewModel  = blogData;
 
         await moduleService.processModuleInColumn(options, viewModel);
       }
@@ -22,6 +22,16 @@ module.exports = blogDetailsMainService = {
     emitterService.on("preProcessPageUrlLookup", async function (req) {
       if (req.url.indexOf("/blog/") === 0) {
         req.url = "/blog-details";
+      }
+    });
+
+    emitterService.on("postPageDataFetch", async function (options) {
+      if(options.page){
+        if (options.req.url === "/blog-details") {
+          blogData  = await dataService.getContentByUrl(options.req.originalUrl);
+
+          options.page.data.heroTitle = blogData.data.title;
+        }
       }
     });
   },

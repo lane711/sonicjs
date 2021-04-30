@@ -58,6 +58,9 @@ module.exports = contentService = {
 
     let page = await dataService.getContentByUrl(req.url);
 
+    await emitterService.emit("postPageDataFetch", { req: req, page: page });
+
+
     if (page.data) {
       //page templates
       if (page.data.pageTemplate) {

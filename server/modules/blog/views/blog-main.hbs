@@ -1,5 +1,3 @@
-{{#each data.list}}
-
 <!-- <div class="card mb-4 my-4">
   <a href="{{this.data.url}}">
     <img class="card-img-top" src="{{this.data.image}}" alt="{{this.data.title}}">
@@ -15,7 +13,7 @@
   </div>
 </div> -->
 
-<div class="card card-blog shadow-box shadow-hover border-0 mb-4">
+<!-- <div class="card card-blog shadow-box shadow-hover border-0 mb-4">
   <a href="{{this.data.url}}"
     ><img
       class="card-img-top img-responsive"
@@ -43,8 +41,75 @@
     </p>
     <p class="bold small text-secondary my-0"><small>{{this.data.createdOnFormatted}}</small></p>
   </div>
+</div> -->
+
+<div class="container">
+  <div class="row gap-y">
+    <div class="col-lg-12 b-r">
+      <div class="row gap-y">
+        {{#each data.list}}
+
+        <a href="{{this.data.url}}">
+
+        
+        <div class="col-md-6">
+          <div class="card card-blog shadow-box shadow-hover border-0">
+            <a href="{{this.data.url}}"
+              ><img
+                class="card-img-top img-responsive"
+                src="{{this.data.image}}"
+                alt=""
+            /></a>
+            <div class="card-body">
+              <div class="d-flex align-items-center justify-content-between">
+                <div class="author d-flex align-items-center">
+                  <img
+                    class="author-picture rounded-circle icon-md shadow-box"
+                    src="/assets/uploads/lane-profile-mini.jpeg"
+                    alt="Author profile"
+                  />
+                  <p class="small bold my-0">Lane C., SonicJs Founder</p>
+                </div>
+                <!-- <nav class="nav">
+                  <a
+                    href="javascript:;"
+                    class="d-flex align-items-center text-secondary mr-3 blog-action blog-favorite"
+                    ><i class="fas fa-heart text-danger mr-2"></i>
+                    <span class="small">347</span> </a
+                  ><a
+                    href="javascript:;"
+                    class="d-flex align-items-center text-secondary blog-action blog-bookmark"
+                    ><i class="far fa-bookmark mr-2"></i>
+                    <span class="small">73</span></a
+                  >
+                </nav> -->
+              </div>
+              <hr />
+              <p class="card-title regular">
+                <a href="{{this.data.url}}">{{this.data.title}}</a>
+              </p>
+              <p class="card-text text-secondary">
+                {{this.data.body}}
+              </p>
+              <p class="bold small text-secondary my-0">
+                <small>{{this.data.createdOnFormatted}}</small>
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </a>
+
+        {{/each}}
+      </div>
+      <nav class="nav justify-content-center mt-5">
+        <a class="btn btn-contrast btn-rounded mr-5" href="#"
+          ><i class="fas fa-angle-left"></i> Previous</a
+        >
+        <a class="btn btn-contrast btn-rounded" href="#"
+          >Next <i class="fas fa-angle-right"></i
+        ></a>
+      </nav>
+    </div>
+  </div>
 </div>
-
-{{/each}}
-
-
