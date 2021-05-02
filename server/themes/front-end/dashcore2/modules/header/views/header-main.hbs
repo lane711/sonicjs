@@ -1,0 +1,40 @@
+<header class="section header text-contrast automate-social-header">
+  <div class="shape-wrapper">
+    <div
+      class="shape shape-background shape-main gradient gradient-blue-purple"
+    ></div>
+    <div class="shape shape-background shape-main shadow"></div>
+    <div class="shape shape-background shape-top"></div>
+    <div class="shape shape-background shape-right"></div>
+  </div>
+  <div class="container overflow-hidden">
+    <div class="row gap-y">
+      <div class="col-lg-6">
+        <h1
+          class="text-contrast extra-bold display-md-3 display-lg-2 font-lg mb-5"
+        >
+          {{ data.title }}
+          <span class="d-block light font-md">{{ data.subTitle }}
+        </span>
+        </h1>
+        <p class="text-contrast lead">
+            {{{ data.tagline }}}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-shape-wrapper">
+    <div class="bubbles-wrapper">
+      <div data-aos="fade-up">
+        <img
+          src="/assets/uploads/build.svg"
+          class="img-responsive main-shape floating"
+          alt=""
+        />
+      </div>
+    </div>
+  </div>
+</header>
+
+{{{ data.body }}}

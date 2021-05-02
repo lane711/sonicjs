@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" class="{{data.pageCssClass}}">
+  <head>
+    <meta charset="utf-8" />
+    <!--[if IE
+      ]><meta http-equiv="X-UA-Compatible" content="IE=edge"
+    /><![endif]-->
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <!-- Place favicon.ico in the root directory -->
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <link rel="icon" href="/assets/img/favicon.ico" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:100,300,400,700,900"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Caveat"
+      rel="stylesheet"
+    />
+    <meta name="description" content="{{ data.metaDescription }}" />
+    <meta name="generator" content="SonicJs" />
+    <meta name="version" content="{{ data.appVersion }}" />
+    <title>{{ data.metaTitle }}</title>
+    <!-- themeforest:css -->
+
+    {{{data.cssLinks}}}
+
+    {{#if data.showPageBuilder}}
+    <link href="/page-builder/css/page-builder.css" rel="stylesheet" />
+    {{/if}}
+  </head>
+
+  <body>
+    <input type="hidden" name="page-id" id="page-id" value="{{ data.id }}" />
+
+    <!--[if lt IE 8]>
+      <p class="browserupgrade">
+        You are using an <strong>outdated</strong> browser. Please
+        <a href="http://browsehappy.com/">upgrade your browser</a> to improve
+        your experience.
+      </p>
+    <![endif]-->
+
+    {{> menu level='1'}}
+
+    {{#if data.showPageBuilder}}
+    {{> page-builder }}
+    {{/if}}
+
+    <main>
+        
+      {{{body}}}
+
+
+      <!-- ./Footer - Four Columns -->
+      <footer class="site-footer section">
+        <div class="container pb-3">
+          <!-- <div class="row gap-y text-center text-md-left">
+            <div class="col-md-4 mr-auto">
+              <img src="img/logo.png" alt="" class="logo" />
+              <p>
+                Dashcore, a carefully crafted and powerful HTML5 template, it's
+                perfect to showcase your startup or software
+              </p>
+            </div>
+            <div class="col-md-2">
+              <h6 class="py-2 bold">Company</h6>
+              <nav class="nav flex-column">
+                <a class="nav-item py-2" href="about.html">About</a>
+                <a class="nav-item py-2" href="#">Services</a>
+                <a class="nav-item py-2" href="blog/blog-grid.html">Blog</a>
+              </nav>
+            </div>
+            <div class="col-md-2">
+              <h6 class="py-2 bold">Product</h6>
+              <nav class="nav flex-column">
+                <a class="nav-item py-2" href="#">Features</a>
+                <a class="nav-item py-2" href="#">API</a>
+                <a class="nav-item py-2" href="#">Customers</a>
+              </nav>
+            </div>
+            <div class="col-md-2">
+              <h6 class="py-2 bold">Channels</h6>
+              <nav class="nav flex-column">
+                <a class="nav-item py-2" href="#">Careers</a>
+                <a class="nav-item py-2" href="#">Contact</a>
+                <a class="nav-item py-2" href="#">Search</a>
+              </nav>
+            </div>
+          </div> -->
+          <hr class="mt-5" />
+          <div class="row small align-items-center">
+            <div class="col-md-4">
+              <p class="mt-2 mb-md-0 text-secondary text-center text-md-left">
+                © 2021 SonicJs. All Rights Reserved
+              </p>
+            </div>
+            <div class="col-md-8">
+              <nav class="nav justify-content-center justify-content-md-end">
+                <a
+                href="https://github.com/lane711/sonicjs"
+                target="_blank"
+                class="btn btn-circle btn-sm btn-secondary mr-3 op-4"
+                ><i class="fab fa-github"></i
+              ></a>
+                <a
+                  href="https://www.youtube.com/channel/UCm_B7S9smSvtrv0nAt2vrqw"
+                  target="_blank"
+                  class="btn btn-circle btn-sm btn-secondary mr-3 op-4"
+                  ><i class="fab fa-youtube"></i
+                ></a>
+                <a
+                  href="https://www.facebook.com/SonicJs-Nodejs-CMS-113052493788728"
+                  target="_blank"
+                  class="btn btn-circle btn-sm btn-secondary mr-3 op-4"
+                  ><i class="fab fa-facebook"></i
+                ></a>
+                <a href="https://twitter.com/SonicJs1" class="btn btn-circle btn-sm btn-secondary op-4"
+                target="_blank"
+                  ><i class="fab fa-twitter"></i
+                ></a>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    {{{data.jsLinks}}}
+  </body>
+</html>
