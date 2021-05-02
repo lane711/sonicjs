@@ -418,7 +418,12 @@ section {
 }
 
 .page-template-region{
+  display: none;
   border: 6px dashed grey;
   text-align: center;
   line-height: 40px;
+}
+
+.pb .page-template-region{
+  display: block;
 }
