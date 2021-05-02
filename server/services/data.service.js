@@ -426,7 +426,7 @@ if (typeof module !== "undefined" && module.exports) {
       let allOfContentType = await this.getContentByContentType(contentType);
       if (allOfContentType) {
         let contentByTitle = allOfContentType.filter(
-          (c) => c.data.title === title
+          (c) => c.data.title.toLowerCase() === title.toLowerCase()
         )[0];
         return contentByTitle;
       }

@@ -1,4 +1,4 @@
-<div
+<!-- <div
   class="panel-group accordion-menu-module"
   id="accordionMenu"
   role="tablist"
@@ -13,7 +13,7 @@
           role="button"
           data-toggle="collapse"
           data-parent="#accordionMenu"
-          href="#{{this.id}}"
+          href="#{{ this.id }}"
           aria-expanded="false"
           aria-controls="collapseOne"
         >
@@ -22,7 +22,7 @@
       </h4>
     </div>
     <div
-      id="{{this.id}}"
+      id="{{ this.id }}"
       class="panel-collapse collapse in"
       role="tabpanel"
       aria-labelledby="headingOne"
@@ -30,7 +30,9 @@
       <div class="panel-body">
         <ul class="nav">
           {{#each this.children}}
-          <li><a href="{{this.data.url}}">{{this.text}}</a></li>
+          <li>
+            <a href="{{ this.data.url }}">{{ this.text }}</a>
+          </li>
           {{/each}}
         </ul>
       </div>
@@ -38,4 +40,19 @@
   </div>
 
   {{/each}}
-</div>
+</div> -->
+
+
+{{#each data.menuData }}
+<h4 class="bold small text-uppercase mt-4 mb-3">{{ this.text }}</h4>
+  {{#each this.children}}
+  <nav class="nav flex-column font-sm">
+    <a class="pl-0 nav-item nav-link bold active" href="faqs.html">{{ this.text }}</a>
+    <!-- third level -->
+    {{#each this.children}}
+      <a class="pl-0 nav-item nav-link" href="{{ this.data.url }}">{{ this.text }}</a>
+    {{/each}}
+    <!-- third level end -->
+  </nav>
+  {{/each}}
+{{/each}}
