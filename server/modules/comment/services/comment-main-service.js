@@ -1,6 +1,7 @@
 var dataService = require('../../../services/data.service');
 var emitterService = require('../../../services/emitter.service');
 var globalService = require('../../../services/global.service');
+var formService = require("../../../services/form.service");
 
 module.exports = commentMainService = {
 
@@ -9,7 +10,7 @@ module.exports = commentMainService = {
 
             if (options.shortcode.name === 'COMMENT') {
 
-                options.moduleName = 'comments';
+                options.moduleName = 'comment';
                 await moduleService.processModuleInColumn(options);
             }
 
@@ -26,7 +27,6 @@ module.exports = commentMainService = {
               "submitForm(submission)"
             );
       
-            // console.log('contact module after view model', options.viewModel);
           });
     },
 
