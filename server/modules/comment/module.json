@@ -1,0 +1,9 @@
+{
+  "title": "Comment",
+  "enabled": true,
+  "systemId": "comment",
+  "canBeAddedToColumn": true,
+  "version": "0.0.0.1",
+  "systemidUpperCase": "COMMENT",
+  "systemidCamelCase": "comment"
+}
