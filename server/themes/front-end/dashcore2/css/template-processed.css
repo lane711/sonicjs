@@ -10,19 +10,19 @@
   background-image: linear-gradient(to right top, #a772ff, #0083dd);
 }
 
-.about h1{
-    margin-bottom: 45px;
-  }
+.about h1 {
+  margin-bottom: 45px;
+}
 
 .about [data-module="HTML"] {
   margin-bottom: 90px;
 }
 
-main{
-  background-color: #f9fbfd !important
+main {
+  background-color: #f9fbfd !important;
 }
 
-.home h1.extra-bold{
+.home h1.extra-bold {
   font-size: 3.5rem !important;
 }
 
@@ -31,10 +31,32 @@ main{
 }
 
 .page.header.gradient.gradient-purple-blue {
-  background-image: -webkit-gradient(linear, left bottom, right top, from(red), to(#0083dd));
+  background-image: -webkit-gradient(
+    linear,
+    left bottom,
+    right top,
+    from(red),
+    to(#0083dd)
+  );
   background-image: linear-gradient(to right top, red, #0083dd);
 }
 
-.form-text.text-muted{
-  font-size: .8rem;
+.form-text.text-muted {
+  font-size: 0.8rem;
+}
+
+.home .automate-social-header .shape-main.shadow {
+  background-color: rgba(23, 45, 87, 0.65);
+  -webkit-transform: translate(19%, 10px) rotate(-30deg);
+  transform: translate(19%, 10px) rotate(-30deg);
+}
+
+.automate-social-header .shape-top {
+  top: 0;
+  background-image: linear-gradient(-57deg, #22048b 0%, #24262e 100%);
+  -webkit-transform: rotate(30deg) translate3D(-45%, -45%, 0);
+  transform: rotate(30deg) translate3D(-45%, -45%, 0);
+  max-height: 560px;
+  -webkit-box-shadow: 0 0 25px 50px rgb(74 97 209 / 50%);
+  box-shadow: 0 0 25px 50px rgb(74 97 209 / 50%);
 }
