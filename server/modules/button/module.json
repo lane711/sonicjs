@@ -1,0 +1,9 @@
+{
+  "title": "Button",
+  "enabled": true,
+  "systemId": "button",
+  "canBeAddedToColumn": true,
+  "version": "0.0.0.1",
+  "systemidUpperCase": "BUTTON",
+  "systemidCamelCase": "button"
+}
