@@ -25,3 +25,16 @@ main{
 .home h1.extra-bold{
   font-size: 3.5rem !important;
 }
+
+.navigation .logo {
+  max-height: 72px;
+}
+
+.page.header.gradient.gradient-purple-blue {
+  background-image: -webkit-gradient(linear, left bottom, right top, from(red), to(#0083dd));
+  background-image: linear-gradient(to right top, red, #0083dd);
+}
+
+.form-text.text-muted{
+  font-size: .8rem;
+}

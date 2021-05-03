@@ -1,0 +1,19 @@
+<div class="accordion accordion-clean" id="faqs-accordion">
+  {{#each data.faqs}}
+  <div class="card mb-3">
+    <div class="card-header">
+      <a
+        href="#"
+        class="card-title btn collapsed"
+        data-toggle="collapse"
+        data-target="#v1-q1"
+        aria-expanded="false"
+        ><i class="fas fa-angle-down angle"></i>{{ this.question }}
+      </a>
+    </div>
+    <div id="v1-q1" class="collapse" data-parent="#faqs-accordion" style="">
+      <div class="card-body">{{{ this.answer }}}</div>
+    </div>
+  </div>
+  {{/each}}
+</div>

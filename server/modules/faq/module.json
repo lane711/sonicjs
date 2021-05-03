@@ -1,0 +1,9 @@
+{
+  "title": "FAQ",
+  "enabled": true,
+  "systemId": "faq",
+  "canBeAddedToColumn": true,
+  "version": "0.0.0.1",
+  "systemidUpperCase": "FAQ",
+  "systemidCamelCase": "faq"
+}
