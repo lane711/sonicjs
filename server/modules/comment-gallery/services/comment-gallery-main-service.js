@@ -17,7 +17,7 @@ module.exports = commentGalleryMainService = {
 
         emitterService.on("postModuleGetData", async function (options) {
             if (options.shortcode.name === "COMMENT-GALLERY") {
-              await blogMainService.getCommentData(options);
+              await commentGalleryMainService.getCommentData(options);
             }
           });
     
@@ -31,25 +31,25 @@ module.exports = commentGalleryMainService = {
     
         let listRaw = await dataService.getContentByType(contentType);
     
-        listRaw = listRaw.filter((x) => x.data.title);
-        let list = listRaw.map(function (record) {
-          return {
-            data: {
-              title: record.data.title,
-              body: formatService.stripHtmlTags(
-                helperService.truncateString(record.data.body, 400)
-              ),
-              image: record.data.fileName
-                ? dataService.getImageUrl(record.data.fileName)
-                : undefined,
-              url: record.data.url,
-              createdOn: record.data.createdOn,
-            },
-          };
-        });
+        // listRaw = listRaw.filter((x) => x.data.title);
+        // let list = listRaw.map(function (record) {
+        //   return {
+        //     data: {
+        //       title: record.data.title,
+        //       body: formatService.stripHtmlTags(
+        //         helperService.truncateString(record.data.body, 400)
+        //       ),
+        //       image: record.data.fileName
+        //         ? dataService.getImageUrl(record.data.fileName)
+        //         : undefined,
+        //       url: record.data.url,
+        //       createdOn: record.data.createdOn,
+        //     },
+        //   };
+        // });
     
     
-        options.viewModel.data.list = list;
+        options.viewModel.data.list = listRaw;
       },
     
       processView: async function (contentType, viewModel, viewPath) {

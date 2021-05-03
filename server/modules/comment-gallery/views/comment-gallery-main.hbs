@@ -10,22 +10,22 @@
           
           <div class="col-md-6">
             <div class="card card-blog shadow-box shadow-hover border-0">
-              <a href="{{this.data.url}}"
+              <!-- <a href="{{this.data.url}}"
                 ><img
                   class="card-img-top img-responsive"
                   src="{{this.data.image}}"
                   alt=""
-              /></a>
+              /></a> -->
               <div class="card-body">
                 <div class="d-flex align-items-center justify-content-between">
-                  <div class="author d-flex align-items-center">
+                  <!-- <div class="author d-flex align-items-center">
                     <img
                       class="author-picture rounded-circle icon-md shadow-box"
                       src="/assets/uploads/lane-profile-mini.jpeg"
                       alt="Author profile"
                     />
-                    <p class="small bold my-0">Lane C., SonicJs Founder</p>
-                  </div>
+                    <p class="small bold my-0">{{this.data.displayName}}</p>
+                  </div> -->
                   <!-- <nav class="nav">
                     <a
                       href="javascript:;"
@@ -45,7 +45,7 @@
                   <a href="{{this.data.url}}">{{this.data.title}}</a>
                 </p>
                 <p class="card-text text-secondary">
-                  {{this.data.body}}
+                  {{this.data.message}}
                 </p>
                 <p class="bold small text-secondary my-0">
                   <small>{{this.data.createdOnFormatted}}</small>
