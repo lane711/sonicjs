@@ -427,3 +427,8 @@ section {
 .pb .page-template-region{
   display: block;
 }
+
+.formio-component-modal-wrapper .open-modal-button {
+  max-height: 60vh;
+  overflow: auto;
+}
