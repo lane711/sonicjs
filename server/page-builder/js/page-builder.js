@@ -1594,7 +1594,7 @@ async function setupDropZone() {
         contentType: "media",
       },
     };
-    debugger;
+    // debugger;
     await createInstance(payload);
   }
 }
