@@ -1,0 +1,9 @@
+{
+  "title": "Comment Swiper",
+  "enabled": true,
+  "systemId": "comment-swiper",
+  "canBeAddedToColumn": true,
+  "version": "0.0.0.1",
+  "systemidUpperCase": "COMMENT-SWIPER",
+  "systemidCamelCase": "commentSwiper"
+}

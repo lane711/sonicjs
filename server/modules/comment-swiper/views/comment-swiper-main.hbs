@@ -1,0 +1,56 @@
+{{ log data }}
+<section class="section features-carousel b-b">
+    <div class="container pt-0">
+      <div class="cards-wrapper">
+        <div
+          class="swiper-container"
+          data-sw-show-items="4"
+          data-sw-autoplay="3500"
+          data-sw-loop="true"
+          data-sw-nav-arrows=".features-nav"
+          data-sw-breakpoints='{"1024": {"slidesPerView": 4,"spaceBetween": 40},"992": {"slidesPerView": 4,"spaceBetween": 15},"768": {"slidesPerView": 4.5,"spaceBetween": 15},"576": {"slidesPerView": 1.5,"spaceBetween": 10}}'
+        >
+          <div
+            class="swiper-wrapper px-1 modal-popup popup-gallery"
+            data-type="gallery"
+            data-image='{"verticalFit": true}'
+            data-zoom="300"
+          >
+            {{#each data.list }}
+
+            <div class="swiper-slide px-2 px-sm-1">
+              <a
+                href="/assets/uploads/{{ this.select.file }}"
+                title="<b>Node.js CMS - {{ this.title }}</b> <i class='fas fa-long-arrow-alt-right'></i>{{ this.body }}"
+              >
+                <div class="card border-0 shadow">
+                  <div class="card-body">
+                    <div class="logo mx-auto my-3">
+                      <img
+                        src="/assets/uploads/{{ this.select.file }}"
+                        class="img-responsive"
+                        alt=""
+                      />
+                    </div>
+                    <p class="bold mt-4">{{ this.data.displayName }}</p>
+                    <hr class="w-50 mx-auto my-3" />
+
+                    <p class="regular small text-secondary">
+                      {{ this.data.message }}
+                    </p>
+                  </div>
+                </div>
+              </a>
+            </div>
+  
+            {{/each}}
+          </div>
+          <!-- Add Arrows -->
+          <div class="text-primary features-nav features-nav-next">
+            <a href="/comments"><span class="text-uppercase small">All Comments</span></a>
+            <i class="features-nav-icon fas fa-long-arrow-alt-right"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
