@@ -61,13 +61,25 @@ main {
   box-shadow: 0 0 25px 50px rgb(74 97 209 / 50%);
 }
 
-.construction{
+.construction {
   width: 100%;
-  background-color: #B22234;
+  background-color: #b22234;
   color: #fff;
   font-weight: bold;
-  border:1px solid #fff;
+  border: 1px solid #fff;
   text-align: center;
   padding: 4px;
   margin: 8px 0;
+}
+
+@media (min-width: 992px) {
+  .automate-social-header .main-shape-wrapper {
+    position: absolute;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+    right: 0;
+    width: 48%;
+    max-height: 300px;
+  }
 }
