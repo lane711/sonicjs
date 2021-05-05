@@ -1,5 +1,3 @@
-const { registerPrompt } = require("inquirer");
-
 isBackEndMode = false;
 var axiosInstance;
 
@@ -60,20 +58,7 @@ if (typeof module !== "undefined" && module.exports) {
       res.send("form ok");
     });
 
-    app.post("/form-submit", async function (req, res) {
-      console.log(req);
 
-      let payload = {
-        data: {
-          contentType: req.body.contentType,
-          email: req.body.email,
-        },
-      };
-
-      let entity = await dataService.contentCreate(payload);
-
-      res.send("form ok");
-    });
   }),
     (exports.getForm = async function (
       contentTypeId,

@@ -286,9 +286,8 @@ exports.loadRoutes = async function (app) {
   });
 
   app.post("/form-submission", async function (req, res) {
-    // console.log(req.body.data);
-    //
-    await emitterService.emit("afterFormSubmit", req.body.data);
+    let payload = req.body.data ?? req.body;
+    await emitterService.emit("afterFormSubmit", payload);
   });
 
   // router.get('/admin/content-types', function (req, res) {
