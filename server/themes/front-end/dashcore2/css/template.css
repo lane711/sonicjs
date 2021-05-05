@@ -82,4 +82,9 @@ main {
     width: 48%;
     max-height: 300px;
   }
+
+  .automate-social-header .container {
+    padding-top: 7rem !important;
+    padding-bottom: 7rem !important;
+  }
 }
