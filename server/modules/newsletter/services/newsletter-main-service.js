@@ -35,8 +35,8 @@ module.exports = newsletterMainService = {
             //confirmation to user
             let body = `Hi Fellow Patriot, \n\nThanks for signing up for our mailing list. We'll be in touch soon!`;
             await emailService.sendEmail(
-                options.email,
               "admin@ocunite.org",
+              options.email,
               "Newsletter SignUp Confirmed",
               body
             );
@@ -44,8 +44,8 @@ module.exports = newsletterMainService = {
             //admin notification
             let adminBody = `${options.email}`;
             await emailService.sendEmail(
-              "admin@ocunite.org",
               options.email,
+              "admin@ocunite.org",
               "OCUnite Newsletter SignUp",
               adminBody
             );
