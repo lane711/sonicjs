@@ -36,15 +36,20 @@
         <p class="text-contrast lead">{{{ data.tagline }}}</p>
 
         <form
-          action="newsletter-signup"
+          action="/form-submit"
           class="form"
           data-response-message-animation="slide-in-left"
           novalidate
         >
           <div class="input-group-register py-4">
             <input
+              type="hidden"
+              name="contentType"
+              value="newsletter"
+            />
+            <input
               type="email"
-              name="Subscribe[email]"
+              name="email"
               class="form-control shadow-lg bg-contrast form-control-rounded"
               placeholder="Enter your email"
               required=""

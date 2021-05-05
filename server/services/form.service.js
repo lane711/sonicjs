@@ -1,3 +1,5 @@
+const { registerPrompt } = require("inquirer");
+
 isBackEndMode = false;
 var axiosInstance;
 
@@ -55,9 +57,23 @@ if (typeof module !== "undefined" && module.exports) {
     });
 
     app.get("/form", async function (req, res) {
-      res.send('form ok');
-    })
+      res.send("form ok");
+    });
 
+    app.post("/form-submit", async function (req, res) {
+      console.log(req);
+
+      let payload = {
+        data: {
+          contentType: req.body.contentType,
+          email: req.body.email,
+        },
+      };
+
+      let entity = await dataService.contentCreate(payload);
+
+      res.send("form ok");
+    });
   }),
     (exports.getForm = async function (
       contentTypeId,
@@ -65,7 +81,6 @@ if (typeof module !== "undefined" && module.exports) {
       onFormSubmitFunction,
       returnModuleSettings = false
     ) {
-
       let contentType;
       // debugger;
       if (content && content.data.contentType) {
@@ -77,10 +92,12 @@ if (typeof module !== "undefined" && module.exports) {
         // let  contentTypeSettings = await dataService.contentTypeGet(`${contentTypeId}-settings`);
         // contentType = contentTypeSettings ?? contentType;
         //show settings version of content type if exist
-        if(returnModuleSettings){
-          const settingContentType = await dataService.contentTypeGet(`${contentTypeId}-settings`);
+        if (returnModuleSettings) {
+          const settingContentType = await dataService.contentTypeGet(
+            `${contentTypeId}-settings`
+          );
           // debugger;
-          if(settingContentType && settingContentType.data){
+          if (settingContentType && settingContentType.data) {
             contentType = settingContentType;
           }
         }
@@ -216,7 +233,6 @@ if (typeof module !== "undefined" && module.exports) {
           hidden: false,
           input: true,
         });
-
       }
 
       return components;
