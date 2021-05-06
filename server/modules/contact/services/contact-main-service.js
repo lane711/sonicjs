@@ -44,18 +44,18 @@ module.exports = contactUsMainService = {
       //confirmation to user
       let body = `Hi ${contact.name}, \n\nThanks for reaching out. We'll get back to you ASAP.\n\nFor your reference, here was your message:\n${contact.message}`;
       await emailService.sendEmail(
+        "admin@ocunite.org",
         contact.email,
-        "lane@sonicjs.com",
-        "SoncisJs Message Received",
+        "OCUnite.org Message Received",
         body
       );
 
       //admin notification
       let adminBody = `${contact.name} (${contact.email}) wrote: \n\n${contact.message}`;
       await emailService.sendEmail(
-        "lane@sonicjs.com",
         contact.email,
-        "SoncisJs Contact",
+        "admin@ocunite.org",
+        "OCUnite.org Contact",
         adminBody
       );
     });

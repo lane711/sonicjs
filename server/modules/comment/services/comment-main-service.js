@@ -39,7 +39,7 @@ module.exports = commentMainService = {
       let body = `Hi ${contact.name}, \n\nThanks for reaching out. We'll get back to you ASAP.\n\nFor your reference, here was your message:\n${contact.message}`;
       await emailService.sendEmail(
         contact.email,
-        "lane@sonicjs.com",
+        "admin@ocunite.org",
         "SoncisJs Message Received",
         body
       );
@@ -47,7 +47,7 @@ module.exports = commentMainService = {
       //admin notification
       let adminBody = `${contact.name} (${contact.email}) wrote: \n\n${contact.message}`;
       await emailService.sendEmail(
-        "lane@sonicjs.com",
+        "admin@ocunite.org",
         contact.email,
         "SoncisJs Contact",
         adminBody
