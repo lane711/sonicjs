@@ -18,6 +18,7 @@ const querystring = require('querystring');
 
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
+const adminDomain = process.env.ADMIN_DOMAIN;
 
 module.exports = authService = {
   startup: async function (app) {
@@ -71,6 +72,14 @@ module.exports = authService = {
 
     //TODO: https://www.sitepoint.com/local-authentication-using-passport-node-js/
     app.post('/login', (req, res, next) => {
+
+      if (process.env.MODE !== "dev") {
+        if (adminDomain !== req.host) {
+          res.send(401);
+          return;
+        }
+      }
+
       passport.authenticate('local',
       (err, user, info) => {
         if (err) {
@@ -110,6 +119,14 @@ module.exports = authService = {
     );
 
     app.get("/login", async function (req, res) {
+
+      if (process.env.MODE !== "dev") {
+        if (adminDomain !== req.host) {
+          res.send(401);
+          return;
+        }
+      }
+
       let data = { registerMessage: "<b>admin</b>" };
 
       let parsedUrl = url.parse(req.url);

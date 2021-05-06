@@ -41,6 +41,7 @@ module.exports = adminService = {
         if (process.env.MODE !== "dev") {
           if (adminDomain !== req.host) {
             res.send(401);
+            return;
           }
         }
 
