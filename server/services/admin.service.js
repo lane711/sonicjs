@@ -18,8 +18,10 @@ const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 const chalk = require("chalk");
 const log = console.log;
 var _ = require("underscore");
+const { registerPrompt } = require("inquirer");
 
 const adminTheme = `${process.env.ADMIN_THEME}`;
+const adminDomain = process.env.ADMIN_DOMAIN;
 // var loopback = require("loopback");
 // var app = loopback();
 // var User = loopback.User;
@@ -36,9 +38,11 @@ module.exports = adminService = {
         //   //user not logged in
         // }
 
-        // if (process.env.MODE !== "dev") {
-        //   res.send(401);
-        // }
+        if (process.env.MODE !== "dev") {
+          if (adminDomain !== req.host) {
+            res.send(401);
+          }
+        }
 
         globalService.setAreaMode(true, false, true);
 
@@ -154,7 +158,6 @@ module.exports = adminService = {
         }
 
         if (viewName == "admin-roles") {
-
           data.editFormRole = await formService.getForm(
             "role",
             undefined,
@@ -173,7 +176,7 @@ module.exports = adminService = {
         }
 
         if (viewName == "admin-role-edit") {
-          let roleId = param1 ;
+          let roleId = param1;
           let role = await dataService.getContentById(roleId);
 
           data.editForm = await formService.getForm(
@@ -188,7 +191,11 @@ module.exports = adminService = {
           if (param1) {
             let userRecord = await userService.getUser(param1);
             // user.profile = userRecord.profile ? userRecord.profile : {};
-            userRecord.data = {contentType : "user", email: userRecord.username, id: userRecord.id };
+            userRecord.data = {
+              contentType: "user",
+              email: userRecord.username,
+              id: userRecord.id,
+            };
 
             data.editForm = await formService.getForm(
               "user",
@@ -196,7 +203,6 @@ module.exports = adminService = {
               'submitContent(submission, true, "user");'
             );
           }
-
         }
 
         let accessToken = "fakeToken"; //await userService.getToken(req);
