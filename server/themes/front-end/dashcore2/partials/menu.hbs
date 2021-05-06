@@ -60,7 +60,10 @@
 
       <li class="st-nav-section st-nav-primary nav-item">
         {{#each data.menu}}
-        <a class="st-root-link {{#if this.showChildren}}st-has-dropdown{{/if}} nav-link" data-dropdown="{{ this.data.title }}" href="{{ this.data.url }}"
+        <a
+          class="st-root-link {{#if this.showChildren}}st-has-dropdown{{/if}} nav-link"
+          data-dropdown="{{ this.data.title }}"
+          href="{{ this.data.url }}"
           >{{ this.data.title }}
         </a>
         {{/each}}
@@ -104,17 +107,21 @@
             <a class="st-popup-close-button">Close</a>
             <div class="st-dropdown-content-group">
               <h4 class="text-uppercase regular">Pages</h4>
-              <a class="regular text-primary" href="about.html"
-                ><i class="far fa-building mr-2"></i> About </a
-              ><a class="regular text-success" href="contact.html"
+              {{#each data.menu}}
+
+              <a class="regular text-primary" href="{{ this.data.url }}">
+                <i class="fa fa-chevron-right mr-2"></i> {{ this.data.title }} </a>
+                {{/each}}
+
+                <!-- <a class="regular text-success" href="contact.html"
                 ><i class="far fa-envelope mr-2"></i> Contact </a
               ><a class="regular text-warning" href="pricing.html"
                 ><i class="fas fa-hand-holding-usd mr-2"></i> Pricing </a
               ><a class="regular text-info" href="faqs.html"
                 ><i class="far fa-question-circle mr-2"></i> FAQs</a
-              >
+              > -->
             </div>
-            <div class="st-dropdown-content-group border-top bw-2">
+            <!-- <div class="st-dropdown-content-group border-top bw-2">
               <h4 class="text-uppercase regular">Components</h4>
               <div class="row">
                 <div class="col mr-4">
@@ -149,7 +156,7 @@
               <a href="login.html"
                 >Sign in <i class="fas fa-arrow-right"></i
               ></a>
-            </div>
+            </div> -->
           </div>
         </div>
       </li>
