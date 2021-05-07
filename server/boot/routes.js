@@ -287,6 +287,7 @@ exports.loadRoutes = async function (app) {
 
   app.post("/form-submission", async function (req, res) {
     let payload = req.body.data ?? req.body;
+    payload.cookies = req.cookies;
     await emitterService.emit("afterFormSubmit", payload);
   });
 

@@ -25,6 +25,7 @@
     "@fancyapps/fancybox": "^3.5.7",
     "@simonwep/pickr": "^1.8.0",
     "app-root-path": "^3.0.0",
+    "aws-sdk": "^2.901.0",
     "axios": "^0.21.0",
     "bootstrap": "^4.5.3",
     "bootswatch": "^4.5.3",
@@ -35,6 +36,7 @@
     "connect-ensure-login": "^0.1.1",
     "connect-mongo": "^3.2.0",
     "connect-mongoose": "0.0.2",
+    "connect-multiparty": "^2.2.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "css": "^3.0.0",
@@ -84,7 +86,8 @@
     "sortablejs": "^1.13.0",
     "uglify-es": "^3.3.9",
     "underscore": "^1.12.0",
-    "yaml": "^1.10.0"
+    "yaml": "^1.10.0",
+    "zencoder": "^2.0.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.6"

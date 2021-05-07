@@ -60,6 +60,7 @@ function start() {
   setupAssets(app);
 
   app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(cookieParser());
   setupHandlebars(app);
 
   passport.use(User.createStrategy());

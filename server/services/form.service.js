@@ -7,6 +7,9 @@ if (typeof module !== "undefined" && module.exports) {
   var emitterService = require("./emitter.service");
   var helperService = require("./helper.service");
   var globalService = require("./global.service");
+  var multipart = require("connect-multiparty");
+  var _ = require("underscore");
+  var appRoot = require("app-root-path");
 
   var fs = require("fs");
   var axios = require("axios");
@@ -58,7 +61,30 @@ if (typeof module !== "undefined" && module.exports) {
       res.send("form ok");
     });
 
+    var multipart = require("connect-multiparty");
 
+    app.use(
+      multipart({
+        uploadDir: `${appRoot.path}/temp`,
+      })
+    );
+
+    app.post("/video-upload", async function (req, res, next) {
+      let filePath = req.files.file.path;
+      // var data = _.pick(req.body, "type"),
+      //   uploadPath = path.normalize(cfg.data + "/uploads"),
+      //   file = req.files.file;
+
+      // console.log(file.name); //original name (ie: sunset.png)
+      // console.log(file.path); //tmp path (ie: /tmp/12345-xyaz.png)
+      // console.log(uploadPath); //uploads directory: (ie: /home/user/data/uploads)
+      //set cookie
+      res.cookie('videoPath', filePath, { maxAge: 900000, httpOnly: true });
+
+
+      res.send(filePath);
+      // next();
+    });
   }),
     (exports.getForm = async function (
       contentTypeId,

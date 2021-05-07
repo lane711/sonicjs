@@ -2,6 +2,7 @@ var dataService = require("../../../services/data.service");
 var emitterService = require("../../../services/emitter.service");
 var globalService = require("../../../services/global.service");
 var formService = require("../../../services/form.service");
+var s3Service = require("../../../services/s3.service");
 
 module.exports = commentMainService = {
   startup: async function () {
@@ -32,24 +33,27 @@ module.exports = commentMainService = {
       // save the form
       await dataService.contentCreate(options);
 
+
+      s3Service.upload(options.data.videoUpload[0].name, options.cookies.videoPath)
+
       // send the emails
       let contact = options.data;
 
       //confirmation to user
-      let body = `Hi ${contact.name}, \n\nThanks for reaching out. We'll get back to you ASAP.\n\nFor your reference, here was your message:\n${contact.message}`;
+      let body = `Hi ${contact.name}, \n\nThanks for submitting your comment. It will be live within several hours.\n\nFor your reference, here was your message:\n${contact.message}`;
       await emailService.sendEmail(
-        contact.email,
         "admin@ocunite.org",
-        "SoncisJs Message Received",
+        contact.email,
+        "OCUnite.org Comment Received",
         body
       );
 
       //admin notification
       let adminBody = `${contact.name} (${contact.email}) wrote: \n\n${contact.message}`;
       await emailService.sendEmail(
-        "admin@ocunite.org",
         contact.email,
-        "SoncisJs Contact",
+        "admin@ocunite.org",
+        "OCUnite.org Comment Received",
         adminBody
       );
     });
