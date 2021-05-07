@@ -1,0 +1,9 @@
+{
+  "title": "Video",
+  "enabled": true,
+  "systemId": "video",
+  "canBeAddedToColumn": true,
+  "version": "0.0.0.1",
+  "systemidUpperCase": "VIDEO",
+  "systemidCamelCase": "video"
+}
