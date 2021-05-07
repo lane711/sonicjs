@@ -33,29 +33,33 @@ module.exports = commentMainService = {
       // save the form
       await dataService.contentCreate(options);
 
-
-      s3Service.upload(options.data.videoUpload[0].name, options.cookies.videoPath)
+      s3Service.upload(
+        options.data.videoUpload[0].name,
+        options.cookies.videoPath
+      );
 
       // send the emails
       let contact = options.data;
 
-      //confirmation to user
-      let body = `Hi ${contact.name}, \n\nThanks for submitting your comment. It will be live within several hours.\n\nFor your reference, here was your message:\n${contact.message}`;
-      await emailService.sendEmail(
-        "admin@ocunite.org",
-        contact.email,
-        "OCUnite.org Comment Received",
-        body
-      );
+      if (contact.email) {
+        //confirmation to user
+        let body = `Hi ${contact.name}, \n\nThanks for submitting your comment. It will be live within several hours.\n\nFor your reference, here was your message:\n${contact.message}`;
+        await emailService.sendEmail(
+          "admin@ocunite.org",
+          contact.email,
+          "OCUnite.org Comment Received",
+          body
+        );
 
-      //admin notification
-      let adminBody = `${contact.name} (${contact.email}) wrote: \n\n${contact.message}`;
-      await emailService.sendEmail(
-        contact.email,
-        "admin@ocunite.org",
-        "OCUnite.org Comment Received",
-        adminBody
-      );
+        //admin notification
+        let adminBody = `${contact.name} (${contact.email}) wrote: \n\n${contact.message}`;
+        await emailService.sendEmail(
+          contact.email,
+          "admin@ocunite.org",
+          "OCUnite.org Comment Received",
+          adminBody
+        );
+      }
     });
   },
 };
