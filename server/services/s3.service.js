@@ -41,7 +41,18 @@ module.exports = s3Service = {
   },
 
   encodeVideo: function(url){
-    zencoder.Job.create({input: url}, function(err, data) {
+    //https://app.zencoder.com/request_builder
+    zencoder.Job.create(
+      {
+        input: url,
+        size: "640x480",
+        audio_bitrate: 160,
+        max_video_bitrate: 1500,
+        h264_profile: "baseline",
+        h264_reference_frames: 1,
+        max_frame_rate: 30
+      }
+      , function(err, data) {
       if (err) { console.log(err); return; }
     
       console.log(data);
