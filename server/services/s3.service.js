@@ -53,7 +53,7 @@ module.exports = s3Service = {
         max_frame_rate: 30,
         outputs: [
           {
-            bucket: 'ocunite',
+            bucket: 'ocunite-zencoder',
             public: true,
             thumbnails: {
               number: 3,

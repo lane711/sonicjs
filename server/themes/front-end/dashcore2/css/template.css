@@ -14,8 +14,8 @@
   margin-bottom: 45px;
 }
 
-.about [data-module="HTML"] {
-  margin-bottom: 90px;
+[data-module="HTML"] {
+  margin-bottom: 3rem;
 }
 
 main {
@@ -88,3 +88,19 @@ main {
     padding-bottom: 7rem !important;
   }
 }
+
+h1{
+  margin: 0 0 3rem;
+}
+
+h3{
+  margin: 0 0 1rem;
+}
+
+.complaints h1{
+  margin: 5rem 0 3rem;
+}
+
+/* .complaints h1:first-of-type{
+  margin: 0 0 3rem;
+} */
