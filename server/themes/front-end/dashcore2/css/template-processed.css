@@ -87,6 +87,10 @@ main {
     padding-top: 7rem !important;
     padding-bottom: 7rem !important;
   }
+
+  .rumble{
+    min-height: 300px;
+  }
 }
 
 h1{

@@ -39,6 +39,7 @@ assets:
     - /themes/front-end/{{frontEndTheme}}/js/shop.js
     - /themes/front-end/{{frontEndTheme}}/js/svg.js
     - /themes/front-end/{{frontEndTheme}}/js/site.js
+    - /themes/front-end/{{frontEndTheme}}/js/site-custom.js
     - /themes/front-end/{{frontEndTheme}}/js/03.demo.js
     - /node_modules/ace-builds/src-min-noconflict/ace.js
     - /node_modules/ace-builds/src-min-noconflict/ext-beautify.js

@@ -287,8 +287,15 @@ exports.loadRoutes = async function (app) {
 
   app.post("/form-submission", async function (req, res) {
     let payload = req.body.data ?? req.body;
+
+    //hack for newletter
+    if(!payload.data && payload.contentType){
+      payload.data = {contentType : payload.contentType};
+    }
+
     payload.cookies = req.cookies;
     await emitterService.emit("afterFormSubmit", payload);
+    res.redirect('/thank-you');
   });
 
   // router.get('/admin/content-types', function (req, res) {

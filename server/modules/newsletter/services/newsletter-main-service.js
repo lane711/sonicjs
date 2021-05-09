@@ -14,7 +14,7 @@ module.exports = newsletterMainService = {
     });
 
     emitterService.on("afterFormSubmit", async function (options) {
-      if (options.contentType !== "newsletter") {
+      if (options.data.contentType !== "newsletter") {
         return;
       }
 

@@ -26,7 +26,7 @@ module.exports = commentMainService = {
     });
 
     emitterService.on("afterFormSubmit", async function (options) {
-      if (options.data.contentType !== "comment") {
+      if (options.data && options.data.contentType !== "comment") {
         return;
       }
 
