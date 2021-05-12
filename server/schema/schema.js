@@ -7,7 +7,7 @@ const { GraphQLJSONObject } = require("graphql-type-json");
 const moduleService = require("../services/module.service");
 const { data } = require("jquery");
 const fileService = require("../services/file.service");
-const medi=ervice = require("../services/media.service");
+const medi = (ervice = require("../services/media.service"));
 const viewService = require("../services/view.service");
 
 const {
@@ -25,8 +25,8 @@ const {
 const {
   GraphQLDate,
   GraphQLTime,
-  GraphQLDateTime
-} = require('graphql-iso-date');
+  GraphQLDateTime,
+} = require("graphql-iso-date");
 
 //Schema defines data on the Graph like object types(book type), relation between
 //these object types and describes how it can reach into the graph to interact with
@@ -38,7 +38,7 @@ const UserType = new GraphQLObjectType({
     id: { type: GraphQLID },
     username: { type: GraphQLString },
     password: { type: GraphQLString },
-    lastLoginOn: { type: GraphQLDateTime},
+    lastLoginOn: { type: GraphQLDateTime },
     profile: { type: GraphQLJSONObject },
     // book: {
     //   type: new GraphQLList(UserType),
@@ -184,8 +184,17 @@ const RootQuery = new GraphQLObjectType({
         username: { type: GraphQLString },
         password: { type: GraphQLString },
       },
-      resolve(parent, args) {
-        return User.findById(args.id);
+      resolve(parent, args, req) {
+        //user can always see their own profile
+        if (args.id === req.session.userId) {
+          return User.findById(args.id);
+        }
+
+        //admins can see all users
+        //TODO: get role by name
+        if (req.session.user.roles.includes("609a01f831463944efa08747")) {
+          return User.findById(args.id);
+        }
       },
     },
     users: {
@@ -390,10 +399,14 @@ const Mutation = new GraphQLObjectType({
           );
         }
 
-        let userDoc = User.findByIdAndUpdate(args.id, {
-          lastLoginOn: new Date(),
-          profile: profileObj,
-        }, false);
+        let userDoc = User.findByIdAndUpdate(
+          args.id,
+          {
+            lastLoginOn: new Date(),
+            profile: profileObj,
+          },
+          false
+        );
         userDoc.exec();
       },
     },
@@ -479,7 +492,7 @@ const Mutation = new GraphQLObjectType({
         createdByUserId: { type: GraphQLID },
       },
       resolve(parent, args, context) {
-        let userId = context.session.userId
+        let userId = context.session.user.id
           ? context.session.userId
           : args.createdByUserId;
         let now = new Date();
@@ -645,7 +658,6 @@ const Mutation = new GraphQLObjectType({
         return moduleService.updateModule(args);
       },
     },
-
   },
 });
 

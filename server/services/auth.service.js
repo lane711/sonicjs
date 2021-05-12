@@ -95,10 +95,9 @@ module.exports = authService = {
             return next(err);
           }
 
-          req.session.userId = user.id;
+          req.session.user = user.profile;
 
-          //TODO: add roles
-          userService.getRoles()
+          // req.session.userId = user.id;
     
           if(!req.session.returnTo){
             return res.redirect('/admin');
