@@ -22,6 +22,12 @@ const {
   GraphQLBoolean,
 } = graphql;
 
+const {
+  GraphQLDate,
+  GraphQLTime,
+  GraphQLDateTime
+} = require('graphql-iso-date');
+
 //Schema defines data on the Graph like object types(book type), relation between
 //these object types and describes how it can reach into the graph to interact with
 //the data to retrieve or mutate the data
@@ -32,12 +38,14 @@ const UserType = new GraphQLObjectType({
     id: { type: GraphQLID },
     username: { type: GraphQLString },
     password: { type: GraphQLString },
-    book: {
-      type: new GraphQLList(UserType),
-      resolve(parent, args) {
-        return User.find({ userId: parent.id });
-      },
-    },
+    lastLoginOn: { type: GraphQLDateTime},
+    profile: { type: GraphQLJSONObject },
+    // book: {
+    //   type: new GraphQLList(UserType),
+    //   resolve(parent, args) {
+    //     return User.find({ userId: parent.id });
+    //   },
+    // },
   }),
 });
 
@@ -385,7 +393,7 @@ const Mutation = new GraphQLObjectType({
         let userDoc = User.findByIdAndUpdate(args.id, {
           lastLoginOn: new Date(),
           profile: profileObj,
-        });
+        }, false);
         userDoc.exec();
       },
     },
@@ -440,14 +448,14 @@ const Mutation = new GraphQLObjectType({
         let tagDoc = Tag.findByIdAndUpdate(
           args.tagId,
           { $push: { contents: args.contentId } },
-          { new: true, useFindAndModify: false }
+          { new: true }
         );
         tagDoc.exec();
 
         let contentDoc = Content.findByIdAndUpdate(
           args.contentId,
           { $push: { tags: args.tagId } },
-          { new: true, useFindAndModify: false }
+          { new: true }
         );
         contentDoc.exec();
 

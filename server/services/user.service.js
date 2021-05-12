@@ -89,6 +89,8 @@ module.exports = userService = {
       user(id:"${id}"){
         id
         username
+        lastLoginOn
+        profile
       }
       }
         `;

@@ -125,7 +125,7 @@ if (typeof module !== "undefined" && module.exports) {
             `,
     });
 
-    return result.data.data.contentType;
+    return result.data;
   }),
     (exports.rolesGet = async function () {
       let result = await this.getAxios().post(apiUrl, {

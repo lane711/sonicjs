@@ -683,6 +683,8 @@ async function editInstanceUser(payload, refresh, contentType = "content") {
   // }
 
   await dataService.userUpdate(payload);
+
+  fullPageUpdate();
   //update user
   // return axiosInstance
   //   .put(`/api/${contentType}/${id}`, payload)

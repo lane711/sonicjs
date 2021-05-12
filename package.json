@@ -60,6 +60,7 @@
     "font-awesome": "^4.7.0",
     "formiojs": "^4.13.0",
     "graphql": "^14.7.0",
+    "graphql-iso-date": "^3.6.1",
     "graphql-request": "^3.3.0",
     "graphql-type-json": "^0.3.2",
     "inquirer": "^7.3.3",

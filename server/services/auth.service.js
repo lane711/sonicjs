@@ -96,6 +96,9 @@ module.exports = authService = {
           }
 
           req.session.userId = user.id;
+
+          //TODO: add roles
+          userService.getRoles()
     
           if(!req.session.returnTo){
             return res.redirect('/admin');

@@ -34,6 +34,7 @@ mongoose.set('useCreateIndex', true);
 mongoose.connect(process.env.MONGODB_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  useFindAndModify: false
 });
 const User = require("./server/schema/models/user");
 
