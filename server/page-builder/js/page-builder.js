@@ -682,6 +682,7 @@ async function editInstanceUser(payload, refresh, contentType = "content") {
   //   }
   // }
 
+  // debugger;
   await dataService.userUpdate(payload);
 
   fullPageUpdate();

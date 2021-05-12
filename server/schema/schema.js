@@ -365,12 +365,12 @@ const Mutation = new GraphQLObjectType({
       args: {
         id: { type: new GraphQLNonNull(GraphQLID) },
         password: { type: GraphQLString },
-        data: {
+        profile: {
           type: new GraphQLNonNull(GraphQLString),
         },
       },
       resolve(parent, args) {
-        let profileObj = JSON.parse(args.data);
+        let profileObj = JSON.parse(args.profile);
         if (profileObj.password !== "_temp_password") {
           //password has been updated
           User.findByUsername(profileObj.email).then(

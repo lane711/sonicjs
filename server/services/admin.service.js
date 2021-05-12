@@ -192,11 +192,8 @@ module.exports = adminService = {
           if (param1) {
             let userRecord = await userService.getUser(param1);
             // user.profile = userRecord.profile ? userRecord.profile : {};
-            userRecord.data = {
-              contentType: "user",
-              email: userRecord.username,
-              id: userRecord.id,
-            };
+            userRecord.data = userRecord.profile;
+            userRecord.data.id = userRecord.id;
 
             data.editForm = await formService.getForm(
               "user",

@@ -118,7 +118,7 @@ if (typeof module !== "undefined" && module.exports) {
         mutation{
           userUpdate( 
             id:"${id}", 
-            data:"""${data}"""){
+            profile:"""${data}"""){
               username
           }
         }
