@@ -948,6 +948,7 @@ async function onContentTypeSave() {
 }
 
 async function onContentTypeRawSave() {
+  // debugger;
   var contentType = jsonEditorRaw.get();
   console.log("jsonEditor", contentType);
   await editContentType(contentType);
@@ -1504,6 +1505,7 @@ async function writeFile(container, file) {
 }
 
 async function setupACEEditor() {
+  return;
   if ($("#editor").length === 0) {
     return;
   }

@@ -108,6 +108,7 @@ const ContentTypeType = new GraphQLObjectType({
     title: { type: GraphQLString },
     systemId: { type: GraphQLString },
     data: { type: GraphQLJSONObject },
+    permissions: { type: GraphQLJSONObject },
     filePath: { type: GraphQLString },
     moduleSystemId: { type: GraphQLString },
   }),
@@ -566,6 +567,7 @@ const Mutation = new GraphQLObjectType({
         systemId: { type: new GraphQLNonNull(GraphQLString) },
         moduleSystemId: { type: new GraphQLNonNull(GraphQLString) },
         filePath: { type: GraphQLString },
+        permissions: { type: new GraphQLNonNull(GraphQLString) },
         data: { type: new GraphQLNonNull(GraphQLString) },
         // data: {
         //   type: new GraphQLNonNull(GraphQLJSONObject),
@@ -574,7 +576,11 @@ const Mutation = new GraphQLObjectType({
       },
       resolve(parent, args) {
         let dataObj = JSON.parse(args.data);
+        let permissionsObj = JSON.parse(args.permissions);
+
         args.data = dataObj;
+        args.permissions = permissionsObj;
+
         console.log("contentTypeUpdate", args);
         moduleService.contentTypeUpdate(args).then((data) => {
           return data;

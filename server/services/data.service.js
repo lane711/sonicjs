@@ -293,7 +293,10 @@ if (typeof module !== "undefined" && module.exports) {
       return JSON.stringify(obj);
     }),
     (exports.contentTypeUpdate = async function (contentType) {
+      debugger;
       let components = JSON.stringify(contentType.data);
+      let permissions = JSON.stringify(contentType.permissions);
+
       let result = await this.getAxios().post(apiUrl, {
         query: `
         mutation{
@@ -301,6 +304,7 @@ if (typeof module !== "undefined" && module.exports) {
             title:"${contentType.title}", 
             moduleSystemId:"${contentType.moduleSystemId}", 
             systemId:"${contentType.systemId}", 
+            permissions:"""${permissions}""",
             data:"""${components}"""){
               title
           }
