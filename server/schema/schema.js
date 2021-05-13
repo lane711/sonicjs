@@ -186,6 +186,7 @@ const RootQuery = new GraphQLObjectType({
         password: { type: GraphQLString },
       },
       resolve(parent, args, req) {
+
         //user can always see their own profile
         if (args.id === req.session.userId) {
           return User.findById(args.id);
@@ -193,7 +194,7 @@ const RootQuery = new GraphQLObjectType({
 
         //admins can see all users
         //TODO: get role by name
-        if (req.session.user.roles.includes("609a01f831463944efa08747")) {
+        if (req.session.user.roles.includes("admin")) {
           return User.findById(args.id);
         }
       },

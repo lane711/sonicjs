@@ -28,7 +28,7 @@ module.exports = userService = {
     app.get("/api-admin/roles", async function (req, res) {
       let data = await dataService.rolesGet();
       let roles = data.map(r => {
-        return {id: r.id, name: r.data.title};
+        return {id: r.data.key, name: r.data.title};
       });
       res.send(roles);
     })
@@ -106,6 +106,23 @@ module.exports = userService = {
 
   return data;
   },
+
+  mapUserRoles: async function (user) {
+
+    let roles = await userService.getRoles();
+
+    if(user.profile.roles){
+      user.roleMapping = [];
+      user.profile.roles.forEach(role => {
+        let roleRecord = roles.filter(x => x.id === role);
+        if(roleRecord){
+          user.roleMapping.push(roleRecord[0].data.title);
+        }
+      });
+    }
+  
+    return data;
+    },
 
   // getRole: async function (id) {
   //   var roleModel = loopback.getModel("Role");

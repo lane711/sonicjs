@@ -90,14 +90,14 @@ module.exports = authService = {
           return res.redirect('/login?info=' + info);
         }
     
-        req.logIn(user, function(err) {
+        req.logIn(user, async function(err) {
           if (err) {
             return next(err);
           }
 
-          req.session.user = user.profile;
 
-          // req.session.userId = user.id;
+          req.session.user = user.profile;
+          // await userService.mapUserRoles(user);
     
           if(!req.session.returnTo){
             return res.redirect('/admin');
