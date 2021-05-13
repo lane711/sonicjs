@@ -113,6 +113,7 @@ module.exports = moduleService = {
     moduleDef.data = moduleContentType.data;
     moduleDef.canBeAddedToColumn = moduleContentType.canBeAddedToColumn;
     moduleDef.canBeAddedToColumn = moduleContentType.canBeAddedToColumn;
+    moduleDef.permissions = moduleContentType.permissions;
     moduleDef.filePath = `/server/modules/${moduleDef.moduleSystemId}/models/${moduleDef.systemId}.json`;
 
     let moduleDefString = JSON.stringify(moduleDef);

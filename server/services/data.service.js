@@ -24,7 +24,7 @@ if (typeof module !== "undefined" && module.exports) {
     baseURL: globalService.baseUrl,
   };
   let newAxiosInstance = axios.create(defaultOptions);
-  console.log("newAxiosInstance", newAxiosInstance);
+  // console.log("newAxiosInstance", newAxiosInstance);
 }
 
 (function (exports) {
@@ -248,6 +248,7 @@ if (typeof module !== "undefined" && module.exports) {
                   moduleSystemId
                   filePath
                   data
+                  permissions
                 }
               }
             `,
@@ -293,7 +294,7 @@ if (typeof module !== "undefined" && module.exports) {
       return JSON.stringify(obj);
     }),
     (exports.contentTypeUpdate = async function (contentType) {
-      debugger;
+      // debugger;
       let components = JSON.stringify(contentType.data);
       let permissions = JSON.stringify(contentType.permissions);
 
