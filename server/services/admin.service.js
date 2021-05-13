@@ -45,6 +45,9 @@ module.exports = adminService = {
           }
         }
 
+        let userSession = req.session.user;
+        res.locals.AAAAAAAAuser = userSession;
+
         globalService.setAreaMode(true, false, true);
 
         let path = req.url.split("/");

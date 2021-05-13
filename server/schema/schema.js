@@ -185,8 +185,11 @@ const RootQuery = new GraphQLObjectType({
         username: { type: GraphQLString },
         password: { type: GraphQLString },
       },
-      resolve(parent, args, req) {
+      resolve(parent, args, req, res) {
 
+        //create a direct api instead of user.find...
+        // then use that api directly from the admin backend
+        
         //user can always see their own profile
         if (args.id === req.session.userId) {
           return User.findById(args.id);
