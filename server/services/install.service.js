@@ -5,7 +5,13 @@ var logSymbols = require('log-symbols');
 
 module.exports = installService = {
   checkInstallation: async function () {
+
+    if(process.env.BYPASS_INSTALL_CHECK){
+      return;
+    }
+    
     console.log(logSymbols.info, 'Checking Install...');
+
 
     await installService.checkDefaultContent();
 

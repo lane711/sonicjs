@@ -9,6 +9,7 @@ const { data } = require("jquery");
 const fileService = require("../services/file.service");
 const medi = (ervice = require("../services/media.service"));
 const viewService = require("../services/view.service");
+const dalService = require("../services/dal.service");
 
 const {
   GraphQLObjectType,
@@ -189,7 +190,7 @@ const RootQuery = new GraphQLObjectType({
 
         //create a direct api instead of user.find...
         // then use that api directly from the admin backend
-        
+        return dalService.getUser(args.id);
         //user can always see their own profile
         if (args.id === req.session.userId) {
           return User.findById(args.id);
@@ -248,28 +249,29 @@ const RootQuery = new GraphQLObjectType({
         tag: { type: GraphQLString },
       },
 
-      resolve(parent, args) {
-        if (args.contentTypeId) {
-          return Content.find({
-            contentTypeId: args.contentTypeId,
-          });
-        } else if (args.url) {
-          return Content.find({
-            url: args.url,
-          });
-        } else if (args.data) {
-          var query = {};
-          query["data." + args.data.attr] = args.data.val;
-          console.log("query", query);
-          return Content.find(query);
-        } else if (args.tag) {
-          let contentsQuery = Tag.findById(args.tag); //.populate("contents");
-          let contents = contentsQuery.exec();
-          console.log(contents);
-          return contents;
-        } else {
-          return Content.find({});
-        }
+      resolve(parent, args, req) {
+        return dalService.getContents(args.contentTypeId, args.url, args.data, args.tag, req.session.user)
+        // if (args.contentTypeId) {
+        //   return Content.find({
+        //     contentTypeId: args.contentTypeId,
+        //   });
+        // } else if (args.url) {
+        //   return Content.find({
+        //     url: args.url,
+        //   });
+        // } else if (args.data) {
+        //   var query = {};
+        //   query["data." + args.data.attr] = args.data.val;
+        //   console.log("query", query);
+        //   return Content.find(query);
+        // } else if (args.tag) {
+        //   let contentsQuery = Tag.findById(args.tag); //.populate("contents");
+        //   let contents = contentsQuery.exec();
+        //   console.log(contents);
+        //   return contents;
+        // } else {
+        //   return Content.find({});
+        // }
       },
     },
 

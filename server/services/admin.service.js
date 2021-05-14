@@ -9,6 +9,7 @@ const connectEnsureLogin = require("connect-ensure-login");
 var dataService = require(".//data.service");
 var userService = require(".//user.service");
 var breadcrumbsService = require("../services/breadcrumbs.service");
+var dalService = require(".//dal.service");
 
 var emitterService = require("./emitter.service");
 
@@ -46,7 +47,7 @@ module.exports = adminService = {
         }
 
         let userSession = req.session.user;
-        res.locals.AAAAAAAAuser = userSession;
+        userSession.id = req.session.userId;
 
         globalService.setAreaMode(true, false, true);
 
@@ -193,9 +194,9 @@ module.exports = adminService = {
         if (viewName == "admin-user-edit") {
           let user = { id: param1 };
           if (param1) {
-            let userRecord = await userService.getUser(param1);
-            // user.profile = userRecord.profile ? userRecord.profile : {};
-            userRecord.data = userRecord.profile;
+            let userRecord = await dalService.getUser(param1, userSession);
+            userRecord.data = userRecord.profile ? userRecord.profile : {};
+            // userRecord.data = userRecord.profile;
             userRecord.data.id = userRecord.id;
 
             data.editForm = await formService.getForm(
