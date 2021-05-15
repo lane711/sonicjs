@@ -33,6 +33,7 @@ var mixPanelService = require("../modules/mixpanel/services/mixpanel-main-servic
 var _ = require("underscore");
 const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 let ShortcodeFormatter = require("shortcode-tree").ShortcodeFormatter;
+var appRoot = require("app-root-path");
 
 const path = require("path");
 var cors = require("cors");
@@ -253,6 +254,10 @@ exports.loadRoutes = async function (app) {
 
   app.get("/ztest", async function (req, res) {
     res.send("ok");
+  });
+
+  app.get("/grapejs", async function (req, res) {
+    res.sendFile('./server/page-builder/grappejs/grapejs.html', { root: appRoot.path });
   });
 
   app.get("/session-test", async function (req, res) {

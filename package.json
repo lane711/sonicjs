@@ -59,6 +59,8 @@
     "flag-icon-css": "^3.5.0",
     "font-awesome": "^4.7.0",
     "formiojs": "^4.13.0",
+    "grapesjs": "^0.17.3",
+    "grapesjs-preset-webpage": "^0.1.11",
     "graphql": "^14.7.0",
     "graphql-iso-date": "^3.6.1",
     "graphql-request": "^3.3.0",
