@@ -47,7 +47,9 @@ module.exports = adminService = {
         }
 
         let userSession = req.session.user;
-        userSession.id = req.session.userId;
+        if (userSession && userSession.id) {
+          userSession.id = req.session.userId;
+        }
 
         globalService.setAreaMode(true, false, true);
 
