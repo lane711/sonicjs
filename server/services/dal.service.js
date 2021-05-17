@@ -65,6 +65,12 @@ module.exports = dalService = {
       if (view === "admin") {
         data = [];
       }
+      if (view === "filtered") {
+        //remove sensative fields like email, address
+        data.forEach(entity => {
+          delete entity.data.email;
+        });
+      }
     }
 
     return data;
