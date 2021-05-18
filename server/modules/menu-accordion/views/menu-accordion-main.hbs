@@ -44,10 +44,10 @@
 
 
 {{#each data.menuData }}
-<h4 class="bold small text-uppercase mt-4 mb-3">{{ this.text }}</h4>
+<a href="{{ this.data.url }}"><h4 class="bold small text-uppercase mt-4 mb-3">{{ this.text }}</h4></a>
   {{#each this.children}}
   <nav class="nav flex-column font-sm">
-    <a class="pl-0 nav-item nav-link bold active" href="faqs.html">{{ this.text }}</a>
+    <a class="pl-0 nav-item nav-link bold active" href="{{ this.data.url }}">{{ this.text }}</a>
     <!-- third level -->
     {{#each this.children}}
       <a class="pl-0 nav-item nav-link" href="{{ this.data.url }}">{{ this.text }}</a>

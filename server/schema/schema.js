@@ -499,8 +499,8 @@ const Mutation = new GraphQLObjectType({
         createdByUserId: { type: GraphQLID },
       },
       resolve(parent, args, context) {
-        let userId = context.session.user.id
-          ? context.session.userId
+        let userId = (context.session.userSession && context.session.userSession.id)
+          ? context.session.userSession.id
           : args.createdByUserId;
         let now = new Date();
         let dataObj = JSON.parse(args.data);
