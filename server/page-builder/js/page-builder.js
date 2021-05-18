@@ -580,7 +580,7 @@ async function createInstance(
     payload = payload.data;
   }
 
-  debugger;
+  // debugger;
   let entity = await dataService.contentCreate(payload);
 
   if (entity.contentTypeId === "page") {
