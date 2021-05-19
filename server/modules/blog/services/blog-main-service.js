@@ -11,22 +11,12 @@ module.exports = blogMainService = {
         options.moduleName = "blog";
         await moduleService.processModuleInColumn(options);
       }
+    });
 
-      emitterService.on("postModuleGetData", async function (options) {
-        if (options.shortcode.name === "BLOG") {
-          await blogMainService.getBlogData(options);
-        }
-      });
-
-      // if (options.shortcode.name === "BLOG") {
-      //   options.moduleName = 'blog';
-      //   options.shortcode.name = 'BLOG'
-
-      //   options.page.data.html = options.page.data.html.replace(
-      //     options.shortcode.codeText,
-      //     processedHtml
-      //   );
-      // }
+    emitterService.on("postModuleGetData", async function (options) {
+      if (options.shortcode.name === "BLOG") {
+        await blogMainService.getBlogData(options);
+      }
     });
   },
 
@@ -71,13 +61,13 @@ module.exports = blogMainService = {
     options.viewModel.data.list = list;
   },
 
-  processView: async function (contentType, viewModel, viewPath) {
-    var result = await viewService.getProcessedView(
-      contentType,
-      viewModel,
-      viewPath
-    );
+  // processView: async function (contentType, viewModel, viewPath) {
+  //   var result = await viewService.getProcessedView(
+  //     contentType,
+  //     viewModel,
+  //     viewPath
+  //   );
 
-    return result;
-  },
+  //   return result;
+  // },
 };
