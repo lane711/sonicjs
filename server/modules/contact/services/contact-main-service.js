@@ -39,6 +39,8 @@ module.exports = contactUsMainService = {
         return;
       }
 
+      let formSettings = await dataService.getContentById(options.data.formSettingsId);
+
       // save the form
       await dataService.contentCreate(options);
 
@@ -46,11 +48,13 @@ module.exports = contactUsMainService = {
       let contact = options.data;
 
       //confirmation to user
-      let body = `Hi ${contact.name}, \n\nThanks for reaching out. We'll get back to you ASAP.\n\nFor your reference, here was your message:\n${contact.message}`;
+      // let body = `Hi ${contact.name}, \n\nThanks for reaching out. We'll get back to you ASAP.\n\nFor your reference, here was your message:\n${contact.message}`;
+      let body = eval(formSettings.data.emailMessageBody);
+      
       await emailService.sendEmail(
-        "admin@ocunite.org",
+        formSettings.data.adminEmail,
         contact.email,
-        "OCUnite.org Message Received",
+        formSettings.data.emailMessageSubject,
         body
       );
 
@@ -58,8 +62,8 @@ module.exports = contactUsMainService = {
       let adminBody = `${contact.name} (${contact.email}) wrote: \n\n${contact.message}`;
       await emailService.sendEmail(
         contact.email,
-        "admin@ocunite.org",
-        "OCUnite.org Contact",
+        formSettings.data.adminEmail,
+        formSettings.data.emailMessageSubjectAdmin,
         adminBody
       );
     });

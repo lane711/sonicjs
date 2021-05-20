@@ -295,7 +295,7 @@ exports.loadRoutes = async function (app) {
 
     payload.cookies = req.cookies;
     await emitterService.emit("afterFormSubmit", payload);
-    res.redirect('/thank-you');
+    // res.redirect('/thank-you');
   });
 
   // router.get('/admin/content-types', function (req, res) {
