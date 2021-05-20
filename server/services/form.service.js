@@ -79,8 +79,7 @@ if (typeof module !== "undefined" && module.exports) {
       // console.log(file.path); //tmp path (ie: /tmp/12345-xyaz.png)
       // console.log(uploadPath); //uploads directory: (ie: /home/user/data/uploads)
       //set cookie
-      res.cookie('videoPath', filePath, { maxAge: 900000, httpOnly: true });
-
+      res.cookie("videoPath", filePath, { maxAge: 900000, httpOnly: true });
 
       res.send(filePath);
       // next();
@@ -90,7 +89,8 @@ if (typeof module !== "undefined" && module.exports) {
       contentTypeId,
       content,
       onFormSubmitFunction,
-      returnModuleSettings = false
+      returnModuleSettings = false,
+      formSettingsId
     ) {
       let contentType;
       // debugger;
@@ -100,9 +100,20 @@ if (typeof module !== "undefined" && module.exports) {
         );
       } else if (contentTypeId) {
         contentType = await dataService.contentTypeGet(contentTypeId);
-        // let  contentTypeSettings = await dataService.contentTypeGet(`${contentTypeId}-settings`);
-        // contentType = contentTypeSettings ?? contentType;
-        //show settings version of content type if exist
+
+        //add a hidden object for the formsettings id so we can look it up on form submission
+        if (formSettingsId) {
+          contentType.data.components.unshift({
+            type: "textfield",
+            inputType: "text",
+            key: "formSettingsId",
+            defaultValue: formSettingsId,
+            hidden: false,
+            input: true,
+            customClass: "hide",
+          });
+        }
+
         if (returnModuleSettings) {
           const settingContentType = await dataService.contentTypeGet(
             `${contentTypeId}-settings`

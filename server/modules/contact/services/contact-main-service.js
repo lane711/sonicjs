@@ -21,10 +21,14 @@ module.exports = contactUsMainService = {
         return;
       }
 
+      let contactFormSettingsId = options.shortcode.properties.id;
+
       options.viewModel.data.form = await formService.getForm(
         "contact",
         undefined,
-        "submitForm(submission)"
+        "submitForm(submission)",
+        false,
+        contactFormSettingsId
       );
 
       // console.log('contact module after view model', options.viewModel);
