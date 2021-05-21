@@ -85,6 +85,8 @@
     "shortcode-tree": "^1.4.14",
     "simple-line-icons": "^2.5.5",
     "sortablejs": "^1.13.0",
+    "sqlite3": "^5.0.2",
+    "typeorm": "^0.2.32",
     "uglify-es": "^3.3.9",
     "underscore": "^1.12.0",
     "video.js": "^7.11.8",
@@ -92,6 +94,7 @@
     "zencoder": "^2.0.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.6"
+    "nodemon": "^2.0.6",
+    "typescript": "^4.2.4"
   }
 }

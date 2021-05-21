@@ -30,6 +30,23 @@ const mongoose = require("mongoose");
 
 
 
+const typeorm = require("typeorm"); 
+const Post = require("./server/data/entity/PostSchema");
+const databaseConnection = require('./server/data/database.connection.json')
+
+typeorm.createConnection(databaseConnection).then(connection => {
+  const userRepository = connection.getRepository(Post);
+
+  // register routes
+  console.log('SQL Lite!')
+  console.log(chalk.red("SQL Lite!"));
+
+  // app.get("/typeorm", async function(req: Request, res: Response) {
+  //     const users = await userRepository.find();
+  //     res.json(users);
+  // });
+});
+
 mongoose.set('useCreateIndex', true);
 mongoose.connect(process.env.MONGODB_URL, {
   useNewUrlParser: true,
