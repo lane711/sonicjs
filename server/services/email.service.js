@@ -17,7 +17,7 @@ module.exports = emailService = {
 
                 var from_email = new sendgrid.Email(from);
                 var to_email = new sendgrid.Email(to);;
-                var content = new sendgrid.Content('text/plain', body);
+                var content = new sendgrid.Content('text/html', body);
                 var mail = new sendgrid.Mail(from_email, subject, to_email, content);
 
                 if(!process.env.SENDGRID_API_KEY){
