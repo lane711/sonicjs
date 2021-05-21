@@ -54,6 +54,7 @@ module.exports = contactUsMainService = {
       
       await emailService.sendEmail(
         formSettings.data.adminEmail,
+        formSettings.data.fromName,
         contact.email,
         formSettings.data.emailMessageSubject,
         body
@@ -63,6 +64,7 @@ module.exports = contactUsMainService = {
       let adminBody = `${contact.name} (${contact.email}) wrote: \n\n${contact.message}`;
       await emailService.sendEmail(
         contact.email,
+        formSettings.data.fromName,
         formSettings.data.adminEmail,
         formSettings.data.emailMessageSubjectAdmin,
         adminBody

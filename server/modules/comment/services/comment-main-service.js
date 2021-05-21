@@ -46,6 +46,7 @@ module.exports = commentMainService = {
         let body = `Hi ${contact.name}, \n\nThanks for submitting your comment. It will be live within several hours.\n\nFor your reference, here was your message:\n${contact.message}`;
         await emailService.sendEmail(
           "admin@ocunite.org",
+          "Test123",
           contact.email,
           "OCUnite.org Comment Received",
           body
@@ -55,6 +56,7 @@ module.exports = commentMainService = {
         let adminBody = `${contact.name} (${contact.email}) wrote: \n\n${contact.message}`;
         await emailService.sendEmail(
           contact.email,
+          "Test123",
           "admin@ocunite.org",
           "OCUnite.org Comment Received",
           adminBody
