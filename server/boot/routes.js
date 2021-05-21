@@ -25,6 +25,7 @@ cssService.startup();
 var assetService = require("../services/asset.service");
 var userService = require("../services/user.service");
 var authService = require("../services/auth.service");
+var dalService = require("../services/dal.service");
 
 var helperService = require("../services/helper.service");
 var sharedService = require("../services/shared.service");
@@ -57,6 +58,7 @@ exports.loadRoutes = async function (app) {
   let adminPage = "";
 
   (async () => {
+    await dalService.startup(app);
     await cacheService.startup();
     await menuService.startup();
     await mediaService.startup();
@@ -65,6 +67,8 @@ exports.loadRoutes = async function (app) {
     await userService.startup(app);
     await assetService.startup();
     await pageBuilderService.startup(app);
+    await pageBuilderService.startup(app);
+
 
     await emitterService.emit("startup");
   })();

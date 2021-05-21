@@ -5,6 +5,35 @@ const Tag = require("../schema/models/tag");
 var dataService = require("./data.service");
 
 module.exports = dalService = {
+  startup: async function (app) {
+    app.get("/typeorm", async function (req, res) {
+      // const users = await userRepository.find();
+      dalService.test();
+      res.json({});
+    });
+    
+  },
+
+  test: async function () {
+    const typeorm = require("typeorm");
+    const { Post } = require("../data/model/Post");
+
+    const databaseConnection = require("../data/database.connection.json");
+
+    typeorm.createConnection(databaseConnection).then((connection) => {
+      const posts = connection.getRepository(Post);
+
+      console.log("SQL Lite DAL!");
+
+      // let newPost = new Post();
+      // newPost.title = "Control flow based type analysis";
+      // newPost.text = "TypeScript 2.0 implements a control flow-based type analysis for local variables and parameters.";
+
+      // let postRepository = connection.getRepository(Post);
+      // postRepository.save(newPost);
+    });
+  },
+
   getUser: async function (id, user) {
     if (id === user.id) {
       return User.findById(id);
@@ -67,7 +96,7 @@ module.exports = dalService = {
       }
       if (view === "filtered") {
         //remove sensative fields like email, address
-        data.forEach(entity => {
+        data.forEach((entity) => {
           delete entity.data.email;
         });
       }

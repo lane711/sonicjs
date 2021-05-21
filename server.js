@@ -4,8 +4,8 @@ require("dotenv").config();
 const express = require("express");
 const graphqlHTTP = require("express-graphql");
 const schema = require("./server/schema/schema");
-const session = require('express-session');
-const MongoStore = require('connect-mongo')(session);
+const session = require("express-session");
+const MongoStore = require("connect-mongo")(session);
 const app = express();
 const { request, gql } = require("graphql-request");
 const path = require("path");
@@ -13,7 +13,7 @@ const chalk = require("chalk");
 // var express = require("express");
 var exphbs = require("express-handlebars");
 var Handlebars = require("handlebars");
-var logSymbols = require('log-symbols');
+var logSymbols = require("log-symbols");
 var globalService = require("./server/services/global.service");
 var installService = require("./server/services/install.service");
 
@@ -28,53 +28,52 @@ const adminTheme = `${process.env.ADMIN_THEME}`;
 const passport = require("passport");
 const mongoose = require("mongoose");
 
+// const typeorm = require("typeorm");
+// const {Post} = require("./server/data/model/Post");
 
+// const databaseConnection = require("./server/data/database.connection.json");
 
-const typeorm = require("typeorm"); 
-const Post = require("./server/data/entity/PostSchema");
-const databaseConnection = require('./server/data/database.connection.json')
+// typeorm.createConnection(databaseConnection).then((connection) => {
+//   const posts = connection.getRepository(Post);
 
-typeorm.createConnection(databaseConnection).then(connection => {
-  const userRepository = connection.getRepository(Post);
+//   console.log(chalk.red("SQL Lite!"));
 
-  // register routes
-  console.log('SQL Lite!')
-  console.log(chalk.red("SQL Lite!"));
+//   // let newPost = new Post();
+//   // newPost.title = "Control flow based type analysis";
+//   // newPost.text = "TypeScript 2.0 implements a control flow-based type analysis for local variables and parameters.";
 
-  // app.get("/typeorm", async function(req: Request, res: Response) {
-  //     const users = await userRepository.find();
-  //     res.json(users);
-  // });
-});
+//   // let postRepository = connection.getRepository(Post);
+//   // postRepository.save(newPost);
 
-mongoose.set('useCreateIndex', true);
+// });
+
+mongoose.set("useCreateIndex", true);
 mongoose.connect(process.env.MONGODB_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  useFindAndModify: false
+  useFindAndModify: false,
 });
 const User = require("./server/schema/models/user");
 
-
 mongoose.connection.once("open", async () => {
-  console.log(logSymbols.success, 'Successfully connected to database!');
+  console.log(logSymbols.success, "Successfully connected to database!");
 
   await installService.checkInstallation();
 });
 
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
+    resave: true,
+    saveUninitialized: true,
+  })
+);
 
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  store: new MongoStore({ mongooseConnection: mongoose.connection }),
-  resave: true,
-  saveUninitialized: true
-}));
-
-app.use(bodyParser.json({limit: '100mb'}));
+app.use(bodyParser.json({ limit: "100mb" }));
 setupGraphQL(app);
 
 function start() {
-
   setupAssets(app);
 
   app.use(bodyParser.urlencoded({ extended: false }));
@@ -122,14 +121,14 @@ function initEnvFile() {
       //create default env file
       fs.copyFile(".env-default", ".env", (err) => {
         if (err) {
-          console.log('initEnvFile error');
+          console.log("initEnvFile error");
           throw err;
         }
         console.log(".env-default was copied to .env");
       });
     }
   } catch (err) {
-    console.log('initEnvFile catch error');
+    console.log("initEnvFile catch error");
     console.error(err);
   }
 }
@@ -152,7 +151,7 @@ function setupHandlebars(app) {
   var hbs = exphbs.create({
     layoutsDir: path.join(themeDirectory),
     partialsDir: partialsDirs,
-    extname: '.hbs'
+    extname: ".hbs",
   });
 
   app.engine(".hbs", hbs.engine);
@@ -224,10 +223,7 @@ function setupAssets(app) {
     "/page-builder",
     express.static(path.join(appRoot.path, "server/page-builder"))
   );
-  app.use(
-    "/assets",
-    express.static(path.join(appRoot.path, "server/assets"))
-  );
+  app.use("/assets", express.static(path.join(appRoot.path, "server/assets")));
   app.use(
     "/api/containers/files/download",
     express.static(path.join(appRoot.path, "server/storage/files"))
@@ -238,7 +234,9 @@ function setupAssets(app) {
   );
   app.use(
     "/",
-    express.static(path.join(appRoot.path, "/node_modules/ace-builds/src-min-noconflict"))
+    express.static(
+      path.join(appRoot.path, "/node_modules/ace-builds/src-min-noconflict")
+    )
   );
 }
 
