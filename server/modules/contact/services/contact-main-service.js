@@ -4,6 +4,7 @@ var globalService = require("../../../services/global.service");
 var formService = require("../../../services/form.service");
 var dataService = require("../../../services/data.service");
 var emailService = require("../../../services/email.service");
+var viewService = require("../../../services/view.service");
 
 module.exports = contactUsMainService = {
   startup: async function () {
@@ -49,7 +50,7 @@ module.exports = contactUsMainService = {
 
       //confirmation to user
       // let body = `Hi ${contact.name}, \n\nThanks for reaching out. We'll get back to you ASAP.\n\nFor your reference, here was your message:\n${contact.message}`;
-      let body = eval(formSettings.data.emailMessageBody);
+      let body = viewService.processTemplateString(formSettings.data.emailMessageBody, {contact});
       
       await emailService.sendEmail(
         formSettings.data.adminEmail,
