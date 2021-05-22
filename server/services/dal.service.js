@@ -4,26 +4,35 @@ const Tag = require("../schema/models/tag");
 
 var dataService = require("./data.service");
 
+
+
+const {getRepository} = require("typeorm");
+const {Post} = require("../data/model/Post");
+
 module.exports = dalService = {
   startup: async function (app) {
     app.get("/typeorm", async function (req, res) {
       // const users = await userRepository.find();
-      dalService.test();
-      res.json({});
+      ;
+      res.json(await dalService.test());
     });
     
   },
 
   test: async function () {
-    const typeorm = require("typeorm");
-    const { Post } = require("../data/model/Post");
 
-    const databaseConnection = require("../data/database.connection.json");
+    const posts = await getRepository(Post).find();
+    return posts
 
-    typeorm.createConnection(databaseConnection).then((connection) => {
-      const posts = connection.getRepository(Post);
+    // const typeorm = require("typeorm");
+    // const { Post } = require("../data/model/Post");
 
-      console.log("SQL Lite DAL!");
+    // const databaseConnection = require("../data/database.connection.json");
+
+    // typeorm.createConnection(databaseConnection).then((connection) => {
+    //   const posts = getRepository(Post);
+
+    //   console.log("SQL Lite DAL!");
 
       // let newPost = new Post();
       // newPost.title = "Control flow based type analysis";
@@ -31,7 +40,7 @@ module.exports = dalService = {
 
       // let postRepository = connection.getRepository(Post);
       // postRepository.save(newPost);
-    });
+    // });
   },
 
   getUser: async function (id, user) {

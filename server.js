@@ -28,24 +28,28 @@ const adminTheme = `${process.env.ADMIN_THEME}`;
 const passport = require("passport");
 const mongoose = require("mongoose");
 
-// const typeorm = require("typeorm");
-// const {Post} = require("./server/data/model/Post");
 
-// const databaseConnection = require("./server/data/database.connection.json");
+//typeorm start
+const typeorm = require("typeorm");
+const {Post} = require("./server/data/model/Post");
 
-// typeorm.createConnection(databaseConnection).then((connection) => {
-//   const posts = connection.getRepository(Post);
+const databaseConnection = require("./server/data/database.connection.json");
 
-//   console.log(chalk.red("SQL Lite!"));
+typeorm.createConnection(databaseConnection).then((connection) => {
+  const posts = connection.getRepository(Post);
 
-//   // let newPost = new Post();
-//   // newPost.title = "Control flow based type analysis";
-//   // newPost.text = "TypeScript 2.0 implements a control flow-based type analysis for local variables and parameters.";
+  console.log(chalk.red("SQL Lite!"));
 
-//   // let postRepository = connection.getRepository(Post);
-//   // postRepository.save(newPost);
+  // let newPost = new Post();
+  // newPost.title = "Control flow based type analysis";
+  // newPost.text = "TypeScript 2.0 implements a control flow-based type analysis for local variables and parameters.";
 
-// });
+  // let postRepository = connection.getRepository(Post);
+  // postRepository.save(newPost);
+
+});
+//typeorm end
+
 
 mongoose.set("useCreateIndex", true);
 mongoose.connect(process.env.MONGODB_URL, {
