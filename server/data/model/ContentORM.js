@@ -1,6 +1,6 @@
 /*export */ 
 class ContentORM {
-    constructor(data, contentTypeId, createdByUserId, lastUpdatedByUserId, createdOn, updatedOn, url, tags) {
+    constructor(id, data, contentTypeId, createdByUserId, lastUpdatedByUserId, createdOn, updatedOn, url, tags) {
         this.id = id;
         this.data = data;
         this.contentTypeId = contentTypeId;
