@@ -2,7 +2,8 @@
 $(function(){
     
     $('.newsletter-submit').on('click', function (event) {
-        alert('Thanks you for signing up. You should receive an email confirmation shortly.')
+        $('#newsletter-signup-form').hide();
+        $('#newsletter-confirmation-message').show();
     });
 
 });
