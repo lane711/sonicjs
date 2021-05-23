@@ -35,9 +35,7 @@ const {Post} = require("./server/data/model/Post");
 const {ContentORM} = require("./server/data/model/ContentORM");
 
 
-const databaseConnection = require("./server/data/database.connection.json");
-
-typeorm.createConnection(databaseConnection).then((connection) => {
+typeorm.createConnection().then((connection) => {
   const posts = connection.getRepository(Post);
   const contentORM = connection.getRepository(ContentORM);
 
