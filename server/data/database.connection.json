@@ -1,11 +1,13 @@
 {
     "type": "sqlite",
-    "database": "/Users/lanecampbell/Dev/sonicjs/server/data/line.sqlite",
+    "database": "line.sqlite",
     "dropSchema": false,
     "synchronize": true,
     "logging": false,
     "entities": [
-      "/Users/lanecampbell/Dev/sonicjs/server/data/entity/PostSchema.js",
-      "/Users/lanecampbell/Dev/sonicjs/server/data/entity/CategorySchema.js"
+      "server/data/entity/PostSchema.js",
+      "server/data/entity/CategorySchema.js",
+      "server/data/entity/ContentSchema.js",
+      "server/data/entity/TagSchema.js"
     ]
 }

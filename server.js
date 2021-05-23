@@ -32,11 +32,14 @@ const mongoose = require("mongoose");
 //typeorm start
 const typeorm = require("typeorm");
 const {Post} = require("./server/data/model/Post");
+const {ContentORM} = require("./server/data/model/ContentORM");
+
 
 const databaseConnection = require("./server/data/database.connection.json");
 
 typeorm.createConnection(databaseConnection).then((connection) => {
   const posts = connection.getRepository(Post);
+  const contentORM = connection.getRepository(ContentORM);
 
   console.log(chalk.red("SQL Lite!"));
 

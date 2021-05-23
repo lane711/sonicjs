@@ -4,25 +4,26 @@ const Tag = require("../schema/models/tag");
 
 var dataService = require("./data.service");
 
-
-
-const {getRepository} = require("typeorm");
-const {Post} = require("../data/model/Post");
+const { getRepository } = require("typeorm");
+const { Post } = require("../data/model/Post");
+const {  ContentORM } = require("../data/model/ContentORM");
 
 module.exports = dalService = {
   startup: async function (app) {
     app.get("/typeorm", async function (req, res) {
       // const users = await userRepository.find();
-      ;
       res.json(await dalService.test());
     });
-    
   },
 
   test: async function () {
+    const contentRepo = await getRepository(Content).find();
+    let content = new Content();
+    content.data = { data: "test" };
+    contentRepo.save(content);
 
-    const posts = await getRepository(Post).find();
-    return posts
+    const posts = await getRepository(ContentORM).find();
+    return posts;
 
     // const typeorm = require("typeorm");
     // const { Post } = require("../data/model/Post");
@@ -34,12 +35,12 @@ module.exports = dalService = {
 
     //   console.log("SQL Lite DAL!");
 
-      // let newPost = new Post();
-      // newPost.title = "Control flow based type analysis";
-      // newPost.text = "TypeScript 2.0 implements a control flow-based type analysis for local variables and parameters.";
+    // let newPost = new Post();
+    // newPost.title = "Control flow based type analysis";
+    // newPost.text = "TypeScript 2.0 implements a control flow-based type analysis for local variables and parameters.";
 
-      // let postRepository = connection.getRepository(Post);
-      // postRepository.save(newPost);
+    // let postRepository = connection.getRepository(Post);
+    // postRepository.save(newPost);
     // });
   },
 
