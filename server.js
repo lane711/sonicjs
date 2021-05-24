@@ -37,7 +37,7 @@ const {ContentORM} = require("./server/data/model/ContentORM");
 
 typeorm.createConnection().then((connection) => {
   const posts = connection.getRepository(Post);
-  const contentORM = connection.getRepository(ContentORM);
+  const contentRepo = connection.getRepository(ContentORM);
 
   console.log(chalk.red("SQL Lite!"));
 
@@ -47,6 +47,19 @@ typeorm.createConnection().then((connection) => {
 
   let postRepository = connection.getRepository(Post);
   postRepository.save(newPost);
+
+
+  // let content = new ContentORM();
+  // content.data = JSON.stringify({ data: "test" });
+  // content.contentTypeId = 'test';
+  // content.createdByUserId = '123'
+  // content.lastUpdatedByUserId = '123'
+  // content.createdOn = new Date();
+  // content.updatedOn = new Date();
+  // content.url = '/ipsum'
+  // content.tags = [];
+
+  // contentRepo.save(content);
 
 });
 //typeorm end

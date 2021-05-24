@@ -17,13 +17,26 @@ module.exports = dalService = {
   },
 
   test: async function () {
-    const contentRepo = await getRepository(ContentORM).find();
+    const contentRepo = await getRepository(ContentORM);
+
     let content = new ContentORM();
-    content.data = { data: "test" };
+    content.data = JSON.stringify({ data: "test" });
+    content.contentTypeId = 'test';
+    content.createdByUserId = '123'
+    content.lastUpdatedByUserId = '123'
+    content.createdOn = new Date();
+    content.updatedOn = new Date();
+    content.url = '/ipsum1'
+    content.tags = [];
+  
     contentRepo.save(content);
+
 
     const posts = await getRepository(ContentORM).find();
     return posts;
+
+
+
 
     // const typeorm = require("typeorm");
     // const { Post } = require("../data/model/Post");

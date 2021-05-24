@@ -30,7 +30,8 @@ module.exports = new EntitySchema({
             type: "datetime"
         },
         url: {
-            type: "varchar"
+            type: "varchar",
+            unique:true,
         },
         tags: {
             type: "varchar"
