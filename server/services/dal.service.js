@@ -17,8 +17,8 @@ module.exports = dalService = {
   },
 
   test: async function () {
-    const contentRepo = await getRepository(Content).find();
-    let content = new Content();
+    const contentRepo = await getRepository(ContentORM).find();
+    let content = new ContentORM();
     content.data = { data: "test" };
     contentRepo.save(content);
 

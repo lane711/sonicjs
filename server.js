@@ -41,12 +41,12 @@ typeorm.createConnection().then((connection) => {
 
   console.log(chalk.red("SQL Lite!"));
 
-  // let newPost = new Post();
-  // newPost.title = "Control flow based type analysis";
-  // newPost.text = "TypeScript 2.0 implements a control flow-based type analysis for local variables and parameters.";
+  let newPost = new Post();
+  newPost.title = "Control flow based type analysis";
+  newPost.text = "TypeScript .0 implements a control flow-based type analysis for local variables and parameters.";
 
-  // let postRepository = connection.getRepository(Post);
-  // postRepository.save(newPost);
+  let postRepository = connection.getRepository(Post);
+  postRepository.save(newPost);
 
 });
 //typeorm end
