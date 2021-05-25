@@ -1,7 +1,7 @@
 const fs = require("fs");
 const { parse, stringify } = require("envfile");
 const path = require("path");
-const Content = require("../schema/models/content");
+const  Content = require("../schema/models/content");
 var globalService = require("../services/global.service");
 
 const mongoose = require("mongoose");
@@ -11,12 +11,12 @@ const { Like } = require("typeorm");
 
 const { getRepository } = require("typeorm");
 const { Post } = require("../data/model/Post");
-const { Content } = require("../data/model/Content");
+const { Content2 } = require("../data/model/Content");
+const { assertCompositeType } = require("graphql");
 
 let idMapTable = [];
 
-const mongoUrl =
-  "mongodb+srv://sonicAdmin:Tiger66^@cluster0.1igz1.mongodb.net/sonicjs?retryWrites=true&w=majority";
+const mongoUrl = "";
 
 mongoose.connect(mongoUrl, {
   useNewUrlParser: true,
@@ -40,13 +40,13 @@ mongoose.connection.once("open", async () => {
 
 async function migrateContent(data) {
   typeorm.createConnection().then((connection) => {
-    const contentRepo = connection.getRepository(Content);
+    const contentRepo = connection.getRepository(Content2);
 
     //clear all data
     connection
       .createQueryBuilder()
       .delete()
-      .from(Content)
+      .from(Content2)
       .where("id > :id", { id: 0 })
       .execute();
 
@@ -56,7 +56,7 @@ async function migrateContent(data) {
     data.forEach((contentData) => {
       // console.log(contentData.url);
 
-      let content = new Content();
+      let content = new Content2();
       content.data = JSON.stringify(contentData.data);
       content.contentTypeId = contentData.contentTypeId;
       content.createdByUserId = 1;
@@ -83,7 +83,7 @@ async function updateIds() {
   console.log("===== updateIds =====");
 
   // typeorm.createConnection().then((connection) => {
-  const contentRepo = getRepository(Content);
+  const contentRepo = getRepository(Content2);
 
   for (let index = 0; index < idMapTable.length; index++) {
     const contentData = idMapTable[index];
