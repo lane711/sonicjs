@@ -36,17 +36,17 @@ const {Content} = require("./server/data/model/Content");
 
 
 typeorm.createConnection().then((connection) => {
-  const posts = connection.getRepository(Post);
-  const contentRepo = connection.getRepository(Content);
+  // const posts = connection.getRepository(Post);
+  // const contentRepo = connection.getRepository(Content);
 
-  console.log(chalk.red("SQL Lite!"));
+  console.log(chalk.blueBright("Connected to SQL Lite!"));
 
-  let newPost = new Post();
-  newPost.title = "Control flow based type analysis";
-  newPost.text = "TypeScript .0 implements a control flow-based type analysis for local variables and parameters.";
+  // let newPost = new Post();
+  // newPost.title = "Control flow based type analysis";
+  // newPost.text = "TypeScript .0 implements a control flow-based type analysis for local variables and parameters.";
 
-  let postRepository = connection.getRepository(Post);
-  postRepository.save(newPost);
+  // let postRepository = connection.getRepository(Post);
+  // postRepository.save(newPost);
 
 
   // let content = new Content();

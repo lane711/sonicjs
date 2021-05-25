@@ -226,31 +226,33 @@ const RootQuery = new GraphQLObjectType({
         url: { type: GraphQLString },
         data: { type: GraphQLString },
       },
-      resolve(parent, args) {
-        if (args.id) {
-          return Content.findById(args.id);
-        } else if (args.url) {
-          return Content.findOne({
-            url: args.url,
-          });
-        } else if (args.data) {
-          return Content.find({
-            data: { name: "my data 5" },
-          });
-        }
+      resolve(parent, args, req) {
+        return dalService.getContents(args.id, args.ContentTypeId, args.url, args.data, args.tag, req.session.user)
+        // if (args.id) {
+        //   return Content.findById(args.id);
+        // } else if (args.url) {
+        //   return Content.findOne({
+        //     url: args.url,
+        //   });
+        // } else if (args.data) {
+        //   return Content.find({
+        //     data: { name: "my data 5" },
+        //   });
+        // }
       },
     },
     Contents: {
       type: new GraphQLList(ContentType),
       args: {
-        ContentTypeId: { type: GraphQLString },
+        id: { type: GraphQLID },
+        contentTypeId: { type: GraphQLString },
         url: { type: GraphQLString },
         data: { type: GraphQLJSONObject },
         tag: { type: GraphQLString },
       },
 
       resolve(parent, args, req) {
-        return dalService.getContents(args.ContentTypeId, args.url, args.data, args.tag, req.session.user)
+        return dalService.getContents(args.id, args.ContentTypeId, args.url, args.data, args.tag, req.session.user)
         // if (args.ContentTypeId) {
         //   return Content.find({
         //     ContentTypeId: args.ContentTypeId,
