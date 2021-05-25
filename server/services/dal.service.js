@@ -69,7 +69,7 @@ module.exports = dalService = {
     }
   },
 
-  getContents: async function (id, contentTypeId, url, data, tag, user) {
+  getContents: async function (id, contentTypeId, url, data, tag, user, returnAsArray = false) {
     let contents = [];
     const contentRepo = await getRepository(Content);
 
@@ -79,6 +79,11 @@ module.exports = dalService = {
             { id:  id}
         });
         dalService.processContent(content);
+
+        if(returnAsArray){
+          contents.push(content);
+          return contents;
+        }
         return content;
     }
     else if (contentTypeId) {
@@ -110,8 +115,15 @@ module.exports = dalService = {
     return contents;
   },
 
-  processContent: function (content){
+  processContent: function (content, user){
     content.data = JSON.parse(content.data);
+    content = dalService.checkPermission(content, user);
+  },
+
+  processContents: function (contents, user){
+    contents.forEach(content => {
+      dalService.processContent(content, user);
+    });
   },
 
   //get content type so we can detect permissions

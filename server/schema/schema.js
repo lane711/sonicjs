@@ -83,7 +83,7 @@ const ContentType = new GraphQLObjectType({
   //found if not wrapped in a function
   fields: () => ({
     id: { type: GraphQLID },
-    ContentTypeId: { type: GraphQLString },
+    contentTypeId: { type: GraphQLString },
     data: { type: GraphQLJSONObject },
     url: { type: GraphQLString },
     createdOn: { type: GraphQLJSONObject },
@@ -222,12 +222,12 @@ const RootQuery = new GraphQLObjectType({
       //argument passed by the user while making the query
       args: {
         id: { type: GraphQLID },
-        ContentTypeId: { type: GraphQLString },
+        contentTypeId: { type: GraphQLString },
         url: { type: GraphQLString },
         data: { type: GraphQLString },
       },
       resolve(parent, args, req) {
-        return dalService.getContents(args.id, args.ContentTypeId, args.url, args.data, args.tag, req.session.user)
+        return dalService.getContents(args.id, args.contentTypeId, args.url, args.data, args.tag, req.session.user)
         // if (args.id) {
         //   return Content.findById(args.id);
         // } else if (args.url) {
@@ -252,7 +252,7 @@ const RootQuery = new GraphQLObjectType({
       },
 
       resolve(parent, args, req) {
-        return dalService.getContents(args.id, args.ContentTypeId, args.url, args.data, args.tag, req.session.user)
+        return dalService.getContents(args.id, args.contentTypeId, args.url, args.data, args.tag, req.session.user, true)
         // if (args.ContentTypeId) {
         //   return Content.find({
         //     ContentTypeId: args.ContentTypeId,
