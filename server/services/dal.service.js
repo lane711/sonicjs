@@ -87,9 +87,11 @@ module.exports = dalService = {
         return content;
     }
     else if (contentTypeId) {
-      contents = await Content.find({
-        contentTypeId: contentTypeId,
-      }).exec();
+      contents = await contentRepo.find(
+        { where:
+            { contentTypeId:  contentTypeId}
+        });
+        dalService.processContents(contents);
     } else if (url) {
       return Content.find({
         url: url,
