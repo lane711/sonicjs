@@ -91,11 +91,12 @@ module.exports = dalService = {
         { where:
             { contentTypeId:  contentTypeId}
         });
-        dalService.processContents(contents);
+        
     } else if (url) {
-      return Content.find({
-        url: url,
-      });
+      contents = await contentRepo.find(
+        { where:
+            { url:  url}
+        });
     } else if (data) {
       var query = {};
       query["data." + data.attr] = data.val;
@@ -107,13 +108,10 @@ module.exports = dalService = {
       console.log(contents);
       return contents;
     } else {
-      return Content.find({});
-    }
+      contents = await contentRepo.find();
+      }
 
-    if (contents.length > 0) {
-      contents = dalService.checkPermission(contents, user);
-    }
-
+    dalService.processContents(contents);
     return contents;
   },
 

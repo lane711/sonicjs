@@ -217,7 +217,7 @@ const RootQuery = new GraphQLObjectType({
         });
       },
     },
-    Content: {
+    content: {
       type: ContentType,
       //argument passed by the user while making the query
       args: {
@@ -241,7 +241,7 @@ const RootQuery = new GraphQLObjectType({
         // }
       },
     },
-    Contents: {
+    contents: {
       type: new GraphQLList(ContentType),
       args: {
         id: { type: GraphQLID },
@@ -277,14 +277,14 @@ const RootQuery = new GraphQLObjectType({
       },
     },
 
-    ContentTypes: {
+    contentTypes: {
       type: new GraphQLList(ContentTypeType),
       resolve(parent, args) {
         return moduleService.getModuleContentTypes();
       },
     },
 
-    ContentType: {
+    contentType: {
       type: ContentTypeType,
       args: {
         systemId: { type: GraphQLString },
