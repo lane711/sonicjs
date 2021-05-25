@@ -1,5 +1,5 @@
 /*export */ 
-class ContentORM {
+class Content {
     constructor(id, data, contentTypeId, createdByUserId, lastUpdatedByUserId, createdOn, updatedOn, url, tags) {
         this.id = id;
         this.data = data;
@@ -14,5 +14,5 @@ class ContentORM {
 }
 
 module.exports = {
-    ContentORM: ContentORM
+    Content: Content
 };

@@ -1,10 +1,10 @@
 const EntitySchema = require("typeorm").EntitySchema;
-const ContentORM = require("../model/ContentORM").ContentORM;
+const Content = require("../model/Content").Content;
 const Tag = require("../model/Tag").Tag;
 
 module.exports = new EntitySchema({
-    name: "ContentORM",
-    target: ContentORM,
+    name: "Content",
+    target: Content,
     columns: {
         id: {
             primary: true,
@@ -15,7 +15,7 @@ module.exports = new EntitySchema({
             type: "text"
         },
         contentTypeId: {
-            type: "int"
+            type: "varchar"
         },
         createdByUserId: {
             type: "int"

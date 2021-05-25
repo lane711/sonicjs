@@ -1,12 +1,12 @@
 const User = require("../schema/models/user");
-const Content = require("../schema/models/content");
+// const Content = require("../schema/models/content");
 const Tag = require("../schema/models/tag");
 
 var dataService = require("./data.service");
 
 const { getRepository } = require("typeorm");
 const { Post } = require("../data/model/Post");
-const {  ContentORM } = require("../data/model/ContentORM");
+const {  Content } = require("../data/model/Content");
 
 module.exports = dalService = {
   startup: async function (app) {
@@ -17,9 +17,9 @@ module.exports = dalService = {
   },
 
   test: async function () {
-    const contentRepo = await getRepository(ContentORM);
+    const contentRepo = await getRepository(Content);
 
-    let content = new ContentORM();
+    let content = new Content();
     content.data = JSON.stringify({ data: "test" });
     content.contentTypeId = 'test';
     content.createdByUserId = '123'
@@ -32,7 +32,7 @@ module.exports = dalService = {
     contentRepo.save(content);
 
 
-    const posts = await getRepository(ContentORM).find();
+    const posts = await getRepository(Content).find();
     return posts;
 
 

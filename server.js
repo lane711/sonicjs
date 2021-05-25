@@ -32,12 +32,12 @@ const mongoose = require("mongoose");
 //typeorm start
 const typeorm = require("typeorm");
 const {Post} = require("./server/data/model/Post");
-const {ContentORM} = require("./server/data/model/ContentORM");
+const {Content} = require("./server/data/model/Content");
 
 
 typeorm.createConnection().then((connection) => {
   const posts = connection.getRepository(Post);
-  const contentRepo = connection.getRepository(ContentORM);
+  const contentRepo = connection.getRepository(Content);
 
   console.log(chalk.red("SQL Lite!"));
 
@@ -49,7 +49,7 @@ typeorm.createConnection().then((connection) => {
   postRepository.save(newPost);
 
 
-  // let content = new ContentORM();
+  // let content = new Content();
   // content.data = JSON.stringify({ data: "test" });
   // content.contentTypeId = 'test';
   // content.createdByUserId = '123'

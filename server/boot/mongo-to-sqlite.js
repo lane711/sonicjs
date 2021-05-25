@@ -2,14 +2,23 @@ const fs = require("fs");
 const { parse, stringify } = require("envfile");
 const path = require("path");
 const Content = require("../schema/models/content");
+var globalService = require("../services/global.service");
 
 const mongoose = require("mongoose");
 
+const typeorm = require("typeorm");
+const { Like } = require("typeorm");
+
 const { getRepository } = require("typeorm");
 const { Post } = require("../data/model/Post");
-const {  ContentORM } = require("../data/model/ContentORM");
+const { Content } = require("../data/model/Content");
 
-mongoose.connect("mongodb://localhost:27017/sonicjs", {
+let idMapTable = [];
+
+const mongoUrl =
+  "mongodb+srv://sonicAdmin:Tiger66^@cluster0.1igz1.mongodb.net/sonicjs?retryWrites=true&w=majority";
+
+mongoose.connect(mongoUrl, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -30,27 +39,88 @@ mongoose.connection.once("open", async () => {
 });
 
 async function migrateContent(data) {
+  typeorm.createConnection().then((connection) => {
+    const contentRepo = connection.getRepository(Content);
 
-  const contentRepo = await getRepository(ContentORM);
+    //clear all data
+    connection
+      .createQueryBuilder()
+      .delete()
+      .from(Content)
+      .where("id > :id", { id: 0 })
+      .execute();
 
+    // return;
 
-  data.forEach((contentData) => {
-    console.log(contentData.url);
+    let i = 0;
+    data.forEach((contentData) => {
+      // console.log(contentData.url);
 
+      let content = new Content();
+      content.data = JSON.stringify(contentData.data);
+      content.contentTypeId = contentData.contentTypeId;
+      content.createdByUserId = 1;
+      content.lastUpdatedByUserId = 1;
+      content.createdOn = contentData.createdOn;
+      content.updatedOn = contentData.updatedOn;
+      content.url = contentData.url;
+      content.tags = [];
 
-    // let content = new ContentORM();
-    // content.data = JSON.stringify(contentData.data);
-    // content.contentTypeId = contentData.contentTypeId;
-    // content.createdByUserId = contentData.createdByUserId
-    // content.lastUpdatedByUserId = contentData.lastUpdatedByUserId
-    // content.createdOn = contentData.createdOn
-    // content.updatedOn = contentData.updatedOn
-    // content.url = contentData.url
-    // content.tags = [];
-  
-    // contentRepo.save(content);
+      contentRepo.save(content).then((newContent) => {
+        idMapTable.push({ oldId: contentData.id, newId: newContent.id });
+        i++;
 
+        if (data.length === i) {
+          updateIds();
+        }
+      });
+    });
+    return;
   });
+}
+
+async function updateIds() {
+  console.log("===== updateIds =====");
+
+  // typeorm.createConnection().then((connection) => {
+  const contentRepo = getRepository(Content);
+
+  for (let index = 0; index < idMapTable.length; index++) {
+    const contentData = idMapTable[index];
+    console.log("map-->", contentData);
+
+    let contentToBeUpdated = await contentRepo.find({
+      data: Like(`%${contentData.oldId}%`),
+    });
+
+    if (contentToBeUpdated.length > 0) {
+      for (let index = 0; index < contentToBeUpdated.length; index++) {
+        const content = contentToBeUpdated[index];
+        let contentRecord = await contentRepo.findOne(
+          { where:
+              { id:  content.id}
+          });
+        console.log(contentRecord);
+        contentRecord.lastUpdatedByUserId = 3;
+        contentRecord.data = contentRecord.data.replace(contentData.oldId, contentData.newId);
+        contentRepo.update(content.id, contentRecord);
+      }
+    }
+  }
+
+  // let content = new Content();
+  // content.data = JSON.stringify(contentData.data);
+  // content.contentTypeId = contentData.contentTypeId;
+  // content.createdByUserId = 1
+  // content.lastUpdatedByUserId = 1
+  // content.createdOn = contentData.createdOn
+  // content.updatedOn = contentData.updatedOn
+  // content.url = contentData.url
+  // content.tags = [];
+
+  // contentRepo.save(content);
+
+  // });
 }
 
 function slugify(text) {

@@ -1,6 +1,6 @@
 const graphql = require("graphql");
 const User = require("./models/user");
-const Content = require("./models/content");
+const Content = require("./models/Content");
 const Tag = require("./models/tag");
 
 const { GraphQLJSONObject } = require("graphql-type-json");
@@ -58,7 +58,7 @@ const TagType = new GraphQLObjectType({
     url: { type: GraphQLString },
     createdOn: { type: GraphQLJSONObject },
     updatedOn: { type: GraphQLJSONObject },
-    contents: {
+    Contents: {
       type: new GraphQLList(ContentType),
       resolve(parent, args) {
         return Content.find({ tags: parent.id });
@@ -70,7 +70,7 @@ const TagType = new GraphQLObjectType({
 const TagRefType = new GraphQLObjectType({
   name: "TagRefType",
   fields: () => ({
-    contentId: { type: GraphQLString },
+    ContentId: { type: GraphQLString },
     tagId: { type: GraphQLString },
     status: { type: GraphQLString },
   }),
@@ -83,7 +83,7 @@ const ContentType = new GraphQLObjectType({
   //found if not wrapped in a function
   fields: () => ({
     id: { type: GraphQLID },
-    contentTypeId: { type: GraphQLString },
+    ContentTypeId: { type: GraphQLString },
     data: { type: GraphQLJSONObject },
     url: { type: GraphQLString },
     createdOn: { type: GraphQLJSONObject },
@@ -213,16 +213,16 @@ const RootQuery = new GraphQLObjectType({
       type: new GraphQLList(ContentType),
       async resolve(parent, args) {
         return Content.find({
-          contentTypeId: "role",
+          ContentTypeId: "role",
         });
       },
     },
-    content: {
+    Content: {
       type: ContentType,
       //argument passed by the user while making the query
       args: {
         id: { type: GraphQLID },
-        contentTypeId: { type: GraphQLString },
+        ContentTypeId: { type: GraphQLString },
         url: { type: GraphQLString },
         data: { type: GraphQLString },
       },
@@ -240,20 +240,20 @@ const RootQuery = new GraphQLObjectType({
         }
       },
     },
-    contents: {
+    Contents: {
       type: new GraphQLList(ContentType),
       args: {
-        contentTypeId: { type: GraphQLString },
+        ContentTypeId: { type: GraphQLString },
         url: { type: GraphQLString },
         data: { type: GraphQLJSONObject },
         tag: { type: GraphQLString },
       },
 
       resolve(parent, args, req) {
-        return dalService.getContents(args.contentTypeId, args.url, args.data, args.tag, req.session.user)
-        // if (args.contentTypeId) {
+        return dalService.getContents(args.ContentTypeId, args.url, args.data, args.tag, req.session.user)
+        // if (args.ContentTypeId) {
         //   return Content.find({
-        //     contentTypeId: args.contentTypeId,
+        //     ContentTypeId: args.ContentTypeId,
         //   });
         // } else if (args.url) {
         //   return Content.find({
@@ -265,24 +265,24 @@ const RootQuery = new GraphQLObjectType({
         //   console.log("query", query);
         //   return Content.find(query);
         // } else if (args.tag) {
-        //   let contentsQuery = Tag.findById(args.tag); //.populate("contents");
-        //   let contents = contentsQuery.exec();
-        //   console.log(contents);
-        //   return contents;
+        //   let ContentsQuery = Tag.findById(args.tag); //.populate("Contents");
+        //   let Contents = ContentsQuery.exec();
+        //   console.log(Contents);
+        //   return Contents;
         // } else {
         //   return Content.find({});
         // }
       },
     },
 
-    contentTypes: {
+    ContentTypes: {
       type: new GraphQLList(ContentTypeType),
       resolve(parent, args) {
         return moduleService.getModuleContentTypes();
       },
     },
 
-    contentType: {
+    ContentType: {
       type: ContentTypeType,
       args: {
         systemId: { type: GraphQLString },
@@ -295,7 +295,7 @@ const RootQuery = new GraphQLObjectType({
     tags: {
       type: new GraphQLList(TagType),
       resolve(parent, args, context) {
-        return Tag.find({}).populate("contents");
+        return Tag.find({}).populate("Contents");
       },
     },
 
@@ -305,7 +305,7 @@ const RootQuery = new GraphQLObjectType({
         id: { type: GraphQLID },
       },
       resolve(parent, args) {
-        return Tag.findById(args.id).populate("contents");
+        return Tag.findById(args.id).populate("Contents");
       },
     },
 
@@ -319,13 +319,13 @@ const RootQuery = new GraphQLObjectType({
     view: {
       type: ViewType,
       args: {
-        contentType: { type: GraphQLString },
+        ContentType: { type: GraphQLString },
         viewModel: { type: GraphQLString },
         viewPath: { type: GraphQLString },
       },
       resolve(parent, args) {
         let html = viewService.getProcessedView(
-          args.contentType,
+          args.ContentType,
           JSON.parse(args.viewModel),
           args.viewPath
         );
@@ -460,39 +460,39 @@ const Mutation = new GraphQLObjectType({
     tagAddToContent: {
       type: TagRefType,
       args: {
-        contentId: { type: new GraphQLNonNull(GraphQLString) },
+        ContentId: { type: new GraphQLNonNull(GraphQLString) },
         tagId: { type: new GraphQLNonNull(GraphQLString) },
       },
       resolve(parent, args) {
         //TODO: only add if not already exists
         let tagDoc = Tag.findByIdAndUpdate(
           args.tagId,
-          { $push: { contents: args.contentId } },
+          { $push: { Contents: args.ContentId } },
           { new: true }
         );
         tagDoc.exec();
 
-        let contentDoc = Content.findByIdAndUpdate(
-          args.contentId,
+        let ContentDoc = Content.findByIdAndUpdate(
+          args.ContentId,
           { $push: { tags: args.tagId } },
           { new: true }
         );
-        contentDoc.exec();
+        ContentDoc.exec();
 
         let tagRef = {};
-        tagRef.contentId = args.contentId;
+        tagRef.ContentId = args.ContentId;
         tagRef.tagId = args.tagId;
         tagRef.status = "success";
         return tagRef;
       },
     },
 
-    //content mutations
-    contentCreate: {
+    //Content mutations
+    ContentCreate: {
       type: ContentType,
       args: {
         url: { type: new GraphQLNonNull(GraphQLString) },
-        contentTypeId: { type: new GraphQLNonNull(GraphQLString) },
+        ContentTypeId: { type: new GraphQLNonNull(GraphQLString) },
         data: {
           type: new GraphQLNonNull(GraphQLString),
         },
@@ -505,8 +505,8 @@ const Mutation = new GraphQLObjectType({
         let now = new Date();
         let dataObj = JSON.parse(args.data);
         args.data = dataObj;
-        let content = new Content({
-          contentTypeId: args.contentTypeId,
+        let Content = new Content({
+          ContentTypeId: args.ContentTypeId,
           data: args.data,
           url: args.url,
           createdByUserId: userId,
@@ -514,12 +514,12 @@ const Mutation = new GraphQLObjectType({
           lastUpdatedByUserId: userId,
           updatedOn: now,
         });
-        return content.save();
+        return Content.save();
       },
     },
 
-    //TODO: fix content update
-    contentUpdate: {
+    //TODO: fix Content update
+    ContentUpdate: {
       type: ContentType,
       args: {
         id: { type: new GraphQLNonNull(GraphQLString) },
@@ -533,17 +533,17 @@ const Mutation = new GraphQLObjectType({
       resolve(parent, args) {
         let dataObj = JSON.parse(args.data);
         args.data = dataObj;
-        let contentDoc = Content.findByIdAndUpdate(args.id, {
+        let ContentDoc = Content.findByIdAndUpdate(args.id, {
           url: args.url,
           data: args.data,
         });
-        contentDoc.exec();
+        ContentDoc.exec();
 
-        return contentDoc;
+        return ContentDoc;
       },
     },
 
-    contentDelete: {
+    ContentDelete: {
       type: ContentType,
       args: {
         id: { type: new GraphQLNonNull(GraphQLString) },
@@ -553,8 +553,8 @@ const Mutation = new GraphQLObjectType({
       },
     },
 
-    // content type mutations
-    contentTypeCreate: {
+    // Content type mutations
+    ContentTypeCreate: {
       type: ContentTypeType,
       args: {
         title: { type: new GraphQLNonNull(GraphQLString) },
@@ -566,7 +566,7 @@ const Mutation = new GraphQLObjectType({
       },
     },
 
-    contentTypeUpdate: {
+    ContentTypeUpdate: {
       type: ContentTypeType,
       args: {
         title: { type: new GraphQLNonNull(GraphQLString) },
@@ -587,14 +587,14 @@ const Mutation = new GraphQLObjectType({
         args.data = dataObj;
         args.permissions = permissionsObj;
 
-        console.log("contentTypeUpdate", args);
-        moduleService.contentTypeUpdate(args).then((data) => {
+        console.log("ContentTypeUpdate", args);
+        moduleService.ContentTypeUpdate(args).then((data) => {
           return data;
         });
       },
     },
 
-    contentTypeDelete: {
+    ContentTypeDelete: {
       type: ContentTypeType,
       args: {
         systemId: { type: new GraphQLNonNull(GraphQLString) },
