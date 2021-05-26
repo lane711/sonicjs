@@ -128,7 +128,7 @@ module.exports = dalService = {
 
   //get content type so we can detect permissions
   checkPermission: async function (data, user) {
-    let contentTypeId = data[0].contentTypeId;
+    let contentTypeId = data.contentTypeId ?? data[0].contentTypeId;
     let contentType = await moduleService.getModuleContentType(contentTypeId);
 
     if (user && user.roles.includes("admin")) {

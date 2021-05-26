@@ -321,7 +321,7 @@ const RootQuery = new GraphQLObjectType({
     view: {
       type: ViewType,
       args: {
-        ContentType: { type: GraphQLString },
+        contentType: { type: GraphQLString },
         viewModel: { type: GraphQLString },
         viewPath: { type: GraphQLString },
       },
