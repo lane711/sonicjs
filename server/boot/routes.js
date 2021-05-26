@@ -375,7 +375,8 @@ exports.loadRoutes = async function (app) {
     }
 
     let isAuthenticated = await userService.isAuthenticated(req);
-    globalService.setAreaMode(false, true, isAuthenticated);
+    let isAdminDomain = process.env.ADMIN_DOMAIN;
+    globalService.setAreaMode(false, true, isAuthenticated, isAdminDomain);
     var { page } = await contentService.getRenderedPage(req);
 
     if (page.data.title === "Not Found") {

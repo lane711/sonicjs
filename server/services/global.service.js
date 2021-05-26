@@ -42,11 +42,12 @@
   exports.setAreaMode = function (
     isBackEnd = false,
     isFrontEnd = false,
-    isAuthenticated = false
+    isAuthenticated = false,
+    isAdminDomain = false
   ) {
     this.isBackEnd = isBackEnd;
     this.isFrontEnd = isFrontEnd;
-    this.isPageBuilder = isFrontEnd && isAuthenticated;
+    this.isPageBuilder = isFrontEnd && isAuthenticated && isAdminDomain;
   };
 })(typeof exports === "undefined" ? (this["globalService"] = {}) : exports);
 
