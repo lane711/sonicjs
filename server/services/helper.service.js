@@ -98,6 +98,8 @@
 
       let slug = this ? this.slugify(copy) : slugify(copy);
 
+      slug = slug.length > 100 ? slug.substr(0,100) : slug;
+
       if(includePrecedingSlash === true){
         slug = `/${slug}`;
       }
