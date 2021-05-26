@@ -190,7 +190,7 @@ const RootQuery = new GraphQLObjectType({
 
         //create a direct api instead of user.find...
         // then use that api directly from the admin backend
-        return dalService.getUser(args.id);
+        return dalService.userGet(args.id);
         //user can always see their own profile
         if (args.id === req.session.userId) {
           return User.findById(args.id);
@@ -227,7 +227,7 @@ const RootQuery = new GraphQLObjectType({
         data: { type: GraphQLString },
       },
       resolve(parent, args, req) {
-        return dalService.getContents(args.id, args.contentTypeId, args.url, args.data, args.tag, req.session.user)
+        return dalService.contentGet(args.id, args.contentTypeId, args.url, args.data, args.tag, req.session.user)
         // if (args.id) {
         //   return Content.findById(args.id);
         // } else if (args.url) {
@@ -252,7 +252,7 @@ const RootQuery = new GraphQLObjectType({
       },
 
       resolve(parent, args, req) {
-        return dalService.getContents(args.id, args.contentTypeId, args.url, args.data, args.tag, req.session.user, true)
+        return dalService.contentGet(args.id, args.contentTypeId, args.url, args.data, args.tag, req.session.user, true)
         // if (args.ContentTypeId) {
         //   return Content.find({
         //     ContentTypeId: args.ContentTypeId,
@@ -490,7 +490,7 @@ const Mutation = new GraphQLObjectType({
     },
 
     //Content mutations
-    ContentCreate: {
+    contentCreate: {
       type: ContentType,
       args: {
         url: { type: new GraphQLNonNull(GraphQLString) },
@@ -521,7 +521,7 @@ const Mutation = new GraphQLObjectType({
     },
 
     //TODO: fix Content update
-    ContentUpdate: {
+    contentUpdate: {
       type: ContentType,
       args: {
         id: { type: new GraphQLNonNull(GraphQLString) },
@@ -534,18 +534,19 @@ const Mutation = new GraphQLObjectType({
       },
       resolve(parent, args) {
         let dataObj = JSON.parse(args.data);
-        args.data = dataObj;
-        let ContentDoc = Content.findByIdAndUpdate(args.id, {
-          url: args.url,
-          data: args.data,
-        });
-        ContentDoc.exec();
+        return dalService.contentUpdate(args.id, args.url, dataObj);
+        // args.data = dataObj;
+        // let ContentDoc = Content.findByIdAndUpdate(args.id, {
+        //   url: args.url,
+        //   data: args.data,
+        // });
+        // ContentDoc.exec();
 
-        return ContentDoc;
+        // return ContentDoc;
       },
     },
 
-    ContentDelete: {
+    contentDelete: {
       type: ContentType,
       args: {
         id: { type: new GraphQLNonNull(GraphQLString) },
@@ -556,7 +557,7 @@ const Mutation = new GraphQLObjectType({
     },
 
     // Content type mutations
-    ContentTypeCreate: {
+    contentTypeCreate: {
       type: ContentTypeType,
       args: {
         title: { type: new GraphQLNonNull(GraphQLString) },
@@ -568,7 +569,7 @@ const Mutation = new GraphQLObjectType({
       },
     },
 
-    ContentTypeUpdate: {
+    contentTypeUpdate: {
       type: ContentTypeType,
       args: {
         title: { type: new GraphQLNonNull(GraphQLString) },
@@ -596,7 +597,7 @@ const Mutation = new GraphQLObjectType({
       },
     },
 
-    ContentTypeDelete: {
+    contentTypeDelete: {
       type: ContentTypeType,
       args: {
         systemId: { type: new GraphQLNonNull(GraphQLString) },

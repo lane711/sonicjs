@@ -6,7 +6,7 @@ var dataService = require("./data.service");
 
 const { getRepository } = require("typeorm");
 const { Post } = require("../data/model/Post");
-const {  Content } = require("../data/model/Content");
+const { Content } = require("../data/model/Content");
 
 module.exports = dalService = {
   startup: async function (app) {
@@ -21,22 +21,18 @@ module.exports = dalService = {
 
     let content = new Content();
     content.data = JSON.stringify({ data: "test" });
-    content.contentTypeId = 'test';
-    content.createdByUserId = '123'
-    content.lastUpdatedByUserId = '123'
+    content.contentTypeId = "test";
+    content.createdByUserId = "123";
+    content.lastUpdatedByUserId = "123";
     content.createdOn = new Date();
     content.updatedOn = new Date();
-    content.url = '/ipsum1'
+    content.url = "/ipsum1";
     content.tags = [];
-  
-    contentRepo.save(content);
 
+    contentRepo.save(content);
 
     const posts = await getRepository(Content).find();
     return posts;
-
-
-
 
     // const typeorm = require("typeorm");
     // const { Post } = require("../data/model/Post");
@@ -57,7 +53,7 @@ module.exports = dalService = {
     // });
   },
 
-  getUser: async function (id, user) {
+  userGet: async function (id, user) {
     if (id === user.id) {
       return User.findById(id);
     }
@@ -69,34 +65,37 @@ module.exports = dalService = {
     }
   },
 
-  getContents: async function (id, contentTypeId, url, data, tag, user, returnAsArray = false) {
+  contentGet: async function (
+    id,
+    contentTypeId,
+    url,
+    data,
+    tag,
+    user,
+    returnAsArray = false
+  ) {
     let contents = [];
     const contentRepo = await getRepository(Content);
 
-    if(id){
+    if (id) {
       let content = await contentRepo.findOne(
         { where:
-            { id:  id}
-        });
-        dalService.processContent(content);
+          { id: id }
+      }
+      );
+      dalService.processContent(content);
 
-        if(returnAsArray){
-          contents.push(content);
-          return contents;
-        }
-        return content;
-    }
-    else if (contentTypeId) {
-      contents = await contentRepo.find(
-        { where:
-            { contentTypeId:  contentTypeId}
-        });
-        
+      if (returnAsArray) {
+        contents.push(content);
+        return contents;
+      }
+      return content;
+    } else if (contentTypeId) {
+      contents = await contentRepo.find({
+        where: { contentTypeId: contentTypeId },
+      });
     } else if (url) {
-      contents = await contentRepo.find(
-        { where:
-            { url:  url}
-        });
+      contents = await contentRepo.find({ where: { url: url } });
     } else if (data) {
       var query = {};
       query["data." + data.attr] = data.val;
@@ -109,19 +108,31 @@ module.exports = dalService = {
       return contents;
     } else {
       contents = await contentRepo.find();
-      }
+    }
 
     dalService.processContents(contents);
     return contents;
   },
 
-  processContent: function (content, user){
+  contentUpdate: async function (id, url, data) {
+    const contentRepo = await getRepository(Content);
+    let content = await contentRepo.findOne(
+      { where:
+        { id: id }
+    }
+    );
+    content.url = url;
+    content.data = data;
+    return contentRepo.save(content);
+  },
+
+  processContent: function (content, user) {
     content.data = JSON.parse(content.data);
     content = dalService.checkPermission(content, user);
   },
 
-  processContents: function (contents, user){
-    contents.forEach(content => {
+  processContents: function (contents, user) {
+    contents.forEach((content) => {
       dalService.processContent(content, user);
     });
   },
