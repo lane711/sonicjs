@@ -348,6 +348,11 @@ const Mutation = new GraphQLObjectType({
         password: { type: new GraphQLNonNull(GraphQLString) },
       },
       resolve(parent, args) {
+
+        if (adminDomain !== req.host) {
+          res.send(401);
+          return;
+        }
         // let now = new Date();
         // let user = new User({
         //   username: args.username,
@@ -499,6 +504,9 @@ const Mutation = new GraphQLObjectType({
         createdByUserId: { type: GraphQLID },
       },
       resolve(parent, args, context) {
+        if(!checkPermissions(context)){
+          return "Unauthorized"
+        }
         let userId = (context.session.user && context.session.user.id)
           ? context.session.userId
           : args.createdByUserId;
@@ -530,7 +538,10 @@ const Mutation = new GraphQLObjectType({
         // createdByUserId: { type: new GraphQLNonNull(GraphQLID) },
         // lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
       },
-      resolve(parent, args) {
+      resolve(parent, args, context) {
+        if(!checkPermissions(context)){
+          return "Unauthorized"
+        }
         let dataObj = JSON.parse(args.data);
         args.data = dataObj;
         let contentDoc = Content.findByIdAndUpdate(args.id, {
@@ -548,7 +559,10 @@ const Mutation = new GraphQLObjectType({
       args: {
         id: { type: new GraphQLNonNull(GraphQLString) },
       },
-      resolve(parent, args) {
+      resolve(parent, args, context) {
+        if(!checkPermissions(context)){
+          return "Unauthorized"
+        }
         return Content.findByIdAndDelete(args.id);
       },
     },
@@ -561,7 +575,10 @@ const Mutation = new GraphQLObjectType({
         systemId: { type: new GraphQLNonNull(GraphQLString) },
         moduleSystemId: { type: new GraphQLNonNull(GraphQLString) },
       },
-      resolve(parent, args) {
+      resolve(parent, args, context) {
+        if(!checkPermissions(context)){
+          return "Unauthorized"
+        }
         return moduleService.createModuleContentType(args);
       },
     },
@@ -580,7 +597,10 @@ const Mutation = new GraphQLObjectType({
         // },
         // lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
       },
-      resolve(parent, args) {
+      resolve(parent, args, context) {
+        if(!checkPermissions(context)){
+          return "Unauthorized"
+        }
         let dataObj = JSON.parse(args.data);
         let permissionsObj = JSON.parse(args.permissions);
 
@@ -599,7 +619,10 @@ const Mutation = new GraphQLObjectType({
       args: {
         systemId: { type: new GraphQLNonNull(GraphQLString) },
       },
-      resolve(parent, args) {
+      resolve(parent, args, context) {
+        if(!checkPermissions(context)){
+          return "Unauthorized"
+        }
         moduleService.deleteModuleContentType(args.systemId).then((data) => {
           return data;
         });
@@ -613,7 +636,10 @@ const Mutation = new GraphQLObjectType({
         filePath: { type: new GraphQLNonNull(GraphQLString) },
         fileContent: { type: new GraphQLNonNull(GraphQLString) },
       },
-      resolve(parent, args) {
+      resolve(parent, args, context) {
+        if(!checkPermissions(context)){
+          return "Unauthorized"
+        }
         fileService.writeFile(args.filePath, args.fileContent);
         let fileData = new FileData(args.filePath, args.fileContent);
         return fileData;
@@ -626,7 +652,10 @@ const Mutation = new GraphQLObjectType({
         filePath: { type: new GraphQLNonNull(GraphQLString) },
         fileContent: { type: new GraphQLNonNull(GraphQLString) },
       },
-      resolve(parent, args) {
+      resolve(parent, args, context) {
+        if(!checkPermissions(context)){
+          return "Unauthorized"
+        }
         fileService.writeFile(args.filePath, args.fileContent);
         let fileData = new FileData(args.filePath, args.fileContent);
         return fileData;
@@ -642,7 +671,10 @@ const Mutation = new GraphQLObjectType({
         systemId: { type: new GraphQLNonNull(GraphQLString) },
         canBeAddedToColumn: { type: new GraphQLNonNull(GraphQLBoolean) },
       },
-      resolve(parent, args) {
+      resolve(parent, args, context) {
+        if(!checkPermissions(context)){
+          return "Unauthorized"
+        }
         return moduleService.createModule(args);
       },
     },
@@ -652,7 +684,10 @@ const Mutation = new GraphQLObjectType({
       args: {
         systemId: { type: new GraphQLNonNull(GraphQLString) },
       },
-      resolve(parent, args) {
+      resolve(parent, args, context) {
+        if(!checkPermissions(context)){
+          return "Unauthorized"
+        }
         return moduleService.deleteModule(args.systemId);
       },
     },
@@ -666,12 +701,22 @@ const Mutation = new GraphQLObjectType({
         canBeAddedToColumn: { type: new GraphQLNonNull(GraphQLBoolean) },
         singleInstance: { type: new GraphQLNonNull(GraphQLBoolean) },
       },
-      resolve(parent, args) {
+      resolve(parent, args, context) {
+        if(!checkPermissions(context)){
+          return "Unauthorized"
+        }
         return moduleService.updateModule(args);
       },
     },
   },
 });
+
+function checkPermissions(context){
+  if (process.env.ADMIN_DOMAIN !== context.host) {
+    return false;
+  }
+  return true;
+}
 
 //Creating a new GraphQL Schema, with options query which defines query
 //we will allow users to use when they are making request.
