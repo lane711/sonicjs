@@ -31,21 +31,29 @@ module.exports = authService = {
     });
 
     passport.use(
-      new LocalStrategy(function (email, password, done) {
-        let loginUser = userService.loginUser(email, password);
+      new LocalStrategy(async function (email, password, done) {
+        let loginUser = await userService.loginUser(email, password);
 
-        if (err) {
-          return done(err);
-        }
-        if (!loginUser) {
-          return done(null, false, { message: "Incorrect username." });
-        }
-        if (!loginUser.validPassword(password)) {
-          return done(null, false, { message: "Incorrect password." });
-        }
-        return done(null, user);
+        // if (err) {
+        //   return done(err);
+        // }
+        // if (!loginUser) {
+        //   return done(null, false, { message: "Incorrect username." });
+        // }
+        // if (!loginUser.validPassword(password)) {
+        //   return done(null, false, { message: "Incorrect password." });
+        // }
+        return done(null, loginUser);
       })
     );
+
+    passport.serializeUser(function(user, done) {
+      done(null, user);
+    });
+    
+    passport.deserializeUser(function(user, done) {
+      done(null, user);
+    });
 
     app.get("/register", async function (req, res) {
       let data = { registerMessage: "<b>admin</b>" };
@@ -62,7 +70,7 @@ module.exports = authService = {
       let password = req.body.password;
       let passwordConfirm = req.body.passwordConfirm;
 
-      let newUser = await userService.createUser(email, password);
+      let newUser = await userService.registerUser(email, password);
 
       globalService.isAdminUserCreated = true;
       let message = encodeURI(`Account created successfully. Please login`);

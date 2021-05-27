@@ -11,6 +11,7 @@ const chalk = require("chalk");
 var { GraphQLClient, gql, request } = require("graphql-request");
 const crypto = require("crypto");
 const User = require("../schema/models/user");
+const dalService = require("./dal.service");
 
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
@@ -34,8 +35,9 @@ module.exports = userService = {
     })
   },
 
-  createUser: async function (username, password) {
-    User.register({ username: username, active: false }, password);
+  registerUser: async function (email, password) {
+    return await dalService.userRegister(email, password);
+    // User.register({ username: username, active: false }, password);
     // let passwordHash = crypto.createHash('md5').update('password').digest("hex")
 
     // const query = gql`
@@ -53,18 +55,19 @@ module.exports = userService = {
   },
 
   loginUser: async function (email, password) {
-    const query = gql`
-      mutation{
-        userCreate(email:"${email}", password:"${password}"){
-          email
-          id
-        }
-      }
-        `;
+    return await dalService.userGetByLogin(email, password);
+    // const query = gql`
+    //   mutation{
+    //     userCreate(email:"${email}", password:"${password}"){
+    //       email
+    //       id
+    //     }
+    //   }
+    //     `;
 
-    let data = await dataService.executeGraphqlQuery(query);
+    // let data = await dataService.executeGraphqlQuery(query);
 
-    return data.contents;
+    // return data.contents;
   },
 
   getUsers: async function () {

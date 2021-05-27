@@ -1,4 +1,4 @@
-const User = require("../schema/models/user");
+// const User = require("../schema/models/user");
 // const Content = require("../schema/models/content");
 const Tag = require("../schema/models/tag");
 
@@ -7,6 +7,7 @@ var dataService = require("./data.service");
 const { getRepository } = require("typeorm");
 const { Post } = require("../data/model/Post");
 const { Content } = require("../data/model/Content");
+const { User } = require("../data/model/User");
 
 module.exports = dalService = {
   startup: async function (app) {
@@ -26,6 +27,49 @@ module.exports = dalService = {
     if (user.roles.includes("admin")) {
       return User.findById(id);
     }
+  },
+
+  userGetByLogin: async function (email, password) {
+    const userRepo = await getRepository(User);
+
+    let user = await userRepo.findOne({
+      where: [{ username: email }, { password: password }],
+    });
+
+    user.profile = JSON.parse(user.profile);
+
+    return user;
+
+    //admins can see all users
+    //TODO: get role by name
+    if (user.roles.includes("admin")) {
+      return User.findById(id);
+    }
+  },
+
+  userRegister: async function (email, password) {
+    const userRepo = await getRepository(User);
+
+    let user = await userRepo.findOne({
+      where: { username: email },
+    });
+
+    if(!user){
+      let newUser = new User();
+      newUser.username = email;
+      newUser.password = password;
+      newUser.profile = "{}";
+      newUser.createdOn = new Date();
+      newUser.updatedOn = new Date();
+
+      let userRecord = await userRepo.save(newUser);
+    }
+
+    //admins can see all users
+    //TODO: get role by name
+    // if (user.roles.includes("admin")) {
+    //   return User.findById(id);
+    // }
   },
 
   contentGet: async function (
