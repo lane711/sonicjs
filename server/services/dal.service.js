@@ -78,11 +78,7 @@ module.exports = dalService = {
     const contentRepo = await getRepository(Content);
 
     if (id) {
-      let content = await contentRepo.findOne(
-        { where:
-          { id: id }
-      }
-      );
+      let content = await contentRepo.findOne({ where: { id: id } });
       dalService.processContent(content);
 
       if (returnAsArray) {
@@ -116,18 +112,18 @@ module.exports = dalService = {
 
   contentUpdate: async function (id, url, data) {
     const contentRepo = await getRepository(Content);
-    let content = await contentRepo.findOne(
-      { where:
-        { id: id }
-    }
-    );
+    let content = await contentRepo.findOne({ where: { id: id } });
     content.url = url;
-    content.data = data;
+    content.data = JSON.stringify(data);
     return contentRepo.save(content);
   },
 
   processContent: function (content, user) {
-    content.data = JSON.parse(content.data);
+    try {
+      content.data = JSON.parse(content.data);
+    } catch (err) {
+      console.log(`JSON parsing error, id: ${content.id}, ${content.contentTypeId}` , err);
+    }
     content = dalService.checkPermission(content, user);
   },
 
