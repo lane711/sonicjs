@@ -16,43 +16,6 @@ module.exports = dalService = {
     });
   },
 
-  test: async function () {
-    const contentRepo = await getRepository(Content);
-
-    let content = new Content();
-    content.data = JSON.stringify({ data: "test" });
-    content.contentTypeId = "test";
-    content.createdByUserId = "123";
-    content.lastUpdatedByUserId = "123";
-    content.createdOn = new Date();
-    content.updatedOn = new Date();
-    content.url = "/ipsum1";
-    content.tags = [];
-
-    contentRepo.save(content);
-
-    const posts = await getRepository(Content).find();
-    return posts;
-
-    // const typeorm = require("typeorm");
-    // const { Post } = require("../data/model/Post");
-
-    // const databaseConnection = require("../data/database.connection.json");
-
-    // typeorm.createConnection(databaseConnection).then((connection) => {
-    //   const posts = getRepository(Post);
-
-    //   console.log("SQL Lite DAL!");
-
-    // let newPost = new Post();
-    // newPost.title = "Control flow based type analysis";
-    // newPost.text = "TypeScript 2.0 implements a control flow-based type analysis for local variables and parameters.";
-
-    // let postRepository = connection.getRepository(Post);
-    // postRepository.save(newPost);
-    // });
-  },
-
   userGet: async function (id, user) {
     if (id === user.id) {
       return User.findById(id);
@@ -86,12 +49,14 @@ module.exports = dalService = {
         return contents;
       }
       return content;
+    } else if (url) {
+      let content = await contentRepo.findOne({ where: { url: url } });
+      dalService.processContent(content);
+      return content;
     } else if (contentTypeId) {
       contents = await contentRepo.find({
         where: { contentTypeId: contentTypeId },
       });
-    } else if (url) {
-      contents = await contentRepo.find({ where: { url: url } });
     } else if (data) {
       var query = {};
       query["data." + data.attr] = data.val;
@@ -122,7 +87,10 @@ module.exports = dalService = {
     try {
       content.data = JSON.parse(content.data);
     } catch (err) {
-      console.log(`JSON parsing error, id: ${content.id}, ${content.contentTypeId}` , err);
+      console.log(
+        `JSON parsing error, id: ${content.id}, ${content.contentTypeId}`,
+        err
+      );
     }
     content = dalService.checkPermission(content, user);
   },

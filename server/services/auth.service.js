@@ -30,22 +30,22 @@ module.exports = authService = {
       }
     });
 
-    // passport.use(
-    //   new LocalStrategy(function (email, password, done) {
-    //     let loginUser = userService.loginUser(email, password);
+    passport.use(
+      new LocalStrategy(function (email, password, done) {
+        let loginUser = userService.loginUser(email, password);
 
-    //     if (err) {
-    //       return done(err);
-    //     }
-    //     if (!loginUser) {
-    //       return done(null, false, { message: "Incorrect username." });
-    //     }
-    //     if (!loginUser.validPassword(password)) {
-    //       return done(null, false, { message: "Incorrect password." });
-    //     }
-    //     return done(null, user);
-    //   })
-    // );
+        if (err) {
+          return done(err);
+        }
+        if (!loginUser) {
+          return done(null, false, { message: "Incorrect username." });
+        }
+        if (!loginUser.validPassword(password)) {
+          return done(null, false, { message: "Incorrect password." });
+        }
+        return done(null, user);
+      })
+    );
 
     app.get("/register", async function (req, res) {
       let data = { registerMessage: "<b>admin</b>" };
@@ -72,6 +72,20 @@ module.exports = authService = {
 
     //TODO: https://www.sitepoint.com/local-authentication-using-passport-node-js/
     app.post('/login', (req, res, next) => {
+
+
+
+      // passport.authenticate('local', function(err, user, info) {
+      //   if (err) { return next(err); }
+      //   if (!user) { return res.redirect('/login'); }
+      //   req.logIn(user, function(err) {
+      //     if (err) { return next(err); }
+      //     return res.redirect('/users/' + user.username);
+      //   });
+
+
+
+
 
       if (process.env.MODE !== "dev") {
         if (adminDomain !== req.host) {

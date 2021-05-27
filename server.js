@@ -98,11 +98,12 @@ function start() {
   app.use(cookieParser());
   setupHandlebars(app);
 
-  passport.use(User.createStrategy());
-  passport.serializeUser(User.serializeUser());
-  passport.deserializeUser(User.deserializeUser());
-  app.use(passport.initialize());
-  app.use(passport.session());
+  setupPassport(app);
+  // passport.use(User.createStrategy());
+  // passport.serializeUser(User.serializeUser());
+  // passport.deserializeUser(User.deserializeUser());
+  // app.use(passport.initialize());
+  // app.use(passport.session());
 
   routes.loadRoutes(app);
 
@@ -116,6 +117,20 @@ function start() {
 
     app.emit("started");
   });
+}
+
+function setupPassport(app){
+  // passport.use(User.createStrategy());
+  // passport.serializeUser(User.serializeUser());
+  // passport.deserializeUser(User.deserializeUser());
+  // app.use(passport.initialize());
+  // app.use(passport.session());
+
+  app.use(session({ secret: process.env.SESSION_SECRET }));
+app.use(passport.initialize());
+app.use(passport.session()); // persistent login sessions
+// app.use(flash()); // use connect-flash for flash messages stored in session
+
 }
 
 function setupGraphQL(app) {
