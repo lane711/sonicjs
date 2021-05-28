@@ -1,9 +1,10 @@
 /*export */ 
 class User {
-    constructor(id, username, password, profile, createdOn, updatedOn) {
+    constructor(id, username, salt, hash, profile, createdOn, updatedOn) {
         this.id = id;
         this.username = username;
-        this.password = password;
+        this.salt = salt;
+        this.hash = hash;
         this.profile = profile;
         this.createdOn = createdOn;
         this.updatedOn = updatedOn;

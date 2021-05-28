@@ -14,7 +14,10 @@ module.exports = new EntitySchema({
             type: "varchar",
             unique:true,
         },
-        password: {
+        salt: {
+            type: "varchar"
+        },
+        hash: {
             type: "varchar"
         },
         profile: {

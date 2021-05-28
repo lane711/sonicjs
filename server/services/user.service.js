@@ -28,15 +28,17 @@ module.exports = userService = {
 
     app.get("/api-admin/roles", async function (req, res) {
       let data = await dataService.rolesGet();
-      let roles = data.map(r => {
-        return {id: r.data.key, name: r.data.title};
+      let roles = data.map((r) => {
+        return { id: r.data.key, name: r.data.title };
       });
       res.send(roles);
-    })
+    });
   },
 
   registerUser: async function (email, password) {
-    return await dalService.userRegister(email, password);
+    let passwordHash = await userService.hashPassword(password);
+
+    return await dalService.userRegister(email, passwordHash);
     // User.register({ username: username, active: false }, password);
     // let passwordHash = crypto.createHash('md5').update('password').digest("hex")
 
@@ -104,28 +106,26 @@ module.exports = userService = {
   },
 
   getRoles: async function () {
+    let data = await dataService.getContentByContentType("role");
 
-  let data = await dataService.getContentByContentType('role');
-
-  return data;
+    return data;
   },
 
   mapUserRoles: async function (user) {
-
     let roles = await userService.getRoles();
 
-    if(user.profile.roles){
+    if (user.profile.roles) {
       user.roleMapping = [];
-      user.profile.roles.forEach(role => {
-        let roleRecord = roles.filter(x => x.id === role);
-        if(roleRecord){
+      user.profile.roles.forEach((role) => {
+        let roleRecord = roles.filter((x) => x.id === role);
+        if (roleRecord) {
           user.roleMapping.push(roleRecord[0].data.title);
         }
       });
     }
-  
+
     return data;
-    },
+  },
 
   // getRole: async function (id) {
   //   var roleModel = loopback.getModel("Role");
@@ -162,6 +162,22 @@ module.exports = userService = {
       return true;
     }
     return false;
+  },
+
+  hashPassword: async function (password, salt = undefined) {
+    if(!salt){
+      var salt = crypto.randomBytes(128).toString("base64");
+    }
+
+    // Implementing pbkdf2Sync
+    const hash = crypto
+      .pbkdf2Sync(password, salt, 100000, 100, "sha512")
+      .toString("hex");
+
+    return {
+      salt: salt,
+      hash: hash,
+    };
   },
 
   // getToken: async function (req) {

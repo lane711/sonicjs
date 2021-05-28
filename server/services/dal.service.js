@@ -8,6 +8,7 @@ const { getRepository } = require("typeorm");
 const { Post } = require("../data/model/Post");
 const { Content } = require("../data/model/Content");
 const { User } = require("../data/model/User");
+const userService = require("./user.service");
 
 module.exports = dalService = {
   startup: async function (app) {
@@ -58,22 +59,29 @@ module.exports = dalService = {
   userGetByLogin: async function (email, password) {
     const userRepo = await getRepository(User);
 
-    let user = await userRepo.findOne({
-      where: [{ username: email }, { password: password }],
+    let userByEmail = await userRepo.findOne({
+      where: [{ username: email }],
     });
 
-    user.profile = JSON.parse(user.profile);
-
-    return user;
+    if(userByEmail){
+      let passwordHash = await userService.hashPassword(password, userByEmail.salt);
+      if(passwordHash.hash === userByEmail.hash){
+        userByEmail.profile = JSON.parse(userByEmail.profile);
+        //no longer need salt and hash on object
+        delete userByEmail.hash;
+        delete userByEmail.salt;
+        return userByEmail;
+      }
+    }
 
     //admins can see all users
     //TODO: get role by name
-    if (user.roles.includes("admin")) {
-      return User.findById(id);
-    }
+    // if (user.roles.includes("admin")) {
+    //   return User.findById(id);
+    // }
   },
 
-  userRegister: async function (email, password) {
+  userRegister: async function (email, passwordHash) {
     const userRepo = await getRepository(User);
 
     let user = await userRepo.findOne({
@@ -83,7 +91,8 @@ module.exports = dalService = {
     if (!user) {
       let newUser = new User();
       newUser.username = email;
-      newUser.password = password;
+      newUser.salt = passwordHash.salt;
+      newUser.hash = passwordHash.hash;
       newUser.profile = "{}";
       newUser.createdOn = new Date();
       newUser.updatedOn = new Date();

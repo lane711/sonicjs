@@ -15,6 +15,7 @@ var passport = require("passport"),
 const connectEnsureLogin = require('connect-ensure-login');
 const url = require('url');
 const querystring = require('querystring');
+const dalService = require("./dal.service");
 
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
@@ -32,7 +33,9 @@ module.exports = authService = {
 
     passport.use(
       new LocalStrategy(async function (email, password, done) {
-        let loginUser = await userService.loginUser(email, password);
+        
+        let loginUser = await dalService.userGetByLogin(email, password);
+        //userService.loginUser(email, password);
 
         // if (err) {
         //   return done(err);
@@ -120,7 +123,7 @@ module.exports = authService = {
 
           req.session.userSession = user.profile;
           req.session.userSession.id = user.id;
-          res.locals.user = req.session.user
+          res.locals.user = req.session.passport.user
           // await userService.mapUserRoles(user);
     
           if(!req.session.returnTo){
