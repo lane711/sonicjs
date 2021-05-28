@@ -206,7 +206,7 @@ const RootQuery = new GraphQLObjectType({
     users: {
       type: new GraphQLList(UserType),
       resolve(parent, args) {
-        return User.find({});
+        return dalService.usersGet();
       },
     },
     roles: {
@@ -381,42 +381,45 @@ const Mutation = new GraphQLObjectType({
     userUpdate: {
       type: UserType,
       args: {
-        id: { type: new GraphQLNonNull(GraphQLID) },
+        id: { type: new GraphQLNonNull(GraphQLID)  },
         password: { type: GraphQLString },
         profile: {
           type: new GraphQLNonNull(GraphQLString),
         },
       },
-      resolve(parent, args) {
-        let profileObj = JSON.parse(args.profile);
-        if (profileObj.password !== "_temp_password") {
-          //password has been updated
-          User.findByUsername(profileObj.email).then(
-            function (user) {
-              if (user) {
-                user.setPassword(profileObj.password, function () {
-                  user.save();
-                  console.log("password reset successful");
-                });
-              } else {
-                console.log("This user does not exist");
-              }
-            },
-            function (err) {
-              console.error(err);
-            }
-          );
-        }
+      resolve(parent, args, context) {
+        let user = args;
+        user.id = parseInt(user.id);
+        return dalService.userUpdate(user, context.session.passport.user);
+        // let profileObj = JSON.parse(args.profile);
+        // if (profileObj.password !== "_temp_password") {
+        //   //password has been updated
+        //   User.findByUsername(profileObj.email).then(
+        //     function (user) {
+        //       if (user) {
+        //         user.setPassword(profileObj.password, function () {
+        //           user.save();
+        //           console.log("password reset successful");
+        //         });
+        //       } else {
+        //         console.log("This user does not exist");
+        //       }
+        //     },
+        //     function (err) {
+        //       console.error(err);
+        //     }
+        //   );
+        // }
 
-        let userDoc = User.findByIdAndUpdate(
-          args.id,
-          {
-            lastLoginOn: new Date(),
-            profile: profileObj,
-          },
-          false
-        );
-        userDoc.exec();
+        // let userDoc = User.findByIdAndUpdate(
+        //   args.id,
+        //   {
+        //     lastLoginOn: new Date(),
+        //     profile: profileObj,
+        //   },
+        //   false
+        // );
+        // userDoc.exec();
       },
     },
     // addBook: {

@@ -18,15 +18,41 @@ module.exports = dalService = {
   },
 
   userGet: async function (id, user) {
+    const userRepo = await getRepository(User);
+
     if (id === user.id) {
-      return User.findById(id);
+      let user = await userRepo.findOne(id);
+      user.contentTypeId = 'user';
+      dalService.processContent(user);
+      user.profile.email = user.username;
+      return user;
     }
 
     //admins can see all users
     //TODO: get role by name
     if (user.roles.includes("admin")) {
-      return User.findById(id);
+      return userRepo.find(id);
     }
+  },
+
+  usersGet: async function () {
+    const userRepo = await getRepository(User);
+
+    let users = await userRepo.find();
+
+    if(users){
+      users.forEach(user =>{
+        user.contentTypeId = 'user';
+      })
+    }
+    dalService.processContents(users)
+    return users;
+
+    //admins can see all users
+    //TODO: get role by name
+    // if (user.roles.includes("admin")) {
+    //   return User.findById(id);
+    // }
   },
 
   userGetByLogin: async function (email, password) {
@@ -54,7 +80,7 @@ module.exports = dalService = {
       where: { username: email },
     });
 
-    if(!user){
+    if (!user) {
       let newUser = new User();
       newUser.username = email;
       newUser.password = password;
@@ -70,6 +96,38 @@ module.exports = dalService = {
     // if (user.roles.includes("admin")) {
     //   return User.findById(id);
     // }
+  },
+
+  userUpdate: async function(userArgs, userSession){
+
+    const userRepo = await getRepository(User);
+
+    let profileObj = JSON.parse(userArgs.profile);
+
+    //update password
+    if (profileObj.password !== "_temp_password") {
+      //password has been updated
+      User.findByUsername(profileObj.email).then(
+        function (user) {
+          if (user) {
+            user.setPassword(profileObj.password, function () {
+              user.save();
+              console.log("password reset successful");
+            });
+          } else {
+            console.log("This user does not exist");
+          }
+        },
+        function (err) {
+          console.error(err);
+        }
+      );
+    }
+
+    let userRecord = await dalService.userGet(userArgs.id, userSession);
+    userRecord.updatedOn = new Date();
+    userRecord.profile = JSON.stringify(profileObj);
+    userRepo.save(userRecord);
   },
 
   contentGet: async function (
@@ -127,21 +185,35 @@ module.exports = dalService = {
     return contentRepo.save(content);
   },
 
-  processContent: function (content, user) {
-    try {
-      content.data = JSON.parse(content.data);
-    } catch (err) {
-      console.log(
-        `JSON parsing error, id: ${content.id}, ${content.contentTypeId}`,
-        err
-      );
+  processContent: function (entity, user) {
+    if (entity.data) {
+      try {
+        entity.data = JSON.parse(entity.data);
+      } catch (err) {
+        console.log(
+          `JSON parsing error, id: ${entity.id}, ${entity.contentTypeId}`,
+          err
+        );
+      }
     }
-    content = dalService.checkPermission(content, user);
+
+    if (entity.profile) {
+      try {
+        entity.profile = JSON.parse(entity.profile);
+      } catch (err) {
+        console.log(
+          `JSON parsing error, id: ${entity.id}, ${entity.contentTypeId}`,
+          err
+        );
+      }
+    }
+
+    content = dalService.checkPermission(entity, user);
   },
 
-  processContents: function (contents, user) {
-    contents.forEach((content) => {
-      dalService.processContent(content, user);
+  processContents: function (entities, user) {
+    entities.forEach((entitiy) => {
+      dalService.processContent(entitiy, user);
     });
   },
 

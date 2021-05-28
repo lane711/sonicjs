@@ -46,10 +46,10 @@ module.exports = adminService = {
           }
         }
 
-        let userSession = req.session.user;
-        if (userSession && userSession.id) {
-          userSession.id = req.session.userId;
-        }
+        let userSession = req.session.passport.user;
+        // if (userSession && userSession.id) {
+        //   userSession.id = req.session.userId;
+        // }
 
         globalService.setAreaMode(true, false, true);
 
@@ -196,7 +196,7 @@ module.exports = adminService = {
         if (viewName == "admin-user-edit") {
           let user = { id: param1 };
           if (param1) {
-            let userRecord = await dalService.getUser(param1, userSession);
+            let userRecord = await dalService.userGet(parseInt(param1), userSession);
             userRecord.data = userRecord.profile ? userRecord.profile : {};
             // userRecord.data = userRecord.profile;
             userRecord.data.id = userRecord.id;
