@@ -1,14 +1,8 @@
-// const User = require("../schema/models/user");
-// const Content = require("../schema/models/content");
 const Tag = require("../schema/models/tag");
-
-var dataService = require("./data.service");
-
 const { getRepository } = require("typeorm");
-const { Post } = require("../data/model/Post");
 const { Content } = require("../data/model/Content");
 const { User } = require("../data/model/User");
-const userService = require("./user.service");
+const crypto = require("crypto");
 
 module.exports = dalService = {
   startup: async function (app) {
@@ -64,7 +58,7 @@ module.exports = dalService = {
     });
 
     if(userByEmail){
-      let passwordHash = await userService.hashPassword(password, userByEmail.salt);
+      let passwordHash = await dalService.hashPassword(password, userByEmail.salt);
       if(passwordHash.hash === userByEmail.hash){
         userByEmail.profile = JSON.parse(userByEmail.profile);
         //no longer need salt and hash on object
@@ -251,5 +245,21 @@ module.exports = dalService = {
     }
 
     return data;
+  },
+
+  hashPassword: async function (password, salt = undefined) {
+    if(!salt){
+      var salt = crypto.randomBytes(128).toString("base64");
+    }
+
+    // Implementing pbkdf2Sync
+    const hash = crypto
+      .pbkdf2Sync(password, salt, 100000, 100, "sha512")
+      .toString("hex");
+
+    return {
+      salt: salt,
+      hash: hash,
+    };
   },
 };

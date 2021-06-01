@@ -29,7 +29,6 @@ $(document).ready(async function () {
   setupJsonEditorContentTypeRaw();
   setupJsonRawSave();
 
-
   setupFormBuilder(contentType);
   await setupACEEditor();
   await setupDropZone();
@@ -571,7 +570,7 @@ async function createInstance(
     delete payload.id;
   }
 
-  if (!payload.data && contentType !== "user") {
+  if (!payload.data) {
     let temp = { data: payload };
     payload = temp;
   }
@@ -1357,8 +1356,8 @@ async function addModuleToColumn(submission) {
   // debugger;
   let args = { id: processedEntity.id };
   let contentType = submission.data.contentType;
-  if(contentType.indexOf('-settings') > -1){
-    contentType = contentType.replace('-settings', '');
+  if (contentType.indexOf("-settings") > -1) {
+    contentType = contentType.replace("-settings", "");
   }
   let moduleInstanceShortCode = sharedService.generateShortCode(
     `${contentType}`,
@@ -1409,25 +1408,30 @@ async function submitContent(
   // debugger;
   console.log("Submission was made!", submission);
   let entity = submission.data ? submission.data : submission;
-  if (!contentType.startsWith("user")) {
-    entity = processContentFields(submission.data);
-  }
+  // if (!contentType.startsWith("user")) {
+  //   entity = processContentFields(submission.data);
+  // }
   // if (contentType.toLowerCase().startsWith("role")) {
   //   contentType = "Roles";
   //   entity = submission.data;
   // }
-  if (submission.id || submission.data.id) {
-    if (contentType.startsWith("user")) {
-      await editInstanceUser(entity, refresh, contentType);
-    } else {
+
+  if (!contentType.startsWith("user")) {
+    if (submission.id || submission.data.id) {
       await editInstance(entity, refresh, contentType);
-    }
-  } else {
-    if (contentType === "user") {
-      await dataService.userCreate(entity.email, entity.password);
     } else {
       await createInstance(entity, true, contentType);
     }
+  } else {
+    // send a POST request
+    let result = await axios({
+      method: "post",
+      url: "/form-submission",
+      data: {
+        data: submission,
+      },
+    });
+    fullPageUpdate();
   }
 }
 
@@ -1694,7 +1698,6 @@ async function updateModuleSort(shortCode, event) {
     ? "[data-template-region='true']"
     : ".module";
 
-
   destinationModules = $(destinationColumn)
     .find(destinationModuleFilter)
     .toArray()
@@ -1823,11 +1826,7 @@ async function addUser() {
 }
 
 async function setupAdminMediaFormImage() {
-  if (
-    window.location.href.indexOf(
-      "admin/content/edit/media/"
-    ) > 0
-  ) {
+  if (window.location.href.indexOf("admin/content/edit/media/") > 0) {
     let fileName = $('input[name="data[file]"]').val();
     if (fileName) {
       $(".admin-form-media-image").attr("src", `/assets/uploads/${fileName}`);

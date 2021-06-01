@@ -9,7 +9,6 @@ const axios = require("axios");
 const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 const chalk = require("chalk");
 var { GraphQLClient, gql, request } = require("graphql-request");
-const crypto = require("crypto");
 const User = require("../schema/models/user");
 const dalService = require("./dal.service");
 
@@ -36,7 +35,7 @@ module.exports = userService = {
   },
 
   registerUser: async function (email, password) {
-    let passwordHash = await userService.hashPassword(password);
+    let passwordHash = await dalService.hashPassword(password);
 
     return await dalService.userRegister(email, passwordHash);
     // User.register({ username: username, active: false }, password);
@@ -162,22 +161,6 @@ module.exports = userService = {
       return true;
     }
     return false;
-  },
-
-  hashPassword: async function (password, salt = undefined) {
-    if(!salt){
-      var salt = crypto.randomBytes(128).toString("base64");
-    }
-
-    // Implementing pbkdf2Sync
-    const hash = crypto
-      .pbkdf2Sync(password, salt, 100000, 100, "sha512")
-      .toString("hex");
-
-    return {
-      salt: salt,
-      hash: hash,
-    };
   },
 
   // getToken: async function (req) {

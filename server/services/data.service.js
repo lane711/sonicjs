@@ -91,21 +91,20 @@ if (typeof module !== "undefined" && module.exports) {
       return axiosInstance;
     }),
     (exports.userCreate = async function (email, password) {
-      debugger;
 
-      let result = await this.getAxios().post(apiUrl, {
-        query: `
-          mutation{
-            userCreate(username:"${email}", password:"${password}")
-            {
-              username
-              id
-            }
-          }
-              `,
-      });
+      // let result = await this.getAxios().post(apiUrl, {
+      //   query: `
+      //     mutation{
+      //       userCreate(username:"${email}", password:"${password}")
+      //       {
+      //         username
+      //         id
+      //       }
+      //     }
+      //         `,
+      // });
 
-      return result.userCreate;
+      // return result.userCreate;
     });
 
   (exports.userUpdate = async function (user) {
