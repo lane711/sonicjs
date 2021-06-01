@@ -47,7 +47,7 @@ module.exports = newsletterMainService = {
         //admin notification
         let adminBody = `${options.email}`;
         await emailService.sendEmail(
-          options.email,
+          "admin@ocunite.org",
           "admin@ocunite.org",
           "OCUnite Newsletter SignUp",
           adminBody
