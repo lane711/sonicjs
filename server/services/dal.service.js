@@ -25,9 +25,9 @@ module.exports = dalService = {
 
     //admins can see all users
     //TODO: get role by name
-    if (user.roles.includes("admin")) {
-      return userRepo.find(id);
-    }
+    // if (user.roles.includes("admin")) {
+    //   return userRepo.find(id);
+    // }
   },
 
   usersGet: async function () {

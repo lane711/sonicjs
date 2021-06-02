@@ -211,10 +211,12 @@ const RootQuery = new GraphQLObjectType({
     },
     roles: {
       type: new GraphQLList(ContentType),
-      async resolve(parent, args) {
-        return Content.find({
-          ContentTypeId: "role",
-        });
+      async resolve(parent, args, req) {
+        return dalService.contentGet('', 'role', '', '', '', req.session.user);
+
+        // return Content.find({
+        //   ContentTypeId: "role",
+        // });
       },
     },
     content: {
