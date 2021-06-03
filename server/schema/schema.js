@@ -564,7 +564,7 @@ const Mutation = new GraphQLObjectType({
           args.id,
           args.url,
           dataObj,
-          req.session.user
+          req.session.passport.user
         );
         // args.data = dataObj;
         // let ContentDoc = Content.findByIdAndUpdate(args.id, {
