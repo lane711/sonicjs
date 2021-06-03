@@ -300,7 +300,7 @@ exports.loadRoutes = async function (app) {
     payload.cookies = req.cookies;
     await emitterService.emit("afterFormSubmit", payload);
     
-    res.send(200);
+    res.sendStatus(200);
   });
 
   // router.get('/admin/content-types', function (req, res) {

@@ -5,7 +5,6 @@ const express = require("express");
 const graphqlHTTP = require("express-graphql");
 const schema = require("./server/schema/schema");
 const session = require("express-session");
-const MongoStore = require("connect-mongo")(session);
 const app = express();
 const { request, gql } = require("graphql-request");
 const path = require("path");
@@ -26,8 +25,6 @@ const frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
 
 const passport = require("passport");
-const mongoose = require("mongoose");
-
 
 //typeorm start
 const typeorm = require("typeorm");
@@ -35,54 +32,15 @@ const {Post} = require("./server/data/model/Post");
 const {Content} = require("./server/data/model/Content");
 
 
-typeorm.createConnection().then((connection) => {
-  // const posts = connection.getRepository(Post);
-  // const contentRepo = connection.getRepository(Content);
-
-  console.log(chalk.blueBright("Connected to SQL Lite!"));
-
-  // let newPost = new Post();
-  // newPost.title = "Control flow based type analysis";
-  // newPost.text = "TypeScript .0 implements a control flow-based type analysis for local variables and parameters.";
-
-  // let postRepository = connection.getRepository(Post);
-  // postRepository.save(newPost);
-
-
-  // let content = new Content();
-  // content.data = JSON.stringify({ data: "test" });
-  // content.contentTypeId = 'test';
-  // content.createdByUserId = '123'
-  // content.lastUpdatedByUserId = '123'
-  // content.createdOn = new Date();
-  // content.updatedOn = new Date();
-  // content.url = '/ipsum'
-  // content.tags = [];
-
-  // contentRepo.save(content);
-
-});
-//typeorm end
-
-
-mongoose.set("useCreateIndex", true);
-mongoose.connect(process.env.MONGODB_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false,
-});
-const User = require("./server/schema/models/user");
-
-mongoose.connection.once("open", async () => {
-  console.log(logSymbols.success, "Successfully connected to database!");
-
+typeorm.createConnection().then(async (connection) => {
+  console.log(logSymbols.success, "Successfully connected to SQL Lite!");
   await installService.checkInstallation();
+
 });
 
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
-    store: new MongoStore({ mongooseConnection: mongoose.connection }),
     resave: true,
     saveUninitialized: true,
   })
