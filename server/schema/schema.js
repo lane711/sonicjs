@@ -187,7 +187,6 @@ const RootQuery = new GraphQLObjectType({
         password: { type: GraphQLString },
       },
       resolve(parent, args, req, res) {
-
         //create a direct api instead of user.find...
         // then use that api directly from the admin backend
         return dalService.userGet(args.id);
@@ -212,7 +211,7 @@ const RootQuery = new GraphQLObjectType({
     roles: {
       type: new GraphQLList(ContentType),
       async resolve(parent, args, req) {
-        return dalService.contentGet('', 'role', '', '', '', req.session.user);
+        return dalService.contentGet("", "role", "", "", "", req.session.user);
 
         // return Content.find({
         //   ContentTypeId: "role",
@@ -229,7 +228,14 @@ const RootQuery = new GraphQLObjectType({
         data: { type: GraphQLString },
       },
       resolve(parent, args, req) {
-        return dalService.contentGet(args.id, args.contentTypeId, args.url, args.data, args.tag, req.session.user)
+        return dalService.contentGet(
+          args.id,
+          args.contentTypeId,
+          args.url,
+          args.data,
+          args.tag,
+          req.session.user
+        );
         // if (args.id) {
         //   return Content.findById(args.id);
         // } else if (args.url) {
@@ -254,7 +260,15 @@ const RootQuery = new GraphQLObjectType({
       },
 
       resolve(parent, args, req) {
-        return dalService.contentGet(args.id, args.contentTypeId, args.url, args.data, args.tag, req.session.user, true)
+        return dalService.contentGet(
+          args.id,
+          args.contentTypeId,
+          args.url,
+          args.data,
+          args.tag,
+          req.session.user,
+          true
+        );
         // if (args.ContentTypeId) {
         //   return Content.find({
         //     ContentTypeId: args.ContentTypeId,
@@ -383,7 +397,7 @@ const Mutation = new GraphQLObjectType({
     userUpdate: {
       type: UserType,
       args: {
-        id: { type: new GraphQLNonNull(GraphQLID)  },
+        id: { type: new GraphQLNonNull(GraphQLID) },
         password: { type: GraphQLString },
         profile: {
           type: new GraphQLNonNull(GraphQLString),
@@ -499,29 +513,36 @@ const Mutation = new GraphQLObjectType({
       type: ContentType,
       args: {
         url: { type: new GraphQLNonNull(GraphQLString) },
-        ContentTypeId: { type: new GraphQLNonNull(GraphQLString) },
+        contentTypeId: { type: new GraphQLNonNull(GraphQLString) },
         data: {
           type: new GraphQLNonNull(GraphQLString),
         },
         createdByUserId: { type: GraphQLID },
       },
-      resolve(parent, args, context) {
-        let userId = (context.session.userSession && context.session.userSession.id)
-          ? context.session.userSession.id
-          : args.createdByUserId;
-        let now = new Date();
+      resolve(parent, args, req) {
         let dataObj = JSON.parse(args.data);
-        args.data = dataObj;
-        let Content = new Content({
-          ContentTypeId: args.ContentTypeId,
-          data: args.data,
-          url: args.url,
-          createdByUserId: userId,
-          createdOn: now,
-          lastUpdatedByUserId: userId,
-          updatedOn: now,
-        });
-        return Content.save();
+        return dalService.contentUpdate(
+          "",
+          args.url,
+          dataObj,
+          req.session.user
+        );
+        // let userId = (context.session.userSession && context.session.userSession.id)
+        //   ? context.session.userSession.id
+        //   : args.createdByUserId;
+        // let now = new Date();
+        // let dataObj = JSON.parse(args.data);
+        // args.data = dataObj;
+        // let Content = new Content({
+        //   contentTypeId: args.contentTypeId,
+        //   data: args.data,
+        //   url: args.url,
+        //   createdByUserId: userId,
+        //   createdOn: now,
+        //   lastUpdatedByUserId: userId,
+        //   updatedOn: now,
+        // });
+        // return Content.save();
       },
     },
 
@@ -537,9 +558,14 @@ const Mutation = new GraphQLObjectType({
         // createdByUserId: { type: new GraphQLNonNull(GraphQLID) },
         // lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
       },
-      resolve(parent, args) {
+      resolve(parent, args, req) {
         let dataObj = JSON.parse(args.data);
-        return dalService.contentUpdate(args.id, args.url, dataObj);
+        return dalService.contentUpdate(
+          args.id,
+          args.url,
+          dataObj,
+          req.session.user
+        );
         // args.data = dataObj;
         // let ContentDoc = Content.findByIdAndUpdate(args.id, {
         //   url: args.url,
