@@ -472,14 +472,15 @@ if (typeof module !== "undefined" && module.exports) {
         delete payload.data.id;
       }
 
-      let data = JSON.stringify(payload.data);
+      let data = payload.data ?? payload;
+      let dataString = JSON.stringify(data);
 
       let query = `
       mutation{
         contentUpdate( 
           id:"${id}", 
-          url:"${payload.data.url}", 
-          data:"""${data}"""){
+          url:"${data.url}", 
+          data:"""${dataString}"""){
             id
             url
             contentTypeId
