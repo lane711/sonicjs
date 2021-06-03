@@ -182,8 +182,16 @@ module.exports = dalService = {
 
   contentUpdate: async function (id, url, data, userSession) {
     const contentRepo = await getRepository(Content);
-    let content = await contentRepo.findOne({ where: { id: id } });
+    let content = await contentRepo.findOne({ where: { id: id } }) ?? {};
     content.url = url;
+    if(!id){
+      //upsert
+      content.contentTypeId = data.contentType;
+      content.createdByUserId = userSession.id;
+      content.createdOn = new Date();
+    }
+    content.lastUpdatedByUserId = userSession.id;
+    content.lastUpdateOn = new Date();
     content.data = JSON.stringify(data);
     return contentRepo.save(content);
   },

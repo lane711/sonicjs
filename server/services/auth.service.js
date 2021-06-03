@@ -121,9 +121,9 @@ module.exports = authService = {
           }
 
 
-          req.session.userSession = user.profile;
-          req.session.userSession.id = user.id;
-          res.locals.user = req.session.passport.user
+          // req.session.userSession = user;
+          // req.session.userSession.id = user.id;
+          // res.locals.user = req.session.passport.user
           // await userService.mapUserRoles(user);
     
           if(!req.session.returnTo){
