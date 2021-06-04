@@ -20,34 +20,59 @@ const routes = require("./server/boot/routes.js");
 var appRoot = require("app-root-path");
 var bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
+const passport = require("passport");
 const port = `${process.env.PORT}`;
 const frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
 
-const passport = require("passport");
 
-//typeorm start
+
 const typeorm = require("typeorm");
-const { Post } = require("./server/data/model/Post");
-const { Content } = require("./server/data/model/Content");
+const { TypeormStore } = require("connect-typeorm");
 
-typeorm.createConnection().then(async (connection) => {
+const { Session } = require("./server/data/model/Session");
+
+// typeorm.createConnection().then(async (connection) => {
+//   console.log(logSymbols.success, "Successfully connected to SQL Lite!");
+//   await installService.checkInstallation();
+//   main();
+
+// });
+
+async function main() {
+  const connection = await typeorm.createConnection();
+
+// TYPEORM_CONNECTION=sqlite
+// TYPEORM_DATABASE=server/data/data.sqlite
+// TYPEORM_SYNCHRONIZE=true
+// TYPEORM_LOGGING=false
+// TYPEORM_ENTITIES=server/data/entity/*.js
+
+  // const sessionRepository = connection.getRepository(Session);
+
+  // let connection = await typeorm.createConnection();
+  // .then(async (connection) => {
   console.log(logSymbols.success, "Successfully connected to SQL Lite!");
-  await installService.checkInstallation();
-});
+  // await installService.checkInstallation();
+  // });
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: true,
-    saveUninitialized: true,
-  })
-);
+  let sessionRepository = connection.getRepository(Session);
 
-app.use(bodyParser.json({ limit: "100mb" }));
-setupGraphQL(app);
+  app.use(
+    session({
+      resave: false,
+      saveUninitialized: false,
+      store: new TypeormStore({
+        cleanupLimit: 2,
+        ttl: 86400,
+      }).connect(sessionRepository),
+      secret: process.env.SESSION_SECRET,
+    })
+  );
 
-function start() {
+  app.use(bodyParser.json({ limit: "100mb" }));
+  setupGraphQL(app);
+
   setupAssets(app);
 
   app.use(bodyParser.urlencoded({ extended: false }));
@@ -74,6 +99,9 @@ function start() {
     app.emit("started");
   });
 }
+
+main();
+
 
 function setupPassport(app) {
   // passport.use(User.createStrategy());
@@ -228,4 +256,3 @@ function setupAssets(app) {
   );
 }
 
-start();

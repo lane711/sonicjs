@@ -35,6 +35,7 @@
     "cheerio": "^1.0.0-rc.3",
     "connect-ensure-login": "^0.1.1",
     "connect-multiparty": "^2.2.0",
+    "connect-typeorm": "^1.1.4",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "css": "^3.0.0",
