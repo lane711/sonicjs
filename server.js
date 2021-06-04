@@ -20,59 +20,38 @@ const routes = require("./server/boot/routes.js");
 var appRoot = require("app-root-path");
 var bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
-const passport = require("passport");
 const port = `${process.env.PORT}`;
 const frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
 
+const passport = require("passport");
 
-
+//typeorm start
 const typeorm = require("typeorm");
 const { TypeormStore } = require("connect-typeorm");
 
-const { Session } = require("./server/data/model/Session");
+const {Post} = require("./server/data/model/Post");
+const {Content} = require("./server/data/model/Content");
 
-// typeorm.createConnection().then(async (connection) => {
-//   console.log(logSymbols.success, "Successfully connected to SQL Lite!");
-//   await installService.checkInstallation();
-//   main();
 
-// });
-
-async function main() {
-  const connection = await typeorm.createConnection();
-
-// TYPEORM_CONNECTION=sqlite
-// TYPEORM_DATABASE=server/data/data.sqlite
-// TYPEORM_SYNCHRONIZE=true
-// TYPEORM_LOGGING=false
-// TYPEORM_ENTITIES=server/data/entity/*.js
-
-  // const sessionRepository = connection.getRepository(Session);
-
-  // let connection = await typeorm.createConnection();
-  // .then(async (connection) => {
+typeorm.createConnection().then(async (connection) => {
   console.log(logSymbols.success, "Successfully connected to SQL Lite!");
-  // await installService.checkInstallation();
-  // });
+  await installService.checkInstallation();
 
-  let sessionRepository = connection.getRepository(Session);
+});
 
-  app.use(
-    session({
-      resave: false,
-      saveUninitialized: false,
-      store: new TypeormStore({
-        cleanupLimit: 2,
-        ttl: 86400,
-      }).connect(sessionRepository),
-      secret: process.env.SESSION_SECRET,
-    })
-  );
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: true,
+    saveUninitialized: true,
+  })
+);
 
-  app.use(bodyParser.json({ limit: "100mb" }));
-  setupGraphQL(app);
+app.use(bodyParser.json({ limit: "100mb" }));
+setupGraphQL(app);
 
+function start() {
   setupAssets(app);
 
   app.use(bodyParser.urlencoded({ extended: false }));
@@ -100,10 +79,7 @@ async function main() {
   });
 }
 
-main();
-
-
-function setupPassport(app) {
+function setupPassport(app){
   // passport.use(User.createStrategy());
   // passport.serializeUser(User.serializeUser());
   // passport.deserializeUser(User.deserializeUser());
@@ -111,9 +87,10 @@ function setupPassport(app) {
   // app.use(passport.session());
 
   app.use(session({ secret: process.env.SESSION_SECRET }));
-  app.use(passport.initialize());
-  app.use(passport.session()); // persistent login sessions
-  // app.use(flash()); // use connect-flash for flash messages stored in session
+app.use(passport.initialize());
+app.use(passport.session()); // persistent login sessions
+// app.use(flash()); // use connect-flash for flash messages stored in session
+
 }
 
 function setupGraphQL(app) {
@@ -256,3 +233,4 @@ function setupAssets(app) {
   );
 }
 
+start();
