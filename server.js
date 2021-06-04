@@ -24,11 +24,15 @@ const port = `${process.env.PORT}`;
 const frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
 
-const passport = require("passport");
+// const passport = require("passport");
 
 //typeorm start
 const typeorm = require("typeorm");
+const { getConnection } = require("typeorm");
+
 const { TypeormStore } = require("connect-typeorm");
+
+const {Session} = require("./server/data/model/Session");
 
 const {Post} = require("./server/data/model/Post");
 const {Content} = require("./server/data/model/Content");
@@ -38,27 +42,31 @@ typeorm.createConnection().then(async (connection) => {
   console.log(logSymbols.success, "Successfully connected to SQL Lite!");
   await installService.checkInstallation();
 
+  const repository = getConnection().getRepository(Session);
+
 });
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: true,
-    saveUninitialized: true,
-  })
-);
-
-app.use(bodyParser.json({ limit: "100mb" }));
-setupGraphQL(app);
 
 function start() {
+
+  app.use(
+    session({
+      secret: process.env.SESSION_SECRET,
+      resave: true,
+      saveUninitialized: true,
+    })
+  );
+  
+  app.use(bodyParser.json({ limit: "100mb" }));
+  setupGraphQL(app);
+
   setupAssets(app);
 
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(cookieParser());
   setupHandlebars(app);
 
-  setupPassport(app);
+  // setupPassport(app);
   // passport.use(User.createStrategy());
   // passport.serializeUser(User.serializeUser());
   // passport.deserializeUser(User.deserializeUser());
