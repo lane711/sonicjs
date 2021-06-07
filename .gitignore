@@ -28,4 +28,5 @@ sonicjscom-deploy.sh
 tests/cypress/screenshots
 tests/cypress/videos
 temp/*
+sessions/*
 
