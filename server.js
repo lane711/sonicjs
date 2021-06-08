@@ -9,7 +9,7 @@ const app = express();
 const { request, gql } = require("graphql-request");
 const path = require("path");
 const chalk = require("chalk");
-// var express = require("express");
+var FileStore = require("session-file-store")(session);
 var exphbs = require("express-handlebars");
 var Handlebars = require("handlebars");
 var logSymbols = require("log-symbols");
@@ -24,7 +24,8 @@ const port = `${process.env.PORT}`;
 const frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
 
-// const passport = require("passport");
+const passport = require("passport");
+LocalStrategy = require("passport-local").Strategy;
 
 //typeorm start
 const typeorm = require("typeorm");
@@ -32,46 +33,37 @@ const { getConnection } = require("typeorm");
 
 const { TypeormStore } = require("connect-typeorm");
 
-const {Session} = require("./server/data/model/Session");
+const { Session } = require("./server/data/model/Session");
 
-const {Post} = require("./server/data/model/Post");
-const {Content} = require("./server/data/model/Content");
-
+const { Post } = require("./server/data/model/Post");
+const { Content } = require("./server/data/model/Content");
 
 typeorm.createConnection().then(async (connection) => {
   console.log(logSymbols.success, "Successfully connected to SQL Lite!");
   await installService.checkInstallation();
 
   const repository = getConnection().getRepository(Session);
-
 });
 
-
 function start() {
-
-  app.use(
-    session({
-      secret: process.env.SESSION_SECRET,
-      resave: true,
-      saveUninitialized: true,
-    })
-  );
-  
   app.use(bodyParser.json({ limit: "100mb" }));
-  setupGraphQL(app);
-
   setupAssets(app);
-
   app.use(bodyParser.urlencoded({ extended: false }));
-  app.use(cookieParser());
   setupHandlebars(app);
 
-  // setupPassport(app);
-  // passport.use(User.createStrategy());
-  // passport.serializeUser(User.serializeUser());
-  // passport.deserializeUser(User.deserializeUser());
-  // app.use(passport.initialize());
-  // app.use(passport.session());
+  // 1 cookieParser
+  app.use(cookieParser());
+
+  // 2 session
+  setupSession(app);
+
+  // 3 passport.initialize & 4 passport.session
+  setupPassport(app);
+
+  //4.5 graphql?
+  setupGraphQL(app);
+
+  // 5 app.router
 
   routes.loadRoutes(app);
 
@@ -87,18 +79,57 @@ function start() {
   });
 }
 
-function setupPassport(app){
+function setupSession(app) {
+  var fileStoreOptions = {
+    reapAsync: true,
+    path: "./server/sessions",
+  };
+
+  app.use(
+    session({
+      secret: process.env.SESSION_SECRET,
+      resave: true,
+      saveUninitialized: false
+    })
+  );
+}
+
+function setupPassport(app) {
   // passport.use(User.createStrategy());
   // passport.serializeUser(User.serializeUser());
   // passport.deserializeUser(User.deserializeUser());
   // app.use(passport.initialize());
   // app.use(passport.session());
 
-  app.use(session({ secret: process.env.SESSION_SECRET }));
-app.use(passport.initialize());
-app.use(passport.session()); // persistent login sessions
-// app.use(flash()); // use connect-flash for flash messages stored in session
+  passport.use(
+    new LocalStrategy(async function (email, password, done) {
+      let loginUser = await dalService.userGetByLogin(email, password);
+      //userService.loginUser(email, password);
 
+      // if (err) {
+      //   return done(err);
+      // }
+      // if (!loginUser) {
+      //   return done(null, false, { message: "Incorrect username." });
+      // }
+      // if (!loginUser.validPassword(password)) {
+      //   return done(null, false, { message: "Incorrect password." });
+      // }
+      return done(null, loginUser);
+    })
+  );
+
+  passport.serializeUser(function (user, done) {
+    done(null, user);
+  });
+
+  passport.deserializeUser(function (user, done) {
+    done(null, user);
+  });
+
+  app.use(passport.initialize());
+  app.use(passport.session()); // persistent login sessions
+  // app.use(flash()); // use connect-flash for flash messages stored in session
 }
 
 function setupGraphQL(app) {

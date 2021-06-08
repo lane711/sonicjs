@@ -10,13 +10,11 @@ const axios = require("axios");
 const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 const chalk = require("chalk");
 var { GraphQLClient, gql, request } = require("graphql-request");
-var passport = require("passport"),
-  LocalStrategy = require("passport-local").Strategy;
 const connectEnsureLogin = require('connect-ensure-login');
 const url = require('url');
 const querystring = require('querystring');
 const dalService = require("./dal.service");
-
+const passport = require("passport");
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
 const adminDomain = process.env.ADMIN_DOMAIN;
@@ -29,33 +27,6 @@ module.exports = authService = {
         //   options.req
         // );
       }
-    });
-
-    passport.use(
-      new LocalStrategy(async function (email, password, done) {
-        
-        let loginUser = await dalService.userGetByLogin(email, password);
-        //userService.loginUser(email, password);
-
-        // if (err) {
-        //   return done(err);
-        // }
-        // if (!loginUser) {
-        //   return done(null, false, { message: "Incorrect username." });
-        // }
-        // if (!loginUser.validPassword(password)) {
-        //   return done(null, false, { message: "Incorrect password." });
-        // }
-        return done(null, loginUser);
-      })
-    );
-
-    passport.serializeUser(function(user, done) {
-      done(null, user);
-    });
-    
-    passport.deserializeUser(function(user, done) {
-      done(null, user);
     });
 
     app.get("/register", async function (req, res) {
