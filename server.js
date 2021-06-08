@@ -89,7 +89,9 @@ function setupSession(app) {
     session({
       secret: process.env.SESSION_SECRET,
       resave: true,
-      saveUninitialized: false
+      saveUninitialized: false,
+      cookie: {maxAge: 60000000},
+      store: new FileStore(fileStoreOptions),
     })
   );
 }
