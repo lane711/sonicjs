@@ -33,6 +33,12 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "SQLite Health Check",
+      "program": "${workspaceFolder}/server/boot/sqlite-health-check.js"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Reset",
       "program": "${workspaceFolder}/server/install/npm-reset.js"
     },
