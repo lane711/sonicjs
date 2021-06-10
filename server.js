@@ -28,7 +28,7 @@ const passport = require("passport");
 LocalStrategy = require("passport-local").Strategy;
 
 //typeorm start
-const typeorm = require("typeorm");
+const { createConnection } = require("typeorm");
 const { getConnection } = require("typeorm");
 
 const { TypeormStore } = require("connect-typeorm");
@@ -38,12 +38,6 @@ const { Session } = require("./server/data/model/Session");
 const { Post } = require("./server/data/model/Post");
 const { Content } = require("./server/data/model/Content");
 
-typeorm.createConnection().then(async (connection) => {
-  console.log(logSymbols.success, "Successfully connected to SQL Lite!");
-  await installService.checkInstallation();
-
-  const repository = getConnection().getRepository(Session);
-});
 
 function start() {
   app.use(bodyParser.json({ limit: "100mb" }));
@@ -55,7 +49,10 @@ function start() {
   app.use(cookieParser());
 
   // 2 session
-  setupSession(app);
+  setupSessionFile(app);
+
+
+  setupSessionDb(app);
 
   // 3 passport.initialize & 4 passport.session
   setupPassport(app);
@@ -64,9 +61,12 @@ function start() {
   setupGraphQL(app);
 
   // 5 app.router
-
   routes.loadRoutes(app);
 
+  appListen(app);
+}
+
+function appListen(app) {
   app.listen(port, () => {
     var baseUrl = `http://localhost:${port}`;
     globalService.baseUrl = baseUrl;
@@ -79,7 +79,7 @@ function start() {
   });
 }
 
-function setupSession(app) {
+function setupSessionFile(app) {
   var fileStoreOptions = {
     reapAsync: true,
     path: "./server/sessions",
@@ -90,8 +90,23 @@ function setupSession(app) {
       secret: process.env.SESSION_SECRET,
       resave: true,
       saveUninitialized: false,
-      cookie: {maxAge: 60000000},
-      store: new FileStore(fileStoreOptions),
+    })
+  );
+}
+
+function setupSessionDb(app) {
+  const repository = getConnection().getRepository(Session);
+
+  var fileStoreOptions = {
+    reapAsync: true,
+    path: "./server/sessions",
+  };
+
+  app.use(
+    session({
+      secret: process.env.SESSION_SECRET,
+      resave: true,
+      saveUninitialized: false,
     })
   );
 }
@@ -274,4 +289,12 @@ function setupAssets(app) {
   );
 }
 
-start();
+// start();
+
+createConnection().then(connection => {
+  console.log(logSymbols.success, "Successfully connected to SQL Lite!");
+  // await installService.checkInstallation();
+  const repository = connection.getRepository(Session);
+
+  start();
+});
