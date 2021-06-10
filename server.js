@@ -28,7 +28,7 @@ const passport = require("passport");
 LocalStrategy = require("passport-local").Strategy;
 
 //typeorm start
-const { createConnection } = require("typeorm");
+const typeorm = require("typeorm");
 const { getConnection } = require("typeorm");
 
 const { TypeormStore } = require("connect-typeorm");
@@ -37,7 +37,6 @@ const { Session } = require("./server/data/model/Session");
 
 const { Post } = require("./server/data/model/Post");
 const { Content } = require("./server/data/model/Content");
-
 
 function start() {
   app.use(bodyParser.json({ limit: "100mb" }));
@@ -50,7 +49,6 @@ function start() {
 
   // 2 session
   setupSessionFile(app);
-
 
   setupSessionDb(app);
 
@@ -289,12 +287,14 @@ function setupAssets(app) {
   );
 }
 
-// start();
+function main() {
+  typeorm.createConnection().then((connection) => {
+    console.log(logSymbols.success, "Successfully connected to SQL Lite!");
+    // await installService.checkInstallation();
+    const repository = connection.getRepository(Session);
 
-createConnection().then(connection => {
-  console.log(logSymbols.success, "Successfully connected to SQL Lite!");
-  // await installService.checkInstallation();
-  const repository = connection.getRepository(Session);
+    start();
+  });
+}
 
-  start();
-});
+main();
