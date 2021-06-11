@@ -10,9 +10,9 @@ const axios = require("axios");
 const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 const chalk = require("chalk");
 var { GraphQLClient, gql, request } = require("graphql-request");
-const connectEnsureLogin = require('connect-ensure-login');
-const url = require('url');
-const querystring = require('querystring');
+const connectEnsureLogin = require("connect-ensure-login");
+const url = require("url");
+const querystring = require("querystring");
 const dalService = require("./dal.service");
 const passport = require("passport");
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
@@ -53,73 +53,57 @@ module.exports = authService = {
     });
 
     //TODO: https://www.sitepoint.com/local-authentication-using-passport-node-js/
-    app.post('/login', (req, res, next) => {
-
-
-
-      // passport.authenticate('local', function(err, user, info) {
-      //   if (err) { return next(err); }
-      //   if (!user) { return res.redirect('/login'); }
-      //   req.logIn(user, function(err) {
-      //     if (err) { return next(err); }
-      //     return res.redirect('/users/' + user.username);
-      //   });
-
-
-
-
-
-      if (process.env.MODE !== "dev") {
-        if (adminDomain !== req.host) {
-          res.send(401);
-          return;
-        }
-      }
-
-      passport.authenticate('local',
-      (err, user, info) => {
-        if (err) {
-          return next(err);
-        }
-
-        if (!user) {
-          return res.redirect('/login?info=' + info);
-        }
-    
-        req.logIn(user, async function(err) {
-          if (err) {
-            return next(err);
-          }
-
-
-          // req.session.userSession = user;
-          // req.session.userSession.id = user.id;
-          // res.locals.user = req.session.passport.user
-          // await userService.mapUserRoles(user);
-    
-          if(!req.session.returnTo){
-            return res.redirect('/admin');
-          }else{
-            return res.redirect(req.session.returnTo);
-          }
-        });
-    
-      })(req, res, next);
-    });
-
-
-    app.get('/private',
-      connectEnsureLogin.ensureLoggedIn(),
-      (req, res) => res.sendFile('html/private.html', { root: __dirname })
+    app.post(
+      "/login",
+      passport.authenticate("local", {
+        successReturnToOrRedirect: "/",
+        failureRedirect: "/login",
+      })
     );
 
-    app.get('/user',
-      connectEnsureLogin.ensureLoggedIn(),
-      (req, res) => res.send({ user: req.user })
+    // app.post('/login', (req, res, next) => {
+
+    //   if (process.env.MODE !== "dev") {
+    //     if (adminDomain !== req.host) {
+    //       res.send(401);
+    //       return;
+    //     }
+    //   }
+
+    //   passport.authenticate('local',
+    //   (err, user, info) => {
+    //     if (err) {
+    //       return next(err);
+    //     }
+
+    //     if (!user) {
+    //       return res.redirect('/login?info=' + info);
+    //     }
+
+    //     req.logIn(user, async function(err) {
+    //       if (err) {
+    //         return next(err);
+    //       }
+
+    //       if(!req.session.returnTo){
+    //         return res.redirect('/admin');
+    //       }else{
+    //         return res.redirect(req.session.returnTo);
+    //       }
+    //     });
+
+    //   })(req, res, next);
+    // });
+
+    app.get("/private", connectEnsureLogin.ensureLoggedIn(), (req, res) =>
+      res.sendFile("html/private.html", { root: __dirname })
+    );
+
+    app.get("/user", connectEnsureLogin.ensureLoggedIn(), (req, res) =>
+      res.send({ user: req.user })
     );
 
     app.get("/login", async function (req, res) {
-
       if (process.env.MODE !== "dev") {
         if (adminDomain !== req.host) {
           res.send(401);
@@ -133,7 +117,6 @@ module.exports = authService = {
       let parsedQs = querystring.parse(parsedUrl.query);
       if (parsedQs && parsedQs.message) {
         data.message = parsedQs.message;
-
       }
 
       res.render("admin/shared-views/admin-login", {
@@ -148,14 +131,11 @@ module.exports = authService = {
       res.redirect("/");
     });
 
-
     // app.post("/login", passport.authenticate("local"), function (req, res) {
     //   // If this function gets called, authentication was successful.
     //   // `req.user` contains the authenticated user.
     //   res.redirect("/users/" + req.user.username);
     // });
-
-
 
     // app.post("/login", function (req, res) {
     //   console.log('login post');

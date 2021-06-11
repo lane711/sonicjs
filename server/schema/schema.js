@@ -259,7 +259,7 @@ const RootQuery = new GraphQLObjectType({
         tag: { type: GraphQLString },
       },
 
-      resolve(parent, args, req) {
+      resolve(parent, args, req, res) {
         return dalService.contentGet(
           args.id,
           args.contentTypeId,

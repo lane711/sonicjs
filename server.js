@@ -36,13 +36,20 @@ const { TypeormStore } = require("connect-typeorm");
 const { Session } = require("./server/data/model/Session");
 
 function start() {
-  app.use(bodyParser.json({ limit: "100mb" }));
-  setupAssets(app);
-  app.use(bodyParser.urlencoded({ extended: false }));
-  setupHandlebars(app);
+
+  setupStaticAssets(app);
 
   // 1 cookieParser
   app.use(cookieParser());
+
+  // 1.5 body parser
+  // app.use(express.bodyParser());
+  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(bodyParser.json({ limit: "100mb" }));
+
+  
+  //1.8 handlebars
+  setupHandlebars(app);
 
   // 2 session
   // setupSessionFile(app);
@@ -235,7 +242,7 @@ function setupHandlebarsHelpers() {
   });
 }
 
-function setupAssets(app) {
+function setupStaticAssets(app) {
   app.use(express.static("server/storage/css"));
   // app.use('/node_modules', express.static(__dirname + '/node_modules'))
   app.use("/themes", express.static(path.join(appRoot.path, "server/themes")));
