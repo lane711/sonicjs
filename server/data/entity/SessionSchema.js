@@ -6,10 +6,10 @@ module.exports = new EntitySchema({
     target: Session,
     columns: {
         expiredAt: {
-            primary: true,
             type: "bigint",
         },
         id: {
+            primary: true,
             type: "varchar"
         },
         json: {

@@ -9,7 +9,7 @@ const app = express();
 const { request, gql } = require("graphql-request");
 const path = require("path");
 const chalk = require("chalk");
-var FileStore = require("session-file-store")(session);
+// var FileStore = require("session-file-store")(session);
 var exphbs = require("express-handlebars");
 var Handlebars = require("handlebars");
 var logSymbols = require("log-symbols");
@@ -35,9 +35,6 @@ const { TypeormStore } = require("connect-typeorm");
 
 const { Session } = require("./server/data/model/Session");
 
-const { Post } = require("./server/data/model/Post");
-const { Content } = require("./server/data/model/Content");
-
 function start() {
   app.use(bodyParser.json({ limit: "100mb" }));
   setupAssets(app);
@@ -48,8 +45,7 @@ function start() {
   app.use(cookieParser());
 
   // 2 session
-  setupSessionFile(app);
-
+  // setupSessionFile(app);
   setupSessionDb(app);
 
   // 3 passport.initialize & 4 passport.session
@@ -93,18 +89,17 @@ function setupSessionFile(app) {
 }
 
 function setupSessionDb(app) {
-  const repository = getConnection().getRepository(Session);
-
-  var fileStoreOptions = {
-    reapAsync: true,
-    path: "./server/sessions",
-  };
+  const sessionRepo = getConnection().getRepository(Session);
 
   app.use(
     session({
       secret: process.env.SESSION_SECRET,
-      resave: true,
+      resave: false,
       saveUninitialized: false,
+      store: new TypeormStore({
+        cleanupLimit: 2,
+        ttl: 86400*30
+      }).connect(sessionRepo),
     })
   );
 }
