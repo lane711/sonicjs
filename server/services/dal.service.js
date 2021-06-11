@@ -192,7 +192,8 @@ module.exports = dalService = {
       content.createdOn = new Date();
     }
     content.lastUpdatedByUserId = userSession.id;
-    content.lastUpdateOn = new Date();
+    content.updatedOn = new Date();
+    content.tags = [];
     content.data = JSON.stringify(data);
     return contentRepo.save(content);
   },

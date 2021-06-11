@@ -191,13 +191,13 @@ const RootQuery = new GraphQLObjectType({
         // then use that api directly from the admin backend
         return dalService.userGet(args.id);
         //user can always see their own profile
-        if (args.id === req.session.userId) {
+        if (args.id === req.session.passport.userId) {
           return User.findById(args.id);
         }
 
         //admins can see all users
         //TODO: get role by name
-        if (req.session.user.roles.includes("admin")) {
+        if (req.session.passport.user.roles.includes("admin")) {
           return User.findById(args.id);
         }
       },
@@ -211,7 +211,7 @@ const RootQuery = new GraphQLObjectType({
     roles: {
       type: new GraphQLList(ContentType),
       async resolve(parent, args, req) {
-        return dalService.contentGet("", "role", "", "", "", req.session.user);
+        return dalService.contentGet("", "role", "", "", "", req.session.passport.user);
 
         // return Content.find({
         //   ContentTypeId: "role",
@@ -234,7 +234,7 @@ const RootQuery = new GraphQLObjectType({
           args.url,
           args.data,
           args.tag,
-          req.session.user
+          req.session.passport.user
         );
         // if (args.id) {
         //   return Content.findById(args.id);
@@ -266,7 +266,7 @@ const RootQuery = new GraphQLObjectType({
           args.url,
           args.data,
           args.tag,
-          req.session.user,
+          getUserSession(req),
           true
         );
         // if (args.ContentTypeId) {
@@ -525,7 +525,7 @@ const Mutation = new GraphQLObjectType({
           "",
           args.url,
           dataObj,
-          req.session.user
+          req.session.passport.user
         );
         // let userId = (context.session.userSession && context.session.userSession.id)
         //   ? context.session.userSession.id
@@ -706,6 +706,14 @@ const Mutation = new GraphQLObjectType({
     },
   },
 });
+
+function getUserSession(req){
+  let userSession = req.session.passport && req.session.passport.user;
+  if(!userSession){
+    throw new Error('Unable to detect user session');
+  }
+  return userSession;
+}
 
 //Creating a new GraphQL Schema, with options query which defines query
 //we will allow users to use when they are making request.
