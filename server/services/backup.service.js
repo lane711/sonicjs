@@ -12,11 +12,13 @@ module.exports = backUpService = {
     app.get("/backup", async function (req, res) {
       await backUpService.exportContentToJsonFiles();
       await backUpService.zipBackUpDirectory();
-      backUpService.uploadToDropBox();
+      // backUpService.uploadToDropBox();
+      res.sendStatus(200);
     });
   },
 
   exportContentToJsonFiles: async function () {
+    //content
     let contents = await dalService.contentGet("", "", "", "", "", "");
 
     contents.forEach((content) => {
@@ -25,21 +27,44 @@ module.exports = backUpService = {
         JSON.stringify(content)
       );
     });
+
+    //user
+
+    //tags
+
   },
 
   zipBackUpDirectory: async function () {
-    const output = fs.createWriteStream(`${appRoot.path}/backups/content.zip`);
-    const archive = archiver("zip", {
-      zlib: { level: 9 }, // Sets the compression level.
-    });
+    // return new Promise(function(resolve, reject) {
+      const zipPath = `${appRoot.path}/backups/content.zip`;
+      var output = fs.createWriteStream(zipPath);
+      var archive = archiver('zip', {
+        zlib: { level: 9 },
+      });
+  
+      archive.on('error', function(err) {
+        console.log(err);
+      });
+  
+      archive.on('warning', function(err) {
+        if (err.code === 'ENOENT') {
+          console.log('Archiver warning: ', err);
+        } else {
+          console.log(err);
+        }
+      });
+  
+      archive.pipe(output);
+      archive.glob('**/*.json', { cwd: `${appRoot.path}/backups/content/` });
+      archive.finalize();
+  
+      output.on('close', function() {
+        console.log(zipPath);
+      });
+    // });
 
-    archive.on("error", function (err) {
-      throw err;
-    });
+    return;
 
-    let source = `${appRoot.path}/backups/content/`;
-    archive.directory(source, false);
-    archive.finalize();
   },
 
   uploadToDropBox: async function (backupFileName) {
