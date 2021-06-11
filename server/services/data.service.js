@@ -421,7 +421,7 @@ if (typeof module !== "undefined" && module.exports) {
       //   return record.data;
       // }
 
-      return notFound;
+      return 'notFound';
     }),
     (exports.getContentByContentTypeAndTitle = async function (
       contentType,
