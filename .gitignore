@@ -28,5 +28,6 @@ sonicjscom-deploy.sh
 tests/cypress/screenshots
 tests/cypress/videos
 temp/*
-server/sessions/*
-backups/*
+backups/content.zip
+backups/user.zip
+backups/tag.zip

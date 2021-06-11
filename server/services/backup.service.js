@@ -11,7 +11,7 @@ module.exports = backUpService = {
   startup: async function (app) {
     app.get("/backup", async function (req, res) {
       await backUpService.exportContentToJsonFiles();
-      await backUpService.zipBackUpDirectory();
+      // await backUpService.zipBackUpDirectory();
       // backUpService.uploadToDropBox();
       res.sendStatus(200);
     });
@@ -29,6 +29,14 @@ module.exports = backUpService = {
     });
 
     //user
+    let users = await dalService.usersGet();
+
+    users.forEach((user) => {
+      fileService.writeFile(
+        `backups/user/${user.id}.json`,
+        JSON.stringify(user)
+      );
+    });
 
     //tags
 
