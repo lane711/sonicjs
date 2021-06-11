@@ -6,10 +6,11 @@ var fileService = require("./file.service");
 const archiver = require("archiver");
 
 const token = process.env.DROPBOX_TOKEN;
+const backUpUrl = process.env.BACKUP_URL;
 
 module.exports = backUpService = {
   startup: async function (app) {
-    app.get("/backup", async function (req, res) {
+    app.get(backUpUrl, async function (req, res) {
       await backUpService.exportContentToJsonFiles();
       // await backUpService.zipBackUpDirectory();
       // backUpService.uploadToDropBox();
@@ -28,6 +29,8 @@ module.exports = backUpService = {
       );
     });
 
+    backUpService.zipBackUpDirectory('content');
+
     //user
     let users = await dalService.usersGet();
 
@@ -38,13 +41,26 @@ module.exports = backUpService = {
       );
     });
 
+    backUpService.zipBackUpDirectory('user');
+
     //tags
+    let tags = await dalService.tagsGet();
+
+    tags.forEach((tag) => {
+      fileService.writeFile(
+        `backups/tag/${tag.id}.json`,
+        JSON.stringify(tag)
+      );
+    });
+
+    backUpService.zipBackUpDirectory('tag');
+
 
   },
 
-  zipBackUpDirectory: async function () {
+  zipBackUpDirectory: async function (contentType) {
     // return new Promise(function(resolve, reject) {
-      const zipPath = `${appRoot.path}/backups/content.zip`;
+      const zipPath = `${appRoot.path}/backups/${contentType}.zip`;
       var output = fs.createWriteStream(zipPath);
       var archive = archiver('zip', {
         zlib: { level: 9 },
@@ -63,11 +79,12 @@ module.exports = backUpService = {
       });
   
       archive.pipe(output);
-      archive.glob('**/*.json', { cwd: `${appRoot.path}/backups/content/` });
+      archive.glob('**/*.json', { cwd: `${appRoot.path}/backups/${contentType}/` });
       archive.finalize();
   
       output.on('close', function() {
-        console.log(zipPath);
+        // console.log('close ' + zipPath);
+        backUpService.uploadToDropBox(zipPath, `/backups/${contentType}.zip`);
       });
     // });
 
@@ -75,8 +92,8 @@ module.exports = backUpService = {
 
   },
 
-  uploadToDropBox: async function (backupFileName) {
-    fs.readFile(`${appRoot.path}/README.md`, "utf8", function (err, data) {
+  uploadToDropBox: async function (sourceFilePath, destinationFileName) {
+    fs.readFile(sourceFilePath, "utf8", function (err, data) {
       const req = https.request(
         "https://content.dropboxapi.com/2/files/upload",
         {
@@ -84,7 +101,7 @@ module.exports = backUpService = {
           headers: {
             Authorization: `Bearer ${token}`,
             "Dropbox-API-Arg": JSON.stringify({
-              path: "/backup/test.txt",
+              path: destinationFileName,
               mode: "overwrite",
               autorename: true,
               mute: false,
@@ -108,3 +125,37 @@ module.exports = backUpService = {
     });
   },
 };
+
+// uploadToDropBox: async function (backupFileName) {
+//   fs.readFile(`${appRoot.path}/README.md`, "utf8", function (err, data) {
+//     const req = https.request(
+//       "https://content.dropboxapi.com/2/files/upload",
+//       {
+//         method: "POST",
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//           "Dropbox-API-Arg": JSON.stringify({
+//             path: "/backup/test.txt",
+//             mode: "overwrite",
+//             autorename: true,
+//             mute: false,
+//             strict_conflict: false,
+//           }),
+//           "Content-Type": "application/octet-stream",
+//         },
+//       },
+//       (res) => {
+//         console.log("statusCode: ", res.statusCode);
+//         console.log("headers: ", res.headers);
+
+//         res.on("data", function (d) {
+//           process.stdout.write(d);
+//         });
+//       }
+//     );
+
+//     req.write(data);
+//     req.end();
+//   });
+// },
+// };

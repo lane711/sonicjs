@@ -1,7 +1,8 @@
-const Tag = require("../schema/models/tag");
 const { getRepository } = require("typeorm");
 const { Content } = require("../data/model/Content");
 const { User } = require("../data/model/User");
+const { Tag } = require("../data/model/Tag");
+
 const crypto = require("crypto");
 
 module.exports = dalService = {
@@ -194,6 +195,11 @@ module.exports = dalService = {
     content.lastUpdateOn = new Date();
     content.data = JSON.stringify(data);
     return contentRepo.save(content);
+  },
+
+  tagsGet: async function () {
+    const tagRepo = await getRepository(Tag);
+    return tagRepo.find();
   },
 
   processContent: function (entity, user) {
