@@ -246,11 +246,13 @@ module.exports = assetService = {
     if (!fileService.fileExists(path)) {
       console.log(`Generating Asset: ${path}`);
       if (assetType === "js") {
-        minifiedAsset = UglifyJS.minify(fileContent, {
+        let minJs = UglifyJS.minify(fileContent, {
           compress: false,
-        }).code;
+        });
 
+        minifiedAsset = minJs.code;
       }
+      
       if (assetType === "css") {
         minifiedAsset = csso.minify(fileContent).css;
       }

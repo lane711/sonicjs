@@ -472,7 +472,11 @@ if (typeof module !== "undefined" && module.exports) {
         delete payload.data.id;
       }
 
-      let data = payload.data ?? payload;
+      let data = payload.data;
+      if(!data){
+        data = payload;
+      };
+      
       let dataString = JSON.stringify(data);
 
       let query = `
