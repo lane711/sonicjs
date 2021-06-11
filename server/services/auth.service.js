@@ -10,12 +10,11 @@ const axios = require("axios");
 const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 const chalk = require("chalk");
 var { GraphQLClient, gql, request } = require("graphql-request");
-var passport = require("passport"),
-  LocalStrategy = require("passport-local").Strategy;
 const connectEnsureLogin = require('connect-ensure-login');
 const url = require('url');
 const querystring = require('querystring');
-
+const dalService = require("./dal.service");
+const passport = require("passport");
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
 const adminDomain = process.env.ADMIN_DOMAIN;
@@ -29,23 +28,6 @@ module.exports = authService = {
         // );
       }
     });
-
-    // passport.use(
-    //   new LocalStrategy(function (email, password, done) {
-    //     let loginUser = userService.loginUser(email, password);
-
-    //     if (err) {
-    //       return done(err);
-    //     }
-    //     if (!loginUser) {
-    //       return done(null, false, { message: "Incorrect username." });
-    //     }
-    //     if (!loginUser.validPassword(password)) {
-    //       return done(null, false, { message: "Incorrect password." });
-    //     }
-    //     return done(null, user);
-    //   })
-    // );
 
     app.get("/register", async function (req, res) {
       let data = { registerMessage: "<b>admin</b>" };
@@ -62,7 +44,7 @@ module.exports = authService = {
       let password = req.body.password;
       let passwordConfirm = req.body.passwordConfirm;
 
-      let newUser = await userService.createUser(email, password);
+      let newUser = await userService.registerUser(email, password);
 
       globalService.isAdminUserCreated = true;
       let message = encodeURI(`Account created successfully. Please login`);
@@ -72,6 +54,20 @@ module.exports = authService = {
 
     //TODO: https://www.sitepoint.com/local-authentication-using-passport-node-js/
     app.post('/login', (req, res, next) => {
+
+
+
+      // passport.authenticate('local', function(err, user, info) {
+      //   if (err) { return next(err); }
+      //   if (!user) { return res.redirect('/login'); }
+      //   req.logIn(user, function(err) {
+      //     if (err) { return next(err); }
+      //     return res.redirect('/users/' + user.username);
+      //   });
+
+
+
+
 
       if (process.env.MODE !== "dev") {
         if (adminDomain !== req.host) {
@@ -96,9 +92,9 @@ module.exports = authService = {
           }
 
 
-          req.session.userSession = user.profile;
-          req.session.userSession.id = user.id;
-          res.locals.user = req.session.user
+          // req.session.userSession = user;
+          // req.session.userSession.id = user.id;
+          // res.locals.user = req.session.passport.user
           // await userService.mapUserRoles(user);
     
           if(!req.session.returnTo){

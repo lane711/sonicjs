@@ -1,6 +1,6 @@
 {
-  "name": "graphqlserver",
-  "version": "0.3.2",
+  "name": "sonicjs",
+  "version": "0.4.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -25,6 +25,7 @@
     "@fancyapps/fancybox": "^3.5.7",
     "@simonwep/pickr": "^1.8.0",
     "app-root-path": "^3.0.0",
+    "archiver": "^5.3.0",
     "aws-sdk": "^2.901.0",
     "axios": "^0.21.0",
     "bootstrap": "^4.5.3",
@@ -34,9 +35,8 @@
     "chart.js": "^2.9.4",
     "cheerio": "^1.0.0-rc.3",
     "connect-ensure-login": "^0.1.1",
-    "connect-mongo": "^3.2.0",
-    "connect-mongoose": "0.0.2",
     "connect-multiparty": "^2.2.0",
+    "connect-typeorm": "^1.1.4",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "css": "^3.0.0",
@@ -73,18 +73,19 @@
     "log-symbols": "^4.0.0",
     "mixpanel": "^0.13.0",
     "moment": "^2.29.1",
-    "mongoose": "^5.11.4",
     "node-cache": "^5.1.2",
     "pace-progress": "^1.0.2",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
-    "passport-local-mongoose": "^6.0.1",
     "perfect-scrollbar": "^1.5.0",
     "popper.js": "^1.16.1",
     "sendgrid": "^5.2.3",
+    "session-file-store": "^1.5.0",
     "shortcode-tree": "^1.4.14",
     "simple-line-icons": "^2.5.5",
     "sortablejs": "^1.13.0",
+    "sqlite3": "^5.0.2",
+    "typeorm": "^0.2.32",
     "uglify-es": "^3.3.9",
     "underscore": "^1.12.0",
     "video.js": "^7.11.8",
@@ -92,6 +93,7 @@
     "zencoder": "^2.0.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.6"
+    "nodemon": "^2.0.6",
+    "typescript": "^4.2.4"
   }
 }

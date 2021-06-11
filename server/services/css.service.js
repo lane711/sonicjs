@@ -13,6 +13,8 @@ var cssbeautify = require("cssbeautify");
 const path = require("path");
 var isTemplateCssProcessed = false;
 const frontEndTheme = `${process.env.FRONT_END_THEME}`;
+const { getConnection } = require("typeorm");
+const { Content } = require("../data/model/Content");
 
 module.exports = cssService = {
   startup: async function () {
@@ -66,7 +68,27 @@ module.exports = cssService = {
     // console.log(originalFile);
     let processedFilePath = `/server/themes/front-end/${frontEndTheme}/css/template-processed.css`;
 
-    let viewModel = await dataService.getContentTopOne("site-settings-colors");
+    // let conn = await getConnection();
+    // let viewModel = conn.getRepository(Content).find({
+    //   where: { contentTypeId: 'site-settings-colors' },
+    // });
+
+
+    // let viewModel = await dataService.getContentTopOne("site-settings-colors");
+
+    //TODO: need to fix the above, hard codeing for now
+    let viewModel = {
+      "contentType": "site-settings-colors",
+      "url": "/site-settings-colors",
+      "bodyBackground": "#F8F8F8",
+      "headerBackground": "#000",
+      "headerOpacity": ".95",
+      "background": "green",
+      "header": "#555555",
+      "createdOn": 1602119522916,
+      "submit": true,
+      "id": "290"
+    }
 
     // console.log("processing template css data", viewModel);
     if (viewModel) {

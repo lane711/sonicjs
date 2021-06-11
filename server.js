@@ -4,16 +4,15 @@ require("dotenv").config();
 const express = require("express");
 const graphqlHTTP = require("express-graphql");
 const schema = require("./server/schema/schema");
-const session = require('express-session');
-const MongoStore = require('connect-mongo')(session);
+const session = require("express-session");
 const app = express();
 const { request, gql } = require("graphql-request");
 const path = require("path");
 const chalk = require("chalk");
-// var express = require("express");
+// var FileStore = require("session-file-store")(session);
 var exphbs = require("express-handlebars");
 var Handlebars = require("handlebars");
-var logSymbols = require('log-symbols');
+var logSymbols = require("log-symbols");
 var globalService = require("./server/services/global.service");
 var installService = require("./server/services/install.service");
 
@@ -26,52 +25,42 @@ const frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
 
 const passport = require("passport");
-const mongoose = require("mongoose");
+LocalStrategy = require("passport-local").Strategy;
 
+//typeorm start
+const typeorm = require("typeorm");
+const { getConnection } = require("typeorm");
 
+const { TypeormStore } = require("connect-typeorm");
 
-mongoose.set('useCreateIndex', true);
-mongoose.connect(process.env.MONGODB_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false
-});
-const User = require("./server/schema/models/user");
-
-
-mongoose.connection.once("open", async () => {
-  console.log(logSymbols.success, 'Successfully connected to database!');
-
-  await installService.checkInstallation();
-});
-
-
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  store: new MongoStore({ mongooseConnection: mongoose.connection }),
-  resave: true,
-  saveUninitialized: true
-}));
-
-app.use(bodyParser.json({limit: '100mb'}));
-setupGraphQL(app);
+const { Session } = require("./server/data/model/Session");
 
 function start() {
-
+  app.use(bodyParser.json({ limit: "100mb" }));
   setupAssets(app);
-
   app.use(bodyParser.urlencoded({ extended: false }));
-  app.use(cookieParser());
   setupHandlebars(app);
 
-  passport.use(User.createStrategy());
-  passport.serializeUser(User.serializeUser());
-  passport.deserializeUser(User.deserializeUser());
-  app.use(passport.initialize());
-  app.use(passport.session());
+  // 1 cookieParser
+  app.use(cookieParser());
 
+  // 2 session
+  // setupSessionFile(app);
+  setupSessionDb(app);
+
+  // 3 passport.initialize & 4 passport.session
+  setupPassport(app);
+
+  //4.5 graphql?
+  setupGraphQL(app);
+
+  // 5 app.router
   routes.loadRoutes(app);
 
+  appListen(app);
+}
+
+function appListen(app) {
   app.listen(port, () => {
     var baseUrl = `http://localhost:${port}`;
     globalService.baseUrl = baseUrl;
@@ -82,6 +71,75 @@ function start() {
 
     app.emit("started");
   });
+}
+
+function setupSessionFile(app) {
+  var fileStoreOptions = {
+    reapAsync: true,
+    path: "./server/sessions",
+  };
+
+  app.use(
+    session({
+      secret: process.env.SESSION_SECRET,
+      resave: true,
+      saveUninitialized: false,
+    })
+  );
+}
+
+function setupSessionDb(app) {
+  const sessionRepo = getConnection().getRepository(Session);
+
+  app.use(
+    session({
+      secret: process.env.SESSION_SECRET,
+      resave: false,
+      saveUninitialized: false,
+      store: new TypeormStore({
+        cleanupLimit: 2,
+        ttl: 86400*30
+      }).connect(sessionRepo),
+    })
+  );
+}
+
+function setupPassport(app) {
+  // passport.use(User.createStrategy());
+  // passport.serializeUser(User.serializeUser());
+  // passport.deserializeUser(User.deserializeUser());
+  // app.use(passport.initialize());
+  // app.use(passport.session());
+
+  passport.use(
+    new LocalStrategy(async function (email, password, done) {
+      let loginUser = await dalService.userGetByLogin(email, password);
+      //userService.loginUser(email, password);
+
+      // if (err) {
+      //   return done(err);
+      // }
+      // if (!loginUser) {
+      //   return done(null, false, { message: "Incorrect username." });
+      // }
+      // if (!loginUser.validPassword(password)) {
+      //   return done(null, false, { message: "Incorrect password." });
+      // }
+      return done(null, loginUser);
+    })
+  );
+
+  passport.serializeUser(function (user, done) {
+    done(null, user);
+  });
+
+  passport.deserializeUser(function (user, done) {
+    done(null, user);
+  });
+
+  app.use(passport.initialize());
+  app.use(passport.session()); // persistent login sessions
+  // app.use(flash()); // use connect-flash for flash messages stored in session
 }
 
 function setupGraphQL(app) {
@@ -105,14 +163,14 @@ function initEnvFile() {
       //create default env file
       fs.copyFile(".env-default", ".env", (err) => {
         if (err) {
-          console.log('initEnvFile error');
+          console.log("initEnvFile error");
           throw err;
         }
         console.log(".env-default was copied to .env");
       });
     }
   } catch (err) {
-    console.log('initEnvFile catch error');
+    console.log("initEnvFile catch error");
     console.error(err);
   }
 }
@@ -135,7 +193,7 @@ function setupHandlebars(app) {
   var hbs = exphbs.create({
     layoutsDir: path.join(themeDirectory),
     partialsDir: partialsDirs,
-    extname: '.hbs'
+    extname: ".hbs",
   });
 
   app.engine(".hbs", hbs.engine);
@@ -207,10 +265,7 @@ function setupAssets(app) {
     "/page-builder",
     express.static(path.join(appRoot.path, "server/page-builder"))
   );
-  app.use(
-    "/assets",
-    express.static(path.join(appRoot.path, "server/assets"))
-  );
+  app.use("/assets", express.static(path.join(appRoot.path, "server/assets")));
   app.use(
     "/api/containers/files/download",
     express.static(path.join(appRoot.path, "server/storage/files"))
@@ -221,8 +276,20 @@ function setupAssets(app) {
   );
   app.use(
     "/",
-    express.static(path.join(appRoot.path, "/node_modules/ace-builds/src-min-noconflict"))
+    express.static(
+      path.join(appRoot.path, "/node_modules/ace-builds/src-min-noconflict")
+    )
   );
 }
 
-start();
+function main() {
+  typeorm.createConnection().then((connection) => {
+    console.log(logSymbols.success, "Successfully connected to SQL Lite!");
+    // await installService.checkInstallation();
+    const repository = connection.getRepository(Session);
+
+    start();
+  });
+}
+
+main();

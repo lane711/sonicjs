@@ -91,21 +91,20 @@ if (typeof module !== "undefined" && module.exports) {
       return axiosInstance;
     }),
     (exports.userCreate = async function (email, password) {
-      debugger;
 
-      let result = await this.getAxios().post(apiUrl, {
-        query: `
-          mutation{
-            userCreate(username:"${email}", password:"${password}")
-            {
-              username
-              id
-            }
-          }
-              `,
-      });
+      // let result = await this.getAxios().post(apiUrl, {
+      //   query: `
+      //     mutation{
+      //       userCreate(username:"${email}", password:"${password}")
+      //       {
+      //         username
+      //         id
+      //       }
+      //     }
+      //         `,
+      // });
 
-      return result.userCreate;
+      // return result.userCreate;
     });
 
   (exports.userUpdate = async function (user) {
@@ -473,14 +472,15 @@ if (typeof module !== "undefined" && module.exports) {
         delete payload.data.id;
       }
 
-      let data = JSON.stringify(payload.data);
+      let data = payload.data ?? payload;
+      let dataString = JSON.stringify(data);
 
       let query = `
       mutation{
         contentUpdate( 
           id:"${id}", 
-          url:"${payload.data.url}", 
-          data:"""${data}"""){
+          url:"${data.url}", 
+          data:"""${dataString}"""){
             id
             url
             contentTypeId

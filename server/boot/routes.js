@@ -25,6 +25,9 @@ cssService.startup();
 var assetService = require("../services/asset.service");
 var userService = require("../services/user.service");
 var authService = require("../services/auth.service");
+var dalService = require("../services/dal.service");
+var backupService = require("../services/backup.service");
+
 
 var helperService = require("../services/helper.service");
 var sharedService = require("../services/shared.service");
@@ -47,6 +50,7 @@ exports.loadRoutes = async function (app) {
   authService.startup(app);
   adminService.startup(app);
   formService.startup(app);
+  backupService.startup(app);
   // app.get('/', async function (req, res) {
   //   res.send('ok');
   // });
@@ -57,6 +61,7 @@ exports.loadRoutes = async function (app) {
   let adminPage = "";
 
   (async () => {
+    await dalService.startup(app);
     await cacheService.startup();
     await menuService.startup();
     await mediaService.startup();
@@ -65,6 +70,8 @@ exports.loadRoutes = async function (app) {
     await userService.startup(app);
     await assetService.startup();
     await pageBuilderService.startup(app);
+    await pageBuilderService.startup(app);
+
 
     await emitterService.emit("startup");
   })();
@@ -295,7 +302,8 @@ exports.loadRoutes = async function (app) {
 
     payload.cookies = req.cookies;
     await emitterService.emit("afterFormSubmit", payload);
-    // res.redirect('/thank-you');
+    
+    res.sendStatus(200);
   });
 
   // router.get('/admin/content-types', function (req, res) {
@@ -311,6 +319,7 @@ exports.loadRoutes = async function (app) {
   });
 
   app.get("*", async function (req, res, next) {
+
     await emitterService.emit("requestBegin", { req: req, res: res });
 
     if (req.isRequestAlreadyHandled) {
