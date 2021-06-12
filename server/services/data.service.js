@@ -91,7 +91,6 @@ if (typeof module !== "undefined" && module.exports) {
       return axiosInstance;
     }),
     (exports.userCreate = async function (email, password) {
-
       // let result = await this.getAxios().post(apiUrl, {
       //   query: `
       //     mutation{
@@ -103,7 +102,6 @@ if (typeof module !== "undefined" && module.exports) {
       //     }
       //         `,
       // });
-
       // return result.userCreate;
     });
 
@@ -170,7 +168,6 @@ if (typeof module !== "undefined" && module.exports) {
         }
           `,
       });
-      
 
       if (result.data.data.contents) {
         let content = result.data.data.contents;
@@ -178,7 +175,6 @@ if (typeof module !== "undefined" && module.exports) {
         await formattingService.formatTitles(content);
         return content;
       }
-      
     }),
     (exports.getContentAdmin = async function () {
       let contents = await this.getContent();
@@ -397,17 +393,18 @@ if (typeof module !== "undefined" && module.exports) {
       notFound.url = url;
       return notFound;
     }),
-    (exports.getContentByContentType = async function (contentType) {
+    (exports.getContentByContentType = async function (contentType, sessionID) {
+      let query = `
+      {
+        contents(contentTypeId: "${contentType}", sessionID:"${sessionID}") {
+          id
+          contentTypeId
+          data
+        }
+      }
+    `;
       let result = await this.getAxios().post(apiUrl, {
-        query: `
-            {
-              contents(contentTypeId: "${contentType}") {
-                id
-                contentTypeId
-                data
-              }
-            }
-          `,
+        query: query,
       });
 
       if (result.data.data.contents) {
@@ -421,13 +418,17 @@ if (typeof module !== "undefined" && module.exports) {
       //   return record.data;
       // }
 
-      return 'notFound';
+      return "notFound";
     }),
     (exports.getContentByContentTypeAndTitle = async function (
       contentType,
-      title
+      title,
+      sessionID
     ) {
-      let allOfContentType = await this.getContentByContentType(contentType);
+      let allOfContentType = await this.getContentByContentType(
+        contentType,
+        sessionID
+      );
       if (allOfContentType) {
         let contentByTitle = allOfContentType.filter(
           (c) => c.data.title.toLowerCase() === title.toLowerCase()
@@ -438,9 +439,7 @@ if (typeof module !== "undefined" && module.exports) {
     (exports.getContentByContentTypeAndTag = async function (contentType, tag) {
       let allOfContentType = await this.getContentByContentType(contentType);
       if (allOfContentType) {
-        let contentByTag = allOfContentType.filter(
-          (x) => x.data.tags === tag
-        );
+        let contentByTag = allOfContentType.filter((x) => x.data.tags === tag);
         return contentByTag;
       }
     }),
@@ -473,10 +472,10 @@ if (typeof module !== "undefined" && module.exports) {
       }
 
       let data = payload.data;
-      if(!data){
+      if (!data) {
         data = payload;
-      };
-      
+      }
+
       let dataString = JSON.stringify(data);
 
       let query = `

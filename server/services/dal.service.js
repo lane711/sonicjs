@@ -2,6 +2,7 @@ const { getRepository } = require("typeorm");
 const { Content } = require("../data/model/Content");
 const { User } = require("../data/model/User");
 const { Tag } = require("../data/model/Tag");
+const { Session } = require("../data/model/Session");
 
 const crypto = require("crypto");
 
@@ -201,6 +202,16 @@ module.exports = dalService = {
   tagsGet: async function () {
     const tagRepo = await getRepository(Tag);
     return tagRepo.find();
+  },
+
+  sessionGet: async function (sessionID) {
+    const sessionRepo = await getRepository(Session);
+
+    if (sessionID) {
+      let session = await sessionRepo.findOne(sessionID);
+      session.user = JSON.parse(session.json);
+      return session;
+    }
   },
 
   processContent: function (entity, user) {

@@ -257,16 +257,18 @@ const RootQuery = new GraphQLObjectType({
         url: { type: GraphQLString },
         data: { type: GraphQLJSONObject },
         tag: { type: GraphQLString },
+        sessionID: { type: GraphQLString },
       },
 
-      resolve(parent, args, req, res) {
+      async resolve(parent, args, req, res) {
+        let userSession = await getUserSession(args.sessionID);
         return dalService.contentGet(
           args.id,
           args.contentTypeId,
           args.url,
           args.data,
           args.tag,
-          getUserSession(req),
+          userSession,
           true
         );
         // if (args.ContentTypeId) {
@@ -707,12 +709,8 @@ const Mutation = new GraphQLObjectType({
   },
 });
 
-function getUserSession(req){
-  let userSession = req.session.passport && req.session.passport.user;
-  if(!userSession){
-    throw new Error('Unable to detect user session');
-  }
-  return userSession;
+async function getUserSession(sessionID){
+  return await dalService.sessionGet(sessionID);
 }
 
 //Creating a new GraphQL Schema, with options query which defines query
