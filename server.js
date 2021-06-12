@@ -36,8 +36,10 @@ const { TypeormStore } = require("connect-typeorm");
 const { Session } = require("./server/data/model/Session");
 
 function start() {
-
   setupStaticAssets(app);
+
+  //1.2 handlebars
+  setupHandlebars(app);
 
   // 1 cookieParser
   app.use(cookieParser());
@@ -46,10 +48,6 @@ function start() {
   // app.use(express.bodyParser());
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json({ limit: "100mb" }));
-
-  
-  //1.8 handlebars
-  setupHandlebars(app);
 
   // 2 session
   // setupSessionFile(app);
@@ -80,20 +78,20 @@ function appListen(app) {
   });
 }
 
-function setupSessionFile(app) {
-  var fileStoreOptions = {
-    reapAsync: true,
-    path: "./server/sessions",
-  };
+// function setupSessionFile(app) {
+//   var fileStoreOptions = {
+//     reapAsync: true,
+//     path: "./server/sessions",
+//   };
 
-  app.use(
-    session({
-      secret: process.env.SESSION_SECRET,
-      resave: true,
-      saveUninitialized: false,
-    })
-  );
-}
+//   app.use(
+//     session({
+//       secret: process.env.SESSION_SECRET,
+//       resave: true,
+//       saveUninitialized: false,
+//     })
+//   );
+// }
 
 function setupSessionDb(app) {
   const sessionRepo = getConnection().getRepository(Session);
@@ -102,10 +100,10 @@ function setupSessionDb(app) {
     session({
       secret: process.env.SESSION_SECRET,
       resave: false,
-      saveUninitialized: false,
+      saveUninitialized: true,
       store: new TypeormStore({
         cleanupLimit: 2,
-        ttl: 86400*30
+        ttl: 86400 * 30,
       }).connect(sessionRepo),
     })
   );

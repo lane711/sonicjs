@@ -53,47 +53,49 @@ module.exports = authService = {
     });
 
     //TODO: https://www.sitepoint.com/local-authentication-using-passport-node-js/
-    app.post(
-      "/login",
-      passport.authenticate("local", {
-        successReturnToOrRedirect: "/",
-        failureRedirect: "/login",
-      })
-    );
+    // app.post(
+    //   "/login",
+    //   passport.authenticate("local", {
+    //     successReturnToOrRedirect: "/",
+    //     failureRedirect: "/login",
+    //   }) () =>{
 
-    // app.post('/login', (req, res, next) => {
-
-    //   if (process.env.MODE !== "dev") {
-    //     if (adminDomain !== req.host) {
-    //       res.send(401);
-    //       return;
-    //     }
     //   }
+    // );
 
-    //   passport.authenticate('local',
-    //   (err, user, info) => {
-    //     if (err) {
-    //       return next(err);
-    //     }
+    app.post('/login', (req, res, next) => {
 
-    //     if (!user) {
-    //       return res.redirect('/login?info=' + info);
-    //     }
+      if (process.env.MODE !== "dev") {
+        if (adminDomain !== req.host) {
+          res.send(401);
+          return;
+        }
+      }
 
-    //     req.logIn(user, async function(err) {
-    //       if (err) {
-    //         return next(err);
-    //       }
+      passport.authenticate('local',
+      (err, user, info) => {
+        if (err) {
+          return next(err);
+        }
 
-    //       if(!req.session.returnTo){
-    //         return res.redirect('/admin');
-    //       }else{
-    //         return res.redirect(req.session.returnTo);
-    //       }
-    //     });
+        if (!user) {
+          return res.redirect('/login?info=' + info);
+        }
 
-    //   })(req, res, next);
-    // });
+        req.logIn(user, async function(err) {
+          if (err) {
+            return next(err);
+          }
+
+          if(!req.session.returnTo){
+            return res.redirect('/admin');
+          }else{
+            return res.redirect(req.session.returnTo);
+          }
+        });
+
+      })(req, res, next);
+    });
 
     app.get("/private", connectEnsureLogin.ensureLoggedIn(), (req, res) =>
       res.sendFile("html/private.html", { root: __dirname })
