@@ -116,7 +116,7 @@ if (typeof module !== "undefined" && module.exports) {
           userUpdate( 
             id:"${id}", 
             profile:"""${data}""",
-            sessionID:"${sessionID}"){
+            sessionId:"${sessionId}"){
               username
           }
         }
@@ -129,7 +129,7 @@ if (typeof module !== "undefined" && module.exports) {
       let result = await this.getAxios().post(apiUrl, {
         query: `
       {
-        roles (sessionID:"${sessionID}"){
+        roles (sessionId:"${sessionId}"){
           id
           data
         }
@@ -151,7 +151,7 @@ if (typeof module !== "undefined" && module.exports) {
       let result = await this.getAxios().post(apiUrl, {
         query: `
         {
-          contents (sessionID:"${sessionID}")
+          contents (sessionId:"${sessionId}")
           {
             id
             contentTypeId
@@ -213,7 +213,7 @@ if (typeof module !== "undefined" && module.exports) {
       let result = await this.getAxios().post(apiUrl, {
         query: `
         {
-          contents (contentTypeId : "${contentType}", sessionID:"${sessionID}") {
+          contents (contentTypeId : "${contentType}", sessionId:"${sessionId}") {
             id
             contentTypeId
             data
@@ -239,7 +239,7 @@ if (typeof module !== "undefined" && module.exports) {
       let result = await this.getAxios().post(apiUrl, {
         query: `
             {
-                contentType(systemId:"${contentType}", sessionID:"${sessionID}") {
+                contentType(systemId:"${contentType}", sessionId:"${sessionId}") {
                   title
                   systemId
                   moduleSystemId
@@ -257,7 +257,7 @@ if (typeof module !== "undefined" && module.exports) {
       let result = await this.getAxios().post(apiUrl, {
         query: `
         {
-          contentTypes (sessionID:"${sessionID}") {
+          contentTypes (sessionId:"${sessionId}") {
             title
             systemId
             moduleSystemId
@@ -304,7 +304,7 @@ if (typeof module !== "undefined" && module.exports) {
             systemId:"${contentType.systemId}", 
             permissions:"""${permissions}""",
             data:"""${components}""",
-            sessionID:"${sessionID}"){
+            sessionId:"${sessionId}"){
               title
           }
         }
@@ -319,7 +319,7 @@ if (typeof module !== "undefined" && module.exports) {
         query: `
         mutation{
           contentTypeDelete( 
-            systemId:"${contentType}", sessionID:"${sessionID}"){
+            systemId:"${contentType}", sessionId:"${sessionId}"){
               title
           }
         }
@@ -335,7 +335,7 @@ if (typeof module !== "undefined" && module.exports) {
           title:"${contentType.title}", 
           moduleSystemId:"${contentType.moduleSystemId}", 
           systemId:"${contentType.systemId}",
-          sessionID:"${sessionID}")
+          sessionId:"${sessionId}")
           {
             title
         }
@@ -379,7 +379,7 @@ if (typeof module !== "undefined" && module.exports) {
       let result = await this.getAxios().post(apiUrl, {
         query: `
             {
-              content(url: "${url}", sessionID:"${sessionID}") {
+              content(url: "${url}", sessionId:"${sessionId}") {
                 id
                 contentTypeId
                 data
@@ -398,10 +398,10 @@ if (typeof module !== "undefined" && module.exports) {
       notFound.url = url;
       return notFound;
     }),
-    (exports.getContentByContentType = async function (contentType, sessionID) {
+    (exports.getContentByContentType = async function (contentType, sessionId) {
       let query = `
       {
-        contents(contentTypeId: "${contentType}", sessionID:"${sessionID}") {
+        contents(contentTypeId: "${contentType}", sessionId:"${sessionId}") {
           id
           contentTypeId
           data
@@ -428,11 +428,11 @@ if (typeof module !== "undefined" && module.exports) {
     (exports.getContentByContentTypeAndTitle = async function (
       contentType,
       title,
-      sessionID
+      sessionId
     ) {
       let allOfContentType = await this.getContentByContentType(
         contentType,
-        sessionID
+        sessionId
       );
       if (allOfContentType) {
         let contentByTitle = allOfContentType.filter(
@@ -524,7 +524,7 @@ if (typeof module !== "undefined" && module.exports) {
           url:"${payload.data.url}", 
           createdByUserId:"5fd834ec29f419535f049803"
           data:"""${JSON.stringify(payload.data)}""",
-          sessionID:"${sessionID}"){
+          sessionId:"${sessionId}"){
             id
             url
             contentTypeId
@@ -544,7 +544,7 @@ if (typeof module !== "undefined" && module.exports) {
       mutation{
         contentDelete( 
           id:"${id}",
-          sessionID:"${sessionID}"){
+          sessionId:"${sessionId}"){
             id
           }
       }
@@ -592,7 +592,7 @@ if (typeof module !== "undefined" && module.exports) {
       query: `
         {
           content(id: "${id}",
-          sessionID:"${sessionID}") {
+          sessionId:"${sessionId}") {
             contentTypeId
             data
             id
@@ -618,7 +618,7 @@ if (typeof module !== "undefined" && module.exports) {
         fileUpdate( 
           filePath:"${filePath}", 
           fileContent:"""${fileContent}""",
-          sessionID:"${sessionID}"
+          sessionId:"${sessionId}"
           )
           { 
             filePath 
@@ -635,7 +635,7 @@ if (typeof module !== "undefined" && module.exports) {
         fileCreate( 
           filePath:"${filePath}", 
           fileContent:"""${fileContent}""",
-          sessionID:"${sessionID}"
+          sessionId:"${sessionId}"
           )
           { 
             filePath 
@@ -658,7 +658,7 @@ if (typeof module !== "undefined" && module.exports) {
             contentType:"${contentType}",
             viewModel: """${JSON.stringify(viewModel)}""",
             viewPath:"${viewPath}",
-            sessionID:"${sessionID}"
+            sessionId:"${sessionId}"
           ) {
           html
         }
@@ -701,7 +701,7 @@ if (typeof module !== "undefined" && module.exports) {
       mutation{
         moduleTypeDelete( 
           systemId:"${moduleSystemId}",
-          sessionID:"${sessionID}")
+          sessionId:"${sessionId}")
           { systemId }
       }
           `;
@@ -719,7 +719,7 @@ if (typeof module !== "undefined" && module.exports) {
             enabled:${payload.data.enabled}, 
             systemId:"${payload.data.systemId}", 
             canBeAddedToColumn: ${payload.data.canBeAddedToColumn},
-            sessionID:"${sessionID}"
+            sessionId:"${sessionId}"
             )
           {		
             title
@@ -743,7 +743,7 @@ if (typeof module !== "undefined" && module.exports) {
             systemId:"${payload.data.systemId}", 
             canBeAddedToColumn: ${payload.data.canBeAddedToColumn},
             singleInstance: ${payload.data.singleInstance},
-            sessionID:"${sessionID}"
+            sessionId:"${sessionId}"
             )
           {		
             title

@@ -56,7 +56,7 @@ module.exports = contentService = {
 
     await emitterService.emit("preProcessPageUrlLookup", req);
 
-    let page = await dataService.getContentByUrl(req.url);
+    let page = await dataService.getContentByUrl(req.url, req.sessionId);
 
     await emitterService.emit("postPageDataFetch", { req: req, page: page });
 
@@ -124,7 +124,7 @@ module.exports = contentService = {
   },
 
   getBlog: async function (req) {
-    let blog = await dataService.getContentByUrl(req.url);
+    let blog = await dataService.getContentByUrl(req.url, req.sessionId);
     blog = blog.data[0];
     if (blog) {
       blog.data.menu = await menuService.getMenu("Main");

@@ -12,7 +12,7 @@ module.exports = menuService = {
 
     emitterService.on("getRenderedPagePostDataFetch", async function (options) {
       if (options) {
-        let menuData = await menuService.getMenu("Main", options.req.sessionID);
+        let menuData = await menuService.getMenu("Main", options.req.sessionId);
         menuData.forEach((menuItem) => {
           menuItem.isActive = menuItem.data.url === options.req.path;
 
@@ -52,11 +52,11 @@ module.exports = menuService = {
     }
   },
 
-  getMenu: async function (menuName, sessionID) {
+  getMenu: async function (menuName, sessionId) {
     let menuData = await dataService.getContentByContentTypeAndTitle(
       "menu",
       menuName,
-      sessionID
+      sessionId
     );
     if (menuData) {
       let links = menuData.data.links;

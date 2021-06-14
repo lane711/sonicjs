@@ -185,14 +185,14 @@ const RootQuery = new GraphQLObjectType({
         id: { type: GraphQLID },
         username: { type: GraphQLString },
         password: { type: GraphQLString },
-        sessionID: { type: GraphQLString },
+        sessionId: { type: GraphQLString },
       },
       async resolve(parent, args, req, res) {
         //create a direct api instead of user.find...
         // then use that api directly from the admin backend
         return dalService.userGet(
           args.id,
-          await getUserSession(args.sessionID)
+          await getUserSession(args.sessionId)
         );
         //user can always see their own profile
         if (args.id === req.session.passport.userId) {
@@ -209,7 +209,7 @@ const RootQuery = new GraphQLObjectType({
     users: {
       type: new GraphQLList(UserType),
       async resolve(parent, args) {
-        return dalService.usersGet(await getUserSession(args.sessionID));
+        return dalService.usersGet(await getUserSession(args.sessionId));
       },
     },
     roles: {
@@ -221,7 +221,7 @@ const RootQuery = new GraphQLObjectType({
           "",
           "",
           "",
-          await getUserSession(args.sessionID)
+          await getUserSession(args.sessionId)
         );
 
         // return Content.find({
@@ -237,7 +237,7 @@ const RootQuery = new GraphQLObjectType({
         contentTypeId: { type: GraphQLString },
         url: { type: GraphQLString },
         data: { type: GraphQLString },
-        sessionID: { type: GraphQLString },
+        sessionId: { type: GraphQLString },
       },
       async resolve(parent, args, req) {
         return dalService.contentGet(
@@ -246,7 +246,7 @@ const RootQuery = new GraphQLObjectType({
           args.url,
           args.data,
           args.tag,
-          await getUserSession(args.sessionID)
+          await getUserSession(args.sessionId)
         );
         // if (args.id) {
         //   return Content.findById(args.id);
@@ -269,7 +269,7 @@ const RootQuery = new GraphQLObjectType({
         url: { type: GraphQLString },
         data: { type: GraphQLJSONObject },
         tag: { type: GraphQLString },
-        sessionID: { type: GraphQLString },
+        sessionId: { type: GraphQLString },
       },
 
       async resolve(parent, args, req, res) {
@@ -279,7 +279,7 @@ const RootQuery = new GraphQLObjectType({
           args.url,
           args.data,
           args.tag,
-          await getUserSession(args.sessionID),
+          await getUserSession(args.sessionId),
           true
         );
         // if (args.ContentTypeId) {
@@ -309,11 +309,11 @@ const RootQuery = new GraphQLObjectType({
     contentTypes: {
       type: new GraphQLList(ContentTypeType),
       args: {
-        sessionID: { type: GraphQLString },
+        sessionId: { type: GraphQLString },
       },
       async resolve(parent, args) {
         return moduleService.getModuleContentTypes(
-          await getUserSession(args.sessionID)
+          await getUserSession(args.sessionId)
         );
       },
     },
@@ -322,12 +322,12 @@ const RootQuery = new GraphQLObjectType({
       type: ContentTypeType,
       args: {
         systemId: { type: GraphQLString },
-        sessionID: { type: GraphQLString },
+        sessionId: { type: GraphQLString },
       },
       async resolve(parent, args) {
         return moduleService.getModuleContentType(
           args.systemId,
-          await getUserSession(args.sessionID)
+          await getUserSession(args.sessionId)
         );
       },
     },
@@ -362,7 +362,7 @@ const RootQuery = new GraphQLObjectType({
         contentType: { type: GraphQLString },
         viewModel: { type: GraphQLString },
         viewPath: { type: GraphQLString },
-        sessionID: { type: GraphQLString },
+        sessionId: { type: GraphQLString },
       },
       resolve(parent, args) {
         let html = viewService.getProcessedView(
@@ -730,8 +730,8 @@ const Mutation = new GraphQLObjectType({
   },
 });
 
-async function getUserSession(sessionID) {
-  let session = await dalService.sessionGet(sessionID);
+async function getUserSession(sessionId) {
+  let session = await dalService.sessionGet(sessionId);
 
   if (!session) {
     throw new Error("Session not found");

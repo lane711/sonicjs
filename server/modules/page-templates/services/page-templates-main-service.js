@@ -30,13 +30,7 @@ module.exports = pageTemplatesMainService = {
 
     emitterService.on("postModuleGetData", async function (options) {
       if (options.shortcode.name === "PAGE-TEMPLATES") {
-        // let basePage = await dataService.getContentByUrl(
-        //   options.req.originalUrl
-        // );
 
-        // if (!basePage.data.isPageTemplate) {
-        //   // let data = await dataService.getContentByUrl(options.req.originalUrl);
-        //   if (basePage.data.pageTemplateRegions) {
 
         if (options.page.data.pageTemplateRegions) {
           let regionId = options.viewModel.data.id;
@@ -82,9 +76,7 @@ module.exports = pageTemplatesMainService = {
     });
 
     emitterService.on("preRenderTemplate", async function (options) {
-      //TODO get from cache
-      // let data = await dataService.getContentByUrl(options.req.originalUrl);
-      // options.page.data.id = data.id;
+
     });
 
     emitterService.on("preProcessSections", async function (page) {
@@ -97,8 +89,7 @@ module.exports = pageTemplatesMainService = {
           page.data.layout = templatePage.data.layout;
         }
       }
-      // let basePage = await dataService.getContentByUrl(options.req.originalUrl);
-      // page.data.sections = [];
+
     });
   },
 };
