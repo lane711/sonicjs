@@ -210,7 +210,9 @@ module.exports = dalService = {
     if (sessionID) {
       let session = await sessionRepo.findOne(sessionID);
       session.user = JSON.parse(session.json);
-      return session;
+      let userSession = session.user.passport;
+      userSession.sessionID = sessionID;
+      return userSession;
     }
   },
 

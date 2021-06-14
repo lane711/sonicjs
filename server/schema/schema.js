@@ -261,14 +261,13 @@ const RootQuery = new GraphQLObjectType({
       },
 
       async resolve(parent, args, req, res) {
-        let userSession = await getUserSession(args.sessionID);
         return dalService.contentGet(
           args.id,
           args.contentTypeId,
           args.url,
           args.data,
           args.tag,
-          userSession,
+          await getUserSession(args.sessionID),
           true
         );
         // if (args.ContentTypeId) {
