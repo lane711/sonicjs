@@ -32,7 +32,7 @@ module.exports = dalService = {
     // }
   },
 
-  usersGet: async function () {
+  usersGet: async function (user) {
     const userRepo = await getRepository(User);
 
     let users = await userRepo.find();

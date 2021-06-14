@@ -198,7 +198,7 @@ module.exports = moduleService = {
     return {};
   },
 
-  getModuleContentTypes: async function () {
+  getModuleContentTypes: async function (userSession) {
     let configInfos = await globalService.moduleContentTypeConfigs;
     let configs = [];
     configInfos.forEach((configInfo) => {
