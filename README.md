@@ -16,7 +16,7 @@
 
 ### It will help spread the word so that I can start to generate developer feedback. Thanks in advance!
 
-![Image of SonicJs Logo](https://sonicjs.com/api/containers/files/download/sonicjs-logo-dark.svg)
+![Image of SonicJs Logo](https://sonicjs.com/assets/uploads/sonicjs-logo-dark.svg)
 [https://sonicjs.com](https://sonicjs.com)
 
 # SonicJS is a Modern Open Source "Free Forever" NodeJs Based Content Management System
