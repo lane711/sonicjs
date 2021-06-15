@@ -90,7 +90,8 @@ if (typeof module !== "undefined" && module.exports) {
       content,
       onFormSubmitFunction,
       returnModuleSettings = false,
-      formSettingsId
+      formSettingsId,
+      sessionId
     ) {
       let contentType;
       // debugger;

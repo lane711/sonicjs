@@ -46,7 +46,7 @@ module.exports = adminService = {
           }
         }
 
-        let userSession = req.session.passport.user;
+        // let userSession = req.session.passport.user;
         // if (userSession && userSession.id) {
         //   userSession.id = req.session.userId;
         // }
@@ -74,53 +74,58 @@ module.exports = adminService = {
         let data = {};
 
         if (viewName == "admin-content") {
-          data = await dataService.getContentAdmin();
-          data.contentTypes = await dataService.contentTypesGet();
+          data = await dataService.getContentAdmin(req.sessionId);
+          data.contentTypes = await dataService.contentTypesGet(req.sessionId);
         }
 
         if (viewName == "admin-content-edit") {
           let content = null;
           if (param2) {
-            content = await dataService.getContentById(param2);
+            content = await dataService.getContentById(param2, req.sessionId);
           }
           data.editForm = await formService.getForm(
             param1,
             content,
-            "submitContent(submission)"
+            "submitContent(submission)",
+            req.sessionId
           );
           data.contentId = param2;
         }
 
         if (viewName == "admin-content-types") {
-          let dataRaw = await dataService.contentTypesGet();
+          let dataRaw = await dataService.contentTypesGet(req.sessionId);
           data = _.sortBy(dataRaw, "title");
         }
 
         if (viewName == "admin-content-types-edit") {
           data.contentTypeId = param1;
-          data.raw = await dataService.contentTypeGet(param1);
+          data.raw = await dataService.contentTypeGet(param1, req.sessionId);
         }
 
         if (viewName == "admin-modules") {
-          data = await moduleService.getModules();
+          data = await moduleService.getModules(req.sessionId);
         }
 
         if (viewName == "admin-modules-edit") {
           data.moduleSystemId = param1;
           data.contentTypes = await moduleService.getModuleContentTypesAdmin(
-            param1
+            param1,
+            req.sessionId
           );
           data.contentTypeId = param1;
-          data.moduleDef = await moduleService.getModuleDefinition(param1);
+          data.moduleDef = await moduleService.getModuleDefinition(
+            param1,
+            req.sessionId
+          );
         }
 
         if (viewName == "admin-media") {
-          data = await mediaService.getMedia();
+          data = await mediaService.getMedia(req.sessionId);
         }
 
         if (viewName == "admin-menus-edit") {
           if (param1) {
-            data = await dataService.getContentById(param1);
+            data = await dataService.getContentById(param1, req.sessionId);
             if (data.data.links) {
               data.data.linksString = JSON.stringify(data.data.links);
             }
@@ -128,37 +133,74 @@ module.exports = adminService = {
         }
 
         if (viewName == "admin-menus") {
-          data = await dataService.getContentByContentType("menu");
+          data = await dataService.getContentByContentType(
+            "menu",
+            req.sessionId
+          );
         }
 
         if (viewName == "admin-site-settings") {
-          data = await dataService.getContentTopOne("site-settings");
-          data.editForm = await formService.getForm("site-settings", data);
+          data = await dataService.getContentTopOne(
+            "site-settings",
+            req.sessionId
+          );
+          data.editForm = await formService.getForm(
+            "site-settings",
+            data,
+            undefined,
+            undefined,
+            undefined,
+            req.sessionId
+          );
         }
 
         if (viewName == "admin-theme-settings") {
-          data = await dataService.getContentTopOne("theme-settings");
-          data.editForm = await formService.getForm("theme-settings", data);
+          data = await dataService.getContentTopOne(
+            "theme-settings",
+            req.sessionId
+          );
+          data.editForm = await formService.getForm(
+            "theme-settings",
+            data,
+            undefined,
+            undefined,
+            undefined,
+            req.sessionId
+          );
         }
 
         if (viewName == "admin-site-settings-colors") {
-          data = await dataService.getContentTopOne("site-settings-colors");
+          data = await dataService.getContentTopOne(
+            "site-settings-colors",
+            req.sessionId
+          );
           data.editForm = await formService.getForm(
             "site-settings-colors",
-            data
+            data,
+            undefined,
+            undefined,
+            undefined,
+            req.sessionId
           );
         }
 
         if (viewName == "admin-site-settings-typography") {
           data = await dataService.getContentTopOne("site-settings");
-          data.editForm = await formService.getForm("site-settings", data);
+          data.editForm = await formService.getForm("site-settings", data,
+          undefined,
+          undefined,
+          undefined,
+          req.sessionId);
         }
 
         if (viewName == "admin-users") {
           data.editFormUser = await formService.getForm(
             "user-register",
             undefined,
-            "await submitContent(submission,true,'user');"
+            "await submitContent(submission,true,'user');",
+            undefined,
+            undefined, 
+            req.sessionId
           );
           let users = await userService.getUsers();
           data.users = users;
@@ -168,9 +210,12 @@ module.exports = adminService = {
           data.editFormRole = await formService.getForm(
             "role",
             undefined,
-            "submitContent(submission,true,'role')"
+            "submitContent(submission,true,'role')",
+            undefined,
+            undefined,
+            req.sessionId
           );
-          let roles = await userService.getRoles();
+          let roles = await userService.getRoles(req.sessionId);
           data.roles = roles;
         }
 
@@ -178,25 +223,34 @@ module.exports = adminService = {
           data.editForm = await formService.getForm(
             "role",
             undefined,
-            "submitContent(submission,true,'role');"
+            "submitContent(submission,true,'role');",
+            undefined,
+            undefined,
+            req.sessionId
           );
         }
 
         if (viewName == "admin-role-edit") {
           let roleId = param1;
-          let role = await dataService.getContentById(roleId);
+          let role = await dataService.getContentById(roleId, req.sessionId);
 
           data.editForm = await formService.getForm(
             "role",
             role,
-            'submitContent(submission, true, "role");'
+            'submitContent(submission, true, "role");',
+            undefined,
+            undefined,
+            req.sessionId
           );
         }
 
         if (viewName == "admin-user-edit") {
           let user = { id: param1 };
           if (param1) {
-            let userRecord = await dalService.userGet(parseInt(param1), userSession);
+            let userRecord = await dalService.userGet(
+              parseInt(param1),
+              req.sessionId
+            );
             userRecord.data = userRecord.profile ? userRecord.profile : {};
             // userRecord.data = userRecord.profile;
             userRecord.data.id = userRecord.id;
@@ -204,13 +258,16 @@ module.exports = adminService = {
             data.editForm = await formService.getForm(
               "user",
               userRecord,
-              'submitContent(submission, true, "user");'
+              'submitContent(submission, true, "user");',
+              undefined,
+              undefined,
+              req.sessionId
             );
           }
         }
 
         let accessToken = "fakeToken"; //await userService.getToken(req);
-        data.breadCrumbs = await breadcrumbsService.getAdminBreadcrumbs(req);
+        data.breadCrumbs = await breadcrumbsService.getAdminBreadcrumbs(req, req.sessionId);
 
         // mixPanelService.trackEvent("PAGE_LOAD_ADMIN", req, {
         //   page: req.url,

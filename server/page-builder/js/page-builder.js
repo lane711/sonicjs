@@ -538,22 +538,22 @@ async function getContentInstance(id) {
     });
 }
 
-async function getContentByContentTypeAndTitle(contentType, title) {
-  const filter = `{"where":{"and":[{"data.title":"${title}"},{"data.contentType":"${contentType}"}]}}`;
-  const encodedFilter = encodeURI(filter);
-  let url = `/api/content?filter=${encodedFilter}`;
-  return axiosInstance
-    .get(url)
-    .then(async function (record) {
-      if (record.data[0]) {
-        return record.data[0];
-      }
-      return "not found";
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-}
+// async function getContentByContentTypeAndTitle(contentType, title) {
+//   const filter = `{"where":{"and":[{"data.title":"${title}"},{"data.contentType":"${contentType}"}]}}`;
+//   const encodedFilter = encodeURI(filter);
+//   let url = `/api/content?filter=${encodedFilter}`;
+//   return axiosInstance
+//     .get(url)
+//     .then(async function (record) {
+//       if (record.data[0]) {
+//         return record.data[0];
+//       }
+//       return "not found";
+//     })
+//     .catch(function (error) {
+//       console.log(error);
+//     });
+// }
 
 async function createInstance(
   payload,

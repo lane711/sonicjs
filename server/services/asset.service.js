@@ -104,17 +104,15 @@ module.exports = assetService = {
     if (globalService.isBackEnd) {
       let assets = await dataService.getContentByContentTypeAndTitle(
         "asset",
-        `${assetType}-back-end`
+        `${assetType}-back-end`,
+        option.req.sessionId
       );
       let asset2 = this.getThemeAssets();
       this.addPaths(options, assets.data.paths, assetType);
     }
 
     if (globalService.isFrontEnd) {
-      // let assets = await dataService.getContentByContentTypeAndTitle(
-      //   "asset",
-      //   `${assetType}-front-end`
-      // );
+
       let assets = await this.getThemeAssets();
 
       this.addPaths(options, assets[assetType], assetType);
