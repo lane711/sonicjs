@@ -29,7 +29,8 @@ module.exports = contactUsMainService = {
         undefined,
         "submitForm(submission)",
         false,
-        contactFormSettingsId
+        contactFormSettingsId,
+        options.req.sessionID
       );
 
       // console.log('contact module after view model', options.viewModel);

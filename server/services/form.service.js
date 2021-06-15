@@ -91,16 +91,17 @@ if (typeof module !== "undefined" && module.exports) {
       onFormSubmitFunction,
       returnModuleSettings = false,
       formSettingsId,
-      sessionId
+      sessionID
     ) {
       let contentType;
       // debugger;
       if (content && content.data.contentType) {
         contentType = await dataService.contentTypeGet(
-          content.data.contentType.toLowerCase()
+          content.data.contentType.toLowerCase(),
+          sessionID
         );
       } else if (contentTypeId) {
-        contentType = await dataService.contentTypeGet(contentTypeId);
+        contentType = await dataService.contentTypeGet(contentTypeId, sessionID);
 
         //add a hidden object for the formsettings id so we can look it up on form submission
         if (formSettingsId) {
@@ -117,7 +118,8 @@ if (typeof module !== "undefined" && module.exports) {
 
         if (returnModuleSettings) {
           const settingContentType = await dataService.contentTypeGet(
-            `${contentTypeId}-settings`
+            `${contentTypeId}-settings`,
+            sessionID
           );
           // debugger;
           if (settingContentType && settingContentType.data) {

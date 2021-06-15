@@ -233,8 +233,8 @@ exports.loadRoutes = async function (app) {
 
   app.get("/form/*", async function (req, res) {
     let moduleSystemId = req.path.replace("/form/", "");
-    let contentType = await dataService.contentTypeGet(moduleSystemId);
-    let form = await formService.getFormJson(contentType);
+    let contentType = await dataService.contentTypeGet(moduleSystemId, req.sessionID);
+    let form = await formService.getFormJson(contentType, req.sessionID);
     res.send(form);
   });
 

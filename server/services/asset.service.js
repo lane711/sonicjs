@@ -105,7 +105,7 @@ module.exports = assetService = {
       let assets = await dataService.getContentByContentTypeAndTitle(
         "asset",
         `${assetType}-back-end`,
-        option.req.sessionId
+        option.req.sessionID
       );
       let asset2 = this.getThemeAssets();
       this.addPaths(options, assets.data.paths, assetType);

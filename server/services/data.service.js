@@ -105,7 +105,7 @@ if (typeof module !== "undefined" && module.exports) {
       // return result.userCreate;
     });
 
-  (exports.userUpdate = async function (user, sessionId) {
+  (exports.userUpdate = async function (user, sessionID) {
     // debugger;
     let id = user.id;
     delete user.id;
@@ -116,7 +116,7 @@ if (typeof module !== "undefined" && module.exports) {
           userUpdate( 
             id:"${id}", 
             profile:"""${data}""",
-            sessionId:"${sessionId}"){
+            sessionID:"${sessionID}"){
               username
           }
         }
@@ -125,11 +125,11 @@ if (typeof module !== "undefined" && module.exports) {
 
     return result.data;
   }),
-    (exports.rolesGet = async function (sessionId) {
+    (exports.rolesGet = async function (sessionID) {
       let result = await this.getAxios().post(apiUrl, {
         query: `
       {
-        roles (sessionId:"${sessionId}"){
+        roles (sessionID:"${sessionID}"){
           id
           data
         }
@@ -141,7 +141,7 @@ if (typeof module !== "undefined" && module.exports) {
         return result.data.data.roles;
       }
     }),
-    (exports.getContent = async function (sessionId) {
+    (exports.getContent = async function (sessionID) {
       //HACK removing sort bc LB not working with RDMS
       // const filter = ""; //encodeURI(`{"order":"data.createdOn DESC"}`);
 
@@ -151,7 +151,7 @@ if (typeof module !== "undefined" && module.exports) {
       let result = await this.getAxios().post(apiUrl, {
         query: `
         {
-          contents (sessionId:"${sessionId}")
+          contents (sessionID:"${sessionID}")
           {
             id
             contentTypeId
@@ -178,8 +178,8 @@ if (typeof module !== "undefined" && module.exports) {
         return content;
       }
     }),
-    (exports.getContentAdmin = async function (sessionId) {
-      let contents = await this.getContent();
+    (exports.getContentAdmin = async function (sessionID) {
+      let contents = await this.getContent(sessionID);
       //HACK removing sort bc LB not working with RDMS
       // const filter = ""; //encodeURI(`{"order":"data.createdOn DESC"}`);
 
@@ -196,7 +196,7 @@ if (typeof module !== "undefined" && module.exports) {
 
       return data;
     }),
-    (exports.getContentByType = async function (contentType, sessionId) {
+    (exports.getContentByType = async function (contentType, sessionID) {
       // const query = gql`
       // {
       //   contents (contentTypeId : "${contentType}") {
@@ -213,7 +213,7 @@ if (typeof module !== "undefined" && module.exports) {
       let result = await this.getAxios().post(apiUrl, {
         query: `
         {
-          contents (contentTypeId : "${contentType}", sessionId:"${sessionId}") {
+          contents (contentTypeId : "${contentType}", sessionID:"${sessionID}") {
             id
             contentTypeId
             data
@@ -224,7 +224,7 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.contents;
     }),
-    (exports.getPageTemplates = async function (sessionId) {
+    (exports.getPageTemplates = async function (sessionID) {
       let pages = await this.getContentByType("page");
 
       //filter out content type that should not appear in admin content list
@@ -234,12 +234,12 @@ if (typeof module !== "undefined" && module.exports) {
 
       return data;
     }),
-    (exports.contentTypeGet = async function (contentType, sessionId) {
+    (exports.contentTypeGet = async function (contentType, sessionID) {
       // debugger;
       let result = await this.getAxios().post(apiUrl, {
         query: `
             {
-                contentType(systemId:"${contentType}", sessionId:"${sessionId}") {
+                contentType(systemId:"${contentType}", sessionID:"${sessionID}") {
                   title
                   systemId
                   moduleSystemId
@@ -253,11 +253,11 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.contentType;
     }),
-    (exports.contentTypesGet = async function (sessionId) {
+    (exports.contentTypesGet = async function (sessionID) {
       let result = await this.getAxios().post(apiUrl, {
         query: `
         {
-          contentTypes (sessionId:"${sessionId}") {
+          contentTypes (sessionID:"${sessionID}") {
             title
             systemId
             moduleSystemId
@@ -290,7 +290,7 @@ if (typeof module !== "undefined" && module.exports) {
 
       return JSON.stringify(obj);
     }),
-    (exports.contentTypeUpdate = async function (contentType, sessionId) {
+    (exports.contentTypeUpdate = async function (contentType, sessionID) {
       // debugger;
       let components = JSON.stringify(contentType.data);
       let permissions = JSON.stringify(contentType.permissions);
@@ -304,7 +304,7 @@ if (typeof module !== "undefined" && module.exports) {
             systemId:"${contentType.systemId}", 
             permissions:"""${permissions}""",
             data:"""${components}""",
-            sessionId:"${sessionId}"){
+            sessionID:"${sessionID}"){
               title
           }
         }
@@ -313,13 +313,13 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.contentType;
     }),
-    (exports.contentTypeDelete = async function (contentType, sessionId) {
+    (exports.contentTypeDelete = async function (contentType, sessionID) {
       let components = JSON.stringify(contentType.data);
       let result = await this.getAxios().post(apiUrl, {
         query: `
         mutation{
           contentTypeDelete( 
-            systemId:"${contentType}", sessionId:"${sessionId}"){
+            systemId:"${contentType}", sessionID:"${sessionID}"){
               title
           }
         }
@@ -328,14 +328,14 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.contentType;
     }),
-    (exports.contentTypeCreate = async function (contentType, sessionId) {
+    (exports.contentTypeCreate = async function (contentType, sessionID) {
       let query = `
       mutation{
         contentTypeCreate( 
           title:"${contentType.title}", 
           moduleSystemId:"${contentType.moduleSystemId}", 
           systemId:"${contentType.systemId}",
-          sessionId:"${sessionId}")
+          sessionID:"${sessionID}")
           {
             title
         }
@@ -347,12 +347,12 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.contentType;
     }),
-    (exports.getContentTopOne = async function (contentType, sessionId) {
+    (exports.getContentTopOne = async function (contentType, sessionID) {
       debugger;
       let results = await this.getContentByType(contentType);
       return results[0];
     }),
-    (exports.getContentByUrl = async function (url, sessionId) {
+    (exports.getContentByUrl = async function (url, sessionID) {
       // var filter = encodeURI(`{"where":{"data.url":"${url}"}}`);
       // let apiFullUrl = `${apiUrl}content?filter=${filter}`;
       // let record = await this.getAxios().get(apiFullUrl);
@@ -379,7 +379,7 @@ if (typeof module !== "undefined" && module.exports) {
       let result = await this.getAxios().post(apiUrl, {
         query: `
             {
-              content(url: "${url}", sessionId:"${sessionId}") {
+              content(url: "${url}", sessionID:"${sessionID}") {
                 id
                 contentTypeId
                 data
@@ -398,10 +398,10 @@ if (typeof module !== "undefined" && module.exports) {
       notFound.url = url;
       return notFound;
     }),
-    (exports.getContentByContentType = async function (contentType, sessionId) {
+    (exports.getContentByContentType = async function (contentType, sessionID) {
       let query = `
       {
-        contents(contentTypeId: "${contentType}", sessionId:"${sessionId}") {
+        contents(contentTypeId: "${contentType}", sessionID:"${sessionID}") {
           id
           contentTypeId
           data
@@ -428,11 +428,11 @@ if (typeof module !== "undefined" && module.exports) {
     (exports.getContentByContentTypeAndTitle = async function (
       contentType,
       title,
-      sessionId
+      sessionID
     ) {
       let allOfContentType = await this.getContentByContentType(
         contentType,
-        sessionId
+        sessionID
       );
       if (allOfContentType) {
         let contentByTitle = allOfContentType.filter(
@@ -441,7 +441,7 @@ if (typeof module !== "undefined" && module.exports) {
         return contentByTitle;
       }
     }),
-    (exports.getContentByContentTypeAndTag = async function (contentType, tag, sessionId) {
+    (exports.getContentByContentTypeAndTag = async function (contentType, tag, sessionID) {
       let allOfContentType = await this.getContentByContentType(contentType);
       if (allOfContentType) {
         let contentByTag = allOfContentType.filter((x) => x.data.tags === tag);
@@ -451,7 +451,7 @@ if (typeof module !== "undefined" && module.exports) {
     (exports.getContentByUrlAndContentType = async function (
       contentType,
       pageUrl,
-      sessionId
+      sessionID
     ) {
       const filter = `{"where":{"and":[{"url":"${pageUrl}"},{"data.contentType":"${contentType}"}]}}`;
       const encodedFilter = encodeURI(filter);
@@ -503,7 +503,7 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.contentUpdate;
     }),
-    (exports.contentCreate = async function (payload, autoGenerateUrl = true, sessionId) {
+    (exports.contentCreate = async function (payload, autoGenerateUrl = true, sessionID) {
       if (
         payload.data.contentType !== "page" &&
         payload.data.contentType !== "blog"
@@ -524,7 +524,7 @@ if (typeof module !== "undefined" && module.exports) {
           url:"${payload.data.url}", 
           createdByUserId:"5fd834ec29f419535f049803"
           data:"""${JSON.stringify(payload.data)}""",
-          sessionId:"${sessionId}"){
+          sessionID:"${sessionID}"){
             id
             url
             contentTypeId
@@ -539,12 +539,12 @@ if (typeof module !== "undefined" && module.exports) {
       return result.data.data.contentCreate;
     });
 
-  exports.contentDelete = async function (id, sessionId) {
+  exports.contentDelete = async function (id, sessionID) {
     let query = `
       mutation{
         contentDelete( 
           id:"${id}",
-          sessionId:"${sessionId}"){
+          sessionID:"${sessionID}"){
             id
           }
       }
@@ -557,7 +557,7 @@ if (typeof module !== "undefined" && module.exports) {
     return result.data.data.contentCreate;
   };
 
-  (exports.getContentById = async function (id, sessionId) {
+  (exports.getContentById = async function (id, sessionID) {
     // let url = `${apiUrl}content/${id}`;
     // return this.getAxios()
     //   .get(url)
@@ -592,7 +592,7 @@ if (typeof module !== "undefined" && module.exports) {
       query: `
         {
           content(id: "${id}",
-          sessionId:"${sessionId}") {
+          sessionID:"${sessionID}") {
             contentTypeId
             data
             id
@@ -611,14 +611,14 @@ if (typeof module !== "undefined" && module.exports) {
       return result.data.data.content;
     }
   }),
-    (exports.fileUpdate = async function (filePath, fileContent, sessionId) {
+    (exports.fileUpdate = async function (filePath, fileContent, sessionID) {
       let result = await this.getAxios().post(apiUrl, {
         query: `
       mutation{
         fileUpdate( 
           filePath:"${filePath}", 
           fileContent:"""${fileContent}""",
-          sessionId:"${sessionId}"
+          sessionID:"${sessionID}"
           )
           { 
             filePath 
@@ -629,13 +629,13 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.fileUpdate;
     }),
-    (exports.fileCreate = async function (filePath, fileContent, sessionId) {
+    (exports.fileCreate = async function (filePath, fileContent, sessionID) {
       let query = `
       mutation{
         fileCreate( 
           filePath:"${filePath}", 
           fileContent:"""${fileContent}""",
-          sessionId:"${sessionId}"
+          sessionID:"${sessionID}"
           )
           { 
             filePath 
@@ -650,7 +650,7 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.fileUpdate;
     }),
-    (exports.getView = async function (contentType, viewModel, viewPath, sessionId) {
+    (exports.getView = async function (contentType, viewModel, viewPath, sessionID) {
       let result = await this.getAxios().post(apiUrl, {
         query: `
         {
@@ -658,7 +658,7 @@ if (typeof module !== "undefined" && module.exports) {
             contentType:"${contentType}",
             viewModel: """${JSON.stringify(viewModel)}""",
             viewPath:"${viewPath}",
-            sessionId:"${sessionId}"
+            sessionID:"${sessionID}"
           ) {
           html
         }
@@ -691,7 +691,7 @@ if (typeof module !== "undefined" && module.exports) {
       let url = this.getImageUrl(img);
       return `<img class="img-fluid rounded" src="${url}" />`;
     }),
-    (exports.deleteModule = async function (moduleSystemId, sessionId) {
+    (exports.deleteModule = async function (moduleSystemId, sessionID) {
       // debugger;
       // let url = `${apiUrl}modules/deleteModule`;
       // let objToDelete = { moduleSystemId: moduleSystemId };
@@ -701,7 +701,7 @@ if (typeof module !== "undefined" && module.exports) {
       mutation{
         moduleTypeDelete( 
           systemId:"${moduleSystemId}",
-          sessionId:"${sessionId}")
+          sessionID:"${sessionID}")
           { systemId }
       }
           `;
@@ -710,7 +710,7 @@ if (typeof module !== "undefined" && module.exports) {
         query: query,
       });
     }),
-    (exports.moduleCreate = async function (payload, sessionId) {
+    (exports.moduleCreate = async function (payload, sessionID) {
       let result = await this.getAxios().post(apiUrl, {
         query: `
         mutation{
@@ -719,7 +719,7 @@ if (typeof module !== "undefined" && module.exports) {
             enabled:${payload.data.enabled}, 
             systemId:"${payload.data.systemId}", 
             canBeAddedToColumn: ${payload.data.canBeAddedToColumn},
-            sessionId:"${sessionId}"
+            sessionID:"${sessionID}"
             )
           {		
             title
@@ -733,7 +733,7 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.fileUpdate;
     }),
-    (exports.moduleEdit = async function (payload, sessionId) {
+    (exports.moduleEdit = async function (payload, sessionID) {
       let result = await this.getAxios().post(apiUrl, {
         query: `
         mutation{
@@ -743,7 +743,7 @@ if (typeof module !== "undefined" && module.exports) {
             systemId:"${payload.data.systemId}", 
             canBeAddedToColumn: ${payload.data.canBeAddedToColumn},
             singleInstance: ${payload.data.singleInstance},
-            sessionId:"${sessionId}"
+            sessionID:"${sessionID}"
             )
           {		
             title

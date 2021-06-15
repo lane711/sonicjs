@@ -56,7 +56,7 @@ module.exports = contentService = {
 
     await emitterService.emit("preProcessPageUrlLookup", req);
 
-    let page = await dataService.getContentByUrl(req.url, req.sessionId);
+    let page = await dataService.getContentByUrl(req.url, req.sessionID);
 
     await emitterService.emit("postPageDataFetch", { req: req, page: page });
 
@@ -124,7 +124,7 @@ module.exports = contentService = {
   },
 
   getBlog: async function (req) {
-    let blog = await dataService.getContentByUrl(req.url, req.sessionId);
+    let blog = await dataService.getContentByUrl(req.url, req.sessionID);
     blog = blog.data[0];
     if (blog) {
       blog.data.menu = await menuService.getMenu("Main");
@@ -371,7 +371,7 @@ module.exports = contentService = {
     let blockId = shortcode.properties.id;
     let contentType = shortcode.properties.contentType;
 
-    let form = await formService.getForm(contentType);
+    let form = await formService.getForm(contentType, undefined, undefined, undefined, undefined, sessionID);
 
     page.data.html = page.data.html.replace(shortcode.codeText, form);
   },

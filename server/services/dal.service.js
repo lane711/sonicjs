@@ -204,14 +204,14 @@ module.exports = dalService = {
     return tagRepo.find();
   },
 
-  sessionGet: async function (sessionId) {
+  sessionGet: async function (sessionID) {
     const sessionRepo = await getRepository(Session);
 
-    if (sessionId) {
-      let session = await sessionRepo.findOne(sessionId);
+    if (sessionID) {
+      let session = await sessionRepo.findOne(sessionID);
       session.user = JSON.parse(session.json);
       let userSession = session.user.passport;
-      userSession.sessionId = sessionId;
+      userSession.sessionID = sessionID;
       return userSession;
     }
   },

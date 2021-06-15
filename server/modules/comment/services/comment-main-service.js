@@ -21,7 +21,10 @@ module.exports = commentMainService = {
       options.viewModel.data.form = await formService.getForm(
         "comment",
         undefined,
-        "submitForm(submission)"
+        "submitForm(submission)",
+        undefined, 
+        undefined,
+        options.req.sessionID
       );
     });
 

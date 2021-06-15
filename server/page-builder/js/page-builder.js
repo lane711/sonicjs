@@ -752,7 +752,7 @@ async function openForm(action, contentType) {
   $("#pageSettingsModal").appendTo("body").modal("show");
 }
 
-async function setupPageSettings(action, contentType) {
+async function setupPageSettings(action, contentType, sessionID) {
   console.log("setupPageSettings");
   let pageId = $("#page-id").val();
   // let page = await dataService.getContentById(pageId);
@@ -809,7 +809,10 @@ async function setupPageSettings(action, contentType) {
     form = await formService.getForm(
       contentType,
       formValuesToLoad,
-      "await submitContent(submission);"
+      "await submitContent(submission);",
+      undefined,
+      undefined,
+      sessionID
     );
   }
 
@@ -822,7 +825,10 @@ async function setupPageSettings(action, contentType) {
     form = await formService.getForm(
       "page",
       undefined,
-      "await submitContent(submission);"
+      "await submitContent(submission);",
+      undefined,
+      undefined,
+      sessionID
     );
   }
 
@@ -1153,14 +1159,16 @@ async function saveWYSIWYG() {
   fullPageUpdate();
 }
 
-async function addModule(systemId) {
+async function addModule(systemId, sessionID) {
   showSidePanel();
 
   let form = await formService.getForm(
     systemId,
     undefined,
     "addModuleToColumn(submission, true)",
-    true
+    true,
+    undefined,
+    sessionID
   );
 
   $(".pb-side-panel #main").html(form);
@@ -1171,7 +1179,7 @@ async function addModule(systemId) {
   //   .modal("show");
 }
 
-async function editModule() {
+async function editModule(sessionID) {
   // cleanModal();
   showSidePanel();
 
@@ -1183,7 +1191,9 @@ async function editModule() {
     currentModuleContentType,
     data,
     "await editInstance(submission, true);",
-    true
+    true,
+    undefined,
+    sessionID
   );
   $("#dynamicModelTitle").text(
     `Settings: ${currentModuleContentType} (Id:${currentModuleId})`

@@ -88,7 +88,10 @@ $(document).ready(async function () {
     let form = await formService.getForm(
       "menu",
       content,
-      "addModuleToColumn(submission)"
+      "addModuleToColumn(submission)",
+      undefined,
+      undefined,
+      undefined
     );
 
     // debugger;
