@@ -208,6 +208,9 @@ const RootQuery = new GraphQLObjectType({
     },
     users: {
       type: new GraphQLList(UserType),
+      args: {
+        sessionID: { type: GraphQLString },
+      },
       async resolve(parent, args, req) {
         return dalService.usersGet(
           await getUserSession(args.sessionID, req.sessionID)

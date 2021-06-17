@@ -204,7 +204,7 @@ module.exports = adminService = {
             undefined, 
             req.sessionID
           );
-          let users = await userService.getUsers();
+          let users = await userService.getUsers(req.sessionID);
           data.users = users;
         }
 

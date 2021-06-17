@@ -71,10 +71,10 @@ module.exports = userService = {
     // return data.contents;
   },
 
-  getUsers: async function () {
+  getUsers: async function (sessionID) {
     const query = gql`
       {
-        users {
+        users (sessionID:"${sessionID}") {
           id
           username
           password
@@ -90,7 +90,7 @@ module.exports = userService = {
   getUser: async function (id) {
     const query = gql`
     {
-      user(id:"${id}"){
+      user(id:"${id}", sessionID:"${sessionID}"){
         id
         username
         lastLoginOn
