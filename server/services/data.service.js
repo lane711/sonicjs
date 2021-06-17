@@ -348,8 +348,7 @@ if (typeof module !== "undefined" && module.exports) {
       return result.data.data.contentType;
     }),
     (exports.getContentTopOne = async function (contentType, sessionID) {
-      debugger;
-      let results = await this.getContentByType(contentType);
+      let results = await this.getContentByType(contentType, sessionID);
       return results[0];
     }),
     (exports.getContentByUrl = async function (url, sessionID) {

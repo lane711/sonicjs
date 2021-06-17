@@ -98,6 +98,8 @@ function setupSessionDb(app) {
 
   app.use(
     session({
+      name: 'sonicjs',
+      cookie: { secure: false },
       secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: true,

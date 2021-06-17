@@ -79,7 +79,7 @@ module.exports = mixpanelMainService = {
   },
 
   addHeaderJs: async function(options) {
-    let mixpanelSettings = await dataService.getContentTopOne("mixpanel");
+    let mixpanelSettings = await dataService.getContentTopOne("mixpanel", options.req.sessionID);
 
     if (!mixpanelSettings) {
       return;

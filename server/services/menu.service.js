@@ -131,7 +131,7 @@ module.exports = menuService = {
       children: [],
     };
 
-    let menu = await dataService.getContentTopOne("menu");
+    let menu = await dataService.getContentTopOne("menu", undefined);
 
     var updatedMenu = {
       data: {

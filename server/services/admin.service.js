@@ -187,7 +187,7 @@ module.exports = adminService = {
         }
 
         if (viewName == "admin-site-settings-typography") {
-          data = await dataService.getContentTopOne("site-settings");
+          data = await dataService.getContentTopOne("site-settings", req.sessionID);
           data.editForm = await formService.getForm("site-settings", data,
           undefined,
           undefined,

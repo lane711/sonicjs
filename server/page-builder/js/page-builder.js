@@ -61,7 +61,7 @@ async function setPage() {
 async function setContentType() {
   let contentTypeId = $("#contentTypeId").val();
   if (contentTypeId) {
-    this.contentType = await dataService.contentTypeGet(contentTypeId);
+    this.contentType = await dataService.contentTypeGet(contentTypeId, undefined);
   }
 }
 
