@@ -14,11 +14,14 @@ module.exports = dalService = {
     });
   },
 
-  userGet: async function (id, user) {
+  userGet: async function (id, sessionID) {
     const userRepo = await getRepository(User);
+    let session = await dalService.sessionGet(sessionID);
 
-    if (id === user.id) {
-      let user = await userRepo.findOne(id);
+    // let user = await userRepo.findOne(id);
+
+    if (id === session.user.id) {
+      let user = session.user;
       user.contentTypeId = 'user';
       dalService.processContent(user);
       user.profile.email = user.username;

@@ -26,7 +26,7 @@ module.exports = userService = {
     });
 
     app.get("/api-admin/roles", async function (req, res) {
-      let data = await dataService.rolesGet();
+      let data = await dataService.rolesGet(req.sessionID);
       let roles = data.map((r) => {
         return { id: r.data.key, name: r.data.title };
       });
@@ -87,7 +87,7 @@ module.exports = userService = {
     return data.users;
   },
 
-  getUser: async function (id) {
+  getUser: async function (id, sessionID) {
     const query = gql`
     {
       user(id:"${id}", sessionID:"${sessionID}"){

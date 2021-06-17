@@ -219,6 +219,9 @@ const RootQuery = new GraphQLObjectType({
     },
     roles: {
       type: new GraphQLList(ContentType),
+      args: {
+        sessionID: { type: GraphQLString },
+      },
       async resolve(parent, args, req) {
         return dalService.contentGet(
           "",
