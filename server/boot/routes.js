@@ -296,12 +296,12 @@ exports.loadRoutes = async function (app) {
     let payload = req.body.data ?? req.body;
 
     //hack for newletter
-    if(!payload.data && payload.contentType){
-      payload.data = {contentType : payload.contentType};
-    }
-
-    payload.cookies = req.cookies;
-    await emitterService.emit("afterFormSubmit", payload);
+    // if(!payload.data && payload.contentType){
+    //   payload.data = {contentType : payload.contentType};
+    // }
+    let options = { data: payload, sessionID: req.sessionID}
+    
+    await emitterService.emit("afterFormSubmit", options);
     
     res.sendStatus(200);
   });

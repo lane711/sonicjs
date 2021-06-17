@@ -1433,12 +1433,13 @@ async function submitContent(
       await createInstance(entity, true, contentType);
     }
   } else {
-    // send a POST request
+    entity.contentType = contentType;
+
     let result = await axios({
       method: "post",
       url: "/form-submission",
       data: {
-        data: submission,
+        data: entity,
       },
     });
     fullPageUpdate();

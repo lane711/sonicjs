@@ -1,8 +1,0 @@
-{
-  contents(contentTypeId: "menu", user:"{"id":1,"username":"a@a.com","profile":{},"createdOn":"2021-05-28T15:49:24.832Z","updatedOn":"2021-05-28T15:49:25.763Z"}") 
-  {
-    id
-    contentTypeId
-    data        
-  }      
-}

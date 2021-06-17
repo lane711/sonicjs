@@ -17,11 +17,11 @@ module.exports = dalService = {
   userGet: async function (id, sessionID) {
     const userRepo = await getRepository(User);
     let session = await dalService.sessionGet(sessionID);
+    // let user = session.user;
 
-    // let user = await userRepo.findOne(id);
+    let user = await userRepo.findOne(session.user.id);
 
     if (id === session.user.id) {
-      let user = session.user;
       user.contentTypeId = 'user';
       dalService.processContent(user);
       user.profile.email = user.username;
@@ -110,7 +110,14 @@ module.exports = dalService = {
 
     const userRepo = await getRepository(User);
 
-    let profileObj = JSON.parse(userArgs.profile);
+
+    let profileObj = {};
+    try {
+      profileObj = JSON.parse(userArgs.profile);
+    } catch (error) {
+      profileObj = userArgs.profile;
+      delete profileObj.contentType;
+    }
 
     //update password
     if (profileObj.password !== "_temp_password") {
