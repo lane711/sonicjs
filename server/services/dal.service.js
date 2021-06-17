@@ -19,20 +19,23 @@ module.exports = dalService = {
     let session = await dalService.sessionGet(sessionID);
     // let user = session.user;
 
-    let user = await userRepo.findOne(session.user.id);
-
+    let user = await userRepo.findOne(id);
+    dalService.processContent(user);
+    user.contentTypeId = 'user';
+    user.profile.email = user.username;
+    
     if (id === session.user.id) {
-      user.contentTypeId = 'user';
-      dalService.processContent(user);
-      user.profile.email = user.username;
       return user;
     }
 
     //admins can see all users
     //TODO: get role by name
-    // if (user.roles.includes("admin")) {
-    //   return userRepo.find(id);
-    // }
+    let sessionUser = await userRepo.findOne(session.user.id);
+    dalService.processContent(sessionUser);
+
+    if (sessionUser.profile.roles.includes("admin")) {
+      return user;
+    }
   },
 
   usersGet: async function (user) {
