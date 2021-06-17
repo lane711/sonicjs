@@ -104,8 +104,8 @@ module.exports = userService = {
     return data.user;
   },
 
-  getRoles: async function () {
-    let data = await dataService.getContentByContentType("role");
+  getRoles: async function (sessionID) {
+    let data = await dataService.getContentByContentType("role", sessionID);
 
     return data;
   },
