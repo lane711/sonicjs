@@ -187,7 +187,7 @@ module.exports = contentService = {
           if (section.data.content) {
             //process raw column without rows and columns
             page.data.html += `${section.data.content}`;
-            await this.processShortCodes(page, section, section.data.content, req);
+            await this.processShortCodes(page, section, section.data.content, 0, 0, req);
           } else {
             page.data.html += `<section data-id='${section.id}' class="${section.data.cssClass} jumbotron-fluid">`;
             page.data.html += '<div class="section-overlay">';
