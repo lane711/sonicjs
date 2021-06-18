@@ -52,7 +52,10 @@ if (typeof module !== "undefined" && module.exports) {
         options.page.data.editForm = await exports.getForm(
           options.page.contentTypeId,
           null,
-          "submitContent(submission)"
+          "submitContent(submission)",
+          undefined,
+          undefined,
+          options.req.sessionID
         );
       }
     });

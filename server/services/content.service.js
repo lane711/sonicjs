@@ -18,10 +18,6 @@ const chalk = require("chalk");
 const log = console.log;
 var emitterService = require("./emitter.service");
 
-const apiUrl = "/api/";
-var page;
-var id;
-var req;
 var modulesToDelayProcessing = [];
 
 const NodeCache = require("node-cache");
@@ -43,7 +39,6 @@ module.exports = contentService = {
   },
 
   getRenderedPage: async function (req) {
-    this.req = req;
     // emitterService.emit('getRenderedPagePreDataFetch', req);
 
     let cachedPage = cacheService.getCache().get(req.url);
@@ -71,7 +66,7 @@ module.exports = contentService = {
         //merge data?
       }
 
-      await this.getPage(page.id, page);
+      await this.getPage(page.id, page, req, req.sessionID);
       await emitterService.emit("postProcessPage");
 
       // page.data.html = page.data.html;
@@ -113,12 +108,12 @@ module.exports = contentService = {
     return { page: page };
   },
 
-  getPage: async function (id, page) {
+  getPage: async function (id, page, req, sessionID) {
     if (!id) {
       return;
     }
 
-    await this.processTemplate(page);
+    await this.processTemplate(page, req, sessionID);
 
     return page.data.html;
   },
@@ -147,12 +142,12 @@ module.exports = contentService = {
 
   getPageByUrl: async function (id, instance) {},
 
-  processTemplate: async function (page) {
+  processTemplate: async function (page, req, sessionID) {
     page.data.html = ""; //reset
     // const $ = cheerio.load("");
 
-    await this.processSections(page);
-    await this.processDelayedModules(page);
+    await this.processSections(page, req, req.sessionID);
+    await this.processDelayedModules(page, req);
 
     // return $.html();
   },
@@ -173,7 +168,7 @@ module.exports = contentService = {
     });
   },
 
-  processSections: async function (page) {
+  processSections: async function (page, req, sessionID) {
     await emitterService.emit("preProcessSections", page);
 
     page.data.sections = [];
@@ -187,18 +182,18 @@ module.exports = contentService = {
       let sections = page.data.layout;
 
       await this.asyncForEach(sections, async (sectionId) => {
-        let section = await dataService.getContentById(sectionId);
+        let section = await dataService.getContentById(sectionId, sessionID);
         if (section) {
           if (section.data.content) {
             //process raw column without rows and columns
             page.data.html += `${section.data.content}`;
-            await this.processShortCodes(page, section, section.data.content);
+            await this.processShortCodes(page, section, section.data.content, req);
           } else {
             page.data.html += `<section data-id='${section.id}' class="${section.data.cssClass} jumbotron-fluid">`;
             page.data.html += '<div class="section-overlay">';
             page.data.html += '<div class="container">';
             let rows;
-            rows = await this.processRows(page, section, section.data.rows);
+            rows = await this.processRows(page, section, section.data.rows, req);
             page.data.html += "</div>";
             page.data.html += "</div>";
             page.data.html += `</section>`;
@@ -217,7 +212,7 @@ module.exports = contentService = {
   },
 
   //TODO loop thru rows
-  processRows: async function (page, section, rows) {
+  processRows: async function (page, section, rows, req) {
     let rowArray = [];
     let rowIndex = 0;
 
@@ -227,7 +222,7 @@ module.exports = contentService = {
       for (const row of rows) {
         // console.log(chalk.red(JSON.stringify(row)));
         page.data.html += `<div class='${row.class}''>`;
-        let columns = await this.processColumns(page, section, row, rowIndex);
+        let columns = await this.processColumns(page, section, row, rowIndex, req);
         page.data.html += `</div>`;
 
         rowArray.push(row);
@@ -238,7 +233,7 @@ module.exports = contentService = {
     return rowArray;
   },
 
-  processColumns: async function (page, section, row, rowIndex) {
+  processColumns: async function (page, section, row, rowIndex, req) {
     let columnArray = [];
     let columnIndex = 0;
 
@@ -255,7 +250,8 @@ module.exports = contentService = {
           section,
           column.content,
           rowIndex,
-          columnIndex
+          columnIndex,
+          req
         );
       } else {
         page.data.html += `<span class="empty-column">empty column</spam>`;
@@ -272,7 +268,8 @@ module.exports = contentService = {
     section,
     body,
     rowIndex,
-    columnIndex
+    columnIndex,
+    req
   ) {
     let parsedBlock = ShortcodeTree.parse(body);
 
@@ -292,7 +289,7 @@ module.exports = contentService = {
           await emitterService.emit("beginProcessModuleShortCode", {
             page: page,
             section: section,
-            req: this.req,
+            req: req,
             shortcode: shortcode,
             rowIndex: rowIndex,
             columnIndex: columnIndex,
@@ -318,12 +315,12 @@ module.exports = contentService = {
 
   //loop thru again to support modules that need delayed processing
   //ei: module B needs module A to process first so that it can use the data generated by module A
-  processDelayedModules: async function (page) {
+  processDelayedModules: async function (page, req) {
     for (let shortcode of modulesToDelayProcessing) {
       await emitterService.emit("beginProcessModuleShortCodeDelayed", {
         page: page,
         section: undefined,
-        req: this.req,
+        req: req,
         shortcode: shortcode,
         rowIndex: 0,
         columnIndex: 0,

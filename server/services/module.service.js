@@ -286,7 +286,7 @@ module.exports = moduleService = {
       let viewPath = await this.getModuleViewFile(options.moduleName);
       options.viewModel = viewModel
         ? viewModel
-        : await dataService.getContentById(id);
+        : await dataService.getContentById(id, options.req.sessionID);
 
       await emitterService.emit("postModuleGetData", options);
 
