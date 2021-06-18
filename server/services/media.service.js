@@ -38,10 +38,10 @@ module.exports = mediaService = {
     page.data.jumbotronStyle = jumbotronStyle;
   },
 
-  getMedia: async function () {
+  getMedia: async function (sessionID) {
     let mediaFilesList = fileService.getFilesSync("/server/assets/uploads");
 
-    let mediaRecords = await dataService.getContentByType("media") || [];
+    let mediaRecords = await dataService.getContentByType("media", sessionID) || [];
 
     if (mediaRecords.length !== mediaFilesList.length) {
       for (let index = 0; index < mediaFilesList.length; index++) {
