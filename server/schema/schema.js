@@ -395,6 +395,7 @@ const Mutation = new GraphQLObjectType({
         //GraphQLNonNull make these field required
         username: { type: new GraphQLNonNull(GraphQLString) },
         password: { type: new GraphQLNonNull(GraphQLString) },
+        sessionID: { type: GraphQLString },
       },
       resolve(parent, args) {
         // let now = new Date();
@@ -433,6 +434,7 @@ const Mutation = new GraphQLObjectType({
         profile: {
           type: new GraphQLNonNull(GraphQLString),
         },
+        sessionID: { type: GraphQLString },
       },
       resolve(parent, args, context) {
         let user = args;
@@ -495,6 +497,7 @@ const Mutation = new GraphQLObjectType({
         url: { type: new GraphQLNonNull(GraphQLString) },
         createdByUserId: { type: new GraphQLNonNull(GraphQLID) },
         lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
+        sessionID: { type: GraphQLString },
       },
       resolve(parent, args) {
         let now = new Date();
@@ -514,6 +517,7 @@ const Mutation = new GraphQLObjectType({
       args: {
         ContentId: { type: new GraphQLNonNull(GraphQLString) },
         tagId: { type: new GraphQLNonNull(GraphQLString) },
+        sessionID: { type: GraphQLString },
       },
       resolve(parent, args) {
         //TODO: only add if not already exists
@@ -548,15 +552,15 @@ const Mutation = new GraphQLObjectType({
         data: {
           type: new GraphQLNonNull(GraphQLString),
         },
-        createdByUserId: { type: GraphQLID },
+        sessionID: { type: GraphQLString },
       },
-      resolve(parent, args, req) {
+      async resolve(parent, args, req) {
         let dataObj = JSON.parse(args.data);
         return dalService.contentUpdate(
           "",
           args.url,
           dataObj,
-          req.session.passport.user
+          await getUserSession(args.sessionID, req.sessionID)
         );
         // let userId = (context.session.userSession && context.session.userSession.id)
         //   ? context.session.userSession.id
@@ -586,16 +590,17 @@ const Mutation = new GraphQLObjectType({
         data: {
           type: new GraphQLNonNull(GraphQLString),
         },
+        sessionID: { type: GraphQLString },
         // createdByUserId: { type: new GraphQLNonNull(GraphQLID) },
         // lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
       },
-      resolve(parent, args, req) {
+      async resolve(parent, args, req) {
         let dataObj = JSON.parse(args.data);
         return dalService.contentUpdate(
           args.id,
           args.url,
           dataObj,
-          req.session.passport.user
+          await getUserSession(args.sessionID, req.sessionID)
         );
         // args.data = dataObj;
         // let ContentDoc = Content.findByIdAndUpdate(args.id, {
@@ -625,6 +630,7 @@ const Mutation = new GraphQLObjectType({
         title: { type: new GraphQLNonNull(GraphQLString) },
         systemId: { type: new GraphQLNonNull(GraphQLString) },
         moduleSystemId: { type: new GraphQLNonNull(GraphQLString) },
+        sessionID: { type: GraphQLString },
       },
       resolve(parent, args) {
         return moduleService.createModuleContentType(args);
@@ -640,6 +646,7 @@ const Mutation = new GraphQLObjectType({
         filePath: { type: GraphQLString },
         permissions: { type: new GraphQLNonNull(GraphQLString) },
         data: { type: new GraphQLNonNull(GraphQLString) },
+        sessionID: { type: GraphQLString },
         // data: {
         //   type: new GraphQLNonNull(GraphQLJSONObject),
         // },
@@ -663,6 +670,7 @@ const Mutation = new GraphQLObjectType({
       type: ContentTypeType,
       args: {
         systemId: { type: new GraphQLNonNull(GraphQLString) },
+        sessionID: { type: GraphQLString },
       },
       resolve(parent, args) {
         moduleService.deleteModuleContentType(args.systemId).then((data) => {
@@ -677,6 +685,7 @@ const Mutation = new GraphQLObjectType({
       args: {
         filePath: { type: new GraphQLNonNull(GraphQLString) },
         fileContent: { type: new GraphQLNonNull(GraphQLString) },
+        sessionID: { type: GraphQLString },
       },
       resolve(parent, args) {
         fileService.writeFile(args.filePath, args.fileContent);
@@ -690,6 +699,7 @@ const Mutation = new GraphQLObjectType({
       args: {
         filePath: { type: new GraphQLNonNull(GraphQLString) },
         fileContent: { type: new GraphQLNonNull(GraphQLString) },
+        sessionID: { type: GraphQLString },
       },
       resolve(parent, args) {
         fileService.writeFile(args.filePath, args.fileContent);
@@ -706,6 +716,7 @@ const Mutation = new GraphQLObjectType({
         enabled: { type: new GraphQLNonNull(GraphQLBoolean) },
         systemId: { type: new GraphQLNonNull(GraphQLString) },
         canBeAddedToColumn: { type: new GraphQLNonNull(GraphQLBoolean) },
+        sessionID: { type: GraphQLString },
       },
       resolve(parent, args) {
         return moduleService.createModule(args);
@@ -716,6 +727,7 @@ const Mutation = new GraphQLObjectType({
       type: ModuleType,
       args: {
         systemId: { type: new GraphQLNonNull(GraphQLString) },
+        sessionID: { type: GraphQLString },
       },
       resolve(parent, args) {
         return moduleService.deleteModule(args.systemId);
@@ -730,6 +742,7 @@ const Mutation = new GraphQLObjectType({
         systemId: { type: new GraphQLNonNull(GraphQLString) },
         canBeAddedToColumn: { type: new GraphQLNonNull(GraphQLBoolean) },
         singleInstance: { type: new GraphQLNonNull(GraphQLBoolean) },
+        sessionID: { type: GraphQLString },
       },
       resolve(parent, args) {
         return moduleService.updateModule(args);

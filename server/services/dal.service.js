@@ -202,10 +202,10 @@ module.exports = dalService = {
     if(!id){
       //upsert
       content.contentTypeId = data.contentType;
-      content.createdByUserId = userSession.id;
+      content.createdByUserId = userSession.user.id;
       content.createdOn = new Date();
     }
-    content.lastUpdatedByUserId = userSession.id;
+    content.lastUpdatedByUserId = userSession.user.id;
     content.updatedOn = new Date();
     content.tags = [];
     content.data = JSON.stringify(data);

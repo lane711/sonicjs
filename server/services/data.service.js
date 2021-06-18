@@ -521,7 +521,6 @@ if (typeof module !== "undefined" && module.exports) {
         contentCreate( 
           contentTypeId:"${payload.data.contentType}", 
           url:"${payload.data.url}", 
-          createdByUserId:"5fd834ec29f419535f049803"
           data:"""${JSON.stringify(payload.data)}""",
           sessionID:"${sessionID}"){
             id
