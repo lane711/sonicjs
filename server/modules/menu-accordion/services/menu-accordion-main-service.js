@@ -24,7 +24,7 @@ module.exports = menuAccordionMainService = {
             if (options.shortcode.name === 'MENU-ACCORDION') {
       
                 let menuToDisplay = options.viewModel.data.menuTitle;
-                let menuData = await menuService.getMenu(menuToDisplay);
+                let menuData = await menuService.getMenu(menuToDisplay, options.req.sessionID);
                 options.viewModel.data.menuData = menuData;
 
             }
