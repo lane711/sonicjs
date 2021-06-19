@@ -22,11 +22,11 @@ module.exports = blogMainService = {
 
   getBlogData: async function (options) {
     let id = options.shortcode.properties.id;
-    let moduleData = await dataService.getContentById(id);
+    let moduleData = await dataService.getContentById(id, options.req.sessionID);
     let contentType = "blog";
     let viewModel = moduleData;
 
-    let listRaw = await dataService.getContentByType(contentType);
+    let listRaw = await dataService.getContentByType(contentType, options.req.sessionID);
 
     listRaw = listRaw.filter((x) => x.data.title);
     let list = listRaw.map(function (record) {

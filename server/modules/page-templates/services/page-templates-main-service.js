@@ -44,7 +44,8 @@ module.exports = pageTemplatesMainService = {
               "s0",
               body[0].shortCodes,
               0,
-              0
+              0,
+              options.req
             );
 
             // var processedHtml ={
@@ -79,14 +80,15 @@ module.exports = pageTemplatesMainService = {
 
     });
 
-    emitterService.on("preProcessSections", async function (page) {
+    emitterService.on("preProcessSections", async function (options) {
       // check is page is using a template
-      if (page.data.pageTemplate && page.data.pageTemplate !== "none") {
+      if (options.page.data.pageTemplate && options.page.data.pageTemplate !== "none") {
         let templatePage = await dataService.getContentById(
-          page.data.pageTemplate
+          options.page.data.pageTemplate,
+          options.req.sessionID
         );
         if(templatePage){
-          page.data.layout = templatePage.data.layout;
+          options.page.data.layout = templatePage.data.layout;
         }
       }
 
