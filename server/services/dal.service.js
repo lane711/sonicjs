@@ -223,8 +223,16 @@ module.exports = dalService = {
     if (sessionID) {
       let session = await sessionRepo.findOne(sessionID);
       session.user = JSON.parse(session.json);
-      let userSession = session.user.passport;
+      let userSession = {};
+
+      if(session.user.passport){
+        userSession = session.user.passport;
+        userSession.isAuthenticated = true;
+      } else{
+        userSession.isAuthenticated = false;
+      }
       userSession.sessionID = sessionID;
+
       return userSession;
     }
   },
