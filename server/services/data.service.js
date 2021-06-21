@@ -349,7 +349,11 @@ if (typeof module !== "undefined" && module.exports) {
     }),
     (exports.getContentTopOne = async function (contentType, sessionID) {
       let results = await this.getContentByType(contentType, sessionID);
-      return results[0];
+      if (results) {
+        return results[0];
+      }else{
+        throw new Error(`Could not find element getContentTopOne: ${contentType}, ${sessionID}`);
+      }
     }),
     (exports.getContentByUrl = async function (url, sessionID) {
       // var filter = encodeURI(`{"where":{"data.url":"${url}"}}`);
@@ -440,7 +444,11 @@ if (typeof module !== "undefined" && module.exports) {
         return contentByTitle;
       }
     }),
-    (exports.getContentByContentTypeAndTag = async function (contentType, tag, sessionID) {
+    (exports.getContentByContentTypeAndTag = async function (
+      contentType,
+      tag,
+      sessionID
+    ) {
       let allOfContentType = await this.getContentByContentType(contentType);
       if (allOfContentType) {
         let contentByTag = allOfContentType.filter((x) => x.data.tags === tag);
@@ -502,7 +510,11 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.contentUpdate;
     }),
-    (exports.contentCreate = async function (payload, autoGenerateUrl = true, sessionID) {
+    (exports.contentCreate = async function (
+      payload,
+      autoGenerateUrl = true,
+      sessionID
+    ) {
       if (
         payload.data.contentType !== "page" &&
         payload.data.contentType !== "blog"
@@ -648,7 +660,12 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.fileUpdate;
     }),
-    (exports.getView = async function (contentType, viewModel, viewPath, sessionID) {
+    (exports.getView = async function (
+      contentType,
+      viewModel,
+      viewPath,
+      sessionID
+    ) {
       let result = await this.getAxios().post(apiUrl, {
         query: `
         {
