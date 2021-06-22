@@ -617,9 +617,14 @@ const Mutation = new GraphQLObjectType({
       type: ContentType,
       args: {
         id: { type: new GraphQLNonNull(GraphQLString) },
+        sessionID: { type: GraphQLString },
       },
-      resolve(parent, args) {
-        return Content.findByIdAndDelete(args.id);
+      async resolve(parent, args) {
+        return dalService.contentDelete(
+          args.id, 
+          await getUserSession(args.sessionID, undefined)
+          )
+        // return Content.findByIdAndDelete(args.id);
       },
     },
 

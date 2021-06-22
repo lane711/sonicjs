@@ -276,6 +276,9 @@ module.exports = adminService = {
         //   ip: ip,
         // });
 
+        //add session ID
+        data.sessionID = req.sessionID;
+
         res.render(`admin/shared-views/${viewName}`, {
           layout: `admin/${adminTheme}/${adminTheme}`,
           data: data,

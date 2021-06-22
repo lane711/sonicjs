@@ -711,9 +711,9 @@ async function editContentType(payload) {
   dataService.contentTypeUpdate(payload);
 }
 
-async function deleteContentInstance(id) {
+async function deleteContentInstance(id, sessionID) {
   // debugger;
-  dataService.contentDelete(id);
+  dataService.contentDelete(id, sessionID);
 }
 
 async function deleteContentType(id) {
@@ -1115,7 +1115,7 @@ function setupJsonRawSave() {
     if (rawData.contentType !== "user") {
       json = { data: rawData };
       json.data.id = contentId;
-      refresh = false;
+      // refresh = false;
     }
 
     submitContent(json, refresh, json.contentType);

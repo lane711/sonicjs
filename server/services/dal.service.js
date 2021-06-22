@@ -21,9 +21,9 @@ module.exports = dalService = {
 
     let user = await userRepo.findOne(id);
     dalService.processContent(user);
-    user.contentTypeId = 'user';
+    user.contentTypeId = "user";
     user.profile.email = user.username;
-    
+
     if (id === session.user.id) {
       return user;
     }
@@ -43,12 +43,12 @@ module.exports = dalService = {
 
     let users = await userRepo.find();
 
-    if(users){
-      users.forEach(user =>{
-        user.contentTypeId = 'user';
-      })
+    if (users) {
+      users.forEach((user) => {
+        user.contentTypeId = "user";
+      });
     }
-    dalService.processContents(users)
+    dalService.processContents(users);
     return users;
 
     //admins can see all users
@@ -65,9 +65,12 @@ module.exports = dalService = {
       where: [{ username: email }],
     });
 
-    if(userByEmail){
-      let passwordHash = await dalService.hashPassword(password, userByEmail.salt);
-      if(passwordHash.hash === userByEmail.hash){
+    if (userByEmail) {
+      let passwordHash = await dalService.hashPassword(
+        password,
+        userByEmail.salt
+      );
+      if (passwordHash.hash === userByEmail.hash) {
         userByEmail.profile = JSON.parse(userByEmail.profile);
         //no longer need salt and hash on object
         delete userByEmail.hash;
@@ -109,10 +112,8 @@ module.exports = dalService = {
     // }
   },
 
-  userUpdate: async function(userArgs, userSession){
-
+  userUpdate: async function (userArgs, userSession) {
     const userRepo = await getRepository(User);
-
 
     let profileObj = {};
     try {
@@ -197,9 +198,9 @@ module.exports = dalService = {
 
   contentUpdate: async function (id, url, data, userSession) {
     const contentRepo = await getRepository(Content);
-    let content = await contentRepo.findOne({ where: { id: id } }) ?? {};
+    let content = (await contentRepo.findOne({ where: { id: id } })) ?? {};
     content.url = url;
-    if(!id){
+    if (!id) {
       //upsert
       content.contentTypeId = data.contentType;
       content.createdByUserId = userSession.user.id;
@@ -210,6 +211,13 @@ module.exports = dalService = {
     content.tags = [];
     content.data = JSON.stringify(data);
     return contentRepo.save(content);
+  },
+
+  contentDelete: async function (id, userSession) {
+    const contentRepo = await getRepository(Content);
+    if (userSession.user.profile.roles.includes("admin")) {
+      return contentRepo.delete(id);
+    }
   },
 
   tagsGet: async function () {
@@ -225,10 +233,10 @@ module.exports = dalService = {
       session.user = JSON.parse(session.json);
       let userSession = {};
 
-      if(session.user.passport){
+      if (session.user.passport) {
         userSession = session.user.passport;
         userSession.isAuthenticated = true;
-      } else{
+      } else {
         userSession.isAuthenticated = false;
       }
       userSession.sessionID = sessionID;
@@ -297,7 +305,7 @@ module.exports = dalService = {
   },
 
   hashPassword: async function (password, salt = undefined) {
-    if(!salt){
+    if (!salt) {
       var salt = crypto.randomBytes(128).toString("base64");
     }
 
