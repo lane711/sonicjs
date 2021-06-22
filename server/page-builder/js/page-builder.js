@@ -17,8 +17,10 @@ var imageList,
   jsonEditor,
   ShortcodeTree,
   jsonEditorRaw;
+  sessionID
 
 $(document).ready(async function () {
+  setupSessionID();
   await setupAxiosInstance();
   setupUIHovers();
   setupUIClicks();
@@ -36,6 +38,10 @@ $(document).ready(async function () {
   setupSidePanel();
   setupAdminMenuMinimizer();
 });
+
+function setupSessionID(){
+  sessionID = $('#sessionID').val();
+}
 
 async function setupAxiosInstance() {
   let baseUrl = window.location.protocol + "//" + window.location.host + "/";
@@ -707,8 +713,8 @@ async function editInstanceUser(payload, refresh, contentType = "content") {
   //   });
 }
 
-async function editContentType(payload) {
-  dataService.contentTypeUpdate(payload);
+async function editContentType(payload, sessionID) {
+  dataService.contentTypeUpdate(payload, sessionID);
 }
 
 async function deleteContentInstance(id, sessionID) {
@@ -940,7 +946,7 @@ async function onContentTypeSave() {
     if (!contentType.id) {
       contentType.id = $("#createContentTypeForm #id").val();
     }
-    await editContentType(contentType);
+    await editContentType(contentType, sessionID);
   }
 }
 
@@ -948,7 +954,7 @@ async function onContentTypeRawSave() {
   // debugger;
   var contentType = jsonEditorRaw.get();
   console.log("jsonEditor", contentType);
-  await editContentType(contentType);
+  await editContentType(contentType, sessionID);
   fullPageUpdate();
 
   // if (contentTypeComponents) {

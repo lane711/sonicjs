@@ -106,7 +106,7 @@ describe("Admin Content Types", function () {
   });
 
 
-  it.only("Content type edit raw data", function () {
+  it("Content type edit raw data", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/modules`);
 
     cy.contains("AA Cypress Module Content Type").click();
@@ -126,8 +126,9 @@ describe("Admin Content Types", function () {
     cy.get(".jsoneditor-text")
       .invoke("val")
       .then((rawText) => {
-        cy.log('BEFORE json from field ----->', JSON.stringify(json));
         let json = JSON.parse(rawText);
+        cy.log('BEFORE json from field ----->', JSON.stringify(json));
+
         json.title = "AA Cypress Module Content Type RAW EDIT";
         cy.log('AFTER json from field ----->', JSON.stringify(json));
         cy.get(".jsoneditor-text").clear();

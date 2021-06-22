@@ -315,20 +315,21 @@ if (typeof module !== "undefined" && module.exports) {
       let components = JSON.stringify(contentType.data);
       let permissions = JSON.stringify(contentType.permissions);
 
-      let result = await this.getAxios().post(apiUrl, {
-        query: `
-        mutation{
-          contentTypeUpdate( 
-            title:"${contentType.title}", 
-            moduleSystemId:"${contentType.moduleSystemId}", 
-            systemId:"${contentType.systemId}", 
-            permissions:"""${permissions}""",
-            data:"""${components}""",
-            sessionID:"${sessionID}"){
-              title
-          }
+      let query = `
+      mutation{
+        contentTypeUpdate( 
+          title:"${contentType.title}", 
+          moduleSystemId:"${contentType.moduleSystemId}", 
+          systemId:"${contentType.systemId}", 
+          permissions:"""${permissions}""",
+          data:"""${components}""",
+          sessionID:"${sessionID}"){
+            title
         }
-            `,
+      }
+          `
+      let result = await this.getAxios().post(apiUrl, {
+        query: query
       });
 
       return result.data.data.contentType;
