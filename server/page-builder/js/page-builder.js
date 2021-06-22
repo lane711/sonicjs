@@ -730,17 +730,8 @@ async function deleteContentType(id) {
     });
 }
 
-async function deleteUser(id) {
-  console.log("deleting user", id);
-  // return this.http.put(environment.apiUrl + `content/${id}`, payload).toPromise();
-  axiosInstance
-    .delete(`/api/user/${id}`)
-    .then(async function (response) {
-      console.log(response);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+async function userDelete(id, sessionID) {
+  dataService.userDelete(id, sessionID);
 }
 
 function processContentFields(payload) {

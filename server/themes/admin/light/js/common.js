@@ -16,7 +16,7 @@ $(document).ready(async function () {
         var sessionID = getPathParts(this.href, 0);
 
         if (idToDelete) {
-          // debugger;
+          debugger;
           if (typeToDelete == "content") {
             await deleteContentInstance(idToDelete, sessionID);
             location.reload();
@@ -28,7 +28,7 @@ $(document).ready(async function () {
           }
 
           if (typeToDelete == "user") {
-            await deleteUser(idToDelete, sessionID);
+            await userDelete(idToDelete, sessionID);
             location.reload();
           }
 

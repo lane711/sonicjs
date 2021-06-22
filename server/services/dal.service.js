@@ -149,6 +149,13 @@ module.exports = dalService = {
     userRepo.save(userRecord);
   },
 
+  userDelete: async function (id, userSession) {
+    const userRepo = await getRepository(User);
+    if (userSession.user.profile.roles.includes("admin")) {
+      return userRepo.delete(id);
+    }
+  },
+
   contentGet: async function (
     id,
     contentTypeId,

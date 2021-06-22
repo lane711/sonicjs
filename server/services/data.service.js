@@ -125,6 +125,26 @@ if (typeof module !== "undefined" && module.exports) {
 
     return result.data;
   }),
+
+  (exports.userDelete = async function (id, sessionID) {
+    debugger;
+    let query = `
+      mutation{
+        userDelete( 
+          id:"${id}",
+          sessionID:"${sessionID}"){
+            id
+          }
+      }
+          `;
+
+    let result = await this.getAxios().post(apiUrl, {
+      query: query,
+    });
+
+    return result.data.data.userDelete;
+  }),
+
     (exports.rolesGet = async function (sessionID) {
       let result = await this.getAxios().post(apiUrl, {
         query: `
