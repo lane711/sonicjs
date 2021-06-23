@@ -18,7 +18,7 @@ describe("Smoke Testing", function () {
 
     cy.SonicJs.adminPageVerify('./admin/media', 'New Media');
 
-    cy.SonicJs.adminPageVerify('./admin/field-types', 'New Field Type');
+    // cy.SonicJs.adminPageVerify('./admin/field-types', 'New Field Type');
 
     cy.SonicJs.adminPageVerify('./admin/content-types', 'New Content Type');
 
