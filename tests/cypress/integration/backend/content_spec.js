@@ -28,32 +28,32 @@ describe("Admin Content", function () {
 
   });
 
-  // it("Content edit", function () {
+  it("Content edit", function () {
 
-  //   cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content`);
-  //   cy.get('input[type="search"]').type('Cypress Test Page');
-  //   cy.contains('Cypress Test Page').click();
-  //   cy.get('input[name="data[title]"]').type(' EDITED');
-  //   cy.get('input[name="data[heroTitle]"]').type(' EDITED');
-  //   cy.contains('Submit').click();
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content`);
+    cy.get('input[type="search"]').type('Cypress Test Page');
+    cy.contains('Cypress Test Page').click();
+    cy.get('input[name="data[title]"]').type(' EDITED');
+    cy.get('input[name="data[heroTitle]"]').type(' EDITED');
+    cy.contains('Submit').click();
 
-  //   cy.visit(`${cy.SonicJs.getBaseUrl()}/cypress-test-page-edited`);
-  //   cy.contains('Cypress Hero EDITED');
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/cypress-test-page-edited`);
+    cy.contains('Cypress Hero EDITED');
 
-  // });
+  });
 
-  // it("Content delete", function () {
+  it("Content delete", function () {
 
-  //   cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content`);
-  //   cy.get('input[type="search"]').type('Cypress Test Page');
-  //   cy.contains('Delete').first().click();
-  //   cy.wait(1000);
-  //   cy.contains('Confirm Delete').click();
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content`);
+    cy.get('input[type="search"]').type('Cypress Test Page');
+    cy.contains('Delete').first().click();
+    cy.wait(1000);
+    cy.contains('Confirm Delete').click();
 
-  //   cy.url().should('include', '/admin/content');
-  //   cy.contains('Cypress Test Page').should('not.exist');
+    cy.url().should('include', '/admin/content');
+    cy.contains('Cypress Test Page').should('not.exist');
 
-  // });
+  });
 
 });
 

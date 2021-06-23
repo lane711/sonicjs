@@ -16,8 +16,8 @@ var imageList,
   currentModuleContentType,
   jsonEditor,
   ShortcodeTree,
-  jsonEditorRaw;
-  sessionID
+  jsonEditorRaw,
+  sessionID;
 
 $(document).ready(async function () {
   setupSessionID();
@@ -588,7 +588,7 @@ async function createInstance(
   // debugger;
   let entity = await dataService.contentCreate(payload);
 
-  if (entity.contentTypeId === "page") {
+  if (entity && entity.contentTypeId === "page") {
     let isBackEnd = globalService.isBackEnd();
     if (isBackEnd) {
       window.location.href = `/admin/content/edit/page/${entity.id}`;
