@@ -78,7 +78,7 @@
 - Express
 - GraphQL
 - Bootstrap 4
-- MongoDB
+- Databases Supported: MySQL, PostgreSQL, SQLite (local file based database), MariaDB, Microsoft SQL Server, Oracle, WebSQL, MongoDB, CockroachDB, SAP Hana, sql.js, and others.
 
 
 ### Why SonicJs?
