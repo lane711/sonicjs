@@ -3,13 +3,6 @@ assets:
   js:
     - /assets/js/startup.js
     - /node_modules/js-cookie/src/js.cookie.js
-    - /themes/front-end/{{frontEndTheme}}/js/01.cookie-consent-util.js
-    - /themes/front-end/{{frontEndTheme}}/js/02.1.cookie-consent-themes.js
-    - /themes/front-end/{{frontEndTheme}}/js/02.2.cookie-consent-custom-css.js
-    - /themes/front-end/{{frontEndTheme}}/js/02.3.cookie-consent-informational.js
-    - /themes/front-end/{{frontEndTheme}}/js/02.4.cookie-consent-opt-out.js
-    - /themes/front-end/{{frontEndTheme}}/js/02.5.cookie-consent-opt-in.js
-    - /themes/front-end/{{frontEndTheme}}/js/02.6.cookie-consent-location.js
     - /themes/front-end/{{frontEndTheme}}/js/card.js
     - /themes/front-end/{{frontEndTheme}}/js/counterup2.js
     - /themes/front-end/{{frontEndTheme}}/js/index.js
@@ -22,14 +15,11 @@ assets:
     - /themes/front-end/{{frontEndTheme}}/js/jquery.js
     - /themes/front-end/{{frontEndTheme}}/js/jquery.easing.min.js
     - /themes/front-end/{{frontEndTheme}}/js/jquery.validate.js
-    - /themes/front-end/{{frontEndTheme}}/js/jquery.smartWizard.js
     - /themes/front-end/{{frontEndTheme}}/js/plugins/jquery.animatebar.js
     - /themes/front-end/{{frontEndTheme}}/js/feather.min.js
     - /themes/front-end/{{frontEndTheme}}/js/bootstrap.js
     - /themes/front-end/{{frontEndTheme}}/js/aos.js
     - /themes/front-end/{{frontEndTheme}}/js/typed.js
-    - /themes/front-end/{{frontEndTheme}}/js/jquery.magnific-popup.js
-    - /themes/front-end/{{frontEndTheme}}/js/cookieconsent.min.js
     - /themes/front-end/{{frontEndTheme}}/js/common-script.js
     - /themes/front-end/{{frontEndTheme}}/js/forms.js
     - /themes/front-end/{{frontEndTheme}}/js/stripe-bubbles.js
@@ -47,6 +37,7 @@ assets:
     - /node_modules/formiojs/dist/formio.full.min.js
     - /node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.js
     - /node_modules/dropzone/dist/min/dropzone.min.js
+    - /node_modules/prismjs/prism.js
     - /assets/js/common.js
     - /services/shared.service.js
     - /services/global.service.js
@@ -66,4 +57,5 @@ assets:
     - /node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css
     - /node_modules/formiojs/dist/formio.form.min.css
     - /node_modules/jsoneditor/dist/jsoneditor.min.css
+    - /node_modules/prismjs/themes/prism-coy.css
     - /assets/css/common.css
