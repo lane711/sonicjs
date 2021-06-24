@@ -28,7 +28,6 @@ var authService = require("../services/auth.service");
 var dalService = require("../services/dal.service");
 var backupService = require("../services/backup.service");
 
-
 var helperService = require("../services/helper.service");
 var sharedService = require("../services/shared.service");
 var breadcrumbsService = require("../services/breadcrumbs.service");
@@ -42,6 +41,7 @@ var cors = require("cors");
 const chalk = require("chalk");
 const log = console.log;
 const url = require("url");
+var pageLoadedCount = 0;
 // var admin = require(__dirname + "/admin");
 
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
@@ -71,7 +71,6 @@ exports.loadRoutes = async function (app) {
     await assetService.startup();
     await pageBuilderService.startup(app);
     await pageBuilderService.startup(app);
-
 
     await emitterService.emit("startup");
   })();
@@ -212,7 +211,6 @@ exports.loadRoutes = async function (app) {
     });
   });
 
-
   app.get("/hbs", async function (req, res) {
     res.render("home");
   });
@@ -233,7 +231,10 @@ exports.loadRoutes = async function (app) {
 
   app.get("/form/*", async function (req, res) {
     let moduleSystemId = req.path.replace("/form/", "");
-    let contentType = await dataService.contentTypeGet(moduleSystemId, req.sessionID);
+    let contentType = await dataService.contentTypeGet(
+      moduleSystemId,
+      req.sessionID
+    );
     let form = await formService.getFormJson(contentType, req.sessionID);
     res.send(form);
   });
@@ -299,10 +300,10 @@ exports.loadRoutes = async function (app) {
     // if(!payload.data && payload.contentType){
     //   payload.data = {contentType : payload.contentType};
     // }
-    let options = { data: payload, sessionID: req.sessionID}
-    
+    let options = { data: payload, sessionID: req.sessionID };
+
     await emitterService.emit("afterFormSubmit", options);
-    
+
     res.sendStatus(200);
   });
 
@@ -319,7 +320,6 @@ exports.loadRoutes = async function (app) {
   });
 
   app.get("*", async function (req, res, next) {
-
     await emitterService.emit("requestBegin", { req: req, res: res });
 
     if (req.isRequestAlreadyHandled) {
@@ -383,6 +383,18 @@ exports.loadRoutes = async function (app) {
       console.log(`serving: ${req.url}`);
     }
 
+    //ensure session exists if app just starting up
+    pageLoadedCount++;
+    console.log("pageLoadedCount:", pageLoadedCount);
+    if (pageLoadedCount < 10) {
+      let session = await dalService.sessionGet(req.sessionID);
+      if (!session) {
+        res.redirect("/");
+        return;
+      }
+    }
+
+
     let isAuthenticated = await userService.isAuthenticated(req);
     globalService.setAreaMode(false, true, isAuthenticated);
     var { page } = await contentService.getRenderedPage(req);
@@ -405,7 +417,6 @@ exports.loadRoutes = async function (app) {
 
     page.data.id = page.id;
     page.data.sessionID = req.sessionID;
-
 
     res.render(`front-end/${frontEndTheme}/layouts/main`, {
       layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
