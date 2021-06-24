@@ -105,17 +105,16 @@ There are thousands of CMS out there and several already built on the modern JAM
 
 ### Pre-requisites
 
-You will need NodeJs installed and access to a MongoDB database. Its recommended that you setup MongoDB locally as it will run very fast, but you can also sign up for a free MongoDB database at Mlab: https://mlab.com/
+You will need NodeJs installed. VS Code IDE is recommended, but any IDE that support Javascript development will work.
 
 ### Setup Steps
 
-Assuming that you have a MongoDB database ready to go, setup takes < 2 minutes.
+Setup takes < 2 minutes.
 
 Follow these steps and you should be good to go:
 
 1. Clone the repo: `git clone https://github.com/lane711/sonicjs.git`
 1. Change to created folder `cd sonicjs`
-1. Validate the `MONGODB_URL` value the .env-default file (located in the root directory) 
 1. Install the dependencies: `npm install`
 1. Run it with: `npm start`
 
