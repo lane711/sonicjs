@@ -404,6 +404,8 @@ exports.loadRoutes = async function (app) {
     await emitterService.emit("preRenderTemplate", (options = { page, req }));
 
     page.data.id = page.id;
+    page.data.sessionID = req.sessionID;
+
 
     res.render(`front-end/${frontEndTheme}/layouts/main`, {
       layout: `front-end/${frontEndTheme}/${frontEndTheme}`,

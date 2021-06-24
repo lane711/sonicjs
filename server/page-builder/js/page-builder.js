@@ -17,10 +17,12 @@ var imageList,
   jsonEditor,
   ShortcodeTree,
   jsonEditorRaw,
-  sessionID;
+  sessionID,
+  theme;
 
 $(document).ready(async function () {
   setupSessionID();
+  setupThemeID();
   await setupAxiosInstance();
   setupUIHovers();
   setupUIClicks();
@@ -41,6 +43,10 @@ $(document).ready(async function () {
 
 function setupSessionID(){
   sessionID = $('#sessionID').val();
+}
+
+function setupThemeID(){
+  theme = $('#theme').val();
 }
 
 async function setupAxiosInstance() {
@@ -1518,7 +1524,7 @@ async function writeFile(container, file) {
 }
 
 async function setupACEEditor() {
-  return;
+
   if ($("#editor").length === 0) {
     return;
   }
@@ -1555,12 +1561,14 @@ async function setupACEEditor() {
   }
 
   $("#save-global-css").click(async function () {
+    debugger;
     let cssContent = editor.getSession().getValue();
 
     // let file = new File([cssContent], "template.css", { type: "text/css" });
     await dataService.fileUpdate(
-      "/server/themes/front-end/bootstrap/css/template.css",
-      cssContent
+      `/server/themes/front-end/${theme}/css/template.css`,
+      cssContent,
+      sessionID
     );
 
     // writeFile("css", file);

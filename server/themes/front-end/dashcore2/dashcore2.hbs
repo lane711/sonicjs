@@ -51,9 +51,11 @@
     {{/if}}
 
     <main>
-        
-      {{{body}}}
 
+      <input id="theme" type="hidden" value="dashcore2"/>
+      <input id="sessionID" type="hidden" value="{{data.sessionID}}"/>
+      
+      {{{body}}}
 
       <!-- ./Footer - Four Columns -->
       <footer class="site-footer section">
