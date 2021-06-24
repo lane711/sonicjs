@@ -27,7 +27,7 @@ module.exports = pageBuilderService = {
 
 
     app.get("/api/page-templates", async function (req, res) {
-      let data = await dataService.getPageTemplates();
+      let data = await dataService.getPageTemplates(req.sessionID);
       console.log(data);
       res.json(data);
     });
@@ -38,7 +38,7 @@ module.exports = pageBuilderService = {
       // console.log(data);
 
       if (data.isPageUsingTemplate && data.pageTemplateRegion) {
-        let page = await dataService.getContentById(data.pageId);
+        let page = await dataService.getContentById(data.pageId, req.sessionID);
 
         let region = page.data.pageTemplateRegions.filter(
           (r) => r.regionId === data.pageTemplateRegion
@@ -58,9 +58,9 @@ module.exports = pageBuilderService = {
           region.shortCodes = newRegionShortCodes;
         }
 
-        await dataService.editInstance(page);
+        await dataService.editInstance(page, req.sessionID);
       } else {
-        let section = await dataService.getContentById(data.sectionId);
+        let section = await dataService.getContentById(data.sectionId, req.sessionID);
         let content =
           section.data.rows[data.rowIndex].columns[data.columnIndex].content;
         // console.log("content", content);
@@ -80,13 +80,14 @@ module.exports = pageBuilderService = {
             data.columnIndex
           ].content = newContent;
           // console.log("newContent", newContent);
-          await dataService.editInstance(section);
+          await dataService.editInstance(section, req.sessionID);
         }
       }
 
       if (data.deleteContent) {
         await dataService.contentDelete(
-          shortCodeToRemove.shortcode.properties.id
+          shortCodeToRemove.shortcode.properties.id,
+          req.sessionID
         );
       }
 
@@ -117,7 +118,7 @@ module.exports = pageBuilderService = {
       console.log(data);
 
       if (data.isPageUsingTemplate && data.sourcePageTemplateRegion) {
-        let page = await dataService.getContentById(data.pageId);
+        let page = await dataService.getContentById(data.pageId, req.sessionID);
 
         let updatedDestinationContent = sharedService.generateShortCodeList(
           data.destinationModules
@@ -155,10 +156,11 @@ module.exports = pageBuilderService = {
           );
         }
 
-        await dataService.editInstance(page);
+        await dataService.editInstance(page, req.sessionID);
       } else {
         let sourceSection = await dataService.getContentById(
-          data.sourceSectionId
+          data.sourceSectionId,
+          req.sessionID
         );
         let content =
           sourceSection.data.rows[data.sourceRowIndex].columns[
@@ -181,12 +183,13 @@ module.exports = pageBuilderService = {
             data.sourceColumnIndex
           ].content = newContent;
           // console.log("newContent", newContent);
-          await dataService.editInstance(sourceSection);
+          await dataService.editInstance(sourceSection, req.sessionID);
         }
 
         //regen the destination
         let destinationSection = await dataService.getContentById(
-          data.destinationSectionId
+          data.destinationSectionId,
+          req.sessionID
         );
 
         let updatedDestinationContent = sharedService.generateShortCodeList(
@@ -197,7 +200,7 @@ module.exports = pageBuilderService = {
           data.destinationColumnIndex
         ].content = updatedDestinationContent;
 
-        let r = await dataService.editInstance(destinationSection);
+        let r = await dataService.editInstance(destinationSection, req.sessionID);
       }
       res.send(`ok`);
     });
@@ -206,13 +209,13 @@ module.exports = pageBuilderService = {
       let data = req.body.data;
       console.log(data);
 
-      let section = await dataService.getContentById(data.sectionId);
+      let section = await dataService.getContentById(data.sectionId, req.sessionID);
       let content =
         section.data.rows[data.rowIndex].columns[data.columnIndex].content;
       console.log("content", content);
 
       //copy module
-      let moduleToCopy = await dataService.getContentById(data.moduleId);
+      let moduleToCopy = await dataService.getContentById(data.moduleId, req.sessionID);
       let newModule = await dataService.contentCreate(moduleToCopy);
 
       let sectionColumn =
@@ -245,7 +248,7 @@ module.exports = pageBuilderService = {
         data.columnIndex
       ].content = newShortCodeContent;
 
-      let result = await dataService.editInstance(section);
+      let result = await dataService.editInstance(section, req.sessionID);
 
       res.send(`ok`);
       // // return;

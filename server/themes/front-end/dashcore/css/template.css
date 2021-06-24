@@ -42,3 +42,8 @@ background-size: cover
 .sub-tagline {
 font-size: .98rem
 }
+
+.clip-hero{
+    height: 92px;
+    overflow: hidden;
+}

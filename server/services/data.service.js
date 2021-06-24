@@ -495,7 +495,7 @@ if (typeof module !== "undefined" && module.exports) {
       }
       return "not found";
     }),
-    (exports.editInstance = async function (payload) {
+    (exports.editInstance = async function (payload, sessionID) {
       let id = payload.id;
       // console.log('putting payload', payload);
       if (payload.id) {
@@ -518,7 +518,8 @@ if (typeof module !== "undefined" && module.exports) {
         contentUpdate( 
           id:"${id}", 
           url:"${data.url}", 
-          data:"""${dataString}"""){
+          data:"""${dataString}""",
+          sessionID:"${sessionID}"){
             id
             url
             contentTypeId
