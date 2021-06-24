@@ -20,7 +20,7 @@ module.exports = bodyTextShortcodesMainService = {
                         if(!id) continue;
                         let contentType = bodyBlock.shortcode.name.toLowerCase();
                         let viewPath = await moduleService.getModuleViewFile(contentType);
-                        let viewModel = await dataService.getContentById(id);
+                        let viewModel = await dataService.getContentById(id, options.req.sessionID);
                   
                         var processedHtml = {
                           id: id,
