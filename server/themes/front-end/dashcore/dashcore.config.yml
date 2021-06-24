@@ -61,7 +61,6 @@ assets:
     - /themes/front-end/{{frontEndTheme}}/css/template-processed.css
     - /themes/front-end/{{frontEndTheme}}/css/all.css
     - /themes/front-end/{{frontEndTheme}}/css/aos.css
-    - /themes/front-end/{{frontEndTheme}}/css/cookieconsent.min.css
     - /themes/front-end/{{frontEndTheme}}/css/magnific-popup.css
     - /themes/front-end/{{frontEndTheme}}/css/odometer-theme-minimal.css
     - /themes/front-end/{{frontEndTheme}}/css/prism-okaidia.css
