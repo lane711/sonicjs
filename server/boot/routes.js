@@ -385,7 +385,6 @@ exports.loadRoutes = async function (app) {
 
     //ensure session exists if app just starting up
     pageLoadedCount++;
-    console.log("pageLoadedCount:", pageLoadedCount);
     if (pageLoadedCount < 10) {
       let session = await dalService.sessionGet(req.sessionID);
       if (!session) {
@@ -393,7 +392,6 @@ exports.loadRoutes = async function (app) {
         return;
       }
     }
-
 
     let isAuthenticated = await userService.isAuthenticated(req);
     globalService.setAreaMode(false, true, isAuthenticated);
