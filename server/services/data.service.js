@@ -237,6 +237,7 @@ if (typeof module !== "undefined" && module.exports) {
             id
             contentTypeId
             data
+            createdOn
           }
         }
             `,

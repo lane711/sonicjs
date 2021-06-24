@@ -59,13 +59,13 @@ module.exports = mediaService = {
             },
           };
           // debugger;
-          mediaRecord = await dataService.contentCreate(payload);
+          mediaRecord = await dataService.contentCreate(payload, true, sessionID);
           // mediaRecords.push(mediaRecord);
         }
 
       }
       //re-get list 
-      mediaRecords = await dataService.getContentByType("media");
+      mediaRecords = await dataService.getContentByType("media", sessionID);
     }
 
     return mediaRecords;
