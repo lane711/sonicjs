@@ -359,8 +359,8 @@ const RootQuery = new GraphQLObjectType({
 
     media: {
       type: new GraphQLList(MediaType),
-      resolve(parent, args, context) {
-        return mediaService.getMedia();
+      resolve(parent, args, req) {
+        return mediaService.getMedia(req.sessionID);
       },
     },
 
