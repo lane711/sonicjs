@@ -385,6 +385,7 @@ exports.loadRoutes = async function (app) {
 
     //ensure session exists if app just starting up
     pageLoadedCount++;
+    req.pageLoadedCount = pageLoadedCount;
     if (pageLoadedCount < 10) {
       let session = await dalService.sessionGet(req.sessionID);
       if (!session) {

@@ -21,7 +21,7 @@ module.exports = assetService = {
           //TODO: cache this
           let assetFilesExist = await assetService.doesAssetFilesExist();
 
-          if (process.env.REBUILD_ASSETS === "TRUE" || !assetFilesExist) {
+          if (process.env.REBUILD_ASSETS === "TRUE" || !assetFilesExist || options.req.pageLoadedCount === 1) {
             //rebuild the assets before delivering
             await assetService.getLinks(options, "css");
             await assetService.getLinks(options, "js");
@@ -234,14 +234,15 @@ module.exports = assetService = {
 
     let appVersion = globalService.getAppVersion();
     let fileName = this.getCombinedFileName(assetType);
+    let overwriteFile = options.req.pageLoadedCount === 1;
 
-    await this.createCombinedFile(fileContent, fileName, assetType);
+    await this.createCombinedFile(fileContent, fileName, assetType, overwriteFile);
   },
 
-  createCombinedFile: async function (fileContent, fileName, assetType) {
+  createCombinedFile: async function (fileContent, fileName, assetType, overwriteFile) {
     let path = this.getAssetPath(fileName);
     let minifiedAsset = "";
-    if (!fileService.fileExists(path)) {
+    if (!fileService.fileExists(path) || overwriteFile) {
       console.log(`Generating Asset: ${path}`);
       if (assetType === "js") {
         let minJs = UglifyJS.minify(fileContent, {
