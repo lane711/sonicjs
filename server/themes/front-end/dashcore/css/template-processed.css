@@ -43,7 +43,15 @@ background-size: cover
 font-size: .98rem
 }
 
-.clip-hero{
-    height: 92px;
-    overflow: hidden;
+.clip-hero {
+height: 92px;
+overflow: hidden
+}
+
+.docs h1 {
+margin: 60px 0
+}
+
+.docs h2, h3 {
+margin: 40px 0
 }

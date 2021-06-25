@@ -263,7 +263,12 @@ section {
 
 #editor.ace_editor {
   width: 255px;
-  height: 85vh;
+  height: calc(100vh - 180px);
+}
+
+.editor-wrapper{
+background: green;
+height: 100%;
 }
 
 .section-wrapper {
