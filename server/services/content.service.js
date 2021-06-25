@@ -60,10 +60,11 @@ module.exports = contentService = {
       //page templates
       if (page.data.pageTemplate) {
         // console.log(page.data.pageTemplate)
-        // let pageTemplate = await dataService.getContentById(page.data.pageTemplate);
-        // console.log(pageTemplate)
-        // let processedTemplate = await this.getPage(pageTemplate.id, pageTemplate.data);
-        //merge data?
+        let pageTemplate = await dataService.getContentById(page.data.pageTemplate, req.sessionID);
+
+        //merge data
+        page.data.pageCssClass += ' ' + pageTemplate.data.pageCssClass;
+
       }
 
       await this.getPage(page.id, page, req, req.sessionID);
