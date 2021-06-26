@@ -55,16 +55,19 @@ module.exports = contentService = {
 
     await emitterService.emit("postPageDataFetch", { req: req, page: page });
 
-
     if (page.data) {
       //page templates
       if (page.data.pageTemplate) {
         // console.log(page.data.pageTemplate)
-        let pageTemplate = await dataService.getContentById(page.data.pageTemplate, req.sessionID);
+        let pageTemplate = await dataService.getContentById(
+          page.data.pageTemplate,
+          req.sessionID
+        );
 
         //merge data
-        page.data.pageCssClass += ' ' + pageTemplate.data.pageCssClass;
-
+        if (pageTemplate && pageTemplate.data.pageCssClass) {
+          page.data.pageCssClass += " " + pageTemplate.data.pageCssClass;
+        }
       }
 
       await this.getPage(page.id, page, req, req.sessionID);
@@ -170,7 +173,7 @@ module.exports = contentService = {
   },
 
   processSections: async function (page, req, sessionID) {
-    await emitterService.emit("preProcessSections", {page: page, req: req} );
+    await emitterService.emit("preProcessSections", { page: page, req: req });
 
     page.data.sections = [];
     // let sectionWrapper = $(".s--section").parent(); //container
@@ -188,13 +191,25 @@ module.exports = contentService = {
           if (section.data.content) {
             //process raw column without rows and columns
             page.data.html += `${section.data.content}`;
-            await this.processShortCodes(page, section, section.data.content, 0, 0, req);
+            await this.processShortCodes(
+              page,
+              section,
+              section.data.content,
+              0,
+              0,
+              req
+            );
           } else {
             page.data.html += `<section data-id='${section.id}' class="${section.data.cssClass} jumbotron-fluid">`;
             page.data.html += '<div class="section-overlay">';
             page.data.html += '<div class="container">';
             let rows;
-            rows = await this.processRows(page, section, section.data.rows, req);
+            rows = await this.processRows(
+              page,
+              section,
+              section.data.rows,
+              req
+            );
             page.data.html += "</div>";
             page.data.html += "</div>";
             page.data.html += `</section>`;
@@ -223,7 +238,13 @@ module.exports = contentService = {
       for (const row of rows) {
         // console.log(chalk.red(JSON.stringify(row)));
         page.data.html += `<div class='${row.class}''>`;
-        let columns = await this.processColumns(page, section, row, rowIndex, req);
+        let columns = await this.processColumns(
+          page,
+          section,
+          row,
+          rowIndex,
+          req
+        );
         page.data.html += `</div>`;
 
         rowArray.push(row);
@@ -369,7 +390,14 @@ module.exports = contentService = {
     let blockId = shortcode.properties.id;
     let contentType = shortcode.properties.contentType;
 
-    let form = await formService.getForm(contentType, undefined, undefined, undefined, undefined, sessionID);
+    let form = await formService.getForm(
+      contentType,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      sessionID
+    );
 
     page.data.html = page.data.html.replace(shortcode.codeText, form);
   },
