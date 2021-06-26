@@ -15,7 +15,7 @@
     </div>
   </header>
 {{/if}}
-{{#unless data.showHero}}
+{{#if data.showHeroCompact}}
 <div class="clip-hero">
 <header class="page header text-contrast overlay gradient gradient-purple-blue alpha-8 image-background cover" style="background-image: url('/assets/uploads/waves.jpeg')">
   <div class="divider-shape">
@@ -33,4 +33,6 @@
     </div>
   </header>
 </div>
-{{/unless}}
+{{/if}}
+
+<!-- {{log data.url}} -->
