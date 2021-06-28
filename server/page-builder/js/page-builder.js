@@ -41,12 +41,12 @@ $(document).ready(async function () {
   setupAdminMenuMinimizer();
 });
 
-function setupSessionID(){
-  sessionID = $('#sessionID').val();
+function setupSessionID() {
+  sessionID = $("#sessionID").val();
 }
 
-function setupThemeID(){
-  theme = $('#theme').val();
+function setupThemeID() {
+  theme = $("#theme").val();
 }
 
 async function setupAxiosInstance() {
@@ -73,7 +73,10 @@ async function setPage() {
 async function setContentType() {
   let contentTypeId = $("#contentTypeId").val();
   if (contentTypeId) {
-    this.contentType = await dataService.contentTypeGet(contentTypeId, undefined);
+    this.contentType = await dataService.contentTypeGet(
+      contentTypeId,
+      undefined
+    );
   }
 }
 
@@ -1243,6 +1246,7 @@ async function deleteModuleConfirm(deleteContent = false) {
   let moduleDiv = $(`.module[data-id='${currentModuleId}'`);
   let { isPageUsingTemplate, pageTemplateRegion } = getPageTemplateRegion(
     page,
+    currentColumn[0],
     currentColumn[0]
   );
 
@@ -1334,12 +1338,18 @@ function getPageTemplateRegion(page, sourceColumn, destinationColumn) {
     })[0];
     sourcePageTemplateRegion = $(sourceRegionModule).attr("data-id");
 
-    let destinationRegionModule = $(destinationColumn.children).filter(
-      function () {
-        return $(this).attr("data-module") == "PAGE-TEMPLATES";
-      }
-    )[0];
-    destinationPageTemplateRegion = $(destinationRegionModule).attr("data-id");
+    let destinationRegionModule;
+
+    if (destinationColumn) {
+      destinationRegionModule = $(destinationColumn.children).filter(
+        function () {
+          return $(this).attr("data-module") == "PAGE-TEMPLATES";
+        }
+      )[0];
+      destinationPageTemplateRegion = $(destinationRegionModule).attr(
+        "data-id"
+      );
+    }
   }
   return {
     isPageUsingTemplate,
@@ -1524,7 +1534,6 @@ async function writeFile(container, file) {
 }
 
 async function setupACEEditor() {
-
   if ($("#editor").length === 0) {
     return;
   }
