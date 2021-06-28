@@ -1244,7 +1244,7 @@ async function deleteModuleConfirm(deleteContent = false) {
   console.log("deleteing module: " + currentModuleId, currentModuleContentType);
 
   let moduleDiv = $(`.module[data-id='${currentModuleId}'`);
-  let { isPageUsingTemplate, pageTemplateRegion } = getPageTemplateRegion(
+  let { isPageUsingTemplate, sourcePageTemplateRegion, destinationPageTemplateRegion } = getPageTemplateRegion(
     page,
     currentColumn[0],
     currentColumn[0]
@@ -1262,7 +1262,7 @@ async function deleteModuleConfirm(deleteContent = false) {
   //need to ignore template regions
   payload.data.moduleIndex = currentModuleIndex;
   payload.data.isPageUsingTemplate = isPageUsingTemplate;
-  payload.data.pageTemplateRegion = pageTemplateRegion;
+  payload.data.pageTemplateRegion = sourcePageTemplateRegion;
   payload.data.pageId = page.id;
   payload.data.deleteContent = deleteContent;
 
