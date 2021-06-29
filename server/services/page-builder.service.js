@@ -216,7 +216,7 @@ module.exports = pageBuilderService = {
 
       //copy module
       let moduleToCopy = await dataService.getContentById(data.moduleId, req.sessionID);
-      let newModule = await dataService.contentCreate(moduleToCopy);
+      let newModule = await dataService.contentCreate(moduleToCopy, true, req.sessionID);
 
       let sectionColumn =
         section.data.rows[data.rowIndex].columns[data.columnIndex];
@@ -226,7 +226,7 @@ module.exports = pageBuilderService = {
       // generate short code ie: [MODULE-HELLO-WORLD id="123"]
       let args = { id: newModule.id };
       let moduleInstanceShortCodeText = sharedService.generateShortCode(
-        `${newModule.data.contentType}`,
+        `${newModule.contentTypeId}`,
         args
       );
 
