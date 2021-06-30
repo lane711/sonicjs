@@ -62,11 +62,31 @@ position: absolute;
 top: -100px
 }
 
-.docs .field-types button{
-    font-size:.8em;
-    margin:8px;
+.docs .field-types button {
+font-size: .8em;
+margin: 8px
 }
 
-.docs .field-types button i{
-    margin:0 8px 0;
+.docs .field-types button i {
+margin: 0 8px 0
 }
+
+.checkbox label:before,.radio label:before {
+display: none
+}
+
+.checkbox input,.radio input {
+display: block
+}
+
+input[type=checkbox] {
+transform: scale(1.5);
+padding: 0 0 0 3px
+}
+
+.form-check-label{
+    margin: 0 0 0 4px;
+}
+.form-check-label span {
+margin: 4px 0 0
+}}

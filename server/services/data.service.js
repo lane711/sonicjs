@@ -246,7 +246,7 @@ if (typeof module !== "undefined" && module.exports) {
       return result.data.data.contents;
     }),
     (exports.getPageTemplates = async function (sessionID) {
-      let pages = await this.getContentByType("page");
+      let pages = await this.getContentByType("page", sessionID);
 
       //filter out content type that should not appear in admin content list
       let data = pages.filter((x) => x.data.isPageTemplate);
