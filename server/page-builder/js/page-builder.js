@@ -1244,11 +1244,11 @@ async function deleteModuleConfirm(deleteContent = false) {
   console.log("deleteing module: " + currentModuleId, currentModuleContentType);
 
   let moduleDiv = $(`.module[data-id='${currentModuleId}'`);
-  let { isPageUsingTemplate, sourcePageTemplateRegion, destinationPageTemplateRegion } = getPageTemplateRegion(
-    page,
-    currentColumn[0],
-    currentColumn[0]
-  );
+  let {
+    isPageUsingTemplate,
+    sourcePageTemplateRegion,
+    destinationPageTemplateRegion,
+  } = getPageTemplateRegion(page, currentColumn[0], currentColumn[0]);
 
   // debugger;
   let source = await getModuleHierarchy(moduleDiv);
@@ -1301,11 +1301,68 @@ async function copyModule() {
   payload.data.moduleId = currentModuleId;
   payload.data.moduleIndex = currentModuleIndex;
 
+  let {
+    isPageUsingTemplate,
+    sourcePageTemplateRegion,
+    destinationPageTemplateRegion,
+  } = getPageTemplateRegion(page, currentColumn[0], currentColumn[0]);
+
+  payload.data.isPageUsingTemplate = isPageUsingTemplate;
+  payload.data.sourcePageTemplateRegion = sourcePageTemplateRegion;
+  payload.data.destinationPageTemplateRegion = destinationPageTemplateRegion;
+  payload.data.pageId = page.id;
+
+  ////////////////////
+  // let moduleBeingMovedId = event.item.dataset.id;
+  // let sourceColumn = $(event.from)[0].closest('div[class^="col"]');
+  // let destinationColumn = $(event.to)[0].closest('div[class^="col"]');
+
+  // let {
+  //   isPageUsingTemplate,
+  //   sourcePageTemplateRegion,
+  //   destinationPageTemplateRegion,
+  // } = getPageTemplateRegion(page, sourceColumn, destinationColumn);
+
+  // //source
+  // let source = await getModuleHierarchy(event.from);
+
+  // //destination
+  // let destinationSectionHtml = $(event.to)[0].closest("section");
+  // let destinationSectionId = destinationSectionHtml.dataset.id;
+  // let destinationRow = $(event.to)[0].closest(".row");
+  // let destinationRowIndex = $(destinationRow).index();
+  // let destinationColumnIndex = $(destinationColumn).index();
+
+  // //get destination list of modules in their updated sort order
+  // let destinationModules;
+  // let destinationModuleFilter = isPageUsingTemplate
+  //   ? "[data-template-region='true']"
+  //   : ".module";
+
+  // destinationModules = $(destinationColumn)
+  //   .find(destinationModuleFilter)
+  //   .toArray()
+  //   .map(function (div) {
+  //     let shortCodeData = { id: div.dataset.id, module: div.dataset.module };
+  //     return shortCodeData;
+  //   });
+
+  // let payload = { data: {} };
+  // payload.data.pageId = page.id;
+  // payload.data.sourceSectionId = source.sourceSectionId;
+  // payload.data.sourceRowIndex = source.sourceRowIndex;
+  // payload.data.sourceColumnIndex = source.sourceColumnIndex;
+  // payload.data.sourceModuleIndex = event.oldIndex;
   // payload.data.destinationSectionId = destinationSectionId;
   // payload.data.destinationRowIndex = destinationRowIndex;
   // payload.data.destinationColumnIndex = destinationColumnIndex;
   // payload.data.destinationModuleIndex = event.newIndex;
   // payload.data.destinationModules = destinationModules;
+  // payload.data.isPageUsingTemplate = isPageUsingTemplate;
+  // payload.data.sourcePageTemplateRegion = sourcePageTemplateRegion;
+  // payload.data.destinationPageTemplateRegion = destinationPageTemplateRegion;
+  // payload.data.moduleBeingMovedId = moduleBeingMovedId;
+  /////////////////
 
   return axiosInstance
     .post("/admin/pb-update-module-copy", payload)

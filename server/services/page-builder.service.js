@@ -234,19 +234,37 @@ module.exports = pageBuilderService = {
 
       if (data.isPageUsingTemplate && data.sourcePageTemplateRegion) {
 
+        let page = await dataService.getContentById(data.pageId, req.sessionID);
+
         let sourceRegion = page.data.pageTemplateRegions.filter(
           (r) => r.regionId === data.sourcePageTemplateRegion
-        );
+        )[0];
 
         let shortCodesInColumn = ShortcodeTree.parse(
-          sourceRegion[0].shortCodes
+          sourceRegion.shortCodes
         );
+
+        let args = { id: newModule.id };
+        let nodeModuleShortCode = sharedService.generateShortCode(
+          `${newModule.contentTypeId}`,
+          args
+        );
+
+        let argsOld = { id: moduleToCopy.id };
+        let oldModuleShortCode = sharedService.generateShortCode(
+          `${moduleToCopy.contentTypeId}`,
+          argsOld
+        );
+
+        sourceRegion.shortCodes = sourceRegion.shortCodes.replace(oldModuleShortCode, oldModuleShortCode + nodeModuleShortCode)
+
+        let result = await dataService.editInstance(page, req.sessionID);
 
         //moduleBeingMovedId
 
-        let shortCodeToRemove = shortCodesInColumn.children.filter(
-          (s) => s.shortcode.properties.id === data.moduleBeingMovedId
-        )[0];
+        // let shortCodeToRemove = shortCodesInColumn.children.filter(
+        //   (s) => s.shortcode.properties.id === data.moduleBeingMovedId
+        // )[0];
         // console.log("shortCodeToRemove", shortCodeToRemove);
 
         // let shortCodeToRemoveText = shortCodeToRemove.shortcode.codeText;
