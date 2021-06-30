@@ -742,6 +742,7 @@ const Mutation = new GraphQLObjectType({
 });
 
 async function getUserSession(sessionID, reqSessionID) {
+
   let id = sessionID;
   if (!id || id === "undefined") {
     id = reqSessionID;
@@ -749,7 +750,8 @@ async function getUserSession(sessionID, reqSessionID) {
   let session = await dalService.sessionGet(id);
 
   if (!session || session === "undefined") {
-    throw new Error("Session not found");
+    session = undefined;
+    // throw new Error("Session not found");
   }
 
   return session;
