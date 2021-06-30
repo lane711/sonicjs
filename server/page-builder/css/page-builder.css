@@ -21,17 +21,20 @@
   margin-left: 300px;
 }
 
-main, .fixed-top, footer {
+main,
+.fixed-top,
+footer {
   margin-left: 260px;
   transition: margin-left 1s;
 }
 
-.page-builder-nav, .sidebar {
+.page-builder-nav,
+.sidebar {
   width: 260px;
 }
 
 .mini-layout .row {
-  border: 1px dotted #F8F8F8;
+  border: 1px dotted #f8f8f8;
   margin: 2px;
   padding: 4px;
 }
@@ -81,8 +84,8 @@ hr {
 .header {
   color: #fff;
   padding: 4px 0;
-  font-size: .6em;
-  padding: .5rem 1rem;
+  font-size: 0.6em;
+  padding: 0.5rem 1rem;
 }
 
 .nav {
@@ -143,7 +146,7 @@ hr {
   background-repeat: no-repeat;
   background-position: center;
   background-size: 12.5px;
-  transition: .3s;
+  transition: 0.3s;
 }
 
 .opened {
@@ -180,7 +183,8 @@ section {
   position: relative;
 }
 
-.row-button, .col-button {
+.row-button,
+.col-button {
   /* display: none */
 }
 
@@ -234,7 +238,9 @@ section {
   box-shadow: 0px 0px 0px 1px #777 inset;
 }
 
-.pb section .col span, .pb-section .nav-link, .dropdown-menu .dropdown-item {
+.pb section .col span,
+.pb-section .nav-link,
+.dropdown-menu .dropdown-item {
   cursor: pointer;
 }
 
@@ -266,9 +272,9 @@ section {
   height: calc(100vh - 180px);
 }
 
-.editor-wrapper{
-background: green;
-height: 100%;
+.editor-wrapper {
+  background: green;
+  height: 100%;
 }
 
 .section-wrapper {
@@ -285,7 +291,7 @@ height: 100%;
 }
 
 .empty-column {
-  font-size: .7em;
+  font-size: 0.7em;
   color: #777;
   display: block;
   text-align: center;
@@ -373,7 +379,7 @@ height: 100%;
   width: 100vw;
   height: 100vh;
   background-color: #000;
-  opacity: .5;
+  opacity: 0.5;
 }
 
 .pb-side-panel-modal-backdrop.close {
@@ -412,28 +418,45 @@ height: 100%;
   display: none;
 } */
 
-.delete-data-preview{
-  margin: 30px 0 0 ;
-  width:100%;
+.delete-data-preview {
+  margin: 30px 0 0;
+  width: 100%;
 }
 
-.delete-data-preview textarea{
-  width:100%;
-  height:400px;
+.delete-data-preview textarea {
+  width: 100%;
+  height: 400px;
 }
 
-.page-template-region{
+.page-template-region {
   display: none;
   border: 6px dashed grey;
   text-align: center;
   line-height: 40px;
 }
 
-.pb .page-template-region{
+.pb .page-template-region {
   display: block;
 }
 
 .formio-component-modal-wrapper .open-modal-button {
   max-height: 60vh;
   overflow: auto;
+}
+
+.pb-wrapper {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.pb-wrapper a {
+  color: #fff;
+}
+
+.pb-wrapper .nav-tabs .nav-link {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.open-admin.row {
+  margin: 15px 0 8px 0;
 }
