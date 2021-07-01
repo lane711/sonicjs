@@ -10,6 +10,7 @@ var dataService = require(".//data.service");
 var userService = require(".//user.service");
 var breadcrumbsService = require("../services/breadcrumbs.service");
 var dalService = require(".//dal.service");
+const mixPanelService = require("../modules/mixpanel/services/mixpanel-main-service");
 
 var emitterService = require("./emitter.service");
 
@@ -271,10 +272,9 @@ module.exports = adminService = {
         let accessToken = "fakeToken"; //await userService.getToken(req);
         data.breadCrumbs = await breadcrumbsService.getAdminBreadcrumbs(req, req.sessionID);
 
-        // mixPanelService.trackEvent("PAGE_LOAD_ADMIN", req, {
-        //   page: req.url,
-        //   ip: ip,
-        // });
+        mixPanelService.trackEvent("PAGE_LOAD_ADMIN", req, {
+          page: req.url
+        });
 
         //add session ID
         data.sessionID = req.sessionID;

@@ -46,7 +46,8 @@ module.exports = mixpanelMainService = {
     let email;
     email = await mixpanelMainService.getEmail(req);
 
-    // console.log("mix", email, data);
+    //add app version
+    data.appVersion = globalService.getAppVersion();
 
     mixpanel.track(eventName, {
       $email: email,
