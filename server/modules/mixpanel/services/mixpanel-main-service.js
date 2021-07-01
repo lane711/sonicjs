@@ -5,7 +5,7 @@ var Mixpanel = require("mixpanel");
 var mixpanel;
 
 module.exports = mixpanelMainService = {
-  startup: async function() {
+  startup: async function () {
     // emitterService.on("getRenderedPagePostDataFetch", async function(options) {
     //   if (options && options.page) {
     //     await mixpanelMainService.addHeaderJs(options);
@@ -15,12 +15,11 @@ module.exports = mixpanelMainService = {
     mixpanelMainService.init();
   },
 
-  init: async function(options) {
+  init: async function (options) {
     mixpanel = Mixpanel.init("02789a7317a3ecd565a8863a79ca6802");
   },
 
-  setPeople: async function(email) {
-
+  setPeople: async function (email) {
     if (!mixpanelMainService.trackingEnabled()) {
       return;
     }
@@ -28,17 +27,16 @@ module.exports = mixpanelMainService = {
     mixpanel.people.set({
       $email: email,
       $distinct_id: email,
-      $created: new Date().toISOString()
+      $created: new Date().toISOString(),
     });
   },
 
-  trackEvent: async function(eventName, req, data) {
-
-    if(!mixpanel){
+  trackEvent: async function (eventName, req, data) {
+    if (!mixpanel) {
       return;
     }
 
-    let enabled = await mixpanelMainService.trackingEnabled();
+    let enabled = await mixpanelMainService.trackingEnabled(req.headers.host);
     if (!enabled) {
       return;
     }
@@ -52,7 +50,7 @@ module.exports = mixpanelMainService = {
     mixpanel.track(eventName, {
       $email: email,
       distinct_id: email,
-      data: data
+      data: data,
     });
 
     if (email) {
@@ -64,23 +62,27 @@ module.exports = mixpanelMainService = {
     }
   },
 
-  getEmail: async function(req){
+  getEmail: async function (req) {
     if (req.user && req.user.username) {
       return req.user.username;
     }
   },
 
-  trackingEnabled: async function() {
-    if (
-      process.env.LOCAL_ANALYTICS === "false"
-    ) {
+  trackingEnabled: async function (host) {
+    if (process.env.LOCAL_ANALYTICS && process.env.LOCAL_ANALYTICS.toLowerCase() === "false") {
       return false;
     }
-    return true;
+    if (host.indexOf("localhost") > -1) {
+      return true;
+    }
+    return false;
   },
 
-  addHeaderJs: async function(options) {
-    let mixpanelSettings = await dataService.getContentTopOne("mixpanel", options.req.sessionID);
+  addHeaderJs: async function (options) {
+    let mixpanelSettings = await dataService.getContentTopOne(
+      "mixpanel",
+      options.req.sessionID
+    );
 
     if (!mixpanelSettings) {
       return;
@@ -97,5 +99,5 @@ module.exports = mixpanelMainService = {
       //       mixpanel.init('${mixpanelSettings.data.clientId}');</script><!-- end Mixpanel -->`;
       // options.page.data.headerJs += script;
     }
-  }
+  },
 };
