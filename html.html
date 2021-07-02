@@ -1,0 +1,107 @@
+<div class="table-responsive">
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Field</th>
+        <th scope="col">Type</th>
+        <th scope="col">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">Id</th>
+        <td data-title="Type">int</td>
+        <td data-title="Description">The Id for the entity. The Id auto increments from 1.</td>
+      </tr>
+      <tr>
+        <th scope="row">data</th>
+        <td data-title="Type">text</td>
+        <td data-title="Description">This field is used to store stringified JSON data. It is highly dynamic and contain any shape of data (properties, arrays). The "schema" for this data is defined in content types which are managed with a drag and drop content type manager.</td>
+      </tr>
+      <tr>
+        <th scope="row">contentTypeId</th>
+        <td data-title="Type">varchar</td>
+        <td data-title="Description">This is the type of content or "schema" that the above data field contains. Examples: "blog", "menu", "role"</td>
+      </tr>
+
+      <tr>
+        <th scope="row">createdByUserId</th>
+        <td data-title="Type">int</td>
+        <td data-title="Description">The user Id that originally created the content.</td>
+      </tr>
+
+      <tr>
+        <th scope="row">lastUpdatedByUserId</th>
+        <td data-title="Type">int</td>
+        <td data-title="Description">The user Id that most recently updated the content.</td>
+      </tr>
+
+      <tr>
+        <th scope="row">createdOn</th>
+        <td data-title="Type">datetime</td>
+        <td data-title="Description">Timestamp from when the content was first created.</td>
+      </tr>
+
+      <tr>
+        <th scope="row">updatedOn</th>
+        <td data-title="Type">datetime</td>
+        <td data-title="Description">Timestamp from when the content was most recently updated.</td>
+      </tr>
+
+      <tr>
+        <th scope="row">url</th>
+        <td data-title="Type">varchar / unique:true</td>
+        <td data-title="Description">Every content has a unique url. The provides and an easy lookup when rendering site pages.</td>
+      </tr>
+
+      <tr>
+        <th scope="row">tags</th>
+        <td data-title="Type">relationship: many-to-many</td>
+        <td data-title="Description">Tags that are related to the content. Content can have many tags. Tags can have many content.</td>
+      </tr>
+
+    </tbody>
+  </table>
+</div>
+
+
+columns: {
+    id: {
+        primary: true,
+        type: "int",
+        generated: true
+    },
+    data: {
+        type: "text"
+    },
+    contentTypeId: {
+        type: "varchar"
+    },
+    createdByUserId: {
+        type: "int"
+    },
+    lastUpdatedByUserId: {
+        type: "int"
+    },
+    createdOn: {
+        type: "datetime"
+    },
+    updatedOn: {
+        type: "datetime"
+    },
+    url: {
+        type: "varchar",
+        unique:true,
+    },
+    tags: {
+        type: "varchar"
+    }
+},
+relations: {
+    categories: {
+        target: "Tag",
+        type: "many-to-many",
+        joinTable: true,
+        cascade: true
+    }
+}
