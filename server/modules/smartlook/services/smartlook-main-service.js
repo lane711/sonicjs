@@ -15,7 +15,7 @@ module.exports = smartlookMainService = {
 
   addHeaderJs: async function (options) {
     let smartlookSettings = await dataService.getContentTopOne("smartlook", options.req.sessionID);
-    if (smartlookSettings) {
+    if (smartlookSettings && process.env.ENABLE_SMARTLOOK === "TRUE") {
       options.page.data.headerJs += `<script type='text/javascript'>
           window.smartlook||(function(d) {
             var o=smartlook=function(){ o.api.push(arguments)},h=d.getElementsByTagName('head')[0];
@@ -27,3 +27,4 @@ module.exports = smartlookMainService = {
     }
   },
 };
+smartlook
