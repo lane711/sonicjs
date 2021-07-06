@@ -1717,6 +1717,7 @@ async function setupSortableColum(el) {
     var sortable = new Sortable(el, {
       // Element dragging ended
       group: "shared",
+      draggable: "module",
       onEnd: function (/**Event*/ event) {
         var itemEl = event.item; // dragged HTMLElement
         event.to; // target list
