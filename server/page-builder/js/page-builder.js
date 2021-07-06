@@ -1704,6 +1704,7 @@ async function setupSortable() {
   var columns = jQuery.makeArray(columnsList);
 
   // console.log("columns", columns);
+  // debugger;
   columns.forEach((column) => {
     setupSortableColum(column);
   });
@@ -1717,6 +1718,7 @@ async function setupSortableColum(el) {
     var sortable = new Sortable(el, {
       // Element dragging ended
       group: "shared",
+      draggable: ".module",  // Specifies which items inside the element should be draggable
       onEnd: function (/**Event*/ event) {
         var itemEl = event.item; // dragged HTMLElement
         event.to; // target list

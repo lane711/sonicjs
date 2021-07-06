@@ -49,12 +49,17 @@ if (typeof module !== "undefined" && module.exports) {
       else str = str.toString();
       return str.replace(/<[^>]*>/g, "");
     });
-    (exports.generateModuleDivWrapper = function(id, wrapperCss, wrapperStyles, shortCodeName, contentType, body, isInTemplateRegion = false){
+    (exports.generateModuleDivWrapper = function(id, wrapperCss, wrapperStyles, shortCodeName, contentType, body, isInTemplateRegion = false, isUsingPageTemplate = false){
       if(shortCodeName === 'PAGE-TEMPLATES'){
         return body;
         wrapperCss = 'page-template-region';
         // body = 'TEMPLATE REGION'
       }
+
+      if(isUsingPageTemplate && !isInTemplateRegion){
+        wrapperCss = wrapperCss.replace('module','module-template');
+      }
+
       return `<div class="${wrapperCss}" style="${wrapperStyles}" data-id="${id}" data-module="${shortCodeName}" data-content-type="${contentType}" data-template-region=${isInTemplateRegion}>${body}</div>`;
     });
 })(typeof exports === "undefined" ? (this["formattingService"] = {}) : exports);

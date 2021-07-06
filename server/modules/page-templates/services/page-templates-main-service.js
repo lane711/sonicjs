@@ -17,10 +17,12 @@ module.exports = pageTemplatesMainService = {
           "",
           options.shortcode.name,
           options.shortcode.name,
-          "PAGE TEMPLATE REGION"
+          "PAGE TEMPLATE REGION",
+          true,
+          true 
         );
 
-        options.page.data.currentShortCodeHtml = `<div class="module page-template-region mb-2" data-id="${options.shortcode.properties.id}" data-module="PAGE-TEMPLATES">PAGE TEMPLATE REGION START</div>`;
+        options.page.data.currentShortCodeHtml = `<div class="module-region page-template-region mb-2" data-id="${options.shortcode.properties.id}" data-module="PAGE-TEMPLATES">PAGE TEMPLATE REGION START</div>`;
 
         await moduleService.processModuleInColumn(options);
 

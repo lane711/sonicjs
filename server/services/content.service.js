@@ -374,7 +374,9 @@ module.exports = contentService = {
       wrapperStyles,
       processedHtml.shortCode.name,
       processedHtml.contentType,
-      processedHtml.body
+      processedHtml.body,
+      false,
+      false
     );
   },
 
