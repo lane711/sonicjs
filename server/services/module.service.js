@@ -307,7 +307,8 @@ module.exports = moduleService = {
             options.shortcode.name,
             contentType,
             processedHtml.body,
-            false
+            true,
+            options.page.data.pageTemplate !== 'none'
           );
           options.page.data.currentShortCodeHtml += wrappedDiv;
         } else {
@@ -315,9 +316,9 @@ module.exports = moduleService = {
         }
       }
 
+      options.processedHtml = processedHtml;
       await emitterService.emit("postProcessModuleShortCodeProcessedHtml", {
-        processedHtml: processedHtml,
-        viewModel: options.viewModel,
+        options
       });
 
       options.page.data.html = options.page.data.html.replace(
