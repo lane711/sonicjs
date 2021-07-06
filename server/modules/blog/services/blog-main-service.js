@@ -2,7 +2,7 @@ var dataService = require("../../../services/data.service");
 var emitterService = require("../../../services/emitter.service");
 var moduleService = require("../../../services/module.service");
 var helperService = require("../../../services/helper.service");
-var formatService = require("../../../services/formatting.service");
+var formattingService = require("../../../services/formatting.service");
 
 module.exports = blogMainService = {
   startup: async function () {
@@ -34,18 +34,19 @@ module.exports = blogMainService = {
       return {
         data: {
           title: record.data.title,
-          body: formatService.stripHtmlTags(
+          body: formattingService.stripHtmlTags(
             helperService.truncateString(record.data.body, 400)
           ),
           image: record.data.fileName
             ? dataService.getImageUrl(record.data.fileName)
             : undefined,
           url: record.data.url,
-          createdOn: record.data.createdOn,
+          createdOn: record.createdOn,
         },
       };
     });
 
+    let sortedList = list.sort((a, b) => (a.data.createdOn < b.data.createdOn) ? 1 : -1)
     // await formattingService.formatDates(list, true);
 
     // viewModel.list = list;
@@ -59,7 +60,7 @@ module.exports = blogMainService = {
     //   viewPath
     // );
 
-    options.viewModel.data.list = list;
+    options.viewModel.data.list = sortedList;
   },
 
   // processView: async function (contentType, viewModel, viewPath) {
