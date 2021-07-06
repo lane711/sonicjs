@@ -27,11 +27,10 @@ module.exports = contentService = {
   startup: async function () {
     emitterService.on(
       "postProcessModuleShortCodeProcessedHtml",
-      async function (options) {
+      async function ({ options }) {
         if (options) {
           contentService.wrapBlockInModuleDiv(
-            options.processedHtml,
-            options.viewModel
+            options
           );
         }
       }
@@ -350,31 +349,33 @@ module.exports = contentService = {
     }
   },
 
-  wrapBlockInModuleDiv: function (processedHtml, viewModel) {
+  wrapBlockInModuleDiv: function (options) {
     let wrapperCss = "module";
     if (
-      viewModel &&
-      viewModel.data.settings &&
-      viewModel.data.settings.data.wrapperCss
+      options.viewModel &&
+      options.viewModel.data.settings &&
+      options.viewModel.data.settings.data.wrapperCss
     ) {
-      wrapperCss += " " + viewModel.data.settings.data.wrapperCss;
+      wrapperCss += " " + options.viewModel.data.settings.data.wrapperCss;
     }
 
     let wrapperStyles = "";
     if (
-      viewModel &&
-      viewModel.data.settings &&
-      viewModel.data.settings.data.wrapperStyles
+      options.viewModel &&
+      options.viewModel.data.settings &&
+      options.viewModel.data.settings.data.wrapperStyles
     ) {
-      wrapperStyles = viewModel.data.settings.data.wrapperStyles;
+      wrapperStyles = options.viewModel.data.settings.data.wrapperStyles;
     }
-    processedHtml.body = formattingService.generateModuleDivWrapper(
-      processedHtml.id,
+    options.processedHtml.body = formattingService.generateModuleDivWrapper(
+      options.processedHtml.id,
       wrapperCss,
       wrapperStyles,
-      processedHtml.shortCode.name,
-      processedHtml.contentType,
-      processedHtml.body
+      options.processedHtml.shortCode.name,
+      options.processedHtml.contentType,
+      options.processedHtml.body,
+      false,
+      options.page.data.pageTemplate !== 'none'
     );
   },
 

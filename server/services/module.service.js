@@ -316,9 +316,9 @@ module.exports = moduleService = {
         }
       }
 
+      options.processedHtml = processedHtml;
       await emitterService.emit("postProcessModuleShortCodeProcessedHtml", {
-        processedHtml: processedHtml,
-        viewModel: options.viewModel,
+        options
       });
 
       options.page.data.html = options.page.data.html.replace(

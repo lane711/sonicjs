@@ -65,8 +65,8 @@ if (typeof module !== "undefined" && module.exports) {
       // body = 'TEMPLATE REGION'
     }
 
-    if (usesPageTemplate && !usesPageTemplate) {
-      wrapperCss.replace("module", "module-template");
+    if (usesPageTemplate && !isInTemplateRegion) {
+      wrapperCss = wrapperCss.replace("module", "module-template");
     }
 
     return `<div class="${wrapperCss}" style="${wrapperStyles}" data-id="${id}" data-module="${shortCodeName}" data-content-type="${contentType}" 
