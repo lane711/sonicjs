@@ -14,10 +14,10 @@ var appRoot = require("app-root-path");
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 
 module.exports = moduleService = {
-  startup: function () {
-    emitterService.on("startup", async function () {
+  startup: function (app) {
+    emitterService.on("startup", async function ({app}) {
       // console.log('>>=== startup from module service');
-      await moduleService.processModules();
+      await moduleService.processModules(app);
     });
 
     emitterService.on("getRenderedPagePostDataFetch", async function (options) {
@@ -29,10 +29,10 @@ module.exports = moduleService = {
     });
   },
 
-  processModules: async function () {
+  processModules: async function (app) {
     let moduleDir = path.join(appRoot.path, "/server/modules");
 
-    await this.getModuleDefinitionFiles(moduleDir);
+    await this.getModuleDefinitionFiles(moduleDir, app);
     await this.getModuleCss(moduleDir);
     await this.getModuleJs(moduleDir);
     await this.getModuleContentTypesConfigs(moduleDir);
@@ -48,11 +48,11 @@ module.exports = moduleService = {
   //     });
   // },
 
-  loadModuleServices: async function (moduleList) {
+  loadModuleServices: async function (moduleList, app) {
     moduleList.forEach(async function (moduleDef) {
       if (moduleDef.enabled === undefined || moduleDef.enabled === true) {
         let m = require(moduleDef.mainService);
-        await m.startup();
+        await m.startup(app);
       }
     });
 
@@ -122,7 +122,7 @@ module.exports = moduleService = {
     return moduleDef;
   },
 
-  getModuleDefinitionFiles: async function (path) {
+  getModuleDefinitionFiles: async function (path, app) {
     const files = fileService.getFilesSearchSync(path, "/**/module.json");
 
     let moduleList = [];
@@ -154,7 +154,7 @@ module.exports = moduleService = {
       (x) => x.canBeAddedToColumn == true
     );
 
-    await moduleService.loadModuleServices(moduleList);
+    await moduleService.loadModuleServices(moduleList, app);
 
     return moduleList;
   },

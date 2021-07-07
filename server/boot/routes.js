@@ -12,7 +12,7 @@ var adminService = require("../services/admin.service");
 var dataService = require("../services/data.service");
 dataService.startup();
 var moduleService = require("../services/module.service");
-moduleService.startup();
+// moduleService.startup();
 var formService = require("../services/form.service");
 var menuService = require("../services/menu.service");
 var mediaService = require("../services/media.service");
@@ -63,6 +63,7 @@ exports.loadRoutes = async function (app) {
   (async () => {
     await dalService.startup(app);
     await cacheService.startup();
+    await moduleService.startup(app);
     await menuService.startup();
     await mediaService.startup();
     await siteSettingsService.startup();
@@ -72,7 +73,10 @@ exports.loadRoutes = async function (app) {
     await pageBuilderService.startup(app);
     await pageBuilderService.startup(app);
 
-    await emitterService.emit("startup");
+    await emitterService.emit("startup", { app: app });
+
+    //load catch-all last
+    this.loadRoutesCatchAll(app);
   })();
 
   app.get("*", async function (req, res, next) {
@@ -318,7 +322,9 @@ exports.loadRoutes = async function (app) {
       next();
     }
   });
+};
 
+exports.loadRoutesCatchAll = async function (app) {
   app.get("*", async function (req, res, next) {
     await emitterService.emit("requestBegin", { req: req, res: res });
 

@@ -4,7 +4,7 @@ var globalService = require('../../../services/global.service');
 
 module.exports = appAnalyticsMainService = {
 
-    startup: async function () {
+    startup: async function (app) {
         emitterService.on('beginProcessModuleShortCode', async function (options) {
 
             if (options.shortcode.name === 'APP-ANALYTICS') {
@@ -14,7 +14,14 @@ module.exports = appAnalyticsMainService = {
             }
 
         });
+
+        app.get("/app1", async function (req, res) {
+            res.json({});
+          });
     },
+
+    
+
 
 }
 
