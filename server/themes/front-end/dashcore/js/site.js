@@ -260,7 +260,7 @@ $(function(){
                 type: type
             }, typeDefaults[type], attributes);
 
-            $element.magnificPopup(options);
+            // $element.magnificPopup(options);
         });
 
         $(document).on('click', '.modal-popup-dismiss', function (e) {
