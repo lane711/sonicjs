@@ -5,17 +5,21 @@ var globalService = require('../../../services/global.service');
 module.exports = servicesMainService = {
 
     startup: async function () {
+
+        // This is boilerplate for proccessing the module inside of a column
+        // You will rarely need to alter this
         emitterService.on('beginProcessModuleShortCode', async function (options) {
 
             if (options.shortcode.name === 'SERVICES') {
-
                 options.moduleName = 'services';
                 await moduleService.processModuleInColumn(options);
             }
 
         });
 
-
+        // We want to get a list of all services
+        // By default SonicJs will pass in the view settings, so we'll extend the 
+        // view model to include our list of services
         emitterService.on("postModuleGetData", async function (options) {
             if (options.shortcode.name === "SERVICES") {
               await servicesMainService.getServicesData(options);
@@ -23,48 +27,13 @@ module.exports = servicesMainService = {
           });
     },
 
+    //get all content of type "services", sort it and send it to the view
     getServicesData: async function (options) {
-        let id = options.shortcode.properties.id;
-        let moduleData = await dataService.getContentById(id, options.req.sessionID);
-        let contentType = "services";
-        let viewModel = moduleData;
-    
-        let listRaw = await dataService.getContentByType(contentType, options.req.sessionID);
-        listRaw = listRaw.sort((a, b) => (a.title > b.title) ? 1 : -1)
-    
-        // listRaw = listRaw.filter((x) => x.data.title);
-        // let list = listRaw.map(function (record) {
-        //   return {
-        //     data: {
-        //       title: record.data.title,
-        //       body: formattingService.stripHtmlTags(
-        //         helperService.truncateString(record.data.body, 400)
-        //       ),
-        //       image: record.data.fileName
-        //         ? dataService.getImageUrl(record.data.fileName)
-        //         : undefined,
-        //       url: record.data.url,
-        //       createdOn: record.createdOn,
-        //     },
-        //   };
-        // });
-    
-        // let sortedList = list.sort((a, b) => (a.data.createdOn < b.data.createdOn) ? 1 : -1)
-        // await formattingService.formatDates(list, true);
-    
-        // viewModel.list = list;
-        // let viewPath = `/server/modules/blog/views/blog-main.hbs`;
-        // // let sortedFiles = files.sort((a, b) => (a.data.sortOrder > b.data.sortOrder) ? 1 : -1)
-        // // await mediaService.addMediaUrl(sortedFiles);
-        // // viewModel.data.files = sortedFiles;
-        // let processedHtml = await blogMainService.processView(
-        //   contentType,
-        //   viewModel,
-        //   viewPath
-        // );
-    
-        options.viewModel.data.list = listRaw;
+   
+        let list = await dataService.getContentByType("services", options.req.sessionID);
+        list = list.sort((a, b) => (a.title > b.title) ? 1 : -1)
+
+        options.viewModel.data.list = list;
       },
 
 }
-
