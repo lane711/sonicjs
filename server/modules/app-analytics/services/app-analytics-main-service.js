@@ -15,16 +15,16 @@ module.exports = appAnalyticsMainService = {
     });
 
     emitterService.on("postPageRender", async function (options) {
-      appAnalyticsMainService.trackEventSend(options);
+      // appAnalyticsMainService.trackEventSend(options);
     });
 
     emitterService.on("startup", async function (options) {
-      appAnalyticsMainService.trackEventSend(options);
+      // appAnalyticsMainService.trackEventSend(options);
     });
 
     app.post(process.env.ANALYTICS_RECEIVE_URL, async function (req, res) {
-      appAnalyticsMainService.processEvent(req.body);
-      res.json({ ok: "ok" });
+      // appAnalyticsMainService.processEvent(req.body);
+      // res.json({ ok: "ok" });
     });
   },
 
