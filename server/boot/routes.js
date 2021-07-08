@@ -427,5 +427,8 @@ exports.loadRoutesCatchAll = async function (app) {
       layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
       data: page.data,
     });
+
+    await emitterService.emit("postPageRender", (options = { page, req }));
+
   });
 };

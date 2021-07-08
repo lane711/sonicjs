@@ -15,6 +15,8 @@ var Handlebars = require("handlebars");
 var logSymbols = require("log-symbols");
 var globalService = require("./server/services/global.service");
 var installService = require("./server/services/install.service");
+var helperService = require("./server/services/helper.service");
+initInstallIdFile();
 
 const routes = require("./server/boot/routes.js");
 var appRoot = require("app-root-path");
@@ -34,6 +36,7 @@ const { getConnection } = require("typeorm");
 const { TypeormStore } = require("connect-typeorm");
 
 const { Session } = require("./server/data/model/Session");
+const { stringify } = require("yaml");
 
 function start() {
   setupStaticAssets(app);
@@ -175,6 +178,27 @@ function initEnvFile() {
         }
         console.log(".env-default was copied to .env");
       });
+    }
+  } catch (err) {
+    console.log("initEnvFile catch error");
+    console.error(err);
+  }
+}
+
+function initInstallIdFile(){
+  const path = "./server/data/config/installId.json";
+
+  try {
+    if (!fs.existsSync(path)) {
+      //create default install id file
+      let content = JSON.stringify({installId: helperService.generateRandomString(8)});
+      fs.writeFile(path, content, err => {
+        if (err) {
+          console.error(err)
+          return
+        }
+        //file written successfully
+      })
     }
   } catch (err) {
     console.log("initEnvFile catch error");
