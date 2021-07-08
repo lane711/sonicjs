@@ -19,8 +19,8 @@ module.exports = appAnalyticsMainService = {
     });
 
     emitterService.on("startup", async function (options) {
-        appAnalyticsMainService.trackEventSend(options);
-      });
+      appAnalyticsMainService.trackEventSend(options);
+    });
 
     app.post(process.env.ANALYTICS_RECEIVE_URL, async function (req, res) {
       appAnalyticsMainService.processEvent(req.body);
@@ -29,10 +29,10 @@ module.exports = appAnalyticsMainService = {
   },
 
   trackEventSend: async function (options) {
-    const installId =  require("../../../data/config/installId.json");
+    const installId = require("../../../data/config/installId.json");
 
     let data = {
-      installId : installId.installId,
+      installId: installId.installId,
       eventName: "page_load",
       url: options.page.data.url,
       timestamp: Date.now(),
@@ -40,42 +40,54 @@ module.exports = appAnalyticsMainService = {
 
     let axios = await appAnalyticsMainService.getAxios();
 
-    let result = axios.post(process.env.ANALYTICS_POST_URL, 
-      data
-    );
+    let result = axios.post(process.env.ANALYTICS_POST_URL, data);
   },
 
   processEvent: async function (data) {
+    let profileUrl = `/analytics/${data.installId}`;
+    let profile = await dataService.getContentByUrl(profileUrl);
+
+    if (!profile || profile.data.status === "Not Found") {
+      let payload = {
+        data: {
+          contentType: "app-analytics",
+          url: profileUrl,
+          installId: data.installId,
+          firstSeenOn: data.timestamp,
+        },
+      };
+      profile = await dataService.contentCreate(payload, false, "anonymous");
+    }
     // if (!mixpanel) {
     //   return;
     // }
 
-    let enabled = await appAnalyticsMainService.trackingEnabled(
-      req.headers.host
-    );
-    if (!enabled) {
-      return;
-    }
+    // let enabled = await appAnalyticsMainService.trackingEnabled(
+    //   req.headers.host
+    // );
+    // if (!enabled) {
+    //   return;
+    // }
 
-    let email;
-    email = await appAnalyticsMainService.getEmail(req);
+    // let email;
+    // email = await appAnalyticsMainService.getEmail(req);
 
-    //add app version
-    data.appVersion = globalService.getAppVersion();
+    // //add app version
+    // data.appVersion = globalService.getAppVersion();
 
-    mixpanel.track(eventName, {
-      $email: email,
-      distinct_id: email,
-      data: data,
-    });
+    // mixpanel.track(eventName, {
+    //   $email: email,
+    //   distinct_id: email,
+    //   data: data,
+    // });
 
-    if (email) {
-      if (eventName === "PAGE_LOAD") {
-        // mixpanel.people.increment(email, "page_viewed");
-      } else if (eventName === "PAGE_LOAD_ADMIN") {
-        // mixpanel.people.increment(email, "page_viewed_admin");
-      }
-    }
+    // if (email) {
+    // if (eventName === "PAGE_LOAD") {
+      // mixpanel.people.increment(email, "page_viewed");
+    // } else if (eventName === "PAGE_LOAD_ADMIN") {
+      // mixpanel.people.increment(email, "page_viewed_admin");
+      //   }
+    // }
   },
 
   getEmail: async function (req) {

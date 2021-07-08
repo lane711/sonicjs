@@ -743,6 +743,10 @@ const Mutation = new GraphQLObjectType({
 
 async function getUserSession(sessionID, reqSessionID) {
 
+  if(sessionID == 'anonymous'){
+    return {user : {id: sessionID}};
+  }
+
   let id = sessionID;
   if (!id || id === "undefined") {
     id = reqSessionID;

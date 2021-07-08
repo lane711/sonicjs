@@ -420,6 +420,7 @@ if (typeof module !== "undefined" && module.exports) {
       let notFound = { data: {} };
       notFound.data.title = "Not Found";
       notFound.data.body = "Not Found";
+      notFound.data.status = "Not Found";
       notFound.url = url;
       return notFound;
     }),
