@@ -71,6 +71,11 @@ margin: 8px
 margin: 0 8px 0
 }
 
+.docs [data-module="IMAGE"],
+.docs [data-module="CODE-SNIPPET"]{
+margin:0 0 100px;    
+}
+
 .checkbox label:before,.radio label:before {
 display: none
 }
@@ -84,9 +89,10 @@ transform: scale(1.5);
 padding: 0 0 0 3px
 }
 
-.form-check-label{
-    margin: 0 0 0 4px;
+.form-check-label {
+margin: 0 0 0 4px
 }
+
 .form-check-label span {
 margin: 4px 0 0
 }}
