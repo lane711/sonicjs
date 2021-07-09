@@ -399,35 +399,55 @@ module.exports = moduleService = {
       JSON.stringify(moduleDefinitionFile, null, 2)
     );
 
-    //create content type
-    let moduleContentType = {
-      title: `Module - ${moduleDefinitionFile.title}`,
+    //create default content type
+    let contentTypeDef = {
+      moduleSystemId: moduleDefinitionFile.systemId,
       systemId: moduleDefinitionFile.systemId,
-      canBeAddedToColumn: moduleDefinitionFile.canBeAddedToColumn,
-      enabled: moduleDefinitionFile.enabled,
+      title: moduleDefinitionFile.title,
       data: { components: [] },
     };
-    moduleContentType.data.components.push({
-      label: "First Name",
+
+    contentTypeDef.data.components.push({
+      label: "Title",
       type: "textfield",
       input: true,
-      key: "firstName",
+      key: "title",
       validate: { required: true },
     });
-    moduleContentType.data.components.push({
+    contentTypeDef.data.components.push({
       label: "Submit",
       type: "button",
       input: true,
       key: "submit",
       theme: "primary",
     });
-    // let ct = await dataService.createContentType(moduleContentType);
-    let contentTypeDef = {
-      moduleSystemId: moduleDefinitionFile.systemId,
-      systemId: moduleDefinitionFile.systemId,
-      title: moduleDefinitionFile.title,
-    };
+
     await moduleService.createModuleContentType(contentTypeDef);
+
+    //create settings content type
+    let contentTypeDefSettings = {
+      moduleSystemId: moduleDefinitionFile.systemId,
+      systemId: `${moduleDefinitionFile.systemId}-settings`,
+      title: `${moduleDefinitionFile.title} Settings`,
+      data: { components: [] },
+    };
+
+    contentTypeDefSettings.data.components.push({
+      label: "Enabled",
+      type: "checkbox",
+      input: true,
+      key: "enabled",
+      defaultValue: true
+    });
+    contentTypeDefSettings.data.components.push({
+      label: "Submit",
+      type: "button",
+      input: true,
+      key: "submit",
+      theme: "primary",
+    });
+
+    await moduleService.createModuleContentType(contentTypeDefSettings);
   },
 
   updateModule: async function (moduleDefinitionFile) {
