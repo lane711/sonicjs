@@ -38,7 +38,7 @@ assets:
     - /node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.js
     - /node_modules/dropzone/dist/min/dropzone.min.js
     - /node_modules/prismjs/prism.js
-    - /vendors/prism-treeview/prism-treeview.js
+    - /assets/vendors/prism-treeview/prism-treeview.js
     - /assets/js/common.js
     - /services/shared.service.js
     - /services/global.service.js
@@ -58,5 +58,5 @@ assets:
     - /node_modules/formiojs/dist/formio.form.min.css
     - /node_modules/jsoneditor/dist/jsoneditor.min.css
     - /node_modules/prismjs/themes/prism-coy.css
-    - /vendors/prism-treeview/prism-treeview.css
+    - /assets/vendors/prism-treeview/prism-treeview.css
     - /assets/css/common.css
