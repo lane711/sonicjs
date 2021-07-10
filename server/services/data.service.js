@@ -76,8 +76,12 @@ if (typeof module !== "undefined" && module.exports) {
         // if (true) {
 
         const defaultOptions = {
-          headers: {},
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          withCredentials: true,
           baseURL: globalService.baseUrl,
+          cookie: 'sonicjs=s%3AMmvj7HC35YSG-RP1WEY6G3NS7mrSRFcN.EoldLokzB5IMX34xGLC2QwbU0HZn2dSFmtQ9BhPB26w'
         };
 
         let token = helperService.getCookie("sonicjs_access_token");
@@ -85,7 +89,10 @@ if (typeof module !== "undefined" && module.exports) {
           defaultOptions.headers.Authorization = token;
         }
 
+
         axiosInstance = axios.create(defaultOptions);
+        axiosInstance.defaults.withCredentials = true
+
       }
       // debugger;
       return axiosInstance;

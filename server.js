@@ -105,9 +105,9 @@ function setupSessionDb(app) {
       cookie: { secure: false },
       secret: process.env.SESSION_SECRET,
       resave: false,
-      saveUninitialized: true,
+      saveUninitialized: false,
       store: new TypeormStore({
-        cleanupLimit: 2,
+        // cleanupLimit: 2,
         ttl: 86400 * 30,
       }).connect(sessionRepo),
     })
