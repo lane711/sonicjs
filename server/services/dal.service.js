@@ -256,9 +256,12 @@ module.exports = dalService = {
 
   contentRestore: async function (id, url, data, userSession) {
     const contentRepo = await getRepository(Content);
+    data.lastUpdatedByUserId = 'anonymous' ? 1 : data.lastUpdatedByUserId;
+    data.createdByUserId = 'anonymous' ? 1 : data.lastUpdatedByUserId;
+
     data.data = JSON.stringify(data.data);
     let result = await contentRepo.save(data);
-    console.log(result);
+    // console.log(result);
   },
 
   userRestore: async function (id, url, data, userSession) {

@@ -21,30 +21,42 @@ module.exports = backUpRestoreService = {
 
   importJsonFiles: async function (req) {
 
-    // var contentFiles = fileService.getFilesSync("/backups/content");
-    // for (let index = 0; index < contentFiles.length; index++) {
-    //   const file = contentFiles[index];
-    //   let contentFile = fileService.getFileSync(`/backups/content/${file}`);
-    //   if (contentFile) {
-    //     let payload = JSON.parse(contentFile);
-    //     let id = parseInt(file.replace('.json', ''));
-    //     payload.id = id;
-    //     await dalService.contentRestore(id, payload.url, payload, req.sessionID);
-    //   }
-    // }
+    var contentFiles = fileService.getFilesSync("/backups/content");
+    for (let index = 0; index < contentFiles.length; index++) {
+      const file = contentFiles[index];
+      // let file = '479.json';
 
-    var userFiles = fileService.getFilesSync("/backups/user");
+      let contentFile = fileService.getFileSync(`/backups/content/${file}`);
 
-    for (let index = 0; index < userFiles.length; index++) {
-      const file = userFiles[index];
-      let userFile = fileService.getFileSync(`/backups/user/${file}`);
-      if (userFile) {
-        let payload = JSON.parse(userFile);
+      if (contentFile) {
+        let payload = JSON.parse(contentFile);
         let id = parseInt(file.replace('.json', ''));
         payload.id = id;
-        await dalService.userRestore(id, payload.url, payload, req.sessionID);
+        try {
+          await dalService.contentRestore(id, payload.url, payload, req.sessionID);
+
+        } catch (error) {
+          console.log('id', id)
+
+          console.log(error);
+          console.log('paylaod', payload);
+        }
+
       }
     }
+
+    // var userFiles = fileService.getFilesSync("/backups/user");
+
+    // for (let index = 0; index < userFiles.length; index++) {
+    //   const file = userFiles[index];
+    //   let userFile = fileService.getFileSync(`/backups/user/${file}`);
+    //   if (userFile) {
+    //     let payload = JSON.parse(userFile);
+    //     let id = parseInt(file.replace('.json', ''));
+    //     payload.id = id;
+    //     await dalService.userRestore(id, payload.url, payload, req.sessionID);
+    //   }
+    // }
 
   },
 };

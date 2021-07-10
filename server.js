@@ -315,7 +315,7 @@ function setupStaticAssets(app) {
 
 function main() {
   typeorm.createConnection().then((connection) => {
-    console.log(logSymbols.success, "Successfully connected to SQL Lite!");
+    console.log(logSymbols.success, "Successfully connected to Database!");
     // await installService.checkInstallation();
     const repository = connection.getRepository(Session);
 
