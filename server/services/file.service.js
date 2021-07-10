@@ -37,15 +37,16 @@ module.exports = fileService = {
   },
 
   getFileSync: function (relativeFilePath) {
-    let filePath = path.join(appRoot.path, relativeFilePath);
+    if (!relativeFilePath.includes(".gitignore")) {
+      let filePath = path.join(appRoot.path, relativeFilePath);
 
-    let content = fs.readFileSync(filePath, "utf8");
-    return content;
+      let content = fs.readFileSync(filePath, "utf8");
+      return content;
+    }
   },
 
   getFilesSync: function (relativeDir) {
     let files = fs.readdirSync(path.join(appRoot.path + relativeDir));
-    // let filesRelative = fileService.convertFullPathToRelative(files);
     return files;
   },
 

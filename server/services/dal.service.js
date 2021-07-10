@@ -254,6 +254,20 @@ module.exports = dalService = {
     }
   },
 
+  contentRestore: async function (id, url, data, userSession) {
+    const contentRepo = await getRepository(Content);
+    data.data = JSON.stringify(data.data);
+    let result = await contentRepo.save(data);
+    console.log(result);
+  },
+
+  userRestore: async function (id, url, data, userSession) {
+    const contentRepo = await getRepository(User);
+    data.data = JSON.stringify(data.data);
+    let result = await contentRepo.save(data);
+    console.log(result);
+  },
+
   processContent: function (entity, user) {
     if (entity.data) {
       try {

@@ -27,6 +27,7 @@ var userService = require("../services/user.service");
 var authService = require("../services/auth.service");
 var dalService = require("../services/dal.service");
 var backupService = require("../services/backup.service");
+var backupRestoreService = require("../services/backup-restore.service");
 
 var helperService = require("../services/helper.service");
 var sharedService = require("../services/shared.service");
@@ -51,6 +52,8 @@ exports.loadRoutes = async function (app) {
   adminService.startup(app);
   formService.startup(app);
   backupService.startup(app);
+  backupRestoreService.startup(app);
+
   // app.get('/', async function (req, res) {
   //   res.send('ok');
   // });

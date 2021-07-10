@@ -1,5 +1,6 @@
 const EntitySchema = require("typeorm").EntitySchema;
 const User = require("../model/User").User;
+const typeHelper = require('../helper/type.helper');
 
 module.exports = new EntitySchema({
     name: "User",
@@ -24,10 +25,10 @@ module.exports = new EntitySchema({
             type: "text"
         },
         createdOn: {
-            type: "datetime"
+            type: typeHelper.getDateTime()
         },
         updatedOn: {
-            type: "datetime"
+            type: typeHelper.getDateTime()
         },
     },
     relations: {

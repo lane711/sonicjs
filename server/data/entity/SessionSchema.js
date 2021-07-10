@@ -1,5 +1,6 @@
 const EntitySchema = require("typeorm").EntitySchema;
 const Session = require("../model/Session").Session; // import {Category} from "../model/Category";
+const typeHelper = require('../helper/type.helper');
 
 module.exports = new EntitySchema({
     name: "Session",

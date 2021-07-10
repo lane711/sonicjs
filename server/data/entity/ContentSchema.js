@@ -1,6 +1,7 @@
 const EntitySchema = require("typeorm").EntitySchema;
 const Content = require("../model/Content").Content;
 const Tag = require("../model/Tag").Tag;
+const typeHelper = require('../helper/type.helper');
 
 module.exports = new EntitySchema({
     name: "Content",
@@ -24,10 +25,10 @@ module.exports = new EntitySchema({
             type: "int"
         },
         createdOn: {
-            type: "datetime"
+            type: typeHelper.getDateTime()
         },
         updatedOn: {
-            type: "datetime"
+            type: typeHelper.getDateTime()
         },
         url: {
             type: "varchar",
