@@ -101,7 +101,7 @@ function setupSessionDb(app) {
 
   app.use(
     session({
-      name: 'sonicjs',
+      name: "sonicjs",
       cookie: { secure: false },
       secret: process.env.SESSION_SECRET,
       resave: false,
@@ -185,20 +185,22 @@ function initEnvFile() {
   }
 }
 
-function initInstallIdFile(){
+function initInstallIdFile() {
   const path = "./server/data/config/installId.json";
 
   try {
     if (!fs.existsSync(path)) {
       //create default install id file
-      let content = JSON.stringify({installId: helperService.generateRandomString(8)});
-      fs.writeFile(path, content, err => {
+      let content = JSON.stringify({
+        installId: helperService.generateRandomString(8),
+      });
+      fs.writeFile(path, content, (err) => {
         if (err) {
-          console.error(err)
-          return
+          console.error(err);
+          return;
         }
         //file written successfully
-      })
+      });
     }
   } catch (err) {
     console.log("initEnvFile catch error");
@@ -314,13 +316,20 @@ function setupStaticAssets(app) {
 }
 
 function main() {
-  typeorm.createConnection().then((connection) => {
-    console.log(logSymbols.success, "Successfully connected to Database!");
-    // await installService.checkInstallation();
-    const repository = connection.getRepository(Session);
-
-    start();
-  });
+  typeorm
+    .createConnection({
+      url: process.env.DATABASE_URL,
+      type: "postgres",
+      entities: ["server/data/entity/*.js"],
+      synchronize: false,
+      ssl: {
+        rejectUnauthorized: false,
+      },
+    })
+    .then((connection) => {
+      console.log(logSymbols.success, "Successfully connected to Database!");
+      start();
+    });
 }
 
 main();
