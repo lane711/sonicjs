@@ -15,16 +15,16 @@ module.exports = appAnalyticsMainService = {
     });
 
     emitterService.on("postPageRender", async function (options) {
-      // appAnalyticsMainService.trackEventSend(options);
+      appAnalyticsMainService.trackEventSend(options);
     });
 
     emitterService.on("startup", async function (options) {
-      // appAnalyticsMainService.trackEventSend(options);
+      appAnalyticsMainService.trackEventSend(options);
     });
 
     app.post(process.env.ANALYTICS_RECEIVE_URL, async function (req, res) {
-      // appAnalyticsMainService.processEvent(req.body);
-      // res.json({ ok: "ok" });
+      appAnalyticsMainService.processEvent(req.body);
+      res.json({ ok: "ok" });
     });
   },
 
@@ -54,9 +54,13 @@ module.exports = appAnalyticsMainService = {
           url: profileUrl,
           installId: data.installId,
           firstSeenOn: data.timestamp,
+          events: []
         },
       };
       profile = await dataService.contentCreate(payload, false, "anonymous");
+    } else{
+      profile.events.push({name: data.eventName, timestamp: data.timestamp, url: data.url});
+      profile = await dataService.editInstance(payload, "anonymous");
     }
     // if (!mixpanel) {
     //   return;
