@@ -54,14 +54,19 @@ module.exports = appAnalyticsMainService = {
           url: profileUrl,
           installId: data.installId,
           firstSeenOn: data.timestamp,
-          events: []
+          events: [],
         },
       };
-      profile = await dataService.contentCreate(payload, false, "anonymous");
-    } else{
-      profile.events.push({name: data.eventName, timestamp: data.timestamp, url: data.url});
-      profile = await dataService.editInstance(payload, "anonymous");
+      profile = await dataService.contentCreate(payload, false, 0);
     }
+
+    profile.data.events.push({
+      name: data.eventName,
+      timestamp: data.timestamp,
+      url: data.url,
+    });
+    profile = await dataService.editInstance(profile, 0);
+
     // if (!mixpanel) {
     //   return;
     // }
@@ -87,10 +92,10 @@ module.exports = appAnalyticsMainService = {
 
     // if (email) {
     // if (eventName === "PAGE_LOAD") {
-      // mixpanel.people.increment(email, "page_viewed");
+    // mixpanel.people.increment(email, "page_viewed");
     // } else if (eventName === "PAGE_LOAD_ADMIN") {
-      // mixpanel.people.increment(email, "page_viewed_admin");
-      //   }
+    // mixpanel.people.increment(email, "page_viewed_admin");
+    //   }
     // }
   },
 

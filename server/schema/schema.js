@@ -541,12 +541,14 @@ const Mutation = new GraphQLObjectType({
       },
       async resolve(parent, args, req) {
         let dataObj = JSON.parse(args.data);
-        return dalService.contentUpdate(
+        let result = await dalService.contentUpdate(
           "",
           args.url,
           dataObj,
           await getUserSession(args.sessionID, req.sessionID)
         );
+
+        return result;
         // let userId = (context.session.userSession && context.session.userSession.id)
         //   ? context.session.userSession.id
         //   : args.createdByUserId;
@@ -743,8 +745,8 @@ const Mutation = new GraphQLObjectType({
 
 async function getUserSession(sessionID, reqSessionID) {
 
-  if(sessionID == 'anonymous'){
-    return {user : {id: sessionID}};
+  if(sessionID == 0){
+    return {user : {id: 0}};
   }
 
   let id = sessionID;

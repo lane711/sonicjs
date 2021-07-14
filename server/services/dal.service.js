@@ -222,7 +222,8 @@ module.exports = dalService = {
     content.updatedOn = new Date();
     content.tags = [];
     content.data = JSON.stringify(data);
-    return contentRepo.save(content);
+    let result = await contentRepo.save(content);
+    return result;
   },
 
   contentDelete: async function (id, userSession) {
