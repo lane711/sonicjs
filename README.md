@@ -10,12 +10,6 @@
       <img src="https://img.shields.io/badge/Donate-PayPal-green.svg" alt="Donate" />
   </a>
 
-### If you find the project promising:
-
-### :star: PLEASE STAR THIS PROJECT :star: !!! :)
-
-### It will help spread the word so that I can start to generate developer feedback. Thanks in advance!
-
 ![Image of SonicJs Logo](https://sonicjs.com/assets/uploads/sonicjs-logo-dark.svg)
 [https://sonicjs.com](https://sonicjs.com)
 
@@ -143,7 +137,7 @@ If you are considering using SonicJs for your next web project, its important to
 
 If you are interested in reading more about me or the goals and motivation of the project, please check out the "about" page here: https://sonicjs.com/about.
 
-Also, if you've actually read down this far and happen to be a in generous mood, :star::star::star::star::star: **would you mind given the project a star?**:star::star::star::star::star: Thanks in advance!
+Also, if you've actually read down this far and happen to be a in generous mood, :star::star::star::star::star: **please consider giving this project a star to help us spread the word?** :star::star::star::star::star: Thanks in advance!
 
 ## Debugging
 
