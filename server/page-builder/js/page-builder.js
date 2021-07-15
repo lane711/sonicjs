@@ -658,7 +658,7 @@ async function editInstance(payload, refresh, contentType = "content") {
   }
   // debugger;
   dataService
-    .editInstance(payload)
+    .editInstance(payload, sessionID)
     .then(async function (response) {
       // debugger;
       console.log("editInstance", response);

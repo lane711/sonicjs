@@ -272,8 +272,9 @@ if (typeof module !== "undefined" && module.exports) {
         type: "textfield",
         key: "id",
         label: "id",
+        customClass: "hide",
         defaultValue: id,
-        hidden: true,
+        hidden: false,
         input: true,
       });
 
