@@ -346,7 +346,10 @@ function setupStaticAssets(app) {
 
 function main() {
   let sslParam = { rejectUnauthorized: false };
-  // (process.env.LOCAL_DEV && process.env.LOCAL_DEV == 'true') ? false : { rejectUnauthorized: false };
+  
+  if(process.env.LOCAL_DEV && process.env.LOCAL_DEV == 'true'){
+    sslParam = false;
+  }
 
     let connectionSettings = {
       url: process.env.DATABASE_URL,
