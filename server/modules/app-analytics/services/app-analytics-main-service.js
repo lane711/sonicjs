@@ -43,7 +43,7 @@ module.exports = appAnalyticsMainService = {
   },
 
   trackEventSend: async function (data) {
-    if (appAnalyticsMainService.trackingEnabled) {
+    if (await appAnalyticsMainService.trackingEnabled()) {
       const { installId } = require("../../../data/config/installId.json");
       data.installId = installId;
       let axios = await appAnalyticsMainService.getAxios();

@@ -348,14 +348,20 @@ function main() {
   let sslParam =
     process.env.LOCAL_DEV == 'true' ? false : { rejectUnauthorized: false };
 
-  typeorm
-    .createConnection({
+    let connectionSettings = {
       url: process.env.DATABASE_URL,
-      type: "postgres",
+      type: process.env.TYPEORM_CONNECTION,
       entities: ["server/data/entity/*.js"],
-      synchronize: false,
+      synchronize: process.env.TYPEORM_SYNCHRONIZE,
       ssl: sslParam,
-    })
+    }
+
+    if(process.env.TYPEORM_CONNECTION === 'sqlite'){
+      connectionSettings.database = process.env.TYPEORM_DATABASE;
+    }
+
+  typeorm
+    .createConnection(connectionSettings)
     .then((connection) => {
       console.log(logSymbols.success, "Successfully connected to Database!");
       start();
