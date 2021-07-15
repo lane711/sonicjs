@@ -11,16 +11,17 @@ const backUpRestoreUrl = process.env.BACKUP_RESTORE_URL;
 
 module.exports = backUpRestoreService = {
   startup: async function (app) {
-    app.get(backUpRestoreUrl, async function (req, res) {
-      await backUpRestoreService.importJsonFiles(req);
-      // await backUpRestoreService.zipBackUpDirectory();
-      // backUpRestoreService.uploadToDropBox();
-      res.sendStatus(200);
-    });
+    if (backUpRestoreUrl) {
+      app.get(backUpRestoreUrl, async function (req, res) {
+        await backUpRestoreService.importJsonFiles(req);
+        // await backUpRestoreService.zipBackUpDirectory();
+        // backUpRestoreService.uploadToDropBox();
+        res.sendStatus(200);
+      });
+    }
   },
 
   importJsonFiles: async function (req) {
-
     var contentFiles = fileService.getFilesSync("/backups/content");
     for (let index = 0; index < contentFiles.length; index++) {
       const file = contentFiles[index];
@@ -30,18 +31,21 @@ module.exports = backUpRestoreService = {
 
       if (contentFile) {
         let payload = JSON.parse(contentFile);
-        let id = parseInt(file.replace('.json', ''));
+        let id = parseInt(file.replace(".json", ""));
         payload.id = id;
         try {
-          await dalService.contentRestore(id, payload.url, payload, req.sessionID);
-
+          await dalService.contentRestore(
+            id,
+            payload.url,
+            payload,
+            req.sessionID
+          );
         } catch (error) {
-          console.log('id', id)
+          console.log("id", id);
 
           console.log(error);
-          console.log('paylaod', payload);
+          console.log("paylaod", payload);
         }
-
       }
     }
 
@@ -57,6 +61,5 @@ module.exports = backUpRestoreService = {
     //     await dalService.userRestore(id, payload.url, payload, req.sessionID);
     //   }
     // }
-
   },
 };
