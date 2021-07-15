@@ -1,6 +1,19 @@
 $(document).ready(async function () {
   $(function () {
-    $('[data-toggle="popover"]').popover();
+    // $('[data-toggle="popover"]').popover();
+    // $('[data-toggle="popover"]').on('click', function(){
+    //   $('[data-toggle="popover"]').popover();
+    // });
+
+    $(document).on('click', '[data-toggle="popover"]', function (e) {
+      //
+      // If popover is visible: do nothing
+      //
+      if ($(this).prop('popShown') == undefined) {
+         $(this).prop('popShown', true).popover('show');
+      }
+  });
+  
   });
 
   $("table").on("shown.bs.popover", function () {

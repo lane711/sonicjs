@@ -110,8 +110,6 @@ module.exports = appAnalyticsMainService = {
       }
 
       profile = await dataService.editInstance(profile, 0);
-      console.log(`profile event added for ${profile.id}`);
-
     }
 
   },

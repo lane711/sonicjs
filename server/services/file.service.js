@@ -112,15 +112,16 @@ module.exports = fileService = {
     return appRoot.path;
   },
 
-  updateEnvFileVariable: async function (variableName, variableValue) {
-    process.env.REBUILD_ASSETS = "FALSE";
+  //this causes all env comments to be lost
+  // updateEnvFileVariable: async function (variableName, variableValue) {
+  //   process.env.REBUILD_ASSETS = "FALSE";
 
-    let envFile = await this.getFile(".env");
-    let parsedFile = parse(envFile);
-    parsedFile[variableName] = variableValue;
-    let envFileContent = stringify(parsedFile);
-    await this.writeFile(".env", envFileContent);
-  },
+  //   let envFile = await this.getFile(".env");
+  //   let parsedFile = parse(envFile);
+  //   parsedFile[variableName] = variableValue;
+  //   let envFileContent = stringify(parsedFile);
+  //   await this.writeFile(".env", envFileContent);
+  // },
 
   deleteFile: function (filePath) {
     fs.unlinkSync(filePath);

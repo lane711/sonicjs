@@ -319,9 +319,11 @@ function main() {
   typeorm
     .createConnection({
       url: process.env.DATABASE_URL,
-      type: "postgres",
+      database: process.env.TYPEORM_DATABASE,
+      type: process.env.TYPEORM_CONNECTION,
       entities: ["server/data/entity/*.js"],
-      synchronize: false,
+      synchronize: process.env.TYPEORM_SYNCHRONIZE,
+      logging: process.env.TYPEORM_LOGGING,
       // ssl: {
       //   rejectUnauthorized: false,
       // },

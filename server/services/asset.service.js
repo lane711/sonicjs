@@ -21,13 +21,14 @@ module.exports = assetService = {
           //TODO: cache this
           let assetFilesExist = await assetService.doesAssetFilesExist();
 
-          if (process.env.REBUILD_ASSETS === "TRUE" || !assetFilesExist || options.req.pageLoadedCount === 1) {
+          // if (process.env.REBUILD_ASSETS === "TRUE" || !assetFilesExist || options.req.pageLoadedCount === 1) {
+            if (!assetFilesExist || options.req.pageLoadedCount === 1) {
             //rebuild the assets before delivering
             await assetService.getLinks(options, "css");
             await assetService.getLinks(options, "js");
 
             //file will now exist, so no need to rebuild
-            await fileService.updateEnvFileVariable("REBUILD_ASSETS", "FALSE");
+            // await fileService.updateEnvFileVariable("REBUILD_ASSETS", "FALSE");
           }
 
           //add combined assets
@@ -38,7 +39,7 @@ module.exports = assetService = {
             "css"
           )}" rel="stylesheet">`;
         } else {
-          await fileService.updateEnvFileVariable("REBUILD_ASSETS", "TRUE");
+          // await fileService.updateEnvFileVariable("REBUILD_ASSETS", "TRUE");
           await assetService.getLinks(options, "css");
           await assetService.getLinks(options, "js");
         }
