@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="{{ data.metaDescription }}">
+  <meta name="generator" content="SonicJs">
+  <meta name="version" content="{{ data.appVersion }}">
+  <link rel="icon" href="/assets/img/favicon.ico">
+  <title>{{data.metaTitle}}</title>
+
+  <!-- Web Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family={{data.siteSettings.fontHeaders}}">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family={{data.siteSettings.fontDefault}}">
+  <style>
+    body,
+    p {
+      font-family: '{{data.siteSettings.fontDefault}}',
+      serif !important;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: '{{data.siteSettings.fontHeaders}}',
+      serif;
+    }
+  </style>
+
+  {{{data.cssLinks}}}
+
+  {{#if data.showPageBuilder}}
+  <link href="/page-builder/css/page-builder.css" rel="stylesheet">
+  {{/if}}
+
+</head>
+<body>
+  <input type="hidden" name="page-id" id="page-id" value="{{data.id}}">
+
+  <main role="main">
+
+    {{> menu level='1'}}
+
+    {{#if data.showPageBuilder}}
+    {{> page-builder }}
+    {{/if}}
+
+    <input id="sessionID" type="hidden" value="{{data.sessionID}}"/>
+    {{{body}}}
+
+  </main><!-- /.container -->
+
+  {{{data.jsLinks}}}
+
+</body>
+
+</html>

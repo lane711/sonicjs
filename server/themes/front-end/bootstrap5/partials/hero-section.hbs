@@ -1,0 +1,16 @@
+{{#if data.showHero}}
+<section class="jumbotron-fluid hero no-margin">
+    <div class="dark-fade">
+        <div class='container'>
+            <div class='row'>
+                <div class='col'>
+                    <h1>{{data.heroTitle}}</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{{/if}}
+{{#unless data.showHero}}
+<div class="under-menu-spacer"></div>
+{{/unless}}

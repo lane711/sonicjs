@@ -29,6 +29,7 @@
     "aws-sdk": "^2.901.0",
     "axios": "^0.21.0",
     "bootstrap": "^4.5.3",
+    "bootstrap5": "npm:bootstrap@^5.0.2",
     "bootswatch": "^4.5.3",
     "chai": "^4.2.0",
     "chalk": "^4.1.0",
