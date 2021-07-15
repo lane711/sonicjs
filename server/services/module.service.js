@@ -177,7 +177,7 @@ module.exports = moduleService = {
             filePath: file.replace(`/${appRoot.path}/g`, ""),
             systemId: contentType.systemId,
           };
-          console.log('==> moduleContentTypeConfigs push ', contentTypeInfo);
+          // console.log('==> moduleContentTypeConfigs push ', contentTypeInfo);
           globalService.moduleContentTypeConfigs.push(contentTypeInfo);
         } else {
           console.log("error on " + file);

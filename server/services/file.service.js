@@ -40,8 +40,8 @@ module.exports = fileService = {
     if (!relativeFilePath.includes(".gitignore")) {
       let filePath = path.join(appRoot.path, relativeFilePath);
 
-      console.log('getFileSync filePath: ', filePath);
-      
+      // console.log('getFileSync filePath: ', filePath);
+
       let content = fs.readFileSync(filePath, "utf8");
       return content;
     }
