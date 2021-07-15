@@ -124,7 +124,7 @@ module.exports = appAnalyticsMainService = {
     ) {
       return false;
     }
-    if (host.indexOf("localhost") > -1) {
+    if (process.env.LOCAL_DEV === 'true') {
       return true;
     }
     return false;
