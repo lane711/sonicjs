@@ -46,7 +46,7 @@ module.exports = appAnalyticsMainService = {
     const { installId } = require("../../../data/config/installId.json");
     data.installId = installId;
     let axios = await appAnalyticsMainService.getAxios();
-    let result = axios.post(process.env.ANALYTICS_POST_URL, data);
+    let result = axios.post(process.env.ANALYTICS_POST_URL ?? 'https://sonicjs.com/sonicjs-app-analytics', data);
   },
 
   processEvent: async function (data) {
