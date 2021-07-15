@@ -43,11 +43,15 @@ module.exports = appAnalyticsMainService = {
   },
 
   trackEventSend: async function (data) {
-    const { installId } = require("../../../data/config/installId.json");
-    data.installId = installId;
-    let axios = await appAnalyticsMainService.getAxios();
-    let url = process.env.ANALYTICS_POST_URL ?? 'https://sonicjs.com/sonicjs-app-analytics'
-    let result = axios.post(url, data);
+    if (appAnalyticsMainService.trackingEnabled) {
+      const { installId } = require("../../../data/config/installId.json");
+      data.installId = installId;
+      let axios = await appAnalyticsMainService.getAxios();
+      let url =
+        process.env.ANALYTICS_POST_URL ??
+        "https://sonicjs.com/sonicjs-app-analytics";
+      let result = axios.post(url, data);
+    }
   },
 
   processEvent: async function (data) {
@@ -74,20 +78,16 @@ module.exports = appAnalyticsMainService = {
     }
 
     if (profile && profile.data.events) {
-
       if (data.eventName == "startup") {
         profile.data.pageCount = data.pageCount;
 
         profile.data.events.push({
           name: data.eventName,
-          timeStamp: timeStamp
+          timeStamp: timeStamp,
         });
-
       }
 
-      if (
-        data.eventName === "page_load"
-      ) {
+      if (data.eventName === "page_load") {
         profile.data.events.push({
           name: data.eventName,
           timeStamp: timeStamp,
@@ -97,10 +97,7 @@ module.exports = appAnalyticsMainService = {
         profile.data.pageVisits += 1;
       }
 
-
-      if (
-        data.eventName === "admin_page_load"
-      ) {
+      if (data.eventName === "admin_page_load") {
         profile.data.events.push({
           name: data.eventName,
           timeStamp: timeStamp,
@@ -112,7 +109,6 @@ module.exports = appAnalyticsMainService = {
 
       profile = await dataService.editInstance(profile, 0);
     }
-
   },
 
   getEmail: async function (req) {
@@ -135,7 +131,6 @@ module.exports = appAnalyticsMainService = {
   },
 
   getAxios: async function () {
-
     if (!appAnalyticsMainService.axiosInstance) {
       const defaultOptions = {
         headers: {},
