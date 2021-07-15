@@ -15,7 +15,6 @@ const url = require("url");
 const querystring = require("querystring");
 const dalService = require("./dal.service");
 const passport = require("passport");
-const mixpanelMainService = require("../modules/mixpanel/services/mixpanel-main-service");
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
 const adminDomain = process.env.ADMIN_DOMAIN;
@@ -78,8 +77,6 @@ module.exports = authService = {
         if (err) {
           return next(err);
         }
-
-        mixpanelMainService.setPeople(user.username);
 
         if (!user) {
           return res.redirect('/login?info=' + info);
