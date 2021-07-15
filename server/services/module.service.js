@@ -174,7 +174,7 @@ module.exports = moduleService = {
           let contentType = JSON.parse(contentTypeRaw);
           // console.log(contentType);
           let contentTypeInfo = {
-            filePath: file.replace(appRoot.path, ""),
+            filePath: file.replace(`/${appRoot.path}/g`, ""),
             systemId: contentType.systemId,
           };
           console.log('==> moduleContentTypeConfigs push ', contentTypeInfo);
