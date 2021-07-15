@@ -363,7 +363,7 @@ function main() {
       connectionSettings.database = process.env.TYPEORM_DATABASE;
     }
 
-    console.log('db connection:', connectionSettings);
+    // console.log('db connection:', connectionSettings);
 
   typeorm
     .createConnection(connectionSettings)
