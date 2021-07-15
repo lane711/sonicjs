@@ -317,7 +317,15 @@ function setupStaticAssets(app) {
 
 function main() {
   typeorm
-    .createConnection()
+    .createConnection({
+      url: process.env.DATABASE_URL,
+      type: "postgres",
+      entities: ["server/data/entity/*.js"],
+      synchronize: false,
+      ssl: {
+        rejectUnauthorized: false,
+      }
+    })
     .then((connection) => {
       console.log(logSymbols.success, "Successfully connected to Database!");
       start();
@@ -325,14 +333,3 @@ function main() {
 }
 
 main();
-
-
-      // url: process.env.DATABASE_URL,
-      // database: process.env.TYPEORM_DATABASE,
-      // type: process.env.TYPEORM_CONNECTION,
-      // entities: ["server/data/entity/*.js"],
-      // synchronize: process.env.TYPEORM_SYNCHRONIZE,
-      // logging: process.env.TYPEORM_LOGGING,
-      // // ssl: {
-      // //   rejectUnauthorized: false,
-      // // },
