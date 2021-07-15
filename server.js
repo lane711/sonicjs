@@ -322,9 +322,9 @@ function main() {
       type: "postgres",
       entities: ["server/data/entity/*.js"],
       synchronize: false,
-      ssl: {
-        rejectUnauthorized: false,
-      }
+      // ssl: {
+      //   rejectUnauthorized: false,
+      // }
     })
     .then((connection) => {
       console.log(logSymbols.success, "Successfully connected to Database!");
