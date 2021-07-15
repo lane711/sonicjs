@@ -272,10 +272,6 @@ module.exports = adminService = {
         let accessToken = "fakeToken"; //await userService.getToken(req);
         data.breadCrumbs = await breadcrumbsService.getAdminBreadcrumbs(req, req.sessionID);
 
-        mixPanelService.trackEvent("PAGE_LOAD_ADMIN", req, {
-          page: req.url
-        });
-
         //add session ID
         data.sessionID = req.sessionID;
 
@@ -284,6 +280,9 @@ module.exports = adminService = {
           data: data,
           accessToken: accessToken,
         });
+
+        await emitterService.emit("postAdminPageRender", (options = { req }));
+
       }
     );
   },

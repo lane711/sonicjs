@@ -80,6 +80,8 @@ exports.loadRoutes = async function (app) {
 
     //load catch-all last
     this.loadRoutesCatchAll(app);
+
+    await emitterService.emit("started", { app: app });
   })();
 
   app.get("*", async function (req, res, next) {
@@ -393,15 +395,17 @@ exports.loadRoutesCatchAll = async function (app) {
     }
 
     //ensure session exists if app just starting up
-    pageLoadedCount++;
-    req.pageLoadedCount = pageLoadedCount;
-    if (pageLoadedCount < 10) {
-      let session = await dalService.sessionGet(req.sessionID);
-      if (!session) {
-        res.redirect("/");
-        return;
-      }
-    }
+    // pageLoadedCount++;
+    // req.pageLoadedCount = pageLoadedCount;
+    // if (pageLoadedCount < 10) {
+    //   let session = await dalService.sessionGet(req.sessionID);
+    //   if (!session) {
+    //     res.redirect("/");
+    //     return;
+    //   }
+    // }
+
+
 
     let isAuthenticated = await userService.isAuthenticated(req);
     globalService.setAreaMode(false, true, isAuthenticated);
@@ -416,11 +420,6 @@ exports.loadRoutesCatchAll = async function (app) {
       return;
     }
 
-    mixPanelService.trackEvent("PAGE_LOAD", req, {
-      page: page.data.title,
-      ip: ip,
-    });
-
     await emitterService.emit("preRenderTemplate", (options = { page, req }));
 
     page.data.id = page.id;
@@ -430,6 +429,13 @@ exports.loadRoutesCatchAll = async function (app) {
       layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
       data: page.data,
     });
+
+    req.pageLoadedCount = pageLoadedCount;
+    if (pageLoadedCount < 1) {    
+      await emitterService.emit("firstPageLoaded", (options = { req }));
+    }
+    pageLoadedCount++;
+
 
     await emitterService.emit("postPageRender", (options = { page, req }));
 

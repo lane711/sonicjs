@@ -15,11 +15,25 @@ module.exports = appAnalyticsMainService = {
     });
 
     emitterService.on("postPageRender", async function (options) {
-      appAnalyticsMainService.trackEventSend(options);
+      appAnalyticsMainService.trackEventSend({
+        eventName: "page_load",
+        url: options.page.data.url,
+      });
     });
 
-    emitterService.on("startup", async function (options) {
-      appAnalyticsMainService.trackEventSend(options);
+    emitterService.on("postAdminPageRender", async function (options) {
+      appAnalyticsMainService.trackEventSend({
+        eventName: "admin_page_load",
+        url: options.req.url,
+      });
+    });
+
+    emitterService.on("firstPageLoaded", async function (options) {
+      let pageCount = await dataService.getContentByType("page", 0);
+      appAnalyticsMainService.trackEventSend({
+        eventName: "startup",
+        pageCount: pageCount.length,
+      });
     });
 
     app.post(process.env.ANALYTICS_RECEIVE_URL, async function (req, res) {
@@ -28,75 +42,78 @@ module.exports = appAnalyticsMainService = {
     });
   },
 
-  trackEventSend: async function (options) {
-    const installId = require("../../../data/config/installId.json");
-
-    let data = {
-      installId: installId.installId,
-      eventName: "page_load",
-      url: options.page.data.url,
-      timestamp: Date.now(),
-    };
-
+  trackEventSend: async function (data) {
+    const { installId } = require("../../../data/config/installId.json");
+    data.installId = installId;
     let axios = await appAnalyticsMainService.getAxios();
-
     let result = axios.post(process.env.ANALYTICS_POST_URL, data);
   },
 
   processEvent: async function (data) {
     let profileUrl = `/analytics/${data.installId}`;
     let profile = await dataService.getContentByUrl(profileUrl);
+    let timeStamp = new Date().toISOString();
 
     if (!profile || profile.data.status === "Not Found") {
       let payload = {
         data: {
           contentType: "app-analytics",
+          title: "app-analytics",
           url: profileUrl,
           installId: data.installId,
-          firstSeenOn: data.timestamp,
+          firstSeenOn: timeStamp,
           events: [],
+          pageCount: 0,
+          pageVisits: 0,
+          adminPageVisits: 0,
+          bootCount: 1,
         },
       };
       profile = await dataService.contentCreate(payload, false, 0);
     }
 
-    profile.data.events.push({
-      name: data.eventName,
-      timestamp: data.timestamp,
-      url: data.url,
-    });
-    profile = await dataService.editInstance(profile, 0);
+    if (profile && profile.data.events) {
 
-    // if (!mixpanel) {
-    //   return;
-    // }
+      if (data.eventName == "startup") {
+        profile.data.pageCount = data.pageCount;
 
-    // let enabled = await appAnalyticsMainService.trackingEnabled(
-    //   req.headers.host
-    // );
-    // if (!enabled) {
-    //   return;
-    // }
+        profile.data.events.push({
+          name: data.eventName,
+          timeStamp: timeStamp
+        });
 
-    // let email;
-    // email = await appAnalyticsMainService.getEmail(req);
+      }
 
-    // //add app version
-    // data.appVersion = globalService.getAppVersion();
+      if (
+        data.eventName === "page_load"
+      ) {
+        profile.data.events.push({
+          name: data.eventName,
+          timeStamp: timeStamp,
+          url: data.url,
+        });
 
-    // mixpanel.track(eventName, {
-    //   $email: email,
-    //   distinct_id: email,
-    //   data: data,
-    // });
+        profile.data.pageVisits += 1;
+      }
 
-    // if (email) {
-    // if (eventName === "PAGE_LOAD") {
-    // mixpanel.people.increment(email, "page_viewed");
-    // } else if (eventName === "PAGE_LOAD_ADMIN") {
-    // mixpanel.people.increment(email, "page_viewed_admin");
-    //   }
-    // }
+
+      if (
+        data.eventName === "admin_page_load"
+      ) {
+        profile.data.events.push({
+          name: data.eventName,
+          timeStamp: timeStamp,
+          url: data.url,
+        });
+
+        profile.data.adminPageVisits += 1;
+      }
+
+      profile = await dataService.editInstance(profile, 0);
+      console.log(`profile event added for ${profile.id}`);
+
+    }
+
   },
 
   getEmail: async function (req) {
@@ -119,24 +136,15 @@ module.exports = appAnalyticsMainService = {
   },
 
   getAxios: async function () {
-    //TODO add auth
-    // debugger;
-    if (!appAnalyticsMainService.axiosInstance) {
-      // if (true) {
 
+    if (!appAnalyticsMainService.axiosInstance) {
       const defaultOptions = {
         headers: {},
         baseURL: globalService.baseUrl,
       };
 
-      //   let token = helperService.getCookie("sonicjs_access_token");
-      //   if (token) {
-      //     defaultOptions.headers.Authorization = token;
-      //   }
-
       appAnalyticsMainService.axiosInstance = axios.create(defaultOptions);
     }
-    // debugger;
     return appAnalyticsMainService.axiosInstance;
   },
 };
