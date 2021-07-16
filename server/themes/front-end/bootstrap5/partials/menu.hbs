@@ -10,7 +10,7 @@
           {{#each data.menu}}
           <li class="nav-item {{#if this.showChildren}}dropdown{{/if}}">
             <a class="nav-link {{#if this.isActive}}active{{/if}} {{#if this.showChildren}}dropdown-toggle{{/if}}" href="{{this.data.url}}"
-              {{#if this.showChildren}}data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{/if}}>
+              {{#if this.showChildren}}data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{/if}}>
               {{this.data.title}}
               <span class="sr-only">(current)</span></a>
     
