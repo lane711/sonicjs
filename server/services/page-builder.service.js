@@ -70,7 +70,7 @@ module.exports = pageBuilderService = {
         // remove shortcode from the source column
         let shortCodesInColumn = ShortcodeTree.parse(content);
         shortCodeToRemove = shortCodesInColumn.children.filter(
-          (x) => x.shortcode.properties.id === data.moduleId
+          (x) => x.shortcode.properties.id === data.moduleId.toString()
         )[0];
         // console.log("shortCodeToRemove", shortCodeToRemove);
         if (shortCodeToRemove && shortCodeToRemove.shortcode) {
