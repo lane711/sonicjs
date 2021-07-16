@@ -41,6 +41,7 @@
     
     <input type="hidden" id="page-id" name="page-id"  value="{{data.id}}">
     <input type="hidden" id="sessionID" value="{{data.sessionID}}"/>
+    <input type="hidden" id="theme"  value="bootstrap5"/>
 
 <header>
 
@@ -60,7 +61,7 @@
 
 <footer class="footer mt-auto py-3 bg-light">
   <div class="container">
-    <span class="text-muted">Place sticky footer content here.</span>
+    <span class="text-muted">{{ data.themeSettings.footerText }}</span>
   </div>
 </footer>
 

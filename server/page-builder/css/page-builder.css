@@ -460,3 +460,13 @@ section {
 .open-admin.row {
   margin: 15px 0 8px 0;
 }
+
+.add-module-dropdown{
+  -moz-column-count: 2;
+  /* Firefox */
+  -webkit-column-count: 2;
+  /* Safari and Chrome */
+  column-count: 2;
+  /* width: 500px; */
+  height:640px;
+}
