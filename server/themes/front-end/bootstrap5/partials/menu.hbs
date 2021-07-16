@@ -1,47 +1,4 @@
-<!-- 
-<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
-
-  {{#if (eq data.themeSettings.logoType "text")}}
-  <h5 class="my-0 mr-md-auto font-weight-normal">{{ data.themeSettings.logoTitle }}</h5>
-  {{/if}}
-
-  {{#if (eq data.themeSettings.logoType "image")}}
-  <div style="{{ data.themeSettings.imageStyle}}" class="mr-md-auto">
-    <img src="/assets/uploads/{{ data.themeSettings.fileName}}" alt=""
-      width="{{ data.themeSettings.imageWidth}}">
-  </div>
-  {{/if}}
-
-  <nav class="my-2 my-md-0 mr-md-3">
-
-    <ul class="nav justify-content-end">
-      {{#each data.menu}}
-      <li class="nav-item {{#if this.isActive}}active{{/if}} {{#if this.showChildren}}dropdown{{/if}}">
-        <a class="nav-link {{#if this.showChildren}}dropdown-toggle{{/if}}" href="{{this.data.url}}"
-          {{#if this.showChildren}}data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{/if}}>
-          {{this.data.title}}
-          <span class="sr-only">(current)</span></a>
-
-        {{#if this.showChildren}}
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          {{#each this.children}}
-          <a class="dropdown-item" href="{{this.data.url}}">{{this.data.title}}</a>
-          {{/each}}
-        </div>
-        {{/if}}
-      </li>
-      {{/each}}
-      </li>
-    </ul>
-    </ul>
-  </nav>
-  <a class="btn btn-outline-primary" href="/login">Login</a>&nbsp;
-  <a class="btn btn-outline-primary" href="/register">Sign up</a>
-</div> -->
-
-
-  <!-- Fixed navbar -->
-  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">{{> menu-logo }}</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,15 +6,24 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav me-auto mb-2 mb-md-0">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Home</a>
+
+          {{#each data.menu}}
+          <li class="nav-item {{#if this.showChildren}}dropdown{{/if}}">
+            <a class="nav-link {{#if this.isActive}}active{{/if}} {{#if this.showChildren}}dropdown-toggle{{/if}}" href="{{this.data.url}}"
+              {{#if this.showChildren}}data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{/if}}>
+              {{this.data.title}}
+              <span class="sr-only">(current)</span></a>
+    
+            {{#if this.showChildren}}
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              {{#each this.children}}
+              <a class="dropdown-item" href="{{this.data.url}}">{{this.data.title}}</a>
+              {{/each}}
+            </div>
+            {{/if}}
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Link</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-          </li>
+          {{/each}}
+
         </ul>
         <form class="d-flex">
           <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
