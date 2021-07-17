@@ -45,6 +45,13 @@
           class="btn btn-success btn-sm ml-1 mt-1" data-dismiss="modal">Add
           Page</button>
 
+          <hr>
+
+          {{#each data.modulesForColumns}}
+          <a class="dropdown-item" onclick="addModule('{{this.systemId}}')"><i class="fa fa-plus"></i>
+            {{this.title}}</a>
+          {{/each}}
+
       </div>
 
       <div class="tab-pane fade show active" id="page" role="tabpanel" aria-labelledby="page-tab">

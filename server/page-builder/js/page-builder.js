@@ -1701,6 +1701,7 @@ async function beatifyACECss() {
 
 async function setupSortable() {
   let columnsList = $('main div[class^="col"]');
+  // TODO: limited this to only columns that are managed by page builder
   var columns = jQuery.makeArray(columnsList);
 
   // console.log("columns", columns);
