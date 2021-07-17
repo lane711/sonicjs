@@ -71,7 +71,7 @@
 - NodeJs
 - Express
 - GraphQL
-- Bootstrap 4
+- Bootstrap 5
 - Databases Supported: MySQL, PostgreSQL, SQLite (local file based database), MariaDB, Microsoft SQL Server, Oracle, WebSQL, MongoDB, CockroachDB, SAP Hana, sql.js, and others.
 
 
