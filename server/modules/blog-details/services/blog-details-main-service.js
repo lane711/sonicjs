@@ -28,7 +28,7 @@ module.exports = blogDetailsMainService = {
     emitterService.on("postPageDataFetch", async function (options) {
       if(options.page){
         if (options.req.url === "/blog-details") {
-          blogData  = await dataService.getContentByUrl(options.req.originalUrl);
+          blogData  = await dataService.getContentByUrl(options.req.originalUrl, options.req.sessionID);
 
           options.page.data.heroTitle = blogData.data.title;
         }

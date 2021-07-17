@@ -14,14 +14,14 @@ module.exports = themeSettingsService = {
       options
     ) {
       if (options) {
-        await themeSettingsService.processThemeSettings(options.page);
+        await themeSettingsService.processThemeSettings(options);
       }
     });
   },
 
-  processThemeSettings: async function (page) {
-    var themeSettings = await dataService.getContentTopOne("theme-settings");
+  processThemeSettings: async function (options) {
+    var themeSettings = await dataService.getContentTopOne("theme-settings", options.req.sessionID);
     // console.log("themeSettings", themeSettings);
-    page.data.themeSettings = themeSettings.data;
+    options.page.data.themeSettings = themeSettings.data;
   },
 };

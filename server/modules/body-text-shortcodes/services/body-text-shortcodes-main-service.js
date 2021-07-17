@@ -8,7 +8,7 @@ module.exports = bodyTextShortcodesMainService = {
   startup: async function () {
     emitterService.on("postModuleGetData", async function (options) {
 
-        if(options.viewModel.data.body){
+        if(options.viewModel && options.viewModel.data && options.viewModel.data.body){
 
             let parsedBlock = ShortcodeTree.parse(options.viewModel.data.body);
         
@@ -20,7 +20,7 @@ module.exports = bodyTextShortcodesMainService = {
                         if(!id) continue;
                         let contentType = bodyBlock.shortcode.name.toLowerCase();
                         let viewPath = await moduleService.getModuleViewFile(contentType);
-                        let viewModel = await dataService.getContentById(id);
+                        let viewModel = await dataService.getContentById(id, options.req.sessionID);
                   
                         var processedHtml = {
                           id: id,

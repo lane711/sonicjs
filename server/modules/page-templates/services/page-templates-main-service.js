@@ -20,7 +20,8 @@ module.exports = pageTemplatesMainService = {
           "PAGE TEMPLATE REGION"
         );
 
-        options.page.data.currentShortCodeHtml = `<div class="module page-template-region mb-2" data-id="${options.shortcode.properties.id}" data-module="PAGE-TEMPLATES">PAGE TEMPLATE REGION START</div>`;
+        let moduleClass = options.page.data.isPageTemplate ? 'module ' : '';
+        options.page.data.currentShortCodeHtml = `<div class="${moduleClass} page-template-region mb-2" data-id="${options.shortcode.properties.id}" data-module="PAGE-TEMPLATES">PAGE TEMPLATE REGION START</div>`;
 
         await moduleService.processModuleInColumn(options);
 
@@ -30,13 +31,7 @@ module.exports = pageTemplatesMainService = {
 
     emitterService.on("postModuleGetData", async function (options) {
       if (options.shortcode.name === "PAGE-TEMPLATES") {
-        // let basePage = await dataService.getContentByUrl(
-        //   options.req.originalUrl
-        // );
 
-        // if (!basePage.data.isPageTemplate) {
-        //   // let data = await dataService.getContentByUrl(options.req.originalUrl);
-        //   if (basePage.data.pageTemplateRegions) {
 
         if (options.page.data.pageTemplateRegions) {
           let regionId = options.viewModel.data.id;
@@ -50,7 +45,8 @@ module.exports = pageTemplatesMainService = {
               "s0",
               body[0].shortCodes,
               0,
-              0
+              0,
+              options.req
             );
 
             // var processedHtml ={
@@ -82,23 +78,21 @@ module.exports = pageTemplatesMainService = {
     });
 
     emitterService.on("preRenderTemplate", async function (options) {
-      //TODO get from cache
-      // let data = await dataService.getContentByUrl(options.req.originalUrl);
-      // options.page.data.id = data.id;
+
     });
 
-    emitterService.on("preProcessSections", async function (page) {
+    emitterService.on("preProcessSections", async function (options) {
       // check is page is using a template
-      if (page.data.pageTemplate && page.data.pageTemplate !== "none") {
+      if (options.page.data.pageTemplate && options.page.data.pageTemplate !== "none") {
         let templatePage = await dataService.getContentById(
-          page.data.pageTemplate
+          options.page.data.pageTemplate,
+          options.req.sessionID
         );
         if(templatePage){
-          page.data.layout = templatePage.data.layout;
+          options.page.data.layout = templatePage.data.layout;
         }
       }
-      // let basePage = await dataService.getContentByUrl(options.req.originalUrl);
-      // page.data.sections = [];
+
     });
   },
 };

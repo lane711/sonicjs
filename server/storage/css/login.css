@@ -31,3 +31,16 @@ body {
 .hide{
     display: none;
 }
+
+.terms-wrapper{
+    margin: 0 0 0 6px;;
+}
+
+input[type=checkbox] {
+    transform: scale(1.5);
+    padding: 3px 0 0 6px
+    }
+
+.checkbox-label{
+    margin: -4px 2px 0 12px;
+}

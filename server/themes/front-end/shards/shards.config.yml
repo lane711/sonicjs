@@ -10,7 +10,6 @@ bootstrap-version: 4.5.3
 #     - /services/helper.service.js
 #     - /services/data.service.js
 #     - /services/form.service.js
-#     - /services/analytics.service.js
 #     - /page-builder/js/page-builder.js:
 #         isPageBuilder: true
 #   css:
@@ -43,7 +42,6 @@ assets:
     - /services/formatting.service.js
     - /services/data.service.js
     - /services/form.service.js
-    - /services/analytics.service.js
     - /page-builder/js/page-builder.js:
         isPageBuilder: true
   css:

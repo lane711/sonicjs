@@ -16,9 +16,13 @@ var imageList,
   currentModuleContentType,
   jsonEditor,
   ShortcodeTree,
-  jsonEditorRaw;
+  jsonEditorRaw,
+  sessionID,
+  theme;
 
 $(document).ready(async function () {
+  setupSessionID();
+  setupThemeID();
   await setupAxiosInstance();
   setupUIHovers();
   setupUIClicks();
@@ -29,7 +33,6 @@ $(document).ready(async function () {
   setupJsonEditorContentTypeRaw();
   setupJsonRawSave();
 
-
   setupFormBuilder(contentType);
   await setupACEEditor();
   await setupDropZone();
@@ -37,6 +40,14 @@ $(document).ready(async function () {
   setupSidePanel();
   setupAdminMenuMinimizer();
 });
+
+function setupSessionID() {
+  sessionID = $("#sessionID").val();
+}
+
+function setupThemeID() {
+  theme = $("#theme").val();
+}
 
 async function setupAxiosInstance() {
   let baseUrl = window.location.protocol + "//" + window.location.host + "/";
@@ -62,7 +73,10 @@ async function setPage() {
 async function setContentType() {
   let contentTypeId = $("#contentTypeId").val();
   if (contentTypeId) {
-    this.contentType = await dataService.contentTypeGet(contentTypeId);
+    this.contentType = await dataService.contentTypeGet(
+      contentTypeId,
+      undefined
+    );
   }
 }
 
@@ -539,22 +553,22 @@ async function getContentInstance(id) {
     });
 }
 
-async function getContentByContentTypeAndTitle(contentType, title) {
-  const filter = `{"where":{"and":[{"data.title":"${title}"},{"data.contentType":"${contentType}"}]}}`;
-  const encodedFilter = encodeURI(filter);
-  let url = `/api/content?filter=${encodedFilter}`;
-  return axiosInstance
-    .get(url)
-    .then(async function (record) {
-      if (record.data[0]) {
-        return record.data[0];
-      }
-      return "not found";
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-}
+// async function getContentByContentTypeAndTitle(contentType, title) {
+//   const filter = `{"where":{"and":[{"data.title":"${title}"},{"data.contentType":"${contentType}"}]}}`;
+//   const encodedFilter = encodeURI(filter);
+//   let url = `/api/content?filter=${encodedFilter}`;
+//   return axiosInstance
+//     .get(url)
+//     .then(async function (record) {
+//       if (record.data[0]) {
+//         return record.data[0];
+//       }
+//       return "not found";
+//     })
+//     .catch(function (error) {
+//       console.log(error);
+//     });
+// }
 
 async function createInstance(
   payload,
@@ -571,7 +585,7 @@ async function createInstance(
     delete payload.id;
   }
 
-  if (!payload.data && contentType !== "user") {
+  if (!payload.data) {
     let temp = { data: payload };
     payload = temp;
   }
@@ -580,9 +594,10 @@ async function createInstance(
     payload = payload.data;
   }
 
+  // debugger;
   let entity = await dataService.contentCreate(payload);
 
-  if (entity.contentTypeId === "page") {
+  if (entity && entity.contentTypeId === "page") {
     let isBackEnd = globalService.isBackEnd();
     if (isBackEnd) {
       window.location.href = `/admin/content/edit/page/${entity.id}`;
@@ -643,7 +658,7 @@ async function editInstance(payload, refresh, contentType = "content") {
   }
   // debugger;
   dataService
-    .editInstance(payload)
+    .editInstance(payload, sessionID)
     .then(async function (response) {
       // debugger;
       console.log("editInstance", response);
@@ -707,13 +722,13 @@ async function editInstanceUser(payload, refresh, contentType = "content") {
   //   });
 }
 
-async function editContentType(payload) {
-  dataService.contentTypeUpdate(payload);
+async function editContentType(payload, sessionID) {
+  dataService.contentTypeUpdate(payload, sessionID);
 }
 
-async function deleteContentInstance(id) {
+async function deleteContentInstance(id, sessionID) {
   // debugger;
-  dataService.contentDelete(id);
+  dataService.contentDelete(id, sessionID);
 }
 
 async function deleteContentType(id) {
@@ -730,17 +745,8 @@ async function deleteContentType(id) {
     });
 }
 
-async function deleteUser(id) {
-  console.log("deleting user", id);
-  // return this.http.put(environment.apiUrl + `content/${id}`, payload).toPromise();
-  axiosInstance
-    .delete(`/api/user/${id}`)
-    .then(async function (response) {
-      console.log(response);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+async function userDelete(id, sessionID) {
+  dataService.userDelete(id, sessionID);
 }
 
 function processContentFields(payload) {
@@ -752,7 +758,7 @@ async function openForm(action, contentType) {
   $("#pageSettingsModal").appendTo("body").modal("show");
 }
 
-async function setupPageSettings(action, contentType) {
+async function setupPageSettings(action, contentType, sessionID) {
   console.log("setupPageSettings");
   let pageId = $("#page-id").val();
   // let page = await dataService.getContentById(pageId);
@@ -809,7 +815,10 @@ async function setupPageSettings(action, contentType) {
     form = await formService.getForm(
       contentType,
       formValuesToLoad,
-      "await submitContent(submission);"
+      "await submitContent(submission);",
+      undefined,
+      undefined,
+      sessionID
     );
   }
 
@@ -822,7 +831,10 @@ async function setupPageSettings(action, contentType) {
     form = await formService.getForm(
       "page",
       undefined,
-      "await submitContent(submission);"
+      "await submitContent(submission);",
+      undefined,
+      undefined,
+      sessionID
     );
   }
 
@@ -943,7 +955,7 @@ async function onContentTypeSave() {
     if (!contentType.id) {
       contentType.id = $("#createContentTypeForm #id").val();
     }
-    await editContentType(contentType);
+    await editContentType(contentType, sessionID);
   }
 }
 
@@ -951,7 +963,7 @@ async function onContentTypeRawSave() {
   // debugger;
   var contentType = jsonEditorRaw.get();
   console.log("jsonEditor", contentType);
-  await editContentType(contentType);
+  await editContentType(contentType, sessionID);
   fullPageUpdate();
 
   // if (contentTypeComponents) {
@@ -1109,7 +1121,7 @@ function setupJsonRawSave() {
     if (rawData.contentType !== "user") {
       json = { data: rawData };
       json.data.id = contentId;
-      refresh = false;
+      // refresh = false;
     }
 
     submitContent(json, refresh, json.contentType);
@@ -1153,14 +1165,16 @@ async function saveWYSIWYG() {
   fullPageUpdate();
 }
 
-async function addModule(systemId) {
+async function addModule(systemId, sessionID) {
   showSidePanel();
 
   let form = await formService.getForm(
     systemId,
     undefined,
     "addModuleToColumn(submission, true)",
-    true
+    true,
+    undefined,
+    sessionID
   );
 
   $(".pb-side-panel #main").html(form);
@@ -1171,7 +1185,7 @@ async function addModule(systemId) {
   //   .modal("show");
 }
 
-async function editModule() {
+async function editModule(sessionID) {
   // cleanModal();
   showSidePanel();
 
@@ -1183,7 +1197,9 @@ async function editModule() {
     currentModuleContentType,
     data,
     "await editInstance(submission, true);",
-    true
+    true,
+    undefined,
+    sessionID
   );
   $("#dynamicModelTitle").text(
     `Settings: ${currentModuleContentType} (Id:${currentModuleId})`
@@ -1208,7 +1224,7 @@ async function deleteModule() {
 
   let confirmDeleteButton = `<div class="btn-group">
     <button type="button" onclick="deleteModuleConfirm(true)" class="btn btn-danger">Delete Content and Remove from Column</button>
-    <button type="button" class="btn btn-danger dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button type="button" class="btn btn-danger dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       <span class="sr-only">Toggle Dropdown</span>
     </button>
     <div class="dropdown-menu">
@@ -1228,10 +1244,11 @@ async function deleteModuleConfirm(deleteContent = false) {
   console.log("deleteing module: " + currentModuleId, currentModuleContentType);
 
   let moduleDiv = $(`.module[data-id='${currentModuleId}'`);
-  let { isPageUsingTemplate, pageTemplateRegion } = getPageTemplateRegion(
-    page,
-    currentColumn[0]
-  );
+  let {
+    isPageUsingTemplate,
+    sourcePageTemplateRegion,
+    destinationPageTemplateRegion,
+  } = getPageTemplateRegion(page, currentColumn[0], currentColumn[0]);
 
   // debugger;
   let source = await getModuleHierarchy(moduleDiv);
@@ -1245,7 +1262,7 @@ async function deleteModuleConfirm(deleteContent = false) {
   //need to ignore template regions
   payload.data.moduleIndex = currentModuleIndex;
   payload.data.isPageUsingTemplate = isPageUsingTemplate;
-  payload.data.pageTemplateRegion = pageTemplateRegion;
+  payload.data.pageTemplateRegion = sourcePageTemplateRegion;
   payload.data.pageId = page.id;
   payload.data.deleteContent = deleteContent;
 
@@ -1284,11 +1301,68 @@ async function copyModule() {
   payload.data.moduleId = currentModuleId;
   payload.data.moduleIndex = currentModuleIndex;
 
+  let {
+    isPageUsingTemplate,
+    sourcePageTemplateRegion,
+    destinationPageTemplateRegion,
+  } = getPageTemplateRegion(page, currentColumn[0], currentColumn[0]);
+
+  payload.data.isPageUsingTemplate = isPageUsingTemplate;
+  payload.data.sourcePageTemplateRegion = sourcePageTemplateRegion;
+  payload.data.destinationPageTemplateRegion = destinationPageTemplateRegion;
+  payload.data.pageId = page.id;
+
+  ////////////////////
+  // let moduleBeingMovedId = event.item.dataset.id;
+  // let sourceColumn = $(event.from)[0].closest('div[class^="col"]');
+  // let destinationColumn = $(event.to)[0].closest('div[class^="col"]');
+
+  // let {
+  //   isPageUsingTemplate,
+  //   sourcePageTemplateRegion,
+  //   destinationPageTemplateRegion,
+  // } = getPageTemplateRegion(page, sourceColumn, destinationColumn);
+
+  // //source
+  // let source = await getModuleHierarchy(event.from);
+
+  // //destination
+  // let destinationSectionHtml = $(event.to)[0].closest("section");
+  // let destinationSectionId = destinationSectionHtml.dataset.id;
+  // let destinationRow = $(event.to)[0].closest(".row");
+  // let destinationRowIndex = $(destinationRow).index();
+  // let destinationColumnIndex = $(destinationColumn).index();
+
+  // //get destination list of modules in their updated sort order
+  // let destinationModules;
+  // let destinationModuleFilter = isPageUsingTemplate
+  //   ? "[data-template-region='true']"
+  //   : ".module";
+
+  // destinationModules = $(destinationColumn)
+  //   .find(destinationModuleFilter)
+  //   .toArray()
+  //   .map(function (div) {
+  //     let shortCodeData = { id: div.dataset.id, module: div.dataset.module };
+  //     return shortCodeData;
+  //   });
+
+  // let payload = { data: {} };
+  // payload.data.pageId = page.id;
+  // payload.data.sourceSectionId = source.sourceSectionId;
+  // payload.data.sourceRowIndex = source.sourceRowIndex;
+  // payload.data.sourceColumnIndex = source.sourceColumnIndex;
+  // payload.data.sourceModuleIndex = event.oldIndex;
   // payload.data.destinationSectionId = destinationSectionId;
   // payload.data.destinationRowIndex = destinationRowIndex;
   // payload.data.destinationColumnIndex = destinationColumnIndex;
   // payload.data.destinationModuleIndex = event.newIndex;
   // payload.data.destinationModules = destinationModules;
+  // payload.data.isPageUsingTemplate = isPageUsingTemplate;
+  // payload.data.sourcePageTemplateRegion = sourcePageTemplateRegion;
+  // payload.data.destinationPageTemplateRegion = destinationPageTemplateRegion;
+  // payload.data.moduleBeingMovedId = moduleBeingMovedId;
+  /////////////////
 
   return axiosInstance
     .post("/admin/pb-update-module-copy", payload)
@@ -1321,12 +1395,18 @@ function getPageTemplateRegion(page, sourceColumn, destinationColumn) {
     })[0];
     sourcePageTemplateRegion = $(sourceRegionModule).attr("data-id");
 
-    let destinationRegionModule = $(destinationColumn.children).filter(
-      function () {
-        return $(this).attr("data-module") == "PAGE-TEMPLATES";
-      }
-    )[0];
-    destinationPageTemplateRegion = $(destinationRegionModule).attr("data-id");
+    let destinationRegionModule;
+
+    if (destinationColumn) {
+      destinationRegionModule = $(destinationColumn.children).filter(
+        function () {
+          return $(this).attr("data-module") == "PAGE-TEMPLATES";
+        }
+      )[0];
+      destinationPageTemplateRegion = $(destinationRegionModule).attr(
+        "data-id"
+      );
+    }
   }
   return {
     isPageUsingTemplate,
@@ -1356,8 +1436,8 @@ async function addModuleToColumn(submission) {
   // debugger;
   let args = { id: processedEntity.id };
   let contentType = submission.data.contentType;
-  if(contentType.indexOf('-settings') > -1){
-    contentType = contentType.replace('-settings', '');
+  if (contentType.indexOf("-settings") > -1) {
+    contentType = contentType.replace("-settings", "");
   }
   let moduleInstanceShortCode = sharedService.generateShortCode(
     `${contentType}`,
@@ -1408,25 +1488,31 @@ async function submitContent(
   // debugger;
   console.log("Submission was made!", submission);
   let entity = submission.data ? submission.data : submission;
-  if (!contentType.startsWith("user")) {
-    entity = processContentFields(submission.data);
-  }
+  // if (!contentType.startsWith("user")) {
+  //   entity = processContentFields(submission.data);
+  // }
   // if (contentType.toLowerCase().startsWith("role")) {
   //   contentType = "Roles";
   //   entity = submission.data;
   // }
-  if (submission.id || submission.data.id) {
-    if (contentType.startsWith("user")) {
-      await editInstanceUser(entity, refresh, contentType);
-    } else {
+
+  if (!contentType.startsWith("user")) {
+    if (submission.id || submission.data.id) {
       await editInstance(entity, refresh, contentType);
-    }
-  } else {
-    if (contentType === "user") {
-      await dataService.userCreate(entity.email, entity.password);
     } else {
       await createInstance(entity, true, contentType);
     }
+  } else {
+    entity.contentType = contentType;
+
+    let result = await axios({
+      method: "post",
+      url: "/form-submission",
+      data: {
+        data: entity,
+      },
+    });
+    fullPageUpdate();
   }
 }
 
@@ -1505,7 +1591,6 @@ async function writeFile(container, file) {
 }
 
 async function setupACEEditor() {
-  return;
   if ($("#editor").length === 0) {
     return;
   }
@@ -1542,12 +1627,14 @@ async function setupACEEditor() {
   }
 
   $("#save-global-css").click(async function () {
+    // debugger;
     let cssContent = editor.getSession().getValue();
 
     // let file = new File([cssContent], "template.css", { type: "text/css" });
     await dataService.fileUpdate(
-      "/server/themes/front-end/bootstrap/css/template.css",
-      cssContent
+      `/server/themes/front-end/${theme}/css/template.css`,
+      cssContent,
+      sessionID
     );
 
     // writeFile("css", file);
@@ -1630,6 +1717,7 @@ async function setupSortableColum(el) {
     var sortable = new Sortable(el, {
       // Element dragging ended
       group: "shared",
+      draggable: ".module",
       onEnd: function (/**Event*/ event) {
         var itemEl = event.item; // dragged HTMLElement
         event.to; // target list
@@ -1692,7 +1780,6 @@ async function updateModuleSort(shortCode, event) {
   let destinationModuleFilter = isPageUsingTemplate
     ? "[data-template-region='true']"
     : ".module";
-
 
   destinationModules = $(destinationColumn)
     .find(destinationModuleFilter)
@@ -1822,11 +1909,7 @@ async function addUser() {
 }
 
 async function setupAdminMediaFormImage() {
-  if (
-    window.location.href.indexOf(
-      "admin/content/edit/media/"
-    ) > 0
-  ) {
+  if (window.location.href.indexOf("admin/content/edit/media/") > 0) {
     let fileName = $('input[name="data[file]"]').val();
     if (fileName) {
       $(".admin-form-media-image").attr("src", `/assets/uploads/${fileName}`);

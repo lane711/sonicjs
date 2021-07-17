@@ -25,9 +25,8 @@ module.exports = pageBuilderService = {
       }
     });
 
-
     app.get("/api/page-templates", async function (req, res) {
-      let data = await dataService.getPageTemplates();
+      let data = await dataService.getPageTemplates(req.sessionID);
       console.log(data);
       res.json(data);
     });
@@ -38,7 +37,7 @@ module.exports = pageBuilderService = {
       // console.log(data);
 
       if (data.isPageUsingTemplate && data.pageTemplateRegion) {
-        let page = await dataService.getContentById(data.pageId);
+        let page = await dataService.getContentById(data.pageId, req.sessionID);
 
         let region = page.data.pageTemplateRegions.filter(
           (r) => r.regionId === data.pageTemplateRegion
@@ -47,7 +46,7 @@ module.exports = pageBuilderService = {
         let shortCodesInColumn = ShortcodeTree.parse(region.shortCodes);
 
         shortCodeToRemove = shortCodesInColumn.children.filter(
-          (s) => s.shortcode.properties.id === data.moduleId
+          (s) => s.shortcode.properties.id === data.moduleId.toString()
         )[0];
 
         if (shortCodeToRemove && shortCodeToRemove.shortcode) {
@@ -58,9 +57,12 @@ module.exports = pageBuilderService = {
           region.shortCodes = newRegionShortCodes;
         }
 
-        await dataService.editInstance(page);
+        await dataService.editInstance(page, req.sessionID);
       } else {
-        let section = await dataService.getContentById(data.sectionId);
+        let section = await dataService.getContentById(
+          data.sectionId,
+          req.sessionID
+        );
         let content =
           section.data.rows[data.rowIndex].columns[data.columnIndex].content;
         // console.log("content", content);
@@ -68,7 +70,7 @@ module.exports = pageBuilderService = {
         // remove shortcode from the source column
         let shortCodesInColumn = ShortcodeTree.parse(content);
         shortCodeToRemove = shortCodesInColumn.children.filter(
-          (x) => x.shortcode.properties.id === data.moduleId
+          (x) => x.shortcode.properties.id === data.moduleId.toString()
         )[0];
         // console.log("shortCodeToRemove", shortCodeToRemove);
         if (shortCodeToRemove && shortCodeToRemove.shortcode) {
@@ -76,17 +78,17 @@ module.exports = pageBuilderService = {
             shortCodeToRemove.shortcode.codeText,
             ""
           );
-          section.data.rows[data.rowIndex].columns[
-            data.columnIndex
-          ].content = newContent;
+          section.data.rows[data.rowIndex].columns[data.columnIndex].content =
+            newContent;
           // console.log("newContent", newContent);
-          await dataService.editInstance(section);
+          await dataService.editInstance(section, req.sessionID);
         }
       }
 
       if (data.deleteContent) {
         await dataService.contentDelete(
-          shortCodeToRemove.shortcode.properties.id
+          shortCodeToRemove.shortcode.properties.id,
+          req.sessionID
         );
       }
 
@@ -117,7 +119,7 @@ module.exports = pageBuilderService = {
       console.log(data);
 
       if (data.isPageUsingTemplate && data.sourcePageTemplateRegion) {
-        let page = await dataService.getContentById(data.pageId);
+        let page = await dataService.getContentById(data.pageId, req.sessionID);
 
         let updatedDestinationContent = sharedService.generateShortCodeList(
           data.destinationModules
@@ -145,7 +147,7 @@ module.exports = pageBuilderService = {
 
           let shortCodeToRemove = shortCodesInColumn.children.filter(
             (s) => s.shortcode.properties.id === data.moduleBeingMovedId
-          )[0]
+          )[0];
           // console.log("shortCodeToRemove", shortCodeToRemove);
 
           let shortCodeToRemoveText = shortCodeToRemove.shortcode.codeText;
@@ -155,10 +157,11 @@ module.exports = pageBuilderService = {
           );
         }
 
-        await dataService.editInstance(page);
+        await dataService.editInstance(page, req.sessionID);
       } else {
         let sourceSection = await dataService.getContentById(
-          data.sourceSectionId
+          data.sourceSectionId,
+          req.sessionID
         );
         let content =
           sourceSection.data.rows[data.sourceRowIndex].columns[
@@ -181,12 +184,13 @@ module.exports = pageBuilderService = {
             data.sourceColumnIndex
           ].content = newContent;
           // console.log("newContent", newContent);
-          await dataService.editInstance(sourceSection);
+          await dataService.editInstance(sourceSection, req.sessionID);
         }
 
         //regen the destination
         let destinationSection = await dataService.getContentById(
-          data.destinationSectionId
+          data.destinationSectionId,
+          req.sessionID
         );
 
         let updatedDestinationContent = sharedService.generateShortCodeList(
@@ -197,7 +201,10 @@ module.exports = pageBuilderService = {
           data.destinationColumnIndex
         ].content = updatedDestinationContent;
 
-        let r = await dataService.editInstance(destinationSection);
+        let r = await dataService.editInstance(
+          destinationSection,
+          req.sessionID
+        );
       }
       res.send(`ok`);
     });
@@ -206,46 +213,97 @@ module.exports = pageBuilderService = {
       let data = req.body.data;
       console.log(data);
 
-      let section = await dataService.getContentById(data.sectionId);
+      let section = await dataService.getContentById(
+        data.sectionId,
+        req.sessionID
+      );
       let content =
         section.data.rows[data.rowIndex].columns[data.columnIndex].content;
       console.log("content", content);
 
       //copy module
-      let moduleToCopy = await dataService.getContentById(data.moduleId);
-      let newModule = await dataService.contentCreate(moduleToCopy);
-
-      let sectionColumn =
-        section.data.rows[data.rowIndex].columns[data.columnIndex];
-
-      let shortCodesInColumn = ShortcodeTree.parse(sectionColumn.content);
-
-      // generate short code ie: [MODULE-HELLO-WORLD id="123"]
-      let args = { id: newModule.id };
-      let moduleInstanceShortCodeText = sharedService.generateShortCode(
-        `${newModule.data.contentType}`,
-        args
+      let moduleToCopy = await dataService.getContentById(
+        data.moduleId,
+        req.sessionID
+      );
+      let newModule = await dataService.contentCreate(
+        moduleToCopy,
+        true,
+        req.sessionID
       );
 
-      let moduleInstanceShortCode = ShortcodeTree.parse(
-        moduleInstanceShortCodeText
-      ).children[0];
+      if (data.isPageUsingTemplate && data.sourcePageTemplateRegion) {
 
-      shortCodesInColumn.children.splice(
-        data.moduleIndex + 1,
-        0,
-        moduleInstanceShortCode
-      );
+        let page = await dataService.getContentById(data.pageId, req.sessionID);
 
-      let newShortCodeContent = sharedService.generateContentFromShortcodeList(
-        shortCodesInColumn
-      );
+        let sourceRegion = page.data.pageTemplateRegions.filter(
+          (r) => r.regionId === data.sourcePageTemplateRegion
+        )[0];
 
-      section.data.rows[data.rowIndex].columns[
-        data.columnIndex
-      ].content = newShortCodeContent;
+        let shortCodesInColumn = ShortcodeTree.parse(
+          sourceRegion.shortCodes
+        );
 
-      let result = await dataService.editInstance(section);
+        let args = { id: newModule.id };
+        let nodeModuleShortCode = sharedService.generateShortCode(
+          `${newModule.contentTypeId}`,
+          args
+        );
+
+        let argsOld = { id: moduleToCopy.id };
+        let oldModuleShortCode = sharedService.generateShortCode(
+          `${moduleToCopy.contentTypeId}`,
+          argsOld
+        );
+
+        sourceRegion.shortCodes = sourceRegion.shortCodes.replace(oldModuleShortCode, oldModuleShortCode + nodeModuleShortCode)
+
+        let result = await dataService.editInstance(page, req.sessionID);
+
+        //moduleBeingMovedId
+
+        // let shortCodeToRemove = shortCodesInColumn.children.filter(
+        //   (s) => s.shortcode.properties.id === data.moduleBeingMovedId
+        // )[0];
+        // console.log("shortCodeToRemove", shortCodeToRemove);
+
+        // let shortCodeToRemoveText = shortCodeToRemove.shortcode.codeText;
+        // sourceRegion[0].shortCodes = sourceRegion[0].shortCodes.replace(
+        //   shortCodeToRemoveText,
+        //   ""
+        // );
+
+      } else {
+        let sectionColumn =
+          section.data.rows[data.rowIndex].columns[data.columnIndex];
+
+        let shortCodesInColumn = ShortcodeTree.parse(sectionColumn.content);
+
+        // generate short code ie: [MODULE-HELLO-WORLD id="123"]
+        let args = { id: newModule.id };
+        let moduleInstanceShortCodeText = sharedService.generateShortCode(
+          `${newModule.contentTypeId}`,
+          args
+        );
+
+        let moduleInstanceShortCode = ShortcodeTree.parse(
+          moduleInstanceShortCodeText
+        ).children[0];
+
+        shortCodesInColumn.children.splice(
+          data.moduleIndex + 1,
+          0,
+          moduleInstanceShortCode
+        );
+
+        let newShortCodeContent =
+          sharedService.generateContentFromShortcodeList(shortCodesInColumn);
+
+        section.data.rows[data.rowIndex].columns[data.columnIndex].content =
+          newShortCodeContent;
+
+        let result = await dataService.editInstance(section, req.sessionID);
+      }
 
       res.send(`ok`);
       // // return;

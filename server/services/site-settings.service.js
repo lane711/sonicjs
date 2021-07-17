@@ -15,13 +15,13 @@ module.exports = siteSettingsService = {
     startup: async function () {
         emitterService.on('getRenderedPagePostDataFetch', async function (options) {
             if(options){
-                await siteSettingsService.processSiteSettings(options.page);
+                await siteSettingsService.processSiteSettings(options.page, options.req.sessionID);
             }
         });
     },
 
-    processSiteSettings: async function (page) {
-        var siteSettings =  await dataService.getContentTopOne('site-settings');
+    processSiteSettings: async function (page, sessionID) {
+        var siteSettings =  await dataService.getContentTopOne('site-settings', sessionID);
         page.data.siteSettings = siteSettings.data;
     }
 }

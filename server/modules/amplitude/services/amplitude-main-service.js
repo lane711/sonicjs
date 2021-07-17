@@ -12,7 +12,7 @@ module.exports = amplitudeMainService = {
   },
 
   addHeaderJs: async function(options) {
-    let amplitudeSettings = await dataService.getContentTopOne("amplitude");
+    let amplitudeSettings = await dataService.getContentTopOne("amplitude", options.req.sessionID);
     if (!options.page.data.headerJs) {
       options.page.data.headerJs = "";
     }

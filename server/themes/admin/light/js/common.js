@@ -1,6 +1,19 @@
 $(document).ready(async function () {
   $(function () {
-    $('[data-toggle="popover"]').popover();
+    // $('[data-toggle="popover"]').popover();
+    // $('[data-toggle="popover"]').on('click', function(){
+    //   $('[data-toggle="popover"]').popover();
+    // });
+
+    $(document).on('click', '[data-toggle="popover"]', function (e) {
+      //
+      // If popover is visible: do nothing
+      //
+      if ($(this).prop('popShown') == undefined) {
+         $(this).prop('popShown', true).popover('show');
+      }
+  });
+  
   });
 
   $("table").on("shown.bs.popover", function () {
@@ -11,32 +24,34 @@ $(document).ready(async function () {
         event.preventDefault();
         //delete content
         if (!this.href) return;
-        var typeToDelete = getPathParts(this.href, 1);
-        var idToDelete = getPathParts(this.href, 0);
+        var typeToDelete = getPathParts(this.href, 2);
+        var idToDelete = getPathParts(this.href, 1);
+        var sessionID = getPathParts(this.href, 0);
+
         if (idToDelete) {
-          // debugger;
+          debugger;
           if (typeToDelete == "content") {
-            await deleteContentInstance(idToDelete);
+            await deleteContentInstance(idToDelete, sessionID);
             location.reload();
           }
 
           if (typeToDelete == "contentType") {
-            await dataService.contentTypeDelete(idToDelete);
+            await dataService.contentTypeDelete(idToDelete, sessionID);
             location.reload();
           }
 
           if (typeToDelete == "user") {
-            await deleteUser(idToDelete);
+            await userDelete(idToDelete, sessionID);
             location.reload();
           }
 
           if (typeToDelete == "Role") {
-            await deleteContentInstance(idToDelete);
+            await deleteContentInstance(idToDelete, sessionID);
             location.reload();
           }
 
           if (typeToDelete == "module") {
-            await dataService.deleteModule(idToDelete);
+            await dataService.deleteModule(idToDelete, sessionID);
             location.reload();
           }
         }

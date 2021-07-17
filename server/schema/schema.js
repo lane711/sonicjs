@@ -58,7 +58,7 @@ const TagType = new GraphQLObjectType({
     url: { type: GraphQLString },
     createdOn: { type: GraphQLJSONObject },
     updatedOn: { type: GraphQLJSONObject },
-    contents: {
+    Contents: {
       type: new GraphQLList(ContentType),
       resolve(parent, args) {
         return Content.find({ tags: parent.id });
@@ -70,7 +70,7 @@ const TagType = new GraphQLObjectType({
 const TagRefType = new GraphQLObjectType({
   name: "TagRefType",
   fields: () => ({
-    contentId: { type: GraphQLString },
+    ContentId: { type: GraphQLString },
     tagId: { type: GraphQLString },
     status: { type: GraphQLString },
   }),
@@ -185,36 +185,56 @@ const RootQuery = new GraphQLObjectType({
         id: { type: GraphQLID },
         username: { type: GraphQLString },
         password: { type: GraphQLString },
+        sessionID: { type: GraphQLString },
       },
-      resolve(parent, args, req, res) {
-
+      async resolve(parent, args, req, res) {
         //create a direct api instead of user.find...
         // then use that api directly from the admin backend
-        return dalService.getUser(args.id);
+        return dalService.userGet(
+          args.id,
+          await getUserSession(args.sessionID, req.sessionID)
+        );
         //user can always see their own profile
-        if (args.id === req.session.userId) {
+        if (args.id === req.session.passport.userId) {
           return User.findById(args.id);
         }
 
         //admins can see all users
         //TODO: get role by name
-        if (req.session.user.roles.includes("admin")) {
+        if (req.session.passport.user.roles.includes("admin")) {
           return User.findById(args.id);
         }
       },
     },
     users: {
       type: new GraphQLList(UserType),
-      resolve(parent, args) {
-        return User.find({});
+      args: {
+        sessionID: { type: GraphQLString },
+      },
+      async resolve(parent, args, req) {
+        return dalService.usersGet(
+          await getUserSession(args.sessionID, req.sessionID)
+        );
       },
     },
     roles: {
       type: new GraphQLList(ContentType),
-      async resolve(parent, args) {
-        return Content.find({
-          contentTypeId: "role",
-        });
+      args: {
+        sessionID: { type: GraphQLString },
+      },
+      async resolve(parent, args, req) {
+        return dalService.contentGet(
+          "",
+          "role",
+          "",
+          "",
+          "",
+          await getUserSession(args.sessionID, req.sessionID)
+        );
+
+        // return Content.find({
+        //   ContentTypeId: "role",
+        // });
       },
     },
     content: {
@@ -225,35 +245,54 @@ const RootQuery = new GraphQLObjectType({
         contentTypeId: { type: GraphQLString },
         url: { type: GraphQLString },
         data: { type: GraphQLString },
+        sessionID: { type: GraphQLString },
       },
-      resolve(parent, args) {
-        if (args.id) {
-          return Content.findById(args.id);
-        } else if (args.url) {
-          return Content.findOne({
-            url: args.url,
-          });
-        } else if (args.data) {
-          return Content.find({
-            data: { name: "my data 5" },
-          });
-        }
+      async resolve(parent, args, req) {
+        return dalService.contentGet(
+          args.id,
+          args.contentTypeId,
+          args.url,
+          args.data,
+          args.tag,
+          await getUserSession(args.sessionID, req.sessionID)
+        );
+        // if (args.id) {
+        //   return Content.findById(args.id);
+        // } else if (args.url) {
+        //   return Content.findOne({
+        //     url: args.url,
+        //   });
+        // } else if (args.data) {
+        //   return Content.find({
+        //     data: { name: "my data 5" },
+        //   });
+        // }
       },
     },
     contents: {
       type: new GraphQLList(ContentType),
       args: {
+        id: { type: GraphQLID },
         contentTypeId: { type: GraphQLString },
         url: { type: GraphQLString },
         data: { type: GraphQLJSONObject },
         tag: { type: GraphQLString },
+        sessionID: { type: GraphQLString },
       },
 
-      resolve(parent, args, req) {
-        return dalService.getContents(args.contentTypeId, args.url, args.data, args.tag, req.session.user)
-        // if (args.contentTypeId) {
+      async resolve(parent, args, req, res) {
+        return dalService.contentGet(
+          args.id,
+          args.contentTypeId,
+          args.url,
+          args.data,
+          args.tag,
+          await getUserSession(args.sessionID, req.sessionID),
+          true
+        );
+        // if (args.ContentTypeId) {
         //   return Content.find({
-        //     contentTypeId: args.contentTypeId,
+        //     ContentTypeId: args.ContentTypeId,
         //   });
         // } else if (args.url) {
         //   return Content.find({
@@ -265,10 +304,10 @@ const RootQuery = new GraphQLObjectType({
         //   console.log("query", query);
         //   return Content.find(query);
         // } else if (args.tag) {
-        //   let contentsQuery = Tag.findById(args.tag); //.populate("contents");
-        //   let contents = contentsQuery.exec();
-        //   console.log(contents);
-        //   return contents;
+        //   let ContentsQuery = Tag.findById(args.tag); //.populate("Contents");
+        //   let Contents = ContentsQuery.exec();
+        //   console.log(Contents);
+        //   return Contents;
         // } else {
         //   return Content.find({});
         // }
@@ -277,8 +316,13 @@ const RootQuery = new GraphQLObjectType({
 
     contentTypes: {
       type: new GraphQLList(ContentTypeType),
-      resolve(parent, args) {
-        return moduleService.getModuleContentTypes();
+      args: {
+        sessionID: { type: GraphQLString },
+      },
+      async resolve(parent, args, req) {
+        return moduleService.getModuleContentTypes(
+          await getUserSession(args.sessionID, req.sessionID)
+        );
       },
     },
 
@@ -286,16 +330,20 @@ const RootQuery = new GraphQLObjectType({
       type: ContentTypeType,
       args: {
         systemId: { type: GraphQLString },
+        sessionID: { type: GraphQLString },
       },
-      resolve(parent, args) {
-        return moduleService.getModuleContentType(args.systemId);
+      async resolve(parent, args, req) {
+        return moduleService.getModuleContentType(
+          args.systemId,
+          await getUserSession(args.sessionID, req.sessionID)
+        );
       },
     },
 
     tags: {
       type: new GraphQLList(TagType),
       resolve(parent, args, context) {
-        return Tag.find({}).populate("contents");
+        return Tag.find({}).populate("Contents");
       },
     },
 
@@ -305,14 +353,14 @@ const RootQuery = new GraphQLObjectType({
         id: { type: GraphQLID },
       },
       resolve(parent, args) {
-        return Tag.findById(args.id).populate("contents");
+        return Tag.findById(args.id).populate("Contents");
       },
     },
 
     media: {
       type: new GraphQLList(MediaType),
-      resolve(parent, args, context) {
-        return mediaService.getMedia();
+      resolve(parent, args, req) {
+        return mediaService.getMedia(req.sessionID);
       },
     },
 
@@ -322,10 +370,11 @@ const RootQuery = new GraphQLObjectType({
         contentType: { type: GraphQLString },
         viewModel: { type: GraphQLString },
         viewPath: { type: GraphQLString },
+        sessionID: { type: GraphQLString },
       },
       resolve(parent, args) {
         let html = viewService.getProcessedView(
-          args.contentType,
+          args.ContentType,
           JSON.parse(args.viewModel),
           args.viewPath
         );
@@ -346,6 +395,7 @@ const Mutation = new GraphQLObjectType({
         //GraphQLNonNull make these field required
         username: { type: new GraphQLNonNull(GraphQLString) },
         password: { type: new GraphQLNonNull(GraphQLString) },
+        sessionID: { type: GraphQLString },
       },
       resolve(parent, args) {
         // let now = new Date();
@@ -384,37 +434,26 @@ const Mutation = new GraphQLObjectType({
         profile: {
           type: new GraphQLNonNull(GraphQLString),
         },
+        sessionID: { type: GraphQLString },
       },
-      resolve(parent, args) {
-        let profileObj = JSON.parse(args.profile);
-        if (profileObj.password !== "_temp_password") {
-          //password has been updated
-          User.findByUsername(profileObj.email).then(
-            function (user) {
-              if (user) {
-                user.setPassword(profileObj.password, function () {
-                  user.save();
-                  console.log("password reset successful");
-                });
-              } else {
-                console.log("This user does not exist");
-              }
-            },
-            function (err) {
-              console.error(err);
-            }
-          );
-        }
+      resolve(parent, args, context) {
+        let user = args;
+        user.id = parseInt(user.id);
+        return dalService.userUpdate(user, context.session.passport.user);
+      },
+    },
 
-        let userDoc = User.findByIdAndUpdate(
+    userDelete: {
+      type: UserType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLID) },
+        sessionID: { type: GraphQLString },
+      },
+      async resolve(parent, args, context) {
+        return dalService.userDelete(
           args.id,
-          {
-            lastLoginOn: new Date(),
-            profile: profileObj,
-          },
-          false
-        );
-        userDoc.exec();
+          await getUserSession(args.sessionID, undefined)
+          );
       },
     },
     // addBook: {
@@ -443,6 +482,7 @@ const Mutation = new GraphQLObjectType({
         url: { type: new GraphQLNonNull(GraphQLString) },
         createdByUserId: { type: new GraphQLNonNull(GraphQLID) },
         lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
+        sessionID: { type: GraphQLString },
       },
       resolve(parent, args) {
         let now = new Date();
@@ -460,34 +500,35 @@ const Mutation = new GraphQLObjectType({
     tagAddToContent: {
       type: TagRefType,
       args: {
-        contentId: { type: new GraphQLNonNull(GraphQLString) },
+        ContentId: { type: new GraphQLNonNull(GraphQLString) },
         tagId: { type: new GraphQLNonNull(GraphQLString) },
+        sessionID: { type: GraphQLString },
       },
       resolve(parent, args) {
         //TODO: only add if not already exists
         let tagDoc = Tag.findByIdAndUpdate(
           args.tagId,
-          { $push: { contents: args.contentId } },
+          { $push: { Contents: args.ContentId } },
           { new: true }
         );
         tagDoc.exec();
 
-        let contentDoc = Content.findByIdAndUpdate(
-          args.contentId,
+        let ContentDoc = Content.findByIdAndUpdate(
+          args.ContentId,
           { $push: { tags: args.tagId } },
           { new: true }
         );
-        contentDoc.exec();
+        ContentDoc.exec();
 
         let tagRef = {};
-        tagRef.contentId = args.contentId;
+        tagRef.ContentId = args.ContentId;
         tagRef.tagId = args.tagId;
         tagRef.status = "success";
         return tagRef;
       },
     },
 
-    //content mutations
+    //Content mutations
     contentCreate: {
       type: ContentType,
       args: {
@@ -496,29 +537,38 @@ const Mutation = new GraphQLObjectType({
         data: {
           type: new GraphQLNonNull(GraphQLString),
         },
-        createdByUserId: { type: GraphQLID },
+        sessionID: { type: GraphQLString },
       },
-      resolve(parent, args, context) {
-        let userId = context.session.user.id
-          ? context.session.userId
-          : args.createdByUserId;
-        let now = new Date();
+      async resolve(parent, args, req) {
         let dataObj = JSON.parse(args.data);
-        args.data = dataObj;
-        let content = new Content({
-          contentTypeId: args.contentTypeId,
-          data: args.data,
-          url: args.url,
-          createdByUserId: userId,
-          createdOn: now,
-          lastUpdatedByUserId: userId,
-          updatedOn: now,
-        });
-        return content.save();
+        let result = await dalService.contentUpdate(
+          "",
+          args.url,
+          dataObj,
+          await getUserSession(args.sessionID, req.sessionID)
+        );
+
+        return result;
+        // let userId = (context.session.userSession && context.session.userSession.id)
+        //   ? context.session.userSession.id
+        //   : args.createdByUserId;
+        // let now = new Date();
+        // let dataObj = JSON.parse(args.data);
+        // args.data = dataObj;
+        // let Content = new Content({
+        //   contentTypeId: args.contentTypeId,
+        //   data: args.data,
+        //   url: args.url,
+        //   createdByUserId: userId,
+        //   createdOn: now,
+        //   lastUpdatedByUserId: userId,
+        //   updatedOn: now,
+        // });
+        // return Content.save();
       },
     },
 
-    //TODO: fix content update
+    //TODO: fix Content update
     contentUpdate: {
       type: ContentType,
       args: {
@@ -527,19 +577,26 @@ const Mutation = new GraphQLObjectType({
         data: {
           type: new GraphQLNonNull(GraphQLString),
         },
+        sessionID: { type: GraphQLString },
         // createdByUserId: { type: new GraphQLNonNull(GraphQLID) },
         // lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
       },
-      resolve(parent, args) {
+      async resolve(parent, args, req) {
         let dataObj = JSON.parse(args.data);
-        args.data = dataObj;
-        let contentDoc = Content.findByIdAndUpdate(args.id, {
-          url: args.url,
-          data: args.data,
-        });
-        contentDoc.exec();
+        return dalService.contentUpdate(
+          args.id,
+          args.url,
+          dataObj,
+          await getUserSession(args.sessionID, req.sessionID)
+        );
+        // args.data = dataObj;
+        // let ContentDoc = Content.findByIdAndUpdate(args.id, {
+        //   url: args.url,
+        //   data: args.data,
+        // });
+        // ContentDoc.exec();
 
-        return contentDoc;
+        // return ContentDoc;
       },
     },
 
@@ -547,19 +604,25 @@ const Mutation = new GraphQLObjectType({
       type: ContentType,
       args: {
         id: { type: new GraphQLNonNull(GraphQLString) },
+        sessionID: { type: GraphQLString },
       },
-      resolve(parent, args) {
-        return Content.findByIdAndDelete(args.id);
+      async resolve(parent, args) {
+        return dalService.contentDelete(
+          args.id, 
+          await getUserSession(args.sessionID, undefined)
+          )
+        // return Content.findByIdAndDelete(args.id);
       },
     },
 
-    // content type mutations
+    // Content type mutations
     contentTypeCreate: {
       type: ContentTypeType,
       args: {
         title: { type: new GraphQLNonNull(GraphQLString) },
         systemId: { type: new GraphQLNonNull(GraphQLString) },
         moduleSystemId: { type: new GraphQLNonNull(GraphQLString) },
+        sessionID: { type: GraphQLString },
       },
       resolve(parent, args) {
         return moduleService.createModuleContentType(args);
@@ -575,6 +638,7 @@ const Mutation = new GraphQLObjectType({
         filePath: { type: GraphQLString },
         permissions: { type: new GraphQLNonNull(GraphQLString) },
         data: { type: new GraphQLNonNull(GraphQLString) },
+        sessionID: { type: GraphQLString },
         // data: {
         //   type: new GraphQLNonNull(GraphQLJSONObject),
         // },
@@ -587,7 +651,7 @@ const Mutation = new GraphQLObjectType({
         args.data = dataObj;
         args.permissions = permissionsObj;
 
-        console.log("contentTypeUpdate", args);
+        console.log("ContentTypeUpdate", args);
         moduleService.contentTypeUpdate(args).then((data) => {
           return data;
         });
@@ -598,6 +662,7 @@ const Mutation = new GraphQLObjectType({
       type: ContentTypeType,
       args: {
         systemId: { type: new GraphQLNonNull(GraphQLString) },
+        sessionID: { type: GraphQLString },
       },
       resolve(parent, args) {
         moduleService.deleteModuleContentType(args.systemId).then((data) => {
@@ -612,6 +677,7 @@ const Mutation = new GraphQLObjectType({
       args: {
         filePath: { type: new GraphQLNonNull(GraphQLString) },
         fileContent: { type: new GraphQLNonNull(GraphQLString) },
+        sessionID: { type: GraphQLString },
       },
       resolve(parent, args) {
         fileService.writeFile(args.filePath, args.fileContent);
@@ -625,6 +691,7 @@ const Mutation = new GraphQLObjectType({
       args: {
         filePath: { type: new GraphQLNonNull(GraphQLString) },
         fileContent: { type: new GraphQLNonNull(GraphQLString) },
+        sessionID: { type: GraphQLString },
       },
       resolve(parent, args) {
         fileService.writeFile(args.filePath, args.fileContent);
@@ -641,6 +708,7 @@ const Mutation = new GraphQLObjectType({
         enabled: { type: new GraphQLNonNull(GraphQLBoolean) },
         systemId: { type: new GraphQLNonNull(GraphQLString) },
         canBeAddedToColumn: { type: new GraphQLNonNull(GraphQLBoolean) },
+        sessionID: { type: GraphQLString },
       },
       resolve(parent, args) {
         return moduleService.createModule(args);
@@ -651,6 +719,7 @@ const Mutation = new GraphQLObjectType({
       type: ModuleType,
       args: {
         systemId: { type: new GraphQLNonNull(GraphQLString) },
+        sessionID: { type: GraphQLString },
       },
       resolve(parent, args) {
         return moduleService.deleteModule(args.systemId);
@@ -665,6 +734,7 @@ const Mutation = new GraphQLObjectType({
         systemId: { type: new GraphQLNonNull(GraphQLString) },
         canBeAddedToColumn: { type: new GraphQLNonNull(GraphQLBoolean) },
         singleInstance: { type: new GraphQLNonNull(GraphQLBoolean) },
+        sessionID: { type: GraphQLString },
       },
       resolve(parent, args) {
         return moduleService.updateModule(args);
@@ -672,6 +742,26 @@ const Mutation = new GraphQLObjectType({
     },
   },
 });
+
+async function getUserSession(sessionID, reqSessionID) {
+
+  if(sessionID == 0){
+    return {user : {id: 0}};
+  }
+
+  let id = sessionID;
+  if (!id || id === "undefined") {
+    id = reqSessionID;
+  }
+  let session = await dalService.sessionGet(id);
+
+  if (!session || session === "undefined") {
+    session = undefined;
+    // throw new Error("Session not found");
+  }
+
+  return session;
+}
 
 //Creating a new GraphQL Schema, with options query which defines query
 //we will allow users to use when they are making request.

@@ -10,13 +10,7 @@
       <img src="https://img.shields.io/badge/Donate-PayPal-green.svg" alt="Donate" />
   </a>
 
-### If you find the project promising:
-
-### :star: PLEASE STAR THIS PROJECT :star: !!! :)
-
-### It will help spread the word so that I can start to generate developer feedback. Thanks in advance!
-
-![Image of SonicJs Logo](https://sonicjs.com/api/containers/files/download/sonicjs-logo-dark.svg)
+![Image of SonicJs Logo](https://sonicjs.com/assets/uploads/sonicjs-logo-dark.svg)
 [https://sonicjs.com](https://sonicjs.com)
 
 # SonicJS is a Modern Open Source "Free Forever" NodeJs Based Content Management System
@@ -30,9 +24,9 @@
      <td>Edit Content with Automagically Generated Forms</td>
   </tr>
   <tr>
-    <td><img src="https://sonicjs.com/images/Node.js CMS - Content Type Edit.png?width=600" width="300px" alt="Manage Content Types" /></td>
-    <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="Drag and Drop Form Builder" /></td>
-    <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Edit%20Content.png?width=600" width="300px" alt="Edit Content with Automagically Generated Forms" /></td>
+    <td><img src="https://sonicjs.com/assets/uploads/Node.js CMS - Content Type Edit.png?width=600" width="300px" alt="Manage Content Types" /></td>
+    <td><img src="https://sonicjs.com/assets/uploads/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="Drag and Drop Form Builder" /></td>
+    <td><img src="https://sonicjs.com/assets/uploads/Node.js%20CMS%20-%20Edit%20Content.png?width=600" width="300px" alt="Edit Content with Automagically Generated Forms" /></td>
   </tr>
     <tr>
     <td>Build Advanced Forms with over 20 Field Types</td>
@@ -40,9 +34,9 @@
      <td>Front End WYSIWYG Editor</td>
   </tr>
   <tr>
-    <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="Drag and Drop Form Builder" /></td>
-    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20Page%20Settings.png?width=600" width="300px" alt="Front End Content Editing" /></td>
-    <td><img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20WYSIWYG%20Editor.png?width=600" width="300px" alt="Front End WYSIWYG Editor" /></td>
+    <td><img src="https://sonicjs.com/assets/uploads/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="Drag and Drop Form Builder" /></td>
+    <td>    <img src="https://sonicjs.com/assets/uploads/Node.js%20CMS%20-%20Front%20End%20Page%20Settings.png?width=600" width="300px" alt="Front End Content Editing" /></td>
+    <td><img src="https://sonicjs.com/assets/uploads/Node.js%20CMS%20-%20Front%20End%20WYSIWYG%20Editor.png?width=600" width="300px" alt="Front End WYSIWYG Editor" /></td>
   </tr>
       <tr>
     <td>Menu Manager</td>
@@ -50,19 +44,19 @@
      <td>Built In Media Server</td>
   </tr>
   <tr>
-    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Menu%20Management.png?width=600" width="300px" alt="Menu Manager" /></td>
-    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20CSS%20Editing.png?width=600" width="300px" alt="Real Time CSS Editor" /></td>
-    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Media%20Manager.png?width=600" width="300px" alt="Built In Media Server" /></td>
+    <td>    <img src="https://sonicjs.com/assets/uploads/Node.js CMS Menu Manager.png" width="300px" alt="Menu Manager" /></td>
+    <td>    <img src="https://sonicjs.com/assets/uploads/Node.js%20CMS%20-%20Front%20End%20CSS%20Editing.png?width=600" width="300px" alt="Real Time CSS Editor" /></td>
+    <td>    <img src="https://sonicjs.com/assets/uploads/Node.js%20CMS%20-%20Media%20Manager.png?width=600" width="300px" alt="Built In Media Server" /></td>
   </tr>
         <tr>
     <td>Module Management</td>
      <td>Front End Json Editor</td>
-     <td>Swagger API Explorer</td>
+     <td></td>
   </tr>
   <tr>
-    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Module%20Management.png?width=600" width="300px" alt="Module Management" /></td>
-    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20Front%20End%20Json%20Editor.png?width=600" width="300px" alt="Front End Json Editor" /></td>
-    <td>    <img src="https://sonicjs.com/images/Node.js%20CMS%20-%20API%20Explorer.png?width=600" width="300px" alt="Swagger API Explorer" /></td>
+    <td>    <img src="https://sonicjs.com/assets/uploads/Node.js%20CMS%20-%20Module%20Management.png?width=600" width="300px" alt="Module Management" /></td>
+    <td>    <img src="https://sonicjs.com/assets/uploads/Node.js%20CMS%20-%20Front%20End%20Json%20Editor.png?width=600" width="300px" alt="Front End Json Editor" /></td>
+    <td></td>
   </tr>
  </table>
 
@@ -77,8 +71,8 @@
 - NodeJs
 - Express
 - GraphQL
-- Bootstrap 4
-- MongoDB
+- Bootstrap 5
+- Databases Supported: MySQL, PostgreSQL, SQLite (local file based database), MariaDB, Microsoft SQL Server, Oracle, WebSQL, MongoDB, CockroachDB, SAP Hana, sql.js, and others.
 
 
 ### Why SonicJs?
@@ -94,7 +88,6 @@ There are thousands of CMS out there and several already built on the modern JAM
 1. [Support](#support)
 1. [Contributing - Get Involved!](#contributing---get-involved)
 1. [Deployment](#deployment)
-1. [Examples](#examples)
 1. [Versioning](#versioning)
 1. [Authors](#authors)
 1. [License](#license)
@@ -105,17 +98,16 @@ There are thousands of CMS out there and several already built on the modern JAM
 
 ### Pre-requisites
 
-You will need NodeJs installed and access to a MongoDB database. Its recommended that you setup MongoDB locally as it will run very fast, but you can also sign up for a free MongoDB database at Mlab: https://mlab.com/
+You will need NodeJs installed. VS Code IDE is recommended, but any IDE that support Javascript development will work.
 
 ### Setup Steps
 
-Assuming that you have a MongoDB database ready to go, setup takes < 2 minutes.
+Setup takes < 2 minutes.
 
 Follow these steps and you should be good to go:
 
 1. Clone the repo: `git clone https://github.com/lane711/sonicjs.git`
 1. Change to created folder `cd sonicjs`
-1. Validate the `MONGODB_URL` value the .env-default file (located in the root directory) 
 1. Install the dependencies: `npm install`
 1. Run it with: `npm start`
 
@@ -145,7 +137,7 @@ If you are considering using SonicJs for your next web project, its important to
 
 If you are interested in reading more about me or the goals and motivation of the project, please check out the "about" page here: https://sonicjs.com/about.
 
-Also, if you've actually read down this far and happen to be a in generous mood, :star::star::star::star::star: **would you mind given the project a star?**:star::star::star::star::star: Thanks in advance!
+Also, if you've actually read down this far and happen to be a in generous mood, :star::star::star::star::star: **please consider giving this project a star to help us get the word out.** :star::star::star::star::star: Thanks in advance!
 
 ## Debugging
 
@@ -183,10 +175,6 @@ Interested in contributing to SonicJs? Any and all help is welcome! Please read 
 ## Deployment
 
 Deployment is basically the same as any regular Node.js/Express project. The project has successfully been deployed to Heroku, NodeChef, Amazon EC2 and others. I recommend using a process manager like PM2 or similar if you are deploying on a self managed server (like EC2).
-
-## Examples
-
-Presently, the only in-production implementations that I know about (aside from sonicjs.com) are internal company applications. If you have an example you'd like to share, please contact me [here.](https://sonicjs.com/contact) and I'll be happy to list it here.
 
 ## Versioning
 

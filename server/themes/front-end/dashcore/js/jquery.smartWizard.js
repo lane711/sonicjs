@@ -619,29 +619,4 @@
         }
     });
 
-    // Wrapper for the plugin
-    $.fn.smartWizard = function (options) {
-        var args = arguments;
-        var instance;
-
-        if (options === undefined || typeof options === 'object') {
-            return this.each(function () {
-                if (!$.data(this, "smartWizard")) {
-                    $.data(this, "smartWizard", new SmartWizard(this, options));
-                }
-            });
-        } else if (typeof options === 'string' && options[0] !== '_' && options !== 'init') {
-            instance = $.data(this[0], 'smartWizard');
-
-            if (options === 'destroy') {
-                $.data(this, 'smartWizard', null);
-            }
-
-            if (instance instanceof SmartWizard && typeof instance[options] === 'function') {
-                return instance[options].apply(instance, Array.prototype.slice.call(args, 1));
-            } else {
-                return this;
-            }
-        }
-    };
 })(jQuery, window, document);

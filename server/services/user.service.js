@@ -9,8 +9,8 @@ const axios = require("axios");
 const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 const chalk = require("chalk");
 var { GraphQLClient, gql, request } = require("graphql-request");
-const crypto = require("crypto");
 const User = require("../schema/models/user");
+const dalService = require("./dal.service");
 
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
@@ -26,16 +26,19 @@ module.exports = userService = {
     });
 
     app.get("/api-admin/roles", async function (req, res) {
-      let data = await dataService.rolesGet();
-      let roles = data.map(r => {
-        return {id: r.data.key, name: r.data.title};
+      let data = await dataService.rolesGet(req.sessionID);
+      let roles = data.map((r) => {
+        return { id: r.data.key, name: r.data.title };
       });
       res.send(roles);
-    })
+    });
   },
 
-  createUser: async function (username, password) {
-    User.register({ username: username, active: false }, password);
+  registerUser: async function (email, password) {
+    let passwordHash = await dalService.hashPassword(password);
+
+    return await dalService.userRegister(email, passwordHash);
+    // User.register({ username: username, active: false }, password);
     // let passwordHash = crypto.createHash('md5').update('password').digest("hex")
 
     // const query = gql`
@@ -53,24 +56,25 @@ module.exports = userService = {
   },
 
   loginUser: async function (email, password) {
-    const query = gql`
-      mutation{
-        userCreate(email:"${email}", password:"${password}"){
-          email
-          id
-        }
-      }
-        `;
+    return await dalService.userGetByLogin(email, password);
+    // const query = gql`
+    //   mutation{
+    //     userCreate(email:"${email}", password:"${password}"){
+    //       email
+    //       id
+    //     }
+    //   }
+    //     `;
 
-    let data = await dataService.executeGraphqlQuery(query);
+    // let data = await dataService.executeGraphqlQuery(query);
 
-    return data.contents;
+    // return data.contents;
   },
 
-  getUsers: async function () {
+  getUsers: async function (sessionID) {
     const query = gql`
       {
-        users {
+        users (sessionID:"${sessionID}") {
           id
           username
           password
@@ -83,10 +87,10 @@ module.exports = userService = {
     return data.users;
   },
 
-  getUser: async function (id) {
+  getUser: async function (id, sessionID) {
     const query = gql`
     {
-      user(id:"${id}"){
+      user(id:"${id}", sessionID:"${sessionID}"){
         id
         username
         lastLoginOn
@@ -100,29 +104,27 @@ module.exports = userService = {
     return data.user;
   },
 
-  getRoles: async function () {
+  getRoles: async function (sessionID) {
+    let data = await dataService.getContentByContentType("role", sessionID);
 
-  let data = await dataService.getContentByContentType('role');
-
-  return data;
+    return data;
   },
 
   mapUserRoles: async function (user) {
-
     let roles = await userService.getRoles();
 
-    if(user.profile.roles){
+    if (user.profile.roles) {
       user.roleMapping = [];
-      user.profile.roles.forEach(role => {
-        let roleRecord = roles.filter(x => x.id === role);
-        if(roleRecord){
+      user.profile.roles.forEach((role) => {
+        let roleRecord = roles.filter((x) => x.id === role);
+        if (roleRecord) {
           user.roleMapping.push(roleRecord[0].data.title);
         }
       });
     }
-  
+
     return data;
-    },
+  },
 
   // getRole: async function (id) {
   //   var roleModel = loopback.getModel("Role");

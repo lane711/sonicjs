@@ -127,8 +127,10 @@ describe("Admin Content Types", function () {
       .invoke("val")
       .then((rawText) => {
         let json = JSON.parse(rawText);
+        cy.log('BEFORE json from field ----->', JSON.stringify(json));
+
         json.title = "AA Cypress Module Content Type RAW EDIT";
-        cy.log(json);
+        cy.log('AFTER json from field ----->', JSON.stringify(json));
         cy.get(".jsoneditor-text").clear();
         cy.get(".jsoneditor-text").click();
         cy.wait(500);
@@ -136,6 +138,8 @@ describe("Admin Content Types", function () {
           parseSpecialCharSequences: false,
         });
       });
+
+      cy.wait(500);
 
     cy.contains("Save Json").click();
 

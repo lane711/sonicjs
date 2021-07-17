@@ -21,13 +21,14 @@ module.exports = assetService = {
           //TODO: cache this
           let assetFilesExist = await assetService.doesAssetFilesExist();
 
-          if (process.env.REBUILD_ASSETS === "TRUE" || !assetFilesExist) {
+          // if (process.env.REBUILD_ASSETS === "TRUE" || !assetFilesExist || options.req.pageLoadedCount === 1) {
+            if (!assetFilesExist || options.req.pageLoadedCount === 1) {
             //rebuild the assets before delivering
             await assetService.getLinks(options, "css");
             await assetService.getLinks(options, "js");
 
             //file will now exist, so no need to rebuild
-            await fileService.updateEnvFileVariable("REBUILD_ASSETS", "FALSE");
+            // await fileService.updateEnvFileVariable("REBUILD_ASSETS", "FALSE");
           }
 
           //add combined assets
@@ -38,7 +39,7 @@ module.exports = assetService = {
             "css"
           )}" rel="stylesheet">`;
         } else {
-          await fileService.updateEnvFileVariable("REBUILD_ASSETS", "TRUE");
+          // await fileService.updateEnvFileVariable("REBUILD_ASSETS", "TRUE");
           await assetService.getLinks(options, "css");
           await assetService.getLinks(options, "js");
         }
@@ -104,17 +105,15 @@ module.exports = assetService = {
     if (globalService.isBackEnd) {
       let assets = await dataService.getContentByContentTypeAndTitle(
         "asset",
-        `${assetType}-back-end`
+        `${assetType}-back-end`,
+        option.req.sessionID
       );
       let asset2 = this.getThemeAssets();
       this.addPaths(options, assets.data.paths, assetType);
     }
 
     if (globalService.isFrontEnd) {
-      // let assets = await dataService.getContentByContentTypeAndTitle(
-      //   "asset",
-      //   `${assetType}-front-end`
-      // );
+
       let assets = await this.getThemeAssets();
 
       this.addPaths(options, assets[assetType], assetType);
@@ -236,21 +235,24 @@ module.exports = assetService = {
 
     let appVersion = globalService.getAppVersion();
     let fileName = this.getCombinedFileName(assetType);
+    let overwriteFile = options.req.pageLoadedCount === 1;
 
-    await this.createCombinedFile(fileContent, fileName, assetType);
+    await this.createCombinedFile(fileContent, fileName, assetType, overwriteFile);
   },
 
-  createCombinedFile: async function (fileContent, fileName, assetType) {
+  createCombinedFile: async function (fileContent, fileName, assetType, overwriteFile) {
     let path = this.getAssetPath(fileName);
     let minifiedAsset = "";
-    if (!fileService.fileExists(path)) {
+    if (!fileService.fileExists(path) || overwriteFile) {
       console.log(`Generating Asset: ${path}`);
       if (assetType === "js") {
-        minifiedAsset = UglifyJS.minify(fileContent, {
+        let minJs = UglifyJS.minify(fileContent, {
           compress: false,
-        }).code;
+        });
 
+        minifiedAsset = minJs.code;
       }
+      
       if (assetType === "css") {
         minifiedAsset = csso.minify(fileContent).css;
       }

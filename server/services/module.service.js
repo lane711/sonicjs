@@ -14,10 +14,10 @@ var appRoot = require("app-root-path");
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 
 module.exports = moduleService = {
-  startup: function () {
-    emitterService.on("startup", async function () {
+  startup: function (app) {
+    emitterService.on("startup", async function ({app}) {
       // console.log('>>=== startup from module service');
-      await moduleService.processModules();
+      await moduleService.processModules(app);
     });
 
     emitterService.on("getRenderedPagePostDataFetch", async function (options) {
@@ -29,10 +29,10 @@ module.exports = moduleService = {
     });
   },
 
-  processModules: async function () {
+  processModules: async function (app) {
     let moduleDir = path.join(appRoot.path, "/server/modules");
 
-    await this.getModuleDefinitionFiles(moduleDir);
+    await this.getModuleDefinitionFiles(moduleDir, app);
     await this.getModuleCss(moduleDir);
     await this.getModuleJs(moduleDir);
     await this.getModuleContentTypesConfigs(moduleDir);
@@ -48,11 +48,11 @@ module.exports = moduleService = {
   //     });
   // },
 
-  loadModuleServices: async function (moduleList) {
+  loadModuleServices: async function (moduleList, app) {
     moduleList.forEach(async function (moduleDef) {
       if (moduleDef.enabled === undefined || moduleDef.enabled === true) {
         let m = require(moduleDef.mainService);
-        await m.startup();
+        await m.startup(app);
       }
     });
 
@@ -122,7 +122,7 @@ module.exports = moduleService = {
     return moduleDef;
   },
 
-  getModuleDefinitionFiles: async function (path) {
+  getModuleDefinitionFiles: async function (path, app) {
     const files = fileService.getFilesSearchSync(path, "/**/module.json");
 
     let moduleList = [];
@@ -154,7 +154,7 @@ module.exports = moduleService = {
       (x) => x.canBeAddedToColumn == true
     );
 
-    await moduleService.loadModuleServices(moduleList);
+    await moduleService.loadModuleServices(moduleList, app);
 
     return moduleList;
   },
@@ -174,9 +174,10 @@ module.exports = moduleService = {
           let contentType = JSON.parse(contentTypeRaw);
           // console.log(contentType);
           let contentTypeInfo = {
-            filePath: file.replace(appRoot.path, ""),
+            filePath: file.replace(`/${appRoot.path}/g`, ""),
             systemId: contentType.systemId,
           };
+          // console.log('==> moduleContentTypeConfigs push ', contentTypeInfo);
           globalService.moduleContentTypeConfigs.push(contentTypeInfo);
         } else {
           console.log("error on " + file);
@@ -198,7 +199,7 @@ module.exports = moduleService = {
     return {};
   },
 
-  getModuleContentTypes: async function () {
+  getModuleContentTypes: async function (userSession) {
     let configInfos = await globalService.moduleContentTypeConfigs;
     let configs = [];
     configInfos.forEach((configInfo) => {
@@ -286,7 +287,7 @@ module.exports = moduleService = {
       let viewPath = await this.getModuleViewFile(options.moduleName);
       options.viewModel = viewModel
         ? viewModel
-        : await dataService.getContentById(id);
+        : await dataService.getContentById(id, options.req.sessionID);
 
       await emitterService.emit("postModuleGetData", options);
 
@@ -307,7 +308,8 @@ module.exports = moduleService = {
             options.shortcode.name,
             contentType,
             processedHtml.body,
-            true
+            true,
+            options.page.data.pageTemplate !== 'none'
           );
           options.page.data.currentShortCodeHtml += wrappedDiv;
         } else {
@@ -315,9 +317,9 @@ module.exports = moduleService = {
         }
       }
 
+      options.processedHtml = processedHtml;
       await emitterService.emit("postProcessModuleShortCodeProcessedHtml", {
-        processedHtml: processedHtml,
-        viewModel: options.viewModel,
+        options
       });
 
       options.page.data.html = options.page.data.html.replace(
@@ -398,35 +400,55 @@ module.exports = moduleService = {
       JSON.stringify(moduleDefinitionFile, null, 2)
     );
 
-    //create content type
-    let moduleContentType = {
-      title: `Module - ${moduleDefinitionFile.title}`,
+    //create default content type
+    let contentTypeDef = {
+      moduleSystemId: moduleDefinitionFile.systemId,
       systemId: moduleDefinitionFile.systemId,
-      canBeAddedToColumn: moduleDefinitionFile.canBeAddedToColumn,
-      enabled: moduleDefinitionFile.enabled,
+      title: moduleDefinitionFile.title,
       data: { components: [] },
     };
-    moduleContentType.data.components.push({
-      label: "First Name",
+
+    contentTypeDef.data.components.push({
+      label: "Title",
       type: "textfield",
       input: true,
-      key: "firstName",
+      key: "title",
       validate: { required: true },
     });
-    moduleContentType.data.components.push({
+    contentTypeDef.data.components.push({
       label: "Submit",
       type: "button",
       input: true,
       key: "submit",
       theme: "primary",
     });
-    // let ct = await dataService.createContentType(moduleContentType);
-    let contentTypeDef = {
-      moduleSystemId: moduleDefinitionFile.systemId,
-      systemId: moduleDefinitionFile.systemId,
-      title: moduleDefinitionFile.title,
-    };
+
     await moduleService.createModuleContentType(contentTypeDef);
+
+    //create settings content type
+    let contentTypeDefSettings = {
+      moduleSystemId: moduleDefinitionFile.systemId,
+      systemId: `${moduleDefinitionFile.systemId}-settings`,
+      title: `${moduleDefinitionFile.title} Settings`,
+      data: { components: [] },
+    };
+
+    contentTypeDefSettings.data.components.push({
+      label: "Enabled",
+      type: "checkbox",
+      input: true,
+      key: "enabled",
+      defaultValue: true
+    });
+    contentTypeDefSettings.data.components.push({
+      label: "Submit",
+      type: "button",
+      input: true,
+      key: "submit",
+      theme: "primary",
+    });
+
+    await moduleService.createModuleContentType(contentTypeDefSettings);
   },
 
   updateModule: async function (moduleDefinitionFile) {

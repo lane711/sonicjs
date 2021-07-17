@@ -11,53 +11,27 @@ var handlebars = require('handlebars');
 module.exports = viewService = {
 
     getProcessedView: function (contentType, viewModel, viewPath) {
-        // debugger;
-
-      // return;
-
         var source = viewService.getHandlebarsTemplateForContentType(contentType, viewPath);
-        var template = handlebars.compile(source);
+        
+        var result = viewService.processTemplateString(source, viewModel)
 
-        // var data = await dataService.getContentByType(contentType);
+        return result;
+    },
 
-        // let viewModel = data.map(function (record) {
-        //     return {
-        //         title: record.data.title,
-        //         body: helperService.truncateString(record.data.body, 400),
-        //         image: dataService.getImage(record.data.image[0]),
-        //         url: record.data.url
-        //     };
-        // });
+    processTemplateString: function (template, viewModel) {
 
-        var result = template(viewModel);
+        var templateView = handlebars.compile(template);
+
+        var result = templateView(viewModel);
 
         return result;
     },
 
     getHandlebarsTemplateForContentType: function (contentType, viewPath) {
-        // let filePath = `/../views/partials/${contentType}/list.handlebars`;
+
         let file = fileService.getFileSync(viewPath);
         return file;
 
-        // if(viewPath){
-        //     path = viewPath;
-        // }
-
-        // return await viewService.getHandlebarsTemplate(path);
     },
 
-    // getHandlebarsTemplate: async function (path) {
-
-    //     return new Promise((resolve, reject) => {
-    //         fs.readFile(path, "utf8", (err, data) => {
-    //             if (err) {
-    //                 console.log(err);
-    //                 reject(err);
-    //             }
-    //             else {
-    //                 resolve(data);
-    //             }
-    //         });
-    //     });
-    // }
 }

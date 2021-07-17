@@ -27,8 +27,14 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Seed",
-      "program": "${workspaceFolder}/server/boot/seed-data.js"
+      "name": "Migrate to SQLite",
+      "program": "${workspaceFolder}/server/boot/mongo-to-sqlite.js"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "SQLite Health Check",
+      "program": "${workspaceFolder}/server/boot/sqlite-health-check.js"
     },
     {
       "type": "node",

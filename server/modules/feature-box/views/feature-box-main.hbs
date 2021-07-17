@@ -8,5 +8,7 @@
     <div class="description">
         {{{ data.description }}}
     </div>
+    {{#if data.buttonLink }}
     <a href="{{ data.buttonLink }}" class="btn btn-primary mt-4">{{ data.buttonText }}</a>
+    {{/if }}
 </div>

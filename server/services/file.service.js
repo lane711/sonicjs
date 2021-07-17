@@ -37,15 +37,18 @@ module.exports = fileService = {
   },
 
   getFileSync: function (relativeFilePath) {
-    let filePath = path.join(appRoot.path, relativeFilePath);
+    if (!relativeFilePath.includes(".gitignore")) {
+      let filePath = path.join(appRoot.path, relativeFilePath);
 
-    let content = fs.readFileSync(filePath, "utf8");
-    return content;
+      // console.log('getFileSync filePath: ', filePath);
+
+      let content = fs.readFileSync(filePath, "utf8");
+      return content;
+    }
   },
 
   getFilesSync: function (relativeDir) {
     let files = fs.readdirSync(path.join(appRoot.path + relativeDir));
-    // let filesRelative = fileService.convertFullPathToRelative(files);
     return files;
   },
 
@@ -111,15 +114,16 @@ module.exports = fileService = {
     return appRoot.path;
   },
 
-  updateEnvFileVariable: async function (variableName, variableValue) {
-    process.env.REBUILD_ASSETS = "FALSE";
+  //this causes all env comments to be lost
+  // updateEnvFileVariable: async function (variableName, variableValue) {
+  //   process.env.REBUILD_ASSETS = "FALSE";
 
-    let envFile = await this.getFile(".env");
-    let parsedFile = parse(envFile);
-    parsedFile[variableName] = variableValue;
-    let envFileContent = stringify(parsedFile);
-    await this.writeFile(".env", envFileContent);
-  },
+  //   let envFile = await this.getFile(".env");
+  //   let parsedFile = parse(envFile);
+  //   parsedFile[variableName] = variableValue;
+  //   let envFileContent = stringify(parsedFile);
+  //   await this.writeFile(".env", envFileContent);
+  // },
 
   deleteFile: function (filePath) {
     fs.unlinkSync(filePath);

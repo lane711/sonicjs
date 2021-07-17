@@ -52,7 +52,10 @@ if (typeof module !== "undefined" && module.exports) {
         options.page.data.editForm = await exports.getForm(
           options.page.contentTypeId,
           null,
-          "submitContent(submission)"
+          "submitContent(submission)",
+          undefined,
+          undefined,
+          options.req.sessionID
         );
       }
     });
@@ -79,8 +82,7 @@ if (typeof module !== "undefined" && module.exports) {
       // console.log(file.path); //tmp path (ie: /tmp/12345-xyaz.png)
       // console.log(uploadPath); //uploads directory: (ie: /home/user/data/uploads)
       //set cookie
-      res.cookie('videoPath', filePath, { maxAge: 900000, httpOnly: true });
-
+      res.cookie("videoPath", filePath, { maxAge: 900000, httpOnly: true });
 
       res.send(filePath);
       // next();
@@ -90,22 +92,37 @@ if (typeof module !== "undefined" && module.exports) {
       contentTypeId,
       content,
       onFormSubmitFunction,
-      returnModuleSettings = false
+      returnModuleSettings = false,
+      formSettingsId,
+      sessionID
     ) {
       let contentType;
       // debugger;
       if (content && content.data.contentType) {
         contentType = await dataService.contentTypeGet(
-          content.data.contentType.toLowerCase()
+          content.data.contentType.toLowerCase(),
+          sessionID
         );
       } else if (contentTypeId) {
-        contentType = await dataService.contentTypeGet(contentTypeId);
-        // let  contentTypeSettings = await dataService.contentTypeGet(`${contentTypeId}-settings`);
-        // contentType = contentTypeSettings ?? contentType;
-        //show settings version of content type if exist
+        contentType = await dataService.contentTypeGet(contentTypeId, sessionID);
+
+        //add a hidden object for the formsettings id so we can look it up on form submission
+        if (formSettingsId) {
+          contentType.data.components.unshift({
+            type: "textfield",
+            inputType: "text",
+            key: "formSettingsId",
+            defaultValue: formSettingsId,
+            hidden: false,
+            input: true,
+            customClass: "hide",
+          });
+        }
+
         if (returnModuleSettings) {
           const settingContentType = await dataService.contentTypeGet(
-            `${contentTypeId}-settings`
+            `${contentTypeId}-settings`,
+            sessionID
           );
           // debugger;
           if (settingContentType && settingContentType.data) {
@@ -255,8 +272,9 @@ if (typeof module !== "undefined" && module.exports) {
         type: "textfield",
         key: "id",
         label: "id",
+        customClass: "hide",
         defaultValue: id,
-        hidden: true,
+        hidden: false,
         input: true,
       });
 

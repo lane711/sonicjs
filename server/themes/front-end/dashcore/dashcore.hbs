@@ -29,6 +29,8 @@
     {{#if data.showPageBuilder}}
     <link href="/page-builder/css/page-builder.css" rel="stylesheet" />
     {{/if}}
+
+    {{{ data.headerJs }}}
   </head>
 
   <body>
@@ -49,7 +51,10 @@
     {{/if}}
 
     <main>
-        
+      
+      <input id="sessionID" type="hidden" value="{{data.sessionID}}"/>
+      <input id="theme" type="hidden" value="dashcore"/>
+
       {{{body}}}
 
 

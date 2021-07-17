@@ -12,7 +12,7 @@ var adminService = require("../services/admin.service");
 var dataService = require("../services/data.service");
 dataService.startup();
 var moduleService = require("../services/module.service");
-moduleService.startup();
+// moduleService.startup();
 var formService = require("../services/form.service");
 var menuService = require("../services/menu.service");
 var mediaService = require("../services/media.service");
@@ -25,6 +25,9 @@ cssService.startup();
 var assetService = require("../services/asset.service");
 var userService = require("../services/user.service");
 var authService = require("../services/auth.service");
+var dalService = require("../services/dal.service");
+var backupService = require("../services/backup.service");
+var backupRestoreService = require("../services/backup-restore.service");
 
 var helperService = require("../services/helper.service");
 var sharedService = require("../services/shared.service");
@@ -40,6 +43,7 @@ var cors = require("cors");
 const chalk = require("chalk");
 const log = console.log;
 const url = require("url");
+var pageLoadedCount = 0;
 // var admin = require(__dirname + "/admin");
 
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
@@ -48,6 +52,9 @@ exports.loadRoutes = async function (app) {
   authService.startup(app);
   adminService.startup(app);
   formService.startup(app);
+  backupService.startup(app);
+  backupRestoreService.startup(app);
+
   // app.get('/', async function (req, res) {
   //   res.send('ok');
   // });
@@ -58,7 +65,9 @@ exports.loadRoutes = async function (app) {
   let adminPage = "";
 
   (async () => {
+    await dalService.startup(app);
     await cacheService.startup();
+    await moduleService.startup(app);
     await menuService.startup();
     await mediaService.startup();
     await siteSettingsService.startup();
@@ -66,8 +75,14 @@ exports.loadRoutes = async function (app) {
     await userService.startup(app);
     await assetService.startup();
     await pageBuilderService.startup(app);
+    await pageBuilderService.startup(app);
 
-    await emitterService.emit("startup");
+    await emitterService.emit("startup", { app: app });
+
+    //load catch-all last
+    this.loadRoutesCatchAll(app);
+
+    await emitterService.emit("started", { app: app });
   })();
 
   app.get("*", async function (req, res, next) {
@@ -206,7 +221,6 @@ exports.loadRoutes = async function (app) {
     });
   });
 
-
   app.get("/hbs", async function (req, res) {
     res.render("home");
   });
@@ -227,8 +241,11 @@ exports.loadRoutes = async function (app) {
 
   app.get("/form/*", async function (req, res) {
     let moduleSystemId = req.path.replace("/form/", "");
-    let contentType = await dataService.contentTypeGet(moduleSystemId);
-    let form = await formService.getFormJson(contentType);
+    let contentType = await dataService.contentTypeGet(
+      moduleSystemId,
+      req.sessionID
+    );
+    let form = await formService.getFormJson(contentType, req.sessionID);
     res.send(form);
   });
 
@@ -294,13 +311,14 @@ exports.loadRoutes = async function (app) {
     let payload = req.body.data ?? req.body;
 
     //hack for newletter
-    if(!payload.data && payload.contentType){
-      payload.data = {contentType : payload.contentType};
-    }
+    // if(!payload.data && payload.contentType){
+    //   payload.data = {contentType : payload.contentType};
+    // }
+    let options = { data: payload, sessionID: req.sessionID };
 
-    payload.cookies = req.cookies;
-    await emitterService.emit("afterFormSubmit", payload);
-    res.redirect('/thank-you');
+    await emitterService.emit("afterFormSubmit", options);
+
+    res.sendStatus(200);
   });
 
   // router.get('/admin/content-types', function (req, res) {
@@ -314,7 +332,9 @@ exports.loadRoutes = async function (app) {
       next();
     }
   });
+};
 
+exports.loadRoutesCatchAll = async function (app) {
   app.get("*", async function (req, res, next) {
     await emitterService.emit("requestBegin", { req: req, res: res });
 
@@ -379,6 +399,19 @@ exports.loadRoutes = async function (app) {
       console.log(`serving: ${req.url}`);
     }
 
+    //ensure session exists if app just starting up
+    // pageLoadedCount++;
+    // req.pageLoadedCount = pageLoadedCount;
+    // if (pageLoadedCount < 10) {
+    //   let session = await dalService.sessionGet(req.sessionID);
+    //   if (!session) {
+    //     res.redirect("/");
+    //     return;
+    //   }
+    // }
+
+
+
     let isAuthenticated = await userService.isAuthenticated(req);
     globalService.setAreaMode(false, true, isAuthenticated);
     var { page } = await contentService.getRenderedPage(req);
@@ -392,18 +425,24 @@ exports.loadRoutes = async function (app) {
       return;
     }
 
-    mixPanelService.trackEvent("PAGE_LOAD", req, {
-      page: page.data.title,
-      ip: ip,
-    });
-
     await emitterService.emit("preRenderTemplate", (options = { page, req }));
 
     page.data.id = page.id;
+    page.data.sessionID = req.sessionID;
 
     res.render(`front-end/${frontEndTheme}/layouts/main`, {
       layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
       data: page.data,
     });
+
+    req.pageLoadedCount = pageLoadedCount;
+    if (pageLoadedCount < 1) {    
+      await emitterService.emit("firstPageLoaded", (options = { req }));
+    }
+    pageLoadedCount++;
+
+
+    await emitterService.emit("postPageRender", (options = { page, req }));
+
   });
 };
