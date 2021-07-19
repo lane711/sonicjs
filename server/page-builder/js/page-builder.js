@@ -1668,6 +1668,7 @@ async function setupDropZone() {
         );
         await createMediaRecord(file);
         _this.processQueue();
+        wait(600); //HACK: need make fileCreate sync
         fullPageUpdate();
       };
       reader.readAsDataURL(file);
