@@ -17,7 +17,7 @@ const s3 = new AWS.S3({
 });
 
 module.exports = s3Service = {
-  upload: function (fileName, filePath, fileType) {
+  upload: async function (fileName, filePath, fileType) {
     // read content from the file
     const fileContent = fs.readFileSync(filePath);
 
@@ -30,27 +30,35 @@ module.exports = s3Service = {
     };
 
     // Uploading files to the bucket
-    s3.upload(params, function (err, data) {
-      if (err) {
-        throw err;
-      }
-      console.log(`File uploaded successfully. ${data.Location}`);
 
-      if (fileType == "video") {
-        s3Service.encodeVideo(data.Location);
-      }
+    try {
+      const data = await s3.upload(params).promise();
+      console.log("Success uploading data");
+    } catch (err) {
+      console.log("Error uploading data. ", err);
+    }
 
-      if (fileType == "image") {
-        return true;
-      }
-    });
+    // await s3.upload(params, function (err, data) {
+    //   if (err) {
+    //     throw err;
+    //   }
+    //   console.log(`File uploaded successfully. ${data.Location}`);
+
+    //   if (fileType == "video") {
+    //     return s3Service.encodeVideo(data.Location);
+    //   }
+
+    //   if (fileType == "image") {
+    //     return true;
+    //   }
+    // });
   },
 
   encodeVideo: function (url) {
     //https://app.zencoder.com/request_builder
     zencoder.Job.create(
       {
-        bucket: "ocunite",
+        bucket: bucketName,
         input: url,
         size: "1280x720",
         audio_bitrate: 160,
