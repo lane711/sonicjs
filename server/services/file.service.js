@@ -1,6 +1,7 @@
 var dataService = require("./data.service");
 var helperService = require("./helper.service");
 var emitterService = require("./emitter.service");
+var s3Service = require("./s3.service");
 
 var fs = require("fs");
 var fsPromise = require("fs").promises;
@@ -91,8 +92,18 @@ module.exports = fileService = {
       if (fileContent.indexOf(",") > -1) {
         fileContent = fileContent.split(",")[1];
       }
+
+      //at a minimum, we need to temporarily store the file locally
       await fsPromise.writeFile(fullPath, fileContent, "base64");
+
+      //for image uploads
+      let storageOption = process.env.FILE_STORAGE;
+      if (storageOption === "AMAZON_S3") {
+        var filename = filePath.replace(/^.*[\\\/]/, "");
+        let result = await s3Service.upload(filename, fullPath, 'image');
+      }
     } else {
+      //system file updates
       await fsPromise.writeFile(fullPath, fileContent);
     }
   },

@@ -302,6 +302,10 @@ exports.loadRoutes = async function (app) {
     res.send(css);
   });
 
+  app.post("/dropzone-ignore", async function (req, res) {
+    res.sendStatus(200);
+  });
+
   app.post("/form-submission", async function (req, res) {
     let payload = req.body.data ?? req.body;
 

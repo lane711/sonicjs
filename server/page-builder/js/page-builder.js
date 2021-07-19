@@ -1646,8 +1646,8 @@ async function setupACEEditor() {
 async function setupDropZone() {
   Dropzone.autoDiscover = false;
 
-  var myDropzone = $("#sonicjs-dropzone").dropzone({
-    url: "/",
+  var myDropzone = $(document.body).dropzone({
+    url: "/dropzone-ignore",
     addRemoveLinks: true,
     maxFilesize: 100,
     dictDefaultMessage:

@@ -8,7 +8,7 @@ const SECRET = process.env.AMAZONSECRET;
 var zencoder = require("zencoder")(process.env.ZENCODERKEY);
 
 // Enter the name of the bucket that you have created here
-const BUCKET_NAME = "ocunite";
+const bucketName = process.env.AMAZON_S3_BUCKETNAME;
 
 // Initializing S3 Interface
 const s3 = new AWS.S3({
@@ -17,13 +17,13 @@ const s3 = new AWS.S3({
 });
 
 module.exports = s3Service = {
-  upload: function (fileName, filePath) {
+  upload: function (fileName, filePath, fileType) {
     // read content from the file
     const fileContent = fs.readFileSync(filePath);
 
     // setting up s3 upload parameters
     const params = {
-      Bucket: BUCKET_NAME,
+      Bucket: bucketName,
       Key: fileName, // file name you want to save as
       Body: fileContent,
       ACL: "public-read",
@@ -35,7 +35,14 @@ module.exports = s3Service = {
         throw err;
       }
       console.log(`File uploaded successfully. ${data.Location}`);
-      s3Service.encodeVideo(data.Location);
+
+      if (fileType == "video") {
+        s3Service.encodeVideo(data.Location);
+      }
+
+      if (fileType == "image") {
+        return true;
+      }
     });
   },
 
@@ -43,7 +50,7 @@ module.exports = s3Service = {
     //https://app.zencoder.com/request_builder
     zencoder.Job.create(
       {
-        bucket: 'ocunite',
+        bucket: "ocunite",
         input: url,
         size: "1280x720",
         audio_bitrate: 160,
@@ -53,7 +60,7 @@ module.exports = s3Service = {
         max_frame_rate: 30,
         outputs: [
           {
-            bucket: 'ocunite-zencoder',
+            bucket: "ocunite-zencoder",
             public: true,
             thumbnails: {
               number: 3,
@@ -68,7 +75,7 @@ module.exports = s3Service = {
           return;
         }
 
-        console.log('zencoder-->', data);
+        console.log("zencoder-->", data);
       }
     );
   },
