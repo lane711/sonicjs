@@ -199,7 +199,8 @@ module.exports = contentService = {
               req
             );
           } else {
-            page.data.html += `<section data-id='${section.id}' class="${section.data.cssClass} jumbotron-fluid">`;
+            let sectionClass = section.data.cssClass ? section.data.cssClass + ' ' : '';
+            page.data.html += `<section data-id='${section.id}' class="${sectionClass}jumbotron-fluid pb">`;
             page.data.html += '<div class="section-overlay">';
             page.data.html += '<div class="container">';
             let rows;
