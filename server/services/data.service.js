@@ -804,6 +804,23 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data;
     }),
+    exports.mediaDelete = async function (id, sessionID) {
+      let query = `
+        mutation{
+          mediaDelete( 
+            id:"${id}",
+            sessionID:"${sessionID}"){
+              id
+            }
+        }
+            `;
+  
+      let result = await this.getAxios().post(apiUrl, {
+        query: query,
+      });
+  
+      return result.data.data.mediaDelete;
+    };
     (exports.getFiles = async function () {
       let files = [{ title: "my image", filePath: "/images/test123.png" }];
       return files;

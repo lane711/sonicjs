@@ -54,6 +54,16 @@ module.exports = s3Service = {
     // });
   },
 
+  delete: async function (fileName) {
+    var params = { Bucket: bucketName, Key: fileName };
+
+    s3.deleteObject(params, function (err, data) {
+      if (err) console.log(err, err.stack);
+      // error
+      else console.log(); // deleted
+    });
+  },
+
   encodeVideo: function (url) {
     //https://app.zencoder.com/request_builder
     zencoder.Job.create(

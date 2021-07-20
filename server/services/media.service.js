@@ -8,6 +8,9 @@ const axios = require("axios");
 const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 const chalk = require("chalk");
 const fileService = require("./file.service");
+const dalService = require("./dal.service");
+const s3Service = require("./s3.service");
+
 const log = console.log;
 var axiosInstance;
 
@@ -84,6 +87,15 @@ module.exports = mediaService = {
     }
     return mediaRecords;
   },
+
+  mediaDelete: async function (id, sessionID) {
+    let media = await dataService.getContentById(id, sessionID);
+    dalService.contentDelete(media.id, sessionID);
+    //delete from s3
+    s3Service.delete(media.data.file);
+  },
+
+  
 
   getMediaUrl: async function(fileName){
 

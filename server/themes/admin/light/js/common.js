@@ -17,7 +17,7 @@ $(document).ready(async function () {
   });
 
   $("table").on("shown.bs.popover", function () {
-    // debugger;
+    debugger;
     var btns = document.getElementsByClassName("custom-delete");
     for (var i = 0; i < btns.length; i++) {
       btns[i].onclick = async function (event) {
@@ -52,6 +52,34 @@ $(document).ready(async function () {
 
           if (typeToDelete == "module") {
             await dataService.deleteModule(idToDelete, sessionID);
+            location.reload();
+          }
+
+          if (typeToDelete == "media") {
+            await dataService.deleteModule(idToDelete, sessionID);
+            location.reload();
+          }
+        }
+      };
+    }
+  });
+
+  $(".admin-media-list .btn-media-delete").on("shown.bs.popover", function () {
+    // debugger;
+    var btns = document.getElementsByClassName("custom-delete");
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].onclick = async function (event) {
+        event.preventDefault();
+        //delete content
+        if (!this.href) return;
+        var typeToDelete = getPathParts(this.href, 2);
+        var idToDelete = getPathParts(this.href, 1);
+        var sessionID = getPathParts(this.href, 0);
+
+        if (idToDelete) {
+
+          if (typeToDelete == "media") {
+            await dataService.mediaDelete(idToDelete, sessionID);
             location.reload();
           }
         }

@@ -83,3 +83,14 @@
 .tab-content{
   margin-bottom: 1.5rem;
 }
+
+.admin-media-list .thumbnail{
+  min-height: 60px;
+} 
+
+.admin-media-list .btn-media-delete{
+  position: absolute;
+  right:20px;
+  top:6px;
+  cursor: pointer;
+}

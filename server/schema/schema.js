@@ -28,6 +28,7 @@ const {
   GraphQLTime,
   GraphQLDateTime,
 } = require("graphql-iso-date");
+const mediaService = require("../services/media.service");
 
 //Schema defines data on the Graph like object types(book type), relation between
 //these object types and describes how it can reach into the graph to interact with
@@ -738,6 +739,22 @@ const Mutation = new GraphQLObjectType({
       },
       resolve(parent, args) {
         return moduleService.updateModule(args);
+      },
+    },
+
+    //media
+    mediaDelete: {
+      type: ContentType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLString) },
+        sessionID: { type: GraphQLString },
+      },
+      async resolve(parent, args) {
+        return mediaService.mediaDelete(
+          args.id, 
+          await getUserSession(args.sessionID, undefined)
+          )
+        // return Content.findByIdAndDelete(args.id);
       },
     },
   },
