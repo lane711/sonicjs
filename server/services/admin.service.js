@@ -274,6 +274,9 @@ module.exports = adminService = {
 
         //add session ID
         data.sessionID = req.sessionID;
+        data.fileStorage = process.env.FILE_STORAGE;
+        data.fileStorageBase = `https://${process.env.AMAZON_S3_BUCKETNAME}.s3.amazonaws.com`;
+
 
         res.render(`admin/shared-views/${viewName}`, {
           layout: `admin/${adminTheme}/${adminTheme}`,

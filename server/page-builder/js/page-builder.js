@@ -1673,7 +1673,8 @@ async function setupDropZone() {
       // };
       // reader.readAsDataURL(file);
     },
-    complete: function(){
+    complete: function () {
+      debugger;
       fullPageUpdate();
     },
     accept: async function (file, done) {
@@ -1917,7 +1918,13 @@ async function setupAdminMediaFormImage() {
   if (window.location.href.indexOf("admin/content/edit/media/") > 0) {
     let fileName = $('input[name="data[file]"]').val();
     if (fileName) {
-      $(".admin-form-media-image").attr("src", `/assets/uploads/${fileName}`);
+      if ($("#fileStorage").val() == "AMAZON_S3") {
+        let storageBase = $("#fileStorageBase").val();
+        $(".admin-form-media-image").attr("src", `${storageBase}/${fileName}`);
+
+      } else {
+        $(".admin-form-media-image").attr("src", `/assets/uploads/${fileName}`);
+      }
     }
   }
 }
