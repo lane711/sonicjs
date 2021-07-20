@@ -1675,14 +1675,15 @@ async function setupDropZone() {
       // reader.readAsDataURL(file);
     },
     complete: function () {
-      // debugger;
-
-      // fullPageUpdate();
       console.log('dropzone complete');
     },
     accept: async function (file, done) {
       console.log('dropzone accept');
       done();
+    },
+    queuecomplete: function () {
+      console.log('dropzone queuecomplete');
+      fullPageUpdate();
     },
   });
 

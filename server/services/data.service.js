@@ -1,5 +1,3 @@
-const mediaService = require("./media.service");
-
 //check if running in node (and not the browser)
 if (typeof module !== "undefined" && module.exports) {
   // var loopback = require("loopback");
@@ -9,6 +7,7 @@ if (typeof module !== "undefined" && module.exports) {
   var formService = require("./form.service");
   var helperService = require("./helper.service");
   var formattingService = require("./formatting.service");
+  var mediaService = require("./media.service");
 
   var axios = require("axios");
   var fs = require("fs");

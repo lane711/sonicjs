@@ -100,18 +100,26 @@ module.exports = fileService = {
       var title = file.name.replace(/^.*[\\\/]/, "");
       let result = await s3Service.upload(file.name, file.path, "image");
 
-      //create media record
-      let payload = {
-        data: {
-          title: title,
-          file: file.name,
-          contentType: "media",
-        },
-      };
-      // debugger;
-      await dataService.contentCreate(payload, true, sessionID);
+      //see if image already exists
+      let existingMedia = await dataService.getContentByContentTypeAndTitle(
+        "media",
+        title
+      );
+
+      if (!existingMedia) {
+        //create media record
+        let payload = {
+          data: {
+            title: title,
+            file: file.name,
+            contentType: "media",
+          },
+        };
+        // debugger;
+        await dataService.contentCreate(payload, true, sessionID);
+      }
       // await createInstance(payload);
-      //delete temp file
+      //delete temp file?
     }
   },
 
