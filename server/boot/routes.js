@@ -304,7 +304,7 @@ exports.loadRoutes = async function (app) {
   });
 
   app.post("/dropzone-upload", async function (req, res) {
-    await fileService.uploadWriteFile(req.files.file);
+    await fileService.uploadWriteFile(req.files.file, req.sessionID);
     res.sendStatus(200);
   });
 

@@ -109,7 +109,7 @@ module.exports = fileService = {
     // }
   },
 
-  uploadWriteFile: async function (file) {
+  uploadWriteFile: async function (file, sessionID) {
     let storageOption = process.env.FILE_STORAGE;
     if (
       storageOption === "AMAZON_S3" &&
@@ -127,7 +127,7 @@ module.exports = fileService = {
         },
       };
       // debugger;
-      await dataService.contentCreate(payload)
+      await dataService.contentCreate(payload, true, sessionID)
       // await createInstance(payload);
       //delete temp file
     }

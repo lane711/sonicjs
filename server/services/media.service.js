@@ -46,7 +46,7 @@ module.exports = mediaService = {
     if (storageOption === "AMAZON_S3") {
       for (let index = 0; index < mediaRecords.length; index++) {
         const file = mediaRecords[index];
-        file.data.src = `https://${process.env.AMAZON_S3_BUCKETNAME}.s3.amazonaws.com/${file.data.file}`;
+        file.data.src = await mediaService.getMediaUrl(file.data.file);
       }
     } else {
       let mediaFilesList = fileService.getFilesSync("/server/assets/uploads");
@@ -66,7 +66,7 @@ module.exports = mediaService = {
                 title: title,
                 file: fileName,
                 contentType: "media",
-                src: `/assets/uploads/${file}`,
+                src: await mediaService.getMediaUrl(file),
               },
             };
             // debugger;
@@ -83,6 +83,15 @@ module.exports = mediaService = {
       }
     }
     return mediaRecords;
+  },
+
+  getMediaUrl: async function(fileName){
+
+    if (process.env.FILE_STORAGE === "AMAZON_S3") {
+      return `https://${process.env.AMAZON_S3_BUCKETNAME}.s3.amazonaws.com/${fileName}`;
+    }else{
+      return `/assets/uploads/${fileName}`;
+    }
   },
 
   addMediaUrl: async function (mediaList) {
