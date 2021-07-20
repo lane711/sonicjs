@@ -309,7 +309,7 @@ exports.loadRoutes = async function (app) {
   });
 
   app.post("/form-submission", async function (req, res) {
-    let payload = req.body.data ?? req.body;
+    let payload = req.body.data.data ?? req.body.data.data;
 
     //hack for newletter
     // if(!payload.data && payload.contentType){
