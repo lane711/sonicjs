@@ -1657,6 +1657,7 @@ async function setupDropZone() {
       Authorization: $("#token").val(),
     },
     addedfile: function (file) {
+      console.log('dropzone adding file ' + file);
       // var _this = this,
       //   reader = new FileReader();
       // reader.onload = async function (event) {
@@ -1674,10 +1675,13 @@ async function setupDropZone() {
       // reader.readAsDataURL(file);
     },
     complete: function () {
-      debugger;
-      fullPageUpdate();
+      // debugger;
+
+      // fullPageUpdate();
+      console.log('dropzone complete');
     },
     accept: async function (file, done) {
+      console.log('dropzone accept');
       done();
     },
   });

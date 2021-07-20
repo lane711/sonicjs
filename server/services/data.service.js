@@ -1,3 +1,5 @@
+const mediaService = require("./media.service");
+
 //check if running in node (and not the browser)
 if (typeof module !== "undefined" && module.exports) {
   // var loopback = require("loopback");
@@ -731,7 +733,7 @@ if (typeof module !== "undefined" && module.exports) {
       }
     }),
     (exports.getImageUrl = function (file) {
-      return `/assets/uploads/${file.file}`;
+      return mediaService.getMediaUrl(file);
     }),
     (exports.getImage = function (img) {
       let url = this.getImageUrl(img);

@@ -4,9 +4,9 @@
   {{#each data.galleryImages }}
   <div>
     <a
-      href="/assets/uploads/{{ this.select.file }}"
+      href="{{ this.select.src }}"
       title="<b>{{ this.title }}</b> {{ this.body }}"
-      ><img src="/assets/uploads/{{ this.select.file }}"
+      ><img src="{{ this.select.src }}"
     /></a>
   </div>
   {{/each}}
@@ -36,14 +36,14 @@
 
           <div class="swiper-slide px-2 px-sm-1">
             <a
-              href="/assets/uploads/{{ this.select.file }}"
+              href="{{ this.select.src }}"
               title="<b>Node.js CMS - {{ this.title }}</b> <i class='fas fa-long-arrow-alt-right'></i>{{ this.body }}"
             >
               <div class="card border-0 shadow">
                 <div class="card-body">
                   <div class="logo mx-auto my-3">
                     <img
-                      src="/assets/uploads/{{ this.select.file }}"
+                      src="{{ this.select.src }}"
                       class="img-responsive"
                       alt=""
                     />
