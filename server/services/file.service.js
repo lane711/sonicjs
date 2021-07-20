@@ -87,26 +87,8 @@ module.exports = fileService = {
   },
 
   writeFile: async function (filePath, fileContent) {
-    // let storageOption = process.env.FILE_STORAGE;
-    // let fullPath = path.join(this.getRootAppPath(), filePath);
-
-    // if (filePath.match(/.(jpg|jpeg|png|gif)$/i)) {
-    //   if (fileContent.indexOf(",") > -1) {
-    //     fileContent = fileContent.split(",")[1];
-    //   }
-    //   //at a minimum, we need to temporarily store the file locally
-    //   await fsPromise.writeFile(fullPath, fileContent, "base64");
-    // } else {
-    //   //system file updates
-      await fsPromise.writeFile(fullPath, fileContent);
-    // }
-
-    // if (storageOption === "AMAZON_S3" && filePath.match(/.(jpg|jpeg|png|gif|svg)$/i)) {
-    //   var filename = filePath.replace(/^.*[\\\/]/, "");
-    //   let result = await s3Service.upload(filename, fullPath, "image");
-
-    //   //delete temp file
-    // }
+    let fullPath = path.join(this.getRootAppPath(), filePath);
+    await fsPromise.writeFile(fullPath, fileContent);
   },
 
   uploadWriteFile: async function (file, sessionID) {
@@ -127,7 +109,7 @@ module.exports = fileService = {
         },
       };
       // debugger;
-      await dataService.contentCreate(payload, true, sessionID)
+      await dataService.contentCreate(payload, true, sessionID);
       // await createInstance(payload);
       //delete temp file
     }
