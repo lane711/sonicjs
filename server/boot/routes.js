@@ -42,6 +42,7 @@ var cors = require("cors");
 const chalk = require("chalk");
 const log = console.log;
 const url = require("url");
+const fileService = require("../services/file.service");
 var pageLoadedCount = 0;
 // var admin = require(__dirname + "/admin");
 
@@ -302,7 +303,8 @@ exports.loadRoutes = async function (app) {
     res.send(css);
   });
 
-  app.post("/dropzone-ignore", async function (req, res) {
+  app.post("/dropzone-upload", async function (req, res) {
+    await fileService.uploadWriteFile(req.files.file);
     res.sendStatus(200);
   });
 
@@ -409,8 +411,6 @@ exports.loadRoutesCatchAll = async function (app) {
     //   }
     // }
 
-
-
     let isAuthenticated = await userService.isAuthenticated(req);
     globalService.setAreaMode(false, true, isAuthenticated);
     var { page } = await contentService.getRenderedPage(req);
@@ -435,13 +435,11 @@ exports.loadRoutesCatchAll = async function (app) {
     });
 
     req.pageLoadedCount = pageLoadedCount;
-    if (pageLoadedCount < 1) {    
+    if (pageLoadedCount < 1) {
       await emitterService.emit("firstPageLoaded", (options = { req }));
     }
     pageLoadedCount++;
 
-
     await emitterService.emit("postPageRender", (options = { page, req }));
-
   });
 };

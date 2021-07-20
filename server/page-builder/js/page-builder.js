@@ -1647,7 +1647,7 @@ async function setupDropZone() {
   Dropzone.autoDiscover = false;
 
   var myDropzone = $(document.body).dropzone({
-    url: "/dropzone-ignore",
+    url: "/dropzone-upload",
     addRemoveLinks: true,
     maxFilesize: 100,
     dictDefaultMessage:
@@ -1657,21 +1657,24 @@ async function setupDropZone() {
       Authorization: $("#token").val(),
     },
     addedfile: function (file) {
-      var _this = this,
-        reader = new FileReader();
-      reader.onload = async function (event) {
-        base64content = event.target.result;
-        console.log(base64content);
-        await dataService.fileCreate(
-          `/server/assets/uploads/${file.name}`,
-          base64content
-        );
-        await createMediaRecord(file);
-        _this.processQueue();
-        wait(600); //HACK: need make fileCreate sync
-        fullPageUpdate();
-      };
-      reader.readAsDataURL(file);
+      // var _this = this,
+      //   reader = new FileReader();
+      // reader.onload = async function (event) {
+      //   debugger;
+      //   base64content = event.target.result;
+      //   console.log(base64content);
+      //   await dataService.fileCreate(
+      //     `/server/assets/uploads/${file.name}`,
+      //     base64content
+      //   );
+      //   await createMediaRecord(file);
+      //   _this.processQueue();
+      //   wait(600); //HACK: need make fileCreate sync
+      // };
+      // reader.readAsDataURL(file);
+    },
+    complete: function(){
+      fullPageUpdate();
     },
     accept: async function (file, done) {
       done();
