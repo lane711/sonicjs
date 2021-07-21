@@ -7,7 +7,6 @@ if (typeof module !== "undefined" && module.exports) {
   var formService = require("./form.service");
   var helperService = require("./helper.service");
   var formattingService = require("./formatting.service");
-  var mediaService = require("./media.service");
 
   var axios = require("axios");
   var fs = require("fs");
@@ -730,9 +729,6 @@ if (typeof module !== "undefined" && module.exports) {
       for (let index = 0; index < array.length; index++) {
         await callback(array[index], index, array);
       }
-    }),
-    (exports.getImageUrl = async function (file) {
-      return mediaService.getMediaUrl(file);
     }),
     (exports.getImage = function (img) {
       let url = this.getImageUrl(img);
