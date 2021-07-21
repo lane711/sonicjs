@@ -728,7 +728,7 @@ async function editContentType(payload, sessionID) {
 
 async function deleteContentInstance(id, sessionID) {
   // debugger;
-  dataService.contentDelete(id, sessionID);
+  await dataService.contentDelete(id, sessionID);
 }
 
 async function deleteContentType(id) {
