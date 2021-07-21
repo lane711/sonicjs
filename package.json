@@ -92,6 +92,7 @@
     "typeorm": "^0.2.32",
     "uglify-es": "^3.3.9",
     "underscore": "^1.12.0",
+    "unzipper": "^0.10.11",
     "video.js": "^7.11.8",
     "yaml": "^1.10.0",
     "zencoder": "^2.0.1"

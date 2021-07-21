@@ -1,5 +1,6 @@
 const https = require("https");
 fs = require("fs");
+var unzipper = require("unzipper");
 var appRoot = require("app-root-path");
 var dalService = require("./dal.service");
 var dataService = require("./data.service");
@@ -22,33 +23,41 @@ module.exports = backUpRestoreService = {
   },
 
   importJsonFiles: async function (req) {
-    console.log('starting restore');
+    console.log("starting restore");
+    //unzip into json files
 
+    fs.createReadStream(`${appRoot.path}/backups/content.zip`).pipe(
+      unzipper.Extract({ path: `${appRoot.path}/backups/content` })
+    );
+
+    // return;
+    //proccess json file
     var contentFiles = fileService.getFilesSync("/backups/content");
     for (let index = 0; index < contentFiles.length; index++) {
       const file = contentFiles[index];
-      console.log('file:' + file);
+      console.log("file:" + file);
 
-      // let file = '479.json';
+      if (file.includes(".json")) {
+        // let file = '479.json';
+        let contentFile = fileService.getFileSync(`/backups/content/${file}`);
 
-      let contentFile = fileService.getFileSync(`/backups/content/${file}`);
+        if (contentFile) {
+          let payload = JSON.parse(contentFile);
+          let id = parseInt(file.replace(".json", ""));
+          payload.id = id;
+          try {
+            await dalService.contentRestore(
+              id,
+              payload.url,
+              payload,
+              req.sessionID
+            );
+          } catch (error) {
+            console.log("id", id);
 
-      if (contentFile) {
-        let payload = JSON.parse(contentFile);
-        let id = parseInt(file.replace(".json", ""));
-        payload.id = id;
-        try {
-          await dalService.contentRestore(
-            id,
-            payload.url,
-            payload,
-            req.sessionID
-          );
-        } catch (error) {
-          console.log("id", id);
-
-          console.log(error);
-          console.log("paylaod", payload);
+            console.log(error);
+            console.log("paylaod", payload);
+          }
         }
       }
     }
