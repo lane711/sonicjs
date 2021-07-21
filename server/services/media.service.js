@@ -58,28 +58,29 @@ module.exports = mediaService = {
       if (mediaRecords.length !== mediaFilesList.length) {
         for (let index = 0; index < mediaFilesList.length; index++) {
           const fileName = mediaFilesList[index];
-
-          let mediaRecord = mediaRecords.filter(
-            (x) => x.data.file === fileName
-          )[0];
-          if (!mediaRecord) {
-            //create the media record - the user has uploaded files
-            let title = fileName.replace(/\.[^/.]+$/, "");
-            let payload = {
-              data: {
-                title: title,
-                file: fileName,
-                contentType: "media",
-                src: await mediaService.getMediaUrl(file),
-              },
-            };
-            // debugger;
-            mediaRecord = await dataService.contentCreate(
-              payload,
-              true,
-              sessionID
-            );
-            // mediaRecords.push(mediaRecord);
+          if (fileName !== ".DS_Store") {
+            let mediaRecord = mediaRecords.filter(
+              (x) => x.data.file === fileName
+            )[0];
+            if (!mediaRecord) {
+              //create the media record - the user has uploaded files
+              let title = fileName.replace(/\.[^/.]+$/, "");
+              let payload = {
+                data: {
+                  title: title,
+                  file: fileName,
+                  contentType: "media",
+                  src: await mediaService.getMediaUrl(file),
+                },
+              };
+              // debugger;
+              mediaRecord = await dataService.contentCreate(
+                payload,
+                true,
+                sessionID
+              );
+              // mediaRecords.push(mediaRecord);
+            }
           }
         }
         //re-get list
@@ -87,7 +88,9 @@ module.exports = mediaService = {
       }
     }
 
-    let sortedMediaRecords = _.sortBy(mediaRecords, (i) => i.data.title.toLowerCase());
+    let sortedMediaRecords = _.sortBy(mediaRecords, (i) =>
+      i.data.title.toLowerCase()
+    );
     return sortedMediaRecords;
   },
 
@@ -98,15 +101,12 @@ module.exports = mediaService = {
     s3Service.delete(media.data.file);
   },
 
-  
-
-  getMediaUrl: function(fileName){
-
+  getMediaUrl: function (fileName) {
     if (process.env.FILE_STORAGE === "AMAZON_S3") {
       // return 'https://sonicjscom.s3.us-west-1.amazonaws.com/main-shape.svg';
       return `https://${process.env.AMAZON_S3_BUCKETNAME}.s3.${process.env.AMAZON_S3_REGION}.amazonaws.com/${fileName}`;
       // https://sonicjscom.s3.us-west-1.amazonaws.com/main-shape.svg
-    }else{
+    } else {
       return `/assets/uploads/${fileName}`;
     }
   },
