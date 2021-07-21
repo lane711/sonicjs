@@ -731,7 +731,7 @@ if (typeof module !== "undefined" && module.exports) {
         await callback(array[index], index, array);
       }
     }),
-    (exports.getImageUrl = function (file) {
+    (exports.getImageUrl = async function (file) {
       return mediaService.getMediaUrl(file);
     }),
     (exports.getImage = function (img) {

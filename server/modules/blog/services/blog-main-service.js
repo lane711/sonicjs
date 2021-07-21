@@ -22,12 +22,18 @@ module.exports = blogMainService = {
 
   getBlogData: async function (options) {
     let id = options.shortcode.properties.id;
-    let moduleData = await dataService.getContentById(id, options.req.sessionID);
+    let moduleData = await dataService.getContentById(
+      id,
+      options.req.sessionID
+    );
     let contentType = "blog";
     let viewModel = moduleData;
 
-    let listRaw = await dataService.getContentByType(contentType, options.req.sessionID);
-    listRaw = listRaw.sort((a, b) => (a.createdOn > b.createdOn) ? 1 : -1)
+    let listRaw = await dataService.getContentByType(
+      contentType,
+      options.req.sessionID
+    );
+    listRaw = listRaw.sort((a, b) => (a.createdOn > b.createdOn ? 1 : -1));
 
     listRaw = listRaw.filter((x) => x.data.title);
     let list = listRaw.map(function (record) {
@@ -38,7 +44,7 @@ module.exports = blogMainService = {
             helperService.truncateString(record.data.body, 400)
           ),
           image: record.data.fileName
-            ? dataService.getImageUrl(record.data.fileName)
+            ? mediaService.getMediaUrl(record.data.fileName.file)
             : undefined,
           url: record.data.url,
           createdOn: record.createdOn,
@@ -46,21 +52,19 @@ module.exports = blogMainService = {
       };
     });
 
-    let sortedList = list.sort((a, b) => (a.data.createdOn < b.data.createdOn) ? 1 : -1)
-    // await formattingService.formatDates(list, true);
-
-    // viewModel.list = list;
-    // let viewPath = `/server/modules/blog/views/blog-main.hbs`;
-    // // let sortedFiles = files.sort((a, b) => (a.data.sortOrder > b.data.sortOrder) ? 1 : -1)
-    // // await mediaService.addMediaUrl(sortedFiles);
-    // // viewModel.data.files = sortedFiles;
-    // let processedHtml = await blogMainService.processView(
-    //   contentType,
-    //   viewModel,
-    //   viewPath
-    // );
-
+    let sortedList = list.sort((a, b) =>
+      a.data.createdOn < b.data.createdOn ? 1 : -1
+    );
     options.viewModel.data.list = sortedList;
+
+    // Wait for all Promises to complete
+    // Promise.all(list)
+    //   .then((list) => {
+    //     // Handle results
+    //   })
+    //   .catch((e) => {
+    //     console.error(e);
+    //   });
   },
 
   // processView: async function (contentType, viewModel, viewPath) {

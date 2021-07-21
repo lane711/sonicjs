@@ -100,7 +100,7 @@ module.exports = mediaService = {
 
   
 
-  getMediaUrl: async function(fileName){
+  getMediaUrl: function(fileName){
 
     if (process.env.FILE_STORAGE === "AMAZON_S3") {
       // return 'https://sonicjscom.s3.us-west-1.amazonaws.com/main-shape.svg';
