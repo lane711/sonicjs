@@ -36,6 +36,7 @@ describe("Admin Content", function () {
     cy.get('input[name="data[title]"]').type(' EDITED');
     cy.get('input[name="data[heroTitle]"]').type(' EDITED');
     cy.contains('Submit').click();
+    cy.wait(1000);
 
     cy.visit(`${cy.SonicJs.getBaseUrl()}/cypress-test-page-edited`);
     cy.contains('Cypress Hero EDITED');
