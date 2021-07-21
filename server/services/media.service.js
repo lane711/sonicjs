@@ -70,7 +70,7 @@ module.exports = mediaService = {
                   title: title,
                   file: fileName,
                   contentType: "media",
-                  src: await mediaService.getMediaUrl(file),
+                  src: await mediaService.getMediaUrl(fileName),
                 },
               };
               // debugger;
