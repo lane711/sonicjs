@@ -17,16 +17,18 @@ const s3 = new AWS.S3({
 });
 
 module.exports = s3Service = {
-  upload: async function (fileName, filePath, fileType) {
+  upload: async function (fileName, filePath, fileType, mimetype) {
     // read content from the file
     const fileContent = fs.readFileSync(filePath);
 
+    // let contentType = 
     // setting up s3 upload parameters
     const params = {
       Bucket: bucketName,
       Key: fileName, // file name you want to save as
       Body: fileContent,
       ACL: "public-read",
+      ContentType: mimetype
     };
 
     // Uploading files to the bucket

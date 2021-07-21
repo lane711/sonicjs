@@ -98,7 +98,7 @@ module.exports = fileService = {
       file.name.match(/.(jpg|jpeg|png|gif|svg)$/i)
     ) {
       var title = file.name.replace(/^.*[\\\/]/, "");
-      let result = await s3Service.upload(file.name, file.path, "image");
+      let result = await s3Service.upload(file.name, file.path, "image", file.type);
 
       //see if image already exists
       let existingMedia = await dataService.getContentByContentTypeAndTitle(

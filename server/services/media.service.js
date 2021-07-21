@@ -10,6 +10,7 @@ const chalk = require("chalk");
 const fileService = require("./file.service");
 const dalService = require("./dal.service");
 const s3Service = require("./s3.service");
+var _ = require("underscore");
 
 const log = console.log;
 var axiosInstance;
@@ -85,7 +86,9 @@ module.exports = mediaService = {
         mediaRecords = await dataService.getContentByType("media", sessionID);
       }
     }
-    return mediaRecords;
+
+    let sortedMediaRecords = _.sortBy(mediaRecords, (i) => i.data.title.toLowerCase());
+    return sortedMediaRecords;
   },
 
   mediaDelete: async function (id, sessionID) {
@@ -100,7 +103,9 @@ module.exports = mediaService = {
   getMediaUrl: async function(fileName){
 
     if (process.env.FILE_STORAGE === "AMAZON_S3") {
-      return `https://${process.env.AMAZON_S3_BUCKETNAME}.s3.amazonaws.com/${fileName}`;
+      // return 'https://sonicjscom.s3.us-west-1.amazonaws.com/main-shape.svg';
+      return `https://${process.env.AMAZON_S3_BUCKETNAME}.s3.${process.env.AMAZON_S3_REGION}.amazonaws.com/${fileName}`;
+      // https://sonicjscom.s3.us-west-1.amazonaws.com/main-shape.svg
     }else{
       return `/assets/uploads/${fileName}`;
     }
