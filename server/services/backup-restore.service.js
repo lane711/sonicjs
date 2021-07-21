@@ -22,9 +22,13 @@ module.exports = backUpRestoreService = {
   },
 
   importJsonFiles: async function (req) {
+    console.log('starting restore');
+
     var contentFiles = fileService.getFilesSync("/backups/content");
     for (let index = 0; index < contentFiles.length; index++) {
       const file = contentFiles[index];
+      console.log('file:' + file);
+
       // let file = '479.json';
 
       let contentFile = fileService.getFileSync(`/backups/content/${file}`);
