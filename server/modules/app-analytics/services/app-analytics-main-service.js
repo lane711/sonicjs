@@ -36,11 +36,13 @@ module.exports = appAnalyticsMainService = {
       });
     });
 
-    app.post(process.env.ANALYTICS_RECEIVE_URL, async function (req, res) {
-      appAnalyticsMainService.processEvent(req.body);
-      res.json({ ok: "ok" });
-    });
-  },
+    if (process.env.ANALYTICS_RECEIVE_URL) {
+      app.post(process.env.ANALYTICS_RECEIVE_URL, async function (req, res) {
+        appAnalyticsMainService.processEvent(req.body);
+        res.json({ ok: "ok" });
+      });
+      }
+    },
 
   trackEventSend: async function (data) {
     if (await appAnalyticsMainService.trackingEnabled()) {
@@ -124,7 +126,7 @@ module.exports = appAnalyticsMainService = {
     ) {
       return false;
     }
-    if (process.env.LOCAL_DEV === 'true') {
+    if (process.env.LOCAL_DEV === "true") {
       return true;
     }
     return false;
