@@ -33,6 +33,8 @@ module.exports = backUpRestoreService = {
     // return;
     //proccess json file
     var contentFiles = fileService.getFilesSync("/backups/content");
+
+    console.log('file count:' +  contentFiles.length);
     for (let index = 0; index < contentFiles.length; index++) {
       const file = contentFiles[index];
       console.log("file:" + file);
