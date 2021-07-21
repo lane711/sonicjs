@@ -10,6 +10,7 @@ module.exports = new EntitySchema({
         id: {
             primary: true,
             type: "int",
+            generated: true
         },
         data: {
             type: "text"
