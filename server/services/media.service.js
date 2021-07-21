@@ -46,13 +46,13 @@ module.exports = mediaService = {
     let mediaRecords =
       (await dataService.getContentByType("media", sessionID)) || [];
 
+    for (let index = 0; index < mediaRecords.length; index++) {
+      const file = mediaRecords[index];
+      file.data.src = await mediaService.getMediaUrl(file.data.file);
+    }
+
     let storageOption = process.env.FILE_STORAGE;
-    if (storageOption === "AMAZON_S3") {
-      for (let index = 0; index < mediaRecords.length; index++) {
-        const file = mediaRecords[index];
-        file.data.src = await mediaService.getMediaUrl(file.data.file);
-      }
-    } else {
+    if (storageOption !== "AMAZON_S3") {
       let mediaFilesList = fileService.getFilesSync("/server/assets/uploads");
 
       if (mediaRecords.length !== mediaFilesList.length) {
