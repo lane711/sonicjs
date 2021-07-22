@@ -1,4 +1,4 @@
-bootstrap-version: 4.5.3
+bootstrap-version: 4
 assets:
   js:
     - /assets/js/startup.js

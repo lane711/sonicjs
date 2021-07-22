@@ -23,5 +23,13 @@ module.exports = themeSettingsService = {
     var themeSettings = await dataService.getContentTopOne("theme-settings", options.req.sessionID);
     // console.log("themeSettings", themeSettings);
     options.page.data.themeSettings = themeSettings.data;
+
+    //add bs version
+    //server/themes/front-end/bootstrap5/bootstrap5.config.yml
+    var themeConfig = await fileService.getYamlConfig(
+      `/server/themes/front-end/${process.env.FRONT_END_THEME}/${process.env.FRONT_END_THEME}.config.yml`
+    );
+
+    options.page.data.themeSettings.bootstrapVersion = themeConfig['bootstrap-version'];
   },
 };
