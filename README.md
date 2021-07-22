@@ -10,7 +10,7 @@
       <img src="https://img.shields.io/badge/Donate-PayPal-green.svg" alt="Donate" />
   </a>
 
-![Image of SonicJs Logo](https://sonicjs.com/assets/uploads/sonicjs-logo-dark.svg)
+![Image of SonicJs Logo](https://sonicjscom.s3.us-west-1.amazonaws.com/sonicjs-logo-dark.svg)
 [https://sonicjs.com](https://sonicjs.com)
 
 # SonicJS is a Modern Open Source "Free Forever" NodeJs Based Content Management System
@@ -24,9 +24,9 @@
      <td>Edit Content with Automagically Generated Forms</td>
   </tr>
   <tr>
-    <td><img src="https://sonicjs.com/assets/uploads/Node.js CMS - Content Type Edit.png?width=600" width="300px" alt="Manage Content Types" /></td>
-    <td><img src="https://sonicjs.com/assets/uploads/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="Drag and Drop Form Builder" /></td>
-    <td><img src="https://sonicjs.com/assets/uploads/Node.js%20CMS%20-%20Edit%20Content.png?width=600" width="300px" alt="Edit Content with Automagically Generated Forms" /></td>
+    <td><img src="https://sonicjscom.s3.us-west-1.amazonaws.com/Node.js CMS - Content Type Edit.png?width=600" width="300px" alt="Manage Content Types" /></td>
+    <td><img src="https://sonicjscom.s3.us-west-1.amazonaws.com/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="Drag and Drop Form Builder" /></td>
+    <td><img src="https://sonicjscom.s3.us-west-1.amazonaws.com/Node.js%20CMS%20-%20Edit%20Content.png?width=600" width="300px" alt="Edit Content with Automagically Generated Forms" /></td>
   </tr>
     <tr>
     <td>Build Advanced Forms with over 20 Field Types</td>
@@ -34,9 +34,9 @@
      <td>Front End WYSIWYG Editor</td>
   </tr>
   <tr>
-    <td><img src="https://sonicjs.com/assets/uploads/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="Drag and Drop Form Builder" /></td>
-    <td>    <img src="https://sonicjs.com/assets/uploads/Node.js%20CMS%20-%20Front%20End%20Page%20Settings.png?width=600" width="300px" alt="Front End Content Editing" /></td>
-    <td><img src="https://sonicjs.com/assets/uploads/Node.js%20CMS%20-%20Front%20End%20WYSIWYG%20Editor.png?width=600" width="300px" alt="Front End WYSIWYG Editor" /></td>
+    <td><img src="https://sonicjscom.s3.us-west-1.amazonaws.com/Node.js%20CMS%20-%20Content%20Type%20Edit.png?width=600" width="300px" alt="Drag and Drop Form Builder" /></td>
+    <td>    <img src="https://sonicjscom.s3.us-west-1.amazonaws.com/Node.js%20CMS%20-%20Front%20End%20Page%20Settings.png?width=600" width="300px" alt="Front End Content Editing" /></td>
+    <td><img src="https://sonicjscom.s3.us-west-1.amazonaws.com/Node.js%20CMS%20-%20Front%20End%20WYSIWYG%20Editor.png?width=600" width="300px" alt="Front End WYSIWYG Editor" /></td>
   </tr>
       <tr>
     <td>Menu Manager</td>
@@ -44,9 +44,9 @@
      <td>Built In Media Server</td>
   </tr>
   <tr>
-    <td>    <img src="https://sonicjs.com/assets/uploads/Node.js CMS Menu Manager.png" width="300px" alt="Menu Manager" /></td>
-    <td>    <img src="https://sonicjs.com/assets/uploads/Node.js%20CMS%20-%20Front%20End%20CSS%20Editing.png?width=600" width="300px" alt="Real Time CSS Editor" /></td>
-    <td>    <img src="https://sonicjs.com/assets/uploads/Node.js%20CMS%20-%20Media%20Manager.png?width=600" width="300px" alt="Built In Media Server" /></td>
+    <td>    <img src="https://sonicjscom.s3.us-west-1.amazonaws.com/Node.js CMS Menu Manager.png" width="300px" alt="Menu Manager" /></td>
+    <td>    <img src="https://sonicjscom.s3.us-west-1.amazonaws.com/Node.js%20CMS%20-%20Front%20End%20CSS%20Editing.png?width=600" width="300px" alt="Real Time CSS Editor" /></td>
+    <td>    <img src="https://sonicjscom.s3.us-west-1.amazonaws.com/Node.js%20CMS%20-%20Media%20Manager.png?width=600" width="300px" alt="Built In Media Server" /></td>
   </tr>
         <tr>
     <td>Module Management</td>
@@ -54,8 +54,8 @@
      <td></td>
   </tr>
   <tr>
-    <td>    <img src="https://sonicjs.com/assets/uploads/Node.js%20CMS%20-%20Module%20Management.png?width=600" width="300px" alt="Module Management" /></td>
-    <td>    <img src="https://sonicjs.com/assets/uploads/Node.js%20CMS%20-%20Front%20End%20Json%20Editor.png?width=600" width="300px" alt="Front End Json Editor" /></td>
+    <td>    <img src="https://sonicjscom.s3.us-west-1.amazonaws.com/Node.js%20CMS%20-%20Module%20Management.png?width=600" width="300px" alt="Module Management" /></td>
+    <td>    <img src="https://sonicjscom.s3.us-west-1.amazonaws.com/Node.js%20CMS%20-%20Front%20End%20Json%20Editor.png?width=600" width="300px" alt="Front End Json Editor" /></td>
     <td></td>
   </tr>
  </table>
