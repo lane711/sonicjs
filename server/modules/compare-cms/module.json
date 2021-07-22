@@ -1,0 +1,10 @@
+{
+  "title": "Compare CMS",
+  "enabled": true,
+  "systemId": "compare-cms",
+  "canBeAddedToColumn": true,
+  "sessionID": "undefined",
+  "version": "0.0.0.1",
+  "systemidUpperCase": "COMPARE-CMS",
+  "systemidCamelCase": "compareCms"
+}
