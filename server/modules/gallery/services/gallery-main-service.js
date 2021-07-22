@@ -20,8 +20,8 @@ module.exports = galleryMainService = {
         //       return;
         //     }
       
-        //     let mediaList = await dataService.getContentByContentTypeAndTag('media', options.viewModel.data.tags);
-        //     options.viewModel.data.mediaList = [{file:'testfile.png'}];
+        //     // let mediaList = await dataService.getContentByContentTypeAndTag('media', options.viewModel.data.tags);
+        //     // options.viewModel.data.mediaList = [{file:'testfile.png'}];
 
         //   });
     },

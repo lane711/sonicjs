@@ -35,7 +35,7 @@ assets:
     - /node_modules/axios/dist/axios.min.js
     - /node_modules/jsoneditor/dist/jsoneditor.min.js
     - /node_modules/formiojs/dist/formio.full.min.js
-    - /node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.js
+    - /node_modules/@fancyapps/ui/dist/fancybox.umd.js
     - /node_modules/dropzone/dist/min/dropzone.min.js
     - /node_modules/prismjs/prism.js
     - /assets/vendors/prism-treeview/prism-treeview.js
@@ -54,7 +54,7 @@ assets:
     - /themes/front-end/{{frontEndTheme}}/css/aos.css
     - /themes/front-end/{{frontEndTheme}}/css/swiper.css
     - /themes/front-end/{{frontEndTheme}}/css/theme.css
-    - /node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css
+    - /node_modules/@fancyapps/ui/dist/fancybox.css
     - /node_modules/formiojs/dist/formio.form.min.css
     - /node_modules/jsoneditor/dist/jsoneditor.min.css
     - /node_modules/prismjs/themes/prism-coy.css

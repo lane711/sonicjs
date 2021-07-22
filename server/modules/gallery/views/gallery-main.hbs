@@ -13,7 +13,7 @@
 </div>
 {{/if}}
 
-{{#if (eq data.view "swipper")}}
+{{#if (eq data.view "fancybox")}}
 
 <section class="section features-carousel b-b">
   <div class="container pt-0">
@@ -36,7 +36,10 @@
 
           <div class="swiper-slide px-2 px-sm-1">
             <a
-              href="{{ this.select.src }}"
+              href="{{ this.select.src }}" class="fancybox" rel="gallery-group"
+              data-fancybox="gallery"
+              data-slug="{{this.url}}"
+  data-caption="<b>Node.js CMS - {{ this.title }}</b>&nbsp;&nbsp;<i class='fas fa-long-arrow-alt-right'></i>&nbsp;&nbsp;{{ this.body }}"
               title="<b>Node.js CMS - {{ this.title }}</b> <i class='fas fa-long-arrow-alt-right'></i>{{ this.body }}"
             >
               <div class="card border-0 shadow">

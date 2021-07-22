@@ -22,7 +22,7 @@
     "@coreui/coreui": "^2.1.12",
     "@coreui/coreui-plugin-chartjs-custom-tooltips": "^1.3.1",
     "@coreui/icons": "^0.4.1",
-    "@fancyapps/fancybox": "^3.5.7",
+    "@fancyapps/ui": "^4.0.0-alpha.4",
     "@popperjs/core": "^2.9.2",
     "@simonwep/pickr": "^1.8.0",
     "app-root-path": "^3.0.0",

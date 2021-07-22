@@ -2,6 +2,7 @@ $(document).ready(async function () {
   // console.log('share service test: ' + sharedService.test());
 
   setupToolTips();
+  setupFancyBox();
 });
 
 function submitForm(submission) {
@@ -27,4 +28,21 @@ function setupToolTips() {
 
 function testFunction(echo) {
   return echo;
+}
+
+function setupFancyBox(){
+// debugger;
+  Fancybox.bind("[data-fancybox]", {
+    // Your options go here
+  });
+
+  // $("a.fancybox").fancybox({
+	// 	'transitionIn'	:	'elastic',
+	// 	'transitionOut'	:	'elastic',
+	// 	'speedIn'		:	600, 
+	// 	'speedOut'		:	200, 
+	// 	'overlayShow'	:	false,
+  //   'hideOnContentClick': true
+
+	// });
 }
