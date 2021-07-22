@@ -75,32 +75,362 @@
         <td></td>
       </tr>
       <tr>
-        <th scope="row">MySQL</th>
+        <th scope="row">Backup Database
+          <a
+            href="#"
+            data-toggle="tooltip"
+            class="badge badge-info"
+            title="Backs up and zips/tars the database records into a format that be be restored into the CMS."
+          >Info</a>
+        </th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Restore Database
+          <a
+            href="#"
+            data-toggle="tooltip"
+            class="badge badge-info"
+            title="Imports zip/tar based backup and restores database to a prior snapshot."
+          >Info</a>
+        </th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Database-to-Database Migration
+          <a
+            href="#"
+            data-toggle="tooltip"
+            class="badge badge-info"
+            title="Allows the developer to migrate from one database to another. IE from Postgres to MongoDb."
+          >Info</a>
+        </th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Remote Connection
+          <a
+            href="#"
+            data-toggle="tooltip"
+            class="badge badge-info"
+            title="Allows the developer connect there local development environment to a production environment for troubleshooting."
+          >Info</a>
+        </th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-check text-success"></i></td>
+      </tr>
+
+      <tr class="category">
+        <th scope="row">Content Types
+          <a
+            href="#"
+            data-toggle="tooltip"
+            class="badge badge-info"
+            title="Content types allow site builders to manage the schema of various data objects that will be maintained on their site/app. IE: blog post, user profile, site settings."
+          >Info</a>
+
+        </th>
+        <td></td>
+        <td></td>
+      </tr>
+
+      <tr>
+        <th scope="row">Code Driven Content Types
+          <a
+            href="#"
+            data-toggle="tooltip"
+            class="badge badge-info"
+            title="Allows the developer to define content types in code, typically a json or js file."
+          >Info</a>
+        </th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-check text-success"></i></td>
+      </tr>
+
+      <tr>
+        <th scope="row">UI Driven Content Types
+          <a
+            href="#"
+            data-toggle="tooltip"
+            class="badge badge-info"
+            title="Allows the admin user to define content types from a drag-and-drop user interface."
+          >Info</a>
+        </th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+
+      <tr>
+        <th scope="row">Content Type Relationships
+          <a
+            href="#"
+            data-toggle="tooltip"
+            class="badge badge-info"
+            title="Allows the admin user to define relationships between content types. IE: one-to-many, many-to-many"
+          >Info</a>
+        </th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-check text-success"></i></td>
+      </tr>
+
+      <tr>
+        <th scope="row">Module Association
+          <a
+            href="#"
+            data-toggle="tooltip"
+            class="badge badge-info"
+            title="Associate content types to modules for organization/management purposes. One module can have multiple content types."
+          >Info</a>
+        </th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+
+
+
+      <tr class="category">
+        <th scope="row">Field Type <a
+          href="#"
+          data-toggle="tooltip"
+          class="badge badge-info"
+          title="Fields are the building blocks of content types. They are the html form controls presented to the user in the UI."
+        >Info</a></th>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th scope="row">Text Box</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-check text-success"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Text Area</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-check text-success"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Number</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-check text-success"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Password</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-check text-success"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Checkbox</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-check text-success"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Select Checkboxes</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-check text-success"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Select List</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-check text-success"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Radio</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-check text-success"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Button</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-check text-success"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Email</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-check text-success"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Url</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-check text-success"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Phone Number</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-check text-success"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Tags</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-check text-success"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Address</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-check text-success"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Date/Time</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-check text-success"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Day</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-check text-success"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Time</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-check text-success"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Currency</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-check text-success"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Survey</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Signature</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">HTML Element</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Content</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Columns</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Field Set</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Panel</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Table</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Tabs</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Well</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Hidden</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Container</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Data Map</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Data Grid</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Edit Grid</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Tree</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">reCaptcha</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Resource</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">File</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Nested Form</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Custom</th>
+        <td><i class="fas fa-check text-success"></i></td>
+        <td><i class="fas fa-times text-danger"></i></td>
+      </tr>
+      <tr>
+        <th scope="row">Existing Resource Fields</th>
         <td><i class="fas fa-check text-success"></i></td>
         <td><i class="fas fa-times text-danger"></i></td>
       </tr>
 
       <tr class="category">
-        <th scope="row">Content Types</th>
+        <th scope="row">Layout Management</th>
         <td></td>
         <td></td>
       </tr>
       <tr>
-        <th scope="row">MySQL</th>
+        <th scope="row">UI Driven Layout Builder
+          <a
+          href="#"
+          data-toggle="tooltip"
+          class="badge badge-info"
+          title="Allows the admin to build reusable page layouts visually by specifying sections, rows, columns, etc."
+        >Info</a>
+        </th>
         <td><i class="fas fa-check text-success"></i></td>
         <td><i class="fas fa-times text-danger"></i></td>
       </tr>
 
-      <tr class="category">
-        <th scope="row">Layout Builder</th>
-        <td></td>
-        <td></td>
-      </tr>
-      <tr>
-        <th scope="row">MySQL</th>
-        <td><i class="fas fa-check text-success"></i></td>
-        <td><i class="fas fa-times text-danger"></i></td>
-      </tr>
+      <th scope="row">Code Driven Layout Builder
+        <a
+        href="#"
+        data-toggle="tooltip"
+        class="badge badge-info"
+        title="Allows the developer to build reusable page layouts in code using VS Code or similar by specifying sections, rows, columns, etc."
+      >Info</a>
+      </th>
+      <td><i class="fas fa-check text-success"></i></td>
+      <td><i class="fas fa-check text-success"></i></td>
+    </tr>
 
       <tr class="category">
         <th scope="row">Page Builder</th>
@@ -156,8 +486,6 @@
         <td><i class="fas fa-check text-success"></i></td>
         <td><i class="fas fa-times text-danger"></i></td>
       </tr>
-
-
 
       <tr class="category">
         <th scope="row">Field Type</th>
@@ -224,8 +552,6 @@
         <td><i class="fas fa-check text-success"></i></td>
         <td><i class="fas fa-times text-danger"></i></td>
       </tr>
-
-
 
     </tbody>
   </table>
