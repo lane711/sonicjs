@@ -206,9 +206,11 @@ module.exports = dalService = {
   contentUpdate: async function (id, url, data, userSession) {
     const contentRepo = await getRepository(Content);
     let content = {};
-    if(id)
-    {
-      content = (await contentRepo.findOne({ where: { id: id } })) ?? {};
+    if (id) {
+      content = await contentRepo.findOne({ where: { id: id } });
+      if (!content) {
+        content = {};
+      }
     }
 
     content.url = url;
@@ -262,8 +264,8 @@ module.exports = dalService = {
 
   contentRestore: async function (id, url, data, userSession) {
     const contentRepo = await getRepository(Content);
-    data.lastUpdatedByUserId = 'anonymous' ? 1 : data.lastUpdatedByUserId;
-    data.createdByUserId = 'anonymous' ? 1 : data.lastUpdatedByUserId;
+    data.lastUpdatedByUserId = "anonymous" ? 1 : data.lastUpdatedByUserId;
+    data.createdByUserId = "anonymous" ? 1 : data.lastUpdatedByUserId;
 
     data.data = JSON.stringify(data.data);
     let result = await contentRepo.save(data);
@@ -311,7 +313,7 @@ module.exports = dalService = {
 
   //get content type so we can detect permissions
   checkPermission: async function (data, user) {
-    let contentTypeId = data.contentTypeId ?? data[0].contentTypeId;
+    let contentTypeId = data.contentTypeId ? data.contentTypeId : data[0].contentTypeId;
     let contentType = await moduleService.getModuleContentType(contentTypeId);
 
     if (user && user.roles.includes("admin")) {
