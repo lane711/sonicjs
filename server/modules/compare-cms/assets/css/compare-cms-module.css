@@ -1,0 +1,22 @@
+/* Css File for Module: compare-cms */
+.compare-cms th {
+    font-size: .9rem;
+padding-left: 2rem;
+}
+
+.compare-cms .table .category{
+    background: #fff;
+}
+
+.compare-cms .table .category th{
+    padding: 3rem 0.75rem 1.4rem 0.75rem;
+    font-size: 1.4rem;
+}
+/* 
+.compare-cms .table th, .compare-cms .table td {
+    padding: 0.75rem 0.75rem 0.75rem 2rem;
+    vertical-align: top;
+    border-top: 1px solid #d9e2ef;
+    font-size: .9rem;
+
+} */
