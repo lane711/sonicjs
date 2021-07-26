@@ -9,6 +9,7 @@ const app = express();
 const { request, gql } = require("graphql-request");
 const path = require("path");
 const chalk = require("chalk");
+const _ = require("lodash");
 // var FileStore = require("session-file-store")(session);
 var exphbs = require("express-handlebars");
 var Handlebars = require("handlebars");
@@ -264,6 +265,10 @@ function setupHandlebarsHelpers() {
     },
     json: function (context) {
       return JSON.stringify(context);
+    },
+    comparerow: function (row, column) {
+      let cms = _.camelCase(column.title);
+      return row[cms] ?  'fa-check text-success' : 'fa-times text-danger';
     },
   });
 }

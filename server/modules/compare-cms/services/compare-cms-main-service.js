@@ -14,7 +14,23 @@ module.exports = compareCmsMainService = {
             }
 
         });
+
+        emitterService.on("postModuleGetData", async function (options) {
+            if (options.shortcode.name === "COMPARE-CMS") {
+              await compareCmsMainService.getCompareRowData(options);
+            }
+          });
     },
+
+    getCompareRowData: async function (options) {
+   
+        let list = await dataService.getContentByType("compare-row", options.req.sessionID);
+        // list = list.sort((a, b) => (a.title > b.title) ? 1 : -1)
+
+        options.viewModel.data.list = list[0].data.cmsList;
+
+        options.viewModel.data.rows = list[0].data.dataGrid;
+      },
 
 }
 

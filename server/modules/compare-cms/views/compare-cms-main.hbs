@@ -3,6 +3,62 @@
     <thead class="border-light">
       <tr>
         <th scope="col"></th>
+        {{#each data.list}}
+          <th scope="col"><strong>{{this.title}}</strong></th>
+        {{/each}}
+      </tr>
+    </thead>
+    <tbody>
+
+      {{#each data.rows}}
+
+        {{log this}}
+        {{#if category}}
+          <tr class="category">
+            <th scope="row">{{this.title}}
+              <a
+                href="#"
+                data-toggle="tooltip"
+                class="badge badge-info"
+                title="Can the CMS accommodate the use case more efficiently/effectively than the compared options? Is the scenario one of the primary use cases that the CMS was meant to solve?"
+              >Info</a>
+            </th> 
+            {{#each ../data.list}}
+              <td>{{this.title}}</td>
+            {{/each}}
+          </tr>
+        {{/if}}
+
+        {{#unless category}}
+          <tr>
+            <th scope="row">{{this.title}}</th>
+
+            {{#each ../data.list}}
+
+
+              <td><i class="fas {{comparerow ../this this}}"></i></td>
+
+            {{/each}}
+
+    
+          </tr>
+        {{/unless}}
+
+      {{/each}}
+
+    </tbody>
+  </table>
+</div>
+
+<hr />
+<hr />
+<hr />
+
+<div class="table-responsive compare-cms">
+  <table class="table table-striped text-successtable-border border-light">
+    <thead class="border-light">
+      <tr>
+        <th scope="col"></th>
         <th scope="col"><strong>SonicJs</strong></th>
         <th scope="col"><strong>KeystoneJs</strong></th>
         <th scope="col"><strong>Ghost</strong></th>
