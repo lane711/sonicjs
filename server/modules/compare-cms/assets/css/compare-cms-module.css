@@ -9,7 +9,7 @@ padding-left: 2rem;
 }
 
 .compare-cms .table .category th{
-    padding: 3rem 0.75rem 1.4rem 0.75rem;
+    padding: 5rem 0.75rem 0 0.75rem;
     font-size: 1.4rem;
 }
 /* 
@@ -20,3 +20,21 @@ padding-left: 2rem;
     font-size: .9rem;
 
 } */
+
+
+.compare-cms td.rotate {
+    /* Something you can count on */
+    height: 140px;
+    white-space: nowrap;
+  }
+  
+  .compare-cms td.rotate > div {
+    transform: 
+    translate(-8px, 90px)
+      rotate(-50deg);
+    width: 30px;
+  }
+  .compare-cms td.rotate > div > span {
+    padding: 5px 10px;
+    font-weight: bold;
+  }

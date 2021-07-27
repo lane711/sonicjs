@@ -1,13 +1,5 @@
 <div class="table-responsive compare-cms">
   <table class="table table-striped text-successtable-border border-light">
-    <thead class="border-light">
-      <tr>
-        <th scope="col"></th>
-        {{#each data.list}}
-          <th scope="col"><strong>{{this.title}}</strong></th>
-        {{/each}}
-      </tr>
-    </thead>
     <tbody>
 
       {{#each data.rows}}
@@ -16,31 +8,40 @@
         {{#if category}}
           <tr class="category">
             <th scope="row">{{this.title}}
+              {{#if note}}
               <a
                 href="#"
                 data-toggle="tooltip"
                 class="badge badge-info"
-                title="Can the CMS accommodate the use case more efficiently/effectively than the compared options? Is the scenario one of the primary use cases that the CMS was meant to solve?"
+                title="{{this.note}}"
               >Info</a>
+              {{/if}}
             </th> 
             {{#each ../data.list}}
-              <td>{{this.title}}</td>
+              <td class="rotate"><div><span>{{this.title}}</span></div></td>
             {{/each}}
           </tr>
         {{/if}}
 
         {{#unless category}}
           <tr>
-            <th scope="row">{{this.title}}</th>
+            <th scope="row">{{this.title}}
+              {{#if note}}
+              <a
+                href="#"
+                data-toggle="tooltip"
+                class="badge badge-info"
+                title="{{this.note}}"
+              >Info</a>
+              {{/if}}
+            </th>
 
             {{#each ../data.list}}
-
 
               <td><i class="fas {{comparerow ../this this}}"></i></td>
 
             {{/each}}
 
-    
           </tr>
         {{/unless}}
 
