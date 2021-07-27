@@ -1,6 +1,7 @@
 var dataService = require('../../../services/data.service');
 var emitterService = require('../../../services/emitter.service');
 var globalService = require('../../../services/global.service');
+var helperService = require('../../../services/helper.service');
 
 module.exports = compareCmsMainService = {
 
@@ -30,6 +31,13 @@ module.exports = compareCmsMainService = {
         options.viewModel.data.list = list[0].data.cmsList;
 
         options.viewModel.data.rows = list[0].data.dataGrid;
+
+        //add anchor ids
+        options.viewModel.data.rows.forEach(row => {
+          if(row.category){
+            row.anchor = helperService.slugify(row.title);
+          }
+        });
       },
 
 }
