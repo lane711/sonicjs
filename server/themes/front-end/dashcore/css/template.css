@@ -71,9 +71,8 @@ margin: 8px
 margin: 0 8px 0
 }
 
-.docs [data-module="IMAGE"],
-.docs [data-module="CODE-SNIPPET"]{
-margin:0 0 100px;    
+.docs [data-module="IMAGE"],.docs [data-module="CODE-SNIPPET"] {
+margin: 0 0 100px
 }
 
 .checkbox label:before,.radio label:before {
@@ -95,4 +94,9 @@ margin: 0 0 0 4px
 
 .form-check-label span {
 margin: 4px 0 0
+}
+
+.compare a.anchor {
+position: absolute;
+top: -90px
 }
