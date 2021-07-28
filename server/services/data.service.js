@@ -216,10 +216,10 @@ if (typeof module !== "undefined" && module.exports) {
       // await formattingService.formatTitles(page.data);
 
       //filter out content type that should not appear in admin content list
-      let data = contents
-        .filter((x) => x.contentTypeId !== "menu")
-        .filter((x) => x.contentTypeId !== "section")
-        .filter((x) => x.contentTypeId !== "site-settings");
+      let data = contents;
+        // .filter((x) => x.contentTypeId !== "menu")
+        // .filter((x) => x.contentTypeId !== "section")
+        // .filter((x) => x.contentTypeId !== "site-settings");
 
       return data;
     }),
