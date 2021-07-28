@@ -29,9 +29,7 @@ module.exports = contentService = {
       "postProcessModuleShortCodeProcessedHtml",
       async function ({ options }) {
         if (options) {
-          contentService.wrapBlockInModuleDiv(
-            options
-          );
+          contentService.wrapBlockInModuleDiv(options);
         }
       }
     );
@@ -40,12 +38,14 @@ module.exports = contentService = {
   getRenderedPage: async function (req) {
     // emitterService.emit('getRenderedPagePreDataFetch', req);
 
-    let cachedPage = cacheService.getCache().get(req.url);
-    if (cachedPage !== undefined) {
-      // console.log('returning from cache');
-      return { page: cachedPage };
-    } else {
-      // console.log("no cache");
+    if (process.env.ENABLE_CACHE === "TRUE") {
+      let cachedPage = cacheService.getCache().get(req.url);
+      if (cachedPage !== undefined) {
+        // console.log('returning from cache');
+        return { page: cachedPage };
+      } else {
+        // console.log("no cache");
+      }
     }
 
     await emitterService.emit("preProcessPageUrlLookup", req);
@@ -199,7 +199,9 @@ module.exports = contentService = {
               req
             );
           } else {
-            let sectionClass = section.data.cssClass ? section.data.cssClass + ' ' : '';
+            let sectionClass = section.data.cssClass
+              ? section.data.cssClass + " "
+              : "";
             page.data.html += `<section data-id='${section.id}' class="${sectionClass}jumbotron-fluid pb">`;
             page.data.html += '<div class="section-overlay">';
             page.data.html += '<div class="container">';
@@ -376,7 +378,7 @@ module.exports = contentService = {
       options.processedHtml.contentType,
       options.processedHtml.body,
       false,
-      options.page.data.pageTemplate !== 'none'
+      options.page.data.pageTemplate !== "none"
     );
   },
 
