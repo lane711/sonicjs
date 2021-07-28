@@ -30,19 +30,23 @@ function testFunction(echo) {
   return echo;
 }
 
-function setupFancyBox(){
-// debugger;
-  Fancybox.bind("[data-fancybox]", {
-    // Your options go here
-  });
+function setupFancyBox() {
+  // debugger;
+  if (typeof $.fancybox == "function") {
+    Fancybox.bind("[data-fancybox]", {
+      // Your options go here
+    });
+  } else {
+    // fancy box not loaded;
+  }
 
   // $("a.fancybox").fancybox({
-	// 	'transitionIn'	:	'elastic',
-	// 	'transitionOut'	:	'elastic',
-	// 	'speedIn'		:	600, 
-	// 	'speedOut'		:	200, 
-	// 	'overlayShow'	:	false,
+  // 	'transitionIn'	:	'elastic',
+  // 	'transitionOut'	:	'elastic',
+  // 	'speedIn'		:	600,
+  // 	'speedOut'		:	200,
+  // 	'overlayShow'	:	false,
   //   'hideOnContentClick': true
 
-	// });
+  // });
 }

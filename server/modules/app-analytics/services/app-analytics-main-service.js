@@ -41,17 +41,17 @@ module.exports = appAnalyticsMainService = {
         appAnalyticsMainService.processEvent(req.body);
         res.json({ ok: "ok" });
       });
-      }
-    },
+    }
+  },
 
   trackEventSend: async function (data) {
     if (await appAnalyticsMainService.trackingEnabled()) {
       const { installId } = require("../../../data/config/installId.json");
       data.installId = installId;
       let axios = await appAnalyticsMainService.getAxios();
-      let url =
-        process.env.ANALYTICS_POST_URL ??
-        "https://sonicjs.com/sonicjs-app-analytics";
+      let url = process.env.ANALYTICS_POST_URL
+        ? process.env.ANALYTICS_POST_URL
+        : "https://sonicjs.com/sonicjs-app-analytics";
       let result = axios.post(url, data);
     }
   },

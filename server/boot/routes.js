@@ -309,15 +309,17 @@ exports.loadRoutes = async function (app) {
   });
 
   app.post("/form-submission", async function (req, res) {
-    let payload = req.body.data.data ?? req.body.data.data;
+    let payload = req.body.data.data ? req.body.data.data : undefined;
 
     //hack for newletter
     // if(!payload.data && payload.contentType){
     //   payload.data = {contentType : payload.contentType};
     // }
-    let options = { data: payload, sessionID: req.sessionID };
+    if (payload) {
+      let options = { data: payload, sessionID: req.sessionID };
 
-    await emitterService.emit("afterFormSubmit", options);
+      await emitterService.emit("afterFormSubmit", options);
+    }
 
     res.sendStatus(200);
   });
