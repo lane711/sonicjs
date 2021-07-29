@@ -29,6 +29,14 @@ module.exports = compareCmsMainService = {
         // list = list.sort((a, b) => (a.title > b.title) ? 1 : -1)
 
         options.viewModel.data.list = list[0].data.cmsList;
+        //add anchor ids
+        options.viewModel.data.list.forEach(row => {
+          if(row.title){
+            row.anchor = helperService.slugify(row.title);
+          }
+        });
+
+
 
         options.viewModel.data.rows = list[0].data.dataGrid;
 

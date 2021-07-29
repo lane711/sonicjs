@@ -1,4 +1,4 @@
-<a class='anchor' id='matrix'></a>
+            <a class='anchor' id='matrix'></a>
 <div class="table-responsive compare-cms">
   <table class="table table-striped text-successtable-border border-light">
     <tbody>
@@ -49,4 +49,12 @@
 
     </tbody>
   </table>
+</div>
+
+<div class="review-wrapper">
+{{#each data.list}}
+  <a class='anchor' id="{{this.anchor}}"></a>
+  <h1>{{this.title}} Review</h1>
+  {{{this.review}}}
+{{/each}}
 </div>

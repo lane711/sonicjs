@@ -28,3 +28,8 @@
   padding: 5px 10px;
   font-weight: bold;
 }
+
+.compare .review-wrapper{
+  margin: 100px 0 80px;
+  position: relative;
+}
