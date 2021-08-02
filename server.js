@@ -100,6 +100,8 @@ function appListen(app) {
 function setupSessionDb(app) {
   const sessionRepo = getConnection().getRepository(Session);
 
+  let sessionLengthDays = process.env.SESSION_LENGTH_DAYS ? process.env.SESSION_LENGTH_DAYS : 14
+
   app.use(
     session({
       name: "sonicjs",
@@ -108,8 +110,8 @@ function setupSessionDb(app) {
       resave: false,
       saveUninitialized: false,
       store: new TypeormStore({
-        // cleanupLimit: 2,
-        ttl: 86400 * 30,
+        cleanupLimit: 5,
+        ttl: 86400 * sessionLengthDays,
       }).connect(sessionRepo),
     })
   );
@@ -294,10 +296,6 @@ function setupStaticAssets(app) {
   app.use(
     "/js",
     express.static(path.join(appRoot.path, "server/storage/files"))
-  );
-  app.use(
-    "/services",
-    express.static(path.join(appRoot.path, "server/services"))
   );
   app.use(
     "/page-builder",
