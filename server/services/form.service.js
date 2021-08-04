@@ -68,7 +68,7 @@ if (typeof module !== "undefined" && module.exports) {
 
     app.use(
       multipart({
-        uploadDir: `${appRoot.path}/temp`,
+        uploadDir: `${appRoot.path}/server/temp`,
       })
     );
 
