@@ -298,6 +298,10 @@ function setupStaticAssets(app) {
     express.static(path.join(appRoot.path, "server/storage/files"))
   );
   app.use(
+    "/sonicjs-services",
+    express.static(path.join(appRoot.path, "server/services"))
+  );
+  app.use(
     "/page-builder",
     express.static(path.join(appRoot.path, "server/page-builder"))
   );
