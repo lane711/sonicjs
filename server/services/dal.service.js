@@ -20,7 +20,8 @@ module.exports = dalService = {
     // let user = session.user;
 
     let user = await userRepo.findOne(id);
-    dalService.processContent(user);
+
+    dalService.processContent(user, user);
     user.contentTypeId = "user";
     user.profile.email = user.username;
 
@@ -31,7 +32,7 @@ module.exports = dalService = {
     //admins can see all users
     //TODO: get role by name
     let sessionUser = await userRepo.findOne(session.user.id);
-    dalService.processContent(sessionUser);
+    dalService.processContent(sessionUser, user);
 
     if (sessionUser.profile.roles.includes("admin")) {
       return user;
@@ -124,6 +125,7 @@ module.exports = dalService = {
     }
 
     //update password
+    /*
     if (profileObj.password !== "_temp_password") {
       //password has been updated
       User.findByUsername(profileObj.email).then(
@@ -142,6 +144,7 @@ module.exports = dalService = {
         }
       );
     }
+    */
 
     let userRecord = await dalService.userGet(userArgs.id, userSession);
     userRecord.updatedOn = new Date();
@@ -230,7 +233,10 @@ module.exports = dalService = {
 
   contentDelete: async function (id, userSession) {
     const contentRepo = await getRepository(Content);
+    console.log('starting deleting:', Content)
+    console.log('starting userSession:', userSession)
     if (userSession.user.profile.roles.includes("admin")) {
+      console.log('deleting:', Content)
       return contentRepo.delete(id);
     }
   },
@@ -279,7 +285,7 @@ module.exports = dalService = {
     console.log(result);
   },
 
-  processContent: function (entity, user) {
+  processContent: async function (entity, user) {
     if (entity.data) {
       try {
         entity.data = JSON.parse(entity.data);
@@ -302,7 +308,7 @@ module.exports = dalService = {
       }
     }
 
-    content = dalService.checkPermission(entity, user);
+    content = await dalService.checkPermission(entity, user);
   },
 
   processContents: function (entities, user) {
@@ -313,12 +319,13 @@ module.exports = dalService = {
 
   //get content type so we can detect permissions
   checkPermission: async function (data, user) {
-    let contentTypeId = data.contentTypeId ? data.contentTypeId : data[0].contentTypeId;
-    let contentType = await moduleService.getModuleContentType(contentTypeId);
 
-    if (user && user.roles.includes("admin")) {
+    if (user && user.profile && user.profile.roles.includes("admin")) {
       return data;
     }
+
+    let contentTypeId = data.contentTypeId ? data.contentTypeId : data[0].contentTypeId;
+    let contentType = await moduleService.getModuleContentType(contentTypeId);
 
     if (contentType.permissions) {
       let view = contentType.permissions.mappings.find(

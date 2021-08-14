@@ -200,7 +200,8 @@ module.exports = contentService = {
             );
           } else {
             let sectionClass = section.data.cssClass ? section.data.cssClass + ' ' : '';
-            page.data.html += `<section data-id='${section.id}' class="${sectionClass}jumbotron-fluid pb">`;
+//            page.data.html += `<section data-id='${section.id}' class="${sectionClass}jumbotron-fluid pb" style="z-index:-999">`;
+            page.data.html += `<section data-id='${section.id}' class="${sectionClass} pb" style="z-index:-999">`;
             page.data.html += '<div class="section-overlay">';
             page.data.html += '<div class="container">';
             let rows;
@@ -237,7 +238,7 @@ module.exports = contentService = {
     if (rows) {
       for (const row of rows) {
         // console.log(chalk.red(JSON.stringify(row)));
-        page.data.html += `<div class='${row.class}''>`;
+        page.data.html += `<div class="${row.class}">`;
         let columns = await this.processColumns(
           page,
           section,

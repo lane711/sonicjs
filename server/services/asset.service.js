@@ -194,7 +194,7 @@ module.exports = assetService = {
       options.page.data.links[assetType],
       async (link) => {
         if (assetType === "js") {
-          options.page.data.jsLinks += `<script src="${link.path}"></script>`;
+          options.page.data.jsLinks += `<script src="${link.path}"></script>\n`;
         }
 
         if (assetType === "css") {
@@ -252,7 +252,7 @@ module.exports = assetService = {
 
         minifiedAsset = minJs.code;
       }
-      
+
       if (assetType === "css") {
         minifiedAsset = csso.minify(fileContent).css;
       }

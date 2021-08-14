@@ -190,22 +190,57 @@ function setupUIClicks() {
     },
   });
 
+  $('#btnGroupDropModules').on({
+    'click': function (e) {
+      $('.dropdown-menu-module-editor').toggle();
+      e.stopImmediatePropagation();
+    }
+  })
+
+  $('#btnGroupColumnEditor').on({
+    'click': function (e) {
+      $('.dropdown-menu-column-editor').toggle();
+      e.stopImmediatePropagation();
+    }
+  })
+
+  $('#btnGroupRowEditor').on({
+    'click': function (e) {
+      $('.dropdown-menu-row-editor').toggle();
+      e.stopImmediatePropagation();
+    }
+  })
+
   $("section .row > *").on({
-    click: function () {
+    click: function (e) {
       // debugger;
       $(".col-highlight").removeClass("col-highlight");
       $(".block-edit").removeClass("block-edit");
-      currentSectionId = $(this).closest("section").data("id");
-      currentRow = $(this).closest(".row")[0];
-      $(this).closest(".row").addClass("row-highlight");
-      currentRowIndex = $(this).closest(".row").index();
-      console.log("currentRowIndex pbcol", currentRowIndex);
-      currentColumnIndex = $(this).index() + 1;
-      currentColumn = $(this);
-      currentColumn.addClass("col-highlight");
-      $(".col-button").show().appendTo(currentColumn);
-      $(".add-module").show().appendTo(currentColumn);
-      $(".row-button").show().appendTo(currentRow);
+
+      var tmpRowIdx = $(this).closest(".row").index();
+      var tmpColIdx = $(this).index() + 1;
+
+      console.log("col:", currentColumnIndex, ' row:', currentRowIndex);
+
+      if (!((tmpRowIdx === currentRowIndex) && (tmpColIdx === currentColumnIndex))) {
+        currentSectionId = $(this).closest("section").data("id");
+        currentRow = $(this).closest(".row")[0];
+        $(this).closest(".row").addClass("row-highlight");
+
+        currentRowIndex = $(this).closest(".row").index();
+        currentColumnIndex = $(this).index() + 1;
+
+        currentColumn = $(this);
+        currentColumn.addClass("col-highlight");
+        $(".col-button").show().appendTo(currentColumn);
+        $(".row-button").show().appendTo(currentRow);
+        $(".add-module").show().appendTo(currentColumn);
+
+      } else {
+        e.stopPropagation();
+      }
+
+
       // $('.block-button').show().appendTo(currentColumn.children('.module'));
       // currentColumn.children('.module').addClass('block-edit');
     },
@@ -403,13 +438,13 @@ async function addSection() {
 }
 
 async function editSection(sectionId) {
-  console.log(sectionId);
+  console.log('sectionId:', sectionId);
   currentSectionRecord = await dataService.getContentById(sectionId);
   currentSection = currentSectionRecord.data;
   console.log("currentSection", currentSection);
   // $('#section-editor').text(JSON.stringify(currentSection));
   loadJsonEditor();
-  $("#sectoinEditorModal").appendTo("body").modal("show");
+  $("#sectionEditorModal").appendTo("body").modal("show");
 }
 
 async function deleteSection(sectionId, index) {

@@ -29,6 +29,7 @@ tests/cypress/screenshots
 tests/cypress/videos
 temp/*
 server/data/config/installId.json
+server/data/data.sqlite
 # backups/content.zip
 # backups/user.zip
 # backups/tag.zip

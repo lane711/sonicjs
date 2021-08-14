@@ -311,12 +311,21 @@ exports.loadRoutes = async function (app) {
   app.post("/form-submission", async function (req, res) {
     let payload = req.body.data.data ? req.body.data.data : undefined;
 
+    if (req.body.data) {
+      payload = req.body.data
+    }
+
+    console.log('routes form-submission req:', req.body)
+    console.log('routes form-submission payload:', payload)
+
     //hack for newletter
     // if(!payload.data && payload.contentType){
     //   payload.data = {contentType : payload.contentType};
     // }
     if (payload) {
       let options = { data: payload, sessionID: req.sessionID };
+
+      console.log('routes form-submission options:', options)
 
       await emitterService.emit("afterFormSubmit", options);
     }
