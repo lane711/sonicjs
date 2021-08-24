@@ -187,23 +187,27 @@ module.exports = moduleService = {
     return moduleCount;
   },
 
-  getModuleContentType: async function (contentTypeSystemId) {
+  getModuleContentType: async function (contentTypeSystemId, session, req) {
+    let = rootDomain = `${req.protocol}://${req.get('host')}`;
     let configInfo = await globalService.moduleContentTypeConfigs.filter(
       (x) => x.systemId === contentTypeSystemId
     );
     if (configInfo[0]) {
       let config = fileService.getFileSync(configInfo[0].filePath);
+      config = config.replace('http://localhost:3018', rootDomain);
       let contentType = JSON.parse(config);
       return contentType;
     }
     return {};
   },
 
-  getModuleContentTypes: async function (userSession) {
+  getModuleContentTypes: async function (userSession, req) {
+    let = rootDomain = `${req.protocol}://${req.get('host')}`;
     let configInfos = await globalService.moduleContentTypeConfigs;
     let configs = [];
     configInfos.forEach((configInfo) => {
       let config = fileService.getFileSync(configInfo.filePath);
+      config = config.replace('http://localhost:3018', rootDomain);
       let configObj = JSON.parse(config);
       configs.push(configObj);
     });

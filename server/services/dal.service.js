@@ -14,7 +14,7 @@ module.exports = dalService = {
     });
   },
 
-  userGet: async function (id, sessionID) {
+  userGet: async function (id, sessionID, req) {
     const userRepo = await getRepository(User);
     let session = await dalService.sessionGet(sessionID);
     // let user = session.user;
@@ -38,7 +38,7 @@ module.exports = dalService = {
     }
   },
 
-  usersGet: async function (user) {
+  usersGet: async function (user, req) {
     const userRepo = await getRepository(User);
 
     let users = await userRepo.find();
@@ -48,7 +48,7 @@ module.exports = dalService = {
         user.contentTypeId = "user";
       });
     }
-    dalService.processContents(users);
+    dalService.processContents(users, req);
     return users;
 
     //admins can see all users
@@ -163,6 +163,7 @@ module.exports = dalService = {
     data,
     tag,
     user,
+    req,
     returnAsArray = false
   ) {
     let contents = [];
@@ -199,7 +200,7 @@ module.exports = dalService = {
       contents = await contentRepo.find();
     }
 
-    dalService.processContents(contents);
+    dalService.processContents(contents, req);
     return contents;
   },
 
@@ -279,7 +280,7 @@ module.exports = dalService = {
     console.log(result);
   },
 
-  processContent: function (entity, user) {
+  processContent: function (entity, user, req) {
     if (entity.data) {
       try {
         entity.data = JSON.parse(entity.data);
@@ -302,19 +303,19 @@ module.exports = dalService = {
       }
     }
 
-    content = dalService.checkPermission(entity, user);
+    content = dalService.checkPermission(entity, user, req);
   },
 
-  processContents: function (entities, user) {
+  processContents: function (entities, user, req) {
     entities.forEach((entitiy) => {
-      dalService.processContent(entitiy, user);
+      dalService.processContent(entitiy, user, req);
     });
   },
 
   //get content type so we can detect permissions
-  checkPermission: async function (data, user) {
+  checkPermission: async function (data, user, req) {
     let contentTypeId = data.contentTypeId ? data.contentTypeId : data[0].contentTypeId;
-    let contentType = await moduleService.getModuleContentType(contentTypeId);
+    let contentType = await moduleService.getModuleContentType(contentTypeId, undefined, req);
 
     if (user && user.roles.includes("admin")) {
       return data;

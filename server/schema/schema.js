@@ -193,7 +193,8 @@ const RootQuery = new GraphQLObjectType({
         // then use that api directly from the admin backend
         return dalService.userGet(
           args.id,
-          await getUserSession(args.sessionID, req.sessionID)
+          await getUserSession(args.sessionID, req.sessionID),
+          req
         );
         //user can always see their own profile
         if (args.id === req.session.passport.userId) {
@@ -214,7 +215,8 @@ const RootQuery = new GraphQLObjectType({
       },
       async resolve(parent, args, req) {
         return dalService.usersGet(
-          await getUserSession(args.sessionID, req.sessionID)
+          await getUserSession(args.sessionID, req.sessionID),
+          req
         );
       },
     },
@@ -230,7 +232,8 @@ const RootQuery = new GraphQLObjectType({
           "",
           "",
           "",
-          await getUserSession(args.sessionID, req.sessionID)
+          await getUserSession(args.sessionID, req.sessionID),
+          req
         );
 
         // return Content.find({
@@ -255,7 +258,8 @@ const RootQuery = new GraphQLObjectType({
           args.url,
           args.data,
           args.tag,
-          await getUserSession(args.sessionID, req.sessionID)
+          await getUserSession(args.sessionID, req.sessionID),
+          req
         );
         // if (args.id) {
         //   return Content.findById(args.id);
@@ -289,6 +293,7 @@ const RootQuery = new GraphQLObjectType({
           args.data,
           args.tag,
           await getUserSession(args.sessionID, req.sessionID),
+          req,
           true
         );
         // if (args.ContentTypeId) {
@@ -322,7 +327,8 @@ const RootQuery = new GraphQLObjectType({
       },
       async resolve(parent, args, req) {
         return moduleService.getModuleContentTypes(
-          await getUserSession(args.sessionID, req.sessionID)
+          await getUserSession(args.sessionID, req.sessionID),
+          req
         );
       },
     },
@@ -336,7 +342,8 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         return moduleService.getModuleContentType(
           args.systemId,
-          await getUserSession(args.sessionID, req.sessionID)
+          await getUserSession(args.sessionID, req.sessionID),
+          req
         );
       },
     },
