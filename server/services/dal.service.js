@@ -20,7 +20,7 @@ module.exports = dalService = {
     // let user = session.user;
 
     let user = await userRepo.findOne(id);
-    dalService.processContent(user);
+    dalService.processContent(user, user, req);
     user.contentTypeId = "user";
     user.profile.email = user.username;
 
@@ -31,7 +31,7 @@ module.exports = dalService = {
     //admins can see all users
     //TODO: get role by name
     let sessionUser = await userRepo.findOne(session.user.id);
-    dalService.processContent(sessionUser);
+    dalService.processContent(sessionUser, sessionUser, req);
 
     if (sessionUser.profile.roles.includes("admin")) {
       return user;
@@ -48,7 +48,7 @@ module.exports = dalService = {
         user.contentTypeId = "user";
       });
     }
-    dalService.processContents(users, req);
+    dalService.processContents(users, user, req);
     return users;
 
     //admins can see all users
@@ -171,7 +171,7 @@ module.exports = dalService = {
 
     if (id) {
       let content = await contentRepo.findOne({ where: { id: id } });
-      dalService.processContent(content);
+      dalService.processContent(content, user, req);
 
       if (returnAsArray) {
         contents.push(content);
@@ -180,7 +180,7 @@ module.exports = dalService = {
       return content;
     } else if (url) {
       let content = await contentRepo.findOne({ where: { url: url } });
-      dalService.processContent(content);
+      dalService.processContent(content, user, req);
       return content;
     } else if (contentTypeId) {
       contents = await contentRepo.find({
@@ -200,7 +200,7 @@ module.exports = dalService = {
       contents = await contentRepo.find();
     }
 
-    dalService.processContents(contents, req);
+    dalService.processContents(contents, user, req);
     return contents;
   },
 
@@ -315,9 +315,9 @@ module.exports = dalService = {
   //get content type so we can detect permissions
   checkPermission: async function (data, user, req) {
     let contentTypeId = data.contentTypeId ? data.contentTypeId : data[0].contentTypeId;
-    let contentType = await moduleService.getModuleContentType(contentTypeId, undefined, req);
+    let contentType = await moduleService.getModuleContentType(contentTypeId, user, req);
 
-    if (user && user.roles.includes("admin")) {
+    if (user && user.roles && user.roles.includes("admin")) {
       return data;
     }
 
