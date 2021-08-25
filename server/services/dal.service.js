@@ -286,6 +286,9 @@ module.exports = dalService = {
   },
 
   processContent: async function (entity, user) {
+    if(!entity){
+      return;
+    }
     if (entity.data) {
       try {
         entity.data = JSON.parse(entity.data);
