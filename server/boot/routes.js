@@ -430,7 +430,7 @@ exports.loadRoutesCatchAll = async function (app) {
 
     page.data.id = page.id;
     page.data.sessionID = req.sessionID;
-    page.data.themeSettings.bootstrapToggleMiddle  = page.data.themeSettings.bootstrapVersion = 4 ? '': 'bs-';
+    page.data.themeSettings.bootstrapToggleMiddle  = page.data.themeSettings.bootstrapVersion == 4 ? '': 'bs-';
 
     res.render(`front-end/${frontEndTheme}/layouts/main`, {
       layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
