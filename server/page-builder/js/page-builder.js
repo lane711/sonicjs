@@ -1644,6 +1644,11 @@ async function setupACEEditor() {
 }
 
 async function setupDropZone() {
+
+  if (!globalService.isBackEnd()) {
+    return;
+  }
+
   Dropzone.autoDiscover = false;
 
   var myDropzone = $(document.body).dropzone({
@@ -1657,7 +1662,7 @@ async function setupDropZone() {
       Authorization: $("#token").val(),
     },
     addedfile: function (file) {
-      console.log('dropzone adding file ' + file);
+      console.log("dropzone adding file " + file.name);
       // var _this = this,
       //   reader = new FileReader();
       // reader.onload = async function (event) {
@@ -1675,14 +1680,14 @@ async function setupDropZone() {
       // reader.readAsDataURL(file);
     },
     complete: function () {
-      console.log('dropzone complete');
+      console.log("dropzone complete");
     },
     accept: async function (file, done) {
-      console.log('dropzone accept');
+      console.log("dropzone accept");
       done();
     },
     queuecomplete: function () {
-      console.log('dropzone queuecomplete');
+      console.log("dropzone queuecomplete");
       fullPageUpdate();
     },
   });
@@ -1926,11 +1931,9 @@ async function setupAdminMediaFormImage() {
       if ($("#fileStorage").val() == "AMAZON_S3") {
         let storageBase = $("#fileStorageBase").val();
         $(".admin-form-media-image").attr("src", `${storageBase}/${fileName}`);
-
       } else {
         $(".admin-form-media-image").attr("src", `/assets/uploads/${fileName}`);
       }
     }
   }
 }
-
