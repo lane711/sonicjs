@@ -340,14 +340,13 @@
 </div>
 
 <!-- Section Editor Modal -->
-<div class="modal fade" id="sectoinEditorModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+<div class="modal" id="sectoinEditorModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Edit Section Data</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
+        <button type="button"   data-{{data.themeSettings.bootstrapToggleMiddle}}dismiss="modal" class="btn-close" aria-label="Close">
         </button>
       </div>
       <div class="modal-body">
@@ -364,7 +363,7 @@
 
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button"  data-{{data.themeSettings.bootstrapToggleMiddle}}dismiss="modal" class="btn btn-secondary">Cancel</button>
         <button type="button" class="btn btn-primary wysiwyg-save" onclick='saveSection()'
           data-dismiss="modal">Save</button>
       </div>
@@ -391,7 +390,6 @@
           <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 
           <div id="formio"></div>
-
 
         </div>
 
