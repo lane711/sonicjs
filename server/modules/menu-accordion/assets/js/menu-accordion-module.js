@@ -7,7 +7,9 @@ window.onscroll = function() {scrollCheck()};
 var navbar = document.getElementById("accordian-menu");
 
 // Get the offset position of the navbar
-var sticky = navbar.getBoundingClientRect().top - 90;
+if(navbar){
+  var sticky = navbar.getBoundingClientRect().top - 90;
+}
 
 // Add the sticky class to the navbar when you reach its scroll position. Remove "sticky" when you leave the scroll position
 function scrollCheck() {

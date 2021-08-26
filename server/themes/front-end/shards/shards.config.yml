@@ -5,11 +5,11 @@ bootstrap-version: 4.5.3
 #     - /node_modules/jquery/dist/jquery.min.js
 #     - /themes/front-end/{{frontEndTheme}}/js/bootstrap.bundle.min.js
 #     - /assets/js/common.js
-#     - /services/shared.service.js
-#     - /services/global.service.js
-#     - /services/helper.service.js
-#     - /services/data.service.js
-#     - /services/form.service.js
+#     - /sonicjs-services/shared.service.js
+#     - /sonicjs-services/global.service.js
+#     - /sonicjs-services/helper.service.js
+#     - /sonicjs-services/data.service.js
+#     - /sonicjs-services/form.service.js
 #     - /page-builder/js/page-builder.js:
 #         isPageBuilder: true
 #   css:
@@ -36,12 +36,12 @@ assets:
     - /node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.js
     - /node_modules/dropzone/dist/min/dropzone.min.js
     - /assets/js/common.js
-    - /services/shared.service.js
-    - /services/global.service.js
-    - /services/helper.service.js
-    - /services/formatting.service.js
-    - /services/data.service.js
-    - /services/form.service.js
+    - /sonicjs-services/shared.service.js
+    - /sonicjs-services/global.service.js
+    - /sonicjs-services/helper.service.js
+    - /sonicjs-services/formatting.service.js
+    - /sonicjs-services/data.service.js
+    - /sonicjs-services/form.service.js
     - /page-builder/js/page-builder.js:
         isPageBuilder: true
   css:
