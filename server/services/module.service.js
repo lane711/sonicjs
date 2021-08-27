@@ -80,7 +80,7 @@ module.exports = moduleService = {
     return moduleDef;
   },
 
-  getModuleContentTypesAdmin: async function (systemId) {
+  getModuleContentTypesAdmin: async function (systemId,  session, req) {
     let basePath = `${appRoot.path}/server/modules/${systemId}/models`;
     // let file = await fileService.getFile(`${basePath}/module.json`);
     // return file;
@@ -92,7 +92,7 @@ module.exports = moduleService = {
 
     for (let index = 0; index < moduleContentTypesAdmin.length; index++) {
       const ct = moduleContentTypesAdmin[index];
-      let contentType = await moduleService.getModuleContentType(ct.systemId);
+      let contentType = await moduleService.getModuleContentType(ct.systemId, session, req);
       moduleContentTypes.push(contentType);
     }
     // moduleContentTypesAdmin.forEach(contentTypeSystemId => {

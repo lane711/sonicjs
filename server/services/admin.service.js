@@ -113,7 +113,8 @@ module.exports = adminService = {
           data.moduleSystemId = param1;
           data.contentTypes = await moduleService.getModuleContentTypesAdmin(
             param1,
-            req.sessionID
+            req.sessionID,
+            req
           );
           data.contentTypeId = param1;
           data.moduleDef = await moduleService.getModuleDefinition(
