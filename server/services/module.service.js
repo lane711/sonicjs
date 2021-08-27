@@ -131,7 +131,7 @@ module.exports = moduleService = {
       let raw = fileService.getFileSync(file); // fs.readFileSync(file);
       if (raw && raw.length > 0) {
         let moduleDef = JSON.parse(raw);
-        let moduleFolder = moduleDef.systemId.replace("module-", "");
+        let moduleFolder =file.replace("/server/modules/", "").replace("/module.json","");
         moduleDef.mainService = `${path}\/${moduleFolder}\/services\/${moduleFolder}-main-service.js`;
         moduleList.push(moduleDef);
       }
