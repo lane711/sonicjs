@@ -103,8 +103,8 @@ module.exports = moduleService = {
     return moduleContentTypes;
   },
 
-  contentTypeUpdate: async function (moduleContentType) {
-    let moduleDef = await this.getModuleContentType(moduleContentType.systemId);
+  contentTypeUpdate: async function (moduleContentType, session, req) {
+    let moduleDef = await this.getModuleContentType(moduleContentType.systemId, session, req);
 
     moduleDef.canBeAddedToColumn = moduleContentType.canBeAddedToColumn;
     moduleDef.enabled = moduleContentType.enabled;

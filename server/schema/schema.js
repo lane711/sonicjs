@@ -652,7 +652,7 @@ const Mutation = new GraphQLObjectType({
         // },
         // lastUpdatedByUserId: { type: new GraphQLNonNull(GraphQLID) },
       },
-      resolve(parent, args) {
+      resolve(parent, args, req) {
         let dataObj = JSON.parse(args.data);
         let permissionsObj = JSON.parse(args.permissions);
 
@@ -660,7 +660,7 @@ const Mutation = new GraphQLObjectType({
         args.permissions = permissionsObj;
 
         console.log("ContentTypeUpdate", args);
-        moduleService.contentTypeUpdate(args).then((data) => {
+        moduleService.contentTypeUpdate(args, args.sessionID, req).then((data) => {
           return data;
         });
       },
