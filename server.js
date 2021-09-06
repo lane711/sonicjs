@@ -80,7 +80,7 @@ function appListen(app) {
 
     app.emit("started");
 
-    installService.checkInstallation();
+    installService.checkInstallation(app);
   });
 }
 

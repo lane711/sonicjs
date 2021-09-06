@@ -1,4 +1,6 @@
+var dalService = require("./dal.service");
 var dataService = require("./data.service");
+
 var helperService = require("./helper.service");
 var fileService = require("./file.service");
 var logSymbols = require('log-symbols');
@@ -6,7 +8,7 @@ var logSymbols = require('log-symbols');
 module.exports = installService = {
   checkInstallation: async function () {
 
-    if(process.env.BYPASS_INSTALL_CHECK){
+    if(process.env.BYPASS_INSTALL_CHECK === 'TRUE'){
       return;
     }
     
@@ -19,16 +21,16 @@ module.exports = installService = {
 
   },
 
-  checkDefaultContent: async function () {
+  checkDefaultContent: async function (app) {
     console.log(logSymbols.info, 'Checking Base Content...');
 
+    let session = {user : {id:0}};
 
     let siteSettingsColors = await dataService.getContentByType(
       "site-settings-colors"
     );
     if (siteSettingsColors.length === 0) {
       let data = {
-        data: {
           contentType: "site-settings-colors",
           url: "/site-settings-colors",
           bodyBackground: "#F8F8F8",
@@ -36,18 +38,21 @@ module.exports = installService = {
           headerOpacity: ".95",
           background: "green",
           header: "#555555",
-          createdOn: 1602119522916.0,
           submit: true,
-        },
       };
-      let record = await dataService.contentCreate(data, false);
+      let record = await dalService.contentUpdate(
+        "",
+        "/site-settings-colors",
+        data,
+        session
+      );
+
       console.log("created siteSettingsColors:", record);
     }
 
     let siteSettings = await dataService.getContentByType("site-settings");
     if (siteSettings.length === 0) {
       let data = {
-        data: {
           contentType: "site-settings",
           url: "/site-settings",
           logoType: "text",
@@ -55,16 +60,19 @@ module.exports = installService = {
           fontDefault: "Lato",
           fontHeaders: "Roboto",
           homePageId: "1",
-        },
       };
-      let record = await dataService.contentCreate(data, false);
+      let record = await dalService.contentUpdate(
+        "",
+        "/site-settings",
+        data,
+        session
+      );
       console.log("created siteSettings:", record);
     }
 
     let themeSettings = await dataService.getContentByType("theme-settings");
     if (themeSettings.length === 0) {
       let data = {
-        data: {
           contentType: "theme-settings",
           url: "/theme-settings",
           logoType: "image",
@@ -74,23 +82,30 @@ module.exports = installService = {
           fileName: "temp-logo.png",
           imageWidth: "120px",
           imageStyle: "",
-        },
       };
-      let record = await dataService.contentCreate(data, false);
+      let record = await dalService.contentUpdate(
+        "",
+        "/theme-settings",
+        data,
+        session
+      );
       console.log("created themeSettings:", record);
     }
 
     let googleAnalytics = await dataService.getContentByType("google-analytics");
     if (googleAnalytics.length === 0) {
       let data = {
-        data: {
           contentType: "google-analytics",
           url: "/google-analytics",
           "googleAnalyticsUACode" : "UA-132867068-1", 
           "enableOnDomain" : "sonicjs.com", 
-        },
       };
-      let record = await dataService.contentCreate(data, false);
+      let record = await dalService.contentUpdate(
+        "",
+        "/google-analytics",
+        data,
+        session
+      );
       console.log("created googleAnalytics:", record);
     }
 
@@ -98,7 +113,6 @@ module.exports = installService = {
     let mainMenu = await menuService.getMenu("Main")
     if (!mainMenu) {
       let data = {
-        data: {
           contentType: "main-menu",
           url: "/main-menu",
           title: "Main", 
@@ -134,16 +148,19 @@ module.exports = installService = {
                   "type" : "default"
               }
           ]
-        },
       };
-      let record = await dataService.contentCreate(data, false);
+      let record = await dalService.contentUpdate(
+        "",
+        "/main-menu",
+        data,
+        session
+      );
       console.log("created main menu:", record);
     }
 
     let page = await dataService.getContentByType("page");
     if (page.length === 0) {
       let data = {
-        data: {
           contentType: "page",
           url: "/",
           title : "Home", 
@@ -151,9 +168,13 @@ module.exports = installService = {
           heroTitle : "", 
           pageCssClass : "", 
           autoGenerateUrl : false, 
-        },
       };
-      let record = await dataService.contentCreate(data, false);
+      let record = await dalService.contentUpdate(
+        "",
+        "/",
+        data,
+        session
+      );
       console.log("created default page:", record);
     }
 
