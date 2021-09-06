@@ -79,23 +79,10 @@ function appListen(app) {
     console.log(chalk.cyan("GraphQL API at: ", baseUrl + "/graphql"));
 
     app.emit("started");
+
+    installService.checkInstallation();
   });
 }
-
-// function setupSessionFile(app) {
-//   var fileStoreOptions = {
-//     reapAsync: true,
-//     path: "./server/sessions",
-//   };
-
-//   app.use(
-//     session({
-//       secret: process.env.SESSION_SECRET,
-//       resave: true,
-//       saveUninitialized: false,
-//     })
-//   );
-// }
 
 function setupSessionDb(app) {
   const sessionRepo = getConnection().getRepository(Session);
@@ -118,26 +105,10 @@ function setupSessionDb(app) {
 }
 
 function setupPassport(app) {
-  // passport.use(User.createStrategy());
-  // passport.serializeUser(User.serializeUser());
-  // passport.deserializeUser(User.deserializeUser());
-  // app.use(passport.initialize());
-  // app.use(passport.session());
 
   passport.use(
     new LocalStrategy(async function (email, password, done) {
       let loginUser = await dalService.userGetByLogin(email, password);
-      //userService.loginUser(email, password);
-
-      // if (err) {
-      //   return done(err);
-      // }
-      // if (!loginUser) {
-      //   return done(null, false, { message: "Incorrect username." });
-      // }
-      // if (!loginUser.validPassword(password)) {
-      //   return done(null, false, { message: "Incorrect password." });
-      // }
       return done(null, loginUser);
     })
   );
@@ -152,7 +123,6 @@ function setupPassport(app) {
 
   app.use(passport.initialize());
   app.use(passport.session()); // persistent login sessions
-  // app.use(flash()); // use connect-flash for flash messages stored in session
 }
 
 function setupGraphQL(app) {
@@ -202,7 +172,6 @@ function initInstallIdFile() {
           console.error(err);
           return;
         }
-        //file written successfully
       });
     }
   } catch (err) {
@@ -277,9 +246,7 @@ function setupHandlebarsHelpers() {
 
 function setupStaticAssets(app) {
   app.use(express.static("server/storage/css"));
-  // app.use('/node_modules', express.static(__dirname + '/node_modules'))
   app.use("/themes", express.static(path.join(appRoot.path, "server/themes")));
-
   app.use(
     "/node_modules",
     express.static(path.join(appRoot.path, "node_modules"))
@@ -322,35 +289,6 @@ function setupStaticAssets(app) {
   );
 }
 
-// old working
-// function main() {
-//   typeorm
-//     .createConnection()
-//     .then((connection) => {
-//       console.log(logSymbols.success, "Successfully connected to Database!");
-//       start();
-//     });
-// }
-
-// function main() {
-//   typeorm
-//     .createConnection({
-//       url: process.env.DATABASE_URL,
-//       database: process.env.TYPEORM_DATABASE,
-//       type: process.env.TYPEORM_CONNECTION,
-//       entities: ["server/data/entity/*.js"],
-//       synchronize: process.env.TYPEORM_SYNCHRONIZE,
-//       logging: process.env.TYPEORM_LOGGING,
-//       // ssl: {
-//       //   rejectUnauthorized: false,
-//       // },
-//     })
-//     .then((connection) => {
-//       console.log(logSymbols.success, "Successfully connected to Database!");
-//       start();
-//     });
-// }
-
 function main() {
   let sslParam = { rejectUnauthorized: false };
   
@@ -369,8 +307,6 @@ function main() {
     if(process.env.TYPEORM_CONNECTION === 'sqlite'){
       connectionSettings.database = process.env.TYPEORM_DATABASE;
     }
-
-    // console.log('db connection:', connectionSettings);
 
   typeorm
     .createConnection(connectionSettings)
