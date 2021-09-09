@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="h-100">
+<html lang="en" class="h-100 {{data.pageCssClass}}">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -41,11 +41,13 @@
     
     <input type="hidden" id="page-id" name="page-id"  value="{{data.id}}">
     <input type="hidden" id="sessionID" value="{{data.sessionID}}"/>
-    <input type="hidden" id="theme"  value="bootstrap5"/>
+    <input type="hidden" id="theme"  value="weoc"/>
 
 <header>
 
   {{> menu level='1'}}
+
+  {{> hero-section }}
 
 </header>
 
