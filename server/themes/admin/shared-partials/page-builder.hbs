@@ -73,35 +73,14 @@
 
           <li class="nav-title">Layout</li>
 
+
           <div class="section-wrapper">
             {{#each data.sections}}
             <li class="nav-item nav-dropdown pb-section" data-id="{{this.id}}">
 
 
-
-              <a class="nav-link" data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="collapse" data-{{data.themeSettings.bootstrapToggleMiddle}}target="#collapse{{this.id}}">
+              <a class="nav-link" data-bs-toggle="collapse" href="#collapse{{this.id}}" role="button" aria-expanded="false" aria-controls="collapseSection">
                 <i class="nav-icon fa fa-align-justify"></i><span>{{this.title}}</span>
-                <!-- <ng-template #popTitle class="pop-title">Section Options</ng-template>
-                                <ng-template #popContent>
-                                    <button class="btn btn-sm btn-block btn-primary"><i
-                                            class="nav-icon fa fa-arrows"></i></button>
-                                    <button class="btn btn-sm btn-block btn-secondary">Edit</button>
-                                    <button class="btn btn-sm btn-block btn-success">Duplicate</button>
-                                    <button class="btn btn-sm btn-block btn-warning">Remove</button>
-                                    <button class="btn btn-sm btn-block btn-danger"
-                                        (click)="deleteSection(section.id)">Delete</button>
-                                </ng-template> -->
-                {{!-- <button type="button" class="btn btn-outline-secondary pull-right btn-util"
-                                    data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="collapse" data-target="#collapse{{this.id}}" aria-expanded="false"
-                                    aria-controls="collapseExample">
-                                    <i class="nav-icon fa fa-chevron-down"></i>
-                                </button> --}}
-
-                <button class="btn btn-outline-secondary section-edit pull-right btn-util" [ngbPopover]="popContent"
-                  data-id="{{isection}}" [popoverTitle]="popTitle" placement="right"> <i
-                    class="nav-icon fa fa-ellipsis-h"></i>
-                </button>
-
               </a>
 
               <div class="container mini-layout collapse" id="collapse{{this.id}}">
