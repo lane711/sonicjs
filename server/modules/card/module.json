@@ -1,0 +1,10 @@
+{
+  "title": "Card",
+  "enabled": true,
+  "systemId": "card",
+  "canBeAddedToColumn": true,
+  "sessionID": "undefined",
+  "version": "0.0.0.1",
+  "systemidUpperCase": "CARD",
+  "systemidCamelCase": "card"
+}
