@@ -1,0 +1,40 @@
+// flag
+
+main {
+  padding: 80px 15px 0;
+}
+.home .hero {
+  background: blue;
+}
+.home .bg-image {
+  background-image: url("https://sonicjscom.s3.amazonaws.com/american-flag1.jpg");
+  height: 600px;
+  background-size: cover;
+}
+.home .bg-image .mask{
+    height: 100%;
+    /* background-color: rgba(0, 0, 0, 0.4); */
+
+        /* ff 3.6+ */
+        background:-moz-linear-gradient(90deg, rgba(0, 0, 0, 0.32) 0%, rgba(0, 0, 0, 0) 66%); 
+
+        /* safari 5.1+,chrome 10+ */
+        background:-webkit-linear-gradient(90deg, rgba(0, 0, 0, 0.32) 0%, rgba(0, 0, 0, 0) 66%);
+    
+        /* opera 11.10+ */
+        background:-o-linear-gradient(90deg, rgba(0, 0, 0, 0.32) 0%, rgba(0, 0, 0, 0) 66%);
+    
+        /* ie 6-9 */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#000000', GradientType=0 );
+    
+        /* ie 10+ */
+        background:-ms-linear-gradient(90deg, rgba(0, 0, 0, 0.32) 0%, rgba(0, 0, 0, 0) 66%);
+    
+        /* global 94%+ browsers support */
+        background:linear-gradient(90deg, rgba(0, 0, 0, 0.32) 0%, rgba(0, 0, 0, 0) 66%);
+}
+
+.bg-dark {
+    --bs-bg-opacity: .5;
+    background-color: #B22234 !important;
+}

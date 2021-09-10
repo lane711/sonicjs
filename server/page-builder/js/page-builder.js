@@ -1627,7 +1627,7 @@ async function setupACEEditor() {
   }
 
   $("#save-global-css").click(async function () {
-    // debugger;
+    debugger;
     let cssContent = editor.getSession().getValue();
 
     // let file = new File([cssContent], "template.css", { type: "text/css" });

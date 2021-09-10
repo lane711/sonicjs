@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en" class="h-100 {{data.pageCssClass}}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{ data.metaDescription }}">
+    <meta name="generator" content="SonicJs">
+    <meta name="version" content="{{ data.appVersion }}">
+    <link rel="icon" href="/assets/img/favicon.ico">
+    <title>{{data.metaTitle}}</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family={{data.siteSettings.fontHeaders}}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family={{data.siteSettings.fontDefault}}">
+    <style>
+      body,
+      p {
+        font-family: '{{data.siteSettings.fontDefault}}',
+        serif !important;
+      }
+  
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-family: '{{data.siteSettings.fontHeaders}}',
+        serif;
+      }
+    </style>
+    
+    {{{data.cssLinks}}}
+
+    {{#if data.showPageBuilder}}
+    <link href="/page-builder/css/page-builder.css" rel="stylesheet">
+    {{/if}}
+
+  </head>
+
+  <body class="d-flex flex-column h-100">
+    
+    <input type="hidden" id="page-id" name="page-id"  value="{{data.id}}">
+    <input type="hidden" id="sessionID" value="{{data.sessionID}}"/>
+    <input type="hidden" id="theme"  value="weoc"/>
+
+<header>
+
+  {{> menu level='1'}}
+
+  {{> hero-section }}
+
+</header>
+
+<main class="flex-shrink-0">
+
+  {{#if data.showPageBuilder}}
+  {{> page-builder }}
+  {{/if}}
+
+  {{{body}}}
+
+</main>
+
+<footer class="footer mt-auto py-3 bg-light">
+  <div class="container">
+    <span class="text-muted">{{ data.themeSettings.footerText }}</span>
+  </div>
+</footer>
+
+{{{data.jsLinks}}}
+      
+  </body>
+</html>
+
