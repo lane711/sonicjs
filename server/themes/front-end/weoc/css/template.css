@@ -1,24 +1,75 @@
-// flag
+body {
+font-size: 24px;
+line-height: 2rem
+}
+
+.navbar-nav{
+    font-size:1.1rem;
+}
 
 main {
-  padding: 80px 15px 0;
+padding: 80px 15px 0
 }
+
 .home .hero {
-  background: blue;
+background: blue
 }
+
 .home .bg-image {
-  background-image: url("https://sonicjscom.s3.amazonaws.com/american-flag1.jpg");
-  height: 600px;
-  background-size: cover;
+background-image: url("https://sonicjscom.s3.amazonaws.com/american-flag1.jpg");
+height: 600px;
+background-size: cover
 }
-.home .bg-image .mask{
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
 
-
+.home .bg-image .mask {
+height: 100%;
+background-color: rgba(0,0,0,0.4)
 }
 
 .bg-dark {
-    --bs-bg-opacity: .5;
-    background-color: #B22234 !important;
+--bs-bg-opacity: .5;
+background-color: #B22234!important
+}
+
+h1 {
+font-weight: bold;
+font-size: 3rem
+}
+
+span[class^="vol"] {
+font-size: 4rem;
+font-weight: bold;
+color: #3C3B6E;
+font-family: verdana
+}
+
+.vol2 {
+color: #B22234!important
+}
+
+section[data-id="12"] {
+background-image: url(https://sonicjscom.s3.amazonaws.com/bannerpolitic.jpeg);
+background-position: center center;
+background-repeat: no-repeat;
+background-size: cover
+}
+
+section[data-id="14"] {
+background-color: #3C3B6E;
+color: #fff
+}
+
+.card-header {
+font-size: .9rem;
+line-height: 1.5rem
+}
+
+.card-header {
+font-size: .9rem;
+line-height: 1.5rem
+}
+
+.card-text {
+font-size: 1rem;
+line-height: 1.5rem
 }

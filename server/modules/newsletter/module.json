@@ -2,7 +2,8 @@
   "title": "Newsletter",
   "enabled": true,
   "systemId": "newsletter",
-  "canBeAddedToColumn": false,
+  "canBeAddedToColumn": true,
+  "sessionID": "undefined",
   "version": "0.0.0.1",
   "systemidUpperCase": "NEWSLETTER",
   "systemidCamelCase": "newsletter"

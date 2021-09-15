@@ -1,12 +1,14 @@
-<div class="card" style="width: 18rem;">
+<div class="card">
 
     <div class="card-header">
         {{data.header}}
       </div>
-    <img src="{{ data.image.src }}" class="card-img-top" alt="...">
+    <img src="{{ data.image.src }}" class="card-img-top" alt="{{data.title}}">
     <div class="card-body">
       <h5 class="card-title">{{data.title}}</h5>
       <p class="card-text">{{data.body}}</p>
+      {{#if data.link}}
       <a href="{{data.link}}" class="btn btn-primary">{{data.linkText}}</a>
+      {{/if}}
     </div>
   </div>
