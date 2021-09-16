@@ -3,12 +3,12 @@ font-size: 24px;
 line-height: 2rem
 }
 
-.navbar-nav{
-    font-size:1.1rem;
+.navbar-nav {
+font-size: 1.1rem
 }
 
 main {
-padding: 80px 15px 0
+padding: 64px 0 0
 }
 
 .home .hero {
@@ -21,9 +21,9 @@ height: 600px;
 background-size: cover
 }
 
-.home .bg-image .mask {
+.home .mask {
 height: 100%;
-background-color: rgba(0,0,0,0.4)
+background-color: rgba(0,0,0,0.6)
 }
 
 .bg-dark {
@@ -54,9 +54,31 @@ background-repeat: no-repeat;
 background-size: cover
 }
 
+section[data-id="36"] {
+background-image: url(https://sonicjscom.s3.amazonaws.com/american-flag1.jpg);
+background-position: center center;
+background-repeat: no-repeat;
+background-size: cover
+}
+
+.home-signup .home-signup {
+background-color: #fff;
+color: #000;
+font-weight: bold
+}
+
+section[data-id="36"] .formio-form {
+font-size: 1rem
+}
+
 section[data-id="14"] {
-background-color: #3C3B6E;
+background: rgb(60,59,110);
+background: radial-gradient(circle, rgba(60,59,110,1) 45%, rgba(60,59,110,0.9094012605042017) 100%);
 color: #fff
+}
+
+.donation-list {
+margin: 0 0 0 6rem
 }
 
 .card-header {
