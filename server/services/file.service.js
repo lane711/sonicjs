@@ -27,6 +27,10 @@ module.exports = fileService = {
   getFile: async function (relativeFilePath) {
     let filePath = path.join(appRoot.path, relativeFilePath);
 
+    if(filePath.includes('/sonicjs-services/')){
+      filePath = filePath.replace('/sonicjs-services/', '/services/')
+    }
+
     return new Promise((resolve, reject) => {
       fs.readFile(filePath, "utf8", (err, data) => {
         if (err) {
