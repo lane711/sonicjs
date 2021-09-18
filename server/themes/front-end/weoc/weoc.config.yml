@@ -29,3 +29,4 @@ assets:
     - /node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css
     - /node_modules/formiojs/dist/formio.form.min.css
     - /node_modules/jsoneditor/dist/jsoneditor.min.css
+    - /assets/css/common.css
