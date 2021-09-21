@@ -30,10 +30,8 @@ const adminTheme = `${process.env.ADMIN_THEME}`;
 const passport = require("passport");
 LocalStrategy = require("passport-local").Strategy;
 
-//typeorm start
 const typeorm = require("typeorm");
 const { getConnection } = require("typeorm");
-
 const { TypeormStore } = require("connect-typeorm");
 
 const { Session } = require("./server/data/model/Session");

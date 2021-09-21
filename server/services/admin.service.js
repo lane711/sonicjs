@@ -24,9 +24,6 @@ const { registerPrompt } = require("inquirer");
 
 const adminTheme = `${process.env.ADMIN_THEME}`;
 const adminDomain = process.env.ADMIN_DOMAIN;
-// var loopback = require("loopback");
-// var app = loopback();
-// var User = loopback.User;
 
 module.exports = adminService = {
   startup: async function (app) {
@@ -36,21 +33,12 @@ module.exports = adminService = {
       "/admin*",
       connectEnsureLogin.ensureLoggedIn(),
       async function (req, res) {
-        // if (!req.signedCookies.sonicjs_access_token) {
-        //   //user not logged in
-        // }
-
         if (process.env.MODE !== "dev") {
           if (adminDomain !== req.host) {
             res.send(401);
             return;
           }
         }
-
-        // let userSession = req.session.passport.user;
-        // if (userSession && userSession.id) {
-        //   userSession.id = req.session.userId;
-        // }
 
         globalService.setAreaMode(true, false, true);
 

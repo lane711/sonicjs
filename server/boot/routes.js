@@ -2,17 +2,11 @@
 var emitterService = require("../services/emitter.service");
 var globalService = require("../services/global.service");
 var cacheService = require("../services/cache.service");
-
-// globalService.startup();
-// var themes = require(__dirname + "../../themes/themes");
 var pageBuilderService = require("../services/page-builder.service");
-// var formio = require("../services/formio.service");
 var adminService = require("../services/admin.service");
-
 var dataService = require("../services/data.service");
 dataService.startup();
 var moduleService = require("../services/module.service");
-// moduleService.startup();
 var formService = require("../services/form.service");
 var menuService = require("../services/menu.service");
 var mediaService = require("../services/media.service");
@@ -44,7 +38,6 @@ const log = console.log;
 const url = require("url");
 const fileService = require("../services/file.service");
 var pageLoadedCount = 0;
-// var admin = require(__dirname + "/admin");
 
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 
@@ -54,12 +47,6 @@ exports.loadRoutes = async function (app) {
   formService.startup(app);
   backupService.startup(app);
   backupRestoreService.startup(app);
-
-  // app.get('/', async function (req, res) {
-  //   res.send('ok');
-  // });
-
-  // var router = app.loopback.Router();
 
   let page = "";
   let adminPage = "";
@@ -86,116 +73,14 @@ exports.loadRoutes = async function (app) {
   })();
 
   app.get("*", async function (req, res, next) {
-    //TODO: https://stackabuse.com/authentication-and-authorization-with-jwts-in-express-js/
     globalService.AccessToken = "todo-access-token";
 
-    // Update a value in the cookie so that the set-cookie will be sent.
-    // Only changes every minute so that it's not sent with every request.
     if (req.session) {
       req.session.nowInMinutes = Math.floor(Date.now() / 60e3);
     }
 
     next();
   });
-
-  // await emitterService.emit("loadRoutes", { app: app });
-
-  // app.get("/register", async function (req, res) {
-  //   let data = { registerMessage: "<b>admin</b>" };
-  //   res.render("admin/shared-views/admin-register", { layout: `front-end/${frontEndTheme}/login.handlebars`, data: data });
-  //   return;
-  // });
-
-  // app.post("/register", function (req, res) {
-  //   // var user = loopback.getModel("user");
-  //   user.create(
-  //     { email: req.body.email, password: req.body.password, roles: [1] },
-  //     function (err, userInstance) {
-  //       // console.log(userInstance);
-
-  //       //map admin role
-  //       // var roleMappingModel = loopback.getModel("RoleMapping");
-  //       // roleMappingModel.upsertWithWhere(
-  //       //   {
-  //       //     principalType: "user",
-  //       //     principalId: 1,
-  //       //     roleId: "admin",
-  //       //   },
-  //       //   {
-  //       //     principalType: "user",
-  //       //     principalId: 1,
-  //       //     roleId: "admin",
-  //       //   },
-  //       //   function (err, info) {
-  //       //     if (err) {
-  //       //       console.log(info);
-  //       //     }
-  //       //   }
-  //       // );
-
-  //       globalService.isAdminUserCreated = true;
-  //       let message = encodeURI(`Account created successfully. Please login`);
-  //       res.redirect(`/admin?message=${message}`); // /admin will show the login
-  //       return;
-  //     }
-  //   );
-  // });
-
-  //log a user in
-  // app.post("/login", function (req, res) {
-  //   var user = app.models.User;
-  //   let referer = req.headers.referer;
-
-  //   user.login(
-  //     {
-  //       email: req.body.email,
-  //       password: req.body.password,
-  //     },
-  //     "user",
-  //     function (err, token) {
-  //       if (err) {
-  //         if (err.details && err.code === "LOGIN_FAILED_EMAIL_NOT_VERIFIED") {
-  //           res.render("reponseToTriggerEmail", {
-  //             title: "Login failed",
-  //             content: err,
-  //             redirectToEmail: "/api/user/" + err.details.userId + "/verify",
-  //             redirectTo: "/",
-  //             redirectToLinkText: "Click here",
-  //             userId: err.details.userId,
-  //           });
-  //         } else if (err.code) {
-  //           let urlToRedirect = helperService.urlAppendParam(
-  //             referer,
-  //             "error",
-  //             err.message
-  //           );
-  //           res.redirect(urlToRedirect);
-  //         }
-  //         return;
-  //       }
-
-  //       //amp
-  //       var data = {
-  //         event_type: "LOGIN", // required
-  //         user_id: req.body.email, // only required if device id is not passed in
-  //       };
-
-  //       //set cookie
-  //       res.cookie("sonicjs_access_token", token.id, {
-  //         signed: true,
-  //         maxAge: 30000000,
-  //       });
-
-  //       mixPanelService.setPeople(req.body.email);
-
-  //       mixPanelService.trackEvent("LOGIN", req, { email: req.body.email });
-  //       if (referer.includes("/admin?")) {
-  //         referer = "/admin";
-  //       }
-  //       res.redirect(referer);
-  //     }
-  //   );
-  // });
 
   //log a user out
   app.get("/logout", async function (req, res, next) {
@@ -292,8 +177,6 @@ exports.loadRoutes = async function (app) {
     let userId = await userService.getCurrentUserId(req);
     let user = await userService.getCurrentUser(req);
 
-    // console.log("getCurrentUser:" + user);
-
     res.send(`userId:${userId}`);
   });
 
@@ -312,10 +195,6 @@ exports.loadRoutes = async function (app) {
   app.post("/form-submission", async function (req, res) {
     let payload = req.body.data.data ? req.body.data.data : undefined;
 
-    //hack for newletter
-    // if(!payload.data && payload.contentType){
-    //   payload.data = {contentType : payload.contentType};
-    // }
     if (payload) {
       let options = { data: payload, sessionID: req.sessionID };
 
@@ -324,10 +203,6 @@ exports.loadRoutes = async function (app) {
 
     res.sendStatus(200);
   });
-
-  // router.get('/admin/content-types', function (req, res) {
-  //   res.send(adminPage);
-  // });
 
   app.post("*", async function (req, res, next) {
     await emitterService.emit("postBegin", { req: req, res: res });
@@ -349,21 +224,6 @@ exports.loadRoutesCatchAll = async function (app) {
     }
 
     var ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
-
-    if (req.url.startsWith("/images/")) {
-      // console.log("continuing request");
-    }
-
-    // if (
-    //   !globalService.isAdminUserCreated &&
-    //   (req.url === "/" || req.url === "/admin")
-    // ) {
-    //   if (process.env.MODE === "dev") {
-    //     //brand new site, admin accounts needs to be created
-    //     res.redirect("/register");
-    //     return;
-    //   }
-    // }
 
     //for modules css/js files
     if (
@@ -394,25 +254,12 @@ exports.loadRoutesCatchAll = async function (app) {
       req.url.indexOf("fonts") > -1 ||
       req.url.indexOf(".woff") > -1
     ) {
-      // log(chalk.blue(req.url));
-
       return next();
     }
 
     if (process.env.MODE == "production") {
       console.log(`serving: ${req.url}`);
     }
-
-    //ensure session exists if app just starting up
-    // pageLoadedCount++;
-    // req.pageLoadedCount = pageLoadedCount;
-    // if (pageLoadedCount < 10) {
-    //   let session = await dalService.sessionGet(req.sessionID);
-    //   if (!session) {
-    //     res.redirect("/");
-    //     return;
-    //   }
-    // }
 
     let isAuthenticated = await userService.isAuthenticated(req);
     globalService.setAreaMode(false, true, isAuthenticated);
