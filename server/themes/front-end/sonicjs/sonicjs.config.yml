@@ -8,7 +8,7 @@ assets:
     - /node_modules/ace-builds/src-min-noconflict/ext-beautify.js
     - /node_modules/axios/dist/axios.min.js
     - /node_modules/popper.js/dist/umd/popper.min.js
-    - /node_modules/bootstrap/dist/js/bootstrap.min.js
+    - /node_modules/bootstrap4/dist/js/bootstrap.min.js
     - /node_modules/jsoneditor/dist/jsoneditor.min.js
     - /node_modules/formiojs/dist/formio.full.min.js
     - /node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.js
@@ -23,7 +23,7 @@ assets:
     - /page-builder/js/page-builder.js:
         isPageBuilder: true
   css:
-    - /node_modules/bootstrap/dist/css/bootstrap.min.css
+    - /node_modules/bootstrap4/dist/css/bootstrap.min.css
     - /themes/front-end/{{frontEndTheme}}/css/template-processed.css
     - /node_modules/font-awesome/css/font-awesome.min.css
     - /node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css
