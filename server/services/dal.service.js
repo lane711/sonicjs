@@ -86,7 +86,7 @@ module.exports = dalService = {
     // }
   },
 
-  userRegister: async function (email, passwordHash, agreeToFeedback) {
+  userRegister: async function (email, passwordHash, agreeToFeedback, isAdmin) {
     const userRepo = await getRepository(User);
 
     let user = await userRepo.findOne({
@@ -102,6 +102,10 @@ module.exports = dalService = {
       newUser.createdOn = new Date();
       newUser.updatedOn = new Date();
       newUser.agreeToFeedback = agreeToFeedback;
+
+      if(isAdmin){
+        newUser.profile = '{"roles":["admin"]}'
+      }
 
       let userRecord = await userRepo.save(newUser);
     }

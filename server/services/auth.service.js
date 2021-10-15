@@ -76,7 +76,7 @@ module.exports = authService = {
       let passwordConfirm = req.body.passwordConfirm;
       let agreeToFeedback = req.body.agreeToFeedback === 'on' ? true : false;
 
-      let newUser = await userService.registerUser(email, password, agreeToFeedback);
+      let newUser = await userService.registerUser(email, password, agreeToFeedback, true);
 
       globalService.isAdminUserCreated = true;
       let message = encodeURI(`Account created successfully. Please login`);
