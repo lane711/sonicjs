@@ -15,6 +15,18 @@
         <div class="card mx-4">
           <div class="card-body p-4">
             <h1>Setup</h1>
+
+
+            {{#if data.message }}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              <strong>Error!</strong> {{{ data.message }}}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            {{/if}}
+
+            
             <p class="text-muted">Create your {{{ data.registerMessage }}} account</p>
             <div class="input-group mb-3">
               <div class="input-group-prepend">

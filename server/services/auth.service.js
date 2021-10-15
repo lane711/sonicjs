@@ -53,11 +53,17 @@ module.exports = authService = {
 
     app.get("/register-admin", async function (req, res) {
 
+      let data = { };
+      let parsedUrl = url.parse(req.url);
+      let parsedQs = querystring.parse(parsedUrl.query);
+      if (parsedQs && parsedQs.message) {
+        data.message = parsedQs.message;
+      }
+      
       if(globalService.isAdminUserCreated == true){
         res.send('Admin account already created');
       }
 
-      let data = { registerMessage: "<b>admin</b>" };
       res.render("admin/shared-views/admin-register", {
         layout: `front-end/${frontEndTheme}/login.hbs`,
         data: data,
@@ -70,13 +76,46 @@ module.exports = authService = {
       let email = req.body.email;
       let password = req.body.password;
       let passwordConfirm = req.body.passwordConfirm;
+
+      let isEmailValid = helperService.validateEmail(email);
+      if(!isEmailValid || password !== passwordConfirm){
+        res.redirect(`/register-admin?message=Invalid email or password do no match`); // /admin will show the login
+      }
+
+      let newUser = await userService.registerUser(email, password, false, true);
+
+      globalService.isAdminUserCreated = true;
+      let message = encodeURI(`Account created successfully. Please login`);
+      req.session.optinEmail = email;
+      res.redirect(`/register-admin-optin`); // /admin will show the login
+      return;
+    });
+
+    app.get("/register-admin-optin", async function (req, res) {
+
+      if(globalService.isAdminUserCreated == true){
+        res.send('Admin account already created');
+      }
+
+      let data = { email: req.session.optinEmail };
+      res.render("admin/shared-views/admin-register-optin", {
+        layout: `front-end/${frontEndTheme}/login.hbs`,
+        data: data,
+      });
+      return;
+    });
+
+
+    app.post("/register-admin-optin", async function (req, res) {
+
       let agreeToFeedback = req.body.agreeToFeedback === 'on' ? true : false;
 
       let newUser = await userService.registerUser(email, password, agreeToFeedback, true);
 
       globalService.isAdminUserCreated = true;
       let message = encodeURI(`Account created successfully. Please login`);
-      res.redirect(`/login?message=${message}`); // /admin will show the login
+      req.session.optinEmail = email;
+      res.redirect(`/admin`); // /admin will show the login
       return;
     });
 
