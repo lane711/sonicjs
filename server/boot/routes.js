@@ -225,8 +225,9 @@ exports.loadRoutesCatchAll = async function (app) {
 
     if(!globalService.isAdminUserCreated){
       res.redirect('/register-admin');
+      return;
     }
-    
+
     var ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
 
     //for modules css/js files
