@@ -86,7 +86,7 @@ module.exports = dalService = {
     // }
   },
 
-  userRegister: async function (email, passwordHash) {
+  userRegister: async function (email, passwordHash, agreeToFeedback) {
     const userRepo = await getRepository(User);
 
     let user = await userRepo.findOne({
@@ -101,6 +101,7 @@ module.exports = dalService = {
       newUser.profile = "{}";
       newUser.createdOn = new Date();
       newUser.updatedOn = new Date();
+      newUser.agreeToFeedback = agreeToFeedback;
 
       let userRecord = await userRepo.save(newUser);
     }

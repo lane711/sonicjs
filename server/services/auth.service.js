@@ -30,6 +30,37 @@ module.exports = authService = {
     });
 
     app.get("/register", async function (req, res) {
+      let data = { registerMessage: "<b>user</b>" };
+      res.render("admin/shared-views/user-register", {
+        layout: `front-end/${frontEndTheme}/login.hbs`,
+        data: data,
+      });
+      return;
+    });
+
+    app.post("/register", async function (req, res) {
+
+      // var user = loopback.getModel("user");
+      let email = req.body.email;
+      let password = req.body.password;
+      let passwordConfirm = req.body.passwordConfirm;
+      // let agreeToFeedback = req.body.agreeToFeedback === 'on' ? true : false;
+
+      let newUser = await userService.registerUser(email, password, agreeToFeedback);
+
+      globalService.isAdminUserCreated = true;
+      let message = encodeURI(`Account created successfully. Please login`);
+      res.redirect(`/login?message=${message}`); // /admin will show the login
+      return;
+    });
+
+
+    app.get("/register-admin", async function (req, res) {
+
+      if(globalService.isAdminUserCreated == true){
+        res.send('Admin account already created');
+      }
+
       let data = { registerMessage: "<b>admin</b>" };
       res.render("admin/shared-views/admin-register", {
         layout: `front-end/${frontEndTheme}/login.hbs`,
@@ -38,13 +69,14 @@ module.exports = authService = {
       return;
     });
 
-    app.post("/register", async function (req, res) {
-      // var user = loopback.getModel("user");
+    app.post("/register-admin", async function (req, res) {
+
       let email = req.body.email;
       let password = req.body.password;
       let passwordConfirm = req.body.passwordConfirm;
+      let agreeToFeedback = req.body.agreeToFeedback === 'on' ? true : false;
 
-      let newUser = await userService.registerUser(email, password);
+      let newUser = await userService.registerUser(email, password, agreeToFeedback);
 
       globalService.isAdminUserCreated = true;
       let message = encodeURI(`Account created successfully. Please login`);

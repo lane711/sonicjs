@@ -10,11 +10,11 @@
   <div class="row justify-content-center">
     <div class="col-md-6">
 
-      <form action="/register-admin" method="post">
+      <form action="/register" method="post">
 
         <div class="card mx-4">
           <div class="card-body p-4">
-            <h1>Setup</h1>
+            <h1>Register</h1>
             <p class="text-muted">Create your {{{ data.registerMessage }}} account</p>
             <div class="input-group mb-3">
               <div class="input-group-prepend">
@@ -38,28 +38,12 @@
               </div>
               <input class="form-control" type="password" name="passwordConfirm" id="passwordConfirm"  placeholder="Repeat password">
             </div>
-            <hr>
-            <p class="text-muted">Website Details</p>
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <span class="input-group-text">
-                  <i class="icon-globe"></i>
-                </span>
-              </div>
-              <input class="form-control" type="text" name="title" id="title" placeholder="Website Title, ie: Acme Engineering">
-            </div>
-            <hr>
-            <div class="input-group mb-4 terms-wrapper">              
-              <input type="checkbox" name="agreeToFeedback" id="agreeToFeedback">
-              <label class="checkbox-label" for="agreeToFeedback">I agree that SonicJs may request feedback?</label>
-            </div>
-
           </div>
           <div class="card-footer p-4">
 
             <div class="row">
               <div class="col-12">
-                <button class="btn btn-block btn-success" type="submit">Complete Setup</button>
+                <button class="btn btn-block btn-success" type="submit">Create Account</button>
               </div>
             </div>
 

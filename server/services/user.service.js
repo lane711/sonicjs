@@ -34,10 +34,10 @@ module.exports = userService = {
     });
   },
 
-  registerUser: async function (email, password) {
+  registerUser: async function (email, password, agreeToFeedback) {
     let passwordHash = await dalService.hashPassword(password);
 
-    return await dalService.userRegister(email, passwordHash);
+    return await dalService.userRegister(email, passwordHash, agreeToFeedback);
     // User.register({ username: username, active: false }, password);
     // let passwordHash = crypto.createHash('md5').update('password').digest("hex")
 
