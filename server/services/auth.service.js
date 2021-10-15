@@ -39,16 +39,12 @@ module.exports = authService = {
     });
 
     app.post("/register", async function (req, res) {
-
-      // var user = loopback.getModel("user");
       let email = req.body.email;
       let password = req.body.password;
       let passwordConfirm = req.body.passwordConfirm;
-      // let agreeToFeedback = req.body.agreeToFeedback === 'on' ? true : false;
 
       let newUser = await userService.registerUser(email, password, agreeToFeedback);
 
-      globalService.isAdminUserCreated = true;
       let message = encodeURI(`Account created successfully. Please login`);
       res.redirect(`/login?message=${message}`); // /admin will show the login
       return;

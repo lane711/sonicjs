@@ -58,6 +58,14 @@ module.exports = dalService = {
     // }
   },
 
+  usersGetCount: async function () {
+    const userRepo = await getRepository(User);
+
+    let users = await userRepo.find();
+
+    return users.length;
+  },
+
   userGetByLogin: async function (email, password) {
     const userRepo = await getRepository(User);
 

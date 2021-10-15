@@ -223,6 +223,10 @@ exports.loadRoutesCatchAll = async function (app) {
       return;
     }
 
+    if(!globalService.isAdminUserCreated){
+      res.redirect('/register-admin');
+    }
+    
     var ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
 
     //for modules css/js files
@@ -256,6 +260,8 @@ exports.loadRoutesCatchAll = async function (app) {
     ) {
       return next();
     }
+
+
 
     if (process.env.MODE == "production") {
       console.log(`serving: ${req.url}`);
