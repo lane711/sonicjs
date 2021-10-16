@@ -112,10 +112,6 @@ module.exports = authService = {
     });
 
     app.get("/register-admin-optin", async function (req, res) {
-      // if (globalService.isAdminUserCreated == true) {
-      //   res.send("Admin account already created");
-      //   return;
-      // }
 
       let data = { email: req.session.optinEmail };
       res.render("admin/shared-views/admin-register-optin", {

@@ -290,7 +290,7 @@ module.exports = adminService = {
     // the must be at least one account
     let users = await dalService.usersGetCount();
 
-    if (users.length > 0) {
+    if (users > 0) {
       globalService.isAdminUserCreated = true;
     } else {
       globalService.isAdminUserCreated = false;
