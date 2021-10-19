@@ -46,14 +46,25 @@ module.exports = appAnalyticsMainService = {
 
   trackEventSend: async function (data) {
     if (await appAnalyticsMainService.trackingEnabled()) {
-      const { installId } = require("../../../data/config/installId.json");
-      data.installId = installId;
+  
+      const installFile = await appAnalyticsMainService.getEventMeta();
+
+      data.installId = installFile.installId;
+      data.websiteTitle = installFile.websiteTitle ? installFile.websiteTitle : '';
+      data.agreeToFeedback = installFile.agreeToFeedback ? installFile.agreeToFeedback : ''; 
+      data.email = installFile.agreeToFeedback ? installFile.email : ''; 
+
       let axios = await appAnalyticsMainService.getAxios();
       let url = process.env.ANALYTICS_POST_URL
         ? process.env.ANALYTICS_POST_URL
         : "https://sonicjs.com/sonicjs-app-analytics";
       let result = axios.post(url, data);
     }
+  },
+
+  getEventMeta: async function (){
+    const installFile = require("../../../data/config/installId.json");
+    return installFile;
   },
 
   processEvent: async function (data) {
@@ -108,6 +119,10 @@ module.exports = appAnalyticsMainService = {
 
         profile.data.adminPageVisits += 1;
       }
+
+      profile.data.websiteTitle = data.websiteTitle;
+      profile.data.emailOptin = data.agreeToFeedback;
+      profile.data.email = data.email;
 
       profile = await dataService.editInstance(profile, 0);
     }

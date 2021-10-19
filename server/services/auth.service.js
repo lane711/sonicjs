@@ -126,6 +126,7 @@ module.exports = authService = {
 
       installFile.websiteTitle = req.session.websiteTitle;
       installFile.agreeToFeedback = agreeToFeedback;
+      installFile.email = req.body.email;
 
       await fileService.writeFile('/server/data/config/installId.json', JSON.stringify(installFile));
 
