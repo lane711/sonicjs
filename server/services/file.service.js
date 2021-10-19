@@ -27,6 +27,10 @@ module.exports = fileService = {
   getFile: async function (relativeFilePath) {
     let filePath = path.join(appRoot.path, relativeFilePath);
 
+    if (filePath.includes("/server/sonicjs-services/")) {
+      filePath = filePath.replace("/server/sonicjs-services/", "/server/services/");
+    }
+
     return new Promise((resolve, reject) => {
       fs.readFile(filePath, "utf8", (err, data) => {
         if (err) {
@@ -98,7 +102,12 @@ module.exports = fileService = {
       file.name.match(/.(jpg|jpeg|png|gif|svg)$/i)
     ) {
       var title = file.name.replace(/^.*[\\\/]/, "");
-      let result = await s3Service.upload(file.name, file.path, "image", file.type);
+      let result = await s3Service.upload(
+        file.name,
+        file.path,
+        "image",
+        file.type
+      );
 
       //see if image already exists
       let existingMedia = await dataService.getContentByContentTypeAndTitle(
