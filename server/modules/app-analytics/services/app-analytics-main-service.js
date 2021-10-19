@@ -79,7 +79,7 @@ module.exports = appAnalyticsMainService = {
       profile = await dataService.contentCreate(payload, false, 0);
     }
 
-    if (profile && profile.data.events) {
+    if (profile && profile.data && profile.data.events) {
       if (data.eventName == "startup") {
         profile.data.pageCount = data.pageCount;
 
