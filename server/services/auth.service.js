@@ -98,6 +98,10 @@ module.exports = authService = {
         return;
       }
 
+      req.session.optinEmail = email;
+      req.app.set('optinEmail', email);
+      req.session.websiteTitle = websiteTitle;
+
       let newUser = await userService.registerUser(
         email,
         password,
@@ -105,15 +109,16 @@ module.exports = authService = {
       );
 
       globalService.isAdminUserCreated = true;
-      req.session.optinEmail = email;
-      req.session.websiteTitle = websiteTitle;
+
+      helperService.sleep(500);
+
       res.redirect(`/register-admin-optin`); // /admin will show the login
       return;
     });
 
     app.get("/register-admin-optin", async function (req, res) {
 
-      let data = { email: req.session.optinEmail };
+      let data = { email: req.app.get('optinEmail') };
       res.render("admin/shared-views/admin-register-optin", {
         layout: `front-end/${frontEndTheme}/login.hbs`,
         data: data,
