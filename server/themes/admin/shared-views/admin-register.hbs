@@ -10,11 +10,33 @@
   <div class="row justify-content-center">
     <div class="col-md-6">
 
-      <form action="/register" method="post">
+      <form action="/register-admin" method="post">
 
         <div class="card mx-4">
           <div class="card-body p-4">
-            <h1>Register</h1>
+            <h1>Setup</h1>
+
+
+            {{#if data.message }}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              <strong>Error!</strong> {{{ data.message }}}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            {{/if}}
+
+            <p class="text-muted">Website Details</p>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="icon-globe"></i>
+                </span>
+              </div>
+              <input class="form-control" type="text" name="title" id="title" placeholder="Website Title, ie: Acme Engineering">
+            </div>
+            <hr>
+
             <p class="text-muted">Create your {{{ data.registerMessage }}} account</p>
             <div class="input-group mb-3">
               <div class="input-group-prepend">
@@ -38,18 +60,14 @@
               </div>
               <input class="form-control" type="password" name="passwordConfirm" id="passwordConfirm"  placeholder="Repeat password">
             </div>
-            <hr>
-            <div class="input-group mb-4 terms-wrapper">              
-              <input type="checkbox" name="agreeToTerms" id="agreeToTerms">
-              <label class="checkbox-label" for="agreeToTerms">I agree to the <a target="_blank" href="https://sonicjs.com/app-usage-terms">terms and conditions</a></label>
-            </div>
+
 
           </div>
           <div class="card-footer p-4">
 
             <div class="row">
               <div class="col-12">
-                <button class="btn btn-block btn-success" type="submit">Create Account</button>
+                <button class="btn btn-block btn-success" type="submit">Complete Setup</button>
               </div>
             </div>
 

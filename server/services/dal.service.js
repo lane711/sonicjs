@@ -58,6 +58,14 @@ module.exports = dalService = {
     // }
   },
 
+  usersGetCount: async function () {
+    const userRepo = await getRepository(User);
+
+    let users = await userRepo.find();
+
+    return users.length;
+  },
+
   userGetByLogin: async function (email, password) {
     const userRepo = await getRepository(User);
 
@@ -86,7 +94,7 @@ module.exports = dalService = {
     // }
   },
 
-  userRegister: async function (email, passwordHash) {
+  userRegister: async function (email, passwordHash, isAdmin) {
     const userRepo = await getRepository(User);
 
     let user = await userRepo.findOne({
@@ -101,6 +109,10 @@ module.exports = dalService = {
       newUser.profile = "{}";
       newUser.createdOn = new Date();
       newUser.updatedOn = new Date();
+
+      if(isAdmin){
+        newUser.profile = '{"roles":["admin"]}'
+      }
 
       let userRecord = await userRepo.save(newUser);
     }

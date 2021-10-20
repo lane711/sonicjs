@@ -177,12 +177,18 @@ module.exports = adminService = {
         }
 
         if (viewName == "admin-site-settings-typography") {
-          data = await dataService.getContentTopOne("site-settings", req.sessionID);
-          data.editForm = await formService.getForm("site-settings", data,
-          undefined,
-          undefined,
-          undefined,
-          req.sessionID);
+          data = await dataService.getContentTopOne(
+            "site-settings",
+            req.sessionID
+          );
+          data.editForm = await formService.getForm(
+            "site-settings",
+            data,
+            undefined,
+            undefined,
+            undefined,
+            req.sessionID
+          );
         }
 
         if (viewName == "admin-users") {
@@ -191,7 +197,7 @@ module.exports = adminService = {
             undefined,
             "await submitContent(submission,true,'user');",
             undefined,
-            undefined, 
+            undefined,
             req.sessionID
           );
           let users = await userService.getUsers(req.sessionID);
@@ -259,13 +265,15 @@ module.exports = adminService = {
         }
 
         let accessToken = "fakeToken"; //await userService.getToken(req);
-        data.breadCrumbs = await breadcrumbsService.getAdminBreadcrumbs(req, req.sessionID);
+        data.breadCrumbs = await breadcrumbsService.getAdminBreadcrumbs(
+          req,
+          req.sessionID
+        );
 
         //add session ID
         data.sessionID = req.sessionID;
         data.fileStorage = process.env.FILE_STORAGE;
         data.fileStorageBase = `https://${process.env.AMAZON_S3_BUCKETNAME}.s3.amazonaws.com`;
-
 
         res.render(`admin/shared-views/${viewName}`, {
           layout: `admin/${adminTheme}/${adminTheme}`,
@@ -274,23 +282,18 @@ module.exports = adminService = {
         });
 
         await emitterService.emit("postAdminPageRender", (options = { req }));
-
       }
     );
   },
 
-  checkIfAdminAccountIsCreated: async function () {
-    // var user = loopback.getModel("user");
-    //the must be at least one account
-    // await user.find({limit: 1}, function (err, adminUser) {
-    //   if (err) {
-    //     console.log(err);
-    //   }
-    //   if (adminUser && adminUser.length > 0) {
-    //     globalService.isAdminUserCreated = true;
-    //   } else {
-    //     globalService.isAdminUserCreated = false;
-    //   }
-    // });
+  checkIfAdminAccountIsCreated: async function (sessionID) {
+    // the must be at least one account
+    let users = await dalService.usersGetCount();
+
+    if (users > 0) {
+      globalService.isAdminUserCreated = true;
+    } else {
+      globalService.isAdminUserCreated = false;
+    }
   },
 };
