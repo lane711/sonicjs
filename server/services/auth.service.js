@@ -19,7 +19,6 @@ const fileService = require("./file.service");
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
 const adminDomain = process.env.ADMIN_DOMAIN;
-const installFile = require(appRoot.path + '/server/data/config/installId.json');
 
 module.exports = authService = {
   startup: async function (app) {
@@ -128,6 +127,8 @@ module.exports = authService = {
 
     app.post("/register-admin-optin", async function (req, res) {
       let agreeToFeedback = req.body.agreeToFeedback === "on" ? true : false;
+
+      const installFile = require(appRoot.path + '/server/data/config/installId.json');
 
       installFile.websiteTitle = req.session.websiteTitle;
       installFile.agreeToFeedback = agreeToFeedback;
