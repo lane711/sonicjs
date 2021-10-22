@@ -54,10 +54,7 @@ module.exports = authService = {
       let password = req.body.password;
       let passwordConfirm = req.body.passwordConfirm;
 
-      let newUser = await userService.registerUser(
-        email,
-        password
-              );
+      let newUser = await userService.registerUser(email, password);
 
       let message = encodeURI(`Account created successfully. Please login`);
       res.redirect(`/login?message=${message}`); // /admin will show the login
@@ -98,14 +95,10 @@ module.exports = authService = {
       }
 
       req.session.optinEmail = email;
-      req.app.set('optinEmail', email);
+      req.app.set("optinEmail", email);
       req.session.websiteTitle = websiteTitle;
 
-      let newUser = await userService.registerUser(
-        email,
-        password,
-        true
-      );
+      let newUser = await userService.registerUser(email, password, true);
 
       globalService.isAdminUserCreated = true;
 
@@ -116,8 +109,7 @@ module.exports = authService = {
     });
 
     app.get("/register-admin-optin", async function (req, res) {
-
-      let data = { email: req.app.get('optinEmail') };
+      let data = { email: req.app.get("optinEmail") };
       res.render("admin/shared-views/admin-register-optin", {
         layout: `front-end/${frontEndTheme}/login.hbs`,
         data: data,
@@ -128,14 +120,21 @@ module.exports = authService = {
     app.post("/register-admin-optin", async function (req, res) {
       let agreeToFeedback = req.body.agreeToFeedback === "on" ? true : false;
 
-      const installFile = require(appRoot.path + '/server/data/config/installId.json');
+      try {
+        const installFile = require(appRoot.path +
+          "/server/data/config/installId.json");
 
-      installFile.websiteTitle = req.session.websiteTitle;
-      installFile.agreeToFeedback = agreeToFeedback;
-      installFile.email = req.body.email;
+        installFile.websiteTitle = req.session.websiteTitle;
+        installFile.agreeToFeedback = agreeToFeedback;
+        installFile.email = req.body.email;
 
-      await fileService.writeFile('/server/data/config/installId.json', JSON.stringify(installFile));
-
+        await fileService.writeFile(
+          "/server/data/config/installId.json",
+          JSON.stringify(installFile)
+        );
+      } catch (error) {
+        console.log("unable to post analytics");
+      }
 
       globalService.isAdminUserCreated = true;
       let message = encodeURI(`Account created successfully. Please login`);

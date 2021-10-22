@@ -1,0 +1,91 @@
+<div class="col-lg-12">
+  <div class="card">
+    <div class="card-header">
+      <i class="fa fa-align-justify"></i> Total: {{data.count}}
+      <button type="button" class="btn btn-success float-right" data-toggle="modal" data-target="#newContentModal">
+        New Content
+      </button>
+    </div>
+    <div class="card-body page-list">
+      <table class="table table-responsive-sm table-striped" id="admin-content">
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Title</th>
+            <th>Optin</th>
+            <th>First Seen</th>
+            <th>Last Seen</th>
+            <th>Age</th>
+            <th>Page Count</th>
+            <th>Page Visits</th>
+            <th>Admin Page Visits</th>
+            <th>Boot Count</th>
+            <th class='text-right'>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each data.installs}}
+          <tr>
+            <td><a href="/admin/content/edit/{{ this.contentTypeId }}/{{ this.id }}">{{this.id}}/{{ this.data.installId }}</a></td>
+            <td>{{ this.data.websiteTitle }}</td>
+            <td>{{ this.data.emailOptin }} / {{ this.data.email }}</td>
+            <td>{{ this.data.firstSeenOn }}</td>
+            <td>{{ this.data.lastSeenOn }}</td>
+            <td>{{ this.data.age }}</td>
+            <td>{{ this.data.pageCount }}</td>
+            <td>{{ this.data.pageVisits }}</td>
+            <td>{{ this.data.adminPageVisits }}</td>
+            <td>{{ this.data.bootCount }}</td>
+
+            <td class='text-right'>
+              <a href="/admin/content/edit/{{ this.contentTypeId }}/{{ this.id }}"
+                class="btn btn-sm btn-primary rmargin">Edit</a>
+
+              <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
+                data-trigger="focus" aria-label="Delete {{ this.data.title }}" title="Delete <b>{{ this.data.title }}</b> Forever?" 
+                data-content="<a href='/content/{{ this.id }}/{{../data.sessionID}}'
+   class='btn btn-sm btn-danger rmargin custom-delete'>Confirm Delete</a>
+">Delete</a>
+
+              {{!-- <!-- <a href="{{ content.url }}" target="_blank" class="btn btn-sm btn-success rmargin">View</a> -->
+                <a class="btn btn-sm btn-warning rmargin" *ngIf="content.data.contentType==='page'" [routerLink]="['/page-builder', content.id]">Page Builder</a>
+
+
+                <ng-template #popTitle>Delete <b>{{ content.name }}</b>?</ng-template>
+                <ng-template #popContent><button class="btn btn-sm btn-danger" (click)="deleteContent(content.id)">Confirm Delete</button></ng-template>
+                <button class="btn btn-sm btn-danger" placement="top"
+                [ngbPopover]="popContent" [popoverTitle]="popTitle">Delete</button> --}}
+            </td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<!-- Section Editor Modal -->
+<div class="modal fade" id="newContentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">New Content</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h5>Select a content type to add:</h5>
+        {{#each data.contentTypes}}
+        <a class='btn btn-success' data-content-type="{{ this.systemId }}" href="/admin/content/edit/{{ this.systemId }}">
+          {{ this.title }}</a>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</div>

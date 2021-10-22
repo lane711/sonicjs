@@ -11,6 +11,7 @@ var userService = require(".//user.service");
 var breadcrumbsService = require("../services/breadcrumbs.service");
 var dalService = require(".//dal.service");
 const mixPanelService = require("../modules/mixpanel/services/mixpanel-main-service");
+const appAnalyticReportService = require("../modules/app-analytics/services/app-analytics-report-service");
 
 var emitterService = require("./emitter.service");
 
@@ -262,6 +263,10 @@ module.exports = adminService = {
               req.sessionID
             );
           }
+        }
+
+        if (viewName == "admin-reports-analytics") {
+          data = await appAnalyticReportService.getAggregates(req.sessionID);
         }
 
         let accessToken = "fakeToken"; //await userService.getToken(req);

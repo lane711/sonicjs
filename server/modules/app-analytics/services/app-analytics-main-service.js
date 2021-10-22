@@ -92,7 +92,13 @@ module.exports = appAnalyticsMainService = {
 
     if (profile && profile.data && profile.data.events) {
       if (data.eventName == "startup") {
+
+        //only on startup get page counts, boot counts, etc
         profile.data.pageCount = data.pageCount;
+        //TODO
+
+        // IP Lookup
+
 
         profile.data.events.push({
           name: data.eventName,
@@ -123,6 +129,8 @@ module.exports = appAnalyticsMainService = {
       profile.data.websiteTitle = data.websiteTitle;
       profile.data.emailOptin = data.agreeToFeedback;
       profile.data.email = data.email;
+      profile.data.lastSeenOn = timeStamp;
+
 
       profile = await dataService.editInstance(profile, 0);
     }
@@ -141,7 +149,15 @@ module.exports = appAnalyticsMainService = {
     ) {
       return false;
     }
-    if (process.env.LOCAL_DEV === "true") {
+
+    if (
+      process.env.LOCAL_ANALYTICS &&
+      process.env.LOCAL_ANALYTICS.toLowerCase() === "true"
+    ) {
+      return true;
+    }
+
+    if (process.env.LOCAL_DEV === "TRUE") {
       return true;
     }
     return false;
