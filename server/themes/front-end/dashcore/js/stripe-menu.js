@@ -272,8 +272,8 @@
     
     $(function() {
         if ($scope.menu) {
-            new StripeMenu($scope.menu);
-            new StripeMenuPopup(".st-nav .st-nav-section.st-nav-mobile");
+            // new StripeMenu($scope.menu);
+            // new StripeMenuPopup(".st-nav .st-nav-section.st-nav-mobile");
         }
     });
 }(jQuery, this, {}));
