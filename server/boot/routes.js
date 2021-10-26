@@ -154,32 +154,6 @@ exports.loadRoutes = async function (app) {
     res.render("sandbox", { layout: "admin.handlebars", data: data });
   });
 
-  app.get("/ztest", async function (req, res) {
-    res.send("ok");
-  });
-
-  app.get("/session-test", async function (req, res) {
-    var token = req.signedCookies.sonicjs_access_token;
-    if (req.session.views) {
-      req.session.views++;
-      res.setHeader("Content-Type", "text/html");
-      res.write("<p>views: " + req.session.views + "</p>");
-      res.write("<p>expires in: " + req.session.cookie.maxAge / 1000 + "s</p>");
-      res.end();
-    } else {
-      req.session.views = 1;
-      res.end("welcome to the session demo. refresh!");
-    }
-  });
-
-  app.get("/session-details", async function (req, res) {
-    var token = req.signedCookies.sonicjs_access_token;
-    let userId = await userService.getCurrentUserId(req);
-    let user = await userService.getCurrentUser(req);
-
-    res.send(`userId:${userId}`);
-  });
-
   app.get("/css/generated.css", async function (req, res) {
     res.set("Content-Type", "text/css");
     let css = await cssService.getGeneratedCss();

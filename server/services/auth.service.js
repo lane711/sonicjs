@@ -40,6 +40,10 @@ module.exports = authService = {
       next();
     });
 
+    app.get("/session-details", async function (req, res) {
+      res.send({ user: req.user })
+    });
+
     app.get("/register", async function (req, res) {
       let data = { registerMessage: "<b>user</b>" };
       res.render("admin/shared-views/user-register", {
@@ -199,6 +203,11 @@ module.exports = authService = {
           res.send(401);
           return;
         }
+      }
+
+      //check if use is already logged in
+      if(req.user && req.user.profile.roles.includes('admin')){
+        return res.redirect("/admin");
       }
 
       let data = { registerMessage: "<b>admin</b>" };
