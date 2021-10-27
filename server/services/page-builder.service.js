@@ -19,9 +19,7 @@ module.exports = pageBuilderService = {
   startup: async function (app) {
     emitterService.on("getRenderedPagePostDataFetch", async function (options) {
       if (options) {
-        options.page.data.showPageBuilder = await userService.isAuthenticated(
-          options.req
-        );
+        options.page.data.showPageBuilder = options.req.user ? true : false;
       }
     });
 

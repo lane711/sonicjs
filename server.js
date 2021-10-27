@@ -107,6 +107,7 @@ function setupPassport(app) {
   passport.use(
     new LocalStrategy(async function (email, password, done) {
       let loginUser = await dalService.userGetByLogin(email, password);
+      console.log('loggin in:', loginUser.username);
       return done(null, loginUser);
     })
   );
