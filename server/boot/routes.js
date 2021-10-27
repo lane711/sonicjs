@@ -82,30 +82,6 @@ exports.loadRoutes = async function (app) {
     next();
   });
 
-  //log a user out
-  app.get("/logout", async function (req, res, next) {
-    var user = app.models.User;
-    var token = req.signedCookies.sonicjs_access_token;
-    let currentUser = await userService.getCurrentUser(req);
-    if (!token) return res.sendStatus(401);
-
-    user.logout(token, async function (err) {
-      if (err) {
-        //user already logged out
-        res.redirect("/admin");
-      }
-
-      //amp
-      var data = {
-        event_type: "LOGOUT", // required
-        user_id: currentUser.email,
-      };
-
-      res.clearCookie("sonicjs_access_token");
-      res.redirect("/admin");
-    });
-  });
-
   app.get("/hbs", async function (req, res) {
     res.render("home");
   });
