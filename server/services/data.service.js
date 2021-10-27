@@ -7,7 +7,7 @@ if (typeof module !== "undefined" && module.exports) {
   var formService = require("./form.service");
   var helperService = require("./helper.service");
   var formattingService = require("./formatting.service");
-
+  var _ = require("underscore");
   var axios = require("axios");
   var fs = require("fs");
   var ShortcodeTree = require("shortcode-tree").ShortcodeTree;
@@ -77,11 +77,12 @@ if (typeof module !== "undefined" && module.exports) {
 
         const defaultOptions = {
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
           withCredentials: true,
           baseURL: globalService.baseUrl,
-          cookie: 'sonicjs=s%3AMmvj7HC35YSG-RP1WEY6G3NS7mrSRFcN.EoldLokzB5IMX34xGLC2QwbU0HZn2dSFmtQ9BhPB26w'
+          cookie:
+            "sonicjs=s%3AMmvj7HC35YSG-RP1WEY6G3NS7mrSRFcN.EoldLokzB5IMX34xGLC2QwbU0HZn2dSFmtQ9BhPB26w",
         };
 
         let token = helperService.getCookie("sonicjs_access_token");
@@ -89,10 +90,8 @@ if (typeof module !== "undefined" && module.exports) {
           defaultOptions.headers.Authorization = token;
         }
 
-
         axiosInstance = axios.create(defaultOptions);
-        axiosInstance.defaults.withCredentials = true
-
+        axiosInstance.defaults.withCredentials = true;
       }
       // debugger;
       return axiosInstance;
@@ -132,10 +131,9 @@ if (typeof module !== "undefined" && module.exports) {
 
     return result.data;
   }),
-
-  (exports.userDelete = async function (id, sessionID) {
-    debugger;
-    let query = `
+    (exports.userDelete = async function (id, sessionID) {
+      debugger;
+      let query = `
       mutation{
         userDelete( 
           id:"${id}",
@@ -145,13 +143,12 @@ if (typeof module !== "undefined" && module.exports) {
       }
           `;
 
-    let result = await this.getAxios().post(apiUrl, {
-      query: query,
-    });
+      let result = await this.getAxios().post(apiUrl, {
+        query: query,
+      });
 
-    return result.data.data.userDelete;
-  }),
-
+      return result.data.data.userDelete;
+    }),
     (exports.rolesGet = async function (sessionID) {
       let result = await this.getAxios().post(apiUrl, {
         query: `
@@ -216,10 +213,10 @@ if (typeof module !== "undefined" && module.exports) {
       // await formattingService.formatTitles(page.data);
 
       //filter out content type that should not appear in admin content list
-      let data = contents;
-        // .filter((x) => x.contentTypeId !== "menu")
-        // .filter((x) => x.contentTypeId !== "section")
-        // .filter((x) => x.contentTypeId !== "site-settings");
+      let data = _.sortBy(contents, "updatedOn");
+      // .filter((x) => x.contentTypeId !== "menu")
+      // .filter((x) => x.contentTypeId !== "section")
+      // .filter((x) => x.contentTypeId !== "site-settings");
 
       return data;
     }),
@@ -335,9 +332,9 @@ if (typeof module !== "undefined" && module.exports) {
             title
         }
       }
-          `
+          `;
       let result = await this.getAxios().post(apiUrl, {
-        query: query
+        query: query,
       });
 
       return result.data.data.contentType;
@@ -380,8 +377,10 @@ if (typeof module !== "undefined" && module.exports) {
       let results = await this.getContentByType(contentType, sessionID);
       if (results) {
         return results[0];
-      }else{
-        throw new Error(`Could not find element getContentTopOne: ${contentType}, ${sessionID}`);
+      } else {
+        throw new Error(
+          `Could not find element getContentTopOne: ${contentType}, ${sessionID}`
+        );
       }
     }),
     (exports.getContentByUrl = async function (url, sessionID) {
@@ -800,7 +799,7 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data;
     }),
-    exports.mediaDelete = async function (id, sessionID) {
+    (exports.mediaDelete = async function (id, sessionID) {
       let query = `
         mutation{
           mediaDelete( 
@@ -810,15 +809,15 @@ if (typeof module !== "undefined" && module.exports) {
             }
         }
             `;
-  
+
       let result = await this.getAxios().post(apiUrl, {
         query: query,
       });
-  
+
       return result.data.data.mediaDelete;
-    };
-    (exports.getFiles = async function () {
-      let files = [{ title: "my image", filePath: "/images/test123.png" }];
-      return files;
     });
+  exports.getFiles = async function () {
+    let files = [{ title: "my image", filePath: "/images/test123.png" }];
+    return files;
+  };
 })(typeof exports === "undefined" ? (this["dataService"] = {}) : exports);
