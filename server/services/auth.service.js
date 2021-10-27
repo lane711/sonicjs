@@ -147,17 +147,6 @@ module.exports = authService = {
       return;
     });
 
-    //TODO: https://www.sitepoint.com/local-authentication-using-passport-node-js/
-    // app.post(
-    //   "/login",
-    //   passport.authenticate("local", {
-    //     successReturnToOrRedirect: "/",
-    //     failureRedirect: "/login",
-    //   }) () =>{
-
-    //   }
-    // );
-
     app.post("/login", (req, res, next) => {
       if (process.env.MODE !== "dev") {
         if (adminDomain !== req.host) {
@@ -179,12 +168,15 @@ module.exports = authService = {
 
         req.logIn(user, async function (err) {
           if (err) {
+            console.error(err);
             return next(err);
           }
 
           if (!req.session.returnTo) {
+            console.log("redirect to admin");
             return res.redirect("/admin");
           } else {
+            console.log("redirect to " + req.session.returnTo);
             return res.redirect(req.session.returnTo);
           }
         });

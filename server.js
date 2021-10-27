@@ -85,7 +85,9 @@ function appListen(app) {
 function setupSessionDb(app) {
   const sessionRepo = getConnection().getRepository(Session);
 
-  let sessionLengthDays = process.env.SESSION_LENGTH_DAYS ? process.env.SESSION_LENGTH_DAYS : 14
+  let sessionLengthDays = process.env.SESSION_LENGTH_DAYS
+    ? process.env.SESSION_LENGTH_DAYS
+    : 14;
 
   app.use(
     session({
@@ -103,11 +105,14 @@ function setupSessionDb(app) {
 }
 
 function setupPassport(app) {
-
   passport.use(
     new LocalStrategy(async function (email, password, done) {
       let loginUser = await dalService.userGetByLogin(email, password);
-      console.log('loggin in:', loginUser.username);
+      if (loginUser) {
+        console.log("logging in:", loginUser.username);
+      } else {
+        console.log("Invalid login");
+      }
       return done(null, loginUser);
     })
   );
@@ -238,7 +243,7 @@ function setupHandlebarsHelpers() {
     },
     comparerow: function (row, column) {
       let cms = _.camelCase(column.title);
-      return row[cms] ?  'fa-check text-success' : 'fa-times text-danger';
+      return row[cms] ? "fa-check text-success" : "fa-times text-danger";
     },
   });
 }
@@ -290,29 +295,27 @@ function setupStaticAssets(app) {
 
 function main() {
   let sslParam = { rejectUnauthorized: false };
-  
-  if(process.env.LOCAL_DEV && process.env.LOCAL_DEV == 'true'){
+
+  if (process.env.LOCAL_DEV && process.env.LOCAL_DEV == "true") {
     sslParam = false;
   }
 
-    let connectionSettings = {
-      url: process.env.DATABASE_URL,
-      type: process.env.TYPEORM_CONNECTION,
-      entities: ["server/data/entity/*.js"],
-      synchronize: process.env.TYPEORM_SYNCHRONIZE,
-      ssl: sslParam,
-    }
+  let connectionSettings = {
+    url: process.env.DATABASE_URL,
+    type: process.env.TYPEORM_CONNECTION,
+    entities: ["server/data/entity/*.js"],
+    synchronize: process.env.TYPEORM_SYNCHRONIZE,
+    ssl: sslParam,
+  };
 
-    if(process.env.TYPEORM_CONNECTION === 'sqlite'){
-      connectionSettings.database = process.env.TYPEORM_DATABASE;
-    }
+  if (process.env.TYPEORM_CONNECTION === "sqlite") {
+    connectionSettings.database = process.env.TYPEORM_DATABASE;
+  }
 
-  typeorm
-    .createConnection(connectionSettings)
-    .then((connection) => {
-      console.log(logSymbols.success, "Successfully connected to Database!");
-      start();
-    });
+  typeorm.createConnection(connectionSettings).then((connection) => {
+    console.log(logSymbols.success, "Successfully connected to Database!");
+    start();
+  });
 }
 
 main();
