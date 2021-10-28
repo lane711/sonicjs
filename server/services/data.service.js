@@ -204,20 +204,7 @@ if (typeof module !== "undefined" && module.exports) {
     }),
     (exports.getContentAdmin = async function (sessionID) {
       let contents = await this.getContent(sessionID);
-      //HACK removing sort bc LB not working with RDMS
-      // const filter = ""; //encodeURI(`{"order":"data.createdOn DESC"}`);
-
-      // let url = `${apiUrl}content?filter=${filter}`;
-      // let page = await this.getAxios().get(url);
-      // await formattingService.formatDates(page.data);
-      // await formattingService.formatTitles(page.data);
-
-      //filter out content type that should not appear in admin content list
       let data = _.sortBy(contents, "updatedOn");
-      // .filter((x) => x.contentTypeId !== "menu")
-      // .filter((x) => x.contentTypeId !== "section")
-      // .filter((x) => x.contentTypeId !== "site-settings");
-
       return data;
     }),
     (exports.getContentByType = async function (contentType, sessionID) {
