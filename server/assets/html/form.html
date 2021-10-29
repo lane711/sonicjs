@@ -40,7 +40,11 @@
                     formChanged(changed);
                   }
 
-                  setupAdminMediaFormImage();
+                  try {
+                    setupAdminMediaFormImage();
+                  } catch (error) {
+                    //anon mode
+                  }
               });
 
           });
