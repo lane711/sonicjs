@@ -132,6 +132,13 @@ module.exports = adminService = {
           );
         }
 
+        if (viewName == "admin-taxonomy") {
+          data = await dataService.getContentByContentType(
+            "taxonomy",
+            req.sessionID
+          );
+        }
+
         if (viewName == "admin-site-settings") {
           data = await dataService.getContentTopOne(
             "site-settings",
