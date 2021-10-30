@@ -1,1 +1,10 @@
-<div>Hello to you {{ data.firstName }} from the Taxonomy module!</div>
+<div class="list-group">
+
+  {{#each data.list}}
+    <a
+      href="{{this.urlRelative}}"
+      class="list-group-item list-group-item-action"
+    >{{this.title}}</a>
+  {{/each}}
+
+</div>
