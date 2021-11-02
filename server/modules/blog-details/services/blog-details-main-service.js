@@ -21,7 +21,14 @@ module.exports = blogDetailsMainService = {
 
     emitterService.on("preProcessPageUrlLookup", async function (req) {
       if (req.url.indexOf("/blog/") === 0) {
-        req.url = "/blog-details";
+
+        //TODO: check is page exists
+        // let post = await dataService.getContentByUrl(req.url);
+
+        // if(post.id){
+        //   req.url = "/blog-details";
+        // }
+
       }
     });
 

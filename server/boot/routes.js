@@ -2,6 +2,7 @@
 var emitterService = require("../services/emitter.service");
 var globalService = require("../services/global.service");
 var cacheService = require("../services/cache.service");
+var urlService = require("../services/url.service");
 var pageBuilderService = require("../services/page-builder.service");
 var adminService = require("../services/admin.service");
 var dataService = require("../services/data.service");
@@ -54,6 +55,7 @@ exports.loadRoutes = async function (app) {
   (async () => {
     await dalService.startup(app);
     await cacheService.startup();
+    await urlService.startup(app);
     await moduleService.startup(app);
     await menuService.startup();
     await mediaService.startup();
