@@ -27,7 +27,6 @@ module.exports = pageMainService = {
 
     emitterService.on("processUrl", async function (options) {
       if (options.urlKey.handler === "pageHandler") {
-        options.req.aaa ='444444444';
         var { page : pageData } = await contentService.getRenderedPage(options.req);
         options.page = pageData;
 
