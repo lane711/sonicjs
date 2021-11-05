@@ -1,6 +1,6 @@
 var dalService = require("../../../services/dal.service");
 var emitterService = require("../../../services/emitter.service");
-var globalService = require("../../../services/global.service");
+var contentService = require("../../../services/content.service");
 const urlService = require("../../../services/url.service");
 
 var sourceColumnId = undefined;
@@ -23,6 +23,16 @@ module.exports = pageMainService = {
       pages.map((page) => {
         urlService.addUrl(page.url, "pageHandler", "exact");
       });
+    });
+
+    emitterService.on("processUrl", async function (options) {
+      if (options.urlKey.handler === "pageHandler") {
+        options.req.aaa ='444444444';
+        var { page : pageData } = await contentService.getRenderedPage(options.req);
+        options.page = pageData;
+
+        return;
+      }
     });
   },
 };

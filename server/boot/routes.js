@@ -221,11 +221,16 @@ exports.loadRoutesCatchAll = async function (app) {
     let urlKey = await urlService.getUrl(req.url);
     console.log("urlKey", urlKey);
 
-    var { page } = await contentService.getRenderedPage(req);
 
-    await emitterService.emit("processUrl", { req, res, urlKey, page });
+    //replace this will 
 
-return;
+    var page = {};
+    var processUrlOptions = { req, res, urlKey, page };
+
+    await emitterService.emit("processUrl",processUrlOptions);
+    page = processUrlOptions.page;
+
+// return;
 
     if (page.data.title === "Not Found") {
       // res.render("404", page);
