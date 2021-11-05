@@ -10,34 +10,52 @@ module.exports = taxonomyMainService = {
         options.moduleName = "taxonomy";
         await moduleService.processModuleInColumn(options);
       }
+    });
 
-      emitterService.on("postModuleGetData", async function (options) {
-        if (options.shortcode.name === "TAXONOMY") {
-          let list = await dataService.getContentById(
-            options.viewModel.data.taxonomy
-          );
+    emitterService.on("postModuleGetData", async function (options) {
+      if (options.shortcode.name === "TAXONOMY") {
+        let list = await dataService.getContentById(
+          options.viewModel.data.taxonomy
+        );
 
-          options.viewModel.data.list = list.data.terms;
-        }
-      });
+        options.viewModel.data.list = list.data.terms;
+      }
+    });
 
-      emitterService.on("preProcessPageUrlLookup", async function (req) {
-        if (req.url.indexOf("/blog/") === 0) {
-          let list = await dataService.getContentByType("taxonomy");
+    emitterService.on("preProcessPageUrlLookup", async function (req) {
+      if (req.url.indexOf("/blog/") === 0) {
+        let list = await dataService.getContentByType("taxonomy");
 
-          //check if its a taxonomy page
-          //https://stackoverflow.com/questions/24756779/underscore-js-find-and-return-element-in-nested-array/24757040
-          var taxonomy = _(list)
-            .chain();
+        //check if its a taxonomy page
+        //https://stackoverflow.com/questions/24756779/underscore-js-find-and-return-element-in-nested-array/24757040
+        var taxonomy = _(list).chain();
 
+        // .pluck("data.terms")
+        // .flatten()
+        // .findWhere({ urlRelative: req.url })
+        // .value();
 
-            // .pluck("data.terms")
-            // .flatten()
-            // .findWhere({ urlRelative: req.url })
-            // .value();
+        req.url = "/blog";
+      }
+    });
 
-          req.url = "/blog";
-        }
+    emitterService.on("modulesLoaded", async function (options) {
+      const taxonomies = await dalService.contentGet(
+        null,
+        "taxonomy",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        true
+      );
+      taxonomies.map((taxonomy) => {
+        const data = JSON.parse(taxonomy.data);
+        data.terms.map((term) => {
+          urlService.addUrl(term.urlRelative, "taxonomyHandler", "exact");
+        });
       });
     });
 

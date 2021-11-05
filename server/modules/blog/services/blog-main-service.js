@@ -3,6 +3,7 @@ var emitterService = require("../../../services/emitter.service");
 var moduleService = require("../../../services/module.service");
 var helperService = require("../../../services/helper.service");
 var formattingService = require("../../../services/formatting.service");
+var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 
 module.exports = blogMainService = {
   startup: async function () {
@@ -18,6 +19,38 @@ module.exports = blogMainService = {
         await blogMainService.getBlogData(options);
       }
     });
+
+    emitterService.on("processUrl", async function (options) {
+      if (options.urlKey.handler === "blogHandler") {
+        // const data = await blogMainService.getBlogData(options);
+        const data = await dataService.getContentByUrl(options.urlKey.url);
+
+        options.res.render(`front-end/${frontEndTheme}/layouts/main`, {
+          layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
+          data: options.page.data,
+        });
+
+        return;
+      }
+    });
+
+    emitterService.on("modulesLoaded", async function (options) {
+      const blogs = await dalService.contentGet(
+        null,
+        "blog",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        true
+      );
+      blogs.map((blog) => {
+        urlService.addUrl(blog.url, "blogHandler", "exact");
+      });
+    });
+
   },
 
   getBlogData: async function (options) {

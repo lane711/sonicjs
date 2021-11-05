@@ -3,6 +3,7 @@ var emitterService = require("../services/emitter.service");
 var globalService = require("../services/global.service");
 var cacheService = require("../services/cache.service");
 var urlService = require("../services/url.service");
+urlService.startup();
 var pageBuilderService = require("../services/page-builder.service");
 var adminService = require("../services/admin.service");
 var dataService = require("../services/data.service");
@@ -55,7 +56,6 @@ exports.loadRoutes = async function (app) {
   (async () => {
     await dalService.startup(app);
     await cacheService.startup();
-    await urlService.startup(app);
     await moduleService.startup(app);
     await menuService.startup();
     await mediaService.startup();
@@ -139,7 +139,7 @@ exports.loadRoutes = async function (app) {
   });
 
   app.post("/dropzone-upload", async function (req, res) {
-    console.log('dropzone-upload req.files.file', req.files.file)
+    console.log("dropzone-upload req.files.file", req.files.file);
     await fileService.uploadWriteFile(req.files.file, req.sessionID);
     res.sendStatus(200);
   });
@@ -209,15 +209,23 @@ exports.loadRoutesCatchAll = async function (app) {
       return next();
     }
 
-
-
     if (process.env.MODE == "production") {
       console.log(`serving: ${req.url}`);
     }
 
     let isAuthenticated = await userService.isAuthenticated(req);
     globalService.setAreaMode(false, true, isAuthenticated);
+
+    //lookup which module should handle this request
+    console.log("processing", req.url);
+    let urlKey = await urlService.getUrl(req.url);
+    console.log("urlKey", urlKey);
+
     var { page } = await contentService.getRenderedPage(req);
+
+    await emitterService.emit("processUrl", { req, res, urlKey, page });
+
+return;
 
     if (page.data.title === "Not Found") {
       // res.render("404", page);
@@ -232,7 +240,7 @@ exports.loadRoutesCatchAll = async function (app) {
 
     page.data.id = page.id;
     page.data.sessionID = req.sessionID;
-    page.data.themeSettings.bootstrapToggleMiddle  = page.data.themeSettings.bootstrapVersion == 4 ? '': 'bs-';
+    // page.data.themeSettings.bootstrapToggleMiddle  = page.data.themeSettings.bootstrapVersion == 4 ? '': 'bs-';
 
     res.render(`front-end/${frontEndTheme}/layouts/main`, {
       layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
