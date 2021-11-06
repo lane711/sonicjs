@@ -177,7 +177,7 @@ module.exports = dalService = {
     user,
     req,
     returnAsArray = false,
-    bypassProcessContent = true
+    bypassProcessContent = false
   ) {
     let contents = [];
     const contentRepo = await getRepository(Content);
@@ -216,6 +216,7 @@ module.exports = dalService = {
     if (!bypassProcessContent) {
       dalService.processContents(contents, user, req);
     }
+    
     return contents;
   },
 
