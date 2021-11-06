@@ -20,19 +20,30 @@ module.exports = blogMainService = {
       }
     });
 
-    emitterService.on("processUrl", async function (options) {
-      if (options.urlKey.handler === "blogHandler") {
-        // const data = await blogMainService.getBlogData(options);
-        const data = await dataService.getContentByUrl(options.urlKey.url);
+    // emitterService.on("processUrl", async function (options) {
+    //   if (options.urlKey.handler === "blogHandler") {
+    //     // const data = await blogMainService.getBlogData(options);
+    //     const data = await dataService.getContentByUrl(options.urlKey.url);
 
-        options.res.render(`front-end/${frontEndTheme}/layouts/main`, {
-          layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
-          data: options.page.data,
-        });
+    //     options.res.render(`front-end/${frontEndTheme}/layouts/main`, {
+    //       layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
+    //       data: options.page.data,
+    //     });
 
-        return;
-      }
-    });
+    //     return;
+    //   }
+    // });
+
+    // emitterService.on("processUrl", async function (options) {
+    //   if (options.urlKey.handler === "blogHandler") {
+    //     var { page : pageData } = await contentService.getRenderedPage(options.req);
+    //     const data = await dataService.getContentByUrl(options.urlKey.url);
+
+    //     options.page = pageData;
+
+    //     return;
+    //   }
+    // });
 
     emitterService.on("modulesLoaded", async function (options) {
       const blogs = await dalService.contentGet(
