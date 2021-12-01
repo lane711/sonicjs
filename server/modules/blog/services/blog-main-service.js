@@ -58,7 +58,8 @@ module.exports = blogMainService = {
         true
       );
       blogs.map((blog) => {
-        urlService.addUrl(blog.url, "blogHandler", "exact");
+        const blogData = JSON.parse(blog.data);
+        urlService.addUrl(blog.url, "blogHandler", "exact", blogData.title);
       });
     });
 

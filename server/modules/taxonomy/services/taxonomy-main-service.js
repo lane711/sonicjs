@@ -54,9 +54,27 @@ module.exports = taxonomyMainService = {
       taxonomies.map((taxonomy) => {
         const data = JSON.parse(taxonomy.data);
         data.terms.map((term) => {
-          urlService.addUrl(term.urlRelative, "taxonomyHandler", "exact");
+          urlService.addUrl(term.urlRelative, "taxonomyHandler", "exact", term.title);
         });
       });
+    });
+
+    emitterService.on("processUrl", async function (options) {
+      if (options.urlKey.handler === "taxonomyHandler") {
+        const taxonomy = await dataService.getContentByUrl(options.urlKey.url);
+
+        let blogDetailsUrl = "/taxonomy-details";
+        options.req.url = blogDetailsUrl;
+        var { page: pageData } = await contentService.getRenderedPage(
+          options.req
+        );
+        options.page = pageData;
+
+        //overrides
+        options.page.data.heroTitle = options.urlKey.title;
+
+        return;
+      }
     });
 
     app.get("/taxonomy-get*", async function (req, res) {

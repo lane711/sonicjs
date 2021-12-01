@@ -21,7 +21,8 @@ module.exports = pageMainService = {
         true
       );
       pages.map((page) => {
-        urlService.addUrl(page.url, "pageHandler", "exact");
+        const pageData = JSON.parse(page.data);
+        urlService.addUrl(page.url, "pageHandler", "exact", pageData.title);
       });
     });
 
