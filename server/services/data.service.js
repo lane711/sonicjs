@@ -467,7 +467,7 @@ if (typeof module !== "undefined" && module.exports) {
     ) {
       let allOfContentType = await this.getContentByContentType(contentType);
       if (allOfContentType) {
-        let contentByTag = allOfContentType.filter((x) => x.data.tags === tag);
+        let contentByTag = allOfContentType.filter((x) => x.data.tags.includes(tag.id));
         return contentByTag;
       }
     }),

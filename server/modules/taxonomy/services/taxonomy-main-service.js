@@ -54,7 +54,7 @@ module.exports = taxonomyMainService = {
       taxonomies.map((taxonomy) => {
         const data = JSON.parse(taxonomy.data);
         data.terms.map((term) => {
-          urlService.addUrl(term.urlRelative, "taxonomyHandler", "exact", term.title);
+          urlService.addUrl(term.urlRelative, "taxonomyHandler", "exact", term.title, term.id);
         });
       });
     });

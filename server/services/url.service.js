@@ -5,9 +5,9 @@ const urlCache = new NodeCache();
 module.exports = urlService = {
   startup: async (app) => urlCache.flushAll()  ,
 
-  addUrl: async (url, handler, type, title) => {
-    console.log("adding url:", url);
-    return urlCache.set(url, { url, handler, type, title });
+  addUrl: async (url, handler, type, title, id) => {
+    console.log("adding url:", url, id);
+    return urlCache.set(url, { url, handler, type, title, id });
   },
 
   getUrls: async () => {

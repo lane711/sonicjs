@@ -22,7 +22,7 @@ module.exports = pageMainService = {
       );
       pages.map((page) => {
         const pageData = JSON.parse(page.data);
-        urlService.addUrl(page.url, "pageHandler", "exact", pageData.title);
+        urlService.addUrl(page.url, "pageHandler", "exact", pageData.title, page.id);
       });
     });
 
