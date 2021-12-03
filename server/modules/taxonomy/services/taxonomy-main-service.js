@@ -65,6 +65,7 @@ module.exports = taxonomyMainService = {
 
         let blogDetailsUrl = "/taxonomy-details";
         options.req.url = blogDetailsUrl;
+        options.req.urlKey = options.urlKey;
         var { page: pageData } = await contentService.getRenderedPage(
           options.req
         );

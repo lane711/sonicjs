@@ -62,7 +62,6 @@ module.exports = blogMainService = {
         urlService.addUrl(blog.url, "blogHandler", "exact", blogData.title);
       });
     });
-
   },
 
   getBlogData: async function (options) {
@@ -74,10 +73,20 @@ module.exports = blogMainService = {
     let contentType = "blog";
     let viewModel = moduleData;
 
-    let listRaw = await dataService.getContentByType(
-      contentType,
-      options.req.sessionID
-    );
+    let listRaw;
+    if (options.req.urlKey.handler === "taxonomyHandler") {
+      listRaw = await dataService.getContentByContentTypeAndTag(
+        contentType,
+        options.req.urlKey,
+        options.req.sessionID
+      );
+    } else {
+      listRaw = await dataService.getContentByType(
+        contentType,
+        options.req.sessionID
+      );
+    }
+
     listRaw = listRaw.sort((a, b) => (a.createdOn > b.createdOn ? 1 : -1));
 
     listRaw = listRaw.filter((x) => x.data.title);
