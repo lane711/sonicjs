@@ -3,7 +3,13 @@
     <div class="card-body">
       <h2 class="card-title">{{data.title}}</h2>
       <p class="card-text">{{{ data.body }}}</p>
-      <a href="{{this.data.url}}" class="btn btn-primary">Next Post →</a>
+      {{#if data.urlKey.previousUrl}}
+      <a href="{{data.urlKey.previousUrl}}" class="btn btn-primary">← Previous Post</a>
+      {{/if}}
+
+      {{#if data.urlKey.nextUrl}}
+      <a href="{{data.urlKey.nextUrl}}" class="btn btn-primary pull-right">Next Post →</a>
+      {{/if}}
     </div>
     <div class="card-footer text-muted">
       <!-- {{this.data.createdOnFormatted}} by

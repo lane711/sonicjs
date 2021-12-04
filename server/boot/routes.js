@@ -225,6 +225,7 @@ exports.loadRoutesCatchAll = async function (app) {
     //replace this will 
 
     var page = {};
+    req.urlKey = urlKey;
     var processUrlOptions = { req, res, urlKey, page };
 
     await emitterService.emit("processUrl",processUrlOptions);

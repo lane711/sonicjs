@@ -46,7 +46,7 @@ module.exports = blogMainService = {
     // });
 
     emitterService.on("modulesLoaded", async function (options) {
-      const blogs = await dalService.contentGet(
+      var blogs = await dalService.contentGet(
         null,
         "blog",
         null,
@@ -57,10 +57,18 @@ module.exports = blogMainService = {
         null,
         true
       );
-      blogs.map((blog) => {
-        const blogData = JSON.parse(blog.data);
-        urlService.addUrl(blog.url, "blogHandler", "exact", blogData.title, blog.id);
-      });
+      blogs = blogs.sort((a, b) => (a.createdOn > b.createdOn ? 1 : -1));
+
+      for (let index = 0; index < blogs.length; index++) {
+        const blogPrevious = index > 0 ? blogs[index -1] : {};
+        const blog = blogs[index];
+        const blogNext = index < (blogs.length -1) ? blogs[index +1] : {};
+        urlService.addUrl(blog.url, "blogHandler", "exact", blogData.title, blog.id, blogPrevious?.url, blogNext.url);
+      }
+      // blogs.map((blog) => {
+      //   const blogData = JSON.parse(blog.data);
+      //   urlService.addUrl(blog.url, "blogHandler", "exact", blogData.title, blog.id);
+      // });
     });
   },
 
@@ -74,7 +82,7 @@ module.exports = blogMainService = {
     let viewModel = moduleData;
 
     let listRaw;
-    if (options.req.urlKey.handler === "taxonomyHandler") {
+    if (options.req.urlKey?.handler === "taxonomyHandler") {
       listRaw = await dataService.getContentByContentTypeAndTag(
         contentType,
         options.req.urlKey,
@@ -106,10 +114,10 @@ module.exports = blogMainService = {
       };
     });
 
-    let sortedList = list.sort((a, b) =>
-      a.data.createdOn < b.data.createdOn ? 1 : -1
-    );
-    options.viewModel.data.list = sortedList;
+    // let sortedList = list.sort((a, b) =>
+    //   a.data.createdOn < b.data.createdOn ? 1 : -1
+    // );
+    options.viewModel.data.list = list;
 
     // Wait for all Promises to complete
     // Promise.all(list)

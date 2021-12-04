@@ -60,12 +60,12 @@ module.exports = taxonomyMainService = {
     });
 
     emitterService.on("processUrl", async function (options) {
-      if (options.urlKey.handler === "taxonomyHandler") {
+
+      if (options.urlKey?.handler === "taxonomyHandler") {
         const taxonomy = await dataService.getContentByUrl(options.urlKey.url);
 
         let blogDetailsUrl = "/taxonomy-details";
         options.req.url = blogDetailsUrl;
-        options.req.urlKey = options.urlKey;
         var { page: pageData } = await contentService.getRenderedPage(
           options.req
         );
@@ -73,6 +73,10 @@ module.exports = taxonomyMainService = {
 
         //overrides
         options.page.data.heroTitle = options.urlKey.title;
+        options.page.data.title = options.urlKey.title;
+        options.page.data.metaTitle = options.urlKey.title;
+
+
 
         return;
       }

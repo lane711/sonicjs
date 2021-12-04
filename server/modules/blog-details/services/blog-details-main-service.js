@@ -11,6 +11,7 @@ module.exports = blogDetailsMainService = {
         options.moduleName = "blog-details";
 
         //get blog record
+        blogData.data.urlKey = options.req.urlKey;
         const viewModel = blogData;
 
         await moduleService.processModuleInColumn(options, viewModel);
@@ -28,7 +29,7 @@ module.exports = blogDetailsMainService = {
     });
 
     emitterService.on("processUrl", async function (options) {
-      if (options.urlKey.handler === "blogHandler") {
+      if (options.urlKey?.handler === "blogHandler") {
         const blogPost = await dataService.getContentByUrl(options.urlKey.url);
 
         let blogDetailsUrl = "/blog-details";
