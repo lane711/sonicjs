@@ -217,9 +217,9 @@ exports.loadRoutesCatchAll = async function (app) {
     globalService.setAreaMode(false, true, isAuthenticated);
 
     //lookup which module should handle this request
-    console.log("processing", req.url);
+    // console.log("processing", req.url);
     let urlKey = await urlService.getUrl(req.url);
-    console.log("urlKey", urlKey);
+    // console.log("urlKey", urlKey);
 
 
     //replace this will 
