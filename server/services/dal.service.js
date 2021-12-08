@@ -3,6 +3,7 @@ const { Content } = require("../data/model/Content");
 const { User } = require("../data/model/User");
 const { Tag } = require("../data/model/Tag");
 const { Session } = require("../data/model/Session");
+const emitterService = require("../services/emitter.service");
 
 const crypto = require("crypto");
 
@@ -231,17 +232,29 @@ module.exports = dalService = {
     }
 
     content.url = url;
+    let isExisting = false;
     if (!id) {
       //upsert
       content.contentTypeId = data.contentType;
       content.createdByUserId = userSession.user.id;
       content.createdOn = new Date();
+      isExisting = true;
     }
     content.lastUpdatedByUserId = userSession.user.id;
     content.updatedOn = new Date();
     content.tags = [];
     content.data = JSON.stringify(data);
     let result = await contentRepo.save(content);
+
+    if(isExisting){
+      emitterService.emit('contentUpdated', result);
+    }else{
+      emitterService.emit('contentCreated', result);
+    }
+
+    emitterService.emit('contentCreatedOrUpdated', result);
+
+
     return result;
   },
 

@@ -54,13 +54,18 @@ module.exports = taxonomyMainService = {
       taxonomies.map((taxonomy) => {
         const data = JSON.parse(taxonomy.data);
         data.terms.map((term) => {
-          urlService.addUrl(term.urlRelative, "taxonomyHandler", "exact", term.title, term.id);
+          urlService.addUrl(
+            term.urlRelative,
+            "taxonomyHandler",
+            "exact",
+            term.title,
+            term.id
+          );
         });
       });
     });
 
     emitterService.on("processUrl", async function (options) {
-
       if (options.urlKey?.handler === "taxonomyHandler") {
         const taxonomy = await dataService.getContentByUrl(options.urlKey.url);
 
@@ -76,25 +81,25 @@ module.exports = taxonomyMainService = {
         options.page.data.title = options.urlKey.title;
         options.page.data.metaTitle = options.urlKey.title;
 
-
-
         return;
       }
     });
 
-    app.get("/taxonomy-get*", async function (req, res) {
-      if (req.url === "/taxonomy-get") {
-        taxonomies = await dataService.getContentByType("taxonomy");
-        res.send({ data: taxonomies });
-        return;
-      }
+    if (app) {
+      app.get("/taxonomy-get*", async function (req, res) {
+        if (req.url === "/taxonomy-get") {
+          taxonomies = await dataService.getContentByType("taxonomy");
+          res.send({ data: taxonomies });
+          return;
+        }
 
-      let id = req.url.substring(req.url.lastIndexOf("/") + 1);
+        let id = req.url.substring(req.url.lastIndexOf("/") + 1);
 
-      if (id) {
-        let taxonomy = await dataService.getContentById(id);
-        res.send(taxonomy.data);
-      }
-    });
+        if (id) {
+          let taxonomy = await dataService.getContentById(id);
+          res.send(taxonomy.data);
+        }
+      });
+    }
   },
 };

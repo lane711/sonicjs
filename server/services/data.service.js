@@ -563,6 +563,8 @@ if (typeof module !== "undefined" && module.exports) {
         query: query,
       });
 
+      emitterService.emit('contentCreated', result);
+
       return result.data.data.contentCreate;
     });
 
