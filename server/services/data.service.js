@@ -467,7 +467,9 @@ if (typeof module !== "undefined" && module.exports) {
     ) {
       let allOfContentType = await this.getContentByContentType(contentType);
       if (allOfContentType) {
-        let contentByTag = allOfContentType.filter((x) => x.data.tags.includes(tag.id));
+        let contentByTag = allOfContentType.filter((x) =>
+          x.data.tags.includes(tag.id)
+        );
         return contentByTag;
       }
     }),
@@ -563,8 +565,10 @@ if (typeof module !== "undefined" && module.exports) {
         query: query,
       });
 
-      emitterService.emit('contentCreated', result);
-
+      if (emitterService) {
+        emitterService.emit("contentCreated", result);
+      }
+      
       return result.data.data.contentCreate;
     });
 

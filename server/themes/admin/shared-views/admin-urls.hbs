@@ -2,8 +2,8 @@
   <div class="card">
     <div class="card-header">
       <i class="fa fa-align-justify"></i> URLs
-      <a href="/admin/content/edit/taxonomy" class="btn btn-success float-right">New
-        Taxonomy</a>
+      <!-- <a href="/admin/content/edit/taxonomy" class="btn btn-success float-right">New
+        Taxonomy</a> -->
     </div>
     <div class="card-body page-list">
       <table class="table table-responsive-sm table-striped">
@@ -11,15 +11,15 @@
           <tr>
             <th>Url</th>
             <th>Handler</th>
-            <th>Actions</th>
+            <!-- <th>Actions</th> -->
           </tr>
         </thead>
         <tbody>
           {{#each data.data}}
           <tr>
-            <td><a href="/admin/content/edit/taxonomy/{{ this.id }}">{{ this.url }}</a></td>
-            <td><a href="/admin/content/edit/taxonomy/{{ this.id }}">{{ this.handler }}</a></td>
-            <td>
+            <td><a target="_blank" href="{{ this.url }}">{{ this.url }}</a></td>
+            <td>{{ this.handler }}</td>
+            <!-- <td>
 
               <a class="btn btn-sm btn-primary rmargin" href="/admin/content/edit/taxonomy/{{ this.id }}">Edit</a>
 
@@ -35,7 +35,7 @@
                     {{ this.title }}?</a> </div>
               </div>
 
-            </td>
+            </td> -->
           </tr>
           {{/each}}
         </tbody>
