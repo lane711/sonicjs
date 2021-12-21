@@ -3,6 +3,7 @@ const { Content } = require("../data/model/Content");
 const { User } = require("../data/model/User");
 const { Tag } = require("../data/model/Tag");
 const { Session } = require("../data/model/Session");
+const emitterService = require("../services/emitter.service");
 
 const crypto = require("crypto");
 
@@ -110,8 +111,8 @@ module.exports = dalService = {
       newUser.createdOn = new Date();
       newUser.updatedOn = new Date();
 
-      if(isAdmin){
-        newUser.profile = '{"roles":["admin"]}'
+      if (isAdmin) {
+        newUser.profile = '{"roles":["admin"]}';
       }
 
       let userRecord = await userRepo.save(newUser);
@@ -176,7 +177,8 @@ module.exports = dalService = {
     tag,
     user,
     req,
-    returnAsArray = false
+    returnAsArray = false,
+    bypassProcessContent = false
   ) {
     let contents = [];
     const contentRepo = await getRepository(Content);
@@ -212,7 +214,10 @@ module.exports = dalService = {
       contents = await contentRepo.find();
     }
 
-    dalService.processContents(contents, user, req);
+    if (!bypassProcessContent) {
+      dalService.processContents(contents, user, req);
+    }
+    
     return contents;
   },
 
@@ -227,17 +232,29 @@ module.exports = dalService = {
     }
 
     content.url = url;
+    let isExisting = false;
     if (!id) {
       //upsert
       content.contentTypeId = data.contentType;
       content.createdByUserId = userSession.user.id;
       content.createdOn = new Date();
+      isExisting = true;
     }
     content.lastUpdatedByUserId = userSession.user.id;
     content.updatedOn = new Date();
     content.tags = [];
     content.data = JSON.stringify(data);
     let result = await contentRepo.save(content);
+
+    if(isExisting){
+      emitterService.emit('contentUpdated', result);
+    }else{
+      emitterService.emit('contentCreated', result);
+    }
+
+    emitterService.emit('contentCreatedOrUpdated', result);
+
+
     return result;
   },
 
@@ -326,8 +343,14 @@ module.exports = dalService = {
 
   //get content type so we can detect permissions
   checkPermission: async function (data, user, req) {
-    let contentTypeId = data.contentTypeId ? data.contentTypeId : data[0].contentTypeId;
-    let contentType = await moduleService.getModuleContentType(contentTypeId, user, req);
+    let contentTypeId = data.contentTypeId
+      ? data.contentTypeId
+      : data[0].contentTypeId;
+    let contentType = await moduleService.getModuleContentType(
+      contentTypeId,
+      user,
+      req
+    );
 
     if (user && user.roles && user.roles.includes("admin")) {
       return data;

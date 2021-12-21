@@ -22,8 +22,8 @@ describe("Admin Content", function () {
     cy.get('input[name="data[metaTitle]"]').type('Cypress Meta Title');
     cy.get('textarea[name="data[metaDescription]"]').type('Cypress Meta Description');
     cy.contains('Submit').click();
-
-    cy.contains('Cypress Hero');
+    cy.wait(1000);
+    cy.contains('Title');
     cy.url().should('include', '/admin/content/edit/page/');
 
   });

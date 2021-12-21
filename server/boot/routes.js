@@ -2,6 +2,8 @@
 var emitterService = require("../services/emitter.service");
 var globalService = require("../services/global.service");
 var cacheService = require("../services/cache.service");
+var urlService = require("../services/url.service");
+urlService.startup();
 var pageBuilderService = require("../services/page-builder.service");
 var adminService = require("../services/admin.service");
 var dataService = require("../services/data.service");
@@ -137,7 +139,7 @@ exports.loadRoutes = async function (app) {
   });
 
   app.post("/dropzone-upload", async function (req, res) {
-    console.log('dropzone-upload req.files.file', req.files.file)
+    console.log("dropzone-upload req.files.file", req.files.file);
     await fileService.uploadWriteFile(req.files.file, req.sessionID);
     res.sendStatus(200);
   });
@@ -207,17 +209,31 @@ exports.loadRoutesCatchAll = async function (app) {
       return next();
     }
 
-
-
     if (process.env.MODE == "production") {
       console.log(`serving: ${req.url}`);
     }
 
     let isAuthenticated = await userService.isAuthenticated(req);
     globalService.setAreaMode(false, true, isAuthenticated);
-    var { page } = await contentService.getRenderedPage(req);
 
-    if (page.data.title === "Not Found") {
+    //lookup which module should handle this request
+    // console.log("processing", req.url);
+    let urlKey = await urlService.getUrl(req.url);
+    // console.log("urlKey", urlKey);
+
+
+    //replace this will 
+
+    var page = {};
+    req.urlKey = urlKey;
+    var processUrlOptions = { req, res, urlKey, page };
+
+    await emitterService.emit("processUrl",processUrlOptions);
+    page = processUrlOptions.page;
+
+// return;
+
+    if (page.data?.title === "Not Found") {
       // res.render("404", page);
       res.render(`front-end/${frontEndTheme}/layouts/404`, {
         layout: `front-end/${frontEndTheme}/${frontEndTheme}`,

@@ -18,7 +18,9 @@ cy.SonicJs = {
   },
 
   adminPageVerify: (url, textToVerify) => {
-    cy.visit(`${cy.SonicJs.getBaseUrl()}/${url}`);
+    const fullUrl = `${cy.SonicJs.getBaseUrl()}/${url}`;
+    console.log('verify url', fullUrl);
+    cy.visit(fullUrl);
     cy.contains(textToVerify);
   },
 

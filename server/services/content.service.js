@@ -21,7 +21,6 @@ var emitterService = require("./emitter.service");
 var modulesToDelayProcessing = [];
 
 const NodeCache = require("node-cache");
-const myCache = new NodeCache();
 
 module.exports = contentService = {
   startup: async function () {

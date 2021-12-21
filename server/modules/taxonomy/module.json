@@ -1,0 +1,10 @@
+{
+  "title": "Taxonomy",
+  "enabled": true,
+  "systemId": "taxonomy",
+  "canBeAddedToColumn": true,
+  "sessionID": "undefined",
+  "version": "0.0.0.1",
+  "systemidUpperCase": "TAXONOMY",
+  "systemidCamelCase": "taxonomy"
+}
