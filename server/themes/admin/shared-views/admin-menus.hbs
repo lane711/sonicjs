@@ -10,15 +10,13 @@
         <thead>
           <tr>
             <th>Title</th>
-            <th>Content</th>
-            <th>Status</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {{#each data}}
           <tr>
             <td><a href="/admin/menus/edit/{{ this.id }}">{{ this.data.title }}</a></td>
-            <td>{{ contentType.description}}</td>
             <td>
 
               <a class="btn btn-sm btn-primary rmargin" href="/admin/menus/edit/{{ this.id }}">Edit</a>

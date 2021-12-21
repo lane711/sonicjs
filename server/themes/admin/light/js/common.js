@@ -17,7 +17,6 @@ $(document).ready(async function () {
   });
 
   $("table").on("shown.bs.popover", function () {
-    debugger;
     var btns = document.getElementsByClassName("custom-delete");
     for (var i = 0; i < btns.length; i++) {
       btns[i].onclick = async function (event) {
@@ -29,7 +28,6 @@ $(document).ready(async function () {
         var sessionID = getPathParts(this.href, 0);
 
         if (idToDelete) {
-          debugger;
           if (typeToDelete == "content") {
             await deleteContentInstance(idToDelete, sessionID);
             location.reload();

@@ -1,0 +1,44 @@
+<div class="col-lg-12">
+  <div class="card">
+    <div class="card-header">
+      <i class="fa fa-align-justify"></i> Taxonomies
+      <a href="/admin/content/edit/taxonomy" class="btn btn-success float-right">New
+        Taxonomy</a>
+    </div>
+    <div class="card-body page-list">
+      <table class="table table-responsive-sm table-striped">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each data}}
+          <tr>
+            <td><a href="/admin/content/edit/taxonomy/{{ this.id }}">{{ this.data.title }}</a></td>
+            <td>
+
+              <a class="btn btn-sm btn-primary rmargin" href="/admin/content/edit/taxonomy/{{ this.id }}">Edit</a>
+
+              <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
+                data-trigger="focus" aria-label="Delete {{ this.data.title }}" title="Delete <b>{{ this.data.title }}</b> Forever?" 
+                data-content="<a href='/content/{{ this.id }}/{{../data.sessionID}}'
+   class='btn btn-sm btn-danger rmargin custom-delete'>Confirm Delete</a>
+">Delete</a>
+
+              <div class="collapse" style="margin: 12px 0 0; max-width:300px;" id="collapse{{ this.systemId }}">
+                <div class="card card-body">
+                  <a class='btn btn-sm btn-danger' href="#" onclick='deleteContentType({{ this.id }})'>Confirm Delete
+                    {{ this.title }}?</a> </div>
+              </div>
+
+            </td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>

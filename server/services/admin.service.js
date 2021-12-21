@@ -4,6 +4,7 @@ var listService = require(".//list.service");
 var menuService = require(".//menu.service");
 var helperService = require(".//helper.service");
 var dataService = require(".//data.service");
+var urlService = require(".//url.service");
 var globalService = require(".//global.service");
 const connectEnsureLogin = require("connect-ensure-login");
 var dataService = require(".//data.service");
@@ -130,6 +131,17 @@ module.exports = adminService = {
             "menu",
             req.sessionID
           );
+        }
+
+        if (viewName == "admin-taxonomy") {
+          data = await dataService.getContentByContentType(
+            "taxonomy",
+            req.sessionID
+          );
+        }
+
+        if (viewName == "admin-urls") {
+          data.data = await urlService.getUrls();
         }
 
         if (viewName == "admin-site-settings") {
