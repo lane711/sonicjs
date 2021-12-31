@@ -159,7 +159,7 @@ module.exports = appAnalyticsMainService = {
       return true;
     }
 
-    if (process.env.LOCAL_DEV === "TRUE") {
+    if (process.env.LOCAL_DEV === "true") {
       return true;
     }
     return false;
