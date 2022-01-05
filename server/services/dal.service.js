@@ -1,7 +1,6 @@
 const { getRepository } = require("typeorm");
 const { Content } = require("../data/model/Content");
 const { User } = require("../data/model/User");
-const { Tag } = require("../data/model/Tag");
 const { Session } = require("../data/model/Session");
 const emitterService = require("../services/emitter.service");
 
@@ -206,10 +205,10 @@ module.exports = dalService = {
       console.log("query", query);
       return Content.find(query);
     } else if (tag) {
-      let contentsQuery = Tag.findById(tag); //.populate("contents");
-      contents = contentsQuery.exec();
-      console.log(contents);
-      return contents;
+      // let contentsQuery = Tag.findById(tag); //.populate("contents");
+      // contents = contentsQuery.exec();
+      // console.log(contents);
+      // return contents;
     } else {
       contents = await contentRepo.find();
     }
@@ -242,7 +241,7 @@ module.exports = dalService = {
     }
     content.lastUpdatedByUserId = userSession.user.id;
     content.updatedOn = new Date();
-    content.tags = [];
+    content.tags = "";//[];
     content.data = JSON.stringify(data);
     let result = await contentRepo.save(content);
 

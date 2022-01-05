@@ -305,12 +305,20 @@ function main() {
     type: process.env.TYPEORM_CONNECTION,
     entities: ["server/data/entity/*.js"],
     synchronize: process.env.TYPEORM_SYNCHRONIZE,
+    logging:process.env.TYPEORM_LOGGING,
     ssl: sslParam,
   };
 
   if (process.env.TYPEORM_CONNECTION === "sqlite") {
     connectionSettings.database = process.env.TYPEORM_DATABASE;
   }
+
+  if (process.env.TYPEORM_CONNECTION === "mysql") {
+    connectionSettings.username = process.env.TYPEORM_USERNAME;
+    connectionSettings.password = process.env.TYPEORM_PASSWORD;
+    connectionSettings.port = process.env.TYPEORM_PORT;
+    connectionSettings.database = process.env.TYPEORM_DATABASE;
+    }
 
   typeorm.createConnection(connectionSettings).then((connection) => {
     console.log(logSymbols.success, "Successfully connected to Database!");
@@ -319,3 +327,6 @@ function main() {
 }
 
 main();
+
+
+

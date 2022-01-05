@@ -1,6 +1,5 @@
 const EntitySchema = require("typeorm").EntitySchema;
 const Content = require("../model/Content").Content;
-const Tag = require("../model/Tag").Tag;
 const typeHelper = require('../helper/type.helper');
 
 module.exports = new EntitySchema({
@@ -38,12 +37,4 @@ module.exports = new EntitySchema({
             type: "varchar"
         }
     },
-    relations: {
-        categories: {
-            target: "Tag",
-            type: "many-to-many",
-            joinTable: true,
-            cascade: true
-        }
-    }
 });
