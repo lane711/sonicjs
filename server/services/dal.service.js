@@ -38,7 +38,7 @@ module.exports = dalService = {
     }
   },
 
-  usersGet: async function (user, req) {
+  usersGet: async function (user, req, bypassProcessContent = false) {
     const userRepo = await getRepository(User);
 
     let users = await userRepo.find();
@@ -48,7 +48,9 @@ module.exports = dalService = {
         user.contentTypeId = "user";
       });
     }
-    dalService.processContents(users, user, req);
+    if (!bypassProcessContent) {
+      dalService.processContents(users, user, req);
+    }
     return users;
 
     //admins can see all users
@@ -216,7 +218,7 @@ module.exports = dalService = {
     if (!bypassProcessContent) {
       dalService.processContents(contents, user, req);
     }
-    
+
     return contents;
   },
 
@@ -241,18 +243,17 @@ module.exports = dalService = {
     }
     content.lastUpdatedByUserId = userSession.user.id;
     content.updatedOn = new Date();
-    content.tags = "";//[];
+    content.tags = ""; //[];
     content.data = JSON.stringify(data);
     let result = await contentRepo.save(content);
 
-    if(isExisting){
-      emitterService.emit('contentUpdated', result);
-    }else{
-      emitterService.emit('contentCreated', result);
+    if (isExisting) {
+      emitterService.emit("contentUpdated", result);
+    } else {
+      emitterService.emit("contentCreated", result);
     }
 
-    emitterService.emit('contentCreatedOrUpdated', result);
-
+    emitterService.emit("contentCreatedOrUpdated", result);
 
     return result;
   },

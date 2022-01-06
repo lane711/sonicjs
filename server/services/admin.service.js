@@ -144,6 +144,12 @@ module.exports = adminService = {
           data.data = await urlService.getUrls();
         }
 
+        if (viewName == "admin-backup-restore") {
+          data.backupUrl = process.env.BACKUP_URL;
+          data.files = fileService.getFilesSearchSync(fileService.getRootAppPath() + "/backups", "/**/*.zip");
+          data.data = await urlService.getUrls();
+        }
+
         if (viewName == "admin-site-settings") {
           data = await dataService.getContentTopOne(
             "site-settings",
