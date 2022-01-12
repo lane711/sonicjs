@@ -314,11 +314,12 @@ function main() {
   }
 
   if (process.env.TYPEORM_CONNECTION === "mysql") {
+    connectionSettings.host = process.env.TYPEORM_HOST;
+    connectionSettings.port = process.env.TYPEORM_PORT;
     connectionSettings.username = process.env.TYPEORM_USERNAME;
     connectionSettings.password = process.env.TYPEORM_PASSWORD;
-    connectionSettings.port = process.env.TYPEORM_PORT;
     connectionSettings.database = process.env.TYPEORM_DATABASE;
-    }
+  }
 
   typeorm.createConnection(connectionSettings).then((connection) => {
     console.log(logSymbols.success, "Successfully connected to Database!");
