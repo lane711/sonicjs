@@ -98,6 +98,7 @@ function setupSessionDb(app) {
       saveUninitialized: false,
       store: new TypeormStore({
         cleanupLimit: 5,
+        limitSubquery: false, // If using MariaDB - see https://github.com/nykula/connect-typeorm/issues/8
         ttl: 86400 * sessionLengthDays,
       }).connect(sessionRepo),
     })
