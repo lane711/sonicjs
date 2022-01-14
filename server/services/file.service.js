@@ -28,7 +28,10 @@ module.exports = fileService = {
     let filePath = path.join(appRoot.path, relativeFilePath);
 
     if (filePath.includes("/server/sonicjs-services/")) {
-      filePath = filePath.replace("/server/sonicjs-services/", "/server/services/");
+      filePath = filePath.replace(
+        "/server/sonicjs-services/",
+        "/server/services/"
+      );
     }
 
     return new Promise((resolve, reject) => {
@@ -162,6 +165,20 @@ module.exports = fileService = {
 
   deleteFile: function (filePath) {
     fs.unlinkSync(filePath);
+  },
+
+  deleteFilesInDirectory: function (directory) {
+    fs.readdir(directory, (err, files) => {
+      if (err) throw err;
+
+      for (const file of files) {
+        if (!file.includes(".gitignore")) {
+          fs.unlink(path.join(directory, file), (err) => {
+            if (err) throw err;
+          });
+        }
+      }
+    });
   },
 
   deleteDirectory: function (directoryPath) {

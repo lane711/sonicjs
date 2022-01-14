@@ -29,7 +29,7 @@ module.exports = installService = {
     let siteSettingsColors = await dataService.getContentByType(
       "site-settings-colors"
     );
-    if (siteSettingsColors.length === 0) {
+    if (!siteSettingsColors || siteSettingsColors.length === 0) {
       let data = {
           contentType: "site-settings-colors",
           url: "/site-settings-colors",

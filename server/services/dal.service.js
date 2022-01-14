@@ -1,7 +1,6 @@
 const { getRepository } = require("typeorm");
 const { Content } = require("../data/model/Content");
 const { User } = require("../data/model/User");
-const { Tag } = require("../data/model/Tag");
 const { Session } = require("../data/model/Session");
 const emitterService = require("../services/emitter.service");
 
@@ -39,7 +38,7 @@ module.exports = dalService = {
     }
   },
 
-  usersGet: async function (user, req) {
+  usersGet: async function (user, req, bypassProcessContent = false) {
     const userRepo = await getRepository(User);
 
     let users = await userRepo.find();
@@ -49,7 +48,9 @@ module.exports = dalService = {
         user.contentTypeId = "user";
       });
     }
-    dalService.processContents(users, user, req);
+    if (!bypassProcessContent) {
+      dalService.processContents(users, user, req);
+    }
     return users;
 
     //admins can see all users
@@ -206,10 +207,10 @@ module.exports = dalService = {
       console.log("query", query);
       return Content.find(query);
     } else if (tag) {
-      let contentsQuery = Tag.findById(tag); //.populate("contents");
-      contents = contentsQuery.exec();
-      console.log(contents);
-      return contents;
+      // let contentsQuery = Tag.findById(tag); //.populate("contents");
+      // contents = contentsQuery.exec();
+      // console.log(contents);
+      // return contents;
     } else {
       contents = await contentRepo.find();
     }
@@ -217,7 +218,7 @@ module.exports = dalService = {
     if (!bypassProcessContent) {
       dalService.processContents(contents, user, req);
     }
-    
+
     return contents;
   },
 
@@ -242,18 +243,17 @@ module.exports = dalService = {
     }
     content.lastUpdatedByUserId = userSession.user.id;
     content.updatedOn = new Date();
-    content.tags = [];
+    content.tags = ""; //[];
     content.data = JSON.stringify(data);
     let result = await contentRepo.save(content);
 
-    if(isExisting){
-      emitterService.emit('contentUpdated', result);
-    }else{
-      emitterService.emit('contentCreated', result);
+    if (isExisting) {
+      emitterService.emit("contentUpdated", result);
+    } else {
+      emitterService.emit("contentCreated", result);
     }
 
-    emitterService.emit('contentCreatedOrUpdated', result);
-
+    emitterService.emit("contentCreatedOrUpdated", result);
 
     return result;
   },

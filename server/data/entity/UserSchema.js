@@ -31,12 +31,4 @@ module.exports = new EntitySchema({
             type: typeHelper.getDateTime()
         },
     },
-    relations: {
-        categories: {
-            target: "Tag",
-            type: "many-to-many",
-            joinTable: true,
-            cascade: true
-        }
-    }
 });

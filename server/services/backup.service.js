@@ -14,82 +14,76 @@ module.exports = backUpService = {
       await backUpService.exportContentToJsonFiles();
       // await backUpService.zipBackUpDirectory();
       // backUpService.uploadToDropBox();
-      res.sendStatus(200);
+      res.redirect('/admin/backup-restore');
     });
   },
 
   exportContentToJsonFiles: async function () {
+    backUpService.cleanupTempFiles();
     //content
     let contents = await dalService.contentGet("", "", "", "", "", "");
 
     contents.forEach((content) => {
       fileService.writeFile(
-        `backups/content/${content.id}.json`,
+        `backups/temp/content/${content.id}.json`,
         JSON.stringify(content)
       );
     });
 
-    backUpService.zipBackUpDirectory('content');
+    // backUpService.zipBackUpDirectory('content');
 
     //user
-    let users = await dalService.usersGet();
+    let users = await dalService.usersGet("", "", true);
 
     users.forEach((user) => {
       fileService.writeFile(
-        `backups/user/${user.id}.json`,
+        `backups/temp/user/${user.id}.json`,
         JSON.stringify(user)
       );
     });
 
-    backUpService.zipBackUpDirectory('user');
-
-    //tags
-    let tags = await dalService.tagsGet();
-
-    tags.forEach((tag) => {
-      fileService.writeFile(
-        `backups/tag/${tag.id}.json`,
-        JSON.stringify(tag)
-      );
-    });
-
-    backUpService.zipBackUpDirectory('tag');
-
-
+    // backUpService.zipBackUpDirectory('user');
+    let fileName = `${new Date().toJSON()}-sonicjs-backup.zip`;
+    backUpService.zipJsonFilesDirectory(fileName);
   },
 
-  zipBackUpDirectory: async function (contentType) {
+  cleanupTempFiles: async function () {
+    //empty temp files
+    fileService.deleteFilesInDirectory(`${appRoot.path}/backups/temp/content`);
+    fileService.deleteFilesInDirectory(`${appRoot.path}/backups/temp/user`);
+  },
+
+  zipJsonFilesDirectory: async function (fileName) {
     // return new Promise(function(resolve, reject) {
-      const zipPath = `${appRoot.path}/backups/${contentType}.zip`;
-      var output = fs.createWriteStream(zipPath);
-      var archive = archiver('zip', {
-        zlib: { level: 9 },
-      });
-  
-      archive.on('error', function(err) {
+    const zipPath = `${appRoot.path}/backups/${fileName}`;
+    var output = fs.createWriteStream(zipPath);
+    var archive = archiver("zip", {
+      zlib: { level: 9 },
+    });
+
+    archive.on("error", function (err) {
+      console.log(err);
+    });
+
+    archive.on("warning", function (err) {
+      if (err.code === "ENOENT") {
+        console.log("Archiver warning: ", err);
+      } else {
         console.log(err);
-      });
-  
-      archive.on('warning', function(err) {
-        if (err.code === 'ENOENT') {
-          console.log('Archiver warning: ', err);
-        } else {
-          console.log(err);
-        }
-      });
-  
-      archive.pipe(output);
-      archive.glob('**/*.json', { cwd: `${appRoot.path}/backups/${contentType}/` });
-      archive.finalize();
-  
-      output.on('close', function() {
-        // console.log('close ' + zipPath);
-        backUpService.uploadToDropBox(zipPath, `/backups/${contentType}.zip`);
-      });
+      }
+    });
+
+    archive.pipe(output);
+    archive.glob("**/*.json", { cwd: `${appRoot.path}/backups/temp` });
+    archive.finalize();
+
+    output.on("close", function () {
+      console.log("close " + zipPath);
+      backUpService.cleanupTempFiles();
+    });
     // });
 
     return;
-
   },
 
   uploadToDropBox: async function (sourceFilePath, destinationFileName) {
@@ -125,37 +119,3 @@ module.exports = backUpService = {
     });
   },
 };
-
-// uploadToDropBox: async function (backupFileName) {
-//   fs.readFile(`${appRoot.path}/README.md`, "utf8", function (err, data) {
-//     const req = https.request(
-//       "https://content.dropboxapi.com/2/files/upload",
-//       {
-//         method: "POST",
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//           "Dropbox-API-Arg": JSON.stringify({
-//             path: "/backup/test.txt",
-//             mode: "overwrite",
-//             autorename: true,
-//             mute: false,
-//             strict_conflict: false,
-//           }),
-//           "Content-Type": "application/octet-stream",
-//         },
-//       },
-//       (res) => {
-//         console.log("statusCode: ", res.statusCode);
-//         console.log("headers: ", res.headers);
-
-//         res.on("data", function (d) {
-//           process.stdout.write(d);
-//         });
-//       }
-//     );
-
-//     req.write(data);
-//     req.end();
-//   });
-// },
-// };
