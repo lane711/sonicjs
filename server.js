@@ -98,6 +98,7 @@ function setupSessionDb(app) {
       saveUninitialized: false,
       store: new TypeormStore({
         cleanupLimit: 5,
+        limitSubquery: false, // If using MariaDB - see https://github.com/nykula/connect-typeorm/issues/8
         ttl: 86400 * sessionLengthDays,
       }).connect(sessionRepo),
     })
@@ -314,11 +315,12 @@ function main() {
   }
 
   if (process.env.TYPEORM_CONNECTION === "mysql") {
+    connectionSettings.host = process.env.TYPEORM_HOST;
+    connectionSettings.port = process.env.TYPEORM_PORT;
     connectionSettings.username = process.env.TYPEORM_USERNAME;
     connectionSettings.password = process.env.TYPEORM_PASSWORD;
-    connectionSettings.port = process.env.TYPEORM_PORT;
     connectionSettings.database = process.env.TYPEORM_DATABASE;
-    }
+  }
 
   typeorm.createConnection(connectionSettings).then((connection) => {
     console.log(logSymbols.success, "Successfully connected to Database!");
