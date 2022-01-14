@@ -26,15 +26,31 @@ module.exports = backUpRestoreService = {
     console.log("starting restore");
     //unzip into json files
 
-    fs.createReadStream(`${appRoot.path}/backups/content.zip`).pipe(
-      unzipper.Extract({ path: `${appRoot.path}/backups/content` })
+    const backupFilePath = `${appRoot.path}${req.query.file}`;
+
+    fs.createReadStream(backupFilePath).pipe(
+      unzipper.Extract({ path: `${appRoot.path}/backups/temp/restore` })
     );
+
+    // const zip = fs
+    //   .createReadStream("path/to/archive.zip")
+    //   .pipe(unzipper.Parse({ forceStream: true }));
+    // for await (const entry of zip) {
+    //   const fileName = entry.path;
+    //   const type = entry.type; // 'Directory' or 'File'
+    //   const size = entry.vars.uncompressedSize; // There is also compressedSize;
+    //   if (fileName === "this IS the file I'm looking for") {
+    //     entry.pipe(fs.createWriteStream("output/path"));
+    //   } else {
+    //     entry.autodrain();
+    //   }
+    // }
 
     // return;
     //proccess json file
-    var contentFiles = fileService.getFilesSync("/backups/content");
+    var contentFiles = fileService.getFilesSync("/backups/temp/restore");
 
-    console.log('file count:' +  contentFiles.length);
+    console.log("file count:" + contentFiles.length);
     for (let index = 0; index < contentFiles.length; index++) {
       const file = contentFiles[index];
       console.log("file:" + file);
