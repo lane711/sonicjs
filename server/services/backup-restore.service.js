@@ -53,7 +53,7 @@ module.exports = backUpRestoreService = {
 
     console.log("file count:" + contentFiles.length);
     if(contentFiles.length){
-      dalService.contentDeleteAll(req);
+      await dalService.contentDeleteAll(req);
     }
     for (let index = 0; index < contentFiles.length; index++) {
       const file = contentFiles[index];

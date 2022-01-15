@@ -1,7 +1,7 @@
 const graphql = require("graphql");
-const User = require("./models/user");
-const Content = require("./models/content");
-const Tag = require("./models/tag");
+// const User = require("./models/user");
+// const Content = require("./models/content");
+// const Tag = require("./models/tag");
 
 const { GraphQLJSONObject } = require("graphql-type-json");
 const moduleService = require("../services/module.service");

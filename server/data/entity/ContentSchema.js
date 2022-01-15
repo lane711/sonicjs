@@ -8,8 +8,8 @@ module.exports = new EntitySchema({
     columns: {
         id: {
             primary: true,
-            type: "int",
-            generated: true
+            type: "uuid",
+            generated: false
         },
         data: {
             type: "text"
@@ -28,13 +28,6 @@ module.exports = new EntitySchema({
         },
         updatedOn: {
             type: typeHelper.getDateTime()
-        },
-        url: {
-            type: "varchar",
-            unique:true,
-        },
-        tags: {
-            type: "varchar"
         }
     },
 });

@@ -6,6 +6,7 @@ const emitterService = require("../services/emitter.service");
 
 const crypto = require("crypto");
 const {contentDelete} = require("./data.service");
+const { uuid } = require('uuidv4');
 
 module.exports = dalService = {
   startup: async function (app) {
@@ -106,6 +107,7 @@ module.exports = dalService = {
 
     if (!user) {
       let newUser = new User();
+      newUser.id = uuid();
       newUser.username = email;
       newUser.salt = passwordHash.salt;
       newUser.hash = passwordHash.hash;
@@ -237,6 +239,7 @@ module.exports = dalService = {
     let isExisting = false;
     if (!id) {
       //upsert
+      content.id = uuid();
       content.contentTypeId = data.contentType;
       content.createdByUserId = userSession.user.id;
       content.createdOn = new Date();
@@ -267,6 +270,7 @@ module.exports = dalService = {
   },
 
   contentDeleteAll: async function (userSession) {
+    const contentRepo = await getRepository(Content);
     contents = await contentRepo.find();
     for(const content of contents){
       contentDelete(content.id, userSession);
