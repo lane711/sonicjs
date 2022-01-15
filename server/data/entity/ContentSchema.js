@@ -28,6 +28,10 @@ module.exports = new EntitySchema({
         },
         updatedOn: {
             type: typeHelper.getDateTime()
+        },
+        url: {
+            type: "varchar",
+            unique:true,
         }
     },
 });
