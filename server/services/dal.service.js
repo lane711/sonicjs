@@ -5,6 +5,7 @@ const { Session } = require("../data/model/Session");
 const emitterService = require("../services/emitter.service");
 
 const crypto = require("crypto");
+const {contentDelete} = require("./data.service");
 
 module.exports = dalService = {
   startup: async function (app) {
@@ -262,6 +263,13 @@ module.exports = dalService = {
     const contentRepo = await getRepository(Content);
     if (userSession.user.profile.roles.includes("admin")) {
       return contentRepo.delete(id);
+    }
+  },
+
+  contentDeleteAll: async function (userSession) {
+    contents = await contentRepo.find();
+    for(const content of contents){
+      contentDelete(content.id, userSession);
     }
   },
 

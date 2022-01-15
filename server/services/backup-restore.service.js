@@ -27,37 +27,43 @@ module.exports = backUpRestoreService = {
     //unzip into json files
 
     const backupFilePath = `${appRoot.path}${req.query.file}`;
+    const extractToPath = `${appRoot.path}/backups/temp/restore`;
+    // fs.createReadStream(backupFilePath).pipe(
+    //   unzipper.Extract({ path: `${appRoot.path}/backups/temp/restore` })
+    // );
 
-    fs.createReadStream(backupFilePath).pipe(
-      unzipper.Extract({ path: `${appRoot.path}/backups/temp/restore` })
+    fs.createReadStream(backupFilePath)
+      .pipe(unzipper.Extract({ path: extractToPath }))
+      .on("entry", (entry) => entry.autodrain())
+      .promise()
+      .then(
+        () => {
+          console.log("done");
+          backUpRestoreService.processJsonFiles(req);
+        },
+        (e) => console.log("error", e)
+      );
+  },
+
+  processJsonFiles: async function (req) {
+
+    var contentFiles = fileService.getFilesSync(
+      "/backups/temp/restore/content"
     );
 
-    // const zip = fs
-    //   .createReadStream("path/to/archive.zip")
-    //   .pipe(unzipper.Parse({ forceStream: true }));
-    // for await (const entry of zip) {
-    //   const fileName = entry.path;
-    //   const type = entry.type; // 'Directory' or 'File'
-    //   const size = entry.vars.uncompressedSize; // There is also compressedSize;
-    //   if (fileName === "this IS the file I'm looking for") {
-    //     entry.pipe(fs.createWriteStream("output/path"));
-    //   } else {
-    //     entry.autodrain();
-    //   }
-    // }
-
-    // return;
-    //proccess json file
-    var contentFiles = fileService.getFilesSync("/backups/temp/restore");
-
     console.log("file count:" + contentFiles.length);
+    if(contentFiles.length){
+      dalService.contentDeleteAll(req);
+    }
     for (let index = 0; index < contentFiles.length; index++) {
       const file = contentFiles[index];
       console.log("file:" + file);
 
       if (file.includes(".json")) {
         // let file = '479.json';
-        let contentFile = fileService.getFileSync(`/backups/content/${file}`);
+        let contentFile = fileService.getFileSync(
+          `/backups/temp/restore/content/${file}`
+        );
 
         if (contentFile) {
           let payload = JSON.parse(contentFile);
@@ -79,18 +85,17 @@ module.exports = backUpRestoreService = {
         }
       }
     }
-
-    // var userFiles = fileService.getFilesSync("/backups/user");
-
-    // for (let index = 0; index < userFiles.length; index++) {
-    //   const file = userFiles[index];
-    //   let userFile = fileService.getFileSync(`/backups/user/${file}`);
-    //   if (userFile) {
-    //     let payload = JSON.parse(userFile);
-    //     let id = parseInt(file.replace('.json', ''));
-    //     payload.id = id;
-    //     await dalService.userRestore(id, payload.url, payload, req.sessionID);
-    //   }
-    // }
   },
+  // var userFiles = fileService.getFilesSync("/backups/user");
+
+  // for (let index = 0; index < userFiles.length; index++) {
+  //   const file = userFiles[index];
+  //   let userFile = fileService.getFileSync(`/backups/user/${file}`);
+  //   if (userFile) {
+  //     let payload = JSON.parse(userFile);
+  //     let id = parseInt(file.replace('.json', ''));
+  //     payload.id = id;
+  //     await dalService.userRestore(id, payload.url, payload, req.sessionID);
+  //   }
+  // }
 };
