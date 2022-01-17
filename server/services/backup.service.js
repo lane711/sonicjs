@@ -21,11 +21,11 @@ module.exports = backUpService = {
   exportContentToJsonFiles: async function () {
     backUpService.cleanupTempFiles();
     //content
-    let contents = await dalService.contentGet("", "", "", "", "", "");
+    let contents = await dalService.contentGet("", "", "", "", "", "", "", false, true);
 
     contents.forEach((content) => {
       fileService.writeFile(
-        `backups/temp/content/${content.id}.json`,
+        `backups/temp/backup/content/${content.id}.json`,
         JSON.stringify(content)
       );
     });
@@ -37,7 +37,7 @@ module.exports = backUpService = {
 
     users.forEach((user) => {
       fileService.writeFile(
-        `backups/temp/user/${user.id}.json`,
+        `backups/temp/backup/user/${user.id}.json`,
         JSON.stringify(user)
       );
     });
@@ -49,8 +49,8 @@ module.exports = backUpService = {
 
   cleanupTempFiles: async function () {
     //empty temp files
-    fileService.deleteFilesInDirectory(`${appRoot.path}/backups/temp/content`);
-    fileService.deleteFilesInDirectory(`${appRoot.path}/backups/temp/user`);
+    fileService.deleteFilesInDirectory(`${appRoot.path}/backups/temp/backup/content`);
+    fileService.deleteFilesInDirectory(`${appRoot.path}/backups/temp/backup/user`);
   },
 
   zipJsonFilesDirectory: async function (fileName) {
@@ -74,7 +74,7 @@ module.exports = backUpService = {
     });
 
     archive.pipe(output);
-    archive.glob("**/*.json", { cwd: `${appRoot.path}/backups/temp` });
+    archive.glob("**/*.json", { cwd: `${appRoot.path}/backups/temp/backup` });
     archive.finalize();
 
     output.on("close", function () {

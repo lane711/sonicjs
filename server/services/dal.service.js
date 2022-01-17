@@ -5,8 +5,8 @@ const { Session } = require("../data/model/Session");
 const emitterService = require("../services/emitter.service");
 
 const crypto = require("crypto");
-const {contentDelete} = require("./data.service");
-const { uuid } = require('uuidv4');
+const { contentDelete } = require("./data.service");
+const { uuid } = require("uuidv4");
 
 module.exports = dalService = {
   startup: async function (app) {
@@ -272,8 +272,8 @@ module.exports = dalService = {
   contentDeleteAll: async function (userSession) {
     const contentRepo = await getRepository(Content);
     contents = await contentRepo.find();
-    for(const content of contents){
-      contentDelete(content.id, userSession);
+    for (const content of contents) {
+      await contentRepo.delete(content.id);
     }
   },
 
