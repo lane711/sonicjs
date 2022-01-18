@@ -18,10 +18,10 @@ module.exports = new EntitySchema({
             type: "varchar"
         },
         createdByUserId: {
-            type: "int"
+            type: "uuid"
         },
         lastUpdatedByUserId: {
-            type: "int"
+            type: "uuid"
         },
         createdOn: {
             type: typeHelper.getDateTime()
