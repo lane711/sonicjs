@@ -1,3 +1,22 @@
 main {
 padding: 80px 15px 0
 }
+
+.home .feature-box {
+text-align: center;
+}
+
+.home .feature-box i {
+font-size: 9rem;
+margin: 3rem 0
+}
+
+.home .feature-box .title {
+font-size: 3rem;
+margin: 1rem 0
+}
+
+.home .feature-box .description {
+font-size: 1rem;
+margin: 1rem 0;
+}

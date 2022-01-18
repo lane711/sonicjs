@@ -5,6 +5,8 @@ const { Session } = require("../data/model/Session");
 const emitterService = require("../services/emitter.service");
 
 const crypto = require("crypto");
+const { contentDelete } = require("./data.service");
+const { uuid } = require("uuidv4");
 
 module.exports = dalService = {
   startup: async function (app) {
@@ -105,6 +107,7 @@ module.exports = dalService = {
 
     if (!user) {
       let newUser = new User();
+      newUser.id = uuid();
       newUser.username = email;
       newUser.salt = passwordHash.salt;
       newUser.hash = passwordHash.hash;
@@ -236,6 +239,7 @@ module.exports = dalService = {
     let isExisting = false;
     if (!id) {
       //upsert
+      content.id = uuid();
       content.contentTypeId = data.contentType;
       content.createdByUserId = userSession.user.id;
       content.createdOn = new Date();
@@ -262,6 +266,14 @@ module.exports = dalService = {
     const contentRepo = await getRepository(Content);
     if (userSession.user.profile.roles.includes("admin")) {
       return contentRepo.delete(id);
+    }
+  },
+
+  contentDeleteAll: async function (userSession) {
+    const contentRepo = await getRepository(Content);
+    contents = await contentRepo.find();
+    for (const content of contents) {
+      await contentRepo.delete(content.id);
     }
   },
 
@@ -292,13 +304,17 @@ module.exports = dalService = {
     }
   },
 
-  contentRestore: async function (id, url, data, userSession) {
+  contentRestore: async function (payload, userSession) {
     const contentRepo = await getRepository(Content);
-    data.lastUpdatedByUserId = "anonymous" ? 1 : data.lastUpdatedByUserId;
-    data.createdByUserId = "anonymous" ? 1 : data.lastUpdatedByUserId;
-
-    data.data = JSON.stringify(data.data);
-    let result = await contentRepo.save(data);
+//     let payload = {};
+//     payload.lastUpdatedByUserId = "anonymous" ? 1 : data.lastUpdatedByUserId;
+//     payload.createdByUserId = "anonymous" ? 1 : data.lastUpdatedByUserId;
+// paylod.createdOn = 
+// payload.updatedOn = 
+//     payload.id = id;
+//     payload.url = url;
+//     payload.data = data;
+    let result = await contentRepo.save(payload);
     // console.log(result);
   },
 

@@ -9,7 +9,7 @@ const axios = require("axios");
 const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 const chalk = require("chalk");
 var { GraphQLClient, gql, request } = require("graphql-request");
-const User = require("../schema/models/user");
+// const User = require("../schema/models/user");
 const dalService = require("./dal.service");
 
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;

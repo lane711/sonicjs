@@ -95,6 +95,7 @@
     "uglify-es": "^3.3.9",
     "underscore": "^1.12.0",
     "unzipper": "^0.10.11",
+    "uuidv4": "^6.2.12",
     "video.js": "^7.11.8",
     "yaml": "^1.10.0",
     "zencoder": "^2.0.1"

@@ -8,8 +8,8 @@ module.exports = new EntitySchema({
     columns: {
         id: {
             primary: true,
-            type: "int",
-            generated: true
+            type: "uuid",
+            generated: false
         },
         data: {
             type: "text"
@@ -32,9 +32,6 @@ module.exports = new EntitySchema({
         url: {
             type: "varchar",
             unique:true,
-        },
-        tags: {
-            type: "varchar"
         }
     },
 });
