@@ -5,7 +5,7 @@ var appRoot = require("app-root-path");
 // Enter copied or downloaded access id and secret here
 const ID = process.env.AMAZONID;
 const SECRET = process.env.AMAZONSECRET;
-var zencoder = require("zencoder")(process.env.ZENCODERKEY);
+// var zencoder = require("zencoder")(process.env.ZENCODERKEY);
 
 // Enter the name of the bucket that you have created here
 const bucketName = process.env.AMAZON_S3_BUCKETNAME;
@@ -68,35 +68,35 @@ module.exports = s3Service = {
 
   encodeVideo: function (url) {
     //https://app.zencoder.com/request_builder
-    zencoder.Job.create(
-      {
-        bucket: bucketName,
-        input: url,
-        size: "1280x720",
-        audio_bitrate: 160,
-        max_video_bitrate: 5000,
-        h264_profile: "main",
-        h264_level: "3.1",
-        max_frame_rate: 30,
-        outputs: [
-          {
-            bucket: "ocunite-zencoder",
-            public: true,
-            thumbnails: {
-              number: 3,
-              public: false,
-            },
-          },
-        ],
-      },
-      function (err, data) {
-        if (err) {
-          console.log(err);
-          return;
-        }
+    // zencoder.Job.create(
+    //   {
+    //     bucket: bucketName,
+    //     input: url,
+    //     size: "1280x720",
+    //     audio_bitrate: 160,
+    //     max_video_bitrate: 5000,
+    //     h264_profile: "main",
+    //     h264_level: "3.1",
+    //     max_frame_rate: 30,
+    //     outputs: [
+    //       {
+    //         bucket: "ocunite-zencoder",
+    //         public: true,
+    //         thumbnails: {
+    //           number: 3,
+    //           public: false,
+    //         },
+    //       },
+    //     ],
+    //   },
+    //   function (err, data) {
+    //     if (err) {
+    //       console.log(err);
+    //       return;
+    //     }
 
-        console.log("zencoder-->", data);
-      }
-    );
+    //     console.log("zencoder-->", data);
+    //   }
+    // );
   },
 };
