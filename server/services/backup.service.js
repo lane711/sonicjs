@@ -78,12 +78,10 @@ module.exports = backUpService = {
     archive.finalize();
 
     output.on("close", function () {
-      console.log("close " + zipPath);
+      console.log("backup completed: " + zipPath);
       backUpService.cleanupTempFiles();
     });
-    // });
 
-    return;
   },
 
   uploadToDropBox: async function (sourceFilePath, destinationFileName) {

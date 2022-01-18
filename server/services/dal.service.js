@@ -304,13 +304,17 @@ module.exports = dalService = {
     }
   },
 
-  contentRestore: async function (id, url, data, userSession) {
+  contentRestore: async function (payload, userSession) {
     const contentRepo = await getRepository(Content);
-    data.lastUpdatedByUserId = "anonymous" ? 1 : data.lastUpdatedByUserId;
-    data.createdByUserId = "anonymous" ? 1 : data.lastUpdatedByUserId;
-
-    data.data = JSON.stringify(data.data);
-    let result = await contentRepo.save(data);
+//     let payload = {};
+//     payload.lastUpdatedByUserId = "anonymous" ? 1 : data.lastUpdatedByUserId;
+//     payload.createdByUserId = "anonymous" ? 1 : data.lastUpdatedByUserId;
+// paylod.createdOn = 
+// payload.updatedOn = 
+//     payload.id = id;
+//     payload.url = url;
+//     payload.data = data;
+    let result = await contentRepo.save(payload);
     // console.log(result);
   },
 

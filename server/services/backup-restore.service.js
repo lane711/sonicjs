@@ -14,23 +14,27 @@ module.exports = backUpRestoreService = {
   startup: async function (app) {
     if (backUpRestoreUrl) {
       app.get(backUpRestoreUrl, async function (req, res) {
-        await backUpRestoreService.importJsonFiles(req);
+        const backupFilePath = `${appRoot.path}${req.query.file}`;
+        await backUpRestoreService.importJsonFiles(req, backupFilePath);
         // await backUpRestoreService.zipBackUpDirectory();
         // backUpRestoreService.uploadToDropBox();
-        res.sendStatus(200);
+        res.redirect(`/admin/backup-restore`);
       });
     }
   },
 
-  importJsonFiles: async function (req) {
+  importJsonFiles: async function (req, backupFilePath) {
     console.log("starting restore");
     //unzip into json files
 
-    const backupFilePath = `${appRoot.path}${req.query.file}`;
+    fileService.deleteFilesInDirectory(
+      `${appRoot.path}/backups/temp/restore/user`
+    );
+    fileService.deleteFilesInDirectory(
+      `${appRoot.path}/backups/temp/restore/content`
+    );
+
     const extractToPath = `${appRoot.path}/backups/temp/restore`;
-    // fs.createReadStream(backupFilePath).pipe(
-    //   unzipper.Extract({ path: `${appRoot.path}/backups/temp/restore` })
-    // );
 
     fs.createReadStream(backupFilePath)
       .pipe(unzipper.Extract({ path: extractToPath }))
@@ -46,13 +50,12 @@ module.exports = backUpRestoreService = {
   },
 
   processJsonFiles: async function (req) {
-
     var contentFiles = fileService.getFilesSync(
       "/backups/temp/restore/content"
     );
 
     console.log("file count:" + contentFiles.length);
-    if(contentFiles.length){
+    if (contentFiles.length) {
       await dalService.contentDeleteAll(req);
     }
     for (let index = 0; index < contentFiles.length; index++) {
@@ -67,15 +70,8 @@ module.exports = backUpRestoreService = {
 
         if (contentFile) {
           let payload = JSON.parse(contentFile);
-          let id = parseInt(file.replace(".json", ""));
-          payload.id = id;
           try {
-            await dalService.contentRestore(
-              id,
-              payload.url,
-              payload,
-              req.sessionID
-            );
+            await dalService.contentRestore(payload, req.sessionID);
           } catch (error) {
             console.log("id", id);
 
@@ -86,16 +82,5 @@ module.exports = backUpRestoreService = {
       }
     }
   },
-  // var userFiles = fileService.getFilesSync("/backups/user");
 
-  // for (let index = 0; index < userFiles.length; index++) {
-  //   const file = userFiles[index];
-  //   let userFile = fileService.getFileSync(`/backups/user/${file}`);
-  //   if (userFile) {
-  //     let payload = JSON.parse(userFile);
-  //     let id = parseInt(file.replace('.json', ''));
-  //     payload.id = id;
-  //     await dalService.userRestore(id, payload.url, payload, req.sessionID);
-  //   }
-  // }
 };
