@@ -146,7 +146,8 @@ module.exports = adminService = {
 
         if (viewName == "admin-backup-restore") {
           data.backupUrl = process.env.BACKUP_URL;
-          data.files = fileService.getFilesSearchSync(fileService.getRootAppPath() + "/backups", "/**/*.zip");
+          data.restoreUrl = process.env.BACKUP_RESTORE_URL;
+          data.files = fileService.getFilesSearchSync(fileService.getRootAppPath() + "/backups", "/**/*.zip").reverse();
           data.data = await urlService.getUrls();
         }
 
