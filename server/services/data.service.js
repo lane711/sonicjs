@@ -205,7 +205,8 @@ if (typeof module !== "undefined" && module.exports) {
     (exports.getContentAdmin = async function (sessionID) {
       let contents = await this.getContent(sessionID);
       let data = _.sortBy(contents, "updatedOn");
-      return data;
+      let dataFiltered = data.filter(d => d.contentTypeId === 'page' || d.contentTypeId === 'blog');
+      return dataFiltered;
     }),
     (exports.getContentByType = async function (contentType, sessionID) {
       // const query = gql`

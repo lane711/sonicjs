@@ -42,8 +42,6 @@ if (typeof module !== "undefined" && module.exports) {
         }
 
         axiosInstance = axios.create(defaultOptions);
-
-        // axiosInstance = axios.create({ baseURL: globalService.baseUrl });
       }
     });
 
@@ -74,14 +72,7 @@ if (typeof module !== "undefined" && module.exports) {
 
     app.post("/video-upload", async function (req, res, next) {
       let filePath = req.files.file.path;
-      // var data = _.pick(req.body, "type"),
-      //   uploadPath = path.normalize(cfg.data + "/uploads"),
-      //   file = req.files.file;
 
-      // console.log(file.name); //original name (ie: sunset.png)
-      // console.log(file.path); //tmp path (ie: /tmp/12345-xyaz.png)
-      // console.log(uploadPath); //uploads directory: (ie: /home/user/data/uploads)
-      //set cookie
       res.cookie("videoPath", filePath, { maxAge: 900000, httpOnly: true });
 
       res.send(filePath);
@@ -104,7 +95,10 @@ if (typeof module !== "undefined" && module.exports) {
           sessionID
         );
       } else if (contentTypeId) {
-        contentType = await dataService.contentTypeGet(contentTypeId, sessionID);
+        contentType = await dataService.contentTypeGet(
+          contentTypeId,
+          sessionID
+        );
 
         //add a hidden object for the formsettings id so we can look it up on form submission
         if (formSettingsId) {
@@ -133,38 +127,16 @@ if (typeof module !== "undefined" && module.exports) {
         return;
       }
 
-      // emitterService.emit('getFormPostContentType', contentType);
 
       if (!onFormSubmitFunction) {
         onFormSubmitFunction = "editInstance(submission,true)";
       }
 
-      // let name = `${contentType.systemId}Form`;
-      // let settings = await this.getFormSettings(contentType, content);
-      // let components = await this.getFormComponents(contentType, content);
-      // const formJSON = {
-      //   components: components,
-      //   name: name,
-      //   settings: settings
-      // };
-      // debugger;
+
       const formJSON = await exports.getFormJson(contentType, content);
 
       let form = "";
-      // let form = "<script type='text/javascript'> const formJSON = ";
-      // form += JSON.stringify(formJSON);
-      // form += "</script>";
 
-      // form += "<script type='text/javascript'> const formValuesToLoad = ";
-      // if (content) {
-      //     form += JSON.stringify(content.data);
-      // }
-      // else {
-      //     form += "{}";
-      // }
-      // form += "</script>";
-
-      // debugger;
       let data = { viewModel: {}, viewPath: "/server/assets/html/form.html" };
       data.viewModel.onFormSubmitFunction = onFormSubmitFunction;
       data.viewModel.formJSON = JSON.stringify(formJSON);
@@ -241,10 +213,8 @@ if (typeof module !== "undefined" && module.exports) {
       return settings;
     }),
     (exports.getFormComponents = async function (contentType, content) {
-      // let contentTypeDef = await dataService.contentTypeGet(content.data.contentType);
-      // console.log('contentTypeDef', contentTypeDef);
-      // debugger;
-      let components = contentType.data.components;
+
+      let components = contentType.data?.components;
 
       if (content) {
         this.addBaseContentTypeFields(
@@ -266,45 +236,20 @@ if (typeof module !== "undefined" && module.exports) {
       return components;
     }),
     (exports.addBaseContentTypeFields = function (id, contentType, controls) {
-      // console.log('addBaseContentTypeFields', contentType, controls);
+      // console.log("addBaseContentTypeFields", contentType, controls);
 
-      controls.push({
-        type: "textfield",
-        key: "id",
-        label: "id",
-        customClass: "hide",
-        defaultValue: id,
-        hidden: false,
-        input: true,
-      });
+      if (controls) {
+        controls.push({
+          type: "textfield",
+          key: "id",
+          label: "id",
+          customClass: "hide",
+          defaultValue: id,
+          hidden: false,
+          input: true,
+        });
+      }
 
-      //   controls.push({
-      //     type: 'textfield',
-      //     key: 'contentTypeId',
-      //     label: 'contentTypeId',
-      //     defaultValue: contentType,
-      //     input: true
-      //   });
-
-      // if(isToBePopulatedWithExistingContent){
-      //   let controlId = new HiddenQuestion({
-      //     key: 'id',
-      //     label: 'Id',
-      //     value: contentType.id,
-      //     required: true,
-      //     order: 0
-      //   });
-      //   controls.push(controlId);
-
-      //   let controlContentType = new HiddenQuestion({
-      //     key: 'contentTypeId',
-      //     label: 'Content Type',
-      //     value: contentType.systemId,
-      //     required: true,
-      //     order: 1
-      //   });
-      //   controls.push(controlContentType);
-      // }
     });
 
   exports.setFormApiUrls = async function (Formio) {
