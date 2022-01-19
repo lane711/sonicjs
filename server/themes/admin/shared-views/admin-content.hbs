@@ -65,9 +65,16 @@
         </button>
       </div>
       <div class="modal-body">
-        <h5>Select a content type to add:</h5>
+        <h3>Common Content Types</h3>
+
+        <a class='btn btn-success' data-content-type="page" href="/admin/content/edit/page">Page</a>
+
+          <a class='btn btn-success' data-content-type="blog" href="/admin/content/edit/blog">Blog</a>
+
+            <hr>
+        <h5>Other Content Types (Typically added in the front end)</h5>
         {{#each data.contentTypes}}
-        <a class='btn btn-success' data-content-type="{{ this.systemId }}" href="/admin/content/edit/{{ this.systemId }}">
+        <a class='btn btn-primary' data-content-type="{{ this.systemId }}" href="/admin/content/edit/{{ this.systemId }}">
           {{ this.title }}</a>
         {{/each}}
       </div>
