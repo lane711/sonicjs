@@ -32,6 +32,14 @@ module.exports = adminService = {
     this.checkIfAdminAccountIsCreated();
 
     app.get(
+      "/admin",
+      connectEnsureLogin.ensureLoggedIn(),
+      async function (req, res) {
+        res.redirect('/admin/content');
+      }
+    );
+
+    app.get(
       "/admin*",
       connectEnsureLogin.ensureLoggedIn(),
       async function (req, res) {
@@ -45,7 +53,7 @@ module.exports = adminService = {
         globalService.setAreaMode(true, false, true);
 
         let path = req.url.split("/");
-        let viewName = "admin-dashboard";
+        let viewName = "admin-content";
         let param1 = null;
         let param2 = null;
 
@@ -147,7 +155,12 @@ module.exports = adminService = {
         if (viewName == "admin-backup-restore") {
           data.backupUrl = process.env.BACKUP_URL;
           data.restoreUrl = process.env.BACKUP_RESTORE_URL;
-          data.files = fileService.getFilesSearchSync(fileService.getRootAppPath() + "/backups", "/**/*.zip").reverse();
+          data.files = fileService
+            .getFilesSearchSync(
+              fileService.getRootAppPath() + "/backups",
+              "/**/*.zip"
+            )
+            .reverse();
           data.data = await urlService.getUrls();
         }
 
