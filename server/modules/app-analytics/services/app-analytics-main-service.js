@@ -39,7 +39,7 @@ module.exports = appAnalyticsMainService = {
     if (process.env.ANALYTICS_RECEIVE_URL) {
       if (app) {
         app.post(process.env.ANALYTICS_RECEIVE_URL, async function (req, res) {
-          appAnalyticsMainService.processEvent(req.body);
+          appAnalyticsMainService.processEvent(req.body, req.ip);
           res.json({ ok: "ok" });
         });
       }
@@ -72,7 +72,13 @@ module.exports = appAnalyticsMainService = {
     return installFile;
   },
 
-  processEvent: async function (data) {
+  getLocation: async function(ipAddress){
+    let token = process.env.IPINFO_TOKEN
+    let result = await axios.get(`https://ipinfo.io/${ipAddress}?token=${token}`);
+    return result.data;
+  },
+
+  processEvent: async function (data, ipAddress) {
     let profileUrl = `/analytics/${data.installId}`;
     let profile = await dataService.getContentByUrl(profileUrl);
     let timeStamp = new Date().toISOString();
@@ -92,6 +98,7 @@ module.exports = appAnalyticsMainService = {
           bootCount: 1,
         },
       };
+      payload.location = await appAnalyticsMainService.getLocation(ipAddress);
       profile = await dataService.contentCreate(payload, false, 0);
     }
 

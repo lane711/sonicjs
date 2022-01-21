@@ -119,13 +119,12 @@ function setupPassport(app) {
   );
 
   passport.serializeUser(function (user, done) {
-    console.log('serializeUser', user);
+    // console.log('serializeUser', user);
     done(null, user);
   });
 
   passport.deserializeUser(function (user, done) {
-    console.log('deserializeUser', user);
-
+    // console.log('deserializeUser', user);
     done(null, user);
   });
 
