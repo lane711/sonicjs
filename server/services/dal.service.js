@@ -6,7 +6,7 @@ const emitterService = require("../services/emitter.service");
 
 const crypto = require("crypto");
 const { contentDelete } = require("./data.service");
-const { v4: uuidv4 } = require('uuid');
+const uuid = require('uuid').v4;
 
 module.exports = dalService = {
   startup: async function (app) {

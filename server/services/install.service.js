@@ -24,7 +24,7 @@ module.exports = installService = {
   checkDefaultContent: async function (app) {
     console.log(logSymbols.info, 'Checking Base Content...');
 
-    let session = {user : {id:0}};
+    let session = {user : {id:"69413190-833b-4318-ae46-219d690260a9"}};
 
     let siteSettingsColors = await dataService.getContentByType(
       "site-settings-colors"
