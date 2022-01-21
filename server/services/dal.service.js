@@ -6,7 +6,7 @@ const emitterService = require("../services/emitter.service");
 
 const crypto = require("crypto");
 const { contentDelete } = require("./data.service");
-const uuid = require('uuid').v4;
+const uuid = require("uuid").v4;
 
 module.exports = dalService = {
   startup: async function (app) {
@@ -107,7 +107,7 @@ module.exports = dalService = {
 
     if (!user) {
       let newUser = new User();
-      newUser.id = uuidv4();
+      newUser.id = uuid();
       newUser.username = email;
       newUser.salt = passwordHash.salt;
       newUser.hash = passwordHash.hash;
@@ -306,14 +306,14 @@ module.exports = dalService = {
 
   contentRestore: async function (payload, userSession) {
     const contentRepo = await getRepository(Content);
-//     let payload = {};
-//     payload.lastUpdatedByUserId = "anonymous" ? 1 : data.lastUpdatedByUserId;
-//     payload.createdByUserId = "anonymous" ? 1 : data.lastUpdatedByUserId;
-// paylod.createdOn = 
-// payload.updatedOn = 
-//     payload.id = id;
-//     payload.url = url;
-//     payload.data = data;
+    //     let payload = {};
+    //     payload.lastUpdatedByUserId = "anonymous" ? 1 : data.lastUpdatedByUserId;
+    //     payload.createdByUserId = "anonymous" ? 1 : data.lastUpdatedByUserId;
+    // paylod.createdOn =
+    // payload.updatedOn =
+    //     payload.id = id;
+    //     payload.url = url;
+    //     payload.data = data;
     let result = await contentRepo.save(payload);
     // console.log(result);
   },
