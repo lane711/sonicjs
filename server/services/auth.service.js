@@ -174,6 +174,10 @@ module.exports = authService = {
             return next(err);
           }
 
+          // TODO: fix this, the user is sometimes redirected to the login screen as if the login hasn't set in yet
+          // this usually only happens on a new site when creating the root admin
+          helperService.sleep(500);
+
           if (!req.session.returnTo) {
             console.log("redirect to admin");
             return res.redirect("/admin");

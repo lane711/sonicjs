@@ -24,6 +24,7 @@ var authService = require("../services/auth.service");
 var dalService = require("../services/dal.service");
 var backupService = require("../services/backup.service");
 var backupRestoreService = require("../services/backup-restore.service");
+var migrateService = require("../services/migration.service");
 
 var helperService = require("../services/helper.service");
 var sharedService = require("../services/shared.service");
@@ -49,6 +50,7 @@ exports.loadRoutes = async function (app) {
   formService.startup(app);
   backupService.startup(app);
   backupRestoreService.startup(app);
+  migrateService.startup(app);
 
   let page = "";
   let adminPage = "";

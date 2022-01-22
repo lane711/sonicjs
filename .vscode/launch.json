@@ -4,6 +4,7 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
+
     {
       "type": "node",
       "request": "launch",
@@ -29,6 +30,12 @@
       "request": "launch",
       "name": "Migrate to SQLite",
       "program": "${workspaceFolder}/server/boot/mongo-to-sqlite.js"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Migrate Postgres to UUID",
+      "program": "${workspaceFolder}/server/boot/postgres-to-uuid.js"
     },
     {
       "type": "node",

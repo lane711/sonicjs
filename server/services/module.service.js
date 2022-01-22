@@ -80,7 +80,7 @@ module.exports = moduleService = {
     return moduleDef;
   },
 
-  getModuleContentTypesAdmin: async function (systemId,  session, req) {
+  getModuleContentTypesAdmin: async function (systemId, session, req) {
     let basePath = `${appRoot.path}/server/modules/${systemId}/models`;
     // let file = await fileService.getFile(`${basePath}/module.json`);
     // return file;
@@ -131,7 +131,7 @@ module.exports = moduleService = {
       let raw = fileService.getFileSync(file); // fs.readFileSync(file);
       if (raw && raw.length > 0) {
         let moduleDef = JSON.parse(raw);
-        let moduleFolder =file.replace("/server/modules/", "").replace("/module.json","");
+        let moduleFolder = file.replace("/server/modules/", "").replace("/module.json", "");
         moduleDef.mainService = `${path}\/${moduleFolder}\/services\/${moduleFolder}-main-service.js`;
         moduleList.push(moduleDef);
       }
@@ -188,21 +188,25 @@ module.exports = moduleService = {
   },
 
   getModuleContentType: async function (contentTypeSystemId, session, req) {
-    let = rootDomain = `${req.protocol}://${req.get('host')}`;
-    let configInfo = await globalService.moduleContentTypeConfigs.filter(
-      (x) => x.systemId === contentTypeSystemId
-    );
-    if (configInfo[0]) {
-      let config = fileService.getFileSync(configInfo[0].filePath);
-      config = config.replace('http://localhost:3018', rootDomain);
-      let contentType = JSON.parse(config);
-      return contentType;
+    if (req) {
+      let =
+      rootDomain = `${req.protocol}://${req.get('host')}`;
+      let configInfo = await globalService.moduleContentTypeConfigs.filter(
+        (x) => x.systemId === contentTypeSystemId
+      );
+      if (configInfo[0]) {
+        let config = fileService.getFileSync(configInfo[0].filePath);
+        config = config.replace('http://localhost:3018', rootDomain);
+        let contentType = JSON.parse(config);
+        return contentType;
+      }
     }
     return {};
   },
 
   getModuleContentTypes: async function (userSession, req) {
-    let = rootDomain = `${req.protocol}://${req.get('host')}`;
+    let =
+    rootDomain = `${req.protocol}://${req.get('host')}`;
     let configInfos = await globalService.moduleContentTypeConfigs;
     let configs = [];
     configInfos.forEach((configInfo) => {
@@ -224,7 +228,7 @@ module.exports = moduleService = {
     contentTypeDef.title = contentTypeDef.title
       ? contentTypeDef.title
       : contentTypeDef.moduleSystemId;
-    contentTypeDef.data = { components: [] };
+    contentTypeDef.data = {components: []};
     let contentTypeDefObj = JSON.stringify(contentTypeDef);
     await fileService.writeFile(contentTypeDef.filePath, contentTypeDefObj);
     //reload modules
@@ -409,7 +413,7 @@ module.exports = moduleService = {
       moduleSystemId: moduleDefinitionFile.systemId,
       systemId: moduleDefinitionFile.systemId,
       title: moduleDefinitionFile.title,
-      data: { components: [] },
+      data: {components: []},
     };
 
     contentTypeDef.data.components.push({
@@ -417,7 +421,7 @@ module.exports = moduleService = {
       type: "textfield",
       input: true,
       key: "title",
-      validate: { required: true },
+      validate: {required: true},
     });
     contentTypeDef.data.components.push({
       label: "Submit",
@@ -434,7 +438,7 @@ module.exports = moduleService = {
       moduleSystemId: moduleDefinitionFile.systemId,
       systemId: `${moduleDefinitionFile.systemId}-settings`,
       title: `${moduleDefinitionFile.title} Settings`,
-      data: { components: [] },
+      data: {components: []},
     };
 
     contentTypeDefSettings.data.components.push({

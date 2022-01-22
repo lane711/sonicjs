@@ -33,7 +33,6 @@ module.exports = contactUsMainService = {
         options.req.sessionID
       );
 
-      // console.log('contact module after view model', options.viewModel);
     });
 
     emitterService.on("afterFormSubmit", async function (options) {
