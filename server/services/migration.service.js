@@ -10,11 +10,11 @@ const {getRepository, Like} = require("typeorm");
 const {Content} = require("../data/model/Content");
 const globalService = require("./global.service");
 const axios = require("axios");
-
+const _ = require("underscore")
 const token = process.env.DROPBOX_TOKEN;
 const migrateUrl = process.env.MIGRATE_URL;
 const session = {user: {id: "69413190-833b-4318-ae46-219d690260a9"}};
-const idMapTable = [];
+var idMapTable = [];
 
 module.exports = migrationService = {
   startup: async function (app) {
@@ -87,42 +87,48 @@ module.exports = migrationService = {
     // typeorm.createConnection().then((connection) => {
     // const contentRepo = getRepository(Content);
 
+    idMapTable = _.sortBy(idMapTable, 'oldId');
+
     for (let index = 0; index < idMapTable.length; index++) {
       const contentData = idMapTable[index];
-      if(contentData.oldId === "47"){
-        let x = 1;
-      }
+
       console.log("map-->", contentData);
 
+      //handle with front slash then quote refs
       let contentToBeUpdated = await dalService.contentGet("", "", "", "", "", "", undefined, false,
         true, `%\\\\"${contentData.oldId}\\\\"%`);
-      //   = await contentRepo.find({
-      //   data: Like(`%${contentData.oldId}%`),
-      // });
+      migrationService.updateWithNewId(contentToBeUpdated, contentData);
 
-      if (contentToBeUpdated.length > 0) {
-        for (let index = 0; index < contentToBeUpdated.length; index++) {
-          const content = contentToBeUpdated[index];
-          console.log("replacing-->", content.id);
-          let contentRecord = await dalService.contentGet(content.id,"", "", "", "", "", undefined, false,
-            true, undefined);
+      //handle with simple quotes
+      let contentToBeUpdated2 = await dalService.contentGet("", "", "", "", "", "", undefined, false,
+        true, `%"${contentData.oldId}"%`);
+      migrationService.updateWithNewId(contentToBeUpdated2, contentData);
 
-          //   await contentRepo.findOne({
-          //   where: {id: content.id},
-          // });
-          console.log(contentRecord);
-          // contentRecord.lastUpdatedByUserId = 3;
-          contentRecord.data = JSON.stringify(contentRecord.data);
-          contentRecord.data = contentRecord.data.replace(
-            contentData.oldId,
-            contentData.newId
-          );
-          if(contentRecord.contentTypeId === 'section'){
-            let data = JSON.parse(contentRecord.data);
-            await dalService.contentUpdate(content.id, content.url, data, session, true);
-          }
 
-        }
+    }
+  },
+
+  updateWithNewId: async function (contentToBeUpdated, contentData) {
+    if (contentToBeUpdated.length > 0) {
+      for (let index = 0; index < contentToBeUpdated.length; index++) {
+        const content = contentToBeUpdated[index];
+        console.log("replacing-->", content.id);
+        let contentRecord = await dalService.contentGet(content.id, "", "", "", "", "", undefined, false,
+          true, undefined);
+
+        //   await contentRepo.findOne({
+        //   where: {id: content.id},
+        // });
+        console.log(contentRecord);
+        // contentRecord.lastUpdatedByUserId = 3;
+        contentRecord.data = JSON.stringify(contentRecord.data);
+        contentRecord.data = contentRecord.data.replace(
+          contentData.oldId,
+          contentData.newId
+        );
+        let data = JSON.parse(contentRecord.data);
+        await dalService.contentUpdate(content.id, content.url, data, session, true);
+
       }
     }
   },
