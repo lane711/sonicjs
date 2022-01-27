@@ -6,7 +6,7 @@ const emitterService = require("../services/emitter.service");
 
 const crypto = require("crypto");
 const { contentDelete } = require("./data.service");
-const uuid = require("uuid").v4;
+const { v4: uuidv4 } = require('uuid');
 
 module.exports = dalService = {
   startup: async function (app) {
@@ -107,7 +107,7 @@ module.exports = dalService = {
 
     if (!user) {
       let newUser = new User();
-      newUser.id = uuid();
+      newUser.id = uuidv4();
       newUser.username = email;
       newUser.salt = passwordHash.salt;
       newUser.hash = passwordHash.hash;
@@ -239,7 +239,7 @@ module.exports = dalService = {
     let isExisting = false;
     if (!id) {
       //upsert
-      content.id = uuid();
+      content.id = uuidv4();
       content.contentTypeId = data.contentType;
       content.createdByUserId = userSession.user.id;
       content.createdOn = new Date();
