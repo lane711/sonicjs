@@ -102,7 +102,7 @@ module.exports = fileService = {
     let storageOption = process.env.FILE_STORAGE;
     if (
       storageOption === "AMAZON_S3" &&
-      file.name.match(/.(jpg|jpeg|png|gif|svg)$/i)
+      file.name.match(/.(jpg|jpeg|png|gif|svg|mp4)$/i)
     ) {
       var title = file.name.replace(/^.*[\\\/]/, "");
       let result = await s3Service.upload(

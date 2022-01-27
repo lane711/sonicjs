@@ -3,7 +3,7 @@ padding: 80px 15px 0
 }
 
 .home .feature-box {
-text-align: center;
+text-align: center
 }
 
 .home .feature-box i {
@@ -18,5 +18,67 @@ margin: 1rem 0
 
 .home .feature-box .description {
 font-size: 1rem;
-margin: 1rem 0;
+margin: 1rem 0
+}
+
+.home-partner {
+background: grey
+}
+
+h1 {
+font-size: 3rem
+}
+
+h2 {
+font-size: 2.4rem
+}
+
+h3 {
+font-size: 2rem
+}
+
+.pt-5 {
+padding-top: 8rem!important
+}
+
+.pb-5 {
+padding-bottom: 8rem!important
+}
+
+.pt-4 {
+padding-top: 5rem!important
+}
+
+.pb-4 {
+padding-bottom: 5rem!important
+}
+
+.client-logos {
+background: url(images/bar-bg.jpg) repeat-x
+}
+
+.client-logos .table {
+display: table;
+margin: 0 auto
+}
+
+.client-logos ul#horizontal-list {
+min-width: 696px;
+list-style: none;
+padding-top: 20px
+}
+
+.client-logos ul#horizontal-list li {
+display: inline
+}
+
+.client-logos .short img{
+    height:100px;
+    width:auto;
+  margin: 0 70px
+}
+
+.client-logos img {
+width: 250px;
+margin: 0 20px
 }
