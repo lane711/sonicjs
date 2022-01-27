@@ -1,0 +1,15 @@
+version: "3.3"
+services:
+  cms:
+    build:
+        context: .
+    container_name: sonicjs-cms
+    ports:
+      - "3018:3018"
+    volumes:
+      - data:/app
+    environment:
+      NODE_ENV: dev
+volumes:
+  data:
+    driver: local
