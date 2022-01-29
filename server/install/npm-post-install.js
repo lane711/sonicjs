@@ -1,11 +1,11 @@
-console.log("\nWelcome to:\n\n");
+console.log('\nWelcome to:\n\n')
 console.log(`███████╗ ██████╗ ███╗   ██╗██╗ ██████╗     ██╗███████╗
 ██╔════╝██╔═══██╗████╗  ██║██║██╔════╝     ██║██╔════╝
 ███████╗██║   ██║██╔██╗ ██║██║██║          ██║███████╗
 ╚════██║██║   ██║██║╚██╗██║██║██║     ██   ██║╚════██║
 ███████║╚██████╔╝██║ ╚████║██║╚██████╗╚█████╔╝███████║
 ╚══════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚════╝ ╚══════╝
-                                                      `);
+                                                      `)
 console.log(
-  `Last Step: You need to install the SonicJs database.\n\nPlease run:\n\n"npm run setup"\n\n`
-);
+  'Last Step: You need to install the SonicJs database.\n\nPlease run:\n\n"npm run setup"\n\n'
+)

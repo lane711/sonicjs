@@ -1,43 +1,43 @@
-var dataService = require("./data.service");
-var helperService = require("./helper.service");
-var emitterService = require("./emitter.service");
-var globalService = require("./global.service");
+const dataService = require('./data.service')
+const helperService = require('./helper.service')
+const emitterService = require('./emitter.service')
+const globalService = require('./global.service')
 // var loopback = require("loopback");
 // var app = loopback();
-var fs = require("fs");
-const axios = require("axios");
-const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
-const chalk = require("chalk");
-var { GraphQLClient, gql, request } = require("graphql-request");
+const fs = require('fs')
+const axios = require('axios')
+const ShortcodeTree = require('shortcode-tree').ShortcodeTree
+const chalk = require('chalk')
+const { GraphQLClient, gql, request } = require('graphql-request')
 // const User = require("../schema/models/user");
-const dalService = require("./dal.service");
+const dalService = require('./dal.service')
 
-var frontEndTheme = `${process.env.FRONT_END_THEME}`;
-const adminTheme = `${process.env.ADMIN_THEME}`;
+const frontEndTheme = `${process.env.FRONT_END_THEME}`
+const adminTheme = `${process.env.ADMIN_THEME}`
 
 module.exports = userService = {
   startup: async function (app) {
-    emitterService.on("getRenderedPagePostDataFetch", async function (options) {
+    emitterService.on('getRenderedPagePostDataFetch', async function (options) {
       if (options) {
         options.page.data.showPageBuilder = await userService.isAuthenticated(
           options.req
-        );
+        )
       }
-    });
+    })
 
-    app.get("/api-admin/roles", async function (req, res) {
-      let data = await dataService.rolesGet(req.sessionID);
-      let roles = data.map((r) => {
-        return { id: r.data.key, name: r.data.title };
-      });
-      res.send(roles);
-    });
+    app.get('/api-admin/roles', async function (req, res) {
+      const data = await dataService.rolesGet(req.sessionID)
+      const roles = data.map((r) => {
+        return { id: r.data.key, name: r.data.title }
+      })
+      res.send(roles)
+    })
   },
 
   registerUser: async function (email, password, isAdmin = false) {
-    let passwordHash = await dalService.hashPassword(password);
+    const passwordHash = await dalService.hashPassword(password)
 
-    return await dalService.userRegister(email, passwordHash, isAdmin);
+    return await dalService.userRegister(email, passwordHash, isAdmin)
     // User.register({ username: username, active: false }, password);
     // let passwordHash = crypto.createHash('md5').update('password').digest("hex")
 
@@ -56,7 +56,7 @@ module.exports = userService = {
   },
 
   loginUser: async function (email, password) {
-    return await dalService.userGetByLogin(email, password);
+    return await dalService.userGetByLogin(email, password)
     // const query = gql`
     //   mutation{
     //     userCreate(email:"${email}", password:"${password}"){
@@ -80,11 +80,11 @@ module.exports = userService = {
           password
         }
       }
-    `;
+    `
 
-    let data = await dataService.executeGraphqlQuery(query);
+    const data = await dataService.executeGraphqlQuery(query)
 
-    return data.users;
+    return data.users
   },
 
   getUser: async function (id, sessionID) {
@@ -97,33 +97,33 @@ module.exports = userService = {
         profile
       }
       }
-        `;
+        `
 
-    let data = await dataService.executeGraphqlQuery(query);
+    const data = await dataService.executeGraphqlQuery(query)
 
-    return data.user;
+    return data.user
   },
 
   getRoles: async function (sessionID) {
-    let data = await dataService.getContentByContentType("role", sessionID);
+    const data = await dataService.getContentByContentType('role', sessionID)
 
-    return data;
+    return data
   },
 
   mapUserRoles: async function (user) {
-    let roles = await userService.getRoles();
+    const roles = await userService.getRoles()
 
     if (user.profile.roles) {
-      user.roleMapping = [];
+      user.roleMapping = []
       user.profile.roles.forEach((role) => {
-        let roleRecord = roles.filter((x) => x.id === role);
+        const roleRecord = roles.filter((x) => x.id === role)
         if (roleRecord) {
-          user.roleMapping.push(roleRecord[0].data.title);
+          user.roleMapping.push(roleRecord[0].data.title)
         }
-      });
+      })
     }
 
-    return data;
+    return data
   },
 
   // getRole: async function (id) {
@@ -158,12 +158,12 @@ module.exports = userService = {
   isAuthenticated: async function (req) {
     // console.log("user account", req.user);
     if (req.user && req.user.username) {
-      return true;
+      return true
     }
-    return false;
-  },
+    return false
+  }
 
   // getToken: async function (req) {
   //   return req.signedCookies.sonicjs_access_token;
   // },
-};
+}

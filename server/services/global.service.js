@@ -1,54 +1,54 @@
 (function (exports) {
-  var isAdminUserCreated = false;
-  var axiosInstance;
-  var baseUrl;
-  var moduleDefinitions = [];
-  var moduleDefinitionsForColumns = [];
-  var moduleCssFiles = [];
-  var moduleJsFiles = [];
-  var moduleContentTypeConfigs = [];
-  var AccessToken;
-  var isRequestAlreadyHandled = false;
-  var isBackEnd = false;
-  var isFrontEnd = false;
-  var isPageBuilder = false;
-  var path;
+  const isAdminUserCreated = false
+  let axiosInstance
+  let baseUrl
+  const moduleDefinitions = []
+  const moduleDefinitionsForColumns = []
+  const moduleCssFiles = []
+  const moduleJsFiles = []
+  const moduleContentTypeConfigs = []
+  let AccessToken
+  const isRequestAlreadyHandled = false
+  const isBackEnd = false
+  const isFrontEnd = false
+  const isPageBuilder = false
+  let path
 
-  if (typeof module !== "undefined" && module.exports) {
+  if (typeof module !== 'undefined' && module.exports) {
 
   } else {
-    //client version
+    // client version
   }
 
   exports.isBackEnd = function () {
-    return window.location.pathname.startsWith('/admin');
-  };
+    return window.location.pathname.startsWith('/admin')
+  }
 
   exports.getAppVersion = function () {
-    const path = require("path");
-    let packageJsonPath = path.join(__dirname, "../..", "package.json");
-    var pjson = require(packageJsonPath);
+    const path = require('path')
+    const packageJsonPath = path.join(__dirname, '../..', 'package.json')
+    const pjson = require(packageJsonPath)
     if (pjson) {
-      return pjson.version;
+      return pjson.version
     }
-  };
+  }
 
   exports.asyncForEach = async function (array, callback) {
     for (let index = 0; index < array.length; index++) {
-      await callback(array[index], index, array);
+      await callback(array[index], index, array)
     }
-  };
+  }
 
   exports.setAreaMode = function (
     isBackEnd = false,
     isFrontEnd = false,
     isAuthenticated = false
   ) {
-    this.isBackEnd = isBackEnd;
-    this.isFrontEnd = isFrontEnd;
-    this.isPageBuilder = isFrontEnd && isAuthenticated;
-  };
-})(typeof exports === "undefined" ? (this["globalService"] = {}) : exports);
+    this.isBackEnd = isBackEnd
+    this.isFrontEnd = isFrontEnd
+    this.isPageBuilder = isFrontEnd && isAuthenticated
+  }
+})(typeof exports === 'undefined' ? (this.globalService = {}) : exports)
 
 // var emitterService = require('./emitter.service');
 // var os = require("os");

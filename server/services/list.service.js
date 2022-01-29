@@ -1,21 +1,21 @@
-var crypto = require('crypto'),
-    algorithm = 'aes-256-ctr',
-    password = 'd6F3Efeq';
+const crypto = require('crypto')
+const algorithm = 'aes-256-ctr'
+const password = 'd6F3Efeq'
 
 module.exports = {
 
-    encrypt : function (text){
-        var cipher = crypto.createCipher(algorithm,password)
-        var crypted = cipher.update(text,'utf8','hex')
-        crypted += cipher.final('hex');
-        return crypted;
-      },
-       
-    decrypt: function (text){
-        var decipher = crypto.createDecipher(algorithm,password)
-        var dec = decipher.update(text,'hex','utf8')
-        dec += decipher.final('utf8');
-        return dec;
-      }
+  encrypt: function (text) {
+    const cipher = crypto.createCipher(algorithm, password)
+    let crypted = cipher.update(text, 'utf8', 'hex')
+    crypted += cipher.final('hex')
+    return crypted
+  },
+
+  decrypt: function (text) {
+    const decipher = crypto.createDecipher(algorithm, password)
+    let dec = decipher.update(text, 'hex', 'utf8')
+    dec += decipher.final('utf8')
+    return dec
+  }
 
 }

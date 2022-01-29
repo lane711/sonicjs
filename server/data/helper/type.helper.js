@@ -1,14 +1,14 @@
 module.exports = typeHelper = {
   getDateTime: function () {
-    let database = typeHelper.getDatabase();
-    if (database.toLowerCase() == 'postgres'  ){
-      return "timestamp";
+    const database = typeHelper.getDatabase()
+    if (database.toLowerCase() == 'postgres') {
+      return 'timestamp'
     }
 
-    return "datetime";
+    return 'datetime'
   },
 
   getDatabase: function () {
-    return process.env.TYPEORM_CONNECTION;
-  },
-};
+    return process.env.TYPEORM_CONNECTION
+  }
+}

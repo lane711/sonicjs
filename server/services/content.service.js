@@ -1,179 +1,179 @@
-var pageBuilderService = require(".//page-builder.service");
-var formService = require(".//form.service");
-var listService = require(".//list.service");
-var menuService = require(".//menu.service");
-var helperService = require(".//helper.service");
-var userService = require(".//user.service");
-var globalService = require(".//global.service");
-var cacheService = require(".//cache.service");
-var formattingService = require(".//formatting.service");
+const pageBuilderService = require('.//page-builder.service')
+const formService = require('.//form.service')
+const listService = require('.//list.service')
+const menuService = require('.//menu.service')
+const helperService = require('.//helper.service')
+const userService = require('.//user.service')
+const globalService = require('.//global.service')
+const cacheService = require('.//cache.service')
+const formattingService = require('.//formatting.service')
 
-var dataService = require(".//data.service");
+const dataService = require('.//data.service')
 
-var fs = require("fs");
-const cheerio = require("cheerio");
-const axios = require("axios");
-const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
-const chalk = require("chalk");
-const log = console.log;
-var emitterService = require("./emitter.service");
+const fs = require('fs')
+const cheerio = require('cheerio')
+const axios = require('axios')
+const ShortcodeTree = require('shortcode-tree').ShortcodeTree
+const chalk = require('chalk')
+const log = console.log
+const emitterService = require('./emitter.service')
 
-var modulesToDelayProcessing = [];
+const modulesToDelayProcessing = []
 
-const NodeCache = require("node-cache");
+const NodeCache = require('node-cache')
 
 module.exports = contentService = {
   startup: async function () {
     emitterService.on(
-      "postProcessModuleShortCodeProcessedHtml",
+      'postProcessModuleShortCodeProcessedHtml',
       async function ({ options }) {
         if (options) {
-          contentService.wrapBlockInModuleDiv(options);
+          contentService.wrapBlockInModuleDiv(options)
         }
       }
-    );
+    )
   },
 
   getRenderedPage: async function (req) {
     // emitterService.emit('getRenderedPagePreDataFetch', req);
 
-    if (process.env.ENABLE_CACHE === "TRUE") {
-      let cachedPage = cacheService.getCache().get(req.url);
+    if (process.env.ENABLE_CACHE === 'TRUE') {
+      const cachedPage = cacheService.getCache().get(req.url)
       if (cachedPage !== undefined) {
         // console.log('returning from cache');
-        return { page: cachedPage };
+        return { page: cachedPage }
       } else {
         // console.log("no cache");
       }
     }
 
-    await emitterService.emit("preProcessPageUrlLookup", req);
+    await emitterService.emit('preProcessPageUrlLookup', req)
 
-    let page = await dataService.getContentByUrl(req.url, req.sessionID);
+    const page = await dataService.getContentByUrl(req.url, req.sessionID)
 
-    await emitterService.emit("postPageDataFetch", { req: req, page: page });
+    await emitterService.emit('postPageDataFetch', { req: req, page: page })
 
     if (page.data) {
-      //page templates
+      // page templates
       if (page.data.pageTemplate) {
         // console.log(page.data.pageTemplate)
-        let pageTemplate = await dataService.getContentById(
+        const pageTemplate = await dataService.getContentById(
           page.data.pageTemplate,
           req.sessionID
-        );
+        )
 
-        //merge data
+        // merge data
         if (pageTemplate && pageTemplate.data.pageCssClass) {
-          page.data.pageCssClass += " " + pageTemplate.data.pageCssClass;
+          page.data.pageCssClass += ' ' + pageTemplate.data.pageCssClass
         }
       }
 
-      await this.getPage(page.id, page, req, req.sessionID);
-      await emitterService.emit("postProcessPage");
+      await this.getPage(page.id, page, req, req.sessionID)
+      await emitterService.emit('postProcessPage')
 
       // page.data.html = page.data.html;
     }
 
-    page.data.eventCount = 0;
-    page.data.headerJs = "";
+    page.data.eventCount = 0
+    page.data.headerJs = ''
 
-    await emitterService.emit("getRenderedPagePostDataFetch", {
+    await emitterService.emit('getRenderedPagePostDataFetch', {
       req: req,
-      page: page,
-    });
+      page: page
+    })
 
-    //handle 404
-    if (!page || page.data.title == "Not Found") {
-      //not found
-      return { page: page };
+    // handle 404
+    if (!page || page.data.title == 'Not Found') {
+      // not found
+      return { page: page }
     }
 
-    let rows = [];
-    page.data.hasRows = false;
+    const rows = []
+    page.data.hasRows = false
     if (page.data.layout) {
-      page.data.rows = page.data.layout.rows;
-      page.data.hasRows = true;
+      page.data.rows = page.data.layout.rows
+      page.data.hasRows = true
     }
 
-    await emitterService.emit("preRender", { req: req, page: page });
+    await emitterService.emit('preRender', { req: req, page: page })
 
-    page.data.appVersion = globalService.getAppVersion;
+    page.data.appVersion = globalService.getAppVersion
 
     page.data.metaTitle = page.data.metaTitle
       ? page.data.metaTitle
-      : page.data.title;
+      : page.data.title
 
-    let cache = cacheService.getCache();
-    success = cache.set(req.url, page);
+    const cache = cacheService.getCache()
+    success = cache.set(req.url, page)
     // console.log(success);
 
-    return { page: page };
+    return { page: page }
   },
 
   getPage: async function (id, page, req, sessionID) {
     if (!id) {
-      return;
+      return
     }
 
-    await this.processTemplate(page, req, sessionID);
+    await this.processTemplate(page, req, sessionID)
 
-    return page.data.html;
+    return page.data.html
   },
 
   getBlog: async function (req) {
-    let blog = await dataService.getContentByUrl(req.url, req.sessionID);
-    blog = blog.data[0];
+    let blog = await dataService.getContentByUrl(req.url, req.sessionID)
+    blog = blog.data[0]
     if (blog) {
-      blog.data.menu = await menuService.getMenu("Main");
+      blog.data.menu = await menuService.getMenu('Main')
 
       if (blog.data.image) {
-        blog.data.heroImage = blog.data.image[0].originalName;
+        blog.data.heroImage = blog.data.image[0].originalName
       }
 
-      await emitterService.emit("getRenderedPagePostDataFetch", {
+      await emitterService.emit('getRenderedPagePostDataFetch', {
         req: req,
-        page: blog,
-      });
+        page: blog
+      })
 
       // let page = page.data[0];
       // page.data.html = page.data.html;
-      return { page: blog };
+      return { page: blog }
     }
-    return "error";
+    return 'error'
   },
 
   getPageByUrl: async function (id, instance) {},
 
   processTemplate: async function (page, req, sessionID) {
-    page.data.html = ""; //reset
+    page.data.html = '' // reset
     // const $ = cheerio.load("");
 
-    await this.processSections(page, req, req.sessionID);
-    await this.processDelayedModules(page, req, req.sessionID);
+    await this.processSections(page, req, req.sessionID)
+    await this.processDelayedModules(page, req, req.sessionID)
 
     // return $.html();
   },
 
   processMenu: async function () {
-    let menuItemTemplate = $.html(".s--menu-item");
-    let navWrapper = $(".s--menu-item").parent();
-    navWrapper.empty();
+    const menuItemTemplate = $.html('.s--menu-item')
+    const navWrapper = $('.s--menu-item').parent()
+    navWrapper.empty()
 
-    let menuItems = await dataService.getContentByType("menu");
+    const menuItems = await dataService.getContentByType('menu')
     // console.log('menuItems', menuItems);
     menuItems.forEach((menuItem) => {
       // console.log('menuItem', menuItem);
-      let item = menuItemTemplate
-        .replace("Home", menuItem.data.name)
-        .replace("#", menuItem.url);
-      navWrapper.append(item);
-    });
+      const item = menuItemTemplate
+        .replace('Home', menuItem.data.name)
+        .replace('#', menuItem.url)
+      navWrapper.append(item)
+    })
   },
 
   processSections: async function (page, req, sessionID) {
-    await emitterService.emit("preProcessSections", { page: page, req: req });
+    await emitterService.emit('preProcessSections', { page: page, req: req })
 
-    page.data.sections = [];
+    page.data.sections = []
     // let sectionWrapper = $(".s--section").parent(); //container
     // sectionWrapper.empty();
 
@@ -181,14 +181,14 @@ module.exports = contentService = {
     // console.log('processSections:page==>', page);
 
     if (page.data && page.data.layout) {
-      let sections = page.data.layout;
+      const sections = page.data.layout
 
       await this.asyncForEach(sections, async (sectionId) => {
-        let section = await dataService.getContentById(sectionId, sessionID);
+        const section = await dataService.getContentById(sectionId, sessionID)
         if (section) {
           if (section.data.content) {
-            //process raw column without rows and columns
-            page.data.html += `${section.data.content}`;
+            // process raw column without rows and columns
+            page.data.html += `${section.data.content}`
             await this.processShortCodes(
               page,
               section,
@@ -196,77 +196,77 @@ module.exports = contentService = {
               0,
               0,
               req
-            );
+            )
           } else {
-            let sectionClass = section.data.cssClass
-              ? section.data.cssClass + " "
-              : "";
-            page.data.html += `<section data-id='${section.id}' class="${sectionClass}jumbotron-fluid pb">`;
-            page.data.html += '<div class="section-overlay">';
-            page.data.html += '<div class="container">';
-            let rows;
+            const sectionClass = section.data.cssClass
+              ? section.data.cssClass + ' '
+              : ''
+            page.data.html += `<section data-id='${section.id}' class="${sectionClass}jumbotron-fluid pb">`
+            page.data.html += '<div class="section-overlay">'
+            page.data.html += '<div class="container">'
+            let rows
             rows = await this.processRows(
               page,
               section,
               section.data.rows,
               req
-            );
-            page.data.html += "</div>";
-            page.data.html += "</div>";
-            page.data.html += `</section>`;
+            )
+            page.data.html += '</div>'
+            page.data.html += '</div>'
+            page.data.html += '</section>'
 
             page.data.sections.push({
               id: sectionId,
               title: section.data.title,
-              rows: rows,
-            });
+              rows: rows
+            })
           }
         }
-      });
+      })
 
       // sectionWrapper.append(page.data.html);
     }
   },
 
-  //TODO loop thru rows
+  // TODO loop thru rows
   processRows: async function (page, section, rows, req) {
-    let rowArray = [];
-    let rowIndex = 0;
+    const rowArray = []
+    let rowIndex = 0
 
-    await emitterService.emit("preProcessRows");
+    await emitterService.emit('preProcessRows')
 
     if (rows) {
       for (const row of rows) {
         // console.log(chalk.red(JSON.stringify(row)));
-        page.data.html += `<div class='${row.class}''>`;
-        let columns = await this.processColumns(
+        page.data.html += `<div class='${row.class}''>`
+        const columns = await this.processColumns(
           page,
           section,
           row,
           rowIndex,
           req
-        );
-        page.data.html += `</div>`;
+        )
+        page.data.html += '</div>'
 
-        rowArray.push(row);
-        rowIndex++;
+        rowArray.push(row)
+        rowIndex++
       }
     }
     // console.log('rowArray---->', rowArray);
-    return rowArray;
+    return rowArray
   },
 
   processColumns: async function (page, section, row, rowIndex, req) {
-    let columnArray = [];
-    let columnIndex = 0;
+    const columnArray = []
+    let columnIndex = 0
 
-    await emitterService.emit("preProcessColumns");
+    await emitterService.emit('preProcessColumns')
 
     for (const column of row.columns) {
       // console.log('== column ==', column);
 
-      page.data.html += `<div id='${column.id}' class='${column.class}'>`;
-      page.data.html += `${column.content}`;
+      page.data.html += `<div id='${column.id}' class='${column.class}'>`
+      page.data.html += `${column.content}`
       if (column.content) {
         await this.processShortCodes(
           page,
@@ -275,15 +275,15 @@ module.exports = contentService = {
           rowIndex,
           columnIndex,
           req
-        );
+        )
       } else {
-        page.data.html += `<span class="empty-column">empty column</spam>`;
+        page.data.html += '<span class="empty-column">empty column</spam>'
       }
-      page.data.html += `</div>`;
-      columnArray.push(column);
-      columnIndex++;
+      page.data.html += '</div>'
+      columnArray.push(column)
+      columnIndex++
     }
-    return columnArray;
+    return columnArray
   },
 
   processShortCodes: async function (
@@ -294,29 +294,29 @@ module.exports = contentService = {
     columnIndex,
     req
   ) {
-    let parsedBlock = ShortcodeTree.parse(body);
+    const parsedBlock = ShortcodeTree.parse(body)
 
-    await emitterService.emit("preProcessModuleShortCode");
+    await emitterService.emit('preProcessModuleShortCode')
 
     if (parsedBlock.children) {
-      for (let bodyBlock of parsedBlock.children) {
-        let shortcode = bodyBlock.shortcode;
+      for (const bodyBlock of parsedBlock.children) {
+        const shortcode = bodyBlock.shortcode
 
-        //new way:
+        // new way:
         if (shortcode) {
           if (shortcode.properties.delayedProcessing) {
-            modulesToDelayProcessing.push(shortcode);
-            continue;
+            modulesToDelayProcessing.push(shortcode)
+            continue
           }
 
-          await emitterService.emit("beginProcessModuleShortCode", {
+          await emitterService.emit('beginProcessModuleShortCode', {
             page: page,
             section: section,
             req: req,
             shortcode: shortcode,
             rowIndex: rowIndex,
-            columnIndex: columnIndex,
-          });
+            columnIndex: columnIndex
+          })
 
           // if (wrapWithModuleDiv) {
           //   var processedHtml = {
@@ -336,38 +336,38 @@ module.exports = contentService = {
     }
   },
 
-  //loop thru again to support modules that need delayed processing
-  //ei: module B needs module A to process first so that it can use the data generated by module A
+  // loop thru again to support modules that need delayed processing
+  // ei: module B needs module A to process first so that it can use the data generated by module A
   processDelayedModules: async function (page, req, sessionID) {
-    for (let shortcode of modulesToDelayProcessing) {
-      await emitterService.emit("beginProcessModuleShortCodeDelayed", {
+    for (const shortcode of modulesToDelayProcessing) {
+      await emitterService.emit('beginProcessModuleShortCodeDelayed', {
         page: page,
         section: undefined,
         req: req,
         shortcode: shortcode,
         rowIndex: 0,
-        columnIndex: 0,
-      });
+        columnIndex: 0
+      })
     }
   },
 
   wrapBlockInModuleDiv: function (options) {
-    let wrapperCss = "module";
+    let wrapperCss = 'module'
     if (
       options.viewModel &&
       options.viewModel.data.settings &&
       options.viewModel.data.settings.data.wrapperCss
     ) {
-      wrapperCss += " " + options.viewModel.data.settings.data.wrapperCss;
+      wrapperCss += ' ' + options.viewModel.data.settings.data.wrapperCss
     }
 
-    let wrapperStyles = "";
+    let wrapperStyles = ''
     if (
       options.viewModel &&
       options.viewModel.data.settings &&
       options.viewModel.data.settings.data.wrapperStyles
     ) {
-      wrapperStyles = options.viewModel.data.settings.data.wrapperStyles;
+      wrapperStyles = options.viewModel.data.settings.data.wrapperStyles
     }
     options.processedHtml.body = formattingService.generateModuleDivWrapper(
       options.processedHtml.id,
@@ -377,45 +377,45 @@ module.exports = contentService = {
       options.processedHtml.contentType,
       options.processedHtml.body,
       false,
-      options.page.data.pageTemplate !== "none"
-    );
+      options.page.data.pageTemplate !== 'none'
+    )
   },
 
   replaceBlockShortCode: async function (page, shortcode) {
-    let blockId = shortcode.properties.id;
-    let content = await dataService.getContentById(blockId);
+    const blockId = shortcode.properties.id
+    const content = await dataService.getContentById(blockId)
     // console.log('replaceShortCode.getContentById', content);
-    let newBody = `<span data-id="${blockId}">${content.data.body}</span>`;
-    page.data.html = page.data.html.replace(shortcode.codeText, newBody);
+    const newBody = `<span data-id="${blockId}">${content.data.body}</span>`
+    page.data.html = page.data.html.replace(shortcode.codeText, newBody)
   },
 
   replaceFormShortCode: async function (page, shortcode) {
-    let blockId = shortcode.properties.id;
-    let contentType = shortcode.properties.contentType;
+    const blockId = shortcode.properties.id
+    const contentType = shortcode.properties.contentType
 
-    let form = await formService.getForm(
+    const form = await formService.getForm(
       contentType,
       undefined,
       undefined,
       undefined,
       undefined,
       sessionID
-    );
+    )
 
-    page.data.html = page.data.html.replace(shortcode.codeText, form);
+    page.data.html = page.data.html.replace(shortcode.codeText, form)
   },
 
   replaceListShortCode: async function (page, shortcode) {
-    let blockId = shortcode.properties.id;
-    let contentType = shortcode.properties.contentType;
+    const blockId = shortcode.properties.id
+    const contentType = shortcode.properties.contentType
 
-    let list = await listService.getList(contentType);
-    page.data.html = page.data.html.replace(shortcode.codeText, list);
+    const list = await listService.getList(contentType)
+    page.data.html = page.data.html.replace(shortcode.codeText, list)
   },
 
   asyncForEach: async function (array, callback) {
     for (let index = 0; index < array.length; index++) {
-      await callback(array[index], index, array);
+      await callback(array[index], index, array)
     }
-  },
-};
+  }
+}

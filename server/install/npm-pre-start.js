@@ -5,4 +5,4 @@
 // ███████║╚██████╔╝██║ ╚████║██║╚██████╗╚█████╔╝███████║
 // ╚══════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚════╝ ╚══════╝
 //                                                       `);
-console.log(`SonicJs is starting up! Hang tight...\n\n`);
+console.log('SonicJs is starting up! Hang tight...\n\n')

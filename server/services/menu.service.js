@@ -1,68 +1,68 @@
-var dataService = require("./data.service");
-var helperService = require("./helper.service");
-var emitterService = require("./emitter.service");
+const dataService = require('./data.service')
+const helperService = require('./helper.service')
+const emitterService = require('./emitter.service')
 
-var fs = require("fs");
-const axios = require("axios");
-const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
-const chalk = require("chalk");
+const fs = require('fs')
+const axios = require('axios')
+const ShortcodeTree = require('shortcode-tree').ShortcodeTree
+const chalk = require('chalk')
 
 module.exports = menuService = {
   startup: function () {
-    emitterService.on("getRenderedPagePostDataFetch", async function (options) {
+    emitterService.on('getRenderedPagePostDataFetch', async function (options) {
       if (options) {
-        let menuData = await menuService.getMenu("Main", options.req.sessionID);
+        const menuData = await menuService.getMenu('Main', options.req.sessionID)
         if (menuData) {
           menuData.forEach((menuItem) => {
-            menuItem.isActive = menuItem.data.url === options.req.path;
+            menuItem.isActive = menuItem.data.url === options.req.path
 
             menuItem.children.forEach((subMenuItem) => {
-              //if child is active, set parent active too
+              // if child is active, set parent active too
               if (subMenuItem.data.url === options.req.path) {
-                menuItem.isActive = true;
+                menuItem.isActive = true
               }
-            });
+            })
 
-            //has children?
+            // has children?
             if (menuItem.children.length > 0 && menuItem.data.showChildren) {
-              menuItem.showChildren = true;
+              menuItem.showChildren = true
             } else {
-              menuItem.showChildren = false;
+              menuItem.showChildren = false
             }
 
             // menuItem.isActive = options.req.path.startsWith(menuItem.data.url);
-          });
-          options.page.data.menu = menuData;
+          })
+          options.page.data.menu = menuData
           options.page.data.menuSecondLevel = menuService.processSecondLevel(
             menuData,
             options.req.path
-          );
+          )
         }
       }
-    });
+    })
   },
 
   processSecondLevel: function (menuData, url) {
-    let activeNode = menuData.find((x) => x.isActive === true);
+    const activeNode = menuData.find((x) => x.isActive === true)
     if (activeNode && activeNode.children && activeNode.children.length > 0) {
       activeNode.children.forEach((menuItem) => {
-        menuItem.isActive = menuItem.data.url === url;
-      });
+        menuItem.isActive = menuItem.data.url === url
+      })
 
-      return activeNode.children;
+      return activeNode.children
     }
   },
 
   getMenu: async function (menuName, sessionID) {
-    let menuData = await dataService.getContentByContentTypeAndTitle(
-      "menu",
+    const menuData = await dataService.getContentByContentTypeAndTitle(
+      'menu',
       menuName,
       sessionID
-    );
+    )
     if (menuData) {
-      let links = menuData.data.links;
+      const links = menuData.data.links
 
-      return links;
+      return links
     }
     // let menu = [];
 
@@ -93,61 +93,61 @@ module.exports = menuService = {
 
   hasChildren: function (links, currentLinkIndex) {
     if (currentLinkIndex < links.length - 1) {
-      let currentLink = links[currentLinkIndex];
-      let nextLink = links[currentLinkIndex + 1];
+      const currentLink = links[currentLinkIndex]
+      const nextLink = links[currentLinkIndex + 1]
       if (currentLink.level == 0 && nextLink.level == 1) {
-        return true;
+        return true
       }
     }
-    return false;
+    return false
   },
 
   getChildren: function (links, hasChildren, currentLinkIndex) {
-    let childLinks = [];
+    const childLinks = []
     if (hasChildren) {
       for (let index = currentLinkIndex + 1; index < links.length; index++) {
-        let currentLink = links[index];
+        const currentLink = links[index]
         if (currentLink.level == 1) {
           childLinks.push({
             url: currentLink.url,
             title: currentLink.title,
-            hasChildren: false,
-          });
+            hasChildren: false
+          })
         } else {
-          break;
+          break
         }
       }
     }
 
-    return childLinks;
+    return childLinks
   },
 
   addMenuItem: async function (url, linkText) {
-    let randomId = Math.random().toString(36).slice(2);
-    var parent = "#";
-    var node = {
+    const randomId = Math.random().toString(36).slice(2)
+    const parent = '#'
+    const node = {
       id: randomId,
       text: linkText,
       data: { id: randomId, title: linkText, url: url, showInMenu: true },
-      children: [],
-    };
+      children: []
+    }
 
-    let menu = await dataService.getContentTopOne("menu", undefined);
+    const menu = await dataService.getContentTopOne('menu', undefined)
 
-    var updatedMenu = {
+    const updatedMenu = {
       data: {
         title: menu.data.title,
-        contentType: "menu",
-        links: menu.data.links,
-      },
-    };
+        contentType: 'menu',
+        links: menu.data.links
+      }
+    }
 
-    let linkAlreadyExists =
-      updatedMenu.data.links.filter((x) => x.data.url == url).length > 0;
+    const linkAlreadyExists =
+      updatedMenu.data.links.filter((x) => x.data.url == url).length > 0
 
     if (!linkAlreadyExists) {
-      updatedMenu.data.links.push(node);
-      dataService.editInstance(menu);
+      updatedMenu.data.links.push(node)
+      dataService.editInstance(menu)
     }
-  },
-};
+  }
+}

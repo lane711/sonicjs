@@ -1,32 +1,32 @@
-var dataService = require("../../../services/data.service");
-var emitterService = require("../../../services/emitter.service");
-var globalService = require("../../../services/global.service");
+const dataService = require('../../../services/data.service')
+const emitterService = require('../../../services/emitter.service')
+const globalService = require('../../../services/global.service')
 
 module.exports = commentSwiperMainService = {
   startup: async function () {
-    emitterService.on("beginProcessModuleShortCode", async function (options) {
-      if (options.shortcode.name === "COMMENT-SWIPER") {
-        options.moduleName = "comment-swiper";
-        await moduleService.processModuleInColumn(options);
+    emitterService.on('beginProcessModuleShortCode', async function (options) {
+      if (options.shortcode.name === 'COMMENT-SWIPER') {
+        options.moduleName = 'comment-swiper'
+        await moduleService.processModuleInColumn(options)
       }
-    });
+    })
 
-    emitterService.on("postModuleGetData", async function (options) {
-      if (options.shortcode.name === "COMMENT-SWIPER") {
-        await commentSwiperMainService.getCommentData(options);
+    emitterService.on('postModuleGetData', async function (options) {
+      if (options.shortcode.name === 'COMMENT-SWIPER') {
+        await commentSwiperMainService.getCommentData(options)
       }
-    });
+    })
   },
 
   getCommentData: async function (options) {
-    let id = options.shortcode.properties.id;
-    let moduleData = await dataService.getContentById(id);
-    let contentType = "comment";
-    let viewModel = moduleData;
+    const id = options.shortcode.properties.id
+    const moduleData = await dataService.getContentById(id)
+    const contentType = 'comment'
+    const viewModel = moduleData
 
-    let listRaw = await dataService.getContentByType(contentType);
+    const listRaw = await dataService.getContentByType(contentType)
 
-    options.viewModel.data.list = listRaw;
+    options.viewModel.data.list = listRaw
 
     // listRaw = listRaw.filter((x) => x.data.title);
     // let list = listRaw.map(function (record) {
@@ -59,5 +59,5 @@ module.exports = commentSwiperMainService = {
     // );
 
     // options.viewModel.data.list = list;
-  },
-};
+  }
+}

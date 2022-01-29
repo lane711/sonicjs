@@ -1,32 +1,31 @@
-require("./app-analytics-main-service");
-var dataService = require("../../../services/data.service");
-var dalService = require("../../../services/dal.service");
-var emitterService = require("../../../services/emitter.service");
-var globalService = require("../../../services/global.service");
-var moment = require('moment');
-var axios = require("axios");
-var axiosInstance;
+require('./app-analytics-main-service')
+const dataService = require('../../../services/data.service')
+const dalService = require('../../../services/dal.service')
+const emitterService = require('../../../services/emitter.service')
+const globalService = require('../../../services/global.service')
+const moment = require('moment')
+const axios = require('axios')
+let axiosInstance
 
 module.exports = appAnalyticsReportService = {
   getAggregates: async function (sessionID) {
-    let contents = await dataService.getContentByType(
-      "app-analytics",
+    const contents = await dataService.getContentByType(
+      'app-analytics',
       sessionID
-    );
+    )
 
     contents.forEach(log => {
-      if(log.data.firstSeenOn && log.data.lastSeenOn){
-        let age = moment(log.data.firstSeenOn).diff(log.data.lastSeenOn,'days');
-        log.data.age = age;
-      }else{
-        log.data.age='?'
+      if (log.data.firstSeenOn && log.data.lastSeenOn) {
+        const age = moment(log.data.firstSeenOn).diff(log.data.lastSeenOn, 'days')
+        log.data.age = age
+      } else {
+        log.data.age = '?'
       }
-    });
+    })
 
-    let data = {};
-    data.count = contents.length;
-    data.installs = contents;
-    return data;
-  },
-};
- 
+    const data = {}
+    data.count = contents.length
+    data.installs = contents
+    return data
+  }
+}

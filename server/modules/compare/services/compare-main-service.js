@@ -1,90 +1,90 @@
-var dataService = require("../../../services/data.service");
-var emitterService = require("../../../services/emitter.service");
-var globalService = require("../../../services/global.service");
+const dataService = require('../../../services/data.service')
+const emitterService = require('../../../services/emitter.service')
+const globalService = require('../../../services/global.service')
 
 module.exports = compareMainService = {
   startup: async function () {
-    emitterService.on("beginProcessModuleShortCode", async function (options) {
-      if (options.shortcode.name === "COMPARE") {
-        options.moduleName = "compare";
-        await moduleService.processModuleInColumn(options);
+    emitterService.on('beginProcessModuleShortCode', async function (options) {
+      if (options.shortcode.name === 'COMPARE') {
+        options.moduleName = 'compare'
+        await moduleService.processModuleInColumn(options)
       }
-    });
+    })
 
-    emitterService.on("postModuleGetData", async function (options) {
-      if (options.shortcode.name !== "COMPARE") {
-        return;
+    emitterService.on('postModuleGetData', async function (options) {
+      if (options.shortcode.name !== 'COMPARE') {
+        return
       }
 
-      let compareItems = await dataService.getContentByType("compare-item");
-      options.viewModel.data.compareItems = compareItems;
+      const compareItems = await dataService.getContentByType('compare-item')
+      options.viewModel.data.compareItems = compareItems
 
-      let contentType = await dataService.contentTypeGet("compare-item");
-      let tabs = contentType.data.components[0].components;
-      options.viewModel.data.contentType = tabs;
+      const contentType = await dataService.contentTypeGet('compare-item')
+      const tabs = contentType.data.components[0].components
+      options.viewModel.data.contentType = tabs
 
-      let matrix = compareMainService.getMatrixData(tabs, compareItems);
-      console.log(matrix);
-      options.viewModel.data.matrix = matrix;
-    });
+      const matrix = compareMainService.getMatrixData(tabs, compareItems)
+      console.log(matrix)
+      options.viewModel.data.matrix = matrix
+    })
   },
 
   getMatrixData: function (contentType, compareItems) {
-    let colspanCount = compareItems.length + 1;
-    let rows = [];
+    const colspanCount = compareItems.length + 1
+    const rows = []
     contentType.forEach((group) => {
-      let row = { columns: [] };
-      this.addCell(row, group.label, true, colspanCount, "main-group");
-      rows.push(row);
+      const row = { columns: [] }
+      this.addCell(row, group.label, true, colspanCount, 'main-group')
+      rows.push(row)
 
       // console.log(group.label);
       group.components.forEach((element) => {
-        let rowAlreadyProcessed = false;
-        let row = { columns: [] };
-        if (element.label === "Field Set") {
-          var fieldSet = element.components[0];
-          this.addCell(row, fieldSet.label, true, colspanCount, "category");
-          rows.push(row);
-          rowAlreadyProcessed = true;
-          //now need another row for child components
+        let rowAlreadyProcessed = false
+        const row = { columns: [] }
+        if (element.label === 'Field Set') {
+          const fieldSet = element.components[0]
+          this.addCell(row, fieldSet.label, true, colspanCount, 'category')
+          rows.push(row)
+          rowAlreadyProcessed = true
+          // now need another row for child components
           fieldSet.values.forEach((fieldSetValue) => {
-            let row = { columns: [] };
-            this.addCell(row, fieldSetValue.label, false, 0, "sub-category");
+            const row = { columns: [] }
+            this.addCell(row, fieldSetValue.label, false, 0, 'sub-category')
 
-            //add columns for compare items
+            // add columns for compare items
             compareItems.forEach((complareItem) => {
-              let fieldSet = element.components[0];
-              var fieldSetKey = fieldSet.key;
-              let column = complareItem.data[fieldSetKey][fieldSetValue.value];
+              const fieldSet = element.components[0]
+              const fieldSetKey = fieldSet.key
+              const column = complareItem.data[fieldSetKey][fieldSetValue.value]
               if (column != undefined) {
-                this.addCell(row, column);
+                this.addCell(row, column)
               }
-            });
+            })
 
-            rows.push(row);
-          });
+            rows.push(row)
+          })
         } else {
-          if (element.label == "Content") {
-            rowAlreadyProcessed = true;
+          if (element.label == 'Content') {
+            rowAlreadyProcessed = true
           } else {
-            this.addCell(row, element.label, false, 0, "category");
+            this.addCell(row, element.label, false, 0, 'category')
           }
         }
 
-        //add columns for compare items
+        // add columns for compare items
         compareItems.forEach((complareItem) => {
-          if (element.label !== "Field Set") {
-            let column = complareItem.data[element.key];
-            this.addCell(row, column);
+          if (element.label !== 'Field Set') {
+            const column = complareItem.data[element.key]
+            this.addCell(row, column)
           }
-        });
+        })
 
         if (!rowAlreadyProcessed) {
-          rows.push(row);
+          rows.push(row)
         }
-      });
-    });
-    return rows;
+      })
+    })
+    return rows
   },
 
   addCell: function (
@@ -92,44 +92,44 @@ module.exports = compareMainService = {
     column,
     colspan = false,
     colspanCount = 0,
-    cssClass = ""
+    cssClass = ''
   ) {
-    let cell = { text: column };
+    const cell = { text: column }
 
-    if (column.data && column.data.contentType === "compare-item-boolean") {
-      cell.text = column.data.support;
-      cell.notes = column.data.notes;
+    if (column.data && column.data.contentType === 'compare-item-boolean') {
+      cell.text = column.data.support
+      cell.notes = column.data.notes
     }
 
     if (colspan) {
-      cell.colspan = colspanCount;
+      cell.colspan = colspanCount
     }
     if (cssClass) {
-      cell.cssClass = cssClass;
+      cell.cssClass = cssClass
     }
 
-    if (column === true || cell.text === "true") {
-      cell.text = '<i class="fa fa-check green"></i>';
+    if (column === true || cell.text === 'true') {
+      cell.text = '<i class="fa fa-check green"></i>'
     }
 
-    if (column === false || cell.text === "false") {
-      cell.text = '<i class="fa fa-times red"></i>';
+    if (column === false || cell.text === 'false') {
+      cell.text = '<i class="fa fa-times red"></i>'
     }
 
-    if (cell.text === "partial") {
-      cell.text = '<i class="fa fa-minus-square yellow"></i>';
+    if (cell.text === 'partial') {
+      cell.text = '<i class="fa fa-minus-square yellow"></i>'
     }
 
-    if (cell.text === "plannedTrue") {
-      cell.text = '<i class="fa fa-check light-green"></i>';
+    if (cell.text === 'plannedTrue') {
+      cell.text = '<i class="fa fa-check light-green"></i>'
     }
 
     if (cell.notes) {
-      let notesClean = cell.notes.replace(/"/g, "'");
-      console.log(notesClean);
-      cell.notes = `<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="${notesClean}"><i class="fa fa-comment"></i></button>`;
+      const notesClean = cell.notes.replace(/"/g, "'")
+      console.log(notesClean)
+      cell.notes = `<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="${notesClean}"><i class="fa fa-comment"></i></button>`
     }
 
-    row.columns.push(cell);
-  },
-};
+    row.columns.push(cell)
+  }
+}

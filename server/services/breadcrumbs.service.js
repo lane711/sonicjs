@@ -1,16 +1,16 @@
-var _ = require('lodash');
+const _ = require('lodash')
 
 module.exports = breadcrumbsService = {
-  getAdminBreadcrumbs: async function(req) {
-    let path = req.path.split("/");
-    let url = "";
-    let breadcrumbs = [];
+  getAdminBreadcrumbs: async function (req) {
+    const path = req.path.split('/')
+    let url = ''
+    const breadcrumbs = []
     path.forEach(pathItem => {
       if (pathItem) {
-        url += "/" + pathItem;
-        breadcrumbs.push({ title: _.startCase(pathItem), url: url });
+        url += '/' + pathItem
+        breadcrumbs.push({ title: _.startCase(pathItem), url: url })
       }
-    });
-    return breadcrumbs;
+    })
+    return breadcrumbs
   }
-};
+}

@@ -18,18 +18,15 @@
 // const utils = require('formiojs/utils');
 
 (function (exports) {
-
-  if (typeof module !== "undefined" && module.exports) {
-    var helperService = require("./helper.service");
-
+  if (typeof module !== 'undefined' && module.exports) {
+    const helperService = require('./helper.service')
   } else {
-    //client version
+    // client version
   }
 
-
-  (exports.truncateString = function(body, length) {
+  (exports.truncateString = function (body, length) {
     if (body) {
-      let cleanHtml = body.substring(0, 450);
+      const cleanHtml = body.substring(0, 450)
       // if(sanitizeHtml){
       //     cleanHtml = sanitizeHtml(body, {
       //         allowedTags: [],
@@ -38,82 +35,82 @@
       // }
 
       return cleanHtml.length > length
-        ? cleanHtml.substr(0, length - 1) + "..."
-        : cleanHtml;
+        ? cleanHtml.substr(0, length - 1) + '...'
+        : cleanHtml
     }
   }),
-    (exports.urlAppendParam = function(url, paramName, paramValue) {
-      let baseUrl = url;
-      if (url.indexOf("?") > -1) {
-        baseUrl = url.substring(0, url.indexOf("?"));
+  (exports.urlAppendParam = function (url, paramName, paramValue) {
+    let baseUrl = url
+    if (url.indexOf('?') > -1) {
+      baseUrl = url.substring(0, url.indexOf('?'))
+    }
+    return `${baseUrl}?${paramName}=${paramValue}`
+  }),
+  (exports.sleep = function (ms) {
+    return new Promise(resolve => {
+      setTimeout(resolve, ms)
+    })
+  }),
+  (exports.generateRandomString = function (length) {
+    let result = ''
+    const characters =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    const charactersLength = characters.length
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(
+        Math.floor(Math.random() * charactersLength)
+      )
+    }
+    return result
+  }),
+  (exports.getCookie = function (name) {
+    // debugger;
+    if (typeof document !== 'undefined' && document && document.cookie) {
+      const value = '; ' + document.cookie
+      const parts = value.split('; ' + name + '=')
+      if (parts.length == 2) {
+        return parts
+          .pop()
+          .split(';')
+          .shift()
       }
-      return `${baseUrl}?${paramName}=${paramValue}`;
-    }),
-    (exports.sleep = function(ms) {
-      return new Promise(resolve => {
-        setTimeout(resolve, ms);
-      });
-    }),
-    (exports.generateRandomString = function(length) {
-      var result = "";
-      var characters =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-      var charactersLength = characters.length;
-      for (var i = 0; i < length; i++) {
-        result += characters.charAt(
-          Math.floor(Math.random() * charactersLength)
-        );
-      }
-      return result;
-    }),
-    (exports.getCookie = function(name) {
-      // debugger;
-      if (typeof document !== 'undefined' && document && document.cookie) {
-        var value = "; " + document.cookie;
-        var parts = value.split("; " + name + "=");
-        if (parts.length == 2) {
-          return parts
-            .pop()
-            .split(";")
-            .shift();
-        }
-      }
-    });
-    (exports.slugify = function(text) {
-      // console.log('slug', text);
-      let slug = text
-        .toLowerCase()
-        .replace(/[^\w ]+/g, "")
-        .replace(/ +/g, "-");
-    
-      return slug;
-    });
-    (exports.validateEmail = function(email) {
-      const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      return re.test(String(email).toLowerCase());
-    });
-    (exports.generateSlugFromContent = function(content, includePrecedingSlash = false, makeUnique = false) {
-      let copy = content.title;
-      if(!copy) copy = content.text;
-      if(!copy) copy = content.body;
-      if(!copy) copy = content.alertCopy;
-      if(!copy) copy = content.contentType;
+    }
+  });
+  (exports.slugify = function (text) {
+    // console.log('slug', text);
+    const slug = text
+      .toLowerCase()
+      .replace(/[^\w ]+/g, '')
+      .replace(/ +/g, '-')
 
-      // let copyClean =  formattingService.stripHtmlTags(copy)
+    return slug
+  });
+  (exports.validateEmail = function (email) {
+    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    return re.test(String(email).toLowerCase())
+  });
+  (exports.generateSlugFromContent = function (content, includePrecedingSlash = false, makeUnique = false) {
+    let copy = content.title
+    if (!copy) copy = content.text
+    if (!copy) copy = content.body
+    if (!copy) copy = content.alertCopy
+    if (!copy) copy = content.contentType
 
-      let slug = this ? this.slugify(copy) : slugify(copy);
+    // let copyClean =  formattingService.stripHtmlTags(copy)
 
-      if(includePrecedingSlash === true){
-        slug = `/${slug}`;
-      }
+    let slug = this ? this.slugify(copy) : slugify(copy)
 
-      if(makeUnique === true){
-        slug = `${slug}-${this.generateRandomString(6)}`
-      }
+    if (includePrecedingSlash === true) {
+      slug = `/${slug}`
+    }
 
-      return slug;
-    });
-})(typeof exports === "undefined" ? (this["helperService"] = {}) : exports);
+    if (makeUnique === true) {
+      slug = `${slug}-${this.generateRandomString(6)}`
+    }
+
+    return slug
+  })
+})(typeof exports === 'undefined' ? (this.helperService = {}) : exports)
 
 // (function (exports) {
 
@@ -134,5 +131,3 @@
 //     };
 
 // })(typeof exports === 'undefined' ? this['globalService'] = {} : exports);
-
-

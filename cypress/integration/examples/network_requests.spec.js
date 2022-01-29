@@ -22,12 +22,12 @@ context('Network Requests', () => {
 
   it('cy.request() - verify response using BDD syntax', () => {
     cy.request('https://jsonplaceholder.cypress.io/comments')
-    .then((response) => {
+      .then((response) => {
       // https://on.cypress.io/assertions
-      expect(response).property('status').to.equal(200)
-      expect(response).property('body').to.have.property('length').and.be.oneOf([500, 501])
-      expect(response).to.include.keys('headers', 'duration')
-    })
+        expect(response).property('status').to.equal(200)
+        expect(response).property('body').to.have.property('length').and.be.oneOf([500, 501])
+        expect(response).to.include.keys('headers', 'duration')
+      })
   })
 
   it('cy.request() with query parameters', () => {
@@ -37,17 +37,17 @@ context('Network Requests', () => {
       url: 'https://jsonplaceholder.cypress.io/comments',
       qs: {
         postId: 1,
-        id: 3,
-      },
+        id: 3
+      }
     })
-    .its('body')
-    .should('be.an', 'array')
-    .and('have.length', 1)
-    .its('0') // yields first element of the array
-    .should('contain', {
-      postId: 1,
-      id: 3,
-    })
+      .its('body')
+      .should('be.an', 'array')
+      .and('have.length', 1)
+      .its('0') // yields first element of the array
+      .should('contain', {
+        postId: 1,
+        id: 3
+      })
   })
 
   it('cy.request() - pass result to the second request', () => {
@@ -64,7 +64,7 @@ context('Network Requests', () => {
         cy.request('POST', 'https://jsonplaceholder.cypress.io/posts', {
           userId: user.id,
           title: 'Cypress Test Runner',
-          body: 'Fast, easy and reliable testing for anything that runs in a browser.',
+          body: 'Fast, easy and reliable testing for anything that runs in a browser.'
         })
       })
       // note that the value here is the returned value of the 2nd request
@@ -72,7 +72,7 @@ context('Network Requests', () => {
       .then((response) => {
         expect(response).property('status').to.equal(201) // new entity created
         expect(response).property('body').to.contain({
-          title: 'Cypress Test Runner',
+          title: 'Cypress Test Runner'
         })
 
         // we don't know the exact post id - only that it will be > 100
@@ -101,9 +101,9 @@ context('Network Requests', () => {
         cy.request('POST', 'https://jsonplaceholder.cypress.io/posts', {
           userId: this.user.id,
           title: 'Cypress Test Runner',
-          body: 'Fast, easy and reliable testing for anything that runs in a browser.',
+          body: 'Fast, easy and reliable testing for anything that runs in a browser.'
         })
-        .its('body').as('post') // save the new post from the response
+          .its('body').as('post') // save the new post from the response
       })
       .then(function () {
         // When this callback runs, both "cy.request" API commands have finished
@@ -116,7 +116,7 @@ context('Network Requests', () => {
   it('cy.intercept() - route responses to matching requests', () => {
     // https://on.cypress.io/http
 
-    let message = 'whoa, this comment does not exist'
+    const message = 'whoa, this comment does not exist'
 
     // Listen to GET to comments/1
     cy.intercept('GET', '**/comments/*').as('getComment')
@@ -143,12 +143,12 @@ context('Network Requests', () => {
     // Stub a response to PUT comments/ ****
     cy.intercept({
       method: 'PUT',
-      url: '**/comments/*',
+      url: '**/comments/*'
     }, {
       statusCode: 404,
       body: { error: message },
       headers: { 'access-control-allow-origin': '*' },
-      delayMs: 500,
+      delayMs: 500
     }).as('putComment')
 
     // we have code that puts a comment when

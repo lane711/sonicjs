@@ -1,8 +1,8 @@
-var dataService = require("../../../services/data.service");
-var emitterService = require("../../../services/emitter.service");
-var globalService = require("../../../services/global.service");
-var Mixpanel = require("mixpanel");
-var mixpanel;
+const dataService = require('../../../services/data.service')
+const emitterService = require('../../../services/emitter.service')
+const globalService = require('../../../services/global.service')
+const Mixpanel = require('mixpanel')
+let mixpanel
 
 // module.exports = mixpanelMainService = {
 //   startup: async function () {

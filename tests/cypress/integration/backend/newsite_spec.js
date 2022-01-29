@@ -1,11 +1,10 @@
-const { expect } = require("chai");
-const { iteratee } = require("lodash");
+const { expect } = require('chai')
+const { iteratee } = require('lodash')
 
-describe("new site", function () {
-
+describe('new site', function () {
   before(() => {
-    //clear admin user
-    //TODO: create an endpoint that resets all data - replace data.json with data.original.json
+    // clear admin user
+    // TODO: create an endpoint that resets all data - replace data.json with data.original.json
 
   })
 
@@ -18,7 +17,6 @@ describe("new site", function () {
   // it("register form validation", function () {
   //   cy.visit('http://localhost:3018/');
 
-
   //   cy.contains('Create Account').click();
 
   //   cy.get('[type="email"]').then(($input) => {
@@ -26,5 +24,4 @@ describe("new site", function () {
   //   })
 
   // });
-});
-
+})

@@ -1,16 +1,16 @@
-var dataService = require("../../../services/data.service");
-var emitterService = require("../../../services/emitter.service");
-var globalService = require("../../../services/global.service");
+const dataService = require('../../../services/data.service')
+const emitterService = require('../../../services/emitter.service')
+const globalService = require('../../../services/global.service')
 
 module.exports = smartlookMainService = {
   startup: async function () {
-    emitterService.on("getRenderedPagePostDataFetch", async function (
+    emitterService.on('getRenderedPagePostDataFetch', async function (
       options
     ) {
       if (options && options.page) {
-        await smartlookMainService.addHeaderJs(options);
+        await smartlookMainService.addHeaderJs(options)
       }
-    });
+    })
   },
 
   addHeaderJs: async function (options) {
@@ -23,7 +23,7 @@ module.exports = smartlookMainService = {
             c.charset='utf-8';c.src='https://rec.smartlook.com/recorder.js';h.appendChild(c);
             })(document);
             smartlook('init', '${process.env.SMARTLOOK_CLEINTID}');
-        </script>`;
+        </script>`
     }
-  },
-};
+  }
+}

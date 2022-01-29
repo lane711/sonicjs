@@ -1,85 +1,85 @@
-var fs = require("fs");
-const axios = require("axios");
-const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
-const chalk = require("chalk");
-const log = console.log;
-var emitterService = require("./emitter.service");
-var dataService = require("./data.service");
-var sharedService = require("./shared.service");
+const fs = require('fs')
+const axios = require('axios')
+const ShortcodeTree = require('shortcode-tree').ShortcodeTree
+const chalk = require('chalk')
+const log = console.log
+const emitterService = require('./emitter.service')
+const dataService = require('./data.service')
+const sharedService = require('./shared.service')
 
-const apiUrl = "/api/";
-var pageContent = "";
-var page;
-var id;
-var sectionTemplate = "";
-var rowTemplate = "";
-var columnTemplate = "";
+const apiUrl = '/api/'
+const pageContent = ''
+let page
+let id
+const sectionTemplate = ''
+const rowTemplate = ''
+const columnTemplate = ''
 
 module.exports = pageBuilderService = {
   startup: async function (app) {
-    emitterService.on("getRenderedPagePostDataFetch", async function (options) {
+    emitterService.on('getRenderedPagePostDataFetch', async function (options) {
       if (options) {
-        options.page.data.showPageBuilder = options.req.user ? true : false;
+        options.page.data.showPageBuilder = !!options.req.user
       }
-    });
+    })
 
-    app.get("/api/page-templates", async function (req, res) {
-      let data = await dataService.getPageTemplates(req.sessionID);
-      console.log(data);
-      res.json(data);
-    });
+    app.get('/api/page-templates', async function (req, res) {
+      const data = await dataService.getPageTemplates(req.sessionID)
+      console.log(data)
+      res.json(data)
+    })
 
-    app.post("/admin/pb-update-module-delete", async function (req, res) {
-      let data = req.body.data;
-      let shortCodeToRemove;
+    app.post('/admin/pb-update-module-delete', async function (req, res) {
+      const data = req.body.data
+      let shortCodeToRemove
       // console.log(data);
 
       if (data.isPageUsingTemplate && data.pageTemplateRegion) {
-        let page = await dataService.getContentById(data.pageId, req.sessionID);
+        const page = await dataService.getContentById(data.pageId, req.sessionID)
 
-        let region = page.data.pageTemplateRegions.filter(
+        const region = page.data.pageTemplateRegions.filter(
           (r) => r.regionId === data.pageTemplateRegion
-        )[0];
+        )[0]
 
-        let shortCodesInColumn = ShortcodeTree.parse(region.shortCodes);
+        const shortCodesInColumn = ShortcodeTree.parse(region.shortCodes)
 
         shortCodeToRemove = shortCodesInColumn.children.filter(
           (s) => s.shortcode.properties.id === data.moduleId.toString()
-        )[0];
+        )[0]
 
         if (shortCodeToRemove && shortCodeToRemove.shortcode) {
-          let newRegionShortCodes = region.shortCodes.replace(
+          const newRegionShortCodes = region.shortCodes.replace(
             shortCodeToRemove.shortcode.codeText,
-            ""
-          );
-          region.shortCodes = newRegionShortCodes;
+            ''
+          )
+          region.shortCodes = newRegionShortCodes
         }
 
-        await dataService.editInstance(page, req.sessionID);
+        await dataService.editInstance(page, req.sessionID)
       } else {
-        let section = await dataService.getContentById(
+        const section = await dataService.getContentById(
           data.sectionId,
           req.sessionID
-        );
-        let content =
-          section.data.rows[data.rowIndex].columns[data.columnIndex].content;
+        )
+        const content =
+          section.data.rows[data.rowIndex].columns[data.columnIndex].content
         // console.log("content", content);
 
         // remove shortcode from the source column
-        let shortCodesInColumn = ShortcodeTree.parse(content);
+        const shortCodesInColumn = ShortcodeTree.parse(content)
         shortCodeToRemove = shortCodesInColumn.children.filter(
           (x) => x.shortcode.properties.id === data.moduleId.toString()
-        )[0];
+        )[0]
         // console.log("shortCodeToRemove", shortCodeToRemove);
         if (shortCodeToRemove && shortCodeToRemove.shortcode) {
-          let newContent = content.replace(
+          const newContent = content.replace(
             shortCodeToRemove.shortcode.codeText,
-            ""
-          );
+            ''
+          )
           section.data.rows[data.rowIndex].columns[data.columnIndex].content =
-            newContent;
+            newContent
           // console.log("newContent", newContent);
-          await dataService.editInstance(section, req.sessionID);
+          await dataService.editInstance(section, req.sessionID)
         }
       }
 
@@ -87,178 +87,177 @@ module.exports = pageBuilderService = {
         await dataService.contentDelete(
           shortCodeToRemove.shortcode.properties.id,
           req.sessionID
-        );
+        )
       }
 
-      res.send(`ok`);
-    });
+      res.send('ok')
+    })
 
     upsertPageRegion = function (
       page,
       destinationPageTemplateRegion,
       updatedDestinationContent
     ) {
-      let region = page.data.pageTemplateRegions.filter(
+      const region = page.data.pageTemplateRegions.filter(
         (r) => r.regionId === destinationPageTemplateRegion
-      );
+      )
 
       if (region && region.length > 0) {
-        region[0].shortCodes = updatedDestinationContent;
+        region[0].shortCodes = updatedDestinationContent
       } else {
         page.data.pageTemplateRegions.push({
           regionId: destinationPageTemplateRegion,
-          shortCodes: updatedDestinationContent,
-        });
+          shortCodes: updatedDestinationContent
+        })
       }
-    };
+    }
 
-    app.post("/admin/pb-update-module-sort", async function (req, res) {
-      let data = req.body.data;
-      console.log(data);
+    app.post('/admin/pb-update-module-sort', async function (req, res) {
+      const data = req.body.data
+      console.log(data)
 
       if (data.isPageUsingTemplate && data.sourcePageTemplateRegion) {
-        let page = await dataService.getContentById(data.pageId, req.sessionID);
+        const page = await dataService.getContentById(data.pageId, req.sessionID)
 
-        let updatedDestinationContent = sharedService.generateShortCodeList(
+        const updatedDestinationContent = sharedService.generateShortCodeList(
           data.destinationModules
-        );
+        )
 
         upsertPageRegion(
           page,
           data.destinationPageTemplateRegion,
           updatedDestinationContent
-        );
+        )
 
-        //moving between regions, need to remove from source
+        // moving between regions, need to remove from source
         if (
           data.sourcePageTemplateRegion !== data.destinationPageTemplateRegion
         ) {
-          let sourceRegion = page.data.pageTemplateRegions.filter(
+          const sourceRegion = page.data.pageTemplateRegions.filter(
             (r) => r.regionId === data.sourcePageTemplateRegion
-          );
+          )
 
-          let shortCodesInColumn = ShortcodeTree.parse(
+          const shortCodesInColumn = ShortcodeTree.parse(
             sourceRegion[0].shortCodes
-          );
+          )
 
-          //moduleBeingMovedId
+          // moduleBeingMovedId
 
-          let shortCodeToRemove = shortCodesInColumn.children.filter(
+          const shortCodeToRemove = shortCodesInColumn.children.filter(
             (s) => s.shortcode.properties.id === data.moduleBeingMovedId
-          )[0];
+          )[0]
           // console.log("shortCodeToRemove", shortCodeToRemove);
 
-          let shortCodeToRemoveText = shortCodeToRemove.shortcode.codeText;
+          const shortCodeToRemoveText = shortCodeToRemove.shortcode.codeText
           sourceRegion[0].shortCodes = sourceRegion[0].shortCodes.replace(
             shortCodeToRemoveText,
-            ""
-          );
+            ''
+          )
         }
 
-        await dataService.editInstance(page, req.sessionID);
+        await dataService.editInstance(page, req.sessionID)
       } else {
-        let sourceSection = await dataService.getContentById(
+        const sourceSection = await dataService.getContentById(
           data.sourceSectionId,
           req.sessionID
-        );
-        let content =
+        )
+        const content =
           sourceSection.data.rows[data.sourceRowIndex].columns[
             data.sourceColumnIndex
-          ].content;
+          ].content
         // console.log("content", content);
 
         // remove shortcode from the source column
-        let shortCodesInColumn = ShortcodeTree.parse(content);
-        let shortCodeToRemove = shortCodesInColumn.children.filter(
+        const shortCodesInColumn = ShortcodeTree.parse(content)
+        const shortCodeToRemove = shortCodesInColumn.children.filter(
           (s) => s.shortcode.properties.id === data.moduleBeingMovedId
-        )[0];
+        )[0]
         // console.log("shortCodeToRemove", shortCodeToRemove);
         if (shortCodeToRemove && shortCodeToRemove.shortcode) {
-          let newContent = content.replace(
+          const newContent = content.replace(
             shortCodeToRemove.shortcode.codeText,
-            ""
-          );
+            ''
+          )
           sourceSection.data.rows[data.sourceRowIndex].columns[
             data.sourceColumnIndex
-          ].content = newContent;
+          ].content = newContent
           // console.log("newContent", newContent);
-          await dataService.editInstance(sourceSection, req.sessionID);
+          await dataService.editInstance(sourceSection, req.sessionID)
         }
 
-        //regen the destination
-        let destinationSection = await dataService.getContentById(
+        // regen the destination
+        const destinationSection = await dataService.getContentById(
           data.destinationSectionId,
           req.sessionID
-        );
+        )
 
-        let updatedDestinationContent = sharedService.generateShortCodeList(
+        const updatedDestinationContent = sharedService.generateShortCodeList(
           data.destinationModules
-        );
+        )
         // console.log("updatedDestinationContent", updatedDestinationContent);
         destinationSection.data.rows[data.destinationRowIndex].columns[
           data.destinationColumnIndex
-        ].content = updatedDestinationContent;
+        ].content = updatedDestinationContent
 
-        let r = await dataService.editInstance(
+        const r = await dataService.editInstance(
           destinationSection,
           req.sessionID
-        );
+        )
       }
-      res.send(`ok`);
-    });
+      res.send('ok')
+    })
 
-    app.post("/admin/pb-update-module-copy", async function (req, res) {
-      let data = req.body.data;
-      console.log(data);
+    app.post('/admin/pb-update-module-copy', async function (req, res) {
+      const data = req.body.data
+      console.log(data)
 
-      let section = await dataService.getContentById(
+      const section = await dataService.getContentById(
         data.sectionId,
         req.sessionID
-      );
-      let content =
-        section.data.rows[data.rowIndex].columns[data.columnIndex].content;
-      console.log("content", content);
+      )
+      const content =
+        section.data.rows[data.rowIndex].columns[data.columnIndex].content
+      console.log('content', content)
 
-      //copy module
-      let moduleToCopy = await dataService.getContentById(
+      // copy module
+      const moduleToCopy = await dataService.getContentById(
         data.moduleId,
         req.sessionID
-      );
-      let newModule = await dataService.contentCreate(
+      )
+      const newModule = await dataService.contentCreate(
         moduleToCopy,
         true,
         req.sessionID
-      );
+      )
 
       if (data.isPageUsingTemplate && data.sourcePageTemplateRegion) {
+        const page = await dataService.getContentById(data.pageId, req.sessionID)
 
-        let page = await dataService.getContentById(data.pageId, req.sessionID);
-
-        let sourceRegion = page.data.pageTemplateRegions.filter(
+        const sourceRegion = page.data.pageTemplateRegions.filter(
           (r) => r.regionId === data.sourcePageTemplateRegion
-        )[0];
+        )[0]
 
-        let shortCodesInColumn = ShortcodeTree.parse(
+        const shortCodesInColumn = ShortcodeTree.parse(
           sourceRegion.shortCodes
-        );
+        )
 
-        let args = { id: newModule.id };
-        let nodeModuleShortCode = sharedService.generateShortCode(
+        const args = { id: newModule.id }
+        const nodeModuleShortCode = sharedService.generateShortCode(
           `${newModule.contentTypeId}`,
           args
-        );
+        )
 
-        let argsOld = { id: moduleToCopy.id };
-        let oldModuleShortCode = sharedService.generateShortCode(
+        const argsOld = { id: moduleToCopy.id }
+        const oldModuleShortCode = sharedService.generateShortCode(
           `${moduleToCopy.contentTypeId}`,
           argsOld
-        );
+        )
 
         sourceRegion.shortCodes = sourceRegion.shortCodes.replace(oldModuleShortCode, oldModuleShortCode + nodeModuleShortCode)
 
-        let result = await dataService.editInstance(page, req.sessionID);
+        const result = await dataService.editInstance(page, req.sessionID)
 
-        //moduleBeingMovedId
+        // moduleBeingMovedId
 
         // let shortCodeToRemove = shortCodesInColumn.children.filter(
         //   (s) => s.shortcode.properties.id === data.moduleBeingMovedId
@@ -270,42 +269,41 @@ module.exports = pageBuilderService = {
         //   shortCodeToRemoveText,
         //   ""
         // );
-
       } else {
-        let sectionColumn =
-          section.data.rows[data.rowIndex].columns[data.columnIndex];
+        const sectionColumn =
+          section.data.rows[data.rowIndex].columns[data.columnIndex]
 
-        let shortCodesInColumn = ShortcodeTree.parse(sectionColumn.content);
+        const shortCodesInColumn = ShortcodeTree.parse(sectionColumn.content)
 
         // generate short code ie: [MODULE-HELLO-WORLD id="123"]
-        let args = { id: newModule.id };
-        let moduleInstanceShortCodeText = sharedService.generateShortCode(
+        const args = { id: newModule.id }
+        const moduleInstanceShortCodeText = sharedService.generateShortCode(
           `${newModule.contentTypeId}`,
           args
-        );
+        )
 
-        let moduleInstanceShortCode = ShortcodeTree.parse(
+        const moduleInstanceShortCode = ShortcodeTree.parse(
           moduleInstanceShortCodeText
-        ).children[0];
+        ).children[0]
 
         shortCodesInColumn.children.splice(
           data.moduleIndex + 1,
           0,
           moduleInstanceShortCode
-        );
+        )
 
-        let newShortCodeContent =
-          sharedService.generateContentFromShortcodeList(shortCodesInColumn);
+        const newShortCodeContent =
+          sharedService.generateContentFromShortcodeList(shortCodesInColumn)
 
         section.data.rows[data.rowIndex].columns[data.columnIndex].content =
-          newShortCodeContent;
+          newShortCodeContent
 
-        let result = await dataService.editInstance(section, req.sessionID);
+        const result = await dataService.editInstance(section, req.sessionID)
       }
 
-      res.send(`ok`);
+      res.send('ok')
       // // return;
-    });
+    })
   },
   // module.exports = {
 
@@ -315,37 +313,37 @@ module.exports = pageBuilderService = {
 
   processPageBuilder: async function (page) {
     // console.log('<==processPageBuilder', page);
-    this.page = page;
-    const $ = cheerio.load(page.data.body);
+    this.page = page
+    const $ = cheerio.load(page.data.body)
 
-    let body = $("body");
+    const body = $('body')
 
-    //load pb root index file
-    let ui = await this.getPageBuilderUI();
+    // load pb root index file
+    const ui = await this.getPageBuilderUI()
 
     // console.log(pageBuilder);
     // body.prepend(ui);
 
     // return $.html();
-    return ui;
+    return ui
   },
 
   getPageBuilderUI: async function () {
-    let themePath = __dirname + "/../page-builder/page-builder.html";
+    const themePath = __dirname + '/../page-builder/page-builder.html'
 
     return new Promise((resolve, reject) => {
-      fs.readFile(themePath, "utf8", (err, data) => {
+      fs.readFile(themePath, 'utf8', (err, data) => {
         if (err) {
-          console.log(err);
-          reject(err);
+          console.log(err)
+          reject(err)
         } else {
           // console.log('data==>', data);
           // this.processTemplate(data).then(html => {
           //     resolve(html);
           // })
         }
-      });
-    });
+      })
+    })
   },
 
   // processTemplate: async function (html) {
@@ -368,19 +366,19 @@ module.exports = pageBuilderService = {
   // },
 
   loadHtmlTemplates: async function ($) {
-    this.columnTemplate = $.html(".s--column");
+    this.columnTemplate = $.html('.s--column')
     // console.log(chalk.blue('columnTemplate-->', this.columnTemplate));
 
-    this.rowTemplate = $.html(".s--row").replace(
+    this.rowTemplate = $.html('.s--row').replace(
       this.columnTemplate,
-      "[[columnTemplate]]"
-    );
+      '[[columnTemplate]]'
+    )
     // console.log(chalk.green('rowTemplate-->', this.rowTemplate));
 
-    this.sectionTemplate = $.html(".s--section").replace(
+    this.sectionTemplate = $.html('.s--section').replace(
       this.rowTemplate,
-      "[[rowTemplate]]"
-    );
+      '[[rowTemplate]]'
+    )
     // console.log(chalk.cyan('sectionTemplate-->', this.sectionTemplate));
   },
 
@@ -445,17 +443,17 @@ module.exports = pageBuilderService = {
   // },
 
   getContentById: async function (id) {
-    let url = `${apiUrl}content/${id}`;
+    const url = `${apiUrl}content/${id}`
     // console.log('url', url);
-    let page = await axios.get(url);
-    page.data.html = undefined;
+    const page = await axios.get(url)
+    page.data.html = undefined
     // console.log('getContent', page.data);
-    return page.data;
+    return page.data
   },
 
   asyncForEach: async function (array, callback) {
     for (let index = 0; index < array.length; index++) {
-      await callback(array[index], index, array);
+      await callback(array[index], index, array)
     }
-  },
-};
+  }
+}

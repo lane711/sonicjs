@@ -1,19 +1,19 @@
-var dataService = require("./data.service");
-var helperService = require("./helper.service");
-var emitterService = require("./emitter.service");
-var s3Service = require("./s3.service");
+const dataService = require('./data.service')
+const helperService = require('./helper.service')
+const emitterService = require('./emitter.service')
+const s3Service = require('./s3.service')
 
-var fs = require("fs");
-var fsPromise = require("fs").promises;
-const axios = require("axios");
-const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
-const chalk = require("chalk");
-const log = console.log;
-var path = require("path");
-const YAML = require("yaml");
-const { parse, stringify } = require("envfile");
-var appRoot = require("app-root-path");
-const glob = require("glob");
+const fs = require('fs')
+const fsPromise = require('fs').promises
+const axios = require('axios')
+const ShortcodeTree = require('shortcode-tree').ShortcodeTree
+const chalk = require('chalk')
+const log = console.log
+const path = require('path')
+const YAML = require('yaml')
+const { parse, stringify } = require('envfile')
+const appRoot = require('app-root-path')
+const glob = require('glob')
 
 module.exports = fileService = {
   // startup: async function () {
@@ -25,134 +25,134 @@ module.exports = fileService = {
   // },
 
   getFile: async function (relativeFilePath) {
-    let filePath = path.join(appRoot.path, relativeFilePath);
+    let filePath = path.join(appRoot.path, relativeFilePath)
 
-    if (filePath.includes("/server/sonicjs-services/")) {
+    if (filePath.includes('/server/sonicjs-services/')) {
       filePath = filePath.replace(
-        "/server/sonicjs-services/",
-        "/server/services/"
-      );
+        '/server/sonicjs-services/',
+        '/server/services/'
+      )
     }
 
     return new Promise((resolve, reject) => {
-      fs.readFile(filePath, "utf8", (err, data) => {
+      fs.readFile(filePath, 'utf8', (err, data) => {
         if (err) {
-          console.log(chalk.red(err));
-          reject(err);
-        } else resolve(data);
-      });
-    });
+          console.log(chalk.red(err))
+          reject(err)
+        } else resolve(data)
+      })
+    })
   },
 
   getFileSync: function (relativeFilePath) {
-    if (!relativeFilePath.includes(".gitignore")) {
-      let filePath = path.join(appRoot.path, relativeFilePath);
+    if (!relativeFilePath.includes('.gitignore')) {
+      const filePath = path.join(appRoot.path, relativeFilePath)
 
       // console.log('getFileSync filePath: ', filePath);
 
-      let content = fs.readFileSync(filePath, "utf8");
-      return content;
+      const content = fs.readFileSync(filePath, 'utf8')
+      return content
     }
   },
 
   getFilesSync: function (relativeDir) {
-    let files = fs.readdirSync(path.join(appRoot.path + relativeDir));
-    return files;
+    const files = fs.readdirSync(path.join(appRoot.path + relativeDir))
+    return files
   },
 
   getFilesSearchSync: function (dir, pattern) {
-    const files = glob.sync(path.join(dir + pattern));
-    let filesRelative = fileService.convertFullPathToRelative(files);
-    return filesRelative;
+    const files = glob.sync(path.join(dir + pattern))
+    const filesRelative = fileService.convertFullPathToRelative(files)
+    return filesRelative
   },
 
   convertFullPathToRelative: function (files) {
-    let filesRelative = [];
+    const filesRelative = []
 
     files.forEach((file) => {
-      const root = appRoot.path.split(path.sep).join(path.posix.sep);
-      filesRelative.push(file.replace(root, ""));
-    });
+      const root = appRoot.path.split(path.sep).join(path.posix.sep)
+      filesRelative.push(file.replace(root, ''))
+    })
 
-    return filesRelative;
+    return filesRelative
   },
 
   getFilePath: function (filePath, root = false) {
-    let adminPath = "";
+    let adminPath = ''
     if (root) {
-      adminPath = path.join(__dirname, "../../", filePath);
+      adminPath = path.join(__dirname, '../../', filePath)
     } else {
-      adminPath = path.join(__dirname, "../", filePath);
+      adminPath = path.join(__dirname, '../', filePath)
     }
-    return adminPath;
+    return adminPath
   },
 
   getYamlConfig: async function (path) {
-    let yamlFile = await this.getFile(path);
-    let parsedFile = YAML.parse(yamlFile);
-    return parsedFile;
+    const yamlFile = await this.getFile(path)
+    const parsedFile = YAML.parse(yamlFile)
+    return parsedFile
   },
 
   writeFile: async function (filePath, fileContent) {
-    let fullPath = path.join(this.getRootAppPath(), filePath);
-    await fsPromise.writeFile(fullPath, fileContent);
+    const fullPath = path.join(this.getRootAppPath(), filePath)
+    await fsPromise.writeFile(fullPath, fileContent)
   },
 
   uploadWriteFile: async function (file, sessionID) {
-    let storageOption = process.env.FILE_STORAGE;
+    const storageOption = process.env.FILE_STORAGE
     if (
-      storageOption === "AMAZON_S3" &&
+      storageOption === 'AMAZON_S3' &&
       file.name.match(/.(jpg|jpeg|png|gif|svg)$/i)
     ) {
-      var title = file.name.replace(/^.*[\\\/]/, "");
-      let result = await s3Service.upload(
+      const title = file.name.replace(/^.*[\\\/]/, '')
+      const result = await s3Service.upload(
         file.name,
         file.path,
-        "image",
+        'image',
         file.type
-      );
+      )
 
-      //see if image already exists
-      let existingMedia = await dataService.getContentByContentTypeAndTitle(
-        "media",
+      // see if image already exists
+      const existingMedia = await dataService.getContentByContentTypeAndTitle(
+        'media',
         title
-      );
+      )
 
       if (!existingMedia) {
-        //create media record
-        let payload = {
+        // create media record
+        const payload = {
           data: {
             title: title,
             file: file.name,
-            contentType: "media",
-          },
-        };
+            contentType: 'media'
+          }
+        }
         // debugger;
-        await dataService.contentCreate(payload, true, sessionID);
+        await dataService.contentCreate(payload, true, sessionID)
       }
       // await createInstance(payload);
-      //delete temp file?
+      // delete temp file?
     }
   },
 
   createDirectory: async function (directoryRelativePath) {
-    let dirPath = path.join(appRoot.path, directoryRelativePath);
+    const dirPath = path.join(appRoot.path, directoryRelativePath)
     if (!fs.existsSync(dirPath)) {
-      fs.mkdirSync(dirPath);
+      fs.mkdirSync(dirPath)
     }
   },
 
   fileExists: function (filePath) {
-    let dirPath = path.join(appRoot.path, filePath);
-    let fileExist = fs.existsSync(dirPath);
-    return fileExist;
+    const dirPath = path.join(appRoot.path, filePath)
+    const fileExist = fs.existsSync(dirPath)
+    return fileExist
   },
 
   getRootAppPath: function () {
-    return appRoot.path;
+    return appRoot.path
   },
 
-  //this causes all env comments to be lost
+  // this causes all env comments to be lost
   // updateEnvFileVariable: async function (variableName, variableValue) {
   //   process.env.REBUILD_ASSETS = "FALSE";
 
@@ -164,24 +164,24 @@ module.exports = fileService = {
   // },
 
   deleteFile: function (filePath) {
-    fs.unlinkSync(filePath);
+    fs.unlinkSync(filePath)
   },
 
   deleteFilesInDirectory: function (directory) {
     fs.readdir(directory, (err, files) => {
-      if (err) throw err;
+      if (err) throw err
 
       for (const file of files) {
-        if (!file.includes(".gitignore")) {
+        if (!file.includes('.gitignore')) {
           fs.unlink(path.join(directory, file), (err) => {
-            if (err) throw err;
-          });
+            if (err) throw err
+          })
         }
       }
-    });
+    })
   },
 
   deleteDirectory: function (directoryPath) {
-    return fs.rmdirSync(directoryPath, { recursive: true });
-  },
-};
+    return fs.rmdirSync(directoryPath, { recursive: true })
+  }
+}

@@ -1,67 +1,67 @@
-const fs = require("fs");
-const { parse, stringify } = require("envfile");
-const path = require("path");
-const Content = require("../schema/models/content");
+const fs = require('fs')
+const { parse, stringify } = require('envfile')
+const path = require('path')
+const Content = require('../schema/models/content')
 
-const mongoose = require("mongoose");
+const mongoose = require('mongoose')
 
-mongoose.connect("mongodb://localhost:27017/sonicjs", {
+mongoose.connect('mongodb://localhost:27017/sonicjs', {
   useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+  useUnifiedTopology: true
+})
 
-mongoose.connection.once("open", () => {
-  console.log("conneted to database");
+mongoose.connection.once('open', () => {
+  console.log('conneted to database')
 
-  console.log("Info: running seed-data.js to seed database.");
+  console.log('Info: running seed-data.js to seed database.')
 
-  let dataRaw = fs.readFileSync("server/data/data.json");
-  let data = JSON.parse(dataRaw);
+  const dataRaw = fs.readFileSync('server/data/data.json')
+  const data = JSON.parse(dataRaw)
 
   // console.log(data);
   // migrateContentTypes(app);
-  migrateContent(data);
-});
+  migrateContent(data)
+})
 
-async function migrateContent(data) {
-  let contentObjs = data.models.content;
+async function migrateContent (data) {
+  const contentObjs = data.models.content
 
-  var contents = Object.keys(contentObjs).map((key) => [
+  const contents = Object.keys(contentObjs).map((key) => [
     Number(key),
-    contentObjs[key],
-  ]);
+    contentObjs[key]
+  ])
 
   contents.forEach((contentData) => {
-    console.log(contentData);
-    let objString = contentData[1];
-    let obj = JSON.parse(objString);
+    console.log(contentData)
+    const objString = contentData[1]
+    const obj = JSON.parse(objString)
 
-    let newContent = {
-      data: obj.data,
-    };
+    const newContent = {
+      data: obj.data
+    }
 
-    console.log(newContent);
+    console.log(newContent)
 
-    let url = newContent.data.url ?? slugify(newContent.data.title) ?? slugify(newContent.data.contentType);
-    console.log("url -->", url);
+    const url = newContent.data.url ?? slugify(newContent.data.title) ?? slugify(newContent.data.contentType)
+    console.log('url -->', url)
 
-    //insert to db
-    let content = new Content({
+    // insert to db
+    const content = new Content({
       contentTypeId: newContent.data.contentType,
       data: newContent.data,
       createdByUserId: -1,
       lastUpdatedByUserId: -1,
       url: url,
       createdOn: new Date(),
-      updatedOn: new Date(),
-    });
+      updatedOn: new Date()
+    })
 
-    delete content.data.contentType;
+    delete content.data.contentType
 
     try {
-      content.save();
+      content.save()
     } catch (error) {
-      console.log(err);
+      console.log(err)
     }
 
     // app.models.content.create(newContent, function (err, newInstance) {
@@ -70,33 +70,33 @@ async function migrateContent(data) {
     //   setEnvVarToEnsureMigrationDoesNotRunAgain();
     //   console.log("Success! Initial data migration complete.");
     // });
-  });
+  })
 }
 
-function slugify(text) {
+function slugify (text) {
   // console.log('slug', text);
   if (!text) {
-    return undefined;
+    return undefined
   }
 
-  let slug = text
+  const slug = text
     .toLowerCase()
-    .replace(/[^\w ]+/g, "")
-    .replace(/ +/g, "-");
+    .replace(/[^\w ]+/g, '')
+    .replace(/ +/g, '-')
 
-  return '/' + slug;
+  return '/' + slug
 }
 
-async function setEnvVarToEnsureMigrationDoesNotRunAgain() {
-  let sourcePath = path.join(__dirname, "../..", ".env");
+async function setEnvVarToEnsureMigrationDoesNotRunAgain () {
+  const sourcePath = path.join(__dirname, '../..', '.env')
 
-  fs.readFile(sourcePath, "utf8", function (err, data) {
+  fs.readFile(sourcePath, 'utf8', function (err, data) {
     if (err) {
-      return console.log(err);
+      return console.log(err)
     }
-    let parsedFile = parse(data);
-    parsedFile.RUN_NEW_SITE_MIGRATION = "FALSE";
-    fs.writeFileSync(sourcePath, stringify(parsedFile));
-  });
+    const parsedFile = parse(data)
+    parsedFile.RUN_NEW_SITE_MIGRATION = 'FALSE'
+    fs.writeFileSync(sourcePath, stringify(parsedFile))
+  })
 }
 // };

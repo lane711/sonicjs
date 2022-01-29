@@ -1,52 +1,45 @@
-var dataService = require('../../../services/data.service');
-var emitterService = require('../../../services/emitter.service');
-var globalService = require('../../../services/global.service');
-var helperService = require('../../../services/helper.service');
+const dataService = require('../../../services/data.service')
+const emitterService = require('../../../services/emitter.service')
+const globalService = require('../../../services/global.service')
+const helperService = require('../../../services/helper.service')
 
 module.exports = compareCmsMainService = {
 
-    startup: async function () {
-        emitterService.on('beginProcessModuleShortCode', async function (options) {
+  startup: async function () {
+    emitterService.on('beginProcessModuleShortCode', async function (options) {
+      if (options.shortcode.name === 'COMPARE-CMS') {
+        options.moduleName = 'compare-cms'
+        await moduleService.processModuleInColumn(options)
+      }
+    })
 
-            if (options.shortcode.name === 'COMPARE-CMS') {
+    emitterService.on('postModuleGetData', async function (options) {
+      if (options.shortcode.name === 'COMPARE-CMS') {
+        await compareCmsMainService.getCompareRowData(options)
+      }
+    })
+  },
 
-                options.moduleName = 'compare-cms';
-                await moduleService.processModuleInColumn(options);
-            }
+  getCompareRowData: async function (options) {
+    const list = await dataService.getContentByType('compare-row', options.req.sessionID)
+    // list = list.sort((a, b) => (a.title > b.title) ? 1 : -1)
 
-        });
+    options.viewModel.data.list = list[0].data.cmsList
+    // add anchor ids
+    options.viewModel.data.list.forEach(row => {
+      if (row.title) {
+        row.anchor = helperService.slugify(row.title)
+      }
+    })
 
-        emitterService.on("postModuleGetData", async function (options) {
-            if (options.shortcode.name === "COMPARE-CMS") {
-              await compareCmsMainService.getCompareRowData(options);
-            }
-          });
-    },
+    options.viewModel.data.rows = list[0].data.dataGrid
 
-    getCompareRowData: async function (options) {
-   
-        let list = await dataService.getContentByType("compare-row", options.req.sessionID);
-        // list = list.sort((a, b) => (a.title > b.title) ? 1 : -1)
-
-        options.viewModel.data.list = list[0].data.cmsList;
-        //add anchor ids
-        options.viewModel.data.list.forEach(row => {
-          if(row.title){
-            row.anchor = helperService.slugify(row.title);
-          }
-        });
-
-
-
-        options.viewModel.data.rows = list[0].data.dataGrid;
-
-        //add anchor ids
-        options.viewModel.data.rows.forEach(row => {
-          if(row.category){
-            row.anchor = helperService.slugify(row.title);
-          }
-        });
-      },
+    // add anchor ids
+    options.viewModel.data.rows.forEach(row => {
+      if (row.category) {
+        row.anchor = helperService.slugify(row.title)
+      }
+    })
+  }
 
 }
-

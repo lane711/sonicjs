@@ -1,37 +1,29 @@
-var dataService = require('./data.service');
-var helperService = require('./helper.service');
-var fileService = require('./file.service');
+const fileService = require('./file.service')
 
-// var fs = require('fs');
-
-
-var handlebars = require('handlebars');
-
+const handlebars = require('handlebars')
 
 module.exports = viewService = {
+  getProcessedView: function (contentType, viewModel, viewPath) {
+    const source = viewService.getHandlebarsTemplateForContentType(
+      contentType,
+      viewPath
+    )
 
-    getProcessedView: function (contentType, viewModel, viewPath) {
-        var source = viewService.getHandlebarsTemplateForContentType(contentType, viewPath);
-        
-        var result = viewService.processTemplateString(source, viewModel)
+    const result = viewService.processTemplateString(source, viewModel)
 
-        return result;
-    },
+    return result
+  },
 
-    processTemplateString: function (template, viewModel) {
+  processTemplateString: function (template, viewModel) {
+    const templateView = handlebars.compile(template)
 
-        var templateView = handlebars.compile(template);
+    const result = templateView(viewModel)
 
-        var result = templateView(viewModel);
+    return result
+  },
 
-        return result;
-    },
-
-    getHandlebarsTemplateForContentType: function (contentType, viewPath) {
-
-        let file = fileService.getFileSync(viewPath);
-        return file;
-
-    },
-
+  getHandlebarsTemplateForContentType: function (contentType, viewPath) {
+    const file = fileService.getFileSync(viewPath)
+    return file
+  }
 }
