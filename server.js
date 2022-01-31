@@ -303,7 +303,7 @@ function main() {
     sslParam = false;
   }
 
-  sslParam = true;
+  // sslParam = true;
 
   let connectionSettings = {
     url: process.env.DATABASE_URL,
