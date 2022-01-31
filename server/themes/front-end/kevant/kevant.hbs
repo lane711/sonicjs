@@ -62,68 +62,57 @@
 
 <!-- Footer -->
 
-<footer class="text-center text-lg-start bg-dark text-light">
+<footer class="text-center text-lg-start bg-dark text-light footer">
 
 
     <!-- Section: Links  -->
     <section class="">
-        <div class="container text-center text-md-start mt-5">
+        <div class="container text-center text-md-start mt-5 text-muted">
             <!-- Grid row -->
             <div class="row mt-3">
                 <!-- Grid column -->
-                <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
+                <div class="col-md-4 col-lg-4 col-xl-3 mx-auto mb-4">
                     <!-- Content -->
                     <h6 class="text-uppercase fw-bold mb-4">
-                        <i class="fas fa-gem me-3"></i> <i class="fa-regular fa-house-blank"></i> Kevant Technologies
+                        <i class="bi bi-gem"></i> Kevant Technologies
                     </h6>
                     <p>
-                        Here you can use rows and columns to organize your footer content. Lorem ipsum
-                        dolor sit amet, consectetur adipisicing elit.
+                        We are a team of passionate IT professionals providing custom web and application development
+                        services
+                        dedicated towards bringing your product vision to life.
+                    </p>
+                    <p>
+                        We are a team of passionate IT professionals providing custom web and application development
+                        services
+                        dedicated towards bringing your product vision to life.
                     </p>
                 </div>
                 <!-- Grid column -->
 
                 <!-- Grid column -->
-                <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
+                <div class="col-md-4 col-lg-2 col-xl-2 mx-auto mb-4">
                     <!-- Links -->
                     <h6 class="text-uppercase fw-bold mb-4">
-                        Products
+                        Resoruces
                     </h6>
                     <p>
-                        <a href="#!" class="text-reset">Angular</a>
+                        <i class="bi bi-dash"></i><a href="#!" class="text-reset">Our Services</a>
                     </p>
                     <p>
-                        <a href="#!" class="text-reset">React</a>
+                        <i class="bi bi-dash"></i> <a href="#!" class="text-reset">Website Design</a>
                     </p>
                     <p>
-                        <a href="#!" class="text-reset">Vue</a>
+                        <i class="bi bi-dash"></i> <a href="#!" class="text-reset">Web App Development</a>
                     </p>
                     <p>
-                        <a href="#!" class="text-reset">Laravel</a>
+                        <i class="bi bi-dash"></i> <a href="#!" class="text-reset">Mobile App Development</a>
+                    </p>
+                    <p>
+                        <i class="bi bi-dash"></i> <a href="#!" class="text-reset">Case Studies</a>
                     </p>
                 </div>
                 <!-- Grid column -->
 
-                <!-- Grid column -->
-                <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
-                    <!-- Links -->
-                    <h6 class="text-uppercase fw-bold mb-4">
-                        Useful links
-                    </h6>
-                    <p>
-                        <a href="#!" class="text-reset">Pricing</a>
-                    </p>
-                    <p>
-                        <a href="#!" class="text-reset">Settings</a>
-                    </p>
-                    <p>
-                        <a href="#!" class="text-reset">Orders</a>
-                    </p>
-                    <p>
-                        <a href="#!" class="text-reset">Help</a>
-                    </p>
-                </div>
-                <!-- Grid column -->
 
                 <!-- Grid column -->
                 <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
@@ -131,14 +120,15 @@
                     <h6 class="text-uppercase fw-bold mb-4">
                         Contact
                     </h6>
-                    <p><i class="bi bi-house"></i>
-                        New York, NY 10012, US</p>
+                    <p><i class="bi bi-building"></i>
+                        Mission Viejo, CA 92692, US</p>
                     <p>
-                        <i class="bi bi-envelope"></i>
-                        info@example.com
+                        <i class="bi bi-envelope"></i><a class="text-reset" href="mailTo:contact@kevant.com">contact@kevant.com
+                    </a>
                     </p>
-                    <p><i class="bi bi-phone"></i> + 01 234 567 88</p>
-                    <p><i class="bi bi-phone"></i> + 01 234 567 89</p>
+                    <p><i class="bi bi-phone"></i>US + 01 949.287.4720</p>
+                    <p><i class="bi bi-linkedin"></i>Connet on LinkedIn</p>
+                    <p><i class="bi bi-calendar-check"></i>M-F 8AM - 6PM PST</p>
                 </div>
                 <!-- Grid column -->
             </div>
@@ -148,9 +138,9 @@
     <!-- Section: Links  -->
 
     <!-- Copyright -->
-    <div class="text-center p-4" style="background-color: rgba(0, 0, 0, 0.05);">
-        {{ data.themeSettings.footerText }}
-    </div>
+    <section class="copyright text-center p-4">
+                    {{ data.themeSettings.footerText }}<a href="/terms">Terms</a><a href="/privacy">Privacy</a><a href="/cookie-policy">Cookie Policy</a>
+    </section>
     <!-- Copyright -->
 </footer>
 <!-- Footer -->

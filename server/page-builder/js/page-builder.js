@@ -1112,7 +1112,7 @@ function loadJsonEditor() {
 
 function setupJsonRawSave() {
   $("#saveRawJson").on("click", function () {
-    debugger;
+    // debugger;
     let rawData = jsonEditorRaw.get();
     console.log("json save");
     let contentId = $("#contentId").val();

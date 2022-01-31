@@ -71,10 +71,6 @@ p {
     font-size: 2rem;
 }
 
-.client-logos {
-    background: url(images/bar-bg.jpg) repeat-x
-}
-
 .client-logos .table {
     display: table;
     margin: 0 auto
@@ -1183,15 +1179,15 @@ fieldset:last-child {
 }
 
 .platforms-options label.is-web {
-    background-image: url(https://railsware.com/assets/web-c1490a676dedd27d94d027658ed956db.svg);
+    background-image: url(https://sonicjscom.s3.us-west-1.amazonaws.com/web-icon.svg);
 }
 
 .platforms-options label.is-ios {
-    background-image: url(https://railsware.com/assets/ios-d8f28b5a41229b7f3a207c0d984685c0.svg);
+    background-image: url(https://sonicjscom.s3.us-west-1.amazonaws.com/ios-icon.svg);
 }
 
 .platforms-options label.is-android {
-    background-image: url(https://railsware.com/assets/gray-android-c3ea447744b8d871ae2af89b64df6406.svg);
+    background-image: url(https://sonicjscom.s3.us-west-1.amazonaws.com/android-icon.svg);
 }
 
 @media (max-width: 1000px) {
@@ -1202,19 +1198,6 @@ fieldset:last-child {
 
 section {
     overflow: hidden;
-}
-
-/*! CSS Used fontfaces */
-@font-face {
-    font-family: "Poppins SemiBold";
-    src: url(https://railsware.com/assets/Poppins-SemiBold-cce5625b56ec678e42021270b84ef400.ttf) format("truetype");
-    font-style: normal;
-}
-
-@font-face {
-    font-family: "Poppins Regular";
-    src: url(https://railsware.com/assets/Poppins-Regular-8081832fc5cfbf634aa664a9eff0350e.ttf) format("truetype");
-    font-style: normal;
 }
 
 /* end contact form */
@@ -1230,3 +1213,33 @@ section {
 .footer span {
     font-size: .7rem;
 }
+
+.footer .copyright{
+    font-size:.8rem;
+    color: #999;
+    background-color:#111;
+}
+
+.footer .copyright a{
+    font-size:.8rem;
+    color: #999 !important;
+    margin:0 0 0 20px;
+}
+
+.footer p, .footer a{
+    font-size:.9rem;
+}
+
+.footer i{
+    margin: 0 12px 0 0;
+}
+
+.footer .text-muted {
+    color: #999!important;
+}
+
+.text-reset{
+    padding: 0;
+    margin: 0;
+}
+
