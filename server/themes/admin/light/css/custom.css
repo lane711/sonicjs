@@ -94,3 +94,8 @@
   top:6px;
   cursor: pointer;
 }
+
+.dropzone2 span{
+  font-size: .7rem!important;
+  display:block;
+}

@@ -66,12 +66,12 @@ exports.loadRoutes = async function (app) {
     await pageBuilderService.startup(app);
     await pageBuilderService.startup(app);
 
-    await emitterService.emit("startup", { app: app });
+    await emitterService.emit("startup", {app: app});
 
     //load catch-all last
     this.loadRoutesCatchAll(app);
 
-    await emitterService.emit("started", { app: app });
+    await emitterService.emit("started", {app: app});
   })();
 
   app.get("*", async function (req, res, next) {
@@ -114,22 +114,22 @@ exports.loadRoutes = async function (app) {
 
   app.get("/zsandbox", async function (req, res) {
     let data = {};
-    res.render("sandbox", { layout: "blank.handlebars", data: data });
+    res.render("sandbox", {layout: "blank.handlebars", data: data});
   });
 
   app.get("/theme1", async function (req, res) {
     let data = {};
-    res.render("sandbox", { layout: theme, data: data });
+    res.render("sandbox", {layout: theme, data: data});
   });
 
   app.get("/theme2", async function (req, res) {
     let data = {};
-    res.render("sandbox", { layout: "theme2.handlebars", data: data });
+    res.render("sandbox", {layout: "theme2.handlebars", data: data});
   });
 
   app.get("/admin/sandbox", async function (req, res) {
     let data = {};
-    res.render("sandbox", { layout: "admin.handlebars", data: data });
+    res.render("sandbox", {layout: "admin.handlebars", data: data});
   });
 
   app.get("/css/generated.css", async function (req, res) {
@@ -139,16 +139,21 @@ exports.loadRoutes = async function (app) {
   });
 
   app.post("/dropzone-upload", async function (req, res) {
-    console.log("dropzone-upload req.files.file", req.files.file);
-    await fileService.uploadWriteFile(req.files.file, req.sessionID);
-    res.sendStatus(200);
-  });
+      console.log("dropzone-upload req.files.file", req.files.file);
+      if (req.files.file.name.match(/.(zip)$/i)) {
+        await fileService.uploadBackupFile(req.files.file, req.sessionID);
+      } else {
+        await fileService.uploadWriteFile(req.files.file, req.sessionID);
+      }
+      res.sendStatus(200);
+    }
+  );
 
   app.post("/form-submission", async function (req, res) {
     let payload = req.body.data.data ? req.body.data.data : undefined;
 
     if (payload) {
-      let options = { data: payload, sessionID: req.sessionID };
+      let options = {data: payload, sessionID: req.sessionID};
 
       await emitterService.emit("afterFormSubmit", options);
     }
@@ -157,7 +162,7 @@ exports.loadRoutes = async function (app) {
   });
 
   app.post("*", async function (req, res, next) {
-    await emitterService.emit("postBegin", { req: req, res: res });
+    await emitterService.emit("postBegin", {req: req, res: res});
 
     if (!req.isRequestAlreadyHandled) {
       next();
@@ -167,7 +172,7 @@ exports.loadRoutes = async function (app) {
 
 exports.loadRoutesCatchAll = async function (app) {
   app.get(/^[^.]*$/, async function (req, res, next) {
-    await emitterService.emit("requestBegin", { req: req, res: res });
+    await emitterService.emit("requestBegin", {req: req, res: res});
 
     if (req.isRequestAlreadyHandled) {
       //modules can set the req.isRequestAlreadyHandled to true if they
@@ -222,13 +227,13 @@ exports.loadRoutesCatchAll = async function (app) {
     // console.log("urlKey", urlKey);
 
 
-    //replace this will 
+    //replace this will
 
     var page = {};
     req.urlKey = urlKey;
-    var processUrlOptions = { req, res, urlKey, page };
+    var processUrlOptions = {req, res, urlKey, page};
 
-    await emitterService.emit("processUrl",processUrlOptions);
+    await emitterService.emit("processUrl", processUrlOptions);
     page = processUrlOptions.page;
 
 // return;
@@ -242,11 +247,11 @@ exports.loadRoutesCatchAll = async function (app) {
       return;
     }
 
-    await emitterService.emit("preRenderTemplate", (options = { page, req }));
+    await emitterService.emit("preRenderTemplate", (options = {page, req}));
 
     page.data.id = page.id;
     page.data.sessionID = req.sessionID;
-    page.data.themeSettings.bootstrapToggleMiddle  = page.data.themeSettings.bootstrapVersion == 4 ? '': 'bs-';
+    page.data.themeSettings.bootstrapToggleMiddle = page.data.themeSettings.bootstrapVersion == 4 ? '' : 'bs-';
 
     res.render(`front-end/${frontEndTheme}/layouts/main`, {
       layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
@@ -255,10 +260,10 @@ exports.loadRoutesCatchAll = async function (app) {
 
     req.pageLoadedCount = pageLoadedCount;
     if (pageLoadedCount < 1) {
-      await emitterService.emit("firstPageLoaded", (options = { req }));
+      await emitterService.emit("firstPageLoaded", (options = {req}));
     }
     pageLoadedCount++;
 
-    await emitterService.emit("postPageRender", (options = { page, req }));
+    await emitterService.emit("postPageRender", (options = {page, req}));
   });
 };

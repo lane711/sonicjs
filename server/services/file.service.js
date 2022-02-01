@@ -11,7 +11,7 @@ const chalk = require("chalk");
 const log = console.log;
 var path = require("path");
 const YAML = require("yaml");
-const { parse, stringify } = require("envfile");
+const {parse, stringify} = require("envfile");
 var appRoot = require("app-root-path");
 const glob = require("glob");
 
@@ -98,6 +98,18 @@ module.exports = fileService = {
     await fsPromise.writeFile(fullPath, fileContent);
   },
 
+  uploadBackupFile: async function (file, sessionID) {
+    let destinationPath = path.join(this.getRootAppPath(), '/backups', file.name);
+    await fileService.copyFile(file.path, destinationPath);
+  },
+
+  copyFile: async function (sourcePath, destinationPath) {
+    fs.copyFile(sourcePath, destinationPath, (err) => {
+      if (err) throw err;
+      console.log(`${sourcePath} was copied to ${destinationPath}`);
+    });
+  },
+
   uploadWriteFile: async function (file, sessionID) {
     let storageOption = process.env.FILE_STORAGE;
     if (
@@ -182,6 +194,6 @@ module.exports = fileService = {
   },
 
   deleteDirectory: function (directoryPath) {
-    return fs.rmdirSync(directoryPath, { recursive: true });
+    return fs.rmdirSync(directoryPath, {recursive: true});
   },
 };
