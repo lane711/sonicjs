@@ -12,7 +12,7 @@ describe("Smoke Testing", function () {
 
   it("All admin pages should load", function () {
 
-    cy.SonicJs.adminPageVerify('admin', 'Traffic');
+    cy.SonicJs.adminPageVerify('admin', 'Content');
 
     cy.SonicJs.adminPageVerify('admin/content', 'New Content');
 

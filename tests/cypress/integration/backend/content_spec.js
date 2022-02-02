@@ -14,7 +14,8 @@ describe("Admin Content", function () {
 
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content`);
     cy.contains('New Content').click();
-    cy.get('[data-content-type="page"]').click();
+    cy.wait(1000);
+    cy.get('[data-content-type="page"]').first().click();
     cy.get('input[name="data[title]"]').type('Cypress Test Page');
     cy.get('input[name="data[url]').should('have.value', '/cypress-test-page');
     cy.get('input[name="data[heroTitle]"]').type('Cypress Hero');

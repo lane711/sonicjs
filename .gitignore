@@ -23,6 +23,7 @@ admin/e2e/puppeteer/screenshots/*.png
 server/storage/container1/*
 server/storage/files/height*
 server/storage/files/width*
+server/data/data.sqlite
 data-user.json
 sonicjscom-deploy.sh
 tests/cypress/screenshots
