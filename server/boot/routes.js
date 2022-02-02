@@ -239,12 +239,7 @@ exports.loadRoutesCatchAll = async function (app) {
 // return;
 
     if (!page.data || page.data?.title === "Not Found") {
-      // res.render("404", page);
-      res.render(`front-end/${frontEndTheme}/layouts/main`, {
-        layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
-      });
-
-      return;
+      res.redirect("404");
     }
 
     await emitterService.emit("preRenderTemplate", (options = {page, req}));
