@@ -303,8 +303,6 @@ function main() {
     sslParam = false;
   }
 
-  // sslParam = true;
-
   let connectionSettings = {
     url: process.env.DATABASE_URL,
     type: process.env.TYPEORM_CONNECTION,
@@ -326,7 +324,6 @@ function main() {
     connectionSettings.database = process.env.TYPEORM_DATABASE;
   }
 
-  console.log("connectionSettings", connectionSettings);
   typeorm.createConnection(connectionSettings).then((connection) => {
     console.log(logSymbols.success, "Successfully connected to Database!");
     start();

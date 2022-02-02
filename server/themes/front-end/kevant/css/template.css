@@ -935,7 +935,17 @@ fieldset:last-child {
 }
 
 .contact-content {
+    font-size: 1.1rem;
+}
+
+.contact-content .label-text {
+    color: #222;
+}
+
+.contact-content  .contact-link{
     font-size: 1.2rem;
+    margin: 0 0 0 8px;
+    font-weight: 500;
 }
 
 .thank-you {
@@ -1214,37 +1224,37 @@ section {
     font-size: .7rem;
 }
 
-.footer .copyright{
-    font-size:.8rem;
+.footer .copyright {
+    font-size: .8rem;
     color: #999;
-    background-color:#111;
+    background-color: #111;
 }
 
-.footer .copyright a{
-    font-size:.8rem;
+.footer .copyright a {
+    font-size: .8rem;
     color: #999 !important;
-    margin:0 0 0 20px;
+    margin: 0 0 0 20px;
 }
 
-.footer p, .footer a{
-    font-size:.9rem;
+.footer p, .footer a {
+    font-size: .9rem;
 }
 
-.footer i{
+.footer i {
     margin: 0 12px 0 0;
 }
 
 .footer .text-muted {
-    color: #999!important;
+    color: #999 !important;
 }
 
-.text-reset{
+.text-reset {
     padding: 0;
     margin: 0;
 }
 
-.kevant-k{
-    height:30px;
+.kevant-k {
+    height: 30px;
     margin: 0 12px 0 0;
 }
 

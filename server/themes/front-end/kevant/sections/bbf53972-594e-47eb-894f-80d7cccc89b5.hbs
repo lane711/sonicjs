@@ -1,0 +1,99 @@
+<section class="contact-content container">
+    <div class="row justify-content-md-center responsive" id="contact_form_block">
+        <div class="col-md-8">
+            <form action="/form-submission" id="contact_form" method="post" novalidate="novalidate"
+                  data-ol-has-click-handler="">
+                <fieldset>
+                    <div class="field"><input name="utf8" type="hidden" value="✓"> <input name="user_data"
+                                                                                          type="hidden"></div>
+                    <h4>Ready to learn more?</h4>
+                    <h1 class="large mb-5">Let's chat</h1>
+                    <div class="field">
+                        <div class="error-hint">
+                            <div class="error-message">Enter your Name</div>
+                        </div>
+                        <input name="name" placeholder="Your Full Name *" type="text"
+                               style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAfBJREFUWAntVk1OwkAUZkoDKza4Utm61iP0AqyIDXahN2BjwiHYGU+gizap4QDuegWN7lyCbMSlCQjU7yO0TOlAi6GwgJc0fT/fzPfmzet0crmD7HsFBAvQbrcrw+Gw5fu+AfOYvgylJ4TwCoVCs1ardYTruqfj8fgV5OUMSVVT93VdP9dAzpVvm5wJHZFbg2LQ2pEYOlZ/oiDvwNcsFoseY4PBwMCrhaeCJyKWZU37KOJcYdi27QdhcuuBIb073BvTNL8ln4NeeR6NRi/wxZKQcGurQs5oNhqLshzVTMBewW/LMU3TTNlO0ieTiStjYhUIyi6DAp0xbEdgTt+LE0aCKQw24U4llsCs4ZRJrYopB6RwqnpA1YQ5NGFZ1YQ41Z5S8IQQdP5laEBRJcD4Vj5DEsW2gE6s6g3d/YP/g+BDnT7GNi2qCjTwGd6riBzHaaCEd3Js01vwCPIbmWBRx1nwAN/1ov+/drgFWIlfKpVukyYihtgkXNp4mABK+1GtVr+SBhJDbBIubVw+Cd/TDgKO2DPiN3YUo6y/nDCNEIsqTKH1en2tcwA9FKEItyDi3aIh8Gl1sRrVnSDzNFDJT1bAy5xpOYGn5fP5JuL95ZjMIn1ya7j5dPGfv0A5eAnpZUY3n5jXcoec5J67D9q+VuAPM47D3XaSeL4AAAAASUVORK5CYII=&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%; cursor: auto;">
+                    </div>
+                    <div class="row">
+                        <div class="field email-field col">
+                            <div class="error-hint">
+                                <div class="error-message">Enter correct Email Address</div>
+                            </div>
+                            <input name="email" placeholder="Your Email *" type="email"></div>
+                        <div class="field phone-field col">
+                            <div class="error-hint">
+                                <div class="error-message">Enter your Phone Number</div>
+                            </div>
+                            <input name="phone" placeholder="Your Phone *" type="tel"></div>
+                    </div>
+                    <div class="field">
+                        <div class="error-hint">
+                            <div class="error-message">Enter your Message</div>
+                        </div>
+                        <textarea name="message" placeholder="Message *" rows="4"></textarea></div>
+                </fieldset>
+                <fieldset><h3>I'm interested in</h3>
+                    <div class="platforms-options js-platforms-options"><label class="is-web"> <input
+                            name="platform_web" type="checkbox" value="web"> <span class="label-text">Web</span>
+                    </label><label class="is-ios"> <input name="platform_ios" type="checkbox" value="ios"> <span
+                            class="label-text">iOS</span> </label><label class="is-android"> <input
+                            name="platform_android" type="checkbox" value="android"> <span
+                            class="label-text">Android</span> </label></div>
+                </fieldset>
+                <fieldset class="js-product-types">
+                    <div class="product-services responsive row"><h3>Services</h3>
+                        <div class="col">
+                            <div class="product-option"><label> <input name="product" type="radio" value="prototype"
+                                                                       data-ol-has-click-handler=""> <span
+                                    class="label-text">Prototype</span> </label></div>
+                            <div class="product-option"><label> <input name="product" type="radio" value="mvp"
+                                                                       data-ol-has-click-handler=""> <span
+                                    class="label-text">Minimum Viable Product</span> </label></div>
+                        </div>
+                        <div class="col">
+                            <div class="product-option"><label> <input name="product" type="radio"
+                                                                       value="complete_solution"
+                                                                       data-ol-has-click-handler=""> <span
+                                    class="label-text">Complete Solution</span> </label></div>
+                            <div class="product-option"><label> <input name="product" type="radio"
+                                                                       value="help_with_existing_product"
+                                                                       data-ol-has-click-handler=""> <span
+                                    class="label-text">Help with Existing Product</span> </label></div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="js-budget-range">
+                    <div class="product-services row responsive"><h3>Budget</h3>
+                        <div class="col">
+                            <div class="product-option"><label> <input name="budget" type="radio" value="200k+"
+                                                                       data-ol-has-click-handler=""> <span
+                                    class="label-text">Over $200K</span> </label></div>
+                            <div class="product-option"><label> <input name="budget" type="radio" value="100-200k"
+                                                                       data-ol-has-click-handler=""> <span
+                                    class="label-text">$100K to $200K</span> </label></div>
+                        </div>
+                        <div class="col">
+                            <div class="product-option"><label> <input name="budget" type="radio" value="50-100k"
+                                                                       data-ol-has-click-handler=""> <span
+                                    class="label-text">$50K to $100K</span> </label></div>
+                            <div class="product-option"><label> <input name="budget" type="radio" value="15-50k"
+                                                                       data-ol-has-click-handler=""> <span
+                                    class="label-text">$15K to $50K</span> </label></div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="js-policy-consent consent mbs" style="display: none;"><label class="field">
+                    <div class="error-hint">
+                        <div class="error-message">Please accept our Privacy Policy before continuing</div>
+                    </div>
+                    <input class="js-agreed-to-privacy" name="agreed_to_privacy" type="checkbox" disabled=""
+                           data-ol-has-click-handler=""> <span class="label-text"> I have read and agree to the <a
+                        href="/legal/privacy" target="_blank">Privacy Policy</a> conditions. * </span> </label>
+                </fieldset>
+                <fieldset class="submit-block"><input class="submit-button" type="submit" value="Send request"> or <a
+                        class="mlx bold contact-link" href="mailto:contact@kevant.com">Write an email</a></fieldset>
+            </form>
+        </div>
+    </div>
+</section>

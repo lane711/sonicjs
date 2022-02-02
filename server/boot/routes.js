@@ -240,7 +240,7 @@ exports.loadRoutesCatchAll = async function (app) {
 
     if (!page.data || page.data?.title === "Not Found") {
       // res.render("404", page);
-      res.render(`front-end/${frontEndTheme}/layouts/404`, {
+      res.render(`front-end/${frontEndTheme}/layouts/main`, {
         layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
       });
 
