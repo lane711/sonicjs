@@ -1,3 +1,7 @@
-<a href="{{ data.clickUrl }}">
-  <img width="{{ data.thumbnailWidth }}" src="{{ data.fileName.src }}?width={{ data.thumbnailWidthRetina }}">
-</a>
+{{#if data.clickUrl}}
+    <a href="{{ data.clickUrl }}">
+        <img width="{{ data.thumbnailWidth }}" src="{{ data.fileName.src }}?width={{ data.thumbnailWidthRetina }}" />
+    </a>
+{{else}}
+    <img width="{{ data.thumbnailWidth }}" src="{{ data.fileName.src }}?width={{ data.thumbnailWidthRetina }}" />
+{{/if}}

@@ -250,7 +250,7 @@ module.exports = contentService = {
     if (rows) {
       for (const row of rows) {
         // console.log(chalk.red(JSON.stringify(row)));
-        page.data.html += `<div class='${row.class}''>`;
+        page.data.html += `<div class='${row.class}'>`;
         let columns = await this.processColumns(
           page,
           section,

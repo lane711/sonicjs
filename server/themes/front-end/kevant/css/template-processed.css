@@ -21,6 +21,9 @@
 .home-partner {
     background: grey
 }
+body{
+    font-size:1.2rem;
+}
 
 h1 {
     font-size: 3.5rem
@@ -215,7 +218,7 @@ section[data-id="e67bf674-1ca3-4e0a-8dd4-609e9febfded"] {
     background-color: #DFF2FF;
 }
 
-section a {
+section.home-intro a {
     display: inline-block;
     margin: 0 30px 15px;
     font-size: 26px;
@@ -525,10 +528,6 @@ p {
 
 .homepage-technologies h1, .homepage-technologies h2 {
     line-height: 1;
-}
-
-section {
-    overflow: hidden;
 }
 
 .technologies-intro p {
@@ -942,7 +941,7 @@ fieldset:last-child {
     color: #222;
 }
 
-.contact-content  .contact-link{
+.contact-content .contact-link {
     font-size: 1.2rem;
     margin: 0 0 0 8px;
     font-weight: 500;
@@ -1206,9 +1205,6 @@ fieldset:last-child {
     }
 }
 
-section {
-    overflow: hidden;
-}
 
 /* end contact form */
 
@@ -1216,6 +1212,7 @@ section {
 .hire-us {
     position: absolute;
     right: 92px;
+    top: 9px;
     color: #2fd6ff;
     border-color: #2fd6ff;
 }
@@ -1258,3 +1255,15 @@ section {
     margin: 0 12px 0 0;
 }
 
+.services-intro {
+    background-color: #f6f6f6;
+}
+
+.services h2 {
+    font-family: "Poppins Regular", Helvetica, sans-serif;
+    font-weight:bold;
+}
+
+.sr-only{
+    display:none;
+}
