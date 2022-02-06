@@ -121,7 +121,7 @@ module.exports = installService = {
               {
                   "id" : "NQ6YeBCClIQ", 
                   "text" : "Home", 
-                  "icon" : "fa fa-chevron-right", 
+                  "icon" : "bi bi-chevron-right",
                   "li_attr" : {
                       "id" : "NQ6YeBCClIQ"
                   }, 

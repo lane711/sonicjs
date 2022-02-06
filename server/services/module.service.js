@@ -30,12 +30,15 @@ module.exports = moduleService = {
   },
 
   processModules: async function (app) {
-    let moduleDir = path.join(appRoot.path, "/server/modules");
 
-    await this.getModuleDefinitionFiles(moduleDir, app);
-    await this.getModuleCss(moduleDir);
-    await this.getModuleJs(moduleDir);
-    await this.getModuleContentTypesConfigs(moduleDir);
+    let moduleDirs = [];
+    moduleDirs.push(path.join(appRoot.path, "/server/modules"));
+    moduleDirs.push(path.join(appRoot.path, `/server/themes/front-end/${frontEndTheme}/modules`));
+
+    await this.getModuleDefinitionFiles(moduleDirs, app);
+    // await this.getModuleCss(moduleDirs);
+    // await this.getModuleJs(moduleDirs);
+    // await this.getModuleContentTypesConfigs(moduleDirs);
   },
 
   getModules: async function () {
@@ -65,9 +68,16 @@ module.exports = moduleService = {
   },
 
   getModuleDefinitionFile: async function (systemId) {
-    let file = await fileService.getFile(
-      `server/modules/${systemId}/module.json`
-    );
+    let file = "";
+
+    if (systemId.includes(frontEndTheme)) {
+      file = await fileService.getFile(`/server/themes/front-end/${frontEndTheme}/modules/${systemId}/module.json`);
+    } else {
+      file = await fileService.getFile(
+        `server/modules/${systemId}/module.json`
+      );
+    }
+
     return file;
   },
 
@@ -80,13 +90,19 @@ module.exports = moduleService = {
     return moduleDef;
   },
 
-  getModuleContentTypesAdmin: async function (systemId,  session, req) {
+  getModuleContentTypesAdmin: async function (systemId, session, req) {
     let basePath = `${appRoot.path}/server/modules/${systemId}/models`;
-    // let file = await fileService.getFile(`${basePath}/module.json`);
-    // return file;
-    let moduleContentTypesAdmin = globalService.moduleContentTypeConfigs.filter(
-      (x) => x.filePath.indexOf(`modules/${systemId}/models`) > -1
-    );
+
+    if (systemId.includes(frontEndTheme)) {
+      basePath = `${appRoot.path}/server/themes/front-end/${frontEndTheme}/modules/${systemId}/models`;
+    }
+
+    let moduleContentTypesAdminFiles = fileService.getFilesSearchSync(basePath, "/**/*.json");
+
+    let moduleContentTypesAdmin = [];
+    moduleContentTypesAdminFiles.map(file => {
+      moduleContentTypesAdmin.push(globalService.moduleContentTypeConfigs.find(f => f.filePath === file));
+    })
 
     let moduleContentTypes = [];
 
@@ -95,11 +111,7 @@ module.exports = moduleService = {
       let contentType = await moduleService.getModuleContentType(ct.systemId, session, req);
       moduleContentTypes.push(contentType);
     }
-    // moduleContentTypesAdmin.forEach(contentTypeSystemId => {
-    //   let ct = await moduleService.getModuleContentType(contentTypeSystemId);
-    //   moduleContentTypes.push(ct);
-    // });
-    // let moduleContentTypes = await moduleService.getModuleContentTypesConfigs(basePath);
+
     return moduleContentTypes;
   },
 
@@ -120,22 +132,35 @@ module.exports = moduleService = {
     await fileService.writeFile(moduleDef.filePath, moduleDefString);
 
     return moduleDef;
-  },
+  }
+  ,
 
-  getModuleDefinitionFiles: async function (path, app) {
-    const files = fileService.getFilesSearchSync(path, "/**/module.json");
+  getModuleDefinitionFiles: async function (paths, app) {
 
+    // let files = [];
     let moduleList = [];
+    await this.resetGlobalModuleLists();
 
-    files.forEach((file) => {
-      let raw = fileService.getFileSync(file); // fs.readFileSync(file);
-      if (raw && raw.length > 0) {
-        let moduleDef = JSON.parse(raw);
-        let moduleFolder =file.replace("/server/modules/", "").replace("/module.json","");
-        moduleDef.mainService = `${path}\/${moduleFolder}\/services\/${moduleFolder}-main-service.js`;
-        moduleList.push(moduleDef);
-      }
-    });
+    paths.map(modulePath => {
+      let fileArray = fileService.getFilesSearchSync(modulePath, "/**/module.json");
+      // let files = fileArray);
+
+
+      this.getModuleCss(modulePath);
+      this.getModuleJs(modulePath);
+      this.getModuleContentTypesConfigs(modulePath);
+
+
+      fileArray.forEach((file) => {
+        let raw = fileService.getFileSync(file); // fs.readFileSync(file);
+        if (raw && raw.length > 0) {
+          let moduleDef = JSON.parse(raw);
+          let moduleFolder = moduleDef.systemId; // file.replace("/server/modules/", "").replace("/module.json","");
+          moduleDef.mainService = `${modulePath}\/${moduleFolder}\/services\/${moduleFolder}-main-service.js`;
+          moduleList.push(moduleDef);
+        }
+      });
+    })
 
     moduleList.sort(function (a, b) {
       if (a.title < b.title) {
@@ -157,14 +182,13 @@ module.exports = moduleService = {
     await moduleService.loadModuleServices(moduleList, app);
 
     return moduleList;
-  },
+  }
+  ,
 
-  getModuleContentTypesConfigs: async function (path) {
+  getModuleContentTypesConfigs: function (path) {
     let moduleCount = 0;
 
     const files = fileService.getFilesSearchSync(path, "/**/*.json");
-
-    globalService.moduleContentTypeConfigs = [];
 
     files.forEach((file) => {
       if (file.indexOf("models") > -1) {
@@ -185,10 +209,12 @@ module.exports = moduleService = {
       }
     });
     return moduleCount;
-  },
+  }
+  ,
 
   getModuleContentType: async function (contentTypeSystemId, session, req) {
-    let = rootDomain = `${req.protocol}://${req.get('host')}`;
+    let =
+    rootDomain = `${req.protocol}://${req.get('host')}`;
     let configInfo = await globalService.moduleContentTypeConfigs.filter(
       (x) => x.systemId === contentTypeSystemId
     );
@@ -199,10 +225,12 @@ module.exports = moduleService = {
       return contentType;
     }
     return {};
-  },
+  }
+  ,
 
   getModuleContentTypes: async function (userSession, req) {
-    let = rootDomain = `${req.protocol}://${req.get('host')}`;
+    let =
+    rootDomain = `${req.protocol}://${req.get('host')}`;
     let configInfos = await globalService.moduleContentTypeConfigs;
     let configs = [];
     configInfos.forEach((configInfo) => {
@@ -212,11 +240,13 @@ module.exports = moduleService = {
       configs.push(configObj);
     });
     return configs;
-  },
+  }
+  ,
 
   updateModuleContentType: async function (contentTypeDef) {
     let path = contentTypeDef.filePath;
-  },
+  }
+  ,
 
   createModuleContentType: async function (contentTypeDef) {
     // console.log("creating content type", contentTypeDef);
@@ -224,14 +254,15 @@ module.exports = moduleService = {
     contentTypeDef.title = contentTypeDef.title
       ? contentTypeDef.title
       : contentTypeDef.moduleSystemId;
-    contentTypeDef.data = { components: [] };
+    contentTypeDef.data = {components: []};
     let contentTypeDefObj = JSON.stringify(contentTypeDef);
     await fileService.writeFile(contentTypeDef.filePath, contentTypeDefObj);
     //reload modules
     await moduleService.processModules();
 
     return contentTypeDef;
-  },
+  }
+  ,
 
   deleteModuleContentType: async function (moduleContentTypeSystemid) {
     console.log("deleting content type", moduleContentTypeSystemid);
@@ -245,23 +276,29 @@ module.exports = moduleService = {
 
     //reload modules
     await moduleService.processModules();
-  },
+  }
+  ,
 
-  getModuleCss: async function (path) {
+  getModuleCss: function (path) {
     const files = fileService.getFilesSearchSync(path, "/**/*.css");
-
-    globalService.moduleCssFiles = [];
 
     files.forEach((file) => {
       let link = file.substr(file.indexOf("server") + 6, file.length);
       globalService.moduleCssFiles.push(link);
     });
-  },
+  }
+  ,
 
-  getModuleJs: async function (path) {
+  resetGlobalModuleLists: async function (path) {
+    globalService.moduleCssFiles = [];
+    globalService.moduleJsFiles = [];
+    globalService.moduleContentTypeConfigs = [];
+  }
+  ,
+
+  getModuleJs: function (path) {
     const files = fileService.getFilesSearchSync(path, "/**/*.js");
 
-    globalService.moduleJsFiles = [];
 
     files.forEach((file) => {
       if (file.indexOf("assets/js") > -1) {
@@ -269,7 +306,8 @@ module.exports = moduleService = {
         globalService.moduleJsFiles.push(link);
       }
     });
-  },
+  }
+  ,
 
   getModuleViewFile: async function (contentType) {
     //see if theme level override exists
@@ -282,7 +320,8 @@ module.exports = moduleService = {
       viewPath = themeViewPath;
     }
     return viewPath;
-  },
+  }
+  ,
 
   processModuleInColumn: async function (options, viewModel) {
     if (options.shortcode.name === options.moduleName.toUpperCase()) {
@@ -331,7 +370,8 @@ module.exports = moduleService = {
         processedHtml.body
       );
     }
-  },
+  }
+  ,
 
   processView: async function (contentType, viewModel, viewPath) {
     var result = await viewService.getProcessedView(
@@ -341,7 +381,8 @@ module.exports = moduleService = {
     );
 
     return result;
-  },
+  }
+  ,
 
   createModule: async function (moduleDefinitionFile) {
     let basePath = `/server/modules/${moduleDefinitionFile.systemId}`;
@@ -409,7 +450,7 @@ module.exports = moduleService = {
       moduleSystemId: moduleDefinitionFile.systemId,
       systemId: moduleDefinitionFile.systemId,
       title: moduleDefinitionFile.title,
-      data: { components: [] },
+      data: {components: []},
     };
 
     contentTypeDef.data.components.push({
@@ -417,7 +458,7 @@ module.exports = moduleService = {
       type: "textfield",
       input: true,
       key: "title",
-      validate: { required: true },
+      validate: {required: true},
     });
     contentTypeDef.data.components.push({
       label: "Submit",
@@ -434,7 +475,7 @@ module.exports = moduleService = {
       moduleSystemId: moduleDefinitionFile.systemId,
       systemId: `${moduleDefinitionFile.systemId}-settings`,
       title: `${moduleDefinitionFile.title} Settings`,
-      data: { components: [] },
+      data: {components: []},
     };
 
     contentTypeDefSettings.data.components.push({
@@ -453,7 +494,8 @@ module.exports = moduleService = {
     });
 
     await moduleService.createModuleContentType(contentTypeDefSettings);
-  },
+  }
+  ,
 
   updateModule: async function (moduleDefinitionFile) {
     let basePath = `server/modules/${moduleDefinitionFile.systemId}`;
@@ -462,7 +504,8 @@ module.exports = moduleService = {
       JSON.stringify(moduleDefinitionFile, null, 2)
     );
     await moduleService.processModules();
-  },
+  }
+  ,
 
   deleteModule: async function (moduleSystemId) {
     if (moduleSystemId) {
@@ -474,5 +517,7 @@ module.exports = moduleService = {
       await moduleService.processModules();
     }
     return true;
-  },
-};
+  }
+  ,
+}
+;

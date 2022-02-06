@@ -61,6 +61,7 @@
     "express-handlebars": "^5.2.0",
     "express-session": "^1.17.1",
     "flag-icon-css": "^3.5.0",
+    "font-awesome": "^4.7.0",
     "formiojs": "^4.13.0",
     "graphql": "^14.7.0",
     "graphql-iso-date": "^3.6.1",

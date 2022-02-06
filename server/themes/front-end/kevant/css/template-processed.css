@@ -45,6 +45,10 @@ p {
     font-size: 1.5rem
 }
 
+a{
+    color: #00a2c5;
+}
+
 .pt-5 {
     padding-top: 8rem !important
 }

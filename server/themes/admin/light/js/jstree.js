@@ -5,7 +5,7 @@ $(document).ready(async function () {
     let links = [{
       "id" : id, 
       "text" : "New Link", 
-      "icon" : "fa fa-chevron-right", 
+      "icon" : "bi bi-chevron-right",
       "li_attr" : {
           "id" : id
       }, 
@@ -55,7 +55,7 @@ $(document).ready(async function () {
 
     types: {
       default: {
-        icon: "fa fa-chevron-right",
+        icon: "bi bi-chevron-right",
       },
       demo: {
         icon: "fa fa-home",
