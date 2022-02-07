@@ -742,6 +742,7 @@ const Mutation = new GraphQLObjectType({
         systemId: { type: new GraphQLNonNull(GraphQLString) },
         canBeAddedToColumn: { type: new GraphQLNonNull(GraphQLBoolean) },
         singleInstance: { type: new GraphQLNonNull(GraphQLBoolean) },
+        version: { type: new GraphQLNonNull(GraphQLString) },
         sessionID: { type: GraphQLString },
       },
       resolve(parent, args) {

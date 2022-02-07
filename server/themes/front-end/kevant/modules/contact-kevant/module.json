@@ -1,8 +1,8 @@
 {
   "title": "Contact Kevant",
-  "systemId": "contact-kevant",
-  "version": "0.0.0.1",
   "enabled": true,
+  "systemId": "contact-kevant",
   "canBeAddedToColumn": true,
-  "singleInstance": false
+  "singleInstance": false,
+  "version": "0.0.0.1"
 }

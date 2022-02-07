@@ -68,21 +68,12 @@ module.exports = moduleService = {
   },
 
   getModuleDefinitionFile: async function (systemId) {
-    let file = "";
-
-    if (systemId.includes(frontEndTheme)) {
-      file = await fileService.getFile(`/server/themes/front-end/${frontEndTheme}/modules/${systemId}/module.json`);
-    } else {
-      file = await fileService.getFile(
-        `server/modules/${systemId}/module.json`
-      );
-    }
-
+    let file = await fileService.getFile(`${await this.getBasePath(systemId, true)}/module.json`);
     return file;
   },
 
   getModuleDefinitionFileWithPath: async function (systemId) {
-    let basePath = `/server/modules/${systemId}`;
+    let basePath = this.getBasePath(systemId);
     let filePath = `${basePath}/module.json`;
     let file = await fileService.getFile(filePath);
     let moduleDef = JSON.parse(file);
@@ -90,12 +81,19 @@ module.exports = moduleService = {
     return moduleDef;
   },
 
-  getModuleContentTypesAdmin: async function (systemId, session, req) {
-    let basePath = `${appRoot.path}/server/modules/${systemId}/models`;
+   getBasePath : async function(systemId, relative = false){
+    let root = relative ? "" : appRoot.path;
+    let basePath = `${root}/server/modules/${systemId}`;
 
     if (systemId.includes(frontEndTheme)) {
-      basePath = `${appRoot.path}/server/themes/front-end/${frontEndTheme}/modules/${systemId}/models`;
+      basePath = `${root}/server/themes/front-end/${frontEndTheme}/modules/${systemId}`;
     }
+
+    return basePath;
+  },
+
+  getModuleContentTypesAdmin: async function (systemId, session, req) {
+    let basePath = await this.getBasePath(systemId) + "/models";
 
     let moduleContentTypesAdminFiles = fileService.getFilesSearchSync(basePath, "/**/*.json");
 
@@ -498,7 +496,7 @@ module.exports = moduleService = {
   ,
 
   updateModule: async function (moduleDefinitionFile) {
-    let basePath = `server/modules/${moduleDefinitionFile.systemId}`;
+    let basePath = await this.getBasePath(moduleDefinitionFile.systemId);
     await fileService.writeFile(
       `${basePath}/module.json`,
       JSON.stringify(moduleDefinitionFile, null, 2)

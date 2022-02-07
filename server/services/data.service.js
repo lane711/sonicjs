@@ -779,7 +779,7 @@ if (typeof module !== "undefined" && module.exports) {
             systemId:"${payload.data.systemId}", 
             canBeAddedToColumn: ${payload.data.canBeAddedToColumn},
             singleInstance: ${payload.data.singleInstance},
-            sessionID:"${sessionID}"
+            version:"${payload.data.version}"
             )
           {		
             title

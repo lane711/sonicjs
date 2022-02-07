@@ -94,8 +94,7 @@ module.exports = fileService = {
   },
 
   writeFile: async function (filePath, fileContent) {
-    let fullPath = path.join(this.getRootAppPath(), filePath);
-    await fsPromise.writeFile(fullPath, fileContent);
+    await fsPromise.writeFile(filePath, fileContent);
   },
 
   uploadBackupFile: async function (file, sessionID) {
