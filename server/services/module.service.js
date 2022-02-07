@@ -233,8 +233,7 @@ module.exports = moduleService = {
   ,
 
   getModuleContentTypes: async function (userSession, req) {
-    let =
-    rootDomain = `${req.protocol}://${req.get('host')}`;
+    let rootDomain = `${req.protocol}://${req.get('host')}`;
     let configInfos = await globalService.moduleContentTypeConfigs;
     let configs = [];
     configInfos.forEach((configInfo) => {

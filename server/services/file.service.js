@@ -94,6 +94,9 @@ module.exports = fileService = {
   },
 
   writeFile: async function (filePath, fileContent) {
+    if(filePath.startsWith('/server/')){
+      filePath = appRoot.path + filePath;
+    }
     await fsPromise.writeFile(filePath, fileContent);
   },
 
