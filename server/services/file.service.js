@@ -24,18 +24,18 @@ module.exports = fileService = {
   //     });
   // },
 
-  getFile: async function (relativeFilePath) {
-    let filePath = path.join(appRoot.path, relativeFilePath);
+  getFile: async function (filePath, isRelative = true) {
+    let fullFilePath = isRelative ? path.join(appRoot.path, filePath) : filePath;
 
-    if (filePath.includes("/server/sonicjs-services/")) {
-      filePath = filePath.replace(
+    if (fullFilePath.includes("/server/sonicjs-services/")) {
+      fullFilePath = fullFilePath.replace(
         "/server/sonicjs-services/",
         "/server/services/"
       );
     }
 
     return new Promise((resolve, reject) => {
-      fs.readFile(filePath, "utf8", (err, data) => {
+      fs.readFile(fullFilePath, "utf8", (err, data) => {
         if (err) {
           console.log(chalk.red(err));
           reject(err);
@@ -153,8 +153,8 @@ module.exports = fileService = {
     }
   },
 
-  fileExists: function (filePath) {
-    let dirPath = path.join(appRoot.path, filePath);
+  fileExists: function (filePath, isFullPath = false) {
+    let dirPath = isFullPath ? filePath : path.join(appRoot.path, filePath);
     let fileExist = fs.existsSync(dirPath);
     return fileExist;
   },

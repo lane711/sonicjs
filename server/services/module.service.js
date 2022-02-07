@@ -68,7 +68,7 @@ module.exports = moduleService = {
   },
 
   getModuleDefinitionFile: async function (systemId) {
-    let file = await fileService.getFile(`${await this.getBasePath(systemId, true)}/module.json`);
+    let file = await fileService.getFile(`${await this.getBasePath(systemId, true)}/module.json`, false);
     return file;
   },
 
@@ -81,16 +81,20 @@ module.exports = moduleService = {
     return moduleDef;
   },
 
-   getBasePath : async function(systemId, relative = false){
-    let root = relative ? "" : appRoot.path;
-    let basePath = `${root}/server/modules/${systemId}`;
+  getBasePath: async function (systemId) {
+    let basePath = `${appRoot.path}/server/modules/${systemId}`;
 
-    if (systemId.includes(frontEndTheme)) {
-      basePath = `${root}/server/themes/front-end/${frontEndTheme}/modules/${systemId}`;
+    if (await fileService.fileExists(`${basePath}/module.json`, true)) {
+      return basePath;
+    } else {
+      basePath = `${appRoot.path}/server/themes/front-end/${frontEndTheme}/modules/${systemId}`;
+      if (await fileService.fileExists(`${basePath}/module.json`, true)) {
+        return basePath;
+      }
     }
-
-    return basePath;
-  },
+    console.error('Can not find module base path');
+  }
+  ,
 
   getModuleContentTypesAdmin: async function (systemId, session, req) {
     let basePath = await this.getBasePath(systemId) + "/models";
@@ -111,7 +115,8 @@ module.exports = moduleService = {
     }
 
     return moduleContentTypes;
-  },
+  }
+  ,
 
   contentTypeUpdate: async function (moduleContentType, session, req) {
     let moduleDef = await this.getModuleContentType(moduleContentType.systemId, session, req);
@@ -124,7 +129,9 @@ module.exports = moduleService = {
     moduleDef.canBeAddedToColumn = moduleContentType.canBeAddedToColumn;
     moduleDef.canBeAddedToColumn = moduleContentType.canBeAddedToColumn;
     moduleDef.permissions = moduleContentType.permissions;
-    moduleDef.filePath = `/server/modules/${moduleDef.moduleSystemId}/models/${moduleDef.systemId}.json`;
+
+
+    moduleDef.filePath = await this.getBasePath(moduleContentType.moduleSystemId) + `/models/${moduleDef.systemId}.json`;
 
     let moduleDefString = JSON.stringify(moduleDef);
     await fileService.writeFile(moduleDef.filePath, moduleDefString);
@@ -153,7 +160,7 @@ module.exports = moduleService = {
         let raw = fileService.getFileSync(file); // fs.readFileSync(file);
         if (raw && raw.length > 0) {
           let moduleDef = JSON.parse(raw);
-          let moduleFolder = moduleDef.systemId; // file.replace("/server/modules/", "").replace("/module.json","");
+          let moduleFolder = moduleDef.systemId;
           moduleDef.mainService = `${modulePath}\/${moduleFolder}\/services\/${moduleFolder}-main-service.js`;
           moduleList.push(moduleDef);
         }
@@ -211,8 +218,7 @@ module.exports = moduleService = {
   ,
 
   getModuleContentType: async function (contentTypeSystemId, session, req) {
-    let =
-    rootDomain = `${req.protocol}://${req.get('host')}`;
+    let rootDomain = `${req.protocol}://${req.get('host')}`;
     let configInfo = await globalService.moduleContentTypeConfigs.filter(
       (x) => x.systemId === contentTypeSystemId
     );
@@ -248,7 +254,7 @@ module.exports = moduleService = {
 
   createModuleContentType: async function (contentTypeDef) {
     // console.log("creating content type", contentTypeDef);
-    contentTypeDef.filePath = `/server/modules/${contentTypeDef.moduleSystemId}/models/${contentTypeDef.systemId}.json`;
+    contentTypeDef.filePath = await this.getBasePath(contentTypeDef.moduleSystemId) + `/models/${contentTypeDef.systemId}.json`;
     contentTypeDef.title = contentTypeDef.title
       ? contentTypeDef.title
       : contentTypeDef.moduleSystemId;
