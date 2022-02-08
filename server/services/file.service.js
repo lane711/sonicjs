@@ -97,6 +97,11 @@ module.exports = fileService = {
     if(filePath.startsWith('/server/')){
       filePath = appRoot.path + filePath;
     }
+
+    //for security, make sure we are only writing files inside the app
+    if(!filePath.startsWith(appRoot.path)){
+      return;
+    }
     await fsPromise.writeFile(filePath, fileContent);
   },
 
