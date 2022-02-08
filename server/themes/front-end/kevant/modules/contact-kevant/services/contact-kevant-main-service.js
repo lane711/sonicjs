@@ -13,19 +13,19 @@ module.exports = contactKevantUsMainService = {
         return;
       }
 
-      options.moduleName = "contact";
+      options.moduleName = "contact-kevant";
       await moduleService.processModuleInColumn(options);
     });
 
     emitterService.on("postModuleGetData", async function (options) {
-      if (options.shortcode.name !== "CONTACT") {
+      if (options.shortcode.name !== "CONTACT-KEVANT") {
         return;
       }
 
       let contactFormSettingsId = options.shortcode.properties.id;
 
       options.viewModel.data.form = await formService.getForm(
-        "contact",
+        "contact-kevant",
         undefined,
         "submitForm(submission)",
         false,
@@ -37,7 +37,7 @@ module.exports = contactKevantUsMainService = {
     });
 
     emitterService.on("afterFormSubmit", async function (options) {
-      if (options.data.contentType !== "contact") {
+      if (options.data.contentType !== "contact-kevant") {
         return;
       }
 
