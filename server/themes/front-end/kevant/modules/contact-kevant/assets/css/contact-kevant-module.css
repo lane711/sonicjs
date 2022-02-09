@@ -39,7 +39,7 @@
 }
 
 .contact-kevant .interest-boxes .radio .form-check-inline.radio-selected label {
-    border: 2px solid #000;
+    border: 2px solid #00a2c5;
 }
 
 .contact-kevant .inline {
@@ -52,4 +52,8 @@
 
 .contact-kevant .field-required{
     display:none;
+}
+
+.contact-kevant .btn{
+    padding: 20px 60px;
 }
