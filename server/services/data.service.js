@@ -202,11 +202,16 @@ if (typeof module !== "undefined" && module.exports) {
         return content;
       }
     }),
-    (exports.getContentAdmin = async function (sessionID) {
+    (exports.getContentAdminCommon = async function (sessionID) {
       let contents = await this.getContent(sessionID);
       let data = _.sortBy(contents, "updatedOn");
       let dataFiltered = data.filter(d => d.contentTypeId === 'page' || d.contentTypeId === 'blog');
       return dataFiltered;
+    }),
+    (exports.getContentAdmin = async function (sessionID) {
+      let contents = await this.getContent(sessionID);
+      let data = _.sortBy(contents, "updatedOn");
+      return data;
     }),
     (exports.getContentByType = async function (contentType, sessionID) {
       // const query = gql`
