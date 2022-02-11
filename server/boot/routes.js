@@ -145,6 +145,7 @@ exports.loadRoutes = async function (app) {
   });
 
   app.post("/form-submission", async function (req, res) {
+
     let payload = req.body.data.data ? req.body.data.data : undefined;
 
     if (payload) {
@@ -166,7 +167,9 @@ exports.loadRoutes = async function (app) {
 };
 
 exports.loadRoutesCatchAll = async function (app) {
-  app.get(/^[^.]*$/, async function (req, res, next) {
+  // app.get(/^[^.]*$/, async function (req, res, next) {
+    app.get("*", async function (req, res, next) {
+
     await emitterService.emit("requestBegin", { req: req, res: res });
 
     if (req.isRequestAlreadyHandled) {
@@ -233,13 +236,8 @@ exports.loadRoutesCatchAll = async function (app) {
 
 // return;
 
-    if (page.data?.title === "Not Found") {
-      // res.render("404", page);
-      res.render(`front-end/${frontEndTheme}/layouts/404`, {
-        layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
-      });
-
-      return;
+    if (!page.data || page.data?.title === "Not Found") {
+      res.redirect("/404");
     }
 
     await emitterService.emit("preRenderTemplate", (options = { page, req }));

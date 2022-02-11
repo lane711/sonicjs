@@ -94,3 +94,18 @@
   top:6px;
   cursor: pointer;
 }
+
+.dropzone2 span{
+  font-size: .7rem!important;
+  display:block;
+}
+
+.sidebar .nav-link i {
+  display: inline-block;
+  width: 1.09375rem;
+  margin: 0 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: #73818f;
+  text-align: center;
+  margin: 0 8px 0 8px;
+}

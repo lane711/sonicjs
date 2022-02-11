@@ -1,1 +1,8 @@
-{"title":"Menu","systemId":"menu","enabled":true,"canBeAddedToColumn":false,"singleInstance":false,"submit":true}
+{
+  "title": "Menu",
+  "enabled": true,
+  "systemId": "menu",
+  "canBeAddedToColumn": false,
+  "singleInstance": false,
+  "version": "0.0.0.1"
+}

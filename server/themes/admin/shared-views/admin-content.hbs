@@ -5,6 +5,8 @@
       <button type="button" class="btn btn-success float-right" data-toggle="modal" data-target="#newContentModal">
         New Content
       </button>
+        <a class="btn btn-primary float-right mx-2" href="/admin/content-all">Show All</a>
+
     </div>
     <div class="card-body page-list">
       <table class="table table-responsive-sm table-striped" id="admin-content">
@@ -19,10 +21,12 @@
         <tbody>
           {{#each data}}
           <tr>
-            <td><a href="/admin/content/edit/{{ this.contentTypeId }}/{{ this.id }}">{{ this.data.title }}</a></td>
+            <td><a href="/admin/content/edit/{{ this.contentTypeId }}/{{ this.id }}">{{ this.data.title }}</a>
+            </td>
             <td>{{ this.contentTypeId }}</td>
             <td>{{ this.updatedOnFormatted }}</td>
             <td class='text-right'>
+                <a class="btn btn-success btn-sm" target="_blank" href="{{ this.data.url }}"><i class="fa fa-external-link"></i></a>
               <a href="/admin/content/edit/{{ this.contentTypeId }}/{{ this.id }}"
                 class="btn btn-sm btn-primary rmargin">Edit</a>
 

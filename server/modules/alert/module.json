@@ -1,8 +1,8 @@
 {
   "title": "Alert",
-  "systemId": "alert",
-  "version": "0.0.0.1",
   "enabled": true,
+  "systemId": "alert",
   "canBeAddedToColumn": true,
-  "singleInstance": false
+  "singleInstance": false,
+  "version": "0.0.1"
 }

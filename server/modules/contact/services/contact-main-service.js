@@ -44,7 +44,7 @@ module.exports = contactUsMainService = {
       let formSettings = await dataService.getContentById(options.data.formSettingsId);
 
       // save the form
-      await dataService.contentCreate(options);
+      await dataService.contentCreate(options, true, options.sessionID);
 
       // send the emails
       let contact = options.data;
@@ -52,24 +52,28 @@ module.exports = contactUsMainService = {
       //confirmation to user
       // let body = `Hi ${contact.name}, \n\nThanks for reaching out. We'll get back to you ASAP.\n\nFor your reference, here was your message:\n${contact.message}`;
       let body = viewService.processTemplateString(formSettings.data.emailMessageBody, {contact});
-      
+
+      //to user - confirmation
       await emailService.sendEmail(
         formSettings.data.adminEmail,
         formSettings.data.fromName,
+        formSettings.data.adminEmail,
         contact.email,
         formSettings.data.emailMessageSubject,
         body
       );
 
       //admin notification
-      let adminBody = `${contact.name} (${contact.email}) wrote: \n\n${contact.message}`;
+      let adminBody = `${contact.name} (${contact.email}) wrote: <br/><br/>${contact.message}`;
       await emailService.sendEmail(
+        formSettings.data.adminEmail,
+        contact.name,
         contact.email,
-        formSettings.data.fromName,
         formSettings.data.adminEmail,
         formSettings.data.emailMessageSubjectAdmin,
         adminBody
       );
+
     });
   },
 };

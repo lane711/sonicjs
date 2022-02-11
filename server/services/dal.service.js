@@ -306,14 +306,14 @@ module.exports = dalService = {
 
   contentRestore: async function (payload, userSession) {
     const contentRepo = await getRepository(Content);
-//     let payload = {};
-//     payload.lastUpdatedByUserId = "anonymous" ? 1 : data.lastUpdatedByUserId;
-//     payload.createdByUserId = "anonymous" ? 1 : data.lastUpdatedByUserId;
-// paylod.createdOn = 
-// payload.updatedOn = 
-//     payload.id = id;
-//     payload.url = url;
-//     payload.data = data;
+    //     let payload = {};
+    //     payload.lastUpdatedByUserId = "anonymous" ? 1 : data.lastUpdatedByUserId;
+    //     payload.createdByUserId = "anonymous" ? 1 : data.lastUpdatedByUserId;
+    // paylod.createdOn =
+    // payload.updatedOn =
+    //     payload.id = id;
+    //     payload.url = url;
+    //     payload.data = data;
     let result = await contentRepo.save(payload);
     // console.log(result);
   },

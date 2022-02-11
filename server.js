@@ -289,6 +289,10 @@ function setupStaticAssets(app) {
     express.static(path.join(appRoot.path, "node_modules/font-awesome/fonts"))
   );
   app.use(
+    "/assets/css/fonts",
+    express.static(path.join(appRoot.path, "node_modules/bootstrap-icons/font/fonts"))
+  );
+  app.use(
     "/",
     express.static(
       path.join(appRoot.path, "/node_modules/ace-builds/src-min-noconflict")
