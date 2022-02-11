@@ -94,7 +94,7 @@ module.exports = fileService = {
   },
 
   writeFile: async function (filePath, fileContent) {
-    if (filePath.startsWith('/server/')) {
+    if (filePath.startsWith('/server/') || filePath.startsWith('/backups/')) {
       filePath = appRoot.path + filePath;
     }
 
