@@ -583,6 +583,12 @@ p {
     padding-top:3.5rem;
 }
 
+a.footer-kevant{
+    color:#999;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
 .text-reset {
     padding: 0;
     margin: 0;
@@ -606,3 +612,27 @@ p {
     display:none;
 }
 
+.blue{
+    color: #2fd6ff;
+}
+
+a.blue{
+    text-decoration: none;
+}
+
+a.blue:hover{
+    color:#00a5ce;
+}
+
+.platform .table i{
+    font-size: 2rem;
+}
+
+.platform .table th, td{
+text-align: center;
+}
+
+.platform .table tr th{
+    text-align: left;
+    padding: 20px 10px 20px 20px;
+}

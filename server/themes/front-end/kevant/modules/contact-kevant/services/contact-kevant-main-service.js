@@ -24,6 +24,8 @@ module.exports = contactKevantUsMainService = {
 
       let contactFormSettingsId = options.shortcode.properties.id;
 
+      options.viewModel.data.tagLine = options.req.url.includes("sonicjs") ? "Ready to learn how Kevant can leverage SonicJs for your project?" : "Ready to learn more?"
+
       options.viewModel.data.form = await formService.getForm(
         "contact-kevant",
         undefined,

@@ -1,6 +1,6 @@
 {{#if data.clickUrl}}
     <a href="{{ data.clickUrl }}">
-        <img width="{{ data.thumbnailWidth }}" src="{{ data.fileName.src }}?width={{ data.thumbnailWidthRetina }}" />
+        <img {{#if data.openInNewTab}}target="_blank"{{/if}} width="{{ data.thumbnailWidth }}" src="{{ data.fileName.src }}?width={{ data.thumbnailWidthRetina }}" />
     </a>
 {{else}}
     <img width="{{ data.thumbnailWidth }}" src="{{ data.fileName.src }}?width={{ data.thumbnailWidthRetina }}" />
