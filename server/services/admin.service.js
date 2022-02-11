@@ -73,6 +73,11 @@ module.exports = adminService = {
         let data = {};
 
         if (viewName == "admin-content") {
+          data = await dataService.getContentAdminCommon(req.sessionID);
+          data.contentTypes = await dataService.contentTypesGet(req.sessionID);
+        }
+
+        if (viewName == "admin-content-all") {
           data = await dataService.getContentAdmin(req.sessionID);
           data.contentTypes = await dataService.contentTypesGet(req.sessionID);
         }

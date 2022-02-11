@@ -3,5 +3,6 @@
   "enabled": true,
   "systemId": "body-text-shortcodes",
   "canBeAddedToColumn": false,
-  "singleInstance": false
+  "singleInstance": false,
+  "version": "0.0.0.1"
 }

@@ -45,16 +45,16 @@ module.exports = imageProcessingMainService = {
           "../../..",
           `/storage/files/${fileName}`
         );
-        let newImagePath = `server/storage/files/width-${width}/${fileName}`;
+        let newImagePath = `/server/storage/files/width-${width}/${fileName}`;
 
         let widthBasedResize = true;
         if (!width && height) {
-          newImagePath = `server/storage/files/height-${height}/${fileName}`;
+          newImagePath = `/server/storage/files/height-${height}/${fileName}`;
           widthBasedResize = false;
         }
 
         if (!width && !height) {
-          let originalImagePath = `server/storage/files/${fileName}`;
+          let originalImagePath = `/server/storage/files/${fileName}`;
           options.res.sendFile(originalImagePath, { root: "./" });
         }
 

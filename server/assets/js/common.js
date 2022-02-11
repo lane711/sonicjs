@@ -18,6 +18,27 @@ function submitForm(submission) {
   });
 }
 
+async function submitFormAndRedirect(submission, redirectTo) {
+  console.log("front end form submitting: ", submission);
+
+  // send a POST request
+  let result = await axios({
+    method: "post",
+    url: "/form-submission",
+    data: {
+      data: submission,
+    },
+  });
+
+  if(result.status !== 200){
+    alert('Error submitting form, please try again');
+  }
+
+  if(redirectTo){
+    window.location.href = redirectTo;
+  }
+}
+
 function setupToolTips() {
   $(function () {
     $('[data-toggle="tooltip"]').tooltip({

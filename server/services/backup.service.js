@@ -19,13 +19,13 @@ module.exports = backUpService = {
   },
 
   exportContentToJsonFiles: async function () {
-    backUpService.cleanupTempFiles();
+    await backUpService.cleanupTempFiles();
     //content
     let contents = await dalService.contentGet("", "", "", "", "", "", "", false, true);
 
-    contents.forEach((content) => {
+    contents.map((content) => {
       fileService.writeFile(
-        `backups/temp/backup/content/${content.id}.json`,
+        `/backups/temp/backup/content/${content.id}.json`,
         JSON.stringify(content)
       );
     });
@@ -35,9 +35,9 @@ module.exports = backUpService = {
     //user
     let users = await dalService.usersGet("", "", true);
 
-    users.forEach((user) => {
+    users.map((user) => {
       fileService.writeFile(
-        `backups/temp/backup/user/${user.id}.json`,
+        `/backups/temp/backup/user/${user.id}.json`,
         JSON.stringify(user)
       );
     });
