@@ -94,12 +94,12 @@ module.exports = fileService = {
   },
 
   writeFile: async function (filePath, fileContent) {
-    if(filePath.startsWith('/server/')){
+    if (filePath.startsWith('/server/')) {
       filePath = appRoot.path + filePath;
     }
 
     //for security, make sure we are only writing files inside the app
-    if(!filePath.startsWith(appRoot.path)){
+    if (!filePath.startsWith(appRoot.path)) {
       return;
     }
     await fsPromise.writeFile(filePath, fileContent);
@@ -121,36 +121,40 @@ module.exports = fileService = {
     let storageOption = process.env.FILE_STORAGE;
     if (
       storageOption === "AMAZON_S3" &&
-      file.name.match(/.(jpg|jpeg|png|gif|svg|mp4)$/i)
+      file.name.match(/.(jpg|jpeg|png|gif|svg|mp4|zip)$/i)
     ) {
-      var title = file.name.replace(/^.*[\\\/]/, "");
-      let result = await s3Service.upload(
-        file.name,
-        file.path,
-        "image",
-        file.type
-      );
+      if (file.name.endsWith(".zip")) {
+        await this.uploadBackupFile(file, sessionID);
+      } else {
+        var title = file.name.replace(/^.*[\\\/]/, "");
+        let result = await s3Service.upload(
+          file.name,
+          file.path,
+          "image",
+          file.type
+        );
 
-      //see if image already exists
-      let existingMedia = await dataService.getContentByContentTypeAndTitle(
-        "media",
-        title
-      );
+        //see if image already exists
+        let existingMedia = await dataService.getContentByContentTypeAndTitle(
+          "media",
+          title
+        );
 
-      if (!existingMedia) {
-        //create media record
-        let payload = {
-          data: {
-            title: title,
-            file: file.name,
-            contentType: "media",
-          },
-        };
-        // debugger;
-        await dataService.contentCreate(payload, true, sessionID);
+        if (!existingMedia) {
+          //create media record
+          let payload = {
+            data: {
+              title: title,
+              file: file.name,
+              contentType: "media",
+            },
+          };
+          // debugger;
+          await dataService.contentCreate(payload, true, sessionID);
+        }
+        // await createInstance(payload);
+        //delete temp file?
       }
-      // await createInstance(payload);
-      //delete temp file?
     }
   },
 
