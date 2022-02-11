@@ -3,7 +3,7 @@ var emitterService = require("./emitter.service");
 var fileService = require("./file.service");
 var dataService = require("./data.service");
 const path = require("path");
-var UglifyJS = require("uglify-es");
+var UglifyJS = require("uglify-js");
 var csso = require("csso");
 var fileName = {};
 const frontEndTheme = `${process.env.FRONT_END_THEME}`;
@@ -22,7 +22,7 @@ module.exports = assetService = {
           let assetFilesExist = await assetService.doesAssetFilesExist();
 
           // if (process.env.REBUILD_ASSETS === "TRUE" || !assetFilesExist || options.req.pageLoadedCount === 1) {
-            if (!assetFilesExist || options.req.pageLoadedCount === 1) {
+          if (!assetFilesExist || options.req.pageLoadedCount === 1) {
             //rebuild the assets before delivering
             await assetService.getLinks(options, "css");
             await assetService.getLinks(options, "js");
@@ -137,7 +137,7 @@ module.exports = assetService = {
       await globalService.asyncForEach(
         globalService.moduleJsFiles,
         async (path) => {
-          this.addPath(options, { path: path }, assetType);
+          this.addPath(options, {path: path}, assetType);
         }
       );
     }
@@ -147,7 +147,7 @@ module.exports = assetService = {
       await globalService.asyncForEach(
         globalService.moduleCssFiles,
         async (path) => {
-          this.addPath(options, { path: path }, assetType);
+          this.addPath(options, {path: path}, assetType);
         }
       );
     }
@@ -169,7 +169,7 @@ module.exports = assetService = {
       let skipAsset =
         typeOfRecord === "object" && !options.page.data.showPageBuilder;
       if (!skipAsset) {
-        this.addPath(options, { path: path }, assetType);
+        this.addPath(options, {path: path}, assetType);
       }
     });
   },
@@ -214,9 +214,9 @@ module.exports = assetService = {
       async (link) => {
         let root = link.path.startsWith("/node_modules");
         if (link.path.includes("/api/containers/css/download/template.css")) {
-          link.path = `server/themes/front-end/${frontEndTheme}/css/template-processed.css`;
+          link.path = `/server/themes/front-end/${frontEndTheme}/css/template-processed.css`;
         }
-        if(!link.path.startsWith('/node_modules')){
+        if (!link.path.startsWith('/node_modules')) {
           link.path = '/server' + link.path;
         }
         let fileContentRaw = await fileService.getFile(link.path);
@@ -227,7 +227,7 @@ module.exports = assetService = {
           fileContent += fileContentRaw + "\n";
           console.log(`fileContent Size: ${fileContent.length}`);
         } else {
-          console.log("Error retrieving " + link.path);
+          console.log("empty, skipping:  " + link.path);
         }
       }
     );
@@ -250,11 +250,17 @@ module.exports = assetService = {
           compress: false,
         });
 
+        if (minJs.error) {
+          console.error(`Error minifying ${fileName}`, minJs.error)
+        }
+
         minifiedAsset = minJs.code;
       }
-      
+
       if (assetType === "css") {
-        minifiedAsset = csso.minify(fileContent).css;
+        let cssMin = csso.minify(fileContent).css;
+        minifiedAsset = cssMin;
+
       }
 
       fileService.writeFile(`${path}`, minifiedAsset);
