@@ -78,30 +78,20 @@ a{
     font-size: 2rem;
 }
 
-.client-logos .table {
-    display: table;
-    margin: 0 auto
+.client-logos .short{
+    text-align: center;
 }
-
-.client-logos ul#horizontal-list {
-    min-width: 696px;
-    list-style: none;
-
-}
-
-.client-logos ul#horizontal-list li {
-    display: inline
-}
-
 .client-logos .short img {
-    height: 72px;
+    height: 44px;
     width: auto;
-    margin: 0 0 0 100px
+}
+
+.client-logos {
+    text-align: center;
 }
 
 .client-logos img {
-    width: 160px;
-    margin: 0 72px
+    width: 142px;
 }
 
 .homepage-build .divider {
@@ -635,4 +625,48 @@ text-align: center;
 .platform .table tr th{
     text-align: left;
     padding: 20px 10px 20px 20px;
+}
+
+.anchor{
+    display: none !important;
+}
+
+/*mobile*/
+@media (max-width: 480px) {
+    .home-intro h1{
+        font-size: 2rem;
+    }
+
+    .home-intro h2 {
+        font-size: 1.4rem;
+    }
+
+    section.home-intro a{
+        font-size: 1rem;
+    }
+
+    section[data-id="9d41236c-c2e5-4661-ad01-29bc24311186"]{
+        height:1000px;
+    }
+
+    .homepage-technologies h1, .homepage-technologies h2 {
+        line-height: 1;
+        margin: 30px 0 20px;
+    }
+
+    .client-logos img{
+        margin: 20px 0;
+    }
+
+    .homepage-build .divider{
+        display:none;
+    }
+
+    .contact-kevant .interest-boxes .form-radio.radio .form-check-inline {
+        width: 64%;
+    }
+
+    .contact-kevant .radio .form-check-inline {
+        width: 100% !important;
+    }
 }
