@@ -120,7 +120,7 @@ module.exports = assetService = {
 
       // add css for current theme
       if (assetType === "css") {
-        if (frontEndThemeBootswatch) {
+        if (frontEndThemeBootswatch && frontEndThemeBootswatch !== undefined) {
           this.addPath(
             options,
             {
