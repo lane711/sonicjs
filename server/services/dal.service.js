@@ -239,7 +239,7 @@ module.exports = dalService = {
     let isExisting = false;
     if (!id) {
       //upsert
-      content.id = uuid();
+      content.id = uuidv4();
       content.contentTypeId = data.contentType;
       content.createdByUserId = userSession.user.id;
       content.createdOn = new Date();
