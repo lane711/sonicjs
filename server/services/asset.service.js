@@ -78,8 +78,8 @@ module.exports = assetService = {
     });
   },
 
-  doesAssetFilesExist: async function (fileName) {
-    console.log('doesAssetFilesExist', fileName);
+  doesAssetFilesExist: async function () {
+    // console.log('doesAssetFilesExist', fileName);
     let cssPath = this.getAssetPath(this.getCombinedFileName("css"));
     let jsPath = this.getAssetPath(this.getCombinedFileName("js"));
     return fileService.fileExists(cssPath) && fileService.fileExists(jsPath);
