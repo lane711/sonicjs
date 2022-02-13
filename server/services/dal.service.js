@@ -1,12 +1,12 @@
-const {getRepository, Like} = require("typeorm");
-const {Content} = require("../data/model/Content");
-const {User} = require("../data/model/User");
-const {Session} = require("../data/model/Session");
+const { getRepository } = require("typeorm");
+const { Content } = require("../data/model/Content");
+const { User } = require("../data/model/User");
+const { Session } = require("../data/model/Session");
 const emitterService = require("../services/emitter.service");
 
 const crypto = require("crypto");
-const {contentDelete} = require("./data.service");
-const {v4: uuidv4} = require('uuid');
+const { contentDelete } = require("./data.service");
+const { v4: uuidv4 } = require('uuid');
 
 module.exports = dalService = {
   startup: async function (app) {
@@ -74,7 +74,7 @@ module.exports = dalService = {
     const userRepo = await getRepository(User);
 
     let userByEmail = await userRepo.findOne({
-      where: [{username: email}],
+      where: [{ username: email }],
     });
 
     if (userByEmail) {
@@ -102,7 +102,7 @@ module.exports = dalService = {
     const userRepo = await getRepository(User);
 
     let user = await userRepo.findOne({
-      where: {username: email},
+      where: { username: email },
     });
 
     if (!user) {
@@ -182,14 +182,13 @@ module.exports = dalService = {
     user,
     req,
     returnAsArray = false,
-    bypassProcessContent = false,
-    dataLike = undefined
+    bypassProcessContent = false
   ) {
     let contents = [];
     const contentRepo = await getRepository(Content);
 
     if (id) {
-      let content = await contentRepo.findOne({where: {id: id}});
+      let content = await contentRepo.findOne({ where: { id: id } });
       dalService.processContent(content, user, req);
 
       if (returnAsArray) {
@@ -198,22 +197,18 @@ module.exports = dalService = {
       }
       return content;
     } else if (url) {
-      let content = await contentRepo.findOne({where: {url: url}});
+      let content = await contentRepo.findOne({ where: { url: url } });
       dalService.processContent(content, user, req);
       return content;
     } else if (contentTypeId) {
       contents = await contentRepo.find({
-        where: {contentTypeId: contentTypeId},
+        where: { contentTypeId: contentTypeId },
       });
     } else if (data) {
       var query = {};
       query["data." + data.attr] = data.val;
       console.log("query", query);
-      return contentRepo.find(query);
-    } else if (dataLike) {
-      return contentRepo.find({
-        data: Like(`${dataLike}`),
-      });
+      return Content.find(query);
     } else if (tag) {
       // let contentsQuery = Tag.findById(tag); //.populate("contents");
       // contents = contentsQuery.exec();
@@ -230,11 +225,11 @@ module.exports = dalService = {
     return contents;
   },
 
-  contentUpdate: async function (id, url, data, userSession, bypassHooks = false) {
+  contentUpdate: async function (id, url, data, userSession) {
     const contentRepo = await getRepository(Content);
     let content = {};
     if (id) {
-      content = await contentRepo.findOne({where: {id: id}});
+      content = await contentRepo.findOne({ where: { id: id } });
       if (!content) {
         content = {};
       }
@@ -244,7 +239,7 @@ module.exports = dalService = {
     let isExisting = false;
     if (!id) {
       //upsert
-      content.id = uuidv4();
+      content.id = uuid();
       content.contentTypeId = data.contentType;
       content.createdByUserId = userSession.user.id;
       content.createdOn = new Date();
@@ -256,14 +251,13 @@ module.exports = dalService = {
     content.data = JSON.stringify(data);
     let result = await contentRepo.save(content);
 
-    if (!bypassHooks) {
-      if (isExisting) {
-        emitterService.emit("contentUpdated", result);
-      } else {
-        emitterService.emit("contentCreated", result);
-      }
-      emitterService.emit("contentCreatedOrUpdated", result);
+    if (isExisting) {
+      emitterService.emit("contentUpdated", result);
+    } else {
+      emitterService.emit("contentCreated", result);
     }
+
+    emitterService.emit("contentCreatedOrUpdated", result);
 
     return result;
   },

@@ -1,0 +1,31 @@
+bootstrap-version: 5
+assets:
+  js:
+    - /assets/js/startup.js
+    - /node_modules/jquery/dist/jquery.min.js
+    - /node_modules/js-cookie/src/js.cookie.js
+    - /node_modules/ace-builds/src-min-noconflict/ace.js
+    - /node_modules/ace-builds/src-min-noconflict/ext-beautify.js
+    - /node_modules/axios/dist/axios.min.js
+    - /node_modules/@popperjs/core/dist/umd/popper.min.js
+    - /node_modules/bootstrap5/dist/js/bootstrap.min.js
+    - /node_modules/jsoneditor/dist/jsoneditor.min.js
+    - /node_modules/formiojs/dist/formio.full.min.js
+    - /node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.js
+    - /node_modules/dropzone/dist/min/dropzone.min.js
+    - /assets/js/common.js
+    - /sonicjs-services/shared.service.js
+    - /sonicjs-services/global.service.js
+    - /sonicjs-services/helper.service.js
+    - /sonicjs-services/formatting.service.js
+    - /sonicjs-services/data.service.js
+    - /sonicjs-services/form.service.js
+    - /page-builder/js/page-builder.js:
+        isPageBuilder: true
+  css:
+    - /node_modules/bootstrap5/dist/css/bootstrap.min.css
+    - /themes/front-end/{{frontEndTheme}}/css/template-processed.css
+    - /node_modules/bootstrap-icons/font/bootstrap-icons.css
+    - /node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css
+    - /node_modules/formiojs/dist/formio.form.min.css
+    - /node_modules/jsoneditor/dist/jsoneditor.min.css

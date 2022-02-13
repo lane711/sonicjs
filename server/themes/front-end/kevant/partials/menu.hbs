@@ -1,0 +1,23 @@
+<nav class="navbar navbar-dark bg-dark" aria-label="First navbar example">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">{{> menu-logo }}</a>
+        <a class="btn btn-outline-light hire-us" href="/contact">HIRE US</a>
+        <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarsExample01" aria-controls="navbarsExample01" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="navbar-collapse collapse" id="navbarsExample01" style="">
+            <ul class="navbar-nav me-auto mb-2">
+                {{#each data.menu}}
+                    <li class="nav-item">
+                        <a class="nav-link {{#if this.isActive}}active{{/if}}" aria-current="page" href="{{this.data.url}}">{{this.data.title}}</a>
+                    </li>
+                {{/each}}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+

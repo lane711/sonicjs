@@ -1,0 +1,15 @@
+{{#if (eq data.themeSettings.logoType "text")}}
+  <h5
+    class="my-0 mr-md-auto font-weight-normal"
+  >{{data.themeSettings.logoTitle}}</h5>
+{{/if}}
+
+{{#if (eq data.themeSettings.logoType "image")}}
+  <div style="{{data.themeSettings.imageStyle}}" class="mr-md-auto">
+    <img
+      src="{{data.themeSettings.fileName.src}}"
+      alt=""
+      width="{{data.themeSettings.imageWidth}}"
+    />
+  </div>
+{{/if}}

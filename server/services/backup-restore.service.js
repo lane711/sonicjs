@@ -6,6 +6,7 @@ var dalService = require("./dal.service");
 var dataService = require("./data.service");
 var fileService = require("./file.service");
 const archiver = require("archiver");
+const {v4: uuidv4} = require('uuid');
 
 const token = process.env.DROPBOX_TOKEN;
 const backUpRestoreUrl = process.env.BACKUP_RESTORE_URL;
@@ -37,7 +38,7 @@ module.exports = backUpRestoreService = {
     const extractToPath = `${appRoot.path}/backups/temp/restore`;
 
     fs.createReadStream(backupFilePath)
-      .pipe(unzipper.Extract({ path: extractToPath }))
+      .pipe(unzipper.Extract({path: extractToPath}))
       .on("entry", (entry) => entry.autodrain())
       .promise()
       .then(
@@ -71,6 +72,13 @@ module.exports = backUpRestoreService = {
         if (contentFile) {
           let payload = JSON.parse(contentFile);
           try {
+            if (payload.createdByUserId == 0) {
+              payload.createdByUserId = uuidv4();
+            }
+            if (payload.lastUpdatedByUserId == 0) {
+              payload.lastUpdatedByUserId = uuidv4();
+            }
+
             await dalService.contentRestore(payload, req.sessionID);
           } catch (error) {
             console.log("id", id);

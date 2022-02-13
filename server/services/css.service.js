@@ -100,7 +100,7 @@ module.exports = cssService = {
       );
 
       // console.log(processCssString);
-      fileService.writeFile(processedFilePath, processCssString);
+      await fileService.writeFile(processedFilePath, processCssString);
     }
   },
 

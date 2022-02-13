@@ -251,12 +251,12 @@
 
             </div> --}}
 
-      <button type="button" onclick="deleteModule()" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>
+      <button type="button" onclick="deleteModule()" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
 
-      <button type="button" onclick="copyModule()" class="btn btn-primary btn-sm"><i class="fa fa-copy"></i></button>
+      <button type="button" onclick="copyModule()" class="btn btn-primary btn-sm"><i class="bi bi-clipboard-plus"></i></button>
 
       <button type="button" onclick="editModule()" class="btn btn-secondary btn-sm"><i
-          class="fa fa-edit"></i></button>
+          class="bi bi-pen"></i></button>
     </div>
   </div>
 
@@ -267,11 +267,11 @@
 
       <button id="btnGroupDropModules" type="button" class="btn btn-secondary dropdown-toggle btn-sm"
         data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <i class="fa fa-plus"></i> Module</button>
+        <i class="bi bi-plus-square"></i> Module</button>
       </button>
       <div class="dropdown-menu dropdown-menu-right add-module-dropdown" aria-labelledby="btnGroupDropModules">
         {{#each data.modulesForColumns}}
-        <a class="dropdown-item" onclick="addModule('{{this.systemId}}')"><i class="fa fa-plus"></i>
+        <a class="dropdown-item" onclick="addModule('{{this.systemId}}')"><i class="bi bi-plus-square"></i>
           {{this.title}}</a>
         {{/each}}
       </div>
@@ -381,7 +381,7 @@
 <div class="pb-side-panel close">
   <div class="handle">
     <span>
-      <i class="nav-icon fa fa-times"></i>
+      <i class="nav-icon bi bi-x-lg"></i>
     </span>
   </div>
   <h5 class="modal-title" id="dynamicModelTitle">Settings</h5>

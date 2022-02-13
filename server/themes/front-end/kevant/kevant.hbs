@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en" class="{{data.pageCssClass}}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{ data.metaDescription }}">
+    <meta name="generator" content="SonicJs">
+    <meta name="version" content="{{ data.appVersion }}">
+    <link rel="icon" href="/assets/img/favicon.ico">
+    <title>{{data.metaTitle}} | Kevant Technologies</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family={{data.siteSettings.fontDefault}}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="https://sonicjscom.s3.us-west-1.amazonaws.com/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://sonicjscom.s3.us-west-1.amazonaws.com/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://sonicjscom.s3.us-west-1.amazonaws.com/favicon-16x16.png">
+
+    <style>
+        body,
+        p,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: {{data.siteSettings.fontDefault}},
+            serif;
+        }
+
+        h1 {
+            font-family: {{data.siteSettings.fontHeaders}},
+            serif;
+        }
+    </style>
+
+    {{{data.cssLinks}}}
+
+    {{#if data.showPageBuilder}}
+        <link href="/page-builder/css/page-builder.css" rel="stylesheet">
+    {{/if}}
+
+</head>
+
+<body>
+
+<input type="hidden" id="page-id" name="page-id" value="{{data.id}}">
+<input type="hidden" id="sessionID" value="{{data.sessionID}}"/>
+<input type="hidden" id="theme" value="bootstrap5"/>
+
+<main>
+
+    {{> menu level='1'}}
+
+    {{#if data.showPageBuilder}}
+        {{> page-builder }}
+    {{/if}}
+
+    {{{body}}}
+
+</main>
+
+<!-- Footer -->
+
+<footer class="text-center text-lg-start bg-dark text-light footer">
+
+
+    <!-- Section: Links  -->
+    <section>
+        <div class="container text-center text-md-start mt-2 text-muted footer-pt">
+            <!-- Grid row -->
+            <div class="row">
+                <!-- Grid column -->
+                <div class="col-md-4 col-lg-4 col-xl-3 mx-auto mb-4">
+                    <!-- Content -->
+                    <h6 class="text-uppercase fw-bold mb-4">
+                        <a class="footer-kevant" href="/"><img class="kevant-k" src="https://sonicjscom.s3.us-west-1.amazonaws.com/kevant%20K.png" /> Kevant Technologies</a>
+                    </h6>
+                    <p>
+                        We are a team of passionate IT professionals providing custom web and application development
+                        services
+                        dedicated towards bringing your product vision to life.
+                    </p>
+                    <p>
+                        Since 2014, Kevant Technologies has driven dozens of projects from conception to launch. We are friendly, passionate, transparent
+                        and results driven.
+                    </p>
+                </div>
+                <!-- Grid column -->
+
+                <!-- Grid column -->
+                <div class="col-md-4 col-lg-2 col-xl-2 mx-auto mb-4">
+                    <!-- Links -->
+                    <h6 class="text-uppercase fw-bold mb-4 mt-2">
+                        Resoruces
+                    </h6>
+                    <p>
+                        <i class="bi bi-arrow-right"></i><a href="/services" class="text-reset">Our Services</a>
+                    </p>
+                    <p>
+                        <i class="bi bi-arrow-right"></i> <a href="/services#web-design" class="text-reset">Website Design</a>
+                    </p>
+                    <p>
+                        <i class="bi bi-arrow-right"></i> <a href="/services#web-development" class="text-reset">Web App Development</a>
+                    </p>
+                    <p>
+                        <i class="bi bi-arrow-right"></i> <a href="/services#mobile-development" class="text-reset">Mobile App Development</a>
+                    </p>
+                    <p>
+                        <i class="bi bi-arrow-right"></i> <a href="/sonicjs" class="text-reset">Our Platform</a>
+                    </p>
+                </div>
+                <!-- Grid column -->
+
+
+                <!-- Grid column -->
+                <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
+                    <!-- Links -->
+                    <h6 class="text-uppercase fw-bold mb-4 mt-2">
+                        Contact
+                    </h6>
+                    <p><i class="bi bi-building"></i>
+                        Mission Viejo, California</p>
+                    <p>
+                        <i class="bi bi-envelope"></i><a class="text-reset" href="mailTo:contact@kevant.com">contact@kevant.com
+                    </a>
+                    </p>
+                    <p><i class="bi bi-phone"></i><a class="text-reset" href="tel:9492874720">US + 01 949.287.4720</a></p>
+                    <p><i class="bi bi-linkedin"></i><a class="text-reset" target="_blank"  href="https://linkedin.com">Connect on LinkedIn</a></p>
+                    <p><i class="bi bi-calendar-check"></i>M-F 8AM - 6PM PST</p>
+                </div>
+                <!-- Grid column -->
+            </div>
+            <!-- Grid row -->
+        </div>
+    </section>
+    <!-- Section: Links  -->
+
+    <!-- Copyright -->
+    <section class="copyright text-center p-4">
+        © {{data.currentYear}} {{ data.themeSettings.footerText }}<a href="/terms">Terms</a><a href="/privacy">Privacy</a><a href="/cookie-policy">Cookie Policy</a><a href="/contact">Contact Us</a>
+    </section>
+    <!-- Copyright -->
+</footer>
+<!-- Footer -->
+
+{{{data.jsLinks}}}
+
+</body>
+</html>
+

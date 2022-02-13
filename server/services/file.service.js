@@ -11,7 +11,7 @@ const chalk = require("chalk");
 const log = console.log;
 var path = require("path");
 const YAML = require("yaml");
-const { parse, stringify } = require("envfile");
+const {parse, stringify} = require("envfile");
 var appRoot = require("app-root-path");
 const glob = require("glob");
 
@@ -24,18 +24,18 @@ module.exports = fileService = {
   //     });
   // },
 
-  getFile: async function (relativeFilePath) {
-    let filePath = path.join(appRoot.path, relativeFilePath);
+  getFile: async function (filePath, isRelative = true) {
+    let fullFilePath = isRelative ? path.join(appRoot.path, filePath) : filePath;
 
-    if (filePath.includes("/server/sonicjs-services/")) {
-      filePath = filePath.replace(
+    if (fullFilePath.includes("/server/sonicjs-services/")) {
+      fullFilePath = fullFilePath.replace(
         "/server/sonicjs-services/",
         "/server/services/"
       );
     }
 
     return new Promise((resolve, reject) => {
-      fs.readFile(filePath, "utf8", (err, data) => {
+      fs.readFile(fullFilePath, "utf8", (err, data) => {
         if (err) {
           console.log(chalk.red(err));
           reject(err);
@@ -94,44 +94,67 @@ module.exports = fileService = {
   },
 
   writeFile: async function (filePath, fileContent) {
-    let fullPath = path.join(this.getRootAppPath(), filePath);
-    await fsPromise.writeFile(fullPath, fileContent);
+    if (filePath.startsWith('/server/') || filePath.startsWith('/backups/')) {
+      filePath = appRoot.path + filePath;
+    }
+
+    //for security, make sure we are only writing files inside the app
+    if (!filePath.startsWith(appRoot.path)) {
+      return;
+    }
+    await fsPromise.writeFile(filePath, fileContent);
+  },
+
+  uploadBackupFile: async function (file, sessionID) {
+    let destinationPath = path.join(this.getRootAppPath(), '/backups', file.name);
+    await fileService.copyFile(file.path, destinationPath);
+  },
+
+  copyFile: async function (sourcePath, destinationPath) {
+    fs.copyFile(sourcePath, destinationPath, (err) => {
+      if (err) throw err;
+      console.log(`${sourcePath} was copied to ${destinationPath}`);
+    });
   },
 
   uploadWriteFile: async function (file, sessionID) {
     let storageOption = process.env.FILE_STORAGE;
     if (
       storageOption === "AMAZON_S3" &&
-      file.name.match(/.(jpg|jpeg|png|gif|svg)$/i)
+      file.name.match(/.(jpg|jpeg|png|gif|svg|mp4|zip)$/i)
     ) {
-      var title = file.name.replace(/^.*[\\\/]/, "");
-      let result = await s3Service.upload(
-        file.name,
-        file.path,
-        "image",
-        file.type
-      );
+      if (file.name.endsWith(".zip")) {
+        await this.uploadBackupFile(file, sessionID);
+      } else {
+        var title = file.name.replace(/^.*[\\\/]/, "");
+        let result = await s3Service.upload(
+          file.name,
+          file.path,
+          "image",
+          file.type
+        );
 
-      //see if image already exists
-      let existingMedia = await dataService.getContentByContentTypeAndTitle(
-        "media",
-        title
-      );
+        //see if image already exists
+        let existingMedia = await dataService.getContentByContentTypeAndTitle(
+          "media",
+          title
+        );
 
-      if (!existingMedia) {
-        //create media record
-        let payload = {
-          data: {
-            title: title,
-            file: file.name,
-            contentType: "media",
-          },
-        };
-        // debugger;
-        await dataService.contentCreate(payload, true, sessionID);
+        if (!existingMedia) {
+          //create media record
+          let payload = {
+            data: {
+              title: title,
+              file: file.name,
+              contentType: "media",
+            },
+          };
+          // debugger;
+          await dataService.contentCreate(payload, true, sessionID);
+        }
+        // await createInstance(payload);
+        //delete temp file?
       }
-      // await createInstance(payload);
-      //delete temp file?
     }
   },
 
@@ -142,8 +165,8 @@ module.exports = fileService = {
     }
   },
 
-  fileExists: function (filePath) {
-    let dirPath = path.join(appRoot.path, filePath);
+  fileExists: function (filePath, isFullPath = false) {
+    let dirPath = isFullPath ? filePath : path.join(appRoot.path, filePath);
     let fileExist = fs.existsSync(dirPath);
     return fileExist;
   },
@@ -182,6 +205,6 @@ module.exports = fileService = {
   },
 
   deleteDirectory: function (directoryPath) {
-    return fs.rmdirSync(directoryPath, { recursive: true });
+    return fs.rmdirSync(directoryPath, {recursive: true});
   },
 };

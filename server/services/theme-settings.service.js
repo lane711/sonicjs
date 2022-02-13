@@ -23,6 +23,7 @@ module.exports = themeSettingsService = {
     var themeSettings = await dataService.getContentTopOne("theme-settings", options.req.sessionID);
     // console.log("themeSettings", themeSettings);
     options.page.data.themeSettings = themeSettings.data;
+    options.page.data.currentYear = new Date().getFullYear();
 
     //add bs version
     //server/themes/front-end/bootstrap5/bootstrap5.config.yml

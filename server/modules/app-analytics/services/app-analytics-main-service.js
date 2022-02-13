@@ -98,7 +98,8 @@ module.exports = appAnalyticsMainService = {
           bootCount: 1,
         },
       };
-      payload.location = await appAnalyticsMainService.getLocation(ipAddress);
+      // TODO: troubleshoot
+      // payload.location = await appAnalyticsMainService.getLocation(ipAddress);
       profile = await dataService.contentCreate(payload, false, 0);
     }
 
