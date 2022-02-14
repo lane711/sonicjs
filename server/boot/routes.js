@@ -238,6 +238,7 @@ exports.loadRoutesCatchAll = async function (app) {
 
     if (!page.data || page.data?.title === "Not Found") {
       res.redirect("/404");
+      return;
     }
 
     await emitterService.emit("preRenderTemplate", (options = { page, req }));
