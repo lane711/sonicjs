@@ -1,4 +1,4 @@
-const { getRepository } = require("typeorm");
+const { getRepository, Like} = require("typeorm");
 const { Content } = require("../data/model/Content");
 const { User } = require("../data/model/User");
 const { Session } = require("../data/model/Session");
@@ -225,6 +225,13 @@ module.exports = dalService = {
     return contents;
   },
 
+  contentGetLike: async function(like){
+    const contentRepo = await getRepository(Content);
+    return contentRepo.find({
+      data: Like(`%${like}%`),
+    });
+  },
+
   contentUpdate: async function (id, url, data, userSession) {
     const contentRepo = await getRepository(Content);
     let content = {};
@@ -247,7 +254,7 @@ module.exports = dalService = {
     }
     content.lastUpdatedByUserId = userSession.user.id;
     content.updatedOn = new Date();
-    content.tags = ""; //[];
+    // content.tags = ""; //[];
     content.data = JSON.stringify(data);
     let result = await contentRepo.save(content);
 
