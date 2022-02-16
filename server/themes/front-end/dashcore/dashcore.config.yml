@@ -60,3 +60,5 @@ assets:
     - /node_modules/prismjs/themes/prism-coy.css
     - /assets/vendors/prism-treeview/prism-treeview.css
     - /assets/css/common.css
+    - /node_modules/bootstrap-icons/font/bootstrap-icons.css
+
