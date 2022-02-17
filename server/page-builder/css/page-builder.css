@@ -395,7 +395,7 @@ section {
 }
 
 .sidebar-expander {
-  position: absolute;
+  position: fixed;
   top: calc(50% - 30px);
   left: -60px;
   width: 60px;
