@@ -1,4 +1,4 @@
-bootstrap-version: 4
+bootstrap-version: 5
 assets:
   js:
     - /assets/js/startup.js
@@ -11,13 +11,13 @@ assets:
     - /themes/front-end/{{frontEndTheme}}/js/prism.js
     - /themes/front-end/{{frontEndTheme}}/js/simplebar.js
     - /themes/front-end/{{frontEndTheme}}/js/swiper.js
-    - /themes/front-end/{{frontEndTheme}}/js/popper.js
     - /themes/front-end/{{frontEndTheme}}/js/jquery.js
     - /themes/front-end/{{frontEndTheme}}/js/jquery.easing.min.js
     - /themes/front-end/{{frontEndTheme}}/js/jquery.validate.js
     - /themes/front-end/{{frontEndTheme}}/js/plugins/jquery.animatebar.js
     - /themes/front-end/{{frontEndTheme}}/js/feather.min.js
-    - /themes/front-end/{{frontEndTheme}}/js/bootstrap.js
+    - /node_modules/@popperjs/core/dist/umd/popper.min.js
+    - /node_modules/bootstrap5/dist/js/bootstrap.min.js
     - /themes/front-end/{{frontEndTheme}}/js/aos.js
     - /themes/front-end/{{frontEndTheme}}/js/typed.js
     - /themes/front-end/{{frontEndTheme}}/js/common-script.js
@@ -49,6 +49,7 @@ assets:
     - /page-builder/js/page-builder.js:
         isPageBuilder: true
   css:
+    - /node_modules/bootstrap5/dist/css/bootstrap.min.css
     - /themes/front-end/{{frontEndTheme}}/css/template-processed.css
     - /themes/front-end/{{frontEndTheme}}/css/all.css
     - /themes/front-end/{{frontEndTheme}}/css/aos.css
