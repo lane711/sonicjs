@@ -155,6 +155,15 @@ module.exports = fileService = {
         // await createInstance(payload);
         //delete temp file?
       }
+    }//Local file upload fix
+    else if(storageOption === "FILE_SYSTEM" && 
+        file.name.match(/.(jpg|jpeg|png|gif|svg|mp4|zip)$/i))
+    {
+      //Upload file to default assets location
+      await fileService.copyFile(file.path, path.join(appRoot.path, `server/assets/uploads/${file.name}`))
+      .catch(error => {console.log(error); throw new Error(error)}) 
+      //Remove temp file
+      await deleteFile(file.path)
     }
   },
 
