@@ -133,5 +133,9 @@
     </main>
 
     {{{data.jsLinks}}}
+
+    {{#if data.siteSettings.addThisPubId}}
+      <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid={{data.siteSettings.addThisPubId}}"></script>
+    {{/if}}
   </body>
 </html>
