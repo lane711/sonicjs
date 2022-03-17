@@ -11,7 +11,7 @@ const chalk = require("chalk");
 const log = console.log;
 var path = require("path");
 const YAML = require("yaml");
-const {parse, stringify} = require("envfile");
+const { parse, stringify } = require("envfile");
 var appRoot = require("app-root-path");
 const glob = require("glob");
 
@@ -25,7 +25,9 @@ module.exports = fileService = {
   // },
 
   getFile: async function (filePath, isRelative = true) {
-    let fullFilePath = isRelative ? path.join(appRoot.path, filePath) : filePath;
+    let fullFilePath = isRelative
+      ? path.join(appRoot.path, filePath)
+      : filePath;
 
     if (fullFilePath.includes("/server/sonicjs-services/")) {
       fullFilePath = fullFilePath.replace(
@@ -94,7 +96,7 @@ module.exports = fileService = {
   },
 
   writeFile: async function (filePath, fileContent) {
-    if (filePath.startsWith('/server/') || filePath.startsWith('/backups/')) {
+    if (filePath.startsWith("/server/") || filePath.startsWith("/backups/")) {
       filePath = appRoot.path + filePath;
     }
 
@@ -106,7 +108,11 @@ module.exports = fileService = {
   },
 
   uploadBackupFile: async function (file, sessionID) {
-    let destinationPath = path.join(this.getRootAppPath(), '/backups', file.name);
+    let destinationPath = path.join(
+      this.getRootAppPath(),
+      "/backups",
+      file.name
+    );
     await fileService.copyFile(file.path, destinationPath);
   },
 
@@ -134,36 +140,46 @@ module.exports = fileService = {
           file.type
         );
 
-        //see if image already exists
-        let existingMedia = await dataService.getContentByContentTypeAndTitle(
-          "media",
-          title
-        );
-
-        if (!existingMedia) {
-          //create media record
-          let payload = {
-            data: {
-              title: title,
-              file: file.name,
-              contentType: "media",
-            },
-          };
-          // debugger;
-          await dataService.contentCreate(payload, true, sessionID);
-        }
-        // await createInstance(payload);
-        //delete temp file?
+        await addMediaRecord(title, file, sessionID);
       }
-    }//Local file upload fix
-    else if(storageOption === "FILE_SYSTEM" && 
-        file.name.match(/.(jpg|jpeg|png|gif|svg|mp4|zip)$/i))
-    {
+    } //Local file upload fix
+    else if (file.name.match(/.(jpg|jpeg|png|gif|svg|mp4|zip)$/i)) {
+      var title = file.name.replace(/^.*[\\\/]/, "");
+
       //Upload file to default assets location
-      await fileService.copyFile(file.path, path.join(appRoot.path, `server/assets/uploads/${file.name}`))
-      .catch(error => {console.log(error); throw new Error(error)}) 
+      await fileService
+        .copyFile(
+          file.path,
+          path.join(appRoot.path, `server/assets/uploads/${file.name}`)
+        )
+        .catch((error) => {
+          console.log(error);
+          throw new Error(error);
+        });
+
       //Remove temp file
-      await deleteFile(file.path)
+      await fileService.deleteFile(file.path);
+    }
+  },
+
+  addMediaRecord: async function (title, file, sessionID) {
+    //see if image already exists
+    let existingMedia = await dataService.getContentByContentTypeAndTitle(
+      "media",
+      title
+    );
+
+    if (!existingMedia) {
+      //create media record
+      let payload = {
+        data: {
+          title: title,
+          file: file.name,
+          contentType: "media",
+        },
+      };
+      // debugger;
+      await dataService.contentCreate(payload, true, sessionID);
     }
   },
 
@@ -214,6 +230,6 @@ module.exports = fileService = {
   },
 
   deleteDirectory: function (directoryPath) {
-    return fs.rmdirSync(directoryPath, {recursive: true});
+    return fs.rmdirSync(directoryPath, { recursive: true });
   },
 };
