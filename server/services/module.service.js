@@ -60,6 +60,9 @@ module.exports = moduleService = {
     });
 
     emitterService.emit("modulesLoaded");
+
+    emitterService.emit("addUrl");
+
   },
 
   getModuleDefinition: async function (systemId) {

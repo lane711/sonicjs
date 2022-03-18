@@ -39,7 +39,7 @@ module.exports = taxonomyMainService = {
       }
     });
 
-    emitterService.on("modulesLoaded", async function (options) {
+    emitterService.on("addUrl", async function (options) {
       const taxonomies = await dalService.contentGet(
         null,
         "taxonomy",
