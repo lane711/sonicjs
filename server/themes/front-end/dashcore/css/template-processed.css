@@ -94,8 +94,7 @@ section[data-id="908"] {
   margin: 0 8px 0;
 }
 
-.docs [data-module="IMAGE"],
-.docs [data-module="CODE-SNIPPET"] {
+.docs [data-module="IMAGE"]{
   margin: 0 0 100px;
 }
 
