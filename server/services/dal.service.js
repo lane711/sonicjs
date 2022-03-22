@@ -255,16 +255,19 @@ module.exports = dalService = {
 
     content.url = url;
     let isExisting = false;
+    let userId =
+      userSession.user && userSession.user.id ? userSession.user.id : 0;
+
     if (!id || id.length === 0) {
       //upsert
       content.id = uuidv4();
       content.contentTypeId = data.contentType;
-      content.createdByUserId = userSession.user.id;
+      content.createdByUserId = userId;
       content.createdOn = new Date();
     } else {
       isExisting = true;
     }
-    content.lastUpdatedByUserId = userSession.user.id;
+    content.lastUpdatedByUserId = userId;
     content.updatedOn = new Date();
     content.tags = ""; //[];
     content.data = JSON.stringify(data);
