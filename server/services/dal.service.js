@@ -234,6 +234,9 @@ module.exports = dalService = {
     const contentRepo = await getRepository(Content);
     let content = {};
     if (id) {
+      if (verboseLogging) {
+        console.log("dal contentUpdate existing content for ==>", `id:${id}`, `id length:${id.length}`);
+      }
       content = await contentRepo.findOne({ where: { id: id } });
       if (!content) {
         content = {};
