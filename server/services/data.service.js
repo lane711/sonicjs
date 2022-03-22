@@ -576,7 +576,7 @@ if (typeof module !== "undefined" && module.exports) {
       }
 
       if(result.data.errors){
-        console.error('contentCreate error ===>', result.data.errors[0].message);
+        console.error('contentCreate error ===>', result.data.errors);
       }
       
       return result.data.data.contentCreate;
