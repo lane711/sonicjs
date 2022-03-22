@@ -33,6 +33,7 @@ if (typeof module !== "undefined" && module.exports) {
   var page;
   var id;
   var axiosInstance;
+  const verboseLogging = process.env.APP_LOGGING === "verbose";
 
   (exports.startup = async function () {
     emitterService.on("requestBegin", async function (options) {
@@ -205,7 +206,9 @@ if (typeof module !== "undefined" && module.exports) {
     (exports.getContentAdminCommon = async function (sessionID) {
       let contents = await this.getContent(sessionID);
       let data = _.sortBy(contents, "updatedOn");
-      let dataFiltered = data.filter(d => d.contentTypeId === 'page' || d.contentTypeId === 'blog');
+      let dataFiltered = data.filter(
+        (d) => d.contentTypeId === "page" || d.contentTypeId === "blog"
+      );
       return dataFiltered;
     }),
     (exports.getContentAdmin = async function (sessionID) {
@@ -567,6 +570,10 @@ if (typeof module !== "undefined" && module.exports) {
       }
           `;
 
+      if (verboseLogging) {
+        console.log("contentCreate query ===>", query);
+      }
+
       let result = await this.getAxios().post(apiUrl, {
         query: query,
       });
@@ -575,10 +582,17 @@ if (typeof module !== "undefined" && module.exports) {
         emitterService.emit("contentCreated", result);
       }
 
-      if(result.data.errors){
-        console.error('contentCreate error ===>', result.data.errors);
+      if (result.data.errors) {
+        console.error(
+          "contentCreate error ===>",
+          JSON.stringify(result.data.errors)
+        );
       }
-      
+
+      if (verboseLogging) {
+        console.log("contentCreate result ===>", JSON.stringify(result.data));
+      }
+
       return result.data.data.contentCreate;
     });
 

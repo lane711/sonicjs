@@ -18,16 +18,15 @@
 // const utils = require('formiojs/utils');
 
 (function (exports) {
-
   if (typeof module !== "undefined" && module.exports) {
     var helperService = require("./helper.service");
-
   } else {
     //client version
   }
 
+  const verboseLogging = process.env.APP_LOGGING === "verbose";
 
-  (exports.truncateString = function(body, length) {
+  (exports.truncateString = function (body, length) {
     if (body) {
       let cleanHtml = body.substring(0, 450);
       // if(sanitizeHtml){
@@ -42,19 +41,19 @@
         : cleanHtml;
     }
   }),
-    (exports.urlAppendParam = function(url, paramName, paramValue) {
+    (exports.urlAppendParam = function (url, paramName, paramValue) {
       let baseUrl = url;
       if (url.indexOf("?") > -1) {
         baseUrl = url.substring(0, url.indexOf("?"));
       }
       return `${baseUrl}?${paramName}=${paramValue}`;
     }),
-    (exports.sleep = function(ms) {
-      return new Promise(resolve => {
+    (exports.sleep = function (ms) {
+      return new Promise((resolve) => {
         setTimeout(resolve, ms);
       });
     }),
-    (exports.generateRandomString = function(length) {
+    (exports.generateRandomString = function (length) {
       var result = "";
       var characters =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -66,53 +65,61 @@
       }
       return result;
     }),
-    (exports.getCookie = function(name) {
+    (exports.getCookie = function (name) {
       // debugger;
-      if (typeof document !== 'undefined' && document && document.cookie) {
+      if (typeof document !== "undefined" && document && document.cookie) {
         var value = "; " + document.cookie;
         var parts = value.split("; " + name + "=");
         if (parts.length == 2) {
-          return parts
-            .pop()
-            .split(";")
-            .shift();
+          return parts.pop().split(";").shift();
         }
       }
     });
-    (exports.slugify = function(text) {
-      // console.log('slug', text);
-      let slug = text
-        .toLowerCase()
-        .replace(/[^\w ]+/g, "")
-        .replace(/ +/g, "-");
-    
-      return slug;
-    });
-    (exports.validateEmail = function(email) {
-      const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      return re.test(String(email).toLowerCase());
-    });
-    (exports.generateSlugFromContent = function(content, includePrecedingSlash = false, makeUnique = false) {
-      let copy = content.title;
-      if(!copy) copy = content.text;
-      if(!copy) copy = content.body;
-      if(!copy) copy = content.alertCopy;
-      if(!copy) copy = content.contentType;
+  exports.slugify = function (text) {
+    // console.log('slug', text);
+    let slug = text
+      .toLowerCase()
+      .replace(/[^\w ]+/g, "")
+      .replace(/ +/g, "-");
 
-      // let copyClean =  formattingService.stripHtmlTags(copy)
+    return slug;
+  };
+  exports.validateEmail = function (email) {
+    const re =
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+  };
+  exports.generateSlugFromContent = function (
+    content,
+    includePrecedingSlash = false,
+    makeUnique = false
+  ) {
+    let copy = content.title;
+    if (!copy) copy = content.text;
+    if (!copy) copy = content.body;
+    if (!copy) copy = content.alertCopy;
+    if (!copy) copy = content.contentType;
 
-      let slug = this ? this.slugify(copy) : slugify(copy);
+    let slug = this ? this.slugify(copy) : slugify(copy);
 
-      if(includePrecedingSlash === true){
-        slug = `/${slug}`;
-      }
+    if (verboseLogging) {
+      console.log("generateSlugFromContent slug ===>", slug);
+    }
 
-      if(makeUnique === true){
-        slug = `${slug}-${this.generateRandomString(6)}`
-      }
+    if (includePrecedingSlash === true) {
+      slug = `/${slug}`;
+    }
 
-      return slug;
-    });
+    if (makeUnique === true) {
+      slug = `${slug}-${this.generateRandomString(6)}`;
+    }
+
+    if (verboseLogging) {
+      console.log("generateSlugFromContent slug final ===>", slug);
+    }
+
+    return slug;
+  };
 })(typeof exports === "undefined" ? (this["helperService"] = {}) : exports);
 
 // (function (exports) {
@@ -134,5 +141,3 @@
 //     };
 
 // })(typeof exports === 'undefined' ? this['globalService'] = {} : exports);
-
-
