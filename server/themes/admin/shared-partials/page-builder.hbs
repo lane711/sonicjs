@@ -92,11 +92,11 @@
                     onclick="editSection('{{this.id}}')">
                     <i class="nav-icon fa fa-code"></i> Edit</button>
                   <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
-                    data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="sr-only">Toggle Dropdown</span>
                   </button>
                   <div class="dropdown-menu">
-                    <a class="dropdown-item" onclick="deleteSection('{{this.id}}', {{@index}})">Delete Section</a>
+                    <a class="dropdown-item text-primary" onclick="deleteSection('{{this.id}}', {{@index}})">Delete Section</a>
                   </div>
                 </div>
 
@@ -154,17 +154,23 @@
           </div>
 
           <hr />
+
           <div class="btn-group btn-section">
+          <button type="button" class="btn btn-outline-secondary" onclick="addSection()">
+            <i class="nav-icon fa fa-plus"></i> Add New Section</button>
+          </div>
+
+          <!-- <div class="btn-group btn-section">
             <button type="button" class="btn btn-outline-secondary add-section" onclick="addSection()">
               <i class="nav-icon fa fa-plus"></i> Add New Section</button>
             <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
-              data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <span class="sr-only">Toggle Dropdown</span>
             </button>
-            {{!-- <div class="dropdown-menu">
-              <a class="dropdown-item" href="#">Add Existing Section</a>
-            </div> --}}
-          </div>
+            <div class="dropdown-menu">
+              <a class="dropdown-item text-primary" href="#">Add Existing Section</a>
+            </div>
+          </div> -->
 
           {{!-- <li class="nav-item">
                         <a class="btn btn-outline-success pull-right add-section" onclick="addSection()">
