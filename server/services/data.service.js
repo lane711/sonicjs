@@ -574,6 +574,10 @@ if (typeof module !== "undefined" && module.exports) {
       if (emitterService) {
         emitterService.emit("contentCreated", result);
       }
+
+      if(result.data.errors){
+        console.error('contentCreate error ===>', result.data.errors[0].message);
+      }
       
       return result.data.data.contentCreate;
     });
