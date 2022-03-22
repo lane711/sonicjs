@@ -6,7 +6,8 @@ const emitterService = require("../services/emitter.service");
 
 const crypto = require("crypto");
 const { contentDelete } = require("./data.service");
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require("uuid");
+const verboseLogging = process.env.APP_LOGGING === "verbose";
 
 module.exports = dalService = {
   startup: async function (app) {
@@ -226,6 +227,10 @@ module.exports = dalService = {
   },
 
   contentUpdate: async function (id, url, data, userSession) {
+    if (verboseLogging) {
+      console.log("dal contentUpdate ==>", id, url, data, userSession);
+    }
+
     const contentRepo = await getRepository(Content);
     let content = {};
     if (id) {
