@@ -256,7 +256,7 @@ module.exports = dalService = {
     content.url = url;
     let isExisting = false;
     let userId =
-      userSession.user && userSession.user.id ? userSession.user.id : 0;
+      userSession.user && userSession.user.id ? userSession.user.id : '00000000-0000-0000-0000-000000000000';
 
     if (!id || id.length === 0) {
       //upsert
