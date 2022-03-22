@@ -47,7 +47,8 @@ module.exports = contactKevantUsMainService = {
 
       // save the form
       console.log('kevant contact =====>', options)
-      await dataService.contentCreate(options, false, options.sessionID);
+      let result = await dataService.contentCreate(options, false, options.sessionID);
+      console.log('kevant contact result =====>', result)
 
       // send the emails
       let contact = options.data;
