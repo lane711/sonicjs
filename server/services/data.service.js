@@ -1,3 +1,4 @@
+var verboseLogging = false;
 //check if running in node (and not the browser)
 if (typeof module !== "undefined" && module.exports) {
   // var loopback = require("loopback");
@@ -14,6 +15,7 @@ if (typeof module !== "undefined" && module.exports) {
   var chalk = require("chalk");
   // const { request, gql } = require("graphql-request");
   var { GraphQLClient, gql, request } = require("graphql-request");
+  verboseLogging = process.env.APP_LOGGING === "verbose";
 
   var log = console.log;
 } else {
@@ -33,7 +35,6 @@ if (typeof module !== "undefined" && module.exports) {
   var page;
   var id;
   var axiosInstance;
-  const verboseLogging = process.env.APP_LOGGING === "verbose";
 
   (exports.startup = async function () {
     emitterService.on("requestBegin", async function (options) {

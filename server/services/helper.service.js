@@ -18,13 +18,14 @@
 // const utils = require('formiojs/utils');
 
 (function (exports) {
+  var verboseLogging = false;
   if (typeof module !== "undefined" && module.exports) {
     var helperService = require("./helper.service");
+     verboseLogging = process.env.APP_LOGGING === "verbose";
   } else {
     //client version
   }
 
-  const verboseLogging = process.env.APP_LOGGING === "verbose";
 
   (exports.truncateString = function (body, length) {
     if (body) {
