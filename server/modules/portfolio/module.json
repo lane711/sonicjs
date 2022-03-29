@@ -1,0 +1,10 @@
+{
+  "title": "Portfolio",
+  "enabled": true,
+  "systemId": "portfolio",
+  "canBeAddedToColumn": true,
+  "sessionID": "undefined",
+  "version": "0.0.0.1",
+  "systemidUpperCase": "PORTFOLIO",
+  "systemidCamelCase": "portfolio"
+}

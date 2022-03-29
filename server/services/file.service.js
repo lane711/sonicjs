@@ -140,7 +140,7 @@ module.exports = fileService = {
           file.type
         );
 
-        await addMediaRecord(title, file, sessionID);
+        await fileService.addMediaRecord(title, file, sessionID);
       }
     } //Local file upload fix
     else if (file.name.match(/.(jpg|jpeg|png|gif|svg|mp4|zip)$/i)) {

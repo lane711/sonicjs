@@ -109,3 +109,8 @@
   text-align: center;
   margin: 0 8px 0 8px;
 }
+
+
+.image-module-wrapper{
+  min-width: 200px;
+}
