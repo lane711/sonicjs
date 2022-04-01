@@ -1,21 +1,49 @@
-{{ log data}}
+<div class="portfolio pt-5">
 {{#each data.items}}
-<div>
-
-  <div class="card mb-3">
-    <div class="row g-0">
-      <div class="col-md-4">
-        <img src="{{ this.image.src }}" class="img-fluid" alt="...">
-      </div>
-      <div class="col-md-8">
-        <div class="card-body">
-          <h2 class="card-title">{{ this.title }}</h2>
-          <p class="card-text">{{ this.description }}</p>
-          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+  {{#if this.isEven}}
+  
+    <div class="card border-none">
+      <div class="row">
+        <div class="col-md-4">
+          <img src="{{this.image.src}}" class="img-fluid" />
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h2 class="card-title">{{this.title}}</h2>
+            <p class="card-text">{{{this.description}}}</p>
+            <p class="card-text"><a target="_blank" href="{{this.linkUrl}}">{{this.linkText}}</a></p>
+            <p class="card-text">
+              {{#each this.tech}}
+                <span class="badge bg-primary">{{this}}</span>
+              {{/each}}
+            </p>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-</div>
+  {{else}}
+
+    <div class="card border-none">
+      <div class="row">
+        <div class="col-md-8">
+          <div class="card-body">
+            <h2 class="card-title">{{this.title}}</h2>
+            <p class="card-text">{{{this.description}}}</p>
+            <p class="card-text"><a target="_blank" href="{{this.linkUrl}}">{{this.linkText}}</a></p>
+            <p class="card-text">
+              {{#each this.tech}}
+                <span class="badge bg-primary">{{this}}</span>
+              {{/each}}
+            </p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <img src="{{this.image.src}}" class="img-fluid" />
+        </div>
+      </div>
+    </div>
+
+  {{/if}}
 {{/each}}
+</div>

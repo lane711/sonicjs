@@ -14,7 +14,28 @@ module.exports = portfolioMainService = {
             }
 
         });
+
+        emitterService.on("postModuleGetData", async function (options) {
+            if (options.shortcode.name === "PORTFOLIO") {
+              await portfolioMainService.processPortfolioData(options);
+            }
+          });
     },
+
+    processPortfolioData: async function (options) {
+        let enabledRecords = [];
+        options.viewModel.data.items.map(function(record, index) {
+
+            if(record.description.length > 0){
+                record.isEven = false;
+                if (index % 2 === 0) {
+                    record.isEven = true;
+                }
+                enabledRecords.push(record);
+            }
+        })
+        options.viewModel.data.items = enabledRecords;
+    }
 
 }
 
