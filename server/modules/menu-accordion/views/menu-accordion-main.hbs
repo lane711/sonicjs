@@ -13,13 +13,13 @@
 
 <nav id="accordian-menu" class="accordian-menu {{data.css}}">
 {{#each data.menuData }}
-<a href="{{ this.data.url }}"><h4 class="bold small text-uppercase mt-4 mb-3">{{ this.text }}</h4></a>
+<a href="{{ this.data.url }}" class="bold small text-uppercase mt-4 mb-3 level-1">{{ this.text }}</a>
   {{#each this.children}}
   <nav class="nav flex-column font-sm">
-    <a class="pl-0 nav-item nav-link bold active" href="{{ this.data.url }}"><span>{{ this.text }}</span></a>
+    <a class="pl-0 nav-item nav-link bold active level-2" href="{{ this.data.url }}"><span>{{ this.text }}</span></a>
     <!-- third level -->
     {{#each this.children}}
-      <a class="pl-0 nav-item nav-link" href="{{ this.data.url }}"><span>{{ this.text }}</span></a>
+      <a class="pl-0 nav-item nav-link level-3" href="{{ this.data.url }}"><span>{{ this.text }}</span></a>
     {{/each}}
     <!-- third level end -->
   </nav>

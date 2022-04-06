@@ -31,3 +31,19 @@
   height: calc(100vh - 100px);
   overflow-y: scroll;
 }
+
+.accordian-menu .level-1{
+  display: block;
+  color: #000;
+  font-size: 1.2rem;
+}
+
+.accordian-menu .level-3{
+  border-left: 4px solid #E0E2E4;
+  padding: 4px 8px;
+  margin: 2px 0;
+}
+
+.accordian-menu .level-3 span{
+  margin: 0 0 0 8px;
+}
