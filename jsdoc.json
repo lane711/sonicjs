@@ -1,0 +1,18 @@
+{
+    "source": {
+      "include": ["server"],
+      "includePattern": ".js$",
+      "excludePattern": "(node_modules/|docs)",
+      "exclude":["server/assets/js/module-default-main-service.js","server/theme"]
+    },
+    "plugins": ["plugins/markdown"],
+    "templates": {
+      "cleverLinks": true,
+      "monospaceLinks": true
+    },
+    "opts": {
+      "recurse": true,
+      "destination": "./docs/",
+      "readme": "./readme.md"
+    }
+  }
