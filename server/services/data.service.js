@@ -102,6 +102,7 @@ if (typeof module !== "undefined" && module.exports) {
      * @name userCreate
      * @param {string} email - user's email address
      * @param {string} password - user's password in plain text (it will be encrypted)
+     * @returns {object} new user object
      */
     (exports.userCreate = async function (email, password) {
       // let result = await this.getAxios().post(apiUrl, {

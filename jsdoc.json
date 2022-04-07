@@ -1,9 +1,9 @@
 {
     "source": {
-      "include": ["server"],
+      "include": ["server/services"],
       "includePattern": ".js$",
-      "excludePattern": "(node_modules/|docs)",
-      "exclude":["server/assets/js/module-default-main-service.js","server/themes/"]
+      "excludePattern": "(node_modules/|docs|themes/)",
+      "exclude":["server/assets/js/module-default-main-service.js"]
     },
     "plugins": ["plugins/markdown"],
     "templates": {
