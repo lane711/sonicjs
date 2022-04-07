@@ -176,3 +176,7 @@ input[type="checkbox"] {
   color: #5533ff;
   filter: drop-shadow(5px 5px 1px #fff);
 }
+
+.pb .col-highlight {
+  margin: 50px 0 0;
+}
