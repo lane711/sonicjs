@@ -96,6 +96,13 @@ if (typeof module !== "undefined" && module.exports) {
       // debugger;
       return axiosInstance;
     }),
+    /**
+     * Creates new user
+     * @function
+     * @name userCreate
+     * @param {string} email - user's email address
+     * @param {string} password - user's password in plain text (it will be encrypted)
+     */
     (exports.userCreate = async function (email, password) {
       // let result = await this.getAxios().post(apiUrl, {
       //   query: `
