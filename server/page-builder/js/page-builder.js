@@ -1224,13 +1224,14 @@ async function deleteModule() {
 
   let confirmDeleteButton = `<div class="btn-group">
     <button type="button" onclick="deleteModuleConfirm(true)" class="btn btn-danger">Delete Content and Remove from Column</button>
-    <button type="button" class="btn btn-danger dropdown-toggle dropdown-toggle-split" data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button type="button" class="btn btn-danger dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       <span class="sr-only">Toggle Dropdown</span>
     </button>
     <div class="dropdown-menu">
       <a class="dropdown-item" onclick="deleteModuleConfirm(false)" href="#">Remove From Column Only</a>
     </div>
   </div>`;
+  
   let dataPreview = `<div class="delete-data-preview""><textarea>${JSON.stringify(
     data,
     null,

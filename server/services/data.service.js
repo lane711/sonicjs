@@ -1,3 +1,4 @@
+var verboseLogging = false;
 //check if running in node (and not the browser)
 if (typeof module !== "undefined" && module.exports) {
   // var loopback = require("loopback");
@@ -14,6 +15,7 @@ if (typeof module !== "undefined" && module.exports) {
   var chalk = require("chalk");
   // const { request, gql } = require("graphql-request");
   var { GraphQLClient, gql, request } = require("graphql-request");
+  verboseLogging = process.env.APP_LOGGING === "verbose";
 
   var log = console.log;
 } else {
@@ -205,7 +207,9 @@ if (typeof module !== "undefined" && module.exports) {
     (exports.getContentAdminCommon = async function (sessionID) {
       let contents = await this.getContent(sessionID);
       let data = _.sortBy(contents, "updatedOn");
-      let dataFiltered = data.filter(d => d.contentTypeId === 'page' || d.contentTypeId === 'blog');
+      let dataFiltered = data.filter(
+        (d) => d.contentTypeId === "page" || d.contentTypeId === "blog"
+      );
       return dataFiltered;
     }),
     (exports.getContentAdmin = async function (sessionID) {
@@ -567,6 +571,10 @@ if (typeof module !== "undefined" && module.exports) {
       }
           `;
 
+      if (verboseLogging) {
+        console.log("contentCreate query ===>", query);
+      }
+
       let result = await this.getAxios().post(apiUrl, {
         query: query,
       });
@@ -574,7 +582,18 @@ if (typeof module !== "undefined" && module.exports) {
       if (emitterService) {
         emitterService.emit("contentCreated", result);
       }
-      
+
+      if (result.data.errors) {
+        console.error(
+          "contentCreate error ===>",
+          JSON.stringify(result.data.errors)
+        );
+      }
+
+      if (verboseLogging) {
+        console.log("contentCreate result ===>", JSON.stringify(result.data));
+      }
+
       return result.data.data.contentCreate;
     });
 

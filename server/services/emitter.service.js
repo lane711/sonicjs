@@ -1,4 +1,5 @@
 var emitterList = [];
+const verboseLogging = process.env.APP_LOGGING === "verbose";
 
 (function (exports) {
   exports.on = function (emitterName, functionToExecute) {
@@ -14,7 +15,9 @@ var emitterList = [];
   };
 
   exports.emit = async function (emitterName, options) {
-    // console.log('*** emit >> ' + emitterName);
+    if (verboseLogging) {
+      console.log("*** emit >> " + emitterName);
+    }
     // console.log('list', emitterList);
 
     //TODO: ordering

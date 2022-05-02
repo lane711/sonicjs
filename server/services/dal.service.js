@@ -6,7 +6,8 @@ const emitterService = require("../services/emitter.service");
 
 const crypto = require("crypto");
 const { contentDelete } = require("./data.service");
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require("uuid");
+const verboseLogging = process.env.APP_LOGGING === "verbose";
 
 module.exports = dalService = {
   startup: async function (app) {
@@ -226,9 +227,26 @@ module.exports = dalService = {
   },
 
   contentUpdate: async function (id, url, data, userSession) {
+    if (verboseLogging) {
+      console.log(
+        "dal contentUpdate ==>",
+        `id:${id}`,
+        `url:${url}`,
+        data,
+        userSession
+      );
+    }
+
     const contentRepo = await getRepository(Content);
     let content = {};
     if (id) {
+      if (verboseLogging) {
+        console.log(
+          "dal contentUpdate existing content for ==>",
+          `id:${id}`,
+          `id length:${id.length}`
+        );
+      }
       content = await contentRepo.findOne({ where: { id: id } });
       if (!content) {
         content = {};
@@ -237,27 +255,34 @@ module.exports = dalService = {
 
     content.url = url;
     let isExisting = false;
-    if (!id) {
+    let userId =
+      userSession.user && userSession.user.id ? userSession.user.id : '00000000-0000-0000-0000-000000000000';
+
+    if (!id || id.length === 0) {
       //upsert
       content.id = uuidv4();
       content.contentTypeId = data.contentType;
-      content.createdByUserId = userSession.user.id;
+      content.createdByUserId = userId;
       content.createdOn = new Date();
+    } else {
       isExisting = true;
     }
-    content.lastUpdatedByUserId = userSession.user.id;
+    content.lastUpdatedByUserId = userId;
     content.updatedOn = new Date();
     content.tags = ""; //[];
     content.data = JSON.stringify(data);
+    if (verboseLogging) {
+      console.log("dal contentUpdate repo save ==>", JSON.stringify(content));
+    }
     let result = await contentRepo.save(content);
 
     if (isExisting) {
-      emitterService.emit("contentUpdated", result);
+      await emitterService.emit("contentUpdated", result);
     } else {
-      emitterService.emit("contentCreated", result);
+      await emitterService.emit("contentCreated", result);
     }
 
-    emitterService.emit("contentCreatedOrUpdated", result);
+    await emitterService.emit("contentCreatedOrUpdated", result);
 
     return result;
   },

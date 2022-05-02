@@ -8,14 +8,18 @@ const ShortcodeTree = require("shortcode-tree").ShortcodeTree;
 const chalk = require("chalk");
 const log = console.log;
 var path = require("path");
-const sgMail = require('@sendgrid/mail');
+const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+var sendEmail = process.env.SEND_EMAIL;
 
 module.exports = emailService = {
   sendEmail: async function (from, fromName, replyTo, to, subject, body) {
+    if (sendEmail !== "TRUE") {
+      return;
+    }
+
     //convert to html
     body = body.replace(/(?:\r\n|\r|\n)/g, "<br>");
-
 
     // const msg = {
     // to: 'Some One <someone@example.org>',
@@ -29,7 +33,6 @@ module.exports = emailService = {
     //   html: '<p>Hello HTML world!</p>',
     // };
 
-
     const msg = {
       to: to,
       from: `${fromName} <${from}>`, // Use the email address or domain you verified above
@@ -38,15 +41,15 @@ module.exports = emailService = {
       html: body,
     };
 
-    sgMail
-      .send(msg)
-      .then(() => {}, error => {
+    sgMail.send(msg).then(
+      () => {},
+      (error) => {
         console.error(error);
 
         if (error.response) {
-          console.error(error.response.body)
+          console.error(error.response.body);
         }
-      });
-
+      }
+    );
   },
 };
