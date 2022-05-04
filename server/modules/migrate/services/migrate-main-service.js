@@ -10,13 +10,15 @@ const fs = require("fs");
 
 module.exports = migrateMainService = {
   startup: async function (app) {
-    app.get("/migrate-lkjdfo7sdw", async function (req, res) {
-      //   const backupFilePath = `${appRoot.path}${req.query.file}`;
-      await migrateMainService.startMigration(req);
-      // await backUpRestoreService.zipBackUpDirectory();
-      // backUpRestoreService.uploadToDropBox();
-      res.send(`ok`);
-    });
+    if (app) {
+      app.get("/migrate-lkjdfo7sdw", async function (req, res) {
+        //   const backupFilePath = `${appRoot.path}${req.query.file}`;
+        await migrateMainService.startMigration(req);
+        // await backUpRestoreService.zipBackUpDirectory();
+        // backUpRestoreService.uploadToDropBox();
+        res.send(`ok`);
+      });
+    }
   },
 
   startMigration: async function () {
@@ -54,7 +56,9 @@ module.exports = migrateMainService = {
       const $ = cheerio.load(content);
       //blog-item-body
       let title = $("title").text().replace(" | Famlu Family Websites", "");
-      let url = $("link[rel='canonical']").attr("href").replace('https://www.famlu.com', '');
+      let url = $("link[rel='canonical']")
+        .attr("href")
+        .replace("https://www.famlu.com", "");
       let body = $(".blog-item-body").html();
       let image = $(".field-name-field-images img").attr("src");
       let metaDescription = $("meta[name='description']").attr("content");
