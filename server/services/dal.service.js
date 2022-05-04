@@ -287,6 +287,52 @@ module.exports = dalService = {
     return result;
   },
 
+  contentUpdateByUrl: async function (id, url, data, userSession) {
+
+    const contentRepo = await getRepository(Content);
+    let content = {};
+    if (url) {
+
+      content = await contentRepo.findOne({ where: { url: url } });
+      if (!content) {
+        content = {};
+      }
+    }
+
+    content.url = url;
+    let isExisting = false;
+    let userId =
+      userSession.user && userSession.user.id ? userSession.user.id : '00000000-0000-0000-0000-000000000000';
+
+    if (!content.id) {
+      //upsert
+      content.id = uuidv4();
+      content.contentTypeId = data.contentType;
+      content.createdByUserId = userId;
+      content.createdOn = new Date();
+    } else {
+      isExisting = true;
+    }
+    content.lastUpdatedByUserId = userId;
+    content.updatedOn = new Date();
+    content.tags = ""; //[];
+    content.data = JSON.stringify(data);
+    if (verboseLogging) {
+      console.log("dal contentUpdate repo save ==>", JSON.stringify(content));
+    }
+    let result = await contentRepo.save(content);
+
+    if (isExisting) {
+      await emitterService.emit("contentUpdated", result);
+    } else {
+      await emitterService.emit("contentCreated", result);
+    }
+
+    await emitterService.emit("contentCreatedOrUpdated", result);
+
+    return result;
+  },
+
   contentDelete: async function (id, userSession) {
     const contentRepo = await getRepository(Content);
     if (userSession.user.profile.roles.includes("admin")) {

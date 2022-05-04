@@ -1,0 +1,10 @@
+{
+  "title": "Migrate",
+  "enabled": true,
+  "systemId": "migrate",
+  "canBeAddedToColumn": false,
+  "sessionID": "undefined",
+  "version": "0.0.0.1",
+  "systemidUpperCase": "MIGRATE",
+  "systemidCamelCase": "migrate"
+}
