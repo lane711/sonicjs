@@ -1,0 +1,29 @@
+<div class="accordion" id="accordionExample">
+  {{#each data.items}}
+
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="heading{{this.index}}">
+        <button
+          class="accordion-button"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#collapse{{this.index}}"
+          aria-expanded="false"
+          aria-controls="collapse{{this.index}}"
+        >
+          {{this.heading}}
+        </button>
+      </h2>
+      <div
+        id="collapse{{this.index}}"
+        class="accordion-collapse collapse"
+        aria-labelledby="heading{{this.index}}"
+        data-bs-parent="#accordionExample"
+      >
+        <div class="accordion-body">
+          {{{this.body}}}
+        </div>
+      </div>
+    </div>
+  {{/each}}
+</div>

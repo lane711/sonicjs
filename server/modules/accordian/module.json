@@ -1,0 +1,10 @@
+{
+  "title": "Accordian",
+  "enabled": true,
+  "systemId": "accordian",
+  "canBeAddedToColumn": true,
+  "sessionID": "undefined",
+  "version": "0.0.0.1",
+  "systemidUpperCase": "ACCORDIAN",
+  "systemidCamelCase": "accordian"
+}
