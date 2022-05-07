@@ -9,10 +9,13 @@ module.exports = userMainService = {
   startup: async function() {
 
     emitterService.on("afterFormSubmit", async function (options) {
+
+      //for new user
       if (options.data && options.data.contentType === "user-register") {
         await userService.registerUser(options.data.email, options.data.password);
       }
 
+      //for updating exisintg user
       if (options.data && options.data.contentType === "user") {
         let user = {};
         user.id = options.data.id;

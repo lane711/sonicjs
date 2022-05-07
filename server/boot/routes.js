@@ -145,16 +145,14 @@ exports.loadRoutes = async function (app) {
   });
 
   app.post("/form-submission", async function (req, res) {
-
-    let payload = req.body.data.data ? req.body.data.data : undefined;
+    let payload = req.body.data ? req.body.data : req.body.data.data ;
 
     if (payload) {
       let options = { data: payload, sessionID: req.sessionID };
 
       await emitterService.emit("afterFormSubmit", options);
-    }
-
-    res.sendStatus(200);
+      res.sendStatus(200);
+    } 
   });
 
   app.post("*", async function (req, res, next) {
@@ -168,8 +166,7 @@ exports.loadRoutes = async function (app) {
 
 exports.loadRoutesCatchAll = async function (app) {
   // app.get(/^[^.]*$/, async function (req, res, next) {
-    app.get("*", async function (req, res, next) {
-
+  app.get("*", async function (req, res, next) {
     await emitterService.emit("requestBegin", { req: req, res: res });
 
     if (req.isRequestAlreadyHandled) {
@@ -224,17 +221,16 @@ exports.loadRoutesCatchAll = async function (app) {
     let urlKey = await urlService.getUrl(req.url);
     // console.log("urlKey", urlKey);
 
-
-    //replace this will 
+    //replace this will
 
     var page = {};
     req.urlKey = urlKey;
     var processUrlOptions = { req, res, urlKey, page };
 
-    await emitterService.emit("processUrl",processUrlOptions);
+    await emitterService.emit("processUrl", processUrlOptions);
     page = processUrlOptions.page;
 
-// return;
+    // return;
 
     if (!page.data || page.data?.title === "Not Found") {
       res.redirect("/404");
@@ -245,7 +241,8 @@ exports.loadRoutesCatchAll = async function (app) {
 
     page.data.id = page.id;
     page.data.sessionID = req.sessionID;
-    page.data.themeSettings.bootstrapToggleMiddle  = page.data.themeSettings.bootstrapVersion == 4 ? '': 'bs-';
+    page.data.themeSettings.bootstrapToggleMiddle =
+      page.data.themeSettings.bootstrapVersion == 4 ? "" : "bs-";
 
     res.render(`front-end/${frontEndTheme}/layouts/main`, {
       layout: `front-end/${frontEndTheme}/${frontEndTheme}`,

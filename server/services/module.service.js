@@ -15,7 +15,7 @@ var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 
 module.exports = moduleService = {
   startup: function (app) {
-    emitterService.on("startup", async function ({app}) {
+    emitterService.on("startup", async function ({ app }) {
       // console.log('>>=== startup from module service');
       await moduleService.processModules(app);
     });
@@ -30,10 +30,14 @@ module.exports = moduleService = {
   },
 
   processModules: async function (app) {
-
     let moduleDirs = [];
     moduleDirs.push(path.join(appRoot.path, "/server/modules"));
-    moduleDirs.push(path.join(appRoot.path, `/server/themes/front-end/${frontEndTheme}/modules`));
+    moduleDirs.push(
+      path.join(
+        appRoot.path,
+        `/server/themes/front-end/${frontEndTheme}/modules`
+      )
+    );
 
     await this.getModuleDefinitionFiles(moduleDirs, app);
     // await this.getModuleCss(moduleDirs);
@@ -68,7 +72,10 @@ module.exports = moduleService = {
   },
 
   getModuleDefinitionFile: async function (systemId) {
-    let file = await fileService.getFile(`${await this.getBasePath(systemId, true)}/module.json`, false);
+    let file = await fileService.getFile(
+      `${await this.getBasePath(systemId, true)}/module.json`,
+      false
+    );
     return file;
   },
 
@@ -92,34 +99,43 @@ module.exports = moduleService = {
         return basePath;
       }
     }
-    console.error('Can not find module base path');
-  }
-  ,
-
+    console.error("Can not find module base path");
+  },
   getModuleContentTypesAdmin: async function (systemId, session, req) {
-    let basePath = await this.getBasePath(systemId) + "/models";
+    let basePath = (await this.getBasePath(systemId)) + "/models";
 
-    let moduleContentTypesAdminFiles = fileService.getFilesSearchSync(basePath, "/**/*.json");
+    let moduleContentTypesAdminFiles = fileService.getFilesSearchSync(
+      basePath,
+      "/**/*.json"
+    );
 
     let moduleContentTypesAdmin = [];
-    moduleContentTypesAdminFiles.map(file => {
-      moduleContentTypesAdmin.push(globalService.moduleContentTypeConfigs.find(f => f.filePath === file));
-    })
+    moduleContentTypesAdminFiles.map((file) => {
+      moduleContentTypesAdmin.push(
+        globalService.moduleContentTypeConfigs.find((f) => f.filePath === file)
+      );
+    });
 
     let moduleContentTypes = [];
 
     for (let index = 0; index < moduleContentTypesAdmin.length; index++) {
       const ct = moduleContentTypesAdmin[index];
-      let contentType = await moduleService.getModuleContentType(ct.systemId, session, req);
+      let contentType = await moduleService.getModuleContentType(
+        ct.systemId,
+        session,
+        req
+      );
       moduleContentTypes.push(contentType);
     }
 
     return moduleContentTypes;
-  }
-  ,
-
+  },
   contentTypeUpdate: async function (moduleContentType, session, req) {
-    let moduleDef = await this.getModuleContentType(moduleContentType.systemId, session, req);
+    let moduleDef = await this.getModuleContentType(
+      moduleContentType.systemId,
+      session,
+      req
+    );
 
     moduleDef.canBeAddedToColumn = moduleContentType.canBeAddedToColumn;
     moduleDef.enabled = moduleContentType.enabled;
@@ -130,31 +146,30 @@ module.exports = moduleService = {
     moduleDef.canBeAddedToColumn = moduleContentType.canBeAddedToColumn;
     moduleDef.permissions = moduleContentType.permissions;
 
-
-    moduleDef.filePath = await this.getBasePath(moduleContentType.moduleSystemId) + `/models/${moduleDef.systemId}.json`;
+    moduleDef.filePath =
+      (await this.getBasePath(moduleContentType.moduleSystemId)) +
+      `/models/${moduleDef.systemId}.json`;
 
     let moduleDefString = JSON.stringify(moduleDef);
     await fileService.writeFile(moduleDef.filePath, moduleDefString);
 
     return moduleDef;
-  }
-  ,
-
+  },
   getModuleDefinitionFiles: async function (paths, app) {
-
     // let files = [];
     let moduleList = [];
     await this.resetGlobalModuleLists();
 
-    paths.map(modulePath => {
-      let fileArray = fileService.getFilesSearchSync(modulePath, "/**/module.json");
+    paths.map((modulePath) => {
+      let fileArray = fileService.getFilesSearchSync(
+        modulePath,
+        "/**/module.json"
+      );
       // let files = fileArray);
-
 
       this.getModuleCss(modulePath);
       this.getModuleJs(modulePath);
       this.getModuleContentTypesConfigs(modulePath);
-
 
       fileArray.forEach((file) => {
         let raw = fileService.getFileSync(file); // fs.readFileSync(file);
@@ -165,7 +180,7 @@ module.exports = moduleService = {
           moduleList.push(moduleDef);
         }
       });
-    })
+    });
 
     moduleList.sort(function (a, b) {
       if (a.title < b.title) {
@@ -187,9 +202,7 @@ module.exports = moduleService = {
     await moduleService.loadModuleServices(moduleList, app);
 
     return moduleList;
-  }
-  ,
-
+  },
   getModuleContentTypesConfigs: function (path) {
     let moduleCount = 0;
 
@@ -214,59 +227,53 @@ module.exports = moduleService = {
       }
     });
     return moduleCount;
-  }
-  ,
-
+  },
   getModuleContentType: async function (contentTypeSystemId, session, req) {
-    let rootDomain = `${req.protocol}://${req.get('host')}`;
+    let rootDomain = (req && req.protocol) ? `${req.protocol}://${req.get("host")}` : undefined;
     let configInfo = await globalService.moduleContentTypeConfigs.filter(
       (x) => x.systemId === contentTypeSystemId
     );
     if (configInfo[0]) {
       let config = fileService.getFileSync(configInfo[0].filePath);
-      config = config.replace('http://localhost:3018', rootDomain);
+      if (rootDomain) {
+        config = config.replace("http://localhost:3018", rootDomain);
+      }
       let contentType = JSON.parse(config);
       return contentType;
     }
     return {};
-  }
-  ,
-
+  },
   getModuleContentTypes: async function (userSession, req) {
-    let rootDomain = `${req.protocol}://${req.get('host')}`;
+    let rootDomain = `${req.protocol}://${req.get("host")}`;
     let configInfos = await globalService.moduleContentTypeConfigs;
     let configs = [];
     configInfos.forEach((configInfo) => {
       let config = fileService.getFileSync(configInfo.filePath);
-      config = config.replace('http://localhost:3018', rootDomain);
+      config = config.replace("http://localhost:3018", rootDomain);
       let configObj = JSON.parse(config);
       configs.push(configObj);
     });
     return configs;
-  }
-  ,
-
+  },
   updateModuleContentType: async function (contentTypeDef) {
     let path = contentTypeDef.filePath;
-  }
-  ,
-
+  },
   createModuleContentType: async function (contentTypeDef) {
     // console.log("creating content type", contentTypeDef);
-    contentTypeDef.filePath = await this.getBasePath(contentTypeDef.moduleSystemId) + `/models/${contentTypeDef.systemId}.json`;
+    contentTypeDef.filePath =
+      (await this.getBasePath(contentTypeDef.moduleSystemId)) +
+      `/models/${contentTypeDef.systemId}.json`;
     contentTypeDef.title = contentTypeDef.title
       ? contentTypeDef.title
       : contentTypeDef.moduleSystemId;
-    contentTypeDef.data = {components: []};
+    contentTypeDef.data = { components: [] };
     let contentTypeDefObj = JSON.stringify(contentTypeDef);
     await fileService.writeFile(contentTypeDef.filePath, contentTypeDefObj);
     //reload modules
     await moduleService.processModules();
 
     return contentTypeDef;
-  }
-  ,
-
+  },
   deleteModuleContentType: async function (moduleContentTypeSystemid) {
     console.log("deleting content type", moduleContentTypeSystemid);
     let filePath = await fileService.getFilesSearchSync(
@@ -279,9 +286,7 @@ module.exports = moduleService = {
 
     //reload modules
     await moduleService.processModules();
-  }
-  ,
-
+  },
   getModuleCss: function (path) {
     const files = fileService.getFilesSearchSync(path, "/**/*.css");
 
@@ -289,19 +294,14 @@ module.exports = moduleService = {
       let link = file.substr(file.indexOf("server") + 6, file.length);
       globalService.moduleCssFiles.push(link);
     });
-  }
-  ,
-
+  },
   resetGlobalModuleLists: async function (path) {
     globalService.moduleCssFiles = [];
     globalService.moduleJsFiles = [];
     globalService.moduleContentTypeConfigs = [];
-  }
-  ,
-
+  },
   getModuleJs: function (path) {
     const files = fileService.getFilesSearchSync(path, "/**/*.js");
-
 
     files.forEach((file) => {
       if (file.indexOf("assets/js") > -1) {
@@ -309,9 +309,7 @@ module.exports = moduleService = {
         globalService.moduleJsFiles.push(link);
       }
     });
-  }
-  ,
-
+  },
   getModuleViewFile: async function (contentType) {
     //see if theme level override exists
 
@@ -323,9 +321,7 @@ module.exports = moduleService = {
       viewPath = themeViewPath;
     }
     return viewPath;
-  }
-  ,
-
+  },
   processModuleInColumn: async function (options, viewModel) {
     if (options.shortcode.name === options.moduleName.toUpperCase()) {
       let id = options.shortcode.properties.id;
@@ -355,7 +351,7 @@ module.exports = moduleService = {
             contentType,
             processedHtml.body,
             true,
-            options.page.data.pageTemplate !== 'none'
+            options.page.data.pageTemplate !== "none"
           );
           options.page.data.currentShortCodeHtml += wrappedDiv;
         } else {
@@ -365,7 +361,7 @@ module.exports = moduleService = {
 
       options.processedHtml = processedHtml;
       await emitterService.emit("postProcessModuleShortCodeProcessedHtml", {
-        options
+        options,
       });
 
       options.page.data.html = options.page.data.html.replace(
@@ -373,9 +369,7 @@ module.exports = moduleService = {
         processedHtml.body
       );
     }
-  }
-  ,
-
+  },
   processView: async function (contentType, viewModel, viewPath) {
     var result = await viewService.getProcessedView(
       contentType,
@@ -384,9 +378,7 @@ module.exports = moduleService = {
     );
 
     return result;
-  }
-  ,
-
+  },
   createModule: async function (moduleDefinitionFile) {
     let basePath = `/server/modules/${moduleDefinitionFile.systemId}`;
 
@@ -425,7 +417,8 @@ module.exports = moduleService = {
     );
 
     //create main.js file
-    moduleDefinitionFile.systemidUpperCase = moduleDefinitionFile.systemId.toUpperCase();
+    moduleDefinitionFile.systemidUpperCase =
+      moduleDefinitionFile.systemId.toUpperCase();
     moduleDefinitionFile.systemidCamelCase = _.camelCase(
       moduleDefinitionFile.systemId
     );
@@ -453,7 +446,7 @@ module.exports = moduleService = {
       moduleSystemId: moduleDefinitionFile.systemId,
       systemId: moduleDefinitionFile.systemId,
       title: moduleDefinitionFile.title,
-      data: {components: []},
+      data: { components: [] },
     };
 
     contentTypeDef.data.components.push({
@@ -461,7 +454,7 @@ module.exports = moduleService = {
       type: "textfield",
       input: true,
       key: "title",
-      validate: {required: true},
+      validate: { required: true },
     });
     contentTypeDef.data.components.push({
       label: "Submit",
@@ -478,7 +471,7 @@ module.exports = moduleService = {
       moduleSystemId: moduleDefinitionFile.systemId,
       systemId: `${moduleDefinitionFile.systemId}-settings`,
       title: `${moduleDefinitionFile.title} Settings`,
-      data: {components: []},
+      data: { components: [] },
     };
 
     contentTypeDefSettings.data.components.push({
@@ -486,7 +479,7 @@ module.exports = moduleService = {
       type: "checkbox",
       input: true,
       key: "enabled",
-      defaultValue: true
+      defaultValue: true,
     });
     contentTypeDefSettings.data.components.push({
       label: "Submit",
@@ -497,9 +490,7 @@ module.exports = moduleService = {
     });
 
     await moduleService.createModuleContentType(contentTypeDefSettings);
-  }
-  ,
-
+  },
   updateModule: async function (moduleDefinitionFile) {
     let basePath = await this.getBasePath(moduleDefinitionFile.systemId);
     await fileService.writeFile(
@@ -507,9 +498,7 @@ module.exports = moduleService = {
       JSON.stringify(moduleDefinitionFile, null, 2)
     );
     await moduleService.processModules();
-  }
-  ,
-
+  },
   deleteModule: async function (moduleSystemId) {
     if (moduleSystemId) {
       let modulePath = path.join(
@@ -520,7 +509,5 @@ module.exports = moduleService = {
       await moduleService.processModules();
     }
     return true;
-  }
-  ,
-}
-;
+  },
+};

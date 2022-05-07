@@ -410,6 +410,7 @@ module.exports = dalService = {
 
     if (entity.profile) {
       try {
+        entity.contentTypeId = 'user';
         entity.profile = JSON.parse(entity.profile);
       } catch (err) {
         console.log(
@@ -430,6 +431,9 @@ module.exports = dalService = {
 
   //get content type so we can detect permissions
   checkPermission: async function (data, user, req) {
+    if(data.contentTypeId == 'app-analytics'){
+      return data;
+    }
     let contentTypeId = data.contentTypeId
       ? data.contentTypeId
       : data[0].contentTypeId;
@@ -439,7 +443,11 @@ module.exports = dalService = {
       req
     );
 
-    if (user && user.roles && user.roles.includes("admin")) {
+    let localUser = user && user.user ? user.user : user;
+
+    // console.log(localUser);
+
+    if (localUser && localUser.profile && localUser.profile.roles && localUser.profile.roles.includes("admin")) {
       return data;
     }
 
@@ -451,7 +459,7 @@ module.exports = dalService = {
         data = [];
       }
       if (view === "filtered") {
-        //remove sensative fields like email, address
+        //remove sensitive fields like email, address
         data.forEach((entity) => {
           delete entity.data.email;
         });

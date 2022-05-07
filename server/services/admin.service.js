@@ -233,7 +233,7 @@ module.exports = adminService = {
           data.editFormUser = await formService.getForm(
             "user-register",
             undefined,
-            "await submitContent(submission,true,'user');",
+            "submitContent(submission,true,'user-register');",
             undefined,
             undefined,
             req.sessionID
@@ -284,7 +284,7 @@ module.exports = adminService = {
           let user = { id: param1 };
           if (param1) {
             let userRecord = await dalService.userGet(
-              parseInt(param1),
+              param1,
               req.sessionID
             );
             userRecord.data = userRecord.profile ? userRecord.profile : {};
