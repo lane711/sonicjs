@@ -266,7 +266,7 @@ module.exports = moduleService = {
     contentTypeDef.title = contentTypeDef.title
       ? contentTypeDef.title
       : contentTypeDef.moduleSystemId;
-    contentTypeDef.data = { components: [] };
+    contentTypeDef.data = contentTypeDef.data ?? { components: [] };
     let contentTypeDefObj = JSON.stringify(contentTypeDef);
     await fileService.writeFile(contentTypeDef.filePath, contentTypeDefObj);
     //reload modules
@@ -450,10 +450,10 @@ module.exports = moduleService = {
     };
 
     contentTypeDef.data.components.push({
-      label: "Title",
+      label: "First Name",
       type: "textfield",
       input: true,
-      key: "title",
+      key: "firstName",
       validate: { required: true },
     });
     contentTypeDef.data.components.push({
@@ -466,30 +466,30 @@ module.exports = moduleService = {
 
     await moduleService.createModuleContentType(contentTypeDef);
 
-    //create settings content type
-    let contentTypeDefSettings = {
-      moduleSystemId: moduleDefinitionFile.systemId,
-      systemId: `${moduleDefinitionFile.systemId}-settings`,
-      title: `${moduleDefinitionFile.title} Settings`,
-      data: { components: [] },
-    };
+    // //create settings content type
+    // let contentTypeDefSettings = {
+    //   moduleSystemId: moduleDefinitionFile.systemId,
+    //   systemId: `${moduleDefinitionFile.systemId}-settings`,
+    //   title: `${moduleDefinitionFile.title} Settings`,
+    //   data: { components: [] },
+    // };
 
-    contentTypeDefSettings.data.components.push({
-      label: "Enabled",
-      type: "checkbox",
-      input: true,
-      key: "enabled",
-      defaultValue: true,
-    });
-    contentTypeDefSettings.data.components.push({
-      label: "Submit",
-      type: "button",
-      input: true,
-      key: "submit",
-      theme: "primary",
-    });
+    // contentTypeDefSettings.data.components.push({
+    //   label: "Enabled",
+    //   type: "checkbox",
+    //   input: true,
+    //   key: "enabled",
+    //   defaultValue: true,
+    // });
+    // contentTypeDefSettings.data.components.push({
+    //   label: "Submit",
+    //   type: "button",
+    //   input: true,
+    //   key: "submit",
+    //   theme: "primary",
+    // });
 
-    await moduleService.createModuleContentType(contentTypeDefSettings);
+    // await moduleService.createModuleContentType(contentTypeDefSettings);
   },
   updateModule: async function (moduleDefinitionFile) {
     let basePath = await this.getBasePath(moduleDefinitionFile.systemId);
