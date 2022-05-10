@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "module": "system",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "outDir": "./server/data/entity-mongodb",
+  },
+  "include": ["server/**/*"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
+}

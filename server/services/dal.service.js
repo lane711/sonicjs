@@ -13,7 +13,11 @@ module.exports = dalService = {
   startup: async function (app) {
     app.get("/typeorm", async function (req, res) {
       // const users = await userRepository.find();
-      res.json(await dalService.test());
+      res.json(await dalService.usersGetCount());
+    });
+    app.get("/typeorm2", async function (req, res) {
+      // const users = await userRepository.find();
+      res.json({'test':'ok'});
     });
   },
 

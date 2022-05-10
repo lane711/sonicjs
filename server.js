@@ -89,20 +89,38 @@ function setupSessionDb(app) {
     ? process.env.SESSION_LENGTH_DAYS
     : 14;
 
-  app.use(
-    session({
-      name: "sonicjs",
-      cookie: { secure: false },
-      secret: process.env.SESSION_SECRET,
-      resave: false,
-      saveUninitialized: false,
-      store: new TypeormStore({
-        cleanupLimit: 5,
-        limitSubquery: false, // If using MariaDB - see https://github.com/nykula/connect-typeorm/issues/8
-        ttl: 86400 * sessionLengthDays,
-      }).connect(sessionRepo),
-    })
-  );
+  if (process.env.TYPEORM_CONNECTION === "mongodb") {
+    app.use(
+      session({
+        name: "sonicjs",
+        cookie: { secure: false },
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        // store: new MongoStore({
+        //   cleanupLimit: 5,
+        //   limitSubquery: false, // If using MariaDB - see https://github.com/nykula/connect-typeorm/issues/8
+        //   ttl: 86400 * sessionLengthDays,
+        // }).connect(sessionRepo),
+      })
+    );
+  }
+  else{
+    app.use(
+      session({
+        name: "sonicjs",
+        cookie: { secure: false },
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        store: new TypeormStore({
+          cleanupLimit: 5,
+          limitSubquery: false, // If using MariaDB - see https://github.com/nykula/connect-typeorm/issues/8
+          ttl: 86400 * sessionLengthDays,
+        }).connect(sessionRepo),
+      })
+    );
+  }
 }
 
 function setupPassport(app) {
@@ -290,7 +308,9 @@ function setupStaticAssets(app) {
   );
   app.use(
     "/assets/css/fonts",
-    express.static(path.join(appRoot.path, "node_modules/bootstrap-icons/font/fonts"))
+    express.static(
+      path.join(appRoot.path, "node_modules/bootstrap-icons/font/fonts")
+    )
   );
   app.use(
     "/",
@@ -312,7 +332,7 @@ function main() {
     type: process.env.TYPEORM_CONNECTION,
     entities: ["server/data/entity/*.js"],
     synchronize: process.env.TYPEORM_SYNCHRONIZE,
-    logging:process.env.TYPEORM_LOGGING,
+    logging: process.env.TYPEORM_LOGGING,
     ssl: sslParam,
   };
 
@@ -328,13 +348,23 @@ function main() {
     connectionSettings.database = process.env.TYPEORM_DATABASE;
   }
 
-  typeorm.createConnection(connectionSettings).then((connection) => {
+  // if (process.env.TYPEORM_CONNECTION === "mongodb") {
+  //   connectionSettings.entities  = ["server/data/entity-test/*.js"];
+
+  // }
+  
+
+  typeorm.createConnection(connectionSettings).then(async (connection) => {
     console.log(logSymbols.success, "Successfully connected to Database!");
+
+    const session = new Session();
+    session.expiredAt = 1652244073153;
+    session.json = "{}";
+    await connection.manager.save(session);
+    console.log("session a new user with id: " + session.id);
+
     start();
   });
 }
 
 main();
-
-
-
