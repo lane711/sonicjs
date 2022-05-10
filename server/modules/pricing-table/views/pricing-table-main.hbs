@@ -1,0 +1,18 @@
+<div class="card mb-4 rounded-3 shadow-sm text-center">
+  <div class="card-header py-3">
+    <h4 class="my-0 fw-normal">{{data.name}}</h4>
+  </div>
+  <div class="card-body">
+    <h1 class="card-title pricing-card-title">${{data.cost}}<small
+        class="text-muted fw-light"
+      >/{{data.term}}</small></h1>
+    <ul class="list-unstyled mt-3 mb-4">
+      {{#each data.items}}
+        <li> {{this.title}}</li>
+      {{/each}}
+    </ul>
+
+    <b>{{{data.tagline}}}</b>
+    <a href="{{data.buttonLink}}" class="w-100 btn btn-lg btn-outline-primary">{{data.buttonText}}</a>
+  </div>
+</div>

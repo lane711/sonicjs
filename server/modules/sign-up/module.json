@@ -1,0 +1,10 @@
+{
+  "title": "Sign Up",
+  "enabled": true,
+  "systemId": "sign-up",
+  "canBeAddedToColumn": true,
+  "sessionID": "undefined",
+  "version": "0.0.0.1",
+  "systemidUpperCase": "SIGN-UP",
+  "systemidCamelCase": "signUp"
+}

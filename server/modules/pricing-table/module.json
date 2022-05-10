@@ -1,0 +1,10 @@
+{
+  "title": "Pricing Table",
+  "enabled": true,
+  "systemId": "pricing-table",
+  "canBeAddedToColumn": true,
+  "sessionID": "undefined",
+  "version": "0.0.0.1",
+  "systemidUpperCase": "PRICING-TABLE",
+  "systemidCamelCase": "pricingTable"
+}

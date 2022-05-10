@@ -1,14 +1,12 @@
 {
   "name": "sonicjs",
-  "version": "0.5.6",
+  "version": "0.5.5",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js -e hbs,js,css,html --ignore 'template-processed.css' --ignore '*_spec.js'",
-    "test": "npx cypress open --project ./tests",
-    "doc": "jsdoc -c ./docs/jsdoc.json ",
-    "doc-json": "jsdoc -c ./docs/jsdoc.json -X > ./docs/json/jsdoc-ast.json"
+    "test": "npx cypress open --project ./tests"
   },
   "repository": {
     "type": "git",
@@ -40,7 +38,7 @@
     "chai": "^4.2.0",
     "chalk": "^4.1.0",
     "chart.js": "^2.9.4",
-    "cheerio": "^1.0.0-rc.3",
+    "cheerio": "^1.0.0-rc.10",
     "connect-ensure-login": "^0.1.1",
     "connect-multiparty": "^2.2.0",
     "connect-typeorm": "^1.1.4",
@@ -74,7 +72,6 @@
     "jimp": "^0.16.1",
     "jquery": "^3.5.1",
     "js-cookie": "^2.2.1",
-    "jsdoc": "^3.6.10",
     "jsoneditor": "^9.1.5",
     "jstree": "^3.3.10",
     "lodash": "^4.17.20",
