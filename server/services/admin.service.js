@@ -306,6 +306,10 @@ module.exports = adminService = {
           data = await appAnalyticReportService.getAggregates(req.sessionID);
         }
 
+        if (viewName == "admin-reports-optins") {
+          data = await appAnalyticReportService.getOptins(req.sessionID);
+        }
+
         let accessToken = "fakeToken"; //await userService.getToken(req);
         data.breadCrumbs = await breadcrumbsService.getAdminBreadcrumbs(
           req,

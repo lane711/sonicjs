@@ -44,13 +44,14 @@ describe("Admin Modules", function () {
 
     cy.contains("Create Module").click();
     //
-    // cy.url().should(
-    //   "include",
-    //   "/admin/modules"
-    // );
+ 
 
     cy.wait(1000); //wait for system id function to run
 
+    cy.url().should(
+      "include",
+      "/admin/modules"
+    );
 
     cy.contains("AA Cypress Module");
 
