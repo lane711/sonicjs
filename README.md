@@ -13,7 +13,7 @@
 ![Image of SonicJs Logo](https://sonicjscom.s3.us-west-1.amazonaws.com/sonicjs-logo-dark.svg)
 [https://sonicjs.com](https://sonicjs.com)
 
-# SonicJS is a Modern Open Source "Free Forever" NodeJs Based Content Management System
+# SonicJS is a Modern Open Source "Free Forever" NodeJs Based CMS (Content Management System)
 
 ## Screen Shots
 

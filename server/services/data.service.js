@@ -1,3 +1,7 @@
+/**
+ * Data Service module
+ * @module dataService
+ */
 //check if running in node (and not the browser)
 if (typeof module !== "undefined" && module.exports) {
   // var loopback = require("loopback");
@@ -14,6 +18,7 @@ if (typeof module !== "undefined" && module.exports) {
   var chalk = require("chalk");
   // const { request, gql } = require("graphql-request");
   var { GraphQLClient, gql, request } = require("graphql-request");
+  const {User} = require('./typedefs/typedefs');
 
   var log = console.log;
 } else {
@@ -96,13 +101,14 @@ if (typeof module !== "undefined" && module.exports) {
       // debugger;
       return axiosInstance;
     }),
+
     /**
      * Creates new user
      * @function
      * @name userCreate
      * @param {string} email - user's email address
      * @param {string} password - user's password in plain text (it will be encrypted)
-     * @returns {object} new user object
+     * @returns {User} new user object
      */
     (exports.userCreate = async function (email, password) {
       // let result = await this.getAxios().post(apiUrl, {
@@ -119,6 +125,14 @@ if (typeof module !== "undefined" && module.exports) {
       // return result.userCreate;
     });
 
+        /**
+     * Updates existing user
+     * @function
+     * @name userUpdate
+     * @param {User} user - the user object
+     * @param {sessionID} user's session ID
+     * @returns {User} updated user object
+     */
   (exports.userUpdate = async function (user, sessionID) {
     // debugger;
     let id = user.id;
@@ -213,7 +227,9 @@ if (typeof module !== "undefined" && module.exports) {
     (exports.getContentAdminCommon = async function (sessionID) {
       let contents = await this.getContent(sessionID);
       let data = _.sortBy(contents, "updatedOn");
-      let dataFiltered = data.filter(d => d.contentTypeId === 'page' || d.contentTypeId === 'blog');
+      let dataFiltered = data.filter(
+        (d) => d.contentTypeId === "page" || d.contentTypeId === "blog"
+      );
       return dataFiltered;
     }),
     (exports.getContentAdmin = async function (sessionID) {
@@ -582,7 +598,7 @@ if (typeof module !== "undefined" && module.exports) {
       if (emitterService) {
         emitterService.emit("contentCreated", result);
       }
-      
+
       return result.data.data.contentCreate;
     });
 
