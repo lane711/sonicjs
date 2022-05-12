@@ -88,7 +88,7 @@ module.exports = appAnalyticsMainService = {
     let profile = await dataService.getContentByUrl(profileUrl);
     let timeStamp = new Date().toISOString();
 
-    console.log(`processing event for ${data.installId} - ${websiteTitle}`)
+    console.log(`processing event for ${data.installId} - ${data.websiteTitle}`)
 
     if (!profile || profile.data.status === "Not Found") {
 
