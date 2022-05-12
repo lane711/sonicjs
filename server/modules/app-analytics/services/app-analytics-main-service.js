@@ -92,7 +92,7 @@ module.exports = appAnalyticsMainService = {
 
     if (!profile || profile.data.status === "Not Found") {
 
-      await appAnalyticsMainService.addEmailToList(profile.data);
+      await appAnalyticsMainService.addEmailToList(data);
 
       let payload = {
         data: {
@@ -160,7 +160,7 @@ module.exports = appAnalyticsMainService = {
 
     console.log('adding to email list', data);
 
-    if (data.emailOptin) {
+    if (data.agreeToFeedback) {
       let defaultClient = SibApiV3Sdk.ApiClient.instance;
 
       let apiKey = defaultClient.authentications["api-key"];
