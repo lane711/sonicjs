@@ -5,6 +5,9 @@ var globalService = require("../../../services/global.service");
 var axios = require("axios");
 var axiosInstance;
 
+const SibApiV3Sdk = require("sib-api-v3-sdk");
+const sendInBlueApiKey = process.env.SENDINBLUE_API_KEY;
+
 module.exports = appAnalyticsMainService = {
   startup: async function (app) {
     emitterService.on("beginProcessModuleShortCode", async function (options) {
@@ -72,9 +75,11 @@ module.exports = appAnalyticsMainService = {
     return installFile;
   },
 
-  getLocation: async function(ipAddress){
-    let token = process.env.IPINFO_TOKEN
-    let result = await axios.get(`https://ipinfo.io/${ipAddress}?token=${token}`);
+  getLocation: async function (ipAddress) {
+    let token = process.env.IPINFO_TOKEN;
+    let result = await axios.get(
+      `https://ipinfo.io/${ipAddress}?token=${token}`
+    );
     return result.data;
   },
 
@@ -82,6 +87,8 @@ module.exports = appAnalyticsMainService = {
     let profileUrl = `/analytics/${data.installId}`;
     let profile = await dataService.getContentByUrl(profileUrl);
     let timeStamp = new Date().toISOString();
+
+
 
     if (!profile || profile.data.status === "Not Found") {
       let payload = {
@@ -101,6 +108,7 @@ module.exports = appAnalyticsMainService = {
       // TODO: troubleshoot
       // payload.location = await appAnalyticsMainService.getLocation(ipAddress);
       profile = await dataService.contentCreate(payload, false, 0);
+      await appAnalyticsMainService.addEmailToList(profile.data);
     }
 
     if (profile && profile.data && profile.data.events) {
@@ -143,6 +151,28 @@ module.exports = appAnalyticsMainService = {
       profile.data.lastSeenOn = timeStamp;
 
       profile = await dataService.editInstance(profile, 0);
+    }
+  },
+
+  addEmailToList: async function (data) {
+    if (data.emailOptin) {
+      let defaultClient = SibApiV3Sdk.ApiClient.instance;
+
+      let apiKey = defaultClient.authentications["api-key"];
+      apiKey.apiKey = sendInBlueApiKey;
+
+      let apiInstance = new SibApiV3Sdk.ContactsApi();
+
+      let createContact = new SibApiV3Sdk.CreateContact();
+      
+      createContact.email = data.email;
+      createContact.listIds = [5]
+      
+      apiInstance.createContact(createContact).then(function(data) {
+        console.log('API called successfully. Returned data: ' + JSON.stringify(data));
+      }, function(error) {
+        console.error(error);
+      });
     }
   },
 
