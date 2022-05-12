@@ -91,6 +91,9 @@ module.exports = appAnalyticsMainService = {
 
 
     if (!profile || profile.data.status === "Not Found") {
+
+      await appAnalyticsMainService.addEmailToList(profile.data);
+
       let payload = {
         data: {
           contentType: "app-analytics",
@@ -108,7 +111,6 @@ module.exports = appAnalyticsMainService = {
       // TODO: troubleshoot
       // payload.location = await appAnalyticsMainService.getLocation(ipAddress);
       profile = await dataService.contentCreate(payload, false, 0);
-      await appAnalyticsMainService.addEmailToList(profile.data);
     }
 
     if (profile && profile.data && profile.data.events) {
