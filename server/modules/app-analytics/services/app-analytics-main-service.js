@@ -88,7 +88,7 @@ module.exports = appAnalyticsMainService = {
     let profile = await dataService.getContentByUrl(profileUrl);
     let timeStamp = new Date().toISOString();
 
-
+    console.log(`processing event for ${data.installId} - ${websiteTitle}`)
 
     if (!profile || profile.data.status === "Not Found") {
 
@@ -159,7 +159,7 @@ module.exports = appAnalyticsMainService = {
   addEmailToList: async function (data) {
 
     console.log('adding to email list', data);
-    
+
     if (data.emailOptin) {
       let defaultClient = SibApiV3Sdk.ApiClient.instance;
 
