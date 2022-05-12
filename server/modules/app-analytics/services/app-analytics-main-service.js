@@ -157,6 +157,9 @@ module.exports = appAnalyticsMainService = {
   },
 
   addEmailToList: async function (data) {
+
+    console.log('adding to email list', data);
+    
     if (data.emailOptin) {
       let defaultClient = SibApiV3Sdk.ApiClient.instance;
 
