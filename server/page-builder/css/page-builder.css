@@ -334,6 +334,7 @@ section {
   z-index: 1030;
   background: #fff;
   border-left: 1px solid #666;
+  color:#333
 }
 
 .pb-side-panel .content {
