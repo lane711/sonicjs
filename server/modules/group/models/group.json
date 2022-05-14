@@ -1,0 +1,1 @@
+{"moduleSystemId":"group","systemId":"group","title":"Group","data":{"components":[{"label":"First Name","type":"textfield","input":true,"key":"firstName","validate":{"required":true}},{"label":"Submit","type":"button","input":true,"key":"submit","theme":"primary"}]},"filePath":"/Users/lanecampbell/Dev/sonicjs-dft/server/modules/group/models/group.json"}
