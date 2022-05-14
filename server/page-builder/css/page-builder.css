@@ -471,3 +471,7 @@ section {
   /* width: 500px; */
   height:640px;
 }
+
+.modal{
+  color:#333;
+}

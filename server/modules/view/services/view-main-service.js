@@ -14,7 +14,23 @@ module.exports = viewMainService = {
             }
 
         });
+
+        emitterService.on("postModuleGetData", async function (options) {
+            if (options.shortcode.name === "VIEW") {
+              await viewMainService.getViewData(options);
+              options.viewPath = 'server/modules/view/views/text-card.hbs';
+            }
+          });
     },
+
+    getViewData: async function (options) {
+        let id = options.shortcode.properties.id;
+        options.viewModel.list = await dataService.getContentByType(
+          options.viewModel.data.contentTypeToLoad,
+          options.req.sessionID
+        );
+        // console.log(options.viewModel.data.contentTypeToLoad, moduleData);
+    }
 
 }
 
