@@ -834,6 +834,16 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.mediaDelete;
     });
+
+  exports.taxonomyGet = async function (id = null, sessionID) {
+    taxonomies = await this.getContentByType("taxonomy");
+    if (!id) {
+      return taxonomies;
+    }else{
+      return taxonomies.find(t => t.id === id);
+    }
+  };
+
   exports.getFiles = async function () {
     let files = [{ title: "my image", filePath: "/images/test123.png" }];
     return files;
