@@ -2,7 +2,8 @@ var dataService = require("../../../services/data.service");
 var emitterService = require("../../../services/emitter.service");
 var globalService = require("../../../services/global.service");
 const _ = require("lodash");
-const {data} = require("jquery");
+const { data } = require("jquery");
+const dalService = require("../../../services/dal.service");
 
 module.exports = taxonomyMainService = {
   startup: async function (app) {
@@ -50,6 +51,7 @@ module.exports = taxonomyMainService = {
         null,
         null,
         null,
+        null,
         true
       );
       taxonomies.map((taxonomy) => {
@@ -68,10 +70,18 @@ module.exports = taxonomyMainService = {
 
     emitterService.on("processUrl", async function (options) {
       if (options.urlKey?.handler === "taxonomyHandler") {
-        const taxonomy = await dataService.getContentByUrl(options.urlKey.url);
-        const taxonomyContentType = await dataService.taxonomyGet(taxonomy.contentTypeId);
+        const content = await dataService.getContentByUrl(options.urlKey.url);
+        const taxonomy = await dataService.taxonomyGet(
+          undefined,
+          content.contentTypeId
+        );
+        const detailsPage = await dalService.contentGet(taxonomy.data.detailsPage);
 
-        let taxonomyDetailsUrl = "/taxonomy-details";
+        options.req.content = content;
+        options.req.taxonomy = taxonomy;
+        options.req.detailsPage = detailsPage;
+
+        let taxonomyDetailsUrl = detailsPage.url ?? "/taxonomy-details";
         options.req.url = taxonomyDetailsUrl;
         var { page: pageData } = await contentService.getRenderedPage(
           options.req
@@ -106,18 +116,18 @@ module.exports = taxonomyMainService = {
       app.get("/api-admin/page-templates", async function (req, res) {
         let data = await dataService.getContentByType("page");
         let pageTemplates = data.map((r) => {
-            return { id: r.id, name: r.data.title };
+          return { id: r.id, name: r.data.title };
         });
-        pageTemplates = _.sortBy(pageTemplates,'name');
+        pageTemplates = _.sortBy(pageTemplates, "name");
         res.send(pageTemplates);
       });
 
       app.get("/api-admin/content-types", async function (req, res) {
         let data = await dataService.contentTypesGet();
         let pageTemplates = data.map((r) => {
-            return { id: r.systemId, name: r.title };
+          return { id: r.systemId, name: r.title };
         });
-        pageTemplates = _.sortBy(pageTemplates,'name');
+        pageTemplates = _.sortBy(pageTemplates, "name");
         res.send(pageTemplates);
       });
     }

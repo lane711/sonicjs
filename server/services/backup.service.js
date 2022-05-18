@@ -21,7 +21,7 @@ module.exports = backUpService = {
   exportContentToJsonFiles: async function () {
     await backUpService.cleanupTempFiles();
     //content
-    let contents = await dalService.contentGet("", "", "", "", "", "", "", false, true);
+    let contents = await dalService.contentGet("", "", "", "", "", "", "", "", false, true);
 
     contents.map((content) => {
       fileService.writeFile(

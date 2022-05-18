@@ -232,6 +232,7 @@ const RootQuery = new GraphQLObjectType({
           "",
           "",
           "",
+          null,
           await getUserSession(args.sessionID, req.sessionID),
           req
         );
@@ -258,6 +259,7 @@ const RootQuery = new GraphQLObjectType({
           args.url,
           args.data,
           args.tag,
+          args.group,
           await getUserSession(args.sessionID, req.sessionID),
           req
         );
@@ -282,6 +284,7 @@ const RootQuery = new GraphQLObjectType({
         url: { type: GraphQLString },
         data: { type: GraphQLJSONObject },
         tag: { type: GraphQLString },
+        group: { type: GraphQLString },
         sessionID: { type: GraphQLString },
       },
 
@@ -292,6 +295,7 @@ const RootQuery = new GraphQLObjectType({
           args.url,
           args.data,
           args.tag,
+          args.group,
           await getUserSession(args.sessionID, req.sessionID),
           req,
           true

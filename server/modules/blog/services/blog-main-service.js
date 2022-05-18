@@ -55,6 +55,7 @@ module.exports = blogMainService = {
         null,
         null,
         null,
+        null,
         true
       );
       blogs = blogs.sort((a, b) => (a.createdOn > b.createdOn ? 1 : -1));

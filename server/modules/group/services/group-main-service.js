@@ -14,6 +14,21 @@ module.exports = groupMainService = {
             }
 
         });
+
+        //add group select list
+        emitterService.on('formComponentsLoaded', async function (contentType) {
+
+            //TODO: limit to specified content types
+            contentType.data.components.splice(-1, 0, {
+                type: "textfield",
+                inputType: "text",
+                key: "groupId",
+                label:"Group",
+                hidden: false,
+                input: true,
+              });
+
+        });
     },
 
 }

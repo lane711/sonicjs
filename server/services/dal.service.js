@@ -1,4 +1,4 @@
-const { getRepository } = require("typeorm");
+const { getRepository, Like } = require("typeorm");
 const { Content } = require("../data/model/Content");
 const { User } = require("../data/model/User");
 const { Session } = require("../data/model/Session");
@@ -180,6 +180,7 @@ module.exports = dalService = {
     url,
     data,
     tag,
+    group,
     user,
     req,
     returnAsArray = false,
@@ -201,6 +202,14 @@ module.exports = dalService = {
       let content = await contentRepo.findOne({ where: { url: url } });
       dalService.processContent(content, user, req);
       return content;
+    } else if (group) {
+      contents = await contentRepo.find({
+        contentTypeId : contentTypeId,
+        data: Like(`%${group}%`),
+      });
+      // contents = await contentRepo.find({
+      //   where: { contentTypeId: contentTypeId, data: Like(group)  },
+      // });
     } else if (contentTypeId) {
       contents = await contentRepo.find({
         where: { contentTypeId: contentTypeId },
@@ -256,7 +265,9 @@ module.exports = dalService = {
     content.url = url;
     let isExisting = false;
     let userId =
-      userSession.user && userSession.user.id ? userSession.user.id : '00000000-0000-0000-0000-000000000000';
+      userSession.user && userSession.user.id
+        ? userSession.user.id
+        : "00000000-0000-0000-0000-000000000000";
 
     if (!id || id.length === 0) {
       //upsert
@@ -288,11 +299,9 @@ module.exports = dalService = {
   },
 
   contentUpdateByUrl: async function (id, url, data, userSession) {
-
     const contentRepo = await getRepository(Content);
     let content = {};
     if (url) {
-
       content = await contentRepo.findOne({ where: { url: url } });
       if (!content) {
         content = {};
@@ -302,7 +311,9 @@ module.exports = dalService = {
     content.url = url;
     let isExisting = false;
     let userId =
-      userSession.user && userSession.user.id ? userSession.user.id : '00000000-0000-0000-0000-000000000000';
+      userSession.user && userSession.user.id
+        ? userSession.user.id
+        : "00000000-0000-0000-0000-000000000000";
 
     if (!content.id) {
       //upsert
@@ -410,7 +421,7 @@ module.exports = dalService = {
 
     if (entity.profile) {
       try {
-        entity.contentTypeId = 'user';
+        entity.contentTypeId = "user";
         entity.profile = JSON.parse(entity.profile);
       } catch (err) {
         console.log(
@@ -431,7 +442,7 @@ module.exports = dalService = {
 
   //get content type so we can detect permissions
   checkPermission: async function (data, user, req) {
-    if(data.contentTypeId == 'app-analytics'){
+    if (data.contentTypeId == "app-analytics") {
       return data;
     }
     let contentTypeId = data.contentTypeId
@@ -447,7 +458,12 @@ module.exports = dalService = {
 
     // console.log(localUser);
 
-    if (localUser && localUser.profile && localUser.profile.roles && localUser.profile.roles.includes("admin")) {
+    if (
+      localUser &&
+      localUser.profile &&
+      localUser.profile.roles &&
+      localUser.profile.roles.includes("admin")
+    ) {
       return data;
     }
 
