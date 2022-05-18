@@ -17,7 +17,7 @@ module.exports = groupMainService = {
 
         //add group select list
         emitterService.on('formComponentsLoaded', async function (contentType) {
-
+console.log('adding group id')
             //TODO: limit to specified content types
             contentType.data.components.splice(-1, 0, {
                 type: "textfield",

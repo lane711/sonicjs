@@ -253,6 +253,7 @@ module.exports = moduleService = {
       let configObj = JSON.parse(config);
       configs.push(configObj);
     });
+    configs = _.sortBy(configs, 'title');
     return configs;
   },
   updateModuleContentType: async function (contentTypeDef) {
