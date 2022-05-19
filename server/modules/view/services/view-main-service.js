@@ -2,6 +2,8 @@ var dataService = require("../../../services/data.service");
 var emitterService = require("../../../services/emitter.service");
 var globalService = require("../../../services/global.service");
 var fileService = require("../../../services/file.service");
+var helperService = require("../../../services/helper.service");
+
 var appRoot = require("app-root-path");
 var path = require("path");
 
@@ -21,6 +23,7 @@ module.exports = viewMainService = {
         options.viewPath = dynamicView
           ? `server/modules/view/views/${dynamicView}`
           : "server/modules/view/views/text-card.hbs";
+
       }
     });
 
@@ -47,6 +50,17 @@ module.exports = viewMainService = {
       groupId,
       options.req.sessionID
     );
+
+    viewMainService.trimBody(options);
     // console.log(options.viewModel.data.contentTypeToLoad, moduleData);
   },
+
+  trimBody: async function (options) {
+    options.viewModel.list.map(item =>{
+      if(item.data.body){
+        item.data.body = helperService.truncateString(item.data.body, options.viewModel.data.maxBodyCharacters);
+
+      }
+    })
+  }
 };

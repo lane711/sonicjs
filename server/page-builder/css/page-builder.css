@@ -475,3 +475,7 @@ section {
 .modal{
   color:#333;
 }
+
+.formio-component-submit{
+  margin: 20px 0 0;
+}
