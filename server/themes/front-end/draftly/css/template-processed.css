@@ -1,3 +1,7 @@
 main {
     padding: 80px 0
 }
+
+.menu-module .nav-item a{
+    color: #FFCB05;
+}

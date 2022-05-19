@@ -1,0 +1,16 @@
+{{#each list}}
+<div class="row">
+  <div class="col{{../data.bootstrapColumnClass}} text-{{../data.textJustification}}">
+    <h3>{{this.data.title}}</h3>
+    {{{this.data.body}}}
+  </div>
+</div>
+{{/each}}
+
+{{#if data.seeMoreLinkCopy}}
+<div class="row text-center">
+  <div class="col">
+   <a href=""#">{{data.seeMoreLinkCopy}}</a>
+  </div>
+</div>
+{{/if}}

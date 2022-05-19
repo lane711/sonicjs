@@ -253,6 +253,7 @@ module.exports = moduleService = {
       let configObj = JSON.parse(config);
       configs.push(configObj);
     });
+    configs = _.sortBy(configs, 'title');
     return configs;
   },
   updateModuleContentType: async function (contentTypeDef) {
@@ -326,7 +327,7 @@ module.exports = moduleService = {
     if (options.shortcode.name === options.moduleName.toUpperCase()) {
       let id = options.shortcode.properties.id;
       let contentType = options.moduleName;
-      let viewPath = await this.getModuleViewFile(options.moduleName);
+      options.viewPath = await this.getModuleViewFile(options.moduleName);
       options.viewModel = viewModel
         ? viewModel
         : await dataService.getContentById(id, options.req.sessionID);
@@ -337,7 +338,7 @@ module.exports = moduleService = {
         id: id,
         contentType: contentType,
         shortCode: options.shortcode,
-        body: await this.processView(contentType, options.viewModel, viewPath),
+        body: await this.processView(contentType, options.viewModel, options.viewPath),
       };
 
       //for template based pages

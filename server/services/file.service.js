@@ -118,12 +118,27 @@ module.exports = fileService = {
 
   copyFile: async function (sourcePath, destinationPath) {
     fs.copyFile(sourcePath, destinationPath, (err) => {
-      if (err) throw err;
+      if (err) {
+        console.error("copyFile==> unable to copy ", sourcePath);
+        throw err;
+      }
       console.log(`${sourcePath} was copied to ${destinationPath}`);
     });
   },
 
   uploadWriteFile: async function (file, sessionID) {
+    const fileExists = this.fileExists(file.path, true);
+    if (fileExists) {
+      this.execUpload(file, sessionID);
+    } else {
+      //wait and retry
+      console.log("temp file not found, retrying");
+      helperService.sleep(1000);
+      this.execUpload(file, sessionID);
+    }
+  },
+
+  execUpload: async function (file, sessionID) {
     let storageOption = process.env.FILE_STORAGE;
     if (
       storageOption === "AMAZON_S3" &&
@@ -153,7 +168,7 @@ module.exports = fileService = {
           path.join(appRoot.path, `server/assets/uploads/${file.name}`)
         )
         .catch((error) => {
-          console.log(error);
+          console.log("uploadWriteFile ==>", error);
           throw new Error(error);
         });
 

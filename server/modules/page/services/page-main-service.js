@@ -18,6 +18,7 @@ module.exports = pageMainService = {
         null,
         null,
         null,
+        null,
         true
       );
       pages.map((page) => {

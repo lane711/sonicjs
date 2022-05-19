@@ -1,0 +1,11 @@
+<ul class="nav menu-module">
+  {{#each data.links}}
+    <li class="nav-item">
+      <a
+        class="nav-link active"
+        aria-current="page"
+        href="{{this.data.url}}"
+      >{{this.data.title}}</a>
+    </li>
+  {{/each}}
+</ul>
