@@ -1,0 +1,24 @@
+// Required
+@import "../../../../../node_modules/bootstrap/scss/functions";
+
+// Default variable overrides
+$body-bg: #001C36;
+$body-color: #ffffff;
+$primary: #FFCB05;
+
+.btn-primary{
+    background-color: $primary;
+}
+
+$theme-colors: (
+  "primary": $primary ,
+);
+// Required
+@import "../../../../../node_modules/bootstrap/scss/variables";
+@import "../../../../../node_modules/bootstrap/scss/mixins";
+
+// Optional Bootstrap components here
+@import "../../../../../node_modules/bootstrap/scss/root";
+@import "../../../../../node_modules/bootstrap/scss/reboot";
+@import "../../../../../node_modules/bootstrap/scss/type";
+// etc
