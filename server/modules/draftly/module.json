@@ -1,0 +1,8 @@
+{
+  "title": "Draftly",
+  "enabled": true,
+  "systemId": "draftly",
+  "canBeAddedToColumn": false,
+  "singleInstance": false,
+  "version": "0.0.0.1"
+}

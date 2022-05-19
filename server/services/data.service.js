@@ -218,23 +218,29 @@ if (typeof module !== "undefined" && module.exports) {
       return data;
     }),
     (exports.getContentByType = async function (contentType, sessionID) {
-      // const query = gql`
-      // {
-      //   contents (contentTypeId : "${contentType}") {
-      //     contentTypeId
-      //     data
-      //   }
-      // }
-      // `;
-
-      // let data = await this.executeGraphqlQuery(query);
-
-      // return data.contents;
 
       let result = await this.getAxios().post(apiUrl, {
         query: `
         {
           contents (contentTypeId : "${contentType}", sessionID:"${sessionID}") {
+            id
+            contentTypeId
+            data
+            createdOn
+          }
+        }
+            `,
+      });
+
+      return result.data.data.contents;
+    }),
+    (exports.getContentByTypeAndGroup = async function (contentType, groupId, sessionID) {
+
+      let groupParam = groupId ? `, group : "${groupId}"` : '';
+      let result = await this.getAxios().post(apiUrl, {
+        query: `
+        {
+          contents (contentTypeId : "${contentType}" ${groupParam}, sessionID:"${sessionID}") {
             id
             contentTypeId
             data
@@ -834,6 +840,22 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.mediaDelete;
     });
+
+  exports.taxonomyGet = async function (
+    id = null,
+    contentType = null,
+    sessionID
+  ) {
+    taxonomies = await this.getContentByType("taxonomy");
+    if (id) {
+      return taxonomies.find((t) => t.id === id);
+    } else if (contentType) {
+      return taxonomies.find((t) => t.data.targetContentType === contentType);
+    } else {
+      return taxonomies;
+    }
+  };
+
   exports.getFiles = async function () {
     let files = [{ title: "my image", filePath: "/images/test123.png" }];
     return files;

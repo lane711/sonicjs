@@ -1,0 +1,10 @@
+{
+  "title": "Group",
+  "enabled": true,
+  "systemId": "group",
+  "canBeAddedToColumn": false,
+  "sessionID": "undefined",
+  "version": "0.0.0.1",
+  "systemidUpperCase": "GROUP",
+  "systemidCamelCase": "group"
+}

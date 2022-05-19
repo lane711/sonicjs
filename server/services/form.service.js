@@ -127,11 +127,13 @@ if (typeof module !== "undefined" && module.exports) {
         return;
       }
 
+      if (contentType && emitterService) {
+        await emitterService.emit("formComponentsLoaded", contentType);
+      }
 
       if (!onFormSubmitFunction) {
         onFormSubmitFunction = "editInstance(submission,true)";
       }
-
 
       const formJSON = await exports.getFormJson(contentType, content);
 
@@ -213,7 +215,6 @@ if (typeof module !== "undefined" && module.exports) {
       return settings;
     }),
     (exports.getFormComponents = async function (contentType, content) {
-
       let components = contentType.data?.components;
 
       if (content) {
@@ -249,7 +250,6 @@ if (typeof module !== "undefined" && module.exports) {
           input: true,
         });
       }
-
     });
 
   exports.setFormApiUrls = async function (Formio) {
