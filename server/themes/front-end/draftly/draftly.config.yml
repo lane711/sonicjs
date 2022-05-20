@@ -13,6 +13,7 @@ assets:
     - /node_modules/formiojs/dist/formio.full.min.js
     - /node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.js
     - /node_modules/dropzone/dist/min/dropzone.min.js
+    - /node_modules/moralis/dist/moralis.min.js
     - /assets/js/common.js
     - /sonicjs-services/shared.service.js
     - /sonicjs-services/global.service.js

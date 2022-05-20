@@ -78,6 +78,7 @@
     "log-symbols": "^4.0.0",
     "mixpanel": "^0.13.0",
     "moment": "^2.29.1",
+    "moralis": "^1.7.0",
     "mysql": "^2.18.1",
     "node-cache": "^5.1.2",
     "pace-progress": "^1.0.2",
