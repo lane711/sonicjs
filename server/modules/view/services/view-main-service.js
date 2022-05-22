@@ -23,7 +23,6 @@ module.exports = viewMainService = {
         options.viewPath = dynamicView
           ? `server/modules/view/views/${dynamicView}`
           : "server/modules/view/views/text-card.hbs";
-
       }
     });
 
@@ -45,22 +44,30 @@ module.exports = viewMainService = {
   getViewData: async function (options) {
     let id = options.shortcode.properties.id;
     let groupId = options.req.content ? options.req.content.id : null;
-    options.viewModel.list = await dataService.getContentByTypeAndGroup(
-      options.viewModel.data.contentTypeToLoad,
-      groupId,
-      options.req.sessionID
-    );
 
-    viewMainService.trimBody(options);
+    if (options.viewModel.data.contentTypeToLoad === "group") {
+      options.viewModel.group = options.req.content;
+    } else {
+      options.viewModel.list = await dataService.getContentByTypeAndGroup(
+        options.viewModel.data.contentTypeToLoad,
+        groupId,
+        options.req.sessionID
+      );
+
+      viewMainService.trimBody(options);
+    }
+
     // console.log(options.viewModel.data.contentTypeToLoad, moduleData);
   },
 
   trimBody: async function (options) {
-    options.viewModel.list.map(item =>{
-      if(item.data.body){
-        item.data.body = helperService.truncateString(item.data.body, options.viewModel.data.maxBodyCharacters);
-
+    options.viewModel.list.map((item) => {
+      if (item.data.body) {
+        item.data.body = helperService.truncateString(
+          item.data.body,
+          options.viewModel.data.maxBodyCharacters
+        );
       }
-    })
-  }
+    });
+  },
 };

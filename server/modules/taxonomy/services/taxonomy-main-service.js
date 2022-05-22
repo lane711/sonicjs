@@ -2,7 +2,6 @@ var dataService = require("../../../services/data.service");
 var emitterService = require("../../../services/emitter.service");
 var globalService = require("../../../services/global.service");
 const _ = require("lodash");
-const { data } = require("jquery");
 const dalService = require("../../../services/dal.service");
 
 module.exports = taxonomyMainService = {

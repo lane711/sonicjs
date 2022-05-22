@@ -120,8 +120,10 @@ module.exports = dalService = {
         newUser.profile = '{"roles":["admin"]}';
       }
 
-      let userRecord = await userRepo.save(newUser);
+      user = await userRepo.save(newUser);
     }
+
+    return user;
 
     //admins can see all users
     //TODO: get role by name
@@ -142,7 +144,7 @@ module.exports = dalService = {
     }
 
     //update password
-    if (profileObj.password !== "_temp_password") {
+    if (profileObj.password && profileObj.password !== "_temp_password") {
       //password has been updated
       User.findByUsername(profileObj.email).then(
         function (user) {
