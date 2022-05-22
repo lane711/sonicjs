@@ -30,7 +30,6 @@ module.exports = tabMainService = {
           item.show = index === 0 ? 'show' : '';
 
         })
-        console.log('-->', data.viewModel.data.tabs);
       },
 
 }

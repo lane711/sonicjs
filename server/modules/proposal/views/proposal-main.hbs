@@ -1,0 +1,42 @@
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#open" type="button" role="tab" 
+      aria-controls="home" aria-selected="true">Open Proposals</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#closed" type="button" role="tab" 
+      aria-controls="profile" aria-selected="false">Closed Proposals</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="messages-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" 
+      aria-controls="messages" aria-selected="false">Review Proposals</button>
+    </li>
+  </ul>
+  
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div class="tab-pane active" id="open" role="tabpanel" aria-labelledby="home-tab">
+
+        <div class="row">
+            {{ log this}}
+            {{#each openProposals}}
+              <div class="col-md-4">
+                <h3>{{this.data.title}}</h3>
+                {{{this.data.body}}}
+              </div>
+            {{/each}}
+            </div>
+            
+            {{#if data.seeMoreLinkCopy}}
+            <div class="row text-center">
+              <div class="col">
+               <a href=""#">{{data.seeMoreLinkCopy}}</a>
+              </div>
+            </div>
+            {{/if}}
+
+
+    </div>
+    <div class="tab-pane" id="closed" role="tabpanel" aria-labelledby="profile-tab">.2..</div>
+    <div class="tab-pane" id="pending" role="tabpanel" aria-labelledby="messages-tab">..3.</div>
+  </div>
