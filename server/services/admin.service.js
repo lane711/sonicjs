@@ -35,7 +35,7 @@ module.exports = adminService = {
       "/admin",
       connectEnsureLogin.ensureLoggedIn(),
       async function (req, res) {
-        res.redirect('/admin/content');
+        res.redirect("/admin/content");
       }
     );
 
@@ -170,18 +170,7 @@ module.exports = adminService = {
         }
 
         if (viewName == "admin-site-settings") {
-          data = await dataService.getContentTopOne(
-            "site-settings",
-            req.sessionID
-          );
-          data.editForm = await formService.getForm(
-            "site-settings",
-            data,
-            undefined,
-            undefined,
-            undefined,
-            req.sessionID
-          );
+          data = await adminService.getSiteSettings(req);
         }
 
         if (viewName == "admin-theme-settings") {
@@ -283,10 +272,7 @@ module.exports = adminService = {
         if (viewName == "admin-user-edit") {
           let user = { id: param1 };
           if (param1) {
-            let userRecord = await dalService.userGet(
-              param1,
-              req.sessionID
-            );
+            let userRecord = await dalService.userGet(param1, req.sessionID);
             userRecord.data = userRecord.profile ? userRecord.profile : {};
             // userRecord.data = userRecord.profile;
             userRecord.data.id = userRecord.id;
@@ -342,4 +328,45 @@ module.exports = adminService = {
       globalService.isAdminUserCreated = false;
     }
   },
+
+  getSiteSettings: async function (req) {
+    //get content types ending with "site-setting";
+    let siteSettings = await dataService.contentTypesGet(req.sessionID);
+    siteSettings = siteSettings.filter((c) =>
+      c.systemId.includes("-site-setting")
+    );
+
+    // const resultArray = await Promise.all(
+    //   inputArray.map(async (i) => someAsyncFunction(i))
+    // );
+
+    await Promise.all(
+      siteSettings.map(async (s) => {
+        s.instance =  await dataService.getContentTopOne(s.systemId);
+        s.editForm = await formService.getForm(
+          s.systemId,
+          s.instance,
+          "submitContent(submission)",
+          undefined,
+          undefined,
+          req.sessionID
+        );
+      })
+    );
+    // const results = await adminService.getSiteSettingsForm(siteSettings);
+    // console.log("results", results);
+
+    // data.editForm = await formService.getForm(
+    //   param1,
+    //   content,
+    //   "submitContent(submission)",
+    //   undefined,
+    //   undefined,
+    //   req.sessionID
+    // );
+
+    return siteSettings;
+  },
+
+
 };
