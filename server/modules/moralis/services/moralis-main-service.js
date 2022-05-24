@@ -15,7 +15,6 @@ module.exports = moralisMainService = {
     });
 
     emitterService.on("formComponentsLoaded", async function (contentType) {
-      console.log("adding group id: ", contentType.systemId);
       if (contentType.systemId === "user") {
         contentType.data.components.splice(-1, 0, {
           type: "textfield",
