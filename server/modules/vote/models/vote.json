@@ -1,0 +1,1 @@
+{"moduleSystemId":"vote","systemId":"vote","title":"Vote","data":{"components":[{"label":"First Name","type":"textfield","input":true,"key":"firstName","validate":{"required":true}},{"label":"Submit","type":"button","input":true,"key":"submit","theme":"primary"}]},"filePath":"/Users/lanecampbell/Dev/draftly/sonicjs-draftly/server/modules/vote/models/vote.json"}
