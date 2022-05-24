@@ -12,7 +12,6 @@
       }
 
       form_{{ random }} = async function () {
-          // debugger;
           Formio.icons = 'fontawesome';
           formService.setFormApiUrls(Formio);
 
@@ -34,8 +33,6 @@
               });
 
               form.on('change', function (changed) {
-                // console.log('form.html changed', changed)
-                // debugger;
                 if (typeof formChanged != "undefined") {
                     formChanged(changed);
                   }
@@ -50,16 +47,13 @@
           });
       };
 
-      window.onload = async function () {
-          // debugger;
+      window.addEventListener("load", function() {
+          console.log('Page is loaded');
           if (typeof module === 'undefined') {
-            formInit();
+            form_{{ random }}();
           }
-      }
+      });
 
-      function formInit(){
-        form_{{ random }}();
-      }
 </script>
 
 <div id="formio_{{ random }}"></div>

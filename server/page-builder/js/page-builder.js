@@ -753,10 +753,15 @@ function processContentFields(payload) {
   return { id: payload.id, data: payload };
 }
 
-async function openForm(action, contentType) {
+async function openPageSettingsForm(action, contentType) {
   await setupPageSettings(action, contentType);
   $("#pageSettingsModal").appendTo("body").modal("show");
 }
+
+async function openFormInModal(action, id) {
+  console.log(action, id);
+}
+
 
 async function setupPageSettings(action, contentType, sessionID) {
   console.log("setupPageSettings");
