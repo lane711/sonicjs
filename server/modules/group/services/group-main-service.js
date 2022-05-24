@@ -13,7 +13,6 @@ module.exports = groupMainService = {
 
     //add group select list
     emitterService.on("formComponentsLoaded", async function (contentType) {
-      //TODO: limit to specified content types
       const groupContentTypes = await dataService.getContentTopOne(
         "group-site-settings"
       );

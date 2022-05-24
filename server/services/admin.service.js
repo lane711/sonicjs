@@ -336,10 +336,6 @@ module.exports = adminService = {
       c.systemId.includes("-site-setting")
     );
 
-    // const resultArray = await Promise.all(
-    //   inputArray.map(async (i) => someAsyncFunction(i))
-    // );
-
     await Promise.all(
       siteSettings.map(async (s) => {
         s.instance =  await dataService.getContentTopOne(s.systemId);
@@ -353,17 +349,6 @@ module.exports = adminService = {
         );
       })
     );
-    // const results = await adminService.getSiteSettingsForm(siteSettings);
-    // console.log("results", results);
-
-    // data.editForm = await formService.getForm(
-    //   param1,
-    //   content,
-    //   "submitContent(submission)",
-    //   undefined,
-    //   undefined,
-    //   req.sessionID
-    // );
 
     return siteSettings;
   },
