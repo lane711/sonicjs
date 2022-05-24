@@ -760,6 +760,9 @@ async function openPageSettingsForm(action, contentType) {
 
 async function openFormInModal(action, id) {
   console.log(action, id);
+  $("#genericModal").appendTo("body").modal("show");
+
+  
 }
 
 
