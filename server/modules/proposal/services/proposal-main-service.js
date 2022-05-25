@@ -40,6 +40,11 @@ module.exports = proposalMainService = {
       return p.data.ticks;
     });
 
+    options.viewModel.items = proposals;
+
+    //emit so we can talley votes
+    await emitterService.emit("postModuleGetData2", options);
+
     options.viewModel.openProposals = proposals.filter(
       (p) => p.data.approved && p.data.ticks > now
     );

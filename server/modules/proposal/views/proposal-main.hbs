@@ -27,8 +27,11 @@
                 {{{this.data.preview}}}
                 <div class="text-muted">{{ this.data.remainingDays }}</div>
                 <div>                  
-                  <button type="button"  onclick="return voteUp('up','{{this.id}}')"><i class="bi bi-hand-thumbs-up"></i></button>
-                  <button type="button"  onclick="return vote('down','{{this.id}}')"><i class="bi bi-hand-thumbs-down"></i></button>
+                  <button type="button"  onclick="return vote('{{this.id}}', 1)""><i class="bi bi-hand-thumbs-up"></i></button>
+                  <button type="button"  onclick="return vote('{{this.id}}', -1)"><i class="bi bi-hand-thumbs-down"></i></button>
+                </div>
+                <div>
+                   Votes: {{this.voteCount}}              
                 </div>
               </div>
             {{/each}}
