@@ -1,17 +1,12 @@
 // JS File for Module: vote
 
-$(document).ready(function () {});
-
 function vote(id, vote) {
-  console.log("vote up", id, vote, axios);
-
   const payload = { id, vote };
   axiosInstance
     .post("/vote-api", payload)
-    .then(async function (response) {
-      // debugger;
-      console.log(response);
-      // return await response.data;
+    .then(function (response) {
+      $(`[data-vote-controls-id="${response.data.id}"] .voteUps`).text(response.data.data.voteUps);
+      $(`[data-vote-controls-id="${response.data.id}"] .voteDowns`).text(response.data.data.voteDowns)
     })
     .catch(function (error) {
       console.log(error);

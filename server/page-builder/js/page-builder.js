@@ -760,11 +760,30 @@ async function openPageSettingsForm(action, contentType) {
 
 async function openFormInModal(action, id) {
   console.log(action, id);
+
+  let content = await dataService.getContentById(id);
+  let form = await formService.getForm(
+    content.contentTypeId,
+    content,
+    "await submitContent(submission);",
+    undefined,
+    undefined,
+    undefined
+  );
+
+  $("#genericModal .modal-title").text(
+    helperService.titleCase(`${action} ${content.contentTypeId}`)
+  );
+
+  $("#formio").empty();
+  $("#formio").html(form);
+
+  loadModuleSettingForm();
+
+  $('input[name="data[title]"').focus();
+
   $("#genericModal").appendTo("body").modal("show");
-
-  
 }
-
 
 async function setupPageSettings(action, contentType, sessionID) {
   console.log("setupPageSettings");
@@ -1239,7 +1258,7 @@ async function deleteModule() {
       <a class="dropdown-item" onclick="deleteModuleConfirm(false)" href="#">Remove From Column Only</a>
     </div>
   </div>`;
-  
+
   let dataPreview = `<div class="delete-data-preview""><textarea>${JSON.stringify(
     data,
     null,
@@ -1652,7 +1671,6 @@ async function setupACEEditor() {
 }
 
 async function setupDropZone() {
-
   if (!globalService.isBackEnd()) {
     return;
   }

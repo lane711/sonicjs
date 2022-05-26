@@ -32,7 +32,6 @@ module.exports = proposalMainService = {
       p.data.ticks = new Date(p.data.expires).getTime();
       p.data.remainingDays =
         moment(p.data.expires, "YYYYMMDD").fromNow(true) + " left to vote";
-      console.log(p.data.remainingDays);
       p.data.preview = helperService.truncateString(p.data.body, 85);
     });
 

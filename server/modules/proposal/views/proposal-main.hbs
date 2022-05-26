@@ -21,18 +21,19 @@
             {{#each openProposals}}
               <div class="col-md-4  mt-3 mb-5">
                 <h3>{{this.data.title}} 
-                  <a target="_blank" href="/admin/content/edit/fe/{{this.id}}"><i class="bi bi-pencil"></i></a>
-                    <!-- <button type="button"  onclick="return openFormInModal('edit', '{{this.id}}')"><i class="bi bi-pencil"></i></button> -->
+                  <!-- <a target="_blank" href="/admin/content/edit/fe/{{this.id}}"><i class="bi bi-pencil"></i></a> -->
+                    <button type="button"  onclick="return openFormInModal('edit', '{{this.id}}')"><i class="bi bi-pencil"></i></button>
                 </h3>
                 {{{this.data.preview}}}
                 <div class="text-muted">{{ this.data.remainingDays }}</div>
-                <div>                  
-                  <button type="button"  onclick="return vote('{{this.id}}', 1)""><i class="bi bi-hand-thumbs-up"></i></button>
-                  <button type="button"  onclick="return vote('{{this.id}}', -1)"><i class="bi bi-hand-thumbs-down"></i></button>
+           
+                <div class="vote-controls" data-vote-controls-id="{{this.id}}">                  
+                  <button type="button"  onclick="return vote('{{this.id}}', 1)""><i class="bi bi-arrow-up"></i></button>
+                  <span class="voteUps">{{this.data.voteUps}}</span> 
+                  <button type="button"  onclick="return vote('{{this.id}}', -1)"><i class="bi bi-arrow-down"></i></button>
+                  <span class="voteDowns">{{this.data.voteDowns}}</span>  
                 </div>
-                <div>
-                   Votes: {{this.voteCount}}              
-                </div>
+
               </div>
             {{/each}}
         </div>

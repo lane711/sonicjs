@@ -99,7 +99,7 @@ $(document).ready(async function () {
     $("#menuTreeForm").empty();
     $("#menuTreeForm").html(form);
 
-    formInit();
+    loadModuleSettingForm();
 
     $("#menuTreeForm #title").focus();
   });

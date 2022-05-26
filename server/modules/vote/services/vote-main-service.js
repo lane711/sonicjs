@@ -33,13 +33,10 @@ module.exports = voteMainService = {
         //talley votes
         if (options.viewModel.items) {
           options.viewModel.items.map((i) => {
-            let voteCount = 0;
-            if (i.data.votes) {
-                voteCount = i.data.votes.reduce((s, f) => {
-                    return s + f.vote;               // return the sum of the accumulator and the current time, as the the new accumulator
-                }, 0);  
-            }
-            i.voteCount = voteCount;
+            
+            i.data.voteScore = i.data.voteScore ?? 0;
+            i.data.voteUps = i.data.voteUps ?? 0;
+            i.data.voteDowns = i.data.voteDowns ?? 0;
           });
         }
       }
@@ -54,7 +51,7 @@ module.exports = voteMainService = {
 
         const now = new Date().getTime();
         let item = await dataService.getContentById(id);
-        let existingVote = item.data.votes?.find((v) => v.userId === user);
+        let existingVote = item.data.votes?.find((v) => v.user === user);
         if (existingVote) {
           //change user's existing vote
           existingVote.timeStamp = now;
@@ -71,9 +68,34 @@ module.exports = voteMainService = {
             item.data.votes = [newVote];
           }
         }
+
+        //talley votes
+        let voteScore,
+          voteUps,
+          voteDowns = 0;
+        if (item.data.votes) {
+          voteScore = item.data.votes.reduce((s, f) => {
+            return s + f.vote; // return the sum of the accumulator and the current time, as the the new accumulator
+          }, 0);
+          voteUps = item.data.votes
+            .filter((v) => v.vote === 1)
+            .reduce((s, f) => {
+              return s + f.vote; // return the sum of the accumulator and the current time, as the the new accumulator
+            }, 0);
+          voteDowns = item.data.votes
+            .filter((v) => v.vote === -1)
+            .reduce((s, f) => {
+              return s + f.vote; // return the sum of the accumulator and the current time, as the the new accumulator
+            }, 0);
+        }
+        item.data.voteScore = voteScore;
+        item.data.voteUps = voteUps;
+        item.data.voteDowns = voteDowns;
+
         let results = await dataService.editInstance(item, sessionID);
 
-        res.send(200);
+        item.id = id;
+        res.send(item);
       });
     }
   },
