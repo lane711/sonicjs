@@ -26,7 +26,6 @@ module.exports = proposalMainService = {
     let proposals = await dataService.getContentByContentType("proposal");
 
     const now = new Date().getTime();
-    console.log("non", now);
 
     proposals.map((p) => {
       p.data.ticks = new Date(p.data.expires).getTime();
