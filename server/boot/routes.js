@@ -39,6 +39,7 @@ const chalk = require("chalk");
 const log = console.log;
 const url = require("url");
 const fileService = require("../services/file.service");
+const {data} = require("jquery");
 var pageLoadedCount = 0;
 
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
@@ -243,6 +244,9 @@ exports.loadRoutesCatchAll = async function (app) {
     page.data.sessionID = req.sessionID;
     page.data.themeSettings.bootstrapToggleMiddle =
       page.data.themeSettings.bootstrapVersion == 4 ? "" : "bs-";
+
+      //add user data
+      page.data.user = req.session.passport?.user ? req.session.passport.user : {username: 'anon'};
 
     res.render(`front-end/${frontEndTheme}/layouts/main`, {
       layout: `front-end/${frontEndTheme}/${frontEndTheme}`,

@@ -193,6 +193,10 @@ module.exports = authService = {
       res.send({ user: req.user })
     );
 
+    app.get("/user-open", (req, res) =>
+    res.send({ user: req.user })
+  );
+
     app.get("/login", async function (req, res) {
       if (process.env.MODE !== "dev") {
         if (adminDomain !== req.host) {

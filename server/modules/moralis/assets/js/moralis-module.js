@@ -7,20 +7,26 @@ console.log("moralis started");
 
 /* Authentication code */
 async function moralisLogin() {
-    let user = Moralis.User.current();
-    if (!user) {
+  // debugger;
+    // let user = Moralis.User.current();
+    // if (user) {
+    //   //user already logged into moralis, now login to sonic
+    //   sonicLogin({username: user.id, password: user.id})
+    // } else{
       user = await Moralis.authenticate({
         signingMessage: "Log in using Moralis",
       })
-        .then(function (user) {
-          console.log("logged in user:", user);
-          console.log(user.get("ethAddress"));
-          sonicLogic(user);
+        .then(async function (user) {
+
+          await sonicRegister(user);
+          await sonicLogin({username: user.id, password: user.id});
+          location.reload();
+
         })
         .catch(function (error) {
           console.log('login error==>', error);
         });
-    }
+    // }
   }
 
   async function moralisLogOut() {
@@ -28,9 +34,16 @@ async function moralisLogin() {
     console.log("logged out");
   }
 
-  async function sonicLogic(user){
+  async function sonicRegister(user){
+    await axios.post(
+        '/api-admin/moralis-register',
+        user
+    )
+  }
+
+  async function sonicLogin(user){
     axios.post(
-        '/api-admin/moralis-login',
+        '/login',
         user
     )
   }

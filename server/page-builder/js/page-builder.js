@@ -758,31 +758,63 @@ async function openPageSettingsForm(action, contentType) {
   $("#pageSettingsModal").appendTo("body").modal("show");
 }
 
-async function openFormInModal(action, id) {
-  console.log(action, id);
+async function openFormInModal(action, contentType, id) {
+  await openEditForm(action, id);
+  await openCreateForm(action, contentType);
+}
 
-  let content = await dataService.getContentById(id);
-  let form = await formService.getForm(
-    content.contentTypeId,
-    content,
-    "await submitContent(submission);",
-    undefined,
-    undefined,
-    undefined
-  );
+async function openEditForm(action, id) {
+  if (action === "edit") {
+    let content = await dataService.getContentById(id);
+    let form = await formService.getForm(
+      content.contentTypeId,
+      content,
+      "await submitContent(submission);",
+      undefined,
+      undefined,
+      undefined
+    );
 
-  $("#genericModal .modal-title").text(
-    helperService.titleCase(`${action} ${content.contentTypeId}`)
-  );
+    $("#genericModal .modal-title").text(
+      helperService.titleCase(`${action} ${content.contentTypeId}`)
+    );
 
-  $("#formio").empty();
-  $("#formio").html(form);
+    $("#formio").empty();
+    $("#formio").html(form);
 
-  loadModuleSettingForm();
+    loadModuleSettingForm();
 
-  $('input[name="data[title]"').focus();
+    $('input[name="data[title]"').focus();
 
-  $("#genericModal").appendTo("body").modal("show");
+    $("#genericModal").appendTo("body").modal("show");
+  }
+}
+
+async function openCreateForm(action, contentType) {
+  if (action === "create") {
+    // let content = await dataService.getContentById(id);
+    let form = await formService.getForm(
+      contentType,
+      undefined,
+      "await submitContent(submission);",
+      undefined,
+      undefined,
+      undefined
+    );
+
+    $("#genericModal .modal-title").text(
+      helperService.titleCase(`${action} ${contentType}`)
+    );
+
+    $("#formio").empty();
+    $("#formio").html(form);
+
+    loadModuleSettingForm();
+
+    $('input[name="data[title]"').focus();
+
+    $("#genericModal").appendTo("body").modal("show");
+  }
 }
 
 async function setupPageSettings(action, contentType, sessionID) {

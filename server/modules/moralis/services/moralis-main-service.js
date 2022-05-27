@@ -37,20 +37,21 @@ module.exports = moralisMainService = {
     });
 
     if (app) {
-      app.post("/api-admin/moralis-login", async function (req, res) {
-        console.log("logging in user", req.body);
+      app.post("/api-admin/moralis-register", async function (req, res) {
+        console.log("registering user", req.body);
 
         let moralisUserId = req.body.objectId;
         let moralisUsername = req.body.username;
         let moralisEthAddress = req.body.ethAddress;
         let moralisSessionToken = req.body.sessionToken;
 
-        let user = await userService.registerUser(
-          moralisUsername,
-          moralisEthAddress
-        );
+        let user = await userService.registerUser(moralisUserId, moralisUserId);
+
+        //TODO: login user
+        // user must be loggedin before this can update
 
         //update user props
+
         if (user.profile.length < 3) {
           user.profile = {
             roles: ["member"],
@@ -59,6 +60,15 @@ module.exports = moralisMainService = {
           };
           await dalService.userUpdate(user, req.sessionID);
         }
+
+        req.session.returnTo = "/clubs";
+
+        res.send("ok");
+        return;
+      });
+
+      app.post("/api-admin/moralis-login", async function (req, res) {
+        console.log("registering user", req.body);
 
         res.send("ok");
         return;
