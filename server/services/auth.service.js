@@ -185,6 +185,23 @@ module.exports = authService = {
       })(req, res, next);
     });
 
+    app.post("/login-user", (req, res, next) => {
+
+      passport.authenticate("local", (err, user, info) => {
+        if (err) {
+          return next(err);
+        }
+
+        req.logIn(user, async function (err) {
+          if (err) {
+            console.error(err);
+            return next(err);
+          }
+          res.send(user);
+        });
+      })(req, res, next);
+    });
+
     app.get("/private", connectEnsureLogin.ensureLoggedIn(), (req, res) =>
       res.sendFile("html/private.html", { root: __dirname })
     );

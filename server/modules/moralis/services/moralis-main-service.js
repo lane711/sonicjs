@@ -47,32 +47,40 @@ module.exports = moralisMainService = {
 
         let user = await userService.registerUser(moralisUserId, moralisUserId);
 
-        //TODO: login user
-        // user must be loggedin before this can update
-
-        //update user props
-
-        if (user.profile.length < 3) {
-          user.profile = {
-            roles: ["member"],
-            moralisUserId: moralisUserId,
-            moralisEthAddress: moralisEthAddress,
-          };
-          await dalService.userUpdate(user, req.sessionID);
-        }
-
         req.session.returnTo = "/clubs";
 
         res.send("ok");
-        return;
       });
 
       app.post("/api-admin/moralis-login", async function (req, res) {
         console.log("registering user", req.body);
 
         res.send("ok");
-        return;
       });
+
+      app.post(
+        "/api-admin/moralis-register-finalize",
+        async function (req, res) {
+          // user must be logged in  before this can update
+          // update user props
+          let moralisUser = req.body.moralisUser;
+          let sonicUser = req.body.sonicUser.data;
+
+
+          if (Object.keys(sonicUser.profile).length === 0) {
+            sonicUser.profile = {
+              roles: ["member"],
+              moralisUserId: moralisUser.objectId,
+              moralisEthAddress: moralisUser.ethAddress,
+            };
+            await dalService.userUpdate(sonicUser, req.sessionID);
+          }
+
+          req.session.returnTo = "/clubs";
+
+          res.send("ok");
+        }
+      );
     }
   },
 };

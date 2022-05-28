@@ -24,14 +24,24 @@
           </li>
           {{/each}}
 
+          {{#if this.data.user.isAuthenticated}}
           <li class="nav-item">
-            <a href="#" class="btn btn-primary nav-link  text-dark moralis-metamask-login">Connect Your Wallet</a>
+            <div class="input-group mb-3">
+              <span class="input-group-text" id="basic-addon1">ETH 0.000</span>
+              <input type="text" class="form-control" placeholder="Username" value="{{ this.data.user.profile.moralisEthAddress}}" aria-label="Username" aria-describedby="basic-addon1">
+              <span class="input-group-text moralis-metamask-logout"><i class="bi bi-box-arrow-right"></i></span>
+            </div>
+            <!-- <a href="#" class="nav-link moralis-metamask-logout">Logout</a> -->
           </li>
+          {{else}}
+            <li class="nav-item">
+              <a href="#" class="btn btn-primary nav-link  text-dark moralis-metamask-login">Connect Your Wallet</a>
+            </li>
+          {{/if}}
 
-          <li class="nav-item">
-            <a href="#" class="nav-link moralis-metamask-logout">Logout</a>
-            u:{{ this.data.user.username}}
-          </li>
+        
+
+         
 
         </ul>
         <!-- <form class="d-flex">
