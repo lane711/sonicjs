@@ -642,42 +642,7 @@ async function createInstance(
   //   });
 }
 
-async function editInstance(payload, refresh, contentType = "content") {
-  // let id = payload.id;
-  // console.log("putting payload", payload);
-  // if (payload.id) {
-  //   delete payload.id;
-  // }
-  // if (payload.data && payload.data.id) {
-  //   id = payload.data.id;
-  //   delete payload.data.id;
-  // }
 
-  if (contentType === "user") {
-    contentType = "users";
-  }
-  // debugger;
-  dataService
-    .editInstance(payload, sessionID)
-    .then(async function (response) {
-      // debugger;
-      console.log("editInstance", response);
-      // resolve(response.data);
-      // return await response.data;
-      if (response.contentTypeId === "page" && !globalService.isBackEnd()) {
-        if (response.url) {
-          window.location.href = response.url;
-        } else {
-          fullPageUpdate();
-        }
-      } else if (refresh) {
-        fullPageUpdate();
-      }
-    })
-    .catch(function (error) {
-      console.log("editInstance", error);
-    });
-}
 
 async function editInstanceUser(payload, refresh, contentType = "content") {
   // let id = payload.id;
@@ -758,64 +723,7 @@ async function openPageSettingsForm(action, contentType) {
   $("#pageSettingsModal").appendTo("body").modal("show");
 }
 
-async function openFormInModal(action, contentType, id) {
-  await openEditForm(action, id);
-  await openCreateForm(action, contentType);
-}
 
-async function openEditForm(action, id) {
-  if (action === "edit") {
-    let content = await dataService.getContentById(id);
-    let form = await formService.getForm(
-      content.contentTypeId,
-      content,
-      "await submitContent(submission);",
-      undefined,
-      undefined,
-      undefined
-    );
-
-    $("#genericModal .modal-title").text(
-      helperService.titleCase(`${action} ${content.contentTypeId}`)
-    );
-
-    $("#formio").empty();
-    $("#formio").html(form);
-
-    loadModuleSettingForm();
-
-    $('input[name="data[title]"').focus();
-
-    $("#genericModal").appendTo("body").modal("show");
-  }
-}
-
-async function openCreateForm(action, contentType) {
-  if (action === "create") {
-    // let content = await dataService.getContentById(id);
-    let form = await formService.getForm(
-      contentType,
-      undefined,
-      "await submitContent(submission);",
-      undefined,
-      undefined,
-      undefined
-    );
-
-    $("#genericModal .modal-title").text(
-      helperService.titleCase(`${action} ${contentType}`)
-    );
-
-    $("#formio").empty();
-    $("#formio").html(form);
-
-    loadModuleSettingForm();
-
-    $('input[name="data[title]"').focus();
-
-    $("#genericModal").appendTo("body").modal("show");
-  }
-}
 
 async function setupPageSettings(action, contentType, sessionID) {
   console.log("setupPageSettings");
@@ -1540,41 +1448,7 @@ async function addModuleToColumn(submission) {
   fullPageUpdate();
 }
 
-async function submitContent(
-  submission,
-  refresh = true,
-  contentType = "content"
-) {
-  // debugger;
-  console.log("Submission was made!", submission);
-  let entity = submission.data ? submission.data : submission;
-  // if (!contentType.startsWith("user")) {
-  //   entity = processContentFields(submission.data);
-  // }
-  // if (contentType.toLowerCase().startsWith("role")) {
-  //   contentType = "Roles";
-  //   entity = submission.data;
-  // }
 
-  if (!contentType.startsWith("user")) {
-    if (submission.id || submission.data.id) {
-      await editInstance(entity, refresh, contentType);
-    } else {
-      await createInstance(entity, true, contentType);
-    }
-  } else {
-    entity.contentType = contentType;
-
-    let result = await axios({
-      method: "post",
-      url: "/form-submission",
-      data: {
-        data: entity,
-      },
-    });
-    fullPageUpdate();
-  }
-}
 
 // async function submitUser(submission, refresh = true) {
 //   // debugger;
@@ -1609,17 +1483,6 @@ async function postProcessNewContent(content) {
       mainMenu.data.links.push(menuItem);
       await editInstance(mainMenu);
     }
-  }
-}
-
-//TODO, make this just refresh the body content with a full get
-function fullPageUpdate(url = undefined) {
-  // debugger;
-  console.log("refreshing page");
-  if (url) {
-    window.location.replace(url);
-  } else {
-    location.reload();
   }
 }
 
@@ -1906,6 +1769,7 @@ function showSidePanel() {
 }
 
 function setupAdminMenuMinimizer() {
+  debugger;
   if (globalService.isBackEnd()) {
     return;
   }

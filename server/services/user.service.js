@@ -19,7 +19,7 @@ module.exports = userService = {
   startup: async function (app) {
     emitterService.on("getRenderedPagePostDataFetch", async function (options) {
       if (options) {
-        options.page.data.showPageBuilder = await userService.isAuthenticated(
+        options.page.data.showPageBuilder = await userService.canEditPages(
           options.req
         );
       }
@@ -158,6 +158,15 @@ module.exports = userService = {
   isAuthenticated: async function (req) {
     // console.log("user account", req.user);
     if (req.user && req.user.username) {
+      return true;
+    }
+    return false;
+  },
+
+  canEditPages: async function (req) {
+    // console.log("user account", req.user);
+    if (req.user && req.user.username 
+      && (req.user.profile.roles.includes("admin") || req.user.profile.roles.includes("page-editor"))) {
       return true;
     }
     return false;

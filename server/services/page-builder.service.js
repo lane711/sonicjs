@@ -6,6 +6,7 @@ const log = console.log;
 var emitterService = require("./emitter.service");
 var dataService = require("./data.service");
 var sharedService = require("./shared.service");
+const userService = require("./user.service");
 
 const apiUrl = "/api/";
 var pageContent = "";
@@ -19,7 +20,7 @@ module.exports = pageBuilderService = {
   startup: async function (app) {
     emitterService.on("getRenderedPagePostDataFetch", async function (options) {
       if (options) {
-        options.page.data.showPageBuilder = options.req.user ? true : false;
+        options.page.data.showPageBuilder =  await userService.canEditPages(options.req);
       }
     });
 

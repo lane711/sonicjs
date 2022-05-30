@@ -7,6 +7,7 @@ console.log("moralis started");
 
 async function moralisLogin() {
 
+  debugger;
   user = await Moralis.authenticate({
     signingMessage: "Log in using Moralis",
   })
