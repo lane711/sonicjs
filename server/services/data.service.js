@@ -182,15 +182,9 @@ if (typeof module !== "undefined" && module.exports) {
             id
             contentTypeId
             data
-            createdByUserId {
-              id
-              username
-            }
+            createdByUserId 
             createdOn
-            lastUpdatedByUserId {
-              id
-              username
-            }	
+            lastUpdatedByUserId
             updatedOn
           }
         }
@@ -440,6 +434,10 @@ if (typeof module !== "undefined" && module.exports) {
           id
           contentTypeId
           data
+          createdByUserId 
+          lastUpdatedByUserId
+          createdOn
+          updatedOn
         }
       }
     `;

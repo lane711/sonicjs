@@ -5,6 +5,10 @@ const moralisApiKey = process.env.REACT_APP_MORALIS_API_KEY;
 const axios = require("axios");
 const dalService = require("../../../services/dal.service");
 
+const serverUrl = process.env.MORALIS_SERVER_URL;
+const appId = process.env.MORALIS_APP_ID;
+const masterKey = process.env.MORALIS_MASTERKEY;
+
 module.exports = moralisMainService = {
   startup: async function (app) {
     emitterService.on("beginProcessModuleShortCode", async function (options) {
@@ -66,7 +70,6 @@ module.exports = moralisMainService = {
           let moralisUser = req.body.moralisUser;
           let sonicUser = req.body.sonicUser.data;
 
-
           if (Object.keys(sonicUser.profile).length === 0) {
             sonicUser.profile = {
               roles: ["member"],
@@ -81,6 +84,38 @@ module.exports = moralisMainService = {
           res.send("ok");
         }
       );
+
+      app.get("/api/moralis-nfts", async function (req, res) {
+        /* import moralis */
+        const Moralis = require("moralis/node");
+        const moralisEthAddress = req.user.profile.moralisEthAddress;
+
+        /* Moralis init code */
+
+        await Moralis.start({ serverUrl, appId, masterKey });
+
+        const userEthNFTs = await Moralis.Web3API.account.getNFTs({
+          address: moralisEthAddress,
+        });
+        console.log(userEthNFTs);
+
+        // get testnet NFTs for user
+        const testnetNFTs = await Moralis.Web3API.account.getNFTs({
+          chain: "ropsten",
+          address: moralisEthAddress,
+        });
+        console.log(testnetNFTs);
+
+        // get polygon NFTs for address
+        const options = {
+          chain: "polygon",
+          address: moralisEthAddress,
+        };
+        const polygonNFTs = await Moralis.Web3API.account.getNFTs(options);
+        console.log(polygonNFTs);
+
+        res.send(polygonNFTs);
+      });
     }
   },
 };

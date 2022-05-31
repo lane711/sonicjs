@@ -32,6 +32,7 @@ module.exports = proposalMainService = {
       p.data.remainingDays =
         moment(p.data.expires, "YYYYMMDD").fromNow(true) + " left to vote";
       p.data.preview = helperService.truncateString(p.data.body, 85);
+      proposalMainService.processPermissions(options, p);
     });
 
     proposals = _.sortBy(proposals, function (p) {
@@ -58,5 +59,22 @@ module.exports = proposalMainService = {
     options.viewModel.pendingProposals = proposals.filter(
       (p) => p.data.approved === false
     );
+  },
+
+  processPermissions: async function (options, item) {
+
+    item.data.canEdit = false;
+    item.data.canDelete = false;
+
+    let userRole = options.req.user.profile.roles[0];
+    let userId = options.req.user.id;
+
+    //create can always create/delete their own content
+    if(item.createdByUserId == userId){
+      item.data.canEdit = true;
+      item.data.canDelete = true;
+    }
+
+
   },
 };

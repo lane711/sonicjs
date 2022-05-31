@@ -570,77 +570,7 @@ async function getContentInstance(id) {
 //     });
 // }
 
-async function createInstance(
-  payload,
-  refresh = false,
-  contentType = "content"
-) {
-  // console.log('createInstance payload', payload);
-  // let content = {};
-  // content.data = payload;
-  // this.processContentFields(payload, content);
-  // debugger;
-  console.log("payload", payload);
-  if (payload.id || "id" in payload) {
-    delete payload.id;
-  }
 
-  if (!payload.data) {
-    let temp = { data: payload };
-    payload = temp;
-  }
-
-  if (contentType === "Roles") {
-    payload = payload.data;
-  }
-
-  // debugger;
-  let entity = await dataService.contentCreate(payload);
-
-  if (entity && entity.contentTypeId === "page") {
-    let isBackEnd = globalService.isBackEnd();
-    if (isBackEnd) {
-      window.location.href = `/admin/content/edit/page/${entity.id}`;
-    } else {
-      window.location.href = payload.data.url;
-    }
-  } else if (refresh) {
-    fullPageUpdate();
-  }
-
-  return entity;
-
-  // .then(async function (response) {
-  //   // debugger;
-  //   console.log("editInstance", response);
-  //   // resolve(response.data);
-  //   // return await response.data;
-  //   if (response.contentTypeId === "page" && !globalService.isBackEnd()) {
-  //     window.location.href = response.url;
-  //   } else if (refresh) {
-  //     fullPageUpdate();
-  //   }
-  // })
-  // .catch(function (error) {
-  //   console.log("editInstance", error);
-  // });
-  // return axiosInstance
-  //   .post(`/api/${contentType}/`, payload)
-  //   .then(async function (response) {
-  //     console.log(response);
-  //     // debugger;
-  //     if (response.data.data.contentType === "page") {
-  //       window.location.href = response.data.data.url;
-  //     } else if (refresh) {
-  //       fullPageUpdate();
-  //     }
-
-  //     return await response.data;
-  //   })
-  //   .catch(function (error) {
-  //     console.log(error);
-  //   });
-}
 
 
 
@@ -1769,7 +1699,6 @@ function showSidePanel() {
 }
 
 function setupAdminMenuMinimizer() {
-  debugger;
   if (globalService.isBackEnd()) {
     return;
   }
