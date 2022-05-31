@@ -26,19 +26,23 @@ module.exports = proposalMainService = {
     let proposals = await dataService.getContentByContentType("proposal");
 
     const now = new Date().getTime();
-    console.log("non", now);
 
     proposals.map((p) => {
       p.data.ticks = new Date(p.data.expires).getTime();
       p.data.remainingDays =
         moment(p.data.expires, "YYYYMMDD").fromNow(true) + " left to vote";
-      console.log(p.data.remainingDays);
       p.data.preview = helperService.truncateString(p.data.body, 85);
+      proposalMainService.processPermissions(options, p);
     });
 
     proposals = _.sortBy(proposals, function (p) {
       return p.data.ticks;
     });
+
+    options.viewModel.items = proposals;
+
+    //emit so we can talley votes
+    await emitterService.emit("postModuleGetData2", options);
 
     options.viewModel.openProposals = proposals.filter(
       (p) => p.data.approved && p.data.ticks > now
@@ -55,5 +59,22 @@ module.exports = proposalMainService = {
     options.viewModel.pendingProposals = proposals.filter(
       (p) => p.data.approved === false
     );
+  },
+
+  processPermissions: async function (options, item) {
+
+    item.data.canEdit = false;
+    item.data.canDelete = false;
+
+    let userRole = options.req.user.profile.roles[0];
+    let userId = options.req.user.id;
+
+    //create can always create/delete their own content
+    if(item.createdByUserId == userId){
+      item.data.canEdit = true;
+      item.data.canDelete = true;
+    }
+
+
   },
 };

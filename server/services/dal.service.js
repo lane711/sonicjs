@@ -27,7 +27,7 @@ module.exports = dalService = {
     user.contentTypeId = "user";
     user.profile.email = user.username;
 
-    if (id === session.user.id) {
+    if (id === session.user?.id) {
       return user;
     }
 

@@ -5,6 +5,10 @@ const moralisApiKey = process.env.REACT_APP_MORALIS_API_KEY;
 const axios = require("axios");
 const dalService = require("../../../services/dal.service");
 
+const serverUrl = process.env.MORALIS_SERVER_URL;
+const appId = process.env.MORALIS_APP_ID;
+const masterKey = process.env.MORALIS_MASTERKEY;
+
 module.exports = moralisMainService = {
   startup: async function (app) {
     emitterService.on("beginProcessModuleShortCode", async function (options) {
@@ -15,7 +19,6 @@ module.exports = moralisMainService = {
     });
 
     emitterService.on("formComponentsLoaded", async function (contentType) {
-      console.log("adding group id: ", contentType.systemId);
       if (contentType.systemId === "user") {
         contentType.data.components.splice(-1, 0, {
           type: "textfield",
@@ -38,31 +41,80 @@ module.exports = moralisMainService = {
     });
 
     if (app) {
-      app.post("/api-admin/moralis-login", async function (req, res) {
-        console.log("logging in user", req.body);
+      app.post("/api-admin/moralis-register", async function (req, res) {
+        console.log("registering user", req.body);
 
         let moralisUserId = req.body.objectId;
         let moralisUsername = req.body.username;
         let moralisEthAddress = req.body.ethAddress;
         let moralisSessionToken = req.body.sessionToken;
 
-        let user = await userService.registerUser(
-          moralisUsername,
-          moralisEthAddress
-        );
+        let user = await userService.registerUser(moralisUserId, moralisUserId);
 
-        //update user props
-        if (user.profile.length < 3) {
-          user.profile = {
-            roles: ["member"],
-            moralisUserId: moralisUserId,
-            moralisEthAddress: moralisEthAddress,
-          };
-          await dalService.userUpdate(user, req.sessionID);
-        }
+        req.session.returnTo = "/clubs";
 
         res.send("ok");
-        return;
+      });
+
+      app.post("/api-admin/moralis-login", async function (req, res) {
+        console.log("registering user", req.body);
+
+        res.send("ok");
+      });
+
+      app.post(
+        "/api-admin/moralis-register-finalize",
+        async function (req, res) {
+          // user must be logged in  before this can update
+          // update user props
+          let moralisUser = req.body.moralisUser;
+          let sonicUser = req.body.sonicUser.data;
+
+          if (Object.keys(sonicUser.profile).length === 0) {
+            sonicUser.profile = {
+              roles: ["member"],
+              moralisUserId: moralisUser.objectId,
+              moralisEthAddress: moralisUser.ethAddress,
+            };
+            await dalService.userUpdate(sonicUser, req.sessionID);
+          }
+
+          req.session.returnTo = "/clubs";
+
+          res.send("ok");
+        }
+      );
+
+      app.get("/api/moralis-nfts", async function (req, res) {
+        /* import moralis */
+        const Moralis = require("moralis/node");
+        const moralisEthAddress = req.user.profile.moralisEthAddress;
+
+        /* Moralis init code */
+
+        await Moralis.start({ serverUrl, appId, masterKey });
+
+        const userEthNFTs = await Moralis.Web3API.account.getNFTs({
+          address: moralisEthAddress,
+        });
+        console.log(userEthNFTs);
+
+        // get testnet NFTs for user
+        const testnetNFTs = await Moralis.Web3API.account.getNFTs({
+          chain: "ropsten",
+          address: moralisEthAddress,
+        });
+        console.log(testnetNFTs);
+
+        // get polygon NFTs for address
+        const options = {
+          chain: "polygon",
+          address: moralisEthAddress,
+        };
+        const polygonNFTs = await Moralis.Web3API.account.getNFTs(options);
+        console.log(polygonNFTs);
+
+        res.send(polygonNFTs);
       });
     }
   },

@@ -2,7 +2,7 @@
   "title": "Group",
   "enabled": true,
   "systemId": "group",
-  "canBeAddedToColumn": false,
+  "canBeAddedToColumn": true,
   "singleInstance": true,
   "version": "0.0.0.1"
 }

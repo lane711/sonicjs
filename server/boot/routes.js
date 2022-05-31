@@ -244,6 +244,10 @@ exports.loadRoutesCatchAll = async function (app) {
     page.data.themeSettings.bootstrapToggleMiddle =
       page.data.themeSettings.bootstrapVersion == 4 ? "" : "bs-";
 
+      //add user data
+      page.data.user = req.user ? req.user : {username: 'anon'};
+      page.data.user.isAuthenticated =  req.user ? true: false;
+
     res.render(`front-end/${frontEndTheme}/layouts/main`, {
       layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
       data: page.data,

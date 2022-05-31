@@ -5,3 +5,7 @@ main {
 .menu-module .nav-item a{
     color: #FFCB05;
 }
+
+.modal-content{
+    background-color: #000;
+}

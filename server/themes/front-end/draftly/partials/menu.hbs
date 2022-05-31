@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">{{> menu-logo }}</a>
+      <a class="navbar-brand" href="/">{{> menu-logo }}</a>
       <button class="navbar-toggler" type="button" data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -24,19 +24,22 @@
           </li>
           {{/each}}
 
-          <li class="nav-item">
-            <a href="#" class="nav-link moralis-metamask-login">Meta Login</a>
-          </li>
 
-          <li class="nav-item">
-            <a href="#" class="nav-link moralis-metamask-logout">Logout</a>
-          </li>
 
         </ul>
-        <!-- <form class="d-flex">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form> -->
+        <form class="d-flex">
+
+          {{#if this.data.user.isAuthenticated}}
+            <div class="input-group me-2">
+              <span class="input-group-text" id="basic-addon1">ETH 0.000</span>
+              <input type="text" class="form-control" placeholder="Username" value="{{ this.data.user.profile.moralisEthAddress}}" aria-label="Username" aria-describedby="basic-addon1">
+              <span class="input-group-text moralis-metamask-logout"><i class="bi bi-box-arrow-right"></i></span>
+            </div>
+          {{else}}
+              <a href="#" class="btn btn-primary nav-link  text-dark moralis-metamask-login">Connect Your Wallet</a>
+          {{/if}}
+
+        </form>
       </div>
     </div>
   </nav>

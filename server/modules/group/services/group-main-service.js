@@ -29,5 +29,12 @@ module.exports = groupMainService = {
         });
       }
     });
+
+    emitterService.on("postModuleGetData", async function (options) {
+      if (options.shortcode.name === "GROUP") {
+        let list = await dataService.getContentByContentType('group');
+        options.viewModel.data.list = list;
+      }
+    });
   },
 };

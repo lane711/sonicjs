@@ -89,18 +89,8 @@ const ContentType = new GraphQLObjectType({
     url: { type: GraphQLString },
     createdOn: { type: GraphQLJSONObject },
     updatedOn: { type: GraphQLJSONObject },
-    createdByUserId: {
-      type: UserType,
-      resolve(parent, args) {
-        return User.findById(parent.userId);
-      },
-    },
-    lastUpdatedByUserId: {
-      type: UserType,
-      resolve(parent, args) {
-        return User.findById(parent.userId);
-      },
-    },
+    createdByUserId:  { type: GraphQLString },
+    lastUpdatedByUserId:  { type: GraphQLString },
   }),
 });
 
