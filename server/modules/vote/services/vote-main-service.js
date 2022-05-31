@@ -75,17 +75,17 @@ module.exports = voteMainService = {
           voteDowns = 0;
         if (item.data.votes) {
           voteScore = item.data.votes.reduce((s, f) => {
-            return s + f.vote; // return the sum of the accumulator and the current time, as the the new accumulator
+            return s + f.vote; 
           }, 0);
           voteUps = item.data.votes
             .filter((v) => v.vote === 1)
             .reduce((s, f) => {
-              return s + f.vote; // return the sum of the accumulator and the current time, as the the new accumulator
+              return s + f.vote;
             }, 0);
           voteDowns = item.data.votes
             .filter((v) => v.vote === -1)
             .reduce((s, f) => {
-              return s + f.vote; // return the sum of the accumulator and the current time, as the the new accumulator
+              return s + f.vote; 
             }, 0);
         }
         item.data.voteScore = voteScore;
@@ -101,13 +101,3 @@ module.exports = voteMainService = {
   },
 };
 
-// app.post("/form-submission", async function (req, res) {
-//     let payload = req.body.data ? req.body.data : req.body.data.data ;
-
-//     if (payload) {
-//       let options = { data: payload, sessionID: req.sessionID };
-
-//       await emitterService.emit("afterFormSubmit", options);
-//       res.sendStatus(200);
-//     }
-//   });

@@ -39,7 +39,6 @@ const chalk = require("chalk");
 const log = console.log;
 const url = require("url");
 const fileService = require("../services/file.service");
-const {data} = require("jquery");
 var pageLoadedCount = 0;
 
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
