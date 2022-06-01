@@ -1,1 +1,33 @@
-<div>Hello to you {{ data.firstName }} from the Group module!</div>
+<h1>My Clubhouses</h1>
+
+<div class="row">
+  {{#each data.myGroups}}
+  <div class="col-md-4">
+    <div class="card bg-dark">
+      <img src="{{data.icon.src}}" class="card-img-top" />
+      <div class="card-body">
+        <p class="card-text">
+          <a href="{{data.url}}" class="stretched-link">{{data.title}}</a>
+        </p>
+      </div>
+    </div>
+  </div>
+  {{/each}}
+</div>
+
+<h1>All Clubhouses</h1>
+
+<div class="row">
+  {{#each data.list}}
+    <div class="col-md-4">
+      <div class="card bg-dark">
+        <img src="{{data.icon.src}}" class="card-img-top" />
+        <div class="card-body">
+          <p class="card-text">
+            <a href="{{data.url}}" class="stretched-link">{{data.title}}</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  {{/each}}
+</div>

@@ -4,6 +4,7 @@ var globalService = require("../../../services/global.service");
 const moralisApiKey = process.env.REACT_APP_MORALIS_API_KEY;
 const axios = require("axios");
 const dalService = require("../../../services/dal.service");
+const helperService = require("../../../services/helper.service");
 
 const serverUrl = process.env.MORALIS_SERVER_URL;
 const appId = process.env.MORALIS_APP_ID;
@@ -11,6 +12,9 @@ const masterKey = process.env.MORALIS_MASTERKEY;
 
 module.exports = moralisMainService = {
   startup: async function (app) {
+    const Moralis = require("moralis/node");
+    await Moralis.start({ serverUrl, appId, masterKey });
+
     emitterService.on("beginProcessModuleShortCode", async function (options) {
       if (options.shortcode.name === "MORALIS") {
         options.moduleName = "moralis";
@@ -37,6 +41,60 @@ module.exports = moralisMainService = {
           hidden: false,
           input: true,
         });
+      }
+    });
+
+    emitterService.on("getMyNFTs", async function (options) {
+      const moralisEthAddress = options.req.user.profile.moralisEthAddress;
+
+      if (moralisEthAddress) {
+        const mynfts = await Moralis.Web3API.account.getNFTs({
+          chain: "polygon",
+          address: moralisEthAddress,
+        });
+        // <img class="img-fluid" src="https://ipfs.io/ipfs/QmQqzMTavQgT4f4T5v6PWBp7XNKtoPmC9jvn12WPT3gkSE" />
+        // image:'ipfs://Qmc79kfRBVypni4ZwcnqctY9ATeMc4dT9iKFRboktWqsg7'
+
+        mynfts.result.map((n) => {
+          n.data = JSON.parse(n.metadata);
+          n.imageUrl =
+            "https://ipfs.io/ipfs/" + n.data.image.split("ipfs://")[1];
+          n.data.descriptionPreview = helperService.truncateString(n.data.description, 100);
+        });
+
+        options.viewModel.mynfts = mynfts.result;
+      }
+    });
+
+    emitterService.on("getNFTs", async function (options) {
+      let collections = process.env.MORALIS_NFT_COLLECTIONS.split(",");
+      let nfts = [];
+
+      await Promise.all(
+        collections.map(async (c) => {
+          let collectionNfts = await Moralis.Web3API.token.getAllTokenIds({
+            address: c,
+            chain: "polygon",
+          });
+          nfts.push(...collectionNfts.result);
+        })
+      );
+
+      nfts.map((n) => {
+        return (n.data = JSON.parse(n.metadata));
+      });
+      options.nfts = nfts;
+    });
+
+    emitterService.on("viewPostModuleGetData", async function (options) {
+      let viewSettings = options.viewModel.data;
+      if (
+        viewSettings.limitToCurrentUser &&
+        viewSettings.limitToCurrentGroup &&
+        viewSettings.contentTypeToLoad === "nft"
+      ) {
+        let x;
+        await emitterService.emit("getMyNFTs", options);
       }
     });
 
@@ -87,12 +145,10 @@ module.exports = moralisMainService = {
 
       app.get("/api/moralis-nfts", async function (req, res) {
         /* import moralis */
-        const Moralis = require("moralis/node");
+
         const moralisEthAddress = req.user.profile.moralisEthAddress;
 
         /* Moralis init code */
-
-        await Moralis.start({ serverUrl, appId, masterKey });
 
         const userEthNFTs = await Moralis.Web3API.account.getNFTs({
           address: moralisEthAddress,
