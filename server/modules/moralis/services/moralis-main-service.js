@@ -93,7 +93,6 @@ module.exports = moralisMainService = {
         viewSettings.limitToCurrentGroup &&
         viewSettings.contentTypeToLoad === "nft"
       ) {
-        let x;
         await emitterService.emit("getMyNFTs", options);
       }
     });
