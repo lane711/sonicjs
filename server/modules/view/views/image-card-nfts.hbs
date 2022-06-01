@@ -1,0 +1,9 @@
+<div class="row">
+{{#each mynfts}}
+  <div class="col-md-3 text-{{../data.textJustification}}">
+    <img class="img-fluid" src="{{this.imageUrl}}" />
+    <h3>{{this.data.name}}</h3>
+    {{{this.data.descriptionPreview}}}
+  </div>
+{{/each}}
+</div>

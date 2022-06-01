@@ -23,6 +23,7 @@ module.exports = viewMainService = {
         options.viewPath = dynamicView
           ? `server/modules/view/views/${dynamicView}`
           : "server/modules/view/views/text-card.hbs";
+          await emitterService.emit("viewPostModuleGetData", options);
       }
     });
 

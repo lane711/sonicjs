@@ -5,6 +5,15 @@ const appId = "OvJO9vCe1pwwLSXDQFT4nf2oQgzZyiI9aOvaCBt0";
 Moralis.start({ serverUrl, appId });
 console.log("moralis started");
 
+// !async function(){
+//   const options = {
+//     address: "0x772770fA1ce3196A1c895Fbe49a634dCe758D87d",
+//     chain: "polygon",
+//   };
+//   const NFTs = await Moralis.Web3API.token.getAllTokenIds(options);
+//   console.log(NFTs);
+// }();
+
 
 async function moralisLogin() {
 

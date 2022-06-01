@@ -5,7 +5,6 @@ const { Session } = require("../data/model/Session");
 const emitterService = require("../services/emitter.service");
 
 const crypto = require("crypto");
-const { contentDelete } = require("./data.service");
 const { v4: uuidv4 } = require("uuid");
 const verboseLogging = process.env.APP_LOGGING === "verbose";
 
