@@ -1,4 +1,5 @@
 <div class="row">
+  {{#if hasNFTInGroup }}
 {{#each mynfts}}
   <div class="col-md-3 text-{{../data.textJustification}}">
     <img class="img-fluid" src="{{this.imageUrl}}" />
@@ -6,4 +7,9 @@
     {{{this.data.descriptionPreview}}}
   </div>
 {{/each}}
+{{else}}
+<h1>Oops...</h1>
+<p>It looks like you don’t own any Draftly or Clubhouse NFTs. Click below to buy an NFT + join the clubhouse.</p>
+<h3>See our lates NFT drop</h3>
+{{/if}}
 </div>

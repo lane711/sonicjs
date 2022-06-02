@@ -93,7 +93,13 @@ module.exports = moralisMainService = {
         viewSettings.limitToCurrentGroup &&
         viewSettings.contentTypeToLoad === "nft"
       ) {
+        options.viewModel.group = await dataService.getContentByUrl(options.req.originalUrl);
+        options.viewModel.groups = await dataService.getContentByContentType("group");
         await emitterService.emit("getMyNFTs", options);
+        await groupMainService.getMyGroups(options);
+
+        //is nft in current group?
+        options.viewModel.hasNFTInGroup = options.viewModel.myGroups.find((g)=> g.id === options.viewModel.group.id) ? true : false;
       }
     });
 

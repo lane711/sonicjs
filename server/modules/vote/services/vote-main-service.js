@@ -47,7 +47,6 @@ module.exports = voteMainService = {
         const { id, vote } = req.body;
         const sessionID = req.sessionID;
         let user = req.session.passport.user.id;
-        console.log("voting in user", req.body);
 
         const now = new Date().getTime();
         let item = await dataService.getContentById(id);

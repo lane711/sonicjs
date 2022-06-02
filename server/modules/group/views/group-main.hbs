@@ -1,7 +1,7 @@
 <h1>My Clubhouses</h1>
 
 <div class="row">
-  {{#each data.myGroups}}
+  {{#each myGroups}}
   <div class="col-md-4">
     <div class="card bg-dark">
       <img src="{{data.icon.src}}" class="card-img-top" />
@@ -18,7 +18,7 @@
 <h1>All Clubhouses</h1>
 
 <div class="row">
-  {{#each data.list}}
+  {{#each groups}}
     <div class="col-md-4">
       <div class="card bg-dark">
         <img src="{{data.icon.src}}" class="card-img-top" />

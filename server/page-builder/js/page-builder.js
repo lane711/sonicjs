@@ -1,7 +1,6 @@
 var page = {};
 var contentType;
 var contentTypeComponents;
-var axiosInstance;
 
 var imageList,
   tinyImageList,
@@ -23,7 +22,6 @@ var imageList,
 $(document).ready(async function () {
   setupSessionID();
   setupThemeID();
-  await setupAxiosInstance();
   setupUIHovers();
   setupUIClicks();
   setupClickEvents();
@@ -47,20 +45,6 @@ function setupSessionID() {
 
 function setupThemeID() {
   theme = $("#theme").val();
-}
-
-async function setupAxiosInstance() {
-  let baseUrl = window.location.protocol + "//" + window.location.host + "/";
-  let token = $("#token").val();
-
-  const defaultOptions = {
-    headers: {
-      Authorization: `${token}`,
-    },
-    baseUrl: baseUrl,
-  };
-
-  axiosInstance = axios.create(defaultOptions);
 }
 
 async function setPage() {
