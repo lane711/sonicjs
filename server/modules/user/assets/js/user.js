@@ -1,9 +1,25 @@
 /* user module for loggedin users */
 var sessionID;
+var axiosInstance;
 
 $(document).ready(async function () {
   setupSessionID();
+  await setupAxiosInstance();
 });
+
+async function setupAxiosInstance() {
+  let baseUrl = window.location.protocol + "//" + window.location.host + "/";
+  let token = $("#token").val();
+
+  const defaultOptions = {
+    headers: {
+      Authorization: `${token}`,
+    },
+    baseUrl: baseUrl,
+  };
+
+  axiosInstance = axios.create(defaultOptions);
+}
 
 function setupSessionID() {
   sessionID = $("#sessionID").val();

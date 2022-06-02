@@ -66,8 +66,8 @@ module.exports = proposalMainService = {
     item.data.canEdit = false;
     item.data.canDelete = false;
 
-    let userRole = options.req.user.profile.roles[0];
-    let userId = options.req.user.id;
+    let userRole = options.req.user?.profile.roles[0];
+    let userId = options.req.user?.id;
 
     //create can always create/delete their own content
     if(item.createdByUserId == userId){

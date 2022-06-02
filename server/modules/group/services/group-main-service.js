@@ -36,8 +36,8 @@ module.exports = groupMainService = {
 
     emitterService.on("postModuleGetData", async function (options) {
       if (options.shortcode.name === "GROUP") {
-        let list = await dataService.getContentByContentType("group");
-        options.viewModel.data.list = list;
+        let groups = await dataService.getContentByContentType("group");
+        options.viewModel.groups = groups;
 
         await emitterService.emit("getNFTs", options.viewModel.data);
 
@@ -49,10 +49,9 @@ module.exports = groupMainService = {
   },
 
   getMyGroups: async function (options) {
-    var isInList = _.intersection([1, 2, 3], [4, 1]).length !== 0;
-    let myGroups = [];
+    options.viewModel.myGroups = [];
 
-    options.viewModel.data.list.map((g) => {
+    options.viewModel.groups.map((g) => {
       let groupNfts = g.data.nfTs.map((nft) => {
         return nft.nftTokenHash;
       });
@@ -66,9 +65,8 @@ module.exports = groupMainService = {
       userHasNftInGroup = _.intersection(groupNfts, myNfts).length !== 0;
 
       if (userHasNftInGroup) {
-        myGroups.push(g);
+        options.viewModel.myGroups.push(g);
       }
     });
-    options.viewModel.data.myGroups = myGroups;
   },
 };
