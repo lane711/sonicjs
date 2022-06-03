@@ -66,6 +66,10 @@ module.exports = proposalMainService = {
     item.data.canEdit = false;
     item.data.canDelete = false;
 
+    if(!options.req.user || !options.req.user?.profile.roles){
+      return;
+    }
+    
     let userRole = options.req.user?.profile.roles[0];
     let userId = options.req.user?.id;
 

@@ -45,24 +45,33 @@ module.exports = moralisMainService = {
     });
 
     emitterService.on("getMyNFTs", async function (options) {
-      const moralisEthAddress = options.req.user.profile.moralisEthAddress;
+      if (options.req.user) {
+        const moralisEthAddress = options.req.user.profile.moralisEthAddress;
 
-      if (moralisEthAddress) {
-        const mynfts = await Moralis.Web3API.account.getNFTs({
-          chain: "polygon",
-          address: moralisEthAddress,
-        });
-        // <img class="img-fluid" src="https://ipfs.io/ipfs/QmQqzMTavQgT4f4T5v6PWBp7XNKtoPmC9jvn12WPT3gkSE" />
-        // image:'ipfs://Qmc79kfRBVypni4ZwcnqctY9ATeMc4dT9iKFRboktWqsg7'
+        if (moralisEthAddress) {
+          const mynfts = await Moralis.Web3API.account.getNFTs({
+            chain: "polygon",
+            address: moralisEthAddress,
+          });
 
-        mynfts.result.map((n) => {
-          n.data = JSON.parse(n.metadata);
-          n.imageUrl =
-            "https://ipfs.io/ipfs/" + n.data.image.split("ipfs://")[1];
-          n.data.descriptionPreview = helperService.truncateString(n.data.description, 100);
-        });
+          let nfts = [];
+          mynfts.result.map((n) => {
+            if (n.metadata) {
+              n.data = JSON.parse(n.metadata);
+              n.imageUrl =
+                "https://ipfs.io/ipfs/" + n.data.image.split("ipfs://")[1];
+              n.data.descriptionPreview = helperService.truncateString(
+                n.data.description,
+                100
+              );
+              nfts.push(n);
+            }else{
+              console.error('error: could not parse metadata for ', n);
+            }
+          });
 
-        options.viewModel.mynfts = mynfts.result;
+          options.viewModel.mynfts = nfts;
+        }
       }
     });
 
@@ -93,13 +102,21 @@ module.exports = moralisMainService = {
         viewSettings.limitToCurrentGroup &&
         viewSettings.contentTypeToLoad === "nft"
       ) {
-        options.viewModel.group = await dataService.getContentByUrl(options.req.originalUrl);
-        options.viewModel.groups = await dataService.getContentByContentType("group");
+        options.viewModel.group = await dataService.getContentByUrl(
+          options.req.originalUrl
+        );
+        options.viewModel.groups = await dataService.getContentByContentType(
+          "group"
+        );
         await emitterService.emit("getMyNFTs", options);
         await groupMainService.getMyGroups(options);
 
         //is nft in current group?
-        options.viewModel.hasNFTInGroup = options.viewModel.myGroups.find((g)=> g.id === options.viewModel.group.id) ? true : false;
+        options.viewModel.hasNFTInGroup = options.viewModel.myGroups.find(
+          (g) => g.id === options.viewModel.group.id
+        )
+          ? true
+          : false;
       }
     });
 
