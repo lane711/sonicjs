@@ -165,7 +165,7 @@ module.exports = userService = {
 
   canEditPages: async function (req) {
     // console.log("user account", req.user);
-    if (req.user && req.user.username 
+    if (req.user && req.user.username && req.user.profile.roles
       && (req.user.profile.roles.includes("admin") || req.user.profile.roles.includes("page-editor"))) {
       return true;
     }

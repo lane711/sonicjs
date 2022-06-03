@@ -17,7 +17,6 @@ console.log("moralis started");
 
 async function moralisLogin() {
 
-  debugger;
   user = await Moralis.authenticate({
     signingMessage: "Log in using Moralis",
   })
@@ -25,6 +24,10 @@ async function moralisLogin() {
       await sonicRegister(moralisUser);
       const sonicUser = await sonicLogin({ username: moralisUser.id, password: moralisUser.id });
       await sonicRegisterFinalize({moralisUser, sonicUser});
+      //TODO: this could be streamlined. needing to logout, then back in so that profile data tied to passport session
+      await axios.get("/logout");
+      await sonicLogin({ username: moralisUser.id, password: moralisUser.id });
+
       location.reload();
     })
     .catch(function (error) {
@@ -40,14 +43,14 @@ async function moralisLogOut() {
 }
 
 async function sonicRegister(user) {
-  await axios.post("/api-admin/moralis-register", user);
+  return axios.post("/api-admin/moralis-register", user);
 }
 async function sonicRegisterFinalize(user) {
-  await axios.post("/api-admin/moralis-register-finalize", user);
+  return axios.post("/api-admin/moralis-register-finalize", user);
 }
 
 async function sonicLogin(user) {
-  return await axios.post("/login-user", user);
+  return axios.post("/login-user", user);
 }
 
 $(document).ready(async function () {

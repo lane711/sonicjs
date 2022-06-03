@@ -44,6 +44,9 @@ module.exports = voteMainService = {
 
     if (app) {
       app.post("/vote-api", async function (req, res) {
+        if(!req.session.passport){
+          return;
+        }
         const { id, vote } = req.body;
         const sessionID = req.sessionID;
         let user = req.session.passport.user.id;

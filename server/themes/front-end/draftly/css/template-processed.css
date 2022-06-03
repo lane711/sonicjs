@@ -9,3 +9,7 @@ main {
 .modal-content{
     background-color: #000;
 }
+
+.moralis-metamask-logout:hover{
+    cursor: pointer;
+}
