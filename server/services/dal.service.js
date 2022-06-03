@@ -355,17 +355,18 @@ module.exports = dalService = {
       userSession
     );
 
-    let rolesThatCanDelete =
-      contentType.permissions?.mappings.find((p) => p.delete) ?? "admin";
-      if(rolesThatCanDelete.delete.includes(',')){
-        rolesThatCanDelete = rolesThatCanDelete.delete.split(',');
-      }else{
-        rolesThatCanDelete = [rolesThatCanDelete];
-      }
+    let rolesThatCanDelete = contentType.permissions?.mappings.find(
+      (p) => p.delete
+    ) ?? { delete: "admin" };
+    if (rolesThatCanDelete && rolesThatCanDelete.delete.includes(",")) {
+      rolesThatCanDelete = rolesThatCanDelete.delete.split(",");
+    } else {
+      rolesThatCanDelete = [rolesThatCanDelete.delete];
+    }
     const userRoles = userSession.user.profile.roles;
 
-    const canDelete = _.intersection(rolesThatCanDelete, userRoles).length !== 0;
-
+    const canDelete =
+      _.intersection(rolesThatCanDelete, userRoles).length !== 0;
 
     if (canDelete) {
       const contentRepo = await getRepository(Content);
