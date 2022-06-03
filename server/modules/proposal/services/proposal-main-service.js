@@ -20,6 +20,32 @@ module.exports = proposalMainService = {
         await proposalMainService.getViewData(options);
       }
     });
+
+    emitterService.on(
+      "formComponentsLoaded",
+      async function (contentType, content) {
+        if (contentType.systemId === "proposal") {
+          const groupContentTypes = await dataService.getContentTopOne(
+            "group-site-settings"
+          );
+        }
+
+        // if (
+        //   groupContentTypes.data.applyToContentTypes.includes(
+        //     contentType.systemId
+        //   )
+        // ) {
+        //   contentType.data.components.splice(-1, 0, {
+        //     type: "textfield",
+        //     inputType: "text",
+        //     key: "groupId",
+        //     label: "Group",
+        //     hidden: false,
+        //     input: true,
+        //   });
+        // }
+      }
+    );
   },
 
   getViewData: async function (options) {
@@ -32,7 +58,7 @@ module.exports = proposalMainService = {
       p.data.remainingDays =
         moment(p.data.expires, "YYYYMMDD").fromNow(true) + " left to vote";
       p.data.preview = helperService.truncateString(p.data.body, 85);
-      proposalMainService.processPermissions(options, p);
+      // proposalMainService.processItemPermissions(options, p);
     });
 
     proposals = _.sortBy(proposals, function (p) {
@@ -48,10 +74,6 @@ module.exports = proposalMainService = {
       (p) => p.data.approved && p.data.ticks > now
     );
 
-    // proposals.map((p) => {
-    //     console.log(p.data.ticks, p.data.expires);
-    //   });
-
     options.viewModel.closedProposals = proposals.filter(
       (p) => p.data.ticks < now
     );
@@ -59,26 +81,71 @@ module.exports = proposalMainService = {
     options.viewModel.pendingProposals = proposals.filter(
       (p) => p.data.approved === false
     );
+
+    await proposalMainService.processPagePermissions(options);
   },
 
-  processPermissions: async function (options, item) {
+  processPagePermissions: async function (options) {
+    //add new or review proposal permissions
+    options.viewModel.canAdd = false;
+    options.viewModel.canReview = false;
+    options.viewModel.canEdit = false;
+    options.viewModel.canVote = false;
 
-    item.data.canEdit = false;
-    item.data.canDelete = false;
-
-    if(!options.req.user || !options.req.user?.profile.roles){
-      return;
-    }
-    
     let userRole = options.req.user?.profile.roles[0];
-    let userId = options.req.user?.id;
-
-    //create can always create/delete their own content
-    if(item.createdByUserId == userId){
-      item.data.canEdit = true;
-      item.data.canDelete = true;
+    if (userRole === "communityAdmin" || userRole === "clubAdmin") {
+      options.viewModel.canAdd = true;
+      options.viewModel.canReview = true;
+      options.viewModel.canEdit = true;
+      options.viewModel.canVote = true;
     }
 
-
+    if (userRole === "gm") {
+      options.viewModel.canVote = true;
+    }
   },
+
+  // processItemPermissions: async function (options, item) {
+  //   item.data.canEdit = false;
+  //   item.data.canDelete = false;
+  //   item.data.canVote = false;
+
+  //   if (!options.req.user || !options.req.user?.profile.roles) {
+  //     return;
+  //   }
+
+  //   let userRole = options.req.user?.profile.roles[0];
+  //   let userId = options.req.user?.id;
+
+  //   // member,
+  //   // gm,
+  //   // clubAdmin,
+  //   // communityAdmin
+
+  //   //     Draftly Admin - I am able to perform CRUD for any clubhouse in Draftly Ecosystem
+  //   // Clubhouse Admin - I am able to perform CRUD only on proposals my clubhouse on Draftly; I am a more privileged Clubhouse gm
+  //   // Clubhouse governance member (gm) - I am able to create and edit proposals ( that I have created) in the clubhouse I hold a governance token for
+  //   // Clubhouse member - I am not able to perform any CRUD options on Proposals
+
+  //   //member permissions
+  //   if (userRole == "communityAdmin") {
+  //     //applies to all clubs
+  //     item.data.canEdit = true;
+  //     item.data.canDelete = true;
+  //     item.data.canVote = true;
+  //   }
+
+  //   if (userRole == "clubAdmin") {
+  //     //applies only to assigned clubs
+  //     item.data.canEdit = true;
+  //     item.data.canDelete = true;
+  //     item.data.canVote = true;
+  //   }
+
+  //   //create can always create/delete their own content
+  //   if (item.createdByUserId == userId) {
+  //     item.data.canEdit = true;
+  //     item.data.canDelete = true;
+  //   }
+  // },
 };

@@ -6,6 +6,7 @@ const emitterService = require("../services/emitter.service");
 
 const crypto = require("crypto");
 const { v4: uuidv4 } = require("uuid");
+const _ = require("underscore");
 const verboseLogging = process.env.APP_LOGGING === "verbose";
 
 module.exports = dalService = {
@@ -205,7 +206,7 @@ module.exports = dalService = {
       return content;
     } else if (group) {
       contents = await contentRepo.find({
-        contentTypeId : contentTypeId,
+        contentTypeId: contentTypeId,
         data: Like(`%${group}%`),
       });
       // contents = await contentRepo.find({
@@ -346,8 +347,28 @@ module.exports = dalService = {
   },
 
   contentDelete: async function (id, userSession) {
-    const contentRepo = await getRepository(Content);
-    if (userSession.user.profile.roles.includes("admin")) {
+    // emitterService.emit('preContentDeleteCheck', {id, userSession})
+    //lookup content type, check permissions
+    const content = await this.contentGet(id);
+    const contentType = await moduleService.getModuleContentTypeRaw(
+      content.contentTypeId,
+      userSession
+    );
+
+    let rolesThatCanDelete =
+      contentType.permissions?.mappings.find((p) => p.delete) ?? "admin";
+      if(rolesThatCanDelete.delete.includes(',')){
+        rolesThatCanDelete = rolesThatCanDelete.delete.split(',');
+      }else{
+        rolesThatCanDelete = [rolesThatCanDelete];
+      }
+    const userRoles = userSession.user.profile.roles;
+
+    const canDelete = _.intersection(rolesThatCanDelete, userRoles).length !== 0;
+
+
+    if (canDelete) {
+      const contentRepo = await getRepository(Content);
       return contentRepo.delete(id);
     }
   },

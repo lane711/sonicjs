@@ -243,6 +243,17 @@ module.exports = moduleService = {
     }
     return {};
   },
+  getModuleContentTypeRaw: async function (contentTypeSystemId, session) {
+    let configInfo = await globalService.moduleContentTypeConfigs.find(
+      (x) => x.systemId === contentTypeSystemId
+    );
+    if (configInfo) {
+      let config = fileService.getFileSync(configInfo.filePath);
+      let contentType = JSON.parse(config);
+      return contentType;
+    }
+    return {};
+  },
   getModuleContentTypes: async function (userSession, req) {
     let rootDomain = `${req.protocol}://${req.get("host")}`;
     let configInfos = await globalService.moduleContentTypeConfigs;

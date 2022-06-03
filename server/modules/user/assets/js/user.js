@@ -38,6 +38,7 @@ function fullPageUpdate(url = undefined) {
 
 async function openFormInModal(action, contentType, id) {
   await openEditForm(action, id);
+  await openDeleteForm(action, id);
   await openCreateForm(action, contentType);
 }
 
@@ -66,6 +67,40 @@ async function openEditForm(action, id) {
 
     $("#genericModal").appendTo("body").modal("show");
   }
+}
+
+async function openDeleteForm(action, id) {
+  if (action === "delete") {
+    let content = await dataService.getContentById(id);
+    let form = JSON.stringify(
+      content.data,
+      null,
+      4
+    );
+
+    form += `<button class="mt-2" type="button"  onclick="return confirmDelete('${content.id}', 1)""><i class="bi bi-trash"></i> Confirm Delete</button>`;
+
+    $("#genericModal .modal-title").text(
+      helperService.titleCase(`${action} ${content.contentTypeId}`)
+    );
+
+    $("#formio").empty();
+    $("#formio").html(form);
+
+
+    $("#genericModal").appendTo("body").modal("show");
+  }
+}
+
+async function confirmDelete(id){
+  console.log('attempting delete of ', id);
+
+  dataService.contentDelete(id, $('#sessionID').val()).then((response)=>{
+    fullPageUpdate();
+
+  })
+
+
 }
 
 async function openCreateForm(action, contentType) {

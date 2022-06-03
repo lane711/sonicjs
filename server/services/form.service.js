@@ -128,7 +128,7 @@ if (typeof module !== "undefined" && module.exports) {
       }
 
       if (contentType && emitterService) {
-        await emitterService.emit("formComponentsLoaded", contentType);
+        await emitterService.emit("formComponentsLoaded", contentType, content);
       }
 
       if (!onFormSubmitFunction) {
@@ -142,7 +142,12 @@ if (typeof module !== "undefined" && module.exports) {
       let data = { viewModel: {}, viewPath: "/server/assets/html/form.html" };
       data.viewModel.onFormSubmitFunction = onFormSubmitFunction;
       data.viewModel.formJSON = JSON.stringify(formJSON);
-      let formValuesToLoad = content && content.data ? content.data : {};
+      data.viewModel.editMode = false;
+      let formValuesToLoad = {};
+      if(content && content.data){
+        formValuesToLoad = content.data;
+        data.viewModel.editMode = true;
+      } 
       data.viewModel.formValuesToLoad = JSON.stringify(formValuesToLoad);
       data.viewModel.random = helperService.generateRandomString(8);
       data.viewPath = "/server/assets/html/form.html";

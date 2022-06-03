@@ -1,3 +1,6 @@
+{{#if canAdd}}
+<button type="button" class="btn btn-primary btn-medium" onclick="return openFormInModal('create', 'proposal')">Submit Your Proposal</button>
+{{/if}}
 <ul class="nav nav-tabs" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
       <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#open" type="button" role="tab" 
@@ -7,10 +10,12 @@
       <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#closed" type="button" role="tab" 
       aria-controls="profile" aria-selected="false">Closed Proposals</button>
     </li>
+    {{#if canReview}}
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="messages-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" 
       aria-controls="messages" aria-selected="false">Review Proposals</button>
     </li>
+    {{/if}}
   </ul>
   
   <!-- Tab panes -->
@@ -22,19 +27,23 @@
               <div class="col-md-4  mt-3 mb-5">
                 <h3>{{this.data.title}} 
                   <!-- <a target="_blank" href="/admin/content/edit/fe/{{this.id}}"><i class="bi bi-pencil"></i></a> -->
-                  {{#if this.data.canEdit }}
+                  {{#if ../canEdit }}
                     <button type="button"  onclick="return openFormInModal('edit', null, '{{this.id}}')"><i class="bi bi-pencil"></i></button>
-                  {{/if}}
+                    <button type="button"  onclick="return openFormInModal('delete', null, '{{this.id}}')"><i class="bi bi-trash"></i></button>
+                  
+                    {{/if}}
                   </h3>
                 {{{this.data.preview}}}
                 <div class="text-muted">{{ this.data.remainingDays }}</div>
            
-                <div class="vote-controls" data-vote-controls-id="{{this.id}}">                  
-                  <button type="button"  onclick="return vote('{{this.id}}', 1)""><i class="bi bi-arrow-up"></i></button>
-                  <span class="voteUps">{{this.data.voteUps}}</span> 
-                  <button type="button"  onclick="return vote('{{this.id}}', -1)"><i class="bi bi-arrow-down"></i></button>
-                  <span class="voteDowns">{{this.data.voteDowns}}</span>  
-                </div>
+                {{#if ../canVote }}
+                  <div class="vote-controls" data-vote-controls-id="{{this.id}}">                  
+                    <button type="button"  onclick="return vote('{{this.id}}', 1)""><i class="bi bi-arrow-up"></i></button>
+                    <span class="voteUps">{{this.data.voteUps}}</span> 
+                    <button type="button"  onclick="return vote('{{this.id}}', -1)"><i class="bi bi-arrow-down"></i></button>
+                    <span class="voteDowns">{{this.data.voteDowns}}</span>  
+                  </div>
+                {{/if}}
 
               </div>
             {{/each}}
@@ -67,6 +76,8 @@
         </div>
 
     </div>
+
+    {{#if canReview}}
     <div class="tab-pane" id="pending" role="tabpanel" aria-labelledby="messages-tab">
 
         <div class="row">
@@ -86,4 +97,6 @@
         </div>
 
     </div>
+    {{/if}}
+
   </div>
