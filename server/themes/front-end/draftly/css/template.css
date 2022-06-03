@@ -13,3 +13,40 @@ main {
 .moralis-metamask-logout:hover{
     cursor: pointer;
 }
+
+.footer-area {
+    padding: 100px 0 50px;
+}
+
+.footer-area p {
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 20px;
+}
+
+.footer-area h4 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 25px;
+}
+
+.footer-area ul li a {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 14px;
+    color: #fff;
+    padding-bottom: 8px;
+    display: inline-block;
+    text-transform: uppercase;
+    transition: 0.2s all ease;
+}
+
+.footer-area ul li a:hover {
+    color: #FFCB05;
+}
+
+.nobullets {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
