@@ -1,15 +1,36 @@
+<!-- 
 <div class="row">
   {{#if hasNFTInGroup }}
-{{#each mynfts}}
-  <div class="col-md-3 text-{{../data.textJustification}}">
-    <img class="img-fluid" src="{{this.imageUrl}}" />
-    <h3>{{this.data.name}}</h3>
-    {{{this.data.descriptionPreview}}}
-  </div>
-{{/each}}
-{{else}}
-<h1>Oops...</h1>
-<p>It looks like you don’t own any Draftly or Clubhouse NFTs. Click below to buy an NFT + join the clubhouse.</p>
-<h3>See our lates NFT drop</h3>
-{{/if}}
+    {{#each mynfts}}
+      <div class="col-md-3 text-{{../data.textJustification}}">
+        <img class="img-fluid" src="{{this.imageUrl}}" />
+        <h3>{{this.data.name}}</h3>
+        {{{this.data.descriptionPreview}}}
+      </div>
+    {{/each}}
+  {{else}}
+    <h1>Oops...</h1>
+    <p>It looks like you don’t own any Draftly or Clubhouse NFTs. Click below to buy an NFT + join the clubhouse.</p>
+    <h3>See our lates NFT drop</h3>
+  {{/if}}
+</div>
+-->
+
+
+<div class="d-flex flex-wrap align-content-start" >
+  {{#if hasNFTInGroup }}
+    {{#each mynfts}}
+      <div class="text-{{../data.textJustification}}">
+        <img class="img-fluid" src="{{this.imageUrl}}" />
+        <h3>{{this.data.name}}</h3>
+        {{{this.data.descriptionPreview}}}
+      </div>
+    {{/each}}
+  {{else}}
+    <div class="d-block">
+      <h1>Oops...</h1>
+      <p>It looks like you don’t own any Draftly or Clubhouse NFTs. Click below to buy an NFT + join the clubhouse.</p>
+      <h3>See our lates NFT drop</h3>
+    </div>
+  {{/if}}
 </div>

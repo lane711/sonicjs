@@ -1,8 +1,61 @@
-<div class="jumbotron jumbotron-fluid" style="background-color:{{this.group.data.bannerBackgroundColor}};
+<!-- <div class="jumbotron jumbotron-fluid" style="background-color:{{this.group.data.bannerBackgroundColor}};
 background-image:url('{{this.group.data.banner.src}}')">
   <div class="container">
     <h1 class="display-4">{{this.group.data.title}}</h1>
     <p class="lead">{{this.group.data.bio}}</p>
     <img height="200px" src="{{this.group.data.icon.src}}">
   </div>
-</div>
+</div> -->
+
+
+<!-- banner-area start -->	
+<div class="banner-area" style="background-image: url('{{this.group.data.banner.src}}');">
+  <div class="container">
+    <a href="#">
+      <img src="/assets/uploads/leftarrow.png" alt="">&nbsp;
+      Back to Clubhouses
+    </a>				
+  </div>
+</div>	
+<!-- banner-area end -->	
+
+<!-- banner-bt-area start -->	
+<div class="banner-bt-area">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-2">
+        <div class="bbt-left">
+          <img src="{{this.group.data.icon.src}}" class="img-fluid" alt="">
+        </div>
+      </div>
+      <div class="col-lg-10">
+        <div class="bbt-right">
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <div class="bbt-title">
+                <h2>
+                  {{this.group.data.title}}
+                  <a href="#"><img src="/assets/uploads/s1.png" alt=""></a>
+                  <a href="#"><img src="/assets/uploads/s2.png" alt=""></a>
+                  <a href="#"><img src="/assets/uploads/s3.png" alt=""></a>
+                  <a href="#"><img src="/assets/uploads/s4.png" alt=""></a>
+                </h2>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="bbt-edit text-md-right">
+                <a href="#">
+                  Edit Bio &nbsp;
+                  <img src="/assets/uploads/edit.png" alt="">
+                </a>
+              </div>
+            </div>
+          </div>
+          <p>{{this.group.data.bio}}</p>
+        </div>
+      </div>
+    </div>				
+  </div>
+</div>	
+<!-- banner-bt-area end -->	
+
