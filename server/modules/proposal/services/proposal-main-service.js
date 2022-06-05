@@ -20,32 +20,6 @@ module.exports = proposalMainService = {
         await proposalMainService.getViewData(options);
       }
     });
-
-    emitterService.on(
-      "formComponentsLoaded",
-      async function (contentType, content) {
-        if (contentType.systemId === "proposal") {
-          const groupContentTypes = await dataService.getContentTopOne(
-            "group-site-settings"
-          );
-        }
-
-        // if (
-        //   groupContentTypes.data.applyToContentTypes.includes(
-        //     contentType.systemId
-        //   )
-        // ) {
-        //   contentType.data.components.splice(-1, 0, {
-        //     type: "textfield",
-        //     inputType: "text",
-        //     key: "groupId",
-        //     label: "Group",
-        //     hidden: false,
-        //     input: true,
-        //   });
-        // }
-      }
-    );
   },
 
   getViewData: async function (options) {
@@ -86,13 +60,13 @@ module.exports = proposalMainService = {
   },
 
   processPagePermissions: async function (options) {
-    //add new or review proposal permissions
     options.viewModel.canAdd = false;
     options.viewModel.canReview = false;
     options.viewModel.canEdit = false;
     options.viewModel.canVote = false;
 
     let userRole = options.req.user?.profile.roles[0];
+    //TODO: need to check that club admin is for the current club(not just has the role)
     if (userRole === "communityAdmin" || userRole === "clubAdmin") {
       options.viewModel.canAdd = true;
       options.viewModel.canReview = true;
