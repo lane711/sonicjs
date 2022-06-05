@@ -7,7 +7,7 @@ cy.SonicJs = {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin`);
     cy.contains("Login");
 
-    cy.get('[type="email"]').type("a@a.com");
+    cy.get('#email').type("a@a.com");
     cy.get('[type="password"]').type("tiger44");
 
     cy.get("#login-submit").click();

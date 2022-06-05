@@ -617,7 +617,7 @@ if (typeof module !== "undefined" && module.exports) {
       query: query,
     });
 
-    return result.data.data.contentCreate;
+    return result;
   };
 
   (exports.getContentById = async function (id, sessionID) {
