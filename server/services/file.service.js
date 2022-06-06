@@ -139,6 +139,7 @@ module.exports = fileService = {
   },
 
   execUpload: async function (file, sessionID) {
+    //TODO: needs refac
     let storageOption = process.env.FILE_STORAGE;
     if (
       storageOption === "AMAZON_S3" &&
