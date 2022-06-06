@@ -139,6 +139,7 @@ module.exports = fileService = {
   },
 
   execUpload: async function (file, sessionID) {
+    //TODO: needs refac
     let storageOption = process.env.FILE_STORAGE;
     if (
       storageOption === "AMAZON_S3" &&
@@ -159,21 +160,25 @@ module.exports = fileService = {
       }
     } //Local file upload fix
     else if (file.name.match(/.(jpg|jpeg|png|gif|svg|mp4|zip)$/i)) {
-      var title = file.name.replace(/^.*[\\\/]/, "");
+      if (file.name.endsWith(".zip")) {
+        await this.uploadBackupFile(file, sessionID);
+      } else {
+        var title = file.name.replace(/^.*[\\\/]/, "");
 
-      //Upload file to default assets location
-      await fileService
-        .copyFile(
-          file.path,
-          path.join(appRoot.path, `server/assets/uploads/${file.name}`)
-        )
-        .catch((error) => {
-          console.log("uploadWriteFile ==>", error);
-          throw new Error(error);
-        });
+        //Upload file to default assets location
+        await fileService
+          .copyFile(
+            file.path,
+            path.join(appRoot.path, `server/assets/uploads/${file.name}`)
+          )
+          .catch((error) => {
+            console.log("uploadWriteFile ==>", error);
+            throw new Error(error);
+          });
 
-      //Remove temp file
-      await fileService.deleteFile(file.path);
+        //Remove temp file
+        await fileService.deleteFile(file.path);
+      }
     }
   },
 
