@@ -18,6 +18,12 @@
       <a class="nav-link active" id="home-tab" data-toggle="tab" href="#fields" role="tab" aria-controls="home"
         aria-selected="true">Fields</a>
     </li>
+
+    <li class="nav-item">
+      <a class="nav-link" id="states-tab" data-toggle="tab" href="#states" role="tab" aria-controls="states"
+        aria-selected="true">States</a>
+    </li>
+
     <li class="nav-item">
       <a class="nav-link" id="raw-tab" data-toggle="tab" href="#raw" role="tab" aria-controls="raw"
         aria-selected="true">Raw</a>
@@ -47,8 +53,6 @@
 
     <div class="tab-pane fade show active" id="fields" role="tabpanel" aria-labelledby="home-tab">
 
-
-
       <div class="row">
         <div class="col-md-12">
           <div class="card">
@@ -72,8 +76,55 @@
         <!--/.col-->
       </div>
 
+    </div>
+
+
+    <div class="tab-pane fade  " id="states" role="tabpanel" aria-labelledby="states-tab">
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-header">
+              <i class="fa fa-align-justify"></i> Manage Form States
+
+            </div>
+            <div class="card-body">
+
+              <div id='form-states'>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Component</th>
+                      <th scope="col">Add</th>
+                      <th scope="col">Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">Submit Button Text</th>
+                      <td><input id="addText" type="text" value="{{this.data.raw.data.states.new.buttonText}}"></td>
+                      <td><input id="editText" type="text" value="{{this.data.raw.data.states.edit.buttonText}}"></td>
+
+                    </tr>
+                  </tbody>
+                </table>
+
+              </div>
+
+            </div>
+            <div class="card-footer">
+              <button type="button" class="btn btn-success pull-right" onclick="onContentTypeSave()">
+                Save States
+              </button>
+            </div>
+          </div>
+
+        </div>
+        <!--/.col-->
+      </div>
 
     </div>
+
     <div class="tab-pane fade show" id="raw" role="tabpanel" aria-labelledby="raw-tab">
 
       <div class="col-md-12">
