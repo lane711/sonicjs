@@ -16,7 +16,7 @@
 </div>
 -->
 
-
+<!-- 
 <div class="d-flex flex-wrap align-content-start" >
   {{#if hasNFTInGroup }}
     {{#each mynfts}}
@@ -34,3 +34,27 @@
     </div>
   {{/if}}
 </div>
+ -->
+
+ <div class="d-flex flex-wrap align-content-start" >
+  {{#if hasNFTInGroup }}
+    {{#each mynfts}}
+      <div class="card bg-dark" style="width: 14rem; margin: 3px;">
+        <img src="{{this.imageUrl}}" class="card-img-top" />
+        <div class="card-body">
+          <p class="card-text">
+            <h3>{{this.data.name}}</h3><br>
+            {{{this.data.descriptionPreview}}}
+          </p>
+        </div>
+      </div>
+    {{/each}}
+  {{else}}
+    <div class="d-block">
+      <h1>Oops...</h1>
+      <p>It looks like you don’t own any Draftly or Clubhouse NFTs. Click below to buy an NFT + join the clubhouse.</p>
+      <h3>See our lates NFT drop</h3>
+    </div>
+  {{/if}}
+</div>
+ 
