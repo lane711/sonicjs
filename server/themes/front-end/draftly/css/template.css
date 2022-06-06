@@ -245,6 +245,37 @@ body {
     padding-bottom: 12px;
 }
 
+
+.event-item h2 {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 25px;
+    color: #FFCB05;
+}
+
+.event-item p {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    color: #FFFFFF;
+    margin: 0;
+}
+
+.event-item {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 38.33%, #000000 77.29%), url(.jpg), #0B0B0B;
+    border: 1px solid #525252;
+    border-radius: 5px;
+    margin-bottom: 30px;
+}
+
+.event-inner {
+    padding: 0 30px 20px;
+}
+
+.event-item img {
+    border-radius: 5px 5px 0 0;
+}
+
 .footer-area {
     padding: 100px 0 50px;
 }
