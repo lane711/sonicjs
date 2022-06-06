@@ -139,6 +139,18 @@ const ModuleType = new GraphQLObjectType({
   }),
 });
 
+const FormType = new GraphQLObjectType({
+  name: "FormType",
+  fields: () => ({
+    contentType: { type: GraphQLString },
+    content: { type: GraphQLString },
+    id: { type: GraphQLString },
+    onFormSubmitFunction: { type: GraphQLString },
+    returnModuleSettings: { type: GraphQLBoolean },
+    formSettingsId: { type: GraphQLString },
+  }),
+});
+
 class FileData {
   constructor(filePath, fileContent) {
     this.filePath = filePath;
@@ -364,6 +376,29 @@ const RootQuery = new GraphQLObjectType({
       resolve(parent, args, req) {
         return mediaService.getMedia(req.sessionID);
       },
+
+      form: {
+        type: new GraphQLList(FormType),
+        args: {
+          contentType: { type: GraphQLString },
+          content: { type: GraphQLString },
+          id: { type: GraphQLString },
+          onFormSubmitFunction: { type: GraphQLString },
+          returnModuleSettings: { type: GraphQLBoolean },
+          formSettingsId: { type: GraphQLString },
+        },
+        resolve(parent, args, req) {
+
+          return data.editForm = await formService.getForm(
+            "theme-settings",
+            data,
+            undefined,
+            undefined,
+            undefined,
+            req.sessionID
+          );
+
+        },
     },
 
     view: {
