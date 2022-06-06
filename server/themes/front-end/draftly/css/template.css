@@ -14,6 +14,13 @@ main {
     cursor: pointer;
 }
 
+.formio-component-submit{
+    margin: 12px 0 0;
+}
+
+.modal, .modal th{
+    color: #fff;
+}
 
 /*
 ==========
