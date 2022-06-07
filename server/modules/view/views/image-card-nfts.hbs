@@ -16,14 +16,19 @@
 </div>
 -->
 
-
-<div class="d-flex flex-wrap align-content-start" >
+ <div class="row g-3">
   {{#if hasNFTInGroup }}
     {{#each mynfts}}
-      <div class="text-{{../data.textJustification}}">
-        <img class="img-fluid" src="{{this.imageUrl}}" />
-        <h3>{{this.data.name}}</h3>
-        {{{this.data.descriptionPreview}}}
+      <div class="col-md-3 text-{{../data.textJustification}}">
+        <div class="card bg-dark h-100"">
+          <img src="{{this.imageUrl}}" class="card-img-top" />
+          <div class="card-body">
+            <p class="card-text">
+              <h3>{{this.data.name}}</h3><br>
+              {{{this.data.descriptionPreview}}}
+            </p>
+          </div>
+        </div>
       </div>
     {{/each}}
   {{else}}
@@ -34,3 +39,4 @@
     </div>
   {{/if}}
 </div>
+ 
