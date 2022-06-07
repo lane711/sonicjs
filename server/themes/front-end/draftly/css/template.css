@@ -183,17 +183,6 @@ body {
 }
 
 
-.proposal-area .card {
-    width: 32%;
-    border: none;
-}
-
-.proposal-area .card-body {
-    background-color: #000000;
-    text-align: left;
-    border: 1px solid #525252;
-    border-radius: 5px;
-}
 
 .button-yellow {
     background-color: transparent;

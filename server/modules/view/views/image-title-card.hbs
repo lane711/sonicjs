@@ -19,27 +19,27 @@
 {{/if}} -->
 
 
-<div class="announcements-area">
+<div class="events-area">
   <div class="container">
-    <div class="row">
-
+    <div class="row g-3">
     {{#each list}}
-    <div class="col-md-3">
-      <div class="card bg-dark event-item">
-        <img src="{{this.data.image.src}}" class="card-img-top" />
-        <div class="card-body">
-          <p class="card-text">
-            <a target="_blank" href="/admin/content/edit/fe/{{this.id}}"><i class="bi bi-pencil"></i></a>
-            <h2>{{this.data.title}}</h2>
-            Start Time & Date: &nbsp;
-            <p>{{this.data.dateTime}}</p>
-          </p>
+      <!-- <div class="col-md-4"> -->
+      <div class="col{{../data.bootstrapColumnClass}} text-{{../data.textJustification}}">
+        <div class="card bg-dark event-item h-100">
+          <img src="{{this.data.image.src}}" class="card-img-top" />
+          <div class="card-body">
+            <p class="card-text">
+              <a target="_blank" href="/admin/content/edit/fe/{{this.id}}"><i class="bi bi-pencil"></i></a>
+              <h2>{{this.data.title}}</h2>
+              Start Time & Date: &nbsp;
+              <p>{{this.data.dateTime}}</p>
+            </p>
+          </div>
         </div>
-      </div>
-    </div>
-    {{/each}}
+        </div>
+  {{/each}}
+  </div>
 
-    </div>
 
     {{#if data.seeMoreLinkCopy}}
     <div class="row text-center">
