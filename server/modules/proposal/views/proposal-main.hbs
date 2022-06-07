@@ -1,7 +1,7 @@
 {{#if canAdd}}
 <button type="button" class="btn btn-primary btn-medium" onclick="return openFormInModal('create', 'proposal')">Submit Your Proposal</button>
 {{/if}}
-<ul class="nav nav-tabs" id="myTab" role="tablist">
+<ul class="nav nav-tabs" id="myTab" role="tablist" style="border-style: none;">
   <li class="nav-item" role="presentation">
     <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#open" type="button" role="tab" 
     aria-controls="home" aria-selected="true">Open Proposals</button>
@@ -23,39 +23,38 @@
 <div class="tab-content">
   <div class="tab-pane active" id="open" role="tabpanel" aria-labelledby="home-tab">
     <div class="proposal-area">
-      <div class="d-flex flex-wrap align-content-start">
-
+      <div class="row g-3">
         {{#each openProposals}}
-        <div class="card proposal-item">						
-          <div class="card-body">
-            <h2>{{this.data.title}}</h2>
+          <div class="col-md-4 gx-3">
+            <div class="card proposal-item h-100">						
+              <div class="card-body">
+                <h2>{{this.data.title}}</h2>
 
-            {{#if ../canEdit }}
-              <button type="button" class="button-white" onclick="return openFormInModal('edit', null, '{{this.id}}')"><i class="bi bi-pencil"></i></button>
-            {{/if}}
+                {{#if ../canEdit }}
+                  <button type="button" class="button-white" onclick="return openFormInModal('edit', null, '{{this.id}}')"><i class="bi bi-pencil"></i></button>
+                {{/if}}
 
-            <p> {{{this.data.preview}}} <br> <a href="#">Read More</a></p>
-            
-            {{#if ../canVote }}
-              <div class="d-flex align-items-left pt-3">             
-                <div class="vote-controls" data-vote-controls-id="{{this.id}}">                  
-                  <button type="button" class="button-green" onclick="return vote('{{this.id}}', 1)""><i class="bi bi-arrow-up"></i></button>
-                  <span class="voteUps">{{this.data.voteUps}}</span> 
-                  <button type="button" class="button-red"  onclick="return vote('{{this.id}}', -1)"><i class="bi bi-arrow-down"></i></button>
-                  <span class="voteDowns">{{this.data.voteDowns}}</span>  
-                </div>
-                <div class="ms-auto">
-                  <span><a href="#" class="text-white font-italic">3 days left to vote &nbsp; </a></span>
-                  <button type="button" class="button-red" onclick="return openFormInModal('delete', null, '{{this.id}}')"><i class="bi bi-trash"></i></button>      
+                <p> {{{this.data.preview}}} <br> <a href="#">Read More</a></p>
+                
+                {{#if ../canVote }}
+                  <div class="d-flex align-items-left pt-3">             
+                    <div class="vote-controls" data-vote-controls-id="{{this.id}}">                  
+                      <button type="button" class="button-green" onclick="return vote('{{this.id}}', 1)""><i class="bi bi-arrow-up"></i></button>
+                      <span class="voteUps">{{this.data.voteUps}}</span> 
+                      <button type="button" class="button-red"  onclick="return vote('{{this.id}}', -1)"><i class="bi bi-arrow-down"></i></button>
+                      <span class="voteDowns">{{this.data.voteDowns}}</span>  
+                    </div>
+                    <div class="ms-auto">
+                      <span><a href="#" class="text-white font-italic">3 days left to vote &nbsp; </a></span>
+                      <button type="button" class="button-red" onclick="return openFormInModal('delete', null, '{{this.id}}')"><i class="bi bi-trash"></i></button>      
+                    </div>
+                  </div>
+                {{/if}}
 
-                </div>
               </div>
-            {{/if}}
-
+            </div>
           </div>
-        </div>
         {{/each}}
-
       </div>
       <div class="row text-center">
         <div class="col">
@@ -66,22 +65,22 @@
   </div>
 
   <div class="tab-pane" id="closed" role="tabpanel" aria-labelledby="profile-tab">
-
     <div class="proposal-area">
-      <div class="d-flex flex-wrap align-content-start">
-
+      <div class="row g-3">
         {{#each closedProposals}}
-        <div class="card proposal-item">						
-          <div class="card-body">
-            <h2>{{this.data.title}}</h2> 
+        <div class="col-md-4">
+          <div class="card proposal-item h-100">						
+            <div class="card-body">
+              <h2>{{this.data.title}}</h2> 
 
-            {{#if ../canEdit }}
-              <button type="button" class="button-white" onclick="return openFormInModal('edit', null, '{{this.id}}')"><i class="bi bi-pencil"></i></button>
-            {{/if}}
+              {{#if ../canEdit }}
+                <button type="button" class="button-white" onclick="return openFormInModal('edit', null, '{{this.id}}')"><i class="bi bi-pencil"></i></button>
+              {{/if}}
 
-            <p> {{{this.data.preview}}} <br> <a href="#">Read More</a></p>
+              <p> {{{this.data.preview}}} <br> <a href="#">Read More</a></p>
+            </div>
+
           </div>
-
         </div>
         {{/each}}
 
@@ -98,20 +97,22 @@
   <div class="tab-pane" id="pending" role="tabpanel" aria-labelledby="messages-tab">
 
     <div class="proposal-area">
-      <div class="d-flex flex-wrap align-content-start">
-
+      <!-- <div class="d-flex flex-wrap align-content-start"> -->
+        <div class="row g-3">
           {{#each pendingProposals}}
-            <div class="card proposal-item">						
-              <div class="card-body">
-                <h2>{{this.data.title}}</h2> 
-    
-                {{#if ../canEdit }}
-                  <button type="button" class="button-white" onclick="return openFormInModal('edit', null, '{{this.id}}')"><i class="bi bi-pencil"></i></button>
-                {{/if}}
-    
-                <p> {{{this.data.preview}}} <br> <a href="#">Read More</a></p>
+            <div class="col-md-4">
+              <div class="card proposal-item">						
+                <div class="card-body">
+                  <h2>{{this.data.title}}</h2> 
+      
+                  {{#if ../canEdit }}
+                    <button type="button" class="button-white" onclick="return openFormInModal('edit', null, '{{this.id}}')"><i class="bi bi-pencil"></i></button>
+                  {{/if}}
+      
+                  <p> {{{this.data.preview}}} <br> <a href="#">Read More</a></p>
+                </div>
+      
               </div>
-    
             </div>
           {{/each}}
       </div>
@@ -127,5 +128,3 @@
 
 
 </div>
-
-  

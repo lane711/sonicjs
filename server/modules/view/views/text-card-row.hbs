@@ -32,33 +32,39 @@
       <a href="#">Post an Announcements</a>
     </div>
 
-    {{#each list}}
-    <div class="announcement-item">
-      <div class="media">
-        <img src="/assets/uploads/bell.png" class="img-fluid" alt="">
-        <div class="media-body ml-4">
-          <div class="d-flex align-items-center mb-3">
-            <h2>{{this.data.title}}</h2>
-            <div class="ms-auto">
-              <a target="_blank" href="/admin/content/edit/fe/{{this.id}}"><img src="/assets/uploads/edit.png" alt=""></a> &nbsp; 
-              <a href="#"><img src="/assets/uploads/delete.png" alt=""></a>					
+    <div class="row g-3">
+
+      {{#each list}}
+      <div class="col{{../data.bootstrapColumnClass}} text-{{../data.textJustification}}">
+        <div class="announcement-item">
+          <div class="media">
+            <img src="/assets/uploads/bell.png" class="img-fluid" alt="">
+            <div class="media-body ml-4">
+              <div class="d-flex align-items-center mb-3">
+                <h2>{{this.data.title}}</h2>
+                <div class="ms-auto">
+                  <a target="_blank" href="/admin/content/edit/fe/{{this.id}}"><img src="/assets/uploads/edit.png" alt=""></a> &nbsp; 
+                  <a href="#"><img src="/assets/uploads/delete.png" alt=""></a>					
+                </div>
+              </div>
+              <p>{{{this.data.body}}}</p>
+              <p><a href="#">Read More</a></p>
+              <div class="d-flex align-items-center pt-3">
+                <div>
+                  <img src="/assets/uploads/thumbsup.png" alt=""> 20 &nbsp; &nbsp; 
+                  <img src="/assets/uploads/thumbsdown.png" alt=""> 5
+                </div>								
+                <div class="ms-auto">
+                  <span>Today 3:00PM</span>
+                </div>
+              </div>
             </div>
-          </div>
-          <p>{{{this.data.body}}}</p>
-          <p><a href="#">Read More</a></p>
-          <div class="d-flex align-items-center pt-3">
-            <div>
-              <img src="/assets/uploads/thumbsup.png" alt=""> 20 &nbsp; &nbsp; 
-              <img src="/assets/uploads/thumbsdown.png" alt=""> 5
-            </div>								
-            <div class="ms-auto">
-              <span>Today 3:00PM</span>
-            </div>
-          </div>
+          </div>					
         </div>
-      </div>					
+      </div>
+      {{/each}}
+
     </div>
-    {{/each}}
     
     {{#if data.seeMoreLinkCopy}}
     <div class="see-more text-center">
@@ -68,5 +74,9 @@
 			
   </div>
 </div>	
+
+<div class="container">
+  <span class="hr-line"></span>
+</div>
 
 

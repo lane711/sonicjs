@@ -37,38 +37,44 @@
 
 
 <h1>My Clubhouses</h1>
-<div class="d-flex flex-wrap align-content-start">
-  {{#each myGroups}}
-  <div class="card bg-dark" style="width: 14rem; margin: 3px;">
-    <img src="{{data.icon.src}}" class="card-img-top" />
-    <div class="card-body">
-      <p class="card-text">
-        <a href="{{data.url}}" class="stretched-link">{{data.title}}</a>
-      </p>
-    </div>
+<!-- <div class="d-flex flex-wrap align-content-start"> -->
+  <div class="row g-3">
+    {{#each myGroups}}
+      <div class="col-md-4">
+        <div class="card bg-dark h-100">
+          <img src="{{data.icon.src}}" class="card-img-top" />
+          <div class="card-body">
+            <p class="card-text">
+              <a href="{{data.url}}" class="stretched-link">{{data.title}}</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    {{/each}}
+    <a href="#" onclick="return openFormInModal('create', 'group')" class="m-4" style="width: 14rem;">
+        <img src="/assets/uploads/new_clubhouse.png" class="card-img-top" />
+    </a>
   </div>
-  {{/each}}
-  <a href="#" onclick="return openFormInModal('create', 'group')" class="m-4" style="width: 14rem;">
-      <img src="/assets/uploads/new_clubhouse.png" class="card-img-top" />
-  </a>
-</div>
 
 <br>    
 <br>    
 
 <h1>Clubhouses</h1>
-<div class="d-flex flex-wrap align-content-start">
+<!-- <div class="d-flex flex-wrap align-content-start"> -->
+<div class="row g-3">
   {{#each groups}}
-  <div class="card bg-dark" style="width: 14rem; margin: 3px;">
-    <img src="{{data.icon.src}}" class="card-img-top" />
-    <div class="card-body">
-      <p class="card-text">
-        <a href="{{data.url}}" class="stretched-link">{{data.title}}</a>
-      </p>
+  <div class="col-md-4">
+    <div class="card bg-dark h-100">
+      <img src="{{data.icon.src}}" class="card-img-top" />
+      <div class="card-body">
+        <p class="card-text">
+          <a href="{{data.url}}" class="stretched-link">{{data.title}}</a>
+        </p>
+      </div>
     </div>
   </div>
   {{/each}}
-  <div class="m-4" style="width: 14rem;">
-      <img src="/assets/uploads/new_clubhouse.png" class="card-img-top" />
-  </div>
+    <div class="m-4" style="width: 14rem;">
+        <img src="/assets/uploads/new_clubhouse.png" class="card-img-top" />
+    </div>
 </div>
