@@ -167,6 +167,33 @@ if (typeof module !== "undefined" && module.exports) {
         return result.data.data.roles;
       }
     }),
+    (exports.formGet = async function (
+      contentTypeId,
+      content,
+      onFormSubmitFunction,
+      returnModuleSettings = false,
+      formSettingsId,
+      sessionID
+    ) {
+      let result = await this.getAxios().post(apiUrl, {
+        query: `
+      {
+        form (contentTypeId: "${contentTypeId}",
+        content: "${content}",
+        onFormSubmitFunction: "${onFormSubmitFunction}",
+        returnModuleSettings: "${returnModuleSettings}",
+        formSettingsId: "${formSettingsId}",
+        sessionID:"${sessionID}"){
+          html
+        }
+      }
+        `,
+      });
+
+      if (result.data.data.html) {
+        return result.data.data.html;
+      }
+    }),
     (exports.getContent = async function (sessionID) {
       //HACK removing sort bc LB not working with RDMS
       // const filter = ""; //encodeURI(`{"order":"data.createdOn DESC"}`);

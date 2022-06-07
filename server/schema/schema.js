@@ -387,11 +387,11 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         return {
           html: await formService.getForm(
-            "theme-settings",
-            data,
-            undefined,
-            undefined,
-            undefined,
+            args.contentType,
+            args.content,
+            args.onFormSubmitFunction,
+            args. returnModuleSettings,
+            args.formSettingsId,
             req.sessionID
           ),
         };

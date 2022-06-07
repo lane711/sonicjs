@@ -79,6 +79,19 @@ if (typeof module !== "undefined" && module.exports) {
       // next();
     });
   }),
+    (exports.getFormUI = async function (
+      contentTypeId,
+      content,
+      onFormSubmitFunction,
+      returnModuleSettings = false,
+      formSettingsId,
+      sessionID
+    ) {
+      //get the form thru the back via graphql
+            let formHtml = await axiosInstance.post(`/api/views/getProceedView`, {
+        data: data,
+      });
+    }),
     (exports.getForm = async function (
       contentTypeId,
       content,
@@ -144,14 +157,16 @@ if (typeof module !== "undefined" && module.exports) {
       data.viewModel.formJSON = JSON.stringify(formJSON);
       data.viewModel.editMode = false;
       let formValuesToLoad = {};
-      if(content && content.data){
+      if (content && content.data) {
         formValuesToLoad = content.data;
         data.viewModel.editMode = true;
-      } 
+      }
       data.viewModel.formValuesToLoad = JSON.stringify(formValuesToLoad);
       data.viewModel.random = helperService.generateRandomString(8);
       data.viewPath = "/server/assets/html/form.html";
       data.contentType = "";
+
+      //state overrides
 
       // let formHtml = await axiosInstance.post(`/api/views/getProceedView`, {
       //   data: data,
