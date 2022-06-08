@@ -13,17 +13,17 @@ module.exports = groupMainService = {
     });
 
     //add group select list
-    emitterService.on("formComponentsLoaded", async function (contentType) {
+    emitterService.on("formComponentsLoaded", async function (options) {
       const groupContentTypes = await dataService.getContentTopOne(
         "group-site-settings"
       );
 
       if (
         groupContentTypes.data.applyToContentTypes.includes(
-          contentType.systemId
+          options.contentType.systemId
         )
       ) {
-        contentType.data.components.splice(-1, 0, {
+        options.contentType.data.components.splice(-1, 0, {
           type: "textfield",
           inputType: "text",
           key: "groupId",

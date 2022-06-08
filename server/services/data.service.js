@@ -167,6 +167,35 @@ if (typeof module !== "undefined" && module.exports) {
         return result.data.data.roles;
       }
     }),
+    (exports.formGet = async function (
+      contentTypeId,
+      content,
+      onFormSubmitFunction,
+      returnModuleSettings = false,
+      formSettingsId,
+      sessionID
+    ) {
+
+      const query = `
+      {
+        form (contentType: "${contentTypeId}",
+        content: "${content ?? ''}",
+        onFormSubmitFunction: "${onFormSubmitFunction}",
+        returnModuleSettings: ${returnModuleSettings},
+        formSettingsId: "${formSettingsId ?? ''}"){
+          html
+        }
+      }
+        `;
+
+      let result = await this.getAxios().post("/graphql", {
+        query,
+      });
+
+      if (result.data.data.form.html) {
+        return result.data.data.form.html;
+      }
+    }),
     (exports.getContent = async function (sessionID) {
       //HACK removing sort bc LB not working with RDMS
       // const filter = ""; //encodeURI(`{"order":"data.createdOn DESC"}`);
@@ -212,7 +241,6 @@ if (typeof module !== "undefined" && module.exports) {
       return data;
     }),
     (exports.getContentByType = async function (contentType, sessionID) {
-
       let result = await this.getAxios().post(apiUrl, {
         query: `
         {
@@ -228,9 +256,12 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.contents;
     }),
-    (exports.getContentByTypeAndGroup = async function (contentType, groupId, sessionID) {
-
-      let groupParam = groupId ? `, group : "${groupId}"` : '';
+    (exports.getContentByTypeAndGroup = async function (
+      contentType,
+      groupId,
+      sessionID
+    ) {
+      let groupParam = groupId ? `, group : "${groupId}"` : "";
       let result = await this.getAxios().post(apiUrl, {
         query: `
         {
@@ -487,7 +518,6 @@ if (typeof module !== "undefined" && module.exports) {
         return contentByTag;
       }
     }),
-    
     (exports.getContentByUrlAndContentType = async function (
       contentType,
       pageUrl,

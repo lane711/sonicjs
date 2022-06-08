@@ -554,10 +554,6 @@ async function getContentInstance(id) {
 //     });
 // }
 
-
-
-
-
 async function editInstanceUser(payload, refresh, contentType = "content") {
   // let id = payload.id;
   // if (payload.id) {
@@ -637,8 +633,6 @@ async function openPageSettingsForm(action, contentType) {
   $("#pageSettingsModal").appendTo("body").modal("show");
 }
 
-
-
 async function setupPageSettings(action, contentType, sessionID) {
   console.log("setupPageSettings");
   let pageId = $("#page-id").val();
@@ -693,7 +687,7 @@ async function setupPageSettings(action, contentType, sessionID) {
   if (action == "edit" && contentType) {
     formValuesToLoad = this.page;
 
-    form = await formService.getForm(
+    form = await dataService.formGet(
       contentType,
       formValuesToLoad,
       "await submitContent(submission);",
@@ -740,7 +734,6 @@ async function setupFormBuilder(contentType) {
 
   Formio.builder(document.getElementById("formBuilder"), null).then(
     async function (form) {
-      // debugger;
       form.setForm({
         components: contentType.data.components,
       });
@@ -753,6 +746,11 @@ async function setupFormBuilder(contentType) {
         if (event.components) {
           contentTypeComponents = event.components;
           console.log("event ->", event);
+        }
+      });
+      form.on("formLoad", async function (event) {
+        if (event.components) {
+          contentTypeComponents = event.components;
         }
       });
     }
@@ -829,15 +827,30 @@ async function setupFormBuilder(contentType) {
 }
 
 async function onContentTypeSave() {
-  // debugger;
   if (contentTypeComponents) {
     console.log("contentTypeComponents", contentTypeComponents);
     contentType.data.components = contentTypeComponents;
     if (!contentType.id) {
       contentType.id = $("#createContentTypeForm #id").val();
     }
+
+    //states
+    processContentTypeStates(contentType);
+
+    //form
     await editContentType(contentType, sessionID);
   }
+}
+
+function processContentTypeStates(contentType) {
+  contentType.data.states = {
+    new: {
+      buttonText: $("#addText").val() ?? "Submit",
+    },
+    edit: {
+      buttonText: $("#editText").val() ?? "Submit",
+    },
+  };
 }
 
 async function onContentTypeRawSave() {
@@ -1361,8 +1374,6 @@ async function addModuleToColumn(submission) {
 
   fullPageUpdate();
 }
-
-
 
 // async function submitUser(submission, refresh = true) {
 //   // debugger;
