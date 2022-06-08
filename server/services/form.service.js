@@ -152,7 +152,10 @@ if (typeof module !== "undefined" && module.exports) {
       }
 
       if (contentType && emitterService) {
-        await emitterService.emit("formComponentsLoaded", contentType, content);
+        await emitterService.emit("formComponentsLoaded", {
+          contentType,
+          content,
+        });
       }
 
       if (!onFormSubmitFunction) {
@@ -165,13 +168,36 @@ if (typeof module !== "undefined" && module.exports) {
 
       let data = { viewModel: {}, viewPath: "/server/assets/html/form.html" };
       data.viewModel.onFormSubmitFunction = onFormSubmitFunction;
-      data.viewModel.formJSON = JSON.stringify(formJSON);
       data.viewModel.editMode = false;
       let formValuesToLoad = {};
       if (content && content.data) {
         formValuesToLoad = content.data;
         data.viewModel.editMode = true;
       }
+
+      //override button copy
+      if (contentType.data.states) {
+        if (data.viewModel.editMode && contentType.data.states.edit) {
+          const submitButton = contentType.data.components.find(
+            (c) => c.key === "submit"
+          );
+          if (submitButton) {
+            submitButton.label = contentType.data.states.edit.buttonText;
+          }
+        }
+
+        if (!data.viewModel.editMode && contentType.data.states.new) {
+          const submitButton = contentType.data.components.find(
+            (c) => c.key === "submit"
+          );
+          if (submitButton) {
+            submitButton.label = contentType.data.states.new.buttonText;
+          }
+        }
+      }
+
+      data.viewModel.formJSON = JSON.stringify(formJSON);
+
       data.viewModel.formValuesToLoad = JSON.stringify(formValuesToLoad);
       data.viewModel.random = helperService.generateRandomString(8);
       data.viewPath = "/server/assets/html/form.html";

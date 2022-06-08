@@ -385,7 +385,6 @@ const RootQuery = new GraphQLObjectType({
         formSettingsId: { type: GraphQLString },
       },
       async resolve(parent, args, req) {
-        console.log('getting form ', args.contentType, req.sessionID);
         return {
           html: await formService.getForm(
             args.contentType,

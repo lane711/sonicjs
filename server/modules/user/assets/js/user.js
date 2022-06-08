@@ -37,9 +37,28 @@ function fullPageUpdate(url = undefined) {
 }
 
 async function openFormInModal(action, contentType, id) {
+  await openDetailForm(action, id);
   await openEditForm(action, id);
   await openDeleteForm(action, id);
   await openCreateForm(action, contentType);
+}
+
+async function openDetailForm(action, id) {
+  if (action === "detail") {
+    let content = await dataService.getContentById(id);
+    let form = 'details go here'
+
+    $("#genericModal .modal-title").text(
+      content.data.title
+    );
+
+    $("#formio").empty();
+    $("#formio").html(form);
+
+    $('input[name="data[title]"').focus();
+
+    $("#genericModal").appendTo("body").modal("show");
+  }
 }
 
 async function openEditForm(action, id) {
@@ -78,7 +97,7 @@ async function openDeleteForm(action, id) {
       4
     );
 
-    form += `<button class="mt-2" type="button"  onclick="return confirmDelete('${content.id}', 1)""><i class="bi bi-trash"></i> Confirm Delete</button>`;
+    form += `<div><button class="mt-2" type="button"  onclick="return confirmDelete('${content.id}', 1)""><i class="bi bi-trash"></i> Confirm Delete</button></div>`;
 
     $("#genericModal .modal-title").text(
       helperService.titleCase(`${action} ${content.contentTypeId}`)

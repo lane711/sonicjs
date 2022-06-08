@@ -26,9 +26,9 @@ module.exports = moralisMainService = {
       }
     });
 
-    emitterService.on("formComponentsLoaded", async function (contentType) {
-      if (contentType.systemId === "user") {
-        contentType.data.components.splice(-1, 0, {
+    emitterService.on("formComponentsLoaded", async function (options) {
+      if (options.contentType.systemId === "user") {
+        options.contentType.data.components.splice(-1, 0, {
           type: "textfield",
           inputType: "text",
           key: "moralisUserId",
@@ -37,7 +37,7 @@ module.exports = moralisMainService = {
           input: true,
         });
 
-        contentType.data.components.splice(-1, 0, {
+        options.contentType.data.components.splice(-1, 0, {
           type: "textfield",
           inputType: "text",
           key: "moralisEthAddress",

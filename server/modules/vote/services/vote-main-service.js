@@ -11,20 +11,20 @@ module.exports = voteMainService = {
       }
     });
 
-    emitterService.on("formComponentsLoaded", async function (contentType) {
+    emitterService.on("formComponentsLoaded", async function (options) {
       const voteContentTypes = await dataService.getContentTopOne(
         "vote-site-settings"
       );
 
       if (
-        voteContentTypes.data.applyToContentTypes.includes(contentType.systemId)
+        voteContentTypes.data.applyToContentTypes.includes(options.contentType.systemId)
       ) {
         const voteContentType = await dataService.contentTypeGet("vote");
         const voteComponentsToAdd = voteContentType.data.components.filter(
           (c) => c.type !== "button"
         );
 
-        contentType.data.components.splice(-1, 0, ...voteComponentsToAdd);
+        options.contentType.data.components.splice(-1, 0, ...voteComponentsToAdd);
       }
     });
 
