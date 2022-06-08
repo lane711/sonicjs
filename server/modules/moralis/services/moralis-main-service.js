@@ -13,7 +13,11 @@ const masterKey = process.env.MORALIS_MASTERKEY;
 module.exports = moralisMainService = {
   startup: async function (app) {
     const Moralis = require("moralis/node");
-    await Moralis.start({ serverUrl, appId, masterKey });
+    try {
+      await Moralis.start({ serverUrl, appId, masterKey });
+    } catch (error) {
+      console.error(error, 'This happens if the moralis server is in sleep mode');
+    }
 
     emitterService.on("beginProcessModuleShortCode", async function (options) {
       if (options.shortcode.name === "MORALIS") {
@@ -76,6 +80,9 @@ module.exports = moralisMainService = {
     });
 
     emitterService.on("getNFTs", async function (options) {
+      if(!Moralis){
+        return;
+      }
       let collections = process.env.MORALIS_NFT_COLLECTIONS.split(",");
       let nfts = [];
 

@@ -175,24 +175,25 @@ if (typeof module !== "undefined" && module.exports) {
       formSettingsId,
       sessionID
     ) {
-      debugger;
-      let result = await this.getAxios().post(apiUrl, {
-        query: `
+
+      const query = `
       {
-        form (contentTypeId: "${contentTypeId}",
-        content: "${content}",
+        form (contentType: "${contentTypeId}",
+        content: "${content ?? ''}",
         onFormSubmitFunction: "${onFormSubmitFunction}",
-        returnModuleSettings: "${returnModuleSettings}",
-        formSettingsId: "${formSettingsId}",
-        sessionID:"${sessionID}"){
+        returnModuleSettings: ${returnModuleSettings},
+        formSettingsId: "${formSettingsId ?? ''}"){
           html
         }
       }
-        `,
+        `;
+
+      let result = await this.getAxios().post("/graphql", {
+        query,
       });
 
-      if (result.data.data.html) {
-        return result.data.data.html;
+      if (result.data.data.form.html) {
+        return result.data.data.form.html;
       }
     }),
     (exports.getContent = async function (sessionID) {
@@ -240,7 +241,6 @@ if (typeof module !== "undefined" && module.exports) {
       return data;
     }),
     (exports.getContentByType = async function (contentType, sessionID) {
-
       let result = await this.getAxios().post(apiUrl, {
         query: `
         {
@@ -256,9 +256,12 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.contents;
     }),
-    (exports.getContentByTypeAndGroup = async function (contentType, groupId, sessionID) {
-
-      let groupParam = groupId ? `, group : "${groupId}"` : '';
+    (exports.getContentByTypeAndGroup = async function (
+      contentType,
+      groupId,
+      sessionID
+    ) {
+      let groupParam = groupId ? `, group : "${groupId}"` : "";
       let result = await this.getAxios().post(apiUrl, {
         query: `
         {
@@ -515,7 +518,6 @@ if (typeof module !== "undefined" && module.exports) {
         return contentByTag;
       }
     }),
-    
     (exports.getContentByUrlAndContentType = async function (
       contentType,
       pageUrl,

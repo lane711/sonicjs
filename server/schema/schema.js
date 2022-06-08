@@ -385,14 +385,15 @@ const RootQuery = new GraphQLObjectType({
         formSettingsId: { type: GraphQLString },
       },
       async resolve(parent, args, req) {
+        console.log('getting form ', args.contentType, req.sessionID);
         return {
           html: await formService.getForm(
             args.contentType,
             args.content,
             args.onFormSubmitFunction,
-            args. returnModuleSettings,
+            args.returnModuleSettings,
             args.formSettingsId,
-            req.sessionID
+            await getUserSession(undefined, req.sessionID)
           ),
         };
       },
@@ -811,7 +812,6 @@ async function getUserSession(sessionID, reqSessionID) {
     session = undefined;
     // throw new Error("Session not found");
   }
-
   return session;
 }
 

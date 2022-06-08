@@ -106,7 +106,7 @@ async function confirmDelete(id){
 async function openCreateForm(action, contentType) {
   if (action === "create") {
     // let content = await dataService.getContentById(id);
-    debugger;
+    // debugger;
     let form = await dataService.formGet(
       contentType,
       undefined,

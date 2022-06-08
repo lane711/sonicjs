@@ -3,7 +3,6 @@
 const serverUrl = "https://5vuta7xfoe0n.usemoralis.com:2053/server";
 const appId = "OvJO9vCe1pwwLSXDQFT4nf2oQgzZyiI9aOvaCBt0";
 Moralis.start({ serverUrl, appId });
-console.log("moralis started");
 
 // !async function(){
 //   const options = {
