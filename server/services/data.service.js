@@ -175,6 +175,7 @@ if (typeof module !== "undefined" && module.exports) {
       formSettingsId,
       sessionID
     ) {
+      debugger;
       let result = await this.getAxios().post(apiUrl, {
         query: `
       {

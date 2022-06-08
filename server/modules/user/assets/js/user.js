@@ -106,13 +106,14 @@ async function confirmDelete(id){
 async function openCreateForm(action, contentType) {
   if (action === "create") {
     // let content = await dataService.getContentById(id);
-    let form = await formService.getForm(
+    debugger;
+    let form = await dataService.formGet(
       contentType,
       undefined,
       "await submitContent(submission);",
       undefined,
       undefined,
-      undefined
+      $('#sessionID').val()
     );
 
     $("#genericModal .modal-title").text(

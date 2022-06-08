@@ -79,19 +79,30 @@ if (typeof module !== "undefined" && module.exports) {
       // next();
     });
   }),
-    (exports.getFormUI = async function (
-      contentTypeId,
-      content,
-      onFormSubmitFunction,
-      returnModuleSettings = false,
-      formSettingsId,
-      sessionID
-    ) {
-      //get the form thru the back via graphql
-            let formHtml = await axiosInstance.post(`/api/views/getProceedView`, {
-        data: data,
-      });
-    }),
+    // (exports.getFormFromFrontEnd = async function (
+    //   contentTypeId,
+    //   content,
+    //   onFormSubmitFunction,
+    //   returnModuleSettings = false,
+    //   formSettingsId,
+    //   sessionID
+    // ) {
+    //   const params = {
+    //     contentTypeId,
+    //     content,
+    //     onFormSubmitFunction,
+    //     returnModuleSettings,
+    //     formSettingsId,
+    //     sessionID
+    //   }
+    //   //get the form thru the back via graphql
+    //   debugger;
+    //   let formHtml = await axiosInstance.post(`/api/views/getProceedView`, {
+    //     data: params,
+    //   });
+
+    //   return formHtml;
+    // }),
     (exports.getForm = async function (
       contentTypeId,
       content,
