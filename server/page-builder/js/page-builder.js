@@ -687,7 +687,6 @@ async function setupPageSettings(action, contentType, sessionID) {
   if (action == "edit" && contentType) {
     formValuesToLoad = this.page;
 
-    debugger;
     form = await dataService.formGet(
       contentType,
       formValuesToLoad,
