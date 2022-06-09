@@ -837,8 +837,13 @@ async function onContentTypeSave() {
     //states
     processContentTypeStates(contentType);
 
+    //post submission
+    processPostSubmission(contentType);
+
     //form
     await editContentType(contentType, sessionID);
+
+    fullPageUpdate();
   }
 }
 
@@ -850,6 +855,21 @@ function processContentTypeStates(contentType) {
     edit: {
       buttonText: $("#editText").val() ?? "Submit",
     },
+  };
+}
+
+function processPostSubmission(contentType) {
+  let action = 'fullPageRefresh';
+  let property = '';
+
+  if($('#redirectToUrl').prop("checked")){
+    action = 'redirectToUrl';
+    property = $('#redirectUrl').val();
+  };
+
+  contentType.data.postSubmission = {
+    action, 
+    property
   };
 }
 

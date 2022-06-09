@@ -91,6 +91,7 @@
             <div class="card-body">
 
               <div id='form-states'>
+                <h3>Components</h3>
                 <table class="table">
                   <thead>
                     <tr>
@@ -109,6 +110,24 @@
                   </tbody>
                 </table>
 
+                <h3 class="mt-5">Post Submission</h3>
+                <fieldset>
+                  <legend>What happens after a form is submitted?</legend>
+              
+                  <div>
+                    <input type="radio" id="fullPageRefresh" name="postSubmission" value="fullPageRefresh"
+                    {{{setChecked this.data.raw.data.postSubmission.action 'fullPageRefresh'}}}>
+                    <label for="fullPageRefresh">Full Page Refresh (Default)</label>
+                  </div>
+              
+                  <div>
+                    <input type="radio" id="redirectToUrl" name="postSubmission" value="redirectToUrl"
+                    {{{setChecked this.data.raw.data.postSubmission.action 'redirectToUrl'}}}>
+                    <label for="redirectToUrl">Redirect To Url: <input type="text" id="redirectUrl" value="{{this.data.raw.data.postSubmission.property}}"></label>
+                  </div>
+              
+                
+              </fieldset>
               </div>
 
             </div>

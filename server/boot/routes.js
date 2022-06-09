@@ -151,7 +151,43 @@ exports.loadRoutes = async function (app) {
       let options = { data: payload, sessionID: req.sessionID };
 
       await emitterService.emit("afterFormSubmit", options);
-      res.sendStatus(200);
+
+      // if (!payload.contentType.startsWith("user")) {
+      //   if (submission.id || submission.data.id) {
+      //     await editInstance(entity, refresh, contentType);
+      //   } else {
+      //     await createInstance(entity, true, contentType);
+      //   }
+      // }
+      let entity;
+
+      if (payload.id) {
+        //edit existing
+        // await editInstance(entity, refresh, contentType);
+      } else {
+        //create new
+        let newContent = { contentType: payload.contentType, data: payload };
+        entity = await dataService.contentCreate(newContent, true, req.sessionID);
+      }
+
+      let redirectTo = "/";
+      if (entity && entity.contentTypeId === "page") {
+        let isBackEnd = globalService.isBackEnd();
+        if (isBackEnd) {
+          redirectTo = `/admin/content/edit/page/${entity.id}`;
+        } else {
+          // window.location.href = payload.data.url;
+          redirectTo =  payload.data.url;
+        }
+      } 
+      // else if (refresh) {
+      //   fullPageUpdate();
+      // }
+
+      let successAction = "fullPageUpdate();"
+
+      await emitterService.emit("afterFormSubmit", options);
+      res.send({successAction});
     }
   });
 

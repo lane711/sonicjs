@@ -158,25 +158,36 @@ async function submitContent(
   console.log("Submission was made!", submission);
   let entity = submission.data ? submission.data : submission;
 
-  if (!contentType.startsWith("user")) {
-    if (submission.id || submission.data.id) {
-      await editInstance(entity, refresh, contentType);
-    } else {
-      await createInstance(entity, true, contentType);
-    }
-  } else {
-    entity.contentType = contentType;
+  // debugger;
 
-    let result = await axios({
-      method: "post",
-      url: "/form-submission",
-      data: {
-        data: entity,
-      },
-    });
-    debugger;
-    fullPageUpdate();
-  }
+  let result = await axios({
+    method: "post",
+    url: "/form-submission",
+    data: {
+      data: entity,
+    },
+  });
+
+  eval(result.data.successAction);
+
+  // if (!contentType.startsWith("user")) {
+  //   if (submission.id || submission.data.id) {
+  //     await editInstance(entity, refresh, contentType);
+  //   } else {
+  //     await createInstance(entity, true, contentType);
+  //   }
+  // } else {
+  //   entity.contentType = contentType;
+
+  //   let result = await axios({
+  //     method: "post",
+  //     url: "/form-submission",
+  //     data: {
+  //       data: entity,
+  //     },
+  //   });
+    // fullPageUpdate();
+  // }
 }
 
 async function editInstance(payload, refresh, contentType = "content") {
@@ -205,43 +216,43 @@ async function editInstance(payload, refresh, contentType = "content") {
     });
 }
 
-async function createInstance(
-  payload,
-  refresh = false,
-  contentType = "content"
-) {
-  // console.log('createInstance payload', payload);
-  // let content = {};
-  // content.data = payload;
-  // this.processContentFields(payload, content);
-  // debugger;
-  console.log("payload", payload);
-  if (payload.id || "id" in payload) {
-    delete payload.id;
-  }
+// async function createInstance(
+//   payload,
+//   refresh = false,
+//   contentType = "content"
+// ) {
+//   // console.log('createInstance payload', payload);
+//   // let content = {};
+//   // content.data = payload;
+//   // this.processContentFields(payload, content);
+//   // debugger;
+//   console.log("payload", payload);
+//   if (payload.id || "id" in payload) {
+//     delete payload.id;
+//   }
 
-  if (!payload.data) {
-    let temp = { data: payload };
-    payload = temp;
-  }
+//   if (!payload.data) {
+//     let temp = { data: payload };
+//     payload = temp;
+//   }
 
-  if (contentType === "Roles") {
-    payload = payload.data;
-  }
+//   if (contentType === "Roles") {
+//     payload = payload.data;
+//   }
 
-  // debugger;
-  let entity = await dataService.contentCreate(payload);
+//   // debugger;
+//   let entity = await dataService.contentCreate(payload);
 
-  if (entity && entity.contentTypeId === "page") {
-    let isBackEnd = globalService.isBackEnd();
-    if (isBackEnd) {
-      window.location.href = `/admin/content/edit/page/${entity.id}`;
-    } else {
-      window.location.href = payload.data.url;
-    }
-  } else if (refresh) {
-    fullPageUpdate();
-  }
+//   if (entity && entity.contentTypeId === "page") {
+//     let isBackEnd = globalService.isBackEnd();
+//     if (isBackEnd) {
+//       window.location.href = `/admin/content/edit/page/${entity.id}`;
+//     } else {
+//       window.location.href = payload.data.url;
+//     }
+//   } else if (refresh) {
+//     fullPageUpdate();
+//   }
 
-  return entity;
-}
+//   return entity;
+// }
