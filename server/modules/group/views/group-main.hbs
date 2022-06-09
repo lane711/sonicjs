@@ -52,7 +52,7 @@
   {{/each}}
   <a
     href="#"
-    onclick="return openFormInModal('create', 'group')"
+    onclick="return openFormInModal('create', 'club-request')"
     class="m-4"
     style="width: 14rem;"
   >
@@ -79,7 +79,14 @@
     </div>
   {{/each}}
   <div class="m-4" style="width: 14rem;">
-    <img src="/assets/uploads/new_clubhouse.png" class="card-img-top" />
+    <a
+      href="#"
+      onclick="return openFormInModal('create', 'club-request')"
+      class="m-4"
+      style="width: 14rem;"
+    >
+      <img src="/assets/uploads/new_clubhouse.png" class="card-img-top" />
+    </a>
   </div>
 </div>
 
@@ -95,6 +102,6 @@
     {{this.token_address}}<br />
     Hash:
     {{this.token_hash}}
-    <hr>
+    <hr />
   </div>
 {{/each}}

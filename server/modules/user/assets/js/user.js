@@ -174,6 +174,7 @@ async function submitContent(
         data: entity,
       },
     });
+    debugger;
     fullPageUpdate();
   }
 }

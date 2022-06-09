@@ -159,7 +159,7 @@ if (typeof module !== "undefined" && module.exports) {
 
       //override button copy
       if (contentType.data.states) {
-        if (data.viewModel.editMode && contentType.data.states.edit) {
+        if (data.viewModel.editMode && contentType.data.states.edit?.buttonText) {
           const submitButton = contentType.data.components.find(
             (c) => c.key === "submit"
           );
@@ -168,7 +168,7 @@ if (typeof module !== "undefined" && module.exports) {
           }
         }
 
-        if (!data.viewModel.editMode && contentType.data.states.new) {
+        if (!data.viewModel.editMode && contentType.data.states.new?.buttonText) {
           const submitButton = contentType.data.components.find(
             (c) => c.key === "submit"
           );
