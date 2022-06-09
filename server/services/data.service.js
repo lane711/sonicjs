@@ -176,10 +176,12 @@ if (typeof module !== "undefined" && module.exports) {
       sessionID
     ) {
 
+      let contentString = content ? JSON.stringify(content) : '';
+
       const query = `
       {
         form (contentType: "${contentTypeId}",
-        content: "${content ?? ''}",
+        content: """${contentString}""",
         onFormSubmitFunction: "${onFormSubmitFunction}",
         returnModuleSettings: ${returnModuleSettings},
         formSettingsId: "${formSettingsId ?? ''}"){
@@ -188,6 +190,8 @@ if (typeof module !== "undefined" && module.exports) {
       }
         `;
 
+        console.log('query', query);
+        
       let result = await this.getAxios().post("/graphql", {
         query,
       });

@@ -64,13 +64,13 @@ async function openDetailForm(action, id) {
 async function openEditForm(action, id) {
   if (action === "edit") {
     let content = await dataService.getContentById(id);
-    let form = await formService.getForm(
+    let form = await dataService.formGet(
       content.contentTypeId,
       content,
       "await submitContent(submission);",
       undefined,
       undefined,
-      undefined
+      $('#sessionID').val()
     );
 
     $("#genericModal .modal-title").text(
@@ -162,7 +162,6 @@ async function submitContent(
     if (submission.id || submission.data.id) {
       await editInstance(entity, refresh, contentType);
     } else {
-      debugger;
       await createInstance(entity, true, contentType);
     }
   } else {

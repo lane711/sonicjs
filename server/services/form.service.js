@@ -79,25 +79,30 @@ if (typeof module !== "undefined" && module.exports) {
       // next();
     });
   }),
+
     (exports.getForm = async function (
       contentTypeId,
       content,
       onFormSubmitFunction,
       returnModuleSettings = false,
       formSettingsId,
-      sessionID
+      req
     ) {
+      let contentObject = content;
+      if ((typeof content === 'string' || content instanceof String) && content.length){
+        contentObject = JSON.parse(content)
+      } 
       let contentType;
       // debugger;
-      if (content && content.data.contentType) {
+      if (contentObject && contentObject.data.contentType) {
         contentType = await dataService.contentTypeGet(
-          content.data.contentType.toLowerCase(),
-          sessionID
+          contentObject.data.contentType.toLowerCase(),
+          req.sessionID
         );
       } else if (contentTypeId) {
         contentType = await dataService.contentTypeGet(
           contentTypeId,
-          sessionID
+          req.sessionID
         );
 
         //add a hidden object for the formsettings id so we can look it up on form submission
@@ -116,7 +121,7 @@ if (typeof module !== "undefined" && module.exports) {
         if (returnModuleSettings) {
           const settingContentType = await dataService.contentTypeGet(
             `${contentTypeId}-settings`,
-            sessionID
+            req.sessionID
           );
           // debugger;
           if (settingContentType && settingContentType.data) {
@@ -130,7 +135,8 @@ if (typeof module !== "undefined" && module.exports) {
       if (contentType && emitterService) {
         await emitterService.emit("formComponentsLoaded", {
           contentType,
-          content,
+          contentObject,
+          req
         });
       }
 
@@ -138,7 +144,7 @@ if (typeof module !== "undefined" && module.exports) {
         onFormSubmitFunction = "editInstance(submission,true)";
       }
 
-      const formJSON = await exports.getFormJson(contentType, content);
+      const formJSON = await exports.getFormJson(contentType, contentObject);
 
       let form = "";
 
@@ -146,8 +152,8 @@ if (typeof module !== "undefined" && module.exports) {
       data.viewModel.onFormSubmitFunction = onFormSubmitFunction;
       data.viewModel.editMode = false;
       let formValuesToLoad = {};
-      if (content && content.data) {
-        formValuesToLoad = content.data;
+      if (contentObject && contentObject.data) {
+        formValuesToLoad = contentObject.data;
         data.viewModel.editMode = true;
       }
 

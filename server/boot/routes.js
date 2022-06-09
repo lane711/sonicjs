@@ -167,6 +167,8 @@ exports.loadRoutes = async function (app) {
 exports.loadRoutesCatchAll = async function (app) {
   // app.get(/^[^.]*$/, async function (req, res, next) {
   app.get("*", async function (req, res, next) {
+
+
     await emitterService.emit("requestBegin", { req: req, res: res });
 
     if (req.isRequestAlreadyHandled) {
@@ -208,6 +210,8 @@ exports.loadRoutesCatchAll = async function (app) {
     ) {
       return next();
     }
+
+    req.user.profile.currentPageUrl = req.url;
 
     if (process.env.MODE == "production") {
       console.log(`serving: ${req.url}`);

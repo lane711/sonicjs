@@ -85,7 +85,7 @@ $(document).ready(async function () {
 
     // debugger;
 
-    let form = await formService.getForm(
+    let form = await dataService.formGet(
       "menu",
       content,
       "addModuleToColumn(submission)",
