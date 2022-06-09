@@ -23,6 +23,17 @@ module.exports = groupMainService = {
           options.contentType.systemId
         )
       ) {
+        //get current group by url
+        let groupId = "";
+        if (options.req.user?.profile) {
+          const group = await dataService.getContentByUrl(
+            options.req.user.profile.currentPageUrl,
+            options.req.sessionID
+          );
+          groupId = group.id;
+        }
+
+        //add hidden group field to content type, set current group id
         options.contentType.data.components.splice(-1, 0, {
           type: "textfield",
           inputType: "text",
@@ -30,6 +41,8 @@ module.exports = groupMainService = {
           label: "Group",
           hidden: false,
           input: true,
+          defaultValue: groupId,
+          customClass:'fe-hide'
         });
       }
     });

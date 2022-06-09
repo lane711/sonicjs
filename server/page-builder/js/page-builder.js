@@ -703,7 +703,7 @@ async function setupPageSettings(action, contentType, sessionID) {
 
     // debugger;
 
-    form = await formService.getForm(
+    form = await dataService.formGet(
       "page",
       undefined,
       "await submitContent(submission);",
@@ -1062,7 +1062,7 @@ async function saveWYSIWYG() {
 async function addModule(systemId, sessionID) {
   showSidePanel();
 
-  let form = await formService.getForm(
+  let form = await dataService.formGet(
     systemId,
     undefined,
     "addModuleToColumn(submission, true)",
@@ -1087,7 +1087,7 @@ async function editModule(sessionID) {
 
   let data = await dataService.getContentById(currentModuleId);
 
-  let form = await formService.getForm(
+  let form = await dataService.formGet(
     currentModuleContentType,
     data,
     "await editInstance(submission, true);",

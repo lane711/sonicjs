@@ -145,14 +145,14 @@ exports.loadRoutes = async function (app) {
   });
 
   app.post("/form-submission", async function (req, res) {
-    let payload = req.body.data ? req.body.data : req.body.data.data ;
+    let payload = req.body.data ? req.body.data : req.body.data.data;
 
     if (payload) {
       let options = { data: payload, sessionID: req.sessionID };
 
       await emitterService.emit("afterFormSubmit", options);
       res.sendStatus(200);
-    } 
+    }
   });
 
   app.post("*", async function (req, res, next) {
@@ -209,6 +209,10 @@ exports.loadRoutesCatchAll = async function (app) {
       return next();
     }
 
+    if (req.user?.profile) {
+      req.user.profile.currentPageUrl = req.url;
+    }
+
     if (process.env.MODE == "production") {
       console.log(`serving: ${req.url}`);
     }
@@ -244,9 +248,9 @@ exports.loadRoutesCatchAll = async function (app) {
     page.data.themeSettings.bootstrapToggleMiddle =
       page.data.themeSettings.bootstrapVersion == 4 ? "" : "bs-";
 
-      //add user data
-      page.data.user = req.user ? req.user : {username: 'anon'};
-      page.data.user.isAuthenticated =  req.user ? true: false;
+    //add user data
+    page.data.user = req.user ? req.user : { username: "anon" };
+    page.data.user.isAuthenticated = req.user ? true : false;
 
     res.render(`front-end/${frontEndTheme}/layouts/main`, {
       layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
