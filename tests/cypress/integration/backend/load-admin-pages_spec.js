@@ -3,7 +3,7 @@ const { iteratee } = require("lodash");
 
 
 
-describe("Smoke Testing", function () {
+describe("Load Admin Pages", function () {
 
   beforeEach(() => {
     cy.SonicJs.login();

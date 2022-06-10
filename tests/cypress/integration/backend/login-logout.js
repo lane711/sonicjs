@@ -3,7 +3,7 @@ const { iteratee } = require("lodash");
 
 
 
-describe("Smoke Testing", function () {
+describe("Login Logout Admin", function () {
 
   it("login and logout of admin", function () {
 

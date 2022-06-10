@@ -3,7 +3,7 @@ const { iteratee } = require("lodash");
 
 
 
-describe("Smoke Testing", function () {
+describe("Ensure /Admin Protected Url", function () {
 
   it("login cookie expiration should redirect to login", function () {
 

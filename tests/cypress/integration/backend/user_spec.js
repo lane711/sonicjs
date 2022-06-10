@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { iteratee } = require("lodash");
 
-describe("Admin Content", function () {
+describe("Admin Users", function () {
   beforeEach(() => {
     cy.SonicJs.login();
   });
