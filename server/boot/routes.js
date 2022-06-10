@@ -146,7 +146,7 @@ exports.loadRoutes = async function (app) {
 
   app.post("/form-submission", async function (req, res) {
     let payload = req.body.data ? req.body.data : req.body.data.data;
-
+    let contentTypeId = payload.contentType;
     if (payload) {
       let options = { data: payload, sessionID: req.sessionID };
 
@@ -162,13 +162,18 @@ exports.loadRoutes = async function (app) {
       let entity;
 
       let contentType = await dataService.contentTypeGet(
-        payload.contentType,
+        contentTypeId,
         req.sessionID
       );
 
       if (payload.id) {
         //edit existing
-        entity = await dataService.editInstance(payload, req.sessionID);
+        if (contentTypeId === "user") {
+          //do nothing, already managed by hook
+          // entity = await dataService.userUpdate(payload, req.sessionID);
+        } else {
+          entity = await dataService.editInstance(payload, req.sessionID);
+        }
       } else {
         //create new
         let newContent = { contentType: payload.contentType, data: payload };
@@ -192,10 +197,9 @@ exports.loadRoutes = async function (app) {
       // else if (refresh) {
       //   fullPageUpdate();
       // }
+      let successAction;
 
-      let successAction = "fullPageUpdate();";
-
-      if (contentType.data.postSubmission) {
+      if (contentType.data?.postSubmission) {
         if (contentType.data.postSubmission.action === "redirectToUrl") {
           successAction = `redirectToUrl('${contentType.data.postSubmission.redirectUrl}');`;
         } else if (contentType.data.postSubmission.action === "showMessage") {
@@ -206,10 +210,14 @@ exports.loadRoutes = async function (app) {
       }
 
       //if admin, redirect to edit page
-      let isBackEnd = req.body.url.startsWith("/admin")
-      if(isBackEnd){
-        successAction = `redirectToUrl('/admin/content/edit/page/${entity.id}');`;
+      let isBackEnd = req.body.url.startsWith("/admin");
+      if (isBackEnd && !successAction) {
+        successAction = `redirectToUrl('/admin/content/edit/${contentTypeId}/${entity.id}');`;
+      } else if(!isBackEnd && contentTypeId === 'page'){
+        successAction = `redirectToUrl('${entity.url}');`;
       }
+
+      successAction = successAction ?? "fullPageUpdate();";
 
       res.send({ successAction });
     }
@@ -272,7 +280,6 @@ exports.loadRoutesCatchAll = async function (app) {
     if (req.user?.profile) {
       req.user.profile.currentPageUrl = req.url;
     }
-
 
     if (process.env.MODE == "production") {
       console.log(`serving: ${req.url}`);

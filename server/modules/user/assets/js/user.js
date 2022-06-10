@@ -147,6 +147,7 @@ async function submitContent(
 ) {
   console.log("Submission was made!", submission);
   let entity = submission.data ? submission.data : submission;
+  entity.contentType = entity.contentType ?? contentType;
 
   // debugger;
 
