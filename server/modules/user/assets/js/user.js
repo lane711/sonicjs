@@ -76,7 +76,7 @@ async function openEditForm(action, id) {
     );
 
     $("#formio").empty();
-    $("#formio").html(form);
+    $("#formio").html(form.html);
 
     loadModuleSettingForm();
 
@@ -126,7 +126,7 @@ async function openCreateForm(action, contentType) {
     );
 
     $("#genericModal .modal-title").text(
-      form.contentType.data.modalSettings.modalTitle
+      form.contentType.data.modalSettings?.modalTitle ?? helperService.titleCase(`${action} ${contentType}`)
     );
 
     $("#formio").empty();
@@ -155,6 +155,7 @@ async function submitContent(
     url: "/form-submission",
     data: {
       data: entity,
+      url: window.location.pathname
     },
   });
 

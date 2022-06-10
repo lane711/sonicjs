@@ -180,15 +180,15 @@ exports.loadRoutes = async function (app) {
       }
 
       let redirectTo = "/";
-      if (entity && entity.contentTypeId === "page") {
-        let isBackEnd = globalService.isBackEnd();
-        if (isBackEnd) {
-          redirectTo = `/admin/content/edit/page/${entity.id}`;
-        } else {
-          // window.location.href = payload.data.url;
-          redirectTo = payload.data.url;
-        }
-      }
+      // if (entity && entity.contentTypeId === "page") {
+      //   let isBackEnd = globalService.isBackEnd();
+      //   if (isBackEnd) {
+      //     redirectTo = `/admin/content/edit/page/${entity.id}`;
+      //   } else {
+      //     // window.location.href = payload.data.url;
+      //     redirectTo = payload.data.url;
+      //   }
+      // }
       // else if (refresh) {
       //   fullPageUpdate();
       // }
@@ -203,6 +203,12 @@ exports.loadRoutes = async function (app) {
         } else if (contentType.data.postSubmission.action === "doNothing") {
           successAction = `javascript:void(0);`;
         }
+      }
+
+      //if admin, redirect to edit page
+      let isBackEnd = req.body.url.startsWith("/admin")
+      if(isBackEnd){
+        successAction = `redirectToUrl('/admin/content/edit/page/${entity.id}');`;
       }
 
       res.send({ successAction });
@@ -266,6 +272,7 @@ exports.loadRoutesCatchAll = async function (app) {
     if (req.user?.profile) {
       req.user.profile.currentPageUrl = req.url;
     }
+
 
     if (process.env.MODE == "production") {
       console.log(`serving: ${req.url}`);

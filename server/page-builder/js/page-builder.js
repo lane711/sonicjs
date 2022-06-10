@@ -713,7 +713,7 @@ async function setupPageSettings(action, contentType, sessionID) {
     );
   }
 
-  $("#formio").html(form);
+  $("#formio").html(form.html);
   loadModuleSettingForm();
 
   $("#genericModal").appendTo("body").modal("show");
@@ -1140,7 +1140,7 @@ async function editModule(sessionID) {
   );
 
   // $("#moduleSettingsFormio").html(form);
-  $(".pb-side-panel #main").html(form);
+  $(".pb-side-panel #main").html(form.html);
   loadModuleSettingForm();
   // $("#moduleSettingsModal")
   //   .appendTo("body")
