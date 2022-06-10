@@ -161,13 +161,22 @@ exports.loadRoutes = async function (app) {
       // }
       let entity;
 
+      let contentType = await dataService.contentTypeGet(
+        payload.contentType,
+        req.sessionID
+      );
+
       if (payload.id) {
         //edit existing
-        // await editInstance(entity, refresh, contentType);
+        entity = await dataService.editInstance(payload, req.sessionID);
       } else {
         //create new
         let newContent = { contentType: payload.contentType, data: payload };
-        entity = await dataService.contentCreate(newContent, true, req.sessionID);
+        entity = await dataService.contentCreate(
+          newContent,
+          true,
+          req.sessionID
+        );
       }
 
       let redirectTo = "/";
@@ -177,17 +186,26 @@ exports.loadRoutes = async function (app) {
           redirectTo = `/admin/content/edit/page/${entity.id}`;
         } else {
           // window.location.href = payload.data.url;
-          redirectTo =  payload.data.url;
+          redirectTo = payload.data.url;
         }
-      } 
+      }
       // else if (refresh) {
       //   fullPageUpdate();
       // }
 
-      let successAction = "fullPageUpdate();"
+      let successAction = "fullPageUpdate();";
 
-      await emitterService.emit("afterFormSubmit", options);
-      res.send({successAction});
+      if (contentType.data.postSubmission) {
+        if (contentType.data.postSubmission.action === "redirectToUrl") {
+          successAction = `redirectToUrl('${contentType.data.postSubmission.redirectUrl}');`;
+        } else if (contentType.data.postSubmission.action === "showMessage") {
+          successAction = `postSubmissionSuccessMessage("${contentType.data.postSubmission.message}");`;
+        } else if (contentType.data.postSubmission.action === "doNothing") {
+          successAction = `javascript:void(0);`;
+        }
+      }
+
+      res.send({ successAction });
     }
   });
 

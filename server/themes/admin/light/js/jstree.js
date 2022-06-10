@@ -97,7 +97,7 @@ $(document).ready(async function () {
     // debugger;
 
     $("#menuTreeForm").empty();
-    $("#menuTreeForm").html(form);
+    $("#menuTreeForm").html(form.html);
 
     loadModuleSettingForm();
 

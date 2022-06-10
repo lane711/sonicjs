@@ -46,11 +46,9 @@ async function openFormInModal(action, contentType, id) {
 async function openDetailForm(action, id) {
   if (action === "detail") {
     let content = await dataService.getContentById(id);
-    let form = 'details go here'
+    let form = "details go here";
 
-    $("#genericModal .modal-title").text(
-      content.data.title
-    );
+    $("#genericModal .modal-title").text(content.data.title);
 
     $("#formio").empty();
     $("#formio").html(form);
@@ -70,7 +68,7 @@ async function openEditForm(action, id) {
       "await submitContent(submission);",
       undefined,
       undefined,
-      $('#sessionID').val()
+      $("#sessionID").val()
     );
 
     $("#genericModal .modal-title").text(
@@ -91,11 +89,7 @@ async function openEditForm(action, id) {
 async function openDeleteForm(action, id) {
   if (action === "delete") {
     let content = await dataService.getContentById(id);
-    let form = JSON.stringify(
-      content.data,
-      null,
-      4
-    );
+    let form = JSON.stringify(content.data, null, 4);
 
     form += `<div><button class="mt-2" type="button"  onclick="return confirmDelete('${content.id}', 1)""><i class="bi bi-trash"></i> Confirm Delete</button></div>`;
 
@@ -106,20 +100,16 @@ async function openDeleteForm(action, id) {
     $("#formio").empty();
     $("#formio").html(form);
 
-
     $("#genericModal").appendTo("body").modal("show");
   }
 }
 
-async function confirmDelete(id){
-  console.log('attempting delete of ', id);
+async function confirmDelete(id) {
+  console.log("attempting delete of ", id);
 
-  dataService.contentDelete(id, $('#sessionID').val()).then((response)=>{
+  dataService.contentDelete(id, $("#sessionID").val()).then((response) => {
     fullPageUpdate();
-
-  })
-
-
+  });
 }
 
 async function openCreateForm(action, contentType) {
@@ -132,15 +122,15 @@ async function openCreateForm(action, contentType) {
       "await submitContent(submission);",
       undefined,
       undefined,
-      $('#sessionID').val()
+      $("#sessionID").val()
     );
 
     $("#genericModal .modal-title").text(
-      helperService.titleCase(`${action} ${contentType}`)
+      form.contentType.data.modalSettings.modalTitle
     );
 
     $("#formio").empty();
-    $("#formio").html(form);
+    $("#formio").html(form.html);
 
     loadModuleSettingForm();
 
@@ -168,6 +158,7 @@ async function submitContent(
     },
   });
 
+  // debugger;
   eval(result.data.successAction);
 
   // if (!contentType.startsWith("user")) {
@@ -186,7 +177,7 @@ async function submitContent(
   //       data: entity,
   //     },
   //   });
-    // fullPageUpdate();
+  // fullPageUpdate();
   // }
 }
 
@@ -214,6 +205,21 @@ async function editInstance(payload, refresh, contentType = "content") {
     .catch(function (error) {
       console.log("editInstance", error);
     });
+}
+
+function postSubmissionSuccessMessage(message) {
+  let form = `<div>
+  ${message}
+  </div>
+  <button class="btn btn-success mt-5" type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">Ok</span>
+  </button>`;
+  $("#formio").empty();
+  $("#formio").html(form);
+}
+
+function redirectToUrl(url) {
+  window.location.href = url;
 }
 
 // async function createInstance(

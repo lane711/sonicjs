@@ -144,6 +144,7 @@ const FormType = new GraphQLObjectType({
   name: "FormType",
   fields: () => ({
     html: { type: GraphQLString },
+    contentType: { type: GraphQLJSONObject },
   }),
 });
 
@@ -385,16 +386,14 @@ const RootQuery = new GraphQLObjectType({
         formSettingsId: { type: GraphQLString },
       },
       async resolve(parent, args, req) {
-        return {
-          html: await formService.getForm(
+        return formService.getForm(
             args.contentType,
             args.content,
             args.onFormSubmitFunction,
             args.returnModuleSettings,
             args.formSettingsId,
             await getUserSession(undefined, req.sessionID)
-          ),
-        };
+          );
       },
     },
 

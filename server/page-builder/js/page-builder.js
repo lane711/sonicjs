@@ -840,6 +840,9 @@ async function onContentTypeSave() {
     //post submission
     processPostSubmission(contentType);
 
+    //modal settings
+    processModalSettings(contentType);
+
     //form
     await editContentType(contentType, sessionID);
 
@@ -860,16 +863,33 @@ function processContentTypeStates(contentType) {
 
 function processPostSubmission(contentType) {
   let action = 'fullPageRefresh';
-  let property = '';
+  let redirectUrl = $('#redirectUrl').val();
+  let message = $('#showMessageCopy').val();
 
   if($('#redirectToUrl').prop("checked")){
     action = 'redirectToUrl';
-    property = $('#redirectUrl').val();
+  };
+
+  if($('#showMessage').prop("checked")){
+    action = 'showMessage';
+  };
+
+  if($('#doNothing').prop("checked")){
+    action = 'doNothing';
   };
 
   contentType.data.postSubmission = {
     action, 
-    property
+    redirectUrl,
+    message
+  };
+}
+
+function processModalSettings(contentType) {
+  let modalTitle = $('#modalTitle').val();
+ 
+  contentType.data.modalSettings = {
+    modalTitle
   };
 }
 
