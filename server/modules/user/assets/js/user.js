@@ -45,15 +45,14 @@ async function openFormInModal(action, contentType, id) {
 
 async function openDetailForm(action, id) {
   if (action === "detail") {
+    debugger;
     let content = await dataService.getContentById(id);
-    let form = "details go here";
+    let form = content.data.body;
 
-    $("#genericModal .modal-title").text(content.data.title);
+    $("#genericModal .modal-title").html(content.data.title);
 
     $("#formio").empty();
     $("#formio").html(form);
-
-    $('input[name="data[title]"').focus();
 
     $("#genericModal").appendTo("body").modal("show");
   }
