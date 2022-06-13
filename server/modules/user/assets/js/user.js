@@ -45,7 +45,6 @@ async function openFormInModal(action, contentType, id) {
 
 async function openDetailForm(action, id) {
   if (action === "detail") {
-    debugger;
     let content = await dataService.getContentById(id);
     let form = content.data.body;
 
