@@ -49,6 +49,17 @@ if (typeof module !== "undefined" && module.exports) {
       else str = str.toString();
       return str.replace(/<[^>]*>/g, "");
     });
+    (exports.truncateStringAndClearNewLines = function (body, length) {
+      if (body) {
+        let noTags = this.stripHtmlTags(body);
+        let cleanHtml = noTags.replace(/(\r\n|\n|\r)/gm," ")
+        .substring(0, 450);
+  
+        return cleanHtml.length > length
+          ? cleanHtml.substr(0, length - 1) + "..."
+          : cleanHtml;
+      }
+    }),
   exports.generateModuleDivWrapper = function (
     id,
     wrapperCss,

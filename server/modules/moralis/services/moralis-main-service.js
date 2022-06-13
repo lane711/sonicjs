@@ -58,8 +58,15 @@ module.exports = moralisMainService = {
             address: moralisEthAddress,
           });
 
+          const testNfts = await Moralis.Web3API.account.getNFTs({
+            chain: "mumbai",
+            address: moralisEthAddress,
+          });
+
+          const allNfts = [...mynfts.result, ...testNfts.result];
+
           let nfts = [];
-          mynfts.result.map((n) => {
+          allNfts.map((n) => {
             if (n.metadata) {
               n.data = JSON.parse(n.metadata);
               n.imageUrl =
