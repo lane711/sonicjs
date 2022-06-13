@@ -50,7 +50,7 @@ module.exports = groupMainService = {
     emitterService.on("postModuleGetData", async function (options) {
       if (options.shortcode.name === "GROUP") {
         let groups = await dataService.getContentByContentType("group");
-        options.viewModel.groups = groups;
+        options.viewModel.groups = groups.filter((g) => g.data.active === true);
 
         await emitterService.emit("getNFTs", options.viewModel.data);
 
