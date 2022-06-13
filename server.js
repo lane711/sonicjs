@@ -248,6 +248,13 @@ function setupHandlebarsHelpers() {
       let cms = _.camelCase(column.title);
       return row[cms] ? "fa-check text-success" : "fa-times text-danger";
     },
+    setChecked: function (value, currentValue) {
+      if (value == currentValue) {
+        return "checked";
+      } else {
+        return "";
+      }
+    },
   });
 }
 
@@ -290,7 +297,9 @@ function setupStaticAssets(app) {
   );
   app.use(
     "/assets/css/fonts",
-    express.static(path.join(appRoot.path, "node_modules/bootstrap-icons/font/fonts"))
+    express.static(
+      path.join(appRoot.path, "node_modules/bootstrap-icons/font/fonts")
+    )
   );
   app.use(
     "/",
@@ -312,7 +321,7 @@ function main() {
     type: process.env.TYPEORM_CONNECTION,
     entities: ["server/data/entity/*.js"],
     synchronize: process.env.TYPEORM_SYNCHRONIZE,
-    logging:process.env.TYPEORM_LOGGING,
+    logging: process.env.TYPEORM_LOGGING,
     ssl: sslParam,
   };
 
@@ -335,6 +344,3 @@ function main() {
 }
 
 main();
-
-
-

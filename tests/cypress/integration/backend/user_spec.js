@@ -36,7 +36,7 @@ describe("Admin Content", function () {
     cy.get('input[name="data[lastName]"]').click();
     cy.contains("Submit").click();
     cy.wait(1000);
-    cy.contains('cypress last');
+    cy.url().should('include', '/admin/users');
 
   });
 

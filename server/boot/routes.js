@@ -146,12 +146,80 @@ exports.loadRoutes = async function (app) {
 
   app.post("/form-submission", async function (req, res) {
     let payload = req.body.data ? req.body.data : req.body.data.data;
-
+    let contentTypeId = payload.contentType;
     if (payload) {
       let options = { data: payload, sessionID: req.sessionID };
 
       await emitterService.emit("afterFormSubmit", options);
-      res.sendStatus(200);
+
+      // if (!payload.contentType.startsWith("user")) {
+      //   if (submission.id || submission.data.id) {
+      //     await editInstance(entity, refresh, contentType);
+      //   } else {
+      //     await createInstance(entity, true, contentType);
+      //   }
+      // }
+      let entity;
+
+      let contentType = await dataService.contentTypeGet(
+        contentTypeId,
+        req.sessionID
+      );
+
+      if (payload.id) {
+        //edit existing
+        if (contentTypeId === "user") {
+          //do nothing, already managed by hook
+          // entity = await dataService.userUpdate(payload, req.sessionID);
+        } else {
+          entity = await dataService.editInstance(payload, req.sessionID);
+        }
+      } else {
+        //create new
+        let newContent = { contentType: payload.contentType, data: payload };
+        entity = await dataService.contentCreate(
+          newContent,
+          true,
+          req.sessionID
+        );
+      }
+
+      let redirectTo = "/";
+      // if (entity && entity.contentTypeId === "page") {
+      //   let isBackEnd = globalService.isBackEnd();
+      //   if (isBackEnd) {
+      //     redirectTo = `/admin/content/edit/page/${entity.id}`;
+      //   } else {
+      //     // window.location.href = payload.data.url;
+      //     redirectTo = payload.data.url;
+      //   }
+      // }
+      // else if (refresh) {
+      //   fullPageUpdate();
+      // }
+      let successAction;
+
+      if (contentType.data?.postSubmission) {
+        if (contentType.data.postSubmission.action === "redirectToUrl") {
+          successAction = `redirectToUrl('${contentType.data.postSubmission.redirectUrl}');`;
+        } else if (contentType.data.postSubmission.action === "showMessage") {
+          successAction = `postSubmissionSuccessMessage("${contentType.data.postSubmission.message}");`;
+        } else if (contentType.data.postSubmission.action === "doNothing") {
+          successAction = `javascript:void(0);`;
+        }
+      }
+
+      //if admin, redirect to edit page
+      let isBackEnd = req.body.url.startsWith("/admin");
+      if (isBackEnd && !successAction) {
+        successAction = `redirectToUrl('/admin/content/edit/${contentTypeId}/${entity.id}');`;
+      } else if(!isBackEnd && contentTypeId === 'page'){
+        successAction = `redirectToUrl('${entity.url}');`;
+      }
+
+      successAction = successAction ?? "fullPageUpdate();";
+
+      res.send({ successAction });
     }
   });
 

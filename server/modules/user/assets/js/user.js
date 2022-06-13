@@ -46,11 +46,9 @@ async function openFormInModal(action, contentType, id) {
 async function openDetailForm(action, id) {
   if (action === "detail") {
     let content = await dataService.getContentById(id);
-    let form = 'details go here'
+    let form = "details go here";
 
-    $("#genericModal .modal-title").text(
-      content.data.title
-    );
+    $("#genericModal .modal-title").text(content.data.title);
 
     $("#formio").empty();
     $("#formio").html(form);
@@ -70,7 +68,7 @@ async function openEditForm(action, id) {
       "await submitContent(submission);",
       undefined,
       undefined,
-      $('#sessionID').val()
+      $("#sessionID").val()
     );
 
     $("#genericModal .modal-title").text(
@@ -78,7 +76,7 @@ async function openEditForm(action, id) {
     );
 
     $("#formio").empty();
-    $("#formio").html(form);
+    $("#formio").html(form.html);
 
     loadModuleSettingForm();
 
@@ -91,11 +89,7 @@ async function openEditForm(action, id) {
 async function openDeleteForm(action, id) {
   if (action === "delete") {
     let content = await dataService.getContentById(id);
-    let form = JSON.stringify(
-      content.data,
-      null,
-      4
-    );
+    let form = JSON.stringify(content.data, null, 4);
 
     form += `<div><button class="mt-2" type="button"  onclick="return confirmDelete('${content.id}', 1)""><i class="bi bi-trash"></i> Confirm Delete</button></div>`;
 
@@ -106,20 +100,16 @@ async function openDeleteForm(action, id) {
     $("#formio").empty();
     $("#formio").html(form);
 
-
     $("#genericModal").appendTo("body").modal("show");
   }
 }
 
-async function confirmDelete(id){
-  console.log('attempting delete of ', id);
+async function confirmDelete(id) {
+  console.log("attempting delete of ", id);
 
-  dataService.contentDelete(id, $('#sessionID').val()).then((response)=>{
+  dataService.contentDelete(id, $("#sessionID").val()).then((response) => {
     fullPageUpdate();
-
-  })
-
-
+  });
 }
 
 async function openCreateForm(action, contentType) {
@@ -132,15 +122,15 @@ async function openCreateForm(action, contentType) {
       "await submitContent(submission);",
       undefined,
       undefined,
-      $('#sessionID').val()
+      $("#sessionID").val()
     );
 
     $("#genericModal .modal-title").text(
-      helperService.titleCase(`${action} ${contentType}`)
+      form.contentType.data.modalSettings?.modalTitle ?? helperService.titleCase(`${action} ${contentType}`)
     );
 
     $("#formio").empty();
-    $("#formio").html(form);
+    $("#formio").html(form.html);
 
     loadModuleSettingForm();
 
@@ -157,26 +147,40 @@ async function submitContent(
 ) {
   console.log("Submission was made!", submission);
   let entity = submission.data ? submission.data : submission;
+  entity.contentType = entity.contentType ?? contentType;
 
-  if (!contentType.startsWith("user")) {
-    if (submission.id || submission.data.id) {
-      await editInstance(entity, refresh, contentType);
-    } else {
-      await createInstance(entity, true, contentType);
-    }
-  } else {
-    entity.contentType = contentType;
+  // debugger;
 
-    let result = await axios({
-      method: "post",
-      url: "/form-submission",
-      data: {
-        data: entity,
-      },
-    });
-    debugger;
-    fullPageUpdate();
-  }
+  let result = await axios({
+    method: "post",
+    url: "/form-submission",
+    data: {
+      data: entity,
+      url: window.location.pathname
+    },
+  });
+
+  // debugger;
+  eval(result.data.successAction);
+
+  // if (!contentType.startsWith("user")) {
+  //   if (submission.id || submission.data.id) {
+  //     await editInstance(entity, refresh, contentType);
+  //   } else {
+  //     await createInstance(entity, true, contentType);
+  //   }
+  // } else {
+  //   entity.contentType = contentType;
+
+  //   let result = await axios({
+  //     method: "post",
+  //     url: "/form-submission",
+  //     data: {
+  //       data: entity,
+  //     },
+  //   });
+  // fullPageUpdate();
+  // }
 }
 
 async function editInstance(payload, refresh, contentType = "content") {
@@ -205,43 +209,58 @@ async function editInstance(payload, refresh, contentType = "content") {
     });
 }
 
-async function createInstance(
-  payload,
-  refresh = false,
-  contentType = "content"
-) {
-  // console.log('createInstance payload', payload);
-  // let content = {};
-  // content.data = payload;
-  // this.processContentFields(payload, content);
-  // debugger;
-  console.log("payload", payload);
-  if (payload.id || "id" in payload) {
-    delete payload.id;
-  }
-
-  if (!payload.data) {
-    let temp = { data: payload };
-    payload = temp;
-  }
-
-  if (contentType === "Roles") {
-    payload = payload.data;
-  }
-
-  // debugger;
-  let entity = await dataService.contentCreate(payload);
-
-  if (entity && entity.contentTypeId === "page") {
-    let isBackEnd = globalService.isBackEnd();
-    if (isBackEnd) {
-      window.location.href = `/admin/content/edit/page/${entity.id}`;
-    } else {
-      window.location.href = payload.data.url;
-    }
-  } else if (refresh) {
-    fullPageUpdate();
-  }
-
-  return entity;
+function postSubmissionSuccessMessage(message) {
+  let form = `<div>
+  ${message}
+  </div>
+  <button class="btn btn-success mt-5" type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">Ok</span>
+  </button>`;
+  $("#formio").empty();
+  $("#formio").html(form);
 }
+
+function redirectToUrl(url) {
+  window.location.href = url;
+}
+
+// async function createInstance(
+//   payload,
+//   refresh = false,
+//   contentType = "content"
+// ) {
+//   // console.log('createInstance payload', payload);
+//   // let content = {};
+//   // content.data = payload;
+//   // this.processContentFields(payload, content);
+//   // debugger;
+//   console.log("payload", payload);
+//   if (payload.id || "id" in payload) {
+//     delete payload.id;
+//   }
+
+//   if (!payload.data) {
+//     let temp = { data: payload };
+//     payload = temp;
+//   }
+
+//   if (contentType === "Roles") {
+//     payload = payload.data;
+//   }
+
+//   // debugger;
+//   let entity = await dataService.contentCreate(payload);
+
+//   if (entity && entity.contentTypeId === "page") {
+//     let isBackEnd = globalService.isBackEnd();
+//     if (isBackEnd) {
+//       window.location.href = `/admin/content/edit/page/${entity.id}`;
+//     } else {
+//       window.location.href = payload.data.url;
+//     }
+//   } else if (refresh) {
+//     fullPageUpdate();
+//   }
+
+//   return entity;
+// }

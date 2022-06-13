@@ -198,7 +198,7 @@ if (typeof module !== "undefined" && module.exports) {
         form += template;
       }
 
-      return form;
+      return {html: form, contentType };
     }),
     (exports.getFormJson = async function (contentType, content) {
       let name = `${contentType.systemId}Form`;

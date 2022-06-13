@@ -713,7 +713,7 @@ async function setupPageSettings(action, contentType, sessionID) {
     );
   }
 
-  $("#formio").html(form);
+  $("#formio").html(form.html);
   loadModuleSettingForm();
 
   $("#genericModal").appendTo("body").modal("show");
@@ -837,8 +837,16 @@ async function onContentTypeSave() {
     //states
     processContentTypeStates(contentType);
 
+    //post submission
+    processPostSubmission(contentType);
+
+    //modal settings
+    processModalSettings(contentType);
+
     //form
     await editContentType(contentType, sessionID);
+
+    fullPageUpdate();
   }
 }
 
@@ -850,6 +858,38 @@ function processContentTypeStates(contentType) {
     edit: {
       buttonText: $("#editText").val() ?? "Submit",
     },
+  };
+}
+
+function processPostSubmission(contentType) {
+  let action = 'fullPageRefresh';
+  let redirectUrl = $('#redirectUrl').val();
+  let message = $('#showMessageCopy').val();
+
+  if($('#redirectToUrl').prop("checked")){
+    action = 'redirectToUrl';
+  };
+
+  if($('#showMessage').prop("checked")){
+    action = 'showMessage';
+  };
+
+  if($('#doNothing').prop("checked")){
+    action = 'doNothing';
+  };
+
+  contentType.data.postSubmission = {
+    action, 
+    redirectUrl,
+    message
+  };
+}
+
+function processModalSettings(contentType) {
+  let modalTitle = $('#modalTitle').val();
+ 
+  contentType.data.modalSettings = {
+    modalTitle
   };
 }
 
@@ -1100,7 +1140,7 @@ async function editModule(sessionID) {
   );
 
   // $("#moduleSettingsFormio").html(form);
-  $(".pb-side-panel #main").html(form);
+  $(".pb-side-panel #main").html(form.html);
   loadModuleSettingForm();
   // $("#moduleSettingsModal")
   //   .appendTo("body")

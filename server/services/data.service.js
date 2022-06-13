@@ -186,6 +186,7 @@ if (typeof module !== "undefined" && module.exports) {
         returnModuleSettings: ${returnModuleSettings},
         formSettingsId: "${formSettingsId ?? ''}"){
           html
+          contentType
         }
       }
         `;
@@ -196,8 +197,8 @@ if (typeof module !== "undefined" && module.exports) {
         query,
       });
 
-      if (result.data.data.form.html) {
-        return result.data.data.form.html;
+      if (result.data.data.form) {
+        return result.data.data.form;
       }
     }),
     (exports.getContent = async function (sessionID) {
