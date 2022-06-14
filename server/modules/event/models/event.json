@@ -1,0 +1,1 @@
+{"moduleSystemId":"event","systemId":"event","title":"Event","data":{"components":[{"label":"First Name","type":"textfield","input":true,"key":"firstName","validate":{"required":true}},{"label":"Submit","type":"button","input":true,"key":"submit","theme":"primary"}]},"filePath":"/Users/lanecampbell/Dev/draftly/sonicjs-draftly/server/modules/event/models/event.json"}
