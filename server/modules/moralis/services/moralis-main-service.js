@@ -15,6 +15,11 @@ module.exports = moralisMainService = {
     const Moralis = require("moralis/node");
     try {
       await Moralis.start({ serverUrl, appId, masterKey });
+
+      // Moralis.settings.setAPIRateLimit({
+      //   anonymous:100, authenticated:200, windowMs:60000
+      // })
+      
     } catch (error) {
       console.error(error, 'This happens if the moralis server is in sleep mode');
     }
