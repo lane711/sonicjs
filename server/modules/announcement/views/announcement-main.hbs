@@ -5,8 +5,10 @@
   
   <div class="announcements-area">
       <div class="announcements-title">
-        <h2>Announcements</h2>
-        <a href="javascript:void(0)" onclick="return openFormInModal('create', 'announcement')" >Post an Announcements</a>
+        <h2 id="announcements">Announcements</h2>
+        {{#if canAdd}}
+          <a href="javascript:void(0)" onclick="return openFormInModal('create', 'announcement')" >Post an Announcements</a>
+        {{/if}}
       </div>
   
       <div class="row g-3">
