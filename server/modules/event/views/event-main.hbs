@@ -1,1 +1,45 @@
-<div>Hello to you {{ data.firstName }} from the Event module!</div>
+<div class="container">
+    <span class="hr-line"></span>
+  </div>
+
+<div class="events-area">
+
+    <div class="announcements-title">
+        <h2 id="events">Upcoming Events</h2>
+        {{#if canAdd}}
+        <a href="javascript:void(0)" onclick="return openFormInModal('create', 'event')" >Post a New Event</a>
+        {{/if}}
+      </div>
+
+      <div class="row g-3">
+      {{#each items}}
+        <!-- <div class="col-md-4"> -->
+        <div class="col-md-4 text-left">
+          <div class="card bg-dark event-item h-100">
+            <img src="{{this.data.image.src}}" class="card-img-top" />
+            <div class="card-body">
+              <p class="card-text">
+                {{#if ../canEdit }}
+                    <a onclick="return openFormInModal('edit', 'announcement', '{{ this.id }}')" 
+                    href="javascript:void(0)"><img src="/assets/uploads/edit.png" alt=""></a> &nbsp; 
+                <a href="javascript:void(0)" onclick="return openFormInModal('delete', null, '{{ this.id }}')"><img src="/assets/uploads/delete.png" alt=""></a>					
+              {{/if}}
+                <h2>{{this.data.title}}</h2>
+                Start Time & Date: &nbsp;
+                <p>{{this.data.dateFormatted}}</p>
+              </p>
+            </div>
+          </div>
+          </div>
+    {{/each}}
+    </div>
+  
+  
+      {{#if data.seeMoreLinkCopy}}
+      <div class="row text-center">
+        <div class="col">
+          <a href=""#">{{data.seeMoreLinkCopy}}</a>
+        </div>
+      </div>
+      {{/if}}
+  </div>

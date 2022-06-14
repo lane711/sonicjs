@@ -89,7 +89,7 @@ async function openDeleteForm(action, id) {
     let content = await dataService.getContentById(id);
     let form = JSON.stringify(content.data, null, 4);
 
-    form += `<div><button class="mt-2" type="button"  onclick="return confirmDelete('${content.id}', 1)""><i class="bi bi-trash"></i> Confirm Delete</button></div>`;
+    form += `<div><button class="mt-2 btn btn-danger" type="button"  onclick="return confirmDelete('${content.id}', 1)""><i class="bi bi-trash"></i> Confirm Delete</button></div>`;
 
     $("#genericModal .modal-title").text(
       helperService.titleCase(`${action} ${content.contentTypeId}`)

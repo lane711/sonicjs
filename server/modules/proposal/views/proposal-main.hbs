@@ -1,6 +1,10 @@
-{{#if canAdd}}
-<button type="button" class="btn btn-primary btn-medium" onclick="return openFormInModal('create', 'proposal')">Submit Your Proposal</button>
-{{/if}}
+<div class="announcements-title">
+  <h2 id="proposals">Proposals</h2>
+  {{#if canAdd}}
+  <button type="button" class="btn btn-primary btn-medium" onclick="return openFormInModal('create', 'proposal')">Submit Your Proposal</button>
+  {{/if}}
+</div>
+
 <ul class="nav nav-tabs" id="myTab" role="tablist" style="border-style: none;">
   <li class="nav-item" role="presentation">
     <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#open" type="button" role="tab" 
@@ -58,11 +62,11 @@
           </div>
         {{/each}}
       </div>
-      <div class="row text-center">
+      <!-- <div class="row text-center">
         <div class="col">
         <a href=""#">See All Open Proposals</a>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 
