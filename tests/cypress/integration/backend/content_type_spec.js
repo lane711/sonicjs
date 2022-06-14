@@ -19,7 +19,7 @@ describe("Admin Content Types", function () {
     // });
   });
 
-  it("Content type create should  user to module", function () {
+  it("Content type create should direct user to add to module", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
     cy.contains("New Content Type").click();
     cy.wait(500);
