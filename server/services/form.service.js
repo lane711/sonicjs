@@ -285,10 +285,9 @@ if (typeof module !== "undefined" && module.exports) {
     });
 
   exports.setFormApiUrls = async function (Formio) {
-    // Formio.setProjectUrl(sharedService.getBaseUrl() + "/nested-forms-list");
-    // Formio.setBaseUrl(sharedService.getBaseUrl() + "/nested-forms-get");
-    Formio.setProjectUrl(sharedService.getBaseUrl());
-    Formio.setBaseUrl(sharedService.getBaseUrl());
+    let baseUrl = sharedService.getBaseUrl();
+    Formio.setProjectUrl(baseUrl);
+    Formio.setBaseUrl(baseUrl);
   };
   // }
 })(typeof exports === "undefined" ? (this["formService"] = {}) : exports);
