@@ -31,7 +31,8 @@ describe("Admin Users", function () {
     cy.get('[aria-label="Select Role(s)..."]').first().click();
     // cy.contains('Admin').click();
 
-    cy.get("#choices--ea3cvni-roles-item-choice-1").click();
+    
+    cy.get(".formio-component-roles .choices").first().click();
 
     cy.get('input[name="data[lastName]"]').click();
     cy.contains("Submit").click();
