@@ -1,13 +1,13 @@
 <div class="container">
     <span class="hr-line"></span>
   </div>
-  
+
 <div class="events-area">
 
     <div class="announcements-title">
         <h2 id="events">Upcoming Events</h2>
         {{#if canAdd}}
-        <a href="javascript:void(0)" onclick="return openFormInModal('create', 'announcement')" >Post an Announcements</a>
+        <a href="javascript:void(0)" onclick="return openFormInModal('create', 'event')" >Post a New Event</a>
         {{/if}}
       </div>
 
@@ -19,7 +19,11 @@
             <img src="{{this.data.image.src}}" class="card-img-top" />
             <div class="card-body">
               <p class="card-text">
-                <a target="_blank" href="/admin/content/edit/fe/{{this.id}}"><i class="bi bi-pencil"></i></a>
+                {{#if ../canEdit }}
+                    <a onclick="return openFormInModal('edit', 'announcement', '{{ this.id }}')" 
+                    href="javascript:void(0)"><img src="/assets/uploads/edit.png" alt=""></a> &nbsp; 
+                <a href="javascript:void(0)" onclick="return openFormInModal('delete', null, '{{ this.id }}')"><img src="/assets/uploads/delete.png" alt=""></a>					
+              {{/if}}
                 <h2>{{this.data.title}}</h2>
                 Start Time & Date: &nbsp;
                 <p>{{this.data.dateFormatted}}</p>
