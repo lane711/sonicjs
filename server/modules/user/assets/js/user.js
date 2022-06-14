@@ -207,6 +207,48 @@ async function editInstance(payload, refresh, contentType = "content") {
     });
 }
 
+async function createInstance(
+  payload,
+  refresh = false,
+  contentType = "content"
+) {
+  // console.log('createInstance payload', payload);
+  // let content = {};
+  // content.data = payload;
+  // this.processContentFields(payload, content);
+  // debugger;
+  console.log("payload", payload);
+  if (payload.id || "id" in payload) {
+    delete payload.id;
+  }
+
+  if (!payload.data) {
+    let temp = { data: payload };
+    payload = temp;
+  }
+
+  if (contentType === "Roles") {
+    payload = payload.data;
+  }
+
+  // debugger;
+  let entity = await dataService.contentCreate(payload);
+
+  if (entity && entity.contentTypeId === "page") {
+    let isBackEnd = globalService.isBackEnd();
+    if (isBackEnd) {
+      window.location.href = `/admin/content/edit/page/${entity.id}`;
+    } else {
+      window.location.href = payload.data.url;
+    }
+  } else if (refresh) {
+    fullPageUpdate();
+  }
+
+  return entity;
+}
+
+
 function postSubmissionSuccessMessage(message) {
   let form = `<div>
   ${message}
@@ -221,44 +263,3 @@ function postSubmissionSuccessMessage(message) {
 function redirectToUrl(url) {
   window.location.href = url;
 }
-
-// async function createInstance(
-//   payload,
-//   refresh = false,
-//   contentType = "content"
-// ) {
-//   // console.log('createInstance payload', payload);
-//   // let content = {};
-//   // content.data = payload;
-//   // this.processContentFields(payload, content);
-//   // debugger;
-//   console.log("payload", payload);
-//   if (payload.id || "id" in payload) {
-//     delete payload.id;
-//   }
-
-//   if (!payload.data) {
-//     let temp = { data: payload };
-//     payload = temp;
-//   }
-
-//   if (contentType === "Roles") {
-//     payload = payload.data;
-//   }
-
-//   // debugger;
-//   let entity = await dataService.contentCreate(payload);
-
-//   if (entity && entity.contentTypeId === "page") {
-//     let isBackEnd = globalService.isBackEnd();
-//     if (isBackEnd) {
-//       window.location.href = `/admin/content/edit/page/${entity.id}`;
-//     } else {
-//       window.location.href = payload.data.url;
-//     }
-//   } else if (refresh) {
-//     fullPageUpdate();
-//   }
-
-//   return entity;
-// }
