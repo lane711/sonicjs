@@ -296,6 +296,12 @@ body {
     color: #FFCB05;
 }
 
+.card-img-top {
+    width: 100%;
+    height: 20vw;
+    object-fit: cover;
+}
+
 /*
 ^^^^^^^^^^
 Hugh's CSS End
