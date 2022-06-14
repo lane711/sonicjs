@@ -29,7 +29,8 @@ module.exports = voteMainService = {
     });
 
     emitterService.on("postModuleGetData2", async function (options) {
-      if (options.shortcode.name === "PROPOSAL") {
+      //HACK this should be softcoded based on global settings
+      if (options.shortcode.name === "PROPOSAL" || options.shortcode.name === "ANNOUNCEMENT") {
         //talley votes
         if (options.viewModel.items) {
           options.viewModel.items.map((i) => {

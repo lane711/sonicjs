@@ -1111,7 +1111,7 @@ async function addModule(systemId, sessionID) {
     sessionID
   );
 
-  $(".pb-side-panel #main").html(form);
+  $(".pb-side-panel #main").html(form.html);
 
   loadModuleSettingForm();
   // $("#moduleSettingsModal")

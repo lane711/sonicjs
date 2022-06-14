@@ -213,7 +213,7 @@ exports.loadRoutes = async function (app) {
       let isBackEnd = req.body.url.startsWith("/admin");
       if (isBackEnd && !successAction) {
         successAction = `redirectToUrl('/admin/content/edit/${contentTypeId}/${entity.id}');`;
-      } else if(!isBackEnd && contentTypeId === 'page'){
+      } else if (!isBackEnd && contentTypeId === "page") {
         successAction = `redirectToUrl('${entity.url}');`;
       }
 
@@ -235,6 +235,11 @@ exports.loadRoutes = async function (app) {
 exports.loadRoutesCatchAll = async function (app) {
   // app.get(/^[^.]*$/, async function (req, res, next) {
   app.get("*", async function (req, res, next) {
+    //HACK: need to softcode this in a setting
+    // if (req.url === "/") {
+    //   res.redirect("/clubhouses", 301);
+    // }
+
     await emitterService.emit("requestBegin", { req: req, res: res });
 
     if (req.isRequestAlreadyHandled) {

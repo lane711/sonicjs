@@ -2,6 +2,9 @@ var dataService = require("../../../services/data.service");
 var emitterService = require("../../../services/emitter.service");
 var globalService = require("../../../services/global.service");
 
+var moment = require("moment");
+var _ = require("underscore");
+
 module.exports = announcementMainService = {
   startup: async function () {
     emitterService.on("beginProcessModuleShortCode", async function (options) {
@@ -18,36 +21,39 @@ module.exports = announcementMainService = {
   },
 
   getViewData: async function (options) {
-    let announcements = await dataService.getContentByContentType("announcement");
+
+
+    let id = options.shortcode.properties.id;
+    let groupId = options.req.content ? options.req.content.id : null;
+
+    let announcements = await dataService.getContentByTypeAndGroup(
+        'announcement',
+        groupId,
+        options.req.sessionID
+      );
+
+
+
+    // let announcements = await dataService.getContentByContentType(
+    //   "announcement"
+    // );
 
     const now = new Date().getTime();
 
     announcements = _.sortBy(announcements, function (p) {
-      return p.data;
+      return p.data.date;
+    });
+
+    announcements.map((a) => {
+      a.data.dateFormatted = moment(a.data.date).format("MMMM Do YYYY, h:mm a");
     });
 
     options.viewModel.items = announcements;
 
-    await proposalMainService.processPagePermissions(options);
+    //emit so we can talley votes
+    await emitterService.emit("postModuleGetData2", options);
+
   },
 
-  processPagePermissions: async function (options) {
-    options.viewModel.canAdd = false;
-    options.viewModel.canReview = false;
-    options.viewModel.canEdit = false;
-    options.viewModel.canVote = false;
 
-    let userRole = options.req.user?.profile.roles[0];
-    //TODO: need to check that club admin is for the current club(not just has the role)
-    if (userRole === "communityAdmin" || userRole === "clubAdmin") {
-      options.viewModel.canAdd = true;
-      options.viewModel.canReview = true;
-      options.viewModel.canEdit = true;
-      options.viewModel.canVote = true;
-    }
-
-    if (userRole === "gm") {
-      options.viewModel.canVote = true;
-    }
-  },
 };
