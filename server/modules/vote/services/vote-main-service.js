@@ -1,6 +1,6 @@
 var dataService = require("../../../services/data.service");
 var emitterService = require("../../../services/emitter.service");
-var globalService = require("../../../services/global.service");
+var helperService = require("../../../services/helper.service");
 
 module.exports = voteMainService = {
   startup: async function (app) {
@@ -12,29 +12,39 @@ module.exports = voteMainService = {
     });
 
     emitterService.on("formComponentsLoaded", async function (options) {
-      const voteContentTypes = await dataService.getContentTopOne(
-        "vote-site-settings"
-      );
-
-      if (
-        voteContentTypes.data.applyToContentTypes.includes(options.contentType.systemId)
-      ) {
-        const voteContentType = await dataService.contentTypeGet("vote");
-        const voteComponentsToAdd = voteContentType.data.components.filter(
-          (c) => c.type !== "button"
+      if (helperService.isBackEnd(options.req.referringUrl)) {
+        const voteContentTypes = await dataService.getContentTopOne(
+          "vote-site-settings"
         );
 
-        options.contentType.data.components.splice(-1, 0, ...voteComponentsToAdd);
+        if (
+          voteContentTypes.data.applyToContentTypes.includes(
+            options.contentType.systemId
+          )
+        ) {
+          const voteContentType = await dataService.contentTypeGet("vote");
+          const voteComponentsToAdd = voteContentType.data.components.filter(
+            (c) => c.type !== "button"
+          );
+
+          options.contentType.data.components.splice(
+            -1,
+            0,
+            ...voteComponentsToAdd
+          );
+        }
       }
     });
 
     emitterService.on("postModuleGetData2", async function (options) {
       //HACK this should be softcoded based on global settings
-      if (options.shortcode.name === "PROPOSAL" || options.shortcode.name === "ANNOUNCEMENT") {
+      if (
+        options.shortcode.name === "PROPOSAL" ||
+        options.shortcode.name === "ANNOUNCEMENT"
+      ) {
         //talley votes
         if (options.viewModel.items) {
           options.viewModel.items.map((i) => {
-            
             i.data.voteScore = i.data.voteScore ?? 0;
             i.data.voteUps = i.data.voteUps ?? 0;
             i.data.voteDowns = i.data.voteDowns ?? 0;
@@ -45,7 +55,7 @@ module.exports = voteMainService = {
 
     if (app) {
       app.post("/vote-api", async function (req, res) {
-        if(!req.session.passport){
+        if (!req.session.passport) {
           return;
         }
         const { id, vote } = req.body;
@@ -78,7 +88,7 @@ module.exports = voteMainService = {
           voteDowns = 0;
         if (item.data.votes) {
           voteScore = item.data.votes.reduce((s, f) => {
-            return s + f.vote; 
+            return s + f.vote;
           }, 0);
           voteUps = item.data.votes
             .filter((v) => v.vote === 1)
@@ -88,7 +98,7 @@ module.exports = voteMainService = {
           voteDowns = item.data.votes
             .filter((v) => v.vote === -1)
             .reduce((s, f) => {
-              return s + f.vote; 
+              return s + f.vote;
             }, 0);
         }
         item.data.voteScore = voteScore;
@@ -103,4 +113,3 @@ module.exports = voteMainService = {
     }
   },
 };
-

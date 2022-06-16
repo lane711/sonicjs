@@ -53,7 +53,8 @@ if (typeof module !== "undefined" && module.exports) {
           "submitContent(submission)",
           undefined,
           undefined,
-          options.req.sessionID
+          options.req.sessionID,
+          options.req.url
         );
       }
     });
@@ -86,8 +87,10 @@ if (typeof module !== "undefined" && module.exports) {
       onFormSubmitFunction,
       returnModuleSettings = false,
       formSettingsId,
-      req
+      req,
+      referringUrl
     ) {
+      req.referringUrl = referringUrl;
       let contentObject = content;
       if ((typeof content === 'string' || content instanceof String) && content.length){
         contentObject = JSON.parse(content)

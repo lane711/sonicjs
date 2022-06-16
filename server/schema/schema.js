@@ -384,6 +384,7 @@ const RootQuery = new GraphQLObjectType({
         onFormSubmitFunction: { type: GraphQLString },
         returnModuleSettings: { type: GraphQLBoolean },
         formSettingsId: { type: GraphQLString },
+        referringUrl: { type: GraphQLString },
       },
       async resolve(parent, args, req) {
         return formService.getForm(
@@ -392,7 +393,8 @@ const RootQuery = new GraphQLObjectType({
             args.onFormSubmitFunction,
             args.returnModuleSettings,
             args.formSettingsId,
-            await getUserSession(undefined, req.sessionID)
+            req,
+            args.referringUrl
           );
       },
     },
