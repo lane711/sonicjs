@@ -87,13 +87,14 @@ module.exports = adminService = {
           if (param2) {
             content = await dataService.getContentById(param2, req.sessionID);
           }
-          data.editForm = await formService.getForm(
+          data.editForm = await dataService.formGet(
             param1,
             content,
             "submitContent(submission)",
             undefined,
             undefined,
-            req.sessionID
+            req.sessionID,
+            req.url
           );
           data.contentId = param2;
         }
@@ -178,13 +179,14 @@ module.exports = adminService = {
             "theme-settings",
             req.sessionID
           );
-          data.editForm = await formService.getForm(
+          data.editForm = await dataService.formGet(
             "theme-settings",
             data,
             undefined,
             undefined,
             undefined,
-            req.sessionID
+            req.sessionID,
+            req.url
           );
         }
 
@@ -193,13 +195,14 @@ module.exports = adminService = {
             "site-settings-colors",
             req.sessionID
           );
-          data.editForm = await formService.getForm(
+          data.editForm = await dataService.formGet(
             "site-settings-colors",
             data,
             undefined,
             undefined,
             undefined,
-            req.sessionID
+            req.sessionID,
+            req.url
           );
         }
 
@@ -208,50 +211,54 @@ module.exports = adminService = {
             "site-settings",
             req.sessionID
           );
-          data.editForm = await formService.getForm(
+          data.editForm = await dataService.formGet(
             "site-settings",
             data,
             undefined,
             undefined,
             undefined,
-            req.sessionID
+            req.sessionID,
+            req.url
           );
         }
 
         if (viewName == "admin-users") {
-          data.editFormUser = await formService.getForm(
+          data.editFormUser = await dataService.formGet(
             "user-register",
             undefined,
             "submitContent(submission,true,'user-register');",
             undefined,
             undefined,
-            req.sessionID
+            req.sessionID,
+            req.url
           );
           let users = await userService.getUsers(req.sessionID);
           data.users = users;
         }
 
         if (viewName == "admin-roles") {
-          data.editFormRole = await formService.getForm(
+          data.editFormRole = await dataService.formGet(
             "role",
             undefined,
             "submitContent(submission,true,'role')",
             undefined,
             undefined,
-            req.sessionID
+            req.sessionID,
+            req.url
           );
           let roles = await userService.getRoles(req.sessionID);
           data.roles = roles;
         }
 
         if (viewName == "admin-role-new") {
-          data.editForm = await formService.getForm(
+          data.editForm = await dataService.formGet(
             "role",
             undefined,
             "submitContent(submission,true,'role');",
             undefined,
             undefined,
-            req.sessionID
+            req.sessionID,
+            req.url
           );
         }
 
@@ -259,13 +266,14 @@ module.exports = adminService = {
           let roleId = param1;
           let role = await dataService.getContentById(roleId, req.sessionID);
 
-          data.editForm = await formService.getForm(
+          data.editForm = await dataService.formGet(
             "role",
             role,
             'submitContent(submission, true, "role");',
             undefined,
             undefined,
-            req.sessionID
+            req.sessionID,
+            req.url
           );
         }
 
@@ -277,13 +285,14 @@ module.exports = adminService = {
             // userRecord.data = userRecord.profile;
             userRecord.data.id = userRecord.id;
 
-            data.editForm = await formService.getForm(
+            data.editForm = await dataService.formGet(
               "user",
               userRecord,
               'submitContent(submission, true, "user");',
               undefined,
               undefined,
-              req.sessionID
+              req.sessionID,
+              req.url
             );
           }
         }
@@ -339,7 +348,7 @@ module.exports = adminService = {
     await Promise.all(
       siteSettings.map(async (s) => {
         s.instance =  await dataService.getContentTopOne(s.systemId);
-        s.editForm = await formService.getForm(
+        s.editForm = await dataService.formGet(
           s.systemId,
           s.instance,
           "submitContent(submission)",

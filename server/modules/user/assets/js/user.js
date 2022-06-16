@@ -66,7 +66,8 @@ async function openEditForm(action, id) {
       "await submitContent(submission);",
       undefined,
       undefined,
-      $("#sessionID").val()
+      $("#sessionID").val(),
+      window.location.pathname
     );
 
     $("#genericModal .modal-title").text(
@@ -112,15 +113,15 @@ async function confirmDelete(id) {
 
 async function openCreateForm(action, contentType) {
   if (action === "create") {
-    // let content = await dataService.getContentById(id);
-    // debugger;
+
     let form = await dataService.formGet(
       contentType,
       undefined,
       "await submitContent(submission);",
       undefined,
       undefined,
-      $("#sessionID").val()
+      $("#sessionID").val(),
+      window.location.pathname
     );
 
     $("#genericModal .modal-title").text(

@@ -54,6 +54,11 @@
         setTimeout(resolve, ms);
       });
     }),
+    exports.isBackEnd = function (url) {
+      if (url) {
+        return url.startsWith("/admin");
+      }
+    },
     (exports.generateRandomString = function (length) {
       var result = "";
       var characters =
