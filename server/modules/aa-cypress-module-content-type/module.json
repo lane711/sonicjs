@@ -1,0 +1,10 @@
+{
+  "title": "AA Cypress Module Content Type",
+  "enabled": true,
+  "systemId": "aa-cypress-module-content-type",
+  "canBeAddedToColumn": true,
+  "sessionID": "undefined",
+  "version": "0.0.0.1",
+  "systemidUpperCase": "AA-CYPRESS-MODULE-CONTENT-TYPE",
+  "systemidCamelCase": "aaCypressModuleContentType"
+}
