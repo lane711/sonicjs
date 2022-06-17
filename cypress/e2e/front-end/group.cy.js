@@ -3,6 +3,7 @@ const { iteratee } = require("lodash");
 
 describe("Group", function () {
   beforeEach(() => {
+    //TODO: maybe just need to login with a non meta mask user?
     cy.SonicJs.frontEndLogin();
   });
 
