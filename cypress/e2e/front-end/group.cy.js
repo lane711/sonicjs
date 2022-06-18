@@ -3,42 +3,64 @@ const { iteratee } = require("lodash");
 
 describe("Group", function () {
   beforeEach(() => {
-    //TODO: maybe just need to login with a non meta mask user?
     cy.SonicJs.frontEndLogin();
   });
 
   after(() => {
-    // cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content`);
-    // let deleteButtonPattern = '[aria-label*="Cypress PB Test"]';
-
-    // cy.get("body").then(($body) => {
-    //   if ($body.find(deleteButtonPattern).length > 0) {
-    //     cy.get(deleteButtonPattern).first().click();
-    //     cy.wait(500);
-    //     cy.contains("Confirm Delete").click();
-    //   }
-    // });
   });
 
   it("list groups", function () {
-    // cy.visit(`${cy.SonicJs.getBaseUrl()}`);
-    // cy.get("#sidebar-expander").click();
-    // cy.contains("Template").should("be.visible");
-    // cy.get("#add-tab").click();
-    // cy.get("#btn-add-page").click();
-    // cy.wait(1000);
-    // cy.get('input[name="data[title]').type("Cypress PB Test");
-    // cy.get('input[name="data[url]').should("have.value", "/cypress-pb-test");
-    // cy.get('input[name="data[heroTitle]"]').type("Cypress Hero");
-    // cy.get('input[name="data[pageCssClass]"]').type("cypress-pb-test");
-    // cy.get('input[name="data[metaTitle]"]').type("Cypress Meta Title");
-    // cy.get('textarea[name="data[metaDescription]"]').type(
-    //   "Cypress Meta Description"
-    // );
-    // cy.contains("Submit").click();
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/clubhouses`);
+    cy.contains("My Clubhouses");
+    cy.contains("Clubhouses");
 
-    // cy.contains('Cypress Hero');
-    // cy.url().should('include', '/cypress-test-page');
+    cy.get(".clubhouses").find(".card").its("length").should("be.gte", 1);
+    cy.get(".clubhouses").find(".new-group").should("have.length", 1);
   });
 
+  it("should submit new clubhouse request form if validations met", function () {
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/clubhouses`);
+    cy.get(".new-clubhouse-request").first().click();
+
+    cy.get('input[name="data[fullName]"]').type("Mr. Cypress");
+    cy.get('input[name="data[email]"]').type("cypress@test.com");
+    cy.get('input[name="data[title]"]').type("Team Cypress");
+    cy.get('textarea[name="data[clubDescription]"]').type(
+      "Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum."
+    );
+    cy.get('input[name="data[twitterHandle]"]').type("@testcypress");
+    cy.get('input[name="data[discordInviteLink]"]').type(
+      "https://discord.gg/acg5t"
+    );
+    cy.get('textarea[name="data[nftContractListCommaSeparated]"]').type(
+      "0x772770fa1ce3196a1c895fbe49a634dce758d87d,0x772770fa1ce3196a1c895fbe49a634dce758d86e"
+    );
+    cy.get('textarea[name="data[anythingElseWeShouldKnow]"]').type(
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    );
+
+    cy.contains("Submit Request").click();
+
+    //Thanks for your new club request!
+    cy.contains("New Club Request");
+    cy.contains("Thanks for your new club request!");
+
+    cy.contains("Ok").click();
+
+    cy.contains("New Club Request").should('not.be.visible') 
+  });
+
+  it("should not submit new clubhouse request form if validations not met", function () {
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/clubhouses`);
+    cy.get(".new-clubhouse-request").first().click();
+
+    cy.get('input[name="data[fullName]"]').type("Mr. Cypress");
+
+    cy.get('textarea[name="data[anythingElseWeShouldKnow]"]').type(
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    );
+
+    cy.contains("Submit Request").should('be.disabled')
+
+  });
 });

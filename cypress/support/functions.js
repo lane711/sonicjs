@@ -25,13 +25,17 @@ cy.SonicJs = {
   },
 
   frontEndLogin: () => {
-    cy.visit(`${cy.SonicJs.getBaseUrl()}`);
-    cy.contains("Connect Your Wallet").click();
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/login`);
+    cy.contains("Login");
 
-    // cy.get('#email').type("a@a.com");
-    // cy.get('[type="password"]').type("tiger44");
+    cy.get('#email').type("LUOjqFCZz1AA3250pCBYAoxV");
+    cy.get('[type="password"]').type("LUOjqFCZz1AA3250pCBYAoxV");
 
-    // cy.get("#login-submit").click();
+    cy.get("#login-submit").click();
+
   },
 
+  clearCypressTestData: () => {
+    cy.request(`${cy.SonicJs.getBaseUrl()}/clear-test-data`);
+  }
 };
