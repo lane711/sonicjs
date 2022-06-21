@@ -193,8 +193,6 @@ if (typeof module !== "undefined" && module.exports) {
       }
         `;
 
-        console.log('query', query);
-        
       let result = await this.getAxios().post("/graphql", {
         query,
       });

@@ -374,6 +374,21 @@ module.exports = dalService = {
     }
   },
 
+  contentDeleteTestData: async function (cypressTestCleanupTag) {
+    const contentRepo = await getRepository(Content);
+
+    contents = await contentRepo.find({
+      data: Like(`%${cypressTestCleanupTag}%`),
+    });
+
+    contents.map(async (c) => {
+      await contentRepo.delete(c.id);
+    });
+
+    return contents.length;
+
+  },
+
   contentDeleteAll: async function (userSession) {
     const contentRepo = await getRepository(Content);
     contents = await contentRepo.find();

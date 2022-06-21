@@ -1,43 +1,6 @@
-<!-- 
-<h1>My Clubhouses</h1>
-<div class="row">
-  {{#each myGroups}}
-  <div class="col-md-4">
-    <div class="card bg-dark">
-      <img src="{{data.icon.src}}" class="card-img-top" />
-      <div class="card-body">
-        <p class="card-text">
-          <a href="{{data.url}}" class="stretched-link">{{data.title}}</a>
-        </p>
-      </div>
-    </div>
-  </div>
-  {{/each}}
-</div>
--->
-
-<!--
- <h1>Clubhouses</h1>
- <div class="container">
-  <div class="row">
-    {{#each groups}}
-      <div class="col-md-4 d-flex align-items-stretch">
-        <div class="card bg-dark">
-          <img src="{{data.icon.src}}" class="card-img-top" />
-          <div class="card-body">
-            <p class="card-text">
-              <a href="{{data.url}}" class="stretched-link">{{data.title}}</a>
-            </p>
-          </div>
-        </div>
-      </div>
-    {{/each}}
-  </div>
--->
-
 <h1>My Clubhouses</h1>
 <!-- <div class="d-flex flex-wrap align-content-start"> -->
-<div class="row g-3">
+<div class="row g-3 my-clubhouses">
   {{#each myGroups}}
     <div class="col-md-4">
       <div class="card bg-dark h-100">
@@ -53,7 +16,7 @@
   <a
     href="#"
     onclick="return openFormInModal('create', 'club-request')"
-    class="m-4"
+    class="m-4 new-clubhouse-request"
     style="width: 14rem;"
   >
     <img src="/assets/uploads/new_clubhouse.png" />
@@ -65,7 +28,7 @@
 
 <h1>Clubhouses</h1>
 <!-- <div class="d-flex flex-wrap align-content-start"> -->
-<div class="row g-3">
+<div class="row g-3 clubhouses">
   {{#each groups}}
     <div class="col-md-4">
       <div class="card bg-dark h-100">
@@ -78,11 +41,11 @@
       </div>
     </div>
   {{/each}}
-  <div class="m-4" style="width: 14rem;">
+  <div class="m-4 new-group" style="width: 14rem;">
     <a
       href="#"
       onclick="return openFormInModal('create', 'club-request')"
-      class="m-4"
+      class="m-4 new-clubhouse-request"
       style="width: 14rem;"
     >
       <img src="/assets/uploads/new_clubhouse.png" />

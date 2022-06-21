@@ -24,6 +24,8 @@ var authService = require("../services/auth.service");
 var dalService = require("../services/dal.service");
 var backupService = require("../services/backup.service");
 var backupRestoreService = require("../services/backup-restore.service");
+var testService = require("../services/test.service");
+
 
 var helperService = require("../services/helper.service");
 var sharedService = require("../services/shared.service");
@@ -65,6 +67,7 @@ exports.loadRoutes = async function (app) {
     await assetService.startup();
     await pageBuilderService.startup(app);
     await pageBuilderService.startup(app);
+    await testService.startup(app);
 
     await emitterService.emit("startup", { app: app });
 
@@ -239,6 +242,7 @@ exports.loadRoutesCatchAll = async function (app) {
     // if (req.url === "/") {
     //   res.redirect("/clubhouses", 301);
     // }
+
 
     await emitterService.emit("requestBegin", { req: req, res: res });
 

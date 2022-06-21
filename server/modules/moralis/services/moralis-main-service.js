@@ -19,9 +19,11 @@ module.exports = moralisMainService = {
       // Moralis.settings.setAPIRateLimit({
       //   anonymous:100, authenticated:200, windowMs:60000
       // })
-      
     } catch (error) {
-      console.error(error, 'This happens if the moralis server is in sleep mode');
+      console.error(
+        error,
+        "This happens if the moralis server is in sleep mode"
+      );
     }
 
     emitterService.on("beginProcessModuleShortCode", async function (options) {
@@ -54,6 +56,12 @@ module.exports = moralisMainService = {
     });
 
     emitterService.on("getMyNFTs", async function (options) {
+      //HACK: since we can't fake begin logged into moralis, we have to send test objects
+      if (process.env.E2E_TEST_MODE) {
+        options.viewModel.mynfts = getFakeNFTsForTesting();
+        return;
+      }
+
       if (options.req.user) {
         const moralisEthAddress = options.req.user.profile.moralisEthAddress;
 
@@ -81,18 +89,86 @@ module.exports = moralisMainService = {
                 100
               );
               nfts.push(n);
-            }else{
-              console.error('error: could not parse metadata for ', n);
+            } else {
+              console.error("error: could not parse metadata for ", n);
             }
           });
-
           options.viewModel.mynfts = nfts;
         }
       }
     });
 
+    function getFakeNFTsForTesting() {
+      return [
+        {
+          token_address: "0x772770fa1ce3196a1c895fbe49a634dce758d87d",
+          token_id: "2",
+          amount: "1",
+          owner_of: "0x265485b34a0c5de1bebdc303f470b1907e33b3b4",
+          token_hash: "a26e7fe6b45ec85d6829e1dc55745dde",
+          block_number_minted: "23073056",
+          block_number: "28554646",
+          contract_type: "ERC1155",
+          name: null,
+          symbol: null,
+          token_uri:
+            "https://ipfs.moralis.io:2053/ipfs/QmRHNF1FQvqpr737Qao6KWriouFpC42FSXnkxxvK7Mk1j7",
+          metadata: `{"name":"Blake Corum","description":"Blake Corum is a Sophomore Running Back at the University of Michigan.  Prior to the 2021 season, Sports Illustrated predicted that Corum was \\"poised for a breakout year.\\" and that’s what he did rushing for 939 yards and 11 touchdowns. On September 18, Corum recorded his third straight 100-yard rushing game to start the season, becoming the first Michigan player to accomplish this feat since 2011.  Corum attended St. Frances Academy in Baltimore. As a senior, he rushed for 1,438 yards and 22 touchdowns and led his team to a No. 4 national ranking.\\n\\n* Class year - Sophomore\\n* Conference - Big Ten\\n* Player name - Blake Corum\\n* Position - RB\\n* Quantity - 500\\n* Rarity - Limited\\n* Sport - NCAA Men's Football\\n* Team - University of Michigan","image":"ipfs://Qmc79kfRBVypni4ZwcnqctY9ATeMc4dT9iKFRboktWqsg7"}`,
+          synced_at: "2022-05-18T16:26:09.464Z",
+          last_token_uri_sync: "2022-05-18T16:20:13.383Z",
+          last_metadata_sync: "2022-05-18T16:26:09.464Z",
+          data: {
+            name: "Blake Corum",
+            description:
+              'Blake Corum is a Sophomore Running Back at the University of Michigan.  Prior to the 2021 season, Sports Illustrated predicted that Corum was "poised for a breakout year." and that’s what he did rushing for 939 yards and 11 touchdowns. On September 18, Corum recorded his third straight 100-yard rushing game to start the season, becoming the first Michigan player to accomplish this feat since 2011.  Corum attended St. Frances Academy in Baltimore. As a senior, he rushed for 1,438 yards and 22 touchdowns and led his team to a No. 4 national ranking.\n' +
+              "\n" +
+              "* Class year - Sophomore\n" +
+              "* Conference - Big Ten\n" +
+              "* Player name - Blake Corum\n" +
+              "* Position - RB\n" +
+              "* Quantity - 500\n" +
+              "* Rarity - Limited\n" +
+              "* Sport - NCAA Men's Football\n" +
+              "* Team - University of Michigan",
+            image: "ipfs://Qmc79kfRBVypni4ZwcnqctY9ATeMc4dT9iKFRboktWqsg7",
+            descriptionPreview:
+              "Blake Corum is a Sophomore Running Back at the University of Michigan.  Prior to the 2021 season, S...",
+          },
+          imageUrl:
+            "https://ipfs.io/ipfs/Qmc79kfRBVypni4ZwcnqctY9ATeMc4dT9iKFRboktWqsg7",
+        },
+        {
+          token_address: "0x22f239fac779be167755e7cf33cec5201b87ef95",
+          token_id: "144",
+          amount: "5",
+          owner_of: "0x265485b34a0c5de1bebdc303f470b1907e33b3b4",
+          token_hash: "97b8109c527cfbe71c8004aa21ae7253",
+          block_number_minted: "26660704",
+          block_number: "26667269",
+          contract_type: "ERC1155",
+          name: null,
+          symbol: null,
+          token_uri:
+            "https://ipfs.moralis.io:2053/ipfs/QmPaig2T4FXNDEfko2pgPdpDNMGqQcS9QtTm7jTx5HYadN",
+          metadata:
+            '{"name":"clubhouse","description":"a house of club","image":"ipfs://QmYXmg7wueqaigAcXEK2BtZcm9PTR8vuxoySLkMJNxq4tt"}',
+          synced_at: "2022-06-08T18:19:16.433Z",
+          last_token_uri_sync: "2022-06-08T18:19:13.682Z",
+          last_metadata_sync: "2022-06-08T18:19:16.433Z",
+          data: {
+            name: "clubhouse",
+            description: "a house of club",
+            image: "ipfs://QmYXmg7wueqaigAcXEK2BtZcm9PTR8vuxoySLkMJNxq4tt",
+            descriptionPreview: "a house of club",
+          },
+          imageUrl:
+            "https://ipfs.io/ipfs/QmYXmg7wueqaigAcXEK2BtZcm9PTR8vuxoySLkMJNxq4tt",
+        },
+      ];
+    }
+
     emitterService.on("getNFTs", async function (options) {
-      if(!Moralis){
+      if (!Moralis) {
         return;
       }
       let collections = process.env.MORALIS_NFT_COLLECTIONS.split(",");

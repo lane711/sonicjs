@@ -155,8 +155,6 @@ module.exports = authService = {
         }
       }
 
-      console.log("passport.authenticate");
-
       passport.authenticate("local", (err, user, info) => {
         if (err) {
           return next(err);

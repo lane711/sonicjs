@@ -23,7 +23,12 @@ module.exports = proposalMainService = {
   },
 
   getViewData: async function (options) {
-    let proposals = await dataService.getContentByContentType("proposal");
+    let groupId = options.req.content ? options.req.content.id : null;
+    let proposals = await dataService.getContentByTypeAndGroup(
+      'proposal',
+      groupId,
+      options.req.sessionID
+    );
 
     const now = new Date().getTime();
 
@@ -53,7 +58,7 @@ module.exports = proposalMainService = {
     );
 
     options.viewModel.pendingProposals = proposals.filter(
-      (p) => p.data.approved === false
+      (p) => p.data.approved !== true
     );
 
     // await proposalMainService.processPagePermissions(options);
