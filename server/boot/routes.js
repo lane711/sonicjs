@@ -243,6 +243,7 @@ exports.loadRoutesCatchAll = async function (app) {
     //   res.redirect("/clubhouses", 301);
     // }
 
+
     await emitterService.emit("requestBegin", { req: req, res: res });
 
     if (req.isRequestAlreadyHandled) {

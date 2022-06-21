@@ -42,7 +42,7 @@ module.exports = announcementMainService = {
 
     announcements = _.sortBy(announcements, function (p) {
       return p.data.date;
-    });
+    }).reverse();
 
     announcements.map((a) => {
       a.data.dateFormatted = moment(a.data.date).format("MMMM Do YYYY, h:mm a");
