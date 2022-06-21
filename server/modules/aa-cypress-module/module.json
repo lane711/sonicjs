@@ -1,8 +1,0 @@
-{
-  "title": "AA Cypress Module EDITED",
-  "enabled": true,
-  "systemId": "aa-cypress-module",
-  "canBeAddedToColumn": true,
-  "singleInstance": false,
-  "version": "0.0.0.1"
-}
