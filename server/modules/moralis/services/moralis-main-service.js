@@ -64,39 +64,48 @@ module.exports = moralisMainService = {
 
       if (options.req.user) {
         const moralisEthAddress = options.req.user.profile.moralisEthAddress;
-
-        if (moralisEthAddress) {
-          const mynfts = await Moralis.Web3API.account.getNFTs({
-            chain: "polygon",
-            address: moralisEthAddress,
-          });
-
-          const testNfts = await Moralis.Web3API.account.getNFTs({
-            chain: "mumbai",
-            address: moralisEthAddress,
-          });
-
-          const allNfts = [...mynfts.result, ...testNfts.result];
-
-          let nfts = [];
-          allNfts.map((n) => {
-            if (n.metadata) {
-              n.data = JSON.parse(n.metadata);
-              n.imageUrl =
-                "https://ipfs.io/ipfs/" + n.data.image.split("ipfs://")[1];
-              n.data.descriptionPreview = helperService.truncateString(
-                n.data.description,
-                100
-              );
-              nfts.push(n);
-            } else {
-              console.error("error: could not parse metadata for ", n);
-            }
-          });
-          options.viewModel.mynfts = nfts;
-        }
+        options.viewModel.myEthAddress = moralisEthAddress;
+        options.viewModel.mynfts = await getMyNfts(moralisEthAddress);
       }
     });
+
+    async function getMyNfts(moralisEthAddress){
+      const mynfts = await Moralis.Web3API.account.getNFTs({
+        chain: "polygon",
+        address: moralisEthAddress,
+      });
+
+      const testNfts = await Moralis.Web3API.account.getNFTs({
+        chain: "mumbai",
+        address: moralisEthAddress,
+      });
+
+      const allNfts = [...mynfts.result, ...testNfts.result];
+
+      let nfts = [];
+      allNfts.map((n) => {
+        if (n.metadata) {
+          n.data = JSON.parse(n.metadata);
+          try {
+            n.imageUrl =
+            "https://ipfs.io/ipfs/" + n.data.image.split("ipfs://")[1];
+
+          } catch (error) {
+            n.imageUrl = 'error-ocurred'
+          }
+          
+          n.data.descriptionPreview = helperService.truncateString(
+            n.data.description,
+            100
+          );
+          nfts.push(n);
+        } else {
+          console.error("error: could not parse metadata for ", n);
+        }
+      });
+      return nfts;
+    }
+    
 
     function getFakeNFTsForTesting() {
       return [
@@ -113,7 +122,7 @@ module.exports = moralisMainService = {
           symbol: null,
           token_uri:
             "https://ipfs.moralis.io:2053/ipfs/QmRHNF1FQvqpr737Qao6KWriouFpC42FSXnkxxvK7Mk1j7",
-          metadata: `{"name":"Blake Corum","description":"Blake Corum is a Sophomore Running Back at the University of Michigan.  Prior to the 2021 season, Sports Illustrated predicted that Corum was \\"poised for a breakout year.\\" and that’s what he did rushing for 939 yards and 11 touchdowns. On September 18, Corum recorded his third straight 100-yard rushing game to start the season, becoming the first Michigan player to accomplish this feat since 2011.  Corum attended St. Frances Academy in Baltimore. As a senior, he rushed for 1,438 yards and 22 touchdowns and led his team to a No. 4 national ranking.\\n\\n* Class year - Sophomore\\n* Conference - Big Ten\\n* Player name - Blake Corum\\n* Position - RB\\n* Quantity - 500\\n* Rarity - Limited\\n* Sport - NCAA Men's Football\\n* Team - University of Michigan","image":"ipfs://Qmc79kfRBVypni4ZwcnqctY9ATeMc4dT9iKFRboktWqsg7"}`,
+          metadata: `{"name":"Blake Corum FAKE","description":"Blake Corum is a Sophomore Running Back at the University of Michigan.  Prior to the 2021 season, Sports Illustrated predicted that Corum was \\"poised for a breakout year.\\" and that’s what he did rushing for 939 yards and 11 touchdowns. On September 18, Corum recorded his third straight 100-yard rushing game to start the season, becoming the first Michigan player to accomplish this feat since 2011.  Corum attended St. Frances Academy in Baltimore. As a senior, he rushed for 1,438 yards and 22 touchdowns and led his team to a No. 4 national ranking.\\n\\n* Class year - Sophomore\\n* Conference - Big Ten\\n* Player name - Blake Corum\\n* Position - RB\\n* Quantity - 500\\n* Rarity - Limited\\n* Sport - NCAA Men's Football\\n* Team - University of Michigan","image":"ipfs://Qmc79kfRBVypni4ZwcnqctY9ATeMc4dT9iKFRboktWqsg7"}`,
           synced_at: "2022-05-18T16:26:09.464Z",
           last_token_uri_sync: "2022-05-18T16:20:13.383Z",
           last_metadata_sync: "2022-05-18T16:26:09.464Z",
@@ -156,7 +165,7 @@ module.exports = moralisMainService = {
           last_token_uri_sync: "2022-06-08T18:19:13.682Z",
           last_metadata_sync: "2022-06-08T18:19:16.433Z",
           data: {
-            name: "clubhouse",
+            name: "clubhouse FAKE",
             description: "a house of club",
             image: "ipfs://QmYXmg7wueqaigAcXEK2BtZcm9PTR8vuxoySLkMJNxq4tt",
             descriptionPreview: "a house of club",
@@ -261,33 +270,13 @@ module.exports = moralisMainService = {
       );
 
       app.get("/api/moralis-nfts", async function (req, res) {
-        /* import moralis */
+        let eth = req.query.eth;
 
-        const moralisEthAddress = req.user.profile.moralisEthAddress;
+        const moralisEthAddress = eth ?? req.user.profile.moralisEthAddress;
 
-        /* Moralis init code */
+        let nfts = await getMyNfts(moralisEthAddress);
 
-        const userEthNFTs = await Moralis.Web3API.account.getNFTs({
-          address: moralisEthAddress,
-        });
-        console.log(userEthNFTs);
-
-        // get testnet NFTs for user
-        const testnetNFTs = await Moralis.Web3API.account.getNFTs({
-          chain: "ropsten",
-          address: moralisEthAddress,
-        });
-        console.log(testnetNFTs);
-
-        // get polygon NFTs for address
-        const options = {
-          chain: "polygon",
-          address: moralisEthAddress,
-        };
-        const polygonNFTs = await Moralis.Web3API.account.getNFTs(options);
-        console.log(polygonNFTs);
-
-        res.send(polygonNFTs);
+        res.send(nfts);
       });
     }
   },
