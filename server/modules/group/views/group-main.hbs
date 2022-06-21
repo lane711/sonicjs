@@ -13,14 +13,20 @@
       </div>
     </div>
   {{/each}}
-  <a
-    href="#"
-    onclick="return openFormInModal('create', 'club-request')"
-    class="m-4 new-clubhouse-request"
-    style="width: 14rem;"
-  >
-    <img src="/assets/uploads/new_clubhouse.png" />
-  </a>
+
+  <div class="col-md-4">
+    <a
+      href="#"
+      onclick="return openFormInModal('create', 'club-request')"
+    >
+      <div class="card bg-dark h-100">
+        <img src="/assets/uploads/new_clubhouse.png" class="card-img-top" />
+        <div class="card-body">
+          <p class="card-text"></p>
+        </div>      
+      </div>
+    </a>
+  </div>
 </div>
 
 <br />
@@ -41,14 +47,17 @@
       </div>
     </div>
   {{/each}}
-  <div class="m-4 new-group" style="width: 14rem;">
+  <div class="col-md-4">
     <a
       href="#"
       onclick="return openFormInModal('create', 'club-request')"
-      class="m-4 new-clubhouse-request"
-      style="width: 14rem;"
     >
-      <img src="/assets/uploads/new_clubhouse.png" />
+      <div class="card bg-dark h-100">
+        <img src="/assets/uploads/new_clubhouse.png" class="card-img-top" />
+        <div class="card-body">
+          <p class="card-text"></p>
+        </div>      
+      </div>
     </a>
   </div>
 </div>
