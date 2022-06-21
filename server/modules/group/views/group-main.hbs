@@ -1,43 +1,6 @@
-<!-- 
-<h1>My Clubhouses</h1>
-<div class="row">
-  {{#each myGroups}}
-  <div class="col-md-4">
-    <div class="card bg-dark">
-      <img src="{{data.icon.src}}" class="card-img-top" />
-      <div class="card-body">
-        <p class="card-text">
-          <a href="{{data.url}}" class="stretched-link">{{data.title}}</a>
-        </p>
-      </div>
-    </div>
-  </div>
-  {{/each}}
-</div>
--->
-
-<!--
- <h1>Clubhouses</h1>
- <div class="container">
-  <div class="row">
-    {{#each groups}}
-      <div class="col-md-4 d-flex align-items-stretch">
-        <div class="card bg-dark">
-          <img src="{{data.icon.src}}" class="card-img-top" />
-          <div class="card-body">
-            <p class="card-text">
-              <a href="{{data.url}}" class="stretched-link">{{data.title}}</a>
-            </p>
-          </div>
-        </div>
-      </div>
-    {{/each}}
-  </div>
--->
-
 <h1>My Clubhouses</h1>
 <!-- <div class="d-flex flex-wrap align-content-start"> -->
-<div class="row g-3">
+<div class="row g-3 my-clubhouses">
   {{#each myGroups}}
     <div class="col-md-4">
       <div class="card bg-dark h-100">
@@ -50,6 +13,7 @@
       </div>
     </div>
   {{/each}}
+
   <div class="col-md-4">
     <a
       href="#"
@@ -70,7 +34,7 @@
 
 <h1>Clubhouses</h1>
 <!-- <div class="d-flex flex-wrap align-content-start"> -->
-<div class="row g-3">
+<div class="row g-3 clubhouses">
   {{#each groups}}
     <div class="col-md-4">
       <div class="card bg-dark h-100">

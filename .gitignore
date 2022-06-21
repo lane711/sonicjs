@@ -32,3 +32,5 @@ server/temp/*
 server/data/config/installId.json
 backups/*.zip
 backups/temp/*
+cypress/screenshots
+cypress/videos

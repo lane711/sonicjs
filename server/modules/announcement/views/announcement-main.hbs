@@ -7,7 +7,7 @@
       <div class="announcements-title">
         <h2 id="announcements">Announcements</h2>
         {{#if canAdd}}
-          <a href="javascript:void(0)" onclick="return openFormInModal('create', 'announcement')" >Post an Announcements</a>
+          <a href="javascript:void(0)" onclick="return openFormInModal('create', 'announcement')" >Post an Announcement</a>
         {{/if}}
       </div>
   
@@ -23,9 +23,9 @@
                   <h2>{{this.data.title}}</h2>
                   <div class="ms-auto">
                     {{#if ../canEdit }}
-                      <a onclick="return openFormInModal('edit', 'announcement', '{{ this.id }}')" 
+                      <a class="edit-announcement" onclick="return openFormInModal('edit', 'announcement', '{{ this.id }}')" 
                       href="javascript:void(0)"><img src="/assets/uploads/edit.png" alt=""></a> &nbsp; 
-                      <a href="javascript:void(0)" onclick="return openFormInModal('delete', null, '{{ this.id }}')"><img src="/assets/uploads/delete.png" alt=""></a>					
+                      <a href="javascript:void(0)" class="delete-announcement" onclick="return openFormInModal('delete', null, '{{ this.id }}')"><img src="/assets/uploads/delete.png" alt=""></a>					
                     {{/if}}
                   </div>
                 </div>
