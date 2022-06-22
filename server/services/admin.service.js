@@ -50,7 +50,7 @@ module.exports = adminService = {
           }
         }
 
-        if(userService.canAccessBackEnd(req) !== true){
+        if(await userService.canAccessBackEnd(req) !== true){
           res.send(401);
           return;
         }

@@ -165,22 +165,29 @@ module.exports = userService = {
 
   canEditPages: async function (req) {
     // console.log("user account", req.user);
-    if (req.user && req.user.username && req.user.profile.roles
-      && (req.user.profile.roles.includes("admin") || req.user.profile.roles.includes("page-editor"))) {
+    if (
+      req.user &&
+      req.user.username &&
+      req.user.profile.roles &&
+      (req.user.profile.roles.includes("admin") ||
+        req.user.profile.roles.includes("page-editor"))
+    ) {
       return true;
     }
     return false;
   },
 
   canAccessBackEnd: async function (req) {
-    if (req.
-      user 
-      && req.user.username 
-      && req.user.profile.roles
-      && req.user.profile.roles.includes("admin")) {
+    if (
+      req.user &&
+      req.user.username &&
+      req.user.profile.roles &&
+      req.user.profile.roles.includes("admin")
+    ) {
       return true;
+    } else {
+      return false;
     }
-    return false;
   },
 
   // getToken: async function (req) {
