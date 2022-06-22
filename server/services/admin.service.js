@@ -50,6 +50,11 @@ module.exports = adminService = {
           }
         }
 
+        if(userService.canAccessBackEnd(req) !== true){
+          res.send(401);
+          return;
+        }
+
         globalService.setAreaMode(true, false, true);
 
         let path = req.url.split("/");
