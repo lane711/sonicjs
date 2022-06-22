@@ -133,21 +133,6 @@ module.exports = moralisMainService = {
         return url;
       }
 
-      // if (rawUrl.includes("ipfs.io")) {
-      //   try {
-      //     if (rawUrl.startsWith("https://ipfs.io/ipfs/")) {
-      //       return rawUrl;
-      //     } else {
-      //       return "https://ipfs.io/ipfs/" + rawUrl.split("ipfs://")[1];
-      //     }
-      //   } catch (error) {
-      //     console.error("could not parse " + rawUrl);
-      //     return "error-ocurred";
-      //   }
-      // }
-      // if (isValidHttpUrl(rawUrl)) {
-      //   return rawUrl;
-      // }
     }
 
     function isValidHttpUrl(string) {
