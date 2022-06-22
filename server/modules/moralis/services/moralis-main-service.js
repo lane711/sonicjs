@@ -69,7 +69,7 @@ module.exports = moralisMainService = {
       }
     });
 
-    async function getMyNfts(moralisEthAddress){
+    async function getMyNfts(moralisEthAddress) {
       const mynfts = await Moralis.Web3API.account.getNFTs({
         chain: "polygon",
         address: moralisEthAddress,
@@ -80,32 +80,72 @@ module.exports = moralisMainService = {
         address: moralisEthAddress,
       });
 
-      const allNfts = [...mynfts.result, ...testNfts.result];
+      let allNfts = [...mynfts.result, ...testNfts.result];
+
+      //
+      // allNfts = allNfts.filter(
+      //   (n) => n.token_hash === "0148831f3ec7228a169726eb79669f7e"
+      // );
 
       let nfts = [];
-      allNfts.map((n) => {
+      allNfts.map(async (n) => {
         if (n.metadata) {
           n.data = JSON.parse(n.metadata);
-          try {
-            n.imageUrl =
-            "https://ipfs.io/ipfs/" + n.data.image.split("ipfs://")[1];
+        } else if (n.token_uri) {
+          let result = await axios
+            .get(n.token_uri)
+            .then(function (result) {
+              if (result) {
+                n.data = result.data;
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+        }
 
-          } catch (error) {
-            n.imageUrl = 'error-ocurred'
-          }
-          
+        if (n.data) {
+          n.imageUrl = n.data.image || n.data.image_url ? getImageUrl(n.data.image, n.data.image_url) : "no-image";
           n.data.descriptionPreview = helperService.truncateString(
             n.data.description,
             100
           );
-          nfts.push(n);
-        } else {
-          console.error("error: could not parse metadata for ", n);
         }
+        nfts.push(n);
       });
       return nfts;
     }
-    
+
+    function getImageUrl(url1, url2) {
+      let url = url1 ? url1 : url2;
+      if (!url) {
+        return "no-url";
+      }
+      if (url.startsWith("https://ipfs.io/ipfs/")) {
+        return url;
+      }
+
+      if (url.includes("ipfs://")) {
+        return "https://ipfs.io/ipfs/" + url.split("ipfs://")[1];
+      }
+
+      if (isValidHttpUrl(url)) {
+        return url;
+      }
+
+    }
+
+    function isValidHttpUrl(string) {
+      let url;
+
+      try {
+        url = new URL(string);
+      } catch (_) {
+        return false;
+      }
+
+      return url.protocol === "http:" || url.protocol === "https:";
+    }
 
     function getFakeNFTsForTesting() {
       return [
