@@ -172,6 +172,17 @@ module.exports = userService = {
     return false;
   },
 
+  canAccessBackEnd: async function (req) {
+    if (req.
+      user 
+      && req.user.username 
+      && req.user.profile.roles
+      && req.user.profile.roles.includes("admin")) {
+      return true;
+    }
+    return false;
+  },
+
   // getToken: async function (req) {
   //   return req.signedCookies.sonicjs_access_token;
   // },
