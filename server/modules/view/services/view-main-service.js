@@ -59,6 +59,8 @@ module.exports = viewMainService = {
       viewMainService.trimBody(options);
     }
 
+    await emitterService.emit("postModuleGetData2", options);
+
     // console.log(options.viewModel.data.contentTypeToLoad, moduleData);
   },
 

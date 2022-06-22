@@ -43,12 +43,14 @@ background-image:url('{{this.group.data.banner.src}}')">
               </div>
             </div>
             <div class="col-md-6">
-              <div class="bbt-edit text-md-right">
-                <a href="#" onclick="return openFormInModal('edit', 'group', '{{this.group.id}}')" >
-                  Edit Bio &nbsp;
-                  <img src="/assets/uploads/edit.png" alt="">
-                </a>
-              </div>
+              {{#if canEdit }}
+                <div class="bbt-edit text-md-right">
+                  <a href="#" onclick="return openFormInModal('edit', 'group', '{{this.group.id}}')" >
+                    Edit Bio &nbsp;
+                    <img src="/assets/uploads/edit.png" alt="">
+                  </a>
+                </div>
+              {{/if}}
             </div>
           </div>
           <p>{{this.group.data.bio}}</p>
