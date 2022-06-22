@@ -15,15 +15,12 @@
   {{/each}}
 
   <div class="col-md-4">
-    <a
-      href="#"
-      onclick="return openFormInModal('create', 'club-request')"
-    >
+    <a href="#" onclick="return openFormInModal('create', 'club-request')">
       <div class="card bg-dark h-100">
         <img src="/assets/uploads/new_clubhouse.png" class="card-img-top" />
         <div class="card-body">
           <p class="card-text"></p>
-        </div>      
+        </div>
       </div>
     </a>
   </div>
@@ -48,32 +45,41 @@
     </div>
   {{/each}}
   <div class="col-md-4">
-    <a
-      href="#"
-      onclick="return openFormInModal('create', 'club-request')"
-    >
+    <a href="#" onclick="return openFormInModal('create', 'club-request')">
       <div class="card bg-dark h-100">
         <img src="/assets/uploads/new_clubhouse.png" class="card-img-top" />
         <div class="card-body">
           <p class="card-text"></p>
-        </div>      
+        </div>
       </div>
     </a>
   </div>
 </div>
 
 <h1 class="mt-5">My NFTs</h1>
-<p>This is a temporary section for displaying NFTs for ETH Address:<br>{{ myEthAddress }}<br> It will be removed before
-  launch</p>
-{{#each mynfts}}
-  <div>
-    <img src="{{this.imageUrl}}" width="150px" /><br />
-    Name:
-    {{this.data.name}}<br />
-    Token Address:
-    {{this.token_address}}<br />
-    Hash:
-    {{this.token_hash}}
-    <hr />
+<p>This is a temporary section for displaying NFTs for ETH Address:<br
+  />{{myEthAddress}}<br />
+  It will be removed before launch</p>
+  <p>Raw NFT Data can be viewed <a target="_blank" href="/api/moralis-nfts">here</a></p>
+
+
+
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+
+    {{#each mynfts}}
+    <div class="col">
+      <div class="card">
+        <img src="{{this.imageUrl}}" class="card-img-top" alt="...">
+        <div class="card-body">
+          <h5 class="card-title">{{this.data.name}}</h5>
+          <p class="card-text"><a target="_blank" href="{{this.imageUrl}}">{{this.imageUrl}}</a></p>
+          <p class="card-text">Token Address: {{this.token_address}}</p>
+          <p class="card-text"><small class="text-muted">Hash:{{this.token_hash}}</small></p>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+
   </div>
-{{/each}}
+
+
