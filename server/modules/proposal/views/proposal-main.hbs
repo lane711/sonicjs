@@ -50,7 +50,7 @@
                       <span class="voteDowns">{{this.data.voteDowns}}</span>  
                     </div>
                     <div class="ms-auto">
-                      <span><a href="#" class="text-white font-italic">3 days left to vote &nbsp; </a></span>
+                      <span><a href="#" class="text-white font-italic mx-2">{{ this.data.remainingDays }}</a></span>
                       {{#if ../canEdit }}
                        <button type="button" class="button-red delete-proposal " onclick="return openFormInModal('delete', null, '{{this.id}}')"><i class="bi bi-trash"></i></button>      
                       {{/if}}

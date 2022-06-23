@@ -172,6 +172,10 @@ module.exports = authService = {
             return next(err);
           }
 
+          if ((await userService.canAccessBackEnd(req)) !== true) {
+            return res.redirect("/");
+          }
+          
           if (!req.session.returnTo) {
             console.log("redirect to admin");
             return res.redirect("/admin");
@@ -184,7 +188,6 @@ module.exports = authService = {
     });
 
     app.post("/login-user", (req, res, next) => {
-
       passport.authenticate("local", (err, user, info) => {
         if (err) {
           return next(err);
@@ -208,9 +211,7 @@ module.exports = authService = {
       res.send({ user: req.user })
     );
 
-    app.get("/user-open", (req, res) =>
-    res.send({ user: req.user })
-  );
+    app.get("/user-open", (req, res) => res.send({ user: req.user }));
 
     app.get("/login", async function (req, res) {
       if (process.env.MODE !== "dev") {

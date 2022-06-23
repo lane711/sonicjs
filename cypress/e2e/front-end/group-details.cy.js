@@ -32,10 +32,10 @@ describe("Group", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/clubs/mgo-locker-room`);
     cy.contains("Post an Announcement").click({ force: true });
     cy.get('#genericModal',{ timeout: 10000 }).should('be.visible');
+    cy.get('#genericModal input[name="data[title]"]',{ timeout: 10000 }).should('be.visible');
 
     cy.get('input[name="data[title]"]').type(
-      "Cypress Announcement cypress-test-cleanup-tag",
-      { delay: 0 }
+      "Cypress Announcement cypress-test-cleanup-tag"
     ).should(
       "have.value",
       "Cypress Announcement cypress-test-cleanup-tag"
@@ -52,6 +52,12 @@ describe("Group", function () {
     );
     cy.wait(150); //wait for validation to fire
     cy.contains("Post Announcement").click();
+
+    cy.location("pathname", { timeout: 10000 }).should(
+      "include",
+      `/clubs/mgo-locker-room`
+    );
+
     cy.contains("Cypress Announcement cypress-test-cleanup-tag");
 
     //edit
@@ -59,7 +65,7 @@ describe("Group", function () {
     cy.get('#genericModal',{ timeout: 10000 }).should('be.visible');
 
     cy.get('input[name="data[title]"]')
-      .type(" EDITED BY CYPRESS", { delay: 0 })
+      .type(" EDITED BY CYPRESS")
       .should(
         "have.value",
         "Cypress Announcement cypress-test-cleanup-tag EDITED BY CYPRESS"
@@ -88,10 +94,10 @@ describe("Group", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/clubs/mgo-locker-room`);
     cy.contains("Submit Your Proposal").click({ force: true });
     cy.get('#genericModal',{ timeout: 10000 }).should('be.visible');
+    cy.get('#genericModal input[name="data[title]"]',{ timeout: 10000 }).should('be.visible');
 
-    cy.get('input[name="data[title]"]').type(
-      "Cypress Proposal cypress-test-cleanup-tag",
-      { delay: 0 }
+    cy.get('#genericModal input[name="data[title]"]').type(
+      "Cypress Proposal cypress-test-cleanup-tag"
     ).should(
       "have.value",
       "Cypress Proposal cypress-test-cleanup-tag"
@@ -138,7 +144,7 @@ describe("Group", function () {
     cy.get('input[name="data[title]"]', { timeout: 10000 }).should('be.visible');
     cy.get('input[name="data[approved]"]').click();
     cy.get('input[name="data[title]"]')
-      .type(" EDITED BY CYPRESS", { delay: 0 })
+      .type(" EDITED BY CYPRESS")
       .should(
         "have.value",
         "Cypress Proposal cypress-test-cleanup-tag EDITED BY CYPRESS"
