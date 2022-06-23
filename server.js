@@ -188,7 +188,9 @@ function initInstallIdFile() {
 }
 
 function setupHandlebars(app) {
-  let themeDirectory = path.join(__dirname, "server/themes");
+  // let themeDirectory = path.join(__dirname, "server/themes");
+  let themeDirectory = path.join(__dirname, "custom/themes");
+
   let partialsDirs = [
     path.join(__dirname, "server/themes", "front-end", "bootstrap", "partials"),
     path.join(
@@ -198,19 +200,24 @@ function setupHandlebars(app) {
       frontEndTheme,
       "partials"
     ),
+    path.join(
+      __dirname,
+      frontEndTheme,
+      "partials"
+    ),
     path.join(__dirname, "server/themes", "admin", adminTheme, "partials"),
     path.join(__dirname, "server/themes", "admin", "shared-partials"),
   ];
 
   var hbs = exphbs.create({
-    layoutsDir: path.join(themeDirectory),
+    layoutsDir: themeDirectory,
     partialsDir: partialsDirs,
     extname: ".hbs",
   });
 
   app.engine(".hbs", hbs.engine);
   app.set("view engine", ".hbs");
-  app.set("views", __dirname + "/server/themes");
+  app.set("views", __dirname);
 
   setupHandlebarsHelpers();
 }

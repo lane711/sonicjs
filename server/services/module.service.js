@@ -94,7 +94,7 @@ module.exports = moduleService = {
     if (await fileService.fileExists(`${basePath}/module.json`, true)) {
       return basePath;
     } else {
-      basePath = `${appRoot.path}/server/themes/front-end/${frontEndTheme}/modules/${systemId}`;
+      basePath = `${appRoot.path}/${frontEndTheme}/modules/${systemId}`;
       if (await fileService.fileExists(`${basePath}/module.json`, true)) {
         return basePath;
       }

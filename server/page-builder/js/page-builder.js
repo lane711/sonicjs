@@ -1517,9 +1517,8 @@ async function setupACEEditor() {
   $("#save-global-css").click(async function () {
     let cssContent = editor.getSession().getValue();
 
-    // let file = new File([cssContent], "template.css", { type: "text/css" });
     await dataService.fileUpdate(
-      `/server/themes/front-end/${theme}/css/template.css`,
+      `${theme}/css/template.css`,
       cssContent,
       sessionID
     );
