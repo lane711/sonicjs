@@ -76,10 +76,15 @@ module.exports = groupMainService = {
         options.viewModel.canVote = true;
       }
   
-      if (userRole === "gm") {
+      if (userRole === "gm" || userRole === "member") {
         options.viewModel.canVote = true;
+
+        //HACK: this should be soft coded
+        if(options.viewModel.contentTypeId === 'proposal-settings'){
+          options.viewModel.canAdd = true;
+        }
       }
-      
+
     });
   },
 
