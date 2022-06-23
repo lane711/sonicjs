@@ -347,8 +347,10 @@ module.exports = adminService = {
     //get content types ending with "site-setting";
     let siteSettings = await dataService.contentTypesGet(req.sessionID);
     siteSettings = siteSettings.filter((c) =>
-      c.systemId.includes("-site-setting")
+      c.systemId.includes("-site-setting") || c.systemId === "site-settings"
     );
+
+    siteSettings = _.sortBy(siteSettings, 'title');
 
     await Promise.all(
       siteSettings.map(async (s) => {
