@@ -26,7 +26,6 @@ var backupService = require("../services/backup.service");
 var backupRestoreService = require("../services/backup-restore.service");
 var testService = require("../services/test.service");
 
-
 var helperService = require("../services/helper.service");
 var sharedService = require("../services/shared.service");
 var breadcrumbsService = require("../services/breadcrumbs.service");
@@ -238,12 +237,6 @@ exports.loadRoutes = async function (app) {
 exports.loadRoutesCatchAll = async function (app) {
   // app.get(/^[^.]*$/, async function (req, res, next) {
   app.get("*", async function (req, res, next) {
-    //HACK: need to softcode this in a setting
-    // if (req.url === "/") {
-    //   res.redirect("/clubhouses", 301);
-    // }
-
-
     await emitterService.emit("requestBegin", { req: req, res: res });
 
     if (req.isRequestAlreadyHandled) {
@@ -284,6 +277,11 @@ exports.loadRoutesCatchAll = async function (app) {
       req.url.indexOf(".woff") > -1
     ) {
       return next();
+    }
+
+    //allow something other than '/' to be the site home page
+    if (req.url === '/' && req.siteSettings.homePageUrl && req.siteSettings.homePageUrl !== '/') {
+      res.redirect(req.siteSettings.homePageUrl, 301);
     }
 
     if (req.user?.profile) {
@@ -328,6 +326,8 @@ exports.loadRoutesCatchAll = async function (app) {
     //add user data
     page.data.user = req.user ? req.user : { username: "anon" };
     page.data.user.isAuthenticated = req.user ? true : false;
+    page.data.siteSettings = req.siteSettings;
+
 
     res.render(`front-end/${frontEndTheme}/layouts/main`, {
       layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
