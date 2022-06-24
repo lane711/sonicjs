@@ -4,5 +4,10 @@
       },
       "files.exclude": {
         "**/combined-*": true
+      },
+      "workbench.colorCustomizations": {
+        "activityBar.background": "#382C05",
+        "titleBar.activeBackground": "#4E3E07",
+        "titleBar.activeForeground": "#FEFAEF"
       }
 }

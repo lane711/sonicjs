@@ -42,7 +42,8 @@ module.exports = appAnalyticsMainService = {
     if (process.env.ANALYTICS_RECEIVE_URL) {
       if (app) {
         app.post(process.env.ANALYTICS_RECEIVE_URL, async function (req, res) {
-          appAnalyticsMainService.processEvent(req.body, req.ip);
+          //HACK: this is causing prod app to crash, bypass for now
+          // appAnalyticsMainService.processEvent(req.body, req.ip);
           res.json({ ok: "ok" });
         });
       }
