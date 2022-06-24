@@ -188,11 +188,13 @@ function initInstallIdFile() {
 }
 
 function setupHandlebars(app) {
-  // let themeDirectory = path.join(__dirname, "server/themes");
-  let themeDirectory = path.join(__dirname, "custom/themes");
+  let themeDirectory = path.join(__dirname, "server/themes");
+  // let themeDirectory = path.join(__dirname, "custom/themes");
 
   let partialsDirs = [
     path.join(__dirname, "server/themes", "front-end", "bootstrap", "partials"),
+    path.join(__dirname, "server/themes"),
+
     path.join(
       __dirname,
       "server/themes",
@@ -313,6 +315,10 @@ function setupStaticAssets(app) {
     express.static(
       path.join(appRoot.path, "/node_modules/ace-builds/src-min-noconflict")
     )
+  );
+  app.use(
+    "/custom/themes",
+    express.static(path.join(appRoot.path, "/custom/themes"))
   );
 }
 

@@ -329,11 +329,6 @@ exports.loadRoutesCatchAll = async function (app) {
     page.data.user.isAuthenticated = req.user ? true : false;
     page.data.siteSettings = req.siteSettings;
 
-    // res.render(`front-end/${frontEndTheme}/layouts/main`, {
-    //   layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
-    //   data: page.data,
-    // });
-
     res.render(`${frontEndTheme}/layouts/main`, {
       layout: path.join(appRoot.path, frontEndTheme, 'theme.hbs'),
       data: page.data,

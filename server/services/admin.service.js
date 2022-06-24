@@ -23,6 +23,7 @@ const chalk = require("chalk");
 const log = console.log;
 var _ = require("underscore");
 const { registerPrompt } = require("inquirer");
+var appRoot = require("app-root-path");
 
 const adminTheme = `${process.env.ADMIN_THEME}`;
 const adminDomain = process.env.ADMIN_DOMAIN;
@@ -50,7 +51,7 @@ module.exports = adminService = {
           }
         }
 
-        if(await userService.canAccessBackEnd(req) !== true){
+        if ((await userService.canAccessBackEnd(req)) !== true) {
           res.send(401);
           return;
         }
@@ -321,8 +322,15 @@ module.exports = adminService = {
         data.fileStorage = process.env.FILE_STORAGE;
         data.fileStorageBase = `https://${process.env.AMAZON_S3_BUCKETNAME}.s3.amazonaws.com`;
 
-        res.render(`admin/shared-views/${viewName}`, {
-          layout: `admin/${adminTheme}/${adminTheme}`,
+        // res.render(`${frontEndTheme}/layouts/main`, {
+        //   layout: path.join(appRoot.path, frontEndTheme, 'theme.hbs'),
+        //   data: page.data,
+        // });
+
+        let layoutPath = `${appRoot.path}/server/themes/admin/${adminTheme}/theme.hbs`;
+
+        res.render(`server/themes/admin/shared-views/${viewName}`, {
+          layout: layoutPath,
           data: data,
           accessToken: accessToken,
         });
@@ -346,15 +354,16 @@ module.exports = adminService = {
   getSiteSettings: async function (req) {
     //get content types ending with "site-setting";
     let siteSettings = await dataService.contentTypesGet(req.sessionID);
-    siteSettings = siteSettings.filter((c) =>
-      c.systemId.includes("-site-setting") || c.systemId === "site-settings"
+    siteSettings = siteSettings.filter(
+      (c) =>
+        c.systemId.includes("-site-setting") || c.systemId === "site-settings"
     );
 
-    siteSettings = _.sortBy(siteSettings, 'title');
+    siteSettings = _.sortBy(siteSettings, "title");
 
     await Promise.all(
       siteSettings.map(async (s) => {
-        s.instance =  await dataService.getContentTopOne(s.systemId);
+        s.instance = await dataService.getContentTopOne(s.systemId);
         s.editForm = await dataService.formGet(
           s.systemId,
           s.instance,
@@ -368,6 +377,4 @@ module.exports = adminService = {
 
     return siteSettings;
   },
-
-
 };

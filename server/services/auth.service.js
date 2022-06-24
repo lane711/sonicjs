@@ -175,7 +175,7 @@ module.exports = authService = {
           if ((await userService.canAccessBackEnd(req)) !== true) {
             return res.redirect("/");
           }
-          
+
           if (!req.session.returnTo) {
             console.log("redirect to admin");
             return res.redirect("/admin");
@@ -237,8 +237,14 @@ module.exports = authService = {
         data.error = parsedQs.error;
       }
 
-      res.render("admin/shared-views/admin-login", {
-        layout: `front-end/${frontEndTheme}/login.hbs`,
+      // res.render(`${frontEndTheme}/layouts/main`, {
+      //   layout: path.join(appRoot.path, frontEndTheme, 'theme.hbs'),
+      //   data: page.data,
+      // });
+
+      //TODO change to standard admin login
+      res.render("server/themes/admin/shared-views/admin-login", {
+        layout: `${appRoot.path}/server/themes/admin/shared-views/login.hbs`,
         data: data,
       });
       // return;
