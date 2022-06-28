@@ -2,6 +2,9 @@ const { expect } = require("chai");
 const { iteratee } = require("lodash");
 
 describe("Admin Roles", function () {
+  before(() => {
+    cy.SonicJs.clearCypressTestData();
+  });
   beforeEach(() => {
     cy.SonicJs.login();
   });
@@ -11,7 +14,7 @@ describe("Admin Roles", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/roles`);
     cy.contains('New Role').click();
     cy.wait(1000);
-    cy.get('input[name="data[title]"]').type('Cypress Role');
+    cy.get('input[name="data[title]"]').type('Cypress Role cypress-test-cleanup-tag');
     cy.get('input[name="data[key]').type('cypress');
     cy.get('input[name="data[description]').type('cypress testing');
 
@@ -26,25 +29,26 @@ describe("Admin Roles", function () {
   it("Role edit", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/roles`);
     cy.contains("Cypress Role").click();
-    cy.wait(1000);
+    cy.url().should('contain', 'role/edit')
     cy.get('input[name="data[title]"]').type(" edited");
     cy.get('input[name="data[key]"]').type("-cypress");
 
     cy.contains("Submit").click();
-    cy.wait(1000);
-    cy.contains('edited');
+    cy.url().should('contain', 'admin/roles')
+
+    cy.contains('Cypress Role cypress-test-cleanup-tag edited');
 
   });
 
   it("Role delete", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/roles`);
 
-    cy.get('[data-role="Cypress Role edited"]').click();
+    cy.get('[data-role="Cypress Role cypress-test-cleanup-tag edited"]').click();
 
-    cy.wait(1000);
+    cy.wait(200);
     cy.contains("Confirm Delete").click();
 
-    cy.wait(1000);
+    cy.wait(500);
 
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/roles`);
 
