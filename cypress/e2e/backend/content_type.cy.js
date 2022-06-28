@@ -3,6 +3,7 @@ const { iteratee } = require("lodash");
 
 describe("Admin Content Types", function () {
   beforeEach(() => {
+    cy.SonicJs.clearCypressTestData();
     cy.SonicJs.login();
   });
 

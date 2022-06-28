@@ -56,6 +56,8 @@ module.exports = moralisMainService = {
     });
 
     emitterService.on("getMyNFTs", async function (options) {
+
+      console.log('mode =====>', process.env.E2E_TEST_MODE);
       //HACK: since we can't fake begin logged into moralis, we have to send test objects
       if (process.env.E2E_TEST_MODE) {
         options.viewModel.mynfts = getFakeNFTsForTesting();

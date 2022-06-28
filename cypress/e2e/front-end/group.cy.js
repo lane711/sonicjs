@@ -3,7 +3,13 @@ const { iteratee } = require("lodash");
 
 describe("Group", function () {
   beforeEach(() => {
+    cy.SonicJs.clearCypressTestData();
     cy.SonicJs.frontEndLogin();
+  });
+
+  after(() => {
+    //cleanup incase any tests failed
+    cy.SonicJs.clearCypressTestData();
   });
 
   after(() => {
