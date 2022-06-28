@@ -13,7 +13,7 @@ describe("Group", function () {
     cy.SonicJs.clearCypressTestData();
   });
 
-  it.skip("should show list of announcements, proposals and events", function () {
+  it("should show list of announcements, proposals and events", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/clubs/mgo-locker-room`);
     cy.contains("Proposals");
     cy.contains("Upcoming Events");
@@ -33,7 +33,7 @@ describe("Group", function () {
     cy.contains("Post an Announcement").click({ force: true });
     cy.get('#genericModal',{ timeout: 10000 }).should('be.visible');
     cy.get('#genericModal input[name="data[title]"]',{ timeout: 10000 }).should('be.visible');
-    cy.wait(150); //wait for formio
+    cy.wait(500); //wait for formio
 
     cy.get('input[name="data[title]"]').type(
       "Cypress Announcement cypress-test-cleanup-tag"
@@ -90,12 +90,13 @@ describe("Group", function () {
     ).should("not.exist");
   });
 
-  it.skip("should allow a new proposal to be created/edited/deleted", function () {
+  it("should allow a new proposal to be created/edited/deleted", function () {
     //create
     cy.visit(`${cy.SonicJs.getBaseUrl()}/clubs/mgo-locker-room`);
     cy.contains("Submit Your Proposal").click({ force: true });
     cy.get('#genericModal',{ timeout: 10000 }).should('be.visible');
     cy.get('#genericModal input[name="data[title]"]',{ timeout: 10000 }).should('be.visible');
+    cy.wait(500); //wait for formio
 
     cy.get('#genericModal input[name="data[title]"]').type(
       "Cypress Proposal cypress-test-cleanup-tag"

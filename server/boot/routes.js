@@ -281,8 +281,13 @@ exports.loadRoutesCatchAll = async function (app) {
     }
 
     //allow something other than '/' to be the site home page
-    if (req.url === '/' && req.siteSettings.homePageUrl && req.siteSettings.homePageUrl !== '/') {
-      res.redirect(req.siteSettings.homePageUrl, 301);
+    if (
+      req.url === "/" &&
+      req.siteSettings.homePageUrl &&
+      req.siteSettings.homePageUrl !== "/"
+    ) {
+      res.redirect(301, req.siteSettings.homePageUrl);
+      return;
     }
 
     if (req.user?.profile) {
@@ -330,7 +335,7 @@ exports.loadRoutesCatchAll = async function (app) {
     page.data.siteSettings = req.siteSettings;
 
     res.render(`${frontEndTheme}/layouts/main`, {
-      layout: path.join(appRoot.path, frontEndTheme, 'theme.hbs'),
+      layout: path.join(appRoot.path, frontEndTheme, "theme.hbs"),
       data: page.data,
     });
 

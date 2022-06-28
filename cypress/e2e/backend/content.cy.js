@@ -9,6 +9,16 @@ describe("Admin Content", function () {
     cy.SonicJs.login();
   })
 
+  before(() => {
+    //cleanup incase any tests failed
+    cy.SonicJs.clearCypressTestData();
+  });
+
+  after(() => {
+    //cleanup incase any tests failed
+    cy.SonicJs.clearCypressTestData();
+  });
+
 
   it("Content create", function () {
 
@@ -18,7 +28,7 @@ describe("Admin Content", function () {
     cy.get('[data-content-type="page"]').first().click();
     cy.get('input[name="data[title]"]').type('Cypress Test Page');
     cy.get('input[name="data[url]').should('have.value', '/cypress-test-page');
-    cy.get('input[name="data[heroTitle]"]').type('Cypress Hero');
+    cy.get('input[name="data[heroTitle]"]').type('Cypress Hero cypress-test-cleanup-tag');
     cy.get('input[name="data[pageCssClass]"]').type('Cypress Hero');
     cy.get('input[name="data[metaTitle]"]').type('Cypress Meta Title');
     cy.get('textarea[name="data[metaDescription]"]').type('Cypress Meta Description');
@@ -40,7 +50,7 @@ describe("Admin Content", function () {
     cy.wait(1000);
 
     cy.visit(`${cy.SonicJs.getBaseUrl()}/cypress-test-page-edited`);
-    cy.contains('Cypress Hero EDITED');
+    cy.contains('Cypress Hero cypress-test-cleanup-tag');
 
   });
 
