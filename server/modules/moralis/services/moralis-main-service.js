@@ -56,8 +56,6 @@ module.exports = moralisMainService = {
     });
 
     emitterService.on("getMyNFTs", async function (options) {
-
-      console.log('mode =====>', process.env.E2E_TEST_MODE);
       //HACK: since we can't fake begin logged into moralis, we have to send test objects
       if (process.env.E2E_TEST_MODE) {
         options.viewModel.mynfts = getFakeNFTsForTesting();
@@ -107,7 +105,10 @@ module.exports = moralisMainService = {
         }
 
         if (n.data) {
-          n.imageUrl = n.data.image || n.data.image_url ? getImageUrl(n.data.image, n.data.image_url) : "no-image";
+          n.imageUrl =
+            n.data.image || n.data.image_url
+              ? getImageUrl(n.data.image, n.data.image_url)
+              : "no-image";
           n.data.descriptionPreview = helperService.truncateString(
             n.data.description,
             100
@@ -134,7 +135,6 @@ module.exports = moralisMainService = {
       if (isValidHttpUrl(url)) {
         return url;
       }
-
     }
 
     function isValidHttpUrl(string) {
@@ -218,6 +218,51 @@ module.exports = moralisMainService = {
       ];
     }
 
+    function getFakeNFTCollectionForTesting() {
+      return {
+        total: 12,
+        page: 0,
+        page_size: 100,
+        cursor:
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ3aGVyZSI6eyJ0b2tlbl9hZGRyZXNzIjoiMHg3NzI3NzBmYTFjZTMxOTZhMWM4OTVmYmU0OWE2MzRkY2U3NThkODdkIn0sImxpbWl0IjoxMDAsIm9mZnNldCI6MCwib3JkZXIiOltbInRva2VuX2hhc2giLCJERVNDIl1dLCJncm91cCI6WyJ0b2tlbl9oYXNoIiwidG9rZW5fYWRkcmVzcyIsInRva2VuX2lkIiwiYmxvY2tfbnVtYmVyX21pbnRlZCJdLCJwYWdlIjoxLCJrZXkiOiIwMDE1NjlmYTk3MjIzNGYxNTRlNjQzMDM2ZDcxNTQwZiIsInRvdGFsIjoxMiwiaWF0IjoxNjU2MzgwMjgyfQ.JR4J9DIQwdxF61qpVIXMWwdB-Yrq4EieOz00SRAY-nE",
+        result: [
+          {
+            token_address: "0x772770fa1ce3196a1c895fbe49a634dce758d87d",
+            token_id: "1",
+            amount: "100",
+            token_hash: "6777c19d76d54b30e1ad30f165652c5d",
+            block_number_minted: "23072758",
+            contract_type: "ERC1155",
+            name: null,
+            symbol: null,
+            token_uri:
+              "https://ipfs.moralis.io:2053/ipfs/QmZkT3zkMZHfDBxS6gu8jH44NRYUbgkgnKuCd5jQjSEZG9",
+            metadata: `{"name":"Blake Corum","description":"Blake Corum is a Sophomore Running Back at the University of Michigan.  Prior to the 2021 season, Sports Illustrated predicted that Corum was \\"poised for a breakout year.\\" and that’s what he did rushing for 939 yards and 11 touchdowns. On September 18, Corum recorded his third straight 100-yard rushing game to start the season, becoming the first Michigan player to accomplish this feat since 2011.  Corum attended St. Frances Academy in Baltimore. As a senior, he rushed for 1,438 yards and 22 touchdowns and led his team to a No. 4 national ranking.\\n\\n* Class year - Sophomore\\n* Conference - Big Ten\\n* Player name - Blake Corum\\n* Position - RB\\n* Quantity - 100\\n* Rarity - Epic\\n* Sport - NCAA Men's Football\\n* Team - University of Michigan","image":"ipfs://QmXDAxcbKMwbhJLofiBBa6H7EPQZaQHQjXXJmBdVNBz7Vd"}`,
+            synced_at: "2022-05-18T16:26:09.464Z",
+            last_token_uri_sync: "2022-05-18T16:20:13.383Z",
+            last_metadata_sync: "2022-05-18T16:26:09.464Z",
+          },
+
+          {
+            token_address: "0x772770fa1ce3196a1c895fbe49a634dce758d87d",
+            token_id: "5",
+            amount: "1",
+            token_hash: "001569fa972234f154e643036d71540f",
+            block_number_minted: "23079574",
+            contract_type: "ERC1155",
+            name: null,
+            symbol: null,
+            token_uri:
+              "https://ipfs.moralis.io:2053/ipfs/QmV1RzewWxFCLBoRKgDNJvAddoeWx8fVPzWiJuGpfs5NQF",
+            metadata: `{"name":"Blake Corum","description":"Blake Corum is a Sophomore Running Back at the University of Michigan.  Prior to the 2021 season, Sports Illustrated predicted that Corum was \\"poised for a breakout year.\\" and that’s what he did rushing for 939 yards and 11 touchdowns. On September 18, Corum recorded his third straight 100-yard rushing game to start the season, becoming the first Michigan player to accomplish this feat since 2011.  Corum attended St. Frances Academy in Baltimore. As a senior, he rushed for 1,438 yards and 22 touchdowns and led his team to a No. 4 national ranking.\\n\\n* Class year - Sophomore\\n* Conference - Big Ten\\n* Player name - Blake Corum\\n* Position - RB\\n* Quantity - 1\\n* Rarity - Legendary\\n* Sport - NCAA Men's Football\\n* Team - University of Michigan","image":"ipfs://QmNr4kb5oePBjL6dNzWzrY2rcnWfqZkvjF6o2Hp63HLT3C","animation_url":"ipfs://QmPipQVFbexM8rNWsPE8rp1VewAatoBCEyFoygNG97oBHh"}`,
+            synced_at: "2022-05-18T16:26:09.465Z",
+            last_token_uri_sync: "2022-05-18T16:20:13.383Z",
+            last_metadata_sync: "2022-05-18T16:26:09.465Z",
+          },
+        ],
+      };
+    }
+
     emitterService.on("getNFTs", async function (options) {
       if (!Moralis) {
         return;
@@ -227,10 +272,17 @@ module.exports = moralisMainService = {
 
       await Promise.all(
         collections.map(async (c) => {
-          let collectionNfts = await Moralis.Web3API.token.getAllTokenIds({
-            address: c,
-            chain: "polygon",
-          });
+          let collectionNfts;
+
+          if (process.env.E2E_TEST_MODE) {
+            collectionNfts = getFakeNFTCollectionForTesting();
+          } else {
+            collectionNfts = await Moralis.Web3API.token.getAllTokenIds({
+              address: c,
+              chain: "polygon",
+            });
+          }
+
           nfts.push(...collectionNfts.result);
         })
       );
