@@ -1,10 +1,10 @@
-var dataService = require("../../../services/data.service");
-var emitterService = require("../../../services/emitter.service");
-var globalService = require("../../../services/global.service");
+var dataService = require("../../../../server/services/data.service");
+var emitterService = require("../../../../server/services/emitter.service");
+var globalService = require("../../../../server/services/global.service");
 const moralisApiKey = process.env.REACT_APP_MORALIS_API_KEY;
 const axios = require("axios");
-const dalService = require("../../../services/dal.service");
-const helperService = require("../../../services/helper.service");
+const dalService = require("../../../../server/services/dal.service");
+const helperService = require("../../../../server/services/helper.service");
 
 const serverUrl = process.env.MORALIS_SERVER_URL;
 const appId = process.env.MORALIS_APP_ID;

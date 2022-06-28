@@ -320,6 +320,10 @@ function setupStaticAssets(app) {
     "/custom/themes",
     express.static(path.join(appRoot.path, "/custom/themes"))
   );
+  app.use(
+    "/custom/modules",
+    express.static(path.join(appRoot.path, "/custom/modules"))
+  );
 }
 
 function main() {
