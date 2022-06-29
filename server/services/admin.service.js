@@ -322,11 +322,6 @@ module.exports = adminService = {
         data.fileStorage = process.env.FILE_STORAGE;
         data.fileStorageBase = `https://${process.env.AMAZON_S3_BUCKETNAME}.s3.amazonaws.com`;
 
-        // res.render(`${frontEndTheme}/layouts/main`, {
-        //   layout: path.join(appRoot.path, frontEndTheme, 'theme.hbs'),
-        //   data: page.data,
-        // });
-
         let layoutPath = `${appRoot.path}/server/themes/admin/${adminTheme}/theme.hbs`;
 
         res.render(`server/themes/admin/shared-views/${viewName}`, {
