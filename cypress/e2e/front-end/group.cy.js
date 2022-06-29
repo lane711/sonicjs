@@ -3,7 +3,13 @@ const { iteratee } = require("lodash");
 
 describe("Group", function () {
   beforeEach(() => {
+    cy.SonicJs.clearCypressTestData();
     cy.SonicJs.frontEndLogin();
+  });
+
+  after(() => {
+    //cleanup incase any tests failed
+    cy.SonicJs.clearCypressTestData();
   });
 
   after(() => {
@@ -15,7 +21,6 @@ describe("Group", function () {
     cy.contains("Clubhouses");
 
     cy.get(".clubhouses").find(".card").its("length").should("be.gte", 1);
-    cy.get(".clubhouses").find(".new-group").should("have.length", 1);
   });
 
   it("should submit new clubhouse request form if validations met", function () {

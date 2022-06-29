@@ -189,12 +189,21 @@ function initInstallIdFile() {
 
 function setupHandlebars(app) {
   let themeDirectory = path.join(__dirname, "server/themes");
+  // let themeDirectory = path.join(__dirname, "custom/themes");
+
   let partialsDirs = [
     path.join(__dirname, "server/themes", "front-end", "bootstrap", "partials"),
+    path.join(__dirname, "server/themes"),
+
     path.join(
       __dirname,
       "server/themes",
       "front-end",
+      frontEndTheme,
+      "partials"
+    ),
+    path.join(
+      __dirname,
       frontEndTheme,
       "partials"
     ),
@@ -203,14 +212,14 @@ function setupHandlebars(app) {
   ];
 
   var hbs = exphbs.create({
-    layoutsDir: path.join(themeDirectory),
+    layoutsDir: themeDirectory,
     partialsDir: partialsDirs,
     extname: ".hbs",
   });
 
   app.engine(".hbs", hbs.engine);
   app.set("view engine", ".hbs");
-  app.set("views", __dirname + "/server/themes");
+  app.set("views", __dirname);
 
   setupHandlebarsHelpers();
 }
@@ -306,6 +315,14 @@ function setupStaticAssets(app) {
     express.static(
       path.join(appRoot.path, "/node_modules/ace-builds/src-min-noconflict")
     )
+  );
+  app.use(
+    "/custom/themes",
+    express.static(path.join(appRoot.path, "/custom/themes"))
+  );
+  app.use(
+    "/custom/modules",
+    express.static(path.join(appRoot.path, "/custom/modules"))
   );
 }
 

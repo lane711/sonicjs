@@ -1,0 +1,24 @@
+{
+  "moduleSystemId": "moralis",
+  "systemId": "moralis",
+  "title": "Moralis",
+  "data": {
+    "components": [
+      {
+        "label": "First Name",
+        "type": "textfield",
+        "input": true,
+        "key": "firstName",
+        "validate": { "required": true }
+      },
+      {
+        "label": "Submit",
+        "type": "button",
+        "input": true,
+        "key": "submit",
+        "theme": "primary"
+      }
+    ]
+  },
+  "filePath": "/Users/lanecampbell/Dev/draftly/sonicjs-draftly/custom/modules/moralis/models/moralis.json"
+}

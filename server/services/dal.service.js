@@ -287,15 +287,23 @@ module.exports = dalService = {
     if (verboseLogging) {
       console.log("dal contentUpdate repo save ==>", JSON.stringify(content));
     }
-    let result = await contentRepo.save(content);
 
-    if (isExisting) {
-      await emitterService.emit("contentUpdated", result);
-    } else {
-      await emitterService.emit("contentCreated", result);
+    let result;
+    try {
+      result = await contentRepo.save(content);
+    } catch (error) {
+      console.error("Unable to upsert record", error);
+    } finally {
+      if (result) {
+        if (isExisting) {
+          await emitterService.emit("contentUpdated", result);
+        } else {
+          await emitterService.emit("contentCreated", result);
+        }
+
+        await emitterService.emit("contentCreatedOrUpdated", result);
+      }
     }
-
-    await emitterService.emit("contentCreatedOrUpdated", result);
 
     return result;
   },
@@ -386,7 +394,6 @@ module.exports = dalService = {
     });
 
     return contents.length;
-
   },
 
   contentDeleteAll: async function (userSession) {

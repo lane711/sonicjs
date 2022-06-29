@@ -63,10 +63,10 @@ module.exports = cssService = {
   },
 
   processTemplateCss: async function () {
-    let originalFilePath = `/server/themes/front-end/${frontEndTheme}/css/template.css`;
+    let originalFilePath = `${frontEndTheme}/css/template.css`;
     let originalFile = await fileService.getFile(originalFilePath);
     // console.log(originalFile);
-    let processedFilePath = `/server/themes/front-end/${frontEndTheme}/css/template-processed.css`;
+    let processedFilePath = `${frontEndTheme}/css/template-processed.css`;
 
     // let conn = await getConnection();
     // let viewModel = conn.getRepository(Content).find({
@@ -122,7 +122,7 @@ module.exports = cssService = {
   getCssFile: async function (page) {
     //get template.css
     let cssString = await fileService.getFile(
-      `/server/themes/front-end/${frontEndTheme}/css/template.css`
+      `${frontEndTheme}/css/template.css`
     );
     //parse the css
     var ast = csstree.parse(cssString);

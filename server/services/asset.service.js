@@ -155,7 +155,7 @@ module.exports = assetService = {
 
   getThemeAssets: async function () {
     var themeConfig = await fileService.getYamlConfig(
-      `/server/themes/front-end/${frontEndTheme}/${frontEndTheme}.config.yml`
+      `${frontEndTheme}/assets.config.yml`
     );
     return themeConfig.assets;
   },
@@ -214,7 +214,7 @@ module.exports = assetService = {
       async (link) => {
         let root = link.path.startsWith("/node_modules");
         if (link.path.includes("/api/containers/css/download/template.css")) {
-          link.path = `/server/themes/front-end/${frontEndTheme}/css/template-processed.css`;
+          link.path = `${frontEndTheme}/css/template-processed.css`;
         }
         if (!link.path.startsWith('/node_modules')) {
           link.path = '/server' + link.path;

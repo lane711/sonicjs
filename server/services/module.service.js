@@ -35,7 +35,7 @@ module.exports = moduleService = {
     moduleDirs.push(
       path.join(
         appRoot.path,
-        `/server/themes/front-end/${frontEndTheme}/modules`
+        `/custom/modules`
       )
     );
 
@@ -94,7 +94,7 @@ module.exports = moduleService = {
     if (await fileService.fileExists(`${basePath}/module.json`, true)) {
       return basePath;
     } else {
-      basePath = `${appRoot.path}/server/themes/front-end/${frontEndTheme}/modules/${systemId}`;
+      basePath = `${appRoot.path}/custom/modules/${systemId}`;
       if (await fileService.fileExists(`${basePath}/module.json`, true)) {
         return basePath;
       }
@@ -304,6 +304,9 @@ module.exports = moduleService = {
 
     files.forEach((file) => {
       let link = file.substr(file.indexOf("server") + 6, file.length);
+      if(file.includes('/custom/module')){
+        link = file;
+      }
       globalService.moduleCssFiles.push(link);
     });
   },
@@ -318,6 +321,9 @@ module.exports = moduleService = {
     files.forEach((file) => {
       if (file.indexOf("assets/js") > -1) {
         let link = file.substr(file.indexOf("server") + 6, file.length);
+        if(file.includes('/custom/module')){
+          link = file;
+        }
         globalService.moduleJsFiles.push(link);
       }
     });

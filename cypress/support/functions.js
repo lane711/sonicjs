@@ -39,6 +39,10 @@ cy.SonicJs = {
   clearCypressTestData: () => {
     cy.request(`${cy.SonicJs.getBaseUrl()}/set-e2e-test-mode`);
     cy.request(`${cy.SonicJs.getBaseUrl()}/clear-test-data`);
+  },
+
+  clearCypressTesFlag: () => {
+    cy.request(`${cy.SonicJs.getBaseUrl()}/set-e2e-test-mode-off`);
   }
 
 

@@ -11,7 +11,14 @@ module.exports = testService = {
     });
 
     app.get("/set-e2e-test-mode", async function (req, res) {
+      console.log('setting E2E_TEST_MODE to true')
       process.env.E2E_TEST_MODE = true;
+      res.sendStatus(200);
+    });
+
+    app.get("/set-e2e-test-mode-off", async function (req, res) {
+      console.log('setting E2E_TEST_MODE to false')
+      process.env.E2E_TEST_MODE = false;
       res.sendStatus(200);
     });
   },

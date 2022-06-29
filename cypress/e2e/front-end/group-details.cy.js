@@ -33,6 +33,7 @@ describe("Group", function () {
     cy.contains("Post an Announcement").click({ force: true });
     cy.get('#genericModal',{ timeout: 10000 }).should('be.visible');
     cy.get('#genericModal input[name="data[title]"]',{ timeout: 10000 }).should('be.visible');
+    cy.wait(500); //wait for formio
 
     cy.get('input[name="data[title]"]').type(
       "Cypress Announcement cypress-test-cleanup-tag"
@@ -95,6 +96,7 @@ describe("Group", function () {
     cy.contains("Submit Your Proposal").click({ force: true });
     cy.get('#genericModal',{ timeout: 10000 }).should('be.visible');
     cy.get('#genericModal input[name="data[title]"]',{ timeout: 10000 }).should('be.visible');
+    cy.wait(500); //wait for formio
 
     cy.get('#genericModal input[name="data[title]"]').type(
       "Cypress Proposal cypress-test-cleanup-tag"
