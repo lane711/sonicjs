@@ -115,9 +115,17 @@ exports.loadRoutes = async function (app) {
     res.send(form);
   });
 
-  app.get("/zsandbox", async function (req, res) {
-    let data = {};
-    res.render("sandbox", { layout: "blank.handlebars", data: data });
+  app.get("/health", async function (req, res) {
+    res.status(200).send("ok");
+  });
+
+  app.get("/health-database", async function (req, res) {
+    let content = await dataService.getContentByUrl("/");
+    if (content && content.contentTypeId === "page") {
+      res.status(200).send("ok");
+    } else {
+      res.status(500).send("database offline");
+    }
   });
 
   app.get("/theme1", async function (req, res) {
