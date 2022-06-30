@@ -113,6 +113,8 @@ module.exports = adminService = {
         if (viewName == "admin-content-types-edit") {
           data.contentTypeId = param1;
           data.raw = await dataService.contentTypeGet(param1, req.sessionID);
+          let roles = await userService.getRoles(req.sessionID);
+          await adminService.getPermissionsMatrix(data.raw, roles);
         }
 
         if (viewName == "admin-modules") {
@@ -344,6 +346,37 @@ module.exports = adminService = {
     } else {
       globalService.isAdminUserCreated = false;
     }
+  },
+
+  getPermissionsMatrix: async function (contentType, acls, roles) {
+    contentType.permissions = [
+      {
+        view: "everyone",
+      },
+      {
+        create: "communityAdmin,clubAdmin",
+      },
+      {
+        edit: "communityAdmin,clubAdmin",
+      },
+      {
+        delete: "communityAdmin,clubAdmin",
+      },
+    ];
+
+    contentType.permissionsMatrix = {
+      acls: ["view", "create", "edit", "delete"],
+    };
+    contentType.permissionsMatrix.rows = [
+      {
+        roleTitle: "anonymous",
+        columns: [true, false, false, false],
+      },
+      {
+        roleTitle: "member",
+        columns: [true, true, true, true],
+      },
+    ];
   },
 
   getSiteSettings: async function (req) {
