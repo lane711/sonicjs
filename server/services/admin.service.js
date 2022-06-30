@@ -114,7 +114,7 @@ module.exports = adminService = {
           data.contentTypeId = param1;
           data.raw = await dataService.contentTypeGet(param1, req.sessionID);
           let roles = await userService.getRoles(req.sessionID);
-          await adminService.getPermissionsMatrix(data.raw, roles);
+          await adminService.getPermissionsMatrix(data.raw, roles, req);
         }
 
         if (viewName == "admin-modules") {
@@ -348,7 +348,7 @@ module.exports = adminService = {
     }
   },
 
-  getPermissionsMatrix: async function (contentType, acls, roles) {
+  getPermissionsMatrix: async function (contentType, roles, req) {
     contentType.permissions = [
       {
         view: "everyone",
@@ -364,19 +364,38 @@ module.exports = adminService = {
       },
     ];
 
+    let settings = await dataService.getContentByType(
+      "site-settings",
+      req.sessionID
+    );
+    let acls = settings[0].data.permissionAccessControls.map((a) => a.title);
+
     contentType.permissionsMatrix = {
-      acls: ["view", "create", "edit", "delete"],
+      acls: acls,
     };
-    contentType.permissionsMatrix.rows = [
-      {
-        roleTitle: "anonymous",
+
+    contentType.permissionsMatrix.rows = roles.map((role) => {
+      return {
+        roleTitle: `${role.data.title} (${role.data.key})`,
         columns: [true, false, false, false],
-      },
-      {
-        roleTitle: "member",
-        columns: [true, true, true, true],
-      },
-    ];
+      };
+    });
+
+    console.log(
+      "contentType.permissionsMatrix.rows",
+      contentType.permissionsMatrix.rows
+    );
+
+    // contentType.permissionsMatrix.rows = [
+    //   {
+    //     roleTitle: "anonymous",
+    //     columns: [true, false, false, false],
+    //   },
+    //   {
+    //     roleTitle: "member",
+    //     columns: [true, true, true, true],
+    //   },
+    // ];
   },
 
   getSiteSettings: async function (req) {
