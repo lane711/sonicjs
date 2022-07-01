@@ -1515,15 +1515,19 @@ async function setupACEEditor() {
   }
 
   $("#save-global-css").click(async function () {
-    let cssContent = editor.getSession().getValue();
+    let cssContent = editor.getSession().getValue().toString();;
+    // debugger;
 
-    await dataService.fileUpdate(
-      `${theme}/css/template.css`,
-      cssContent,
-      sessionID
-    );
+    return axiosInstance
+    .post("/admin/update-css", {css: cssContent})
+    .then(async function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+      alert(error)
+    });
 
-    // writeFile("css", file);
   });
 
   beatifyACECss();
