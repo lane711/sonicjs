@@ -385,7 +385,6 @@ module.exports = adminService = {
     };
 
     contentType.permissionsMatrix.rows = roles.map((role) => {
-      // let permission =contentType.permissions.find((p)=> p === role.key);
       let columns = acls.map((a) => {
         let permission = contentType.permissions.find((p) => p.acl === a);
         if (permission?.roles.includes(role.key) || role.key === 'admin') {
@@ -400,21 +399,6 @@ module.exports = adminService = {
       };
     });
 
-    console.log(
-      "contentType.permissionsMatrix.rows",
-      contentType.permissionsMatrix.rows
-    );
-
-    // contentType.permissionsMatrix.rows = [
-    //   {
-    //     roleTitle: "anonymous",
-    //     columns: [true, false, false, false],
-    //   },
-    //   {
-    //     roleTitle: "member",
-    //     columns: [true, true, true, true],
-    //   },
-    // ];
   },
 
   getSiteSettings: async function (req) {

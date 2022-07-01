@@ -62,28 +62,29 @@ module.exports = groupMainService = {
 
     emitterService.on("postModuleGetData2", async function (options) {
 
-      options.viewModel.canAdd = false;
-      options.viewModel.canReview = false;
+      options.viewModel.canView = true;
+      options.viewModel.canCreate = false;
       options.viewModel.canEdit = false;
-      options.viewModel.canVote = false;
-  
-      let userRole = options.req.user?.profile.roles[0];
-      //TODO: need to check that club admin is for the current club(not just has the role)
-      if (userRole === "communityAdmin" || userRole === "clubAdmin") {
-        options.viewModel.canAdd = true;
-        options.viewModel.canReview = true;
-        options.viewModel.canEdit = true;
-        options.viewModel.canVote = true;
-      }
-  
-      if (userRole === "gm" || userRole === "member") {
-        options.viewModel.canVote = true;
+      options.viewModel.canDelete = false;
+      options.viewModel.canVote = true;
 
-        //HACK: this should be soft coded
-        if(options.viewModel.contentTypeId === 'proposal-settings'){
-          options.viewModel.canAdd = true;
-        }
-      }
+      // let userRole = options.req.user?.profile.roles[0];
+      // //TODO: need to check that club admin is for the current club(not just has the role)
+      // if (userRole === "communityAdmin" || userRole === "clubAdmin") {
+      //   options.viewModel.canAdd = true;
+      //   options.viewModel.canReview = true;
+      //   options.viewModel.canEdit = true;
+      //   options.viewModel.canVote = true;
+      // }
+  
+      // if (userRole === "gm" || userRole === "member") {
+      //   options.viewModel.canVote = true;
+
+      //   //HACK: this should be soft coded
+      //   if(options.viewModel.contentTypeId === 'proposal-settings'){
+      //     options.viewModel.canAdd = true;
+      //   }
+      // }
 
     });
   },
