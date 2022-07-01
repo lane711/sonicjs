@@ -70,6 +70,9 @@ module.exports = moralisMainService = {
     });
 
     async function getMyNfts(moralisEthAddress) {
+      if(!moralisEthAddress){
+        return;
+      }
       const mynfts = await Moralis.Web3API.account.getNFTs({
         chain: "polygon",
         address: moralisEthAddress,

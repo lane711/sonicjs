@@ -1515,13 +1515,25 @@ async function setupACEEditor() {
   }
 
   $("#save-global-css").click(async function () {
+    debugger;
     let cssContent = editor.getSession().getValue();
 
-    await dataService.fileUpdate(
-      `${theme}/css/template.css`,
-      cssContent,
-      sessionID
-    );
+    return axiosInstance
+    .post("/admin/update-css", cssContent)
+    .then(async function (response) {
+      console.log(response);
+      // fullPageUpdate();
+      // return await response.data;
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+    
+    // await dataService.fileUpdate(
+    //   `${theme}/css/template.css`,
+    //   cssContent,
+    //   sessionID
+    // );
 
     // writeFile("css", file);
   });

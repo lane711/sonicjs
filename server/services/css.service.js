@@ -17,7 +17,7 @@ const { getConnection } = require("typeorm");
 const { Content } = require("../data/model/Content");
 
 module.exports = cssService = {
-  startup: async function () {
+  startup: async function (app) {
     emitterService.on("getRenderedPagePostDataFetch", async function (options) {
       if (options && options.page) {
         await cssService.getCssFile(options.page);
@@ -60,6 +60,22 @@ module.exports = cssService = {
     //     return;
     //   }
     // });
+
+
+    app.post("/admin/update-css", async function (req, res) {
+      let cssContent = req.body;
+
+      let cssFilePath = `${frontEndTheme}/css/template.css`;
+
+      let result = await dataService.fileUpdate(
+        cssFilePath,
+        cssContent,
+        req.sessionID
+      );
+
+      // cssFilePath = 
+
+    });
   },
 
   processTemplateCss: async function () {

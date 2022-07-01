@@ -17,7 +17,6 @@ var themeSettingsService = require("../services/theme-settings.service");
 var contentService = require("../services/content.service");
 contentService.startup();
 var cssService = require("../services/css.service");
-cssService.startup();
 var assetService = require("../services/asset.service");
 var userService = require("../services/user.service");
 var authService = require("../services/auth.service");
@@ -68,6 +67,8 @@ exports.loadRoutes = async function (app) {
     await pageBuilderService.startup(app);
     await pageBuilderService.startup(app);
     await testService.startup(app);
+    await cssService.startup(app);
+
 
     await emitterService.emit("startup", { app: app });
 
