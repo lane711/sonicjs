@@ -245,17 +245,23 @@ module.exports = adminService = {
         }
 
         if (viewName == "admin-roles") {
-          data.editFormRole = await dataService.formGet(
-            "role",
-            undefined,
-            "submitContent(submission,true,'role')",
-            undefined,
-            undefined,
-            req.sessionID,
-            req.url
+          let data = await dataService.getContentByContentType(
+            "roles",
+            req.sessionID
           );
-          let roles = await userService.getRoles(req.sessionID);
-          data.roles = roles;
+          res.redirect(`/admin/content/edit/roles/${data[0].id}`);
+          return;
+          // data.editFormRole = await dataService.formGet(
+          //   "role",
+          //   undefined,
+          //   "submitContent(submission,true,'role')",
+          //   undefined,
+          //   undefined,
+          //   req.sessionID,
+          //   req.url
+          // );
+          // let roles = await userService.getRoles(req.sessionID);
+          // data.roles = roles;
         }
 
         if (viewName == "admin-role-new") {
@@ -351,16 +357,20 @@ module.exports = adminService = {
   getPermissionsMatrix: async function (contentType, roles, req) {
     contentType.permissions = [
       {
-        view: "everyone",
+        acl: "view",
+        roles: ["clubhouseGeneralManager", "communityAdmin", "anonymous"],
       },
       {
-        create: "communityAdmin,clubAdmin",
+        acl: "create",
+        roles: ["clubhouseGeneralManager", "communityAdmin", "clubhouseMember"],
       },
       {
-        edit: "communityAdmin,clubAdmin",
+        acl: "edit",
+        roles: ["clubhouseGeneralManager", "communityAdmin"],
       },
       {
-        delete: "communityAdmin,clubAdmin",
+        acl: "delete",
+        roles: ["clubhouseGeneralManager", "communityAdmin"],
       },
     ];
 
@@ -375,9 +385,18 @@ module.exports = adminService = {
     };
 
     contentType.permissionsMatrix.rows = roles.map((role) => {
+      // let permission =contentType.permissions.find((p)=> p === role.key);
+      let columns = acls.map((a) => {
+        let permission = contentType.permissions.find((p) => p.acl === a);
+        if (permission?.roles.includes(role.key) || role.key === 'admin') {
+          return true;
+        } else {
+          return false;
+        }
+      });
       return {
-        roleTitle: `${role.data.title} (${role.data.key})`,
-        columns: [true, false, false, false],
+        roleTitle: `${role.title} (${role.key})`,
+        columns: columns,
       };
     });
 

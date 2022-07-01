@@ -105,9 +105,9 @@ module.exports = userService = {
   },
 
   getRoles: async function (sessionID) {
-    let data = await dataService.getContentByContentType("role", sessionID);
+    let data = await dataService.getContentByContentType("roles", sessionID);
 
-    return data;
+    return data[0].data.roles;
   },
 
   mapUserRoles: async function (user) {
