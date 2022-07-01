@@ -1527,14 +1527,7 @@ async function setupACEEditor() {
       console.log(error);
       alert(error)
     });
-    
-    // await dataService.fileUpdate(
-    //   `${theme}/css/template.css`,
-    //   cssContent,
-    //   sessionID
-    // );
 
-    // writeFile("css", file);
   });
 
   beatifyACECss();

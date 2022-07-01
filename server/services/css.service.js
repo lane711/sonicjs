@@ -73,7 +73,6 @@ module.exports = cssService = {
         req.sessionID
       );
 
-      // cssFilePath =
       if (result.filePath === cssFilePath) {
         res.send(200, "ok");
       } else {
