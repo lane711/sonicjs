@@ -396,7 +396,7 @@ section {
 }
 
 .sidebar-expander {
-  position: absolute;
+  position: fixed;
   top: calc(50% - 30px);
   left: -60px;
   width: 60px;
@@ -405,10 +405,11 @@ section {
   background-repeat: no-repeat;
   background-position: center;
   background-size: 60px;
-  background-color: transparent;
+  background-color: rgba(255, 255, 255, 0.3);
   border: 0;
   transition: left 2s;
   z-index: 999;
+  padding: 50px 0;
 }
 
 .sidebar-expander:focus {

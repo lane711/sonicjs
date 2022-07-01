@@ -1515,18 +1515,17 @@ async function setupACEEditor() {
   }
 
   $("#save-global-css").click(async function () {
-    debugger;
-    let cssContent = editor.getSession().getValue();
+    let cssContent = editor.getSession().getValue().toString();;
+    // debugger;
 
     return axiosInstance
-    .post("/admin/update-css", cssContent)
+    .post("/admin/update-css", {css: cssContent})
     .then(async function (response) {
       console.log(response);
-      // fullPageUpdate();
-      // return await response.data;
     })
     .catch(function (error) {
       console.log(error);
+      alert(error)
     });
     
     // await dataService.fileUpdate(
