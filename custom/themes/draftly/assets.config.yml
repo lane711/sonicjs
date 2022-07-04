@@ -26,6 +26,7 @@ assets:
   css:
     - /node_modules/bootstrap5/dist/css/bootstrap.min.css
     - /{{frontEndTheme}}/css/custom.css
+    - /{{frontEndTheme}}/css/template.css
     - /node_modules/bootstrap-icons/font/bootstrap-icons.css
     - /node_modules/font-awesome/css/font-awesome.min.css
     - /node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css
