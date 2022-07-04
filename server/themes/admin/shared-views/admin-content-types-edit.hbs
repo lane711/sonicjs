@@ -46,6 +46,18 @@
     <li class="nav-item">
       <a
         class="nav-link"
+        id="permissions-tab"
+        data-toggle="tab"
+        href="#permissions"
+        role="tab"
+        aria-controls="permissions"
+        aria-selected="true"
+      >Permissions</a>
+    </li>
+
+    <li class="nav-item">
+      <a
+        class="nav-link"
         id="raw-tab"
         data-toggle="tab"
         href="#raw"
@@ -254,6 +266,68 @@
 
         </div>
         <!--/.col-->
+      </div>
+
+    </div>
+
+    <div
+      class="tab-pane fade show"
+      id="permissions"
+      role="tabpanel"
+      aria-labelledby="raw-tab"
+    >
+
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <i class="fa fa-align-justify"></i>
+            Manage Fields
+
+          </div>
+          <div class="card-body">
+
+            {{#each this.data.raw.permissionsMatrix}}
+              {{this.title}}
+              {{#each this.roles}}
+                {{this.role}}
+              {{/each}}
+            {{/each}}
+
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Access Control</th>
+                  {{#each this.data.raw.permissionsMatrix.acls}}
+                    <th scope="col">{{this}}</th>
+                  {{/each}}
+                </tr>
+              </thead>
+              <tbody>
+                {{#each this.data.raw.permissionsMatrix.rows}}
+                  <tr>
+                    <th scope="row">{{this.roleTitle}}</th>
+                    {{#each this.columns}}
+                      <td>{{this}}</td>
+                    {{/each}}
+
+                  </tr>
+                {{/each}}
+
+              </tbody>
+            </table>
+
+          </div>
+          <div class="card-footer">
+            <button
+              type="button"
+              class="btn btn-success pull-right"
+              onclick="onContentTypeSave()"
+            >
+              Save Json
+            </button>
+          </div>
+        </div>
+
       </div>
 
     </div>
