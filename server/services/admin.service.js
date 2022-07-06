@@ -113,8 +113,15 @@ module.exports = adminService = {
         if (viewName == "admin-content-types-edit") {
           data.contentTypeId = param1;
           data.raw = await dataService.contentTypeGet(param1, req.sessionID);
-          let roles = await userService.getRoles(req.sessionID);
-          await adminService.getPermissionsMatrix(data.raw, roles, req);
+          data.editForm = await dataService.formGet(
+            param1,
+            undefined,
+            "submitContent(submission)",
+            undefined,
+            undefined,
+            req.sessionID,
+            req.url
+          );
         }
 
         if (viewName == "admin-modules") {
@@ -352,53 +359,6 @@ module.exports = adminService = {
     } else {
       globalService.isAdminUserCreated = false;
     }
-  },
-
-  getPermissionsMatrix: async function (contentType, roles, req) {
-    contentType.permissions = [
-      {
-        acl: "view",
-        roles: ["clubhouseGeneralManager", "communityAdmin", "anonymous"],
-      },
-      {
-        acl: "create",
-        roles: ["clubhouseGeneralManager", "communityAdmin", "clubhouseMember"],
-      },
-      {
-        acl: "edit",
-        roles: ["clubhouseGeneralManager", "communityAdmin"],
-      },
-      {
-        acl: "delete",
-        roles: ["clubhouseGeneralManager", "communityAdmin"],
-      },
-    ];
-
-    let settings = await dataService.getContentByType(
-      "site-settings",
-      req.sessionID
-    );
-    let acls = settings[0].data.permissionAccessControls.map((a) => a.title);
-
-    contentType.permissionsMatrix = {
-      acls: acls,
-    };
-
-    contentType.permissionsMatrix.rows = roles.map((role) => {
-      let columns = acls.map((a) => {
-        let permission = contentType.permissions.find((p) => p.acl === a);
-        if (permission?.roles.includes(role.key) || role.key === 'admin') {
-          return true;
-        } else {
-          return false;
-        }
-      });
-      return {
-        roleTitle: `${role.title} (${role.key})`,
-        columns: columns,
-      };
-    });
-
   },
 
   getSiteSettings: async function (req) {

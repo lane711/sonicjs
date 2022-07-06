@@ -42,7 +42,7 @@ module.exports = groupMainService = {
           hidden: false,
           input: true,
           defaultValue: groupId,
-          customClass:'fe-hide'
+          customClass: "fe-hide",
         });
       }
     });
@@ -61,14 +61,28 @@ module.exports = groupMainService = {
     });
 
     emitterService.on("postModuleGetData2", async function (options) {
+      const groupContentTypes = await dataService.getContentTopOne(
+        "group-site-settings"
+      );
 
-      options.viewModel.canView = true;
-      options.viewModel.canCreate = false;
-      options.viewModel.canEdit = false;
-      options.viewModel.canDelete = false;
-      options.viewModel.canVote = true;
+      let baseContentType = options.viewModel.contentTypeId.replace(
+        "-settings",
+        ""
+      );
 
-      // let userRole = options.req.user?.profile.roles[0];
+      if (
+        groupContentTypes.data.applyToContentTypes.includes(baseContentType)
+      ) {
+        let contentType = await dataService.contentTypeGet(baseContentType);
+        let userRole = options.req.user?.profile.roles[0];
+
+        options.viewModel.canView = true;
+        options.viewModel.canCreate = false;
+        options.viewModel.canEdit = false;
+        options.viewModel.canDelete = false;
+        options.viewModel.canVote = true;
+      }
+
       // //TODO: need to check that club admin is for the current club(not just has the role)
       // if (userRole === "communityAdmin" || userRole === "clubAdmin") {
       //   options.viewModel.canAdd = true;
@@ -76,7 +90,7 @@ module.exports = groupMainService = {
       //   options.viewModel.canEdit = true;
       //   options.viewModel.canVote = true;
       // }
-  
+
       // if (userRole === "gm" || userRole === "member") {
       //   options.viewModel.canVote = true;
 
@@ -85,7 +99,6 @@ module.exports = groupMainService = {
       //     options.viewModel.canAdd = true;
       //   }
       // }
-
     });
   },
 

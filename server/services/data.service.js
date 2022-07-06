@@ -309,8 +309,61 @@ if (typeof module !== "undefined" && module.exports) {
             `,
       });
 
+      //TODO: process permission at data layer with role
+      // let roles = await userService.getRoles(sessionID);
+      // await this.getPermissionsMatrix(result.data.data.contentType, roles, sessionID);
+
       return result.data.data.contentType;
     }),
+
+
+  (exports.getPermissionsMatrix=  async function (contentType, roles, sessionID) {
+    contentType.permissions = [
+      {
+        acl: "view",
+        roles: ["clubhouseGeneralManager", "communityAdmin", "anonymous"],
+      },
+      {
+        acl: "create",
+        roles: ["clubhouseGeneralManager", "communityAdmin", "clubhouseMember"],
+      },
+      {
+        acl: "edit",
+        roles: ["clubhouseGeneralManager", "communityAdmin"],
+      },
+      {
+        acl: "delete",
+        roles: ["clubhouseGeneralManager", "communityAdmin"],
+      },
+    ];
+
+    let settings = await this.getContentByType(
+      "site-settings",
+      sessionID
+    );
+    let acls = settings[0].data.permissionAccessControls.map((a) => a.title);
+
+    contentType.permissionsMatrix = {
+      acls: acls,
+    },
+
+    contentType.permissionsMatrix.rows = roles.map((role) => {
+      let columns = acls.map((a) => {
+        let permission = contentType.permissions.find((p) => p.acl === a);
+        if (permission?.roles.includes(role.key) || role.key === 'admin') {
+          return true;
+        } else {
+          return false;
+        }
+      });
+      return {
+        roleTitle: `${role.title} (${role.key})`,
+        columns: columns,
+      };
+    });
+
+  }),
+
     (exports.contentTypesGet = async function (sessionID) {
       let result = await this.getAxios().post(apiUrl, {
         query: `
