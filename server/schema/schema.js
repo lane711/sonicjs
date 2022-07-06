@@ -681,10 +681,8 @@ const Mutation = new GraphQLObjectType({
       },
       resolve(parent, args, req) {
         let dataObj = JSON.parse(args.data);
-        let permissionsObj = JSON.parse(args.permissions);
 
         args.data = dataObj;
-        args.permissions = permissionsObj;
 
         console.log("ContentTypeUpdate", args);
         moduleService

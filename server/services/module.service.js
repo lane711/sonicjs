@@ -144,7 +144,6 @@ module.exports = moduleService = {
     moduleDef.data = moduleContentType.data;
     moduleDef.canBeAddedToColumn = moduleContentType.canBeAddedToColumn;
     moduleDef.canBeAddedToColumn = moduleContentType.canBeAddedToColumn;
-    moduleDef.permissions = moduleContentType.permissions;
 
     moduleDef.filePath =
       (await this.getBasePath(moduleContentType.moduleSystemId)) +
