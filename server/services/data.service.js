@@ -303,7 +303,6 @@ if (typeof module !== "undefined" && module.exports) {
                   moduleSystemId
                   filePath
                   data
-                  permissions
                 }
               }
             `,
