@@ -512,6 +512,7 @@ module.exports = dalService = {
       return data;
     }
 
+    //TODO: update this
     if (contentType.permissions) {
       let view = contentType.permissions.mappings.find(
         (x) => (x = "view")
