@@ -27,7 +27,7 @@ $(document).ready(async function () {
   setupClickEvents();
   setupJsonEditor();
   await setPage();
-  await setContentType();
+  // await setContentType();
   setupJsonEditorContentTypeRaw();
   setupJsonRawSave();
 
