@@ -292,12 +292,12 @@ if (typeof module !== "undefined" && module.exports) {
 
       return data;
     }),
-    (exports.contentTypeGet = async function (contentType, sessionID) {
+    (exports.contentTypeGet = async function (contentType, req) {
       // debugger;
       let result = await this.getAxios().post(apiUrl, {
         query: `
             {
-                contentType(systemId:"${contentType}", sessionID:"${sessionID}") {
+                contentType(systemId:"${contentType}", sessionID:"${req.sessionID}") {
                   title
                   systemId
                   moduleSystemId
@@ -310,12 +310,39 @@ if (typeof module !== "undefined" && module.exports) {
 
       //we don't need this if getting on the front end
       if (!isFrontEnd) {
-        let roles = await userService.getRoles(sessionID);
+        let roles = await userService.getRoles(req.sessionID);
         await this.getPermissionsMatrix(
           result.data.data.contentType,
           roles,
-          sessionID
+          req.sessionID
         );
+
+        //make sure admin always has all permissions
+        //TODO: should get site default permissions if not set
+        result.data.data.contentType.data.permissions =
+          result.data.data.contentType.data.permissions ?? [];
+        result.data.data.contentType.data.permissions.map((p) => {
+          p.roles.push("admin");
+        });
+
+        if (result.data.data.contentType.data.permissions.length) {
+          let settings = await this.getContentByType(
+            "site-settings",
+            req.sessionID
+          );
+          let acls = settings[0].data.permissionAccessControls.map(
+            (a) => a.title
+          );
+          let userRoles = req.user?.profile.roles;
+
+          acls.map((a) => {
+            let viewPermission = result.data.data.contentType.data.permissions.find(
+              (p) => p.acl === a
+            );
+            result.data.data.contentType.acls[`can${helperService.capitalizeFirstLetter(a)}`] =
+              _.intersection(viewPermission.roles, userRoles).length !== 0;
+          });
+        }
       }
 
       return result.data.data.contentType;
@@ -325,28 +352,28 @@ if (typeof module !== "undefined" && module.exports) {
       roles,
       sessionID
     ) {
-      contentType.permissions = [
-        {
-          "acl": "view",
-          "roles": ["clubhouseGeneralManager", "communityAdmin", "anonymous"]
-        },
-        {
-          "acl": "create",
-          "roles": [
-            "clubhouseGeneralManager",
-            "communityAdmin",
-            "clubhouseMember"
-          ]
-        },
-        {
-          "acl": "edit",
-          "roles": ["clubhouseGeneralManager", "communityAdmin"]
-        },
-        {
-          "acl": "delete",
-          "roles": ["clubhouseGeneralManager", "communityAdmin"]
-        }
-      ];
+      // contentType.permissions = [
+      //   {
+      //     "acl": "view",
+      //     "roles": ["clubhouseGeneralManager", "communityAdmin", "anonymous"]
+      //   },
+      //   {
+      //     "acl": "create",
+      //     "roles": [
+      //       "clubhouseGeneralManager",
+      //       "communityAdmin",
+      //       "clubhouseMember"
+      //     ]
+      //   },
+      //   {
+      //     "acl": "edit",
+      //     "roles": ["clubhouseGeneralManager", "communityAdmin"]
+      //   },
+      //   {
+      //     "acl": "delete",
+      //     "roles": ["clubhouseGeneralManager", "communityAdmin"]
+      //   }
+      // ];
 
       let settings = await this.getContentByType("site-settings", sessionID);
       let acls = settings[0].data.permissionAccessControls.map((a) => a.title);
@@ -356,9 +383,18 @@ if (typeof module !== "undefined" && module.exports) {
       }),
         (contentType.permissionsMatrix.rows = roles.map((role) => {
           let columns = acls.map((a) => {
-            let permission = contentType.permissions.find((p) => p.acl === a);
-            if (permission?.roles.includes(role.key) || role.key === "admin") {
-              return true;
+            if (contentType.data.permissions) {
+              let permission = contentType.data.permissions.find(
+                (p) => p.acl === a
+              );
+              if (
+                permission?.roles.includes(role.key) ||
+                role.key === "admin"
+              ) {
+                return true;
+              } else {
+                return false;
+              }
             } else {
               return false;
             }

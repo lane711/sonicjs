@@ -112,7 +112,8 @@ module.exports = adminService = {
 
         if (viewName == "admin-content-types-edit") {
           data.contentTypeId = param1;
-          data.raw = await dataService.contentTypeGet(param1, req.sessionID);
+          data.raw = await dataService.contentTypeGet(param1, req);
+          data.showOnlyPermissionTab = data.raw.systemId === 'site-settings-permissions';
           data.editForm = await dataService.formGet(
             param1,
             undefined,

@@ -110,9 +110,9 @@ exports.loadRoutes = async function (app) {
     let moduleSystemId = req.path.replace("/form/", "");
     let contentType = await dataService.contentTypeGet(
       moduleSystemId,
-      req.sessionID
+      req
     );
-    let form = await formService.getFormJson(contentType, req.sessionID);
+    let form = await formService.getFormJson(contentType, req);
     res.send(form);
   });
 
@@ -175,7 +175,7 @@ exports.loadRoutes = async function (app) {
 
       let contentType = await dataService.contentTypeGet(
         contentTypeId,
-        req.sessionID
+        req
       );
 
       if (payload.id) {

@@ -19,6 +19,7 @@
   </div>
 
   <ul class="nav nav-tabs" id="myTab" role="tablist">
+    {{#unless data.showOnlyPermissionTab }}
     <li class="nav-item">
       <a
         class="nav-link active"
@@ -43,9 +44,11 @@
       >States</a>
     </li>
 
+  {{/unless}}
+
     <li class="nav-item">
       <a
-        class="nav-link"
+        class="nav-link {{#if data.showOnlyPermissionTab }}active{{/if}}"
         id="permissions-tab"
         data-toggle="tab"
         href="#permissions"
@@ -90,7 +93,7 @@
   <div class="tab-content" id="myTabContent">
 
     <div
-      class="tab-pane fade show active"
+      class="tab-pane fade show {{#unless data.showOnlyPermissionTab }}active{{/unless}}"
       id="fields"
       role="tabpanel"
       aria-labelledby="home-tab"
@@ -271,7 +274,7 @@
     </div>
 
     <div
-      class="tab-pane fade show"
+      class="tab-pane fade show {{#if data.showOnlyPermissionTab }}active{{/if}}"
       id="permissions"
       role="tabpanel"
       aria-labelledby="raw-tab"
@@ -281,7 +284,7 @@
         <div class="card">
           <div class="card-header">
             <i class="fa fa-align-justify"></i>
-            Manage Fields
+            Permissions
 
           </div>
           <div class="card-body">
@@ -307,7 +310,18 @@
                   <tr>
                     <th scope="row">{{this.roleTitle}}</th>
                     {{#each this.columns}}
-                      <td>{{this}}</td>
+                      <td>{{this}}
+                        <input
+                        type="checkbox"
+                        id="doNothing"
+                        name="postSubmission"
+                        value="doNothing"
+                        {{setChecked
+                          this
+                          "doNothing"
+                        }}
+                      />
+                      </td>
                     {{/each}}
 
                   </tr>
@@ -343,7 +357,7 @@
         <div class="card">
           <div class="card-header">
             <i class="fa fa-align-justify"></i>
-            Manage Fields
+           Json
 
           </div>
           <div class="card-body">

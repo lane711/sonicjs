@@ -671,7 +671,6 @@ const Mutation = new GraphQLObjectType({
         systemId: { type: new GraphQLNonNull(GraphQLString) },
         moduleSystemId: { type: new GraphQLNonNull(GraphQLString) },
         filePath: { type: GraphQLString },
-        permissions: { type: new GraphQLNonNull(GraphQLString) },
         data: { type: new GraphQLNonNull(GraphQLString) },
         sessionID: { type: GraphQLString },
         // data: {

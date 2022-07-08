@@ -53,7 +53,7 @@ if (typeof module !== "undefined" && module.exports) {
           "submitContent(submission)",
           undefined,
           undefined,
-          options.req.sessionID,
+          options.req,
           options.req.url
         );
       }
@@ -100,12 +100,12 @@ if (typeof module !== "undefined" && module.exports) {
       if (contentObject && contentObject.data.contentType) {
         contentType = await dataService.contentTypeGet(
           contentObject.data.contentType.toLowerCase(),
-          req.sessionID
+          req
         );
       } else if (contentTypeId) {
         contentType = await dataService.contentTypeGet(
           contentTypeId,
-          req.sessionID
+          req
         );
 
         //add a hidden object for the formsettings id so we can look it up on form submission
@@ -124,7 +124,7 @@ if (typeof module !== "undefined" && module.exports) {
         if (returnModuleSettings) {
           const settingContentType = await dataService.contentTypeGet(
             `${contentTypeId}-settings`,
-            req.sessionID
+            req
           );
           // debugger;
           if (settingContentType && settingContentType.data) {

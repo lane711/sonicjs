@@ -134,6 +134,10 @@
     }
     return str.join(' ');
   }
+
+  exports.capitalizeFirstLetter = function(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
 })(typeof exports === "undefined" ? (this["helperService"] = {}) : exports);
 
 // (function (exports) {

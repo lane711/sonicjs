@@ -1,6 +1,8 @@
 var dataService = require("../../../services/data.service");
 var emitterService = require("../../../services/emitter.service");
 var globalService = require("../../../services/global.service");
+var helperService = require("../../../services/helper.service");
+
 var _ = require("underscore");
 
 module.exports = groupMainService = {
@@ -73,14 +75,15 @@ module.exports = groupMainService = {
       if (
         groupContentTypes.data.applyToContentTypes.includes(baseContentType)
       ) {
-        let contentType = await dataService.contentTypeGet(baseContentType);
-        let userRole = options.req.user?.profile.roles[0];
+        // let contentType = await dataService.contentTypeGet(baseContentType);
+        // let userRoles = options.req.user?.profile.roles;
 
-        options.viewModel.canView = true;
-        options.viewModel.canCreate = false;
-        options.viewModel.canEdit = false;
-        options.viewModel.canDelete = false;
-        options.viewModel.canVote = true;
+        // await groupMainService.processPermissions(
+        //   options,
+        //   contentType,
+        //   userRoles,
+        //   options.req.sessionID
+        // );
       }
 
       // //TODO: need to check that club admin is for the current club(not just has the role)
@@ -100,6 +103,25 @@ module.exports = groupMainService = {
       //   }
       // }
     });
+  },
+
+  processPermissions: async function (options, contentType, userRoles, sessionID) {
+    //set defaults
+    // options.viewModel.canView = false;
+    // options.viewModel.canCreate = false;
+    // options.viewModel.canEdit = false;
+    // options.viewModel.canDelete = false;
+    // options.viewModel.canVote = false;
+
+    // let settings = await dataService.getContentByType("site-settings", sessionID);
+    // let acls = settings[0].data.permissionAccessControls.map((a) => a.title);
+    // acls.map((a) => {
+    //   let viewPermission = contentType.data.permissions.find(
+    //     (p) => p.acl === a
+    //   );
+    //   options.viewModel[`can${helperService.capitalizeFirstLetter(a)}`] =
+    //     _.intersection(viewPermission.roles, userRoles).length !== 0;
+    // });
   },
 
   getMyGroups: async function (options) {
