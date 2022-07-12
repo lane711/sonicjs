@@ -17,7 +17,7 @@
           Formio.icons = 'fontawesome';
           formService.setFormApiUrls(Formio);
 
-          Formio.createForm(document.getElementById('formio_{{ random }}'), formJSON_{{ random }}).then((form) => {
+          Formio.{{formioFunction}}(document.getElementById('formio_{{ random }}'), formJSON_{{ random }}).then((form) => {
               console.log('log form', form);
 
               if (formValuesToLoad_{{ random }}) {

@@ -121,7 +121,8 @@ module.exports = adminService = {
             undefined,
             undefined,
             req.sessionID,
-            req.url
+            req.url,
+            true
           );
         }
 

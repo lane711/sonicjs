@@ -383,6 +383,7 @@ const RootQuery = new GraphQLObjectType({
         id: { type: GraphQLString },
         onFormSubmitFunction: { type: GraphQLString },
         returnModuleSettings: { type: GraphQLBoolean },
+        showBuilder: { type: GraphQLBoolean },
         formSettingsId: { type: GraphQLString },
         referringUrl: { type: GraphQLString },
       },
@@ -394,7 +395,8 @@ const RootQuery = new GraphQLObjectType({
             args.returnModuleSettings,
             args.formSettingsId,
             req,
-            args.referringUrl
+            args.referringUrl,
+            args.showBuilder
           );
       },
     },

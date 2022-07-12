@@ -175,7 +175,8 @@ if (typeof module !== "undefined" && module.exports) {
       returnModuleSettings = false,
       formSettingsId,
       sessionID,
-      referringUrl
+      referringUrl,
+      showBuilder = false
     ) {
       let contentString = content ? JSON.stringify(content) : "";
 
@@ -186,6 +187,7 @@ if (typeof module !== "undefined" && module.exports) {
         onFormSubmitFunction: """${onFormSubmitFunction}""",
         returnModuleSettings: ${returnModuleSettings},
         formSettingsId: "${formSettingsId ?? ""}",
+        showBuilder: ${showBuilder},
         referringUrl: "${referringUrl}"){
           html
           contentType
