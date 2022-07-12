@@ -22,7 +22,7 @@ module.exports = voteMainService = {
             options.contentType.systemId
           )
         ) {
-          const voteContentType = await dataService.contentTypeGet("vote");
+          const voteContentType = await dataService.contentTypeGet("vote", options.req.sessionID);
           const voteComponentsToAdd = voteContentType.data.components.filter(
             (c) => c.type !== "button"
           );
