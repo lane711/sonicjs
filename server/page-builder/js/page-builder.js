@@ -27,7 +27,7 @@ $(document).ready(async function () {
   setupClickEvents();
   setupJsonEditor();
   await setPage();
-  // await setContentType();
+  await setContentType();
   setupJsonEditorContentTypeRaw();
   setupJsonRawSave();
 
@@ -59,7 +59,7 @@ async function setContentType() {
   if (contentTypeId) {
     this.contentType = await dataService.contentTypeGet(
       contentTypeId,
-      undefined
+      {req: {sessionID: sessionID}}
     );
   }
 }

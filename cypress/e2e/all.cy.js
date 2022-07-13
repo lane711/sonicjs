@@ -12,4 +12,5 @@ import "./page-builder/page.cy";
 
 after(() => {
   cy.SonicJs.clearCypressTesFlag();
+  cy.SonicJs.clearCypressTestData();
 });

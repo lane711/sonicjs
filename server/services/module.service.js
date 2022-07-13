@@ -32,12 +32,7 @@ module.exports = moduleService = {
   processModules: async function (app) {
     let moduleDirs = [];
     moduleDirs.push(path.join(appRoot.path, "/server/modules"));
-    moduleDirs.push(
-      path.join(
-        appRoot.path,
-        `/custom/modules`
-      )
-    );
+    moduleDirs.push(path.join(appRoot.path, `/custom/modules`));
 
     await this.getModuleDefinitionFiles(moduleDirs, app);
     // await this.getModuleCss(moduleDirs);
@@ -228,7 +223,8 @@ module.exports = moduleService = {
     return moduleCount;
   },
   getModuleContentType: async function (contentTypeSystemId, session, req) {
-    let rootDomain = (req && req.protocol) ? `${req.protocol}://${req.get("host")}` : undefined;
+    let rootDomain =
+      req && req.protocol ? `${req.protocol}://${req.get("host")}` : undefined;
     let configInfo = await globalService.moduleContentTypeConfigs.filter(
       (x) => x.systemId === contentTypeSystemId
     );
@@ -263,7 +259,7 @@ module.exports = moduleService = {
       let configObj = JSON.parse(config);
       configs.push(configObj);
     });
-    configs = _.sortBy(configs, 'title');
+    configs = _.sortBy(configs, "title");
     return configs;
   },
   updateModuleContentType: async function (contentTypeDef) {
@@ -303,7 +299,7 @@ module.exports = moduleService = {
 
     files.forEach((file) => {
       let link = file.substr(file.indexOf("server") + 6, file.length);
-      if(file.includes('/custom/module')){
+      if (file.includes("/custom/module")) {
         link = file;
       }
       globalService.moduleCssFiles.push(link);
@@ -320,7 +316,7 @@ module.exports = moduleService = {
     files.forEach((file) => {
       if (file.indexOf("assets/js") > -1) {
         let link = file.substr(file.indexOf("server") + 6, file.length);
-        if(file.includes('/custom/module')){
+        if (file.includes("/custom/module")) {
           link = file;
         }
         globalService.moduleJsFiles.push(link);
@@ -354,7 +350,11 @@ module.exports = moduleService = {
         id: id,
         contentType: contentType,
         shortCode: options.shortcode,
-        body: await this.processView(contentType, options.viewModel, options.viewPath),
+        body: await this.processView(
+          contentType,
+          options.viewModel,
+          options.viewPath
+        ),
       };
 
       //for template based pages
@@ -522,8 +522,15 @@ module.exports = moduleService = {
         appRoot.path,
         `/server/modules/${moduleSystemId}`
       );
-      await fileService.deleteDirectory(modulePath);
-      await moduleService.processModules();
+      let moduleFilePath = `${modulePath}/module.json`;
+      if (fileService.fileExists(`${modulePath}/module.json`, true)) {
+        console.log(`deleting module ${moduleFilePath}`);
+
+        await fileService.deleteDirectory(modulePath);
+        await moduleService.processModules();
+      }else{
+        console.log(`${moduleFilePath} does not exist`);
+      }
     }
     return true;
   },

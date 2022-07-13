@@ -1,4 +1,6 @@
 const dalService = require("./dal.service");
+const moduleService = require("./module.service");
+
 const cypressTestCleanupTag = 'cypress-test-cleanup-tag'
 
 module.exports = testService = {
@@ -24,7 +26,11 @@ module.exports = testService = {
   },
 
   cleanTestData: async function () {
-   return dalService.contentDeleteTestData(cypressTestCleanupTag);
+   await dalService.contentDeleteTestData(cypressTestCleanupTag);
+   console.log('deleting test modules')
+   await moduleService.deleteModule('aa-cypress-module-content-type')
+   await moduleService.deleteModule('aa-cypress-module')
+
   },
 
 };

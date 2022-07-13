@@ -2,22 +2,15 @@ const { expect } = require("chai");
 const { iteratee } = require("lodash");
 
 describe("Admin Content Types", function () {
-  beforeEach(() => {
+  before(() => {
     cy.SonicJs.clearCypressTestData();
+  });
+  beforeEach(() => {
     cy.SonicJs.login();
   });
 
   after(() => {
-    // cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
-    // let deleteButtonPattern = '[aria-label*="Delete Cypress CT"]';
-    // cy.get("body").then(($body) => {
-    //   if ($body.find(deleteButtonPattern).length > 0) {
-    //     //evaluates as true
-    //     cy.get(deleteButtonPattern).first().click();
-    //     cy.wait(500);
-    //     cy.contains("Confirm Delete").click();
-    //   }
-    // });
+    // cy.SonicJs.clearCypressTestData();
   });
 
   it("Content type create should direct user to add to module", function () {
@@ -45,48 +38,54 @@ describe("Admin Content Types", function () {
 
     cy.contains("AA Cypress Module Content Type").click();
 
-    cy.contains('New Content Type').click();
+    cy.contains("New Content Type").click();
 
-    cy.wait(500);
+    // cy.wait(500);
+    cy.contains("Content Type Title")
+    cy.contains("Module System Id")
 
-    cy.get('#createContentTypeForm input[name="data[title]"]').type("AA Cypress Module Content Type 2");
 
-    cy.wait(500);
+    cy.get('#createContentTypeForm input[name="data[title]"]').type(
+      "AA Cypress Module Content Type 2"
+    );
 
-    cy.get('#createContentTypeForm button').click();
+    cy.wait(150); //wait for validation to fire
 
-    cy.contains('AA Cypress Module Content Type 2');
+    cy.get("#createContentTypeForm button").click();
 
+    cy.contains("AA Cypress Module Content Type 2");
   });
 
   it("Content type delete content type from module page", function () {
-    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/modules/edit/aa-cypress-module-content-type`);
+    cy.visit(
+      `${cy.SonicJs.getBaseUrl()}/admin/modules/edit/aa-cypress-module-content-type`
+    );
 
     cy.contains("AA Cypress Module Content Type").click();
 
-    cy.contains('New Content Type').click();
+    cy.contains("New Content Type").click();
 
     cy.wait(500);
 
-    cy.get('#createContentTypeForm input[name="data[title]"]').type("AA Cypress Module Content Type 2");
+    cy.get('#createContentTypeForm input[name="data[title]"]').type(
+      "AA Cypress Module Content Type 2"
+    );
 
     cy.wait(500);
 
-    cy.get('#createContentTypeForm button').click();
+    cy.get("#createContentTypeForm button").click();
 
-    cy.contains('AA Cypress Module Content Type 2');
+    cy.contains("AA Cypress Module Content Type 2");
 
     cy.wait(500);
 
-    cy.contains('Delete').first().click();
+    cy.contains("Delete").first().click();
 
     cy.wait(1000);
 
-    cy.contains('Confirm Delete').click();
+    cy.contains("Confirm Delete").click();
 
-    cy.contains('AA Cypress Module Content Type 2').should('not.exist');
-
-
+    cy.contains("AA Cypress Module Content Type 2").should("not.exist");
   });
 
   it.skip("Content type add field via drag and drop", function () {
@@ -103,9 +102,7 @@ describe("Admin Content Types", function () {
     cy.wait(500);
 
     //TODO: add drag and drop
-
   });
-
 
   it("Content type edit raw data", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/modules`);
@@ -128,10 +125,10 @@ describe("Admin Content Types", function () {
       .invoke("val")
       .then((rawText) => {
         let json = JSON.parse(rawText);
-        cy.log('BEFORE json from field ----->', JSON.stringify(json));
+        cy.log("BEFORE json from field ----->", JSON.stringify(json));
 
         json.title = "AA Cypress Module Content Type RAW EDIT";
-        cy.log('AFTER json from field ----->', JSON.stringify(json));
+        cy.log("AFTER json from field ----->", JSON.stringify(json));
         cy.get(".jsoneditor-text").clear();
         cy.get(".jsoneditor-text").click();
         cy.wait(500);
@@ -140,7 +137,7 @@ describe("Admin Content Types", function () {
         });
       });
 
-      cy.wait(500);
+    cy.wait(500);
 
     cy.contains("Save Json").click();
 
@@ -151,19 +148,26 @@ describe("Admin Content Types", function () {
 
   it("Content type delete", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
-    cy.get('[aria-label="Delete AA Cypress Module Content Type RAW EDIT"]').first().click();
+    cy.get('[aria-label="Delete AA Cypress Module Content Type RAW EDIT"]')
+      .first()
+      .click();
     cy.wait(500);
     cy.contains("Confirm Delete").click();
     cy.wait(500);
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content-types`);
-    cy.get('[aria-label="Delete AA Cypress Module Content Type RAW EDIT"]').should('not.exist');
+    cy.get(
+      '[aria-label="Delete AA Cypress Module Content Type RAW EDIT"]'
+    ).should("not.exist");
 
     //mow delete test module
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/modules`);
-    cy.get('[aria-label="Delete AA Cypress Module Content Type"]').first().click();
+    cy.get('[aria-label="Delete AA Cypress Module Content Type"]')
+      .first()
+      .click();
     cy.wait(500);
     cy.contains("Confirm Delete").click();
-    cy.get('[aria-label="Delete AA Cypress Module Content Type"]').should('not.exist');
-
+    cy.get('[aria-label="Delete AA Cypress Module Content Type"]').should(
+      "not.exist"
+    );
   });
 });

@@ -179,10 +179,10 @@ module.exports = authService = {
           }
 
           if (!req.session.returnTo) {
-            console.log("redirect to admin");
+            // console.log("redirect to admin");
             return res.redirect("/admin");
           } else {
-            console.log("redirect to " + req.session.returnTo);
+            // cons ole.log("redirect to " + req.session.returnTo);
             return res.redirect(req.session.returnTo);
           }
         });
@@ -247,7 +247,7 @@ module.exports = authService = {
     });
 
     app.get("/logout", function (req, res) {
-      console.log("logging out:" + req.user.username);
+      // console.log("logging out:" + req.user.username);
       req.session.destroy(function (err) {
         res.redirect("/"); //Inside a callback… bulletproof!
       });
