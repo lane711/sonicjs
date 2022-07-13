@@ -261,6 +261,7 @@ if (typeof module !== "undefined" && module.exports) {
           components
         );
       } else if (components) {
+        //only need this when creating new instances
         components.push({
           type: "hidden",
           key: "contentType",

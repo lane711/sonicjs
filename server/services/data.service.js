@@ -321,8 +321,9 @@ if (typeof module !== "undefined" && module.exports) {
 
         //make sure admin always has all permissions
         //TODO: should get site default permissions if not set
+        result.data.data.contentType.data = result.data.data.contentType.data ?? {};
         result.data.data.contentType.data.permissions =
-          result.data.data.contentType.data.permissions ?? [];
+          result.data.data.contentType.data?.permissions ?? [];
         result.data.data.contentType.data.permissions.map((p) => {
           p.roles.push("admin");
         });
@@ -385,7 +386,7 @@ if (typeof module !== "undefined" && module.exports) {
       }),
         (contentType.permissionsMatrix.rows = roles.map((role) => {
           let columns = acls.map((a) => {
-            if (contentType.data.permissions) {
+            if (contentType.data?.permissions) {
               let permission = contentType.data.permissions.find(
                 (p) => p.acl === a
               );

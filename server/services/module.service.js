@@ -141,11 +141,16 @@ module.exports = moduleService = {
     return moduleContentTypes;
   },
   contentTypeUpdate: async function (moduleContentType, session, req) {
+    //TODO: remove extra content type field
+    moduleContentType.components = moduleContentType.data.components.filter((c) => c.key !== 'contentType');
+
     let moduleDef = await this.getModuleContentType(
-      moduleContentType.systemId,
+      moduleContentType.systemId, 
       session,
       req
     );
+
+
 
     moduleDef.canBeAddedToColumn = moduleContentType.canBeAddedToColumn;
     moduleDef.enabled = moduleContentType.enabled;
