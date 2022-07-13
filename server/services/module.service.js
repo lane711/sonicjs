@@ -84,7 +84,8 @@ module.exports = moduleService = {
   },
 
   getBasePath: async function (systemId) {
-    let basePath = `${appRoot.path}/server/modules/${systemId}`;
+    let root = await this.getAppRoot();
+    let basePath = `${root}/server/modules/${systemId}`;
 
     if (await fileService.fileExists(`${basePath}/module.json`, true)) {
       return basePath;
@@ -94,8 +95,22 @@ module.exports = moduleService = {
         return basePath;
       }
     }
-    console.error("Can not find module base path");
+    console.error("*** Can not find module base path ***");
   },
+
+  //HACK: doesn't always return path
+  getAppRoot: async function (systemId) {
+    let root = '';
+    for (let index = 0; index < 10; index++) {
+      if(appRoot.path){
+        root = appRoot.path;
+        return root;
+      }
+    }
+    console.error('****** can not find app root');
+    return null;
+  },
+
   getModuleContentTypesAdmin: async function (systemId, session, req) {
     let basePath = (await this.getBasePath(systemId)) + "/models";
 
@@ -277,9 +292,12 @@ module.exports = moduleService = {
     let contentTypeDefObj = JSON.stringify(contentTypeDef);
     await fileService.writeFile(contentTypeDef.filePath, contentTypeDefObj);
     //reload modules
-    await moduleService.processModules();
-
-    return contentTypeDef;
+    if (fileService.fileExists(contentTypeDef.filePath, true)) {
+      await moduleService.processModules();
+      return contentTypeDef;
+    } else {
+      console.error(contentTypeDef.filePath + " not found");
+    }
   },
   deleteModuleContentType: async function (moduleContentTypeSystemid) {
     console.log("deleting content type", moduleContentTypeSystemid);
@@ -528,7 +546,7 @@ module.exports = moduleService = {
 
         await fileService.deleteDirectory(modulePath);
         await moduleService.processModules();
-      }else{
+      } else {
         console.log(`${moduleFilePath} does not exist`);
       }
     }

@@ -24,13 +24,14 @@ describe("Admin Content Types", function () {
     //first create a module
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/modules`);
     cy.contains("New Module").click();
-    cy.get('input[name="data[title]"]').type("AA Cypress Module Content Type");
+    cy.get('input[name="data[title]"]').type("AA Cypress Module Content Type", { delay: 0 });
     cy.wait(500); //wait for system id function to run
 
     cy.contains("Create Module").click();
-    cy.wait(500);
 
+    cy.url().should("include", "/admin/modules");
     cy.contains("AA Cypress Module Content Type");
+
   });
 
   it("Content type create to existing module", function () {
@@ -41,17 +42,21 @@ describe("Admin Content Types", function () {
     cy.contains("New Content Type").click();
 
     // cy.wait(500);
-    cy.contains("Content Type Title")
-    cy.contains("Module System Id")
-
+    cy.contains("Content Type Title");
+    cy.contains("Module System Id");
 
     cy.get('#createContentTypeForm input[name="data[title]"]').type(
-      "AA Cypress Module Content Type 2"
+      "AA Cypress Module Content Type 2", { delay: 0 }
     );
 
     cy.wait(150); //wait for validation to fire
 
     cy.get("#createContentTypeForm button").click();
+
+    cy.url().should(
+      "include",
+      "/admin/modules/edit/aa-cypress-module-content-type"
+    );
 
     cy.contains("AA Cypress Module Content Type 2");
   });
@@ -68,7 +73,7 @@ describe("Admin Content Types", function () {
     cy.wait(500);
 
     cy.get('#createContentTypeForm input[name="data[title]"]').type(
-      "AA Cypress Module Content Type 2"
+      "AA Cypress Module Content Type 2", { delay: 0 }
     );
 
     cy.wait(500);
@@ -133,11 +138,11 @@ describe("Admin Content Types", function () {
         cy.get(".jsoneditor-text").click();
         cy.wait(500);
         cy.get(".jsoneditor-text").type(JSON.stringify(json), {
-          parseSpecialCharSequences: false,
+          parseSpecialCharSequences: false
         });
       });
 
-    cy.wait(500);
+    cy.wait(1500);
 
     cy.contains("Save Json").click();
 

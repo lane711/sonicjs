@@ -6,7 +6,6 @@
                     <i class="fa fa-align-justify edit-content-type"></i> Edit Module: {{ data.moduleDef.title }}
                 </div>
 
-                {{ log data}}
                 <div class="card-body">
 
                     <script type='text/javascript'>
@@ -146,7 +145,6 @@
                         </thead>
                         <tbody>
 
-                        {{!-- {{log data}} --}}
                         {{#each data.contentTypes}}
                             <tr>
                                 <td aria-label="content-type-{{ this.systemId }}"><a
