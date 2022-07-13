@@ -227,7 +227,7 @@ const RootQuery = new GraphQLObjectType({
       async resolve(parent, args, req) {
         return dalService.contentGet(
           "",
-          "role",
+          "roles",
           "",
           "",
           "",

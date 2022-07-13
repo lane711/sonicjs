@@ -27,8 +27,8 @@ module.exports = userService = {
 
     app.get("/api-admin/roles", async function (req, res) {
       let data = await dataService.rolesGet(req.sessionID);
-      let roles = data.map((r) => {
-        return { id: r.data.key, name: r.data.title };
+      let roles = data[0].data.roles.map((r) => {
+        return { id: r.key, name: r.title };
       });
       res.send(roles);
     });
