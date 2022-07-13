@@ -321,7 +321,7 @@
                   <tr>
                     <th scope="row">{{this.roleTitle}}</th>
                     {{#each this.columns}}
-                      <td>{{this}}
+                      <td>
                         <input
                         type="checkbox"
                         id="doNothing"
@@ -329,7 +329,7 @@
                         value="doNothing"
                         {{setChecked
                           this
-                          "doNothing"
+                          true
                         }}
                       />
                       </td>
@@ -375,6 +375,7 @@
         <div class="card-body">
 
       ACLS here
+      {{{ data.editFormACLs.html}}}
 
         </div>
         <div class="card-footer">

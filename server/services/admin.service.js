@@ -124,6 +124,19 @@ module.exports = adminService = {
             req.url,
             true
           );
+
+
+          data.showOnlyPermissionTab = data.raw.systemId === 'site-settings-acls';
+          data.editFormACLs = await dataService.formGet(
+            param1,
+            undefined,
+            "submitContent(submission)",
+            undefined,
+            undefined,
+            req.sessionID,
+            req.url,
+            true
+          );
         }
 
         if (viewName == "admin-modules") {

@@ -32,6 +32,11 @@ module.exports = announcementMainService = {
         options.req.sessionID
       );
 
+      options.viewModel.contentType = await dataService.contentTypeGet(
+        'announcement',
+        options.req
+      );
+
 
 
     // let announcements = await dataService.getContentByContentType(

@@ -14,11 +14,12 @@
       <div class="row g-3">
   
         Permissions:<br>
-        view: {{canView}}<br>
-        create: {{canCreate}}<br>
-        edit: {{canEdit}}<br>
-        delete: {{canDelete}}<br>
-        vote: {{canVote}}<br>
+        {{ log this }}
+        view: {{contentType.acls.canView}}<br>
+        create: {{contentType.acls.canCreate}}<br>
+        edit: {{contentType.acls.canEdit}}<br>
+        delete: {{contentType.acls.canDelete}}<br>
+        vote: {{contentType.acls.canVote}}<br>
 
         {{#each items}}
         <div class="col-md-12 text-left">

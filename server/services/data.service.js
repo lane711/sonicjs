@@ -341,7 +341,8 @@ if (typeof module !== "undefined" && module.exports) {
           acls.map((a) => {
             let viewPermission = result.data.data.contentType.data.permissions.find(
               (p) => p.acl === a
-            );
+            ); 
+            result.data.data.contentType.acls = result.data.data.contentType.acls ?? {};
             result.data.data.contentType.acls[`can${helperService.capitalizeFirstLetter(a)}`] =
               _.intersection(viewPermission.roles, userRoles).length !== 0;
           });
