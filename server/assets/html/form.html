@@ -26,6 +26,7 @@
                   };
               }
 
+
               form.on('submit', async function (submission) {
 
                   // analyticsTrackEvent({event: 'FORM_SUBMIT', data: submission.data});
@@ -37,6 +38,11 @@
               form.on('change', function (changed) {
                 if (typeof formChanged != "undefined") {
                     formChanged(changed);
+                  }
+
+                  if (changed.components) {
+                    contentTypeComponents = changed.components;
+                    console.log("event ->", event);
                   }
 
                   try {

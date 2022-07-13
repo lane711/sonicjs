@@ -749,6 +749,7 @@ async function setupFormBuilder(contentType) {
         }
       });
       form.on("formLoad", async function (event) {
+        debugg
         if (event.components) {
           contentTypeComponents = event.components;
         }
