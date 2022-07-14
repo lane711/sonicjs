@@ -1,7 +1,16 @@
 <div class="proposals">
+
+  Permissions:<br>
+  view: {{contentType.acls.canView}}<br>
+  create: {{contentType.acls.canCreate}}<br>
+  edit: {{contentType.acls.canEdit}}<br>
+  delete: {{contentType.acls.canDelete}}<br>
+  vote: {{contentType.acls.canVote}}<br>
+
+
 <div class="announcements-title">
   <h2 id="proposals">Proposals</h2>
-  {{#if canAdd}}
+  {{#if contentType.acls.canCreate}}
   <button type="button" class="btn btn-primary btn-medium" onclick="return openFormInModal('create', 'proposal')">Submit Your Proposal</button>
   {{/if}}
 </div>
@@ -15,7 +24,7 @@
     <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#closed" type="button" role="tab" 
     aria-controls="profile" aria-selected="false">Closed Proposals</button>
   </li>
-  {{#if canReview}}
+  {{#if contentType.acls.canEdit}}
   <li class="nav-item" role="presentation">
     <button class="nav-link" id="messages-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" 
     aria-controls="messages" aria-selected="false">Review Proposals</button>
@@ -35,13 +44,13 @@
               <div class="card-body">
                 <h2>{{this.data.title}}</h2>
 
-                {{#if ../canEdit }}
+                {{#if ../contentType.acls.canEdit }}
                   <button type="button" class="button-white" onclick="return openFormInModal('edit', null, '{{this.id}}')"><i class="bi bi-pencil"></i></button>
                 {{/if}}
 
                 <p> {{{this.data.preview}}} <br> <a href="#">Read More</a></p>
                 
-                {{#if ../canVote }}
+                {{#if ../contentType.acls.canVote }}
                   <div class="d-flex align-items-left pt-3">             
                     <div class="vote-controls" data-vote-controls-id="{{this.id}}">                  
                       <button type="button" class="button-green" onclick="return vote('{{this.id}}', 1)""><i class="bi bi-arrow-up"></i></button>
@@ -51,7 +60,7 @@
                     </div>
                     <div class="ms-auto">
                       <span><a href="#" class="text-white font-italic mx-2">{{ this.data.remainingDays }}</a></span>
-                      {{#if ../canEdit }}
+                      {{#if ../contentType.acls.canDelete }}
                        <button type="button" class="button-red delete-proposal " onclick="return openFormInModal('delete', null, '{{this.id}}')"><i class="bi bi-trash"></i></button>      
                       {{/if}}
                     </div>
@@ -80,7 +89,7 @@
             <div class="card-body">
               <h2>{{this.data.title}}</h2> 
 
-              {{#if ../canEdit }}
+              {{#if ../contentType.acls.canEdit }}
                 <button type="button" class="button-white" onclick="return openFormInModal('edit', null, '{{this.id}}')"><i class="bi bi-pencil"></i></button>
               {{/if}}
 
@@ -100,7 +109,7 @@
     </div>
   </div>
 
-  {{#if canReview}}
+  {{#if contentType.acls.canEdit}}
   <div class="tab-pane" id="pending" role="tabpanel" aria-labelledby="messages-tab">
 
     <div class="proposal-area">
@@ -112,7 +121,7 @@
                 <div class="card-body">
                   <h2>{{this.data.title}}</h2> 
       
-                  {{#if ../canEdit }}
+                  {{#if ../contentType.acls.canEdit }}
                     <button type="button" class="button-white pending-edit-proposal" onclick="return openFormInModal('edit', null, '{{this.id}}')"><i class="bi bi-pencil"></i></button>
                   {{/if}}
       

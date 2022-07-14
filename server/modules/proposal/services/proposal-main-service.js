@@ -30,6 +30,11 @@ module.exports = proposalMainService = {
       options.req.sessionID
     );
 
+    options.viewModel.contentType = await dataService.contentTypeGet(
+      'proposal',
+      options.req
+    );
+
     const now = new Date().getTime();
 
     proposals.map((p) => {
