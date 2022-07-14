@@ -49,6 +49,9 @@ module.exports = voteMainService = {
             i.data.voteUps = i.data.voteUps ?? 0;
             i.data.voteDowns = i.data.voteDowns ?? 0;
           });
+
+          //add acls
+          options.viewModel.contentType.acls.canVote = true;
         }
       }
     });

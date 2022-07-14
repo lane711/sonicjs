@@ -59,6 +59,10 @@ module.exports = groupMainService = {
           g.data.icon.src = mediaService.getMediaUrl(g.data.icon.file);
         })
 
+        options.viewModel.contentType = await dataService.contentTypeGet(
+          'group',
+          options.req
+        );
 
         await emitterService.emit("getNFTs", options.viewModel.data);
 

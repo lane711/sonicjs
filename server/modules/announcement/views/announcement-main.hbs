@@ -1,9 +1,5 @@
 
- <div class="container">
-    <span class="hr-line"></span>
-  </div>
-  
-  <div class="announcements-area">
+ <div class="announcements-area mt-group">
       <div class="announcements-title">
         <h2 id="announcements">Announcements</h2>
         {{#if contentType.acls.canCreate}}
@@ -13,13 +9,6 @@
   
       <div class="row g-3">
   
-        Permissions:<br>
-        view: {{contentType.acls.canView}}<br>
-        create: {{contentType.acls.canCreate}}<br>
-        edit: {{contentType.acls.canEdit}}<br>
-        delete: {{contentType.acls.canDelete}}<br>
-        vote: {{contentType.acls.canVote}}<br>
-
         {{#each items}}
         <div class="col-md-12 text-left">
           <div class="announcement-item">
@@ -76,10 +65,3 @@
               
 
   </div>	
-  
-  <div class="container">
-    <span class="hr-line"></span>
-  </div>
-  
-  
-  

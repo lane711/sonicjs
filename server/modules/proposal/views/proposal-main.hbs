@@ -1,17 +1,9 @@
-<div class="proposals">
-
-  Permissions:<br>
-  view: {{contentType.acls.canView}}<br>
-  create: {{contentType.acls.canCreate}}<br>
-  edit: {{contentType.acls.canEdit}}<br>
-  delete: {{contentType.acls.canDelete}}<br>
-  vote: {{contentType.acls.canVote}}<br>
-
+<div class="proposals mt-group2">
 
 <div class="announcements-title">
   <h2 id="proposals">Proposals</h2>
   {{#if contentType.acls.canCreate}}
-  <button type="button" class="btn btn-primary btn-medium" onclick="return openFormInModal('create', 'proposal')">Submit Your Proposal</button>
+  <button type="button" class="btn-square" onclick="return openFormInModal('create', 'proposal')">Submit Your Proposal</button>
   {{/if}}
 </div>
 
@@ -45,10 +37,15 @@
                 <h2>{{this.data.title}}</h2>
 
                 {{#if ../contentType.acls.canEdit }}
-                  <button type="button" class="button-white" onclick="return openFormInModal('edit', null, '{{this.id}}')"><i class="bi bi-pencil"></i></button>
+                  <a onclick="return openFormInModal('edit', 'proposal', '{{ this.id }}')" 
+                    href="javascript:void(0)"><img src="/assets/uploads/edit.png" alt=""></a> &nbsp; 
+                  <a href="javascript:void(0)" onclick="return openFormInModal('delete', null, '{{ this.id }}')"><img src="/assets/uploads/delete.png" alt=""></a>					
                 {{/if}}
 
-                <p> {{{this.data.preview}}} <br> <a href="#">Read More</a></p>
+                <p> {{{this.data.preview}}} <br> 
+                  <a href="javascript:void(0)" onclick="return openFormInModal('detail', 'proposal', '{{ this.id }}')" >
+                    Read More</a>
+                  </p>
                 
                 {{#if ../contentType.acls.canVote }}
                   <div class="d-flex align-items-left pt-3">             
@@ -60,9 +57,6 @@
                     </div>
                     <div class="ms-auto">
                       <span><a href="#" class="text-white font-italic mx-2">{{ this.data.remainingDays }}</a></span>
-                      {{#if ../contentType.acls.canDelete }}
-                       <button type="button" class="button-red delete-proposal " onclick="return openFormInModal('delete', null, '{{this.id}}')"><i class="bi bi-trash"></i></button>      
-                      {{/if}}
                     </div>
                   </div>
                 {{/if}}
@@ -90,8 +84,10 @@
               <h2>{{this.data.title}}</h2> 
 
               {{#if ../contentType.acls.canEdit }}
-                <button type="button" class="button-white" onclick="return openFormInModal('edit', null, '{{this.id}}')"><i class="bi bi-pencil"></i></button>
-              {{/if}}
+              <a onclick="return openFormInModal('edit', 'proposal', '{{ this.id }}')" 
+                href="javascript:void(0)"><img src="/assets/uploads/edit.png" alt=""></a> &nbsp; 
+              <a href="javascript:void(0)" onclick="return openFormInModal('delete', null, '{{ this.id }}')"><img src="/assets/uploads/delete.png" alt=""></a>					
+            {{/if}}
 
               <p> {{{this.data.preview}}} <br> <a href="#">Read More</a></p>
             </div>
@@ -101,11 +97,11 @@
         {{/each}}
 
       </div>
-      <div class="row text-center">
+      <!-- <div class="row text-center">
         <div class="col">
         <a href=""#">See All Closed Proposals</a>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 
@@ -122,8 +118,10 @@
                   <h2>{{this.data.title}}</h2> 
       
                   {{#if ../contentType.acls.canEdit }}
-                    <button type="button" class="button-white pending-edit-proposal" onclick="return openFormInModal('edit', null, '{{this.id}}')"><i class="bi bi-pencil"></i></button>
-                  {{/if}}
+                  <a onclick="return openFormInModal('edit', 'proposal', '{{ this.id }}')" 
+                    href="javascript:void(0)"><img src="/assets/uploads/edit.png" alt=""></a> &nbsp; 
+                  <a href="javascript:void(0)" onclick="return openFormInModal('delete', null, '{{ this.id }}')"><img src="/assets/uploads/delete.png" alt=""></a>					
+                {{/if}}
       
                   <p> {{{this.data.preview}}} <br> <a href="#">Read More</a></p>
                 </div>
@@ -133,11 +131,11 @@
           {{/each}}
       </div>
           
-      <div class="row text-center">
+      <!-- <div class="row text-center">
           <div class="col">
           <a href=""#">See All Pending Proposals</a>
           </div>
-      </div>
+      </div> -->
     </div>
   </div>
   {{/if}}

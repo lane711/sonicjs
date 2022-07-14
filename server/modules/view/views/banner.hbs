@@ -43,7 +43,7 @@ background-image:url('{{this.group.data.banner.src}}')">
               </div>
             </div>
             <div class="col-md-6">
-              {{#if canEdit }}
+              {{#if contentType.acls.canEdit }}
                 <div class="bbt-edit text-md-right">
                   <a href="#" onclick="return openFormInModal('edit', 'group', '{{this.group.id}}')" >
                     Edit Bio &nbsp;
