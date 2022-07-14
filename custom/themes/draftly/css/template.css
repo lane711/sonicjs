@@ -283,7 +283,7 @@ margin-bottom: 30px
 padding: 0 30px 20px
 }
 
-.event-item img {
+.event-item img.card-img-top {
 border-radius: 5px 5px 0 0;
 height: 10vw
 }

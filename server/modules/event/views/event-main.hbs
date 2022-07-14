@@ -13,7 +13,7 @@
 
     <div class="announcements-title">
         <h2 id="events">Upcoming Events</h2>
-        {{#if canAdd}}
+        {{#if contentType.acls.canCreate}}
         <a href="javascript:void(0)" onclick="return openFormInModal('create', 'event')" >Post a New Event</a>
         {{/if}}
       </div>
@@ -26,7 +26,7 @@
             <img src="{{this.data.image.src}}" class="card-img-top" />
             <div class="card-body">
               <p class="card-text">
-                {{#if ../canEdit }}
+                {{#if ../contentType.acls.canEdit }}
                     <a onclick="return openFormInModal('edit', 'announcement', '{{ this.id }}')" 
                     href="javascript:void(0)"><img src="/assets/uploads/edit.png" alt=""></a> &nbsp; 
                 <a href="javascript:void(0)" onclick="return openFormInModal('delete', null, '{{ this.id }}')"><img src="/assets/uploads/delete.png" alt=""></a>					

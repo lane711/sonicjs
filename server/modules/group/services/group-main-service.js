@@ -4,6 +4,7 @@ var globalService = require("../../../services/global.service");
 var helperService = require("../../../services/helper.service");
 
 var _ = require("underscore");
+const mediaService = require("../../../services/media.service");
 
 module.exports = groupMainService = {
   startup: async function () {
@@ -53,6 +54,11 @@ module.exports = groupMainService = {
       if (options.shortcode.name === "GROUP") {
         let groups = await dataService.getContentByContentType("group");
         options.viewModel.groups = groups.filter((g) => g.data.active === true);
+
+        options.viewModel.groups.map((g)=>{
+          g.data.icon.src = mediaService.getMediaUrl(g.data.icon.file);
+        })
+
 
         await emitterService.emit("getNFTs", options.viewModel.data);
 
