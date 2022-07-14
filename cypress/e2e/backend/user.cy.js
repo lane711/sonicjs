@@ -46,10 +46,10 @@ describe("Admin Users", function () {
 
     cy.get('[data-email="cypress-test-cleanup-tag@test.com"]').click();
 
-    cy.wait(1000);
+    // cy.wait(1000);
     cy.contains("Confirm Delete").click();
 
-    cy.wait(1000);
+    // cy.wait(1000);
 
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/users`);
 

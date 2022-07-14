@@ -135,7 +135,6 @@ if (typeof module !== "undefined" && module.exports) {
     return result.data;
   }),
     (exports.userDelete = async function (id, sessionID) {
-      debugger;
       let query = `
       mutation{
         userDelete( 
