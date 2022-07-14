@@ -3,11 +3,41 @@ padding: 80px 0
 }
 
 .menu-module .nav-item a {
-color: #FFCB05
+color: #fff
+}
+
+.nav {
+font-size: 21px;
+padding: 10px 0px 10px 0px;
+border-top: solid;
+border-bottom: solid;
+border-width: thin;
+border-color: #424141
+}
+
+.nav-tabs .nav-link {
+border-radius: 1rem;
+margin-bottom: 30px
+}
+
+.banner-bt-area {
+padding: 0px 0px 30px 0px
 }
 
 .modal-content {
 background-color: #000
+}
+
+.modal-title {
+font-size: 26px
+}
+
+.modal-header {
+border-bottom: 1px solid #2d2d2d
+}
+
+.modal-backdrop {
+background-color: #fff
 }
 
 .moralis-metamask-logout:hover {
@@ -28,14 +58,14 @@ padding: 0;
 margin: 0
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap");
 
 body {
-font-family: 'Roboto',sans-serif;
-font-size: 14px;
+font-family: "Roboto",sans-serif;
+font-size: 20px;
 font-weight: 400;
-background: #111;
-color: #C8C8C8
+background: #000;
+color: #c8c8c8
 }
 
 .banner-area {
@@ -53,7 +83,7 @@ background: rgba(0,0,0,0.5);
 border: 1px solid #000000;
 border-radius: 10px;
 font-weight: 400;
-font-size: 12px;
+font-size: 16px;
 color: #fff;
 transition: 0.2s all ease
 }
@@ -65,15 +95,15 @@ opacity: 0.8
 .bbt-title h2 {
 font-weight: 700;
 line-height: 38px;
-color: #FFFFFF;
+color: #ffffff;
 margin: 0
 }
 
 .bbt-right p {
 font-weight: 400;
-font-size: 16px;
+font-size: 20px;
 line-height: 150%;
-color: #CECECE;
+color: #cecece;
 margin-top: 15px
 }
 
@@ -81,7 +111,7 @@ margin-top: 15px
 font-weight: 400;
 font-size: 12px;
 line-height: 14px;
-color: #FFFFFF;
+color: #ffffff;
 border: 1px solid #fff;
 padding: 12px 20px;
 display: inline-block
@@ -93,36 +123,34 @@ top: -25px
 }
 
 .bbt-right {
-padding-top: 25px
+padding: 20px 0px 0px 20px
 }
 
 .hr-line {
 width: 100%;
 height: 1px;
 display: block;
-background-color: #2D2D2D;
-margin-bottom: 50px;
-margin-top: 30px
+background-color: #2d2d2d
 }
 
 .announcements-title {
 display: flex;
 align-items: center;
-justify-content: space-between;
-margin-bottom: 30px
+justify-content: space-between
 }
 
 .announcements-title h2 {
 font-weight: 500;
-font-size: 17px;
-color: #FFFFFF
+font-size: 20px;
+padding-bottom: 30px;
+color: #ffffff
 }
 
 .announcements-title>a {
 padding: 15px;
 width: 195px;
 height: 40px;
-background: #FFCB05;
+background: #ffcb05;
 font-weight: 500;
 font-size: 15px;
 color: #000000;
@@ -132,7 +160,7 @@ justify-content: center
 }
 
 .announcement-item {
-background: #0B0B0B;
+background: #0b0b0b;
 border: 1px solid #525252;
 border-radius: 5px;
 padding: 30px;
@@ -141,25 +169,29 @@ margin-bottom: 30px
 
 .announcement-item h2 {
 font-weight: 500;
-font-size: 25px;
-color: #FFCB05
+font-size: 26px;
+color: #ffcb05
 }
 
 .announcement-item p {
-font-size: 14px;
-color: #C8C8C8
+font-size: 20px;
+color: #c8c8c8
 }
 
 .announcement-item p a {
 text-decoration: underline;
-color: #FFCB05
+color: #ffcb05
+}
+
+.announcements-area {
+padding-top: 30px
 }
 
 .see-more a {
 font-weight: 500;
 font-size: 17px;
 text-decoration-line: underline;
-color: #FFCB05
+color: #ffcb05
 }
 
 .see-more {
@@ -172,12 +204,12 @@ color: #fff
 }
 
 .announcements-title h2 a:first-child {
-color: #FFCB05
+color: #ffcb05
 }
 
 .button-yellow {
 background-color: transparent;
-color: #FFCB05
+color: #ffcb05
 }
 
 .button-white {
@@ -196,30 +228,30 @@ color: green
 }
 
 .proposal-item {
-background: #0B0B0B;
+background: #0b0b0b;
 border: 1px solid #525252;
 border-radius: 5px;
-padding: 30px;
+padding: 20px;
 margin-bottom: 30px
 }
 
 .proposal-item h2 {
 font-weight: 500;
-font-size: 25px;
-color: #FFCB05
+font-size: 26px;
+color: #ffcb05
 }
 
 .proposal-item p {
 font-weight: 400;
-font-size: 14px;
-color: #C8C8C8
+font-size: 20px;
+color: #c8c8c8
 }
 
 .proposal-item p a {
 font-weight: 400;
-font-size: 14px;
+font-size: 20px;
 text-decoration-line: underline;
-color: #FFCB05;
+color: #ffcb05;
 display: inline-block;
 padding-top: 10px;
 padding-bottom: 12px
@@ -228,20 +260,20 @@ padding-bottom: 12px
 .event-item h2 {
 font-style: normal;
 font-weight: 500;
-font-size: 25px;
-color: #FFCB05
+font-size: 26px;
+color: #ffcb05
 }
 
 .event-item p {
 font-style: normal;
 font-weight: 500;
-font-size: 14px;
-color: #FFFFFF;
+font-size: 20px;
+color: #ffffff;
 margin: 0
 }
 
 .event-item {
-background: linear-gradient(180deg,rgba(0,0,0,0) 38.33%,#000000 77.29%),url(.jpg),#0B0B0B;
+background: linear-gradient(180deg,rgba(0,0,0,0) 38.33%,#000000 77.29%),url(.jpg),#0b0b0b;
 border: 1px solid #525252;
 border-radius: 5px;
 margin-bottom: 30px
@@ -252,7 +284,12 @@ padding: 0 30px 20px
 }
 
 .event-item img {
-border-radius: 5px 5px 0 0
+border-radius: 5px 5px 0 0;
+height: 10vw
+}
+
+.events-area {
+padding-top: 50px
 }
 
 .footer-area {
@@ -260,19 +297,19 @@ padding: 100px 0 50px
 }
 
 .footer-area p {
-font-size: 16px;
+font-size: 20px;
 font-weight: 500;
 margin-top: 20px
 }
 
 .footer-area h4 {
-font-size: 16px;
+font-size: 20px;
 font-weight: 500;
 margin-bottom: 25px
 }
 
 .footer-area ul li a {
-font-size: 12px;
+font-size: 16px;
 font-weight: 500;
 line-height: 14px;
 color: #fff;
@@ -283,7 +320,7 @@ transition: 0.2s all ease
 }
 
 .footer-area ul li a:hover {
-color: #FFCB05
+color: #ffcb05
 }
 
 .card-img-top {
