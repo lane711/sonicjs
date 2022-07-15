@@ -78,12 +78,12 @@ module.exports = moralisMainService = {
         address: moralisEthAddress,
       });
 
-      const testNfts = await Moralis.Web3API.account.getNFTs({
-        chain: "mumbai",
-        address: moralisEthAddress,
-      });
+      // const testNfts = await Moralis.Web3API.account.getNFTs({
+      //   chain: "mumbai",
+      //   address: moralisEthAddress,
+      // });
 
-      let allNfts = [...mynfts.result, ...testNfts.result];
+      let allNfts = [...mynfts.result];
 
       //
       // allNfts = allNfts.filter(
@@ -119,6 +119,7 @@ module.exports = moralisMainService = {
         }
         nfts.push(n);
       });
+      console.log(nfts)
       return nfts;
     }
 
@@ -353,7 +354,7 @@ module.exports = moralisMainService = {
 
           if (Object.keys(sonicUser.profile).length === 0) {
             sonicUser.profile = {
-              roles: ["member"],
+              roles: ["clubhouseMember"],
               moralisUserId: moralisUser.objectId,
               moralisEthAddress: moralisUser.ethAddress,
             };
