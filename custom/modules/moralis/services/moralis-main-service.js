@@ -66,14 +66,15 @@ module.exports = moralisMainService = {
         const moralisEthAddress = options.req.user.profile.moralisEthAddress;
         options.viewModel.myEthAddress = moralisEthAddress;
         options.viewModel.mynfts = await getMyNfts(moralisEthAddress);
+
       }
     });
 
     async function getMyNfts(moralisEthAddress) {
-      if(!moralisEthAddress){
+      if (!moralisEthAddress) {
         return;
       }
-      const mynfts = await Moralis.Web3API.account.getNFTs({
+      let allNfts = await Moralis.Web3API.account.getNFTs({
         chain: "polygon",
         address: moralisEthAddress,
       });
@@ -83,15 +84,19 @@ module.exports = moralisMainService = {
       //   address: moralisEthAddress,
       // });
 
-      let allNfts = [...mynfts.result];
+      // let allNfts = [...mynfts.result];
 
       //
       // allNfts = allNfts.filter(
       //   (n) => n.token_hash === "0148831f3ec7228a169726eb79669f7e"
       // );
 
+      allNfts = allNfts.result.filter((n) =>
+        n.metadata.toLowerCase().includes("canes")
+      );
+
       let nfts = [];
-      allNfts.map(async (n) => {
+      await allNfts.map(async (n) => {
         if (n.metadata) {
           n.data = JSON.parse(n.metadata);
         } else if (n.token_uri) {
@@ -119,7 +124,16 @@ module.exports = moralisMainService = {
         }
         nfts.push(n);
       });
-      console.log(nfts)
+
+      //HACK: filter - should be softcoded
+      // const nftForCurrentClub = nfts.filter(
+      //   (n) =>
+      //     n.data.attributes
+      //     && n.data.attributes[0].trait_type === "Clubhouse"
+      //     && n.data.attributes[0].value === "CanesDAO"
+      // );
+
+      // console.log("nfts", nfts);
       return nfts;
     }
 
@@ -311,14 +325,17 @@ module.exports = moralisMainService = {
           "group"
         );
         await emitterService.emit("getMyNFTs", options);
+        console.log("emit mynfts", options.viewModel.mynfts);
+
         await groupMainService.getMyGroups(options);
 
         //is nft in current group?
-        options.viewModel.hasNFTInGroup = options.viewModel.myGroups.find(
-          (g) => g.id === options.viewModel.group.id
-        )
-          ? true
-          : false;
+        //TODO: revisit this
+        // options.viewModel.hasNFTInGroup = options.viewModel.myGroups.find(
+        //   (g) => g.id === options.viewModel.group.id
+        // )
+        //   ? true
+        //   : false;
       }
     });
 

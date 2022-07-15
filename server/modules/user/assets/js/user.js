@@ -104,8 +104,6 @@ async function openDeleteForm(action, id) {
 }
 
 async function confirmDelete(id) {
-  console.log("attempting delete of ", id);
-
   dataService.contentDelete(id, $("#sessionID").val()).then((response) => {
     fullPageUpdate();
   });

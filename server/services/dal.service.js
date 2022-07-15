@@ -358,19 +358,18 @@ module.exports = dalService = {
     // emitterService.emit('preContentDeleteCheck', {id, userSession})
     //lookup content type, check permissions
     const content = await this.contentGet(id);
-    const contentType = await moduleService.getModuleContentTypeRaw(
-      content.contentTypeId,
-      userSession
-    );
+    const contentType = await dataService.contentTypeGet(content.contentTypeId, {
+      req: { sessionID: userSession.sessionID, user: userSession },
+    });
 
-    let rolesThatCanDelete = contentType.permissions?.mappings.find(
-      (p) => p.delete
-    ) ?? { delete: "admin" };
-    if (rolesThatCanDelete && rolesThatCanDelete.delete.includes(",")) {
-      rolesThatCanDelete = rolesThatCanDelete.delete.split(",");
-    } else {
-      rolesThatCanDelete = [rolesThatCanDelete.delete];
-    }
+    let rolesThatCanDelete = contentType.data.permissions?.find(
+      (p) => p.acl === "delete"
+    ).roles ?? { delete: "admin" };
+    // if (rolesThatCanDelete && rolesThatCanDelete.delete.includes(",")) {
+    //   rolesThatCanDelete = rolesThatCanDelete.delete.split(",");
+    // } else {
+    //   rolesThatCanDelete = [rolesThatCanDelete.delete];
+    // }
     const userRoles = userSession.user.profile.roles;
 
     const canDelete =
