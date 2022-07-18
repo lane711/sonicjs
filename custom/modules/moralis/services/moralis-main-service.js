@@ -66,7 +66,6 @@ module.exports = moralisMainService = {
         const moralisEthAddress = options.req.user.profile.moralisEthAddress;
         options.viewModel.myEthAddress = moralisEthAddress;
         options.viewModel.mynfts = await getMyNfts(moralisEthAddress);
-
       }
     });
 
@@ -91,8 +90,8 @@ module.exports = moralisMainService = {
       //   (n) => n.token_hash === "0148831f3ec7228a169726eb79669f7e"
       // );
 
-      allNfts = allNfts.result.filter((n) =>
-        n.metadata.toLowerCase().includes("canes")
+      allNfts = allNfts.result.filter(
+        (n) => n.metadata && n.metadata.toLowerCase().includes("canes")
       );
 
       let nfts = [];
