@@ -1,17 +1,8 @@
 // JS File for Module: moralis
-/* Moralis init code */
 const serverUrl = "https://5vuta7xfoe0n.usemoralis.com:2053/server";
 const appId = "OvJO9vCe1pwwLSXDQFT4nf2oQgzZyiI9aOvaCBt0";
 Moralis.start({ serverUrl, appId });
 
-// !async function(){
-//   const options = {
-//     address: "0x772770fA1ce3196A1c895Fbe49a634dCe758D87d",
-//     chain: "polygon",
-//   };
-//   const NFTs = await Moralis.Web3API.token.getAllTokenIds(options);
-//   console.log(NFTs);
-// }();
 
 async function moralisLogin() {
   user = await Moralis.authenticate({
@@ -66,11 +57,6 @@ $(document).ready(async function () {
 
 
   lazyLoadNftImages($);
-  //   window.addEventListener("load", event => {
-  //     var image = document.querySelector('img.my-nft');
-  //     var isLoaded = image.complete && image.naturalHeight !== 0;
-  //     alert(isLoaded);
-  // });
 });
 
 function lazyLoadNftImages($){
