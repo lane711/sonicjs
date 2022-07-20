@@ -324,7 +324,6 @@ module.exports = moralisMainService = {
           "group"
         );
         await emitterService.emit("getMyNFTs", options);
-        console.log("emit mynfts", options.viewModel.mynfts);
 
         await groupMainService.getMyGroups(options);
 

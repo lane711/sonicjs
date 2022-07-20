@@ -13,16 +13,17 @@ Moralis.start({ serverUrl, appId });
 //   console.log(NFTs);
 // }();
 
-
 async function moralisLogin() {
-
   user = await Moralis.authenticate({
     signingMessage: "Log in using Moralis",
   })
     .then(async function (moralisUser) {
       await sonicRegister(moralisUser);
-      const sonicUser = await sonicLogin({ username: moralisUser.id, password: moralisUser.id });
-      await sonicRegisterFinalize({moralisUser, sonicUser});
+      const sonicUser = await sonicLogin({
+        username: moralisUser.id,
+        password: moralisUser.id,
+      });
+      await sonicRegisterFinalize({ moralisUser, sonicUser });
       //TODO: this could be streamlined. needing to logout, then back in so that profile data tied to passport session
       await axios.get("/logout");
       await sonicLogin({ username: moralisUser.id, password: moralisUser.id });
@@ -54,10 +55,31 @@ async function sonicLogin(user) {
 
 $(document).ready(async function () {
   $(".moralis-metamask-login").on("click", function () {
+    $(".login-control .init").hide();
+    $(".login-control .loading").show();
     moralisLogin();
   });
 
   $(".moralis-metamask-logout").on("click", function () {
     moralisLogOut();
   });
+
+
+  lazyLoadNftImages($);
+  //   window.addEventListener("load", event => {
+  //     var image = document.querySelector('img.my-nft');
+  //     var isLoaded = image.complete && image.naturalHeight !== 0;
+  //     alert(isLoaded);
+  // });
 });
+
+function lazyLoadNftImages($){
+  const nftImagesToLoad = $("img[data-src]");
+
+  if (nftImagesToLoad) {
+    nftImagesToLoad.each(function () {
+      let src = $(this).data("src");
+      $( this ).attr( "src", src );
+    });
+  }
+}

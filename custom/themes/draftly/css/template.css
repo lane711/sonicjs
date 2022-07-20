@@ -161,6 +161,7 @@ h2 {
   align-items: center;
   justify-content: center;
   border: 0;
+  text-decoration: none;
 }
 
 .announcement-item {
@@ -351,4 +352,10 @@ h2 {
 
 .mt-group2{
     margin-top: 60px;
+}
+
+.login-spinner{
+  height: 20px;
+  width: 20px;
+  margin: 0 0 0 12px;
 }
