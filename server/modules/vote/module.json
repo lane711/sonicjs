@@ -1,10 +1,8 @@
 {
   "title": "Vote",
-  "enabled": true,
+  "enabled": false,
   "systemId": "vote",
   "canBeAddedToColumn": true,
-  "sessionID": "undefined",
-  "version": "0.0.0.1",
-  "systemidUpperCase": "VOTE",
-  "systemidCamelCase": "vote"
+  "singleInstance": false,
+  "version": "0.0.0.1"
 }

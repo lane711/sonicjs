@@ -1,6 +1,6 @@
 {
   "title": "Draftly",
-  "enabled": true,
+  "enabled": false,
   "systemId": "draftly",
   "canBeAddedToColumn": false,
   "singleInstance": false,

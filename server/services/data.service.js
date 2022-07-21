@@ -329,7 +329,7 @@ if (typeof module !== "undefined" && module.exports) {
 
         if (result.data.data.contentType.data.permissions.length) {
           let settings = await this.getContentByType(
-            "site-settings",
+            "site-settings-acls",
             req.sessionID
           );
           let acls = settings[0].data.permissionAccessControls.map(
@@ -378,8 +378,8 @@ if (typeof module !== "undefined" && module.exports) {
       //   }
       // ];
 
-      let settings = await this.getContentByType("site-settings", sessionID);
-      let acls = settings[0].data.permissionAccessControls.map((a) => a.title);
+      let settings = await this.getContentByType("site-settings-acls", sessionID);
+      let acls = settings[0].data.permissionAccessControls?.map((a) => a.title);
 
       (contentType.permissionsMatrix = {
         acls: acls,

@@ -113,7 +113,8 @@ module.exports = adminService = {
         if (viewName == "admin-content-types-edit") {
           data.contentTypeId = param1;
           data.raw = await dataService.contentTypeGet(param1, req);
-          data.showOnlyPermissionTab = data.raw.systemId === 'site-settings-permissions';
+          data.showOnlyPermissionTab =
+            data.raw.systemId === "site-settings-permissions";
           data.editForm = await dataService.formGet(
             param1,
             undefined,
@@ -125,18 +126,24 @@ module.exports = adminService = {
             true
           );
 
+          data.showOnlyPermissionTab =
+            data.raw.systemId === "site-settings-permissions";
+          if (data.showOnlyPermissionTab) {
+            //get site default acls
+            const defaultACLs =
+              await dataService.getContentTopOne("site-settings-acls");
 
-          data.showOnlyPermissionTab = data.raw.systemId === 'site-settings-acls';
-          data.editFormACLs = await dataService.formGet(
-            param1,
-            undefined,
-            "submitContent(submission)",
-            undefined,
-            undefined,
-            req.sessionID,
-            req.url,
-            true
-          );
+            data.editFormACLs = await dataService.formGet(
+              "site-settings-acls",
+              defaultACLs,
+              "submitContent(submission)",
+              undefined,
+              undefined,
+              req.sessionID,
+              req.url,
+              false
+            );
+          }
         }
 
         if (viewName == "admin-modules") {

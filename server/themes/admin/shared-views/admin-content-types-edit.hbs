@@ -300,12 +300,9 @@
           </div>
           <div class="card-body">
 
-            {{#each this.data.raw.permissionsMatrix}}
-              {{this.title}}
-              {{#each this.roles}}
-                {{this.role}}
-              {{/each}}
-            {{/each}}
+            <div class="alert alert-info" role="alert">
+              Use this form to set site-wide default permissions. Permissions can be overridden at each content type.
+            </div>
 
             <table class="table">
               <thead>
@@ -374,7 +371,10 @@
         </div>
         <div class="card-body">
 
-      ACLS here
+          <div class="alert alert-info" role="alert">
+            Use this form to set site-wide default access controls. Access control lists can be overridden at each content type.
+          </div>
+
       {{{ data.editFormACLs.html}}}
 
         </div>

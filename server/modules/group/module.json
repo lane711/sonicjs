@@ -1,6 +1,6 @@
 {
   "title": "Group",
-  "enabled": true,
+  "enabled": false,
   "systemId": "group",
   "canBeAddedToColumn": true,
   "singleInstance": true,
