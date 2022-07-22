@@ -37,7 +37,15 @@
               <span class="input-group-text moralis-metamask-logout"><i class="bi bi-box-arrow-right"></i></span>
             </div>
           {{else}}
-              <a href="#" class="btn btn-primary nav-link  text-dark moralis-metamask-login">Connect Your Wallet</a>
+            <div class="announcements-title login-control">
+              <a href="javascript:void(0)" class="moralis-metamask-login">
+                <span class="init">Connect Your Wallet</span>
+                <span class="loading hide">Connecting...</span>
+                <div class="spinner-border login-spinner hide loading" role="status">
+                  <span class="sr-only">Loading...</span>
+                </div>
+              </a>
+            </div>
           {{/if}}
 
         </form>

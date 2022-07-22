@@ -20,8 +20,8 @@
   {{#if mynfts }}
     {{#each mynfts}}
       <div class="col-md-3 text-{{../data.textJustification}}">
-        <div class="card bg-dark h-100"">
-          <img src="{{this.imageUrl}}" class="card-img-top" />
+        <div class="card bg-dark h-100">
+          <img src="https://draftly.s3.amazonaws.com/spinner.mov.gif" data-src="{{this.imageUrl}}" class="card-img-top my-nft" />
           <div class="card-body">
             <p class="card-text">
               <h3>{{this.data.name}}</h3><br>
