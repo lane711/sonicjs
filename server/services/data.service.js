@@ -320,7 +320,8 @@ if (typeof module !== "undefined" && module.exports) {
 
         //make sure admin always has all permissions
         //TODO: should get site default permissions if not set
-        result.data.data.contentType.data = result.data.data.contentType.data ?? {};
+        result.data.data.contentType.data =
+          result.data.data.contentType.data ?? {};
         result.data.data.contentType.data.permissions =
           result.data.data.contentType.data?.permissions ?? [];
         result.data.data.contentType.data.permissions.map((p) => {
@@ -338,12 +339,15 @@ if (typeof module !== "undefined" && module.exports) {
           let userRoles = req.user?.profile.roles;
 
           acls.map((a) => {
-            let viewPermission = result.data.data.contentType.data.permissions.find(
-              (p) => p.acl === a
-            ); 
-            result.data.data.contentType.acls = result.data.data.contentType.acls ?? {};
-            result.data.data.contentType.acls[`can${helperService.capitalizeFirstLetter(a)}`] =
-              _.intersection(viewPermission.roles, userRoles).length !== 0;
+            let viewPermission =
+              result.data.data.contentType.data.permissions.find(
+                (p) => p.acl === a
+              );
+            result.data.data.contentType.acls =
+              result.data.data.contentType.acls ?? {};
+            result.data.data.contentType.acls[
+              `can${helperService.capitalizeFirstLetter(a)}`
+            ] = _.intersection(viewPermission.roles, userRoles).length !== 0;
           });
         }
       }
@@ -378,7 +382,10 @@ if (typeof module !== "undefined" && module.exports) {
       //   }
       // ];
 
-      let settings = await this.getContentByType("site-settings-acls", sessionID);
+      let settings = await this.getContentByType(
+        "site-settings-acls",
+        sessionID
+      );
       let acls = settings[0].data.permissionAccessControls?.map((a) => a.title);
 
       (contentType.permissionsMatrix = {
@@ -972,6 +979,7 @@ if (typeof module !== "undefined" && module.exports) {
   exports.taxonomyGet = async function (
     id = null,
     contentType = null,
+    url = null,
     sessionID
   ) {
     taxonomies = await this.getContentByType("taxonomy");
@@ -979,6 +987,11 @@ if (typeof module !== "undefined" && module.exports) {
       return taxonomies.find((t) => t.id === id);
     } else if (contentType) {
       return taxonomies.find((t) => t.data.targetContentType === contentType);
+    } else if (url) {
+      var tax = _.filter(taxonomies, function (taxonomy) {
+        return _.some(taxonomy.data.terms, { urlRelative: url });
+      });
+      return tax;
     } else {
       return taxonomies;
     }

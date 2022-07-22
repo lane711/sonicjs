@@ -72,15 +72,16 @@ module.exports = taxonomyMainService = {
         const content = await dataService.getContentByUrl(options.urlKey.url);
         const taxonomy = await dataService.taxonomyGet(
           undefined,
-          content.contentTypeId
+          content.contentTypeId,
+          options.urlKey.url
         );
-        const detailsPage = await dalService.contentGet(taxonomy.data.detailsPage);
+        const detailsPage = await dalService.contentGet(taxonomy[0].data.detailsPage);
 
         options.req.content = content;
         options.req.taxonomy = taxonomy;
         options.req.detailsPage = detailsPage;
 
-        let taxonomyDetailsUrl = detailsPage.url ?? "/taxonomy-details";
+        let taxonomyDetailsUrl = detailsPage?.url ?? "/taxonomy-details";
         options.req.url = taxonomyDetailsUrl;
         var { page: pageData } = await contentService.getRenderedPage(
           options.req
