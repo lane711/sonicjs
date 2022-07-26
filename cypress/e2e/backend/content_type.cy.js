@@ -29,6 +29,8 @@ describe("Admin Content Types", function () {
 
     cy.contains("Create Module").click();
 
+    cy.wait(1000); //wait for system id function to run
+
     cy.url().should("include", "/admin/modules");
     cy.contains("AA Cypress Module Content Type");
 

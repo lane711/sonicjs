@@ -107,6 +107,10 @@ module.exports = moduleService = {
         return root;
       }
     }
+    if(global.appPath){
+      console.log('fall back on globals appPath')
+      return globals.appPath;
+    }
     console.error('****** can not find app root');
     return null;
   },

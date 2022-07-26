@@ -38,6 +38,8 @@ const { Session } = require("./server/data/model/Session");
 const { stringify } = require("yaml");
 
 function start() {
+  setupGlobalAppPath();
+
   setupStaticAssets(app);
 
   //1.2 handlebars
@@ -80,6 +82,10 @@ function appListen(app) {
 
     installService.checkInstallation(app);
   });
+}
+
+function setupGlobalAppPath() {
+  global.appPAth = appRoot.path;
 }
 
 function setupSessionDb(app) {
@@ -202,11 +208,7 @@ function setupHandlebars(app) {
       frontEndTheme,
       "partials"
     ),
-    path.join(
-      __dirname,
-      frontEndTheme,
-      "partials"
-    ),
+    path.join(__dirname, frontEndTheme, "partials"),
     path.join(__dirname, "server/themes", "admin", adminTheme, "partials"),
     path.join(__dirname, "server/themes", "admin", "shared-partials"),
   ];
