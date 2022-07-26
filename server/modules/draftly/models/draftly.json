@@ -1,1 +1,0 @@
-{"moduleSystemId":"draftly","systemId":"draftly","title":"Draftly","data":{"components":[{"label":"First Name","type":"textfield","input":true,"key":"firstName","validate":{"required":true}},{"label":"Submit","type":"button","input":true,"key":"submit","theme":"primary"}]},"filePath":"/Users/lanecampbell/Dev/sonicjs-dft/server/modules/draftly/models/draftly.json"}
