@@ -24,6 +24,7 @@ describe("Page Builder", function () {
     cy.get("#sidebar-expander").click();
     cy.contains("Template").should("be.visible");
     cy.get("#add-tab").click();
+    cy.wait(1000);
     cy.get("#btn-add-page").click();
     cy.wait(1000);
     cy.get('input[name="data[title]').type("Cypress PB Test");

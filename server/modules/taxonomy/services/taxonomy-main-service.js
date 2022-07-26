@@ -109,7 +109,7 @@ module.exports = taxonomyMainService = {
 
         if (id) {
           let taxonomy = await dataService.getContentById(id);
-          res.send(taxonomy.data);
+          res.send(taxonomy?.data);
         }
       });
 

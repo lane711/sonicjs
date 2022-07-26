@@ -111,7 +111,6 @@ async function confirmDelete(id) {
 
 async function openCreateForm(action, contentType) {
   if (action === "create") {
-
     let form = await dataService.formGet(
       contentType,
       undefined,
@@ -122,9 +121,10 @@ async function openCreateForm(action, contentType) {
       window.location.pathname
     );
 
-    $("#genericModal .modal-title").text(
-      form.contentType.data.modalSettings?.modalTitle ?? helperService.titleCase(`${action} ${contentType}`)
-    );
+    // let moduleTitle = form.contentType.data.modalSettings?.modalTitle ?? helperService.titleCase(`${action} ${contentType}`);
+    let moduleTitle = helperService.titleCase(`${action} ${contentType}`);
+
+    $("#genericModal .modal-title").text(moduleTitle);
 
     $("#formio").empty();
     $("#formio").html(form.html);
@@ -153,7 +153,7 @@ async function submitContent(
     url: "/form-submission",
     data: {
       data: entity,
-      url: window.location.pathname
+      url: window.location.pathname,
     },
   });
 
@@ -246,7 +246,6 @@ async function createInstance(
 
   return entity;
 }
-
 
 function postSubmissionSuccessMessage(message) {
   let form = `<div>

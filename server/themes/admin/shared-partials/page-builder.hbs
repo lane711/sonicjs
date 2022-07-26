@@ -41,9 +41,8 @@
     <div class="tab-content" id="myTabContent">
       <div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
 
-        <button type="button" id="btn-add-page" onclick="openPageSettingsForm('add','page')"
-          class="btn btn-success btn-sm ml-1 mt-1" data-dismiss="modal">Add
-          Page</button>
+          <button type="button" id="btn-add-page" class="btn btn-success btn-sm ml-1 mt-1" onclick="return openFormInModal('create', 'page')">Add Page</button>
+          <button type="button" class="btn btn-success btn-sm ml-1 mt-1" onclick="return openFormInModal('create', 'blog')">Add Blog Post</button>
 
           <hr>
 

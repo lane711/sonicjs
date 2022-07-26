@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { iteratee } = require("lodash");
 
-describe("Group", function () {
+describe.skip("Group", function () {
   beforeEach(() => {
     cy.SonicJs.clearCypressTestData();
 
