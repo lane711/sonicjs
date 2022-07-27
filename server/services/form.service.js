@@ -148,7 +148,7 @@ if (typeof module !== "undefined" && module.exports) {
         onFormSubmitFunction = "editInstance(submission,true)";
       }
 
-      const formJSON = await exports.getFormJson(contentType, contentObject);
+      const formJSON = await exports.getFormJson(contentType, contentObject, showBuilder);
 
       let form = "";
 
@@ -205,10 +205,10 @@ if (typeof module !== "undefined" && module.exports) {
 
       return {html: form, contentType };
     }),
-    (exports.getFormJson = async function (contentType, content) {
+    (exports.getFormJson = async function (contentType, content, showBuilder) {
       let name = `${contentType.systemId}Form`;
       let settings = await this.getFormSettings(contentType, content);
-      let components = await this.getFormComponents(contentType, content);
+      let components = await this.getFormComponents(contentType, content, showBuilder);
       const formJSON = {
         components: components,
         name: name,
@@ -251,7 +251,7 @@ if (typeof module !== "undefined" && module.exports) {
       }
       return settings;
     }),
-    (exports.getFormComponents = async function (contentType, content) {
+    (exports.getFormComponents = async function (contentType, content, showBuilder) {
       let components = contentType.data?.components;
 
       if (content) {
@@ -260,14 +260,14 @@ if (typeof module !== "undefined" && module.exports) {
           content.data.contentType,
           components
         );
-      } else if (components) {
+      } else if (components && !showBuilder) {
         //only need this when creating new instances
         components.push({
           type: "hidden",
           key: "contentType",
           label: "contentType",
           defaultValue: contentType.systemId,
-          hidden: false,
+          hidden: true,
           input: true,
         });
       }

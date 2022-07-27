@@ -99,7 +99,7 @@
                   </div>
                 </div>
 
-                {{!-- <div class="header">Layout</div>
+                 <div class="header">Layout</div>
 
                                 {{#each this.rows}}
                                 <div class="{{this.class}} pb-row">
@@ -114,11 +114,10 @@
                                         onclick="addColumn('{{../this.id}}', {{@index}})"><i
                                             class="nav-icon fa fa-plus"></i></span>
                                 </div>
-                                {{/each}} --}}
+                                {{/each}}
 
 
-
-                {{!-- <div class="header">Background</div>
+                 <div class="header">Background</div>
                 <div class="section-background-editor">
                   <div class="btn-group" role="group" aria-label="Basic example">
                     <button type="button" data-type="none" data-section-id="{{this.id}}"
@@ -132,19 +131,19 @@
                   </div>
                 </div>
 
-                <div id="background-color" data-section-id="{{this.id}}" class="hide">
+                <div id="background-color" data-section-id="{{this.id}}" class="">
                   bg:
                   <div id="backgroundColorPreview-{{this.id}}" data-section-id="{{this.id}}"></div>
 
               </div>
 
               <div id="background-image" data-section-id="{{this.id}}" class="hide">
-                bg image options
+                <a href="javascript:void(0)">Select Image...</a>
               </div>
 
               <div id="background-video" data-section-id="{{this.id}}" class="hide">
                 bg video options
-              </div> --}}
+              </div>
 
               </div>
 
@@ -155,8 +154,8 @@
           <hr />
 
           <div class="btn-group btn-section">
-          <button type="button" class="btn btn-outline-secondary" onclick="addSection()">
-            <i class="nav-icon fa fa-plus"></i> Add New Section</button>
+          <button type="button" class="btn btn-success" onclick="addSection()">
+            <i class="nav-icon fa fa-plus"></i> Add Section</button>
           </div>
 
           <!-- <div class="btn-group btn-section">

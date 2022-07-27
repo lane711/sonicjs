@@ -1,3 +1,8 @@
+:root {
+  --light-grey: #F8F8F8;
+  --medium-grey: #D8D8D8;
+  --dark-grey: #989898	;
+}
 .pb-wrapper {
   width: 260px;
   height: 100%;
@@ -235,7 +240,7 @@ section {
 }
 
 .pb .module:hover {
-  box-shadow: 0px 0px 0px 1px #777 inset;
+  box-shadow: 0px 0px 0px 1px pink inset;
 }
 
 .pb section .col span,
@@ -248,8 +253,9 @@ section {
   border: 1px dotted transparent;
 }
 
-.pb section .col:hover {
-  border: 1px dotted #6b5b95;
+.pb section[id] .col:hover {
+  border: 1px dotted var(--medium-grey);
+  cursor: pointer;
 }
 
 .section-editor-button .btn {
@@ -479,4 +485,12 @@ section {
 
 .formio-component-submit{
   margin: 20px 0 0;
+}
+
+.pb-empty-section, .empty-column{
+  border: 6px var(--medium-grey) dashed;
+  border-radius: 12px;
+  background-color: var(--light-grey);
+  padding: 90px;
+  text-align: center;
 }

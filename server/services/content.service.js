@@ -237,6 +237,19 @@ module.exports = contentService = {
       });
 
       // sectionWrapper.append(page.data.html);
+    }else{
+      //new page with no sections yet
+      page.data.html += `<section class="jumbotron-fluid pb">`;
+      page.data.html += '<div class="container pb-empty-section">';
+      page.data.html += '<div class="row">';
+      page.data.html += '<div class="col">';
+      page.data.html += `<div class="mb-5"><h4>Your Page Has No Sections Yet</h4></div>`;
+      page.data.html += `<div><button type="button" class="btn btn-success" onclick="addSection()">
+      <i class="nav-icon fa fa-plus"></i> Add Section</button></div>`;
+      page.data.html += "</div>";
+      page.data.html += "</div>";
+      page.data.html += "</div>";
+      page.data.html += `</section>`;
     }
   },
 
@@ -289,7 +302,7 @@ module.exports = contentService = {
           req
         );
       } else {
-        page.data.html += `<span class="empty-column">empty column</spam>`;
+        page.data.html += `<span class="empty-column"><h5>Empty Column</h5><p>(click here)</p></spam>`;
       }
       page.data.html += `</div>`;
       columnArray.push(column);

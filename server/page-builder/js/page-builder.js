@@ -57,10 +57,9 @@ async function setPage() {
 async function setContentType() {
   let contentTypeId = $("#contentTypeId").val();
   if (contentTypeId) {
-    this.contentType = await dataService.contentTypeGet(
-      contentTypeId,
-      {req: {sessionID: sessionID}}
-    );
+    this.contentType = await dataService.contentTypeGet(contentTypeId, {
+      req: { sessionID: sessionID },
+    });
   }
 }
 
@@ -180,16 +179,18 @@ function setupUIClicks() {
       $(".col-highlight").removeClass("col-highlight");
       $(".block-edit").removeClass("block-edit");
       currentSectionId = $(this).closest("section").data("id");
-      currentRow = $(this).closest(".row")[0];
-      $(this).closest(".row").addClass("row-highlight");
-      currentRowIndex = $(this).closest(".row").index();
-      console.log("currentRowIndex pbcol", currentRowIndex);
-      currentColumnIndex = $(this).index() + 1;
-      currentColumn = $(this);
-      currentColumn.addClass("col-highlight");
-      $(".col-button").show().appendTo(currentColumn);
-      $(".add-module").show().appendTo(currentColumn);
-      $(".row-button").show().appendTo(currentRow);
+      if (currentSectionId) {
+        currentRow = $(this).closest(".row")[0];
+        $(this).closest(".row").addClass("row-highlight");
+        currentRowIndex = $(this).closest(".row").index();
+        console.log("currentRowIndex pbcol", currentRowIndex);
+        currentColumnIndex = $(this).index() + 1;
+        currentColumn = $(this);
+        currentColumn.addClass("col-highlight");
+        $(".col-button").show().appendTo(currentColumn);
+        $(".add-module").show().appendTo(currentColumn);
+        $(".row-button").show().appendTo(currentRow);
+      }
       // $('.block-button').show().appendTo(currentColumn.children('.module'));
       // currentColumn.children('.module').addClass('block-edit');
     },
@@ -749,7 +750,7 @@ async function setupFormBuilder(contentType) {
         }
       });
       form.on("formLoad", async function (event) {
-        debugg
+        debugg;
         if (event.components) {
           contentTypeComponents = event.components;
         }
@@ -863,34 +864,34 @@ function processContentTypeStates(contentType) {
 }
 
 function processPostSubmission(contentType) {
-  let action = 'fullPageRefresh';
-  let redirectUrl = $('#redirectUrl').val();
-  let message = $('#showMessageCopy').val();
+  let action = "fullPageRefresh";
+  let redirectUrl = $("#redirectUrl").val();
+  let message = $("#showMessageCopy").val();
 
-  if($('#redirectToUrl').prop("checked")){
-    action = 'redirectToUrl';
-  };
+  if ($("#redirectToUrl").prop("checked")) {
+    action = "redirectToUrl";
+  }
 
-  if($('#showMessage').prop("checked")){
-    action = 'showMessage';
-  };
+  if ($("#showMessage").prop("checked")) {
+    action = "showMessage";
+  }
 
-  if($('#doNothing').prop("checked")){
-    action = 'doNothing';
-  };
+  if ($("#doNothing").prop("checked")) {
+    action = "doNothing";
+  }
 
   contentType.data.postSubmission = {
-    action, 
+    action,
     redirectUrl,
-    message
+    message,
   };
 }
 
 function processModalSettings(contentType) {
-  let modalTitle = $('#modalTitle').val();
- 
+  let modalTitle = $("#modalTitle").val();
+
   contentType.data.modalSettings = {
-    modalTitle
+    modalTitle,
   };
 }
 
@@ -1516,19 +1517,18 @@ async function setupACEEditor() {
   }
 
   $("#save-global-css").click(async function () {
-    let cssContent = editor.getSession().getValue().toString();;
+    let cssContent = editor.getSession().getValue().toString();
     // debugger;
 
     return axiosInstance
-    .post("/admin/update-css", {css: cssContent})
-    .then(async function (response) {
-      console.log(response);
-    })
-    .catch(function (error) {
-      console.log(error);
-      alert(error)
-    });
-
+      .post("/admin/update-css", { css: cssContent })
+      .then(async function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+        alert(error);
+      });
   });
 
   beatifyACECss();
