@@ -24,7 +24,7 @@ module.exports = commentMainService = {
         "submitForm(submission)",
         undefined, 
         undefined,
-        options.req.sessionID
+        options.req
       );
     });
 

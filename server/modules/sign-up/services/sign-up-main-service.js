@@ -32,7 +32,7 @@ module.exports = signUpMainService = {
               "submitForm(submission)",
               false,
               contactFormSettingsId,
-              options.req.sessionID
+              options.req
             );
       
             // console.log('contact module after view model', options.viewModel);

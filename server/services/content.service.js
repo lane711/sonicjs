@@ -189,7 +189,7 @@ module.exports = contentService = {
       await this.asyncForEach(sections, async (sectionId) => {
 
         //sections can be overridden at a theme level, let's first check if the section is manually overriden in code
-        let sectionViewPath = `/server/themes/front-end/${frontEndTheme}/sections/${sectionId}.hbs`;
+        let sectionViewPath = `${frontEndTheme}/sections/${sectionId}.hbs`;
 
         if (await fileService.fileExists(sectionViewPath)) {
           let sectionContent = await fileService.getFile(sectionViewPath);

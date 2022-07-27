@@ -1,3 +1,18 @@
-<div class="col text-center">
-    <a href="{{ data.linkUrl }}" class="btn btn-{{data.style}} btn-{{data.size}}">{{ data.title }}</a>
+{{#if (eq data.buttonType "url")}}
+  <div class="col text-center">
+    <a
+      href="{{data.linkUrl}}"
+      class="btn btn-{{data.style}} btn-{{data.size}}"
+    >{{data.title}}</a>
   </div>
+{{/if}}
+
+{{#if (eq data.buttonType "addContent")}}
+  <div class="col text-center">
+    <button
+      type="button"
+      class="btn btn-{{data.style}} btn-{{data.size}}"
+      onclick="return openFormInModal('create', '{{data.contentTypeToAdd}}')"
+    >{{data.title}}</button>
+  </div>
+{{/if}}

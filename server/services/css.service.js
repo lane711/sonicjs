@@ -15,9 +15,10 @@ var isTemplateCssProcessed = false;
 const frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const { getConnection } = require("typeorm");
 const { Content } = require("../data/model/Content");
+var appRoot = require("app-root-path");
 
 module.exports = cssService = {
-  startup: async function () {
+  startup: async function (app) {
     emitterService.on("getRenderedPagePostDataFetch", async function (options) {
       if (options && options.page) {
         await cssService.getCssFile(options.page);
@@ -60,35 +61,52 @@ module.exports = cssService = {
     //     return;
     //   }
     // });
+
+    app.post("/admin/update-css", async function (req, res) {
+      let cssContent = req.body.css;
+
+      let cssFilePath = `${appRoot.path}/${frontEndTheme}/css/template.css`;
+
+      let result = await dataService.fileUpdate(
+        cssFilePath,
+        cssContent,
+        req.sessionID
+      );
+
+      if (result.filePath === cssFilePath) {
+        res.send(200, "ok");
+      } else {
+        res.send(500);
+      }
+    });
   },
 
   processTemplateCss: async function () {
-    let originalFilePath = `/server/themes/front-end/${frontEndTheme}/css/template.css`;
+    let originalFilePath = `${frontEndTheme}/css/template.css`;
     let originalFile = await fileService.getFile(originalFilePath);
     // console.log(originalFile);
-    let processedFilePath = `/server/themes/front-end/${frontEndTheme}/css/template-processed.css`;
+    let processedFilePath = `${frontEndTheme}/css/template-processed.css`;
 
     // let conn = await getConnection();
     // let viewModel = conn.getRepository(Content).find({
     //   where: { contentTypeId: 'site-settings-colors' },
     // });
 
-
     // let viewModel = await dataService.getContentTopOne("site-settings-colors");
 
     //TODO: need to fix the above, hard codeing for now
     let viewModel = {
-      "contentType": "site-settings-colors",
-      "url": "/site-settings-colors",
-      "bodyBackground": "#F8F8F8",
-      "headerBackground": "#000",
-      "headerOpacity": ".95",
-      "background": "green",
-      "header": "#555555",
-      "createdOn": 1602119522916,
-      "submit": true,
-      "id": "290"
-    }
+      contentType: "site-settings-colors",
+      url: "/site-settings-colors",
+      bodyBackground: "#F8F8F8",
+      headerBackground: "#000",
+      headerOpacity: ".95",
+      background: "green",
+      header: "#555555",
+      createdOn: 1602119522916,
+      submit: true,
+      id: "290",
+    };
 
     // console.log("processing template css data", viewModel);
     if (viewModel) {
@@ -122,7 +140,7 @@ module.exports = cssService = {
   getCssFile: async function (page) {
     //get template.css
     let cssString = await fileService.getFile(
-      `/server/themes/front-end/${frontEndTheme}/css/template.css`
+      `${frontEndTheme}/css/template.css`
     );
     //parse the css
     var ast = csstree.parse(cssString);

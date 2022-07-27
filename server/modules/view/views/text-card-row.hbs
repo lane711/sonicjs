@@ -1,0 +1,65 @@
+<div class="announcements-area">
+  <div class="container">
+    <div class="announcements-title">
+      <h2>Announcements</h2>
+      <a href="javascript:void(0)" onclick="return openFormInModal('create', 'announcement')" >Post an Announcements</a>
+    </div>
+
+    <div class="row g-3">
+
+      {{#each list}}
+      <div class="col{{../data.bootstrapColumnClass}} text-{{../data.textJustification}}">
+        <div class="announcement-item">
+          <div class="media">
+            <!-- <img src="/assets/uploads/bell.png" class="img-fluid" alt=""> -->
+            <div class="media-body ml-4">
+              <div class="d-flex align-items-center mb-3">
+                <h2>{{this.data.title}}</h2>
+                <div class="ms-auto">
+                  <a onclick="return openFormInModal('edit', 'announcement', '{{ this.id }}')" 
+                  href="javascript:void(0)"><img src="/assets/uploads/edit.png" alt=""></a> &nbsp; 
+                  <a href="javascript:void(0)" onclick="return openFormInModal('delete', null, '{{ this.id }}')"><img src="/assets/uploads/delete.png" alt=""></a>					
+                </div>
+              </div>
+              <p>{{{this.data.body}}}</p>
+              <p><a href="javascript:void(0)" onclick="return openFormInModal('detail', 'announcement', '{{ this.id }}')" >
+                Read More</a></p>
+
+                <div class="d-flex align-items-left pt-3">             
+                  <div class="vote-controls" data-vote-controls-id="{{this.id}}">                  
+                    <button type="button" class="button-green" onclick="return vote('{{this.id}}', 1)""><i class="bi bi-arrow-up"></i></button>
+                    <span class="voteUps">{{this.data.voteUps}}</span> 
+                    <button type="button" class="button-red"  onclick="return vote('{{this.id}}', -1)"><i class="bi bi-arrow-down"></i></button>
+                    <span class="voteDowns">{{this.data.voteDowns}}</span>  
+                  </div>
+                  <div class="ms-auto">
+                    <span><a href="#" class="text-white font-italic">3 days left to vote &nbsp; </a></span>
+                    <button type="button" class="button-red" onclick="return openFormInModal('delete', null, '{{this.id}}')"><i class="bi bi-trash"></i></button>      
+                  </div>
+                </div>
+
+              <div class="d-flex align-items-center pt-3">
+                <!-- <div>
+                  <img src="/assets/uploads/thumbsup.png" alt=""> 20 &nbsp; &nbsp; 
+                  <img src="/assets/uploads/thumbsdown.png" alt=""> 5
+                </div> -->								
+                <div class="ms-auto">
+                  <span>Today 3:00PM</span>
+                </div>
+              </div>
+            </div>
+          </div>					
+        </div>
+      </div>
+      {{/each}}
+
+    </div>
+    
+    {{#if data.seeMoreLinkCopy}}
+    <div class="see-more text-center">
+       <a href=""#">{{data.seeMoreLinkCopy}}</a>
+    </div>
+    {{/if}}
+			
+  </div>
+</div>	

@@ -2,7 +2,7 @@
   "title": "Menu",
   "enabled": true,
   "systemId": "menu",
-  "canBeAddedToColumn": false,
+  "canBeAddedToColumn": true,
   "singleInstance": false,
   "version": "0.0.0.1"
 }

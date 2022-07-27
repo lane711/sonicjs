@@ -1,0 +1,8 @@
+{
+  "title": "Group",
+  "enabled": false,
+  "systemId": "group",
+  "canBeAddedToColumn": true,
+  "singleInstance": true,
+  "version": "0.0.0.1"
+}

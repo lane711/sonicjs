@@ -1,12 +1,12 @@
-const { getRepository } = require("typeorm");
+const { getRepository, Like } = require("typeorm");
 const { Content } = require("../data/model/Content");
 const { User } = require("../data/model/User");
 const { Session } = require("../data/model/Session");
 const emitterService = require("../services/emitter.service");
 
 const crypto = require("crypto");
-const { contentDelete } = require("./data.service");
 const { v4: uuidv4 } = require("uuid");
+const _ = require("underscore");
 const verboseLogging = process.env.APP_LOGGING === "verbose";
 
 module.exports = dalService = {
@@ -27,7 +27,7 @@ module.exports = dalService = {
     user.contentTypeId = "user";
     user.profile.email = user.username;
 
-    if (id === session.user.id) {
+    if (id === session.user?.id) {
       return user;
     }
 
@@ -120,8 +120,10 @@ module.exports = dalService = {
         newUser.profile = '{"roles":["admin"]}';
       }
 
-      let userRecord = await userRepo.save(newUser);
+      user = await userRepo.save(newUser);
     }
+
+    return user;
 
     //admins can see all users
     //TODO: get role by name
@@ -142,7 +144,7 @@ module.exports = dalService = {
     }
 
     //update password
-    if (profileObj.password !== "_temp_password") {
+    if (profileObj.password && profileObj.password !== "_temp_password") {
       //password has been updated
       User.findByUsername(profileObj.email).then(
         function (user) {
@@ -180,6 +182,7 @@ module.exports = dalService = {
     url,
     data,
     tag,
+    group,
     user,
     req,
     returnAsArray = false,
@@ -201,6 +204,14 @@ module.exports = dalService = {
       let content = await contentRepo.findOne({ where: { url: url } });
       dalService.processContent(content, user, req);
       return content;
+    } else if (group) {
+      contents = await contentRepo.find({
+        contentTypeId: contentTypeId,
+        data: Like(`%${group}%`),
+      });
+      // contents = await contentRepo.find({
+      //   where: { contentTypeId: contentTypeId, data: Like(group)  },
+      // });
     } else if (contentTypeId) {
       contents = await contentRepo.find({
         where: { contentTypeId: contentTypeId },
@@ -256,7 +267,9 @@ module.exports = dalService = {
     content.url = url;
     let isExisting = false;
     let userId =
-      userSession.user && userSession.user.id ? userSession.user.id : '00000000-0000-0000-0000-000000000000';
+      userSession.user && userSession.user.id
+        ? userSession.user.id
+        : "00000000-0000-0000-0000-000000000000";
 
     if (!id || id.length === 0) {
       //upsert
@@ -274,25 +287,31 @@ module.exports = dalService = {
     if (verboseLogging) {
       console.log("dal contentUpdate repo save ==>", JSON.stringify(content));
     }
-    let result = await contentRepo.save(content);
 
-    if (isExisting) {
-      await emitterService.emit("contentUpdated", result);
-    } else {
-      await emitterService.emit("contentCreated", result);
+    let result;
+    try {
+      result = await contentRepo.save(content);
+    } catch (error) {
+      console.error("Unable to upsert record", error);
+    } finally {
+      if (result) {
+        if (isExisting) {
+          await emitterService.emit("contentUpdated", result);
+        } else {
+          await emitterService.emit("contentCreated", result);
+        }
+
+        await emitterService.emit("contentCreatedOrUpdated", result);
+      }
     }
-
-    await emitterService.emit("contentCreatedOrUpdated", result);
 
     return result;
   },
 
   contentUpdateByUrl: async function (id, url, data, userSession) {
-
     const contentRepo = await getRepository(Content);
     let content = {};
     if (url) {
-
       content = await contentRepo.findOne({ where: { url: url } });
       if (!content) {
         content = {};
@@ -302,7 +321,9 @@ module.exports = dalService = {
     content.url = url;
     let isExisting = false;
     let userId =
-      userSession.user && userSession.user.id ? userSession.user.id : '00000000-0000-0000-0000-000000000000';
+      userSession.user && userSession.user.id
+        ? userSession.user.id
+        : "00000000-0000-0000-0000-000000000000";
 
     if (!content.id) {
       //upsert
@@ -334,10 +355,43 @@ module.exports = dalService = {
   },
 
   contentDelete: async function (id, userSession) {
-    const contentRepo = await getRepository(Content);
-    if (userSession.user.profile.roles.includes("admin")) {
+    // emitterService.emit('preContentDeleteCheck', {id, userSession})
+    //lookup content type, check permissions
+    const content = await this.contentGet(id);
+
+    // const contentType = await dataService.contentTypeGet(content.contentTypeId, {
+    //   req: { sessionID: userSession.sessionID, user: userSession },
+    // });
+
+    // let rolesThatCanDelete = contentType.data.permissions?.find(
+    //   (p) => p.acl === "delete"
+    // ).roles ?? { delete: "admin" };
+
+    const userRoles = userSession.user.profile.roles;
+
+    // const canDelete =
+    //   _.intersection(rolesThatCanDelete, userRoles).length !== 0;
+
+    const canDelete =userRoles.includes('admin')
+
+    if (canDelete) {
+      const contentRepo = await getRepository(Content);
       return contentRepo.delete(id);
     }
+  },
+
+  contentDeleteTestData: async function (cypressTestCleanupTag) {
+    const contentRepo = await getRepository(Content);
+
+    contents = await contentRepo.find({
+      data: Like(`%${cypressTestCleanupTag}%`),
+    });
+
+    contents.map(async (c) => {
+      await contentRepo.delete(c.id);
+    });
+
+    return contents.length;
   },
 
   contentDeleteAll: async function (userSession) {
@@ -410,7 +464,7 @@ module.exports = dalService = {
 
     if (entity.profile) {
       try {
-        entity.contentTypeId = 'user';
+        entity.contentTypeId = "user";
         entity.profile = JSON.parse(entity.profile);
       } catch (err) {
         console.log(
@@ -431,7 +485,7 @@ module.exports = dalService = {
 
   //get content type so we can detect permissions
   checkPermission: async function (data, user, req) {
-    if(data.contentTypeId == 'app-analytics'){
+    if (data.contentTypeId == "app-analytics") {
       return data;
     }
     let contentTypeId = data.contentTypeId
@@ -447,10 +501,16 @@ module.exports = dalService = {
 
     // console.log(localUser);
 
-    if (localUser && localUser.profile && localUser.profile.roles && localUser.profile.roles.includes("admin")) {
+    if (
+      localUser &&
+      localUser.profile &&
+      localUser.profile.roles &&
+      localUser.profile.roles.includes("admin")
+    ) {
       return data;
     }
 
+    //TODO: update this
     if (contentType.permissions) {
       let view = contentType.permissions.mappings.find(
         (x) => (x = "view")

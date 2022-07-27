@@ -4,6 +4,7 @@ var appRoot = require("app-root-path");
 var dalService = require("./dal.service");
 var fileService = require("./file.service");
 const archiver = require("archiver");
+const moment = require("moment");
 
 const token = process.env.DROPBOX_TOKEN;
 const backUpUrl = process.env.BACKUP_URL;
@@ -21,7 +22,7 @@ module.exports = backUpService = {
   exportContentToJsonFiles: async function () {
     await backUpService.cleanupTempFiles();
     //content
-    let contents = await dalService.contentGet("", "", "", "", "", "", "", false, true);
+    let contents = await dalService.contentGet("", "", "", "", "", "", "", "", false, true);
 
     contents.map((content) => {
       fileService.writeFile(
@@ -42,8 +43,8 @@ module.exports = backUpService = {
       );
     });
 
-    // backUpService.zipBackUpDirectory('user');
-    let fileName = `${new Date().toJSON()}-sonicjs-backup.zip`;
+    let dateString = moment().format('YY-MM-DD_h.mm.ssa')
+    let fileName = `${dateString}-sonicjs-backup.zip`;
     backUpService.zipJsonFilesDirectory(fileName);
   },
 

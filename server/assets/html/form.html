@@ -6,17 +6,18 @@
 
   //used for json explorer
   var formValuesToLoad = {{{ formValuesToLoad }}}
+  var editMode = {{{ editMode }}}
+
 
       loadModuleSettingForm = async function (){
         return form_{{ random }}();
       }
 
       form_{{ random }} = async function () {
-          // debugger;
           Formio.icons = 'fontawesome';
           formService.setFormApiUrls(Formio);
 
-          Formio.createForm(document.getElementById('formio_{{ random }}'), formJSON_{{ random }}).then((form) => {
+          Formio.{{formioFunction}}(document.getElementById('formio_{{ random }}'), formJSON_{{ random }}).then((form) => {
               console.log('log form', form);
 
               if (formValuesToLoad_{{ random }}) {
@@ -24,6 +25,7 @@
                       data: formValuesToLoad_{{ random }}
                   };
               }
+
 
               form.on('submit', async function (submission) {
 
@@ -34,10 +36,13 @@
               });
 
               form.on('change', function (changed) {
-                // console.log('form.html changed', changed)
-                // debugger;
                 if (typeof formChanged != "undefined") {
                     formChanged(changed);
+                  }
+
+                  if (changed.components) {
+                    contentTypeComponents = changed.components;
+                    console.log("event ->", event);
                   }
 
                   try {
@@ -50,16 +55,13 @@
           });
       };
 
-      window.onload = async function () {
-          // debugger;
+      window.addEventListener("load", function() {
+          console.log('Page is loaded');
           if (typeof module === 'undefined') {
-            formInit();
+            form_{{ random }}();
           }
-      }
+      });
 
-      function formInit(){
-        form_{{ random }}();
-      }
 </script>
 
 <div id="formio_{{ random }}"></div>

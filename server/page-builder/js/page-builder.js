@@ -1,7 +1,6 @@
 var page = {};
 var contentType;
 var contentTypeComponents;
-var axiosInstance;
 
 var imageList,
   tinyImageList,
@@ -23,7 +22,6 @@ var imageList,
 $(document).ready(async function () {
   setupSessionID();
   setupThemeID();
-  await setupAxiosInstance();
   setupUIHovers();
   setupUIClicks();
   setupClickEvents();
@@ -49,20 +47,6 @@ function setupThemeID() {
   theme = $("#theme").val();
 }
 
-async function setupAxiosInstance() {
-  let baseUrl = window.location.protocol + "//" + window.location.host + "/";
-  let token = $("#token").val();
-
-  const defaultOptions = {
-    headers: {
-      Authorization: `${token}`,
-    },
-    baseUrl: baseUrl,
-  };
-
-  axiosInstance = axios.create(defaultOptions);
-}
-
 async function setPage() {
   let pageId = $("#page-id").val();
   if (pageId) {
@@ -75,7 +59,7 @@ async function setContentType() {
   if (contentTypeId) {
     this.contentType = await dataService.contentTypeGet(
       contentTypeId,
-      undefined
+      {req: {sessionID: sessionID}}
     );
   }
 }
@@ -570,115 +554,6 @@ async function getContentInstance(id) {
 //     });
 // }
 
-async function createInstance(
-  payload,
-  refresh = false,
-  contentType = "content"
-) {
-  // console.log('createInstance payload', payload);
-  // let content = {};
-  // content.data = payload;
-  // this.processContentFields(payload, content);
-  // debugger;
-  console.log("payload", payload);
-  if (payload.id || "id" in payload) {
-    delete payload.id;
-  }
-
-  if (!payload.data) {
-    let temp = { data: payload };
-    payload = temp;
-  }
-
-  if (contentType === "Roles") {
-    payload = payload.data;
-  }
-
-  // debugger;
-  let entity = await dataService.contentCreate(payload);
-
-  if (entity && entity.contentTypeId === "page") {
-    let isBackEnd = globalService.isBackEnd();
-    if (isBackEnd) {
-      window.location.href = `/admin/content/edit/page/${entity.id}`;
-    } else {
-      window.location.href = payload.data.url;
-    }
-  } else if (refresh) {
-    fullPageUpdate();
-  }
-
-  return entity;
-
-  // .then(async function (response) {
-  //   // debugger;
-  //   console.log("editInstance", response);
-  //   // resolve(response.data);
-  //   // return await response.data;
-  //   if (response.contentTypeId === "page" && !globalService.isBackEnd()) {
-  //     window.location.href = response.url;
-  //   } else if (refresh) {
-  //     fullPageUpdate();
-  //   }
-  // })
-  // .catch(function (error) {
-  //   console.log("editInstance", error);
-  // });
-  // return axiosInstance
-  //   .post(`/api/${contentType}/`, payload)
-  //   .then(async function (response) {
-  //     console.log(response);
-  //     // debugger;
-  //     if (response.data.data.contentType === "page") {
-  //       window.location.href = response.data.data.url;
-  //     } else if (refresh) {
-  //       fullPageUpdate();
-  //     }
-
-  //     return await response.data;
-  //   })
-  //   .catch(function (error) {
-  //     console.log(error);
-  //   });
-}
-
-async function editInstance(payload, refresh, contentType = "content") {
-  // let id = payload.id;
-  // console.log("putting payload", payload);
-  // if (payload.id) {
-  //   delete payload.id;
-  // }
-  // if (payload.data && payload.data.id) {
-  //   id = payload.data.id;
-  //   delete payload.data.id;
-  // }
-
-  if (contentType === "user") {
-    contentType = "users";
-  }
-  // debugger;
-  dataService
-    .editInstance(payload, sessionID)
-    .then(async function (response) {
-      // debugger;
-      console.log("editInstance", response);
-      // resolve(response.data);
-      // return await response.data;
-      if (response.contentTypeId === "page" && !globalService.isBackEnd()) {
-        if (response.url) {
-          window.location.href = response.url;
-        } else {
-          fullPageUpdate();
-        }
-      } else if (refresh) {
-        fullPageUpdate();
-      }
-    })
-    .catch(function (error) {
-      console.log("editInstance", error);
-    });
-}
-
 async function editInstanceUser(payload, refresh, contentType = "content") {
   // let id = payload.id;
   // if (payload.id) {
@@ -753,7 +628,7 @@ function processContentFields(payload) {
   return { id: payload.id, data: payload };
 }
 
-async function openForm(action, contentType) {
+async function openPageSettingsForm(action, contentType) {
   await setupPageSettings(action, contentType);
   $("#pageSettingsModal").appendTo("body").modal("show");
 }
@@ -812,7 +687,7 @@ async function setupPageSettings(action, contentType, sessionID) {
   if (action == "edit" && contentType) {
     formValuesToLoad = this.page;
 
-    form = await formService.getForm(
+    form = await dataService.formGet(
       contentType,
       formValuesToLoad,
       "await submitContent(submission);",
@@ -828,7 +703,7 @@ async function setupPageSettings(action, contentType, sessionID) {
 
     // debugger;
 
-    form = await formService.getForm(
+    form = await dataService.formGet(
       "page",
       undefined,
       "await submitContent(submission);",
@@ -838,7 +713,7 @@ async function setupPageSettings(action, contentType, sessionID) {
     );
   }
 
-  $("#formio").html(form);
+  $("#formio").html(form.html);
   loadModuleSettingForm();
 
   $("#genericModal").appendTo("body").modal("show");
@@ -859,7 +734,6 @@ async function setupFormBuilder(contentType) {
 
   Formio.builder(document.getElementById("formBuilder"), null).then(
     async function (form) {
-      // debugger;
       form.setForm({
         components: contentType.data.components,
       });
@@ -872,6 +746,12 @@ async function setupFormBuilder(contentType) {
         if (event.components) {
           contentTypeComponents = event.components;
           console.log("event ->", event);
+        }
+      });
+      form.on("formLoad", async function (event) {
+        debugg
+        if (event.components) {
+          contentTypeComponents = event.components;
         }
       });
     }
@@ -948,15 +828,70 @@ async function setupFormBuilder(contentType) {
 }
 
 async function onContentTypeSave() {
-  // debugger;
   if (contentTypeComponents) {
     console.log("contentTypeComponents", contentTypeComponents);
     contentType.data.components = contentTypeComponents;
     if (!contentType.id) {
       contentType.id = $("#createContentTypeForm #id").val();
     }
+
+    //states
+    processContentTypeStates(contentType);
+
+    //post submission
+    processPostSubmission(contentType);
+
+    //modal settings
+    processModalSettings(contentType);
+
+    //form
     await editContentType(contentType, sessionID);
+
+    fullPageUpdate();
   }
+}
+
+function processContentTypeStates(contentType) {
+  contentType.data.states = {
+    new: {
+      buttonText: $("#addText").val() ?? "Submit",
+    },
+    edit: {
+      buttonText: $("#editText").val() ?? "Submit",
+    },
+  };
+}
+
+function processPostSubmission(contentType) {
+  let action = 'fullPageRefresh';
+  let redirectUrl = $('#redirectUrl').val();
+  let message = $('#showMessageCopy').val();
+
+  if($('#redirectToUrl').prop("checked")){
+    action = 'redirectToUrl';
+  };
+
+  if($('#showMessage').prop("checked")){
+    action = 'showMessage';
+  };
+
+  if($('#doNothing').prop("checked")){
+    action = 'doNothing';
+  };
+
+  contentType.data.postSubmission = {
+    action, 
+    redirectUrl,
+    message
+  };
+}
+
+function processModalSettings(contentType) {
+  let modalTitle = $('#modalTitle').val();
+ 
+  contentType.data.modalSettings = {
+    modalTitle
+  };
 }
 
 async function onContentTypeRawSave() {
@@ -1168,7 +1103,7 @@ async function saveWYSIWYG() {
 async function addModule(systemId, sessionID) {
   showSidePanel();
 
-  let form = await formService.getForm(
+  let form = await dataService.formGet(
     systemId,
     undefined,
     "addModuleToColumn(submission, true)",
@@ -1177,7 +1112,7 @@ async function addModule(systemId, sessionID) {
     sessionID
   );
 
-  $(".pb-side-panel #main").html(form);
+  $(".pb-side-panel #main").html(form.html);
 
   loadModuleSettingForm();
   // $("#moduleSettingsModal")
@@ -1193,7 +1128,7 @@ async function editModule(sessionID) {
 
   let data = await dataService.getContentById(currentModuleId);
 
-  let form = await formService.getForm(
+  let form = await dataService.formGet(
     currentModuleContentType,
     data,
     "await editInstance(submission, true);",
@@ -1206,7 +1141,7 @@ async function editModule(sessionID) {
   );
 
   // $("#moduleSettingsFormio").html(form);
-  $(".pb-side-panel #main").html(form);
+  $(".pb-side-panel #main").html(form.html);
   loadModuleSettingForm();
   // $("#moduleSettingsModal")
   //   .appendTo("body")
@@ -1231,7 +1166,7 @@ async function deleteModule() {
       <a class="dropdown-item" onclick="deleteModuleConfirm(false)" href="#">Remove From Column Only</a>
     </div>
   </div>`;
-  
+
   let dataPreview = `<div class="delete-data-preview""><textarea>${JSON.stringify(
     data,
     null,
@@ -1481,42 +1416,6 @@ async function addModuleToColumn(submission) {
   fullPageUpdate();
 }
 
-async function submitContent(
-  submission,
-  refresh = true,
-  contentType = "content"
-) {
-  // debugger;
-  console.log("Submission was made!", submission);
-  let entity = submission.data ? submission.data : submission;
-  // if (!contentType.startsWith("user")) {
-  //   entity = processContentFields(submission.data);
-  // }
-  // if (contentType.toLowerCase().startsWith("role")) {
-  //   contentType = "Roles";
-  //   entity = submission.data;
-  // }
-
-  if (!contentType.startsWith("user")) {
-    if (submission.id || submission.data.id) {
-      await editInstance(entity, refresh, contentType);
-    } else {
-      await createInstance(entity, true, contentType);
-    }
-  } else {
-    entity.contentType = contentType;
-
-    let result = await axios({
-      method: "post",
-      url: "/form-submission",
-      data: {
-        data: entity,
-      },
-    });
-    fullPageUpdate();
-  }
-}
-
 // async function submitUser(submission, refresh = true) {
 //   // debugger;
 //   console.log("Submission was made!", submission);
@@ -1550,17 +1449,6 @@ async function postProcessNewContent(content) {
       mainMenu.data.links.push(menuItem);
       await editInstance(mainMenu);
     }
-  }
-}
-
-//TODO, make this just refresh the body content with a full get
-function fullPageUpdate(url = undefined) {
-  // debugger;
-  console.log("refreshing page");
-  if (url) {
-    window.location.replace(url);
-  } else {
-    location.reload();
   }
 }
 
@@ -1628,23 +1516,25 @@ async function setupACEEditor() {
   }
 
   $("#save-global-css").click(async function () {
-    let cssContent = editor.getSession().getValue();
+    let cssContent = editor.getSession().getValue().toString();;
+    // debugger;
 
-    // let file = new File([cssContent], "template.css", { type: "text/css" });
-    await dataService.fileUpdate(
-      `/server/themes/front-end/${theme}/css/template.css`,
-      cssContent,
-      sessionID
-    );
+    return axiosInstance
+    .post("/admin/update-css", {css: cssContent})
+    .then(async function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+      alert(error)
+    });
 
-    // writeFile("css", file);
   });
 
   beatifyACECss();
 }
 
 async function setupDropZone() {
-
   if (!globalService.isBackEnd()) {
     return;
   }

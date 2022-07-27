@@ -118,12 +118,28 @@ module.exports = fileService = {
 
   copyFile: async function (sourcePath, destinationPath) {
     fs.copyFile(sourcePath, destinationPath, (err) => {
-      if (err) throw err;
+      if (err) {
+        console.error("copyFile==> unable to copy ", sourcePath);
+        throw err;
+      }
       console.log(`${sourcePath} was copied to ${destinationPath}`);
     });
   },
 
   uploadWriteFile: async function (file, sessionID) {
+    const fileExists = this.fileExists(file.path, true);
+    if (fileExists) {
+      this.execUpload(file, sessionID);
+    } else {
+      //wait and retry
+      console.log("temp file not found, retrying");
+      helperService.sleep(1000);
+      this.execUpload(file, sessionID);
+    }
+  },
+
+  execUpload: async function (file, sessionID) {
+    //TODO: needs refac
     let storageOption = process.env.FILE_STORAGE;
     if (
       storageOption === "AMAZON_S3" &&
@@ -144,21 +160,25 @@ module.exports = fileService = {
       }
     } //Local file upload fix
     else if (file.name.match(/.(jpg|jpeg|png|gif|svg|mp4|zip)$/i)) {
-      var title = file.name.replace(/^.*[\\\/]/, "");
+      if (file.name.endsWith(".zip")) {
+        await this.uploadBackupFile(file, sessionID);
+      } else {
+        var title = file.name.replace(/^.*[\\\/]/, "");
 
-      //Upload file to default assets location
-      await fileService
-        .copyFile(
-          file.path,
-          path.join(appRoot.path, `server/assets/uploads/${file.name}`)
-        )
-        .catch((error) => {
-          console.log(error);
-          throw new Error(error);
-        });
+        //Upload file to default assets location
+        await fileService
+          .copyFile(
+            file.path,
+            path.join(appRoot.path, `server/assets/uploads/${file.name}`)
+          )
+          .catch((error) => {
+            console.log("uploadWriteFile ==>", error);
+            throw new Error(error);
+          });
 
-      //Remove temp file
-      await fileService.deleteFile(file.path);
+        //Remove temp file
+        await fileService.deleteFile(file.path);
+      }
     }
   },
 

@@ -1,0 +1,8 @@
+{
+  "title": "Vote",
+  "enabled": false,
+  "systemId": "vote",
+  "canBeAddedToColumn": true,
+  "singleInstance": false,
+  "version": "0.0.0.1"
+}
