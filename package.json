@@ -39,6 +39,7 @@
     "chalk": "^4.1.0",
     "chart.js": "^2.9.4",
     "cheerio": "^1.0.0-rc.10",
+    "choices.js": "^10.1.0",
     "connect-ensure-login": "^0.1.1",
     "connect-multiparty": "^2.2.0",
     "connect-typeorm": "^1.1.4",

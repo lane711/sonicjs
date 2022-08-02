@@ -258,6 +258,45 @@ async function setupSectionBackgroundEvents() {
 
     editInstance(currentSectionRecord);
   });
+
+  $(".pb .layout .background-image-link").on("click", async function () {
+
+    $("#genericModal").on("show.bs.modal", function () {
+      // alert("load");
+
+      $(".image-module-list-item").on("click", function () {
+        console.log('image-module-list-item', $(this).text());
+      });
+  
+      // debugger;
+      //  const element = $(".section-background .choices .choices__input")[0]
+      const example = new Choices(
+        $(".section-background .choices .choices__input")[0]
+      );
+  
+      example.passedElement.element.addEventListener(
+        "addItem",
+        function (event) {
+          // do something creative here...
+          // console.log(event.detail.id);
+          console.log(event.detail.value.src);
+          // console.log(event.detail.label);
+          // console.log(event.detail.customProperties);
+          // console.log(event.detail.groupValue);
+          // debugger;
+          $(`section[data-id="${currentSectionId}"]`).css(
+            "background",
+            `url(${event.detail.value.src})`
+          )
+          .addClass('bg-image-cover')
+        },
+        false
+      );
+
+    });
+
+  
+  });
 }
 
 async function setDefaultBackgroundSetting(currentSectionRecord, color) {
@@ -313,16 +352,20 @@ async function setupColorPicker(currentSectionId) {
   });
 
   pickr
-    .on("change", (color, instance) => {
+    .on("change", async (color, instance) =>  {
       // debugger;
       console.log("change", color, instance);
       $(`section[data-id="${currentSectionId}"]`).css(
         "background-color",
         color.toHEXA()
       );
+
     })
-    .on("save", (color, instance) => {
+    .on("save", async (color, instance) => {
       console.log("save", color, instance);
+      currentSectionRecord = await getCurrentSection();
+      currentSectionRecord.data.background = { type: 'color', color: color.toRGBA() };
+      editInstance(currentSectionRecord);
     });
 
   var parent = document.querySelector(

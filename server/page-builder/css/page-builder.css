@@ -86,11 +86,10 @@ hr {
   padding: 0;
 }
 
-.header {
-  color: #fff;
-  padding: 4px 0;
-  font-size: 0.6em;
-  padding: 0.5rem 1rem;
+.pb .header {
+  color:#000;
+  padding: 0 0 4px 0;
+  font-size: 1.1em;
 }
 
 .nav {
@@ -490,7 +489,14 @@ section {
 .pb-empty-section, .empty-column{
   border: 6px var(--medium-grey) dashed;
   border-radius: 12px;
-  background-color: var(--light-grey);
   padding: 90px;
   text-align: center;
+}
+
+.pb .accordion, .pb .accordion-item{
+  width: 100%;
+}
+
+.pb .pickr .pcr-button{
+  width:100%;
 }

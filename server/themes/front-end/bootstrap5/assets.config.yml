@@ -12,6 +12,7 @@ assets:
     - /node_modules/jsoneditor/dist/jsoneditor.min.js
     - /node_modules/formiojs/dist/formio.full.min.js
     - /node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.js
+    - /node_modules/choices.js/public/assets/scripts/choices.min.js
     - /node_modules/dropzone/dist/min/dropzone.min.js
     - /assets/js/common.js
     - /sonicjs-services/shared.service.js
