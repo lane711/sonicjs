@@ -252,6 +252,7 @@ async function setupSectionBackgroundEvents() {
     setupColorPicker(currentSectionId);
 
     currentSectionRecord = await getCurrentSection();
+    // debugger;
     currentSectionRecord.data.background = { type: backgroundSetting };
     // setDefaultBackgroundSetting(currentSectionRecord);
     showBackgroundTypeOptions(backgroundSetting, currentSectionId);
@@ -260,47 +261,55 @@ async function setupSectionBackgroundEvents() {
   });
 
   $(".pb .layout .background-image-link").on("click", async function () {
-
     $("#genericModal").on("show.bs.modal", function () {
       // alert("load");
 
       $(".image-module-list-item").on("click", function () {
-        console.log('image-module-list-item', $(this).text());
+        console.log("image-module-list-item", $(this).text());
       });
-  
+
       // debugger;
       //  const element = $(".section-background .choices .choices__input")[0]
       const example = new Choices(
         $(".section-background .choices .choices__input")[0]
       );
-  
+
       example.passedElement.element.addEventListener(
         "addItem",
-        function (event) {
+        async function (event) {
           // do something creative here...
           // console.log(event.detail.id);
           console.log(event.detail.value.src);
           // console.log(event.detail.label);
           // console.log(event.detail.customProperties);
           // console.log(event.detail.groupValue);
-          // debugger;
-          $(`section[data-id="${currentSectionId}"]`).css(
-            "background",
-            `url(${event.detail.value.src})`
-          )
-          .addClass('bg-image-cover')
+          debugger;
+          $(`section[data-id="${currentSectionId}"]`)
+            .css("background", `url(${event.detail.value.src})`)
+            .addClass("bg-image-cover");
+
+          //save
+
+          currentSectionRecord = await getCurrentSection();
+          currentSectionRecord.data.background = {
+            type: "image",
+            src: event.detail.value.src,
+            css: "bg-image-cover",
+          };
+          editInstance(currentSectionRecord);
         },
         false
       );
-
     });
-
-  
   });
 }
 
 async function setDefaultBackgroundSetting(currentSectionRecord, color) {
   currentSectionRecord.data.background.color = color;
+}
+
+async function saveSectionBackgroundImage() {
+  alert("saving ...");
 }
 
 async function showBackgroundTypeOptions(backgroundSetting, sectionId) {
@@ -352,19 +361,21 @@ async function setupColorPicker(currentSectionId) {
   });
 
   pickr
-    .on("change", async (color, instance) =>  {
+    .on("change", async (color, instance) => {
       // debugger;
       console.log("change", color, instance);
       $(`section[data-id="${currentSectionId}"]`).css(
         "background-color",
         color.toHEXA()
       );
-
     })
     .on("save", async (color, instance) => {
       console.log("save", color, instance);
       currentSectionRecord = await getCurrentSection();
-      currentSectionRecord.data.background = { type: 'color', color: color.toRGBA() };
+      currentSectionRecord.data.background = {
+        type: "color",
+        color: color.toRGBA().toString(3),
+      };
       editInstance(currentSectionRecord);
     });
 
@@ -879,20 +890,30 @@ async function onContentTypeSave() {
       contentType.id = $("#createContentTypeForm #id").val();
     }
 
-    //states
-    processContentTypeStates(contentType);
-
-    //post submission
-    processPostSubmission(contentType);
-
-    //modal settings
-    processModalSettings(contentType);
-
     //form
     await editContentType(contentType, sessionID);
 
     fullPageUpdate();
   }
+}
+
+async function onContentTypeStatesSave(submission) {
+  //states
+  // processContentTypeStates(contentType);
+
+  // //post submission
+  // processPostSubmission(contentType);
+
+  // //modal settings
+  // processModalSettings(contentType);
+debugger;
+
+  //add states form data to content type
+  contentType.data.states = '';
+
+  await editContentType(contentType, sessionID);
+
+  fullPageUpdate();
 }
 
 function processContentTypeStates(contentType) {
@@ -906,29 +927,36 @@ function processContentTypeStates(contentType) {
   };
 }
 
-function processPostSubmission(contentType) {
-  let action = "fullPageRefresh";
-  let redirectUrl = $("#redirectUrl").val();
-  let message = $("#showMessageCopy").val();
+// function processPostSubmission(contentType) {
+//   debugger;
+//   let action = "fullPageRefresh";
+//   let redirectUrl = $("#redirectUrl").val();
+//   let message = $("#showMessageCopy").val();
+//   let callFunction = $("#callFunctionName").val();
 
-  if ($("#redirectToUrl").prop("checked")) {
-    action = "redirectToUrl";
-  }
+//   if ($("#redirectToUrl").prop("checked")) {
+//     action = "redirectToUrl";
+//   }
 
-  if ($("#showMessage").prop("checked")) {
-    action = "showMessage";
-  }
+//   if ($("#showMessage").prop("checked")) {
+//     action = "showMessage";
+//   }
 
-  if ($("#doNothing").prop("checked")) {
-    action = "doNothing";
-  }
+//   if ($("#doNothing").prop("checked")) {
+//     action = "doNothing";
+//   }
 
-  contentType.data.postSubmission = {
-    action,
-    redirectUrl,
-    message,
-  };
-}
+//   if ($("#callFunction").prop("checked")) {
+//     action = "callFunction";
+//   }
+
+//   contentType.data.postSubmission = {
+//     action,
+//     redirectUrl,
+//     message,
+//     callFunction,
+//   };
+// }
 
 function processModalSettings(contentType) {
   let modalTitle = $("#modalTitle").val();

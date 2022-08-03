@@ -158,112 +158,7 @@
             <div class="card-body">
 
               <div id="form-states">
-                <h3>Components</h3>
-                <table class="table">
-                  <thead>
-                    <tr>
-                      <th scope="col">Component</th>
-                      <th scope="col">Add</th>
-                      <th scope="col">Edit</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <th scope="row">Submit Button Text</th>
-                      <td><input
-                          id="addText"
-                          type="text"
-                          value="{{this.data.raw.data.states.new.buttonText}}"
-                        /></td>
-                      <td><input
-                          id="editText"
-                          type="text"
-                          value="{{this.data.raw.data.states.edit.buttonText}}"
-                        /></td>
-
-                    </tr>
-                  </tbody>
-                </table>
-
-                <h3 class="mt-5">Post Submission</h3>
-                <fieldset>
-                  <legend>What happens after a form is submitted?</legend>
-
-                  <div>
-                    <input
-                      type="radio"
-                      id="fullPageRefresh"
-                      name="postSubmission"
-                      value="fullPageRefresh"
-                      {{setChecked
-                        this.data.raw.data.postSubmission.action
-                        "fullPageRefresh"
-                      }}
-                    />
-                    <label for="fullPageRefresh">Full Page Refresh (Default)</label>
-                  </div>
-
-                  <div>
-                    <input
-                      type="radio"
-                      id="doNothing"
-                      name="postSubmission"
-                      value="doNothing"
-                      {{setChecked
-                        this.data.raw.data.postSubmission.action
-                        "doNothing"
-                      }}
-                    />
-                    <label for="doNothing">Do Nothing</label>
-                  </div>
-
-                  <div>
-                    <input
-                      type="radio"
-                      id="redirectToUrl"
-                      name="postSubmission"
-                      value="redirectToUrl"
-                      {{setChecked
-                        this.data.raw.data.postSubmission.action
-                        "redirectToUrl"
-                      }}
-                    />
-                    <label for="redirectToUrl">Redirect To Url:
-                      <input
-                        type="text"
-                        id="redirectUrl"
-                        value="{{this.data.raw.data.postSubmission.redirectUrl}}"
-                      /></label>
-                  </div>
-
-                  <div>
-                    <input
-                      type="radio"
-                      id="showMessage"
-                      name="postSubmission"
-                      value="showMessage"
-                      {{setChecked
-                        this.data.raw.data.postSubmission.action
-                        "showMessage"
-                      }}
-                    />
-                    <label for="showMessage">Show Message:
-                      <input
-                        type="text"
-                        id="showMessageCopy"
-                        value="{{this.data.raw.data.postSubmission.message}}"
-                      /></label>
-                  </div>
-
-                </fieldset>
-
-                <h3 class="mt-5">Modal Settings</h3>
-                Modal Title:
-                <input
-                  type="text"
-                  id="modalTitle"
-                  value="{{this.data.raw.data.modalSettings.modalTitle}}"
-                />
+                {{{ data.editFormStates.html}}}
               </div>
 
             </div>
@@ -271,7 +166,7 @@
               <button
                 type="button"
                 class="btn btn-success pull-right"
-                onclick="onContentTypeSave()"
+                onclick="onContentTypeStatesSave()"
               >
                 Save States
               </button>

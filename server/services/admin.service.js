@@ -144,6 +144,16 @@ module.exports = adminService = {
               false
             );
           }
+
+          data.editFormStates = await dataService.formGet(
+            'content-type-states',
+            undefined,
+            "onContentTypeStatesSave(submission)",
+            undefined,
+            undefined,
+            req.sessionID,
+            req.url
+          );
         }
 
         if (viewName == "admin-modules") {
