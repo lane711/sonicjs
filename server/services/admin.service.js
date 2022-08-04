@@ -145,9 +145,10 @@ module.exports = adminService = {
             );
           }
 
+          const states = {contentTypeId: 'content-type-states', data: data.raw.data.states}
           data.editFormStates = await dataService.formGet(
             'content-type-states',
-            undefined,
+            states,
             "onContentTypeStatesSave(submission)",
             undefined,
             undefined,

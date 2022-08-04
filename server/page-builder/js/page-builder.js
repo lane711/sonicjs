@@ -283,20 +283,12 @@ async function setupSectionBackgroundEvents() {
           // console.log(event.detail.label);
           // console.log(event.detail.customProperties);
           // console.log(event.detail.groupValue);
-          debugger;
+          // debugger;
           $(`section[data-id="${currentSectionId}"]`)
             .css("background", `url(${event.detail.value.src})`)
             .addClass("bg-image-cover");
 
           //save
-
-          currentSectionRecord = await getCurrentSection();
-          currentSectionRecord.data.background = {
-            type: "image",
-            src: event.detail.value.src,
-            css: "bg-image-cover",
-          };
-          editInstance(currentSectionRecord);
         },
         false
       );
@@ -309,7 +301,16 @@ async function setDefaultBackgroundSetting(currentSectionRecord, color) {
 }
 
 async function saveSectionBackgroundImage() {
-  alert("saving ...");
+  debugger;
+  console.log('submittedFormData', submittedFormData);
+  // alert("saving saveSectionBackgroundImage...");
+  currentSectionRecord = await getCurrentSection();
+  currentSectionRecord.data.background = {
+    type: "image",
+    src: event.detail.value.src,
+    css: "bg-image-cover",
+  };
+  editInstance(currentSectionRecord);
 }
 
 async function showBackgroundTypeOptions(backgroundSetting, sectionId) {
@@ -906,10 +907,10 @@ async function onContentTypeStatesSave(submission) {
 
   // //modal settings
   // processModalSettings(contentType);
-debugger;
+  debugger;
 
   //add states form data to content type
-  contentType.data.states = '';
+  contentType.data.states = submission.data;
 
   await editContentType(contentType, sessionID);
 

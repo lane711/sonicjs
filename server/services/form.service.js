@@ -163,7 +163,7 @@ if (typeof module !== "undefined" && module.exports) {
 
       //override button copy
       if (contentType.data.states) {
-        if (data.viewModel.editMode && contentType.data.states.edit?.buttonText) {
+        if (data.viewModel.editMode && contentType.data.states.editSubmitButtonText) {
           const submitButton = contentType.data.components.find(
             (c) => c.key === "submit"
           );
@@ -172,7 +172,7 @@ if (typeof module !== "undefined" && module.exports) {
           }
         }
 
-        if (!data.viewModel.editMode && contentType.data.states.new?.buttonText) {
+        if (!data.viewModel.editMode && contentType.data.states.addSubmitButtonText) {
           const submitButton = contentType.data.components.find(
             (c) => c.key === "submit"
           );
@@ -267,7 +267,7 @@ if (typeof module !== "undefined" && module.exports) {
           key: "contentType",
           label: "contentType",
           defaultValue: contentType.systemId,
-          hidden: true,
+          hidden: false,
           input: true,
         });
       }

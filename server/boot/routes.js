@@ -211,13 +211,15 @@ exports.loadRoutes = async function (app) {
       // }
       let successAction;
 
-      if (contentType.data?.postSubmission) {
-        if (contentType.data.postSubmission.action === "redirectToUrl") {
+      if (contentType.data?.states) {
+        if (contentType.data.states.postSubmission === "redirectToUrl") {
           successAction = `redirectToUrl('${contentType.data.postSubmission.redirectUrl}');`;
-        } else if (contentType.data.postSubmission.action === "showMessage") {
+        } else if (contentType.data.states.postSubmission === "showMessage") {
           successAction = `postSubmissionSuccessMessage("${contentType.data.postSubmission.message}");`;
-        } else if (contentType.data.postSubmission.action === "doNothing") {
+        } else if (contentType.data.states.postSubmission === "doNothing") {
           successAction = `javascript:void(0);`;
+        } else if (contentType.data.states.postSubmission === "callFunction") {
+          successAction = contentType.data.states.functionToCall;
         }
       }
 
