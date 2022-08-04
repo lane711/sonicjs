@@ -257,7 +257,7 @@ module.exports = contentService = {
       let style = "";
       let css = "";
 
-      console.log(section.data.background);
+      // console.log(section.data.background);
 
       switch (section.data.background.type) {
         case "color":

@@ -685,7 +685,7 @@ const Mutation = new GraphQLObjectType({
 
         args.data = dataObj;
 
-        console.log("ContentTypeUpdate", args);
+        // console.log("ContentTypeUpdate", args);
         moduleService
           .contentTypeUpdate(args, args.sessionID, req)
           .then((data) => {
