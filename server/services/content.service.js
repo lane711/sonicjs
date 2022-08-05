@@ -291,7 +291,7 @@ module.exports = contentService = {
     if (rows) {
       for (const row of rows) {
         // console.log(chalk.red(JSON.stringify(row)));
-        page.data.html += `<div class='${row.class}'>`;
+        page.data.html += `<div class='${row.css}'>`;
         let columns = await this.processColumns(
           page,
           section,
@@ -318,13 +318,17 @@ module.exports = contentService = {
     for (const column of row.columns) {
       // console.log('== column ==', column);
 
-      page.data.html += `<div id='${column.id}' class='${column.class}'>`;
-      page.data.html += `${column.content}`;
-      if (column.content) {
+      page.data.html += `<div class='${column.css}'>`;
+      let content = '';
+      column.content.map((c, index) =>{
+        content += c.content;
+      })
+      page.data.html += `${content}`;
+      if (content) {
         await this.processShortCodes(
           page,
           section,
-          column.content,
+          content,
           rowIndex,
           columnIndex,
           req

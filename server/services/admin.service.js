@@ -11,6 +11,8 @@ var dataService = require(".//data.service");
 var userService = require(".//user.service");
 var breadcrumbsService = require("../services/breadcrumbs.service");
 var dalService = require(".//dal.service");
+var sharedService = require(".//shared.service");
+
 const mixPanelService = require("../modules/mixpanel/services/mixpanel-main-service");
 const appAnalyticReportService = require("../modules/app-analytics/services/app-analytics-report-service");
 
@@ -103,6 +105,9 @@ module.exports = adminService = {
             req.url
           );
           data.contentId = param2;
+          data.shortCode = sharedService.generateShortCode(param1, {
+            id: content.id,
+          });
         }
 
         if (viewName == "admin-content-types") {
@@ -130,8 +135,9 @@ module.exports = adminService = {
             data.raw.systemId === "site-settings-permissions";
           if (data.showOnlyPermissionTab) {
             //get site default acls
-            const defaultACLs =
-              await dataService.getContentTopOne("site-settings-acls");
+            const defaultACLs = await dataService.getContentTopOne(
+              "site-settings-acls"
+            );
 
             data.editFormACLs = await dataService.formGet(
               "site-settings-acls",
@@ -145,9 +151,12 @@ module.exports = adminService = {
             );
           }
 
-          const states = {contentTypeId: 'content-type-states', data: data.raw.data.states}
+          const states = {
+            contentTypeId: "content-type-states",
+            data: data.raw.data.states,
+          };
           data.editFormStates = await dataService.formGet(
-            'content-type-states',
+            "content-type-states",
             states,
             "onContentTypeStatesSave(submission)",
             undefined,
