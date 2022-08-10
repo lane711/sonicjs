@@ -20,6 +20,15 @@
   display: flex;
 }
 
+.pb-wrapper.expanded {
+  /* left:420px; */
+}
+
+.pb-wrapper.collapsed {
+  display:none;
+}
+
+
 .pb-wrapper .left-sidebar {
   background-color: var(--white);
   /* width: 60px;
@@ -44,9 +53,9 @@
   margin-left: 300px;
 }
 
-main,
-.fixed-top,
-footer {
+.expanded main,
+.expanded .fixed-top,
+.expanded footer {
   margin-left: 420px;
   /* transition: margin-left 1s; */
 }
@@ -440,6 +449,7 @@ section {
   /* transition: left 1s; */
   z-index: 10;
   padding: 50px 0;
+  left:0;
 }
 
 .sidebar-expander.expanded {

@@ -1853,24 +1853,28 @@ function isEditMode() {
 
 function toggleSidebar(showSidebar) {
 
-
+// debugger;
   if (showSidebar) {
     //opening
-    $(".pb-wrapper").css("left", "0");
-    $("main, .fixed-top, footer").css("margin-left", "420px");
-    $(".sidebar-expander").css("left", "420px");
-    $(".sidebar-expander").addClass("expanded");
-    $(".sidebar-expander").removeClass("collapsed");
-    $('.pb-wrapper').show();
+    $(".sidebar-expander, .pb-wrapper, html").removeClass('collapsed');
+    $(".sidebar-expander, .pb-wrapper, html").addClass('expanded');
+    // $("html").removeClass('expanded');
+    // $("main, .fixed-top, footer").css("margin-left", "420px");
+    // $(".sidebar-expander").css("left", "420px");
+    // $(".sidebar-expander").addClass("expanded");
+    // $(".sidebar-expander").removeClass("collapsed");
+    // $('.pb-wrapper').show();
 
     // setupUIClicks();
   } else {
     //closing
-    $(".pb-wrapper").css("left", "-420px");
-    $("main, .fixed-top, footer").css("margin-left", "0");
-    $(".sidebar-expander").css("left", "0");
-    $(".sidebar-expander").removeClass("expanded");
-    $(".sidebar-expander").addClass("collapsed");
+    // $(".pb-wrapper").css("left", "-420px");
+    $(".sidebar-expander, .pb-wrapper, html").addClass('collapsed');
+    $(".sidebar-expander, .pb-wrapper, html ").removeClass('expanded');
+    // $("main, .fixed-top, footer").css("margin-left", "0");
+    // $(".sidebar-expander").css("left", "0");
+    // $(".sidebar-expander").removeClass("expanded");
+    // $(".sidebar-expander").addClass("collapsed");
     disableUIHoversAndClicks();
   }
 }

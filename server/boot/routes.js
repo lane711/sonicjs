@@ -345,6 +345,11 @@ exports.loadRoutesCatchAll = async function (app) {
     page.data.user.isAuthenticated = req.user ? true : false;
     page.data.siteSettings = req.siteSettings;
 
+    //check is edit mode, sidebar expanded
+    page.data.isEditMode = req.cookies.showSidebar === 'false' ? false : true;
+    page.data.sidebarClass = page.data.isEditMode ? 'expanded' : 'collapsed';
+
+
     res.render(`${frontEndTheme}/layouts/main`, {
       layout: path.join(appRoot.path, frontEndTheme, "theme.hbs"),
       data: page.data,
