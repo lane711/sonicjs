@@ -259,7 +259,7 @@ module.exports = contentService = {
 
       // console.log(section.data.background);
 
-      switch (section.data.background.type) {
+      switch (section.data.background) {
         case "color":
           let colorRGBA = section.data.background.color;
           if (colorRGBA) {
@@ -267,10 +267,10 @@ module.exports = contentService = {
           }
           break;
         case "image":
-          let imageSrc = section.data.background.src;
+          let imageSrc = section.data.image.src;
           if (imageSrc) {
             style = `background: url(${imageSrc});`;
-            css = section.data.background.css;
+            css = "bg-image-cover";
           }
           break;
         default:
@@ -319,10 +319,12 @@ module.exports = contentService = {
       // console.log('== column ==', column);
 
       page.data.html += `<div class='${column.css}'>`;
-      let content = '';
-      column.content.map((c, index) =>{
-        content += c.content;
-      })
+      let content = "";
+      if (Array.isArray(column.content)) {
+        column.content.map((c, index) => {
+          content += c.content;
+        });
+      }
       page.data.html += `${content}`;
       if (content) {
         await this.processShortCodes(

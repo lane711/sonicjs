@@ -2,9 +2,10 @@
   --light-grey: #F8F8F8;
   --medium-grey: #D8D8D8;
   --dark-grey: #989898	;
+  --side-panel-width: 420px;
 }
 .pb-wrapper {
-  width: 260px;
+  width: var(--side-panel-width);
   height: 100%;
   position: fixed;
   left: 0;
@@ -17,7 +18,7 @@
 }
 
 .pbe-wrapper {
-  width: 240px;
+  width: var(--side-panel-width);
   padding: 15px 30px;
   color: #fff;
 }
@@ -29,13 +30,13 @@
 main,
 .fixed-top,
 footer {
-  margin-left: 260px;
+  margin-left: 420px;
   transition: margin-left 1s;
 }
 
 .page-builder-nav,
 .sidebar {
-  width: 260px;
+  width: var(--side-panel-width);
 }
 
 .mini-layout .row {

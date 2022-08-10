@@ -196,6 +196,7 @@ function setupUIClicks() {
     },
   });
 
+  // debugger;
   $("section .row .module").on({
     click: function () {
       // debugger;
@@ -212,6 +213,9 @@ function setupUIClicks() {
 
       console.log("moduleId", currentModuleId);
       $(".edit-module").show().appendTo(moduleDiv);
+
+      // debugger;
+      editModule(sessionID);
     },
   });
 }
@@ -1195,7 +1199,7 @@ async function addModule(systemId, sessionID) {
 
 async function editModule(sessionID) {
   // cleanModal();
-  showSidePanel();
+  // showSidePanel();
 
   console.log("editing module: " + currentModuleId, currentModuleContentType);
 
@@ -1209,12 +1213,13 @@ async function editModule(sessionID) {
     undefined,
     sessionID
   );
-  $("#dynamicModelTitle").text(
-    `Settings: ${currentModuleContentType} (Id:${currentModuleId})`
-  );
+  // $("#dynamicModelTitle").text(
+  //   `Settings: ${currentModuleContentType} (Id:${currentModuleId})`
+  // );
 
   // $("#moduleSettingsFormio").html(form);
-  $(".pb-side-panel #main").html(form.html);
+  // $(".pb-side-panel #main").html(form.html);
+  $('#module-content-container').html(form.html);
   loadModuleSettingForm();
   // $("#moduleSettingsModal")
   //   .appendTo("body")
@@ -1835,12 +1840,12 @@ function toggleSidebar(showSidebar) {
   if (showSidebar) {
     //opening
     $(".pb-wrapper").css("left", "0");
-    $("main, .fixed-top, footer").css("margin-left", "260px");
+    $("main, .fixed-top, footer").css("margin-left", "420px");
     $(".sidebar-expander").css("left", "-60px");
-    setupUIClicks();
+    // setupUIClicks();
   } else {
     //closing
-    $(".pb-wrapper").css("left", "-260px");
+    $(".pb-wrapper").css("left", "-420px");
     $("main, .fixed-top, footer").css("margin-left", "0");
     $(".sidebar-expander").css("left", "0");
     disableUIHoversAndClicks();
