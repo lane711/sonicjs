@@ -12,6 +12,8 @@
 </style>
 
 <div class="pb-wrapper">
+<div class="left-sidebar">small side</div>
+<div class="main">
   <div class="open-admin row no-gutters">
     <div class="col text-center"> <a href="/admin" >Open Admin</a>
     </div>
@@ -248,11 +250,11 @@
 
             </div> --}}
 
-      <button type="button" onclick="deleteModule()" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+      <button type="button" onclick="deleteModule()" class="btn btn-sm"><i class="bi bi-trash"></i></button>
 
-      <button type="button" onclick="copyModule()" class="btn btn-primary btn-sm"><i class="bi bi-clipboard-plus"></i></button>
+      <button type="button" onclick="copyModule()" class="btn btn-sm"><i class="bi bi-clipboard-plus"></i></button>
 
-      <button type="button" onclick="editModule()" class="btn btn-secondary btn-sm"><i
+      <button type="button" onclick="editModule()" class="btn btn-sm"><i
           class="bi bi-pen"></i></button>
     </div>
   </div>
@@ -280,10 +282,10 @@
 
   <button class="sidebar-minimizer brand-minimizer" type="button"></button>
 
-
+</div>
 </div>
 
-  <button class="sidebar-expander" id="sidebar-expander" type="button"></button>
+<button class="sidebar-expander collapsed" id="sidebar-expander" type="button"></button>
 
 <!-- WYSIWYG Modal -->
 <div class="modal fade admin-field-add" id="wysiwygModal" tabindex="-1" role="dialog"

@@ -200,7 +200,9 @@ function setupUIClicks() {
   $("section .row .module").on({
     click: function () {
       // debugger;
+      $(".module-highlight").removeClass("module-highlight");
       let moduleDiv = $(this).closest(".module");
+      moduleDiv.addClass("module-highlight");
       currentModuleId = moduleDiv.data("id");
       currentModuleIndex = $(moduleDiv).index();
       currentModuleContentType = moduleDiv.data("content-type");
@@ -306,7 +308,7 @@ async function setDefaultBackgroundSetting(currentSectionRecord, color) {
 
 async function saveSectionBackgroundImage() {
   debugger;
-  console.log('submittedFormData', submittedFormData);
+  console.log("submittedFormData", submittedFormData);
   // alert("saving saveSectionBackgroundImage...");
   currentSectionRecord = await getCurrentSection();
   currentSectionRecord.data.background = {
@@ -1219,7 +1221,7 @@ async function editModule(sessionID) {
 
   // $("#moduleSettingsFormio").html(form);
   // $(".pb-side-panel #main").html(form.html);
-  $('#module-content-container').html(form.html);
+  $("#module-content-container").html(form.html);
   loadModuleSettingForm();
   // $("#moduleSettingsModal")
   //   .appendTo("body")
@@ -1819,15 +1821,23 @@ function setupAdminMenuMinimizer() {
     return;
   }
 
-  $(".pb-wrapper .sidebar-minimizer").click(function () {
-    Cookies.set("showSidebar", false);
-    toggleSidebar(false);
-  });
+  // $(".pb-wrapper .sidebar-minimizer").click(function () {
+  //   Cookies.set("showSidebar", false);
+  //   toggleSidebar(false);
+  // });
 
   $(".sidebar-expander").click(function () {
-    Cookies.set("showSidebar", true);
-    toggleSidebar(true);
+    // debugger;
+    let isEditMode = Cookies.get("showSidebar") === 'false' ? false : true;
+    let showSidebar = !isEditMode;
+    Cookies.set("showSidebar", showSidebar);
+    toggleSidebar(showSidebar);
   });
+
+  // $(".sidebar-expander.expanded").click(function () {
+  //   Cookies.set("showSidebar", false);
+  //   toggleSidebar(false);
+  // });
 
   if (isEditMode() === "true") {
     toggleSidebar(true);
@@ -1836,25 +1846,33 @@ function setupAdminMenuMinimizer() {
   }
 }
 
+function isEditMode() {
+  let isEditMode = Cookies.get("showSidebar");
+  return isEditMode;
+}
+
 function toggleSidebar(showSidebar) {
+
+
   if (showSidebar) {
     //opening
     $(".pb-wrapper").css("left", "0");
     $("main, .fixed-top, footer").css("margin-left", "420px");
-    $(".sidebar-expander").css("left", "-60px");
+    $(".sidebar-expander").css("left", "420px");
+    $(".sidebar-expander").addClass("expanded");
+    $(".sidebar-expander").removeClass("collapsed");
+    $('.pb-wrapper').show();
+
     // setupUIClicks();
   } else {
     //closing
     $(".pb-wrapper").css("left", "-420px");
     $("main, .fixed-top, footer").css("margin-left", "0");
     $(".sidebar-expander").css("left", "0");
+    $(".sidebar-expander").removeClass("expanded");
+    $(".sidebar-expander").addClass("collapsed");
     disableUIHoversAndClicks();
   }
-}
-
-function isEditMode() {
-  let isEditMode = Cookies.get("showSidebar");
-  return isEditMode;
 }
 
 async function addUser() {

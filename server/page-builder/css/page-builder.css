@@ -1,8 +1,10 @@
 :root {
+  --white:#fff;
   --light-grey: #F8F8F8;
   --medium-grey: #D8D8D8;
   --dark-grey: #989898	;
-  --side-panel-width: 420px;
+  --side-panel-width: 360px;
+  --highlight: #B3F1BF;
 }
 .pb-wrapper {
   width: var(--side-panel-width);
@@ -13,8 +15,23 @@
   background: #2f353a;
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 13px;
-  transition: left 1s;
+  /* transition: left 1s; */
   z-index: 1;
+  display: flex;
+}
+
+.pb-wrapper .left-sidebar {
+  background-color: var(--white);
+  /* width: 60px;
+  height: 100px; */
+  flex: 0 0 60px;
+}
+
+.pb-wrapper .main {
+  background-color: var(--light-grey);
+  /* width: 360px; */
+  /* height: 100px; */
+  flex: 1;
 }
 
 .pbe-wrapper {
@@ -31,7 +48,7 @@ main,
 .fixed-top,
 footer {
   margin-left: 420px;
-  transition: margin-left 1s;
+  /* transition: margin-left 1s; */
 }
 
 .page-builder-nav,
@@ -175,13 +192,18 @@ section {
 }
 
 .row-highlight {
-  box-shadow: 0 0 0 1px yellowgreen !important;
-  outline: dashed 1px darkgreen !important;
+  box-shadow: 0 0 0 2px var(--highlight) !important;
+  outline: dashed 2px var(--highlight) !important;
 }
 
 .col-highlight {
-  box-shadow: 0 0 0 1px crimson !important;
-  outline: dashed 1px darkred !important;
+  box-shadow: 0 0 0 2px var(--highlight) !important;
+  outline: dashed 2px var(--highlight) !important;
+}
+
+.col-highlight .module-highlight {
+  box-shadow: 0 0 0 2px var(--highlight) !important;
+  outline: dashed 2px var(--highlight) !important;
 }
 
 .row {
@@ -218,9 +240,11 @@ section {
 
 .edit-module {
   position: absolute;
-  right: -1px;
-  top: -5px;
+  right: -2px;
+  top: -39px;
   z-index: 2;
+  padding: 4px;
+  background-color: var(--highlight);
 }
 
 .module-button {
@@ -240,7 +264,7 @@ section {
 }
 
 .pb .module:hover {
-  box-shadow: 0px 0px 0px 1px pink inset;
+  box-shadow: 0px 0px 0px 1px var(--highlight) inset;
 }
 
 .pb section .col span,
@@ -404,18 +428,23 @@ section {
 .sidebar-expander {
   position: fixed;
   top: calc(50% - 30px);
-  left: -60px;
-  width: 60px;
+  left: -30px;
+  width: 30px;
   height: 60px;
   background-image: url("/assets/img/right-arrow.svg");
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 60px;
-  background-color: rgba(255, 255, 255, 0.3);
+  background-size: 30px;
+  background-color: rgba(0, 0, 0, 0.1);
   border: 0;
-  transition: left 2s;
-  z-index: 999;
+  /* transition: left 1s; */
+  z-index: 10;
   padding: 50px 0;
+}
+
+.sidebar-expander.expanded {
+  left:420px;
+  transform: rotate(180deg);
 }
 
 .sidebar-expander:focus {
