@@ -17,6 +17,7 @@
         data-bs-toggle="popover"
         data-bs-trigger="hover focus"
         data-bs-content="Elements"
+        id="pb-elements"
       ><i class="bi bi-plus-circle"></i></button>
 
       <button
@@ -92,14 +93,35 @@
           ></i></button>
       </div>
     </div>
-    <div class="content">content</div>
+    <div class="content">
+      <div id="pb-content-container"></div>
+    </div>
     <div class="footer">
       <button type="button" class="btn btn-success">
-        <i class="bi bi-save text-primary white"></i> Update
+        <i class="bi bi-save text-primary white"></i>
+        Update
       </button>
     </div>
   </div>
 </div>
+
+<button
+  class="sidebar-expander {{data.sidebarClass}}"
+  id="sidebar-expander"
+  type="button"
+>
+</button>
+
+<!-- elements start-->
+<div id="elements-list" class="hide">
+  {{#each data.modulesForColumns}}
+    <div class="element-item" data-module-id="{{this.systemId}}">
+      <i class="bi bi-plus-square"></i>
+      <span>{{this.title}}</span>
+    </div>
+  {{/each}}
+</div>
+<!-- elements end-->
 
 <!-- <div class="pb-wrapper {{data.sidebarClass}}">
 

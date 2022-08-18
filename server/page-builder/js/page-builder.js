@@ -38,7 +38,7 @@ $(document).ready(async function () {
   setupSidePanel();
   setupAdminMenuMinimizer();
   setupPopovers();
-
+  setupElements();
 });
 
 function setupSessionID() {
@@ -1182,7 +1182,7 @@ async function saveWYSIWYG() {
 }
 
 async function addModule(systemId, sessionID) {
-  showSidePanel();
+  // showSidePanel();
 
   let form = await dataService.formGet(
     systemId,
@@ -1193,7 +1193,8 @@ async function addModule(systemId, sessionID) {
     sessionID
   );
 
-  $(".pb-side-panel #main").html(form.html);
+  $("#pb-content-container").html(form.html);
+  // $(".pb-side-panel #main").html(form.html);
 
   loadModuleSettingForm();
   // $("#moduleSettingsModal")
@@ -1223,7 +1224,7 @@ async function editModule(sessionID) {
 
   // $("#moduleSettingsFormio").html(form);
   // $(".pb-side-panel #main").html(form.html);
-  $("#module-content-container").html(form.html);
+  $("#pb-content-container").html(form.html);
   loadModuleSettingForm();
   // $("#moduleSettingsModal")
   //   .appendTo("body")
@@ -1691,15 +1692,24 @@ async function setupSortable() {
   var columns = jQuery.makeArray(columnsList);
 
   // console.log("columns", columns);
-  columns.forEach((column) => {
+  columns.map((column) => {
     setupSortableColum(column);
   });
 }
 
-async function setupSortableColum(el) {
-  // var el = document.getElementById("main");
-  // var el = document.getElementsByClassName("col-md-9")[0];
+async function setupSortableModules() {
+  // debugger;
+  let elementWrapper = $("#elements-list")[0];
+  setupSortableModule(elementWrapper);
 
+  // let newModuleList = $(".pb-wrapper .element-item");
+  // var modules = jQuery.makeArray(newModuleList);
+  // modules.map((newModule) => {
+  //   setupSortableModule(newModule);
+  // });
+}
+
+async function setupSortableColum(el) {
   if (typeof Sortable !== "undefined") {
     var sortable = new Sortable(el, {
       // Element dragging ended
@@ -1716,6 +1726,35 @@ async function setupSortableColum(el) {
         event.clone; // the clone element
         event.pullMode; // when item is in another sortable: `"clone"` if cloning, `true` if moving
         updateModuleSort(itemEl, event);
+      },
+    });
+  }
+}
+
+async function setupSortableModule(el) {
+  // debugger;
+
+  if (typeof Sortable !== "undefined") {
+    var sortable = new Sortable(el, {
+      // Element dragging ended
+      group: {
+        name: 'shared',
+        pull: 'clone',
+        put: false // Do not allow items to be put into this list
+    },
+      draggable: ".element-item",
+      sort: false,
+      onEnd: function (/**Event*/ event) {
+        var itemEl = event.item; // dragged HTMLElement
+        event.to; // target list
+        event.from; // previous list
+        event.oldIndex; // element's old index within old parent
+        event.newIndex; // element's new index within new parent
+        event.oldDraggableIndex; // element's old index within old parent, only counting draggable elements
+        event.newDraggableIndex; // element's new index within new parent, only counting draggable elements
+        event.clone; // the clone element
+        event.pullMode; // when item is in another sortable: `"clone"` if cloning, `true` if moving
+        addModuleSort(itemEl, event);
       },
     });
   }
@@ -1739,6 +1778,15 @@ async function getModuleHierarchy(element) {
   };
 }
 
+async function addModuleSort(shortCode, event) {
+  // debugger;
+
+  let systemId = event.item.dataset.moduleid;
+  // let sourceColumn = $(event.from)[0].closest('div[class^="col"]');
+  // let destinationColumn = $(event.to)[0].closest('div[class^="col"]');
+  // console.log('adding to', destinationColumn);
+  addModule(systemId, sessionID) 
+}
 async function updateModuleSort(shortCode, event) {
   // debugger;
 
@@ -1830,7 +1878,7 @@ function setupAdminMenuMinimizer() {
 
   $(".sidebar-expander").click(function () {
     // debugger;
-    let isEditMode = Cookies.get("showSidebar") === 'false' ? false : true;
+    let isEditMode = Cookies.get("showSidebar") === "false" ? false : true;
     let showSidebar = !isEditMode;
     Cookies.set("showSidebar", showSidebar);
     toggleSidebar(showSidebar);
@@ -1854,12 +1902,11 @@ function isEditMode() {
 }
 
 function toggleSidebar(showSidebar) {
-
-// debugger;
+  // debugger;
   if (showSidebar) {
     //opening
-    $(".sidebar-expander, .pb-wrapper, html").removeClass('collapsed');
-    $(".sidebar-expander, .pb-wrapper, html").addClass('expanded');
+    $(".sidebar-expander, .pb-wrapper, html").removeClass("collapsed");
+    $(".sidebar-expander, .pb-wrapper, html").addClass("expanded");
     // $("html").removeClass('expanded');
     // $("main, .fixed-top, footer").css("margin-left", "420px");
     // $(".sidebar-expander").css("left", "420px");
@@ -1871,8 +1918,8 @@ function toggleSidebar(showSidebar) {
   } else {
     //closing
     // $(".pb-wrapper").css("left", "-420px");
-    $(".sidebar-expander, .pb-wrapper, html").addClass('collapsed');
-    $(".sidebar-expander, .pb-wrapper, html ").removeClass('expanded');
+    $(".sidebar-expander, .pb-wrapper, html").addClass("collapsed");
+    $(".sidebar-expander, .pb-wrapper, html ").removeClass("expanded");
     // $("main, .fixed-top, footer").css("margin-left", "0");
     // $(".sidebar-expander").css("left", "0");
     // $(".sidebar-expander").removeClass("expanded");
@@ -1929,9 +1976,20 @@ async function setupAdminMediaFormImage() {
   }
 }
 
-function setupPopovers(){
-  var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+function setupPopovers() {
+  var popoverTriggerList = [].slice.call(
+    document.querySelectorAll('[data-bs-toggle="popover"]')
+  );
   var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-    return new bootstrap.Popover(popoverTriggerEl)
-  })
+    return new bootstrap.Popover(popoverTriggerEl);
+  });
+}
+
+function setupElements() {
+  $("#pb-elements").on("click", async function () {
+    const elementsList = $("#elements-list").clone();
+    $("#pb-content-container").html(elementsList);
+    elementsList.removeClass("hide");
+    setupSortableModules();
+  });
 }
