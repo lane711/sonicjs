@@ -1182,13 +1182,13 @@ async function saveWYSIWYG() {
 }
 
 async function addModule(systemId, sessionID) {
-  // showSidePanel();
+  debugger;
 
   let form = await dataService.formGet(
     systemId,
     undefined,
     "addModuleToColumn(submission, true)",
-    true,
+    false,
     undefined,
     sessionID
   );
@@ -1210,6 +1210,7 @@ async function editModule(sessionID) {
 
   let data = await dataService.getContentById(currentModuleId);
 
+  debugger;
   let form = await dataService.formGet(
     currentModuleContentType,
     data,
@@ -1738,10 +1739,10 @@ async function setupSortableModule(el) {
     var sortable = new Sortable(el, {
       // Element dragging ended
       group: {
-        name: 'shared',
-        pull: 'clone',
-        put: false // Do not allow items to be put into this list
-    },
+        name: "shared",
+        pull: "clone",
+        put: false, // Do not allow items to be put into this list
+      },
       draggable: ".element-item",
       sort: false,
       onEnd: function (/**Event*/ event) {
@@ -1781,11 +1782,11 @@ async function getModuleHierarchy(element) {
 async function addModuleSort(shortCode, event) {
   // debugger;
 
-  let systemId = event.item.dataset.moduleid;
+  let systemId = event.item.dataset.moduleId;
   // let sourceColumn = $(event.from)[0].closest('div[class^="col"]');
   // let destinationColumn = $(event.to)[0].closest('div[class^="col"]');
   // console.log('adding to', destinationColumn);
-  addModule(systemId, sessionID) 
+  addModule(systemId, sessionID);
 }
 async function updateModuleSort(shortCode, event) {
   // debugger;
