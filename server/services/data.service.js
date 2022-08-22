@@ -343,11 +343,13 @@ if (typeof module !== "undefined" && module.exports) {
               result.data.data.contentType.data.permissions.find(
                 (p) => p.acl === a
               );
-            result.data.data.contentType.acls =
-              result.data.data.contentType.acls ?? {};
-            result.data.data.contentType.acls[
-              `can${helperService.capitalizeFirstLetter(a)}`
-            ] = _.intersection(viewPermission.roles, userRoles).length !== 0;
+            if (viewPermission) {
+              result.data.data.contentType.acls =
+                result.data.data.contentType.acls ?? {};
+              result.data.data.contentType.acls[
+                `can${helperService.capitalizeFirstLetter(a)}`
+              ] = _.intersection(viewPermission.roles, userRoles).length !== 0;
+            }
           });
         }
       }
