@@ -97,10 +97,23 @@
       <div id="pb-content-container"></div>
     </div>
     <div class="footer">
-      <button type="button" class="btn btn-success">
-        <i class="bi bi-save text-primary white"></i>
-        Update
+
+      <button type="button" 
+      class="btn btn-danger"
+      data-bs-toggle="popover"
+      data-bs-trigger="hover focus"
+      data-bs-content="Undo">
+        <i class="bi bi-arrow-counterclockwise text-primary white"></i>
       </button>
+
+      <button type="button" 
+      class="btn btn-primary"
+      data-bs-toggle="popover"
+      data-bs-trigger="hover focus"
+      data-bs-content="Redo">
+        <i class="bi bi-arrow-clockwise text-primary white"></i>
+      </button>
+
     </div>
   </div>
 </div>
@@ -790,3 +803,4 @@
 
 <script src="/node_modules/@simonwep/pickr/dist/pickr.min.js"></script>
 <script src="/node_modules/sortablejs/Sortable.min.js"></script>
+

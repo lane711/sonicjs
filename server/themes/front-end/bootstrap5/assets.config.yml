@@ -4,6 +4,7 @@ assets:
     - /assets/js/startup.js
     - /node_modules/jquery/dist/jquery.min.js
     - /node_modules/js-cookie/src/js.cookie.js
+    - /themes/admin/light/js/jquery.bootstrap-growl.min.js
     - /node_modules/ace-builds/src-min-noconflict/ace.js
     - /node_modules/ace-builds/src-min-noconflict/ext-beautify.js
     - /node_modules/axios/dist/axios.min.js
