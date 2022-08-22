@@ -1224,7 +1224,7 @@ async function editModule(sessionID) {
 
   let data = await dataService.getContentById(currentModuleId);
 
-  debugger;
+  // debugger;
   let form = await dataService.formGet(
     currentModuleContentType,
     data,

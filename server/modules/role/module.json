@@ -1,8 +1,8 @@
 {
   "title": "Role",
-  "systemId": "role",
-  "version": "0.0.0.1",
   "enabled": true,
-  "canBeAddedToColumn": true,
-  "singleInstance": false
+  "systemId": "role",
+  "canBeAddedToColumn": false,
+  "singleInstance": false,
+  "version": "0.0.0.1"
 }
