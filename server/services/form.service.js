@@ -128,7 +128,7 @@ if (typeof module !== "undefined" && module.exports) {
             req
           );
           // debugger;
-          if (settingContentType && settingContentType.data) {
+          if (settingContentType && settingContentType.filePath && settingContentType.data) {
             contentType = settingContentType;
           }
         }
