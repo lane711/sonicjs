@@ -42,16 +42,16 @@ $(document).ready(async function () {
   setupGrowl();
 });
 
-function setupGrowl(){
+function setupGrowl() {
   $.bootstrapGrowl("another message, yay!", {
-    ele: 'body', // which element to append to
-    type: 'info', // (null, 'info', 'danger', 'success')
-    offset: {from: 'bottom', amount: 20}, // 'top', or 'bottom'
-    align: 'right', // ('left', 'right', or 'center')
+    ele: "body", // which element to append to
+    type: "info", // (null, 'info', 'danger', 'success')
+    offset: { from: "bottom", amount: 20 }, // 'top', or 'bottom'
+    align: "right", // ('left', 'right', or 'center')
     width: 250, // (integer, or 'auto')
     delay: 40000, // Time while the message will be displayed. It's not equivalent to the *demo* timeOut!
     allow_dismiss: false, // If true then will display a cross to close the popup.
-    stackup_spacing: 10 // spacing between consecutively stacked growls.
+    stackup_spacing: 10, // spacing between consecutively stacked growls.
   });
 }
 
@@ -1196,7 +1196,7 @@ async function saveWYSIWYG() {
 }
 
 async function addModule(systemId, sessionID) {
-  debugger;
+  // debugger;
 
   let form = await dataService.formGet(
     systemId,
@@ -2007,4 +2007,21 @@ function setupElements() {
     elementsList.removeClass("hide");
     setupSortableModules();
   });
+}
+
+function pageBuilderFormChanged(data) {
+  console.log("pageBuilderFormChanged", data);
+  //render module (may not have instance yet_
+
+  // debugger;
+
+  axiosInstance
+    .post(`/api/modules/render`,  {data: data.data } )
+    .then(async function (response) {
+      console.log(response);
+      // redirect("/admin/content-types");
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
 }

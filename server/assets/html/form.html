@@ -40,6 +40,10 @@
                     formChanged(changed);
                   }
 
+                  if (typeof pageBuilderFormChanged != "undefined") {
+                    pageBuilderFormChanged(changed);
+                  }
+
                   if (changed.components) {
                     contentTypeComponents = changed.components;
                     console.log("event ->", event);

@@ -13,6 +13,8 @@ var formattingService = require("../services/formatting.service");
 var appRoot = require("app-root-path");
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 
+const connectEnsureLogin = require("connect-ensure-login");
+
 module.exports = moduleService = {
   startup: function (app) {
     emitterService.on("startup", async function ({ app }) {
@@ -26,6 +28,12 @@ module.exports = moduleService = {
         options.page.data.modulesForColumns =
           globalService.moduleDefinitionsForColumns;
       }
+    });
+
+    app.post("/api/modules/render", connectEnsureLogin.ensureLoggedIn(), async function (req, res) {
+      let viewModel = req.body.data;
+      let renderedModule = await moduleService.renderModule(viewModel);
+      res.send(renderedModule);
     });
   },
 
@@ -362,6 +370,23 @@ module.exports = moduleService = {
     }
     return viewPath;
   },
+
+  renderModule: async function(viewModel){
+    let viewPath = await this.getModuleViewFile(viewModel.contentType);
+
+    var processedHtml = {
+      contentType: viewModel.contentType,
+      // shortCode: options.shortcode,
+      body: await this.processView(
+        viewModel.contentType,
+        viewModel,
+        viewPath
+      ),
+    };
+
+    return processedHtml;
+  },
+
   processModuleInColumn: async function (options, viewModel) {
     if (options.shortcode.name === options.moduleName.toUpperCase()) {
       let id = options.shortcode.properties.id;
