@@ -147,16 +147,16 @@
 .pb-wrapper .element-item {
   background: #fff;
   flex-grow: 1;
-  margin: var(--padding);
+  margin: 4px;
   border: 1px dashed var(--medium-grey);
   text-align: center;
   cursor: move;
   width: 40%;
-  padding: var(--padding);
+  padding: 4px;
 }
 
 .pb-wrapper .element-item i {
-  font-size: 26px;
+  font-size: 16px;
   display: block;
 }
 

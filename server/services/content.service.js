@@ -185,54 +185,8 @@ module.exports = contentService = {
     if (page.data && page.data.layout) {
       let sections = page.data.layout;
 
-      await this.asyncForEach(sections, async (sectionId) => {
-        //sections can be overridden at a theme level, let's first check if the section is manually overriden in code
-        let sectionViewPath = `${frontEndTheme}/sections/${sectionId}.hbs`;
-
-        if (await fileService.fileExists(sectionViewPath)) {
-          let sectionContent = await fileService.getFile(sectionViewPath);
-          page.data.html += sectionContent;
-        } else {
-          let section = await dataService.getContentById(sectionId, sessionID);
-          if (section) {
-            if (section.data.content) {
-              //process raw column without rows and columns
-              page.data.html += `${section.data.content}`;
-              await this.processShortCodes(
-                page,
-                section,
-                section.data.content,
-                0,
-                0,
-                req
-              );
-            } else {
-              let sectionClass = section.data.cssClass
-                ? section.data.cssClass + " "
-                : "";
-              let sectionStyle = await this.getSectionBackgroundStyle(section);
-              page.data.html += `<section data-id='${section.id}' class="${sectionClass}jumbotron-fluid pb ${sectionStyle?.css}" style="${sectionStyle?.style}">`;
-              page.data.html += '<div class="section-overlay">';
-              page.data.html += '<div class="container">';
-              let rows;
-              rows = await this.processRows(
-                page,
-                section,
-                section.data.rows,
-                req
-              );
-              page.data.html += "</div>";
-              page.data.html += "</div>";
-              page.data.html += `</section>`;
-
-              page.data.sections.push({
-                id: sectionId,
-                title: section.data.title,
-                rows: rows,
-              });
-            }
-          }
-        }
+      sections.map(async (sectionId) => {
+        await this.renderSection(page, sectionId, sessionID, req);
       });
 
       // sectionWrapper.append(page.data.html);
@@ -252,6 +206,54 @@ module.exports = contentService = {
     }
   },
 
+  renderSection: async function (page, sectionId, sessionID, req, sectionData) {
+    console.log('rendering section', sectionId);
+    //sections can be overridden at a theme level, let's first check if the section is manually overriden in code
+    let sectionViewPath = `${frontEndTheme}/sections/${sectionId}.hbs`;
+
+    if (await fileService.fileExists(sectionViewPath)) {
+      let sectionContent = await fileService.getFile(sectionViewPath);
+      page.data.html += sectionContent;
+    } else {
+      let section = await dataService.getContentById(sectionId, sessionID);
+      if (section) {
+        section.data = sectionData ?? section.data;
+
+        if (section.data.content) {
+          //process raw column without rows and columns
+          page.data.html += `${section.data.content}`;
+          await this.processShortCodes(
+            page,
+            section,
+            section.data.content,
+            0,
+            0,
+            req
+          );
+        } else {
+          let sectionClass = section.data.cssClass
+            ? section.data.cssClass + " "
+            : "";
+          let sectionStyle = await this.getSectionBackgroundStyle(section);
+          page.data.html += `<section data-id='${section.id}' class="${sectionClass}jumbotron-fluid pb ${sectionStyle?.css}" style="${sectionStyle?.style}">`;
+          page.data.html += '<div class="section-overlay">';
+          page.data.html += '<div class="container">';
+          let rows;
+          rows = await this.processRows(page, section, section.data.rows, req);
+          page.data.html += "</div>";
+          page.data.html += "</div>";
+          page.data.html += `</section>`;
+
+          page.data.sections.push({
+            id: sectionId,
+            title: section.data.title,
+            rows: rows,
+          });
+        }
+      }
+    }
+  },
+
   getSectionBackgroundStyle: async function (section) {
     if (section.data.background) {
       let style = "";
@@ -261,7 +263,7 @@ module.exports = contentService = {
 
       switch (section.data.background) {
         case "color":
-          let colorRGBA = section.data.background.color;
+          let colorRGBA = section.data.color;
           if (colorRGBA) {
             style = `background:${colorRGBA};`;
           }

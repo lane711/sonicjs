@@ -108,42 +108,11 @@ function setupUIHovers() {
       $(`section[id='${sectionId}']`).removeClass("section-highlight");
     },
   });
-
-  $(".mini-layout .pb-row").on({
-    mouseenter: function () {
-      let sectionId = getParentSectionId($(this));
-      let rowIndex = $(this).index();
-      getRow(sectionId, rowIndex).addClass("row-highlight");
-    },
-    mouseleave: function () {
-      let sectionId = getParentSectionId($(this));
-      let rowIndex = $(this).index();
-      getRow(sectionId, rowIndex).removeClass("row-highlight");
-    },
-  });
-
-  $(".mini-layout .pb-row .col").on({
-    mouseenter: function () {
-      let sectionId = getParentSectionId($(this));
-      let parentRow = getParentRow(this);
-      let rowIndex = $(this).parent().index();
-      let colIndex = $(this).index() + 1;
-      getColumn(sectionId, rowIndex, colIndex).addClass("col-highlight");
-    },
-    mouseleave: function () {
-      let sectionId = getParentSectionId($(this));
-      let parentRow = getParentRow(this);
-      let rowIndex = $(this).parent().index();
-      let colIndex = $(this).index() + 1;
-      getColumn(sectionId, rowIndex, colIndex).removeClass("col-highlight");
-    },
-  });
 }
 
 function disableUIHoversAndClicks() {
   $(".pb-section").off();
-  $(".mini-layout .pb-row").off();
-  $(".mini-layout .pb-row .col").off();
+
   $("section .row > *").off();
   $("section .row .module").off();
   removeAllHighlights();
@@ -161,56 +130,26 @@ function removeAllHighlights() {
 function setupUIClicks() {
   $("html").addClass("pb");
 
-  $(".mini-layout .pb-row").on({
-    click: function () {
-      currentSectionId = getParentSectionId($(this));
-      currentRowIndex = $(this).index();
-      console.log("currentRowIndex pbrow", currentRowIndex);
-      currentRow = getRow(currentSectionId, currentRowIndex).addClass(
-        "row-highlight"
-      );
-      $(".row-button").show().appendTo(currentRow);
-    },
-  });
-
-  $(".mini-layout .pb-row .col").on({
-    click: function () {
-      currentSectionId = getParentSectionId($(this));
-      currentRow = getParentRow(this);
-      currentRowIndex = $(this).parent().index();
-      console.log("currentRowIndex pbcol", currentRowIndex);
-      currentColumnIndex = $(this).index() + 1;
-      currentColumn = getColumn(
-        currentSectionId,
-        currentRowIndex,
-        currentColumnIndex
-      ).addClass("col-highlight");
-      $(".col-button").show().appendTo(currentColumn);
-    },
-  });
-
-  $("section .row > *").on({
-    click: function () {
-      // debugger;
-      $(".col-highlight").removeClass("col-highlight");
-      $(".block-edit").removeClass("block-edit");
-      currentSectionId = $(this).closest("section").data("id");
-      if (currentSectionId) {
-        currentRow = $(this).closest(".row")[0];
-        $(this).closest(".row").addClass("row-highlight");
-        currentRowIndex = $(this).closest(".row").index();
-        console.log("currentRowIndex pbcol", currentRowIndex);
-        currentColumnIndex = $(this).index() + 1;
-        currentColumn = $(this);
-        currentColumn.addClass("col-highlight");
-        $(".col-button").show().appendTo(currentColumn);
-        $(".add-module").show().appendTo(currentColumn);
-        $(".row-button").show().appendTo(currentRow);
-      }
-      // $('.block-button').show().appendTo(currentColumn.children('.module'));
-      // currentColumn.children('.module').addClass('block-edit');
-    },
-  });
+  // $("section .row > *").on({
+  //   click: function () {
+  //     // debugger;
+  //     $(".col-highlight").removeClass("col-highlight");
+  //     $(".block-edit").removeClass("block-edit");
+  //     currentSectionId = $(this).closest("section").data("id");
+  //     if (currentSectionId) {
+  //       currentRow = $(this).closest(".row")[0];
+  //       $(this).closest(".row").addClass("row-highlight");
+  //       currentRowIndex = $(this).closest(".row").index();
+  //       console.log("currentRowIndex pbcol", currentRowIndex);
+  //       currentColumnIndex = $(this).index() + 1;
+  //       currentColumn = $(this);
+  //       currentColumn.addClass("col-highlight");
+  //       $(".col-button").show().appendTo(currentColumn);
+  //       $(".add-module").show().appendTo(currentColumn);
+  //       $(".row-button").show().appendTo(currentRow);
+  //     }
+  //   },
+  // });
 
   // debugger;
   $("section .row .module").on({
@@ -218,24 +157,26 @@ function setupUIClicks() {
       // debugger;
       $(".module-highlight").removeClass("module-highlight");
       let moduleDiv = $(this).closest(".module");
-      moduleDiv.addClass("module-highlight");
-      currentModuleId = moduleDiv.data("id");
-      currentModuleIndex = $(moduleDiv).index();
-      currentModuleContentType = moduleDiv.data("content-type");
-      currentSection = $(this)[0].closest("section");
-      currentSectionId = currentSection.dataset.id;
-      currentRow = $(this)[0].closest(".row");
-      currentRowIndex = $(currentRow).index();
-      currentColumn = $(this)[0].closest('div[class^="col"]');
-      currentColumnIndex = $(currentColumn).index();
-
-      console.log("moduleId", currentModuleId);
-      $(".edit-module").show().appendTo(moduleDiv);
-
-      // debugger;
+      setCurrentIds(moduleDiv);
       editModule(sessionID);
     },
   });
+}
+
+function setCurrentIds(moduleDiv) {
+  moduleDiv.addClass("module-highlight");
+  currentModuleId = moduleDiv.data("id");
+  currentModuleIndex = $(moduleDiv).index();
+  currentModuleContentType = moduleDiv.data("content-type");
+  currentSection = $(moduleDiv)[0].closest("section");
+  currentSectionId = currentSection.dataset.id;
+  currentRow = $(moduleDiv)[0].closest(".row");
+  currentRowIndex = $(currentRow).index();
+  currentColumn = $(moduleDiv)[0].closest('div[class^="col"]');
+  currentColumnIndex = $(currentColumn).index();
+
+  console.log("moduleId", currentModuleId);
+  $(".edit-module").show().appendTo(moduleDiv);
 }
 
 function getParentSectionId(el) {
@@ -259,12 +200,40 @@ async function setupClickEvents() {
   // $('.add-section').on("click", async function () {
   //     await addSection();
   // });
+  setupBreadcrumbEvents();
   setupSectionBackgroundEvents();
 }
 
 async function getCurrentSection() {
   currentSectionRecord = await dataService.getContentById(currentSectionId);
   return currentSectionRecord;
+}
+async function setupBreadcrumbEvents() {
+  $(".select-current-section").on("click", async function () {
+    console.log("current section", currentSectionId);
+
+    // debugger;
+    let data = await dataService.getContentById(currentSectionId);
+    let form = await dataService.formGet(
+      "section",
+      data,
+      "await submitContent(submission);",
+      false,
+      undefined,
+      sessionID
+    );
+
+    $("#pb-content-container").html(form.html);
+    loadModuleSettingForm();
+  });
+
+  $(".select-current-row").on("click", async function () {
+    console.log("current row", currentRow);
+  });
+
+  $(".select-current-column").on("click", async function () {
+    console.log("current column", currentColumn);
+  });
 }
 
 async function setupSectionBackgroundEvents() {
@@ -834,75 +803,6 @@ async function setupFormBuilder(contentType) {
       });
     }
   );
-
-  // Formio.builder(document.getElementById('formBuilder'), componentsToLoad)
-  //     .then(async function (form) {
-  //         form.on('submit', async function (submission) {
-  //             debugger;
-  //             console.log('submission ->', submission);
-  //             //TODO: copy logic from admin app to save data
-  //             // let entity = {id: submission.data.id, url: submission.data.url, data: submission.data}
-  //             if (action == 'add') {
-  //                 // debugger;
-  //                 //need create default block, etc
-  //                 // submission.data.contentType = contentType;
-  //                 // await createInstance(submission.data);
-  //                 // await postProcessNewContent(submission.data);
-  //                 // await redirect(submission.data.url);
-  //             }
-  //             else {
-  //                 //editing current
-  //                 // debugger;
-  //                 // let entity = processContentFields(submission.data)
-  //                 // await editInstance(entity);
-  //                 // fullPageUpdate();
-  //             }
-
-  //             // debugger;
-
-  //             // for(var name in submission.data) {
-  //             //     var value = submission.data[name];
-  //             //     page.data[name] = value;
-  //             // }
-  //         });;
-
-  // let formio = Formio.createForm(document.getElementById('formBuilder'), {
-  //     components: componentsToLoad
-  // }).then(async function (form) {
-  //     form.submission = {
-  //         // data: formValuesToLoad
-  //     };
-  //     form.on('submit', async function (submission) {
-  //         console.log('submission ->', submission);
-  //         //TODO: copy logic from admin app to save data
-  //         // let entity = {id: submission.data.id, url: submission.data.url, data: submission.data}
-  //         if (action == 'add') {
-  //             // debugger;
-  //             //need create default block, etc
-  //             submission.data.contentType = contentType;
-  //             await createInstance(submission.data);
-  //             await postProcessNewContent(submission.data);
-  //             await redirect(submission.data.url);
-  //         }
-  //         else {
-  //             //editing current
-  //             // debugger;
-  //             let entity = processContentFields(submission.data)
-  //             await editInstance(entity);
-  //             fullPageUpdate();
-  //         }
-
-  //         // debugger;
-
-  //         // for(var name in submission.data) {
-  //         //     var value = submission.data[name];
-  //         //     page.data[name] = value;
-  //         // }
-  //     });
-  //     form.on('error', (errors) => {
-  //         console.log('We have errors!');
-  //     })
-  // });
 }
 
 async function onContentTypeSave() {
@@ -1207,6 +1107,8 @@ async function addModule(systemId, sessionID) {
     sessionID
   );
 
+  console.log("adding module form", form.contentType.systemId);
+
   $("#pb-content-container").html(form.html);
   // $(".pb-side-panel #main").html(form.html);
 
@@ -1290,7 +1192,7 @@ async function deleteModuleConfirm(deleteContent = false) {
   let payload = { data: {} };
   payload.data.sectionId = currentSectionId;
   payload.data.rowIndex = currentRowIndex;
-  payload.data.columnIndex = currentColumnIndex - 1;
+  payload.data.columnIndex = currentColumnIndex;
   payload.data.moduleId = currentModuleId;
 
   //need to ignore template regions
@@ -1450,6 +1352,7 @@ function getPageTemplateRegion(page, sourceColumn, destinationColumn) {
 }
 
 async function addModuleToColumn(submission) {
+  // debugger;
   let entity = processContentFields(submission.data);
 
   let {
@@ -1505,9 +1408,8 @@ async function addModuleToColumn(submission) {
   } else {
     //add the shortCode to the column
     let section = await dataService.getContentById(currentSectionId);
-    let column =
-      section.data.rows[currentRowIndex].columns[currentColumnIndex - 1];
-    column.content += moduleInstanceShortCode;
+    let column = section.data.rows[currentRowIndex].columns[currentColumnIndex];
+    column.content.push({ content: moduleInstanceShortCode });
     editInstance(section);
   }
 
@@ -1761,6 +1663,8 @@ async function setupSortableModule(el) {
       sort: false,
       onEnd: function (/**Event*/ event) {
         var itemEl = event.item; // dragged HTMLElement
+        const item = $(itemEl);
+        item.addClass("current-drop");
         event.to; // target list
         event.from; // previous list
         event.oldIndex; // element's old index within old parent
@@ -1769,7 +1673,7 @@ async function setupSortableModule(el) {
         event.newDraggableIndex; // element's new index within new parent, only counting draggable elements
         event.clone; // the clone element
         event.pullMode; // when item is in another sortable: `"clone"` if cloning, `true` if moving
-        addModuleSort(itemEl, event);
+        addModuleSort(item, event);
       },
     });
   }
@@ -1793,13 +1697,14 @@ async function getModuleHierarchy(element) {
   };
 }
 
-async function addModuleSort(shortCode, event) {
+async function addModuleSort(item, event) {
   // debugger;
 
   let systemId = event.item.dataset.moduleId;
   // let sourceColumn = $(event.from)[0].closest('div[class^="col"]');
   // let destinationColumn = $(event.to)[0].closest('div[class^="col"]');
   // console.log('adding to', destinationColumn);
+  setCurrentIds(item);
   addModule(systemId, sessionID);
 }
 async function updateModuleSort(shortCode, event) {
@@ -2010,16 +1915,55 @@ function setupElements() {
 }
 
 function pageBuilderFormChanged(data) {
+  // debugger;
+
+  if (globalService.isBackEnd()) {
+    return;
+  }
+
+  if ($.isEmptyObject(data.data)) {
+    return;
+  }
+
+  if (!data.changed) {
+    return;
+  }
+
   console.log("pageBuilderFormChanged", data);
   //render module (may not have instance yet_
 
-  // debugger;
 
   axiosInstance
-    .post(`/api/modules/render`,  {data: data.data } )
+  .post(`/api/modules/render`, { data: data.data })
+  .then(async function (response) {
+    console.log("render response", response);
+    if (response.data.type === "module") {
+      $(".current-drop").html(response.data.html);
+    } else if (response.data.type === "section") {
+      // debugger;
+      $(`section[data-id="${data.data.id}"]`).replaceWith(response.data.html);
+    }
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+
+  
+  // savePBData(data);
+
+}
+
+function savePBData(data){
+  axiosInstance
+    .post(`/api/modules/render`, { data: data.data })
     .then(async function (response) {
-      console.log(response);
-      // redirect("/admin/content-types");
+      console.log("render response", response);
+      if (response.data.type === "module") {
+        $(".current-drop").html(response.data.html);
+      } else if (response.data.type === "section") {
+        // debugger;
+        $(`section[data-id="${data.data.id}"]`).replaceWith(response.data.html);
+      }
     })
     .catch(function (error) {
       console.log(error);

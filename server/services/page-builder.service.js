@@ -64,29 +64,32 @@ module.exports = pageBuilderService = {
         );
         let content =
           section.data.rows[data.rowIndex].columns[data.columnIndex].content;
+
+          content = content.filter(c => !c.content.includes(data.moduleId.toString()));
+          await dataService.editInstance(section, req.sessionID);
         // console.log("content", content);
 
         // remove shortcode from the source column
-        let shortCodesInColumn = ShortcodeTree.parse(content);
-        shortCodeToRemove = shortCodesInColumn.children.filter(
-          (x) => x.shortcode.properties.id === data.moduleId.toString()
-        )[0];
-        // console.log("shortCodeToRemove", shortCodeToRemove);
-        if (shortCodeToRemove && shortCodeToRemove.shortcode) {
-          let newContent = content.replace(
-            shortCodeToRemove.shortcode.codeText,
-            ""
-          );
-          section.data.rows[data.rowIndex].columns[data.columnIndex].content =
-            newContent;
-          // console.log("newContent", newContent);
-          await dataService.editInstance(section, req.sessionID);
-        }
+        // let shortCodesInColumn = ShortcodeTree.parse(content);
+        // shortCodeToRemove = shortCodesInColumn.children.filter(
+        //   (x) => x.shortcode.properties.id === data.moduleId.toString()
+        // )[0];
+        // // console.log("shortCodeToRemove", shortCodeToRemove);
+        // if (shortCodeToRemove && shortCodeToRemove.shortcode) {
+        //   let newContent = content.replace(
+        //     shortCodeToRemove.shortcode.codeText,
+        //     ""
+        //   );
+        //   section.data.rows[data.rowIndex].columns[data.columnIndex].content =
+        //     newContent;
+        //   // console.log("newContent", newContent);
+        //   await dataService.editInstance(section, req.sessionID);
+        // }
       }
 
       if (data.deleteContent) {
         await dataService.contentDelete(
-          shortCodeToRemove.shortcode.properties.id,
+          data.moduleId,
           req.sessionID
         );
       }
