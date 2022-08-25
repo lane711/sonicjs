@@ -44,7 +44,7 @@ module.exports = moduleService = {
             res.send({type:'section', html: page.data.html});
           } else {
             let renderedModule = await moduleService.renderModule(viewModel);
-            res.send({type:'section', html: renderedModule});
+            res.send({type:'module', html: renderedModule});
           }
         }
       }
@@ -398,7 +398,7 @@ module.exports = moduleService = {
       ),
     };
 
-    let id = "unsaved";
+    let id = viewModel.id ?? "unsaved";
 
     let wrappedDiv = formattingService.generateModuleDivWrapper(
       id,

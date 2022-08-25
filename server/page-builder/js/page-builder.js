@@ -1932,40 +1932,29 @@ function pageBuilderFormChanged(data) {
   console.log("pageBuilderFormChanged", data);
   //render module (may not have instance yet_
 
-
-  axiosInstance
-  .post(`/api/modules/render`, { data: data.data })
-  .then(async function (response) {
-    console.log("render response", response);
-    if (response.data.type === "module") {
-      $(".current-drop").html(response.data.html);
-    } else if (response.data.type === "section") {
-      // debugger;
-      $(`section[data-id="${data.data.id}"]`).replaceWith(response.data.html);
-    }
-  })
-  .catch(function (error) {
-    console.log(error);
-  });
-
-  
-  // savePBData(data);
-
+  savePBData(data);
 }
 
-function savePBData(data){
+// var returnedFunction = debounce(savePBData(data), 2000);
+
+function savePBData(formData) {
+  console.log("savePBData saving...");
   axiosInstance
-    .post(`/api/modules/render`, { data: data.data })
+    .post(`/api/modules/render`, { data: formData.data })
     .then(async function (response) {
       console.log("render response", response);
+    
       if (response.data.type === "module") {
-        $(".current-drop").html(response.data.html);
+        $(`div[data-id="${formData.data.id}"]`).replaceWith(response.data.html);
+
+        // $(".current-drop").html(response.data.html);
       } else if (response.data.type === "section") {
         // debugger;
-        $(`section[data-id="${data.data.id}"]`).replaceWith(response.data.html);
+        $(`section[data-id="${formData.data.id}"]`).replaceWith(response.data.html);
       }
     })
     .catch(function (error) {
       console.log(error);
     });
 }
+
