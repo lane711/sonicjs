@@ -41,10 +41,10 @@ module.exports = moduleService = {
             let page = { data: { html: '', sections: []}}
             let sectionId = viewModel.id;
             let renderedModule = await contentService.renderSection(page, sectionId, req.sessionID, req, viewModel)
-            res.send({type:'section', html: page.data.html});
+            res.send({id: sectionId, type:'section', html: page.data.html});
           } else {
             let renderedModule = await moduleService.renderModule(viewModel);
-            res.send({type:'module', html: renderedModule});
+            res.send({id: viewModel.id, type:'module', html: renderedModule});
           }
         }
       }

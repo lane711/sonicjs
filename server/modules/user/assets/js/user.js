@@ -142,6 +142,7 @@ async function submitContent(
   refresh = true,
   contentType = "content"
 ) {
+  debugger;
   console.log("Submission was made!", submission);
   let entity = submission.data ? submission.data : submission;
   entity.contentType = entity.contentType ?? contentType;
@@ -180,7 +181,12 @@ async function submitContent(
   // }
 }
 
-async function editInstance(payload, refresh, contentType = "content") {
+async function editInstance(
+  payload,
+  refresh,
+  contentType = "content",
+  growlMessage
+) {
   if (contentType === "user") {
     contentType = "users";
   }
@@ -197,6 +203,8 @@ async function editInstance(payload, refresh, contentType = "content") {
         } else {
           fullPageUpdate();
         }
+      } else if (growlMessage) {
+        addGrowl(growlMessage);
       } else if (refresh) {
         fullPageUpdate();
       }
@@ -260,4 +268,17 @@ function postSubmissionSuccessMessage(message) {
 
 function redirectToUrl(url) {
   window.location.href = url;
+}
+
+function addGrowl(message) {
+  $.bootstrapGrowl(message, {
+    ele: "body", // which element to append to
+    type: "info", // (null, 'info', 'danger', 'success')
+    offset: { from: "bottom", amount: 20 }, // 'top', or 'bottom'
+    align: "right", // ('left', 'right', or 'center')
+    width: 250, // (integer, or 'auto')
+    delay: 2500, // Time while the message will be displayed. It's not equivalent to the *demo* timeOut!
+    allow_dismiss: false, // If true then will display a cross to close the popup.
+    stackup_spacing: 10, // spacing between consecutively stacked growls.
+  });
 }

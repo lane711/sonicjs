@@ -22,7 +22,7 @@ var imageList,
 $(document).ready(async function () {
   setupSessionID();
   setupThemeID();
-  setupUIHovers();
+  // setupUIHovers();
   setupUIClicks();
   setupClickEvents();
   setupJsonEditor();
@@ -39,21 +39,7 @@ $(document).ready(async function () {
   setupAdminMenuMinimizer();
   setupPopovers();
   setupElements();
-  setupGrowl();
 });
-
-function setupGrowl() {
-  $.bootstrapGrowl("another message, yay!", {
-    ele: "body", // which element to append to
-    type: "info", // (null, 'info', 'danger', 'success')
-    offset: { from: "bottom", amount: 20 }, // 'top', or 'bottom'
-    align: "right", // ('left', 'right', or 'center')
-    width: 250, // (integer, or 'auto')
-    delay: 40000, // Time while the message will be displayed. It's not equivalent to the *demo* timeOut!
-    allow_dismiss: false, // If true then will display a cross to close the popup.
-    stackup_spacing: 10, // spacing between consecutively stacked growls.
-  });
-}
 
 function setupSessionID() {
   sessionID = $("#sessionID").val();
@@ -97,18 +83,18 @@ function axiosTest() {
     });
 }
 
-function setupUIHovers() {
-  $(".pb-section").on({
-    mouseenter: function () {
-      let sectionId = getParentSectionId($(this));
-      $(`section[id='${sectionId}']`).addClass("section-highlight");
-    },
-    mouseleave: function () {
-      let sectionId = getParentSectionId($(this));
-      $(`section[id='${sectionId}']`).removeClass("section-highlight");
-    },
-  });
-}
+// function setupUIHovers() {
+//   $(".pb-section").on({
+//     mouseenter: function () {
+//       let sectionId = getParentSectionId($(this));
+//       $(`section[id='${sectionId}']`).addClass("section-highlight");
+//     },
+//     mouseleave: function () {
+//       let sectionId = getParentSectionId($(this));
+//       $(`section[id='${sectionId}']`).removeClass("section-highlight");
+//     },
+//   });
+// }
 
 function disableUIHoversAndClicks() {
   $(".pb-section").off();
@@ -116,15 +102,15 @@ function disableUIHoversAndClicks() {
   $("section .row > *").off();
   $("section .row .module").off();
   removeAllHighlights();
-  $(".edit-module").hide();
-  $(".section-editor-button").hide();
+  // $(".edit-module").hide();
+  // $(".section-editor-button").hide();
 }
 
 function removeAllHighlights() {
-  $(".row-highlight").removeClass("row-highlight");
-  $(".col-highlight").removeClass("col-highlight");
-  $(".block-edit").removeClass("block-edit");
-  $("html").removeClass("pb");
+  // $(".row-highlight").removeClass("row-highlight");
+  // $(".col-highlight").removeClass("col-highlight");
+  // $(".block-edit").removeClass("block-edit");
+  // $("html").removeClass("pb");
 }
 
 function setupUIClicks() {
@@ -154,29 +140,35 @@ function setupUIClicks() {
   // debugger;
   $("section .row .module").on({
     click: function () {
-      // debugger;
-      $(".module-highlight").removeClass("module-highlight");
-      let moduleDiv = $(this).closest(".module");
-      setCurrentIds(moduleDiv);
+      let moduleDiv = $(this).closest(".module")[0];
+      setCurrentIds(moduleDiv.dataset.id);
       editModule(sessionID);
     },
   });
 }
 
-function setCurrentIds(moduleDiv) {
-  moduleDiv.addClass("module-highlight");
-  currentModuleId = moduleDiv.data("id");
+function setCurrentIds(moduleId) {
+  let moduleDiv = $(`div[data-id="${moduleId}"]`)[0];
+
+  //reset
+  $(".module-highlight").removeClass("module-highlight");
+
+
+  currentModuleId = moduleDiv.dataset.id;
   currentModuleIndex = $(moduleDiv).index();
-  currentModuleContentType = moduleDiv.data("content-type");
-  currentSection = $(moduleDiv)[0].closest("section");
+  currentModuleContentType = moduleDiv.dataset.contentType;
+  currentSection = $(moduleDiv).closest("section")[0];
   currentSectionId = currentSection.dataset.id;
-  currentRow = $(moduleDiv)[0].closest(".row");
+  currentRow = $(moduleDiv).closest(".row");
   currentRowIndex = $(currentRow).index();
-  currentColumn = $(moduleDiv)[0].closest('div[class^="col"]');
+  currentColumn = $(moduleDiv).closest('div[class^="col"]');
   currentColumnIndex = $(currentColumn).index();
 
-  console.log("moduleId", currentModuleId);
-  $(".edit-module").show().appendTo(moduleDiv);
+  console.log(`setting current ids, section: ${currentSectionId}, moduleId: ${currentModuleId}`);
+  $(moduleDiv).addClass("module-highlight");
+  $(currentSection).addClass('current-section');
+
+  $(".edit-module").clone().appendTo(moduleDiv).show();
 }
 
 function getParentSectionId(el) {
@@ -1101,13 +1093,13 @@ async function addModule(systemId, sessionID) {
   let form = await dataService.formGet(
     systemId,
     undefined,
-    "addModuleToColumn(submission, true)",
+    `addModuleToColumn(submission, false, undefined, "${systemId} Module Added")`,
     false,
     undefined,
     sessionID
   );
 
-  console.log("adding module form", form.contentType.systemId);
+  console.log("adding module type:", form.contentType.systemId);
 
   $("#pb-content-container").html(form.html);
   // $(".pb-side-panel #main").html(form.html);
@@ -1126,11 +1118,12 @@ async function editModule(sessionID) {
 
   let data = await dataService.getContentById(currentModuleId);
 
+  let message = `Updated ${currentModuleContentType} module`;
   // debugger;
   let form = await dataService.formGet(
     currentModuleContentType,
     data,
-    "await editInstance(submission, true);",
+    `await editInstance(submission, false, undefined, "${message}");`,
     true,
     undefined,
     sessionID
@@ -1925,7 +1918,7 @@ function pageBuilderFormChanged(data) {
     return;
   }
 
-  if (!data.changed) {
+  if (data.changed == undefined) {
     return;
   }
 
@@ -1943,18 +1936,26 @@ function savePBData(formData) {
     .post(`/api/modules/render`, { data: formData.data })
     .then(async function (response) {
       console.log("render response", response);
-    
-      if (response.data.type === "module") {
-        $(`div[data-id="${formData.data.id}"]`).replaceWith(response.data.html);
 
-        // $(".current-drop").html(response.data.html);
+      if (response.data.type === "module") {
+        console.log('replacing module', response.data.id);
+        if (response.data.id) {
+          let moduleDiv = $(`div[data-id="${response.data.i}"]`);
+          moduleDiv.replaceWith(
+            response.data.html
+          );
+          setCurrentIds(response.data.id);
+        } else {
+          $(`.current-drop, div[data-id="unsaved"]`).replaceWith(response.data.html);
+        }
       } else if (response.data.type === "section") {
-        // debugger;
-        $(`section[data-id="${formData.data.id}"]`).replaceWith(response.data.html);
+        console.log('replacing section', formData.data.id);
+        $(`section[data-id="${formData.data.id}"]`).replaceWith(
+          response.data.html
+        );
       }
     })
     .catch(function (error) {
       console.log(error);
     });
 }
-

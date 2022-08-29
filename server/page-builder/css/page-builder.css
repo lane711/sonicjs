@@ -477,12 +477,14 @@ section {
   background-color: slateblue;
 }
 
-.edit-module .btn-secondary {
-  background-color: skyblue;
-}
-
 .pb .module:hover {
   box-shadow: 0px 0px 0px 1px var(--highlight) inset;
+}
+
+.pb .current-section {
+  box-shadow: 0px 0px 0px 4px var(--highlight) inset;
+  /* border-top: 4px solid var(--highlight);
+  border-bottom: 4px solid var(--highlight); */
 }
 
 .pb section .col span,

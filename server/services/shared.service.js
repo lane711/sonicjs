@@ -37,7 +37,7 @@
     var url = window.location.href;
     var arr = url.split("/");
     var result = arr[0] + "//" + arr[2];
-    console.log('getBaseUrl', result)
+    // console.log('getBaseUrl', result)
     return result;
   };
 
