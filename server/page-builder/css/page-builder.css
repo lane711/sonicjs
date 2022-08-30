@@ -166,6 +166,12 @@
 }
 /* elements end */
 
+/* growl */
+.bootstrap-growl{
+  font-weight: bold;
+  /* border: #fff 10px dashed; */
+}
+
 /* .pb-wrapper .left-sidebar {
   background-color: var(--white);
 
@@ -419,7 +425,7 @@ section {
   outline: dashed 2px var(--highlight) !important;
 }
 
-.col-highlight .module-highlight {
+.module.module-highlight {
   box-shadow: 0 0 0 2px var(--highlight) !important;
   outline: dashed 2px var(--highlight) !important;
 }
@@ -757,4 +763,8 @@ section {
 .pb-wrapper .white,
 .pb-wrapper .white a {
   color: #fff !important;
+}
+
+.formio-component-form .has-success .help-block {
+  display: none;
 }

@@ -17,7 +17,8 @@ var imageList,
   ShortcodeTree,
   jsonEditorRaw,
   sessionID,
-  theme;
+  theme,
+  formSubmitted = false;
 
 $(document).ready(async function () {
   setupSessionID();
@@ -147,12 +148,17 @@ function setupUIClicks() {
   });
 }
 
-function setCurrentIds(moduleId) {
-  let moduleDiv = $(`div[data-id="${moduleId}"]`)[0];
+function setCurrentIds(moduleId, newDrop = false) {
+  let moduleDiv;
+  if (newDrop) {
+    moduleDiv = $(".current-drop")[0];
+  } else {
+    moduleDiv = $(`div[data-id="${moduleId}"]`)[0];
+  }
 
   //reset
   $(".module-highlight").removeClass("module-highlight");
-
+  $(".edit-module.cloned").remove();
 
   currentModuleId = moduleDiv.dataset.id;
   currentModuleIndex = $(moduleDiv).index();
@@ -164,11 +170,13 @@ function setCurrentIds(moduleId) {
   currentColumn = $(moduleDiv).closest('div[class^="col"]');
   currentColumnIndex = $(currentColumn).index();
 
-  console.log(`setting current ids, section: ${currentSectionId}, moduleId: ${currentModuleId}`);
+  console.log(
+    `setting current ids, section: ${currentSectionId}, moduleId: ${currentModuleId}`
+  );
   $(moduleDiv).addClass("module-highlight");
-  $(currentSection).addClass('current-section');
+  $(currentSection).addClass("current-section");
 
-  $(".edit-module").clone().appendTo(moduleDiv).show();
+  $(".edit-module").clone().addClass("cloned").appendTo(moduleDiv).show();
 }
 
 function getParentSectionId(el) {
@@ -1123,7 +1131,7 @@ async function editModule(sessionID) {
   let form = await dataService.formGet(
     currentModuleContentType,
     data,
-    `await editInstance(submission, false, undefined, "${message}");`,
+    `await updatePBModule(submission, false, undefined, "${message}");`,
     true,
     undefined,
     sessionID
@@ -1139,6 +1147,19 @@ async function editModule(sessionID) {
   // $("#moduleSettingsModal")
   //   .appendTo("body")
   //   .modal("show");
+}
+
+async function updatePBModule(
+  payload,
+  refresh,
+  contentType = "content",
+  growlMessage
+) {
+  console.log("updatePBModule", payload);
+  formSubmitted = true;
+  await editInstance(payload, false, undefined, growlMessage);
+  //reset form
+  // await editModule(sessionID);
 }
 
 async function deleteModule() {
@@ -1697,7 +1718,7 @@ async function addModuleSort(item, event) {
   // let sourceColumn = $(event.from)[0].closest('div[class^="col"]');
   // let destinationColumn = $(event.to)[0].closest('div[class^="col"]');
   // console.log('adding to', destinationColumn);
-  setCurrentIds(item);
+  setCurrentIds(item, true);
   addModule(systemId, sessionID);
 }
 async function updateModuleSort(shortCode, event) {
@@ -1922,6 +1943,18 @@ function pageBuilderFormChanged(data) {
     return;
   }
 
+  // if (formSubmitted) {
+  //   //reset 
+  //   formSubmitted = false;
+  //   return;
+  // }
+
+  // if (data.state === "submitted") {
+  //   console.log("IGNORING SUBMIT BUTTON CHANGE");
+  //   debugger;
+  //   return;
+  // }
+
   console.log("pageBuilderFormChanged", data);
   //render module (may not have instance yet_
 
@@ -1938,18 +1971,18 @@ function savePBData(formData) {
       console.log("render response", response);
 
       if (response.data.type === "module") {
-        console.log('replacing module', response.data.id);
+        console.log("replacing module", response.data.id);
         if (response.data.id) {
-          let moduleDiv = $(`div[data-id="${response.data.i}"]`);
-          moduleDiv.replaceWith(
-            response.data.html
-          );
+          let moduleDiv = $(`div[data-id="${response.data.id}"]`);
+          moduleDiv.replaceWith(response.data.html);
           setCurrentIds(response.data.id);
         } else {
-          $(`.current-drop, div[data-id="unsaved"]`).replaceWith(response.data.html);
+          $(`.current-drop, div[data-id="unsaved"]`).replaceWith(
+            response.data.html
+          );
         }
       } else if (response.data.type === "section") {
-        console.log('replacing section', formData.data.id);
+        console.log("replacing section", formData.data.id);
         $(`section[data-id="${formData.data.id}"]`).replaceWith(
           response.data.html
         );

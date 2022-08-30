@@ -18,6 +18,7 @@
           formService.setFormApiUrls(Formio);
 
           Formio.{{formioFunction}}(document.getElementById('formio_{{ random }}'), formJSON_{{ random }}).then((form) => {
+              form.options.noAlerts = true;
               console.log('log form', form);
 
               if (formValuesToLoad_{{ random }}) {
@@ -32,6 +33,8 @@
                   // analyticsTrackEvent({event: 'FORM_SUBMIT', data: submission.data});
 
                   {{{ onFormSubmitFunction }}}
+
+                  form.emit('submitDone')//call submitdone event here to stop loading
 
               });
 
