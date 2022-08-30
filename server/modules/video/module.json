@@ -2,8 +2,8 @@
   "title": "Video",
   "enabled": true,
   "systemId": "video",
+  "icon": "bi-play-btn",
   "canBeAddedToColumn": true,
-  "version": "0.0.0.1",
-  "systemidUpperCase": "VIDEO",
-  "systemidCamelCase": "video"
+  "singleInstance": false,
+  "version": "0.0.0.1"
 }

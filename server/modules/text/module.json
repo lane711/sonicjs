@@ -1,8 +1,9 @@
 {
   "title": "Text",
-  "systemId": "text",
-  "version": "0.0.0.1",
   "enabled": true,
+  "systemId": "text",
+  "icon": "bi-body-text",
   "canBeAddedToColumn": true,
-  "singleInstance": false
+  "singleInstance": false,
+  "version": "0.0.0.1"
 }

@@ -2,9 +2,8 @@
   "title": "Tab",
   "enabled": true,
   "systemId": "tab",
+  "icon": "bi-folder2",
   "canBeAddedToColumn": true,
-  "sessionID": "undefined",
-  "version": "0.0.0.1",
-  "systemidUpperCase": "TAB",
-  "systemidCamelCase": "tab"
+  "singleInstance": false,
+  "version": "0.0.0.1"
 }

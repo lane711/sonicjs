@@ -1,8 +1,9 @@
 {
   "title": "Feature Box",
-  "systemId": "feature-box",
-  "version": "0.0.0.1",
   "enabled": true,
+  "systemId": "feature-box",
+  "icon": "bi-credit-card-2-front",
   "canBeAddedToColumn": true,
-  "singleInstance": false
+  "singleInstance": false,
+  "version": "0.0.0.1"
 }

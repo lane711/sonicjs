@@ -146,7 +146,7 @@
 <div id="elements-list" class="hide">
   {{#each data.modulesForColumns}}
     <div class="element-item" data-module-id="{{this.systemId}}">
-      <i class="bi bi-plus-square"></i>
+      <i class="bi {{this.icon}}""></i>
       <span>{{this.title}}</span>
     </div>
   {{/each}}
@@ -620,7 +620,7 @@
     >
       {{#each data.modulesForColumns}}
         <a class="dropdown-item" onclick="addModule('{{this.systemId}}')"><i
-            class="bi bi-plus-square"
+            class=`bi {{this.icon}}`
           ></i>
           {{this.title}}</a>
       {{/each}}

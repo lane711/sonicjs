@@ -2,9 +2,8 @@
   "title": "Pricing Table",
   "enabled": true,
   "systemId": "pricing-table",
+  "icon": "bi-layout-three-columns",
   "canBeAddedToColumn": true,
-  "sessionID": "undefined",
-  "version": "0.0.0.1",
-  "systemidUpperCase": "PRICING-TABLE",
-  "systemidCamelCase": "pricingTable"
+  "singleInstance": false,
+  "version": "0.0.0.1"
 }

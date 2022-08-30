@@ -28,6 +28,7 @@ module.exports = moduleService = {
         options.page.data.modules = globalService.moduleDefinitions;
         options.page.data.modulesForColumns =
           globalService.moduleDefinitionsForColumns;
+          options.page.data.modulesForColumns.map(m => m.icon = m.icon ?? 'bi-plus-square');
       }
     });
 

@@ -2,8 +2,8 @@
   "title": "Button",
   "enabled": true,
   "systemId": "button",
+  "icon": "bi-square",
   "canBeAddedToColumn": true,
-  "version": "0.0.0.1",
-  "systemidUpperCase": "BUTTON",
-  "systemidCamelCase": "button"
+  "singleInstance": false,
+  "version": "0.0.0.1"
 }
