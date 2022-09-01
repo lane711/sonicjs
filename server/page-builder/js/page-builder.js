@@ -177,6 +177,11 @@ function setCurrentIds(moduleId, newDrop = false) {
   $(currentSection).addClass("current-section");
 
   $(".edit-module").clone().addClass("cloned").appendTo(moduleDiv).show();
+  if (!$(".section-add-above.cloned").length) {
+    $(".section-add-above").prependTo(currentSection).show();
+
+    $(".section-add-below").appendTo(currentSection).show();
+  }
 }
 
 function getParentSectionId(el) {
@@ -197,9 +202,13 @@ function getColumn(sectionId, rowIndex, colIndex) {
 
 async function setupClickEvents() {
   //add section
-  // $('.add-section').on("click", async function () {
-  //     await addSection();
-  // });
+  $(".section-add-above").on("click", async function () {
+    await addSection(true);
+  });
+  $(".section-add-below").on("click", async function () {
+    await addSection(false);
+  });
+
   setupBreadcrumbEvents();
   setupSectionBackgroundEvents();
 }
@@ -398,8 +407,8 @@ function getHtmlHex(hex) {
   // return hex.substring(0,7);
 }
 
-async function addSection() {
-  // debugger;
+async function addSection(above = true) {
+  debugger;
   console.log("adding section");
   let row = await generateNewRow();
   //rows
@@ -1944,7 +1953,7 @@ function pageBuilderFormChanged(data) {
   }
 
   // if (formSubmitted) {
-  //   //reset 
+  //   //reset
   //   formSubmitted = false;
   //   return;
   // }

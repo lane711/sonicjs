@@ -116,14 +116,14 @@
   margin: 0 0 10px 0;
 }
 
-.pb-wrapper .left .bottom button.sonic {
+.pb-wrapper .left .bottom a.sonic {
   background: #f8f9fa;
   width: 42px;
   height: 83px;
   position: relative;
 }
 
-.pb-wrapper .left .bottom button.sonic img {
+.pb-wrapper .left .bottom a.sonic img {
   transform: rotate(-90deg);
   width: 60px;
   position: absolute;
@@ -167,7 +167,7 @@
 /* elements end */
 
 /* growl */
-.bootstrap-growl{
+.bootstrap-growl {
   font-weight: bold;
   /* border: #fff 10px dashed; */
 }
@@ -491,6 +491,25 @@ section {
   box-shadow: 0px 0px 0px 4px var(--highlight) inset;
   /* border-top: 4px solid var(--highlight);
   border-bottom: 4px solid var(--highlight); */
+  position: relative;
+}
+
+.pb .section-add .btn {
+  background-color: var(--highlight);
+  border-color: var(--highlight);
+}
+
+.pb .section-add {
+  position: absolute;
+  left: 50%;
+}
+
+.pb .section-add.section-add-above {
+  top: -18px;
+}
+
+.pb .section-add.section-add-below {
+  bottom: -18px;
 }
 
 .pb section .col span,

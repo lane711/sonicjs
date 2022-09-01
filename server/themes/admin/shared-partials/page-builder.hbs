@@ -71,13 +71,15 @@
         data-bs-content="Section Sorting"
       ><i class="bi bi-layers"></i></button>
 
-      <button
-        type="button"
+      <a
+      href="/admin"
+      target="_blank"
         class="btn sonic"
         data-bs-toggle="popover"
         data-bs-trigger="hover focus"
         data-bs-content="SonicJs Backend"
-      ><img src="/assets/img/SonicJs-Logo-2019.svg" /></button>
+      ><img src="/assets/img/SonicJs-Logo-2019.svg" />
+    </a>
 
     </div>
   </div>
@@ -545,7 +547,7 @@
 
 <!-- Column Editor Button START -->
 
-<div class="btn-group col-button section-editor-button hide" role="group">
+<!-- <div class="btn-group col-button section-editor-button hide" role="group">
   <button
     id="btnGroupDrop1"
     type="button"
@@ -569,11 +571,11 @@
       Delete Column</a>
     {{! <a class="dropdown-item" href="#"><i class="fa fa-copy"></i> Duplicate Column</a> }}
   </div>
-</div>
+</div> -->
 <!-- Column Editor Button END -->
 
 <!-- Block Editor Button START -->
-<div
+<!-- <div
   class="btn-group block-button section-editor-button hide edit-module"
   role="group"
 >
@@ -592,7 +594,7 @@
         class="bi bi-pen"
       ></i></button>
   </div>
-</div>
+</div> -->
 
 <div
   class="btn-group block-button section-editor-button hide add-module"
@@ -627,6 +629,24 @@
     </div>
 
   </div>
+</div>
+
+<div class="section-add section-add-above hide">
+  <button class="btn btn-primary"
+  data-bs-toggle="popover"
+  data-bs-trigger="hover focus"
+  data-bs-content="Add Section Above">
+  <i class="bi bi-plus-square"></i>
+</button>
+</div>
+
+<div class="section-add section-add-below hide">
+  <button class="btn btn-primary"
+  data-bs-toggle="popover"
+  data-bs-trigger="hover focus"
+  data-bs-content="Add Section Below">
+  <i class="bi bi-plus-square"></i>
+</button>
 </div>
 <!-- Block Editor Button END -->
 
