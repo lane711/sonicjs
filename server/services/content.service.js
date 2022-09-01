@@ -185,9 +185,10 @@ module.exports = contentService = {
     if (page.data && page.data.layout) {
       let sections = page.data.layout;
 
-      sections.map(async (sectionId) => {
+      for (const sectionId of sections) {
         await this.renderSection(page, sectionId, sessionID, req);
-      });
+      }
+
 
       // sectionWrapper.append(page.data.html);
     } else {
@@ -207,11 +208,11 @@ module.exports = contentService = {
   },
 
   renderSection: async function (page, sectionId, sessionID, req, sectionData) {
-    console.log('rendering section', sectionId);
+    console.log('rendering section start', sectionId);
     //sections can be overridden at a theme level, let's first check if the section is manually overriden in code
     let sectionViewPath = `${frontEndTheme}/sections/${sectionId}.hbs`;
 
-    if (await fileService.fileExists(sectionViewPath)) {
+    if (fileService.fileExists(sectionViewPath)) {
       let sectionContent = await fileService.getFile(sectionViewPath);
       page.data.html += sectionContent;
     } else {
@@ -249,6 +250,8 @@ module.exports = contentService = {
             title: section.data.title,
             rows: rows,
           });
+          console.log('rendering section end', sectionId);
+
         }
       }
     }
@@ -259,7 +262,7 @@ module.exports = contentService = {
       let style = "";
       let css = "";
 
-      // console.log(section.data.background);
+      // console.log(section.data.background);rs
 
       switch (section.data.background) {
         case "color":
