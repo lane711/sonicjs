@@ -28,12 +28,14 @@ function setupSessionID() {
 //TODO, make this just refresh the body content with a full get
 function fullPageUpdate(url = undefined) {
   // debugger;
-  console.log("refreshing page");
-  if (url) {
-    window.location.replace(url);
-  } else {
-    location.reload();
-  }
+  setTimeout(()=>{
+	  console.log("refreshing page");
+	  if (url) {
+		window.location.replace(url);
+	  } else {
+		location.reload();
+	  }
+  },200)
 }
 
 async function openFormInModal(action, contentType, id) {
