@@ -489,8 +489,7 @@ section {
 
 .pb .current-section {
   box-shadow: 0px 0px 0px 4px var(--highlight) inset;
-  /* border-top: 4px solid var(--highlight);
-  border-bottom: 4px solid var(--highlight); */
+  border: 1px solid var(--highlight);
   position: relative;
 }
 

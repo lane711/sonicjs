@@ -28,7 +28,9 @@ module.exports = moduleService = {
         options.page.data.modules = globalService.moduleDefinitions;
         options.page.data.modulesForColumns =
           globalService.moduleDefinitionsForColumns;
-          options.page.data.modulesForColumns.map(m => m.icon = m.icon ?? 'bi-plus-square');
+        options.page.data.modulesForColumns.map(
+          (m) => (m.icon = m.icon ?? "bi-plus-square")
+        );
       }
     });
 
@@ -39,13 +41,25 @@ module.exports = moduleService = {
         let viewModel = req.body.data;
         if (!_.isEmpty(viewModel)) {
           if (viewModel.contentType === "section") {
-            let page = { data: { html: '', sections: []}}
+            let page = { data: { html: "", sections: [] } };
             let sectionId = viewModel.id;
-            let renderedModule = await contentService.renderSection(page, sectionId, req.sessionID, req, viewModel)
-            res.send({id: sectionId, type:'section', html: page.data.html});
-          } else {
+            let renderedModule = await contentService.renderSection(
+              page,
+              sectionId,
+              req.sessionID,
+              req,
+              viewModel
+            );
+            res.send({ id: sectionId, type: "section", html: page.data.html });
+          } else if (viewModel.contentType === "module") {
             let renderedModule = await moduleService.renderModule(viewModel);
-            res.send({id: viewModel.id, type:'module', html: renderedModule});
+            res.send({
+              id: viewModel.id,
+              type: "module",
+              html: renderedModule,
+            });
+          } else if (viewModel.contentType === "page") {
+            console.log("rendering page");
           }
         }
       }

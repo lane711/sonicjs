@@ -6,6 +6,7 @@ var imageList,
   tinyImageList,
   currentSectionId,
   currentSection,
+  currentSectionTitle,
   currentRow,
   currentRowIndex,
   currentColumn,
@@ -40,6 +41,7 @@ $(document).ready(async function () {
   setupAdminMenuMinimizer();
   setupPopovers();
   setupElements();
+  setupPageForm();
 });
 
 function setupSessionID() {
@@ -79,8 +81,7 @@ function axiosTest() {
       console.log(error);
     })
     .finally(function () {
-      // always executed
-      // console.log("done axios");
+      // always executed      // console.log("done axios");
     });
 }
 
@@ -153,6 +154,12 @@ function setupUIClicks() {
   });
 }
 
+function setMainPanelHeaderTextAndIcon(text, icon) {
+  $(".main .header .icon i").removeClass();
+  $(".main .header .icon i").addClass(`bi header-icon ${icon}`);
+  $(".main .header .panel-title").text(text);
+}
+
 function setCurrentIds(moduleId, newDrop = false, emptyColumn = false) {
   let moduleDiv;
   if (newDrop) {
@@ -175,6 +182,8 @@ function setCurrentIds(moduleId, newDrop = false, emptyColumn = false) {
   }
   currentSection = $(moduleDiv).closest("section")[0];
   currentSectionId = currentSection.dataset.id;
+  currentSectionTitle = currentSection.dataset.title;
+  $(".select-current-section").text(currentSectionTitle);
   currentRow = $(moduleDiv).closest(".row");
   currentRowIndex = $(currentRow).index();
   currentColumn = $(moduleDiv).closest('div[class^="col"]');
@@ -1155,6 +1164,9 @@ async function editModule(sessionID) {
     undefined,
     sessionID
   );
+
+  setMainPanelHeaderTextAndIcon(currentModuleContentType, "bi-gear");
+
   // $("#dynamicModelTitle").text(
   //   `Settings: ${currentModuleContentType} (Id:${currentModuleId})`
   // );
@@ -1944,6 +1956,26 @@ function setupElements() {
     $("#pb-content-container").html(elementsList);
     elementsList.removeClass("hide");
     setupSortableModules();
+  });
+}
+
+async function setupPageForm() {
+  $("#page-form").on("click", async function () {
+    console.log("page form click");
+
+    await setPage();
+    let data = await dataService.getContentById();
+    let form = await dataService.formGet(
+      "page",
+      page,
+      "await submitContent(submission);",
+      false,
+      undefined,
+      sessionID
+    );
+
+    $("#pb-content-container").html(form.html);
+    loadModuleSettingForm();
   });
 }
 

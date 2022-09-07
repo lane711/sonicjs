@@ -185,8 +185,8 @@ module.exports = contentService = {
     if (page.data && page.data.layout) {
       let sections = page.data.layout;
 
-      for (const sectionId of sections) {
-        await this.renderSection(page, sectionId, sessionID, req);
+      for (const section of sections) {
+        await this.renderSection(page, section.sectionId, sessionID, req);
       }
 
 
@@ -235,7 +235,7 @@ module.exports = contentService = {
             ? section.data.cssClass + " "
             : "";
           let sectionStyle = await this.getSectionBackgroundStyle(section);
-          page.data.html += `<section data-id='${section.id}' class="${sectionClass}jumbotron-fluid pb ${sectionStyle?.css}" style="${sectionStyle?.style}">`;
+          page.data.html += `<section data-id='${section.id}' data-title='${section.data.title}' class="${sectionClass}jumbotron-fluid pb ${sectionStyle?.css}" style="${sectionStyle?.style}">`;
           page.data.html += '<div class="section-overlay">';
           page.data.html += '<div class="container">';
           let rows;
