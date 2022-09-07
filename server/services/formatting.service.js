@@ -72,8 +72,6 @@ if (typeof module !== "undefined" && module.exports) {
   ) {
     if (shortCodeName === "PAGE-TEMPLATES") {
       return body;
-      wrapperCss = "page-template-region";
-      // body = 'TEMPLATE REGION'
     }
 
     if (usesPageTemplate && !isInTemplateRegion) {

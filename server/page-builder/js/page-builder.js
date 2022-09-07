@@ -139,30 +139,40 @@ function setupUIClicks() {
   // });
 
   // debugger;
-  $("section .row .module").on({
-    click: function () {
-      let moduleDiv = $(this).closest(".module")[0];
-      setCurrentIds(moduleDiv.dataset.id);
-      editModule(sessionID);
-    },
+
+  $(document).on("click", "section .row .module", function () {
+    let moduleDiv = $(this).closest(".module")[0];
+    console.log("module click", moduleDiv);
+    setCurrentIds(moduleDiv.dataset.id);
+    editModule(sessionID);
+  });
+
+  $(document).on("click", ".empty-column", function () {
+    let moduleDiv = $(this).closest(".col")[0];
+    setCurrentIds(moduleDiv, undefined, true);
   });
 }
 
-function setCurrentIds(moduleId, newDrop = false) {
+function setCurrentIds(moduleId, newDrop = false, emptyColumn = false) {
   let moduleDiv;
   if (newDrop) {
     moduleDiv = $(".current-drop")[0];
+  } else if (emptyColumn) {
+    moduleDiv = moduleId;
   } else {
     moduleDiv = $(`div[data-id="${moduleId}"]`)[0];
   }
 
   //reset
   $(".module-highlight").removeClass("module-highlight");
+  $(".current-section").removeClass("current-section");
   $(".edit-module.cloned").remove();
 
-  currentModuleId = moduleDiv.dataset.id;
-  currentModuleIndex = $(moduleDiv).index();
-  currentModuleContentType = moduleDiv.dataset.contentType;
+  if (!emptyColumn) {
+    currentModuleId = moduleDiv.dataset.id;
+    currentModuleIndex = $(moduleDiv).index();
+    currentModuleContentType = moduleDiv.dataset.contentType;
+  }
   currentSection = $(moduleDiv).closest("section")[0];
   currentSectionId = currentSection.dataset.id;
   currentRow = $(moduleDiv).closest(".row");
@@ -176,11 +186,13 @@ function setCurrentIds(moduleId, newDrop = false) {
   $(moduleDiv).addClass("module-highlight");
   $(currentSection).addClass("current-section");
 
-  $(".edit-module").clone().addClass("cloned").appendTo(moduleDiv).show();
-  if (!$(".section-add-above.cloned").length) {
-    $(".section-add-above").prependTo(currentSection).show();
+  if (!emptyColumn) {
+    $(".edit-module").clone().addClass("cloned").appendTo(moduleDiv).show();
+    if (!$(".section-add-above.cloned").length) {
+      $(".section-add-above").prependTo(currentSection).show();
 
-    $(".section-add-below").appendTo(currentSection).show();
+      $(".section-add-below").appendTo(currentSection).show();
+    }
   }
 }
 
@@ -408,11 +420,25 @@ function getHtmlHex(hex) {
 }
 
 async function addSection(above = true) {
-  debugger;
-  console.log("adding section");
-  let row = await generateNewRow();
-  //rows
-  let rows = [row];
+  console.log("adding section above:", above);
+  let rows = [
+    {
+      class: "row",
+      columns: [
+        {
+          class: "col",
+          content: [
+            {
+              content: "",
+            },
+          ],
+          css: "col",
+        },
+      ],
+      css: "row",
+      styles: "",
+    },
+  ];
 
   //section
   let nextSectionCount = 1;
@@ -423,23 +449,28 @@ async function addSection(above = true) {
   let section = {
     title: `Section ${nextSectionCount}`,
     contentType: "section",
+    background: "none",
     rows: rows,
   };
   let s1 = await createInstance(section);
 
   //add to current page
+
   if (!page.data.layout) {
     page.data.layout = [];
   }
-  page.data.layout.push(s1.id);
 
-  // this.contentService.editPage(this.page);
+  let currentSectionIndex = page.data.layout.indexOf(currentSectionId) ?? 0;
+
+  if (above) {
+    page.data.layout.splice(currentSectionIndex, 0, s1.id);
+  } else {
+    page.data.layout.splice(currentSectionIndex + 1, 0, s1.id);
+  }
+
   let updatedPage = await editInstance(page);
 
-  //update ui
-  // this.fullPageUpdate();
-  // this.loadSections(updatedPage);
-  // fullPageUpdate();
+  fullPageUpdate();
 }
 
 async function editSection(sectionId) {
@@ -476,27 +507,6 @@ async function saveSection() {
   // console.log('currentSection', currentSection);
   // $('#section-editor').text(JSON.stringify(currentSection));
   // $('#sectoinEditorModal').appendTo("body").modal('show');
-}
-
-async function generateNewRow() {
-  let col = await generateNewColumn();
-
-  let row = { class: "row", columns: [col] };
-
-  return row;
-}
-
-async function generateNewColumn() {
-  // let block1 = { contentType: 'block', body: '<p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>' };
-
-  // //save blocks and get the ids
-  // let b1 = await createInstance(block1);
-  // let b1ShortCode = `[BLOCK id="${b1.id}"/]`;
-
-  //columns
-  // let col = { class: 'col', content: `${b1ShortCode}` }
-  let col = { class: "col", content: `` };
-  return col;
 }
 
 // async function addRow(sectionId) {

@@ -208,7 +208,6 @@ module.exports = contentService = {
   },
 
   renderSection: async function (page, sectionId, sessionID, req, sectionData) {
-    console.log('rendering section start', sectionId);
     //sections can be overridden at a theme level, let's first check if the section is manually overriden in code
     let sectionViewPath = `${frontEndTheme}/sections/${sectionId}.hbs`;
 
@@ -250,8 +249,6 @@ module.exports = contentService = {
             title: section.data.title,
             rows: rows,
           });
-          console.log('rendering section end', sectionId);
-
         }
       }
     }
