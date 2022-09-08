@@ -304,6 +304,7 @@ if (typeof module !== "undefined" && module.exports) {
                   moduleSystemId
                   filePath
                   data
+                  module
                 }
               }
             `,

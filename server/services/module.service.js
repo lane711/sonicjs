@@ -51,16 +51,16 @@ module.exports = moduleService = {
               viewModel
             );
             res.send({ id: sectionId, type: "section", html: page.data.html });
-          } else if (viewModel.contentType === "module") {
-            let renderedModule = await moduleService.renderModule(viewModel);
-            res.send({
-              id: viewModel.id,
-              type: "module",
-              html: renderedModule,
-            });
           } else if (viewModel.contentType === "page") {
             console.log("rendering page");
           }
+        } else {
+          let renderedModule = await moduleService.renderModule(viewModel);
+          res.send({
+            id: viewModel.id,
+            type: "module",
+            html: renderedModule,
+          });
         }
       }
     );
@@ -132,7 +132,7 @@ module.exports = moduleService = {
         return basePath;
       }
     }
-    console.error("*** Can not find module base path ***");
+    console.error("*** Can not find module base path *** ", systemId);
   },
 
   //HACK: doesn't always return path
@@ -284,18 +284,27 @@ module.exports = moduleService = {
     return moduleCount;
   },
   getModuleContentType: async function (contentTypeSystemId, session, req) {
-    let rootDomain =
-      req && req.protocol ? `${req.protocol}://${req.get("host")}` : undefined;
-    let configInfo = await globalService.moduleContentTypeConfigs.filter(
-      (x) => x.systemId === contentTypeSystemId
-    );
-    if (configInfo[0]) {
-      let config = fileService.getFileSync(configInfo[0].filePath);
-      if (rootDomain) {
-        config = config.replace("http://localhost:3018", rootDomain);
+    if (contentTypeSystemId) {
+      let rootDomain =
+        req && req.protocol
+          ? `${req.protocol}://${req.get("host")}`
+          : undefined;
+      let configInfo = await globalService.moduleContentTypeConfigs.filter(
+        (x) => x.systemId === contentTypeSystemId
+      );
+      if (configInfo[0]) {
+        let config = fileService.getFileSync(configInfo[0].filePath);
+        if (rootDomain) {
+          config = config.replace("http://localhost:3018", rootDomain);
+        }
+        let contentType = JSON.parse(config);
+
+        //add module
+        contentType.module = await moduleService.getModuleDefinition(
+          contentType.moduleSystemId
+        );
+        return contentType;
       }
-      let contentType = JSON.parse(config);
-      return contentType;
     }
     return {};
   },

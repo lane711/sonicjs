@@ -104,6 +104,7 @@ const ContentTypeType = new GraphQLObjectType({
     permissions: { type: GraphQLJSONObject },
     filePath: { type: GraphQLString },
     moduleSystemId: { type: GraphQLString },
+    module: { type: GraphQLJSONObject },
   }),
 });
 
