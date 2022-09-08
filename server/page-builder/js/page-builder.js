@@ -1266,6 +1266,14 @@ async function deleteModuleConfirm(deleteContent = false) {
     });
 }
 
+async function resizeLeft() {
+  console.log('shrinking column')
+}
+
+async function resizeRight() {
+  console.log('expanding column')
+}
+
 async function copyModule() {
   console.log("copying module: " + currentModuleId, currentModuleContentType);
   //need index and column
@@ -1677,6 +1685,7 @@ async function setupSortableColum(el) {
       // Element dragging ended
       group: "shared",
       draggable: ".module",
+      handle: ".module-move",
       onEnd: function (/**Event*/ event) {
         var itemEl = event.item; // dragged HTMLElement
         event.to; // target list
@@ -1753,8 +1762,6 @@ async function addModuleSort(item, event) {
   addModule(systemId, sessionID);
 }
 async function updateModuleSort(shortCode, event) {
-  // debugger;
-
   let moduleBeingMovedId = event.item.dataset.id;
   let sourceColumn = $(event.from)[0].closest('div[class^="col"]');
   let destinationColumn = $(event.to)[0].closest('div[class^="col"]');
@@ -1810,7 +1817,8 @@ async function updateModuleSort(shortCode, event) {
     .post("/admin/pb-update-module-sort", payload)
     .then(async function (response) {
       console.log(response);
-      fullPageUpdate();
+      // fullPageUpdate();
+      addGrowl('Module Moved')
       return await response.data;
     })
     .catch(function (error) {

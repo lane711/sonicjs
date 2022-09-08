@@ -577,11 +577,38 @@
 
 <!-- Block Editor Button START -->
 <div
-  class="btn-group block-button section-editor-button hide edit-module"
+  class="btn-group block-button section-editor-button hide edit-module top"
   role="group"
 >
 
+
   <div class="dropdown">
+
+    <button type="button" class="btn btn-sm resize-left" onclick="resizeLeft()"><i
+      class="bi bi-arrow-left-square"
+    ></i></button>
+
+    <button type="button" class="btn btn-sm resize-right"><i
+      class="bi bi-arrow-right-square" onclick="resizeRight()"
+    ></i></button>
+  </div>
+  </div>
+
+<div
+  class="btn-group block-button section-editor-button hide edit-module bottom"
+  role="group"
+>
+
+
+  <div class="dropdown">
+
+    <!-- <button type="button" class="btn btn-sm resize-left"><i
+      class="bi bi-arrow-left-square"
+    ></i></button>
+
+    <button type="button" class="btn btn-sm resize-right"><i
+      class="bi bi-arrow-right-square"
+    ></i></button> -->
 
     <button type="button" onclick="deleteModule()" class="btn btn-sm"><i
         class="bi bi-trash"

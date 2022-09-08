@@ -166,11 +166,12 @@
 }
 /* elements end */
 
-/* growl */
+/* growl start */
 .bootstrap-growl {
   font-weight: bold;
   /* border: #fff 10px dashed; */
 }
+/* growl end */
 
 /* .pb-wrapper .left-sidebar {
   background-color: var(--white);
@@ -462,10 +463,19 @@ section {
   top: -34px;
 }
 
-.edit-module {
+.edit-module.top {
   position: absolute;
   right: -2px;
   top: -39px;
+  z-index: 2;
+  padding: 4px;
+  background-color: var(--highlight);
+}
+
+.edit-module.bottom {
+  position: absolute;
+  right: -2px;
+  bottom: -39px;
   z-index: 2;
   padding: 4px;
   background-color: var(--highlight);
@@ -516,6 +526,11 @@ section {
 .dropdown-menu .dropdown-item {
   cursor: pointer;
 }
+
+.pb section .module-move{
+  cursor: move;
+}
+
 
 .pb section .col {
   border: 1px dotted transparent;
@@ -579,7 +594,7 @@ section {
 }
 
 .sortable-ghost {
-  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background: linear-gradient(-45deg, var(--highlight), #fff, var(--light-grey2), var(--highlight));
   background-size: 400% 400%;
   animation: gradient-sortable-ghost 1s ease infinite;
 }
