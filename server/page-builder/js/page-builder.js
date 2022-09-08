@@ -1165,7 +1165,7 @@ async function editModule(sessionID) {
     sessionID
   );
 
-  setMainPanelHeaderTextAndIcon(currentModuleContentType, "bi-gear");
+  setMainPanelHeaderTextAndIcon(currentModuleContentType, form.contentType.module.icon);
 
   // $("#dynamicModelTitle").text(
   //   `Settings: ${currentModuleContentType} (Id:${currentModuleId})`

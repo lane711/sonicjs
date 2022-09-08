@@ -79,7 +79,7 @@
   padding: var(--padding);
 }
 
-.pb-wrapper .main .header .title {
+.pb-wrapper .main .header .panel-title {
   flex-grow: 1;
   line-height: 60px;
 }
