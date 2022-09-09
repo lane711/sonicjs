@@ -189,7 +189,8 @@ function setCurrentIds(moduleId, newDrop = false, emptyColumn = false) {
   $(".select-current-section").text(currentSectionTitle);
   currentRow = $(moduleDiv).closest(".row");
   currentRowIndex = $(currentRow).index();
-  currentColumn = $(moduleDiv).closest('div[class^="col"]');
+  currentColumn = $(moduleDiv).closest('div[class*="col"]');
+  console.log('setting currentColumn', currentColumn)
   currentColumnIndex = $(currentColumn).index();
 
   console.log(
@@ -1273,10 +1274,25 @@ async function deleteModuleConfirm(deleteContent = false) {
 }
 
 async function resizeLeft(event) {
-  console.log("shrinking column");
+  console.log("shrinking column", currentColumn);
+  await setNewColumnSize(-1);
 }
+
 async function resizeRight(event) {
   console.log("expanding column");
+  await setNewColumnSize(1);
+}
+
+async function setNewColumnSize(diff) {
+  let currentClasses = currentColumn.attr("class").split(" ");
+  let currentColClass = currentClasses.filter((c) => c.includes("col"))[0];
+  let currentColClassSize = parseInt(currentColClass.replace(/^\D+/g, ""));
+  let newColClassSize = currentColClass.replace(
+    currentColClassSize,
+    currentColClassSize + parseInt(diff)
+  );
+
+  $(currentColumn).removeClass(currentColClass).addClass(newColClassSize);
 }
 
 async function copyModule() {
