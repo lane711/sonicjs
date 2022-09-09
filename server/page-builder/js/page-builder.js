@@ -141,7 +141,10 @@ function setupUIClicks() {
 
   // debugger;
 
-  $(document).on("click", "section .row .module", function () {
+  $(document).on("click", "section .row .module > *", function () {
+    if ($(this).hasClass("cloned")) {
+      return;
+    }
     let moduleDiv = $(this).closest(".module")[0];
     console.log("module click", moduleDiv);
     setCurrentIds(moduleDiv.dataset.id);
@@ -1165,7 +1168,10 @@ async function editModule(sessionID) {
     sessionID
   );
 
-  setMainPanelHeaderTextAndIcon(currentModuleContentType, form.contentType.module.icon);
+  setMainPanelHeaderTextAndIcon(
+    currentModuleContentType,
+    form.contentType.module.icon
+  );
 
   // $("#dynamicModelTitle").text(
   //   `Settings: ${currentModuleContentType} (Id:${currentModuleId})`
@@ -1266,12 +1272,11 @@ async function deleteModuleConfirm(deleteContent = false) {
     });
 }
 
-async function resizeLeft() {
-  console.log('shrinking column')
+async function resizeLeft(event) {
+  console.log("shrinking column");
 }
-
-async function resizeRight() {
-  console.log('expanding column')
+async function resizeRight(event) {
+  console.log("expanding column");
 }
 
 async function copyModule() {
@@ -1818,7 +1823,7 @@ async function updateModuleSort(shortCode, event) {
     .then(async function (response) {
       console.log(response);
       // fullPageUpdate();
-      addGrowl('Module Moved')
+      addGrowl("Module Moved");
       return await response.data;
     })
     .catch(function (error) {
