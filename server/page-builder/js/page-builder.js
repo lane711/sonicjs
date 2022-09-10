@@ -228,10 +228,24 @@ function getColumn(sectionId, rowIndex, colIndex) {
 async function setupClickEvents() {
   //add section
   $(".section-add-above").on("click", async function () {
-    await addSection(true);
+    $('#new-section').show();
+    $('#new-section').insertBefore($(currentSection));
+
+
+    // await addSection(true);
   });
   $(".section-add-below").on("click", async function () {
-    await addSection(false);
+    $('#new-section').show();
+    $('#new-section').insertAfter($(currentSection));
+  
+    // await addSection(false);
+  });
+
+  debugger;
+  $('.new-section .mini-layout').on("click", async function () {
+
+    console.log('adding new section')
+    // await addSection(false);
   });
 
   setupBreadcrumbEvents();

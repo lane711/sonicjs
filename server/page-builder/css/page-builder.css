@@ -481,6 +481,62 @@ section {
   background-color: var(--highlight);
 }
 
+#new-section {
+  border: 5px dashed var(--highlight);
+  margin: 40px;
+}
+.new-section .new-section-text {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.new-section .mini-layout {
+  width: 80px;
+  height: 40px;
+  display: inline-flex;
+  margin: 40px 12px 0;
+}
+
+.new-section .mini-layout > div {
+  height: 89%;
+  width: 100%;
+  border: 2px dashed var(--dark-grey);
+  margin: 2px;
+}
+
+.new-section .mini-layout:hover {
+  cursor: pointer;
+  background-color: var(--highlight);
+}
+
+.new-section .mini-layout.half > div {
+  width: 50%;
+}
+
+.new-section .mini-layout.thirds > div {
+  width: 33%;
+}
+
+.new-section .mini-layout.forths > div {
+  width: 33%;
+}
+
+.new-section .mini-layout.left-sidebar > div:first-child {
+  width: 33%;
+}
+
+.new-section .mini-layout.right-sidebar > div:last-child {
+  width: 33%;
+}
+
+.new-section .mini-layout.both-sidebars > div {
+  width: 33%;
+}
+
+.new-section .mini-layout.both-sidebars > div:nth-of-type(2) {
+  width: 66%;
+}
+
 .module-button {
   right: 32px;
 }
@@ -527,10 +583,9 @@ section {
   cursor: pointer;
 }
 
-.pb section .module-move{
+.pb section .module-move {
   cursor: move;
 }
-
 
 .pb section .col {
   border: 1px dotted transparent;
@@ -594,7 +649,13 @@ section {
 }
 
 .sortable-ghost {
-  background: linear-gradient(-45deg, var(--highlight), #fff, var(--light-grey2), var(--highlight));
+  background: linear-gradient(
+    -45deg,
+    var(--highlight),
+    #fff,
+    var(--light-grey2),
+    var(--highlight)
+  );
   background-size: 400% 400%;
   animation: gradient-sortable-ghost 1s ease infinite;
 }
