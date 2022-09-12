@@ -7,6 +7,7 @@ var imageList,
   currentSectionId,
   currentSection,
   currentSectionTitle,
+  newSectionDirectionAbove = true,
   currentRow,
   currentRowIndex,
   currentColumn,
@@ -190,7 +191,7 @@ function setCurrentIds(moduleId, newDrop = false, emptyColumn = false) {
   currentRow = $(moduleDiv).closest(".row");
   currentRowIndex = $(currentRow).index();
   currentColumn = $(moduleDiv).closest('div[class*="col"]');
-  console.log('setting currentColumn', currentColumn)
+  console.log("setting currentColumn", currentColumn);
   currentColumnIndex = $(currentColumn).index();
 
   console.log(
@@ -228,28 +229,111 @@ function getColumn(sectionId, rowIndex, colIndex) {
 async function setupClickEvents() {
   //add section
   $(".section-add-above").on("click", async function () {
-    $('#new-section').show();
-    $('#new-section').insertBefore($(currentSection));
-
-
-    // await addSection(true);
+    newSectionDirectionAbove = true;
+    $("#new-section").show();
+    $("#new-section").insertBefore($(currentSection));
   });
   $(".section-add-below").on("click", async function () {
-    $('#new-section').show();
-    $('#new-section').insertAfter($(currentSection));
-  
-    // await addSection(false);
+    newSectionDirectionAbove = false;
+    $("#new-section").show();
+    $("#new-section").insertAfter($(currentSection));
   });
 
-  debugger;
-  $('.new-section .mini-layout').on("click", async function () {
+  $(".new-section .mini-layout").on("click", async function () {
+    let layoutSizeArr = $(this).attr("class").split(" ");
+    let layoutSize = layoutSizeArr[layoutSizeArr.length - 1];
 
-    console.log('adding new section')
-    // await addSection(false);
+    await addSection(newSectionDirectionAbove, layoutSize);
   });
 
   setupBreadcrumbEvents();
   setupSectionBackgroundEvents();
+}
+
+async function addSection(above = true, layout) {
+  console.log("adding section above:", above);
+  let newColumns = generateNewColumns(layout);
+  let rows = [
+    {
+      class: "row",
+      columns: newColumns,
+      css: "row",
+      styles: "",
+    },
+  ];
+
+  //section
+  let nextSectionCount = 1;
+  if (page.data.layout) {
+    nextSectionCount = page.data.layout.length + 1;
+  }
+
+  let section = {
+    title: `Section ${nextSectionCount}`,
+    contentType: "section",
+    background: "none",
+    rows: rows,
+  };
+  let s1 = await createInstance(section);
+
+  //add to current page
+
+  if (!page.data.layout) {
+    page.data.layout = [];
+  }
+
+  let currentSectionIndex = page.data.layout.map(s => s.sectionId).indexOf(currentSectionId) ?? 0;
+  if (above) {
+    page.data.layout.splice(currentSectionIndex, 0, { sectionId: s1.id });
+  } else {
+    page.data.layout.splice(currentSectionIndex + 1, 0, { sectionId: s1.id });
+  }
+
+  let updatedPage = await editInstance(page);
+
+  fullPageUpdate();
+}
+
+function generateNewColumns(layout) {
+  let columns = [
+    {
+      css: "col-md-12",
+      content: [
+        {
+          content: "",
+        },
+      ],
+    },
+  ];
+
+  switch (layout) {
+    case "full":
+      break;
+    case "half":
+      columns = [
+        {
+          css: "col-md-6",
+          content: [
+            {
+              content: "",
+            },
+          ],
+        },
+        {
+          css: "col-md-6",
+          content: [
+            {
+              content: "",
+            },
+          ],
+        },
+      ];
+      break;
+    default:
+      break;
+  }
+
+  return columns;
 }
 
 async function getCurrentSection() {
@@ -444,60 +528,6 @@ async function setupColorPicker(currentSectionId) {
 function getHtmlHex(hex) {
   return hex;
   // return hex.substring(0,7);
-}
-
-async function addSection(above = true) {
-  console.log("adding section above:", above);
-  let rows = [
-    {
-      class: "row",
-      columns: [
-        {
-          class: "col",
-          content: [
-            {
-              content: "",
-            },
-          ],
-          css: "col",
-        },
-      ],
-      css: "row",
-      styles: "",
-    },
-  ];
-
-  //section
-  let nextSectionCount = 1;
-  if (page.data.layout) {
-    nextSectionCount = page.data.layout.length + 1;
-  }
-
-  let section = {
-    title: `Section ${nextSectionCount}`,
-    contentType: "section",
-    background: "none",
-    rows: rows,
-  };
-  let s1 = await createInstance(section);
-
-  //add to current page
-
-  if (!page.data.layout) {
-    page.data.layout = [];
-  }
-
-  let currentSectionIndex = page.data.layout.indexOf(currentSectionId) ?? 0;
-
-  if (above) {
-    page.data.layout.splice(currentSectionIndex, 0, s1.id);
-  } else {
-    page.data.layout.splice(currentSectionIndex + 1, 0, s1.id);
-  }
-
-  let updatedPage = await editInstance(page);
-
-  fullPageUpdate();
 }
 
 async function editSection(sectionId) {
