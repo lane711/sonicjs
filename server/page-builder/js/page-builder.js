@@ -20,7 +20,8 @@ var imageList,
   jsonEditorRaw,
   sessionID,
   theme,
-  formSubmitted = false;
+  formSubmitted = false,
+  newDrop = false;
 
 $(document).ready(async function () {
   setupSessionID();
@@ -43,6 +44,7 @@ $(document).ready(async function () {
   setupPopovers();
   setupElements();
   setupPageForm();
+  showElements();
 });
 
 function setupSessionID() {
@@ -282,7 +284,8 @@ async function addSection(above = true, layout) {
     page.data.layout = [];
   }
 
-  let currentSectionIndex = page.data.layout.map(s => s.sectionId).indexOf(currentSectionId) ?? 0;
+  let currentSectionIndex =
+    page.data.layout.map((s) => s.sectionId).indexOf(currentSectionId) ?? 0;
   if (above) {
     page.data.layout.splice(currentSectionIndex, 0, { sectionId: s1.id });
   } else {
@@ -295,45 +298,53 @@ async function addSection(above = true, layout) {
 }
 
 function generateNewColumns(layout) {
-  let columns = [
-    {
-      css: "col-md-12",
-      content: [
-        {
-          content: "",
-        },
-      ],
-    },
-  ];
+  let columns = generateBootstrapColumns(["col-md-12"]);
 
   switch (layout) {
     case "full":
       break;
     case "half":
-      columns = [
-        {
-          css: "col-md-6",
-          content: [
-            {
-              content: "",
-            },
-          ],
-        },
-        {
-          css: "col-md-6",
-          content: [
-            {
-              content: "",
-            },
-          ],
-        },
-      ];
+      columns = generateBootstrapColumns(["col-md-6", "col-md-6"]);
+      break;
+    case "thirds":
+      columns = generateBootstrapColumns(["col-md-4", "col-md-4", "col-md-4"]);
+      break;
+    case "forths":
+      columns = generateBootstrapColumns([
+        "col-md-3",
+        "col-md-3",
+        "col-md-3",
+        "col-md-3",
+      ]);
+      break;
+    case "left-sidebar":
+      columns = generateBootstrapColumns(["col-md-3", "col-md-9"]);
+      break;
+    case "right-sidebar":
+      columns = generateBootstrapColumns(["col-md-9", "col-md-3"]);
+      break;
+    case "both-sidebars":
+      columns = generateBootstrapColumns(["col-md-3", "col-md-6", "col-md-3"]);
       break;
     default:
       break;
   }
 
   return columns;
+}
+
+function generateBootstrapColumns(classList) {
+  // debugger;
+  let list = classList.map((bsClass) => ({
+    css: bsClass,
+    content: [
+      {
+        content: "",
+      },
+    ],
+  }));
+
+  return list;
 }
 
 async function getCurrentSection() {
@@ -1752,6 +1763,7 @@ async function setupSortableColum(el) {
       draggable: ".module",
       handle: ".module-move",
       onEnd: function (/**Event*/ event) {
+        console.log("setupSortableColum onEnd");
         var itemEl = event.item; // dragged HTMLElement
         event.to; // target list
         event.from; // previous list
@@ -1781,6 +1793,7 @@ async function setupSortableModule(el) {
       draggable: ".element-item",
       sort: false,
       onEnd: function (/**Event*/ event) {
+        console.log("setupSortableModule onEnd");
         var itemEl = event.item; // dragged HTMLElement
         const item = $(itemEl);
         item.addClass("current-drop");
@@ -1818,7 +1831,9 @@ async function getModuleHierarchy(element) {
 
 async function addModuleSort(item, event) {
   // debugger;
+  console.log("addModuleSort", item);
 
+  newDrop = true;
   let systemId = event.item.dataset.moduleId;
   // let sourceColumn = $(event.from)[0].closest('div[class^="col"]');
   // let destinationColumn = $(event.to)[0].closest('div[class^="col"]');
@@ -2025,11 +2040,15 @@ function setupPopovers() {
 
 function setupElements() {
   $("#pb-elements").on("click", async function () {
-    const elementsList = $("#elements-list").clone();
-    $("#pb-content-container").html(elementsList);
-    elementsList.removeClass("hide");
-    setupSortableModules();
+    showElements();
   });
+}
+
+function showElements() {
+  const elementsList = $("#elements-list").clone();
+  $("#pb-content-container").html(elementsList);
+  elementsList.removeClass("hide");
+  setupSortableModules();
 }
 
 async function setupPageForm() {
@@ -2063,10 +2082,11 @@ function pageBuilderFormChanged(data) {
     return;
   }
 
-  if (data.changed == undefined) {
+  if (data.changed == undefined && !newDrop) {
     return;
   }
 
+  newDrop = false;
   // if (formSubmitted) {
   //   //reset
   //   formSubmitted = false;
