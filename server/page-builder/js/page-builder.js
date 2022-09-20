@@ -170,6 +170,9 @@ function setCurrentIds(moduleId, newDrop = false, emptyColumn = false) {
   let moduleDiv;
   if (newDrop) {
     moduleDiv = $(".current-drop")[0];
+    //remove "empty column"
+    let parent = $(moduleDiv).parent()[0]
+    $(parent).find(".empty-column").remove();
   } else if (emptyColumn) {
     moduleDiv = moduleId;
   } else {
@@ -1796,6 +1799,7 @@ async function setupSortableModule(el) {
         console.log("setupSortableModule onEnd");
         var itemEl = event.item; // dragged HTMLElement
         const item = $(itemEl);
+        $('current-drop').removeClass('current-drop');
         item.addClass("current-drop");
         event.to; // target list
         event.from; // previous list
@@ -1830,7 +1834,7 @@ async function getModuleHierarchy(element) {
 }
 
 async function addModuleSort(item, event) {
-  // debugger;
+  debugger;
   console.log("addModuleSort", item);
 
   newDrop = true;
@@ -2124,6 +2128,9 @@ function savePBData(formData) {
           $(`.current-drop, div[data-id="unsaved"]`).replaceWith(
             response.data.html
           );
+          //now save the new module
+          let submitButton = $('#pb-content-container .formio-component-submit .btn');
+          submitButton.click();
         }
       } else if (response.data.type === "section") {
         console.log("replacing section", formData.data.id);
