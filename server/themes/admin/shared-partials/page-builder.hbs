@@ -1,24 +1,21 @@
-<link
-  href="/node_modules/@simonwep/pickr/dist/themes/nano.min.css"
-  rel="stylesheet"
-/>
+<link href="/node_modules/@simonwep/pickr/dist/themes/nano.min.css" rel="stylesheet" />
 
 <style type="text/css" id="templateCss">
-  {{{data.editor.css}}}
+  {
+      {
+        {
+        data.editor.css
+      }
+    }
+  }
 </style>
 
 <div class="pb-wrapper">
   <div class="left">
     <div class="top">
 
-      <button
-        type="button"
-        class="btn btn-light"
-        data-bs-toggle="popover"
-        data-bs-trigger="hover focus"
-        data-bs-content="Elements"
-        id="pb-elements"
-      ><i class="bi bi-plus-circle"></i></button>
+      <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+        data-bs-content="Elements" id="pb-elements"><i class="bi bi-plus-circle"></i></button>
 
       <!-- <button
         type="button"
@@ -28,14 +25,8 @@
         data-bs-content="Pre-built Sections"
       ><i class="bi bi-plus-square"></i></button> -->
 
-      <button
-        type="button"
-        class="btn btn-light"
-        data-bs-toggle="popover"
-        data-bs-trigger="hover focus"
-        data-bs-content="Page Settings"
-        id="page-form"
-      ><i class="bi bi-sliders"></i></button>
+      <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+        data-bs-content="Page Settings" id="page-form"><i class="bi bi-sliders"></i></button>
 
       <!-- <button
         type="button"
@@ -45,42 +36,21 @@
         data-bs-content="Page Form"
       ><i class="bi bi-grid-3x2"></i></button> -->
 
-      <button
-        type="button"
-        class="btn btn-light"
-        data-bs-toggle="popover"
-        data-bs-trigger="hover focus"
-        data-bs-content="Page Code"
-      ><i class="bi bi-code-square"></i></button>
+      <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+        data-bs-content="Page Code"><i class="bi bi-code-square"></i></button>
 
     </div>
     <div class="bottom">
 
-      <button
-        type="button"
-        class="btn btn-light"
-        data-bs-toggle="popover"
-        data-bs-trigger="hover focus"
-        data-bs-content="Site CSS"
-      ><i class="bi bi-filetype-css"></i></button>
+      <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+        data-bs-content="Site CSS"><i class="bi bi-filetype-css"></i></button>
 
-      <button
-        type="button"
-        class="btn btn-light"
-        data-bs-toggle="popover"
-        data-bs-trigger="hover focus"
-        data-bs-content="Section Sorting"
-      ><i class="bi bi-layers"></i></button>
+      <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+        data-bs-content="Section Sorting"><i class="bi bi-layers"></i></button>
 
-      <a
-      href="/admin"
-      target="_blank"
-        class="btn sonic"
-        data-bs-toggle="popover"
-        data-bs-trigger="hover focus"
-        data-bs-content="SonicJs Backend"
-      ><img src="/assets/img/SonicJs-Logo-2019.svg" />
-    </a>
+      <a href="/admin" target="_blank" class="btn sonic" data-bs-toggle="popover" data-bs-trigger="hover focus"
+        data-bs-content="SonicJs Backend"><img src="/assets/img/SonicJs-Logo-2019.svg" />
+      </a>
 
     </div>
   </div>
@@ -91,9 +61,7 @@
       </div>
       <div class="panel-title">Column Text</div>
       <div class="close">
-        <button type="button" class="btn btn-light"><i
-            class="bi bi-x-lg"
-          ></i></button>
+        <button type="button" class="btn btn-light"><i class="bi bi-x-lg"></i></button>
       </div>
     </div>
     <div class="breadcrumbs">
@@ -138,17 +106,23 @@
   </div>
 </div>
 
-<button
-  class="sidebar-expander {{data.sidebarClass}}"
-  id="sidebar-expander"
-  type="button"
->
+<button class="sidebar-expander {{data.sidebarClass}}" id="sidebar-expander" type="button">
 </button>
 
 <!-- elements start-->
 <div id="elements-list" class="hide">
+  <h2>Common Elements</h2>
+  <div class="element-item" data-module-id="title">
+    <i class="bi bi-type-h1"></i>
+    <span>Title</span>
+  </div>
+  <div class="element-item" data-module-id="text">
+    <i class="bi bi-body-text""></i>
+    <span>text</span>
+  </div>
+  <h2>All Elements</h2>
   {{#each data.modulesForColumns}}
-    <div class="element-item" data-module-id="{{this.systemId}}">
+    <div class=" element-item" data-module-id="{{this.systemId}}">
       <i class="bi {{this.icon}}""></i>
       <span>{{this.title}}</span>
     </div>
@@ -156,107 +130,62 @@
 </div>
 <!-- elements end-->
 
-<!-- <div class="pb-wrapper {{data.sidebarClass}}">
+<!-- <div class=" pb-wrapper {{data.sidebarClass}}">
 
-  <div class="left-sidebar">
+        <div class="left-sidebar">
 
-    <div class="middle">
+          <div class="middle">
 
-      <button
-        type="button"
-        class="btn btn-light"
-        data-bs-toggle="popover"
-        data-bs-trigger="hover focus"
-        data-bs-content="Elements"
-      ><i class="bi bi-plus-circle"></i></button>
+            <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+              data-bs-content="Elements"><i class="bi bi-plus-circle"></i></button>
 
-      <button
-        type="button"
-        class="btn btn-light"
-        data-bs-toggle="popover"
-        data-bs-trigger="hover focus"
-        data-bs-content="Pre-built Sections"
-      ><i class="bi bi-plus-square"></i></button>
+            <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+              data-bs-content="Pre-built Sections"><i class="bi bi-plus-square"></i></button>
 
-      <button
-        type="button"
-        class="btn btn-light"
-        data-bs-toggle="popover"
-        data-bs-trigger="hover focus"
-        data-bs-content="Page Options"
-      ><i class="bi bi-sliders"></i></button>
+            <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+              data-bs-content="Page Options"><i class="bi bi-sliders"></i></button>
 
-      <button
-        type="button"
-        class="btn btn-light"
-        data-bs-toggle="popover"
-        data-bs-trigger="hover focus"
-        data-bs-content="Page Form"
-      ><i class="bi bi-grid-3x2"></i></button>
+            <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+              data-bs-content="Page Form"><i class="bi bi-grid-3x2"></i></button>
 
-      <button
-        type="button"
-        class="btn btn-light"
-        data-bs-toggle="popover"
-        data-bs-trigger="hover focus"
-        data-bs-content="Page Code"
-      ><i class="bi bi-code-square"></i></button>
+            <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+              data-bs-content="Page Code"><i class="bi bi-code-square"></i></button>
 
-    </div>
+          </div>
 
-    <div class="bottom">
+          <div class="bottom">
 
-      <button
-        type="button"
-        class="btn btn-light"
-        data-bs-toggle="popover"
-        data-bs-trigger="hover focus"
-        data-bs-content="Site CSS"
-      ><i class="bi bi-filetype-css"></i></button>
+            <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+              data-bs-content="Site CSS"><i class="bi bi-filetype-css"></i></button>
 
-      <button
-        type="button"
-        class="btn btn-light"
-        data-bs-toggle="popover"
-        data-bs-trigger="hover focus"
-        data-bs-content="Section Sorting"
-      ><i class="bi bi-layers"></i></button>
+            <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+              data-bs-content="Section Sorting"><i class="bi bi-layers"></i></button>
 
-      <button
-        type="button"
-        class="btn sonic"
-        data-bs-toggle="popover"
-        data-bs-trigger="hover focus"
-        data-bs-content="SonicJs Backend"
-      ><img src="/assets/img/SonicJs-Logo-2019.svg" /></button>
+            <button type="button" class="btn sonic" data-bs-toggle="popover" data-bs-trigger="hover focus"
+              data-bs-content="SonicJs Backend"><img src="/assets/img/SonicJs-Logo-2019.svg" /></button>
 
-    </div>
+          </div>
+        </div>
+        <div class="main">
+          <div class="header">
+            <div class="icon">
+              <i class="bi bi-layers header-icon"></i>
+            </div>
+            <div class="text">
+              Column Text
+            </div>
+            <div class="close">
+              <button type="button" class="btn btn-light"><i class="bi bi-x-lg"></i></button>
+            </div>
+          </div>
+          <div class="content">content</div>
+          <div class="footer">footer</div>
+
+        </div>
   </div>
-  <div class="main">
-    <div class="header">
-      <div class="icon">
-        <i class="bi bi-layers header-icon"></i>
-      </div>
-      <div class="text">
-        Column Text
-      </div>
-      <div class="close">
-        <button type="button" class="btn btn-light"><i
-            class="bi bi-x-lg"
-          ></i></button>
-      </div>
-    </div>
-    <div class="content">content</div>
-    <div class="footer">footer</div>
-
-  </div>
-</div>
-  <button
-  class="sidebar-expander {{data.sidebarClass}}"
-  id="sidebar-expander"
-  type="button">
-</button> -->
-<!-- <nav class="page-builder-nav">
+  <button class="sidebar-expander {{data.sidebarClass}}" id="sidebar-expander" type="button">
+  </button> -->
+  <!-- <nav class="page-builder-nav">
 
       <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item">
@@ -519,36 +448,28 @@
 
     </nav> -->
 
-<!-- Row Editor Button START -->
-<div class="btn-group row-button section-editor-button hide" role="group">
-  <button
-    id="btnGroupDrop1"
-    type="button"
-    class="btn btn-secondary dropdown-toggle btn-sm"
-    data-
-    {{data.themeSettings.bootstrapToggleMiddle}}
-    toggle="dropdown"
-    aria-haspopup="true"
-    aria-expanded="false"
-  >
-    Row
-  </button>
-  <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-    <a class="dropdown-item" onclick="addColumn()"><i class="fa fa-plus"></i>
-      Add Column</a>
-    <a class="dropdown-item" onclick="addRow()"><i class="fa fa-plus"></i>
-      Add Row</a>
-    <a class="dropdown-item" onclick="deleteRow()"><i class="fa fa-trash"></i>
-      Delete Row</a>
+  <!-- Row Editor Button START -->
+  <div class="btn-group row-button section-editor-button hide" role="group">
+    <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-
+      {{data.themeSettings.bootstrapToggleMiddle}} toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Row
+    </button>
+    <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+      <a class="dropdown-item" onclick="addColumn()"><i class="fa fa-plus"></i>
+        Add Column</a>
+      <a class="dropdown-item" onclick="addRow()"><i class="fa fa-plus"></i>
+        Add Row</a>
+      <a class="dropdown-item" onclick="deleteRow()"><i class="fa fa-trash"></i>
+        Delete Row</a>
 
-    {{! <a class="dropdown-item" href="#"><i class="fa fa-copy"></i> Duplicate Row</a> }}
+      {{! <a class="dropdown-item" href="#"><i class="fa fa-copy"></i> Duplicate Row</a> }}
+    </div>
   </div>
-</div>
-<!-- Row Editor Button END -->
+  <!-- Row Editor Button END -->
 
-<!-- Column Editor Button START -->
+  <!-- Column Editor Button START -->
 
-<!-- <div class="btn-group col-button section-editor-button hide" role="group">
+  <!-- <div class="btn-group col-button section-editor-button hide" role="group">
   <button
     id="btnGroupDrop1"
     type="button"
@@ -573,36 +494,28 @@
     {{! <a class="dropdown-item" href="#"><i class="fa fa-copy"></i> Duplicate Column</a> }}
   </div>
 </div> -->
-<!-- Column Editor Button END -->
+  <!-- Column Editor Button END -->
 
-<!-- Block Editor Button START -->
-<div
-  class="btn-group block-button section-editor-button hide edit-module top"
-  role="group"
->
+  <!-- Block Editor Button START -->
+  <div class="btn-group block-button section-editor-button hide edit-module top" role="group">
 
 
-  <div class="dropdown">
+    <div class="dropdown">
 
-    <button type="button" class="btn btn-sm resize resize-left" onclick="resizeLeft()"><i
-      class="bi bi-arrow-left-square"
-    ></i></button>
+      <button type="button" class="btn btn-sm resize resize-left" onclick="resizeLeft()"><i
+          class="bi bi-arrow-left-square"></i></button>
 
-    <button type="button" class="btn btn-sm resize resize-right"><i
-      class="bi bi-arrow-right-square" onclick="resizeRight()"
-    ></i></button>
-  </div>
+      <button type="button" class="btn btn-sm resize resize-right"><i class="bi bi-arrow-right-square"
+          onclick="resizeRight()"></i></button>
+    </div>
   </div>
 
-<div
-  class="btn-group block-button section-editor-button hide edit-module bottom"
-  role="group"
->
+  <div class="btn-group block-button section-editor-button hide edit-module bottom" role="group">
 
 
-  <div class="dropdown">
+    <div class="dropdown">
 
-    <!-- <button type="button" class="btn btn-sm resize-left"><i
+      <!-- <button type="button" class="btn btn-sm resize-left"><i
       class="bi bi-arrow-left-square"
     ></i></button>
 
@@ -610,306 +523,225 @@
       class="bi bi-arrow-right-square"
     ></i></button> -->
 
-    <button type="button" onclick="deleteModule()" class="btn btn-sm"><i
-        class="bi bi-trash"
-      ></i></button>
+      <button type="button" onclick="deleteModule()" class="btn btn-sm"><i class="bi bi-trash"></i></button>
 
-    <button type="button" onclick="copyModule()" class="btn btn-sm"><i
-        class="bi bi-clipboard-plus"
-      ></i></button>
+      <button type="button" onclick="copyModule()" class="btn btn-sm"><i class="bi bi-clipboard-plus"></i></button>
 
-    <button type="button" class="btn btn-sm module-move"><i
-        class="bi bi-arrows-move"
-      ></i></button>
+      <button type="button" class="btn btn-sm module-move"><i class="bi bi-arrows-move"></i></button>
+    </div>
   </div>
-</div>
 
-<div
-  class="btn-group block-button section-editor-button hide add-module"
-  role="group"
->
+  <div class="btn-group block-button section-editor-button hide add-module" role="group">
 
-  <div class="dropdown block-button module-button">
+    <div class="dropdown block-button module-button">
 
-    <button
-      id="btnGroupDropModules"
-      type="button"
-      class="btn btn-secondary dropdown-toggle btn-sm"
-      data-
-      {{data.themeSettings.bootstrapToggleMiddle}}
-      toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <i class="bi bi-plus-square"></i>
-      Module
-    </button>
-    <div
-      class="dropdown-menu dropdown-menu-right add-module-dropdown"
-      aria-labelledby="btnGroupDropModules"
-    >
-      {{#each data.modulesForColumns}}
-        <a class="dropdown-item" onclick="addModule('{{this.systemId}}')"><i
-            class=`bi {{this.icon}}`
-          ></i>
+      <button id="btnGroupDropModules" type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-
+        {{data.themeSettings.bootstrapToggleMiddle}} toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="bi bi-plus-square"></i>
+        Module
+      </button>
+      <div class="dropdown-menu dropdown-menu-right add-module-dropdown" aria-labelledby="btnGroupDropModules">
+        {{#each data.modulesForColumns}}
+        <a class="dropdown-item" onclick="addModule('{{this.systemId}}')"><i class=`bi {{this.icon}}`></i>
           {{this.title}}</a>
-      {{/each}}
-    </div>
-
-  </div>
-</div>
-
-<div class="section-add section-add-above hide">
-  <button class="btn btn-primary"
-  data-bs-toggle="popover"
-  data-bs-trigger="hover focus"
-  data-bs-content="Add Section Above">
-  <i class="bi bi-plus-square"></i>
-</button>
-</div>
-
-<div class="section-add section-add-below hide">
-  <button class="btn btn-primary"
-  data-bs-toggle="popover"
-  data-bs-trigger="hover focus"
-  data-bs-content="Add Section Below">
-  <i class="bi bi-plus-square"></i>
-</button>
-</div>
-<!-- Block Editor Button END -->
-
-<!-- New Section START -->
-<section id="new-section" class="new-section hide">
-  <div class="row justify-content-md-center">
-    <div class="col-md-8">
-      <p class="new-section-text text-center">Select a section layout</p>
-      <div class="mini-layouts">
-        <div class="mini-layout full">
-          <div></div>
-        </div>
-        <div class="mini-layout half">
-          <div></div>
-          <div></div>
-        </div>
-        <div class="mini-layout thirds">
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-        <div class="mini-layout forths">
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-        <div class="mini-layout left-sidebar">
-          <div></div>
-          <div></div>
-        </div>
-        <div class="mini-layout right-sidebar">
-          <div></div>
-          <div></div>
-        </div>
-        <div class="mini-layout both-sidebars">
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-
+        {{/each}}
       </div>
+
     </div>
   </div>
-</section>
-<!-- New Section END -->
 
-<!-- <button class="sidebar-minimizer brand-minimizer" type="button"></button> -->
+  <div class="section-add section-add-above hide">
+    <button class="btn btn-primary" data-bs-toggle="popover" data-bs-trigger="hover focus"
+      data-bs-content="Add Section Above">
+      <i class="bi bi-plus-square"></i>
+    </button>
+  </div>
 
-<!-- WYSIWYG Modal -->
-<div
-  class="modal fade admin-field-add"
-  id="wysiwygModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="exampleModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Edit Block</h5>
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
+  <div class="section-add section-add-below hide">
+    <button class="btn btn-primary" data-bs-toggle="popover" data-bs-trigger="hover focus"
+      data-bs-content="Add Section Below">
+      <i class="bi bi-plus-square"></i>
+    </button>
+  </div>
+  <!-- Block Editor Button END -->
 
-        <input type="hidden" id="block-edit-it" />
-        <div id="editor-container">
-
-          <textarea
-            id="block-content"
-            class="wysiwyg-content"
-          >loading...</textarea>
+  <!-- New Section START -->
+  <section id="new-section" class="new-section hide">
+    <div class="row justify-content-md-center">
+      <div class="col-md-8">
+        <p class="new-section-text text-center">Select a section layout</p>
+        <div class="mini-layouts">
+          <div class="mini-layout full">
+            <div></div>
+          </div>
+          <div class="mini-layout half">
+            <div></div>
+            <div></div>
+          </div>
+          <div class="mini-layout thirds">
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+          <div class="mini-layout forths">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+          <div class="mini-layout left-sidebar">
+            <div></div>
+            <div></div>
+          </div>
+          <div class="mini-layout right-sidebar">
+            <div></div>
+            <div></div>
+          </div>
+          <div class="mini-layout both-sidebars">
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
 
         </div>
-
       </div>
-      <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          data-dismiss="modal"
-        >Cancel</button>
-        <button
-          type="button"
-          class="btn btn-primary wysiwyg-save"
-          onclick="saveWYSIWYG()"
-          data-dismiss="modal"
-        >Save</button>
+    </div>
+  </section>
+  <!-- New Section END -->
+
+  <!-- <button class="sidebar-minimizer brand-minimizer" type="button"></button> -->
+
+  <!-- WYSIWYG Modal -->
+  <div class="modal fade admin-field-add" id="wysiwygModal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Edit Block</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+          <input type="hidden" id="block-edit-it" />
+          <div id="editor-container">
+
+            <textarea id="block-content" class="wysiwyg-content">loading...</textarea>
+
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary wysiwyg-save" onclick="saveWYSIWYG()"
+            data-dismiss="modal">Save</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- Section Editor Modal -->
-<div
-  class="modal"
-  id="sectoinEditorModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="exampleModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Edit Section Data</h5>
-        <button
-          type="button"
-          data-
-          {{data.themeSettings.bootstrapToggleMiddle}}
-          dismiss="modal"
-          class="btn-close"
-          aria-label="Close"
-        >
-        </button>
-      </div>
-      <div class="modal-body">
+  <!-- Section Editor Modal -->
+  <div class="modal" id="sectoinEditorModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Edit Section Data</h5>
+          <button type="button" data- {{data.themeSettings.bootstrapToggleMiddle}} dismiss="modal" class="btn-close"
+            aria-label="Close">
+          </button>
+        </div>
+        <div class="modal-body">
 
-        <input type="hidden" id="block-edit-it" />
-        <div id="editor-container">
+          <input type="hidden" id="block-edit-it" />
+          <div id="editor-container">
 
-          <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+            <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 
-          <div id="jsoneditor" style="width: 100%; height: 600px;"></div>
+            <div id="jsoneditor" style="width: 100%; height: 600px;"></div>
+
+          </div>
 
         </div>
-
-      </div>
-      <div class="modal-footer">
-        <button
-          type="button"
-          data-
-          {{data.themeSettings.bootstrapToggleMiddle}}
-          dismiss="modal"
-          class="btn btn-secondary"
-        >Cancel</button>
-        <button
-          type="button"
-          class="btn btn-primary wysiwyg-save"
-          onclick="saveSection()"
-          data-dismiss="modal"
-        >Save</button>
+        <div class="modal-footer">
+          <button type="button" data- {{data.themeSettings.bootstrapToggleMiddle}} dismiss="modal"
+            class="btn btn-secondary">Cancel</button>
+          <button type="button" class="btn btn-primary wysiwyg-save" onclick="saveSection()"
+            data-dismiss="modal">Save</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- Dynamic SidePanel -->
-<div class="pb-side-panel close">
-  <div class="handle">
-    <span>
-      <i class="nav-icon bi bi-x-lg"></i>
-    </span>
+  <!-- Dynamic SidePanel -->
+  <div class="pb-side-panel close">
+    <div class="handle">
+      <span>
+        <i class="nav-icon bi bi-x-lg"></i>
+      </span>
+    </div>
+    <h5 class="modal-title" id="dynamicModelTitle">Settings</h5>
+
+    <div class="content">
+
+      <div id="main">Loading...</div>
+
+      {{!-- <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" id="home-tab" data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="tab"
+            href="#main" role="tab" aria-controls="main" aria-selected="true">Data</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="profile-tab" data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="tab"
+            href="#profile" role="tab" aria-controls="profile" aria-selected="false">Setting</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="contact-tab" data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="tab"
+            href="#contact" role="tab" aria-controls="contact" aria-selected="false">Revisions</a>
+        </li>
+      </ul>
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="main" role="tabpanel" aria-labelledby="home-tab">Loading...</div>
+        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">...</div>
+        <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">Coming Soon</div>
+      </div> --}}
+
+    </div>
+
   </div>
-  <h5 class="modal-title" id="dynamicModelTitle">Settings</h5>
 
-  <div class="content">
+  <!-- Dynamic SidePanel Backdrop-->
+  <div class="pb-side-panel-modal-backdrop close"></div>
 
-    <div id="main">Loading...</div>
+  <!-- Dynamic Modal -->
+  <div class="modal fade" id="moduleSettingsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="dynamicModelTitle">Settings</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
 
-    {{!-- <ul class="nav nav-tabs" id="myTab" role="tablist">
-      <li class="nav-item">
-        <a class="nav-link active" id="home-tab" data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="tab" href="#main" role="tab" aria-controls="main"
-          aria-selected="true">Data</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" id="profile-tab" data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="tab" href="#profile" role="tab" aria-controls="profile"
-          aria-selected="false">Setting</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" id="contact-tab" data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="tab" href="#contact" role="tab" aria-controls="contact"
-          aria-selected="false">Revisions</a>
-      </li>
-    </ul>
-    <div class="tab-content" id="myTabContent">
-      <div class="tab-pane fade show active" id="main" role="tabpanel" aria-labelledby="home-tab">Loading...</div>
-      <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">...</div>
-      <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">Coming Soon</div>
-    </div> --}}
+          <input type="hidden" id="block-edit-it" />
+          <div id="editor-container">
 
-  </div>
+            <div id="moduleSettingsFormio"></div>
 
-</div>
-
-<!-- Dynamic SidePanel Backdrop-->
-<div class="pb-side-panel-modal-backdrop close"></div>
-
-<!-- Dynamic Modal -->
-<div
-  class="modal fade"
-  id="moduleSettingsModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="exampleModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="dynamicModelTitle">Settings</h5>
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-
-        <input type="hidden" id="block-edit-it" />
-        <div id="editor-container">
-
-          <div id="moduleSettingsFormio"></div>
+          </div>
 
         </div>
-
+        {{! <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary page-settings-save" data-dismiss="modal">Save</button>
+        </div> }}
       </div>
-      {{! <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary page-settings-save" data-dismiss="modal">Save</button>
-            </div> }}
     </div>
   </div>
-</div>
 
-<script src="/node_modules/@simonwep/pickr/dist/pickr.min.js"></script>
-<script src="/node_modules/sortablejs/Sortable.min.js"></script>
-
+  <script src="/node_modules/@simonwep/pickr/dist/pickr.min.js"></script>
+  <script src="/node_modules/sortablejs/Sortable.min.js"></script>

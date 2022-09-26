@@ -140,6 +140,12 @@
   flex-wrap: wrap;
 }
 
+#elements-list h2{
+  font-size: 18px;
+  width: 100%;
+  margin: 1rem 0 .5rem;
+}
+
 #elements-list.hide {
   display: none;
 }
