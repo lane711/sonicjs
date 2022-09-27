@@ -141,9 +141,9 @@
 }
 
 #elements-list h2{
-  font-size: 18px;
+  font-size: 16px;
   width: 100%;
-  margin: 1rem 0 .5rem;
+  margin: 1rem 0 .5rem 6px;
 }
 
 #elements-list.hide {
