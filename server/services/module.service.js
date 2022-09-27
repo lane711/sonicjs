@@ -9,7 +9,7 @@ var fileService = require("../services/file.service");
 var viewService = require("../services/view.service");
 var dataService = require("../services/data.service");
 var formattingService = require("../services/formatting.service");
-var contentService = require("../services/content.service");
+// var contentService = require("../services/content.service");
 
 var appRoot = require("app-root-path");
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
@@ -43,13 +43,13 @@ module.exports = moduleService = {
           if (viewModel.contentType === "section") {
             let page = { data: { html: "", sections: [] } };
             let sectionId = viewModel.id;
-            let renderedModule = await contentService.renderSection(
-              page,
-              sectionId,
-              req.sessionID,
-              req,
-              viewModel
-            );
+            // let renderedModule = await contentService.renderSection(
+            //   page,
+            //   sectionId,
+            //   req.sessionID,
+            //   req,
+            //   viewModel
+            // );
             res.send({ id: sectionId, type: "section", html: page.data.html });
           } else if (viewModel.contentType === "page") {
             console.log("rendering page");

@@ -7,7 +7,10 @@ var userService = require(".//user.service");
 var globalService = require(".//global.service");
 var cacheService = require(".//cache.service");
 var formattingService = require(".//formatting.service");
+var moduleService = require(".//module.service");
+
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
+var _ = require("lodash");
 
 var dataService = require(".//data.service");
 
@@ -23,14 +26,37 @@ var modulesToDelayProcessing = [];
 
 const NodeCache = require("node-cache");
 const fileService = require("./file.service");
+const connectEnsureLogin = require("connect-ensure-login");
 
 module.exports = contentService = {
-  startup: async function () {
+  startup: async function (app) {
     emitterService.on(
       "postProcessModuleShortCodeProcessedHtml",
       async function ({ options }) {
         if (options) {
           contentService.wrapBlockInModuleDiv(options);
+        }
+      }
+    );
+
+    app.post(
+      "/api/content/render",
+      connectEnsureLogin.ensureLoggedIn(),
+      async function (req, res) {
+        let viewModel = req.body.data;
+        if (!_.isEmpty(viewModel)) {
+          if (viewModel.contentType === "section") {
+            let page = { data: { html: "", sections: [] } };
+            let sectionId = viewModel.id;
+            let renderedModule = await contentService.renderSection(
+              page,
+              sectionId,
+              req.sessionID,
+              req,
+              viewModel
+            );
+            res.send({ id: sectionId, type: "section", html: page.data.html });
+          }
         }
       }
     );
@@ -182,13 +208,12 @@ module.exports = contentService = {
     // let page = page; // await this.getContentById('5cd5af93523eac22087e4358');
     // console.log('processSections:page==>', page);
 
-    if (page.data && page.data.layout) {
+    if (page.data && page.data.layout.length) {
       let sections = page.data.layout;
 
       for (const section of sections) {
         await this.renderSection(page, section.sectionId, sessionID, req);
       }
-
 
       // sectionWrapper.append(page.data.html);
     } else {
@@ -327,7 +352,7 @@ module.exports = contentService = {
           content += c.content;
         });
       }
-      page.data.html += `${content}`;
+      // page.data.html += `${content}`;
       if (content) {
         await this.processShortCodes(
           page,
@@ -361,39 +386,31 @@ module.exports = contentService = {
 
     if (parsedBlock.children) {
       for (let bodyBlock of parsedBlock.children) {
-        let shortcode = bodyBlock.shortcode;
+        if (bodyBlock.text) {
+          let viewModel = JSON.parse(bodyBlock.text);
+          let renderedModule = await moduleService.renderModule(viewModel);
+          page.data.html += renderedModule;
+        } else {
+          let shortcode = bodyBlock.shortcode;
+          page.data.html += `${shortcode.codeText}`;
+          //new way:
+          if (shortcode) {
+            if (shortcode.properties.delayedProcessing) {
+              modulesToDelayProcessing.push(shortcode);
+              continue;
+            }
 
-        //new way:
-        if (shortcode) {
-          if (shortcode.properties.delayedProcessing) {
-            modulesToDelayProcessing.push(shortcode);
-            continue;
+            await emitterService.emit("beginProcessModuleShortCode", {
+              page: page,
+              section: section,
+              req: req,
+              shortcode: shortcode,
+              rowIndex: rowIndex,
+              columnIndex: columnIndex,
+            });
           }
-
-          await emitterService.emit("beginProcessModuleShortCode", {
-            page: page,
-            section: section,
-            req: req,
-            shortcode: shortcode,
-            rowIndex: rowIndex,
-            columnIndex: columnIndex,
-          });
-
-          // if (wrapWithModuleDiv) {
-          //   var processedHtml = {
-          //     id: shortcode.properties.id,
-          //     shortCode: shortcode,
-          //     contentType: shortcode.name,
-          //     body: options.page.data.currentShortCodeHtml,
-          //   };
-
-          //   contentService.wrapBlockInModuleDiv(processedHtml, undefined);
-          //   page.data.currentShortCodeHtml = processedHtml;
-          // }
         }
       }
-
-      // console.log("done regular modules");
     }
   },
 

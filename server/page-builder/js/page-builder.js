@@ -171,7 +171,7 @@ function setCurrentIds(moduleId, newDrop = false, emptyColumn = false) {
   if (newDrop) {
     moduleDiv = $(".current-drop")[0];
     //remove "empty column"
-    let parent = $(moduleDiv).parent()[0]
+    let parent = $(moduleDiv).parent()[0];
     $(parent).find(".empty-column").remove();
   } else if (emptyColumn) {
     moduleDiv = moduleId;
@@ -1799,7 +1799,7 @@ async function setupSortableModule(el) {
         console.log("setupSortableModule onEnd");
         var itemEl = event.item; // dragged HTMLElement
         const item = $(itemEl);
-        $('current-drop').removeClass('current-drop');
+        $("current-drop").removeClass("current-drop");
         item.addClass("current-drop");
         event.to; // target list
         event.from; // previous list
@@ -1834,7 +1834,7 @@ async function getModuleHierarchy(element) {
 }
 
 async function addModuleSort(item, event) {
-  debugger;
+  // debugger;
   console.log("addModuleSort", item);
 
   newDrop = true;
@@ -2113,33 +2113,48 @@ function pageBuilderFormChanged(data) {
 
 function savePBData(formData) {
   console.log("savePBData saving...");
-  axiosInstance
-    .post(`/api/modules/render`, { data: formData.data })
-    .then(async function (response) {
-      console.log("render response", response);
-
-      if (response.data.type === "module") {
-        console.log("replacing module", response.data.id);
-        if (response.data.id) {
-          let moduleDiv = $(`div[data-id="${response.data.id}"]`);
-          moduleDiv.replaceWith(response.data.html);
-          setCurrentIds(response.data.id);
-        } else {
-          $(`.current-drop, div[data-id="unsaved"]`).replaceWith(
+  let contentType = formData.data.contentType;
+  if (contentType === "section") {
+    axiosInstance
+      .post(`/api/content/render`, { data: formData.data })
+      .then(async function (response) {
+        console.log("render response", response);
+        if (response.data.type === "section") {
+          console.log("replacing section", formData.data.id);
+          $(`section[data-id="${formData.data.id}"]`).replaceWith(
             response.data.html
           );
-          //now save the new module
-          let submitButton = $('#pb-content-container .formio-component-submit .btn');
-          submitButton.click();
         }
-      } else if (response.data.type === "section") {
-        console.log("replacing section", formData.data.id);
-        $(`section[data-id="${formData.data.id}"]`).replaceWith(
-          response.data.html
-        );
-      }
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  } else {
+    axiosInstance
+      .post(`/api/modules/render`, { data: formData.data })
+      .then(async function (response) {
+        console.log("render response", response);
+
+        if (response.data.type === "module") {
+          console.log("replacing module", response.data.id);
+          if (response.data.id) {
+            let moduleDiv = $(`div[data-id="${response.data.id}"]`);
+            moduleDiv.replaceWith(response.data.html);
+            setCurrentIds(response.data.id);
+          } else {
+            $(`.current-drop, div[data-id="unsaved"]`).replaceWith(
+              response.data.html
+            );
+            //now save the new module
+            let submitButton = $(
+              "#pb-content-container .formio-component-submit .btn"
+            );
+            submitButton.click();
+          }
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
 }

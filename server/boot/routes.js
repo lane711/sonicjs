@@ -15,7 +15,6 @@ var mediaService = require("../services/media.service");
 var siteSettingsService = require("../services/site-settings.service");
 var themeSettingsService = require("../services/theme-settings.service");
 var contentService = require("../services/content.service");
-contentService.startup();
 var cssService = require("../services/css.service");
 var assetService = require("../services/asset.service");
 var userService = require("../services/user.service");
@@ -57,6 +56,7 @@ exports.loadRoutes = async function (app) {
   (async () => {
     await dalService.startup(app);
     await cacheService.startup();
+    await contentService.startup(app);
     await moduleService.startup(app);
     await menuService.startup();
     await mediaService.startup();
@@ -68,7 +68,6 @@ exports.loadRoutes = async function (app) {
     await pageBuilderService.startup(app);
     await testService.startup(app);
     await cssService.startup(app);
-
 
     await emitterService.emit("startup", { app: app });
 
@@ -108,10 +107,7 @@ exports.loadRoutes = async function (app) {
 
   app.get("/form/*", async function (req, res) {
     let moduleSystemId = req.path.replace("/form/", "");
-    let contentType = await dataService.contentTypeGet(
-      moduleSystemId,
-      req
-    );
+    let contentType = await dataService.contentTypeGet(moduleSystemId, req);
     let form = await formService.getFormJson(contentType, req);
     res.send(form);
   });
@@ -173,10 +169,7 @@ exports.loadRoutes = async function (app) {
       // }
       let entity;
 
-      let contentType = await dataService.contentTypeGet(
-        contentTypeId,
-        req
-      );
+      let contentType = await dataService.contentTypeGet(contentTypeId, req);
 
       if (payload.id) {
         //edit existing
@@ -346,9 +339,8 @@ exports.loadRoutesCatchAll = async function (app) {
     page.data.siteSettings = req.siteSettings;
 
     //check is edit mode, sidebar expanded
-    page.data.isEditMode = req.cookies.showSidebar === 'false' ? false : true;
-    page.data.sidebarClass = page.data.isEditMode ? 'expanded' : 'collapsed';
-
+    page.data.isEditMode = req.cookies.showSidebar === "false" ? false : true;
+    page.data.sidebarClass = page.data.isEditMode ? "expanded" : "collapsed";
 
     res.render(`${frontEndTheme}/layouts/main`, {
       layout: path.join(appRoot.path, frontEndTheme, "theme.hbs"),

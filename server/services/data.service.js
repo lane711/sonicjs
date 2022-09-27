@@ -758,6 +758,10 @@ if (typeof module !== "undefined" && module.exports) {
   };
 
   (exports.getContentById = async function (id, sessionID) {
+
+    if(!id){
+      return;
+    }
     // let url = `${apiUrl}content/${id}`;
     // return this.getAxios()
     //   .get(url)
