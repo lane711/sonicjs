@@ -757,7 +757,7 @@ if (typeof module !== "undefined" && module.exports) {
     return result;
   };
 
-  (exports.getContentById = async function (id, sessionID) {
+  (exports.getContentById = async function (id, sessionID, sectionId = undefined) {
 
     if(!id){
       return;

@@ -1214,7 +1214,8 @@ async function editModule(sessionID) {
 
   console.log("editing module: " + currentModuleId, currentModuleContentType);
 
-  let data = await dataService.getContentById(currentModuleId);
+  //TODO, need to get content from section
+  let data = await dataService.getContentById(currentModuleId. sessionID, currentSectionId);
 
   let message = `Updated ${currentModuleContentType} module`;
   // debugger;

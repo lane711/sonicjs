@@ -251,6 +251,7 @@ const RootQuery = new GraphQLObjectType({
         url: { type: GraphQLString },
         data: { type: GraphQLString },
         sessionID: { type: GraphQLString },
+        sectionId: { type: GraphQLString },
       },
       async resolve(parent, args, req) {
         return dalService.contentGet(
@@ -261,7 +262,8 @@ const RootQuery = new GraphQLObjectType({
           args.tag,
           args.group,
           await getUserSession(args.sessionID, req.sessionID),
-          req
+          req,
+          args.sectionId
         );
         // if (args.id) {
         //   return Content.findById(args.id);
@@ -286,6 +288,7 @@ const RootQuery = new GraphQLObjectType({
         tag: { type: GraphQLString },
         group: { type: GraphQLString },
         sessionID: { type: GraphQLString },
+        sectionId: { type: GraphQLString },
       },
 
       async resolve(parent, args, req, res) {
@@ -298,7 +301,8 @@ const RootQuery = new GraphQLObjectType({
           args.group,
           await getUserSession(args.sessionID, req.sessionID),
           req,
-          true
+          true,
+          args.sectionId
         );
         // if (args.ContentTypeId) {
         //   return Content.find({

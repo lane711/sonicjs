@@ -186,8 +186,22 @@ module.exports = dalService = {
     user,
     req,
     returnAsArray = false,
-    bypassProcessContent = false
+    bypassProcessContent = false,
+    sectionId = undefined
   ) {
+    console.log(
+      "contentGet",
+      id,
+      contentTypeId,
+      url,
+      tag,
+      group,
+      user,
+      returnAsArray,
+      bypassProcessContent,
+      sectionId
+    );
+
     let contents = [];
     const contentRepo = await getRepository(Content);
 
@@ -234,6 +248,7 @@ module.exports = dalService = {
       dalService.processContents(contents, user, req);
     }
 
+    console.log('contentGet contents', contents)
     return contents;
   },
 
@@ -372,7 +387,7 @@ module.exports = dalService = {
     // const canDelete =
     //   _.intersection(rolesThatCanDelete, userRoles).length !== 0;
 
-    const canDelete =userRoles.includes('admin')
+    const canDelete = userRoles.includes("admin");
 
     if (canDelete) {
       const contentRepo = await getRepository(Content);
