@@ -189,18 +189,18 @@ module.exports = dalService = {
     bypassProcessContent = false,
     sectionId = undefined
   ) {
-    console.log(
-      "contentGet",
-      id,
-      contentTypeId,
-      url,
-      tag,
-      group,
-      user,
-      returnAsArray,
-      bypassProcessContent,
-      sectionId
-    );
+    // console.log(
+    //   "contentGet",
+    //   id,
+    //   contentTypeId,
+    //   url,
+    //   tag,
+    //   group,
+    //   user,
+    //   returnAsArray,
+    //   bypassProcessContent,
+    //   sectionId
+    // );
 
     let contents = [];
     const contentRepo = await getRepository(Content);
@@ -248,7 +248,7 @@ module.exports = dalService = {
       dalService.processContents(contents, user, req);
     }
 
-    console.log('contentGet contents', contents)
+    // console.log('contentGet contents', contents)
     return contents;
   },
 

@@ -791,11 +791,13 @@ if (typeof module !== "undefined" && module.exports) {
     //       console.log(err);
     //       return "";
     //     });
+    sectionId = "abc";
 
     let result = await this.getAxios().post(apiUrl, {
       query: `
         {
           content(id: "${id}",
+          sectionId:"${sectionId}",
           sessionID:"${sessionID}") {
             contentTypeId
             data
@@ -815,7 +817,7 @@ if (typeof module !== "undefined" && module.exports) {
       return result.data.data.content;
     }
   }),
-    (exports.fileUpdate = async function (filePath, fileContent, sessionID) {
+    (exports.fileUpdate = async function (filePath, fileContent, sessionID) {s
       let result = await this.getAxios().post(apiUrl, {
         query: `
       mutation{

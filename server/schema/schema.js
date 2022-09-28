@@ -263,6 +263,8 @@ const RootQuery = new GraphQLObjectType({
           args.group,
           await getUserSession(args.sessionID, req.sessionID),
           req,
+          null,
+          null,
           args.sectionId
         );
         // if (args.id) {
