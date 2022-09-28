@@ -757,44 +757,13 @@ if (typeof module !== "undefined" && module.exports) {
     return result;
   };
 
-  (exports.getContentById = async function (id, sessionID, sectionId = undefined) {
-
-    if(!id){
+  (exports.getContentById = async function (id, sessionID, sectionId) {
+    if (!id) {
       return;
     }
-    // let url = `${apiUrl}content/${id}`;
-    // return this.getAxios()
-    //   .get(url)
-    //   .then(function (content) {
-    //     // console.log('getContentById', content.data);
-    //     return content.data;
-    //   })
-    //   .catch(function (error) {
-    //     console.log(`getContentById ERROR, Id:${id}`, error);
-    //   });
 
-    //   const query = gql`
-    //   {
-    //     content(id: "${id}") {
-    //       contentTypeId
-    //       data
-    //       id
-    //     }
-    //   }
-    // `;
-
-    //   this.executeGraphqlQuery(query)
-    //     .then((data) => {
-    //       return data.content;
-    //     })
-    //     .catch((err) => {
-    //       console.log(err);
-    //       return "";
-    //     });
-    sectionId = "abc";
-
-    let result = await this.getAxios().post(apiUrl, {
-      query: `
+    let query = sectionId
+      ? `
         {
           content(id: "${id}",
           sectionId:"${sectionId}",
@@ -805,7 +774,21 @@ if (typeof module !== "undefined" && module.exports) {
             url
           }
         }
-          `,
+          `
+      : `
+        {
+          content(id: "${id}",
+          sessionID:"${sessionID}") {
+            contentTypeId
+            data
+            id
+            url
+          }
+        }
+          `;
+
+    let result = await this.getAxios().post(apiUrl, {
+      query: query,
     });
 
     if (result.data.data.content) {
@@ -817,7 +800,8 @@ if (typeof module !== "undefined" && module.exports) {
       return result.data.data.content;
     }
   }),
-    (exports.fileUpdate = async function (filePath, fileContent, sessionID) {s
+    (exports.fileUpdate = async function (filePath, fileContent, sessionID) {
+      s;
       let result = await this.getAxios().post(apiUrl, {
         query: `
       mutation{

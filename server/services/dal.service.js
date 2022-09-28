@@ -187,7 +187,7 @@ module.exports = dalService = {
     req,
     returnAsArray = false,
     bypassProcessContent = false,
-    sectionId = undefined
+    sectionId = null
   ) {
     // console.log(
     //   "contentGet",
@@ -205,7 +205,11 @@ module.exports = dalService = {
     let contents = [];
     const contentRepo = await getRepository(Content);
 
-    if (id) {
+    if (sectionId) {
+      let section = await contentRepo.findOne({ where: { id: sectionId } });
+
+    }
+    else if (id) {
       let content = await contentRepo.findOne({ where: { id: id } });
       dalService.processContent(content, user, req);
 
