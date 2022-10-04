@@ -189,7 +189,6 @@ module.exports = contentService = {
         await this.renderSection(page, section.sectionId, sessionID, req);
       }
 
-
       // sectionWrapper.append(page.data.html);
     } else {
       //new page with no sections yet
@@ -235,13 +234,15 @@ module.exports = contentService = {
             ? section.data.cssClass + " "
             : "";
           let sectionStyle = await this.getSectionBackgroundStyle(section);
+          // let overlayStyle = await this.getSectionOverlayStyle(section);
+
           page.data.html += `<section data-id='${section.id}' data-title='${section.data.title}' class="${sectionClass}jumbotron-fluid pb ${sectionStyle?.css}" style="${sectionStyle?.style}">`;
-          page.data.html += '<div class="section-overlay">';
+          // page.data.html += `<div class="section-overlay" style="${overlayStyle}">`;
           page.data.html += '<div class="container">';
           let rows;
           rows = await this.processRows(page, section, section.data.rows, req);
           page.data.html += "</div>";
-          page.data.html += "</div>";
+          // page.data.html += "</div>";
           page.data.html += `</section>`;
 
           page.data.sections.push({
@@ -258,20 +259,23 @@ module.exports = contentService = {
     if (section.data.background) {
       let style = "";
       let css = "";
+      let overlayCss = "";
 
-      // console.log(section.data.background);rs
+      if (section.data.overlay) {
+        overlayCss = `linear-gradient(${section.data.overlayTopColor}, ${section.data.overlayBottomColor}), `;
+      }
 
       switch (section.data.background) {
         case "color":
           let colorRGBA = section.data.color;
           if (colorRGBA) {
-            style = `background:${colorRGBA};`;
+            style = `background:${overlayCss}${colorRGBA};`;
           }
           break;
         case "image":
           let imageSrc = section.data.image.src;
           if (imageSrc) {
-            style = `background: url(${imageSrc});`;
+            style = `background: ${overlayCss}url(${imageSrc});`;
             css = "bg-image-cover";
           }
           break;
@@ -280,6 +284,22 @@ module.exports = contentService = {
       }
 
       return { style, css };
+    }
+  },
+
+  getSectionOverlayStyle: async function (section) {
+    if (section.data.overlay) {
+      console.log(
+        "getting section overlay",
+        section.data.overlayTopColor,
+        section.data.overlayBottomColor
+      );
+      // background-image: linear-gradient(rgba(255,255,255,0.9),rgba(255,255,255,0.7));
+
+      let style = `background-image: linear-gradient(${section.data.overlayTopColor}, ${section.data.overlayBottomColor})`;
+      // style = `background-image: linear-gradient(rgba(255,255,255,0.9),rgba(255,255,255,0.7))`;
+
+      return style;
     }
   },
 

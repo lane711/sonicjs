@@ -171,7 +171,7 @@ function setCurrentIds(moduleId, newDrop = false, emptyColumn = false) {
   if (newDrop) {
     moduleDiv = $(".current-drop")[0];
     //remove "empty column"
-    let parent = $(moduleDiv).parent()[0]
+    let parent = $(moduleDiv).parent()[0];
     $(parent).find(".empty-column").remove();
   } else if (emptyColumn) {
     moduleDiv = moduleId;
@@ -1342,6 +1342,7 @@ async function resizeRight(event) {
 }
 
 async function setNewColumnSize(diff) {
+  // ui
   let currentClasses = currentColumn.attr("class").split(" ");
   let currentColClass = currentClasses.filter((c) => c.includes("col"))[0];
   let currentColClassSize = parseInt(currentColClass.replace(/^\D+/g, ""));
@@ -1351,6 +1352,12 @@ async function setNewColumnSize(diff) {
   );
 
   $(currentColumn).removeClass(currentColClass).addClass(newColClassSize);
+
+  //save to db
+  let section = await dataService.getContentById(currentSectionId);
+  let column = section.data.rows[currentRowIndex].columns[currentColumnIndex];
+  column.css = newColClassSize;
+  await editInstance(section, false, 'section', "Column css class updates to " + newColClassSize);
 }
 
 async function copyModule() {
@@ -1799,7 +1806,7 @@ async function setupSortableModule(el) {
         console.log("setupSortableModule onEnd");
         var itemEl = event.item; // dragged HTMLElement
         const item = $(itemEl);
-        $('current-drop').removeClass('current-drop');
+        $("current-drop").removeClass("current-drop");
         item.addClass("current-drop");
         event.to; // target list
         event.from; // previous list
@@ -1834,7 +1841,7 @@ async function getModuleHierarchy(element) {
 }
 
 async function addModuleSort(item, event) {
-  debugger;
+
   console.log("addModuleSort", item);
 
   newDrop = true;
@@ -2129,7 +2136,9 @@ function savePBData(formData) {
             response.data.html
           );
           //now save the new module
-          let submitButton = $('#pb-content-container .formio-component-submit .btn');
+          let submitButton = $(
+            "#pb-content-container .formio-component-submit .btn"
+          );
           submitButton.click();
         }
       } else if (response.data.type === "section") {
