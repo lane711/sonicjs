@@ -487,11 +487,12 @@ async function setupColorPicker(id) {
   waitForElm(`.color-picker-append`).then((elm) => {
     console.log("Element is ready");
     $(`<input type="text" id="${buttonId}">`).insertAfter($(`#${id}`));
-    addColorPicker(id, buttonId);
+    let color = $(`#${id}`).val();
+    addColorPicker(id, buttonId, color);
   });
 }
 
-async function addColorPicker(textBoxId, buttonId) {
+async function addColorPicker(textBoxId, buttonId, color) {
   let pickr = Pickr.create({
     el: `#${buttonId}`,
     appClass: "color-picker-button",
@@ -535,8 +536,10 @@ async function addColorPicker(textBoxId, buttonId) {
     },
   });
 
-  console.log("setting color picker");
-  pickr.setColor("red");
+  pickr.on("init", () => {
+    console.log("setting color picker");
+    pickr.setColor(color);
+  });
 
   pickr.on("change", async (color, instance) => {
     // debugger;
