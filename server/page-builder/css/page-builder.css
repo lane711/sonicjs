@@ -140,10 +140,10 @@
   flex-wrap: wrap;
 }
 
-#elements-list h2{
+#elements-list h2 {
   font-size: 16px;
   width: 100%;
-  margin: 1rem 0 .5rem 6px;
+  margin: 1rem 0 0.5rem 6px;
 }
 
 #elements-list.hide {
@@ -808,6 +808,9 @@ section {
   overflow: auto;
 }
 
+
+
+
 .pb-wrapper {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
@@ -856,8 +859,16 @@ section {
   width: 100%;
 }
 
+.color-picker-append .pickr .form-control {
+  margin: 0;
+  border-bottom:1px red;
+}
+
 .pb .pickr .pcr-button {
   width: 100%;
+  border: 1px solid #ced4da;
+  border-top: none;
+
 }
 
 .pb-wrapper .white,
