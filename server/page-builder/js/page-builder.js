@@ -45,6 +45,7 @@ $(document).ready(async function () {
   setupElements();
   setupPageForm();
   showElements();
+  setupFormIsLoadedEvent();
 });
 
 function setupSessionID() {
@@ -252,7 +253,7 @@ async function setupClickEvents() {
   });
 
   setupBreadcrumbEvents();
-  setupSectionBackgroundEvents();
+  // setupSectionBackgroundEvents();
 }
 
 async function addSection(above = true, layout) {
@@ -371,6 +372,9 @@ async function setupBreadcrumbEvents() {
 
     $("#pb-content-container").html(form.html);
     loadModuleSettingForm();
+
+    //seup color pickers
+    // setupColorPicker(currentSectionId);
   });
 
   $(".select-current-row").on("click", async function () {
@@ -382,56 +386,56 @@ async function setupBreadcrumbEvents() {
   });
 }
 
-async function setupSectionBackgroundEvents() {
-  $(".section-background-editor button").on("click", async function () {
-    let backgroundSetting = $(this).data("type");
-    currentSectionId = $(this).data("section-id");
-    setupColorPicker(currentSectionId);
+// async function setupSectionBackgroundEvents() {
+//   $(".section-background-editor button").on("click", async function () {
+//     let backgroundSetting = $(this).data("type");
+//     currentSectionId = $(this).data("section-id");
+//     setupColorPicker(currentSectionId);
 
-    currentSectionRecord = await getCurrentSection();
-    // debugger;
-    currentSectionRecord.data.background = { type: backgroundSetting };
-    // setDefaultBackgroundSetting(currentSectionRecord);
-    showBackgroundTypeOptions(backgroundSetting, currentSectionId);
+//     currentSectionRecord = await getCurrentSection();
+//     // debugger;
+//     currentSectionRecord.data.background = { type: backgroundSetting };
+//     // setDefaultBackgroundSetting(currentSectionRecord);
+//     showBackgroundTypeOptions(backgroundSetting, currentSectionId);
 
-    editInstance(currentSectionRecord);
-  });
+//     editInstance(currentSectionRecord);
+//   });
 
-  $(".pb .layout .background-image-link").on("click", async function () {
-    $("#genericModal").on("show.bs.modal", function () {
-      // alert("load");
+//   $(".pb .layout .background-image-link").on("click", async function () {
+//     $("#genericModal").on("show.bs.modal", function () {
+//       // alert("load");
 
-      $(".image-module-list-item").on("click", function () {
-        console.log("image-module-list-item", $(this).text());
-      });
+//       $(".image-module-list-item").on("click", function () {
+//         console.log("image-module-list-item", $(this).text());
+//       });
 
-      // debugger;
-      //  const element = $(".section-background .choices .choices__input")[0]
-      const example = new Choices(
-        $(".section-background .choices .choices__input")[0]
-      );
+//       // debugger;
+//       //  const element = $(".section-background .choices .choices__input")[0]
+//       const example = new Choices(
+//         $(".section-background .choices .choices__input")[0]
+//       );
 
-      example.passedElement.element.addEventListener(
-        "addItem",
-        async function (event) {
-          // do something creative here...
-          // console.log(event.detail.id);
-          console.log(event.detail.value.src);
-          // console.log(event.detail.label);
-          // console.log(event.detail.customProperties);
-          // console.log(event.detail.groupValue);
-          // debugger;
-          $(`section[data-id="${currentSectionId}"]`)
-            .css("background", `url(${event.detail.value.src})`)
-            .addClass("bg-image-cover");
+//       example.passedElement.element.addEventListener(
+//         "addItem",
+//         async function (event) {
+//           // do something creative here...
+//           // console.log(event.detail.id);
+//           console.log(event.detail.value.src);
+//           // console.log(event.detail.label);
+//           // console.log(event.detail.customProperties);
+//           // console.log(event.detail.groupValue);
+//           // debugger;
+//           $(`section[data-id="${currentSectionId}"]`)
+//             .css("background", `url(${event.detail.value.src})`)
+//             .addClass("bg-image-cover");
 
-          //save
-        },
-        false
-      );
-    });
-  });
-}
+//           //save
+//         },
+//         false
+//       );
+//     });
+//   });
+// }
 
 async function setDefaultBackgroundSetting(currentSectionRecord, color) {
   currentSectionRecord.data.background.color = color;
@@ -456,9 +460,46 @@ async function showBackgroundTypeOptions(backgroundSetting, sectionId) {
   $(selector).show();
 }
 
-async function setupColorPicker(currentSectionId) {
+function setupFormIsLoadedEvent() {
+  const visibleProp = Object.getOwnPropertyDescriptor(
+    Formio.Components.components.component.prototype,
+    "visible"
+  );
+  const setVisible = visibleProp.set;
+  visibleProp.set = function (visible) {
+    if (visible) {
+      console.log(
+        "VISIBLE",
+        this.component.key,
+        this.component.currentSectionTitle
+      );
+      if (this.component.customClass.includes("color-picker")) {
+        setupColorPicker(`${this.component.id}-${this.component.key}`);
+      }
+    }
+    return setVisible.call(this, visible);
+  };
+  Object.defineProperty(
+    Formio.Components.components.component.prototype,
+    "visible",
+    visibleProp
+  );
+}
+
+async function setupColorPicker(id) {
+  let buttonId = `color-picker-button-${id}`;
+
+  waitForElm(`.color-picker-append`).then((elm) => {
+    console.log("Element is ready");
+    $(`<input type="text" id="${buttonId}">`).insertAfter($(`#${id}`));
+    addColorPicker(buttonId);
+  });
+}
+
+async function addColorPicker(buttonId) {
   const pickr = Pickr.create({
-    el: `#backgroundColorPreview-${currentSectionId}`,
+    el: `#${buttonId}`,
+    // useAsButton: true,
     theme: "nano", // or 'monolith', or 'nano'
 
     swatches: [
@@ -497,46 +538,6 @@ async function setupColorPicker(currentSectionId) {
       },
     },
   });
-
-  pickr
-    .on("change", async (color, instance) => {
-      // debugger;
-      console.log("change", color, instance);
-      $(`section[data-id="${currentSectionId}"]`).css(
-        "background-color",
-        color.toHEXA()
-      );
-    })
-    .on("save", async (color, instance) => {
-      console.log("save", color, instance);
-      currentSectionRecord = await getCurrentSection();
-      currentSectionRecord.data.background = {
-        type: "color",
-        color: color.toRGBA().toString(3),
-      };
-      editInstance(currentSectionRecord);
-    });
-
-  var parent = document.querySelector(
-    `#backgroundColorPreview-${currentSectionId}`
-  );
-  // var parent = $('#background-color-preview');
-
-  // var parent = $('.color-picker input');
-
-  // debugger;
-  // var picker = new Picker({ parent: parent, popup: 'bottom' });
-
-  // picker.onChange = function (color) {
-  //     parent.style.background = color.rgbaString;
-  //     $(`section[data-id="${currentSectionId}"]`).css('background-color', getHtmlHex(color.hex));
-  // };
-
-  // picker.onDone = async function (color) {
-  //     currentSectionRecord = await getCurrentSection();
-  //     setDefaultBackgroundSetting(currentSectionRecord, getHtmlHex(color.hex));
-  //     editInstance(currentSectionRecord);
-  // };
 }
 
 function getHtmlHex(hex) {
@@ -1357,7 +1358,12 @@ async function setNewColumnSize(diff) {
   let section = await dataService.getContentById(currentSectionId);
   let column = section.data.rows[currentRowIndex].columns[currentColumnIndex];
   column.css = newColClassSize;
-  await editInstance(section, false, 'section', "Column css class updates to " + newColClassSize);
+  await editInstance(
+    section,
+    false,
+    "section",
+    "Column css class updates to " + newColClassSize
+  );
 }
 
 async function copyModule() {
@@ -1841,7 +1847,6 @@ async function getModuleHierarchy(element) {
 }
 
 async function addModuleSort(item, event) {
-
   console.log("addModuleSort", item);
 
   newDrop = true;
