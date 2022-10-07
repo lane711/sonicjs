@@ -468,11 +468,6 @@ function setupFormIsLoadedEvent() {
   const setVisible = visibleProp.set;
   visibleProp.set = function (visible) {
     if (visible) {
-      console.log(
-        "VISIBLE",
-        this.component.key,
-        this.component.currentSectionTitle
-      );
       if (this.component.customClass.includes("color-picker")) {
         setupColorPicker(`${this.component.id}-${this.component.key}`);
       }
@@ -492,13 +487,14 @@ async function setupColorPicker(id) {
   waitForElm(`.color-picker-append`).then((elm) => {
     console.log("Element is ready");
     $(`<input type="text" id="${buttonId}">`).insertAfter($(`#${id}`));
-    addColorPicker(buttonId);
+    addColorPicker(id, buttonId);
   });
 }
 
-async function addColorPicker(buttonId) {
-  const pickr = Pickr.create({
+async function addColorPicker(textBoxId, buttonId) {
+  let pickr = Pickr.create({
     el: `#${buttonId}`,
+    appClass: "color-picker-button",
     // useAsButton: true,
     theme: "nano", // or 'monolith', or 'nano'
 
@@ -534,10 +530,43 @@ async function addColorPicker(buttonId) {
         cmyk: false,
         input: true,
         clear: true,
-        save: true,
+        save: false,
       },
     },
   });
+
+  console.log("setting color picker");
+  pickr.setColor("red");
+
+  pickr.on("change", async (color, instance) => {
+    // debugger;
+    pickr.applyColor();
+
+    const componentName = textBoxId.split("-")[1];
+
+    console.log("setting component color", componentName);
+    currentForm
+      .getComponent(componentName)
+      .setValue(color.toRGBA().toString(3));
+
+    console.log("change", buttonId, color, instance);
+    // $(`#${textBoxId}`).val(color.toRGBA().toString(3));
+
+    // $(`#${textBoxId}`).keypress();
+    // $(`section[data-id="${currentSectionId}"]`).css(
+    //   "background-color",
+    //   color.toHEXA()
+    // );
+  });
+  // .on("save", async (color, instance) => {
+  //   console.log("save", color, instance);
+  //   currentSectionRecord = await getCurrentSection();
+  //   currentSectionRecord.data.background = {
+  //     type: "color",
+  //     color: color.toRGBA().toString(3),
+  //   };
+  //   editInstance(currentSectionRecord);
+  // });
 }
 
 function getHtmlHex(hex) {
@@ -2090,6 +2119,14 @@ async function setupPageForm() {
 function pageBuilderFormChanged(data) {
   // debugger;
 
+  if (formIsDirty) {
+    // $('.formio-component-submit').css('background','red');
+    if (!$(".submit-alert").length)
+      $(
+        '<div class="submit-alert alert alert-danger mt-1">Unsaved changes!</div>'
+      ).appendTo(".formio-component-submit");
+  }
+
   if (globalService.isBackEnd()) {
     return;
   }
@@ -2117,6 +2154,8 @@ function pageBuilderFormChanged(data) {
 
   console.log("pageBuilderFormChanged", data);
   //render module (may not have instance yet_
+
+  formIsDirty = true;
 
   savePBData(data);
 }

@@ -7,9 +7,12 @@
   //used for json explorer
   var formValuesToLoad = {{{ formValuesToLoad }}}
   var editMode = {{{ editMode }}}
-
-
+  var currentForm = '';
+  var formIsDirty = false;
+  
       loadModuleSettingForm = async function (){
+        ('setting for dirty false')
+      formIsDirty = false;
         return form_{{ random }}();
       }
 
@@ -18,6 +21,7 @@
           formService.setFormApiUrls(Formio);
 
           Formio.{{formioFunction}}(document.getElementById('formio_{{ random }}'), formJSON_{{ random }}).then((form) => {
+              currentForm = form; //make form available in other JS
               form.options.noAlerts = true;
               console.log('log form', form);
 

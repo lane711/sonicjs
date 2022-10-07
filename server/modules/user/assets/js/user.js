@@ -195,6 +195,7 @@ async function editInstance(
     .then(async function (response) {
       // debugger;
       console.log("editInstance -->", response);
+      $(".submit-alert").remove();
       // resolve(response.data);
       // return await response.data;
       if (response.contentTypeId === "page" && !globalService.isBackEnd()) {
