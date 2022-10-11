@@ -196,7 +196,7 @@ function setupUIClicks() {
 }
 function resetModule() {
   savePBData(originalModuleDataFromDb);
-  $(".submit-alert").remove();
+  // $(".submit-alert").remove();
   editModule(sessionID);
   // formIsDirty = false;
 }
