@@ -879,3 +879,12 @@ section {
 .formio-component-form .has-success .help-block {
   display: none;
 }
+
+.pb .submit-alert{
+  padding: 9px 1rem 12px;
+}
+
+.pb .submit-alert span:first-of-type{
+  margin: 0 10px 0 0;
+  vertical-align: middle;
+}
