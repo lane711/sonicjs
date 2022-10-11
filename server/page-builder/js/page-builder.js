@@ -20,6 +20,9 @@ var imageList,
   jsonEditorRaw,
   sessionID,
   theme,
+  nextSelectedModule,
+  unsavedChanedsModal,
+  originalModuleDataFromDb,
   formSubmitted = false,
   newDrop = false;
 
@@ -149,16 +152,63 @@ function setupUIClicks() {
     if ($(this).hasClass("cloned")) {
       return;
     }
-    let moduleDiv = $(this).closest(".module")[0];
-    console.log("module click", moduleDiv);
-    setCurrentIds(moduleDiv.dataset.id);
-    editModule(sessionID);
+
+    nextSelectedModule = this;
+    if (!checkForUnsavedChanges()) {
+      selectNextModule();
+    } else {
+      unsavedChanedsModal = new bootstrap.Modal(
+        document.getElementById("unsavedChanedsModal"),
+        {
+          keyboard: false,
+        }
+      );
+      unsavedChanedsModal.show();
+    }
   });
 
   $(document).on("click", ".empty-column", function () {
     let moduleDiv = $(this).closest(".col")[0];
     setCurrentIds(moduleDiv, undefined, true);
   });
+
+  $("#unsavedLooseChanges").on("click", function () {
+    //need to revert/reset module
+
+    selectNextModule();
+  });
+
+  $("#unsavedSaveChanges").on("click", function () {
+    clickFormUpdateButton();
+    unsavedChanedsModal.hide();
+    selectNextModule();
+  });
+
+  $(document).on("click", "#reset-module", function () {
+    //need to revert/reset module
+
+    resetModule();
+  });
+}
+function resetModule() {
+  savePBData(originalModuleDataFromDb);
+  $('.submit-alert').remove();
+  //reset form
+
+  // let moduleDiv = $(`div[data-id="${originalModuleDataFromDb.id}"]`);
+  // moduleDiv.replaceWith(originalModuleDataFromDb.html);
+  // setCurrentIds(originalModuleDataFromDb.data.id);
+}
+
+function checkForUnsavedChanges() {
+  return typeof formIsDirty !== "undefined" && formIsDirty === true;
+}
+
+function selectNextModule() {
+  let moduleDiv = $(nextSelectedModule).closest(".module")[0];
+  console.log("module click", moduleDiv);
+  setCurrentIds(moduleDiv.dataset.id);
+  editModule(sessionID);
 }
 
 function setMainPanelHeaderTextAndIcon(text, icon) {
@@ -194,6 +244,7 @@ function setCurrentIds(moduleId, newDrop = false, emptyColumn = false) {
   currentSectionId = currentSection.dataset.id;
   currentSectionTitle = currentSection.dataset.title;
   $(".select-current-section").text(currentSectionTitle);
+  $(".breadcrumbs").removeClass("hide");
   currentRow = $(moduleDiv).closest(".row");
   currentRowIndex = $(currentRow).index();
   currentColumn = $(moduleDiv).closest('div[class*="col"]');
@@ -377,13 +428,13 @@ async function setupBreadcrumbEvents() {
     // setupColorPicker(currentSectionId);
   });
 
-  $(".select-current-row").on("click", async function () {
-    console.log("current row", currentRow);
-  });
+  // $(".select-current-row").on("click", async function () {
+  //   console.log("current row", currentRow);
+  // });
 
-  $(".select-current-column").on("click", async function () {
-    console.log("current column", currentColumn);
-  });
+  // $(".select-current-column").on("click", async function () {
+  //   console.log("current column", currentColumn);
+  // });
 }
 
 // async function setupSectionBackgroundEvents() {
@@ -2126,8 +2177,12 @@ function pageBuilderFormChanged(data) {
     // $('.formio-component-submit').css('background','red');
     if (!$(".submit-alert").length)
       $(
-        '<div class="submit-alert alert alert-danger mt-1">Unsaved changes!</div>'
-      ).appendTo(".formio-component-submit");
+        '<span class="submit-alert alert alert-danger ms-3"><span>Unsaved changes!</span><span id="reset-module" class="btn btn-sm btn-danger">Reset</span></span>'
+      ).insertAfter(".formio-component-submit button");
+  } else {
+    if (!data.changed) {
+      originalModuleDataFromDb = JSON.parse(JSON.stringify(data)); //deep copy
+    }
   }
 
   if (globalService.isBackEnd()) {
@@ -2163,9 +2218,15 @@ function pageBuilderFormChanged(data) {
   savePBData(data);
 }
 
+function clickFormUpdateButton() {
+  //now save the new module
+  let submitButton = $("#pb-content-container .formio-component-submit .btn");
+  submitButton.click();
+}
+
 // var returnedFunction = debounce(savePBData(data), 2000);
 
-function savePBData(formData) {
+function savePBData(formData, setCurrentIdsAfter = true) {
   console.log("savePBData saving...");
   axiosInstance
     .post(`/api/modules/render`, { data: formData.data })
@@ -2177,16 +2238,17 @@ function savePBData(formData) {
         if (response.data.id) {
           let moduleDiv = $(`div[data-id="${response.data.id}"]`);
           moduleDiv.replaceWith(response.data.html);
+          if(setCurrentIdsAfter){
           setCurrentIds(response.data.id);
+          }
+          // if (!originalModuleDataFromDb.html) {
+          //   originalModuleDataFromDb.html = { ...response.data.html };
+          // }
         } else {
           $(`.current-drop, div[data-id="unsaved"]`).replaceWith(
             response.data.html
           );
-          //now save the new module
-          let submitButton = $(
-            "#pb-content-container .formio-component-submit .btn"
-          );
-          submitButton.click();
+          clickFormUpdateButton();
         }
       } else if (response.data.type === "section") {
         console.log("replacing section", formData.data.id);
