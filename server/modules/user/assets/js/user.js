@@ -140,14 +140,17 @@ async function openCreateForm(action, contentType) {
 async function submitContent(
   submission,
   refresh = true,
-  contentType = "content"
+  contentType = "content",
+  ignoreSuccessAction = false
 ) {
   // debugger;
   console.log("Submission was made!", submission);
   let entity = submission.data ? submission.data : submission;
   entity.contentType = entity.contentType ?? contentType;
 
-  // debugger;
+  if (typeof formIsDirty !== "undefined") {
+    formIsDirty = false;
+  }
 
   let result = await axios({
     method: "post",
@@ -159,7 +162,9 @@ async function submitContent(
   });
 
   // debugger;
-  eval(result.data.successAction);
+  if (!ignoreSuccessAction) {
+    eval(result.data.successAction);
+  }
 
   // if (!contentType.startsWith("user")) {
   //   if (submission.id || submission.data.id) {
@@ -195,7 +200,7 @@ async function editInstance(
     .then(async function (response) {
       // debugger;
       console.log("editInstance -->", response);
-      $(".submit-alert").remove();
+      removeDirty();
       // resolve(response.data);
       // return await response.data;
       if (response.contentTypeId === "page" && !globalService.isBackEnd()) {
@@ -213,6 +218,13 @@ async function editInstance(
     .catch(function (error) {
       console.log("editInstance", error);
     });
+}
+
+function removeDirty(){
+  $(".submit-alert").remove();
+  if (typeof formIsDirty !== "undefined") {
+    formIsDirty = false;
+  }
 }
 
 async function createInstance(
