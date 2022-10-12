@@ -1404,6 +1404,8 @@ async function deleteModuleConfirm(deleteContent = false) {
   // payload.data.destinationModuleIndex = event.newIndex;
   // payload.data.destinationModules = destinationModules;
 
+  debugger;
+
   return axiosInstance
     .post("/admin/pb-update-module-delete", payload)
     .then(async function (response) {

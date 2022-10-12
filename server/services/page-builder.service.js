@@ -70,6 +70,9 @@ module.exports = pageBuilderService = {
         content = content.filter(
           (c) => !c.content.includes(data.moduleId.toString())
         );
+
+        section.data.rows[data.rowIndex].columns[data.columnIndex].content = content;
+        
         await dataService.editInstance(section, req.sessionID);
         // console.log("content", content);
 
