@@ -177,9 +177,12 @@ module.exports = installService = {
   },
 
   migrateToNewSectionColumnStructure: async function (app) {
+    let session = { user: { id: "69413190-833b-4318-ae46-219d690260a9" } };
     let sections = await dataService.getContentByType("section");
 
-    sections.map((section) => {
+    let updateSection;
+    sections.map(async (section) => {
+      updateSection = false;
       section.data.rows?.map((row) => {
         row.columns.map((column) => {
           if (!Array.isArray(column.content)) {
@@ -197,10 +200,19 @@ module.exports = installService = {
 
               column.content = newcContentArr;
               console.log('new',newcContentArr );
+              updateSection = false;
             }
           }
         });
       });
+      if(updateSection){
+        let record = await dalService.contentUpdate(
+          section.id,
+          section.url,
+          section.data,
+          session
+        );
+      }
     });
   },
 };
