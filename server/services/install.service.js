@@ -3,42 +3,42 @@ var dataService = require("./data.service");
 
 var helperService = require("./helper.service");
 var fileService = require("./file.service");
-var logSymbols = require('log-symbols');
+var logSymbols = require("log-symbols");
 
 module.exports = installService = {
   checkInstallation: async function () {
+    if (process.env.MIGRATE_DATA === "TRUE") {
+      await installService.migrateToNewSectionColumnStructure();
+    }
 
-    if(process.env.BYPASS_INSTALL_CHECK === 'TRUE'){
+    if (process.env.BYPASS_INSTALL_CHECK === "TRUE") {
       return;
     }
-    
-    console.log(logSymbols.info, 'Checking Install...');
 
-
+    console.log(logSymbols.info, "Checking Install...");
     await installService.checkDefaultContent();
 
-    console.log(logSymbols.success, 'Install Verified!');
-
+    console.log(logSymbols.success, "Install Verified!");
   },
 
   checkDefaultContent: async function (app) {
-    console.log(logSymbols.info, 'Checking Base Content...');
+    console.log(logSymbols.info, "Checking Base Content...");
 
-    let session = {user : {id:"69413190-833b-4318-ae46-219d690260a9"}};
+    let session = { user: { id: "69413190-833b-4318-ae46-219d690260a9" } };
 
     let siteSettingsColors = await dataService.getContentByType(
       "site-settings-colors"
     );
     if (!siteSettingsColors || siteSettingsColors.length === 0) {
       let data = {
-          contentType: "site-settings-colors",
-          url: "/site-settings-colors",
-          bodyBackground: "#F8F8F8",
-          headerBackground: "#000",
-          headerOpacity: ".95",
-          background: "green",
-          header: "#555555",
-          submit: true,
+        contentType: "site-settings-colors",
+        url: "/site-settings-colors",
+        bodyBackground: "#F8F8F8",
+        headerBackground: "#000",
+        headerOpacity: ".95",
+        background: "green",
+        header: "#555555",
+        submit: true,
       };
       let record = await dalService.contentUpdate(
         "",
@@ -53,13 +53,13 @@ module.exports = installService = {
     let siteSettings = await dataService.getContentByType("site-settings");
     if (siteSettings.length === 0) {
       let data = {
-          contentType: "site-settings",
-          url: "/site-settings",
-          logoType: "text",
-          logoTitle: "My Site",
-          fontDefault: "Lato",
-          fontHeaders: "Roboto",
-          homePageId: "1",
+        contentType: "site-settings",
+        url: "/site-settings",
+        logoType: "text",
+        logoTitle: "My Site",
+        fontDefault: "Lato",
+        fontHeaders: "Roboto",
+        homePageId: "1",
       };
       let record = await dalService.contentUpdate(
         "",
@@ -73,15 +73,15 @@ module.exports = installService = {
     let themeSettings = await dataService.getContentByType("theme-settings");
     if (themeSettings.length === 0) {
       let data = {
-          contentType: "theme-settings",
-          url: "/theme-settings",
-          logoType: "image",
-          logoTitle: "Acme Widgets",
-          fontSize: "24px",
-          fontColor: "#fff",
-          fileName: "temp-logo.png",
-          imageWidth: "120px",
-          imageStyle: "",
+        contentType: "theme-settings",
+        url: "/theme-settings",
+        logoType: "image",
+        logoTitle: "Acme Widgets",
+        fontSize: "24px",
+        fontColor: "#fff",
+        fileName: "temp-logo.png",
+        imageWidth: "120px",
+        imageStyle: "",
       };
       let record = await dalService.contentUpdate(
         "",
@@ -92,13 +92,15 @@ module.exports = installService = {
       console.log("created themeSettings:", record);
     }
 
-    let googleAnalytics = await dataService.getContentByType("google-analytics");
+    let googleAnalytics = await dataService.getContentByType(
+      "google-analytics"
+    );
     if (googleAnalytics.length === 0) {
       let data = {
-          contentType: "google-analytics",
-          url: "/google-analytics",
-          "googleAnalyticsUACode" : "UA-132867068-1", 
-          "enableOnDomain" : "sonicjs.com", 
+        contentType: "google-analytics",
+        url: "/google-analytics",
+        googleAnalyticsUACode: "UA-132867068-1",
+        enableOnDomain: "sonicjs.com",
       };
       let record = await dalService.contentUpdate(
         "",
@@ -110,44 +112,42 @@ module.exports = installService = {
     }
 
     // let mainMenu = await dataService.getContentByType("menu");
-    let mainMenu = await menuService.getMenu("Main")
+    let mainMenu = await menuService.getMenu("Main");
     if (!mainMenu) {
       let data = {
-          contentType: "main-menu",
-          url: "/main-menu",
-          title: "Main", 
-          contentType : "menu", 
-          links : [
-              {
-                  "id" : "NQ6YeBCClIQ", 
-                  "text" : "Home", 
-                  "icon" : "bi bi-chevron-right",
-                  "li_attr" : {
-                      "id" : "NQ6YeBCClIQ"
-                  }, 
-                  "a_attr" : {
-                      "href" : "#", 
-                      "id" : "NQ6YeBCClIQ_anchor"
-                  }, 
-                  "state" : {
-                      "loaded" : true, 
-                      "opened" : false, 
-                      "selected" : true, 
-                      "disabled" : false
-                  }, 
-                  "data" : {
-                      "id" : "NQ6YeBCClIQ", 
-                      "title" : "Home", 
-                      "url" : "/", 
-                      "showInMenu" : true, 
-                      "showChildren" : false
-                  }, 
-                  "children" : [
-  
-                  ], 
-                  "type" : "default"
-              }
-          ]
+        contentType: "main-menu",
+        url: "/main-menu",
+        title: "Main",
+        contentType: "menu",
+        links: [
+          {
+            id: "NQ6YeBCClIQ",
+            text: "Home",
+            icon: "bi bi-chevron-right",
+            li_attr: {
+              id: "NQ6YeBCClIQ",
+            },
+            a_attr: {
+              href: "#",
+              id: "NQ6YeBCClIQ_anchor",
+            },
+            state: {
+              loaded: true,
+              opened: false,
+              selected: true,
+              disabled: false,
+            },
+            data: {
+              id: "NQ6YeBCClIQ",
+              title: "Home",
+              url: "/",
+              showInMenu: true,
+              showChildren: false,
+            },
+            children: [],
+            type: "default",
+          },
+        ],
       };
       let record = await dalService.contentUpdate(
         "",
@@ -161,24 +161,46 @@ module.exports = installService = {
     let page = await dataService.getContentByType("page");
     if (page.length === 0) {
       let data = {
-          contentType: "page",
-          url: "/",
-          title : "Home", 
-          showHero : false, 
-          heroTitle : "", 
-          pageCssClass : "", 
-          autoGenerateUrl : false, 
+        contentType: "page",
+        url: "/",
+        title: "Home",
+        showHero: false,
+        heroTitle: "",
+        pageCssClass: "",
+        autoGenerateUrl: false,
       };
-      let record = await dalService.contentUpdate(
-        "",
-        "/",
-        data,
-        session
-      );
+      let record = await dalService.contentUpdate("", "/", data, session);
       console.log("created default page:", record);
     }
 
-    console.log(logSymbols.success, 'Base Content Verified!');
+    console.log(logSymbols.success, "Base Content Verified!");
+  },
 
+  migrateToNewSectionColumnStructure: async function (app) {
+    let sections = await dataService.getContentByType("section");
+
+    sections.map((section) => {
+      section.data.rows?.map((row) => {
+        row.columns.map((column) => {
+          if (!Array.isArray(column.content)) {
+            if (column.content) {
+              let contentArr = column.content.split("][");
+              console.log(
+                section.id,
+                column.content,
+                contentArr
+              );
+
+              let newcContentArr = contentArr.map(c => {
+                return {content : c}
+              })
+
+              column.content = newcContentArr;
+              console.log('new',newcContentArr );
+            }
+          }
+        });
+      });
+    });
   },
 };
