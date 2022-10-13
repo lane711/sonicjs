@@ -8,7 +8,7 @@ var logSymbols = require("log-symbols");
 module.exports = installService = {
   checkInstallation: async function () {
     if (process.env.MIGRATE_DATA === "TRUE") {
-      // await installService.migrateToNewSectionColumnStructure();
+      await installService.migrateToNewSectionColumnStructure();
       await installService.migrateToNewPageLayoutStructure();
     }
 
@@ -189,23 +189,11 @@ module.exports = installService = {
           if (!Array.isArray(column.content)) {
             if (column.content) {
               let contentPreSpilt = column.content.replace("][", "]|[");
-              console.log("preSplit", contentPreSpilt);
-
               let contentArr = contentPreSpilt.split("|");
-
-              // console.log(
-              //   // section.id,
-              //   // column.content,
-              //   contentArr
-              // );
-
               let newcContentArr = contentArr.map((c) => {
                 return { content: c };
               });
-
               column.content = newcContentArr;
-              console.log("new", newcContentArr);
-              // console.log('----')
               updateSection = true;
             }
           }
