@@ -8,7 +8,8 @@ var logSymbols = require("log-symbols");
 module.exports = installService = {
   checkInstallation: async function () {
     if (process.env.MIGRATE_DATA === "TRUE") {
-      await installService.migrateToNewSectionColumnStructure();
+      // await installService.migrateToNewSectionColumnStructure();
+      await installService.migrateToNewPageLayoutStructure();
     }
 
     if (process.env.BYPASS_INSTALL_CHECK === "TRUE") {
@@ -187,31 +188,67 @@ module.exports = installService = {
         row.columns.map((column) => {
           if (!Array.isArray(column.content)) {
             if (column.content) {
-              let contentArr = column.content.split("][");
-              console.log(
-                section.id,
-                column.content,
-                contentArr
-              );
+              let contentPreSpilt = column.content.replace("][", "]|[");
+              console.log("preSplit", contentPreSpilt);
 
-              let newcContentArr = contentArr.map(c => {
-                return {content : c}
-              })
+              let contentArr = contentPreSpilt.split("|");
+
+              // console.log(
+              //   // section.id,
+              //   // column.content,
+              //   contentArr
+              // );
+
+              let newcContentArr = contentArr.map((c) => {
+                return { content: c };
+              });
 
               column.content = newcContentArr;
-              console.log('new',newcContentArr );
-              updateSection = false;
+              console.log("new", newcContentArr);
+              // console.log('----')
+              updateSection = true;
             }
           }
         });
       });
-      if(updateSection){
+      if (updateSection) {
         let record = await dalService.contentUpdate(
           section.id,
-          section.url,
+          section.data.url,
           section.data,
           session
         );
+        console.log("updated column structure for", record.id);
+      }
+    });
+  },
+
+  migrateToNewPageLayoutStructure: async function (app) {
+    let session = { user: { id: "69413190-833b-4318-ae46-219d690260a9" } };
+    let pages = await dataService.getContentByType("page");
+
+    let updatePage;
+    pages.map(async (page) => {
+      updatePage = false;
+      let newLayout = [];
+      page.data.layout?.map((layout) => {
+        if (typeof layout !== "object") {
+          console.log("layout", layout);
+          newLayout.push({ sectionId: layout });
+          updatePage = true;
+        }
+      });
+
+      console.log("newLayout", newLayout);
+      if (updatePage) {
+        page.data.layout = newLayout;
+        let record = await dalService.contentUpdate(
+          page.id,
+          page.data.url,
+          page.data,
+          session
+        );
+        console.log("updated page layout for", record.id);
       }
     });
   },
