@@ -1,0 +1,52 @@
+<!-- <div class="row">
+{{#each list}}
+  <div class="col{{../data.bootstrapColumnClass}} text-{{../data.textJustification}}">
+    <h3>{{this.data.title}}
+      <a target="_blank" href="/admin/content/edit/fe/{{this.id}}"><i class="bi bi-pencil"></i></a>
+    </h3>
+    <img class="img-fluid" src="{{this.data.image.src}}" />
+    {{this.data.dateTime}}
+  </div>
+{{/each}}
+</div>
+
+{{#if data.seeMoreLinkCopy}}
+<div class="row text-center">
+  <div class="col">
+   <a href=""#">{{data.seeMoreLinkCopy}}</a>
+  </div>
+</div>
+{{/if}} -->
+
+
+<div class="events-area">
+  <div class="container">
+    <div class="row g-3">
+    {{#each list}}
+      <!-- <div class="col-md-4"> -->
+      <div class="col{{../data.bootstrapColumnClass}} text-{{../data.textJustification}}">
+        <div class="card bg-dark event-item h-100">
+          <img src="{{this.data.image.src}}" class="card-img-top" />
+          <div class="card-body">
+            <p class="card-text">
+              <a target="_blank" href="/admin/content/edit/fe/{{this.id}}"><i class="bi bi-pencil"></i></a>
+              <h2>{{this.data.title}}</h2>
+              Start Time & Date: &nbsp;
+              <p>{{this.data.dateTime}}</p>
+            </p>
+          </div>
+        </div>
+        </div>
+  {{/each}}
+  </div>
+
+
+    {{#if data.seeMoreLinkCopy}}
+    <div class="row text-center">
+      <div class="col">
+        <a href=""#">{{data.seeMoreLinkCopy}}</a>
+      </div>
+    </div>
+    {{/if}}
+  </div>
+</div>

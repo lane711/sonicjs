@@ -3,6 +3,9 @@
     <div class="card admin-create-instance">
       <div class="card-header">
         <i class="fa fa-align-justify"></i>
+        <button type="button" onclick="copyTextToClipboard('{{data.shortCode}}');" class="btn btn-success float-right">
+          <i class="fa fa-copy"></i> {{data.shortCode}}
+        </button>
       </div>
       <div class="card-body">
 
@@ -23,7 +26,7 @@
 
           <div class="tab-pane fade show active" id="fields" role="tabpanel" aria-labelledby="home-tab">
 
-            {{{ data.editForm }}}
+            {{{ data.editForm.html }}}
 
 
           </div>

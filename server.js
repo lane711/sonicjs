@@ -38,6 +38,8 @@ const { Session } = require("./server/data/model/Session");
 const { stringify } = require("yaml");
 
 function start() {
+  setupGlobalAppPath();
+
   setupStaticAssets(app);
 
   //1.2 handlebars
@@ -80,6 +82,10 @@ function appListen(app) {
 
     installService.checkInstallation(app);
   });
+}
+
+function setupGlobalAppPath() {
+  global.appPAth = appRoot.path;
 }
 
 function setupSessionDb(app) {
@@ -189,8 +195,12 @@ function initInstallIdFile() {
 
 function setupHandlebars(app) {
   let themeDirectory = path.join(__dirname, "server/themes");
+  // let themeDirectory = path.join(__dirname, "custom/themes");
+
   let partialsDirs = [
     path.join(__dirname, "server/themes", "front-end", "bootstrap", "partials"),
+    path.join(__dirname, "server/themes"),
+
     path.join(
       __dirname,
       "server/themes",
@@ -198,19 +208,20 @@ function setupHandlebars(app) {
       frontEndTheme,
       "partials"
     ),
+    path.join(__dirname, frontEndTheme, "partials"),
     path.join(__dirname, "server/themes", "admin", adminTheme, "partials"),
     path.join(__dirname, "server/themes", "admin", "shared-partials"),
   ];
 
   var hbs = exphbs.create({
-    layoutsDir: path.join(themeDirectory),
+    layoutsDir: themeDirectory,
     partialsDir: partialsDirs,
     extname: ".hbs",
   });
 
   app.engine(".hbs", hbs.engine);
   app.set("view engine", ".hbs");
-  app.set("views", __dirname + "/server/themes");
+  app.set("views", __dirname);
 
   setupHandlebarsHelpers();
 }
@@ -247,6 +258,13 @@ function setupHandlebarsHelpers() {
     comparerow: function (row, column) {
       let cms = _.camelCase(column.title);
       return row[cms] ? "fa-check text-success" : "fa-times text-danger";
+    },
+    setChecked: function (value, currentValue) {
+      if (value == currentValue) {
+        return "checked";
+      } else {
+        return "";
+      }
     },
   });
 }
@@ -290,13 +308,27 @@ function setupStaticAssets(app) {
   );
   app.use(
     "/assets/css/fonts",
-    express.static(path.join(appRoot.path, "node_modules/bootstrap-icons/font/fonts"))
+    express.static(
+      path.join(appRoot.path, "node_modules/bootstrap-icons/font/fonts")
+    )
   );
   app.use(
     "/",
     express.static(
       path.join(appRoot.path, "/node_modules/ace-builds/src-min-noconflict")
     )
+  );
+  app.use(
+    "/custom/themes",
+    express.static(path.join(appRoot.path, "/custom/themes"))
+  );
+  app.use(
+    "/server/themes",
+    express.static(path.join(appRoot.path, "/server/themes"))
+  );
+  app.use(
+    "/custom/modules",
+    express.static(path.join(appRoot.path, "/custom/modules"))
   );
 }
 
@@ -312,7 +344,7 @@ function main() {
     type: process.env.TYPEORM_CONNECTION,
     entities: ["server/data/entity/*.js"],
     synchronize: process.env.TYPEORM_SYNCHRONIZE,
-    logging:process.env.TYPEORM_LOGGING,
+    logging: process.env.TYPEORM_LOGGING,
     ssl: sslParam,
   };
 
@@ -335,6 +367,3 @@ function main() {
 }
 
 main();
-
-
-

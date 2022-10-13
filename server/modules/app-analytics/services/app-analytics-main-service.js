@@ -67,7 +67,11 @@ module.exports = appAnalyticsMainService = {
       let url = process.env.ANALYTICS_POST_URL
         ? process.env.ANALYTICS_POST_URL
         : "https://sonicjs.com/sonicjs-app-analytics";
-      let result = axios.post(url, data);
+        try {
+          let result = axios.post(url, data);
+        } catch (error) {
+          
+        }
     }
   },
 

@@ -1,10 +1,8 @@
 {
   "title": "Services",
-  "enabled": true,
+  "enabled": false,
   "systemId": "services",
-  "canBeAddedToColumn": true,
-  "sessionID": "undefined",
-  "version": "0.0.0.1",
-  "systemidUpperCase": "SERVICES",
-  "systemidCamelCase": "services"
+  "canBeAddedToColumn": false,
+  "singleInstance": false,
+  "version": "0.0.0.1"
 }

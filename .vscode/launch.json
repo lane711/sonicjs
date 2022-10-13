@@ -11,7 +11,7 @@
       "name": "Server",
       "program": "${workspaceFolder}/server.js",
       "skipFiles": [
-        "<node_internals>/**/*.js"
+        "<node_internals>/**"
       ]   
     },
     {

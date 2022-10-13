@@ -54,6 +54,11 @@
         setTimeout(resolve, ms);
       });
     }),
+    exports.isBackEnd = function (url) {
+      if (url) {
+        return url.startsWith("/admin");
+      }
+    },
     (exports.generateRandomString = function (length) {
       var result = "";
       var characters =
@@ -121,6 +126,18 @@
 
     return slug;
   };
+
+  exports.titleCase = function(str) {
+    str = str.toLowerCase().split(' ');
+    for (var i = 0; i < str.length; i++) {
+      str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1); 
+    }
+    return str.join(' ');
+  }
+
+  exports.capitalizeFirstLetter = function(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
 })(typeof exports === "undefined" ? (this["helperService"] = {}) : exports);
 
 // (function (exports) {

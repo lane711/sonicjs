@@ -28,7 +28,7 @@ module.exports = contentService = {
   startup: async function () {
     emitterService.on(
       "postProcessModuleShortCodeProcessedHtml",
-      async function ({options}) {
+      async function ({ options }) {
         if (options) {
           contentService.wrapBlockInModuleDiv(options);
         }
@@ -43,7 +43,7 @@ module.exports = contentService = {
       let cachedPage = cacheService.getCache().get(req.url);
       if (cachedPage !== undefined) {
         // console.log('returning from cache');
-        return {page: cachedPage};
+        return { page: cachedPage };
       } else {
         // console.log("no cache");
       }
@@ -53,7 +53,7 @@ module.exports = contentService = {
 
     let page = await dataService.getContentByUrl(req.url, req.sessionID);
 
-    await emitterService.emit("postPageDataFetch", {req: req, page: page});
+    await emitterService.emit("postPageDataFetch", { req: req, page: page });
 
     if (page.data) {
       //page templates
@@ -87,7 +87,7 @@ module.exports = contentService = {
     //handle 404
     if (!page || page.data.title == "Not Found") {
       //not found
-      return {page: page};
+      return { page: page };
     }
 
     let rows = [];
@@ -97,7 +97,7 @@ module.exports = contentService = {
       page.data.hasRows = true;
     }
 
-    await emitterService.emit("preRender", {req: req, page: page});
+    await emitterService.emit("preRender", { req: req, page: page });
 
     page.data.appVersion = globalService.getAppVersion;
 
@@ -109,7 +109,7 @@ module.exports = contentService = {
     success = cache.set(req.url, page);
     // console.log(success);
 
-    return {page: page};
+    return { page: page };
   },
 
   getPage: async function (id, page, req, sessionID) {
@@ -139,13 +139,12 @@ module.exports = contentService = {
 
       // let page = page.data[0];
       // page.data.html = page.data.html;
-      return {page: blog};
+      return { page: blog };
     }
     return "error";
   },
 
-  getPageByUrl: async function (id, instance) {
-  },
+  getPageByUrl: async function (id, instance) {},
 
   processTemplate: async function (page, req, sessionID) {
     page.data.html = ""; //reset
@@ -174,7 +173,7 @@ module.exports = contentService = {
   },
 
   processSections: async function (page, req, sessionID) {
-    await emitterService.emit("preProcessSections", {page: page, req: req});
+    await emitterService.emit("preProcessSections", { page: page, req: req });
 
     page.data.sections = [];
     // let sectionWrapper = $(".s--section").parent(); //container
@@ -186,57 +185,121 @@ module.exports = contentService = {
     if (page.data && page.data.layout) {
       let sections = page.data.layout;
 
-      await this.asyncForEach(sections, async (sectionId) => {
-
-        //sections can be overridden at a theme level, let's first check if the section is manually overriden in code
-        let sectionViewPath = `/server/themes/front-end/${frontEndTheme}/sections/${sectionId}.hbs`;
-
-        if (await fileService.fileExists(sectionViewPath)) {
-          let sectionContent = await fileService.getFile(sectionViewPath);
-          page.data.html += sectionContent;
-        } else {
-          let section = await dataService.getContentById(sectionId, sessionID);
-          if (section) {
-            if (section.data.content) {
-              //process raw column without rows and columns
-              page.data.html += `${section.data.content}`;
-              await this.processShortCodes(
-                page,
-                section,
-                section.data.content,
-                0,
-                0,
-                req
-              );
-            } else {
-              let sectionClass = section.data.cssClass
-                ? section.data.cssClass + " "
-                : "";
-              page.data.html += `<section data-id='${section.id}' class="${sectionClass}jumbotron-fluid pb">`;
-              page.data.html += '<div class="section-overlay">';
-              page.data.html += '<div class="container">';
-              let rows;
-              rows = await this.processRows(
-                page,
-                section,
-                section.data.rows,
-                req
-              );
-              page.data.html += "</div>";
-              page.data.html += "</div>";
-              page.data.html += `</section>`;
-
-              page.data.sections.push({
-                id: sectionId,
-                title: section.data.title,
-                rows: rows,
-              });
-            }
-          }
-        }
-      });
+      for (const section of sections) {
+        await this.renderSection(page, section.sectionId, sessionID, req);
+      }
 
       // sectionWrapper.append(page.data.html);
+    } else {
+      //new page with no sections yet
+      page.data.html += `<section class="jumbotron-fluid pb">`;
+      page.data.html += '<div class="container pb-empty-section">';
+      page.data.html += '<div class="row">';
+      page.data.html += '<div class="col">';
+      page.data.html += `<div class="mb-5"><h4>Your Page Has No Sections Yet</h4></div>`;
+      page.data.html += `<div><button type="button" class="btn btn-success" onclick="addSection()">
+      <i class="nav-icon fa fa-plus"></i> Add Section</button></div>`;
+      page.data.html += "</div>";
+      page.data.html += "</div>";
+      page.data.html += "</div>";
+      page.data.html += `</section>`;
+    }
+  },
+
+  renderSection: async function (page, sectionId, sessionID, req, sectionData) {
+    //sections can be overridden at a theme level, let's first check if the section is manually overriden in code
+    let sectionViewPath = `${frontEndTheme}/sections/${sectionId}.hbs`;
+
+    if (fileService.fileExists(sectionViewPath)) {
+      let sectionContent = await fileService.getFile(sectionViewPath);
+      page.data.html += sectionContent;
+    } else {
+      let section = await dataService.getContentById(sectionId, sessionID);
+      if (section) {
+        section.data = sectionData ?? section.data;
+
+        if (section.data.content) {
+          //process raw column without rows and columns
+          page.data.html += `${section.data.content}`;
+          await this.processShortCodes(
+            page,
+            section,
+            section.data.content,
+            0,
+            0,
+            req
+          );
+        } else {
+          let sectionClass = section.data.cssClass
+            ? section.data.cssClass + " "
+            : "";
+          let sectionStyle = await this.getSectionBackgroundStyle(section);
+          // let overlayStyle = await this.getSectionOverlayStyle(section);
+
+          page.data.html += `<section data-id='${section.id}' data-title='${section.data.title}' class="${sectionClass}jumbotron-fluid pb ${sectionStyle?.css}" style="${sectionStyle?.style}">`;
+          // page.data.html += `<div class="section-overlay" style="${overlayStyle}">`;
+          page.data.html += '<div class="container">';
+          let rows;
+          rows = await this.processRows(page, section, section.data.rows, req);
+          page.data.html += "</div>";
+          // page.data.html += "</div>";
+          page.data.html += `</section>`;
+
+          page.data.sections.push({
+            id: sectionId,
+            title: section.data.title,
+            rows: rows,
+          });
+        }
+      }
+    }
+  },
+
+  getSectionBackgroundStyle: async function (section) {
+    if (section.data.background) {
+      let style = "";
+      let css = "";
+      let overlayCss = "";
+
+      if (section.data.overlay) {
+        overlayCss = `linear-gradient(${section.data.overlayTopColor}, ${section.data.overlayBottomColor}), `;
+      }
+
+      switch (section.data.background) {
+        case "color":
+          let colorRGBA = section.data.color;
+          if (colorRGBA) {
+            style = `background:${overlayCss}${colorRGBA};`;
+          }
+          break;
+        case "image":
+          let imageSrc = section.data.image.src;
+          if (imageSrc) {
+            style = `background: ${overlayCss}url(${imageSrc});`;
+            css = "bg-image-cover";
+          }
+          break;
+        default:
+          break;
+      }
+
+      return { style, css };
+    }
+  },
+
+  getSectionOverlayStyle: async function (section) {
+    if (section.data.overlay) {
+      console.log(
+        "getting section overlay",
+        section.data.overlayTopColor,
+        section.data.overlayBottomColor
+      );
+      // background-image: linear-gradient(rgba(255,255,255,0.9),rgba(255,255,255,0.7));
+
+      let style = `background-image: linear-gradient(${section.data.overlayTopColor}, ${section.data.overlayBottomColor})`;
+      // style = `background-image: linear-gradient(rgba(255,255,255,0.9),rgba(255,255,255,0.7))`;
+
+      return style;
     }
   },
 
@@ -250,7 +313,7 @@ module.exports = contentService = {
     if (rows) {
       for (const row of rows) {
         // console.log(chalk.red(JSON.stringify(row)));
-        page.data.html += `<div class='${row.class}'>`;
+        page.data.html += `<div class='${row.css}'>`;
         let columns = await this.processColumns(
           page,
           section,
@@ -277,19 +340,25 @@ module.exports = contentService = {
     for (const column of row.columns) {
       // console.log('== column ==', column);
 
-      page.data.html += `<div id='${column.id}' class='${column.class}'>`;
-      page.data.html += `${column.content}`;
-      if (column.content) {
+      page.data.html += `<div class='${column.css}'>`;
+      let content = "";
+      if (Array.isArray(column.content)) {
+        column.content.map((c, index) => {
+          content += c.content;
+        });
+      }
+      page.data.html += `${content}`;
+      if (content) {
         await this.processShortCodes(
           page,
           section,
-          column.content,
+          content,
           rowIndex,
           columnIndex,
           req
         );
       } else {
-        page.data.html += `<span class="empty-column">empty column</spam>`;
+        page.data.html += `<span class="empty-column"><h5>Empty Column</h5><p>(click here)</p></spam>`;
       }
       page.data.html += `</div>`;
       columnArray.push(column);

@@ -2,7 +2,7 @@
   "title": "Page Templates",
   "enabled": true,
   "systemId": "page-templates",
-  "canBeAddedToColumn": true,
+  "canBeAddedToColumn": false,
   "singleInstance": false,
   "version": "0.0.0.1"
 }

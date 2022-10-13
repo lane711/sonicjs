@@ -1,9 +1,8 @@
 {
   "title": "Compare",
+  "enabled": false,
   "systemId": "compare",
-  "version": "0.0.0.1",
-  "canBeAddedToColumn": true,
-  "enabled": true,
-  "systemidUpperCase": "COMPARE",
-  "systemidCamelCase": "compare"
+  "canBeAddedToColumn": false,
+  "singleInstance": false,
+  "version": "0.0.0.1"
 }

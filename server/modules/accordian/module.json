@@ -2,9 +2,8 @@
   "title": "Accordian",
   "enabled": true,
   "systemId": "accordian",
+  "icon": "bi-list",
   "canBeAddedToColumn": true,
-  "sessionID": "undefined",
-  "version": "0.0.0.1",
-  "systemidUpperCase": "ACCORDIAN",
-  "systemidCamelCase": "accordian"
+  "singleInstance": false,
+  "version": "0.0.0.1"
 }

@@ -3,9 +3,10 @@
  * @module dataService
  */
 var verboseLogging = false;
+var isFrontEnd = true;
 //check if running in node (and not the browser)
 if (typeof module !== "undefined" && module.exports) {
-  // var loopback = require("loopback");
+  isFrontEnd = false;
   var emitterService = require("./emitter.service");
   var globalService = require("./global.service");
   var pageBuilderService = require("./page-builder.service");
@@ -156,7 +157,6 @@ if (typeof module !== "undefined" && module.exports) {
     return result.data;
   }),
     (exports.userDelete = async function (id, sessionID) {
-      debugger;
       let query = `
       mutation{
         userDelete( 
@@ -189,6 +189,41 @@ if (typeof module !== "undefined" && module.exports) {
         return result.data.data.roles;
       }
     }),
+    (exports.formGet = async function (
+      contentTypeId,
+      content,
+      onFormSubmitFunction,
+      returnModuleSettings = false,
+      formSettingsId,
+      sessionID,
+      referringUrl,
+      showBuilder = false
+    ) {
+      let contentString = content ? JSON.stringify(content) : "";
+
+      const query = `
+      {
+        form (contentType: "${contentTypeId}",
+        content: """${contentString}""",
+        onFormSubmitFunction: """${onFormSubmitFunction}""",
+        returnModuleSettings: ${returnModuleSettings},
+        formSettingsId: "${formSettingsId ?? ""}",
+        showBuilder: ${showBuilder},
+        referringUrl: "${referringUrl}"){
+          html
+          contentType
+        }
+      }
+        `;
+
+      let result = await this.getAxios().post("/graphql", {
+        query,
+      });
+
+      if (result.data.data.form) {
+        return result.data.data.form;
+      }
+    }),
     (exports.getContent = async function (sessionID) {
       //HACK removing sort bc LB not working with RDMS
       // const filter = ""; //encodeURI(`{"order":"data.createdOn DESC"}`);
@@ -204,15 +239,9 @@ if (typeof module !== "undefined" && module.exports) {
             id
             contentTypeId
             data
-            createdByUserId {
-              id
-              username
-            }
+            createdByUserId 
             createdOn
-            lastUpdatedByUserId {
-              id
-              username
-            }	
+            lastUpdatedByUserId
             updatedOn
           }
         }
@@ -240,23 +269,31 @@ if (typeof module !== "undefined" && module.exports) {
       return data;
     }),
     (exports.getContentByType = async function (contentType, sessionID) {
-      // const query = gql`
-      // {
-      //   contents (contentTypeId : "${contentType}") {
-      //     contentTypeId
-      //     data
-      //   }
-      // }
-      // `;
-
-      // let data = await this.executeGraphqlQuery(query);
-
-      // return data.contents;
-
       let result = await this.getAxios().post(apiUrl, {
         query: `
         {
           contents (contentTypeId : "${contentType}", sessionID:"${sessionID}") {
+            id
+            contentTypeId
+            data
+            createdOn
+          }
+        }
+            `,
+      });
+
+      return result.data.data.contents;
+    }),
+    (exports.getContentByTypeAndGroup = async function (
+      contentType,
+      groupId,
+      sessionID
+    ) {
+      let groupParam = groupId ? `, group : "${groupId}"` : "";
+      let result = await this.getAxios().post(apiUrl, {
+        query: `
+        {
+          contents (contentTypeId : "${contentType}" ${groupParam}, sessionID:"${sessionID}") {
             id
             contentTypeId
             data
@@ -278,24 +315,128 @@ if (typeof module !== "undefined" && module.exports) {
 
       return data;
     }),
-    (exports.contentTypeGet = async function (contentType, sessionID) {
+    (exports.contentTypeGet = async function (contentType, req) {
       // debugger;
       let result = await this.getAxios().post(apiUrl, {
         query: `
             {
-                contentType(systemId:"${contentType}", sessionID:"${sessionID}") {
+                contentType(systemId:"${contentType}", sessionID:"${req.sessionID}") {
                   title
                   systemId
                   moduleSystemId
                   filePath
                   data
-                  permissions
+                  module
                 }
               }
             `,
       });
 
+      //we don't need this if getting on the front end
+      if (!isFrontEnd) {
+        let roles = await userService.getRoles(req.sessionID);
+        await this.getPermissionsMatrix(
+          result.data.data.contentType,
+          roles,
+          req.sessionID
+        );
+
+        //make sure admin always has all permissions
+        //TODO: should get site default permissions if not set
+        result.data.data.contentType.data =
+          result.data.data.contentType.data ?? {};
+        result.data.data.contentType.data.permissions =
+          result.data.data.contentType.data?.permissions ?? [];
+        result.data.data.contentType.data.permissions.map((p) => {
+          p.roles.push("admin");
+        });
+
+        if (result.data.data.contentType.data.permissions.length) {
+          let settings = await this.getContentByType(
+            "site-settings-acls",
+            req.sessionID
+          );
+          let acls = settings[0].data.permissionAccessControls.map(
+            (a) => a.title
+          );
+          let userRoles = req.user?.profile.roles;
+
+          acls.map((a) => {
+            let viewPermission =
+              result.data.data.contentType.data.permissions.find(
+                (p) => p.acl === a
+              );
+            result.data.data.contentType.acls =
+              result.data.data.contentType.acls ?? {};
+            result.data.data.contentType.acls[
+              `can${helperService.capitalizeFirstLetter(a)}`
+            ] = _.intersection(viewPermission.roles, userRoles).length !== 0;
+          });
+        }
+      }
+
       return result.data.data.contentType;
+    }),
+    (exports.getPermissionsMatrix = async function (
+      contentType,
+      roles,
+      sessionID
+    ) {
+      // contentType.permissions = [
+      //   {
+      //     "acl": "view",
+      //     "roles": ["clubhouseGeneralManager", "communityAdmin", "anonymous"]
+      //   },
+      //   {
+      //     "acl": "create",
+      //     "roles": [
+      //       "clubhouseGeneralManager",
+      //       "communityAdmin",
+      //       "clubhouseMember"
+      //     ]
+      //   },
+      //   {
+      //     "acl": "edit",
+      //     "roles": ["clubhouseGeneralManager", "communityAdmin"]
+      //   },
+      //   {
+      //     "acl": "delete",
+      //     "roles": ["clubhouseGeneralManager", "communityAdmin"]
+      //   }
+      // ];
+
+      let settings = await this.getContentByType(
+        "site-settings-acls",
+        sessionID
+      );
+      let acls = settings[0].data.permissionAccessControls?.map((a) => a.title);
+
+      (contentType.permissionsMatrix = {
+        acls: acls,
+      }),
+        (contentType.permissionsMatrix.rows = roles.map((role) => {
+          let columns = acls.map((a) => {
+            if (contentType.data?.permissions) {
+              let permission = contentType.data.permissions.find(
+                (p) => p.acl === a
+              );
+              if (
+                permission?.roles.includes(role.key) ||
+                role.key === "admin"
+              ) {
+                return true;
+              } else {
+                return false;
+              }
+            } else {
+              return false;
+            }
+          });
+          return {
+            roleTitle: `${role.title} (${role.key})`,
+            columns: columns,
+          };
+        }));
     }),
     (exports.contentTypesGet = async function (sessionID) {
       let result = await this.getAxios().post(apiUrl, {
@@ -335,9 +476,7 @@ if (typeof module !== "undefined" && module.exports) {
       return JSON.stringify(obj);
     }),
     (exports.contentTypeUpdate = async function (contentType, sessionID) {
-      // debugger;
       let components = JSON.stringify(contentType.data);
-      let permissions = JSON.stringify(contentType.permissions);
 
       let query = `
       mutation{
@@ -345,7 +484,6 @@ if (typeof module !== "undefined" && module.exports) {
           title:"${contentType.title}", 
           moduleSystemId:"${contentType.moduleSystemId}", 
           systemId:"${contentType.systemId}", 
-          permissions:"""${permissions}""",
           data:"""${components}""",
           sessionID:"${sessionID}"){
             title
@@ -456,6 +594,10 @@ if (typeof module !== "undefined" && module.exports) {
           id
           contentTypeId
           data
+          createdByUserId 
+          lastUpdatedByUserId
+          createdOn
+          updatedOn
         }
       }
     `;
@@ -634,7 +776,7 @@ if (typeof module !== "undefined" && module.exports) {
       query: query,
     });
 
-    return result.data.data.contentCreate;
+    return result;
   };
 
   (exports.getContentById = async function (id, sessionID) {
@@ -823,6 +965,7 @@ if (typeof module !== "undefined" && module.exports) {
             title:"${payload.data.title}", 
             enabled:${payload.data.enabled}, 
             systemId:"${payload.data.systemId}", 
+            icon:"${payload.data.icon}", 
             canBeAddedToColumn: ${payload.data.canBeAddedToColumn},
             singleInstance: ${payload.data.singleInstance},
             version:"${payload.data.version}"
@@ -856,6 +999,28 @@ if (typeof module !== "undefined" && module.exports) {
 
       return result.data.data.mediaDelete;
     });
+
+  exports.taxonomyGet = async function (
+    id = null,
+    contentType = null,
+    url = null,
+    sessionID
+  ) {
+    taxonomies = await this.getContentByType("taxonomy");
+    if (id) {
+      return taxonomies.find((t) => t.id === id);
+    } else if (contentType) {
+      return taxonomies.find((t) => t.data.targetContentType === contentType);
+    } else if (url) {
+      var tax = _.filter(taxonomies, function (taxonomy) {
+        return _.some(taxonomy.data.terms, { urlRelative: url });
+      });
+      return tax;
+    } else {
+      return taxonomies;
+    }
+  };
+
   exports.getFiles = async function () {
     let files = [{ title: "my image", filePath: "/images/test123.png" }];
     return files;

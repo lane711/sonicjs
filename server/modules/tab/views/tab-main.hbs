@@ -1,0 +1,26 @@
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+  {{#each data.tabs}}
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link {{this.active}}"
+        id="home-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#{{this.index}}"
+        type="button"
+        role="tab"
+        aria-controls="home"
+        aria-selected="true"
+      >{{this.title}}</button>
+    </li>
+  {{/each}}
+</ul>
+<div class="tab-content" id="myTabContent">
+  {{#each data.tabs}}
+    <div
+      class="tab-pane fade {{this.show}} {{this.active}}"
+      id="{{this.index}}"
+      role="tabpanel"
+      aria-labelledby="home-tab"
+    >{{this.body}}</div>
+  {{/each}}
+</div>

@@ -2,8 +2,8 @@
   "title": "Gallery",
   "enabled": true,
   "systemId": "gallery",
+  "icon": "bi-images",
   "canBeAddedToColumn": true,
-  "version": "0.0.0.1",
-  "systemidUpperCase": "GALLERY",
-  "systemidCamelCase": "gallery"
+  "singleInstance": false,
+  "version": "0.0.0.1"
 }

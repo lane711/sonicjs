@@ -30,7 +30,7 @@ module.exports = contactUsMainService = {
         "submitForm(submission)",
         false,
         contactFormSettingsId,
-        options.req.sessionID
+        options.req
       );
 
     });

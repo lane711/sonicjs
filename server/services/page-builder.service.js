@@ -6,6 +6,7 @@ const log = console.log;
 var emitterService = require("./emitter.service");
 var dataService = require("./data.service");
 var sharedService = require("./shared.service");
+const userService = require("./user.service");
 
 const apiUrl = "/api/";
 var pageContent = "";
@@ -19,7 +20,9 @@ module.exports = pageBuilderService = {
   startup: async function (app) {
     emitterService.on("getRenderedPagePostDataFetch", async function (options) {
       if (options) {
-        options.page.data.showPageBuilder = options.req.user ? true : false;
+        options.page.data.showPageBuilder = await userService.canEditPages(
+          options.req
+        );
       }
     });
 
@@ -63,31 +66,36 @@ module.exports = pageBuilderService = {
         );
         let content =
           section.data.rows[data.rowIndex].columns[data.columnIndex].content;
+
+        content = content.filter(
+          (c) => !c.content.includes(data.moduleId.toString())
+        );
+
+        section.data.rows[data.rowIndex].columns[data.columnIndex].content = content;
+        
+        await dataService.editInstance(section, req.sessionID);
         // console.log("content", content);
 
         // remove shortcode from the source column
-        let shortCodesInColumn = ShortcodeTree.parse(content);
-        shortCodeToRemove = shortCodesInColumn.children.filter(
-          (x) => x.shortcode.properties.id === data.moduleId.toString()
-        )[0];
-        // console.log("shortCodeToRemove", shortCodeToRemove);
-        if (shortCodeToRemove && shortCodeToRemove.shortcode) {
-          let newContent = content.replace(
-            shortCodeToRemove.shortcode.codeText,
-            ""
-          );
-          section.data.rows[data.rowIndex].columns[data.columnIndex].content =
-            newContent;
-          // console.log("newContent", newContent);
-          await dataService.editInstance(section, req.sessionID);
-        }
+        // let shortCodesInColumn = ShortcodeTree.parse(content);
+        // shortCodeToRemove = shortCodesInColumn.children.filter(
+        //   (x) => x.shortcode.properties.id === data.moduleId.toString()
+        // )[0];
+        // // console.log("shortCodeToRemove", shortCodeToRemove);
+        // if (shortCodeToRemove && shortCodeToRemove.shortcode) {
+        //   let newContent = content.replace(
+        //     shortCodeToRemove.shortcode.codeText,
+        //     ""
+        //   );
+        //   section.data.rows[data.rowIndex].columns[data.columnIndex].content =
+        //     newContent;
+        //   // console.log("newContent", newContent);
+        //   await dataService.editInstance(section, req.sessionID);
+        // }
       }
 
       if (data.deleteContent) {
-        await dataService.contentDelete(
-          shortCodeToRemove.shortcode.properties.id,
-          req.sessionID
-        );
+        await dataService.contentDelete(data.moduleId, req.sessionID);
       }
 
       res.send(`ok`);
@@ -114,7 +122,7 @@ module.exports = pageBuilderService = {
 
     app.post("/admin/pb-update-module-sort", async function (req, res) {
       let data = req.body.data;
-      console.log(data);
+      // console.log(data);
 
       if (data.isPageUsingTemplate && data.sourcePageTemplateRegion) {
         let page = await dataService.getContentById(data.pageId, req.sessionID);
@@ -157,53 +165,83 @@ module.exports = pageBuilderService = {
 
         await dataService.editInstance(page, req.sessionID);
       } else {
+        // REMOVE shortcode from the source column
         let sourceSection = await dataService.getContentById(
           data.sourceSectionId,
           req.sessionID
         );
-        let content =
+
+        let sourceContent =
           sourceSection.data.rows[data.sourceRowIndex].columns[
             data.sourceColumnIndex
           ].content;
-        // console.log("content", content);
+        const indexOfModuleToRemove = sourceContent.findIndex((object) => {
+          return object.content.includes(data.moduleBeingMovedId);
+        });
 
-        // remove shortcode from the source column
-        let shortCodesInColumn = ShortcodeTree.parse(content);
-        let shortCodeToRemove = shortCodesInColumn.children.filter(
-          (s) => s.shortcode.properties.id === data.moduleBeingMovedId
-        )[0];
-        // console.log("shortCodeToRemove", shortCodeToRemove);
-        if (shortCodeToRemove && shortCodeToRemove.shortcode) {
-          let newContent = content.replace(
-            shortCodeToRemove.shortcode.codeText,
-            ""
-          );
-          sourceSection.data.rows[data.sourceRowIndex].columns[
-            data.sourceColumnIndex
-          ].content = newContent;
-          // console.log("newContent", newContent);
-          await dataService.editInstance(sourceSection, req.sessionID);
-        }
+        const shortCodeToRemoveAndThenAddSomewhereElse = sourceContent.find(
+          (object) => {
+            return object.content.includes(data.moduleBeingMovedId);
+          }
+        );
 
-        //regen the destination
+        sourceContent.splice(indexOfModuleToRemove, 1);
+
+        await dataService.editInstance(sourceSection, req.sessionID);
+
+        // ADD shortcode to the destination column
         let destinationSection = await dataService.getContentById(
           data.destinationSectionId,
           req.sessionID
         );
 
-        let updatedDestinationContent = sharedService.generateShortCodeList(
-          data.destinationModules
-        );
-        // console.log("updatedDestinationContent", updatedDestinationContent);
-        destinationSection.data.rows[data.destinationRowIndex].columns[
-          data.destinationColumnIndex
-        ].content = updatedDestinationContent;
+        let destinationContent =
+          destinationSection.data.rows[data.destinationRowIndex].columns[
+            data.destinationColumnIndex
+          ].content;
 
-        let r = await dataService.editInstance(
-          destinationSection,
-          req.sessionID
-        );
+        destinationContent.splice(data.destinationModuleIndex, 0, {
+          content: shortCodeToRemoveAndThenAddSomewhereElse.content,
+        });
+
+        await dataService.editInstance(destinationSection, req.sessionID);
+
+        // let shortCodesInColumn = ShortcodeTree.parse(content);
+        // let shortCodeToRemove = shortCodesInColumn.children.filter(
+        //   (s) => s.shortcode.properties.id === data.moduleBeingMovedId
+        // )[0];
+        // // console.log("shortCodeToRemove", shortCodeToRemove);
+        // if (shortCodeToRemove && shortCodeToRemove.shortcode) {
+        //   let newContent = content.replace(
+        //     shortCodeToRemove.shortcode.codeText,
+        //     ""
+        //   );
+        //   sourceSection.data.rows[data.sourceRowIndex].columns[
+        //     data.sourceColumnIndex
+        //   ].content = newContent;
+
+        // ----- await dataService.editInstance(sourceSection, req.sessionID);
       }
+
+      //regen the destination
+      //   let destinationSection = await dataService.getContentById(
+      //     data.destinationSectionId,
+      //     req.sessionID
+      //   );
+
+      //   let updatedDestinationContent = sharedService.generateShortCodeList(
+      //     data.destinationModules
+      //   );
+      //   // console.log("updatedDestinationContent", updatedDestinationContent);
+      //   destinationSection.data.rows[data.destinationRowIndex].columns[
+      //     data.destinationColumnIndex
+      //   ].content = updatedDestinationContent;
+
+      //   let r = await dataService.editInstance(
+      //     destinationSection,
+      //     req.sessionID
+      //   );
+      // }
       res.send(`ok`);
     });
 
@@ -231,16 +269,13 @@ module.exports = pageBuilderService = {
       );
 
       if (data.isPageUsingTemplate && data.sourcePageTemplateRegion) {
-
         let page = await dataService.getContentById(data.pageId, req.sessionID);
 
         let sourceRegion = page.data.pageTemplateRegions.filter(
           (r) => r.regionId === data.sourcePageTemplateRegion
         )[0];
 
-        let shortCodesInColumn = ShortcodeTree.parse(
-          sourceRegion.shortCodes
-        );
+        let shortCodesInColumn = ShortcodeTree.parse(sourceRegion.shortCodes);
 
         let args = { id: newModule.id };
         let nodeModuleShortCode = sharedService.generateShortCode(
@@ -254,7 +289,10 @@ module.exports = pageBuilderService = {
           argsOld
         );
 
-        sourceRegion.shortCodes = sourceRegion.shortCodes.replace(oldModuleShortCode, oldModuleShortCode + nodeModuleShortCode)
+        sourceRegion.shortCodes = sourceRegion.shortCodes.replace(
+          oldModuleShortCode,
+          oldModuleShortCode + nodeModuleShortCode
+        );
 
         let result = await dataService.editInstance(page, req.sessionID);
 
@@ -270,7 +308,6 @@ module.exports = pageBuilderService = {
         //   shortCodeToRemoveText,
         //   ""
         // );
-
       } else {
         let sectionColumn =
           section.data.rows[data.rowIndex].columns[data.columnIndex];

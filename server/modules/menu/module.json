@@ -2,7 +2,8 @@
   "title": "Menu",
   "enabled": true,
   "systemId": "menu",
-  "canBeAddedToColumn": false,
+  "icon": "bi-card-list",
+  "canBeAddedToColumn": true,
   "singleInstance": false,
   "version": "0.0.0.1"
 }

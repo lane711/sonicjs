@@ -1,0 +1,8 @@
+{
+  "title": "Announcement",
+  "enabled": false,
+  "systemId": "announcement",
+  "canBeAddedToColumn": false,
+  "singleInstance": false,
+  "version": "0.0.0.1"
+}

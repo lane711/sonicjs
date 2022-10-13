@@ -9,9 +9,12 @@ var fileService = require("../services/file.service");
 var viewService = require("../services/view.service");
 var dataService = require("../services/data.service");
 var formattingService = require("../services/formatting.service");
+var contentService = require("../services/content.service");
 
 var appRoot = require("app-root-path");
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
+
+const connectEnsureLogin = require("connect-ensure-login");
 
 module.exports = moduleService = {
   startup: function (app) {
@@ -25,19 +28,48 @@ module.exports = moduleService = {
         options.page.data.modules = globalService.moduleDefinitions;
         options.page.data.modulesForColumns =
           globalService.moduleDefinitionsForColumns;
+        options.page.data.modulesForColumns.map(
+          (m) => (m.icon = m.icon ?? "bi-plus-square")
+        );
       }
     });
+
+    app.post(
+      "/api/modules/render",
+      connectEnsureLogin.ensureLoggedIn(),
+      async function (req, res) {
+        let viewModel = req.body.data;
+        if (!_.isEmpty(viewModel)) {
+          if (viewModel.contentType === "section") {
+            let page = { data: { html: "", sections: [] } };
+            let sectionId = viewModel.id;
+            let renderedModule = await contentService.renderSection(
+              page,
+              sectionId,
+              req.sessionID,
+              req,
+              viewModel
+            );
+            res.send({ id: sectionId, type: "section", html: page.data.html });
+          } else if (viewModel.contentType === "page") {
+            console.log("rendering page");
+          } else {
+            let renderedModule = await moduleService.renderModule(viewModel);
+            res.send({
+              id: viewModel.id,
+              type: "module",
+              html: renderedModule,
+            });
+          }
+        }
+      }
+    );
   },
 
   processModules: async function (app) {
     let moduleDirs = [];
     moduleDirs.push(path.join(appRoot.path, "/server/modules"));
-    moduleDirs.push(
-      path.join(
-        appRoot.path,
-        `/server/themes/front-end/${frontEndTheme}/modules`
-      )
-    );
+    moduleDirs.push(path.join(appRoot.path, `/custom/modules`));
 
     await this.getModuleDefinitionFiles(moduleDirs, app);
     // await this.getModuleCss(moduleDirs);
@@ -92,18 +124,37 @@ module.exports = moduleService = {
   },
 
   getBasePath: async function (systemId) {
-    let basePath = `${appRoot.path}/server/modules/${systemId}`;
+    let root = await this.getAppRoot();
+    let basePath = `${root}/server/modules/${systemId}`;
 
     if (await fileService.fileExists(`${basePath}/module.json`, true)) {
       return basePath;
     } else {
-      basePath = `${appRoot.path}/server/themes/front-end/${frontEndTheme}/modules/${systemId}`;
+      basePath = `${appRoot.path}/custom/modules/${systemId}`;
       if (await fileService.fileExists(`${basePath}/module.json`, true)) {
         return basePath;
       }
     }
-    console.error("Can not find module base path");
+    console.error("*** Can not find module base path *** ", systemId);
   },
+
+  //HACK: doesn't always return path
+  getAppRoot: async function (systemId) {
+    let root = "";
+    for (let index = 0; index < 10; index++) {
+      if (appRoot.path) {
+        root = appRoot.path;
+        return root;
+      }
+    }
+    if (global.appPath) {
+      console.log("fall back on globals appPath");
+      return globals.appPath;
+    }
+    console.error("****** can not find app root");
+    return null;
+  },
+
   getModuleContentTypesAdmin: async function (systemId, session, req) {
     let basePath = (await this.getBasePath(systemId)) + "/models";
 
@@ -134,6 +185,11 @@ module.exports = moduleService = {
     return moduleContentTypes;
   },
   contentTypeUpdate: async function (moduleContentType, session, req) {
+    //TODO: remove extra content type field
+    moduleContentType.components = moduleContentType.data.components.filter(
+      (c) => c.key !== "contentType"
+    );
+
     let moduleDef = await this.getModuleContentType(
       moduleContentType.systemId,
       session,
@@ -147,7 +203,6 @@ module.exports = moduleService = {
     moduleDef.data = moduleContentType.data;
     moduleDef.canBeAddedToColumn = moduleContentType.canBeAddedToColumn;
     moduleDef.canBeAddedToColumn = moduleContentType.canBeAddedToColumn;
-    moduleDef.permissions = moduleContentType.permissions;
 
     moduleDef.filePath =
       (await this.getBasePath(moduleContentType.moduleSystemId)) +
@@ -232,15 +287,36 @@ module.exports = moduleService = {
     return moduleCount;
   },
   getModuleContentType: async function (contentTypeSystemId, session, req) {
-    let rootDomain = (req && req.protocol) ? `${req.protocol}://${req.get("host")}` : undefined;
-    let configInfo = await globalService.moduleContentTypeConfigs.filter(
+    if (contentTypeSystemId) {
+      let rootDomain =
+        req && req.protocol
+          ? `${req.protocol}://${req.get("host")}`
+          : undefined;
+      let configInfo = await globalService.moduleContentTypeConfigs.filter(
+        (x) => x.systemId === contentTypeSystemId
+      );
+      if (configInfo[0]) {
+        let config = fileService.getFileSync(configInfo[0].filePath);
+        if (rootDomain) {
+          config = config.replace("http://localhost:3018", rootDomain);
+        }
+        let contentType = JSON.parse(config);
+
+        //add module
+        contentType.module = await moduleService.getModuleDefinition(
+          contentType.moduleSystemId
+        );
+        return contentType;
+      }
+    }
+    return {};
+  },
+  getModuleContentTypeRaw: async function (contentTypeSystemId, session) {
+    let configInfo = await globalService.moduleContentTypeConfigs.find(
       (x) => x.systemId === contentTypeSystemId
     );
-    if (configInfo[0]) {
-      let config = fileService.getFileSync(configInfo[0].filePath);
-      if (rootDomain) {
-        config = config.replace("http://localhost:3018", rootDomain);
-      }
+    if (configInfo) {
+      let config = fileService.getFileSync(configInfo.filePath);
       let contentType = JSON.parse(config);
       return contentType;
     }
@@ -256,6 +332,7 @@ module.exports = moduleService = {
       let configObj = JSON.parse(config);
       configs.push(configObj);
     });
+    configs = _.sortBy(configs, "title");
     return configs;
   },
   updateModuleContentType: async function (contentTypeDef) {
@@ -273,9 +350,12 @@ module.exports = moduleService = {
     let contentTypeDefObj = JSON.stringify(contentTypeDef);
     await fileService.writeFile(contentTypeDef.filePath, contentTypeDefObj);
     //reload modules
-    await moduleService.processModules();
-
-    return contentTypeDef;
+    if (fileService.fileExists(contentTypeDef.filePath, true)) {
+      await moduleService.processModules();
+      return contentTypeDef;
+    } else {
+      console.error(contentTypeDef.filePath + " not found");
+    }
   },
   deleteModuleContentType: async function (moduleContentTypeSystemid) {
     console.log("deleting content type", moduleContentTypeSystemid);
@@ -295,6 +375,9 @@ module.exports = moduleService = {
 
     files.forEach((file) => {
       let link = file.substr(file.indexOf("server") + 6, file.length);
+      if (file.includes("/custom/module")) {
+        link = file;
+      }
       globalService.moduleCssFiles.push(link);
     });
   },
@@ -309,6 +392,9 @@ module.exports = moduleService = {
     files.forEach((file) => {
       if (file.indexOf("assets/js") > -1) {
         let link = file.substr(file.indexOf("server") + 6, file.length);
+        if (file.includes("/custom/module")) {
+          link = file;
+        }
         globalService.moduleJsFiles.push(link);
       }
     });
@@ -325,11 +411,45 @@ module.exports = moduleService = {
     }
     return viewPath;
   },
+
+  renderModule: async function (viewModel) {
+    let viewPath = await this.getModuleViewFile(viewModel.contentType);
+
+    var processedHtml = {
+      contentType: viewModel.contentType,
+      // shortCode: options.shortcode,
+      body: await this.processView(
+        viewModel.contentType,
+        { data: viewModel },
+        viewPath
+      ),
+    };
+
+    let id = viewModel.id ?? "unsaved";
+
+    let wrappedDiv = formattingService.generateModuleDivWrapper(
+      id,
+      "module",
+      "",
+      viewModel.contentType.toUpperCase(),
+      viewModel.contentType,
+      processedHtml.body,
+      true,
+      false
+    );
+
+    return wrappedDiv;
+  },
+
+  renderSection: async function (viewModel) {
+    return {};
+  },
+
   processModuleInColumn: async function (options, viewModel) {
     if (options.shortcode.name === options.moduleName.toUpperCase()) {
       let id = options.shortcode.properties.id;
       let contentType = options.moduleName;
-      let viewPath = await this.getModuleViewFile(options.moduleName);
+      options.viewPath = await this.getModuleViewFile(options.moduleName);
       options.viewModel = viewModel
         ? viewModel
         : await dataService.getContentById(id, options.req.sessionID);
@@ -340,7 +460,11 @@ module.exports = moduleService = {
         id: id,
         contentType: contentType,
         shortCode: options.shortcode,
-        body: await this.processView(contentType, options.viewModel, viewPath),
+        body: await this.processView(
+          contentType,
+          options.viewModel,
+          options.viewPath
+        ),
       };
 
       //for template based pages
@@ -508,8 +632,15 @@ module.exports = moduleService = {
         appRoot.path,
         `/server/modules/${moduleSystemId}`
       );
-      await fileService.deleteDirectory(modulePath);
-      await moduleService.processModules();
+      let moduleFilePath = `${modulePath}/module.json`;
+      if (fileService.fileExists(`${modulePath}/module.json`, true)) {
+        console.log(`deleting module ${moduleFilePath}`);
+
+        await fileService.deleteDirectory(modulePath);
+        await moduleService.processModules();
+      } else {
+        console.log(`${moduleFilePath} does not exist`);
+      }
     }
     return true;
   },

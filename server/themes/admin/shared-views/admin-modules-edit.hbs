@@ -6,7 +6,6 @@
                     <i class="fa fa-align-justify edit-content-type"></i> Edit Module: {{ data.moduleDef.title }}
                 </div>
 
-                {{ log data}}
                 <div class="card-body">
 
                     <script type='text/javascript'>
@@ -33,6 +32,13 @@
                                         key: 'version',
                                         label: 'Version',
                                         placeholder: 'Version of the module',
+                                        input: true
+                                    },
+                                    {
+                                        type: 'textfield',
+                                        key: 'icon',
+                                        label: 'Icon',
+                                        placeholder: 'bi-gear',
                                         input: true
                                     },
                                     {
@@ -67,6 +73,7 @@
                                             data: {
                                                 title: moduleDef.title,
                                                 systemId: moduleDef.systemId,
+                                                icon: moduleDef.icon,
                                                 enabled: moduleDef.enabled,
                                                 canBeAddedToColumn: moduleDef.canBeAddedToColumn,
                                                 singleInstance: moduleDef.singleInstance,
@@ -146,7 +153,6 @@
                         </thead>
                         <tbody>
 
-                        {{!-- {{log data}} --}}
                         {{#each data.contentTypes}}
                             <tr>
                                 <td aria-label="content-type-{{ this.systemId }}"><a

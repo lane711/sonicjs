@@ -104,7 +104,8 @@ module.exports = mediaService = {
   getMediaUrl: function (fileName) {
     if (process.env.FILE_STORAGE === "AMAZON_S3") {
       // return 'https://sonicjscom.s3.us-west-1.amazonaws.com/main-shape.svg';
-      return `https://${process.env.AMAZON_S3_BUCKETNAME}.s3.${process.env.AMAZON_S3_REGION}.amazonaws.com/${fileName}`;
+      let region = process.env.AMAZON_S3_REGION ? `.${process.env.AMAZON_S3_REGION}` : '';
+      return `https://${process.env.AMAZON_S3_BUCKETNAME}.s3${region}.amazonaws.com/${fileName}`;
       // https://sonicjscom.s3.us-west-1.amazonaws.com/main-shape.svg
     } else {
       return `/assets/uploads/${fileName}`;

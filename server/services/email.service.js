@@ -9,7 +9,9 @@ const chalk = require("chalk");
 const log = console.log;
 var path = require("path");
 const sgMail = require("@sendgrid/mail");
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+if(process.env.SENDGRID_API_KEY.indexOf('SG.') > -1){
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+}
 var sendEmail = process.env.SEND_EMAIL;
 
 module.exports = emailService = {
