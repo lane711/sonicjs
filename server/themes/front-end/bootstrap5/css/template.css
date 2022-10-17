@@ -18,8 +18,8 @@ main {
 padding: 80px 0
 }
 
-.demo section {
-padding: 80px 0
+section{
+    padding:80px 0;
 }
 
 .section-overlay {

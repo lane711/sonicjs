@@ -226,8 +226,7 @@ function setCurrentIds(moduleId, newDrop = false, emptyColumn = false) {
   let moduleDiv;
   if (newDrop) {
     moduleDiv = $(".current-drop")[0];
-    //remove "empty column"
-    checkIfColumnIsEmpty();
+    
   } else if (emptyColumn) {
     moduleDiv = moduleId;
   } else {
@@ -235,6 +234,9 @@ function setCurrentIds(moduleId, newDrop = false, emptyColumn = false) {
   }
 
   currentModuleDiv = moduleDiv;
+
+  //remove "empty column"
+  checkIfColumnIsEmpty($(currentModuleDiv).parent[0]);
 
   //reset
   $(".module-highlight").removeClass("module-highlight");
@@ -2025,7 +2027,7 @@ function checkIfColumnIsEmpty(sourceColumn) {
     $(parent).find(".empty-column").remove();
   }
 
-  if (!$(sourceColumn).find("div").length) {
+  if (sourceColumn && !$(sourceColumn).find("div").length) {
     $(sourceColumn).html('<span class="empty-column"><h5>Empty Column</h5><p>(drag element here)</p></span>')
   }
 
