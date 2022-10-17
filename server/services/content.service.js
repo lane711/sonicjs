@@ -182,7 +182,7 @@ module.exports = contentService = {
     // let page = page; // await this.getContentById('5cd5af93523eac22087e4358');
     // console.log('processSections:page==>', page);
 
-    if (page.data && page.data.layout) {
+    if (page.data && page.data.layout.length > 0) {
       let sections = page.data.layout;
 
       for (const section of sections) {
@@ -192,12 +192,12 @@ module.exports = contentService = {
       // sectionWrapper.append(page.data.html);
     } else {
       //new page with no sections yet
-      page.data.html += `<section class="jumbotron-fluid pb">`;
+      page.data.html += `<section class="jumbotron-fluid pb new-page-no-sections">`;
       page.data.html += '<div class="container pb-empty-section">';
       page.data.html += '<div class="row">';
       page.data.html += '<div class="col">';
       page.data.html += `<div class="mb-5"><h4>Your Page Has No Sections Yet</h4></div>`;
-      page.data.html += `<div><button type="button" class="btn btn-success" onclick="addSection()">
+      page.data.html += `<div><button type="button" class="btn btn-success section-add-below">
       <i class="nav-icon fa fa-plus"></i> Add Section</button></div>`;
       page.data.html += "</div>";
       page.data.html += "</div>";
@@ -358,7 +358,7 @@ module.exports = contentService = {
           req
         );
       } else {
-        page.data.html += `<span class="empty-column"><h5>Empty Column</h5><p>(click here)</p></spam>`;
+        page.data.html += `<span class="empty-column"><h5>Empty Column</h5><p>(drag element here)</p></span>`;
       }
       page.data.html += `</div>`;
       columnArray.push(column);
