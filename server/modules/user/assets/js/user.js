@@ -28,7 +28,7 @@ function setupSessionID() {
 //TODO, make this just refresh the body content with a full get
 function fullPageUpdate(url = undefined) {
   // debugger;
-  console.log("refreshing page");
+  console.log("refreshing page url", url);
   if (url) {
     window.location.replace(url);
   } else {

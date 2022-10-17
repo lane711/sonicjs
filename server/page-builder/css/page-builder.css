@@ -618,8 +618,7 @@ section {
 }
 
 #editor.ace_editor {
-  width: 255px;
-  height: calc(100vh - 180px);
+  height: 100%;
 }
 
 .editor-wrapper {

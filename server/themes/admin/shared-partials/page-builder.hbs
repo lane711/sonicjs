@@ -1,13 +1,7 @@
 <link href="/node_modules/@simonwep/pickr/dist/themes/nano.min.css" rel="stylesheet" />
 
 <style type="text/css" id="templateCss">
-  {
-      {
-        {
-        data.editor.css
-      }
-    }
-  }
+  {{{ data.editor.css }}}
 </style>
 
 <div class="pb-wrapper">
@@ -36,17 +30,27 @@
         data-bs-content="Page Form"
       ><i class="bi bi-grid-3x2"></i></button> -->
 
-      <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
-        data-bs-content="Page Code"><i class="bi bi-code-square"></i></button>
+      <!-- <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+        data-bs-content="Page Code" id="page-code"><i class="bi bi-code-square"></i></button> -->
 
     </div>
     <div class="bottom">
 
-      <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
-        data-bs-content="Site CSS"><i class="bi bi-filetype-css"></i></button>
 
-      <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
-        data-bs-content="Section Sorting"><i class="bi bi-layers"></i></button>
+
+      <!-- <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+        data-bs-content="Section Sorting"><i class="bi bi-layers"></i></button> -->
+
+        <button type="button"  class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+        data-bs-content="New Page"
+        onclick="return openFormInModal('create', 'page')"><i class="bi bi-file-plus"></i></button>
+
+        <button type="button"  class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+        data-bs-content="New Blog Post"
+        onclick="return openFormInModal('create', 'blog')"><i class="bi bi-file-post"></i></button>
+
+        <button type="button" id="site-css" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+        data-bs-content="Site CSS"><i class="bi bi-filetype-css"></i></button>
 
       <a href="/admin" target="_blank" class="btn sonic" data-bs-toggle="popover" data-bs-trigger="hover focus"
         data-bs-content="SonicJs Backend"><img src="/assets/img/SonicJs-Logo-2019.svg" />
@@ -83,10 +87,11 @@
     </div>
     <div class="content">
       <div id="pb-content-container"></div>
+      <div id="editor" class="css-editor hide">{{{data.editor.css}}}</div>
     </div>
-    <!-- <div class="footer">
+    <div class="footer hide">
 
-      <button type="button" 
+      <!-- <button type="button" 
       class="btn btn-danger"
       data-bs-toggle="popover"
       data-bs-trigger="hover focus"
@@ -100,17 +105,16 @@
       data-bs-trigger="hover focus"
       data-bs-content="Redo">
         <i class="bi bi-arrow-clockwise text-primary white"></i>
-      </button>
+      </button> -->
 
       <button type="button" 
-      class="btn btn-primary"
-      data-bs-toggle="popover"
-      data-bs-trigger="hover focus"
-      data-bs-content="Redo">
-        <i class="bi bi-arrow-clockwise text-primary white"></i>
+      class="btn btn-primary btn-sm"
+      id="save-global-css">
+      Save Site CSS
+        <i class="bi btn-sm bi-save text-primary white"></i>
       </button>
 
-    </div> -->
+    </div>
   </div>
 </div>
 
@@ -533,7 +537,7 @@
 
       <button type="button" onclick="deleteModule()" class="btn btn-sm"><i class="bi bi-trash"></i></button>
 
-      <button type="button" onclick="copyModule()" class="btn btn-sm"><i class="bi bi-clipboard-plus"></i></button>
+      <!-- <button type="button" onclick="copyModule()" class="btn btn-sm"><i class="bi bi-clipboard-plus"></i></button> -->
 
       <button type="button" class="btn btn-sm module-move"><i class="bi bi-arrows-move"></i></button>
     </div>
