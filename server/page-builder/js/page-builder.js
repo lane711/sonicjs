@@ -1293,6 +1293,11 @@ async function addModule(systemId, sessionID) {
 
   console.log("adding module type:", form.contentType.systemId);
 
+  setMainPanelHeaderTextAndIcon(
+    systemId,
+    form.contentType.module.icon
+  );
+
   $("#pb-content-container").html(form.html);
   // $(".pb-side-panel #main").html(form.html);
 

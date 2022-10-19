@@ -201,10 +201,6 @@ module.exports = pageBuilderService = {
             data.destinationColumnIndex
           ].content;
 
-        console.log(
-          "shortCodeToRemoveAndThenAddSomewhereElse",
-          shortCodeToRemoveAndThenAddSomewhereElse
-        );
         if (shortCodeToRemoveAndThenAddSomewhereElse) {
           destinationContent.splice(data.destinationModuleIndex, 0, {
             content: shortCodeToRemoveAndThenAddSomewhereElse.content,
