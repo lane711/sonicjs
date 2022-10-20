@@ -187,6 +187,8 @@ module.exports = installService = {
       section.data.rows?.map((row) => {
         row.columns.map((column) => {
           if (!Array.isArray(column.content)) {
+            column.css = column.class;
+            delete column.class;
             if (column.content) {
               let contentPreSpilt = column.content.replace("][", "]|[");
               let contentArr = contentPreSpilt.split("|");
@@ -197,17 +199,18 @@ module.exports = installService = {
               updateSection = true;
             }
           }
+          console.log('column', column);
         });
       });
-      // if (updateSection) {
-      //   let record = await dalService.contentUpdate(
-      //     section.id,
-      //     section.data.url,
-      //     section.data,
-      //     session
-      //   );
-      //   console.log("updated column structure for", record.id);
-      // }
+      if (updateSection) {
+        let record = await dalService.contentUpdate(
+          section.id,
+          section.data.url,
+          section.data,
+          session
+        );
+        console.log("updated column structure for", record.id);
+      }
     });
   },
 
