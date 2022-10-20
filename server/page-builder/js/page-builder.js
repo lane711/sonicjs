@@ -321,7 +321,6 @@ async function addSection(above = true, layout) {
   let newColumns = generateNewColumns(layout);
   let rows = [
     {
-      class: "row",
       columns: newColumns,
       css: "row",
       styles: "",

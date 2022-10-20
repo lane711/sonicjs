@@ -199,15 +199,15 @@ module.exports = installService = {
           }
         });
       });
-      if (updateSection) {
-        let record = await dalService.contentUpdate(
-          section.id,
-          section.data.url,
-          section.data,
-          session
-        );
-        console.log("updated column structure for", record.id);
-      }
+      // if (updateSection) {
+      //   let record = await dalService.contentUpdate(
+      //     section.id,
+      //     section.data.url,
+      //     section.data,
+      //     session
+      //   );
+      //   console.log("updated column structure for", record.id);
+      // }
     });
   },
 
