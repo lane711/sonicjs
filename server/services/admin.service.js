@@ -105,9 +105,9 @@ module.exports = adminService = {
             req.url
           );
           data.contentId = param2;
-          data.shortCode = sharedService.generateShortCode(param1, {
+          data.shortCode = content ? sharedService.generateShortCode(param1, {
             id: content.id,
-          });
+          }) : null;
         }
 
         if (viewName == "admin-content-types") {

@@ -1,30 +1,31 @@
 const { expect } = require("chai");
 const { iteratee } = require("lodash");
+const cleanupTag = "cypress-test-cleanup-tag";
 
 describe("Page Builder", function () {
   beforeEach(() => {
     cy.SonicJs.login();
   });
 
-  // before(() => {
-  //   //cleanup incase any tests failed
-  //   cy.SonicJs.clearCypressTestData();
-  // });
+  before(() => {
+    //cleanup incase any tests failed
+    cy.SonicJs.clearCypressTestData();
+  });
 
   // after(() => {
   //   //cleanup incase any tests failed
   //   cy.SonicJs.clearCypressTestData();
   // });
 
-  it.skip("Page create", function () {
+  it("Page create", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}`);
-    // cy.get(".sidebar-expander.collapsed").click();
-    cy.contains("Add Element").should("be.visible");
+    cy.SonicJs.openPageBuilderPanel();
+
     cy.get("#new-page").click();
 
     cy.contains("Create Page").should("be.visible");
 
-    cy.get('input[name="data[title]').type("Cypress PB Test", { delay: 0 });
+    cy.get('input[name="data[title]').type("Cypress PB Test");
     cy.wait(1000);
 
     // cy.contains("Cypress PB Test").should("be.visible");
@@ -34,7 +35,7 @@ describe("Page Builder", function () {
     cy.get('input[name="data[pageCssClass]"]').type("cypress-pb-test");
     cy.get('input[name="data[metaTitle]"]').type("Cypress Meta Title");
     cy.get('textarea[name="data[metaDescription]"]').type(
-      "Cypress Meta Description - cypress-test-cleanup-tag"
+      `Cypress Meta Description - ${cleanupTag}`
     );
 
     cy.contains("Submit").should("not.be.disabled");
@@ -45,7 +46,7 @@ describe("Page Builder", function () {
     // cy.url().should('include', '/cypress-test-page');
   });
 
-  it.skip("Add setion ", function () {
+  it("Add setion ", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/cypress-pb-test`);
     // cy.get(".sidebar-expander.collapsed").click();
     cy.contains("Add Section").should("be.visible");
@@ -72,54 +73,35 @@ describe("Page Builder", function () {
     cy.contains("Ipsum De Lorem").should("be.visible");
 
     //unsved module form is showing in the sidebar
-    cy.get('.formio-component-form .formio-component-text input').type(' cypress');
-    cy.get('#reset-module').should("be.visible");
+    cy.get(".formio-component-form .formio-component-text input").type(
+      " cypress"
+    );
+    cy.get("#reset-module").should("be.visible");
 
     cy.get('[data-id="unsaved"]').should(
       "contain.text",
       "Ipsum De Lorem cypress"
     );
+    cy.get(".panel-title").should("contain.text", "title");
 
     //check reset function on unsaved module
-    cy.get('#reset-module').click();
-    cy.get('[data-id="unsaved"]').should(
+    cy.get("#reset-module").click();
+    cy.get('[data-id="unsaved"]').should("not.have.text", "cypress");
+    cy.get(".formio-component-form .formio-component-text input").should(
       "not.have.text",
-      "Ipsum De Lorem cypress"
-    );
-    cy.get('.formio-component-form .formio-component-text input').should(
-      "not.have.text",
-      "Ipsum De Lorem cypress"
+      "cypress"
     );
 
+    //update and save the module
+    cy.get(".formio-component-form .formio-component-text input").type(
+      ` ${cleanupTag}`
+    );
+    cy.get(".formio-component-submit button").click()
+    cy.contains('Module added to column'); //test growl
   });
 
   it.skip("Content edit", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/cypress-pb-test`);
-    cy.get("#sidebar-expander").click();
-    cy.contains("Template").should("be.visible");
-    cy.get("#page-settings").click();
-    cy.wait(1000);
 
-    cy.get('input[name="data[heroTitle]"]').type(" EDITED");
-    cy.get('input[name="data[title]').type(" EDITED");
-    cy.wait(1000);
-
-    cy.contains("Submit").click();
-
-    cy.wait(500);
-
-    cy.visit(`${cy.SonicJs.getBaseUrl()}/cypress-pb-test-edited`);
-    cy.contains("Cypress Hero EDITED");
-  });
-
-  it.skip("Content delete", function () {
-    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/content`);
-    cy.get('input[type="search"]').type("Cypress PB Test");
-    cy.contains("Delete").first().click();
-    cy.wait(1000);
-    cy.contains("Confirm Delete").click();
-
-    cy.url().should("include", "/admin/content");
-    cy.contains("Cypress Test Page").should("not.exist");
   });
 });

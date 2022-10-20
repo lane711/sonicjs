@@ -226,7 +226,6 @@ function setCurrentIds(moduleId, newDrop = false, emptyColumn = false) {
   let moduleDiv;
   if (newDrop) {
     moduleDiv = $(".current-drop")[0];
-    
   } else if (emptyColumn) {
     moduleDiv = moduleId;
   } else {
@@ -1281,6 +1280,7 @@ async function saveWYSIWYG() {
 
 async function addModule(systemId, sessionID) {
   // debugger;
+  currentModuleContentType = systemId;
 
   let form = await dataService.formGet(
     systemId,
@@ -1293,10 +1293,7 @@ async function addModule(systemId, sessionID) {
 
   console.log("adding module type:", form.contentType.systemId);
 
-  setMainPanelHeaderTextAndIcon(
-    systemId,
-    form.contentType.module.icon
-  );
+  setMainPanelHeaderTextAndIcon(systemId, form.contentType.module.icon);
 
   $("#pb-content-container").html(form.html);
   // $(".pb-side-panel #main").html(form.html);
@@ -1308,12 +1305,20 @@ async function addModule(systemId, sessionID) {
 }
 
 async function editModule(sessionID) {
-  // cleanModal();
-  // showSidePanel();
+  if (!currentModuleId) {
+    //newdrop unsaved
+    addModule(currentModuleContentType, sessionID);
+    return;
+  }
 
   console.log("editing module: " + currentModuleId, currentModuleContentType);
 
   let data = await dataService.getContentById(currentModuleId);
+
+  // if (!data) {
+  //   //newdrop unsaved
+  //   data = originalModuleDataFromDb;
+  // }
 
   let message = `Updated ${currentModuleContentType} module`;
   // debugger;
@@ -2033,7 +2038,9 @@ function checkIfColumnIsEmpty(sourceColumn) {
   }
 
   if (sourceColumn && !$(sourceColumn).find("div").length) {
-    $(sourceColumn).html('<span class="empty-column"><h5>Empty Column</h5><p>(drag element here)</p></span>')
+    $(sourceColumn).html(
+      '<span class="empty-column"><h5>Empty Column</h5><p>(drag element here)</p></span>'
+    );
   }
 
   // let sourceColumnDev = $(`div[data-id="${sourceColumnId}"]`)[0];

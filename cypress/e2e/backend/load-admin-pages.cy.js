@@ -16,7 +16,7 @@ describe("Load Admin Pages", function () {
 
     cy.SonicJs.adminPageVerify('admin/content', 'New Content');
 
-    cy.SonicJs.adminPageVerify('admin/media', 'New Media');
+    cy.SonicJs.adminPageVerify('admin/media', 'Drop Files');
 
     // cy.SonicJs.adminPageVerify('admin/field-types', 'New Field Type');
 
