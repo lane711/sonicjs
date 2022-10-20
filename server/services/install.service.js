@@ -185,6 +185,8 @@ module.exports = installService = {
     sections.map(async (section) => {
       updateSection = false;
       section.data.rows?.map((row) => {
+        row.css = row.class;
+        delete row.class;
         row.columns.map((column) => {
           if (!Array.isArray(column.content)) {
             column.css = column.class;
@@ -199,8 +201,9 @@ module.exports = installService = {
               updateSection = true;
             }
           }
-          console.log('column', column);
+          // console.log('column', column);
         });
+        console.log("row", row);
       });
       if (updateSection) {
         let record = await dalService.contentUpdate(

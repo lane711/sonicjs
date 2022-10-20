@@ -170,6 +170,20 @@ function setupUIClicks() {
     }
   });
 
+  $(document).on("click", ".cancel-panel", function () {
+    if (!checkForUnsavedChanges()) {
+      showElements();
+    } else {
+      unsavedChanedsModal = new bootstrap.Modal(
+        document.getElementById("unsavedChanedsModal"),
+        {
+          keyboard: false,
+        }
+      );
+      unsavedChanedsModal.show();
+    }
+  });
+
   $(document).on("click", ".empty-column", function () {
     let moduleDiv = $(this).closest(".col")[0];
     setCurrentIds(moduleDiv, undefined, true);
@@ -1458,7 +1472,7 @@ async function setNewColumnSize(diff) {
     section,
     false,
     "section",
-    "Column css class updates to " + newColClassSize
+    "Column css class updated to " + newColClassSize
   );
 }
 
@@ -2188,6 +2202,7 @@ function setupElements() {
 function showElements() {
   const elementsList = $("#elements-list").clone();
   $("#pb-content-container").html(elementsList);
+  setMainPanelHeaderTextAndIcon('Add Elements', 'bi-plus-circle')
   elementsList.removeClass("hide");
   setupSortableModules();
 }
