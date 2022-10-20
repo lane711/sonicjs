@@ -1,7 +1,7 @@
 {
   "name": "sonicjs",
-  "version": "0.6.0",
-  "description": "",
+  "version": "0.7.0",
+  "description": "Node.js open source CMS",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/utkarshp21/graphql-server-setup.git"
+    "url": "git+https://github.com/lane711/sonicjs.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "SonicJs",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/utkarshp21/graphql-server-setup/issues"
+    "url": "https://github.com/lane711/sonicjs/issues"
   },
-  "homepage": "https://github.com/utkarshp21/graphql-server-setup#readme",
+  "homepage": "https://sonicjs.com/",
   "dependencies": {
     "@coreui/coreui": "^2.1.12",
     "@coreui/coreui-plugin-chartjs-custom-tooltips": "^1.3.1",
