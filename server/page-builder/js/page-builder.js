@@ -125,6 +125,11 @@ function removeAllHighlights() {
   // $("html").removeClass("pb");
 }
 
+function disableAllModuleLinks(){
+  //disable hyperlinks in module so that user can select it
+  $('section').find('a').attr('href', '#');
+}
+
 function setupUIClicks() {
   $("html").addClass("pb");
 
@@ -151,7 +156,35 @@ function setupUIClicks() {
 
   // debugger;
 
-  $(document).on("click", "section .row .module > *", function () {
+
+
+//   $('.module-hover-wrap a').click(function(e) {
+//     debugger;
+//     e.preventDefault();
+//     //do other stuff when a click happens
+// });
+
+
+//   $("section .row .module").on({
+//     mouseenter: function () {
+//         //stuff to do on mouse enter
+//         console.log("hovering", this);
+//         //wrap inner content in case there are hyperlinks
+//         // $(this).wrap(function() {
+//         //   return "<a href='javascript:void(0);' class='module-hover-wrap'></a>";
+//         // });
+
+//         $('section').find('a').attr('href', '#');
+
+//     },
+//     mouseleave: function () {
+//         //stuff to do on mouse leave
+//         console.log("leaving", this);
+//         // $(this).unwrap();
+//     }
+// });
+
+  $(document).on("click", "section .row .module", function () {
     if ($(this).hasClass("cloned")) {
       return;
     }
@@ -286,6 +319,8 @@ function setCurrentIds(moduleId, newDrop = false, emptyColumn = false) {
       $(".section-add-below").appendTo(currentSection).show();
     }
   }
+
+  disableAllModuleLinks();
 }
 
 function getParentSectionId(el) {
@@ -2202,7 +2237,7 @@ function setupElements() {
 function showElements() {
   const elementsList = $("#elements-list").clone();
   $("#pb-content-container").html(elementsList);
-  setMainPanelHeaderTextAndIcon('Add Elements', 'bi-plus-circle')
+  setMainPanelHeaderTextAndIcon("Add Elements", "bi-plus-circle");
   elementsList.removeClass("hide");
   setupSortableModules();
 }
