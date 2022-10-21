@@ -71,6 +71,37 @@ module.exports = installService = {
       console.log("created siteSettings:", record);
     }
 
+
+    let siteSettingsACLs = await dataService.getContentByType(
+      "site-settings-acls"
+    );
+    if (siteSettingsACLs.length === 0) {
+      let data = {
+        contentType: "site-settings-acls",
+        permissionAccessControls: [
+          {
+            title: "view",
+          },
+          {
+            title: "create",
+          },
+          {
+            title: "edit",
+          },
+          {
+            title: "delete",
+          },
+        ],
+      };
+      let record = await dalService.contentUpdate(
+        "",
+        "/site-settings-acls",
+        data,
+        session
+      );
+      console.log("created siteSettingsACLs:", record);
+    }
+    
     let themeSettings = await dataService.getContentByType("theme-settings");
     if (themeSettings.length === 0) {
       let data = {
