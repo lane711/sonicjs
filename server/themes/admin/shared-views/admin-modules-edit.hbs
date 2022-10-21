@@ -35,6 +35,13 @@
                                         input: true
                                     },
                                     {
+                                        type: 'textfield',
+                                        key: 'icon',
+                                        label: 'Icon',
+                                        placeholder: 'bi-gear',
+                                        input: true
+                                    },
+                                    {
                                         type: 'checkbox',
                                         key: 'enabled',
                                         label: 'Enabled',
@@ -66,6 +73,7 @@
                                             data: {
                                                 title: moduleDef.title,
                                                 systemId: moduleDef.systemId,
+                                                icon: moduleDef.icon,
                                                 enabled: moduleDef.enabled,
                                                 canBeAddedToColumn: moduleDef.canBeAddedToColumn,
                                                 singleInstance: moduleDef.singleInstance,

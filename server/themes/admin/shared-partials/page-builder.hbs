@@ -1,429 +1,778 @@
-<link href="/node_modules/@simonwep/pickr/dist/themes/nano.min.css" rel="stylesheet">
-
+<link href="/node_modules/@simonwep/pickr/dist/themes/nano.min.css" rel="stylesheet" />
 
 <style type="text/css" id="templateCss">
-  {
-      {
-        {
-        data.editor.css
-      }
-    }
-  }
+  {{{ data.editor.css }}}
 </style>
 
-<div class="pb-wrapper">
-  <div class="open-admin row no-gutters">
-    <div class="col text-center"> <a href="/admin" >Open Admin</a>
+<div class="pb-wrapper collapsed">
+  <div class="left">
+    <div class="top">
+
+      <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+        data-bs-content="Elements" id="pb-elements"><i class="bi bi-plus-circle"></i></button>
+
+      <!-- <button
+        type="button"
+        class="btn btn-light"
+        data-bs-toggle="popover"
+        data-bs-trigger="hover focus"
+        data-bs-content="Pre-built Sections"
+      ><i class="bi bi-plus-square"></i></button> -->
+
+      <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+        data-bs-content="Page Settings" id="page-form"><i class="bi bi-sliders"></i></button>
+
+      <!-- <button
+        type="button"
+        class="btn btn-light"
+        data-bs-toggle="popover"
+        data-bs-trigger="hover focus"
+        data-bs-content="Page Form"
+      ><i class="bi bi-grid-3x2"></i></button> -->
+
+      <!-- <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+        data-bs-content="Page Code" id="page-code"><i class="bi bi-code-square"></i></button> -->
+
     </div>
-    <div class="col text-center"> <a href="/logout">Logout <i class="nav-icon fa fa-sign-out"></i></a>
+    <div class="bottom">
+
+
+
+      <!-- <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+        data-bs-content="Section Sorting"><i class="bi bi-layers"></i></button> -->
+
+        <button type="button"  class="btn btn-light" data-bs-toggle="popover" id="new-page" data-bs-trigger="hover focus"
+        data-bs-content="New Page"
+        onclick="return openFormInModal('create', 'page')"><i class="bi bi-file-plus"></i></button>
+
+        <button type="button"  class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+        data-bs-content="New Blog Post"
+        onclick="return openFormInModal('create', 'blog')"><i class="bi bi-file-post"></i></button>
+
+        <button type="button" id="site-css" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+        data-bs-content="Site CSS"><i class="bi bi-filetype-css"></i></button>
+
+      <a href="/admin" target="_blank" class="btn sonic" data-bs-toggle="popover" data-bs-trigger="hover focus"
+        data-bs-content="SonicJs Backend"><img src="/assets/img/SonicJs-Logo-2019.svg" />
+      </a>
+
     </div>
   </div>
-  <div>
-    <hr>
-  </div>
-
-  <nav class="page-builder-nav">
-
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
-      <li class="nav-item">
-        <a class="nav-link" id="add-tab" data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="tab" href="#add" role="tab" aria-controls="add"
-          aria-selected="true"><i class="fa fa-plus"></i></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link active" id="page-tab" data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="tab" href="#page" role="tab" aria-controls="page"
-          aria-selected="true">Page</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" id="template-tab" data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="tab" href="#template" role="tab" aria-controls="template"
-          aria-selected="false">Template</a>
-      </li>
-    </ul>
-    <div class="tab-content" id="myTabContent">
-      <div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
-
-          <button type="button" id="btn-add-page" class="btn btn-success btn-sm ml-1 mt-1" onclick="return openFormInModal('create', 'page')">Add Page</button>
-          <button type="button" class="btn btn-success btn-sm ml-1 mt-1" onclick="return openFormInModal('create', 'blog')">Add Blog Post</button>
-
-          <hr>
-
-          <!-- {{#each data.modulesForColumns}}
-          <a class="dropdown-item" onclick="addModule('{{this.systemId}}')"><i class="fa fa-plus"></i>
-            {{this.title}}</a>
-          {{/each}} -->
-
+  <div class="main">
+    <div class="header">
+      <div class="icon">
+        <i class="bi bi-plus-circle header-icon"></i>
       </div>
-
-      <div class="tab-pane fade show active" id="page" role="tabpanel" aria-labelledby="page-tab">
-
-        <ul class="nav page">
-
-          <li class="nav-title">Page Settings</li>
-
-          <li class="nav-item nav-dropdown">
-            <a class="nav-link white" id="page-settings" onclick="return openPageSettingsForm('edit','page')"
-              href="javascript:void(0);">
-              <i class="nav-icon fa fa-gear"></i> Page Settings</a>
+      <div class="panel-title">Add Element</div>
+      <div class="close">
+        <button type="button" class="btn btn-light cancel-panel"><i class="bi bi-x-lg"></i></button>
+      </div>
+    </div>
+    <div class="breadcrumbs hide">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="javascript:void(0);" class="select-current-section">Section</a></li>
+          <li class="breadcrumb-item">
+            <!-- <a href="javascript:void(0);" class="select-current-row"> -->
+              Row
+            <!-- </a> -->
           </li>
+          <li class="breadcrumb-item">
+            <!-- <a href="javascript:void(0);" class="select-current-column"> -->
+              Column
+            <!-- </a> -->
+          </li>
+        </ol>
+      </nav>
+    </div>
+    <div class="content">
+      <div id="pb-content-container"></div>
+      <div id="editor" class="css-editor hide">{{{data.editor.css}}}</div>
+    </div>
+    <div class="footer hide">
 
-          {{!-- <li class="nav-item nav-dropdown">
-                        <a class="nav-link refresh" (click)="refresh" href="#">
-                            <i class="nav-icon fa fa-refresh"></i> Refresh</a>
-                    </li> --}}
+      <!-- <button type="button" 
+      class="btn btn-danger"
+      data-bs-toggle="popover"
+      data-bs-trigger="hover focus"
+      data-bs-content="Undo">
+        <i class="bi bi-arrow-counterclockwise text-primary white"></i>
+      </button>
 
-          <li class="nav-title">Layout</li>
+      <button type="button" 
+      class="btn btn-primary"
+      data-bs-toggle="popover"
+      data-bs-trigger="hover focus"
+      data-bs-content="Redo">
+        <i class="bi bi-arrow-clockwise text-primary white"></i>
+      </button> -->
 
+      <button type="button" 
+      class="btn btn-primary btn-sm"
+      id="save-global-css">
+      Save Site CSS
+        <i class="bi btn-sm bi-save text-primary white"></i>
+      </button>
 
-          <div class="section-wrapper">
-            {{#each data.sections}}
-            <li class="nav-item nav-dropdown pb-section" data-id="{{this.id}}">
+    </div>
+  </div>
+</div>
 
+<button class="sidebar-expander {{data.sidebarClass}}" id="sidebar-expander" type="button">
+</button>
 
-              <a class="nav-link" data-bs-toggle="collapse" href="#collapse{{this.id}}" role="button" aria-expanded="false" aria-controls="collapseSection">
-                <i class="nav-icon fa fa-align-justify"></i><span>{{this.title}}</span>
-              </a>
+<!-- elements start-->
+<div id="elements-list" class="hide">
+  <h2>Common Elements</h2>
+  <div class="element-item" data-module-id="title">
+    <i class="bi bi-type-h1"></i>
+    <span>Title</span>
+  </div>
+  <div class="element-item" data-module-id="text">
+    <i class="bi bi-body-text""></i>
+    <span>text</span>
+  </div>
+  <h2>All Elements</h2>
+  {{#each data.modulesForColumns}}
+    <div class=" element-item" data-module-id="{{this.systemId}}">
+      <i class="bi {{this.icon}}""></i>
+      <span>{{this.title}}</span>
+    </div>
+  {{/each}}
+</div>
+<!-- elements end-->
 
-              <div class="container mini-layout collapse" id="collapse{{this.id}}">
+<!-- <div class=" pb-wrapper {{data.sidebarClass}}">
 
-                <div class="header">Tools</div>
+        <div class="left-sidebar">
 
-                <div class="btn-group">
-                  <button type="button" class="btn btn-outline-secondary add-section"
-                    onclick="editSection('{{this.id}}')">
-                    <i class="nav-icon fa fa-code"></i> Edit</button>
-                  <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
-                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="sr-only">Toggle Dropdown</span>
-                  </button>
-                  <div class="dropdown-menu">
-                    <a class="dropdown-item text-primary" onclick="deleteSection('{{this.id}}', {{@index}})">Delete Section</a>
-                  </div>
-                </div>
+          <div class="middle">
 
-                {{!-- <div class="header">Layout</div>
+            <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+              data-bs-content="Elements"><i class="bi bi-plus-circle"></i></button>
 
-                                {{#each this.rows}}
-                                <div class="{{this.class}} pb-row">
+            <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+              data-bs-content="Pre-built Sections"><i class="bi bi-plus-square"></i></button>
 
-                                    {{#each this.columns}}
-                                    <div class="{{this.class}}">
-                                        <span class="badge badge-primary">Block</span>
-                                    </div>
-                                    {{/each}}
+            <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+              data-bs-content="Page Options"><i class="bi bi-sliders"></i></button>
 
-                                    <span class="badge badge-success"
-                                        onclick="addColumn('{{../this.id}}', {{@index}})"><i
-                                            class="nav-icon fa fa-plus"></i></span>
-                                </div>
-                                {{/each}} --}}
+            <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+              data-bs-content="Page Form"><i class="bi bi-grid-3x2"></i></button>
 
+            <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+              data-bs-content="Page Code"><i class="bi bi-code-square"></i></button>
 
-
-                {{!-- <div class="header">Background</div>
-                <div class="section-background-editor">
-                  <div class="btn-group" role="group" aria-label="Basic example">
-                    <button type="button" data-type="none" data-section-id="{{this.id}}"
-                      class="btn btn-secondary btn-sm"><i class="fa fa-ban"></i></button>
-                    <button type="button" data-type="color" data-section-id="{{this.id}}"
-                      class="btn btn-secondary btn-sm"><i class="fa fa-tint"></i></button>
-                    <button type="button" data-type="image" data-section-id="{{this.id}}"
-                      class="btn btn-secondary btn-sm"><i class="fa fa-image"></i></button>
-                    <button type="button" data-type="video" data-section-id="{{this.id}}"
-                      class="btn btn-secondary btn-sm"><i class="fa fa-film"></i></button>
-                  </div>
-                </div>
-
-                <div id="background-color" data-section-id="{{this.id}}" class="hide">
-                  bg:
-                  <div id="backgroundColorPreview-{{this.id}}" data-section-id="{{this.id}}"></div>
-
-              </div>
-
-              <div id="background-image" data-section-id="{{this.id}}" class="hide">
-                bg image options
-              </div>
-
-              <div id="background-video" data-section-id="{{this.id}}" class="hide">
-                bg video options
-              </div> --}}
-
-              </div>
-
-            </li>
-            {{/each}}
           </div>
+
+          <div class="bottom">
+
+            <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+              data-bs-content="Site CSS"><i class="bi bi-filetype-css"></i></button>
+
+            <button type="button" class="btn btn-light" data-bs-toggle="popover" data-bs-trigger="hover focus"
+              data-bs-content="Section Sorting"><i class="bi bi-layers"></i></button>
+
+            <button type="button" class="btn sonic" data-bs-toggle="popover" data-bs-trigger="hover focus"
+              data-bs-content="SonicJs Backend"><img src="/assets/img/SonicJs-Logo-2019.svg" /></button>
+
+          </div>
+        </div>
+        <div class="main">
+          <div class="header">
+            <div class="icon">
+              <i class="bi bi-layers header-icon"></i>
+            </div>
+            <div class="text">
+              Column Text
+            </div>
+            <div class="close">
+              <button type="button" class="btn btn-light"><i class="bi bi-x-lg"></i></button>
+            </div>
+          </div>
+          <div class="content">content</div>
+          <div class="footer">footer</div>
+
+        </div>
+  </div>
+ -->
+  <!-- <nav class="page-builder-nav">
+
+      <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            id="add-tab"
+            data-
+            {{data.themeSettings.bootstrapToggleMiddle}}
+            toggle="tab"
+            href="#add"
+            role="tab"
+            aria-controls="add"
+            aria-selected="true"
+          ><i class="fa fa-plus"></i></a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link active"
+            id="page-tab"
+            data-
+            {{data.themeSettings.bootstrapToggleMiddle}}
+            toggle="tab"
+            href="#page"
+            role="tab"
+            aria-controls="page"
+            aria-selected="true"
+          >Page</a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            id="template-tab"
+            data-
+            {{data.themeSettings.bootstrapToggleMiddle}}
+            toggle="tab"
+            href="#template"
+            role="tab"
+            aria-controls="template"
+            aria-selected="false"
+          >Template</a>
+        </li>
+      </ul>
+      <div class="tab-content" id="myTabContent">
+        <div
+          class="tab-pane fade"
+          id="add"
+          role="tabpanel"
+          aria-labelledby="add-tab"
+        >
+
+          <button
+            type="button"
+            id="btn-add-page"
+            class="btn btn-success btn-sm ml-1 mt-1"
+            onclick="return openFormInModal('create', 'page')"
+          >Add Page</button>
+          <button
+            type="button"
+            class="btn btn-success btn-sm ml-1 mt-1"
+            onclick="return openFormInModal('create', 'blog')"
+          >Add Blog Post</button>
 
           <hr />
 
-          <div class="btn-group btn-section">
-          <button type="button" class="btn btn-outline-secondary" onclick="addSection()">
-            <i class="nav-icon fa fa-plus"></i> Add New Section</button>
-          </div>
 
-          <!-- <div class="btn-group btn-section">
-            <button type="button" class="btn btn-outline-secondary add-section" onclick="addSection()">
-              <i class="nav-icon fa fa-plus"></i> Add New Section</button>
-            <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
-              data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <span class="sr-only">Toggle Dropdown</span>
-            </button>
-            <div class="dropdown-menu">
-              <a class="dropdown-item text-primary" href="#">Add Existing Section</a>
+
+        </div>
+
+        <div
+          class="tab-pane fade show active"
+          id="page"
+          role="tabpanel"
+          aria-labelledby="page-tab"
+        >
+
+          <ul class="nav page">
+
+            <li class="nav-title">Page Settings</li>
+
+            <li class="nav-item nav-dropdown">
+              <a
+                class="nav-link white"
+                id="page-settings"
+                onclick="return openPageSettingsForm('edit','page')"
+                href="javascript:void(0);"
+              >
+                <i class="nav-icon fa fa-gear"></i>
+                Page Settings</a>
+            </li>
+
+            {{! <li class="nav-item nav-dropdown">
+                        <a class="nav-link refresh" (click)="refresh" href="#">
+                            <i class="nav-icon fa fa-refresh"></i> Refresh</a>
+                    </li> }}
+
+            <li class="nav-title">Layout</li>
+
+            <div class="accordion accordion-flush" id="accordionLayout">
+
+              {{#each data.sections}}
+                <div class="accordion-item layout">
+                  <h2 class="accordion-header" id="flush-headingOne">
+                    <button
+                      class="accordion-button collapsed"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#flush-collapse{{@index}}"
+                      aria-expanded="false"
+                      aria-controls="flush-collapse{{@index}}"
+                    >
+                      {{this.title}}
+                    </button>
+                  </h2>
+                  <div
+                    id="flush-collapse{{@index}}"
+                    class="accordion-collapse collapse"
+                    aria-labelledby="flush-heading{{@index}}"
+                    data-bs-parent="#accordionLayout"
+                  >
+
+                    <div class="accordion-body">
+
+                      <div class="btn-group">
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-secondary add-section"
+                          onclick="editSection('{{this.id}}')"
+                        >
+                          <i class="nav-icon fa fa-code"></i>
+                          Edit Code</button>
+                        <button
+                          type="button"
+                          class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
+                          data-bs-toggle="dropdown"
+                          aria-haspopup="true"
+                          aria-expanded="false"
+                        >
+                          <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <div class="dropdown-menu">
+                          <a
+                            class="dropdown-item text-primary"
+                            onclick="deleteSection('{{this.id}}', {{@index}})"
+                          >Delete Section</a>
+                        </div>
+                      </div>
+
+                      <hr />
+
+                      <div class="header">Background</div>
+
+                      <div class="section-background-editor">
+                        <div
+                          class="btn-group"
+                          role="group"
+                          aria-label="Basic example"
+                        >
+                          <button
+                            type="button"
+                            data-type="none"
+                            data-section-id="{{this.id}}"
+                            class="btn btn-outline-secondary btn-sm"
+                          ><i class="fa fa-ban"></i></button>
+                          <button
+                            type="button"
+                            data-type="color"
+                            data-section-id="{{this.id}}"
+                            class="btn btn-outline-secondary btn-sm"
+                          ><i class="fa fa-tint"></i></button>
+                          <button
+                            type="button"
+                            data-type="image"
+                            data-section-id="{{this.id}}"
+                            class="btn btn-outline-secondary btn-sm"
+                          ><i class="fa fa-image"></i></button>
+                          <button
+                            type="button"
+                            data-type="video"
+                            data-section-id="{{this.id}}"
+                            class="btn btn-outline-secondary btn-sm"
+                          ><i class="fa fa-film"></i></button>
+                        </div>
+                      </div>
+
+                      <div
+                        id="background-color"
+                        data-section-id="{{this.id}}"
+                        class=""
+                      >
+                        bg:
+                        <div
+                          id="backgroundColorPreview-{{this.id}}"
+                          data-section-id="{{this.id}}"
+                        ></div>
+
+                      </div>
+
+                      <div
+                        id="background-image"
+                        data-section-id="{{this.id}}"
+                        class="hide mt-3"
+                      >
+                        <a
+                          class="text-dark background-image-link"
+                          href="javascript:void(0)"
+                          onclick="return openFormInModal('create', 'section-background-image')"
+                        >Select Image...</a>
+
+                      </div>
+
+                      <div
+                        id="background-video"
+                        data-section-id="{{this.id}}"
+                        class="hide"
+                      >
+                        bg video options
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              {{/each}}
+
             </div>
-          </div> -->
 
-          {{!-- <li class="nav-item">
-                        <a class="btn btn-outline-success pull-right add-section" onclick="addSection()">
-                            <i class="nav-icon fa fa-plus"></i>
-                            {{#if data.hasRows}}
-                            Add Section
-                            {{else}}
-                            Add a section to get started
-                            {{/if}}
-                        </a>
-                    </li> --}}
+            <hr />
 
-        </ul>
+            <div class="btn-group btn-section">
+              <button
+                type="button"
+                class="btn btn-success"
+                onclick="addSection()"
+              >
+                <i class="nav-icon fa fa-plus"></i>
+                Add Section</button>
+            </div>
 
+            <div id="module-content-container"></div>
+
+         
+
+          </ul>
+
+        </div>
+        <div
+          class="tab-pane fade"
+          id="template"
+          role="tabpanel"
+          aria-labelledby="template-tab"
+        >
+
+          <button
+            style="margin:10px"
+            id="save-global-css"
+            class="btn btn-success btn-sm ml-1 mt-1"
+          ><i class="nav-icon fa fa-save"></i> Save Global CSS</button>
+          <div id="editor">{{{data.editor.css}}}</div>
+        </div>
       </div>
-      <div class="tab-pane fade" id="template" role="tabpanel" aria-labelledby="template-tab">
-        
-          <button style="margin:10px" id="save-global-css" class="btn btn-success btn-sm ml-1 mt-1"><i
-              class="nav-icon fa fa-save"></i> Save Global CSS</button>
-          <div id="editor">{{{ data.editor.css }}}</div>
-      </div>
-    </div>
 
-  </nav>
+    </nav> -->
 
   <!-- Row Editor Button START -->
-  {{!-- <div class="btn-group row-button" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-secondary btn-sm"><i class="fa fa-ban"></i></button>
-        <button type="button" class="btn btn-secondary btn-sm"><i class="fa fa-image"></i></button>
-        <button type="button" class="btn btn-secondary btn-sm"><i class="fa fa-film"></i></button>
-    </div> --}}
   <div class="btn-group row-button section-editor-button hide" role="group">
-    <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="dropdown"
-      aria-haspopup="true" aria-expanded="false">
+    <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-
+      {{data.themeSettings.bootstrapToggleMiddle}} toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Row
     </button>
     <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-      <a class="dropdown-item" onclick="addColumn()"><i class="fa fa-plus"></i> Add Column</a>
-      <a class="dropdown-item" onclick="addRow()"><i class="fa fa-plus"></i> Add Row</a>
-      <a class="dropdown-item" onclick="deleteRow()"><i class="fa fa-trash"></i> Delete Row</a>
+      <a class="dropdown-item" onclick="addColumn()"><i class="fa fa-plus"></i>
+        Add Column</a>
+      <a class="dropdown-item" onclick="addRow()"><i class="fa fa-plus"></i>
+        Add Row</a>
+      <a class="dropdown-item" onclick="deleteRow()"><i class="fa fa-trash"></i>
+        Delete Row</a>
 
-
-      {{!-- <a class="dropdown-item" href="#"><i class="fa fa-copy"></i> Duplicate Row</a> --}}
+      {{! <a class="dropdown-item" href="#"><i class="fa fa-copy"></i> Duplicate Row</a> }}
     </div>
   </div>
   <!-- Row Editor Button END -->
 
   <!-- Column Editor Button START -->
-  {{!-- <div class="btn-group col-button" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-secondary btn-sm"><i class="fa fa-ban"></i></button>
-        <button type="button" class="btn btn-secondary btn-sm"><i class="fa fa-image"></i></button>
-    </div> --}}
-  <div class="btn-group col-button section-editor-button hide" role="group">
-    <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="dropdown"
-      aria-haspopup="true" aria-expanded="false">
-      Column
-    </button>
-    <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-      <a class="dropdown-item" onclick="editColumnContent()"><i class="fa fa-edit"></i> Edit Content</a>
-      <a class="dropdown-item" onclick="deleteColumn()"><i class="fa fa-trash"></i> Delete Column</a>
-      {{!-- <a class="dropdown-item" href="#"><i class="fa fa-copy"></i> Duplicate Column</a> --}}
-    </div>
+
+  <!-- <div class="btn-group col-button section-editor-button hide" role="group">
+  <button
+    id="btnGroupDrop1"
+    type="button"
+    class="btn btn-secondary dropdown-toggle btn-sm"
+    data-
+    {{data.themeSettings.bootstrapToggleMiddle}}
+    toggle="dropdown"
+    aria-haspopup="true"
+    aria-expanded="false"
+  >
+    Column
+  </button>
+  <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+    <a class="dropdown-item" onclick="editColumnContent()"><i
+        class="fa fa-edit"
+      ></i>
+      Edit Content</a>
+    <a class="dropdown-item" onclick="deleteColumn()"><i
+        class="fa fa-trash"
+      ></i>
+      Delete Column</a>
+    {{! <a class="dropdown-item" href="#"><i class="fa fa-copy"></i> Duplicate Column</a> }}
   </div>
+</div> -->
   <!-- Column Editor Button END -->
 
   <!-- Block Editor Button START -->
-  <div class="btn-group block-button section-editor-button hide edit-module" role="group">
+  <div class="btn-group block-button section-editor-button hide edit-module top" role="group">
+
 
     <div class="dropdown">
-      {{!-- <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle btn-sm"
-                data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Block
-            </button>
-            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="btnGroupDrop1">
-                <a class="dropdown-item" onclick="addBlockNew()"><i class="fa fa-plus"></i> Add New Block</a>
-                <a class="dropdown-item" onclick="addBlockExisting()"><i class="fa fa-plus"></i> Add Existing Block</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" onclick="openWYSIWYG()"><i class="fa fa-edit"></i> Edit Block</a>
-                <a class="dropdown-item" onclick="deleteBlock()"><i class="fa fa-trash"></i> Delete Block</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" onclick="deleteBlock()"><i class="fa fa-gear"></i> Block Settings</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" onclick="deleteBlock()"><i class="fa fa-gear"></i> Form</a>
 
-            </div> --}}
+      <button type="button" class="btn btn-sm resize resize-left" onclick="resizeLeft()"><i
+          class="bi bi-arrow-left-square"></i></button>
 
-      <button type="button" onclick="deleteModule()" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
-
-      <button type="button" onclick="copyModule()" class="btn btn-primary btn-sm"><i class="bi bi-clipboard-plus"></i></button>
-
-      <button type="button" onclick="editModule()" class="btn btn-secondary btn-sm"><i
-          class="bi bi-pen"></i></button>
+      <button type="button" class="btn btn-sm resize resize-right"><i class="bi bi-arrow-right-square"
+          onclick="resizeRight()"></i></button>
     </div>
   </div>
 
+  <div class="btn-group block-button section-editor-button hide edit-module bottom" role="group">
+
+
+    <div class="dropdown">
+
+      <!-- <button type="button" class="btn btn-sm resize-left"><i
+      class="bi bi-arrow-left-square"
+    ></i></button>
+
+    <button type="button" class="btn btn-sm resize-right"><i
+      class="bi bi-arrow-right-square"
+    ></i></button> -->
+
+      <button type="button" onclick="deleteModule()" class="btn btn-sm"><i class="bi bi-trash"></i></button>
+
+      <!-- <button type="button" onclick="copyModule()" class="btn btn-sm"><i class="bi bi-clipboard-plus"></i></button> -->
+
+      <button type="button" class="btn btn-sm module-move"><i class="bi bi-arrows-move"></i></button>
+    </div>
+  </div>
 
   <div class="btn-group block-button section-editor-button hide add-module" role="group">
 
     <div class="dropdown block-button module-button">
 
-      <button id="btnGroupDropModules" type="button" class="btn btn-secondary dropdown-toggle btn-sm"
-        data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <i class="bi bi-plus-square"></i> Module</button>
+      <button id="btnGroupDropModules" type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-
+        {{data.themeSettings.bootstrapToggleMiddle}} toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="bi bi-plus-square"></i>
+        Module
       </button>
       <div class="dropdown-menu dropdown-menu-right add-module-dropdown" aria-labelledby="btnGroupDropModules">
         {{#each data.modulesForColumns}}
-        <a class="dropdown-item" onclick="addModule('{{this.systemId}}')"><i class="bi bi-plus-square"></i>
+        <a class="dropdown-item" onclick="addModule('{{this.systemId}}')"><i class=`bi {{this.icon}}`></i>
           {{this.title}}</a>
         {{/each}}
       </div>
 
     </div>
   </div>
+
+  <div class="section-add section-add-above hide">
+    <button class="btn btn-primary" data-bs-toggle="popover" data-bs-trigger="hover focus"
+      data-bs-content="Add Section Above">
+      <i class="bi bi-plus-square"></i>
+    </button>
+  </div>
+
+  <div class="section-add section-add-below hide">
+    <button class="btn btn-primary" data-bs-toggle="popover" data-bs-trigger="hover focus"
+      data-bs-content="Add Section Below">
+      <i class="bi bi-plus-square"></i>
+    </button>
+  </div>
   <!-- Block Editor Button END -->
 
-
-  <button class="sidebar-minimizer brand-minimizer" type="button"></button>
-
-
-</div>
-
-  <button class="sidebar-expander" id="sidebar-expander" type="button"></button>
-
-<!-- WYSIWYG Modal -->
-<div class="modal fade admin-field-add" id="wysiwygModal" tabindex="-1" role="dialog"
-  aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Edit Block</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-
-        <input type="hidden" id="block-edit-it">
-        <div id="editor-container">
-
-          <textarea id="block-content" class="wysiwyg-content">loading...</textarea>
+  <!-- New Section START -->
+  <section id="new-section" class="new-section hide">
+    <div class="row justify-content-md-center">
+      <div class="col-md-8">
+        <p class="new-section-text text-center">Select a section layout</p>
+        <div class="mini-layouts">
+          <div class="mini-layout full">
+            <div></div>
+          </div>
+          <div class="mini-layout half">
+            <div></div>
+            <div></div>
+          </div>
+          <div class="mini-layout thirds">
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+          <div class="mini-layout forths">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+          <div class="mini-layout left-sidebar">
+            <div></div>
+            <div></div>
+          </div>
+          <div class="mini-layout right-sidebar">
+            <div></div>
+            <div></div>
+          </div>
+          <div class="mini-layout both-sidebars">
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
 
         </div>
-
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary wysiwyg-save" onclick='saveWYSIWYG()'
-          data-dismiss="modal">Save</button>
+    </div>
+  </section>
+  <!-- New Section END -->
+
+  <!-- <button class="sidebar-minimizer brand-minimizer" type="button"></button> -->
+
+  <!-- WYSIWYG Modal -->
+  <div class="modal fade admin-field-add" id="wysiwygModal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Edit Block</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+          <input type="hidden" id="block-edit-it" />
+          <div id="editor-container">
+
+            <textarea id="block-content" class="wysiwyg-content">loading...</textarea>
+
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary wysiwyg-save" onclick="saveWYSIWYG()"
+            data-dismiss="modal">Save</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- Section Editor Modal -->
-<div class="modal" id="sectoinEditorModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Edit Section Data</h5>
-        <button type="button"   data-{{data.themeSettings.bootstrapToggleMiddle}}dismiss="modal" class="btn-close" aria-label="Close">
-        </button>
-      </div>
-      <div class="modal-body">
+  <!-- Section Editor Modal -->
+  <div class="modal" id="sectoinEditorModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Edit Section Data</h5>
+          <button type="button" data- {{data.themeSettings.bootstrapToggleMiddle}} dismiss="modal" class="btn-close"
+            aria-label="Close">
+          </button>
+        </div>
+        <div class="modal-body">
 
-        <input type="hidden" id="block-edit-it">
-        <div id="editor-container">
+          <input type="hidden" id="block-edit-it" />
+          <div id="editor-container">
 
-          <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+            <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 
-          <div id="jsoneditor" style="width: 100%; height: 600px;"></div>
+            <div id="jsoneditor" style="width: 100%; height: 600px;"></div>
 
+          </div>
 
         </div>
-
-      </div>
-      <div class="modal-footer">
-        <button type="button"  data-{{data.themeSettings.bootstrapToggleMiddle}}dismiss="modal" class="btn btn-secondary">Cancel</button>
-        <button type="button" class="btn btn-primary wysiwyg-save" onclick='saveSection()'
-          data-dismiss="modal">Save</button>
+        <div class="modal-footer">
+          <button type="button" data- {{data.themeSettings.bootstrapToggleMiddle}} dismiss="modal"
+            class="btn btn-secondary">Cancel</button>
+          <button type="button" class="btn btn-primary wysiwyg-save" onclick="saveSection()"
+            data-dismiss="modal">Save</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- Dynamic SidePanel -->
-<div class="pb-side-panel close">
-  <div class="handle">
-    <span>
-      <i class="nav-icon bi bi-x-lg"></i>
-    </span>
+  <!-- Dynamic SidePanel -->
+  <div class="pb-side-panel close">
+    <div class="handle">
+      <span>
+        <i class="nav-icon bi bi-x-lg"></i>
+      </span>
+    </div>
+    <h5 class="modal-title" id="dynamicModelTitle">Settings</h5>
+
+    <div class="content">
+
+      <div id="main">Loading...</div>
+
+      {{!-- <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" id="home-tab" data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="tab"
+            href="#main" role="tab" aria-controls="main" aria-selected="true">Data</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="profile-tab" data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="tab"
+            href="#profile" role="tab" aria-controls="profile" aria-selected="false">Setting</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="contact-tab" data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="tab"
+            href="#contact" role="tab" aria-controls="contact" aria-selected="false">Revisions</a>
+        </li>
+      </ul>
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="main" role="tabpanel" aria-labelledby="home-tab">Loading...</div>
+        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">...</div>
+        <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">Coming Soon</div>
+      </div> --}}
+
+    </div>
+
   </div>
-  <h5 class="modal-title" id="dynamicModelTitle">Settings</h5>
 
-  <div class="content">
+  <!-- Dynamic SidePanel Backdrop-->
+  <div class="pb-side-panel-modal-backdrop close"></div>
 
-    <div id="main">Loading...</div>
+  <!-- Dynamic Modal -->
+  <div class="modal fade" id="moduleSettingsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="dynamicModelTitle">Settings</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
 
+          <input type="hidden" id="block-edit-it" />
+          <div id="editor-container">
 
-    {{!-- <ul class="nav nav-tabs" id="myTab" role="tablist">
-      <li class="nav-item">
-        <a class="nav-link active" id="home-tab" data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="tab" href="#main" role="tab" aria-controls="main"
-          aria-selected="true">Data</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" id="profile-tab" data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="tab" href="#profile" role="tab" aria-controls="profile"
-          aria-selected="false">Setting</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" id="contact-tab" data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="tab" href="#contact" role="tab" aria-controls="contact"
-          aria-selected="false">Revisions</a>
-      </li>
-    </ul>
-    <div class="tab-content" id="myTabContent">
-      <div class="tab-pane fade show active" id="main" role="tabpanel" aria-labelledby="home-tab">Loading...</div>
-      <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">...</div>
-      <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">Coming Soon</div>
-    </div> --}}
+            <div id="moduleSettingsFormio"></div>
 
-  </div>
-
-</div>
-
-<!-- Dynamic SidePanel Backdrop-->
-<div class="pb-side-panel-modal-backdrop close"></div>
-
-<!-- Dynamic Modal -->
-<div class="modal fade" id="moduleSettingsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="dynamicModelTitle">Settings</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-
-        <input type="hidden" id="block-edit-it">
-        <div id="editor-container">
-
-          <div id='moduleSettingsFormio'></div>
+          </div>
 
         </div>
-
+        {{! <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary page-settings-save" data-dismiss="modal">Save</button>
+        </div> }}
       </div>
-      {{!-- <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary page-settings-save" data-dismiss="modal">Save</button>
-            </div> --}}
     </div>
   </div>
-</div>
 
-<script src="/node_modules/@simonwep/pickr/dist/pickr.min.js"></script>
-<script src="/node_modules/sortablejs/Sortable.min.js"></script>
+
+  <!-- Unsaved changes popup -->
+  <div class="modal" id="unsavedChanedsModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Unsaved Changes</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Do you want to loose or save your changes?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="unsavedLooseChanges" class="btn btn-secondary" data-bs-dismiss="modal">Loose Changes</button>
+          <button type="button" id="unsavedSaveChanges" class="btn btn-primary">Save Shanges</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/node_modules/@simonwep/pickr/dist/pickr.min.js"></script>
+  <script src="/node_modules/sortablejs/Sortable.min.js"></script>

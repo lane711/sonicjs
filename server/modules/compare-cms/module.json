@@ -1,6 +1,6 @@
 {
   "title": "Compare CMS",
-  "enabled": true,
+  "enabled": false,
   "systemId": "compare-cms",
   "canBeAddedToColumn": false,
   "singleInstance": false,

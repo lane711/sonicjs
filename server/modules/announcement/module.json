@@ -1,10 +1,8 @@
 {
   "title": "Announcement",
-  "enabled": true,
+  "enabled": false,
   "systemId": "announcement",
-  "canBeAddedToColumn": true,
-  "sessionID": "undefined",
-  "version": "0.0.0.1",
-  "systemidUpperCase": "ANNOUNCEMENT",
-  "systemidCamelCase": "announcement"
+  "canBeAddedToColumn": false,
+  "singleInstance": false,
+  "version": "0.0.0.1"
 }

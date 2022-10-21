@@ -304,6 +304,7 @@ if (typeof module !== "undefined" && module.exports) {
                   moduleSystemId
                   filePath
                   data
+                  module
                 }
               }
             `,
@@ -942,6 +943,7 @@ if (typeof module !== "undefined" && module.exports) {
             title:"${payload.data.title}", 
             enabled:${payload.data.enabled}, 
             systemId:"${payload.data.systemId}", 
+            icon:"${payload.data.icon}", 
             canBeAddedToColumn: ${payload.data.canBeAddedToColumn},
             singleInstance: ${payload.data.singleInstance},
             version:"${payload.data.version}"

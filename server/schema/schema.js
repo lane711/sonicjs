@@ -104,6 +104,7 @@ const ContentTypeType = new GraphQLObjectType({
     permissions: { type: GraphQLJSONObject },
     filePath: { type: GraphQLString },
     moduleSystemId: { type: GraphQLString },
+    module: { type: GraphQLJSONObject },
   }),
 });
 
@@ -685,7 +686,7 @@ const Mutation = new GraphQLObjectType({
 
         args.data = dataObj;
 
-        console.log("ContentTypeUpdate", args);
+        // console.log("ContentTypeUpdate", args);
         moduleService
           .contentTypeUpdate(args, args.sessionID, req)
           .then((data) => {
@@ -768,6 +769,7 @@ const Mutation = new GraphQLObjectType({
         title: { type: new GraphQLNonNull(GraphQLString) },
         enabled: { type: new GraphQLNonNull(GraphQLBoolean) },
         systemId: { type: new GraphQLNonNull(GraphQLString) },
+        icon: { type: GraphQLString },
         canBeAddedToColumn: { type: new GraphQLNonNull(GraphQLBoolean) },
         singleInstance: { type: new GraphQLNonNull(GraphQLBoolean) },
         version: { type: new GraphQLNonNull(GraphQLString) },

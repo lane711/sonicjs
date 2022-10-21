@@ -4,6 +4,7 @@ assets:
     - /assets/js/startup.js
     - /node_modules/jquery/dist/jquery.min.js
     - /node_modules/js-cookie/src/js.cookie.js
+    - /themes/admin/light/js/jquery.bootstrap-growl.min.js
     - /node_modules/ace-builds/src-min-noconflict/ace.js
     - /node_modules/ace-builds/src-min-noconflict/ext-beautify.js
     - /node_modules/axios/dist/axios.min.js
@@ -12,6 +13,7 @@ assets:
     - /node_modules/jsoneditor/dist/jsoneditor.min.js
     - /node_modules/formiojs/dist/formio.full.min.js
     - /node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.js
+    - /node_modules/choices.js/public/assets/scripts/choices.min.js
     - /node_modules/dropzone/dist/min/dropzone.min.js
     - /assets/js/common.js
     - /sonicjs-services/shared.service.js

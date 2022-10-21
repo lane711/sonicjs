@@ -1,3 +1,7 @@
 .hide,  .fe-hide{
     display: none;
 }
+
+.bg-image-cover{
+    background-size: cover !important;
+}

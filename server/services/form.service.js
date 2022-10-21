@@ -128,7 +128,7 @@ if (typeof module !== "undefined" && module.exports) {
             req
           );
           // debugger;
-          if (settingContentType && settingContentType.filePath && settingContentType.data) {
+          if (settingContentType && settingContentType.title && settingContentType.data) {
             contentType = settingContentType;
           }
         }
@@ -148,7 +148,7 @@ if (typeof module !== "undefined" && module.exports) {
         onFormSubmitFunction = "editInstance(submission,true)";
       }
 
-      const formJSON = await exports.getFormJson(contentType, contentObject);
+      const formJSON = await exports.getFormJson(contentType, contentObject, showBuilder);
 
       let form = "";
 
@@ -163,21 +163,21 @@ if (typeof module !== "undefined" && module.exports) {
 
       //override button copy
       if (contentType.data.states) {
-        if (data.viewModel.editMode && contentType.data.states.edit?.buttonText) {
+        if (data.viewModel.editMode && contentType.data.states.editSubmitButtonText) {
           const submitButton = contentType.data.components.find(
             (c) => c.key === "submit"
           );
           if (submitButton) {
-            submitButton.label = contentType.data.states.edit.buttonText;
+            submitButton.label = contentType.data.states.editSubmitButtonText;
           }
         }
 
-        if (!data.viewModel.editMode && contentType.data.states.new?.buttonText) {
+        if (!data.viewModel.editMode && contentType.data.states.addSubmitButtonText) {
           const submitButton = contentType.data.components.find(
             (c) => c.key === "submit"
           );
           if (submitButton) {
-            submitButton.label = contentType.data.states.new.buttonText;
+            submitButton.label = contentType.data.states.addSubmitButtonText;
           }
         }
       }
@@ -205,10 +205,10 @@ if (typeof module !== "undefined" && module.exports) {
 
       return {html: form, contentType };
     }),
-    (exports.getFormJson = async function (contentType, content) {
+    (exports.getFormJson = async function (contentType, content, showBuilder) {
       let name = `${contentType.systemId}Form`;
       let settings = await this.getFormSettings(contentType, content);
-      let components = await this.getFormComponents(contentType, content);
+      let components = await this.getFormComponents(contentType, content, showBuilder);
       const formJSON = {
         components: components,
         name: name,
@@ -251,7 +251,7 @@ if (typeof module !== "undefined" && module.exports) {
       }
       return settings;
     }),
-    (exports.getFormComponents = async function (contentType, content) {
+    (exports.getFormComponents = async function (contentType, content, showBuilder) {
       let components = contentType.data?.components;
 
       if (content) {
@@ -260,7 +260,7 @@ if (typeof module !== "undefined" && module.exports) {
           content.data.contentType,
           components
         );
-      } else if (components) {
+      } else if (components && !showBuilder) {
         //only need this when creating new instances
         components.push({
           type: "hidden",

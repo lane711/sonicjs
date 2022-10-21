@@ -1,6 +1,6 @@
 {
   "title": "Compare",
-  "enabled": true,
+  "enabled": false,
   "systemId": "compare",
   "canBeAddedToColumn": false,
   "singleInstance": false,

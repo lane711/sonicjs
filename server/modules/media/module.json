@@ -2,6 +2,7 @@
   "title": "Media",
   "enabled": true,
   "systemId": "media",
+  "icon": "bi-file-earmark-image",
   "canBeAddedToColumn": true,
   "singleInstance": false,
   "version": "0.0.0.1"

@@ -13,7 +13,7 @@ describe("Admin Users", function () {
     cy.wait(1000);
     cy.get('input[name="data[email]"]').type('cypress-test-cleanup-tag@test.com');
     cy.get('input[name="data[password]').type('123456');
-    cy.contains('Submit').click();
+    cy.contains('Create User').click();
     cy.wait(2000);
     cy.contains('Users');
     cy.contains('cypress-test-cleanup-tag@test.com');
@@ -52,7 +52,7 @@ describe("Admin Users", function () {
     cy.contains("cypress-test-cleanup-tag@test.com").should("not.exist");
   });
 
-  it.skip("User delete", function () {
+  it("User delete", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/users`);
 
         // cy.wait(1000);

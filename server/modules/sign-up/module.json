@@ -2,9 +2,8 @@
   "title": "Sign Up",
   "enabled": true,
   "systemId": "sign-up",
+  "icon": "bi-input-cursor",
   "canBeAddedToColumn": true,
-  "sessionID": "undefined",
-  "version": "0.0.0.1",
-  "systemidUpperCase": "SIGN-UP",
-  "systemidCamelCase": "signUp"
+  "singleInstance": false,
+  "version": "0.0.0.1"
 }

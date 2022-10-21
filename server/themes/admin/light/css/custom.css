@@ -109,3 +109,13 @@
   text-align: center;
   margin: 0 8px 0 8px;
 }
+
+.submit-alert{
+  padding: 9px 1rem 12px;
+  margin: 0 0 0 12px;
+}
+
+.submit-alert span:first-of-type{
+  margin: 0 10px 0 0;
+  vertical-align: middle;
+}

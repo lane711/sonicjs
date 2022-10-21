@@ -1,10 +1,8 @@
 {
   "title": "Event",
-  "enabled": true,
+  "enabled": false,
   "systemId": "event",
-  "canBeAddedToColumn": true,
-  "sessionID": "undefined",
-  "version": "0.0.0.1",
-  "systemidUpperCase": "EVENT",
-  "systemidCamelCase": "event"
+  "canBeAddedToColumn": false,
+  "singleInstance": false,
+  "version": "0.0.0.1"
 }
