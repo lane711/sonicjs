@@ -236,7 +236,7 @@ module.exports = contentService = {
           let sectionStyle = await this.getSectionBackgroundStyle(section);
           // let overlayStyle = await this.getSectionOverlayStyle(section);
 
-          page.data.html += `<section data-id='${section.id}' data-title='${section.data.title}' class="${sectionClass}jumbotron-fluid pb ${sectionStyle?.css}" style="${sectionStyle?.style}">`;
+          page.data.html += `<section data-id='${section.id}' data-title='${section.data.title}' class="${sectionClass}jumbotron-fluid ${sectionStyle?.css}" style="${sectionStyle?.style}">`;
           // page.data.html += `<div class="section-overlay" style="${overlayStyle}">`;
           page.data.html += '<div class="container">';
           let rows;
