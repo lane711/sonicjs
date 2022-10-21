@@ -321,6 +321,7 @@ function setCurrentIds(moduleId, newDrop = false, emptyColumn = false) {
   }
 
   disableAllModuleLinks();
+  setupSortable();
 }
 
 function getParentSectionId(el) {
@@ -2339,7 +2340,7 @@ function clickFormUpdateButton() {
 // var returnedFunction = debounce(savePBData(data), 2000);
 
 function renderSectionOrModule(formData) {
-  console.log("savePBData saving...");
+  console.log("renderSectionOrModule with form data");
   axiosInstance
     .post(`/api/modules/render`, { data: formData })
     .then(async function (response) {
