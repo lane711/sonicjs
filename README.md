@@ -17,7 +17,7 @@
 
 ## Screen Shots
 
-<img src="https://sonicjscom.s3.amazonaws.com/sonicjs_intro.gif" width="800px" alt="Edit Content with Automagically Generated Forms" />
+<img src="https://sonicjscom.s3.amazonaws.com/sonicjs_intro.gif?raw=true" width="800px" alt="Edit Content with Automagically Generated Forms" />
 
 <table>
   <tr>
