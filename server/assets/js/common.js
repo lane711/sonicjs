@@ -2,7 +2,6 @@ $(document).ready(async function () {
   // console.log('share service test: ' + sharedService.test());
 
   setupToolTips();
-  setupFancyBox();
 });
 
 function submitForm(submission) {
@@ -49,27 +48,6 @@ function setupToolTips() {
 
 function testFunction(echo) {
   return echo;
-}
-
-function setupFancyBox() {
-  // debugger;
-  if (typeof $.fancybox == "function") {
-    Fancybox.bind("[data-fancybox]", {
-      // Your options go here
-    });
-  } else {
-    // fancy box not loaded;
-  }
-
-  // $("a.fancybox").fancybox({
-  // 	'transitionIn'	:	'elastic',
-  // 	'transitionOut'	:	'elastic',
-  // 	'speedIn'		:	600,
-  // 	'speedOut'		:	200,
-  // 	'overlayShow'	:	false,
-  //   'hideOnContentClick': true
-
-  // });
 }
 
 function copyTextToClipboard(text) {

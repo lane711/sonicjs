@@ -1,39 +1,4 @@
 /* Css File for Module: gallery */
-.popup-gallery{
-
-}
-
-.grid-of-images img{
-    max-height: 120px;
-    margin: 0 20px 20px 0;
-}
-
-.gallery-container {
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .gallery-container div{
-    width:100%;
-}
-
-.gallery-container img{
-    max-height: 120px;
-
-}
-
-.mfp-title{
-    margin: 20px 0;
-    padding: 20px;
-    position: absolute;
-    top: -82px;
-    background: rgba(0, 0, 0, 0.9)
-}
-
-.mfp-title i{
-    margin: 0 12px;
-}
-
-.swiper-container .card {
-    height: 390px;
+.gallery-wrapper a img {
+  width: 95px;
 }
