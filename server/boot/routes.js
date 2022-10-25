@@ -69,7 +69,6 @@ exports.loadRoutes = async function (app) {
     await testService.startup(app);
     await cssService.startup(app);
 
-
     await emitterService.emit("startup", { app: app });
 
     //load catch-all last
@@ -108,10 +107,7 @@ exports.loadRoutes = async function (app) {
 
   app.get("/form/*", async function (req, res) {
     let moduleSystemId = req.path.replace("/form/", "");
-    let contentType = await dataService.contentTypeGet(
-      moduleSystemId,
-      req
-    );
+    let contentType = await dataService.contentTypeGet(moduleSystemId, req);
     let form = await formService.getFormJson(contentType, req);
     res.send(form);
   });
@@ -173,10 +169,7 @@ exports.loadRoutes = async function (app) {
       // }
       let entity;
 
-      let contentType = await dataService.contentTypeGet(
-        contentTypeId,
-        req
-      );
+      let contentType = await dataService.contentTypeGet(contentTypeId, req);
 
       if (payload.id) {
         //edit existing
@@ -225,7 +218,11 @@ exports.loadRoutes = async function (app) {
 
       //if admin, redirect to edit page
       let isBackEnd = req.body.url.startsWith("/admin");
-      if (isBackEnd && !successAction) {
+      if (isBackEnd && (contentTypeId === "user-register" || contentTypeId === "user")) {
+        successAction = `redirectToUrl('/admin/users');`;
+        // TODO: fix so that admin is redirected to user edit form
+        // successAction = `redirectToUrl('/admin/user/edit/${entity.id}');`;
+      } else if (isBackEnd && !successAction) {
         successAction = `redirectToUrl('/admin/content/edit/${contentTypeId}/${entity.id}');`;
       } else if (!isBackEnd && contentTypeId === "page") {
         successAction = `redirectToUrl('${entity.url}');`;
@@ -346,9 +343,8 @@ exports.loadRoutesCatchAll = async function (app) {
     page.data.siteSettings = req.siteSettings;
 
     //check is edit mode, sidebar expanded
-    page.data.isEditMode = req.cookies.showSidebar === 'false' ? false : true;
-    page.data.sidebarClass = page.data.isEditMode ? 'expanded' : 'collapsed';
-
+    page.data.isEditMode = req.cookies.showSidebar === "false" ? false : true;
+    page.data.sidebarClass = page.data.isEditMode ? "expanded" : "collapsed";
 
     res.render(`${frontEndTheme}/layouts/main`, {
       layout: path.join(appRoot.path, frontEndTheme, "theme.hbs"),

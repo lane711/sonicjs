@@ -53,6 +53,8 @@ module.exports = moduleService = {
             res.send({ id: sectionId, type: "section", html: page.data.html });
           } else if (viewModel.contentType === "page") {
             console.log("rendering page");
+            res.send('ok');
+
           } else {
             let renderedModule = await moduleService.renderModule(viewModel);
             res.send({

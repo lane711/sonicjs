@@ -24,3 +24,10 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
+require('@4tw/cypress-drag-drop')
+
+Cypress.Commands.overwrite('type', (originalFn, subject, text, options = {}) => {
+    options.delay = 0;
+  
+    return originalFn(subject, text, options)
+  })

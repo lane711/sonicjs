@@ -128,7 +128,7 @@ if (typeof module !== "undefined" && module.exports) {
             req
           );
           // debugger;
-          if (settingContentType && settingContentType.data) {
+          if (settingContentType && settingContentType.title && settingContentType.data) {
             contentType = settingContentType;
           }
         }
@@ -168,7 +168,7 @@ if (typeof module !== "undefined" && module.exports) {
             (c) => c.key === "submit"
           );
           if (submitButton) {
-            submitButton.label = contentType.data.states.edit.buttonText;
+            submitButton.label = contentType.data.states.editSubmitButtonText;
           }
         }
 
@@ -177,7 +177,7 @@ if (typeof module !== "undefined" && module.exports) {
             (c) => c.key === "submit"
           );
           if (submitButton) {
-            submitButton.label = contentType.data.states.new.buttonText;
+            submitButton.label = contentType.data.states.addSubmitButtonText;
           }
         }
       }

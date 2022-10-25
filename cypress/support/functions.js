@@ -43,7 +43,16 @@ cy.SonicJs = {
 
   clearCypressTesFlag: () => {
     cy.request(`${cy.SonicJs.getBaseUrl()}/set-e2e-test-mode-off`);
-  }
+  },
+
+  openPageBuilderPanel: () => {
+    cy.get("#sidebar-expander").should("have.class", "collapsed");
+    cy.get(".pb-wrapper").should("have.class", "collapsed");
+    cy.get("#sidebar-expander").click().click();
+    cy.get("#sidebar-expander").should("have.class", "expanded");
+    cy.contains("Add Element").should("be.visible");
+    cy.contains("Title").should("be.visible");
+    cy.contains("Accordian").should("be.visible");  },
 
 
 };

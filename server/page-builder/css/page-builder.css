@@ -432,7 +432,7 @@ section {
   outline: dashed 2px var(--highlight) !important;
 }
 
-.module.module-highlight {
+.pb .module.module-highlight {
   box-shadow: 0 0 0 2px var(--highlight) !important;
   outline: dashed 2px var(--highlight) !important;
 }
@@ -557,7 +557,18 @@ section {
 
 .pb .module:hover {
   box-shadow: 0px 0px 0px 1px var(--highlight) inset;
+  /* padding-bottom: 10px;
+  background: var(--highlight); */
 }
+
+/* .pb .module:hover::after {
+  content: "\f0da";
+  font-family: FontAwesome;
+  font-weight: normal;
+  font-style: normal;
+  margin: 0px 0px 0px 10px;
+  text-decoration: none;
+} */
 
 .pb .current-section {
   box-shadow: 0px 0px 0px 4px var(--highlight) inset;
@@ -618,8 +629,7 @@ section {
 }
 
 #editor.ace_editor {
-  width: 255px;
-  height: calc(100vh - 180px);
+  height: 100%;
 }
 
 .editor-wrapper {
@@ -808,9 +818,6 @@ section {
   overflow: auto;
 }
 
-
-
-
 .pb-wrapper {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
@@ -861,14 +868,13 @@ section {
 
 .color-picker-append .pickr .form-control {
   margin: 0;
-  border-bottom:1px red;
+  border-bottom: 1px red;
 }
 
 .pb .pickr .pcr-button {
   width: 100%;
   border: 1px solid #ced4da;
   border-top: none;
-
 }
 
 .pb-wrapper .white,
@@ -880,11 +886,20 @@ section {
   display: none;
 }
 
-.pb .submit-alert{
+.pb .submit-alert {
   padding: 9px 1rem 12px;
 }
 
-.pb .submit-alert span:first-of-type{
+.pb .submit-alert span:first-of-type {
   margin: 0 10px 0 0;
   vertical-align: middle;
+}
+
+.pb .ck.ck-editor {
+  width: 341px;
+}
+
+.module-hover-wrap{
+  background-color: #20a8d8;
+  cursor: pointer;
 }

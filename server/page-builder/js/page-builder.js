@@ -13,6 +13,7 @@ var imageList,
   currentColumn,
   currentColumnIndex,
   currentModuleId,
+  currentModuleDiv,
   currentModuleIndex,
   currentModuleContentType,
   jsonEditor,
@@ -48,6 +49,7 @@ $(document).ready(async function () {
   setupPopovers();
   setupElements();
   setupPageForm();
+  setupSiteCss();
   showElements();
   setupFormIsLoadedEvent();
 });
@@ -123,6 +125,11 @@ function removeAllHighlights() {
   // $("html").removeClass("pb");
 }
 
+function disableAllModuleLinks(){
+  //disable hyperlinks in module so that user can select it
+  $('section').find('a').attr('href', '#');
+}
+
 function setupUIClicks() {
   $("html").addClass("pb");
 
@@ -149,7 +156,35 @@ function setupUIClicks() {
 
   // debugger;
 
-  $(document).on("click", "section .row .module > *", function () {
+
+
+//   $('.module-hover-wrap a').click(function(e) {
+//     debugger;
+//     e.preventDefault();
+//     //do other stuff when a click happens
+// });
+
+
+//   $("section .row .module").on({
+//     mouseenter: function () {
+//         //stuff to do on mouse enter
+//         console.log("hovering", this);
+//         //wrap inner content in case there are hyperlinks
+//         // $(this).wrap(function() {
+//         //   return "<a href='javascript:void(0);' class='module-hover-wrap'></a>";
+//         // });
+
+//         $('section').find('a').attr('href', '#');
+
+//     },
+//     mouseleave: function () {
+//         //stuff to do on mouse leave
+//         console.log("leaving", this);
+//         // $(this).unwrap();
+//     }
+// });
+
+  $(document).on("click", ".pb section .row .module", function () {
     if ($(this).hasClass("cloned")) {
       return;
     }
@@ -168,6 +203,20 @@ function setupUIClicks() {
     }
   });
 
+  $(document).on("click", ".cancel-panel", function () {
+    if (!checkForUnsavedChanges()) {
+      showElements();
+    } else {
+      unsavedChanedsModal = new bootstrap.Modal(
+        document.getElementById("unsavedChanedsModal"),
+        {
+          keyboard: false,
+        }
+      );
+      unsavedChanedsModal.show();
+    }
+  });
+
   $(document).on("click", ".empty-column", function () {
     let moduleDiv = $(this).closest(".col")[0];
     setCurrentIds(moduleDiv, undefined, true);
@@ -175,7 +224,7 @@ function setupUIClicks() {
 
   $("#unsavedLooseChanges").on("click", function () {
     //need to revert/reset module
-    savePBData(originalModuleDataFromDb);
+    renderSectionOrModule(originalModuleDataFromDb);
     selectNextModule();
   });
 
@@ -195,7 +244,7 @@ function setupUIClicks() {
   });
 }
 function resetModule() {
-  savePBData(originalModuleDataFromDb);
+  renderSectionOrModule(originalModuleDataFromDb);
   // $(".submit-alert").remove();
   editModule(sessionID);
   // formIsDirty = false;
@@ -206,6 +255,7 @@ function checkForUnsavedChanges() {
 }
 
 function selectNextModule() {
+  hideSiteCss();
   originalModuleDataFromDb = {};
   let moduleDiv = $(nextSelectedModule).closest(".module")[0];
   console.log("module click", moduleDiv);
@@ -223,14 +273,16 @@ function setCurrentIds(moduleId, newDrop = false, emptyColumn = false) {
   let moduleDiv;
   if (newDrop) {
     moduleDiv = $(".current-drop")[0];
-    //remove "empty column"
-    let parent = $(moduleDiv).parent()[0];
-    $(parent).find(".empty-column").remove();
   } else if (emptyColumn) {
     moduleDiv = moduleId;
   } else {
     moduleDiv = $(`div[data-id="${moduleId}"]`)[0];
   }
+
+  currentModuleDiv = moduleDiv;
+
+  //remove "empty column"
+  checkIfColumnIsEmpty($(currentModuleDiv).parent[0]);
 
   //reset
   $(".module-highlight").removeClass("module-highlight");
@@ -267,6 +319,9 @@ function setCurrentIds(moduleId, newDrop = false, emptyColumn = false) {
       $(".section-add-below").appendTo(currentSection).show();
     }
   }
+
+  disableAllModuleLinks();
+  setupSortable();
 }
 
 function getParentSectionId(el) {
@@ -296,6 +351,8 @@ async function setupClickEvents() {
     newSectionDirectionAbove = false;
     $("#new-section").show();
     $("#new-section").insertAfter($(currentSection));
+    //if new page, need to remoce the "this page has now sections div"
+    $(".new-page-no-sections").remove();
   });
 
   $(".new-section .mini-layout").on("click", async function () {
@@ -314,7 +371,6 @@ async function addSection(above = true, layout) {
   let newColumns = generateNewColumns(layout);
   let rows = [
     {
-      class: "row",
       columns: newColumns,
       css: "row",
       styles: "",
@@ -1273,6 +1329,7 @@ async function saveWYSIWYG() {
 
 async function addModule(systemId, sessionID) {
   // debugger;
+  currentModuleContentType = systemId;
 
   let form = await dataService.formGet(
     systemId,
@@ -1285,6 +1342,8 @@ async function addModule(systemId, sessionID) {
 
   console.log("adding module type:", form.contentType.systemId);
 
+  setMainPanelHeaderTextAndIcon(systemId, form.contentType.module.icon);
+
   $("#pb-content-container").html(form.html);
   // $(".pb-side-panel #main").html(form.html);
 
@@ -1295,12 +1354,20 @@ async function addModule(systemId, sessionID) {
 }
 
 async function editModule(sessionID) {
-  // cleanModal();
-  // showSidePanel();
+  if (!currentModuleId) {
+    //newdrop unsaved
+    addModule(currentModuleContentType, sessionID);
+    return;
+  }
 
   console.log("editing module: " + currentModuleId, currentModuleContentType);
 
   let data = await dataService.getContentById(currentModuleId);
+
+  // if (!data) {
+  //   //newdrop unsaved
+  //   data = originalModuleDataFromDb;
+  // }
 
   let message = `Updated ${currentModuleContentType} module`;
   // debugger;
@@ -1398,14 +1465,6 @@ async function deleteModuleConfirm(deleteContent = false) {
   payload.data.pageId = page.id;
   payload.data.deleteContent = deleteContent;
 
-  // payload.data.destinationSectionId = destinationSectionId;
-  // payload.data.destinationRowIndex = destinationRowIndex;
-  // payload.data.destinationColumnIndex = destinationColumnIndex;
-  // payload.data.destinationModuleIndex = event.newIndex;
-  // payload.data.destinationModules = destinationModules;
-
-  debugger;
-
   return axiosInstance
     .post("/admin/pb-update-module-delete", payload)
     .then(async function (response) {
@@ -1449,7 +1508,7 @@ async function setNewColumnSize(diff) {
     section,
     false,
     "section",
-    "Column css class updates to " + newColClassSize
+    "Column css class updated to " + newColClassSize
   );
 }
 
@@ -1584,7 +1643,6 @@ function getPageTemplateRegion(page, sourceColumn, destinationColumn) {
 }
 
 async function addModuleToColumn(submission) {
-  // debugger;
   let entity = processContentFields(submission.data);
 
   let {
@@ -1598,7 +1656,10 @@ async function addModuleToColumn(submission) {
   if (submission.data.id) {
     processedEntity = await editInstance(entity);
   } else {
-    processedEntity = await createInstance(entity);
+    processedEntity = await createInstance(entity, false);
+    //need to replace temporary div with the real one that included the id
+    let moduleDiv = $('div[data-id="unsaved"]')[0];
+    $(moduleDiv).data("id", processedEntity.id);
   }
 
   // generate short code ie: [MODULE-HELLO-WORLD id="123"]
@@ -1642,10 +1703,15 @@ async function addModuleToColumn(submission) {
     let section = await dataService.getContentById(currentSectionId);
     let column = section.data.rows[currentRowIndex].columns[currentColumnIndex];
     column.content.push({ content: moduleInstanceShortCode });
-    editInstance(section);
+    editInstance(section, false);
+    //form should go from add to edit
+    // setCurrentIds(processedEntity.id);
+    // editModule(sessionID);
+    addGrowl("Module added to column");
+    //we should now reload section so we have the new module id
   }
 
-  fullPageUpdate();
+  // fullPageUpdate();
 }
 
 // async function submitUser(submission, refresh = true) {
@@ -1718,7 +1784,7 @@ async function setupACEEditor() {
 
   ace.config.set("basePath", "/node_modules/ace-builds/src-min-noconflict");
   var editor = ace.edit("editor");
-  editor.setTheme("ace/theme/monokai");
+  editor.setTheme("ace/theme/dreamweaver");
   editor.session.setMode("ace/mode/css");
   // editor.session.setDocument("ace/mode/css");
   // editor.session.setTabSize(0);
@@ -1755,6 +1821,7 @@ async function setupACEEditor() {
       .post("/admin/update-css", { css: cssContent })
       .then(async function (response) {
         console.log(response);
+        addGrowl("CSS Updated");
       })
       .catch(function (error) {
         console.log(error);
@@ -1836,7 +1903,7 @@ async function beatifyACECss() {
 }
 
 async function setupSortable() {
-  let columnsList = $('main .pb div[class^="col"]');
+  let columnsList = $('.pb main div[class^="col"]');
   // TODO: limited this to only columns that are managed by page builder
   var columns = jQuery.makeArray(columnsList);
 
@@ -1988,7 +2055,7 @@ async function updateModuleSort(shortCode, event) {
   payload.data.destinationSectionId = destinationSectionId;
   payload.data.destinationRowIndex = destinationRowIndex;
   payload.data.destinationColumnIndex = destinationColumnIndex;
-  payload.data.destinationModuleIndex = event.newIndex;
+  payload.data.destinationModuleIndex = event.newIndex + 1;
   payload.data.destinationModules = destinationModules;
   payload.data.isPageUsingTemplate = isPageUsingTemplate;
   payload.data.sourcePageTemplateRegion = sourcePageTemplateRegion;
@@ -2002,11 +2069,32 @@ async function updateModuleSort(shortCode, event) {
       console.log(response);
       // fullPageUpdate();
       addGrowl("Module Moved");
+      checkIfColumnIsEmpty(sourceColumn);
       return await response.data;
     })
     .catch(function (error) {
       console.log(error);
     });
+}
+
+function checkIfColumnIsEmpty(sourceColumn) {
+  console.log("checking if column empty");
+
+  let parent = $(currentModuleDiv).parent()[0];
+  //has any divs?
+  if ($(parent).find("div").length) {
+    $(parent).find(".empty-column").remove();
+  }
+
+  if (sourceColumn && !$(sourceColumn).find("div").length) {
+    $(sourceColumn).html(
+      '<span class="empty-column"><h5>Empty Column</h5><p>(drag element here)</p></span>'
+    );
+  }
+
+  // let sourceColumnDev = $(`div[data-id="${sourceColumnId}"]`)[0];
+  // {
+  // }
 }
 
 function setupSidePanel() {
@@ -2061,25 +2149,16 @@ function toggleSidebar(showSidebar) {
   // debugger;
   if (showSidebar) {
     //opening
+    $("html").addClass('pb');
     $(".sidebar-expander, .pb-wrapper, html").removeClass("collapsed");
     $(".sidebar-expander, .pb-wrapper, html").addClass("expanded");
-    // $("html").removeClass('expanded');
-    // $("main, .fixed-top, footer").css("margin-left", "420px");
-    // $(".sidebar-expander").css("left", "420px");
-    // $(".sidebar-expander").addClass("expanded");
-    // $(".sidebar-expander").removeClass("collapsed");
-    // $('.pb-wrapper').show();
 
-    // setupUIClicks();
   } else {
     //closing
-    // $(".pb-wrapper").css("left", "-420px");
+    $("html").removeClass('pb');
     $(".sidebar-expander, .pb-wrapper, html").addClass("collapsed");
     $(".sidebar-expander, .pb-wrapper, html ").removeClass("expanded");
-    // $("main, .fixed-top, footer").css("margin-left", "0");
-    // $(".sidebar-expander").css("left", "0");
-    // $(".sidebar-expander").removeClass("expanded");
-    // $(".sidebar-expander").addClass("collapsed");
+
     disableUIHoversAndClicks();
   }
 }
@@ -2150,12 +2229,14 @@ function setupElements() {
 function showElements() {
   const elementsList = $("#elements-list").clone();
   $("#pb-content-container").html(elementsList);
+  setMainPanelHeaderTextAndIcon("Add Elements", "bi-plus-circle");
   elementsList.removeClass("hide");
   setupSortableModules();
 }
 
 async function setupPageForm() {
   $("#page-form").on("click", async function () {
+    hideSiteCss();
     console.log("page form click");
 
     await setPage();
@@ -2172,6 +2253,20 @@ async function setupPageForm() {
     $("#pb-content-container").html(form.html);
     loadModuleSettingForm();
   });
+}
+
+async function setupSiteCss() {
+  $("#site-css").on("click", async function () {
+    $("#pb-content-container").empty();
+    $(".footer").removeClass("hide");
+    $(".css-editor").removeClass("hide");
+    setMainPanelHeaderTextAndIcon("Edit Site CSS", "bi-filetype-css");
+  });
+}
+
+function hideSiteCss() {
+  $(".footer").addClass("hide");
+  $(".css-editor").addClass("hide");
 }
 
 function pageBuilderFormChanged(data) {
@@ -2193,8 +2288,10 @@ function pageBuilderFormChanged(data) {
       ).insertAfter(".formio-component-submit button");
   } else {
     $(".submit-alert").remove();
-    if (!data.changed) {
-      originalModuleDataFromDb = JSON.parse(JSON.stringify(latestModuleDataFromForm)); //deep copy
+    if (!data.changed && latestModuleDataFromForm) {
+      originalModuleDataFromDb = JSON.parse(
+        JSON.stringify(latestModuleDataFromForm)
+      ); //deep copy
     }
   }
 
@@ -2231,7 +2328,7 @@ function pageBuilderFormChanged(data) {
   console.log("pageBuilderFormChanged", latestModuleDataFromForm);
   //render module (may not have instance yet_
 
-  savePBData(latestModuleDataFromForm);
+  renderSectionOrModule(latestModuleDataFromForm);
 }
 
 function clickFormUpdateButton() {
@@ -2242,8 +2339,8 @@ function clickFormUpdateButton() {
 
 // var returnedFunction = debounce(savePBData(data), 2000);
 
-function savePBData(formData) {
-  console.log("savePBData saving...");
+function renderSectionOrModule(formData) {
+  console.log("renderSectionOrModule with form data");
   axiosInstance
     .post(`/api/modules/render`, { data: formData })
     .then(async function (response) {
@@ -2262,13 +2359,11 @@ function savePBData(formData) {
           $(`.current-drop, div[data-id="unsaved"]`).replaceWith(
             response.data.html
           );
-          clickFormUpdateButton();
+          // clickFormUpdateButton();
         }
       } else if (response.data.type === "section") {
         console.log("replacing section", formData.id);
-        $(`section[data-id="${formData.id}"]`).replaceWith(
-          response.data.html
-        );
+        $(`section[data-id="${formData.id}"]`).replaceWith(response.data.html);
       }
     })
     .catch(function (error) {

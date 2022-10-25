@@ -71,8 +71,9 @@ module.exports = pageBuilderService = {
           (c) => !c.content.includes(data.moduleId.toString())
         );
 
-        section.data.rows[data.rowIndex].columns[data.columnIndex].content = content;
-        
+        section.data.rows[data.rowIndex].columns[data.columnIndex].content =
+          content;
+
         await dataService.editInstance(section, req.sessionID);
         // console.log("content", content);
 
@@ -200,9 +201,11 @@ module.exports = pageBuilderService = {
             data.destinationColumnIndex
           ].content;
 
-        destinationContent.splice(data.destinationModuleIndex, 0, {
-          content: shortCodeToRemoveAndThenAddSomewhereElse.content,
-        });
+        if (shortCodeToRemoveAndThenAddSomewhereElse) {
+          destinationContent.splice(data.destinationModuleIndex, 0, {
+            content: shortCodeToRemoveAndThenAddSomewhereElse.content,
+          });
+        }
 
         await dataService.editInstance(destinationSection, req.sessionID);
 

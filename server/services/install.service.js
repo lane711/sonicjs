@@ -71,6 +71,37 @@ module.exports = installService = {
       console.log("created siteSettings:", record);
     }
 
+
+    let siteSettingsACLs = await dataService.getContentByType(
+      "site-settings-acls"
+    );
+    if (siteSettingsACLs.length === 0) {
+      let data = {
+        contentType: "site-settings-acls",
+        permissionAccessControls: [
+          {
+            title: "view",
+          },
+          {
+            title: "create",
+          },
+          {
+            title: "edit",
+          },
+          {
+            title: "delete",
+          },
+        ],
+      };
+      let record = await dalService.contentUpdate(
+        "",
+        "/site-settings-acls",
+        data,
+        session
+      );
+      console.log("created siteSettingsACLs:", record);
+    }
+    
     let themeSettings = await dataService.getContentByType("theme-settings");
     if (themeSettings.length === 0) {
       let data = {
@@ -185,8 +216,12 @@ module.exports = installService = {
     sections.map(async (section) => {
       updateSection = false;
       section.data.rows?.map((row) => {
+        row.css = row.class;
+        delete row.class;
         row.columns.map((column) => {
           if (!Array.isArray(column.content)) {
+            column.css = column.class;
+            delete column.class;
             if (column.content) {
               let contentPreSpilt = column.content.replace("][", "]|[");
               let contentArr = contentPreSpilt.split("|");
@@ -197,7 +232,9 @@ module.exports = installService = {
               updateSection = true;
             }
           }
+          // console.log('column', column);
         });
+        console.log("row", row);
       });
       if (updateSection) {
         let record = await dalService.contentUpdate(
