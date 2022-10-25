@@ -53,9 +53,14 @@ module.exports = moduleService = {
             res.send({ id: sectionId, type: "section", html: page.data.html });
           } else if (viewModel.contentType === "page") {
             console.log("rendering page");
-            res.send('ok');
-
+            res.send("ok");
           } else {
+            if (viewModel.contentType.endsWith("-settings")) {
+              viewModel.contentType = viewModel.contentType.replace(
+                "-settings",
+                ""
+              );
+            }
             let renderedModule = await moduleService.renderModule(viewModel);
             res.send({
               id: viewModel.id,
@@ -100,7 +105,6 @@ module.exports = moduleService = {
     emitterService.emit("modulesLoaded");
 
     emitterService.emit("addUrl");
-
   },
 
   getModuleDefinition: async function (systemId) {
