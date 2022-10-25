@@ -273,10 +273,13 @@ function setCurrentIds(moduleId, newDrop = false, emptyColumn = false) {
   let moduleDiv;
   if (newDrop) {
     moduleDiv = $(".current-drop")[0];
-  } else if (emptyColumn) {
+  } else if (emptyColumn && moduleId) {
     moduleDiv = moduleId;
-  } else {
+  } else if (moduleId) {
     moduleDiv = $(`div[data-id="${moduleId}"]`)[0];
+  } else{
+    //user has selected empty column
+    return;
   }
 
   currentModuleDiv = moduleDiv;
