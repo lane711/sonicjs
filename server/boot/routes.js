@@ -153,7 +153,7 @@ exports.loadRoutes = async function (app) {
   });
 
   app.post("/form-submission", async function (req, res) {
-    let payload = req.body.data ? req.body.data : req.body.data.data;
+    let payload = req.body.data.data ? req.body.data.data : req.body.data;
     let contentTypeId = payload.contentType;
     if (payload) {
       let options = { data: payload, sessionID: req.sessionID };
@@ -217,7 +217,7 @@ exports.loadRoutes = async function (app) {
       }
 
       //if admin, redirect to edit page
-      let isBackEnd = req.body.url.startsWith("/admin");
+      let isBackEnd = req.body && req.body.url && req.body.url.startsWith("/admin");
       if (isBackEnd && (contentTypeId === "user-register" || contentTypeId === "user")) {
         successAction = `redirectToUrl('/admin/users');`;
         // TODO: fix so that admin is redirected to user edit form

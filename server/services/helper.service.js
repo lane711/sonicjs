@@ -105,6 +105,7 @@
     if (!copy) copy = content.body;
     if (!copy) copy = content.alertCopy;
     if (!copy) copy = content.contentType;
+    if (!copy) copy = this.generateRandomString(6); //if nothing else, generate random string
 
     let slug = this ? this.slugify(copy) : slugify(copy);
 

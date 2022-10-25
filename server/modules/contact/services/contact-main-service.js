@@ -43,7 +43,7 @@ module.exports = contactUsMainService = {
       let formSettings = await dataService.getContentById(options.data.formSettingsId);
 
       // save the form
-      await dataService.contentCreate(options, true, options.sessionID);
+      // await dataService.contentCreate(options.data, true, options.sessionID);
 
       // send the emails
       let contact = options.data;
