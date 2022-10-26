@@ -257,7 +257,7 @@ function setupHandlebarsHelpers() {
     },
     comparerow: function (row, column) {
       let cms = _.camelCase(column.title);
-      return row[cms] ? "fa-check text-success" : "fa-times text-danger";
+      return row[cms] ? "bi-check-circle-fill text-success" : "bi-x text-danger";
     },
     setChecked: function (value, currentValue) {
       if (value == currentValue) {
