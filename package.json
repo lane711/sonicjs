@@ -32,7 +32,7 @@
     "axios": "^0.21.0",
     "bootstrap-icons": "^1.7.2",
     "bootstrap4": "npm:bootstrap@^4.5.3",
-    "bootstrap5": "npm:bootstrap@^5.0.2",
+    "bootstrap5": "npm:bootstrap@^5.2.0",
     "bootswatch": "^4.5.3",
     "chai": "^4.2.0",
     "chalk": "^4.1.0",

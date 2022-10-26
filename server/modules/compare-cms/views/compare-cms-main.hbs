@@ -9,12 +9,11 @@
           <tr class="category">
             <th scope="row">{{this.title}}<a class='anchor' id='{{this.anchor}}'></a>
               {{#if note}}
-              <a
-                href="#"
+              <span
                 data-toggle="tooltip"
-                class="badge badge-info"
+                class="badge text-bg-primary"
                 title="{{this.note}}"
-              >Info</a>
+              >Info</span>
               {{/if}}
             </th> 
             {{#each ../data.list}}
@@ -27,12 +26,11 @@
           <tr>
             <th scope="row">{{this.title}}
               {{#if note}}
-              <a
-                href="#"
+              <span
                 data-toggle="tooltip"
-                class="badge badge-info"
+                class="badge text-bg-primary"
                 title="{{this.note}}"
-              >Info</a>
+              >Info</span>
               {{/if}}
             </th>
 
