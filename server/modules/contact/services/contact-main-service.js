@@ -27,7 +27,7 @@ module.exports = contactUsMainService = {
       options.viewModel.data.form = await formService.getForm(
         "contact",
         undefined,
-        "submitForm(submission)",
+        "submitContent(submission)",
         false,
         contactFormSettingsId,
         options.req

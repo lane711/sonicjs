@@ -206,7 +206,7 @@ exports.loadRoutes = async function (app) {
 
       if (contentType.data?.states) {
         if (contentType.data.states.postSubmission === "redirectToUrl") {
-          successAction = `redirectToUrl('${contentType.data.postSubmission.redirectUrl}');`;
+          successAction = `redirectToUrl('${contentType.data.states.redirectUrl}');`;
         } else if (contentType.data.states.postSubmission === "showMessage") {
           successAction = `postSubmissionSuccessMessage("${contentType.data.postSubmission.message}");`;
         } else if (contentType.data.states.postSubmission === "doNothing") {
