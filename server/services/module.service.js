@@ -13,6 +13,7 @@ var contentService = require("../services/content.service");
 
 var appRoot = require("app-root-path");
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
+var enableModules = `${process.env.ENABLE_MODULES}`;
 
 const connectEnsureLogin = require("connect-ensure-login");
 
@@ -95,8 +96,18 @@ module.exports = moduleService = {
   // },
 
   loadModuleServices: async function (moduleList, app) {
+    let enableModulesList = [];
+    if (enableModules) {
+      enableModulesList = enableModules.split(",");
+      console.log("enableModulesList", enableModulesList);
+    }
+
     moduleList.forEach(async function (moduleDef) {
-      if (moduleDef.enabled === undefined || moduleDef.enabled === true) {
+      if (
+        moduleDef.enabled === undefined ||
+        moduleDef.enabled === true ||
+        enableModulesList.includes(moduleDef.systemId)
+      ) {
         let m = require(moduleDef.mainService);
         await m.startup(app);
       }

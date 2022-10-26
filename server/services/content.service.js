@@ -358,7 +358,10 @@ module.exports = contentService = {
           req
         );
       } else {
-        page.data.html += `<span class="empty-column"><h5>Empty Column</h5><p>(drag element here)</p></span>`;
+        //only show for admin
+        if (req.user) {
+          page.data.html += `<span class="empty-column"><h5>Empty Column</h5><p>(drag element here)</p></span>`;
+        }
       }
       page.data.html += `</div>`;
       columnArray.push(column);
