@@ -8,8 +8,8 @@ $(document).ready(async function () {
       // Your options go here
     });
 
-    const myCarousel = new Carousel(document.querySelector(".carousel"), {
-      // Options
-    });
+    // const myCarousel = new Carousel(document.querySelector(".carousel"), {
+    //   // Options
+    // });
   }
 });

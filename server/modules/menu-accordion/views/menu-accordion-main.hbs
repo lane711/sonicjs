@@ -11,9 +11,9 @@
   </ul>
 </nav> -->
 
-<nav id="accordian-menu" class="accordian-menu {{data.css}}">
+<nav id="accordian-menu" class="accordian-menu">
 {{#each data.menuData }}
-<a href="{{ this.data.url }}" class="bold small text-uppercase mt-4 mb-3 level-1">{{ this.text }}</a>
+<a href="{{ this.data.url }}" class="bold small text-uppercase mt-3 mb-1 level-1">{{ this.text }}</a>
   {{#each this.children}}
   <nav class="nav flex-column font-sm">
     <a class="pl-0 nav-item nav-link bold active level-2" href="{{ this.data.url }}"><span>{{ this.text }}</span></a>

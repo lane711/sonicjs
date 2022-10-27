@@ -127,7 +127,7 @@ function removeAllHighlights() {
 
 function disableAllModuleLinks(){
   //disable hyperlinks in module so that user can select it
-  $('section').find('a').attr('href', '#');
+  $('section').find('a').attr('href', 'javascript:void(0);');
 }
 
 function setupUIClicks() {

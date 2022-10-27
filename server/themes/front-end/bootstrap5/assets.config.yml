@@ -15,6 +15,8 @@ assets:
     - /node_modules/@fancyapps/ui/dist/fancybox.umd.js
     - /node_modules/choices.js/public/assets/scripts/choices.min.js
     - /node_modules/dropzone/dist/min/dropzone.min.js
+    - /node_modules/prismjs/prism.js
+    - /assets/vendors/prism-treeview/prism-treeview.js
     - /assets/js/common.js
     - /sonicjs-services/shared.service.js
     - /sonicjs-services/global.service.js
@@ -32,4 +34,6 @@ assets:
     - /node_modules/formiojs/dist/formio.form.min.css
     - /node_modules/jsoneditor/dist/jsoneditor.min.css
     - /node_modules/inter-ui/inter.css
+    - /node_modules/prismjs/themes/prism-coy.css
+    - /assets/vendors/prism-treeview/prism-treeview.css
     - /{{frontEndTheme}}/css/template.css
