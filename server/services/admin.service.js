@@ -29,6 +29,7 @@ var appRoot = require("app-root-path");
 
 const adminTheme = `${process.env.ADMIN_THEME}`;
 const adminDomain = process.env.ADMIN_DOMAIN;
+const verboseLogging = process.env.APP_LOGGING === "verbose";
 
 module.exports = adminService = {
   startup: async function (app) {
@@ -105,9 +106,11 @@ module.exports = adminService = {
             req.url
           );
           data.contentId = param2;
-          data.shortCode = content ? sharedService.generateShortCode(param1, {
-            id: content.id,
-          }) : null;
+          data.shortCode = content
+            ? sharedService.generateShortCode(param1, {
+                id: content.id,
+              })
+            : null;
         }
 
         if (viewName == "admin-content-types") {
@@ -151,13 +154,15 @@ module.exports = adminService = {
             );
           }
 
-          const states = data.raw.data.states ? {
-            contentTypeId: "content-type-states",
-            data: data.raw.data.states,
-          } : undefined;
+          const states = data.raw.data.states
+            ? {
+                contentTypeId: "content-type-states",
+                data: data.raw.data.states,
+              }
+            : undefined;
 
-          console.log('states', states)
-          
+          console.log("states", states);
+
           data.editFormStates = await dataService.formGet(
             "content-type-states",
             states,
@@ -403,6 +408,13 @@ module.exports = adminService = {
       globalService.isAdminUserCreated = true;
     } else {
       globalService.isAdminUserCreated = false;
+    }
+
+    if (verboseLogging) {
+      console.log(
+        "checkIfAdminAccountIsCreated",
+        globalService.isAdminUserCreated
+      );
     }
   },
 
