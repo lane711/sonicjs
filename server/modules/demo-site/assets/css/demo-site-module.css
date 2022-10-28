@@ -1,1 +1,14 @@
 /* Css File for Module: demo-site */
+nav.navbar{
+    top: 56px;
+}
+
+.demo-alert
+{
+    border:0;
+    border-radius: 0;
+}
+.demo-alert a{
+    color: var(--bs-alert-color);
+    font-weight: bold;
+}

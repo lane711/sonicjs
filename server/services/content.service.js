@@ -73,6 +73,7 @@ module.exports = contentService = {
       await this.getPage(page.id, page, req, req.sessionID);
       await emitterService.emit("postProcessPage");
 
+
       // page.data.html = page.data.html;
     }
 
@@ -107,8 +108,7 @@ module.exports = contentService = {
 
     let cache = cacheService.getCache();
     success = cache.set(req.url, page);
-    // console.log(success);
-
+    
     return { page: page };
   },
 

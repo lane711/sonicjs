@@ -14,17 +14,18 @@ module.exports = demoSiteMainService = {
     // });
 
     app.on("modulesLoaded", demoSiteMainService.setupDemoSite);
+    app.on("pagePreRender", demoSiteMainService.addDemoSiteHeader);
+
   },
 
   setupDemoSite: async function () {
     // console.log("demo site moduleLoaded");
     //check that demo user admin account is available
     demoSiteMainService.checkDemoAdminAccount();
-    //add demo site header
   },
 
   checkDemoAdminAccount: async function () {
-    console.log("checkDemoAdminAccount");
+    // console.log("checkDemoAdminAccount");
 
     let session = { user: { id: "69413190-833b-4318-ae46-219d690260a9" } };
 
@@ -33,7 +34,7 @@ module.exports = demoSiteMainService = {
       "demo123"
     );
 
-    console.log("demoAdminUser", demoAdminUser);
+    // console.log("demoAdminUser", demoAdminUser);
 
     if (!demoAdminUser || demoAdminUser.length === 0) {
       let newDemoUser = await userService.registerUser(
@@ -44,5 +45,14 @@ module.exports = demoSiteMainService = {
 
       console.log("created newDemoUser:", newDemoUser);
     }
+  },
+
+  addDemoSiteHeader: async function (options) {
+    // console.log('postProcessPage', options.page.data);
+    options.page.data.preHeader = `  <div class="alert alert-danger demo-alert fixed-top text-center" >
+    <strong>SonicJs Demo Site</strong><i class="bi bi-chevron-double-right mx-3"></i><a href="/admin">Click here to login</a>
+    <i class="bi bi-chevron-left mx-1"></i>username: <strong>demo@sonicjs.com</strong> , password: <strong>demo123</strong>
+    <i class="bi bi-chevron-right mx-1"></i>
+  </div>`;
   },
 };
