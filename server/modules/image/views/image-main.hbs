@@ -1,6 +1,5 @@
 {{#if data.clickUrl}}
     <a href="{{ data.clickUrl }}">
-        {{log data}}
         <img {{#if data.openInNewTab}}target="_blank"{{/if}} class="{{data.css}}" width="100%" src="{{ data.fileName.src }}" />
     </a>
 {{else}}
