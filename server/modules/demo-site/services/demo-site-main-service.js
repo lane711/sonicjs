@@ -1,5 +1,6 @@
 var userService = require("../../../services/user.service");
 var dalService = require("../../../services/dal.service");
+var adminService = require("../../../services/admin.service");
 
 module.exports = demoSiteMainService = {
   startup: async function (app) {
@@ -44,6 +45,8 @@ module.exports = demoSiteMainService = {
       );
 
       console.log("created newDemoUser:", newDemoUser);
+
+      adminService.checkIfAdminAccountIsCreated();
     }
   },
 
