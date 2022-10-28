@@ -51,6 +51,9 @@ background: #fff;
 background: linear-gradient(180deg,rgba(255,255,255,0) 0,#fff 85%)
 }
 
-pre[class*="language-"]{
-    font-size:1rem;
+.demo-btn{
+    margin: 0 100px 0;
+}
+pre[class*="language-"] {
+font-size: 1rem
 }
