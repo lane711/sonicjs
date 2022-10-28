@@ -400,7 +400,7 @@ module.exports = adminService = {
     );
   },
 
-  checkIfAdminAccountIsCreated: async function (sessionID) {
+  checkIfAdminAccountIsCreated: async function () {
     // the must be at least one account
     let users = await dalService.usersGetCount();
 
