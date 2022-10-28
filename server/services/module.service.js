@@ -83,6 +83,7 @@ module.exports = moduleService = {
     // await this.getModuleCss(moduleDirs);
     // await this.getModuleJs(moduleDirs);
     // await this.getModuleContentTypesConfigs(moduleDirs);
+    app.emit('modulesLoaded');
   },
 
   getModules: async function () {
@@ -103,11 +104,13 @@ module.exports = moduleService = {
     }
 
     moduleList.forEach(async function (moduleDef) {
-      if (
-        moduleDef.enabled === undefined ||
-        moduleDef.enabled === true ||
-        enableModulesList.includes(moduleDef.systemId)
-      ) {
+      if (enableModulesList.includes(moduleDef.systemId)) {
+        moduleDef.enabled = true;
+      }
+    });
+
+    moduleList.forEach(async function (moduleDef) {
+      if (moduleDef.enabled === undefined || moduleDef.enabled === true) {
         let m = require(moduleDef.mainService);
         await m.startup(app);
       }
