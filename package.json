@@ -94,7 +94,7 @@
     "sib-api-v3-sdk": "^8.4.2",
     "simple-line-icons": "^2.5.5",
     "sortablejs": "^1.13.0",
-    "sqlite3": "^5.0.2",
+    "sqlite3": "^5.0.3",
     "typeorm": "^0.2.41",
     "uglify-js": "^3.15.1",
     "underscore": "^1.12.0",
