@@ -75,6 +75,7 @@ module.exports = moduleService = {
   },
 
   processModules: async function (app) {
+    console.log('processing modules');
     let moduleDirs = [];
     moduleDirs.push(path.join(appRoot.path, "/server/modules"));
     moduleDirs.push(path.join(appRoot.path, `/custom/modules`));
@@ -103,11 +104,13 @@ module.exports = moduleService = {
     }
 
     moduleList.forEach(async function (moduleDef) {
-      if (
-        moduleDef.enabled === undefined ||
-        moduleDef.enabled === true ||
-        enableModulesList.includes(moduleDef.systemId)
-      ) {
+      if (enableModulesList.includes(moduleDef.systemId)) {
+        moduleDef.enabled = true;
+      }
+    });
+
+    moduleList.forEach(async function (moduleDef) {
+      if (moduleDef.enabled === undefined || moduleDef.enabled === true) {
         let m = require(moduleDef.mainService);
         await m.startup(app);
       }
