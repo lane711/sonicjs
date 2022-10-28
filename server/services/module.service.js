@@ -75,7 +75,6 @@ module.exports = moduleService = {
   },
 
   processModules: async function (app) {
-    console.log('processing modules');
     let moduleDirs = [];
     moduleDirs.push(path.join(appRoot.path, "/server/modules"));
     moduleDirs.push(path.join(appRoot.path, `/custom/modules`));
@@ -84,6 +83,7 @@ module.exports = moduleService = {
     // await this.getModuleCss(moduleDirs);
     // await this.getModuleJs(moduleDirs);
     // await this.getModuleContentTypesConfigs(moduleDirs);
+    app.emit('modulesLoaded');
   },
 
   getModules: async function () {
