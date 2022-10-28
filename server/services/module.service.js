@@ -99,7 +99,7 @@ module.exports = moduleService = {
     let enableModulesList = [];
     if (enableModules) {
       enableModulesList = enableModules.split(",");
-      console.log("enableModulesList", enableModulesList);
+      // console.log("enableModulesList", enableModulesList);
     }
 
     moduleList.forEach(async function (moduleDef) {
