@@ -39,7 +39,7 @@ module.exports = demoSiteMainService = {
 
     if (!demoAdminUser || demoAdminUser.length === 0) {
       let newDemoUser = await userService.registerUser(
-        "demo@sonicjs.com",
+        "demo@demo.com",
         "demo123",
         true
       );
@@ -54,7 +54,7 @@ module.exports = demoSiteMainService = {
     // console.log('postProcessPage', options.page.data);
     options.page.data.preHeader = `  <div class="alert alert-danger demo-alert fixed-top text-center" >
     <strong>SonicJs Demo Site</strong><i class="bi bi-chevron-double-right mx-3"></i><a href="/admin">Click here to login</a>
-    <i class="bi bi-chevron-left mx-1"></i>username: <strong>demo@sonicjs.com</strong> , password: <strong>demo123</strong>
+    <i class="bi bi-chevron-left mx-1"></i>username: <strong>demo@demo.com</strong> , password: <strong>demo123</strong>
     <i class="bi bi-chevron-right mx-1"></i>
   </div>`;
   },
