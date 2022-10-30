@@ -389,6 +389,14 @@ module.exports = adminService = {
 
         let layoutPath = `${appRoot.path}/server/themes/admin/${adminTheme}/theme.hbs`;
 
+        //smart look demo site only
+        data.isDemoSite = false;
+        data.smartlookClientId = '';
+        if(req.hostname === 'demo.sonicjs.com'){
+          data.isDemoSite = true;
+          data.smartlookClientId = provess.env.SMARTLOOK_CLEINTID
+        }
+
         res.render(`server/themes/admin/shared-views/${viewName}`, {
           layout: layoutPath,
           data: data,
