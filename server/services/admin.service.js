@@ -394,7 +394,7 @@ module.exports = adminService = {
         data.smartlookClientId = '';
         if(req.hostname === 'demo.sonicjs.com'){
           data.isDemoSite = true;
-          data.smartlookClientId = provess.env.SMARTLOOK_CLEINTID
+          data.smartlookClientId = process.env.SMARTLOOK_CLEINTID
         }
 
         res.render(`server/themes/admin/shared-views/${viewName}`, {
