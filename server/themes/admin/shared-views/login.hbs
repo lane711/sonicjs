@@ -36,11 +36,15 @@
     <link href="/themes/admin/light/css/style.css" rel="stylesheet" />
     <link href="/vendors/pace-progress/css/pace.min.css" rel="stylesheet" />
     <link href="/css/login.css" rel="stylesheet" />
+
+    {{#if data.headerJs}}
+      {{{data.headerJs}}}
+    {{/if}}
+
   </head>
 
   <body class="app flex-row align-items-center">
 
-    {{ log data }}
     {{#if data.preHeader}}
       {{{data.preHeader}}}
     {{/if}}

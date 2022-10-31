@@ -8,7 +8,7 @@ module.exports = demoSiteMainService = {
     emitterService.on("processUrl", async function (options) {
       //smart look demo site only
       options.page.isDemoSite = false;
-      let demoHostname = "demo.sonicjs.com";
+      let demoHostname = 'localhost';// "demo.sonicjs.com";
       if (options.req.hostname === demoHostname) {
         options.page.isDemoSite = true;
         options.page.smartlookClientId = process.env.SMARTLOOK_CLEINTID;
@@ -17,6 +17,8 @@ module.exports = demoSiteMainService = {
 
     app.on("modulesLoaded", demoSiteMainService.setupDemoSite);
     app.on("pagePreRender", demoSiteMainService.addDemoSiteHeader);
+    app.on("pagePreRender", demoSiteMainService.addHeaderJs);
+
   },
 
   setupDemoSite: async function () {
@@ -62,6 +64,22 @@ module.exports = demoSiteMainService = {
       options.page.preHeader = `  <div class="alert alert-danger demo-alert fixed-top text-center" >
         <h3>SonicJs Demo Site</h3> Email: <strong>demo@demo.com</strong> , Password: <strong>demo123</strong>
       </div>`;
+    }
+  },
+
+  addHeaderJs: async function (options) {
+    // let smartlookSettings = await dataService.getContentTopOne("smartlook", options.req.sessionID);
+    if (process.env.SMARTLOOK_CLEINTID) {
+      let data = options.page.data ?? options.page;
+      data.headerJs = data.headerJs ?? '';
+      data.headerJs += `<script type='text/javascript'>
+          window.smartlook||(function(d) {
+            var o=smartlook=function(){ o.api.push(arguments)},h=d.getElementsByTagName('head')[0];
+            var c=d.createElement('script');o.api=new Array();c.async=true;c.type='text/javascript';
+            c.charset='utf-8';c.src='https://rec.smartlook.com/recorder.js';h.appendChild(c);
+            })(document);
+            smartlook('init', '${process.env.SMARTLOOK_CLEINTID}');
+        </script>`;
     }
   },
 };
