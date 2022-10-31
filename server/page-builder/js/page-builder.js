@@ -127,7 +127,6 @@ function removeAllHighlights() {
 
 function disableAllModuleLinks() {
   //disable hyperlinks in module so that user can select it
-  debugger;
   if (isEditMode()) {
     $("section").find("a").attr("href", "javascript:void(0);");
   }

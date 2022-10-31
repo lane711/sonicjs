@@ -8,7 +8,7 @@ module.exports = demoSiteMainService = {
     emitterService.on("processUrl", async function (options) {
       //smart look demo site only
       options.page.isDemoSite = false;
-      let demoHostname =  process.env.DEMO_HOSTNAME ?? "demo.sonicjs.com";
+      let demoHostname = process.env.DEMO_HOSTNAME ?? "demo.sonicjs.com";
       if (options.req.hostname === demoHostname) {
         options.page.isDemoSite = true;
         options.page.smartlookClientId = process.env.SMARTLOOK_CLEINTID;
@@ -18,7 +18,6 @@ module.exports = demoSiteMainService = {
     app.on("modulesLoaded", demoSiteMainService.setupDemoSite);
     app.on("pagePreRender", demoSiteMainService.addDemoSiteHeader);
     app.on("pagePreRender", demoSiteMainService.addHeaderJs);
-
   },
 
   setupDemoSite: async function () {
@@ -55,12 +54,17 @@ module.exports = demoSiteMainService = {
   addDemoSiteHeader: async function (options) {
     // console.log('postProcessPage', options.page);
     if (options.page.data) {
-      options.page.data.preHeader = `  <div class="alert alert-danger demo-alert fixed-top text-center" >
+      //not needed if user already logged in
+      if (await userService.canEditPages(options.req) === false) {
+        options.page.data.pageCssClass = options.page.data.pageCssClass ?? '';
+        options.page.data.pageCssClass += ' demo';
+        options.page.data.preHeader = `  <div class="alert alert-danger demo-alert fixed-top text-center" >
         <strong>SonicJs Demo Site</strong></i><a class="btn btn-success btn-sm text-white ms-3" href="/admin">Click Here to Login as Admin</a>
       </div>`;
+      }
     }
 
-    if (options.page && options.req.path.includes('/login')) {
+    if (options.page && options.req.path.includes("/login")) {
       options.page.preHeader = `  <div class="alert alert-danger demo-alert fixed-top text-center" >
         <h3>SonicJs Demo Site</h3> Email: <strong>demo@demo.com</strong> , Password: <strong>demo123</strong>
       </div>`;
@@ -71,7 +75,7 @@ module.exports = demoSiteMainService = {
     // let smartlookSettings = await dataService.getContentTopOne("smartlook", options.req.sessionID);
     if (process.env.SMARTLOOK_CLEINTID) {
       let data = options.page.data ?? options.page;
-      data.headerJs = data.headerJs ?? '';
+      data.headerJs = data.headerJs ?? "";
       data.headerJs += `<script type='text/javascript'>
           window.smartlook||(function(d) {
             var o=smartlook=function(){ o.api.push(arguments)},h=d.getElementsByTagName('head')[0];
