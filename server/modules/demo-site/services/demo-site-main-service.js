@@ -8,7 +8,7 @@ module.exports = demoSiteMainService = {
     emitterService.on("processUrl", async function (options) {
       //smart look demo site only
       options.page.isDemoSite = false;
-      let demoHostname = 'localhost';// "demo.sonicjs.com";
+      let demoHostname = "demo.sonicjs.com";
       if (options.req.hostname === demoHostname) {
         options.page.isDemoSite = true;
         options.page.smartlookClientId = process.env.SMARTLOOK_CLEINTID;
