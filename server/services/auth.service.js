@@ -149,7 +149,7 @@ module.exports = authService = {
       return;
     });
 
-    app.post("/login", (req, res, next) => {
+    app.post("/login", async (req, res, next) => {
       if (process.env.MODE !== "dev") {
         if (adminDomain !== req.host) {
           res.send(401);
@@ -238,6 +238,9 @@ module.exports = authService = {
       if (parsedQs && parsedQs.error) {
         data.error = parsedQs.error;
       }
+
+      await emitterService.emit("processUrl", { req, res, urlKey : 'admin', page : data });
+      await res.app.emit("pagePreRender", {req, page : data});
 
       res.render("server/themes/admin/shared-views/admin-login", {
         layout: `${appRoot.path}/server/themes/admin/shared-views/login.hbs`,

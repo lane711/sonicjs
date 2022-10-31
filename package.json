@@ -1,6 +1,6 @@
 {
   "name": "sonicjs",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "description": "Node.js open source CMS",
   "main": "index.js",
   "scripts": {

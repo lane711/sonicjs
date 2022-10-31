@@ -125,9 +125,12 @@ function removeAllHighlights() {
   // $("html").removeClass("pb");
 }
 
-function disableAllModuleLinks(){
+function disableAllModuleLinks() {
   //disable hyperlinks in module so that user can select it
-  $('section').find('a').attr('href', 'javascript:void(0);');
+  debugger;
+  if (isEditMode()) {
+    $("section").find("a").attr("href", "javascript:void(0);");
+  }
 }
 
 function setupUIClicks() {
@@ -156,33 +159,30 @@ function setupUIClicks() {
 
   // debugger;
 
+  //   $('.module-hover-wrap a').click(function(e) {
+  //     debugger;
+  //     e.preventDefault();
+  //     //do other stuff when a click happens
+  // });
 
+  //   $("section .row .module").on({
+  //     mouseenter: function () {
+  //         //stuff to do on mouse enter
+  //         console.log("hovering", this);
+  //         //wrap inner content in case there are hyperlinks
+  //         // $(this).wrap(function() {
+  //         //   return "<a href='javascript:void(0);' class='module-hover-wrap'></a>";
+  //         // });
 
-//   $('.module-hover-wrap a').click(function(e) {
-//     debugger;
-//     e.preventDefault();
-//     //do other stuff when a click happens
-// });
+  //         $('section').find('a').attr('href', '#');
 
-
-//   $("section .row .module").on({
-//     mouseenter: function () {
-//         //stuff to do on mouse enter
-//         console.log("hovering", this);
-//         //wrap inner content in case there are hyperlinks
-//         // $(this).wrap(function() {
-//         //   return "<a href='javascript:void(0);' class='module-hover-wrap'></a>";
-//         // });
-
-//         $('section').find('a').attr('href', '#');
-
-//     },
-//     mouseleave: function () {
-//         //stuff to do on mouse leave
-//         console.log("leaving", this);
-//         // $(this).unwrap();
-//     }
-// });
+  //     },
+  //     mouseleave: function () {
+  //         //stuff to do on mouse leave
+  //         console.log("leaving", this);
+  //         // $(this).unwrap();
+  //     }
+  // });
 
   $(document).on("click", ".pb section .row .module", function () {
     if ($(this).hasClass("cloned")) {
@@ -277,7 +277,7 @@ function setCurrentIds(moduleId, newDrop = false, emptyColumn = false) {
     moduleDiv = moduleId;
   } else if (moduleId) {
     moduleDiv = $(`div[data-id="${moduleId}"]`)[0];
-  } else{
+  } else {
     //user has selected empty column
     return;
   }
@@ -2152,13 +2152,12 @@ function toggleSidebar(showSidebar) {
   // debugger;
   if (showSidebar) {
     //opening
-    $("html").addClass('pb');
+    $("html").addClass("pb");
     $(".sidebar-expander, .pb-wrapper, html").removeClass("collapsed");
     $(".sidebar-expander, .pb-wrapper, html").addClass("expanded");
-
   } else {
     //closing
-    $("html").removeClass('pb');
+    $("html").removeClass("pb");
     $(".sidebar-expander, .pb-wrapper, html").addClass("collapsed");
     $(".sidebar-expander, .pb-wrapper, html ").removeClass("expanded");
 
