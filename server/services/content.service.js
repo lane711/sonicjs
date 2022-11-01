@@ -269,13 +269,13 @@ module.exports = contentService = {
         case "color":
           let colorRGBA = section.data.color;
           if (colorRGBA) {
-            styleList.push(`background:${overlayCss}${colorRGBA};`);
+            styleList.push(`background:${colorRGBA};`);
           }
           break;
         case "image":
           let imageSrc = section.data.image.src;
           if (imageSrc) {
-            styleList.push(`background: ${overlayCss}url(${imageSrc});`);
+            styleList.push(`background: url(${imageSrc});`);
             cssList.push("bg-image-cover");
           }
           break;
