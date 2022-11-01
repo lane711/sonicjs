@@ -29,17 +29,19 @@ main {
 padding: 55px 0
 }
 
-section.jumbotron-fluid {
-padding: 80px 0 0
-}
-
 section {
-padding: 80px 0
+padding: 80px 0;
+margin: 80px 0
 }
 
 .section-overlay {
 width: 100%;
 height: 100%
+}
+
+section.no-margin{
+    margin:0;
+    padding:80px 0 0;
 }
 
 .home .overlay-fade {
@@ -51,6 +53,6 @@ background: #fff;
 background: linear-gradient(180deg,rgba(255,255,255,0) 0,#fff 85%)
 }
 
-pre[class*="language-"]{
-    font-size:1rem;
+pre[class*="language-"] {
+font-size: 1rem
 }

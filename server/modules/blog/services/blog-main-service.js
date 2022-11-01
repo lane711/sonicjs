@@ -75,7 +75,7 @@ module.exports = blogMainService = {
         data: {
           title: record.data.title,
           body: formattingService.stripHtmlTags(
-            helperService.truncateString(record.data.body, 400)
+            helperService.truncateString(record.data.body, 250)
           ),
           image: record.data.fileName
             ? mediaService.getMediaUrl(record.data.fileName.file)
