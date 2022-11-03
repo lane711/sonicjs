@@ -2270,6 +2270,16 @@ function hideSiteCss() {
   $(".css-editor").addClass("hide");
 }
 
+// function reloadStylesheets() {
+//   var queryString = "?reload=" + new Date().getTime();
+//   $('link[rel="stylesheet"]').each(function () {
+//     if (this.href.includes("/site.css")) {
+//       console.log("this", this);
+//       this.href = this.href.replace(/\?.*|$/, queryString);
+//     }
+//   });
+// }
+
 function pageBuilderFormChanged(data) {
   // debugger;
 

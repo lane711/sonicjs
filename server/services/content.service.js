@@ -6,6 +6,7 @@ var helperService = require(".//helper.service");
 var userService = require(".//user.service");
 var globalService = require(".//global.service");
 var cacheService = require(".//cache.service");
+var cssService = require(".//css.service");
 var formattingService = require(".//formatting.service");
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 
@@ -232,12 +233,12 @@ module.exports = contentService = {
           let sectionClass = section.data.cssClass
             ? section.data.cssClass + " "
             : "";
-          // let sectionStyle = await this.getSectionStyles(section);
-          // console.log('sectionStyle', sectionStyle)
+          let sectionCss = await cssService.getSectionStyle(section);
+          console.log('sectionCss', sectionCss)
           // let overlayStyle = await this.getSectionOverlayStyle(section);
           let sectionMiniGuid = section.id.substr(section.id.length - 12);
 
-          page.data.html += `<section data-id='${section.id}' data-title='${section.data.title}' class="${sectionClass}jumbotron-fluid css-${sectionMiniGuid}">`;
+          page.data.html += `<section data-id='${section.id}' data-title='${section.data.title}' class="${sectionClass}jumbotron-fluid css-${sectionMiniGuid} ${sectionCss.css}">`;
           // page.data.html += `<div class="section-overlay" style="${overlayStyle}">`;
           page.data.html += '<div class="container">';
           let rows;
