@@ -232,10 +232,12 @@ module.exports = contentService = {
           let sectionClass = section.data.cssClass
             ? section.data.cssClass + " "
             : "";
-          let sectionStyle = await this.getSectionStyles(section);
+          // let sectionStyle = await this.getSectionStyles(section);
+          // console.log('sectionStyle', sectionStyle)
           // let overlayStyle = await this.getSectionOverlayStyle(section);
+          let sectionMiniGuid = section.id.substr(section.id.length - 12);
 
-          page.data.html += `<section data-id='${section.id}' data-title='${section.data.title}' class="${sectionClass}jumbotron-fluid ${sectionStyle?.css}" style="${sectionStyle?.style}">`;
+          page.data.html += `<section data-id='${section.id}' data-title='${section.data.title}' class="${sectionClass}jumbotron-fluid css-${sectionMiniGuid}">`;
           // page.data.html += `<div class="section-overlay" style="${overlayStyle}">`;
           page.data.html += '<div class="container">';
           let rows;
@@ -254,57 +256,6 @@ module.exports = contentService = {
     }
   },
 
-  getSectionStyles: async function (section) {
-    if (section.data.background) {
-      let styleList = [];
-      let cssList = [];
-      let backgroundList = [];
-
-      if (section.data.overlay) {
-        backgroundList.push(
-          `linear-gradient(${section.data.overlayTopColor}, ${section.data.overlayBottomColor})`
-        );
-      }
-
-      switch (section.data.background) {
-        case "color":
-          let colorRGBA = section.data.color;
-          if (colorRGBA) {
-            backgroundList.push(`${colorRGBA};`);
-          }
-          break;
-        case "image":
-          let imageSrc = section.data.image.src;
-          if (imageSrc) {
-            backgroundList.push(`url(${imageSrc});`);
-            cssList.push("bg-image-cover");
-          }
-          break;
-        default:
-          break;
-      }
-
-      if (section.data.textColor) {
-        cssList.push(section.data.textColor);
-      }
-
-      if (section.data.css) {
-        cssList.push(section.data.css);
-      }
-
-      let background = 'background: ' + backgroundList.join(", ");
-      let style = styleList.join(", ");
-      let css = cssList.join(" ");
-
-      // background: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.72)), url(/assets/uploads/cheetah.jpeg);
-
-      // console.log("style", style);
-      // console.log("css", css);
-      // console.log("background", background);
-
-      return { style: background, css };
-    }
-  },
 
   getSectionOverlayStyle: async function (section) {
     if (section.data.overlay) {

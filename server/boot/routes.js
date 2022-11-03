@@ -140,12 +140,6 @@ exports.loadRoutes = async function (app) {
     res.render("sandbox", { layout: "admin.handlebars", data: data });
   });
 
-  app.get("/css/generated.css", async function (req, res) {
-    res.set("Content-Type", "text/css");
-    let css = await cssService.getGeneratedCss();
-    res.send(css);
-  });
-
   app.post("/dropzone-upload", async function (req, res) {
     console.log("dropzone-upload req.files.file", req.files.file);
     await fileService.uploadWriteFile(req.files.file, req.sessionID);
