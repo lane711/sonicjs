@@ -131,10 +131,38 @@ module.exports = cssService = {
       let styleList = [];
       let cssList = [];
       let backgroundList = [];
+      let paddingList = [];
+      let marginList = [];
       let overlay = ''
 
       if (section.data.overlay) {
         overlay =`background: linear-gradient(${section.data.overlayTopColor}, ${section.data.overlayBottomColor})`;
+      }
+
+      if (section.data.paddingTop) {
+        paddingList.push(section.data.paddingTop);
+      }
+      if (section.data.paddingLeft) {
+        paddingList.push(section.data.paddingLeft);
+      }
+      if (section.data.paddingBottom) {
+        paddingList.push(section.data.paddingBottom);
+      }
+      if (section.data.paddingRight) {
+        paddingList.push(section.data.paddingRight);
+      }
+
+      if (section.data.marginTop) {
+        marginList.push(section.data.marginTop);
+      }
+      if (section.data.marginLeft) {
+        marginList.push(section.data.marginLeft);
+      }
+      if (section.data.marginBottom) {
+        marginList.push(section.data.marginBottom);
+      }
+      if (section.data.marginRight) {
+        marginList.push(section.data.marginRight);
       }
 
       switch (section.data.background) {
@@ -178,14 +206,15 @@ module.exports = cssService = {
       let background = "background: " + backgroundList.join(", ");
       let style = styleList.join("; ") + `${background}`;
       let css = cssList.join(" ");
-
+      let padding = paddingList.join(" ")
+      let margin = marginList.join(" ")
       // background: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.72)), url(/assets/uploads/cheetah.jpeg);
 
       // console.log("style", style);
       // console.log("css", css);
       // console.log("background", background);
 
-      return { style , css, overlay };
+      return { style , css, overlay, padding, margin };
     }
   },
 

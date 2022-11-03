@@ -238,17 +238,17 @@ module.exports = contentService = {
           // let overlayStyle = await this.getSectionOverlayStyle(section);
           let sectionMiniGuid = section.id.substr(section.id.length - 12);
 
-          page.data.html += `<section data-id='${section.id}' data-title='${section.data.title}' class="${sectionClass}jumbotron-fluid css-${sectionMiniGuid} ${sectionCss?.css}">`;
-          if (sectionCss?.overlay) {
-            page.data.html += `<div class="section-overlay overlay-${sectionMiniGuid}">`;
-          }
+          page.data.html += '<style>';
+          page.data.html += `\n.pb .css-${sectionMiniGuid}{${sectionCss?.style}}\n`
+          page.data.html += '</style>';
+
+          page.data.html += `<section data-id='${section.id}' data-title='${section.data.title}' class="${sectionClass}jumbotron-fluid css-${sectionMiniGuid} ${sectionCss?.css} ${sectionCss?.margin}">`;
+          page.data.html += `<div class="section-overlay overlay-${sectionMiniGuid} ${sectionCss?.padding}">`;
           page.data.html += '<div class="container">';
           let rows;
           rows = await this.processRows(page, section, section.data.rows, req);
           page.data.html += "</div>";
-          if (sectionCss?.overlay) {
-            page.data.html += "</div>";
-          }
+          page.data.html += "</div>";
           page.data.html += `</section>`;
 
           page.data.sections.push({
