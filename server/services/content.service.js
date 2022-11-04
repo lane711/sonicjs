@@ -234,7 +234,7 @@ module.exports = contentService = {
             ? section.data.cssClass + " "
             : "";
           let sectionCss = await cssService.getSectionStyle(section);
-          console.log("sectionCss", sectionCss);
+          // console.log("sectionCss", sectionCss);
           // let overlayStyle = await this.getSectionOverlayStyle(section);
           let sectionMiniGuid = section.id.substr(section.id.length - 12);
 

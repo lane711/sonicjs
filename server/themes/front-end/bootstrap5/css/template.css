@@ -26,7 +26,15 @@ margin: 1.8rem 0
 }
 
 main {
+padding: 112px 0
+}
+
+.pb main {
 padding: 55px 0
+}
+
+.hero {
+padding: 55px 0 55px
 }
 
 .section-overlay {
