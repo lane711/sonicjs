@@ -270,7 +270,7 @@ function setupHandlebarsHelpers() {
 }
 
 function setupStaticAssets(app) {
-  app.use(express.static("server/storage/css"));
+  // app.use(express.static("server/storage/css"));
   app.use("/themes", express.static(path.join(appRoot.path, "server/themes")));
   app.use(
     "/node_modules",
@@ -280,15 +280,15 @@ function setupStaticAssets(app) {
     "/vendors",
     express.static(path.join(appRoot.path, "server/assets/vendors"))
   );
-  app.use(
-    "/css",
-    express.static(path.join(appRoot.path, "server/storage/css"))
-  );
-  app.use("/js", express.static(path.join(appRoot.path, "server/storage/js")));
-  app.use(
-    "/js",
-    express.static(path.join(appRoot.path, "server/storage/files"))
-  );
+  // app.use(
+  //   "/css",
+  //   express.static(path.join(appRoot.path, "server/storage/css"))
+  // );
+  // app.use("/js", express.static(path.join(appRoot.path, "server/storage/js")));
+  // app.use(
+  //   "/js",
+  //   express.static(path.join(appRoot.path, "server/storage/files"))
+  // );
   app.use(
     "/sonicjs-services",
     express.static(path.join(appRoot.path, "server/services"))
@@ -298,10 +298,10 @@ function setupStaticAssets(app) {
     express.static(path.join(appRoot.path, "server/page-builder"))
   );
   app.use("/assets", express.static(path.join(appRoot.path, "server/assets")));
-  app.use(
-    "/api/containers/files/download",
-    express.static(path.join(appRoot.path, "server/storage/files"))
-  );
+  // app.use(
+  //   "/api/containers/files/download",
+  //   express.static(path.join(appRoot.path, "server/storage/files"))
+  // );
   app.use(
     "/assets/fonts",
     express.static(path.join(appRoot.path, "node_modules/font-awesome/fonts"))

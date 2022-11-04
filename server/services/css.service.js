@@ -19,7 +19,6 @@ var appRoot = require("app-root-path");
 
 module.exports = cssService = {
   startup: async function (app) {
-
     emitterService.on("getRenderedPagePostDataFetch", async function (options) {
       if (options && options.page) {
         await cssService.getCssFile(options.page);
@@ -27,15 +26,14 @@ module.exports = cssService = {
       }
     });
 
-    app.get("/css/site.css", async function (req, res) {
-
+    app.get("/css/template-processed.css", async function (req, res) {
       let originalFilePath = `${frontEndTheme}/css/template.css`;
-      let processedFilePath = `${frontEndTheme}/css/template-processed.css`;
-  
+      let processedFilePath = `/${frontEndTheme}/css/template-processed.css`;
+
       let css = await fileService.getFile(originalFilePath);
       let sectionStyles = await cssService.getSectionStyles();
       let processedCss = css + `\n${sectionStyles}`;
-  
+
       // console.log(processCssString);
       await fileService.writeFile(processedFilePath, processedCss);
 
@@ -99,32 +97,33 @@ module.exports = cssService = {
   },
 
   getSectionStyles: async function () {
-
-    let cssString = '';
-    let sections = await dataService.getContentByContentType('section')
-    for (const section of sections){
+    let cssString = "";
+    let sections = await dataService.getContentByContentType("section");
+    for (const section of sections) {
       let sectionMiniGuid = section.id.substr(section.id.length - 12);
 
-        let sectionCss = await cssService.getSectionStyle(section);
-        // console.log('css section id', sectionMiniGuid, sectionCss);
+      let sectionCss = await cssService.getSectionStyle(section);
+      // console.log('css section id', sectionMiniGuid, sectionCss);
 
-        cssString += `\n.css-${sectionMiniGuid}{${sectionCss?.style}}\n`
+      if (sectionCss?.style) {
+        cssString += `\n.css-${sectionMiniGuid}{${sectionCss?.style}}\n`;
+      }
 
-        if(sectionCss?.overlay){
-          cssString += `\n.overlay-${sectionMiniGuid}{${sectionCss?.overlay}}\n`
-        }
+      if (sectionCss?.overlay) {
+        cssString += `\n.overlay-${sectionMiniGuid}{${sectionCss?.overlay}}\n`;
+      }
 
-        // if (section.data.background) {
-        //   let sectionMiniGuid = section.id.substr(section.id.length - 12);
-        //     if (section.data.background.type === 'color') {
-        //         let color = section.data.background.color;
-        //         cssString += ` section[data-id="${section.id}"]{background-color:${color}}`
-        //     }
-        // }
-    };
+      // if (section.data.background) {
+      //   let sectionMiniGuid = section.id.substr(section.id.length - 12);
+      //     if (section.data.background.type === 'color') {
+      //         let color = section.data.background.color;
+      //         cssString += ` section[data-id="${section.id}"]{background-color:${color}}`
+      //     }
+      // }
+    }
 
     return cssString;
-},
+  },
 
   getSectionStyle: async function (section) {
     if (section.data.background) {
@@ -133,10 +132,10 @@ module.exports = cssService = {
       let backgroundList = [];
       let paddingList = [];
       let marginList = [];
-      let overlay = ''
+      let overlay = "";
 
       if (section.data.overlay) {
-        overlay =`background: linear-gradient(${section.data.overlayTopColor}, ${section.data.overlayBottomColor})`;
+        overlay = `background: linear-gradient(${section.data.overlayTopColor}, ${section.data.overlayBottomColor})`;
       }
 
       if (section.data.paddingTop) {
@@ -194,7 +193,6 @@ module.exports = cssService = {
       // background-attachment: fixed;
       // background-size: cover;
 
-
       if (section.data.textColor) {
         cssList.push(section.data.textColor);
       }
@@ -203,18 +201,20 @@ module.exports = cssService = {
         cssList.push(section.data.css);
       }
 
-      let background = "background: " + backgroundList.join(", ");
+      let background = backgroundList.length
+        ? "background: " + backgroundList.join(", ")
+        : "";
       let style = styleList.join("; ") + `${background}`;
       let css = cssList.join(" ");
-      let padding = paddingList.join(" ")
-      let margin = marginList.join(" ")
+      let padding = paddingList.join(" ");
+      let margin = marginList.join(" ");
       // background: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.72)), url(/assets/uploads/cheetah.jpeg);
 
       // console.log("style", style);
       // console.log("css", css);
       // console.log("background", background);
 
-      return { style , css, overlay, padding, margin };
+      return { style, css, overlay, padding, margin };
     }
   },
 
@@ -223,13 +223,11 @@ module.exports = cssService = {
     let processedFilePath = `${frontEndTheme}/css/template-processed.css`;
 
     let css = await fileService.getFile(originalFilePath);
-    let processedCss = css + '\ntest{}';
+    let processedCss = css + "\ntest{}";
 
     // console.log(processCssString);
     await fileService.writeFile(processedFilePath, processedCss);
   },
-
-
 
   getCssFile: async function (page) {
     //get template.css
