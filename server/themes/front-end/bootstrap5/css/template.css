@@ -33,3 +33,11 @@ padding: 55px 0
 width: 100%;
 height: 100%
 }
+
+.pt-5 {
+padding-top: 9rem!important
+}
+
+.pb-5 {
+padding-bottom: 9rem!important
+}
