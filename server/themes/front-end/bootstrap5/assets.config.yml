@@ -36,4 +36,4 @@ assets:
     - /node_modules/inter-ui/inter.css
     - /node_modules/prismjs/themes/prism-coy.css
     - /assets/vendors/prism-treeview/prism-treeview.css
-    - /css/site.css
+    - /{{frontEndTheme}}/css/template-processed.css

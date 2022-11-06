@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js -e hbs,js,css,html --ignore 'template-processed.css' --ignore '*_spec.js'",
-    "test": "npx cypress open"
+    "test": "npx cypress open",
+    "css": "echo csssss"
   },
   "repository": {
     "type": "git",
