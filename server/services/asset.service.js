@@ -9,10 +9,12 @@ var fileName = {};
 const frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const frontEndThemeBootswatch = `${process.env.FRONT_END_THEME_BOOTSWATCH}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
-const regenerateAssets = `${process.env.REGEN_ASSETS}`;
+const regenerateAssets = `${process.env.REGEN_ASSETS}` === 'TRUE';
 
 module.exports = assetService = {
   startup: async function () {
+    console.log('regenerateAssets', regenerateAssets);
+
     emitterService.on("getRenderedPagePostDataFetch", async function (options) {
       if (options && options.page) {
         options.page.data.jsLinks = "";

@@ -15,9 +15,11 @@ module.exports = demoSiteMainService = {
       }
     });
 
-    app.on("modulesLoaded", demoSiteMainService.setupDemoSite);
-    app.on("pagePreRender", demoSiteMainService.addDemoSiteHeader);
-    app.on("pagePreRender", demoSiteMainService.addHeaderJs);
+    if (app) {
+      app.on("modulesLoaded", demoSiteMainService.setupDemoSite);
+      app.on("pagePreRender", demoSiteMainService.addDemoSiteHeader);
+      app.on("pagePreRender", demoSiteMainService.addHeaderJs);
+    }
   },
 
   setupDemoSite: async function () {
@@ -55,9 +57,9 @@ module.exports = demoSiteMainService = {
     // console.log('postProcessPage', options.page);
     if (options.page.data) {
       //not needed if user already logged in
-      if (await userService.canEditPages(options.req) === false) {
-        options.page.data.pageCssClass = options.page.data.pageCssClass ?? '';
-        options.page.data.pageCssClass += ' demo';
+      if ((await userService.canEditPages(options.req)) === false) {
+        options.page.data.pageCssClass = options.page.data.pageCssClass ?? "";
+        options.page.data.pageCssClass += " demo";
         options.page.data.preHeader = `  <div class="alert alert-danger demo-alert fixed-top text-center" >
         <strong>SonicJs Demo Site</strong></i><a class="btn btn-success btn-sm text-white ms-3" href="/admin">Click Here to Login as Admin</a>
       </div>`;

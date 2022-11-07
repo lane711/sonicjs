@@ -41,13 +41,13 @@ module.exports = cssService = {
       res.send(processedCss);
     });
 
-    if (!isTemplateCssProcessed) {
-      //runs once at statup
-      // console.log("regen template css");
-      isTemplateCssProcessed = true;
+    // if (!isTemplateCssProcessed) {
+    //   //runs once at statup
+    //   // console.log("regen template css");
+    //   isTemplateCssProcessed = true;
 
-      await cssService.processTemplateCss();
-    }
+    //   await cssService.processTemplateCss();
+    // }
 
     // emitterService.on("requestBegin", async function (options) {
     //   //handle combined js file
