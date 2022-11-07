@@ -83,7 +83,9 @@ module.exports = moduleService = {
     // await this.getModuleCss(moduleDirs);
     // await this.getModuleJs(moduleDirs);
     // await this.getModuleContentTypesConfigs(moduleDirs);
-    app.emit('modulesLoaded');
+    if (app) {
+      app.emit("modulesLoaded");
+    }
   },
 
   getModules: async function () {
