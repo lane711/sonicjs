@@ -13,7 +13,6 @@ const regenerateAssets = `${process.env.REGEN_ASSETS}` === 'TRUE';
 
 module.exports = assetService = {
   startup: async function () {
-    console.log('regenerateAssets', regenerateAssets);
 
     emitterService.on("getRenderedPagePostDataFetch", async function (options) {
       if (options && options.page) {
