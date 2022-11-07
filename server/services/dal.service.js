@@ -176,6 +176,26 @@ module.exports = dalService = {
     }
   },
 
+  userDeleteAll: async function (userSession) {
+    if (userSession.passport.user.profile.roles.includes("admin")) {
+      const userRepo = await getRepository(User);
+      users = await userRepo.find();
+      for (const user of users) {
+        await userRepo.delete(user.id);
+      }
+    }
+  },
+
+  userSessionsDeleteAll: async function (userSession) {
+    if (userSession.passport.user.profile.roles.includes("admin")) {
+      const userSessionRepo = await getRepository(Session);
+      sessions = await userSessionRepo.find();
+      for (const session of sessions) {
+        await userSessionRepo.delete(session.id);
+      }
+    }
+  },
+
   contentGet: async function (
     id,
     contentTypeId,
@@ -372,7 +392,7 @@ module.exports = dalService = {
     // const canDelete =
     //   _.intersection(rolesThatCanDelete, userRoles).length !== 0;
 
-    const canDelete =userRoles.includes('admin')
+    const canDelete = userRoles.includes("admin");
 
     if (canDelete) {
       const contentRepo = await getRepository(Content);

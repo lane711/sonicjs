@@ -23,6 +23,7 @@ var authService = require("../services/auth.service");
 var dalService = require("../services/dal.service");
 var backupService = require("../services/backup.service");
 var backupRestoreService = require("../services/backup-restore.service");
+var installService = require("../services/install.service");
 var testService = require("../services/test.service");
 
 var helperService = require("../services/helper.service");
@@ -68,6 +69,7 @@ exports.loadRoutes = async function (app) {
     await pageBuilderService.startup(app);
     await testService.startup(app);
     await cssService.startup(app);
+    await installService.startup(app);
 
     await emitterService.emit("startup", { app: app });
 
