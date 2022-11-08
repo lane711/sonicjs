@@ -121,8 +121,9 @@ async function openCreateForm(action, contentType) {
       window.location.pathname
     );
 
+    // debugger;
     // let moduleTitle = form.contentType.data.modalSettings?.modalTitle ?? helperService.titleCase(`${action} ${contentType}`);
-    let moduleTitle = helperService.titleCase(`${action} ${contentType}`);
+    let moduleTitle = form.contentType.data.states?.moduleTitle ?? helperService.titleCase(`${action} ${contentType}`);
 
     $("#genericModal .modal-title").text(moduleTitle);
 

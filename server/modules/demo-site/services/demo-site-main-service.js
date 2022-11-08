@@ -15,6 +15,48 @@ module.exports = demoSiteMainService = {
       }
     });
 
+    emitterService.on("afterFormSubmit", async function (options) {
+      if (options.data.contentType !== "emailotp") {
+        return;
+      }
+
+      console.log('proccessing OTP')
+
+      // let formSettings = await dataService.getContentById(options.data.formSettingsId);
+
+      // save the form
+      // await dataService.contentCreate(options.data, true, options.sessionID);
+
+      // send the emails
+      // let contact = options.data;
+
+      // //confirmation to user
+      // // let body = `Hi ${contact.name}, \n\nThanks for reaching out. We'll get back to you ASAP.\n\nFor your reference, here was your message:\n${contact.message}`;
+      // let body = viewService.processTemplateString(formSettings.data.emailMessageBody, {contact});
+
+      // //to user - confirmation
+      // await emailService.sendEmail(
+      //   formSettings.data.adminEmail,
+      //   formSettings.data.fromName,
+      //   formSettings.data.adminEmail,
+      //   contact.email,
+      //   formSettings.data.emailMessageSubject,
+      //   body
+      // );
+
+      // //admin notification
+      // let adminBody = `${contact.name} (${contact.email}) wrote: <br/><br/>${contact.message}`;
+      // await emailService.sendEmail(
+      //   formSettings.data.adminEmail,
+      //   contact.name,
+      //   contact.email,
+      //   formSettings.data.adminEmail,
+      //   formSettings.data.emailMessageSubjectAdmin,
+      //   adminBody
+      // );
+
+    });
+
     if (app) {
       app.on("modulesLoaded", demoSiteMainService.setupDemoSite);
       app.on("pagePreRender", demoSiteMainService.addDemoSiteHeader);
@@ -61,7 +103,7 @@ module.exports = demoSiteMainService = {
         options.page.data.pageCssClass = options.page.data.pageCssClass ?? "";
         options.page.data.pageCssClass += " demo";
         options.page.data.preHeader = `  <div class="alert alert-danger demo-alert fixed-top text-center" >
-        <strong>SonicJs Demo Site</strong></i><a class="btn btn-success btn-sm text-white ms-3" href="javascript:void(0)" onclick="return openFormInModal('create', 'email-otp')">Click Here to Login as Admin</a>
+        <strong>SonicJs Demo Site</strong></i><a class="btn btn-success btn-sm text-white ms-3" href="javascript:void(0)" onclick="return openFormInModal('create', 'emailotp')">Click Here to Login as Admin</a>
       </div>`;
       }
     }
@@ -88,4 +130,5 @@ module.exports = demoSiteMainService = {
         </script>`;
     }
   },
+  
 };

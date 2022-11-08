@@ -583,8 +583,9 @@ const Mutation = new GraphQLObjectType({
           "",
           args.url,
           dataObj,
-          await getUserSession(args.sessionID, req.sessionID)
-        );
+          await getUserSession(args.sessionID, req.sessionID),
+          req
+        ); 
 
         return result;
         // let userId = (context.session.userSession && context.session.userSession.id)

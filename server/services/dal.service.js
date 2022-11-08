@@ -257,7 +257,7 @@ module.exports = dalService = {
     return contents;
   },
 
-  contentUpdate: async function (id, url, data, userSession) {
+  contentUpdate: async function (id, url, data, userSession, req) {
     if (verboseLogging) {
       console.log(
         "dal contentUpdate ==>",
@@ -266,6 +266,17 @@ module.exports = dalService = {
         data,
         userSession
       );
+    }
+
+    if (req) {
+      let contentType = await moduleService.getModuleContentType(
+        data.contentType,
+        userSession,
+        req
+      );
+      if(contentType.data.states.skipSave){
+        return;
+      }
     }
 
     const contentRepo = await getRepository(Content);

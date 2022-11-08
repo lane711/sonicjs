@@ -1063,7 +1063,7 @@ async function onContentTypeStatesSave(submission) {
 
   // //modal settings
   // processModalSettings(contentType);
-  debugger;
+  // debugger;
 
   //add states form data to content type
   contentType.data.states = submission.data;
