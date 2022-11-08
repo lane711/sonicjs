@@ -163,7 +163,7 @@ module.exports = adminService = {
               }
             : undefined;
 
-          console.log("states", states);
+          // console.log("states", states);
 
           data.editFormStates = await dataService.formGet(
             "content-type-states",

@@ -61,7 +61,7 @@ module.exports = demoSiteMainService = {
         options.page.data.pageCssClass = options.page.data.pageCssClass ?? "";
         options.page.data.pageCssClass += " demo";
         options.page.data.preHeader = `  <div class="alert alert-danger demo-alert fixed-top text-center" >
-        <strong>SonicJs Demo Site</strong></i><a class="btn btn-success btn-sm text-white ms-3" href="/admin">Click Here to Login as Admin</a>
+        <strong>SonicJs Demo Site</strong></i><a class="btn btn-success btn-sm text-white ms-3" href="javascript:void(0)" onclick="return openFormInModal('create', 'email-otp')">Click Here to Login as Admin</a>
       </div>`;
       }
     }
