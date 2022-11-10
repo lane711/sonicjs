@@ -102,6 +102,7 @@ module.exports = fileService = {
 
     //for security, make sure we are only writing files inside the app
     if (!filePath.startsWith(appRoot.path)) {
+      console.log('file not written for security reasons:', filePath)
       return;
     }
     await fsPromise.writeFile(filePath, fileContent);

@@ -9,9 +9,11 @@ var fileName = {};
 const frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const frontEndThemeBootswatch = `${process.env.FRONT_END_THEME_BOOTSWATCH}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
+const regenerateAssets = `${process.env.REGEN_ASSETS}` === 'TRUE';
 
 module.exports = assetService = {
   startup: async function () {
+
     emitterService.on("getRenderedPagePostDataFetch", async function (options) {
       if (options && options.page) {
         options.page.data.jsLinks = "";
@@ -22,7 +24,7 @@ module.exports = assetService = {
           let assetFilesExist = await assetService.doesAssetFilesExist();
 
           // if (process.env.REBUILD_ASSETS === "TRUE" || !assetFilesExist || options.req.pageLoadedCount === 1) {
-          if (!assetFilesExist || options.req.pageLoadedCount === 1) {
+          if (!assetFilesExist || options.req.pageLoadedCount === 1 || regenerateAssets) {
             //rebuild the assets before delivering
             await assetService.getLinks(options, "css");
             await assetService.getLinks(options, "js");
@@ -216,7 +218,7 @@ module.exports = assetService = {
         if (link.path.includes("/api/containers/css/download/template.css")) {
           link.path = `${frontEndTheme}/css/template-processed.css`;
         }
-        if (!link.path.startsWith('/node_modules') && !link.path.endsWith('template.css')) {
+        if (!link.path.startsWith('/node_modules') && !link.path.endsWith('template-processed.css')) {
           link.path = '/server' + link.path;
         }
         let fileContentRaw = await fileService.getFile(link.path);

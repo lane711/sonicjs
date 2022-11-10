@@ -23,6 +23,7 @@ var authService = require("../services/auth.service");
 var dalService = require("../services/dal.service");
 var backupService = require("../services/backup.service");
 var backupRestoreService = require("../services/backup-restore.service");
+var installService = require("../services/install.service");
 var testService = require("../services/test.service");
 
 var helperService = require("../services/helper.service");
@@ -63,11 +64,12 @@ exports.loadRoutes = async function (app) {
     await siteSettingsService.startup();
     await themeSettingsService.startup();
     await userService.startup(app);
-    await assetService.startup();
+    await assetService.startup(app);
     await pageBuilderService.startup(app);
     await pageBuilderService.startup(app);
     await testService.startup(app);
     await cssService.startup(app);
+    await installService.startup(app);
 
     await emitterService.emit("startup", { app: app });
 
@@ -138,12 +140,6 @@ exports.loadRoutes = async function (app) {
   app.get("/admin/sandbox", async function (req, res) {
     let data = {};
     res.render("sandbox", { layout: "admin.handlebars", data: data });
-  });
-
-  app.get("/css/generated.css", async function (req, res) {
-    res.set("Content-Type", "text/css");
-    let css = await cssService.getGeneratedCss();
-    res.send(css);
   });
 
   app.post("/dropzone-upload", async function (req, res) {

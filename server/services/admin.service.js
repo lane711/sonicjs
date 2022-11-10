@@ -81,6 +81,8 @@ module.exports = adminService = {
 
         let data = {};
 
+        await emitterService.emit("processUrl", { req, res, urlKey : 'admin', page : data });
+
         if (viewName == "admin-content") {
           data = await dataService.getContentAdminCommon(req.sessionID);
           data.contentTypes = await dataService.contentTypesGet(req.sessionID);
@@ -161,7 +163,7 @@ module.exports = adminService = {
               }
             : undefined;
 
-          console.log("states", states);
+          // console.log("states", states);
 
           data.editFormStates = await dataService.formGet(
             "content-type-states",
@@ -388,6 +390,9 @@ module.exports = adminService = {
         data.fileStorageBase = `https://${process.env.AMAZON_S3_BUCKETNAME}.s3.amazonaws.com`;
 
         let layoutPath = `${appRoot.path}/server/themes/admin/${adminTheme}/theme.hbs`;
+
+        await res.app.emit("pagePreRender", {req, page : data});
+
 
         res.render(`server/themes/admin/shared-views/${viewName}`, {
           layout: layoutPath,

@@ -28,6 +28,10 @@
     <link href="/node_modules/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="icon" href="/assets/img/favicon.ico">
 
+    {{#if data.headerJs}}
+      {{{data.headerJs}}}
+    {{/if}}
+
 </head>
 
 <body class="app header-fixed sidebar-fixed aside-menu-fixed sidebar-lg-show">

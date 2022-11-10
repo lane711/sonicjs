@@ -4,8 +4,19 @@ var dataService = require("./data.service");
 var helperService = require("./helper.service");
 var fileService = require("./file.service");
 var logSymbols = require("log-symbols");
+const cleanInstallUrl = process.env.CLEAN_INSTALL_URL;
 
 module.exports = installService = {
+  startup: async function (app) {
+    if (cleanInstallUrl) {
+      app.get(cleanInstallUrl, async function (req, res) {
+        await installService.cleanInstall(req);
+
+        res.send("install cleansed");
+      });
+    }
+  },
+
   checkInstallation: async function () {
     if (process.env.MIGRATE_DATA === "TRUE") {
       await installService.migrateToNewSectionColumnStructure();
@@ -20,6 +31,13 @@ module.exports = installService = {
     await installService.checkDefaultContent();
 
     console.log(logSymbols.success, "Install Verified!");
+  },
+
+  cleanInstall: async function (req) {
+    console.log(logSymbols.info, "Cleaning install...");
+
+    await dalService.userDeleteAll(req.session);
+    await dalService.userSessionsDeleteAll(req.session);
   },
 
   checkDefaultContent: async function (app) {
@@ -71,7 +89,6 @@ module.exports = installService = {
       console.log("created siteSettings:", record);
     }
 
-
     let siteSettingsACLs = await dataService.getContentByType(
       "site-settings-acls"
     );
@@ -101,7 +118,7 @@ module.exports = installService = {
       );
       console.log("created siteSettingsACLs:", record);
     }
-    
+
     let themeSettings = await dataService.getContentByType("theme-settings");
     if (themeSettings.length === 0) {
       let data = {

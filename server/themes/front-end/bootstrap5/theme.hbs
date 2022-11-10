@@ -110,7 +110,7 @@
     <div class="row small">
       <div class="col-md-4">
         <h6 class="mt-2 mb-md-0 text-secondary text-md-left">
-          © 2022 SonicJs. All Rights Reserved
+          {{ data.themeSettings.footerText }}
         </h6>
       </div>
       <div class="col-md-8">
@@ -118,22 +118,22 @@
           <a
           href="https://github.com/lane711/sonicjs"
           target="_blank"
-          class="btn btn-circle btn-sm btn-primary mx-1"
+          class="btn btn-circle btn-sm btn-warning mx-1"
           ><i class="bi bi-github"></i
         ></a>
           <a
             href="https://www.youtube.com/channel/UCm_B7S9smSvtrv0nAt2vrqw"
             target="_blank"
-            class="btn btn-circle btn-sm btn-primary mx-1"
+            class="btn btn-circle btn-sm btn-warning mx-1"
             ><i class="bi bi-youtube"></i
           ></a>
           <a
             href="https://www.facebook.com/SonicJs-Nodejs-CMS-113052493788728"
             target="_blank"
-            class="btn btn-circle btn-sm btn-primary mx-1"
+            class="btn btn-circle btn-sm btn-warning mx-1"
             ><i class="bi bi-facebook"></i
           ></a>
-          <a href="https://twitter.com/SonicJs1" class="btn btn-circle btn-sm btn-primary mx-1"
+          <a href="https://twitter.com/SonicJs1" class="btn btn-circle btn-sm btn-warning mx-1"
           target="_blank"
             ><i class="bi bi-twitter"></i
           ></a>
@@ -147,32 +147,32 @@
       
   </body>
 
-    <!-- Formio Generic Modal -->
-    <div class="modal fade" id="genericModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">New Page</h5>
-          <button type="button" class="close" data-{{data.themeSettings.bootstrapToggleMiddle}}dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
 
-          <input type="hidden" id="block-edit-it">
-          <div id="editor-container">
-
-            <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-
-            <div id="formio"></div>
-
-          </div>
-
-        </div>
+    <!-- Modal -->
+<div class="modal fade" id="genericModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+      <div class="modal-body">
+        
+        <input type="hidden" id="block-edit-it">
+        <div id="editor-container">
+          <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+          <div id="formio"></div>
+        </div>
+
+      </div>
+      <!-- <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div> -->
     </div>
-    </div>
+  </div>
+</div>
+
 
 </html>
 

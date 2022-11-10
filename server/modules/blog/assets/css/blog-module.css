@@ -1,1 +1,9 @@
 /* Css File for Module: blog */
+div.blog-wrapper {
+    font-size: 1.1rem;
+}
+
+.blog-wrapper h4 a{
+    text-decoration: none;
+    color:var(--bs-body-color);
+}

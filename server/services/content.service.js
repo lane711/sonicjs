@@ -6,6 +6,7 @@ var helperService = require(".//helper.service");
 var userService = require(".//user.service");
 var globalService = require(".//global.service");
 var cacheService = require(".//cache.service");
+var cssService = require(".//css.service");
 var formattingService = require(".//formatting.service");
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
 
@@ -73,7 +74,6 @@ module.exports = contentService = {
       await this.getPage(page.id, page, req, req.sessionID);
       await emitterService.emit("postProcessPage");
 
-
       // page.data.html = page.data.html;
     }
 
@@ -108,7 +108,7 @@ module.exports = contentService = {
 
     let cache = cacheService.getCache();
     success = cache.set(req.url, page);
-    
+
     return { page: page };
   },
 
@@ -233,16 +233,23 @@ module.exports = contentService = {
           let sectionClass = section.data.cssClass
             ? section.data.cssClass + " "
             : "";
-          let sectionStyle = await this.getSectionBackgroundStyle(section);
+          let sectionCss = await cssService.getSectionStyle(section);
+          // console.log("sectionCss", sectionCss);
           // let overlayStyle = await this.getSectionOverlayStyle(section);
+          let sectionMiniGuid = section.id.substr(section.id.length - 12);
 
-          page.data.html += `<section data-id='${section.id}' data-title='${section.data.title}' class="${sectionClass}jumbotron-fluid ${sectionStyle?.css}" style="${sectionStyle?.style}">`;
-          // page.data.html += `<div class="section-overlay" style="${overlayStyle}">`;
+          page.data.html += '<style>';
+          page.data.html += `\n.pb .css-${sectionMiniGuid}{${sectionCss?.style}}\n`
+          page.data.html += `\n.pb .overlay-${sectionMiniGuid}{${sectionCss?.overlay}}\n`
+          page.data.html += '</style>';
+
+          page.data.html += `<section data-id='${section.id}' data-title='${section.data.title}' class="${sectionClass}jumbotron-fluid css-${sectionMiniGuid} ${sectionCss?.css} ${sectionCss?.margin}">`;
+          page.data.html += `<div class="section-overlay overlay-${sectionMiniGuid} ${sectionCss?.padding}">`;
           page.data.html += '<div class="container">';
           let rows;
           rows = await this.processRows(page, section, section.data.rows, req);
           page.data.html += "</div>";
-          // page.data.html += "</div>";
+          page.data.html += "</div>";
           page.data.html += `</section>`;
 
           page.data.sections.push({
@@ -252,38 +259,6 @@ module.exports = contentService = {
           });
         }
       }
-    }
-  },
-
-  getSectionBackgroundStyle: async function (section) {
-    if (section.data.background) {
-      let style = "";
-      let css = "";
-      let overlayCss = "";
-
-      if (section.data.overlay) {
-        overlayCss = `linear-gradient(${section.data.overlayTopColor}, ${section.data.overlayBottomColor}), `;
-      }
-
-      switch (section.data.background) {
-        case "color":
-          let colorRGBA = section.data.color;
-          if (colorRGBA) {
-            style = `background:${overlayCss}${colorRGBA};`;
-          }
-          break;
-        case "image":
-          let imageSrc = section.data.image.src;
-          if (imageSrc) {
-            style = `background: ${overlayCss}url(${imageSrc});`;
-            css = "bg-image-cover";
-          }
-          break;
-        default:
-          break;
-      }
-
-      return { style, css };
     }
   },
 

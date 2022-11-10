@@ -1,7 +1,8 @@
 {
   "title": "App Analytics",
-  "enabled": false,
+  "enabled": true,
   "systemId": "app-analytics",
+  "icon": "",
   "canBeAddedToColumn": false,
   "singleInstance": false,
   "version": "0.0.0.1"
