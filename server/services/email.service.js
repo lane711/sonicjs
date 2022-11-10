@@ -17,6 +17,7 @@ var sendEmail = process.env.SEND_EMAIL;
 module.exports = emailService = {
   sendEmail: async function (from, fromName, replyTo, to, subject, body) {
     if (sendEmail !== "TRUE") {
+      console.log('SEND_EMAIL env var set to false, not sending email');
       return;
     }
 

@@ -274,7 +274,7 @@ module.exports = dalService = {
         userSession,
         req
       );
-      if(contentType.data.states.skipSave){
+      if(contentType.data.states?.skipSave){
         return;
       }
     }

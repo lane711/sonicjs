@@ -17,25 +17,26 @@ module.exports = appAnalyticsMainService = {
       }
     });
 
-    emitterService.on("postPageRender", async function (options) {
-      appAnalyticsMainService.trackEventSend({
-        eventName: "page_load",
-        url: options.page.data.url,
-      });
-    });
+    // emitterService.on("postPageRender", async function (options) {
+    //   appAnalyticsMainService.trackEventSend({
+    //     eventName: "page_load",
+    //     url: options.page.data.url,
+    //   });
+    // });
 
-    emitterService.on("postAdminPageRender", async function (options) {
-      appAnalyticsMainService.trackEventSend({
-        eventName: "admin_page_load",
-        url: options.req.url,
-      });
-    });
+    // emitterService.on("postAdminPageRender", async function (options) {
+    //   appAnalyticsMainService.trackEventSend({
+    //     eventName: "admin_page_load",
+    //     url: options.req.url,
+    //   });
+    // });
 
     emitterService.on("firstPageLoaded", async function (options) {
       let pageCount = await dataService.getContentByType("page", 0);
       appAnalyticsMainService.trackEventSend({
         eventName: "startup",
         pageCount: pageCount.length,
+        siteDomain: options.req.hostname
       });
     });
 
@@ -43,7 +44,7 @@ module.exports = appAnalyticsMainService = {
       if (app) {
         app.post(process.env.ANALYTICS_RECEIVE_URL, async function (req, res) {
           //HACK: this is causing prod app to crash, bypass for now
-          // appAnalyticsMainService.processEvent(req.body, req.ip);
+          appAnalyticsMainService.processEvent(req.body, req.ip);
           res.json({ ok: "ok" });
         });
       }
@@ -105,6 +106,7 @@ module.exports = appAnalyticsMainService = {
           title: "app-analytics",
           url: profileUrl,
           installId: data.installId,
+          siteDomain: data.siteDomain,
           firstSeenOn: timeStamp,
           events: [],
           pageCount: 0,
