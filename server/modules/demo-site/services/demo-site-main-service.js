@@ -2,9 +2,39 @@ var userService = require("../../../services/user.service");
 var dalService = require("../../../services/dal.service");
 var adminService = require("../../../services/admin.service");
 var emitterService = require("../../../services/emitter.service");
+var globalService = require("../../../services/global.service");
+
+const axios = require("axios");
+var axiosInstance;
+const SibApiV3Sdk = require("sib-api-v3-sdk");
+const sendInBlueApiKey = process.env.SENDINBLUE_API_KEY;
+const demoOTP = process.env.DEMO_OTP;
+const demoEmailFrom = process.env.DEMO_EMAIL_FROM;
+const demoEmailFromName = process.env.DEMO_EMAIL_FROM_NAME;
+const demoUsername = "demo@demo.com";
+const demoPassword = "demo123";
 
 module.exports = demoSiteMainService = {
   startup: async function (app) {
+    app.get("/login-otp", async function (req, res) {
+      let code = req.query.code;
+
+      if (code === demoOTP) {
+        const user = {
+          username: demoUsername,
+          password: demoPassword,
+        };
+        // let axoisLocal = await demoSiteMainService.getAxios()
+        // await await axoisLocal.get("/logout");
+        // let login = await axoisLocal.post("/login-user", user);
+        // res.send(login.data.id);
+
+        res.redirect(`/login-redirect?username=${user.username}&password=${user.password}`);
+      } else {
+        res.send("Bad Code");
+      }
+    });
+
     emitterService.on("processUrl", async function (options) {
       //smart look demo site only
       options.page.isDemoSite = false;
@@ -20,29 +50,23 @@ module.exports = demoSiteMainService = {
         return;
       }
 
-      console.log('proccessing OTP')
+      console.log("proccessing OTP");
 
-      // let formSettings = await dataService.getContentById(options.data.formSettingsId);
+      demoSiteMainService.sendToMarketingEmailList(options.data);
 
-      // save the form
-      // await dataService.contentCreate(options.data, true, options.sessionID);
-
-      // send the emails
-      // let contact = options.data;
-
-      // //confirmation to user
-      // // let body = `Hi ${contact.name}, \n\nThanks for reaching out. We'll get back to you ASAP.\n\nFor your reference, here was your message:\n${contact.message}`;
-      // let body = viewService.processTemplateString(formSettings.data.emailMessageBody, {contact});
+      let loginLink = `http://demo.sonicjs.com/login-otp?code=${demoOTP}`;
+      let body = `Thanks for your interest in SonicJs, the free-forever open source Node CMS.\n\n
+                  Please click on the link below to login to the demo as admin:\n${loginLink}`;
 
       // //to user - confirmation
-      // await emailService.sendEmail(
-      //   formSettings.data.adminEmail,
-      //   formSettings.data.fromName,
-      //   formSettings.data.adminEmail,
-      //   contact.email,
-      //   formSettings.data.emailMessageSubject,
-      //   body
-      // );
+      await emailService.sendEmail(
+        demoEmailFrom,
+        demoEmailFromName,
+        demoEmailFrom,
+        options.data.email,
+        "SonicJS Demo One Time Password",
+        body
+      );
 
       // //admin notification
       // let adminBody = `${contact.name} (${contact.email}) wrote: <br/><br/>${contact.message}`;
@@ -54,13 +78,40 @@ module.exports = demoSiteMainService = {
       //   formSettings.data.emailMessageSubjectAdmin,
       //   adminBody
       // );
-
     });
 
     if (app) {
       app.on("modulesLoaded", demoSiteMainService.setupDemoSite);
       app.on("pagePreRender", demoSiteMainService.addDemoSiteHeader);
       app.on("pagePreRender", demoSiteMainService.addHeaderJs);
+    }
+  },
+
+  sendToMarketingEmailList: async function (data) {
+    if (data.emailOptin) {
+      let defaultClient = SibApiV3Sdk.ApiClient.instance;
+
+      let apiKey = defaultClient.authentications["api-key"];
+      apiKey.apiKey = sendInBlueApiKey;
+
+      let apiInstance = new SibApiV3Sdk.ContactsApi();
+
+      let createContact = new SibApiV3Sdk.CreateContact();
+
+      createContact.email = data.email;
+      createContact.listIds = [6];
+
+      apiInstance.createContact(createContact).then(
+        function (data) {
+          console.log(
+            "Send in Blue API called successfully. Returned data: " +
+              JSON.stringify(data)
+          );
+        },
+        function (error) {
+          console.error(error);
+        }
+      );
     }
   },
 
@@ -76,16 +127,16 @@ module.exports = demoSiteMainService = {
     let session = { user: { id: "69413190-833b-4318-ae46-219d690260a9" } };
 
     let demoAdminUser = await dalService.userGetByLogin(
-      "demo@demo.com",
-      "demo123"
+      demoUsername,
+      demoPassword
     );
 
     // console.log("demoAdminUser", demoAdminUser);
 
     if (!demoAdminUser || demoAdminUser.length === 0) {
       let newDemoUser = await userService.registerUser(
-        "demo@demo.com",
-        "demo123",
+        demoUsername,
+        demoPassword,
         true
       );
 
@@ -130,5 +181,16 @@ module.exports = demoSiteMainService = {
         </script>`;
     }
   },
-  
+
+  getAxios: async function () {
+    if (!demoSiteMainService.axiosInstance) {
+      const defaultOptions = {
+        headers: {},
+        baseURL: globalService.baseUrl,
+      };
+
+      demoSiteMainService.axiosInstance = axios.create(defaultOptions);
+    }
+    return demoSiteMainService.axiosInstance;
+  },
 };

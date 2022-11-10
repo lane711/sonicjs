@@ -215,6 +215,23 @@ module.exports = authService = {
 
     app.get("/user-open", (req, res) => res.send({ user: req.user }));
 
+    app.get("/login-redirect", async function (req, res) {
+      if (process.env.MODE !== "dev") {
+        if (adminDomain !== req.host) {
+          res.send(401);
+          return;
+        }
+      }
+
+      let data = {username:req.query.username, password:req.query.password};
+
+      res.render("server/themes/admin/shared-views/admin-login-redirect", {
+        layout: null,
+        data: data,
+      });
+      // return;
+    });
+
     app.get("/login", async function (req, res) {
       if (process.env.MODE !== "dev") {
         if (adminDomain !== req.host) {
