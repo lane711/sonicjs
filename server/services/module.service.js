@@ -17,8 +17,13 @@ var enableModules = `${process.env.ENABLE_MODULES}`;
 
 const connectEnsureLogin = require("connect-ensure-login");
 
+var enableModulesList = [];
+
 module.exports = moduleService = {
   startup: function (app) {
+
+    moduleService.loadModuleOverridersFromEnv();
+
     emitterService.on("startup", async function ({ app }) {
       // console.log('>>=== startup from module service');
       await moduleService.processModules(app);
@@ -98,12 +103,16 @@ module.exports = moduleService = {
   //     });
   // },
 
-  loadModuleServices: async function (moduleList, app) {
-    let enableModulesList = [];
+  loadModuleOverridersFromEnv(){
+    // let enableModulesList = [];
     if (enableModules) {
       enableModulesList = enableModules.split(",");
       // console.log("enableModulesList", enableModulesList);
     }
+  },
+
+  loadModuleServices: async function (moduleList, app) {
+
 
     moduleList.forEach(async function (moduleDef) {
       if (enableModulesList.includes(moduleDef.systemId)) {
@@ -258,7 +267,8 @@ module.exports = moduleService = {
           let moduleFolder = moduleDef.systemId;
           moduleDef.mainService = `${modulePath}\/${moduleFolder}\/services\/${moduleFolder}-main-service.js`;
           moduleList.push(moduleDef);
-          if (moduleDef.enabled) {
+          let isIncludedInEnv = enableModulesList.includes(moduleDef.systemId)
+          if (moduleDef.enabled || isIncludedInEnv) {
             let moduleBasePath = `${modulePath}\/${moduleFolder}`;
             this.getModuleCss(moduleBasePath);
             this.getModuleJs(moduleBasePath);
