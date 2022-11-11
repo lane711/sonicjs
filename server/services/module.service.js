@@ -247,9 +247,9 @@ module.exports = moduleService = {
       );
       // let files = fileArray);
 
-      this.getModuleCss(modulePath);
-      this.getModuleJs(modulePath);
-      this.getModuleContentTypesConfigs(modulePath);
+      // this.getModuleCss(modulePath);
+      // this.getModuleJs(modulePath);
+      // this.getModuleContentTypesConfigs(modulePath);
 
       fileArray.forEach((file) => {
         let raw = fileService.getFileSync(file); // fs.readFileSync(file);
@@ -258,6 +258,12 @@ module.exports = moduleService = {
           let moduleFolder = moduleDef.systemId;
           moduleDef.mainService = `${modulePath}\/${moduleFolder}\/services\/${moduleFolder}-main-service.js`;
           moduleList.push(moduleDef);
+          if (moduleDef.enabled) {
+            let moduleBasePath = `${modulePath}\/${moduleFolder}`;
+            this.getModuleCss(moduleBasePath);
+            this.getModuleJs(moduleBasePath);
+            this.getModuleContentTypesConfigs(moduleBasePath);
+          }
         }
       });
     });
@@ -393,6 +399,8 @@ module.exports = moduleService = {
     await moduleService.processModules();
   },
   getModuleCss: function (path) {
+    //need to only look in enabled modules
+    // globalService.moduleList;
     const files = fileService.getFilesSearchSync(path, "/**/*.css");
 
     files.forEach((file) => {
