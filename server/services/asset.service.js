@@ -245,7 +245,7 @@ module.exports = assetService = {
   createCombinedFile: async function (fileContent, fileName, assetType, overwriteFile) {
     let path = this.getAssetPath(fileName);
     let minifiedAsset = "";
-    if (!fileService.fileExists(path) || overwriteFile) {
+    if (!fileService.fileExists(path) || overwriteFile || regenerateAssets) {
       console.log(`Generating Asset: ${path}`);
       if (assetType === "js") {
         let minJs = UglifyJS.minify(fileContent, {
