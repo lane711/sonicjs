@@ -177,7 +177,7 @@ module.exports = dalService = {
   },
 
   userDeleteAll: async function (userSession) {
-    if (userSession.passport.user.profile.roles.includes("admin")) {
+    if (userSession.passport.user?.profile.roles.includes("admin")) {
       const userRepo = await getRepository(User);
       users = await userRepo.find();
       for (const user of users) {
@@ -192,6 +192,16 @@ module.exports = dalService = {
       sessions = await userSessionRepo.find();
       for (const session of sessions) {
         await userSessionRepo.delete(session.id);
+      }
+    }
+  },
+
+  deleteAllOfContentType: async function (contentType, userSession) {
+    if (userSession.passport.user?.profile.roles.includes("admin")) {
+      const contentRepo = await getRepository(Content);
+      let contents = await dalService.contentGet(undefined,contentType);
+      for (const content of contents) {
+        await contentRepo.delete(content.id);
       }
     }
   },

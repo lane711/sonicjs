@@ -36,6 +36,7 @@ module.exports = installService = {
   cleanInstall: async function (req) {
     console.log(logSymbols.info, "Cleaning install...");
 
+    await dalService.deleteAllOfContentType('app-analytics', req.session );
     await dalService.userDeleteAll(req.session);
     await dalService.userSessionsDeleteAll(req.session);
   },
