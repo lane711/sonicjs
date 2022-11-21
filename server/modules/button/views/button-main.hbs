@@ -1,7 +1,8 @@
 {{#if (eq data.buttonType "url")}}
   <div class="col text-center">
     <a
-      href="{{data.linkUrl}}"
+      href="{{data.redirectUrl}}" 
+      {{#if (eq data.openUrl "newWindow")}}target="_blank"{{/if}}
       class="btn btn-{{data.style}} btn-{{data.size}}"
     >{{data.title}}</a>
   </div>
