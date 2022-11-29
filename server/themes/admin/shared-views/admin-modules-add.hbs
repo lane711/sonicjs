@@ -54,6 +54,9 @@
                   form.on('submit', async function (submission) {
 
                     await dataService.moduleCreate(submission);
+                    //TODO: fix hack
+                    await sleep(1000);
+
                     window.location.replace('/admin/modules');
 
                   });
