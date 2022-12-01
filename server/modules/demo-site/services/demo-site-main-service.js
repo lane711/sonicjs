@@ -16,25 +16,29 @@ const demoPassword = "demo123";
 
 module.exports = demoSiteMainService = {
   startup: async function (app) {
-    app.get("/login-otp", async function (req, res) {
-      let code = req.query.code;
+    if (app) {
+      app.get("/login-otp", async function (req, res) {
+        let code = req.query.code;
 
-      if (code === demoOTP) {
-        const user = {
-          username: demoUsername,
-          password: demoPassword,
-        };
-        // let axoisLocal = await demoSiteMainService.getAxios()
-        // await await axoisLocal.get("/logout");
-        // let login = await axoisLocal.post("/login-user", user);
-        // res.send(login.data.id);
+        if (code === demoOTP) {
+          const user = {
+            username: demoUsername,
+            password: demoPassword,
+          };
+          // let axoisLocal = await demoSiteMainService.getAxios()
+          // await await axoisLocal.get("/logout");
+          // let login = await axoisLocal.post("/login-user", user);
+          // res.send(login.data.id);
 
-        res.redirect(`/login-redirect?username=${user.username}&password=${user.password}`);
-      } else {
-        res.send("Bad Code");
-      }
-    });
-
+          res.redirect(
+            `/login-redirect?username=${user.username}&password=${user.password}`
+          );
+        } else {
+          res.send("Bad Code");
+        }
+      });
+    }
+    
     emitterService.on("processUrl", async function (options) {
       //smart look demo site only
       options.page.isDemoSite = false;
