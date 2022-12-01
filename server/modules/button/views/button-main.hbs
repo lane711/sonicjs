@@ -3,8 +3,8 @@
     <a
       href="{{data.redirectUrl}}" 
       {{#if (eq data.openUrl "newWindow")}}target="_blank"{{/if}}
-      class="btn btn-{{data.style}} btn-{{data.size}}"
-    >{{data.title}}</a>
+      class="btn btn-{{data.style}} btn-{{data.size}} float-{{data.alignment}}"
+    ><i class="bi bi-box-arrow-up-right ms-2"></i>{{data.title}}</a>
   </div>
 {{/if}}
 
@@ -12,7 +12,7 @@
   <div class="col text-center">
     <button
       type="button"
-      class="btn btn-{{data.style}} btn-{{data.size}}"
+      class="btn btn-{{data.style}} btn-{{data.size}} float-{{data.alignment}}"
       onclick="return openFormInModal('create', '{{data.contentTypeToAdd}}')"
     >{{data.title}}</button>
   </div>
