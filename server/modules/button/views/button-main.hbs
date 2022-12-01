@@ -4,7 +4,9 @@
       href="{{data.redirectUrl}}" 
       {{#if (eq data.openUrl "newWindow")}}target="_blank"{{/if}}
       class="btn btn-{{data.style}} btn-{{data.size}} float-{{data.alignment}}"
-    ><i class="bi bi-box-arrow-up-right ms-2"></i>{{data.title}}</a>
+    >
+    <i class="bi bi-{{data.bootstrapIcon}} me-2"></i>
+    {{data.title}}</a>
   </div>
 {{/if}}
 
@@ -14,6 +16,8 @@
       type="button"
       class="btn btn-{{data.style}} btn-{{data.size}} float-{{data.alignment}}"
       onclick="return openFormInModal('create', '{{data.contentTypeToAdd}}')"
-    >{{data.title}}</button>
+    >
+    <i class="bi bi-{{data.bootstrapIcon}} me-2"></i>
+    {{data.title}}</button>
   </div>
 {{/if}}
