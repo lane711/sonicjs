@@ -7,6 +7,7 @@
   var moduleCssFiles = [];
   var moduleJsFiles = [];
   var moduleContentTypeConfigs = [];
+  var moduleContentTypeConfigsAll = [];
   var AccessToken;
   var isRequestAlreadyHandled = false;
   var isBackEnd = false;

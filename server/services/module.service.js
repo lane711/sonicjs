@@ -21,7 +21,6 @@ var enableModulesList = [];
 
 module.exports = moduleService = {
   startup: function (app) {
-
     moduleService.loadModuleOverridersFromEnv();
 
     emitterService.on("startup", async function ({ app }) {
@@ -103,7 +102,7 @@ module.exports = moduleService = {
   //     });
   // },
 
-  loadModuleOverridersFromEnv(){
+  loadModuleOverridersFromEnv() {
     // let enableModulesList = [];
     if (enableModules) {
       enableModulesList = enableModules.split(",");
@@ -112,8 +111,6 @@ module.exports = moduleService = {
   },
 
   loadModuleServices: async function (moduleList, app) {
-
-
     moduleList.forEach(async function (moduleDef) {
       if (enableModulesList.includes(moduleDef.systemId)) {
         moduleDef.enabled = true;
@@ -197,7 +194,7 @@ module.exports = moduleService = {
     let moduleContentTypesAdmin = [];
     moduleContentTypesAdminFiles.map((file) => {
       moduleContentTypesAdmin.push(
-        globalService.moduleContentTypeConfigs.find((f) => f.filePath === file)
+        globalService.moduleContentTypeConfigsAll.find((f) => f.filePath === file)
       );
     });
 
@@ -267,9 +264,12 @@ module.exports = moduleService = {
           let moduleFolder = moduleDef.systemId;
           moduleDef.mainService = `${modulePath}\/${moduleFolder}\/services\/${moduleFolder}-main-service.js`;
           moduleList.push(moduleDef);
-          let isIncludedInEnv = enableModulesList.includes(moduleDef.systemId)
+          let isIncludedInEnv = enableModulesList.includes(moduleDef.systemId);
+
+          let moduleBasePath = `${modulePath}\/${moduleFolder}`;
+          this.getModuleContentTypesConfigs(moduleBasePath, true);
+
           if (moduleDef.enabled || isIncludedInEnv) {
-            let moduleBasePath = `${modulePath}\/${moduleFolder}`;
             this.getModuleCss(moduleBasePath);
             this.getModuleJs(moduleBasePath);
             this.getModuleContentTypesConfigs(moduleBasePath);
@@ -299,7 +299,7 @@ module.exports = moduleService = {
 
     return moduleList;
   },
-  getModuleContentTypesConfigs: function (path) {
+  getModuleContentTypesConfigs: function (path, includeDisabled = false) {
     let moduleCount = 0;
 
     const files = fileService.getFilesSearchSync(path, "/**/*.json");
@@ -315,8 +315,11 @@ module.exports = moduleService = {
             filePath: file.replace(`/${appRoot.path}/g`, ""),
             systemId: contentType.systemId,
           };
-          // console.log('==> moduleContentTypeConfigs push ', contentTypeInfo);
-          globalService.moduleContentTypeConfigs.push(contentTypeInfo);
+          // console.log("==> moduleContentTypeConfigs push ", contentTypeInfo);
+          globalService.moduleContentTypeConfigsAll.push(contentTypeInfo);
+          if (!includeDisabled) {
+            globalService.moduleContentTypeConfigs.push(contentTypeInfo);
+          }
         } else {
           console.log("error on " + file);
         }
@@ -425,6 +428,7 @@ module.exports = moduleService = {
     globalService.moduleCssFiles = [];
     globalService.moduleJsFiles = [];
     globalService.moduleContentTypeConfigs = [];
+    globalService.moduleContentTypeConfigsAll = [];
   },
   getModuleJs: function (path) {
     const files = fileService.getFilesSearchSync(path, "/**/*.js");

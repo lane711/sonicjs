@@ -1,0 +1,10 @@
+{
+  "title": "Project Management",
+  "enabled": true,
+  "systemId": "project-management",
+  "canBeAddedToColumn": true,
+  "sessionID": "undefined",
+  "version": "0.0.0.1",
+  "systemidUpperCase": "PROJECT-MANAGEMENT",
+  "systemidCamelCase": "projectManagement"
+}
