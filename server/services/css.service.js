@@ -89,9 +89,9 @@ module.exports = cssService = {
       );
 
       if (result.filePath === cssFilePath) {
-        res.send(200, "ok");
+        res.status(200).send('ok');
       } else {
-        res.send(500);
+        res.status(500);
       }
     });
   },

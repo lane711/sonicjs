@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js -e hbs,js,css,html --ignore 'template-processed.css' --ignore '*_spec.js'",
+    "dev": "nodemon server.js -e hbs,js,css,html --ignore 'template-processed.css' --ignore 'template.css' --ignore '*_spec.js'" ,
     "test": "npx cypress open"
   },
   "repository": {

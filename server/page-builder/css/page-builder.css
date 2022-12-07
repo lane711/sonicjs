@@ -19,6 +19,7 @@
   font-size: 13px;
   /* transition: left 1s; */
   z-index: 1;
+  background: #fff;
 }
 
 .pb-wrapper.expanded {
