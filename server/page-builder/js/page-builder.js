@@ -1645,6 +1645,7 @@ function getPageTemplateRegion(page, sourceColumn, destinationColumn) {
 }
 
 async function addModuleToColumn(submission) {
+  console.log('addModuleToColumn', submission)
   let entity = processContentFields(submission.data);
 
   let {

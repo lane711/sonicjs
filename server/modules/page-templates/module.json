@@ -2,7 +2,8 @@
   "title": "Page Templates",
   "enabled": true,
   "systemId": "page-templates",
-  "canBeAddedToColumn": false,
+  "icon": "bi-aspect-ratio",
+  "canBeAddedToColumn": true,
   "singleInstance": false,
   "version": "0.0.0.1"
 }
