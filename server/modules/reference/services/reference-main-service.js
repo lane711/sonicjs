@@ -21,11 +21,11 @@ module.exports = referenceMainService = {
         "reference-site-settings"
       );
 
-      if (
-        referenceContentTypes.data.applyToContentTypes.includes(
-          options.contentType.systemId
-        )
-      ) {
+      const isAChild = referenceContentTypes.data.parentChildReferences.filter(
+        (c) => c.children.includes(options.contentType.systemId)
+      );
+
+      if (isAChild.length) {
         //get current reference by url
         let referenceId = "";
         if (options.req.user?.profile) {
@@ -36,12 +36,20 @@ module.exports = referenceMainService = {
           referenceId = reference.id;
         }
 
+
+
+        const parentContentType = isAChild[0].parent;
+
+        const parentContent = await dataService.getContentByType(
+          parentContentType
+        );
+
         //add hidden group field to content type, set current group id
         options.contentType.data.components.splice(-1, 0, {
           type: "textfield",
           inputType: "text",
           key: "referenceId",
-          label: "Parent",
+          label: helperService.titleCase(parentContentType),
           hidden: false,
           input: true,
           defaultValue: referenceId,
@@ -53,14 +61,16 @@ module.exports = referenceMainService = {
     emitterService.on("postModuleGetData", async function (options) {
       if (options.shortcode.name === "REFERENCE") {
         let references = await dataService.getContentByContentType("reference");
-        options.viewModel.references = references.filter((g) => g.data.active === true);
+        options.viewModel.references = references.filter(
+          (g) => g.data.active === true
+        );
 
-        options.viewModel.references.map((g)=>{
+        options.viewModel.references.map((g) => {
           g.data.icon.src = mediaService.getMediaUrl(g.data.icon.file);
-        })
+        });
 
         options.viewModel.contentType = await dataService.contentTypeGet(
-          'reference',
+          "reference",
           options.req
         );
 
@@ -87,7 +97,6 @@ module.exports = referenceMainService = {
       ) {
         // let contentType = await dataService.contentTypeGet(baseContentType);
         // let userRoles = options.req.user?.profile.roles;
-
         // await referenceMainService.processPermissions(
         //   options,
         //   contentType,
@@ -115,14 +124,18 @@ module.exports = referenceMainService = {
     });
   },
 
-  processPermissions: async function (options, contentType, userRoles, sessionID) {
+  processPermissions: async function (
+    options,
+    contentType,
+    userRoles,
+    sessionID
+  ) {
     //set defaults
     // options.viewModel.canView = false;
     // options.viewModel.canCreate = false;
     // options.viewModel.canEdit = false;
     // options.viewModel.canDelete = false;
     // options.viewModel.canVote = false;
-
     // let settings = await dataService.getContentByType("site-settings", sessionID);
     // let acls = settings[0].data.permissionAccessControls.map((a) => a.title);
     // acls.map((a) => {
