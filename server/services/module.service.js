@@ -163,7 +163,7 @@ module.exports = moduleService = {
         return basePath;
       }
     }
-    console.error("*** Can not find module base path *** ", systemId);
+    console.error("*** Can not find module base path *** ", systemId, basePath);
   },
 
   //HACK: doesn't always return path
@@ -176,7 +176,7 @@ module.exports = moduleService = {
       }
     }
     if (global.appPath) {
-      console.log("fall back on globals appPath");
+      console.log("fall back on globals appPath " +global.appPath );
       return globals.appPath;
     }
     console.error("****** can not find app root");
@@ -634,6 +634,8 @@ module.exports = moduleService = {
       key: "submit",
       theme: "primary",
     });
+
+    console.log(`module files create for ${moduleDefinitionFile.systemId}, generating content type....`)
 
     await moduleService.createModuleContentType(contentTypeDef);
 
