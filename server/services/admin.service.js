@@ -48,7 +48,7 @@ module.exports = adminService = {
       connectEnsureLogin.ensureLoggedIn(),
       async function (req, res) {
         if (process.env.MODE !== "dev") {
-          if (adminDomain !== req.host) {
+          if (adminDomain !== req.hostname) {
             res.send(401);
             return;
           }

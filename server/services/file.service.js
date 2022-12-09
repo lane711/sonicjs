@@ -105,7 +105,7 @@ module.exports = fileService = {
       console.log('file not written for security reasons:', filePath)
       return;
     }
-    await fsPromise.writeFile(filePath, fileContent);
+    return fsPromise.writeFile(filePath, fileContent);
   },
 
   uploadBackupFile: async function (file, sessionID) {
