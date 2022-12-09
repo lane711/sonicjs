@@ -26,6 +26,7 @@ module.exports = cssService = {
       }
     });
 
+    //merged css for sections into the main template file
     app.get("/css/template-processed.css", async function (req, res) {
       let originalFilePath = `${frontEndTheme}/css/template.css`;
       let processedFilePath = `/${frontEndTheme}/css/template-processed.css`;

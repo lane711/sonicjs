@@ -215,7 +215,7 @@ module.exports = assetService = {
       options.page.data.links[assetType],
       async (link) => {
         let root = link.path.startsWith("/node_modules");
-        if (link.path.includes("/api/containers/css/download/template.css")) {
+        if (link.path.includes("/css/template-processed.css")) {
           link.path = `${frontEndTheme}/css/template-processed.css`;
         }
         if (!link.path.startsWith('/node_modules') && !link.path.endsWith('template-processed.css')) {
