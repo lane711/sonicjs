@@ -12,51 +12,24 @@
 
           {{#each data.menu}}
 
-          {{#unless this.showChildren}}
-            <li class="nav-item">
-              <a class="nav-link {{#if this.isActive}}active{{/if}}" aria-current="page" href="{{this.data.url}}">{{this.data.title}}</a>
-            </li>
-          {{/unless}}
+            {{#unless this.showChildren}}
+              <li class="nav-item">
+                <a class="nav-link {{#if this.isActive}}active{{/if}}" aria-current="page" href="{{this.data.url}}">{{this.data.title}}</a>
+              </li>
+            {{/unless}}
 
-          {{#if this.showChildren}}
-            <li class="nav-item dropdown {{#if this.isActive}}active{{/if}}">
-              <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">{{this.data.title}}</a>
-              <ul class="dropdown-menu">
-                {{#each this.children}}
-                  <li><a class="dropdown-item" href="{{this.data.url}}">{{this.data.title}}</a></li>
-                {{/each}}
-              </ul>
-            </li>
-          {{/if}}
-
-
-          <!-- <li class="nav-item {{#if this.showChildren}}dropdown{{/if}}">
-            <a class="nav-link {{#if this.isActive}}active{{/if}} {{#if this.showChildren}}dropdown-toggle{{/if}}" href="{{this.data.url}}"
-              {{#if this.showChildren}}data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{/if}}>
-              {{this.data.title}}
-              <span class="sr-only">(current)</span></a>
-    
             {{#if this.showChildren}}
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              {{#each this.children}}
-              <li><a class="dropdown-item" href="{{this.data.url}}">{{this.data.title}}</a></li>
-              {{/each}}
-            </ul>
+              <li class="nav-item dropdown {{#if this.isActive}}active{{/if}}">
+                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">{{this.data.title}}</a>
+                <ul class="dropdown-menu">
+                  {{#each this.children}}
+                    <li><a class="dropdown-item" href="{{this.data.url}}">{{this.data.title}}</a></li>
+                  {{/each}}
+                </ul>
+              </li>
             {{/if}}
-          </li> -->
+
           {{/each}}
-
-
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Dropdown</a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#">Action</a></li>
-              <li><a class="dropdown-item" href="#">Another action</a></li>
-              <li><a class="dropdown-item" href="#">Something else here</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="#">Separated link</a></li>
-            </ul>
-          </li>
 
         </ul>
         <form class="d-flex" style="margin-right:100px;">
