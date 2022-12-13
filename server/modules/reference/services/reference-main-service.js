@@ -22,7 +22,7 @@ module.exports = referenceMainService = {
       );
 
       if (
-        referenceContentTypes.data.applyToContentTypes.includes(
+        referenceContentTypes && referenceContentTypes.data.applyToContentTypes.includes(
           options.contentType.systemId
         )
       ) {
