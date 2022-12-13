@@ -257,7 +257,9 @@ function setupHandlebarsHelpers() {
     },
     comparerow: function (row, column) {
       let cms = _.camelCase(column.title);
-      return row[cms] ? "bi-check-circle-fill text-success" : "bi-x text-danger";
+      return row[cms]
+        ? "bi-check-circle-fill text-success"
+        : "bi-x text-danger";
     },
     setChecked: function (value, currentValue) {
       if (value == currentValue) {
@@ -302,6 +304,7 @@ function setupStaticAssets(app) {
   //   "/api/containers/files/download",
   //   express.static(path.join(appRoot.path, "server/storage/files"))
   // );
+
   app.use(
     "/assets/fonts",
     express.static(path.join(appRoot.path, "node_modules/font-awesome/fonts"))
@@ -329,6 +332,11 @@ function setupStaticAssets(app) {
   app.use(
     "/custom/modules",
     express.static(path.join(appRoot.path, "/custom/modules"))
+  );
+  // # http://localhost:3018/node_modules/inter-ui/Inter (web)/Inter-Italic.woff2?v=3.19
+  app.use(
+    "/assets/css",
+    express.static(path.join(appRoot.path, "node_modules/inter-ui"))
   );
 }
 

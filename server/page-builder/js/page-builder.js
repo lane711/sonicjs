@@ -52,6 +52,9 @@ $(document).ready(async function () {
   setupSiteCss();
   showElements();
   setupFormIsLoadedEvent();
+
+  console.log('pb loaded');
+
 });
 
 function setupSessionID() {
