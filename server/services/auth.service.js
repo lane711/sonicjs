@@ -1,3 +1,8 @@
+/**
+ * Auth Service -
+ * The auth service is responsible for registering and logging in users
+ * @module authService
+ */
 var dataService = require("./data.service");
 var helperService = require("./helper.service");
 var emitterService = require("./emitter.service");

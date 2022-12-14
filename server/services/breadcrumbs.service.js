@@ -1,3 +1,8 @@
+/**
+ * Breadcrumb Service -
+ * The breadcrumb service is responsible for generating site breadcrumbs
+ * @module breadcrumbsService
+ */
 var _ = require('lodash');
 
 module.exports = breadcrumbsService = {

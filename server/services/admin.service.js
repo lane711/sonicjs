@@ -1,3 +1,8 @@
+/**
+ * Admin Service -
+ * The admin service is responsible for rendering the admin UI page.
+ * @module adminService
+ */
 var pageBuilderService = require(".//page-builder.service");
 var formService = require(".//form.service");
 var listService = require(".//list.service");
@@ -405,6 +410,16 @@ module.exports = adminService = {
     );
   },
 
+  /**
+ * Checks if the admin account has already been created
+ * @example
+ * // returns 2
+ * globalNS.method1(5, 10);
+ * @example
+ * // returns 3
+ * globalNS.method(5, 15);
+ * @returns {Boolean} Returns true is admin account is already created
+ */
   checkIfAdminAccountIsCreated: async function () {
     // the must be at least one account
     let users = await dalService.usersGetCount();

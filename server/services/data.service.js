@@ -1,5 +1,5 @@
 /**
- * Data Service module
+ * Data Service module ABCDEF
  * @module dataService
  */
 var verboseLogging = false;

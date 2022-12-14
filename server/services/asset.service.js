@@ -1,3 +1,11 @@
+/**
+ * Asset Service -
+ * The asset service is responsible for processing the css and js files used by the site. 
+ * It is responsible for minimizing assets for production. The assets that are loaded for the site
+ * are combined from various sources: 1) your themes assets.yml file. 2) Assets from the enabled modules 
+ * 3) CSS for sections managed in the page builder  
+ * @module assetService
+ */
 var globalService = require("./global.service");
 var emitterService = require("./emitter.service");
 var fileService = require("./file.service");
