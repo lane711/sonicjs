@@ -450,9 +450,14 @@ module.exports = moduleService = {
 
     let viewPath = `/server/modules/${contentType}/views/${contentType}-main.hbs`;
 
+    let customModuleViewPath = `/custom/modules/${contentType}/views/${contentType}-main.hbs`;
+
     let themeViewPath = `/server/themes/front-end/${frontEndTheme}/modules/${contentType}/views/${contentType}-main.hbs`;
 
-    if (await fileService.fileExists(themeViewPath)) {
+    if (await fileService.fileExists(customModuleViewPath)) {
+      viewPath = customModuleViewPath;
+    }
+    else if (await fileService.fileExists(themeViewPath)) {
       viewPath = themeViewPath;
     }
     return viewPath;
