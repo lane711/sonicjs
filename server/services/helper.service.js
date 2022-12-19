@@ -1,21 +1,8 @@
-// var dataService = require('./data.service');
-// var sanitizeHtml = require('sanitize-html');
-
-// var fs = require('fs');
-// // const axios = require('axios');
-// const ShortcodeTree = require('shortcode-tree').ShortcodeTree;
-// const chalk = require('chalk');
-// const log = console.log;
-
-// import FormioForm from 'formiojs/form';
-
-// import { Form } from 'formiojs';
-
-// const {f} = require('formiojs');
-// var formio = require('formio-service')();
-// var Form = formio.Form;
-
-// const utils = require('formiojs/utils');
+/**
+ * Helper Service -
+ * The heloper service is a set of utiliites used throught SonicJs. IE: slugify, validateEmail, generateRandomString, etc
+ * @module helperService
+ */
 
 (function (exports) {
   var verboseLogging = false;

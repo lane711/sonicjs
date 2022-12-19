@@ -1,3 +1,10 @@
+/**
+ * Module Service -
+ * The module service is resposible for managing the SonicJs' module system. It is one of the more complex services in SonicJs. It process the modules
+ * at system startup and provides all necessary function of each module throught it's life cycle.
+ * @module moduleService
+ */
+
 var path = require("path");
 var fs = require("fs");
 var _ = require("lodash");

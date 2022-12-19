@@ -1,3 +1,9 @@
+/**
+ * Page Builder Service -
+ * The page builider service is resposible for all back end aspects of the front end page builder. 
+ * @module pageBuilderService
+ */
+
 var fs = require("fs");
 const axios = require("axios");
 const ShortcodeTree = require("shortcode-tree").ShortcodeTree;

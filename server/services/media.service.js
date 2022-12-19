@@ -1,3 +1,8 @@
+/**
+ * Media Service -
+ * The media service is respoinsible managing site assets such as images and videos. It can manage assets on the file system or Amazon S3.
+ * @module mediaService
+ */
 var dataService = require("./data.service");
 var helperService = require("./helper.service");
 var emitterService = require("./emitter.service");

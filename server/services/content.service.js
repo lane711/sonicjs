@@ -1,6 +1,11 @@
+/**
+ * Content Service -
+ * The content service is respoinsible for the actual rendering of pages. This is the service that processes secions, rows, column and triggers the modeuls 
+ * in each column to be rendered.
+ * @module contentService
+ */
 var pageBuilderService = require(".//page-builder.service");
 var formService = require(".//form.service");
-var listService = require(".//list.service");
 var menuService = require(".//menu.service");
 var helperService = require(".//helper.service");
 var userService = require(".//user.service");
@@ -464,13 +469,13 @@ module.exports = contentService = {
     page.data.html = page.data.html.replace(shortcode.codeText, form);
   },
 
-  replaceListShortCode: async function (page, shortcode) {
-    let blockId = shortcode.properties.id;
-    let contentType = shortcode.properties.contentType;
+  // replaceListShortCode: async function (page, shortcode) {
+  //   let blockId = shortcode.properties.id;
+  //   let contentType = shortcode.properties.contentType;
 
-    let list = await listService.getList(contentType);
-    page.data.html = page.data.html.replace(shortcode.codeText, list);
-  },
+  //   let list = await listService.getList(contentType);
+  //   page.data.html = page.data.html.replace(shortcode.codeText, list);
+  // },
 
   asyncForEach: async function (array, callback) {
     for (let index = 0; index < array.length; index++) {

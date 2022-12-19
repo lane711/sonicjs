@@ -1,3 +1,10 @@
+/**
+ * Install Service -
+ * The install service is run when SonicJs first starts up. It is responsible for making sure the your database contains certain must-have records. 
+ * It also contain so migration examples.
+ * @module installService
+ */
+
 var dalService = require("./dal.service");
 var dataService = require("./data.service");
 

@@ -1,3 +1,8 @@
+/**
+ * Crypto Service -
+ * The crypto service exposes the encrypt and decrypt methods, primarily for safely storing user password
+ * @module cryptoService
+ */
 var crypto = require('crypto'),
     algorithm = 'aes-256-ctr',
     password = process.env.CRYPTO_PASSWORD;

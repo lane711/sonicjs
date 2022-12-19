@@ -1,3 +1,8 @@
+/**
+ * CSS Service -
+ * The css service processes the template file and support front end css updates from the page builder. It also manages merging in section styles into the main template.css file
+ * @module cssService
+ */
 var dataService = require("./data.service");
 var helperService = require("./helper.service");
 var fileService = require("./file.service");

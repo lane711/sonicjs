@@ -1,5 +1,7 @@
 /**
- * Data Service module ABCDEF
+ * Data Service -
+ * The data service is the primary service used for access SonicJs' persistence layer. It generates the graphql queries that 
+ * are executes on SonicJs' api layer. It passes along any necessary session data along with the data related paramwters.
  * @module dataService
  */
 var verboseLogging = false;

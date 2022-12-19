@@ -1,3 +1,9 @@
+/**
+ * Form Service -
+ * The form service is responsible for generating the data entry forms that are used both on the front end and back end aministratice sections. 
+ * SonicJs uses form.io, an open source form generator.
+ * @module formService
+ */
 isBackEndMode = false;
 var axiosInstance;
 

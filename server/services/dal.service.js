@@ -1,3 +1,9 @@
+/**
+ * DAL Service -
+ * The DAL service is the data access layer of SonicJs. You will typically use the dataServie as it take the user session and the user's role into account.
+ * However, there are a few instances where you may need to access the DAL directly such as scheduled jobs. Alsway attempt to use the dataSerivce first and use the dalService only as a last resort.
+ * @module dalService
+ */
 const { getRepository, Like } = require("typeorm");
 const { Content } = require("../data/model/Content");
 const { User } = require("../data/model/User");

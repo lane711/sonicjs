@@ -1,3 +1,9 @@
+/**
+ * S3 Service -
+ * The S3 service is used to manage asset's on Amazon's S3 service. 
+ * @module s3Service
+ */
+
 const fs = require("fs");
 const AWS = require("aws-sdk");
 var appRoot = require("app-root-path");

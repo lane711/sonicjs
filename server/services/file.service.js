@@ -1,3 +1,8 @@
+/**
+ * File Service -
+ * The service is responsible for filesystem IO operations.
+ * @module fileService
+ */
 var dataService = require("./data.service");
 var helperService = require("./helper.service");
 var emitterService = require("./emitter.service");
