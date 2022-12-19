@@ -5,7 +5,6 @@
  */
 var pageBuilderService = require(".//page-builder.service");
 var formService = require(".//form.service");
-var listService = require(".//list.service");
 var menuService = require(".//menu.service");
 var helperService = require(".//helper.service");
 var dataService = require(".//data.service");

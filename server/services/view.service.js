@@ -1,3 +1,9 @@
+/**
+ * View Service -
+ * The view service processes views. This service provides integration with the Handlebars view engine.
+ * @module urlService
+ */
+
 var dataService = require('./data.service');
 var helperService = require('./helper.service');
 var fileService = require('./file.service');
