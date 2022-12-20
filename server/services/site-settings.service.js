@@ -1,3 +1,9 @@
+/**
+ * Site Settings Service -
+ * The site settings service adds the site settings data object to each request for use in downstream processes.
+ * @module siteSettingsService
+ */
+
 var dataService = require('./data.service');
 var helperService = require('./helper.service');
 var emitterService = require('./emitter.service');

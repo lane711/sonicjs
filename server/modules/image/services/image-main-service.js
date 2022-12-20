@@ -16,6 +16,8 @@ module.exports = imageMainService = {
         return;
       }
 
+      options.viewModel.data.width = options.viewModel.data.width ? options.viewModel.data.width : '100%';
+
       if (options.viewModel.data.thumbnailWidth === 0) {
         options.viewModel.data.thumbnailWidth = "100%";
         return;

@@ -1,3 +1,10 @@
+/**
+ * Migration Service -
+ * The migration service is respoinsible for managing data migrations. SonicJs rarely needs to run site migration from one version to another due 
+ * to its simple data model.
+ * @module migrationService
+ */
+
 const https = require("https");
 fs = require("fs");
 var unzipper = require("unzipper");

@@ -3,6 +3,10 @@
     top: 56px;
 }
 
+.demo section.hero{
+    padding-top:118px;
+}
+
 .demo-alert
 {
     border:0;

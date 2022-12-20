@@ -1,3 +1,8 @@
+/**
+ * Backup-Restore Service -
+ * The backup-restore service is responsible for restoring data from SonicJs' json based data backup system
+ * @module backupRestoreService
+ */
 const https = require("https");
 fs = require("fs");
 var unzipper = require("unzipper");

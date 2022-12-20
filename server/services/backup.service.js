@@ -1,3 +1,8 @@
+/**
+ * Backup Service -
+ * The backup service is responsible for backing up all database data into json files (one for each db record) and then zipping them up.
+ * @module backupService
+ */
 const https = require("https");
 fs = require("fs");
 var appRoot = require("app-root-path");

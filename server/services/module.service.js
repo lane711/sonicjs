@@ -1,3 +1,10 @@
+/**
+ * Module Service -
+ * The module service is resposible for managing the SonicJs' module system. It is one of the more complex services in SonicJs. It process the modules
+ * at system startup and provides all necessary function of each module throught it's life cycle.
+ * @module moduleService
+ */
+
 var path = require("path");
 var fs = require("fs");
 var _ = require("lodash");
@@ -10,6 +17,7 @@ var viewService = require("../services/view.service");
 var dataService = require("../services/data.service");
 var formattingService = require("../services/formatting.service");
 var contentService = require("../services/content.service");
+var helperService = require("../services/helper.service");
 
 var appRoot = require("app-root-path");
 var frontEndTheme = `${process.env.FRONT_END_THEME}`;
@@ -154,6 +162,7 @@ module.exports = moduleService = {
   getBasePath: async function (systemId) {
     let root = await this.getAppRoot();
     let basePath = `${root}/server/modules/${systemId}`;
+    // console.log('getBasePath path', basePath);
 
     if (await fileService.fileExists(`${basePath}/module.json`, true)) {
       return basePath;
@@ -163,7 +172,7 @@ module.exports = moduleService = {
         return basePath;
       }
     }
-    console.error("*** Can not find module base path *** ", systemId);
+    console.error("*** Can not find module base path *** ", systemId, basePath);
   },
 
   //HACK: doesn't always return path
@@ -176,7 +185,7 @@ module.exports = moduleService = {
       }
     }
     if (global.appPath) {
-      console.log("fall back on globals appPath");
+      console.log("fall back on globals appPath " +global.appPath );
       return globals.appPath;
     }
     console.error("****** can not find app root");
@@ -448,9 +457,14 @@ module.exports = moduleService = {
 
     let viewPath = `/server/modules/${contentType}/views/${contentType}-main.hbs`;
 
+    let customModuleViewPath = `/custom/modules/${contentType}/views/${contentType}-main.hbs`;
+
     let themeViewPath = `/server/themes/front-end/${frontEndTheme}/modules/${contentType}/views/${contentType}-main.hbs`;
 
-    if (await fileService.fileExists(themeViewPath)) {
+    if (await fileService.fileExists(customModuleViewPath)) {
+      viewPath = customModuleViewPath;
+    }
+    else if (await fileService.fileExists(themeViewPath)) {
       viewPath = themeViewPath;
     }
     return viewPath;
@@ -569,20 +583,20 @@ module.exports = moduleService = {
 
     //create default assets
     let defaultCssFile = `/* Css File for Module: ${moduleDefinitionFile.systemId} */`;
-    fileService.writeFile(
+    await fileService.writeFile(
       `${basePath}/assets/css/${moduleDefinitionFile.systemId}-module.css`,
       defaultCssFile
     );
 
     let defaultJsFile = `// JS File for Module: ${moduleDefinitionFile.systemId}`;
-    fileService.writeFile(
+    await fileService.writeFile(
       `${basePath}/assets/js/${moduleDefinitionFile.systemId}-module.js`,
       defaultJsFile
     );
 
     //create default view
     let defaultViewFile = `<div>Hello to you {{ data.firstName }} from the ${moduleDefinitionFile.title} module!</div>`;
-    fileService.writeFile(
+    await fileService.writeFile(
       `${basePath}/views/${moduleDefinitionFile.systemId}-main.hbs`,
       defaultViewFile
     );
@@ -601,13 +615,13 @@ module.exports = moduleService = {
       moduleDefinitionFile,
       mainServiceFilePath
     );
-    fileService.writeFile(
+    await fileService.writeFile(
       `${basePath}/services/${moduleDefinitionFile.systemId}-main-service.js`,
       mainServiceFile
     );
 
     //create module def file
-    fileService.writeFile(
+    await fileService.writeFile(
       `${basePath}/module.json`,
       JSON.stringify(moduleDefinitionFile, null, 2)
     );
@@ -634,6 +648,12 @@ module.exports = moduleService = {
       key: "submit",
       theme: "primary",
     });
+
+    
+
+    console.log(`module files create for ${moduleDefinitionFile.systemId}, generating content type....`)
+    //hack waiting for files to be generated
+    // helperService.sleep(500);
 
     await moduleService.createModuleContentType(contentTypeDef);
 

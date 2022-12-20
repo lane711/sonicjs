@@ -1,20 +1,20 @@
 {{#if (eq data.buttonType "url")}}
-  <div class="col text-center">
+  <p class="text-{{data.alignment}} {{data.css}}">
     <a
       href="{{data.redirectUrl}}" 
       {{#if (eq data.openUrl "newWindow")}}target="_blank"{{/if}}
-      class="btn btn-{{data.style}} btn-{{data.size}} float-{{data.alignment}}"
+      class="btn btn-{{data.style}} btn-{{data.size}}"
     >
     <i class="bi bi-{{data.bootstrapIcon}} me-2"></i>
     {{data.title}}</a>
-  </div>
+  </p>
 {{/if}}
 
 {{#if (eq data.buttonType "addContent")}}
-  <div class="col text-center">
+  <div class="col">
     <button
       type="button"
-      class="btn btn-{{data.style}} btn-{{data.size}} float-{{data.alignment}}"
+      class="btn btn-{{data.style}} btn-{{data.size}} text-{{data.alignment}}"
       onclick="return openFormInModal('create', '{{data.contentTypeToAdd}}')"
     >
     <i class="bi bi-{{data.bootstrapIcon}} me-2"></i>

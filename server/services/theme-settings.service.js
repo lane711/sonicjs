@@ -1,3 +1,9 @@
+/**
+ * Theme Service -
+ * The theme service is adds runtime data for use in theme rendering. IE it provides the current year for use in the site footer.
+ * @module themeService
+ */
+
 var dataService = require("./data.service");
 var helperService = require("./helper.service");
 var emitterService = require("./emitter.service");

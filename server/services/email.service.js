@@ -1,3 +1,9 @@
+/**
+ * Email Service -
+ * The email service is responsible for sending transactional emails. It currently uses sendgrid but can easily be expanded 
+ * to include other email providers.
+ * @module emailService
+ */
 var dataService = require("./data.service");
 var helperService = require("./helper.service");
 var emitterService = require("./emitter.service");

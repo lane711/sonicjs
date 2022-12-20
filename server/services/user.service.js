@@ -1,3 +1,9 @@
+/**
+ * User Service -
+ * The user service manages site users, including role checking
+ * @module userService
+ */
+
 var dataService = require("./data.service");
 var helperService = require("./helper.service");
 var emitterService = require("./emitter.service");

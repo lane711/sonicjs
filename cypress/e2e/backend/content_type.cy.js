@@ -24,14 +24,20 @@ describe("Admin Content Types", function () {
     //first create a module
     cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/modules`);
     cy.contains("New Module").click();
-    cy.get('input[name="data[title]"]').type("AA Cypress Module Content Type", { delay: 0 });
+    cy.get('input[name="data[title]"]').type("AA Cypress Module Content Type");
     cy.wait(500); //wait for system id function to run
 
     cy.contains("Create Module").click();
+    //
+ 
 
     cy.wait(1000); //wait for system id function to run
 
-    cy.url().should("include", "/admin/modules");
+    cy.url().should(
+      "include",
+      "/admin/modules"
+    );
+
     cy.contains("AA Cypress Module Content Type");
 
   });

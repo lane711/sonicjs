@@ -1,0 +1,11 @@
+{{#each data.apis}}
+<div class="api-service-wrapper">
+  <h3>{{this.name}}</h3>
+  <div class="alert alert-secondary" role="alert">
+    [root]/server/services/{{this.fileName}}</div>
+  <p>{{{this.description}}}</p>
+  <!-- <a href="/docs/developer-guide/api-backend/{{this.slug}}-service" class="btn btn-primary btn-medium">
+    <i class="bi bi-box-arrow-in-down-right me-2"></i>
+    {{this.fileName}} Details</a> -->
+  </div>
+{{/each}}

@@ -1,3 +1,9 @@
+/**
+ * Test Service -
+ * The test service is contains utilities that accomadate Cypress end to end testing
+ * @module testService
+ */
+
 const dalService = require("./dal.service");
 const moduleService = require("./module.service");
 

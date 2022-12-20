@@ -1,3 +1,9 @@
+/**
+ * Shared Service -
+ * The shared service is resposible for a few helper sytle functions.
+ * @module sharedService
+ */
+
 (function(exports) {
   exports.test = function() {
     return "hello world";

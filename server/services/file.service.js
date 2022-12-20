@@ -1,3 +1,8 @@
+/**
+ * File Service -
+ * The service is responsible for filesystem IO operations.
+ * @module fileService
+ */
 var dataService = require("./data.service");
 var helperService = require("./helper.service");
 var emitterService = require("./emitter.service");
@@ -105,7 +110,7 @@ module.exports = fileService = {
       console.log('file not written for security reasons:', filePath)
       return;
     }
-    await fsPromise.writeFile(filePath, fileContent);
+    return fsPromise.writeFile(filePath, fileContent);
   },
 
   uploadBackupFile: async function (file, sessionID) {

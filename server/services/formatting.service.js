@@ -1,3 +1,9 @@
+/**
+ * Formatting Service -
+ * The formatting serivce is responsible for simple formatting needs of the system. IE date formats, title formating, etc
+ * @module formattingervice
+ */
+
 //check if running in node (and not the browser)
 if (typeof module !== "undefined" && module.exports) {
   var moment = require("moment");

@@ -11,20 +11,24 @@
         <ul class="navbar-nav me-auto mb-2 mb-md-0">
 
           {{#each data.menu}}
-          <li class="nav-item {{#if this.showChildren}}dropdown{{/if}}">
-            <a class="nav-link {{#if this.isActive}}active{{/if}} {{#if this.showChildren}}dropdown-toggle{{/if}}" href="{{this.data.url}}"
-              {{#if this.showChildren}}data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{/if}}>
-              {{this.data.title}}
-              <span class="sr-only">(current)</span></a>
-    
+
+            {{#unless this.showChildren}}
+              <li class="nav-item">
+                <a class="nav-link {{#if this.isActive}}active{{/if}}" aria-current="page" href="{{this.data.url}}">{{this.data.title}}</a>
+              </li>
+            {{/unless}}
+
             {{#if this.showChildren}}
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              {{#each this.children}}
-              <a class="dropdown-item" href="{{this.data.url}}">{{this.data.title}}</a>
-              {{/each}}
-            </div>
+              <li class="nav-item dropdown {{#if this.isActive}}active{{/if}}">
+                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">{{this.data.title}}</a>
+                <ul class="dropdown-menu">
+                  {{#each this.children}}
+                    <li><a class="dropdown-item" href="{{this.data.url}}">{{this.data.title}}</a></li>
+                  {{/each}}
+                </ul>
+              </li>
             {{/if}}
-          </li>
+
           {{/each}}
 
         </ul>

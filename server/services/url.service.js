@@ -1,3 +1,9 @@
+/**
+ * Url Service -
+ * The url service manage the in-memory url table used for mapping routes to services
+ * @module urlService
+ */
+
 const NodeCache = require("node-cache");
 const { values } = require("underscore");
 const urlCache = new NodeCache();

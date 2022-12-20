@@ -38,18 +38,6 @@ describe("Admin Users", function () {
     cy.contains("Submit").click();
     cy.wait(1000);
     cy.url().should('include', '/admin/users');
-
-    //delete
-    cy.get('[data-email="cypress-test-cleanup-tag@test.com"]').click();
-
-    // cy.wait(1000);
-    cy.contains("Confirm Delete").click();
-
-    // cy.wait(1000);
-
-    // cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/users`);
-
-    cy.contains("cypress-test-cleanup-tag@test.com").should("not.exist");
   });
 
   it("User delete", function () {
@@ -59,12 +47,13 @@ describe("Admin Users", function () {
 
     cy.get('[data-email="cypress-test-cleanup-tag@test.com"]').click();
 
-    // cy.wait(1000);
+    cy.wait(1000);
+
     cy.contains("Confirm Delete").click();
 
-    // cy.wait(1000);
+    cy.wait(1000);
 
-    // cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/users`);
+    cy.visit(`${cy.SonicJs.getBaseUrl()}/admin/users`);
 
     cy.contains("cypress-test-cleanup-tag@test.com").should("not.exist");
   });

@@ -52,6 +52,9 @@ $(document).ready(async function () {
   setupSiteCss();
   showElements();
   setupFormIsLoadedEvent();
+
+  console.log('pb loaded');
+
 });
 
 function setupSessionID() {
@@ -1645,6 +1648,7 @@ function getPageTemplateRegion(page, sourceColumn, destinationColumn) {
 }
 
 async function addModuleToColumn(submission) {
+  console.log('addModuleToColumn', submission)
   let entity = processContentFields(submission.data);
 
   let {

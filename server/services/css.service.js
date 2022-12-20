@@ -1,3 +1,8 @@
+/**
+ * CSS Service -
+ * The css service processes the template file and support front end css updates from the page builder. It also manages merging in section styles into the main template.css file
+ * @module cssService
+ */
 var dataService = require("./data.service");
 var helperService = require("./helper.service");
 var fileService = require("./file.service");
@@ -26,6 +31,7 @@ module.exports = cssService = {
       }
     });
 
+    //merged css for sections into the main template file
     app.get("/css/template-processed.css", async function (req, res) {
       let originalFilePath = `${frontEndTheme}/css/template.css`;
       let processedFilePath = `/${frontEndTheme}/css/template-processed.css`;

@@ -1,3 +1,10 @@
+/**
+ * Menu Service -
+ * The menu service is respoinsible for managing site menus. It processes menu hierachys, for example it can determine if the 1st level menu item should
+ * be set to active if a child item is presently being viewed by the user.
+ * @module menuService
+ */
+
 var dataService = require("./data.service");
 var helperService = require("./helper.service");
 var emitterService = require("./emitter.service");

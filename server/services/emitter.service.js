@@ -1,3 +1,9 @@
+/**
+ * Emitter Service -
+ * The emitter service is the foundation of SonicJs' hook system. It uses the event-emitter design pattern to manage the hooks that can 
+ * be utilized in other services and modules.
+ * @module emitterService
+ */
 var emitterList = [];
 const verboseLogging = process.env.APP_LOGGING === "verbose";
 
