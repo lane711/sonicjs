@@ -50,4 +50,8 @@ padding-top: 9rem!important
 padding-bottom: 9rem!important
 }
 
+.under-menu-spacer {
+  height: 80px
+}
+
 .overlay-6997e1339832{background: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.66))}
