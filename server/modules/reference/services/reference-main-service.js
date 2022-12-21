@@ -202,10 +202,34 @@ module.exports = referenceMainService = {
         );
 
         if (reference) {
+          let parentDataList = options.viewModel.list;
+
           const childrenContentTypes = reference.children;
-          for(childrenContentType of childrenContentTypes){
-            const childData = dataService.getContentByType(childrenContentType);
+          for (childrenContentType of childrenContentTypes) {
+
+            const childData = await dataService.getContentByType(
+              childrenContentType,
+              options.req.sessionID
+            );
+            // add child data to parent data
+            for (parentData of parentDataList) {
+              let childDataOfParent = childData.filter(
+                (c) => c.data["project"] === parentData.id
+              ) ?? [];
+              parentData.data.children = parentData.data.children ?? [];
+              // childDateToAdd = [];
+              // if (childDataOdParent) {
+              //   childDateToAdd = parentData.data.children.data.push(parentData.child);
+              // }
+              parentData.data.children.push({
+                contentType: childrenContentType,
+                data: childDataOfParent,
+                hasChildren: childDataOfParent.length
+              });
+
+            }
           }
+          let x;
         }
 
         // let contentType = await dataService.contentTypeGet(baseContentType);
