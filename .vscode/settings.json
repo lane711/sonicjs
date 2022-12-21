@@ -3,7 +3,9 @@
         "*.hbs": "html"
       },
       "files.exclude": {
-        "**/combined-*": true
+        "**/combined-*": true,
+        "**/node_modules": true,
+        "**/docs/json": true,
       },
       "workbench.colorCustomizations": {
         "activityBar.background": "#2F1282",

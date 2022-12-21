@@ -36,137 +36,128 @@ module.exports = referenceMainService = {
           referenceId = reference.id;
         }
 
-
-
         const parentContentType = isAChild[0].parent;
 
         const parentContent = await dataService.getContentByType(
           parentContentType
         );
 
+        const parentData = parentContent.map((p) => {
+          return { label: p.data.title, value: p.id };
+        });
+
         //add hidden group field to content type, set current group id
         //needs to be a autocomplete dropdown
-        options.contentType.data.components.splice(-1, 0, 
-          {
-            "label": "Project",
-            "labelPosition": "top",
-            "widget": "choicesjs",
-            "placeholder": "",
-            "description": "",
-            "tooltip": "",
-            "customClass": "",
-            "tabindex": "",
-            "hidden": false,
-            "hideLabel": false,
-            "uniqueOptions": false,
-            "autofocus": false,
-            "disabled": false,
-            "tableView": true,
-            "modalEdit": false,
-            "multiple": false,
-            "dataSrc": "values",
-            "data": {
-              "values": [
-                {
-                  "label": "Project A",
-                  "value": "projectA"
-                },
-                {
-                  "label": "Project B",
-                  "value": "projectB"
-                }
-              ],
-              "resource": "",
-              "json": "",
-              "url": "",
-              "custom": ""
-            },
-            "dataType": "",
-            "idPath": "id",
-            "valueProperty": "",
-            "template": "<span>{{ item.label }}</span>",
-            "refreshOn": "",
-            "refreshOnBlur": "",
-            "clearOnRefresh": false,
-            "searchEnabled": true,
-            "selectThreshold": 0.3,
-            "readOnlyValue": false,
-            "customOptions": {},
-            "useExactSearch": false,
-            "persistent": true,
-            "protected": false,
-            "dbIndex": false,
-            "encrypted": false,
-            "clearOnHide": true,
-            "customDefaultValue": "",
-            "calculateValue": "",
-            "calculateServer": false,
-            "allowCalculateOverride": false,
-            "validateOn": "change",
-            "validate": {
-              "required": false,
-              "onlyAvailableItems": false,
-              "customMessage": "",
-              "custom": "",
-              "customPrivate": false,
-              "json": "",
-              "strictDateValidation": false,
-              "multiple": false,
-              "unique": false
-            },
-            "unique": false,
-            "errorLabel": "",
-            "errors": "",
-            "key": "project",
-            "tags": [],
-            "properties": {},
-            "conditional": {
-              "show": null,
-              "when": null,
-              "eq": "",
-              "json": ""
-            },
-            "customConditional": "",
-            "logic": [],
-            "attributes": {},
-            "overlay": {
-              "style": "",
-              "page": "",
-              "left": "",
-              "top": "",
-              "width": "",
-              "height": ""
-            },
-            "type": "select",
-            "indexeddb": {
-              "filter": {}
-            },
-            "selectFields": "",
-            "searchField": "",
-            "searchDebounce": 0.3,
-            "minSearch": 0,
-            "filter": "",
-            "limit": 100,
-            "redrawOn": "",
-            "input": true,
-            "prefix": "",
-            "suffix": "",
-            "dataGridLabel": false,
-            "showCharCount": false,
-            "showWordCount": false,
-            "allowMultipleMasks": false,
-            "addons": [],
-            "lazyLoad": true,
-            "authenticate": false,
-            "ignoreCache": false,
-            "fuseOptions": {
-              "include": "score",
-              "threshold": 0.3
-            },
-            "id": "refIdFromCode",
-            "defaultValue": ""
-          }
-          );
+        options.contentType.data.components.splice(-1, 0, {
+          label: "Project",
+          labelPosition: "top",
+          widget: "choicesjs",
+          placeholder: "",
+          description: "",
+          tooltip: "",
+          customClass: "",
+          tabindex: "",
+          hidden: false,
+          hideLabel: false,
+          uniqueOptions: false,
+          autofocus: false,
+          disabled: false,
+          tableView: true,
+          modalEdit: false,
+          multiple: false,
+          dataSrc: "values",
+          data: {
+            values: parentData,
+            resource: "",
+            json: "",
+            url: "",
+            custom: "",
+          },
+          dataType: "",
+          idPath: "id",
+          valueProperty: "",
+          template: "<span>{{ item.label }}</span>",
+          refreshOn: "",
+          refreshOnBlur: "",
+          clearOnRefresh: false,
+          searchEnabled: true,
+          selectThreshold: 0.3,
+          readOnlyValue: false,
+          customOptions: {},
+          useExactSearch: false,
+          persistent: true,
+          protected: false,
+          dbIndex: false,
+          encrypted: false,
+          clearOnHide: true,
+          customDefaultValue: "",
+          calculateValue: "",
+          calculateServer: false,
+          allowCalculateOverride: false,
+          validateOn: "change",
+          validate: {
+            required: false,
+            onlyAvailableItems: false,
+            customMessage: "",
+            custom: "",
+            customPrivate: false,
+            json: "",
+            strictDateValidation: false,
+            multiple: false,
+            unique: false,
+          },
+          unique: false,
+          errorLabel: "",
+          errors: "",
+          key: "project",
+          tags: [],
+          properties: { fromCustomCode: true },
+          conditional: {
+            show: null,
+            when: null,
+            eq: "",
+            json: "",
+          },
+          customConditional: "",
+          logic: [],
+          attributes: {},
+          overlay: {
+            style: "",
+            page: "",
+            left: "",
+            top: "",
+            width: "",
+            height: "",
+          },
+          type: "select",
+          indexeddb: {
+            filter: {},
+          },
+          selectFields: "",
+          searchField: "",
+          searchDebounce: 0.3,
+          minSearch: 0,
+          filter: "",
+          limit: 100,
+          redrawOn: "",
+          input: true,
+          prefix: "",
+          suffix: "",
+          dataGridLabel: false,
+          showCharCount: false,
+          showWordCount: false,
+          allowMultipleMasks: false,
+          addons: [],
+          lazyLoad: true,
+          authenticate: false,
+          ignoreCache: false,
+          fuseOptions: {
+            include: "score",
+            threshold: 0.3,
+          },
+          id: "refIdFromCode",
+          defaultValue: "",
+        });
       }
     });
 
@@ -204,9 +195,19 @@ module.exports = referenceMainService = {
         ""
       );
 
-      if (
-        groupContentTypes.data.applyToContentTypes.includes(baseContentType)
-      ) {
+      //check if parent/child relationship exists, if so, get child data
+      if (groupContentTypes.data.parentChildReferences.length) {
+        const reference = groupContentTypes.data.parentChildReferences.find(
+          (p) => p.parent[0] === options.viewModel.data.contentTypeToLoad
+        );
+
+        if (reference) {
+          const childrenContentTypes = reference.children;
+          for(childrenContentType of childrenContentTypes){
+            const childData = dataService.getContentByType(childrenContentType);
+          }
+        }
+
         // let contentType = await dataService.contentTypeGet(baseContentType);
         // let userRoles = options.req.user?.profile.roles;
         // await referenceMainService.processPermissions(
