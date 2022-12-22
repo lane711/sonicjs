@@ -2322,6 +2322,11 @@ function pageBuilderFormChanged(data) {
     return;
   }
 
+  //if page builder not expanded
+  if(!$('.pb-wrapper .expanded').length){
+    return;
+  }
+
   // if(data.changed){
   //   console.log('form is dirty')
   //   formIsDirty = true;

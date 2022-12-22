@@ -1,18 +1,31 @@
-<div class="row">
 {{#each list}}
-  <div class="col{{../data.bootstrapColumnClass}} text-{{../data.textJustification}}">
-    <h3>{{this.data.title}}</h3>
-    {{{this.data.body}}}
-    {{log this}}
-    Children:
+  <div class="row mb-5">
+    <h2>{{this.data.title}}</h2>
+      {{{this.data.body}}}
+
+      {{#each this.data.children}}
+
+      <div class="col">
+        <div class="card">
+          <div class="card-header">
+            {{this.contentType}} <button type="button" class="btn btn-small btn-success float-end" onclick="return openFormInModal('create', '{{this.contentType}}')"><i class="bi bi-plus-square"></i></button>
+          </div>
+
+          {{#if this.hasChildren}}
+            <ul class="list-group list-group-flush">
+              {{#each this.data}}
+                <li class="list-group-item">
+                  <a href="javascript:void(0)" onclick="return openFormInModal('detail', '{{this.contentTypeId}}', '{{ this.id }}')" >{{this.data.title}}</a>
+                  <button type="button" class="btn btn-small btn-danger float-end" onclick="return openFormInModal('delete', null, '{{this.id}}')"><i class="bi bi-trash"></i></button>      
+                  <button type="button" class="btn btn-small btn-primary float-end me-2" onclick="return openFormInModal('edit', '{{this.contentTypeId}}', '{{this.id}}')"><i class="bi bi-pencil"></i></button>
+                </li>
+              {{/each}}
+              </ul>
+          {{/if}}
+        </div>
+      </div>
+      {{/each}}
+
   </div>
 {{/each}}
 </div>
-
-{{#if data.seeMoreLinkCopy}}
-<div class="row text-center">
-  <div class="col">
-   <a href=""#">{{data.seeMoreLinkCopy}}</a>
-  </div>
-</div>
-{{/if}}

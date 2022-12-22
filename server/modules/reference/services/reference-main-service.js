@@ -64,7 +64,7 @@ module.exports = referenceMainService = {
           disabled: false,
           tableView: true,
           modalEdit: false,
-          multiple: false,
+          multiple: true,
           dataSrc: "values",
           data: {
             values: parentData,
@@ -214,7 +214,7 @@ module.exports = referenceMainService = {
             // add child data to parent data
             for (parentData of parentDataList) {
               let childDataOfParent = childData.filter(
-                (c) => c.data["project"] === parentData.id
+                (c) => c.data["project"].includes(parentData.id)
               ) ?? [];
               parentData.data.children = parentData.data.children ?? [];
               // childDateToAdd = [];
