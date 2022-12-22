@@ -36,11 +36,11 @@ function fullPageUpdate(url = undefined) {
   }
 }
 
-async function openFormInModal(action, contentType, id) {
+async function openFormInModal(action, contentType, id, options) {
   await openDetailForm(action, id);
   await openEditForm(action, id);
   await openDeleteForm(action, id);
-  await openCreateForm(action, contentType);
+  await openCreateForm(action, contentType, options);
 }
 
 async function openDetailForm(action, id) {
@@ -109,7 +109,7 @@ async function confirmDelete(id) {
   });
 }
 
-async function openCreateForm(action, contentType) {
+async function openCreateForm(action, contentType, options) {
   if (action === "create") {
     let form = await dataService.formGet(
       contentType,
@@ -118,7 +118,9 @@ async function openCreateForm(action, contentType) {
       undefined,
       undefined,
       $("#sessionID").val(),
-      window.location.pathname
+      window.location.pathname,
+      false,
+      options.defaults
     );
 
     // debugger;

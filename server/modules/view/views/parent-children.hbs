@@ -8,7 +8,7 @@
       <div class="col">
         <div class="card">
           <div class="card-header">
-            {{this.contentType}} <button type="button" class="btn btn-small btn-success float-end" onclick="return openFormInModal('create', '{{this.contentType}}')"><i class="bi bi-plus-square"></i></button>
+            {{this.contentType}} <button type="button" class="btn btn-small btn-success float-end" onclick="return openFormInModal('create', '{{this.contentType}}', null, {defaults:[{project:'{{../id}}'}]})"><i class="bi bi-plus-square"></i></button>
           </div>
 
           {{#if this.hasChildren}}

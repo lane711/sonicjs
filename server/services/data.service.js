@@ -198,14 +198,17 @@ if (typeof module !== "undefined" && module.exports) {
       formSettingsId,
       sessionID,
       referringUrl,
-      showBuilder = false
+      showBuilder = false,
+      defaults = []
     ) {
       let contentString = content ? JSON.stringify(content) : "";
+      let defaultsString = defaults ? JSON.stringify(defaults) : "";
 
       const query = `
       {
         form (contentType: "${contentTypeId}",
         content: """${contentString}""",
+        defaults: """${defaultsString}""",
         onFormSubmitFunction: """${onFormSubmitFunction}""",
         returnModuleSettings: ${returnModuleSettings},
         formSettingsId: "${formSettingsId ?? ""}",

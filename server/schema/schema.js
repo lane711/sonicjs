@@ -381,6 +381,7 @@ const RootQuery = new GraphQLObjectType({
       args: {
         contentType: { type: GraphQLString },
         content: { type: GraphQLString },
+        defaults: { type: GraphQLString },
         id: { type: GraphQLString },
         onFormSubmitFunction: { type: GraphQLString },
         returnModuleSettings: { type: GraphQLBoolean },
@@ -397,7 +398,8 @@ const RootQuery = new GraphQLObjectType({
             args.formSettingsId,
             req,
             args.referringUrl,
-            args.showBuilder
+            args.showBuilder,
+            args.defaults
           );
       },
     },
