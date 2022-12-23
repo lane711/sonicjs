@@ -1,31 +1,58 @@
+
 {{#each list}}
-  <div class="row mb-5">
-    <h2>{{this.data.title}}</h2>
-      {{{this.data.body}}}
+  <div class="row mb-5 border rounded pb-4">
 
-      {{#each this.data.children}}
+    <nav class="navbar navbar-dark bg-dark mb-4" aria-label="First navbar example">
+      <div class="container-fluid">
+        <span class="navbar-brand fs-2">{{this.data.title}}</span>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav{{ this.id }}" aria-controls="navbarsExample01" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-      <div class="col">
-        <div class="card">
-          <div class="card-header">
-            {{this.contentType}} <button type="button" class="btn btn-small btn-success float-end" onclick="return openFormInModal('create', '{{this.contentType}}', null, {defaults:[{project:'{{../id}}'}]})"><i class="bi bi-plus-square"></i></button>
-          </div>
-
-          {{#if this.hasChildren}}
-            <ul class="list-group list-group-flush">
-              {{#each this.data}}
-                <li class="list-group-item">
-                  <a href="javascript:void(0)" onclick="return openFormInModal('detail', '{{this.contentTypeId}}', '{{ this.id }}')" >{{this.data.title}}</a>
-                  <button type="button" class="btn btn-small btn-danger float-end" onclick="return openFormInModal('delete', null, '{{this.id}}')"><i class="bi bi-trash"></i></button>      
-                  <button type="button" class="btn btn-small btn-primary float-end me-2" onclick="return openFormInModal('edit', '{{this.contentTypeId}}', '{{this.id}}')"><i class="bi bi-pencil"></i></button>
-                </li>
-              {{/each}}
-              </ul>
-          {{/if}}
+        <div class="collapse navbar-collapse" id="nav{{ this.id }}">
+          <form class="d-flex" role="search">
+            <button type="button" class="btn btn-small btn-secondary float-end me-2" onclick="return openFormInModal('detail', '{{this.contentTypeId}}', '{{ this.id }}')"><i class="bi bi-eye"></i></button>      
+            <button type="button" class="btn btn-small btn-primary float-end me-2" onclick="return openFormInModal('edit', '{{this.contentTypeId}}', '{{this.id}}')"><i class="bi bi-pencil"></i></button>
+            <button type="button" class="btn btn-small btn-danger float-end" onclick="return openFormInModal('delete', null, '{{this.id}}')"><i class="bi bi-trash"></i></button>      
+          </form>
         </div>
       </div>
-      {{/each}}
+    </nav>
+
+    {{#each this.data.children}}
+    <div class="col">
+      <div class="card">
+        <div class="card-header">
+          {{this.contentTypeDef.data.states.moduleTitle}} <button type="button" class="btn btn-small btn-success float-end" onclick="return openFormInModal('create', '{{this.contentType}}', null, {defaults:[{project:'{{../id}}'}]})"><i class="bi bi-plus-square"></i></button>
+        </div>
+
+        {{#if this.hasChildren}}
+          <ul class="list-group list-group-flush">
+            {{#each this.data}}
+              <li class="list-group-item">
+                <a href="javascript:void(0)" onclick="return openFormInModal('detail', '{{this.contentTypeId}}', '{{ this.id }}')" >{{this.data.title}}</a>
+                <button type="button" class="btn btn-small btn-danger float-end" onclick="return openFormInModal('delete', null, '{{this.id}}')"><i class="bi bi-trash"></i></button>      
+                <button type="button" class="btn btn-small btn-primary float-end me-2" onclick="return openFormInModal('edit', '{{this.contentTypeId}}', '{{this.id}}')"><i class="bi bi-pencil"></i></button>
+              </li>
+            {{/each}}
+            </ul>
+        {{/if}}
+      </div>
+    </div>
+    {{/each}}
 
   </div>
 {{/each}}
 </div>
+<div class="px-4 py-5 my-5 text-center">
+  <div class="col-lg-6 mx-auto">
+    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+      <button type="button" class="btn btn-lg btn-success float-center" 
+      onclick="return openFormInModal('create', '{{this.contentType.systemId}}', null, null)">
+      <i class="bi bi-plus-square me-2"></i>
+       New {{this.contentType.systemId}}
+      </button>
+    </div>
+  </div>
+</div>
+

@@ -206,6 +206,10 @@ module.exports = referenceMainService = {
 
           const childrenContentTypes = reference.children;
           for (childrenContentType of childrenContentTypes) {
+            childrenContentTypeDef = await dataService.contentTypeGet(
+              childrenContentType,
+              options.req.sessionID
+            );
 
             const childData = await dataService.getContentByType(
               childrenContentType,
@@ -213,9 +217,10 @@ module.exports = referenceMainService = {
             );
             // add child data to parent data
             for (parentData of parentDataList) {
-              let childDataOfParent = childData.filter(
-                (c) => c.data["project"].includes(parentData.id)
-              ) ?? [];
+              let childDataOfParent =
+                childData.filter((c) =>
+                  c.data["project"].includes(parentData.id)
+                ) ?? [];
               parentData.data.children = parentData.data.children ?? [];
               // childDateToAdd = [];
               // if (childDataOdParent) {
@@ -223,10 +228,10 @@ module.exports = referenceMainService = {
               // }
               parentData.data.children.push({
                 contentType: childrenContentType,
+                contentTypeDef: childrenContentTypeDef,
                 data: childDataOfParent,
-                hasChildren: childDataOfParent.length
+                hasChildren: childDataOfParent.length,
               });
-
             }
           }
           let x;

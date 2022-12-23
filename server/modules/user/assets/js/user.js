@@ -120,7 +120,7 @@ async function openCreateForm(action, contentType, options) {
       $("#sessionID").val(),
       window.location.pathname,
       false,
-      options.defaults
+      options && options.defaults ? options.defaults : []
     );
 
     // debugger;
