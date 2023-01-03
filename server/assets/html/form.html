@@ -20,10 +20,12 @@
           Formio.icons = 'fontawesome';
           formService.setFormApiUrls(Formio);
 
-          Formio.{{formioFunction}}(document.getElementById('formio_{{ random }}'), formJSON_{{ random }}).then((form) => {
+          Formio.{{formioFunction}}(document.getElementById('formio_{{ random }}'), formJSON_{{ random }},{readOnly:{{readOnly}} }).then((form) => {
               currentForm = form; //make form available in other JS
               form.options.noAlerts = true;
+
               console.log('log form', form);
+
 
               if (formValuesToLoad_{{ random }}) {
                   form.submission = {

@@ -46,12 +46,27 @@ async function openFormInModal(action, contentType, id, options) {
 async function openDetailForm(action, id) {
   if (action === "detail") {
     let content = await dataService.getContentById(id);
-    let form = content.data.body;
+    let form = await dataService.formGet(
+      content.contentTypeId,
+      content,
+      "await submitContent(submission);",
+      undefined,
+      undefined,
+      $("#sessionID").val(),
+      window.location.pathname,
+      false,
+      undefined,
+      true
+    );
 
-    $("#genericModal .modal-title").html(content.data.title);
+    $("#genericModal .modal-title").text(
+      helperService.titleCase(`${content.contentTypeId} ${action}`)
+    );
 
     $("#formio").empty();
-    $("#formio").html(form);
+    $("#formio").html(form.html);
+
+    loadModuleSettingForm();
 
     $("#genericModal").appendTo("body").modal("show");
   }
@@ -120,15 +135,17 @@ async function openCreateForm(action, contentType, options) {
       $("#sessionID").val(),
       window.location.pathname,
       false,
-      options && options.defaults ? options.defaults : []
+      options && options.defaults ? options.defaults : [],
+      false
     );
 
     // debugger;
     // let moduleTitle = form.contentType.data.modalSettings?.modalTitle ?? helperService.titleCase(`${action} ${contentType}`);
     let moduleTitle = form.contentType.data.states?.moduleTitle ?? helperService.titleCase(`${action} ${contentType}`);
 
-    $("#genericModal .modal-title").text(moduleTitle);
-
+    $("#genericModal .modal-title").text(
+      helperService.titleCase(`New ${contentType}`)
+    );
     $("#formio").empty();
     $("#formio").html(form.html);
 

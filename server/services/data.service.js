@@ -199,7 +199,8 @@ if (typeof module !== "undefined" && module.exports) {
       sessionID,
       referringUrl,
       showBuilder = false,
-      defaults = []
+      defaults = [],
+      readOnly = false
     ) {
       let contentString = content ? JSON.stringify(content) : "";
       let defaultsString = defaults ? JSON.stringify(defaults) : "";
@@ -213,7 +214,8 @@ if (typeof module !== "undefined" && module.exports) {
         returnModuleSettings: ${returnModuleSettings},
         formSettingsId: "${formSettingsId ?? ""}",
         showBuilder: ${showBuilder},
-        referringUrl: "${referringUrl}"){
+        referringUrl: "${referringUrl}",
+        readOnly: ${readOnly}){
           html
           contentType
         }

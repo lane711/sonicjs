@@ -95,7 +95,8 @@ if (typeof module !== "undefined" && module.exports) {
       req,
       referringUrl,
       showBuilder = false,
-      defaults
+      defaults,
+      readOnly = false
     ) {
       req.referringUrl = referringUrl;
       let contentObject = content;
@@ -221,6 +222,8 @@ if (typeof module !== "undefined" && module.exports) {
       data.viewModel.formValuesToLoad = JSON.stringify(formValuesToLoad);
       data.viewModel.random = helperService.generateRandomString(8);
       data.viewModel.formioFunction = showBuilder ? "builder" : "createForm";
+      data.viewModel.readOnly = readOnly;
+
       data.viewPath = "/server/assets/html/form.html";
       data.contentType = "";
 

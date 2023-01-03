@@ -388,6 +388,7 @@ const RootQuery = new GraphQLObjectType({
         showBuilder: { type: GraphQLBoolean },
         formSettingsId: { type: GraphQLString },
         referringUrl: { type: GraphQLString },
+        readOnly: { type: GraphQLBoolean }
       },
       async resolve(parent, args, req) {
         return formService.getForm(
@@ -399,7 +400,8 @@ const RootQuery = new GraphQLObjectType({
             req,
             args.referringUrl,
             args.showBuilder,
-            args.defaults
+            args.defaults,
+            args.readOnly
           );
       },
     },
