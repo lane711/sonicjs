@@ -23,7 +23,7 @@ describe("Page Builder", function () {
 
     cy.get("#new-page").click();
 
-    cy.contains("Create Page").should("be.visible");
+    cy.contains("New Page").should("be.visible");
 
     cy.get('input[name="data[title]').type("Cypress PB Test");
     cy.wait(1000);
@@ -93,8 +93,8 @@ describe("Page Builder", function () {
     );
 
     //update and save the module
-    cy.get(".formio-component-form .formio-component-text input").type(
-      ` ${cleanupTag}`
+    cy.get(`.formio-component-form .formio-component-text input[name="data[text]"]`).type(
+      ` ${cleanupTag}`, {force:true}
     );
     cy.get(".formio-component-submit button").click()
     cy.contains('Module added to column'); //test growl

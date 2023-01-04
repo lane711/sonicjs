@@ -2323,7 +2323,7 @@ function pageBuilderFormChanged(data) {
   }
 
   //if page builder not expanded
-  if(!$('.pb-wrapper .expanded').length){
+  if(!$('.pb-wrapper.expanded').length){
     return;
   }
 
