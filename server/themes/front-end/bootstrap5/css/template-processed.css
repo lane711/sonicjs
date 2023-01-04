@@ -51,7 +51,11 @@ padding-bottom: 9rem!important
 }
 
 .under-menu-spacer {
-  height: 80px
+height: 80px
+}
+
+.home .under-menu-spacer {
+height: 0;
 }
 
 .css-c691d9415645{background: url(/assets/uploads/cheetah.jpeg);}

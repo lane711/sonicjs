@@ -16,3 +16,7 @@
     color: var(--bs-alert-color);
     font-weight: bold;
 }
+
+.home.demo main{
+    padding: 112px 0;
+}
