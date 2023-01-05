@@ -229,6 +229,8 @@ module.exports = assetService = {
 
     let fileContent = "";
 
+
+
     for (link of options.page.data.links[assetType]) {
 
       let root = link.path.startsWith("/node_modules");
@@ -242,8 +244,6 @@ module.exports = assetService = {
         if (!link.path.startsWith("/custom")) {
           link.path = "/server" + link.path;
         }
-      } else {
-        let x;
       }
       let fileContentRaw = await fileService.getFile(link.path);
       if (link.path === "/server/page-builder/js/page-builder.js") {
@@ -257,6 +257,7 @@ module.exports = assetService = {
       } else {
         console.log("empty, skipping:  " + link.path);
       }
+
     }
 
     let appVersion = globalService.getAppVersion();
