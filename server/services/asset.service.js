@@ -1,9 +1,9 @@
 /**
  * Asset Service -
- * The asset service is responsible for processing the css and js files used by the site. 
+ * The asset service is responsible for processing the css and js files used by the site.
  * It is responsible for minimizing assets for production. The assets that are loaded for the site
- * are combined from various sources: 1) your themes assets.yml file. 2) Assets from the enabled modules 
- * 3) CSS for sections managed in the page builder  
+ * are combined from various sources: 1) your themes assets.yml file. 2) Assets from the enabled modules
+ * 3) CSS for sections managed in the page builder
  * @module assetService
  */
 var globalService = require("./global.service");
@@ -229,33 +229,35 @@ module.exports = assetService = {
 
     let fileContent = "";
 
-    await globalService.asyncForEach(
-      options.page.data.links[assetType],
-      async (link) => {
-        let root = link.path.startsWith("/node_modules");
-        if (link.path.includes("/css/template-processed.css")) {
-          link.path = `${frontEndTheme}/css/template-processed.css`;
-        }
-        if (
-          !link.path.startsWith("/node_modules") &&
-          !link.path.endsWith("template-processed.css")
-        ) {
+    for (link of options.page.data.links[assetType]) {
+
+      let root = link.path.startsWith("/node_modules");
+      if (link.path.includes("/css/template-processed.css")) {
+        link.path = `${frontEndTheme}/css/template-processed.css`;
+      }
+      if (
+        !link.path.startsWith("/node_modules") &&
+        !link.path.endsWith("template-processed.css")
+      ) {
+        if (!link.path.startsWith("/custom")) {
           link.path = "/server" + link.path;
         }
-        let fileContentRaw = await fileService.getFile(link.path);
-        if (link.path === "/server/page-builder/js/page-builder.js") {
-          console.log("skipping page builder for prod mmode:  " + link.path);
-        } else if (fileContentRaw) {
-          console.log(
-            `Adding Path: ${link.path} -- Size: ${fileContentRaw.length}`
-          );
-          fileContent += fileContentRaw + "\n";
-          console.log(`fileContent Size: ${fileContent.length}`);
-        } else {
-          console.log("empty, skipping:  " + link.path);
-        }
+      } else {
+        let x;
       }
-    );
+      let fileContentRaw = await fileService.getFile(link.path);
+      if (link.path === "/server/page-builder/js/page-builder.js") {
+        console.log("skipping page builder for prod mmode:  " + link.path);
+      } else if (fileContentRaw) {
+        console.log(
+          `Adding Path: ${link.path} -- Size: ${fileContentRaw.length}`
+        );
+        fileContent += fileContentRaw + "\n";
+        console.log(`fileContent Size: ${fileContent.length}`);
+      } else {
+        console.log("empty, skipping:  " + link.path);
+      }
+    }
 
     let appVersion = globalService.getAppVersion();
     let fileName = this.getCombinedFileName(assetType);
