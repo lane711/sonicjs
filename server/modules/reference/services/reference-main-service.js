@@ -21,6 +21,10 @@ module.exports = referenceMainService = {
         "reference-site-settings"
       );
 
+      if(!referenceContentTypes){
+        return;
+      }
+
       const isAChild = referenceContentTypes.data.parentChildReferences.filter(
         (c) => c.children.includes(options.contentType.systemId)
       );
