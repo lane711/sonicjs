@@ -67,7 +67,7 @@ module.exports = blogMainService = {
       );
     }
 
-    // listRaw = listRaw.sort((a, b) => (a.createdOn > b.createdOn ? 1 : -1));
+    listRaw = listRaw.sort((a, b) => (a.createdOn < b.createdOn ? 1 : -1));
 
     listRaw = listRaw.filter((x) => x.data.title);
     let list = listRaw.map(function (record) {
