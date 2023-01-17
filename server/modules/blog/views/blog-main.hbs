@@ -1,35 +1,26 @@
-<div class="container blog-wrapper gx-0">
-  <div class="row gap-y">
+<div class="container blog gx-0">
 
-    {{#each data.list}}
-      <div class="col-md-6">
+  {{#each data.list}}
+    <div class="row gap-y mb-5">
 
-        <div class="card card-blog shadow-box shadow-hover border-0">
-          <a href="{{this.data.url}}"><img
-              class="card-img-top img-responsive"
-              src="{{this.data.image}}"
-              alt=""
-            /></a>
-          <div class="card-body">
-            <div class="d-flex align-items-center justify-content-between">
-            </div>
-            <!-- <p class="card-title regular">
-              <span class="badge bg-secondary">Secondary</span>
-            </p> -->
-            <p class="card-title regular">
-              <h4><a href="{{this.data.url}}">{{this.data.title}}</a></h4>
-            </p>
-            <p class="card-text text-secondary">
-              {{this.data.body}}
-            </p>
-            <!-- <p class="bold small text-secondary my-0">
-              <small>{{this.data.createdOnFormatted}}</small>
-            </p> -->
-          </div>
-        </div>
-
+      <div class="col-md-4">
+        <a href="{{this.data.url}}"><img
+            class="card-img-top img-responsive"
+            src="{{this.data.image}}"
+            alt=""
+          /></a>
       </div>
-    {{/each}}
+      <div class="col-md-8">
 
-  </div>
+        <h4><a href="{{this.data.url}}">{{this.data.title}}</a></h4>
+
+        <p class="card-text text-secondary">
+          {{this.data.body}}
+        </p>
+      </div>
+
+    </div>
+
+  {{/each}}
+
 </div>

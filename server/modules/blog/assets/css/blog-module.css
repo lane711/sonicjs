@@ -1,9 +1,12 @@
 /* Css File for Module: blog */
-div.blog-wrapper {
+div.blog {
     font-size: 1.1rem;
 }
 
-.blog-wrapper h4 a{
+div.blog h4{
+margin-top:0}
+
+.blog h4 a{
     text-decoration: none;
     color:var(--bs-body-color);
 }
