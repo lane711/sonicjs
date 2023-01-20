@@ -99,7 +99,7 @@ module.exports = taxonomyMainService = {
 
     if (app) {
       app.get("/taxonomy-get*", async function (req, res) {
-        if (req.url === "/taxonomy-get") {
+        if (req.url === "/taxonomy-get" || req.url === '/taxonomy-get?limit=100&skip=0') {
           taxonomies = await dataService.getContentByType("taxonomy");
           res.send({ data: taxonomies });
           return;

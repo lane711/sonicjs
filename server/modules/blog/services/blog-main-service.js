@@ -73,6 +73,7 @@ module.exports = blogMainService = {
     let list = listRaw.map(function (record) {
       return {
         data: {
+          id: record.id,
           title: record.data.title,
           body: formattingService.stripHtmlTags(
             helperService.truncateString(record.data.body, 250)

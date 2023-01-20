@@ -1340,7 +1340,7 @@ async function addModule(systemId, sessionID) {
     systemId,
     undefined,
     `addModuleToColumn(submission, false, undefined, "${systemId} Module Added")`,
-    false,
+    true,
     undefined,
     sessionID
   );
