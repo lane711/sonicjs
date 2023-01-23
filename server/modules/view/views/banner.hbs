@@ -1,0 +1,63 @@
+<!-- <div class="jumbotron jumbotron-fluid" style="background-color:{{this.group.data.bannerBackgroundColor}};
+background-image:url('{{this.group.data.banner.src}}')">
+  <div class="container">
+    <h1 class="display-4">{{this.group.data.title}}</h1>
+    <p class="lead">{{this.group.data.bio}}</p>
+    <img height="200px" src="{{this.group.data.icon.src}}">
+  </div>
+</div> -->
+
+
+<!-- banner-area start -->	
+<div class="banner-area" style="background-image: url('{{this.group.data.banner.src}}');">
+  <div class="container">
+    <a href='/clubhouses'>
+      <img src="/assets/uploads/leftarrow.png" alt="">&nbsp;
+      Back to Clubhouses
+    </a>				
+  </div>
+</div>	
+<!-- banner-area end -->	
+
+<!-- banner-bt-area start -->	
+<div class="banner-bt-area">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-2">
+        <div class="bbt-left">
+          <img src="{{this.group.data.icon.src}}" class="img-fluid" alt="">
+        </div>
+      </div>
+      <div class="col-lg-10">
+        <div class="bbt-right">
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <div class="bbt-title">
+                <h2>
+                  {{this.group.data.title}}
+                  <a href="https://twitter.com/CanesDao" target="_blank"><i class="bi bi-twitter" style="font-size: 1rem; color: white"></i></a>
+                  <!-- <a href="https://www.facebook.com/Draftlysports/?show_switched_toast=0&show_switched_tooltip=0&show_podcast_settings=0"><i class="bi bi-facebook" style="font-size: 1rem; color: white"></i></a> -->
+                  <a href="https://discord.com/invite/GwG4fApxV9" target="_blank"><i class="bi bi-discord" style="font-size: 1rem; color: white"></i></a>
+                  <a href="https://www.instagram.com/canes.dao/" target="_blank"><i class="bi bi-instagram" style="font-size: 1rem; color: white"></i></a>
+                </h2>
+              </div>
+            </div>
+            <div class="col-md-6">
+              {{#if contentType.acls.canEdit }}
+                <div class="bbt-edit text-md-right">
+                  <a href="#" onclick="return openFormInModal('edit', 'group', '{{this.group.id}}')" >
+                    Edit Bio &nbsp;
+                    <img src="/assets/uploads/edit.png" alt="">
+                  </a>
+                </div>
+              {{/if}}
+            </div>
+          </div>
+          <p>{{this.group.data.bio}}</p>
+        </div>
+      </div>
+    </div>				
+  </div>
+</div>	
+<!-- banner-bt-area end -->	
+

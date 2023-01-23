@@ -5,6 +5,9 @@ var globalService = require("../../../services/global.service");
 var axios = require("axios");
 var axiosInstance;
 
+const SibApiV3Sdk = require("sib-api-v3-sdk");
+const sendInBlueApiKey = process.env.SENDINBLUE_API_KEY;
+
 module.exports = appAnalyticsMainService = {
   startup: async function (app) {
     emitterService.on("beginProcessModuleShortCode", async function (options) {
@@ -14,31 +17,33 @@ module.exports = appAnalyticsMainService = {
       }
     });
 
-    emitterService.on("postPageRender", async function (options) {
-      appAnalyticsMainService.trackEventSend({
-        eventName: "page_load",
-        url: options.page.data.url,
-      });
-    });
+    // emitterService.on("postPageRender", async function (options) {
+    //   appAnalyticsMainService.trackEventSend({
+    //     eventName: "page_load",
+    //     url: options.page.data.url,
+    //   });
+    // });
 
-    emitterService.on("postAdminPageRender", async function (options) {
-      appAnalyticsMainService.trackEventSend({
-        eventName: "admin_page_load",
-        url: options.req.url,
-      });
-    });
+    // emitterService.on("postAdminPageRender", async function (options) {
+    //   appAnalyticsMainService.trackEventSend({
+    //     eventName: "admin_page_load",
+    //     url: options.req.url,
+    //   });
+    // });
 
     emitterService.on("firstPageLoaded", async function (options) {
       let pageCount = await dataService.getContentByType("page", 0);
       appAnalyticsMainService.trackEventSend({
         eventName: "startup",
         pageCount: pageCount.length,
+        siteDomain: options.req.hostname
       });
     });
 
     if (process.env.ANALYTICS_RECEIVE_URL) {
       if (app) {
         app.post(process.env.ANALYTICS_RECEIVE_URL, async function (req, res) {
+          //HACK: this is causing prod app to crash, bypass for now
           appAnalyticsMainService.processEvent(req.body, req.ip);
           res.json({ ok: "ok" });
         });
@@ -63,7 +68,11 @@ module.exports = appAnalyticsMainService = {
       let url = process.env.ANALYTICS_POST_URL
         ? process.env.ANALYTICS_POST_URL
         : "https://sonicjs.com/sonicjs-app-analytics";
-      let result = axios.post(url, data);
+        try {
+          let result = axios.post(url, data);
+        } catch (error) {
+          
+        }
     }
   },
 
@@ -72,9 +81,11 @@ module.exports = appAnalyticsMainService = {
     return installFile;
   },
 
-  getLocation: async function(ipAddress){
-    let token = process.env.IPINFO_TOKEN
-    let result = await axios.get(`https://ipinfo.io/${ipAddress}?token=${token}`);
+  getLocation: async function (ipAddress) {
+    let token = process.env.IPINFO_TOKEN;
+    let result = await axios.get(
+      `https://ipinfo.io/${ipAddress}?token=${token}`
+    );
     return result.data;
   },
 
@@ -83,13 +94,19 @@ module.exports = appAnalyticsMainService = {
     let profile = await dataService.getContentByUrl(profileUrl);
     let timeStamp = new Date().toISOString();
 
+    console.log(`processing event for ${data.installId} - ${data.websiteTitle}`)
+
     if (!profile || profile.data.status === "Not Found") {
+
+      await appAnalyticsMainService.addEmailToList(data);
+
       let payload = {
         data: {
           contentType: "app-analytics",
           title: "app-analytics",
           url: profileUrl,
           installId: data.installId,
+          siteDomain: data.siteDomain,
           firstSeenOn: timeStamp,
           events: [],
           pageCount: 0,
@@ -143,6 +160,31 @@ module.exports = appAnalyticsMainService = {
       profile.data.lastSeenOn = timeStamp;
 
       profile = await dataService.editInstance(profile, 0);
+    }
+  },
+
+  addEmailToList: async function (data) {
+
+    console.log('adding to email list', data);
+
+    if (data.agreeToFeedback) {
+      let defaultClient = SibApiV3Sdk.ApiClient.instance;
+
+      let apiKey = defaultClient.authentications["api-key"];
+      apiKey.apiKey = sendInBlueApiKey;
+
+      let apiInstance = new SibApiV3Sdk.ContactsApi();
+
+      let createContact = new SibApiV3Sdk.CreateContact();
+      
+      createContact.email = data.email;
+      createContact.listIds = [5]
+      
+      apiInstance.createContact(createContact).then(function(data) {
+        console.log('API called successfully. Returned data: ' + JSON.stringify(data));
+      }, function(error) {
+        console.error(error);
+      });
     }
   },
 

@@ -27,13 +27,12 @@ module.exports = contactUsMainService = {
       options.viewModel.data.form = await formService.getForm(
         "contact",
         undefined,
-        "submitForm(submission)",
+        "submitContent(submission)",
         false,
         contactFormSettingsId,
-        options.req.sessionID
+        options.req
       );
 
-      // console.log('contact module after view model', options.viewModel);
     });
 
     emitterService.on("afterFormSubmit", async function (options) {
@@ -44,7 +43,7 @@ module.exports = contactUsMainService = {
       let formSettings = await dataService.getContentById(options.data.formSettingsId);
 
       // save the form
-      await dataService.contentCreate(options, true, options.sessionID);
+      // await dataService.contentCreate(options.data, true, options.sessionID);
 
       // send the emails
       let contact = options.data;

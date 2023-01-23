@@ -3,9 +3,14 @@
     <div class="col-md-12">
       <div class="card admin-content-type-edit">
         <div class="card-header">
-          <i class="fa fa-align-justify edit-content-type"></i> Edit {{ data.raw.title }} ({{ data.raw.systemId }}) | Module: <a href='/admin/modules/edit/{{ data.raw.moduleSystemId }}'>{{ data.raw.moduleSystemId }}</a>
+          <i class="fa fa-align-justify edit-content-type"></i>
+          Edit
+          {{data.raw.title}}
+          ({{data.raw.systemId}}) | Module:
+          <a
+            href="/admin/modules/edit/{{data.raw.moduleSystemId}}"
+          >{{data.raw.moduleSystemId}}</a>
         </div>
-
 
       </div>
 
@@ -14,13 +19,66 @@
   </div>
 
   <ul class="nav nav-tabs" id="myTab" role="tablist">
+    {{#unless data.showOnlyPermissionTab }}
     <li class="nav-item">
-      <a class="nav-link active" id="home-tab" data-toggle="tab" href="#fields" role="tab" aria-controls="home"
-        aria-selected="true">Fields</a>
+      <a
+        class="nav-link active"
+        id="home-tab"
+        data-toggle="tab"
+        href="#fields"
+        role="tab"
+        aria-controls="home"
+        aria-selected="true"
+      >Fields</a>
     </li>
+
     <li class="nav-item">
-      <a class="nav-link" id="raw-tab" data-toggle="tab" href="#raw" role="tab" aria-controls="raw"
-        aria-selected="true">Raw</a>
+      <a
+        class="nav-link"
+        id="states-tab"
+        data-toggle="tab"
+        href="#states"
+        role="tab"
+        aria-controls="states"
+        aria-selected="true"
+      >States</a>
+    </li>
+  {{/unless}}
+
+    <li class="nav-item">
+      <a
+        class="nav-link {{#if data.showOnlyPermissionTab }}active{{/if}}"
+        id="permissions-tab"
+        data-toggle="tab"
+        href="#permissions"
+        role="tab"
+        aria-controls="permissions"
+        aria-selected="true"
+      >Permissions</a>
+    </li>
+
+    <li class="nav-item">
+      <a
+        class="nav-link"
+        id="acls-tab"
+        data-toggle="tab"
+        href="#acls"
+        role="tab"
+        aria-controls="acls"
+        aria-selected="true"
+      >ACLS</a>
+    </li>
+
+    <li class="nav-item">
+      <a
+        class="nav-link"
+        id="raw-tab"
+        data-toggle="tab"
+        href="#raw"
+        role="tab"
+        aria-controls="raw"
+        aria-selected="true"
+      >Raw</a>
     </li>
     <!-- <li class="nav-item">
       <a class="nav-link " id="profile-tab" data-toggle="tab" href="#permissions" role="tab" aria-controls="profile"
@@ -45,24 +103,32 @@
   </ul>
   <div class="tab-content" id="myTabContent">
 
-    <div class="tab-pane fade show active" id="fields" role="tabpanel" aria-labelledby="home-tab">
-
-
+    <div
+      class="tab-pane fade show {{#unless data.showOnlyPermissionTab }}active{{/unless}}"
+      id="fields"
+      role="tabpanel"
+      aria-labelledby="home-tab"
+    >
 
       <div class="row">
         <div class="col-md-12">
           <div class="card">
             <div class="card-header">
-              <i class="fa fa-align-justify"></i> Manage Fields
+              <i class="fa fa-align-justify"></i>
+              Manage Fields
 
             </div>
             <div class="card-body">
 
-              <div id='formBuilder'></div>
+              {{{ data.editForm.html}}}
 
             </div>
             <div class="card-footer">
-              <button type="button" class="btn btn-success pull-right" onclick="onContentTypeSave()">
+              <button
+                type="button"
+                class="btn btn-success pull-right"
+                onclick="onContentTypeSave()"
+              >
                 Save Fields
               </button>
             </div>
@@ -72,28 +138,189 @@
         <!--/.col-->
       </div>
 
+    </div>
+
+    <div
+      class="tab-pane fade"
+      id="states"
+      role="tabpanel"
+      aria-labelledby="states-tab"
+    >
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-header">
+              <i class="fa fa-align-justify"></i>
+              Manage Form States
+
+            </div>
+            <div class="card-body">
+
+              <div id="form-states">
+                {{{ data.editFormStates.html}}}
+              </div>
+
+            </div>
+            <!-- <div class="card-footer">
+              <button
+                type="button"
+                class="btn btn-success pull-right"
+                onclick="onContentTypeStatesSave()"
+              >
+                Save States
+              </button>
+            </div> -->
+          </div>
+
+        </div>
+        <!--/.col-->
+      </div>
 
     </div>
-    <div class="tab-pane fade show" id="raw" role="tabpanel" aria-labelledby="raw-tab">
+
+    <div
+      class="tab-pane fade show {{#if data.showOnlyPermissionTab }}active{{/if}}"
+      id="permissions"
+      role="tabpanel"
+      aria-labelledby="raw-tab"
+    >
 
       <div class="col-md-12">
         <div class="card">
           <div class="card-header">
-            <i class="fa fa-align-justify"></i> Manage Fields
+            <i class="fa fa-align-justify"></i>
+            Permissions
+
+          </div>
+          <div class="card-body">
+
+            <div class="alert alert-info" role="alert">
+              Use this form to set site-wide default permissions. Permissions can be overridden at each content type.
+            </div>
+
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Access Control</th>
+                  {{#each this.data.raw.permissionsMatrix.acls}}
+                    <th scope="col">{{this}}</th>
+                  {{/each}}
+                </tr>
+              </thead>
+              <tbody>
+                {{#each this.data.raw.permissionsMatrix.rows}}
+                  <tr>
+                    <th scope="row">{{this.roleTitle}}</th>
+                    {{#each this.columns}}
+                      <td>
+                        <input
+                        type="checkbox"
+                        id="doNothing"
+                        name="postSubmission"
+                        value="doNothing"
+                        {{setChecked
+                          this
+                          true
+                        }}
+                      />
+                      </td>
+                    {{/each}}
+
+                  </tr>
+                {{/each}}
+
+              </tbody>
+            </table>
+
+          </div>
+          <div class="card-footer">
+            <button
+              type="button"
+              class="btn btn-success pull-right"
+              onclick="onContentTypeSave()"
+            >
+              Save Permissions
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div
+    class="tab-pane fade"
+    id="acls"
+    role="tabpanel"
+    aria-labelledby="acls-tab"
+  >
+
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <i class="fa fa-align-justify"></i>
+          Access Control List
+
+        </div>
+        <div class="card-body">
+
+          <div class="alert alert-info" role="alert">
+            Use this form to set site-wide default access controls. Access control lists can be overridden at each content type.
+          </div>
+
+      {{{ data.editFormACLs.html}}}
+
+        </div>
+        <div class="card-footer">
+          <button
+            type="button"
+            class="btn btn-success pull-right"
+            onclick="onContentTypeSave()"
+          >
+            Save ACL
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+    <div
+      class="tab-pane fade show"
+      id="raw"
+      role="tabpanel"
+      aria-labelledby="raw-tab"
+    >
+
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <i class="fa fa-align-justify"></i>
+           Json
 
           </div>
           <div class="card-body">
 
             <div id="editor-container">
 
-              <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+              <meta
+                http-equiv="Content-Type"
+                content="text/html;charset=utf-8"
+              />
 
               <div id="jsoneditorRaw" style="width: 100%; height: 600px;"></div>
 
             </div>
           </div>
           <div class="card-footer">
-            <button type="button" class="btn btn-success pull-right" onclick="onContentTypeRawSave()">
+            <button
+              type="button"
+              class="btn btn-success pull-right"
+              onclick="onContentTypeRawSave()"
+            >
               Save Json
             </button>
           </div>
@@ -101,23 +328,47 @@
 
       </div>
 
-
-
     </div>
-    <div class="tab-pane fade show" id="shortcode" role="tabpanel" aria-labelledby="shortcode-tab">
-      <div class='shortcode'><span>Shortcode: </span>{{shortcode}}</div>
+    <div
+      class="tab-pane fade show"
+      id="shortcode"
+      role="tabpanel"
+      aria-labelledby="shortcode-tab"
+    >
+      <div class="shortcode"><span>Shortcode: </span>{{shortcode}}</div>
     </div>
-    <div class="tab-pane fade show" id="views" role="tabpanel" aria-labelledby="profile-tab">
+    <div
+      class="tab-pane fade show"
+      id="views"
+      role="tabpanel"
+      aria-labelledby="profile-tab"
+    >
       <app-content-type-edit-views></app-content-type-edit-views>
     </div>
-    <div class="tab-pane fade show" id="permissions" role="tabpanel" aria-labelledby="profile-tab">
+    <div
+      class="tab-pane fade show"
+      id="permissions"
+      role="tabpanel"
+      aria-labelledby="profile-tab"
+    >
       Permissions Here
     </div>
-    <div class="tab-pane fade show" id="settings" role="tabpanel" aria-labelledby="contact-tab">
+    <div
+      class="tab-pane fade show"
+      id="settings"
+      role="tabpanel"
+      aria-labelledby="contact-tab"
+    >
       <app-content-type-edit-settings></app-content-type-edit-settings>
     </div>
-    <div class="tab-pane fade show" id="create" role="tabpanel" aria-labelledby="home-tab">
-      <app-content-type-edit-create-instance></app-content-type-edit-create-instance>
+    <div
+      class="tab-pane fade show"
+      id="create"
+      role="tabpanel"
+      aria-labelledby="home-tab"
+    >
+      <app-content-type-edit-create-instance
+      ></app-content-type-edit-create-instance>
     </div>
   </div>
 

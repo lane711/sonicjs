@@ -6,18 +6,26 @@
 
   //used for json explorer
   var formValuesToLoad = {{{ formValuesToLoad }}}
-
+  var editMode = {{{ editMode }}}
+  var currentForm = '';
+  var formIsDirty = false;
+  
       loadModuleSettingForm = async function (){
+        ('setting for dirty false')
+      formIsDirty = false;
         return form_{{ random }}();
       }
 
       form_{{ random }} = async function () {
-          // debugger;
           Formio.icons = 'fontawesome';
           formService.setFormApiUrls(Formio);
 
-          Formio.createForm(document.getElementById('formio_{{ random }}'), formJSON_{{ random }}).then((form) => {
+          Formio.{{formioFunction}}(document.getElementById('formio_{{ random }}'), formJSON_{{ random }},{readOnly:{{readOnly}} }).then((form) => {
+              currentForm = form; //make form available in other JS
+              form.options.noAlerts = true;
+
               console.log('log form', form);
+
 
               if (formValuesToLoad_{{ random }}) {
                   form.submission = {
@@ -25,19 +33,29 @@
                   };
               }
 
+
               form.on('submit', async function (submission) {
 
                   // analyticsTrackEvent({event: 'FORM_SUBMIT', data: submission.data});
 
                   {{{ onFormSubmitFunction }}}
 
+                  form.emit('submitDone')//call submitdone event here to stop loading
+
               });
 
               form.on('change', function (changed) {
-                // console.log('form.html changed', changed)
-                // debugger;
                 if (typeof formChanged != "undefined") {
                     formChanged(changed);
+                  }
+
+                  if (typeof pageBuilderFormChanged != "undefined") {
+                    pageBuilderFormChanged(changed);
+                  }
+
+                  if (changed.components) {
+                    contentTypeComponents = changed.components;
+                    console.log("event ->", event);
                   }
 
                   try {
@@ -50,16 +68,13 @@
           });
       };
 
-      window.onload = async function () {
-          // debugger;
+      window.addEventListener("load", function() {
+          console.log('Page is loaded');
           if (typeof module === 'undefined') {
-            formInit();
+            form_{{ random }}();
           }
-      }
+      });
 
-      function formInit(){
-        form_{{ random }}();
-      }
 </script>
 
 <div id="formio_{{ random }}"></div>

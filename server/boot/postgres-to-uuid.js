@@ -1,152 +1,224 @@
 const fs = require("fs");
-const { parse, stringify } = require("envfile");
+const {parse, stringify} = require("envfile");
 const path = require("path");
-const  Content = require("../schema/models/content");
 var globalService = require("../services/global.service");
-
-const mongoose = require("mongoose");
+var dalService = require("../services/dal.service");
+const {Content} = require("../data/model/Content");
 
 const typeorm = require("typeorm");
-const { Like } = require("typeorm");
-
-const { getRepository } = require("typeorm");
-const { Post } = require("../data/model/Post");
-const { Content2 } = require("../data/model/Content");
-const { assertCompositeType } = require("graphql");
+const {Like} = require("typeorm");
+const {getRepository} = require("typeorm");
+const {assertCompositeType} = require("graphql");
+var contentRepo;
 
 let idMapTable = [];
 
-const mongoUrl = "";
+var axios = require("axios");
+// const defaultOptions = {
+//   headers: {},
+//   baseURL: globalService.baseUrl,
+// };
+let axiosInstance = axios.create();
+const session = {user: {id: "69413190-833b-4318-ae46-219d690260a9"}};
 
-mongoose.connect(mongoUrl, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+async function main() {
+  console.log('starting...');
+  let {data} = await getContentFromAPI();
+  if (data.data.contents.length > 1) {
+    console.log('content count ', data.data.contents.length);
+    await dalService.contentDeleteAll(session);
+    console.log('content deleted');
+    await migrateContent(data.data.contents);
+    console.log('migration complete');
 
-mongoose.connection.once("open", async () => {
-  console.log("conneted to database");
+    await updateIds();
+  }
+  let x;
+}
 
-  console.log("Info: migrating mongo data to sql lite");
+async function test(){
+  let id = 1;
+  let contentToBeUpdated = await dalService.contentGetLike('\\\\"1\\\\"');
 
-  // let dataRaw = fs.readFileSync("server/data/data.json");
-  // let data = JSON.parse(dataRaw);
+  console.log(contentToBeUpdated);
+}
 
-  const data = await Content.find();
+async function getContentFromAPI() {
+  let apiUrl = "https://sonicjs.herokuapp.com/graphql";
 
-  // console.log(data);
-  // migrateContentTypes(app);
-  migrateContent(data);
-});
-
-async function migrateContent(data) {
-  typeorm.createConnection().then((connection) => {
-    const contentRepo = connection.getRepository(Content2);
-
-    //clear all data
-    connection
-      .createQueryBuilder()
-      .delete()
-      .from(Content2)
-      .where("id > :id", { id: 0 })
-      .execute();
-
-    // return;
-
-    let i = 0;
-    data.forEach((contentData) => {
-      // console.log(contentData.url);
-
-      let content = new Content2();
-      content.data = JSON.stringify(contentData.data);
-      content.contentTypeId = contentData.contentTypeId;
-      content.createdByUserId = 1;
-      content.lastUpdatedByUserId = 1;
-      content.createdOn = contentData.createdOn;
-      content.updatedOn = contentData.updatedOn;
-      content.url = contentData.url;
-      content.tags = [];
-
-      contentRepo.save(content).then((newContent) => {
-        idMapTable.push({ oldId: contentData.id, newId: newContent.id });
-        i++;
-
-        if (data.length === i) {
-          updateIds();
-        }
-      });
-    });
-    return;
+  return await getAxios().post(apiUrl, {
+    query: `
+    {
+      contents (sessionID:"bypass")
+      {
+        id
+        contentTypeId
+        data
+        url
+        createdOn
+        updatedOn
+      }
+    }
+      `,
   });
 }
+
+async function migrateContent(data) {
+
+  let i = 0;
+  await Promise.all(data.map(async (contentData) => {
+    // console.log(contentData.url);
+
+    // let content = {};
+    // content.data = JSON.stringify(contentData.data);
+    // content.contentType = contentData.contentTypeId;
+    // content.createdByUserId = "69413190-833b-4318-ae46-219d690260a9";
+    // content.lastUpdatedByUserId = "69413190-833b-4318-ae46-219d690260a9";
+    // content.createdOn = contentData.createdOn;
+    // content.updatedOn = contentData.updatedOn;
+    // content.url = contentData.url;
+
+    let newContent = await dalService.contentUpdate(undefined, contentData.url, contentData.data, session);
+    console.log('id', contentData.id, newContent.id);
+    idMapTable.push({oldId: contentData.id, newId: newContent.id});
+  }));
+}
+
+
 
 async function updateIds() {
   console.log("===== updateIds =====");
 
-  // typeorm.createConnection().then((connection) => {
-  const contentRepo = getRepository(Content2);
 
   for (let index = 0; index < idMapTable.length; index++) {
     const contentData = idMapTable[index];
     console.log("map-->", contentData);
 
-    let contentToBeUpdated = await contentRepo.find({
-      data: Like(`%${contentData.oldId}%`),
-    });
+    //this is for smart tags
+    let contentToBeUpdated = await dalService.contentGetLike(`\\\\"${contentData.oldId}\\\\"`);
+    await updateIdsRecords(contentToBeUpdated, contentData);
 
-    if (contentToBeUpdated.length > 0) {
-      for (let index = 0; index < contentToBeUpdated.length; index++) {
-        const content = contentToBeUpdated[index];
-        let contentRecord = await contentRepo.findOne(
-          { where:
-              { id:  content.id}
-          });
-        console.log(contentRecord);
-        contentRecord.lastUpdatedByUserId = 3;
-        contentRecord.data = contentRecord.data.replace(contentData.oldId, contentData.newId);
-        contentRepo.update(content.id, contentRecord);
+    //this is for section layouts
+    let contentToBeUpdated2 = await dalService.contentGetLike(`\"${contentData.oldId}\"`);
+    await updateIdsRecords(contentToBeUpdated2, contentData);
+
+  }
+}
+
+async function updateIdsRecords(contentToBeUpdated, contentData) {
+  if (contentToBeUpdated.length > 0) {
+    console.log(contentToBeUpdated.length + ' updates to be made');
+    for (let index = 0; index < contentToBeUpdated.length; index++) {
+      const content = contentToBeUpdated[index];
+      let contentRecord = await contentRepo.findOne({
+        where: {id: content.id},
+      });
+      console.log(contentRecord);
+      contentRecord.lastUpdatedByUserId = 3;
+      contentRecord.data = contentRecord.data.replace(
+        `"${contentData.oldId}`,
+        `"${contentData.newId}`
+      );
+
+      contentRecord.data = JSON.parse(contentRecord.data);
+      if(contentRecord.contentTypeId == 'section'){
+        console.log('section', contentRecord.data)
       }
+      // await contentRepo.update(content.id, contentRecord);
+      let updateContent = await dalService.contentUpdate(contentRecord.id, contentRecord.url, contentRecord.data, session);
+
     }
   }
-
-  // let content = new Content();
-  // content.data = JSON.stringify(contentData.data);
-  // content.contentTypeId = contentData.contentTypeId;
-  // content.createdByUserId = 1
-  // content.lastUpdatedByUserId = 1
-  // content.createdOn = contentData.createdOn
-  // content.updatedOn = contentData.updatedOn
-  // content.url = contentData.url
-  // content.tags = [];
-
-  // contentRepo.save(content);
-
-  // });
 }
 
-function slugify(text) {
-  // console.log('slug', text);
-  if (!text) {
-    return undefined;
-  }
+function getAxios() {
+  //TODO add auth
+  // debugger;
+  if (!axiosInstance) {
+    // if (true) {
 
-  let slug = text
-    .toLowerCase()
-    .replace(/[^\w ]+/g, "")
-    .replace(/ +/g, "-");
+    const defaultOptions = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      withCredentials: true,
+      baseURL: globalService.baseUrl,
+      cookie:
+        "sonicjs=s%3AMmvj7HC35YSG-RP1WEY6G3NS7mrSRFcN.EoldLokzB5IMX34xGLC2QwbU0HZn2dSFmtQ9BhPB26w",
+    };
 
-  return "/" + slug;
-}
-
-async function setEnvVarToEnsureMigrationDoesNotRunAgain() {
-  let sourcePath = path.join(__dirname, "../..", ".env");
-
-  fs.readFile(sourcePath, "utf8", function (err, data) {
-    if (err) {
-      return console.log(err);
+    let token = helperService.getCookie("sonicjs_access_token");
+    if (token) {
+      defaultOptions.headers.Authorization = token;
     }
-    let parsedFile = parse(data);
-    parsedFile.RUN_NEW_SITE_MIGRATION = "FALSE";
-    fs.writeFileSync(sourcePath, stringify(parsedFile));
+
+    axiosInstance = axios.create(defaultOptions);
+    axiosInstance.defaults.withCredentials = true;
+  }
+  // debugger;
+  return axiosInstance;
+}
+
+
+async function setupConnection() {
+
+  let connectionSettings = {
+    url: "postgres://postgres:postgres@localhost:5432/sjs",
+    type: "postgres",
+    entities: ["server/data/entity/*.js"],
+    synchronize: false,
+    logging: "error",
+    ssl: false,
+  };
+
+  typeorm.createConnection(connectionSettings).then((connection) => {
+    contentRepo = getRepository(Content);
+    // console.log(logSymbols.success, "Successfully connected to Database!");
+    main();
   });
 }
+
+// let content = new Content();
+// content.data = JSON.stringify(contentData.data);
+// content.contentTypeId = contentData.contentTypeId;
+// content.createdByUserId = 1
+// content.lastUpdatedByUserId = 1
+// content.createdOn = contentData.createdOn
+// content.updatedOn = contentData.updatedOn
+// content.url = contentData.url
+
+// contentRepo.save(content);
+
+// });
+// }
+
+// function slugify(text) {
+//   // console.log('slug', text);
+//   if (!text) {
+//     return undefined;
+//   }
+
+//   let slug = text
+//     .toLowerCase()
+//     .replace(/[^\w ]+/g, "")
+//     .replace(/ +/g, "-");
+
+//   return "/" + slug;
+// }
+
+// async function setEnvVarToEnsureMigrationDoesNotRunAgain() {
+//   let sourcePath = path.join(__dirname, "../..", ".env");
+
+//   fs.readFile(sourcePath, "utf8", function (err, data) {
+//     if (err) {
+//       return console.log(err);
+//     }
+//     let parsedFile = parse(data);
+//     parsedFile.RUN_NEW_SITE_MIGRATION = "FALSE";
+//     fs.writeFileSync(sourcePath, stringify(parsedFile));
+//   });
+// }
 // };
+
+setupConnection();
+

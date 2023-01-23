@@ -3,6 +3,8 @@
         "*.hbs": "html"
       },
       "files.exclude": {
-        "**/combined-*": true
+        "**/combined-*": true,
+        "**/node_modules": true,
+        "**/docs/json": true,
       }
 }

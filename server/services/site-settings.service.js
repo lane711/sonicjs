@@ -1,3 +1,9 @@
+/**
+ * Site Settings Service -
+ * The site settings service adds the site settings data object to each request for use in downstream processes.
+ * @module siteSettingsService
+ */
+
 var dataService = require('./data.service');
 var helperService = require('./helper.service');
 var emitterService = require('./emitter.service');
@@ -13,15 +19,15 @@ const log = console.log;
 module.exports = siteSettingsService = {
 
     startup: async function () {
-        emitterService.on('getRenderedPagePostDataFetch', async function (options) {
+        emitterService.on('requestBegin', async function (options) {
             if(options){
-                await siteSettingsService.processSiteSettings(options.page, options.req.sessionID);
+                await siteSettingsService.processSiteSettings(options);
             }
         });
     },
 
-    processSiteSettings: async function (page, sessionID) {
-        var siteSettings =  await dataService.getContentTopOne('site-settings', sessionID);
-        page.data.siteSettings = siteSettings.data;
+    processSiteSettings: async function (options) {
+        var siteSettings =  await dataService.getContentTopOne('site-settings', options.req.sessionID);
+        options.req.siteSettings = siteSettings.data;
     }
 }

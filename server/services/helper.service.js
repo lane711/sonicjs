@@ -1,21 +1,8 @@
-// var dataService = require('./data.service');
-// var sanitizeHtml = require('sanitize-html');
-
-// var fs = require('fs');
-// // const axios = require('axios');
-// const ShortcodeTree = require('shortcode-tree').ShortcodeTree;
-// const chalk = require('chalk');
-// const log = console.log;
-
-// import FormioForm from 'formiojs/form';
-
-// import { Form } from 'formiojs';
-
-// const {f} = require('formiojs');
-// var formio = require('formio-service')();
-// var Form = formio.Form;
-
-// const utils = require('formiojs/utils');
+/**
+ * Helper Service -
+ * The heloper service is a set of utiliites used throught SonicJs. IE: slugify, validateEmail, generateRandomString, etc
+ * @module helperService
+ */
 
 (function (exports) {
   var verboseLogging = false;
@@ -54,6 +41,11 @@
         setTimeout(resolve, ms);
       });
     }),
+    exports.isBackEnd = function (url) {
+      if (url) {
+        return url.startsWith("/admin");
+      }
+    },
     (exports.generateRandomString = function (length) {
       var result = "";
       var characters =
@@ -100,6 +92,7 @@
     if (!copy) copy = content.body;
     if (!copy) copy = content.alertCopy;
     if (!copy) copy = content.contentType;
+    if (!copy) copy = this.generateRandomString(6); //if nothing else, generate random string
 
     let slug = this ? this.slugify(copy) : slugify(copy);
 
@@ -121,6 +114,18 @@
 
     return slug;
   };
+
+  exports.titleCase = function(str) {
+    str = str.toLowerCase().split(' ');
+    for (var i = 0; i < str.length; i++) {
+      str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1); 
+    }
+    return str.join(' ');
+  }
+
+  exports.capitalizeFirstLetter = function(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
 })(typeof exports === "undefined" ? (this["helperService"] = {}) : exports);
 
 // (function (exports) {

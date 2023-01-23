@@ -1,3 +1,9 @@
+/**
+ * User Service -
+ * The user service manages site users, including role checking
+ * @module userService
+ */
+
 var dataService = require("./data.service");
 var helperService = require("./helper.service");
 var emitterService = require("./emitter.service");
@@ -19,7 +25,7 @@ module.exports = userService = {
   startup: async function (app) {
     emitterService.on("getRenderedPagePostDataFetch", async function (options) {
       if (options) {
-        options.page.data.showPageBuilder = await userService.isAuthenticated(
+        options.page.data.showPageBuilder = await userService.canEditPages(
           options.req
         );
       }
@@ -27,8 +33,8 @@ module.exports = userService = {
 
     app.get("/api-admin/roles", async function (req, res) {
       let data = await dataService.rolesGet(req.sessionID);
-      let roles = data.map((r) => {
-        return { id: r.data.key, name: r.data.title };
+      let roles = data[0].data.roles.map((r) => {
+        return { id: r.key, name: r.title };
       });
       res.send(roles);
     });
@@ -105,9 +111,9 @@ module.exports = userService = {
   },
 
   getRoles: async function (sessionID) {
-    let data = await dataService.getContentByContentType("role", sessionID);
+    let data = await dataService.getContentByContentType("roles", sessionID);
 
-    return data;
+    return data.length ? data[0].data.roles : [];
   },
 
   mapUserRoles: async function (user) {
@@ -161,6 +167,33 @@ module.exports = userService = {
       return true;
     }
     return false;
+  },
+
+  canEditPages: async function (req) {
+    // console.log("user account", req.user);
+    if (
+      req.user &&
+      req.user.username &&
+      req.user.profile.roles &&
+      (req.user.profile.roles.includes("admin") ||
+        req.user.profile.roles.includes("page-editor"))
+    ) {
+      return true;
+    }
+    return false;
+  },
+
+  canAccessBackEnd: async function (req) {
+    if (
+      req.user &&
+      req.user.username &&
+      req.user.profile.roles &&
+      req.user.profile.roles.includes("admin")
+    ) {
+      return true;
+    } else {
+      return false;
+    }
   },
 
   // getToken: async function (req) {

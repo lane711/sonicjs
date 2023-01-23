@@ -8,10 +8,11 @@ var titleModules = [];
 
 module.exports = pageMainService = {
   startup: async function () {
-    emitterService.on("modulesLoaded", async function (options) {
+    emitterService.on("addUrl", async function (options) {
       const pages = await dalService.contentGet(
         null,
         "page",
+        null,
         null,
         null,
         null,

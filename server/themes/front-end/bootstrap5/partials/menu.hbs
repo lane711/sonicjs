@@ -1,6 +1,9 @@
-<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark top-nav">
+
+  {{> menu-github }}
+
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">{{> menu-logo }}</a>
+      <a class="navbar-brand" href="/">{{> menu-logo }}</a>
       <button class="navbar-toggler" type="button" data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -8,27 +11,31 @@
         <ul class="navbar-nav me-auto mb-2 mb-md-0">
 
           {{#each data.menu}}
-          <li class="nav-item {{#if this.showChildren}}dropdown{{/if}}">
-            <a class="nav-link {{#if this.isActive}}active{{/if}} {{#if this.showChildren}}dropdown-toggle{{/if}}" href="{{this.data.url}}"
-              {{#if this.showChildren}}data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{/if}}>
-              {{this.data.title}}
-              <span class="sr-only">(current)</span></a>
-    
+
+            {{#unless this.showChildren}}
+              <li class="nav-item">
+                <a class="nav-link {{#if this.isActive}}active{{/if}}" aria-current="page" href="{{this.data.url}}">{{this.data.title}}</a>
+              </li>
+            {{/unless}}
+
             {{#if this.showChildren}}
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              {{#each this.children}}
-              <a class="dropdown-item" href="{{this.data.url}}">{{this.data.title}}</a>
-              {{/each}}
-            </div>
+              <li class="nav-item dropdown {{#if this.isActive}}active{{/if}}">
+                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">{{this.data.title}}</a>
+                <ul class="dropdown-menu">
+                  {{#each this.children}}
+                    <li><a class="dropdown-item" href="{{this.data.url}}">{{this.data.title}}</a></li>
+                  {{/each}}
+                </ul>
+              </li>
             {{/if}}
-          </li>
+
           {{/each}}
 
         </ul>
-        <!-- <form class="d-flex">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form> -->
+        <form class="d-flex" style="margin-right:100px;">
+          <a href="https://demo.sonicjs.com" target="_blank" class="btn btn-sm btn-success demo-btn" type="submit">
+            Demo Site<i class="bi bi-box-arrow-up-right ms-2"></i></a>
+        </form>              
       </div>
     </div>
   </nav>

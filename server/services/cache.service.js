@@ -1,3 +1,8 @@
+/**
+ * Cache Service -
+ * The cache service uses NodeCache. It allows data and content, such as rendered pages to be cached, thus dramatically improving performance.
+ * @module cacheService
+ */
 const NodeCache = require("node-cache");
 var cache;
 

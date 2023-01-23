@@ -1,0 +1,8 @@
+{
+  "title": "Proposal",
+  "enabled": false,
+  "systemId": "proposal",
+  "canBeAddedToColumn": false,
+  "singleInstance": false,
+  "version": "0.0.0.1"
+}

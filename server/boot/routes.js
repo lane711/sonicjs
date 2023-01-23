@@ -17,13 +17,14 @@ var themeSettingsService = require("../services/theme-settings.service");
 var contentService = require("../services/content.service");
 contentService.startup();
 var cssService = require("../services/css.service");
-cssService.startup();
 var assetService = require("../services/asset.service");
 var userService = require("../services/user.service");
 var authService = require("../services/auth.service");
 var dalService = require("../services/dal.service");
 var backupService = require("../services/backup.service");
 var backupRestoreService = require("../services/backup-restore.service");
+var installService = require("../services/install.service");
+var testService = require("../services/test.service");
 
 var helperService = require("../services/helper.service");
 var sharedService = require("../services/shared.service");
@@ -38,6 +39,7 @@ var cors = require("cors");
 const chalk = require("chalk");
 const log = console.log;
 const url = require("url");
+var appRoot = require("app-root-path");
 const fileService = require("../services/file.service");
 var pageLoadedCount = 0;
 
@@ -62,9 +64,12 @@ exports.loadRoutes = async function (app) {
     await siteSettingsService.startup();
     await themeSettingsService.startup();
     await userService.startup(app);
-    await assetService.startup();
+    await assetService.startup(app);
     await pageBuilderService.startup(app);
     await pageBuilderService.startup(app);
+    await testService.startup(app);
+    await cssService.startup(app);
+    await installService.startup(app);
 
     await emitterService.emit("startup", { app: app });
 
@@ -104,17 +109,22 @@ exports.loadRoutes = async function (app) {
 
   app.get("/form/*", async function (req, res) {
     let moduleSystemId = req.path.replace("/form/", "");
-    let contentType = await dataService.contentTypeGet(
-      moduleSystemId,
-      req.sessionID
-    );
-    let form = await formService.getFormJson(contentType, req.sessionID);
+    let contentType = await dataService.contentTypeGet(moduleSystemId, req);
+    let form = await formService.getFormJson(contentType, req);
     res.send(form);
   });
 
-  app.get("/zsandbox", async function (req, res) {
-    let data = {};
-    res.render("sandbox", { layout: "blank.handlebars", data: data });
+  app.get("/health", async function (req, res) {
+    res.status(200).send("ok");
+  });
+
+  app.get("/health-database", async function (req, res) {
+    let content = await dataService.getContentByUrl("/");
+    if (content && content.contentTypeId === "page") {
+      res.status(200).send("ok");
+    } else {
+      res.status(500).send("database offline");
+    }
   });
 
   app.get("/theme1", async function (req, res) {
@@ -132,12 +142,6 @@ exports.loadRoutes = async function (app) {
     res.render("sandbox", { layout: "admin.handlebars", data: data });
   });
 
-  app.get("/css/generated.css", async function (req, res) {
-    res.set("Content-Type", "text/css");
-    let css = await cssService.getGeneratedCss();
-    res.send(css);
-  });
-
   app.post("/dropzone-upload", async function (req, res) {
     console.log("dropzone-upload req.files.file", req.files.file);
     await fileService.uploadWriteFile(req.files.file, req.sessionID);
@@ -145,16 +149,85 @@ exports.loadRoutes = async function (app) {
   });
 
   app.post("/form-submission", async function (req, res) {
-
-    let payload = req.body.data.data ? req.body.data.data : undefined;
-
+    let payload = req.body.data.data ? req.body.data.data : req.body.data;
+    let contentTypeId = payload.contentType;
     if (payload) {
       let options = { data: payload, sessionID: req.sessionID };
 
       await emitterService.emit("afterFormSubmit", options);
-    }
 
-    res.sendStatus(200);
+      // if (!payload.contentType.startsWith("user")) {
+      //   if (submission.id || submission.data.id) {
+      //     await editInstance(entity, refresh, contentType);
+      //   } else {
+      //     await createInstance(entity, true, contentType);
+      //   }
+      // }
+      let entity;
+
+      let contentType = await dataService.contentTypeGet(contentTypeId, req);
+
+      if (payload.id) {
+        //edit existing
+        if (contentTypeId === "user") {
+          //do nothing, already managed by hook
+          // entity = await dataService.userUpdate(payload, req.sessionID);
+        } else {
+          entity = await dataService.editInstance(payload, req.sessionID);
+        }
+      } else {
+        //create new
+        let newContent = { contentType: payload.contentType, data: payload };
+        entity = await dataService.contentCreate(
+          newContent,
+          true,
+          req.sessionID
+        );
+      }
+
+      let redirectTo = "/";
+      // if (entity && entity.contentTypeId === "page") {
+      //   let isBackEnd = globalService.isBackEnd();
+      //   if (isBackEnd) {
+      //     redirectTo = `/admin/content/edit/page/${entity.id}`;
+      //   } else {
+      //     // window.location.href = payload.data.url;
+      //     redirectTo = payload.data.url;
+      //   }
+      // }
+      // else if (refresh) {
+      //   fullPageUpdate();
+      // }
+      let successAction;
+
+      if (contentType.data?.states) {
+        if (contentType.data.states.postSubmission === "redirectToUrl") {
+          successAction = `redirectToUrl('${contentType.data.states.redirectUrl}');`;
+        } else if (contentType.data.states.postSubmission === "showMessage") {
+          successAction = `postSubmissionSuccessMessage("${contentType.data.postSubmission.message}");`;
+        } else if (contentType.data.states.postSubmission === "doNothing") {
+          successAction = `javascript:void(0);`;
+        } else if (contentType.data.states.postSubmission === "callFunction") {
+          successAction = contentType.data.states.functionToCall;
+        }
+      }
+
+      //if admin, redirect to edit page
+      let isBackEnd = req.body && req.body.url && req.body.url.startsWith("/admin");
+      if (isBackEnd && (contentTypeId === "user-register" || contentTypeId === "user")) {
+        successAction = `redirectToUrl('/admin/users');`;
+        // TODO: fix so that admin is redirected to user edit form
+        // successAction = `redirectToUrl('/admin/user/edit/${entity.id}');`;
+      } else if (isBackEnd && !successAction) {
+        successAction = `redirectToUrl('/admin/content/edit/${contentTypeId}/${entity.id}');`;
+      } else if (!isBackEnd && contentTypeId === "page") {
+        successAction = `redirectToUrl('${entity.url}');`;
+      }
+
+      successAction = successAction ?? "fullPageUpdate();";
+
+      res.send({ successAction });
+    }
   });
 
   app.post("*", async function (req, res, next) {
@@ -168,8 +241,7 @@ exports.loadRoutes = async function (app) {
 
 exports.loadRoutesCatchAll = async function (app) {
   // app.get(/^[^.]*$/, async function (req, res, next) {
-    app.get("*", async function (req, res, next) {
-
+  app.get("*", async function (req, res, next) {
     await emitterService.emit("requestBegin", { req: req, res: res });
 
     if (req.isRequestAlreadyHandled) {
@@ -212,6 +284,20 @@ exports.loadRoutesCatchAll = async function (app) {
       return next();
     }
 
+    //allow something other than '/' to be the site home page
+    if (
+      req.url === "/" &&
+      req.siteSettings.homePageUrl &&
+      req.siteSettings.homePageUrl !== "/"
+    ) {
+      res.redirect(301, req.siteSettings.homePageUrl);
+      return;
+    }
+
+    if (req.user?.profile) {
+      req.user.profile.currentPageUrl = req.url;
+    }
+
     if (process.env.MODE == "production") {
       console.log(`serving: ${req.url}`);
     }
@@ -224,17 +310,16 @@ exports.loadRoutesCatchAll = async function (app) {
     let urlKey = await urlService.getUrl(req.url);
     // console.log("urlKey", urlKey);
 
-
-    //replace this will 
+    //replace this will
 
     var page = {};
     req.urlKey = urlKey;
     var processUrlOptions = { req, res, urlKey, page };
 
-    await emitterService.emit("processUrl",processUrlOptions);
+    await emitterService.emit("processUrl", processUrlOptions);
     page = processUrlOptions.page;
 
-// return;
+    // return;
 
     if (!page.data || page.data?.title === "Not Found") {
       res.redirect("/404");
@@ -245,10 +330,23 @@ exports.loadRoutesCatchAll = async function (app) {
 
     page.data.id = page.id;
     page.data.sessionID = req.sessionID;
-    page.data.themeSettings.bootstrapToggleMiddle  = page.data.themeSettings.bootstrapVersion == 4 ? '': 'bs-';
+    page.data.themeSettings.bootstrapToggleMiddle =
+      page.data.themeSettings.bootstrapVersion == 4 ? "" : "bs-";
 
-    res.render(`front-end/${frontEndTheme}/layouts/main`, {
-      layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
+    //add user data
+    page.data.user = req.user ? req.user : { username: "anon" };
+    page.data.user.isAuthenticated = req.user ? true : false;
+    page.data.siteSettings = req.siteSettings;
+
+    //check is edit mode, sidebar expanded
+    page.data.isEditMode = req.cookies.showSidebar === "false" ? false : true;
+    page.data.sidebarClass = page.data.isEditMode ? "expanded" : "collapsed";
+
+
+    await res.app.emit("pagePreRender", {req, page});
+
+    res.render(`${frontEndTheme}/layouts/main`, {
+      layout: path.join(appRoot.path, frontEndTheme, "theme.hbs"),
       data: page.data,
     });
 

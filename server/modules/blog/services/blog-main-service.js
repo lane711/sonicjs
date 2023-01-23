@@ -20,35 +20,11 @@ module.exports = blogMainService = {
       }
     });
 
-    // emitterService.on("processUrl", async function (options) {
-    //   if (options.urlKey.handler === "blogHandler") {
-    //     // const data = await blogMainService.getBlogData(options);
-    //     const data = await dataService.getContentByUrl(options.urlKey.url);
-
-    //     options.res.render(`front-end/${frontEndTheme}/layouts/main`, {
-    //       layout: `front-end/${frontEndTheme}/${frontEndTheme}`,
-    //       data: options.page.data,
-    //     });
-
-    //     return;
-    //   }
-    // });
-
-    // emitterService.on("processUrl", async function (options) {
-    //   if (options.urlKey.handler === "blogHandler") {
-    //     var { page : pageData } = await contentService.getRenderedPage(options.req);
-    //     const data = await dataService.getContentByUrl(options.urlKey.url);
-
-    //     options.page = pageData;
-
-    //     return;
-    //   }
-    // });
-
-    emitterService.on("modulesLoaded", async function (options) {
+    emitterService.on("addUrl", async function (options) {
       var blogs = await dalService.contentGet(
         null,
         "blog",
+        null,
         null,
         null,
         null,
@@ -65,10 +41,6 @@ module.exports = blogMainService = {
         const blogNext = index < (blogs.length -1) ? blogs[index +1] : {};
         urlService.addUrl(blog.url, "blogHandler", "exact", blogData.title, blog.id, blogPrevious?.url, blogNext.url);
       }
-      // blogs.map((blog) => {
-      //   const blogData = JSON.parse(blog.data);
-      //   urlService.addUrl(blog.url, "blogHandler", "exact", blogData.title, blog.id);
-      // });
     });
   },
 
@@ -95,7 +67,7 @@ module.exports = blogMainService = {
       );
     }
 
-    listRaw = listRaw.sort((a, b) => (a.createdOn > b.createdOn ? 1 : -1));
+    listRaw = listRaw.sort((a, b) => (a.createdOn < b.createdOn ? 1 : -1));
 
     listRaw = listRaw.filter((x) => x.data.title);
     let list = listRaw.map(function (record) {
@@ -103,7 +75,7 @@ module.exports = blogMainService = {
         data: {
           title: record.data.title,
           body: formattingService.stripHtmlTags(
-            helperService.truncateString(record.data.body, 400)
+            helperService.truncateString(record.data.body, 250)
           ),
           image: record.data.fileName
             ? mediaService.getMediaUrl(record.data.fileName.file)
@@ -114,28 +86,8 @@ module.exports = blogMainService = {
       };
     });
 
-    // let sortedList = list.sort((a, b) =>
-    //   a.data.createdOn < b.data.createdOn ? 1 : -1
-    // );
     options.viewModel.data.list = list;
 
-    // Wait for all Promises to complete
-    // Promise.all(list)
-    //   .then((list) => {
-    //     // Handle results
-    //   })
-    //   .catch((e) => {
-    //     console.error(e);
-    //   });
   },
 
-  // processView: async function (contentType, viewModel, viewPath) {
-  //   var result = await viewService.getProcessedView(
-  //     contentType,
-  //     viewModel,
-  //     viewPath
-  //   );
-
-  //   return result;
-  // },
 };

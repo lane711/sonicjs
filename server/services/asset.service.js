@@ -1,7 +1,16 @@
+/**
+ * Asset Service -
+ * The asset service is responsible for processing the css and js files used by the site.
+ * It is responsible for minimizing assets for production. The assets that are loaded for the site
+ * are combined from various sources: 1) your themes assets.yml file. 2) Assets from the enabled modules
+ * 3) CSS for sections managed in the page builder
+ * @module assetService
+ */
 var globalService = require("./global.service");
 var emitterService = require("./emitter.service");
 var fileService = require("./file.service");
 var dataService = require("./data.service");
+var userService = require("./user.service");
 const path = require("path");
 var UglifyJS = require("uglify-js");
 var csso = require("csso");
@@ -9,6 +18,7 @@ var fileName = {};
 const frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const frontEndThemeBootswatch = `${process.env.FRONT_END_THEME_BOOTSWATCH}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
+const regenerateAssets = `${process.env.REGEN_ASSETS}` === "TRUE";
 
 module.exports = assetService = {
   startup: async function () {
@@ -22,7 +32,11 @@ module.exports = assetService = {
           let assetFilesExist = await assetService.doesAssetFilesExist();
 
           // if (process.env.REBUILD_ASSETS === "TRUE" || !assetFilesExist || options.req.pageLoadedCount === 1) {
-          if (!assetFilesExist || options.req.pageLoadedCount === 1) {
+          if (
+            !assetFilesExist ||
+            options.req.pageLoadedCount === 1 ||
+            regenerateAssets
+          ) {
             //rebuild the assets before delivering
             await assetService.getLinks(options, "css");
             await assetService.getLinks(options, "js");
@@ -35,6 +49,13 @@ module.exports = assetService = {
           options.page.data.jsLinks = `<script src="/assets/js/${assetService.getCombinedFileName(
             "js"
           )}"></script>`;
+          //manually add page builder for prod mode authenticated user
+          if (process.env.MODE === "production") {
+            if (userService.isAuthenticated(options.req)) {
+              options.page.data.jsLinks += `<script src="/page-builder/js/page-builder.js"></script>`;
+            }
+          }
+
           options.page.data.cssLinks = `<link href="/assets/css/${assetService.getCombinedFileName(
             "css"
           )}" rel="stylesheet">`;
@@ -58,7 +79,7 @@ module.exports = assetService = {
         let appVersion = globalService.getAppVersion();
         let fileName = assetService.getCombinedFileName(assetType);
 
-        console.log('prod asset', assetType, appVersion, fileName);
+        console.log("prod asset", assetType, appVersion, fileName);
 
         let file = path.join(
           __dirname,
@@ -113,7 +134,6 @@ module.exports = assetService = {
     }
 
     if (globalService.isFrontEnd) {
-
       let assets = await this.getThemeAssets();
 
       this.addPaths(options, assets[assetType], assetType);
@@ -137,7 +157,7 @@ module.exports = assetService = {
       await globalService.asyncForEach(
         globalService.moduleJsFiles,
         async (path) => {
-          this.addPath(options, {path: path}, assetType);
+          this.addPath(options, { path: path }, assetType);
         }
       );
     }
@@ -147,7 +167,7 @@ module.exports = assetService = {
       await globalService.asyncForEach(
         globalService.moduleCssFiles,
         async (path) => {
-          this.addPath(options, {path: path}, assetType);
+          this.addPath(options, { path: path }, assetType);
         }
       );
     }
@@ -155,7 +175,7 @@ module.exports = assetService = {
 
   getThemeAssets: async function () {
     var themeConfig = await fileService.getYamlConfig(
-      `/server/themes/front-end/${frontEndTheme}/${frontEndTheme}.config.yml`
+      `${frontEndTheme}/assets.config.yml`
     );
     return themeConfig.assets;
   },
@@ -169,7 +189,7 @@ module.exports = assetService = {
       let skipAsset =
         typeOfRecord === "object" && !options.page.data.showPageBuilder;
       if (!skipAsset) {
-        this.addPath(options, {path: path}, assetType);
+        this.addPath(options, { path: path }, assetType);
       }
     });
   },
@@ -209,41 +229,58 @@ module.exports = assetService = {
 
     let fileContent = "";
 
-    await globalService.asyncForEach(
-      options.page.data.links[assetType],
-      async (link) => {
-        let root = link.path.startsWith("/node_modules");
-        if (link.path.includes("/api/containers/css/download/template.css")) {
-          link.path = `/server/themes/front-end/${frontEndTheme}/css/template-processed.css`;
-        }
-        if (!link.path.startsWith('/node_modules')) {
-          link.path = '/server' + link.path;
-        }
-        let fileContentRaw = await fileService.getFile(link.path);
-        if (fileContentRaw) {
-          console.log(
-            `Adding Path: ${link.path} -- Size: ${fileContentRaw.length}`
-          );
-          fileContent += fileContentRaw + "\n";
-          console.log(`fileContent Size: ${fileContent.length}`);
-        } else {
-          console.log("empty, skipping:  " + link.path);
+
+
+    for (link of options.page.data.links[assetType]) {
+
+      let root = link.path.startsWith("/node_modules");
+      if (link.path.includes("/css/template-processed.css")) {
+        link.path = `${frontEndTheme}/css/template-processed.css`;
+      }
+      if (
+        !link.path.startsWith("/node_modules") &&
+        !link.path.endsWith("template-processed.css")
+      ) {
+        if (!link.path.startsWith("/custom")) {
+          link.path = "/server" + link.path;
         }
       }
-    );
+      let fileContentRaw = await fileService.getFile(link.path);
+      if (link.path === "/server/page-builder/js/page-builder.js") {
+        console.log("skipping page builder for prod mmode:  " + link.path);
+      } else if (fileContentRaw) {
+        console.log(
+          `Adding Path: ${link.path} -- Size: ${fileContentRaw.length}`
+        );
+        fileContent += fileContentRaw + "\n";
+        console.log(`fileContent Size: ${fileContent.length}`);
+      } else {
+        console.log("empty, skipping:  " + link.path);
+      }
 
+    }
 
     let appVersion = globalService.getAppVersion();
     let fileName = this.getCombinedFileName(assetType);
     let overwriteFile = options.req.pageLoadedCount === 1;
 
-    await this.createCombinedFile(fileContent, fileName, assetType, overwriteFile);
+    await this.createCombinedFile(
+      fileContent,
+      fileName,
+      assetType,
+      overwriteFile
+    );
   },
 
-  createCombinedFile: async function (fileContent, fileName, assetType, overwriteFile) {
+  createCombinedFile: async function (
+    fileContent,
+    fileName,
+    assetType,
+    overwriteFile
+  ) {
     let path = this.getAssetPath(fileName);
     let minifiedAsset = "";
-    if (!fileService.fileExists(path) || overwriteFile) {
+    if (!fileService.fileExists(path) || overwriteFile || regenerateAssets) {
       console.log(`Generating Asset: ${path}`);
       if (assetType === "js") {
         let minJs = UglifyJS.minify(fileContent, {
@@ -251,7 +288,7 @@ module.exports = assetService = {
         });
 
         if (minJs.error) {
-          console.error(`Error minifying ${fileName}`, minJs.error)
+          console.error(`Error minifying ${fileName}`, minJs.error);
         }
 
         minifiedAsset = minJs.code;
@@ -260,7 +297,6 @@ module.exports = assetService = {
       if (assetType === "css") {
         let cssMin = csso.minify(fileContent).css;
         minifiedAsset = cssMin;
-
       }
 
       fileService.writeFile(`${path}`, minifiedAsset);

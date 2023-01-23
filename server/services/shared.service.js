@@ -1,3 +1,9 @@
+/**
+ * Shared Service -
+ * The shared service is resposible for a few helper sytle functions.
+ * @module sharedService
+ */
+
 (function(exports) {
   exports.test = function() {
     return "hello world";
@@ -36,7 +42,8 @@
   exports.getBaseUrl = function(){
     var url = window.location.href;
     var arr = url.split("/");
-    var result = arr[0] + "//" + arr[2]
+    var result = arr[0] + "//" + arr[2];
+    // console.log('getBaseUrl', result)
     return result;
   };
 

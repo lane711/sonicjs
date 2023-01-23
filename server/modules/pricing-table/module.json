@@ -1,0 +1,9 @@
+{
+  "title": "Pricing Table",
+  "enabled": true,
+  "systemId": "pricing-table",
+  "icon": "bi-layout-three-columns",
+  "canBeAddedToColumn": true,
+  "singleInstance": false,
+  "version": "0.0.0.1"
+}

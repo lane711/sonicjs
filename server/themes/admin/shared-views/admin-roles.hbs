@@ -12,6 +12,7 @@
         <thead>
           <tr>
             <th>Name</th>
+            <th>slug</th>
             <th>Description</th>
             <th class="text-right">Actions</th>
           </tr>
@@ -20,13 +21,15 @@
           {{#each data.roles}}
           <tr>
             <td><a href="/admin/role/edit/{{ this.id }}">{{ this.data.title }}</a></td>
+            <td>{{ this.data.key }}</td>
+
             <td>{{ this.data.description }}</td>
             <td class="text-right">
               <a class="btn btn-sm btn-primary rmargin" href="/admin/role/edit/{{ this.id }}">Edit</a>
 
 
               <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
-                data-trigger="focus" title="Delete <b>{{ this.data.name }}</b> Forever?" data-content="<a href='/Role/{{ this.id }}/{{../data.sessionID}}'
+                data-trigger="focus" data-role="{{ this.data.title }}" title="Delete <b>{{ this.data.name }}</b> Forever?" data-content="<a href='/Role/{{ this.id }}/{{../data.sessionID}}'
 class='btn btn-sm btn-danger rmargin custom-delete'>Confirm Delete</a>
 ">Delete</a>
 
@@ -57,7 +60,7 @@ class='btn btn-sm btn-danger rmargin custom-delete'>Confirm Delete</a>
       </div>
       <div class="modal-body">
 
-        {{{ data.editFormRole }}}
+        {{{ data.editFormRole.html }}}
 
       </div>
     </div>

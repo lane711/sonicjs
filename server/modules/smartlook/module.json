@@ -1,8 +1,9 @@
 {
   "title": "Smartlook",
+  "enabled": false,
   "systemId": "smartlook",
-  "version": "0.0.0.1",
-  "enabled": true,
+  "icon": "",
   "canBeAddedToColumn": false,
-  "singleInstance": true
+  "singleInstance": true,
+  "version": "0.0.0.1"
 }

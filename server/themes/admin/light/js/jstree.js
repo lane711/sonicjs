@@ -85,7 +85,7 @@ $(document).ready(async function () {
 
     // debugger;
 
-    let form = await formService.getForm(
+    let form = await dataService.formGet(
       "menu",
       content,
       "addModuleToColumn(submission)",
@@ -97,9 +97,9 @@ $(document).ready(async function () {
     // debugger;
 
     $("#menuTreeForm").empty();
-    $("#menuTreeForm").html(form);
+    $("#menuTreeForm").html(form.html);
 
-    formInit();
+    loadModuleSettingForm();
 
     $("#menuTreeForm #title").focus();
   });

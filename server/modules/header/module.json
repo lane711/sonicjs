@@ -2,8 +2,8 @@
   "title": "Header",
   "enabled": true,
   "systemId": "header",
+  "icon": "bi-card-heading",
   "canBeAddedToColumn": true,
-  "version": "0.0.0.1",
-  "systemidUpperCase": "HEADER",
-  "systemidCamelCase": "header"
+  "singleInstance": false,
+  "version": "0.0.0.1"
 }

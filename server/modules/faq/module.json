@@ -2,8 +2,8 @@
   "title": "FAQ",
   "enabled": true,
   "systemId": "faq",
+  "icon": "bi-question-square",
   "canBeAddedToColumn": true,
-  "version": "0.0.0.1",
-  "systemidUpperCase": "FAQ",
-  "systemidCamelCase": "faq"
+  "singleInstance": false,
+  "version": "0.0.0.1"
 }

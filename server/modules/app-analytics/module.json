@@ -2,9 +2,8 @@
   "title": "App Analytics",
   "enabled": true,
   "systemId": "app-analytics",
+  "icon": "",
   "canBeAddedToColumn": false,
-  "sessionID": "undefined",
-  "version": "0.0.0.1",
-  "systemidUpperCase": "APP-ANALYTICS",
-  "systemidCamelCase": "appAnalytics"
+  "singleInstance": false,
+  "version": "0.0.0.1"
 }

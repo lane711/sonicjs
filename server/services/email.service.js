@@ -1,3 +1,9 @@
+/**
+ * Email Service -
+ * The email service is responsible for sending transactional emails. It currently uses sendgrid but can easily be expanded 
+ * to include other email providers.
+ * @module emailService
+ */
 var dataService = require("./data.service");
 var helperService = require("./helper.service");
 var emitterService = require("./emitter.service");
@@ -9,12 +15,15 @@ const chalk = require("chalk");
 const log = console.log;
 var path = require("path");
 const sgMail = require("@sendgrid/mail");
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+if(process.env.SENDGRID_API_KEY.indexOf('SG.') > -1){
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+}
 var sendEmail = process.env.SEND_EMAIL;
 
 module.exports = emailService = {
   sendEmail: async function (from, fromName, replyTo, to, subject, body) {
     if (sendEmail !== "TRUE") {
+      console.log('SEND_EMAIL env var set to false, not sending email');
       return;
     }
 

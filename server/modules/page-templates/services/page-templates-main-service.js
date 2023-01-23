@@ -20,19 +20,18 @@ module.exports = pageTemplatesMainService = {
           "PAGE TEMPLATE REGION"
         );
 
-        let moduleClass = options.page.data.isPageTemplate ? 'module ' : '';
-        options.page.data.currentShortCodeHtml = `<div class="${moduleClass} page-template-region mb-2" data-id="${options.shortcode.properties.id}" data-module="PAGE-TEMPLATES">PAGE TEMPLATE REGION START</div>`;
+        let moduleClass = options.page.data.isPageTemplate ? "module " : "";
+        options.page.data.currentShortCodeHtml = "";
+        if (options.req.user) {
+          options.page.data.currentShortCodeHtml = `<div class="${moduleClass} page-template-region mb-2" data-id="${options.shortcode.properties.id}" data-module="PAGE-TEMPLATES">PAGE TEMPLATE REGION START</div>`;
+        }
 
         await moduleService.processModuleInColumn(options);
-
-
       }
     });
 
     emitterService.on("postModuleGetData", async function (options) {
       if (options.shortcode.name === "PAGE-TEMPLATES") {
-
-
         if (options.page.data.pageTemplateRegions) {
           let regionId = options.viewModel.data.id;
           let body = options.page.data.pageTemplateRegions.filter(
@@ -65,7 +64,9 @@ module.exports = pageTemplatesMainService = {
             // );
           }
         }
-        options.page.data.currentShortCodeHtml += `<div class="page-template-region mt-2" data-id="${options.shortcode.properties.id}" data-module="PAGE-TEMPLATES">PAGE TEMPLATE REGION END</div>`;
+        if (options.req.user) {
+          options.page.data.currentShortCodeHtml += `<div class="page-template-region mt-2" data-id="${options.shortcode.properties.id}" data-module="PAGE-TEMPLATES">PAGE TEMPLATE REGION END</div>`;
+        }
 
         options.viewModel.data.html = options.page.data.currentShortCodeHtml;
         // options.viewModel.data.html = processedHtml.body;
@@ -77,22 +78,22 @@ module.exports = pageTemplatesMainService = {
       }
     });
 
-    emitterService.on("preRenderTemplate", async function (options) {
-
-    });
+    emitterService.on("preRenderTemplate", async function (options) {});
 
     emitterService.on("preProcessSections", async function (options) {
       // check is page is using a template
-      if (options.page.data.pageTemplate && options.page.data.pageTemplate !== "none") {
+      if (
+        options.page.data.pageTemplate &&
+        options.page.data.pageTemplate !== "none"
+      ) {
         let templatePage = await dataService.getContentById(
           options.page.data.pageTemplate,
           options.req.sessionID
         );
-        if(templatePage){
+        if (templatePage) {
           options.page.data.layout = templatePage.data.layout;
         }
       }
-
     });
   },
 };

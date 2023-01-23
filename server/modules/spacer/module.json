@@ -2,8 +2,8 @@
   "title": "Spacer",
   "enabled": true,
   "systemId": "spacer",
+  "icon": "bi-distribute-vertical",
   "canBeAddedToColumn": true,
-  "version": "0.0.0.1",
-  "systemidUpperCase": "SPACER",
-  "systemidCamelCase": "spacer"
+  "singleInstance": false,
+  "version": "0.0.0.1"
 }

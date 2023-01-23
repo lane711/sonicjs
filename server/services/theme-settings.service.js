@@ -1,3 +1,9 @@
+/**
+ * Theme Service -
+ * The theme service is adds runtime data for use in theme rendering. IE it provides the current year for use in the site footer.
+ * @module themeService
+ */
+
 var dataService = require("./data.service");
 var helperService = require("./helper.service");
 var emitterService = require("./emitter.service");
@@ -26,9 +32,8 @@ module.exports = themeSettingsService = {
     options.page.data.currentYear = new Date().getFullYear();
 
     //add bs version
-    //server/themes/front-end/bootstrap5/bootstrap5.config.yml
     var themeConfig = await fileService.getYamlConfig(
-      `/server/themes/front-end/${process.env.FRONT_END_THEME}/${process.env.FRONT_END_THEME}.config.yml`
+      `${process.env.FRONT_END_THEME}/assets.config.yml`
     );
 
     options.page.data.themeSettings.bootstrapVersion = themeConfig['bootstrap-version'];

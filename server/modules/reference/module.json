@@ -1,0 +1,9 @@
+{
+  "title": "Reference",
+  "enabled": true,
+  "systemId": "reference",
+  "icon": "",
+  "canBeAddedToColumn": false,
+  "singleInstance": true,
+  "version": "0.0.0.1"
+}

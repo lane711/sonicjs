@@ -1,8 +1,8 @@
 {
   "title": "Theme Settings",
-  "systemId": "theme-settings",
-  "version": "0.0.0.1",
   "enabled": true,
-  "canBeAddedToColumn": true,
-  "singleInstance": false
+  "systemId": "theme-settings",
+  "canBeAddedToColumn": false,
+  "singleInstance": false,
+  "version": "0.0.0.1"
 }

@@ -1,0 +1,10 @@
+{
+  "title": "Disqus",
+  "enabled": true,
+  "systemId": "disqus",
+  "canBeAddedToColumn": true,
+  "sessionID": "undefined",
+  "version": "0.0.0.1",
+  "systemidUpperCase": "DISQUS",
+  "systemidCamelCase": "disqus"
+}

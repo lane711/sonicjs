@@ -2,7 +2,6 @@ $(document).ready(async function () {
   // console.log('share service test: ' + sharedService.test());
 
   setupToolTips();
-  setupFancyBox();
 });
 
 function submitForm(submission) {
@@ -51,23 +50,38 @@ function testFunction(echo) {
   return echo;
 }
 
-function setupFancyBox() {
-  // debugger;
-  if (typeof $.fancybox == "function") {
-    Fancybox.bind("[data-fancybox]", {
-      // Your options go here
-    });
-  } else {
-    // fancy box not loaded;
+function copyTextToClipboard(text) {
+  if (!navigator.clipboard) {
+    fallbackCopyTextToClipboard(text);
+    return;
   }
+  navigator.clipboard.writeText(text).then(function() {
+    console.log('Async: Copying to clipboard was successful!');
+  }, function(err) {
+    console.error('Async: Could not copy text: ', err);
+  });
+}
 
-  // $("a.fancybox").fancybox({
-  // 	'transitionIn'	:	'elastic',
-  // 	'transitionOut'	:	'elastic',
-  // 	'speedIn'		:	600,
-  // 	'speedOut'		:	200,
-  // 	'overlayShow'	:	false,
-  //   'hideOnContentClick': true
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-  // });
+function waitForElm(selector) {
+  return new Promise(resolve => {
+      if (document.querySelector(selector)) {
+          return resolve(document.querySelector(selector));
+      }
+
+      const observer = new MutationObserver(mutations => {
+          if (document.querySelector(selector)) {
+              resolve(document.querySelector(selector));
+              observer.disconnect();
+          }
+      });
+
+      observer.observe(document.body, {
+          childList: true,
+          subtree: true
+      });
+  });
 }

@@ -11,10 +11,25 @@
   }
 } */
 
+/* .accordian-menu{
+  height: calc(100vh - 100px);
+  overflow-y: scroll;
+  font-size: 1rem;
+  width: 100%;
+} */
+
+.accordian-menu{
+  /* height: calc(100vh - 100px);
+  overflow-y: scroll; */
+  font-size: 1rem;
+  width: 100%;
+}
+
 .accordian-menu.sticky {
   position: fixed;
   top: 100px;
-  width: 100%;
+  /* max-width: 400px; */
+  flex: 0 0 auto
 }
 
 .accordian-menu a.current :before, .accordian-menu a.current span :before {
@@ -27,7 +42,35 @@
   margin: 0 6px 0 0;
 }
 
-.accordian-menu{
-  height: calc(100vh - 100px);
-  overflow-y: scroll;
+.accordian-menu a{
+  padding: 0;
+  margin: 0;
+  text-decoration: none;
+}
+
+
+
+.accordian-menu .level-1{
+  display: block;
+  color: #000;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.accordian-menu .level-2{
+  font-weight: bold;
+margin: 3px 0;
+font-size: .9rem;
+
+}
+
+.accordian-menu .level-3{
+  border-left: 4px solid #E0E2E4;
+  margin: 2px 0;
+  font-size: .8rem;
+
+}
+
+.accordian-menu .level-3 span{
+  margin: 0 0 0 8px;
 }

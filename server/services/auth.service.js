@@ -1,3 +1,8 @@
+/**
+ * Auth Service -
+ * The auth service is responsible for registering and logging in users
+ * @module authService
+ */
 var dataService = require("./data.service");
 var helperService = require("./helper.service");
 var emitterService = require("./emitter.service");
@@ -44,26 +49,26 @@ module.exports = authService = {
       res.send({ user: req.user });
     });
 
-    app.get("/register", async function (req, res) {
-      let data = { registerMessage: "<b>user</b>" };
-      res.render("admin/shared-views/user-register", {
-        layout: `front-end/${frontEndTheme}/login.hbs`,
-        data: data,
-      });
-      return;
-    });
+    // app.get("/register", async function (req, res) {
+    //   let data = { registerMessage: "<b>user</b>" };
+    //   res.render("/server/admin/shared-views/user-register", {
+    //     layout: `front-end/${frontEndTheme}/login.hbs`,
+    //     data: data,
+    //   });
+    //   return;
+    // });
 
-    app.post("/register", async function (req, res) {
-      let email = req.body.email;
-      let password = req.body.password;
-      let passwordConfirm = req.body.passwordConfirm;
+    // app.post("/register", async function (req, res) {
+    //   let email = req.body.email;
+    //   let password = req.body.password;
+    //   let passwordConfirm = req.body.passwordConfirm;
 
-      let newUser = await userService.registerUser(email, password);
+    //   let newUser = await userService.registerUser(email, password);
 
-      let message = encodeURI(`Account created successfully. Please login`);
-      res.redirect(`/login?message=${message}`); // /admin will show the login
-      return;
-    });
+    //   let message = encodeURI(`Account created successfully. Please login`);
+    //   res.redirect(`/login?message=${message}`); // /admin will show the login
+    //   return;
+    // });
 
     app.get("/register-admin", async function (req, res) {
       if (globalService.isAdminUserCreated == true) {
@@ -77,8 +82,8 @@ module.exports = authService = {
         data.message = parsedQs.message;
       }
 
-      res.render("admin/shared-views/admin-register", {
-        layout: `front-end/${frontEndTheme}/login.hbs`,
+      res.render("server/themes/admin/shared-views/admin-register", {
+        layout: `${appRoot.path}/server/themes/admin/shared-views/login.hbs`,
         data: data,
       });
       return;
@@ -114,10 +119,12 @@ module.exports = authService = {
 
     app.get("/register-admin-optin", async function (req, res) {
       let data = { email: req.app.get("optinEmail") };
-      res.render("admin/shared-views/admin-register-optin", {
-        layout: `front-end/${frontEndTheme}/login.hbs`,
+
+      res.render("server/themes/admin/shared-views/admin-register-optin", {
+        layout: `${appRoot.path}/server/themes/admin/shared-views/login.hbs`,
         data: data,
       });
+
       return;
     });
 
@@ -147,15 +154,13 @@ module.exports = authService = {
       return;
     });
 
-    app.post("/login", (req, res, next) => {
+    app.post("/login", async (req, res, next) => {
       if (process.env.MODE !== "dev") {
         if (adminDomain !== req.host) {
           res.send(401);
           return;
         }
       }
-
-      console.log("passport.authenticate");
 
       passport.authenticate("local", (err, user, info) => {
         if (err) {
@@ -174,13 +179,33 @@ module.exports = authService = {
             return next(err);
           }
 
+          if ((await userService.canAccessBackEnd(req)) !== true) {
+            return res.redirect("/");
+          }
+
           if (!req.session.returnTo) {
-            console.log("redirect to admin");
+            // console.log("redirect to admin");
             return res.redirect("/admin");
           } else {
-            console.log("redirect to " + req.session.returnTo);
+            // cons ole.log("redirect to " + req.session.returnTo);
             return res.redirect(req.session.returnTo);
           }
+        });
+      })(req, res, next);
+    });
+
+    app.post("/login-user", (req, res, next) => {
+      passport.authenticate("local", (err, user, info) => {
+        if (err) {
+          return next(err);
+        }
+
+        req.logIn(user, async function (err) {
+          if (err) {
+            console.error(err);
+            return next(err);
+          }
+          res.send(user);
         });
       })(req, res, next);
     });
@@ -192,6 +217,25 @@ module.exports = authService = {
     app.get("/user", connectEnsureLogin.ensureLoggedIn(), (req, res) =>
       res.send({ user: req.user })
     );
+
+    app.get("/user-open", (req, res) => res.send({ user: req.user }));
+
+    app.get("/login-redirect", async function (req, res) {
+      if (process.env.MODE !== "dev") {
+        if (adminDomain !== req.host) {
+          res.send(401);
+          return;
+        }
+      }
+
+      let data = {username:req.query.username, password:req.query.password};
+
+      res.render("server/themes/admin/shared-views/admin-login-redirect", {
+        layout: null,
+        data: data,
+      });
+      // return;
+    });
 
     app.get("/login", async function (req, res) {
       if (process.env.MODE !== "dev") {
@@ -217,15 +261,18 @@ module.exports = authService = {
         data.error = parsedQs.error;
       }
 
-      res.render("admin/shared-views/admin-login", {
-        layout: `front-end/${frontEndTheme}/login.hbs`,
+      await emitterService.emit("processUrl", { req, res, urlKey : 'admin', page : data });
+      await res.app.emit("pagePreRender", {req, page : data});
+
+      res.render("server/themes/admin/shared-views/admin-login", {
+        layout: `${appRoot.path}/server/themes/admin/shared-views/login.hbs`,
         data: data,
       });
       // return;
     });
 
     app.get("/logout", function (req, res) {
-      console.log("logging out:" + req.user.username);
+      // console.log("logging out:" + req.user.username);
       req.session.destroy(function (err) {
         res.redirect("/"); //Inside a callback… bulletproof!
       });
@@ -235,7 +282,7 @@ module.exports = authService = {
       if (options.req.url === "/register") {
         options.req.isRequestAlreadyHandled = true;
         let data = { registerMessage: "<b>admin</b>" };
-        options.res.render("admin/shared-views/admin-register", {
+        options.res.render("server/themes/admin/shared-views/admin-register", {
           layout: `front-end/${frontEndTheme}/login.handlebars`,
           data: data,
         });

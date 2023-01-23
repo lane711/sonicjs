@@ -1,3 +1,8 @@
+/**
+ * Global Service -
+ * The global service is responsible for managing global variables used throughout SonicJs.
+ * @module globalService
+ */
 (function (exports) {
   var isAdminUserCreated = false;
   var axiosInstance;
@@ -7,6 +12,7 @@
   var moduleCssFiles = [];
   var moduleJsFiles = [];
   var moduleContentTypeConfigs = [];
+  var moduleContentTypeConfigsAll = [];
   var AccessToken;
   var isRequestAlreadyHandled = false;
   var isBackEnd = false;

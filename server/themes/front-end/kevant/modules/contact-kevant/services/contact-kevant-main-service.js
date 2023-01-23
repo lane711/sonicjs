@@ -32,7 +32,7 @@ module.exports = contactKevantUsMainService = {
         "submitFormAndRedirect(submission, '/thank-you')",
         false,
         contactFormSettingsId,
-        options.req.sessionID
+        options.req
       );
 
       // console.log('contact module after view model', options.viewModel);

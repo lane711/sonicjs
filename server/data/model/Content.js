@@ -9,7 +9,6 @@ class Content {
         this.createdOn = createdOn;
         this.updatedOn = updatedOn;
         this.url = url;
-        this.tags = tags;
     }
 }
 

@@ -1,3 +1,9 @@
+/**
+ * Form Service -
+ * The form service is responsible for generating the data entry forms that are used both on the front end and back end aministratice sections.
+ * SonicJs uses form.io, an open source form generator.
+ * @module formService
+ */
 isBackEndMode = false;
 var axiosInstance;
 
@@ -53,7 +59,8 @@ if (typeof module !== "undefined" && module.exports) {
           "submitContent(submission)",
           undefined,
           undefined,
-          options.req.sessionID
+          options.req,
+          options.req.url
         );
       }
     });
@@ -85,20 +92,29 @@ if (typeof module !== "undefined" && module.exports) {
       onFormSubmitFunction,
       returnModuleSettings = false,
       formSettingsId,
-      sessionID
+      req,
+      referringUrl,
+      showBuilder = false,
+      defaults,
+      readOnly = false
     ) {
+      req.referringUrl = referringUrl;
+      let contentObject = content;
+      if (
+        (typeof content === "string" || content instanceof String) &&
+        content.length
+      ) {
+        contentObject = JSON.parse(content);
+      }
       let contentType;
       // debugger;
-      if (content && content.data.contentType) {
+      if (contentObject && contentObject.data.contentType) {
         contentType = await dataService.contentTypeGet(
-          content.data.contentType.toLowerCase(),
-          sessionID
+          contentObject.data.contentType.toLowerCase(),
+          req
         );
       } else if (contentTypeId) {
-        contentType = await dataService.contentTypeGet(
-          contentTypeId,
-          sessionID
-        );
+        contentType = await dataService.contentTypeGet(contentTypeId, req);
 
         //add a hidden object for the formsettings id so we can look it up on form submission
         if (formSettingsId) {
@@ -116,10 +132,14 @@ if (typeof module !== "undefined" && module.exports) {
         if (returnModuleSettings) {
           const settingContentType = await dataService.contentTypeGet(
             `${contentTypeId}-settings`,
-            sessionID
+            req
           );
           // debugger;
-          if (settingContentType && settingContentType.data) {
+          if (
+            settingContentType &&
+            settingContentType.title &&
+            settingContentType.data
+          ) {
             contentType = settingContentType;
           }
         }
@@ -127,30 +147,86 @@ if (typeof module !== "undefined" && module.exports) {
         return;
       }
 
+      if (contentType && emitterService) {
+        await emitterService.emit("formComponentsLoaded", {
+          contentType,
+          contentObject,
+          req,
+        });
+      }
 
       if (!onFormSubmitFunction) {
         onFormSubmitFunction = "editInstance(submission,true)";
       }
+      ``;
 
+      const formJSON = await exports.getFormJson(
+        contentType,
+        contentObject,
+        showBuilder
+      );
 
-      const formJSON = await exports.getFormJson(contentType, content);
+      //set defaults
+      if (defaults) {
+        const defaultsObj = JSON.parse(defaults);
+        for (const defaultData of defaultsObj) {
+          const key = Object.keys(defaultData);
+          const value = Object.values(defaultData);
+          const formComponentToAddDefault = formJSON.components.find(
+            (c) => c.key === key[0]
+          );
+          formComponentToAddDefault.defaultValue = value;
+        }
+      }
 
       let form = "";
 
       let data = { viewModel: {}, viewPath: "/server/assets/html/form.html" };
       data.viewModel.onFormSubmitFunction = onFormSubmitFunction;
+      data.viewModel.editMode = false;
+      let formValuesToLoad = {};
+      if (contentObject && contentObject.data) {
+        formValuesToLoad = contentObject.data;
+        data.viewModel.editMode = true;
+      }
+
+      //override button copy
+      if (contentType.data.states) {
+        if (
+          data.viewModel.editMode &&
+          contentType.data.states.editSubmitButtonText
+        ) {
+          const submitButton = contentType.data.components.find(
+            (c) => c.key === "submit"
+          );
+          if (submitButton) {
+            submitButton.label = contentType.data.states.editSubmitButtonText;
+          }
+        }
+
+        if (
+          !data.viewModel.editMode &&
+          contentType.data.states.addSubmitButtonText
+        ) {
+          const submitButton = contentType.data.components.find(
+            (c) => c.key === "submit"
+          );
+          if (submitButton) {
+            submitButton.label = contentType.data.states.addSubmitButtonText;
+          }
+        }
+      }
+
       data.viewModel.formJSON = JSON.stringify(formJSON);
-      let formValuesToLoad = content && content.data ? content.data : {};
+
       data.viewModel.formValuesToLoad = JSON.stringify(formValuesToLoad);
       data.viewModel.random = helperService.generateRandomString(8);
+      data.viewModel.formioFunction = showBuilder ? "builder" : "createForm";
+      data.viewModel.readOnly = readOnly;
+
       data.viewPath = "/server/assets/html/form.html";
       data.contentType = "";
 
-      // let formHtml = await axiosInstance.post(`/api/views/getProceedView`, {
-      //   data: data,
-      // });
-
-      // debugger;
       let formHtml = await dataService.getView(
         "",
         data.viewModel,
@@ -164,12 +240,16 @@ if (typeof module !== "undefined" && module.exports) {
         form += template;
       }
 
-      return form;
+      return { html: form, contentType };
     }),
-    (exports.getFormJson = async function (contentType, content) {
+    (exports.getFormJson = async function (contentType, content, showBuilder) {
       let name = `${contentType.systemId}Form`;
       let settings = await this.getFormSettings(contentType, content);
-      let components = await this.getFormComponents(contentType, content);
+      let components = await this.getFormComponents(
+        contentType,
+        content,
+        showBuilder
+      );
       const formJSON = {
         components: components,
         name: name,
@@ -212,8 +292,11 @@ if (typeof module !== "undefined" && module.exports) {
       }
       return settings;
     }),
-    (exports.getFormComponents = async function (contentType, content) {
-
+    (exports.getFormComponents = async function (
+      contentType,
+      content,
+      showBuilder
+    ) {
       let components = contentType.data?.components;
 
       if (content) {
@@ -222,7 +305,8 @@ if (typeof module !== "undefined" && module.exports) {
           content.data.contentType,
           components
         );
-      } else if (components) {
+      } else if (components && !showBuilder) {
+        //only need this when creating new instances
         components.push({
           type: "hidden",
           key: "contentType",
@@ -249,12 +333,12 @@ if (typeof module !== "undefined" && module.exports) {
           input: true,
         });
       }
-
     });
 
   exports.setFormApiUrls = async function (Formio) {
-    Formio.setProjectUrl(sharedService.getBaseUrl() + "/nested-forms-list");
-    Formio.setBaseUrl(sharedService.getBaseUrl() + "/nested-forms-get");
+    let baseUrl = sharedService.getBaseUrl();
+    Formio.setProjectUrl(baseUrl);
+    Formio.setBaseUrl(baseUrl);
   };
   // }
 })(typeof exports === "undefined" ? (this["formService"] = {}) : exports);

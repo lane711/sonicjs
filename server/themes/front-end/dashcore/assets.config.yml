@@ -1,0 +1,65 @@
+bootstrap-version: 5
+assets:
+  js:
+    - /assets/js/startup.js
+    - /node_modules/js-cookie/src/js.cookie.js
+    - /themes/front-end/{{frontEndTheme}}/js/card.js
+    - /themes/front-end/{{frontEndTheme}}/js/counterup2.js
+    - /themes/front-end/{{frontEndTheme}}/js/index.js
+    - /themes/front-end/{{frontEndTheme}}/js/noframework.waypoints.js
+    - /themes/front-end/{{frontEndTheme}}/js/odometer.min.js
+    - /themes/front-end/{{frontEndTheme}}/js/prism.js
+    - /themes/front-end/{{frontEndTheme}}/js/simplebar.js
+    - /themes/front-end/{{frontEndTheme}}/js/swiper.js
+    - /themes/front-end/{{frontEndTheme}}/js/jquery.js
+    - /themes/front-end/{{frontEndTheme}}/js/jquery.easing.min.js
+    - /themes/front-end/{{frontEndTheme}}/js/jquery.validate.js
+    - /themes/front-end/{{frontEndTheme}}/js/plugins/jquery.animatebar.js
+    - /themes/front-end/{{frontEndTheme}}/js/feather.min.js
+    - /node_modules/@popperjs/core/dist/umd/popper.min.js
+    - /node_modules/bootstrap5/dist/js/bootstrap.min.js
+    - /themes/front-end/{{frontEndTheme}}/js/aos.js
+    - /themes/front-end/{{frontEndTheme}}/js/typed.js
+    - /themes/front-end/{{frontEndTheme}}/js/common-script.js
+    - /themes/front-end/{{frontEndTheme}}/js/forms.js
+    - /themes/front-end/{{frontEndTheme}}/js/stripe-bubbles.js
+    - /themes/front-end/{{frontEndTheme}}/js/stripe-menu.js
+    - /themes/front-end/{{frontEndTheme}}/js/cc.js
+    - /themes/front-end/{{frontEndTheme}}/js/pricing.js
+    - /themes/front-end/{{frontEndTheme}}/js/shop.js
+    - /themes/front-end/{{frontEndTheme}}/js/svg.js
+    - /themes/front-end/{{frontEndTheme}}/js/site.js
+    - /themes/front-end/{{frontEndTheme}}/js/03.demo.js
+    - /node_modules/ace-builds/src-min-noconflict/ace.js
+    - /node_modules/ace-builds/src-min-noconflict/ext-beautify.js
+    - /node_modules/axios/dist/axios.min.js
+    - /node_modules/jsoneditor/dist/jsoneditor.min.js
+    - /node_modules/formiojs/dist/formio.full.min.js
+    - /node_modules/@fancyapps/ui/dist/fancybox.umd.js
+    - /node_modules/dropzone/dist/min/dropzone.min.js
+    - /node_modules/prismjs/prism.js
+    - /assets/vendors/prism-treeview/prism-treeview.js
+    - /assets/js/common.js
+    - /sonicjs-services/shared.service.js
+    - /sonicjs-services/global.service.js
+    - /sonicjs-services/helper.service.js
+    - /sonicjs-services/formatting.service.js
+    - /sonicjs-services/data.service.js
+    - /sonicjs-services/form.service.js
+    - /page-builder/js/page-builder.js:
+        isPageBuilder: true
+  css:
+    - /node_modules/bootstrap5/dist/css/bootstrap.min.css
+    - /themes/front-end/{{frontEndTheme}}/css/template-processed.css
+    - /themes/front-end/{{frontEndTheme}}/css/all.css
+    - /themes/front-end/{{frontEndTheme}}/css/aos.css
+    - /themes/front-end/{{frontEndTheme}}/css/swiper.css
+    - /themes/front-end/{{frontEndTheme}}/css/theme.css
+    - /node_modules/@fancyapps/ui/dist/fancybox.css
+    - /node_modules/formiojs/dist/formio.form.min.css
+    - /node_modules/jsoneditor/dist/jsoneditor.min.css
+    - /node_modules/prismjs/themes/prism-coy.css
+    - /assets/vendors/prism-treeview/prism-treeview.css
+    - /assets/css/common.css
+    - /node_modules/bootstrap-icons/font/bootstrap-icons.css
+
