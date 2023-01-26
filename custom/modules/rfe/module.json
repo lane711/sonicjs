@@ -1,0 +1,9 @@
+{
+  "title": "RFE",
+  "enabled": true,
+  "systemId": "rfe",
+  "icon": "bi-gear",
+  "canBeAddedToColumn": true,
+  "singleInstance": false,
+  "version": "0.0.0.1"
+}
