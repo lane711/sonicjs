@@ -1,0 +1,10 @@
+{
+  "title": "Contact Kevant",
+  "enabled": true,
+  "systemId": "contact-kevant",
+  "canBeAddedToColumn": true,
+  "singleInstance": false,
+  "version": "0.0.0.1",
+  "systemidUpperCase": "CONTACT-KEVANT",
+  "systemidCamelCase": "contactKevant"
+}
