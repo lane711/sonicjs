@@ -1,1 +1,0 @@
-{"moduleSystemId":"rfe","systemId":"rfe","title":"RFE","data":{"components":[{"label":"First Name","type":"textfield","input":true,"key":"firstName","validate":{"required":true}},{"label":"Submit","type":"button","input":true,"key":"submit","theme":"primary"}]},"filePath":"/Users/lanecampbell/Dev/sonicjs-rfe/server/modules/rfe/models/rfe.json"}

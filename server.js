@@ -338,6 +338,11 @@ function setupStaticAssets(app) {
     "/assets/css",
     express.static(path.join(appRoot.path, "node_modules/inter-ui"))
   );
+
+  app.use(
+    "/react-apps",
+    express.static(path.join(appRoot.path, "/custom/react-apps"))
+  );
 }
 
 function main() {

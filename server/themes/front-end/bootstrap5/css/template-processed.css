@@ -58,10 +58,6 @@ height: 80px
 height: 0;
 }
 
-.css-c691d9415645{background: url(/assets/uploads/cheetah.jpeg);}
-
-.overlay-c691d9415645{background: linear-gradient(rgba(var(--bs-dark-rgb)), rgba(0, 0, 0, 0.59))}
-
 .overlay-c4dacff20e03{background: linear-gradient(rgba(156, 39, 176, 1), rgba(122.867, 20.949, 120.343, 0.95))}
 
 .css-0da22a2b0cb7{background-color: #ee5522;
@@ -74,3 +70,7 @@ background-size: cover;}
 .css-3df3af1a7720{background: url(/assets/uploads/cheetah.jpeg);}
 
 .overlay-3df3af1a7720{background: linear-gradient(rgba(0, 0, 0, 0.59), rgba(0, 0, 0, 0.48))}
+
+.css-9aa52f1ccb4e{background: url(https://rifeplayer.s3.us-west-1.amazonaws.com/waves.jpeg);}
+
+.overlay-9aa52f1ccb4e{background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.69))}
