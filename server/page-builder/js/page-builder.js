@@ -1333,7 +1333,7 @@ async function saveWYSIWYG() {
 }
 
 async function addModule(systemId, sessionID) {
-  debugger;
+  // debugger;
   currentModuleContentType = systemId;
 
   let form = await dataService.formGet(
