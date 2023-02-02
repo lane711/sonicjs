@@ -55,6 +55,7 @@ module.exports = blogMainService = {
 
     let listRaw;
     if (options.req.urlKey?.handler === "taxonomyHandler") {
+      //get posts in the taxonomy category
       listRaw = await dataService.getContentByContentTypeAndTag(
         contentType,
         options.req.urlKey,
