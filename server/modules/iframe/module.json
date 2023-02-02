@@ -1,0 +1,9 @@
+{
+  "title": "IFrame",
+  "enabled": true,
+  "systemId": "iframe",
+  "icon": "bi-gear",
+  "canBeAddedToColumn": true,
+  "singleInstance": false,
+  "version": "0.0.0.1"
+}

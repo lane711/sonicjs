@@ -340,8 +340,8 @@ function setupStaticAssets(app) {
   );
 
   app.use(
-    "/react-apps",
-    express.static(path.join(appRoot.path, "/custom/react-apps"))
+    "/apps",
+    express.static(path.join(appRoot.path, "/custom/apps"))
   );
 }
 

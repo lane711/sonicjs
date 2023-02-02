@@ -1,0 +1,25 @@
+{
+  "files": {
+    "main.css": "/apps/react/rife/build/static/css/main.e65794ce.chunk.css",
+    "main.js": "/apps/react/rife/build/static/js/main.628756b0.chunk.js",
+    "main.js.map": "/apps/react/rife/build/static/js/main.628756b0.chunk.js.map",
+    "runtime-main.js": "/apps/react/rife/build/static/js/runtime-main.a65b2fa3.js",
+    "runtime-main.js.map": "/apps/react/rife/build/static/js/runtime-main.a65b2fa3.js.map",
+    "static/css/2.c4e73993.chunk.css": "/apps/react/rife/build/static/css/2.c4e73993.chunk.css",
+    "static/js/2.30bee249.chunk.js": "/apps/react/rife/build/static/js/2.30bee249.chunk.js",
+    "static/js/2.30bee249.chunk.js.map": "/apps/react/rife/build/static/js/2.30bee249.chunk.js.map",
+    "static/js/3.c25fe3be.chunk.js": "/apps/react/rife/build/static/js/3.c25fe3be.chunk.js",
+    "static/js/3.c25fe3be.chunk.js.map": "/apps/react/rife/build/static/js/3.c25fe3be.chunk.js.map",
+    "index.html": "/apps/react/rife/build/index.html",
+    "static/css/2.c4e73993.chunk.css.map": "/apps/react/rife/build/static/css/2.c4e73993.chunk.css.map",
+    "static/css/main.e65794ce.chunk.css.map": "/apps/react/rife/build/static/css/main.e65794ce.chunk.css.map",
+    "static/js/2.30bee249.chunk.js.LICENSE.txt": "/apps/react/rife/build/static/js/2.30bee249.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.a65b2fa3.js",
+    "static/css/2.c4e73993.chunk.css",
+    "static/js/2.30bee249.chunk.js",
+    "static/css/main.e65794ce.chunk.css",
+    "static/js/main.628756b0.chunk.js"
+  ]
+}
