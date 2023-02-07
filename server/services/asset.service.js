@@ -236,12 +236,14 @@ module.exports = assetService = {
       let root = link.path.startsWith("/node_modules");
       if (link.path.includes("/css/template-processed.css")) {
         link.path = `${frontEndTheme}/css/template-processed.css`;
+      } else if (link.path.includes("template.css") && link.path.includes("/custom/themes/")) {
+        link.path = `${frontEndTheme}/css/template.css`;
       }
       if (
         !link.path.startsWith("/node_modules") &&
         !link.path.endsWith("template-processed.css")
       ) {
-        if (!link.path.startsWith("/custom")) {
+        if (!link.path.startsWith("/custom") && !link.path.includes("css/template.css")) {
           link.path = "/server" + link.path;
         }
       }
