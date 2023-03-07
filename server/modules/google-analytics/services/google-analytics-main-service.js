@@ -26,14 +26,16 @@ module.exports = googleAnalyticsMainService = {
         let googleAnalyticSettings = await dataService.getContentTopOne('google-analytics', options.req.sessionID);
         // console.log('ga', options.req.hostname, googleAnalyticSettings.data.enableOnDomain);
         if (options.req.hostname === googleAnalyticSettings.data.enableOnDomain) {
-            options.page.data.headerJs += `<script async src="https://www.googletagmanager.com/gtag/js?id=${googleAnalyticSettings.data.googleAnalyticsUACode}"></script>
-                <script>
-                window.dataLayer = window.dataLayer || [];
-                function gtag() { dataLayer.push(arguments); }
-                gtag('js', new Date());
+            options.page.data.headerJs += `
+            <!-- Google tag (gtag.js) -->
+            <script async src="https://www.googletagmanager.com/gtag/js?id=${googleAnalyticSettings.data.googleAnalyticsUACode}"></script>
+            <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
 
-                gtag('config', '${googleAnalyticSettings.data.googleAnalyticsUACode}');
-                </script>`;
+            gtag('config', '${googleAnalyticSettings.data.googleAnalyticsUACode}');
+            </script>`;
         }
     },
 
