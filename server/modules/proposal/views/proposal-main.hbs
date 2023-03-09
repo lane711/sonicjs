@@ -1,1 +1,63 @@
-<div>Hello to you {{ data.firstName }} from the Proposal module!</div>
+<div class="row">
+
+  <div class="col-md-8">
+
+    <div class="proposal border p-4">
+      <div>
+        <img src="{{data.introLogo.src}}" width="100px" />
+      </div>
+      <h1 class="pb-5">{{data.title}}</h1>
+
+      <p>
+        <h4>PREPARED FOR</h4>
+        {{data.clientRep}}<br />
+        {{data.clientName}}<br />
+      </p>
+
+      <p>
+        <h4>PREPARED BY</h4>
+        {{data.companyRep}}<br />
+        {{data.companyName}}<br />
+      </p>
+
+      <div class="pt-5 pb-5">
+        <img src="{{data.mainLogo.src}}" width="500px" />
+      </div>
+
+      <div class="text-end">
+        {{data.date}}<br />
+        {{data.clientRep}}<br />
+        {{data.clientName}}<br />
+      </div>
+
+      <div class="pt-5 pb-5">
+        {{{data.introMessage}}}
+      </div>
+
+      {{#each data.sections}}
+        <div class="proposal-section pt-5">
+          <h2 class="pb-3" id="{{this.slug}}">{{this.title}}</h2>
+          {{{this.body}}}
+        </div>
+      {{/each}}
+    </div>
+
+  </div>
+  <div class="col-md-4">
+    <div class="sticky-top border p-4">
+      <h3>Proposal Menu</h3>
+      <ul class="nav flex-column">
+
+        {{#each data.sections}}
+          <a
+            class="nav-link"
+            aria-current="page"
+            href="#{{this.slug}}"
+          >{{this.title}}</a>
+
+        {{/each}}
+
+      </ul>
+    </div>
+  </div>
+</div>
