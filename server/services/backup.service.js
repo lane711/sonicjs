@@ -10,6 +10,8 @@ var dalService = require("./dal.service");
 var fileService = require("./file.service");
 const archiver = require("archiver");
 const moment = require("moment");
+const connectEnsureLogin = require("connect-ensure-login");
+var appRoot = require("app-root-path");
 
 const token = process.env.DROPBOX_TOKEN;
 const backUpUrl = process.env.BACKUP_URL;
@@ -21,6 +23,15 @@ module.exports = backUpService = {
       // await backUpService.zipBackUpDirectory();
       // backUpService.uploadToDropBox();
       res.redirect('/admin/backup-restore');
+    });
+
+    app.get('/backups/*', connectEnsureLogin.ensureLoggedIn(), async function (req, res) {
+
+      const file = `${appRoot.path}/${req.path}`;
+
+      console.log(`downloading backup ${file}`)
+
+      res.download(file);
     });
   },
 
