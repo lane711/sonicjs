@@ -1,32 +1,41 @@
 {{#if (eq data.view "lightbox")}}
 
-  <div class="gallery-container">
-    {{#each data.galleryImages}}
-      <div>
-        <a
-          href="{{this.select.src}}"
-          title="<b>{{this.title}}</b> {{this.body}}"
-        ><img src="{{this.select.src}}" /></a>
-      </div>
-    {{/each}}
+<div class="gallery-container">
+  {{#each data.galleryImages}}
+  <div>
+    <a href="{{this.select.src}}" title="<b>{{this.title}}</b> {{this.body}}"><img src="{{this.select.src}}" /></a>
   </div>
+  {{/each}}
+</div>
 {{/if}}
 
 {{#if (eq data.view "fancybox")}}
-  <div class="gallery-wrapper">
+<div class="gallery-wrapper">
 
-    {{#each data.galleryImages}}
+  {{#each data.galleryImages}}
 
-      <a
-        href="{{this.select.src}}"
-        data-fancybox="gallery"
-        data-title="title"
-        data-caption="<b>{{this.title}}</b> - {{this.body}}"
-      >
-        <img src="{{this.select.src}}" class="img-responsive" alt="" />
-      </a>
+  <a href="{{this.select.src}}" data-fancybox="gallery" data-title="title"
+    data-caption="<b>{{this.title}}</b> - {{this.body}}">
+    <img src="{{this.select.src}}" class="img-fluid" alt="" />
+  </a>
 
-    {{/each}}
+  {{/each}}
+
+</div>
+
+{{/if}}
+
+{{#if (eq data.view "columnList")}}
+<div class="gallery-wrapper row">
+
+  {{#each data.galleryImages}}
+
+  <div class="col d-flex align-items-center justify-content-center p-4" data-aos="fade-in" data-aos-delay="{{this.aosDelay}}">
+    <img src="{{this.select.src}}" class="img-fluid" alt="" />
   </div>
+
+  {{/each}}
+
+</div>
 
 {{/if}}

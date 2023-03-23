@@ -190,6 +190,9 @@ module.exports = cssService = {
             styleList.push(`${svgRaw}`);
           }
           break;
+          case "video":
+            cssList.push("bg-video-cover");
+            break;
         default:
           break;
       }

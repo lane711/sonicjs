@@ -149,7 +149,7 @@ module.exports = contentService = {
     return "error";
   },
 
-  getPageByUrl: async function (id, instance) {},
+  getPageByUrl: async function (id, instance) { },
 
   processTemplate: async function (page, req, sessionID) {
     page.data.html = ""; //reset
@@ -247,9 +247,15 @@ module.exports = contentService = {
           page.data.html += `\n.pb .css-${sectionMiniGuid}{${sectionCss?.style}}\n`
           page.data.html += `\n.pb .overlay-${sectionMiniGuid}{${sectionCss?.overlay}}\n`
           page.data.html += '</style>';
-
-          page.data.html += `<section data-id='${section.id}' data-title='${section.data.title}' class="${sectionClass}jumbotron-fluid css-${sectionMiniGuid} ${sectionCss?.css} ${sectionCss?.margin}">`;
+          page.data.html += `<section data-id='${section.id}' data-title='${section.data.title}' class="${sectionClass}jumbotron-fluid css-${sectionMiniGuid} ${sectionCss?.css} ${sectionCss?.margin} postition-relative">`;
           page.data.html += `<div class="section-overlay overlay-${sectionMiniGuid} ${sectionCss?.padding}">`;
+
+          if (section.data.background === 'video') {
+            page.data.html += `<video playsinline autoplay muted loop>
+                                <source class="h-100" src="${section.data.videoUrl}" type="video/mp4" />
+                              </video>`
+          }
+
           page.data.html += '<div class="container">';
           let rows;
           rows = await this.processRows(page, section, section.data.rows, req);
