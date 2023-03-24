@@ -24,6 +24,7 @@ assets:
     - /sonicjs-services/formatting.service.js
     - /sonicjs-services/data.service.js
     - /sonicjs-services/form.service.js
+    - /node_modules/chart.js/dist/chart.umd.js
     - /page-builder/js/page-builder.js:
         isPageBuilder: true
   css:

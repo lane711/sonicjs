@@ -247,7 +247,7 @@ module.exports = contentService = {
           page.data.html += `\n.pb .css-${sectionMiniGuid}{${sectionCss?.style}}\n`
           page.data.html += `\n.pb .overlay-${sectionMiniGuid}{${sectionCss?.overlay}}\n`
           page.data.html += '</style>';
-          page.data.html += `<section data-id='${section.id}' data-title='${section.data.title}' class="${sectionClass}jumbotron-fluid css-${sectionMiniGuid} ${sectionCss?.css} ${sectionCss?.margin} postition-relative">`;
+          page.data.html += `<section data-id='${section.id}' data-title='${section.data.title}' class="${sectionClass}jumbotron-fluid css-${sectionMiniGuid} ${sectionCss?.css} ${sectionCss?.margin} position-relative">`;
           page.data.html += `<div class="section-overlay overlay-${sectionMiniGuid} ${sectionCss?.padding}">`;
 
           if (section.data.background === 'video') {

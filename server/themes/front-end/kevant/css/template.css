@@ -666,3 +666,20 @@ width: 64%
 width: 100%!important
 }
 }
+
+
+.light-grey{
+    background-color: #FBFBFB;
+}
+
+.homepage-case-studies .card .overlay {
+    background-image:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.93)),
+    url('https://sonicjscom.s3.amazonaws.com/panasonic.png');
+    width: 100%;
+    height: 200px;
+    background-size: cover;
+    padding: 20px;
+    font-size: 2.4rem;
+    font-weight: bold;
+}
