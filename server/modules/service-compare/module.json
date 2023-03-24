@@ -1,0 +1,10 @@
+{
+  "title": "Service Compare",
+  "enabled": true,
+  "systemId": "service-compare",
+  "canBeAddedToColumn": true,
+  "sessionID": "undefined",
+  "version": "0.0.0.1",
+  "systemidUpperCase": "SERVICE-COMPARE",
+  "systemidCamelCase": "serviceCompare"
+}

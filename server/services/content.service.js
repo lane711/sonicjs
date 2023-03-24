@@ -235,8 +235,8 @@ module.exports = contentService = {
             req
           );
         } else {
-          let sectionClass = section.data.cssClass
-            ? section.data.cssClass + " "
+          let sectionClass = section.data.css
+            ? section.data.css + " "
             : "";
           let sectionCss = await cssService.getSectionStyle(section);
           // console.log("sectionCss", sectionCss);
