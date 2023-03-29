@@ -599,8 +599,8 @@ font-weight: bold
 display: none
 }
 
-.blue {
-color: #2fd6ff
+.blue, a.blue {
+color: #2fd6ff !important
 }
 
 a.blue {

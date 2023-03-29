@@ -30,7 +30,7 @@
   background-color: #ffffffd6;
 }
 
-.homepage-case-studies .card .card-text {
+.homepage-case-studies .card .card-text, .homepage-case-studies .card .card-text p {
   font-size: 1rem;
   margin: 50px 20px;
 }

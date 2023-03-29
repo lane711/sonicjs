@@ -1,3 +1,4 @@
+<div class="bottom-overlay">
 <div class="row">
 
   {{#each data.items}}
@@ -120,15 +121,21 @@
               </tbody>
             </table>
           </p> -->
-          <p class="card-text" data-aos="zoom-out-up">
+          <div class="card-text description-teaser" data-aos="zoom-out-up">
 
-            {{this.description}}
-          </p>
+            {{{this.descriptionTeaser}}} <a class="teaser-show-full" href="javascript:void(0)">[more...]</a>
+          </div>
+          <div class="card-text full-description hide" data-aos="zoom-out-up">
+
+            {{{this.description}}}
+          </div>
           <!-- <p class="card-text"><small class="text-muted">Last updated 3 mins
                   ago</small></p> -->
         </div>
       </div>
     </div>
   {{/each}}
+
+</div>
 
 </div>
