@@ -24,7 +24,7 @@ module.exports = taxonomyMainService = {
     });
 
     emitterService.on("preProcessPageUrlLookup", async function (req) {
-      if (req.url.indexOf("/blog/") === 0) {
+      if (req.url?.indexOf("/blog/") === 0) {
         let list = await dataService.getContentByType("taxonomy");
 
         //check if its a taxonomy page

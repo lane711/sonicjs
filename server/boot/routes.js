@@ -285,14 +285,14 @@ exports.loadRoutesCatchAll = async function (app) {
     }
 
     //allow something other than '/' to be the site home page
-    if (
-      req.url === "/" &&
-      req.siteSettings.homePageUrl &&
-      req.siteSettings.homePageUrl !== "/"
-    ) {
-      res.redirect(301, req.siteSettings.homePageUrl);
-      return;
-    }
+    // if (
+    //   req.url === "/" &&
+    //   req.siteSettings.homePageUrl &&
+    //   req.siteSettings.homePageUrl !== "/"
+    // ) {
+    //   res.redirect(301, req.siteSettings.homePageUrl);
+    //   return;
+    // }
 
     if (req.user?.profile) {
       req.user.profile.currentPageUrl = req.url;
@@ -307,8 +307,9 @@ exports.loadRoutesCatchAll = async function (app) {
 
     //lookup which module should handle this request
     // console.log("processing", req.url);
-    let urlKey = await urlService.getUrl(req.url);
-    // console.log("urlKey", urlKey);
+    let urlWithoutQS = req.url.split('?')[0];
+    let urlKey = await urlService.getUrl(urlWithoutQS);
+    console.log("urlKey", urlKey);
 
     //replace this will
 

@@ -44,9 +44,11 @@ module.exports = contentService = {
 
   getRenderedPage: async function (req) {
     // emitterService.emit('getRenderedPagePreDataFetch', req);
+    let urlWithoutQS = req.url.split('?')[0];
 
     if (process.env.ENABLE_CACHE === "TRUE") {
-      let cachedPage = cacheService.getCache().get(req.url);
+      console.log('getting cached page', urlWithoutQS)
+      let cachedPage = cacheService.getCache().get(urlWithoutQS);
       if (cachedPage !== undefined) {
         // console.log('returning from cache');
         return { page: cachedPage };
@@ -57,7 +59,7 @@ module.exports = contentService = {
 
     await emitterService.emit("preProcessPageUrlLookup", req);
 
-    let page = await dataService.getContentByUrl(req.url, req.sessionID);
+    let page = await dataService.getContentByUrl(urlWithoutQS, req.sessionID);
 
     await emitterService.emit("postPageDataFetch", { req: req, page: page });
 
@@ -187,7 +189,7 @@ module.exports = contentService = {
     // let page = page; // await this.getContentById('5cd5af93523eac22087e4358');
     // console.log('processSections:page==>', page);
 
-    if (page.data && page.data.layout.length > 0) {
+    if (page.data && page.data.layout?.length > 0) {
       let sections = page.data.layout;
 
       for (const section of sections) {
