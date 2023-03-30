@@ -25,6 +25,7 @@
     "@popperjs/core": "^2.9.2",
     "@sendgrid/mail": "^7.6.1",
     "@simonwep/pickr": "^1.8.0",
+    "@splidejs/splide": "^4.1.4",
     "app-root-path": "^3.0.0",
     "archiver": "^5.3.0",
     "aws-sdk": "^2.901.0",

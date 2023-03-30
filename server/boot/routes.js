@@ -309,7 +309,7 @@ exports.loadRoutesCatchAll = async function (app) {
     // console.log("processing", req.url);
     let urlWithoutQS = req.url.split('?')[0];
     let urlKey = await urlService.getUrl(urlWithoutQS);
-    console.log("urlKey", urlKey);
+    // console.log("urlKey", urlKey);
 
     //replace this will
 
