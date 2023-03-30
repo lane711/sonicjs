@@ -25,6 +25,7 @@ assets:
     - /sonicjs-services/data.service.js
     - /sonicjs-services/form.service.js
     - /node_modules/chart.js/dist/chart.umd.js
+    - /node_modules/@splidejs/splide/dist/js/splide.min.js
     - /page-builder/js/page-builder.js:
         isPageBuilder: true
   css:
@@ -36,5 +37,6 @@ assets:
     - /node_modules/jsoneditor/dist/jsoneditor.min.css
     - /node_modules/inter-ui/inter.css
     - /node_modules/prismjs/themes/prism-coy.css
+    - /node_modules/@splidejs/splide/dist/css/themes/splide-skyblue.min.css
     - /assets/vendors/prism-treeview/prism-treeview.css
     - /css/template-processed.css

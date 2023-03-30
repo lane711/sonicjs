@@ -4,6 +4,10 @@
       },
       "files.exclude": {
         "**/combined-*": true,
+        "**/docs/json": true,
+      },
+      "search.exclude": {
+        "**/combined-*": true,
         "**/node_modules": true,
         "**/docs/json": true,
       },
