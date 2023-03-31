@@ -53,8 +53,7 @@ $(document).ready(async function () {
   showElements();
   setupFormIsLoadedEvent();
 
-  console.log('pb loaded');
-
+  console.log("pb loaded");
 });
 
 function setupSessionID() {
@@ -1648,7 +1647,7 @@ function getPageTemplateRegion(page, sourceColumn, destinationColumn) {
 }
 
 async function addModuleToColumn(submission) {
-  console.log('addModuleToColumn', submission)
+  console.log("addModuleToColumn", submission);
   let entity = processContentFields(submission.data);
 
   let {
@@ -2284,6 +2283,10 @@ function hideSiteCss() {
 //   });
 // }
 
+function isPageBuilderMode() {
+  return $("html").hasClass(".pb");
+}
+
 function pageBuilderFormChanged(data) {
   // debugger;
 
@@ -2296,17 +2299,19 @@ function pageBuilderFormChanged(data) {
   }
 
   if (formIsDirty) {
-    // $('.formio-component-submit').css('background','red');
-    if (!$(".submit-alert").length)
-      $(
-        '<span class="submit-alert alert alert-danger ms-3"><span>Unsaved changes!</span><span id="reset-module" class="btn btn-sm btn-danger">Reset</span></span>'
-      ).insertAfter(".formio-component-submit button");
-  } else {
-    $(".submit-alert").remove();
-    if (!data.changed && latestModuleDataFromForm) {
-      originalModuleDataFromDb = JSON.parse(
-        JSON.stringify(latestModuleDataFromForm)
-      ); //deep copy
+    debugger;
+    if (isPageBuilderMode()) {
+      if (!$(".submit-alert").length)
+        $(
+          '<span class="submit-alert alert alert-danger ms-3"><span>Unsaved changes!</span><span id="reset-module" class="btn btn-sm btn-danger">Reset</span></span>'
+        ).insertAfter(".formio-component-submit button");
+    } else {
+      $(".submit-alert").remove();
+      if (!data.changed && latestModuleDataFromForm) {
+        originalModuleDataFromDb = JSON.parse(
+          JSON.stringify(latestModuleDataFromForm)
+        ); //deep copy
+      }
     }
   }
 
@@ -2323,7 +2328,7 @@ function pageBuilderFormChanged(data) {
   }
 
   //if page builder not expanded
-  if(!$('.pb-wrapper.expanded').length){
+  if (!$(".pb-wrapper.expanded").length) {
     return;
   }
 
