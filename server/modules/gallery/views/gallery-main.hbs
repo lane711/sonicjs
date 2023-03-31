@@ -58,14 +58,12 @@
       <ul class="splide__list">
         {{#each data.galleryImages}}
           <li class="splide__slide">
-            <!-- <a
+            <a
               href="{{this.select.src}}"
               data-fancybox="gallery"
-              data-title="title"
-              data-caption="<b>{{this.title}}</b> - {{this.body}}"
-            > -->
+            >
               <img src="{{this.select.src}}" class="img-fluid" alt="" />
-            <!-- </a> -->
+            </a>
           </li>
         {{/each}}
       </ul>
