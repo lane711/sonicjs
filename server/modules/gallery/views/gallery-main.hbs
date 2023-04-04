@@ -53,11 +53,11 @@
 
 {{#if (eq data.view "splide")}}
 
-  <div class="splide" role="group" aria-label="Splide Basic HTML Example" >
+  <div class="splide" role="group" >
     <div class="splide__track">
       <ul class="splide__list">
         {{#each data.galleryImages}}
-          <li class="splide__slide">
+          <li class="splide__slide p-1">
             <a
               href="{{this.select.src}}"
               data-fancybox="gallery"
