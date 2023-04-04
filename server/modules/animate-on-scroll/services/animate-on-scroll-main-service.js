@@ -16,13 +16,8 @@ module.exports = animateOnScrollMainService = {
 
     addJsAndCss: async function (options) {
         options.page.data.jsLinks += `
-        <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
         <script>
             AOS.init();
         </script>`;
-
-        options.page.data.cssLinks += `
-            <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-        `;
     },
 }

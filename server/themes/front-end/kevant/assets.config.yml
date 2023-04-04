@@ -24,6 +24,7 @@ assets:
     - /sonicjs-services/formatting.service.js
     - /sonicjs-services/data.service.js
     - /sonicjs-services/form.service.js
+    - /node_modules/aos/dist/aos.js
     - /node_modules/chart.js/dist/chart.umd.js
     - /node_modules/@splidejs/splide/dist/js/splide.min.js
     - /page-builder/js/page-builder.js:
@@ -32,6 +33,7 @@ assets:
     - /node_modules/bootstrap5/dist/css/bootstrap.min.css
     - /node_modules/bootstrap-icons/font/bootstrap-icons.css
     - /node_modules/font-awesome/css/font-awesome.min.css
+    - /node_modules/aos/dist/aos.css
     - /node_modules/@fancyapps/ui/dist/fancybox.css
     - /node_modules/formiojs/dist/formio.form.min.css
     - /node_modules/jsoneditor/dist/jsoneditor.min.css
