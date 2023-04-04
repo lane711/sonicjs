@@ -17,6 +17,13 @@ $(document).ready(async function () {
       type: "loop",
       padding: "5rem",
       perPage: 3,
+      breakpoints: {
+        640: {
+          type:'fade',
+          pagination:false,
+          perPage: 1,
+        },
+      },
     });
 
     splide.mount();
