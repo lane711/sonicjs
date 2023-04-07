@@ -52,6 +52,7 @@ describe("Page Builder", function () {
     cy.contains("Add Section").should("be.visible");
     cy.contains("Add Section").click();
     cy.get(".mini-layout.thirds").click({ force: true });
+    cy.wait(1000);
 
     cy.get('div:contains("Empty Column")').its("length").should("gte", 3);
   });

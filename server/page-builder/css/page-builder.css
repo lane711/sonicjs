@@ -904,3 +904,12 @@ section {
   background-color: #20a8d8;
   cursor: pointer;
 }
+
+#floating-debug-window{
+  position:fixed;
+  right: 20px;
+  bottom: 100px;
+  width: 300px;
+  background-color: red;
+  z-index: 1000;
+}
