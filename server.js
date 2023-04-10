@@ -356,6 +356,8 @@ function main() {
     ssl: sslParam,
   };
 
+  console.log('connectionSettings', connectionSettings)
+
   if (process.env.TYPEORM_CONNECTION === "sqlite") {
     connectionSettings.database = process.env.TYPEORM_DATABASE;
   }
