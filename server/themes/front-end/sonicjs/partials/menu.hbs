@@ -1,40 +1,23 @@
+<nav class="navbar navbar-dark bg-dark" aria-label="First navbar example">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">{{> menu-logo }}</a>
+        <a class="btn btn-outline-light hire-us" href="https://github.com/lane711/sonicjs" target="_blank"><i class="bi bi-github me-2"></i> Github</a>
+        <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarsExample01" aria-controls="navbarsExample01" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
-
-  {{#if (eq data.themeSettings.logoType "text")}}
-  <h5 class="my-0 mr-md-auto font-weight-normal">{{ data.themeSettings.logoTitle }}</h5>
-  {{/if}}
-
-  {{#if (eq data.themeSettings.logoType "image")}}
-  <div style="{{ data.themeSettings.imageStyle}}" class="mr-md-auto">
-    <img src="/assets/uploads/{{ data.themeSettings.fileName}}" alt=""
-      width="{{ data.themeSettings.imageWidth}}">
-  </div>
-  {{/if}}
-
-  <nav class="my-2 my-md-0 mr-md-3">
-
-    <ul class="nav justify-content-end">
-      {{#each data.menu}}
-      <li class="nav-item {{#if this.isActive}}active{{/if}} {{#if this.showChildren}}dropdown{{/if}}">
-        <a class="nav-link {{#if this.showChildren}}dropdown-toggle{{/if}}" href="{{this.data.url}}"
-          {{#if this.showChildren}}data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{/if}}>
-          {{this.data.title}}
-          <span class="sr-only">(current)</span></a>
-
-        {{#if this.showChildren}}
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          {{#each this.children}}
-          <a class="dropdown-item" href="{{this.data.url}}">{{this.data.title}}</a>
-          {{/each}}
+        <div class="navbar-collapse collapse text-end p-2" id="navbarsExample01">
+            <ul class="navbar-nav me-auto mb-2">
+                {{#each data.menu}}
+                    <li class="nav-item">
+                        <a class="nav-link {{#if this.isActive}}active{{/if}}" aria-current="page" href="{{this.data.url}}">{{this.data.title}}</a>
+                    </li>
+                {{/each}}
+            </ul>
         </div>
-        {{/if}}
-      </li>
-      {{/each}}
-      </li>
-    </ul>
-    </ul>
-  </nav>
-  <a class="btn btn-outline-primary" href="/login">Login</a>&nbsp;
-  <a class="btn btn-outline-primary" href="/register">Sign up</a>
-</div>
+    </div>
+</nav>
+
+
