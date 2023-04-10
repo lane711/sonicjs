@@ -68,6 +68,7 @@ async function setPage() {
   let pageId = $("#page-id").val();
   if (pageId) {
     this.page = await dataService.getContentById(pageId);
+    console.log('page set', pageId)
   }
 }
 
@@ -383,7 +384,8 @@ async function addSection(above = true, layout) {
 
   //section
   let nextSectionCount = 1;
-  if (page.data.layout) {
+  debugger;
+  if (page.data?.layout) {
     nextSectionCount = page.data.layout.length + 1;
   }
 

@@ -48,7 +48,12 @@ describe("Page Builder", function () {
 
   it("Add setion ", function () {
     cy.visit(`${cy.SonicJs.getBaseUrl()}/cypress-pb-test`);
-    // cy.get(".sidebar-expander.collapsed").click();
+    cy.wait(1000);
+
+    cy.window().then((win) => {
+      cy.log('win.page',win.page) 
+  })
+
     cy.contains("Add Section").should("be.visible");
     cy.contains("Add Section").click();
     cy.get(".mini-layout.thirds").click({ force: true });

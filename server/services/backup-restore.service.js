@@ -11,7 +11,7 @@ var dalService = require("./dal.service");
 var dataService = require("./data.service");
 var fileService = require("./file.service");
 const archiver = require("archiver");
-const {v4: uuidv4} = require('uuid');
+const { v4: uuidv4 } = require("uuid");
 
 const token = process.env.DROPBOX_TOKEN;
 const backUpRestoreUrl = process.env.BACKUP_RESTORE_URL;
@@ -43,7 +43,7 @@ module.exports = backUpRestoreService = {
     const extractToPath = `${appRoot.path}/backups/temp/restore`;
 
     fs.createReadStream(backupFilePath)
-      .pipe(unzipper.Extract({path: extractToPath}))
+      .pipe(unzipper.Extract({ path: extractToPath }))
       .on("entry", (entry) => entry.autodrain())
       .promise()
       .then(
@@ -66,18 +66,25 @@ module.exports = backUpRestoreService = {
     }
     for (let index = 0; index < contentFiles.length; index++) {
       const file = contentFiles[index];
-      console.log("file:" + file);
 
       if (file.includes(".json")) {
         // let file = '479.json';
+
         let contentFile = fileService.getFileSync(
           `/backups/temp/restore/content/${file}`
         );
 
         if (contentFile) {
-          let payload = JSON.parse(contentFile);
+          let payload;
           try {
-            if (payload.createdByUserId == 0) {
+            console.log("parseing file: " + file);
+            payload = JSON.parse(contentFile);
+          } catch (error) {
+            console.error(`can not parse ${file}`, error, contentFile);
+          }
+
+          try {
+            if (payload && payload.createdByUserId == 0) {
               payload.createdByUserId = uuidv4();
             }
             if (payload.lastUpdatedByUserId == 0) {
@@ -86,8 +93,6 @@ module.exports = backUpRestoreService = {
 
             await dalService.contentRestore(payload, req.sessionID);
           } catch (error) {
-            console.log("id", id);
-
             console.log(error);
             console.log("paylaod", payload);
           }
@@ -95,5 +100,4 @@ module.exports = backUpRestoreService = {
       }
     }
   },
-
 };
