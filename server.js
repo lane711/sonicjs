@@ -348,15 +348,13 @@ function main() {
   }
 
   let connectionSettings = {
-    url: process.env.DATABASE_URL2,
+    url: process.env.DATABASE_URL,
     type: process.env.TYPEORM_CONNECTION,
     entities: ["server/data/entity/*.js"],
     synchronize: process.env.TYPEORM_SYNCHRONIZE,
     logging: process.env.TYPEORM_LOGGING,
     ssl: sslParam,
   };
-
-  console.log('connectionSettings', connectionSettings)
 
   if (process.env.TYPEORM_CONNECTION === "sqlite") {
     connectionSettings.database = process.env.TYPEORM_DATABASE;
