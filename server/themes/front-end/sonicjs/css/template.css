@@ -25,13 +25,13 @@ body,p,h1,h2,h3,h4,h5 {
     margin: 1.8rem 0
     }
     
-    main {
+    /* main {
     padding: 55px 0
     }
     
     .pb main {
     padding: 55px 0
-    }
+    } */
     
     .hero {
     padding: 55px 0 55px
@@ -56,4 +56,13 @@ body,p,h1,h2,h3,h4,h5 {
     
     .home .under-menu-spacer {
     height: 0;
+    }
+
+    .btn.github {
+        position: absolute;
+        right: 92px;
+        top: 9px;
+        color: #2fd6ff;
+        border-color: #2fd6ff;
+        padding: 6px 12px;
     }

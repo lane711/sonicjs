@@ -348,7 +348,7 @@ function main() {
   }
 
   let connectionSettings = {
-    url: process.env.DATABASE_URL,
+    url: process.env.DATABASE_URL2,
     type: process.env.TYPEORM_CONNECTION,
     entities: ["server/data/entity/*.js"],
     synchronize: process.env.TYPEORM_SYNCHRONIZE,
