@@ -1,70 +1,84 @@
-body,p,h1,h2,h3,h4,h5 {
-    font-family: "Inter","system-ui"!important
-    }
-    
-    h1,h2,h3,h4,h5 {
-    line-height: 1.2;
-    font-weight: 900;
-    letter-spacing: -0.025em;
-    margin: 1rem 0 2rem 0
-    }
-    
-    h1 {
-    font-size: 6rem
-    }
-    
-    h2 {
-    font-size: 3.5rem
-    }
-    
-    .container {
-    font-size: 1.6rem
-    }
-    
-    .container p {
-    margin: 1.8rem 0
-    }
-    
-    /* main {
-    padding: 55px 0
-    }
-    
-    .pb main {
-    padding: 55px 0
-    } */
-    
-    .hero {
-    padding: 55px 0 55px
-    }
-    
-    .section-overlay {
-    width: 100%;
-    height: 100%
-    }
-    
-    .pt-5 {
-    padding-top: 9rem!important
-    }
-    
-    .pb-5 {
-    padding-bottom: 9rem!important
-    }
-    
-    .under-menu-spacer {
-    height: 80px
-    }
-    
-    .home .under-menu-spacer {
-    height: 0;
-    }
+:root {
+--orange: #FFC501
+}
 
-    .btn.github {
-        position: absolute;
-        right: 92px;
-        top: 9px;
-        color: #2fd6ff;
-        border-color: #2fd6ff;
-        padding: 6px 12px;
-    }
+body,p,h1,h2,h3,h4,h5 {
+font-family: "Inter","system-ui"!important
+}
+
+h1,h2 {
+line-height: 1.2;
+font-weight: 700;
+letter-spacing: -0.055em;
+margin: 1rem 0 2rem 0
+}
+
+h3,h4,h5 {
+line-height: 1.2;
+font-weight: 500;
+letter-spacing: -0.035em;
+margin: 1rem 0 2rem 0
+}
+
+h1 {
+font-size: 6rem
+}
+
+h2 {
+font-size: 3.5rem
+}
+
+.container {
+font-size: 1.1rem
+}
+
+.container p {
+margin: 1.8rem 0
+}
+
+.hero {
+padding: 55px 0 55px
+}
+
+.section-overlay {
+width: 100%;
+height: 100%
+}
+
+.pt-5 {
+padding-top: 9rem!important
+}
+
+.pb-5 {
+padding-bottom: 9rem!important
+}
+
+.under-menu-spacer {
+height: 80px
+}
+
+.home .under-menu-spacer {
+height: 0
+}
+
+.btn.github {
+position: absolute;
+right: 92px;
+top: 9px;
+color: var(--orange);
+border-color: var(--orange);
+padding: 6px 12px
+}
+
+.btn.demo {
+position: absolute;
+right: 210px;
+top: 9px;
+color: var(--orange);
+border-color: var(--orange);
+padding: 6px 12px
+}
+
+.css-fe3fc67e4718{background: var(--bs-gray-dark);}
 
 .overlay-6997e1339832{background: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.66))}
