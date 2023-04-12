@@ -180,6 +180,8 @@ module.exports = adminService = {
           );
         }
 
+
+
         if (viewName == "admin-modules") {
           data = await moduleService.getModules(req.sessionID);
         }
@@ -387,6 +389,10 @@ module.exports = adminService = {
           req,
           req.sessionID
         );
+
+        //admin left menu
+        data.nav = await dataService.getContentById('c0f86b8d-01b7-491a-abe7-fa68b4ede8f6', req.sessionID);
+
 
         //add session ID
         data.sessionID = req.sessionID;

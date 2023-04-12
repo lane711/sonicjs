@@ -147,86 +147,13 @@
           <li class="nav-title">My Website</li>
 
 
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/content-all">
-                        <i class="bi bi-columns"></i> Content</a>
-                </li>
+          {{#each data.nav.data.items}}
+            <li class="nav-item">
+              <a class="nav-link" href="{{this.path}}">
+                  <i class="{{this.icon}}"></i> {{this.title}}</a>
+            </li>
+          {{/each}}
 
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/media">
-                        <i class="bi bi-images"></i> Media</a>
-                </li>
-
-
-                <!-- <li class="nav-item">
-                    <a class="nav-link" href="/admin/field-types">
-                        <i class="bi bi-box"></i> Field Types</a>
-                </li> -->
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/content-types">
-                        <i class="bi bi-boxes"></i> Content Types</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/modules">
-                        <i class="bi bi-inboxes"></i> Modules</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/taxonomy">
-                        <i class="bi bi-fonts"></i> Taxonomy</a>
-                </li>
-
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/content/edit/theme-settings/2dc42272-b7b6-473f-9668-bdcf1197ccbe">
-                        <i class="bi bi-brush"></i> Theme</a>
-                </li>
-                <!-- <li class="nav-item">
-                    <a class="nav-link" href="/admin/site-settings-colors">
-                        <i class="bi bi-palette"></i> Colors</a>
-                </li> -->
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/site-settings-typography">
-                        <i class="bi bi-fonts"></i> Typography</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/menus">
-                        <i class="bi bi-list"></i> Menus</a>
-                </li>
-
-                <!-- <li class="nav-item">
-                  <a class="nav-link" href="/admin/security-settings">
-                    <i class="nav-icon fa fa-gear"></i> Settings</a>
-                </li> -->
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/users">
-                        <i class="bi bi-person"></i> Users</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/roles">
-                        <i class="bi bi-people"></i> Roles</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="/admin/content-types/edit/site-settings-permissions">
-                      <i class="bi bi-person-check"></i> Permissions</a>
-              </li>
-
-              
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/urls">
-                        <i class="bi bi-link"></i> Urls</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/backup-restore">
-                        <i class="bi bi-layer-backward"></i> Backups</a>
-                </li>
-
-                <li class="nav-item">
-                  <a class="nav-link" href="/admin/site-settings">
-                      <i class="bi bi-gear"></i> Settings</a>
-              </li>
 
                 <!-- <li class="nav-item mt-auto">
                     <a class="nav-link nav-link-success" href="https://sonicjs.com/docs" target="_top">

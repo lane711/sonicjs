@@ -132,6 +132,10 @@ a {
   margin: 0 8px 0 8px;
 }
 
+.sidebar .nav-link.active i {
+  color: #fff !important;
+}
+
 .submit-alert {
   padding: 9px 1rem 12px;
   margin: 0 0 0 12px;
@@ -153,6 +157,11 @@ a {
 
 .sidebar .sidebar-minimizer {
   background-color: var(--light);
+}
+
+.sidebar .nav-link:hover, .sidebar .nav-link:hover i {
+  color: #fff;
+  background: #3a4248;
 }
 
 .breadcrumb {
@@ -220,4 +229,8 @@ table th,
 
 .table thead th {
   border-bottom: none;
+}
+
+.app-header .nav-item .nav-link > .img-avatar, .app-header .nav-item .avatar.nav-link > img {
+  margin: 0 2rem;
 }

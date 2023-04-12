@@ -1,19 +1,19 @@
 $(document).ready(async function () {
+
   $(function () {
     // $('[data-toggle="popover"]').popover();
     // $('[data-toggle="popover"]').on('click', function(){
     //   $('[data-toggle="popover"]').popover();
     // });
 
-    $(document).on('click', '[data-toggle="popover"]', function (e) {
+    $(document).on("click", '[data-toggle="popover"]', function (e) {
       //
       // If popover is visible: do nothing
       //
-      if ($(this).prop('popShown') == undefined) {
-         $(this).prop('popShown', true).popover('show');
+      if ($(this).prop("popShown") == undefined) {
+        $(this).prop("popShown", true).popover("show");
       }
-  });
-  
+    });
   });
 
   $("table").on("shown.bs.popover", function () {
@@ -75,7 +75,6 @@ $(document).ready(async function () {
         var sessionID = getPathParts(this.href, 0);
 
         if (idToDelete) {
-
           if (typeToDelete == "media") {
             await dataService.mediaDelete(idToDelete, sessionID);
             location.reload();
@@ -90,16 +89,18 @@ $(document).ready(async function () {
     return parts[parts.length - (positionFromLast + 1)];
   }
 
-  var indexLastColumn = $("#admin-content").find('tr')[0].cells.length-1;
-  $("#admin-content").DataTable({
-    columnDefs: [
-      { orderable: false, targets: indexLastColumn }
-    ],
-    order: [[2, "desc"]]
-  });
+
+  if ($("#admin-content").length) {
+    var indexLastColumn = $("#admin-content").find("tr")[0].cells.length - 1;
+    $("#admin-content").DataTable({
+      columnDefs: [{ orderable: false, targets: indexLastColumn }],
+      order: [[2, "desc"]],
+    });
+  }
+
 });
 
 function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
