@@ -90,8 +90,12 @@ $(document).ready(async function () {
     return parts[parts.length - (positionFromLast + 1)];
   }
 
+  var indexLastColumn = $("#admin-content").find('tr')[0].cells.length-1;
   $("#admin-content").DataTable({
-    order: [[2, "desc"]],
+    columnDefs: [
+      { orderable: false, targets: indexLastColumn }
+    ],
+    order: [[2, "desc"]]
   });
 });
 

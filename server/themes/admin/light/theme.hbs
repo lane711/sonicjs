@@ -6,11 +6,10 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <meta name="description" content="CoreUI - Open Source Bootstrap Admin Template">
-    <meta name="author" content="Łukasz Holeczek">
-    <meta name="keyword" content="Bootstrap,Admin,Template,Open,Source,jQuery,CSS,HTML,RWD,Dashboard">
-    <title>NodeJs CMS</title>
+    <meta name="description" content="SonicJs Backend Admin">
+    <title>SonicJs</title>
     <!-- Icons-->
+    <link href="/node_modules/inter-ui/inter.css" rel="stylesheet">
     <link href="/node_modules/@coreui/icons/css/free.min.css" rel="stylesheet">
     <link href="/node_modules/flag-icon-css/css/flag-icon.min.css" rel="stylesheet">
     <link href="/node_modules/font-awesome/css/font-awesome.min.css" rel="stylesheet">
@@ -145,7 +144,9 @@
               {{!-- <span class="badge badge-primary">NEW</span> --}}
             </a>
           </li> -->
-                <li class="nav-title">Content</li>
+          <li class="nav-title">My Website</li>
+
+
                 <li class="nav-item">
                     <a class="nav-link" href="/admin/content-all">
                         <i class="bi bi-columns"></i> Content</a>
@@ -156,7 +157,6 @@
                         <i class="bi bi-images"></i> Media</a>
                 </li>
 
-                <li class="nav-title">Extend</li>
 
                 <!-- <li class="nav-item">
                     <a class="nav-link" href="/admin/field-types">
@@ -179,10 +179,9 @@
                 </li>
 
 
-                <li class="nav-title">Theme</li>
                 <li class="nav-item">
                     <a class="nav-link" href="/admin/content/edit/theme-settings/2dc42272-b7b6-473f-9668-bdcf1197ccbe">
-                        <i class="bi bi-brush"></i> Settings</a>
+                        <i class="bi bi-brush"></i> Theme</a>
                 </li>
                 <!-- <li class="nav-item">
                     <a class="nav-link" href="/admin/site-settings-colors">
@@ -197,7 +196,6 @@
                         <i class="bi bi-list"></i> Menus</a>
                 </li>
 
-                <li class="nav-title">Security</li>
                 <!-- <li class="nav-item">
                   <a class="nav-link" href="/admin/security-settings">
                     <i class="nav-icon fa fa-gear"></i> Settings</a>
@@ -215,11 +213,7 @@
                       <i class="bi bi-person-check"></i> Permissions</a>
               </li>
 
-                <li class="nav-title">System</li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/site-settings">
-                        <i class="bi bi-gear"></i> Settings</a>
-                </li>
+              
                 <li class="nav-item">
                     <a class="nav-link" href="/admin/urls">
                         <i class="bi bi-link"></i> Urls</a>
@@ -228,195 +222,16 @@
                     <a class="nav-link" href="/admin/backup-restore">
                         <i class="bi bi-layer-backward"></i> Backups</a>
                 </li>
-                {{!--
+
                 <li class="nav-item">
-                  <a class="nav-link" href="/admin/logs">
-                    <i class="nav-icon fa fa-bars"></i> Logs</a>
-                </li>
-                 <li class="nav-item">
-                  <a class="nav-link" href="/admin/sandbox">
-                    <i class="nav-icon fa fa-bars"></i> Sandbox</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="/sandbox">
-                    <i class="nav-icon fa fa-bars"></i> Sandbox (blank)</a>
-                </li> --}}
-                {{!--
-                  <li class="nav-title">Components</li>
-                  <li class="nav-item nav-dropdown">
-                    <a class="nav-link nav-dropdown-toggle" href="#">
-                      <i class="nav-icon icon-puzzle"></i> Base</a>
-                    <ul class="nav-dropdown-items">
-                      <li class="nav-item">
-                        <a class="nav-link" href="base/breadcrumb.html">
-                          <i class="nav-icon icon-puzzle"></i> Breadcrumb</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="base/cards.html">
-                          <i class="nav-icon icon-puzzle"></i> Cards</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="base/carousel.html">
-                          <i class="nav-icon icon-puzzle"></i> Carousel</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="base/collapse.html">
-                          <i class="nav-icon icon-puzzle"></i> Collapse</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="base/forms.html">
-                          <i class="nav-icon icon-puzzle"></i> Forms</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="base/jumbotron.html">
-                          <i class="nav-icon icon-puzzle"></i> Jumbotron</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="base/list-group.html">
-                          <i class="nav-icon icon-puzzle"></i> List group</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="base/navs.html">
-                          <i class="nav-icon icon-puzzle"></i> Navs</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="base/pagination.html">
-                          <i class="nav-icon icon-puzzle"></i> Pagination</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="base/popovers.html">
-                          <i class="nav-icon icon-puzzle"></i> Popovers</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="base/progress.html">
-                          <i class="nav-icon icon-puzzle"></i> Progress</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="base/scrollspy.html">
-                          <i class="nav-icon icon-puzzle"></i> Scrollspy</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="base/switches.html">
-                          <i class="nav-icon icon-puzzle"></i> Switches</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="base/tables.html">
-                          <i class="nav-icon icon-puzzle"></i> Tables</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="base/tabs.html">
-                          <i class="nav-icon icon-puzzle"></i> Tabs</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="base/tooltips.html">
-                          <i class="nav-icon icon-puzzle"></i> Tooltips</a>
-                      </li>
-                    </ul>
-                  </li>
-                  <li class="nav-item nav-dropdown">
-                    <a class="nav-link nav-dropdown-toggle" href="#">
-                      <i class="nav-icon icon-cursor"></i> Buttons</a>
-                    <ul class="nav-dropdown-items">
-                      <li class="nav-item">
-                        <a class="nav-link" href="buttons/buttons.html">
-                          <i class="nav-icon icon-cursor"></i> Buttons</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="buttons/button-group.html">
-                          <i class="nav-icon icon-cursor"></i> Buttons Group</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="buttons/dropdowns.html">
-                          <i class="nav-icon icon-cursor"></i> Dropdowns</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="buttons/brand-buttons.html">
-                          <i class="nav-icon icon-cursor"></i> Brand Buttons</a>
-                      </li>
-                    </ul>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="charts.html">
-                      <i class="nav-icon icon-pie-chart"></i> Charts</a>
-                  </li>
-                  <li class="nav-item nav-dropdown">
-                    <a class="nav-link nav-dropdown-toggle" href="#">
-                      <i class="nav-icon icon-star"></i> Icons</a>
-                    <ul class="nav-dropdown-items">
-                      <li class="nav-item">
-                        <a class="nav-link" href="icons/coreui-icons.html">
-                          <i class="nav-icon icon-star"></i> CoreUI Icons
-                          <span class="badge badge-success">NEW</span>
-                        </a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="icons/flags.html">
-                          <i class="nav-icon icon-star"></i> Flags</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="icons/font-awesome.html">
-                          <i class="nav-icon icon-star"></i> Font Awesome
-                          <span class="badge badge-secondary">4.7</span>
-                        </a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="icons/simple-line-icons.html">
-                          <i class="nav-icon icon-star"></i> Simple Line Icons</a>
-                      </li>
-                    </ul>
-                  </li>
-                  <li class="nav-item nav-dropdown">
-                    <a class="nav-link nav-dropdown-toggle" href="#">
-                      <i class="nav-icon icon-bell"></i> Notifications</a>
-                    <ul class="nav-dropdown-items">
-                      <li class="nav-item">
-                        <a class="nav-link" href="notifications/alerts.html">
-                          <i class="nav-icon icon-bell"></i> Alerts</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="notifications/badge.html">
-                          <i class="nav-icon icon-bell"></i> Badge</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="notifications/modals.html">
-                          <i class="nav-icon icon-bell"></i> Modals</a>
-                      </li>
-                    </ul>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="widgets.html">
-                      <i class="nav-icon icon-calculator"></i> Widgets
-                      <span class="badge badge-primary">NEW</span>
-                    </a>
-                  </li>
-                  <li class="divider"></li>
-                  <li class="nav-title">Extras</li>
-                  <li class="nav-item nav-dropdown">
-                    <a class="nav-link nav-dropdown-toggle" href="#">
-                      <i class="nav-icon icon-star"></i> Pages</a>
-                    <ul class="nav-dropdown-items">
-                      <li class="nav-item">
-                        <a class="nav-link" href="login.html" target="_top">
-                          <i class="nav-icon icon-star"></i> Login</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="register.html" target="_top">
-                          <i class="nav-icon icon-star"></i> Register</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="404.html" target="_top">
-                          <i class="nav-icon icon-star"></i> Error 404</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="500.html" target="_top">
-                          <i class="nav-icon icon-star"></i> Error 500</a>
-                      </li>
-                    </ul>
-                  </li> --}}
-                <li class="nav-item mt-auto">
+                  <a class="nav-link" href="/admin/site-settings">
+                      <i class="bi bi-gear"></i> Settings</a>
+              </li>
+
+                <!-- <li class="nav-item mt-auto">
                     <a class="nav-link nav-link-success" href="https://sonicjs.com/docs" target="_top">
                         <i class="nav-icon icon-book-open"></i> SonicJs Docs</a>
-                </li>
+                </li> -->
                 {{!-- <li class="nav-item">
                   <a class="nav-link nav-link-danger" href="https://sonicjs.com/docs" target="_top">
                     <i class="nav-icon icon-layers"></i> SonicJs Videos
@@ -767,7 +582,7 @@
         </div>
     </aside>
 </div>
-<footer class="app-footer">
+<!-- <footer class="app-footer">
     <div>
         <i class="icon-energy"></i> by <a href="http://sonicjs.com">SonicJs CMS</a>
     </div>
@@ -775,7 +590,7 @@
         <span>Theme by</span>
         <a href="https://coreui.io" target="_blank">CoreUI</a>
     </div>
-</footer>
+</footer> -->
 <!-- CoreUI and necessary plugins-->
 <script src="/node_modules/jquery/dist/jquery.min.js"></script>
 <script src="/node_modules/popper.js/dist/umd/popper.min.js"></script>
