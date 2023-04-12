@@ -85,7 +85,12 @@ module.exports = adminService = {
 
         let data = {};
 
-        await emitterService.emit("processUrl", { req, res, urlKey : 'admin', page : data });
+        await emitterService.emit("processUrl", {
+          req,
+          res,
+          urlKey: "admin",
+          page: data,
+        });
 
         if (viewName == "admin-content") {
           data = await dataService.getContentAdminCommon(req.sessionID);
@@ -179,8 +184,6 @@ module.exports = adminService = {
             req.url
           );
         }
-
-
 
         if (viewName == "admin-modules") {
           data = await moduleService.getModules(req.sessionID);
@@ -391,8 +394,16 @@ module.exports = adminService = {
         );
 
         //admin left menu
-        data.nav = await dataService.getContentById('c0f86b8d-01b7-491a-abe7-fa68b4ede8f6', req.sessionID);
-
+        data.nav = await dataService.getContentById(
+          "c0f86b8d-01b7-491a-abe7-fa68b4ede8f6",
+          req.sessionID
+        );
+        data.navCurrent = data.nav.data.items.find(
+          (item) => item.path === req.url
+        );
+        if (data.navCurrent) {
+          data.navCurrent.active = "active";
+        }
 
         //add session ID
         data.sessionID = req.sessionID;
@@ -401,8 +412,7 @@ module.exports = adminService = {
 
         let layoutPath = `${appRoot.path}/server/themes/admin/${adminTheme}/theme.hbs`;
 
-        await res.app.emit("pagePreRender", {req, page : data});
-
+        await res.app.emit("pagePreRender", { req, page: data });
 
         res.render(`server/themes/admin/shared-views/${viewName}`, {
           layout: layoutPath,
@@ -416,15 +426,15 @@ module.exports = adminService = {
   },
 
   /**
- * Checks if the admin account has already been created
- * @example
- * // returns 2
- * globalNS.method1(5, 10);
- * @example
- * // returns 3
- * globalNS.method(5, 15);
- * @returns {Boolean} Returns true is admin account is already created
- */
+   * Checks if the admin account has already been created
+   * @example
+   * // returns 2
+   * globalNS.method1(5, 10);
+   * @example
+   * // returns 3
+   * globalNS.method(5, 15);
+   * @returns {Boolean} Returns true is admin account is already created
+   */
   checkIfAdminAccountIsCreated: async function () {
     // the must be at least one account
     let users = await dalService.usersGetCount();

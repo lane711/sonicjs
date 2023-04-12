@@ -149,7 +149,7 @@
 
           {{#each data.nav.data.items}}
             <li class="nav-item">
-              <a class="nav-link" href="{{this.path}}">
+              <a class="nav-link {{this.active}}" href="{{this.path}}">
                   <i class="{{this.icon}}"></i> {{this.title}}</a>
             </li>
           {{/each}}
