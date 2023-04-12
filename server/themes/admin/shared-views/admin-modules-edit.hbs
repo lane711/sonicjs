@@ -139,7 +139,7 @@
                 <div class="card-header">
                     <i class="fa fa-align-justify"></i> Content Types
                     <a href="javascript:void(0)" onclick="loadCreateContentTypeForm(); openNewContentTypeModal()"
-                       class="btn btn-success float-right new-content-type">New Content Type</a>
+                       class="btn btn-outline-dark float-right new-content-type">New Content Type</a>
                 </div>
                 <div class="card-body page-list">
 
@@ -161,14 +161,14 @@
                                     <a href="/admin/modules/edit/{{ this.moduleSystemId }}">{{ this.moduleSystemId }}</a>
                                 </td>
                                 <td>
-                                    <a class="btn btn-sm btn-primary rmargin"
+                                    <a class="btn btn-sm btn-outline-dark rmargin"
                                        href="/admin/content-types/edit/{{ this.systemId }}">Edit</a>
 
-                                    <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true"
+                                    <a tabindex="0" class="btn btn-sm btn-outline-dark" role="button" data-html="true"
                                        data-toggle="popover"
                                        data-trigger="focus" aria-label="Delete {{ this.title }}"
                                        title="Delete <b>{{ this.title }}</b> Forever?" data-content="<a href='
-                        /contentType/{{ this.systemId }}/{{../data.sessionID}}' class='btn btn-sm btn-danger rmargin custom-delete'>Confirm Delete</a>
+                        /contentType/{{ this.systemId }}/{{../data.sessionID}}' class='btn btn-sm btn-outline-dark rmargin custom-delete'>Confirm Delete</a>
                       ">Delete</a>
 
                                 </td>
@@ -201,7 +201,7 @@
                         </div>
                     </div>
                     <div class="card-footer">
-                        <button type="button" class="btn btn-success pull-right" onclick="onContentTypeRawSave()">
+                        <button type="button" class="btn btn-outline-dark pull-right" onclick="onContentTypeRawSave()">
                             Save Json
                         </button>
                     </div>
@@ -298,7 +298,7 @@
                 </div>
                 {{!-- <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-success wysiwyg-save" onclick='saveNewContentType()'
+                <button type="button" class="btn btn-outline-dark wysiwyg-save" onclick='saveNewContentType()'
                   data-dismiss="modal">Create</button>
               </div> --}}
             </div>

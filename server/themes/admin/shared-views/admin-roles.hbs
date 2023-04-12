@@ -5,7 +5,7 @@
     <div class="card-header">
       <i class="fa fa-align-justify"></i> Roles
       <a href="javascript:void(0)" onclick="openNewRoleModal()"
-        class="btn btn-success float-right new-content-type">New Role</a>
+        class="btn btn-outline-dark float-right new-content-type">New Role</a>
     </div>
     <div class="card-body page-list">
       <table class="table table-responsive-sm table-striped">
@@ -25,12 +25,12 @@
 
             <td>{{ this.data.description }}</td>
             <td class="text-right">
-              <a class="btn btn-sm btn-primary rmargin" href="/admin/role/edit/{{ this.id }}">Edit</a>
+              <a class="btn btn-sm btn-outline-dark rmargin" href="/admin/role/edit/{{ this.id }}">Edit</a>
 
 
-              <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
+              <a tabindex="0" class="btn btn-sm btn-outline-dark" role="button" data-html="true" data-toggle="popover"
                 data-trigger="focus" data-role="{{ this.data.title }}" title="Delete <b>{{ this.data.name }}</b> Forever?" data-content="<a href='/Role/{{ this.id }}/{{../data.sessionID}}'
-class='btn btn-sm btn-danger rmargin custom-delete'>Confirm Delete</a>
+class='btn btn-sm btn-outline-dark rmargin custom-delete'>Confirm Delete</a>
 ">Delete</a>
 
             </td>

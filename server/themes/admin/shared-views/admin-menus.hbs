@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-header">
       <i class="fa fa-align-justify"></i> Menus
-      <a href="javascript:void(0)" onclick="openNewContentTypeModal()" class="btn btn-success float-right new-menu">New
+      <a href="javascript:void(0)" onclick="openNewContentTypeModal()" class="btn btn-outline-dark float-right new-menu">New
         Menu</a>
     </div>
     <div class="card-body page-list">
@@ -19,16 +19,16 @@
             <td><a href="/admin/menus/edit/{{ this.id }}">{{ this.data.title }}</a></td>
             <td>
 
-              <a class="btn btn-sm btn-primary rmargin" href="/admin/menus/edit/{{ this.id }}">Edit</a>
+              <a class="btn btn-sm btn-outline-dark rmargin" href="/admin/menus/edit/{{ this.id }}">Edit</a>
 
-              <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
+              <a tabindex="0" class="btn btn-sm btn-outline-dark" role="button" data-html="true" data-toggle="popover"
                 data-trigger="focus" title="Delete <b>{{ this.data.title }}</b> Forever?" data-content="<a href='/content/{{ this.id }}'
-   class='btn btn-sm btn-danger rmargin custom-delete'>Confirm Delete</a>
+   class='btn btn-sm btn-outline-dark rmargin custom-delete'>Confirm Delete</a>
 ">Delete</a>
 
               <div class="collapse" style="margin: 12px 0 0; max-width:300px;" id="collapse{{ this.systemId }}">
                 <div class="card card-body">
-                  <a class='btn btn-sm btn-danger' href="#" onclick='deleteContentType({{ this.id }})'>Confirm Delete
+                  <a class='btn btn-sm btn-outline-dark' href="#" onclick='deleteContentType({{ this.id }})'>Confirm Delete
                     {{ this.title }}?</a> </div>
               </div>
 

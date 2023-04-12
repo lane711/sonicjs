@@ -4,7 +4,7 @@
       <div class="card-header">
         <i class="fa fa-align-justify"></i>
         {{#if data.shortCode}}
-        <button type="button" onclick="copyTextToClipboard('{{data.shortCode}}');" class="btn btn-success float-right">
+        <button type="button" onclick="copyTextToClipboard('{{data.shortCode}}');" class="btn btn-outline-dark float-right">
           <i class="fa fa-copy"></i> {{data.shortCode}}
         </button>
         {{/if}}
@@ -41,7 +41,7 @@
 
               <div id="jsoneditorRaw" style="width: 100%; height: 600px;"></div>
 
-              <button class="btn btn-primary add-node" id="saveRawJson">Save</button>
+              <button class="btn btn-outline-dark add-node" id="saveRawJson">Save</button>
 
             </div>
 

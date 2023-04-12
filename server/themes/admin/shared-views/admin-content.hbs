@@ -9,7 +9,7 @@
 
     </div>
     <div class="card-body page-list">
-      <table class="table table-responsive-sm" id="admin-content">
+      <table class="table table-responsive-sm table-striped" id="admin-content">
         <thead>
           <tr>
             <th>Title</th>
@@ -33,7 +33,7 @@
               <a tabindex="0" class="btn btn-sm btn-outline-dark" role="button" data-html="true" data-toggle="popover"
                 data-trigger="focus" aria-label="Delete {{ this.data.title }}" title="Delete <b>{{ this.data.title }}</b> Forever?" 
                 data-content="<a href='/content/{{ this.id }}/{{../data.sessionID}}'
-   class='btn btn-sm btn-danger rmargin custom-delete'>Confirm Delete</a>
+   class='btn btn-sm btn-outline-dark rmargin custom-delete'>Confirm Delete</a>
 ">Delete</a>
 
               {{!-- <!-- <a href="{{ content.url }}" target="_blank" class="btn btn-sm btn-outline-dark rmargin">View</a> -->
@@ -71,14 +71,14 @@
       <div class="modal-body">
         <h3>Common Content Types</h3>
 
-        <a class='btn btn-success' data-content-type="page" href="/admin/content/edit/page">Page</a>
+        <a class='btn btn-outline-dark' data-content-type="page" href="/admin/content/edit/page">Page</a>
 
-          <a class='btn btn-success' data-content-type="blog" href="/admin/content/edit/blog">Blog</a>
+          <a class='btn btn-outline-dark' data-content-type="blog" href="/admin/content/edit/blog">Blog</a>
 
             <hr>
         <h5>Other Content Types (Typically added in the front end)</h5>
         {{#each data.contentTypes}}
-        <a class='btn btn-primary' data-content-type="{{ this.systemId }}" href="/admin/content/edit/{{ this.systemId }}">
+        <a class='btn btn-outline-dark' data-content-type="{{ this.systemId }}" href="/admin/content/edit/{{ this.systemId }}">
           {{ this.title }}</a>
         {{/each}}
       </div>
