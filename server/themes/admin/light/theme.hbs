@@ -80,6 +80,8 @@
         <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
                aria-expanded="false">
+               <i class="bi bi-user"></i>
+
                 <img class="img-avatar" src="/assets/img/profile.png" alt="admin@example.com">
             </a>
             <div class="dropdown-menu dropdown-menu-right">
@@ -144,7 +146,7 @@
               {{!-- <span class="badge badge-primary">NEW</span> --}}
             </a>
           </li> -->
-          <li class="nav-title">My Website</li>
+          <li class="nav-title">{{data.siteSettings.data.logoTitle}}</li>
 
 
           {{#each data.nav.data.items}}
@@ -170,22 +172,10 @@
     </div>
     <main class="main">
         <!-- Breadcrumb-->
-        <ol class="breadcrumb">
+        <!-- <ol class="breadcrumb">
             {{> admin-breadcrumbs }}
-            <!-- Breadcrumb Menu-->
-            {{!-- <li class="breadcrumb-menu d-md-down-none">
-              <div class="btn-group" role="group" aria-label="Button group">
-                <a class="btn" href="#">
-                  <i class="icon-speech"></i>
-                </a>
-                <a class="btn" href="./">
-                  <i class="icon-graph"></i>  Dashboard</a>
-                <a class="btn" href="#">
-                  <i class="icon-settings"></i>  Settings</a>
-              </div>
-            </li> --}}
-        </ol>
-        <div class="container-fluid">
+        </ol> -->
+        <div class="container-fluid pt-3">
             <div class="animated fadeIn">
 
                 <input id="sessionID" type="hidden" value="{{data.sessionID}}"/>

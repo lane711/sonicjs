@@ -22,9 +22,10 @@
               <a class="btn btn-sm btn-outline-dark rmargin" href="/admin/menus/edit/{{ this.id }}">Edit</a>
 
               <a tabindex="0" class="btn btn-sm btn-outline-dark" role="button" data-html="true" data-toggle="popover"
-                data-trigger="focus" title="Delete <b>{{ this.data.title }}</b> Forever?" data-content="<a href='/content/{{ this.id }}'
-   class='btn btn-sm btn-outline-dark rmargin custom-delete'>Confirm Delete</a>
-">Delete</a>
+              data-trigger="focus" aria-label="Delete {{ this.data.title }}" title="Delete <b>{{ this.data.title }}</b> Forever?" 
+              data-content="<a href='/content/{{ this.id }}/{{../data.sessionID}}'
+              class='btn btn-sm btn-outline-dark rmargin custom-delete'>Confirm Delete</a>
+              ">Delete</a>
 
               <div class="collapse" style="margin: 12px 0 0; max-width:300px;" id="collapse{{ this.systemId }}">
                 <div class="card card-body">

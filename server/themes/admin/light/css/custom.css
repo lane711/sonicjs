@@ -243,7 +243,17 @@ table th,
   border-bottom: none;
 }
 
+table tr td:first-of-type:hover{
+  background-color: var(--border) !important;
+  cursor: pointer;
+}
+
 .app-header .nav-item .nav-link > .img-avatar,
 .app-header .nav-item .avatar.nav-link > img {
   margin: 0 2rem;
+}
+
+.sidebar .nav-title,
+.navbar-nav .nav-link {
+  color: var(--dark);
 }

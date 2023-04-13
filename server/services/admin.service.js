@@ -104,8 +104,10 @@ module.exports = adminService = {
 
         if (viewName == "admin-content-edit") {
           let content = null;
+          data.cardTitle = `New ${await helperService.titleCase(param1)}`
           if (param2) {
             content = await dataService.getContentById(param2, req.sessionID);
+            data.cardTitle = content.data.title ? `Edit ${content.data.title}` : `Edit ${await helperService.titleCase(param1)}`;
           }
           data.editForm = await dataService.formGet(
             param1,
@@ -404,6 +406,9 @@ module.exports = adminService = {
         if (data.navCurrent) {
           data.navCurrent.active = "active";
         }
+
+        // site settings
+        data.siteSettings = await dataService.getContentTopOne('site-settings', req.sessionID);
 
         //add session ID
         data.sessionID = req.sessionID;

@@ -27,6 +27,8 @@ $(document).ready(async function () {
         var idToDelete = getPathParts(this.href, 1);
         var sessionID = getPathParts(this.href, 0);
 
+        debugger;
+        
         if (idToDelete) {
           if (typeToDelete == "content") {
             await deleteContentInstance(idToDelete, sessionID);
@@ -55,6 +57,11 @@ $(document).ready(async function () {
 
           if (typeToDelete == "media") {
             await dataService.deleteModule(idToDelete, sessionID);
+            location.reload();
+          }
+
+          if (typeToDelete == "menu") {
+            await deleteContentInstance(idToDelete, sessionID);
             location.reload();
           }
         }
@@ -95,6 +102,13 @@ $(document).ready(async function () {
     $("#admin-content").DataTable({
       columnDefs: [{ orderable: false, targets: indexLastColumn }],
       order: [[2, "desc"]],
+    });
+  }
+
+  if($('.table-striped').length){
+    $('.table-striped td:first-of-type').on('click', function () {
+      var url = $(this).find('a:first').attr('href');
+      window.location.href = url;
     });
   }
 
