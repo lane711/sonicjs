@@ -396,8 +396,8 @@ module.exports = adminService = {
         );
 
         //admin left menu
-        data.nav = await dataService.getContentById(
-          "c0f86b8d-01b7-491a-abe7-fa68b4ede8f6",
+        data.nav = await dataService.getContentTopOne(
+          "admin-nav",
           req.sessionID
         );
         data.navCurrent = data.nav.data.items.find(
