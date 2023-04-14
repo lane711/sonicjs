@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-header">
       <i class="fa fa-align-justify"></i> Total: {{data.count}}
-      <button type="button" class="btn btn-success float-right" data-toggle="modal" data-target="#newContentModal">
+      <button type="button" class="btn btn-outline-dark float-right" data-toggle="modal" data-target="#newContentModal">
         New Content
       </button>
     </div>
@@ -39,21 +39,21 @@
 
             <td class='text-right'>
               <a href="/admin/content/edit/{{ this.contentTypeId }}/{{ this.id }}"
-                class="btn btn-sm btn-primary rmargin">Edit</a>
+                class="btn btn-sm btn-outline-dark rmargin">Edit</a>
 
-              <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
+              <a tabindex="0" class="btn btn-sm btn-outline-dark" role="button" data-html="true" data-toggle="popover"
                 data-trigger="focus" aria-label="Delete {{ this.data.title }}" title="Delete <b>{{ this.data.title }}</b> Forever?" 
                 data-content="<a href='/content/{{ this.id }}/{{../data.sessionID}}'
-   class='btn btn-sm btn-danger rmargin custom-delete'>Confirm Delete</a>
+   class='btn btn-sm btn-outline-dark rmargin custom-delete'>Confirm Delete</a>
 ">Delete</a>
 
-              {{!-- <!-- <a href="{{ content.url }}" target="_blank" class="btn btn-sm btn-success rmargin">View</a> -->
+              {{!-- <!-- <a href="{{ content.url }}" target="_blank" class="btn btn-sm btn-outline-dark rmargin">View</a> -->
                 <a class="btn btn-sm btn-warning rmargin" *ngIf="content.data.contentType==='page'" [routerLink]="['/page-builder', content.id]">Page Builder</a>
 
 
                 <ng-template #popTitle>Delete <b>{{ content.name }}</b>?</ng-template>
-                <ng-template #popContent><button class="btn btn-sm btn-danger" (click)="deleteContent(content.id)">Confirm Delete</button></ng-template>
-                <button class="btn btn-sm btn-danger" placement="top"
+                <ng-template #popContent><button class="btn btn-sm btn-outline-dark" (click)="deleteContent(content.id)">Confirm Delete</button></ng-template>
+                <button class="btn btn-sm btn-outline-dark" placement="top"
                 [ngbPopover]="popContent" [popoverTitle]="popTitle">Delete</button> --}}
             </td>
           </tr>
@@ -82,7 +82,7 @@
       <div class="modal-body">
         <h5>Select a content type to add:</h5>
         {{#each data.contentTypes}}
-        <a class='btn btn-success' data-content-type="{{ this.systemId }}" href="/admin/content/edit/{{ this.systemId }}">
+        <a class='btn btn-outline-dark' data-content-type="{{ this.systemId }}" href="/admin/content/edit/{{ this.systemId }}">
           {{ this.title }}</a>
         {{/each}}
       </div>
