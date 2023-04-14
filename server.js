@@ -26,6 +26,7 @@ var cookieParser = require("cookie-parser");
 const port = `${process.env.PORT}`;
 const frontEndTheme = `${process.env.FRONT_END_THEME}`;
 const adminTheme = `${process.env.ADMIN_THEME}`;
+const showStartupIcon = `${process.env.SHOW_STARTUP_ICON}`;
 
 const passport = require("passport");
 LocalStrategy = require("passport-local").Strategy;
@@ -38,8 +39,8 @@ const { Session } = require("./server/data/model/Session");
 const { stringify } = require("yaml");
 
 function start() {
-
-  console.log(`Starting up ...
+  if (showStartupIcon !== "FALSE") {
+    console.log(`Starting up ...
   
 ███████╗ ██████╗ ███╗   ██╗██╗ ██████╗     ██╗███████╗
 ██╔════╝██╔═══██╗████╗  ██║██║██╔════╝     ██║██╔════╝
@@ -48,6 +49,7 @@ function start() {
 ███████║╚██████╔╝██║ ╚████║██║╚██████╗╚█████╔╝███████║
 ╚══════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚════╝ ╚══════╝
                                                     `);
+  }
 
   setupGlobalAppPath();
 
