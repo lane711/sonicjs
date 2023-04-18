@@ -4,6 +4,7 @@ assets:
     - /assets/js/startup.js
     - /node_modules/jquery/dist/jquery.min.js
     - /node_modules/js-cookie/src/js.cookie.js
+    - /themes/admin/light/js/jquery.bootstrap-growl.min.js
     - /node_modules/ace-builds/src-min-noconflict/ace.js
     - /node_modules/ace-builds/src-min-noconflict/ext-beautify.js
     - /node_modules/axios/dist/axios.min.js
@@ -11,8 +12,11 @@ assets:
     - /node_modules/bootstrap5/dist/js/bootstrap.min.js
     - /node_modules/jsoneditor/dist/jsoneditor.min.js
     - /node_modules/formiojs/dist/formio.full.min.js
-    - /node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.js
+    - /node_modules/@fancyapps/ui/dist/fancybox.umd.js
+    - /node_modules/choices.js/public/assets/scripts/choices.min.js
     - /node_modules/dropzone/dist/min/dropzone.min.js
+    - /node_modules/prismjs/prism.js
+    - /assets/vendors/prism-treeview/prism-treeview.js
     - /assets/js/common.js
     - /sonicjs-services/shared.service.js
     - /sonicjs-services/global.service.js
@@ -20,12 +24,21 @@ assets:
     - /sonicjs-services/formatting.service.js
     - /sonicjs-services/data.service.js
     - /sonicjs-services/form.service.js
+    - /node_modules/aos/dist/aos.js
+    - /node_modules/chart.js/dist/chart.umd.js
+    - /node_modules/@splidejs/splide/dist/js/splide.min.js
     - /page-builder/js/page-builder.js:
         isPageBuilder: true
   css:
     - /node_modules/bootstrap5/dist/css/bootstrap.min.css
-    - /themes/front-end/{{frontEndTheme}}/css/template-processed.css
     - /node_modules/bootstrap-icons/font/bootstrap-icons.css
-    - /node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css
+    - /node_modules/font-awesome/css/font-awesome.min.css
+    - /node_modules/aos/dist/aos.css
+    - /node_modules/@fancyapps/ui/dist/fancybox.css
     - /node_modules/formiojs/dist/formio.form.min.css
     - /node_modules/jsoneditor/dist/jsoneditor.min.css
+    - /node_modules/inter-ui/inter.css
+    - /node_modules/prismjs/themes/prism-coy.css
+    - /node_modules/@splidejs/splide/dist/css/themes/splide-skyblue.min.css
+    - /assets/vendors/prism-treeview/prism-treeview.css
+    - /css/template-processed.css

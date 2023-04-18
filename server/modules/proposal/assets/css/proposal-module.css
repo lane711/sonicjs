@@ -1,1 +1,15 @@
 /* Css File for Module: proposal */
+.proposal p, .proposal div, .proposal .nav.flex-column s{
+    font-size: 1rem;
+}
+
+.proposal .proposal-section img{
+    max-width:500px;
+}
+.proposal h1, 
+.proposal h2, 
+.proposal h3, 
+.proposal h4,
+.proposal .nav-link {
+    color: #2fd6ff !important;
+} 

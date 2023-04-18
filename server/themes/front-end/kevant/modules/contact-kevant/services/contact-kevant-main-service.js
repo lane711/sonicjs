@@ -1,10 +1,10 @@
-var dataService = require("../../../../../../services/data.service");
-var emitterService = require("../../../../../../services/emitter.service");
-var globalService = require("../../../../../../services/global.service");
-var formService = require("../../../../../../services/form.service");
-var dataService = require("../../../../../../services/data.service");
-var emailService = require("../../../../../../services/email.service");
-var viewService = require("../../../../../../services/view.service");
+var dataService = require("../../../../server/services/data.service");
+var emitterService = require("../../../../server/services/emitter.service");
+var globalService = require("../../../../server/services/global.service");
+var formService = require("../../../../server/services/form.service");
+var dataService = require("../../../../server/services/data.service");
+var emailService = require("../../../../server/services/email.service");
+var viewService = require("../../../../server/services/view.service");
 
 module.exports = contactKevantUsMainService = {
   startup: async function () {

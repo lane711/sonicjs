@@ -85,7 +85,12 @@ module.exports = adminService = {
 
         let data = {};
 
-        await emitterService.emit("processUrl", { req, res, urlKey : 'admin', page : data });
+        await emitterService.emit("processUrl", {
+          req,
+          res,
+          urlKey: "admin",
+          page: data,
+        });
 
         if (viewName == "admin-content") {
           data = await dataService.getContentAdminCommon(req.sessionID);
@@ -99,8 +104,10 @@ module.exports = adminService = {
 
         if (viewName == "admin-content-edit") {
           let content = null;
+          data.cardTitle = `New ${await helperService.titleCase(param1)}`
           if (param2) {
             content = await dataService.getContentById(param2, req.sessionID);
+            data.cardTitle = content.data.title ? `Edit ${content.data.title}` : `Edit ${await helperService.titleCase(param1)}`;
           }
           data.editForm = await dataService.formGet(
             param1,
@@ -388,6 +395,21 @@ module.exports = adminService = {
           req.sessionID
         );
 
+        //admin left menu
+        data.nav = await dataService.getContentTopOne(
+          "admin-nav",
+          req.sessionID
+        );
+        data.navCurrent = data.nav.data.items.find(
+          (item) => item.path === req.url
+        );
+        if (data.navCurrent) {
+          data.navCurrent.active = "active";
+        }
+
+        // site settings
+        data.siteSettings = await dataService.getContentTopOne('site-settings', req.sessionID);
+
         //add session ID
         data.sessionID = req.sessionID;
         data.fileStorage = process.env.FILE_STORAGE;
@@ -395,8 +417,7 @@ module.exports = adminService = {
 
         let layoutPath = `${appRoot.path}/server/themes/admin/${adminTheme}/theme.hbs`;
 
-        await res.app.emit("pagePreRender", {req, page : data});
-
+        await res.app.emit("pagePreRender", { req, page: data });
 
         res.render(`server/themes/admin/shared-views/${viewName}`, {
           layout: layoutPath,
@@ -410,15 +431,15 @@ module.exports = adminService = {
   },
 
   /**
- * Checks if the admin account has already been created
- * @example
- * // returns 2
- * globalNS.method1(5, 10);
- * @example
- * // returns 3
- * globalNS.method(5, 15);
- * @returns {Boolean} Returns true is admin account is already created
- */
+   * Checks if the admin account has already been created
+   * @example
+   * // returns 2
+   * globalNS.method1(5, 10);
+   * @example
+   * // returns 3
+   * globalNS.method(5, 15);
+   * @returns {Boolean} Returns true is admin account is already created
+   */
   checkIfAdminAccountIsCreated: async function () {
     // the must be at least one account
     let users = await dalService.usersGetCount();

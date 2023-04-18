@@ -1,146 +1,63 @@
-<div class="proposals mt-group2">
+<div class="row">
 
-<div class="announcements-title">
-  <h2 id="proposals">Proposals</h2>
-  {{#if contentType.acls.canCreate}}
-  <button type="button" class="btn-square" onclick="return openFormInModal('create', 'proposal')">Submit Your Proposal</button>
-  {{/if}}
-</div>
+  <div class="col-md-8">
 
-<ul class="nav nav-tabs" id="myTab" role="tablist" style="border-style: none;">
-  <li class="nav-item" role="presentation">
-    <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#open" type="button" role="tab" 
-    aria-controls="home" aria-selected="true">Open Proposals</button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#closed" type="button" role="tab" 
-    aria-controls="profile" aria-selected="false">Closed Proposals</button>
-  </li>
-  {{#if contentType.acls.canEdit}}
-  <li class="nav-item" role="presentation">
-    <button class="nav-link" id="messages-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" 
-    aria-controls="messages" aria-selected="false">Review Proposals</button>
-  </li>
-  {{/if}}
-</ul>
-
-
-<!-- Tab panes -->
-<div class="tab-content">
-  <div class="tab-pane active" id="open" role="tabpanel" aria-labelledby="home-tab">
-    <div class="proposal-area">
-      <div class="row g-3">
-        {{#each openProposals}}
-          <div class="col-md-4 gx-3">
-            <div class="card proposal-item h-100">						
-              <div class="card-body">
-                <h2>{{this.data.title}}</h2>
-
-                {{#if ../contentType.acls.canEdit }}
-                  <a onclick="return openFormInModal('edit', 'proposal', '{{ this.id }}')" 
-                    href="javascript:void(0)"><img src="/assets/uploads/edit.png" alt=""></a> &nbsp; 
-                  <a href="javascript:void(0)" onclick="return openFormInModal('delete', null, '{{ this.id }}')"><img src="/assets/uploads/delete.png" alt=""></a>					
-                {{/if}}
-
-                <p> {{{this.data.preview}}} <br> 
-                  <a href="javascript:void(0)" onclick="return openFormInModal('detail', 'proposal', '{{ this.id }}')" >
-                    Read More</a>
-                  </p>
-                
-                {{#if ../contentType.acls.canVote }}
-                  <div class="d-flex align-items-left pt-3">             
-                    <div class="vote-controls" data-vote-controls-id="{{this.id}}">                  
-                      <button type="button" class="button-green" onclick="return vote('{{this.id}}', 1)""><i class="bi bi-arrow-up"></i></button>
-                      <span class="voteUps">{{this.data.voteUps}}</span> 
-                      <button type="button" class="button-red"  onclick="return vote('{{this.id}}', -1)"><i class="bi bi-arrow-down"></i></button>
-                      <span class="voteDowns">{{this.data.voteDowns}}</span>  
-                    </div>
-                    <div class="ms-auto">
-                      <span><a href="#" class="text-white font-italic mx-2">{{ this.data.remainingDays }}</a></span>
-                    </div>
-                  </div>
-                {{/if}}
-
-              </div>
-            </div>
-          </div>
-        {{/each}}
+    <div class="proposal border p-4">
+      <div>
+        <img src="{{data.introLogo.src}}" width="100px" />
       </div>
-      <!-- <div class="row text-center">
-        <div class="col">
-        <a href=""#">See All Open Proposals</a>
+      <h1 class="pb-5">{{data.title}}</h1>
+
+      <p>
+        <h4>PREPARED FOR</h4>
+        {{data.clientRep}}<br />
+        {{data.clientName}}<br />
+      </p>
+
+      <p>
+        <h4>PREPARED BY</h4>
+        {{data.companyRep}}<br />
+        {{data.companyName}}<br />
+      </p>
+
+      <div class="pt-5 pb-5">
+        <img src="{{data.mainLogo.src}}" width="500px" />
+      </div>
+
+      <div class="text-end">
+        {{data.date}}<br />
+        {{data.clientRep}}<br />
+        {{data.clientName}}<br />
+      </div>
+
+      <div class="pt-5 pb-5">
+        {{{data.introMessage}}}
+      </div>
+
+      {{#each data.sections}}
+        <div class="proposal-section pt-5">
+          <h2 class="pb-3" id="{{this.slug}}">{{this.title}}</h2>
+          {{{this.body}}}
         </div>
-      </div> -->
+      {{/each}}
     </div>
+
   </div>
+  <div class="col-md-4">
+    <div class="sticky-top border p-4">
+      <h3>Proposal Menu</h3>
+      <ul class="nav flex-column">
 
-  <div class="tab-pane" id="closed" role="tabpanel" aria-labelledby="profile-tab">
-    <div class="proposal-area">
-      <div class="row g-3">
-        {{#each closedProposals}}
-        <div class="col-md-4">
-          <div class="card proposal-item h-100">						
-            <div class="card-body">
-              <h2>{{this.data.title}}</h2> 
+        {{#each data.sections}}
+          <a
+            class="nav-link blue"
+            aria-current="page"
+            href="#{{this.slug}}"
+          >{{this.title}}</a>
 
-              {{#if ../contentType.acls.canEdit }}
-              <a onclick="return openFormInModal('edit', 'proposal', '{{ this.id }}')" 
-                href="javascript:void(0)"><img src="/assets/uploads/edit.png" alt=""></a> &nbsp; 
-              <a href="javascript:void(0)" onclick="return openFormInModal('delete', null, '{{ this.id }}')"><img src="/assets/uploads/delete.png" alt=""></a>					
-            {{/if}}
-
-              <p> {{{this.data.preview}}} <br> <a href="#">Read More</a></p>
-            </div>
-
-          </div>
-        </div>
         {{/each}}
 
-      </div>
-      <!-- <div class="row text-center">
-        <div class="col">
-        <a href=""#">See All Closed Proposals</a>
-        </div>
-      </div> -->
+      </ul>
     </div>
   </div>
-
-  {{#if contentType.acls.canEdit}}
-  <div class="tab-pane" id="pending" role="tabpanel" aria-labelledby="messages-tab">
-
-    <div class="proposal-area">
-      <!-- <div class="d-flex flex-wrap align-content-start"> -->
-        <div class="row g-3">
-          {{#each pendingProposals}}
-            <div class="col-md-4">
-              <div class="card proposal-item">						
-                <div class="card-body">
-                  <h2>{{this.data.title}}</h2> 
-      
-                  {{#if ../contentType.acls.canEdit }}
-                  <a onclick="return openFormInModal('edit', 'proposal', '{{ this.id }}')" 
-                    href="javascript:void(0)"><img src="/assets/uploads/edit.png" alt=""></a> &nbsp; 
-                  <a href="javascript:void(0)" onclick="return openFormInModal('delete', null, '{{ this.id }}')"><img src="/assets/uploads/delete.png" alt=""></a>					
-                {{/if}}
-      
-                  <p> {{{this.data.preview}}} <br> <a href="#">Read More</a></p>
-                </div>
-      
-              </div>
-            </div>
-          {{/each}}
-      </div>
-          
-      <!-- <div class="row text-center">
-          <div class="col">
-          <a href=""#">See All Pending Proposals</a>
-          </div>
-      </div> -->
-    </div>
-  </div>
-  {{/if}}
-
-
 </div>
-</div>
-

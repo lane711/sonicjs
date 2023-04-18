@@ -44,9 +44,11 @@ module.exports = contentService = {
 
   getRenderedPage: async function (req) {
     // emitterService.emit('getRenderedPagePreDataFetch', req);
+    let urlWithoutQS = req.url.split('?')[0];
 
     if (process.env.ENABLE_CACHE === "TRUE") {
-      let cachedPage = cacheService.getCache().get(req.url);
+      console.log('getting cached page', urlWithoutQS)
+      let cachedPage = cacheService.getCache().get(urlWithoutQS);
       if (cachedPage !== undefined) {
         // console.log('returning from cache');
         return { page: cachedPage };
@@ -57,7 +59,7 @@ module.exports = contentService = {
 
     await emitterService.emit("preProcessPageUrlLookup", req);
 
-    let page = await dataService.getContentByUrl(req.url, req.sessionID);
+    let page = await dataService.getContentByUrl(urlWithoutQS, req.sessionID);
 
     await emitterService.emit("postPageDataFetch", { req: req, page: page });
 
@@ -149,7 +151,7 @@ module.exports = contentService = {
     return "error";
   },
 
-  getPageByUrl: async function (id, instance) {},
+  getPageByUrl: async function (id, instance) { },
 
   processTemplate: async function (page, req, sessionID) {
     page.data.html = ""; //reset
@@ -187,7 +189,7 @@ module.exports = contentService = {
     // let page = page; // await this.getContentById('5cd5af93523eac22087e4358');
     // console.log('processSections:page==>', page);
 
-    if (page.data && page.data.layout.length > 0) {
+    if (page.data && page.data.layout?.length > 0) {
       let sections = page.data.layout;
 
       for (const section of sections) {
@@ -235,21 +237,29 @@ module.exports = contentService = {
             req
           );
         } else {
-          let sectionClass = section.data.cssClass
-            ? section.data.cssClass + " "
+          let sectionClass = section.data.css
+            ? section.data.css + " "
             : "";
           let sectionCss = await cssService.getSectionStyle(section);
           // console.log("sectionCss", sectionCss);
           // let overlayStyle = await this.getSectionOverlayStyle(section);
           let sectionMiniGuid = section.id.substr(section.id.length - 12);
 
+ 
+
           page.data.html += '<style>';
           page.data.html += `\n.pb .css-${sectionMiniGuid}{${sectionCss?.style}}\n`
           page.data.html += `\n.pb .overlay-${sectionMiniGuid}{${sectionCss?.overlay}}\n`
           page.data.html += '</style>';
+          page.data.html += `<section data-id='${section.id}' data-title='${section.data.title}' class="${sectionClass}jumbotron-fluid css-${sectionMiniGuid} ${sectionCss?.css} ${sectionCss?.margin} ${sectionCss?.padding} position-relative">`;
+          page.data.html += `<div class="section-overlay overlay-${sectionMiniGuid} ${sectionCss.overlayCss}">`;
 
-          page.data.html += `<section data-id='${section.id}' data-title='${section.data.title}' class="${sectionClass}jumbotron-fluid css-${sectionMiniGuid} ${sectionCss?.css} ${sectionCss?.margin}">`;
-          page.data.html += `<div class="section-overlay overlay-${sectionMiniGuid} ${sectionCss?.padding}">`;
+          if (section.data.background === 'video') {
+            page.data.html += `<video playsinline autoplay muted loop>
+                                <source class="h-100" src="${section.data.videoUrl}" type="video/mp4" />
+                              </video>`
+          }
+
           page.data.html += '<div class="container">';
           let rows;
           rows = await this.processRows(page, section, section.data.rows, req);

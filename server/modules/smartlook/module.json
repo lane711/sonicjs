@@ -1,6 +1,6 @@
 {
   "title": "Smartlook",
-  "enabled": false,
+  "enabled": true,
   "systemId": "smartlook",
   "icon": "",
   "canBeAddedToColumn": false,

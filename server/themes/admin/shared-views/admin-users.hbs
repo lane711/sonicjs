@@ -2,9 +2,9 @@
 
   <div class="card">
     <div class="card-header">
-      <i class="fa fa-align-justify"></i> Users
+      <i class="{{data.navCurrent.icon}}"></i> Users
       <a href="javascript:void(0)" onclick="openNewContentTypeModal()"
-        class="btn btn-success float-right new-content-type">New User</a>
+        class="btn btn-outline-dark float-right new-content-type">New User</a>
     </div>
     <div class="card-body page-list">
       <table class="table table-responsive-sm table-striped">
@@ -21,12 +21,12 @@
             <td><a href="/admin/user/edit/{{ this.id }}">{{ this.username }}</a></td>
             <td>{{ this.firstName }} {{ this.lastName }}</td>
             <td class="text-right">
-              <a class="btn btn-sm btn-primary rmargin" href="/admin/user/edit/{{ this.id }}">Edit</a>
+              <a class="btn btn-sm btn-outline-dark rmargin" href="/admin/user/edit/{{ this.id }}">Edit</a>
 
 
-              <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
+              <a tabindex="0" class="btn btn-sm btn-outline-dark" role="button" data-html="true" data-toggle="popover"
                 data-trigger="focus" data-email="{{this.username}}" title="Delete <b>{{ this.data.title }}</b> Forever?" data-content="<a href='/user/{{ this.id }}/{{../data.sessionID}}'
-class='btn btn-sm btn-danger rmargin custom-delete'>Confirm Delete</a>
+class='btn btn-sm btn-outline-dark rmargin custom-delete'>Confirm Delete</a>
 ">Delete</a>
 
             </td>

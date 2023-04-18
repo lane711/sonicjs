@@ -53,8 +53,7 @@ $(document).ready(async function () {
   showElements();
   setupFormIsLoadedEvent();
 
-  console.log('pb loaded');
-
+  console.log("pb loaded");
 });
 
 function setupSessionID() {
@@ -69,6 +68,7 @@ async function setPage() {
   let pageId = $("#page-id").val();
   if (pageId) {
     this.page = await dataService.getContentById(pageId);
+    console.log('page set', pageId)
   }
 }
 
@@ -384,7 +384,8 @@ async function addSection(above = true, layout) {
 
   //section
   let nextSectionCount = 1;
-  if (page.data.layout) {
+  debugger;
+  if (page.data?.layout) {
     nextSectionCount = page.data.layout.length + 1;
   }
 
@@ -1648,7 +1649,7 @@ function getPageTemplateRegion(page, sourceColumn, destinationColumn) {
 }
 
 async function addModuleToColumn(submission) {
-  console.log('addModuleToColumn', submission)
+  console.log("addModuleToColumn", submission);
   let entity = processContentFields(submission.data);
 
   let {
@@ -2284,8 +2285,15 @@ function hideSiteCss() {
 //   });
 // }
 
+function isPageBuilderMode() {
+  return $("html").hasClass("pb");
+}
+
+// function updateDebugWindow() {
+//   $("#floating-debug-window .is-dirty").text(formIsDirty);
+// }
+
 function pageBuilderFormChanged(data) {
-  // debugger;
 
   latestModuleDataFromForm = data.data;
 
@@ -2296,11 +2304,13 @@ function pageBuilderFormChanged(data) {
   }
 
   if (formIsDirty) {
-    // $('.formio-component-submit').css('background','red');
+
     if (!$(".submit-alert").length)
-      $(
-        '<span class="submit-alert alert alert-danger ms-3"><span>Unsaved changes!</span><span id="reset-module" class="btn btn-sm btn-danger">Reset</span></span>'
-      ).insertAfter(".formio-component-submit button");
+      if (isPageBuilderMode()) {
+        $(
+          '<span class="submit-alert alert alert-danger ms-3"><span>Unsaved changes!</span><span id="reset-module" class="btn btn-sm btn-danger">Reset</span></span>'
+        ).insertAfter(".formio-component-submit button");
+      }
   } else {
     $(".submit-alert").remove();
     if (!data.changed && latestModuleDataFromForm) {
@@ -2323,14 +2333,9 @@ function pageBuilderFormChanged(data) {
   }
 
   //if page builder not expanded
-  if(!$('.pb-wrapper.expanded').length){
+  if (!$(".pb-wrapper.expanded").length) {
     return;
   }
-
-  // if(data.changed){
-  //   console.log('form is dirty')
-  //   formIsDirty = true;
-  // }
 
   newDrop = false;
   // if (formSubmitted) {
@@ -2349,6 +2354,8 @@ function pageBuilderFormChanged(data) {
   //render module (may not have instance yet_
 
   renderSectionOrModule(latestModuleDataFromForm);
+
+  // updateDebugWindow();
 }
 
 function clickFormUpdateButton() {

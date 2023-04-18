@@ -23,10 +23,51 @@
         data-title="title"
         data-caption="<b>{{this.title}}</b> - {{this.body}}"
       >
-        <img src="{{this.select.src}}" class="img-responsive" alt="" />
+        <img src="{{this.select.src}}" class="img-fluid" alt="" />
       </a>
 
     {{/each}}
+
+  </div>
+
+{{/if}}
+
+{{#if (eq data.view "columnList")}}
+  <div class="gallery-wrapper row">
+
+    {{#each data.galleryImages}}
+
+      <div
+        class="col-md d-flex align-items-center justify-content-center p-5 p-md-4" 
+        data-aos="zoom-out-down"
+        data-aos-delay="{{this.aosDelay}}"
+      >
+        <img src="{{this.select.src}}" class="img-fluid" alt="" />
+      </div>
+
+    {{/each}}
+
+  </div>
+
+{{/if}}
+
+{{#if (eq data.view "splide")}}
+
+  <div class="splide" role="group" >
+    <div class="splide__track">
+      <ul class="splide__list">
+        {{#each data.galleryImages}}
+          <li class="splide__slide p-1">
+            <a
+              href="{{this.select.src}}"
+              data-fancybox="gallery"
+            >
+              <img src="{{this.select.src}}" class="img-fluid" alt="" />
+            </a>
+          </li>
+        {{/each}}
+      </ul>
+    </div>
   </div>
 
 {{/if}}

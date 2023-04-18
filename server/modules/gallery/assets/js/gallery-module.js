@@ -2,7 +2,6 @@
 // Initialise Carousel
 $(document).ready(async function () {
   if ($("[data-fancybox]").length) {
-
     console.log("init fancybox");
     Fancybox.bind("[data-fancybox]", {
       // Your options go here
@@ -11,5 +10,22 @@ $(document).ready(async function () {
     // const myCarousel = new Carousel(document.querySelector(".carousel"), {
     //   // Options
     // });
+  }
+
+  if ($(".splide").length) {
+    var splide = new Splide(".splide", {
+      type: "loop",
+      padding: "5rem",
+      perPage: 3,
+      breakpoints: {
+        640: {
+          type:'fade',
+          pagination:false,
+          perPage: 1,
+        },
+      },
+    });
+
+    splide.mount();
   }
 });
