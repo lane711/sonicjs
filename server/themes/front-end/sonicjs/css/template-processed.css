@@ -1,5 +1,6 @@
 :root {
 --orange: #FFC501;
+--bs-gray-dark: #212529
 }
 
 body,p,h1,h2,h3,h4,h5 {
@@ -61,9 +62,10 @@ height: 80px
 height: 0
 }
 
-.btn{
-    border-radius: 0;
+.btn {
+border-radius: 0
 }
+
 .btn.github {
 position: absolute;
 right: 92px;

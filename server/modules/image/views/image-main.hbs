@@ -3,5 +3,5 @@
         <img {{#if data.openInNewTab}}target="_blank"{{/if}} class="{{data.css}}" width="100%" src="{{ data.fileName.src }}" />
     </a>
 {{else}}
-    <img width="{{data.width}}" src="{{ data.fileName.src }}" />
+    <img width="{{data.width}}" class="{{data.css}}" src="{{ data.fileName.src }}" />
 {{/if}}

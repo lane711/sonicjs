@@ -107,7 +107,7 @@ module.exports = adminService = {
           data.cardTitle = `New ${await helperService.titleCase(param1)}`
           if (param2) {
             content = await dataService.getContentById(param2, req.sessionID);
-            data.cardTitle = content.data.title ? `Edit ${content.data.title}` : `Edit ${await helperService.titleCase(param1)}`;
+            data.cardTitle = content && content.data.title ? `Edit ${content.data.title}` : `Edit ${await helperService.titleCase(param1)}`;
           }
           data.editForm = await dataService.formGet(
             param1,
