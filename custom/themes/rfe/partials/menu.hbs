@@ -8,11 +8,11 @@
           <span class="navbar-toggler-icon"></span>
       </button>
 
-      <div class="navbar-collapse collapse" id="navbarsExample01" style="">
+      <div class="navbar-collapse collapse text-end" id="navbarsExample01" style="">
           <ul class="navbar-nav me-auto mb-2">
               {{#each data.menu}}
                   <li class="nav-item">
-                      <a class="nav-link {{#if this.isActive}}active{{/if}}" aria-current="page" href="{{this.data.url}}">{{this.data.title}}</a>
+                      <a class="nav-link p-3 {{#if this.isActive}}active{{/if}}" aria-current="page" href="{{this.data.url}}">{{this.data.title}}</a>
                   </li>
               {{/each}}
           </ul>
