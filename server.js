@@ -39,6 +39,7 @@ const { Session } = require("./server/data/model/Session");
 const { stringify } = require("yaml");
 
 function start() {
+
   if (showStartupIcon !== "FALSE") {
     console.log(`Starting up ...
   
