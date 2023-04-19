@@ -2,11 +2,16 @@
     <img class="img-thumbnail shadow mb-5" src="{{  data.fileName.src  }}" alt="{{data.title}}">
     <div>
       <h2 class="mt-5">{{data.title}}</h2>
-      <button
-      type="button"
-      class="btn btn-small btn-primary me-2 float-end"
-      onclick="return openFormInModal('edit', 'blog', '{{this.id}}')"
-    ><i class="bi bi-pencil"></i></button>
+
+      <!-- {{#if contentType.acls.canEdit }}
+        <button
+        type="button"
+        class="btn btn-small btn-primary me-2 float-end"
+        onclick="return openFormInModal('edit', 'blog', '{{this.id}}')"
+      ><i class="bi bi-pencil"></i></button>
+    {{/if}} -->
+
+    
       <p class="card-text">{{{ data.body }}}</p>
       {{#if data.urlKey.previousUrl}}
       <a href="{{data.urlKey.previousUrl}}" class="btn btn-primary">← Previous Post</a>
