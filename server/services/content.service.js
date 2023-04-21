@@ -245,12 +245,14 @@ module.exports = contentService = {
           // let overlayStyle = await this.getSectionOverlayStyle(section);
           let sectionMiniGuid = section.id.substr(section.id.length - 12);
 
+ 
+
           page.data.html += '<style>';
           page.data.html += `\n.pb .css-${sectionMiniGuid}{${sectionCss?.style}}\n`
           page.data.html += `\n.pb .overlay-${sectionMiniGuid}{${sectionCss?.overlay}}\n`
           page.data.html += '</style>';
           page.data.html += `<section data-id='${section.id}' data-title='${section.data.title}' class="${sectionClass}jumbotron-fluid css-${sectionMiniGuid} ${sectionCss?.css} ${sectionCss?.margin} ${sectionCss?.padding} position-relative">`;
-          page.data.html += `<div class="section-overlay overlay-${sectionMiniGuid}">`;
+          page.data.html += `<div class="section-overlay overlay-${sectionMiniGuid} ${sectionCss.overlayCss}">`;
 
           if (section.data.background === 'video') {
             page.data.html += `<video playsinline autoplay muted loop>

@@ -26,6 +26,7 @@
   --white: #fff;
   --gray: #73818f;
   --gray-dark: #2f353a;
+  --gray-light: #c8ced3;
   --light-blue: #63c2de;
   --primary: #20a8d8;
   --secondary: #c8ced3;
@@ -33,7 +34,7 @@
   --info: #63c2de;
   --warning: #ffc107;
   --danger: #f86c6b;
-  --light: #f0f3f5;
+  --light: #FBFBFB;
   --dark: #2f353a;
   --breakpoint-xs: 0;
   --breakpoint-sm: 576px;
@@ -42,6 +43,8 @@
   --breakpoint-xl: 1200px;
   --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --border: #EFF1F3;
+  --border-button: #E8E8E9;
 }
 
 *,
@@ -63,7 +66,7 @@ article, aside, figcaption, figure, footer, header, hgroup, main, nav, section {
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-family: 'Inter',"system-ui"!important;
   font-size: 0.875rem;
   font-weight: 400;
   line-height: 1.5;

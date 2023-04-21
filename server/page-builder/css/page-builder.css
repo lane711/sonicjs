@@ -289,7 +289,7 @@
 .expanded main,
 .expanded .fixed-top,
 .expanded footer {
-  margin-left: 450px;
+  margin-left: 420px;
   /* transition: margin-left 1s; */
 }
 
@@ -903,4 +903,13 @@ section {
 .module-hover-wrap{
   background-color: #20a8d8;
   cursor: pointer;
+}
+
+#floating-debug-window{
+  position:fixed;
+  right: 20px;
+  bottom: 100px;
+  width: 300px;
+  background-color: red;
+  z-index: 1000;
 }

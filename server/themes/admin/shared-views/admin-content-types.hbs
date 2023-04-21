@@ -1,9 +1,9 @@
 <div class="col-lg-12">
   <div class="card">
     <div class="card-header">
-      <i class="fa fa-align-justify"></i> Content Type
+      <i class="{{data.navCurrent.icon}}"></i> Content Type
       <a href="javascript:void(0)" onclick="openNewContentTypeModal()"
-        class="btn btn-success float-right new-content-type">New Content Type</a>
+        class="btn btn-outline-dark float-right new-content-type">New Content Type</a>
     </div>
     <div class="card-body page-list">
       <table class="table table-responsive-sm table-striped">
@@ -24,27 +24,27 @@
             <td><a href="/admin/modules/edit/{{ this.moduleSystemId }}">{{ this.moduleSystemId }}</a></td>
             <td>{{ contentType.description}}</td>
             <td>
-              <a class="btn btn-sm btn-primary rmargin" href="/admin/content-types/edit/{{ this.systemId }}">Edit</a>
+              <a class="btn btn-sm btn-outline-dark rmargin" href="/admin/content-types/edit/{{ this.systemId }}">Edit</a>
 
 
 
 
-              <a tabindex="0" class="btn btn-sm btn-danger" role="button" data-html="true" data-toggle="popover"
+              <a tabindex="0" class="btn btn-sm btn-outline-dark" role="button" data-html="true" data-toggle="popover"
                 data-trigger="focus" aria-label="Delete {{ this.title }}"
                 title="Delete <b>{{ this.title }}</b> Forever?" data-content="<a href='/contentType/{{ this.systemId }}/{{../data.sessionID}}'
-   class='btn btn-sm btn-danger rmargin custom-delete'>Confirm Delete</a>
+   class='btn btn-sm btn-outline-dark rmargin custom-delete'>Confirm Delete</a>
 ">Delete</a>
 
 
-              {{!-- <button type="button" class="btn btn-sm btn-danger" data-toggle="popover"
+              {{!-- <button type="button" class="btn btn-sm btn-outline-dark" data-toggle="popover"
  title="Delete Content Type {{ this.title }}" data-html="true"
-data-content="<a class='btn btn-sm btn-danger' onclick='deleteContentType({{ this.id }})' >Confirm Delete?</a>">Delete</button> --}}
+data-content="<a class='btn btn-sm btn-outline-dark' onclick='deleteContentType({{ this.id }})' >Confirm Delete?</a>">Delete</button> --}}
 
 
               {{!-- <ng-template #popTitle>Delete <b>{{ contentType.name }}</b>?</ng-template>
-              <ng-template #popContent><button class="btn btn-sm btn-danger"
+              <ng-template #popContent><button class="btn btn-sm btn-outline-dark"
                   (click)="deleteContentType(contentType.id)">Confirm Delete</button></ng-template>
-              <button class="btn btn-sm btn-danger" placement="top" [ngbPopover]="popContent"
+              <button class="btn btn-sm btn-outline-dark" placement="top" [ngbPopover]="popContent"
                 [popoverTitle]="popTitle">Delete</button> --}}
             </td>
           </tr>
@@ -95,7 +95,7 @@ data-content="<a class='btn btn-sm btn-danger' onclick='deleteContentType({{ thi
       </div>
       {{!-- <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-success wysiwyg-save" onclick='saveNewContentType()'
+        <button type="button" class="btn btn-outline-dark wysiwyg-save" onclick='saveNewContentType()'
           data-dismiss="modal">Create</button>
       </div> --}}
     </div>

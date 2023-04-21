@@ -92,7 +92,7 @@
     <div class="footer hide">
 
       <!-- <button type="button" 
-      class="btn btn-danger"
+      class="btn btn-outline-dark"
       data-bs-toggle="popover"
       data-bs-trigger="hover focus"
       data-bs-content="Undo">
@@ -100,7 +100,7 @@
       </button>
 
       <button type="button" 
-      class="btn btn-primary"
+      class="btn btn-outline-dark"
       data-bs-toggle="popover"
       data-bs-trigger="hover focus"
       data-bs-content="Redo">
@@ -108,7 +108,7 @@
       </button> -->
 
       <button type="button" 
-      class="btn btn-primary btn-sm"
+      class="btn btn-outline-dark btn-sm"
       id="save-global-css">
       Save Site CSS
         <i class="bi btn-sm bi-save text-primary white"></i>
@@ -218,14 +218,14 @@
   </div>
 
   <div class="section-add section-add-above hide">
-    <button class="btn btn-primary" data-bs-toggle="popover" data-bs-trigger="hover focus"
+    <button class="btn btn-outline-dark" data-bs-toggle="popover" data-bs-trigger="hover focus"
       data-bs-content="Add Section Above">
       <i class="bi bi-plus-square"></i>
     </button>
   </div>
 
   <div class="section-add section-add-below hide">
-    <button class="btn btn-primary" data-bs-toggle="popover" data-bs-trigger="hover focus"
+    <button class="btn btn-outline-dark" data-bs-toggle="popover" data-bs-trigger="hover focus"
       data-bs-content="Add Section Below">
       <i class="bi bi-plus-square"></i>
     </button>
@@ -301,7 +301,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary wysiwyg-save" onclick="saveWYSIWYG()"
+          <button type="button" class="btn btn-outline-dark wysiwyg-save" onclick="saveWYSIWYG()"
             data-dismiss="modal">Save</button>
         </div>
       </div>
@@ -334,7 +334,7 @@
         <div class="modal-footer">
           <button type="button" data- {{data.themeSettings.bootstrapToggleMiddle}} dismiss="modal"
             class="btn btn-secondary">Cancel</button>
-          <button type="button" class="btn btn-primary wysiwyg-save" onclick="saveSection()"
+          <button type="button" class="btn btn-outline-dark wysiwyg-save" onclick="saveSection()"
             data-dismiss="modal">Save</button>
         </div>
       </div>
@@ -404,7 +404,7 @@
         </div>
         {{! <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary page-settings-save" data-dismiss="modal">Save</button>
+          <button type="button" class="btn btn-outline-dark page-settings-save" data-dismiss="modal">Save</button>
         </div> }}
       </div>
     </div>
@@ -424,11 +424,16 @@
         </div>
         <div class="modal-footer">
           <button type="button" id="unsavedLooseChanges" class="btn btn-secondary" data-bs-dismiss="modal">Loose Changes</button>
-          <button type="button" id="unsavedSaveChanges" class="btn btn-primary">Save Shanges</button>
+          <button type="button" id="unsavedSaveChanges" class="btn btn-outline-dark">Save Shanges</button>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Floating Debug Window -->
+  <!-- <div id="floating-debug-window" class="p-2 m-3 rounded">
+    <div >Form Dirty: <span class="is-dirty">false</span></div>
+  </div> -->
 
   <script src="/node_modules/@simonwep/pickr/dist/pickr.min.js"></script>
   <script src="/node_modules/sortablejs/Sortable.min.js"></script>

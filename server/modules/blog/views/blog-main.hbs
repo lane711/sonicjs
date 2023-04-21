@@ -5,7 +5,7 @@
 
       <div class="col-md-4">
         <a href="{{this.data.url}}"><img
-            class="card-img-top img-responsive"
+            class="card-img-top img-responsive img-thumbnail shadow"
             src="{{this.data.image}}"
             alt=""
           /></a>
@@ -13,6 +13,14 @@
       <div class="col-md-8">
 
         <h4><a href="{{this.data.url}}">{{this.data.title}}</a></h4>
+
+        <!-- {{#if ../contentType.acls.canEdit }}
+          <button
+            type="button"
+            class="btn btn-small btn-primary float-end me-2"
+            onclick="return openFormInModal('edit', 'blog', '{{this.data.id}}')"
+          ><i class="bi bi-pencil"></i></button>
+        {{/if}} -->
 
         <p class="card-text text-secondary">
           {{this.data.body}}

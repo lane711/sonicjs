@@ -68,6 +68,7 @@ async function setPage() {
   let pageId = $("#page-id").val();
   if (pageId) {
     this.page = await dataService.getContentById(pageId);
+    console.log('page set', pageId)
   }
 }
 
@@ -383,7 +384,8 @@ async function addSection(above = true, layout) {
 
   //section
   let nextSectionCount = 1;
-  if (page.data.layout) {
+  debugger;
+  if (page.data?.layout) {
     nextSectionCount = page.data.layout.length + 1;
   }
 
@@ -2284,11 +2286,14 @@ function hideSiteCss() {
 // }
 
 function isPageBuilderMode() {
-  return $("html").hasClass(".pb");
+  return $("html").hasClass("pb");
 }
 
+// function updateDebugWindow() {
+//   $("#floating-debug-window .is-dirty").text(formIsDirty);
+// }
+
 function pageBuilderFormChanged(data) {
-  // debugger;
 
   latestModuleDataFromForm = data.data;
 
@@ -2299,19 +2304,19 @@ function pageBuilderFormChanged(data) {
   }
 
   if (formIsDirty) {
-    debugger;
-    if (isPageBuilderMode()) {
-      if (!$(".submit-alert").length)
+
+    if (!$(".submit-alert").length)
+      if (isPageBuilderMode()) {
         $(
           '<span class="submit-alert alert alert-danger ms-3"><span>Unsaved changes!</span><span id="reset-module" class="btn btn-sm btn-danger">Reset</span></span>'
         ).insertAfter(".formio-component-submit button");
-    } else {
-      $(".submit-alert").remove();
-      if (!data.changed && latestModuleDataFromForm) {
-        originalModuleDataFromDb = JSON.parse(
-          JSON.stringify(latestModuleDataFromForm)
-        ); //deep copy
       }
+  } else {
+    $(".submit-alert").remove();
+    if (!data.changed && latestModuleDataFromForm) {
+      originalModuleDataFromDb = JSON.parse(
+        JSON.stringify(latestModuleDataFromForm)
+      ); //deep copy
     }
   }
 
@@ -2332,11 +2337,6 @@ function pageBuilderFormChanged(data) {
     return;
   }
 
-  // if(data.changed){
-  //   console.log('form is dirty')
-  //   formIsDirty = true;
-  // }
-
   newDrop = false;
   // if (formSubmitted) {
   //   //reset
@@ -2354,6 +2354,8 @@ function pageBuilderFormChanged(data) {
   //render module (may not have instance yet_
 
   renderSectionOrModule(latestModuleDataFromForm);
+
+  // updateDebugWindow();
 }
 
 function clickFormUpdateButton() {

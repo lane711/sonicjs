@@ -1,6 +1,6 @@
 /**
  * Install Service -
- * The install service is run when SonicJs first starts up. It is responsible for making sure the your database contains certain must-have records. 
+ * The install service is run when SonicJs first starts up. It is responsible for making sure the your database contains certain must-have records.
  * It also contain so migration examples.
  * @module installService
  */
@@ -43,7 +43,7 @@ module.exports = installService = {
   cleanInstall: async function (req) {
     console.log(logSymbols.info, "Cleaning install...");
 
-    await dalService.deleteAllOfContentType('app-analytics', req.session );
+    await dalService.deleteAllOfContentType("app-analytics", req.session);
     await dalService.userDeleteAll(req.session);
     await dalService.userSessionsDeleteAll(req.session);
   },
@@ -166,6 +166,93 @@ module.exports = installService = {
         session
       );
       console.log("created googleAnalytics:", record);
+    }
+
+    let adminNav = await dataService.getContentByType("admin-nav");
+    if (adminNav.length === 0) {
+      let data = {
+        items: [
+          {
+            title: "Content",
+            path: "/admin/content",
+            icon: "bi bi-columns",
+          },
+          {
+            title: "Media",
+            path: "/admin/media",
+            icon: "bi bi-images",
+          },
+          {
+            title: "Content Types",
+            path: "/admin/content-types",
+            icon: "bi bi-boxes",
+          },
+          {
+            title: "Modules",
+            path: "/admin/modules",
+            icon: "bi bi-inboxes",
+          },
+          {
+            title: "Taxonomy",
+            path: "/admin/taxonomy",
+            icon: "bi bi-tag",
+          },
+          {
+            title: "Theme",
+            path: "/admin/content/edit/theme-settings/2dc42272-b7b6-473f-9668-bdcf1197ccbe",
+            icon: "bi bi-brush",
+          },
+          {
+            title: "Typography",
+            path: "/admin/site-settings-typography",
+            icon: "bi bi-fonts",
+          },
+          {
+            title: "Menus",
+            path: "/admin/menus",
+            icon: "bi bi-list",
+          },
+          {
+            title: "Users",
+            path: "/admin/users",
+            icon: "bi bi-person",
+          },
+          {
+            title: "Roles",
+            path: "/admin/roles",
+            icon: "bi bi-people",
+          },
+          {
+            title: "Permissions",
+            path: "/admin/content-types/edit/site-settings-permissions",
+            icon: "bi bi-person-check",
+          },
+          {
+            title: "Urls",
+            path: "/admin/urls",
+            icon: "bi bi-link",
+          },
+          {
+            title: "Backups",
+            path: "/admin/backup-restore",
+            icon: "bi bi-layer-backward",
+          },
+          {
+            title: "Settings",
+            path: "/admin/site-settings",
+            icon: "bi bi-gear",
+          },
+        ],
+        submit: true,
+        contentType: "admin-nav",
+      };
+      let record = await dalService.contentUpdate(
+        "",
+        "/admin-nav",
+        data,
+        session
+      );
+      console.log("created adminNav:", record);
     }
 
     // let mainMenu = await dataService.getContentByType("menu");
