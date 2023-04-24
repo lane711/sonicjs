@@ -1,0 +1,39 @@
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark top-nav">
+
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/">{{> menu-logo }}</a>
+      <button class="navbar-toggler" type="button" data-{{data.themeSettings.bootstrapToggleMiddle}}toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+
+          {{#each data.menu}}
+
+            {{#unless this.showChildren}}
+              <li class="nav-item">
+                <a class="nav-link {{#if this.isActive}}active{{/if}}" aria-current="page" href="{{this.data.url}}">{{this.data.title}}</a>
+              </li>
+            {{/unless}}
+
+            {{#if this.showChildren}}
+              <li class="nav-item dropdown {{#if this.isActive}}active{{/if}}">
+                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">{{this.data.title}}</a>
+                <ul class="dropdown-menu">
+                  {{#each this.children}}
+                    <li><a class="dropdown-item" href="{{this.data.url}}">{{this.data.title}}</a></li>
+                  {{/each}}
+                </ul>
+              </li>
+            {{/if}}
+
+          {{/each}}
+
+        </ul>
+        <form class="d-flex" style="margin-right:100px;">
+          <a href="/sign-up" class="btn btn-sm btn-success demo-btn" type="submit">
+            Get Started for Free</a>
+        </form>              
+      </div>
+    </div>
+  </nav>
