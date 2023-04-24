@@ -252,7 +252,7 @@ module.exports = contentService = {
           page.data.html += `\n.pb .overlay-${sectionMiniGuid}{${sectionCss?.overlay}}\n`
           page.data.html += '</style>';
           page.data.html += `<section data-id='${section.id}' data-title='${section.data.title}' class="${sectionClass}jumbotron-fluid css-${sectionMiniGuid} ${sectionCss?.css} ${sectionCss?.margin} ${sectionCss?.padding} position-relative">`;
-          page.data.html += `<div class="section-overlay overlay-${sectionMiniGuid} ${sectionCss.overlayCss}">`;
+          page.data.html += `<div class="section-overlay overlay-${sectionMiniGuid} ${sectionCss?.overlayCss}">`;
 
           if (section.data.background === 'video') {
             page.data.html += `<video playsinline autoplay muted loop>
