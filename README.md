@@ -7,6 +7,17 @@ Experience the power of SonicJs, a cutting-edge Headless CMS built on the robust
 
 Read the docs here [https://sonicjs.com]
 
+## How Fast is "Blazingly" Fast?
+
+| Platform      | Average Response Time | Difference |
+| ----------- | ----------- | ----------- |
+| Strapi      | 342.1ms       | - baseline - |
+| Node + Postgres   | 320.2ms        | 1.06x Faster|
+| SonicJs   | 52.7ms        | 6.4x Faster|
+
+The details of our performance benchmark here is available at
+[here](/performance-benchmarks). 
+
 # Prerequisites
 1. You will need a free Cloudflare account: [https://dash.cloudflare.com/sign-up](https://dash.cloudflare.com/sign-up)
 1. Install Wrangler CLI:
