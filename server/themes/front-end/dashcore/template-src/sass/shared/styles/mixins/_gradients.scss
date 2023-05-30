@@ -1,3 +1,0 @@
-@mixin make-gradient($color-start, $color-end) {
-  background-image: linear-gradient(to right top, $color-start, $color-end);
-}

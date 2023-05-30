@@ -1,9 +1,0 @@
-{
-  "title": "Html",
-  "enabled": true,
-  "systemId": "html",
-  "icon": "bi-filetype-html",
-  "canBeAddedToColumn": true,
-  "singleInstance": false,
-  "version": "0.0.0.1"
-}

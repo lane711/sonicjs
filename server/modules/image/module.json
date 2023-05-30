@@ -1,9 +1,0 @@
-{
-  "title": "Image",
-  "enabled": true,
-  "systemId": "image",
-  "icon": "bi-image",
-  "canBeAddedToColumn": true,
-  "singleInstance": false,
-  "version": "0.0.0.1"
-}

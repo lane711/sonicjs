@@ -1,9 +1,0 @@
-{
-  "title": "Button",
-  "enabled": true,
-  "systemId": "button",
-  "icon": "bi-square",
-  "canBeAddedToColumn": true,
-  "singleInstance": false,
-  "version": "0.0.0.1"
-}

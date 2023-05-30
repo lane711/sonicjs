@@ -1,9 +1,0 @@
-{
-  "title": "Spacer",
-  "enabled": true,
-  "systemId": "spacer",
-  "icon": "bi-distribute-vertical",
-  "canBeAddedToColumn": true,
-  "singleInstance": false,
-  "version": "0.0.0.1"
-}

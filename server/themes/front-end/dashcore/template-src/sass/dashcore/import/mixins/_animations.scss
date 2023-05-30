@@ -1,3 +1,0 @@
-@mixin animation($name, $duration: 25s, $timing: linear, $iteration: infinite, $direction: normal) {
-  animation: $name $duration $timing $iteration $direction;
-}

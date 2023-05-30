@@ -1,1 +1,0 @@
-{"moduleSystemId":"demo-site","systemId":"demo-site","title":"Demo Site","data":{"components":[{"label":"First Name","type":"textfield","input":true,"key":"firstName","validate":{"required":true}},{"label":"Submit","type":"button","input":true,"key":"submit","theme":"primary"}]},"filePath":"/Users/lanecampbell/Dev/sonicjs/server/modules/demo-site/models/demo-site.json"}

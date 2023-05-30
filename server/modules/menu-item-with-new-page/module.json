@@ -1,8 +1,0 @@
-{
-  "title": "Menu Item With New Page",
-  "enabled": false,
-  "systemId": "menu-item-with-new-page",
-  "canBeAddedToColumn": false,
-  "singleInstance": false,
-  "version": "0.0.0.1"
-}

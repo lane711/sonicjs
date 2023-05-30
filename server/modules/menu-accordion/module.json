@@ -1,9 +1,0 @@
-{
-  "title": "Menu Accordion",
-  "enabled": true,
-  "systemId": "menu-accordion",
-  "icon": "bi-menu-app",
-  "canBeAddedToColumn": true,
-  "singleInstance": false,
-  "version": "0.0.0.1"
-}

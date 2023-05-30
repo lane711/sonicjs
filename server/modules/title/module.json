@@ -1,9 +1,0 @@
-{
-  "title": "Title",
-  "enabled": true,
-  "systemId": "title",
-  "icon": "bi-type-h1",
-  "canBeAddedToColumn": true,
-  "singleInstance": false,
-  "version": "0.0.0.1"
-}

@@ -1,8 +1,0 @@
-{
-  "title": "Media old",
-  "enabled": false,
-  "systemId": "media-old",
-  "canBeAddedToColumn": false,
-  "singleInstance": false,
-  "version": "0.0.0.1"
-}

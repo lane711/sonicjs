@@ -1,9 +1,0 @@
-{
-  "title": "Contact",
-  "enabled": true,
-  "systemId": "contact",
-  "icon": "bi-envelope",
-  "canBeAddedToColumn": true,
-  "singleInstance": false,
-  "version": "0.0.0.1"
-}

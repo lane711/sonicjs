@@ -1,8 +1,0 @@
-{
-  "title": "Services",
-  "enabled": false,
-  "systemId": "services",
-  "canBeAddedToColumn": false,
-  "singleInstance": false,
-  "version": "0.0.0.1"
-}

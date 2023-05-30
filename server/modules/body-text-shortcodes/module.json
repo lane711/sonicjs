@@ -1,8 +1,0 @@
-{
-  "title": "Body Text Shortcodes",
-  "enabled": true,
-  "systemId": "body-text-shortcodes",
-  "canBeAddedToColumn": false,
-  "singleInstance": false,
-  "version": "0.0.0.1"
-}

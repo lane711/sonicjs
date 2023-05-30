@@ -1,9 +1,0 @@
-{
-  "title": "Sign Up",
-  "enabled": true,
-  "systemId": "sign-up",
-  "icon": "bi-input-cursor",
-  "canBeAddedToColumn": true,
-  "singleInstance": false,
-  "version": "0.0.0.1"
-}

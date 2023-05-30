@@ -1,9 +1,0 @@
-{
-  "title": "Gallery",
-  "enabled": true,
-  "systemId": "gallery",
-  "icon": "bi-images",
-  "canBeAddedToColumn": true,
-  "singleInstance": false,
-  "version": "0.0.0.1"
-}

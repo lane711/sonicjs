@@ -1,8 +1,0 @@
-{
-  "title": "User",
-  "enabled": true,
-  "systemId": "user",
-  "canBeAddedToColumn": false,
-  "singleInstance": false,
-  "version": "0.0.0.1"
-}

@@ -1,9 +1,0 @@
-{
-  "title": "Tab",
-  "enabled": true,
-  "systemId": "tab",
-  "icon": "bi-folder2",
-  "canBeAddedToColumn": true,
-  "singleInstance": false,
-  "version": "0.0.0.1"
-}

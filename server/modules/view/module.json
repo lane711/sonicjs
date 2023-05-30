@@ -1,9 +1,0 @@
-{
-  "title": "View",
-  "enabled": true,
-  "systemId": "view",
-  "icon": "bi-card-text",
-  "canBeAddedToColumn": true,
-  "singleInstance": false,
-  "version": "0.0.0.1"
-}

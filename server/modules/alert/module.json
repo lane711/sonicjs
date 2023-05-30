@@ -1,9 +1,0 @@
-{
-  "title": "Alert",
-  "enabled": true,
-  "systemId": "alert",
-  "icon": "bi-info-square",
-  "canBeAddedToColumn": true,
-  "singleInstance": false,
-  "version": "0.0.1"
-}

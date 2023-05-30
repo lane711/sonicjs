@@ -1,9 +1,0 @@
-{
-  "title": "Accordian",
-  "enabled": true,
-  "systemId": "accordian",
-  "icon": "bi-list",
-  "canBeAddedToColumn": true,
-  "singleInstance": false,
-  "version": "0.0.0.1"
-}

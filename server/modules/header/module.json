@@ -1,9 +1,0 @@
-{
-  "title": "Header",
-  "enabled": true,
-  "systemId": "header",
-  "icon": "bi-card-heading",
-  "canBeAddedToColumn": true,
-  "singleInstance": false,
-  "version": "0.0.0.1"
-}

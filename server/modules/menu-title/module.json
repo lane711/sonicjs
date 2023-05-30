@@ -1,9 +1,0 @@
-{
-  "title": "Menu - Title",
-  "enabled": true,
-  "systemId": "menu-title",
-  "icon": "bi-list",
-  "canBeAddedToColumn": true,
-  "singleInstance": false,
-  "version": "0.0.0.1"
-}

@@ -1,9 +1,0 @@
-{
-  "title": "FAQ",
-  "enabled": true,
-  "systemId": "faq",
-  "icon": "bi-question-square",
-  "canBeAddedToColumn": true,
-  "singleInstance": false,
-  "version": "0.0.0.1"
-}

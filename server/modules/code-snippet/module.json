@@ -1,9 +1,0 @@
-{
-  "title": "Code Snippet",
-  "enabled": true,
-  "systemId": "code-snippet",
-  "icon": "bi-code-square",
-  "canBeAddedToColumn": true,
-  "singleInstance": false,
-  "version": "0.0.0.1"
-}
