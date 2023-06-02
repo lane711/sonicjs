@@ -12,6 +12,7 @@ const archiver = require("archiver");
 const moment = require("moment");
 const connectEnsureLogin = require("connect-ensure-login");
 var appRoot = require("app-root-path");
+const {resolve} = require('path');
 
 const token = process.env.DROPBOX_TOKEN;
 const backUpUrl = process.env.BACKUP_URL;
@@ -29,8 +30,16 @@ module.exports = backUpService = {
 
       const file = `${appRoot.path}/${req.path}`;
 
-      console.log(`downloading backup ${file}`)
+      const path = resolve(file)
+      
+      if (!path.includes("backups")) {
+         console.log("Directory traversal detected...")
+         res.redirect('/admin/backup-restore');
+         return;
+      }
 
+      console.log(`downloading backup ${file}`)
+      
       res.download(file);
     });
   },
