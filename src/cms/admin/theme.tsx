@@ -169,6 +169,12 @@ export const Layout = (props: {
                       Content Types
                     </a>
                   </li>
+
+                  <li class="nav-item">
+                    <a class="nav-link" href="/admin/api">
+                      API
+                    </a>
+                  </li>
                 </ul>
               </div>
             </nav>

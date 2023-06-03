@@ -14,11 +14,11 @@ const content = new Hono<{ Bindings: Bindings }>();
 
 content.get("/", async (ctx) => {
 
-  const metaData = await getDataByPrefix(
-    ctx.env.KVDATA,
-    `site1::content::blog`
-  );
-  return ctx.json(metaData);
+  // const metaData = await getDataByPrefix(
+  //   ctx.env.KVDATA,
+  //   `site1::content::blog`
+  // );
+  // return ctx.json(metaData);
 
   const { meta, contentType, includeContentType, limit, offset } =
     ctx.req.query();
@@ -27,7 +27,7 @@ content.get("/", async (ctx) => {
 
   let content = [];
   if (meta) {
-    content = await getDataByPrefix(ctx.env.KVDATA, `site1::content::`);
+    content = await getDataListByPrefix(ctx.env.KVDATA, `site1::content::`);
   } else if (contentType) {
     content = await getDataByPrefix(
       ctx.env.KVDATA,
@@ -43,11 +43,16 @@ content.get("/", async (ctx) => {
     content.map(async (c) => {
       console.log('----> getting content type -->', c.systemId)
 
-      c.contentType = await getById(
-        ctx.env.KVDATA,
-        `site1::content-type::${c.systemId}`
-      );
+      // let contentType = await getById(
+      //   ctx.env.KVDATA,
+      //   `site1::content-type::${c.systemId}`
+      // );
+      // console.log('====data  contentType ', contentType)
+
+      c.contentType = [];
+
     });
+    console.log('data with ct ', content)
     return ctx.json(content);
 
   }
