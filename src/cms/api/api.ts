@@ -43,54 +43,5 @@ api.post("/form-components", async (c) => {
   return c.text("Created!", 201);
 });
 
-api.get("/content/:contentId", async (ctx) => {
-  const id = ctx.req.param("contentId");
-  const content = await getById(ctx.env.KVDATA, `${id}`);
-
-  return ctx.json(content);
-});
-
-api.get("/contents/:contype-type", async (ctx) => {
-  const contentType = ctx.req.param("contype-type");
-
-  // const content = await getDataListByPrefix(ctx.env.KVDATA, `site1::content::${contentType}`);
-  const content = await getDataByPrefix(ctx.env.KVDATA, `site1::content::${contentType}`);
-console.log('content', content);
-  return ctx.json(content);
-});
-
-api.get("/contents-with-meta/:contype-type", async (ctx) => {
-  const contentType = ctx.req.param("contype-type");
-
-  // const content = await getDataListByPrefix(ctx.env.KVDATA, `site1::content::${contentType}`);
-  const content = await getDataListByPrefix(ctx.env.KVDATA, `site1::content::${contentType}`);
-console.log('content', content);
-  return ctx.json(content);
-});
-
-api.get("/content-with-content-type/:contentId", async (ctx) => {
-  const id = ctx.req.param("contentId");
-  const content = await getById(ctx.env.KVDATA, `${id}`);
-
-  const contentTypeId = content.data.systemId;
-  const contentType = await getById(
-    ctx.env.KVDATA,
-    `site1::content-type::${contentTypeId}`
-  );
-
-  return ctx.json({ content, contentType });
-});
-
-api.post("/content", async (c) => {
-  const content = await c.req.json();
-  const key = content.key;
-  // console.log("content-->", content);
-  //put in kv
-  const result = await saveContent(c.env.KVDATA, "site1", content, key);
-
-  const status = key ? 204 : 201;
-
-  return c.text("", status);
-});
 
 export { api };

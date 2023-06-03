@@ -5,6 +5,7 @@ import { Hono } from "hono";
 import { api } from "./cms/api/api";
 import { Bindings } from "./cms/types/bindings";
 import { admin } from "./cms/admin/admin";
+import { content } from "./cms/api/content";
 
 const app = new Hono<{ Bindings: Bindings }>()
 
@@ -31,6 +32,7 @@ app.get("/public/*", async (ctx) => {
 });
 
 app.route('/api', api)
+app.route('/api/content', content)
 app.route('/admin', admin)
 
 // setAdmin(app);

@@ -36,7 +36,7 @@ export async function getDataByPrefix(db, prefix = "") {
     content.push(record.data);
   }
 
-  console.log("getDataByPrefix content--->", content);
+  // console.log("getDataByPrefix content--->", content);
 
   return content;
 }
