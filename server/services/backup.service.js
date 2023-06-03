@@ -31,8 +31,8 @@ module.exports = backUpService = {
       const file = `${appRoot.path}/${req.path}`;
 
       const path = resolve(file)
-      
-      if (!path.includes("backups")) {
+
+      if (!path.includes(`${appRoot.path}/backups`)) {
          console.log("Directory traversal detected...")
          res.redirect('/admin/backup-restore');
          return;
