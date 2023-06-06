@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { getForm, loadForm } from "../admin/forms/form";
 import {
   getById,
+  getContentTypes,
   getDataByPrefix,
   getDataListByPrefix,
   putData,
@@ -13,50 +14,43 @@ import { Bindings } from "../types/bindings";
 const content = new Hono<{ Bindings: Bindings }>();
 
 content.get("/", async (ctx) => {
+  console.log("getting main content");
 
-  // const metaData = await getDataByPrefix(
-  //   ctx.env.KVDATA,
-  //   `site1::content::blog`
-  // );
-  // return ctx.json(metaData);
-
-  const { meta, contentType, includeContentType, limit, offset } =
+  const { keysOnly, contentType, includeContentType, limit, offset } =
     ctx.req.query();
 
-    console.log('params-->', meta, contentType, includeContentType)
+  console.log("params-->", keysOnly, contentType, includeContentType);
 
   let content = [];
-  if (meta) {
+  if (keysOnly) {
+    console.log('getting keys only')
     content = await getDataListByPrefix(ctx.env.KVDATA, `site1::content::`);
+
   } else if (contentType) {
     content = await getDataByPrefix(
       ctx.env.KVDATA,
       `site1::content::${contentType}`
     );
+    console.log("content ***", content);
   } else {
+    console.log('getting meta')
     content = await getDataByPrefix(ctx.env.KVDATA, `site1::content::`);
+
+
   }
 
   if (includeContentType) {
-    console.log('----> getting content typez -->')
+    const contentTypes = await getContentTypes(ctx.env.KVDATA);
 
-    content.map(async (c) => {
-      console.log('----> getting content type -->', c.systemId)
-
-      // let contentType = await getById(
-      //   ctx.env.KVDATA,
-      //   `site1::content-type::${c.systemId}`
-      // );
-      // console.log('====data  contentType ', contentType)
-
-      c.contentType = [];
-
+    await content.map(async (c) => {
+      const contentTypeKey = `site1::content-type::${c.systemId}`;
+      const ct = contentTypes.find((c) => c.key === contentTypeKey);
+      c.contentType = ct; //
     });
-    console.log('data with ct ', content)
     return ctx.json(content);
-
   }
 
+  return ctx.json(content);
 });
 
 content.get("/:contentId", async (ctx) => {

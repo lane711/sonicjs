@@ -6,6 +6,7 @@ export async function loadApis(ctx) {
   const sites = await getDataListByPrefix(ctx.env.KVDATA, "host::sites");
 
   let contentTypeApis = [
+    "/api/content-type/site1::content-type::",
     "/api/content-type/site1::content-type::blog",
   ];
 

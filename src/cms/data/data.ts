@@ -88,6 +88,17 @@ export function getContentType(contentTypeComponents) {
   return contentType.defaultValue;
 }
 
+export async function getContentTypes(db) {
+  const contentTypeKeys = await db.list({prefix:'site1::content-type::'});
+  var contentTypes = [];
+  for await (const key of contentTypeKeys.keys) {
+    const record = await getById(db, key.name);
+    const contentType = {key: key.name, components: record}
+    contentTypes.push(contentType);
+  }
+  return contentTypes;
+}
+
 export function add(a, b) {
   return a + b;
 }

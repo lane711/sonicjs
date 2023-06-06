@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { getForm, loadForm } from "../admin/forms/form";
 import {
   getById,
+  getContentTypes,
   getDataByPrefix,
   getDataListByPrefix,
   putData,
@@ -11,6 +12,16 @@ import {
 import { Bindings } from "../types/bindings";
 
 const contentType = new Hono<{ Bindings: Bindings }>();
+
+contentType.get("/", async (c) => {
+
+  console.log('getting contentTypes');
+
+  const contentTypes = await getContentTypes(c.env.KVDATA);
+  console.log(contentTypes);
+
+  return c.json(contentTypes);
+});
 
 contentType.get("/:contentType", async (c) => {
   const id = c.req.param("contentType");
