@@ -73,7 +73,7 @@ function saveNewContent(data) {
 function editContent() {
   const contentId = $("#formio").attr("data-id");
   console.log("contentType", contentId);
-  axios.get(`/api/content-with-content-type/${contentId}`).then((response) => {
+  axios.get(`/api/content/${contentId}?includeContentType`).then((response) => {
     console.log(response.data);
 
     Formio.icons = "fontawesome";
@@ -85,7 +85,7 @@ function editContent() {
         saveContent(data);
       });
       form.submission = {
-        data: response.data.content.data,
+        data: response.data.data,
       };
       form.on("change", async function (event) {
         $("#contentFormSaveButton").removeAttr("disabled");

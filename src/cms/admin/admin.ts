@@ -10,6 +10,7 @@ import { Bindings } from "../types/bindings";
 import { loadAdmin, loadEditContent, loadNewContent } from "./pages/content";
 import { loadModule, loadModules } from "./pages/module";
 import { loadContentType, loadContentTypeNew, loadContentTypes } from "./pages/content-type";
+import { loadApis } from "./pages/api";
 const admin = new Hono<{ Bindings: Bindings }>();
 
 // const html = `
@@ -71,6 +72,9 @@ admin.get("/content-type/edit/:contentType", async (ctx) => {
 
   return ctx.html(await loadContentType(ctx, id));
 });
+
+admin.get("/api", async (ctx) => ctx.html(await loadApis(ctx)));
+
 
 // app.get("/api/forms", async (ctx) => ctx.html(await loadForm(ctx)));
 

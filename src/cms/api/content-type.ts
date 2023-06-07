@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { getForm, loadForm } from "../admin/forms/form";
 import {
   getById,
+  getContentTypes,
   getDataByPrefix,
   getDataListByPrefix,
   putData,
@@ -10,29 +11,28 @@ import {
 } from "../data/data";
 import { Bindings } from "../types/bindings";
 
-const api = new Hono<{ Bindings: Bindings }>();
+const contentType = new Hono<{ Bindings: Bindings }>();
 
-api.get("/ping", (c) => {
-  return c.text(Date());
+contentType.get("/", async (c) => {
+
+  console.log('getting contentTypes');
+
+  const contentTypes = await getContentTypes(c.env.KVDATA);
+  console.log(contentTypes);
+
+  return c.json(contentTypes);
 });
 
-api.get("/data", async (c) => {
-  const data = await getDataListByPrefix(c.env.KVDATA, "");
-  return c.json(data);
-});
-
-api.get("/forms", async (c) => c.html(await loadForm(c)));
-
-api.get("/form-components/:contentType", async (c) => {
+contentType.get("/:contentType", async (c) => {
   const id = c.req.param("contentType");
 
-  // console.log("id--->", id);
+  console.log("contentType--->", id);
 
   const ct = await getById(c.env.KVDATA, `${id}`);
   return c.json(ct);
 });
 
-api.post("/form-components", async (c) => {
+contentType.post("/", async (c) => {
   const formComponents = await c.req.json();
 
   console.log("formComponents-->", formComponents);
@@ -43,5 +43,4 @@ api.post("/form-components", async (c) => {
   return c.text("Created!", 201);
 });
 
-
-export { api };
+export { contentType };

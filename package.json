@@ -1,7 +1,7 @@
 {
-  "name": "hono-pages2",
-  "version": "1.0.0",
-  "description": "",
+  "name": "sonicjs",
+  "version": "0.0.2",
+  "description": "Headless CMS based on Cloudflare Workers",
   "main": "src/server.ts",
   "scripts": {
     "dev": "run-p dev:*",
