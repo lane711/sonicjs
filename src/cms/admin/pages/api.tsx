@@ -10,21 +10,21 @@ export async function loadApis(ctx) {
   const sites = await getDataListByPrefix(ctx.env.KVDATA, "host::sites");
 
   let contentTypeApis: link[] = [
-    { url: "/api/content-type", description: "Get All Content Types" },
-    { url: "/api/content-type/site1::content-type::blog", description: "Get Content Type" },
+    { url: "/v1/content-type", description: "Get All Content Types" },
+    { url: "/v1/content-type/site1::content-type::blog", description: "Get Content Type" },
   ];
 
   let contentListApis: link[] = [
-    { url: "/api/content", description: "Get All Content" },
-    { url: "/api/content?includeContentType", description: "Include Content Type" },
-    { url: "/api/content?contentType=blog", description: "Get Content by Content Type" },
-    { url: "/api/content?keysOnly", description: "Return Only Keys" },
-    { url: "/api/content?limit=10", description: "Page Results" },
+    { url: "/v1/content", description: "Get All Content" },
+    { url: "/v1/content?includeContentType", description: "Include Content Type" },
+    { url: "/v1/content?contentType=blog", description: "Get Content by Content Type" },
+    { url: "/v1/content?keysOnly", description: "Return Only Keys" },
+    { url: "/v1/content?limit=10", description: "Page Results" },
   ];
 
   let contentApis: link[] = [
-    { url: "/api/content/site1::content::article::16857474370560000::bpsxzzu", description: "Get Single Record" },
-    { url: "/api/content/site1::content::article::16857474370560000::bpsxzzu?includeContentType", description: "Include Content Type" },
+    { url: "/v1/content/site1::content::article::16857474370560000::bpsxzzu", description: "Get Single Record" },
+    { url: "/v1/content/site1::content::article::16857474370560000::bpsxzzu?includeContentType", description: "Include Content Type" },
   ];
 
   return (

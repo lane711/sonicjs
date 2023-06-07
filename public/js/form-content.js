@@ -30,7 +30,7 @@ function newContent() {
   const contentType = window.location.href.split("/").pop();
   console.log("contentType", contentType);
 
-  axios.get(`/api/form-components/${contentType}`).then((response) => {
+  axios.get(`/v1/form-components/${contentType}`).then((response) => {
     console.log(response.data);
     console.log(response.status);
     console.log(response.statusText);
@@ -59,7 +59,7 @@ function newContent() {
 function saveNewContent(data) {
   console.log(data);
 
-  axios.post("/api/content", data).then((response) => {
+  axios.post("/v1/content", data).then((response) => {
     console.log(response.data);
     console.log(response.status);
     console.log(response.statusText);
@@ -73,7 +73,7 @@ function saveNewContent(data) {
 function editContent() {
   const contentId = $("#formio").attr("data-id");
   console.log("contentType", contentId);
-  axios.get(`/api/content/${contentId}?includeContentType`).then((response) => {
+  axios.get(`/v1/content/${contentId}?includeContentType`).then((response) => {
     console.log(response.data);
 
     Formio.icons = "fontawesome";
@@ -101,7 +101,7 @@ function editContent() {
 function saveContent(data) {
   data.key = window.location.href.split("/").pop();
 
-  axios.post("/api/content", data).then((response) => {
+  axios.post("/v1/content", data).then((response) => {
     console.log(response.data);
     console.log(response.status);
     console.log(response.statusText);

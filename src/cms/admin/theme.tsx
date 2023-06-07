@@ -333,7 +333,7 @@ const old = `
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link " href="/api/forms">
+                    <a class="nav-link " href="/v1/forms">
                       <span data-feather="users"></span>
                       Form Builder
                     </a>

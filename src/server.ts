@@ -32,9 +32,9 @@ app.get("/public/*", async (ctx) => {
   return await ctx.env.ASSETS.fetch(ctx.req.raw);
 });
 
-app.route('/api', api)
-app.route('/api/content', content)
-app.route('/api/content-type', contentType)
+app.route('/v1', api)
+app.route('/v1/content', content)
+app.route('/v1/content-type', contentType)
 
 app.route('/admin', admin)
 
