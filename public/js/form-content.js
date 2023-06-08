@@ -85,7 +85,7 @@ function editContent() {
         saveContent(data);
       });
       form.submission = {
-        data: response.data.data,
+        data: response.data,
       };
       form.on("change", async function (event) {
         $("#contentFormSaveButton").removeAttr("disabled");

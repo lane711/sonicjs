@@ -64,14 +64,18 @@ content.get("/:contentId", async (ctx) => {
 
   const content = await getById(ctx.env.KVDATA, `${id}`);
 
+  const data = content.data;
+  const dataWithKey = { key: id, ...data }; //add key to top of object
+  delete dataWithKey.submit;
+
   if (includeContentType !== undefined) {
-    content.contentType = await getContentType(
+    dataWithKey.contentType = await getContentType(
       ctx.env.KVDATA,
       content.data.systemId
     );
   }
 
-  return ctx.json(content);
+  return ctx.json(dataWithKey);
 });
 
 content.get("/contents/:contype-type", async (ctx) => {

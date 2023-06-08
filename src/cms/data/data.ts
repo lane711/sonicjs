@@ -30,9 +30,9 @@ export async function getDataByPrefix(db, prefix = "", limit?: number, cursor?: 
 
   for await (const key of list.keys) {
     const record = await getById(db, key.name);
-    console.log('-->', record)
-    record.data.key = key.name;
-    content.push(record.data);
+    const data = record.data;
+    const dataWithKey = {'key':key.name , ...data}; //add key to top of object
+    content.push(dataWithKey);
   }
 
   return content;
@@ -70,10 +70,17 @@ export function saveContentType(db, site, contentTypeComponents) {
 export function saveContent(db, site, content, key) {
   console.log("content--->", content.data.systemId);
   delete content.metadata;
+  delete content.data.contentType;
+  delete content.data.submit;
+
   const contentType = content.data.systemId;
   const generatedKey = key ?? getContentKey(site, contentType);
+  console.log(content)
 
-  console.log("generatedKey", generatedKey);
+  const size = JSON.stringify(content).length;
+
+  console.log("size", size);
+  
   return db.put(generatedKey, JSON.stringify(content), {
     metadata: { content },
   });
