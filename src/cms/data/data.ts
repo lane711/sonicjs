@@ -30,6 +30,8 @@ export async function getDataByPrefix(db, prefix = "", limit?: number, cursor?: 
 
   for await (const key of list.keys) {
     const record = await getById(db, key.name);
+    console.log('-->', record)
+    record.data.key = key.name;
     content.push(record.data);
   }
 
