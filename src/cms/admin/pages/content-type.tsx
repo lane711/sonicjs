@@ -1,4 +1,4 @@
-import { getById, getContentType, getDataListByPrefix } from "../../data/data";
+import { getById, getContentType, getDataListByPrefix } from "../../data/kv-data";
 import { Form, FormBuilder, Layout } from "../theme";
 
 export async function loadContentTypes(context) {

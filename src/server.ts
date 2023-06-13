@@ -7,6 +7,7 @@ import { Bindings } from "./cms/types/bindings";
 import { admin } from "./cms/admin/admin";
 import { content } from "./cms/api/content";
 import { contentType } from "./cms/api/content-type";
+import { search } from "./cms/api/search";
 
 const app = new Hono<{ Bindings: Bindings }>()
 
@@ -34,6 +35,7 @@ app.get("/public/*", async (ctx) => {
 
 app.route('/v1', api)
 app.route('/v1/content', content)
+app.route('/v1/search', search)
 app.route('/v1/content-type', contentType)
 
 app.route('/admin', admin)

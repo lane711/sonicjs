@@ -7,7 +7,7 @@ import {
   putData,
   saveContent,
   saveContentType,
-} from "../data/data";
+} from "../data/kv-data";
 import { Bindings } from "../types/bindings";
 
 const api = new Hono<{ Bindings: Bindings }>();

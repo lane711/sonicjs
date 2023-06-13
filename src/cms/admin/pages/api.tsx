@@ -1,4 +1,4 @@
-import { getById, getDataListByPrefix, putData } from "../../data/data";
+import { getById, getDataListByPrefix, putData } from "../../data/kv-data";
 import { Layout } from "../theme";
 
 interface link {

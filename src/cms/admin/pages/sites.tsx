@@ -1,4 +1,4 @@
-import { getById, getDataListByPrefix, putData } from "../../data/data";
+import { getById, getDataListByPrefix, putData } from "../../data/kv-data";
 import { Top } from "../theme";
 
 export async function loadSites(ctx) {

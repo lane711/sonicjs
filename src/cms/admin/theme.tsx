@@ -3,7 +3,7 @@ import {
   getContentType,
   getDataListByPrefix,
   putData,
-} from "../data/data";
+} from "../data/kv-data";
 
 export const Layout = (props: {
   children?: string;

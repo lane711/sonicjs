@@ -1,4 +1,4 @@
-import { getById, getDataListByPrefix } from "../../data/data";
+import { getById, getDataListByPrefix } from "../../data/kv-data";
 import { Detail, Top } from "../theme";
 
 export async function loadModules(context) {
