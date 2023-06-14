@@ -10,8 +10,9 @@
     "build": " rsync -avzh ./public ./dist --delete && esbuild --bundle src/server.ts --format=esm --outfile=dist/_worker.js",
     "deploy": "wrangler pages publish dist",
     "test": "jest --verbose",
-    "generate": "drizzle-kit generate:sqlite --schema=src/db/blog.ts",
-    "up": "drizzle-kit up:sqlite --schema=src/db/blog.ts"
+    "generate": "drizzle-kit generate:sqlite --schema=./src/db/schema.ts --out=./migrations",
+    "up": "wrangler d1 migrations apply sonicjs --local",
+    "up:prod": "wrangler d1 migrations apply sonicjs"
   },
   "keywords": [],
   "author": "",
