@@ -1,0 +1,1 @@
+ALTER TABLE `blog` RENAME TO `blog-posts`;
