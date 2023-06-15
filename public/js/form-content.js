@@ -1,8 +1,13 @@
 //        Formio.builder(document.getElementById('builder'), {}, {});
 var contentTypeComponents;
+var table;
 
 (function () {
   const url = window.location.href;
+
+  const params = url.split('/');
+  table = params[6];
+
   var mode;
 
   if (url.indexOf("admin/content/new") > 0) {
@@ -73,7 +78,7 @@ function saveNewContent(data) {
 function editContent() {
   const contentId = $("#formio").attr("data-id");
   console.log("contentType", contentId);
-  axios.get(`/v1/content/${contentId}?includeContentType`).then((response) => {
+  axios.get(`/v1/${table}/${contentId}?includeContentType`).then((response) => {
     console.log(response.data);
 
     Formio.icons = "fontawesome";

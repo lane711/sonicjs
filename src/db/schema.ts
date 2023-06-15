@@ -36,7 +36,12 @@ export const postsRelations = relations(posts, ({ one }) => ({
   }),
 }));
 
-export const apiConfig = [
+export interface ApiConfig {
+  table: string;
+  route: string;
+}
+
+export const apiConfig: ApiConfig[] = [
   { table: "users", route: "users" },
   { table: "posts", route: "posts" },
 ];

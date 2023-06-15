@@ -19,7 +19,7 @@ export async function loadAdminTable(context) {
   const contentList = content.map((item) => {
     return {
       title: item.name,
-      editPath: `/admin/content/edit/${item.id}`,
+      editPath: `/admin/content/edit/users/${item.id}`,
       newPath: `/admin/content/new/${item.name}`,
     };
   });

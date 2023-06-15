@@ -11,6 +11,7 @@ import {
   saveContentType,
 } from "../data/kv-data";
 import { Bindings } from "../types/bindings";
+import { apiConfig } from "../../db/schema";
 
 const content = new Hono<{ Bindings: Bindings }>();
 
@@ -55,6 +56,7 @@ content.get("/", async (ctx) => {
 
   return ctx.json(content);
 });
+
 
 content.get("/:contentId", async (ctx) => {
   const id = ctx.req.param("contentId");

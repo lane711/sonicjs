@@ -3,6 +3,14 @@ export async function getAllContent(db) {
   return results;
 }
 
+export async function getByTable(db, table) {
+    const { results } = await db.prepare(
+      `SELECT * FROM ${table};`
+    ).all();
+  
+    return results;
+  }
+
 export async function getByTableAndId(db, table, id) {
   const { results } = await db.prepare(
     `SELECT * FROM ${table} where id = '${id}';`

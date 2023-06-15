@@ -9,8 +9,27 @@ import {
   saveContentType,
 } from "../data/kv-data";
 import { Bindings } from "../types/bindings";
+import { apiConfig } from "../../db/schema";
+import { getByTable, getByTableAndId } from "../data/d1-data";
 
 const api = new Hono<{ Bindings: Bindings }>();
+
+
+
+apiConfig.forEach((entry) => {
+  console.log("setting route for " + entry.route);
+
+  api.get(`/${entry.route}`,async (ctx) => {
+    const data = await getByTable(ctx.env.D1DATA, entry.table);
+    return ctx.json(data);
+  });
+
+  api.get(`/${entry.route}/:id`,async (ctx) => {
+    const id = ctx.req.param("id");
+    const data = await getByTableAndId(ctx.env.D1DATA, entry.table, id);
+    return ctx.json(data);
+  });
+});
 
 api.get("/ping", (c) => {
   return c.text(Date());
