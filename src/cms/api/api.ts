@@ -14,19 +14,32 @@ import { getByTable, getByTableAndId } from "../data/d1-data";
 
 const api = new Hono<{ Bindings: Bindings }>();
 
-
-
 apiConfig.forEach((entry) => {
   console.log("setting route for " + entry.route);
 
-  api.get(`/${entry.route}`,async (ctx) => {
+  api.get(`/${entry.route}`, async (ctx) => {
     const data = await getByTable(ctx.env.D1DATA, entry.table);
     return ctx.json(data);
   });
 
-  api.get(`/${entry.route}/:id`,async (ctx) => {
+  api.get(`/${entry.route}/:id`, async (ctx) => {
+    const { includeContentType } = ctx.req.query();
+
     const id = ctx.req.param("id");
     const data = await getByTableAndId(ctx.env.D1DATA, entry.table, id);
+
+    if (includeContentType !== undefined) {
+      data.contentType = [{
+        type: "textfield",
+        key: "firstName",
+        label: "ABC First Name",
+        placeholder: "Enter your first name.",
+        input: true,
+        tooltip: "Enter your <strong>First Name</strong>",
+        description: "Enter your <strong>First Name</strong>",
+      }];
+    }
+
     return ctx.json(data);
   });
 });
@@ -61,6 +74,5 @@ api.post("/form-components", async (c) => {
   console.log("form put", result);
   return c.text("Created!", 201);
 });
-
 
 export { api };
