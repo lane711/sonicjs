@@ -7,7 +7,7 @@ import { loadSite, loadSites } from "./pages/sites";
 
 
 import { Bindings } from "../types/bindings";
-import { loadAdmin, loadEditContent, loadNewContent } from "./pages/content";
+import { loadAdmin, loadAdminTable, loadEditContent, loadNewContent } from "./pages/content";
 import { loadModule, loadModules } from "./pages/module";
 import { loadContentType, loadContentTypeNew, loadContentTypes } from "./pages/content-type";
 import { loadApis } from "./pages/api";
@@ -43,16 +43,17 @@ admin.get("/ping", (ctx) => {
   return ctx.text(Date());
 });
 
-admin.get("/", async (ctx) => ctx.html(await loadAdmin(ctx)));
+admin.get("/", async (ctx) => ctx.html(await loadAdminTable(ctx)));
 
 admin.get("/content/new/:contentType", async (ctx) => {
   const id = ctx.req.param("contentType");
   return ctx.html(await loadNewContent(ctx, id));
 });
 
-admin.get("/content/edit/:contentId", async (ctx) => {
-  const id = ctx.req.param("contentId");
-  return ctx.html(await loadEditContent(ctx, id));
+admin.get("/content/edit/:table/:id", async (ctx) => {
+  const table = ctx.req.param("table");
+  const id = ctx.req.param("id");
+  return ctx.html(await loadEditContent(ctx, table, id));
 });
 
 admin.get("/sites", async (ctx) => ctx.html(await loadSites(ctx)));

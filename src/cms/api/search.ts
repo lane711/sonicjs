@@ -1,8 +1,7 @@
 import { Hono } from "hono";
 import { Bindings } from "../types/bindings";
 import { drizzle } from "drizzle-orm/d1";
-import { user } from "../../db/users";
-import { blog } from "../../db/posts";
+import { users, posts } from "../../db/schema";
 
 export interface Env {
   D1DATA: D1Database;
@@ -24,17 +23,23 @@ search.get("/raw", async (ctx) => {
 
   const db = drizzle(ctx.env.D1DATA);
 
+  // await db
+  //   .insert(users)
+  //   .values({ id: "db722b76-0b88-11ee-be56-0242ac120002", name: "Joe" })
+  //   .run();
+
   // const result = await db
-  //   .insert(blog)
-  //   .values({ title: "Ipsum 2", body: "De Lor" })
+  //   .insert(posts)
+  //   .values({
+  //     id: "db722b76-0b88-11ee-be56-0242ac120003",
+  //     title: "Ipsum 2",
+  //     body: "De Lor",
+  //     userId: "db722b76-0b88-11ee-be56-0242ac120002",
+  //   })
   //   .run();
   // console.log("result", result);
 
-  // await db.insert(user).values({ name: 'Joe' }).run();
-
-
-  
-  const { results } = await ctx.env.D1DATA.prepare("SELECT * FROM blog").all();
+  const { results } = await ctx.env.D1DATA.prepare("SELECT * FROM users").all();
   return ctx.json(results);
 });
 

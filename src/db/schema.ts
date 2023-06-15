@@ -24,13 +24,14 @@ export const usersRelations = relations(users, ({ many }) => ({
 
 export const posts = sqliteTable("posts", {
   id: text("id").primaryKey(),
-  content: text("body"),
-  authorId: integer("user_id"),
+  title: text("title"),
+  body: text("body"),
+  userId: text("user_id"),
 });
 
 export const postsRelations = relations(posts, ({ one }) => ({
   author: one(users, {
-    fields: [posts.authorId],
+    fields: [posts.userId],
     references: [users.id],
   }),
 }));
