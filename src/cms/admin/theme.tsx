@@ -1,3 +1,4 @@
+import { ApiConfig, apiConfig } from "../../db/schema";
 import {
   getById,
   getContentType,
@@ -11,6 +12,9 @@ export const Layout = (props: {
   screenTitle?: string;
   newItemButtonText?: string;
 }) => {
+  const tables = apiConfig;
+  console.log("tables", tables);
+
   return (
     <html lang="en" data-bs-theme="auto">
       <head>
@@ -175,6 +179,17 @@ export const Layout = (props: {
                       API
                     </a>
                   </li>
+
+                  {tables.map((item: ApiConfig) => {
+                    return (
+                      <li class="nav-item">
+                        <a class="nav-link" href={"/admin/tables/" + item.table}>
+                          {item.table}
+                        </a>
+                      </li>
+                    );
+                  })}
+
                 </ul>
               </div>
             </nav>

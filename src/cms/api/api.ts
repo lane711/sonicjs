@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { getForm, loadForm } from "../admin/forms/form";
+import { loadForm } from "../admin/forms/form";
 import {
   getById,
   getDataByPrefix,
@@ -11,6 +11,8 @@ import {
 import { Bindings } from "../types/bindings";
 import { apiConfig } from "../../db/schema";
 import { getByTable, getByTableAndId } from "../data/d1-data";
+import { getForm } from "./forms";
+import { T } from "drizzle-orm/column.d-66a08b85";
 
 const api = new Hono<{ Bindings: Bindings }>();
 
@@ -29,15 +31,7 @@ apiConfig.forEach((entry) => {
     const data = await getByTableAndId(ctx.env.D1DATA, entry.table, id);
 
     if (includeContentType !== undefined) {
-      data.contentType = [{
-        type: "textfield",
-        key: "firstName",
-        label: "ABC First Name",
-        placeholder: "Enter your first name.",
-        input: true,
-        tooltip: "Enter your <strong>First Name</strong>",
-        description: "Enter your <strong>First Name</strong>",
-      }];
+      data.contentType = getForm(ctx, entry.table)
     }
 
     return ctx.json(data);
@@ -55,12 +49,12 @@ api.get("/data", async (c) => {
 
 api.get("/forms", async (c) => c.html(await loadForm(c)));
 
-api.get("/form-components/:contentType", async (c) => {
-  const id = c.req.param("contentType");
+api.get("/form-components/:table", async (c) => {
+  const table = c.req.param("table");
 
   // console.log("id--->", id);
 
-  const ct = await getById(c.env.KVDATA, `${id}`);
+  const ct = await getForm(c.env.D1DATA, table)
   return c.json(ct);
 });
 

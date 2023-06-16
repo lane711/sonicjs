@@ -5,11 +5,20 @@ import { Hono } from "hono";
 import { loadForm } from "./forms/form";
 import { loadSite, loadSites } from "./pages/sites";
 
-
 import { Bindings } from "../types/bindings";
-import { loadAdmin, loadAdminTable, loadEditContent, loadNewContent } from "./pages/content";
+import {
+  loadAdmin,
+  loadAdminTable,
+  loadEditContent,
+  loadNewContent,
+  loadTableData,
+} from "./pages/content";
 import { loadModule, loadModules } from "./pages/module";
-import { loadContentType, loadContentTypeNew, loadContentTypes } from "./pages/content-type";
+import {
+  loadContentType,
+  loadContentTypeNew,
+  loadContentTypes,
+} from "./pages/content-type";
 import { loadApis } from "./pages/api";
 const admin = new Hono<{ Bindings: Bindings }>();
 
@@ -45,15 +54,25 @@ admin.get("/ping", (ctx) => {
 
 admin.get("/", async (ctx) => ctx.html(await loadAdminTable(ctx)));
 
-admin.get("/content/new/:contentType", async (ctx) => {
-  const id = ctx.req.param("contentType");
-  return ctx.html(await loadNewContent(ctx, id));
-});
+// admin.get("/content/new/:contentType", async (ctx) => {
+//   const id = ctx.req.param("contentType");
+//   return ctx.html(await loadNewContent(ctx, id));
+// });
 
 admin.get("/content/edit/:table/:id", async (ctx) => {
   const table = ctx.req.param("table");
   const id = ctx.req.param("id");
   return ctx.html(await loadEditContent(ctx, table, id));
+});
+
+admin.get("/content/new/:table", async (ctx) => {
+  const table = ctx.req.param("table");
+  return ctx.html(await loadNewContent(ctx, table));
+});
+
+admin.get("/tables/:table", async (ctx) => {
+  const table = ctx.req.param("table");
+  return ctx.html(await loadTableData(ctx, table));
 });
 
 admin.get("/sites", async (ctx) => ctx.html(await loadSites(ctx)));
@@ -75,7 +94,6 @@ admin.get("/content-type/edit/:contentType", async (ctx) => {
 });
 
 admin.get("/api", async (ctx) => ctx.html(await loadApis(ctx)));
-
 
 // app.get("/api/forms", async (ctx) => ctx.html(await loadForm(ctx)));
 

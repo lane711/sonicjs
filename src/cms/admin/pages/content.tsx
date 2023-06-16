@@ -1,16 +1,16 @@
-import { getAllContent, getByIdAndTable, getByTableAndId } from "../../data/d1-data";
+import { getAllContent, getByIdAndTable, getByTable, getByTableAndId } from "../../data/d1-data";
 import { getById, getContentType, getDataListByPrefix } from "../../data/kv-data";
 import { Form, Layout } from "../theme";
 
 
-export async function loadAdminTable(context) {
-  // await putData(context.env.KVDATA, 'site1', 'content', {title: '20230508a'});
+export async function loadAdminTable(ctx) {
+  // await putData(ctx.env.KVDATA, 'site1', 'content', {title: '20230508a'});
 
-  const content = await getAllContent(context.env.D1DATA);
+  const content = await getAllContent(ctx.env.D1DATA);
   console.log('content==>', content)
 
   const contentTypes = await getDataListByPrefix(
-    context.env.KVDATA,
+    ctx.env.KVDATA,
     "site1::content-type::"
   );
 
@@ -41,15 +41,47 @@ export async function loadAdminTable(context) {
   );
 }
 
-export async function loadAdmin(context) {
-  // await putData(context.env.KVDATA, 'site1', 'content', {title: '20230508a'});
+export async function loadTableData(ctx, table) {
+  // await putData(ctx.env.KVDATA, 'site1', 'content', {title: '20230508a'});
+  console.log('user==>', table)
 
-  const content = await getDataListByPrefix(context.env.KVDATA, "site1::content::");
-  // const content = await getAllContent(context.env.D1DATA);
+  const data = await getByTable(ctx.env.D1DATA, table);
+
+  // const content = await getAllContent(ctx.env.D1DATA);
+  // console.log('content==>', content)
+
+  // const contentTypes = await getDataListByPrefix(
+  //   ctx.env.KVDATA,
+  //   "site1::content-type::"
+  // );
+
+  // console.log("load admin data", content);
+
+  const contentList = data.map((item) => {
+    return {
+      title: item.name,
+      editPath: `/admin/content/edit/${table}/${item.id}`
+    };
+  });
+
+
+  return (
+    <TopContentTable
+      content={contentList}
+      screenTitle={table}
+    />
+  );
+}
+
+export async function loadAdmin(ctx) {
+  // await putData(ctx.env.KVDATA, 'site1', 'content', {title: '20230508a'});
+
+  const content = await getDataListByPrefix(ctx.env.KVDATA, "site1::content::");
+  // const content = await getAllContent(ctx.env.D1DATA);
   console.log('content==>', content)
 
   const contentTypes = await getDataListByPrefix(
-    context.env.KVDATA,
+    ctx.env.KVDATA,
     "site1::content-type::"
   );
 
@@ -80,23 +112,23 @@ export async function loadAdmin(context) {
   );
 }
 
-export async function loadNewContent(context, id) {
-  console.log("loadContent id", id);
+// export async function loadNewContent(ctx, id) {
+//   console.log("loadContent id", id);
 
-  const data = await getById(context.env.KVDATA, id);
-  console.log("loadContent--????", id, data);
-  const contentType = getContentType(data);
-  return (
-    <Form
-      title={contentType}
-      saveButtonText="Save Content Type"
-      screenTitle="Content Type"
-    />
-  );
-}
+//   const data = await getById(ctx.env.KVDATA, id);
+//   console.log("loadContent--????", id, data);
+//   const contentType = getContentType(data);
+//   return (
+//     <Form
+//       title={contentType}
+//       saveButtonText="Save Content Type"
+//       screenTitle="Content Type"
+//     />
+//   );
+// }
 
-export async function loadEditContent(context, table, id) {
-  // const content = await getByTableAndId(context.env.D1DATA, table, id);
+export async function loadEditContent(ctx, table, id) {
+  // const content = await getByTableAndId(ctx.env.D1DATA, table, id);
   // console.log("loadEditContent", id, content);
 
   // console.log('loadEditContent content type', contentType)
@@ -106,6 +138,19 @@ export async function loadEditContent(context, table, id) {
       saveButtonText="Save Content Type"
       screenTitle="Content Type"
       contentId={id}
+    />
+  );
+}
+
+export async function loadNewContent(ctx, table) {
+  // const content = await getByTableAndId(ctx.env.D1DATA, table, id);
+  // console.log("loadEditContent", id, content);
+
+  // console.log('loadEditContent content type', contentType)
+
+  return (
+    <ContentNewForm
+      table={table}
     />
   );
 }
@@ -124,6 +169,17 @@ export const ContentEditForm = (props: {
   return (
     <Layout screenTitle={"Edit: " + props.contentId}>
       <div id="formio" data-id={props.contentId}></div>
+    </Layout>
+  );
+};
+
+export const ContentNewForm = (props: {
+  table: string;
+}) => {
+  
+  return (
+    <Layout screenTitle={"New: " + props.table}>
+      <div id="formio" data-table={props.table}></div>
     </Layout>
   );
 };
@@ -175,6 +231,49 @@ export const TopContentList = (props: {
                         New Content: {item.title}
                       </a>
                     </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </Layout>
+  );
+};
+
+export const TopContentTable = (props: {
+  content: object[];
+  screenTitle: string;
+}) => {
+  return (
+    <Layout screenTitle={props.screenTitle}>
+      <div class="row">
+        <div class="col-md-12">
+
+        <div class="pb-2 mb-3">
+          {/* <!-- Button trigger modal --> */}
+          <a href="" class="btn btn-warning">
+            New {props.screenTitle} record
+          </a>
+        </div>
+
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Key</th>
+              </tr>
+            </thead>
+            <tbody>
+              {props.content.map((item: any) => {
+                return (
+                  <tr>
+                    <th scope="row">
+                      {" "}
+                      <a class="" href={item.editPath}>
+                        {item.title}
+                      </a>
+                    </th>
                   </tr>
                 );
               })}

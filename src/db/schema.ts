@@ -8,7 +8,7 @@ import {
 
 import { relations } from "drizzle-orm";
 
-export const users = sqliteTable("users", {
+export const userSchema = {
   id: text("id").primaryKey(),
   name: text("name"),
   email: text("email"),
@@ -16,18 +16,21 @@ export const users = sqliteTable("users", {
   role: text("role").$type<"admin" | "user">(),
   createdAt: integer("created_at", { mode: "timestamp" }),
   updatedAt: integer("updated_at", { mode: "timestamp" }),
-});
+}
+
+export const users = sqliteTable("users", userSchema);
 
 export const usersRelations = relations(users, ({ many }) => ({
   posts: many(posts),
 }));
 
-export const posts = sqliteTable("posts", {
+export const postsSchema = {
   id: text("id").primaryKey(),
   title: text("title"),
   body: text("body"),
   userId: text("user_id"),
-});
+}
+export const posts = sqliteTable("posts", postsSchema);
 
 export const postsRelations = relations(posts, ({ one }) => ({
   author: one(users, {
