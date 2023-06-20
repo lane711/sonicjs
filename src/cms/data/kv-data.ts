@@ -67,7 +67,7 @@ export function saveContentType(db, site, contentTypeComponents) {
   return db.put(generatedKey, JSON.stringify(contentTypeComponents));
 }
 
-export function saveContent(db, site, content, key) {
+export function saveKVContent(db, site, content, key) {
   console.log("content--->", content.data.systemId);
   delete content.metadata;
   delete content.data.contentType;

@@ -6,7 +6,7 @@ import {
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 
 export const userSchema = {
   id: text("id").primaryKey(),
@@ -14,8 +14,8 @@ export const userSchema = {
   email: text("email"),
   password: text("password"),
   role: text("role").$type<"admin" | "user">(),
-  createdAt: integer("created_at", { mode: "timestamp" }),
-  updatedAt: integer("updated_at", { mode: "timestamp" }),
+  created_on: integer('created_on'),
+  updated_on: integer('updated_on')
 }
 
 export const users = sqliteTable("users", userSchema);

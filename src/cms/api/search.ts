@@ -23,10 +23,10 @@ search.get("/raw", async (ctx) => {
 
   const db = drizzle(ctx.env.D1DATA);
 
-  // await db
-  //   .insert(users)
-  //   .values({ id: "db722b76-0b88-11ee-be56-0242ac120002", name: "Joe" })
-  //   .run();
+  await db
+    .insert(users)
+    .values({ id: "db722b76-0b88-11ee-be56-0242ac120009", name: "Test" })
+    .run();
 
   // const result = await db
   //   .insert(posts)

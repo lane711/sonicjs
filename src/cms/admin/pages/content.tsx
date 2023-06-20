@@ -253,7 +253,7 @@ export const TopContentTable = (props: {
 
         <div class="pb-2 mb-3">
           {/* <!-- Button trigger modal --> */}
-          <a href="" class="btn btn-warning">
+          <a href={"/admin/content/new/" + props.screenTitle} class="btn btn-warning">
             New {props.screenTitle} record
           </a>
         </div>

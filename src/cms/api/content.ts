@@ -7,11 +7,11 @@ import {
   getDataByPrefix,
   getDataListByPrefix,
   putData,
-  saveContent,
   saveContentType,
 } from "../data/kv-data";
 import { Bindings } from "../types/bindings";
 import { apiConfig } from "../../db/schema";
+import { saveData } from "../data/d1-data";
 
 const content = new Hono<{ Bindings: Bindings }>();
 
@@ -102,15 +102,25 @@ content.get("/contents-with-meta/:contype-type", async (ctx) => {
   return ctx.json(content);
 });
 
-content.post("/", async (c) => {
-  const content = await c.req.json();
-  const key = content.key;
+content.post("/", async (ctx) => {
+  const content = await ctx.req.json();
 
-  const result = await saveContent(c.env.KVDATA, "site1", content, key);
+  const result = await saveData(ctx.env.D1DATA, content.data.table, content.data)
 
-  const status = key ? 204 : 201;
+  // const status = content.data.id ? 204 : 201;
 
-  return c.text("", status);
+  return ctx.text("", 201);
 });
+
+// content.post("/", async (c) => {
+//   const content = await c.req.json();
+//   const key = content.key;
+
+//   const result = await saveContent(c.env.KVDATA, "site1", content, key);
+
+//   const status = key ? 204 : 201;
+
+//   return c.text("", status);
+// });
 
 export { content };
