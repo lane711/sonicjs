@@ -105,11 +105,17 @@ content.get("/contents-with-meta/:contype-type", async (ctx) => {
 content.post("/", async (ctx) => {
   const content = await ctx.req.json();
 
-  const result = await saveData(ctx.env.D1DATA, content.data.table, content.data)
+  try {
+    const result = await saveData(ctx.env.D1DATA, content.data.table, content.data)
+    return ctx.text("", 201);
+
+  } catch (error) {
+    console.log('error posting content', error)
+    return ctx.text(error, 500);
+  }
 
   // const status = content.data.id ? 204 : 201;
 
-  return ctx.text("", 201);
 });
 
 // content.post("/", async (c) => {
