@@ -1,5 +1,8 @@
+import { desc } from "drizzle-orm";
+import { apiConfig } from "../../../db/schema";
 import { getById, getDataListByPrefix, putData } from "../../data/kv-data";
 import { Layout } from "../theme";
+import { getByTable, getByTableAndId } from "../../data/d1-data";
 
 interface link {
   url: string;
@@ -7,84 +10,90 @@ interface link {
 }
 
 export async function loadApis(ctx) {
-  const sites = await getDataListByPrefix(ctx.env.KVDATA, "host::sites");
 
-  let contentTypeApis: link[] = [
-    { url: "/v1/content-type", description: "Get All Content Types" },
-    { url: "/v1/content-type/site1::content-type::blog", description: "Get Content Type" },
-  ];
+  const tables = apiConfig;
 
-  let contentListApis: link[] = [
-    { url: "/v1/content", description: "Get All Content" },
-    { url: "/v1/content?includeContentType", description: "Include Content Type" },
-    { url: "/v1/content?contentType=blog", description: "Get Content by Content Type" },
-    { url: "/v1/content?keysOnly", description: "Return Only Keys" },
-    { url: "/v1/content?limit=10", description: "Page Results" },
-  ];
+  let tableApis: link[] = [];
+  apiConfig.map((scehma) => {
+    let link: link = {
+      url: `/v1/${scehma.route}`,
+      description: `get all ${scehma.table}`,
+    };
+    tableApis.push(link);
+  });
 
-  let contentApis: link[] = [
-    { url: "/v1/content/site1::content::article::16857474370560000::bpsxzzu", description: "Get Single Record" },
-    { url: "/v1/content/site1::content::article::16857474370560000::bpsxzzu?includeContentType", description: "Include Content Type" },
-  ];
+  let recordApis: link[] = [];
+
+  await Promise.all(tables.map(async (scehma) => {
+    const data = await getByTable(ctx.env.D1DATA, scehma.table, 1);
+    let link: link = {
+          url: `/v1/${scehma.route}/${data[0].id}`,
+          description: `get single record from the ${scehma.table} table`,
+        };
+        recordApis.push(link);
+  }));
 
   return (
-    <Top
-      contentTypeApis={contentTypeApis}
-      contentListApis={contentListApis}
-      contentApis={contentApis}
-      screenTitle="APIs"
-    />
+    <Top tableApis={tableApis} recordApis={recordApis} screenTitle="APIs" />
   );
 }
 
 export const Top = (props: {
-  contentTypeApis: link[];
-  contentListApis: link[];
-  contentApis: link[];
+  tableApis: link[];
+  recordApis: link[];
   screenTitle: string;
 }) => {
   return (
     <Layout screenTitle={props.screenTitle}>
-      <h2>Content Types</h2>
-      <ul>
-        {props.contentTypeApis.map((item: any) => {
-          return (
-            <li>
-              {item.description} <br></br>
-              <a class="" target="_blank" href={item.url}>
-                {item.url}
-              </a>
-            </li>
-          );
-        })}
-      </ul>
-      <h2>Content List</h2>
-      <ul>
-        {props.contentListApis.map((item: any) => {
-          return (
-            <li>
-              {item.description} <br></br>
-              <a class="" target="_blank" href={item.url}>
-                {item.url}
-              </a>
-            </li>
-          );
-        })}
-      </ul>
+      <h2>Table APIs</h2>
 
-      <h2>Content Item</h2>
-      <ul>
-        {props.contentApis.map((item: any) => {
-          return (
-            <li>
-              {item.description} <br></br>
-              <a class="" target="_blank" href={item.url}>
-                {item.url}
-              </a>
-            </li>
-          );
-        })}
-      </ul>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Url</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {props.tableApis.map((item: any) => {
+            return (
+              <tr>
+                <td>
+                  <a class="" target="_blank" href={item.url}>
+                    {item.url}
+                  </a>
+                </td>
+                <td>{item.description}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+
+      <h2>Record APIs</h2>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Url</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {props.recordApis.map((item: any) => {
+            return (
+              <tr>
+                <td>
+                  <a class="" target="_blank" href={item.url}>
+                    {item.url}
+                  </a>
+                </td>
+                <td>{item.description}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </Layout>
   );
 };

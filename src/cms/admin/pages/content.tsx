@@ -7,18 +7,19 @@ export async function loadAdminTable(ctx) {
   // await putData(ctx.env.KVDATA, 'site1', 'content', {title: '20230508a'});
 
   const content = await getAllContent(ctx.env.D1DATA);
-  console.log('content==>', content)
+  console.log('content==>', content[0].updated_on)
 
   const contentTypes = await getDataListByPrefix(
     ctx.env.KVDATA,
     "site1::content-type::"
   );
 
-  // console.log("load admin data", content);
+  console.log("load admin data", content);
 
   const contentList = content.map((item) => {
     return {
       title: item.name,
+      updated_on: item.updated_on,
       editPath: `/admin/content/edit/users/${item.id}`,
       newPath: `/admin/content/new/${item.name}`,
     };
@@ -60,6 +61,7 @@ export async function loadTableData(ctx, table) {
   const contentList = data.map((item) => {
     return {
       title: getDisplayField(item),
+      updated_on: item.updated_on,
       editPath: `/admin/content/edit/${table}/${item.id}`
     };
   });
@@ -200,19 +202,25 @@ export const TopContentList = (props: {
           <table class="table">
             <thead>
               <tr>
-                <th scope="col">Key</th>
+                <th scope="col">Record</th>
+          
+                <th scope="col">Last Updated</th>
               </tr>
             </thead>
             <tbody>
               {props.content.map((item: any) => {
                 return (
                   <tr>
-                    <th scope="row">
+                    <td scope="row">
                       {" "}
                       <a class="" href={item.editPath}>
                         {item.title}
                       </a>
-                    </th>
+                    </td>
+                    <td scope="row">
+                      date
+                        {item.updated_on}
+                    </td>
                   </tr>
                 );
               })}
@@ -264,21 +272,26 @@ export const TopContentTable = (props: {
 
           <table class="table">
             <thead>
-              <tr>
-                <th scope="col">Key</th>
+            <tr>
+                <th scope="col">Record</th>
+          
+                <th scope="col">Last Updated</th>
               </tr>
             </thead>
             <tbody>
               {props.content.map((item: any) => {
                 return (
                   <tr>
-                    <th scope="row">
-                      {" "}
-                      <a class="" href={item.editPath}>
-                        {item.title}
-                      </a>
-                    </th>
-                  </tr>
+                  <td scope="row">
+                    {" "}
+                    <a class="" href={item.editPath}>
+                      {item.title}
+                    </a>
+                  </td>
+                  <td scope="row">
+                      {item.updated_on}
+                  </td>
+                </tr>
                 );
               })}
             </tbody>

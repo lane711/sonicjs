@@ -13,7 +13,6 @@ export const Layout = (props: {
   newItemButtonText?: string;
 }) => {
   const tables = apiConfig;
-  console.log("tables", tables);
 
   return (
     <html lang="en" data-bs-theme="auto">

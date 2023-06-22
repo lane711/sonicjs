@@ -8,8 +8,21 @@ export async function getAllContent(db) {
   return results;
 }
 
-export async function getByTable(db, table) {
-  const { results } = await db.prepare(`SELECT * FROM ${table};`).all();
+export async function getByTable(db, table, limit = 0) {
+  // const { results } = await db.prepare(`SELECT * FROM ${table};`).all();
+
+  // return results;
+  // console.log("db ==>", db);
+
+
+  const limitSyntax = limit > 0 ? `limit ${limit}` : "";
+  const sql = `SELECT * FROM ${table} ${limitSyntax};`;
+
+  console.log("sql ==>", sql);
+
+  const { results } = await db.prepare(sql).all();
+
+  console.log("sql results ==>", results);
 
   return results;
 }
@@ -47,10 +60,7 @@ export async function insertData(d1, table, data) {
 
   const schmea = getRepoFromTable(table);
 
-  let result = await db
-    .insert(schmea)
-    .values(data)
-    .run();
+  let result = await db.insert(schmea).values(data).run();
 
   return result;
 }
@@ -69,25 +79,24 @@ export async function updateData(d1, table, data) {
 
   console.log(JSON.stringify(data, null, 4));
 
-
   let result = await db
     .update(users)
-    .set( data )
+    .set(data)
     .where(eq(users.id, data.id))
     // .returning({ updated: users.updatedAt })
-    .values()
-    
+    .values();
+
   console.log("updating data result ", result);
 
   return result;
 }
 
-export function getSchemaFromTable(tableName){
-  console.log('getting schema', tableName)
-  return tableName == 'users' ? userSchema : postsSchema;
+export function getSchemaFromTable(tableName) {
+  console.log("getting schema", tableName);
+  return tableName == "users" ? userSchema : postsSchema;
 }
 
-export function getRepoFromTable(tableName){
-  console.log('getting schema', tableName)
-  return tableName == 'users' ? users : posts;
+export function getRepoFromTable(tableName) {
+  console.log("getting schema", tableName);
+  return tableName == "users" ? users : posts;
 }

@@ -8,7 +8,7 @@
     "dev:wrangler": "wrangler pages dev dist --live-reload",
     "dev:esbuild": "rsync -avzh ./public ./dist --delete && esbuild --bundle src/server.ts --format=esm --watch --outfile=dist/_worker.js",
     "build": " rsync -avzh ./public ./dist --delete && esbuild --bundle src/server.ts --format=esm --outfile=dist/_worker.js",
-    "deploy": "wrangler pages publish dist",
+    "deploy": "wrangler pages deploy dist",
     "test": "jest --verbose",
     "generate": "drizzle-kit generate:sqlite --schema=./src/db/schema.ts --out=./migrations",
     "up": "wrangler d1 migrations apply sonicjs --local",
