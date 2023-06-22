@@ -59,7 +59,7 @@ export async function loadTableData(ctx, table) {
 
   const contentList = data.map((item) => {
     return {
-      title: item.name,
+      title: getDisplayField(item),
       editPath: `/admin/content/edit/${table}/${item.id}`
     };
   });
@@ -71,6 +71,10 @@ export async function loadTableData(ctx, table) {
       screenTitle={table}
     />
   );
+}
+
+function getDisplayField(item){
+return item.name ?? item.title;
 }
 
 export async function loadAdmin(ctx) {

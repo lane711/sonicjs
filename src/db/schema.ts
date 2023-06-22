@@ -8,6 +8,11 @@ import {
 
 import { relations, sql } from "drizzle-orm";
 
+export const auditSchema = {
+  created_on: integer('created_on'),
+  updated_on: integer('updated_on')
+}
+
 export const userSchema = {
   id: text("id").primaryKey(),
   name: text("name"),
@@ -18,7 +23,7 @@ export const userSchema = {
   updated_on: integer('updated_on')
 }
 
-export const users = sqliteTable("users", userSchema);
+export const users = sqliteTable("users", {...userSchema, ...auditSchema});
 
 export const usersRelations = relations(users, ({ many }) => ({
   posts: many(posts),
@@ -30,7 +35,7 @@ export const postsSchema = {
   body: text("body"),
   userId: text("user_id"),
 }
-export const posts = sqliteTable("posts", postsSchema);
+export const posts = sqliteTable("posts", {...postsSchema, ...auditSchema});
 
 export const postsRelations = relations(posts, ({ one }) => ({
   author: one(users, {

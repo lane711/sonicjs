@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/d1";
 import { v4 as uuidv4 } from "uuid";
-import { users } from "../../db/schema";
+import { posts, postsSchema, userSchema, users } from "../../db/schema";
 import { DefaultLogger, LogWriter, eq } from "drizzle-orm";
 
 export async function getAllContent(db) {
@@ -45,8 +45,10 @@ export async function insertData(d1, table, data) {
 
   console.log(JSON.stringify(data, null, 4));
 
+  const schmea = getRepoFromTable(table);
+
   let result = await db
-    .insert(users)
+    .insert(schmea)
     .values(data)
     .run();
 
@@ -78,4 +80,14 @@ export async function updateData(d1, table, data) {
   console.log("updating data result ", result);
 
   return result;
+}
+
+export function getSchemaFromTable(tableName){
+  console.log('getting schema', tableName)
+  return tableName == 'users' ? userSchema : postsSchema;
+}
+
+export function getRepoFromTable(tableName){
+  console.log('getting schema', tableName)
+  return tableName == 'users' ? users : posts;
 }

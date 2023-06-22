@@ -1,8 +1,14 @@
-import { userSchema } from "../../db/schema";
+import { userSchema, postsSchema } from "../../db/schema";
+import { getSchemaFromTable } from "../data/d1-data";
 
 export function getForm(ctx, table) {
   let formFields = [];
-  for (var field in userSchema) {
+
+  //TODO: amke dynamic
+  // const schema = `${table}Schema`;
+  const schema = getSchemaFromTable(table)
+
+  for (var field in schema) {
     const formField = getField(field)
     formFields.push(formField);
   }
