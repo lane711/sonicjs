@@ -19,9 +19,15 @@ const api = new Hono<{ Bindings: Bindings }>();
 apiConfig.forEach((entry) => {
   console.log("setting route for " + entry.route);
 
+  //ie /v1/users
   api.get(`/${entry.route}`, async (ctx) => {
-    const data = await getByTable(ctx.env.D1DATA, entry.table);
-    return ctx.json(data);
+    try {
+      const data = await getByTable(ctx.env.D1DATA, entry.table);
+      return ctx.json(data);
+    } catch (error) {
+      console.log(error);
+      return ctx.text(error);
+    }
   });
 
   api.get(`/${entry.route}/:id`, async (ctx) => {
@@ -31,7 +37,7 @@ apiConfig.forEach((entry) => {
     const data = await getByTableAndId(ctx.env.D1DATA, entry.table, id);
 
     if (includeContentType !== undefined) {
-      data.contentType = getForm(ctx, entry.table)
+      data.contentType = getForm(ctx, entry.table);
     }
 
     return ctx.json(data);
@@ -39,6 +45,7 @@ apiConfig.forEach((entry) => {
 });
 
 api.get("/ping", (c) => {
+  console.log("testing ping", Date());
   return c.text(Date());
 });
 
@@ -54,7 +61,7 @@ api.get("/form-components/:table", async (c) => {
 
   // console.log("id--->", id);
 
-  const ct = await getForm(c.env.D1DATA, table)
+  const ct = await getForm(c.env.D1DATA, table);
   return c.json(ct);
 });
 

@@ -15,6 +15,6 @@ kv_namespaces = [
 ]
 
 [[d1_databases]]
-binding = "D1DATA" # i.e. available in your Worker on env.DB
+binding = "D1DATA"
 database_name = "sonicjs"
 database_id = "30baa933-ceb6-41ac-95a4-ce8b08cd2f41"

@@ -49,6 +49,7 @@ const admin = new Hono<{ Bindings: Bindings }>();
 //   export default app
 
 admin.get("/ping", (ctx) => {
+  console.log("testing ping", Date());
   return ctx.text(Date());
 });
 

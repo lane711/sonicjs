@@ -13,3 +13,8 @@ account_id = "xxx"
 kv_namespaces = [
   { binding = "KVDATA", preview_id="xxx", id = "xxx" }
 ]
+
+[[d1_databases]]
+binding = "D1DATA"
+database_name = "sonicjs"
+database_id = "xxx"
