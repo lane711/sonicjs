@@ -8,18 +8,21 @@ export async function getAllContent(db) {
   return results;
 }
 
-export async function getByTable(db, table, limit = 0, offset = 0, sortBy = '', sortDirection = 'asc') {
+export async function getByTable(db, table, params) {
   // const { results } = await db.prepare(`SELECT * FROM ${table};`).all();
 
   // return results;
   // console.log("db ==>", db);
+  const sortDirection = params.sortDirection ?? "asc";
+  const sortBySyntax = params.sortBy
+    ? `order by ${params.sortBy} ${sortDirection}`
+    : "";
 
-  const sortBySyntax = sortBy ? `order by ${sortBy} ${sortDirection}` : "";
+  const limitSyntax = params.limit > 0 ? `limit ${params.limit}` : "";
+  const offsetSyntax = params.offset > 0 ? `offset ${params.offset}` : "";
+  const whereClause = whereClauseBuilder(params);
 
-  const limitSyntax = limit > 0 ? `limit ${limit}` : "";
-  const offsetSyntax = offset > 0 ? `offset ${offset}` : "";
-
-  const sql = `SELECT * FROM ${table} ${sortBySyntax} ${limitSyntax} ${offsetSyntax};`;
+  const sql = `SELECT * FROM ${table} ${whereClause} ${sortBySyntax} ${limitSyntax} ${offsetSyntax};`;
 
   console.log("sql ==>", sql);
 
@@ -102,4 +105,31 @@ export function getSchemaFromTable(tableName) {
 export function getRepoFromTable(tableName) {
   console.log("getting schema", tableName);
   return tableName == "users" ? users : posts;
+}
+
+export function whereClauseBuilder(params) {
+  console.log("whereClauseBuilder", JSON.stringify(params.filters, null, 2));
+
+  let whereClause = "";
+
+  const filters = params.filters
+
+  if (!filters) {
+    return whereClause;
+  }
+
+  if (Array.isArray(filters)) {
+    filters.map((field) => {
+      console.log(field);
+    });
+  } else {
+    console.log('---filters----')
+    console.log(filters)
+    const field = Object.keys(filters)[0];
+    console.log(field);
+
+    whereClause = `where ${field} = `
+  }
+
+  return whereClause;
 }

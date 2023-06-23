@@ -12,7 +12,8 @@ import { Bindings } from "../types/bindings";
 import { apiConfig } from "../../db/schema";
 import { getByTable, getByTableAndId } from "../data/d1-data";
 import { getForm } from "./forms";
-import { T } from "drizzle-orm/column.d-66a08b85";
+import qs from "qs";
+
 
 const api = new Hono<{ Bindings: Bindings }>();
 
@@ -22,8 +23,9 @@ apiConfig.forEach((entry) => {
   //ie /v1/users
   api.get(`/${entry.route}`, async (ctx) => {
     try {
-      const { limit, offset, sortBy, sortDirection } = ctx.req.query();
-      const data = await getByTable(ctx.env.D1DATA, entry.table, limit, offset, sortBy, sortDirection);
+      // const { limit, offset, sortBy, sortDirection } = ctx.req.query();
+      var params = qs.parse(ctx.req.query());
+      const data = await getByTable(ctx.env.D1DATA, entry.table, params);
       return ctx.json(data);
     } catch (error) {
       console.log(error);
