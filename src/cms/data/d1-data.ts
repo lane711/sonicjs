@@ -8,15 +8,18 @@ export async function getAllContent(db) {
   return results;
 }
 
-export async function getByTable(db, table, limit = 0) {
+export async function getByTable(db, table, limit = 0, offset = 0, sortBy = '', sortDirection = 'asc') {
   // const { results } = await db.prepare(`SELECT * FROM ${table};`).all();
 
   // return results;
   // console.log("db ==>", db);
 
+  const sortBySyntax = sortBy ? `order by ${sortBy} ${sortDirection}` : "";
 
   const limitSyntax = limit > 0 ? `limit ${limit}` : "";
-  const sql = `SELECT * FROM ${table} ${limitSyntax};`;
+  const offsetSyntax = offset > 0 ? `offset ${offset}` : "";
+
+  const sql = `SELECT * FROM ${table} ${sortBySyntax} ${limitSyntax} ${offsetSyntax};`;
 
   console.log("sql ==>", sql);
 

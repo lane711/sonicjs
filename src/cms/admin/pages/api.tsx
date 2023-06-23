@@ -17,9 +17,15 @@ export async function loadApis(ctx) {
   apiConfig.map((scehma) => {
     let link: link = {
       url: `/v1/${scehma.route}`,
-      description: `get all ${scehma.table}`,
+      description: `get all records from the ${scehma.table} table`,
     };
     tableApis.push(link);
+
+    let linkWithParams: link = {
+      url: `/v1/${scehma.route}?limit=2&offset=2&sortBy=created_on&sortDirection=desc`,
+      description: `get data from ${scehma.table} with limits, offsets and sorting`,
+    };
+    tableApis.push(linkWithParams);
   });
 
   let recordApis: link[] = [];
