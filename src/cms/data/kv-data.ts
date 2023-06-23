@@ -1,24 +1,13 @@
-export function getKey(site, schema, key = undefined): string {
-  return key ?? `${site}::${schema}::${getTicksSortKey()}::${getId(7)}`;
+export function getKey(timestamp, table, id): string {
+  return `${timestamp}::${table}::${id}`;
 }
 
-export function getContentKey(site, schema, key = undefined): string {
-  return (
-    key ?? `${site}::content::${schema}::${getTicksSortKey()}::${getId(7)}`
-  );
-}
 
-function getTicksSortKey() {
-  return new Date().getTime() * 10000;
-}
-
-export function getId(length) {
-  const charset = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let res = "";
-  while (length--) res += charset[(Math.random() * charset.length) | 0];
-
-  return res;
-}
+// export function getContentKey(site, schema, key = undefined): string {
+//   return (
+//     key ?? `${site}::content::${schema}::${getTicksSortKey()}::${getId(7)}`
+//   );
+// }
 
 export function getDataListByPrefix(db, prefix = "", limit?: number, cursor?: string) {
   return db.list({ prefix , limit, cursor});
@@ -67,22 +56,22 @@ export function saveContentType(db, site, contentTypeComponents) {
   return db.put(generatedKey, JSON.stringify(contentTypeComponents));
 }
 
-export function saveKVContent(db, site, content, key) {
+export function saveContent(db, content, timestamp, id) {
   console.log("content--->", content.data.systemId);
   delete content.metadata;
   delete content.data.contentType;
   delete content.data.submit;
 
-  const contentType = content.data.systemId;
-  const generatedKey = key ?? getContentKey(site, contentType);
-  console.log(content)
+  // const contentType = content.data.systemId;
+  const generatedKey = getKey(timestamp, content.data.table, id);
+  const metadata = {id, table: content.data.table, timestamp}
 
-  const size = JSON.stringify(content).length;
+  // const size = JSON.stringify(content).length;
 
-  console.log("size", size);
+  // console.log("size", size);
   
   return db.put(generatedKey, JSON.stringify(content), {
-    metadata: { content },
+    metadata: { metadata },
   });
 }
 

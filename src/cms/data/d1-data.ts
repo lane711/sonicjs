@@ -13,14 +13,25 @@ export async function getByTable(db, table, params) {
 
   // return results;
   // console.log("db ==>", db);
-  const sortDirection = params.sortDirection ?? "asc";
-  const sortBySyntax = params.sortBy
-    ? `order by ${params.sortBy} ${sortDirection}`
-    : "";
+  console.log("params ==>", JSON.stringify(params, null, 2));
 
-  const limitSyntax = params.limit > 0 ? `limit ${params.limit}` : "";
-  const offsetSyntax = params.offset > 0 ? `offset ${params.offset}` : "";
-  const whereClause = whereClauseBuilder(params);
+  var whereClause = '';
+  var sortBySyntax = '';
+  var limitSyntax = '';
+  var offsetSyntax = '';
+
+  if (params) {
+    const sortDirection = params.sortDirection ?? "asc";
+    console.log("sortDirection ==>", sortDirection);
+
+    const sortBySyntax = params.sortBy
+      ? `order by ${params.sortBy} ${sortDirection}`
+      : "";
+
+    const limitSyntax = params.limit > 0 ? `limit ${params.limit}` : "";
+    const offsetSyntax = params.offset > 0 ? `offset ${params.offset}` : "";
+    const whereClause = whereClauseBuilder(params);
+  }
 
   const sql = `SELECT * FROM ${table} ${whereClause} ${sortBySyntax} ${limitSyntax} ${offsetSyntax};`;
 
@@ -41,14 +52,14 @@ export async function getByTableAndId(db, table, id) {
   return results[0];
 }
 
-export async function saveData(d1, table, data) {
-  if (!data.id) {
-    data.id = uuidv4();
-    return insertData(d1, table, data);
-  } else {
-    return updateData(d1, table, data);
-  }
-}
+// export async function saveData(d1, table, data) {
+//   if (!data.id) {
+//     data.id = uuidv4();
+//     return insertData(d1, table, data);
+//   } else {
+//     return updateData(d1, table, data);
+//   }
+// }
 
 export async function insertData(d1, table, data) {
   const db = drizzle(d1);
@@ -112,7 +123,7 @@ export function whereClauseBuilder(params) {
 
   let whereClause = "";
 
-  const filters = params.filters
+  const filters = params.filters;
 
   if (!filters) {
     return whereClause;
@@ -123,12 +134,12 @@ export function whereClauseBuilder(params) {
       console.log(field);
     });
   } else {
-    console.log('---filters----')
-    console.log(filters)
+    console.log("---filters----");
+    console.log(filters);
     const field = Object.keys(filters)[0];
     console.log(field);
 
-    whereClause = `where ${field} = `
+    whereClause = `where ${field} = `;
   }
 
   return whereClause;

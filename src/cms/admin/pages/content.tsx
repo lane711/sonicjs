@@ -1,3 +1,4 @@
+import { ApiConfig, apiConfig } from "../../../db/schema";
 import { getAllContent, getByIdAndTable, getByTable, getByTableAndId } from "../../data/d1-data";
 import { getById, getContentType, getDataListByPrefix } from "../../data/kv-data";
 import { Form, Layout } from "../theme";
@@ -6,37 +7,41 @@ import { Form, Layout } from "../theme";
 export async function loadAdminTable(ctx) {
   // await putData(ctx.env.KVDATA, 'site1', 'content', {title: '20230508a'});
 
-  const content = await getAllContent(ctx.env.D1DATA);
-  console.log('content==>', content[0].updated_on)
+  // const content = await getAllContent(ctx.env.D1DATA);
+    // const content = await getAllContent(ctx.env.D1DATA);
 
-  const contentTypes = await getDataListByPrefix(
-    ctx.env.KVDATA,
-    "site1::content-type::"
+
+  const content = await getDataListByPrefix(
+    ctx.env.KVDATA
   );
+
+  console.log('content==>', content.keys)
 
   console.log("load admin data", content);
 
-  const contentList = content.map((item) => {
+  const contentList = content.keys.map((item) => {
+    const id = item.name.split('::').pop();
     return {
       title: item.name,
       updated_on: item.updated_on,
-      editPath: `/admin/content/edit/users/${item.id}`,
+      editPath: `/admin/content/edit/users/${id}`,
       newPath: `/admin/content/new/${item.name}`,
     };
   });
 
-  const contentTypeList = contentTypes.keys.map((item) => {
+  const tables = apiConfig;
+  const tableList = tables.map((schmea) => {
     return {
-      title: item.name,
-      editPath: `/admin/content/${item.name}`,
-      newPath: `/admin/content/new/${item.name}`,
+      title: schmea.table,
+      editPath: `/admin/content/${schmea.table}`,
+      newPath: `/admin/content/new/${schmea.table}`,
     };
   });
 
   return (
     <TopContentList
       content={contentList}
-      contentTypes={contentTypeList}
+      tableList={tableList}
       screenTitle="Content"
     />
   );
@@ -112,7 +117,7 @@ export async function loadAdmin(ctx) {
   return (
     <TopContentList
       content={contentList}
-      contentTypes={contentTypeList}
+      tableList={contentTypeList}
       screenTitle="Content"
     />
   );
@@ -192,7 +197,7 @@ export const ContentNewForm = (props: {
 
 export const TopContentList = (props: {
   content: object[];
-  contentTypes: object[];
+  tableList: ApiConfig[];
   screenTitle: string;
 }) => {
   return (
@@ -204,7 +209,7 @@ export const TopContentList = (props: {
               <tr>
                 <th scope="col">Record</th>
           
-                <th scope="col">Last Updated</th>
+                <th scope="col">Created</th>
               </tr>
             </thead>
             <tbody>
@@ -235,7 +240,7 @@ export const TopContentList = (props: {
               </tr>
             </thead>
             <tbody>
-              {props.contentTypes.map((item: any) => {
+              {props.tableList.map((item: any) => {
                 return (
                   <tr>
                     <td>
@@ -275,7 +280,7 @@ export const TopContentTable = (props: {
             <tr>
                 <th scope="col">Record</th>
           
-                <th scope="col">Last Updated</th>
+                <th scope="col">Created</th>
               </tr>
             </thead>
             <tbody>

@@ -23,7 +23,6 @@ apiConfig.forEach((entry) => {
   //ie /v1/users
   api.get(`/${entry.route}`, async (ctx) => {
     try {
-      // const { limit, offset, sortBy, sortDirection } = ctx.req.query();
       var params = qs.parse(ctx.req.query());
       const data = await getByTable(ctx.env.D1DATA, entry.table, params);
       return ctx.json(data);
