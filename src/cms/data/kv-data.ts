@@ -64,14 +64,16 @@ export function saveContent(db, content, timestamp, id) {
 
   // const contentType = content.data.systemId;
   const generatedKey = getKey(timestamp, content.data.table, id);
-  const metadata = {id, table: content.data.table, timestamp}
+  const metadata = {id, table: content.data.table, created_on: timestamp, updated_on: timestamp}
+
+  console.log('metadata ==>', metadata);
 
   // const size = JSON.stringify(content).length;
 
   // console.log("size", size);
   
   return db.put(generatedKey, JSON.stringify(content), {
-    metadata: { metadata },
+    metadata,
   });
 }
 

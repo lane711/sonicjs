@@ -5,7 +5,7 @@ var table;
 (function () {
   const url = window.location.href;
 
-  const params = url.split('/');
+  const params = url.split("/");
   table = params[6];
 
   var mode;
@@ -87,7 +87,11 @@ function editContent() {
       components: response.data.contentType,
     }).then(function (form) {
       form.on("submit", function (data) {
-        saveContent(data);
+        if (data.id) {
+          updateContent(data);
+        } else {
+          addContent(data);
+        }
       });
       form.submission = {
         data: response.data,
@@ -103,10 +107,25 @@ function editContent() {
   });
 }
 
-function saveContent(data) {
+function addContent(data) {
   data.key = window.location.href.split("/").pop();
 
   axios.post("/v1/content", data).then((response) => {
+    console.log(response.data);
+    console.log(response.status);
+    console.log(response.statusText);
+    console.log(response.headers);
+    console.log(response.config);
+    if (response.status === 201 || response.status === 204) {
+      location.href = "/admin";
+    }
+  });
+}
+
+function updateContent(data) {
+  data.key = window.location.href.split("/").pop();
+
+  axios.put("/v1/content", data).then((response) => {
     console.log(response.data);
     console.log(response.status);
     console.log(response.statusText);

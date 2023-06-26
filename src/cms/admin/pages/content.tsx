@@ -1,33 +1,49 @@
 import { ApiConfig, apiConfig } from "../../../db/schema";
-import { getAllContent, getByIdAndTable, getByTable, getByTableAndId } from "../../data/d1-data";
-import { getById, getContentType, getDataListByPrefix } from "../../data/kv-data";
+import {
+  getAllContent,
+  getByIdAndTable,
+  getByTable,
+  getByTableAndId,
+} from "../../data/d1-data";
+import {
+  getById,
+  getContentType,
+  getDataListByPrefix,
+} from "../../data/kv-data";
 import { Form, Layout } from "../theme";
-
 
 export async function loadAdminTable(ctx) {
   // await putData(ctx.env.KVDATA, 'site1', 'content', {title: '20230508a'});
 
   // const content = await getAllContent(ctx.env.D1DATA);
-    // const content = await getAllContent(ctx.env.D1DATA);
+  // const content = await getAllContent(ctx.env.D1DATA);
 
+  let content = await getDataListByPrefix(ctx.env.KVDATA);
 
-  const content = await getDataListByPrefix(
-    ctx.env.KVDATA
-  );
+  content.keys.reverse();
 
-  console.log('content==>', content.keys)
+  // console.log('content==>', content.keys)
 
-  console.log("load admin data", content);
+  // console.log("load admin data", content);
 
   const contentList = content.keys.map((item) => {
-    const id = item.name.split('::').pop();
+    const id = item.name.split("::").pop();
+    const table = item.name.split("::")[1];
+    // const table = item.name.split('::')[1];
+    // console.log("item-->", JSON.stringify(item, null, 2));
+
+    const updated_on = item.metadata.updated_on;
+    // console.log("updated_on-->", updated_on);
+
     return {
       title: item.name,
-      updated_on: item.updated_on,
-      editPath: `/admin/content/edit/users/${id}`,
+      updated_on: updated_on,
+      editPath: `/admin/content/edit/${table}/${id}`,
       newPath: `/admin/content/new/${item.name}`,
     };
   });
+
+  // console.log("contentList-->", JSON.stringify(contentList, null, 2));
 
   const tables = apiConfig;
   const tableList = tables.map((schmea) => {
@@ -49,7 +65,7 @@ export async function loadAdminTable(ctx) {
 
 export async function loadTableData(ctx, table) {
   // await putData(ctx.env.KVDATA, 'site1', 'content', {title: '20230508a'});
-  console.log('user==>', table)
+  console.log("user==>", table);
 
   const data = await getByTable(ctx.env.D1DATA, table);
 
@@ -67,21 +83,15 @@ export async function loadTableData(ctx, table) {
     return {
       title: getDisplayField(item),
       updated_on: item.updated_on,
-      editPath: `/admin/content/edit/${table}/${item.id}`
+      editPath: `/admin/content/edit/${table}/${item.id}`,
     };
   });
 
-
-  return (
-    <TopContentTable
-      content={contentList}
-      screenTitle={table}
-    />
-  );
+  return <TopContentTable content={contentList} screenTitle={table} />;
 }
 
-function getDisplayField(item){
-return item.name ?? item.title;
+function getDisplayField(item) {
+  return item.name ?? item.title;
 }
 
 export async function loadAdmin(ctx) {
@@ -89,7 +99,7 @@ export async function loadAdmin(ctx) {
 
   const content = await getDataListByPrefix(ctx.env.KVDATA, "site1::content::");
   // const content = await getAllContent(ctx.env.D1DATA);
-  console.log('content==>', content)
+  console.log("content==>", content);
 
   const contentTypes = await getDataListByPrefix(
     ctx.env.KVDATA,
@@ -159,16 +169,11 @@ export async function loadNewContent(ctx, table) {
 
   // console.log('loadEditContent content type', contentType)
 
-  return (
-    <ContentNewForm
-      table={table}
-    />
-  );
+  return <ContentNewForm table={table} />;
 }
 
-function editScript() {  
-
-  return console.log('hello');
+function editScript() {
+  return console.log("hello");
 }
 
 export const ContentEditForm = (props: {
@@ -176,7 +181,6 @@ export const ContentEditForm = (props: {
   saveButtonText: string;
   contentId: string;
 }) => {
-  
   return (
     <Layout screenTitle={"Edit: " + props.contentId}>
       <div id="formio" data-id={props.contentId}></div>
@@ -184,10 +188,7 @@ export const ContentEditForm = (props: {
   );
 };
 
-export const ContentNewForm = (props: {
-  table: string;
-}) => {
-  
+export const ContentNewForm = (props: { table: string }) => {
   return (
     <Layout screenTitle={"New: " + props.table}>
       <div id="formio" data-table={props.table}></div>
@@ -208,7 +209,7 @@ export const TopContentList = (props: {
             <thead>
               <tr>
                 <th scope="col">Record</th>
-          
+
                 <th scope="col">Created</th>
               </tr>
             </thead>
@@ -223,8 +224,7 @@ export const TopContentList = (props: {
                       </a>
                     </td>
                     <td scope="row">
-                      date
-                        {item.updated_on}
+                      {item.updated_on}
                     </td>
                   </tr>
                 );
@@ -267,19 +267,21 @@ export const TopContentTable = (props: {
     <Layout screenTitle={props.screenTitle}>
       <div class="row">
         <div class="col-md-12">
-
-        <div class="pb-2 mb-3">
-          {/* <!-- Button trigger modal --> */}
-          <a href={"/admin/content/new/" + props.screenTitle} class="btn btn-warning">
-            New {props.screenTitle} record
-          </a>
-        </div>
+          <div class="pb-2 mb-3">
+            {/* <!-- Button trigger modal --> */}
+            <a
+              href={"/admin/content/new/" + props.screenTitle}
+              class="btn btn-warning"
+            >
+              New {props.screenTitle} record
+            </a>
+          </div>
 
           <table class="table">
             <thead>
-            <tr>
+              <tr>
                 <th scope="col">Record</th>
-          
+
                 <th scope="col">Created</th>
               </tr>
             </thead>
@@ -287,16 +289,14 @@ export const TopContentTable = (props: {
               {props.content.map((item: any) => {
                 return (
                   <tr>
-                  <td scope="row">
-                    {" "}
-                    <a class="" href={item.editPath}>
-                      {item.title}
-                    </a>
-                  </td>
-                  <td scope="row">
-                      {item.updated_on}
-                  </td>
-                </tr>
+                    <td scope="row">
+                      {" "}
+                      <a class="" href={item.editPath}>
+                        {item.title}
+                      </a>
+                    </td>
+                    <td scope="row">{item.updated_on}</td>
+                  </tr>
                 );
               })}
             </tbody>

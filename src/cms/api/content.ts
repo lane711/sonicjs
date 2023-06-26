@@ -12,7 +12,7 @@ import {
 } from "../data/kv-data";
 import { Bindings } from "../types/bindings";
 import { apiConfig } from "../../db/schema";
-import { insertData, saveData } from "../data/d1-data";
+import { insertData, saveData, updateData } from "../data/d1-data";
 import { v4 as uuidv4 } from "uuid";
 
 const content = new Hono<{ Bindings: Bindings }>();
@@ -103,6 +103,7 @@ content.get("/contents-with-meta/:contype-type", async (ctx) => {
   return ctx.json(content);
 });
 
+//new
 content.post("/", async (ctx) => {
   const content = await ctx.req.json();
 
@@ -121,6 +122,29 @@ content.post("/", async (ctx) => {
     try {
       content.data.id = id;
       const result = insertData(ctx.env.D1DATA, content.data.table, content.data);
+    } catch (error) {
+      console.log("error posting content", error);
+    }
+  }
+});
+
+//edit
+content.put("/", async (ctx) => {
+  const content = await ctx.req.json();
+
+  const timestamp = new Date().getTime();
+  const result = await saveContent(ctx.env.KVDATA, content, timestamp, content.id);
+
+  try {
+    const result = await saveContent(ctx.env.KVDATA, content, timestamp, content.id);
+    return ctx.text("", 200);
+  } catch (error) {
+    console.log("error posting content", error);
+    return ctx.text(error, 500);
+  } finally {
+    //then also save the content to sqlite for filtering, sorting, etc
+    try {
+      const result = updateData(ctx.env.D1DATA, content.data.table, content.data);
     } catch (error) {
       console.log("error posting content", error);
     }
