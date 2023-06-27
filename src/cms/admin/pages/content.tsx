@@ -69,8 +69,9 @@ export async function loadTableData(ctx, table) {
 
   const data = await getByTable(ctx.env.D1DATA, table);
 
+  data.reverse();
   // const content = await getAllContent(ctx.env.D1DATA);
-  // console.log('content==>', content)
+  // console.log('data==>', JSON.stringify(data, null, 2))
 
   // const contentTypes = await getDataListByPrefix(
   //   ctx.env.KVDATA,
@@ -224,7 +225,7 @@ export const TopContentList = (props: {
                       </a>
                     </td>
                     <td scope="row">
-                      {item.updated_on}
+                      <time class="timeSince" datetime={item.updated_on}>{item.updated_on}</time>
                     </td>
                   </tr>
                 );
@@ -295,7 +296,10 @@ export const TopContentTable = (props: {
                         {item.title}
                       </a>
                     </td>
-                    <td scope="row">{item.updated_on}</td>
+                    <td scope="row">
+                    <time class="timeSince" datetime={item.updated_on}>{item.updated_on}</time>
+
+                      </td>
                   </tr>
                 );
               })}
