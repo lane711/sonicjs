@@ -36,6 +36,7 @@ export async function loadAdminTable(ctx) {
     // console.log("updated_on-->", updated_on);
 
     return {
+      id:item.name,
       title: item.name,
       updated_on: updated_on,
       editPath: `/admin/content/edit/${table}/${id}`,
@@ -82,6 +83,7 @@ export async function loadTableData(ctx, table) {
 
   const contentList = data.map((item) => {
     return {
+      id: item.id,
       title: getDisplayField(item),
       updated_on: item.updated_on,
       editPath: `/admin/content/edit/${table}/${item.id}`,
@@ -210,8 +212,8 @@ export const TopContentList = (props: {
             <thead>
               <tr>
                 <th scope="col">Record</th>
-
                 <th scope="col">Created</th>
+                <th scope="col">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -225,7 +227,18 @@ export const TopContentList = (props: {
                       </a>
                     </td>
                     <td scope="row">
-                      <time class="timeSince" datetime={item.updated_on}>{item.updated_on}</time>
+                      <time class="timeSince" datetime={item.updated_on}>
+                        {item.updated_on}
+                      </time>
+                    </td>
+                    <td>
+                      <a
+                        href="javascript:void(0)"
+                        data-id={item.id}
+                        class="btn btn-outline-warning btn-sm delete-content"
+                      >
+                        Delete
+                      </a>
                     </td>
                   </tr>
                 );
@@ -245,8 +258,11 @@ export const TopContentList = (props: {
                 return (
                   <tr>
                     <td>
-                      <a class="" href={item.newPath}>
-                        New Content: {item.title}
+                      <a
+                        href={"/admin/content/new/" + item.title}
+                        class="btn btn-warning"
+                      >
+                        New {item.title} record
                       </a>
                     </td>
                   </tr>
@@ -282,7 +298,6 @@ export const TopContentTable = (props: {
             <thead>
               <tr>
                 <th scope="col">Record</th>
-
                 <th scope="col">Created</th>
               </tr>
             </thead>
@@ -297,9 +312,10 @@ export const TopContentTable = (props: {
                       </a>
                     </td>
                     <td scope="row">
-                    <time class="timeSince" datetime={item.updated_on}>{item.updated_on}</time>
-
-                      </td>
+                      <time class="timeSince" datetime={item.updated_on}>
+                        {item.updated_on}
+                      </time>
+                    </td>
                   </tr>
                 );
               })}

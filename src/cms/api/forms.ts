@@ -6,10 +6,10 @@ export function getForm(ctx, table) {
 
   //TODO: amke dynamic
   // const schema = `${table}Schema`;
-  const schema = getSchemaFromTable(table)
+  const schema = getSchemaFromTable(table);
 
   for (var field in schema) {
-    const formField = getField(field)
+    const formField = getField(field);
     formFields.push(formField);
   }
 
@@ -19,7 +19,7 @@ export function getForm(ctx, table) {
     key: "table",
     label: "table",
     defaultValue: table,
-    disabled: true
+    disabled: true,
   });
 
   //submit button
@@ -33,11 +33,13 @@ export function getForm(ctx, table) {
   return formFields;
 }
 
-function getField(fieldName){
-return {
+function getField(fieldName) {
+  const disabled = fieldName == "id";
+  return {
     type: getFieldType(fieldName),
     key: fieldName,
     label: fieldName,
+    disabled,
     // placeholder: "Enter your first name.",
     // input: true,
     // tooltip: "Enter your <strong>First Name</strong>",
@@ -45,6 +47,6 @@ return {
   };
 }
 
-function getFieldType(fieldName){
-    return fieldName === 'password' ? 'password' : 'textfield'
+function getFieldType(fieldName) {
+  return fieldName === "password" ? "password" : "textfield";
 }

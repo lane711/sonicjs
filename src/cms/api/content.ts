@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { getForm, loadForm } from "../admin/forms/form";
 import {
+  deleteById,
   getById,
   getContentType,
   getContentTypes,
@@ -12,7 +13,12 @@ import {
 } from "../data/kv-data";
 import { Bindings } from "../types/bindings";
 import { apiConfig } from "../../db/schema";
-import { insertData, saveData, updateData } from "../data/d1-data";
+import {
+  deleteByTableAndId,
+  insertData,
+  saveData,
+  updateData,
+} from "../data/d1-data";
 import { v4 as uuidv4 } from "uuid";
 
 const content = new Hono<{ Bindings: Bindings }>();
@@ -109,7 +115,7 @@ content.post("/", async (ctx) => {
 
   const id = uuidv4();
   const timestamp = new Date().getTime();
-  const result = await saveContent(ctx.env.KVDATA, content, timestamp, id);
+  content.data.id = id;
 
   try {
     const result = await saveContent(ctx.env.KVDATA, content, timestamp, id);
@@ -120,8 +126,11 @@ content.post("/", async (ctx) => {
   } finally {
     //then also save the content to sqlite for filtering, sorting, etc
     try {
-      content.data.id = id;
-      const result = insertData(ctx.env.D1DATA, content.data.table, content.data);
+      const result = insertData(
+        ctx.env.D1DATA,
+        content.data.table,
+        content.data
+      );
     } catch (error) {
       console.log("error posting content", error);
     }
@@ -133,10 +142,20 @@ content.put("/", async (ctx) => {
   const content = await ctx.req.json();
 
   const timestamp = new Date().getTime();
-  const result = await saveContent(ctx.env.KVDATA, content, timestamp, content.id);
+  const result = await saveContent(
+    ctx.env.KVDATA,
+    content,
+    timestamp,
+    content.id
+  );
 
   try {
-    const result = await saveContent(ctx.env.KVDATA, content, timestamp, content.id);
+    const result = await saveContent(
+      ctx.env.KVDATA,
+      content,
+      timestamp,
+      content.id
+    );
     return ctx.text("", 200);
   } catch (error) {
     console.log("error posting content", error);
@@ -144,12 +163,47 @@ content.put("/", async (ctx) => {
   } finally {
     //then also save the content to sqlite for filtering, sorting, etc
     try {
-      const result = updateData(ctx.env.D1DATA, content.data.table, content.data);
+      const result = updateData(
+        ctx.env.D1DATA,
+        content.data.table,
+        content.data
+      );
     } catch (error) {
       console.log("error posting content", error);
     }
   }
 });
+
+//delete
+content.delete("/:contentId", async (ctx) => {
+  const id = ctx.req.param("contentId");
+  console.log('deleting ' + id)
+
+  const content = await getById(ctx.env.KVDATA, `${id}`);
+
+  console.log('delete content ' + JSON.stringify(content, null, 2))
+
+  if (content) {
+    console.log('content found, deleting...')
+    const kvDelete = await deleteById(ctx.env.KVDATA, id);
+    const d1Delete = await deleteByTableAndId(
+      ctx.env.D1DATA,
+      content.data.table,
+      content.data.id
+    );
+    console.log('returning 200')
+    return ctx.text("", 200);
+
+  } else {
+    console.log('content not found')
+    return ctx.text("", 404);
+  }
+
+
+
+});
+
+
 
 // content.post("/", async (c) => {
 //   const content = await c.req.json();

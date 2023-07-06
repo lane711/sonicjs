@@ -2,25 +2,34 @@ export function getKey(timestamp, table, id): string {
   return `${timestamp}::${table}::${id}`;
 }
 
-
 // export function getContentKey(site, schema, key = undefined): string {
 //   return (
 //     key ?? `${site}::content::${schema}::${getTicksSortKey()}::${getId(7)}`
 //   );
 // }
 
-export function getDataListByPrefix(db, prefix = "", limit?: number, cursor?: string) {
-  return db.list({ prefix , limit, cursor});
+export function getDataListByPrefix(
+  db,
+  prefix = "",
+  limit?: number,
+  cursor?: string
+) {
+  return db.list({ prefix, limit, cursor });
 }
 
-export async function getDataByPrefix(db, prefix = "", limit?: number, cursor?: string) {
+export async function getDataByPrefix(
+  db,
+  prefix = "",
+  limit?: number,
+  cursor?: string
+) {
   const list = await getDataListByPrefix(db, prefix, limit, cursor);
   const content = [];
 
   for await (const key of list.keys) {
     const record = await getById(db, key.name);
     const data = record.data;
-    const dataWithKey = {'key':key.name , ...data}; //add key to top of object
+    const dataWithKey = { key: key.name, ...data }; //add key to top of object
     content.push(dataWithKey);
   }
 
@@ -29,6 +38,11 @@ export async function getDataByPrefix(db, prefix = "", limit?: number, cursor?: 
 
 export async function getById(db, key) {
   return db.get(key, { type: "json" });
+}
+
+export async function deleteById(db, key) {
+  console.log("deleting kv " + key);
+  return db.delete(key);
 }
 
 export function getAsset(db, key) {
@@ -41,10 +55,16 @@ export function putData(db, site, contentType, value, key = undefined) {
   return db.put(generatedKey, JSON.stringify(value));
 }
 
-export function putDataWithMetaData(db, site, contentType, value, key = undefined) {
+export function putDataWithMetaData(
+  db,
+  site,
+  contentType,
+  value,
+  key = undefined
+) {
   const generatedKey = getKey(site, contentType, key);
   console.log("generatedKey", generatedKey);
-  return db.put(generatedKey, JSON.stringify(value),{
+  return db.put(generatedKey, JSON.stringify(value), {
     metadata: { value },
   });
 }
@@ -64,14 +84,19 @@ export function saveContent(db, content, timestamp, id) {
 
   // const contentType = content.data.systemId;
   const generatedKey = getKey(timestamp, content.data.table, id);
-  const metadata = {id, table: content.data.table, created_on: timestamp, updated_on: timestamp}
+  const metadata = {
+    id,
+    table: content.data.table,
+    created_on: timestamp,
+    updated_on: timestamp,
+  };
 
-  console.log('metadata ==>', metadata);
+  console.log("metadata ==>", metadata);
 
   // const size = JSON.stringify(content).length;
 
   // console.log("size", size);
-  
+
   return db.put(generatedKey, JSON.stringify(content), {
     metadata,
   });
@@ -83,17 +108,20 @@ export function extractContentType(contentTypeComponents) {
 }
 
 export async function getContentType(db, contentTypeSystemId) {
-  const contentType = await db.get(`site1::content-type::${contentTypeSystemId}`, { type: "json" });
+  const contentType = await db.get(
+    `site1::content-type::${contentTypeSystemId}`,
+    { type: "json" }
+  );
   return contentType;
 }
 
 export async function getContentTypes(db) {
-  const contentTypeKeys = await db.list({prefix:'site1::content-type::'});
-  console.log('contentTypeKeys', contentTypeKeys)
+  const contentTypeKeys = await db.list({ prefix: "site1::content-type::" });
+  console.log("contentTypeKeys", contentTypeKeys);
   var contentTypes = [];
   for await (const key of contentTypeKeys.keys) {
     const record = await getById(db, key.name);
-    const contentType = {key: key.name, components: record}
+    const contentType = { key: key.name, components: record };
     contentTypes.push(contentType);
   }
   return contentTypes;
