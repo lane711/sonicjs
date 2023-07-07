@@ -23,6 +23,11 @@ import { v4 as uuidv4 } from "uuid";
 
 const content = new Hono<{ Bindings: Bindings }>();
 
+content.get("/ping", (c) => {
+  console.log("testing ping", Date());
+  return c.text(Date());
+});
+
 content.get("/", async (ctx) => {
   console.log("getting main content");
 
@@ -142,12 +147,12 @@ content.put("/", async (ctx) => {
   const content = await ctx.req.json();
 
   const timestamp = new Date().getTime();
-  const result = await saveContent(
-    ctx.env.KVDATA,
-    content,
-    timestamp,
-    content.id
-  );
+  // const result = await saveContent(
+  //   ctx.env.KVDATA,
+  //   content,
+  //   timestamp,
+  //   content.id
+  // );
 
   try {
     const result = await saveContent(

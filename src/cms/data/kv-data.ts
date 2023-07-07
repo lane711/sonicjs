@@ -77,16 +77,16 @@ export function saveContentType(db, site, contentTypeComponents) {
 }
 
 export function saveContent(db, content, timestamp, id) {
-  console.log("content--->", content.data.systemId);
-  delete content.metadata;
-  delete content.data.contentType;
-  delete content.data.submit;
+  console.log("saveContent--->", JSON.stringify(content, null, 2));
+  // delete content.metadata;
+  delete content.contentType;
+  delete content.submit;
 
   // const contentType = content.data.systemId;
-  const generatedKey = getKey(timestamp, content.data.table, id);
+  // const generatedKey = getKey(timestamp, content.data.table, id);
   const metadata = {
     id,
-    table: content.data.table,
+    table: content.table,
     created_on: timestamp,
     updated_on: timestamp,
   };
@@ -97,7 +97,7 @@ export function saveContent(db, content, timestamp, id) {
 
   // console.log("size", size);
 
-  return db.put(generatedKey, JSON.stringify(content), {
+  return db.put(id, JSON.stringify(content), {
     metadata,
   });
 }

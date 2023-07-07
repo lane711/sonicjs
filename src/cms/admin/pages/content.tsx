@@ -22,13 +22,13 @@ export async function loadAdminTable(ctx) {
 
   content.keys.reverse();
 
-  // console.log('content==>', content.keys)
+  console.log('content==>', JSON.stringify(content, null, 2))
 
   // console.log("load admin data", content);
 
   const contentList = content.keys.map((item) => {
-    const id = item.name.split("::").pop();
-    const table = item.name.split("::")[1];
+    const id = item.metadata.id;
+    const table = item.metadata.table;
     // const table = item.name.split('::')[1];
     // console.log("item-->", JSON.stringify(item, null, 2));
 

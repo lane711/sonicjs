@@ -86,7 +86,7 @@ function editContent() {
     Formio.createForm(document.getElementById("formio"), {
       components: response.data.contentType,
     }).then(function (form) {
-      form.on("submit", function (data) {
+      form.on("submit", function ({data}) {
         if (data.id) {
           updateContent(data);
         } else {
