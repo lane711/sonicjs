@@ -123,7 +123,6 @@ function addContent(data) {
 }
 
 function updateContent(data) {
-  data.key = window.location.href.split("/").pop();
 
   axios.put("/v1/content", data).then((response) => {
     console.log(response.data);
@@ -131,8 +130,10 @@ function updateContent(data) {
     console.log(response.statusText);
     console.log(response.headers);
     console.log(response.config);
-    if (response.status === 201 || response.status === 204) {
+    if (response.status === 200) {
       location.href = "/admin";
+    } else{
+      alert('Error occured updating ' + data.id)
     }
   });
 }

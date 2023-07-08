@@ -10,7 +10,6 @@ interface link {
 }
 
 export async function loadApis(ctx) {
-
   const tables = apiConfig;
 
   let tableApis: link[] = [];
@@ -30,14 +29,18 @@ export async function loadApis(ctx) {
 
   let recordApis: link[] = [];
 
-  await Promise.all(tables.map(async (scehma) => {
-    const data = await getByTable(ctx.env.D1DATA, scehma.table, 1);
-    let link: link = {
+  await Promise.all(
+    tables.map(async (scehma) => {
+      const data = await getByTable(ctx.env.D1DATA, scehma.table, 1);
+      if (data.length) {
+        let link: link = {
           url: `/v1/${scehma.route}/${data[0].id}`,
           description: `get single record from the ${scehma.table} table`,
         };
         recordApis.push(link);
-  }));
+      }
+    })
+  );
 
   return (
     <Top tableApis={tableApis} recordApis={recordApis} screenTitle="APIs" />

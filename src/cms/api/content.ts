@@ -123,7 +123,7 @@ content.post("/", async (ctx) => {
   content.data.id = id;
 
   try {
-    const result = await saveContent(ctx.env.KVDATA, content, timestamp, id);
+    const result = await saveContent(ctx.env.KVDATA, content.data, timestamp, id);
     return ctx.text("", 201);
   } catch (error) {
     console.log("error posting content", error);
@@ -170,8 +170,8 @@ content.put("/", async (ctx) => {
     try {
       const result = updateData(
         ctx.env.D1DATA,
-        content.data.table,
-        content.data
+        content.table,
+        content
       );
     } catch (error) {
       console.log("error posting content", error);

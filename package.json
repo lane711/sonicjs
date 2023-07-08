@@ -22,7 +22,7 @@
     "esbuild": "^0.17.18",
     "npm-run-all": "^4.1.5",
     "typescript": "^5.0.4",
-    "wrangler": "^3.0.1"
+    "wrangler": "^3.1.2"
   },
   "dependencies": {
     "@types/jest": "^29.5.1",
