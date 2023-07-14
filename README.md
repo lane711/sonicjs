@@ -32,25 +32,40 @@ cd sonicjs
 npm install
 ```
 
-Update the account id and KV namespace in your wrangler.toml file:
-```
+Rename `/wrangler.example.toml` to `/wrangler.toml` and update the 4 required Cloudfalre values:
+
+```text copy
+compatibility_date = "2023-05-18"
+name = "sonicjs"
+workers_dev = true
+main = "src/server.ts"
+
 # Enter your account id
-# This can be found at https://dash.cloudflare.com/ --> Workers & Pages --> Overview, then in the right sidebar
-account_id = "xxx"
+# This can be found at https://dash.cloudflare.com/ --> Workers & Pages
+# --> Overview, then in the right sidebar
+account_id = "?????"
 
 # Run the `wrangler kv:namespace create sonicjs` command and copy the id below
 # Run the `wrangler kv:namespace create sonicjs --preview` command and copy the preview_id below
 # Only update the preview_id and id, leave the binding name as "KVDATA"
 kv_namespaces = [
-  { binding = "KVDATA", preview_id="xxx", id = "xxx" }
+  { binding = "KVDATA", preview_id="?????", id = "?????" }
 ]
-```
 
+# Run the `wrangler d1 create sonicjs` command and copy the id below
+[[d1_databases]]
+binding = "D1DATA"
+database_name = "sonicjs"
+database_id = "?????"
+```
+Now you're ready to fire up SonicJs!
 ```
 npm run dev
 ```
 Run the admin interface at:
 [http://localhost:8788](http://localhost:8788)
+
+Check out https://sonicjs.com for next steps.
 
 # Legacy
 The legacy version of SonicJs (a Node.js based web content management system) can be found here:
