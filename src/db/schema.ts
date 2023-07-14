@@ -1,12 +1,10 @@
 import {
   sqliteTable,
   text,
-  integer,
-  SQLiteTimestamp,
-  uniqueIndex,
+  integer
 } from "drizzle-orm/sqlite-core";
 
-import { relations, sql } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 
 export const auditSchema = {
   created_on: integer('created_on'),
@@ -18,9 +16,7 @@ export const userSchema = {
   name: text("name"),
   email: text("email"),
   password: text("password"),
-  role: text("role").$type<"admin" | "user">(),
-  created_on: integer('created_on'),
-  updated_on: integer('updated_on')
+  role: text("role").$type<"admin" | "user">()
 }
 
 export const users = sqliteTable("users", {...userSchema, ...auditSchema});
