@@ -66,10 +66,10 @@ const main = async () => {
     process.chdir(projectPath);
     execSync('npm install')
     console.log(`${infoColor}npm install successfully completed!${resetColor}`);
-    cloudflareAccountId = cloudflareAccountId ?? await getParameter(settings.ACCOUNT_ID, cloudflareAccountId);
-    cloudflareKvNamespaceId = cloudflareKvNamespaceId ?? await getParameter(settings.KV_NAMESPACE_ID, cloudflareKvNamespaceId);
-    cloudflareKvNamespacePreviewId = cloudflareKvNamespacePreviewId ?? await getParameter(settings.KV_NAMESPACE_PREVIEW_ID, cloudflareKvNamespacePreviewId);
-    cloudflareDatabaseId = cloudflareDatabaseId ?? await getParameter(settings.DATABASE_ID, cloudflareDatabaseId);
+    cloudflareAccountId = cloudflareAccountId ?? await getParameter(settings.ACCOUNT_ID);
+    cloudflareKvNamespaceId = cloudflareKvNamespaceId ?? await getParameter(settings.KV_NAMESPACE_ID);
+    cloudflareKvNamespacePreviewId = cloudflareKvNamespacePreviewId ?? await getParameter(settings.KV_NAMESPACE_PREVIEW_ID);
+    cloudflareDatabaseId = cloudflareDatabaseId ?? await getParameter(settings.DATABASE_ID);
     console.log(`parameters complete. start writing config...`);
     process.stdin.unref();
     let configFile;
