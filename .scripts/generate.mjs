@@ -59,7 +59,7 @@ const getConfigFile = async () => {
 }
 
 const main = async () => {
-    console.log('cloning SonicJS ...');
+    console.log('cloning SonicJS...');
     execSync(checkoutCmd);
     console.log(`${infoColor}SonicJS successfully cloned!${resetColor}`);
     console.log('executing npm install...');
@@ -70,7 +70,7 @@ const main = async () => {
     cloudflareKvNamespaceId = cloudflareKvNamespaceId ?? await getParameter(settings.KV_NAMESPACE_ID, cloudflareKvNamespaceId);
     cloudflareKvNamespacePreviewId = cloudflareKvNamespacePreviewId ?? await getParameter(settings.KV_NAMESPACE_PREVIEW_ID, cloudflareKvNamespacePreviewId);
     cloudflareDatabaseId = cloudflareDatabaseId ?? await getParameter(settings.DATABASE_ID, cloudflareDatabaseId);
-    console.log(`parameters complete. start writing config ...`);
+    console.log(`parameters complete. start writing config...`);
     process.stdin.unref();
     let configFile;
     try {
@@ -80,7 +80,7 @@ const main = async () => {
         process.exit(1);
     }
     try{
-        await writeFile(join(projectPath, `wrangler.test.toml`), configFile);
+        await writeFile(join(projectPath, `wrangler.toml`), configFile);
     } catch(err) {
         console.error(`${errorColor}could not write config file! This might be a permissions issue. aborting!${resetColor}`, err);
         process.exit(1);
@@ -89,11 +89,11 @@ const main = async () => {
         const delSampleConfig = rm(join(projectPath, 'wrangler.example.toml'));
         const delScripts = rm(join(projectPath, '.scripts'), {recursive: true});
         const delGit = rm(join(projectPath, '.git'), {recursive: true});
-        Promise.all([delSampleConfig, delScripts, delGit]);
+        Promise.allSettled([delSampleConfig, delScripts, delGit]);
     } catch(err) {
         console.warn('Could not cleanup properly! Please manually delete the wrangler example file and the .scripts directory');
     }
-    console.log(`SonicJS is setup successfully 🚀 To get started: ${infoColor}cd sonicjs${resetColor}, ${infoColor}npm install${resetColor} & ${infoColor}npm run dev${resetColor}`);
+    console.log(`SonicJS is setup successfully 🚀 To get started: ${infoColor}cd ${projectName}${resetColor}, ${infoColor}npm install${resetColor} & ${infoColor}npm run dev${resetColor}`);
 };
 
 main();
