@@ -19,4 +19,4 @@ kv_namespaces = [
 [[d1_databases]]
 binding = "D1DATA"
 database_name = "sonicjs"
-database_id = ${DATABASE_ID}"
+database_id = "${DATABASE_ID}"
