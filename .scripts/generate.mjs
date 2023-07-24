@@ -43,7 +43,7 @@ const checkoutCmd = `git clone https://github.com/lane711/SonicJS ${projectName}
 
 const getParameter = async (setting) => {
     const readSetting = createInterface({ input, output, terminal: false });
-    console.log(`please enter your ${setting.label}.${setting.howToGenerate ? ` ${setting.howToGenerate}` : ''}`);
+    console.log(`Please enter your ${setting.label}.${setting.howToGenerate ? ` ${setting.howToGenerate}` : ''}`);
     const settingValue = await readSetting.question(`${interactiveColor}${setting.label}: ${resetColor}`);
     return settingValue;
 }
@@ -93,7 +93,7 @@ const main = async () => {
     } catch(err) {
         console.warn('Could not cleanup properly! Please manually delete the wrangler example file and the .scripts directory');
     }
-    console.log(`SonicJS is setup successfully 🚀 To get started: ${infoColor}cd ${projectName}${resetColor}, ${infoColor}npm install${resetColor} & ${infoColor}npm run dev${resetColor}`);
+    console.log(`SonicJS is setup successfully 🚀 To get started: ${infoColor}cd ${projectName}${resetColor} && ${infoColor}npm run dev${resetColor}`);
 };
 
 main();
