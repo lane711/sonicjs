@@ -6,17 +6,17 @@ main = "src/server.ts"
 # Enter your account id
 # This can be found at https://dash.cloudflare.com/ --> Workers & Pages
 #  --> Overview, then in the right sidebar
-account_id = "?????"
+account_id = "${ACCOUNT_ID}"
 
 # Run the `wrangler kv:namespace create sonicjs` command and copy the id below
 # Run the `wrangler kv:namespace create sonicjs --preview` command and copy the preview_id below
 # Only update the preview_id and id, leave the binding name as "KVDATA"
 kv_namespaces = [
-  { binding = "KVDATA", preview_id="?????", id = "?????" }
+  { binding = "KVDATA", preview_id="${KV_NAMESPACE_PREVIEW_ID}", id = "${KV_NAMESPACE_ID}" }
 ]
 
 # Run the `wrangler d1 create sonicjs` command and copy the id below
 [[d1_databases]]
 binding = "D1DATA"
 database_name = "sonicjs"
-database_id = "?????"
+database_id = "${DATABASE_ID}"
