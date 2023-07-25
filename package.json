@@ -3,9 +3,6 @@
   "version": "0.0.2",
   "description": "Headless CMS based on Cloudflare Workers",
   "main": "src/server.ts",
-  "bin": {
-    "generate": "./.scripts/generate.mjs"
-  },
   "scripts": {
     "dev": "run-p dev:*",
     "dev:wrangler": "wrangler pages dev dist --live-reload",
