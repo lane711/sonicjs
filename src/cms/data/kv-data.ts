@@ -77,7 +77,7 @@ export function saveContentType(db, site, contentTypeComponents) {
 }
 
 export function saveContent(db, content, timestamp, id) {
-  console.log("saveContent--->", JSON.stringify(content, null, 2));
+  console.log("inserting KV data", JSON.stringify(content, null, 2));
   // delete content.metadata;
   delete content.contentType;
   delete content.submit;

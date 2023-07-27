@@ -64,7 +64,7 @@ export async function getByTableAndId(db, table, id) {
 export async function insertData(d1, table, data) {
   const db = drizzle(d1);
 
-  console.log("inserting data", data);
+  console.log("inserting D1 data", data);
 
   const now = new Date().getTime();
   data.created_on = now;

@@ -94,7 +94,7 @@ export async function loadTableData(ctx, table) {
 }
 
 function getDisplayField(item) {
-  return item.name ?? item.title;
+  return item.name ?? item.title ?? item.firstName ?? item.id;
 }
 
 export async function loadAdmin(ctx) {
