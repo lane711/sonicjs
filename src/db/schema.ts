@@ -2,7 +2,8 @@ import {
   sqliteTable,
   text,
   integer,
-  blob
+  blob,
+  index,
 } from "drizzle-orm/sqlite-core";
 
 import { relations } from "drizzle-orm";
@@ -10,23 +11,24 @@ import { relations } from "drizzle-orm";
 // we want to add the below audit fields to all our tables, so we'll define it here
 // and append it to the rest of the schema for each table
 export const auditSchema = {
-  created_on: integer('created_on'),
-  updated_on: integer('updated_on')
-}
+  created_on: integer("created_on"),
+  updated_on: integer("updated_on"),
+};
 
 /*
-  **** TABLES ****
-*/
+ **** TABLES ****
+ */
 
 // users
 export const userSchema = {
   id: text("id").primaryKey(),
-  name: text("name"),
+  firstName: text("firstName"),
+  lastName: text("lastName"),
   email: text("email"),
   password: text("password"),
   role: text("role").$type<"admin" | "user">(),
-}
-export const user = sqliteTable("users", {...userSchema, ...auditSchema});
+};
+export const user = sqliteTable("users", { ...userSchema, ...auditSchema });
 
 // posts
 export const postSchema = {
@@ -34,35 +36,46 @@ export const postSchema = {
   title: text("title"),
   body: text("body"),
   userId: text("user_id"),
-}
-export const post = sqliteTable("posts", {...postSchema, ...auditSchema});
+};
+export const post = sqliteTable("posts", { ...postSchema, ...auditSchema });
 
 // categories
 export const categorySchema = {
   id: text("id").primaryKey(),
   title: text("title"),
   body: text("body"),
-}
-export const category = sqliteTable("categories", {...categorySchema, ...auditSchema});
+};
+export const category = sqliteTable("categories", {
+  ...categorySchema,
+  ...auditSchema,
+});
 
 // comments
 export const commentSchema = {
   id: text("id").primaryKey(),
   body: text("body"),
   userId: text("user_id"),
-	postId: integer('post_id'),
-}
-export const comment = sqliteTable("comments", {...commentSchema, ...auditSchema});
-
+  postId: integer("post_id"),
+};
+export const comment = sqliteTable(
+  "comments",
+  { ...commentSchema, ...auditSchema },
+  (table) => {
+    return {
+      userIdx: index("user_idx").on(user.id),
+      postIdx: index("post_idx").on(post.id),
+    };
+  }
+);
 
 /*
-  **** TABLES RELATIONSHIPS ****
-*/
+ **** TABLES RELATIONSHIPS ****
+ */
 
 // users can have many posts and many comments
 export const usersRelations = relations(user, ({ many }) => ({
   posts: many(post),
-  comments: many(comment)
+  comments: many(comment),
 }));
 
 // posts can have one author (user), many categories, many comments
@@ -72,7 +85,7 @@ export const postsRelations = relations(post, ({ one, many }) => ({
     references: [user.id],
   }),
   categories: many(category),
-  comments: many(comment)
+  comments: many(comment),
 }));
 
 // categories can have many posts
@@ -97,7 +110,11 @@ export interface ApiConfig {
   route: string;
 }
 
+//create an entry for each table
 export const apiConfig: ApiConfig[] = [
   { table: "users", route: "users" },
   { table: "posts", route: "posts" },
+  { table: "categories", route: "categories" },
+  { table: "comments", route: "comments" },
+
 ];

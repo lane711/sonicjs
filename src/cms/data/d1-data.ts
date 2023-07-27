@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/d1";
 import { v4 as uuidv4 } from "uuid";
-import { posts, postsSchema, userSchema, users } from "../../db/schema";
+import { post, postSchema, userSchema, user } from "../../db/schema";
 import { DefaultLogger, LogWriter, eq } from "drizzle-orm";
 
 export async function getAllContent(db) {

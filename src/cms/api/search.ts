@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { Bindings } from "../types/bindings";
 import { drizzle } from "drizzle-orm/d1";
-import { users, posts } from "../../db/schema";
+import { user, post } from "../../db/schema";
 
 export interface Env {
   D1DATA: D1Database;
