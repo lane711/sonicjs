@@ -73,7 +73,7 @@ export async function getByTableAndId(db, table, id) {
 export async function insertData(d1, table, data) {
   const db = drizzle(d1);
 
-  console.log("inserting D1 data", data);
+  // console.log("inserting D1 data", table, data);
 
   const now = new Date().getTime();
   data.created_on = now;
@@ -87,6 +87,7 @@ export async function insertData(d1, table, data) {
   const schmea = getRepoFromTable(table);
 
   let result = await db.insert(schmea).values(data).run();
+  console.log("===> inserting D1 data result", table, result);
 
   return result;
 }
@@ -133,7 +134,7 @@ export async function updateData(d1, table, data) {
 }
 
 export function getSchemaFromTable(tableName) {
-  console.log("getting schema", tableName);
+  // console.log("getting schema", tableName);
   switch (tableName) {
     case "users":
       return userSchema;
@@ -151,7 +152,7 @@ export function getSchemaFromTable(tableName) {
 }
 
 export function getRepoFromTable(tableName) {
-  console.log("getting schema", tableName);
+  // console.log("getting schema", tableName);
   switch (tableName) {
     case "users":
       return user;

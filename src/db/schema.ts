@@ -31,11 +31,14 @@ export const userSchema = {
 export const user = sqliteTable("users", { ...userSchema, ...auditSchema });
 
 // posts
+type PostCategories = [{ category: string; }];
+
 export const postSchema = {
   id: text("id").primaryKey(),
   title: text("title"),
   body: text("body"),
   userId: text("user_id"),
+  categoryId: text("category_id"),
 };
 export const post = sqliteTable("posts", { ...postSchema, ...auditSchema });
 
@@ -84,7 +87,10 @@ export const postsRelations = relations(post, ({ one, many }) => ({
     fields: [post.userId],
     references: [user.id],
   }),
-  categories: many(category),
+  category: one(category, {
+    fields: [post.categoryId],
+    references: [category.id],
+  }),
   comments: many(comment),
 }));
 
