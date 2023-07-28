@@ -78,11 +78,11 @@ export async function insertData(d1, table, data) {
   const now = new Date().getTime();
   data.created_on = now;
   data.updated_on = now;
-  delete data.contentType;
+  // delete data.contentType;
   // delete data.submit;
   delete data.table;
 
-  console.log(JSON.stringify(data, null, 4));
+  console.log('D1==>', JSON.stringify(data, null, 4));
 
   const schmea = getRepoFromTable(table);
 
