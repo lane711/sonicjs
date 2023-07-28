@@ -80,7 +80,7 @@ export function saveContent(db, content, timestamp, id) {
   console.log("inserting KV data", JSON.stringify(content, null, 2));
   // delete content.metadata;
   delete content.contentType;
-  delete content.submit;
+  // delete content.submit;
 
   // const contentType = content.data.systemId;
   // const generatedKey = getKey(timestamp, content.data.table, id);

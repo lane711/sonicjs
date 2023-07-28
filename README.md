@@ -27,8 +27,10 @@ npm install -g wrangler
 
 # Getting Started
 ```
-npm exec github:lane711/sonicjs
+npc create-sonicjs-app
 ```
+
+Follow the installation script prompts to enter the required Cloudflare values.
 
 Now you're ready to fire up SonicJs!
 

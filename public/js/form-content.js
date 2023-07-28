@@ -62,6 +62,8 @@ function newContent() {
 }
 
 function saveNewContent(data) {
+  delete data.data.submit;
+  delete data.data.id;
   console.log(data);
 
   axios.post("/v1/content", data).then((response) => {
@@ -123,6 +125,7 @@ function addContent(data) {
 }
 
 function updateContent(data) {
+  delete data.submit;
 
   axios.put("/v1/content", data).then((response) => {
     console.log(response.data);
@@ -131,7 +134,7 @@ function updateContent(data) {
     console.log(response.headers);
     console.log(response.config);
     if (response.status === 200) {
-      location.href = "/admin";
+      location.href = `/admin/tables/${data.table}`;
     } else{
       alert('Error occured updating ' + data.id)
     }

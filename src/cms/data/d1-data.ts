@@ -1,6 +1,15 @@
 import { drizzle } from "drizzle-orm/d1";
 import { v4 as uuidv4 } from "uuid";
-import { post, postSchema, userSchema, user } from "../../db/schema";
+import {
+  post,
+  postSchema,
+  userSchema,
+  user,
+  categorySchema,
+  commentSchema,
+  category,
+  comment,
+} from "../../db/schema";
 import { DefaultLogger, LogWriter, eq } from "drizzle-orm";
 
 export async function getAllContent(db) {
@@ -15,10 +24,10 @@ export async function getByTable(db, table, params) {
   // console.log("db ==>", db);
   console.log("params ==>", JSON.stringify(params, null, 2));
 
-  var whereClause = '';
-  var sortBySyntax = '';
-  var limitSyntax = '';
-  var offsetSyntax = '';
+  var whereClause = "";
+  var sortBySyntax = "";
+  var limitSyntax = "";
+  var offsetSyntax = "";
 
   if (params) {
     const sortDirection = params.sortDirection ?? "asc";
@@ -70,7 +79,7 @@ export async function insertData(d1, table, data) {
   data.created_on = now;
   data.updated_on = now;
   delete data.contentType;
-  delete data.submit;
+  // delete data.submit;
   delete data.table;
 
   console.log(JSON.stringify(data, null, 4));
@@ -83,14 +92,12 @@ export async function insertData(d1, table, data) {
 }
 
 export async function deleteByTableAndId(d1, table, id) {
-  console.log('deleteByTableAndId', table, id);
+  console.log("deleteByTableAndId", table, id);
   const db = drizzle(d1);
-
 
   const schmea = getRepoFromTable(table);
   let sql = await db.delete(schmea).where(eq(schmea.id, id)).toSQL();
-  console.log('deleteByTableAndId sql', sql);
-
+  console.log("deleteByTableAndId sql", sql);
 
   let result = await db.delete(schmea).where(eq(schmea.id, id)).run();
 
@@ -100,21 +107,23 @@ export async function deleteByTableAndId(d1, table, id) {
 export async function updateData(d1, table, data) {
   const db = drizzle(d1);
 
-  console.log(JSON.stringify(data, null, 4));
+  console.log('updateData===>', JSON.stringify(data, null, 4));
+
+  const repo = getRepoFromTable(data.table);
 
   // data.created_at = new Date();
   // data.updated_at = new Date().getTime();
   // delete data.id;
-  delete data.contentType;
-  delete data.submit;
+  // delete data.contentType;
+  // delete data.submit;
   delete data.table;
 
   console.log(JSON.stringify(data, null, 4));
 
   let result = await db
-    .update(users)
+    .update(repo)
     .set(data)
-    .where(eq(users.id, data.id))
+    .where(eq(repo.id, data.id))
     // .returning({ updated: users.updatedAt })
     .values();
 
@@ -125,12 +134,38 @@ export async function updateData(d1, table, data) {
 
 export function getSchemaFromTable(tableName) {
   console.log("getting schema", tableName);
-  return tableName == "users" ? userSchema : postsSchema;
+  switch (tableName) {
+    case "users":
+      return userSchema;
+      break;
+    case "posts":
+      return postSchema;
+      break;
+    case "categories":
+      return categorySchema;
+      break;
+    case "comments":
+      return commentSchema;
+      break;
+  }
 }
 
 export function getRepoFromTable(tableName) {
   console.log("getting schema", tableName);
-  return tableName == "users" ? users : posts;
+  switch (tableName) {
+    case "users":
+      return user;
+      break;
+    case "posts":
+      return post;
+      break;
+    case "categories":
+      return category;
+      break;
+    case "comments":
+      return comment;
+      break;
+  }
 }
 
 export function whereClauseBuilder(params) {

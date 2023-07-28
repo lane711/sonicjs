@@ -28,6 +28,11 @@ content.get("/ping", (c) => {
   return c.text(Date());
 });
 
+content.post("/ping", (c) => {
+  const id = uuidv4();
+  return c.json(id, 201);
+});
+
 content.get("/", async (ctx) => {
   console.log("getting main content");
 
@@ -118,13 +123,17 @@ content.get("/contents-with-meta/:contype-type", async (ctx) => {
 content.post("/", async (ctx) => {
   const content = await ctx.req.json();
 
+  console.log('post new', content)
+
   const id = uuidv4();
   const timestamp = new Date().getTime();
   content.data.id = id;
 
+
   try {
     const result = await saveContent(ctx.env.KVDATA, content.data, timestamp, id);
-    return ctx.text("", 201);
+    // console.log('result KV', result);
+    return ctx.json(id, 201);
   } catch (error) {
     console.log("error posting content", error);
     return ctx.text(error, 500);
@@ -161,7 +170,7 @@ content.put("/", async (ctx) => {
       timestamp,
       content.id
     );
-    return ctx.text("", 200);
+    return ctx.text(content.id, 200);
   } catch (error) {
     console.log("error posting content", error);
     return ctx.text(error, 500);

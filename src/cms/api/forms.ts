@@ -1,4 +1,3 @@
-import { userSchema, postsSchema } from "../../db/schema";
 import { getSchemaFromTable } from "../data/d1-data";
 
 export function getForm(ctx, table) {
