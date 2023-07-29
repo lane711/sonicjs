@@ -1,4 +1,4 @@
-import { drizzle } from "drizzle-orm/d1";
+import { DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { v4 as uuidv4 } from "uuid";
 import {
   post,
@@ -70,6 +70,12 @@ export async function getByTableAndId(db, table, id) {
 //   }
 // }
 
+export async function insertUserTest(d1, data) {
+  const db = drizzle(d1);
+
+  return db.insert(user).values(data).returning().get();
+}
+
 export async function insertData(d1, table, data) {
   const db = drizzle(d1);
 
@@ -82,13 +88,11 @@ export async function insertData(d1, table, data) {
   // delete data.submit;
   delete data.table;
 
-  console.log('D1==>', JSON.stringify(data, null, 4));
+  console.log("D1==>", JSON.stringify(data, null, 4));
 
   const schmea = getRepoFromTable(table);
 
-  let result = await db.insert(schmea).values(data).run();
-  console.log("===> inserting D1 data result", table, result);
-
+  let result = db.insert(schmea).values(data).returning().get();
   return result;
 }
 
@@ -108,7 +112,7 @@ export async function deleteByTableAndId(d1, table, id) {
 export async function updateData(d1, table, data) {
   const db = drizzle(d1);
 
-  console.log('updateData===>', JSON.stringify(data, null, 4));
+  console.log("updateData===>", JSON.stringify(data, null, 4));
 
   const repo = getRepoFromTable(data.table);
 
