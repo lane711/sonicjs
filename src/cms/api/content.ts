@@ -29,6 +29,11 @@ content.get("/ping", (c) => {
   return c.text(Date());
 });
 
+content.get("/kvtest", (c) => {
+  console.log("testing ping", Date());
+  return c.text(Date());
+});
+
 content.get("/test", async (ctx) => {
   const data = {
     firstName: "Rosalyn",
