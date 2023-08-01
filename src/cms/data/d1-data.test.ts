@@ -1,4 +1,4 @@
-import { whereClauseBuilder } from "./d1-data";
+import { generateSelectSql, whereClauseBuilder } from "./d1-data";
 import qs from "qs";
 
 it("should not return a where clause", () => {
@@ -19,5 +19,12 @@ it("should return a where clause with multi in", () => {
   const params = qs.parse(queryParams);
   const clause = whereClauseBuilder(params);
   expect(clause).toBe("");
+});
+
+it("should return a SQL select", () => {
+  const queryParams = 'someurl?limit=2'
+  const params = qs.parse(queryParams);
+  const clause = generateSelectSql('my-table', params);
+  expect(clause).toBe("SELECT * FROM my-table limit 2'");
 });
 

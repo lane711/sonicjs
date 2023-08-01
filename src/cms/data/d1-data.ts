@@ -22,35 +22,42 @@ export async function getByTable(db, table, params) {
 
   // return results;
   // console.log("db ==>", db);
-  console.log("params ==>", JSON.stringify(params, null, 2));
-
-  var whereClause = "";
-  var sortBySyntax = "";
-  var limitSyntax = "";
-  var offsetSyntax = "";
-
-  if (params) {
-    const sortDirection = params.sortDirection ?? "asc";
-    console.log("sortDirection ==>", sortDirection);
-
-    const sortBySyntax = params.sortBy
-      ? `order by ${params.sortBy} ${sortDirection}`
-      : "";
-
-    const limitSyntax = params.limit > 0 ? `limit ${params.limit}` : "";
-    const offsetSyntax = params.offset > 0 ? `offset ${params.offset}` : "";
-    const whereClause = whereClauseBuilder(params);
-  }
-
-  const sql = `SELECT * FROM ${table} ${whereClause} ${sortBySyntax} ${limitSyntax} ${offsetSyntax};`;
-
-  console.log("sql ==>", sql);
+  const sql = generateSelectSql(table, params);
 
   const { results } = await db.prepare(sql).all();
 
   console.log("sql results ==>", results);
 
   return results;
+}
+
+export function generateSelectSql(table, params) {
+  console.log("params ==>", JSON.stringify(params, null, 2));
+
+  var whereClause = "";
+  var sortBySyntax = "";
+  var limitSyntax: string = "";
+  var offsetSyntax = "";
+
+  if (params) {
+    const sortDirection = params.sortDirection ?? "asc";
+    console.log("sortDirection ==>", sortDirection);
+
+    sortBySyntax = params.sortBy
+      ? `order by ${params.sortBy} ${sortDirection}`
+      : "";
+
+    limitSyntax = params.limit > 0 ? `limit ${params.limit}` : "";
+    console.log("limitSyntax ==>", limitSyntax);
+
+    offsetSyntax = params.offset > 0 ? `offset ${params.offset}` : "";
+    whereClause = whereClauseBuilder(params);
+  }
+
+  const sql = `SELECT * FROM ${table} ${whereClause} ${sortBySyntax} ${limitSyntax} ${offsetSyntax};`;
+
+  console.log("sql ==>", sql);
+  return sql;
 }
 
 export async function getByTableAndId(db, table, id) {

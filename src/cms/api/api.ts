@@ -14,7 +14,6 @@ import { getByTable, getByTableAndId } from "../data/d1-data";
 import { getForm } from "./forms";
 import qs from "qs";
 
-
 const api = new Hono<{ Bindings: Bindings }>();
 
 apiConfig.forEach((entry) => {
@@ -49,6 +48,11 @@ apiConfig.forEach((entry) => {
 api.get("/ping", (c) => {
   console.log("testing ping", Date());
   return c.text(Date());
+});
+
+api.get("/kvtest", async (ctx) => {
+  const data = await getByTable(ctx.env.D1DATA, "categories", {limit:2});
+  return ctx.json(data);
 });
 
 api.get("/data", async (c) => {
