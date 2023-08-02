@@ -1,4 +1,14 @@
-import { add, getKey } from "./data";
+import { add, getKey,getDataListByPrefix } from "./kv-data";
+
+const env = getMiniflareBindings()
+
+it("getDataListByPrefix should return data", async () => {
+  const data = await getDataListByPrefix(env.KVDATA, "", 2);
+  console.log('getDataListByPrefix==>', data);
+  // expect(key.startsWith("site::module")).toBe(true);
+  // expect(key.length).toBe(40);
+
+});
 
 it("should generate a key", () => {
   const key = getKey("site", "module");

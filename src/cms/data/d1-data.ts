@@ -54,8 +54,9 @@ export function generateSelectSql(table, params) {
     whereClause = whereClauseBuilder(params);
   }
 
-  const sql = `SELECT * FROM ${table} ${whereClause} ${sortBySyntax} ${limitSyntax} ${offsetSyntax};`;
-
+  let sql = `SELECT * FROM ${table} ${whereClause} ${sortBySyntax} ${limitSyntax} ${offsetSyntax};`;
+  sql = sql.replace(/\s+/g, ' ').trim();
+  
   console.log("sql ==>", sql);
   return sql;
 }

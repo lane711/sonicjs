@@ -29,9 +29,9 @@ content.get("/ping", (c) => {
   return c.text(Date());
 });
 
-content.get("/kvtest", (c) => {
-  console.log("testing ping", Date());
-  return c.text(Date());
+content.get("/kvtest", async (ctx) => {
+  const result = await getDataListByPrefix(ctx.env.KVDATA, "", 2);
+  return ctx.json(result);
 });
 
 content.get("/test", async (ctx) => {
@@ -96,8 +96,7 @@ content.get("/", async (ctx) => {
     return ctx.json(content);
   }
 
-  return ctx.json(content);
-});
+  ctx.json(content);});
 
 content.get("/:contentId", async (ctx) => {
   const id = ctx.req.param("contentId");

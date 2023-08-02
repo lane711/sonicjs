@@ -24,6 +24,7 @@ it("should return a where clause with multi in", () => {
 it("should return a SQL select", () => {
   const queryParams = 'someurl?limit=2'
   const params = qs.parse(queryParams);
+  console.log('params ---->', params)
   const clause = generateSelectSql('my-table', params);
   expect(clause).toBe("SELECT * FROM my-table limit 2'");
 });
