@@ -1,1 +1,0 @@
-ALTER TABLE `posts` RENAME COLUMN `categoryId` TO `category_id`;

@@ -5,30 +5,9 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1690413258546,
-      "tag": "0000_wealthy_eternals",
-      "breakpoints": false
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1690414514878,
-      "tag": "0001_wonderful_monster_badoon",
-      "breakpoints": false
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1690583140052,
-      "tag": "0002_handy_mac_gargan",
-      "breakpoints": false
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1690584569264,
-      "tag": "0003_classy_patriot",
-      "breakpoints": false
+      "when": 1691102282940,
+      "tag": "0000_big_jane_foster",
+      "breakpoints": true
     }
   ]
 }

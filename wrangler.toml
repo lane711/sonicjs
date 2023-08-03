@@ -18,3 +18,8 @@ kv_namespaces = [
 binding = "D1DATA"
 database_name = "sonicjs"
 database_id = "30baa933-ceb6-41ac-95a4-ce8b08cd2f41"
+
+[[d1_databases]]
+binding = "__D1_BETA__D1DATA"
+database_name = "sonicjs"
+database_id = "30baa933-ceb6-41ac-95a4-ce8b08cd2f41"
