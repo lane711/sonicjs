@@ -87,7 +87,7 @@ export async function insertUserTest(d1, data) {
 export async function insertData(d1, table, data) {
   const db = drizzle(d1);
 
-  // console.log("inserting D1 data", table, data);
+  console.log("inserting D1 data", table, data);
 
   const now = new Date().getTime();
   data.created_on = now;
@@ -164,7 +164,7 @@ export function getSchemaFromTable(tableName) {
 }
 
 export function getRepoFromTable(tableName) {
-  // console.log("getting schema", tableName);
+  console.log("getting schema", tableName);
   switch (tableName) {
     case "users":
       return user;
