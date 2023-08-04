@@ -83,6 +83,9 @@ it("CRUD", async () => {
   //   .run();
   // console.log("insertResult", insertResult);
 
+  await insertData(__D1_BETA__D1DATA, "users", { firstName: "John", id: "1" });
+  await insertData(__D1_BETA__D1DATA, "users", { firstName: "Jane", id: "2" });
+
   //create a table
   // await db.run(sql`CREATE TABLE users (
   //   id text PRIMARY KEY NOT NULL,
@@ -95,19 +98,24 @@ it("CRUD", async () => {
   //   updated_on integer
   // );`)
 
-  await insertData(__D1_BETA__D1DATA, "users", { firsrName: "a", id: "1234ad" });
 
   // const { results } = await db
   // .prepare(`SELECT * FROM users;`)
   // .all();
 
-  const results = await db.select().from(usersTable).all();
+  // const results = await db.select().from(usersTable).all();
 
-  const results2 = await getByTable(__D1_BETA__D1DATA, "users", undefined);
+  const firstResult = await getByTable(__D1_BETA__D1DATA, "users", undefined);
 
-  expect(results.length).toBe(1);
+  expect(firstResult.data.length).toBe(2);
+  expect(firstResult.source).toBe('c1');
+
+  //if we get it again, it should be cached
+  const secondResult = await getByTable(__D1_BETA__D1DATA, "users", undefined);
+  expect(secondResult.data.length).toBe(2);
+  expect(secondResult.source).toBe('cache');
+
   // let results = await db.run(sql`SELECT * FROM users`);
 
-  console.log("results-->", results);
-  // console.log("results2-->", results2);
+  console.log("results-->", result.source, result.data);
 });

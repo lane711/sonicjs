@@ -26,10 +26,12 @@ export async function getByTable(db, table, params) {
 
   const { results } = await db.prepare(sql).all();
 
+  const data = {data: results, source: 'd1'}
   console.log("sql results ==>", results);
 
-  return results;
+  return data;
 }
+
 
 export function generateSelectSql(table, params) {
   console.log("params ==>", JSON.stringify(params, null, 2));
@@ -55,8 +57,8 @@ export function generateSelectSql(table, params) {
   }
 
   let sql = `SELECT * FROM ${table} ${whereClause} ${sortBySyntax} ${limitSyntax} ${offsetSyntax};`;
-  sql = sql.replace(/\s+/g, ' ').trim();
-  
+  sql = sql.replace(/\s+/g, " ").trim();
+
   console.log("sql ==>", sql);
   return sql;
 }
@@ -81,7 +83,7 @@ export async function getByTableAndId(db, table, id) {
 export async function insertUserTest(d1, data) {
   const db = drizzle(d1);
 
-  return db.insert(user).values(data).returning().get();
+  return db.insert(usersTable).values(data).returning().get();
 }
 
 export async function insertData(d1, table, data) {
@@ -99,8 +101,9 @@ export async function insertData(d1, table, data) {
   console.log("D1==>", JSON.stringify(data, null, 4));
 
   const schmea = getRepoFromTable(table);
-
+  // console.log("insertData schema", schmea);
   let result = db.insert(schmea).values(data).returning().get();
+
   return result;
 }
 
