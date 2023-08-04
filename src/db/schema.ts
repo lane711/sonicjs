@@ -28,7 +28,7 @@ export const userSchema = {
   password: text("password"),
   role: text("role").$type<"admin" | "user">(),
 };
-export const user = sqliteTable("users", { ...userSchema, ...auditSchema });
+export const usersTable = sqliteTable("users", { ...userSchema, ...auditSchema });
 
 // posts
 type PostCategories = [{ category: string; }];
@@ -40,7 +40,7 @@ export const postSchema = {
   userId: text("user_id"),
   categoryId: text("category_id"),
 };
-export const post = sqliteTable("posts", { ...postSchema, ...auditSchema });
+export const postsTable = sqliteTable("posts", { ...postSchema, ...auditSchema });
 
 // categories
 export const categorySchema = {
@@ -48,7 +48,7 @@ export const categorySchema = {
   title: text("title"),
   body: text("body"),
 };
-export const category = sqliteTable("categories", {
+export const categoriesTable = sqliteTable("categories", {
   ...categorySchema,
   ...auditSchema,
 });
@@ -60,7 +60,7 @@ export const commentSchema = {
   userId: text("user_id"),
   postId: integer("post_id"),
 };
-export const comment = sqliteTable(
+export const commentsTable = sqliteTable(
   "comments",
   { ...commentSchema, ...auditSchema },
   (table) => {
@@ -76,38 +76,38 @@ export const comment = sqliteTable(
  */
 
 // users can have many posts and many comments
-export const usersRelations = relations(user, ({ many }) => ({
-  posts: many(post),
-  comments: many(comment),
+export const usersRelations = relations(usersTable, ({ many }) => ({
+  posts: many(postsTable),
+  comments: many(commentsTable),
 }));
 
 // posts can have one author (user), many categories, many comments
-export const postsRelations = relations(post, ({ one, many }) => ({
-  user: one(user, {
-    fields: [post.userId],
-    references: [user.id],
+export const postsRelations = relations(postsTable, ({ one, many }) => ({
+  user: one(usersTable, {
+    fields: [postsTable.userId],
+    references: [usersTable.id],
   }),
-  category: one(category, {
-    fields: [post.categoryId],
-    references: [category.id],
+  category: one(categoriesTable, {
+    fields: [postsTable.categoryId],
+    references: [categoriesTable.id],
   }),
-  comments: many(comment),
+  comments: many(commentsTable),
 }));
 
 // categories can have many posts
-export const categoriesRelations = relations(category, ({ many }) => ({
-  posts: many(post),
+export const categoriesRelations = relations(categoriesTable, ({ many }) => ({
+  posts: many(postsTable),
 }));
 
 // comments can have one post and one author
-export const commentsRelations = relations(comment, ({ one }) => ({
-  post: one(post, {
-    fields: [comment.id],
-    references: [post.id],
+export const commentsRelations = relations(commentsTable, ({ one }) => ({
+  post: one(postsTable, {
+    fields: [commentsTable.id],
+    references: [postsTable.id],
   }),
-  user: one(user, {
-    fields: [comment.userId],
-    references: [user.id],
+  user: one(usersTable, {
+    fields: [commentsTable.userId],
+    references: [usersTable.id],
   }),
 }));
 

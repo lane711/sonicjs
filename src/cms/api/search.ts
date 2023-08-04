@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { Bindings } from "../types/bindings";
 import { drizzle } from "drizzle-orm/d1";
-import { user, post } from "../../db/schema";
+import { usersTable, postsTable } from "../../db/schema";
 
 export interface Env {
   D1DATA: D1Database;
@@ -13,7 +13,7 @@ search.get("/", async (ctx) => {
   console.log("searching data with d1");
 
   const db = drizzle(ctx.env.D1DATA);
-  const result = await db.select().from(user).all();
+  const result = await db.select().from(usersTable).all();
 
   return ctx.json(result);
 });
@@ -24,7 +24,7 @@ search.get("/raw", async (ctx) => {
   const db = drizzle(ctx.env.D1DATA);
 
   await db
-    .insert(users)
+    .insert(usersTable)
     .values({ id: "db722b76-0b88-11ee-be56-0242ac120009", name: "Test" })
     .run();
 

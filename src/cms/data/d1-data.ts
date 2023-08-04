@@ -1,14 +1,14 @@
 import { DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { v4 as uuidv4 } from "uuid";
 import {
-  post,
+  postsTable,
   postSchema,
   userSchema,
-  user,
+  usersTable,
   categorySchema,
   commentSchema,
-  category,
-  comment,
+  categoriesTable,
+  commentsTable,
 } from "../../db/schema";
 import { DefaultLogger, LogWriter, eq } from "drizzle-orm";
 
@@ -167,16 +167,16 @@ export function getRepoFromTable(tableName) {
   console.log("getting schema", tableName);
   switch (tableName) {
     case "users":
-      return user;
+      return usersTable;
       break;
     case "posts":
-      return post;
+      return postsTable;
       break;
     case "categories":
-      return category;
+      return categoriesTable;
       break;
     case "comments":
-      return comment;
+      return commentsTable;
       break;
   }
 }
