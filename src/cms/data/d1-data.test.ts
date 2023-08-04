@@ -57,8 +57,8 @@ it("CRUD", async () => {
 		)
 	`);
 
-  const insertResult = await db.insert(users).values({ id:1, name: 'Andrew' }).run();
-console.log('insertResult', insertResult)
+//   const insertResult = await db.insert(users).values({ id:1, name: 'Andrew' }).run();
+// console.log('insertResult', insertResult)
 
   //create a table
   // await db.run(sql`CREATE TABLE users (
@@ -72,7 +72,7 @@ console.log('insertResult', insertResult)
   //   updated_on integer
   // );`)
 
-  // insertData(__D1_BETA__D1DATA, "users", { firstName: "a", lastName: "b", id: '1234ad' });
+  insertData(__D1_BETA__D1DATA, "users", { name: "a", id: '1234ad' });
 
   // const { results } = await db
   // .prepare(`SELECT * FROM users;`)
@@ -80,7 +80,11 @@ console.log('insertResult', insertResult)
 
   const results = await db.select().from(users).all();
 
+  const results2 = await getByTable(__D1_BETA__D1DATA, "users", undefined);
+
   // let results = await db.run(sql`SELECT * FROM users`);
 
   console.log('results-->', results);
+  console.log('results2-->', results2);
+
 });
