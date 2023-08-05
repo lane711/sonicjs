@@ -41,28 +41,9 @@ it("should return a SQL select", () => {
 });
 
 it("CRUD", async () => {
-  // console.log('env ==>', env)
-  // console.log('D1DATA', __D1_BETA__D1DATA);
+
   const db = drizzle(__D1_BETA__D1DATA);
 
-  // const users = sqliteTable('users', {
-  //   id: integer('id').primaryKey(),
-  //   name: text('name').notNull(),
-  //   verified: integer('verified', { mode: 'boolean' }).notNull().default(false),
-  //   json: blob('json', { mode: 'json' }).$type<string[]>(),
-  //   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`strftime('%s', 'now')`),
-  // });
-
-
-//   db.run(sql`
-//   create table ${users} (
-//     id integer primary key,
-//     name text not null,
-//     verified integer not null default 0,
-//     json blob,
-//     created_at integer not null default (strftime('%s', 'now'))
-//   )
-// `);
 
   db.run(sql`
     CREATE TABLE ${usersTable} (
@@ -77,45 +58,23 @@ it("CRUD", async () => {
     );
 	`);
 
-  // const insertResult = await db
-  //   .insert(usersTable)
-  //   .values({ id: 1, firstName: "Andrew" })
-  //   .run();
-  // console.log("insertResult", insertResult);
 
   await insertData(__D1_BETA__D1DATA, "users", { firstName: "John", id: "1" });
   await insertData(__D1_BETA__D1DATA, "users", { firstName: "Jane", id: "2" });
 
-  //create a table
-  // await db.run(sql`CREATE TABLE users (
-  //   id text PRIMARY KEY NOT NULL,
-  //   firstName text,
-  //   lastName text,
-  //   email text,
-  //   password text,
-  //   role text,
-  //   created_on integer,
-  //   updated_on integer
-  // );`)
-
-
-  // const { results } = await db
-  // .prepare(`SELECT * FROM users;`)
-  // .all();
-
-  // const results = await db.select().from(usersTable).all();
-
-  const firstResult = await getByTable(__D1_BETA__D1DATA, "users", undefined);
+  const firstResult = await getByTable(__D1_BETA__D1DATA, "users", undefined, 'some-cache-key-url');
 
   expect(firstResult.data.length).toBe(2);
-  expect(firstResult.source).toBe('c1');
+  expect(firstResult.source).toBe('d1');
+  // console.log("firstResult-->", firstResult.source, firstResult.data);
 
   //if we get it again, it should be cached
-  const secondResult = await getByTable(__D1_BETA__D1DATA, "users", undefined);
+
+  const secondResult = await getByTable(__D1_BETA__D1DATA, "users", undefined, 'some-cache-key-url');
   expect(secondResult.data.length).toBe(2);
   expect(secondResult.source).toBe('cache');
+  // console.log("secondResult-->", secondResult.source, secondResult.data);
 
   // let results = await db.run(sql`SELECT * FROM users`);
 
-  console.log("results-->", result.source, result.data);
 });

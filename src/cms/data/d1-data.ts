@@ -11,27 +11,32 @@ import {
   commentsTable,
 } from "../../db/schema";
 import { DefaultLogger, LogWriter, eq } from "drizzle-orm";
+import { addToCache, getFromCache } from "./cache";
 
 export async function getAllContent(db) {
   const { results } = await db.prepare("SELECT * FROM users").all();
   return results;
 }
 
-export async function getByTable(db, table, params) {
-  // const { results } = await db.prepare(`SELECT * FROM ${table};`).all();
+export async function getByTable(db, table, params, cacheKey) {
+  const cacheResult = await getFromCache(cacheKey);
+  console.log("cacheResult", cacheResult);
+  if (cacheResult && cacheResult.length) {
+    const cachedData = cacheResult[0].data;
+    console.log("**** cachedData ****", cachedData);
 
-  // return results;
-  // console.log("db ==>", db);
+    return cachedData;
+  }
+
   const sql = generateSelectSql(table, params);
 
   const { results } = await db.prepare(sql).all();
 
-  const data = {data: results, source: 'd1'}
-  console.log("sql results ==>", results);
+  const data = addToCache(cacheKey, { data: results, source: "cache" });
+  // console.log("sql results ==>", results);
 
-  return data;
+  return { data: results, source: "d1" };
 }
-
 
 export function generateSelectSql(table, params) {
   console.log("params ==>", JSON.stringify(params, null, 2));
@@ -89,7 +94,7 @@ export async function insertUserTest(d1, data) {
 export async function insertData(d1, table, data) {
   const db = drizzle(d1);
 
-  console.log("inserting D1 data", table, data);
+  // console.log("inserting D1 data", table, data);
 
   const now = new Date().getTime();
   data.created_on = now;
@@ -98,7 +103,7 @@ export async function insertData(d1, table, data) {
   // delete data.submit;
   delete data.table;
 
-  console.log("D1==>", JSON.stringify(data, null, 4));
+  // console.log("D1==>", JSON.stringify(data, null, 4));
 
   const schmea = getRepoFromTable(table);
   // console.log("insertData schema", schmea);

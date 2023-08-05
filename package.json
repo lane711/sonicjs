@@ -32,6 +32,7 @@
     "hono": "^3.1.8",
     "jest": "^29.5.0",
     "jest-environment-miniflare": "^2.14.0",
+    "lokijs": "^1.5.12",
     "qs": "^6.11.2",
     "uuid": "^9.0.0"
   }
