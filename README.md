@@ -27,7 +27,7 @@ npm install -g wrangler
 
 # Getting Started
 ```
-npm exec github:lane711/sonicjs
+npx create-sonicjs-app
 ```
 
 Now you're ready to fire up SonicJs!
