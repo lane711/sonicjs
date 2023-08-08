@@ -11,28 +11,35 @@ import {
   commentsTable,
 } from "../../db/schema";
 import { DefaultLogger, LogWriter, eq } from "drizzle-orm";
-import { addToCache, getFromCache } from "./cache";
+import { addToCache, addToInMemoryCache, getFromCache } from "./cache";
+import { addToKvCache } from "./kv-data";
 
 export async function getAllContent(db) {
   const { results } = await db.prepare("SELECT * FROM users").all();
   return results;
 }
 
-export async function getByTable(db, table, params, cacheKey) {
+export async function getByTable(db, table, params, cacheKey, source = 'fastest') {
   const cacheResult = await getFromCache(cacheKey);
   console.log("cacheResult", cacheResult);
-  if (cacheResult && cacheResult.length) {
+  if (cacheResult && cacheResult.length && source == 'fastest') {
     const cachedData = cacheResult[0].data;
     console.log("**** cachedData ****", cachedData);
 
     return cachedData;
   }
 
+  if(source == 'kv'){
+
+  }
+
   const sql = generateSelectSql(table, params);
 
   const { results } = await db.prepare(sql).all();
 
-  const data = addToCache(cacheKey, { data: results, source: "cache" });
+  addToInMemoryCache(cacheKey, { data: results, source: "cache" });
+  addToKvCache(cacheKey, { data: results, source: "cache" });
+
   // console.log("sql results ==>", results);
 
   return { data: results, source: "d1" };

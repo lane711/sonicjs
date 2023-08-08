@@ -76,6 +76,14 @@ export function saveContentType(db, site, contentTypeComponents) {
   return db.put(generatedKey, JSON.stringify(contentTypeComponents));
 }
 
+export function addToKvCache(db, key, value) {
+  return db.put(key, JSON.stringify(value));
+}
+
+export function getFromKvCache(db, key) {
+  return db.get(key, { type: "json" });
+}
+
 export function saveContent(db, content, timestamp, id) {
   // console.log("inserting KV data", JSON.stringify(content, null, 2));
   // delete content.metadata;

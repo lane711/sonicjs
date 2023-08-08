@@ -41,9 +41,45 @@ it("should return a SQL select", () => {
 });
 
 it("CRUD", async () => {
+  const db = createTestTable();
 
+  await insertData(__D1_BETA__D1DATA, "users", { firstName: "John", id: "1" });
+  await insertData(__D1_BETA__D1DATA, "users", { firstName: "Jane", id: "2" });
+
+  const d1Result = await getByTable(
+    __D1_BETA__D1DATA,
+    "users",
+    undefined,
+    "some-cache-key-url"
+  );
+
+  expect(d1Result.data.length).toBe(2);
+  expect(d1Result.source).toBe("d1");
+
+  //if we request it again, it should be cached in memory
+  const inMemoryCacheResult = await getByTable(
+    __D1_BETA__D1DATA,
+    "users",
+    undefined,
+    "some-cache-key-url"
+  );
+  expect(inMemoryCacheResult.data.length).toBe(2);
+  expect(inMemoryCacheResult.source).toBe("cache");
+
+  // if we request it again, it should also be cached in kv storage
+  const kvResult = await getByTable(
+    __D1_BETA__D1DATA,
+    "users",
+    undefined,
+    "some-cache-key-url"
+  );
+  expect(kvResult.data.length).toBe(2);
+  expect(kvResult.source).toBe("cache");
+
+});
+
+function createTestTable() {
   const db = drizzle(__D1_BETA__D1DATA);
-
 
   db.run(sql`
     CREATE TABLE ${usersTable} (
@@ -58,23 +94,5 @@ it("CRUD", async () => {
     );
 	`);
 
-
-  await insertData(__D1_BETA__D1DATA, "users", { firstName: "John", id: "1" });
-  await insertData(__D1_BETA__D1DATA, "users", { firstName: "Jane", id: "2" });
-
-  const firstResult = await getByTable(__D1_BETA__D1DATA, "users", undefined, 'some-cache-key-url');
-
-  expect(firstResult.data.length).toBe(2);
-  expect(firstResult.source).toBe('d1');
-  // console.log("firstResult-->", firstResult.source, firstResult.data);
-
-  //if we get it again, it should be cached
-
-  const secondResult = await getByTable(__D1_BETA__D1DATA, "users", undefined, 'some-cache-key-url');
-  expect(secondResult.data.length).toBe(2);
-  expect(secondResult.source).toBe('cache');
-  // console.log("secondResult-->", secondResult.source, secondResult.data);
-
-  // let results = await db.run(sql`SELECT * FROM users`);
-
-});
+  return db;
+}
