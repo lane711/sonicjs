@@ -10,6 +10,7 @@
     "types": ["@cloudflare/workers-types","jest"],
     "jsx": "react-jsx",
     "jsxFragmentFactory": "Fragment",
+    "jsxFactory": "React.createElement",
     "jsxImportSource": "hono/jsx"
   },
   "include": ["src"],

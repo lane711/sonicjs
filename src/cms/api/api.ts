@@ -10,7 +10,7 @@ import {
 } from "../data/kv-data";
 import { Bindings } from "../types/bindings";
 import { apiConfig } from "../../db/schema";
-import { getByTable, getByTableAndId } from "../data/d1-data";
+import { getD1DataByTable, getD1ByTableAndId } from "../data/d1-data";
 import { getForm } from "./forms";
 import qs from "qs";
 
@@ -35,7 +35,7 @@ apiConfig.forEach((entry) => {
     const { includeContentType } = ctx.req.query();
 
     const id = ctx.req.param("id");
-    const data = await getByTableAndId(ctx.env.D1DATA, entry.table, id);
+    const data = await getD1ByTableAndId(ctx.env.D1DATA, entry.table, id);
 
     if (includeContentType !== undefined) {
       data.contentType = getForm(ctx, entry.table);
@@ -50,10 +50,10 @@ api.get("/ping", (c) => {
   return c.text(Date());
 });
 
-api.get("/kvtest", async (ctx) => {
-  const data = await getByTable(ctx.env.D1DATA, "categories", {limit:2});
-  return ctx.json(data);
-});
+// api.get("/kvtest", async (ctx) => {
+//   const data = await getD1DataByTable(ctx.env.D1DATA, "categories", {limit:2});
+//   return ctx.json(data);
+// });
 
 api.get("/data", async (c) => {
   const data = await getDataListByPrefix(c.env.KVDATA, "");

@@ -11,7 +11,7 @@ import {
   commentsTable,
 } from "../../db/schema";
 import { DefaultLogger, LogWriter, eq } from "drizzle-orm";
-import { addToCache, addToInMemoryCache, getFromCache } from "./cache";
+import { addToInMemoryCache } from "./cache";
 import { addToKvCache } from "./kv-data";
 
 export async function getAllContent(db) {
@@ -19,26 +19,15 @@ export async function getAllContent(db) {
   return results;
 }
 
-export async function getByTable(db, table, params, cacheKey, source = 'fastest') {
-  const cacheResult = await getFromCache(cacheKey);
-  console.log("cacheResult", cacheResult);
-  if (cacheResult && cacheResult.length && source == 'fastest') {
-    const cachedData = cacheResult[0].data;
-    console.log("**** cachedData ****", cachedData);
+export async function getD1DataByTable(db, table, params) {
 
-    return cachedData;
-  }
-
-  if(source == 'kv'){
-
-  }
 
   const sql = generateSelectSql(table, params);
 
   const { results } = await db.prepare(sql).all();
 
-  addToInMemoryCache(cacheKey, { data: results, source: "cache" });
-  addToKvCache(cacheKey, { data: results, source: "cache" });
+  // addToInMemoryCache(cacheKey, { data: results, source: "cache" });
+  // addToKvCache(cacheKey, { data: results, source: "kv" });
 
   // console.log("sql results ==>", results);
 
@@ -75,7 +64,7 @@ export function generateSelectSql(table, params) {
   return sql;
 }
 
-export async function getByTableAndId(db, table, id) {
+export async function getD1ByTableAndId(db, table, id) {
   const { results } = await db
     .prepare(`SELECT * FROM ${table} where id = '${id}';`)
     .all();

@@ -1,44 +1,12 @@
-import {
-  generateSelectSql,
-  getByTable,
-  insertData,
-  whereClauseBuilder,
-} from "./d1-data";
+import { insertData } from "./d1-data";
 import { usersTable } from "../../db/schema";
 import qs from "qs";
 const env = getMiniflareBindings();
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
-import { blob, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
-
-it("should not return a where clause", () => {
-  const params = {};
-  const clause = whereClauseBuilder(params);
-  expect(clause).toBe("");
-});
-
-it("should return a where clause with eq", () => {
-  const queryParams = "someurl?filters[id][eq]=100";
-  const params = qs.parse(queryParams);
-  const clause = whereClauseBuilder(params);
-  expect(clause).toBe("where id = 100");
-});
-
-it("should return a where clause with multi in", () => {
-  const queryParams = "someurl?filters[id][$in][0]=100&filters[id][$in][1]=101";
-  const params = qs.parse(queryParams);
-  const clause = whereClauseBuilder(params);
-  expect(clause).toBe("");
-});
-
-it("should return a SQL select", () => {
-  const queryParams = "someurl?limit=2";
-  const params = qs.parse(queryParams);
-  console.log("params ---->", params);
-  const clause = generateSelectSql("my-table", params);
-  expect(clause).toBe("SELECT * FROM my-table limit 2'");
-});
+import { getData } from "./data";
+import { clearInMemoryCache } from "./cache";
 
 it("CRUD", async () => {
   const db = createTestTable();
@@ -46,8 +14,9 @@ it("CRUD", async () => {
   await insertData(__D1_BETA__D1DATA, "users", { firstName: "John", id: "1" });
   await insertData(__D1_BETA__D1DATA, "users", { firstName: "Jane", id: "2" });
 
-  const d1Result = await getByTable(
-    __D1_BETA__D1DATA,
+  const d1Result = await getData(
+    env.__D1_BETA__D1DATA,
+    env.KVDATA,
     "users",
     undefined,
     "some-cache-key-url"
@@ -58,25 +27,30 @@ it("CRUD", async () => {
 
   //if we request it again, it should be cached in memory
   //TODO need to be able to pass in ctx so that we can setup d1 and kv
-  const inMemoryCacheResult = await getByTable(
-    __D1_BETA__D1DATA,
+  const inMemoryCacheResult = await getData(
+    env.__D1_BETA__D1DATA,
+    env.KVDATA,
     "users",
     undefined,
     "some-cache-key-url"
   );
+
   expect(inMemoryCacheResult.data.length).toBe(2);
   expect(inMemoryCacheResult.source).toBe("cache");
 
+  //kill cache to simulate end user requesting kv cache data from another server node
+  clearInMemoryCache();
+  
   // if we request it again, it should also be cached in kv storage
-  const kvResult = await getByTable(
-    __D1_BETA__D1DATA,
+  const kvResult = await getData(
+    env.__D1_BETA__D1DATA,
+    env.KVDATA,
     "users",
     undefined,
     "some-cache-key-url"
   );
   expect(kvResult.data.length).toBe(2);
-  expect(kvResult.source).toBe("cache");
-
+  expect(kvResult.source).toBe("kv");
 });
 
 function createTestTable() {
