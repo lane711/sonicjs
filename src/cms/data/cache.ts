@@ -13,6 +13,12 @@ export async function getFromInMemoryCache(key: string) {
   return data;
 }
 
+export async function getAllFromInMemoryCache() {
+  let data = await cache;
+  return data;
+}
+
+
 export async function clearInMemoryCache() {
   console.log("clearing InMemoryCache");
 

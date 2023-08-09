@@ -5,6 +5,8 @@ import {
   putData,
   addToKvCache,
   getFromKvCache,
+  clearKVCache,
+  getKVCache,
 } from "./kv-data";
 
 const env = getMiniflareBindings();
@@ -74,5 +76,16 @@ describe("test KV cache", () => {
     expect(kvResult2).toEqual({
       foo: "bear",
     });
+
+    const allCacheItems = await getKVCache(env.KVDATA);
+    console.log('allCacheItems', allCacheItems);
+    expect(allCacheItems.keys.length).toEqual(2);
+
+    // //clear cache
+    await clearKVCache(env.KVDATA);
+
+    const allCacheItemsAfterClearCache = await getKVCache(env.KVDATA);
+    expect(allCacheItemsAfterClearCache.keys.length).toEqual(0);
+
   });
 });

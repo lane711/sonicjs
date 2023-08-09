@@ -76,12 +76,28 @@ export function saveContentType(db, site, contentTypeComponents) {
   return db.put(generatedKey, JSON.stringify(contentTypeComponents));
 }
 
-export function addToKvCache(db, key, value) {
-  return db.put(key, JSON.stringify(value));
+export async function addToKvCache(db, key, value) {
+  console.log("adding to kv cache", key);
+  return db.put(addCachePrefix(key), JSON.stringify(value));
 }
 
-export function getFromKvCache(db, key) {
-  return db.get(key, { type: "json" });
+export async function getFromKvCache(db, key) {
+  return db.get(addCachePrefix(key), { type: "json" });
+}
+
+export function getKVCache(db) {
+  return db.list({ prefix: addCachePrefix("") });
+}
+
+export async function clearKVCache(db) {
+  const itemsToDelete = await getDataListByPrefix(db, addCachePrefix(""));
+  for await (const key of itemsToDelete.keys) {
+    await deleteById(db, key.name);
+  }
+}
+
+export function addCachePrefix(key: string) {
+  return `cache::${key}`;
 }
 
 export function saveContent(db, content, timestamp, id) {

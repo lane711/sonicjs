@@ -4,6 +4,7 @@ import {
   getById,
   getDataByPrefix,
   getDataListByPrefix,
+  getKVCache,
   putData,
   saveContent,
   saveContentType,
@@ -13,6 +14,8 @@ import { apiConfig } from "../../db/schema";
 import { getD1DataByTable, getD1ByTableAndId } from "../data/d1-data";
 import { getForm } from "./forms";
 import qs from "qs";
+import { getData } from "../data/data";
+import { clearInMemoryCache, getAllFromInMemoryCache } from "../data/cache";
 
 const api = new Hono<{ Bindings: Bindings }>();
 
@@ -23,7 +26,7 @@ apiConfig.forEach((entry) => {
   api.get(`/${entry.route}`, async (ctx) => {
     try {
       var params = qs.parse(ctx.req.query());
-      const data = await getByTable(ctx.env.D1DATA, entry.table, params);
+      const data = await getData(ctx.env.D1DATA, ctx.env.KVDATA, entry.table, params,ctx.req.url );
       return ctx.json(data);
     } catch (error) {
       console.log(error);
@@ -80,6 +83,36 @@ api.post("/form-components", async (c) => {
 
   console.log("form put", result);
   return c.text("Created!", 201);
+});
+
+api.get("/cache/clear-all", (ctx) => {
+  console.log('clearing cache');
+  clearInMemoryCache();
+  return ctx.text("ok");
+});
+
+api.get("/cache/clear-in-memory", (ctx) => {
+  console.log('clearing cache');
+  clearInMemoryCache();
+  return ctx.text("ok");
+});
+
+api.get("/cache/clear-kv", (ctx) => {
+  console.log('clearing cache');
+  clearInMemoryCache();
+  return ctx.text("ok");
+});
+
+api.get("/cache/in-memory", async (ctx) => {
+  console.log('clearing cache');
+  const cacheItems = await getAllFromInMemoryCache();
+  return ctx.json(cacheItems);
+});
+
+api.get("/cache/kv", async (ctx) => {
+  console.log('getting kv cache');
+  const cacheItems = await getKVCache(ctx.env.KVDATA);
+  return ctx.json(cacheItems);
 });
 
 export { api };
