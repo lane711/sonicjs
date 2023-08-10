@@ -2,7 +2,7 @@ import { desc } from "drizzle-orm";
 import { apiConfig } from "../../../db/schema";
 import { getById, getDataListByPrefix, putData } from "../../data/kv-data";
 import { Layout } from "../theme";
-import { getByTable, getByTableAndId } from "../../data/d1-data";
+import { getD1DataByTable, getD1ByTableAndId } from "../../data/d1-data";
 
 interface link {
   url: string;
@@ -31,10 +31,10 @@ export async function loadApis(ctx) {
 
   await Promise.all(
     tables.map(async (scehma) => {
-      const data = await getByTable(ctx.env.D1DATA, scehma.table, 1);
-      if (data.length) {
+      const results = await getD1DataByTable(ctx.env.D1DATA, scehma.table, {'limit':1});
+      if (results.data.length) {
         let link: link = {
-          url: `/v1/${scehma.route}/${data[0].id}`,
+          url: `/v1/${scehma.route}/${results.data[0].id}`,
           description: `get single record from the ${scehma.table} table`,
         };
         recordApis.push(link);

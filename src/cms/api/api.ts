@@ -1,19 +1,24 @@
 import { Hono } from "hono";
 import { loadForm } from "../admin/forms/form";
 import {
+  clearAllKVRecords,
+  clearKVCache,
+  getAllKV,
   getById,
   getDataByPrefix,
   getDataListByPrefix,
+  getKVCache,
   putData,
   saveContent,
   saveContentType,
 } from "../data/kv-data";
 import { Bindings } from "../types/bindings";
 import { apiConfig } from "../../db/schema";
-import { getByTable, getByTableAndId } from "../data/d1-data";
+import { getD1DataByTable, getD1ByTableAndId } from "../data/d1-data";
 import { getForm } from "./forms";
 import qs from "qs";
-
+import { getData } from "../data/data";
+import { clearInMemoryCache, getAllFromInMemoryCache } from "../data/cache";
 
 const api = new Hono<{ Bindings: Bindings }>();
 
@@ -24,7 +29,7 @@ apiConfig.forEach((entry) => {
   api.get(`/${entry.route}`, async (ctx) => {
     try {
       var params = qs.parse(ctx.req.query());
-      const data = await getByTable(ctx.env.D1DATA, entry.table, params);
+      const data = await getData(ctx.env.D1DATA, ctx.env.KVDATA, entry.table, params,ctx.req.url, 'fastest' );
       return ctx.json(data);
     } catch (error) {
       console.log(error);
@@ -36,7 +41,7 @@ apiConfig.forEach((entry) => {
     const { includeContentType } = ctx.req.query();
 
     const id = ctx.req.param("id");
-    const data = await getByTableAndId(ctx.env.D1DATA, entry.table, id);
+    const data = await getD1ByTableAndId(ctx.env.D1DATA, entry.table, id);
 
     if (includeContentType !== undefined) {
       data.contentType = getForm(ctx, entry.table);
@@ -50,6 +55,11 @@ api.get("/ping", (c) => {
   console.log("testing ping", Date());
   return c.text(Date());
 });
+
+// api.get("/kvtest", async (ctx) => {
+//   const data = await getD1DataByTable(ctx.env.D1DATA, "categories", {limit:2});
+//   return ctx.json(data);
+// });
 
 api.get("/data", async (c) => {
   const data = await getDataListByPrefix(c.env.KVDATA, "");
@@ -76,6 +86,47 @@ api.post("/form-components", async (c) => {
 
   console.log("form put", result);
   return c.text("Created!", 201);
+});
+
+api.get("/cache/clear-all", async (ctx) => {
+  console.log('clearing cache');
+  await clearInMemoryCache();
+  await clearKVCache(ctx.env.KVDATA);
+  return ctx.text("in memory and kv caches cleared");
+});
+
+api.get("/cache/clear-in-memory", async (ctx) => {
+  console.log('clearing cache');
+  await clearInMemoryCache();
+  return ctx.text("in memory cache cleared");
+});
+
+api.get("/cache/clear-kv", async (ctx) => {
+  console.log('clearing cache');
+  await clearKVCache(ctx.env.KVDATA);
+  return ctx.text("kv cache cleared");
+});
+
+api.get("/cache/in-memory", async (ctx) => {
+  console.log('clearing cache');
+  const cacheItems = await getAllFromInMemoryCache();
+  return ctx.json(cacheItems);
+});
+
+api.get("/cache/kv", async (ctx) => {
+  const cacheItems = await getKVCache(ctx.env.KVDATA);
+  console.log('getting kv cache', cacheItems);
+  return ctx.json(cacheItems);
+});
+
+api.get("/kv", async (ctx) => {
+  const allItems = await getAllKV(ctx.env.KVDATA);
+  return ctx.json(allItems);
+});
+
+api.get("/kv/delete-all", async (ctx) => {
+  await clearAllKVRecords(ctx.env.KVDATA);
+  return ctx.text('ok');
 });
 
 export { api };

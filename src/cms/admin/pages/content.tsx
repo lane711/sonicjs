@@ -2,8 +2,8 @@ import { ApiConfig, apiConfig } from "../../../db/schema";
 import {
   getAllContent,
   getByIdAndTable,
-  getByTable,
-  getByTableAndId,
+  getD1ByTableAndId,
+  getD1DataByTable,
 } from "../../data/d1-data";
 import {
   getById,
@@ -68,9 +68,9 @@ export async function loadTableData(ctx, table) {
   // await putData(ctx.env.KVDATA, 'site1', 'content', {title: '20230508a'});
   console.log("user==>", table);
 
-  const data = await getByTable(ctx.env.D1DATA, table);
+  const results = await getD1DataByTable(ctx.env.D1DATA, table, undefined);
 
-  data.reverse();
+  results.data.reverse();
   // const content = await getAllContent(ctx.env.D1DATA);
   // console.log('data==>', JSON.stringify(data, null, 2))
 
@@ -81,7 +81,7 @@ export async function loadTableData(ctx, table) {
 
   // console.log("load admin data", content);
 
-  const contentList = data.map((item) => {
+  const contentList = results.data.map((item) => {
     return {
       id: item.id,
       title: getDisplayField(item),
@@ -94,7 +94,7 @@ export async function loadTableData(ctx, table) {
 }
 
 function getDisplayField(item) {
-  return item.name ?? item.title;
+  return item.name ?? item.title ?? item.firstName ?? item.id;
 }
 
 export async function loadAdmin(ctx) {
@@ -152,7 +152,7 @@ export async function loadAdmin(ctx) {
 // }
 
 export async function loadEditContent(ctx, table, id) {
-  // const content = await getByTableAndId(ctx.env.D1DATA, table, id);
+  // const content = await getD1ByTableAndId(ctx.env.D1DATA, table, id);
   // console.log("loadEditContent", id, content);
 
   // console.log('loadEditContent content type', contentType)
@@ -167,7 +167,7 @@ export async function loadEditContent(ctx, table, id) {
 }
 
 export async function loadNewContent(ctx, table) {
-  // const content = await getByTableAndId(ctx.env.D1DATA, table, id);
+  // const content = await getD1ByTableAndId(ctx.env.D1DATA, table, id);
   // console.log("loadEditContent", id, content);
 
   // console.log('loadEditContent content type', contentType)

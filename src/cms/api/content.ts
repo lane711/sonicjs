@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { getForm, loadForm } from "../admin/forms/form";
 import {
   deleteById,
   getById,
@@ -7,16 +6,13 @@ import {
   getContentTypes,
   getDataByPrefix,
   getDataListByPrefix,
-  putData,
   saveContent,
   saveContentType,
 } from "../data/kv-data";
 import { Bindings } from "../types/bindings";
-import { apiConfig } from "../../db/schema";
 import {
   deleteByTableAndId,
   insertData,
-  saveData,
   updateData,
 } from "../data/d1-data";
 import { v4 as uuidv4 } from "uuid";
@@ -28,13 +24,18 @@ content.get("/ping", (c) => {
   return c.text(Date());
 });
 
+content.post("/ping", (c) => {
+  const id = uuidv4();
+  return c.json(id, 201);
+});
+
 content.get("/", async (ctx) => {
   console.log("getting main content");
 
   const { keysOnly, contentType, includeContentType, limit, offset } =
     ctx.req.query();
 
-  const fetchLimit = limit ?? 100;
+  const fetchLimit = (limit ?? 100) as number;
 
   console.log("params-->", keysOnly, contentType, includeContentType);
 
@@ -67,8 +68,7 @@ content.get("/", async (ctx) => {
     return ctx.json(content);
   }
 
-  return ctx.json(content);
-});
+  ctx.json(content);});
 
 content.get("/:contentId", async (ctx) => {
   const id = ctx.req.param("contentId");
@@ -118,26 +118,37 @@ content.get("/contents-with-meta/:contype-type", async (ctx) => {
 content.post("/", async (ctx) => {
   const content = await ctx.req.json();
 
+  // console.log('post new', content)
+
   const id = uuidv4();
   const timestamp = new Date().getTime();
   content.data.id = id;
 
   try {
-    const result = await saveContent(ctx.env.KVDATA, content.data, timestamp, id);
-    return ctx.text("", 201);
+    const result = await saveContent(
+      ctx.env.KVDATA,
+      content.data,
+      timestamp,
+      id
+    );
+    // console.log('result KV', result);
+    // return ctx.json(id, 201);
   } catch (error) {
     console.log("error posting content", error);
     return ctx.text(error, 500);
   } finally {
     //then also save the content to sqlite for filtering, sorting, etc
     try {
-      const result = insertData(
+      const result = await insertData(
         ctx.env.D1DATA,
         content.data.table,
         content.data
       );
+      console.log('insertData --->', result)
+      return ctx.json(result.id, 201);
+
     } catch (error) {
-      console.log("error posting content", error);
+      console.log("error posting content " + content.data.table, error, JSON.stringify(content.data, null, 2));
     }
   }
 });
@@ -161,18 +172,14 @@ content.put("/", async (ctx) => {
       timestamp,
       content.id
     );
-    return ctx.text("", 200);
+    return ctx.text(content.id, 200);
   } catch (error) {
     console.log("error posting content", error);
     return ctx.text(error, 500);
   } finally {
     //then also save the content to sqlite for filtering, sorting, etc
     try {
-      const result = updateData(
-        ctx.env.D1DATA,
-        content.table,
-        content
-      );
+      const result = updateData(ctx.env.D1DATA, content.table, content);
     } catch (error) {
       console.log("error posting content", error);
     }
@@ -182,33 +189,27 @@ content.put("/", async (ctx) => {
 //delete
 content.delete("/:contentId", async (ctx) => {
   const id = ctx.req.param("contentId");
-  console.log('deleting ' + id)
+  console.log("deleting " + id);
 
   const content = await getById(ctx.env.KVDATA, `${id}`);
 
-  console.log('delete content ' + JSON.stringify(content, null, 2))
+  console.log("delete content " + JSON.stringify(content, null, 2));
 
   if (content) {
-    console.log('content found, deleting...')
+    console.log("content found, deleting...");
     const kvDelete = await deleteById(ctx.env.KVDATA, id);
     const d1Delete = await deleteByTableAndId(
       ctx.env.D1DATA,
       content.data.table,
       content.data.id
     );
-    console.log('returning 200')
+    console.log("returning 200");
     return ctx.text("", 200);
-
   } else {
-    console.log('content not found')
+    console.log("content not found");
     return ctx.text("", 404);
   }
-
-
-
 });
-
-
 
 // content.post("/", async (c) => {
 //   const content = await c.req.json();

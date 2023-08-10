@@ -76,11 +76,57 @@ export function saveContentType(db, site, contentTypeComponents) {
   return db.put(generatedKey, JSON.stringify(contentTypeComponents));
 }
 
+export async function addToKvCache(db, key, value) {
+  const cacheKey = addCachePrefix(key);
+  console.log('*** addToKvCache db', db)
+  console.log("*** addToKvCache adding to kv cache", cacheKey);
+
+  db.put(cacheKey, JSON.stringify(value), {
+    metadata: value ,
+  });
+  console.log("*** addToKvCache put complete");
+
+  const confirmedRecord = await getById(db, cacheKey);
+  console.log('confirmedRecord', confirmedRecord)
+  return confirmedRecord;
+
+}
+
+export async function getRecordFromKvCache(db, key) {
+  return db.get(addCachePrefix(key), { type: "json" });
+}
+
+export function getKVCache(db) {
+  return getDataListByPrefix(db, addCachePrefix(""));
+}
+
+export function getAllKV(db) {
+  return getDataListByPrefix(db, '');
+}
+
+export async function clearKVCache(db) {
+  const itemsToDelete = await getDataListByPrefix(db, addCachePrefix(""));
+  for await (const key of itemsToDelete.keys) {
+    await deleteById(db, key.name);
+  }
+}
+
+export async function clearAllKVRecords(db) {
+  const itemsToDelete = await getDataListByPrefix(db);
+  for await (const key of itemsToDelete.keys) {
+    await deleteById(db, key.name);
+  }
+}
+
+export function addCachePrefix(key: string = '') {
+  return `cache::${key}`;
+}
+
 export function saveContent(db, content, timestamp, id) {
-  console.log("saveContent--->", JSON.stringify(content, null, 2));
+  // console.log("inserting KV data", JSON.stringify(content, null, 2));
   // delete content.metadata;
   delete content.contentType;
-  delete content.submit;
+  // delete content.submit;
 
   // const contentType = content.data.systemId;
   // const generatedKey = getKey(timestamp, content.data.table, id);
@@ -91,15 +137,12 @@ export function saveContent(db, content, timestamp, id) {
     updated_on: timestamp,
   };
 
-  console.log("metadata ==>", metadata);
+  // console.log("metadata ==>", metadata);
 
   // const size = JSON.stringify(content).length;
 
   // console.log("size", size);
 
-  return db.put(id, JSON.stringify(content), {
-    metadata,
-  });
 }
 
 export function extractContentType(contentTypeComponents) {

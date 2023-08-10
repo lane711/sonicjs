@@ -139,13 +139,6 @@ export const Layout = (props: {
             placeholder="Search"
             aria-label="Search"
           />
-          {/* <div class="navbar-nav">
-            <div class="nav-item text-nowrap">
-              <a class="nav-link px-3" href="#">
-                Sign out
-              </a>
-            </div>
-          </div> */}
         </header>
 
         <div class="container-fluid">
@@ -156,11 +149,6 @@ export const Layout = (props: {
             >
               <div class="position-sticky pt-3 sidebar-sticky">
                 <ul class="nav flex-column">
-                  {/* <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="/admin/sites">
-                      Sites
-                    </a>
-                  </li> */}
                   <li class="nav-item">
                     <a class="nav-link" href="/admin">
                       Content
@@ -188,6 +176,54 @@ export const Layout = (props: {
                       </li>
                     );
                   })}
+
+                  <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>Cache</span>
+                  </h6>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      target="_blank"
+                      href="/v1/cache/in-memory"
+                    >
+                      In Memory - Show
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      target="_blank"
+                      href="/v1/cache/clear-in-memory"
+                    >
+                      In Memory - Clear All
+                    </a>
+                  </li>
+
+                  <li class="nav-item">
+                    <a class="nav-link" target="_blank" href="/v1/cache/kv">
+                      KV - Show
+                    </a>
+                  </li>
+
+                  <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      target="_blank"
+                      href="/v1/cache/clear-kv"
+                    >
+                      KV - Clear All
+                    </a>
+                  </li>
+
+                  <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      target="_blank"
+                      href="/v1/cache/clear-all"
+                    >
+                      Clear All Caches
+                    </a>
+                  </li>
                 </ul>
               </div>
             </nav>
@@ -240,12 +276,6 @@ export const Layout = (props: {
           </div>
         </div>
 
-        {/* <script
-          src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
-          integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
-          crossorigin="anonymous"
-        ></script> */}
-
         <script
           src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js"
           integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE"
@@ -275,7 +305,6 @@ export const Layout = (props: {
     </html>
   );
 };
-
 
 export const Top = (props: {
   items: object[];
@@ -359,25 +388,3 @@ export const Form = (props: {
     </Layout>
   );
 };
-
-// export async function loadSites(context) {
-//   const data = await getById(context.env.KVDATA, "host::sites");
-
-//   // console.log('data site', data[0])
-//   const list = data.map((item) => {
-//     return {
-//       title: item.title,
-//       path: `/admin/content-types/${item.name}`,
-//     };
-//   });
-
-//   return <Top items={list} screenTitle="Sites" />;
-// }
-
-// app.get("/new", async (c) => {
-//   KVDATA.put(`todo_${Date.now()}`, JSON.stringify({ "foo": "bar" }));
-
-//   const list = [];
-
-//   return c.html(<Top messages={list} />);
-// });
