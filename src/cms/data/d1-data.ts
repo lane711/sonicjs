@@ -20,16 +20,8 @@ export async function getAllContent(db) {
 }
 
 export async function getD1DataByTable(db, table, params) {
-
-
   const sql = generateSelectSql(table, params);
-
   const { results } = await db.prepare(sql).all();
-
-  // addToInMemoryCache(cacheKey, { data: results, source: "cache" });
-  // addToKvCache(cacheKey, { data: results, source: "kv" });
-
-  // console.log("sql results ==>", results);
 
   return { data: results, source: "d1" };
 }
@@ -57,8 +49,8 @@ export function generateSelectSql(table, params) {
     whereClause = whereClauseBuilder(params);
   }
 
-  let sql = `SELECT * FROM ${table} ${whereClause} ${sortBySyntax} ${limitSyntax} ${offsetSyntax};`;
-  sql = sql.replace(/\s+/g, " ").trim();
+  let sql = `SELECT * FROM ${table} ${whereClause} ${sortBySyntax} ${limitSyntax} ${offsetSyntax}`;
+  sql = sql.replace(/\s+/g, " ").trim() + ';';
 
   console.log("sql ==>", sql);
   return sql;
@@ -72,15 +64,6 @@ export async function getD1ByTableAndId(db, table, id) {
   return results[0];
 }
 
-// export async function saveData(d1, table, data) {
-//   if (!data.id) {
-//     data.id = uuidv4();
-//     return insertData(d1, table, data);
-//   } else {
-//     return updateData(d1, table, data);
-//   }
-// }
-
 export async function insertUserTest(d1, data) {
   const db = drizzle(d1);
 
@@ -90,19 +73,12 @@ export async function insertUserTest(d1, data) {
 export async function insertData(d1, table, data) {
   const db = drizzle(d1);
 
-  // console.log("inserting D1 data", table, data);
-
   const now = new Date().getTime();
   data.created_on = now;
   data.updated_on = now;
-  // delete data.contentType;
-  // delete data.submit;
   delete data.table;
 
-  // console.log("D1==>", JSON.stringify(data, null, 4));
-
   const schmea = getRepoFromTable(table);
-  // console.log("insertData schema", schmea);
   let result = db.insert(schmea).values(data).returning().get();
 
   return result;
@@ -123,16 +99,8 @@ export async function deleteByTableAndId(d1, table, id) {
 
 export async function updateData(d1, table, data) {
   const db = drizzle(d1);
-
   console.log("updateData===>", JSON.stringify(data, null, 4));
-
   const repo = getRepoFromTable(data.table);
-
-  // data.created_at = new Date();
-  // data.updated_at = new Date().getTime();
-  // delete data.id;
-  // delete data.contentType;
-  // delete data.submit;
   delete data.table;
 
   console.log(JSON.stringify(data, null, 4));
@@ -150,7 +118,6 @@ export async function updateData(d1, table, data) {
 }
 
 export function getSchemaFromTable(tableName) {
-  // console.log("getting schema", tableName);
   switch (tableName) {
     case "users":
       return userSchema;
@@ -186,10 +153,8 @@ export function getRepoFromTable(tableName) {
 }
 
 export function whereClauseBuilder(params) {
-  console.log("whereClauseBuilder", JSON.stringify(params.filters, null, 2));
-
+  // console.log("whereClauseBuilder", JSON.stringify(params.filters, null, 2));
   let whereClause = "";
-
   const filters = params.filters;
 
   if (!filters) {
