@@ -9,7 +9,7 @@ describe('Test the application', () => {
   })
 
   it('kvtest should return 200', async () => {
-    const res = await app.fetch(new Request('http://localhost/v1/kvtest'), env)
+    const res = await app.fetch(new Request('http://localhost/v1/cache/kv'), env)
     expect(res.status).toBe(200)
   })
 

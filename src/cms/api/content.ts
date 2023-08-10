@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { getForm, loadForm } from "../admin/forms/form";
 import {
   deleteById,
   getById,
@@ -7,17 +6,13 @@ import {
   getContentTypes,
   getDataByPrefix,
   getDataListByPrefix,
-  putData,
   saveContent,
   saveContentType,
 } from "../data/kv-data";
 import { Bindings } from "../types/bindings";
-import { apiConfig } from "../../db/schema";
 import {
   deleteByTableAndId,
   insertData,
-  insertUserTest,
-  saveData,
   updateData,
 } from "../data/d1-data";
 import { v4 as uuidv4 } from "uuid";
@@ -27,29 +22,6 @@ const content = new Hono<{ Bindings: Bindings }>();
 content.get("/ping", (c) => {
   console.log("testing ping", Date());
   return c.text(Date());
-});
-
-content.get("/kvtest", async (ctx) => {
-  const result = await getDataListByPrefix(ctx.env.KVDATA, "", 2);
-  return ctx.json(result);
-});
-
-content.get("/test", async (ctx) => {
-  const data = {
-    firstName: "Rosalyn",
-    lastName: "Huel",
-    email: "Carson73@hotmail.com",
-    password: "rV4NlzvqrMwFApA",
-    role: "user",
-    id: "a8ac7fe2-1358-48ef-9702-7d65da55b44d",
-    created_on: 1690587534535,
-    updated_on: 1690587534535,
-  };
-
-  const result = await insertUserTest(ctx.env.D1DATA, data);
-  console.log("test results", result);
-
-  return ctx.text(result);
 });
 
 content.post("/ping", (c) => {
@@ -63,7 +35,7 @@ content.get("/", async (ctx) => {
   const { keysOnly, contentType, includeContentType, limit, offset } =
     ctx.req.query();
 
-  const fetchLimit = limit ?? 100;
+  const fetchLimit = (limit ?? 100) as number;
 
   console.log("params-->", keysOnly, contentType, includeContentType);
 
