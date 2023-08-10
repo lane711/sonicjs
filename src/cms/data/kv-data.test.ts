@@ -4,7 +4,7 @@ import {
   getDataListByPrefix,
   putData,
   addToKvCache,
-  getFromKvCache,
+  getRecordFromKvCache,
   clearKVCache,
   getKVCache,
 } from "./kv-data";
@@ -66,9 +66,10 @@ describe("test KV cache", () => {
       foo: "bear",
     });
 
-    const kvResult1 = await getFromKvCache(env.KVDATA, "/some-url-key-1");
-    const kvResult2 = await getFromKvCache(env.KVDATA, "/some-url-key-2");
+    const kvResult1 = await getRecordFromKvCache(env.KVDATA, "/some-url-key-1");
+    const kvResult2 = await getRecordFromKvCache(env.KVDATA, "/some-url-key-2");
 
+    // console.log('kvResult1', kvResult1)
     expect(kvResult1).toEqual({
       foo: "bar",
     });

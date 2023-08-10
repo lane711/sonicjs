@@ -12,7 +12,7 @@ import {
 } from "../../db/schema";
 import { DefaultLogger, LogWriter, eq } from "drizzle-orm";
 import { addToInMemoryCache, getFromInMemoryCache } from "./cache";
-import { addToKvCache, getFromKvCache } from "./kv-data";
+import { addToKvCache, getRecordFromKvCache } from "./kv-data";
 import { getD1DataByTable } from "./d1-data";
 
 
@@ -25,7 +25,7 @@ export async function getData(d1, kv, table, params, cacheKey, source = 'fastest
 
     return cachedData;
   }
-  const kvData = await getFromKvCache(kv, cacheKey)
+  const kvData = await getRecordFromKvCache(kv, cacheKey)
   if(source == 'kv' || kvData){
     console.log("**** getting kv cache ****", kvData);
     return kvData;

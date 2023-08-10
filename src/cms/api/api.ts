@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { loadForm } from "../admin/forms/form";
 import {
+  clearKVCache,
   getById,
   getDataByPrefix,
   getDataListByPrefix,
@@ -91,15 +92,15 @@ api.get("/cache/clear-all", (ctx) => {
   return ctx.text("ok");
 });
 
-api.get("/cache/clear-in-memory", (ctx) => {
+api.get("/cache/clear-in-memory", async (ctx) => {
   console.log('clearing cache');
-  clearInMemoryCache();
+  await clearInMemoryCache();
   return ctx.text("ok");
 });
 
-api.get("/cache/clear-kv", (ctx) => {
+api.get("/cache/clear-kv", async (ctx) => {
   console.log('clearing cache');
-  clearInMemoryCache();
+  await clearKVCache(ctx.env.KVDATA);
   return ctx.text("ok");
 });
 

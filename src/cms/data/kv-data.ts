@@ -77,16 +77,21 @@ export function saveContentType(db, site, contentTypeComponents) {
 }
 
 export async function addToKvCache(db, key, value) {
-  console.log("adding to kv cache", key);
-  return db.put(addCachePrefix(key), JSON.stringify(value));
+  const cacheKey = addCachePrefix(key);
+  console.log("adding to kv cache", cacheKey);
+
+  return db.put(cacheKey, JSON.stringify(value), {
+    metadata: value ,
+  });
+
 }
 
-export async function getFromKvCache(db, key) {
+export async function getRecordFromKvCache(db, key) {
   return db.get(addCachePrefix(key), { type: "json" });
 }
 
 export function getKVCache(db) {
-  return db.list({ prefix: addCachePrefix("") });
+  return getDataListByPrefix(db, addCachePrefix(""));
 }
 
 export async function clearKVCache(db) {
@@ -121,9 +126,6 @@ export function saveContent(db, content, timestamp, id) {
 
   // console.log("size", size);
 
-  return db.put(id, JSON.stringify(content), {
-    metadata,
-  });
 }
 
 export function extractContentType(contentTypeComponents) {

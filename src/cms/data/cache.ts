@@ -21,7 +21,7 @@ export async function getAllFromInMemoryCache() {
 
 export async function clearInMemoryCache() {
   console.log("clearing InMemoryCache");
-
-  db.removeCollection("cache");
-  db.saveDatabase();
+cache.clear();
+  // db.removeCollection("cache");
+  // db.saveDatabase();
 }
