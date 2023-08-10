@@ -44,14 +44,14 @@ export function generateSelectSql(table, params) {
 
   if (params) {
     const sortDirection = params.sortDirection ?? "asc";
-    console.log("sortDirection ==>", sortDirection);
+    // console.log("sortDirection ==>", sortDirection);
 
     sortBySyntax = params.sortBy
       ? `order by ${params.sortBy} ${sortDirection}`
       : "";
 
     limitSyntax = params.limit > 0 ? `limit ${params.limit}` : "";
-    console.log("limitSyntax ==>", limitSyntax);
+    // console.log("limitSyntax ==>", limitSyntax);
 
     offsetSyntax = params.offset > 0 ? `offset ${params.offset}` : "";
     whereClause = whereClauseBuilder(params);

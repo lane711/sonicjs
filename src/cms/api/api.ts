@@ -1,7 +1,9 @@
 import { Hono } from "hono";
 import { loadForm } from "../admin/forms/form";
 import {
+  clearAllKVRecords,
   clearKVCache,
+  getAllKV,
   getById,
   getDataByPrefix,
   getDataListByPrefix,
@@ -27,7 +29,7 @@ apiConfig.forEach((entry) => {
   api.get(`/${entry.route}`, async (ctx) => {
     try {
       var params = qs.parse(ctx.req.query());
-      const data = await getData(ctx.env.D1DATA, ctx.env.KVDATA, entry.table, params,ctx.req.url );
+      const data = await getData(ctx.env.D1DATA, ctx.env.KVDATA, entry.table, params,ctx.req.url, 'fastest' );
       return ctx.json(data);
     } catch (error) {
       console.log(error);
@@ -86,22 +88,23 @@ api.post("/form-components", async (c) => {
   return c.text("Created!", 201);
 });
 
-api.get("/cache/clear-all", (ctx) => {
+api.get("/cache/clear-all", async (ctx) => {
   console.log('clearing cache');
-  clearInMemoryCache();
-  return ctx.text("ok");
+  await clearInMemoryCache();
+  await clearKVCache(ctx.env.KVDATA);
+  return ctx.text("in memory and kv caches cleared");
 });
 
 api.get("/cache/clear-in-memory", async (ctx) => {
   console.log('clearing cache');
   await clearInMemoryCache();
-  return ctx.text("ok");
+  return ctx.text("in memory cache cleared");
 });
 
 api.get("/cache/clear-kv", async (ctx) => {
   console.log('clearing cache');
   await clearKVCache(ctx.env.KVDATA);
-  return ctx.text("ok");
+  return ctx.text("kv cache cleared");
 });
 
 api.get("/cache/in-memory", async (ctx) => {
@@ -111,9 +114,19 @@ api.get("/cache/in-memory", async (ctx) => {
 });
 
 api.get("/cache/kv", async (ctx) => {
-  console.log('getting kv cache');
   const cacheItems = await getKVCache(ctx.env.KVDATA);
+  console.log('getting kv cache', cacheItems);
   return ctx.json(cacheItems);
+});
+
+api.get("/kv", async (ctx) => {
+  const allItems = await getAllKV(ctx.env.KVDATA);
+  return ctx.json(allItems);
+});
+
+api.get("/kv/delete-all", async (ctx) => {
+  await clearAllKVRecords(ctx.env.KVDATA);
+  return ctx.text('ok');
 });
 
 export { api };

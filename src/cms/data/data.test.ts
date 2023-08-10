@@ -9,6 +9,7 @@ import { getData } from "./data";
 import { clearInMemoryCache } from "./cache";
 
 it("CRUD", async () => {
+  const urlKey = 'http://localhost:8888/some-cache-key-url';
   const db = createTestTable();
 
   await insertData(__D1_BETA__D1DATA, "users", { firstName: "John", id: "1" });
@@ -19,7 +20,7 @@ it("CRUD", async () => {
     env.KVDATA,
     "users",
     undefined,
-    "some-cache-key-url"
+    urlKey
   );
 
   expect(d1Result.data.length).toBe(2);
@@ -32,7 +33,7 @@ it("CRUD", async () => {
     env.KVDATA,
     "users",
     undefined,
-    "some-cache-key-url"
+    urlKey
   );
 
   expect(inMemoryCacheResult.data.length).toBe(2);
@@ -47,7 +48,7 @@ it("CRUD", async () => {
     env.KVDATA,
     "users",
     undefined,
-    "some-cache-key-url"
+    urlKey
   );
   expect(kvResult.data.length).toBe(2);
   expect(kvResult.source).toBe("kv");

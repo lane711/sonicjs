@@ -188,6 +188,41 @@ export const Layout = (props: {
                       </li>
                     );
                   })}
+
+<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>Cache</span>
+                  </h6>
+                  <li class="nav-item">
+                    <a class="nav-link" target="_blank" href="/v1/cache/in-memory">
+                      In Memory - Show
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" target="_blank" href="/v1/cache/clear-in-memory">
+                      In Memory - Clear All
+                    </a>
+                  </li>
+
+                  <li class="nav-item">
+                    <a class="nav-link" target="_blank" href="/v1/cache/kv">
+                      KV - Show
+                    </a>
+                  </li>
+
+                  <li class="nav-item">
+                    <a class="nav-link" target="_blank" href="/v1/cache/clear-kv">
+                      KV - Clear All
+                    </a>
+                  </li>
+
+                  <li class="nav-item">
+                    <a class="nav-link" target="_blank" href="/v1/cache/clear-all">
+                      Clear All Caches
+                    </a>
+                  </li>
+
+
+                  
                 </ul>
               </div>
             </nav>

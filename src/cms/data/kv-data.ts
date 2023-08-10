@@ -78,11 +78,17 @@ export function saveContentType(db, site, contentTypeComponents) {
 
 export async function addToKvCache(db, key, value) {
   const cacheKey = addCachePrefix(key);
-  console.log("adding to kv cache", cacheKey);
+  console.log('*** addToKvCache db', db)
+  console.log("*** addToKvCache adding to kv cache", cacheKey);
 
-  return db.put(cacheKey, JSON.stringify(value), {
+  db.put(cacheKey, JSON.stringify(value), {
     metadata: value ,
   });
+  console.log("*** addToKvCache put complete");
+
+  const confirmedRecord = await getById(db, cacheKey);
+  console.log('confirmedRecord', confirmedRecord)
+  return confirmedRecord;
 
 }
 
@@ -94,6 +100,10 @@ export function getKVCache(db) {
   return getDataListByPrefix(db, addCachePrefix(""));
 }
 
+export function getAllKV(db) {
+  return getDataListByPrefix(db, '');
+}
+
 export async function clearKVCache(db) {
   const itemsToDelete = await getDataListByPrefix(db, addCachePrefix(""));
   for await (const key of itemsToDelete.keys) {
@@ -101,7 +111,14 @@ export async function clearKVCache(db) {
   }
 }
 
-export function addCachePrefix(key: string) {
+export async function clearAllKVRecords(db) {
+  const itemsToDelete = await getDataListByPrefix(db);
+  for await (const key of itemsToDelete.keys) {
+    await deleteById(db, key.name);
+  }
+}
+
+export function addCachePrefix(key: string = '') {
   return `cache::${key}`;
 }
 

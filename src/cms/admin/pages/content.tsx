@@ -68,9 +68,9 @@ export async function loadTableData(ctx, table) {
   // await putData(ctx.env.KVDATA, 'site1', 'content', {title: '20230508a'});
   console.log("user==>", table);
 
-  const data = await getD1DataByTable(ctx.env.D1DATA, table, undefined);
+  const results = await getD1DataByTable(ctx.env.D1DATA, table, undefined);
 
-  data.reverse();
+  results.data.reverse();
   // const content = await getAllContent(ctx.env.D1DATA);
   // console.log('data==>', JSON.stringify(data, null, 2))
 
@@ -81,7 +81,7 @@ export async function loadTableData(ctx, table) {
 
   // console.log("load admin data", content);
 
-  const contentList = data.map((item) => {
+  const contentList = results.data.map((item) => {
     return {
       id: item.id,
       title: getDisplayField(item),
