@@ -31,10 +31,10 @@ export async function loadApis(ctx) {
 
   await Promise.all(
     tables.map(async (scehma) => {
-      const data = await getD1DataByTable(ctx.env.D1DATA, scehma.table, 1);
-      if (data.length) {
+      const results = await getD1DataByTable(ctx.env.D1DATA, scehma.table, {'limit':1});
+      if (results.data.length) {
         let link: link = {
-          url: `/v1/${scehma.route}/${data[0].id}`,
+          url: `/v1/${scehma.route}/${results.data[0].id}`,
           description: `get single record from the ${scehma.table} table`,
         };
         recordApis.push(link);
