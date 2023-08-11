@@ -1,5 +1,5 @@
 import loki from "lokijs";
-var db = new loki("sandbox.db");
+var db = new loki("cache.db");
 var cache = db.addCollection("cache");
 
 export async function addToInMemoryCache(key: string, data) {
