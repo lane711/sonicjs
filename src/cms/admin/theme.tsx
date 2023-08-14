@@ -149,14 +149,10 @@ export const Layout = (props: {
             >
               <div class="position-sticky pt-3 sidebar-sticky">
                 <ul class="nav flex-column">
-                  <li class="nav-item">
-                    <a class="nav-link" href="/admin">
-                      Content
-                    </a>
-                  </li>
+
 
                   <li class="nav-item">
-                    <a class="nav-link" href="/admin/api">
+                    <a class="nav-link" href="/admin">
                       API
                     </a>
                   </li>

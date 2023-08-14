@@ -31,7 +31,9 @@ export async function loadApis(ctx) {
 
   await Promise.all(
     tables.map(async (scehma) => {
-      const results = await getD1DataByTable(ctx.env.D1DATA, scehma.table, {'limit':1});
+      const results = await getD1DataByTable(ctx.env.D1DATA, scehma.table, {
+        limit: 1,
+      });
       if (results.data.length) {
         let link: link = {
           url: `/v1/${scehma.route}/${results.data[0].id}`,
@@ -80,7 +82,21 @@ export const Top = (props: {
       </table>
 
       <h2>Record APIs</h2>
+      <ApiTable recordApis={props.recordApis}></ApiTable>
+    </Layout>
+  );
+};
 
+export const ApiTable = (props: { recordApis: link[] }) => {
+  if (props.recordApis.length == 0) {
+    return (
+      <h4>
+        The record API list will be displayed once you have some sample data in
+        your database.
+      </h4>
+    );
+  } else {
+    return (
       <table class="table">
         <thead>
           <tr>
@@ -103,6 +119,6 @@ export const Top = (props: {
           })}
         </tbody>
       </table>
-    </Layout>
-  );
+    );
+  }
 };

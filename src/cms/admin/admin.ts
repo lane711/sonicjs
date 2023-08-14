@@ -21,7 +21,7 @@ admin.get("/ping", (ctx) => {
   return ctx.text(Date());
 });
 
-admin.get("/", async (ctx) => ctx.html(await loadAdminTable(ctx)));
+admin.get("/", async (ctx) => ctx.html(await loadApis(ctx)));
 
 admin.get("/content/edit/:table/:id", async (ctx) => {
   const table = ctx.req.param("table");
@@ -39,6 +39,5 @@ admin.get("/tables/:table", async (ctx) => {
   return ctx.html(await loadTableData(ctx, table));
 });
 
-admin.get("/api", async (ctx) => ctx.html(await loadApis(ctx)));
 
 export { admin };
