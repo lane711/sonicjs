@@ -3,7 +3,7 @@ import {
   getById,
   getContentType,
   getDataListByPrefix,
-  putData,
+  saveKVData,
 } from "../data/kv-data";
 
 export const Layout = (props: {

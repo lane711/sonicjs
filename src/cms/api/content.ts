@@ -12,7 +12,7 @@ import {
 import { Bindings } from "../types/bindings";
 import {
   deleteByTableAndId,
-  insertData,
+  insertD1Data,
   updateData,
 } from "../data/d1-data";
 import { v4 as uuidv4 } from "uuid";
@@ -139,12 +139,13 @@ content.post("/", async (ctx) => {
   } finally {
     //then also save the content to sqlite for filtering, sorting, etc
     try {
-      const result = await insertData(
+      const result = await insertD1Data(
         ctx.env.D1DATA,
+        ctx.env.KVDATA,
         content.data.table,
         content.data
       );
-      console.log('insertData --->', result)
+      console.log('insertD1Data --->', result)
       return ctx.json(result.id, 201);
 
     } catch (error) {

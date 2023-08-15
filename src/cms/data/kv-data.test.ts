@@ -2,7 +2,7 @@ import {
   add,
   getKey,
   getDataListByPrefix,
-  putData,
+  saveKVData,
   addToKvCache,
   getRecordFromKvCache,
   clearKVCache,
@@ -12,15 +12,15 @@ import {
 const env = getMiniflareBindings();
 
 describe("test KV data access tier", () => {
-  it("putData should insert data", async () => {
-    const rec1 = await putData(
+  it("saveKVData should insert data", async () => {
+    const rec1 = await saveKVData(
       env.KVDATA,
       "site",
       "ct",
       { foo: "bar" },
       "12345"
     );
-    const rec2 = await putData(
+    const rec2 = await saveKVData(
       env.KVDATA,
       "site",
       "ct",
@@ -35,7 +35,7 @@ describe("test KV data access tier", () => {
     // expect(key.length).toBe(40);
   });
 
-  putData;
+  saveKVData;
   it("getDataListByPrefix should return data", async () => {
     const data = await getDataListByPrefix(env.KVDATA, "", 2);
     console.log("getDataListByPrefix==>", data);

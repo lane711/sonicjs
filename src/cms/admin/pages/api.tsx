@@ -1,6 +1,6 @@
 import { desc } from "drizzle-orm";
 import { apiConfig } from "../../../db/schema";
-import { getById, getDataListByPrefix, putData } from "../../data/kv-data";
+import { getById, getDataListByPrefix, saveKVData } from "../../data/kv-data";
 import { Layout } from "../theme";
 import { getD1DataByTable, getD1ByTableAndId } from "../../data/d1-data";
 

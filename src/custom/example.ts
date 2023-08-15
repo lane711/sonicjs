@@ -14,4 +14,10 @@ example.get("/users", async (ctx) => {
     return ctx.json(data);
   });
 
+  example.post("/users", async (ctx) => {
+    var params = qs.parse(ctx.req.query());
+    const data = await getData(ctx.env.D1DATA, ctx.env.KVDATA, 'users', params,ctx.req.url, 'fastest' );
+    return ctx.json(data);
+  });
+
 export { example };

@@ -49,13 +49,13 @@ export function getAsset(db, key) {
   return db.get(key, { type: "text" });
 }
 
-export function putData(db, site, contentType, value, key = undefined) {
-  const generatedKey = getKey(site, contentType, key);
-  console.log("generatedKey", generatedKey);
-  return db.put(generatedKey, JSON.stringify(value));
+export function saveKVData(db, id, data) {
+  // const generatedKey = getKey(timestamp, value., id);
+  // console.log("generatedKey", generatedKey);
+  return db.put(id, JSON.stringify(data));
 }
 
-export function putDataWithMetaData(
+export function saveKVDataWithMetaData(
   db,
   site,
   contentType,

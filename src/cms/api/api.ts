@@ -8,7 +8,7 @@ import {
   getDataByPrefix,
   getDataListByPrefix,
   getKVCache,
-  putData,
+  saveKVData,
   saveContent,
   saveContentType,
 } from "../data/kv-data";

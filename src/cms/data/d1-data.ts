@@ -70,7 +70,7 @@ export async function insertUserTest(d1, data) {
   return db.insert(usersTable).values(data).returning().get();
 }
 
-export async function insertData(d1, table, data) {
+export async function insertD1Data(d1, kv, table, data) {
   const db = drizzle(d1);
 
   const now = new Date().getTime();
@@ -80,6 +80,8 @@ export async function insertData(d1, table, data) {
 
   const schmea = getRepoFromTable(table);
   let result = db.insert(schmea).values(data).returning().get();
+
+  //TODO: insert into KV Cache
 
   return result;
 }

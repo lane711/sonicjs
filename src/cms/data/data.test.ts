@@ -1,19 +1,52 @@
-import { insertData } from "./d1-data";
+import { insertD1Data } from "./d1-data";
 import { usersTable } from "../../db/schema";
 import qs from "qs";
 const env = getMiniflareBindings();
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
-import { getData } from "./data";
+import { getData, insertRecord } from "./data";
 import { clearInMemoryCache } from "./cache";
 
+it("Insert Data", async () => {
+  const urlKey = "http://localhost:8888/some-cache-key-url";
+
+  const db = createTestTable();
+  const newRecord = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
+    firstName: "John",
+    id: "1",
+    table: "users",
+  });
+  console.log('newRecord', newRecord);
+
+  const d1Result = await getData(
+    env.__D1_BETA__D1DATA,
+    env.KVDATA,
+    "users",
+    undefined,
+    urlKey
+  );
+
+  //record should be in list
+  expect(d1Result.data.length).toBe(1);
+  expect(d1Result.source).toBe("d1");
+
+  //should be able to lookup new record 
+});
+
 it("CRUD", async () => {
-  const urlKey = 'http://localhost:8888/some-cache-key-url';
+  const urlKey = "http://localhost:8888/some-cache-key-url";
+
   const db = createTestTable();
 
-  await insertData(__D1_BETA__D1DATA, "users", { firstName: "John", id: "1" });
-  await insertData(__D1_BETA__D1DATA, "users", { firstName: "Jane", id: "2" });
+  await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+    firstName: "John",
+    id: "1",
+  });
+  await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+    firstName: "Jane",
+    id: "2",
+  });
 
   const d1Result = await getData(
     env.__D1_BETA__D1DATA,
@@ -41,7 +74,7 @@ it("CRUD", async () => {
 
   //kill cache to simulate end user requesting kv cache data from another server node
   clearInMemoryCache();
-  
+
   // if we request it again, it should also be cached in kv storage
   const kvResult = await getData(
     env.__D1_BETA__D1DATA,

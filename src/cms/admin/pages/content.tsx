@@ -13,7 +13,7 @@ import {
 import { Form, Layout } from "../theme";
 
 export async function loadAdminTable(ctx) {
-  // await putData(ctx.env.KVDATA, 'site1', 'content', {title: '20230508a'});
+  // await saveKVData(ctx.env.KVDATA, 'site1', 'content', {title: '20230508a'});
 
   // const content = await getAllContent(ctx.env.D1DATA);
   // const content = await getAllContent(ctx.env.D1DATA);
@@ -65,7 +65,7 @@ export async function loadAdminTable(ctx) {
 }
 
 export async function loadTableData(ctx, table) {
-  // await putData(ctx.env.KVDATA, 'site1', 'content', {title: '20230508a'});
+  // await saveKVData(ctx.env.KVDATA, 'site1', 'content', {title: '20230508a'});
   console.log("user==>", table);
 
   const results = await getD1DataByTable(ctx.env.D1DATA, table, undefined);
@@ -98,7 +98,7 @@ function getDisplayField(item) {
 }
 
 export async function loadAdmin(ctx) {
-  // await putData(ctx.env.KVDATA, 'site1', 'content', {title: '20230508a'});
+  // await saveKVData(ctx.env.KVDATA, 'site1', 'content', {title: '20230508a'});
 
   const content = await getDataListByPrefix(ctx.env.KVDATA, "site1::content::");
   // const content = await getAllContent(ctx.env.D1DATA);
