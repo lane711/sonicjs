@@ -5,7 +5,7 @@ const env = getMiniflareBindings();
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
-import { getData, insertRecord } from "./data";
+import { getRecord, getRecords, insertRecord } from "./data";
 import { clearInMemoryCache } from "./cache";
 
 it("Insert Data", async () => {
@@ -19,7 +19,7 @@ it("Insert Data", async () => {
   });
   console.log('newRecord', newRecord);
 
-  const d1Result = await getData(
+  const d1Result = await getRecords(
     env.__D1_BETA__D1DATA,
     env.KVDATA,
     "users",
@@ -32,6 +32,14 @@ it("Insert Data", async () => {
   expect(d1Result.source).toBe("d1");
 
   //should be able to lookup new record 
+  // const singleResult = await getRecord(
+  //   env.__D1_BETA__D1DATA,
+  //   env.KVDATA,
+  //   newRecord.data.id
+  // );
+
+  // expect(d1Result.data.length).toBe(1);
+  // expect(d1Result.source).toBe("kv");
 });
 
 it("CRUD", async () => {
@@ -48,7 +56,7 @@ it("CRUD", async () => {
     id: "2",
   });
 
-  const d1Result = await getData(
+  const d1Result = await getRecords(
     env.__D1_BETA__D1DATA,
     env.KVDATA,
     "users",
@@ -61,7 +69,7 @@ it("CRUD", async () => {
 
   //if we request it again, it should be cached in memory
   //TODO need to be able to pass in ctx so that we can setup d1 and kv
-  const inMemoryCacheResult = await getData(
+  const inMemoryCacheResult = await getRecords(
     env.__D1_BETA__D1DATA,
     env.KVDATA,
     "users",
@@ -76,7 +84,7 @@ it("CRUD", async () => {
   clearInMemoryCache();
 
   // if we request it again, it should also be cached in kv storage
-  const kvResult = await getData(
+  const kvResult = await getRecords(
     env.__D1_BETA__D1DATA,
     env.KVDATA,
     "users",

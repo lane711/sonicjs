@@ -12,11 +12,31 @@ import {
 } from "../../db/schema";
 import { DefaultLogger, LogWriter, eq } from "drizzle-orm";
 import { addToInMemoryCache, getFromInMemoryCache } from "./cache";
-import { addToKvCache, getRecordFromKvCache, saveKVData } from "./kv-data";
+import { addCachePrefix, addToKvCache, getRecordFromKvCache, saveKVData } from "./kv-data";
 import { getD1DataByTable, insertD1Data } from "./d1-data";
 
 
-export async function getData(d1, kv, table, params, cacheKey, source = 'fastest') {
+export async function getRecord(d1, kv, id) {
+  const cacheKey = addCachePrefix(id);
+  const cacheResult = await getFromInMemoryCache(cacheKey);
+  console.log("cacheResult", cacheResult);
+  if (cacheResult && cacheResult.length) {
+    const cachedData = cacheResult[0].data;
+    console.log("**** cachedData ****", cachedData);
+
+    return cachedData;
+  }
+  const kvData = await getRecordFromKvCache(kv, id) 
+
+
+  addToInMemoryCache(cacheKey, { data: kvData.data, source: "kv" });
+
+  // console.log("sql results ==>", results);
+
+  return kvData;
+}
+
+export async function getRecords(d1, kv, table, params, cacheKey, source = 'fastest') {
   const cacheResult = await getFromInMemoryCache(cacheKey);
   console.log("cacheResult", cacheResult);
   if (cacheResult && cacheResult.length && source == 'fastest') {
