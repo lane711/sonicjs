@@ -22,7 +22,7 @@ export async function loadAdminTable(ctx) {
 
   content.keys.reverse();
 
-  console.log("content==>", JSON.stringify(content, null, 2));
+  console.log('content==>', JSON.stringify(content, null, 2))
 
   // console.log("load admin data", content);
 
