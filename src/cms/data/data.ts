@@ -33,6 +33,7 @@ export async function getRecord(d1, kv, id) {
 
   // console.log("sql results ==>", results);
 
+  
   return kvData;
 }
 
