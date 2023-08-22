@@ -7,6 +7,7 @@ import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { getRecord, getRecords, insertRecord } from "./data";
 import { clearInMemoryCache } from "./cache";
+import { clearKVCache } from "./kv-data";
 
 it("Insert Data", async () => {
   const urlKey = "http://localhost:8888/some-cache-key-url";
@@ -43,18 +44,25 @@ it("Insert Data", async () => {
 });
 
 it("CRUD", async () => {
+  //start with a clear cache
+  await clearInMemoryCache();
+  await clearKVCache(KVDATA);
+  
   const urlKey = "http://localhost:8888/some-cache-key-url";
 
   const db = createTestTable();
 
-  await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+  const rec1 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
     firstName: "John",
     id: "1",
   });
-  await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+  console.log('rec1', rec1);
+
+  const rec2 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
     firstName: "Jane",
     id: "2",
   });
+  console.log('rec2', rec2);
 
   const d1Result = await getRecords(
     env.__D1_BETA__D1DATA,
@@ -63,6 +71,8 @@ it("CRUD", async () => {
     undefined,
     urlKey
   );
+
+  console.log('d1Result', d1Result);
 
   expect(d1Result.data.length).toBe(2);
   expect(d1Result.source).toBe("d1");
