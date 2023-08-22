@@ -27,7 +27,7 @@ npm install -g wrangler
 
 # Getting Started
 ```
-npc create-sonicjs-app
+npx create-sonicjs-app
 ```
 
 Follow the installation script prompts to enter the required Cloudflare values.
