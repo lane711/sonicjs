@@ -24,6 +24,31 @@ The details of our performance benchmark here is available at
 ```
 npm install -g wrangler
 ```
+3. You will need to have four Cloudflare values during the first step of **Getting Started**:
+    * Cloudflare account id which is your 32 character id at the end of your [https://dash.cloudflare.com/](https://dash.cloudflare.com/) url
+    * For Cloudflare kv namespace id enter the following command in powershell as admin: 
+      ```
+      wrangler kv:namespace create sonicjs
+      ```
+    * Cloudflare kv namespace preview id enter the following command in powershell as admin: 
+      ```
+      wrangler kv:namespace create SonicJS --preview
+      ```
+    * Cloudflare database id enter the following command in powershell as admin: 
+      ```
+      wrangler d1 create SonicJS
+      ```
+If you receive the error:
+`wrangler.ps1 cannot be loaded because running scripts is disabled on this system.`
+
+Run this command on powershell as administrator and try running the wrangler commands from step 3:
+```
+Set-ExecutionPolicy RemoteSigned
+```
+If you already created a namespace and need to see your namespace id do:
+```
+wrangler kv:namespace list 
+```
 
 # Getting Started
 ```
