@@ -16,21 +16,21 @@ import { copy } from 'esbuild-plugin-copy';
         resolveFrom: 'cwd',
         assets: {
           from: ['./public/css/*'],
-          to: ['./dist/css'],
+          to: ['./dist/public/css'],
         }
       }),
       copy({
         resolveFrom: 'cwd',
         assets: {
           from: ['./public/js/*'],
-          to: ['./dist/js'],
+          to: ['./dist/public/js'],
         }
       }),
       copy({
         resolveFrom: 'cwd',
         assets: {
           from: ['./public/images/*'],
-          to: ['./dist/images'],
+          to: ['./dist/public/images'],
         }
       }),
     ],
