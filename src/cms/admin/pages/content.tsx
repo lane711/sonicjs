@@ -22,7 +22,7 @@ export async function loadAdminTable(ctx) {
 
   content.keys.reverse();
 
-  console.log('content==>', JSON.stringify(content, null, 2))
+  console.log("content==>", JSON.stringify(content, null, 2));
 
   // console.log("load admin data", content);
 
@@ -36,7 +36,7 @@ export async function loadAdminTable(ctx) {
     // console.log("updated_on-->", updated_on);
 
     return {
-      id:item.name,
+      id: item.name,
       title: item.name,
       updated_on: updated_on,
       editPath: `/admin/content/edit/${table}/${id}`,
@@ -236,6 +236,7 @@ export const TopContentList = (props: {
                         href="javascript:void(0)"
                         data-id={item.id}
                         class="btn btn-outline-warning btn-sm delete-content"
+                        onClick="return confirm('Delete forever?') ? updateContent(data-id) : false;"
                       >
                         Delete
                       </a>
