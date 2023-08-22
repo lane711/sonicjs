@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "run-p dev:*",
     "dev:wrangler": "wrangler pages dev dist --live-reload",
-    "dev:esbuild": "rsync -avzh ./public ./dist --delete && esbuild --bundle --sourcemap src/server.ts --format=esm --watch --outfile=dist/_worker.js",
-    "buildold": " rsync -avzh ./public ./dist --delete && esbuild --bundle --sourcemap src/server.ts --format=esm --outfile=dist/_worker.js",
+    "dev:esbuild": "node ./src/cms/util/build.mjs",
     "build": "node ./src/cms/util/build.mjs",
     "deploy": "wrangler pages deploy dist",
     "test": "jest --verbose",
