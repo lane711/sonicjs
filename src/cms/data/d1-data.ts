@@ -81,9 +81,6 @@ export async function insertD1Data(d1, kv, table, data) {
   const schmea = getRepoFromTable(table);
   let result = db.insert(schmea).values(data).returning().get();
 
-  //TODO: mark table cache as invalid
-  await setCacheStatus(kv, false);
-
   return result;
 }
 

@@ -38,13 +38,15 @@ export async function setCacheStatus(timeToExpireMs) {
 }
 
 export async function setCacheStatusInvalid() {
-  expires = new Date().getTime() - 1; //setting to the past
+  expires = new Date().getTime() - 1000; //setting to the past
   return LocalCache.getCacheStatus();
 }
 
 export async function addToInMemoryCache(key: string, data) {
   console.log("addToInMemoryCache", key);
   cache.insert({ key, data });
+  //TODO: softcode time
+  await setCacheStatus(9999);
 }
 
 export async function getFromInMemoryCache(key: string) {

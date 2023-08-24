@@ -4,9 +4,14 @@ const env = getMiniflareBindings();
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
-import { getRecords } from "./data";
-import { clearInMemoryCache, isCacheValid, setCacheStatus, setCacheStatusInvalid } from "./cache";
-import { clearKVCache } from "./kv-data";
+import { getRecords, insertRecord } from "./data";
+import {
+  clearInMemoryCache,
+  isCacheValid,
+  setCacheStatus,
+  setCacheStatusInvalid,
+} from "./cache";
+import { clearKVCache, getKVCache, getRecordFromKvCache } from "./kv-data";
 
 describe("cache expiration", () => {
   it("cache status should return false if never set", async () => {
@@ -53,15 +58,17 @@ describe("cache invalidation", () => {
 
     const db = createTestTable();
 
-    const rec1 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+    const rec1 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
       firstName: "John",
       id: "1",
+      table: "users",
     });
     console.log("rec1", rec1);
 
-    const rec2 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+    const rec2 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
       firstName: "Jane",
       id: "2",
+      table: "users",
     });
     console.log("rec2", rec2);
 
@@ -79,7 +86,6 @@ describe("cache invalidation", () => {
     expect(d1Result.source).toBe("d1");
 
     //if we request it again, it should be cached in memory
-    //TODO need to be able to pass in ctx so that we can setup d1 and kv
     const inMemoryCacheResult = await getRecords(
       env.__D1_BETA__D1DATA,
       env.KVDATA,
@@ -92,10 +98,19 @@ describe("cache invalidation", () => {
     expect(inMemoryCacheResult.source).toBe("cache");
 
     // let's insert another records
-    const rec3 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+    const rec3 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
       firstName: "Steve",
       id: "3",
+      table: "users",
     });
+
+    //cache status should not be valid
+    const cacheStatus = await isCacheValid();
+    expect(cacheStatus).toBeFalsy();
+
+    //kv cache for the urlKey should be empty
+    const allCacheItems = await getRecordFromKvCache(KVDATA, `cache::${urlKey}`);
+    expect(allCacheItems).toBeFalsy;
 
     // we inserted another record, it should be returned because the insert should invalidate cache
     // this will only work instantly on the node that the update is made and will be eventually consistent on other nodes
@@ -108,12 +123,8 @@ describe("cache invalidation", () => {
       urlKey
     );
 
-    //cache status should not be valid
-    // const cacheStatus = await isCacheValid();
-    // expect(cacheStatus).toBeTruthy();
-
-    // expect(resultAfterInsert.data.length).toBe(3);
-    // expect(resultAfterInsert.source).toBe("d1");
+    expect(resultAfterInsert.data.length).toBe(3);
+    expect(resultAfterInsert.source).toBe("d1");
   });
 });
 
