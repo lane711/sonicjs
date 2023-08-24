@@ -5,7 +5,7 @@ const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { getRecords } from "./data";
-import { clearInMemoryCache, isCacheValid, setCacheStatus } from "./cache";
+import { clearInMemoryCache, isCacheValid, setCacheStatus, setCacheStatusInvalid } from "./cache";
 import { clearKVCache } from "./kv-data";
 
 describe("cache expiration", () => {
@@ -24,6 +24,22 @@ describe("cache expiration", () => {
     const result = await setCacheStatus(-1000);
     const cacheStatus = await isCacheValid();
     expect(cacheStatus).toBeFalsy();
+  });
+
+  it("cache status should return false if explicity set to invalid", async () => {
+    const result = await setCacheStatusInvalid();
+    const cacheStatus = await isCacheValid();
+    expect(cacheStatus).toBeFalsy();
+  });
+
+  it("cache status should return false if explicity set to invalid after previously being valid", async () => {
+    const result = await setCacheStatus(1000);
+    const cacheStatus = await isCacheValid();
+    expect(cacheStatus).toBeTruthy();
+
+    const result2 = await setCacheStatusInvalid();
+    const cacheStatus2 = await isCacheValid();
+    expect(cacheStatus2).toBeFalsy();
   });
 });
 

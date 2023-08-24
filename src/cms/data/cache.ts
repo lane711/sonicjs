@@ -25,15 +25,20 @@ const LocalCache = {
 
 export async function isCacheValid() {
   let expiresOn = LocalCache.getCacheStatus();
-  let now = new Date().getTime()
-  if(expiresOn && expiresOn > now){
-    return true
+  let now = new Date().getTime();
+  if (expiresOn && expiresOn > now) {
+    return true;
   }
   return false;
 }
 
 export async function setCacheStatus(timeToExpireMs) {
   expires = new Date().getTime() + timeToExpireMs;
+  return LocalCache.getCacheStatus();
+}
+
+export async function setCacheStatusInvalid() {
+  expires = new Date().getTime() - 1; //setting to the past
   return LocalCache.getCacheStatus();
 }
 
