@@ -38,6 +38,11 @@ export async function getRecord(d1, kv, id) {
 }
 
 export async function getRecords(d1, kv, table, params, cacheKey, source = 'fastest') {
+
+  // TODO: this forces us to hit the kv, need to be able to rely on in-memory at this point
+  // const cacheStatus = await getCacheStatus(kv);
+
+  
   const cacheResult = await getFromInMemoryCache(cacheKey);
   console.log("cacheResult", cacheResult);
   if (cacheResult && cacheResult.length && source == 'fastest') {

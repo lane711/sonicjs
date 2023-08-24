@@ -11,7 +11,7 @@ import {
   commentsTable,
 } from "../../db/schema";
 import { DefaultLogger, LogWriter, eq } from "drizzle-orm";
-import { addToInMemoryCache } from "./cache";
+import { addToInMemoryCache, setCacheStatus } from "./cache";
 import { addToKvCache } from "./kv-data";
 
 export async function getAllContent(db) {
@@ -81,10 +81,13 @@ export async function insertD1Data(d1, kv, table, data) {
   const schmea = getRepoFromTable(table);
   let result = db.insert(schmea).values(data).returning().get();
 
-  //TODO: insert into KV Cache
+  //TODO: mark table cache as invalid
+  await setCacheStatus(kv, false);
 
   return result;
 }
+
+
 
 export async function deleteByTableAndId(d1, table, id) {
   console.log("deleteByTableAndId", table, id);
