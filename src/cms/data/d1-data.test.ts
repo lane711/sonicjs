@@ -2,7 +2,7 @@ import {
   generateSelectSql,
   getByTable,
   getD1DataByTable,
-  insertData,
+  insertD1Data,
   whereClauseBuilder,
 } from "./d1-data";
 import { usersTable } from "../../db/schema";
@@ -47,11 +47,12 @@ it("should return a SQL select", () => {
 it.skip("CRUD", async () => {
   const db = createTestTable();
 
-  await insertData(__D1_BETA__D1DATA, "users", { firstName: "John", id: "1" });
-  await insertData(__D1_BETA__D1DATA, "users", { firstName: "Jane", id: "2" });
+  await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", { firstName: "John", id: "1" });
+  await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", { firstName: "Jane", id: "2" });
 
   const d1Result = await getByTable(
     __D1_BETA__D1DATA,
+    KVDATA,
     "users",
     undefined,
     "some-cache-key-url"
