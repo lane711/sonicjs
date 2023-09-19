@@ -13,7 +13,7 @@ import { Bindings } from "../types/bindings";
 import {
   deleteByTableAndId,
   insertD1Data,
-  updateData,
+  updateD1Data,
 } from "../data/d1-data";
 import { v4 as uuidv4 } from "uuid";
 
@@ -180,7 +180,7 @@ content.put("/", async (ctx) => {
   } finally {
     //then also save the content to sqlite for filtering, sorting, etc
     try {
-      const result = updateData(ctx.env.D1DATA, content.table, content);
+      const result = updateD1Data(ctx.env.D1DATA, content.table, content);
     } catch (error) {
       console.log("error posting content", error);
     }

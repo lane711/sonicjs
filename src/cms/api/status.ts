@@ -39,6 +39,13 @@ status.get("/", async (ctx) => {
     status.kv = "error: " + error;
   }
 
+    //env
+  try {
+    status.env = ctx.env;
+  } catch (error) {
+    status.env = "error: " + error;
+  }
+
   return ctx.json(status);
 });
 

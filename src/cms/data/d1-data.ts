@@ -99,9 +99,9 @@ export async function deleteByTableAndId(d1, table, id) {
   return result;
 }
 
-export async function updateData(d1, table, data) {
+export async function updateD1Data(d1, table, data) {
   const db = drizzle(d1);
-  console.log("updateData===>", JSON.stringify(data, null, 4));
+  console.log("updateD1Data===>", JSON.stringify(data, null, 4));
   const repo = getRepoFromTable(data.table);
   delete data.table;
 

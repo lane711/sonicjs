@@ -23,7 +23,7 @@ import { clearInMemoryCache, getAllFromInMemoryCache } from "../data/cache";
 const api = new Hono<{ Bindings: Bindings }>();
 
 apiConfig.forEach((entry) => {
-  console.log("setting route for " + entry.route);
+  // console.log("setting route for " + entry.route);
 
   //ie /v1/users
   api.get(`/${entry.route}`, async (ctx) => {
