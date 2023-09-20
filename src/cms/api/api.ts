@@ -17,7 +17,7 @@ import { apiConfig } from "../../db/schema";
 import { getD1DataByTable, getD1ByTableAndId } from "../data/d1-data";
 import { getForm } from "./forms";
 import qs from "qs";
-import { getRecords } from "../data/data";
+import { getRecords, insertRecord } from "../data/data";
 import { clearInMemoryCache, getAllFromInMemoryCache } from "../data/cache";
 
 const api = new Hono<{ Bindings: Bindings }>();
@@ -37,6 +37,8 @@ apiConfig.forEach((entry) => {
     }
   });
 
+
+  //get single record
   api.get(`/${entry.route}/:id`, async (ctx) => {
     const { includeContentType } = ctx.req.query();
 
@@ -49,6 +51,53 @@ apiConfig.forEach((entry) => {
 
     return ctx.json(data);
   });
+
+  //update single record
+  api.post(`/${entry.route}`, async (ctx) => {
+
+  // content.post("/", async (ctx) => {
+    const content = await ctx.req.json();
+  
+    // console.log('post new', content)
+  
+    const id = uuidv4();
+    const timestamp = new Date().getTime();
+    content.data.id = id;
+  
+
+    try {
+      const result = await  insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, content);
+
+      // const result = await saveContent(
+      //   ctx.env.KVDATA,
+      //   content.data,
+      //   timestamp,
+      //   id
+      // );
+      // console.log('result KV', result);
+      return ctx.json(result.id, 201);
+    } catch (error) {
+      console.log("error posting content", error);
+      return ctx.text(error, 500);
+    } 
+    // finally {
+    //   //then also save the content to sqlite for filtering, sorting, etc
+    //   try {
+    //     const result = await insertD1Data(
+    //       ctx.env.D1DATA,
+    //       ctx.env.KVDATA,
+    //       content.data.table,
+    //       content.data
+    //     );
+    //     console.log('insertD1Data --->', result)
+    //     return ctx.json(result.id, 201);
+  
+    //   } catch (error) {
+    //     console.log("error posting content " + content.data.table, error, JSON.stringify(content.data, null, 2));
+    //   }
+    // }
+  });
+
 });
 
 api.get("/ping", (c) => {

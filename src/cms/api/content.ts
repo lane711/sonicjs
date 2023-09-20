@@ -16,6 +16,7 @@ import {
   updateD1Data,
 } from "../data/d1-data";
 import { v4 as uuidv4 } from "uuid";
+import { deleteRecord } from "../data/data";
 
 const content = new Hono<{ Bindings: Bindings }>();
 
@@ -198,14 +199,15 @@ content.delete("/:contentId", async (ctx) => {
 
   if (content) {
     console.log("content found, deleting...");
-    const kvDelete = await deleteKVById(ctx.env.KVDATA, id);
-    const d1Delete = await deleteD1ByTableAndId(
-      ctx.env.D1DATA,
-      content.data.table,
-      content.data.id
-    );
-    console.log("returning 200");
-    return ctx.text("", 200);
+    const result = await deleteRecord(ctx.env.D1DATA, ctx.env.D1DATA, {id, table: content.table})
+    // const kvDelete = await deleteKVById(ctx.env.KVDATA, id);
+    // const d1Delete = await deleteD1ByTableAndId(
+    //   ctx.env.D1DATA,
+    //   content.data.table,
+    //   content.data.id
+    // );
+    console.log("returning 204");
+    return ctx.text("", 204);
   } else {
     console.log("content not found");
     return ctx.text("", 404);

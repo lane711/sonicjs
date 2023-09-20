@@ -17,7 +17,7 @@ let newPostId = ''
 test('CRUD', async () => {
   // POST /posts
   // let payload = JSON.stringify({ title: 'Morning', body: 'Good Morning',table:'posts' })
-  // let req = new Request('http://localhost', {
+  // let req = new Request('http://localhost/v1/posts', {
   //   method: 'POST',
   //   body: payload,
   //   headers: { 'Content-Type': 'application/json' },
