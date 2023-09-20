@@ -40,7 +40,7 @@ export async function getById(db, key) {
   return db.get(key, { type: "json" });
 }
 
-export async function deleteById(db, key) {
+export async function deleteKVById(db, key) {
   console.log("deleting kv " + key);
   return db.delete(key);
 }
@@ -107,14 +107,14 @@ export function getAllKV(db) {
 export async function clearKVCache(db) {
   const itemsToDelete = await getDataListByPrefix(db, addCachePrefix(""));
   for await (const key of itemsToDelete.keys) {
-    await deleteById(db, key.name);
+    await deleteKVById(db, key.name);
   }
 }
 
 export async function clearAllKVRecords(db) {
   const itemsToDelete = await getDataListByPrefix(db);
   for await (const key of itemsToDelete.keys) {
-    await deleteById(db, key.name);
+    await deleteKVById(db, key.name);
   }
 }
 

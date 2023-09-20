@@ -21,10 +21,11 @@ import {
   addCachePrefix,
   addToKvCache,
   clearKVCache,
+  deleteKVById,
   getRecordFromKvCache,
   saveKVData,
 } from "./kv-data";
-import { getD1DataByTable, insertD1Data, updateD1Data } from "./d1-data";
+import { deleteD1ByTableAndId, getD1DataByTable, insertD1Data, updateD1Data } from "./d1-data";
 
 export async function getRecord(d1, kv, id) {
   const cacheKey = addCachePrefix(id);
@@ -108,7 +109,7 @@ export async function insertRecord(d1, kv, data) {
       //expire cache
       await setCacheStatusInvalid();
       await clearKVCache(kv);
-      
+
       return { code: 201, message: result.id };
     } catch (error) {
       error =
@@ -123,27 +124,38 @@ export async function insertRecord(d1, kv, data) {
 
 export async function updateRecord(d1, kv, data) {
   const timestamp = new Date().getTime();
-  // const result = await saveContent(
-  //   ctx.env.KVDATA,
-  //   content,
-  //   timestamp,
-  //   content.id
-  // );
 
   try {
     const result = await saveKVData(kv, data, timestamp, data.id);
-    return ctx.text(content.id, 200);
   } catch (error) {
     console.log("error posting content", error);
-    return ctx.text(error, 500);
+    return { code: 500, message: error };
   } finally {
     //then also save the content to sqlite for filtering, sorting, etc
     try {
       const result = updateD1Data(d1, data.table, data);
+      //expire cache
+      await setCacheStatusInvalid();
+      await clearKVCache(kv);
+      return { code: 204, message: result.id };
     } catch (error) {
       console.log("error posting content", error);
     }
   }
 }
 
-export async function deleteData(d1, kv, data) {}
+export async function deleteRecord(d1, kv, data) {
+  const timestamp = new Date().getTime();
+
+  try {
+    const kvResult = await deleteKVById(kv, data.id);
+    const d1Result = await deleteD1ByTableAndId(d1, data.table, data.id);
+
+    await setCacheStatusInvalid();
+    await clearKVCache(kv);
+  } catch (error) {
+    console.log("error deleting content", error);
+    return { code: 500, message: error };
+  }
+}
+

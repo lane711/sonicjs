@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import {
-  deleteById,
+  deleteKVById,
   getById,
   getContentType,
   getContentTypes,
@@ -11,7 +11,7 @@ import {
 } from "../data/kv-data";
 import { Bindings } from "../types/bindings";
 import {
-  deleteByTableAndId,
+  deleteD1ByTableAndId,
   insertD1Data,
   updateD1Data,
 } from "../data/d1-data";
@@ -198,8 +198,8 @@ content.delete("/:contentId", async (ctx) => {
 
   if (content) {
     console.log("content found, deleting...");
-    const kvDelete = await deleteById(ctx.env.KVDATA, id);
-    const d1Delete = await deleteByTableAndId(
+    const kvDelete = await deleteKVById(ctx.env.KVDATA, id);
+    const d1Delete = await deleteD1ByTableAndId(
       ctx.env.D1DATA,
       content.data.table,
       content.data.id

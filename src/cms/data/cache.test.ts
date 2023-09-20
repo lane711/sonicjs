@@ -1,10 +1,10 @@
-import { insertD1Data, updateRecord } from "./d1-data";
+import { insertD1Data, updateD1Data } from "./d1-data";
 import { usersTable } from "../../db/schema";
 const env = getMiniflareBindings();
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
-import { getRecords, insertRecord, updateRecord } from "./data";
+import { deleteRecord, getRecords, insertRecord, updateRecord } from "./data";
 import {
   clearInMemoryCache,
   isCacheValid,
@@ -109,7 +109,10 @@ describe("insert", () => {
     expect(cacheStatus).toBeFalsy();
 
     //kv cache for the urlKey should be empty
-    const allCacheItems = await getRecordFromKvCache(KVDATA, `cache::${urlKey}`);
+    const allCacheItems = await getRecordFromKvCache(
+      KVDATA,
+      `cache::${urlKey}`
+    );
     expect(allCacheItems).toBeFalsy;
 
     // we inserted another record, it should be returned because the insert should invalidate cache
@@ -178,9 +181,10 @@ describe("update", () => {
     expect(inMemoryCacheResult.source).toBe("cache");
 
     // let's update a record
+    let recordToUpdate = d1Result.data[1];
     const rec3 = await updateRecord(__D1_BETA__D1DATA, KVDATA, {
-      firstName: "SteveX",
-      id: "3",
+      firstName: "Steve",
+      id: recordToUpdate.id,
       table: "users",
     });
 
@@ -189,13 +193,16 @@ describe("update", () => {
     expect(cacheStatus).toBeFalsy();
 
     //kv cache for the urlKey should be empty
-    const allCacheItems = await getRecordFromKvCache(KVDATA, `cache::${urlKey}`);
+    const allCacheItems = await getRecordFromKvCache(
+      KVDATA,
+      `cache::${urlKey}`
+    );
     expect(allCacheItems).toBeFalsy;
 
     // we inserted another record, it should be returned because the insert should invalidate cache
     // this will only work instantly on the node that the update is made and will be eventually consistent on other nodes
     // based on the in-memory cache settings
-    const resultAfterInsert = await getRecords(
+    const resultAfterUpdate = await getRecords(
       env.__D1_BETA__D1DATA,
       env.KVDATA,
       "users",
@@ -203,12 +210,96 @@ describe("update", () => {
       urlKey
     );
 
-    expect(resultAfterInsert.data.length).toBe(3);
-    expect(resultAfterInsert.source).toBe("d1");
+    expect(resultAfterUpdate.data.length).toBe(2);
+    expect(resultAfterUpdate.source).toBe("d1");
+    expect(resultAfterUpdate.data[1].firstName).toBe("Steve");
   });
 });
 
+describe("delete", () => {
+  it("cache should update after delete", async () => {
+    //start with a clear cache
+    await clearInMemoryCache();
+    await clearKVCache(KVDATA);
 
+    const urlKey = "http://localhost:8888/some-cache-key-url";
+
+    const db = createTestTable();
+
+    const rec1 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
+      firstName: "John",
+      id: "1",
+      table: "users",
+    });
+    console.log("rec1", rec1);
+
+    const rec2 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
+      firstName: "Jane",
+      id: "2",
+      table: "users",
+    });
+    console.log("rec2", rec2);
+
+    const d1Result = await getRecords(
+      env.__D1_BETA__D1DATA,
+      env.KVDATA,
+      "users",
+      undefined,
+      urlKey
+    );
+
+    console.log("d1Result", d1Result);
+
+    expect(d1Result.data.length).toBe(2);
+    expect(d1Result.source).toBe("d1");
+
+    //if we request it again, it should be cached in memory
+    const inMemoryCacheResult = await getRecords(
+      env.__D1_BETA__D1DATA,
+      env.KVDATA,
+      "users",
+      undefined,
+      urlKey
+    );
+
+    expect(inMemoryCacheResult.data.length).toBe(2);
+    expect(inMemoryCacheResult.source).toBe("cache");
+
+    // let's delete a record
+    let recordToDelete = d1Result.data[1];
+
+    const rec3 = await deleteRecord(__D1_BETA__D1DATA, KVDATA, {
+      firstName: "Steve",
+      id: recordToDelete.id,
+      table: "users",
+    });
+
+    //cache status should not be valid
+    const cacheStatus = await isCacheValid();
+    expect(cacheStatus).toBeFalsy();
+
+    //kv cache for the urlKey should be empty
+    const allCacheItems = await getRecordFromKvCache(
+      KVDATA,
+      `cache::${urlKey}`
+    );
+    expect(allCacheItems).toBeFalsy;
+
+    // we inserted another record, it should be returned because the insert should invalidate cache
+    // this will only work instantly on the node that the update is made and will be eventually consistent on other nodes
+    // based on the in-memory cache settings
+    const resultAfterUpdate = await getRecords(
+      env.__D1_BETA__D1DATA,
+      env.KVDATA,
+      "users",
+      undefined,
+      urlKey
+    );
+
+    expect(resultAfterUpdate.data.length).toBe(1);
+    expect(resultAfterUpdate.source).toBe("d1");
+  });
+});
 
 function createTestTable() {
   const db = drizzle(__D1_BETA__D1DATA);

@@ -86,13 +86,12 @@ export async function insertD1Data(d1, kv, table, data) {
 
 
 
-export async function deleteByTableAndId(d1, table, id) {
-  console.log("deleteByTableAndId", table, id);
+export async function deleteD1ByTableAndId(d1, table, id) {
+  console.log("deleteD1ByTableAndId", table, id);
   const db = drizzle(d1);
 
   const schmea = getRepoFromTable(table);
   let sql = await db.delete(schmea).where(eq(schmea.id, id)).toSQL();
-  console.log("deleteByTableAndId sql", sql);
 
   let result = await db.delete(schmea).where(eq(schmea.id, id)).run();
 
