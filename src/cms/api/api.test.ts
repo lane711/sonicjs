@@ -30,19 +30,44 @@ describe("Test the application", () => {
 
 describe("auto endpoints", () => {
   createTestTable();
-  it("post should return 204", async () => {
-    let payload = JSON.stringify({ firstName: "Joe" });
+
+  it("get should return results and 200", async () => {
+    
+    await insertRecord(__D1_BETA__D1DATA, KVDATA, {
+      firstName: "John",
+      table: "users",
+    });
+
+     await insertRecord(__D1_BETA__D1DATA, KVDATA, {
+      firstName: "Jack",
+      table: "users",
+    });
+
+
+
     let req = new Request("http://localhost/v1/users", {
-      method: "POST",
-      body: payload,
+      method: "GET",
       headers: { "Content-Type": "application/json" },
     });
     let res = await app.fetch(req, env);
-    expect(res.status).toBe(201);
+    expect(res.status).toBe(200);
     let body = await res.json();
-    expect(body.firstName).toBe("Joe");
-    expect(body.id.length).toBeGreaterThan(1);
+    expect(body.data.length).toBe(2);
   });
+
+    it("post (insert) should return 204", async () => {
+      let payload = JSON.stringify({ firstName: "Joe" });
+      let req = new Request("http://localhost/v1/users", {
+        method: "POST",
+        body: payload,
+        headers: { "Content-Type": "application/json" },
+      });
+      let res = await app.fetch(req, env);
+      expect(res.status).toBe(201);
+      let body = await res.json();
+      expect(body.firstName).toBe("Joe");
+      expect(body.id.length).toBeGreaterThan(1);
+    });
 
   it("put should return 200 and return id", async () => {
     //create test record to update

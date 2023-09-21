@@ -33,10 +33,15 @@ apiConfig.forEach((entry) => {
 
   //ie /v1/users
   api.get(`/${entry.route}`, async (ctx) => {
+
+        //HACK: for testing while d1 is still in beta, then can be removed
+        const d1 = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
+
     try {
       var params = qs.parse(ctx.req.query());
+      params.limit = params.limit ?? 1000;
       const data = await getRecords(
-        ctx.env.D1DATA,
+        d1,
         ctx.env.KVDATA,
         entry.table,
         params,
