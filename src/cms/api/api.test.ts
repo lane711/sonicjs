@@ -74,11 +74,11 @@ describe("auto endpoints", () => {
       "users",
       {
         firstName: "John",
-        id: "1",
+        id: "a",
       }
     );
 
-    let payload = JSON.stringify({ data: { firstName: "Steve", id: 1 } });
+    let payload = JSON.stringify({ data: { firstName: "Steve", id: 'a' } });
     let req = new Request("http://localhost/v1/users", {
       method: "PUT",
       body: payload,
@@ -98,7 +98,7 @@ describe("auto endpoints", () => {
       "urlKey"
     );
 
-    expect(d1Result.data[0].id).toBe("1");
+    expect(d1Result.data[0].id).toBe("a");
     expect(d1Result.data[0].firstName).toBe("Steve");
   });
 

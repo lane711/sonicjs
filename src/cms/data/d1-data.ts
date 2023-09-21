@@ -103,7 +103,7 @@ export async function updateD1Data(d1, table, data) {
   const repo = getRepoFromTable(schemaTable);
   const recordId = data.id;
   delete data.table;
-  delete data.id;
+  // delete data.id;
 
   const now = new Date().getTime();
   data.updated_on = now;
@@ -114,8 +114,15 @@ export async function updateD1Data(d1, table, data) {
   let result = await db
     .update(repo)
     .set(data)
-    .where(eq(repo.id, recordId));
-    // .returning({ id: repo.id });
+    .where(eq(repo.id, recordId))
+    .returning({ id: repo.id })
+    .values();
+
+    // let result = await db
+    // .update(repo)
+    // .set(data)
+    // .where(eq(repo.id, data.id))
+    // // .returning({ updated: users.updatedAt })
     // .values();
 
   // .returning().get();
