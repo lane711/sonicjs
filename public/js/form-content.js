@@ -6,7 +6,7 @@ var table;
   const url = window.location.href;
 
   const params = url.split("/");
-  table = params[6];
+  table = window.location.href.split("/").pop();
 
   var mode;
 
@@ -32,10 +32,9 @@ var table;
 })();
 
 function newContent() {
-  const contentType = window.location.href.split("/").pop();
-  console.log("contentType", contentType);
+  console.log("contentType", table);
 
-  axios.get(`/v1/form-components/${contentType}`).then((response) => {
+  axios.get(`/v1/form-components/${table}`).then((response) => {
     console.log(response.data);
     console.log(response.status);
     console.log(response.statusText);
@@ -66,7 +65,7 @@ function saveNewContent(data) {
   delete data.data.id;
   console.log(data);
 
-  axios.post("/v1/content", data).then((response) => {
+  axios.post(`/v1/${table}`, data).then((response) => {
     console.log(response.data);
     console.log(response.status);
     console.log(response.statusText);
@@ -79,6 +78,8 @@ function saveNewContent(data) {
 }
 function editContent() {
   const contentId = $("#formio").attr("data-id");
+  table = $("#formio").attr("data-table");
+
   console.log("contentType", contentId);
   axios.get(`/v1/${table}/${contentId}?includeContentType`).then((response) => {
     console.log(response.data);
@@ -110,9 +111,9 @@ function editContent() {
 }
 
 function addContent(data) {
-  data.key = window.location.href.split("/").pop();
+  data.key = table;
 
-  axios.post("/v1/content", data).then((response) => {
+  axios.post(`/v1/${table}`, data).then((response) => {
     console.log(response.data);
     console.log(response.status);
     console.log(response.statusText);
@@ -126,8 +127,9 @@ function addContent(data) {
 
 function updateContent(data) {
   delete data.submit;
+  delete data.contentType;
 
-  axios.put("/v1/content", data).then((response) => {
+  axios.put(`/v1/${table}`, {data: {data}}).then((response) => {
     console.log(response.data);
     console.log(response.status);
     console.log(response.statusText);

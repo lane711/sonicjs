@@ -33,9 +33,8 @@ apiConfig.forEach((entry) => {
 
   //ie /v1/users
   api.get(`/${entry.route}`, async (ctx) => {
-
-        //HACK: for testing while d1 is still in beta, then can be removed
-        const d1 = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
+    //HACK: for testing while d1 is still in beta, then can be removed
+    const d1 = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
 
     try {
       var params = qs.parse(ctx.req.query());
@@ -72,9 +71,12 @@ apiConfig.forEach((entry) => {
   //create single record
   //TODO: support batch inserts
   api.post(`/${entry.route}`, async (ctx) => {
-    const content = await ctx.req.json();
+    const payload = await ctx.req.json();
+    const content = payload.data;
+
     const table = ctx.req.path.split("/")[2];
     content.table = table;
+    console.log("posting new record", table);
 
     //HACK: for testing while d1 is still in beta, then can be removed
     const d1 = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
@@ -92,9 +94,13 @@ apiConfig.forEach((entry) => {
   //upadte single record
   //TODO: support batch inserts
   api.put(`/${entry.route}`, async (ctx) => {
-    const content = await ctx.req.json();
+    const payload = await ctx.req.json();
+    const content = payload.data;
+
     const table = ctx.req.path.split("/")[2];
     content.table = table;
+
+    console.log('updating record', content);
 
     //HACK: for testing while d1 is still in beta, then can be removed
     const d1 = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
@@ -117,7 +123,13 @@ apiConfig.forEach((entry) => {
     //HACK: for testing while d1 is still in beta, then can be removed
     const d1 = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
 
-    const record = await getRecord(d1, ctx.env.KVDATA, table, {id}, ctx.req.path);
+    const record = await getRecord(
+      d1,
+      ctx.env.KVDATA,
+      table,
+      { id },
+      ctx.req.path
+    );
 
     console.log("delete content " + JSON.stringify(record, null, 2));
 

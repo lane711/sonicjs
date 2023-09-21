@@ -162,6 +162,7 @@ export async function loadEditContent(ctx, table, id) {
       saveButtonText="Save Content Type"
       screenTitle="Content Type"
       contentId={id}
+      table={table}
     />
   );
 }
@@ -183,10 +184,11 @@ export const ContentEditForm = (props: {
   screenTitle: string;
   saveButtonText: string;
   contentId: string;
+  table: string;
 }) => {
   return (
     <Layout screenTitle={"Edit: " + props.contentId}>
-      <div id="formio" data-id={props.contentId}></div>
+      <div id="formio" data-id={props.contentId} data-table={props.table}></div>
     </Layout>
   );
 };

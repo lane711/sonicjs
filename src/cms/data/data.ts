@@ -132,6 +132,8 @@ export async function insertRecord(d1, kv, data) {
   content.data.id = id;
   let error = "";
 
+  console.log('insertRecord', content)
+
   try {
     const result = await saveKVData(kv, id, content.data);
     // console.log('result KV', result);

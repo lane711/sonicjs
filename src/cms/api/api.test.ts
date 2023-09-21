@@ -32,13 +32,12 @@ describe("auto endpoints", () => {
   createTestTable();
 
   it("get should return results and 200", async () => {
-    
     await insertRecord(__D1_BETA__D1DATA, KVDATA, {
       firstName: "John",
       table: "users",
     });
 
-     await insertRecord(__D1_BETA__D1DATA, KVDATA, {
+    await insertRecord(__D1_BETA__D1DATA, KVDATA, {
       firstName: "Jack",
       table: "users",
     });
@@ -53,19 +52,19 @@ describe("auto endpoints", () => {
     expect(body.data.length).toBe(2);
   });
 
-    it("post (insert) should return 204", async () => {
-      let payload = JSON.stringify({ firstName: "Joe" });
-      let req = new Request("http://localhost/v1/users", {
-        method: "POST",
-        body: payload,
-        headers: { "Content-Type": "application/json" },
-      });
-      let res = await app.fetch(req, env);
-      expect(res.status).toBe(201);
-      let body = await res.json();
-      expect(body.firstName).toBe("Joe");
-      expect(body.id.length).toBeGreaterThan(1);
+  it("post (insert) should return 204", async () => {
+    let payload = JSON.stringify({ data: { firstName: "Joe" } });
+    let req = new Request("http://localhost/v1/users", {
+      method: "POST",
+      body: payload,
+      headers: { "Content-Type": "application/json" },
     });
+    let res = await app.fetch(req, env);
+    expect(res.status).toBe(201);
+    let body = await res.json();
+    expect(body.firstName).toBe("Joe");
+    expect(body.id.length).toBeGreaterThan(1);
+  });
 
   it("put should return 200 and return id", async () => {
     //create test record to update
@@ -79,7 +78,7 @@ describe("auto endpoints", () => {
       }
     );
 
-    let payload = JSON.stringify({ firstName: "Steve", id: 1 });
+    let payload = JSON.stringify({ data: { firstName: "Steve", id: 1 } });
     let req = new Request("http://localhost/v1/users", {
       method: "PUT",
       body: payload,
@@ -100,6 +99,7 @@ describe("auto endpoints", () => {
     );
 
     expect(d1Result.data[0].id).toBe("1");
+    expect(d1Result.data[0].firstName).toBe("Steve");
   });
 
   it("delete should return 200", async () => {

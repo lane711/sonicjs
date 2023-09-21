@@ -101,16 +101,22 @@ export async function updateD1Data(d1, table, data) {
   console.log("updateD1Data===>", JSON.stringify(data, null, 4));
   const schemaTable = table ?? data.table;
   const repo = getRepoFromTable(schemaTable);
+  const recordId = data.id;
   delete data.table;
+  delete data.id;
+
+  const now = new Date().getTime();
+  data.updated_on = now;
+
 
   console.log(JSON.stringify(data, null, 4));
 
   let result = await db
     .update(repo)
     .set(data)
-    .where(eq(repo.id, data.id))
-    .returning({ id: repo.id })
-    .values();
+    .where(eq(repo.id, recordId));
+    // .returning({ id: repo.id });
+    // .values();
 
   // .returning().get();
 
