@@ -43,8 +43,6 @@ describe("auto endpoints", () => {
       table: "users",
     });
 
-
-
     let req = new Request("http://localhost/v1/users", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
