@@ -1,4 +1,4 @@
-import { insertD1Data } from "./d1-data";
+import { insertD1Data, updateD1Data } from "./d1-data";
 import { usersTable } from "../../db/schema";
 import qs from "qs";
 const env = getMiniflareBindings();
@@ -103,6 +103,30 @@ it("CRUD", async () => {
   );
   expect(kvResult.data.length).toBe(2);
   expect(kvResult.source).toBe("kv");
+});
+
+
+it("update should return updated id", async () => {
+  //start with a clear cache
+  await clearInMemoryCache();
+  await clearKVCache(KVDATA);
+  
+  const urlKey = "http://localhost:8888/some-cache-key-url";
+
+  const db = createTestTable();
+
+  const rec1 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+    firstName: "John",
+    id: "1",
+  });
+
+  const updatedRecord = await updateD1Data(__D1_BETA__D1DATA, "users", {
+    firstName: "Jack",
+    id: "1",
+  });
+
+
+  expect(updatedRecord.id).toBe('1');
 });
 
 function createTestTable() {

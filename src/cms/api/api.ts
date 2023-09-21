@@ -17,7 +17,7 @@ import { apiConfig } from "../../db/schema";
 import { getD1DataByTable, getD1ByTableAndId } from "../data/d1-data";
 import { getForm } from "./forms";
 import qs from "qs";
-import { getRecords, insertRecord } from "../data/data";
+import { getRecords, insertRecord, updateRecord } from "../data/data";
 import { clearInMemoryCache, getAllFromInMemoryCache } from "../data/cache";
 
 const api = new Hono<{ Bindings: Bindings }>();
@@ -29,14 +29,20 @@ apiConfig.forEach((entry) => {
   api.get(`/${entry.route}`, async (ctx) => {
     try {
       var params = qs.parse(ctx.req.query());
-      const data = await getRecords(ctx.env.D1DATA, ctx.env.KVDATA, entry.table, params,ctx.req.url, 'fastest' );
+      const data = await getRecords(
+        ctx.env.D1DATA,
+        ctx.env.KVDATA,
+        entry.table,
+        params,
+        ctx.req.url,
+        "fastest"
+      );
       return ctx.json(data);
     } catch (error) {
       console.log(error);
       return ctx.text(error);
     }
   });
-
 
   //get single record
   api.get(`/${entry.route}/:id`, async (ctx) => {
@@ -52,50 +58,52 @@ apiConfig.forEach((entry) => {
     return ctx.json(data);
   });
 
-  //update single record
+  //create single record
+  //TODO: support batch inserts
   api.post(`/${entry.route}`, async (ctx) => {
-
-  // content.post("/", async (ctx) => {
     const content = await ctx.req.json();
-  
-    // console.log('post new', content)
-  
-    const id = uuidv4();
-    const timestamp = new Date().getTime();
-    content.data.id = id;
-  
+    const table = ctx.req.path.split('/')[2];
+    content.table = table;
+
+    //HACK: for testing while d1 is still in beta, then can be removed
+    const d1 = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA
 
     try {
-      const result = await  insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, content);
+      const result = await insertRecord(
+        d1,
+        ctx.env.KVDATA,
+        content
+      );
 
-      // const result = await saveContent(
-      //   ctx.env.KVDATA,
-      //   content.data,
-      //   timestamp,
-      //   id
-      // );
-      // console.log('result KV', result);
-      return ctx.json(result.id, 201);
+      return ctx.json(result.data, 201);
     } catch (error) {
       console.log("error posting content", error);
       return ctx.text(error, 500);
-    } 
-    // finally {
-    //   //then also save the content to sqlite for filtering, sorting, etc
-    //   try {
-    //     const result = await insertD1Data(
-    //       ctx.env.D1DATA,
-    //       ctx.env.KVDATA,
-    //       content.data.table,
-    //       content.data
-    //     );
-    //     console.log('insertD1Data --->', result)
-    //     return ctx.json(result.id, 201);
-  
-    //   } catch (error) {
-    //     console.log("error posting content " + content.data.table, error, JSON.stringify(content.data, null, 2));
-    //   }
-    // }
+    }
+  });
+
+    //upadte single record
+  //TODO: support batch inserts
+  api.put(`/${entry.route}`, async (ctx) => {
+    const content = await ctx.req.json();
+    const table = ctx.req.path.split('/')[2];
+    content.table = table;
+
+    //HACK: for testing while d1 is still in beta, then can be removed
+    const d1 = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA
+
+    try {
+      const result = await updateRecord(
+        d1,
+        ctx.env.KVDATA,
+        content
+      );
+
+      return ctx.json(result.data, 200);
+    } catch (error) {
+      console.log("error updating content", error);
+      return ctx.text(error, 500);
+    }
   });
 
 });
@@ -138,33 +146,33 @@ api.post("/form-components", async (c) => {
 });
 
 api.get("/cache/clear-all", async (ctx) => {
-  console.log('clearing cache');
+  console.log("clearing cache");
   await clearInMemoryCache();
   await clearKVCache(ctx.env.KVDATA);
   return ctx.text("in memory and kv caches cleared");
 });
 
 api.get("/cache/clear-in-memory", async (ctx) => {
-  console.log('clearing cache');
+  console.log("clearing cache");
   await clearInMemoryCache();
   return ctx.text("in memory cache cleared");
 });
 
 api.get("/cache/clear-kv", async (ctx) => {
-  console.log('clearing cache');
+  console.log("clearing cache");
   await clearKVCache(ctx.env.KVDATA);
   return ctx.text("kv cache cleared");
 });
 
 api.get("/cache/in-memory", async (ctx) => {
-  console.log('clearing cache');
+  console.log("clearing cache");
   const cacheItems = await getAllFromInMemoryCache();
   return ctx.json(cacheItems);
 });
 
 api.get("/cache/kv", async (ctx) => {
   const cacheItems = await getKVCache(ctx.env.KVDATA);
-  console.log('getting kv cache', cacheItems);
+  console.log("getting kv cache", cacheItems);
   return ctx.json(cacheItems);
 });
 
@@ -175,7 +183,7 @@ api.get("/kv", async (ctx) => {
 
 api.get("/kv/delete-all", async (ctx) => {
   await clearAllKVRecords(ctx.env.KVDATA);
-  return ctx.text('ok');
+  return ctx.text("ok");
 });
 
 export { api };

@@ -1,6 +1,12 @@
 import app from "../../server";
+import { usersTable } from "../../db/schema";
+import { drizzle } from "drizzle-orm/d1";
+import { sql } from "drizzle-orm";
+import { insertD1Data } from "../data/d1-data";
+import { getRecords } from "../data/data";
 
 const env = getMiniflareBindings();
+const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
 
 describe("Test the application", () => {
   it("ping should return 200", async () => {
@@ -23,6 +29,7 @@ describe("Test the application", () => {
 });
 
 describe("auto endpoints", () => {
+  createTestTable();
   it("post should return 204", async () => {
     let payload = JSON.stringify({ firstName: "Joe" });
     let req = new Request("http://localhost/v1/users", {
@@ -32,13 +39,63 @@ describe("auto endpoints", () => {
     });
     let res = await app.fetch(req, env);
     expect(res.status).toBe(201);
-    let body = await res.json<{ post: Post }>();
-    const newPost = body["post"];
-    expect(newPost.title).toBe("Morning");
-    expect(newPost.body).toBe("Good Morning");
-    // newPostId = newPost.id;
+    let body = await res.json();
+    expect(body.firstName).toBe("Joe");
+    expect(body.id.length).toBeGreaterThan(1);
+  });
 
-    // const res = await app.post('http://localhost/v1/users', {firstName: 'Joe'})
-    // expect(res.status).toBe(204)
+  it("put should return 200 and return id", async () => {
+    //create test record to update
+    const testRecordToUpdate = await insertD1Data(
+      __D1_BETA__D1DATA,
+      KVDATA,
+      "users",
+      {
+        firstName: "John",
+        id: "1",
+      }
+    );
+
+    let payload = JSON.stringify({ firstName: "Steve", id: 1 });
+    let req = new Request("http://localhost/v1/users", {
+      method: "PUT",
+      body: payload,
+      headers: { "Content-Type": "application/json" },
+    });
+    let res = await app.fetch(req, env);
+    expect(res.status).toBe(200);
+    let body = await res.json();
+    // expect(body.id.length).toBeGreaterThan(1);
+
+    //make sure db was updated
+    const d1Result = await getRecords(
+      env.__D1_BETA__D1DATA,
+      env.KVDATA,
+      "users",
+      undefined,
+      "urlKey"
+    );
+
+    expect(d1Result.data[0].id).toBe('1');
+
   });
 });
+
+function createTestTable() {
+  const db = drizzle(__D1_BETA__D1DATA);
+console.log('creating test table')
+  db.run(sql`
+    CREATE TABLE ${usersTable} (
+      id text PRIMARY KEY NOT NULL,
+      firstName text,
+      lastName text,
+      email text,
+      password text,
+      role text,
+      created_on integer,
+      updated_on integer
+    );
+	`);
+
+  return db;
+}

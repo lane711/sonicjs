@@ -25,7 +25,12 @@ import {
   getRecordFromKvCache,
   saveKVData,
 } from "./kv-data";
-import { deleteD1ByTableAndId, getD1DataByTable, insertD1Data, updateD1Data } from "./d1-data";
+import {
+  deleteD1ByTableAndId,
+  getD1DataByTable,
+  insertD1Data,
+  updateD1Data,
+} from "./d1-data";
 
 export async function getRecord(d1, kv, id) {
   const cacheKey = addCachePrefix(id);
@@ -110,7 +115,7 @@ export async function insertRecord(d1, kv, data) {
       await setCacheStatusInvalid();
       await clearKVCache(kv);
 
-      return { code: 201, message: result.id };
+      return { code: 201, data: result, message: result.id };
     } catch (error) {
       error =
         "error posting content " +
@@ -137,7 +142,7 @@ export async function updateRecord(d1, kv, data) {
       //expire cache
       await setCacheStatusInvalid();
       await clearKVCache(kv);
-      return { code: 204, message: result.id };
+      return { code: 200, data: result };
     } catch (error) {
       console.log("error posting content", error);
     }
@@ -158,4 +163,3 @@ export async function deleteRecord(d1, kv, data) {
     return { code: 500, message: error };
   }
 }
-

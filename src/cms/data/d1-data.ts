@@ -50,7 +50,7 @@ export function generateSelectSql(table, params) {
   }
 
   let sql = `SELECT * FROM ${table} ${whereClause} ${sortBySyntax} ${limitSyntax} ${offsetSyntax}`;
-  sql = sql.replace(/\s+/g, " ").trim() + ';';
+  sql = sql.replace(/\s+/g, " ").trim() + ";";
 
   console.log("sql ==>", sql);
   return sql;
@@ -84,8 +84,6 @@ export async function insertD1Data(d1, kv, table, data) {
   return result;
 }
 
-
-
 export async function deleteD1ByTableAndId(d1, table, id) {
   console.log("deleteD1ByTableAndId", table, id);
   const db = drizzle(d1);
@@ -101,7 +99,8 @@ export async function deleteD1ByTableAndId(d1, table, id) {
 export async function updateD1Data(d1, table, data) {
   const db = drizzle(d1);
   console.log("updateD1Data===>", JSON.stringify(data, null, 4));
-  const repo = getRepoFromTable(data.table);
+  const schemaTable = table ?? data.table;
+  const repo = getRepoFromTable(schemaTable);
   delete data.table;
 
   console.log(JSON.stringify(data, null, 4));
@@ -110,12 +109,16 @@ export async function updateD1Data(d1, table, data) {
     .update(repo)
     .set(data)
     .where(eq(repo.id, data.id))
-    // .returning({ updated: users.updatedAt })
+    .returning({ id: repo.id })
     .values();
+
+  // .returning().get();
+
+  const id = result && result[0] ? result[0]["0"] : undefined;
 
   console.log("updating data result ", result);
 
-  return result;
+  return { id } ?? result;
 }
 
 export function getSchemaFromTable(tableName) {
