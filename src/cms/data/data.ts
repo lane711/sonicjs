@@ -27,28 +27,65 @@ import {
 } from "./kv-data";
 import {
   deleteD1ByTableAndId,
+  getD1ByTableAndId,
   getD1DataByTable,
   insertD1Data,
   updateD1Data,
 } from "./d1-data";
 
-export async function getRecord(d1, kv, id) {
-  const cacheKey = addCachePrefix(id);
-  const cacheResult = await getFromInMemoryCache(cacheKey);
-  console.log("cacheResult", cacheResult);
-  if (cacheResult && cacheResult.length) {
-    const cachedData = cacheResult[0].data;
-    console.log("**** cachedData ****", cachedData);
+// export async function getRecordOld(d1, kv, id) {
+//   const cacheKey = addCachePrefix(id);
+//   const cacheResult = await getFromInMemoryCache(cacheKey);
+//   console.log("cacheResult", cacheResult);
+//   if (cacheResult && cacheResult.length) {
+//     const cachedData = cacheResult[0].data;
+//     console.log("**** cachedData ****", cachedData);
 
-    return cachedData;
+//     return cachedData;
+//   }
+//   const kvData = await getRecordFromKvCache(kv, id);
+
+//   addToInMemoryCache(cacheKey, { data: kvData.data, source: "kv" });
+
+
+//   return kvData;
+// }
+
+export async function getRecord(
+  d1,
+  kv,
+  table,
+  params,
+  cacheKey,
+  source = "fastest"
+) {
+  const cacheStatusValid = await isCacheValid();
+
+  if (cacheStatusValid) {
+    const cacheResult = await getFromInMemoryCache(cacheKey);
+    console.log("cacheResult", cacheResult);
+    if (cacheResult && cacheResult.length && source == "fastest") {
+      const cachedData = cacheResult[0].data;
+      console.log("**** cachedData ****", cachedData);
+
+      return cachedData;
+    }
   }
-  const kvData = await getRecordFromKvCache(kv, id);
 
-  addToInMemoryCache(cacheKey, { data: kvData.data, source: "kv" });
+  const kvData = await getRecordFromKvCache(kv, cacheKey);
+  if (source == "kv" || kvData) {
+    console.log("**** getting kv cache ****", kvData);
+    return kvData;
+  }
+
+  const d1Data = await getD1ByTableAndId(d1, table, params.id);
+
+  addToInMemoryCache(cacheKey, { data: d1Data.data, source: "cache" });
+  addToKvCache(kv, cacheKey, { data: d1Data.data, source: "kv" });
 
   // console.log("sql results ==>", results);
 
-  return kvData;
+  return d1Data;
 }
 
 export async function getRecords(

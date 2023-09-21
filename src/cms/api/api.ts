@@ -17,7 +17,13 @@ import { apiConfig } from "../../db/schema";
 import { getD1DataByTable, getD1ByTableAndId } from "../data/d1-data";
 import { getForm } from "./forms";
 import qs from "qs";
-import { getRecords, insertRecord, updateRecord } from "../data/data";
+import {
+  deleteRecord,
+  getRecord,
+  getRecords,
+  insertRecord,
+  updateRecord,
+} from "../data/data";
 import { clearInMemoryCache, getAllFromInMemoryCache } from "../data/cache";
 
 const api = new Hono<{ Bindings: Bindings }>();
@@ -62,18 +68,14 @@ apiConfig.forEach((entry) => {
   //TODO: support batch inserts
   api.post(`/${entry.route}`, async (ctx) => {
     const content = await ctx.req.json();
-    const table = ctx.req.path.split('/')[2];
+    const table = ctx.req.path.split("/")[2];
     content.table = table;
 
     //HACK: for testing while d1 is still in beta, then can be removed
-    const d1 = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA
+    const d1 = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
 
     try {
-      const result = await insertRecord(
-        d1,
-        ctx.env.KVDATA,
-        content
-      );
+      const result = await insertRecord(d1, ctx.env.KVDATA, content);
 
       return ctx.json(result.data, 201);
     } catch (error) {
@@ -82,22 +84,18 @@ apiConfig.forEach((entry) => {
     }
   });
 
-    //upadte single record
+  //upadte single record
   //TODO: support batch inserts
   api.put(`/${entry.route}`, async (ctx) => {
     const content = await ctx.req.json();
-    const table = ctx.req.path.split('/')[2];
+    const table = ctx.req.path.split("/")[2];
     content.table = table;
 
     //HACK: for testing while d1 is still in beta, then can be removed
-    const d1 = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA
+    const d1 = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
 
     try {
-      const result = await updateRecord(
-        d1,
-        ctx.env.KVDATA,
-        content
-      );
+      const result = await updateRecord(d1, ctx.env.KVDATA, content);
 
       return ctx.json(result.data, 200);
     } catch (error) {
@@ -106,6 +104,37 @@ apiConfig.forEach((entry) => {
     }
   });
 
+  //delete
+  api.delete(`/${entry.route}/:id`, async (ctx) => {
+    const id = ctx.req.param("id");
+    const table = ctx.req.path.split("/")[2];
+
+    //HACK: for testing while d1 is still in beta, then can be removed
+    const d1 = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
+
+    const record = await getRecord(d1, ctx.env.KVDATA, table, {id}, ctx.req.path);
+
+    console.log("delete content " + JSON.stringify(record, null, 2));
+
+    if (record) {
+      console.log("content found, deleting...");
+      const result = await deleteRecord(d1, ctx.env.KVDATA, {
+        id,
+        table: table,
+      });
+      // const kvDelete = await deleteKVById(ctx.env.KVDATA, id);
+      // const d1Delete = await deleteD1ByTableAndId(
+      //   ctx.env.D1DATA,
+      //   content.data.table,
+      //   content.data.id
+      // );
+      console.log("returning 204");
+      return ctx.text("", 204);
+    } else {
+      console.log("content not found");
+      return ctx.text("", 404);
+    }
+  });
 });
 
 api.get("/ping", (c) => {

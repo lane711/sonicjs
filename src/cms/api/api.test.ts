@@ -3,7 +3,7 @@ import { usersTable } from "../../db/schema";
 import { drizzle } from "drizzle-orm/d1";
 import { sql } from "drizzle-orm";
 import { insertD1Data } from "../data/d1-data";
-import { getRecords } from "../data/data";
+import { getRecords, insertRecord } from "../data/data";
 
 const env = getMiniflareBindings();
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
@@ -76,14 +76,43 @@ describe("auto endpoints", () => {
       "urlKey"
     );
 
-    expect(d1Result.data[0].id).toBe('1');
+    expect(d1Result.data[0].id).toBe("1");
+  });
 
+  it("delete should return 200", async () => {
+    //create test record to update
+
+    const testRecordToUpdate = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
+      firstName: "John",
+      table: "users",
+    });
+
+    let req = new Request(
+      `http://localhost/v1/users/${testRecordToUpdate.data.id}`,
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+    let res = await app.fetch(req, env);
+    expect(res.status).toBe(204);
+
+    //make sure db was updated
+    const d1Result = await getRecords(
+      env.__D1_BETA__D1DATA,
+      env.KVDATA,
+      "users",
+      undefined,
+      "urlKey"
+    );
+
+    expect(d1Result.data.length).toBe(0);
   });
 });
 
 function createTestTable() {
   const db = drizzle(__D1_BETA__D1DATA);
-console.log('creating test table')
+  console.log("creating test table");
   db.run(sql`
     CREATE TABLE ${usersTable} (
       id text PRIMARY KEY NOT NULL,
