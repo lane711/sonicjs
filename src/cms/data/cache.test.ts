@@ -183,9 +183,11 @@ describe("update", () => {
     // let's update a record
     let recordToUpdate = d1Result.data[1];
     const rec3 = await updateRecord(__D1_BETA__D1DATA, KVDATA, {
-      firstName: "Steve",
       id: recordToUpdate.id,
       table: "users",
+      data: {
+        firstName: "Steve",
+      },
     });
 
     //cache status should not be valid
