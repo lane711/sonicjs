@@ -126,16 +126,16 @@ function addContent(data) {
 }
 
 function updateContent(data) {
+  const id = data.id;
   var content = {};
   content.data = data;
-  content.id = data.id;
   content.table = data.table;
   delete content.data.submit;
   delete content.data.contentType;
   delete content.data.id;
   delete content.data.table;
 
-  axios.put(`/v1/${table}/${content.id}`, content).then((response) => {
+  axios.put(`/v1/${table}/${id}`, content).then((response) => {
     console.log(response.data);
     console.log(response.status);
     console.log(response.statusText);

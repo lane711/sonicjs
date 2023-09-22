@@ -67,7 +67,34 @@ it("get should return results", async () => {
   expect(d1Result.source).toBe("d1");
 });
 
-it("put should update record", async () => {
+it("updateD1Data should update record", async () => {
+  const db = createTestTable();
+
+  await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+    firstName: "John",
+    id: "a",
+  });
+  await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+    firstName: "Jane",
+    id: "b",
+  });
+
+  updateD1Data(__D1_BETA__D1DATA, "users", {
+    data: { firstName: "Steve" },
+    id: "b",
+  });
+
+  const d1Result = await getD1DataByTable(
+    __D1_BETA__D1DATA,
+    "users",
+    undefined
+  );
+
+  expect(d1Result.data.length).toBe(2);
+  expect(d1Result.data[1].firstName).toBe("Steve");
+});
+
+it("updateD1Data with reference should update record", async () => {
   const db = createTestTable();
 
   await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
@@ -95,6 +122,25 @@ it("put should update record", async () => {
 });
 
 function createTestTable() {
+  const db = drizzle(__D1_BETA__D1DATA);
+
+  db.run(sql`
+    CREATE TABLE ${usersTable} (
+      id text PRIMARY KEY NOT NULL,
+      firstName text,
+      lastName text,
+      email text,
+      password text,
+      role text,
+      created_on integer,
+      updated_on integer
+    );
+	`);
+
+  return db;
+}
+
+function createTestTablesWithReferences() {
   const db = drizzle(__D1_BETA__D1DATA);
 
   db.run(sql`
