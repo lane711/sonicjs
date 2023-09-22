@@ -93,14 +93,18 @@ apiConfig.forEach((entry) => {
 
   //upadte single record
   //TODO: support batch inserts
-  api.put(`/${entry.route}`, async (ctx) => {
+  api.put(`/${entry.route}/:id`, async (ctx) => {
     const payload = await ctx.req.json();
-    const content = payload.data;
+    const id = ctx.req.param("id");
+    var content = {};
+
+    content.data = payload.data;
 
     const table = ctx.req.path.split("/")[2];
     content.table = table;
+    content.id = id;
 
-    console.log('updating record', content);
+    console.log("updating record", content);
 
     //HACK: for testing while d1 is still in beta, then can be removed
     const d1 = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;

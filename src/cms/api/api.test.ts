@@ -78,8 +78,8 @@ describe("auto endpoints", () => {
       }
     );
 
-    let payload = JSON.stringify({ data: { firstName: "Steve", id: 'a' } });
-    let req = new Request("http://localhost/v1/users", {
+    let payload = JSON.stringify({ data: { firstName: "Steve" }, id:'a' });
+    let req = new Request(`http://localhost/v1/users/a`, {
       method: "PUT",
       body: payload,
       headers: { "Content-Type": "application/json" },

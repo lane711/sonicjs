@@ -3,6 +3,7 @@ import {
   getByTable,
   getD1DataByTable,
   insertD1Data,
+  updateD1Data,
   whereClauseBuilder,
 } from "./d1-data";
 import { usersTable } from "../../db/schema";
@@ -44,44 +45,53 @@ it("should return a SQL select", () => {
 });
 
 //TODO: rework to hit the full api
-it.skip("CRUD", async () => {
+it("get should return results", async () => {
   const db = createTestTable();
 
-  await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", { firstName: "John", id: "1" });
-  await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", { firstName: "Jane", id: "2" });
+  await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+    firstName: "John",
+    id: "1",
+  });
+  await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+    firstName: "Jane",
+    id: "2",
+  });
 
-  const d1Result = await getByTable(
+  const d1Result = await getD1DataByTable(
     __D1_BETA__D1DATA,
-    KVDATA,
     "users",
-    undefined,
-    "some-cache-key-url"
+    undefined
   );
 
   expect(d1Result.data.length).toBe(2);
   expect(d1Result.source).toBe("d1");
+});
 
-  //if we request it again, it should be cached in memory
-  //TODO need to be able to pass in ctx so that we can setup d1 and kv
-  const inMemoryCacheResult = await getByTable(
+it("put should update record", async () => {
+  const db = createTestTable();
+
+  await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+    firstName: "John",
+    id: "a",
+  });
+  await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+    firstName: "Jane",
+    id: "b",
+  });
+
+  updateD1Data(__D1_BETA__D1DATA, "users", {
+    data: { firstName: "Steve" },
+    id: "b",
+  });
+
+  const d1Result = await getD1DataByTable(
     __D1_BETA__D1DATA,
     "users",
-    undefined,
-    "some-cache-key-url"
+    undefined
   );
-  expect(inMemoryCacheResult.data.length).toBe(2);
-  expect(inMemoryCacheResult.source).toBe("cache");
 
-  // if we request it again, it should also be cached in kv storage
-  const kvResult = await getByTable(
-    __D1_BETA__D1DATA,
-    "users",
-    undefined,
-    "some-cache-key-url"
-  );
-  expect(kvResult.data.length).toBe(2);
-  expect(kvResult.source).toBe("cache");
-
+  expect(d1Result.data.length).toBe(2);
+  expect(d1Result.data[1].firstName).toBe("Steve");
 });
 
 function createTestTable() {

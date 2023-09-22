@@ -98,32 +98,32 @@ export async function deleteD1ByTableAndId(d1, table, id) {
 
 export async function updateD1Data(d1, table, data) {
   const db = drizzle(d1);
-  console.log("updateD1Data===>", JSON.stringify(data, null, 4));
   const schemaTable = table ?? data.table;
   const repo = getRepoFromTable(schemaTable);
   const recordId = data.id;
-  delete data.table;
-  // delete data.id;
+  // delete data.table;
+  if (data.data && data.data.id) {
+    delete data.data.id;
+  }
 
   const now = new Date().getTime();
-  data.updated_on = now;
+  data.data.updated_on = now;
 
-
-  console.log(JSON.stringify(data, null, 4));
+  console.log("updateD1Data===>", recordId, JSON.stringify(data.data, null, 4));
 
   let result = await db
     .update(repo)
-    .set(data)
+    .set(data.data)
     .where(eq(repo.id, recordId))
     .returning({ id: repo.id })
     .values();
 
-    // let result = await db
-    // .update(repo)
-    // .set(data)
-    // .where(eq(repo.id, data.id))
-    // // .returning({ updated: users.updatedAt })
-    // .values();
+  // let result = await db
+  // .update(repo)
+  // .set(data)
+  // .where(eq(repo.id, data.id))
+  // // .returning({ updated: users.updatedAt })
+  // .values();
 
   // .returning().get();
 

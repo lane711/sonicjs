@@ -126,17 +126,23 @@ function addContent(data) {
 }
 
 function updateContent(data) {
-  delete data.submit;
-  delete data.contentType;
+  var content = {};
+  content.data = data;
+  content.id = data.id;
+  content.table = data.table;
+  delete content.data.submit;
+  delete content.data.contentType;
+  delete content.data.id;
+  delete content.data.table;
 
-  axios.put(`/v1/${table}`, {data: {data}}).then((response) => {
+  axios.put(`/v1/${table}/${content.id}`, content).then((response) => {
     console.log(response.data);
     console.log(response.status);
     console.log(response.statusText);
     console.log(response.headers);
     console.log(response.config);
     if (response.status === 200) {
-      location.href = `/admin/tables/${data.table}`;
+      location.href = `/admin/tables/${table}`;
     } else{
       alert('Error occured updating ' + data.id)
     }
