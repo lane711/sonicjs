@@ -1,4 +1,4 @@
-import { insertD1Data } from "./d1-data";
+import { insertD1Data, updateD1Data } from "./d1-data";
 import { usersTable } from "../../db/schema";
 import qs from "qs";
 const env = getMiniflareBindings();
@@ -18,7 +18,7 @@ it("Insert Data", async () => {
     id: "1",
     table: "users",
   });
-  console.log('newRecord', newRecord);
+  console.log("newRecord", newRecord);
 
   const d1Result = await getRecords(
     env.__D1_BETA__D1DATA,
@@ -32,7 +32,7 @@ it("Insert Data", async () => {
   expect(d1Result.data.length).toBe(1);
   expect(d1Result.source).toBe("d1");
 
-  //should be able to lookup new record 
+  //should be able to lookup new record
   // const singleResult = await getRecord(
   //   env.__D1_BETA__D1DATA,
   //   env.KVDATA,
@@ -47,7 +47,7 @@ it("CRUD", async () => {
   //start with a clear cache
   await clearInMemoryCache();
   await clearKVCache(KVDATA);
-  
+
   const urlKey = "http://localhost:8888/some-cache-key-url";
 
   const db = createTestTable();
@@ -56,13 +56,13 @@ it("CRUD", async () => {
     firstName: "John",
     id: "1",
   });
-  console.log('rec1', rec1);
+  console.log("rec1", rec1);
 
   const rec2 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
     firstName: "Jane",
     id: "2",
   });
-  console.log('rec2', rec2);
+  console.log("rec2", rec2);
 
   const d1Result = await getRecords(
     env.__D1_BETA__D1DATA,
@@ -72,7 +72,7 @@ it("CRUD", async () => {
     urlKey
   );
 
-  console.log('d1Result', d1Result);
+  console.log("d1Result", d1Result);
 
   expect(d1Result.data.length).toBe(2);
   expect(d1Result.source).toBe("d1");
@@ -103,6 +103,30 @@ it("CRUD", async () => {
   );
   expect(kvResult.data.length).toBe(2);
   expect(kvResult.source).toBe("kv");
+});
+
+it("update should return updated id", async () => {
+  //start with a clear cache
+  await clearInMemoryCache();
+  await clearKVCache(KVDATA);
+
+  const urlKey = "http://localhost:8888/some-cache-key-url";
+
+  const db = createTestTable();
+
+  const rec1 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+    firstName: "John",
+    id: "1",
+  });
+
+  const updatedRecord = await updateD1Data(__D1_BETA__D1DATA, "users", {
+    id: "1",
+    data: {
+      firstName: "Jack",
+    },
+  });
+
+  expect(updatedRecord.id).toBe("1");
 });
 
 function createTestTable() {
