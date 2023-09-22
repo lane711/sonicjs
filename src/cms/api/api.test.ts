@@ -33,13 +33,17 @@ describe("auto endpoints", () => {
 
   it("get should return results and 200", async () => {
     await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-      firstName: "John",
       table: "users",
+      data: {
+        firstName: "John",
+      },
     });
 
     await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-      firstName: "Jack",
       table: "users",
+      data: {
+        firstName: "Jack",
+      },
     });
 
     let req = new Request("http://localhost/v1/users", {
@@ -78,7 +82,7 @@ describe("auto endpoints", () => {
       }
     );
 
-    let payload = JSON.stringify({ data: { firstName: "Steve" }, id:'a' });
+    let payload = JSON.stringify({ data: { firstName: "Steve" }, id: "a" });
     let req = new Request(`http://localhost/v1/users/a`, {
       method: "PUT",
       body: payload,
@@ -106,8 +110,10 @@ describe("auto endpoints", () => {
     //create test record to update
 
     const testRecordToUpdate = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-      firstName: "John",
-      table: "users",
+      data: {
+        firstName: "John",
+      },
+      table: 'users'
     });
 
     let req = new Request(

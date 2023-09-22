@@ -9,16 +9,25 @@ import { getRecord, getRecords, insertRecord } from "./data";
 import { clearInMemoryCache } from "./cache";
 import { clearKVCache } from "./kv-data";
 
-it("Insert Data", async () => {
+it("insert should return new record with id and dates", async () => {
   const urlKey = "http://localhost:8888/some-cache-key-url";
 
   const db = createTestTable();
   const newRecord = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-    firstName: "John",
-    id: "1",
     table: "users",
+    data: {
+      firstName: "John",
+    },
   });
   console.log("newRecord", newRecord);
+
+  const newRecord2 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
+    table: "users",
+    data: {
+      firstName: "Steve",
+    },
+  });
+  console.log("newRecord2", newRecord2);
 
   const d1Result = await getRecords(
     env.__D1_BETA__D1DATA,
@@ -29,18 +38,9 @@ it("Insert Data", async () => {
   );
 
   //record should be in list
-  expect(d1Result.data.length).toBe(1);
+  expect(d1Result.data.length).toBe(2);
   expect(d1Result.source).toBe("d1");
-
-  //should be able to lookup new record
-  // const singleResult = await getRecord(
-  //   env.__D1_BETA__D1DATA,
-  //   env.KVDATA,
-  //   newRecord.data.id
-  // );
-
-  // expect(d1Result.data.length).toBe(1);
-  // expect(d1Result.source).toBe("kv");
+  expect(d1Result.data[0].firstName).toBe("John");
 });
 
 it("CRUD", async () => {

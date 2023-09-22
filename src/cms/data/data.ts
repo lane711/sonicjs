@@ -126,7 +126,7 @@ export async function getRecords(
 }
 
 export async function insertRecord(d1, kv, data) {
-  const content = { data };
+  const content = data ;
   const id = uuidv4();
   const timestamp = new Date().getTime();
   content.data.id = id;
@@ -146,7 +146,7 @@ export async function insertRecord(d1, kv, data) {
       const result = await insertD1Data(
         d1,
         kv,
-        content.data.table,
+        content.table,
         content.data
       );
       console.log("insertD1Data --->", result);
@@ -154,7 +154,7 @@ export async function insertRecord(d1, kv, data) {
       await setCacheStatusInvalid();
       await clearKVCache(kv);
 
-      return { code: 201, data: result, message: result.id };
+      return { code: 201, data: result };
     } catch (error) {
       error =
         "error posting content " +

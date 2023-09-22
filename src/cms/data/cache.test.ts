@@ -59,16 +59,18 @@ describe("insert", () => {
     const db = createTestTable();
 
     const rec1 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-      firstName: "John",
-      id: "1",
       table: "users",
+      data: {
+        firstName: "John",
+      },
     });
     console.log("rec1", rec1);
 
     const rec2 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-      firstName: "Jane",
-      id: "2",
       table: "users",
+      data: {
+        firstName: "Jane",
+      },
     });
     console.log("rec2", rec2);
 
@@ -99,9 +101,10 @@ describe("insert", () => {
 
     // let's insert another records
     const rec3 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-      firstName: "Steve",
-      id: "3",
       table: "users",
+      data: {
+        firstName: "Steve",
+      },
     });
 
     //cache status should not be valid
@@ -142,16 +145,18 @@ describe("update", () => {
     const db = createTestTable();
 
     const rec1 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-      firstName: "John",
-      id: "1",
       table: "users",
+      data: {
+        firstName: "John",
+      },
     });
     console.log("rec1", rec1);
 
     const rec2 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-      firstName: "Jane",
-      id: "2",
       table: "users",
+      data: {
+        firstName: "Jane",
+      },
     });
     console.log("rec2", rec2);
 
@@ -229,16 +234,18 @@ describe("delete", () => {
     const db = createTestTable();
 
     const rec1 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-      firstName: "John",
-      id: "1",
       table: "users",
+      data: {
+        firstName: "John",
+      },
     });
     console.log("rec1", rec1);
 
     const rec2 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-      firstName: "Jane",
-      id: "2",
       table: "users",
+      data: {
+        firstName: "Jane",
+      },
     });
     console.log("rec2", rec2);
 

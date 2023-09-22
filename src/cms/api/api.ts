@@ -71,8 +71,7 @@ apiConfig.forEach((entry) => {
   //create single record
   //TODO: support batch inserts
   api.post(`/${entry.route}`, async (ctx) => {
-    const payload = await ctx.req.json();
-    const content = payload.data;
+    const content = await ctx.req.json();
 
     const table = ctx.req.path.split("/")[2];
     content.table = table;
