@@ -8,6 +8,37 @@ import {
 
 import { relations } from "drizzle-orm";
 
+
+
+//Lucia Auth
+
+export const user = sqliteTable("user", {
+	id: text("id").primaryKey()
+	// other user attributes
+});
+
+export const session = sqliteTable("user_session", {
+	id: text("id").primaryKey(),
+	userId: text("user_id")
+		.notNull()
+		.references(() => user.id),
+	activeExpires: blob("active_expires", {
+		mode: "bigint"
+	}).notNull(),
+	idleExpires: blob("idle_expires", {
+		mode: "bigint"
+	}).notNull()
+});
+
+export const key = sqliteTable("user_key", {
+	id: text("id").primaryKey(),
+	userId: text("user_id")
+		.notNull()
+		.references(() => user.id),
+	hashedPassword: text("hashed_password")
+});
+
+
 // we want to add the below audit fields to all our tables, so we'll define it here
 // and append it to the rest of the schema for each table
 export const auditSchema = {
@@ -65,8 +96,8 @@ export const commentsTable = sqliteTable(
   { ...commentSchema, ...auditSchema },
   (table) => {
     return {
-      userIdx: index("user_idx").on(user.id),
-      postIdx: index("post_idx").on(post.id),
+      userIdx: index("user_idx").on(usersTable.id),
+      postIdx: index("post_idx").on(postsTable.id),
     };
   }
 );
