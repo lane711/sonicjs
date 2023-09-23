@@ -21,6 +21,13 @@ it("insert should return new record with id and dates", async () => {
   });
   console.log("newRecord", newRecord);
 
+  await insertRecord(__D1_BETA__D1DATA, KVDATA, {
+    table: "categories",
+    data: {
+      title: "Category One",
+    },
+  });
+
   const newRecord2 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
     table: "users",
     data: {
@@ -47,17 +54,57 @@ function createTestTable() {
   const db = drizzle(__D1_BETA__D1DATA);
 
   db.run(sql`
-    CREATE TABLE ${usersTable} (
-      id text PRIMARY KEY NOT NULL,
-      firstName text,
-      lastName text,
-      email text,
-      password text,
-      role text,
-      created_on integer,
-      updated_on integer
-    );
-	`);
+  CREATE TABLE "categories" (
+    "id" text PRIMARY KEY NOT NULL,
+    "title" text,
+    "body" text,
+    "created_on" integer,
+    "updated_on" integer
+  )`);
+
+  db.run(sql`
+  CREATE TABLE "users" (
+    "id" text PRIMARY KEY NOT NULL,
+    "firstName" text,
+    "lastName" text,
+    "email" text,
+    "password" text,
+    "role" text,
+    "created_on" integer,
+    "updated_on" integer
+  );
+  )`);
+
+  db.run(sql`
+  CREATE TABLE "comments" (
+    "id" text PRIMARY KEY NOT NULL,
+    "body" text,
+    "user_id" text,
+    "post_id" integer,
+    "created_on" integer,
+    "updated_on" integer
+  );
+  )`);
+
+  db.run(sql`
+  CREATE TABLE "posts" (
+    "id" text PRIMARY KEY NOT NULL,
+    "title" text,
+    "body" text,
+    "user_id" text,
+    "category_id" text,
+    "created_on" integer,
+    "updated_on" integer
+  );
+  )`);
+
+  db.run(sql`
+  CREATE INDEX "user_idx" ON "comments" ("id");--> statement-breakpoint
+  )`);
+
+  db.run(sql`
+  CREATE INDEX "post_idx" ON "comments" ("id");
+  )`);
 
   return db;
 }
