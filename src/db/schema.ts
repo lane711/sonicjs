@@ -65,8 +65,8 @@ export const commentsTable = sqliteTable(
   { ...commentSchema, ...auditSchema },
   (table) => {
     return {
-      userIdx: index("user_idx").on(user.id),
-      postIdx: index("post_idx").on(post.id),
+      userIdx: index("user_idx").on(usersTable.id),
+      postIdx: index("post_idx").on(postsTable.id),
     };
   }
 );
