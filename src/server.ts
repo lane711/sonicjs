@@ -13,10 +13,6 @@ app.get("/", async (ctx) => {
   return ctx.redirect('/admin');
 });
 
-app.get("/binding", async (ctx) => {
-  return ctx.json(ctx.env.KVDATA,);
-});
-
 app.get("/public/*", async (ctx) => {
   return await ctx.env.ASSETS.fetch(ctx.req.raw);
 });

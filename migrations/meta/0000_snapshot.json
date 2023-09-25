@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "a85ec262-02dd-42a6-8bbd-df0f8564e2d5",
+  "id": "a88d7405-c4c5-495c-8d93-a40bc11a5769",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "categories": {
@@ -28,15 +28,15 @@
           "notNull": false,
           "autoincrement": false
         },
-        "created_on": {
-          "name": "created_on",
+        "createdOn": {
+          "name": "createdOn",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "updated_on": {
-          "name": "updated_on",
+        "updatedOn": {
+          "name": "updatedOn",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
@@ -65,29 +65,29 @@
           "notNull": false,
           "autoincrement": false
         },
-        "user_id": {
-          "name": "user_id",
+        "userId": {
+          "name": "userId",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "post_id": {
-          "name": "post_id",
+        "postId": {
+          "name": "postId",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "created_on": {
-          "name": "created_on",
+        "createdOn": {
+          "name": "createdOn",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "updated_on": {
-          "name": "updated_on",
+        "updatedOn": {
+          "name": "updatedOn",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
@@ -95,15 +95,15 @@
         }
       },
       "indexes": {
-        "user_idx": {
-          "name": "user_idx",
+        "userIdx": {
+          "name": "userIdx",
           "columns": [
             "id"
           ],
           "isUnique": false
         },
-        "post_idx": {
-          "name": "post_idx",
+        "postIdx": {
+          "name": "postIdx",
           "columns": [
             "id"
           ],
@@ -138,29 +138,29 @@
           "notNull": false,
           "autoincrement": false
         },
-        "user_id": {
-          "name": "user_id",
+        "userId": {
+          "name": "userId",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "category_id": {
-          "name": "category_id",
+        "categoryId": {
+          "name": "categoryId",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "created_on": {
-          "name": "created_on",
+        "createdOn": {
+          "name": "createdOn",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "updated_on": {
-          "name": "updated_on",
+        "updatedOn": {
+          "name": "updatedOn",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
@@ -217,15 +217,15 @@
           "notNull": false,
           "autoincrement": false
         },
-        "created_on": {
-          "name": "created_on",
+        "createdOn": {
+          "name": "createdOn",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "updated_on": {
-          "name": "updated_on",
+        "updatedOn": {
+          "name": "updatedOn",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,

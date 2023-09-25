@@ -9,46 +9,54 @@ import { getRecord, getRecords, insertRecord } from "./data";
 import { clearInMemoryCache } from "./cache";
 import { clearKVCache } from "./kv-data";
 
-it("insert should return new record with id and dates", async () => {
+it("insert should allow refer", async () => {
   const urlKey = "http://localhost:8888/some-cache-key-url";
 
   const db = createTestTable();
-  const newRecord = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
+  const { userRecord, categoryRecord, postRecord } =
+    await createRelatedTestRecords();
+
+  const d1Result = await getRecords(
+    env.__D1_BETA__D1DATA,
+    env.KVDATA,
+    "posts",
+    undefined,
+    urlKey
+  );
+
+  //record should be in list
+  expect(d1Result.data.length).toBe(1);
+  expect(d1Result.source).toBe("d1");
+  expect(d1Result.data[0].category_id).toBe(categoryRecord.data.id);
+  expect(d1Result.data[0].user_id).toBe(userRecord.data.id);
+});
+
+async function createRelatedTestRecords() {
+  const userRecord = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
     table: "users",
     data: {
       firstName: "John",
     },
   });
-  console.log("newRecord", newRecord);
 
-  await insertRecord(__D1_BETA__D1DATA, KVDATA, {
+  const categoryRecord = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
     table: "categories",
     data: {
       title: "Category One",
     },
   });
 
-  const newRecord2 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-    table: "users",
+  const postRecord = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
+    table: "posts",
     data: {
-      firstName: "Steve",
+      title: "Post One",
+      userId: userRecord.data.id,
+      categoryId: categoryRecord.data.id,
     },
   });
-  console.log("newRecord2", newRecord2);
 
-  const d1Result = await getRecords(
-    env.__D1_BETA__D1DATA,
-    env.KVDATA,
-    "users",
-    undefined,
-    urlKey
-  );
-
-  //record should be in list
-  expect(d1Result.data.length).toBe(2);
-  expect(d1Result.source).toBe("d1");
-  expect(d1Result.data[0].firstName).toBe("John");
-});
+  return { userRecord, categoryRecord, postRecord };
+}
 
 function createTestTable() {
   const db = drizzle(__D1_BETA__D1DATA);
@@ -99,12 +107,10 @@ function createTestTable() {
   )`);
 
   db.run(sql`
-  CREATE INDEX "user_idx" ON "comments" ("id");--> statement-breakpoint
-  )`);
+  CREATE INDEX "user_idx" ON "comments" ("id");)`);
 
   db.run(sql`
-  CREATE INDEX "post_idx" ON "comments" ("id");
-  )`);
+  CREATE INDEX "post_idx" ON "comments" ("id");)`);
 
   return db;
 }

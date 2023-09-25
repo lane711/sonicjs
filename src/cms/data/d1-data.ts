@@ -79,9 +79,12 @@ export async function insertD1Data(d1, kv, table, data) {
   delete data.table;
 
   const schmea = getRepoFromTable(table);
-  let result = db.insert(schmea).values(data).returning().get();
-
-  return result;
+  try {
+    let result = db.insert(schmea).values(data).returning().get();
+    return result;
+  } catch (error) {
+    return error;
+  }
 }
 
 export async function deleteD1ByTableAndId(d1, table, id) {

@@ -11,8 +11,8 @@ import { relations } from "drizzle-orm";
 // we want to add the below audit fields to all our tables, so we'll define it here
 // and append it to the rest of the schema for each table
 export const auditSchema = {
-  created_on: integer("created_on"),
-  updated_on: integer("updated_on"),
+  created_on: integer("createdOn"),
+  updated_on: integer("updatedOn"),
 };
 
 /*
@@ -37,8 +37,8 @@ export const postSchema = {
   id: text("id").primaryKey(),
   title: text("title"),
   body: text("body"),
-  userId: text("user_id"),
-  categoryId: text("category_id"),
+  userId: text("userId"),
+  categoryId: text("categoryId"),
 };
 export const postsTable = sqliteTable("posts", { ...postSchema, ...auditSchema });
 
@@ -57,16 +57,17 @@ export const categoriesTable = sqliteTable("categories", {
 export const commentSchema = {
   id: text("id").primaryKey(),
   body: text("body"),
-  userId: text("user_id"),
-  postId: integer("post_id"),
+  userId: text("userId"),
+  postId: integer("postId"),
 };
+
 export const commentsTable = sqliteTable(
   "comments",
   { ...commentSchema, ...auditSchema },
   (table) => {
     return {
-      userIdx: index("user_idx").on(usersTable.id),
-      postIdx: index("post_idx").on(postsTable.id),
+      userIdx: index("userIdx").on(usersTable.id),
+      postIdx: index("postIdx").on(postsTable.id),
     };
   }
 );
