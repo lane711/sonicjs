@@ -1,5 +1,7 @@
 import { insertD1Data, updateD1Data } from "./d1-data";
 import { usersTable } from "../../db/schema";
+import * as schema from "../../db/schema";
+
 import qs from "qs";
 const env = getMiniflareBindings();
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
@@ -27,8 +29,32 @@ it("insert should allow refer", async () => {
   //record should be in list
   expect(d1Result.data.length).toBe(1);
   expect(d1Result.source).toBe("d1");
-  expect(d1Result.data[0].category_id).toBe(categoryRecord.data.id);
-  expect(d1Result.data[0].user_id).toBe(userRecord.data.id);
+  expect(d1Result.data[0].categoryId).toBe(categoryRecord.data.id);
+  expect(d1Result.data[0].userId).toBe(userRecord.data.id);
+});
+
+it("get related data", async () => {
+  const urlKey = "http://localhost:8888/some-cache-key-url";
+
+  createTestTable();
+  const { userRecord, categoryRecord, postRecord } =
+    await createRelatedTestRecords();
+
+
+      const db = drizzle(__D1_BETA__D1DATA, { schema });
+
+  const user = await db.query.usersTable.findMany({
+    with: {
+      posts: true,
+    },
+  });
+
+
+  //record should be in list
+  expect(user.length).toBe(1);
+  expect(user[0].posts.length).toBe(2);
+  expect(user[0].posts[0].userId).toBe(user[0].id);
+
 });
 
 async function createRelatedTestRecords() {
@@ -55,6 +81,15 @@ async function createRelatedTestRecords() {
     },
   });
 
+  const postRecord2 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
+    table: "posts",
+    data: {
+      title: "Post Two",
+      userId: userRecord.data.id,
+      categoryId: categoryRecord.data.id,
+    },
+  });
+
   return { userRecord, categoryRecord, postRecord };
 }
 
@@ -66,8 +101,8 @@ function createTestTable() {
     "id" text PRIMARY KEY NOT NULL,
     "title" text,
     "body" text,
-    "created_on" integer,
-    "updated_on" integer
+    "createdOn" integer,
+    "updatedOn" integer
   )`);
 
   db.run(sql`
@@ -78,8 +113,8 @@ function createTestTable() {
     "email" text,
     "password" text,
     "role" text,
-    "created_on" integer,
-    "updated_on" integer
+    "createdOn" integer,
+    "updatedOn" integer
   );
   )`);
 
@@ -87,10 +122,10 @@ function createTestTable() {
   CREATE TABLE "comments" (
     "id" text PRIMARY KEY NOT NULL,
     "body" text,
-    "user_id" text,
-    "post_id" integer,
-    "created_on" integer,
-    "updated_on" integer
+    "userId" text,
+    "postId" integer,
+    "createdOn" integer,
+    "updatedOn" integer
   );
   )`);
 
@@ -99,10 +134,10 @@ function createTestTable() {
     "id" text PRIMARY KEY NOT NULL,
     "title" text,
     "body" text,
-    "user_id" text,
-    "category_id" text,
-    "created_on" integer,
-    "updated_on" integer
+    "userId" text,
+    "categoryId" text,
+    "createdOn" integer,
+    "updatedOn" integer
   );
   )`);
 
@@ -114,3 +149,4 @@ function createTestTable() {
 
   return db;
 }
+
