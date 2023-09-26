@@ -10,6 +10,7 @@ import {
   categoriesTable,
   commentsTable,
   categoriesToPostsTable,
+  categoriesToPostsSchema,
 } from "../../db/schema";
 import { DefaultLogger, LogWriter, eq } from "drizzle-orm";
 import { addToInMemoryCache, setCacheStatus } from "./cache";
@@ -82,7 +83,7 @@ export async function insertD1Data(d1, kv, table, data) {
   const schmea = getRepoFromTable(table);
   try {
     // let sql = db.insert(schmea).values(data).getSQL();
-    if(!schmea.id){
+    if (!schmea.id) {
       delete data.id;
     }
     let result = await db.insert(schmea).values(data).returning().get();
@@ -157,6 +158,9 @@ export function getSchemaFromTable(tableName) {
     case "comments":
       return commentSchema;
       break;
+    case "categoriesToPosts":
+      return categoriesToPostsSchema;
+      break;
   }
 }
 
@@ -175,9 +179,9 @@ export function getRepoFromTable(tableName) {
     case "comments":
       return commentsTable;
       break;
-      case "categoriesToPosts":
-        return categoriesToPostsTable;
-        break;
+    case "categoriesToPosts":
+      return categoriesToPostsTable;
+      break;
   }
 }
 

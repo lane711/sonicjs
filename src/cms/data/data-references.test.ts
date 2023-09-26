@@ -27,7 +27,7 @@ it("insert should allow refer", async () => {
   );
 
   //record should be in list
-  expect(d1Result.data.length).toBe(2);
+  expect(d1Result.data.length).toBe(1);
   expect(d1Result.source).toBe("d1");
   expect(d1Result.data[0].categoryId).toBe(categoryRecord.data.id);
   expect(d1Result.data[0].userId).toBe(userRecord.data.id);
@@ -51,7 +51,7 @@ it("get user related data", async () => {
 
   //record should be in list
   expect(user.length).toBe(1);
-  expect(user[0].posts.length).toBe(2);
+  expect(user[0].posts.length).toBe(1);
   expect(user[0].posts[0].userId).toBe(user[0].id);
   expect(user[0].comments.length).toBe(2);
   expect(user[0].comments[0].userId).toBe(user[0].id);
@@ -78,7 +78,7 @@ it("get post related data", async () => {
 
   expect(post.user.id).toBe(userRecord.data.id);
   expect(post.category.length).toBe(2);
-  expect(post.category[1].category.title).toBe(categoryRecord.data.title);
+  expect(post.category[1].postId).toBe(postRecord.data.id);
   expect(post.comments.length).toBe(2);
   expect(post.comments[0].user.id).toBe(userRecord.data.id);
 

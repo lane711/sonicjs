@@ -72,13 +72,25 @@ export const commentsTable = sqliteTable("comments", {
   ...auditSchema,
 });
 
-export const categoriesToPostsTable = sqliteTable('categoriesToPosts', {
-  postId: text('postId').notNull().references(() => postsTable.id),
-  categoryId: text('categoryId').notNull().references(() => categoriesTable.id),
-  ...auditSchema,
-}, (t) => ({
-  pk: primaryKey(t.postId, t.categoryId),
-}),
+//posts to categories
+export const categoriesToPostsSchema = {
+  postId: text("postId")
+    .notNull()
+    .references(() => postsTable.id),
+  categoryId: text("categoryId")
+    .notNull()
+    .references(() => categoriesTable.id),
+};
+
+export const categoriesToPostsTable = sqliteTable(
+  "categoriesToPosts",
+  {
+    ...categoriesToPostsSchema,
+    ...auditSchema,
+  },
+  (t) => ({
+    pk: primaryKey(t.postId, t.categoryId),
+  })
 );
 /*
  **** TABLES RELATIONSHIPS ****
@@ -118,16 +130,19 @@ export const commentsRelations = relations(commentsTable, ({ one }) => ({
 }));
 
 //many to many between posts and categories
-export const categoriesToPostsRelations = relations(categoriesToPostsTable, ({ one }) => ({
-	category: one(categoriesTable, {
-		fields: [categoriesToPostsTable.categoryId],
-		references: [categoriesTable.id],
-	}),
-	post: one(postsTable, {
-		fields: [categoriesToPostsTable.postId],
-		references: [postsTable.id],
-	}),
-}));
+export const categoriesToPostsRelations = relations(
+  categoriesToPostsTable,
+  ({ one }) => ({
+    category: one(categoriesTable, {
+      fields: [categoriesToPostsTable.categoryId],
+      references: [categoriesTable.id],
+    }),
+    post: one(postsTable, {
+      fields: [categoriesToPostsTable.postId],
+      references: [postsTable.id],
+    }),
+  })
+);
 
 export interface ApiConfig {
   table: string;
@@ -140,5 +155,5 @@ export const apiConfig: ApiConfig[] = [
   { table: "posts", route: "posts" },
   { table: "categories", route: "categories" },
   { table: "comments", route: "comments" },
-  { table: "categoriesToPostsTable", route: "categories-to-posts" },
+  { table: "categoriesToPosts", route: "categories-to-posts" },
 ];
