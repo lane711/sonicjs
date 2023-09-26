@@ -165,9 +165,9 @@ export const Layout = (props: {
                       <li class="nav-item">
                         <a
                           class="nav-link"
-                          href={"/admin/tables/" + item.table}
+                          href={"/admin/tables/" + item.route}
                         >
-                          {item.table}
+                          {item.route}
                         </a>
                       </li>
                     );

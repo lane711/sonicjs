@@ -64,9 +64,10 @@ export async function loadAdminTable(ctx) {
   );
 }
 
-export async function loadTableData(ctx, table) {
+export async function loadTableData(ctx, route) {
   // await saveKVData(ctx.env.KVDATA, 'site1', 'content', {title: '20230508a'});
-  console.log("user==>", table);
+  console.log("loadTableData==>", route);
+  const table = apiConfig.find((entry) => entry.route === route).table;
 
   const results = await getD1DataByTable(ctx.env.D1DATA, table, undefined);
 

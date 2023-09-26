@@ -34,9 +34,9 @@ admin.get("/content/new/:table", async (ctx) => {
   return ctx.html(await loadNewContent(ctx, table));
 });
 
-admin.get("/tables/:table", async (ctx) => {
-  const table = ctx.req.param("table");
-  return ctx.html(await loadTableData(ctx, table));
+admin.get("/tables/:route", async (ctx) => {
+  const route = ctx.req.param("route");
+  return ctx.html(await loadTableData(ctx, route));
 });
 
 
