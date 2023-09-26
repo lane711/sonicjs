@@ -46,6 +46,7 @@ it("get related data", async () => {
   const user = await db.query.usersTable.findMany({
     with: {
       posts: true,
+      comments: true
     },
   });
 
@@ -54,6 +55,8 @@ it("get related data", async () => {
   expect(user.length).toBe(1);
   expect(user[0].posts.length).toBe(2);
   expect(user[0].posts[0].userId).toBe(user[0].id);
+  expect(user[0].comments[0].userId).toBe(user[0].id);
+
 
 });
 
@@ -87,6 +90,15 @@ async function createRelatedTestRecords() {
       title: "Post Two",
       userId: userRecord.data.id,
       categoryId: categoryRecord.data.id,
+    },
+  });
+
+  const comment = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
+    table: "comments",
+    data: {
+      body: "My first comment",
+      postId: postRecord.data.id,
+      userId: userRecord.data.id,
     },
   });
 
