@@ -32,13 +32,13 @@ export async function loadAdminTable(ctx) {
     // const table = item.name.split('::')[1];
     // console.log("item-->", JSON.stringify(item, null, 2));
 
-    const updated_on = item.metadata.updated_on;
-    // console.log("updated_on-->", updated_on);
+    const updatedOn = item.metadata.updatedOn;
+    // console.log("updatedOn-->", updatedOn);
 
     return {
       id: item.name,
       title: item.name,
-      updated_on: updated_on,
+      updatedOn: updatedOn,
       editPath: `/admin/content/edit/${table}/${id}`,
       newPath: `/admin/content/new/${item.name}`,
     };
@@ -85,7 +85,7 @@ export async function loadTableData(ctx, table) {
     return {
       id: item.id,
       title: getDisplayField(item),
-      updated_on: item.updated_on,
+      updatedOn: item.updatedOn,
       editPath: `/admin/content/edit/${table}/${item.id}`,
     };
   });
@@ -229,8 +229,8 @@ export const TopContentList = (props: {
                       </a>
                     </td>
                     <td scope="row">
-                      <time class="timeSince" datetime={item.updated_on}>
-                        {item.updated_on}
+                      <time class="timeSince" datetime={item.updatedOn}>
+                        {item.updatedOn}
                       </time>
                     </td>
                     <td>
@@ -315,8 +315,8 @@ export const TopContentTable = (props: {
                       </a>
                     </td>
                     <td scope="row">
-                      <time class="timeSince" datetime={item.updated_on}>
-                        {item.updated_on}
+                      <time class="timeSince" datetime={item.updatedOn}>
+                        {item.updatedOn}
                       </time>
                     </td>
                   </tr>

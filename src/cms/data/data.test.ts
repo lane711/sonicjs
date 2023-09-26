@@ -140,8 +140,8 @@ function createTestTable() {
       email text,
       password text,
       role text,
-      created_on integer,
-      updated_on integer
+      createdOn integer,
+      updatedOn integer
     );
 	`);
 

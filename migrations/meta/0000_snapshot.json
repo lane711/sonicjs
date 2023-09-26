@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "a88d7405-c4c5-495c-8d93-a40bc11a5769",
+  "id": "6a292187-b800-4bfa-a368-56c4327555f5",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "categories": {
@@ -46,6 +46,77 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "categoriesToPosts": {
+      "name": "categoriesToPosts",
+      "columns": {
+        "postId": {
+          "name": "postId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "categoryId": {
+          "name": "categoryId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "createdOn": {
+          "name": "createdOn",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "updatedOn": {
+          "name": "updatedOn",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "categoriesToPosts_postId_posts_id_fk": {
+          "name": "categoriesToPosts_postId_posts_id_fk",
+          "tableFrom": "categoriesToPosts",
+          "tableTo": "posts",
+          "columnsFrom": [
+            "postId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "categoriesToPosts_categoryId_categories_id_fk": {
+          "name": "categoriesToPosts_categoryId_categories_id_fk",
+          "tableFrom": "categoriesToPosts",
+          "tableTo": "categories",
+          "columnsFrom": [
+            "categoryId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "categoriesToPosts_postId_categoryId_pk": {
+          "columns": [
+            "categoryId",
+            "postId"
+          ]
+        }
+      },
       "uniqueConstraints": {}
     },
     "comments": {
@@ -94,22 +165,7 @@
           "autoincrement": false
         }
       },
-      "indexes": {
-        "userIdx": {
-          "name": "userIdx",
-          "columns": [
-            "id"
-          ],
-          "isUnique": false
-        },
-        "postIdx": {
-          "name": "postIdx",
-          "columns": [
-            "id"
-          ],
-          "isUnique": false
-        }
-      },
+      "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
@@ -140,13 +196,6 @@
         },
         "userId": {
           "name": "userId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "categoryId": {
-          "name": "categoryId",
           "type": "text",
           "primaryKey": false,
           "notNull": false,

@@ -9,6 +9,7 @@ import {
   commentSchema,
   categoriesTable,
   commentsTable,
+  categoriesToPostsTable,
 } from "../../db/schema";
 import { DefaultLogger, LogWriter, eq } from "drizzle-orm";
 import { addToInMemoryCache, setCacheStatus } from "./cache";
@@ -74,15 +75,20 @@ export async function insertD1Data(d1, kv, table, data) {
   const db = drizzle(d1);
 
   const now = new Date().getTime();
-  data.created_on = now;
-  data.updated_on = now;
+  data.createdOn = now;
+  data.updatedOn = now;
   delete data.table;
 
   const schmea = getRepoFromTable(table);
   try {
-    let result = db.insert(schmea).values(data).returning().get();
+    // let sql = db.insert(schmea).values(data).getSQL();
+    if(!schmea.id){
+      delete data.id;
+    }
+    let result = await db.insert(schmea).values(data).returning().get();
     return result;
   } catch (error) {
+    console.error(error);
     return error;
   }
 }
@@ -110,7 +116,7 @@ export async function updateD1Data(d1, table, data) {
   }
 
   const now = new Date().getTime();
-  data.data.updated_on = now;
+  data.data.updatedOn = now;
 
   console.log("updateD1Data===>", recordId, JSON.stringify(data.data, null, 4));
 
@@ -169,6 +175,9 @@ export function getRepoFromTable(tableName) {
     case "comments":
       return commentsTable;
       break;
+      case "categoriesToPosts":
+        return categoriesToPostsTable;
+        break;
   }
 }
 

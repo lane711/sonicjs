@@ -21,7 +21,7 @@ export async function loadApis(ctx) {
     tableApis.push(link);
 
     let linkWithParams: link = {
-      url: `/v1/${scehma.route}?limit=2&offset=2&sortBy=created_on&sortDirection=desc`,
+      url: `/v1/${scehma.route}?limit=2&offset=2&sortBy=createdOn&sortDirection=desc`,
       description: `get data from ${scehma.table} with limits, offsets and sorting`,
     };
     tableApis.push(linkWithParams);

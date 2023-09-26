@@ -133,8 +133,8 @@ export function saveContent(db, content, timestamp, id) {
   const metadata = {
     id,
     table: content.table,
-    created_on: timestamp,
-    updated_on: timestamp,
+    createdOn: timestamp,
+    updatedOn: timestamp,
   };
 
   // console.log("metadata ==>", metadata);
