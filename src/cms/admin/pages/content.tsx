@@ -87,7 +87,7 @@ export async function loadTableData(ctx, route) {
       id: item.id,
       title: getDisplayField(item),
       updatedOn: item.updatedOn,
-      editPath: `/admin/content/edit/${table}/${item.id}`,
+      editPath: `/admin/content/edit/${route}/${item.id}`,
     };
   });
 
