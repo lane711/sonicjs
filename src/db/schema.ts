@@ -74,6 +74,7 @@ export const commentsTable = sqliteTable("comments", {
 
 //posts to categories
 export const categoriesToPostsSchema = {
+  id: text("id").notNull(),
   postId: text("postId")
     .notNull()
     .references(() => postsTable.id),

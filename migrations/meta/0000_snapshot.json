@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "6a292187-b800-4bfa-a368-56c4327555f5",
+  "id": "e692cc84-7949-4508-9f51-22941e188aa5",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "categories": {
@@ -51,6 +51,13 @@
     "categoriesToPosts": {
       "name": "categoriesToPosts",
       "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "postId": {
           "name": "postId",
           "type": "text",

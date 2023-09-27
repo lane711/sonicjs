@@ -73,7 +73,9 @@ apiConfig.forEach((entry) => {
   api.post(`/${entry.route}`, async (ctx) => {
     const content = await ctx.req.json();
 
-    const table = ctx.req.path.split("/")[2];
+    const route = ctx.req.path.split("/")[2];
+    const table = apiConfig.find((entry) => entry.route === route).table;
+
     content.table = table;
     console.log("posting new record", table);
 
@@ -99,7 +101,9 @@ apiConfig.forEach((entry) => {
 
     content.data = payload.data;
 
-    const table = ctx.req.path.split("/")[2];
+    const route = ctx.req.path.split("/")[2];
+    const table = apiConfig.find((entry) => entry.route === route).table;
+
     content.table = table;
     content.id = id;
 

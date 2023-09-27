@@ -207,6 +207,7 @@ async function createTestTable() {
 
   let res = await db.run(sql`
   CREATE TABLE "categoriesToPosts" (
+    "id" text NOT NULL,
     "postId" text NOT NULL,
     "categoryId" text NOT NULL,
     "createdOn" integer,

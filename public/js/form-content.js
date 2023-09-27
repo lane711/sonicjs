@@ -72,7 +72,7 @@ function saveNewContent(data) {
     console.log(response.headers);
     console.log(response.config);
     if (response.status === 200 || response.status === 201) {
-      location.href = `/admin/tables/${data.data.table}`;
+      location.href = `/admin/tables/${route}`;
     }
   });
 }

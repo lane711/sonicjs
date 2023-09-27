@@ -7,6 +7,7 @@ CREATE TABLE `categories` (
 );
 --> statement-breakpoint
 CREATE TABLE `categoriesToPosts` (
+	`id` text NOT NULL,
 	`postId` text NOT NULL,
 	`categoryId` text NOT NULL,
 	`createdOn` integer,
