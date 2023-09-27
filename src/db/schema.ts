@@ -109,7 +109,7 @@ export const postsRelations = relations(postsTable, ({ one, many }) => ({
     fields: [postsTable.userId],
     references: [usersTable.id],
   }),
-  category: many(categoriesToPostsTable),
+  categories: many(categoriesToPostsTable),
   comments: many(commentsTable),
 }));
 

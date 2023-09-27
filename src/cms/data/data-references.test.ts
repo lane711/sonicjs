@@ -83,6 +83,77 @@ it("get post related data", async () => {
 
 });
 
+it("getRecords can accept custom function for retrieval of data", async () => {
+  //start with a clear cache
+  await clearInMemoryCache();
+  await clearKVCache(KVDATA);
+
+  const urlKey = "http://localhost:8888/some-cache-key-url";
+
+  const db = createTestTable();
+
+  const rec1 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+    firstName: "John",
+    id: "1",
+  });
+
+  const func = function () {
+    return { data: { foo: "bar" } };
+  };
+
+  const result = await getRecords(
+    env.__D1_BETA__D1DATA,
+    env.KVDATA,
+    "users",
+    undefined,
+    urlKey,
+    "fastest",
+    func
+  );
+
+  expect(result.data.foo).toBe("bar");
+});
+
+it("getRecords can accept custom function with parameters for retrieval of data", async () => {
+  //start with a clear cache
+  await clearInMemoryCache();
+  await clearKVCache(KVDATA);
+
+  await createTestTable();
+  const { userRecord, categoryRecord, postRecord, commentRecord } =
+    await createRelatedTestRecords();
+
+  const urlKey = "http://localhost:8888/some-cache-key-url";
+
+
+  const func = async function () {
+    const db = drizzle(__D1_BETA__D1DATA, { schema });
+
+    return await db.query.postsTable.findFirst({
+    with: {
+      user: true,
+      comments: { with: { user: true } },
+      categories: { with: { category: true } },
+    },
+  });
+  };
+
+  const post = await getRecords(
+    env.__D1_BETA__D1DATA,
+    env.KVDATA,
+    "users",
+    undefined,
+    urlKey,
+    "fastest",
+    func
+  );
+
+  expect(post.comments.length).toBe(2);
+  expect(post.categories.length).toBe(2);
+  expect(post.user.firstName).toBe("John");
+
+});
+
 async function createRelatedTestRecords() {
   const userRecord = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
     table: "users",

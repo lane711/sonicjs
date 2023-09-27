@@ -117,7 +117,7 @@ export async function getRecords(
 
   var d1Data;
   if (customDataFunction) {
-    d1Data = customDataFunction();
+    d1Data = await customDataFunction();
   } else {
     d1Data = await getD1DataByTable(d1, table, params);
   }
