@@ -144,7 +144,7 @@ it("getRecords can accept custom function for retrieval of data", async () => {
   });
 
   const func = function () {
-    return { data: { foo: "bar" } };
+    return { foo: "bar" };
   };
 
   const result = await getRecords(

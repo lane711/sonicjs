@@ -25,7 +25,7 @@ export async function getD1DataByTable(db, table, params) {
   const sql = generateSelectSql(table, params);
   const { results } = await db.prepare(sql).all();
 
-  return { data: results, source: "d1" };
+  return results;
 }
 
 export function generateSelectSql(table, params) {

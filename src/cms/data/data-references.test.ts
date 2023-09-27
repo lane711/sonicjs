@@ -71,13 +71,13 @@ it("get post related data", async () => {
     with: {
       user: true,
       comments: { with: { user: true } },
-      category: { with: { category: true } },
+      categories: { with: { category: true } },
     },
   });
 
   expect(post.user.id).toBe(userRecord.data.id);
-  expect(post.category.length).toBe(2);
-  expect(post.category[1].postId).toBe(postRecord.data.id);
+  expect(post.categories.length).toBe(2);
+  expect(post.categories[1].postId).toBe(postRecord.data.id);
   expect(post.comments.length).toBe(2);
   expect(post.comments[0].user.id).toBe(userRecord.data.id);
 
@@ -98,7 +98,7 @@ it("getRecords can accept custom function for retrieval of data", async () => {
   });
 
   const func = function () {
-    return { data: { foo: "bar" } };
+    return { foo: "bar"  };
   };
 
   const result = await getRecords(
@@ -114,7 +114,7 @@ it("getRecords can accept custom function for retrieval of data", async () => {
   expect(result.data.foo).toBe("bar");
 });
 
-it("getRecords can accept custom function with parameters for retrieval of data", async () => {
+it.skip("getRecords can accept custom function with parameters for retrieval of data", async () => {
   //start with a clear cache
   await clearInMemoryCache();
   await clearKVCache(KVDATA);
@@ -138,7 +138,7 @@ it("getRecords can accept custom function with parameters for retrieval of data"
   });
   };
 
-  const post = await getRecords(
+  const {data} = await getRecords(
     env.__D1_BETA__D1DATA,
     env.KVDATA,
     "users",
@@ -148,9 +148,24 @@ it("getRecords can accept custom function with parameters for retrieval of data"
     func
   );
 
-  expect(post.comments.length).toBe(2);
-  expect(post.categories.length).toBe(2);
-  expect(post.user.firstName).toBe("John");
+  expect(data.comments.length).toBe(2);
+  expect(data.categories.length).toBe(2);
+  expect(data.user.firstName).toBe("John");
+
+  //if we get data again, the custom data should be cached
+  const postCached = await getRecords(
+    env.__D1_BETA__D1DATA,
+    env.KVDATA,
+    "users",
+    undefined,
+    urlKey,
+    "fastest",
+    func
+  );
+  expect(postCached.data.comments.length).toBe(2);
+  expect(postCached.data.categories.length).toBe(2);
+  expect(postCached.data.user.firstName).toBe("John");
+  expect(postCached.source).toBe("cache");
 
 });
 

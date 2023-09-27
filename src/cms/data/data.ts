@@ -117,17 +117,15 @@ export async function getRecords(
 
   var d1Data;
   if (customDataFunction) {
-    d1Data = await customDataFunction();
+    d1Data = await customDataFunction() ;
   } else {
     d1Data = await getD1DataByTable(d1, table, params);
   }
 
-  addToInMemoryCache(cacheKey, { data: d1Data.data, source: "cache" });
-  addToKvCache(kv, cacheKey, { data: d1Data.data, source: "kv" });
+  addToInMemoryCache(cacheKey, { data: d1Data, source: "cache" });
+  addToKvCache(kv, cacheKey, { data: d1Data, source: "kv" });
 
-  // console.log("sql results ==>", results);
-
-  return d1Data;
+  return { data: d1Data, source: "d1" };
 }
 
 export async function insertRecord(d1, kv, data) {

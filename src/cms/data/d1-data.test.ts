@@ -63,8 +63,7 @@ it("get should return results", async () => {
     undefined
   );
 
-  expect(d1Result.data.length).toBe(2);
-  expect(d1Result.source).toBe("d1");
+  expect(d1Result.length).toBe(2);
 });
 
 it("updateD1Data should update record", async () => {
@@ -90,8 +89,8 @@ it("updateD1Data should update record", async () => {
     undefined
   );
 
-  expect(d1Result.data.length).toBe(2);
-  expect(d1Result.data[1].firstName).toBe("Steve");
+  expect(d1Result.length).toBe(2);
+  expect(d1Result[1].firstName).toBe("Steve");
 });
 
 function createTestTable() {
