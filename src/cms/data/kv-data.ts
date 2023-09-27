@@ -81,9 +81,10 @@ export async function addToKvCache(db, key, value) {
   console.log('*** addToKvCache db', db)
   console.log("*** addToKvCache adding to kv cache", cacheKey);
 
-  db.put(cacheKey, JSON.stringify(value), {
-    metadata: value ,
-  });
+  // db.put(cacheKey, JSON.stringify(value), {
+  //   metadata: value ,
+  // });
+  db.put(cacheKey, JSON.stringify(value));
   console.log("*** addToKvCache put complete");
 
   const confirmedRecord = await getById(db, cacheKey);

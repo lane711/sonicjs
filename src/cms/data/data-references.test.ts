@@ -114,7 +114,7 @@ it("getRecords can accept custom function for retrieval of data", async () => {
   expect(result.data.foo).toBe("bar");
 });
 
-it.skip("getRecords can accept custom function with parameters for retrieval of data", async () => {
+it("getRecords can accept custom function with parameters for retrieval of data", async () => {
   //start with a clear cache
   await clearInMemoryCache();
   await clearKVCache(KVDATA);
