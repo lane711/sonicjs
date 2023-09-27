@@ -22,13 +22,13 @@ export async function loadAdminTable(ctx) {
 
   content.keys.reverse();
 
-  console.log('content==>', JSON.stringify(content, null, 2))
+  console.log("content==>", JSON.stringify(content, null, 2));
 
   // console.log("load admin data", content);
 
   const contentList = content.keys.map((item) => {
     const id = item.metadata.id;
-    const table = item.metadata.table;
+    const route = item.metadata.route;
     // const table = item.name.split('::')[1];
     // console.log("item-->", JSON.stringify(item, null, 2));
 
@@ -39,7 +39,7 @@ export async function loadAdminTable(ctx) {
       id: item.name,
       title: item.name,
       updatedOn: updatedOn,
-      editPath: `/admin/content/edit/${table}/${id}`,
+      editPath: `/admin/content/edit/${route}/${id}`,
       newPath: `/admin/content/new/${item.name}`,
     };
   });
@@ -50,8 +50,8 @@ export async function loadAdminTable(ctx) {
   const tableList = tables.map((schmea) => {
     return {
       title: schmea.table,
-      editPath: `/admin/content/${schmea.table}`,
-      newPath: `/admin/content/new/${schmea.table}`,
+      editPath: `/admin/content/${schmea.route}`,
+      newPath: `/admin/content/new/${schmea.route}`,
     };
   });
 
@@ -91,7 +91,9 @@ export async function loadTableData(ctx, route) {
     };
   });
 
-  return <TopContentTable content={contentList} screenTitle={table} />;
+  return (
+    <TopContentTable content={contentList} route={route} screenTitle={table} />
+  );
 }
 
 function getDisplayField(item) {
@@ -168,13 +170,16 @@ export async function loadEditContent(ctx, table, id) {
   );
 }
 
-export async function loadNewContent(ctx, table) {
+export async function loadNewContent(ctx, route) {
   // const content = await getD1ByTableAndId(ctx.env.D1DATA, table, id);
   // console.log("loadEditContent", id, content);
 
-  // console.log('loadEditContent content type', contentType)
+  const table = apiConfig.find((entry) => entry.route === route).table;
 
-  return <ContentNewForm table={table} />;
+  console.log('loadNewContent', route, table)
+
+
+  return <ContentNewForm route={route} table={table} />;
 }
 
 function editScript() {
@@ -194,7 +199,7 @@ export const ContentEditForm = (props: {
   );
 };
 
-export const ContentNewForm = (props: { table: string }) => {
+export const ContentNewForm = (props: { table: string; route: string }) => {
   return (
     <Layout screenTitle={"New: " + props.table}>
       <div id="formio" data-table={props.table}></div>
@@ -263,7 +268,7 @@ export const TopContentList = (props: {
                   <tr>
                     <td>
                       <a
-                        href={"/admin/content/new/" + item.title}
+                        href={"/admin/content/new/" + item.route}
                         class="btn btn-warning"
                       >
                         New {item.title} record
@@ -283,6 +288,7 @@ export const TopContentList = (props: {
 export const TopContentTable = (props: {
   content: object[];
   screenTitle: string;
+  route: string;
 }) => {
   return (
     <Layout screenTitle={props.screenTitle}>
@@ -291,7 +297,7 @@ export const TopContentTable = (props: {
           <div class="pb-2 mb-3">
             {/* <!-- Button trigger modal --> */}
             <a
-              href={"/admin/content/new/" + props.screenTitle}
+              href={"/admin/content/new/" + props.route}
               class="btn btn-warning"
             >
               New {props.screenTitle} record

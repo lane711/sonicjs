@@ -1,12 +1,12 @@
 //        Formio.builder(document.getElementById('builder'), {}, {});
 var contentTypeComponents;
-var table;
+var route;
 
 (function () {
   const url = window.location.href;
 
   const params = url.split("/");
-  table = window.location.href.split("/").pop();
+  route = window.location.href.split("/").pop();
 
   var mode;
 
@@ -32,9 +32,9 @@ var table;
 })();
 
 function newContent() {
-  console.log("contentType", table);
+  console.log("contentType", route);
 
-  axios.get(`/v1/form-components/${table}`).then((response) => {
+  axios.get(`/v1/form-components/${route}`).then((response) => {
     console.log(response.data);
     console.log(response.status);
     console.log(response.statusText);
@@ -65,7 +65,7 @@ function saveNewContent(data) {
   delete data.data.id;
   console.log(data);
 
-  axios.post(`/v1/${table}`, data).then((response) => {
+  axios.post(`/v1/${route}`, data).then((response) => {
     console.log(response.data);
     console.log(response.status);
     console.log(response.statusText);
@@ -79,9 +79,8 @@ function saveNewContent(data) {
 function editContent() {
   const contentId = $("#formio").attr("data-id");
   table = $("#formio").attr("data-table");
-
   console.log("contentType", contentId);
-  axios.get(`/v1/${table}/${contentId}?includeContentType`).then((response) => {
+  axios.get(`/v1/${route}/${contentId}?includeContentType`).then((response) => {
     console.log(response.data);
 
     Formio.icons = "fontawesome";
@@ -111,9 +110,9 @@ function editContent() {
 }
 
 function addContent(data) {
-  data.key = table;
+  data.key = route;
 
-  axios.post(`/v1/${table}`, data).then((response) => {
+  axios.post(`/v1/${route}`, data).then((response) => {
     console.log(response.data);
     console.log(response.status);
     console.log(response.statusText);
@@ -135,14 +134,14 @@ function updateContent(data) {
   delete content.data.id;
   delete content.data.table;
 
-  axios.put(`/v1/${table}/${id}`, content).then((response) => {
+  axios.put(`/v1/${route}/${id}`, content).then((response) => {
     console.log(response.data);
     console.log(response.status);
     console.log(response.statusText);
     console.log(response.headers);
     console.log(response.config);
     if (response.status === 200) {
-      location.href = `/admin/tables/${table}`;
+      location.href = `/admin/tables/${route}`;
     } else{
       alert('Error occured updating ' + data.id)
     }

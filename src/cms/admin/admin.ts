@@ -29,9 +29,9 @@ admin.get("/content/edit/:table/:id", async (ctx) => {
   return ctx.html(await loadEditContent(ctx, table, id));
 });
 
-admin.get("/content/new/:table", async (ctx) => {
-  const table = ctx.req.param("table");
-  return ctx.html(await loadNewContent(ctx, table));
+admin.get("/content/new/:route", async (ctx) => {
+  const route = ctx.req.param("route");
+  return ctx.html(await loadNewContent(ctx, route));
 });
 
 admin.get("/tables/:route", async (ctx) => {

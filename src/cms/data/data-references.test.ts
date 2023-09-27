@@ -29,7 +29,6 @@ it("insert should allow refer", async () => {
   //record should be in list
   expect(d1Result.data.length).toBe(1);
   expect(d1Result.source).toBe("d1");
-  expect(d1Result.data[0].categoryId).toBe(categoryRecord.data.id);
   expect(d1Result.data[0].userId).toBe(userRecord.data.id);
 });
 

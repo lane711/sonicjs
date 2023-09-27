@@ -174,10 +174,11 @@ api.get("/data", async (c) => {
 
 api.get("/forms", async (c) => c.html(await loadForm(c)));
 
-api.get("/form-components/:table", async (c) => {
-  const table = c.req.param("table");
+api.get("/form-components/:route", async (c) => {
+  const route = c.req.param("route");
 
-  // console.log("id--->", id);
+
+  const table = apiConfig.find((entry) => entry.route === route).table;
 
   const ct = await getForm(c.env.D1DATA, table);
   return c.json(ct);

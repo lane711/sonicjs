@@ -41,7 +41,7 @@ example.get("/blog-post", async (ctx) => {
   const db = drizzle(ctx.env.D1DATA, { schema });
 
 
-  const post = await db.query.postsTable.findFirst({
+  const post = await db.query.postsTable.findMany({
     with: {
       user: true,
       comments: { with: { user: true } },
@@ -49,8 +49,8 @@ example.get("/blog-post", async (ctx) => {
     },
   });
 
-  return ctx.json(post);
   
+  return ctx.json(post);
 });
 
 export { example };
