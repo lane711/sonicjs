@@ -47,7 +47,6 @@ import {
 
 //   addToInMemoryCache(cacheKey, { data: kvData.data, source: "kv" });
 
-
 //   return kvData;
 // }
 
@@ -94,7 +93,8 @@ export async function getRecords(
   table,
   params,
   cacheKey,
-  source = "fastest"
+  source = "fastest",
+  customDataFunction = undefined
 ) {
   const cacheStatusValid = await isCacheValid();
 
@@ -115,7 +115,12 @@ export async function getRecords(
     return kvData;
   }
 
-  const d1Data = await getD1DataByTable(d1, table, params);
+  var d1Data;
+  if (customDataFunction) {
+    d1Data = customDataFunction();
+  } else {
+    d1Data = await getD1DataByTable(d1, table, params);
+  }
 
   addToInMemoryCache(cacheKey, { data: d1Data.data, source: "cache" });
   addToKvCache(kv, cacheKey, { data: d1Data.data, source: "kv" });
@@ -126,13 +131,13 @@ export async function getRecords(
 }
 
 export async function insertRecord(d1, kv, data) {
-  const content = data ;
+  const content = data;
   const id = uuidv4();
   const timestamp = new Date().getTime();
   content.data.id = id;
   let error = "";
 
-  console.log('insertRecord', content)
+  console.log("insertRecord", content);
 
   try {
     const result = await saveKVData(kv, id, content.data);
@@ -143,12 +148,7 @@ export async function insertRecord(d1, kv, data) {
   } finally {
     //then also save the content to sqlite for filtering, sorting, etc
     try {
-      const result = await insertD1Data(
-        d1,
-        kv,
-        content.table,
-        content.data
-      );
+      const result = await insertD1Data(d1, kv, content.table, content.data);
       console.log("insertD1Data --->", result);
       //expire cache
       await setCacheStatusInvalid();

@@ -129,6 +129,37 @@ it("update should return updated id", async () => {
   expect(updatedRecord.id).toBe("1");
 });
 
+it("getRecords can accept custom function for retrieval of data", async () => {
+  //start with a clear cache
+  await clearInMemoryCache();
+  await clearKVCache(KVDATA);
+
+  const urlKey = "http://localhost:8888/some-cache-key-url";
+
+  const db = createTestTable();
+
+  const rec1 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+    firstName: "John",
+    id: "1",
+  });
+
+  const func = function () {
+    return { data: { foo: "bar" } };
+  };
+
+  const result = await getRecords(
+    env.__D1_BETA__D1DATA,
+    env.KVDATA,
+    "users",
+    undefined,
+    urlKey,
+    "fastest",
+    func
+  );
+
+  expect(result.data.foo).toBe("bar");
+});
+
 function createTestTable() {
   const db = drizzle(__D1_BETA__D1DATA);
 
