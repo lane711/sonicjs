@@ -78,7 +78,7 @@ function saveNewContent(data) {
 }
 function editContent() {
   const contentId = $("#formio").attr("data-id");
-  table = $("#formio").attr("data-table");
+  route = $("#formio").attr("data-route");
   console.log("contentType", contentId);
   axios.get(`/v1/${route}/${contentId}?includeContentType`).then((response) => {
     console.log(response.data);
@@ -133,6 +133,7 @@ function updateContent(data) {
   delete content.data.contentType;
   delete content.data.id;
   delete content.data.table;
+  route = $("#formio").attr("data-route");
 
   axios.put(`/v1/${route}/${id}`, content).then((response) => {
     console.log(response.data);

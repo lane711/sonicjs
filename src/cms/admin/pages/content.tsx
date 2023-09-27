@@ -154,9 +154,10 @@ export async function loadAdmin(ctx) {
 //   );
 // }
 
-export async function loadEditContent(ctx, table, id) {
+export async function loadEditContent(ctx, route, id) {
   // const content = await getD1ByTableAndId(ctx.env.D1DATA, table, id);
   // console.log("loadEditContent", id, content);
+  const table = apiConfig.find((entry) => entry.route === route).table;
 
   // console.log('loadEditContent content type', contentType)
 
@@ -166,6 +167,7 @@ export async function loadEditContent(ctx, table, id) {
       screenTitle="Content Type"
       contentId={id}
       table={table}
+      route={route}
     />
   );
 }
@@ -191,10 +193,11 @@ export const ContentEditForm = (props: {
   saveButtonText: string;
   contentId: string;
   table: string;
+  route: string
 }) => {
   return (
     <Layout screenTitle={"Edit: " + props.contentId}>
-      <div id="formio" data-id={props.contentId} data-table={props.table}></div>
+      <div id="formio" data-id={props.contentId} data-route={props.route}></div>
     </Layout>
   );
 };
@@ -202,7 +205,7 @@ export const ContentEditForm = (props: {
 export const ContentNewForm = (props: { table: string; route: string }) => {
   return (
     <Layout screenTitle={"New: " + props.table}>
-      <div id="formio" data-table={props.table}></div>
+      <div id="formio" data-route={props.route}></div>
     </Layout>
   );
 };

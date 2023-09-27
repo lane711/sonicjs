@@ -23,10 +23,10 @@ admin.get("/ping", (ctx) => {
 
 admin.get("/", async (ctx) => ctx.html(await loadApis(ctx)));
 
-admin.get("/content/edit/:table/:id", async (ctx) => {
-  const table = ctx.req.param("table");
+admin.get("/content/edit/:route/:id", async (ctx) => {
+  const route = ctx.req.param("route");
   const id = ctx.req.param("id");
-  return ctx.html(await loadEditContent(ctx, table, id));
+  return ctx.html(await loadEditContent(ctx, route, id));
 });
 
 admin.get("/content/new/:route", async (ctx) => {
