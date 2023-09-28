@@ -14,6 +14,8 @@ import {
 } from "./pages/content";
 
 import { loadApis } from "./pages/api";
+import { getRecords } from "../data/data";
+import { apiConfig } from "../../db/schema";
 const admin = new Hono<{ Bindings: Bindings }>();
 
 admin.get("/ping", (ctx) => {
@@ -39,5 +41,35 @@ admin.get("/tables/:route", async (ctx) => {
   return ctx.html(await loadTableData(ctx, route));
 });
 
+admin.get("/api/:route", async (ctx) => {
+  const route = ctx.req.param("route");
+  const table = apiConfig.find((entry) => entry.route === route).table;
+
+  const records = await getRecords(
+    ctx.env.D1DATA,
+    ctx.env.KVDATA,
+    table,
+    {},
+    ctx.req.url,
+    "fastest"
+  );
+
+  const data = records.data.map((item) => {
+    return {
+      id: item.id,
+      title: getDisplayField(item),
+      updatedOn: item.updatedOn,
+      editPath: `/admin/content/edit/${route}/${item.id}`,
+    };
+  });
+
+
+  return ctx.json(data);
+});
+
+function getDisplayField(item) {
+  return item.name ?? item.title ?? item.firstName ?? item.id ?? "record";
+}
 
 export { admin };
+

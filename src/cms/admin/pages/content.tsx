@@ -219,6 +219,7 @@ export const TopContentList = (props: {
     <Layout screenTitle={props.screenTitle}>
       <div class="row">
         <div class="col-md-8">
+
           <table class="table">
             <thead>
               <tr>
@@ -306,6 +307,9 @@ export const TopContentTable = (props: {
               New {props.screenTitle} record
             </a>
           </div>
+
+        <div id="myGrid" class="ag-theme-alpine" style="height: 500px"></div>
+
 
           <table class="table">
             <thead>

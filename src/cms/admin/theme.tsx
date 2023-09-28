@@ -47,6 +47,16 @@ export const Layout = (props: {
           href="https://cdn.form.io/formiojs/formio.full.min.css"
         />
 
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css"
+        />
+
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css"
+        />
+
         <meta name="theme-color" content="#712cf9" />
 
         <link href="/public/css/admin.css" rel="stylesheet" />
@@ -149,8 +159,6 @@ export const Layout = (props: {
             >
               <div class="position-sticky pt-3 sidebar-sticky">
                 <ul class="nav flex-column">
-
-
                   <li class="nav-item">
                     <a class="nav-link" href="/admin">
                       API
@@ -294,9 +302,13 @@ export const Layout = (props: {
           crossorigin="anonymous"
         ></script>
 
+        <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
+
         <script src="/public/js/admin.js"></script>
         <script src="/public/js/form-content-type.js"></script>
         <script src="/public/js/form-content.js"></script>
+        <script src="/public/js/grid.js"></script>
+
       </body>
     </html>
   );
