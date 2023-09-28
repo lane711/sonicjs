@@ -55,9 +55,9 @@ admin.get("/api/:route", async (ctx) => {
     d1,
     ctx.env.KVDATA,
     table,
-    {limit:3},
+    {limit:3, offset: 3},
     ctx.req.url,
-    "kv"
+    "fastest"
   );
 
   console.log('===> records', records)
