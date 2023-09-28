@@ -1,38 +1,10 @@
-function deselect(){
-    gridOptions.api.deselectAll()
-}
-
-// Grid Options are properties passed to the grid
-const gridOptions = {
-
-  // each entry here represents one column
-  columnDefs: [
-    { field: "title" },
-    { field: "updatedOn" },
-  ],
-
-  // default col def properties get applied to all columns
-  defaultColDef: {sortable: true, filter: true},
-
-  rowSelection: 'multiple', // allow rows to be selected
-  animateRows: true, // have rows animate to new positions when sorted
-
-  // example event handler
-  onCellClicked: params => {
-    console.log('cell was clicked', params)
-  }
-};
-
-// get div to host the grid
-const eGridDiv = document.getElementById("myGrid");
-// new grid instance, passing in the hosting DIV and Grid Options
-new agGrid.Grid(eGridDiv, gridOptions);
-
-// Fetch data from server
-fetch("/admin/api/users")
-.then(response => response.json())
-.then(results => {
-    // debugger;
-  // load fetched data into grid
-  gridOptions.api.setRowData(results.data);
-});
+new gridjs.Grid({
+  columns: ["Name", "Email", "Phone Number"],
+  data: [
+    ["John", "john@example.com", "(353) 01 222 3333"],
+    ["Mark", "mark@gmail.com", "(01) 22 888 4444"],
+    ["Eoin", "eoin@gmail.com", "0097 22 654 00033"],
+    ["Sarah", "sarahcdd@gmail.com", "+322 876 1233"],
+    ["Afshin", "afshin@mail.com", "(353) 22 87 8356"]
+  ]
+}).render(document.getElementById("grid"));

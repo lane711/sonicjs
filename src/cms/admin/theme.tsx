@@ -48,13 +48,8 @@ export const Layout = (props: {
         />
 
         <link
+          href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css"
           rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css"
-        />
-
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css"
         />
 
         <meta name="theme-color" content="#712cf9" />
@@ -302,13 +297,13 @@ export const Layout = (props: {
           crossorigin="anonymous"
         ></script>
 
-        <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
+<script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+
 
         <script src="/public/js/admin.js"></script>
         <script src="/public/js/form-content-type.js"></script>
         <script src="/public/js/form-content.js"></script>
         <script src="/public/js/grid.js"></script>
-
       </body>
     </html>
   );

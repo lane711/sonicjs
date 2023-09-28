@@ -97,7 +97,7 @@ export async function loadTableData(ctx, route) {
 }
 
 function getDisplayField(item) {
-  return item.name ?? item.title ?? item.firstName ?? item.id ?? 'record';
+  return item.name ?? item.title ?? item.firstName ?? item.id ?? "record";
 }
 
 export async function loadAdmin(ctx) {
@@ -178,8 +178,7 @@ export async function loadNewContent(ctx, route) {
 
   const table = apiConfig.find((entry) => entry.route === route).table;
 
-  console.log('loadNewContent', route, table)
-
+  console.log("loadNewContent", route, table);
 
   return <ContentNewForm route={route} table={table} />;
 }
@@ -193,7 +192,7 @@ export const ContentEditForm = (props: {
   saveButtonText: string;
   contentId: string;
   table: string;
-  route: string
+  route: string;
 }) => {
   return (
     <Layout screenTitle={"Edit: " + props.contentId}>
@@ -219,7 +218,6 @@ export const TopContentList = (props: {
     <Layout screenTitle={props.screenTitle}>
       <div class="row">
         <div class="col-md-8">
-
           <table class="table">
             <thead>
               <tr>
@@ -308,8 +306,7 @@ export const TopContentTable = (props: {
             </a>
           </div>
 
-        <div id="myGrid" class="ag-theme-alpine" style="height: 500px"></div>
-
+          <div id="grid"></div>
 
           <table class="table">
             <thead>
