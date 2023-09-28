@@ -99,6 +99,19 @@ describe("insert", () => {
     expect(inMemoryCacheResult.data.length).toBe(2);
     expect(inMemoryCacheResult.source).toBe("cache");
 
+    // if we clear memory cache, we should get kv cache
+    await clearInMemoryCache();
+    const kvResult = await getRecords(
+      env.__D1_BETA__D1DATA,
+      env.KVDATA,
+      "users",
+      undefined,
+      urlKey
+    );
+
+    expect(kvResult.data.length).toBe(2);
+    expect(kvResult.source).toBe("kv");
+
     // let's insert another records
     const rec3 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
       table: "users",

@@ -97,6 +97,7 @@ export async function getRecords(
   customDataFunction = undefined
 ) {
   const cacheStatusValid = await isCacheValid();
+  console.log("getRecords cacheStatusValid", cacheStatusValid);
 
   if (cacheStatusValid) {
     const cacheResult = await getFromInMemoryCache(cacheKey);
@@ -109,18 +110,21 @@ export async function getRecords(
     }
   }
 
-  const kvData = await getRecordFromKvCache(kv, cacheKey);
-  if (source == "kv" || kvData) {
-    console.log("**** getting kv cache ****", kvData);
-    return kvData;
+  if (source == "fastest" || source == "kv") {
+    const kvData = await getRecordFromKvCache(kv, cacheKey);
+    console.log("getRecords kvData", kvData);
+
+    if (kvData) {
+      return kvData;
+    }
   }
 
   var d1Data;
   if (customDataFunction) {
-    d1Data = await customDataFunction() ;
+    d1Data = await customDataFunction();
   } else {
     d1Data = await getD1DataByTable(d1, table, params);
-    console.log('getRecords d1Data', d1Data)
+    console.log("getRecords d1Data", d1Data);
   }
 
   addToInMemoryCache(cacheKey, { data: d1Data, source: "cache" });

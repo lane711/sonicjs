@@ -7,11 +7,8 @@ const gridOptions = {
 
   // each entry here represents one column
   columnDefs: [
-    { field: "firstName" },
-    { field: "created" },
-    { field: "make" },
-    { field: "model" },
-    { field: "price" },
+    { field: "title" },
+    { field: "updatedOn" },
   ],
 
   // default col def properties get applied to all columns
@@ -32,7 +29,7 @@ const eGridDiv = document.getElementById("myGrid");
 new agGrid.Grid(eGridDiv, gridOptions);
 
 // Fetch data from server
-fetch("/v1/users")
+fetch("/admin/api/users")
 .then(response => response.json())
 .then(results => {
     // debugger;

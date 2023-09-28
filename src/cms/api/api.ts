@@ -11,6 +11,7 @@ import {
   saveKVData,
   saveContent,
   saveContentType,
+  getRecordFromKvCache,
 } from "../data/kv-data";
 import { Bindings } from "../types/bindings";
 import { apiConfig } from "../../db/schema";
@@ -223,9 +224,25 @@ api.get("/cache/kv", async (ctx) => {
   return ctx.json(cacheItems);
 });
 
+api.get("/cache/kv/:cacheKey", async (ctx) => {
+  const cacheKey = ctx.req.param("cacheKey");
+  const cacheItem = await getRecordFromKvCache(ctx.env.KVDATA, cacheKey);
+  console.log("getting kv cache", cacheItem);
+  return ctx.json(cacheItem);
+});
+
 api.get("/kv", async (ctx) => {
-  const allItems = await getAllKV(ctx.env.KVDATA);
+  const allItems = await getDataByPrefix(ctx.env.KVDATA,'', 100);
   return ctx.json(allItems);
+});
+
+api.get("/kv/:cacheKey", async (ctx) => {
+  const cacheKey = ctx.req.param("cacheKey");
+  console.log("getting kv cache", cacheKey);
+
+  const cacheItem = await getRecordFromKvCache(ctx.env.KVDATA, "http://127.0.0.1:8788/admin/api/users");
+  console.log("getting kv cache", cacheItem);
+  return ctx.json(cacheItem);
 });
 
 api.get("/kv/delete-all", async (ctx) => {

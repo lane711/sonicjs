@@ -57,7 +57,7 @@ admin.get("/api/:route", async (ctx) => {
     table,
     {limit:3},
     ctx.req.url,
-    "fastest"
+    "kv"
   );
 
   console.log('===> records', records)

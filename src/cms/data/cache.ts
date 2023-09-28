@@ -46,7 +46,7 @@ export async function addToInMemoryCache(key: string, data) {
   console.log("addToInMemoryCache", key);
   cache.insert({ key, data });
   //TODO: softcode time
-  await setCacheStatus(9999);
+  await setCacheStatus(20 * 60 * 1000);
 }
 
 export async function getFromInMemoryCache(key: string) {
