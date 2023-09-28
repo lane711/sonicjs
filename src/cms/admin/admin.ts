@@ -16,6 +16,8 @@ import {
 import { loadApis } from "./pages/api";
 import { getRecords } from "../data/data";
 import { apiConfig } from "../../db/schema";
+import { getD1Binding } from "../util/d1-binding";
+
 const admin = new Hono<{ Bindings: Bindings }>();
 
 admin.get("/ping", (ctx) => {
@@ -45,14 +47,20 @@ admin.get("/api/:route", async (ctx) => {
   const route = ctx.req.param("route");
   const table = apiConfig.find((entry) => entry.route === route).table;
 
+  console.log('===> records', route, table)
+
+  const d1 = getD1Binding(ctx);
+
   const records = await getRecords(
-    ctx.env.D1DATA,
+    d1,
     ctx.env.KVDATA,
     table,
-    {},
+    {limit:3},
     ctx.req.url,
     "fastest"
   );
+
+  console.log('===> records', records)
 
   const data = records.data.map((item) => {
     return {
@@ -64,7 +72,7 @@ admin.get("/api/:route", async (ctx) => {
   });
 
 
-  return ctx.json(data);
+  return ctx.json({data, source: records.source});
 });
 
 function getDisplayField(item) {

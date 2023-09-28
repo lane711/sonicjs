@@ -25,6 +25,7 @@ import {
   updateRecord,
 } from "../data/data";
 import { clearInMemoryCache, getAllFromInMemoryCache } from "../data/cache";
+import { getD1Binding } from "../util/d1-binding";
 
 const api = new Hono<{ Bindings: Bindings }>();
 
@@ -33,8 +34,7 @@ apiConfig.forEach((entry) => {
 
   //ie /v1/users
   api.get(`/${entry.route}`, async (ctx) => {
-    //HACK: for testing while d1 is still in beta, then can be removed
-    const d1 = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
+    const d1 = getD1Binding(ctx);
 
     try {
       var params = qs.parse(ctx.req.query());
@@ -79,8 +79,8 @@ apiConfig.forEach((entry) => {
     content.table = table;
     console.log("posting new record", table);
 
-    //HACK: for testing while d1 is still in beta, then can be removed
-    const d1 = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
+    const d1 = getD1Binding(ctx);
+
 
     try {
       const result = await insertRecord(d1, ctx.env.KVDATA, content);
@@ -109,8 +109,7 @@ apiConfig.forEach((entry) => {
 
     console.log("updating record", content);
 
-    //HACK: for testing while d1 is still in beta, then can be removed
-    const d1 = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
+    const d1 = getD1Binding(ctx);
 
     try {
       const result = await updateRecord(d1, ctx.env.KVDATA, content);
@@ -127,8 +126,7 @@ apiConfig.forEach((entry) => {
     const id = ctx.req.param("id");
     const table = ctx.req.path.split("/")[2];
 
-    //HACK: for testing while d1 is still in beta, then can be removed
-    const d1 = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
+    const d1 = getD1Binding(ctx);
 
     const record = await getRecord(
       d1,

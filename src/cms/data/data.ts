@@ -120,6 +120,7 @@ export async function getRecords(
     d1Data = await customDataFunction() ;
   } else {
     d1Data = await getD1DataByTable(d1, table, params);
+    console.log('getRecords d1Data', d1Data)
   }
 
   addToInMemoryCache(cacheKey, { data: d1Data, source: "cache" });
