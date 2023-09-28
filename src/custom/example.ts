@@ -45,7 +45,7 @@ example.get("/blog-post", async (ctx) => {
     with: {
       user: true,
       comments: { with: { user: true } },
-      category: { with: { category: true } },
+      categories: { with: { category: true } },
     },
   });
 

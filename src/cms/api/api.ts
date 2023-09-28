@@ -166,11 +166,6 @@ api.get("/ping", (c) => {
   return c.text(Date());
 });
 
-// api.get("/kvtest", async (ctx) => {
-//   const data = await getD1DataByTable(ctx.env.D1DATA, "categories", {limit:2});
-//   return ctx.json(data);
-// });
-
 api.get("/data", async (c) => {
   const data = await getDataListByPrefix(c.env.KVDATA, "");
   return c.json(data);

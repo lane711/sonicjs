@@ -71,7 +71,7 @@ export async function loadTableData(ctx, route) {
 
   const results = await getD1DataByTable(ctx.env.D1DATA, table, undefined);
 
-  results.data.reverse();
+  results.reverse();
   // const content = await getAllContent(ctx.env.D1DATA);
   // console.log('data==>', JSON.stringify(data, null, 2))
 
@@ -82,7 +82,7 @@ export async function loadTableData(ctx, route) {
 
   // console.log("load admin data", content);
 
-  const contentList = results.data.map((item) => {
+  const contentList = results.map((item) => {
     return {
       id: item.id,
       title: getDisplayField(item),

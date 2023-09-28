@@ -34,9 +34,9 @@ export async function loadApis(ctx) {
       const results = await getD1DataByTable(ctx.env.D1DATA, scehma.table, {
         limit: 1,
       });
-      if (results.data.length) {
+      if (results.length) {
         let link: link = {
-          url: `/v1/${scehma.route}/${results.data[0].id}`,
+          url: `/v1/${scehma.route}/${results[0].id}`,
           description: `get single record from the ${scehma.table} table`,
         };
         recordApis.push(link);
