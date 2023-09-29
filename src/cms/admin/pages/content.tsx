@@ -307,6 +307,7 @@ export const TopContentTable = (props: {
           </div>
 
           <div id="grid" data-route={props.route}></div>
+          <div id="executionTime" class="p-4 text-center text-muted">Data retrieved in <span></span>ms</div>
 
           {/* <table class="table">
             <thead>

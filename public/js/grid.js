@@ -19,9 +19,33 @@ const dataGrid = new gridjs.Grid({
   },
   server: {
     url: `/admin/api/${getTable()}`,
-    then: (data) =>
-      data.data.map((record) => [record.editLink, record.updatedOn]),
-    total: (data) => data.total,
+    data: (opts) => {
+      return new Promise((resolve, reject) => {
+        // let's implement our own HTTP client
+        const xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+          if (this.readyState === 4) {
+            if (this.status === 200) {
+              const resp = JSON.parse(this.response);
+              $("#executionTime span").text(resp.executionTime);
+              // make sure the output conforms to StorageResponse format:
+              // https://github.com/grid-js/gridjs/blob/master/src/storage/storage.ts#L21-L24
+              resolve({
+                data: resp.data.map((record) => [
+                  record.editLink,
+                  record.updatedOn,
+                ]),
+                total: resp.total,
+              });
+            } else {
+              reject();
+            }
+          }
+        };
+        xhttp.open("GET", opts.url, true);
+        xhttp.send();
+      });
+    },
   },
 }).render(document.getElementById("grid"));
 
