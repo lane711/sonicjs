@@ -41,7 +41,7 @@ it("should return a SQL select with limit", () => {
   const params = qs.parse(queryParams);
   console.log("params ---->", params);
   const clause = generateSelectSql("my-table", params);
-  expect(clause).toBe("SELECT * FROM my-table limit 2;");
+  expect(clause).toBe("SELECT *, COUNT() OVER() AS total FROM my-table limit 2;");
 });
 
 it("should return a SQL select with offset", () => {
@@ -49,7 +49,7 @@ it("should return a SQL select with offset", () => {
   const params = qs.parse(queryParams);
   console.log("params ---->", params);
   const clause = generateSelectSql("my-table", params);
-  expect(clause).toBe("SELECT * FROM my-table offset 2;");
+  expect(clause).toBe("SELECT *, COUNT() OVER() AS total FROM my-table offset 2;");
 });
 
 it("should return a SQL select with limit and offset", () => {
@@ -57,7 +57,7 @@ it("should return a SQL select with limit and offset", () => {
   const params = qs.parse(queryParams);
   console.log("params ---->", params);
   const clause = generateSelectSql("my-table", params);
-  expect(clause).toBe("SELECT * FROM my-table limit 2 offset 2;");
+  expect(clause).toBe("SELECT *, COUNT() OVER() AS total FROM my-table limit 2 offset 2;");
 });
 
 //TODO: rework to hit the full api
