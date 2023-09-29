@@ -72,9 +72,8 @@ admin.get("/api/:route", async (ctx) => {
   const data = records.data.map((item) => {
     return {
       id: item.id,
-      title: getDisplayField(item),
       updatedOn: format(item.updatedOn, 'MM/dd/yyyy h:mm b'),
-      editPath: `/admin/content/edit/${route}/${item.id}`,
+      editLink: `<a href="/admin/content/edit/${route}/${item.id}">${getDisplayField(item)}</a>`,
     };
   });
 

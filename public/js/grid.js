@@ -1,27 +1,14 @@
 const dataGrid = new gridjs.Grid({
   columns: [
     {
-      name: "Title",
-      formatter: (title, editPath) => gridjs.html(`<a href="${editPath}">${title}`),
-    },
-    { 
-      name: 'editPath',
-      hidden: true
+      name: "Record",
+      formatter: (editPath) => gridjs.html(`${editPath}`),
     },
     {
       name: "Updated",
-      formatter: (dt) => gridjs.html(`<time class="timeSince" datetime="${dt}">${dt}</time>`),
+      formatter: (dt) =>
+        gridjs.html(`<time class="timeSince" datetime="${dt}">${dt}</time>`),
     },
-    'Email',
-      { 
-        name: 'Actions',
-        formatter: (cell, row) => {
-          return gridjs.h('button', {
-            className: 'btn btn-warning',
-            onClick: () => alert(`Editing "${row.cells[0].data}" "${row.cells[1].data}"`)
-          }, 'Edit');
-        }
-      },
   ],
   pagination: {
     limit: 20,
@@ -32,15 +19,15 @@ const dataGrid = new gridjs.Grid({
   },
   server: {
     url: `/admin/api/${getTable()}`,
-    then: (data) => data.data.map((record) => [record.title, record.editPath, record.updatedOn]),
+    then: (data) =>
+      data.data.map((record) => [record.editLink, record.updatedOn]),
     total: (data) => data.total,
   },
 }).render(document.getElementById("grid"));
 
-
-$(document).on('.timeSince', function(){
+$(document).on(".timeSince", function () {
   // $(this).html('<b>yaay!</b>');
-  console.log('new time since')
+  console.log("new time since");
 });
 
 function getTable() {
