@@ -12,7 +12,8 @@
     "test": "jest --verbose",
     "generate": "drizzle-kit generate:sqlite --schema=./src/db/schema.ts --out=./migrations",
     "up": "wrangler d1 migrations apply sonicjs --local",
-    "up:prod": "wrangler d1 migrations apply sonicjs"
+    "up:prod": "wrangler d1 migrations apply sonicjs",
+    "tail": "wrangler pages deployment tail"
   },
   "keywords": [],
   "author": "",

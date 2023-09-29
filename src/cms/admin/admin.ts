@@ -57,7 +57,7 @@ admin.get("/api/:route", async (ctx) => {
 
   const table = apiConfig.find((entry) => entry.route === route).table;
 
-  console.log('===> records', route, table)
+  // console.log('===> records', route, table)
 
   const d1 = getD1Binding(ctx);
 
@@ -70,7 +70,7 @@ admin.get("/api/:route", async (ctx) => {
     "fastest"
   );
 
-  console.log('===> records', records)
+  // console.log('===> records', records)
 
   const data = records.data.map((item) => {
     return {
