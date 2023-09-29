@@ -308,7 +308,7 @@ export const TopContentTable = (props: {
 
           <div id="grid" data-table={props.screenTitle}></div>
 
-          <table class="table">
+          {/* <table class="table">
             <thead>
               <tr>
                 <th scope="col">Record</th>
@@ -334,7 +334,7 @@ export const TopContentTable = (props: {
                 );
               })}
             </tbody>
-          </table>
+          </table> */}
         </div>
       </div>
     </Layout>

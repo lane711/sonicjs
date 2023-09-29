@@ -73,7 +73,7 @@ admin.get("/api/:route", async (ctx) => {
     return {
       id: item.id,
       title: getDisplayField(item),
-      updatedOn: format(item.updatedOn, 'MM/dd/yyyy'),
+      updatedOn: format(item.updatedOn, 'MM/dd/yyyy h:mm b'),
       editPath: `/admin/content/edit/${route}/${item.id}`,
     };
   });
