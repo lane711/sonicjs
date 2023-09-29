@@ -27,7 +27,9 @@ const dataGrid = new gridjs.Grid({
           if (this.readyState === 4) {
             if (this.status === 200) {
               const resp = JSON.parse(this.response);
-              $("#executionTime span").text(resp.executionTime);
+              $("#executionTime").show();
+              $("#executionTime span.time").text(resp.executionTime);
+              $("#executionTime span.source").text(resp.source);
               // make sure the output conforms to StorageResponse format:
               // https://github.com/grid-js/gridjs/blob/master/src/storage/storage.ts#L21-L24
               resolve({
