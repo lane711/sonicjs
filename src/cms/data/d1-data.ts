@@ -165,7 +165,7 @@ export function getSchemaFromTable(tableName) {
 }
 
 export function getRepoFromTable(tableName) {
-  console.log("getting schema", tableName);
+  // console.log("getting schema", tableName);
   switch (tableName) {
     case "users":
       return usersTable;

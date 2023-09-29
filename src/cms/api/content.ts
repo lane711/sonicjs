@@ -146,7 +146,7 @@ content.post("/", async (ctx) => {
         content.data.table,
         content.data
       );
-      console.log('insertD1Data --->', result)
+      // console.log('insertD1Data --->', result)
       return ctx.json(result.id, 201);
 
     } catch (error) {

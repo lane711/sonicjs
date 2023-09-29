@@ -83,7 +83,7 @@ apiConfig.forEach((entry) => {
 
 
     try {
-      console.log("posting new record content", JSON.stringify(content, null, 2));
+      // console.log("posting new record content", JSON.stringify(content, null, 2));
 
       const result = await insertRecord(d1, ctx.env.KVDATA, content);
 

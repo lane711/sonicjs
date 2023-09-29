@@ -124,7 +124,6 @@ export async function getRecords(
     d1Data = await customDataFunction();
   } else {
     d1Data = await getD1DataByTable(d1, table, params);
-    console.log("getRecords d1Data", d1Data);
   }
 
   let total = 0;
@@ -145,7 +144,7 @@ export async function insertRecord(d1, kv, data) {
   content.data.id = id;
   let error = "";
 
-  console.log("insertRecord", content);
+  // console.log("insertRecord", content);
 
   try {
     const result = await saveKVData(kv, id, content.data);
@@ -157,7 +156,7 @@ export async function insertRecord(d1, kv, data) {
     //then also save the content to sqlite for filtering, sorting, etc
     try {
       const result = await insertD1Data(d1, kv, content.table, content.data);
-      console.log("insertD1Data --->", result);
+      // console.log("insertD1Data --->", result);
       //expire cache
       await setCacheStatusInvalid();
       await clearKVCache(kv);
