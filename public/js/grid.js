@@ -11,7 +11,7 @@ const dataGrid = new gridjs.Grid({
     },
   ],
   pagination: {
-    limit: 20,
+    limit: 10,
     server: {
       url: (prev, page, limit) =>
         `${prev}?limit=${limit}&offset=${page * limit}`,
@@ -31,5 +31,5 @@ $(document).on(".timeSince", function () {
 });
 
 function getTable() {
-  return $("#grid").data("table");
+  return $("#grid").data("route");
 }

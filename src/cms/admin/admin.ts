@@ -46,6 +46,11 @@ admin.get("/tables/:route", async (ctx) => {
 });
 
 admin.get("/api/:route", async (ctx) => {
+
+  const start = Date.now();
+
+
+
   const route = ctx.req.param("route");
 
   var params = qs.parse(ctx.req.query());
@@ -77,8 +82,11 @@ admin.get("/api/:route", async (ctx) => {
     };
   });
 
+  const end = Date.now();
+  const executionTime = end - start;
+  console.log(`Execution time: ${end - start} ms`);
 
-  return ctx.json({data, source: records.source, total: records.total});
+  return ctx.json({data, source: records.source, total: records.total, executionTime});
 });
 
 function getDisplayField(item) {

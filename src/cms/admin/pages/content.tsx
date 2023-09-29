@@ -92,7 +92,7 @@ export async function loadTableData(ctx, route) {
   });
 
   return (
-    <TopContentTable content={contentList} route={route} screenTitle={table} />
+    <TopContentTable content={contentList} route={route} table={table} />
   );
 }
 
@@ -289,11 +289,11 @@ export const TopContentList = (props: {
 
 export const TopContentTable = (props: {
   content: object[];
-  screenTitle: string;
+  table: string;
   route: string;
 }) => {
   return (
-    <Layout screenTitle={props.screenTitle}>
+    <Layout screenTitle={props.table}>
       <div class="row">
         <div class="col-md-12">
           <div class="pb-2 mb-3">
@@ -302,11 +302,11 @@ export const TopContentTable = (props: {
               href={"/admin/content/new/" + props.route}
               class="btn btn-warning"
             >
-              New {props.screenTitle} record
+              New {props.table} record
             </a>
           </div>
 
-          <div id="grid" data-table={props.screenTitle}></div>
+          <div id="grid" data-route={props.route}></div>
 
           {/* <table class="table">
             <thead>
