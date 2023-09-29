@@ -78,12 +78,13 @@ apiConfig.forEach((entry) => {
     const table = apiConfig.find((entry) => entry.route === route).table;
 
     content.table = table;
-    console.log("posting new record", table);
 
     const d1 = getD1Binding(ctx);
 
 
     try {
+      console.log("posting new record content", JSON.stringify(content, null, 2));
+
       const result = await insertRecord(d1, ctx.env.KVDATA, content);
 
       return ctx.json(result.data, 201);

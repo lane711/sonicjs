@@ -49,8 +49,6 @@ admin.get("/api/:route", async (ctx) => {
 
   const start = Date.now();
 
-
-
   const route = ctx.req.param("route");
 
   var params = qs.parse(ctx.req.query());
