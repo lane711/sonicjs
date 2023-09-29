@@ -28,14 +28,14 @@ describe("Test admin api", () => {
       id: "b",
     });
 
-    let req = new Request("http://localhost/admin/api/users", {
+    let req = new Request("http://localhost/admin/api/users?limit=1&offset=1", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });
     let res = await app.fetch(req, env);
     expect(res.status).toBe(200);
     let body = await res.json();
-    expect(body.data.length).toBe(2);
+    expect(body.data.length).toBe(1);
   });
 
 });

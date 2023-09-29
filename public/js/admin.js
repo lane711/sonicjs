@@ -1,11 +1,7 @@
 // admin js
 
 $(document).ready(function () {
-  $(".timeSince").each(function (index, value) {
-    console.log(value);
-    const timestamp = $(this).attr("datetime");
-    $(this).text(timeSince(timestamp));
-  });
+  applyTimeSince();
 
   $(".delete-content").on("click", function () {
     const id = $(this).attr("data-id")
@@ -21,6 +17,14 @@ $(document).ready(function () {
 
   // debugger;
 });
+
+function applyTimeSince(){
+  $(".timeSince").each(function (index, value) {
+    // console.log(value);
+    const timestamp = $(this).attr("datetime");
+    $(this).text(timeSince(timestamp));
+  });
+}
 
 function timeSince(date) {
   console.log("timesince for", date);

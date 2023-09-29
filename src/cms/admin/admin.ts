@@ -17,6 +17,8 @@ import { loadApis } from "./pages/api";
 import { getRecords } from "../data/data";
 import { apiConfig } from "../../db/schema";
 import { getD1Binding } from "../util/d1-binding";
+import qs from "qs";
+import { format, compareAsc } from 'date-fns'
 
 const admin = new Hono<{ Bindings: Bindings }>();
 
@@ -45,6 +47,11 @@ admin.get("/tables/:route", async (ctx) => {
 
 admin.get("/api/:route", async (ctx) => {
   const route = ctx.req.param("route");
+
+  var params = qs.parse(ctx.req.query());
+  params.limit = params.limit ?? 1000;
+
+
   const table = apiConfig.find((entry) => entry.route === route).table;
 
   console.log('===> records', route, table)
@@ -55,7 +62,7 @@ admin.get("/api/:route", async (ctx) => {
     d1,
     ctx.env.KVDATA,
     table,
-    {limit:3, offset: 3},
+    params,
     ctx.req.url,
     "fastest"
   );
@@ -66,13 +73,13 @@ admin.get("/api/:route", async (ctx) => {
     return {
       id: item.id,
       title: getDisplayField(item),
-      updatedOn: item.updatedOn,
+      updatedOn: format(item.updatedOn, 'MM/dd/yyyy'),
       editPath: `/admin/content/edit/${route}/${item.id}`,
     };
   });
 
 
-  return ctx.json({data, source: records.source});
+  return ctx.json({data, source: records.source, total: records.total});
 });
 
 function getDisplayField(item) {

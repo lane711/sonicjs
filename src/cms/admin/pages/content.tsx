@@ -306,7 +306,7 @@ export const TopContentTable = (props: {
             </a>
           </div>
 
-          <div id="grid"></div>
+          <div id="grid" data-table={props.screenTitle}></div>
 
           <table class="table">
             <thead>

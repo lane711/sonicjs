@@ -39,6 +39,7 @@ it("insert should return new record with id and dates", async () => {
 
   //record should be in list
   expect(d1Result.data.length).toBe(2);
+  expect(d1Result.total).toBe(2);
   expect(d1Result.source).toBe("d1");
   expect(d1Result.data[0].firstName).toBe("John");
 });

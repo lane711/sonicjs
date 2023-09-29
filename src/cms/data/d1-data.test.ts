@@ -36,12 +36,28 @@ it("should not return a where clause", () => {
 //   expect(clause).toBe("");
 // });
 
-it("should return a SQL select", () => {
+it("should return a SQL select with limit", () => {
   const queryParams = "limit=2";
   const params = qs.parse(queryParams);
   console.log("params ---->", params);
   const clause = generateSelectSql("my-table", params);
   expect(clause).toBe("SELECT * FROM my-table limit 2;");
+});
+
+it("should return a SQL select with offset", () => {
+  const queryParams = "offset=2";
+  const params = qs.parse(queryParams);
+  console.log("params ---->", params);
+  const clause = generateSelectSql("my-table", params);
+  expect(clause).toBe("SELECT * FROM my-table offset 2;");
+});
+
+it("should return a SQL select with limit and offset", () => {
+  const queryParams = "limit=2&offset=2";
+  const params = qs.parse(queryParams);
+  console.log("params ---->", params);
+  const clause = generateSelectSql("my-table", params);
+  expect(clause).toBe("SELECT * FROM my-table limit 2 offset 2;");
 });
 
 //TODO: rework to hit the full api

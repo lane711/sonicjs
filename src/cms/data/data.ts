@@ -127,10 +127,15 @@ export async function getRecords(
     console.log("getRecords d1Data", d1Data);
   }
 
-  addToInMemoryCache(cacheKey, { data: d1Data, source: "cache" });
-  addToKvCache(kv, cacheKey, { data: d1Data, source: "kv" });
+  let total = 0;
+  if(d1Data.length){
+    total = d1Data[0].total
+  }
 
-  return { data: d1Data, source: "d1" };
+  addToInMemoryCache(cacheKey, { data: d1Data, source: "cache", total });
+  addToKvCache(kv, cacheKey, { data: d1Data, source: "kv", total });
+
+  return { data: d1Data, source: "d1", total };
 }
 
 export async function insertRecord(d1, kv, data) {

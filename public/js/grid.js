@@ -1,10 +1,31 @@
-new gridjs.Grid({
-  columns: ["Name", "Email", "Phone Number"],
-  data: [
-    ["John", "john@example.com", "(353) 01 222 3333"],
-    ["Mark", "mark@gmail.com", "(01) 22 888 4444"],
-    ["Eoin", "eoin@gmail.com", "0097 22 654 00033"],
-    ["Sarah", "sarahcdd@gmail.com", "+322 876 1233"],
-    ["Afshin", "afshin@mail.com", "(353) 22 87 8356"]
-  ]
+const dataGrid = new gridjs.Grid({
+  columns: [
+    "Title",
+    {
+      name: "Updated",
+      formatter: (dt) => gridjs.html(`<time class="timeSince" datetime="${dt}">${dt}</time>`),
+    },
+  ],
+  pagination: {
+    limit: 5,
+    server: {
+      url: (prev, page, limit) =>
+        `${prev}?limit=${limit}&offset=${page * limit}`,
+    },
+  },
+  server: {
+    url: `/admin/api/${getTable()}`,
+    then: (data) => data.data.map((record) => [record.title, record.updatedOn]),
+    total: (data) => data.total,
+  },
 }).render(document.getElementById("grid"));
+
+
+$(document).on('.timeSince', function(){
+  // $(this).html('<b>yaay!</b>');
+  console.log('new time since')
+});
+
+function getTable() {
+  return $("#grid").data("table");
+}
