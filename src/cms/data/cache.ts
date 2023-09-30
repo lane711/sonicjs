@@ -43,14 +43,14 @@ export async function setCacheStatusInvalid() {
 }
 
 export async function addToInMemoryCache(key: string, data) {
-  console.log("addToInMemoryCache", key);
+  // console.log("addToInMemoryCache", key);
   cache.insert({ key, data });
   //TODO: softcode time
   await setCacheStatus(20 * 60 * 1000);
 }
 
 export async function getFromInMemoryCache(key: string) {
-  console.log("getFromInMemoryCache", key);
+  // console.log("getFromInMemoryCache", key);
   let data = await cache.find({ key: key });
   return data;
 }

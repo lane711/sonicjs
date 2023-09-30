@@ -41,7 +41,7 @@ export async function getById(db, key) {
 }
 
 export async function deleteKVById(db, key) {
-  console.log("deleting kv " + key);
+  // console.log("deleting kv " + key);
   return db.delete(key);
 }
 
@@ -72,31 +72,31 @@ export function saveKVDataWithMetaData(
 export function saveContentType(db, site, contentTypeComponents) {
   const contentType = extractContentType(contentTypeComponents);
   const generatedKey = `${site}::content-type::${contentType}`;
-  console.log("generatedKey", generatedKey);
+  // console.log("generatedKey", generatedKey);
   return db.put(generatedKey, JSON.stringify(contentTypeComponents));
 }
 
 export async function addToKvCache(db, key, value) {
   const cacheKey = addCachePrefix(key);
-  console.log('*** addToKvCache db', db)
-  console.log("*** addToKvCache adding to kv cache", cacheKey);
+  // console.log('*** addToKvCache db', db)
+  // console.log("*** addToKvCache adding to kv cache", cacheKey);
 
   // db.put(cacheKey, JSON.stringify(value), {
   //   metadata: value ,
   // });
   await db.put(cacheKey, JSON.stringify(value));
-  console.log("*** addToKvCache put complete");
+  // console.log("*** addToKvCache put complete");
 
   const confirmedRecord = await getById(db, cacheKey);
-  console.log('confirmedRecord', confirmedRecord)
+  // console.log('confirmedRecord', confirmedRecord)
   return confirmedRecord;
 
 }
 
 export async function getRecordFromKvCache(db, key) {
-  console.log('getRecordFromKvCache key', key)
+  // console.log('getRecordFromKvCache key', key)
   const results =  await db.get(addCachePrefix(key),{ type: "json" });
-  console.log('getRecordFromKvCache results', results)
+  // console.log('getRecordFromKvCache results', results)
 
   return results;
 }

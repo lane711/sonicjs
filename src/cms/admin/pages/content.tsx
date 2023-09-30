@@ -66,12 +66,12 @@ export async function loadAdminTable(ctx) {
 
 export async function loadTableData(ctx, route) {
   // await saveKVData(ctx.env.KVDATA, 'site1', 'content', {title: '20230508a'});
-  console.log("loadTableData==>", route);
+  // console.log("loadTableData==>", route);
   const table = apiConfig.find((entry) => entry.route === route).table;
 
-  const results = await getD1DataByTable(ctx.env.D1DATA, table, undefined);
+  // const results = await getD1DataByTable(ctx.env.D1DATA, table, undefined);
 
-  results.reverse();
+  // results.reverse();
   // const content = await getAllContent(ctx.env.D1DATA);
   // console.log('data==>', JSON.stringify(data, null, 2))
 
@@ -82,17 +82,17 @@ export async function loadTableData(ctx, route) {
 
   // console.log("load admin data", content);
 
-  const contentList = results.map((item) => {
-    return {
-      id: item.id,
-      title: getDisplayField(item),
-      updatedOn: item.updatedOn,
-      editPath: `/admin/content/edit/${route}/${item.id}`,
-    };
-  });
+  // const contentList = results.map((item) => {
+  //   return {
+  //     id: item.id,
+  //     title: getDisplayField(item),
+  //     updatedOn: item.updatedOn,
+  //     editPath: `/admin/content/edit/${route}/${item.id}`,
+  //   };
+  // });
 
   return (
-    <TopContentTable content={contentList} route={route} table={table} />
+    <TopContentTable route={route} table={table} />
   );
 }
 
@@ -288,7 +288,6 @@ export const TopContentList = (props: {
 };
 
 export const TopContentTable = (props: {
-  content: object[];
   table: string;
   route: string;
 }) => {

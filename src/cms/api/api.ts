@@ -109,7 +109,7 @@ apiConfig.forEach((entry) => {
     content.table = table;
     content.id = id;
 
-    console.log("updating record", content);
+    // console.log("updating record", content);
 
     const d1 = getD1Binding(ctx);
 

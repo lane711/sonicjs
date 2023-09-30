@@ -82,7 +82,7 @@ admin.get("/api/:route", async (ctx) => {
 
   const end = Date.now();
   const executionTime = end - start;
-  console.log(`Execution time: ${end - start} ms`);
+  // console.log(`Execution time: ${end - start} ms`);
   
 
   return ctx.json({data, source: records.source, total: records.total, executionTime});

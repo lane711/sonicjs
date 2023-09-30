@@ -29,7 +29,7 @@ export async function getD1DataByTable(db, table, params) {
 }
 
 export function generateSelectSql(table, params) {
-  console.log("params ==>", JSON.stringify(params, null, 2));
+  // console.log("params ==>", JSON.stringify(params, null, 2));
 
   var whereClause = "";
   var sortBySyntax = "";
@@ -54,7 +54,7 @@ export function generateSelectSql(table, params) {
   let sql = `SELECT *, COUNT() OVER() AS total FROM ${table} ${whereClause} ${sortBySyntax} ${limitSyntax} ${offsetSyntax}`;
   sql = sql.replace(/\s+/g, " ").trim() + ";";
 
-  console.log("sql ==>", sql);
+  // console.log("sql ==>", sql);
   return sql;
 }
 
@@ -119,7 +119,7 @@ export async function updateD1Data(d1, table, data) {
   const now = new Date().getTime();
   data.data.updatedOn = now;
 
-  console.log("updateD1Data===>", recordId, JSON.stringify(data.data, null, 4));
+  // console.log("updateD1Data===>", recordId, JSON.stringify(data.data, null, 4));
 
   let result = await db
     .update(repo)
@@ -139,7 +139,7 @@ export async function updateD1Data(d1, table, data) {
 
   const id = result && result[0] ? result[0]["0"] : undefined;
 
-  console.log("updating data result ", result);
+  // console.log("updating data result ", result);
 
   return { id } ?? result;
 }

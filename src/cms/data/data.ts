@@ -62,10 +62,10 @@ export async function getRecord(
 
   if (cacheStatusValid) {
     const cacheResult = await getFromInMemoryCache(cacheKey);
-    console.log("cacheResult", cacheResult);
+    // console.log("cacheResult", cacheResult);
     if (cacheResult && cacheResult.length && source == "fastest") {
       const cachedData = cacheResult[0].data;
-      console.log("**** cachedData ****", cachedData);
+      // console.log("**** cachedData ****", cachedData);
 
       return cachedData;
     }
@@ -97,14 +97,14 @@ export async function getRecords(
   customDataFunction = undefined
 ) {
   const cacheStatusValid = await isCacheValid();
-  console.log("getRecords cacheStatusValid", cacheStatusValid);
+  // console.log("getRecords cacheStatusValid", cacheStatusValid);
 
   if (cacheStatusValid) {
     const cacheResult = await getFromInMemoryCache(cacheKey);
-    console.log("cacheResult", cacheResult);
+    // console.log("cacheResult", cacheResult);
     if (cacheResult && cacheResult.length && source == "fastest") {
       const cachedData = cacheResult[0].data;
-      console.log("**** cachedData ****", cachedData);
+      // console.log("**** cachedData ****", cachedData);
 
       return cachedData;
     }
@@ -112,7 +112,7 @@ export async function getRecords(
 
   if (source == "fastest" || source == "kv") {
     const kvData = await getRecordFromKvCache(kv, cacheKey);
-    console.log("getRecords kvData", kvData);
+    // console.log("getRecords kvData", kvData);
 
     if (kvData) {
       return kvData;
