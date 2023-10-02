@@ -51,7 +51,7 @@ export function generateSelectSql(table, params) {
     whereClause = whereClauseBuilder(params);
   }
 
-  let sql = `SELECT *, 100 AS total FROM ${table} ${whereClause} ${sortBySyntax} ${limitSyntax} ${offsetSyntax}`;
+  let sql = `SELECT *, COUNT() OVER() AS total FROM ${table} ${whereClause} ${sortBySyntax} ${limitSyntax} ${offsetSyntax}`;
   sql = sql.replace(/\s+/g, " ").trim() + ";";
 
   // console.log("sql ==>", sql);
