@@ -159,7 +159,6 @@ export const Layout = (props: {
                       API
                     </a>
                   </li>
-
                   <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                     <span>Tables</span>
                   </h6>
@@ -175,10 +174,17 @@ export const Layout = (props: {
                       </li>
                     );
                   })}
-
                   <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                     <span>Cache</span>
                   </h6>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      href="/admin/cache/in-memory"
+                    >
+                      In Memory
+                    </a>
+                  </li>
                   <li class="nav-item">
                     <a
                       class="nav-link"
@@ -197,13 +203,11 @@ export const Layout = (props: {
                       In Memory - Clear All
                     </a>
                   </li>
-
                   <li class="nav-item">
                     <a class="nav-link" target="_blank" href="/v1/cache/kv">
                       KV - Show
                     </a>
                   </li>
-
                   <li class="nav-item">
                     <a
                       class="nav-link"
@@ -213,7 +217,6 @@ export const Layout = (props: {
                       KV - Clear All
                     </a>
                   </li>
-
                   <li class="nav-item">
                     <a
                       class="nav-link"
@@ -297,13 +300,14 @@ export const Layout = (props: {
           crossorigin="anonymous"
         ></script>
 
-<script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
-
+        <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
 
         <script src="/public/js/admin.js"></script>
         <script src="/public/js/form-content-type.js"></script>
         <script src="/public/js/form-content.js"></script>
         <script src="/public/js/grid.js"></script>
+        <script src="/public/js/grid-in-memory-cache.js"></script>
+
       </body>
     </html>
   );

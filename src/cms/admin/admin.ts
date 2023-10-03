@@ -8,6 +8,7 @@ import { Bindings } from "../types/bindings";
 import {
   loadAdmin,
   loadAdminTable,
+  loadCacheTable,
   loadEditContent,
   loadNewContent,
   loadTableData,
@@ -19,6 +20,7 @@ import { apiConfig } from "../../db/schema";
 import { getD1Binding } from "../util/d1-binding";
 import qs from "qs";
 import { format, compareAsc } from 'date-fns'
+import { getAllFromInMemoryCache } from "../data/cache";
 
 const admin = new Hono<{ Bindings: Bindings }>();
 
@@ -43,6 +45,10 @@ admin.get("/content/new/:route", async (ctx) => {
 admin.get("/tables/:route", async (ctx) => {
   const route = ctx.req.param("route");
   return ctx.html(await loadTableData(ctx, route));
+});
+
+admin.get("/cache/in-memory", async (ctx) => {
+  return ctx.html(await loadCacheTable(ctx));
 });
 
 admin.get("/api/:route", async (ctx) => {
@@ -77,6 +83,32 @@ admin.get("/api/:route", async (ctx) => {
       id: item.id,
       updatedOn: format(item.updatedOn, 'MM/dd/yyyy h:mm b'),
       editLink: `<a href="/admin/content/edit/${route}/${item.id}">${getDisplayField(item)}</a>`,
+    };
+  });
+
+  const end = Date.now();
+  const executionTime = end - start;
+  // console.log(`Execution time: ${end - start} ms`);
+  
+
+  return ctx.json({data, source: records.source, total: records.total, executionTime});
+});
+
+admin.get("/api/in-memory-cache", async (ctx) => {
+
+  const start = Date.now();
+
+  var params = qs.parse(ctx.req.query());
+  params.limit = params.limit ?? 1000;
+
+
+  const records = await getAllFromInMemoryCache();
+
+  const data = records.data.map((item) => {
+    return {
+      id: item.id,
+      updatedOn: format(item.updatedOn, 'MM/dd/yyyy h:mm b'),
+      editLink: `<a href="/admin/content/edit/${item.id}">record</a>`,
     };
   });
 

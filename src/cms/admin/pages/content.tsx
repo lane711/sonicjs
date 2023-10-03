@@ -91,8 +91,53 @@ export async function loadTableData(ctx, route) {
   //   };
   // });
 
+  return <TopContentTable route={route} table={table} />;
+}
+
+export async function loadCacheTable(ctx) {
   return (
-    <TopContentTable route={route} table={table} />
+    <Layout screenTitle={"In Memory Cache"}>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="pb-2 mb-3">
+            {/* <!-- Button trigger modal --> */}
+            <a href={"/admin/content/new/"} class="btn btn-warning">
+              Clear In Memory
+            </a>
+          </div>
+
+          <div id="grid-in-memory-cache"></div>
+
+          {/* <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Record</th>
+                <th scope="col">Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              {props.content.map((item: any) => {
+                return (
+                  <tr>
+                    <td scope="row">
+                      {" "}
+                      <a class="" href={item.editPath}>
+                        {item.title}
+                      </a>
+                    </td>
+                    <td scope="row">
+                      <time class="timeSince" datetime={item.updatedOn}>
+                        {item.updatedOn}
+                      </time>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table> */}
+        </div>
+      </div>
+    </Layout>
   );
 }
 
@@ -287,10 +332,7 @@ export const TopContentList = (props: {
   );
 };
 
-export const TopContentTable = (props: {
-  table: string;
-  route: string;
-}) => {
+export const TopContentTable = (props: { table: string; route: string }) => {
   return (
     <Layout screenTitle={props.table}>
       <div class="row">
@@ -307,8 +349,10 @@ export const TopContentTable = (props: {
 
           <div id="grid" data-route={props.route}></div>
           <div id="executionTime" class="p-4 text-center text-muted hide">
-            Data Retrieval - <b>Server</b>: <span class="serverTime"></span>ms, <b>Client</b>: <span class="clientTime"></span>ms. <b>Source</b>: <span class="source"></span>
-            </div>
+            Data Retrieval - <b>Server</b>: <span class="serverTime"></span>ms,{" "}
+            <b>Client</b>: <span class="clientTime"></span>ms. <b>Source</b>:{" "}
+            <span class="source"></span>
+          </div>
 
           {/* <table class="table">
             <thead>

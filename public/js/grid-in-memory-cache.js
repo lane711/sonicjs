@@ -1,5 +1,5 @@
-const gridWrapper = document.getElementById("grid");
-if (gridWrapper) {
+const gridWrapperIM = document.getElementById("grid-in-memory-cache");
+if (gridWrapperIM) {
   const dataGrid = new gridjs.Grid({
     columns: [
       {
@@ -20,7 +20,7 @@ if (gridWrapper) {
       },
     },
     server: {
-      url: `/admin/api/${getTable()}`,
+      url: `/v1/cache/in-memory`,
       data: (opts) => {
         return new Promise((resolve, reject) => {
           // let's implement our own HTTP client
@@ -30,6 +30,7 @@ if (gridWrapper) {
           xhttp.onreadystatechange = function () {
             if (this.readyState === 4) {
               if (this.status === 200) {
+                debugger;
                 const resp = JSON.parse(this.response);
                 $("#executionTime").show();
                 $("#executionTime span.serverTime").text(resp.executionTime);
@@ -57,7 +58,7 @@ if (gridWrapper) {
         });
       },
     },
-  }).render(gridWrapper);
+  }).render(gridWrapperIM);
 }
 
 // $(document).on(".timeSince", function () {
