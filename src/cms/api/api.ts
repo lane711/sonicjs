@@ -35,6 +35,7 @@ apiConfig.forEach((entry) => {
 
   //ie /v1/users
   api.get(`/${entry.route}`, async (ctx) => {
+    const start = Date.now();
     const d1 = getD1Binding(ctx);
 
     try {
@@ -48,7 +49,11 @@ apiConfig.forEach((entry) => {
         ctx.req.url,
         "fastest"
       );
-      return ctx.json(data);
+
+      const end = Date.now();
+      const executionTime = end - start;
+
+      return ctx.json({...data, executionTime});
     } catch (error) {
       console.log(error);
       return ctx.text(error);
