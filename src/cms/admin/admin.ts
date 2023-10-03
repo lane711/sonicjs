@@ -6,10 +6,9 @@ import { loadForm } from "./forms/form";
 
 import { Bindings } from "../types/bindings";
 import {
-  loadAdmin,
-  loadAdminTable,
-  loadCacheTable,
   loadEditContent,
+  loadInMemoryCacheTable,
+  loadKVCacheTable,
   loadNewContent,
   loadTableData,
 } from "./pages/content";
@@ -19,7 +18,7 @@ import { getRecords } from "../data/data";
 import { apiConfig } from "../../db/schema";
 import { getD1Binding } from "../util/d1-binding";
 import qs from "qs";
-import { format, compareAsc } from 'date-fns'
+import { format, compareAsc } from "date-fns";
 import { getAllFromInMemoryCache } from "../data/cache";
 
 const admin = new Hono<{ Bindings: Bindings }>();
@@ -48,18 +47,76 @@ admin.get("/tables/:route", async (ctx) => {
 });
 
 admin.get("/cache/in-memory", async (ctx) => {
-  return ctx.html(await loadCacheTable(ctx));
+  return ctx.html(await loadInMemoryCacheTable(ctx));
+});
+
+admin.get("/cache/kv", async (ctx) => {
+  return ctx.html(await loadKVCacheTable(ctx));
+});
+
+admin.get("/api/in-memory-cache", async (ctx) => {
+  const start = Date.now();
+
+  var params = qs.parse(ctx.req.query());
+  params.limit = params.limit ?? 1000;
+
+  const records = await getAllFromInMemoryCache();
+
+  const data = records.data.map((item) => {
+    return {
+      key: item.key,
+      createdOn: format(item.meta.created, "MM/dd/yyyy h:mm b"),
+      viewLink: `<a href="/admin/content/edit/${item.key}">${item.key}</a>`,
+    };
+  });
+
+  const end = Date.now();
+  const executionTime = end - start;
+  // console.log(`Execution time: ${end - start} ms`);
+
+  return ctx.json({
+    data,
+    source: records.source,
+    total: records.total,
+    executionTime,
+  });
+});
+
+admin.get("/api/kv-cache", async (ctx) => {
+  const start = Date.now();
+
+  var params = qs.parse(ctx.req.query());
+  params.limit = params.limit ?? 1000;
+
+  const records = await getAllFromInMemoryCache();
+
+  const data = records.data.map((item) => {
+    return {
+      key: item.key,
+      createdOn: format(item.meta.created, "MM/dd/yyyy h:mm b"),
+      viewLink: `<a href="/admin/content/edit/${item.key}">${item.key}</a>`,
+    };
+  });
+
+  const end = Date.now();
+  const executionTime = end - start;
+  // console.log(`Execution time: ${end - start} ms`);
+
+  return ctx.json({
+    data,
+    source: records.source,
+    total: records.total,
+    executionTime,
+  });
 });
 
 admin.get("/api/:route", async (ctx) => {
-
   const start = Date.now();
 
   const route = ctx.req.param("route");
 
   var params = qs.parse(ctx.req.query());
   params.limit = params.limit ?? 1000;
-
 
   const table = apiConfig.find((entry) => entry.route === route).table;
 
@@ -81,43 +138,23 @@ admin.get("/api/:route", async (ctx) => {
   const data = records.data.map((item) => {
     return {
       id: item.id,
-      updatedOn: format(item.updatedOn, 'MM/dd/yyyy h:mm b'),
-      editLink: `<a href="/admin/content/edit/${route}/${item.id}">${getDisplayField(item)}</a>`,
+      updatedOn: format(item.updatedOn, "MM/dd/yyyy h:mm b"),
+      editLink: `<a href="/admin/content/edit/${route}/${
+        item.id
+      }">${getDisplayField(item)}</a>`,
     };
   });
 
   const end = Date.now();
   const executionTime = end - start;
   // console.log(`Execution time: ${end - start} ms`);
-  
 
-  return ctx.json({data, source: records.source, total: records.total, executionTime});
-});
-
-admin.get("/api/in-memory-cache", async (ctx) => {
-
-  const start = Date.now();
-
-  var params = qs.parse(ctx.req.query());
-  params.limit = params.limit ?? 1000;
-
-
-  const records = await getAllFromInMemoryCache();
-
-  const data = records.data.map((item) => {
-    return {
-      id: item.id,
-      updatedOn: format(item.updatedOn, 'MM/dd/yyyy h:mm b'),
-      editLink: `<a href="/admin/content/edit/${item.id}">record</a>`,
-    };
+  return ctx.json({
+    data,
+    source: records.source,
+    total: records.total,
+    executionTime,
   });
-
-  const end = Date.now();
-  const executionTime = end - start;
-  // console.log(`Execution time: ${end - start} ms`);
-  
-
-  return ctx.json({data, source: records.source, total: records.total, executionTime});
 });
 
 function getDisplayField(item) {
@@ -125,4 +162,3 @@ function getDisplayField(item) {
 }
 
 export { admin };
-

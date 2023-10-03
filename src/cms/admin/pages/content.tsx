@@ -94,47 +94,38 @@ export async function loadTableData(ctx, route) {
   return <TopContentTable route={route} table={table} />;
 }
 
-export async function loadCacheTable(ctx) {
+export async function loadInMemoryCacheTable(ctx) {
   return (
     <Layout screenTitle={"In Memory Cache"}>
       <div class="row">
         <div class="col-md-12">
           <div class="pb-2 mb-3">
-            {/* <!-- Button trigger modal --> */}
-            <a href={"/admin/content/new/"} class="btn btn-warning">
-              Clear In Memory
-            </a>
+            <button id="clear-cache-in-memory" class="btn btn-warning">
+              Clear In Memory Cache
+            </button>
           </div>
 
           <div id="grid-in-memory-cache"></div>
 
-          {/* <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">Record</th>
-                <th scope="col">Created</th>
-              </tr>
-            </thead>
-            <tbody>
-              {props.content.map((item: any) => {
-                return (
-                  <tr>
-                    <td scope="row">
-                      {" "}
-                      <a class="" href={item.editPath}>
-                        {item.title}
-                      </a>
-                    </td>
-                    <td scope="row">
-                      <time class="timeSince" datetime={item.updatedOn}>
-                        {item.updatedOn}
-                      </time>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table> */}
+        </div>
+      </div>
+    </Layout>
+  );
+}
+
+export async function loadKVCacheTable(ctx) {
+  return (
+    <Layout screenTitle={"KV Cache"}>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="pb-2 mb-3">
+            <button id="clear-cache-kv" class="btn btn-warning">
+              Clear KV Cache
+            </button>
+          </div>
+
+          <div id="grid-kv-cache"></div>
+
         </div>
       </div>
     </Layout>

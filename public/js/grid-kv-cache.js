@@ -1,5 +1,5 @@
-const gridWrapperIM = document.getElementById("grid-in-memory-cache");
-if (gridWrapperIM) {
+const gridWrapperKV = document.getElementById("grid-kv-cache");
+if (gridWrapperKV) {
   const dataGrid = new gridjs.Grid({
     columns: [
       {
@@ -20,7 +20,7 @@ if (gridWrapperIM) {
       },
     },
     server: {
-      url: `/admin/api/in-memory-cache`,
+      url: `/admin/api/kv-cache`,
       data: (opts) => {
         return new Promise((resolve, reject) => {
           // let's implement our own HTTP client
@@ -57,14 +57,6 @@ if (gridWrapperIM) {
         });
       },
     },
-  }).render(gridWrapperIM);
+  }).render(gridWrapperKV);
 }
 
-// $(document).on(".timeSince", function () {
-//   // $(this).html('<b>yaay!</b>');
-//   console.log("new time since");
-// });
-
-function getTable() {
-  return $("#grid").data("route");
-}

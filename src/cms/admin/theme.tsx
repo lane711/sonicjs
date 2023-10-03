@@ -178,50 +178,21 @@ export const Layout = (props: {
                     <span>Cache</span>
                   </h6>
                   <li class="nav-item">
-                    <a
-                      class="nav-link"
-                      href="/admin/cache/in-memory"
-                    >
+                    <a class="nav-link" href="/admin/cache/in-memory">
                       In Memory
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a
-                      class="nav-link"
-                      target="_blank"
-                      href="/v1/cache/in-memory"
-                    >
-                      In Memory - Show
+                    <a class="nav-link" href="/admin/cache/kv">
+                      KV
                     </a>
                   </li>
+
                   <li class="nav-item">
                     <a
+                      id="clear-cache-all"
                       class="nav-link"
-                      target="_blank"
-                      href="/v1/cache/clear-in-memory"
-                    >
-                      In Memory - Clear All
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" target="_blank" href="/v1/cache/kv">
-                      KV - Show
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a
-                      class="nav-link"
-                      target="_blank"
-                      href="/v1/cache/clear-kv"
-                    >
-                      KV - Clear All
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a
-                      class="nav-link"
-                      target="_blank"
-                      href="/v1/cache/clear-all"
+                      href="javascript:void(0)"
                     >
                       Clear All Caches
                     </a>
@@ -307,7 +278,7 @@ export const Layout = (props: {
         <script src="/public/js/form-content.js"></script>
         <script src="/public/js/grid.js"></script>
         <script src="/public/js/grid-in-memory-cache.js"></script>
-
+        <script src="/public/js/grid-kv-cache.js"></script>
       </body>
     </html>
   );
