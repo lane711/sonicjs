@@ -10,17 +10,17 @@ import { status } from "./cms/api/status";
 const app = new Hono<{ Bindings: Bindings }>();
 
 //CORS
-// app.use(
-//   "*",
-//   cors({
-//     origin: (origin) => {
-//       console.log("origin", origin);
-//       return origin.indexOf("localhost") > 0 || origin.endsWith(".sonicjs.com")
-//         ? origin
-//         : "https://sonicjs.com";
-//     },
-//   })
-// );
+app.use(
+  "/v1/*",
+  cors({
+    origin: (origin) => {
+      console.log("origin", origin);
+      return origin.indexOf("localhost") > 0 || origin.endsWith(".sonicjs.com")
+        ? origin
+        : "https://sonicjs.com";
+    },
+  })
+);
 
 app.get("/", async (ctx) => {
   return ctx.redirect("/admin");

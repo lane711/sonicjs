@@ -6,11 +6,6 @@ if (gridWrapperKV) {
         name: "Key",
         formatter: (viewLink) => gridjs.html(`${viewLink}`),
       },
-      {
-        name: "Created",
-        formatter: (dt) =>
-          gridjs.html(`<time class="timeSince" datetime="${dt}">${dt}</time>`),
-      },
     ],
     pagination: {
       limit: 10,
@@ -43,7 +38,6 @@ if (gridWrapperKV) {
                 resolve({
                   data: resp.data.map((record) => [
                     record.viewLink,
-                    record.createdOn,
                   ]),
                   total: resp.total,
                 });

@@ -20,6 +20,7 @@ import { getD1Binding } from "../util/d1-binding";
 import qs from "qs";
 import { format, compareAsc } from "date-fns";
 import { getAllFromInMemoryCache } from "../data/cache";
+import { getKVCache } from "../data/kv-data";
 
 const admin = new Hono<{ Bindings: Bindings }>();
 
@@ -88,13 +89,13 @@ admin.get("/api/kv-cache", async (ctx) => {
   var params = qs.parse(ctx.req.query());
   params.limit = params.limit ?? 1000;
 
-  const records = await getAllFromInMemoryCache();
+  const records = await getKVCache(ctx.env.KVDATA);
 
-  const data = records.data.map((item) => {
+  const data = records.keys.map((item) => {
+    console.log('item', item)
     return {
-      key: item.key,
-      createdOn: format(item.meta.created, "MM/dd/yyyy h:mm b"),
-      viewLink: `<a href="/admin/content/edit/${item.key}">${item.key}</a>`,
+      key: item.name,
+      viewLink: `<a href="/admin/content/edit/${item.name}">${item.name}</a>`,
     };
   });
 

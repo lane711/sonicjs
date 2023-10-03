@@ -72,6 +72,40 @@ describe("Test admin api", () => {
     expect(body.data.length).toBe(1);
     expect(body.data[0].key).toBe("/some-key");
   });
+
+  it("kv admin api should return 200", async () => {
+    //start with a clear cache
+    await clearInMemoryCache();
+    await clearKVCache(KVDATA);
+    createTestTable();
+    await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+      firstName: "John",
+      id: "a",
+    });
+    await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+      firstName: "Jane",
+      id: "b",
+    });
+
+    // this should add to cache
+    const d1Result = await getRecords(
+      env.__D1_BETA__D1DATA,
+      env.KVDATA,
+      "users",
+      undefined,
+      "/some-key"
+    );
+
+    let req = new Request("http://localhost/admin/api/kv-cache", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    let res = await app.fetch(req, env);
+    expect(res.status).toBe(200);
+    let body = await res.json();
+    expect(body.data.length).toBe(1);
+    expect(body.data[0].key).toBe("/some-key");
+  });
 });
 
 function createTestTable() {
