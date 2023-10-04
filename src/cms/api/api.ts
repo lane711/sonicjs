@@ -53,7 +53,7 @@ apiConfig.forEach((entry) => {
       const end = Date.now();
       const executionTime = end - start;
 
-      return ctx.json({...data, executionTime});
+      return ctx.json({ ...data, executionTime });
     } catch (error) {
       console.log(error);
       return ctx.text(error);
@@ -62,16 +62,32 @@ apiConfig.forEach((entry) => {
 
   //get single record
   api.get(`/${entry.route}/:id`, async (ctx) => {
+    const start = Date.now();
+
     const { includeContentType } = ctx.req.query();
 
     const id = ctx.req.param("id");
-    const data = await getD1ByTableAndId(ctx.env.D1DATA, entry.table, id);
+    var params = qs.parse(ctx.req.query());
+    params.id = id;
+    const d1 = getD1Binding(ctx);
+
+    const data = await getRecords(
+      d1,
+      ctx.env.KVDATA,
+      entry.table,
+      params,
+      ctx.req.url,
+      "fastest"
+    );
 
     if (includeContentType !== undefined) {
       data.contentType = getForm(ctx, entry.table);
     }
 
-    return ctx.json(data);
+    const end = Date.now();
+    const executionTime = end - start;
+
+    return ctx.json({ ...data, executionTime });
   });
 
   //create single record
@@ -85,7 +101,6 @@ apiConfig.forEach((entry) => {
     content.table = table;
 
     const d1 = getD1Binding(ctx);
-
 
     try {
       // console.log("posting new record content", JSON.stringify(content, null, 2));
@@ -181,7 +196,6 @@ api.get("/forms", async (c) => c.html(await loadForm(c)));
 api.get("/form-components/:route", async (c) => {
   const route = c.req.param("route");
 
-
   const table = apiConfig.find((entry) => entry.route === route).table;
 
   const ct = await getForm(c.env.D1DATA, table);
@@ -238,7 +252,7 @@ api.get("/cache/kv/:cacheKey", async (ctx) => {
 });
 
 api.get("/kv", async (ctx) => {
-  const allItems = await getDataByPrefix(ctx.env.KVDATA,'', 100);
+  const allItems = await getDataByPrefix(ctx.env.KVDATA, "", 100);
   return ctx.json(allItems);
 });
 
@@ -246,7 +260,10 @@ api.get("/kv/:cacheKey", async (ctx) => {
   const cacheKey = ctx.req.param("cacheKey");
   console.log("getting kv cache", cacheKey);
 
-  const cacheItem = await getRecordFromKvCache(ctx.env.KVDATA, "http://127.0.0.1:8788/admin/api/users");
+  const cacheItem = await getRecordFromKvCache(
+    ctx.env.KVDATA,
+    "http://127.0.0.1:8788/admin/api/users"
+  );
   console.log("getting kv cache", cacheItem);
   return ctx.json(cacheItem);
 });

@@ -190,6 +190,20 @@ it("getRecords should return single record if if passed in", async () => {
   expect(result.total).toBe(1);
   expect(result.source).toBe('d1');
 
+  //if we get again it should be cached
+  const cachedResult = await getRecords(
+    env.__D1_BETA__D1DATA,
+    env.KVDATA,
+    "users",
+    {id:"abc"},
+    urlKey,
+    "fastest",
+    undefined
+  );
+
+  expect(cachedResult.data.firstName).toBe("John");
+  expect(cachedResult.total).toBe(1);
+  expect(cachedResult.source).toBe('cache');
 
 });
 
