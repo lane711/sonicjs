@@ -84,6 +84,7 @@ function editContent() {
     console.log(response.data);
 
     Formio.icons = "fontawesome";
+    // debugger;
     // Formio.createForm(document.getElementById("formio"), {
     Formio.createForm(document.getElementById("formio"), {
       components: response.data.contentType,
@@ -96,7 +97,7 @@ function editContent() {
         }
       });
       form.submission = {
-        data: response.data,
+        data: response.data.data,
       };
       form.on("change", async function (event) {
         $("#contentFormSaveButton").removeAttr("disabled");
