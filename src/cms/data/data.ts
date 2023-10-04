@@ -50,42 +50,42 @@ import {
 //   return kvData;
 // }
 
-export async function getRecord(
-  d1,
-  kv,
-  table,
-  params,
-  cacheKey,
-  source = "fastest"
-) {
-  const cacheStatusValid = await isCacheValid();
+// export async function getRecord(
+//   d1,
+//   kv,
+//   table,
+//   params,
+//   cacheKey,
+//   source = "fastest"
+// ) {
+//   const cacheStatusValid = await isCacheValid();
 
-  if (cacheStatusValid) {
-    const cacheResult = await getFromInMemoryCache(cacheKey);
-    // console.log("cacheResult", cacheResult);
-    if (cacheResult && cacheResult.length && source == "fastest") {
-      const cachedData = cacheResult[0].data;
-      // console.log("**** cachedData ****", cachedData);
+//   if (cacheStatusValid) {
+//     const cacheResult = await getFromInMemoryCache(cacheKey);
+//     // console.log("cacheResult", cacheResult);
+//     if (cacheResult && cacheResult.length && source == "fastest") {
+//       const cachedData = cacheResult[0].data;
+//       // console.log("**** cachedData ****", cachedData);
 
-      return cachedData;
-    }
-  }
+//       return cachedData;
+//     }
+//   }
 
-  const kvData = await getRecordFromKvCache(kv, cacheKey);
-  if (source == "kv" || kvData) {
-    console.log("**** getting kv cache ****", kvData);
-    return kvData;
-  }
+//   const kvData = await getRecordFromKvCache(kv, cacheKey);
+//   if (source == "kv" || kvData) {
+//     console.log("**** getting kv cache ****", kvData);
+//     return kvData;
+//   }
 
-  const d1Data = await getD1ByTableAndId(d1, table, params.id);
+//   const d1Data = await getD1ByTableAndId(d1, table, params.id);
 
-  addToInMemoryCache(cacheKey, { data: d1Data.data, source: "cache" });
-  addToKvCache(kv, cacheKey, { data: d1Data.data, source: "kv" });
+//   addToInMemoryCache(cacheKey, { data: d1Data.data, source: "cache" });
+//   addToKvCache(kv, cacheKey, { data: d1Data.data, source: "kv" });
 
-  // console.log("sql results ==>", results);
+//   // console.log("sql results ==>", results);
 
-  return d1Data;
-}
+//   return d1Data;
+// }
 
 export async function getRecords(
   d1,
@@ -120,15 +120,21 @@ export async function getRecords(
   }
 
   var d1Data;
+  let total = 0;
+
   if (customDataFunction) {
     d1Data = await customDataFunction();
   } else {
-    d1Data = await getD1DataByTable(d1, table, params);
+    if (params && params.id) {
+      d1Data = await getD1ByTableAndId(d1, table, params.id);
+      total = d1Data ? 1 : 0;
+    } else {
+      d1Data = await getD1DataByTable(d1, table, params);
+    }
   }
 
-  let total = 0;
-  if(d1Data.length){
-    total = d1Data[0].total
+  if (d1Data.length) {
+    total = d1Data[0].total;
   }
 
   addToInMemoryCache(cacheKey, { data: d1Data, source: "cache", total });

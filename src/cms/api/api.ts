@@ -135,7 +135,7 @@ apiConfig.forEach((entry) => {
 
     const d1 = getD1Binding(ctx);
 
-    const record = await getRecord(
+    const record = await getRecords(
       d1,
       ctx.env.KVDATA,
       table,
