@@ -1,12 +1,12 @@
 //        Formio.builder(document.getElementById('builder'), {}, {});
 var contentTypeComponents;
-var table;
+var route;
 
 (function () {
   const url = window.location.href;
 
   const params = url.split("/");
-  table = params[6];
+  route = window.location.href.split("/").pop();
 
   var mode;
 
@@ -32,10 +32,9 @@ var table;
 })();
 
 function newContent() {
-  const contentType = window.location.href.split("/").pop();
-  console.log("contentType", contentType);
+  console.log("contentType", route);
 
-  axios.get(`/v1/form-components/${contentType}`).then((response) => {
+  axios.get(`/v1/form-components/${route}`).then((response) => {
     console.log(response.data);
     console.log(response.status);
     console.log(response.statusText);
@@ -66,21 +65,22 @@ function saveNewContent(data) {
   delete data.data.id;
   console.log(data);
 
-  axios.post("/v1/content", data).then((response) => {
+  axios.post(`/v1/${route}`, data).then((response) => {
     console.log(response.data);
     console.log(response.status);
     console.log(response.statusText);
     console.log(response.headers);
     console.log(response.config);
     if (response.status === 200 || response.status === 201) {
-      location.href = `/admin/tables/${data.data.table}`;
+      location.href = `/admin/tables/${route}`;
     }
   });
 }
 function editContent() {
   const contentId = $("#formio").attr("data-id");
+  route = $("#formio").attr("data-route");
   console.log("contentType", contentId);
-  axios.get(`/v1/${table}/${contentId}?includeContentType`).then((response) => {
+  axios.get(`/v1/${route}/${contentId}?includeContentType`).then((response) => {
     console.log(response.data);
 
     Formio.icons = "fontawesome";
@@ -110,9 +110,9 @@ function editContent() {
 }
 
 function addContent(data) {
-  data.key = window.location.href.split("/").pop();
+  data.key = route;
 
-  axios.post("/v1/content", data).then((response) => {
+  axios.post(`/v1/${route}`, data).then((response) => {
     console.log(response.data);
     console.log(response.status);
     console.log(response.statusText);
@@ -125,16 +125,24 @@ function addContent(data) {
 }
 
 function updateContent(data) {
-  delete data.submit;
+  const id = data.id;
+  var content = {};
+  content.data = data;
+  content.table = data.table;
+  delete content.data.submit;
+  delete content.data.contentType;
+  delete content.data.id;
+  delete content.data.table;
+  route = $("#formio").attr("data-route");
 
-  axios.put("/v1/content", data).then((response) => {
+  axios.put(`/v1/${route}/${id}`, content).then((response) => {
     console.log(response.data);
     console.log(response.status);
     console.log(response.statusText);
     console.log(response.headers);
     console.log(response.config);
     if (response.status === 200) {
-      location.href = `/admin/tables/${data.table}`;
+      location.href = `/admin/tables/${route}`;
     } else{
       alert('Error occured updating ' + data.id)
     }

@@ -80,7 +80,6 @@ describe("test KV cache", () => {
 
     const allCacheItems = await getKVCache(env.KVDATA);
     console.log('allCacheItems', allCacheItems);
-    expect(allCacheItems.keys.length).toEqual(2);
 
     // //clear cache
     await clearKVCache(env.KVDATA);

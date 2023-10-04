@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import {
-  deleteById,
+  deleteKVById,
   getById,
   getContentType,
   getContentTypes,
@@ -11,11 +11,12 @@ import {
 } from "../data/kv-data";
 import { Bindings } from "../types/bindings";
 import {
-  deleteByTableAndId,
+  deleteD1ByTableAndId,
   insertD1Data,
-  updateData,
+  updateD1Data,
 } from "../data/d1-data";
 import { v4 as uuidv4 } from "uuid";
+import { deleteRecord } from "../data/data";
 
 const content = new Hono<{ Bindings: Bindings }>();
 
@@ -145,7 +146,7 @@ content.post("/", async (ctx) => {
         content.data.table,
         content.data
       );
-      console.log('insertD1Data --->', result)
+      // console.log('insertD1Data --->', result)
       return ctx.json(result.id, 201);
 
     } catch (error) {
@@ -180,7 +181,7 @@ content.put("/", async (ctx) => {
   } finally {
     //then also save the content to sqlite for filtering, sorting, etc
     try {
-      const result = updateData(ctx.env.D1DATA, content.table, content);
+      const result = updateD1Data(ctx.env.D1DATA, content.table, content);
     } catch (error) {
       console.log("error posting content", error);
     }
@@ -198,14 +199,15 @@ content.delete("/:contentId", async (ctx) => {
 
   if (content) {
     console.log("content found, deleting...");
-    const kvDelete = await deleteById(ctx.env.KVDATA, id);
-    const d1Delete = await deleteByTableAndId(
-      ctx.env.D1DATA,
-      content.data.table,
-      content.data.id
-    );
-    console.log("returning 200");
-    return ctx.text("", 200);
+    const result = await deleteRecord(ctx.env.D1DATA, ctx.env.D1DATA, {id, table: content.table})
+    // const kvDelete = await deleteKVById(ctx.env.KVDATA, id);
+    // const d1Delete = await deleteD1ByTableAndId(
+    //   ctx.env.D1DATA,
+    //   content.data.table,
+    //   content.data.id
+    // );
+    console.log("returning 204");
+    return ctx.text("", 204);
   } else {
     console.log("content not found");
     return ctx.text("", 404);

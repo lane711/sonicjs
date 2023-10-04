@@ -22,24 +22,24 @@ export async function loadAdminTable(ctx) {
 
   content.keys.reverse();
 
-  console.log('content==>', JSON.stringify(content, null, 2))
+  console.log("content==>", JSON.stringify(content, null, 2));
 
   // console.log("load admin data", content);
 
   const contentList = content.keys.map((item) => {
     const id = item.metadata.id;
-    const table = item.metadata.table;
+    const route = item.metadata.route;
     // const table = item.name.split('::')[1];
     // console.log("item-->", JSON.stringify(item, null, 2));
 
-    const updated_on = item.metadata.updated_on;
-    // console.log("updated_on-->", updated_on);
+    const updatedOn = item.metadata.updatedOn;
+    // console.log("updatedOn-->", updatedOn);
 
     return {
-      id:item.name,
+      id: item.name,
       title: item.name,
-      updated_on: updated_on,
-      editPath: `/admin/content/edit/${table}/${id}`,
+      updatedOn: updatedOn,
+      editPath: `/admin/content/edit/${route}/${id}`,
       newPath: `/admin/content/new/${item.name}`,
     };
   });
@@ -50,8 +50,8 @@ export async function loadAdminTable(ctx) {
   const tableList = tables.map((schmea) => {
     return {
       title: schmea.table,
-      editPath: `/admin/content/${schmea.table}`,
-      newPath: `/admin/content/new/${schmea.table}`,
+      editPath: `/admin/content/${schmea.route}`,
+      newPath: `/admin/content/new/${schmea.route}`,
     };
   });
 
@@ -64,13 +64,14 @@ export async function loadAdminTable(ctx) {
   );
 }
 
-export async function loadTableData(ctx, table) {
+export async function loadTableData(ctx, route) {
   // await saveKVData(ctx.env.KVDATA, 'site1', 'content', {title: '20230508a'});
-  console.log("user==>", table);
+  // console.log("loadTableData==>", route);
+  const table = apiConfig.find((entry) => entry.route === route).table;
 
-  const results = await getD1DataByTable(ctx.env.D1DATA, table, undefined);
+  // const results = await getD1DataByTable(ctx.env.D1DATA, table, undefined);
 
-  results.data.reverse();
+  // results.reverse();
   // const content = await getAllContent(ctx.env.D1DATA);
   // console.log('data==>', JSON.stringify(data, null, 2))
 
@@ -81,20 +82,96 @@ export async function loadTableData(ctx, table) {
 
   // console.log("load admin data", content);
 
-  const contentList = results.data.map((item) => {
-    return {
-      id: item.id,
-      title: getDisplayField(item),
-      updated_on: item.updated_on,
-      editPath: `/admin/content/edit/${table}/${item.id}`,
-    };
-  });
+  // const contentList = results.map((item) => {
+  //   return {
+  //     id: item.id,
+  //     title: getDisplayField(item),
+  //     updatedOn: item.updatedOn,
+  //     editPath: `/admin/content/edit/${route}/${item.id}`,
+  //   };
+  // });
 
-  return <TopContentTable content={contentList} screenTitle={table} />;
+  return <TopContentTable route={route} table={table} />;
+}
+
+export async function loadInMemoryCacheTable(ctx) {
+  return (
+    <Layout screenTitle={"In Memory Cache"}>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="pb-2 mb-3">
+            <button id="clear-cache-in-memory" class="btn btn-warning">
+              Clear In Memory Cache
+            </button>
+          </div>
+
+          <div id="grid-in-memory-cache"></div>
+        </div>
+      </div>
+    </Layout>
+  );
+}
+
+export async function loadKVCacheTable(ctx) {
+  return (
+    <Layout screenTitle={"KV Cache"}>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="pb-2 mb-3">
+            <button id="clear-cache-kv" class="btn btn-warning">
+              Clear KV Cache
+            </button>
+          </div>
+
+          <div id="grid-kv-cache"></div>
+        </div>
+      </div>
+    </Layout>
+  );
+}
+
+export async function loadKVCacheDetail(ctx, kv) {
+  return (
+    <Layout screenTitle={"KV Item Detail"}>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="pb-2 mb-3">
+            <button id="clear-cache-kv" class="btn btn-warning">
+              Clear KV Cache
+            </button>
+          </div>
+
+          <textarea  rows="24" style="width: 100%; max-width: 100%;">
+            {JSON.stringify(kv, null, 2)}
+          </textarea>
+        </div>
+      </div>
+    </Layout>
+  );
+}
+
+export async function loadInMemoryCacheDetail(ctx, kv) {
+  return (
+    <Layout screenTitle={"In Memory Item Detail"}>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="pb-2 mb-3">
+            <button id="clear-in-memory-kv" class="btn btn-warning">
+              Clear In Memory Cache
+            </button>
+          </div>
+
+          <textarea  rows="24" style="width: 100%; max-width: 100%;">
+            {JSON.stringify(kv, null, 2)}
+          </textarea>
+        </div>
+      </div>
+    </Layout>
+  );
 }
 
 function getDisplayField(item) {
-  return item.name ?? item.title ?? item.firstName ?? item.id;
+  return item.name ?? item.title ?? item.firstName ?? item.id ?? "record";
 }
 
 export async function loadAdmin(ctx) {
@@ -151,9 +228,10 @@ export async function loadAdmin(ctx) {
 //   );
 // }
 
-export async function loadEditContent(ctx, table, id) {
+export async function loadEditContent(ctx, route, id) {
   // const content = await getD1ByTableAndId(ctx.env.D1DATA, table, id);
   // console.log("loadEditContent", id, content);
+  const table = apiConfig.find((entry) => entry.route === route).table;
 
   // console.log('loadEditContent content type', contentType)
 
@@ -162,17 +240,21 @@ export async function loadEditContent(ctx, table, id) {
       saveButtonText="Save Content Type"
       screenTitle="Content Type"
       contentId={id}
+      table={table}
+      route={route}
     />
   );
 }
 
-export async function loadNewContent(ctx, table) {
+export async function loadNewContent(ctx, route) {
   // const content = await getD1ByTableAndId(ctx.env.D1DATA, table, id);
   // console.log("loadEditContent", id, content);
 
-  // console.log('loadEditContent content type', contentType)
+  const table = apiConfig.find((entry) => entry.route === route).table;
 
-  return <ContentNewForm table={table} />;
+  console.log("loadNewContent", route, table);
+
+  return <ContentNewForm route={route} table={table} />;
 }
 
 function editScript() {
@@ -183,18 +265,20 @@ export const ContentEditForm = (props: {
   screenTitle: string;
   saveButtonText: string;
   contentId: string;
+  table: string;
+  route: string;
 }) => {
   return (
     <Layout screenTitle={"Edit: " + props.contentId}>
-      <div id="formio" data-id={props.contentId}></div>
+      <div id="formio" data-id={props.contentId} data-route={props.route}></div>
     </Layout>
   );
 };
 
-export const ContentNewForm = (props: { table: string }) => {
+export const ContentNewForm = (props: { table: string; route: string }) => {
   return (
     <Layout screenTitle={"New: " + props.table}>
-      <div id="formio" data-table={props.table}></div>
+      <div id="formio" data-route={props.route}></div>
     </Layout>
   );
 };
@@ -227,8 +311,8 @@ export const TopContentList = (props: {
                       </a>
                     </td>
                     <td scope="row">
-                      <time class="timeSince" datetime={item.updated_on}>
-                        {item.updated_on}
+                      <time class="timeSince" datetime={item.updatedOn}>
+                        {item.updatedOn}
                       </time>
                     </td>
                     <td>
@@ -236,6 +320,7 @@ export const TopContentList = (props: {
                         href="javascript:void(0)"
                         data-id={item.id}
                         class="btn btn-outline-warning btn-sm delete-content"
+                        onClick="return confirm('Delete forever?') ? updateContent(data-id) : false;"
                       >
                         Delete
                       </a>
@@ -259,7 +344,7 @@ export const TopContentList = (props: {
                   <tr>
                     <td>
                       <a
-                        href={"/admin/content/new/" + item.title}
+                        href={"/admin/content/new/" + item.route}
                         class="btn btn-warning"
                       >
                         New {item.title} record
@@ -276,25 +361,29 @@ export const TopContentList = (props: {
   );
 };
 
-export const TopContentTable = (props: {
-  content: object[];
-  screenTitle: string;
-}) => {
+export const TopContentTable = (props: { table: string; route: string }) => {
   return (
-    <Layout screenTitle={props.screenTitle}>
+    <Layout screenTitle={props.table}>
       <div class="row">
         <div class="col-md-12">
           <div class="pb-2 mb-3">
             {/* <!-- Button trigger modal --> */}
             <a
-              href={"/admin/content/new/" + props.screenTitle}
+              href={"/admin/content/new/" + props.route}
               class="btn btn-warning"
             >
-              New {props.screenTitle} record
+              New {props.table} record
             </a>
           </div>
 
-          <table class="table">
+          <div id="grid" data-route={props.route}></div>
+          <div id="executionTime" class="p-4 text-center text-muted hide">
+            Data Retrieval - <b>Server</b>: <span class="serverTime"></span>ms,{" "}
+            <b>Client</b>: <span class="clientTime"></span>ms. <b>Source</b>:{" "}
+            <span class="source"></span>
+          </div>
+
+          {/* <table class="table">
             <thead>
               <tr>
                 <th scope="col">Record</th>
@@ -312,15 +401,15 @@ export const TopContentTable = (props: {
                       </a>
                     </td>
                     <td scope="row">
-                      <time class="timeSince" datetime={item.updated_on}>
-                        {item.updated_on}
+                      <time class="timeSince" datetime={item.updatedOn}>
+                        {item.updatedOn}
                       </time>
                     </td>
                   </tr>
                 );
               })}
             </tbody>
-          </table>
+          </table> */}
         </div>
       </div>
     </Layout>

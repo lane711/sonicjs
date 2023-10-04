@@ -4,6 +4,7 @@ import {
   integer,
   blob,
   index,
+  primaryKey,
 } from "drizzle-orm/sqlite-core";
 
 import { relations } from "drizzle-orm";
@@ -11,8 +12,8 @@ import { relations } from "drizzle-orm";
 // we want to add the below audit fields to all our tables, so we'll define it here
 // and append it to the rest of the schema for each table
 export const auditSchema = {
-  created_on: integer("created_on"),
-  updated_on: integer("updated_on"),
+  createdOn: integer("createdOn"),
+  updatedOn: integer("updatedOn"),
 };
 
 /*
@@ -28,19 +29,24 @@ export const userSchema = {
   password: text("password"),
   role: text("role").$type<"admin" | "user">(),
 };
-export const usersTable = sqliteTable("users", { ...userSchema, ...auditSchema });
+export const usersTable = sqliteTable("users", {
+  ...userSchema,
+  ...auditSchema,
+});
 
 // posts
-type PostCategories = [{ category: string; }];
+type PostCategories = [{ category: string }];
 
 export const postSchema = {
   id: text("id").primaryKey(),
   title: text("title"),
   body: text("body"),
-  userId: text("user_id"),
-  categoryId: text("category_id"),
+  userId: text("userId"),
 };
-export const postsTable = sqliteTable("posts", { ...postSchema, ...auditSchema });
+export const postsTable = sqliteTable("posts", {
+  ...postSchema,
+  ...auditSchema,
+});
 
 // categories
 export const categorySchema = {
@@ -57,20 +63,36 @@ export const categoriesTable = sqliteTable("categories", {
 export const commentSchema = {
   id: text("id").primaryKey(),
   body: text("body"),
-  userId: text("user_id"),
-  postId: integer("post_id"),
+  userId: text("userId"),
+  postId: integer("postId"),
 };
-export const commentsTable = sqliteTable(
-  "comments",
-  { ...commentSchema, ...auditSchema },
-  (table) => {
-    return {
-      userIdx: index("user_idx").on(user.id),
-      postIdx: index("post_idx").on(post.id),
-    };
-  }
-);
 
+export const commentsTable = sqliteTable("comments", {
+  ...commentSchema,
+  ...auditSchema,
+});
+
+//posts to categories
+export const categoriesToPostsSchema = {
+  id: text("id").notNull(),
+  postId: text("postId")
+    .notNull()
+    .references(() => postsTable.id),
+  categoryId: text("categoryId")
+    .notNull()
+    .references(() => categoriesTable.id),
+};
+
+export const categoriesToPostsTable = sqliteTable(
+  "categoriesToPosts",
+  {
+    ...categoriesToPostsSchema,
+    ...auditSchema,
+  },
+  (t) => ({
+    pk: primaryKey(t.postId, t.categoryId),
+  })
+);
 /*
  **** TABLES RELATIONSHIPS ****
  */
@@ -87,22 +109,19 @@ export const postsRelations = relations(postsTable, ({ one, many }) => ({
     fields: [postsTable.userId],
     references: [usersTable.id],
   }),
-  category: one(categoriesTable, {
-    fields: [postsTable.categoryId],
-    references: [categoriesTable.id],
-  }),
+  categories: many(categoriesToPostsTable),
   comments: many(commentsTable),
 }));
 
 // categories can have many posts
 export const categoriesRelations = relations(categoriesTable, ({ many }) => ({
-  posts: many(postsTable),
+  posts: many(categoriesToPostsTable),
 }));
 
 // comments can have one post and one author
 export const commentsRelations = relations(commentsTable, ({ one }) => ({
   post: one(postsTable, {
-    fields: [commentsTable.id],
+    fields: [commentsTable.postId],
     references: [postsTable.id],
   }),
   user: one(usersTable, {
@@ -110,6 +129,21 @@ export const commentsRelations = relations(commentsTable, ({ one }) => ({
     references: [usersTable.id],
   }),
 }));
+
+//many to many between posts and categories
+export const categoriesToPostsRelations = relations(
+  categoriesToPostsTable,
+  ({ one }) => ({
+    category: one(categoriesTable, {
+      fields: [categoriesToPostsTable.categoryId],
+      references: [categoriesTable.id],
+    }),
+    post: one(postsTable, {
+      fields: [categoriesToPostsTable.postId],
+      references: [postsTable.id],
+    }),
+  })
+);
 
 export interface ApiConfig {
   table: string;
@@ -122,5 +156,5 @@ export const apiConfig: ApiConfig[] = [
   { table: "posts", route: "posts" },
   { table: "categories", route: "categories" },
   { table: "comments", route: "comments" },
-
+  { table: "categoriesToPosts", route: "categories-to-posts" },
 ];

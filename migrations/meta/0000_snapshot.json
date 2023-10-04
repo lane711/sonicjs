@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "71bc870b-e564-4a0a-9782-97a8ea6bf901",
+  "id": "e692cc84-7949-4508-9f51-22941e188aa5",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "categories": {
@@ -28,15 +28,15 @@
           "notNull": false,
           "autoincrement": false
         },
-        "created_on": {
-          "name": "created_on",
+        "createdOn": {
+          "name": "createdOn",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "updated_on": {
-          "name": "updated_on",
+        "updatedOn": {
+          "name": "updatedOn",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
@@ -46,6 +46,84 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "categoriesToPosts": {
+      "name": "categoriesToPosts",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "postId": {
+          "name": "postId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "categoryId": {
+          "name": "categoryId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "createdOn": {
+          "name": "createdOn",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "updatedOn": {
+          "name": "updatedOn",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "categoriesToPosts_postId_posts_id_fk": {
+          "name": "categoriesToPosts_postId_posts_id_fk",
+          "tableFrom": "categoriesToPosts",
+          "tableTo": "posts",
+          "columnsFrom": [
+            "postId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "categoriesToPosts_categoryId_categories_id_fk": {
+          "name": "categoriesToPosts_categoryId_categories_id_fk",
+          "tableFrom": "categoriesToPosts",
+          "tableTo": "categories",
+          "columnsFrom": [
+            "categoryId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "categoriesToPosts_postId_categoryId_pk": {
+          "columns": [
+            "categoryId",
+            "postId"
+          ]
+        }
+      },
       "uniqueConstraints": {}
     },
     "comments": {
@@ -65,51 +143,36 @@
           "notNull": false,
           "autoincrement": false
         },
-        "user_id": {
-          "name": "user_id",
+        "userId": {
+          "name": "userId",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "post_id": {
-          "name": "post_id",
+        "postId": {
+          "name": "postId",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "created_on": {
-          "name": "created_on",
+        "createdOn": {
+          "name": "createdOn",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "updated_on": {
-          "name": "updated_on",
+        "updatedOn": {
+          "name": "updatedOn",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         }
       },
-      "indexes": {
-        "user_idx": {
-          "name": "user_idx",
-          "columns": [
-            "id"
-          ],
-          "isUnique": false
-        },
-        "post_idx": {
-          "name": "post_idx",
-          "columns": [
-            "id"
-          ],
-          "isUnique": false
-        }
-      },
+      "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
@@ -138,29 +201,22 @@
           "notNull": false,
           "autoincrement": false
         },
-        "user_id": {
-          "name": "user_id",
+        "userId": {
+          "name": "userId",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "category_id": {
-          "name": "category_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "created_on": {
-          "name": "created_on",
+        "createdOn": {
+          "name": "createdOn",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "updated_on": {
-          "name": "updated_on",
+        "updatedOn": {
+          "name": "updatedOn",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
@@ -217,15 +273,15 @@
           "notNull": false,
           "autoincrement": false
         },
-        "created_on": {
-          "name": "created_on",
+        "createdOn": {
+          "name": "createdOn",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "updated_on": {
-          "name": "updated_on",
+        "updatedOn": {
+          "name": "updatedOn",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,

@@ -47,6 +47,11 @@ export const Layout = (props: {
           href="https://cdn.form.io/formiojs/formio.full.min.css"
         />
 
+        <link
+          href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css"
+          rel="stylesheet"
+        />
+
         <meta name="theme-color" content="#712cf9" />
 
         <link href="/public/css/admin.css" rel="stylesheet" />
@@ -149,14 +154,11 @@ export const Layout = (props: {
             >
               <div class="position-sticky pt-3 sidebar-sticky">
                 <ul class="nav flex-column">
-
-
                   <li class="nav-item">
                     <a class="nav-link" href="/admin">
                       API
                     </a>
                   </li>
-
                   <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                     <span>Tables</span>
                   </h6>
@@ -165,57 +167,32 @@ export const Layout = (props: {
                       <li class="nav-item">
                         <a
                           class="nav-link"
-                          href={"/admin/tables/" + item.table}
+                          href={"/admin/tables/" + item.route}
                         >
-                          {item.table}
+                          {item.route}
                         </a>
                       </li>
                     );
                   })}
-
                   <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                     <span>Cache</span>
                   </h6>
                   <li class="nav-item">
-                    <a
-                      class="nav-link"
-                      target="_blank"
-                      href="/v1/cache/in-memory"
-                    >
-                      In Memory - Show
+                    <a class="nav-link" href="/admin/cache/in-memory">
+                      In Memory
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a
-                      class="nav-link"
-                      target="_blank"
-                      href="/v1/cache/clear-in-memory"
-                    >
-                      In Memory - Clear All
-                    </a>
-                  </li>
-
-                  <li class="nav-item">
-                    <a class="nav-link" target="_blank" href="/v1/cache/kv">
-                      KV - Show
+                    <a class="nav-link" href="/admin/cache/kv">
+                      KV
                     </a>
                   </li>
 
                   <li class="nav-item">
                     <a
+                      id="clear-cache-all"
                       class="nav-link"
-                      target="_blank"
-                      href="/v1/cache/clear-kv"
-                    >
-                      KV - Clear All
-                    </a>
-                  </li>
-
-                  <li class="nav-item">
-                    <a
-                      class="nav-link"
-                      target="_blank"
-                      href="/v1/cache/clear-all"
+                      href="javascript:void(0)"
                     >
                       Clear All Caches
                     </a>
@@ -294,9 +271,14 @@ export const Layout = (props: {
           crossorigin="anonymous"
         ></script>
 
+        <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+
         <script src="/public/js/admin.js"></script>
         <script src="/public/js/form-content-type.js"></script>
         <script src="/public/js/form-content.js"></script>
+        <script src="/public/js/grid.js"></script>
+        <script src="/public/js/grid-in-memory-cache.js"></script>
+        <script src="/public/js/grid-kv-cache.js"></script>
       </body>
     </html>
   );

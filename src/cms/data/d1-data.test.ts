@@ -3,6 +3,7 @@ import {
   getByTable,
   getD1DataByTable,
   insertD1Data,
+  updateD1Data,
   whereClauseBuilder,
 } from "./d1-data";
 import { usersTable } from "../../db/schema";
@@ -35,53 +36,77 @@ it("should not return a where clause", () => {
 //   expect(clause).toBe("");
 // });
 
-it("should return a SQL select", () => {
+it("should return a SQL select with limit", () => {
   const queryParams = "limit=2";
   const params = qs.parse(queryParams);
   console.log("params ---->", params);
   const clause = generateSelectSql("my-table", params);
-  expect(clause).toBe("SELECT * FROM my-table limit 2;");
+  expect(clause).toBe("SELECT *, COUNT() OVER() AS total FROM my-table limit 2;");
+});
+
+it("should return a SQL select with offset", () => {
+  const queryParams = "offset=2";
+  const params = qs.parse(queryParams);
+  console.log("params ---->", params);
+  const clause = generateSelectSql("my-table", params);
+  expect(clause).toBe("SELECT *, COUNT() OVER() AS total FROM my-table offset 2;");
+});
+
+it("should return a SQL select with limit and offset", () => {
+  const queryParams = "limit=2&offset=2";
+  const params = qs.parse(queryParams);
+  console.log("params ---->", params);
+  const clause = generateSelectSql("my-table", params);
+  expect(clause).toBe("SELECT *, COUNT() OVER() AS total FROM my-table limit 2 offset 2;");
 });
 
 //TODO: rework to hit the full api
-it.skip("CRUD", async () => {
+it("get should return results", async () => {
   const db = createTestTable();
 
-  await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", { firstName: "John", id: "1" });
-  await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", { firstName: "Jane", id: "2" });
+  await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+    firstName: "John",
+    id: "1",
+  });
+  await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+    firstName: "Jane",
+    id: "2",
+  });
 
-  const d1Result = await getByTable(
-    __D1_BETA__D1DATA,
-    KVDATA,
-    "users",
-    undefined,
-    "some-cache-key-url"
-  );
-
-  expect(d1Result.data.length).toBe(2);
-  expect(d1Result.source).toBe("d1");
-
-  //if we request it again, it should be cached in memory
-  //TODO need to be able to pass in ctx so that we can setup d1 and kv
-  const inMemoryCacheResult = await getByTable(
+  const d1Result = await getD1DataByTable(
     __D1_BETA__D1DATA,
     "users",
-    undefined,
-    "some-cache-key-url"
+    undefined
   );
-  expect(inMemoryCacheResult.data.length).toBe(2);
-  expect(inMemoryCacheResult.source).toBe("cache");
 
-  // if we request it again, it should also be cached in kv storage
-  const kvResult = await getByTable(
+  expect(d1Result.length).toBe(2);
+});
+
+it("updateD1Data should update record", async () => {
+  const db = createTestTable();
+
+  await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+    firstName: "John",
+    id: "a",
+  });
+  await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+    firstName: "Jane",
+    id: "b",
+  });
+
+  updateD1Data(__D1_BETA__D1DATA, "users", {
+    data: { firstName: "Steve" },
+    id: "b",
+  });
+
+  const d1Result = await getD1DataByTable(
     __D1_BETA__D1DATA,
     "users",
-    undefined,
-    "some-cache-key-url"
+    undefined
   );
-  expect(kvResult.data.length).toBe(2);
-  expect(kvResult.source).toBe("cache");
 
+  expect(d1Result.length).toBe(2);
+  expect(d1Result[1].firstName).toBe("Steve");
 });
 
 function createTestTable() {
@@ -95,8 +120,8 @@ function createTestTable() {
       email text,
       password text,
       role text,
-      created_on integer,
-      updated_on integer
+      createdOn integer,
+      updatedOn integer
     );
 	`);
 
