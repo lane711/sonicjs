@@ -90,13 +90,18 @@ export async function addToKvCache(db, key, value) {
   const confirmedRecord = await getById(db, cacheKey);
   // console.log('confirmedRecord', confirmedRecord)
   return confirmedRecord;
-
 }
 
-export async function getRecordFromKvCache(db, key) {
-  // console.log('getRecordFromKvCache key', key)
-  const results =  await db.get(addCachePrefix(key),{ type: "json" });
-  // console.log('getRecordFromKvCache results', results)
+export async function getRecordFromKvCache(db, key, ignorePrefix = false) {
+  const lookupKey = ignorePrefix ? key : addCachePrefix(key);
+  var isJSon = false;
+  var results;
+  try {
+    results = await db.get(lookupKey, { type: "json" });
+    isJSon = true;
+  } catch (error) {
+    results = await db.get(lookupKey);
+  }
 
   return results;
 }
@@ -106,7 +111,7 @@ export function getKVCache(db) {
 }
 
 export function getAllKV(db) {
-  return getDataListByPrefix(db, '');
+  return getDataListByPrefix(db, "");
 }
 
 export async function clearKVCache(db) {
@@ -123,7 +128,7 @@ export async function clearAllKVRecords(db) {
   }
 }
 
-export function addCachePrefix(key: string = '') {
+export function addCachePrefix(key: string = "") {
   return `cache::${key}`;
 }
 
@@ -147,7 +152,6 @@ export function saveContent(db, content, timestamp, id) {
   // const size = JSON.stringify(content).length;
 
   // console.log("size", size);
-
 }
 
 export function extractContentType(contentTypeComponents) {

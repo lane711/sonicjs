@@ -8,6 +8,7 @@ import { Bindings } from "../types/bindings";
 import {
   loadEditContent,
   loadInMemoryCacheTable,
+  loadKVCacheDetail,
   loadKVCacheTable,
   loadNewContent,
   loadTableData,
@@ -20,7 +21,7 @@ import { getD1Binding } from "../util/d1-binding";
 import qs from "qs";
 import { format, compareAsc } from "date-fns";
 import { getAllFromInMemoryCache } from "../data/cache";
-import { getKVCache } from "../data/kv-data";
+import { getKVCache, getRecordFromKvCache } from "../data/kv-data";
 
 const admin = new Hono<{ Bindings: Bindings }>();
 
@@ -51,8 +52,23 @@ admin.get("/cache/in-memory", async (ctx) => {
   return ctx.html(await loadInMemoryCacheTable(ctx));
 });
 
+admin.get("/cache/in-memory/:id", async (ctx) => {
+  const id = ctx.req.param("id");
+  const idDecoded = decodeURIComponent(id);
+  const kv = await getRecordFromKvCache(ctx.env.KVDATA, idDecoded, true);
+  return ctx.html(await loadKVCacheDetail(ctx, kv));
+});
+
 admin.get("/cache/kv", async (ctx) => {
   return ctx.html(await loadKVCacheTable(ctx));
+});
+
+admin.get("/cache/kv/:id", async (ctx) => {
+  const id = ctx.req.param("id");
+  const idDecoded = decodeURIComponent(id);
+  console.log('idDecoded', idDecoded)
+  const kv = await getRecordFromKvCache(ctx.env.KVDATA, idDecoded, true);
+  return ctx.html(await loadKVCacheDetail(ctx, kv));
 });
 
 admin.get("/api/in-memory-cache", async (ctx) => {
@@ -92,10 +108,10 @@ admin.get("/api/kv-cache", async (ctx) => {
   const records = await getKVCache(ctx.env.KVDATA);
 
   const data = records.keys.map((item) => {
-    console.log('item', item)
+    const itemEncoded = encodeURIComponent(item.name);
     return {
       key: item.name,
-      viewLink: `<a href="/admin/content/edit/${item.name}">${item.name}</a>`,
+      viewLink: `<a href="/admin/cache/kv/${itemEncoded}">${item.name}</a>`,
     };
   });
 

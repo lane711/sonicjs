@@ -106,7 +106,6 @@ export async function loadInMemoryCacheTable(ctx) {
           </div>
 
           <div id="grid-in-memory-cache"></div>
-
         </div>
       </div>
     </Layout>
@@ -125,7 +124,27 @@ export async function loadKVCacheTable(ctx) {
           </div>
 
           <div id="grid-kv-cache"></div>
+        </div>
+      </div>
+    </Layout>
+  );
+}
 
+export async function loadKVCacheDetail(ctx, kv) {
+  console.log("loadKVCacheDetail", kv);
+  return (
+    <Layout screenTitle={"KV Cache"}>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="pb-2 mb-3">
+            <button id="clear-cache-kv" class="btn btn-warning">
+              Clear KV Cache
+            </button>
+          </div>
+
+          <textarea  rows="24" style="width: 100%; max-width: 100%;">
+            {JSON.stringify(kv, null, 2)}
+          </textarea>
         </div>
       </div>
     </Layout>
