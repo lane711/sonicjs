@@ -7,6 +7,7 @@ import { loadForm } from "./forms/form";
 import { Bindings } from "../types/bindings";
 import {
   loadEditContent,
+  loadInMemoryCacheDetail,
   loadInMemoryCacheTable,
   loadKVCacheDetail,
   loadKVCacheTable,
@@ -20,7 +21,7 @@ import { apiConfig } from "../../db/schema";
 import { getD1Binding } from "../util/d1-binding";
 import qs from "qs";
 import { format, compareAsc } from "date-fns";
-import { getAllFromInMemoryCache } from "../data/cache";
+import { getAllFromInMemoryCache, getFromInMemoryCache } from "../data/cache";
 import { getKVCache, getRecordFromKvCache } from "../data/kv-data";
 
 const admin = new Hono<{ Bindings: Bindings }>();
@@ -55,8 +56,8 @@ admin.get("/cache/in-memory", async (ctx) => {
 admin.get("/cache/in-memory/:id", async (ctx) => {
   const id = ctx.req.param("id");
   const idDecoded = decodeURIComponent(id);
-  const kv = await getRecordFromKvCache(ctx.env.KVDATA, idDecoded, true);
-  return ctx.html(await loadKVCacheDetail(ctx, kv));
+  const cacheResult = await getFromInMemoryCache(idDecoded);
+  return ctx.html(await loadInMemoryCacheDetail(ctx, cacheResult));
 });
 
 admin.get("/cache/kv", async (ctx) => {
@@ -80,10 +81,11 @@ admin.get("/api/in-memory-cache", async (ctx) => {
   const records = await getAllFromInMemoryCache();
 
   const data = records.data.map((item) => {
+    const itemEncoded = encodeURIComponent(item.key);
     return {
       key: item.key,
       createdOn: format(item.meta.created, "MM/dd/yyyy h:mm b"),
-      viewLink: `<a href="/admin/content/edit/${item.key}">${item.key}</a>`,
+      viewLink: `<a href="/admin/cache/in-memory/${itemEncoded}">${item.key}</a>`,
     };
   });
 
