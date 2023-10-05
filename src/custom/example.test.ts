@@ -11,7 +11,7 @@ it("get should return results and 200", async () => {
   const { userRecord, categoryRecord, postRecord } =
     await createRelatedTestRecords();
 
-  let req = new Request("http://localhost/v1/example/blog-posts", {
+  let req = new Request("http://localhost/v1/example/blog-posts?limit=2", {
     method: "GET",
     headers: { "Content-Type": "application/json" },
   });

@@ -89,7 +89,7 @@ example.get("/blog-posts", async (ctx) => {
   const func = async function () {
     const db = drizzle(d1, { schema });
 
-    return await d1.prepare(
+    const data =  await d1.prepare(
       `
       SELECT
       posts.id,
@@ -115,6 +115,8 @@ example.get("/blog-posts", async (ctx) => {
       offset ${offset}
       `
     ).all();
+
+    return data.results
 
   };
 
