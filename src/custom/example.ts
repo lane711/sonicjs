@@ -40,9 +40,11 @@ example.post("/users", async (ctx) => {
 });
 
 example.get("/blog-posts", async (ctx) => {
+  const start = Date.now();
   var params = qs.parse(ctx.req.query());
   const d1 = getD1Binding(ctx);
   const limit = params.limit ? params.limit : 10;
+  const offset = params.offset ? params.offset : 0;
 
   const func = async function () {
     const db = drizzle(d1, { schema });
@@ -54,8 +56,9 @@ example.get("/blog-posts", async (ctx) => {
         categories: { with: { category: true } },
       },
       limit,
+      offset,
       extras: {
-        total: sql`COUNT() OVER()`.as('total'),
+        total: sql`COUNT() OVER()`.as("total"),
       },
     });
   };
@@ -70,7 +73,10 @@ example.get("/blog-posts", async (ctx) => {
     func
   );
 
-  return ctx.json(data);
+  const end = Date.now();
+  const executionTime = end - start;
+
+  return ctx.json({ ...data, executionTime });
 });
 
 export { example };

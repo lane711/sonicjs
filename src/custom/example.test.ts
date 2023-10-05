@@ -21,6 +21,8 @@ it("get should return results and 200", async () => {
   expect(body.data.length).toBe(2);
   expect(body.source).toBe("d1");
   expect(body.total).toBe(2);
+  expect(body.executionTime).toBeGreaterThan(-1);
+
 
 
   //if we get again, should be cached
