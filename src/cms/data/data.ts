@@ -124,6 +124,9 @@ export async function getRecords(
 
   if (customDataFunction) {
     d1Data = await customDataFunction();
+    if (d1Data && d1Data[0]) {
+      total = d1Data[0].total;
+    }
   } else {
     if (params && params.id) {
       d1Data = await getD1ByTableAndId(d1, table, params.id);
