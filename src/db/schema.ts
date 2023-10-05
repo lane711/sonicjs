@@ -5,6 +5,7 @@ import {
   blob,
   index,
   primaryKey,
+  int,
 } from "drizzle-orm/sqlite-core";
 
 import { relations } from "drizzle-orm";
@@ -26,11 +27,37 @@ export const userSchema = {
   firstName: text("firstName"),
   lastName: text("lastName"),
   email: text("email"),
-  password: text("password"),
   role: text("role").$type<"admin" | "user">(),
 };
 export const usersTable = sqliteTable("users", {
   ...userSchema,
+  ...auditSchema,
+});
+
+export const userKeysSchema = {
+  id: text("id").primaryKey(),
+  user_id: text("user_id")
+    .notNull()
+    .references(() => usersTable.id),
+  hashed_passwrod: text("hashed_password"),
+};
+
+export const userKeysTable = sqliteTable("user_keys", {
+  ...userKeysSchema,
+  ...auditSchema,
+});
+
+export const userSessionsSchema = {
+  id: text("id").primaryKey(),
+  user_id: text("user_id")
+    .notNull()
+    .references(() => usersTable.id),
+  active_expires: int("active_expires").notNull(),
+  idle_expires: int("idle_expires").notNull(),
+};
+
+export const userSessionsTable = sqliteTable("user_sessions", {
+  ...userSessionsSchema,
   ...auditSchema,
 });
 
