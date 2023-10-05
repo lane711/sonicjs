@@ -39,7 +39,7 @@ example.post("/users", async (ctx) => {
   return ctx.json(data);
 });
 
-example.get("/blog-posts", async (ctx) => {
+example.get("/blog-posts-orm", async (ctx) => {
   const start = Date.now();
   var params = qs.parse(ctx.req.query());
   const d1 = getD1Binding(ctx);
@@ -78,5 +78,64 @@ example.get("/blog-posts", async (ctx) => {
 
   return ctx.json({ ...data, executionTime });
 });
+
+example.get("/blog-posts", async (ctx) => {
+  const start = Date.now();
+  var params = qs.parse(ctx.req.query());
+  const d1 = getD1Binding(ctx);
+  const limit = params.limit ? params.limit : 10;
+  const offset = params.offset ? params.offset : 0;
+
+  const func = async function () {
+    const db = drizzle(d1, { schema });
+
+    return await d1.prepare(
+      `
+      SELECT
+      posts.id,
+      posts.title,
+      posts.updatedOn,
+      substr(posts.body, 0, 20) as body_preview,
+      users.firstName || ' ' || users.lastName as author,
+      count(comments.id) as commentCount,
+      categories.title,
+      COUNT() OVER() as total
+      FROM posts
+      left join users
+      on posts.userid = users.id
+      left outer join comments
+      on comments.postId = posts.id
+      left outer join categoriesToPosts
+      on categoriesToPosts.postId = posts.id
+      left join categories
+      on categoriesToPosts.categoryId = categories.id
+      group by posts.id
+      order by posts.updatedOn desc
+      limit ${limit}
+      offset ${offset}
+      `
+    ).all();
+
+  };
+
+  const data = await getRecords(
+    ctx.env.D1DATA,
+    ctx.env.KVDATA,
+    "custom",
+    params,
+    ctx.req.url,
+    "fastest",
+    func
+  );
+
+  const end = Date.now();
+  const executionTime = end - start;
+
+  return ctx.json({ ...data, executionTime });
+});
+
+
+
+
 
 export { example };
