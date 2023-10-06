@@ -79,45 +79,59 @@ example.get("/blog-posts-orm", async (ctx) => {
   return ctx.json({ ...data, executionTime });
 });
 
-example.get("/blog-posts", async (ctx) => {
+example.get("/blog-posts/:id", async (ctx) => {
   const start = Date.now();
+  const id = ctx.req.param("id");
   var params = qs.parse(ctx.req.query());
   const d1 = getD1Binding(ctx);
-  const limit = params.limit ? params.limit : 10;
-  const offset = params.offset ? params.offset : 0;
+  let whereClause = "";
+
+  let body = "substr(posts.body, 0, 20) as body";
+  let limit = params.limit ? params.limit : 10;
+  let offset = params.offset ? params.offset : 0;
+
+  if (id) {
+    whereClause = id ? `where posts.id = "${id}"` : "";
+    body = "posts.body";
+    limit = "";
+    offset = "";
+  } else {
+    limit = `limit ${limit}`;
+    offset = `offset ${offset}`;
+  }
 
   const func = async function () {
     const db = drizzle(d1, { schema });
 
-    const data =  await d1.prepare(
-      `
-      SELECT
-      posts.id,
-      posts.title,
-      posts.updatedOn,
-      substr(posts.body, 0, 20) as body_preview,
-      users.firstName || ' ' || users.lastName as author,
-      count(comments.id) as commentCount,
-      categories.title,
-      COUNT() OVER() as total
-      FROM posts
-      left join users
-      on posts.userid = users.id
-      left outer join comments
-      on comments.postId = posts.id
-      left outer join categoriesToPosts
-      on categoriesToPosts.postId = posts.id
-      left join categories
-      on categoriesToPosts.categoryId = categories.id
-      group by posts.id
-      order by posts.updatedOn desc
-      limit ${limit}
-      offset ${offset}
-      `
-    ).all();
+    const sql = `
+    SELECT
+    posts.id,
+    posts.title,
+    posts.updatedOn,
+    ${body},
+    users.firstName || ' ' || users.lastName as author,
+    count(comments.id) as commentCount,
+    categories.title as category,
+    COUNT() OVER() as total
+    FROM posts
+    left join users
+    on posts.userid = users.id
+    left outer join comments
+    on comments.postId = posts.id
+    left outer join categoriesToPosts
+    on categoriesToPosts.postId = posts.id
+    left join categories
+    on categoriesToPosts.categoryId = categories.id
+    ${whereClause}
+    group by posts.id
+    order by posts.updatedOn desc
+    ${limit}
+    ${offset}
+    `;
 
-    return data.results
+    const data = await d1.prepare(sql).all();
 
+    return data.results;
   };
 
   const data = await getRecords(
@@ -136,8 +150,75 @@ example.get("/blog-posts", async (ctx) => {
   return ctx.json({ ...data, executionTime });
 });
 
+example.get("/blog-posts/:id", async (ctx) => {
+  const start = Date.now();
+  const id = ctx.req.param("id");
+  var params = qs.parse(ctx.req.query());
+  const d1 = getD1Binding(ctx);
+  let whereClause = "";
 
+  let body = "substr(posts.body, 0, 20) as body";
+  let limit = params.limit ? params.limit : 10;
+  let offset = params.offset ? params.offset : 0;
 
+  if (id) {
+    whereClause = id ? `where posts.id = "${id}"` : "";
+    body = "posts.body";
+    limit = "";
+    offset = "";
+  } else {
+    limit = `limit ${limit}`;
+    offset = `offset ${offset}`;
+  }
 
+  const func = async function () {
+    const db = drizzle(d1, { schema });
+
+    const sql = `
+    SELECT
+    posts.id,
+    posts.title,
+    posts.updatedOn,
+    ${body},
+    users.firstName || ' ' || users.lastName as author,
+    count(comments.id) as commentCount,
+    categories.title as category,
+    COUNT() OVER() as total
+    FROM posts
+    left join users
+    on posts.userid = users.id
+    left outer join comments
+    on comments.postId = posts.id
+    left outer join categoriesToPosts
+    on categoriesToPosts.postId = posts.id
+    left join categories
+    on categoriesToPosts.categoryId = categories.id
+    ${whereClause}
+    group by posts.id
+    order by posts.updatedOn desc
+    ${limit}
+    ${offset}
+    `;
+
+    const data = await d1.prepare(sql).all();
+
+    return data.results;
+  };
+
+  const data = await getRecords(
+    ctx.env.D1DATA,
+    ctx.env.KVDATA,
+    "custom",
+    params,
+    ctx.req.url,
+    "fastest",
+    func
+  );
+
+  const end = Date.now();
+  const executionTime = end - start;
+
+  return ctx.json({ ...data, executionTime });
+});
 
 export { example };

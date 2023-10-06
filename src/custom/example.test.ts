@@ -38,6 +38,38 @@ it("get should return results and 200", async () => {
   expect(body2.total).toBe(2);
 });
 
+it("get should return single result if id passed in", async () => {
+  const db = createTestTable();
+  const { userRecord, categoryRecord, postRecord } =
+    await createRelatedTestRecords();
+
+  let req = new Request("http://localhost/v1/example/blog-posts/abc", {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+  let res = await app.fetch(req, env);
+  expect(res.status).toBe(200);
+  let body = await res.json();
+  expect(body.data.length).toBe(2);
+  expect(body.source).toBe("d1");
+  expect(body.total).toBe(2);
+  expect(body.executionTime).toBeGreaterThan(-1);
+
+
+
+  //if we get again, should be cached
+  let req2 = new Request("http://localhost/v1/example/blog-posts", {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+  let res2 = await app.fetch(req, env);
+  expect(res.status).toBe(200);
+  let body2 = await res2.json();
+  expect(body2.data.length).toBe(2);
+  expect(body2.source).toBe("cache");
+  expect(body2.total).toBe(2);
+});
+
 async function createRelatedTestRecords() {
   const userRecord = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
     table: "users",
@@ -63,6 +95,7 @@ async function createRelatedTestRecords() {
   const postRecord = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
     table: "posts",
     data: {
+      id: 'abc',
       title: "Post One",
       userId: userRecord.data.id,
     },
