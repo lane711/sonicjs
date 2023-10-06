@@ -121,7 +121,6 @@ export async function getRecords(
 
   var d1Data;
   let total = 0;
-
   if (customDataFunction) {
     d1Data = await customDataFunction();
     if (d1Data && d1Data[0]) {

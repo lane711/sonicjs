@@ -72,21 +72,27 @@ export async function insertUserTest(d1, data) {
   return db.insert(usersTable).values(data).returning().get();
 }
 
-export async function insertD1Data(d1, kv, table, data) {
-  const db = drizzle(d1);
-
+export function prepareD1Data(data, tbl = "") {
+  const table = data.table || tbl;
+  const schema = getRepoFromTable(table);
   const now = new Date().getTime();
   data.createdOn = now;
   data.updatedOn = now;
   delete data.table;
 
-  const schmea = getRepoFromTable(table);
+  if (!schema.id) {
+    delete data.id;
+  }
+  return data;
+}
+
+export async function insertD1Data(d1, kv, table, data) {
+  const db = drizzle(d1);
+  data = prepareD1Data(data, table);
+  const schema = getRepoFromTable(table);
   try {
     // let sql = db.insert(schmea).values(data).getSQL();
-    if (!schmea.id) {
-      delete data.id;
-    }
-    let result = await db.insert(schmea).values(data).returning().get();
+    let result = await db.insert(schema).values(data).returning().get();
     return result;
   } catch (error) {
     console.error(error);

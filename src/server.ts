@@ -23,9 +23,10 @@ app.use(
 );
 
 app.onError((err, c) => {
-  console.log(`SonicJs Error: ${err}`)
-  return c.text('SonicJs Error', 500)
-})
+  console.error(err, c);
+  console.log(`SonicJs Error: ${err}`);
+  return c.text("SonicJs Error", 500);
+});
 
 app.get("/", async (ctx) => {
   return ctx.redirect("/admin");

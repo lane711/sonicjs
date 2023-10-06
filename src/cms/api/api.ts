@@ -53,7 +53,6 @@ apiConfig.forEach((entry) => {
 
       const end = Date.now();
       const executionTime = end - start;
-
       return ctx.json({ ...data, executionTime });
     } catch (error) {
       console.log(error);
@@ -94,7 +93,6 @@ apiConfig.forEach((entry) => {
   //create single record
   //TODO: support batch inserts
   api.post(`/${entry.route}`, async (ctx) => {
-    const auth = initializeLucia(getD1Binding(ctx), ctx.env);
     const content = await ctx.req.json();
     const route = ctx.req.path.split("/")[2];
     const table = apiConfig.find((entry) => entry.route === route).table;
@@ -109,7 +107,7 @@ apiConfig.forEach((entry) => {
         JSON.stringify(content, null, 2)
       );
       if (table === "users") {
-        return await createUser({ ctx, content, table, route });
+        return await createUser({ ctx, content });
       } else {
         const result = await insertRecord(d1, ctx.env.KVDATA, content);
         return ctx.json(result.data, 201);

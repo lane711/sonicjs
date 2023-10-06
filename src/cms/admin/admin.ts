@@ -23,6 +23,7 @@ import qs from "qs";
 import { format, compareAsc } from "date-fns";
 import { getAllFromInMemoryCache, getFromInMemoryCache } from "../data/cache";
 import { getKVCache, getRecordFromKvCache } from "../data/kv-data";
+import { login } from "../lucia";
 
 const admin = new Hono<{ Bindings: Bindings }>();
 
@@ -67,7 +68,7 @@ admin.get("/cache/kv", async (ctx) => {
 admin.get("/cache/kv/:id", async (ctx) => {
   const id = ctx.req.param("id");
   const idDecoded = decodeURIComponent(id);
-  console.log('idDecoded', idDecoded)
+  console.log("idDecoded", idDecoded);
   const kv = await getRecordFromKvCache(ctx.env.KVDATA, idDecoded, true);
   return ctx.html(await loadKVCacheDetail(ctx, kv));
 });
@@ -152,7 +153,7 @@ admin.get("/api/:route", async (ctx) => {
     "fastest"
   );
 
-  // console.log('===> records', records)
+  console.log("===> records", records);
 
   const data = records.data.map((item) => {
     return {
@@ -161,11 +162,11 @@ admin.get("/api/:route", async (ctx) => {
       editLink: `<a href="/admin/content/edit/${route}/${
         item.id
       }">${getDisplayField(item)}</a>`,
-      apiLink: `<a target="_blank" href="/v1/${route}/${
-        item.id
-      }">raw <i class="bi bi-box-arrow-up-right ms-2"></i></a>`,
+      apiLink: `<a target="_blank" href="/v1/${route}/${item.id}">raw <i class="bi bi-box-arrow-up-right ms-2"></i></a>`,
     };
   });
+
+  console.log("===> data", data);
 
   const end = Date.now();
   const executionTime = end - start;
@@ -177,6 +178,11 @@ admin.get("/api/:route", async (ctx) => {
     total: records.total,
     executionTime,
   });
+});
+
+admin.post("/login", async (ctx) => {
+  const content = await ctx.req.json();
+  return await login({ ctx, content });
 });
 
 function getDisplayField(item) {
