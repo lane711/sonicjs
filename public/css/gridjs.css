@@ -1,0 +1,15 @@
+html[data-bs-theme="dark"] {
+  .gridjs-table {
+    color: red;
+  }
+}
+
+th.gridjs-th,
+.gridjs-tbody,
+td.gridjs-td {
+  --bs-bg-opacity: 1;
+  background-color: rgba(
+    var(--bs-tertiary-bg-rgb),
+    var(--bs-bg-opacity)
+  ) !important;
+}

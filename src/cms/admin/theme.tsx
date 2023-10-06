@@ -55,6 +55,7 @@ export const Layout = (props: {
         <meta name="theme-color" content="#712cf9" />
 
         <link href="/public/css/admin.css" rel="stylesheet" />
+        <link href="/public/css/gridjs.css" rel="stylesheet" />
       </head>
       <body>
         <div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle">
