@@ -79,9 +79,8 @@ example.get("/blog-posts-orm", async (ctx) => {
   return ctx.json({ ...data, executionTime });
 });
 
-example.get("/blog-posts/:id", async (ctx) => {
+example.get("/blog-posts", async (ctx) => {
   const start = Date.now();
-  const id = ctx.req.param("id");
   var params = qs.parse(ctx.req.query());
   const d1 = getD1Binding(ctx);
   let whereClause = "";
@@ -162,7 +161,7 @@ example.get("/blog-posts/:id", async (ctx) => {
   let offset = params.offset ? params.offset : 0;
 
   if (id) {
-    whereClause = id ? `where posts.id = "${id}"` : "";
+    whereClause = id ? `where posts.id = '${id}'` : "";
     body = "posts.body";
     limit = "";
     offset = "";
@@ -174,7 +173,12 @@ example.get("/blog-posts/:id", async (ctx) => {
   const func = async function () {
     const db = drizzle(d1, { schema });
 
-    const sql = `
+    await db.execute(sql`select * from ${usersTable} where ${usersTable.id} = ${id}`)
+
+
+    const data = 
+    await d1.prepare(
+      `
     SELECT
     posts.id,
     posts.title,
@@ -193,14 +197,11 @@ example.get("/blog-posts/:id", async (ctx) => {
     on categoriesToPosts.postId = posts.id
     left join categories
     on categoriesToPosts.categoryId = categories.id
-    ${whereClause}
+    where posts.id = ${id}
     group by posts.id
     order by posts.updatedOn desc
-    ${limit}
-    ${offset}
-    `;
-
-    const data = await d1.prepare(sql).all();
+    `
+    ).all();
 
     return data.results;
   };
