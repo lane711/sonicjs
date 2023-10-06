@@ -14,7 +14,7 @@ import {
   getRecordFromKvCache,
 } from "../data/kv-data";
 import { Bindings } from "../types/bindings";
-import { apiConfig } from "../../db/schema";
+import { apiConfig, usersTable } from "../../db/schema";
 import { getD1DataByTable, getD1ByTableAndId } from "../data/d1-data";
 import { getForm } from "./forms";
 import qs from "qs";
@@ -27,6 +27,7 @@ import {
 } from "../data/data";
 import { clearInMemoryCache, getAllFromInMemoryCache } from "../data/cache";
 import { getD1Binding } from "../util/d1-binding";
+import { createUser, initializeLucia } from "../lucia";
 
 const api = new Hono<{ Bindings: Bindings }>();
 
@@ -93,8 +94,8 @@ apiConfig.forEach((entry) => {
   //create single record
   //TODO: support batch inserts
   api.post(`/${entry.route}`, async (ctx) => {
+    const auth = initializeLucia(getD1Binding(ctx), ctx.env);
     const content = await ctx.req.json();
-
     const route = ctx.req.path.split("/")[2];
     const table = apiConfig.find((entry) => entry.route === route).table;
 
@@ -103,11 +104,16 @@ apiConfig.forEach((entry) => {
     const d1 = getD1Binding(ctx);
 
     try {
-      // console.log("posting new record content", JSON.stringify(content, null, 2));
-
-      const result = await insertRecord(d1, ctx.env.KVDATA, content);
-
-      return ctx.json(result.data, 201);
+      console.log(
+        "posting new record content",
+        JSON.stringify(content, null, 2)
+      );
+      if (table === "users") {
+        return await createUser({ ctx, content, table, route });
+      } else {
+        const result = await insertRecord(d1, ctx.env.KVDATA, content);
+        return ctx.json(result.data, 201);
+      }
     } catch (error) {
       console.log("error posting content", error);
       return ctx.text(error, 500);

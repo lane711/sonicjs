@@ -141,7 +141,7 @@ export async function loadKVCacheDetail(ctx, kv) {
             </button>
           </div>
 
-          <textarea  rows="24" style="width: 100%; max-width: 100%;">
+          <textarea rows="24" style="width: 100%; max-width: 100%;">
             {JSON.stringify(kv, null, 2)}
           </textarea>
         </div>
@@ -161,7 +161,7 @@ export async function loadInMemoryCacheDetail(ctx, kv) {
             </button>
           </div>
 
-          <textarea  rows="24" style="width: 100%; max-width: 100%;">
+          <textarea rows="24" style="width: 100%; max-width: 100%;">
             {JSON.stringify(kv, null, 2)}
           </textarea>
         </div>
@@ -375,8 +375,9 @@ export const TopContentTable = (props: { table: string; route: string }) => {
               New {props.table} record
             </a>
           </div>
-
+          {props.route}
           <div id="grid" data-route={props.route}></div>
+          {props.route}
           <div id="executionTime" class="p-4 text-center text-muted hide">
             Data Retrieval - <b>Server</b>: <span class="serverTime"></span>ms,{" "}
             <b>Client</b>: <span class="clientTime"></span>ms. <b>Source</b>:{" "}

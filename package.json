@@ -13,7 +13,8 @@
     "generate": "drizzle-kit generate:sqlite --schema=./src/db/schema.ts --out=./migrations",
     "up": "wrangler d1 migrations apply sonicjs --local",
     "up:prod": "wrangler d1 migrations apply sonicjs",
-    "tail": "wrangler pages deployment tail"
+    "tail": "wrangler pages deployment tail",
+    "reset:d1": "wrangler d1 reset"
   },
   "keywords": [],
   "author": "",

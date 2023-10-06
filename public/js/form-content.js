@@ -89,7 +89,7 @@ function editContent() {
     Formio.createForm(document.getElementById("formio"), {
       components: response.data.contentType,
     }).then(function (form) {
-      form.on("submit", function ({data}) {
+      form.on("submit", function ({ data }) {
         if (data.id) {
           updateContent(data);
         } else {
@@ -130,12 +130,13 @@ function updateContent(data) {
   var content = {};
   content.data = data;
   content.table = data.table;
+
+  console.log("updateContent", content);
   delete content.data.submit;
   delete content.data.contentType;
   delete content.data.id;
   delete content.data.table;
   route = $("#formio").attr("data-route");
-
   axios.put(`/v1/${route}/${id}`, content).then((response) => {
     console.log(response.data);
     console.log(response.status);
@@ -144,8 +145,8 @@ function updateContent(data) {
     console.log(response.config);
     if (response.status === 200) {
       location.href = `/admin/tables/${route}`;
-    } else{
-      alert('Error occured updating ' + data.id)
+    } else {
+      alert("Error occured updating " + data.id);
     }
   });
 }

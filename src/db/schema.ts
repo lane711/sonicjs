@@ -27,6 +27,7 @@ export const userSchema = {
   firstName: text("firstName"),
   lastName: text("lastName"),
   email: text("email"),
+  password: text("password"),
   role: text("role").$type<"admin" | "user">(),
 };
 export const usersTable = sqliteTable("users", {

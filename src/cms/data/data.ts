@@ -97,14 +97,14 @@ export async function getRecords(
   customDataFunction = undefined
 ) {
   const cacheStatusValid = await isCacheValid();
-  // console.log("getRecords cacheStatusValid", cacheStatusValid);
+  console.log("getRecords cacheStatusValid", cacheStatusValid);
 
   if (cacheStatusValid) {
     const cacheResult = await getFromInMemoryCache(cacheKey);
-    // console.log("cacheResult", cacheResult);
+    console.log("cacheResult", cacheResult);
     if (cacheResult && cacheResult.length && source == "fastest") {
       const cachedData = cacheResult[0].data;
-      // console.log("**** cachedData ****", cachedData);
+      console.log("**** cachedData ****", cachedData);
 
       return cachedData;
     }
@@ -112,7 +112,7 @@ export async function getRecords(
 
   if (source == "fastest" || source == "kv") {
     const kvData = await getRecordFromKvCache(kv, cacheKey);
-    // console.log("getRecords kvData", kvData);
+    console.log("getRecords kvData", kvData);
 
     if (kvData) {
       return kvData;
@@ -146,7 +146,7 @@ export async function getRecords(
   return { data: d1Data, source: "d1", total };
 }
 
-export async function insertRecord(d1, kv, data) {
+export async function insertRecord(d1, kv, data, skipD1 = false) {
   const content = data;
   const id = uuidv4();
   const timestamp = new Date().getTime();
@@ -154,9 +154,9 @@ export async function insertRecord(d1, kv, data) {
   let error = "";
 
   // console.log("insertRecord", content);
-
+  let result = {};
   try {
-    const result = await saveKVData(kv, id, content.data);
+    result = await saveKVData(kv, id, content.data);
     // console.log('result KV', result);
     // return ctx.json(id, 201);
   } catch (error) {
@@ -164,7 +164,9 @@ export async function insertRecord(d1, kv, data) {
   } finally {
     //then also save the content to sqlite for filtering, sorting, etc
     try {
-      const result = await insertD1Data(d1, kv, content.table, content.data);
+      if (!skipD1) {
+        result = await insertD1Data(d1, kv, content.table, content.data);
+      }
       // console.log("insertD1Data --->", result);
       //expire cache
       await setCacheStatusInvalid();
