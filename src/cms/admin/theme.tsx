@@ -47,16 +47,43 @@ export const Layout = (props: {
           href="https://cdn.form.io/formiojs/formio.full.min.css"
         />
 
-        <link
-          href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css"
-          rel="stylesheet"
-        />
+        <link href="/public/css/gridjs.css" rel="stylesheet" />
 
         <meta name="theme-color" content="#712cf9" />
 
         <link href="/public/css/admin.css" rel="stylesheet" />
       </head>
       <body>
+        <div class="dropdown">
+          <a
+            class="btn btn-secondary dropdown-toggle"
+            href="#"
+            role="button"
+            id="dropdownMenuLink"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            Dropdown link
+          </a>
+
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+            <li>
+              <a class="dropdown-item" href="#">
+                Action
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="#">
+                Another action
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="#">
+                Something else here
+              </a>
+            </li>
+          </ul>
+        </div>
         <div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle">
           <button
             class="btn btn-bd-primary py-2 dropdown-toggle d-flex align-items-center"
