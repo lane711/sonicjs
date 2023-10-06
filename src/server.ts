@@ -23,7 +23,7 @@ app.use(
 );
 
 app.onError((err, c) => {
-  console.error(`${err}`)
+  console.log(`SonicJs Error: ${err}`)
   return c.text('SonicJs Error', 500)
 })
 

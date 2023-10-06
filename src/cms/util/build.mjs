@@ -4,7 +4,7 @@ import { copy } from 'esbuild-plugin-copy';
 // rsync -avzh ./public ./dist --delete && esbuild --bundle --sourcemap src/server.ts --format=esm --watch --outfile=dist/_worker.js
 
 (async () => {
-  console.log('running build.mjs ...')
+  // console.log('running build.mjs ...')
   const res = await build({
     entryPoints: ['./src/server.ts'],
     bundle: true,
@@ -35,5 +35,5 @@ import { copy } from 'esbuild-plugin-copy';
       }),
     ],
   });
-  console.log(res)
+  // console.log(res)
 })();

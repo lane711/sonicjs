@@ -5,7 +5,7 @@
   "main": "src/server.ts",
   "scripts": {
     "dev": "run-p dev:*",
-    "dev:wrangler": "wrangler pages dev dist --live-reload",
+    "dev:wrangler": "wrangler pages dev dist",
     "dev:esbuild": "node ./src/cms/util/build.mjs",
     "build": "node ./src/cms/util/build.mjs",
     "deploy": "wrangler pages deploy dist",
