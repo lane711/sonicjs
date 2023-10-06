@@ -43,31 +43,31 @@ it("get should return single result if id passed in", async () => {
   const { userRecord, categoryRecord, postRecord } =
     await createRelatedTestRecords();
 
-  let req = new Request("http://localhost/v1/example/blog-posts/abc", {
+  let req = new Request(`http://localhost/v1/example/blog-posts/${postRecord.data.id}`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
   });
   let res = await app.fetch(req, env);
   expect(res.status).toBe(200);
   let body = await res.json();
-  expect(body.data.length).toBe(2);
+  expect(body.data.title).toBe('Post One');
+  expect(body.data.category).toBe('Category One');
   expect(body.source).toBe("d1");
-  expect(body.total).toBe(2);
+  expect(body.total).toBe(1);
   expect(body.executionTime).toBeGreaterThan(-1);
 
-
-
   //if we get again, should be cached
-  let req2 = new Request("http://localhost/v1/example/blog-posts", {
+  let req2 = new Request(`http://localhost/v1/example/blog-posts/${postRecord.data.id}`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
   });
-  let res2 = await app.fetch(req, env);
+  let res2 = await app.fetch(req2, env);
   expect(res.status).toBe(200);
   let body2 = await res2.json();
-  expect(body2.data.length).toBe(2);
+  expect(body2.data.category).toBe('Category One');
   expect(body2.source).toBe("cache");
-  expect(body2.total).toBe(2);
+  expect(body2.total).toBe(1);
+  expect(body2.executionTime).toBeGreaterThan(-1);
 });
 
 async function createRelatedTestRecords() {
@@ -121,7 +121,7 @@ async function createRelatedTestRecords() {
     table: "categoriesToPosts",
     data: {
       categoryId: categoryRecord2.data.id,
-      postId: postRecord.data.id,
+      postId: postRecord2.data.id,
     },
   });
 

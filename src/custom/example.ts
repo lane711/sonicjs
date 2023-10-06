@@ -83,21 +83,10 @@ example.get("/blog-posts", async (ctx) => {
   const start = Date.now();
   var params = qs.parse(ctx.req.query());
   const d1 = getD1Binding(ctx);
-  let whereClause = "";
 
   let body = "substr(posts.body, 0, 20) as body";
   let limit = params.limit ? params.limit : 10;
   let offset = params.offset ? params.offset : 0;
-
-  if (id) {
-    whereClause = id ? `where posts.id = "${id}"` : "";
-    body = "posts.body";
-    limit = "";
-    offset = "";
-  } else {
-    limit = `limit ${limit}`;
-    offset = `offset ${offset}`;
-  }
 
   const func = async function () {
     const db = drizzle(d1, { schema });
@@ -107,7 +96,7 @@ example.get("/blog-posts", async (ctx) => {
     posts.id,
     posts.title,
     posts.updatedOn,
-    ${body},
+    substr(posts.body, 0, 20) as body,
     users.firstName || ' ' || users.lastName as author,
     count(comments.id) as commentCount,
     categories.title as category,
@@ -121,11 +110,10 @@ example.get("/blog-posts", async (ctx) => {
     on categoriesToPosts.postId = posts.id
     left join categories
     on categoriesToPosts.categoryId = categories.id
-    ${whereClause}
     group by posts.id
     order by posts.updatedOn desc
-    ${limit}
-    ${offset}
+    limit ${limit}
+    offset ${offset}
     `;
 
     const data = await d1.prepare(sql).all();
@@ -154,36 +142,21 @@ example.get("/blog-posts/:id", async (ctx) => {
   const id = ctx.req.param("id");
   var params = qs.parse(ctx.req.query());
   const d1 = getD1Binding(ctx);
-  let whereClause = "";
 
-  let body = "substr(posts.body, 0, 20) as body";
-  let limit = params.limit ? params.limit : 10;
-  let offset = params.offset ? params.offset : 0;
-
-  if (id) {
-    whereClause = id ? `where posts.id = '${id}'` : "";
-    body = "posts.body";
-    limit = "";
-    offset = "";
-  } else {
-    limit = `limit ${limit}`;
-    offset = `offset ${offset}`;
-  }
+  const table = 'posts';
 
   const func = async function () {
     const db = drizzle(d1, { schema });
 
-    await db.execute(sql`select * from ${usersTable} where ${usersTable.id} = ${id}`)
 
-
-    const data = 
-    await d1.prepare(
-      `
+    const data = await d1
+      .prepare(
+        `
     SELECT
     posts.id,
     posts.title,
     posts.updatedOn,
-    ${body},
+    posts.body,
     users.firstName || ' ' || users.lastName as author,
     count(comments.id) as commentCount,
     categories.title as category,
@@ -197,13 +170,14 @@ example.get("/blog-posts/:id", async (ctx) => {
     on categoriesToPosts.postId = posts.id
     left join categories
     on categoriesToPosts.categoryId = categories.id
-    where posts.id = ${id}
+    where posts.id = '${id}'
     group by posts.id
     order by posts.updatedOn desc
     `
-    ).all();
+      )
+      .all();
 
-    return data.results;
+    return data.results[0];
   };
 
   const data = await getRecords(
