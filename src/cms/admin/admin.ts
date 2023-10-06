@@ -161,6 +161,9 @@ admin.get("/api/:route", async (ctx) => {
       editLink: `<a href="/admin/content/edit/${route}/${
         item.id
       }">${getDisplayField(item)}</a>`,
+      apiLink: `<a target="_blank" href="/v1/${route}/${
+        item.id
+      }">raw <i class="bi bi-box-arrow-up-right ms-2"></i></a>`,
     };
   });
 

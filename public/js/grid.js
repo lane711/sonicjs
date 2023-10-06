@@ -11,6 +11,10 @@ if (gridWrapper) {
         formatter: (dt) =>
           gridjs.html(`<time class="timeSince" datetime="${dt}">${dt}</time>`),
       },
+      {
+        name: "API",
+        formatter: (editPath) => gridjs.html(`${editPath}`),
+      },
     ],
     pagination: {
       limit: 10,
@@ -44,6 +48,7 @@ if (gridWrapper) {
                   data: resp.data.map((record) => [
                     record.editLink,
                     record.updatedOn,
+                    record.apiLink,
                   ]),
                   total: resp.total,
                 });

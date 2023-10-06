@@ -56,6 +56,37 @@ describe("auto endpoints", () => {
     expect(body.data.length).toBe(2);
   });
 
+  it("get single record should return results and 200", async () => {
+    const rec1 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+      firstName: "John",
+      id: "abc",
+    });
+
+    let req = new Request("http://localhost/v1/users/abc", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    let res = await app.fetch(req, env);
+    expect(res.status).toBe(200);
+    let body = await res.json();
+    expect(body.data.firstName).toBe("John");
+    expect(body.total).toBe(1);
+    expect(body.source).toBe('d1');
+
+    //if we get again it should be cached
+    let req2 = new Request("http://localhost/v1/users/abc", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    let res2 = await app.fetch(req, env);
+    expect(res2.status).toBe(200);
+    let body2 = await res2.json();
+    expect(body2.data.firstName).toBe("John");
+    expect(body2.total).toBe(1);
+    expect(body2.source).toBe('cache');
+
+  });
+
   it("post (insert) should return 204", async () => {
     let payload = JSON.stringify({ data: { firstName: "Joe" } });
     let req = new Request("http://localhost/v1/users", {
