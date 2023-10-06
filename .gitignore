@@ -2,3 +2,4 @@ node_modules
 dist
 .wrangler/state
 wrangler.toml
+.vscode
