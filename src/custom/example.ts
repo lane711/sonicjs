@@ -158,9 +158,8 @@ example.get("/blog-posts/:id", async (ctx) => {
     posts.updatedOn,
     posts.body,
     users.firstName || ' ' || users.lastName as author,
-    count(comments.id) as commentCount,
-    categories.title as category,
-    COUNT() OVER() as total
+    group_concat(comments.id, ',') as comments,
+    categories.title as category
     FROM posts
     left join users
     on posts.userid = users.id
@@ -171,13 +170,15 @@ example.get("/blog-posts/:id", async (ctx) => {
     left join categories
     on categoriesToPosts.categoryId = categories.id
     where posts.id = '${id}'
-    group by posts.id
-    order by posts.updatedOn desc
     `
       )
       .all();
 
-    return data.results[0];
+      const post = data.results[0];
+
+      post.comments = post.comments.split(',');
+
+    return post;
   };
 
   const data = await getRecords(
