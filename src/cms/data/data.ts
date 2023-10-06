@@ -125,6 +125,8 @@ export async function getRecords(
     d1Data = await customDataFunction();
     if (d1Data && d1Data[0]) {
       total = d1Data[0].total;
+    } else if (Object.keys(d1Data).length) {
+      total = 1;
     }
   } else {
     if (params && params.id) {
