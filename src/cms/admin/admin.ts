@@ -153,7 +153,7 @@ admin.get("/api/:route", async (ctx) => {
     "fastest"
   );
 
-  console.log("===> records", records);
+  // console.log("===> records", records);
 
   const data = records.data.map((item) => {
     return {
@@ -166,7 +166,7 @@ admin.get("/api/:route", async (ctx) => {
     };
   });
 
-  console.log("===> data", data);
+  // console.log("===> data", data);
 
   const end = Date.now();
   const executionTime = end - start;
