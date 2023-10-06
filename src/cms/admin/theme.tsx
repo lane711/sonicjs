@@ -47,10 +47,7 @@ export const Layout = (props: {
           href="https://cdn.form.io/formiojs/formio.full.min.css"
         />
 
-        <link
-          href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css"
-          rel="stylesheet"
-        />
+        <link href="/public/css/gridjs.css" rel="stylesheet" />
 
         <meta name="theme-color" content="#712cf9" />
 

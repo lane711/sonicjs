@@ -161,6 +161,52 @@ it("getRecords can accept custom function for retrieval of data", async () => {
   expect(result.data.foo).toBe("bar");
 });
 
+it("getRecords should return single record if if passed in", async () => {
+  //start with a clear cache
+  await clearInMemoryCache();
+  await clearKVCache(KVDATA);
+
+  const urlKey = "http://localhost:8888/some-cache-key-url";
+
+  const db = createTestTable();
+
+  const rec1 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+    firstName: "John",
+    id: "abc",
+  });
+
+
+  const result = await getRecords(
+    env.__D1_BETA__D1DATA,
+    env.KVDATA,
+    "users",
+    {id:"abc"},
+    urlKey,
+    "fastest",
+    undefined
+  );
+
+  expect(result.data.firstName).toBe("John");
+  expect(result.total).toBe(1);
+  expect(result.source).toBe('d1');
+
+  //if we get again it should be cached
+  const cachedResult = await getRecords(
+    env.__D1_BETA__D1DATA,
+    env.KVDATA,
+    "users",
+    {id:"abc"},
+    urlKey,
+    "fastest",
+    undefined
+  );
+
+  expect(cachedResult.data.firstName).toBe("John");
+  expect(cachedResult.total).toBe(1);
+  expect(cachedResult.source).toBe('cache');
+
+});
+
 function createTestTable() {
   const db = drizzle(__D1_BETA__D1DATA);
 
