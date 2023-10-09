@@ -2,6 +2,9 @@ import { Hono } from "hono";
 import { Bindings } from "../types/bindings";
 import { getD1DataByTable } from "../data/d1-data";
 import { getById } from "../data/kv-data";
+import axios from "axios";
+import { datadogLogs } from "@datadog/browser-logs";
+import { log } from "../util/logger";
 
 const status = new Hono<{ Bindings: Bindings }>();
 
@@ -39,7 +42,7 @@ status.get("/", async (ctx) => {
     status.kv = "error: " + error;
   }
 
-    //env
+  //env
   try {
     status.env = ctx.env;
   } catch (error) {
@@ -47,6 +50,12 @@ status.get("/", async (ctx) => {
   }
 
   return ctx.json(status);
+});
+
+status.get("/log", async (ctx) => {
+  log(ctx, { level: "error", messaage: "test from the logger 2" });
+
+  return ctx.json({ ok: "ok" });
 });
 
 export { status };

@@ -6,6 +6,7 @@ import { Bindings } from "./cms/types/bindings";
 import { admin } from "./cms/admin/admin";
 import { example } from "./custom/example";
 import { status } from "./cms/api/status";
+import { log } from "./cms/util/logger";
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -22,10 +23,12 @@ app.use(
   })
 );
 
-app.onError((err, c) => {
-  console.log(`SonicJs Error: ${err}`)
-  return c.text('SonicJs Error', 500)
-})
+app.onError((err, ctx) => {
+  console.log(`SonicJs Error: ${err}`);
+  log(ctx, { level: "error", message: err });
+
+  return ctx.text("SonicJs Error", 500);
+});
 
 app.get("/", async (ctx) => {
   return ctx.redirect("/admin");
