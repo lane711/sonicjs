@@ -44,7 +44,14 @@ status.get("/", async (ctx) => {
 
   //env
   try {
-    status.env = ctx.env;
+    // status.env = ctx.env;
+    var safeOutput = {};
+    for (var prop in ctx.env) {
+      if (Object.prototype.hasOwnProperty.call(ctx.env, prop)) {
+        safeOutput[prop] = '[redacted]'
+      }
+      status.env = safeOutput;
+  }
   } catch (error) {
     status.env = "error: " + error;
   }

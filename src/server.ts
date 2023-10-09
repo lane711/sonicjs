@@ -23,6 +23,14 @@ app.use(
   })
 );
 
+//request Logging
+// app.use("*", async (ctx, next) => {
+//   if (ctx.req.path.indexOf("/admin") > -1 || ctx.req.path.indexOf("/v1") > -1) {
+//     log(ctx, { level: "info", method: ctx.req.method, url: ctx.req.path });
+//   }
+//   await next();
+// });
+
 app.onError((err, ctx) => {
   console.log(`SonicJs Error: ${err}`);
   log(ctx, { level: "error", message: err });
