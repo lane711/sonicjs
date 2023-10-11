@@ -17,9 +17,10 @@ status.get("/", async (ctx) => {
   //D1
   try {
     const { results } = await ctx.env.D1DATA.prepare(
-      "SELECT * FROM users"
+      "SELECT name, type, sql FROM sqlite_schema WHERE type IN ('index');"
     ).all();
     status.d1 = "ok";
+    status.d1_indexes = results;
   } catch (error) {
     status.d1 = "error: " + error;
   }

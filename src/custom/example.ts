@@ -84,7 +84,6 @@ example.get("/blog-posts", async (ctx) => {
   var params = qs.parse(ctx.req.query());
   const d1 = getD1Binding(ctx);
 
-  let body = "substr(posts.body, 0, 20) as body";
   let limit = params.limit ? params.limit : 10;
   let offset = params.offset ? params.offset : 0;
 
@@ -102,13 +101,13 @@ example.get("/blog-posts", async (ctx) => {
     categories.title as category,
     COUNT() OVER() as total
     FROM posts
-    left join users
+    left outer join users
     on posts.userid = users.id
     left outer join comments
     on comments.postId = posts.id
     left outer join categoriesToPosts
     on categoriesToPosts.postId = posts.id
-    left join categories
+    left outer join categories
     on categoriesToPosts.categoryId = categories.id
     group by posts.id
     order by posts.updatedOn desc
@@ -162,13 +161,13 @@ example.get("/blog-posts/:id", async (ctx) => {
     group_concat(comments.id, ',') as comments,
     categories.title as category
     FROM posts
-    left join users
+    left outer join users
     on posts.userid = users.id
     left outer join comments
     on comments.postId = posts.id
     left outer join categoriesToPosts
     on categoriesToPosts.postId = posts.id
-    left join categories
+    left outer join categories
     on categoriesToPosts.categoryId = categories.id
     where posts.id = '${id}'
     `
