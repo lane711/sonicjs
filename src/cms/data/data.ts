@@ -32,6 +32,7 @@ import {
   insertD1Data,
   updateD1Data,
 } from "./d1-data";
+import { log } from "../util/logger";
 
 // export async function getRecordOld(d1, kv, id) {
 //   const cacheKey = addCachePrefix(id);
@@ -94,13 +95,30 @@ export async function getRecords(
   params,
   cacheKey,
   source = "fastest",
-  customDataFunction = undefined
+  customDataFunction = undefined,
+  ctx = {}
 ) {
+  log(ctx, { level: "verbose", message: "getRecords start", cacheKey });
   const cacheStatusValid = await isCacheValid();
   // console.log("getRecords cacheStatusValid", cacheStatusValid);
+  log(ctx, {
+    level: "verbose",
+    message: `getRecords cacheStatusValid:${cacheStatusValid}`,
+  });
 
   if (cacheStatusValid) {
+    log(ctx, {
+      level: "verbose",
+      message: "getRecords getFromInMemoryCache start",
+    });
     const cacheResult = await getFromInMemoryCache(cacheKey);
+    log(ctx, {
+      level: "verbose",
+      message: `getRecords getFromInMemoryCache end. cacheResult:${
+        cacheResult && cacheResult.length
+      }`,
+    });
+
     // console.log("cacheResult", cacheResult);
     if (cacheResult && cacheResult.length && source == "fastest") {
       const cachedData = cacheResult[0].data;
@@ -111,8 +129,17 @@ export async function getRecords(
   }
 
   if (source == "fastest" || source == "kv") {
+    log(ctx, {
+      level: "verbose",
+      message: "getRecords getRecordFromKvCache start",
+    });
     const kvData = await getRecordFromKvCache(kv, cacheKey);
-    // console.log("getRecords kvData", kvData);
+    log(ctx, {
+      level: "verbose",
+      message: `getRecords getRecordFromKvCache end. kvData:${
+        kvData && kvData.length
+      }`,
+    });
 
     if (kvData) {
       return kvData;
@@ -123,18 +150,42 @@ export async function getRecords(
   let total = 0;
 
   if (customDataFunction) {
+    log(ctx, {
+      level: "verbose",
+      message: "getRecords customDataFunction start",
+    });
     d1Data = await customDataFunction();
     if (d1Data && d1Data[0]) {
       total = d1Data[0].total;
     } else if (Object.keys(d1Data).length) {
       total = 1;
     }
+    log(ctx, {
+      level: "verbose",
+      message: "getRecords customDataFunction end",
+    });
   } else {
     if (params && params.id) {
+      log(ctx, {
+        level: "verbose",
+        message: "getRecords getD1ByTableAndId start",
+      });
       d1Data = await getD1ByTableAndId(d1, table, params.id);
+      log(ctx, {
+        level: "verbose",
+        message: "getRecords getD1ByTableAndId end",
+      });
       total = d1Data ? 1 : 0;
     } else {
+      log(ctx, {
+        level: "verbose",
+        message: "getRecords getD1DataByTable start",
+      });
       d1Data = await getD1DataByTable(d1, table, params);
+      log(ctx, {
+        level: "verbose",
+        message: "getRecords getD1DataByTable end",
+      });
     }
   }
 
@@ -142,9 +193,27 @@ export async function getRecords(
     total = d1Data[0].total;
   }
 
+  log(ctx, {
+    level: "verbose",
+    message: "getRecords addToInMemoryCache start",
+  });
   addToInMemoryCache(cacheKey, { data: d1Data, source: "cache", total });
-  addToKvCache(kv, cacheKey, { data: d1Data, source: "kv", total });
+  log(ctx, {
+    level: "verbose",
+    message: "getRecords addToInMemoryCache end",
+  });
 
+  log(ctx, {
+    level: "verbose",
+    message: "getRecords addToKvCache start",
+  });
+  addToKvCache(kv, cacheKey, { data: d1Data, source: "kv", total });
+  log(ctx, {
+    level: "verbose",
+    message: "getRecords addToKvCache end",
+  });
+
+  log(ctx, { level: "verbose", message: "getRecords end", cacheKey });
   return { data: d1Data, source: "d1", total };
 }
 

@@ -128,7 +128,8 @@ example.get("/blog-posts", async (ctx) => {
     params,
     ctx.req.url,
     "fastest",
-    func
+    func,
+    ctx
   );
 
   const end = Date.now();

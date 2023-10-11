@@ -15,7 +15,6 @@ app.use(
   "/v1/*",
   cors({
     origin: (origin) => {
-      console.log("origin", origin);
       return origin.indexOf("localhost") > 0 || origin.endsWith(".sonicjs.com")
         ? origin
         : "https://sonicjs.com";
