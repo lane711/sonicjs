@@ -149,7 +149,9 @@ admin.get("/api/:route", async (ctx) => {
     table,
     params,
     ctx.req.url,
-    "fastest"
+    "fastest",
+    undefined,
+    ctx
   );
 
   // console.log('===> records', records)
