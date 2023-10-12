@@ -227,9 +227,10 @@ example.get("/blog-posts3", async (ctx) => {
     group by posts.id
     order by posts.updatedOn desc
     limit 10
-    offset 0
+    offset ?
     `
     )
+    .bind(offset)
     .all();
 
   results.source = "d1";
