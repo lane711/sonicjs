@@ -67,7 +67,7 @@ admin.get("/cache/kv", async (ctx) => {
 admin.get("/cache/kv/:id", async (ctx) => {
   const id = ctx.req.param("id");
   const idDecoded = decodeURIComponent(id);
-  console.log('idDecoded', idDecoded)
+  console.log("idDecoded", idDecoded);
   const kv = await getRecordFromKvCache(ctx.env.KVDATA, idDecoded, true);
   return ctx.html(await loadKVCacheDetail(ctx, kv));
 });
@@ -149,23 +149,30 @@ admin.get("/api/:route", async (ctx) => {
     table,
     params,
     ctx.req.url,
-    "fastest",
-    undefined,
-    ctx
+    "fastest"
   );
 
   // console.log('===> records', records)
 
   const data = records.data.map((item) => {
+    const deleteButton = `
+      <button data-delete-id="${item.id}" class="btn btn-link delete-btn text-white">
+        <i class="bi bi-trash"></i>
+      </button>
+    `;
+
+    const editButton = `
+      <a href="/admin/content/edit/${route}/${item.id}" class="text-decoration-none">
+        <i class="bi bi-pencil"></i>
+      </a>
+    `;
+
     return {
       id: item.id,
       updatedOn: format(item.updatedOn, "MM/dd/yyyy h:mm b"),
-      editLink: `<a href="/admin/content/edit/${route}/${
-        item.id
-      }">${getDisplayField(item)}</a>`,
-      apiLink: `<a target="_blank" href="/v1/${route}/${
-        item.id
-      }">raw <i class="bi bi-box-arrow-up-right ms-2"></i></a>`,
+      displayValue: `<span>${getDisplayField(item)}</span>`,
+      apiLink: `<a target="_blank" href="/v1/${route}/${item.id}">raw <i class="bi bi-box-arrow-up-right ms-2"></i></a>`,
+      actionButtons: `<div class="action-buttons">${editButton} ${deleteButton}</div>`,
     };
   });
 
