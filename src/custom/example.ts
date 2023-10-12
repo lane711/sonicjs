@@ -79,7 +79,7 @@ example.get("/blog-posts-orm", async (ctx) => {
   return ctx.json({ ...data, executionTime });
 });
 
-example.get("/blog-posts", async (ctx) => {
+example.get("/blog-posts-old", async (ctx) => {
   const start = Date.now();
   var params = qs.parse(ctx.req.query());
   const d1 = getD1Binding(ctx);
@@ -195,7 +195,7 @@ example.get("/blog-posts2", async (ctx) => {
   return ctx.json({ ...data, executionTime });
 });
 
-example.get("/blog-posts3", async (ctx) => {
+example.get("/blog-posts", async (ctx) => {
   const start = Date.now();
   var params = qs.parse(ctx.req.query());
   const d1 = getD1Binding(ctx);
@@ -233,12 +233,12 @@ example.get("/blog-posts3", async (ctx) => {
     .bind(offset)
     .all();
 
-  results.source = "d1";
+const total = results[0].total;
 
   const end = Date.now();
   const executionTime = end - start;
 
-  return ctx.json({ ...results, executionTime });
+  return ctx.json({ data: results, executionTime, source: "d1", total });
 });
 
 example.get("/blog-posts/:id", async (ctx) => {
