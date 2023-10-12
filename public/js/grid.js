@@ -4,7 +4,7 @@ if (gridWrapper) {
     columns: [
       {
         name: "Record",
-        formatter: (editPath) => gridjs.html(`${editPath}`),
+        formatter: (displayValue) => gridjs.html(`${displayValue}`),
       },
       {
         name: "Updated",
@@ -14,6 +14,10 @@ if (gridWrapper) {
       {
         name: "API",
         formatter: (editPath) => gridjs.html(`${editPath}`),
+      },
+      {
+        name: "Actions",
+        formatter: (actionButtons) => gridjs.html(`${actionButtons}`),
       },
     ],
     pagination: {
@@ -46,9 +50,10 @@ if (gridWrapper) {
                 $("#executionTime span.clientTime").text(clientExecutionTime);
                 resolve({
                   data: resp.data.map((record) => [
-                    record.editLink,
+                    record.displayValue,
                     record.updatedOn,
                     record.apiLink,
+                    record.actionButtons,
                   ]),
                   total: resp.total,
                 });
@@ -63,6 +68,34 @@ if (gridWrapper) {
       },
     },
   }).render(gridWrapper);
+
+  function deleteItem(itemId) {
+    const basePath = `${window.location.protocol}//${window.location.host}`;
+    const endpoint = `${basePath}/v1/users/${itemId}`;
+
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("DELETE", endpoint, true);
+    xhttp.onreadystatechange = function () {
+      if (this.readyState === 4 && this.status === 204) {
+        window.location.reload();
+      } else if (this.readyState === 4) {
+        console.error("Error deleting the item:", this.responseText);
+      }
+    };
+    xhttp.send();
+  }
+
+  gridWrapper.addEventListener("click", function (e) {
+    if (e.target.closest(".delete-btn")) {
+      const itemId = e.target
+        .closest(".delete-btn")
+        .getAttribute("data-delete-id");
+      const userResponse = window.confirm(
+        "Do you really want to delete this item?"
+      );
+      if (userResponse) deleteItem(itemId);
+    }
+  });
 }
 
 // $(document).on(".timeSince", function () {
