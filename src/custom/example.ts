@@ -137,17 +137,74 @@ example.get("/blog-posts", async (ctx) => {
   return ctx.json({ ...data, executionTime });
 });
 
+example.get("/blog-posts2", async (ctx) => {
+  const start = Date.now();
+  var params = qs.parse(ctx.req.query());
+  const d1 = getD1Binding(ctx);
+
+  let limit = params.limit ? params.limit : 10;
+  let offset = params.offset ? params.offset : 0;
+
+  const func = async function () {
+    const { results } = await d1
+      .prepare(
+        `
+    SELECT
+    posts.id,
+    posts.title,
+    posts.updatedOn,
+    substr(posts.body, 0, 20) as body,
+    users.firstName || ' ' || users.lastName as author,
+    count(comments.id) as commentCount,
+    categories.title as category,
+    COUNT() OVER() as total
+    FROM posts
+    left outer join users
+    on posts.userid = users.id
+    left outer join comments
+    on comments.postId = posts.id
+    left outer join categoriesToPosts
+    on categoriesToPosts.postId = posts.id
+    left outer join categories
+    on categoriesToPosts.categoryId = categories.id
+    group by posts.id
+    order by posts.updatedOn desc
+    limit 10
+    offset 0
+    `
+      )
+      .all();
+
+    return results;
+  };
+
+  const data = await getRecords(
+    ctx.env.D1DATA,
+    ctx.env.KVDATA,
+    "custom",
+    params,
+    ctx.req.url,
+    "fastest",
+    func,
+    ctx
+  );
+
+  const end = Date.now();
+  const executionTime = end - start;
+
+  return ctx.json({ ...data, executionTime });
+});
+
 example.get("/blog-posts/:id", async (ctx) => {
   const start = Date.now();
   const id = ctx.req.param("id");
   var params = qs.parse(ctx.req.query());
   const d1 = getD1Binding(ctx);
 
-  const table = 'posts';
+  const table = "posts";
 
   const func = async function () {
     const db = drizzle(d1, { schema });
-
 
     const data = await d1
       .prepare(
@@ -174,9 +231,9 @@ example.get("/blog-posts/:id", async (ctx) => {
       )
       .all();
 
-      const post = data.results[0];
+    const post = data.results[0];
 
-      post.comments = post.comments.split(',');
+    post.comments = post.comments.split(",");
 
     return post;
   };
