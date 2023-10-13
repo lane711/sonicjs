@@ -73,13 +73,18 @@ apiConfig.forEach((entry) => {
     params.id = id;
     const d1 = getD1Binding(ctx);
 
+    let source = "fastest";
+    if (includeContentType !== undefined) {
+      source = "d1";
+    }
+
     const data = await getRecords(
       d1,
       ctx.env.KVDATA,
       entry.table,
       params,
       ctx.req.url,
-      "fastest",
+      source,
       undefined,
       ctx
     );
@@ -160,7 +165,7 @@ apiConfig.forEach((entry) => {
       table,
       { id },
       ctx.req.path,
-      'fastest',
+      "fastest",
       undefined,
       ctx
     );

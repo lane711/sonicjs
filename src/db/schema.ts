@@ -84,7 +84,7 @@ export const commentsTable = sqliteTable(
   (table) => {
     return {
       userIdIndex: index("commentsUserIdIndex").on(table.userId),
-      postIdIndex: index("commentsPostIdIndex").on(table.userId),
+      postIdIndex: index("commentsPostIdIndex").on(table.postId),
     };
   }
 );

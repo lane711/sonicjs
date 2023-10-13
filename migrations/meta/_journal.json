@@ -15,6 +15,13 @@
       "when": 1696889283545,
       "tag": "0001_sudden_newton_destine",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1697168652266,
+      "tag": "0002_lovely_gladiator",
+      "breakpoints": true
     }
   ]
 }

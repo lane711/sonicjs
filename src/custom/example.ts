@@ -79,65 +79,7 @@ example.get("/blog-posts-orm", async (ctx) => {
   return ctx.json({ ...data, executionTime });
 });
 
-example.get("/blog-posts-old", async (ctx) => {
-  const start = Date.now();
-  var params = qs.parse(ctx.req.query());
-  const d1 = getD1Binding(ctx);
-
-  let limit = params.limit ? params.limit : 10;
-  let offset = params.offset ? params.offset : 0;
-
-  const func = async function () {
-    const db = drizzle(d1, { schema });
-
-    const sql = `
-    SELECT
-    posts.id,
-    posts.title,
-    posts.updatedOn,
-    substr(posts.body, 0, 20) as body,
-    users.firstName || ' ' || users.lastName as author,
-    count(comments.id) as commentCount,
-    categories.title as category,
-    COUNT() OVER() as total
-    FROM posts
-    left outer join users
-    on posts.userid = users.id
-    left outer join comments
-    on comments.postId = posts.id
-    left outer join categoriesToPosts
-    on categoriesToPosts.postId = posts.id
-    left outer join categories
-    on categoriesToPosts.categoryId = categories.id
-    group by posts.id
-    order by posts.updatedOn desc
-    limit ${limit}
-    offset ${offset}
-    `;
-
-    const data = await d1.prepare(sql).all();
-
-    return data.results;
-  };
-
-  const data = await getRecords(
-    ctx.env.D1DATA,
-    ctx.env.KVDATA,
-    "custom",
-    params,
-    ctx.req.url,
-    "fastest",
-    func,
-    ctx
-  );
-
-  const end = Date.now();
-  const executionTime = end - start;
-
-  return ctx.json({ ...data, executionTime });
-});
-
-example.get("/blog-posts2", async (ctx) => {
+example.get("/blog-posts", async (ctx) => {
   const start = Date.now();
   var params = qs.parse(ctx.req.query());
   const d1 = getD1Binding(ctx);
@@ -170,9 +112,10 @@ example.get("/blog-posts2", async (ctx) => {
     group by posts.id
     order by posts.updatedOn desc
     limit 10
-    offset 0
+    offset ?
     `
       )
+      .bind(offset)
       .all();
 
     return results;
@@ -195,7 +138,7 @@ example.get("/blog-posts2", async (ctx) => {
   return ctx.json({ ...data, executionTime });
 });
 
-example.get("/blog-posts", async (ctx) => {
+example.get("/blog-posts-d1", async (ctx) => {
   const start = Date.now();
   var params = qs.parse(ctx.req.query());
   const d1 = getD1Binding(ctx);
@@ -233,7 +176,7 @@ example.get("/blog-posts", async (ctx) => {
     .bind(offset)
     .all();
 
-const total = results[0].total;
+  const total = results[0].total;
 
   const end = Date.now();
   const executionTime = end - start;
@@ -250,7 +193,7 @@ example.get("/blog-posts/:id", async (ctx) => {
   const table = "posts";
 
   const func = async function () {
-    const db = drizzle(d1, { schema });
+    // const db = drizzle(d1, { schema });
 
     const data = await d1
       .prepare(
