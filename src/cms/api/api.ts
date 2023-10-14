@@ -48,7 +48,9 @@ apiConfig.forEach((entry) => {
         entry.table,
         params,
         ctx.req.url,
-        "fastest"
+        "fastest",
+        undefined,
+        ctx
       );
 
       const end = Date.now();
@@ -71,13 +73,20 @@ apiConfig.forEach((entry) => {
     params.id = id;
     const d1 = getD1Binding(ctx);
 
+    let source = "fastest";
+    if (includeContentType !== undefined) {
+      source = "d1";
+    }
+
     const data = await getRecords(
       d1,
       ctx.env.KVDATA,
       entry.table,
       params,
       ctx.req.url,
-      "fastest"
+      source,
+      undefined,
+      ctx
     );
 
     if (includeContentType !== undefined) {
@@ -159,7 +168,10 @@ apiConfig.forEach((entry) => {
       ctx.env.KVDATA,
       table,
       { id },
-      ctx.req.path
+      ctx.req.path,
+      "fastest",
+      undefined,
+      ctx
     );
 
     console.log("delete content " + JSON.stringify(record, null, 2));

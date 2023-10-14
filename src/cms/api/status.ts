@@ -2,6 +2,9 @@ import { Hono } from "hono";
 import { Bindings } from "../types/bindings";
 import { getD1DataByTable } from "../data/d1-data";
 import { getById } from "../data/kv-data";
+import axios from "axios";
+import { datadogLogs } from "@datadog/browser-logs";
+import { log } from "../util/logger";
 
 const status = new Hono<{ Bindings: Bindings }>();
 
@@ -14,9 +17,10 @@ status.get("/", async (ctx) => {
   //D1
   try {
     const { results } = await ctx.env.D1DATA.prepare(
-      "SELECT * FROM users"
+      "SELECT name, type, sql FROM sqlite_schema WHERE type IN ('index');"
     ).all();
     status.d1 = "ok";
+    status.d1_indexes = results;
   } catch (error) {
     status.d1 = "error: " + error;
   }
@@ -39,14 +43,27 @@ status.get("/", async (ctx) => {
     status.kv = "error: " + error;
   }
 
-    //env
+  //env
   try {
-    status.env = ctx.env;
+    // status.env = ctx.env;
+    var safeOutput = {};
+    for (var prop in ctx.env) {
+      if (Object.prototype.hasOwnProperty.call(ctx.env, prop)) {
+        safeOutput[prop] = '[redacted]'
+      }
+      status.env = safeOutput;
+  }
   } catch (error) {
     status.env = "error: " + error;
   }
 
   return ctx.json(status);
+});
+
+status.get("/log", async (ctx) => {
+  log(ctx, { level: "error", messaage: "test from the logger 2" });
+
+  return ctx.json({ ok: "ok" });
 });
 
 export { status };

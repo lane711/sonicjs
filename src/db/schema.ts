@@ -71,10 +71,18 @@ export const postSchema = {
   body: text("body"),
   userId: text("userId"),
 };
-export const postsTable = sqliteTable("posts", {
-  ...postSchema,
-  ...auditSchema,
-});
+export const postsTable = sqliteTable(
+  "posts",
+  {
+    ...postSchema,
+    ...auditSchema,
+  },
+  (table) => {
+    return {
+      userIdIndex: index("postUserIdIndex").on(table.userId),
+    };
+  }
+);
 
 // categories
 export const categorySchema = {
@@ -95,12 +103,21 @@ export const commentSchema = {
   postId: integer("postId"),
 };
 
-export const commentsTable = sqliteTable("comments", {
-  ...commentSchema,
-  ...auditSchema,
-});
+export const commentsTable = sqliteTable(
+  "comments",
+  {
+    ...commentSchema,
+    ...auditSchema,
+  },
+  (table) => {
+    return {
+      userIdIndex: index("commentsUserIdIndex").on(table.userId),
+      postIdIndex: index("commentsPostIdIndex").on(table.postId),
+    };
+  }
+);
 
-//posts to categories
+//posts to categories (many to many)
 export const categoriesToPostsSchema = {
   id: text("id").notNull(),
   postId: text("postId")
@@ -117,8 +134,8 @@ export const categoriesToPostsTable = sqliteTable(
     ...categoriesToPostsSchema,
     ...auditSchema,
   },
-  (t) => ({
-    pk: primaryKey(t.postId, t.categoryId),
+  (table) => ({
+    pk: primaryKey(table.postId, table.categoryId),
   })
 );
 /*

@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "6b3c1b48-9e65-4071-9131-4bec27f8bd35",
-  "prevId": "e692cc84-7949-4508-9f51-22941e188aa5",
+  "id": "48045afa-3181-4647-bbac-023365f51839",
+  "prevId": "6b3c1b48-9e65-4071-9131-4bec27f8bd35",
   "tables": {
     "categories": {
       "name": "categories",
@@ -183,7 +183,7 @@
         "commentsPostIdIndex": {
           "name": "commentsPostIdIndex",
           "columns": [
-            "userId"
+            "postId"
           ],
           "isUnique": false
         }

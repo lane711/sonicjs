@@ -8,5 +8,10 @@ describe('Test the status url', () => {
     expect(res.status).toBe(200)
   })
 
+  it('log should return 200', async () => {
+    const res = await app.request('http://localhost/status/log')
+    expect(res.status).toBe(200)
+  })
+
 
 })
