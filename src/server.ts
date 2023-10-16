@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 
 import { api } from "./cms/api/api";
+import { authAPI } from "./cms/api/auth";
 import { Bindings } from "./cms/types/bindings";
 import { admin } from "./cms/admin/admin";
 import { example } from "./custom/example";
@@ -13,6 +14,17 @@ const app = new Hono<{ Bindings: Bindings }>();
 //CORS
 app.use(
   "/v1/*",
+  cors({
+    origin: (origin) => {
+      return origin.indexOf("localhost") > 0 || origin.endsWith(".sonicjs.com")
+        ? origin
+        : "https://sonicjs.com";
+    },
+  })
+);
+
+app.use(
+  "/v1/auth/*",
   cors({
     origin: (origin) => {
       return origin.indexOf("localhost") > 0 || origin.endsWith(".sonicjs.com")
@@ -46,6 +58,7 @@ app.get("/public/*", async (ctx) => {
 });
 
 app.route("/v1", api);
+app.route("/v1/auth", authAPI);
 app.route("/admin", admin);
 app.route("v1/example", example);
 app.route("/status", status);

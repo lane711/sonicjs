@@ -7,7 +7,9 @@ import { Context } from "hono";
 import { getD1Binding } from "./util/d1-binding";
 import { insertRecord } from "./data/data";
 import { prepareD1Data } from "./data/d1-data";
+import { saveKVData } from "./data/kv-data";
 
+import { v4 as uuidv4 } from "uuid";
 export const initializeLucia = (db: D1Database, env) => {
   const auth = lucia({
     env: env.ENVIRONMENT === "development" ? "DEV" : "PROD", // "PROD" if deployed to HTTPS,
@@ -47,9 +49,10 @@ export async function createUser<T extends string>(args: LuciaAPIArgs<T>) {
   const email = content.data?.email;
   const password = content.data?.password;
   delete content.data?.password;
-  const recordResult = await insertRecord(d1, kv, content, true);
+  const id = uuidv4();
+  content.data.id = id;
+  // await saveKVData(kv, id, content.data);
   const d1Data = prepareD1Data(content.data);
-  console.log({ recordResult });
   if (typeof email !== "string" || !email?.includes("@")) {
     return ctx.text("invalid email", 400);
   } else if (
@@ -57,7 +60,6 @@ export async function createUser<T extends string>(args: LuciaAPIArgs<T>) {
     password.length < 8 ||
     password.length > 255
   ) {
-    console.log({ password });
     return ctx.text("invalid password", 400);
   }
 

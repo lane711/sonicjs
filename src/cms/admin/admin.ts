@@ -45,6 +45,14 @@ admin.get("/content/new/:route", async (ctx) => {
   return ctx.html(await loadNewContent(ctx, route));
 });
 
+admin.get("/content/new/auth/users", async (ctx) => {
+  return ctx.html(await loadNewContent(ctx, "users"));
+});
+
+admin.get("/tables/auth/users", async (ctx) => {
+  return ctx.html(await loadTableData(ctx, "users"));
+});
+
 admin.get("/tables/:route", async (ctx) => {
   const route = ctx.req.param("route");
   return ctx.html(await loadTableData(ctx, route));

@@ -1,6 +1,7 @@
 //        Formio.builder(document.getElementById('builder'), {}, {});
 var contentTypeComponents;
 var route;
+let mode;
 
 (function () {
   const url = window.location.href;
@@ -8,16 +9,17 @@ var route;
   const params = url.split("/");
   route = window.location.href.split("/").pop();
 
-  var mode;
-
-  if (url.indexOf("admin/content/new") > 0) {
+  console.log({ url });
+  const authNew = url.includes("/auth/users");
+  if (authNew) {
+    mode = "auth:new";
+    route = "users";
+  } else if (url.indexOf("admin/content/new") > 0) {
     mode = "new";
-  }
-
-  if (url.indexOf("admin/content/edit") > 0) {
+  } else if (url.indexOf("admin/content/edit") > 0) {
     mode = "edit";
   }
-
+  console.log("mode", mode);
   if (!mode) {
     return;
   }
@@ -26,7 +28,7 @@ var route;
     editContent();
   }
 
-  if (mode == "new") {
+  if (mode.includes("new")) {
     newContent();
   }
 })();
@@ -65,7 +67,9 @@ function saveNewContent(data) {
   delete data.data.id;
   console.log(data);
 
-  axios.post(`/v1/${route}`, data).then((response) => {
+  const path = mode.includes("auth") ? "/v1/auth/users" : `/v1/${route}`;
+  console.log({ path });
+  axios.post(path, data).then((response) => {
     console.log(response.data);
     console.log(response.status);
     console.log(response.statusText);

@@ -68,7 +68,9 @@ export async function loadTableData(ctx, route) {
   // await saveKVData(ctx.env.KVDATA, 'site1', 'content', {title: '20230508a'});
   // console.log("loadTableData==>", route);
   const table = apiConfig.find((entry) => entry.route === route).table;
-
+  if (ctx._path?.includes("auth")) {
+    route = `auth/${route}`;
+  }
   // const results = await getD1DataByTable(ctx.env.D1DATA, table, undefined);
 
   // results.reverse();
@@ -375,7 +377,7 @@ export const TopContentTable = (props: { table: string; route: string }) => {
               New {props.table} record
             </a>
           </div>
-          <div id="grid" data-route={props.route}></div>
+          <div id="grid" data-route={props.table}></div>
           <div id="executionTime" class="p-4 text-center text-muted hide">
             Data Retrieval - <b>Server</b>: <span class="serverTime"></span>ms,{" "}
             <b>Client</b>: <span class="clientTime"></span>ms. <b>Source</b>:{" "}

@@ -1,4 +1,4 @@
-import { ApiConfig, apiConfig } from "../../db/schema";
+import { ApiConfig, apiConfig, usePasswordAuth } from "../../db/schema";
 import {
   getById,
   getContentType,
@@ -172,6 +172,14 @@ export const Layout = (props: {
                       </li>
                     );
                   })}
+                  <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>Auth</span>
+                  </h6>
+                  <li class="nav-item">
+                    <a class="nav-link" href={"/admin/tables/auth/users"}>
+                      Users
+                    </a>
+                  </li>
                   <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                     <span>Cache</span>
                   </h6>

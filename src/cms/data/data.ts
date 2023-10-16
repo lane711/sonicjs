@@ -216,7 +216,7 @@ export async function getRecords(
   return { data: d1Data, source: "d1", total };
 }
 
-export async function insertRecord(d1, kv, data, skipD1 = false) {
+export async function insertRecord(d1, kv, data) {
   const content = data;
   const id = uuidv4();
   const timestamp = new Date().getTime();
@@ -234,9 +234,7 @@ export async function insertRecord(d1, kv, data, skipD1 = false) {
   } finally {
     //then also save the content to sqlite for filtering, sorting, etc
     try {
-      if (!skipD1) {
-        result = await insertD1Data(d1, kv, content.table, content.data);
-      }
+      result = await insertD1Data(d1, kv, content.table, content.data);
       // console.log("insertD1Data --->", result);
       //expire cache
       await setCacheStatusInvalid();

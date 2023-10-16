@@ -6,6 +6,7 @@ import {
   index,
   primaryKey,
   int,
+  AnySQLiteColumnBuilder,
 } from "drizzle-orm/sqlite-core";
 
 import { relations } from "drizzle-orm";
@@ -21,47 +22,56 @@ export const auditSchema = {
  **** TABLES ****
  */
 
+export let usePasswordAuth = true;
+
 // users
-export const userSchema = {
+export const userSchema: Record<string, AnySQLiteColumnBuilder> & {
+  id: AnySQLiteColumnBuilder;
+} = {
   id: text("id").primaryKey(),
   firstName: text("firstName"),
   lastName: text("lastName"),
   email: text("email"),
-  password: text("password"),
   role: text("role").$type<"admin" | "user">(),
 };
+
+if (usePasswordAuth) {
+  userSchema.password = text("password");
+}
+
 export const usersTable = sqliteTable("users", {
   ...userSchema,
   ...auditSchema,
 });
 
-export const userKeysSchema = {
-  id: text("id").primaryKey(),
-  user_id: text("user_id")
-    .notNull()
-    .references(() => usersTable.id),
-  hashed_passwrod: text("hashed_password"),
-};
+if (usePasswordAuth) {
+  const userKeysSchema = {
+    id: text("id").primaryKey(),
+    user_id: text("user_id")
+      .notNull()
+      .references(() => usersTable.id),
+    hashed_passwrod: text("hashed_password"),
+  };
 
-export const userKeysTable = sqliteTable("user_keys", {
-  ...userKeysSchema,
-  ...auditSchema,
-});
+  sqliteTable("user_keys", {
+    ...userKeysSchema,
+    ...auditSchema,
+  });
 
-export const userSessionsSchema = {
-  id: text("id").primaryKey(),
-  user_id: text("user_id")
-    .notNull()
-    .references(() => usersTable.id),
-  active_expires: int("active_expires").notNull(),
-  idle_expires: int("idle_expires").notNull(),
-};
+  const userSessionsSchema = {
+    id: text("id").primaryKey(),
+    user_id: text("user_id")
+      .notNull()
+      .references(() => usersTable.id),
+    active_expires: int("active_expires").notNull(),
+    idle_expires: int("idle_expires").notNull(),
+  };
 
-export const userSessionsTable = sqliteTable("user_sessions", {
-  ...userSessionsSchema,
-  ...auditSchema,
-});
-
+  sqliteTable("user_sessions", {
+    ...userSessionsSchema,
+    ...auditSchema,
+  });
+}
 // posts
 type PostCategories = [{ category: string }];
 
@@ -197,9 +207,13 @@ export interface ApiConfig {
 
 //create an entry for each table
 export const apiConfig: ApiConfig[] = [
-  { table: "users", route: "users" },
   { table: "posts", route: "posts" },
   { table: "categories", route: "categories" },
   { table: "comments", route: "comments" },
   { table: "categoriesToPosts", route: "categories-to-posts" },
 ];
+
+apiConfig.push({ table: "users", route: "users" });
+if (!usePasswordAuth) {
+  apiConfig.push({ table: "users", route: "users" });
+}

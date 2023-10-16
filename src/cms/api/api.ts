@@ -111,16 +111,12 @@ apiConfig.forEach((entry) => {
     const d1 = getD1Binding(ctx);
 
     try {
-      console.log(
-        "posting new record content",
-        JSON.stringify(content, null, 2)
-      );
-      if (table === "users") {
-        return await createUser({ ctx, content });
-      } else {
-        const result = await insertRecord(d1, ctx.env.KVDATA, content);
-        return ctx.json(result.data, 201);
-      }
+      // console.log(
+      //   "posting new record content",
+      //   JSON.stringify(content, null, 2)
+      // );
+      const result = await insertRecord(d1, ctx.env.KVDATA, content);
+      return ctx.json(result.data, 201);
     } catch (error) {
       console.log("error posting content", error);
       return ctx.text(error, 500);
