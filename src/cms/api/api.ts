@@ -238,6 +238,12 @@ api.get("/kv-test2", async (ctx) => {
   return ctx.json({ value, metadata });
 });
 
+api.get("/kv-list", async (ctx) => {
+  const list = await ctx.env.KVDATA.list();
+  return ctx.json(list);
+
+});
+
 api.get("/data", async (c) => {
   const data = await getDataListByPrefix(c.env.KVDATA, "");
   return c.json(data);
