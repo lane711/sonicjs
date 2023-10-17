@@ -201,7 +201,7 @@ api.get("/ping", (c) => {
 api.get("/kv-test", async (ctx) => {
   const createdOn = new Date().getTime();
 
-  await ctx.env.KVDATA.put("kv-test-key", JSON.stringify({ foo: "bar" }), {
+  await ctx.env.KVDATA.put("cache::kv-test-key", JSON.stringify({ foo: "bar" }), {
     metadata: { createdOn },
   });
 
