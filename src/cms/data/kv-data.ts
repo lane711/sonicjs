@@ -85,6 +85,11 @@ export async function addToKvCache(ctx, db, key, value) {
   // console.log("*** addToKvCache adding to kv cache", cacheKey);
   const createdOn = new Date().getTime();
 
+  log(ctx, {
+    level: "verbose",
+    message: `addToKvCache before put ${key} ${createdOn}`,
+  });
+
   await db.put(cacheKey, JSON.stringify(value), {
     metadata: { createdOn} ,
   });
