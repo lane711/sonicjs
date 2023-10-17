@@ -198,6 +198,21 @@ api.get("/ping", (c) => {
   return c.text(Date());
 });
 
+api.get("/kv-test", async (ctx) => {
+  const createdOn = new Date().getTime();
+
+  await ctx.env.KVDATA.put("kv-test-key", JSON.stringify({ foo: "bar" }), {
+    metadata: { createdOn },
+  });
+
+  const { value, metadata } = await ctx.env.KVDATA.getWithMetadata(
+    "kv-test-key",
+    { type: "json" }
+  );
+
+  return ctx.json({ value, metadata });
+});
+
 api.get("/data", async (c) => {
   const data = await getDataListByPrefix(c.env.KVDATA, "");
   return c.json(data);
