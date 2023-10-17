@@ -12,6 +12,7 @@ import {
   saveContent,
   saveContentType,
   getRecordFromKvCache,
+  addToKvCache,
 } from "../data/kv-data";
 import { Bindings } from "../types/bindings";
 import { apiConfig } from "../../db/schema";
@@ -201,14 +202,38 @@ api.get("/ping", (c) => {
 api.get("/kv-test", async (ctx) => {
   const createdOn = new Date().getTime();
 
-  await ctx.env.KVDATA.put("cache::kv-test-key", JSON.stringify({ foo: "bar" }), {
-    metadata: { createdOn },
-  });
+  await ctx.env.KVDATA.put(
+    "cache::kv-test-key",
+    JSON.stringify({ foo: "bar" }),
+    {
+      metadata: { createdOn },
+    }
+  );
 
   const { value, metadata } = await ctx.env.KVDATA.getWithMetadata(
     "kv-test-key",
     { type: "json" }
   );
+
+  return ctx.json({ value, metadata });
+});
+
+api.get("/kv-test2", async (ctx) => {
+  const cacheKey = "kv-test-key2";
+  await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
+    foo: "bar",
+  });
+
+  // await ctx.env.KVDATA.put(cacheKey, JSON.stringify({ foo: "bar" }), {
+  //   metadata: { createdOn: "123" },
+  // });
+
+  // const list = await ctx.env.KVDATA.list();
+  // console.log("list", list);
+
+  const { value, metadata } = await ctx.env.KVDATA.getWithMetadata(`cache::${cacheKey}`, {
+    type: "json",
+  });
 
   return ctx.json({ value, metadata });
 });

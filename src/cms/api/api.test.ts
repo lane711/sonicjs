@@ -168,6 +168,19 @@ describe("auto endpoints", () => {
 
     expect(d1Result.data.length).toBe(0);
   });
+
+
+  it("kv text should return results and 200", async () => {
+
+    let req = new Request("http://localhost/v1/kv-test2", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    let res = await app.fetch(req, env);
+    expect(res.status).toBe(200);
+    let body = await res.json();
+    expect(body.data.length).toBe(2);
+  });
 });
 
 function createTestTable() {
