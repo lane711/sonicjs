@@ -71,7 +71,7 @@ describe("auto endpoints", () => {
     let body = await res.json();
     expect(body.data.firstName).toBe("John");
     expect(body.total).toBe(1);
-    expect(body.source).toBe('d1');
+    expect(body.source).toBe("d1");
 
     //if we get again it should be cached
     let req2 = new Request("http://localhost/v1/users/abc", {
@@ -83,8 +83,7 @@ describe("auto endpoints", () => {
     let body2 = await res2.json();
     expect(body2.data.firstName).toBe("John");
     expect(body2.total).toBe(1);
-    expect(body2.source).toBe('cache');
-
+    expect(body2.source).toBe("cache");
   });
 
   it("post (insert) should return 204", async () => {
@@ -144,7 +143,7 @@ describe("auto endpoints", () => {
       data: {
         firstName: "John",
       },
-      table: 'users'
+      table: "users",
     });
 
     let req = new Request(
@@ -169,9 +168,7 @@ describe("auto endpoints", () => {
     expect(d1Result.data.length).toBe(0);
   });
 
-
   it("kv text should return results and 200", async () => {
-
     let req = new Request("http://localhost/v1/kv-test2", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
@@ -179,7 +176,7 @@ describe("auto endpoints", () => {
     let res = await app.fetch(req, env);
     expect(res.status).toBe(200);
     let body = await res.json();
-    expect(body.data.length).toBe(2);
+    expect(body.value.foo).toBe("bar");
   });
 });
 

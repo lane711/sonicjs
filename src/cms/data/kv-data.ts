@@ -95,7 +95,7 @@ export async function addToKvCache(ctx, kv, key, value) {
 
   await kv.put(
     cacheKey,
-    JSON.stringify({ foo: "bar" }),
+    JSON.stringify(value),
     {
       metadata: { createdOn },
     }
