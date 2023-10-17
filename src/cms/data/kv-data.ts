@@ -87,11 +87,16 @@ export async function addToKvCache(ctx, db, key, value) {
 
   log(ctx, {
     level: "verbose",
-    message: `addToKvCache before put ${key} ${createdOn}`,
+    message: `addToKvCache before put ${key} ${cacheKey} ${createdOn}`,
   });
 
-  await db.put(cacheKey, JSON.stringify(value), {
+  const result = await db.put(cacheKey, JSON.stringify(value), {
     metadata: { createdOn} ,
+  });
+
+  log(ctx, {
+    level: "verbose",
+    message: `addToKvCache after put ${result}`,
   });
   // await db.put(cacheKey, JSON.stringify(value));
   // console.log("*** addToKvCache put complete");
