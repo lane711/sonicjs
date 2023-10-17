@@ -264,7 +264,7 @@ api.get("/cache/kv/:cacheKey", async (ctx) => {
 });
 
 api.get("/kv", async (ctx) => {
-  const allItems = await getDataByPrefix(ctx.env.KVDATA, "", 100);
+  const allItems = await getDataByPrefix(ctx.env.KVDATA, "", 2);
   return ctx.json(allItems);
 });
 
