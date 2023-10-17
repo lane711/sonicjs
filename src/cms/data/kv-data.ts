@@ -80,11 +80,12 @@ export async function addToKvCache(db, key, value) {
   const cacheKey = addCachePrefix(key);
   // console.log('*** addToKvCache db', db)
   // console.log("*** addToKvCache adding to kv cache", cacheKey);
+  const createdOn = new Date().getTime();
 
-  // db.put(cacheKey, JSON.stringify(value), {
-  //   metadata: value ,
-  // });
-  await db.put(cacheKey, JSON.stringify(value));
+  db.put(cacheKey, JSON.stringify(value), {
+    metadata: { createdOn} ,
+  });
+  // await db.put(cacheKey, JSON.stringify(value));
   // console.log("*** addToKvCache put complete");
 
   const confirmedRecord = await getById(db, cacheKey);

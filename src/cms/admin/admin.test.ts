@@ -105,6 +105,8 @@ describe("Test admin api", () => {
     let body = await res.json();
     expect(body.data.length).toBe(1);
     expect(body.data[0].key).toBe("cache::/some-key");
+    expect(body.data[0].createdOn.length).toBeGreaterThan(0);
+
   });
 });
 

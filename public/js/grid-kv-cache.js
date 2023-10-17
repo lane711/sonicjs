@@ -6,6 +6,7 @@ if (gridWrapperKV) {
         name: "Key",
         formatter: (viewLink) => gridjs.html(`${viewLink}`),
       },
+      "Created On"
     ],
     pagination: {
       limit: 10,
@@ -38,6 +39,7 @@ if (gridWrapperKV) {
                 resolve({
                   data: resp.data.map((record) => [
                     record.viewLink,
+                    record.createdOn,
                   ]),
                   total: resp.total,
                 });

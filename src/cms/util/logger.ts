@@ -1,12 +1,12 @@
 export async function log(ctx, data) {
-  const datadog_apikey = ctx.env.datadog_apikey;
+  const datadog_apikey =
+    ctx && ctx.env && ctx.env.datadog_apikey ? ctx.env.datadog_apikey : null;
 
   if (datadog_apikey) {
     let dd_logsEndpoint =
       "https://http-intake.logs.datadoghq.com/v1/input/" + datadog_apikey;
 
-      let datadog_service= ctx.env.datadog_service;
-
+    let datadog_service = ctx.env.datadog_service;
 
     // let hostname = request.headers.get('host') || ''
 
