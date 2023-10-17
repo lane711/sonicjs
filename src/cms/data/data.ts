@@ -207,7 +207,7 @@ export async function getRecords(
     level: "verbose",
     message: "getRecords addToKvCache start",
   });
-  addToKvCache(kv, cacheKey, { data: d1Data, source: "kv", total });
+  addToKvCache(ctx, kv, cacheKey, { data: d1Data, source: "kv", total });
   log(ctx, {
     level: "verbose",
     message: "getRecords addToKvCache end",
