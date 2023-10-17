@@ -221,7 +221,7 @@ api.get("/kv-test", async (ctx) => {
 api.get("/kv-test2", async (ctx) => {
   const cacheKey = "kv-test-key2";
   await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
-    foo: "bar",
+    foobat: true,
   });
 
   // await ctx.env.KVDATA.put(cacheKey, JSON.stringify({ foo: "bar" }), {
