@@ -93,7 +93,7 @@ export async function addToKvCache(ctx, kv, key, value) {
     createdOn
   });
 
-  await ctx.env.KVDATA.put(
+  await kv.put(
     cacheKey,
     JSON.stringify({ foo: "bar" }),
     {
