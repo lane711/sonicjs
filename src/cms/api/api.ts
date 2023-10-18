@@ -220,9 +220,10 @@ api.get("/kv-test", async (ctx) => {
 
 api.get("/kv-test2", async (ctx) => {
   const cacheKey = "kv-test-key2";
-  await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
-    foobat: true,
-  });
+  const total = 100;
+  const d1Data = [{ a: "1", b: "2" }];
+  const data = { data: d1Data, source: "kv", total };
+  await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, data);
 
   // await ctx.env.KVDATA.put(cacheKey, JSON.stringify({ foo: "bar" }), {
   //   metadata: { createdOn: "123" },
@@ -231,9 +232,12 @@ api.get("/kv-test2", async (ctx) => {
   // const list = await ctx.env.KVDATA.list();
   // console.log("list", list);
 
-  const { value, metadata } = await ctx.env.KVDATA.getWithMetadata(`cache::${cacheKey}`, {
-    type: "json",
-  });
+  const { value, metadata } = await ctx.env.KVDATA.getWithMetadata(
+    `cache::${cacheKey}`,
+    {
+      type: "json",
+    }
+  );
 
   return ctx.json({ value, metadata });
 });
@@ -241,7 +245,6 @@ api.get("/kv-test2", async (ctx) => {
 api.get("/kv-list", async (ctx) => {
   const list = await ctx.env.KVDATA.list();
   return ctx.json(list);
-
 });
 
 api.get("/data", async (c) => {
