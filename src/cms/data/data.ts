@@ -197,7 +197,9 @@ export async function getRecords(
     level: "verbose",
     message: "getRecords addToInMemoryCache start",
   });
-  addToInMemoryCache(cacheKey, { data: d1Data, source: "cache", total });
+  ctx.executionCtx.waitUntil(
+    addToInMemoryCache(cacheKey, { data: d1Data, source: "cache", total })
+  );
   log(ctx, {
     level: "verbose",
     message: "getRecords addToInMemoryCache end",
@@ -207,7 +209,9 @@ export async function getRecords(
     level: "verbose",
     message: "getRecords addToKvCache start",
   });
-  await addToKvCache(ctx, kv, cacheKey, { data: d1Data, source: "kv", total });
+  ctx.executionCtx.waitUntil(
+    await addToKvCache(ctx, kv, cacheKey, { data: d1Data, source: "kv", total })
+  );
   log(ctx, {
     level: "verbose",
     message: "getRecords addToKvCache end",
