@@ -42,11 +42,11 @@ export async function setCacheStatusInvalid() {
   return LocalCache.getCacheStatus();
 }
 
-export async function addToInMemoryCache(key: string, data) {
+export async function addToInMemoryCache(key: string, data, timeToExpire: number = 20 * 60 * 1000) {
   // console.log("addToInMemoryCache", key);
   cache.insert({ key, data });
   //TODO: softcode time
-  await setCacheStatus(20 * 60 * 1000);
+  await setCacheStatus(timeToExpire);
 }
 
 export async function getFromInMemoryCache(key: string) {

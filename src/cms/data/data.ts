@@ -148,18 +148,32 @@ export async function getRecords(
 
     if (kvData) {
       //we have the data in KV, but we should still cache it for the next matching request
-      // HACK to support int testing
-      if (executionCtx) {
-        ctx.executionCtx.waitUntil(
-          addToInMemoryCache(cacheKey, { data: kvData.data, source: "cache", total: kvData.total })
-        );
-      } else {
-        await addToInMemoryCache(cacheKey, {
-          data: kvData.data,
-          source: "cache",
-          total: kvData.total,
-        });
-      }
+      // if (executionCtx) {
+      //   ctx.executionCtx.waitUntil(
+      //     addToInMemoryCache(
+      //       cacheKey,
+      //       { data: kvData.data, source: "cache", total: kvData.total },
+      //       ctx.env.cache_ttl
+      //     )
+      //   );
+      // } else {
+      //   await addToInMemoryCache(
+      //     cacheKey,
+      //     {
+      //       data: kvData.data,
+      //       source: "cache",
+      //       total: kvData.total,
+      //     },
+      //     ctx.env.cache_ttl
+      //   );
+      // }
+      dataAddToInMemoryCache(
+        ctx,
+        executionCtx,
+        cacheKey,
+        kvData.data,
+        kvData.total
+      );
 
       return kvData;
     }
@@ -218,17 +232,26 @@ export async function getRecords(
   });
 
   // HACK to support int testing
-  if (executionCtx) {
-    ctx.executionCtx.waitUntil(
-      addToInMemoryCache(cacheKey, { data: d1Data, source: "cache", total })
-    );
-  } else {
-    await addToInMemoryCache(cacheKey, {
-      data: d1Data,
-      source: "cache",
-      total,
-    });
-  }
+  // if (executionCtx) {
+  //   ctx.executionCtx.waitUntil(
+  //     addToInMemoryCache(
+  //       cacheKey,
+  //       { data: d1Data, source: "cache", total },
+  //       ctx.env.cache_ttl
+  //     )
+  //   );
+  // } else {
+  //   await addToInMemoryCache(
+  //     cacheKey,
+  //     {
+  //       data: d1Data,
+  //       source: "cache",
+  //       total,
+  //     },
+  //     ctx.env.cache_ttl
+  //   );
+  // }
+  dataAddToInMemoryCache(ctx, executionCtx, cacheKey, d1Data, total);
 
   log(ctx, {
     level: "verbose",
@@ -239,6 +262,7 @@ export async function getRecords(
     level: "verbose",
     message: "getRecords addToKvCache start",
   });
+
   if (executionCtx) {
     ctx.executionCtx.waitUntil(
       await addToKvCache(ctx, kv, cacheKey, {
@@ -262,6 +286,30 @@ export async function getRecords(
 
   log(ctx, { level: "verbose", message: "getRecords end", cacheKey });
   return { data: d1Data, source: "d1", total };
+}
+
+async function dataAddToInMemoryCache(
+  ctx,
+  executionCtx,
+  cacheKey,
+  data,
+  total
+) {
+  // HACK to support int testing
+
+  const cache_ttl = (ctx.env && ctx.env.cache_ttl) ?? undefined;
+
+  if (executionCtx) {
+    ctx.executionCtx.waitUntil(
+      addToInMemoryCache(cacheKey, { data, source: "cache", total }, cache_ttl)
+    );
+  } else {
+    return addToInMemoryCache(
+      cacheKey,
+      { data, source: "cache", total },
+      cache_ttl
+    );
+  }
 }
 
 export async function insertRecord(d1, kv, data) {
