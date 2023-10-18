@@ -176,7 +176,7 @@ describe("auto endpoints", () => {
     let res = await app.fetch(req, env);
     expect(res.status).toBe(200);
     let body = await res.json();
-    expect(body.value.foo).toBe("bar");
+    expect(body.value.source).toBe("kv");
   });
 });
 

@@ -128,6 +128,11 @@ export async function getRecords(
     }
   }
 
+  var executionCtx;
+  try {
+    executionCtx = ctx.executionCtx;
+  } catch (err) {}
+
   if (source == "fastest" || source == "kv") {
     log(ctx, {
       level: "verbose",
@@ -142,6 +147,20 @@ export async function getRecords(
     });
 
     if (kvData) {
+      //we have the data in KV, but we should still cache it for the next matching request
+      // HACK to support int testing
+      if (executionCtx) {
+        ctx.executionCtx.waitUntil(
+          addToInMemoryCache(cacheKey, { data: kvData.data, source: "cache", total: kvData.total })
+        );
+      } else {
+        await addToInMemoryCache(cacheKey, {
+          data: kvData.data,
+          source: "cache",
+          total: kvData.total,
+        });
+      }
+
       return kvData;
     }
   }
@@ -197,9 +216,20 @@ export async function getRecords(
     level: "verbose",
     message: "getRecords addToInMemoryCache start",
   });
-  ctx.executionCtx.waitUntil(
-    addToInMemoryCache(cacheKey, { data: d1Data, source: "cache", total })
-  );
+
+  // HACK to support int testing
+  if (executionCtx) {
+    ctx.executionCtx.waitUntil(
+      addToInMemoryCache(cacheKey, { data: d1Data, source: "cache", total })
+    );
+  } else {
+    await addToInMemoryCache(cacheKey, {
+      data: d1Data,
+      source: "cache",
+      total,
+    });
+  }
+
   log(ctx, {
     level: "verbose",
     message: "getRecords addToInMemoryCache end",
@@ -209,9 +239,22 @@ export async function getRecords(
     level: "verbose",
     message: "getRecords addToKvCache start",
   });
-  ctx.executionCtx.waitUntil(
-    await addToKvCache(ctx, kv, cacheKey, { data: d1Data, source: "kv", total })
-  );
+  if (executionCtx) {
+    ctx.executionCtx.waitUntil(
+      await addToKvCache(ctx, kv, cacheKey, {
+        data: d1Data,
+        source: "kv",
+        total,
+      })
+    );
+  } else {
+    await addToKvCache(ctx, kv, cacheKey, {
+      data: d1Data,
+      source: "kv",
+      total,
+    });
+  }
+
   log(ctx, {
     level: "verbose",
     message: "getRecords addToKvCache end",
