@@ -71,7 +71,9 @@ if (gridWrapper) {
 
   function deleteItem(itemId) {
     const basePath = `${window.location.protocol}//${window.location.host}`;
-    const endpoint = `${basePath}/v1/users/${itemId}`;
+    const urlSegments = window.location.pathname.split("/");
+    const tableName = urlSegments[urlSegments.length - 1];
+    const endpoint = `${basePath}/v1/${tableName}/${itemId}`;
 
     const xhttp = new XMLHttpRequest();
     xhttp.open("DELETE", endpoint, true);

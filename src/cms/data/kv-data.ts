@@ -1,3 +1,5 @@
+import { log } from "../util/logger";
+
 export function getKey(timestamp, table, id): string {
   return `${timestamp}::${table}::${id}`;
 }
@@ -11,7 +13,7 @@ export function getKey(timestamp, table, id): string {
 export function getDataListByPrefix(
   db,
   prefix = "",
-  limit?: number,
+  limit: number = 100,
   cursor?: string
 ) {
   return db.list({ prefix, limit, cursor });
@@ -76,20 +78,51 @@ export function saveContentType(db, site, contentTypeComponents) {
   return db.put(generatedKey, JSON.stringify(contentTypeComponents));
 }
 
-export async function addToKvCache(db, key, value) {
+export async function addToKvCache(ctx, kv, key, value) {
   const cacheKey = addCachePrefix(key);
+
   // console.log('*** addToKvCache db', db)
   // console.log("*** addToKvCache adding to kv cache", cacheKey);
+  const createdOn = new Date().getTime();
 
-  // db.put(cacheKey, JSON.stringify(value), {
-  //   metadata: value ,
+  log(ctx, {
+    level: "verbose",
+    message: `addToKvCache before put`,
+    key,
+    cacheKey,
+    createdOn,
+    value
+  });
+
+  await kv.put(
+    cacheKey,
+    JSON.stringify(value),
+    {
+      metadata: { createdOn },
+    }
+  );
+
+  // const result = await kv.put(cacheKey, JSON.stringify(value), {
+  //   metadata: { createdOn} ,
   // });
-  await db.put(cacheKey, JSON.stringify(value));
+
+  log(ctx, {
+    level: "verbose",
+    message: `addToKvCache after put`,
+    cacheKey,
+  });
+  // await db.put(cacheKey, JSON.stringify(value));
   // console.log("*** addToKvCache put complete");
 
-  const confirmedRecord = await getById(db, cacheKey);
+  // const { record, metadata } = await db.getWithMetadata(key, { type: "json" });
+
+  // console.log('getWithMetadata', key, record, metadata)
+  // log(ctx, {
+  //   level: "verbose",
+  //   message: `addToKvCache record ${createdOn}`,
+  // });
   // console.log('confirmedRecord', confirmedRecord)
-  return confirmedRecord;
+  // return record;
 }
 
 export async function getRecordFromKvCache(db, key, ignorePrefix = false) {

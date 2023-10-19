@@ -12,6 +12,7 @@ import {
   saveContent,
   saveContentType,
   getRecordFromKvCache,
+  addToKvCache,
 } from "../data/kv-data";
 import { Bindings } from "../types/bindings";
 import { apiConfig, usersTable } from "../../db/schema";
@@ -198,6 +199,54 @@ api.get("/ping", (c) => {
   return c.text(Date());
 });
 
+api.get("/kv-test", async (ctx) => {
+  const createdOn = new Date().getTime();
+
+  await ctx.env.KVDATA.put(
+    "cache::kv-test-key",
+    JSON.stringify({ foo: "bar" }),
+    {
+      metadata: { createdOn },
+    }
+  );
+
+  const { value, metadata } = await ctx.env.KVDATA.getWithMetadata(
+    "kv-test-key",
+    { type: "json" }
+  );
+
+  return ctx.json({ value, metadata });
+});
+
+api.get("/kv-test2", async (ctx) => {
+  const cacheKey = "kv-test-key2";
+  const total = 100;
+  const d1Data = [{ a: "1", b: "2" }];
+  const data = { data: d1Data, source: "kv", total };
+  await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, data);
+
+  // await ctx.env.KVDATA.put(cacheKey, JSON.stringify({ foo: "bar" }), {
+  //   metadata: { createdOn: "123" },
+  // });
+
+  // const list = await ctx.env.KVDATA.list();
+  // console.log("list", list);
+
+  const { value, metadata } = await ctx.env.KVDATA.getWithMetadata(
+    `cache::${cacheKey}`,
+    {
+      type: "json",
+    }
+  );
+
+  return ctx.json({ value, metadata });
+});
+
+api.get("/kv-list", async (ctx) => {
+  const list = await ctx.env.KVDATA.list();
+  return ctx.json(list);
+});
+
 api.get("/data", async (c) => {
   const data = await getDataListByPrefix(c.env.KVDATA, "");
   return c.json(data);
@@ -264,7 +313,7 @@ api.get("/cache/kv/:cacheKey", async (ctx) => {
 });
 
 api.get("/kv", async (ctx) => {
-  const allItems = await getDataByPrefix(ctx.env.KVDATA, "", 100);
+  const allItems = await getDataByPrefix(ctx.env.KVDATA, "", 2);
   return ctx.json(allItems);
 });
 

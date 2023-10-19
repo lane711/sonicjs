@@ -66,4 +66,34 @@ status.get("/log", async (ctx) => {
   return ctx.json({ ok: "ok" });
 });
 
+status.get("/geo", (ctx) => {
+  let html_content = "";
+    let html_style =
+      "body{padding:6em; font-family: sans-serif;} h1{color:#f6821f;}";
+
+    html_content += "<p> Colo: " + ctx.req.cf.colo + "</p>";
+    html_content += "<p> Country: " + ctx.req.cf.country + "</p>";
+    html_content += "<p> City: " + ctx.req.cf.city + "</p>";
+    html_content += "<p> Continent: " + ctx.req.cf.continent + "</p>";
+    html_content += "<p> Latitude: " + ctx.req.cf.latitude + "</p>";
+    html_content += "<p> Longitude: " + ctx.req.cf.longitude + "</p>";
+    html_content += "<p> PostalCode: " + ctx.req.cf.postalCode + "</p>";
+    html_content += "<p> MetroCode: " + ctx.req.cf.metroCode + "</p>";
+    html_content += "<p> Region: " + ctx.req.cf.region + "</p>";
+    html_content += "<p> RegionCode: " + ctx.req.cf.regionCode + "</p>";
+    html_content += "<p> Timezone: " + ctx.req.cf.timezone + "</p>";
+
+    let html = `<!DOCTYPE html>
+      <head>
+        <title> Geolocation: Hello World </title>
+        <style> ${html_style} </style>
+      </head>
+      <body>
+        <h1>Geolocation: Hello World!</h1>
+        <p>You now have access to geolocation data about where your user is visiting from.</p>
+        ${html_content}
+      </body>`;
+  return ctx.html(html_content);
+});
+
 export { status };
