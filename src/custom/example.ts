@@ -5,7 +5,7 @@ import * as schema from "../db/schema";
 import { drizzle } from "drizzle-orm/d1";
 import { getD1Binding } from "../cms/util/d1-binding";
 import { sql } from "drizzle-orm";
-import { postsTable } from "../db/schema";
+import axios from "axios";
 
 const example = new Hono();
 
@@ -82,10 +82,34 @@ example.get("/blog-posts-orm", async (ctx) => {
 example.get("/blog-posts", async (ctx) => {
   const start = Date.now();
   var params = qs.parse(ctx.req.query());
-  const d1 = getD1Binding(ctx);
 
-  let limit = params.limit ? params.limit : 10;
-  let offset = params.offset ? params.offset : 0;
+  params.limit = params.limit ? parseInt(params.limit) : 10;
+  params.offset = params.offset ? parseInt(params.offset) : 0;
+
+  const data = await getPagedBlogPost(ctx, ctx.req.url, params);
+
+  getPagedBlogPostNext(ctx, ctx.req.url, params);
+
+  const end = Date.now();
+  const executionTime = end - start;
+
+  return ctx.json({ ...data, executionTime });
+});
+
+async function getPagedBlogPostNext(ctx, url, params) {
+    //make an ssync call to the next page in anticipation that the user may page the results
+    let paramsNext = { ...params };
+    paramsNext.offset = paramsNext.limit + paramsNext.offset;
+    const urlNext = ctx.req.url.replace(
+      `offset=${params.offset}`,
+      `offset=${paramsNext.offset}`
+    );
+    getPagedBlogPost(ctx, urlNext, paramsNext);
+}
+
+async function getPagedBlogPost(ctx, url, params) {
+  console.log(">>> getPagedBlogPost", url, params.offset);
+  const d1 = getD1Binding(ctx);
 
   const func = async function () {
     const { results } = await d1
@@ -111,11 +135,11 @@ example.get("/blog-posts", async (ctx) => {
     on categoriesToPosts.categoryId = categories.id
     group by posts.id
     order by posts.updatedOn desc
-    limit 10
+    limit ?
     offset ?
     `
       )
-      .bind(offset)
+      .bind(params.limit, params.offset)
       .all();
 
     return results;
@@ -126,17 +150,14 @@ example.get("/blog-posts", async (ctx) => {
     ctx.env.KVDATA,
     "custom",
     params,
-    ctx.req.url,
+    url,
     "fastest",
     func,
     ctx
   );
 
-  const end = Date.now();
-  const executionTime = end - start;
-
-  return ctx.json({ ...data, executionTime });
-});
+  return data;
+}
 
 example.get("/blog-posts-d1", async (ctx) => {
   const start = Date.now();
@@ -242,5 +263,15 @@ example.get("/blog-posts/:id", async (ctx) => {
 
   return ctx.json({ ...data, executionTime });
 });
+
+example.get("/blog-posts/seedKV", async (ctx) => {
+  getPagedBlogPost(ctx, 10, 5);
+  return ctx.json({ ok: "ok" });
+});
+
+// (function seedKVBlogData() {
+//   console.log("EXAMPLE STARTED *****");
+//   getPagedBlogPost(example.)
+// })();
 
 export { example };
