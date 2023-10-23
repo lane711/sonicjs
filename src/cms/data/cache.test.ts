@@ -13,6 +13,8 @@ import {
 } from "./cache";
 import { clearKVCache, getKVCache, getRecordFromKvCache } from "./kv-data";
 
+const ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
+
 describe("cache expiration", () => {
   it("cache status should return false if never set", async () => {
     const cacheStatus = await isCacheValid();
@@ -74,13 +76,7 @@ describe("insert", () => {
     });
     console.log("rec2", rec2);
 
-    const d1Result = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
-      "users",
-      undefined,
-      urlKey
-    );
+    const d1Result = await getRecords(ctx, "users", undefined, urlKey);
 
     console.log("d1Result", d1Result);
 
@@ -89,8 +85,7 @@ describe("insert", () => {
 
     //if we request it again, it should be cached in memory
     const inMemoryCacheResult = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
+      ctx,
       "users",
       undefined,
       urlKey
@@ -101,13 +96,7 @@ describe("insert", () => {
 
     // if we clear memory cache, we should get kv cache
     await clearInMemoryCache();
-    const kvResult = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
-      "users",
-      undefined,
-      urlKey
-    );
+    const kvResult = await getRecords(ctx, "users", undefined, urlKey);
 
     expect(kvResult.data.length).toBe(2);
     expect(kvResult.source).toBe("kv");
@@ -134,13 +123,7 @@ describe("insert", () => {
     // we inserted another record, it should be returned because the insert should invalidate cache
     // this will only work instantly on the node that the update is made and will be eventually consistent on other nodes
     // based on the in-memory cache settings
-    const resultAfterInsert = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
-      "users",
-      undefined,
-      urlKey
-    );
+    const resultAfterInsert = await getRecords(ctx, "users", undefined, urlKey);
 
     expect(resultAfterInsert.data.length).toBe(3);
     expect(resultAfterInsert.source).toBe("d1");
@@ -173,13 +156,7 @@ describe("update", () => {
     });
     console.log("rec2", rec2);
 
-    const d1Result = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
-      "users",
-      undefined,
-      urlKey
-    );
+    const d1Result = await getRecords(ctx, "users", undefined, urlKey);
 
     console.log("d1Result", d1Result);
 
@@ -188,8 +165,7 @@ describe("update", () => {
 
     //if we request it again, it should be cached in memory
     const inMemoryCacheResult = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
+      ctx,
       "users",
       undefined,
       urlKey
@@ -222,13 +198,7 @@ describe("update", () => {
     // we inserted another record, it should be returned because the insert should invalidate cache
     // this will only work instantly on the node that the update is made and will be eventually consistent on other nodes
     // based on the in-memory cache settings
-    const resultAfterUpdate = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
-      "users",
-      undefined,
-      urlKey
-    );
+    const resultAfterUpdate = await getRecords(ctx, "users", undefined, urlKey);
 
     expect(resultAfterUpdate.data.length).toBe(2);
     expect(resultAfterUpdate.source).toBe("d1");
@@ -262,13 +232,7 @@ describe("delete", () => {
     });
     console.log("rec2", rec2);
 
-    const d1Result = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
-      "users",
-      undefined,
-      urlKey
-    );
+    const d1Result = await getRecords(ctx, "users", undefined, urlKey);
 
     console.log("d1Result", d1Result);
 
@@ -277,8 +241,7 @@ describe("delete", () => {
 
     //if we request it again, it should be cached in memory
     const inMemoryCacheResult = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
+      ctx,
       "users",
       undefined,
       urlKey
@@ -310,13 +273,7 @@ describe("delete", () => {
     // we inserted another record, it should be returned because the insert should invalidate cache
     // this will only work instantly on the node that the update is made and will be eventually consistent on other nodes
     // based on the in-memory cache settings
-    const resultAfterUpdate = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
-      "users",
-      undefined,
-      urlKey
-    );
+    const resultAfterUpdate = await getRecords(ctx, "users", undefined, urlKey);
 
     expect(resultAfterUpdate.data.length).toBe(1);
     expect(resultAfterUpdate.source).toBe("d1");

@@ -47,8 +47,8 @@ status.get("/", async (ctx) => {
   //cache
   try {
     const now = new Date().getTime().toString();
-    const newCacheItem = await addToInMemoryCache(now, { status: "ok" });
-    const itemFromCache = await getFromInMemoryCache(now);
+    const newCacheItem = await addToInMemoryCache(ctx, now, { status: "ok" });
+    const itemFromCache = await getFromInMemoryCache(ctx, now);
     status.cache = itemFromCache[0].data.status;
   } catch (error) {
     status.cache = "error: " + error;

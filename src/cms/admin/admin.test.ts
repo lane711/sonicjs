@@ -54,13 +54,8 @@ describe("Test admin api", () => {
     });
 
     //this should add to cache
-    const d1Result = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
-      "users",
-      undefined,
-      "/some-key"
-    );
+    const ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
+    const d1Result = await getRecords(ctx, "users", undefined, "/some-key");
 
     let req = new Request("http://localhost/admin/api/in-memory-cache", {
       method: "GET",
@@ -88,13 +83,9 @@ describe("Test admin api", () => {
     });
 
     // this should add to cache
-    const d1Result = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
-      "users",
-      undefined,
-      "/some-key"
-    );
+    const ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
+
+    const d1Result = await getRecords(ctx, "users", undefined, "/some-key");
 
     let req = new Request("http://localhost/admin/api/kv-cache", {
       method: "GET",
@@ -106,7 +97,6 @@ describe("Test admin api", () => {
     expect(body.data.length).toBe(1);
     expect(body.data[0].key).toBe("cache::/some-key");
     expect(body.data[0].createdOn.length).toBeGreaterThan(0);
-
   });
 });
 

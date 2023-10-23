@@ -1,4 +1,5 @@
 import loki from "lokijs";
+import { log } from "../util/logger";
 var db = new loki("cache.db");
 var cache = db.addCollection("cache");
 var cacheStatus = db.addCollection("cache-status");
@@ -43,21 +44,42 @@ export async function setCacheStatusInvalid() {
 }
 
 export async function addToInMemoryCache(
+  ctx = {},
   key: string,
   data,
-  timeToExpire: number = 20 * 60 * 1000
+  timeToExpire?: number
 ) {
+  const cache_ttl = (ctx.env && ctx.env.cache_ttl) ?? (10 * 60 * 1000);
+  const ttl = timeToExpire ?? cache_ttl;
+
   // console.log("addToInMemoryCache", key);
-  if (timeToExpire > 0) {
+  if (ttl > 0) {
+    log(ctx, {
+      level: "verbose",
+      message: "addToInMemoryCache start",
+    });
     cache.insert({ key, data });
-    //TODO: softcode time
-    await setCacheStatus(timeToExpire);
+    await setCacheStatus(ttl);
+    log(ctx, {
+      level: "verbose",
+      message: "addToInMemoryCache end",
+    });
   }
 }
 
-export async function getFromInMemoryCache(key: string) {
+export async function getFromInMemoryCache(ctx = {}, key: string) {
   // console.log("getFromInMemoryCache", key);
+  log(ctx, {
+    level: "verbose",
+    message: "getFromInMemoryCache start",
+    key,
+  });
   let data = await cache.find({ key: key });
+  log(ctx, {
+    level: "verbose",
+    message: "getFromInMemoryCache end",
+    key,
+  });
   return data;
 }
 

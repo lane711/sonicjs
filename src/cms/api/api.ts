@@ -21,13 +21,11 @@ import { getForm } from "./forms";
 import qs from "qs";
 import {
   deleteRecord,
-  getRecord,
   getRecords,
   insertRecord,
   updateRecord,
 } from "../data/data";
 import { clearInMemoryCache, getAllFromInMemoryCache } from "../data/cache";
-import { getD1Binding } from "../util/d1-binding";
 
 const api = new Hono<{ Bindings: Bindings }>();
 
@@ -37,20 +35,19 @@ apiConfig.forEach((entry) => {
   //ie /v1/users
   api.get(`/${entry.route}`, async (ctx) => {
     const start = Date.now();
-    const d1 = getD1Binding(ctx);
 
     try {
       var params = qs.parse(ctx.req.query());
       params.limit = params.limit ?? 1000;
+      ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
+
       const data = await getRecords(
-        d1,
-        ctx.env.KVDATA,
+        ctx,
         entry.table,
         params,
         ctx.req.url,
         "fastest",
-        undefined,
-        ctx
+        undefined
       );
 
       const end = Date.now();
@@ -72,7 +69,7 @@ apiConfig.forEach((entry) => {
     const id = ctx.req.param("id");
     var params = qs.parse(ctx.req.query());
     params.id = id;
-    const d1 = getD1Binding(ctx);
+    ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
 
     let source = "fastest";
     if (includeContentType !== undefined) {
@@ -80,14 +77,12 @@ apiConfig.forEach((entry) => {
     }
 
     const data = await getRecords(
-      d1,
-      ctx.env.KVDATA,
+      ctx,
       entry.table,
       params,
       ctx.req.url,
       source,
-      undefined,
-      ctx
+      undefined
     );
 
     if (includeContentType !== undefined) {
@@ -107,15 +102,18 @@ apiConfig.forEach((entry) => {
 
     const route = ctx.req.path.split("/")[2];
     const table = apiConfig.find((entry) => entry.route === route).table;
+    ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
 
     content.table = table;
-
-    const d1 = getD1Binding(ctx);
 
     try {
       // console.log("posting new record content", JSON.stringify(content, null, 2));
 
-      const result = await insertRecord(d1, ctx.env.KVDATA, content);
+      const result = await insertRecord(
+        ctx.env.D1DATA,
+        ctx.env.KVDATA,
+        content
+      );
 
       return ctx.json(result.data, 201);
     } catch (error) {
@@ -130,6 +128,7 @@ apiConfig.forEach((entry) => {
     const payload = await ctx.req.json();
     const id = ctx.req.param("id");
     var content = {};
+    ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
 
     content.data = payload.data;
 
@@ -139,12 +138,12 @@ apiConfig.forEach((entry) => {
     content.table = table;
     content.id = id;
 
-    // console.log("updating record", content);
-
-    const d1 = getD1Binding(ctx);
-
     try {
-      const result = await updateRecord(d1, ctx.env.KVDATA, content);
+      const result = await updateRecord(
+        ctx.env.D1DATA,
+        ctx.env.KVDATA,
+        content
+      );
 
       return ctx.json(result.data, 200);
     } catch (error) {
@@ -157,25 +156,22 @@ apiConfig.forEach((entry) => {
   api.delete(`/${entry.route}/:id`, async (ctx) => {
     const id = ctx.req.param("id");
     const table = ctx.req.path.split("/")[2];
-
-    const d1 = getD1Binding(ctx);
+    ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
 
     const record = await getRecords(
-      d1,
-      ctx.env.KVDATA,
+      ctx,
       table,
       { id },
       ctx.req.path,
       "fastest",
-      undefined,
-      ctx
+      undefined
     );
 
     console.log("delete content " + JSON.stringify(record, null, 2));
 
     if (record) {
       console.log("content found, deleting...");
-      const result = await deleteRecord(d1, ctx.env.KVDATA, {
+      const result = await deleteRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
         id,
         table: table,
       });

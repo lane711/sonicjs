@@ -3,7 +3,6 @@ import qs from "qs";
 import { getRecords } from "../cms/data/data";
 import * as schema from "../db/schema";
 import { drizzle } from "drizzle-orm/d1";
-import { getD1Binding } from "../cms/util/d1-binding";
 import { sql } from "drizzle-orm";
 import axios from "axios";
 
@@ -28,21 +27,13 @@ example.get("/users", async (ctx) => {
 
 example.post("/users", async (ctx) => {
   var params = qs.parse(ctx.req.query());
-  const data = await getRecords(
-    ctx.env.D1DATA,
-    ctx.env.KVDATA,
-    "users",
-    params,
-    ctx.req.url,
-    "fastest"
-  );
+  const data = await getRecords(ctx, "users", params, ctx.req.url, "fastest");
   return ctx.json(data);
 });
 
 example.get("/blog-posts-orm", async (ctx) => {
   const start = Date.now();
   var params = qs.parse(ctx.req.query());
-  const d1 = getD1Binding(ctx);
   const limit = params.limit ? params.limit : 10;
   const offset = params.offset ? params.offset : 0;
 
@@ -64,8 +55,7 @@ example.get("/blog-posts-orm", async (ctx) => {
   };
 
   const data = await getRecords(
-    ctx.env.D1DATA,
-    ctx.env.KVDATA,
+    ctx,
     "custom",
     params,
     ctx.req.url,
@@ -85,6 +75,7 @@ example.get("/blog-posts", async (ctx) => {
 
   params.limit = params.limit ? parseInt(params.limit) : 10;
   params.offset = params.offset ? parseInt(params.offset) : 0;
+  ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
 
   const data = await getPagedBlogPost(ctx, ctx.req.url, params);
 
@@ -97,22 +88,20 @@ example.get("/blog-posts", async (ctx) => {
 });
 
 async function getPagedBlogPostNext(ctx, url, params) {
-    //make an ssync call to the next page in anticipation that the user may page the results
-    let paramsNext = { ...params };
-    paramsNext.offset = paramsNext.limit + paramsNext.offset;
-    const urlNext = ctx.req.url.replace(
-      `offset=${params.offset}`,
-      `offset=${paramsNext.offset}`
-    );
-    getPagedBlogPost(ctx, urlNext, paramsNext);
+  //make an ssync call to the next page in anticipation that the user may page the results
+  let paramsNext = { ...params };
+  paramsNext.offset = paramsNext.limit + paramsNext.offset;
+  const urlNext = ctx.req.url.replace(
+    `offset=${params.offset}`,
+    `offset=${paramsNext.offset}`
+  );
+  getPagedBlogPost(ctx, urlNext, paramsNext);
 }
 
 async function getPagedBlogPost(ctx, url, params) {
-  console.log(">>> getPagedBlogPost", url, params.offset);
-  const d1 = getD1Binding(ctx);
 
   const func = async function () {
-    const { results } = await d1
+    const { results } = await ctx.env.D1DATA
       .prepare(
         `
     SELECT
@@ -145,16 +134,7 @@ async function getPagedBlogPost(ctx, url, params) {
     return results;
   };
 
-  const data = await getRecords(
-    ctx.env.D1DATA,
-    ctx.env.KVDATA,
-    "custom",
-    params,
-    url,
-    "fastest",
-    func,
-    ctx
-  );
+  const data = await getRecords(ctx, "custom", params, url, "fastest", func);
 
   return data;
 }
@@ -162,7 +142,6 @@ async function getPagedBlogPost(ctx, url, params) {
 example.get("/blog-posts-d1", async (ctx) => {
   const start = Date.now();
   var params = qs.parse(ctx.req.query());
-  const d1 = getD1Binding(ctx);
 
   let limit = params.limit ? params.limit : 10;
   let offset = params.offset ? params.offset : 0;
@@ -209,14 +188,14 @@ example.get("/blog-posts/:id", async (ctx) => {
   const start = Date.now();
   const id = ctx.req.param("id");
   var params = qs.parse(ctx.req.query());
-  const d1 = getD1Binding(ctx);
 
   const table = "posts";
+  ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
 
   const func = async function () {
     // const db = drizzle(d1, { schema });
 
-    const data = await d1
+    const data = await ctx.env.D1DATA
       .prepare(
         `
     SELECT
@@ -243,14 +222,13 @@ example.get("/blog-posts/:id", async (ctx) => {
 
     const post = data.results[0];
 
-    post.comments = post.comments.split(",");
+    post.comments = post.comments ? post.comments.split(",") : null;
 
     return post;
   };
 
   const data = await getRecords(
-    ctx.env.D1DATA,
-    ctx.env.KVDATA,
+    ctx,
     "custom",
     params,
     ctx.req.url,
