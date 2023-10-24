@@ -106,7 +106,7 @@ export async function loadInMemoryCacheTable(ctx) {
               Clear In Memory Cache
             </button>
             <div class="mt-3">TTL set to {cache_ttl}ms (Each cache entry will only live for {cache_ttl}ms)</div>
-            <div class="mt-1 text-muted">Use environment variable "cache_ttl" to override. Set to 0 to bypass.</div>
+            <div class="mt-1 text-muted">Use environment variable "cache_ttl" to override. Set to 0 to bypass. Set to -1 to never expire.</div>
           </div>
 
           <div id="grid-in-memory-cache"></div>
