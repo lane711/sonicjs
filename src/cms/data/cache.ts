@@ -25,6 +25,10 @@ const LocalCache = {
 };
 
 export async function isCacheValid() : Promise<boolean> {
+  if(expires === -1){
+    return true;
+  }
+
   let expiresOn = LocalCache.getCacheStatus();
   let now = new Date().getTime();
   if (expiresOn && expiresOn > now) {
@@ -34,8 +38,13 @@ export async function isCacheValid() : Promise<boolean> {
 }
 
 export async function setCacheStatus(timeToExpireMs) {
+  if(timeToExpireMs == -1){
+    //never expires
+    expires = -1;
+    return;
+  }
   expires = new Date().getTime() + timeToExpireMs;
-  return LocalCache.getCacheStatus();
+  // return LocalCache.getCacheStatus();
 }
 
 export async function setCacheStatusInvalid() {

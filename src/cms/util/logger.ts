@@ -1,6 +1,6 @@
 export async function log(ctx, data) {
 
-  console.log(data.message);
+  console.log('SonicJS logger: ' + data.message);
 
   const datadog_apikey =
     ctx && ctx.env && ctx.env.datadog_apikey ? ctx.env.datadog_apikey : null;

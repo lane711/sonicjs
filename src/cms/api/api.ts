@@ -55,7 +55,7 @@ apiConfig.forEach((entry) => {
 
       return ctx.json({ ...data, executionTime });
     } catch (error) {
-      console.log(error);
+      console.log('apiConfig error', error);
       return ctx.text(error);
     }
   });

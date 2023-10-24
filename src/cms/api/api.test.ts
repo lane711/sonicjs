@@ -7,6 +7,7 @@ import { getRecords, insertRecord } from "../data/data";
 
 const env = getMiniflareBindings();
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
+var ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
 
 describe("Test the application", () => {
   it("ping should return 200", async () => {
@@ -57,6 +58,8 @@ describe("auto endpoints", () => {
   });
 
   it("get single record should return results and 200", async () => {
+
+    ctx.env.cache_ttl = -1;
     const rec1 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
       firstName: "John",
       id: "abc",
@@ -124,7 +127,6 @@ describe("auto endpoints", () => {
     // expect(body.id.length).toBeGreaterThan(1);
 
     //make sure db was updated
-    const ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
     const d1Result = await getRecords(ctx, "users", undefined, "urlKey");
 
     expect(d1Result.data[0].id).toBe("a");
@@ -152,7 +154,6 @@ describe("auto endpoints", () => {
     expect(res.status).toBe(204);
 
     //make sure db was updated
-    const ctx = {env: {KVDATA : env.KVDATA, D1DATA: env.__D1_BETA__D1DATA }}
     const d1Result = await getRecords(
       ctx,
       "users",

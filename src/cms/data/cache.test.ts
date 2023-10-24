@@ -13,7 +13,7 @@ import {
 } from "./cache";
 import { clearKVCache, getKVCache, getRecordFromKvCache } from "./kv-data";
 
-const ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
+var ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
 
 describe("cache expiration", () => {
   it("cache status should return false if never set", async () => {
@@ -29,6 +29,18 @@ describe("cache expiration", () => {
 
   it("cache status should return false if expired", async () => {
     const result = await setCacheStatus(-1000);
+    const cacheStatus = await isCacheValid();
+    expect(cacheStatus).toBeFalsy();
+  });
+
+  it("cache status should always be true is ttl set to -1", async () => {
+    const result = await setCacheStatus(-1);
+    const cacheStatus = await isCacheValid();
+    expect(cacheStatus).toBeTruthy();
+  });
+
+  it("cache status should always be false is ttl set to 0", async () => {
+    const result = await setCacheStatus(0);
     const cacheStatus = await isCacheValid();
     expect(cacheStatus).toBeFalsy();
   });
