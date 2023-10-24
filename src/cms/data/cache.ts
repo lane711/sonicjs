@@ -24,7 +24,7 @@ const LocalCache = {
   },
 };
 
-export async function isCacheValid() {
+export async function isCacheValid() : Promise<boolean> {
   let expiresOn = LocalCache.getCacheStatus();
   let now = new Date().getTime();
   if (expiresOn && expiresOn > now) {

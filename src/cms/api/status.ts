@@ -5,7 +5,7 @@ import { getById } from "../data/kv-data";
 import axios from "axios";
 import { datadogLogs } from "@datadog/browser-logs";
 import { log } from "../util/logger";
-import { addToInMemoryCache, getFromInMemoryCache } from "../data/cache";
+import { addToInMemoryCache, getFromInMemoryCache, isCacheValid } from "../data/cache";
 
 const status = new Hono<{ Bindings: Bindings }>();
 
@@ -50,6 +50,7 @@ status.get("/", async (ctx) => {
     const newCacheItem = await addToInMemoryCache(ctx, now, { status: "ok" });
     const itemFromCache = await getFromInMemoryCache(ctx, now);
     status.cache = itemFromCache[0].data.status;
+    status.cacheIsValid = await isCacheValid();
   } catch (error) {
     status.cache = "error: " + error;
   }
