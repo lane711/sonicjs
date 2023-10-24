@@ -2,8 +2,7 @@ import loki from "lokijs";
 import { log } from "../util/logger";
 var db = new loki("cache.db");
 var cache = db.addCollection("cache");
-var cacheStatus = db.addCollection("cache-status");
-var expires;
+
 // class CacheStatus {
 //   private static _instance: CacheStatus;
 //   public static expires: Int16Array;
@@ -20,51 +19,34 @@ var expires;
 
 const LocalCache = {
   getCacheStatus() {
-    return expires ?? false;
+    return true;
   },
 };
 
-export async function isCacheValid() : Promise<boolean> {
-  let expiresOn = LocalCache.getCacheStatus();
-  let now = new Date().getTime();
-  if (expiresOn && expiresOn > now) {
-    return true;
-  }
-  return false;
+export async function isCacheValid(): Promise<boolean> {
+  return true;
 }
 
 export async function setCacheStatus(timeToExpireMs) {
-  expires = new Date().getTime() + timeToExpireMs;
-  return LocalCache.getCacheStatus();
+  // expires = new Date().getTime() + timeToExpireMs;
+  // return LocalCache.getCacheStatus();
 }
 
 export async function setCacheStatusInvalid() {
-  expires = new Date().getTime() - 1000; //setting to the past
-  return LocalCache.getCacheStatus();
+  // expires = new Date().getTime() - 1000; //setting to the past
+  // return LocalCache.getCacheStatus();
 }
 
-export async function addToInMemoryCache(
-  ctx = {},
-  key: string,
-  data,
-  timeToExpire?: number
-) {
-  const cache_ttl = (ctx.env && ctx.env.cache_ttl) ?? (10 * 60 * 1000);
-  const ttl = timeToExpire ?? cache_ttl;
-
-  // console.log("addToInMemoryCache", key);
-  if (ttl > 0) {
-    log(ctx, {
-      level: "verbose",
-      message: "addToInMemoryCache start",
-    });
-    cache.insert({ key, data });
-    await setCacheStatus(ttl);
-    log(ctx, {
-      level: "verbose",
-      message: "addToInMemoryCache end",
-    });
-  }
+export async function addToInMemoryCache(ctx = {}, key: string, data) {
+  log(ctx, {
+    level: "verbose",
+    message: "addToInMemoryCache start",
+  });
+  cache.insert({ key, data });
+  log(ctx, {
+    level: "verbose",
+    message: "addToInMemoryCache end",
+  });
 }
 
 export async function getFromInMemoryCache(ctx = {}, key: string) {
