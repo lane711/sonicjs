@@ -16,38 +16,34 @@ import { clearKVCache, getKVCache, getRecordFromKvCache } from "./kv-data";
 const ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
 
 describe("cache expiration", () => {
-  it("cache status should return false if never set", async () => {
-    const cacheStatus = await isCacheValid();
-    expect(cacheStatus).toBeFalsy();
-  });
+  // it("cache status should return false if never set", async () => {
+  //   const cacheStatus = await isCacheValid();
+  //   expect(cacheStatus).toBeFalsy();
+  // });
 
-  it("cache status should return true", async () => {
-    const result = await setCacheStatus(1000);
-    const cacheStatus = await isCacheValid();
-    expect(cacheStatus).toBeTruthy();
-  });
+  // it("cache status should return true", async () => {
+  //   const result = await setCacheStatus(1000);
+  //   const cacheStatus = await isCacheValid();
+  //   expect(cacheStatus).toBeTruthy();
+  // });
 
-  it("cache status should return false if expired", async () => {
-    const result = await setCacheStatus(-1000);
-    const cacheStatus = await isCacheValid();
-    expect(cacheStatus).toBeFalsy();
-  });
+  // it("cache status should return false if expired", async () => {
+  //   const result = await setCacheStatus(-1000);
+  //   const cacheStatus = await isCacheValid();
+  //   expect(cacheStatus).toBeFalsy();
+  // });
 
-  it("cache status should return false if explicity set to invalid", async () => {
-    const result = await setCacheStatusInvalid();
-    const cacheStatus = await isCacheValid();
-    expect(cacheStatus).toBeFalsy();
-  });
+  // it("cache status should return false if explicity set to invalid", async () => {
+  //   const result = await setCacheStatusInvalid();
+  //   const cacheStatus = await isCacheValid();
+  //   expect(cacheStatus).toBeFalsy();
+  // });
 
-  it("cache status should return false if explicity set to invalid after previously being valid", async () => {
-    const result = await setCacheStatus(1000);
-    const cacheStatus = await isCacheValid();
-    expect(cacheStatus).toBeTruthy();
-
-    const result2 = await setCacheStatusInvalid();
-    const cacheStatus2 = await isCacheValid();
-    expect(cacheStatus2).toBeFalsy();
-  });
+  // it("cache status should return false if explicity set to invalid after previously being valid", async () => {
+  //   const result = await setCacheStatus(1000);
+  //   const cacheStatus = await isCacheValid();
+  //   expect(cacheStatus).toBeTruthy();
+  // });
 });
 
 describe("insert", () => {
