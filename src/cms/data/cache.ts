@@ -35,6 +35,10 @@ export async function setCacheStatus(timeToExpireMs) {
 export async function setCacheStatusInvalid() {
   // expires = new Date().getTime() - 1000; //setting to the past
   // return LocalCache.getCacheStatus();
+  //TODO: its really inefficient to just kill the entire cache. We need to only kill the affected cache based on table or guid.
+  //We'll need to setup dependency tracking at table and record level
+  cache.clear();
+
 }
 
 export async function addToInMemoryCache(ctx = {}, key: string, data) {

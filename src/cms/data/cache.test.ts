@@ -109,10 +109,6 @@ describe("insert", () => {
       },
     });
 
-    //cache status should not be valid
-    const cacheStatus = await isCacheValid();
-    expect(cacheStatus).toBeFalsy();
-
     //kv cache for the urlKey should be empty
     const allCacheItems = await getRecordFromKvCache(
       KVDATA,
@@ -127,6 +123,13 @@ describe("insert", () => {
 
     expect(resultAfterInsert.data.length).toBe(3);
     expect(resultAfterInsert.source).toBe("d1");
+
+
+    //new record should now be in the cache since this is the second time we're requesting it
+    const resultAfterGet = await getRecords(ctx, "users", undefined, urlKey);
+
+    expect(resultAfterGet.data.length).toBe(3);
+    expect(resultAfterGet.source).toBe("cache");
   });
 });
 
@@ -183,10 +186,6 @@ describe("update", () => {
         firstName: "Steve",
       },
     });
-
-    //cache status should not be valid
-    const cacheStatus = await isCacheValid();
-    expect(cacheStatus).toBeFalsy();
 
     //kv cache for the urlKey should be empty
     const allCacheItems = await getRecordFromKvCache(
@@ -258,10 +257,6 @@ describe("delete", () => {
       id: recordToDelete.id,
       table: "users",
     });
-
-    //cache status should not be valid
-    const cacheStatus = await isCacheValid();
-    expect(cacheStatus).toBeFalsy();
 
     //kv cache for the urlKey should be empty
     const allCacheItems = await getRecordFromKvCache(
