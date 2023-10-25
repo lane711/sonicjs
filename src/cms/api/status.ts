@@ -108,4 +108,11 @@ status.get("/geo", (ctx) => {
   return ctx.html(html_content);
 });
 
+(async function(){
+// add startup entry to cache
+const now = new Date().getTime().toString();
+const newCacheItem = await addToInMemoryCache({}, 'system::startup', { started: now });
+
+})();
+
 export { status };
