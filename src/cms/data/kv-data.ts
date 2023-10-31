@@ -1,4 +1,5 @@
 import { log } from "../util/logger";
+var _ = require("lodash");
 
 export function getKey(timestamp, table, id): string {
   return `${timestamp}::${table}::${id}`;
@@ -206,10 +207,10 @@ export async function addToKvKeys(ctx, kv, url) {
     message: `addToKvKeys before put`,
     url,
     cacheKey,
-    lastAccessed
+    lastAccessed,
   });
 
-  await kv.put(cacheKey, '', {
+  await kv.put(cacheKey, "", {
     metadata: { lastAccessed, url },
   });
 
@@ -220,12 +221,7 @@ export async function addToKvKeys(ctx, kv, url) {
   });
 }
 
-
-export async function getKVKeys(
-  db,
-  limit: number = 100,
-  cursor?: string
-) {
+export async function getKVKeys(db, limit: number = 100, cursor?: string) {
   const prefix = addKeyPrefix();
   return db.list({ prefix, limit, cursor });
 }
@@ -235,10 +231,6 @@ export async function getKVKeysSorted(
   limit: number = 100,
   cursor?: string
 ) {
-  const results = await getKVKeys(db, limit, cursor)
-  return results.keys.sort(compareByLastAccessed).reverse();
-}
-
-function compareByLastAccessed(a, b) {
-  return a.metadata.lastAccessed - a.metadata.lastAccessed;
+  const results = await getKVKeys(db, limit, cursor);
+  return _.orderBy(results.keys, ["metadata.lastAccessed"], ["desc"]);
 }

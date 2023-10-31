@@ -105,7 +105,7 @@ describe("test KV keys", () => {
 
   it("getKVKeysSorted return sorted keys by lastAccessed", async () => {
     await addToKvKeys({}, env.KVDATA, "http://some-url-1");
-    sleep(50);
+    sleep(1);
     await addToKvKeys({}, env.KVDATA, "http://some-url-2");
 
     const resultSorted = await getKVKeysSorted(env.KVDATA);
@@ -113,6 +113,21 @@ describe("test KV keys", () => {
     expect(resultSorted.length).toBe(2);
     expect(resultSorted[0].name).toBe("key::http://some-url-2");
     expect(resultSorted[0].metadata.url).toBe("http://some-url-2");
+
+  });
+
+  it("getKVKeysSorted return sorted keys by lastAccessed after update", async () => {
+    await addToKvKeys({}, env.KVDATA, "http://some-url-1");
+    sleep(1);
+    await addToKvKeys({}, env.KVDATA, "http://some-url-2");
+    sleep(1);
+    await addToKvKeys({}, env.KVDATA, "http://some-url-1");
+
+    const resultSorted = await getKVKeysSorted(env.KVDATA);
+
+    expect(resultSorted.length).toBe(2);
+    expect(resultSorted[0].name).toBe("key::http://some-url-1");
+    expect(resultSorted[0].metadata.url).toBe("http://some-url-1");
 
   });
 });
