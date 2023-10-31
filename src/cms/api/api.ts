@@ -25,7 +25,7 @@ import {
   insertRecord,
   updateRecord,
 } from "../data/data";
-import { clearInMemoryCache, getAllFromInMemoryCache } from "../data/cache";
+import { clearInMemoryCache, getAllFromInMemoryCache, repopulateCacheFromKVKeys } from "../data/cache";
 
 const api = new Hono<{ Bindings: Bindings }>();
 
@@ -307,6 +307,13 @@ api.get("/cache/kv/:cacheKey", async (ctx) => {
   console.log("getting kv cache", cacheItem);
   return ctx.json(cacheItem);
 });
+
+// api.get("/cache/repopulate", async (ctx) => {
+//   console.log("repopulating cache");
+//   await clearInMemoryCache();
+//   await repopulateCacheFromKVKeys(ctx);
+//   return ctx.text("cache has been repopulated from kv");
+// });
 
 api.get("/kv", async (ctx) => {
   const allItems = await getDataByPrefix(ctx.env.KVDATA, "", 2);

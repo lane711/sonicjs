@@ -7,6 +7,7 @@ import { admin } from "./cms/admin/admin";
 import { example } from "./custom/example";
 import { status } from "./cms/api/status";
 import { log } from "./cms/util/logger";
+import { repopulateCacheFromKVKeys } from "./cms/data/cache";
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -27,6 +28,7 @@ app.use("*", async (ctx, next) => {
   if (ctx.req.path.indexOf("/admin") == 0 || ctx.req.path.indexOf("/v1") == 0) {
     log(ctx, { level: "info", method: ctx.req.method, url: ctx.req.path });
   }
+  repopulateCacheFromKVKeys(ctx);
   await next();
 });
 
@@ -49,5 +51,11 @@ app.route("/v1", api);
 app.route("/admin", admin);
 app.route("v1/example", example);
 app.route("/status", status);
+
+//caching pop
+app.use("*", async (ctx, next) => {
+  console.log('maybe  check caching')
+  await next();
+});
 
 export default app;

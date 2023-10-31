@@ -1,5 +1,6 @@
 import loki from "lokijs";
 import { log } from "../util/logger";
+import { getDataByPrefix, getKVCache, getRecordFromKvCache } from "./kv-data";
 var db = new loki("cache.db");
 var cache = db.addCollection("cache");
 
@@ -38,7 +39,6 @@ export async function setCacheStatusInvalid() {
   //TODO: its really inefficient to just kill the entire cache. We need to only kill the affected cache based on table or guid.
   //We'll need to setup dependency tracking at table and record level
   cache.clear();
-
 }
 
 export async function addToInMemoryCache(ctx = {}, key: string, data) {
@@ -77,6 +77,31 @@ export async function getAllFromInMemoryCache() {
 export async function clearInMemoryCache() {
   console.log("clearing InMemoryCache");
   cache.clear();
+}
+
+export async function repopulateCacheFromKVKeys(ctx) {
+  // we only want this to run once on start up
+  const cacheKey = "system::cache-repopulated";
+  const isCacheAlreadyPopulated = await getFromInMemoryCache(ctx, cacheKey);
+  console.log("isCacheAlreadyPopulated", isCacheAlreadyPopulated);
+  const now = new Date().getTime().toString();
+
+  if (isCacheAlreadyPopulated.length) {
+    console.log("cache already pop");
+    return;
+  }
+  await addToInMemoryCache({}, cacheKey, { started: now });
+
+  const kvData = await getDataByPrefix(ctx.env.KVDATA, "cache::");
+  if (kvData) {
+    for await (const data of kvData) {
+      data.source = "cache";
+      // console.log("adding to cache " + data.key);
+      // console.log('adding to cache ' + JSON.stringify(data, 2, null));
+
+      await addToInMemoryCache(ctx, data.key, data);
+    }
+  }
 }
 
 // export async function getCacheStatus() {

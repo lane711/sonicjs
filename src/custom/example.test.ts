@@ -41,7 +41,6 @@ it("get should return results and 200", async () => {
   expect(body2.source).toBe("cache");
   expect(body2.total).toBe(3);
 
-  // sleep(200);
   //anticipated next request should be cached
   let req3 = new Request(
     "http://localhost/v1/example/blog-posts?limit=2&offset=2",
@@ -243,8 +242,3 @@ async function createTestTable() {
   return db;
 }
 
-function sleep(miliseconds) {
-  var currentTime = new Date().getTime();
-
-  while (currentTime + miliseconds >= new Date().getTime()) {}
-}

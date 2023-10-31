@@ -7,38 +7,56 @@ import { drizzle } from "drizzle-orm/d1";
 import { deleteRecord, getRecords, insertRecord, updateRecord } from "./data";
 import {
   clearInMemoryCache,
+  getAllFromInMemoryCache,
   isCacheValid,
+  repopulateCacheFromKVKeys,
   setCacheStatus,
   setCacheStatusInvalid,
 } from "./cache";
-import { clearKVCache, getKVCache, getRecordFromKvCache } from "./kv-data";
+import {
+  addToKvCache,
+  clearKVCache,
+  getKVCache,
+  getRecordFromKvCache,
+} from "./kv-data";
 
 const ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
 
+describe("cache population", () => {
+  it("cache should populate based on KV keys", async () => {
+    const cacheKey = "/some-key";
+    await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
+      data: [{ some: "data" }],
+      source: "kv",
+      total: 1,
+    });
+
+    await repopulateCacheFromKVKeys(ctx);
+
+    const cache = await getAllFromInMemoryCache();
+    expect(cache.data.length).toBe(2);
+  });
+});
 describe("cache expiration", () => {
   // it("cache status should return false if never set", async () => {
   //   const cacheStatus = await isCacheValid();
   //   expect(cacheStatus).toBeFalsy();
   // });
-
   // it("cache status should return true", async () => {
   //   const result = await setCacheStatus(1000);
   //   const cacheStatus = await isCacheValid();
   //   expect(cacheStatus).toBeTruthy();
   // });
-
   // it("cache status should return false if expired", async () => {
   //   const result = await setCacheStatus(-1000);
   //   const cacheStatus = await isCacheValid();
   //   expect(cacheStatus).toBeFalsy();
   // });
-
   // it("cache status should return false if explicity set to invalid", async () => {
   //   const result = await setCacheStatusInvalid();
   //   const cacheStatus = await isCacheValid();
   //   expect(cacheStatus).toBeFalsy();
   // });
-
   // it("cache status should return false if explicity set to invalid after previously being valid", async () => {
   //   const result = await setCacheStatus(1000);
   //   const cacheStatus = await isCacheValid();
@@ -119,7 +137,6 @@ describe("insert", () => {
 
     expect(resultAfterInsert.data.length).toBe(3);
     expect(resultAfterInsert.source).toBe("d1");
-
 
     //new record should now be in the cache since this is the second time we're requesting it
     const resultAfterGet = await getRecords(ctx, "users", undefined, urlKey);

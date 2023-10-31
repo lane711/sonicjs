@@ -81,8 +81,6 @@ export function saveContentType(db, site, contentTypeComponents) {
 export async function addToKvCache(ctx, kv, key, value) {
   const cacheKey = addCachePrefix(key);
 
-  // console.log('*** addToKvCache db', db)
-  // console.log("*** addToKvCache adding to kv cache", cacheKey);
   const createdOn = new Date().getTime();
 
   log(ctx, {
@@ -91,38 +89,18 @@ export async function addToKvCache(ctx, kv, key, value) {
     key,
     cacheKey,
     createdOn,
-    value
+    value,
   });
 
-  await kv.put(
-    cacheKey,
-    JSON.stringify(value),
-    {
-      metadata: { createdOn },
-    }
-  );
-
-  // const result = await kv.put(cacheKey, JSON.stringify(value), {
-  //   metadata: { createdOn} ,
-  // });
+  await kv.put(cacheKey, JSON.stringify(value), {
+    metadata: { createdOn },
+  });
 
   log(ctx, {
     level: "verbose",
     message: `addToKvCache after put`,
     cacheKey,
   });
-  // await db.put(cacheKey, JSON.stringify(value));
-  // console.log("*** addToKvCache put complete");
-
-  // const { record, metadata } = await db.getWithMetadata(key, { type: "json" });
-
-  // console.log('getWithMetadata', key, record, metadata)
-  // log(ctx, {
-  //   level: "verbose",
-  //   message: `addToKvCache record ${createdOn}`,
-  // });
-  // console.log('confirmedRecord', confirmedRecord)
-  // return record;
 }
 
 export async function getRecordFromKvCache(db, key, ignorePrefix = false) {
@@ -212,6 +190,55 @@ export async function getContentTypes(db) {
   return contentTypes;
 }
 
-export function add(a, b) {
-  return a + b;
+//keys
+
+export function addKeyPrefix(key: string = "") {
+  return `key::${key}`;
+}
+
+export async function addToKvKeys(ctx, kv, url) {
+  const cacheKey = addKeyPrefix(url);
+
+  const lastAccessed = new Date().getTime();
+
+  log(ctx, {
+    level: "verbose",
+    message: `addToKvKeys before put`,
+    url,
+    cacheKey,
+    lastAccessed
+  });
+
+  await kv.put(cacheKey, '', {
+    metadata: { lastAccessed, url },
+  });
+
+  log(ctx, {
+    level: "verbose",
+    message: `addToKvKeys after put`,
+    cacheKey,
+  });
+}
+
+
+export async function getKVKeys(
+  db,
+  limit: number = 100,
+  cursor?: string
+) {
+  const prefix = addKeyPrefix();
+  return db.list({ prefix, limit, cursor });
+}
+
+export async function getKVKeysSorted(
+  db,
+  limit: number = 100,
+  cursor?: string
+) {
+  const results = await getKVKeys(db, limit, cursor)
+  return results.keys.sort(compareByLastAccessed).reverse();
+}
+
+function compareByLastAccessed(a, b) {
+  return a.metadata.lastAccessed - a.metadata.lastAccessed;
 }

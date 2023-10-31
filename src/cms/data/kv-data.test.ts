@@ -1,3 +1,4 @@
+import { sleep } from "../util/helpers";
 import {
   add,
   getKey,
@@ -7,6 +8,9 @@ import {
   getRecordFromKvCache,
   clearKVCache,
   getKVCache,
+  addToKvKeys,
+  getKVKeys,
+  getKVKeysSorted,
 } from "./kv-data";
 
 const env = getMiniflareBindings();
@@ -79,13 +83,36 @@ describe("test KV cache", () => {
     });
 
     const allCacheItems = await getKVCache(env.KVDATA);
-    console.log('allCacheItems', allCacheItems);
+    console.log("allCacheItems", allCacheItems);
 
     // //clear cache
     await clearKVCache(env.KVDATA);
 
     const allCacheItemsAfterClearCache = await getKVCache(env.KVDATA);
     expect(allCacheItemsAfterClearCache.keys.length).toEqual(0);
+  });
+});
+
+describe("test KV keys", () => {
+  it("addToKvKeys should save key", async () => {
+    await addToKvKeys({}, env.KVDATA, "http://some-url-1");
+    await addToKvKeys({}, env.KVDATA, "http://some-url-2");
+
+    const result = await getKVKeys(env.KVDATA);
+
+    expect(result.keys.length).toBe(2);
+  });
+
+  it("getKVKeysSorted return sorted keys by lastAccessed", async () => {
+    await addToKvKeys({}, env.KVDATA, "http://some-url-1");
+    sleep(50);
+    await addToKvKeys({}, env.KVDATA, "http://some-url-2");
+
+    const resultSorted = await getKVKeysSorted(env.KVDATA);
+
+    expect(resultSorted.length).toBe(2);
+    expect(resultSorted[0].name).toBe("key::http://some-url-2");
+    expect(resultSorted[0].metadata.url).toBe("http://some-url-2");
 
   });
 });
