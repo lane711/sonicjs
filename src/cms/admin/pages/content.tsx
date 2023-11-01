@@ -132,6 +132,25 @@ export async function loadKVCacheTable(ctx) {
   );
 }
 
+
+export async function loadKVKeysTable(ctx) {
+  return (
+    <Layout screenTitle={"Keys Cache"}>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="pb-2 mb-3">
+            <button id="clear-cache-kv" class="btn btn-warning">
+              Clear Keys Cache
+            </button>
+          </div>
+
+          <div id="grid-keys-cache"></div>
+        </div>
+      </div>
+    </Layout>
+  );
+}
+
 export async function loadKVCacheDetail(ctx, kv) {
   return (
     <Layout screenTitle={"KV Item Detail"}>

@@ -95,18 +95,18 @@ describe("test KV cache", () => {
 
 describe("test KV keys", () => {
   it("addToKvKeys should save key", async () => {
-    await addToKvKeys({}, env.KVDATA, "http://some-url-1");
-    await addToKvKeys({}, env.KVDATA, "http://some-url-2");
+    await addToKvKeys({}, env.KVDATA, "cache::http://some-url-1");
+    await addToKvKeys({}, env.KVDATA, "cache::http://some-url-2");
 
     const result = await getKVKeys(env.KVDATA);
 
     expect(result.keys.length).toBe(2);
   });
 
-  it("getKVKeysSorted return sorted keys by lastAccessed", async () => {
-    await addToKvKeys({}, env.KVDATA, "http://some-url-1");
+  it("getKVKeysSorted return sorted keys by lastAccessedOn", async () => {
+    await addToKvKeys({}, env.KVDATA, "cache::http://some-url-1");
     sleep(1);
-    await addToKvKeys({}, env.KVDATA, "http://some-url-2");
+    await addToKvKeys({}, env.KVDATA, "cache::http://some-url-2");
 
     const resultSorted = await getKVKeysSorted(env.KVDATA);
 
@@ -116,12 +116,12 @@ describe("test KV keys", () => {
 
   });
 
-  it("getKVKeysSorted return sorted keys by lastAccessed after update", async () => {
-    await addToKvKeys({}, env.KVDATA, "http://some-url-1");
+  it("getKVKeysSorted return sorted keys by lastAccessedOn after update", async () => {
+    await addToKvKeys({}, env.KVDATA, "cache::http://some-url-1");
     sleep(1);
-    await addToKvKeys({}, env.KVDATA, "http://some-url-2");
+    await addToKvKeys({}, env.KVDATA, "cache::http://some-url-2");
     sleep(1);
-    await addToKvKeys({}, env.KVDATA, "http://some-url-1");
+    await addToKvKeys({}, env.KVDATA, "cache::http://some-url-1");
 
     const resultSorted = await getKVKeysSorted(env.KVDATA);
 

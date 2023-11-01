@@ -197,27 +197,36 @@ export function addKeyPrefix(key: string = "") {
   return `key::${key}`;
 }
 
-export async function addToKvKeys(ctx, kv, url) {
-  const cacheKey = addKeyPrefix(url);
+export function convertCacheToKey(cacheKey: string = "") {
+  return `${'key::'}${cacheKey.replace("cache::", "")}`;
+}
 
-  const lastAccessed = new Date().getTime();
+export function convertCacheToUrl(cacheKey: string = "") {
+  return cacheKey.replace("cache::", "");
+}
+
+export async function addToKvKeys(ctx, kv, cacheKey) {
+  const urlKey = convertCacheToKey(cacheKey);
+  const url = convertCacheToUrl(cacheKey);
+
+  const lastAccessedOn = new Date().getTime();
 
   log(ctx, {
     level: "verbose",
     message: `addToKvKeys before put`,
-    url,
-    cacheKey,
-    lastAccessed,
+    urlKey,
+    lastAccessedOn,
   });
+  console.log('addToKvKeys', cacheKey, urlKey, url);
 
-  await kv.put(cacheKey, "", {
-    metadata: { lastAccessed, url },
+  await kv.put(urlKey, JSON.stringify({}), {
+    metadata: { lastAccessedOn, url },
   });
 
   log(ctx, {
     level: "verbose",
     message: `addToKvKeys after put`,
-    cacheKey,
+    urlKey,
   });
 }
 
@@ -232,5 +241,5 @@ export async function getKVKeysSorted(
   cursor?: string
 ) {
   const results = await getKVKeys(db, limit, cursor);
-  return _.orderBy(results.keys, ["metadata.lastAccessed"], ["desc"]);
+  return _.orderBy(results.keys, ["metadata.lastAccessedOn"], ["desc"]);
 }

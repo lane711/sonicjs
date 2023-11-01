@@ -20,6 +20,7 @@ import {
 import {
   addCachePrefix,
   addToKvCache,
+  addToKvKeys,
   clearKVCache,
   deleteKVById,
   getRecordFromKvCache,
@@ -294,6 +295,8 @@ async function dataAddToInMemoryCache(
   total
 ) {
   // HACK to support int testing
+
+  await addToKvKeys(ctx, ctx.env.KVDATA, cacheKey);
 
   if (executionCtx) {
     ctx.executionCtx.waitUntil(

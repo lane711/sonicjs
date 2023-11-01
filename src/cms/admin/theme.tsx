@@ -186,6 +186,12 @@ export const Layout = (props: {
                   </li>
 
                   <li class="nav-item">
+                    <a class="nav-link" href="/admin/cache/keys">
+                      Keys
+                    </a>
+                  </li>
+
+                  <li class="nav-item">
                     <a
                       id="clear-cache-all"
                       class="nav-link"
@@ -276,6 +282,8 @@ export const Layout = (props: {
         <script src="/public/js/grid.js"></script>
         <script src="/public/js/grid-in-memory-cache.js"></script>
         <script src="/public/js/grid-kv-cache.js"></script>
+        <script src="/public/js/grid-keys-cache.js"></script>
+
       </body>
     </html>
   );

@@ -11,6 +11,7 @@ import {
   loadInMemoryCacheTable,
   loadKVCacheDetail,
   loadKVCacheTable,
+  loadKVKeysTable,
   loadNewContent,
   loadTableData,
 } from "./pages/content";
@@ -21,7 +22,7 @@ import { apiConfig } from "../../db/schema";
 import qs from "qs";
 import { format, compareAsc } from "date-fns";
 import { getAllFromInMemoryCache, getFromInMemoryCache } from "../data/cache";
-import { getKVCache, getRecordFromKvCache } from "../data/kv-data";
+import { getKVCache, getKVKeys, getRecordFromKvCache } from "../data/kv-data";
 
 const admin = new Hono<{ Bindings: Bindings }>();
 
@@ -61,6 +62,10 @@ admin.get("/cache/in-memory/:id", async (ctx) => {
 
 admin.get("/cache/kv", async (ctx) => {
   return ctx.html(await loadKVCacheTable(ctx));
+});
+
+admin.get("/cache/keys", async (ctx) => {
+  return ctx.html(await loadKVKeysTable(ctx));
 });
 
 admin.get("/cache/kv/:id", async (ctx) => {
@@ -115,6 +120,39 @@ admin.get("/api/kv-cache", async (ctx) => {
       viewLink: `<a href="/admin/cache/kv/${itemEncoded}">${item.name}</a>`,
       createdOn: item.metadata.createdOn
         ? format(item.metadata.createdOn, "MM/dd/yyyy h:mm b")
+        : "",
+    };
+  });
+
+  const end = Date.now();
+  const executionTime = end - start;
+  // console.log(`Execution time: ${end - start} ms`);
+
+  return ctx.json({
+    data,
+    source: records.source,
+    total: records.total,
+    executionTime,
+  });
+});
+
+admin.get("/api/keys-cache", async (ctx) => {
+  const start = Date.now();
+
+  var params = qs.parse(ctx.req.query());
+  params.limit = params.limit ?? 1000;
+
+  const records = await getKVKeys(ctx.env.KVDATA);
+
+  console.log('keys', records)
+
+  const data = records.keys.map((item) => {
+    const itemEncoded = encodeURIComponent(item.name);
+    return {
+      key: item.name,
+      viewLink: `<a href="/admin/cache/kv/${itemEncoded}">${item.name}</a>`,
+      lastAccessedOn: item.metadata.lastAccessedOn
+        ? format(item.metadata.lastAccessedOn, "MM/dd/yyyy h:mm b")
         : "",
     };
   });

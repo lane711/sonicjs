@@ -1,6 +1,6 @@
 import loki from "lokijs";
 import { log } from "../util/logger";
-import { getDataByPrefix, getKVCache, getRecordFromKvCache } from "./kv-data";
+import { getDataByPrefix, getKVCache, getKVKeys, getRecordFromKvCache } from "./kv-data";
 var db = new loki("cache.db");
 var cache = db.addCollection("cache");
 
@@ -87,19 +87,20 @@ export async function repopulateCacheFromKVKeys(ctx) {
   const now = new Date().getTime().toString();
 
   if (isCacheAlreadyPopulated.length) {
-    console.log("cache already pop");
+    console.log("cache already populated");
     return;
   }
   await addToInMemoryCache({}, cacheKey, { started: now });
 
-  const kvData = await getDataByPrefix(ctx.env.KVDATA, "cache::");
-  if (kvData) {
-    for await (const data of kvData) {
-      data.source = "cache";
+  const keys = await getKVKeys(ctx.env.KVDATA);
+  if (keys) {
+    for await (const key of keys) {
+      console.log('==> adding to in memory', key)
+      // data.source = "cache";
       // console.log("adding to cache " + data.key);
       // console.log('adding to cache ' + JSON.stringify(data, 2, null));
 
-      await addToInMemoryCache(ctx, data.key, data);
+      // await addToInMemoryCache(ctx, data.key, data);
     }
   }
 }

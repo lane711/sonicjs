@@ -100,6 +100,37 @@ describe("Test admin api", () => {
   });
 });
 
+it("keys admin api should return 200", async () => {
+  //start with a clear cache
+  await clearInMemoryCache();
+  await clearKVCache(KVDATA);
+  createTestTable();
+  await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+    firstName: "John",
+    id: "a",
+  });
+  await insertD1Data(__D1_BETA__D1DATA, KVDATA, "users", {
+    firstName: "Jane",
+    id: "b",
+  });
+
+  // this should add to cache
+  const ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
+
+  const d1Result = await getRecords(ctx, "users", undefined, "/some-key");
+
+  let req = new Request("http://localhost/admin/api/keys-cache", {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+  let res = await app.fetch(req, env);
+  expect(res.status).toBe(200);
+  let body = await res.json();
+  expect(body.data.length).toBe(1);
+  expect(body.data[0].key).toBe("cache::/some-key");
+  expect(body.data[0].createdOn.length).toBeGreaterThan(0);
+});
+
 function createTestTable() {
   const db = drizzle(__D1_BETA__D1DATA);
   console.log("creating test table");
