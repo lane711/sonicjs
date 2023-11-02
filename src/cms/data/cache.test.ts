@@ -7,61 +7,80 @@ import { drizzle } from "drizzle-orm/d1";
 import { deleteRecord, getRecords, insertRecord, updateRecord } from "./data";
 import {
   clearInMemoryCache,
+  getAllCacheItemsFromInMemoryCache,
   getAllFromInMemoryCache,
   isCacheValid,
-  repopulateCacheFromKVKeys,
+  rehydrateCacheFromKVKeys,
   setCacheStatus,
   setCacheStatusInvalid,
 } from "./cache";
 import {
   addToKvCache,
+  addToKvKeys,
   clearKVCache,
   getKVCache,
   getRecordFromKvCache,
 } from "./kv-data";
+import app from "../../server";
 
 const ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
 
-describe("cache population", () => {
-  it("cache should populate based on KV keys", async () => {
-    const cacheKey = "/some-key";
-    await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
-      data: [{ some: "data" }],
-      source: "kv",
-      total: 1,
+describe("cache hydration", () => {
+  it("cache should hydrate based on KV keys", async () => {
+    await addToKvCache({}, env.KVDATA, "http://some-url-1", {
+      data: {
+        foo: "bar",
+      },
+    });
+    await addToKvCache({}, env.KVDATA, "http://some-url-2", {
+      data: {
+        foo: "bear",
+      },
     });
 
-    await repopulateCacheFromKVKeys(ctx);
+    await rehydrateCacheFromKVKeys(ctx);
+
+    const cache = await getAllCacheItemsFromInMemoryCache();
+    expect(cache.data.length).toBe(2);
+    expect(cache.source).toBe("cache");
+  });
+  it("cache should hydrate based on KV keys from prior api calls", async () => {
+    //start with a clear cache
+    await clearInMemoryCache();
+    await clearKVCache(KVDATA);
+
+    const urlKey1 = "http://localhost/v1/users?limit=1";
+    const urlKey2 = "http://localhost/v1/users?limit=2";
+    const urlKey3 = "http://localhost/v1/users?limit=3";
+
+    const db = createTestTable();
+
+    await insertTestUserRecord("Abe");
+    await insertTestUserRecord("Bob");
+    await insertTestUserRecord("Cat");
+
+    let req = new Request(urlKey1, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    let res = await app.fetch(req, env);
+    expect(res.status).toBe(200);
+    let body = await res.json();
+    expect(body.data.length).toBe(1);
+
+    // const d1Result = await getRecords(ctx, "users", undefined, urlKey1);
+
+    // await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
+    //   data: [{ some: "data" }],
+    //   source: "kv",
+    //   total: 1,
+    // });
+
+    await rehydrateCacheFromKVKeys(ctx);
 
     const cache = await getAllFromInMemoryCache();
     expect(cache.data.length).toBe(2);
   });
-});
-describe("cache expiration", () => {
-  // it("cache status should return false if never set", async () => {
-  //   const cacheStatus = await isCacheValid();
-  //   expect(cacheStatus).toBeFalsy();
-  // });
-  // it("cache status should return true", async () => {
-  //   const result = await setCacheStatus(1000);
-  //   const cacheStatus = await isCacheValid();
-  //   expect(cacheStatus).toBeTruthy();
-  // });
-  // it("cache status should return false if expired", async () => {
-  //   const result = await setCacheStatus(-1000);
-  //   const cacheStatus = await isCacheValid();
-  //   expect(cacheStatus).toBeFalsy();
-  // });
-  // it("cache status should return false if explicity set to invalid", async () => {
-  //   const result = await setCacheStatusInvalid();
-  //   const cacheStatus = await isCacheValid();
-  //   expect(cacheStatus).toBeFalsy();
-  // });
-  // it("cache status should return false if explicity set to invalid after previously being valid", async () => {
-  //   const result = await setCacheStatus(1000);
-  //   const cacheStatus = await isCacheValid();
-  //   expect(cacheStatus).toBeTruthy();
-  // });
 });
 
 describe("insert", () => {
@@ -305,4 +324,13 @@ function createTestTable() {
 	`);
 
   return db;
+}
+
+function insertTestUserRecord(firstName) {
+  return insertRecord(__D1_BETA__D1DATA, KVDATA, {
+    table: "users",
+    data: {
+      firstName,
+    },
+  });
 }

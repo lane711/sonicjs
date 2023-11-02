@@ -72,6 +72,22 @@ function setupClearCacheButtons() {
     });
   });
 
+  $("#rehydrate-cache").on("click", function () {
+    axios.get(`/v1/cache/rehydrate`).then((response) => {
+      if (response.status === 200) {
+        window.location = "/admin/cache/keys";
+      }
+    });
+  });
+
+  $("#clear-keys-cache").on("click", function () {
+    axios.get(`/v1/cache/clear-keys`).then((response) => {
+      if (response.status === 200) {
+        window.location = "/admin/cache/kv";
+      }
+    });
+  });
+
   $("#clear-cache-all").on("click", function () {
     axios.get(`/v1/cache/clear-all`).then((response) => {
       if (response.status === 200) {

@@ -139,8 +139,11 @@ export async function loadKVKeysTable(ctx) {
       <div class="row">
         <div class="col-md-12">
           <div class="pb-2 mb-3">
-            <button id="clear-cache-kv" class="btn btn-warning">
+            <button id="clear-keys-cache" class="btn btn-warning">
               Clear Keys Cache
+            </button>
+            <button id="rehydrate-cache" class="btn btn-warning">
+              Rehydrate Cache
             </button>
           </div>
 

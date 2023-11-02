@@ -99,9 +99,12 @@ export async function addToKvCache(ctx, kv, key, value) {
 
   log(ctx, {
     level: "verbose",
-    message: `addToKvCache after put`,
+    message: `addToKvCache after put, addToKvKeys`,
     cacheKey,
   });
+
+  await addToKvKeys(ctx, kv, key);
+
 }
 
 export async function getRecordFromKvCache(db, key, ignorePrefix = false) {
@@ -143,6 +146,7 @@ export async function clearAllKVRecords(db) {
 export function addCachePrefix(key: string = "") {
   return `cache::${key}`;
 }
+
 
 export function saveContent(db, content, timestamp, id) {
   // console.log("inserting KV data", JSON.stringify(content, null, 2));
@@ -242,4 +246,11 @@ export async function getKVKeysSorted(
 ) {
   const results = await getKVKeys(db, limit, cursor);
   return _.orderBy(results.keys, ["metadata.lastAccessedOn"], ["desc"]);
+}
+
+export async function clearKVKeysCache(db) {
+  const itemsToDelete = await getDataListByPrefix(db, addKeyPrefix(""));
+  for await (const key of itemsToDelete.keys) {
+    await deleteKVById(db, key.name);
+  }
 }

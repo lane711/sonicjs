@@ -1,6 +1,11 @@
 import loki from "lokijs";
 import { log } from "../util/logger";
-import { getDataByPrefix, getKVCache, getKVKeys, getRecordFromKvCache } from "./kv-data";
+import {
+  getDataByPrefix,
+  getKVCache,
+  getKVKeys,
+  getRecordFromKvCache,
+} from "./kv-data";
 var db = new loki("cache.db");
 var cache = db.addCollection("cache");
 
@@ -74,33 +79,51 @@ export async function getAllFromInMemoryCache() {
   return data;
 }
 
+export async function getAllCacheItemsFromInMemoryCache() {
+  let fullCache = await cache;
+  const cacheItems = fullCache.data.filter(
+    (item) => item.key.indexOf("cache::") === 0
+  );
+  return { data: cacheItems, source: "cache" };
+}
+
 export async function clearInMemoryCache() {
-  console.log("clearing InMemoryCache");
+  console.log("**** clearing InMemoryCache ****");
   cache.clear();
 }
 
-export async function repopulateCacheFromKVKeys(ctx) {
+export async function rehydrateCacheFromKVKeysOnStartup(ctx) {
   // we only want this to run once on start up
-  const cacheKey = "system::cache-repopulated";
-  const isCacheAlreadyPopulated = await getFromInMemoryCache(ctx, cacheKey);
-  console.log("isCacheAlreadyPopulated", isCacheAlreadyPopulated);
-  const now = new Date().getTime().toString();
+  const rehydrateCacheKey = "system::cache-rehydrated";
+  const isCacheAlreadyPopulated = await getFromInMemoryCache(ctx, rehydrateCacheKey);
+  // console.log("isCacheAlreadyPopulated", isCacheAlreadyPopulated);
 
   if (isCacheAlreadyPopulated.length) {
-    console.log("cache already populated");
+    // console.log("cache already populated");
     return;
+  } else {
+    console.log("rehydrateCacheFromKVKeys ===>");
+    const now = new Date().getTime().toString();
+
+    await addToInMemoryCache({}, rehydrateCacheKey, { started: now });
+
+    rehydrateCacheFromKVKeys(ctx);
   }
-  await addToInMemoryCache({}, cacheKey, { started: now });
-
-  const keys = await getKVKeys(ctx.env.KVDATA);
-  if (keys) {
-    for await (const key of keys) {
-      console.log('==> adding to in memory', key)
-      // data.source = "cache";
-      // console.log("adding to cache " + data.key);
-      // console.log('adding to cache ' + JSON.stringify(data, 2, null));
-
-      // await addToInMemoryCache(ctx, data.key, data);
+}
+export async function rehydrateCacheFromKVKeys(ctx) {
+  const keyData = await getKVKeys(ctx.env.KVDATA);
+  if (keyData.keys) {
+    for await (const key of keyData.keys) {
+      const url = key.metadata.url;
+      console.log("==> adding to in memory", url);
+      const data = await getRecordFromKvCache(ctx.env.KVDATA, url);
+      if (data) {
+        data.source = "cache";
+        const cacheKey = `cache::${url}`;
+        await addToInMemoryCache(ctx, cacheKey, data);
+      } else {
+        console.error("No kv data found for " + url);
+      }
     }
   }
 }

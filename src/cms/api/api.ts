@@ -13,6 +13,7 @@ import {
   saveContentType,
   getRecordFromKvCache,
   addToKvCache,
+  clearKVKeysCache,
 } from "../data/kv-data";
 import { Bindings } from "../types/bindings";
 import { apiConfig } from "../../db/schema";
@@ -25,7 +26,7 @@ import {
   insertRecord,
   updateRecord,
 } from "../data/data";
-import { clearInMemoryCache, getAllFromInMemoryCache, repopulateCacheFromKVKeys } from "../data/cache";
+import { clearInMemoryCache, getAllFromInMemoryCache, rehydrateCacheFromKVKeys } from "../data/cache";
 
 const api = new Hono<{ Bindings: Bindings }>();
 
@@ -274,6 +275,7 @@ api.get("/cache/clear-all", async (ctx) => {
   console.log("clearing cache");
   await clearInMemoryCache();
   await clearKVCache(ctx.env.KVDATA);
+  await clearKVKeysCache(ctx.env.KVDATA);
   return ctx.text("in memory and kv caches cleared");
 });
 
@@ -287,6 +289,12 @@ api.get("/cache/clear-kv", async (ctx) => {
   console.log("clearing cache");
   await clearKVCache(ctx.env.KVDATA);
   return ctx.text("kv cache cleared");
+});
+
+api.get("/cache/clear-keys", async (ctx) => {
+  console.log("clearing keys");
+  await clearKVKeysCache(ctx.env.KVDATA);
+  return ctx.text("kv keys cleared");
 });
 
 api.get("/cache/in-memory", async (ctx) => {
@@ -308,12 +316,12 @@ api.get("/cache/kv/:cacheKey", async (ctx) => {
   return ctx.json(cacheItem);
 });
 
-// api.get("/cache/repopulate", async (ctx) => {
-//   console.log("repopulating cache");
-//   await clearInMemoryCache();
-//   await repopulateCacheFromKVKeys(ctx);
-//   return ctx.text("cache has been repopulated from kv");
-// });
+api.get("/cache/rehydrate", async (ctx) => {
+  console.log("rehydrating cache");
+  await clearInMemoryCache();
+  await rehydrateCacheFromKVKeys(ctx);
+  return ctx.text("cache has been repopulated from kv");
+});
 
 api.get("/kv", async (ctx) => {
   const allItems = await getDataByPrefix(ctx.env.KVDATA, "", 2);
