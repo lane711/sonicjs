@@ -141,9 +141,11 @@ apiConfig.forEach((entry) => {
 
     try {
       const result = await updateRecord(
+        ctx,
         ctx.env.D1DATA,
         ctx.env.KVDATA,
-        content
+        content,
+        ctx.req.url
       );
 
       return ctx.json(result.data, 200);

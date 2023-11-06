@@ -13,8 +13,11 @@ import {
 import { DefaultLogger, LogWriter, eq } from "drizzle-orm";
 import {
   addToInMemoryCache,
+  clearInMemoryCache,
   getFromInMemoryCache,
   isCacheValid,
+  rehydrateCacheFromKVKeys,
+  rehydrateCacheItemFromKVKey,
   setCacheStatusInvalid,
 } from "./cache";
 import {
@@ -23,6 +26,7 @@ import {
   addToKvKeys,
   clearKVCache,
   deleteKVById,
+  getKVKeyLatest,
   getRecordFromKvCache,
   saveKVData,
 } from "./kv-data";
@@ -97,7 +101,9 @@ export async function getRecords(
   source = "fastest",
   customDataFunction = undefined
 ) {
+  cacheKey = addCachePrefix(cacheKey);
   log(ctx, { level: "verbose", message: "getRecords start", cacheKey });
+
   const cacheStatusValid = await isCacheValid();
   // console.log("getRecords cacheStatusValid", cacheStatusValid);
   log(ctx, {
@@ -105,7 +111,7 @@ export async function getRecords(
     message: `getRecords cacheStatusValid:${cacheStatusValid}`,
   });
 
-  if (cacheStatusValid) {
+  if (cacheStatusValid && source == "fastest") {
     log(ctx, {
       level: "verbose",
       message: "getRecords getFromInMemoryCache start",
@@ -340,27 +346,78 @@ export async function insertRecord(d1, kv, data) {
   return { code: 500, error };
 }
 
-export async function updateRecord(d1, kv, data) {
+export async function updateRecord(ctx, d1, kv, data, cacheKey) {
   const timestamp = new Date().getTime();
 
   try {
-    const result = await saveKVData(kv, data, timestamp, data.id);
+    //most important to make sure the data is updated in D1
+    const d1Update = updateD1Data(d1, data.table, data);
+
+    // cache
+    const clearCache = clearInMemoryCache();
+
+    const clearKV = clearKVCache(kv);
+
+    Promise.all([d1Update, clearKV, clearCache]).then(async (result) => {
+      const d1Result = result[0];
+      const record = { ...data.data, id: data.id };
+      const kvUpdate = addToInMemoryCache(ctx, cacheKey, data);
+
+      // kv
+      const cacheUpdate = addToKvCache(kv, data, timestamp, data.id);
+
+      //add last access url
+      const latestKey = await getKVKeyLatest(kv);
+
+      Promise.all([kvUpdate, cacheUpdate]).then((values) => {
+        console.log(values);
+        return { code: 200, data: d1Update };
+      });
+    });
   } catch (error) {
     console.log("error posting content", error);
     return { code: 500, message: error };
   } finally {
     //then also save the content to sqlite for filtering, sorting, etc
     try {
-      const result = updateD1Data(d1, data.table, data);
       //expire cache
-      await setCacheStatusInvalid();
-      await clearKVCache(kv);
-      return { code: 200, data: result };
+      // await setCacheStatusInvalid();
+      // await clearKVCache(kv);
+
+      //getrecord to prime cache
+      // getRecords(ctx, data.table, {id: data.id}, )
+
+      rehydrateCacheFromKVKeys(ctx);
+      // return { code: 200, data: result };
     } catch (error) {
       console.log("error posting content", error);
     }
   }
 }
+
+// export async function updateRecord(ctx,d1, kv, data) {
+//   const timestamp = new Date().getTime();
+
+//   try {
+//     const result = await saveKVData(kv, data, timestamp, data.id);
+//   } catch (error) {
+//     console.log("error posting content", error);
+//     return { code: 500, message: error };
+//   } finally {
+//     //then also save the content to sqlite for filtering, sorting, etc
+//     try {
+//       const result = updateD1Data(d1, data.table, data);
+//       //expire cache
+//       await setCacheStatusInvalid();
+//       await clearKVCache(kv);
+
+//       rehydrateCacheFromKVKeys(ctx)
+//       return { code: 200, data: result };
+//     } catch (error) {
+//       console.log("error posting content", error);
+//     }
+//   }
+// }
 
 export async function deleteRecord(d1, kv, data) {
   const timestamp = new Date().getTime();

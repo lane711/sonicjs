@@ -44,6 +44,7 @@ describe("cache hydration", () => {
     expect(cache.data.length).toBe(2);
     expect(cache.source).toBe("cache");
   });
+
   it("cache should hydrate based on KV keys from prior api calls", async () => {
     //start with a clear cache
     await clearInMemoryCache();
@@ -55,9 +56,9 @@ describe("cache hydration", () => {
 
     const db = createTestTable();
 
-    await insertTestUserRecord("Abe");
-    await insertTestUserRecord("Bob");
-    await insertTestUserRecord("Cat");
+    await insertTestUserRecord("a", "Abe");
+    await insertTestUserRecord("b", "Bob");
+    await insertTestUserRecord("c", "Cat");
 
     let req = new Request(urlKey1, {
       method: "GET",
@@ -68,21 +69,52 @@ describe("cache hydration", () => {
     let body = await res.json();
     expect(body.data.length).toBe(1);
 
-    // const d1Result = await getRecords(ctx, "users", undefined, urlKey1);
+    const cache = await getAllCacheItemsFromInMemoryCache();
+    expect(cache.data.length).toBe(1);
+    expect(cache.data[0].data.data[0].firstName).toBe("Abe");
 
-    // await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
-    //   data: [{ some: "data" }],
-    //   source: "kv",
-    //   total: 1,
-    // });
+    //now hit another api and we should have 2 entries
+    let req2 = new Request(urlKey2, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    let res2 = await app.fetch(req2, env);
+    expect(res2.status).toBe(200);
+    let body2 = await res2.json();
+    expect(body2.data.length).toBe(2);
 
-    await rehydrateCacheFromKVKeys(ctx);
+    const cache2 = await getAllCacheItemsFromInMemoryCache();
+    expect(cache2.data.length).toBe(2);
+    expect(cache2.data[0].data.data[0].firstName).toBe("Abe");
+    expect(cache2.data[1].data.data[0].firstName).toBe("Abe");
+    expect(cache2.data[1].data.data[1].firstName).toBe("Bob");
 
-    const cache = await getAllFromInMemoryCache();
-    expect(cache.data.length).toBe(2);
+    //now update name and retry get
+    let payload = JSON.stringify({ data: { firstName: "Abe2" }, id: "a" });
+    let req3 = new Request(`http://localhost/v1/users/a`, {
+      method: "PUT",
+      body: payload,
+      headers: { "Content-Type": "application/json" },
+    });
+    let res3 = await app.fetch(req, env);
+    expect(res3.status).toBe(200);
+    let body3 = await res3.json();
+
+    //retry get
+    let req4 = new Request(urlKey1, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    let res4 = await app.fetch(req4, env);
+    expect(res4.status).toBe(200);
+    let body4 = await res4.json();
+    expect(body4.data.length).toBe(1);
+
+    const cache4 = await getAllCacheItemsFromInMemoryCache();
+    expect(cache4.data.length).toBe(2);
+    expect(cache4.data[0].data.data[0].firstName).toBe("Abe2");
   });
 });
-
 describe("insert", () => {
   it("cache should update after insert", async () => {
     //start with a clear cache
@@ -211,7 +243,7 @@ describe("update", () => {
 
     // let's update a record
     let recordToUpdate = d1Result.data[1];
-    const rec3 = await updateRecord(__D1_BETA__D1DATA, KVDATA, {
+    const rec3 = await updateRecord(ctx, __D1_BETA__D1DATA, KVDATA, {
       id: recordToUpdate.id,
       table: "users",
       data: {
@@ -326,10 +358,11 @@ function createTestTable() {
   return db;
 }
 
-function insertTestUserRecord(firstName) {
+function insertTestUserRecord(id: string, firstName) {
   return insertRecord(__D1_BETA__D1DATA, KVDATA, {
     table: "users",
     data: {
+      id,
       firstName,
     },
   });

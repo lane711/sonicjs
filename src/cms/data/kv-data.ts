@@ -86,7 +86,7 @@ export async function addToKvCache(ctx, kv, key, value) {
 
   log(ctx, {
     level: "verbose",
-    message: `addToKvCache before put`,
+    message: `addToKvCache before put ${cacheKey}`,
     key,
     cacheKey,
     createdOn,
@@ -144,7 +144,8 @@ export async function clearAllKVRecords(db) {
 }
 
 export function addCachePrefix(key: string = "") {
-  return `cache::${key}`;
+  //prefix is its not already there
+  return `${'cache::'}${key.replace("cache::", "")}`;
 }
 
 
@@ -237,6 +238,12 @@ export async function addToKvKeys(ctx, kv, cacheKey) {
 export async function getKVKeys(db, limit: number = 100, cursor?: string) {
   const prefix = addKeyPrefix();
   return db.list({ prefix, limit, cursor });
+}
+
+export async function getKVKeyLatest(db, limit: number = 1) {
+  const prefix = addKeyPrefix();
+  const list = await db.list({ prefix, limit });
+  return list[0].metadata.url;
 }
 
 export async function getKVKeysSorted(

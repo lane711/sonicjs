@@ -6,8 +6,9 @@ import {
   getKVKeys,
   getRecordFromKvCache,
 } from "./kv-data";
+import { getRecords } from "./data";
 var db = new loki("cache.db");
-var cache = db.addCollection("cache");
+var cache = db.addCollection("cache", {unique: 'key'});
 
 // class CacheStatus {
 //   private static _instance: CacheStatus;
@@ -51,7 +52,14 @@ export async function addToInMemoryCache(ctx = {}, key: string, data) {
     level: "verbose",
     message: "addToInMemoryCache start",
   });
-  cache.insert({ key, data });
+  const existing = await getFromInMemoryCache(ctx, key);
+  if (existing.length) {
+    let doc = existing[0];
+    doc.data = {...data};
+    cache.update(doc);
+  } else {
+    cache.insert({ key, data });
+  }
   log(ctx, {
     level: "verbose",
     message: "addToInMemoryCache end",
@@ -90,12 +98,16 @@ export async function getAllCacheItemsFromInMemoryCache() {
 export async function clearInMemoryCache() {
   console.log("**** clearing InMemoryCache ****");
   cache.clear();
+  return true;
 }
 
 export async function rehydrateCacheFromKVKeysOnStartup(ctx) {
   // we only want this to run once on start up
   const rehydrateCacheKey = "system::cache-rehydrated";
-  const isCacheAlreadyPopulated = await getFromInMemoryCache(ctx, rehydrateCacheKey);
+  const isCacheAlreadyPopulated = await getFromInMemoryCache(
+    ctx,
+    rehydrateCacheKey
+  );
   // console.log("isCacheAlreadyPopulated", isCacheAlreadyPopulated);
 
   if (isCacheAlreadyPopulated.length) {
@@ -116,16 +128,34 @@ export async function rehydrateCacheFromKVKeys(ctx) {
     for await (const key of keyData.keys) {
       const url = key.metadata.url;
       console.log("==> adding to in memory", url);
-      const data = await getRecordFromKvCache(ctx.env.KVDATA, url);
-      if (data) {
-        data.source = "cache";
-        const cacheKey = `cache::${url}`;
-        await addToInMemoryCache(ctx, cacheKey, data);
-      } else {
-        console.error("No kv data found for " + url);
-      }
+      rehydrateCacheItemFromKVKey(ctx, url);
     }
   }
+}
+export async function rehydrateCacheItemFromKVKey(ctx, url) {
+  const data = await getRecordFromKvCache(ctx.env.KVDATA, url);
+  // const data = await getRecords(ctx.env.KVDATA, url);
+
+  if (data) {
+    data.source = "cache";
+    const cacheKey = `cache::${url}`;
+    await addToInMemoryCache(ctx, cacheKey, data);
+  } else {
+    console.error("No kv data found for " + url);
+  }
+}
+
+export async function rehydrateCacheItemByURLl(ctx, url) {
+
+  let req = new Request(url, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    let res = await app.fetch(req, env);
+    expect(res.status).toBe(200);
+    let body = await res.json();
+
+    const data = getRecords(ctx.env.KVDATA, url);
 }
 
 // export async function getCacheStatus() {
