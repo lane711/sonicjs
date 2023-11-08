@@ -104,7 +104,6 @@ export async function addToKvCache(ctx, kv, key, value) {
   });
 
   await addToKvKeys(ctx, kv, key);
-
 }
 
 export async function getRecordFromKvCache(db, key, ignorePrefix = false) {
@@ -145,9 +144,8 @@ export async function clearAllKVRecords(db) {
 
 export function addCachePrefix(key: string = "") {
   //prefix is its not already there
-  return `${'cache::'}${key.replace("cache::", "")}`;
+  return `${"cache::"}${key.replace("cache::", "")}`;
 }
-
 
 export function saveContent(db, content, timestamp, id) {
   // console.log("inserting KV data", JSON.stringify(content, null, 2));
@@ -203,7 +201,7 @@ export function addKeyPrefix(key: string = "") {
 }
 
 export function convertCacheToKey(cacheKey: string = "") {
-  return `${'key::'}${cacheKey.replace("cache::", "")}`;
+  return `${"key::"}${cacheKey.replace("cache::", "")}`;
 }
 
 export function convertCacheToUrl(cacheKey: string = "") {
@@ -222,7 +220,7 @@ export async function addToKvKeys(ctx, kv, cacheKey) {
     urlKey,
     lastAccessedOn,
   });
-  console.log('addToKvKeys', cacheKey, urlKey, url);
+  console.log("addToKvKeys", cacheKey, urlKey, url);
 
   await kv.put(urlKey, JSON.stringify({}), {
     metadata: { lastAccessedOn, url },
@@ -240,10 +238,14 @@ export async function getKVKeys(db, limit: number = 100, cursor?: string) {
   return db.list({ prefix, limit, cursor });
 }
 
-export async function getKVKeyLatest(db, limit: number = 1) {
+export async function getKVKeyLatestUrl(db, limit: number = 1) {
   const prefix = addKeyPrefix();
   const list = await db.list({ prefix, limit });
-  return list[0].metadata.url;
+  if (list.keys.length) {
+    let url = list.keys[0].metadata.url;
+    console.log('getKVKeyLatestUrl', url )
+    return url;
+  }
 }
 
 export async function getKVKeysSorted(

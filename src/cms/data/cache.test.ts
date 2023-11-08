@@ -4,7 +4,7 @@ const env = getMiniflareBindings();
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
-import { deleteRecord, getRecords, insertRecord, updateRecord } from "./data";
+import { deleteRecord, getRecords, getRecordsByUrl, insertRecord, updateRecord } from "./data";
 import {
   clearInMemoryCache,
   getAllCacheItemsFromInMemoryCache,
@@ -22,6 +22,7 @@ import {
   getRecordFromKvCache,
 } from "./kv-data";
 import app from "../../server";
+import { sleep } from "../util/helpers";
 
 const ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
 
@@ -46,6 +47,8 @@ describe("cache hydration", () => {
   });
 
   it("cache should hydrate based on KV keys from prior api calls", async () => {
+    const db = createTestTable();
+
     //start with a clear cache
     await clearInMemoryCache();
     await clearKVCache(KVDATA);
@@ -53,8 +56,6 @@ describe("cache hydration", () => {
     const urlKey1 = "http://localhost/v1/users?limit=1";
     const urlKey2 = "http://localhost/v1/users?limit=2";
     const urlKey3 = "http://localhost/v1/users?limit=3";
-
-    const db = createTestTable();
 
     await insertTestUserRecord("a", "Abe");
     await insertTestUserRecord("b", "Bob");
@@ -96,7 +97,7 @@ describe("cache hydration", () => {
       body: payload,
       headers: { "Content-Type": "application/json" },
     });
-    let res3 = await app.fetch(req, env);
+    let res3 = await app.fetch(req3, env);
     expect(res3.status).toBe(200);
     let body3 = await res3.json();
 
@@ -109,9 +110,12 @@ describe("cache hydration", () => {
     expect(res4.status).toBe(200);
     let body4 = await res4.json();
     expect(body4.data.length).toBe(1);
+    expect(body4.data[0].firstName).toBe('Abe2');
+
 
     const cache4 = await getAllCacheItemsFromInMemoryCache();
     expect(cache4.data.length).toBe(2);
+    expect(cache4.data.source).toBe('cache');
     expect(cache4.data[0].data.data[0].firstName).toBe("Abe2");
   });
 });
@@ -203,7 +207,7 @@ describe("update", () => {
     await clearInMemoryCache();
     await clearKVCache(KVDATA);
 
-    const urlKey = "http://localhost:8888/some-cache-key-url";
+    const urlKey = "http://localhost/v1/users?limit=10&offset=0";
 
     const db = createTestTable();
 
@@ -223,7 +227,7 @@ describe("update", () => {
     });
     console.log("rec2", rec2);
 
-    const d1Result = await getRecords(ctx, "users", undefined, urlKey);
+    const d1Result = await getRecordsByUrl(ctx, urlKey);
 
     console.log("d1Result", d1Result);
 
@@ -231,12 +235,7 @@ describe("update", () => {
     expect(d1Result.source).toBe("d1");
 
     //if we request it again, it should be cached in memory
-    const inMemoryCacheResult = await getRecords(
-      ctx,
-      "users",
-      undefined,
-      urlKey
-    );
+    const inMemoryCacheResult = await getRecordsByUrl(ctx, urlKey);
 
     expect(inMemoryCacheResult.data.length).toBe(2);
     expect(inMemoryCacheResult.source).toBe("cache");
@@ -247,7 +246,7 @@ describe("update", () => {
       id: recordToUpdate.id,
       table: "users",
       data: {
-        firstName: "Steve",
+        firstName: "Jane2",
       },
     });
 
@@ -258,14 +257,23 @@ describe("update", () => {
     );
     expect(allCacheItems).toBeFalsy;
 
+    //wait a moment and the kv should be repopulated
+    sleep(1000);
+
+    const allCacheItemsAfterDelay = await getRecordFromKvCache(
+      KVDATA,
+      `cache::${urlKey}`
+    );
+    expect(allCacheItemsAfterDelay).toBeTruthy;
+
     // we inserted another record, it should be returned because the insert should invalidate cache
     // this will only work instantly on the node that the update is made and will be eventually consistent on other nodes
     // based on the in-memory cache settings
-    const resultAfterUpdate = await getRecords(ctx, "users", undefined, urlKey);
+    const resultAfterUpdate = await getRecordsByUrl(ctx, urlKey);
 
     expect(resultAfterUpdate.data.length).toBe(2);
-    expect(resultAfterUpdate.source).toBe("d1");
-    expect(resultAfterUpdate.data[1].firstName).toBe("Steve");
+    expect(resultAfterUpdate.source).toBe("cache");
+    expect(resultAfterUpdate.data[1].firstName).toBe("Jane2");
   });
 });
 

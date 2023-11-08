@@ -27,8 +27,8 @@ app.use(
 app.use("*", async (ctx, next) => {
   if (ctx.req.path.indexOf("/admin") == 0 || ctx.req.path.indexOf("/v1") == 0) {
     log(ctx, { level: "info", method: ctx.req.method, url: ctx.req.path });
+    rehydrateCacheFromKVKeysOnStartup(ctx);
   }
-  rehydrateCacheFromKVKeysOnStartup(ctx);
   await next();
 });
 

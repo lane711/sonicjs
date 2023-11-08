@@ -11,6 +11,8 @@ import {
   commentsTable,
 } from "../../db/schema";
 import { DefaultLogger, LogWriter, eq } from "drizzle-orm";
+import qs from "qs";
+
 import {
   addToInMemoryCache,
   clearInMemoryCache,
@@ -27,6 +29,7 @@ import {
   clearKVCache,
   deleteKVById,
   getKVKeyLatest,
+  getKVKeyLatestUrl,
   getRecordFromKvCache,
   saveKVData,
 } from "./kv-data";
@@ -38,6 +41,8 @@ import {
   updateD1Data,
 } from "./d1-data";
 import { log } from "../util/logger";
+import { triggerUrl } from "../api/api";
+import { extraTableFromUrl } from "../util/helpers";
 
 // export async function getRecordOld(d1, kv, id) {
 //   const cacheKey = addCachePrefix(id);
@@ -92,7 +97,16 @@ import { log } from "../util/logger";
 
 //   return d1Data;
 // }
+export async function getRecordsByUrl(ctx, url, source = "fastest") {
+  console.log("getRecordsByUrl", url);
+  const query = url.split("?")[1];
+  var params = qs.parse(query);
+  params.limit = params.limit ?? 1000;
+  const table = extraTableFromUrl(url)
+  console.log("getRecordsByUrl table", table);
 
+  return getRecords(ctx, table, params, url, source, undefined);
+}
 export async function getRecords(
   ctx,
   table,
@@ -111,6 +125,7 @@ export async function getRecords(
     message: `getRecords cacheStatusValid:${cacheStatusValid}`,
   });
 
+  //return cache if available
   if (cacheStatusValid && source == "fastest") {
     log(ctx, {
       level: "verbose",
@@ -137,6 +152,8 @@ export async function getRecords(
   try {
     executionCtx = ctx.executionCtx;
   } catch (err) {}
+
+  //return kv if available
 
   if (source == "fastest" || source == "kv") {
     log(ctx, {
@@ -184,6 +201,7 @@ export async function getRecords(
     }
   }
 
+  // cache and kv is not available, so get from d1
   var d1Data;
   let total = 0;
 
@@ -256,7 +274,7 @@ export async function getRecords(
   //     ctx.env.cache_ttl
   //   );
   // }
-  dataAddToInMemoryCache(ctx, executionCtx, cacheKey, d1Data, total);
+  await dataAddToInMemoryCache(ctx, executionCtx, cacheKey, d1Data, total);
 
   log(ctx, {
     level: "verbose",
@@ -289,8 +307,14 @@ export async function getRecords(
     message: "getRecords addToKvCache end",
   });
 
-  log(ctx, { level: "verbose", message: "getRecords end", cacheKey });
-  return { data: d1Data, source: "d1", total };
+  const result = { data: d1Data, source: "d1", total };
+  log(ctx, {
+    level: "verbose",
+    message: "getRecords end",
+    cacheKey,
+    data: result,
+  });
+  return result;
 }
 
 async function dataAddToInMemoryCache(
@@ -310,6 +334,7 @@ async function dataAddToInMemoryCache(
   }
 }
 
+//insert
 export async function insertRecord(d1, kv, data) {
   const content = data;
   const id = uuidv4();
@@ -346,34 +371,54 @@ export async function insertRecord(d1, kv, data) {
   return { code: 500, error };
 }
 
+//update
 export async function updateRecord(ctx, d1, kv, data, cacheKey) {
   const timestamp = new Date().getTime();
 
   try {
+    //TODO make more efficient with async
     //most important to make sure the data is updated in D1
-    const d1Update = updateD1Data(d1, data.table, data);
+    const record = await updateD1Data(d1, data.table, data);
 
     // cache
-    const clearCache = clearInMemoryCache();
+    const clearCache = await clearInMemoryCache();
+    const kvUpdate = await addToInMemoryCache(ctx, cacheKey, record);
 
-    const clearKV = clearKVCache(kv);
+    //kv
+    const clearKV = await clearKVCache(kv);
+    const cacheUpdate = await addToKvCache(ctx, kv, cacheKey, record);
 
-    Promise.all([d1Update, clearKV, clearCache]).then(async (result) => {
-      const d1Result = result[0];
-      const record = { ...data.data, id: data.id };
-      const kvUpdate = addToInMemoryCache(ctx, cacheKey, data);
+    // const d1Result = d1Update;
+    // const record = { ...data.data, id: data.id };
 
-      // kv
-      const cacheUpdate = addToKvCache(kv, data, timestamp, data.id);
+    //add last access url
+    const latestUrl = await getKVKeyLatestUrl(kv);
+    if (latestUrl) {
+      const recache = await getRecordsByUrl(ctx, latestUrl, "d1");
+    }
 
-      //add last access url
-      const latestKey = await getKVKeyLatest(kv);
+    //repop all
+    // rehydrateCacheFromKVKeys(ctx);
 
-      Promise.all([kvUpdate, cacheUpdate]).then((values) => {
-        console.log(values);
-        return { code: 200, data: d1Update };
-      });
-    });
+    return { code: 200, data: record };
+
+    // return Promise.all([d1Update, clearKV, clearCache]).then(async (result) => {
+    //   const d1Result = result[0];
+    //   const record = { ...data.data, id: data.id };
+    //   // const kvUpdate = addToInMemoryCache(ctx, cacheKey, record);
+
+    //   // kv
+    //   // const cacheUpdate = addToKvCache(ctx, kv, cacheKey, record);
+
+    //   //add last access url
+    //   const latestUrl = await getKVKeyLatestUrl(kv);
+    //   const lastUrlUpdate = await getRecordsByUrl(ctx, latestUrl, "d1");
+
+    //   return Promise.all([lastUrlUpdate]).then((values) => {
+    //     console.log(values);
+    //     return { code: 200, data: d1Update };
+    //   });
+    // });
   } catch (error) {
     console.log("error posting content", error);
     return { code: 500, message: error };
@@ -383,11 +428,9 @@ export async function updateRecord(ctx, d1, kv, data, cacheKey) {
       //expire cache
       // await setCacheStatusInvalid();
       // await clearKVCache(kv);
-
       //getrecord to prime cache
       // getRecords(ctx, data.table, {id: data.id}, )
-
-      rehydrateCacheFromKVKeys(ctx);
+      // rehydrateCacheFromKVKeys(ctx);
       // return { code: 200, data: result };
     } catch (error) {
       console.log("error posting content", error);
@@ -419,6 +462,7 @@ export async function updateRecord(ctx, d1, kv, data, cacheKey) {
 //   }
 // }
 
+//delete
 export async function deleteRecord(d1, kv, data) {
   const timestamp = new Date().getTime();
 

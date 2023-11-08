@@ -50,7 +50,8 @@ export async function setCacheStatusInvalid() {
 export async function addToInMemoryCache(ctx = {}, key: string, data) {
   log(ctx, {
     level: "verbose",
-    message: "addToInMemoryCache start",
+    message: "addToInMemoryCache start " + key,
+    key
   });
   const existing = await getFromInMemoryCache(ctx, key);
   if (existing.length) {
@@ -143,19 +144,6 @@ export async function rehydrateCacheItemFromKVKey(ctx, url) {
   } else {
     console.error("No kv data found for " + url);
   }
-}
-
-export async function rehydrateCacheItemByURLl(ctx, url) {
-
-  let req = new Request(url, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
-    let res = await app.fetch(req, env);
-    expect(res.status).toBe(200);
-    let body = await res.json();
-
-    const data = getRecords(ctx.env.KVDATA, url);
 }
 
 // export async function getCacheStatus() {
