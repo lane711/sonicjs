@@ -129,7 +129,7 @@ export async function rehydrateCacheFromKVKeys(ctx) {
     for await (const key of keyData.keys) {
       const url = key.metadata.url;
       console.log("==> adding to in memory", url);
-      rehydrateCacheItemFromKVKey(ctx, url);
+      await rehydrateCacheItemFromKVKey(ctx, url);
     }
   }
 }

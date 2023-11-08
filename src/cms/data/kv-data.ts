@@ -79,7 +79,7 @@ export function saveContentType(db, site, contentTypeComponents) {
   return db.put(generatedKey, JSON.stringify(contentTypeComponents));
 }
 
-export async function addToKvCache(ctx, kv, key, value) {
+export async function addToKvCache(ctx, key, value) {
   const cacheKey = addCachePrefix(key);
 
   const createdOn = new Date().getTime();
@@ -93,7 +93,7 @@ export async function addToKvCache(ctx, kv, key, value) {
     value,
   });
 
-  await kv.put(cacheKey, JSON.stringify(value), {
+  await ctx.env.KVDATA.put(cacheKey, JSON.stringify(value), {
     metadata: { createdOn },
   });
 
@@ -103,7 +103,7 @@ export async function addToKvCache(ctx, kv, key, value) {
     cacheKey,
   });
 
-  await addToKvKeys(ctx, kv, key);
+  await addToKvKeys(ctx, key);
 }
 
 export async function getRecordFromKvCache(db, key, ignorePrefix = false) {
@@ -208,7 +208,7 @@ export function convertCacheToUrl(cacheKey: string = "") {
   return cacheKey.replace("cache::", "");
 }
 
-export async function addToKvKeys(ctx, kv, cacheKey) {
+export async function addToKvKeys(ctx, cacheKey) {
   const urlKey = convertCacheToKey(cacheKey);
   const url = convertCacheToUrl(cacheKey);
 
@@ -222,7 +222,7 @@ export async function addToKvKeys(ctx, kv, cacheKey) {
   });
   console.log("addToKvKeys", cacheKey, urlKey, url);
 
-  await kv.put(urlKey, JSON.stringify({}), {
+  await ctx.env.KVDATA.put(urlKey, JSON.stringify({}), {
     metadata: { lastAccessedOn, url },
   });
 

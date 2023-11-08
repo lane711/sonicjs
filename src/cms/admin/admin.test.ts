@@ -65,7 +65,7 @@ describe("Test admin api", () => {
     expect(res.status).toBe(200);
     let body = await res.json();
     expect(body.data.length).toBe(1);
-    expect(body.data[0].key).toBe("/some-key");
+    expect(body.data[0].key).toBe("cache::/some-key");
   });
 
   it("kv admin api should return 200", async () => {

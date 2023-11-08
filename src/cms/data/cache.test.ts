@@ -4,17 +4,26 @@ const env = getMiniflareBindings();
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
-import { deleteRecord, getRecords, getRecordsByUrl, insertRecord, updateRecord } from "./data";
 import {
+  deleteRecord,
+  getRecords,
+  getRecordsByUrl,
+  insertRecord,
+  updateRecord,
+} from "./data";
+import {
+  addToInMemoryCache,
   clearInMemoryCache,
   getAllCacheItemsFromInMemoryCache,
   getAllFromInMemoryCache,
+  getFromInMemoryCache,
   isCacheValid,
   rehydrateCacheFromKVKeys,
   setCacheStatus,
   setCacheStatusInvalid,
 } from "./cache";
 import {
+  addCachePrefix,
   addToKvCache,
   addToKvKeys,
   clearKVCache,
@@ -26,18 +35,33 @@ import { sleep } from "../util/helpers";
 
 const ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
 
+describe("cache in/out", () => {
+  it("cache should hydrate based on KV keys", async () => {
+    await addToInMemoryCache(ctx, addCachePrefix("key1"), { key: 1 });
+    await addToInMemoryCache(ctx, addCachePrefix("key2"), { key: 2 });
+
+
+    const cache = await getAllCacheItemsFromInMemoryCache();
+    expect(cache.data.length).toBe(2);
+    expect(cache.source).toBe("cache");
+
+    const key1 = await getFromInMemoryCache(ctx, addCachePrefix("key1"));
+    const key2 = await getFromInMemoryCache(ctx, addCachePrefix("key2"));
+
+    expect(key1[0].data.key).toBe(1);
+    expect(key2[0].data.key).toBe(2);
+
+
+  });
+});
+
 describe("cache hydration", () => {
   it("cache should hydrate based on KV keys", async () => {
-    await addToKvCache({}, env.KVDATA, "http://some-url-1", {
-      data: {
-        foo: "bar",
-      },
-    });
-    await addToKvCache({}, env.KVDATA, "http://some-url-2", {
-      data: {
-        foo: "bear",
-      },
-    });
+    await addToKvCache(ctx, "http://some-url-1", { foo: "bar" });
+    await addToKvCache(ctx, "http://some-url-2", { foo: "bear" });
+
+    await addToKvKeys(ctx, "http://some-url-1");
+    await addToKvKeys(ctx, "http://some-url-2");
 
     await rehydrateCacheFromKVKeys(ctx);
 
@@ -45,7 +69,9 @@ describe("cache hydration", () => {
     expect(cache.data.length).toBe(2);
     expect(cache.source).toBe("cache");
   });
+});
 
+describe("full cache hydration via api", () => {
   it("cache should hydrate based on KV keys from prior api calls", async () => {
     const db = createTestTable();
 
@@ -110,12 +136,11 @@ describe("cache hydration", () => {
     expect(res4.status).toBe(200);
     let body4 = await res4.json();
     expect(body4.data.length).toBe(1);
-    expect(body4.data[0].firstName).toBe('Abe2');
-
+    expect(body4.data[0].firstName).toBe("Abe2");
 
     const cache4 = await getAllCacheItemsFromInMemoryCache();
     expect(cache4.data.length).toBe(2);
-    expect(cache4.data.source).toBe('cache');
+    expect(cache4.data.source).toBe("cache");
     expect(cache4.data[0].data.data[0].firstName).toBe("Abe2");
   });
 });
@@ -269,6 +294,7 @@ describe("update", () => {
     // we inserted another record, it should be returned because the insert should invalidate cache
     // this will only work instantly on the node that the update is made and will be eventually consistent on other nodes
     // based on the in-memory cache settings
+    const cacheCheck = await getAllCacheItemsFromInMemoryCache();
     const resultAfterUpdate = await getRecordsByUrl(ctx, urlKey);
 
     expect(resultAfterUpdate.data.length).toBe(2);

@@ -102,7 +102,7 @@ export async function getRecordsByUrl(ctx, url, source = "fastest") {
   const query = url.split("?")[1];
   var params = qs.parse(query);
   params.limit = params.limit ?? 1000;
-  const table = extraTableFromUrl(url)
+  const table = extraTableFromUrl(url);
   console.log("getRecordsByUrl table", table);
 
   return getRecords(ctx, table, params, url, source, undefined);
@@ -170,25 +170,6 @@ export async function getRecords(
 
     if (kvData) {
       //we have the data in KV, but we should still cache it for the next matching request
-      // if (executionCtx) {
-      //   ctx.executionCtx.waitUntil(
-      //     addToInMemoryCache(
-      //       cacheKey,
-      //       { data: kvData.data, source: "cache", total: kvData.total },
-      //       ctx.env.cache_ttl
-      //     )
-      //   );
-      // } else {
-      //   await addToInMemoryCache(
-      //     cacheKey,
-      //     {
-      //       data: kvData.data,
-      //       source: "cache",
-      //       total: kvData.total,
-      //     },
-      //     ctx.env.cache_ttl
-      //   );
-      // }
       dataAddToInMemoryCache(
         ctx,
         executionCtx,
@@ -254,26 +235,6 @@ export async function getRecords(
     message: "getRecords addToInMemoryCache start",
   });
 
-  // HACK to support int testing
-  // if (executionCtx) {
-  //   ctx.executionCtx.waitUntil(
-  //     addToInMemoryCache(
-  //       cacheKey,
-  //       { data: d1Data, source: "cache", total },
-  //       ctx.env.cache_ttl
-  //     )
-  //   );
-  // } else {
-  //   await addToInMemoryCache(
-  //     cacheKey,
-  //     {
-  //       data: d1Data,
-  //       source: "cache",
-  //       total,
-  //     },
-  //     ctx.env.cache_ttl
-  //   );
-  // }
   await dataAddToInMemoryCache(ctx, executionCtx, cacheKey, d1Data, total);
 
   log(ctx, {
@@ -286,21 +247,7 @@ export async function getRecords(
     message: "getRecords addToKvCache start",
   });
 
-  if (executionCtx) {
-    ctx.executionCtx.waitUntil(
-      await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
-        data: d1Data,
-        source: "kv",
-        total,
-      })
-    );
-  } else {
-    await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
-      data: d1Data,
-      source: "kv",
-      total,
-    });
-  }
+  dataAddToKVCache(ctx, executionCtx, cacheKey, d1Data, total);
 
   log(ctx, {
     level: "verbose",
@@ -317,6 +264,30 @@ export async function getRecords(
   return result;
 }
 
+async function dataAddToKVCache(ctx, executionCtx, cacheKey, data, total) {
+  addToKvCache(ctx, cacheKey, {
+    data,
+    source: "kv",
+    total,
+  });
+
+  // if (executionCtx) {
+  //   ctx.executionCtx.waitUntil(
+  //     await addToKvCache(ctx, cacheKey, {
+  //       data,
+  //       source: "kv",
+  //       total,
+  //     })
+  //   );
+  // } else {
+  //   await addToKvCache(ctx, cacheKey, {
+  //     data,
+  //     source: "kv",
+  //     total,
+  //   });
+  // }
+}
+
 async function dataAddToInMemoryCache(
   ctx,
   executionCtx,
@@ -324,14 +295,15 @@ async function dataAddToInMemoryCache(
   data,
   total
 ) {
+  addToInMemoryCache(ctx, cacheKey, { data, source: "cache", total });
   // HACK to support int testing
-  if (executionCtx) {
-    ctx.executionCtx.waitUntil(
-      addToInMemoryCache(ctx, cacheKey, { data, source: "cache", total })
-    );
-  } else {
-    return addToInMemoryCache(ctx, cacheKey, { data, source: "cache", total });
-  }
+  // if (executionCtx) {
+  //   ctx.executionCtx.waitUntil(
+  //     addToInMemoryCache(ctx, cacheKey, { data, source: "cache", total })
+  //   );
+  // } else {
+  //   return addToInMemoryCache(ctx, cacheKey, { data, source: "cache", total });
+  // }
 }
 
 //insert
@@ -386,15 +358,16 @@ export async function updateRecord(ctx, d1, kv, data, cacheKey) {
 
     //kv
     const clearKV = await clearKVCache(kv);
-    const cacheUpdate = await addToKvCache(ctx, kv, cacheKey, record);
+    const cacheUpdate = await addToKvCache(ctx, cacheKey, record);
 
     // const d1Result = d1Update;
     // const record = { ...data.data, id: data.id };
 
     //add last access url
     const latestUrl = await getKVKeyLatestUrl(kv);
+    var recache;
     if (latestUrl) {
-      const recache = await getRecordsByUrl(ctx, latestUrl, "d1");
+      recache = await getRecordsByUrl(ctx, latestUrl, "d1");
     }
 
     //repop all

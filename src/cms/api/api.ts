@@ -222,7 +222,7 @@ api.get("/kv-test2", async (ctx) => {
   const total = 100;
   const d1Data = [{ a: "1", b: "2" }];
   const data = { data: d1Data, source: "kv", total };
-  await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, data);
+  await addToKvCache(ctx, cacheKey, data);
 
   // await ctx.env.KVDATA.put(cacheKey, JSON.stringify({ foo: "bar" }), {
   //   metadata: { createdOn: "123" },
