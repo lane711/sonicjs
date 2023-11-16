@@ -5,8 +5,11 @@ import {
   insertD1Data,
   updateD1Data,
   whereClauseBuilder,
+  getRepoFromTable,
+  getSchemaFromTable,
 } from "./d1-data";
 import usersTable from "../../db/schema/users";
+import { usersSchema } from "../../db/definitions/user";
 import qs from "qs";
 const env = getMiniflareBindings();
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
@@ -35,6 +38,18 @@ it("should not return a where clause", () => {
 //   const clause = whereClauseBuilder(params);
 //   expect(clause).toBe("");
 // });
+
+it("should get table schema from table name", async () => {
+  const tableToFind = "users";
+  const userTable = getSchemaFromTable(tableToFind);
+  expect(userTable).toEqual(usersSchema);
+});
+
+it("should get table object from table name", async () => {
+  const tableToFind = "users";
+  const findableTable = await getRepoFromTable(tableToFind);
+  expect(findableTable).toEqual(usersTable);
+});
 
 it("should return a SQL select with limit", () => {
   const queryParams = "limit=2";

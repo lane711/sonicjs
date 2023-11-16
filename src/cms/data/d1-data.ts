@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { DefaultLogger, LogWriter, eq } from "drizzle-orm";
 import { addToInMemoryCache, setCacheStatus } from "./cache";
 import { addToKvCache } from "./kv-data";
+import { tableDefinitions, tableSchemaMap } from "../../db/routes";
 
 export async function getAllContent(db) {
   const { results } = await db.prepare("SELECT * FROM users").all();
@@ -133,44 +134,15 @@ export async function updateD1Data(d1, table, data) {
 }
 
 export function getSchemaFromTable(tableName) {
-  switch (tableName) {
-    case "users":
-      return userSchema;
-      break;
-    case "posts":
-      return postSchema;
-      break;
-    case "categories":
-      return categorySchema;
-      break;
-    case "comments":
-      return commentSchema;
-      break;
-    case "categoriesToPosts":
-      return categoriesToPostsSchema;
-      break;
-  }
+  let tableToFind = tableDefinitions.find(
+    (table) => table.tableName === tableName
+  );
+  tableToFind = tableToFind[tableName + "Schema"];
+  return tableToFind;
 }
 
 export function getRepoFromTable(tableName) {
-  // console.log("getting schema", tableName);
-  switch (tableName) {
-    case "users":
-      return usersTable;
-      break;
-    case "posts":
-      return postsTable;
-      break;
-    case "categories":
-      return categoriesTable;
-      break;
-    case "comments":
-      return commentsTable;
-      break;
-    case "categoriesToPosts":
-      return categoriesToPostsTable;
-      break;
-  }
+  return tableSchemaMap.get(tableName);
 }
 
 export function whereClauseBuilder(params) {
