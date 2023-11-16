@@ -10,7 +10,7 @@
     "build": "node ./src/cms/util/build.mjs",
     "deploy": "wrangler pages deploy dist",
     "test": "jest --verbose",
-    "generate": "drizzle-kit generate:sqlite --schema=./src/db/schema.ts --out=./migrations",
+    "generate": "drizzle-kit generate:sqlite --schema=./src/db/schema --out=./migrations",
     "up": "wrangler d1 migrations apply sonicjs --local",
     "up:prod": "wrangler d1 migrations apply sonicjs",
     "tail": "wrangler pages deployment tail"
