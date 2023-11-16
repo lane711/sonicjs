@@ -123,7 +123,9 @@ admin.get("/api/kv-cache", async (ctx) => {
     return {
       key: item.name,
       viewLink: `<a href="/admin/cache/kv/${itemEncoded}">${item.name}</a>`,
-      createdOn: item.metadata.createdOn ? format(item.metadata.createdOn, "MM/dd/yyyy h:mm b") : '',
+      createdOn: item.metadata.createdOn
+        ? format(item.metadata.createdOn, "MM/dd/yyyy h:mm b")
+        : "",
     };
   });
 

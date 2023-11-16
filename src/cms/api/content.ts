@@ -69,7 +69,8 @@ content.get("/", async (ctx) => {
     return ctx.json(content);
   }
 
-  ctx.json(content);});
+  ctx.json(content);
+});
 
 content.get("/:contentId", async (ctx) => {
   const id = ctx.req.param("contentId");
@@ -148,9 +149,12 @@ content.post("/", async (ctx) => {
       );
       // console.log('insertD1Data --->', result)
       return ctx.json(result.id, 201);
-
     } catch (error) {
-      console.log("error posting content " + content.data.table, error, JSON.stringify(content.data, null, 2));
+      console.log(
+        "error posting content " + content.data.table,
+        error,
+        JSON.stringify(content.data, null, 2)
+      );
     }
   }
 });
@@ -199,7 +203,10 @@ content.delete("/:contentId", async (ctx) => {
 
   if (content) {
     console.log("content found, deleting...");
-    const result = await deleteRecord(ctx.env.D1DATA, ctx.env.D1DATA, {id, table: content.table})
+    const result = await deleteRecord(ctx.env.D1DATA, ctx.env.D1DATA, {
+      id,
+      table: content.table,
+    });
     // const kvDelete = await deleteKVById(ctx.env.KVDATA, id);
     // const d1Delete = await deleteD1ByTableAndId(
     //   ctx.env.D1DATA,

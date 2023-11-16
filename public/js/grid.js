@@ -70,10 +70,14 @@ if (gridWrapper) {
   }).render(gridWrapper);
 
   function deleteItem(itemId) {
+    const url = window.location.href;
+    const authMode = url.includes("/auth/users");
     const basePath = `${window.location.protocol}//${window.location.host}`;
     const urlSegments = window.location.pathname.split("/");
     const tableName = urlSegments[urlSegments.length - 1];
-    const endpoint = `${basePath}/v1/${tableName}/${itemId}`;
+    const endpoint = authMode
+      ? `/v1/auth/${tableName}/${itemId}`
+      : `${basePath}/v1/${tableName}/${itemId}`;
 
     const xhttp = new XMLHttpRequest();
     xhttp.open("DELETE", endpoint, true);

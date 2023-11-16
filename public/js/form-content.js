@@ -10,8 +10,8 @@ let mode;
   route = window.location.href.split("/").pop();
 
   console.log({ url });
-  const authNew = url.includes("/auth/users");
-  if (authNew) {
+  const authMode = url.includes("/auth/users");
+  if (authMode) {
     mode = "auth:new";
     route = "users";
   } else if (url.indexOf("admin/content/new") > 0) {

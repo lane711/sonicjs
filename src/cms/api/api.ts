@@ -21,14 +21,12 @@ import { getForm } from "./forms";
 import qs from "qs";
 import {
   deleteRecord,
-  getRecord,
   getRecords,
   insertRecord,
   updateRecord,
 } from "../data/data";
 import { clearInMemoryCache, getAllFromInMemoryCache } from "../data/cache";
 import { getD1Binding } from "../util/d1-binding";
-import { createUser, initializeLucia } from "../lucia";
 
 const api = new Hono<{ Bindings: Bindings }>();
 

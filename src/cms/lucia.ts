@@ -38,50 +38,71 @@ export type LuciaAPIArgs<T extends string> = {
     T,
     {}
   >;
-  content: any;
+  content?: any;
 };
 export async function createUser<T extends string>(args: LuciaAPIArgs<T>) {
   const { ctx, content } = args;
-  const kv = ctx.env.KVDATA;
+  if (ctx && content) {
+    const kv = ctx.env.KVDATA;
+    const d1 = getD1Binding(ctx);
+    const auth = initializeLucia(d1, ctx.env);
+
+    const email = content.data?.email;
+    const password = content.data?.password;
+    delete content.data?.password;
+    const id = uuidv4();
+    content.data.id = id;
+    // await saveKVData(kv, id, content.data);
+    const d1Data = prepareD1Data(content.data);
+    if (typeof email !== "string" || !email?.includes("@")) {
+      return ctx.text("invalid email", 400);
+    } else if (
+      typeof password !== "string" ||
+      password.length < 8 ||
+      password.length > 255
+    ) {
+      return ctx.text("invalid password", 400);
+    }
+
+    const user = await auth.createUser({
+      key: {
+        providerId: "email",
+        providerUserId: email.toLowerCase(),
+        password, // hashed by lucia
+      },
+      attributes: d1Data,
+    });
+    const session = await auth.createSession({
+      userId: user.userId,
+      attributes: {},
+    });
+
+    return new Response(JSON.stringify(user), {
+      headers: {
+        Authorization: `Bearer ${session.sessionId}`,
+        "Content-Type": "application/json",
+      },
+    });
+  }
+  return new Response("Invalid request", { status: 400 });
+}
+
+export async function deleteUser<T extends string>(
+  args: LuciaAPIArgs<T>,
+  id: string
+) {
+  const { ctx } = args;
   const d1 = getD1Binding(ctx);
   const auth = initializeLucia(d1, ctx.env);
-
-  const email = content.data?.email;
-  const password = content.data?.password;
-  delete content.data?.password;
-  const id = uuidv4();
-  content.data.id = id;
-  // await saveKVData(kv, id, content.data);
-  const d1Data = prepareD1Data(content.data);
-  if (typeof email !== "string" || !email?.includes("@")) {
-    return ctx.text("invalid email", 400);
-  } else if (
-    typeof password !== "string" ||
-    password.length < 8 ||
-    password.length > 255
-  ) {
-    return ctx.text("invalid password", 400);
+  try {
+    await auth.deleteUser(id);
+    return ctx.text("", 204);
+  } catch (e) {
+    if (e instanceof LuciaError && e.message === "AUTH_INVALID_KEY_ID") {
+      return ctx.text("", 404);
+    }
+    return ctx.text("", 500);
   }
-
-  const user = await auth.createUser({
-    key: {
-      providerId: "email",
-      providerUserId: email.toLowerCase(),
-      password, // hashed by lucia
-    },
-    attributes: d1Data,
-  });
-  const session = await auth.createSession({
-    userId: user.userId,
-    attributes: {},
-  });
-
-  return new Response(JSON.stringify(user), {
-    headers: {
-      Authorization: `Bearer ${session.sessionId}`,
-      "Content-Type": "application/json",
-    },
-  });
 }
 
 export async function login<T extends string>(args: LuciaAPIArgs<T>) {
