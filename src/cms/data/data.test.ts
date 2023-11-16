@@ -1,5 +1,5 @@
 import { insertD1Data, updateD1Data } from "./d1-data";
-import { usersTable } from "../../db/schema";
+import usersTable from "../../db/schema/users";
 import qs from "qs";
 const env = getMiniflareBindings();
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
@@ -8,7 +8,7 @@ import { drizzle } from "drizzle-orm/d1";
 import { getRecord, getRecords, insertRecord } from "./data";
 import { clearInMemoryCache } from "./cache";
 import { clearKVCache } from "./kv-data";
-const ctx = {env: {KVDATA : env.KVDATA, D1DATA: env.__D1_BETA__D1DATA }}
+const ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
 
 it("insert should return new record with id and dates", async () => {
   const urlKey = "http://localhost:8888/some-cache-key-url";
@@ -30,12 +30,7 @@ it("insert should return new record with id and dates", async () => {
   });
   console.log("newRecord2", newRecord2);
 
-  const d1Result = await getRecords(
-    ctx,
-    "users",
-    undefined,
-    urlKey
-  );
+  const d1Result = await getRecords(ctx, "users", undefined, urlKey);
 
   //record should be in list
   expect(d1Result.data.length).toBe(2);
@@ -65,12 +60,7 @@ it("CRUD", async () => {
   });
   console.log("rec2", rec2);
 
-  const d1Result = await getRecords(
-    ctx,
-    "users",
-    undefined,
-    urlKey
-  );
+  const d1Result = await getRecords(ctx, "users", undefined, urlKey);
 
   console.log("d1Result", d1Result);
 
@@ -79,12 +69,7 @@ it("CRUD", async () => {
 
   //if we request it again, it should be cached in memory
   //TODO need to be able to pass in ctx so that we can setup d1 and kv
-  const inMemoryCacheResult = await getRecords(
-    ctx,
-    "users",
-    undefined,
-    urlKey
-  );
+  const inMemoryCacheResult = await getRecords(ctx, "users", undefined, urlKey);
 
   expect(inMemoryCacheResult.data.length).toBe(2);
   expect(inMemoryCacheResult.source).toBe("cache");
@@ -93,12 +78,7 @@ it("CRUD", async () => {
   clearInMemoryCache();
 
   // if we request it again, it should also be cached in kv storage
-  const kvResult = await getRecords(
-    ctx,
-    "users",
-    undefined,
-    urlKey
-  );
+  const kvResult = await getRecords(ctx, "users", undefined, urlKey);
   expect(kvResult.data.length).toBe(2);
   expect(kvResult.source).toBe("kv");
 });
@@ -171,11 +151,10 @@ it("getRecords should return single record if if passed in", async () => {
     id: "abc",
   });
 
-
   const result = await getRecords(
     ctx,
     "users",
-    {id:"abc"},
+    { id: "abc" },
     urlKey,
     "fastest",
     undefined
@@ -183,13 +162,13 @@ it("getRecords should return single record if if passed in", async () => {
 
   expect(result.data.firstName).toBe("John");
   expect(result.total).toBe(1);
-  expect(result.source).toBe('d1');
+  expect(result.source).toBe("d1");
 
   //if we get again it should be cached
   const cachedResult = await getRecords(
     ctx,
     "users",
-    {id:"abc"},
+    { id: "abc" },
     urlKey,
     "fastest",
     undefined
@@ -197,8 +176,7 @@ it("getRecords should return single record if if passed in", async () => {
 
   expect(cachedResult.data.firstName).toBe("John");
   expect(cachedResult.total).toBe(1);
-  expect(cachedResult.source).toBe('cache');
-
+  expect(cachedResult.source).toBe("cache");
 });
 
 function createTestTable() {

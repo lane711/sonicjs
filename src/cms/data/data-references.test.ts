@@ -1,6 +1,6 @@
 import { insertD1Data, updateD1Data } from "./d1-data";
-import { usersTable } from "../../db/schema";
-import * as schema from "../../db/schema";
+import usersTable from "../../db/schema/users";
+import { tableSchemas } from "../../db/routes";
 
 import qs from "qs";
 const env = getMiniflareBindings();
@@ -10,7 +10,7 @@ import { drizzle } from "drizzle-orm/d1";
 import { getRecord, getRecords, insertRecord } from "./data";
 import { clearInMemoryCache } from "./cache";
 import { clearKVCache } from "./kv-data";
-const ctx = {env: {KVDATA : env.KVDATA, D1DATA: env.__D1_BETA__D1DATA }}
+const ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
 
 it("insert should allow refer", async () => {
   const urlKey = "http://localhost:8888/some-cache-key-url";
@@ -19,12 +19,7 @@ it("insert should allow refer", async () => {
   const { userRecord, categoryRecord, postRecord } =
     await createRelatedTestRecords();
 
-  const d1Result = await getRecords(
-    ctx,
-    "posts",
-    undefined,
-    urlKey
-  );
+  const d1Result = await getRecords(ctx, "posts", undefined, urlKey);
 
   //record should be in list
   expect(d1Result.data.length).toBe(1);
@@ -80,7 +75,6 @@ it("get post related data", async () => {
   expect(post.categories[1].postId).toBe(postRecord.data.id);
   expect(post.comments.length).toBe(2);
   expect(post.comments[0].user.id).toBe(userRecord.data.id);
-
 });
 
 it("getRecords can accept custom function for retrieval of data", async () => {
@@ -98,7 +92,7 @@ it("getRecords can accept custom function for retrieval of data", async () => {
   });
 
   const func = function () {
-    return { foo: "bar"  };
+    return { foo: "bar" };
   };
 
   const result = await getRecords(
@@ -124,20 +118,19 @@ it("getRecords can accept custom function with parameters for retrieval of data"
 
   const urlKey = "http://localhost:8888/some-cache-key-url";
 
-
   const func = async function () {
     const db = drizzle(__D1_BETA__D1DATA, { schema });
 
     return await db.query.postsTable.findFirst({
-    with: {
-      user: true,
-      comments: { with: { user: true } },
-      categories: { with: { category: true } },
-    },
-  });
+      with: {
+        user: true,
+        comments: { with: { user: true } },
+        categories: { with: { category: true } },
+      },
+    });
   };
 
-  const {data} = await getRecords(
+  const { data } = await getRecords(
     ctx,
     "users",
     undefined,
@@ -163,7 +156,6 @@ it("getRecords can accept custom function with parameters for retrieval of data"
   expect(postCached.data.categories.length).toBe(2);
   expect(postCached.data.user.firstName).toBe("John");
   expect(postCached.source).toBe("cache");
-
 });
 
 async function createRelatedTestRecords() {

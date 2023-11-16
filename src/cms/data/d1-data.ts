@@ -1,17 +1,5 @@
 import { DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { v4 as uuidv4 } from "uuid";
-import {
-  postsTable,
-  postSchema,
-  userSchema,
-  usersTable,
-  categorySchema,
-  commentSchema,
-  categoriesTable,
-  commentsTable,
-  categoriesToPostsTable,
-  categoriesToPostsSchema,
-} from "../../db/schema";
 import { DefaultLogger, LogWriter, eq } from "drizzle-orm";
 import { addToInMemoryCache, setCacheStatus } from "./cache";
 import { addToKvCache } from "./kv-data";
