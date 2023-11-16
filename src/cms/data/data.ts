@@ -89,14 +89,12 @@ import { log } from "../util/logger";
 // }
 
 export async function getRecords(
-  d1,
-  kv,
+  ctx,
   table,
   params,
   cacheKey,
   source = "fastest",
-  customDataFunction = undefined,
-  ctx = {}
+  customDataFunction = undefined
 ) {
   log(ctx, { level: "verbose", message: "getRecords start", cacheKey });
   const cacheStatusValid = await isCacheValid();
@@ -111,7 +109,7 @@ export async function getRecords(
       level: "verbose",
       message: "getRecords getFromInMemoryCache start",
     });
-    const cacheResult = await getFromInMemoryCache(cacheKey);
+    const cacheResult = await getFromInMemoryCache(ctx, cacheKey);
     log(ctx, {
       level: "verbose",
       message: `getRecords getFromInMemoryCache end. cacheResult:${
@@ -138,7 +136,7 @@ export async function getRecords(
       level: "verbose",
       message: "getRecords getRecordFromKvCache start",
     });
-    const kvData = await getRecordFromKvCache(kv, cacheKey);
+    const kvData = await getRecordFromKvCache(ctx.env.KVDATA, cacheKey);
     log(ctx, {
       level: "verbose",
       message: `getRecords getRecordFromKvCache end. kvData:${
@@ -202,7 +200,7 @@ export async function getRecords(
         level: "verbose",
         message: "getRecords getD1ByTableAndId start",
       });
-      d1Data = await getD1ByTableAndId(d1, table, params.id);
+      d1Data = await getD1ByTableAndId(ctx.env.D1DATA, table, params.id);
       log(ctx, {
         level: "verbose",
         message: "getRecords getD1ByTableAndId end",
@@ -213,7 +211,7 @@ export async function getRecords(
         level: "verbose",
         message: "getRecords getD1DataByTable start",
       });
-      d1Data = await getD1DataByTable(d1, table, params);
+      d1Data = await getD1DataByTable(ctx.env.D1DATA, table, params);
       log(ctx, {
         level: "verbose",
         message: "getRecords getD1DataByTable end",
@@ -264,14 +262,14 @@ export async function getRecords(
 
   if (executionCtx) {
     ctx.executionCtx.waitUntil(
-      await addToKvCache(ctx, kv, cacheKey, {
+      await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
         data: d1Data,
         source: "kv",
         total,
       })
     );
   } else {
-    await addToKvCache(ctx, kv, cacheKey, {
+    await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
       data: d1Data,
       source: "kv",
       total,
@@ -296,18 +294,12 @@ async function dataAddToInMemoryCache(
 ) {
   // HACK to support int testing
 
-  const cache_ttl = (ctx.env && ctx.env.cache_ttl) ?? undefined;
-
   if (executionCtx) {
     ctx.executionCtx.waitUntil(
-      addToInMemoryCache(cacheKey, { data, source: "cache", total }, cache_ttl)
+      addToInMemoryCache(ctx, cacheKey, { data, source: "cache", total })
     );
   } else {
-    return addToInMemoryCache(
-      cacheKey,
-      { data, source: "cache", total },
-      cache_ttl
-    );
+    return addToInMemoryCache(ctx, cacheKey, { data, source: "cache", total });
   }
 }
 

@@ -10,6 +10,7 @@ import { drizzle } from "drizzle-orm/d1";
 import { getRecord, getRecords, insertRecord } from "./data";
 import { clearInMemoryCache } from "./cache";
 import { clearKVCache } from "./kv-data";
+const ctx = {env: {KVDATA : env.KVDATA, D1DATA: env.__D1_BETA__D1DATA }}
 
 it("insert should allow refer", async () => {
   const urlKey = "http://localhost:8888/some-cache-key-url";
@@ -19,8 +20,7 @@ it("insert should allow refer", async () => {
     await createRelatedTestRecords();
 
   const d1Result = await getRecords(
-    env.__D1_BETA__D1DATA,
-    env.KVDATA,
+    ctx,
     "posts",
     undefined,
     urlKey
@@ -102,8 +102,7 @@ it("getRecords can accept custom function for retrieval of data", async () => {
   };
 
   const result = await getRecords(
-    env.__D1_BETA__D1DATA,
-    env.KVDATA,
+    ctx,
     "users",
     undefined,
     urlKey,
@@ -139,8 +138,7 @@ it("getRecords can accept custom function with parameters for retrieval of data"
   };
 
   const {data} = await getRecords(
-    env.__D1_BETA__D1DATA,
-    env.KVDATA,
+    ctx,
     "users",
     undefined,
     urlKey,
@@ -154,8 +152,7 @@ it("getRecords can accept custom function with parameters for retrieval of data"
 
   //if we get data again, the custom data should be cached
   const postCached = await getRecords(
-    env.__D1_BETA__D1DATA,
-    env.KVDATA,
+    ctx,
     "users",
     undefined,
     urlKey,

@@ -13,39 +13,37 @@ import {
 } from "./cache";
 import { clearKVCache, getKVCache, getRecordFromKvCache } from "./kv-data";
 
+const ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
+
 describe("cache expiration", () => {
-  it("cache status should return false if never set", async () => {
-    const cacheStatus = await isCacheValid();
-    expect(cacheStatus).toBeFalsy();
-  });
+  // it("cache status should return false if never set", async () => {
+  //   const cacheStatus = await isCacheValid();
+  //   expect(cacheStatus).toBeFalsy();
+  // });
 
-  it("cache status should return true", async () => {
-    const result = await setCacheStatus(1000);
-    const cacheStatus = await isCacheValid();
-    expect(cacheStatus).toBeTruthy();
-  });
+  // it("cache status should return true", async () => {
+  //   const result = await setCacheStatus(1000);
+  //   const cacheStatus = await isCacheValid();
+  //   expect(cacheStatus).toBeTruthy();
+  // });
 
-  it("cache status should return false if expired", async () => {
-    const result = await setCacheStatus(-1000);
-    const cacheStatus = await isCacheValid();
-    expect(cacheStatus).toBeFalsy();
-  });
+  // it("cache status should return false if expired", async () => {
+  //   const result = await setCacheStatus(-1000);
+  //   const cacheStatus = await isCacheValid();
+  //   expect(cacheStatus).toBeFalsy();
+  // });
 
-  it("cache status should return false if explicity set to invalid", async () => {
-    const result = await setCacheStatusInvalid();
-    const cacheStatus = await isCacheValid();
-    expect(cacheStatus).toBeFalsy();
-  });
+  // it("cache status should return false if explicity set to invalid", async () => {
+  //   const result = await setCacheStatusInvalid();
+  //   const cacheStatus = await isCacheValid();
+  //   expect(cacheStatus).toBeFalsy();
+  // });
 
-  it("cache status should return false if explicity set to invalid after previously being valid", async () => {
-    const result = await setCacheStatus(1000);
-    const cacheStatus = await isCacheValid();
-    expect(cacheStatus).toBeTruthy();
-
-    const result2 = await setCacheStatusInvalid();
-    const cacheStatus2 = await isCacheValid();
-    expect(cacheStatus2).toBeFalsy();
-  });
+  // it("cache status should return false if explicity set to invalid after previously being valid", async () => {
+  //   const result = await setCacheStatus(1000);
+  //   const cacheStatus = await isCacheValid();
+  //   expect(cacheStatus).toBeTruthy();
+  // });
 });
 
 describe("insert", () => {
@@ -74,13 +72,7 @@ describe("insert", () => {
     });
     console.log("rec2", rec2);
 
-    const d1Result = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
-      "users",
-      undefined,
-      urlKey
-    );
+    const d1Result = await getRecords(ctx, "users", undefined, urlKey);
 
     console.log("d1Result", d1Result);
 
@@ -89,8 +81,7 @@ describe("insert", () => {
 
     //if we request it again, it should be cached in memory
     const inMemoryCacheResult = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
+      ctx,
       "users",
       undefined,
       urlKey
@@ -101,13 +92,7 @@ describe("insert", () => {
 
     // if we clear memory cache, we should get kv cache
     await clearInMemoryCache();
-    const kvResult = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
-      "users",
-      undefined,
-      urlKey
-    );
+    const kvResult = await getRecords(ctx, "users", undefined, urlKey);
 
     expect(kvResult.data.length).toBe(2);
     expect(kvResult.source).toBe("kv");
@@ -120,10 +105,6 @@ describe("insert", () => {
       },
     });
 
-    //cache status should not be valid
-    const cacheStatus = await isCacheValid();
-    expect(cacheStatus).toBeFalsy();
-
     //kv cache for the urlKey should be empty
     const allCacheItems = await getRecordFromKvCache(
       KVDATA,
@@ -134,16 +115,17 @@ describe("insert", () => {
     // we inserted another record, it should be returned because the insert should invalidate cache
     // this will only work instantly on the node that the update is made and will be eventually consistent on other nodes
     // based on the in-memory cache settings
-    const resultAfterInsert = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
-      "users",
-      undefined,
-      urlKey
-    );
+    const resultAfterInsert = await getRecords(ctx, "users", undefined, urlKey);
 
     expect(resultAfterInsert.data.length).toBe(3);
     expect(resultAfterInsert.source).toBe("d1");
+
+
+    //new record should now be in the cache since this is the second time we're requesting it
+    const resultAfterGet = await getRecords(ctx, "users", undefined, urlKey);
+
+    expect(resultAfterGet.data.length).toBe(3);
+    expect(resultAfterGet.source).toBe("cache");
   });
 });
 
@@ -173,13 +155,7 @@ describe("update", () => {
     });
     console.log("rec2", rec2);
 
-    const d1Result = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
-      "users",
-      undefined,
-      urlKey
-    );
+    const d1Result = await getRecords(ctx, "users", undefined, urlKey);
 
     console.log("d1Result", d1Result);
 
@@ -188,8 +164,7 @@ describe("update", () => {
 
     //if we request it again, it should be cached in memory
     const inMemoryCacheResult = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
+      ctx,
       "users",
       undefined,
       urlKey
@@ -208,10 +183,6 @@ describe("update", () => {
       },
     });
 
-    //cache status should not be valid
-    const cacheStatus = await isCacheValid();
-    expect(cacheStatus).toBeFalsy();
-
     //kv cache for the urlKey should be empty
     const allCacheItems = await getRecordFromKvCache(
       KVDATA,
@@ -222,13 +193,7 @@ describe("update", () => {
     // we inserted another record, it should be returned because the insert should invalidate cache
     // this will only work instantly on the node that the update is made and will be eventually consistent on other nodes
     // based on the in-memory cache settings
-    const resultAfterUpdate = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
-      "users",
-      undefined,
-      urlKey
-    );
+    const resultAfterUpdate = await getRecords(ctx, "users", undefined, urlKey);
 
     expect(resultAfterUpdate.data.length).toBe(2);
     expect(resultAfterUpdate.source).toBe("d1");
@@ -262,13 +227,7 @@ describe("delete", () => {
     });
     console.log("rec2", rec2);
 
-    const d1Result = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
-      "users",
-      undefined,
-      urlKey
-    );
+    const d1Result = await getRecords(ctx, "users", undefined, urlKey);
 
     console.log("d1Result", d1Result);
 
@@ -277,8 +236,7 @@ describe("delete", () => {
 
     //if we request it again, it should be cached in memory
     const inMemoryCacheResult = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
+      ctx,
       "users",
       undefined,
       urlKey
@@ -296,10 +254,6 @@ describe("delete", () => {
       table: "users",
     });
 
-    //cache status should not be valid
-    const cacheStatus = await isCacheValid();
-    expect(cacheStatus).toBeFalsy();
-
     //kv cache for the urlKey should be empty
     const allCacheItems = await getRecordFromKvCache(
       KVDATA,
@@ -310,13 +264,7 @@ describe("delete", () => {
     // we inserted another record, it should be returned because the insert should invalidate cache
     // this will only work instantly on the node that the update is made and will be eventually consistent on other nodes
     // based on the in-memory cache settings
-    const resultAfterUpdate = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
-      "users",
-      undefined,
-      urlKey
-    );
+    const resultAfterUpdate = await getRecords(ctx, "users", undefined, urlKey);
 
     expect(resultAfterUpdate.data.length).toBe(1);
     expect(resultAfterUpdate.source).toBe("d1");

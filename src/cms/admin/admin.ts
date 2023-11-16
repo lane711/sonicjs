@@ -18,7 +18,6 @@ import {
 import { loadApis } from "./pages/api";
 import { getRecords } from "../data/data";
 import { apiConfig } from "../../db/schema";
-import { getD1Binding } from "../util/d1-binding";
 import qs from "qs";
 import { format, compareAsc } from "date-fns";
 import { getAllFromInMemoryCache, getFromInMemoryCache } from "../data/cache";
@@ -65,7 +64,7 @@ admin.get("/cache/in-memory", async (ctx) => {
 admin.get("/cache/in-memory/:id", async (ctx) => {
   const id = ctx.req.param("id");
   const idDecoded = decodeURIComponent(id);
-  const cacheResult = await getFromInMemoryCache(idDecoded);
+  const cacheResult = await getFromInMemoryCache(ctx, idDecoded);
   return ctx.html(await loadInMemoryCacheDetail(ctx, cacheResult));
 });
 
@@ -150,20 +149,15 @@ admin.get("/api/:route", async (ctx) => {
   params.limit = params.limit ?? 1000;
 
   const table = apiConfig.find((entry) => entry.route === route).table;
-
-  // console.log('===> records', route, table)
-
-  const d1 = getD1Binding(ctx);
+  ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
 
   const records = await getRecords(
-    d1,
-    ctx.env.KVDATA,
+    ctx,
     table,
     params,
     ctx.req.url,
     "fastest",
-    undefined,
-    ctx
+    undefined
   );
 
   // console.log("===> records", records);

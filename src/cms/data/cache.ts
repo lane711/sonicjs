@@ -1,8 +1,8 @@
 import loki from "lokijs";
+import { log } from "../util/logger";
 var db = new loki("cache.db");
 var cache = db.addCollection("cache");
-var cacheStatus = db.addCollection("cache-status");
-var expires;
+
 // class CacheStatus {
 //   private static _instance: CacheStatus;
 //   public static expires: Int16Array;
@@ -19,45 +19,53 @@ var expires;
 
 const LocalCache = {
   getCacheStatus() {
-    return expires ?? false;
+    return true;
   },
 };
 
-export async function isCacheValid() {
-  let expiresOn = LocalCache.getCacheStatus();
-  let now = new Date().getTime();
-  if (expiresOn && expiresOn > now) {
-    return true;
-  }
-  return false;
+export async function isCacheValid(): Promise<boolean> {
+  return true;
 }
 
 export async function setCacheStatus(timeToExpireMs) {
-  expires = new Date().getTime() + timeToExpireMs;
-  return LocalCache.getCacheStatus();
+  // expires = new Date().getTime() + timeToExpireMs;
+  // return LocalCache.getCacheStatus();
 }
 
 export async function setCacheStatusInvalid() {
-  expires = new Date().getTime() - 1000; //setting to the past
-  return LocalCache.getCacheStatus();
+  // expires = new Date().getTime() - 1000; //setting to the past
+  // return LocalCache.getCacheStatus();
+  //TODO: its really inefficient to just kill the entire cache. We need to only kill the affected cache based on table or guid.
+  //We'll need to setup dependency tracking at table and record level
+  cache.clear();
+
 }
 
-export async function addToInMemoryCache(
-  key: string,
-  data,
-  timeToExpire: number = 20 * 60 * 1000
-) {
-  // console.log("addToInMemoryCache", key);
-  if (timeToExpire > 0) {
-    cache.insert({ key, data });
-    //TODO: softcode time
-    await setCacheStatus(timeToExpire);
-  }
+export async function addToInMemoryCache(ctx = {}, key: string, data) {
+  log(ctx, {
+    level: "verbose",
+    message: "addToInMemoryCache start",
+  });
+  cache.insert({ key, data });
+  log(ctx, {
+    level: "verbose",
+    message: "addToInMemoryCache end",
+  });
 }
 
-export async function getFromInMemoryCache(key: string) {
+export async function getFromInMemoryCache(ctx = {}, key: string) {
   // console.log("getFromInMemoryCache", key);
+  log(ctx, {
+    level: "verbose",
+    message: "getFromInMemoryCache start",
+    key,
+  });
   let data = await cache.find({ key: key });
+  log(ctx, {
+    level: "verbose",
+    message: "getFromInMemoryCache end",
+    key,
+  });
   return data;
 }
 

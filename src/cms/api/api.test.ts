@@ -48,7 +48,7 @@ describe("auto endpoints", () => {
 
     let req = new Request("http://localhost/v1/users", {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" }
     });
     let res = await app.fetch(req, env);
     expect(res.status).toBe(200);
@@ -124,13 +124,8 @@ describe("auto endpoints", () => {
     // expect(body.id.length).toBeGreaterThan(1);
 
     //make sure db was updated
-    const d1Result = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
-      "users",
-      undefined,
-      "urlKey"
-    );
+    const ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
+    const d1Result = await getRecords(ctx, "users", undefined, "urlKey");
 
     expect(d1Result.data[0].id).toBe("a");
     expect(d1Result.data[0].firstName).toBe("Steve");
@@ -157,9 +152,9 @@ describe("auto endpoints", () => {
     expect(res.status).toBe(204);
 
     //make sure db was updated
+    const ctx = {env: {KVDATA : env.KVDATA, D1DATA: env.__D1_BETA__D1DATA }}
     const d1Result = await getRecords(
-      env.__D1_BETA__D1DATA,
-      env.KVDATA,
+      ctx,
       "users",
       undefined,
       "urlKey"
