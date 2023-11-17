@@ -1,8 +1,7 @@
 // import { Hono } from 'hono'
 // const app = new Hono()
 
-import { Hono } from "hono";
-import { loadForm } from "./forms/form";
+import { Context, Hono } from "hono";
 
 import { Bindings } from "../types/bindings";
 import {
@@ -17,21 +16,49 @@ import {
 
 import { loadApis } from "./pages/api";
 import { getRecords } from "../data/data";
-import { apiConfig } from "../../db/schema";
+import { adminAccessRoles, apiConfig } from "../../db/schema";
 import qs from "qs";
-import { format, compareAsc } from "date-fns";
+import { format } from "date-fns";
 import { getAllFromInMemoryCache, getFromInMemoryCache } from "../data/cache";
 import { getKVCache, getRecordFromKvCache } from "../data/kv-data";
-import { login } from "../lucia";
+import { loadLogin } from "./pages/login";
+import { Variables } from "../../server";
+import { isAuthEnabled } from "../auth/auth-helpers";
 
-const admin = new Hono<{ Bindings: Bindings }>();
+const admin = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
+admin.use("*", async (ctx, next) => {
+  const authEnabled = await isAuthEnabled(ctx);
+  if (authEnabled) {
+    const path = ctx.req.path;
+    const session = ctx.get("session");
+    const user = ctx.get("user");
+    let canUseAdmin = !!session;
+    if (adminAccessRoles?.length) {
+      if (user?.role) {
+        canUseAdmin = adminAccessRoles.includes(user.role.toLowerCase());
+      } else {
+        canUseAdmin = false;
+      }
+    }
+    if (!canUseAdmin && path !== "/admin/login") {
+      //redirect if not logged in
+      return ctx.redirect("/admin/login", 302);
+    } else if (canUseAdmin && path === "/admin/login") {
+      //redirect if logged in
+      return ctx.redirect("/admin", 302);
+    }
+  }
+  await next();
+});
 admin.get("/ping", (ctx) => {
   console.log("testing ping", Date());
   return ctx.text(Date());
 });
 
 admin.get("/", async (ctx) => ctx.html(await loadApis(ctx)));
+
+admin.get("/login", async (ctx) => ctx.html(await loadLogin(ctx)));
 
 admin.get("/content/edit/:route/:id", async (ctx) => {
   const route = ctx.req.param("route");
@@ -50,6 +77,12 @@ admin.get("/content/new/auth/users", async (ctx) => {
 
 admin.get("/tables/auth/users", async (ctx) => {
   return ctx.html(await loadTableData(ctx, "users"));
+});
+
+admin.get("/content/edit/auth/users/:id", async (ctx) => {
+  const route = "auth/users";
+  const id = ctx.req.param("id");
+  return ctx.html(await loadEditContent(ctx, route, id, "users"));
 });
 
 admin.get("/tables/:route", async (ctx) => {
@@ -139,11 +172,11 @@ admin.get("/api/kv-cache", async (ctx) => {
     executionTime,
   });
 });
-
-admin.get("/api/:route", async (ctx) => {
+async function dataRoute(
+  route: string,
+  ctx: Context<{ Bindings: Bindings; Variables: Variables }>
+) {
   const start = Date.now();
-
-  const route = ctx.req.param("route");
 
   var params = qs.parse(ctx.req.query());
   params.limit = params.limit ?? 1000;
@@ -162,6 +195,8 @@ admin.get("/api/:route", async (ctx) => {
 
   // console.log("===> records", records);
 
+  const authMode = ctx.req.path.includes("/auth/");
+
   const data = records.data.map((item) => {
     const deleteButton = `
       <button data-delete-id="${item.id}" class="btn btn-link delete-btn text-white">
@@ -170,7 +205,9 @@ admin.get("/api/:route", async (ctx) => {
     `;
 
     const editButton = `
-      <a href="/admin/content/edit/${route}/${item.id}" class="text-decoration-none">
+      <a href="/admin/content/edit/${authMode ? `auth/${route}` : route}/${
+        item.id
+      }" class="text-decoration-none">
         <i class="bi bi-pencil"></i>
       </a>
     `;
@@ -196,12 +233,9 @@ admin.get("/api/:route", async (ctx) => {
     total: records.total,
     executionTime,
   });
-});
-
-admin.post("/login", async (ctx) => {
-  const content = await ctx.req.json();
-  return await login({ ctx, content });
-});
+}
+admin.get("/api/auth/:table", (ctx) => dataRoute(ctx.req.param("table"), ctx));
+admin.get("/api/:route", (ctx) => dataRoute(ctx.req.param("route"), ctx));
 
 function getDisplayField(item) {
   return item.name ?? item.title ?? item.firstName ?? item.id ?? "record";

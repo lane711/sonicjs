@@ -1,30 +1,49 @@
-import { Hono } from "hono";
+import { Context, Hono, Next } from "hono";
 import { cors } from "hono/cors";
 
 import { api } from "./cms/api/api";
-import { authAPI } from "./cms/api/auth";
+import { authAPI } from "./cms/admin/auth";
 import { Bindings } from "./cms/types/bindings";
 import { admin } from "./cms/admin/admin";
 import { example } from "./custom/example";
 import { status } from "./cms/api/status";
 import { log } from "./cms/util/logger";
 
-const app = new Hono<{ Bindings: Bindings }>();
+import { AuthRequest, Session, User } from "lucia";
+import { initializeLucia } from "./cms/auth/lucia";
+import { usePasswordAuth } from "./db/schema";
+
+export type Variables = {
+  authRequest: AuthRequest;
+  session: Session;
+  user: User;
+};
+const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
+
+app.use("*", async (ctx, next) => {
+  const path = ctx.req.path;
+  if (usePasswordAuth && !path.includes("/public")) {
+    const auth = initializeLucia(ctx.env.D1DATA, ctx.env);
+    const authRequest = auth.handleRequest(ctx);
+    let session = await authRequest.validate();
+    if (!session) {
+      session = await authRequest.validateBearerToken();
+    }
+    if (session?.user?.userId) {
+      ctx.set("user", session.user);
+    }
+
+    authRequest.setSession(session);
+
+    ctx.set("authRequest", authRequest);
+    ctx.set("session", session);
+  }
+  await next();
+});
 
 //CORS
 app.use(
   "/v1/*",
-  cors({
-    origin: (origin) => {
-      return origin.indexOf("localhost") > 0 || origin.endsWith(".sonicjs.com")
-        ? origin
-        : "https://sonicjs.com";
-    },
-  })
-);
-
-app.use(
-  "/v1/auth/*",
   cors({
     origin: (origin) => {
       return origin.indexOf("localhost") > 0 || origin.endsWith(".sonicjs.com")
@@ -41,6 +60,8 @@ app.use("*", async (ctx, next) => {
   }
   await next();
 });
+
+//auth
 
 app.onError((err, ctx) => {
   console.log(`SonicJs Error: ${err}`);

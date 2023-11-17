@@ -10,7 +10,7 @@ import {
   getContentType,
   getDataListByPrefix,
 } from "../../data/kv-data";
-import { Form, Layout } from "../theme";
+import { Layout } from "../theme";
 
 export async function loadAdminTable(ctx) {
   // await saveKVData(ctx.env.KVDATA, 'site1', 'content', {title: '20230508a'});
@@ -60,6 +60,7 @@ export async function loadAdminTable(ctx) {
       content={contentList}
       tableList={tableList}
       screenTitle="Content"
+      username={ctx.get("user")?.email}
     />
   );
 }
@@ -93,14 +94,20 @@ export async function loadTableData(ctx, route) {
   //   };
   // });
 
-  return <TopContentTable route={route} table={table} />;
+  return (
+    <TopContentTable
+      username={ctx.get("user")?.email}
+      route={route}
+      table={table}
+    />
+  );
 }
 
 export async function loadInMemoryCacheTable(ctx) {
   const cache_ttl = (ctx.env && ctx.env.cache_ttl) ?? 20 * 60 * 1000;
 
   return (
-    <Layout screenTitle={"In Memory Cache"}>
+    <Layout username={ctx.get("user")?.email} screenTitle={"In Memory Cache"}>
       <div class="row">
         <div class="col-md-12">
           <div class="pb-2 mb-3">
@@ -118,7 +125,7 @@ export async function loadInMemoryCacheTable(ctx) {
 
 export async function loadKVCacheTable(ctx) {
   return (
-    <Layout screenTitle={"KV Cache"}>
+    <Layout username={ctx.get("user")?.email} screenTitle={"KV Cache"}>
       <div class="row">
         <div class="col-md-12">
           <div class="pb-2 mb-3">
@@ -136,7 +143,7 @@ export async function loadKVCacheTable(ctx) {
 
 export async function loadKVCacheDetail(ctx, kv) {
   return (
-    <Layout screenTitle={"KV Item Detail"}>
+    <Layout username={ctx.get("user")?.email} screenTitle={"KV Item Detail"}>
       <div class="row">
         <div class="col-md-12">
           <div class="pb-2 mb-3">
@@ -156,7 +163,10 @@ export async function loadKVCacheDetail(ctx, kv) {
 
 export async function loadInMemoryCacheDetail(ctx, kv) {
   return (
-    <Layout screenTitle={"In Memory Item Detail"}>
+    <Layout
+      username={ctx.get("user")?.email}
+      screenTitle={"In Memory Item Detail"}
+    >
       <div class="row">
         <div class="col-md-12">
           <div class="pb-2 mb-3">
@@ -213,6 +223,7 @@ export async function loadAdmin(ctx) {
       content={contentList}
       tableList={contentTypeList}
       screenTitle="Content"
+      username={ctx.get("user")?.email}
     />
   );
 }
@@ -232,10 +243,10 @@ export async function loadAdmin(ctx) {
 //   );
 // }
 
-export async function loadEditContent(ctx, route, id) {
+export async function loadEditContent(ctx, route, id, tbl?: string) {
   // const content = await getD1ByTableAndId(ctx.env.D1DATA, table, id);
   // console.log("loadEditContent", id, content);
-  const table = apiConfig.find((entry) => entry.route === route).table;
+  const table = tbl || apiConfig.find((entry) => entry.route === route).table;
 
   // console.log('loadEditContent content type', contentType)
 
@@ -246,19 +257,26 @@ export async function loadEditContent(ctx, route, id) {
       contentId={id}
       table={table}
       route={route}
+      username={ctx.get("user")?.email}
     />
   );
 }
 
-export async function loadNewContent(ctx, route) {
+export async function loadNewContent(ctx, route, tbl?: string) {
   // const content = await getD1ByTableAndId(ctx.env.D1DATA, table, id);
   // console.log("loadEditContent", id, content);
 
-  const table = apiConfig.find((entry) => entry.route === route).table;
+  const table = tbl || apiConfig.find((entry) => entry.route === route).table;
 
   console.log("loadNewContent", route, table);
 
-  return <ContentNewForm route={route} table={table} />;
+  return (
+    <ContentNewForm
+      username={ctx.get("user")?.email}
+      route={route}
+      table={table}
+    />
+  );
 }
 
 function editScript() {
@@ -271,17 +289,22 @@ export const ContentEditForm = (props: {
   contentId: string;
   table: string;
   route: string;
+  username?: string;
 }) => {
   return (
-    <Layout screenTitle={"Edit: " + props.contentId}>
+    <Layout username={props.username} screenTitle={"Edit: " + props.contentId}>
       <div id="formio" data-id={props.contentId} data-route={props.route}></div>
     </Layout>
   );
 };
 
-export const ContentNewForm = (props: { table: string; route: string }) => {
+export const ContentNewForm = (props: {
+  table: string;
+  route: string;
+  username?: string;
+}) => {
   return (
-    <Layout screenTitle={"New: " + props.table}>
+    <Layout screenTitle={"New: " + props.table} username={props.username}>
       <div id="formio" data-route={props.route}></div>
     </Layout>
   );
@@ -291,9 +314,10 @@ export const TopContentList = (props: {
   content: object[];
   tableList: ApiConfig[];
   screenTitle: string;
+  username?: string;
 }) => {
   return (
-    <Layout screenTitle={props.screenTitle}>
+    <Layout username={props.username} screenTitle={props.screenTitle}>
       <div class="row">
         <div class="col-md-8">
           <table class="table">
@@ -365,9 +389,13 @@ export const TopContentList = (props: {
   );
 };
 
-export const TopContentTable = (props: { table: string; route: string }) => {
+export const TopContentTable = (props: {
+  table: string;
+  route: string;
+  username?: string;
+}) => {
   return (
-    <Layout screenTitle={props.table}>
+    <Layout username={props.username} screenTitle={props.table}>
       <div class="row">
         <div class="col-md-12">
           <div class="pb-2 mb-3">

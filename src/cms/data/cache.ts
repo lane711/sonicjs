@@ -38,7 +38,6 @@ export async function setCacheStatusInvalid() {
   //TODO: its really inefficient to just kill the entire cache. We need to only kill the affected cache based on table or guid.
   //We'll need to setup dependency tracking at table and record level
   cache.clear();
-
 }
 
 export async function addToInMemoryCache(ctx = {}, key: string, data) {

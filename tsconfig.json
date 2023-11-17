@@ -3,14 +3,19 @@
     "outDir": "./dist",
     "module": "esnext",
     "target": "esnext",
-    "lib": ["esnext"],
+    "lib": ["esnext", "dom"],
     "moduleResolution": "node",
     "sourceMap": true,
     "skipLibCheck": true,
-    "types": ["@cloudflare/workers-types","jest"],
+    "types": ["@cloudflare/workers-types", "jest"],
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx"
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist", "__integration-tests__","src/cms/util/build.mjs"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "__integration-tests__",
+    "src/cms/util/build.mjs"
+  ]
 }

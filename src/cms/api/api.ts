@@ -3,20 +3,15 @@ import { loadForm } from "../admin/forms/form";
 import {
   clearAllKVRecords,
   clearKVCache,
-  getAllKV,
-  getById,
   getDataByPrefix,
   getDataListByPrefix,
   getKVCache,
-  saveKVData,
-  saveContent,
   saveContentType,
   getRecordFromKvCache,
   addToKvCache,
 } from "../data/kv-data";
 import { Bindings } from "../types/bindings";
-import { apiConfig, usersTable } from "../../db/schema";
-import { getD1DataByTable, getD1ByTableAndId } from "../data/d1-data";
+import { apiConfig } from "../../db/schema";
 import { getForm } from "./forms";
 import qs from "qs";
 import {
@@ -26,8 +21,16 @@ import {
   updateRecord,
 } from "../data/data";
 import { clearInMemoryCache, getAllFromInMemoryCache } from "../data/cache";
+import { Variables } from "../../server";
+import {
+  canProceedAsEditorOrAdmin,
+  isAdmin,
+  isAdminOrEditor,
+  isAuthEnabled,
+  isEditAllowed,
+} from "../auth/auth-helpers";
 
-const api = new Hono<{ Bindings: Bindings }>();
+const api = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 apiConfig.forEach((entry) => {
   // console.log("setting route for " + entry.route);
@@ -36,11 +39,26 @@ apiConfig.forEach((entry) => {
   api.get(`/${entry.route}`, async (ctx) => {
     const start = Date.now();
 
+    const authEnabled = await isAuthEnabled(ctx);
+    if (authEnabled) {
+      const isPublic = entry.publicPermissions.read;
+      if (!isPublic && !isAdminOrEditor(ctx.get("user"))) {
+        // unauthorized if not public and not admin or editor
+        return ctx.text("Unauthorized", 401);
+      } else if (
+        !isPublic &&
+        entry.table === "users" &&
+        !isAdmin(ctx.get("user"))
+      ) {
+        // unauthorized if not public and not admin for the users table so editors can't see personal info of other users
+        return ctx.text("Unauthorized", 401);
+      }
+    }
+
     try {
       var params = qs.parse(ctx.req.query());
       params.limit = params.limit ?? 1000;
       ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
-
       const data = await getRecords(
         ctx,
         entry.table,
@@ -66,6 +84,23 @@ apiConfig.forEach((entry) => {
     const { includeContentType } = ctx.req.query();
 
     const id = ctx.req.param("id");
+
+    const authEnabled = await isAuthEnabled(ctx);
+    if (authEnabled) {
+      const isPublic = entry.publicPermissions.read;
+      if (!isPublic && !isAdminOrEditor(ctx.get("user"))) {
+        // unauthorized if not public and not admin or editor
+        return ctx.text("Unauthorized", 401);
+      } else if (
+        !isPublic &&
+        entry.table === "users" &&
+        !isEditAllowed(ctx.get("user"), id)
+      ) {
+        // unauthorized if not public and not it's a user and not admin or that user
+        return ctx.text("Unauthorized", 401);
+      }
+    }
+
     var params = qs.parse(ctx.req.query());
     params.id = id;
     ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
@@ -104,6 +139,15 @@ apiConfig.forEach((entry) => {
 
     content.table = table;
 
+    const authEnabled = await isAuthEnabled(ctx);
+    if (authEnabled) {
+      const isPublic = entry.publicPermissions.create;
+      if (!isPublic && !isAdminOrEditor(ctx.get("user"))) {
+        // unauthorized if not public and not admin or editor
+        return ctx.text("Unauthorized", 401);
+      }
+    }
+
     try {
       // console.log("posting new record content", JSON.stringify(content, null, 2));
 
@@ -120,15 +164,32 @@ apiConfig.forEach((entry) => {
     }
   });
 
-  //upadte single record
+  //update single record
   //TODO: support batch inserts
   api.put(`/${entry.route}/:id`, async (ctx) => {
     const payload = await ctx.req.json();
     const id = ctx.req.param("id");
-    var content = {};
+    var content: { data?: any; table?: string; id?: string } = {};
     ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
 
     content.data = payload.data;
+    const authEnabled = await isAuthEnabled(ctx);
+    if (authEnabled) {
+      const isPublic = entry.publicPermissions.update;
+      if (!isPublic && !isAdminOrEditor(ctx.get("user"))) {
+        console.log("not public and not admin or editor", ctx.get("user"));
+        // unauthorized if not public and not admin or editor
+        return ctx.text("Unauthorized", 401);
+      } else if (
+        !isPublic &&
+        entry.table === "users" &&
+        !isEditAllowed(ctx.get("user"), id)
+      ) {
+        // unauthorized if not public and not it's a user and not admin or that user
+        return ctx.text("Unauthorized", 401);
+      }
+      //TODO some sort of editor owner system?
+    }
 
     const route = ctx.req.path.split("/")[2];
     const table = apiConfig.find((entry) => entry.route === route).table;
@@ -155,6 +216,23 @@ apiConfig.forEach((entry) => {
     const id = ctx.req.param("id");
     const table = ctx.req.path.split("/")[2];
     ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
+
+    const authEnabled = await isAuthEnabled(ctx);
+    if (authEnabled) {
+      const isPublic = entry.publicPermissions.delete;
+      if (!isPublic && !isAdminOrEditor(ctx.get("user"))) {
+        // unauthorized if not public and not admin or editor
+        return ctx.text("Unauthorized", 401);
+      } else if (
+        !isPublic &&
+        entry.table === "users" &&
+        !isEditAllowed(ctx.get("user"), id)
+      ) {
+        // unauthorized if not public and not it's a user and not admin or that user
+        return ctx.text("Unauthorized", 401);
+      }
+      //TODO some sort of editor owner system?
+    }
 
     const record = await getRecords(
       ctx,
@@ -194,6 +272,10 @@ api.get("/ping", (c) => {
 });
 
 api.get("/kv-test", async (ctx) => {
+  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  if (!canProceed) {
+    return ctx.text("Unauthorized", 401);
+  }
   const createdOn = new Date().getTime();
 
   await ctx.env.KVDATA.put(
@@ -213,6 +295,10 @@ api.get("/kv-test", async (ctx) => {
 });
 
 api.get("/kv-test2", async (ctx) => {
+  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  if (!canProceed) {
+    return ctx.text("Unauthorized", 401);
+  }
   const cacheKey = "kv-test-key2";
   const total = 100;
   const d1Data = [{ a: "1", b: "2" }];
@@ -237,38 +323,73 @@ api.get("/kv-test2", async (ctx) => {
 });
 
 api.get("/kv-list", async (ctx) => {
+  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  if (!canProceed) {
+    return ctx.text("Unauthorized", 401);
+  }
   const list = await ctx.env.KVDATA.list();
   return ctx.json(list);
 });
 
-api.get("/data", async (c) => {
-  const data = await getDataListByPrefix(c.env.KVDATA, "");
-  return c.json(data);
+api.get("/data", async (ctx) => {
+  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  if (!canProceed) {
+    return ctx.text("Unauthorized", 401);
+  }
+  const data = await getDataListByPrefix(ctx.env.KVDATA, "");
+  return ctx.json(data);
 });
 
-api.get("/forms", async (c) => c.html(await loadForm(c)));
+api.get("/forms", async (ctx) => {
+  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  if (!canProceed) {
+    return ctx.text("Unauthorized", 401);
+  }
+  return ctx.html(await loadForm(ctx));
+});
 
-api.get("/form-components/:route", async (c) => {
-  const route = c.req.param("route");
+api.get("/form-components/auth/users", async (ctx) => {
+  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  if (!canProceed) {
+    return ctx.text("Unauthorized", 401);
+  }
+  const ct = await getForm(ctx.env.D1DATA, "users");
+  return ctx.json(ct);
+});
+
+api.get("/form-components/:route", async (ctx) => {
+  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  if (!canProceed) {
+    return ctx.text("Unauthorized", 401);
+  }
+  const route = ctx.req.param("route");
 
   const table = apiConfig.find((entry) => entry.route === route).table;
 
-  const ct = await getForm(c.env.D1DATA, table);
-  return c.json(ct);
+  const ct = await getForm(ctx.env.D1DATA, table);
+  return ctx.json(ct);
 });
 
-api.post("/form-components", async (c) => {
-  const formComponents = await c.req.json();
+api.post("/form-components", async (ctx) => {
+  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  if (!canProceed) {
+    return ctx.text("Unauthorized", 401);
+  }
+  const formComponents = await ctx.req.json();
 
   console.log("formComponents-->", formComponents);
   //put in kv
-  const result = await saveContentType(c.env.KVDATA, "site1", formComponents);
+  const result = await saveContentType(ctx.env.KVDATA, "site1", formComponents);
 
   console.log("form put", result);
-  return c.text("Created!", 201);
+  return ctx.text("Created!", 201);
 });
 
 api.get("/cache/clear-all", async (ctx) => {
+  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  if (!canProceed) {
+    return ctx.text("Unauthorized", 401);
+  }
   console.log("clearing cache");
   await clearInMemoryCache();
   await clearKVCache(ctx.env.KVDATA);
@@ -276,30 +397,50 @@ api.get("/cache/clear-all", async (ctx) => {
 });
 
 api.get("/cache/clear-in-memory", async (ctx) => {
+  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  if (!canProceed) {
+    return ctx.text("Unauthorized", 401);
+  }
   console.log("clearing cache");
   await clearInMemoryCache();
   return ctx.text("in memory cache cleared");
 });
 
 api.get("/cache/clear-kv", async (ctx) => {
+  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  if (!canProceed) {
+    return ctx.text("Unauthorized", 401);
+  }
   console.log("clearing cache");
   await clearKVCache(ctx.env.KVDATA);
   return ctx.text("kv cache cleared");
 });
 
 api.get("/cache/in-memory", async (ctx) => {
+  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  if (!canProceed) {
+    return ctx.text("Unauthorized", 401);
+  }
   console.log("clearing cache");
   const cacheItems = await getAllFromInMemoryCache();
   return ctx.json(cacheItems);
 });
 
 api.get("/cache/kv", async (ctx) => {
+  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  if (!canProceed) {
+    return ctx.text("Unauthorized", 401);
+  }
   const cacheItems = await getKVCache(ctx.env.KVDATA);
   console.log("getting kv cache", cacheItems);
   return ctx.json(cacheItems);
 });
 
 api.get("/cache/kv/:cacheKey", async (ctx) => {
+  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  if (!canProceed) {
+    return ctx.text("Unauthorized", 401);
+  }
   const cacheKey = ctx.req.param("cacheKey");
   const cacheItem = await getRecordFromKvCache(ctx.env.KVDATA, cacheKey);
   console.log("getting kv cache", cacheItem);
@@ -307,11 +448,19 @@ api.get("/cache/kv/:cacheKey", async (ctx) => {
 });
 
 api.get("/kv", async (ctx) => {
+  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  if (!canProceed) {
+    return ctx.text("Unauthorized", 401);
+  }
   const allItems = await getDataByPrefix(ctx.env.KVDATA, "", 2);
   return ctx.json(allItems);
 });
 
 api.get("/kv/:cacheKey", async (ctx) => {
+  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  if (!canProceed) {
+    return ctx.text("Unauthorized", 401);
+  }
   const cacheKey = ctx.req.param("cacheKey");
   console.log("getting kv cache", cacheKey);
 
@@ -324,6 +473,10 @@ api.get("/kv/:cacheKey", async (ctx) => {
 });
 
 api.get("/kv/delete-all", async (ctx) => {
+  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  if (!canProceed) {
+    return ctx.text("Unauthorized", 401);
+  }
   await clearAllKVRecords(ctx.env.KVDATA);
   return ctx.text("ok");
 });

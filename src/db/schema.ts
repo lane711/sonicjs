@@ -22,7 +22,10 @@ export const auditSchema = {
  **** TABLES ****
  */
 
-export let usePasswordAuth = true;
+export const usePasswordAuth = true;
+export const adminRole = "admin";
+export const editorRole = "editor";
+export const adminAccessRoles = [adminRole, editorRole];
 
 // users
 export const userSchema: Record<string, AnySQLiteColumnBuilder> & {
@@ -203,17 +206,28 @@ export const categoriesToPostsRelations = relations(
 export interface ApiConfig {
   table: string;
   route: string;
+  hidden?: boolean;
+  publicPermissions?: {
+    create?: boolean;
+    read?: boolean;
+    update?: boolean;
+    delete?: boolean;
+  };
 }
 
 //create an entry for each table
 export const apiConfig: ApiConfig[] = [
-  { table: "posts", route: "posts" },
-  { table: "categories", route: "categories" },
-  { table: "comments", route: "comments" },
-  { table: "categoriesToPosts", route: "categories-to-posts" },
+  { table: "posts", route: "posts", publicPermissions: { read: true } },
+  {
+    table: "categories",
+    route: "categories",
+    publicPermissions: { read: true },
+  },
+  { table: "comments", route: "comments", publicPermissions: { read: true } },
+  {
+    table: "categoriesToPosts",
+    route: "categories-to-posts",
+    publicPermissions: { read: true },
+  },
+  { table: "users", route: "users", hidden: usePasswordAuth },
 ];
-
-apiConfig.push({ table: "users", route: "users" });
-if (!usePasswordAuth) {
-  apiConfig.push({ table: "users", route: "users" });
-}

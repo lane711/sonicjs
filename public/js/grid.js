@@ -1,3 +1,5 @@
+const url = window.location.href;
+const authMode = url.includes("/auth/");
 const gridWrapper = document.getElementById("grid");
 if (gridWrapper) {
   const dataGrid = new gridjs.Grid({
@@ -28,7 +30,9 @@ if (gridWrapper) {
       },
     },
     server: {
-      url: `/admin/api/${getTable()}`,
+      url: authMode
+        ? `/admin/api/auth/${getTable()}`
+        : `/admin/api/${getTable()}`,
       data: (opts) => {
         return new Promise((resolve, reject) => {
           // let's implement our own HTTP client
@@ -70,8 +74,6 @@ if (gridWrapper) {
   }).render(gridWrapper);
 
   function deleteItem(itemId) {
-    const url = window.location.href;
-    const authMode = url.includes("/auth/users");
     const basePath = `${window.location.protocol}//${window.location.host}`;
     const urlSegments = window.location.pathname.split("/");
     const tableName = urlSegments[urlSegments.length - 1];

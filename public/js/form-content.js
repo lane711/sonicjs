@@ -9,17 +9,17 @@ let mode;
   const params = url.split("/");
   route = window.location.href.split("/").pop();
 
-  console.log({ url });
-  const authMode = url.includes("/auth/users");
+  const authMode = url.includes("/auth/");
   if (authMode) {
-    mode = "auth:new";
-    route = "users";
-  } else if (url.indexOf("admin/content/new") > 0) {
+    route = `auth/${route}`;
+  }
+  if (url.indexOf("admin/content/new") > 0) {
     mode = "new";
   } else if (url.indexOf("admin/content/edit") > 0) {
     mode = "edit";
+  } else {
+    mode = undefined;
   }
-  console.log("mode", mode);
   if (!mode) {
     return;
   }
@@ -67,9 +67,7 @@ function saveNewContent(data) {
   delete data.data.id;
   console.log(data);
 
-  const path = mode.includes("auth") ? "/v1/auth/users" : `/v1/${route}`;
-  console.log({ path });
-  axios.post(path, data).then((response) => {
+  axios.post(`/v1/${route}`, data).then((response) => {
     console.log(response.data);
     console.log(response.status);
     console.log(response.statusText);
@@ -84,34 +82,38 @@ function editContent() {
   const contentId = $("#formio").attr("data-id");
   route = $("#formio").attr("data-route");
   console.log("contentType", contentId);
-  axios.get(`/v1/${route}/${contentId}?includeContentType`).then((response) => {
-    console.log(response.data);
+  axios
+    .get(
+      `/v1/${route.replaceAll("/auth/", "/")}/${contentId}?includeContentType`
+    )
+    .then((response) => {
+      console.log(response.data);
 
-    Formio.icons = "fontawesome";
-    // debugger;
-    // Formio.createForm(document.getElementById("formio"), {
-    Formio.createForm(document.getElementById("formio"), {
-      components: response.data.contentType,
-    }).then(function (form) {
-      form.on("submit", function ({ data }) {
-        if (data.id) {
-          updateContent(data);
-        } else {
-          addContent(data);
-        }
-      });
-      form.submission = {
-        data: response.data.data,
-      };
-      form.on("change", async function (event) {
-        $("#contentFormSaveButton").removeAttr("disabled");
-        if (event.components) {
-          contentTypeComponents = event.components;
-          console.log("event ->", event);
-        }
+      Formio.icons = "fontawesome";
+      // debugger;
+      // Formio.createForm(document.getElementById("formio"), {
+      Formio.createForm(document.getElementById("formio"), {
+        components: response.data.contentType,
+      }).then(function (form) {
+        form.on("submit", function ({ data }) {
+          if (data.id) {
+            updateContent(data);
+          } else {
+            addContent(data);
+          }
+        });
+        form.submission = {
+          data: response.data.data,
+        };
+        form.on("change", async function (event) {
+          $("#contentFormSaveButton").removeAttr("disabled");
+          if (event.components) {
+            contentTypeComponents = event.components;
+            console.log("event ->", event);
+          }
+        });
       });
     });
-  });
 }
 
 function addContent(data) {

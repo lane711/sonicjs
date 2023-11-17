@@ -67,6 +67,53 @@ Run the admin interface at:
 
 Check out https://sonicjs.com for next steps.
 
+# Authentication
+
+To enable password auth set `usePasswordAuth` to true in src/db/schema.ts (note do this before making users);
+
+  1. Create a new user with the role "admin" from clicking Users in the left nav (/admin/tables/auth/users)
+  1. Login
+  1. You now have admin dashboard for CRUD operations
+  1. To authorize via the API post to /v1/auth/login which will return json like
+    ```
+    {
+      "bearer": "eo0t9q52njemo83rm1qktr6kwjh8zu5o3vma1g6j"
+    }
+    ```
+  1. Then add that bearer token to the Authorization header on future requests
+
+    ```
+    const url = "http://localhost:8788/v1/posts/c1d462a4-fd10-4bdb-bbf2-2b33a94f82aa";
+    const data = {
+      "data": {
+          "title": "Test Post Update"
+      }
+    };
+    const requestOptions = {
+      method: 'PUT',
+      headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer eo0t9q52njemo83rm1qktr6kwjh8zu5o3vma1g6j'
+      },
+      body: JSON.stringify(data)
+    };
+    fetch(url, requestOptions)
+    
+    ```
+
+## Roles
+By default the recognized roles are "admin" and "editor". admin can do all CRUD operations on anything and access the admin dashboard. editor is the same except they can't see/edit other users.
+
+See `adminRole`, `editorRole` and `adminAccessRoles` in src/db/schema.ts for customization.
+Also see src/cms/auth/auth-helpers.ts for functions called from the apis to enable this if you need more customization.
+
+Note if no user has the admin role then all users are considered admins.
+
+## Public Permissions
+The apiConfig has a publicPermissions field for CRUD operations
+
+
+
 # Legacy
 The legacy version of SonicJs (a Node.js based web content management system) can be found here:
 [https://github.com/lane711/sonicjs/tree/legacy](https://github.com/lane711/sonicjs/tree/legacy)
