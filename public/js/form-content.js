@@ -136,8 +136,6 @@ function updateContent(data) {
   var content = {};
   content.data = data;
   content.table = data.table;
-
-  console.log("updateContent", content);
   delete content.data.submit;
   delete content.data.contentType;
   delete content.data.id;
