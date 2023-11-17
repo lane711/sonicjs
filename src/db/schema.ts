@@ -18,14 +18,15 @@ export const auditSchema = {
   updatedOn: integer("updatedOn"),
 };
 
-/*
- **** TABLES ****
- */
-
-export const usePasswordAuth = true;
+// Authentication Settings
+export const usePasswordAuth = false;
 export const adminRole = "admin";
 export const editorRole = "editor";
 export const adminAccessRoles = [adminRole, editorRole];
+
+/*
+ **** TABLES ****
+ */
 
 // users
 export const userSchema: Record<string, AnySQLiteColumnBuilder> & {
