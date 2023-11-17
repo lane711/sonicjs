@@ -75,14 +75,16 @@ To enable password auth set `usePasswordAuth` to true in src/db/schema.ts (note 
   1. Login
   1. You now have admin dashboard for CRUD operations
   1. To authorize via the API post to /v1/auth/login which will return json like
-    ```
+
+    ```json
     {
       "bearer": "eo0t9q52njemo83rm1qktr6kwjh8zu5o3vma1g6j"
     }
     ```
   1. Then add that bearer token to the Authorization header on future requests
 
-    ```
+
+    ```ts
     const url = "http://localhost:8788/v1/posts/c1d462a4-fd10-4bdb-bbf2-2b33a94f82aa";
     const data = {
       "data": {

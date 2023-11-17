@@ -217,11 +217,11 @@ export const Layout = (props: {
                         </li>
                       );
                     })}
-                  <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                    <span>Auth</span>
-                  </h6>
                   {usePasswordAuth ? (
                     <>
+                      <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                        <span>Auth</span>
+                      </h6>
                       <li class="nav-item">
                         <span class="px-3">{props.username}</span>
                       </li>
