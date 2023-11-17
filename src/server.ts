@@ -79,7 +79,9 @@ app.get("/public/*", async (ctx) => {
 });
 
 app.route("/v1", api);
-app.route("/v1/auth", authAPI);
+if (usePasswordAuth) {
+  app.route("/v1/auth", authAPI);
+}
 app.route("/admin", admin);
 app.route("v1/example", example);
 app.route("/status", status);

@@ -82,10 +82,9 @@ function editContent() {
   const contentId = $("#formio").attr("data-id");
   route = $("#formio").attr("data-route");
   console.log("contentType", contentId);
+  const routeWithoutAuth = route.replaceAll("/auth/", "/");
   axios
-    .get(
-      `/v1/${route.replaceAll("/auth/", "/")}/${contentId}?includeContentType`
-    )
+    .get(`/v1/${routeWithoutAuth}/${contentId}?includeContentType`)
     .then((response) => {
       console.log(response.data);
 
