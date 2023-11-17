@@ -36,27 +36,24 @@ import { sleep } from "../util/helpers";
 const ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
 
 describe("cache in/out", () => {
-  it("cache should hydrate based on KV keys", async () => {
-    await addToInMemoryCache(ctx, addCachePrefix("key1"), { key: 1 });
-    await addToInMemoryCache(ctx, addCachePrefix("key2"), { key: 2 });
-
+  it("cache in/out", async () => {
+    await addToInMemoryCache(ctx, "key1", { key: 1 });
+    await addToInMemoryCache(ctx, "key2", { key: 2 });
 
     const cache = await getAllCacheItemsFromInMemoryCache();
     expect(cache.data.length).toBe(2);
     expect(cache.source).toBe("cache");
 
-    const key1 = await getFromInMemoryCache(ctx, addCachePrefix("key1"));
-    const key2 = await getFromInMemoryCache(ctx, addCachePrefix("key2"));
+    const key1 = await getFromInMemoryCache(ctx, "key1");
+    const key2 = await getFromInMemoryCache(ctx, "key2");
 
     expect(key1[0].data.key).toBe(1);
     expect(key2[0].data.key).toBe(2);
-
-
   });
 });
 
 describe("cache hydration", () => {
-  it("cache should hydrate based on KV keys", async () => {
+  it("rehydrateCacheFromKVKeys should hydrate based on KV keys", async () => {
     await addToKvCache(ctx, "http://some-url-1", { foo: "bar" });
     await addToKvCache(ctx, "http://some-url-2", { foo: "bear" });
 

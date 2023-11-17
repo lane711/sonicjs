@@ -143,8 +143,13 @@ export async function clearAllKVRecords(db) {
 }
 
 export function addCachePrefix(key: string = "") {
-  //prefix is its not already there
+  //prefix if its not already there
   return `${"cache::"}${key.replace("cache::", "")}`;
+}
+
+export function addSystemPrefix(key: string = "") {
+  //prefix if its not already there
+  return `${"system::"}${key.replace("system::", "")}`;
 }
 
 export function saveContent(db, content, timestamp, id) {

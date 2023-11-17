@@ -1,6 +1,8 @@
 import loki from "lokijs";
 import { log } from "../util/logger";
 import {
+  addCachePrefix,
+  addSystemPrefix,
   getDataByPrefix,
   getKVCache,
   getKVKeys,
@@ -8,7 +10,7 @@ import {
 } from "./kv-data";
 import { getRecords } from "./data";
 var db = new loki("cache.db");
-var cache = db.addCollection("cache", {unique: 'key'});
+var cache = db.addCollection("cache", { unique: "key" });
 
 // class CacheStatus {
 //   private static _instance: CacheStatus;
@@ -47,16 +49,26 @@ export async function setCacheStatusInvalid() {
   cache.clear();
 }
 
+export async function addToInMemorySystemCache(ctx = {}, key: string, data) {
+  key = addSystemPrefix(key);
+  return addToCache(ctx, key, data);
+}
+
 export async function addToInMemoryCache(ctx = {}, key: string, data) {
+  key = addCachePrefix(key);
+  return addToCache(ctx, key, data);
+}
+
+export async function addToCache(ctx = {}, key: string, data) {
   log(ctx, {
     level: "verbose",
     message: "addToInMemoryCache start " + key,
-    key
+    key,
   });
   const existing = await getFromInMemoryCache(ctx, key);
   if (existing.length) {
     let doc = existing[0];
-    doc.data = {...data};
+    doc.data = { ...data };
     cache.update(doc);
   } else {
     cache.insert({ key, data });
@@ -68,7 +80,16 @@ export async function addToInMemoryCache(ctx = {}, key: string, data) {
 }
 
 export async function getFromInMemoryCache(ctx = {}, key: string) {
-  // console.log("getFromInMemoryCache", key);
+  key = addCachePrefix(key);
+  return getFromInMemoryCache(ctx, key);
+}
+
+export async function getFromInMemorySystemCache(ctx = {}, key: string) {
+  key = addSystemPrefix(key);
+  return getFromInMemoryCache(ctx, key);
+}
+
+export async function getFromCache(ctx = {}, key: string) {
   log(ctx, {
     level: "verbose",
     message: "getFromInMemoryCache start",
@@ -104,8 +125,8 @@ export async function clearInMemoryCache() {
 
 export async function rehydrateCacheFromKVKeysOnStartup(ctx) {
   // we only want this to run once on start up
-  const rehydrateCacheKey = "system::cache-rehydrated";
-  const isCacheAlreadyPopulated = await getFromInMemoryCache(
+  const rehydrateCacheKey = "cache-rehydrated";
+  const isCacheAlreadyPopulated = await getFromInMemorySystemCache(
     ctx,
     rehydrateCacheKey
   );

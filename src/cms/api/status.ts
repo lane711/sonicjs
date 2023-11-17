@@ -5,7 +5,7 @@ import { getById } from "../data/kv-data";
 import axios from "axios";
 import { datadogLogs } from "@datadog/browser-logs";
 import { log } from "../util/logger";
-import { addToInMemoryCache, getFromInMemoryCache, isCacheValid } from "../data/cache";
+import { addToInMemoryCache, addToInMemorySystemCache, getFromInMemoryCache, isCacheValid } from "../data/cache";
 
 const status = new Hono<{ Bindings: Bindings }>();
 
@@ -111,7 +111,7 @@ status.get("/geo", (ctx) => {
 (async function(){
 // add startup entry to cache
 const now = new Date().getTime().toString();
-const newCacheItem = await addToInMemoryCache({}, 'system::startup', { started: now });
+const newCacheItem = await addToInMemorySystemCache({}, 'startup', { started: now });
 
 })();
 
