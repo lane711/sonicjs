@@ -69,9 +69,11 @@ Check out https://sonicjs.com for next steps.
 
 # Authentication
 
-To enable password auth set `usePasswordAuth` to true in src/db/schema.ts (note do this before making users);
+To enable password auth set `usePasswordAuth` to true in src/db/schema.ts;
 
-  1. Create a new user with the role "admin" from clicking Users in the left nav (/admin/tables/auth/users)
+  1. Navigate to the Auth Users section in the left nav (/admin/tables/auth/users)
+  1. If you don't have a user create one with the role "admin" and set a password
+  1. If you have users already edit the user you want to be the admin, set the role to "admin" and set a password
   1. Login
   1. You now have admin dashboard for CRUD operations
   1. To authorize via the API post to /v1/auth/login which will return json like

@@ -101,6 +101,7 @@ export async function updateUser<T extends string>(
   id: string
 ) {
   const { ctx, content } = args;
+  const user = ctx.get("user");
   if (ctx && content && id) {
     const d1 = ctx.env.D1DATA;
     const auth = initializeLucia(d1, ctx.env);
@@ -126,16 +127,36 @@ export async function updateUser<T extends string>(
     });
 
     if (password) {
-      await auth.updateKeyPassword("email", email.toLowerCase(), password);
+      let hasKey = false;
+      try {
+        hasKey = !!(await auth.getKey("email", email.toLowerCase()));
+        console.log({ hasKey });
+      } catch (e) {
+        hasKey = false;
+      }
+      if (hasKey) {
+        await auth.updateKeyPassword("email", email.toLowerCase(), password);
+      } else {
+        await auth.createKey({
+          userId: id,
+          providerId: "email",
+          providerUserId: email.toLowerCase(),
+          password,
+        });
+      }
     }
 
     let session = ctx.get("session");
     if (password || d1Data.role) {
       await auth.invalidateAllUserSessions(id);
-      session = await auth.createSession({
-        userId: id,
-        attributes: {},
-      });
+      if (user.userId === id) {
+        session = await auth.createSession({
+          userId: id,
+          attributes: {},
+        });
+      } else {
+        session = null;
+      }
     }
 
     if (authRequest) {

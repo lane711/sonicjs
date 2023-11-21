@@ -48,34 +48,45 @@ export const usersTable = sqliteTable("users", {
   ...auditSchema,
 });
 
-if (usePasswordAuth) {
-  const userKeysSchema = {
-    id: text("id").primaryKey(),
-    user_id: text("user_id")
-      .notNull()
-      .references(() => usersTable.id),
-    hashed_passwrod: text("hashed_password"),
-  };
+export const userKeysSchema = {
+  id: text("id").primaryKey(),
+  user_id: text("user_id")
+    .notNull()
+    .references(() => usersTable.id),
+  hashed_password: text("hashed_password"),
+};
 
-  sqliteTable("user_keys", {
-    ...userKeysSchema,
-    ...auditSchema,
-  });
+export const userKeysTable = sqliteTable("user_keys", {
+  ...userKeysSchema,
+  ...auditSchema,
+});
+export const userSessionsSchema = {
+  id: text("id").primaryKey(),
+  user_id: text("user_id")
+    .notNull()
+    .references(() => usersTable.id),
+  active_expires: int("active_expires").notNull(),
+  idle_expires: int("idle_expires").notNull(),
+};
 
-  const userSessionsSchema = {
-    id: text("id").primaryKey(),
-    user_id: text("user_id")
-      .notNull()
-      .references(() => usersTable.id),
-    active_expires: int("active_expires").notNull(),
-    idle_expires: int("idle_expires").notNull(),
-  };
+export const userSessionsTable = sqliteTable("user_sessions", {
+  ...userSessionsSchema,
+  ...auditSchema,
+});
 
-  sqliteTable("user_sessions", {
-    ...userSessionsSchema,
-    ...auditSchema,
-  });
-}
+export const keysRelations = relations(userKeysTable, ({ one, many }) => ({
+  user: one(usersTable, {
+    fields: [userKeysTable.user_id],
+    references: [usersTable.id],
+  }),
+}));
+export const sessionsRelations = relations(userSessionsTable, ({ one }) => ({
+  user: one(usersTable, {
+    fields: [userSessionsTable.user_id],
+    references: [usersTable.id],
+  }),
+}));
+
 // posts
 type PostCategories = [{ category: string }];
 
@@ -160,6 +171,8 @@ export const categoriesToPostsTable = sqliteTable(
 export const usersRelations = relations(usersTable, ({ many }) => ({
   posts: many(postsTable),
   comments: many(commentsTable),
+  keys: many(userKeysTable),
+  sessions: many(userSessionsTable),
 }));
 
 // posts can have one author (user), many categories, many comments
