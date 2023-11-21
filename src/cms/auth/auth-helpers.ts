@@ -27,7 +27,7 @@ export const isAuthEnabled = async (ctx: Context) => {
       ctx,
       "custom",
       {},
-      "hasUserCheck",
+      "hasUserWithKeyCheck",
       "d1",
       fn
     );
