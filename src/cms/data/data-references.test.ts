@@ -1,15 +1,18 @@
-import { insertD1Data, updateD1Data } from "./d1-data";
-import usersTable from "../../db/schema/users";
+import { insertD1Data } from "./d1-data";
 import { tableSchemas } from "../../db/routes";
-
-import qs from "qs";
-const env = getMiniflareBindings();
-const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
-import { getRecord, getRecords, insertRecord } from "./data";
+import { getRecords, insertRecord } from "./data";
 import { clearInMemoryCache } from "./cache";
 import { clearKVCache } from "./kv-data";
+
+const schema = {};
+for (const key of Object.keys(tableSchemas)) {
+  schema[key] = tableSchemas[key]?.table;
+  schema[key + "Relation"] = tableSchemas[key]?.relation;
+}
+const env = getMiniflareBindings();
+const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
 const ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
 
 it("insert should allow refer", async () => {
@@ -36,7 +39,7 @@ it("get user related data", async () => {
 
   const db = drizzle(__D1_BETA__D1DATA, { schema });
 
-  const user = await db.query.usersTable.findMany({
+  const user = await db.query.users.findMany({
     with: {
       posts: true,
       comments: true,
@@ -60,9 +63,9 @@ it("get post related data", async () => {
 
   const db = drizzle(__D1_BETA__D1DATA, { schema });
 
-  const comments = await db.query.commentsTable.findMany();
+  const comments = await db.query.comments.findMany();
 
-  const post = await db.query.postsTable.findFirst({
+  const post = await db.query.posts.findFirst({
     with: {
       user: true,
       comments: { with: { user: true } },
@@ -121,7 +124,7 @@ it("getRecords can accept custom function with parameters for retrieval of data"
   const func = async function () {
     const db = drizzle(__D1_BETA__D1DATA, { schema });
 
-    return await db.query.postsTable.findFirst({
+    return await db.query.posts.findFirst({
       with: {
         user: true,
         comments: { with: { user: true } },

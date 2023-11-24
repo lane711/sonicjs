@@ -301,13 +301,14 @@ export async function insertRecord(d1, kv, data) {
   content.data.id = id;
   let error = "";
 
-  // console.log("insertRecord", content);
+  console.log("insertRecord", content);
 
   try {
     const result = await saveKVData(kv, id, content.data);
-    // console.log('result KV', result);
+    // console.log("result KV", result);
     // return ctx.json(id, 201);
   } catch (error) {
+    console.log("error", error);
     error = "error posting content" + error;
   } finally {
     //then also save the content to sqlite for filtering, sorting, etc

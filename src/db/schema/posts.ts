@@ -1,11 +1,25 @@
-import { sqliteTable, index } from "drizzle-orm/sqlite-core";
-import { tableName, postsSchema } from "../definitions/post";
-import { auditSchema } from "../definitions/audit";
+import { sqliteTable, index, text } from "drizzle-orm/sqlite-core";
+import { relations } from "drizzle-orm";
+import { auditSchema } from "./audit";
+import * as users from "./users";
+import * as categoriesToPosts from "./categoriesToPosts";
+import * as comments from "./comments";
 
-export default sqliteTable(
+export const tableName = "posts";
+
+export const route = "posts";
+
+export const definition = {
+  id: text("id").primaryKey(),
+  title: text("title"),
+  body: text("body"),
+  userId: text("userId"),
+};
+
+export const table = sqliteTable(
   tableName,
   {
-    ...postsSchema,
+    ...definition,
     ...auditSchema,
   },
   (table) => {
@@ -14,3 +28,12 @@ export default sqliteTable(
     };
   }
 );
+
+export const relation = relations(table, ({ one, many }) => ({
+  user: one(users.table, {
+    fields: [table.userId],
+    references: [users.table.id],
+  }),
+  categories: many(categoriesToPosts.table),
+  comments: many(comments.table),
+}));
