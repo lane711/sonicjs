@@ -17,6 +17,9 @@ import { getForm } from "../api/forms";
 
 const authAPI = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 authAPI.use("*", async (ctx, next) => {
+  if (ctx.env.useAuth !== "true") {
+    return ctx.text("Not Implemented", 501);
+  }
   const authEnabled = await isAuthEnabled(ctx);
   if (authEnabled) {
     const session = ctx.get("session");

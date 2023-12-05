@@ -5,6 +5,7 @@ export type Bindings = {
   KVDATA: KVNamespace;
   D1DATA: D1Database;
   __D1_BETA__D1DATA: D1Database;
+  useAuth?: string;
 };
 
 declare global {

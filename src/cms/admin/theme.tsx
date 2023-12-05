@@ -1,4 +1,5 @@
-import { ApiConfig, apiConfig, usePasswordAuth } from "../../db/schema";
+import { ApiConfig, apiConfig } from "../../db/schema";
+import { EnvContext } from "./context";
 import {
   getById,
   getContentType,
@@ -153,169 +154,175 @@ export const Layout = (props: {
   screenTitle?: string;
   newItemButtonText?: string;
   username?: string;
+  env?: Record<string, string>;
 }) => {
   const tables = apiConfig;
 
   return (
     <html lang="en" data-bs-theme="auto">
-      <Head />
-      <body>
-        <ToggleTheme />
-        <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-          <a
-            class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6"
-            href="/admin"
-          >
-            <img class="logo" src="/public/images/sonicjs-logo.svg" />
-          </a>
-          <button
-            class="navbar-toggler position-absolute d-md-none collapsed"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#sidebarMenu"
-            aria-controls="sidebarMenu"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <input
-            class="form-control form-control-dark w-100 rounded-0 border-0"
-            type="text"
-            placeholder="Search"
-            aria-label="Search"
-          />
-        </header>
-
-        <div class="container-fluid">
-          <div class="row">
-            <nav
-              id="sidebarMenu"
-              class="col-md-3 col-lg-2 d-md-block bg-body-tertiary sidebar collapse"
+      <EnvContext.Provider value={props.env}>
+        <Head />
+        <body>
+          <ToggleTheme />
+          <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+            <a
+              class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6"
+              href="/admin"
             >
-              <div class="position-sticky pt-3 sidebar-sticky">
-                <ul class="nav flex-column">
-                  <li class="nav-item">
-                    <a class="nav-link" href="/admin">
-                      API
-                    </a>
-                  </li>
-                  <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                    <span>Tables</span>
-                  </h6>
-                  {tables
-                    .filter((t) => !t.hidden)
-                    .map((item: ApiConfig) => {
-                      return (
+              <img class="logo" src="/public/images/sonicjs-logo.svg" />
+            </a>
+            <button
+              class="navbar-toggler position-absolute d-md-none collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#sidebarMenu"
+              aria-controls="sidebarMenu"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+            >
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <input
+              class="form-control form-control-dark w-100 rounded-0 border-0"
+              type="text"
+              placeholder="Search"
+              aria-label="Search"
+            />
+          </header>
+
+          <div class="container-fluid">
+            <div class="row">
+              <nav
+                id="sidebarMenu"
+                class="col-md-3 col-lg-2 d-md-block bg-body-tertiary sidebar collapse"
+              >
+                <div class="position-sticky pt-3 sidebar-sticky">
+                  <ul class="nav flex-column">
+                    <li class="nav-item">
+                      <a class="nav-link" href="/admin">
+                        API
+                      </a>
+                    </li>
+                    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                      <span>Tables</span>
+                    </h6>
+                    {tables
+                      .filter(
+                        (t) =>
+                          props.env.useAuth !== "true" || !t.hideWhenAuthEnabled
+                      )
+                      .map((item: ApiConfig) => {
+                        return (
+                          <li class="nav-item">
+                            <a
+                              class="nav-link"
+                              href={"/admin/tables/" + item.route}
+                            >
+                              {item.route}
+                            </a>
+                          </li>
+                        );
+                      })}
+                    {props.env.useAuth === "true" ? (
+                      <>
+                        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                          <span>Auth</span>
+                        </h6>
                         <li class="nav-item">
-                          <a
-                            class="nav-link"
-                            href={"/admin/tables/" + item.route}
-                          >
-                            {item.route}
+                          <span class="px-3">{props.username}</span>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href={"/admin/tables/auth/users"}>
+                            Users
                           </a>
                         </li>
-                      );
-                    })}
-                  {usePasswordAuth ? (
-                    <>
-                      <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                        <span>Auth</span>
-                      </h6>
-                      <li class="nav-item">
-                        <span class="px-3">{props.username}</span>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href={"/admin/tables/auth/users"}>
-                          Users
-                        </a>
-                      </li>
 
-                      <li class="nav-item">
-                        <a class="nav-link" href="/v1/auth/logout">
-                          Logout
-                        </a>
-                      </li>
-                    </>
-                  ) : (
-                    ""
-                  )}
-                  <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                    <span>Cache</span>
-                  </h6>
-                  <li class="nav-item">
-                    <a class="nav-link" href="/admin/cache/in-memory">
-                      In Memory
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="/admin/cache/kv">
-                      KV
-                    </a>
-                  </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="/v1/auth/logout">
+                            Logout
+                          </a>
+                        </li>
+                      </>
+                    ) : (
+                      ""
+                    )}
+                    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                      <span>Cache</span>
+                    </h6>
+                    <li class="nav-item">
+                      <a class="nav-link" href="/admin/cache/in-memory">
+                        In Memory
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="/admin/cache/kv">
+                        KV
+                      </a>
+                    </li>
 
-                  <li class="nav-item">
-                    <a
-                      id="clear-cache-all"
-                      class="nav-link"
-                      href="javascript:void(0)"
-                    >
-                      Clear All Caches
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </nav>
+                    <li class="nav-item">
+                      <a
+                        id="clear-cache-all"
+                        class="nav-link"
+                        href="javascript:void(0)"
+                      >
+                        Clear All Caches
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </nav>
 
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-              <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">{props.screenTitle}</h1>
-              </div>
+              <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                  <h1 class="h2">{props.screenTitle}</h1>
+                </div>
 
-              {props.children}
-            </main>
+                {props.children}
+              </main>
+            </div>
           </div>
-        </div>
 
-        {/* <!-- Modal --> */}
-        <div
-          class="modal fade"
-          id="exampleModal"
-          tabindex="-1"
-          aria-labelledby="exampleModalLabel"
-          aria-hidden="true"
-        >
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">
-                  Modal title
-                </h5>
-                <button
-                  type="button"
-                  class="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                ></button>
-              </div>
-              <div class="modal-body">...</div>
-              <div class="modal-footer">
-                <button
-                  type="button"
-                  class="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                >
-                  Close
-                </button>
-                <button type="button" class="btn btn-primary">
-                  Save changes
-                </button>
+          {/* <!-- Modal --> */}
+          <div
+            class="modal fade"
+            id="exampleModal"
+            tabindex="-1"
+            aria-labelledby="exampleModalLabel"
+            aria-hidden="true"
+          >
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">
+                    Modal title
+                  </h5>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div class="modal-body">...</div>
+                <div class="modal-footer">
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                  >
+                    Close
+                  </button>
+                  <button type="button" class="btn btn-primary">
+                    Save changes
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <Script />
-      </body>
+          <Script />
+        </body>
+      </EnvContext.Provider>
     </html>
   );
 };

@@ -19,7 +19,6 @@ export const auditSchema = {
 };
 
 // Authentication Settings
-export const usePasswordAuth = false;
 export const adminRole = "admin";
 export const editorRole = "editor";
 export const adminAccessRoles = [adminRole, editorRole];
@@ -36,12 +35,9 @@ export const userSchema: Record<string, AnySQLiteColumnBuilder> & {
   firstName: text("firstName"),
   lastName: text("lastName"),
   email: text("email"),
+  password: text("password"),
   role: text("role").$type<"admin" | "user">(),
 };
-
-if (usePasswordAuth) {
-  userSchema.password = text("password");
-}
 
 export const usersTable = sqliteTable("users", {
   ...userSchema,
@@ -220,7 +216,7 @@ export const categoriesToPostsRelations = relations(
 export interface ApiConfig {
   table: string;
   route: string;
-  hidden?: boolean;
+  hideWhenAuthEnabled?: boolean;
   publicPermissions?: {
     create?: boolean;
     read?: boolean;
@@ -243,5 +239,5 @@ export const apiConfig: ApiConfig[] = [
     route: "categories-to-posts",
     publicPermissions: { read: true },
   },
-  { table: "users", route: "users", hidden: usePasswordAuth },
+  { table: "users", route: "users", hideWhenAuthEnabled: true },
 ];

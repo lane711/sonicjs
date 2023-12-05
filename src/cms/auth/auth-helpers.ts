@@ -1,12 +1,12 @@
 import { Context } from "hono";
-import { adminRole, editorRole, usePasswordAuth } from "../../db/schema";
+import { adminRole, editorRole } from "../../db/schema";
 import * as schema from "../../db/schema";
 import { getRecords } from "../data/data";
 import { User } from "lucia";
 import { drizzle } from "drizzle-orm/d1";
 import { isNotNull } from "drizzle-orm";
 export const isAuthEnabled = async (ctx: Context) => {
-  let authIsEnabled = usePasswordAuth;
+  let authIsEnabled = ctx.env.useAuth === "true";
   if (authIsEnabled) {
     const fn = async function () {
       const db = drizzle(ctx.env.D1DATA, { schema });

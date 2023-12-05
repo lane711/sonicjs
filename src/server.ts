@@ -11,7 +11,6 @@ import { log } from "./cms/util/logger";
 
 import { AuthRequest, Session, User } from "lucia";
 import { initializeLucia } from "./cms/auth/lucia";
-import { usePasswordAuth } from "./db/schema";
 
 export type Variables = {
   authRequest: AuthRequest;
@@ -22,7 +21,7 @@ const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 app.use("*", async (ctx, next) => {
   const path = ctx.req.path;
-  if (usePasswordAuth && !path.includes("/public")) {
+  if (ctx.env.useAuth === "true" && !path.includes("/public")) {
     const auth = initializeLucia(ctx.env.D1DATA, ctx.env);
     const authRequest = auth.handleRequest(ctx);
     let session = await authRequest.validate();
@@ -79,9 +78,7 @@ app.get("/public/*", async (ctx) => {
 });
 
 app.route("/v1", api);
-if (usePasswordAuth) {
-  app.route("/v1/auth", authAPI);
-}
+app.route("/v1/auth", authAPI);
 app.route("/admin", admin);
 app.route("v1/example", example);
 app.route("/status", status);
