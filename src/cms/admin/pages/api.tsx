@@ -50,6 +50,7 @@ export async function loadApis(ctx) {
       tableApis={tableApis}
       recordApis={recordApis}
       screenTitle="APIs"
+      env={ctx.env}
     />
   );
 }
@@ -59,9 +60,14 @@ export const Top = (props: {
   recordApis: link[];
   screenTitle: string;
   username?: string;
+  env?: Record<string, string>;
 }) => {
   return (
-    <Layout username={props.username} screenTitle={props.screenTitle}>
+    <Layout
+      env={props.env}
+      username={props.username}
+      screenTitle={props.screenTitle}
+    >
       <h2>Table APIs</h2>
 
       <table class="table">

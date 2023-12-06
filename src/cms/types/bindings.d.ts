@@ -6,6 +6,8 @@ export type Bindings = {
   D1DATA: D1Database;
   __D1_BETA__D1DATA: D1Database;
   useAuth?: string;
+  AUTH_SECRET?: string;
+  AUTH_ITERATIONS?: string;
 };
 
 declare global {

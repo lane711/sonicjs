@@ -1,15 +1,5 @@
 import { ApiConfig, apiConfig } from "../../../db/schema";
-import {
-  getAllContent,
-  getByIdAndTable,
-  getD1ByTableAndId,
-  getD1DataByTable,
-} from "../../data/d1-data";
-import {
-  getById,
-  getContentType,
-  getDataListByPrefix,
-} from "../../data/kv-data";
+import { getDataListByPrefix } from "../../data/kv-data";
 import { Layout } from "../theme";
 
 export async function loadAdminTable(ctx) {
@@ -46,21 +36,13 @@ export async function loadAdminTable(ctx) {
 
   // console.log("contentList-->", JSON.stringify(contentList, null, 2));
 
-  const tables = apiConfig;
-  const tableList = tables.map((schmea) => {
-    return {
-      title: schmea.table,
-      editPath: `/admin/content/${schmea.route}`,
-      newPath: `/admin/content/new/${schmea.route}`,
-    };
-  });
-
   return (
     <TopContentList
       content={contentList}
-      tableList={tableList}
+      tableList={apiConfig}
       screenTitle="Content"
       username={ctx.get("user")?.email}
+      env={ctx.env}
     />
   );
 }
@@ -96,6 +78,7 @@ export async function loadTableData(ctx, route) {
 
   return (
     <TopContentTable
+      env={ctx.env}
       username={ctx.get("user")?.email}
       route={route}
       table={table}
@@ -107,7 +90,11 @@ export async function loadInMemoryCacheTable(ctx) {
   const cache_ttl = (ctx.env && ctx.env.cache_ttl) ?? 20 * 60 * 1000;
 
   return (
-    <Layout username={ctx.get("user")?.email} screenTitle={"In Memory Cache"}>
+    <Layout
+      env={ctx.env}
+      username={ctx.get("user")?.email}
+      screenTitle={"In Memory Cache"}
+    >
       <div class="row">
         <div class="col-md-12">
           <div class="pb-2 mb-3">
@@ -125,7 +112,11 @@ export async function loadInMemoryCacheTable(ctx) {
 
 export async function loadKVCacheTable(ctx) {
   return (
-    <Layout username={ctx.get("user")?.email} screenTitle={"KV Cache"}>
+    <Layout
+      env={ctx.env}
+      username={ctx.get("user")?.email}
+      screenTitle={"KV Cache"}
+    >
       <div class="row">
         <div class="col-md-12">
           <div class="pb-2 mb-3">
@@ -143,7 +134,11 @@ export async function loadKVCacheTable(ctx) {
 
 export async function loadKVCacheDetail(ctx, kv) {
   return (
-    <Layout username={ctx.get("user")?.email} screenTitle={"KV Item Detail"}>
+    <Layout
+      env={ctx.env}
+      username={ctx.get("user")?.email}
+      screenTitle={"KV Item Detail"}
+    >
       <div class="row">
         <div class="col-md-12">
           <div class="pb-2 mb-3">
@@ -164,6 +159,7 @@ export async function loadKVCacheDetail(ctx, kv) {
 export async function loadInMemoryCacheDetail(ctx, kv) {
   return (
     <Layout
+      env={ctx.env}
       username={ctx.get("user")?.email}
       screenTitle={"In Memory Item Detail"}
     >
@@ -212,14 +208,14 @@ export async function loadAdmin(ctx) {
 
   const contentTypeList = contentTypes.keys.map((item) => {
     return {
-      title: item.name,
-      editPath: `/admin/content/${item.name}`,
-      newPath: `/admin/content/new/${item.name}`,
+      table: item.name,
+      route: item.name,
     };
   });
 
   return (
     <TopContentList
+      env={ctx.env}
       content={contentList}
       tableList={contentTypeList}
       screenTitle="Content"
@@ -252,6 +248,7 @@ export async function loadEditContent(ctx, route, id, tbl?: string) {
 
   return (
     <ContentEditForm
+      env={ctx.env}
       saveButtonText="Save Content Type"
       screenTitle="Content Type"
       contentId={id}
@@ -272,6 +269,7 @@ export async function loadNewContent(ctx, route, tbl?: string) {
 
   return (
     <ContentNewForm
+      env={ctx.env}
       username={ctx.get("user")?.email}
       route={route}
       table={table}
@@ -290,9 +288,14 @@ export const ContentEditForm = (props: {
   table: string;
   route: string;
   username?: string;
+  env: Record<string, string>;
 }) => {
   return (
-    <Layout username={props.username} screenTitle={"Edit: " + props.contentId}>
+    <Layout
+      env={props.env}
+      username={props.username}
+      screenTitle={"Edit: " + props.contentId}
+    >
       <div id="formio" data-id={props.contentId} data-route={props.route}></div>
     </Layout>
   );
@@ -302,9 +305,14 @@ export const ContentNewForm = (props: {
   table: string;
   route: string;
   username?: string;
+  env: Record<string, string>;
 }) => {
   return (
-    <Layout screenTitle={"New: " + props.table} username={props.username}>
+    <Layout
+      env={props.env}
+      screenTitle={"New: " + props.table}
+      username={props.username}
+    >
       <div id="formio" data-route={props.route}></div>
     </Layout>
   );
@@ -315,9 +323,14 @@ export const TopContentList = (props: {
   tableList: ApiConfig[];
   screenTitle: string;
   username?: string;
+  env: Record<string, string>;
 }) => {
   return (
-    <Layout username={props.username} screenTitle={props.screenTitle}>
+    <Layout
+      env={props.env}
+      username={props.username}
+      screenTitle={props.screenTitle}
+    >
       <div class="row">
         <div class="col-md-8">
           <table class="table">
@@ -367,7 +380,7 @@ export const TopContentList = (props: {
               </tr>
             </thead>
             <tbody>
-              {props.tableList.map((item: any) => {
+              {props.tableList.map((item) => {
                 return (
                   <tr>
                     <td>
@@ -375,7 +388,7 @@ export const TopContentList = (props: {
                         href={"/admin/content/new/" + item.route}
                         class="btn btn-warning"
                       >
-                        New {item.title} record
+                        New {item.table} record
                       </a>
                     </td>
                   </tr>
@@ -393,9 +406,10 @@ export const TopContentTable = (props: {
   table: string;
   route: string;
   username?: string;
+  env: Record<string, string>;
 }) => {
   return (
-    <Layout username={props.username} screenTitle={props.table}>
+    <Layout env={props.env} username={props.username} screenTitle={props.table}>
       <div class="row">
         <div class="col-md-12">
           <div class="pb-2 mb-3">

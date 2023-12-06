@@ -154,7 +154,7 @@ export const Layout = (props: {
   screenTitle?: string;
   newItemButtonText?: string;
   username?: string;
-  env?: Record<string, string>;
+  env: Record<string, string>;
 }) => {
   const tables = apiConfig;
 
@@ -209,7 +209,8 @@ export const Layout = (props: {
                     {tables
                       .filter(
                         (t) =>
-                          props.env.useAuth !== "true" || !t.hideWhenAuthEnabled
+                          props.env?.useAuth !== "true" ||
+                          !t.hideWhenAuthEnabled
                       )
                       .map((item: ApiConfig) => {
                         return (
@@ -223,7 +224,7 @@ export const Layout = (props: {
                           </li>
                         );
                       })}
-                    {props.env.useAuth === "true" ? (
+                    {props.env?.useAuth === "true" ? (
                       <>
                         <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                           <span>Auth</span>
@@ -332,9 +333,14 @@ export const Top = (props: {
   screenTitle: string;
   newItemButtonText: string;
   username?: string;
+  env: Record<string, string>;
 }) => {
   return (
-    <Layout username={props.username} screenTitle={props.screenTitle}>
+    <Layout
+      env={props.env}
+      username={props.username}
+      screenTitle={props.screenTitle}
+    >
       <div class="pb-2 mb-3">
         {/* <!-- Button trigger modal --> */}
         <button
@@ -366,9 +372,14 @@ export const Detail = (props: {
   item: any;
   screenTitle: string;
   username?: string;
+  env: Record<string, string>;
 }) => {
   return (
-    <Layout username={props.username} screenTitle={props.screenTitle}>
+    <Layout
+      env={props.env}
+      username={props.username}
+      screenTitle={props.screenTitle}
+    >
       {props.item}
     </Layout>
   );
@@ -379,9 +390,11 @@ export const FormBuilder = (props: {
   screenTitle: string;
   saveButtonText: string;
   username?: string;
+  env: Record<string, string>;
 }) => {
   return (
     <Layout
+      env={props.env}
       username={props.username}
       screenTitle={props.screenTitle + ": " + props.title}
     >
@@ -406,9 +419,11 @@ export const Form = (props: {
   screenTitle: string;
   saveButtonText: string;
   username?: string;
+  env: Record<string, string>;
 }) => {
   return (
     <Layout
+      env={props.env}
       username={props.username}
       screenTitle={props.screenTitle + ": " + props.title}
     >

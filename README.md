@@ -69,7 +69,19 @@ Check out https://sonicjs.com for next steps.
 
 # Authentication
 
-To enable password auth set `useAuth` to "true" in your vars in wrangler.toml [https://sonicjs.com/environment-variables](https://sonicjs.com/environment-variables)
+To enable password auth set `useAuth` to "true" and a AUTH_SECRET in your vars in wrangler.toml
+
+Set the AUTH_SECRET (A random string is used to hash tokens)
+You can quickly create a good value on the command line via this openssl command.
+
+```
+$ openssl rand -base64 32
+```
+Warning: Hashing a password is purposefully computationally expensive in order to make passwords hard to crack if bad actors ever get access to the encrypted password. Due to this you and depending on your workers plan you may need to set the env variable AUTH_ITERATIONS if your worker is running longer than allowed. The default and max is "100000".
+
+e.g AUTH_ITERATIONS="50000"
+
+ [https://sonicjs.com/environment-variables](https://sonicjs.com/environment-variables)
 
   1. Navigate to the Auth Users section in the left nav (/admin/tables/auth/users)
   1. If you don't have a user create one with the role "admin" and set a password

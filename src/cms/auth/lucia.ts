@@ -11,6 +11,53 @@ import { Variables } from "../../server";
 export type Session = {
   user: any;
 };
+
+async function hashPassword(
+  password: string,
+  salt: Uint8Array,
+  iterations = 100000
+) {
+  const encoder = new TextEncoder();
+  const passwordBuffer = encoder.encode(password);
+  const importedKey = await crypto.subtle.importKey(
+    "raw",
+    passwordBuffer,
+    { name: "PBKDF2" },
+    false,
+    ["deriveBits", "deriveKey"]
+  );
+  let now = new Date().getTime();
+  const hashedPassword = await crypto.subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      salt: salt,
+      iterations,
+      hash: "SHA-256",
+    },
+    importedKey,
+    { name: "HMAC", hash: "SHA-1" },
+    true,
+    ["sign", "verify"]
+  );
+  console.log("hashed in", new Date().getTime() - now);
+
+  let exportedKey = await crypto.subtle.exportKey("raw", hashedPassword);
+  let uint8Array = new Uint8Array(exportedKey);
+  let decoder = new TextDecoder();
+  let hash = decoder.decode(uint8Array);
+  return hash;
+}
+function getIterations(env) {
+  let iterations = 100000;
+  if (env.AUTH_ITERATIONS) {
+    try {
+      iterations = +env.AUTH_ITERATIONS;
+    } catch (e) {
+      console.error("failed to parse AUTH_ITERATIONS", e);
+    }
+  }
+  return iterations;
+}
 export const initializeLucia = (db: D1Database, env) => {
   const d1Adapter = d1(db, {
     key: "user_keys",
@@ -27,6 +74,38 @@ export const initializeLucia = (db: D1Database, env) => {
         email: data.email,
         role: data.role,
       };
+    },
+    passwordHash: {
+      async generate(userPassword) {
+        const startNow = new Date().getTime();
+        const salt = crypto.getRandomValues(new Uint8Array(16));
+        const secret = env.AUTH_SECRET || "";
+
+        const hash = await hashPassword(
+          userPassword + secret,
+          salt,
+          getIterations(env)
+        );
+        console.log("Generate completed in", new Date().getTime() - startNow);
+        return `${hash}$${salt}`;
+      },
+      async validate(userPassword, hash) {
+        const startNow = new Date().getTime();
+        console.log({ hash });
+        const [hashedPassword, saltString] = hash.split("$");
+        console.log({ hashedPassword, saltString });
+        const salt = new Uint8Array(saltString.split(",").map(Number));
+        console.log(salt.toString());
+        const secret = env.AUTH_SECRET || "";
+        const verifyHash = await hashPassword(
+          userPassword + secret,
+          salt,
+          getIterations(env)
+        );
+        console.log({ verifyHash });
+        console.log("Generate completed in", new Date().getTime() - startNow);
+        return hashedPassword === verifyHash;
+      },
     },
   });
   return auth;
@@ -130,7 +209,6 @@ export async function updateUser<T extends string>(
       let hasKey = false;
       try {
         hasKey = !!(await auth.getKey("email", email.toLowerCase()));
-        console.log({ hasKey });
       } catch (e) {
         hasKey = false;
       }
