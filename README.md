@@ -77,7 +77,8 @@ You can quickly create a good value on the command line via this openssl command
 ```
 $ openssl rand -base64 32
 ```
-Warning: Hashing a password is purposefully computationally expensive in order to make passwords hard to crack if bad actors ever get access to the encrypted password. Due to this you and depending on your workers plan you may need to set the env variable AUTH_ITERATIONS if your worker is running longer than allowed. The default and max is "100000".
+Note: 
+Although I haven't come close to hitting even the 10ms that free workers allows, hashing a password is purposefully computationally expensive in order to make passwords hard to crack if bad actors ever get access to the encrypted password. Due to this you and depending on your workers plan you may need to set the env variable AUTH_ITERATIONS if your worker is running longer than allowed. The default and max is "100000".
 
 e.g AUTH_ITERATIONS="50000"
 
