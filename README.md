@@ -81,7 +81,7 @@ Note:
 
 Hashing a password is purposefully computationally expensive in order to make passwords hard to crack if bad actors ever get access to the encrypted password. 
 
-In my testing creating a user/logging in takes around 100ms CPU time, but I have never gotten a Exceeded CPU Limits error even on the free plan because Cloudflare allows some requests to be over your limit as long as your median stays below your limit. 
+In my testing creating a user/logging in takes around 100ms CPU time. I have never gotten a Exceeded CPU Limits error even on the free plan because Cloudflare allows rollover CPU time for requests below the CPU limit, and most SonicJS requests are well under.
 
 That said if you do get errors you may need to set the env variable AUTH_ITERATIONS and/or AUTH_HASH if your worker is running longer than allowed. The default and max AUTH_ITERATIONS is "100000". AUTH_HASH must be "SHA_256", "SHA-384" or "SHA-512" ("SHA-512" is the default)
 
