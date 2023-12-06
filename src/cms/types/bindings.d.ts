@@ -8,6 +8,7 @@ export type Bindings = {
   useAuth?: string;
   AUTH_SECRET?: string;
   AUTH_ITERATIONS?: string;
+  AUTH_HASH?: string;
 };
 
 declare global {

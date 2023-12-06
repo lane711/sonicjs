@@ -78,9 +78,11 @@ You can quickly create a good value on the command line via this openssl command
 $ openssl rand -base64 32
 ```
 Note: 
-Although I haven't had any issues getting errors due to much cpu time even on the free plan, hashing a password is purposefully computationally expensive in order to make passwords hard to crack if bad actors ever get access to the encrypted password. Due to this you and depending on your workers plan you may need to set the env variable AUTH_ITERATIONS if your worker is running longer than allowed. The default and max is "100000".
+Although I haven't had any issues getting errors due to much cpu time even on the free plan, hashing a password is purposefully computationally expensive in order to make passwords hard to crack if bad actors ever get access to the encrypted password. Due to this you and depending on your workers plan you may need to set the env variable AUTH_ITERATIONS and/or AUTH_HASH if your worker is running longer than allowed. The default and max AUTH_ITERATIONS is "100000". AUTH_HASH must be "SHA_256", "SHA-384" or "SHA-512" ("SHA-512" is the default)
 
-e.g AUTH_ITERATIONS="50000"
+e.g 
+AUTH_ITERATIONS="50000"
+AUTH_HASH="SHA-256"
 
  [https://sonicjs.com/environment-variables](https://sonicjs.com/environment-variables)
 

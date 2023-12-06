@@ -15,7 +15,8 @@ export type Session = {
 async function hashPassword(
   password: string,
   salt: Uint8Array,
-  iterations = 100000
+  iterations = 100000,
+  hash = "SHA-512"
 ) {
   const encoder = new TextEncoder();
   const passwordBuffer = encoder.encode(password);
@@ -26,12 +27,15 @@ async function hashPassword(
     false,
     ["deriveBits", "deriveKey"]
   );
+  if (hash !== "SHA-512" && hash !== "SHA-384" && hash !== "SHA-256") {
+    hash = "SHA-512";
+  }
   const hashedPassword = await crypto.subtle.deriveKey(
     {
       name: "PBKDF2",
       salt: salt,
       iterations,
-      hash: "SHA-256",
+      hash,
     },
     importedKey,
     { name: "HMAC", hash: "SHA-1" },
@@ -41,8 +45,7 @@ async function hashPassword(
 
   let exportedKey = await crypto.subtle.exportKey("raw", hashedPassword);
   let uint8Array = new Uint8Array(exportedKey);
-  let hash = String.fromCharCode.apply(null, uint8Array);
-  return hash;
+  return String.fromCharCode.apply(null, uint8Array);
 }
 function getIterations(env) {
   let iterations = 100000;
@@ -80,7 +83,8 @@ export const initializeLucia = (db: D1Database, env) => {
         const hash = await hashPassword(
           userPassword + secret,
           salt,
-          getIterations(env)
+          getIterations(env),
+          env.AUTH_HASH
         );
         return `${hash}:$:${salt}`;
       },
@@ -91,7 +95,8 @@ export const initializeLucia = (db: D1Database, env) => {
         const verifyHash = await hashPassword(
           userPassword + secret,
           salt,
-          getIterations(env)
+          getIterations(env),
+          env.AUTH_HASH
         );
         return hashedPassword === verifyHash;
       },
