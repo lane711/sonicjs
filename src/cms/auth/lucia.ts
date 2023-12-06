@@ -41,8 +41,7 @@ async function hashPassword(
 
   let exportedKey = await crypto.subtle.exportKey("raw", hashedPassword);
   let uint8Array = new Uint8Array(exportedKey);
-  let decoder = new TextDecoder();
-  let hash = decoder.decode(uint8Array);
+  let hash = String.fromCharCode.apply(null, uint8Array);
   return hash;
 }
 function getIterations(env) {
@@ -83,10 +82,10 @@ export const initializeLucia = (db: D1Database, env) => {
           salt,
           getIterations(env)
         );
-        return `${hash}$${salt}`;
+        return `${hash}:$:${salt}`;
       },
       async validate(userPassword, hash) {
-        const [hashedPassword, saltString] = hash.split("$");
+        const [hashedPassword, saltString] = hash.split(":$:");
         const salt = new Uint8Array(saltString.split(",").map(Number));
         const secret = env.AUTH_SECRET || "";
         const verifyHash = await hashPassword(
