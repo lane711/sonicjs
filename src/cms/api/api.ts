@@ -26,7 +26,6 @@ import {
   canProceedAsEditorOrAdmin,
   isAdmin,
   isAdminOrEditor,
-  isAuthEnabled,
   isEditAllowed,
 } from "../auth/auth-helpers";
 
@@ -39,7 +38,7 @@ apiConfig.forEach((entry) => {
   api.get(`/${entry.route}`, async (ctx) => {
     const start = Date.now();
 
-    const authEnabled = await isAuthEnabled(ctx);
+    const authEnabled = ctx.get("authEnabled");
     if (authEnabled) {
       const isPublic = entry.publicPermissions.read;
       if (!isPublic && !isAdminOrEditor(ctx.get("user"))) {
@@ -85,7 +84,7 @@ apiConfig.forEach((entry) => {
 
     const id = ctx.req.param("id");
 
-    const authEnabled = await isAuthEnabled(ctx);
+    const authEnabled = ctx.get("authEnabled");
     if (authEnabled) {
       const isPublic = entry.publicPermissions.read;
       if (!isPublic && !isAdminOrEditor(ctx.get("user"))) {
@@ -139,7 +138,7 @@ apiConfig.forEach((entry) => {
 
     content.table = table;
 
-    const authEnabled = await isAuthEnabled(ctx);
+    const authEnabled = ctx.get("authEnabled");
     if (authEnabled) {
       const isPublic = entry.publicPermissions.create;
       if (!isPublic && !isAdminOrEditor(ctx.get("user"))) {
@@ -173,7 +172,7 @@ apiConfig.forEach((entry) => {
     ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
 
     content.data = payload.data;
-    const authEnabled = await isAuthEnabled(ctx);
+    const authEnabled = ctx.get("authEnabled");
     if (authEnabled) {
       const isPublic = entry.publicPermissions.update;
       if (!isPublic && !isAdminOrEditor(ctx.get("user"))) {
@@ -217,7 +216,7 @@ apiConfig.forEach((entry) => {
     const table = ctx.req.path.split("/")[2];
     ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
 
-    const authEnabled = await isAuthEnabled(ctx);
+    const authEnabled = ctx.get("authEnabled");
     if (authEnabled) {
       const isPublic = entry.publicPermissions.delete;
       if (!isPublic && !isAdminOrEditor(ctx.get("user"))) {

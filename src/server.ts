@@ -11,13 +11,17 @@ import { log } from "./cms/util/logger";
 
 import { AuthRequest, Session, User } from "lucia";
 import { initializeLucia } from "./cms/auth/lucia";
+import { isAuthEnabled } from "./cms/auth/auth-helpers";
 
 export type Variables = {
   authRequest: AuthRequest;
   session: Session;
   user: User;
+  authEnabled: boolean;
 };
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
+
+export type AppContext = Context<{ Bindings: Bindings; Variables: Variables }>;
 
 app.use("*", async (ctx, next) => {
   const path = ctx.req.path;
@@ -36,6 +40,8 @@ app.use("*", async (ctx, next) => {
 
     ctx.set("authRequest", authRequest);
     ctx.set("session", session);
+    const authEnabled = await isAuthEnabled(ctx);
+    ctx.set("authEnabled", authEnabled);
   }
   await next();
 });

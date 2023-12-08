@@ -1,4 +1,4 @@
-import { ApiConfig, apiConfig } from "../../../db/schema";
+import { SonicTableConfig, apiConfig } from "../../../db/schema";
 import { getDataListByPrefix } from "../../data/kv-data";
 import { Layout } from "../theme";
 
@@ -320,7 +320,7 @@ export const ContentNewForm = (props: {
 
 export const TopContentList = (props: {
   content: object[];
-  tableList: ApiConfig[];
+  tableList: SonicTableConfig[];
   screenTitle: string;
   username?: string;
   env: Record<string, string>;

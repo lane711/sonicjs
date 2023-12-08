@@ -6,7 +6,6 @@
     "lib": ["esnext", "dom"],
     "moduleResolution": "node",
     "sourceMap": true,
-    "skipLibCheck": true,
     "types": ["@cloudflare/workers-types", "jest"],
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx"

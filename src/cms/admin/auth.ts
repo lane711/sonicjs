@@ -10,17 +10,22 @@ import {
 } from "../auth/lucia";
 
 import qs from "qs";
-import { Variables } from "../../server";
-import { isAuthEnabled, isEditAllowed } from "../auth/auth-helpers";
+import { AppContext, Variables } from "../../server";
 import { getRecords } from "../data/data";
 import { getForm } from "../api/forms";
+import { SonicTableConfig, config } from "../../db/schema";
+import {
+  filterReadFieldAccess,
+  getItemReadResult,
+  getOperationReadResult,
+} from "../auth/auth-helpers";
 
 const authAPI = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 authAPI.use("*", async (ctx, next) => {
   if (ctx.env.useAuth !== "true") {
     return ctx.text("Not Implemented", 501);
   }
-  const authEnabled = await isAuthEnabled(ctx);
+  const authEnabled = ctx.get("authEnabled");
   if (authEnabled) {
     const session = ctx.get("session");
     const path = ctx.req.path;
@@ -30,13 +35,27 @@ authAPI.use("*", async (ctx, next) => {
   }
   await next();
 });
+
+const userTableConfig = config.tablesConfig.find(
+  (tbl) => tbl.table === "users"
+);
+const operationAccess = userTableConfig?.access?.operation;
+const itemAccess = userTableConfig?.access?.item;
+const fieldsAccess = userTableConfig?.access?.fields;
+
 // View user
 authAPI.get(`/users/:id`, async (ctx) => {
   const id = ctx.req.param("id");
   const user = ctx.get("user");
-  const authEnabled = await isAuthEnabled(ctx);
-  if (authEnabled && !isEditAllowed(user, id)) {
-    return ctx.text("Unauthorized", 401);
+  const authEnabled = ctx.get("authEnabled");
+  if (authEnabled) {
+    let authorized = getOperationReadResult(operationAccess?.read, ctx, id);
+    if (authorized) {
+      authorized = getItemReadResult(itemAccess?.read, ctx, id, "users");
+    }
+    if (!authorized) {
+      return ctx.text("Unauthorized", 401);
+    }
   }
   const start = Date.now();
 
@@ -51,7 +70,7 @@ authAPI.get(`/users/:id`, async (ctx) => {
     source = "d1";
   }
 
-  const data = await getRecords(
+  let data = await getRecords(
     ctx,
     "users",
     params,
@@ -59,6 +78,8 @@ authAPI.get(`/users/:id`, async (ctx) => {
     source,
     undefined
   );
+
+  data = await filterReadFieldAccess(fieldsAccess, ctx, data);
 
   if (includeContentType !== undefined) {
     data.contentType = getForm(ctx, "users");
@@ -72,7 +93,7 @@ authAPI.get(`/users/:id`, async (ctx) => {
 // Create user
 authAPI.post(`/users`, async (ctx) => {
   const user = ctx.get("user");
-  const authEnabled = await isAuthEnabled(ctx);
+  const authEnabled = ctx.get("authEnabled");
   if (authEnabled && !isEditAllowed(user)) {
     return ctx.text("Unauthorized", 401);
   }
@@ -92,7 +113,7 @@ authAPI.delete(`/users/:id`, async (ctx) => {
   const id = ctx.req.param("id");
 
   const user = ctx.get("user");
-  const authEnabled = await isAuthEnabled(ctx);
+  const authEnabled = ctx.get("authEnabled");
   if (authEnabled && !isEditAllowed(user, id)) {
     return ctx.text("Unauthorized", 401);
   }
@@ -103,7 +124,7 @@ authAPI.delete(`/users/:id`, async (ctx) => {
 authAPI.put(`/users/:id`, async (ctx) => {
   const id = ctx.req.param("id");
   const user = ctx.get("user");
-  const authEnabled = await isAuthEnabled(ctx);
+  const authEnabled = ctx.get("authEnabled");
   if (authEnabled && !isEditAllowed(user, id)) {
     return ctx.text("Unauthorized", 401);
   }

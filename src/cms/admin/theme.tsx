@@ -1,4 +1,4 @@
-import { ApiConfig, apiConfig } from "../../db/schema";
+import { SonicTableConfig, apiConfig } from "../../db/schema";
 import { EnvContext } from "./context";
 import {
   getById,
@@ -212,7 +212,7 @@ export const Layout = (props: {
                           props.env?.useAuth !== "true" ||
                           !t.hideWhenAuthEnabled
                       )
-                      .map((item: ApiConfig) => {
+                      .map((item: SonicTableConfig) => {
                         return (
                           <li class="nav-item">
                             <a

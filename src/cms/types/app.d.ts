@@ -1,6 +1,7 @@
+// app.d.ts
 /// <reference types="lucia" />
 declare namespace Lucia {
-  type Auth = import("src/cms/lucia.ts").Auth;
+  type Auth = import("../auth/lucia").Auth;
   type DatabaseUserAttributes = {
     firstname?: string;
     lastname?: string;

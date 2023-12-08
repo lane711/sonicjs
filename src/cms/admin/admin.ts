@@ -23,12 +23,11 @@ import { getAllFromInMemoryCache, getFromInMemoryCache } from "../data/cache";
 import { getKVCache, getRecordFromKvCache } from "../data/kv-data";
 import { loadLogin } from "./pages/login";
 import { Variables } from "../../server";
-import { isAuthEnabled } from "../auth/auth-helpers";
 
 const admin = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 admin.use("*", async (ctx, next) => {
-  const authEnabled = await isAuthEnabled(ctx);
+  const authEnabled = ctx.get("authEnabled");
   if (authEnabled) {
     const path = ctx.req.path;
     const session = ctx.get("session");

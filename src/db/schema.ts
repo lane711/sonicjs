@@ -2,14 +2,13 @@ import {
   sqliteTable,
   text,
   integer,
-  blob,
   index,
   primaryKey,
   int,
-  AnySQLiteColumnBuilder,
 } from "drizzle-orm/sqlite-core";
 
 import { relations } from "drizzle-orm";
+import { AppContext } from "../server";
 
 // we want to add the below audit fields to all our tables, so we'll define it here
 // and append it to the rest of the schema for each table
@@ -18,19 +17,12 @@ export const auditSchema = {
   updatedOn: integer("updatedOn"),
 };
 
-// Authentication Settings
-export const adminRole = "admin";
-export const editorRole = "editor";
-export const adminAccessRoles = [adminRole, editorRole];
-
 /*
  **** TABLES ****
  */
 
 // users
-export const userSchema: Record<string, AnySQLiteColumnBuilder> & {
-  id: AnySQLiteColumnBuilder;
-} = {
+export const userSchema = {
   id: text("id").primaryKey(),
   firstName: text("firstName"),
   lastName: text("lastName"),
@@ -43,6 +35,8 @@ export const usersTable = sqliteTable("users", {
   ...userSchema,
   ...auditSchema,
 });
+
+export type User = typeof usersTable._.model.select;
 
 export const userKeysSchema = {
   id: text("id").primaryKey(),
@@ -212,32 +206,199 @@ export const categoriesToPostsRelations = relations(
     }),
   })
 );
-
-export interface ApiConfig {
+export type SonicJSConfig = {
+  tablesConfig: SonicTableConfig[];
+  adminAccessControl: (ctx: AppContext) => boolean;
+};
+export interface SonicTableConfig {
   table: string;
   route: string;
   hideWhenAuthEnabled?: boolean;
-  publicPermissions?: {
-    create?: boolean;
-    read?: boolean;
-    update?: boolean;
-    delete?: boolean;
+  access?: {
+    operation: {
+      create?:
+        | boolean
+        | ((ctx: AppContext, data: any) => boolean | Promise<boolean>);
+      read?:
+        | boolean
+        | ((ctx: AppContext, id: string) => boolean | Promise<boolean>);
+      update?:
+        | boolean
+        | ((
+            ctx: AppContext,
+            id: string,
+            data: any
+          ) => boolean | Promise<boolean>);
+      delete?:
+        | boolean
+        | ((ctx: AppContext, id: string) => boolean | Promise<boolean>);
+    };
+    item?: {
+      create?:
+        | boolean
+        | ((
+            ctx: AppContext,
+            data: any,
+            doc: any
+          ) => boolean | Promise<boolean>);
+      read?:
+        | boolean
+        | ((
+            ctx: AppContext,
+            id: string,
+            doc: any
+          ) => boolean | Promise<boolean>);
+      update?:
+        | boolean
+        | ((
+            ctx: AppContext,
+            id: string,
+            data: any,
+            doc: any
+          ) => boolean | Promise<boolean>);
+      delete?:
+        | boolean
+        | ((
+            ctx: AppContext,
+            id: string,
+            doc: any
+          ) => boolean | Promise<boolean>);
+    };
+    fields?: {
+      [field: string]: {
+        // Returns a boolean which allows or denies the ability to set a field's value when creating a new document. If false is returned, any passed values will be discarded.
+        create?:
+          | boolean
+          | ((ctx: AppContext, data: any) => boolean | Promise<boolean>);
+        //Returns a boolean which allows or denies the ability to read a field's value. If false, the entire property is omitted from the resulting document.
+        read?:
+          | boolean
+          | ((
+              ctx: AppContext,
+              id: string,
+              doc: any
+            ) => boolean | Promise<boolean>);
+        // Returns a boolean which allows or denies the ability to update a field's value. If false is returned, any passed values will be discarded.
+        // If false is returned and you attempt to update the field's value, the operation will not throw an error however the field will be omitted from the update operation and the value will remain unchanged.
+        update?:
+          | boolean
+          | ((
+              ctx: AppContext,
+              id: string,
+              data: any,
+              doc: any
+            ) => boolean | Promise<boolean>);
+      };
+    };
   };
 }
 
 //create an entry for each table
-export const apiConfig: ApiConfig[] = [
-  { table: "posts", route: "posts", publicPermissions: { read: true } },
+export const apiConfig: SonicTableConfig[] = [
+  {
+    table: "posts",
+    route: "posts",
+    access: {
+      operation: {
+        read: true,
+        create: isAdminOrEditor,
+        update: isAdminOrEditor,
+        delete: isAdminOrEditor,
+      },
+    },
+  },
   {
     table: "categories",
     route: "categories",
-    publicPermissions: { read: true },
+    access: {
+      operation: {
+        read: true,
+        create: isAdminOrEditor,
+        update: isAdminOrEditor,
+        delete: isAdminOrEditor,
+      },
+    },
   },
-  { table: "comments", route: "comments", publicPermissions: { read: true } },
+  {
+    table: "comments",
+    route: "comments",
+    access: {
+      operation: {
+        read: true,
+        create: isAdminOrEditor,
+        update: isAdminOrEditor,
+        delete: isAdminOrEditor,
+      },
+    },
+  },
   {
     table: "categoriesToPosts",
     route: "categories-to-posts",
-    publicPermissions: { read: true },
+    access: {
+      operation: {
+        read: true,
+        create: isAdminOrEditor,
+        update: isAdminOrEditor,
+        delete: isAdminOrEditor,
+      },
+    },
   },
-  { table: "users", route: "users", hideWhenAuthEnabled: true },
+  {
+    table: "users",
+    route: "users",
+    hideWhenAuthEnabled: true,
+    access: {
+      operation: {
+        create: isAdmin,
+        delete: isAdmin,
+      },
+      item: {
+        update: isAdminOrUser,
+      },
+      fields: {
+        email: {
+          read: isAdminOrUser,
+        },
+        password: {
+          update: isUser,
+        },
+        role: {
+          read: isAdminOrUser,
+          update: isAdmin,
+        },
+      },
+    },
+  },
 ];
+
+export const config: SonicJSConfig = {
+  tablesConfig: apiConfig,
+  adminAccessControl: isAdminOrEditor,
+};
+
+export function isAdminOrEditor(ctx: AppContext) {
+  const user = ctx.get("user");
+  const role = user?.role?.toLowerCase() || "";
+  if (role === "admin" || role === "editor") {
+    return true;
+  }
+  return false;
+}
+
+export function isAdmin(ctx: AppContext) {
+  const user = ctx.get("user");
+  const role = user?.role?.toLowerCase() || "";
+  if (role === "admin") {
+    return true;
+  }
+  return false;
+}
+
+export function isUser(ctx: AppContext, doc: any) {
+  const user = ctx.get("user");
+  return user.userId === doc.id;
+}
+
+export function isAdminOrUser(ctx: AppContext, doc: any) {
+  return isAdmin(ctx) || isUser(ctx, doc);
+}

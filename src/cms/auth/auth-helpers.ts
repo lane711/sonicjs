@@ -1,11 +1,12 @@
-import { Context } from "hono";
-import { adminRole, editorRole } from "../../db/schema";
 import * as schema from "../../db/schema";
 import { getRecords } from "../data/data";
 import { User } from "lucia";
 import { drizzle } from "drizzle-orm/d1";
 import { isNotNull } from "drizzle-orm";
-export const isAuthEnabled = async (ctx: Context) => {
+import { AppContext } from "../../server";
+import { SonicTableConfig } from "../../db/schema";
+
+export const isAuthEnabled = async (ctx: AppContext) => {
   let authIsEnabled = ctx.env.useAuth === "true";
   if (authIsEnabled) {
     const fn = async function () {
@@ -32,51 +33,86 @@ export const isAuthEnabled = async (ctx: Context) => {
       fn
     );
     authIsEnabled = result?.data?.length > 0;
-    const adminUser = result?.data?.find((user) => user.role === adminRole);
-    if (!adminUser) {
-      const user = ctx.get("user");
-      if (user) {
-        user.role = adminRole;
-        ctx.set("user", user);
-      }
-    }
   }
   return authIsEnabled;
 };
 
-export const isEditAllowed = (user?: User, requestedId?: string) => {
-  const role = user?.role?.toLowerCase() || "";
-  if (role === adminRole) {
-    return true;
-  }
-  if (user?.role === editorRole && user?.userId === requestedId) {
-    return true;
-  }
-  return false;
-};
-
-export const isAdminOrEditor = (user?: User) => {
-  const role = user?.role?.toLowerCase() || "";
-  if (role === adminRole || role === editorRole) {
-    return true;
-  }
-  return false;
-};
-
-export const isAdmin = (user?: User) => {
-  const role = user?.role?.toLowerCase() || "";
-  if (role === adminRole) {
-    return true;
-  }
-  return false;
-};
-
-export const canProceedAsEditorOrAdmin = async (ctx: Context) => {
-  const authEnabled = await isAuthEnabled(ctx);
-  if (authEnabled) {
-    if (!isAdminOrEditor(ctx.get("user"))) {
-      return false;
+export async function getOperationReadResult(
+  read: SonicTableConfig["access"]["operation"]["read"],
+  ctx: AppContext,
+  id: string
+) {
+  let authorized = false;
+  if (typeof read === "boolean") {
+    authorized = read;
+  } else if (typeof read === "function") {
+    const readResult = read(ctx, id);
+    if (typeof readResult === "boolean") {
+      authorized = readResult;
+    } else {
+      authorized = await readResult;
     }
   }
-  return true;
-};
+  return authorized;
+}
+export async function getItemReadResult(
+  read: SonicTableConfig["access"]["item"]["read"],
+  ctx: AppContext,
+  id: string,
+  table: string
+) {
+  let authorized = true;
+  if (typeof read === "boolean") {
+    authorized = read;
+  } else if (typeof read === "function") {
+    const doc = await getRecords(
+      ctx,
+      table,
+      { id },
+      `doc/${table}/${id}`,
+      "fastest"
+    );
+
+    const readResult = read(ctx, id, doc);
+    if (typeof readResult === "boolean") {
+      authorized = readResult;
+    } else {
+      authorized = await readResult;
+    }
+  }
+  return authorized;
+}
+export async function filterReadFieldAccess<D = any>(
+  fields: SonicTableConfig["access"]["fields"],
+  ctx: AppContext,
+  doc: D
+): Promise<D> {
+  let result: D = doc;
+  if (Array.isArray(doc)) {
+    const promises = doc.map((d) => {
+      return filterReadFieldAccess(fields, ctx, d);
+    });
+    result = (await Promise.all(promises)) as D;
+  } else if (typeof doc === "object") {
+    result = Object.keys(doc).reduce<any>(async (acc, key) => {
+      const value = doc[key];
+      const access = fields[key]?.read;
+      let authorized = true;
+      if (typeof access === "boolean") {
+        authorized = access;
+      } else if (typeof access === "function") {
+        const accessResult = access(ctx, value, doc);
+        if (typeof accessResult === "boolean") {
+          authorized = accessResult;
+        } else {
+          authorized = await acc[key];
+        }
+      }
+      acc[key] = authorized ? value : null;
+      return acc;
+    }, {});
+  } else {
+    console.error("HOW??");
+  }
+  return result;
+}
