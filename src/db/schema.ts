@@ -210,6 +210,7 @@ export type SonicJSConfig = {
   tablesConfig: SonicTableConfig[];
   adminAccessControl: (ctx: AppContext) => boolean;
 };
+export type SonicJSFilter = Record<string, any>;
 export interface SonicTableConfig {
   table: string;
   route: string;
@@ -230,6 +231,36 @@ export interface SonicTableConfig {
             data: any
           ) => boolean | Promise<boolean>);
       delete?:
+        | boolean
+        | ((ctx: AppContext, id: string) => boolean | Promise<boolean>);
+    };
+    filter: {
+      read?:
+        | SonicJSFilter
+        | ((
+            ctx: AppContext,
+            id: string
+          ) => SonicJSFilter | Promise<SonicJSFilter>)
+        | boolean
+        | ((ctx: AppContext, id: string) => boolean | Promise<boolean>);
+      update?:
+        | SonicJSFilter
+        | ((
+            ctx: AppContext,
+            id: string
+          ) => SonicJSFilter | Promise<SonicJSFilter>)
+        | boolean
+        | ((
+            ctx: AppContext,
+            id: string,
+            data: any
+          ) => boolean | Promise<boolean>);
+      delete?:
+        | SonicJSFilter
+        | ((
+            ctx: AppContext,
+            id: string
+          ) => SonicJSFilter | Promise<SonicJSFilter>)
         | boolean
         | ((ctx: AppContext, id: string) => boolean | Promise<boolean>);
     };

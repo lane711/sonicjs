@@ -37,6 +37,24 @@ export const isAuthEnabled = async (ctx: AppContext) => {
   return authIsEnabled;
 };
 
+export async function getOperationCreateResult(
+  create: SonicTableConfig["access"]["operation"]["create"],
+  ctx: AppContext,
+  data: any
+) {
+  let authorized = false;
+  if (typeof create === "boolean") {
+    authorized = create;
+  } else if (typeof create === "function") {
+    const readResult = create(ctx, data);
+    if (typeof readResult === "boolean") {
+      authorized = readResult;
+    } else {
+      authorized = await readResult;
+    }
+  }
+  return authorized;
+}
 export async function getOperationReadResult(
   read: SonicTableConfig["access"]["operation"]["read"],
   ctx: AppContext,
@@ -92,7 +110,17 @@ export async function filterReadFieldAccess<D = any>(
     const promises = doc.map((d) => {
       return filterReadFieldAccess(fields, ctx, d);
     });
-    result = (await Promise.all(promises)) as D;
+    const fieldResults = (await Promise.allSettled(
+      promises
+    )) as PromiseSettledResult<D>[];
+    result = fieldResults.reduce((acc: any[], r) => {
+      if (r.status === "fulfilled") {
+        acc.push(r.value);
+      } else {
+        console.error(r.reason);
+      }
+      return acc;
+    }, []) as D;
   } else if (typeof doc === "object") {
     result = Object.keys(doc).reduce<any>(async (acc, key) => {
       const value = doc[key];
