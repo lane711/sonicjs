@@ -16,7 +16,10 @@ import { getForm } from "../api/forms";
 import { SonicTableConfig, config } from "../../db/schema";
 import {
   filterReadFieldAccess,
+  getApiAccessControlResult,
+  getFilterReadResult,
   getItemReadResult,
+  getOperationCreateResult,
   getOperationReadResult,
 } from "../auth/auth-helpers";
 
@@ -37,23 +40,33 @@ authAPI.use("*", async (ctx, next) => {
 });
 
 const userTableConfig = config.tablesConfig.find(
-  (tbl) => tbl.table === "users"
+  (tbl) => tbl.table === "users",
 );
 const operationAccess = userTableConfig?.access?.operation;
 const itemAccess = userTableConfig?.access?.item;
+const filterAccess = userTableConfig?.access?.filter;
 const fieldsAccess = userTableConfig?.access?.fields;
 
 // View user
 authAPI.get(`/users/:id`, async (ctx) => {
   const id = ctx.req.param("id");
-  const user = ctx.get("user");
   const authEnabled = ctx.get("authEnabled");
+  let params = qs.parse(ctx.req.query());
   if (authEnabled) {
-    let authorized = getOperationReadResult(operationAccess?.read, ctx, id);
-    if (authorized) {
-      authorized = getItemReadResult(itemAccess?.read, ctx, id, "users");
+    const acessControlResult = getApiAccessControlResult(
+      operationAccess?.read || true,
+      filterAccess?.read || true,
+      itemAccess?.read || true,
+      ctx,
+      id,
+      "users",
+    );
+
+    if (typeof acessControlResult === "object") {
+      params = { ...params, ...acessControlResult };
     }
-    if (!authorized) {
+
+    if (!acessControlResult) {
       return ctx.text("Unauthorized", 401);
     }
   }
@@ -61,7 +74,6 @@ authAPI.get(`/users/:id`, async (ctx) => {
 
   const { includeContentType } = ctx.req.query();
 
-  var params = qs.parse(ctx.req.query());
   params.id = id;
   ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
 
@@ -76,7 +88,7 @@ authAPI.get(`/users/:id`, async (ctx) => {
     params,
     ctx.req.url,
     source,
-    undefined
+    undefined,
   );
 
   data = await filterReadFieldAccess(fieldsAccess, ctx, data);
@@ -94,8 +106,12 @@ authAPI.get(`/users/:id`, async (ctx) => {
 authAPI.post(`/users`, async (ctx) => {
   const user = ctx.get("user");
   const authEnabled = ctx.get("authEnabled");
-  if (authEnabled && !isEditAllowed(user)) {
-    return ctx.text("Unauthorized", 401);
+
+  if (authEnabled) {
+    let authorized = getOperationCreateResult(operationAccess?.read, ctx, id);
+    if (!authorized) {
+      return ctx.text("Unauthorized", 401);
+    }
   }
   const content = await ctx.req.json();
   content.table = "users";

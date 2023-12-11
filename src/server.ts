@@ -15,9 +15,9 @@ import { isAuthEnabled } from "./cms/auth/auth-helpers";
 
 export type Variables = {
   authRequest: AuthRequest;
-  session: Session;
-  user: User;
-  authEnabled: boolean;
+  session?: Session;
+  user?: User;
+  authEnabled?: boolean;
 };
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 

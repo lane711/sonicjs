@@ -4,7 +4,7 @@ import { User } from "lucia";
 import { drizzle } from "drizzle-orm/d1";
 import { isNotNull } from "drizzle-orm";
 import { AppContext } from "../../server";
-import { SonicTableConfig } from "../../db/schema";
+import { SonicJSFilter, SonicTableConfig } from "../../db/schema";
 
 export const isAuthEnabled = async (ctx: AppContext) => {
   let authIsEnabled = ctx.env.useAuth === "true";
@@ -30,54 +30,125 @@ export const isAuthEnabled = async (ctx: AppContext) => {
       {},
       "hasUserWithKeyCheck",
       "d1",
-      fn
+      fn,
     );
     authIsEnabled = result?.data?.length > 0;
   }
   return authIsEnabled;
 };
+export async function getApiAccessControlResult(
+  operationAccessControl:
+    | boolean
+    | ((...args: any) => boolean | Promise<boolean>),
+  filterAccessControl:
+    | boolean
+    | ((...args: any) => boolean | Promise<boolean>)
+    | SonicJSFilter
+    | ((...args: any) => SonicJSFilter | Promise<SonicJSFilter>),
+  itemAccessControl: boolean | ((...args: any) => boolean | Promise<boolean>),
+  ctx: AppContext,
+  ...args: any
+) {
+  let authorized: boolean | SonicJSFilter = await getAccessControlResult(
+    operationAccessControl,
+    ctx,
+    args,
+  );
+  if (authorized) {
+    authorized = await getAccessControlResult(itemAccessControl, ctx, args);
+  }
+  if (authorized) {
+    authorized = await getAccessControlResult(filterAccessControl, ctx, args);
+  }
+
+  return authorized;
+}
+
+async function getAccessControlResult(
+  accessControl:
+    | boolean
+    | ((...args: any) => boolean | Promise<boolean>)
+    | SonicJSFilter
+    | ((...args: any) => SonicJSFilter | Promise<SonicJSFilter>),
+  ctx: AppContext,
+  ...args: any
+) {
+  let authorized: boolean | SonicJSFilter = true;
+  if (typeof accessControl !== "function") {
+    authorized = accessControl;
+  } else {
+    const acResult = accessControl(ctx, ...args);
+    if (acResult instanceof Promise) {
+      authorized = await acResult;
+    } else {
+      authorized = acResult;
+    }
+  }
+  return authorized;
+}
 
 export async function getOperationCreateResult(
   create: SonicTableConfig["access"]["operation"]["create"],
   ctx: AppContext,
-  data: any
+  data: any,
 ) {
-  let authorized = false;
-  if (typeof create === "boolean") {
-    authorized = create;
-  } else if (typeof create === "function") {
-    const readResult = create(ctx, data);
-    if (typeof readResult === "boolean") {
-      authorized = readResult;
-    } else {
-      authorized = await readResult;
-    }
-  }
-  return authorized;
+  return !!(await getAccessControlResult(create, ctx, data));
 }
 export async function getOperationReadResult(
   read: SonicTableConfig["access"]["operation"]["read"],
   ctx: AppContext,
-  id: string
+  id: string,
 ) {
-  let authorized = false;
-  if (typeof read === "boolean") {
-    authorized = read;
-  } else if (typeof read === "function") {
-    const readResult = read(ctx, id);
-    if (typeof readResult === "boolean") {
-      authorized = readResult;
-    } else {
-      authorized = await readResult;
-    }
-  }
-  return authorized;
+  return !!(await getAccessControlResult(read, ctx, id));
 }
+
+export async function getOperationUpdateResult(
+  update: SonicTableConfig["access"]["operation"]["update"],
+  ctx: AppContext,
+  id: string,
+  data: any,
+) {
+  return !!(await getAccessControlResult(update, ctx, id, data));
+}
+
+export async function getOperationDeleteResult(
+  del: SonicTableConfig["access"]["operation"]["delete"],
+  ctx: AppContext,
+  id: string,
+) {
+  return !!(await getAccessControlResult(del, ctx, id));
+}
+
+export async function getFilterReadResult(
+  read: SonicTableConfig["access"]["filter"]["read"],
+  ctx: AppContext,
+  id: string,
+) {
+  return await getAccessControlResult(read, ctx, id);
+}
+
+export async function getFilterUpdateResult(
+  update: SonicTableConfig["access"]["filter"]["update"],
+  ctx: AppContext,
+  id: string,
+  data: any,
+) {
+  return await getAccessControlResult(update, ctx, id, data);
+}
+
+export async function getFilterDeleteResult(
+  del: SonicTableConfig["access"]["filter"]["delete"],
+  ctx: AppContext,
+  id: string,
+) {
+  return await getAccessControlResult(del, ctx, id);
+}
+
 export async function getItemReadResult(
   read: SonicTableConfig["access"]["item"]["read"],
   ctx: AppContext,
   id: string,
-  table: string
+  table: string,
 ) {
   let authorized = true;
   if (typeof read === "boolean") {
@@ -88,22 +159,94 @@ export async function getItemReadResult(
       table,
       { id },
       `doc/${table}/${id}`,
-      "fastest"
+      "fastest",
     );
 
-    const readResult = read(ctx, id, doc);
-    if (typeof readResult === "boolean") {
-      authorized = readResult;
-    } else {
-      authorized = await readResult;
-    }
+    authorized = !!(await getAccessControlResult(read, ctx, id, doc));
   }
   return authorized;
 }
+
+export async function getItemUpdateResult(
+  update: SonicTableConfig["access"]["item"]["update"],
+  ctx: AppContext,
+  id: string,
+  data: any,
+  table: string,
+) {
+  let authorized: boolean | SonicJSFilter = true;
+  if (typeof update !== "function") {
+    authorized = update;
+  } else {
+    const doc = await getRecords(
+      ctx,
+      table,
+      { id },
+      `doc/${table}/${id}`,
+      "fastest",
+    );
+
+    authorized = await getAccessControlResult(update, ctx, id, data, doc);
+  }
+  return authorized;
+}
+
+export async function getItemDeleteResult(
+  del: SonicTableConfig["access"]["item"]["delete"],
+  ctx: AppContext,
+  id: string,
+  table: string,
+) {
+  let authorized: boolean | SonicJSFilter = true;
+  if (typeof del !== "function") {
+    authorized = del;
+  } else {
+    const doc = await getRecords(
+      ctx,
+      table,
+      { id },
+      `doc/${table}/${id}`,
+      "fastest",
+    );
+
+    authorized = await getAccessControlResult(del, ctx, id, doc);
+  }
+  return authorized;
+}
+export async function filterCreateFieldAccess<D = any>(
+  fields: SonicTableConfig["access"]["fields"],
+  ctx: AppContext,
+  data: D,
+): Promise<D> {
+  let result: D = data;
+  if (typeof data === "object") {
+    result = Object.keys(data).reduce<any>(async (acc, key) => {
+      const value = data[key];
+      const access = fields[key]?.create;
+      let authorized = true;
+      if (typeof access === "boolean") {
+        authorized = access;
+      } else if (typeof access === "function") {
+        const accessResult = access(ctx, data);
+        if (typeof accessResult === "boolean") {
+          authorized = accessResult;
+        } else {
+          authorized = await acc[key];
+        }
+      }
+      acc[key] = authorized ? value : undefined;
+      return acc;
+    }, {});
+  } else {
+    throw new Error("Data must be an object");
+  }
+  return result;
+}
+
 export async function filterReadFieldAccess<D = any>(
   fields: SonicTableConfig["access"]["fields"],
   ctx: AppContext,
-  doc: D
+  doc: D,
 ): Promise<D> {
   let result: D = doc;
   if (Array.isArray(doc)) {
@@ -111,7 +254,7 @@ export async function filterReadFieldAccess<D = any>(
       return filterReadFieldAccess(fields, ctx, d);
     });
     const fieldResults = (await Promise.allSettled(
-      promises
+      promises,
     )) as PromiseSettledResult<D>[];
     result = fieldResults.reduce((acc: any[], r) => {
       if (r.status === "fulfilled") {
@@ -140,7 +283,38 @@ export async function filterReadFieldAccess<D = any>(
       return acc;
     }, {});
   } else {
-    console.error("HOW??");
+    console.error("How is doc not an array or object???");
+  }
+  return result;
+}
+
+export async function filterUpdateFieldAccess<D = any>(
+  fields: SonicTableConfig["access"]["fields"],
+  ctx: AppContext,
+  id: string,
+  data: D,
+): Promise<D> {
+  let result: D = data;
+  if (typeof data === "object") {
+    result = Object.keys(data).reduce<any>(async (acc, key) => {
+      const value = data[key];
+      const access = fields[key]?.update;
+      let authorized = true;
+      if (typeof access === "boolean") {
+        authorized = access;
+      } else if (typeof access === "function") {
+        const accessResult = access(ctx, id, data);
+        if (typeof accessResult === "boolean") {
+          authorized = accessResult;
+        } else {
+          authorized = await acc[key];
+        }
+      }
+      acc[key] = authorized ? value : undefined;
+      return acc;
+    }, {});
+  } else {
+    throw new Error("Data must be an object");
   }
   return result;
 }
