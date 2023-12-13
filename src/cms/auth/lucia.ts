@@ -273,6 +273,7 @@ export async function login<T extends string>(args: LuciaAPIArgs<T>) {
         status: 400,
       });
     }
+    console.log(new Error(e.message, { cause: e }));
     return new Response("An unknown error occurred", {
       status: 500,
     });

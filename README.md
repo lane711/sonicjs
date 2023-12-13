@@ -126,15 +126,6 @@ AUTH_HASH="SHA-256"
     ```
 
 ## Roles
-By default the recognized roles are "admin" and "editor". admin can do all CRUD operations on anything and access the admin dashboard. editor is the same except they can't see/edit other users.
-
-See `adminRole`, `editorRole` and `adminAccessRoles` in src/db/schema.ts for customization.
-Also see src/cms/auth/auth-helpers.ts for functions called from the apis to enable this if you need more customization.
-
-Note if no user has the admin role then all users are considered admins.
-
-## Public Permissions
-The apiConfig has a publicPermissions field for CRUD operations
 
 
 

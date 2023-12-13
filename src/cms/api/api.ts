@@ -11,7 +11,7 @@ import {
   addToKvCache,
 } from "../data/kv-data";
 import { Bindings } from "../types/bindings";
-import { apiConfig } from "../../db/schema";
+import { apiConfig, config } from "../../db/schema";
 import { getForm } from "./forms";
 import qs from "qs";
 import {
@@ -23,10 +23,12 @@ import {
 import { clearInMemoryCache, getAllFromInMemoryCache } from "../data/cache";
 import { Variables } from "../../server";
 import {
-  canProceedAsEditorOrAdmin,
-  isAdmin,
-  isAdminOrEditor,
-  isEditAllowed,
+  filterCreateFieldAccess,
+  filterReadFieldAccess,
+  filterUpdateFieldAccess,
+  getApiAccessControlResult,
+  getItemReadResult,
+  getOperationCreateResult,
 } from "../auth/auth-helpers";
 
 const api = new Hono<{ Bindings: Bindings; Variables: Variables }>();
@@ -39,26 +41,31 @@ apiConfig.forEach((entry) => {
     const start = Date.now();
 
     const authEnabled = ctx.get("authEnabled");
+
+    let { includeContentType, source, ...params } = ctx.req.query();
     if (authEnabled) {
-      const isPublic = entry.publicPermissions.read;
-      if (!isPublic && !isAdminOrEditor(ctx.get("user"))) {
-        // unauthorized if not public and not admin or editor
-        return ctx.text("Unauthorized", 401);
-      } else if (
-        !isPublic &&
-        entry.table === "users" &&
-        !isAdmin(ctx.get("user"))
-      ) {
-        // unauthorized if not public and not admin for the users table so editors can't see personal info of other users
+      const accessControlResult = await getApiAccessControlResult(
+        entry?.access?.operation?.read || true,
+        entry?.access?.filter?.read || true,
+        true,
+        ctx,
+        params.id,
+        entry.table
+      );
+
+      if (typeof accessControlResult === "object") {
+        params = { ...params, ...accessControlResult };
+      }
+
+      if (!accessControlResult) {
         return ctx.text("Unauthorized", 401);
       }
     }
 
     try {
-      var params = qs.parse(ctx.req.query());
-      params.limit = params.limit ?? 1000;
+      params.limit = params.limit ?? "1000";
       ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
-      const data = await getRecords(
+      let data = await getRecords(
         ctx,
         entry.table,
         params,
@@ -67,6 +74,21 @@ apiConfig.forEach((entry) => {
         undefined
       );
 
+      if (entry.access?.item?.read) {
+        const accessControlResult = await getItemReadResult(
+          entry.access.item.read,
+          ctx,
+          data
+        );
+        if (!accessControlResult) {
+          return ctx.text("Unauthorized", 401);
+        }
+      }
+      data.data = await filterReadFieldAccess(
+        entry.access?.fields,
+        ctx,
+        data.data
+      );
       const end = Date.now();
       const executionTime = end - start;
       return ctx.json({ ...data, executionTime });
@@ -80,36 +102,40 @@ apiConfig.forEach((entry) => {
   api.get(`/${entry.route}/:id`, async (ctx) => {
     const start = Date.now();
 
-    const { includeContentType } = ctx.req.query();
+    const authEnabled = ctx.get("authEnabled");
+
+    let { includeContentType, source, ...params } = ctx.req.query();
 
     const id = ctx.req.param("id");
-
-    const authEnabled = ctx.get("authEnabled");
+    params.id = id;
     if (authEnabled) {
-      const isPublic = entry.publicPermissions.read;
-      if (!isPublic && !isAdminOrEditor(ctx.get("user"))) {
-        // unauthorized if not public and not admin or editor
-        return ctx.text("Unauthorized", 401);
-      } else if (
-        !isPublic &&
-        entry.table === "users" &&
-        !isEditAllowed(ctx.get("user"), id)
-      ) {
-        // unauthorized if not public and not it's a user and not admin or that user
+      // will check the item result when we get the data
+      const accessControlResult = await getApiAccessControlResult(
+        entry?.access?.operation?.read || true,
+        entry?.access?.filter?.read || true,
+        true,
+        ctx,
+        id,
+        entry.table
+      );
+
+      if (typeof accessControlResult === "object") {
+        params = { ...params, ...accessControlResult };
+      }
+
+      if (!accessControlResult) {
         return ctx.text("Unauthorized", 401);
       }
     }
 
-    var params = qs.parse(ctx.req.query());
-    params.id = id;
     ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
 
-    let source = "fastest";
+    source = source || "fastest";
     if (includeContentType !== undefined) {
       source = "d1";
     }
 
-    const data = await getRecords(
+    let data = await getRecords(
       ctx,
       entry.table,
       params,
@@ -118,6 +144,17 @@ apiConfig.forEach((entry) => {
       undefined
     );
 
+    if (entry.access?.item?.read) {
+      const accessControlResult = await getItemReadResult(
+        entry.access.item.read,
+        ctx,
+        data
+      );
+      if (!accessControlResult) {
+        return ctx.text("Unauthorized", 401);
+      }
+    }
+    data = await filterReadFieldAccess(entry.access?.fields, ctx, data);
     if (includeContentType !== undefined) {
       data.contentType = getForm(ctx, entry.table);
     }
@@ -131,7 +168,7 @@ apiConfig.forEach((entry) => {
   //create single record
   //TODO: support batch inserts
   api.post(`/${entry.route}`, async (ctx) => {
-    const content = await ctx.req.json();
+    let content = await ctx.req.json();
     const route = ctx.req.path.split("/")[2];
     const table = apiConfig.find((entry) => entry.route === route).table;
     ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
@@ -140,15 +177,31 @@ apiConfig.forEach((entry) => {
 
     const authEnabled = ctx.get("authEnabled");
     if (authEnabled) {
-      const isPublic = entry.publicPermissions.create;
-      if (!isPublic && !isAdminOrEditor(ctx.get("user"))) {
-        // unauthorized if not public and not admin or editor
+      let authorized = await getOperationCreateResult(
+        entry?.access?.operation?.create,
+        ctx,
+        content.data ?? content
+      );
+      if (!authorized) {
         return ctx.text("Unauthorized", 401);
       }
     }
 
     try {
       // console.log("posting new record content", JSON.stringify(content, null, 2));
+      if (content.data) {
+        content.data = await filterCreateFieldAccess(
+          entry?.access?.fields,
+          ctx,
+          content.data
+        );
+      } else {
+        content = await filterCreateFieldAccess(
+          entry?.access?.fields,
+          ctx,
+          content
+        );
+      }
 
       const result = await insertRecord(
         ctx.env.D1DATA,
@@ -170,24 +223,30 @@ apiConfig.forEach((entry) => {
     const id = ctx.req.param("id");
     var content: { data?: any; table?: string; id?: string } = {};
     ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
-
     content.data = payload.data;
+
+    let { includeContentType, source, ...params } = ctx.req.query();
     const authEnabled = ctx.get("authEnabled");
+    let shouldUpdateEntry = true;
     if (authEnabled) {
-      const isPublic = entry.publicPermissions.update;
-      if (!isPublic && !isAdminOrEditor(ctx.get("user"))) {
-        console.log("not public and not admin or editor", ctx.get("user"));
-        // unauthorized if not public and not admin or editor
-        return ctx.text("Unauthorized", 401);
-      } else if (
-        !isPublic &&
-        entry.table === "users" &&
-        !isEditAllowed(ctx.get("user"), id)
-      ) {
-        // unauthorized if not public and not it's a user and not admin or that user
+      const accessControlResult = await getApiAccessControlResult(
+        entry?.access?.operation?.update || true,
+        entry?.access?.filter?.update || true,
+        entry?.access?.item?.update || true,
+        ctx,
+        id,
+        entry.table,
+        content.data
+      );
+
+      if (typeof accessControlResult === "object") {
+        shouldUpdateEntry = false;
+        params = { ...params, ...accessControlResult };
+      }
+
+      if (!accessControlResult) {
         return ctx.text("Unauthorized", 401);
       }
-      //TODO some sort of editor owner system?
     }
 
     const route = ctx.req.path.split("/")[2];
@@ -196,13 +255,37 @@ apiConfig.forEach((entry) => {
     content.table = table;
     content.id = id;
 
-    try {
-      const result = await updateRecord(
-        ctx.env.D1DATA,
-        ctx.env.KVDATA,
-        content
+    if (!shouldUpdateEntry) {
+      //get the record so we use filter params if those are passed in
+      params.id = id;
+      const data = await getRecords(
+        ctx,
+        table,
+        params,
+        ctx.req.url + "-update-check",
+        source || "fastest",
+        undefined
       );
+      if (data?.total > 0) {
+        shouldUpdateEntry = true;
+      }
+    }
 
+    try {
+      let result: {
+        code: number;
+        message?: any;
+        data?: any;
+      } = { code: 200 };
+      if (shouldUpdateEntry) {
+        content.data = await filterUpdateFieldAccess(
+          entry.access?.fields,
+          ctx,
+          id,
+          content.data
+        );
+        result = await updateRecord(ctx.env.D1DATA, ctx.env.KVDATA, content);
+      }
       return ctx.json(result.data, 200);
     } catch (error) {
       console.log("error updating content", error);
@@ -216,29 +299,34 @@ apiConfig.forEach((entry) => {
     const table = ctx.req.path.split("/")[2];
     ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
 
+    let { includeContentType, source, ...params } = ctx.req.query();
     const authEnabled = ctx.get("authEnabled");
     if (authEnabled) {
-      const isPublic = entry.publicPermissions.delete;
-      if (!isPublic && !isAdminOrEditor(ctx.get("user"))) {
-        // unauthorized if not public and not admin or editor
-        return ctx.text("Unauthorized", 401);
-      } else if (
-        !isPublic &&
-        entry.table === "users" &&
-        !isEditAllowed(ctx.get("user"), id)
-      ) {
-        // unauthorized if not public and not it's a user and not admin or that user
+      const accessControlResult = await getApiAccessControlResult(
+        entry?.access?.operation?.delete || true,
+        entry?.access?.filter?.delete || true,
+        entry?.access?.item?.delete || true,
+        ctx,
+        id,
+        entry.table
+      );
+
+      if (typeof accessControlResult === "object") {
+        params = { ...params, ...accessControlResult };
+      }
+
+      if (!accessControlResult) {
         return ctx.text("Unauthorized", 401);
       }
-      //TODO some sort of editor owner system?
     }
+    params.id = id;
 
     const record = await getRecords(
       ctx,
       table,
-      { id },
+      params,
       ctx.req.path,
-      "fastest",
+      source || "fastest",
       undefined
     );
 
@@ -271,7 +359,10 @@ api.get("/ping", (c) => {
 });
 
 api.get("/kv-test", async (ctx) => {
-  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  const authEnabled = ctx.get("authEnabled");
+  const canProceed = authEnabled
+    ? (await config.adminAccessControl(ctx)) ?? true
+    : true;
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -294,7 +385,10 @@ api.get("/kv-test", async (ctx) => {
 });
 
 api.get("/kv-test2", async (ctx) => {
-  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  const authEnabled = ctx.get("authEnabled");
+  const canProceed = authEnabled
+    ? (await config.adminAccessControl(ctx)) ?? true
+    : true;
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -322,7 +416,10 @@ api.get("/kv-test2", async (ctx) => {
 });
 
 api.get("/kv-list", async (ctx) => {
-  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  const authEnabled = ctx.get("authEnabled");
+  const canProceed = authEnabled
+    ? (await config.adminAccessControl(ctx)) ?? true
+    : true;
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -331,7 +428,10 @@ api.get("/kv-list", async (ctx) => {
 });
 
 api.get("/data", async (ctx) => {
-  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  const authEnabled = ctx.get("authEnabled");
+  const canProceed = authEnabled
+    ? (await config.adminAccessControl(ctx)) ?? true
+    : true;
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -340,7 +440,10 @@ api.get("/data", async (ctx) => {
 });
 
 api.get("/forms", async (ctx) => {
-  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  const authEnabled = ctx.get("authEnabled");
+  const canProceed = authEnabled
+    ? (await config.adminAccessControl(ctx)) ?? true
+    : true;
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -348,7 +451,10 @@ api.get("/forms", async (ctx) => {
 });
 
 api.get("/form-components/auth/users", async (ctx) => {
-  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  const authEnabled = ctx.get("authEnabled");
+  const canProceed = authEnabled
+    ? (await config.adminAccessControl(ctx)) ?? true
+    : true;
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -357,7 +463,10 @@ api.get("/form-components/auth/users", async (ctx) => {
 });
 
 api.get("/form-components/:route", async (ctx) => {
-  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  const authEnabled = ctx.get("authEnabled");
+  const canProceed = authEnabled
+    ? (await config.adminAccessControl(ctx)) ?? true
+    : true;
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -370,7 +479,10 @@ api.get("/form-components/:route", async (ctx) => {
 });
 
 api.post("/form-components", async (ctx) => {
-  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  const authEnabled = ctx.get("authEnabled");
+  const canProceed = authEnabled
+    ? (await config.adminAccessControl(ctx)) ?? true
+    : true;
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -385,7 +497,10 @@ api.post("/form-components", async (ctx) => {
 });
 
 api.get("/cache/clear-all", async (ctx) => {
-  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  const authEnabled = ctx.get("authEnabled");
+  const canProceed = authEnabled
+    ? (await config.adminAccessControl(ctx)) ?? true
+    : true;
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -396,7 +511,10 @@ api.get("/cache/clear-all", async (ctx) => {
 });
 
 api.get("/cache/clear-in-memory", async (ctx) => {
-  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  const authEnabled = ctx.get("authEnabled");
+  const canProceed = authEnabled
+    ? (await config.adminAccessControl(ctx)) ?? true
+    : true;
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -406,7 +524,10 @@ api.get("/cache/clear-in-memory", async (ctx) => {
 });
 
 api.get("/cache/clear-kv", async (ctx) => {
-  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  const authEnabled = ctx.get("authEnabled");
+  const canProceed = authEnabled
+    ? (await config.adminAccessControl(ctx)) ?? true
+    : true;
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -416,7 +537,10 @@ api.get("/cache/clear-kv", async (ctx) => {
 });
 
 api.get("/cache/in-memory", async (ctx) => {
-  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  const authEnabled = ctx.get("authEnabled");
+  const canProceed = authEnabled
+    ? (await config.adminAccessControl(ctx)) ?? true
+    : true;
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -426,7 +550,10 @@ api.get("/cache/in-memory", async (ctx) => {
 });
 
 api.get("/cache/kv", async (ctx) => {
-  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  const authEnabled = ctx.get("authEnabled");
+  const canProceed = authEnabled
+    ? (await config.adminAccessControl(ctx)) ?? true
+    : true;
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -436,7 +563,10 @@ api.get("/cache/kv", async (ctx) => {
 });
 
 api.get("/cache/kv/:cacheKey", async (ctx) => {
-  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  const authEnabled = ctx.get("authEnabled");
+  const canProceed = authEnabled
+    ? (await config.adminAccessControl(ctx)) ?? true
+    : true;
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -447,7 +577,10 @@ api.get("/cache/kv/:cacheKey", async (ctx) => {
 });
 
 api.get("/kv", async (ctx) => {
-  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  const authEnabled = ctx.get("authEnabled");
+  const canProceed = authEnabled
+    ? (await config.adminAccessControl(ctx)) ?? true
+    : true;
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -456,7 +589,10 @@ api.get("/kv", async (ctx) => {
 });
 
 api.get("/kv/:cacheKey", async (ctx) => {
-  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  const authEnabled = ctx.get("authEnabled");
+  const canProceed = authEnabled
+    ? (await config.adminAccessControl(ctx)) ?? true
+    : true;
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -472,7 +608,10 @@ api.get("/kv/:cacheKey", async (ctx) => {
 });
 
 api.get("/kv/delete-all", async (ctx) => {
-  const canProceed = await canProceedAsEditorOrAdmin(ctx);
+  const authEnabled = ctx.get("authEnabled");
+  const canProceed = authEnabled
+    ? (await config.adminAccessControl(ctx)) ?? true
+    : true;
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }

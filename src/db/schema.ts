@@ -96,7 +96,7 @@ export const postsTable = sqliteTable(
     return {
       userIdIndex: index("postUserIdIndex").on(table.userId),
     };
-  },
+  }
 );
 
 // categories
@@ -129,7 +129,7 @@ export const commentsTable = sqliteTable(
       userIdIndex: index("commentsUserIdIndex").on(table.userId),
       postIdIndex: index("commentsPostIdIndex").on(table.postId),
     };
-  },
+  }
 );
 
 //posts to categories (many to many)
@@ -151,7 +151,7 @@ export const categoriesToPostsTable = sqliteTable(
   },
   (table) => ({
     pk: primaryKey(table.postId, table.categoryId),
-  }),
+  })
 );
 /*
  **** TABLES RELATIONSHIPS ****
@@ -204,7 +204,7 @@ export const categoriesToPostsRelations = relations(
       fields: [categoriesToPostsTable.postId],
       references: [postsTable.id],
     }),
-  }),
+  })
 );
 export type SonicJSConfig = {
   tablesConfig: SonicTableConfig[];
@@ -217,7 +217,7 @@ export interface SonicTableConfig {
   hideWhenAuthEnabled?: boolean;
   // Access control if auth is enabled
   // ctx: HonoContext, contains all the information about the request
-  // id: the id of the document the operation is being performed on
+  // id: the id of the document the operation is being performed on, could be undefined if reading multiple rows
   // data: the data passed to the operation
   // doc: the document being requested/updated/deleted
   // Get the user: ctx.get("user")
@@ -227,7 +227,7 @@ export interface SonicTableConfig {
   access?: {
     // Each operation that can be performed has access control.
     // Operations can be a boolean or a function (async or not) that returns a boolean.
-    operation: {
+    operation?: {
       // Determines if creating a new document in the table is allowed.
       create?:
         | boolean
@@ -242,7 +242,7 @@ export interface SonicTableConfig {
         | ((
             ctx?: AppContext,
             id?: string,
-            data?: any,
+            data?: any
           ) => boolean | Promise<boolean>);
       // Determines if deleting a document from the table is allowed.
       delete?:
@@ -258,7 +258,7 @@ export interface SonicTableConfig {
         | SonicJSFilter
         | ((
             ctx?: AppContext,
-            id?: string,
+            id?: string
           ) => SonicJSFilter | Promise<SonicJSFilter>)
         | boolean
         | ((ctx: AppContext, id: string) => boolean | Promise<boolean>);
@@ -267,19 +267,19 @@ export interface SonicTableConfig {
         | ((
             ctx?: AppContext,
             id?: string,
-            data?: any,
+            data?: any
           ) => SonicJSFilter | Promise<SonicJSFilter>)
         | boolean
         | ((
             ctx?: AppContext,
             id?: string,
-            data?: any,
+            data?: any
           ) => boolean | Promise<boolean>);
       delete?:
         | SonicJSFilter
         | ((
             ctx?: AppContext,
-            id?: string,
+            id?: string
           ) => SonicJSFilter | Promise<SonicJSFilter>)
         | boolean
         | ((ctx?: AppContext, id?: string) => boolean | Promise<boolean>);
@@ -292,7 +292,7 @@ export interface SonicTableConfig {
         | ((
             ctx?: AppContext,
             id?: string,
-            doc?: any,
+            doc?: any
           ) => boolean | Promise<boolean>);
       update?:
         | boolean
@@ -300,14 +300,14 @@ export interface SonicTableConfig {
             ctx?: AppContext,
             id?: string,
             data?: any,
-            doc?: any,
+            doc?: any
           ) => boolean | Promise<boolean>);
       delete?:
         | boolean
         | ((
             ctx?: AppContext,
             id?: string,
-            doc?: any,
+            doc?: any
           ) => boolean | Promise<boolean>);
     };
     // Defines the access control for each field in the table.
@@ -331,8 +331,8 @@ export interface SonicTableConfig {
           | boolean
           | ((
               ctx?: AppContext,
-              id?: string,
-              doc?: any,
+              value?: string,
+              doc?: any
             ) => boolean | Promise<boolean>);
         // Returns a boolean which allows or denies the ability to update a field's value. If false is returned, any passed values will be discarded.
         // If false is returned and you attempt to update the field's value, the operation will not throw an error however the field will be omitted from the update operation and the value will remain unchanged.
@@ -341,7 +341,7 @@ export interface SonicTableConfig {
           | ((
               ctx?: AppContext,
               id?: string,
-              data?: any,
+              data?: any
             ) => boolean | Promise<boolean>);
       };
     };
@@ -357,8 +357,39 @@ export const apiConfig: SonicTableConfig[] = [
       operation: {
         read: true,
         create: isAdminOrEditor,
-        update: isAdminOrEditor,
-        delete: isAdminOrEditor,
+      },
+      filter: {
+        // if a user tries to update a post and isn't the user that created the post the update won't happen
+        update: (ctx) => {
+          if (isAdmin(ctx)) {
+            return true;
+          } else {
+            const user = ctx.get("user");
+            if (user?.userId) {
+              // Return filter so update doesn't happen if userId doesn't match
+              return {
+                userId: user.userId,
+              };
+            } else {
+              return false;
+            }
+          }
+        },
+        delete: (ctx) => {
+          if (isAdmin(ctx)) {
+            return true;
+          } else {
+            const user = ctx.get("user");
+            if (user?.userId) {
+              // Return filter so update doesn't happen if userId doesn't match
+              return {
+                userId: user.userId,
+              };
+            } else {
+              return false;
+            }
+          }
+        },
       },
     },
   },
@@ -407,32 +438,23 @@ export const apiConfig: SonicTableConfig[] = [
         create: isAdmin,
         delete: isAdmin,
       },
-      filter: {
-        update: (ctx) => {
-          if (isAdmin(ctx)) {
-            return true;
-          } else {
-            const user = ctx.get("user");
-            if (user?.userId) {
-              // Return filter so update doesn't happen if userId doesn't match
-              return {
-                id: user.userId,
-              };
-            } else {
-              return false;
-            }
-          }
-        },
+      item: {
+        // if a user tries to update a user and isn't the user that created the user the update will return unauthorized response
+        update: isAdminOrUser,
       },
       fields: {
         email: {
-          read: isAdminOrUser,
+          read: (ctx, value, doc) => {
+            return isAdminOrUser(ctx, doc.id);
+          },
         },
         password: {
-          update: isUser,
+          update: isAdminOrUser,
         },
         role: {
-          read: isAdminOrUser,
+          read: (ctx, value, doc) => {
+            return isAdminOrUser(ctx, doc.id);
+          },
           update: isAdmin,
         },
       },
@@ -463,11 +485,11 @@ export function isAdmin(ctx: AppContext) {
   return false;
 }
 
-export function isUser(ctx: AppContext, doc: any) {
+export function isUser(ctx: AppContext, id: string) {
   const user = ctx.get("user");
-  return user.userId === doc.id;
+  return user.userId === id;
 }
 
-export function isAdminOrUser(ctx: AppContext, doc: any) {
-  return isAdmin(ctx) || isUser(ctx, doc);
+export function isAdminOrUser(ctx: AppContext, id: string) {
+  return isAdmin(ctx) || isUser(ctx, id);
 }

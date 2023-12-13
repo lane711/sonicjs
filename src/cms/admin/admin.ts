@@ -16,7 +16,7 @@ import {
 
 import { loadApis } from "./pages/api";
 import { getRecords } from "../data/data";
-import { adminAccessRoles, apiConfig } from "../../db/schema";
+import { apiConfig, config } from "../../db/schema";
 import qs from "qs";
 import { format } from "date-fns";
 import { getAllFromInMemoryCache, getFromInMemoryCache } from "../data/cache";
@@ -30,16 +30,7 @@ admin.use("*", async (ctx, next) => {
   const authEnabled = ctx.get("authEnabled");
   if (authEnabled) {
     const path = ctx.req.path;
-    const session = ctx.get("session");
-    const user = ctx.get("user");
-    let canUseAdmin = !!session;
-    if (adminAccessRoles?.length) {
-      if (user?.role) {
-        canUseAdmin = adminAccessRoles.includes(user.role.toLowerCase());
-      } else {
-        canUseAdmin = false;
-      }
-    }
+    let canUseAdmin = await config.adminAccessControl(ctx);
     if (!canUseAdmin && path !== "/admin/login") {
       //redirect if not logged in
       return ctx.redirect("/admin/login", 302);

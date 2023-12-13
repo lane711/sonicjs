@@ -95,7 +95,7 @@ export async function getRecords(
   cacheKey,
   source = "fastest",
   customDataFunction = undefined
-) {
+): Promise<{ data: any; source: string; total: number; contentType?: any }> {
   log(ctx, { level: "verbose", message: "getRecords start", cacheKey });
   const cacheStatusValid = await isCacheValid();
   // console.log("getRecords cacheStatusValid", cacheStatusValid);
