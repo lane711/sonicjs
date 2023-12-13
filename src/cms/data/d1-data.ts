@@ -12,7 +12,7 @@ import {
   categoriesToPostsTable,
   categoriesToPostsSchema,
 } from "../../db/schema";
-import { DefaultLogger, LogWriter, eq } from "drizzle-orm";
+import { DefaultLogger, LogWriter, and, eq } from "drizzle-orm";
 import { addToInMemoryCache, setCacheStatus } from "./cache";
 import { addToKvCache } from "./kv-data";
 
@@ -23,9 +23,9 @@ export async function getAllContent(db) {
 
 export async function getD1DataByTable(db, table, params) {
   const sql = generateSelectSql(table, params);
-  const { results } = await db.prepare(sql).all();
 
-  return results;
+  const { results } = await db.prepare(sql).all();
+  return params.id ? results[0] : results;
 }
 
 export function generateSelectSql(table, params) {
@@ -37,28 +37,29 @@ export function generateSelectSql(table, params) {
   var offsetSyntax = "";
 
   if (params) {
-    const sortDirection = params.sortDirection ?? "asc";
+    let { sortDirection, sortBy, limit, offset, ...filters } = params;
+    sortDirection = sortDirection ?? "asc";
     // console.log("sortDirection ==>", sortDirection);
 
-    sortBySyntax = params.sortBy
-      ? `order by ${params.sortBy} ${sortDirection}`
-      : "";
+    sortBySyntax = sortBy ? `order by ${sortBy} ${sortDirection}` : "";
 
-    limitSyntax = params.limit > 0 ? `limit ${params.limit}` : "";
+    limit = limit ?? 0;
+    limitSyntax = limit > 0 ? `limit ${limit}` : "";
     // console.log("limitSyntax ==>", limitSyntax);
 
-    offsetSyntax = params.offset > 0 ? `offset ${params.offset}` : "";
-    whereClause = whereClauseBuilder(params);
+    offset = offset ?? 0;
+    offsetSyntax = offset > 0 ? `offset ${offset}` : "";
+    whereClause = whereClauseBuilder(filters);
   }
 
   let sql = `SELECT *, COUNT() OVER() AS total FROM ${table} ${whereClause} ${sortBySyntax} ${limitSyntax} ${offsetSyntax}`;
   sql = sql.replace(/\s+/g, " ").trim() + ";";
 
-  // console.log("sql ==>", sql);
+  console.log("sql ==>", sql);
   return sql;
 }
 
-export async function getD1ByTableAndId(db, table, id) {
+export async function getD1ByTableAndId(db, table, id, params) {
   const { results } = await db
     .prepare(`SELECT * FROM ${table} where id = '${id}';`)
     .all();
@@ -112,7 +113,12 @@ export async function deleteD1ByTableAndId(d1, table, id) {
   return result;
 }
 
-export async function updateD1Data(d1, table, data) {
+export async function updateD1Data(
+  d1,
+  table,
+  data,
+  params?: Record<string, any>
+) {
   const db = drizzle(d1);
   const schemaTable = table ?? data.table;
   const repo = getRepoFromTable(schemaTable);
@@ -125,12 +131,18 @@ export async function updateD1Data(d1, table, data) {
   const now = new Date().getTime();
   data.data.updatedOn = now;
 
-  // console.log("updateD1Data===>", recordId, JSON.stringify(data.data, null, 4));
-
+  const eqArgs = [eq(repo.id, recordId)];
+  if (params) {
+    for (const key in params) {
+      if (key !== "id") {
+        eqArgs.push(eq(repo[key], params[key]));
+      }
+    }
+  }
   let result = await db
     .update(repo)
     .set(data.data)
-    .where(eq(repo.id, recordId))
+    .where(and(...eqArgs))
     .returning({ id: repo.id })
     .values();
 
@@ -191,27 +203,20 @@ export function getRepoFromTable(tableName) {
   }
 }
 
-export function whereClauseBuilder(params) {
-  // console.log("whereClauseBuilder", JSON.stringify(params.filters, null, 2));
+export function whereClauseBuilder(filters: Record<string, any>) {
   let whereClause = "";
-  const filters = params.filters;
 
-  if (!filters) {
+  if (!filters || Object.keys(filters).length === 0) {
     return whereClause;
   }
 
-  if (Array.isArray(filters)) {
-    filters.map((field) => {
-      console.log(field);
-    });
-  } else {
-    console.log("---filters----");
-    console.log(filters);
-    const field = Object.keys(filters)[0];
-    console.log(field);
-
-    whereClause = `where ${field} = `;
+  let AND = "";
+  whereClause = "WHERE";
+  for (const key of Object.keys(filters)) {
+    const value =
+      typeof filters[key] === "string" ? `'${filters[key]}'` : filters[key];
+    whereClause = `${whereClause} ${AND} ${key} = ${value}`;
+    AND = "AND";
   }
-
   return whereClause;
 }

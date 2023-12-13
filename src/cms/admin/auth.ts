@@ -49,6 +49,9 @@ const fieldsAccess = userTableConfig?.access?.fields;
 // View user
 authAPI.get(`/users/:id`, async (ctx) => {
   const id = ctx.req.param("id");
+  if (userTableConfig.hooks?.beforeOperation) {
+    await userTableConfig.hooks?.beforeOperation(ctx, "read", id);
+  }
   const authEnabled = ctx.get("authEnabled");
   let { includeContentType, source, ...params } = ctx.req.query();
   if (authEnabled) {
@@ -94,6 +97,15 @@ authAPI.get(`/users/:id`, async (ctx) => {
     data.contentType = getForm(ctx, "users");
   }
 
+  if (userTableConfig.hooks?.afterOperation) {
+    await userTableConfig.hooks.afterOperation(
+      ctx,
+      "read",
+      id,
+      undefined,
+      data
+    );
+  }
   const end = Date.now();
   const executionTime = end - start;
 
@@ -104,29 +116,49 @@ authAPI.post(`/users`, async (ctx) => {
   const authEnabled = ctx.get("authEnabled");
 
   let content = await ctx.req.json();
+  if (userTableConfig.hooks?.beforeOperation) {
+    await userTableConfig.hooks.beforeOperation(
+      ctx,
+      "create",
+      undefined,
+      content
+    );
+  }
   content.table = "users";
   if (authEnabled) {
     let authorized = await getOperationCreateResult(
       operationAccess?.create,
       ctx,
-      content.data ?? content
+      content.data
     );
     if (!authorized) {
       return ctx.text("Unauthorized", 401);
     }
   }
   try {
-    if (content.data) {
-      content.data = await filterCreateFieldAccess(
-        fieldsAccess,
+    content.data = await filterCreateFieldAccess(
+      fieldsAccess,
+      ctx,
+      content.data
+    );
+
+    if (userTableConfig.hooks?.resolveInput?.create) {
+      content.data = await userTableConfig.hooks.resolveInput.create(
         ctx,
         content.data
       );
-    } else {
-      content = await filterCreateFieldAccess(fieldsAccess, ctx, content);
     }
-
-    return await createUser({ content, ctx });
+    const result = await createUser({ content, ctx });
+    if (userTableConfig.hooks?.afterOperation) {
+      await userTableConfig.hooks.afterOperation(
+        ctx,
+        "create",
+        undefined,
+        content,
+        result
+      );
+    }
+    return result;
   } catch (error) {
     console.log("error posting content", error);
     return ctx.text(error, 500);
@@ -139,6 +171,10 @@ authAPI.delete(`/users/:id`, async (ctx) => {
 
   let { includeContentType, source, ...params } = ctx.req.query();
   const authEnabled = ctx.get("authEnabled");
+
+  if (userTableConfig.hooks?.beforeOperation) {
+    await userTableConfig.hooks.beforeOperation(ctx, "delete", id);
+  }
   if (authEnabled) {
     const accessControlResult = await getApiAccessControlResult(
       operationAccess?.delete || true,
@@ -178,6 +214,15 @@ authAPI.delete(`/users/:id`, async (ctx) => {
   if (shouldDeleteUser) {
     result = await deleteUser({ ctx }, id);
   }
+  if (userTableConfig.hooks?.afterOperation) {
+    await userTableConfig.hooks.afterOperation(
+      ctx,
+      "delete",
+      id,
+      undefined,
+      result
+    );
+  }
   return result;
 });
 
@@ -187,6 +232,9 @@ authAPI.put(`/users/:id`, async (ctx) => {
   let { includeContentType, source, ...params } = ctx.req.query();
   const authEnabled = ctx.get("authEnabled");
   let content = await ctx.req.json();
+  if (userTableConfig.hooks?.beforeOperation) {
+    await userTableConfig.hooks.beforeOperation(ctx, "update", id, content);
+  }
   if (authEnabled) {
     console.log({ content: JSON.stringify(content, null, 2) });
     const accessControlResult = await getApiAccessControlResult(
@@ -232,7 +280,23 @@ authAPI.put(`/users/:id`, async (ctx) => {
       id,
       content.data
     );
+    if (userTableConfig.hooks?.resolveInput?.update) {
+      content.data = await userTableConfig.hooks.resolveInput.update(
+        ctx,
+        id,
+        content.data
+      );
+    }
     result = await updateUser({ ctx, content }, id);
+  }
+  if (userTableConfig.hooks?.afterOperation) {
+    await userTableConfig.hooks.afterOperation(
+      ctx,
+      "update",
+      id,
+      content,
+      result
+    );
   }
   return result;
 });

@@ -125,9 +125,6 @@ AUTH_HASH="SHA-256"
     
     ```
 
-## Roles
-
-
 
 # Legacy
 The legacy version of SonicJs (a Node.js based web content management system) can be found here:

@@ -39,10 +39,11 @@ apiConfig.forEach((entry) => {
   //ie /v1/users
   api.get(`/${entry.route}`, async (ctx) => {
     const start = Date.now();
-
     const authEnabled = ctx.get("authEnabled");
-
     let { includeContentType, source, ...params } = ctx.req.query();
+    if (entry.hooks?.beforeOperation) {
+      await entry.hooks.beforeOperation(ctx, "read", params.id);
+    }
     if (authEnabled) {
       const accessControlResult = await getApiAccessControlResult(
         entry?.access?.operation?.read || true,
@@ -89,8 +90,13 @@ apiConfig.forEach((entry) => {
         ctx,
         data.data
       );
+
+      if (entry.hooks?.afterOperation) {
+        await entry.hooks.afterOperation(ctx, "read", params.id, null, data);
+      }
       const end = Date.now();
       const executionTime = end - start;
+
       return ctx.json({ ...data, executionTime });
     } catch (error) {
       console.log(error);
@@ -107,6 +113,11 @@ apiConfig.forEach((entry) => {
     let { includeContentType, source, ...params } = ctx.req.query();
 
     const id = ctx.req.param("id");
+
+    if (entry.hooks?.beforeOperation) {
+      await entry.hooks.beforeOperation(ctx, "read", id);
+    }
+
     params.id = id;
     if (authEnabled) {
       // will check the item result when we get the data
@@ -159,6 +170,10 @@ apiConfig.forEach((entry) => {
       data.contentType = getForm(ctx, entry.table);
     }
 
+    if (entry.hooks?.afterOperation) {
+      await entry.hooks.afterOperation(ctx, "read", id, null, data);
+    }
+
     const end = Date.now();
     const executionTime = end - start;
 
@@ -173,6 +188,10 @@ apiConfig.forEach((entry) => {
     const table = apiConfig.find((entry) => entry.route === route).table;
     ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
 
+    if (entry.hooks?.beforeOperation) {
+      await entry.hooks.beforeOperation(ctx, "create", undefined, content);
+    }
+
     content.table = table;
 
     const authEnabled = ctx.get("authEnabled");
@@ -180,7 +199,7 @@ apiConfig.forEach((entry) => {
       let authorized = await getOperationCreateResult(
         entry?.access?.operation?.create,
         ctx,
-        content.data ?? content
+        content.data
       );
       if (!authorized) {
         return ctx.text("Unauthorized", 401);
@@ -189,27 +208,30 @@ apiConfig.forEach((entry) => {
 
     try {
       // console.log("posting new record content", JSON.stringify(content, null, 2));
-      if (content.data) {
-        content.data = await filterCreateFieldAccess(
-          entry?.access?.fields,
-          ctx,
-          content.data
-        );
-      } else {
-        content = await filterCreateFieldAccess(
-          entry?.access?.fields,
-          ctx,
-          content
-        );
+      content.data = await filterCreateFieldAccess(
+        entry?.access?.fields,
+        ctx,
+        content.data
+      );
+      if (entry?.hooks?.resolveInput?.create) {
+        content.data = await entry.hooks.resolveInput.create(ctx, content.data);
       }
-
       const result = await insertRecord(
         ctx.env.D1DATA,
         ctx.env.KVDATA,
         content
       );
 
-      return ctx.json(result.data, 201);
+      if (entry?.hooks?.afterOperation) {
+        await entry.hooks.afterOperation(
+          ctx,
+          "create",
+          result?.data?.["id"],
+          content,
+          result
+        );
+      }
+      return ctx.json(result?.data, 201);
     } catch (error) {
       console.log("error posting content", error);
       return ctx.text(error, 500);
@@ -225,9 +247,12 @@ apiConfig.forEach((entry) => {
     ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
     content.data = payload.data;
 
+    if (entry.hooks?.beforeOperation) {
+      await entry.hooks?.beforeOperation(ctx, "update", id, content);
+    }
+
     let { includeContentType, source, ...params } = ctx.req.query();
     const authEnabled = ctx.get("authEnabled");
-    let shouldUpdateEntry = true;
     if (authEnabled) {
       const accessControlResult = await getApiAccessControlResult(
         entry?.access?.operation?.update || true,
@@ -240,7 +265,6 @@ apiConfig.forEach((entry) => {
       );
 
       if (typeof accessControlResult === "object") {
-        shouldUpdateEntry = false;
         params = { ...params, ...accessControlResult };
       }
 
@@ -255,36 +279,28 @@ apiConfig.forEach((entry) => {
     content.table = table;
     content.id = id;
 
-    if (!shouldUpdateEntry) {
-      //get the record so we use filter params if those are passed in
-      params.id = id;
-      const data = await getRecords(
-        ctx,
-        table,
-        params,
-        ctx.req.url + "-update-check",
-        source || "fastest",
-        undefined
-      );
-      if (data?.total > 0) {
-        shouldUpdateEntry = true;
-      }
-    }
-
     try {
-      let result: {
-        code: number;
-        message?: any;
-        data?: any;
-      } = { code: 200 };
-      if (shouldUpdateEntry) {
-        content.data = await filterUpdateFieldAccess(
-          entry.access?.fields,
+      content.data = await filterUpdateFieldAccess(
+        entry.access?.fields,
+        ctx,
+        id,
+        content.data
+      );
+      if (entry?.hooks?.resolveInput?.update) {
+        content.data = await entry.hooks.resolveInput.update(
           ctx,
           id,
           content.data
         );
-        result = await updateRecord(ctx.env.D1DATA, ctx.env.KVDATA, content);
+      }
+      const result = await updateRecord(
+        ctx.env.D1DATA,
+        ctx.env.KVDATA,
+        content,
+        params
+      );
+      if (entry?.hooks?.afterOperation) {
+        await entry.hooks.afterOperation(ctx, "update", id, content, result);
       }
       return ctx.json(result.data, 200);
     } catch (error) {
@@ -298,6 +314,10 @@ apiConfig.forEach((entry) => {
     const id = ctx.req.param("id");
     const table = ctx.req.path.split("/")[2];
     ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
+
+    if (entry.hooks?.beforeOperation) {
+      await entry.hooks.beforeOperation(ctx, "delete", id);
+    }
 
     let { includeContentType, source, ...params } = ctx.req.query();
     const authEnabled = ctx.get("authEnabled");
@@ -330,14 +350,15 @@ apiConfig.forEach((entry) => {
       undefined
     );
 
-    console.log("delete content " + JSON.stringify(record, null, 2));
-
     if (record) {
       console.log("content found, deleting...");
       const result = await deleteRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
         id,
         table: table,
       });
+      if (entry?.hooks?.afterOperation) {
+        await entry.hooks.afterOperation(ctx, "delete", id, record, result);
+      }
       // const kvDelete = await deleteKVById(ctx.env.KVDATA, id);
       // const d1Delete = await deleteD1ByTableAndId(
       //   ctx.env.D1DATA,
@@ -474,7 +495,20 @@ api.get("/form-components/:route", async (ctx) => {
 
   const table = apiConfig.find((entry) => entry.route === route).table;
 
-  const ct = await getForm(ctx.env.D1DATA, table);
+  let ct = await getForm(ctx.env.D1DATA, table);
+  const user = ctx.get("user");
+  if (user && user.userId) {
+    const hasUserId = ct.find((f) => f.key === "userId");
+    if (hasUserId) {
+      ct = ct.map((f) => {
+        if (f.key === "userId") {
+          f.disabled = true;
+          f.defaultValue = user.userId;
+        }
+        return f;
+      });
+    }
+  }
   return ctx.json(ct);
 });
 
@@ -501,6 +535,7 @@ api.get("/cache/clear-all", async (ctx) => {
   const canProceed = authEnabled
     ? (await config.adminAccessControl(ctx)) ?? true
     : true;
+
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }

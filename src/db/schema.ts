@@ -346,6 +346,25 @@ export interface SonicTableConfig {
       };
     };
   };
+  hooks?: {
+    resolveInput?: {
+      create?: (ctx: AppContext, data: any) => any | Promise<any>;
+      update?: (ctx: AppContext, id: string, data: any) => any | Promise<any>;
+    };
+    beforeOperation?: (
+      ctx: AppContext,
+      operation: "create" | "read" | "update" | "delete",
+      id?: string,
+      data?: any
+    ) => void | Promise<void>;
+    afterOperation?: (
+      ctx: AppContext,
+      operation: "create" | "read" | "update" | "delete",
+      id?: string,
+      data?: any,
+      result?: { data?: any } & Record<string, any>
+    ) => void | Promise<void>;
+  };
 }
 
 //create an entry for each table
@@ -389,6 +408,27 @@ export const apiConfig: SonicTableConfig[] = [
               return false;
             }
           }
+        },
+      },
+      fields: {
+        userId: {
+          update: false,
+        },
+      },
+    },
+    hooks: {
+      resolveInput: {
+        create: (ctx, data) => {
+          if (ctx.get("user")?.userId) {
+            data.userId = ctx.get("user").userId;
+          }
+          return data;
+        },
+        update: (ctx, id, data) => {
+          if (ctx.get("user")?.userId) {
+            data.userId = ctx.get("user").userId;
+          }
+          return data;
         },
       },
     },
@@ -443,6 +483,11 @@ export const apiConfig: SonicTableConfig[] = [
         update: isAdminOrUser,
       },
       fields: {
+        id: {
+          read: (ctx, value, doc) => {
+            return isAdminOrEditor(ctx) || isAdminOrUser(ctx, doc.id);
+          },
+        },
         email: {
           read: (ctx, value, doc) => {
             return isAdminOrUser(ctx, doc.id);

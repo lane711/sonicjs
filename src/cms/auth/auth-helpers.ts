@@ -49,7 +49,6 @@ export async function getApiAccessControlResult(
   ctx: AppContext,
   ...args: any[]
 ) {
-  console.log("getApiAccessControl args", JSON.stringify(args, null, 2));
   let authorized: boolean | SonicJSFilter = await getAccessControlResult(
     operationAccessControl,
     ctx,
@@ -269,7 +268,8 @@ export async function filterCreateFieldAccess<D = any>(
   let result: D = data;
   if (fields) {
     if (typeof data === "object") {
-      result = Object.keys(data).reduce<any>(async (acc, key) => {
+      const newResult = {} as D;
+      for (const key of Object.keys(data)) {
         const value = data[key];
         const access = fields[key]?.create;
         let authorized = true;
@@ -283,9 +283,11 @@ export async function filterCreateFieldAccess<D = any>(
             authorized = await accessResult;
           }
         }
-        acc[key] = authorized ? value : undefined;
-        return acc;
-      }, {});
+        if (authorized) {
+          newResult[key] = value;
+        }
+      }
+      result = newResult;
     } else {
       throw new Error("Data must be an object");
     }
@@ -298,14 +300,6 @@ export async function filterReadFieldAccess<D = any>(
   ctx: AppContext,
   doc: D
 ): Promise<D> {
-  console.log(
-    "filterreadfieldaccess",
-    JSON.stringify(
-      { doc, fields: !!fields, email: !!fields?.["email"]?.read },
-      null,
-      2
-    )
-  );
   let result: D = doc;
   if (fields) {
     if (Array.isArray(doc)) {
@@ -329,16 +323,10 @@ export async function filterReadFieldAccess<D = any>(
         const value = doc[key];
         const access = fields[key]?.read;
         let authorized = true;
-        if (key === "email") {
-          console.log(access);
-        }
         if (typeof access === "boolean") {
           authorized = access;
         } else if (typeof access === "function") {
           const accessResult = access(ctx, value, doc);
-          if (key === "email") {
-            console.log({ accessResult });
-          }
           if (typeof accessResult === "boolean") {
             authorized = accessResult;
           } else {
@@ -352,7 +340,6 @@ export async function filterReadFieldAccess<D = any>(
       console.error("How is doc not an array or object???");
     }
   }
-  console.log(JSON.stringify({ result }, null, 2));
   return result;
 }
 
@@ -365,7 +352,8 @@ export async function filterUpdateFieldAccess<D = any>(
   let result: D = data;
   if (fields) {
     if (typeof data === "object") {
-      result = Object.keys(data).reduce<any>(async (acc, key) => {
+      const newResult = {} as D;
+      for (const key of Object.keys(data)) {
         const value = data[key];
         const access = fields[key]?.update;
         let authorized = true;
@@ -379,9 +367,12 @@ export async function filterUpdateFieldAccess<D = any>(
             authorized = await accessResult;
           }
         }
-        acc[key] = authorized ? value : undefined;
-        return acc;
-      }, {});
+
+        if (authorized) {
+          newResult[key] = value;
+        }
+      }
+      result = newResult;
     } else {
       throw new Error("Data must be an object");
     }

@@ -195,32 +195,22 @@ export async function getRecords(
       message: "getRecords customDataFunction end",
     });
   } else {
-    if (params && params.id) {
-      log(ctx, {
-        level: "verbose",
-        message: "getRecords getD1ByTableAndId start",
-      });
-      d1Data = await getD1ByTableAndId(ctx.env.D1DATA, table, params.id);
-      log(ctx, {
-        level: "verbose",
-        message: "getRecords getD1ByTableAndId end",
-      });
-      total = d1Data ? 1 : 0;
-    } else {
-      log(ctx, {
-        level: "verbose",
-        message: "getRecords getD1DataByTable start",
-      });
-      d1Data = await getD1DataByTable(ctx.env.D1DATA, table, params);
-      log(ctx, {
-        level: "verbose",
-        message: "getRecords getD1DataByTable end",
-      });
-    }
+    log(ctx, {
+      level: "verbose",
+      message: "getRecords getD1DataByTable start",
+    });
+    d1Data = await getD1DataByTable(ctx.env.D1DATA, table, params);
+    log(ctx, {
+      level: "verbose",
+      message: "getRecords getD1DataByTable end",
+    });
   }
 
-  if (d1Data.length) {
+  if (d1Data?.length) {
     total = d1Data[0].total;
+  } else if (d1Data) {
+    total = 1;
+    d1Data.total = undefined;
   }
 
   log(ctx, {
@@ -339,25 +329,19 @@ export async function insertRecord(d1, kv, data) {
   return { code: 500, error };
 }
 
-export async function updateRecord(d1, kv, data) {
-  const timestamp = new Date().getTime();
-
+export async function updateRecord(d1, kv, data, params: Record<string, any>) {
   try {
-    const result = await saveKVData(kv, data, timestamp, data.id);
+    const result = await updateD1Data(d1, data.table, data, params);
+    console.log("WTF WTF");
+    if ("id" in result && result.id) {
+      await saveKVData(kv, data.id, data);
+    }
+    //expire cache
+    await setCacheStatusInvalid();
+    await clearKVCache(kv);
+    return { code: 200, data: result };
   } catch (error) {
     console.log("error posting content", error);
-    return { code: 500, message: error };
-  } finally {
-    //then also save the content to sqlite for filtering, sorting, etc
-    try {
-      const result = updateD1Data(d1, data.table, data);
-      //expire cache
-      await setCacheStatusInvalid();
-      await clearKVCache(kv);
-      return { code: 200, data: result };
-    } catch (error) {
-      console.log("error posting content", error);
-    }
   }
 }
 

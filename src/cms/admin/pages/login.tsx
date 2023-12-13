@@ -19,7 +19,7 @@ export const Login = (props: { children?: string; screenTitle?: string }) => {
           <div class="row">
             <main class="col-6 offset-3 px-md-4 py-md-4">
               <p class="text-danger" id="login-errors"></p>
-              <div id="formio-login"></div>
+              <form id="formio-login"></form>
               {props.children}
             </main>
           </div>
