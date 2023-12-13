@@ -160,7 +160,7 @@ Get the session: `ctx.get("session")`
 ## Example
 
 
-```
+
 
 The apiConfig array defines access control rules for each table endpoint. 
 
@@ -224,9 +224,7 @@ For the other tables (categories, comments, etc.):
 - No field level or other filters
 - Read access is allowed for everyone
 
-So in summary, it defines role based access control for modifying data, while allowing read access. And has special logic to control updates/deletes of posts.
-
-Let me know if any part needs more explanation!
+```
 
 export const apiConfig: SonicTableConfig[] = [
   {
