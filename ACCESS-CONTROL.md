@@ -5,6 +5,17 @@ The `access` property defines access control rules for interacting with the data
 
 By default operations are always allowed.
 
+## Admin Panel Access
+
+In `schema.ts` a variable `config` should be exported with a `adminAccessControl` property.
+
+```js
+export type SonicJSConfig = {
+  tablesConfig: SonicTableConfig[];
+  adminAccessControl: (ctx: AppContext) => boolean;
+};
+```
+If `adminAccessControl` returns `true` the user will be allowed access to the /admin route and be able to perform operations like clearing cache.
 
 ## Operation Access
 

@@ -120,7 +120,87 @@ If you change your auth options old users will still be able to login but the en
        fetch(url, requestOptions)
       ```
 
-# [Access Control Configuration](ACCESS-CONTROL.md)
+## [Access Control Configuration](ACCESS-CONTROL.md)
+
+  See the [Access Control Readme](ACCESS-CONTROL.md)
+
+
+# Hooks
+
+The `hooks` property on the `SonicTableConfig` type allows configuring functions that run at certain points in the request lifecycle. Here are the available hooks:
+
+## resolveInput
+
+The `resolveInput` hook allows transforming the input data before running a create or update operation. 
+
+```ts
+resolveInput: {
+  create: (ctx: AppContext, data: any) => any | Promise<any>;
+  update: (ctx: AppContext, id: string, data: any) => any | Promise<any>;
+}
+```
+
+For example, it can be used to automatically populate the `userId` field based on the authenticated user:
+
+```ts
+resolveInput: {
+  create: (ctx, data) => {
+    if (ctx.get("user")?.userId) {
+      data.userId = ctx.get("user").userId; 
+    }
+    return data;
+  } 
+}
+```
+
+The hooks receive the context (`ctx`) containing the request information, as well as the input `data`. They can return a Promise of the transformed data.
+
+## beforeOperation
+
+The `beforeOperation` hook runs before executing the database operation:
+
+```ts  
+beforeOperation?: (
+  ctx: AppContext,
+  operation: "create" | "read" | "update" | "delete", 
+  id?: string,
+  data?: any  
+) => void | Promise<void>;
+```
+
+It receives:
+
+- `ctx` - the context
+- `operation` - the operation being performed 
+- `id` - the document ID (if applies)
+- `data` - the input data (if applies)
+
+For example, it can be used for logging.
+
+## afterOperation
+
+The `afterOperation` hook runs after executing the database operation:  
+
+```ts
+afterOperation?: (
+  ctx: AppContext,
+  operation: "create" | "read" | "update" | "delete", 
+  id?: string,
+  data?: any,
+  result?: { data?: any } & Record<string, any>  
+) => void | Promise<void>;
+```
+ 
+It receives:
+
+- `ctx` - the context
+- `operation` - the operation performed
+- `id` - the document ID (if applies) 
+- `data` - the input data (if applies)
+- `result` - the operation result
+
+For example, it can be used for logging or post-processing the result.
+
 
 # Legacy
 The legacy version of SonicJs (a Node.js based web content management system) can be found here:
