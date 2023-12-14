@@ -73,7 +73,7 @@ To enable password auth set `useAuth` to "true" and a AUTH_SECRET in your vars i
 
 **Important:** There are two options for how passwords are stored (key derivation functions), set by the AUTH_KDF env variable. These effect the security of your passwords if they were to ever leak, as well as how much cpu time is used when a user is created, changes their password, or logs in. 
 
-  - AUTH_KDF="pbkdf2"
+  - **AUTH_KDF="pbkdf2"**
     - The default if no env variable is set
     - Faster than scrypt, but less secure
     - Uses about 80-100ms CPU time
@@ -81,7 +81,7 @@ To enable password auth set `useAuth` to "true" and a AUTH_SECRET in your vars i
       - Since cloudflare allows rollover CPU time you are unlikely to get an Exceeded CPU Limits error, but you can adjust the options below to potentially use less CPU time
     - Can adjust iterations with the AUTH_ITERATIONS env variable (default and max 100000)
     - Can adjust hash with the AUTH_HASH env variable ("SHA_256", "SHA-384" or "SHA-512" ("SHA-512" is the default))
-  - AUTH_KDF="scrypt"
+  - **AUTH_KDF="scrypt"**
     - Slower than pbkdf2, but more secure
     - Uses about 300-400ms CPU time
     - Recommended if on cloudflare workers paid plan
