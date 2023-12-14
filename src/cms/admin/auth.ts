@@ -24,7 +24,7 @@ import {
 
 const authAPI = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 authAPI.use("*", async (ctx, next) => {
-  if (ctx.env.useAuth !== "true") {
+  if (ctx.env?.useAuth !== "true") {
     return ctx.text("Not Implemented", 501);
   }
   const authEnabled = ctx.get("authEnabled");
@@ -91,7 +91,9 @@ authAPI.get(`/users/:id`, async (ctx) => {
     undefined
   );
 
-  data.data = await filterReadFieldAccess(fieldsAccess, ctx, data.data);
+  if (authEnabled) {
+    data.data = await filterReadFieldAccess(fieldsAccess, ctx, data.data);
+  }
 
   if (includeContentType !== undefined) {
     data.contentType = getForm(ctx, "users");
@@ -136,11 +138,13 @@ authAPI.post(`/users`, async (ctx) => {
     }
   }
   try {
-    content.data = await filterCreateFieldAccess(
-      fieldsAccess,
-      ctx,
-      content.data
-    );
+    if (authEnabled) {
+      content.data = await filterCreateFieldAccess(
+        fieldsAccess,
+        ctx,
+        content.data
+      );
+    }
 
     if (userTableConfig.hooks?.resolveInput?.create) {
       content.data = await userTableConfig.hooks.resolveInput.create(
@@ -236,7 +240,6 @@ authAPI.put(`/users/:id`, async (ctx) => {
     await userTableConfig.hooks.beforeOperation(ctx, "update", id, content);
   }
   if (authEnabled) {
-    console.log({ content: JSON.stringify(content, null, 2) });
     const accessControlResult = await getApiAccessControlResult(
       operationAccess?.update || true,
       filterAccess?.update || true,

@@ -5,7 +5,11 @@ import { getById } from "../data/kv-data";
 import axios from "axios";
 import { datadogLogs } from "@datadog/browser-logs";
 import { log } from "../util/logger";
-import { addToInMemoryCache, getFromInMemoryCache, isCacheValid } from "../data/cache";
+import {
+  addToInMemoryCache,
+  getFromInMemoryCache,
+  isCacheValid,
+} from "../data/cache";
 
 const status = new Hono<{ Bindings: Bindings }>();
 
@@ -28,9 +32,13 @@ status.get("/", async (ctx) => {
 
   //drizzle
   try {
-    const d1Data = await getD1DataByTable(ctx.env.D1DATA, "users", {
-      limit: 1,
-    });
+    const d1Data = await getD1DataByTable(
+      ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA,
+      "users",
+      {
+        limit: 1,
+      }
+    );
     status.drizzle = "ok";
   } catch (error) {
     status.drizzle = "error: " + error;
@@ -108,11 +116,12 @@ status.get("/geo", (ctx) => {
   return ctx.html(html_content);
 });
 
-(async function(){
-// add startup entry to cache
-const now = new Date().getTime().toString();
-const newCacheItem = await addToInMemoryCache({}, 'system::startup', { started: now });
-
+(async function () {
+  // add startup entry to cache
+  const now = new Date().getTime().toString();
+  const newCacheItem = await addToInMemoryCache({}, "system::startup", {
+    started: now,
+  });
 })();
 
 export { status };

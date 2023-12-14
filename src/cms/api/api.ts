@@ -75,7 +75,7 @@ apiConfig.forEach((entry) => {
         undefined
       );
 
-      if (entry.access?.item?.read) {
+      if (authEnabled && entry.access?.item?.read) {
         const accessControlResult = await getItemReadResult(
           entry.access.item.read,
           ctx,
@@ -85,11 +85,13 @@ apiConfig.forEach((entry) => {
           return ctx.text("Unauthorized", 401);
         }
       }
-      data.data = await filterReadFieldAccess(
-        entry.access?.fields,
-        ctx,
-        data.data
-      );
+      if (authEnabled) {
+        data.data = await filterReadFieldAccess(
+          entry.access?.fields,
+          ctx,
+          data.data
+        );
+      }
 
       if (entry.hooks?.afterOperation) {
         await entry.hooks.afterOperation(ctx, "read", params.id, null, data);
@@ -155,7 +157,7 @@ apiConfig.forEach((entry) => {
       undefined
     );
 
-    if (entry.access?.item?.read) {
+    if (authEnabled && entry.access?.item?.read) {
       const accessControlResult = await getItemReadResult(
         entry.access.item.read,
         ctx,
@@ -165,7 +167,9 @@ apiConfig.forEach((entry) => {
         return ctx.text("Unauthorized", 401);
       }
     }
-    data = await filterReadFieldAccess(entry.access?.fields, ctx, data);
+    if (authEnabled) {
+      data = await filterReadFieldAccess(entry.access?.fields, ctx, data);
+    }
     if (includeContentType !== undefined) {
       data.contentType = getForm(ctx, entry.table);
     }
@@ -208,11 +212,13 @@ apiConfig.forEach((entry) => {
 
     try {
       // console.log("posting new record content", JSON.stringify(content, null, 2));
-      content.data = await filterCreateFieldAccess(
-        entry?.access?.fields,
-        ctx,
-        content.data
-      );
+      if (authEnabled) {
+        content.data = await filterCreateFieldAccess(
+          entry?.access?.fields,
+          ctx,
+          content.data
+        );
+      }
       if (entry?.hooks?.resolveInput?.create) {
         content.data = await entry.hooks.resolveInput.create(ctx, content.data);
       }
@@ -280,12 +286,14 @@ apiConfig.forEach((entry) => {
     content.id = id;
 
     try {
-      content.data = await filterUpdateFieldAccess(
-        entry.access?.fields,
-        ctx,
-        id,
-        content.data
-      );
+      if (authEnabled) {
+        content.data = await filterUpdateFieldAccess(
+          entry.access?.fields,
+          ctx,
+          id,
+          content.data
+        );
+      }
       if (entry?.hooks?.resolveInput?.update) {
         content.data = await entry.hooks.resolveInput.update(
           ctx,

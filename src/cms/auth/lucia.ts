@@ -140,10 +140,8 @@ export const initializeLucia = (db: D1Database, env: Bindings) => {
           env.AUTH_HASH
         );
         if (hash.kdf === "pbkdf2") {
-          console.log("BAM", { hash: JSON.stringify(hash, null, 2) });
           return `snc:${hash.hashedPassword}:${salt}:${hash.hash}:${hash.iterations}`;
         } else {
-          console.log("WHAM", { hash: JSON.stringify(hash, null, 2) });
           return `lca:${hash.hashedPassword}`;
         }
       },

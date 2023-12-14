@@ -7,7 +7,7 @@ import { AppContext } from "../../server";
 import { SonicJSFilter, SonicTableConfig } from "../../db/schema";
 
 export const isAuthEnabled = async (ctx: AppContext) => {
-  let authIsEnabled = ctx.env.useAuth === "true";
+  let authIsEnabled = ctx.env?.useAuth === "true";
   if (authIsEnabled) {
     const fn = async function () {
       const db = drizzle(ctx.env.D1DATA, { schema });
