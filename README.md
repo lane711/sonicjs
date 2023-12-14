@@ -71,23 +71,22 @@ Check out https://sonicjs.com for next steps.
 
 To enable password auth set `useAuth` to "true" and a AUTH_SECRET in your vars in wrangler.toml
 
-Set the AUTH_SECRET (A random string is used to hash tokens)
-You can quickly create a good value on the command line via this openssl command.
+Important: There are two options for hashing passwords, set by the AUTH_KDF env variable. These effect the security of your passwords if they were to ever leak, as well as how much cpu time is used when a user is created, changes their password, or logs in. 
 
-```
-$ openssl rand -base64 32
-```
-Note: 
+  - AUTH_KDF="pbkdf2"
+    - The default if no env variable is set
+    - Faster than scrypt, but less secure
+    - Uses about 80-100ms CPU time
+    - Recommended if on cloudflare workers free plan
+      - Since cloudflare allows rollover CPU time you are unlikely to get an Exceeded CPU Limits error, but you can adjust the options below to potentially use less CPU time
+    - Can adjust iterations with the AUTH_ITERATIONS env variable (default and max 100000)
+    - Can adjust hash with the AUTH_HASH env variable ("SHA_256", "SHA-384" or "SHA-512" ("SHA-512" is the default))
+  - AUTH_KDF="scrypt"
+    - Slower than pbkdf2, but more secure
+    - Uses about 300-400ms CPU time
+    - Recommended if on cloudflare workers paid plan
 
-Hashing a password is purposefully computationally expensive in order to make passwords hard to crack if bad actors ever get access to the encrypted password. 
-
-In my testing creating a user/logging in takes around 100ms CPU time. I have never gotten a Exceeded CPU Limits error even on the free plan because Cloudflare allows rollover CPU time for requests below the CPU limit, and most SonicJS requests are well under.
-
-That said if you do get errors you may need to set the env variable AUTH_ITERATIONS and/or AUTH_HASH if your worker is running longer than allowed. The default and max AUTH_ITERATIONS is "100000". AUTH_HASH must be "SHA_256", "SHA-384" or "SHA-512" ("SHA-512" is the default)
-
-e.g to use use less CPU time
-AUTH_ITERATIONS="50000"
-AUTH_HASH="SHA-256"
+If you change your auth options old users will still be able to login but the encryption won't change for their password until they change their password.
 
  [https://sonicjs.com/environment-variables](https://sonicjs.com/environment-variables)
 
@@ -97,12 +96,11 @@ AUTH_HASH="SHA-256"
   1. Login
   1. You now have admin dashboard for CRUD operations
   1. To authorize via the API post to /v1/auth/login which will return json like
-
-    ```json
-    {
-      "bearer": "eo0t9q52njemo83rm1qktr6kwjh8zu5o3vma1g6j"
-    }
-    ```
+      ```json
+      {
+        "bearer": "eo0t9q52njemo83rm1qktr6kwjh8zu5o3vma1g6j"
+      }
+      ```
   1. Then add that bearer token to the Authorization header on future requests
 
 
