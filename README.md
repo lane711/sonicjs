@@ -125,6 +125,7 @@ AUTH_HASH="SHA-256"
     
     ```
 
+# [Access Control Configuration](ACCESS-CONTROL.md)
 
 # Legacy
 The legacy version of SonicJs (a Node.js based web content management system) can be found here:

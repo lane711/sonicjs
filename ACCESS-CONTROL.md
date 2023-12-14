@@ -160,26 +160,9 @@ Get the session: `ctx.get("session")`
 ## Example
 
 
+```
 
-
-The apiConfig array defines access control rules for each table endpoint. 
-
-
-### Posts Table
-
-- Operation Access:
-  - Read is allowed for everyone (set to true)
-  - Create is allowed only for admins and editors via the `isAdminOrEditor` function
-- Filter Access: 
-  - Updates and deletes apply a filter to restrict access based on the userId not matching the logged in user. This prevents unauthorized updates/deletes.
-
-- Field Level Access:
-  - The userId field cannot be updated directly. This prevents changing the post owner.
-
-- Hooks:
-  - On create/update, it will set the userId field based on the logged in user.
-
-Here is a more detailed explanation of the access control defined for the users table:
+The config defines access control rules for each table endpoint. 
 
 ### Users Table
 
@@ -188,7 +171,6 @@ The users table has more complex access control since it stores user account dat
 - Operation Access:
   - Create is restricted to admins only
   - Delete is restricted to admins only
-  - Update uses item level access control to allow users to update their own user account, but restrict updates to other users.
 
 - Item Level Access:
   - Update checks if the user is an admin or updating their own user account via the `isAdminOrUser` function
@@ -216,15 +198,20 @@ So in summary:
 - Admins have full access
 - Sensitive fields like role, email are protected from unauthorized access
 
-Let me know if any part of the users table access control needs more clarification!
+### Posts Table
 
-For the other tables (categories, comments, etc.):
+- Operation Access:
+  - Read is allowed for everyone (set to true)
+  - Create is allowed only for admins and editors via the `isAdminOrEditor` function
+- Filter Access: 
+  - Updates and deletes apply a filter to restrict access based on the userId not matching the logged in user. This prevents unauthorized updates/deletes.
 
-- CRUD operations are restricted to admins and editors
-- No field level or other filters
-- Read access is allowed for everyone
+- Field Level Access:
+  - The userId field cannot be updated directly. This prevents changing the post owner.
 
-```
+- Hooks:
+  - On create/update, it will set the userId field based on the logged in user.
+
 
 export const apiConfig: SonicTableConfig[] = [
   {
@@ -297,7 +284,7 @@ export const apiConfig: SonicTableConfig[] = [
     access: {
       operation: {
         read: true,
-        create: isAdminOrEditor,
+        create: true,
         update: isAdminOrEditor,
         delete: isAdminOrEditor,
       },
@@ -309,9 +296,9 @@ export const apiConfig: SonicTableConfig[] = [
     access: {
       operation: {
         read: true,
-        create: isAdminOrEditor,
-        update: isAdminOrEditor,
-        delete: isAdminOrEditor,
+        create: true,
+        update: isAdminOrUser,
+        delete: isAdminOrUser,
       },
     },
   },
@@ -321,7 +308,7 @@ export const apiConfig: SonicTableConfig[] = [
     access: {
       operation: {
         read: true,
-        create: isAdminOrEditor,
+        create: true,
         update: isAdminOrEditor,
         delete: isAdminOrEditor,
       },

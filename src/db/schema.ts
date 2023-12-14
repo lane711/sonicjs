@@ -439,7 +439,7 @@ export const apiConfig: SonicTableConfig[] = [
     access: {
       operation: {
         read: true,
-        create: isAdminOrEditor,
+        create: true,
         update: isAdminOrEditor,
         delete: isAdminOrEditor,
       },
@@ -451,9 +451,25 @@ export const apiConfig: SonicTableConfig[] = [
     access: {
       operation: {
         read: true,
-        create: isAdminOrEditor,
-        update: isAdminOrEditor,
-        delete: isAdminOrEditor,
+        create: true,
+        update: isAdminOrUser,
+        delete: isAdminOrUser,
+      },
+    },
+    hooks: {
+      resolveInput: {
+        create: (ctx, data) => {
+          if (ctx.get("user")?.userId) {
+            data.userId = ctx.get("user").userId;
+          }
+          return data;
+        },
+        update: (ctx, id, data) => {
+          if (ctx.get("user")?.userId) {
+            data.userId = ctx.get("user").userId;
+          }
+          return data;
+        },
       },
     },
   },
@@ -463,7 +479,7 @@ export const apiConfig: SonicTableConfig[] = [
     access: {
       operation: {
         read: true,
-        create: isAdminOrEditor,
+        create: true,
         update: isAdminOrEditor,
         delete: isAdminOrEditor,
       },
