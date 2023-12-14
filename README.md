@@ -102,26 +102,23 @@ If you change your auth options old users will still be able to login but the en
       }
       ```
   1. Then add that bearer token to the Authorization header on future requests
-
-
-    ```ts
-    const url = "http://localhost:8788/v1/posts/c1d462a4-fd10-4bdb-bbf2-2b33a94f82aa";
-    const data = {
-      "data": {
-          "title": "Test Post Update"
-      }
-    };
-    const requestOptions = {
-      method: 'PUT',
-      headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer eo0t9q52njemo83rm1qktr6kwjh8zu5o3vma1g6j'
-      },
-      body: JSON.stringify(data)
-    };
-    fetch(url, requestOptions)
-    
-    ```
+      ```js
+       const url = "http://localhost:8788/v1/posts/c1d462a4-fd10-4bdb-bbf2-2b33a94f82aa";
+       const data = {
+         "data": {
+             "title": "Test Post Update"
+         }
+       };
+       const requestOptions = {
+         method: 'PUT',
+         headers: { 
+             'Content-Type': 'application/json',
+             'Authorization': 'Bearer eo0t9q52njemo83rm1qktr6kwjh8zu5o3vma1g6j'
+         },
+         body: JSON.stringify(data)
+       };
+       fetch(url, requestOptions)
+      ```
 
 # [Access Control Configuration](ACCESS-CONTROL.md)
 
