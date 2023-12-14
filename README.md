@@ -71,7 +71,7 @@ Check out https://sonicjs.com for next steps.
 
 To enable password auth set `useAuth` to "true" and a AUTH_SECRET in your vars in wrangler.toml
 
-Important: There are two options for how passwords are stored (key derivation functions), set by the AUTH_KDF env variable. These effect the security of your passwords if they were to ever leak, as well as how much cpu time is used when a user is created, changes their password, or logs in. 
+**Important:** There are two options for how passwords are stored (key derivation functions), set by the AUTH_KDF env variable. These effect the security of your passwords if they were to ever leak, as well as how much cpu time is used when a user is created, changes their password, or logs in. 
 
   - AUTH_KDF="pbkdf2"
     - The default if no env variable is set
