@@ -71,9 +71,9 @@ Check out https://sonicjs.com for next steps.
 
 To enable password auth set `useAuth` to "true" and a AUTH_SECRET in your vars in wrangler.toml
 
-Important: There are two options for hashing passwords, set by the AUTH_KDF env variable. These effect the security of your passwords if they were to ever leak, as well as how much cpu time is used when a user is created, changes their password, or logs in. 
+**Important:** There are two options for how passwords are stored (key derivation functions), set by the AUTH_KDF env variable. These effect the security of your passwords if they were to ever leak, as well as how much cpu time is used when a user is created, changes their password, or logs in. 
 
-  - AUTH_KDF="pbkdf2"
+  - **AUTH_KDF="pbkdf2"**
     - The default if no env variable is set
     - Faster than scrypt, but less secure
     - Uses about 80-100ms CPU time
@@ -81,7 +81,7 @@ Important: There are two options for hashing passwords, set by the AUTH_KDF env 
       - Since cloudflare allows rollover CPU time you are unlikely to get an Exceeded CPU Limits error, but you can adjust the options below to potentially use less CPU time
     - Can adjust iterations with the AUTH_ITERATIONS env variable (default and max 100000)
     - Can adjust hash with the AUTH_HASH env variable ("SHA_256", "SHA-384" or "SHA-512" ("SHA-512" is the default))
-  - AUTH_KDF="scrypt"
+  - **AUTH_KDF="scrypt"**
     - Slower than pbkdf2, but more secure
     - Uses about 300-400ms CPU time
     - Recommended if on cloudflare workers paid plan
@@ -89,7 +89,7 @@ Important: There are two options for hashing passwords, set by the AUTH_KDF env 
 If you change your auth options old users will still be able to login but the encryption won't change for their password until they change their password.
 
  [https://sonicjs.com/environment-variables](https://sonicjs.com/environment-variables)
-
+## Setup a user
   1. Navigate to the Auth Users section in the left nav (/admin/tables/auth/users)
   1. If you don't have a user create one with the role "admin" and set a password
   1. If you have users already edit the user you want to be the admin, set the role to "admin" and set a password
