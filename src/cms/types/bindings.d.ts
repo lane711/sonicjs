@@ -6,9 +6,10 @@ export type Bindings = {
   D1DATA: D1Database;
   __D1_BETA__D1DATA: D1Database;
   useAuth?: string;
-  AUTH_SECRET?: string;
   AUTH_ITERATIONS?: string;
-  AUTH_HASH?: string;
+  AUTH_HASH?: "SHA512" | "SHA384" | "SHA256";
+  AUTH_KDF?: "pbkdf2" | "scrypt";
+  ENVIRONMENT?: "production" | "development";
 };
 
 declare global {

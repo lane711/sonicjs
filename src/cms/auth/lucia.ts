@@ -1,4 +1,9 @@
 import { LuciaError, lucia } from "lucia";
+import {
+  generateLuciaPasswordHash,
+  generateRandomString,
+  validateLuciaPasswordHash,
+} from "lucia/utils";
 import { d1 } from "@lucia-auth/adapter-sqlite";
 import { hono } from "lucia/middleware";
 import { Bindings } from "../types/bindings";
@@ -14,51 +19,99 @@ export type Session = {
 
 async function hashPassword(
   password: string,
-  salt: Uint8Array,
+  kdf: Bindings["AUTH_KDF"] = "pbkdf2",
+  salt: string,
   iterations = 100000,
   hash = "SHA-512"
 ) {
-  const encoder = new TextEncoder();
-  const passwordBuffer = encoder.encode(password);
-  const importedKey = await crypto.subtle.importKey(
-    "raw",
-    passwordBuffer,
-    { name: "PBKDF2" },
-    false,
-    ["deriveBits", "deriveKey"]
-  );
+  password = password.normalize("NFKC");
+  kdf = kdf.toLowerCase() as Bindings["AUTH_KDF"];
+  if (kdf !== "pbkdf2" && kdf !== "scrypt") {
+    kdf = "pbkdf2";
+  }
+  hash = hash.toUpperCase();
   if (hash !== "SHA-512" && hash !== "SHA-384" && hash !== "SHA-256") {
     hash = "SHA-512";
   }
-  const hashedPassword = await crypto.subtle.deriveKey(
-    {
-      name: "PBKDF2",
-      salt: salt,
-      iterations,
-      hash,
-    },
-    importedKey,
-    { name: "HMAC", hash: "SHA-1" },
-    true,
-    ["sign", "verify"]
-  );
+  if (kdf === "pbkdf2") {
+    const encoder = new TextEncoder();
+    const passwordBuffer = encoder.encode(password);
+    const baseKey = await crypto.subtle.importKey(
+      "raw",
+      passwordBuffer,
+      { name: "PBKDF2" },
+      false,
+      ["deriveBits"]
+    );
+    let dkLen = 64;
+    switch (hash) {
+      case "SHA-384":
+        dkLen = 48;
+        break;
+      case "SHA-256":
+        dkLen = 32;
+        break;
+    }
+    const hashedPassword = await crypto.subtle.deriveBits(
+      {
+        name: "PBKDF2",
+        salt: encoder.encode(salt),
+        iterations,
+        hash,
+      },
+      baseKey,
+      dkLen * 8
+    );
 
-  let exportedKey = await crypto.subtle.exportKey("raw", hashedPassword);
-  let uint8Array = new Uint8Array(exportedKey);
-  return String.fromCharCode.apply(null, uint8Array);
+    return {
+      kdf,
+      hash,
+      salt,
+      iterations,
+      hashedPassword: String.fromCharCode.apply(
+        null,
+        new Uint8Array(hashedPassword)
+      ),
+    };
+  } else {
+    return {
+      kdf,
+      hash,
+      salt,
+      iterations,
+      hashedPassword: await generateLuciaPasswordHash(password),
+    };
+  }
+  // let uint8Array = new Uint8Array(exportedKey);
+  // return String.fromCharCode.apply(null, uint8Array);
 }
-function getIterations(env) {
+function getIterations(iterationsString?: string) {
   let iterations = 100000;
-  if (env.AUTH_ITERATIONS) {
+  if (iterationsString) {
     try {
-      iterations = +env.AUTH_ITERATIONS;
+      iterations = +iterationsString;
     } catch (e) {
       console.error("failed to parse AUTH_ITERATIONS", e);
     }
   }
   return Math.min(iterations, 100000);
 }
-export const initializeLucia = (db: D1Database, env) => {
+
+// compare two strings in a constant time, which is particularly important for security-related operations such as comparing cryptographic hashes. This function safeguards against timing attacks where an attacker can gain information based on the amount of time taken to compare two values.
+const constantTimeEqual = (a: string, b: string): boolean => {
+  if (a.length !== b.length) {
+    return false;
+  }
+  const aUint8Array = new TextEncoder().encode(a);
+  const bUint8Array = new TextEncoder().encode(b);
+
+  let c = 0;
+  for (let i = 0; i < a.length; i++) {
+    c |= aUint8Array[i] ^ bUint8Array[i]; // ^: XOR operator
+  }
+  return c === 0;
+};
+export const initializeLucia = (db: D1Database, env: Bindings) => {
   const d1Adapter = d1(db, {
     key: "user_keys",
     user: "users",
@@ -77,28 +130,45 @@ export const initializeLucia = (db: D1Database, env) => {
     },
     passwordHash: {
       async generate(userPassword) {
-        const salt = crypto.getRandomValues(new Uint8Array(16));
-        const secret = env.AUTH_SECRET || "";
+        const salt = await generateRandomString(16);
 
         const hash = await hashPassword(
-          userPassword + secret,
+          userPassword,
+          env.AUTH_KDF,
           salt,
-          getIterations(env),
+          getIterations(env.AUTH_ITERATIONS),
           env.AUTH_HASH
         );
-        return `${hash}:$:${salt}`;
+        if (hash.kdf === "pbkdf2") {
+          console.log("BAM", { hash: JSON.stringify(hash, null, 2) });
+          return `snc:${hash.hashedPassword}:${salt}:${hash.hash}:${hash.iterations}`;
+        } else {
+          console.log("WHAM", { hash: JSON.stringify(hash, null, 2) });
+          return `lca:${hash.hashedPassword}`;
+        }
       },
-      async validate(userPassword, hash) {
-        const [hashedPassword, saltString] = hash.split(":$:");
-        const salt = new Uint8Array(saltString.split(",").map(Number));
-        const secret = env.AUTH_SECRET || "";
-        const verifyHash = await hashPassword(
-          userPassword + secret,
-          salt,
-          getIterations(env),
-          env.AUTH_HASH
-        );
-        return hashedPassword === verifyHash;
+      async validate(userPassword, dbHash) {
+        const [hasher, hashedPassword, salt, hash, iterations] =
+          dbHash.split(":");
+        let kdf: Bindings["AUTH_KDF"] = "pbkdf2";
+        if (hasher === "lca") {
+          kdf = "scrypt";
+        }
+        if (kdf === "pbkdf2") {
+          const verifyHash = await hashPassword(
+            userPassword,
+            kdf,
+            salt,
+            getIterations(iterations),
+            hash
+          );
+          return constantTimeEqual(verifyHash.hashedPassword, hashedPassword);
+        } else {
+          return await validateLuciaPasswordHash(
+            userPassword,
+            dbHash.substring(4)
+          );
+        }
       },
     },
   });
