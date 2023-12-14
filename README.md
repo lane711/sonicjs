@@ -89,7 +89,7 @@ To enable password auth set `useAuth` to "true" and a AUTH_SECRET in your vars i
 If you change your auth options old users will still be able to login but the encryption won't change for their password until they change their password.
 
  [https://sonicjs.com/environment-variables](https://sonicjs.com/environment-variables)
-
+## Setup a user
   1. Navigate to the Auth Users section in the left nav (/admin/tables/auth/users)
   1. If you don't have a user create one with the role "admin" and set a password
   1. If you have users already edit the user you want to be the admin, set the role to "admin" and set a password
