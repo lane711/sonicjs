@@ -24,7 +24,9 @@ import {
 
 const authAPI = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 authAPI.use("*", async (ctx, next) => {
-  if (ctx.env?.useAuth !== "true") {
+  const useAuthEnvEnabled =
+    ctx.env?.useAuth === "true" || ctx.env?.useAuth === true;
+  if (useAuthEnvEnabled) {
     return ctx.text("Not Implemented", 501);
   }
   const authEnabled = ctx.get("authEnabled");

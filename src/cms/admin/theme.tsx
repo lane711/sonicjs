@@ -6,6 +6,7 @@ import {
   getDataListByPrefix,
   saveKVData,
 } from "../data/kv-data";
+import { Bindings } from "../types/bindings";
 
 export const Head = () => {
   return (
@@ -154,10 +155,12 @@ export const Layout = (props: {
   screenTitle?: string;
   newItemButtonText?: string;
   username?: string;
-  env: Record<string, string>;
+  env: Bindings;
 }) => {
   const tables = apiConfig;
 
+  const useAuthEnvEnabled =
+    props.env?.useAuth === "true" || props.env?.useAuth === true;
   return (
     <html lang="en" data-bs-theme="auto">
       <EnvContext.Provider value={props.env}>
@@ -208,9 +211,7 @@ export const Layout = (props: {
                     </h6>
                     {tables
                       .filter(
-                        (t) =>
-                          props.env?.useAuth !== "true" ||
-                          !t.hideWhenAuthEnabled
+                        (t) => !useAuthEnvEnabled || !t.hideWhenAuthEnabled
                       )
                       .map((item: SonicTableConfig) => {
                         return (
@@ -224,7 +225,7 @@ export const Layout = (props: {
                           </li>
                         );
                       })}
-                    {props.env?.useAuth === "true" ? (
+                    {useAuthEnvEnabled ? (
                       <>
                         <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                           <span>Auth</span>
@@ -333,7 +334,7 @@ export const Top = (props: {
   screenTitle: string;
   newItemButtonText: string;
   username?: string;
-  env: Record<string, string>;
+  env: Bindings;
 }) => {
   return (
     <Layout
@@ -372,7 +373,7 @@ export const Detail = (props: {
   item: any;
   screenTitle: string;
   username?: string;
-  env: Record<string, string>;
+  env: Bindings;
 }) => {
   return (
     <Layout
@@ -390,7 +391,7 @@ export const FormBuilder = (props: {
   screenTitle: string;
   saveButtonText: string;
   username?: string;
-  env: Record<string, string>;
+  env: Bindings;
 }) => {
   return (
     <Layout
@@ -419,7 +420,7 @@ export const Form = (props: {
   screenTitle: string;
   saveButtonText: string;
   username?: string;
-  env: Record<string, string>;
+  env: Bindings;
 }) => {
   return (
     <Layout

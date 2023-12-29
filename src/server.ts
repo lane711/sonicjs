@@ -25,8 +25,9 @@ export type AppContext = Context<{ Bindings: Bindings; Variables: Variables }>;
 
 app.use("*", async (ctx, next) => {
   const path = ctx.req.path;
-  console.log("ENV", ctx.env);
-  if (ctx.env?.useAuth === "true" && !path.includes("/public")) {
+  const useAuthEnvEnabled =
+    ctx.env?.useAuth === "true" || ctx.env?.useAuth === true;
+  if (useAuthEnvEnabled && !path.includes("/public")) {
     const auth = initializeLucia(ctx.env.D1DATA, ctx.env);
     const authRequest = auth.handleRequest(ctx);
     let session = await authRequest.validate();
