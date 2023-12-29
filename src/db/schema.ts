@@ -85,6 +85,8 @@ export const postSchema = {
   title: text("title"),
   body: text("body"),
   userId: text("userId"),
+  image: text("image"),
+  file: text("file"),
 };
 export const postsTable = sqliteTable(
   "posts",
@@ -365,6 +367,11 @@ export interface SonicTableConfig {
       result?: { data?: any } & Record<string, any>
     ) => void | Promise<void>;
   };
+  fields?: {
+    [field: string]: {
+      type?: "auto" | "file" | "image";
+    };
+  };
 }
 
 //create an entry for each table
@@ -430,6 +437,14 @@ export const apiConfig: SonicTableConfig[] = [
           }
           return data;
         },
+      },
+    },
+    fields: {
+      image: {
+        type: "image",
+      },
+      file: {
+        type: "file",
       },
     },
   },
