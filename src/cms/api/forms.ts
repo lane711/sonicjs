@@ -1,3 +1,4 @@
+import { apiConfig } from "../../db/schema";
 import { getSchemaFromTable } from "../data/d1-data";
 
 export function getForm(ctx, table) {
@@ -6,9 +7,15 @@ export function getForm(ctx, table) {
   //TODO: amke dynamic
   // const schema = `${table}Schema`;
   const schema = getSchemaFromTable(table);
+  const config = apiConfig.find((tbl) => tbl.table === table);
 
   for (var field in schema) {
     const formField = getField(field);
+    const metaType = config.fields?.[field]?.type || "auto";
+    formField.metaType = metaType;
+    if (formField.metaType === "auto") {
+      delete formField.metaType;
+    }
     formFields.push(formField);
   }
 
@@ -38,6 +45,7 @@ function getField(fieldName) {
     type: getFieldType(fieldName),
     key: fieldName,
     label: fieldName,
+    metaType: "auto",
     disabled,
     // placeholder: "Enter your first name.",
     // input: true,

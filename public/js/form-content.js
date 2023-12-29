@@ -43,6 +43,21 @@ function newContent() {
     console.log(response.headers);
     console.log(response.config);
 
+    const fileFields = response.data.filter((c) => c.metaType == "file");
+    const imageFields = response.data.filter((c) => c.metaType == "image");
+    response.data = response.data.map((c) => {
+      if (c.metaType == "file" || c.metaType == "image") {
+        return {
+          ...c,
+          type: "button",
+          class: "my-2",
+          action: "button",
+          theme: "secondary",
+        };
+      } else {
+        return c;
+      }
+    });
     Formio.icons = "fontawesome";
     // Formio.createForm(document.getElementById("formio"), {
     Formio.createForm(document.getElementById("formio"), {
@@ -58,6 +73,26 @@ function newContent() {
           console.log("event ->", event);
         }
       });
+      if (fileFields.length || imageFields.length) {
+        const formio = document.getElementById("formio");
+        const childDiv = document.createElement("div");
+        childDiv.id = "files-drag-drop";
+        formio.parentNode.insertBefore(childDiv, formio);
+        formio.querySelectorAll(".btn-secondary").forEach((el) => {
+          el.classList.add("uppy-trigger");
+        });
+        (async () => {
+          const { Uppy, Dashboard, Tus } = await import(
+            "https://releases.transloadit.com/uppy/v3.21.0/uppy.min.mjs"
+          );
+          const uppy = new Uppy();
+          uppy.use(Dashboard, {
+            target: "#files-drag-drop",
+            trigger: ".uppy-trigger",
+          });
+          uppy.use(Tus, { endpoint: "https://tusd.tusdemo.net/files/" });
+        })();
+      }
     });
   });
 }

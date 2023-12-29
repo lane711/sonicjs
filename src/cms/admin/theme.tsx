@@ -37,12 +37,11 @@ export const Head = () => {
         href="https://cdn.form.io/formiojs/formio.full.min.css"
       />
 
-      <link href="/public/css/gridjs.css" rel="stylesheet" />
-
       <meta name="theme-color" content="#712cf9" />
 
       <link href="/public/css/admin.css" rel="stylesheet" />
       <link href="/public/css/gridjs.css" rel="stylesheet" />
+      <link href="/public/css/uppy.css" rel="stylesheet" />
     </head>
   );
 };

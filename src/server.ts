@@ -27,7 +27,6 @@ app.use("*", async (ctx, next) => {
   const path = ctx.req.path;
   const useAuthEnvEnabled =
     ctx.env?.useAuth === "true" || ctx.env?.useAuth === true;
-  console.log("useAuthEnvEnabled", ctx.env?.useAuth, useAuthEnvEnabled);
   if (useAuthEnvEnabled && !path.includes("/public")) {
     const auth = initializeLucia(ctx.env.D1DATA, ctx.env);
     const authRequest = auth.handleRequest(ctx);
