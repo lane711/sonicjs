@@ -90,7 +90,7 @@ function newContent() {
             target: "#files-drag-drop",
             trigger: ".uppy-trigger",
           });
-          uppy.use(Tus, { endpoint: "https://tusd.tusdemo.net/files/" });
+          uppy.use(Tus, { endpoint: "http://localhost:8787/tus" });
         })();
       }
     });

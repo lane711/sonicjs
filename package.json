@@ -5,7 +5,7 @@
   "main": "src/server.ts",
   "scripts": {
     "dev": "run-p dev:*",
-    "dev:wrangler": "wrangler pages dev dist --env development",
+    "dev:wrangler": "wrangler pages dev dist --env development --port 8787",
     "dev:esbuild": "node ./src/cms/util/build.mjs",
     "build": "node ./src/cms/util/build.mjs",
     "deploy": "wrangler pages deploy dist",
@@ -30,6 +30,10 @@
   },
   "dependencies": {
     "@lucia-auth/adapter-sqlite": "^2.0.0",
+    "@tussle/core": "^0.7.0",
+    "@tussle/middleware-cloudflareworker": "^0.7.3",
+    "@tussle/state-memory": "^0.7.1",
+    "@tussle/storage-r2": "^0.7.4",
     "@types/jest": "^29.5.1",
     "@uppy/core": "^3.8.0",
     "@uppy/dashboard": "^3.7.1",
