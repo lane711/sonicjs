@@ -1,6 +1,6 @@
 {
   "name": "sonicjs",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Headless CMS based on Cloudflare Workers",
   "main": "src/server.ts",
   "scripts": {
