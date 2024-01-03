@@ -1,5 +1,4 @@
 import app from "../../server";
-import usersTable from "../../db/schema/users";
 import { drizzle } from "drizzle-orm/d1";
 import { sql } from "drizzle-orm";
 import { insertD1Data } from "../data/d1-data";
@@ -174,7 +173,7 @@ function createTestTable() {
   const db = drizzle(__D1_BETA__D1DATA);
   console.log("creating test table");
   db.run(sql`
-    CREATE TABLE ${usersTable} (
+    CREATE TABLE users (
       id text PRIMARY KEY NOT NULL,
       firstName text,
       lastName text,

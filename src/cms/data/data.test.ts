@@ -1,11 +1,10 @@
 import { insertD1Data, updateD1Data } from "./d1-data";
-import usersTable from "../../db/schema/users";
 import qs from "qs";
 const env = getMiniflareBindings();
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
-import { getRecord, getRecords, insertRecord } from "./data";
+import { getRecords, insertRecord } from "./data";
 import { clearInMemoryCache } from "./cache";
 import { clearKVCache } from "./kv-data";
 const ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
@@ -183,7 +182,7 @@ function createTestTable() {
   const db = drizzle(__D1_BETA__D1DATA);
 
   db.run(sql`
-    CREATE TABLE ${usersTable} (
+    CREATE TABLE users (
       id text PRIMARY KEY NOT NULL,
       firstName text,
       lastName text,
