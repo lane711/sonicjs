@@ -14,7 +14,9 @@ export const isAuthEnabled = async (ctx: AppContext) => {
           users: tableSchemas.users.table,
           usersRelations: tableSchemas.users.relation,
           userKeys: tableSchemas.userKeys.table,
+          userKeysRelations: tableSchemas.userKeys.relation,
           userSessions: tableSchemas.userSessions.table,
+          userSessionsRelations: tableSchemas.userSessions.relation,
         },
       });
       const data = await db.query.users.findMany({
