@@ -368,9 +368,15 @@ export interface SonicTableConfig {
     ) => void | Promise<void>;
   };
   fields?: {
-    [field: string]: {
-      type?: "auto" | "file" | "image";
-    };
+    [field: string]:
+      | {
+          type: "auto";
+        }
+      | {
+          type: "file";
+          bucket: (ctx: AppContext) => R2Bucket;
+          path?: string | ((ctx: AppContext) => string);
+        };
   };
 }
 
@@ -441,10 +447,14 @@ export const apiConfig: SonicTableConfig[] = [
     },
     fields: {
       image: {
-        type: "image",
+        type: "file",
+        bucket: (ctx) => ctx.env.R2_STORAGE,
+        path: "images",
       },
       file: {
         type: "file",
+        bucket: (ctx) => ctx.env.R2_STORAGE,
+        path: "files",
       },
     },
   },

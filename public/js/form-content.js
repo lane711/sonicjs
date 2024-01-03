@@ -33,6 +33,25 @@ let mode;
   }
 })();
 
+const initUppy = async (edit) => {
+  const { Uppy, Dashboard, Tus } = await import(
+    "https://releases.transloadit.com/uppy/v3.21.0/uppy.min.mjs"
+  );
+  const uppy = new Uppy();
+  uppy.use(Dashboard, {
+    target: "#files-drag-drop",
+    showProgressDetails: true,
+  });
+  uppy.use(Tus, {
+    endpoint: "http://localhost:8786/tus",
+    withCredentials: true,
+    headers: {
+      "sonic-mode": edit ? "update" : "create",
+      "sonic-route": route,
+    },
+  });
+  return uppy;
+};
 function newContent() {
   console.log("contentType", route);
 
@@ -44,14 +63,12 @@ function newContent() {
     console.log(response.config);
 
     const fileFields = response.data.filter((c) => c.metaType == "file");
-    const imageFields = response.data.filter((c) => c.metaType == "image");
     response.data = response.data.map((c) => {
-      if (c.metaType == "file" || c.metaType == "image") {
+      if (c.metaType == "file") {
         return {
           ...c,
           type: "button",
-          class: "my-2",
-          action: "button",
+          action: "event",
           theme: "secondary",
         };
       } else {
@@ -63,6 +80,20 @@ function newContent() {
     Formio.createForm(document.getElementById("formio"), {
       components: response.data,
     }).then(function (form) {
+      let uppy;
+      if (fileFields.length) {
+        const formio = document.getElementById("formio");
+        const childDiv = document.createElement("div");
+        childDiv.id = "files-drag-drop";
+        formio.parentNode.insertBefore(childDiv, formio);
+        initUppy()
+          .then((u) => {
+            uppy = u;
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      }
       form.on("submit", function (data) {
         saveNewContent(data);
       });
@@ -73,26 +104,18 @@ function newContent() {
           console.log("event ->", event);
         }
       });
-      if (fileFields.length || imageFields.length) {
-        const formio = document.getElementById("formio");
-        const childDiv = document.createElement("div");
-        childDiv.id = "files-drag-drop";
-        formio.parentNode.insertBefore(childDiv, formio);
-        formio.querySelectorAll(".btn-secondary").forEach((el) => {
-          el.classList.add("uppy-trigger");
-        });
-        (async () => {
-          const { Uppy, Dashboard, Tus } = await import(
-            "https://releases.transloadit.com/uppy/v3.21.0/uppy.min.mjs"
-          );
-          const uppy = new Uppy();
-          uppy.use(Dashboard, {
-            target: "#files-drag-drop",
-            trigger: ".uppy-trigger",
-          });
-          uppy.use(Tus, { endpoint: "http://localhost:8787/tus" });
-        })();
-      }
+      form.on("customEvent", function (event) {
+        if (uppy) {
+          console.log(uppy);
+          const field = event.component.key || event.component.label;
+          const tus = uppy.getPlugin("Tus");
+          tus.opts.headers["sonic-field"] = field;
+          const dashboard = uppy.getPlugin("Dashboard");
+          if (!dashboard.isModalOpen()) {
+            dashboard.openModal();
+          }
+        }
+      });
     });
   });
 }

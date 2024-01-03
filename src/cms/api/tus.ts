@@ -1,34 +1,103 @@
 import { Hono } from "hono";
 import { Bindings } from "../types/bindings";
-import { Variables } from "../../server";
+import { AppContext, Variables } from "../../server";
 import { TussleCloudflareWorker } from "@tussle/middleware-cloudflareworker";
 import { TussleStateMemory } from "@tussle/state-memory";
 import { R2UploadState, TussleStorageR2 } from "@tussle/storage-r2";
+import { SonicTableConfig, apiConfig } from "../../db/schema";
+import {
+  getOperationCreateResult,
+  getOperationUpdateResult,
+} from "../auth/auth-helpers";
+import { firstValueFrom } from "rxjs";
 export const tusAPI = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 const stateService = new TussleStateMemory<R2UploadState>();
 
-tusAPI.all("/", async (ctx) => {
+tusAPI.all("*", async (ctx) => {
   const request = ctx.req;
+  const pathname = "/tus/3e77ec4c-5e0a-4323-b795-c9ffa1a87a52";
+
+  const storage = new TussleStorageR2({
+    stateService,
+    appendUniqueSubdir(location) {
+      console.log({ location });
+      return location;
+    },
+    bucket: ctx.env.R2_STORAGE,
+    skipMerge: false,
+  });
+  try {
+    const fileInfo = await firstValueFrom(
+      storage.getFileInfo({ location: pathname })
+    );
+    const file = await storage.getFile(pathname);
+    console.log("file info", JSON.stringify(fileInfo, null, 2));
+    console.log(file);
+    console.log("bam", file.metadata);
+    const type = (file.metadata.type || file.metadata.filetype) as string;
+    ctx.header("Content-Type", type);
+    ctx.status(200);
+    return ctx.body(file.body);
+  } catch (error) {
+    console.log(error);
+  }
+  try {
+    const file = await storage.getFile(pathname);
+    console.log(file);
+    console.log(file.parts);
+    console.log(file.parts[0]);
+  } catch (error) {
+    console.log(error);
+  }
+  console.log("req", request.raw);
+
+  const route = request.header("sonic-route");
+  const fieldName = request.header("sonic-field");
+  const mode = request.header("sonic-mode") as "create" | "update";
+  const id = request.header("data-id");
+  const table = apiConfig.find((entry) => entry.route === route);
+
   if (request.method === "HEAD") {
     const cache = await caches.default.match(request.url);
     if (cache) {
       return cache;
     }
   }
-  const user = ctx.get("user");
-  console.log("user", user);
-  console.log("storage", ctx.env.R2_STORAGE);
-  const storage = new TussleStorageR2({
-    stateService,
-    bucket: ctx.env.R2_STORAGE,
-    skipMerge: false,
-  });
-  const tussle = getTussleMiddleware(storage);
-  const cfRequest = ctx.req.raw;
-  const context = ctx.executionCtx;
-  let res = await tussle.handleRequest(cfRequest, { context });
-  if (res) {
-    return res;
+  if (table) {
+    const field = table.fields?.[fieldName];
+    let bucket: R2Bucket;
+    let path: string;
+    if (field.type === "file") {
+      bucket = field.bucket(ctx);
+      if (typeof field.path === "string") {
+        path = field.path;
+      } else if (typeof field.path === "function") {
+        path = field.path(ctx);
+      } else {
+        path = "";
+      }
+    }
+    console.log({ path });
+    const storage = new TussleStorageR2({
+      stateService,
+      appendUniqueSubdir(location) {
+        console.log({ location });
+        if (path) {
+          return path + "/" + location;
+        } else {
+          return location;
+        }
+      },
+      bucket,
+      skipMerge: false,
+    });
+    const tussle = getTussleMiddleware(storage, table, ctx, mode, id);
+    const cfRequest = ctx.req.raw;
+    const context = ctx.executionCtx;
+    let res = await tussle.handleRequest(cfRequest, { context });
+    if (res) {
+      return res;
+    }
   }
   return ctx.text("Not Implemented", 501);
 });
@@ -44,7 +113,6 @@ async function cacheCompletedUploadResponse(
 ) {
   const url = new URL(request.url);
   url.pathname = location;
-  console.log("CACHED " + url.toString());
   await caches.default.put(
     url.toString(),
     new Response(null, {
@@ -59,12 +127,44 @@ async function cacheCompletedUploadResponse(
 }
 const getTussleMiddleware = (() => {
   let instance: TussleCloudflareWorker<UserParams>;
-  return (storage: TussleStorageR2) => {
+  return (
+    storage: TussleStorageR2,
+    table: SonicTableConfig,
+    honoCtx: AppContext,
+    mode: "create" | "update",
+    id: string
+  ) => {
     if (!instance) {
       instance = new TussleCloudflareWorker({
         hooks: {
           "before-create": async (_ctx, params) => {
-            console.log("before-create", JSON.stringify(params, null, 2));
+            if (table.hooks?.beforeOperation) {
+              await table.hooks.beforeOperation(honoCtx, mode, id, params);
+            }
+
+            console.log("params before", JSON.stringify(params, null, 2));
+            const authEnabled = honoCtx.get("authEnabled");
+
+            if (authEnabled) {
+              let authorized = true;
+              if (mode === "create") {
+                authorized = await getOperationCreateResult(
+                  table?.access?.operation?.create,
+                  honoCtx,
+                  params
+                );
+              } else {
+                authorized = await getOperationUpdateResult(
+                  table?.access?.operation?.update,
+                  honoCtx,
+                  id,
+                  params
+                );
+              }
+              if (!authorized) {
+                return honoCtx.text("Unauthorized", 401);
+              }
+            }
             let path: string;
             switch (params.uploadConcat?.action) {
               case "partial": // Creating a file to hold a segment of a parallel upload.
@@ -75,14 +175,23 @@ const getTussleMiddleware = (() => {
                 path = params.path + "/" + crypto.randomUUID();
                 break;
             }
-            console.log({ path });
             return {
               ...params,
               path,
             };
           },
           "after-complete": async (ctx, params) => {
+            if (table?.hooks?.afterOperation) {
+              await table.hooks.afterOperation(
+                honoCtx,
+                mode,
+                id,
+                params,
+                params
+              );
+            }
             const { location, offset } = params;
+            console.log("params after", JSON.stringify(params, null, 2));
             await cacheCompletedUploadResponse(
               ctx.originalRequest,
               location,
