@@ -1,5 +1,4 @@
 import { insertD1Data, updateD1Data } from "./d1-data";
-import usersTable from "../../db/schema/users";
 const env = getMiniflareBindings();
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
 import { sql } from "drizzle-orm";
@@ -270,7 +269,7 @@ function createTestTable() {
   const db = drizzle(__D1_BETA__D1DATA);
 
   db.run(sql`
-    CREATE TABLE ${usersTable} (
+    CREATE TABLE users (
       id text PRIMARY KEY NOT NULL,
       firstName text,
       lastName text,
