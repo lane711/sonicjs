@@ -1,20 +1,6 @@
-import { DrizzleD1Database, drizzle } from "drizzle-orm/d1";
-import { v4 as uuidv4 } from "uuid";
-import {
-  postsTable,
-  postSchema,
-  userSchema,
-  usersTable,
-  categorySchema,
-  commentSchema,
-  categoriesTable,
-  commentsTable,
-  categoriesToPostsTable,
-  categoriesToPostsSchema,
-} from "../../db/schema";
-import { DefaultLogger, LogWriter, and, eq } from "drizzle-orm";
-import { addToInMemoryCache, setCacheStatus } from "./cache";
-import { addToKvCache } from "./kv-data";
+import { drizzle } from "drizzle-orm/d1";
+import { and, eq } from "drizzle-orm";
+import { tableSchemas } from "../../db/routes";
 
 export async function getAllContent(db) {
   const { results } = await db.prepare("SELECT * FROM users").all();
@@ -66,12 +52,6 @@ export async function getD1ByTableAndId(db, table, id, params) {
   return results[0];
 }
 
-export async function insertUserTest(d1, data) {
-  const db = drizzle(d1);
-
-  return db.insert(usersTable).values(data).returning().get();
-}
-
 export function prepareD1Data(data, tbl = "") {
   const table = data.table || tbl;
   const schema = getRepoFromTable(table);
@@ -95,7 +75,6 @@ export async function insertD1Data(d1, kv, table, data) {
     let result = await db.insert(schema).values(data).returning().get();
     return result;
   } catch (error) {
-    console.error(error);
     return error;
   }
 }
@@ -162,44 +141,11 @@ export async function updateD1Data(
 }
 
 export function getSchemaFromTable(tableName) {
-  switch (tableName) {
-    case "users":
-      return userSchema;
-      break;
-    case "posts":
-      return postSchema;
-      break;
-    case "categories":
-      return categorySchema;
-      break;
-    case "comments":
-      return commentSchema;
-      break;
-    case "categoriesToPosts":
-      return categoriesToPostsSchema;
-      break;
-  }
+  return tableSchemas[tableName]?.definition;
 }
 
 export function getRepoFromTable(tableName) {
-  // console.log("getting schema", tableName);
-  switch (tableName) {
-    case "users":
-      return usersTable;
-      break;
-    case "posts":
-      return postsTable;
-      break;
-    case "categories":
-      return categoriesTable;
-      break;
-    case "comments":
-      return commentsTable;
-      break;
-    case "categoriesToPosts":
-      return categoriesToPostsTable;
-      break;
-  }
+  return tableSchemas[tableName]?.table;
 }
 
 export function whereClauseBuilder(filters: Record<string, any>) {

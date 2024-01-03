@@ -1,5 +1,6 @@
-import { SonicTableConfig, apiConfig } from "../../../db/schema";
+import { ApiConfig, apiConfig } from "../../../db/routes";
 import { getDataListByPrefix } from "../../data/kv-data";
+import { Bindings } from "../../types/bindings";
 import { Layout } from "../theme";
 
 export async function loadAdminTable(ctx) {
@@ -288,7 +289,7 @@ export const ContentEditForm = (props: {
   table: string;
   route: string;
   username?: string;
-  env: Record<string, string>;
+  env: Bindings;
 }) => {
   return (
     <Layout
@@ -305,7 +306,7 @@ export const ContentNewForm = (props: {
   table: string;
   route: string;
   username?: string;
-  env: Record<string, string>;
+  env: Bindings;
 }) => {
   return (
     <Layout
@@ -320,10 +321,10 @@ export const ContentNewForm = (props: {
 
 export const TopContentList = (props: {
   content: object[];
-  tableList: SonicTableConfig[];
+  tableList: ApiConfig[];
   screenTitle: string;
   username?: string;
-  env: Record<string, string>;
+  env: Bindings;
 }) => {
   return (
     <Layout
@@ -406,7 +407,7 @@ export const TopContentTable = (props: {
   table: string;
   route: string;
   username?: string;
-  env: Record<string, string>;
+  env: Bindings;
 }) => {
   return (
     <Layout env={props.env} username={props.username} screenTitle={props.table}>

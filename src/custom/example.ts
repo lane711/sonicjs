@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import qs from "qs";
 import { getRecords } from "../cms/data/data";
-import * as schema from "../db/schema";
+import * as schema from "../db/routes";
 import { drizzle } from "drizzle-orm/d1";
 import { sql } from "drizzle-orm";
 import axios from "axios";
@@ -99,11 +99,9 @@ async function getPagedBlogPostNext(ctx, url, params) {
 }
 
 async function getPagedBlogPost(ctx, url, params) {
-
   const func = async function () {
-    const { results } = await ctx.env.D1DATA
-      .prepare(
-        `
+    const { results } = await ctx.env.D1DATA.prepare(
+      `
     SELECT
     posts.id,
     posts.title,
@@ -127,7 +125,7 @@ async function getPagedBlogPost(ctx, url, params) {
     limit ?
     offset ?
     `
-      )
+    )
       .bind(params.limit, params.offset)
       .all();
 
@@ -195,9 +193,8 @@ example.get("/blog-posts/:id", async (ctx) => {
   const func = async function () {
     // const db = drizzle(d1, { schema });
 
-    const data = await ctx.env.D1DATA
-      .prepare(
-        `
+    const data = await ctx.env.D1DATA.prepare(
+      `
     SELECT
     posts.id,
     posts.title,
@@ -217,8 +214,7 @@ example.get("/blog-posts/:id", async (ctx) => {
     on categoriesToPosts.categoryId = categories.id
     where posts.id = '${id}'
     `
-      )
-      .all();
+    ).all();
 
     const post = data.results[0];
 
