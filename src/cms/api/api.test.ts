@@ -1,5 +1,5 @@
 import app from "../../server";
-import { usersTable } from "../../db/schema";
+import usersTable from "../../db/schema/users";
 import { drizzle } from "drizzle-orm/d1";
 import { sql } from "drizzle-orm";
 import { insertD1Data } from "../data/d1-data";
@@ -48,7 +48,7 @@ describe("auto endpoints", () => {
 
     let req = new Request("http://localhost/v1/users", {
       method: "GET",
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
     let res = await app.fetch(req, env);
     expect(res.status).toBe(200);
@@ -152,13 +152,8 @@ describe("auto endpoints", () => {
     expect(res.status).toBe(204);
 
     //make sure db was updated
-    const ctx = {env: {KVDATA : env.KVDATA, D1DATA: env.__D1_BETA__D1DATA }}
-    const d1Result = await getRecords(
-      ctx,
-      "users",
-      undefined,
-      "urlKey"
-    );
+    const ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
+    const d1Result = await getRecords(ctx, "users", undefined, "urlKey");
 
     expect(d1Result.data.length).toBe(0);
   });

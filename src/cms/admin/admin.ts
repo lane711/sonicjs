@@ -17,7 +17,7 @@ import {
 
 import { loadApis } from "./pages/api";
 import { getRecords } from "../data/data";
-import { apiConfig } from "../../db/schema";
+import { apiConfig } from "../../db/routes";
 import qs from "qs";
 import { format, compareAsc } from "date-fns";
 import { getAllFromInMemoryCache, getFromInMemoryCache } from "../data/cache";

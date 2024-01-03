@@ -5,8 +5,10 @@ import {
   insertD1Data,
   updateD1Data,
   whereClauseBuilder,
+  getRepoFromTable,
+  getSchemaFromTable,
 } from "./d1-data";
-import { usersTable } from "../../db/schema";
+import { tableSchemas } from "../../db/routes";
 import qs from "qs";
 const env = getMiniflareBindings();
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
@@ -36,12 +38,26 @@ it("should not return a where clause", () => {
 //   expect(clause).toBe("");
 // });
 
+it("should get table schema from table name", async () => {
+  const tableToFind = "users";
+  const userTable = getSchemaFromTable(tableToFind);
+  expect(userTable).toEqual(tableSchemas.users.definition);
+});
+
+it("should get table object from table name", async () => {
+  const tableToFind = "users";
+  const findableTable = await getRepoFromTable(tableToFind);
+  expect(findableTable).toEqual(tableSchemas.users.table);
+});
+
 it("should return a SQL select with limit", () => {
   const queryParams = "limit=2";
   const params = qs.parse(queryParams);
   console.log("params ---->", params);
   const clause = generateSelectSql("my-table", params);
-  expect(clause).toBe("SELECT *, COUNT() OVER() AS total FROM my-table limit 2;");
+  expect(clause).toBe(
+    "SELECT *, COUNT() OVER() AS total FROM my-table limit 2;"
+  );
 });
 
 it("should return a SQL select with offset", () => {
@@ -49,7 +65,9 @@ it("should return a SQL select with offset", () => {
   const params = qs.parse(queryParams);
   console.log("params ---->", params);
   const clause = generateSelectSql("my-table", params);
-  expect(clause).toBe("SELECT *, COUNT() OVER() AS total FROM my-table offset 2;");
+  expect(clause).toBe(
+    "SELECT *, COUNT() OVER() AS total FROM my-table offset 2;"
+  );
 });
 
 it("should return a SQL select with limit and offset", () => {
@@ -57,7 +75,9 @@ it("should return a SQL select with limit and offset", () => {
   const params = qs.parse(queryParams);
   console.log("params ---->", params);
   const clause = generateSelectSql("my-table", params);
-  expect(clause).toBe("SELECT *, COUNT() OVER() AS total FROM my-table limit 2 offset 2;");
+  expect(clause).toBe(
+    "SELECT *, COUNT() OVER() AS total FROM my-table limit 2 offset 2;"
+  );
 });
 
 //TODO: rework to hit the full api
@@ -111,6 +131,8 @@ it("updateD1Data should update record", async () => {
 
 function createTestTable() {
   const db = drizzle(__D1_BETA__D1DATA);
+
+  const usersTable = tableSchemas.users.table;
 
   db.run(sql`
     CREATE TABLE ${usersTable} (

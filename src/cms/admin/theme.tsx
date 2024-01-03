@@ -1,4 +1,4 @@
-import { ApiConfig, apiConfig } from "../../db/schema";
+import { ApiConfig, apiConfig } from "../../db/routes";
 import {
   getById,
   getContentType,

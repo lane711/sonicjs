@@ -1,5 +1,5 @@
 import { insertD1Data, updateD1Data } from "./d1-data";
-import { usersTable } from "../../db/schema";
+import usersTable from "../../db/schema/users";
 const env = getMiniflareBindings();
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
 import { sql } from "drizzle-orm";
@@ -20,25 +20,21 @@ describe("cache expiration", () => {
   //   const cacheStatus = await isCacheValid();
   //   expect(cacheStatus).toBeFalsy();
   // });
-
   // it("cache status should return true", async () => {
   //   const result = await setCacheStatus(1000);
   //   const cacheStatus = await isCacheValid();
   //   expect(cacheStatus).toBeTruthy();
   // });
-
   // it("cache status should return false if expired", async () => {
   //   const result = await setCacheStatus(-1000);
   //   const cacheStatus = await isCacheValid();
   //   expect(cacheStatus).toBeFalsy();
   // });
-
   // it("cache status should return false if explicity set to invalid", async () => {
   //   const result = await setCacheStatusInvalid();
   //   const cacheStatus = await isCacheValid();
   //   expect(cacheStatus).toBeFalsy();
   // });
-
   // it("cache status should return false if explicity set to invalid after previously being valid", async () => {
   //   const result = await setCacheStatus(1000);
   //   const cacheStatus = await isCacheValid();
@@ -119,7 +115,6 @@ describe("insert", () => {
 
     expect(resultAfterInsert.data.length).toBe(3);
     expect(resultAfterInsert.source).toBe("d1");
-
 
     //new record should now be in the cache since this is the second time we're requesting it
     const resultAfterGet = await getRecords(ctx, "users", undefined, urlKey);

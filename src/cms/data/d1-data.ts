@@ -1,20 +1,10 @@
+import { definition } from "./../../db/schema/users";
 import { DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { v4 as uuidv4 } from "uuid";
-import {
-  postsTable,
-  postSchema,
-  userSchema,
-  usersTable,
-  categorySchema,
-  commentSchema,
-  categoriesTable,
-  commentsTable,
-  categoriesToPostsTable,
-  categoriesToPostsSchema,
-} from "../../db/schema";
 import { DefaultLogger, LogWriter, eq } from "drizzle-orm";
 import { addToInMemoryCache, setCacheStatus } from "./cache";
 import { addToKvCache } from "./kv-data";
+import { tableSchemas } from "../../db/routes";
 
 export async function getAllContent(db) {
   const { results } = await db.prepare("SELECT * FROM users").all();
@@ -89,7 +79,6 @@ export async function insertD1Data(d1, kv, table, data) {
     let result = await db.insert(schmea).values(data).returning().get();
     return result;
   } catch (error) {
-    console.error(error);
     return error;
   }
 }
@@ -145,44 +134,11 @@ export async function updateD1Data(d1, table, data) {
 }
 
 export function getSchemaFromTable(tableName) {
-  switch (tableName) {
-    case "users":
-      return userSchema;
-      break;
-    case "posts":
-      return postSchema;
-      break;
-    case "categories":
-      return categorySchema;
-      break;
-    case "comments":
-      return commentSchema;
-      break;
-    case "categoriesToPosts":
-      return categoriesToPostsSchema;
-      break;
-  }
+  return tableSchemas[tableName]?.definition;
 }
 
 export function getRepoFromTable(tableName) {
-  // console.log("getting schema", tableName);
-  switch (tableName) {
-    case "users":
-      return usersTable;
-      break;
-    case "posts":
-      return postsTable;
-      break;
-    case "categories":
-      return categoriesTable;
-      break;
-    case "comments":
-      return commentsTable;
-      break;
-    case "categoriesToPosts":
-      return categoriesToPostsTable;
-      break;
-  }
+  return tableSchemas[tableName]?.table;
 }
 
 export function whereClauseBuilder(params) {
