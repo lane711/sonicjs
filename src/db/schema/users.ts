@@ -3,7 +3,8 @@ import { relations } from "drizzle-orm";
 import { auditSchema } from "./audit";
 import * as posts from "./posts";
 import * as comments from "./comments";
-
+import * as userKeys from "./userKeys";
+import * as userSessions from "./userSessions";
 import { ApiConfig } from "../routes";
 import { isAdmin, isAdminOrEditor, isAdminOrUser } from "../config-helpers";
 export const tableName = "users";
@@ -27,6 +28,8 @@ export const table = sqliteTable(tableName, {
 export const relation = relations(table, ({ many }) => ({
   posts: many(posts.table),
   comments: many(comments.table),
+  keys: many(userKeys.table),
+  sessions: many(userSessions.table),
 }));
 
 export const access: ApiConfig["access"] = {

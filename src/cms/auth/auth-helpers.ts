@@ -1,17 +1,23 @@
-import * as schema from "../../db/schema";
+import { tableSchemas } from "../../db/routes";
 import { getRecords } from "../data/data";
-import { User } from "lucia";
 import { drizzle } from "drizzle-orm/d1";
 import { isNotNull } from "drizzle-orm";
 import { AppContext } from "../../server";
-import { SonicJSFilter, ApiConfig } from "../../db/schema";
+import type { SonicJSFilter, ApiConfig } from "../../db/routes";
 
 export const isAuthEnabled = async (ctx: AppContext) => {
   let authIsEnabled = ctx.env?.useAuth === "true" || ctx.env?.useAuth === true;
   if (authIsEnabled) {
     const fn = async function () {
-      const db = drizzle(ctx.env.D1DATA, { schema });
-      const data = await db.query.usersTable.findMany({
+      const db = drizzle(ctx.env.D1DATA, {
+        schema: {
+          users: tableSchemas.users.table,
+          usersRelations: tableSchemas.users.relation,
+          userKeys: tableSchemas.userKeys.table,
+          userSessions: tableSchemas.userSessions.table,
+        },
+      });
+      const data = await db.query.users.findMany({
         with: {
           keys: {
             where(fields) {
