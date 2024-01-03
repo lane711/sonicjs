@@ -4,6 +4,8 @@ import { auditSchema } from "./audit";
 import * as users from "./users";
 import * as categoriesToPosts from "./categoriesToPosts";
 import * as comments from "./comments";
+import { ApiConfig } from "../routes";
+import { isAdmin, isAdminOrEditor } from "../config-helpers";
 
 export const tableName = "posts";
 
@@ -37,3 +39,64 @@ export const relation = relations(table, ({ one, many }) => ({
   categories: many(categoriesToPosts.table),
   comments: many(comments.table),
 }));
+
+export const access: ApiConfig["access"] = {
+  operation: {
+    read: true,
+    create: isAdminOrEditor,
+  },
+  filter: {
+    // if a user tries to update a post and isn't the user that created the post the update won't happen
+    update: (ctx) => {
+      if (isAdmin(ctx)) {
+        return true;
+      } else {
+        const user = ctx.get("user");
+        if (user?.userId) {
+          // Return filter so update doesn't happen if userId doesn't match
+          return {
+            userId: user.userId,
+          };
+        } else {
+          return false;
+        }
+      }
+    },
+    delete: (ctx) => {
+      if (isAdmin(ctx)) {
+        return true;
+      } else {
+        const user = ctx.get("user");
+        if (user?.userId) {
+          // Return filter so update doesn't happen if userId doesn't match
+          return {
+            userId: user.userId,
+          };
+        } else {
+          return false;
+        }
+      }
+    },
+  },
+  fields: {
+    userId: {
+      update: false,
+    },
+  },
+};
+export const hooks: ApiConfig["hooks"] = {
+  resolveInput: {
+    create: (ctx, data) => {
+      if (ctx.get("user")?.userId) {
+        data.userId = ctx.get("user").userId;
+      }
+      return data;
+    },
+    update: (ctx, id, data) => {
+      if (ctx.get("user")?.userId) {
+        data.userId = ctx.get("user").userId;
+      }
+      return data;
+    },
+  },
+};

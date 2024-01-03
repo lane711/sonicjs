@@ -127,7 +127,7 @@ If you change your auth options old users will still be able to login but the en
 
 # Hooks
 
-The `hooks` property on the `SonicTableConfig` type allows configuring functions that run at certain points in the request lifecycle. Here are the available hooks:
+The `hooks` property on the `ApiConfig` type allows configuring functions that run at certain points in the request lifecycle. Here are the available hooks:
 
 ## resolveInput
 

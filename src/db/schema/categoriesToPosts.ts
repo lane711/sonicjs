@@ -3,6 +3,8 @@ import { relations } from "drizzle-orm";
 import { auditSchema } from "./audit";
 import * as categories from "./categories";
 import * as posts from "./posts";
+import { ApiConfig } from "../routes";
+import { isAdminOrEditor } from "../config-helpers";
 
 export const tableName = "categoriesToPosts";
 
@@ -33,3 +35,12 @@ export const relation = relations(table, ({ one }) => ({
     references: [posts.table.id],
   }),
 }));
+
+export const access: ApiConfig["access"] = {
+  operation: {
+    read: true,
+    create: true,
+    update: isAdminOrEditor,
+    delete: isAdminOrEditor,
+  },
+};

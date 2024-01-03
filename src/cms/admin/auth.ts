@@ -13,7 +13,7 @@ import qs from "qs";
 import { AppContext, Variables } from "../../server";
 import { getRecords } from "../data/data";
 import { getForm } from "../api/forms";
-import { SonicTableConfig, config } from "../../db/schema";
+import { ApiConfig, config } from "../../db/schema";
 import {
   filterCreateFieldAccess,
   filterReadFieldAccess,

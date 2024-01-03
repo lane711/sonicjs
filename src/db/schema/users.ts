@@ -4,6 +4,8 @@ import { auditSchema } from "./audit";
 import * as posts from "./posts";
 import * as comments from "./comments";
 
+import { ApiConfig } from "../routes";
+import { isAdmin, isAdminOrEditor, isAdminOrUser } from "../config-helpers";
 export const tableName = "users";
 
 export const route = "users";
@@ -26,3 +28,35 @@ export const relation = relations(table, ({ many }) => ({
   posts: many(posts.table),
   comments: many(comments.table),
 }));
+
+export const access: ApiConfig["access"] = {
+  operation: {
+    create: isAdmin,
+    delete: isAdmin,
+  },
+  item: {
+    // if a user tries to update a user and isn't the user that created the user the update will return unauthorized response
+    update: isAdminOrUser,
+  },
+  fields: {
+    id: {
+      read: (ctx, value, doc) => {
+        return isAdminOrEditor(ctx) || isAdminOrUser(ctx, doc.id);
+      },
+    },
+    email: {
+      read: (ctx, value, doc) => {
+        return isAdminOrUser(ctx, doc.id);
+      },
+    },
+    password: {
+      update: isAdminOrUser,
+    },
+    role: {
+      read: (ctx, value, doc) => {
+        return isAdminOrUser(ctx, doc.id);
+      },
+      update: isAdmin,
+    },
+  },
+};
