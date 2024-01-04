@@ -1,7 +1,8 @@
-import { apiConfig } from "../../db/schema";
+import { apiConfig } from "../../db/routes";
+import { AppContext, Variables } from "../../server";
 import { getSchemaFromTable } from "../data/d1-data";
 
-export function getForm(ctx, table) {
+export function getForm(ctx: AppContext, table) {
   let formFields = [];
 
   //TODO: amke dynamic
@@ -17,6 +18,20 @@ export function getForm(ctx, table) {
       delete formField.metaType;
     }
     formFields.push(formField);
+  }
+
+  const user = ctx.get("user");
+  if (user && user.userId) {
+    const hasUserId = formFields.find((f) => f.key === "userId");
+    if (hasUserId) {
+      formFields = formFields.map((f) => {
+        if (f.key === "userId") {
+          f.disabled = true;
+          f.defaultValue = user.userId;
+        }
+        return f;
+      });
+    }
   }
 
   //table reference

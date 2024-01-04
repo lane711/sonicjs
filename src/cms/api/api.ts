@@ -220,14 +220,17 @@ apiConfig.forEach((entry) => {
           content.data
         );
       }
+      console.log("posting new record content", content.data);
       if (entry?.hooks?.resolveInput?.create) {
         content.data = await entry.hooks.resolveInput.create(ctx, content.data);
       }
+      console.log("posting new record content filtered?", content.data);
       const result = await insertRecord(
         ctx.env.D1DATA,
         ctx.env.KVDATA,
         content
       );
+      console.log("create result", result);
 
       if (entry?.hooks?.afterOperation) {
         await entry.hooks.afterOperation(
@@ -488,7 +491,7 @@ api.get("/form-components/auth/users", async (ctx) => {
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
-  const ct = await getForm(ctx.env.D1DATA, "users");
+  const ct = await getForm(ctx, "users");
   return ctx.json(ct);
 });
 
@@ -504,20 +507,7 @@ api.get("/form-components/:route", async (ctx) => {
 
   const table = apiConfig.find((entry) => entry.route === route).table;
 
-  let ct = await getForm(ctx.env.D1DATA, table);
-  const user = ctx.get("user");
-  if (user && user.userId) {
-    const hasUserId = ct.find((f) => f.key === "userId");
-    if (hasUserId) {
-      ct = ct.map((f) => {
-        if (f.key === "userId") {
-          f.disabled = true;
-          f.defaultValue = user.userId;
-        }
-        return f;
-      });
-    }
-  }
+  let ct = await getForm(ctx, table);
   return ctx.json(ct);
 });
 

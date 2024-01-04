@@ -33,7 +33,9 @@ let mode;
   }
 })();
 
-const initUppy = async (edit) => {
+let currUppyField = "";
+
+const initUppy = async (id) => {
   const { Uppy, Dashboard, Tus } = await import(
     "https://releases.transloadit.com/uppy/v3.21.0/uppy.min.mjs"
   );
@@ -41,16 +43,62 @@ const initUppy = async (edit) => {
   uppy.use(Dashboard, {
     target: "#files-drag-drop",
     showProgressDetails: true,
+    closeModalOnClickOutside: true,
   });
   uppy.use(Tus, {
     endpoint: "http://localhost:8786/tus",
     withCredentials: true,
     headers: {
-      "sonic-mode": edit ? "update" : "create",
+      "sonic-mode": id ? "update" : "create",
       "sonic-route": route,
+      "data-id": id,
     },
   });
   return uppy;
+};
+
+const handleCustomEventForUppy = (uppy, event) => {
+  if (uppy) {
+    const field = event.component.key.replaceAll("_btn", "");
+    currUppyField = field;
+    const tus = uppy.getPlugin("Tus");
+    tus.opts.headers["sonic-field"] = field;
+    const dashboard = uppy.getPlugin("Dashboard");
+    if (!dashboard.isModalOpen()) {
+      dashboard.openModal();
+    }
+  }
+};
+
+const addFileButtons = (data) => {
+  return data.reduce((acc, c) => {
+    if (c.metaType == "file") {
+      acc.push({
+        ...c,
+        disabled: true,
+      });
+      acc.push({
+        ...c,
+        key: c.key + "_btn",
+        label: "Choose File",
+        type: "button",
+        action: "event",
+        theme: "secondary",
+      });
+    } else {
+      acc.push(c);
+    }
+    return acc;
+  }, []);
+};
+const onUploadSuccess = (form) => (file, response) => {
+  console.log(file, response);
+  const component = form.getComponent(currUppyField);
+  console.log("component", component);
+  if (component && response?.uploadURL) {
+    const url = new URL(response?.uploadURL).pathname;
+    component.setValue(url);
+  }
 };
 function newContent() {
   console.log("contentType", route);
@@ -63,18 +111,8 @@ function newContent() {
     console.log(response.config);
 
     const fileFields = response.data.filter((c) => c.metaType == "file");
-    response.data = response.data.map((c) => {
-      if (c.metaType == "file") {
-        return {
-          ...c,
-          type: "button",
-          action: "event",
-          theme: "secondary",
-        };
-      } else {
-        return c;
-      }
-    });
+
+    response.data = addFileButtons(response.data);
     Formio.icons = "fontawesome";
     // Formio.createForm(document.getElementById("formio"), {
     Formio.createForm(document.getElementById("formio"), {
@@ -89,12 +127,19 @@ function newContent() {
         initUppy()
           .then((u) => {
             uppy = u;
+            uppy.on("upload-success", onUploadSuccess(form));
           })
           .catch((e) => {
             console.log(e);
           });
       }
       form.on("submit", function (data) {
+        Object.keys(data.data).forEach((key) => {
+          if (key.endsWith("_btn")) {
+            delete data.data[key];
+          }
+        });
+        console.log(JSON.stringify(data, null, 2));
         saveNewContent(data);
       });
       form.on("change", async function (event) {
@@ -105,16 +150,7 @@ function newContent() {
         }
       });
       form.on("customEvent", function (event) {
-        if (uppy) {
-          console.log(uppy);
-          const field = event.component.key || event.component.label;
-          const tus = uppy.getPlugin("Tus");
-          tus.opts.headers["sonic-field"] = field;
-          const dashboard = uppy.getPlugin("Dashboard");
-          if (!dashboard.isModalOpen()) {
-            dashboard.openModal();
-          }
-        }
+        handleCustomEventForUppy(uppy, event);
       });
     });
   });
@@ -123,7 +159,6 @@ function newContent() {
 function saveNewContent(data) {
   delete data.data.submit;
   delete data.data.id;
-  console.log(data);
 
   axios.post(`/v1/${route}`, data).then((response) => {
     console.log(response.data);
@@ -139,19 +174,36 @@ function saveNewContent(data) {
 function editContent() {
   const contentId = $("#formio").attr("data-id");
   route = $("#formio").attr("data-route");
-  console.log("contentType", contentId);
   const routeWithoutAuth = route.replaceAll("/auth/", "/");
+
   axios
     .get(`/v1/${routeWithoutAuth}/${contentId}?includeContentType`)
     .then((response) => {
-      console.log(response.data);
-
+      const fileFields = response.data.contentType.filter(
+        (c) => c.metaType == "file"
+      );
+      response.data.contentType = addFileButtons(response.data.contentType);
+      let uppy;
       Formio.icons = "fontawesome";
       // debugger;
       // Formio.createForm(document.getElementById("formio"), {
       Formio.createForm(document.getElementById("formio"), {
         components: response.data.contentType,
       }).then(function (form) {
+        if (fileFields.length) {
+          const formio = document.getElementById("formio");
+          const childDiv = document.createElement("div");
+          childDiv.id = "files-drag-drop";
+          formio.parentNode.insertBefore(childDiv, formio);
+          initUppy(response?.data?.data?.id)
+            .then((u) => {
+              uppy = u;
+              uppy.on("upload-success", onUploadSuccess(form));
+            })
+            .catch((e) => {
+              console.log(e);
+            });
+        }
         form.on("submit", function ({ data }) {
           if (data.id) {
             updateContent(data);
@@ -168,6 +220,10 @@ function editContent() {
             contentTypeComponents = event.components;
             console.log("event ->", event);
           }
+        });
+
+        form.on("customEvent", function (event) {
+          handleCustomEventForUppy(uppy, event);
         });
       });
     });

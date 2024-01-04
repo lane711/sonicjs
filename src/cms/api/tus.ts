@@ -6,6 +6,7 @@ import { TussleStateMemory } from "@tussle/state-memory";
 import { R2UploadState, TussleStorageR2 } from "@tussle/storage-r2";
 import { ApiConfig, apiConfig } from "../../db/routes";
 import {
+  getApiAccessControlResult,
   getOperationCreateResult,
   getOperationUpdateResult,
 } from "../auth/auth-helpers";
@@ -76,26 +77,28 @@ tusAPI.all("*", async (ctx) => {
       } else {
         path = "";
       }
+      if (path && path.endsWith("/")) {
+        path = path.slice(0, -1);
+      }
+      if (path && !path.startsWith("/")) {
+        path = "/" + path;
+      }
+      path += "/" + route + path;
     }
-    console.log({ path });
     const storage = new TussleStorageR2({
       stateService,
-      appendUniqueSubdir(location) {
-        console.log({ location });
-        if (path) {
-          return path + "/" + location;
-        } else {
-          return location;
-        }
-      },
       bucket,
       skipMerge: false,
     });
-    const tussle = getTussleMiddleware(storage, table, ctx, mode, id);
+    const tussle = getTussleMiddleware(storage, table, ctx, mode, id, path);
     const cfRequest = ctx.req.raw;
     const context = ctx.executionCtx;
     let res = await tussle.handleRequest(cfRequest, { context });
     if (res) {
+      console.log("res", res);
+      for (let [key, value] of res.headers.entries()) {
+        console.log(`${key}: ${value}`);
+      }
       return res;
     }
   }
@@ -132,7 +135,8 @@ const getTussleMiddleware = (() => {
     table: ApiConfig,
     honoCtx: AppContext,
     mode: "create" | "update",
-    id: string
+    id: string,
+    pathConfig: string
   ) => {
     if (!instance) {
       instance = new TussleCloudflareWorker({
@@ -141,6 +145,10 @@ const getTussleMiddleware = (() => {
             if (table.hooks?.beforeOperation) {
               await table.hooks.beforeOperation(honoCtx, mode, id, params);
             }
+            const filename =
+              params.uploadMetadata.filename || params.uploadMetadata.name;
+
+            const fileExtension = "." + filename.split(".").pop();
 
             console.log("params before", JSON.stringify(params, null, 2));
             const authEnabled = honoCtx.get("authEnabled");
@@ -154,25 +162,39 @@ const getTussleMiddleware = (() => {
                   params
                 );
               } else {
-                authorized = await getOperationUpdateResult(
-                  table?.access?.operation?.update,
+                authorized = !!(await getApiAccessControlResult(
+                  table?.access?.operation?.update || true,
+                  table?.access?.filter?.update || true,
+                  table?.access?.item?.update || true,
                   honoCtx,
                   id,
+                  table.table,
                   params
-                );
+                ));
               }
               if (!authorized) {
                 return honoCtx.text("Unauthorized", 401);
               }
             }
+
             let path: string;
             switch (params.uploadConcat?.action) {
               case "partial": // Creating a file to hold a segment of a parallel upload.
-                path = params.path + "/segments/" + crypto.randomUUID();
+                path =
+                  params.path +
+                  pathConfig +
+                  "/segments/" +
+                  crypto.randomUUID() +
+                  fileExtension;
                 break;
               case "final": // Finishing a parallel upload (combines multiple 'partials' from above)
               default:
-                path = params.path + "/" + crypto.randomUUID();
+                path =
+                  params.path +
+                  pathConfig +
+                  "/" +
+                  crypto.randomUUID() +
+                  fileExtension;
                 break;
             }
             return {
