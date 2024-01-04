@@ -4,7 +4,7 @@ import { AppContext, Variables } from "../../server";
 import { TussleCloudflareWorker } from "@tussle/middleware-cloudflareworker";
 import { TussleStateMemory } from "@tussle/state-memory";
 import { R2UploadState, TussleStorageR2 } from "@tussle/storage-r2";
-import { SonicTableConfig, apiConfig } from "../../db/schema";
+import { ApiConfig, apiConfig } from "../../db/routes";
 import {
   getOperationCreateResult,
   getOperationUpdateResult,
@@ -15,41 +15,41 @@ const stateService = new TussleStateMemory<R2UploadState>();
 
 tusAPI.all("*", async (ctx) => {
   const request = ctx.req;
-  const pathname = "/tus/3e77ec4c-5e0a-4323-b795-c9ffa1a87a52";
+  // const pathname = "/tus/3e77ec4c-5e0a-4323-b795-c9ffa1a87a52";
 
-  const storage = new TussleStorageR2({
-    stateService,
-    appendUniqueSubdir(location) {
-      console.log({ location });
-      return location;
-    },
-    bucket: ctx.env.R2_STORAGE,
-    skipMerge: false,
-  });
-  try {
-    const fileInfo = await firstValueFrom(
-      storage.getFileInfo({ location: pathname })
-    );
-    const file = await storage.getFile(pathname);
-    console.log("file info", JSON.stringify(fileInfo, null, 2));
-    console.log(file);
-    console.log("bam", file.metadata);
-    const type = (file.metadata.type || file.metadata.filetype) as string;
-    ctx.header("Content-Type", type);
-    ctx.status(200);
-    return ctx.body(file.body);
-  } catch (error) {
-    console.log(error);
-  }
-  try {
-    const file = await storage.getFile(pathname);
-    console.log(file);
-    console.log(file.parts);
-    console.log(file.parts[0]);
-  } catch (error) {
-    console.log(error);
-  }
-  console.log("req", request.raw);
+  // const storage = new TussleStorageR2({
+  //   stateService,
+  //   appendUniqueSubdir(location) {
+  //     console.log({ location });
+  //     return location;
+  //   },
+  //   bucket: ctx.env.R2_STORAGE,
+  //   skipMerge: false,
+  // });
+  // try {
+  //   const fileInfo = await firstValueFrom(
+  //     storage.getFileInfo({ location: pathname })
+  //   );
+  //   const file = await storage.getFile(pathname);
+  //   console.log("file info", JSON.stringify(fileInfo, null, 2));
+  //   console.log(file);
+  //   console.log("bam", file.metadata);
+  //   const type = (file.metadata.type || file.metadata.filetype) as string;
+  //   ctx.header("Content-Type", type);
+  //   ctx.status(200);
+  //   return ctx.body(file.body);
+  // } catch (error) {
+  //   console.log(error);
+  // }
+  // try {
+  //   const file = await storage.getFile(pathname);
+  //   console.log(file);
+  //   console.log(file.parts);
+  //   console.log(file.parts[0]);
+  // } catch (error) {
+  //   console.log(error);
+  // }
+  // console.log("req", request.raw);
 
   const route = request.header("sonic-route");
   const fieldName = request.header("sonic-field");
@@ -129,7 +129,7 @@ const getTussleMiddleware = (() => {
   let instance: TussleCloudflareWorker<UserParams>;
   return (
     storage: TussleStorageR2,
-    table: SonicTableConfig,
+    table: ApiConfig,
     honoCtx: AppContext,
     mode: "create" | "update",
     id: string
