@@ -11,7 +11,8 @@ import {
   addToKvCache,
 } from "../data/kv-data";
 import { Bindings } from "../types/bindings";
-import { apiConfig, config } from "../../db/schema";
+import { apiConfig, config } from "../../db/routes";
+import { getD1DataByTable, getD1ByTableAndId } from "../data/d1-data";
 import { getForm } from "./forms";
 import qs from "qs";
 import {

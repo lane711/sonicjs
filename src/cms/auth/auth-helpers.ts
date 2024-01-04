@@ -1,17 +1,25 @@
-import * as schema from "../../db/schema";
+import { tableSchemas } from "../../db/routes";
 import { getRecords } from "../data/data";
-import { User } from "lucia";
 import { drizzle } from "drizzle-orm/d1";
 import { isNotNull } from "drizzle-orm";
 import { AppContext } from "../../server";
-import { SonicJSFilter, SonicTableConfig } from "../../db/schema";
+import type { SonicJSFilter, ApiConfig } from "../../db/routes";
 
 export const isAuthEnabled = async (ctx: AppContext) => {
   let authIsEnabled = ctx.env?.useAuth === "true" || ctx.env?.useAuth === true;
   if (authIsEnabled) {
     const fn = async function () {
-      const db = drizzle(ctx.env.D1DATA, { schema });
-      const data = await db.query.usersTable.findMany({
+      const db = drizzle(ctx.env.D1DATA, {
+        schema: {
+          users: tableSchemas.users.table,
+          usersRelations: tableSchemas.users.relation,
+          userKeys: tableSchemas.userKeys.table,
+          userKeysRelations: tableSchemas.userKeys.relation,
+          userSessions: tableSchemas.userSessions.table,
+          userSessionsRelations: tableSchemas.userSessions.relation,
+        },
+      });
+      const data = await db.query.users.findMany({
         with: {
           keys: {
             where(fields) {
@@ -100,14 +108,14 @@ async function getAccessControlResult(
 }
 
 export async function getOperationCreateResult(
-  create: SonicTableConfig["access"]["operation"]["create"],
+  create: ApiConfig["access"]["operation"]["create"],
   ctx: AppContext,
   data: any
 ) {
   return !!(await getAccessControlResult(create, ctx, data));
 }
 export async function getOperationReadResult(
-  read: SonicTableConfig["access"]["operation"]["read"],
+  read: ApiConfig["access"]["operation"]["read"],
   ctx: AppContext,
   id: string
 ) {
@@ -115,7 +123,7 @@ export async function getOperationReadResult(
 }
 
 export async function getOperationUpdateResult(
-  update: SonicTableConfig["access"]["operation"]["update"],
+  update: ApiConfig["access"]["operation"]["update"],
   ctx: AppContext,
   id: string,
   data: any
@@ -124,7 +132,7 @@ export async function getOperationUpdateResult(
 }
 
 export async function getOperationDeleteResult(
-  del: SonicTableConfig["access"]["operation"]["delete"],
+  del: ApiConfig["access"]["operation"]["delete"],
   ctx: AppContext,
   id: string
 ) {
@@ -132,7 +140,7 @@ export async function getOperationDeleteResult(
 }
 
 export async function getFilterReadResult(
-  read: SonicTableConfig["access"]["filter"]["read"],
+  read: ApiConfig["access"]["filter"]["read"],
   ctx: AppContext,
   id: string
 ) {
@@ -140,7 +148,7 @@ export async function getFilterReadResult(
 }
 
 export async function getFilterUpdateResult(
-  update: SonicTableConfig["access"]["filter"]["update"],
+  update: ApiConfig["access"]["filter"]["update"],
   ctx: AppContext,
   id: string,
   data: any
@@ -149,7 +157,7 @@ export async function getFilterUpdateResult(
 }
 
 export async function getFilterDeleteResult(
-  del: SonicTableConfig["access"]["filter"]["delete"],
+  del: ApiConfig["access"]["filter"]["delete"],
   ctx: AppContext,
   id: string
 ) {
@@ -196,7 +204,7 @@ export async function getItemAccessControlResult(
 }
 
 export async function getItemReadResult(
-  read: SonicTableConfig["access"]["item"]["read"],
+  read: ApiConfig["access"]["item"]["read"],
   ctx: AppContext,
   docs: any
 ) {
@@ -215,7 +223,7 @@ export async function getItemReadResult(
 }
 
 export async function getItemUpdateResult(
-  update: SonicTableConfig["access"]["item"]["update"],
+  update: ApiConfig["access"]["item"]["update"],
   ctx: AppContext,
   id: string,
   data: any,
@@ -239,7 +247,7 @@ export async function getItemUpdateResult(
 }
 
 export async function getItemDeleteResult(
-  del: SonicTableConfig["access"]["item"]["delete"],
+  del: ApiConfig["access"]["item"]["delete"],
   ctx: AppContext,
   id: string,
   table: string
@@ -261,7 +269,7 @@ export async function getItemDeleteResult(
   return authorized;
 }
 export async function filterCreateFieldAccess<D = any>(
-  fields: SonicTableConfig["access"]["fields"],
+  fields: ApiConfig["access"]["fields"],
   ctx: AppContext,
   data: D
 ): Promise<D> {
@@ -296,7 +304,7 @@ export async function filterCreateFieldAccess<D = any>(
 }
 
 export async function filterReadFieldAccess<D = any>(
-  fields: SonicTableConfig["access"]["fields"],
+  fields: ApiConfig["access"]["fields"],
   ctx: AppContext,
   doc: D
 ): Promise<D> {
@@ -344,7 +352,7 @@ export async function filterReadFieldAccess<D = any>(
 }
 
 export async function filterUpdateFieldAccess<D = any>(
-  fields: SonicTableConfig["access"]["fields"],
+  fields: ApiConfig["access"]["fields"],
   ctx: AppContext,
   id: string,
   data: D

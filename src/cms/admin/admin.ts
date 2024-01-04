@@ -16,7 +16,7 @@ import {
 
 import { loadApis } from "./pages/api";
 import { getRecords } from "../data/data";
-import { apiConfig, config } from "../../db/schema";
+import { apiConfig, config } from "../../db/routes";
 import qs from "qs";
 import { format } from "date-fns";
 import { getAllFromInMemoryCache, getFromInMemoryCache } from "../data/cache";

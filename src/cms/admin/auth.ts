@@ -13,7 +13,7 @@ import qs from "qs";
 import { AppContext, Variables } from "../../server";
 import { getRecords } from "../data/data";
 import { getForm } from "../api/forms";
-import { SonicTableConfig, config } from "../../db/schema";
+import { ApiConfig, config } from "../../db/routes";
 import {
   filterCreateFieldAccess,
   filterReadFieldAccess,
@@ -40,9 +40,7 @@ authAPI.use("*", async (ctx, next) => {
   await next();
 });
 
-const userTableConfig = config.tablesConfig.find(
-  (tbl) => tbl.table === "users"
-);
+const userTableConfig = config.apiConfig.find((tbl) => tbl.table === "users");
 const operationAccess = userTableConfig?.access?.operation;
 const itemAccess = userTableConfig?.access?.item;
 const filterAccess = userTableConfig?.access?.filter;

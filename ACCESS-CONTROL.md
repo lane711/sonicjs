@@ -11,7 +11,7 @@ In `schema.ts` a variable `config` should be exported with a `adminAccessControl
 
 ```js
 export type SonicJSConfig = {
-  tablesConfig: SonicTableConfig[];
+  tablesConfig: ApiConfig[];
   adminAccessControl: (ctx: AppContext) => boolean;
 };
 ```
@@ -224,7 +224,7 @@ So in summary:
   - On create/update, it will set the userId field based on the logged in user.
 
 
-export const apiConfig: SonicTableConfig[] = [
+export const apiConfig: ApiConfig[] = [
   {
     table: "posts",
     route: "posts",
