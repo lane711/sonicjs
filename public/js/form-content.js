@@ -45,8 +45,9 @@ const initUppy = async (id) => {
     showProgressDetails: true,
     closeModalOnClickOutside: true,
   });
+  const endpoint = location.origin + "/tus";
   uppy.use(Tus, {
-    endpoint: "http://localhost:8786/tus",
+    endpoint,
     withCredentials: true,
     headers: {
       "sonic-mode": id ? "update" : "create",
