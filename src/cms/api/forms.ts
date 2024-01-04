@@ -7,7 +7,9 @@ export function getForm(ctx: AppContext, table) {
 
   //TODO: amke dynamic
   // const schema = `${table}Schema`;
+  console.log("table", table);
   const schema = getSchemaFromTable(table);
+  console.log("schema", schema);
   const config = apiConfig.find((tbl) => tbl.table === table);
 
   for (var field in schema) {
