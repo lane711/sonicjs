@@ -168,6 +168,17 @@ export interface ApiConfig {
       result?: { data?: any } & Record<string, any>
     ) => void | Promise<void>;
   };
+  fields?: {
+    [field: string]:
+      | {
+          type: "auto";
+        }
+      | {
+          type: "file";
+          bucket: (ctx: AppContext) => R2Bucket;
+          path?: string | ((ctx: AppContext) => string);
+        };
+  };
 }
 
 export const apiConfig: ApiConfig[] = [];
@@ -190,6 +201,7 @@ for (const key of Object.keys(tableSchemas)) {
       route: table.route,
       access: table.access,
       hooks: table.hooks,
+      fields: table.fields,
     });
   }
 }

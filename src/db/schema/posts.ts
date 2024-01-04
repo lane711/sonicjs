@@ -16,6 +16,7 @@ export const definition = {
   title: text("title"),
   body: text("body"),
   userId: text("userId"),
+  image: text("image"),
 };
 
 export const table = sqliteTable(
@@ -98,5 +99,12 @@ export const hooks: ApiConfig["hooks"] = {
       }
       return data;
     },
+  },
+};
+export const fields: ApiConfig["fields"] = {
+  image: {
+    type: "file",
+    bucket: (ctx) => ctx.env.R2_STORAGE,
+    path: "images",
   },
 };
