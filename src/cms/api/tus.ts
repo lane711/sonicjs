@@ -64,6 +64,48 @@ tusAPI.all("*", async (ctx) => {
       return cache;
     }
   }
+  if (request.method === "GET") {
+    const pathname = new URL(request.url).pathname;
+    const pathParts = pathname.split("/");
+    let route = "";
+    let fieldName = "";
+    pathParts.forEach((part) => {
+      if (part.startsWith("r_")) {
+        route = part.replace("r_", "");
+      }
+      if (part.startsWith("f_")) {
+        fieldName = part.replace("f_", "");
+      }
+    });
+    const table = apiConfig.find((entry) => entry.route === route);
+    if (table) {
+      const field = table.fields?.[fieldName];
+      console.log("field", { field: JSON.stringify(field), route, fieldName });
+      if (field.type === "file") {
+        const bucket = field.bucket(ctx);
+        if (bucket) {
+          const storage = new TussleStorageR2({
+            stateService,
+            bucket,
+            skipMerge: false,
+          });
+
+          try {
+            console.log({ pathname });
+            const file = await storage.getFile(pathname);
+            console.log(file);
+            const type = (file.metadata.type ||
+              file.metadata.filetype) as string;
+            ctx.header("Content-Type", type);
+            ctx.status(200);
+            return ctx.body(file.body);
+          } catch (error) {
+            console.log(error);
+          }
+        }
+      }
+    }
+  }
   if (table) {
     const field = table.fields?.[fieldName];
     let bucket: R2Bucket;
@@ -83,7 +125,7 @@ tusAPI.all("*", async (ctx) => {
       if (path && !path.startsWith("/")) {
         path = "/" + path;
       }
-      path += "/" + route + path;
+      path += "/r_" + route + "/f_" + fieldName;
     }
     const storage = new TussleStorageR2({
       stateService,
@@ -214,6 +256,8 @@ const getTussleMiddleware = (() => {
             }
             const { location, offset } = params;
             console.log("params after", JSON.stringify(params, null, 2));
+            const fileInfo = await storage.getFileInfo({ location });
+            console.log("file info", fileInfo);
             await cacheCompletedUploadResponse(
               ctx.originalRequest,
               location,

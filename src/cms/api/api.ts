@@ -256,7 +256,7 @@ apiConfig.forEach((entry) => {
     var content: { data?: any; table?: string; id?: string } = {};
     ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
     content.data = payload.data;
-
+    console.log("put content", JSON.stringify(content.data, null, 2));
     if (entry.hooks?.beforeOperation) {
       await entry.hooks?.beforeOperation(ctx, "update", id, content);
     }

@@ -91,13 +91,39 @@ const addFileButtons = (data) => {
     return acc;
   }, []);
 };
+
+const getImageElement = (url) => {
+  const urlParts = url.split("/");
+  let field = "";
+  urlParts.forEach((part) => {
+    if (part.includes("f_")) {
+      field = part.replace("f_", "");
+    }
+  });
+  document.querySelector(`.file-preview-${field}`)?.remove();
+  return `<div class="file-preview file-preview-${field}" style="height: 140px; max-width: max-content">
+          <img style="width: 100%; height: 100%; object-fit: contain" src="${url}" />
+          </div>`;
+};
 const onUploadSuccess = (form) => (file, response) => {
   console.log(file, response);
-  const component = form.getComponent(currUppyField);
-  console.log("component", component);
-  if (component && response?.uploadURL) {
-    const url = new URL(response?.uploadURL).pathname;
-    component.setValue(url);
+  if (file && response) {
+    const type = file.type;
+    const component = form.getComponent(currUppyField);
+    if (type.includes("image")) {
+      const element = component.element;
+      if (element) {
+        element.insertAdjacentHTML(
+          "afterend",
+          getImageElement(response?.uploadURL)
+        );
+      }
+    }
+    console.log("component", component);
+    if (component && response?.uploadURL) {
+      const url = new URL(response?.uploadURL).pathname;
+      component.setValue(url);
+    }
   }
 };
 function newContent() {
@@ -203,8 +229,36 @@ function editContent() {
             .catch((e) => {
               console.log(e);
             });
+
+          for (const field of fileFields) {
+            const value = response?.data?.data?.[field.key];
+            const component = form.getComponent(field.key);
+            const element = component?.element;
+            if (value && element) {
+              let extensions = [
+                "jpg",
+                "jpeg",
+                "png",
+                "bmp",
+                "gif",
+                "svg",
+                "webp",
+                "avif",
+              ];
+              let regex = new RegExp(`\\.(${extensions.join("|")})$`, "i");
+              if (regex.test(value)) {
+                element.insertAdjacentHTML("afterend", getImageElement(value));
+              }
+            }
+          }
         }
         form.on("submit", function ({ data }) {
+          Object.keys(data).forEach((key) => {
+            if (key.endsWith("_btn")) {
+              delete data[key];
+            }
+          });
+          console.log(JSON.stringify(data, null, 2));
           if (data.id) {
             updateContent(data);
           } else {
