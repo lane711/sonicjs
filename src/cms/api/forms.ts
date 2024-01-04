@@ -11,7 +11,7 @@ export function getForm(ctx: AppContext, table) {
   const schema = getSchemaFromTable(table);
   console.log("schema", schema);
   const config = apiConfig.find((tbl) => tbl.table === table);
-
+  console.log("config", config);
   for (var field in schema) {
     const formField = getField(field);
     const metaType = config.fields?.[field]?.type || "auto";
