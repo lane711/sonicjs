@@ -93,7 +93,7 @@ const addFileButtons = (data) => {
   }, []);
 };
 
-const getImageElement = (url) => {
+const getFilePreviewElement = (url, isImage) => {
   const urlParts = url.split("/");
   let field = "";
   urlParts.forEach((part) => {
@@ -102,22 +102,24 @@ const getImageElement = (url) => {
     }
   });
   document.querySelector(`.file-preview-${field}`)?.remove();
-  return `<div class="file-preview file-preview-${field}" style="height: 140px; max-width: max-content">
+  const linkInner = `<div class="d-flex"><span>${url}</span><i class="ms-2 bi bi-box-arrow-up-right"></i></div>`;
+  const imageInner = `<div  style="height: 140px; max-width: max-content">
           <img style="width: 100%; height: 100%; object-fit: contain" src="${url}" />
           </div>`;
+  return `<a class="file-preview file-preview-${field} d-block my-2" style="text-decoration:underline" target="_blank" rel="noopener noreferrer" href="${url}">
+    ${isImage ? imageInner : linkInner}
+ </a>`;
 };
 const onUploadSuccess = (form) => (file, response) => {
   if (file && response) {
     const type = file.type;
     const component = form.getComponent(currUppyField);
-    if (type.includes("image")) {
-      const element = component.element;
-      if (element) {
-        element.insertAdjacentHTML(
-          "afterend",
-          getImageElement(response?.uploadURL)
-        );
-      }
+    const element = component.element;
+    if (element) {
+      element.insertAdjacentHTML(
+        "afterend",
+        getFilePreviewElement(response?.uploadURL, type.includes("image"))
+      );
     }
     if (component && response?.uploadURL) {
       const url = new URL(response?.uploadURL).pathname;
@@ -244,9 +246,10 @@ function editContent() {
                 "avif",
               ];
               let regex = new RegExp(`\\.(${extensions.join("|")})$`, "i");
-              if (regex.test(value)) {
-                element.insertAdjacentHTML("afterend", getImageElement(value));
-              }
+              element.insertAdjacentHTML(
+                "afterend",
+                getFilePreviewElement(value, regex.test(value))
+              );
             }
           }
         }
