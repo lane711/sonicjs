@@ -107,7 +107,6 @@ const getImageElement = (url) => {
           </div>`;
 };
 const onUploadSuccess = (form) => (file, response) => {
-  console.log(file, response);
   if (file && response) {
     const type = file.type;
     const component = form.getComponent(currUppyField);
@@ -120,7 +119,6 @@ const onUploadSuccess = (form) => (file, response) => {
         );
       }
     }
-    console.log("component", component);
     if (component && response?.uploadURL) {
       const url = new URL(response?.uploadURL).pathname;
       component.setValue(url);
@@ -166,7 +164,6 @@ function newContent() {
             delete data.data[key];
           }
         });
-        console.log(JSON.stringify(data, null, 2));
         saveNewContent(data);
       });
       form.on("change", async function (event) {
@@ -259,7 +256,6 @@ function editContent() {
               delete data[key];
             }
           });
-          console.log(JSON.stringify(data, null, 2));
           if (data.id) {
             updateContent(data);
           } else {

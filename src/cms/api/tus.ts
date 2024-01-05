@@ -16,41 +16,6 @@ const stateService = new TussleStateMemory<R2UploadState>();
 
 tusAPI.all("*", async (ctx) => {
   const request = ctx.req;
-  // const pathname = "/tus/3e77ec4c-5e0a-4323-b795-c9ffa1a87a52";
-
-  // const storage = new TussleStorageR2({
-  //   stateService,
-  //   appendUniqueSubdir(location) {
-  //     console.log({ location });
-  //     return location;
-  //   },
-  //   bucket: ctx.env.R2_STORAGE,
-  //   skipMerge: false,
-  // });
-  // try {
-  //   const fileInfo = await firstValueFrom(
-  //     storage.getFileInfo({ location: pathname })
-  //   );
-  //   const file = await storage.getFile(pathname);
-  //   console.log("file info", JSON.stringify(fileInfo, null, 2));
-  //   console.log(file);
-  //   console.log("bam", file.metadata);
-  //   const type = (file.metadata.type || file.metadata.filetype) as string;
-  //   ctx.header("Content-Type", type);
-  //   ctx.status(200);
-  //   return ctx.body(file.body);
-  // } catch (error) {
-  //   console.log(error);
-  // }
-  // try {
-  //   const file = await storage.getFile(pathname);
-  //   console.log(file);
-  //   console.log(file.parts);
-  //   console.log(file.parts[0]);
-  // } catch (error) {
-  //   console.log(error);
-  // }
-  // console.log("req", request.raw);
 
   const route = request.header("sonic-route");
   const fieldName = request.header("sonic-field");
@@ -65,51 +30,9 @@ tusAPI.all("*", async (ctx) => {
     }
   }
   if (request.method === "GET") {
-    const cache = await caches.default.match(request.url + "GET");
-    if (cache) {
-      return cache;
-    }
-    const pathname = new URL(request.url).pathname;
-    const pathParts = pathname.split("/");
-    let route = "";
-    let fieldName = "";
-    pathParts.forEach((part) => {
-      if (part.startsWith("r_")) {
-        route = part.replace("r_", "");
-      }
-      if (part.startsWith("f_")) {
-        fieldName = part.replace("f_", "");
-      }
-    });
-    const table = apiConfig.find((entry) => entry.route === route);
-    if (table) {
-      const field = table.fields?.[fieldName];
-      console.log("field", { field: JSON.stringify(field), route, fieldName });
-      if (field.type === "file") {
-        const bucket = field.bucket(ctx);
-        if (bucket) {
-          const storage = new TussleStorageR2({
-            stateService,
-            bucket,
-            skipMerge: false,
-          });
-
-          try {
-            console.log({ pathname });
-            const file = await storage.getFile(pathname);
-            console.log(file);
-            const type = (file.metadata.type ||
-              file.metadata.filetype) as string;
-            ctx.header("Content-Type", type);
-            ctx.status(200);
-            const response = ctx.body(file.body);
-            await caches.default.put(request.url + "GET", response.clone());
-            return response;
-          } catch (error) {
-            console.log(error);
-          }
-        }
-      }
+    const res = handleGET(ctx);
+    if (res) {
+      return res;
     }
   }
   if (table) {
@@ -280,3 +203,52 @@ const getTussleMiddleware = (() => {
     return instance;
   };
 })();
+
+const handleGET = async (ctx: AppContext) => {
+  const request = ctx.req;
+  const cache = await caches.default.match(request.url + "GET");
+  if (cache) {
+    return cache;
+  }
+  const pathname = new URL(request.url).pathname;
+  const pathParts = pathname.split("/");
+  let route = "";
+  let fieldName = "";
+  pathParts.forEach((part) => {
+    if (part.startsWith("r_")) {
+      route = part.replace("r_", "");
+    }
+    if (part.startsWith("f_")) {
+      fieldName = part.replace("f_", "");
+    }
+  });
+  const table = apiConfig.find((entry) => entry.route === route);
+  if (table) {
+    const field = table.fields?.[fieldName];
+    console.log("field", { field: JSON.stringify(field), route, fieldName });
+    if (field.type === "file") {
+      const bucket = field.bucket(ctx);
+      if (bucket) {
+        const storage = new TussleStorageR2({
+          stateService,
+          bucket,
+          skipMerge: false,
+        });
+
+        try {
+          console.log({ pathname });
+          const file = await storage.getFile(pathname);
+          console.log(file);
+          const type = (file.metadata.type || file.metadata.filetype) as string;
+          ctx.header("Content-Type", type);
+          ctx.status(200);
+          const response = ctx.body(file.body);
+          await caches.default.put(request.url + "GET", response.clone());
+          return response;
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    }
+  }
+};
