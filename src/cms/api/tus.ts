@@ -206,10 +206,6 @@ const getTussleMiddleware = (() => {
 
 const handleGET = async (ctx: AppContext) => {
   const request = ctx.req;
-  const cache = await caches.default.match(request.url + "GET");
-  if (cache) {
-    return cache;
-  }
   const pathname = new URL(request.url).pathname;
   const pathParts = pathname.split("/");
   let route = "";
@@ -222,10 +218,40 @@ const handleGET = async (ctx: AppContext) => {
       fieldName = part.replace("f_", "");
     }
   });
+
   const table = apiConfig.find((entry) => entry.route === route);
+  if (table.hooks?.beforeOperation) {
+    await table.hooks.beforeOperation(ctx, "read", pathname);
+  }
+
+  const authEnabled = ctx.get("authEnabled");
+
+  if (authEnabled) {
+    const accessControlResult = await getApiAccessControlResult(
+      table?.access?.operation?.read || true,
+      table?.access?.filter?.read || true,
+      table?.access?.item?.read || true,
+      ctx,
+      pathname,
+      table.table
+    );
+
+    if (!accessControlResult) {
+      return ctx.text("Unauthorized", 401);
+    }
+  }
+  const cache = await caches.default.match(request.url + "GET");
+  if (cache) {
+    if (table.hooks?.afterOperation) {
+      await table.hooks.afterOperation(ctx, "read", pathname, null, {
+        pathname,
+        cache: true,
+      });
+    }
+    return cache;
+  }
   if (table) {
     const field = table.fields?.[fieldName];
-    console.log("field", { field: JSON.stringify(field), route, fieldName });
     if (field.type === "file") {
       const bucket = field.bucket(ctx);
       if (bucket) {
@@ -236,9 +262,7 @@ const handleGET = async (ctx: AppContext) => {
         });
 
         try {
-          console.log({ pathname });
           const file = await storage.getFile(pathname);
-          console.log(file);
           const type = (file.metadata.type || file.metadata.filetype) as string;
           ctx.header("Content-Type", type);
           ctx.status(200);
@@ -250,5 +274,12 @@ const handleGET = async (ctx: AppContext) => {
         }
       }
     }
+  }
+
+  if (table.hooks?.afterOperation) {
+    await table.hooks.afterOperation(ctx, "read", pathname, null, {
+      pathname,
+      cache: false,
+    });
   }
 };
