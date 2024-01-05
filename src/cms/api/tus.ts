@@ -65,6 +65,10 @@ tusAPI.all("*", async (ctx) => {
     }
   }
   if (request.method === "GET") {
+    const cache = await caches.default.match(request.url + "GET");
+    if (cache) {
+      return cache;
+    }
     const pathname = new URL(request.url).pathname;
     const pathParts = pathname.split("/");
     let route = "";
@@ -98,7 +102,9 @@ tusAPI.all("*", async (ctx) => {
               file.metadata.filetype) as string;
             ctx.header("Content-Type", type);
             ctx.status(200);
-            return ctx.body(file.body);
+            const response = ctx.body(file.body);
+            await caches.default.put(request.url + "GET", response.clone());
+            return response;
           } catch (error) {
             console.log(error);
           }
