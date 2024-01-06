@@ -190,6 +190,7 @@ for (const key of Object.keys(tableSchemas)) {
       route: table.route,
       access: table.access,
       hooks: table.hooks,
+      hideWhenAuthEnabled: table.hideWhenAuthEnabled,
     });
   }
 }

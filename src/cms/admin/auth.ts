@@ -277,12 +277,14 @@ authAPI.put(`/users/:id`, async (ctx) => {
   }
   let result = ctx.text("", 200);
   if (shouldUpdateUser) {
-    content.data = await filterUpdateFieldAccess(
-      fieldsAccess,
-      ctx,
-      id,
-      content.data
-    );
+    if (authEnabled) {
+      content.data = await filterUpdateFieldAccess(
+        fieldsAccess,
+        ctx,
+        id,
+        content.data
+      );
+    }
     if (userTableConfig.hooks?.resolveInput?.update) {
       content.data = await userTableConfig.hooks.resolveInput.update(
         ctx,
