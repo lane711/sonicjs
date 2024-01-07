@@ -20,7 +20,7 @@ export function isAdmin(ctx: AppContext) {
 
 export function isUser(ctx: AppContext, id: string) {
   const user = ctx.get("user");
-  return user.userId === id;
+  return user?.userId === id;
 }
 
 export function isAdminOrUser(ctx: AppContext, id: string) {

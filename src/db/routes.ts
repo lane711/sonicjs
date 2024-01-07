@@ -202,6 +202,7 @@ for (const key of Object.keys(tableSchemas)) {
       access: table.access,
       hooks: table.hooks,
       fields: table.fields,
+      hideWhenAuthEnabled: table.hideWhenAuthEnabled,
     });
   }
 }

@@ -140,14 +140,15 @@ export const initializeLucia = (db: D1Database, env: Bindings) => {
           env.AUTH_HASH
         );
         if (hash.kdf === "pbkdf2") {
-          return `snc:${hash.hashedPassword}:${salt}:${hash.hash}:${hash.iterations}`;
+          return `snc:$:${hash.hashedPassword}:$:${salt}:$:${hash.hash}:$:${hash.iterations}`;
         } else {
-          return `lca:${hash.hashedPassword}`;
+          return `lca:$:${hash.hashedPassword}`;
         }
       },
       async validate(userPassword, dbHash) {
         const [hasher, hashedPassword, salt, hash, iterations] =
-          dbHash.split(":");
+          dbHash.split(":$:");
+
         let kdf: Bindings["AUTH_KDF"] = "pbkdf2";
         if (hasher === "lca") {
           kdf = "scrypt";
@@ -289,7 +290,7 @@ export async function updateUser<T extends string>(
     let session = ctx.get("session");
     if (password || d1Data.role) {
       await auth.invalidateAllUserSessions(id);
-      if (user.userId === id) {
+      if (user?.userId === id) {
         session = await auth.createSession({
           userId: id,
           attributes: {},
@@ -299,11 +300,15 @@ export async function updateUser<T extends string>(
       }
     }
 
-    if (authRequest) {
-      authRequest.setSession(session);
+    if (session) {
+      if (authRequest) {
+        authRequest.setSession(session);
+      }
+      ctx.header("Authorization", `Bearer ${session.sessionId}`);
+      return ctx.json({ bearer: session.sessionId });
+    } else {
+      return ctx.text("", 200);
     }
-    ctx.header("Authorization", `Bearer ${session.sessionId}`);
-    return ctx.json({ bearer: session.sessionId });
   }
   return new Response("Invalid request", { status: 400 });
 }

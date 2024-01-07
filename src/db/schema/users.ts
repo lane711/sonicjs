@@ -32,6 +32,8 @@ export const relation = relations(table, ({ many }) => ({
   sessions: many(userSessions.table),
 }));
 
+export const hideWhenAuthEnabled = true;
+
 export const access: ApiConfig["access"] = {
   operation: {
     create: isAdmin,

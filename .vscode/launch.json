@@ -21,6 +21,16 @@
       "runtimeArgs": ["run-script", "dev", "--exitcrash"],
       "restart": true,
       "console": "integratedTerminal"
+    },
+    {
+      "name": "Wrangler debug",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "cwd": "/",
+      "resolveSourceMapLocations": null,
+      "attachExistingChildren": false,
+      "autoAttachChildProcesses": false
     }
   ]
 }
