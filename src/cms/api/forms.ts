@@ -19,19 +19,6 @@ export function getForm(ctx: AppContext, table) {
     }
     formFields.push(formField);
   }
-  const user = ctx.get("user");
-  if (user && user.userId) {
-    const hasUserId = formFields.find((f) => f.key === "userId");
-    if (hasUserId) {
-      formFields = formFields.map((f) => {
-        if (f.key === "userId") {
-          f.disabled = true;
-          f.defaultValue = user.userId;
-        }
-        return f;
-      });
-    }
-  }
 
   const user = ctx.get("user");
   if (user && user.userId) {
