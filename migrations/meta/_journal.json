@@ -5,43 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1695843120627,
-      "tag": "0000_steady_chameleon",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1696889283545,
-      "tag": "0001_sudden_newton_destine",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1697168652266,
-      "tag": "0002_lovely_gladiator",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1697404949271,
-      "tag": "0003_eminent_karma",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1703817405034,
-      "tag": "0004_free_sprite",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1704386515840,
-      "tag": "0005_wooden_stardust",
+      "when": 1704753718975,
+      "tag": "0000_busy_venus",
       "breakpoints": true
     }
   ]

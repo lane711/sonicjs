@@ -71,44 +71,89 @@ const handleCustomEventForUppy = (uppy, event) => {
   }
 };
 
-const addFileButtons = (data) => {
-  return data.reduce((acc, c) => {
-    if (c.metaType == "file") {
-      acc.push({
-        ...c,
-        disabled: true,
-      });
-      acc.push({
-        ...c,
-        key: c.key + "_btn",
-        label: "Choose File",
-        type: "button",
-        action: "event",
-        theme: "secondary",
-      });
-    } else {
-      acc.push(c);
-    }
-    return acc;
-  }, []);
+const setupComponents = (data) => {
+  const fileFields = data.filter(
+    (c) => c.metaType === "file" || c.metaType === "file[]"
+  );
+  return {
+    fileFields,
+    contentType: data.reduce((acc, c) => {
+      if (c.metaType == "file") {
+        acc.push({
+          ...c,
+          disabled: true,
+        });
+        acc.push({
+          ...c,
+          key: c.key + "_btn",
+          label: "Choose File",
+          type: "button",
+          action: "event",
+          theme: "secondary",
+          readOnly: true,
+        });
+      } else if (c.metaType == "file[]") {
+        acc.push({
+          type: "datagrid",
+          label: c.label || c.key,
+          key: c.key,
+          components: [
+            {
+              ...c,
+              key: c.key,
+              label: singularize(c.label || c.key),
+            },
+            {
+              key: c.key + "_btn",
+              label: "Choose File",
+              type: "button",
+              action: "event",
+              theme: "secondary",
+              readOnly: true,
+            },
+          ],
+        });
+      } else {
+        acc.push(c);
+      }
+      return acc;
+    }, []),
+  };
 };
 
-const getFilePreviewElement = (url, isImage) => {
-  const urlParts = url.split("/");
-  let field = "";
-  urlParts.forEach((part) => {
-    if (part.includes("f_")) {
-      field = part.replace("f_", "");
+handleSubmitData = (data) => {
+  console.log("data pre", JSON.stringify(data, null, 2));
+  Object.keys(data).forEach((key) => {
+    const value = data[key];
+    if (key.endsWith("_btn")) {
+      delete data[key];
+    }
+    if (Array.isArray(value)) {
+      data[key] = value.map((v) => v[key]);
     }
   });
-  document.querySelector(`.file-preview-${field}`)?.remove();
-  const linkInner = `<div class="d-flex"><span>${url}</span><i class="ms-2 bi bi-box-arrow-up-right"></i></div>`;
-  const imageInner = `<div  style="height: 140px; max-width: max-content">
+  console.log("data post", JSON.stringify(data, null, 2));
+  return data;
+};
+const getFilePreviewElement = (url, isImage, i = 0) => {
+  if (url && typeof url === "string") {
+    const urlParts = url.split("/");
+    let field = "";
+    urlParts.forEach((part) => {
+      if (part.includes("f_")) {
+        field = part.replace("f_", "");
+      }
+    });
+    document.querySelector(`.file-preview-${field}-${i}`)?.remove();
+    const linkInner = `<div class="d-flex"><span>${url}</span><i class="ms-2 bi bi-box-arrow-up-right"></i></div>`;
+    const imageInner = `<div  style="height: 140px; max-width: max-content">
           <img style="width: 100%; height: 100%; object-fit: contain" src="${url}" />
           </div>`;
-  return `<a class="file-preview file-preview-${field} d-block my-2" style="text-decoration:underline" target="_blank" rel="noopener noreferrer" href="${url}">
+    return `<a class="file-preview file-preview-${field}-${i} d-block my-2" style="text-decoration:underline" target="_blank" rel="noopener noreferrer" href="${url}">
     ${isImage ? imageInner : linkInner}
  </a>`;
+  }
+  console.error("bad arguments", url, isImage);
 };
 const onUploadSuccess = (form) => (file, response) => {
   if (file && response) {
@@ -118,7 +163,7 @@ const onUploadSuccess = (form) => (file, response) => {
     if (element) {
       element.insertAdjacentHTML(
         "afterend",
-        getFilePreviewElement(response?.uploadURL, type.includes("image"))
+        getFilePreviewElement(response?.uploadURL, type.includes("image"), 0)
       );
     }
     if (component && response?.uploadURL) {
@@ -137,9 +182,8 @@ function newContent() {
     console.log(response.headers);
     console.log(response.config);
 
-    const fileFields = response.data.filter((c) => c.metaType == "file");
-
-    response.data = addFileButtons(response.data);
+    const { fileFields, contentType } = setupComponents(response.data);
+    response.data = contentType;
     Formio.icons = "fontawesome";
     // Formio.createForm(document.getElementById("formio"), {
     Formio.createForm(document.getElementById("formio"), {
@@ -161,11 +205,7 @@ function newContent() {
           });
       }
       form.on("submit", function (data) {
-        Object.keys(data.data).forEach((key) => {
-          if (key.endsWith("_btn")) {
-            delete data.data[key];
-          }
-        });
+        data.data = handleSubmitData(data.data);
         saveNewContent(data);
       });
       form.on("change", async function (event) {
@@ -205,10 +245,30 @@ function editContent() {
   axios
     .get(`/v1/${routeWithoutAuth}/${contentId}?includeContentType`)
     .then((response) => {
-      const fileFields = response.data.contentType.filter(
-        (c) => c.metaType == "file"
+      const { fileFields, contentType } = setupComponents(
+        response.data.contentType
       );
-      response.data.contentType = addFileButtons(response.data.contentType);
+      response.data.contentType = contentType;
+      // handle array values to the formio format
+      if (response?.data?.data) {
+        Object.keys(response.data.data).forEach((key) => {
+          let value = response.data.data[key];
+          try {
+            value = JSON.parse(value);
+          } catch (e) {
+            //empty by design
+          }
+          if (Array.isArray(value)) {
+            console.log("bam");
+            response.data.data[key] = value.map((v) => {
+              return {
+                [key]: v,
+              };
+            });
+          }
+        });
+      }
+      console.log("data", JSON.stringify(response.data?.data, null, 2));
       let uppy;
       Formio.icons = "fontawesome";
       // debugger;
@@ -234,31 +294,42 @@ function editContent() {
             const value = response?.data?.data?.[field.key];
             const component = form.getComponent(field.key);
             const element = component?.element;
-            if (value && element) {
-              let extensions = [
-                "jpg",
-                "jpeg",
-                "png",
-                "bmp",
-                "gif",
-                "svg",
-                "webp",
-                "avif",
-              ];
-              let regex = new RegExp(`\\.(${extensions.join("|")})$`, "i");
-              element.insertAdjacentHTML(
-                "afterend",
-                getFilePreviewElement(value, regex.test(value))
-              );
+            console.log(component, element);
+            const addPreviewElement = (value, element, i = 0) => {
+              if (value && element) {
+                let extensions = [
+                  "jpg",
+                  "jpeg",
+                  "png",
+                  "bmp",
+                  "gif",
+                  "svg",
+                  "webp",
+                  "avif",
+                ];
+                let regex = new RegExp(`\\.(${extensions.join("|")})$`, "i");
+                element.insertAdjacentHTML(
+                  "afterend",
+                  getFilePreviewElement(value, regex.test(value), i)
+                );
+              }
+            };
+            if (Array.isArray(value)) {
+              const trs = element.querySelectorAll("tr");
+              let i = 0;
+              for (const v of value) {
+                const td = trs[i + 1].querySelector("td");
+                console.log("el", trs[i + 1], td);
+                addPreviewElement(v[field.key], td, i);
+                i++;
+              }
+            } else {
+              addPreviewElement(value, element);
             }
           }
         }
         form.on("submit", function ({ data }) {
-          Object.keys(data).forEach((key) => {
-            if (key.endsWith("_btn")) {
-              delete data[key];
-            }
-          });
+          data = handleSubmitData(data);
           if (data.id) {
             updateContent(data);
           } else {
@@ -320,4 +391,18 @@ function updateContent(data) {
       alert("Error occured updating " + data.id);
     }
   });
+}
+function singularize(word) {
+  if (word.endsWith("ses") || word.endsWith("xes") || word.endsWith("zes")) {
+    return word.slice(0, -3);
+  }
+  if (word.endsWith("shes") || word.endsWith("ches")) {
+    return word.slice(0, -4);
+  }
+
+  if (word.endsWith("ies")) {
+    return word.slice(0, -3) + "y";
+  }
+
+  return word.slice(0, -1);
 }

@@ -171,10 +171,10 @@ export interface ApiConfig {
   fields?: {
     [field: string]:
       | {
-          type: "auto";
+          type: "auto" | "string[]";
         }
       | {
-          type: "file";
+          type: "file" | "file[]";
           bucket: (ctx: AppContext) => R2Bucket;
           path?: string | ((ctx: AppContext) => string);
         };

@@ -39,7 +39,7 @@ tusAPI.all("*", async (ctx) => {
     const field = table.fields?.[fieldName];
     let bucket: R2Bucket;
     let path: string;
-    if (field.type === "file") {
+    if (field.type === "file" || field.type === "file[]") {
       bucket = field.bucket(ctx);
       if (typeof field.path === "string") {
         path = field.path;
@@ -252,7 +252,7 @@ const handleGET = async (ctx: AppContext) => {
   }
   if (table) {
     const field = table.fields?.[fieldName];
-    if (field.type === "file") {
+    if (field.type === "file" || field.type === "file[]") {
       const bucket = field.bucket(ctx);
       if (bucket) {
         const storage = new TussleStorageR2({

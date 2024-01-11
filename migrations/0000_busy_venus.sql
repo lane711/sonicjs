@@ -12,7 +12,6 @@ CREATE TABLE `categoriesToPosts` (
 	`categoryId` text NOT NULL,
 	`createdOn` integer,
 	`updatedOn` integer,
-	PRIMARY KEY(`categoryId`, `postId`),
 	FOREIGN KEY (`postId`) REFERENCES `posts`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`categoryId`) REFERENCES `categories`(`id`) ON UPDATE no action ON DELETE no action
 );
@@ -31,8 +30,29 @@ CREATE TABLE `posts` (
 	`title` text,
 	`body` text,
 	`userId` text,
+	`image` text,
+	`images` text,
 	`createdOn` integer,
 	`updatedOn` integer
+);
+--> statement-breakpoint
+CREATE TABLE `user_keys` (
+	`id` text PRIMARY KEY NOT NULL,
+	`user_id` text NOT NULL,
+	`hashed_password` text,
+	`createdOn` integer,
+	`updatedOn` integer,
+	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
+CREATE TABLE `user_sessions` (
+	`id` text PRIMARY KEY NOT NULL,
+	`user_id` text NOT NULL,
+	`active_expires` integer NOT NULL,
+	`idle_expires` integer NOT NULL,
+	`createdOn` integer,
+	`updatedOn` integer,
+	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `users` (
@@ -45,3 +65,7 @@ CREATE TABLE `users` (
 	`createdOn` integer,
 	`updatedOn` integer
 );
+--> statement-breakpoint
+CREATE INDEX `commentsUserIdIndex` ON `comments` (`userId`);--> statement-breakpoint
+CREATE INDEX `commentsPostIdIndex` ON `comments` (`postId`);--> statement-breakpoint
+CREATE INDEX `postUserIdIndex` ON `posts` (`userId`);
