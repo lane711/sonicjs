@@ -4,21 +4,24 @@ var route;
 let mode;
 
 (function () {
-  const url = window.location.href;
+  const url = new URL(window.location.href);
+  route = url.pathname;
 
-  const params = url.split("/");
-  route = window.location.href.split("/").pop();
-
-  const authMode = url.includes("/auth/");
+  const authMode = route.includes("/auth/");
   if (authMode) {
-    route = `auth/${route}`;
+    route = route.replace("/auth", "");
   }
-  if (url.indexOf("admin/content/new") > 0) {
+  if (url.pathname.indexOf("admin/content/new") > 0) {
+    route = route.replace("/admin/content/new/", "");
     mode = "new";
-  } else if (url.indexOf("admin/content/edit") > 0) {
+  } else if (url.pathname.indexOf("admin/content/edit") > 0) {
+    route = route.replace("/admin/content/edit/", "");
     mode = "edit";
   } else {
     mode = undefined;
+  }
+  if (authMode) {
+    route = `auth/${route}`;
   }
   if (!mode) {
     return;

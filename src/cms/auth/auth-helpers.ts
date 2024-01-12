@@ -1,48 +1,44 @@
 import { tableSchemas } from "../../db/routes";
-import { getRecords } from "../data/data";
 import { drizzle } from "drizzle-orm/d1";
 import { isNotNull } from "drizzle-orm";
+import { getRecords } from "../data/data";
 import { AppContext } from "../../server";
 import type { SonicJSFilter, ApiConfig } from "../../db/routes";
 
-export const isAuthEnabled = async (ctx: AppContext) => {
-  let authIsEnabled = ctx.env?.useAuth === "true" || ctx.env?.useAuth === true;
-  if (authIsEnabled) {
-    const fn = async function () {
-      const db = drizzle(ctx.env.D1DATA, {
-        schema: {
-          users: tableSchemas.users.table,
-          usersRelations: tableSchemas.users.relation,
-          userKeys: tableSchemas.userKeys.table,
-          userKeysRelations: tableSchemas.userKeys.relation,
-          userSessions: tableSchemas.userSessions.table,
-          userSessionsRelations: tableSchemas.userSessions.relation,
-        },
-      });
-      const data = await db.query.users.findMany({
-        with: {
-          keys: {
-            where(fields) {
-              return isNotNull(fields.hashed_password);
-            },
+export const hasUser = async (ctx: AppContext) => {
+  const fn = async function () {
+    const db = drizzle(ctx.env.D1DATA, {
+      schema: {
+        users: tableSchemas.users.table,
+        usersRelations: tableSchemas.users.relation,
+        userKeys: tableSchemas.userKeys.table,
+        userKeysRelations: tableSchemas.userKeys.relation,
+        userSessions: tableSchemas.userSessions.table,
+        userSessionsRelations: tableSchemas.userSessions.relation,
+      },
+    });
+    const data = await db.query.users.findMany({
+      with: {
+        keys: {
+          where(fields) {
+            return isNotNull(fields.hashed_password);
           },
         },
-      });
-      const result = data.filter((user) => user.keys?.length > 0);
-      return result;
-    };
+      },
+    });
+    const result = data.filter((user) => user.keys?.length > 0);
+    return result;
+  };
 
-    const result = await getRecords(
-      ctx,
-      "custom",
-      {},
-      "hasUserWithKeyCheck",
-      "d1",
-      fn
-    );
-    authIsEnabled = result?.data?.length > 0;
-  }
-  return authIsEnabled;
+  const result = await getRecords(
+    ctx,
+    "custom",
+    {},
+    "hasUserWithKeyCheck",
+    "d1",
+    fn
+  );
+  return result.data.length > 0;
 };
 export async function getApiAccessControlResult(
   operationAccessControl:
