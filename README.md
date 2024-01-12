@@ -69,7 +69,6 @@ Check out https://sonicjs.com for next steps.
 
 # Authentication
 
-To enable password auth set `useAuth` to "true" and a AUTH_SECRET in your vars in wrangler.toml
 
 **Important:** There are two options for how passwords are stored (key derivation functions), set by the AUTH_KDF env variable. These effect the security of your passwords if they were to ever leak, as well as how much cpu time is used when a user is created, changes their password, or logs in. 
 
@@ -89,13 +88,20 @@ To enable password auth set `useAuth` to "true" and a AUTH_SECRET in your vars i
 If you change your auth options old users will still be able to login but the encryption won't change for their password until they change their password.
 
  [https://sonicjs.com/environment-variables](https://sonicjs.com/environment-variables)
+
 ## Setup a user
-  1. Navigate to the Auth Users section in the left nav (/admin/tables/auth/users)
-  1. If you don't have a user create one with the role "admin" and set a password
-  1. If you have users already edit the user you want to be the admin, set the role to "admin" and set a password
+  1. When you first open the app you will be prompted to create an admin user
+  1. Create the user and save and you will be redirected to login
   1. Login
   1. You now have admin dashboard for CRUD operations
-  1. To authorize via the API post to /v1/auth/login which will return json like
+  1. To authorize via the API post to /v1/auth/login  with the email and password in the body
+    ```json
+    {
+      "email": "user@sonicjs.com",
+      "password": "password123"
+    }
+    ```
+  1. The API will return a bearer token
       ```json
       {
         "bearer": "eo0t9q52njemo83rm1qktr6kwjh8zu5o3vma1g6j"
