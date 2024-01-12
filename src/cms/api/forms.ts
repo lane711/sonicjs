@@ -3,7 +3,14 @@ import { AppContext } from "../../server";
 import { getSchemaFromTable } from "../data/d1-data";
 
 export function getForm(ctx: AppContext, table) {
-  let formFields = [];
+  let formFields: {
+    type: string;
+    key?: string;
+    label: string;
+    action?: string;
+    defaultValue?: string;
+    disabled?: boolean;
+  }[] = [];
 
   //TODO: amke dynamic
   // const schema = `${table}Schema`;
@@ -48,7 +55,6 @@ export function getForm(ctx: AppContext, table) {
     type: "button",
     action: "submit",
     label: "Save",
-    theme: "primary",
   });
 
   return formFields;

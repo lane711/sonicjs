@@ -20,20 +20,20 @@ import {
   filterUpdateFieldAccess,
   getApiAccessControlResult,
   getOperationCreateResult,
+  hasUser,
 } from "../auth/auth-helpers";
 
 const authAPI = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 authAPI.use("*", async (ctx, next) => {
-  const useAuthEnvEnabled =
-    ctx.env?.useAuth === "true" || ctx.env?.useAuth === true;
-  if (!useAuthEnvEnabled) {
-    return ctx.text("Not Implemented", 501);
-  }
-  const authEnabled = ctx.get("authEnabled");
-  if (authEnabled) {
-    const session = ctx.get("session");
-    const path = ctx.req.path;
-    if (!session && path !== "/v1/auth/login" && path !== "/v1/auth/verify") {
+  const session = ctx.get("session");
+  const path = ctx.req.path;
+  if (!session && path !== "/v1/auth/login" && path !== "/v1/auth/verify") {
+    if (path === "/v1/auth/users/setup") {
+      const userExists = await hasUser(ctx);
+      if (userExists) {
+        return ctx.text("Unauthorized", 401);
+      }
+    } else {
       return ctx.text("Unauthorized", 401);
     }
   }
@@ -52,25 +52,22 @@ authAPI.get(`/users/:id`, async (ctx) => {
   if (userTableConfig.hooks?.beforeOperation) {
     await userTableConfig.hooks?.beforeOperation(ctx, "read", id);
   }
-  const authEnabled = ctx.get("authEnabled");
   let { includeContentType, source, ...params } = ctx.req.query();
-  if (authEnabled) {
-    const accessControlResult = await getApiAccessControlResult(
-      operationAccess?.read || true,
-      filterAccess?.read || true,
-      itemAccess?.read || true,
-      ctx,
-      id,
-      "users"
-    );
+  const accessControlResult = await getApiAccessControlResult(
+    operationAccess?.read || true,
+    filterAccess?.read || true,
+    itemAccess?.read || true,
+    ctx,
+    id,
+    "users"
+  );
 
-    if (typeof accessControlResult === "object") {
-      params = { ...params, ...accessControlResult };
-    }
+  if (typeof accessControlResult === "object") {
+    params = { ...params, ...accessControlResult };
+  }
 
-    if (!accessControlResult) {
-      return ctx.text("Unauthorized", 401);
-    }
+  if (!accessControlResult) {
+    return ctx.text("Unauthorized", 401);
   }
   const start = Date.now();
 
@@ -91,9 +88,7 @@ authAPI.get(`/users/:id`, async (ctx) => {
     undefined
   );
 
-  if (authEnabled) {
-    data.data = await filterReadFieldAccess(fieldsAccess, ctx, data.data);
-  }
+  data.data = await filterReadFieldAccess(fieldsAccess, ctx, data.data);
 
   if (includeContentType !== undefined) {
     data.contentType = getForm(ctx, "users");
@@ -114,9 +109,7 @@ authAPI.get(`/users/:id`, async (ctx) => {
   return ctx.json({ ...data, executionTime });
 });
 // Create user
-authAPI.post(`/users`, async (ctx) => {
-  const authEnabled = ctx.get("authEnabled");
-
+authAPI.post(`/users/:setup?`, async (ctx) => {
   let content = await ctx.req.json();
   if (userTableConfig.hooks?.beforeOperation) {
     await userTableConfig.hooks.beforeOperation(
@@ -127,24 +120,23 @@ authAPI.post(`/users`, async (ctx) => {
     );
   }
   content.table = "users";
-  if (authEnabled) {
-    let authorized = await getOperationCreateResult(
-      operationAccess?.create,
-      ctx,
-      content.data
-    );
-    if (!authorized) {
+  let authorized = await getOperationCreateResult(
+    operationAccess?.create,
+    ctx,
+    content.data
+  );
+  if (!authorized) {
+    const userExists = await hasUser(ctx);
+    if (userExists) {
       return ctx.text("Unauthorized", 401);
     }
   }
   try {
-    if (authEnabled) {
-      content.data = await filterCreateFieldAccess(
-        fieldsAccess,
-        ctx,
-        content.data
-      );
-    }
+    content.data = await filterCreateFieldAccess(
+      fieldsAccess,
+      ctx,
+      content.data
+    );
 
     if (userTableConfig.hooks?.resolveInput?.create) {
       content.data = await userTableConfig.hooks.resolveInput.create(
@@ -152,6 +144,12 @@ authAPI.post(`/users`, async (ctx) => {
         content.data
       );
     }
+    if (content.data?.confirm && content.data?.password) {
+      if (content.data?.password !== content.data?.confirm) {
+        return ctx.text("Passwords do not match", 400);
+      }
+    }
+    delete content.data.confirm;
     const result = await createUser({ content, ctx });
     if (userTableConfig.hooks?.afterOperation) {
       await userTableConfig.hooks.afterOperation(
@@ -174,27 +172,24 @@ authAPI.delete(`/users/:id`, async (ctx) => {
   const id = ctx.req.param("id");
 
   let { includeContentType, source, ...params } = ctx.req.query();
-  const authEnabled = ctx.get("authEnabled");
 
   if (userTableConfig.hooks?.beforeOperation) {
     await userTableConfig.hooks.beforeOperation(ctx, "delete", id);
   }
-  if (authEnabled) {
-    const accessControlResult = await getApiAccessControlResult(
-      operationAccess?.delete || true,
-      filterAccess?.delete || true,
-      itemAccess?.delete || true,
-      ctx,
-      id,
-      "users"
-    );
-    if (typeof accessControlResult === "object") {
-      params = { ...params, ...accessControlResult };
-    }
+  const accessControlResult = await getApiAccessControlResult(
+    operationAccess?.delete || true,
+    filterAccess?.delete || true,
+    itemAccess?.delete || true,
+    ctx,
+    id,
+    "users"
+  );
+  if (typeof accessControlResult === "object") {
+    params = { ...params, ...accessControlResult };
+  }
 
-    if (!accessControlResult) {
-      return ctx.text("Unauthorized", 401);
-    }
+  if (!accessControlResult) {
+    return ctx.text("Unauthorized", 401);
   }
   //get the records so we use filter params if those are passed in
 
@@ -234,28 +229,25 @@ authAPI.delete(`/users/:id`, async (ctx) => {
 authAPI.put(`/users/:id`, async (ctx) => {
   const id = ctx.req.param("id");
   let { includeContentType, source, ...params } = ctx.req.query();
-  const authEnabled = ctx.get("authEnabled");
   let content = await ctx.req.json();
   if (userTableConfig.hooks?.beforeOperation) {
     await userTableConfig.hooks.beforeOperation(ctx, "update", id, content);
   }
-  if (authEnabled) {
-    const accessControlResult = await getApiAccessControlResult(
-      operationAccess?.update || true,
-      filterAccess?.update || true,
-      itemAccess?.update || true,
-      ctx,
-      id,
-      "users",
-      content.data
-    );
-    if (typeof accessControlResult === "object") {
-      params = { ...params, ...accessControlResult };
-    }
+  const accessControlResult = await getApiAccessControlResult(
+    operationAccess?.update || true,
+    filterAccess?.update || true,
+    itemAccess?.update || true,
+    ctx,
+    id,
+    "users",
+    content.data
+  );
+  if (typeof accessControlResult === "object") {
+    params = { ...params, ...accessControlResult };
+  }
 
-    if (!accessControlResult) {
-      return ctx.text("Unauthorized", 401);
-    }
+  if (!accessControlResult) {
+    return ctx.text("Unauthorized", 401);
   }
 
   let shouldUpdateUser = Object.keys(params).length > 0 ? false : true;
@@ -277,14 +269,12 @@ authAPI.put(`/users/:id`, async (ctx) => {
   }
   let result = ctx.text("", 200);
   if (shouldUpdateUser) {
-    if (authEnabled) {
-      content.data = await filterUpdateFieldAccess(
-        fieldsAccess,
-        ctx,
-        id,
-        content.data
-      );
-    }
+    content.data = await filterUpdateFieldAccess(
+      fieldsAccess,
+      ctx,
+      id,
+      content.data
+    );
     if (userTableConfig.hooks?.resolveInput?.update) {
       content.data = await userTableConfig.hooks.resolveInput.update(
         ctx,

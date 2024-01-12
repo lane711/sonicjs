@@ -33,35 +33,32 @@ import {
 } from "../auth/auth-helpers";
 
 const api = new Hono<{ Bindings: Bindings; Variables: Variables }>();
-
-apiConfig.forEach((entry) => {
+const tables = apiConfig.filter((tbl) => tbl.table !== "users");
+tables.forEach((entry) => {
   // console.log("setting route for " + entry.route);
 
   //ie /v1/users
   api.get(`/${entry.route}`, async (ctx) => {
     const start = Date.now();
-    const authEnabled = ctx.get("authEnabled");
     let { includeContentType, source, ...params } = ctx.req.query();
     if (entry.hooks?.beforeOperation) {
       await entry.hooks.beforeOperation(ctx, "read", params.id);
     }
-    if (authEnabled) {
-      const accessControlResult = await getApiAccessControlResult(
-        entry?.access?.operation?.read || true,
-        entry?.access?.filter?.read || true,
-        true,
-        ctx,
-        params.id,
-        entry.table
-      );
+    const accessControlResult = await getApiAccessControlResult(
+      entry?.access?.operation?.read || true,
+      entry?.access?.filter?.read || true,
+      true,
+      ctx,
+      params.id,
+      entry.table
+    );
 
-      if (typeof accessControlResult === "object") {
-        params = { ...params, ...accessControlResult };
-      }
+    if (typeof accessControlResult === "object") {
+      params = { ...params, ...accessControlResult };
+    }
 
-      if (!accessControlResult) {
-        return ctx.text("Unauthorized", 401);
-      }
+    if (!accessControlResult) {
+      return ctx.text("Unauthorized", 401);
     }
 
     try {
@@ -76,7 +73,7 @@ apiConfig.forEach((entry) => {
         undefined
       );
 
-      if (authEnabled && entry.access?.item?.read) {
+      if (entry.access?.item?.read) {
         const accessControlResult = await getItemReadResult(
           entry.access.item.read,
           ctx,
@@ -86,13 +83,11 @@ apiConfig.forEach((entry) => {
           return ctx.text("Unauthorized", 401);
         }
       }
-      if (authEnabled) {
-        data.data = await filterReadFieldAccess(
-          entry.access?.fields,
-          ctx,
-          data.data
-        );
-      }
+      data.data = await filterReadFieldAccess(
+        entry.access?.fields,
+        ctx,
+        data.data
+      );
 
       if (entry.hooks?.afterOperation) {
         await entry.hooks.afterOperation(ctx, "read", params.id, null, data);
@@ -111,8 +106,6 @@ apiConfig.forEach((entry) => {
   api.get(`/${entry.route}/:id`, async (ctx) => {
     const start = Date.now();
 
-    const authEnabled = ctx.get("authEnabled");
-
     let { includeContentType, source, ...params } = ctx.req.query();
 
     const id = ctx.req.param("id");
@@ -122,24 +115,22 @@ apiConfig.forEach((entry) => {
     }
 
     params.id = id;
-    if (authEnabled) {
-      // will check the item result when we get the data
-      const accessControlResult = await getApiAccessControlResult(
-        entry?.access?.operation?.read || true,
-        entry?.access?.filter?.read || true,
-        true,
-        ctx,
-        id,
-        entry.table
-      );
+    // will check the item result when we get the data
+    const accessControlResult = await getApiAccessControlResult(
+      entry?.access?.operation?.read || true,
+      entry?.access?.filter?.read || true,
+      true,
+      ctx,
+      id,
+      entry.table
+    );
 
-      if (typeof accessControlResult === "object") {
-        params = { ...params, ...accessControlResult };
-      }
+    if (typeof accessControlResult === "object") {
+      params = { ...params, ...accessControlResult };
+    }
 
-      if (!accessControlResult) {
-        return ctx.text("Unauthorized", 401);
-      }
+    if (!accessControlResult) {
+      return ctx.text("Unauthorized", 401);
     }
 
     ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
@@ -158,7 +149,7 @@ apiConfig.forEach((entry) => {
       undefined
     );
 
-    if (authEnabled && entry.access?.item?.read) {
+    if (entry.access?.item?.read) {
       const accessControlResult = await getItemReadResult(
         entry.access.item.read,
         ctx,
@@ -168,9 +159,7 @@ apiConfig.forEach((entry) => {
         return ctx.text("Unauthorized", 401);
       }
     }
-    if (authEnabled) {
-      data = await filterReadFieldAccess(entry.access?.fields, ctx, data);
-    }
+    data = await filterReadFieldAccess(entry.access?.fields, ctx, data);
     if (includeContentType !== undefined) {
       data.contentType = getForm(ctx, entry.table);
     }
@@ -199,28 +188,22 @@ apiConfig.forEach((entry) => {
 
     content.table = table;
 
-    const authEnabled = ctx.get("authEnabled");
-    if (authEnabled) {
-      let authorized = await getOperationCreateResult(
-        entry?.access?.operation?.create,
-        ctx,
-        content.data
-      );
-      if (!authorized) {
-        return ctx.text("Unauthorized", 401);
-      }
+    let authorized = await getOperationCreateResult(
+      entry?.access?.operation?.create,
+      ctx,
+      content.data
+    );
+    if (!authorized) {
+      return ctx.text("Unauthorized", 401);
     }
 
     try {
       // console.log("posting new record content", JSON.stringify(content, null, 2));
-      if (authEnabled) {
-        content.data = await filterCreateFieldAccess(
-          entry?.access?.fields,
-          ctx,
-          content.data
-        );
-      }
-      console.log("posting new record content", content.data);
+      content.data = await filterCreateFieldAccess(
+        entry?.access?.fields,
+        ctx,
+        content.data
+      );
       if (entry?.hooks?.resolveInput?.create) {
         content.data = await entry.hooks.resolveInput.create(ctx, content.data);
       }
@@ -262,25 +245,22 @@ apiConfig.forEach((entry) => {
     }
 
     let { includeContentType, source, ...params } = ctx.req.query();
-    const authEnabled = ctx.get("authEnabled");
-    if (authEnabled) {
-      const accessControlResult = await getApiAccessControlResult(
-        entry?.access?.operation?.update || true,
-        entry?.access?.filter?.update || true,
-        entry?.access?.item?.update || true,
-        ctx,
-        id,
-        entry.table,
-        content.data
-      );
+    const accessControlResult = await getApiAccessControlResult(
+      entry?.access?.operation?.update || true,
+      entry?.access?.filter?.update || true,
+      entry?.access?.item?.update || true,
+      ctx,
+      id,
+      entry.table,
+      content.data
+    );
 
-      if (typeof accessControlResult === "object") {
-        params = { ...params, ...accessControlResult };
-      }
+    if (typeof accessControlResult === "object") {
+      params = { ...params, ...accessControlResult };
+    }
 
-      if (!accessControlResult) {
-        return ctx.text("Unauthorized", 401);
-      }
+    if (!accessControlResult) {
+      return ctx.text("Unauthorized", 401);
     }
 
     const route = ctx.req.path.split("/")[2];
@@ -290,14 +270,12 @@ apiConfig.forEach((entry) => {
     content.id = id;
 
     try {
-      if (authEnabled) {
-        content.data = await filterUpdateFieldAccess(
-          entry.access?.fields,
-          ctx,
-          id,
-          content.data
-        );
-      }
+      content.data = await filterUpdateFieldAccess(
+        entry.access?.fields,
+        ctx,
+        id,
+        content.data
+      );
       if (entry?.hooks?.resolveInput?.update) {
         content.data = await entry.hooks.resolveInput.update(
           ctx,
@@ -332,24 +310,22 @@ apiConfig.forEach((entry) => {
     }
 
     let { includeContentType, source, ...params } = ctx.req.query();
-    const authEnabled = ctx.get("authEnabled");
-    if (authEnabled) {
-      const accessControlResult = await getApiAccessControlResult(
-        entry?.access?.operation?.delete || true,
-        entry?.access?.filter?.delete || true,
-        entry?.access?.item?.delete || true,
-        ctx,
-        id,
-        entry.table
-      );
 
-      if (typeof accessControlResult === "object") {
-        params = { ...params, ...accessControlResult };
-      }
+    const accessControlResult = await getApiAccessControlResult(
+      entry?.access?.operation?.delete || true,
+      entry?.access?.filter?.delete || true,
+      entry?.access?.item?.delete || true,
+      ctx,
+      id,
+      entry.table
+    );
 
-      if (!accessControlResult) {
-        return ctx.text("Unauthorized", 401);
-      }
+    if (typeof accessControlResult === "object") {
+      params = { ...params, ...accessControlResult };
+    }
+
+    if (!accessControlResult) {
+      return ctx.text("Unauthorized", 401);
     }
     params.id = id;
 
@@ -392,10 +368,7 @@ api.get("/ping", (c) => {
 });
 
 api.get("/kv-test", async (ctx) => {
-  const authEnabled = ctx.get("authEnabled");
-  const canProceed = authEnabled
-    ? (await config.adminAccessControl(ctx)) ?? true
-    : true;
+  const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -418,10 +391,7 @@ api.get("/kv-test", async (ctx) => {
 });
 
 api.get("/kv-test2", async (ctx) => {
-  const authEnabled = ctx.get("authEnabled");
-  const canProceed = authEnabled
-    ? (await config.adminAccessControl(ctx)) ?? true
-    : true;
+  const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -449,10 +419,7 @@ api.get("/kv-test2", async (ctx) => {
 });
 
 api.get("/kv-list", async (ctx) => {
-  const authEnabled = ctx.get("authEnabled");
-  const canProceed = authEnabled
-    ? (await config.adminAccessControl(ctx)) ?? true
-    : true;
+  const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -461,10 +428,7 @@ api.get("/kv-list", async (ctx) => {
 });
 
 api.get("/data", async (ctx) => {
-  const authEnabled = ctx.get("authEnabled");
-  const canProceed = authEnabled
-    ? (await config.adminAccessControl(ctx)) ?? true
-    : true;
+  const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -473,36 +437,34 @@ api.get("/data", async (ctx) => {
 });
 
 api.get("/forms", async (ctx) => {
-  const authEnabled = ctx.get("authEnabled");
-  const canProceed = authEnabled
-    ? (await config.adminAccessControl(ctx)) ?? true
-    : true;
-  if (!canProceed) {
-    return ctx.text("Unauthorized", 401);
-  }
   return ctx.html(await loadForm(ctx));
 });
 
-api.get("/form-components/auth/users", async (ctx) => {
-  const authEnabled = ctx.get("authEnabled");
-  const canProceed = authEnabled
-    ? (await config.adminAccessControl(ctx)) ?? true
-    : true;
-  if (!canProceed) {
-    return ctx.text("Unauthorized", 401);
+api.get("/form-components/auth/users/:setup?", async (ctx) => {
+  let ct = await getForm(ctx, "users");
+  const setup = ctx.req.param("setup");
+  console.log("setup", setup);
+  if (ctx.req.param("setup")) {
+    ct = ct.reduce((acc, entry) => {
+      if (entry.key === "role") {
+        entry.disabled = true;
+        entry.defaultValue = "admin";
+      }
+      acc.push(entry);
+      if (entry.key === "password") {
+        acc.push({
+          ...entry,
+          key: "confirm",
+          label: "Confirm Password",
+        });
+      }
+      return acc;
+    }, []);
   }
-  const ct = await getForm(ctx, "users");
   return ctx.json(ct);
 });
 
 api.get("/form-components/:route", async (ctx) => {
-  const authEnabled = ctx.get("authEnabled");
-  const canProceed = authEnabled
-    ? (await config.adminAccessControl(ctx)) ?? true
-    : true;
-  if (!canProceed) {
-    return ctx.text("Unauthorized", 401);
-  }
   const route = ctx.req.param("route");
 
   const table = apiConfig.find((entry) => entry.route === route).table;
@@ -512,10 +474,7 @@ api.get("/form-components/:route", async (ctx) => {
 });
 
 api.post("/form-components", async (ctx) => {
-  const authEnabled = ctx.get("authEnabled");
-  const canProceed = authEnabled
-    ? (await config.adminAccessControl(ctx)) ?? true
-    : true;
+  const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -530,10 +489,7 @@ api.post("/form-components", async (ctx) => {
 });
 
 api.get("/cache/clear-all", async (ctx) => {
-  const authEnabled = ctx.get("authEnabled");
-  const canProceed = authEnabled
-    ? (await config.adminAccessControl(ctx)) ?? true
-    : true;
+  const canProceed = await config.adminAccessControl(ctx);
 
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
@@ -545,10 +501,7 @@ api.get("/cache/clear-all", async (ctx) => {
 });
 
 api.get("/cache/clear-in-memory", async (ctx) => {
-  const authEnabled = ctx.get("authEnabled");
-  const canProceed = authEnabled
-    ? (await config.adminAccessControl(ctx)) ?? true
-    : true;
+  const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -558,10 +511,7 @@ api.get("/cache/clear-in-memory", async (ctx) => {
 });
 
 api.get("/cache/clear-kv", async (ctx) => {
-  const authEnabled = ctx.get("authEnabled");
-  const canProceed = authEnabled
-    ? (await config.adminAccessControl(ctx)) ?? true
-    : true;
+  const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -571,10 +521,7 @@ api.get("/cache/clear-kv", async (ctx) => {
 });
 
 api.get("/cache/in-memory", async (ctx) => {
-  const authEnabled = ctx.get("authEnabled");
-  const canProceed = authEnabled
-    ? (await config.adminAccessControl(ctx)) ?? true
-    : true;
+  const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -584,10 +531,7 @@ api.get("/cache/in-memory", async (ctx) => {
 });
 
 api.get("/cache/kv", async (ctx) => {
-  const authEnabled = ctx.get("authEnabled");
-  const canProceed = authEnabled
-    ? (await config.adminAccessControl(ctx)) ?? true
-    : true;
+  const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -597,10 +541,7 @@ api.get("/cache/kv", async (ctx) => {
 });
 
 api.get("/cache/kv/:cacheKey", async (ctx) => {
-  const authEnabled = ctx.get("authEnabled");
-  const canProceed = authEnabled
-    ? (await config.adminAccessControl(ctx)) ?? true
-    : true;
+  const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -611,10 +552,7 @@ api.get("/cache/kv/:cacheKey", async (ctx) => {
 });
 
 api.get("/kv", async (ctx) => {
-  const authEnabled = ctx.get("authEnabled");
-  const canProceed = authEnabled
-    ? (await config.adminAccessControl(ctx)) ?? true
-    : true;
+  const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -623,10 +561,7 @@ api.get("/kv", async (ctx) => {
 });
 
 api.get("/kv/:cacheKey", async (ctx) => {
-  const authEnabled = ctx.get("authEnabled");
-  const canProceed = authEnabled
-    ? (await config.adminAccessControl(ctx)) ?? true
-    : true;
+  const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }
@@ -642,10 +577,7 @@ api.get("/kv/:cacheKey", async (ctx) => {
 });
 
 api.get("/kv/delete-all", async (ctx) => {
-  const authEnabled = ctx.get("authEnabled");
-  const canProceed = authEnabled
-    ? (await config.adminAccessControl(ctx)) ?? true
-    : true;
+  const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
     return ctx.text("Unauthorized", 401);
   }

@@ -7,6 +7,7 @@ import {
   saveKVData,
 } from "../data/kv-data";
 import { Bindings } from "../types/bindings";
+import { FC } from "hono/jsx";
 
 export const Head = () => {
   return (
@@ -148,18 +149,15 @@ export const ToggleTheme = () => {
     </div>
   );
 };
-export const Layout = (props: {
-  children?: string;
+export const Layout: FC<{
   formComponents?: any[];
   screenTitle?: string;
   newItemButtonText?: string;
   username?: string;
   env: Bindings;
-}) => {
+}> = (props) => {
   const tables = apiConfig;
 
-  const useAuthEnvEnabled =
-    props.env?.useAuth === "true" || props.env?.useAuth === true;
   return (
     <html lang="en" data-bs-theme="auto">
       <EnvContext.Provider value={props.env}>
@@ -209,9 +207,7 @@ export const Layout = (props: {
                       <span>Tables</span>
                     </h6>
                     {tables
-                      .filter(
-                        (t) => !useAuthEnvEnabled || !t.hideWhenAuthEnabled
-                      )
+                      .filter((t) => t.route !== "users")
                       .map((item: ApiConfig) => {
                         return (
                           <li class="nav-item">
@@ -224,29 +220,26 @@ export const Layout = (props: {
                           </li>
                         );
                       })}
-                    {useAuthEnvEnabled ? (
-                      <>
-                        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                          <span>Auth</span>
-                        </h6>
-                        <li class="nav-item">
-                          <span class="px-3">{props.username}</span>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" href={"/admin/tables/auth/users"}>
-                            Users
-                          </a>
-                        </li>
+                    <>
+                      <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                        <span>Auth</span>
+                      </h6>
+                      <li class="nav-item">
+                        <span class="px-3">{props.username}</span>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href={"/admin/tables/auth/users"}>
+                          Users
+                        </a>
+                      </li>
 
-                        <li class="nav-item">
-                          <a class="nav-link" href="/v1/auth/logout">
-                            Logout
-                          </a>
-                        </li>
-                      </>
-                    ) : (
-                      ""
-                    )}
+                      <li class="nav-item">
+                        <a class="nav-link" href="/v1/auth/logout">
+                          Logout
+                        </a>
+                      </li>
+                    </>
+
                     <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                       <span>Cache</span>
                     </h6>
@@ -288,7 +281,7 @@ export const Layout = (props: {
           <div
             class="modal fade"
             id="exampleModal"
-            tabindex="-1"
+            tabindex={-1}
             aria-labelledby="exampleModalLabel"
             aria-hidden="true"
           >
