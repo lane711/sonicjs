@@ -122,30 +122,27 @@ const getTussleMiddleware = (() => {
             const fileExtension = "." + filename.split(".").pop();
 
             console.log("params before", JSON.stringify(params, null, 2));
-            const authEnabled = honoCtx.get("authEnabled");
 
-            if (authEnabled) {
-              let authorized = true;
-              if (mode === "create") {
-                authorized = await getOperationCreateResult(
-                  table?.access?.operation?.create,
-                  honoCtx,
-                  params
-                );
-              } else {
-                authorized = !!(await getApiAccessControlResult(
-                  table?.access?.operation?.update || true,
-                  table?.access?.filter?.update || true,
-                  table?.access?.item?.update || true,
-                  honoCtx,
-                  id,
-                  table.table,
-                  params
-                ));
-              }
-              if (!authorized) {
-                return honoCtx.text("Unauthorized", 401);
-              }
+            let authorized = true;
+            if (mode === "create") {
+              authorized = await getOperationCreateResult(
+                table?.access?.operation?.create,
+                honoCtx,
+                params
+              );
+            } else {
+              authorized = !!(await getApiAccessControlResult(
+                table?.access?.operation?.update || true,
+                table?.access?.filter?.update || true,
+                table?.access?.item?.update || true,
+                honoCtx,
+                id,
+                table.table,
+                params
+              ));
+            }
+            if (!authorized) {
+              return honoCtx.text("Unauthorized", 401);
             }
 
             let path: string;
@@ -224,21 +221,17 @@ const handleGET = async (ctx: AppContext) => {
     await table.hooks.beforeOperation(ctx, "read", pathname);
   }
 
-  const authEnabled = ctx.get("authEnabled");
+  const accessControlResult = await getApiAccessControlResult(
+    table?.access?.operation?.read || true,
+    table?.access?.filter?.read || true,
+    table?.access?.item?.read || true,
+    ctx,
+    pathname,
+    table.table
+  );
 
-  if (authEnabled) {
-    const accessControlResult = await getApiAccessControlResult(
-      table?.access?.operation?.read || true,
-      table?.access?.filter?.read || true,
-      table?.access?.item?.read || true,
-      ctx,
-      pathname,
-      table.table
-    );
-
-    if (!accessControlResult) {
-      return ctx.text("Unauthorized", 401);
-    }
+  if (!accessControlResult) {
+    return ctx.text("Unauthorized", 401);
   }
   const cache = await caches.default.match(request.url + "GET");
   if (cache) {
