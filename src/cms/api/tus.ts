@@ -18,7 +18,10 @@ tusAPI.all("*", async (ctx) => {
   const request = ctx.req;
 
   const route = request.header("sonic-route");
-  const fieldName = request.header("sonic-field");
+  let fieldName = request.header("sonic-field");
+  if (fieldName?.includes("[")) {
+    fieldName = fieldName.split("[")[0];
+  }
   const mode = request.header("sonic-mode") as "create" | "update";
   const id = request.header("data-id");
   const table = apiConfig.find((entry) => entry.route === route);
@@ -213,6 +216,9 @@ const handleGET = async (ctx: AppContext) => {
     }
     if (part.startsWith("f_")) {
       fieldName = part.replace("f_", "");
+      if (fieldName.includes("[")) {
+        fieldName = fieldName.split("[")[0];
+      }
     }
   });
 
@@ -234,6 +240,7 @@ const handleGET = async (ctx: AppContext) => {
     return ctx.text("Unauthorized", 401);
   }
   const cache = await caches.default.match(request.url + "GET");
+  console.log(cache);
   if (cache) {
     if (table.hooks?.afterOperation) {
       await table.hooks.afterOperation(ctx, "read", pathname, null, {
@@ -243,6 +250,7 @@ const handleGET = async (ctx: AppContext) => {
     }
     return cache;
   }
+  console.log(table);
   if (table) {
     const field = table.fields?.[fieldName];
     if (field.type === "file" || field.type === "file[]") {
@@ -254,8 +262,10 @@ const handleGET = async (ctx: AppContext) => {
           skipMerge: false,
         });
 
+        console.log(pathname);
         try {
           const file = await storage.getFile(pathname);
+          console.log(file);
           const type = (file.metadata.type || file.metadata.filetype) as string;
           ctx.header("Content-Type", type);
           ctx.status(200);
