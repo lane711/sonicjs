@@ -21,23 +21,36 @@ import qs from "qs";
 import { format } from "date-fns";
 import { getAllFromInMemoryCache, getFromInMemoryCache } from "../data/cache";
 import { getKVCache, getRecordFromKvCache } from "../data/kv-data";
-import { loadLogin } from "./pages/login";
+import { loadLogin, loadSetup } from "./pages/login";
 import { Variables } from "../../server";
+import { tableSchemas } from "../../db/routes";
+import { drizzle } from "drizzle-orm/d1";
+import { isNotNull } from "drizzle-orm";
+import { hasUser } from "../auth/auth-helpers";
 
 const admin = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 admin.use("*", async (ctx, next) => {
-  const authEnabled = ctx.get("authEnabled");
-  if (authEnabled) {
-    const path = ctx.req.path;
-    let canUseAdmin = await config.adminAccessControl(ctx);
-    if (!canUseAdmin && path !== "/admin/login") {
-      //redirect if not logged in
+  const path = ctx.req.path;
+  let canUseAdmin = await config.adminAccessControl(ctx);
+  if (
+    !canUseAdmin &&
+    path !== "/admin/login" &&
+    path !== "/admin/content/new/auth/users/setup"
+  ) {
+    const userExists = await hasUser(ctx);
+    if (userExists) {
       return ctx.redirect("/admin/login", 302);
-    } else if (canUseAdmin && path === "/admin/login") {
-      //redirect if logged in
-      return ctx.redirect("/admin", 302);
+    } else {
+      return ctx.redirect("/admin/content/new/auth/users/setup", 302);
     }
+    //redirect if not logged in
+  } else if (
+    canUseAdmin &&
+    (path === "/admin/login" || path === "/admin/content/new/auth/users/setup")
+  ) {
+    //redirect if logged in
+    return ctx.redirect("/admin", 302);
   }
   await next();
 });
@@ -50,14 +63,24 @@ admin.get("/", async (ctx) => ctx.html(await loadApis(ctx)));
 
 admin.get("/login", async (ctx) => ctx.html(await loadLogin(ctx)));
 
+admin.get("/content/new/auth/users/setup", async (ctx) =>
+  ctx.html(await loadSetup(ctx))
+);
+
 admin.get("/content/edit/:route/:id", async (ctx) => {
   const route = ctx.req.param("route");
   const id = ctx.req.param("id");
+  if (route === "users") {
+    return ctx.redirect(`/admin/content/edit/auth/users/${id}`, 301);
+  }
   return ctx.html(await loadEditContent(ctx, route, id));
 });
 
 admin.get("/content/new/:route", async (ctx) => {
   const route = ctx.req.param("route");
+  if (route === "users") {
+    return ctx.redirect("/admin/content/new/auth/users", 301);
+  }
   return ctx.html(await loadNewContent(ctx, route));
 });
 
@@ -77,6 +100,9 @@ admin.get("/content/edit/auth/users/:id", async (ctx) => {
 
 admin.get("/tables/:route", async (ctx) => {
   const route = ctx.req.param("route");
+  if (route === "users") {
+    return ctx.redirect("/admin/tables/auth/users", 301);
+  }
   return ctx.html(await loadTableData(ctx, route));
 });
 
@@ -224,7 +250,7 @@ async function dataRoute(
     executionTime,
   });
 }
-admin.get("/api/auth/:table", (ctx) => dataRoute(ctx.req.param("table"), ctx));
+admin.get("/api/auth/:route", (ctx) => dataRoute(ctx.req.param("route"), ctx));
 admin.get("/api/:route", (ctx) => dataRoute(ctx.req.param("route"), ctx));
 
 function getDisplayField(item) {

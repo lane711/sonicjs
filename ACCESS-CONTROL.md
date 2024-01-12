@@ -328,7 +328,6 @@ export const apiConfig: ApiConfig[] = [
   {
     table: "users",
     route: "users",
-    hideWhenAuthEnabled: true,
     access: {
       operation: {
         create: isAdmin,
