@@ -81,7 +81,8 @@ export async function addToCache(ctx = {}, key: string, data) {
 
 export async function getFromInMemoryCache(ctx = {}, key: string) {
   key = addCachePrefix(key);
-  return getFromInMemoryCache(ctx, key);
+  return getFromCache(ctx, key);
+
 }
 
 export async function getFromInMemorySystemCache(ctx = {}, key: string) {
@@ -118,7 +119,7 @@ export async function getAllCacheItemsFromInMemoryCache() {
 }
 
 export async function clearInMemoryCache() {
-  console.log("**** clearing InMemoryCache ****");
+  console.log("**** Clearing InMemoryCache ****");
   cache.clear();
   return true;
 }
@@ -130,7 +131,7 @@ export async function rehydrateCacheFromKVKeysOnStartup(ctx) {
     ctx,
     rehydrateCacheKey
   );
-  // console.log("isCacheAlreadyPopulated", isCacheAlreadyPopulated);
+  console.log("isCacheAlreadyPopulated", isCacheAlreadyPopulated);
 
   if (isCacheAlreadyPopulated.length) {
     // console.log("cache already populated");

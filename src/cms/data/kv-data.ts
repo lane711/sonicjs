@@ -129,6 +129,7 @@ export function getAllKV(db) {
 }
 
 export async function clearKVCache(db) {
+  console.log('**** Clearing KV Cache ****')
   const itemsToDelete = await getDataListByPrefix(db, addCachePrefix(""));
   for await (const key of itemsToDelete.keys) {
     await deleteKVById(db, key.name);
@@ -263,6 +264,7 @@ export async function getKVKeysSorted(
 }
 
 export async function clearKVKeysCache(db) {
+  console.log('**** Clearing Keys Cache ****')
   const itemsToDelete = await getDataListByPrefix(db, addKeyPrefix(""));
   for await (const key of itemsToDelete.keys) {
     await deleteKVById(db, key.name);

@@ -6,6 +6,7 @@ import { loadForm } from "./forms/form";
 
 import { Bindings } from "../types/bindings";
 import {
+  loadCacheClear,
   loadEditContent,
   loadInMemoryCacheDetail,
   loadInMemoryCacheTable,
@@ -66,6 +67,10 @@ admin.get("/cache/kv", async (ctx) => {
 
 admin.get("/cache/keys", async (ctx) => {
   return ctx.html(await loadKVKeysTable(ctx));
+});
+
+admin.get("/cache/clear", async (ctx) => {
+  return ctx.html(await loadCacheClear(ctx));
 });
 
 admin.get("/cache/kv/:id", async (ctx) => {

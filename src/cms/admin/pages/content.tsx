@@ -132,14 +132,13 @@ export async function loadKVCacheTable(ctx) {
   );
 }
 
-
 export async function loadKVKeysTable(ctx) {
   return (
     <Layout screenTitle={"Keys Cache"}>
       <div class="row">
         <div class="col-md-12">
           <div class="pb-2 mb-3">
-            <button id="clear-keys-cache" class="btn btn-warning">
+            <button id="clear-keys-cache" class="btn btn-warning me-2">
               Clear Keys Cache
             </button>
             <button id="rehydrate-cache" class="btn btn-warning">
@@ -148,6 +147,20 @@ export async function loadKVKeysTable(ctx) {
           </div>
 
           <div id="grid-keys-cache"></div>
+        </div>
+      </div>
+    </Layout>
+  );
+}
+
+export async function loadCacheClear(ctx) {
+  return (
+    <Layout screenTitle={"Clear All Caches"}>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="pb-2 mb-3">
+            <div id="formio-clear-cache"></div>
+          </div>
         </div>
       </div>
     </Layout>
@@ -165,7 +178,7 @@ export async function loadKVCacheDetail(ctx, kv) {
             </button>
           </div>
 
-          <textarea  rows="24" style="width: 100%; max-width: 100%;">
+          <textarea rows="24" style="width: 100%; max-width: 100%;">
             {JSON.stringify(kv, null, 2)}
           </textarea>
         </div>
@@ -185,7 +198,7 @@ export async function loadInMemoryCacheDetail(ctx, kv) {
             </button>
           </div>
 
-          <textarea  rows="24" style="width: 100%; max-width: 100%;">
+          <textarea rows="24" style="width: 100%; max-width: 100%;">
             {JSON.stringify(kv, null, 2)}
           </textarea>
         </div>

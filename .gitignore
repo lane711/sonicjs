@@ -1,5 +1,5 @@
 node_modules
 dist
-.wrangler/state
+.wrangler
 wrangler.toml
 .vscode/settings.json

@@ -192,14 +192,11 @@ export const Layout = (props: {
                   </li>
 
                   <li class="nav-item">
-                    <a
-                      id="clear-cache-all"
-                      class="nav-link"
-                      href="javascript:void(0)"
-                    >
-                      Clear All Caches
+                    <a class="nav-link" href="/admin/cache/clear">
+                      Clear Caches
                     </a>
                   </li>
+
                 </ul>
               </div>
             </nav>
@@ -283,6 +280,7 @@ export const Layout = (props: {
         <script src="/public/js/grid-in-memory-cache.js"></script>
         <script src="/public/js/grid-kv-cache.js"></script>
         <script src="/public/js/grid-keys-cache.js"></script>
+        <script src="/public/js/clear-cache.js"></script>
 
       </body>
     </html>

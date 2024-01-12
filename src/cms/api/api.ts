@@ -26,7 +26,11 @@ import {
   insertRecord,
   updateRecord,
 } from "../data/data";
-import { clearInMemoryCache, getAllFromInMemoryCache, rehydrateCacheFromKVKeys } from "../data/cache";
+import {
+  clearInMemoryCache,
+  getAllFromInMemoryCache,
+  rehydrateCacheFromKVKeys,
+} from "../data/cache";
 
 const api = new Hono<{ Bindings: Bindings }>();
 
@@ -273,12 +277,23 @@ api.post("/form-components", async (c) => {
   return c.text("Created!", 201);
 });
 
-api.get("/cache/clear-all", async (ctx) => {
-  console.log("clearing cache");
-  await clearInMemoryCache();
-  await clearKVCache(ctx.env.KVDATA);
-  await clearKVKeysCache(ctx.env.KVDATA);
-  return ctx.text("in memory and kv caches cleared");
+api.post("/cache/clear-all", async (ctx) => {
+  const body = await ctx.req.json();
+
+  //must be clears first, otherwise in memory cache will just repopulate
+  if (body.data.keys) {
+    await clearKVKeysCache(ctx.env.KVDATA);
+  }
+
+  if (body.data.inMemory) {
+    await clearInMemoryCache();
+  }
+
+  if (body.data.kv) {
+    await clearKVCache(ctx.env.KVDATA);
+  }
+
+  return ctx.text("selected caches cleared");
 });
 
 api.get("/cache/clear-in-memory", async (ctx) => {
