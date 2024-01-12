@@ -188,6 +188,39 @@ admin.get("/api/kv-cache", async (ctx) => {
     executionTime,
   });
 });
+
+admin.get("/api/files", async (ctx) => {
+  let fileFields: Record<string, string[]> = {};
+  apiConfig.forEach((entry) => {
+    if (entry.fields) {
+      const entryFileFields = Object.keys(entry.fields).filter((key) => {
+        const field = entry.fields[key];
+        return field.type === "file" || field.type === "file[]";
+      });
+      if (entryFileFields.length > 0) {
+        fileFields[entry.table] = entryFileFields;
+      }
+    }
+  });
+  let promises: Promise<any>[] = [];
+  Object.keys(fileFields).forEach((key) => {
+    const fields = fileFields[key];
+    fields.forEach((field) => {
+      promises.push(
+        getRecords(
+          ctx,
+          key,
+          { [field]: "IS NOT NULL" },
+          `${fileFields}-${key}-${field}-files`,
+          "fastest",
+          undefined
+        )
+      );
+    });
+  });
+  const results = await Promise.all(promises);
+  return ctx.json(results);
+});
 async function dataRoute(
   route: string,
   ctx: Context<{ Bindings: Bindings; Variables: Variables }>

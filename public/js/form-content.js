@@ -39,7 +39,7 @@ let mode;
 let currUppyField = "";
 
 const initUppy = async (id) => {
-  const { Uppy, Dashboard, Tus } = await import(
+  const { Uppy, Url, Dashboard, Tus, ImageEditor } = await import(
     "https://releases.transloadit.com/uppy/v3.21.0/uppy.min.mjs"
   );
   const uppy = new Uppy();
@@ -48,6 +48,7 @@ const initUppy = async (id) => {
     showProgressDetails: true,
     closeModalOnClickOutside: true,
   });
+  uppy.use(ImageEditor, { target: Dashboard });
   const endpoint = location.origin + "/tus";
   uppy.use(Tus, {
     endpoint,
@@ -100,7 +101,7 @@ const setupComponents = (data) => {
           attributes: {
             "data-field": c.key,
           },
-          label: "Choose File",
+          label: "Upload File",
           type: "button",
           action: "event",
           theme: "secondary",
@@ -120,7 +121,7 @@ const setupComponents = (data) => {
             },
             {
               key: undefined,
-              label: "Choose File",
+              label: "Upload File",
               attributes: {
                 "data-field": c.key,
                 array: true,
@@ -144,11 +145,14 @@ handleSubmitData = (data) => {
   console.log("data pre", JSON.stringify(data, null, 2));
   Object.keys(data).forEach((key) => {
     const value = data[key];
-    // if (key.endsWith("_btn")) {
-    //   delete data[key];
-    // }
     if (Array.isArray(value)) {
-      data[key] = value.map((v) => v[key]);
+      data[key] = value.filter((v) => v[key]).map((v) => v[key]);
+      if (data[key].length === 0) {
+        delete data[key];
+      }
+    }
+    if (!data[key]) {
+      delete data[key];
     }
   });
   console.log("data post", JSON.stringify(data, null, 2));
@@ -211,6 +215,48 @@ const onUploadSuccess = (form) => (file, response) => {
     }
   }
 };
+
+function setupFilePreviews(fileFields, form) {
+  if (fileFields.length) {
+    for (const field of fileFields) {
+      const component = form.getComponent(field.key);
+      const value = component._data[field.key];
+      const element = component?.element;
+      console.log(value, component, element);
+      const addPreviewElement = (value, element, i = 0) => {
+        if (value && element) {
+          let extensions = [
+            "jpg",
+            "jpeg",
+            "png",
+            "bmp",
+            "gif",
+            "svg",
+            "webp",
+            "avif",
+          ];
+          let regex = new RegExp(`\\.(${extensions.join("|")})$`, "i");
+          element.insertAdjacentHTML(
+            "afterend",
+            getFilePreviewElement(value, regex.test(value), i)
+          );
+        }
+      };
+      if (Array.isArray(value)) {
+        const trs = element.querySelectorAll("tr");
+        let i = 0;
+        for (const v of value) {
+          const td = trs[i + 1].querySelector("td");
+          const input = td.querySelector("input");
+          addPreviewElement(v[field.key], input, i);
+          i++;
+        }
+      } else {
+        addPreviewElement(value, element);
+      }
+    }
+  }
+}
 function newContent() {
   console.log("contentType", route);
 
@@ -253,54 +299,20 @@ function newContent() {
           contentTypeComponents = event.components;
           console.log("event ->", event);
         }
+
+        const changedKey = event.changed.component.key;
+        const fileFieldWasChanged = fileFields
+          .map((f) => f.key)
+          .includes(changedKey);
+        if (fileFieldWasChanged) {
+          setupFilePreviews(fileFields, form);
+        }
       });
       form.on("customEvent", function (event) {
         chooseFileEventHandler(uppy, event);
       });
     });
   });
-}
-
-function setupFilePreviews(fileFields, response, form) {
-  if (fileFields.length) {
-    for (const field of fileFields) {
-      const value = response?.data?.data?.[field.key];
-      const component = form.getComponent(field.key);
-      const element = component?.element;
-      console.log(component, element);
-      const addPreviewElement = (value, element, i = 0) => {
-        if (value && element) {
-          let extensions = [
-            "jpg",
-            "jpeg",
-            "png",
-            "bmp",
-            "gif",
-            "svg",
-            "webp",
-            "avif",
-          ];
-          let regex = new RegExp(`\\.(${extensions.join("|")})$`, "i");
-          element.insertAdjacentHTML(
-            "afterend",
-            getFilePreviewElement(value, regex.test(value), i)
-          );
-        }
-      };
-      if (Array.isArray(value)) {
-        const trs = element.querySelectorAll("tr");
-        let i = 0;
-        for (const v of value) {
-          const td = trs[i + 1].querySelector("td");
-          const input = td.querySelector("input");
-          addPreviewElement(v[field.key], input, i);
-          i++;
-        }
-      } else {
-        addPreviewElement(value, element);
-      }
-    }
-  }
 }
 
 function saveNewContent(data) {
@@ -393,7 +405,13 @@ function editContent() {
             contentTypeComponents = event.components;
             console.log("event ->", event);
           }
-          setupFilePreviews(fileFields, response, form);
+          const changedKey = event.changed.component.key;
+          const fileFieldWasChanged = fileFields
+            .map((f) => f.key)
+            .includes(changedKey);
+          if (fileFieldWasChanged) {
+            setupFilePreviews(fileFields, form);
+          }
           console.log("change");
         });
 
