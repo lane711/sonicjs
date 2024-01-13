@@ -129,7 +129,7 @@ export function getAllKV(db) {
 }
 
 export async function clearKVCache(db) {
-  console.log('**** Clearing KV Cache ****')
+  console.log("**** Clearing KV Cache ****");
   const itemsToDelete = await getDataListByPrefix(db, addCachePrefix(""));
   for await (const key of itemsToDelete.keys) {
     await deleteKVById(db, key.name);
@@ -249,7 +249,7 @@ export async function getKVKeyLatestUrl(db, limit: number = 1) {
   const list = await db.list({ prefix, limit });
   if (list.keys.length) {
     let url = list.keys[0].metadata.url;
-    console.log('getKVKeyLatestUrl', url )
+    console.log("getKVKeyLatestUrl", url);
     return url;
   }
 }
@@ -264,9 +264,12 @@ export async function getKVKeysSorted(
 }
 
 export async function clearKVKeysCache(db) {
-  console.log('**** Clearing Keys Cache ****')
+  console.log("**** Clearing Keys Cache ****");
   const itemsToDelete = await getDataListByPrefix(db, addKeyPrefix(""));
   for await (const key of itemsToDelete.keys) {
-    await deleteKVById(db, key.name);
+    if (key !== "system::startup") {
+      console.log('removing key ', key)
+      await deleteKVById(db, key.name);
+    }
   }
 }

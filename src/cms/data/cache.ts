@@ -153,6 +153,7 @@ export async function rehydrateCacheFromKVKeys(ctx) {
       console.log("==> adding to in memory", url);
       await rehydrateCacheItemFromKVKey(ctx, url);
     }
+    console.log(`Rehydrated ${keyData.keys.length} items`);
   }
 }
 export async function rehydrateCacheItemFromKVKey(ctx, url) {

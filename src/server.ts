@@ -7,7 +7,7 @@ import { admin } from "./cms/admin/admin";
 import { example } from "./custom/example";
 import { status } from "./cms/api/status";
 import { log } from "./cms/util/logger";
-import { rehydrateCacheFromKVKeysOnStartup } from "./cms/data/cache";
+import { addToInMemorySystemCache, rehydrateCacheFromKVKeysOnStartup } from "./cms/data/cache";
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -27,7 +27,6 @@ app.use(
 app.use("*", async (ctx, next) => {
   if (ctx.req.path.indexOf("/admin") == 0 || ctx.req.path.indexOf("/v1") == 0) {
     log(ctx, { level: "info", method: ctx.req.method, url: ctx.req.path });
-    rehydrateCacheFromKVKeysOnStartup(ctx);
   }
   await next();
 });
@@ -54,8 +53,20 @@ app.route("/status", status);
 
 //caching pop
 app.use("*", async (ctx, next) => {
-  console.log('maybe  check caching')
+  console.log("maybe  check caching");
   await next();
 });
+
+//startup code goes here
+(async function () {
+  console.log(">>> SonicJs Starting Up <<<");
+  rehydrateCacheFromKVKeysOnStartup({});
+  // add startup entry to cache
+  const now = new Date().getTime().toString();
+  const newCacheItem = await addToInMemorySystemCache({}, "startup", {
+    started: now,
+  });
+  console.log(">>> SonicJs Starting Up End <<<");
+})();
 
 export default app;
