@@ -189,6 +189,11 @@ admin.get("/api/kv-cache", async (ctx) => {
   });
 });
 
+const isImage = (fileName: string) => {
+  let extensions = ["jpg", "jpeg", "png", "bmp", "gif", "svg", "webp", "avif"];
+  let regex = new RegExp(`\\.(${extensions.join("|")})$`, "i");
+  return regex.test(fileName);
+};
 admin.get("/api/files", async (ctx) => {
   let fileFields: Record<string, string[]> = {};
   apiConfig.forEach((entry) => {
@@ -203,23 +208,45 @@ admin.get("/api/files", async (ctx) => {
     }
   });
   let promises: Promise<any>[] = [];
+  const images = new Set<string>();
+  const files = new Set<string>();
   Object.keys(fileFields).forEach((key) => {
     const fields = fileFields[key];
     fields.forEach((field) => {
       promises.push(
-        getRecords(
-          ctx,
-          key,
-          { [field]: "IS NOT NULL" },
-          `${fileFields}-${key}-${field}-files`,
-          "fastest",
-          undefined
-        )
+        (async function () {
+          const records = await getRecords(
+            ctx,
+            key,
+            { [field]: "IS NOT NULL" },
+            `${fileFields}-${key}-${field}-files`,
+            "fastest",
+            undefined
+          );
+          records.data.forEach((record) => {
+            let value = record[field];
+            if (value.startsWith("[") && value.endsWith("]")) {
+              try {
+                value = JSON.parse(value);
+              } catch (error) {
+                console.error("error", error);
+              }
+            }
+            value = !Array.isArray(value) ? [value] : value;
+            value.forEach((file) => {
+              if (isImage(file)) {
+                images.add(file);
+              } else {
+                files.add(file);
+              }
+            });
+          });
+        })()
       );
     });
   });
-  const results = await Promise.all(promises);
-  return ctx.json(results);
+  await Promise.all(promises);
+  return ctx.json({ images: Array.from(images), files: Array.from(files) });
 });
 async function dataRoute(
   route: string,
