@@ -82,7 +82,6 @@ export async function addToCache(ctx = {}, key: string, data) {
 export async function getFromInMemoryCache(ctx = {}, key: string) {
   key = addCachePrefix(key);
   return getFromCache(ctx, key);
-
 }
 
 export async function getFromInMemorySystemCache(ctx = {}, key: string) {
@@ -145,15 +144,18 @@ export async function rehydrateCacheFromKVKeysOnStartup(ctx) {
     rehydrateCacheFromKVKeys(ctx);
   }
 }
+
 export async function rehydrateCacheFromKVKeys(ctx) {
-  const keyData = await getKVKeys(ctx.env.KVDATA);
-  if (keyData.keys) {
-    for await (const key of keyData.keys) {
-      const url = key.metadata.url;
-      console.log("==> adding to in memory", url);
-      await rehydrateCacheItemFromKVKey(ctx, url);
+  if (ctx.env && ctx.env.KVDATA) {
+    const keyData = await getKVKeys(ctx.env.KVDATA);
+    if (keyData.keys) {
+      for await (const key of keyData.keys) {
+        const url = key.metadata.url;
+        console.log("==> adding to in memory", url);
+        await rehydrateCacheItemFromKVKey(ctx, url);
+      }
+      console.log(`Rehydrated ${keyData.keys.length} items`);
     }
-    console.log(`Rehydrated ${keyData.keys.length} items`);
   }
 }
 export async function rehydrateCacheItemFromKVKey(ctx, url) {
