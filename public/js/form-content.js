@@ -38,7 +38,7 @@ let mode;
 
 let currUppyField = "";
 
-const initUppy = async (id) => {
+async function initUppy(id) {
   const { Uppy, Url, Dashboard, Tus, ImageEditor } = await import(
     "https://releases.transloadit.com/uppy/v3.21.0/uppy.min.mjs"
   );
@@ -60,9 +60,9 @@ const initUppy = async (id) => {
     },
   });
   return uppy;
-};
+}
 
-const chooseFileEventHandler = (uppy, event) => {
+function chooseFileEventHandler(uppy, event) {
   if (uppy) {
     let field = event.component.attributes["data-field"];
     const isArray = event.component.attributes["array"];
@@ -81,9 +81,54 @@ const chooseFileEventHandler = (uppy, event) => {
       dashboard.openModal();
     }
   }
-};
+}
 
-const setupComponents = (data) => {
+let filesResponse;
+async function pickFileEventHandler(event) {
+  const fileModal = new bootstrap.Modal("#fileModal");
+  let field = event.component.attributes["data-field"];
+  const isArray = event.component.attributes["array"];
+
+  if (filesResponse) {
+    fileModal.show();
+  } else {
+    filesResponse = await axios.get("/admin/api/files");
+    console.log(filesResponse.data);
+    const galleryColumns =
+      fileModal._dialog.querySelectorAll(".gallery-column");
+
+    if (galleryColumns && galleryColumns.length) {
+      const images = filesResponse.data.images;
+      for (let i = 0; i < images.length; i++) {
+        const galleryColumn = galleryColumns[i % galleryColumns.length];
+        const image = images[i];
+        const a = document.createElement("a");
+        a.href = image;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        const img = document.createElement("img");
+        img.src = image;
+        a.appendChild(img);
+        galleryColumn.appendChild(a);
+      }
+    }
+    const filePane = fileModal._dialog.querySelector("#file-tab-pane");
+    if (filePane) {
+      const files = filesResponse.data.files;
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const a = document.createElement("a");
+        a.href = file;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        filePane.appendChild(a);
+      }
+    }
+    fileModal.show();
+  }
+}
+
+function setupComponents(data) {
   const fileFields = data.filter(
     (c) => c.metaType === "file" || c.metaType === "file[]"
   );
@@ -100,8 +145,22 @@ const setupComponents = (data) => {
           key: undefined,
           attributes: {
             "data-field": c.key,
+            key: "upload",
           },
           label: "Upload File",
+          type: "button",
+          action: "event",
+          theme: "secondary",
+          readOnly: true,
+        });
+        acc.push({
+          ...c,
+          key: undefined,
+          attributes: {
+            "data-field": c.key,
+            key: "pick",
+          },
+          label: "Pick Existing",
           type: "button",
           action: "event",
           theme: "secondary",
@@ -125,12 +184,26 @@ const setupComponents = (data) => {
               attributes: {
                 "data-field": c.key,
                 array: true,
+                key: "upload",
               },
               type: "button",
               action: "event",
               theme: "secondary",
               readOnly: true,
             },
+            // {
+            //   key: undefined,
+            //   label: "Pick Existing",
+            //   attributes: {
+            //     "data-field": c.key,
+            //     array: true,
+            //     key: "pick",
+            //   },
+            //   type: "button",
+            //   action: "event",
+            //   theme: "secondary",
+            //   readOnly: true,
+            // },
           ],
         });
       } else {
@@ -139,9 +212,9 @@ const setupComponents = (data) => {
       return acc;
     }, []),
   };
-};
+}
 
-handleSubmitData = (data) => {
+function handleSubmitData(data) {
   console.log("data pre", JSON.stringify(data, null, 2));
   Object.keys(data).forEach((key) => {
     const value = data[key];
@@ -157,8 +230,8 @@ handleSubmitData = (data) => {
   });
   console.log("data post", JSON.stringify(data, null, 2));
   return data;
-};
-const getFilePreviewElement = (url, isImage, i = -1) => {
+}
+function getFilePreviewElement(url, isImage, i = -1) {
   if (url && typeof url === "string") {
     const urlParts = url.split("/");
     let field = "";
@@ -177,44 +250,46 @@ const getFilePreviewElement = (url, isImage, i = -1) => {
  </a>`;
   }
   console.error("bad arguments", url, isImage);
-};
-const onUploadSuccess = (form) => (file, response) => {
-  if (file && response) {
-    const type = file.type;
-    let field = currUppyField;
-    let index = -1;
-    if (field.includes("[") && field.includes("]")) {
-      field = currUppyField.split("[")[0];
-      index = currUppyField.split("[")[1].split("]")[0];
+}
+function onUploadSuccess(form) {
+  return (file, response) => {
+    if (file && response) {
+      const type = file.type;
+      let field = currUppyField;
+      let index = -1;
+      if (field.includes("[") && field.includes("]")) {
+        field = currUppyField.split("[")[0];
+        index = currUppyField.split("[")[1].split("]")[0];
+      }
+      let component = form.getComponent(field);
+      let element = component.element;
+      if (index > -1) {
+        const textComponents = component.components.filter(
+          (c) => c.type === "textfield"
+        );
+        component = textComponents[index];
+        element = document.querySelector(
+          `[name="data[${field}][${index}][${field}]"]`
+        );
+      }
+      console.log({ component, element });
+      if (element) {
+        element.insertAdjacentHTML(
+          "afterend",
+          getFilePreviewElement(
+            response?.uploadURL,
+            type.includes("image"),
+            index
+          )
+        );
+      }
+      if (component && response?.uploadURL) {
+        const url = new URL(response?.uploadURL).pathname;
+        component.setValue(url);
+      }
     }
-    let component = form.getComponent(field);
-    let element = component.element;
-    if (index > -1) {
-      const textComponents = component.components.filter(
-        (c) => c.type === "textfield"
-      );
-      component = textComponents[index];
-      element = document.querySelector(
-        `[name="data[${field}][${index}][${field}]"]`
-      );
-    }
-    console.log({ component, element });
-    if (element) {
-      element.insertAdjacentHTML(
-        "afterend",
-        getFilePreviewElement(
-          response?.uploadURL,
-          type.includes("image"),
-          index
-        )
-      );
-    }
-    if (component && response?.uploadURL) {
-      const url = new URL(response?.uploadURL).pathname;
-      component.setValue(url);
-    }
-  }
-};
+  };
+}
 
 function setupFilePreviews(fileFields, form) {
   if (fileFields.length) {
@@ -222,7 +297,7 @@ function setupFilePreviews(fileFields, form) {
       const component = form.getComponent(field.key);
       const value = component._data[field.key];
       const element = component?.element;
-      console.log(value, component, element);
+      console.log("BAM", value, component, element);
       const addPreviewElement = (value, element, i = 0) => {
         if (value && element) {
           let extensions = [
@@ -246,9 +321,16 @@ function setupFilePreviews(fileFields, form) {
         const trs = element.querySelectorAll("tr");
         let i = 0;
         for (const v of value) {
-          const td = trs[i + 1].querySelector("td");
+          const tr = trs[i + 1];
+          const td = tr.querySelector("td");
           const input = td.querySelector("input");
           addPreviewElement(v[field.key], input, i);
+          const button = tr.querySelector(`button[data-field='${field.key}']`);
+          if (button) {
+            const newBtn = button.cloneNode();
+            newBtn.innerText = "Pick Existing";
+            button.insertAdjacentElement("afterend", newBtn);
+          }
           i++;
         }
       } else {
@@ -299,17 +381,22 @@ function newContent() {
           contentTypeComponents = event.components;
           console.log("event ->", event);
         }
-
-        const changedKey = event.changed.component.key;
-        const fileFieldWasChanged = fileFields
-          .map((f) => f.key)
-          .includes(changedKey);
-        if (fileFieldWasChanged) {
-          setupFilePreviews(fileFields, form);
+        if (event && event.changed) {
+          const changedKey = event.changed.component.key;
+          const fileFieldWasChanged = fileFields
+            .map((f) => f.key)
+            .includes(changedKey);
+          if (fileFieldWasChanged) {
+            setupFilePreviews(fileFields, form);
+          }
         }
       });
       form.on("customEvent", function (event) {
-        chooseFileEventHandler(uppy, event);
+        if (event.component.attributes.key === "upload") {
+          chooseFileEventHandler(uppy, event);
+        } else if (event.component.attributes.key === "pick") {
+          pickFileEventHandler(event);
+        }
       });
     });
   });
@@ -405,18 +492,23 @@ function editContent() {
             contentTypeComponents = event.components;
             console.log("event ->", event);
           }
-          const changedKey = event.changed.component.key;
-          const fileFieldWasChanged = fileFields
-            .map((f) => f.key)
-            .includes(changedKey);
-          if (fileFieldWasChanged) {
-            setupFilePreviews(fileFields, form);
+          if (event && event.changed) {
+            const changedKey = event.changed.component.key;
+            const fileFieldWasChanged = fileFields
+              .map((f) => f.key)
+              .includes(changedKey);
+            if (fileFieldWasChanged) {
+              setupFilePreviews(fileFields, form);
+            }
           }
-          console.log("change");
         });
 
         form.on("customEvent", function (event) {
-          chooseFileEventHandler(uppy, event);
+          if (event.component.attributes.key === "upload") {
+            chooseFileEventHandler(uppy, event);
+          } else if (event.component.attributes.key === "pick") {
+            pickFileEventHandler(event);
+          }
         });
       });
     });
