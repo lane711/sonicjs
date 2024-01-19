@@ -84,12 +84,19 @@ function chooseFileEventHandler(uppy, event) {
 }
 
 let filesResponse;
-async function pickFileEventHandler(event) {
-  const fileModal = new bootstrap.Modal("#fileModal");
-  let field = event.component.attributes["data-field"];
-  const isArray = event.component.attributes["array"];
+let fileModal;
+async function pickFileEventHandler(cb) {
+  fileModal = fileModal || new bootstrap.Modal("#fileModal");
 
   if (filesResponse) {
+    const chooseFileButtons =
+      fileModal._dialog.querySelectorAll(".choose-file-btn");
+    chooseFileButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const file = btn.attributes["data-file"];
+        cb(file);
+      });
+    });
     fileModal.show();
   } else {
     filesResponse = await axios.get("/admin/api/files");
@@ -102,14 +109,17 @@ async function pickFileEventHandler(event) {
       for (let i = 0; i < images.length; i++) {
         const galleryColumn = galleryColumns[i % galleryColumns.length];
         const image = images[i];
-        const a = document.createElement("a");
-        a.href = image;
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
+        const btn = document.createElement("button");
+        btn.classList.add("choose-file-btn");
+        btn.addEventListener("click", () => {
+          cb(image);
+        });
+
+        btn.attributes["data-file"] = image;
         const img = document.createElement("img");
         img.src = image;
-        a.appendChild(img);
-        galleryColumn.appendChild(a);
+        btn.appendChild(img);
+        galleryColumn.appendChild(btn);
       }
     }
     const filePane = fileModal._dialog.querySelector("#file-tab-pane");
@@ -117,11 +127,13 @@ async function pickFileEventHandler(event) {
       const files = filesResponse.data.files;
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        const a = document.createElement("a");
-        a.href = file;
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
-        filePane.appendChild(a);
+        const btn = document.createElement("button");
+        btn.classList.add("choose-file-btn");
+        btn.attributes["data-file"] = file;
+        btn.addEventListener("click", () => {
+          cb(file);
+        });
+        filePane.appendChild(btn);
       }
     }
     fileModal.show();
@@ -231,13 +243,13 @@ function handleSubmitData(data) {
   console.log("data post", JSON.stringify(data, null, 2));
   return data;
 }
-function getFilePreviewElement(url, isImage, i = -1) {
+function getFilePreviewElement(url, isImage, i, field) {
   if (url && typeof url === "string") {
     const urlParts = url.split("/");
-    let field = "";
+    field = field || "";
     urlParts.forEach((part) => {
       if (part.includes("f_")) {
-        field = part.replace("f_", "");
+        field = field || part.replace("f_", "");
       }
     });
     document.querySelector(`.file-preview-${field}-${i}`)?.remove();
@@ -298,7 +310,8 @@ function setupFilePreviews(fileFields, form) {
       const value = component._data[field.key];
       const element = component?.element;
       console.log("BAM", value, component, element);
-      const addPreviewElement = (value, element, i = 0) => {
+      const addPreviewElement = (value, element, i, field) => {
+        i = i || 0;
         if (value && element) {
           let extensions = [
             "jpg",
@@ -313,28 +326,47 @@ function setupFilePreviews(fileFields, form) {
           let regex = new RegExp(`\\.(${extensions.join("|")})$`, "i");
           element.insertAdjacentHTML(
             "afterend",
-            getFilePreviewElement(value, regex.test(value), i)
+            getFilePreviewElement(value, regex.test(value), i, field)
           );
         }
       };
-      if (Array.isArray(value)) {
-        const trs = element.querySelectorAll("tr");
-        let i = 0;
-        for (const v of value) {
+
+      const trs = element.querySelectorAll("tr");
+      if (trs.length) {
+        for (let i = 0; i < trs.length; i++) {
           const tr = trs[i + 1];
-          const td = tr.querySelector("td");
-          const input = td.querySelector("input");
-          addPreviewElement(v[field.key], input, i);
-          const button = tr.querySelector(`button[data-field='${field.key}']`);
-          if (button) {
-            const newBtn = button.cloneNode();
-            newBtn.innerText = "Pick Existing";
-            button.insertAdjacentElement("afterend", newBtn);
+          if (tr) {
+            const td = tr.querySelector("td");
+            if (Array.isArray(value)) {
+              const v = value[i];
+              const input = td.querySelector("input");
+              if (v) {
+                addPreviewElement(v[field.key], input, i, field.key);
+              }
+            }
+            const button = tr.querySelector(
+              `button[data-field='${field.key}']`
+            );
+            const pickBtn = tr.querySelector(".btn-pick-existing");
+            if (button && !pickBtn) {
+              const newBtn = button.cloneNode();
+              newBtn.classList.add("btn-pick-existing");
+              newBtn.innerText = "Pick Existing";
+              newBtn.style = "margin-left: 5px";
+              newBtn.addEventListener("click", () => {
+                pickFileEventHandler((v) => {
+                  const input = td.querySelector("input");
+                  input.value = v;
+                  addPreviewElement(v, input, i, field.key);
+                  fileModal.hide();
+                });
+              });
+              button.insertAdjacentElement("afterend", newBtn);
+            }
           }
-          i++;
         }
       } else {
-        addPreviewElement(value, element);
+        addPreviewElement(value, element, 0, field.key);
       }
     }
   }
@@ -395,7 +427,12 @@ function newContent() {
         if (event.component.attributes.key === "upload") {
           chooseFileEventHandler(uppy, event);
         } else if (event.component.attributes.key === "pick") {
-          pickFileEventHandler(event);
+          pickFileEventHandler((v) => {
+            const field = event.component.attributes["data-field"];
+            const component = form.getComponent(field);
+            component.setValue(v);
+            fileModal.hide();
+          });
         }
       });
     });
@@ -507,7 +544,12 @@ function editContent() {
           if (event.component.attributes.key === "upload") {
             chooseFileEventHandler(uppy, event);
           } else if (event.component.attributes.key === "pick") {
-            pickFileEventHandler(event);
+            pickFileEventHandler((v) => {
+              const field = event.component.attributes["data-field"];
+              const component = form.getComponent(field);
+              component.setValue(v);
+              fileModal.hide();
+            });
           }
         });
       });

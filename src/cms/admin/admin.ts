@@ -210,9 +210,31 @@ admin.get("/api/files", async (ctx) => {
   let promises: Promise<any>[] = [];
   const images = new Set<string>();
   const files = new Set<string>();
-  Object.keys(fileFields).forEach((key) => {
+  const fileFieldsKeys = Object.keys(fileFields);
+  for (const key of fileFieldsKeys) {
+    const entry = apiConfig.find((entry) => entry.table === key);
     const fields = fileFields[key];
-    fields.forEach((field) => {
+    for (const field of fields) {
+      const fieldConfig = entry.fields[field];
+      if (fieldConfig.type === "file[]" || fieldConfig.type === "file") {
+        const bucket = fieldConfig.bucket(ctx);
+        promises.push(
+          (async function () {
+            const list = await bucket.list();
+            const r2Files = list.objects.map((item) => item.key);
+            r2Files.forEach((file) => {
+              if (!file.startsWith("/")) {
+                file = `/${file}`;
+              }
+              if (isImage(file)) {
+                images.add(file);
+              } else {
+                files.add(file);
+              }
+            });
+          })()
+        );
+      }
       promises.push(
         (async function () {
           const records = await getRecords(
@@ -243,8 +265,8 @@ admin.get("/api/files", async (ctx) => {
           });
         })()
       );
-    });
-  });
+    }
+  }
   await Promise.all(promises);
   return ctx.json({ images: Array.from(images), files: Array.from(files) });
 });
