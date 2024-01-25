@@ -20,3 +20,8 @@ kv_namespaces = [
 binding = "D1DATA"
 database_name = "sonicjs"
 database_id = "${DATABASE_ID}"
+
+# Run the `wrangler r2 create sonicjs` command and copy the id below
+[[r2_buckets]]
+binding = "js_compatible_name"
+bucket_name = "${bucket_name}"
