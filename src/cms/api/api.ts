@@ -440,30 +440,6 @@ api.get("/forms", async (ctx) => {
   return ctx.html(await loadForm(ctx));
 });
 
-api.get("/form-components/auth/users/:setup?", async (ctx) => {
-  let ct = await getForm(ctx, "users");
-  const setup = ctx.req.param("setup");
-  console.log("setup", setup);
-  if (ctx.req.param("setup")) {
-    ct = ct.reduce((acc, entry) => {
-      if (entry.key === "role") {
-        entry.disabled = true;
-        entry.defaultValue = "admin";
-      }
-      acc.push(entry);
-      if (entry.key === "password") {
-        acc.push({
-          ...entry,
-          key: "confirm",
-          label: "Confirm Password",
-        });
-      }
-      return acc;
-    }, []);
-  }
-  return ctx.json(ct);
-});
-
 api.get("/form-components/:route", async (ctx) => {
   const route = ctx.req.param("route");
 

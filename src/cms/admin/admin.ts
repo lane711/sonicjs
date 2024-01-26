@@ -33,15 +33,11 @@ const admin = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 admin.use("*", async (ctx, next) => {
   const path = ctx.req.path;
   let canUseAdmin = await config.adminAccessControl(ctx);
-  if (
-    !canUseAdmin &&
-    path !== "/admin/login" &&
-    path !== "/admin/content/new/auth/users/setup"
-  ) {
+  if (!canUseAdmin) {
     const userExists = await hasUser(ctx);
-    if (userExists) {
+    if (userExists && path !== "/admin/login") {
       return ctx.redirect("/admin/login", 302);
-    } else {
+    } else if (!userExists && path !== "/admin/content/new/auth/users/setup") {
       return ctx.redirect("/admin/content/new/auth/users/setup", 302);
     }
     //redirect if not logged in
