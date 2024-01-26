@@ -59,7 +59,7 @@ export const Setup = (props: { children?: string; screenTitle?: string }) => {
 
               <p class="text-danger" id="setup-errors"></p>
 
-              <div id="formio-setup" data-route="/users/setup"></div>
+              <form id="formio-setup"></form>
               {props.children}
             </main>
           </div>

@@ -222,10 +222,16 @@ admin.get("/api/files", async (ctx) => {
               if (!file.startsWith("/")) {
                 file = `/${file}`;
               }
-              if (isImage(file)) {
-                images.add(file);
-              } else {
-                files.add(file);
+              let path = fieldConfig.path;
+              if (typeof path === "function") {
+                path = path(ctx);
+              }
+              if (file.includes(path)) {
+                if (isImage(file)) {
+                  images.add(file);
+                } else {
+                  files.add(file);
+                }
               }
             });
           })()

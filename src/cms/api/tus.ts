@@ -69,10 +69,6 @@ tusAPI.all("*", async (ctx) => {
     const context = ctx.executionCtx;
     let res = await tussle.handleRequest(cfRequest, { context });
     if (res) {
-      console.log("res", res);
-      for (let [key, value] of res.headers.entries()) {
-        console.log(`${key}: ${value}`);
-      }
       return res;
     }
   }
@@ -112,94 +108,86 @@ const getTussleMiddleware = (() => {
     id: string,
     pathConfig: string
   ) => {
-    if (!instance) {
-      instance = new TussleCloudflareWorker({
-        hooks: {
-          "before-create": async (_ctx, params) => {
-            if (table.hooks?.beforeOperation) {
-              await table.hooks.beforeOperation(honoCtx, mode, id, params);
-            }
-            const filename =
-              params.uploadMetadata.filename || params.uploadMetadata.name;
+    instance = new TussleCloudflareWorker({
+      hooks: {
+        "before-create": async (_ctx, params) => {
+          if (table.hooks?.beforeOperation) {
+            await table.hooks.beforeOperation(honoCtx, mode, id, params);
+          }
+          const filename =
+            params.uploadMetadata.filename || params.uploadMetadata.name;
 
-            const fileExtension = "." + filename.split(".").pop();
+          const fileExtension = "." + filename.split(".").pop();
 
-            console.log("params before", JSON.stringify(params, null, 2));
+          console.log("params before", JSON.stringify(params, null, 2));
 
-            let authorized = true;
-            if (mode === "create") {
-              authorized = await getOperationCreateResult(
-                table?.access?.operation?.create,
-                honoCtx,
-                params
-              );
-            } else {
-              authorized = !!(await getApiAccessControlResult(
-                table?.access?.operation?.update || true,
-                table?.access?.filter?.update || true,
-                table?.access?.item?.update || true,
-                honoCtx,
-                id,
-                table.table,
-                params
-              ));
-            }
-            if (!authorized) {
-              return honoCtx.text("Unauthorized", 401);
-            }
-
-            let path: string;
-            switch (params.uploadConcat?.action) {
-              case "partial": // Creating a file to hold a segment of a parallel upload.
-                path =
-                  params.path +
-                  pathConfig +
-                  "/segments/" +
-                  crypto.randomUUID() +
-                  fileExtension;
-                break;
-              case "final": // Finishing a parallel upload (combines multiple 'partials' from above)
-              default:
-                path =
-                  params.path +
-                  pathConfig +
-                  "/" +
-                  crypto.randomUUID() +
-                  fileExtension;
-                break;
-            }
-            return {
-              ...params,
-              path,
-            };
-          },
-          "after-complete": async (ctx, params) => {
-            if (table?.hooks?.afterOperation) {
-              await table.hooks.afterOperation(
-                honoCtx,
-                mode,
-                id,
-                params,
-                params
-              );
-            }
-            const { location, offset } = params;
-            console.log("params after", JSON.stringify(params, null, 2));
-            const fileInfo = await storage.getFileInfo({ location });
-            console.log("file info", fileInfo);
-            await cacheCompletedUploadResponse(
-              ctx.originalRequest,
-              location,
-              offset
+          let authorized = true;
+          if (mode === "create") {
+            authorized = await getOperationCreateResult(
+              table?.access?.operation?.create,
+              honoCtx,
+              params
             );
-            return params;
-          },
+          } else {
+            authorized = !!(await getApiAccessControlResult(
+              table?.access?.operation?.update || true,
+              table?.access?.filter?.update || true,
+              table?.access?.item?.update || true,
+              honoCtx,
+              id,
+              table.table,
+              params
+            ));
+          }
+          if (!authorized) {
+            return honoCtx.text("Unauthorized", 401);
+          }
+
+          let path: string;
+          switch (params.uploadConcat?.action) {
+            case "partial": // Creating a file to hold a segment of a parallel upload.
+              path =
+                params.path +
+                pathConfig +
+                "/segments/" +
+                crypto.randomUUID() +
+                fileExtension;
+              break;
+            case "final": // Finishing a parallel upload (combines multiple 'partials' from above)
+            default:
+              path =
+                params.path +
+                pathConfig +
+                "/" +
+                crypto.randomUUID() +
+                fileExtension;
+              break;
+          }
+          return {
+            ...params,
+            path,
+          };
         },
-        core: {
-          storage,
+        "after-complete": async (ctx, params) => {
+          if (table?.hooks?.afterOperation) {
+            await table.hooks.afterOperation(honoCtx, mode, id, params, params);
+          }
+          const { location, offset } = params;
+          // console.log("params after", JSON.stringify(params, null, 2));
+          // const fileInfo = await storage.getFileInfo({ location });
+          // console.log("file info", fileInfo);
+          await cacheCompletedUploadResponse(
+            ctx.originalRequest,
+            location,
+            offset
+          );
+          return params;
         },
-      });
-    }
+      },
+      core: {
+        storage,
+      },
+    });
     return instance;
   };
 })();
@@ -240,7 +228,6 @@ const handleGET = async (ctx: AppContext) => {
     return ctx.text("Unauthorized", 401);
   }
   const cache = await caches.default.match(request.url + "GET");
-  console.log(cache);
   if (cache) {
     if (table.hooks?.afterOperation) {
       await table.hooks.afterOperation(ctx, "read", pathname, null, {
@@ -250,7 +237,6 @@ const handleGET = async (ctx: AppContext) => {
     }
     return cache;
   }
-  console.log(table);
   if (table) {
     const field = table.fields?.[fieldName];
     if (field.type === "file" || field.type === "file[]") {
@@ -262,10 +248,8 @@ const handleGET = async (ctx: AppContext) => {
           skipMerge: false,
         });
 
-        console.log(pathname);
         try {
           const file = await storage.getFile(pathname);
-          console.log(file);
           const type = (file.metadata.type || file.metadata.filetype) as string;
           ctx.header("Content-Type", type);
           ctx.status(200);
