@@ -1,6 +1,7 @@
 import { apiConfig } from "../../db/routes";
 import { AppContext } from "../../server";
 import { getSchemaFromTable } from "../data/d1-data";
+import { singularize } from "../util/utils";
 
 export function getForm(ctx: AppContext, table) {
   let formFields: {
@@ -18,11 +19,28 @@ export function getForm(ctx: AppContext, table) {
   const schema = getSchemaFromTable(table);
   const config = apiConfig.find((tbl) => tbl.table === table);
   for (var field in schema) {
-    const formField = getField(field);
+    let formField = getField(field);
     const metaType = config.fields?.[field]?.type || "auto";
     formField.metaType = metaType;
     if (formField.metaType === "auto") {
       delete formField.metaType;
+    } else if (
+      formField.metaType.includes("[]") &&
+      formField.metaType !== "file[]"
+    ) {
+      const c = formField;
+      formField = {
+        type: "datagrid",
+        label: c.label || c.key,
+        key: c.key,
+        components: [
+          {
+            ...c,
+            key: `${c.key}`,
+            label: singularize(c.label || c.key),
+          },
+        ],
+      };
     }
     formFields.push(formField);
   }
@@ -59,14 +77,25 @@ export function getForm(ctx: AppContext, table) {
 
   return formFields;
 }
+interface Field {
+  type: string;
+  key: string;
+  label: string;
+  metaType?: string;
+  disabled?: boolean;
+  placeholder?: string;
+  input?: boolean;
+  tooltip?: string;
+  description?: string;
+  components?: Field[];
+}
 
-function getField(fieldName) {
+function getField(fieldName): Field {
   const disabled = fieldName == "id";
   return {
     type: getFieldType(fieldName),
     key: fieldName,
     label: fieldName,
-    metaType: "auto",
     disabled,
     // placeholder: "Enter your first name.",
     // input: true,

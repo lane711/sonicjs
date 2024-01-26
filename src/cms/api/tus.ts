@@ -227,7 +227,12 @@ const handleGET = async (ctx: AppContext) => {
   if (!accessControlResult) {
     return ctx.text("Unauthorized", 401);
   }
-  const cache = await caches.default.match(request.url + "GET");
+  let cache;
+  try {
+    cache = await caches.default.match(request.url + "GET");
+  } catch (error) {
+    console.log("cache error", error);
+  }
   if (cache) {
     if (table.hooks?.afterOperation) {
       await table.hooks.afterOperation(ctx, "read", pathname, null, {
@@ -250,12 +255,21 @@ const handleGET = async (ctx: AppContext) => {
 
         try {
           const file = await storage.getFile(pathname);
-          const type = (file.metadata.type || file.metadata.filetype) as string;
-          ctx.header("Content-Type", type);
-          ctx.status(200);
-          const response = ctx.body(file.body);
-          await caches.default.put(request.url + "GET", response.clone());
-          return response;
+          if (file) {
+            const type = (file.metadata.type ||
+              file.metadata.filetype) as string;
+            ctx.header("Content-Type", type);
+            ctx.status(200);
+            const response = ctx.body(file.body);
+            await caches.default.put(request.url + "GET", response.clone());
+            if (table.hooks?.afterOperation) {
+              await table.hooks.afterOperation(ctx, "read", pathname, file, {
+                pathname,
+                cache: false,
+              });
+            }
+            return response;
+          }
         } catch (error) {
           console.log(error);
         }
@@ -269,4 +283,5 @@ const handleGET = async (ctx: AppContext) => {
       cache: false,
     });
   }
+  return ctx.text("Not Found", 404);
 };
