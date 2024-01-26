@@ -216,7 +216,6 @@ function setupComponents(data) {
 }
 
 function handleSubmitData(data) {
-  console.log("data pre", JSON.stringify(data, null, 2));
   Object.keys(data).forEach((key) => {
     const value = data[key];
     if (Array.isArray(value)) {
@@ -229,7 +228,6 @@ function handleSubmitData(data) {
       data[key] = null;
     }
   });
-  console.log("data post", JSON.stringify(data, null, 2));
   return data;
 }
 function getFilePreviewElement(url, isImage, i, field) {
@@ -418,7 +416,6 @@ function newContent() {
       }
 
       form.on("redraw", function () {
-        console.log("redraw");
         setupPickExistingButton(fileFields, form);
         setupFilePreviews(fileFields, form);
       });
@@ -430,7 +427,6 @@ function newContent() {
         $("#contentFormSaveButton").removeAttr("disabled");
         if (event.components) {
           contentTypeComponents = event.components;
-          console.log("event ->", event);
         }
         if (event && event.changed) {
           const changedKey = event.changed.component.key;
@@ -488,10 +484,6 @@ function editContent() {
       response.data.contentType = contentType;
       // handle array values to the formio format
       if (response?.data?.data) {
-        console.log(
-          "data pre response",
-          JSON.stringify(response.data.data, null, 2)
-        );
         Object.keys(response.data.data).forEach((key) => {
           let value = response.data.data[key];
           try {
@@ -509,10 +501,6 @@ function editContent() {
         });
       }
 
-      console.log(
-        "data post response",
-        JSON.stringify(response.data.data, null, 2)
-      );
       let uppy;
       Formio.icons = "fontawesome";
       // debugger;
