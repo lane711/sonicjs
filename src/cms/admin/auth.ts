@@ -111,6 +111,17 @@ authAPI.get(`/users/:id`, async (ctx) => {
 // Create user
 authAPI.post(`/users/:setup?`, async (ctx) => {
   let content = await ctx.req.json();
+  if (!content.data) {
+    content = { data: content };
+  }
+  content.data.table = "users";
+  content.table = "users";
+  content.data.role = "admin";
+  delete content.data.submit;
+  if (content.data?.confirmPassword !== content.data?.password) {
+    return ctx.text("Passwords do not match", 400);
+  }
+  delete content.data.confirmPassword;
   if (userTableConfig.hooks?.beforeOperation) {
     await userTableConfig.hooks.beforeOperation(
       ctx,
@@ -119,7 +130,6 @@ authAPI.post(`/users/:setup?`, async (ctx) => {
       content
     );
   }
-  content.table = "users";
   let authorized = await getOperationCreateResult(
     operationAccess?.create,
     ctx,
@@ -162,7 +172,7 @@ authAPI.post(`/users/:setup?`, async (ctx) => {
     }
     return result;
   } catch (error) {
-    console.log("error posting content", error);
+    console.log("error posting user setup content", error);
     return ctx.text(error, 500);
   }
 });
