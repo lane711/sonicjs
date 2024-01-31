@@ -26,7 +26,7 @@ import {
   updateRecord,
 } from "../data/data";
 import { clearInMemoryCache, getAllFromInMemoryCache } from "../data/cache";
-import { bucketApiExample } from "../bucket/bucket.api.example";
+import { bucketApi } from "../bucket/bucket.api";
 const api = new Hono<{ Bindings: Bindings }>();
 
 apiConfig.forEach((entry) => {
@@ -330,6 +330,6 @@ api.get("/kv/delete-all", async (ctx) => {
   return ctx.text("ok");
 });
 
-api.route("/bucket", bucketApiExample);
+api.route("/bucket", bucketApi);
 
 export { api };

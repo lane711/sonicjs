@@ -1,17 +1,36 @@
 import { Bindings } from "hono/types";
-
-export const bucketUploadFile = async (ctx: Bindings, file: File) => {
+import { encode } from "base64-arraybuffer";
+export const bucketUploadFile = async (
+  ctx: Bindings,
+  file: File,
+  base64return: string
+) => {
   try {
     const bucket = ctx.R2_BUCKET as R2Bucket;
     const { name, size, type } = file;
+    const ab = await file.arrayBuffer();
+    let response;
     await bucket.put(name, file);
-    return {
-      name,
-      size,
-      type,
-      sha1: await sha1(file),
-    };
+    if (base64return) {
+      const base64 = "data:" + type + ";base64," + encode(ab);
+      response = {
+        success: 1,
+        file: {
+          url: base64,
+        },
+        sha1: await sha1(file),
+      };
+    } else {
+      response = {
+        name,
+        size,
+        type,
+        sha1: await sha1(file),
+      };
+    }
+    return response;
   } catch (error) {
+    console.log("error", error);
     return error;
   }
 };

@@ -1,9 +1,9 @@
 import { Hono } from "hono";
 import { bucketGetFile, bucketUploadFile, bucketDeleteFile } from "./bucket";
 
-const bucketApiExample = new Hono();
+const bucketApi = new Hono();
 
-bucketApiExample.get("/", async (ctx) => {
+bucketApi.get("/", async (ctx) => {
   try {
     const key = await ctx.req.query("key");
     const method = await ctx.req.query("method");
@@ -43,18 +43,19 @@ bucketApiExample.get("/", async (ctx) => {
   }
 });
 
-bucketApiExample.post("/", async (ctx) => {
+bucketApi.post("/", async (ctx) => {
   const body = await ctx.req.parseBody();
   const file = body.file as File;
-  const result = await bucketUploadFile(ctx.env, file);
+  const base64return = body.base64return as string;
+  const result = await bucketUploadFile(ctx.env, file, base64return);
   return ctx.json(result);
 });
 
-bucketApiExample.delete("/", async (ctx) => {
+bucketApi.delete("/", async (ctx) => {
   const body = await ctx.req.parseBody();
   const filename = body.filename as String;
   const result = await bucketDeleteFile(ctx.env, filename);
   return ctx.json(result);
 });
 
-export { bucketApiExample };
+export { bucketApi };
