@@ -46,7 +46,7 @@ bucketApi.get("/", async (ctx) => {
 bucketApi.post("/", async (ctx) => {
   const body = await ctx.req.parseBody();
   const file = body.file as File;
-  const base64return = body.base64return as string;
+  const base64return = ctx.req.query("base64return");
   const result = await bucketUploadFile(ctx.env, file, base64return);
   return ctx.json(result);
 });
