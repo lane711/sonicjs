@@ -5,7 +5,7 @@
   "main": "src/server.ts",
   "scripts": {
     "dev": "run-p dev:*",
-    "dev:wrangler": "wrangler pages dev dist",
+    "dev:wrangler": "wrangler pages dev --local dist",
     "dev:esbuild": "node ./src/cms/util/build.mjs",
     "build": "node ./src/cms/util/build.mjs",
     "deploy": "wrangler pages deploy dist",
@@ -19,6 +19,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@aws-sdk/client-s3": "^3.504.0",
+    "@aws-sdk/s3-request-presigner": "^3.504.0",
     "drizzle-kit": "^0.19.12",
     "esbuild": "^0.17.18",
     "esbuild-plugin-copy": "^2.1.1",
