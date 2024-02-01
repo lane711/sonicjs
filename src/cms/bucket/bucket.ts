@@ -1,33 +1,22 @@
 import { Bindings } from "hono/types";
 import { encode } from "base64-arraybuffer";
-export const bucketUploadFile = async (
-  ctx: Bindings,
-  file: File,
-  base64return: string
-) => {
+
+export interface BucketFormats {
+  format: "blob" | "arrayBuffer" | "sha1" | "text" | "base64" | null;
+}
+
+export const bucketUploadFile = async (ctx: Bindings, file: File) => {
   try {
     const bucket = ctx.R2_BUCKET as R2Bucket;
     const { name, size, type } = file;
-    const ab = await file.arrayBuffer();
     let response;
     await bucket.put(name, file);
-    if (base64return) {
-      const base64 = "data:" + type + ";base64," + encode(ab);
-      response = {
-        success: 1,
-        file: {
-          url: base64,
-        },
-        sha1: await sha1(file),
-      };
-    } else {
-      response = {
-        name,
-        size,
-        type,
-        sha1: await sha1(file),
-      };
-    }
+    response = {
+      name,
+      size,
+      type,
+      sha1: await sha1(file),
+    };
     return response;
   } catch (error) {
     console.log("error", error);
@@ -44,16 +33,31 @@ export const bucketDeleteFile = async (ctx: Bindings, filename: string) => {
 export const bucketGetFile = async (
   ctx: Bindings,
   filename: string,
-  format: "blob" | "arrayBuffer" | "sha1" | "text" | null
+  format: BucketFormats
 ) => {
   const bucket = ctx.R2_BUCKET as R2Bucket;
   const object = await bucket.get(filename);
-  if (!format || format === null) {
+  if (!format || format === "null") {
     return object;
-  } else if (format === "sha1") {
-    return sha1(object);
   }
-  return await object[format]();
+  switch (format) {
+    case "sha1":
+      return sha1(object);
+      break;
+    case "base64":
+      const ext = object.key?.match(/\.([a-zA-Z]+)$/gm)[0].replace(".", "");
+      if (!ext) {
+        return object;
+      }
+      const objectArrayBuffer = await object.arrayBuffer();
+      const base64image = encode(objectArrayBuffer);
+      const imageConverted = "data:image/" + ext + ";base64," + base64image;
+      return imageConverted;
+      break;
+    default:
+      return await object[format]();
+      break;
+  }
 };
 
 async function sha1(file) {

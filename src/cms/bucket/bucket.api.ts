@@ -1,5 +1,10 @@
 import { Hono } from "hono";
-import { bucketGetFile, bucketUploadFile, bucketDeleteFile } from "./bucket";
+import {
+  bucketGetFile,
+  bucketUploadFile,
+  bucketDeleteFile,
+  BucketFormats,
+} from "./bucket";
 
 const bucketApi = new Hono();
 
@@ -8,27 +13,7 @@ bucketApi.get("/", async (ctx) => {
     const key = await ctx.req.query("key");
     const method = await ctx.req.query("method");
     let result = {};
-    if (key && !method) {
-      result["image"] = await bucketGetFile(ctx.env, key, "sha1");
-    } else if (key && method) {
-      switch (method) {
-        case "sha1":
-          result["image"] = await bucketGetFile(ctx.env, key, "sha1");
-          break;
-        case "text":
-          result["image"] = await bucketGetFile(ctx.env, key, "text");
-          break;
-        case "arrayBuffer":
-          result["image"] = await bucketGetFile(ctx.env, key, "arrayBuffer");
-          break;
-        case "blob":
-          const object = (await bucketGetFile(ctx.env, key, null)) as R2Object;
-          const headers = new Headers();
-          object.writeHttpMetadata(headers);
-          headers.set("etag", object.httpEtag);
-          return ctx.newResponse(object.body, { headers });
-      }
-    } else {
+    if (!key && !method) {
       result = {
         parameters: {
           type: "querystring",
@@ -37,6 +22,14 @@ bucketApi.get("/", async (ctx) => {
         },
       };
     }
+    if (method == "blob") {
+      const object = (await bucketGetFile(ctx.env, key, null)) as R2Object;
+      const headers = new Headers();
+      object.writeHttpMetadata(headers);
+      headers.set("etag", object.httpEtag);
+      return ctx.newResponse(object.body, { headers });
+    }
+    result["image"] = await bucketGetFile(ctx.env, key, method);
     return ctx.json(result);
   } catch (error) {
     return ctx.json({ error }, 404);
@@ -44,11 +37,25 @@ bucketApi.get("/", async (ctx) => {
 });
 
 bucketApi.post("/", async (ctx) => {
-  const body = await ctx.req.parseBody();
-  const file = body.file as File;
-  const base64return = ctx.req.query("base64return");
-  const result = await bucketUploadFile(ctx.env, file, base64return);
-  return ctx.json(result);
+  try {
+    const body = await ctx.req.parseBody();
+    const file = body.file as File;
+    const methodQuery = ctx.req.query("method") as unknown as BucketFormats; // ?method=base64
+    let result = await bucketUploadFile(ctx.env, file);
+    if (methodQuery) {
+      const base64 = await bucketGetFile(ctx.env, result.name, methodQuery);
+      result = {
+        success: 1,
+        file: {
+          url: base64,
+        },
+      };
+    }
+    return ctx.json(result);
+  } catch (error) {
+    console.log(error);
+    return ctx.json(error);
+  }
 });
 
 bucketApi.delete("/", async (ctx) => {
