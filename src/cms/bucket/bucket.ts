@@ -1,10 +1,20 @@
+import { GetObjectCommandInput } from "./../../../node_modules/@aws-sdk/client-s3/dist-types/commands/GetObjectCommand.d";
+import { S3ClientConfig } from "./../../../node_modules/@aws-sdk/client-s3/dist-types/S3Client.d";
 import { Bindings } from "hono/types";
 import { encode } from "base64-arraybuffer";
-
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 export interface BucketFormats {
-  format: "blob" | "arrayBuffer" | "sha1" | "text" | "base64" | null;
+  format:
+    | "blob"
+    | "arrayBuffer"
+    | "sha1"
+    | "text"
+    | "base64"
+    | "tempurl"
+    | "url"
+    | null;
 }
-
 export const bucketUploadFile = async (ctx: Bindings, file: File) => {
   try {
     const bucket = ctx.R2_BUCKET as R2Bucket;
@@ -53,6 +63,27 @@ export const bucketGetFile = async (
       const base64image = encode(objectArrayBuffer);
       const imageConverted = "data:image/" + ext + ";base64," + base64image;
       return imageConverted;
+      break;
+    case "tempurl":
+      const s3ConfigOptions = {
+        region: "auto",
+        endpoint: `https://${ctx.ACCOUNT_ID}.r2.cloudflarestorage.com`,
+        credentials: {
+          accessKeyId: ctx.BUCKET_ACCESS_KEY_ID,
+          secretAccessKey: ctx.BUCKET_SECRET_ACCESS_KEY,
+        },
+      } as S3ClientConfig;
+      const commandOptions = {
+        Bucket: ctx.BUCKET_NAME,
+        Key: object.key,
+      } as GetObjectCommandInput;
+      const S3 = new S3Client(s3ConfigOptions);
+      return await getSignedUrl(S3, new GetObjectCommand(commandOptions), {
+        expiresIn: 3600,
+      });
+      break;
+    case "url":
+      return `${ctx.BUCKET_CUSTOM_DOMAIN}/${object.key}`;
       break;
     default:
       return await object[format]();
