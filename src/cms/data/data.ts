@@ -342,7 +342,7 @@ export async function updateRecord(d1, kv, data) {
   } finally {
     //then also save the content to sqlite for filtering, sorting, etc
     try {
-      const result = updateD1Data(d1, data.table, data);
+      const result = await updateD1Data(d1, data.table, data);
       //expire cache
       await setCacheStatusInvalid();
       await clearKVCache(kv);

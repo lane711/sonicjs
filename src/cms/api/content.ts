@@ -181,7 +181,7 @@ content.put("/", async (ctx) => {
   } finally {
     //then also save the content to sqlite for filtering, sorting, etc
     try {
-      const result = updateD1Data(ctx.env.D1DATA, content.table, content);
+      const result = await updateD1Data(ctx.env.D1DATA, content.table, content);
     } catch (error) {
       console.log("error posting content", error);
     }
