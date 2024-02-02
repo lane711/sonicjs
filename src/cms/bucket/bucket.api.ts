@@ -48,6 +48,7 @@ bucketApi.post("/", async (ctx) => {
         success: 1,
         file: {
           url: base64,
+          key: result.name,
         },
       };
     }
