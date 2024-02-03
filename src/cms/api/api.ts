@@ -447,6 +447,10 @@ api.get("/form-components/:route", async (ctx) => {
   return ctx.json(ct);
 });
 
+api.get("/form-components/auth/users", async (ctx) => {
+  let ct = await getForm(ctx, "users");
+  return ctx.json(ct);
+});
 api.post("/form-components", async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
