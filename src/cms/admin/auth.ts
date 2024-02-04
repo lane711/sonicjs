@@ -118,7 +118,10 @@ authAPI.post(`/users/:setup?`, async (ctx) => {
   content.table = "users";
   content.data.role = "admin";
   delete content.data.submit;
-  if (content.data?.confirmPassword !== content.data?.password) {
+  if (
+    content.data?.confirmPassword &&
+    content.data?.confirmPassword !== content.data?.password
+  ) {
     return ctx.text("Passwords do not match", 400);
   }
   delete content.data.confirmPassword;
