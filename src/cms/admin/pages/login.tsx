@@ -57,9 +57,9 @@ export const Setup = (props: { children?: string; screenTitle?: string }) => {
               <h2>Welcome to SonicJS!</h2>
               <h3>Setup your admin user to get started.</h3>
 
-              <p class="text-danger" id="login-errors"></p>
+              <p class="text-danger" id="setup-errors"></p>
 
-              <div id="formio" data-route="login"></div>
+              <div id="formio-setup" data-route="/users/setup"></div>
               {props.children}
             </main>
           </div>
