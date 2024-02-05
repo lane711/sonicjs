@@ -7,6 +7,7 @@ import { admin } from "./cms/admin/admin";
 import { example } from "./custom/example";
 import { status } from "./cms/api/status";
 import { log } from "./cms/util/logger";
+import { bucket } from "./cms/bucket/bucket.example";
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -49,5 +50,5 @@ app.route("/v1", api);
 app.route("/admin", admin);
 app.route("v1/example", example);
 app.route("/status", status);
-
+app.route("/bucket", bucket);
 export default app;

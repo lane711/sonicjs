@@ -26,7 +26,7 @@ import {
   updateRecord,
 } from "../data/data";
 import { clearInMemoryCache, getAllFromInMemoryCache } from "../data/cache";
-
+import { bucketApi } from "../bucket/bucket.api";
 const api = new Hono<{ Bindings: Bindings }>();
 
 apiConfig.forEach((entry) => {
@@ -329,5 +329,7 @@ api.get("/kv/delete-all", async (ctx) => {
   await clearAllKVRecords(ctx.env.KVDATA);
   return ctx.text("ok");
 });
+
+api.route("/bucket", bucketApi);
 
 export { api };
