@@ -114,7 +114,7 @@ it("updateD1Data should update record", async () => {
     id: "b",
   });
 
-  updateD1Data(__D1_BETA__D1DATA, "users", {
+  await updateD1Data(__D1_BETA__D1DATA, "users", {
     data: { firstName: "Steve" },
     id: "b",
   });
