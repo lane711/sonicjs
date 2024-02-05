@@ -337,8 +337,6 @@ export async function updateRecord(d1, kv, data, params: Record<string, any>) {
     return { code: 200, data: result };
   } catch (error) {
     console.log("error posting content", error);
-<<<<<<< HEAD
-=======
     return { code: 500, message: error };
   } finally {
     //then also save the content to sqlite for filtering, sorting, etc
@@ -351,7 +349,6 @@ export async function updateRecord(d1, kv, data, params: Record<string, any>) {
     } catch (error) {
       console.log("error posting content", error);
     }
->>>>>>> main
   }
 }
 
