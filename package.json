@@ -38,7 +38,7 @@
     "gridjs-react": "^6.0.1",
     "hono": "^3.11.7",
     "jest": "^29.5.0",
-    "jest-environment-miniflare": "^2.14.0",
+    "jest-environment-miniflare": "^2.14.2",
     "lokijs": "^1.5.12",
     "lucia": "^2.7.4",
     "qs": "^6.11.2",
