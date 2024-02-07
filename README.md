@@ -212,6 +212,10 @@ It receives:
 
 For example, it can be used for logging or post-processing the result.
 
+# Tailwinds
+
+If you are working on updating styles in the admin UI, run this command in a separate terminal tab:
+`npx tailwindcss -i ./src/cms/admin/input.css -o ./public/css/tailwinds.css --watch`
 
 # Legacy
 The legacy version of SonicJs (a Node.js based web content management system) can be found here:
