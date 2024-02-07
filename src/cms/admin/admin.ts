@@ -27,6 +27,7 @@ import { tableSchemas } from "../../db/routes";
 import { drizzle } from "drizzle-orm/d1";
 import { isNotNull } from "drizzle-orm";
 import { hasUser } from "../auth/auth-helpers";
+import { TailWinds } from "./theme-tailwinds";
 
 const admin = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
@@ -58,6 +59,9 @@ admin.get("/ping", (ctx) => {
 admin.get("/", async (ctx) => ctx.html(await loadApis(ctx)));
 
 admin.get("/login", async (ctx) => ctx.html(await loadLogin(ctx)));
+
+admin.get("/tailwinds", async (ctx) => ctx.html(await TailWinds(ctx)));
+
 
 admin.get("/content/new/auth/users/setup", async (ctx) =>
   ctx.html(await loadSetup(ctx))

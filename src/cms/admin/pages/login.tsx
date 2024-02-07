@@ -1,4 +1,4 @@
-import { Head, Script, ToggleTheme } from "../theme";
+import { Head, Script, ToggleTheme } from "../theme-bootstrap";
 export const Login = (props: { children?: string; screenTitle?: string }) => {
   return (
     <html lang="en" data-bs-theme="auto">

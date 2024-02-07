@@ -1,7 +1,7 @@
 import { ApiConfig, apiConfig } from "../../../db/routes";
 import { getDataListByPrefix } from "../../data/kv-data";
 import { Bindings } from "../../types/bindings";
-import { Layout } from "../theme";
+import { Layout } from "../theme-bootstrap";
 
 export async function loadAdminTable(ctx) {
   // await saveKVData(ctx.env.KVDATA, 'site1', 'content', {title: '20230508a'});
