@@ -57,15 +57,20 @@ npx create-sonicjs-app
 
 Follow the installation script prompts to enter the required Cloudflare values.
 
-Now you're ready to fire up SonicJs!
+One last step; we need to run the migration scripts to create our database tables:
+```
+npm run up
+```
 
+Now you're ready to fire up SonicJs!
 ```
 npm run dev
 ```
-Run the admin interface at:
+
+Open the admin interface at:
 [http://localhost:8788](http://localhost:8788)
 
-Check out https://sonicjs.com for next steps.
+Check out https://sonicjs.com/getting-started for next steps.
 
 
 # Array Fields

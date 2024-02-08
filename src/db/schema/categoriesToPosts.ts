@@ -1,4 +1,4 @@
-import { sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { relations } from "drizzle-orm";
 import { auditSchema } from "./audit";
 import * as categories from "./categories";
@@ -20,10 +20,16 @@ export const definition = {
     .references(() => categories.table.id),
 };
 
-export const table = sqliteTable(tableName, {
-  ...definition,
-  ...auditSchema,
-});
+export const table = sqliteTable(
+  tableName,
+  {
+    ...definition,
+    ...auditSchema,
+  },
+  (table) => ({
+    pk: primaryKey(table.postId, table.categoryId),
+  })
+);
 
 export const relation = relations(table, ({ one }) => ({
   category: one(categories.table, {

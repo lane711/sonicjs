@@ -337,6 +337,18 @@ export async function updateRecord(d1, kv, data, params: Record<string, any>) {
     return { code: 200, data: result };
   } catch (error) {
     console.log("error posting content", error);
+    return { code: 500, message: error };
+  } finally {
+    //then also save the content to sqlite for filtering, sorting, etc
+    try {
+      const result = await updateD1Data(d1, data.table, data);
+      //expire cache
+      await setCacheStatusInvalid();
+      await clearKVCache(kv);
+      return { code: 200, data: result };
+    } catch (error) {
+      console.log("error posting content", error);
+    }
   }
 }
 

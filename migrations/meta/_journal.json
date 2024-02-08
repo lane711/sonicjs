@@ -22,13 +22,6 @@
       "when": 1706291004191,
       "tag": "0002_medical_obadiah_stane",
       "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1706800457605,
-      "tag": "0004_amusing_midnight",
-      "breakpoints": true
     }
   ]
 }
