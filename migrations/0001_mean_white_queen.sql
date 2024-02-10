@@ -1,1 +1,0 @@
-ALTER TABLE comments ADD `tags` text;
