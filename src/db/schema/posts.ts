@@ -1,4 +1,5 @@
 import { sqliteTable, index, text } from "drizzle-orm/sqlite-core";
+
 import { relations } from "drizzle-orm";
 import { auditSchema } from "./audit";
 import * as users from "./users";
@@ -16,6 +17,9 @@ export const definition = {
   title: text("title"),
   body: text("body"),
   userId: text("userId"),
+  image: text("image"),
+  images: text("images", { mode: "json" }).$type<string[]>(),
+  tags: text("tags", { mode: "json" }).$type<string[]>(),
 };
 
 export const table = sqliteTable(
@@ -98,5 +102,20 @@ export const hooks: ApiConfig["hooks"] = {
       }
       return data;
     },
+  },
+};
+export const fields: ApiConfig["fields"] = {
+  image: {
+    type: "file",
+    bucket: (ctx) => ctx.env.R2_STORAGE,
+    path: "images",
+  },
+  images: {
+    type: "file[]",
+    bucket: (ctx) => ctx.env.R2_STORAGE,
+    path: "images",
+  },
+  tags: {
+    type: "string[]",
   },
 };

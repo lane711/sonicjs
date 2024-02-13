@@ -72,6 +72,69 @@ Open the admin interface at:
 
 Check out https://sonicjs.com/getting-started for next steps.
 
+
+# Array Fields
+
+Configure array fields by first telling drizzle that the field is an array field.
+
+```js
+  tags: text("tags", { mode: "json" }).$type<string[]>(),
+```
+Then configure the field in the exported `fields` variable from a table file.
+```js
+export const fields: ApiConfig["fields"] = {
+  tags: {
+    type: "string[]",
+  },
+};
+```
+
+# R2 File Upload 
+
+## File fields
+
+Configure file fields in the exported `fields` variable from a table file.
+
+You can configure which bucket to use to upload to as well as the path to store the file in the bucket when uploaded from that field.
+
+Picking an existing file is also an option on the form, it will list any other files in that same bucket and path.
+
+```js
+export const definition = {
+  id: text("id").primaryKey(),
+  title: text("title"),
+  body: text("body"),
+  userId: text("userId"),
+  image: text("image"),
+  images: text("images", { mode: "json" }).$type<string[]>(),
+  tags: text("tags", { mode: "json" }).$type<string[]>(),
+};
+export const fields: ApiConfig["fields"] = {
+  image: {
+    type: "file",
+    bucket: (ctx) => ctx.env.R2_STORAGE,
+    path: "images",
+  },
+  images: {
+    type: "file[]",
+    bucket: (ctx) => ctx.env.R2_STORAGE,
+    path: "images",
+  },
+  tags: {
+    type: "string[]",
+  },
+};
+
+```
+
+## [Tus API](https://tus.io/)
+
+A [tus api](https://tus.io/) is available for uploading files. The tus api is available at `/tus`.  
+In addition to the normal tus api 3 headers should be passed in the request to properly handle finding the correct bucket, the path to store the file, permissions, hooks, etc.
+  - sonic-route - the route of the table the file is being uploaded to e.g 'posts'
+  - sonic-field - the field name of the file e.g. 'image'
+  - sonic-mode - should be 'create' if calling manually
+
 # Authentication
 
 

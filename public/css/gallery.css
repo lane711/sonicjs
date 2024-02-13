@@ -1,0 +1,42 @@
+@media (min-width: 800px) {
+  .modal {
+    --bs-modal-width: 700px;
+  }
+}
+@container (min-width: 500px) {
+  .gallery .gallery-column {
+    flex: 25%;
+    max-width: 25%;
+  }
+}
+
+@container (min-width: 300px) and (max-width: 499px) {
+  .gallery .gallery-column {
+    flex: 50%;
+    max-width: 50%;
+  }
+}
+
+@container (max-width: 299px) {
+  .gallery .gallery-column {
+    flex: 100%;
+    max-width: 100%;
+  }
+}
+
+.gallery {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0 4px;
+  container-type: inline-size;
+}
+
+.gallery .gallery-column {
+  padding: 0 4px;
+}
+
+.gallery .gallery-column img {
+  margin-top: 8px;
+  vertical-align: middle;
+  width: 100%;
+}

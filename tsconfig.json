@@ -3,7 +3,7 @@
     "outDir": "./dist",
     "module": "esnext",
     "target": "esnext",
-    "lib": ["esnext", "dom"],
+    "lib": ["esnext"],
     "moduleResolution": "node",
     "sourceMap": true,
     "types": ["@cloudflare/workers-types", "jest"],

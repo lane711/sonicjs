@@ -148,7 +148,7 @@ export async function loadKVCacheDetail(ctx, kv) {
             </button>
           </div>
 
-          <textarea rows="24" style="width: 100%; max-width: 100%;">
+          <textarea rows={24} style="width: 100%; max-width: 100%;">
             {JSON.stringify(kv, null, 2)}
           </textarea>
         </div>
@@ -172,7 +172,7 @@ export async function loadInMemoryCacheDetail(ctx, kv) {
             </button>
           </div>
 
-          <textarea rows="24" style="width: 100%; max-width: 100%;">
+          <textarea rows={24} style="width: 100%; max-width: 100%;">
             {JSON.stringify(kv, null, 2)}
           </textarea>
         </div>
@@ -282,6 +282,97 @@ function editScript() {
   return console.log("hello");
 }
 
+export const FileModal = () => {
+  return (
+    <div
+      class="modal fade"
+      id="fileModal"
+      tabindex={-1}
+      aria-labelledby="fileModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="fileModalLabel">
+              Modal title
+            </h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link active"
+                  id="image-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#image-tab-pane"
+                  type="button"
+                  role="tab"
+                  aria-controls="image-tab-pane"
+                  aria-selected="true"
+                >
+                  Images
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  id="file-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#file-tab-pane"
+                  type="button"
+                  role="tab"
+                  aria-controls="file-tab-pane"
+                  aria-selected="false"
+                >
+                  Files
+                </button>
+              </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+              <div
+                class="tab-pane fade show active"
+                id="image-tab-pane"
+                role="tabpanel"
+                aria-labelledby="image-tab"
+                tabIndex={0}
+              >
+                <div class="gallery">
+                  <div class="gallery-column"></div>
+                  <div class="gallery-column"></div>
+                  <div class="gallery-column"></div>
+                  <div class="gallery-column"></div>
+                </div>
+              </div>
+              <div
+                class="tab-pane fade"
+                id="file-tab-pane"
+                role="tabpanel"
+                aria-labelledby="file-tab"
+                tabIndex={0}
+              ></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 export const ContentEditForm = (props: {
   screenTitle: string;
   saveButtonText: string;
@@ -298,6 +389,7 @@ export const ContentEditForm = (props: {
       screenTitle={"Edit: " + props.contentId}
     >
       <div id="formio" data-id={props.contentId} data-route={props.route}></div>
+      <FileModal />
     </Layout>
   );
 };
@@ -315,6 +407,7 @@ export const ContentNewForm = (props: {
       username={props.username}
     >
       <div id="formio" data-route={props.route}></div>
+      <FileModal />
     </Layout>
   );
 };

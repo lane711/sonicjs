@@ -15,6 +15,7 @@ export const definition = {
   body: text("body"),
   userId: text("userId"),
   postId: integer("postId"),
+  tags: text("tags", { mode: "json" }).$type<string[]>(),
 };
 
 export const table = sqliteTable(
@@ -65,5 +66,10 @@ export const hooks: ApiConfig["hooks"] = {
       }
       return data;
     },
+  },
+};
+export const fields: ApiConfig["fields"] = {
+  tags: {
+    type: "string[]",
   },
 };

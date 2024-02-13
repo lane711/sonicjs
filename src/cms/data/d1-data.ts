@@ -158,9 +158,16 @@ export function whereClauseBuilder(filters: Record<string, any>) {
   let AND = "";
   whereClause = "WHERE";
   for (const key of Object.keys(filters)) {
-    const value =
-      typeof filters[key] === "string" ? `'${filters[key]}'` : filters[key];
-    whereClause = `${whereClause} ${AND} ${key} = ${value}`;
+    let filter = filters[key];
+    if (typeof filter === "string") {
+      if (filter.toLowerCase().includes("is")) {
+        whereClause = `${whereClause} ${AND} ${key} ${filter}`;
+      } else {
+        whereClause = `${whereClause} ${AND} ${key} = '${filter}'`;
+      }
+    } else {
+      whereClause = `${whereClause} ${AND} ${key} = ${filter}`;
+    }
     AND = "AND";
   }
   return whereClause;

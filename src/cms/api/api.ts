@@ -207,11 +207,13 @@ tables.forEach((entry) => {
       if (entry?.hooks?.resolveInput?.create) {
         content.data = await entry.hooks.resolveInput.create(ctx, content.data);
       }
+      console.log("posting new record content filtered?", content.data);
       const result = await insertRecord(
         ctx.env.D1DATA,
         ctx.env.KVDATA,
         content
       );
+      console.log("create result", result);
 
       if (entry?.hooks?.afterOperation) {
         await entry.hooks.afterOperation(
@@ -237,7 +239,7 @@ tables.forEach((entry) => {
     var content: { data?: any; table?: string; id?: string } = {};
     ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
     content.data = payload.data;
-
+    console.log("put content", JSON.stringify(content.data, null, 2));
     if (entry.hooks?.beforeOperation) {
       await entry.hooks?.beforeOperation(ctx, "update", id, content);
     }
