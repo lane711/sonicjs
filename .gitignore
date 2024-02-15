@@ -3,4 +3,4 @@ dist
 .wrangler/state
 .wrangler/tmp
 wrangler.toml
-.vscode/settings.json
+
