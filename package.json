@@ -13,7 +13,11 @@
     "generate": "drizzle-kit generate:sqlite --schema=./src/db/schema --out=./migrations",
     "up": "wrangler d1 migrations apply sonicjs --local",
     "up:prod": "wrangler d1 migrations apply sonicjs",
-    "tail": "wrangler pages deployment tail"
+    "tail": "wrangler pages deployment tail",
+    "check": "run-p check:*",
+    "check:prettier": "prettier --check --cache . **/*.css",
+    "fix": "run-s fix:*",
+    "fix:prettier": "prettier --write --cache . **/*.css"
   },
   "keywords": [],
   "author": "",
@@ -52,3 +56,4 @@
     "uuid": "^9.0.0"
   }
 }
+
