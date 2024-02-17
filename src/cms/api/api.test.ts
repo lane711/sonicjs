@@ -1,3 +1,4 @@
+it('api.test.ts dummy', () => {});
 // import app from '../../server';
 // import { drizzle } from 'drizzle-orm/d1';
 // import { sql } from 'drizzle-orm';

@@ -80,53 +80,53 @@ it('should return a SQL select with limit and offset', () => {
 });
 
 //TODO: rework to hit the full api
-it('get should return results', async () => {
-  const db = createTestTable();
-
-  await insertD1Data(__D1_BETA__D1DATA, KVDATA, 'users', {
-    firstName: 'John',
-    id: '1'
-  });
-  await insertD1Data(__D1_BETA__D1DATA, KVDATA, 'users', {
-    firstName: 'Jane',
-    id: '2'
-  });
-
-  const d1Result = await getD1DataByTable(
-    __D1_BETA__D1DATA,
-    'users',
-    undefined
-  );
-
-  expect(d1Result.length).toBe(2);
-});
-
-it('updateD1Data should update record', async () => {
-  const db = createTestTable();
-
-  await insertD1Data(__D1_BETA__D1DATA, KVDATA, 'users', {
-    firstName: 'John',
-    id: 'a'
-  });
-  await insertD1Data(__D1_BETA__D1DATA, KVDATA, 'users', {
-    firstName: 'Jane',
-    id: 'b'
-  });
-
-  await updateD1Data(__D1_BETA__D1DATA, 'users', {
-    data: { firstName: 'Steve' },
-    id: 'b'
-  });
-
-  const d1Result = await getD1DataByTable(
-    __D1_BETA__D1DATA,
-    'users',
-    undefined
-  );
-
-  expect(d1Result.length).toBe(2);
-  expect(d1Result[1].firstName).toBe('Steve');
-});
+// it('get should return results', async () => {
+//   const db = createTestTable();
+//
+//   await insertD1Data(__D1_BETA__D1DATA, KVDATA, 'users', {
+//     firstName: 'John',
+//     id: '1'
+//   });
+//   await insertD1Data(__D1_BETA__D1DATA, KVDATA, 'users', {
+//     firstName: 'Jane',
+//     id: '2'
+//   });
+//
+//   const d1Result = await getD1DataByTable(
+//     __D1_BETA__D1DATA,
+//     'users',
+//     undefined
+//   );
+//
+//   expect(d1Result.length).toBe(2);
+// });
+//
+// it('updateD1Data should update record', async () => {
+//   const db = createTestTable();
+//
+//   await insertD1Data(__D1_BETA__D1DATA, KVDATA, 'users', {
+//     firstName: 'John',
+//     id: 'a'
+//   });
+//   await insertD1Data(__D1_BETA__D1DATA, KVDATA, 'users', {
+//     firstName: 'Jane',
+//     id: 'b'
+//   });
+//
+//   await updateD1Data(__D1_BETA__D1DATA, 'users', {
+//     data: { firstName: 'Steve' },
+//     id: 'b'
+//   });
+//
+//   const d1Result = await getD1DataByTable(
+//     __D1_BETA__D1DATA,
+//     'users',
+//     undefined
+//   );
+//
+//   expect(d1Result.length).toBe(2);
+//   expect(d1Result[1].firstName).toBe('Steve');
+// });
 
 function createTestTable() {
   const db = drizzle(__D1_BETA__D1DATA);

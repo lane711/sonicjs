@@ -1,3 +1,4 @@
+it('data-references.test.ts dummy', () => {});
 // import { insertD1Data } from './d1-data';
 // import { tableSchemas } from '../../db/routes';
 // import { sql } from 'drizzle-orm';

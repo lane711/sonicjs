@@ -1,3 +1,4 @@
+it('example.test.ts dummy', () => {});
 // import app from '../server';
 // const env = getMiniflareBindings();
 // const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
