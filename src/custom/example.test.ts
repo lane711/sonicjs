@@ -1,64 +1,64 @@
-import app from "../server";
+import app from '../server';
 const env = getMiniflareBindings();
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
-import { sql } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/d1";
+import { sql } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/d1';
 
-import { insertRecord } from "../cms/data/data";
+import { insertRecord } from '../cms/data/data';
 
-it("get should return results and 200", async () => {
+it('get should return results and 200', async () => {
   const db = createTestTable();
   const { userRecord, categoryRecord, postRecord } =
     await createRelatedTestRecords();
 
   let req = new Request(
-    "http://localhost/v1/example/blog-posts?limit=2&offset=0",
+    'http://localhost/v1/example/blog-posts?limit=2&offset=0',
     {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
     }
   );
   let res = await app.fetch(req, env);
   expect(res.status).toBe(200);
   let body = await res.json();
   expect(body.data.length).toBe(2);
-  expect(body.source).toBe("d1");
+  expect(body.source).toBe('d1');
   expect(body.total).toBe(3);
   expect(body.executionTime).toBeGreaterThan(-1);
 
   //if we get again, should be cached
   let req2 = new Request(
-    "http://localhost/v1/example/blog-posts?limit=2&offset=0",
+    'http://localhost/v1/example/blog-posts?limit=2&offset=0',
     {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
     }
   );
   let res2 = await app.fetch(req2, env);
   expect(res2.status).toBe(200);
   let body2 = await res2.json();
   expect(body2.data.length).toBe(2);
-  expect(body2.source).toBe("cache");
+  expect(body2.source).toBe('cache');
   expect(body2.total).toBe(3);
 
   // sleep(200);
   //anticipated next request should be cached
   let req3 = new Request(
-    "http://localhost/v1/example/blog-posts?limit=2&offset=2",
+    'http://localhost/v1/example/blog-posts?limit=2&offset=2',
     {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
     }
   );
   let res3 = await app.fetch(req3, env);
   expect(res3.status).toBe(200);
   let body3 = await res3.json();
   expect(body3.data.length).toBe(1);
-  expect(body3.source).toBe("cache");
+  expect(body3.source).toBe('cache');
   expect(body3.total).toBe(3);
 });
 
-it("get should return single result if id passed in", async () => {
+it('get should return single result if id passed in', async () => {
   const db = createTestTable();
   const { userRecord, categoryRecord, postRecord } =
     await createRelatedTestRecords();
@@ -66,16 +66,16 @@ it("get should return single result if id passed in", async () => {
   let req = new Request(
     `http://localhost/v1/example/blog-posts/${postRecord.data.id}`,
     {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
     }
   );
   let res = await app.fetch(req, env);
   expect(res.status).toBe(200);
   let body = await res.json();
-  expect(body.data.title).toBe("Post One");
-  expect(body.data.category).toBe("Category One");
-  expect(body.source).toBe("d1");
+  expect(body.data.title).toBe('Post One');
+  expect(body.data.category).toBe('Category One');
+  expect(body.source).toBe('d1');
   expect(body.total).toBe(1);
   expect(body.executionTime).toBeGreaterThan(-1);
 
@@ -83,99 +83,99 @@ it("get should return single result if id passed in", async () => {
   let req2 = new Request(
     `http://localhost/v1/example/blog-posts/${postRecord.data.id}`,
     {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
     }
   );
 
   let res2 = await app.fetch(req2, env);
   expect(res.status).toBe(200);
   let body2 = await res2.json();
-  expect(body2.data.category).toBe("Category One");
-  expect(body2.source).toBe("cache");
+  expect(body2.data.category).toBe('Category One');
+  expect(body2.source).toBe('cache');
   expect(body2.total).toBe(1);
   expect(body2.executionTime).toBeGreaterThan(-1);
 });
 
 async function createRelatedTestRecords() {
   const userRecord = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-    table: "users",
+    table: 'users',
     data: {
-      firstName: "John",
-    },
+      firstName: 'John'
+    }
   });
 
   const categoryRecord = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-    table: "categories",
+    table: 'categories',
     data: {
-      title: "Category One",
-    },
+      title: 'Category One'
+    }
   });
 
   const categoryRecord2 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-    table: "categories",
+    table: 'categories',
     data: {
-      title: "Category Two",
-    },
+      title: 'Category Two'
+    }
   });
 
   const postRecord = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-    table: "posts",
+    table: 'posts',
     data: {
-      id: "abc",
-      title: "Post One",
-      userId: userRecord.data.id,
-    },
+      id: 'abc',
+      title: 'Post One',
+      userId: userRecord.data.id
+    }
   });
 
   const postRecord2 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-    table: "posts",
+    table: 'posts',
     data: {
-      title: "Post Two",
-      userId: userRecord.data.id,
-    },
+      title: 'Post Two',
+      userId: userRecord.data.id
+    }
   });
 
   const postRecord3 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-    table: "posts",
+    table: 'posts',
     data: {
-      title: "Post Three",
-      userId: userRecord.data.id,
-    },
+      title: 'Post Three',
+      userId: userRecord.data.id
+    }
   });
 
   const categoryToPost = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-    table: "categoriesToPosts",
+    table: 'categoriesToPosts',
     data: {
       categoryId: categoryRecord.data.id,
-      postId: postRecord.data.id,
-    },
+      postId: postRecord.data.id
+    }
   });
 
   const categoryToPost2 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-    table: "categoriesToPosts",
+    table: 'categoriesToPosts',
     data: {
       categoryId: categoryRecord2.data.id,
-      postId: postRecord2.data.id,
-    },
+      postId: postRecord2.data.id
+    }
   });
 
   const commentRecord = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-    table: "comments",
+    table: 'comments',
     data: {
-      body: "My first comment",
+      body: 'My first comment',
       postId: postRecord.data.id,
-      userId: userRecord.data.id,
-    },
+      userId: userRecord.data.id
+    }
   });
 
   const commentRecord2 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-    table: "comments",
+    table: 'comments',
     data: {
-      body: "My second comment",
+      body: 'My second comment',
       postId: postRecord.data.id,
-      userId: userRecord.data.id,
-    },
+      userId: userRecord.data.id
+    }
   });
 
   return { userRecord, categoryRecord, postRecord, commentRecord };

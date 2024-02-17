@@ -19,10 +19,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      
+
       - name: Packages Install
         run: npm ci
 
       - name: Static Check
         run: npm run check
-

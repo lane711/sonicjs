@@ -1,7 +1,7 @@
-import { d1 } from "@lucia-auth/adapter-sqlite";
-import { clearKVCache } from "../data/kv-data";
-import type { Adapter, InitializeAdapter } from "lucia";
-import { setCacheStatusInvalid } from "../data/cache";
+import { d1 } from '@lucia-auth/adapter-sqlite';
+import { clearKVCache } from '../data/kv-data';
+import type { Adapter, InitializeAdapter } from 'lucia';
+import { setCacheStatusInvalid } from '../data/cache';
 
 type D1Adapter = ReturnType<typeof d1>;
 
@@ -69,7 +69,7 @@ export const sonicAdapter = (
         await d1.updateKey(keyId, partialKey);
         await setCacheStatusInvalid();
         await clearKVCache(kv);
-      },
+      }
     };
   };
 };

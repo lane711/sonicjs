@@ -1,25 +1,25 @@
-import { AppContext } from "../server";
+import { AppContext } from '../server';
 
 export function isAdminOrEditor(ctx: AppContext) {
-  const user = ctx.get("user");
-  const role = user?.role?.toLowerCase() || "";
-  if (role === "admin" || role === "editor") {
+  const user = ctx.get('user');
+  const role = user?.role?.toLowerCase() || '';
+  if (role === 'admin' || role === 'editor') {
     return true;
   }
   return false;
 }
 
 export function isAdmin(ctx: AppContext) {
-  const user = ctx.get("user");
-  const role = user?.role?.toLowerCase() || "";
-  if (role === "admin") {
+  const user = ctx.get('user');
+  const role = user?.role?.toLowerCase() || '';
+  if (role === 'admin') {
     return true;
   }
   return false;
 }
 
 export function isUser(ctx: AppContext, id: string) {
-  const user = ctx.get("user");
+  const user = ctx.get('user');
   return user?.userId === id;
 }
 

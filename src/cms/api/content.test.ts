@@ -1,18 +1,17 @@
-import {content as app} from './content';
-const env = getMiniflareBindings()
+import { content as app } from './content';
+const env = getMiniflareBindings();
 
-describe("Test the content api", () => {
+describe('Test the content api', () => {
   test('List', async () => {
-    const res = await app.fetch(new Request('http://localhost/ping'), env)
-    expect(res.status).toBe(200)
-    const body = await res.text()
-    expect(body).not.toBeUndefined()
+    const res = await app.fetch(new Request('http://localhost/ping'), env);
+    expect(res.status).toBe(200);
+    const body = await res.text();
+    expect(body).not.toBeUndefined();
     // expect(body['posts'].length).toBe(0)
-  })
-
+  });
 });
 
-let newPostId = ''
+let newPostId = '';
 
 test('CRUD', async () => {
   // POST /posts

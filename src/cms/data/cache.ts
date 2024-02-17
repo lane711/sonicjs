@@ -1,7 +1,7 @@
-import loki from "lokijs";
-import { log } from "../util/logger";
-var db = new loki("cache.db");
-var cache = db.addCollection("cache");
+import loki from 'lokijs';
+import { log } from '../util/logger';
+var db = new loki('cache.db');
+var cache = db.addCollection('cache');
 
 // class CacheStatus {
 //   private static _instance: CacheStatus;
@@ -20,7 +20,7 @@ var cache = db.addCollection("cache");
 const LocalCache = {
   getCacheStatus() {
     return true;
-  },
+  }
 };
 
 export async function isCacheValid(): Promise<boolean> {
@@ -42,28 +42,28 @@ export async function setCacheStatusInvalid() {
 
 export async function addToInMemoryCache(ctx = {}, key: string, data) {
   log(ctx, {
-    level: "verbose",
-    message: "addToInMemoryCache start",
+    level: 'verbose',
+    message: 'addToInMemoryCache start'
   });
   cache.insert({ key, data });
   log(ctx, {
-    level: "verbose",
-    message: "addToInMemoryCache end",
+    level: 'verbose',
+    message: 'addToInMemoryCache end'
   });
 }
 
 export async function getFromInMemoryCache(ctx = {}, key: string) {
   // console.log("getFromInMemoryCache", key);
   log(ctx, {
-    level: "verbose",
-    message: "getFromInMemoryCache start",
-    key,
+    level: 'verbose',
+    message: 'getFromInMemoryCache start',
+    key
   });
   let data = await cache.find({ key: key });
   log(ctx, {
-    level: "verbose",
-    message: "getFromInMemoryCache end",
-    key,
+    level: 'verbose',
+    message: 'getFromInMemoryCache end',
+    key
   });
   return data;
 }
@@ -74,7 +74,7 @@ export async function getAllFromInMemoryCache() {
 }
 
 export async function clearInMemoryCache() {
-  console.log("clearing InMemoryCache");
+  console.log('clearing InMemoryCache');
   cache.clear();
 }
 
@@ -119,5 +119,5 @@ export async function clearInMemoryCache() {
 // }
 
 function getCacheStatusKey() {
-  return "cache-status";
+  return 'cache-status';
 }

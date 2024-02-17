@@ -1,4 +1,4 @@
-import { log } from "../util/logger";
+import { log } from '../util/logger';
 
 export function getKey(timestamp, table, id): string {
   return `${timestamp}::${table}::${id}`;
@@ -12,7 +12,7 @@ export function getKey(timestamp, table, id): string {
 
 export function getDataListByPrefix(
   db,
-  prefix = "",
+  prefix = '',
   limit: number = 100,
   cursor?: string
 ) {
@@ -21,7 +21,7 @@ export function getDataListByPrefix(
 
 export async function getDataByPrefix(
   db,
-  prefix = "",
+  prefix = '',
   limit?: number,
   cursor?: string
 ) {
@@ -39,7 +39,7 @@ export async function getDataByPrefix(
 }
 
 export async function getById(db, key) {
-  return db.get(key, { type: "json" });
+  return db.get(key, { type: 'json' });
 }
 
 export async function deleteKVById(db, key) {
@@ -48,7 +48,7 @@ export async function deleteKVById(db, key) {
 }
 
 export function getAsset(db, key) {
-  return db.get(key, { type: "text" });
+  return db.get(key, { type: 'text' });
 }
 
 export function saveKVData(db, id, data) {
@@ -65,9 +65,9 @@ export function saveKVDataWithMetaData(
   key = undefined
 ) {
   const generatedKey = getKey(site, contentType, key);
-  console.log("generatedKey", generatedKey);
+  console.log('generatedKey', generatedKey);
   return db.put(generatedKey, JSON.stringify(value), {
-    metadata: { value },
+    metadata: { value }
   });
 }
 
@@ -86,7 +86,7 @@ export async function addToKvCache(ctx, kv, key, value) {
   const createdOn = new Date().getTime();
 
   log(ctx, {
-    level: "verbose",
+    level: 'verbose',
     message: `addToKvCache before put`,
     key,
     cacheKey,
@@ -94,22 +94,18 @@ export async function addToKvCache(ctx, kv, key, value) {
     value
   });
 
-  await kv.put(
-    cacheKey,
-    JSON.stringify(value),
-    {
-      metadata: { createdOn },
-    }
-  );
+  await kv.put(cacheKey, JSON.stringify(value), {
+    metadata: { createdOn }
+  });
 
   // const result = await kv.put(cacheKey, JSON.stringify(value), {
   //   metadata: { createdOn} ,
   // });
 
   log(ctx, {
-    level: "verbose",
+    level: 'verbose',
     message: `addToKvCache after put`,
-    cacheKey,
+    cacheKey
   });
   // await db.put(cacheKey, JSON.stringify(value));
   // console.log("*** addToKvCache put complete");
@@ -130,7 +126,7 @@ export async function getRecordFromKvCache(db, key, ignorePrefix = false) {
   var isJSon = false;
   var results;
   try {
-    results = await db.get(lookupKey, { type: "json" });
+    results = await db.get(lookupKey, { type: 'json' });
     isJSon = true;
   } catch (error) {
     results = await db.get(lookupKey);
@@ -140,15 +136,15 @@ export async function getRecordFromKvCache(db, key, ignorePrefix = false) {
 }
 
 export function getKVCache(db) {
-  return getDataListByPrefix(db, addCachePrefix(""));
+  return getDataListByPrefix(db, addCachePrefix(''));
 }
 
 export function getAllKV(db) {
-  return getDataListByPrefix(db, "");
+  return getDataListByPrefix(db, '');
 }
 
 export async function clearKVCache(db) {
-  const itemsToDelete = await getDataListByPrefix(db, addCachePrefix(""));
+  const itemsToDelete = await getDataListByPrefix(db, addCachePrefix(''));
   for await (const key of itemsToDelete.keys) {
     await deleteKVById(db, key.name);
   }
@@ -161,7 +157,7 @@ export async function clearAllKVRecords(db) {
   }
 }
 
-export function addCachePrefix(key: string = "") {
+export function addCachePrefix(key: string = '') {
   return `cache::${key}`;
 }
 
@@ -177,7 +173,7 @@ export function saveContent(db, content, timestamp, id) {
     id,
     table: content.table,
     createdOn: timestamp,
-    updatedOn: timestamp,
+    updatedOn: timestamp
   };
 
   // console.log("metadata ==>", metadata);
@@ -188,21 +184,21 @@ export function saveContent(db, content, timestamp, id) {
 }
 
 export function extractContentType(contentTypeComponents) {
-  const contentType = contentTypeComponents.find((c) => c.key === "systemId");
+  const contentType = contentTypeComponents.find((c) => c.key === 'systemId');
   return contentType.defaultValue;
 }
 
 export async function getContentType(db, contentTypeSystemId) {
   const contentType = await db.get(
     `site1::content-type::${contentTypeSystemId}`,
-    { type: "json" }
+    { type: 'json' }
   );
   return contentType;
 }
 
 export async function getContentTypes(db) {
-  const contentTypeKeys = await db.list({ prefix: "site1::content-type::" });
-  console.log("contentTypeKeys", contentTypeKeys);
+  const contentTypeKeys = await db.list({ prefix: 'site1::content-type::' });
+  console.log('contentTypeKeys', contentTypeKeys);
   var contentTypes = [];
   for await (const key of contentTypeKeys.keys) {
     const record = await getById(db, key.name);

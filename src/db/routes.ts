@@ -1,13 +1,13 @@
-import * as users from "./schema/users";
-import * as posts from "./schema/posts";
-import * as comments from "./schema/comments";
-import * as categories from "./schema/categories";
-import * as categoriesToPosts from "./schema/categoriesToPosts";
-import * as userKeys from "./schema/userKeys";
-import * as userSessions from "./schema/userSessions";
+import * as users from './schema/users';
+import * as posts from './schema/posts';
+import * as comments from './schema/comments';
+import * as categories from './schema/categories';
+import * as categoriesToPosts from './schema/categoriesToPosts';
+import * as userKeys from './schema/userKeys';
+import * as userSessions from './schema/userSessions';
 
-import { AppContext } from "../server";
-import { isAdminOrEditor } from "./config-helpers";
+import { AppContext } from '../server';
+import { isAdminOrEditor } from './config-helpers';
 
 export type SonicJSConfig = {
   apiConfig: ApiConfig[];
@@ -155,13 +155,13 @@ export interface ApiConfig {
     };
     beforeOperation?: (
       ctx: AppContext,
-      operation: "create" | "read" | "update" | "delete",
+      operation: 'create' | 'read' | 'update' | 'delete',
       id?: string,
       data?: any
     ) => void | Promise<void>;
     afterOperation?: (
       ctx: AppContext,
-      operation: "create" | "read" | "update" | "delete",
+      operation: 'create' | 'read' | 'update' | 'delete',
       id?: string,
       data?: any,
       result?: { data?: any } & Record<string, any>
@@ -170,10 +170,10 @@ export interface ApiConfig {
   fields?: {
     [field: string]:
       | {
-          type: "auto" | "string[]";
+          type: 'auto' | 'string[]';
         }
       | {
-          type: "file" | "file[]";
+          type: 'file' | 'file[]';
           bucket: (ctx: AppContext) => R2Bucket;
           path?: string | ((ctx: AppContext) => string);
         };
@@ -189,7 +189,7 @@ export const tableSchemas = {
   categories,
   categoriesToPosts,
   userKeys,
-  userSessions,
+  userSessions
 };
 
 for (const key of Object.keys(tableSchemas)) {
@@ -200,12 +200,12 @@ for (const key of Object.keys(tableSchemas)) {
       route: table.route,
       access: table.access,
       hooks: table.hooks,
-      fields: table.fields,
+      fields: table.fields
     });
   }
 }
 
 export const config: SonicJSConfig = {
   apiConfig: apiConfig,
-  adminAccessControl: isAdminOrEditor,
+  adminAccessControl: isAdminOrEditor
 };

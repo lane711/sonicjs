@@ -1,7 +1,7 @@
-import { apiConfig } from "../../db/routes";
-import { AppContext } from "../../server";
-import { getSchemaFromTable } from "../data/d1-data";
-import { singularize } from "../util/utils";
+import { apiConfig } from '../../db/routes';
+import { AppContext } from '../../server';
+import { getSchemaFromTable } from '../data/d1-data';
+import { singularize } from '../util/utils';
 
 export function getForm(ctx: AppContext, table) {
   let formFields: {
@@ -20,37 +20,37 @@ export function getForm(ctx: AppContext, table) {
   const config = apiConfig.find((tbl) => tbl.table === table);
   for (var field in schema) {
     let formField = getField(field);
-    const metaType = config.fields?.[field]?.type || "auto";
+    const metaType = config.fields?.[field]?.type || 'auto';
     formField.metaType = metaType;
-    if (formField.metaType === "auto") {
+    if (formField.metaType === 'auto') {
       delete formField.metaType;
     } else if (
-      formField.metaType.includes("[]") &&
-      formField.metaType !== "file[]"
+      formField.metaType.includes('[]') &&
+      formField.metaType !== 'file[]'
     ) {
       const c = formField;
       formField = {
-        type: "datagrid",
+        type: 'datagrid',
         label: c.label || c.key,
         key: c.key,
         components: [
           {
             ...c,
             key: `${c.key}`,
-            label: singularize(c.label || c.key),
-          },
-        ],
+            label: singularize(c.label || c.key)
+          }
+        ]
       };
     }
     formFields.push(formField);
   }
 
-  const user = ctx.get("user");
+  const user = ctx.get('user');
   if (user && user.userId) {
-    const hasUserId = formFields.find((f) => f.key === "userId");
+    const hasUserId = formFields.find((f) => f.key === 'userId');
     if (hasUserId) {
       formFields = formFields.map((f) => {
-        if (f.key === "userId") {
+        if (f.key === 'userId') {
           f.disabled = true;
           f.defaultValue = user.userId;
         }
@@ -61,18 +61,18 @@ export function getForm(ctx: AppContext, table) {
 
   //table reference
   formFields.push({
-    type: "textfield",
-    key: "table",
-    label: "table",
+    type: 'textfield',
+    key: 'table',
+    label: 'table',
     defaultValue: table,
-    disabled: true,
+    disabled: true
   });
 
   //submit button
   formFields.push({
-    type: "button",
-    action: "submit",
-    label: "Save",
+    type: 'button',
+    action: 'submit',
+    label: 'Save'
   });
 
   return formFields;
@@ -91,12 +91,12 @@ interface Field {
 }
 
 function getField(fieldName): Field {
-  const disabled = fieldName == "id";
+  const disabled = fieldName == 'id';
   return {
     type: getFieldType(fieldName),
     key: fieldName,
     label: fieldName,
-    disabled,
+    disabled
     // placeholder: "Enter your first name.",
     // input: true,
     // tooltip: "Enter your <strong>First Name</strong>",
@@ -105,5 +105,5 @@ function getField(fieldName): Field {
 }
 
 function getFieldType(fieldName) {
-  return fieldName === "password" ? "password" : "textfield";
+  return fieldName === 'password' ? 'password' : 'textfield';
 }

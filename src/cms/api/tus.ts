@@ -1,38 +1,38 @@
-import { Hono } from "hono";
-import { Bindings } from "../types/bindings";
-import { AppContext, Variables } from "../../server";
-import { TussleCloudflareWorker } from "@tussle/middleware-cloudflareworker";
-import { TussleStateMemory } from "@tussle/state-memory";
-import { R2UploadState, TussleStorageR2 } from "@tussle/storage-r2";
-import { ApiConfig, apiConfig } from "../../db/routes";
+import { Hono } from 'hono';
+import { Bindings } from '../types/bindings';
+import { AppContext, Variables } from '../../server';
+import { TussleCloudflareWorker } from '@tussle/middleware-cloudflareworker';
+import { TussleStateMemory } from '@tussle/state-memory';
+import { R2UploadState, TussleStorageR2 } from '@tussle/storage-r2';
+import { ApiConfig, apiConfig } from '../../db/routes';
 import {
   getApiAccessControlResult,
   getOperationCreateResult,
-  getOperationUpdateResult,
-} from "../auth/auth-helpers";
-import { firstValueFrom } from "rxjs";
+  getOperationUpdateResult
+} from '../auth/auth-helpers';
+import { firstValueFrom } from 'rxjs';
 export const tusAPI = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 const stateService = new TussleStateMemory<R2UploadState>();
 
-tusAPI.all("*", async (ctx) => {
+tusAPI.all('*', async (ctx) => {
   const request = ctx.req;
 
-  const route = request.header("sonic-route");
-  let fieldName = request.header("sonic-field");
-  if (fieldName?.includes("[")) {
-    fieldName = fieldName.split("[")[0];
+  const route = request.header('sonic-route');
+  let fieldName = request.header('sonic-field');
+  if (fieldName?.includes('[')) {
+    fieldName = fieldName.split('[')[0];
   }
-  const mode = request.header("sonic-mode") as "create" | "update";
-  const id = request.header("data-id");
+  const mode = request.header('sonic-mode') as 'create' | 'update';
+  const id = request.header('data-id');
   const table = apiConfig.find((entry) => entry.route === route);
 
-  if (request.method === "HEAD") {
+  if (request.method === 'HEAD') {
     const cache = await caches.default.match(request.url);
     if (cache) {
       return cache;
     }
   }
-  if (request.method === "GET") {
+  if (request.method === 'GET') {
     const res = handleGET(ctx);
     if (res) {
       return res;
@@ -42,27 +42,27 @@ tusAPI.all("*", async (ctx) => {
     const field = table.fields?.[fieldName];
     let bucket: R2Bucket;
     let path: string;
-    if (field.type === "file" || field.type === "file[]") {
+    if (field.type === 'file' || field.type === 'file[]') {
       bucket = field.bucket(ctx);
-      if (typeof field.path === "string") {
+      if (typeof field.path === 'string') {
         path = field.path;
-      } else if (typeof field.path === "function") {
+      } else if (typeof field.path === 'function') {
         path = field.path(ctx);
       } else {
-        path = "";
+        path = '';
       }
-      if (path && path.endsWith("/")) {
+      if (path && path.endsWith('/')) {
         path = path.slice(0, -1);
       }
-      if (path && !path.startsWith("/")) {
-        path = "/" + path;
+      if (path && !path.startsWith('/')) {
+        path = '/' + path;
       }
-      path += "/r_" + route + "/f_" + fieldName;
+      path += '/r_' + route + '/f_' + fieldName;
     }
     const storage = new TussleStorageR2({
       stateService,
       bucket,
-      skipMerge: false,
+      skipMerge: false
     });
     const tussle = getTussleMiddleware(storage, table, ctx, mode, id, path);
     const cfRequest = ctx.req.raw;
@@ -72,7 +72,7 @@ tusAPI.all("*", async (ctx) => {
       return res;
     }
   }
-  return ctx.text("Not Implemented", 501);
+  return ctx.text('Not Implemented', 501);
 });
 
 type UserParams = {
@@ -90,11 +90,11 @@ async function cacheCompletedUploadResponse(
     url.toString(),
     new Response(null, {
       headers: {
-        "Upload-Offset": offset.toString(10),
-        "Upload-Length": offset.toString(10),
-        "Tus-Resumable": "1.0.0",
-        "Cache-Control": "max-age=604800",
-      },
+        'Upload-Offset': offset.toString(10),
+        'Upload-Length': offset.toString(10),
+        'Tus-Resumable': '1.0.0',
+        'Cache-Control': 'max-age=604800'
+      }
     })
   );
 }
@@ -104,25 +104,25 @@ const getTussleMiddleware = (() => {
     storage: TussleStorageR2,
     table: ApiConfig,
     honoCtx: AppContext,
-    mode: "create" | "update",
+    mode: 'create' | 'update',
     id: string,
     pathConfig: string
   ) => {
     instance = new TussleCloudflareWorker({
       hooks: {
-        "before-create": async (_ctx, params) => {
+        'before-create': async (_ctx, params) => {
           if (table.hooks?.beforeOperation) {
             await table.hooks.beforeOperation(honoCtx, mode, id, params);
           }
           const filename =
             params.uploadMetadata.filename || params.uploadMetadata.name;
 
-          const fileExtension = "." + filename.split(".").pop();
+          const fileExtension = '.' + filename.split('.').pop();
 
-          console.log("params before", JSON.stringify(params, null, 2));
+          console.log('params before', JSON.stringify(params, null, 2));
 
           let authorized = true;
-          if (mode === "create") {
+          if (mode === 'create') {
             authorized = await getOperationCreateResult(
               table?.access?.operation?.create,
               honoCtx,
@@ -140,35 +140,35 @@ const getTussleMiddleware = (() => {
             ));
           }
           if (!authorized) {
-            return honoCtx.text("Unauthorized", 401);
+            return honoCtx.text('Unauthorized', 401);
           }
 
           let path: string;
           switch (params.uploadConcat?.action) {
-            case "partial": // Creating a file to hold a segment of a parallel upload.
+            case 'partial': // Creating a file to hold a segment of a parallel upload.
               path =
                 params.path +
                 pathConfig +
-                "/segments/" +
+                '/segments/' +
                 crypto.randomUUID() +
                 fileExtension;
               break;
-            case "final": // Finishing a parallel upload (combines multiple 'partials' from above)
+            case 'final': // Finishing a parallel upload (combines multiple 'partials' from above)
             default:
               path =
                 params.path +
                 pathConfig +
-                "/" +
+                '/' +
                 crypto.randomUUID() +
                 fileExtension;
               break;
           }
           return {
             ...params,
-            path,
+            path
           };
         },
-        "after-complete": async (ctx, params) => {
+        'after-complete': async (ctx, params) => {
           if (table?.hooks?.afterOperation) {
             await table.hooks.afterOperation(honoCtx, mode, id, params, params);
           }
@@ -182,11 +182,11 @@ const getTussleMiddleware = (() => {
             offset
           );
           return params;
-        },
+        }
       },
       core: {
-        storage,
-      },
+        storage
+      }
     });
     return instance;
   };
@@ -195,24 +195,24 @@ const getTussleMiddleware = (() => {
 const handleGET = async (ctx: AppContext) => {
   const request = ctx.req;
   const pathname = new URL(request.url).pathname;
-  const pathParts = pathname.split("/");
-  let route = "";
-  let fieldName = "";
+  const pathParts = pathname.split('/');
+  let route = '';
+  let fieldName = '';
   pathParts.forEach((part) => {
-    if (part.startsWith("r_")) {
-      route = part.replace("r_", "");
+    if (part.startsWith('r_')) {
+      route = part.replace('r_', '');
     }
-    if (part.startsWith("f_")) {
-      fieldName = part.replace("f_", "");
-      if (fieldName.includes("[")) {
-        fieldName = fieldName.split("[")[0];
+    if (part.startsWith('f_')) {
+      fieldName = part.replace('f_', '');
+      if (fieldName.includes('[')) {
+        fieldName = fieldName.split('[')[0];
       }
     }
   });
 
   const table = apiConfig.find((entry) => entry.route === route);
   if (table.hooks?.beforeOperation) {
-    await table.hooks.beforeOperation(ctx, "read", pathname);
+    await table.hooks.beforeOperation(ctx, 'read', pathname);
   }
 
   const accessControlResult = await getApiAccessControlResult(
@@ -225,32 +225,32 @@ const handleGET = async (ctx: AppContext) => {
   );
 
   if (!accessControlResult) {
-    return ctx.text("Unauthorized", 401);
+    return ctx.text('Unauthorized', 401);
   }
   let cache;
   try {
-    cache = await caches.default.match(request.url + "GET");
+    cache = await caches.default.match(request.url + 'GET');
   } catch (error) {
-    console.log("cache error", error);
+    console.log('cache error', error);
   }
   if (cache) {
     if (table.hooks?.afterOperation) {
-      await table.hooks.afterOperation(ctx, "read", pathname, null, {
+      await table.hooks.afterOperation(ctx, 'read', pathname, null, {
         pathname,
-        cache: true,
+        cache: true
       });
     }
     return cache;
   }
   if (table) {
     const field = table.fields?.[fieldName];
-    if (field.type === "file" || field.type === "file[]") {
+    if (field.type === 'file' || field.type === 'file[]') {
       const bucket = field.bucket(ctx);
       if (bucket) {
         const storage = new TussleStorageR2({
           stateService,
           bucket,
-          skipMerge: false,
+          skipMerge: false
         });
 
         try {
@@ -258,14 +258,14 @@ const handleGET = async (ctx: AppContext) => {
           if (file) {
             const type = (file.metadata.type ||
               file.metadata.filetype) as string;
-            ctx.header("Content-Type", type);
+            ctx.header('Content-Type', type);
             ctx.status(200);
             const response = ctx.body(file.body);
-            await caches.default.put(request.url + "GET", response.clone());
+            await caches.default.put(request.url + 'GET', response.clone());
             if (table.hooks?.afterOperation) {
-              await table.hooks.afterOperation(ctx, "read", pathname, file, {
+              await table.hooks.afterOperation(ctx, 'read', pathname, file, {
                 pathname,
-                cache: false,
+                cache: false
               });
             }
             return response;
@@ -278,10 +278,10 @@ const handleGET = async (ctx: AppContext) => {
   }
 
   if (table.hooks?.afterOperation) {
-    await table.hooks.afterOperation(ctx, "read", pathname, null, {
+    await table.hooks.afterOperation(ctx, 'read', pathname, null, {
       pathname,
-      cache: false,
+      cache: false
     });
   }
-  return ctx.text("Not Found", 404);
+  return ctx.text('Not Found', 404);
 };

@@ -1,37 +1,37 @@
-import { Hono } from "hono";
-import qs from "qs";
-import { getRecords } from "../cms/data/data";
-import * as schema from "../db/routes";
-import { drizzle } from "drizzle-orm/d1";
-import { sql } from "drizzle-orm";
-import axios from "axios";
+import { Hono } from 'hono';
+import qs from 'qs';
+import { getRecords } from '../cms/data/data';
+import * as schema from '../db/routes';
+import { drizzle } from 'drizzle-orm/d1';
+import { sql } from 'drizzle-orm';
+import axios from 'axios';
 
 const example = new Hono();
 
-example.get("/", (ctx) => {
-  return ctx.text("Hello SonicJs!");
+example.get('/', (ctx) => {
+  return ctx.text('Hello SonicJs!');
 });
 
-example.get("/users", async (ctx) => {
+example.get('/users', async (ctx) => {
   var params = qs.parse(ctx.req.query());
   const data = await getRecords(
     ctx.env.D1DATA,
     ctx.env.KVDATA,
-    "users",
+    'users',
     params,
     ctx.req.url,
-    "fastest"
+    'fastest'
   );
   return ctx.json(data);
 });
 
-example.post("/users", async (ctx) => {
+example.post('/users', async (ctx) => {
   var params = qs.parse(ctx.req.query());
-  const data = await getRecords(ctx, "users", params, ctx.req.url, "fastest");
+  const data = await getRecords(ctx, 'users', params, ctx.req.url, 'fastest');
   return ctx.json(data);
 });
 
-example.get("/blog-posts-orm", async (ctx) => {
+example.get('/blog-posts-orm', async (ctx) => {
   const start = Date.now();
   var params = qs.parse(ctx.req.query());
   const limit = params.limit ? params.limit : 10;
@@ -44,22 +44,22 @@ example.get("/blog-posts-orm", async (ctx) => {
       with: {
         user: true,
         comments: { with: { user: true } },
-        categories: { with: { category: true } },
+        categories: { with: { category: true } }
       },
       limit,
       offset,
       extras: {
-        total: sql`COUNT() OVER()`.as("total"),
-      },
+        total: sql`COUNT() OVER()`.as('total')
+      }
     });
   };
 
   const data = await getRecords(
     ctx,
-    "custom",
+    'custom',
     params,
     ctx.req.url,
-    "fastest",
+    'fastest',
     func
   );
 
@@ -69,7 +69,7 @@ example.get("/blog-posts-orm", async (ctx) => {
   return ctx.json({ ...data, executionTime });
 });
 
-example.get("/blog-posts", async (ctx) => {
+example.get('/blog-posts', async (ctx) => {
   const start = Date.now();
   var params = qs.parse(ctx.req.query());
 
@@ -132,12 +132,12 @@ async function getPagedBlogPost(ctx, url, params) {
     return results;
   };
 
-  const data = await getRecords(ctx, "custom", params, url, "fastest", func);
+  const data = await getRecords(ctx, 'custom', params, url, 'fastest', func);
 
   return data;
 }
 
-example.get("/blog-posts-d1", async (ctx) => {
+example.get('/blog-posts-d1', async (ctx) => {
   const start = Date.now();
   var params = qs.parse(ctx.req.query());
 
@@ -179,15 +179,15 @@ example.get("/blog-posts-d1", async (ctx) => {
   const end = Date.now();
   const executionTime = end - start;
 
-  return ctx.json({ data: results, executionTime, source: "d1", total });
+  return ctx.json({ data: results, executionTime, source: 'd1', total });
 });
 
-example.get("/blog-posts/:id", async (ctx) => {
+example.get('/blog-posts/:id', async (ctx) => {
   const start = Date.now();
-  const id = ctx.req.param("id");
+  const id = ctx.req.param('id');
   var params = qs.parse(ctx.req.query());
 
-  const table = "posts";
+  const table = 'posts';
   ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
 
   const func = async function () {
@@ -218,17 +218,17 @@ example.get("/blog-posts/:id", async (ctx) => {
 
     const post = data.results[0];
 
-    post.comments = post.comments ? post.comments.split(",") : null;
+    post.comments = post.comments ? post.comments.split(',') : null;
 
     return post;
   };
 
   const data = await getRecords(
     ctx,
-    "custom",
+    'custom',
     params,
     ctx.req.url,
-    "fastest",
+    'fastest',
     func
   );
 
@@ -238,9 +238,9 @@ example.get("/blog-posts/:id", async (ctx) => {
   return ctx.json({ ...data, executionTime });
 });
 
-example.get("/blog-posts/seedKV", async (ctx) => {
+example.get('/blog-posts/seedKV', async (ctx) => {
   getPagedBlogPost(ctx, 10, 5);
-  return ctx.json({ ok: "ok" });
+  return ctx.json({ ok: 'ok' });
 });
 
 // (function seedKVBlogData() {

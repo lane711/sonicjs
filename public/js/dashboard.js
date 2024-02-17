@@ -1,8 +1,7 @@
 /* globals Chart:false, feather:false */
 
 (() => {
-  'use strict'
+  'use strict';
 
-  feather.replace({ 'aria-hidden': 'true' })
-
-})()
+  feather.replace({ 'aria-hidden': 'true' });
+})();
