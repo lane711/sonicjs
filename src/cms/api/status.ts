@@ -2,8 +2,6 @@ import { Hono } from 'hono';
 import { Bindings } from '../types/bindings';
 import { getD1DataByTable } from '../data/d1-data';
 import { getById } from '../data/kv-data';
-import axios from 'axios';
-import { datadogLogs } from '@datadog/browser-logs';
 import { log } from '../util/logger';
 import {
   addToInMemoryCache,
@@ -15,7 +13,8 @@ const status = new Hono<{ Bindings: Bindings }>();
 
 status.get('/', async (ctx) => {
   console.log('status', Date());
-  var status = {};
+  // TODO any
+  var status = {} as any;
 
   status.webServer = 'ok';
 
@@ -91,17 +90,19 @@ status.get('/geo', (ctx) => {
   let html_style =
     'body{padding:6em; font-family: sans-serif;} h1{color:#f6821f;}';
 
-  html_content += '<p> Colo: ' + ctx.req.cf.colo + '</p>';
-  html_content += '<p> Country: ' + ctx.req.cf.country + '</p>';
-  html_content += '<p> City: ' + ctx.req.cf.city + '</p>';
-  html_content += '<p> Continent: ' + ctx.req.cf.continent + '</p>';
-  html_content += '<p> Latitude: ' + ctx.req.cf.latitude + '</p>';
-  html_content += '<p> Longitude: ' + ctx.req.cf.longitude + '</p>';
-  html_content += '<p> PostalCode: ' + ctx.req.cf.postalCode + '</p>';
-  html_content += '<p> MetroCode: ' + ctx.req.cf.metroCode + '</p>';
-  html_content += '<p> Region: ' + ctx.req.cf.region + '</p>';
-  html_content += '<p> RegionCode: ' + ctx.req.cf.regionCode + '</p>';
-  html_content += '<p> Timezone: ' + ctx.req.cf.timezone + '</p>';
+  // TODO any
+  const cf = (ctx.req as any).cf;
+  html_content += '<p> Colo: ' + cf.colo + '</p>';
+  html_content += '<p> Country: ' + cf.country + '</p>';
+  html_content += '<p> City: ' + cf.city + '</p>';
+  html_content += '<p> Continent: ' + cf.continent + '</p>';
+  html_content += '<p> Latitude: ' + cf.latitude + '</p>';
+  html_content += '<p> Longitude: ' + cf.longitude + '</p>';
+  html_content += '<p> PostalCode: ' + cf.postalCode + '</p>';
+  html_content += '<p> MetroCode: ' + cf.metroCode + '</p>';
+  html_content += '<p> Region: ' + cf.region + '</p>';
+  html_content += '<p> RegionCode: ' + cf.regionCode + '</p>';
+  html_content += '<p> Timezone: ' + cf.timezone + '</p>';
 
   let html = `<!DOCTYPE html>
       <head>

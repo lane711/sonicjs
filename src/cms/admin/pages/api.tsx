@@ -3,6 +3,7 @@ import { apiConfig } from '../../../db/routes';
 import { getById, getDataListByPrefix, saveKVData } from '../../data/kv-data';
 import { Layout } from '../theme';
 import { getD1DataByTable, getD1ByTableAndId } from '../../data/d1-data';
+import { Bindings } from '../../types/bindings';
 
 interface link {
   url: string;
@@ -64,7 +65,7 @@ export const Top = (props: {
   recordApis: link[];
   screenTitle: string;
   username?: string;
-  env?: Record<string, string>;
+  env?: Bindings;
 }) => {
   return (
     <Layout

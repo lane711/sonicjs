@@ -27,7 +27,8 @@ tusAPI.all('*', async (ctx) => {
   const table = apiConfig.find((entry) => entry.route === route);
 
   if (request.method === 'HEAD') {
-    const cache = await caches.default.match(request.url);
+    // TODO any
+    const cache = await (caches as any).default.match(request.url);
     if (cache) {
       return cache;
     }
@@ -86,7 +87,8 @@ async function cacheCompletedUploadResponse(
 ) {
   const url = new URL(request.url);
   url.pathname = location;
-  await caches.default.put(
+  // TODO any
+  await (caches as any).default.put(
     url.toString(),
     new Response(null, {
       headers: {
@@ -229,7 +231,8 @@ const handleGET = async (ctx: AppContext) => {
   }
   let cache;
   try {
-    cache = await caches.default.match(request.url + 'GET');
+    // TODO any
+    cache = await (caches as any).default.match(request.url + 'GET');
   } catch (error) {
     console.log('cache error', error);
   }
@@ -261,7 +264,11 @@ const handleGET = async (ctx: AppContext) => {
             ctx.header('Content-Type', type);
             ctx.status(200);
             const response = ctx.body(file.body);
-            await caches.default.put(request.url + 'GET', response.clone());
+            // TODO any
+            await (caches as any).default.put(
+              request.url + 'GET',
+              response.clone()
+            );
             if (table.hooks?.afterOperation) {
               await table.hooks.afterOperation(ctx, 'read', pathname, file, {
                 pathname,
