@@ -15,6 +15,7 @@
     "up:prod": "wrangler d1 migrations apply sonicjs",
     "tail": "wrangler pages deployment tail",
     "check": "run-p check:*",
+    "check:tsc": "tsc --noEmit",
     "check:prettier": "prettier --check --cache . **/*.css",
     "fix": "run-s fix:*",
     "fix:prettier": "prettier --write --cache . **/*.css"
