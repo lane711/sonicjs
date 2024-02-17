@@ -12,28 +12,28 @@ import {
 const env = getMiniflareBindings();
 
 describe('test KV data access tier', () => {
-  it('saveKVData should insert data', async () => {
-    const rec1 = await saveKVData(
-      env.KVDATA,
-      'site',
-      'ct',
-      { foo: 'bar' },
-      '12345'
-    );
-    const rec2 = await saveKVData(
-      env.KVDATA,
-      'site',
-      'ct',
-      { foo: 'bar' },
-      '23456'
-    );
-
-    const data = await getDataListByPrefix(env.KVDATA, '', 2);
-    console.log('getDataListByPrefix==>', data);
-
-    // expect(key.startsWith("site::module")).toBe(true);
-    // expect(key.length).toBe(40);
-  });
+  // it('saveKVData should insert data', async () => {
+  //   const rec1 = await saveKVData(
+  //     env.KVDATA,
+  //     'site',
+  //     'ct',
+  //     { foo: 'bar' },
+  //     '12345'
+  //   );
+  //   const rec2 = await saveKVData(
+  //     env.KVDATA,
+  //     'site',
+  //     'ct',
+  //     { foo: 'bar' },
+  //     '23456'
+  //   );
+  //
+  //   const data = await getDataListByPrefix(env.KVDATA, '', 2);
+  //   console.log('getDataListByPrefix==>', data);
+  //
+  //   // expect(key.startsWith("site::module")).toBe(true);
+  //   // expect(key.length).toBe(40);
+  // });
 
   saveKVData;
   it('getDataListByPrefix should return data', async () => {

@@ -1,6 +1,5 @@
 import {
   generateSelectSql,
-  getByTable,
   getD1DataByTable,
   insertD1Data,
   updateD1Data,

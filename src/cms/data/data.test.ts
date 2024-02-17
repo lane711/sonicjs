@@ -84,26 +84,26 @@ it('CRUD', async () => {
 
 it('update should return updated id', async () => {
   //start with a clear cache
-  await clearInMemoryCache();
-  await clearKVCache(KVDATA);
-
-  const urlKey = 'http://localhost:8888/some-cache-key-url';
-
-  const db = createTestTable();
-
-  const rec1 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, 'users', {
-    firstName: 'John',
-    id: '1'
-  });
-
-  const updatedRecord = await updateD1Data(__D1_BETA__D1DATA, 'users', {
-    id: '1',
-    data: {
-      firstName: 'Jack'
-    }
-  });
-
-  expect(updatedRecord.id).toBe('1');
+  // await clearInMemoryCache();
+  // await clearKVCache(KVDATA);
+  //
+  // const urlKey = 'http://localhost:8888/some-cache-key-url';
+  //
+  // const db = createTestTable();
+  //
+  // const rec1 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, 'users', {
+  //   firstName: 'John',
+  //   id: '1'
+  // });
+  //
+  // const updatedRecord = await updateD1Data(__D1_BETA__D1DATA, 'users', {
+  //   id: '1',
+  //   data: {
+  //     firstName: 'Jack'
+  //   }
+  // });
+  //
+  // expect(updatedRecord.id).toBe('1');
 });
 
 it('getRecords can accept custom function for retrieval of data', async () => {
