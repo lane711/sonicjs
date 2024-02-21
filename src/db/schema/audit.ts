@@ -1,6 +1,6 @@
-import { integer } from "drizzle-orm/sqlite-core";
+import { integer } from 'drizzle-orm/sqlite-core';
 
 export const auditSchema = {
-  createdOn: integer("createdOn"),
-  updatedOn: integer("updatedOn"),
+  createdOn: integer('createdOn'),
+  updatedOn: integer('updatedOn')
 };

@@ -1,9 +1,9 @@
-import { tableSchemas } from "../../db/routes";
-import { drizzle } from "drizzle-orm/d1";
-import { isNotNull } from "drizzle-orm";
-import { getRecords } from "../data/data";
-import { AppContext } from "../../server";
-import type { SonicJSFilter, ApiConfig } from "../../db/routes";
+import { tableSchemas } from '../../db/routes';
+import { drizzle } from 'drizzle-orm/d1';
+import { isNotNull } from 'drizzle-orm';
+import { getRecords } from '../data/data';
+import { AppContext } from '../../server';
+import type { SonicJSFilter, ApiConfig } from '../../db/routes';
 
 export const hasUser = async (ctx: AppContext) => {
   const fn = async function () {
@@ -14,17 +14,17 @@ export const hasUser = async (ctx: AppContext) => {
         userKeys: tableSchemas.userKeys.table,
         userKeysRelations: tableSchemas.userKeys.relation,
         userSessions: tableSchemas.userSessions.table,
-        userSessionsRelations: tableSchemas.userSessions.relation,
-      },
+        userSessionsRelations: tableSchemas.userSessions.relation
+      }
     });
     const data = await db.query.users.findMany({
       with: {
         keys: {
           where(fields) {
             return isNotNull(fields.hashed_password);
-          },
-        },
-      },
+          }
+        }
+      }
     });
     const result = data.filter((user) => user.keys?.length > 0);
     return result;
@@ -32,10 +32,10 @@ export const hasUser = async (ctx: AppContext) => {
 
   const result = await getRecords(
     ctx,
-    "custom",
+    'custom',
     {},
-    "hasUserWithKeyCheck",
-    "d1",
+    'hasUserWithKeyCheck',
+    'd1',
     fn
   );
   return result.data.length > 0;
@@ -90,7 +90,7 @@ async function getAccessControlResult(
   ...args: any[]
 ) {
   let authorized: boolean | SonicJSFilter = true;
-  if (typeof accessControl !== "function") {
+  if (typeof accessControl !== 'function') {
     authorized = accessControl;
   } else {
     const acResult = accessControl(ctx, ...args);
@@ -104,14 +104,14 @@ async function getAccessControlResult(
 }
 
 export async function getOperationCreateResult(
-  create: ApiConfig["access"]["operation"]["create"],
+  create: ApiConfig['access']['operation']['create'],
   ctx: AppContext,
   data: any
 ) {
   return !!(await getAccessControlResult(create, ctx, data));
 }
 export async function getOperationReadResult(
-  read: ApiConfig["access"]["operation"]["read"],
+  read: ApiConfig['access']['operation']['read'],
   ctx: AppContext,
   id: string
 ) {
@@ -119,7 +119,7 @@ export async function getOperationReadResult(
 }
 
 export async function getOperationUpdateResult(
-  update: ApiConfig["access"]["operation"]["update"],
+  update: ApiConfig['access']['operation']['update'],
   ctx: AppContext,
   id: string,
   data: any
@@ -128,7 +128,7 @@ export async function getOperationUpdateResult(
 }
 
 export async function getOperationDeleteResult(
-  del: ApiConfig["access"]["operation"]["delete"],
+  del: ApiConfig['access']['operation']['delete'],
   ctx: AppContext,
   id: string
 ) {
@@ -136,7 +136,7 @@ export async function getOperationDeleteResult(
 }
 
 export async function getFilterReadResult(
-  read: ApiConfig["access"]["filter"]["read"],
+  read: ApiConfig['access']['filter']['read'],
   ctx: AppContext,
   id: string
 ) {
@@ -144,7 +144,7 @@ export async function getFilterReadResult(
 }
 
 export async function getFilterUpdateResult(
-  update: ApiConfig["access"]["filter"]["update"],
+  update: ApiConfig['access']['filter']['update'],
   ctx: AppContext,
   id: string,
   data: any
@@ -153,7 +153,7 @@ export async function getFilterUpdateResult(
 }
 
 export async function getFilterDeleteResult(
-  del: ApiConfig["access"]["filter"]["delete"],
+  del: ApiConfig['access']['filter']['delete'],
   ctx: AppContext,
   id: string
 ) {
@@ -168,15 +168,15 @@ export async function getItemAccessControlResult(
   data?: any
 ) {
   let authorized = true;
-  if (typeof itemAccessControl === "boolean") {
+  if (typeof itemAccessControl === 'boolean') {
     authorized = itemAccessControl;
-  } else if (id && table && typeof itemAccessControl === "function") {
+  } else if (id && table && typeof itemAccessControl === 'function') {
     const doc = await getRecords(
       ctx,
       table,
       { id },
       `doc/${table}/${id}`,
-      "fastest"
+      'fastest'
     );
 
     if (data) {
@@ -200,14 +200,14 @@ export async function getItemAccessControlResult(
 }
 
 export async function getItemReadResult(
-  read: ApiConfig["access"]["item"]["read"],
+  read: ApiConfig['access']['item']['read'],
   ctx: AppContext,
   docs: any
 ) {
   let authorized = true;
-  if (typeof read === "boolean") {
+  if (typeof read === 'boolean') {
     authorized = read;
-  } else if (typeof read === "function") {
+  } else if (typeof read === 'function') {
     docs = Array.isArray(docs) ? docs : [docs];
     for (const doc of docs) {
       if (authorized) {
@@ -219,14 +219,14 @@ export async function getItemReadResult(
 }
 
 export async function getItemUpdateResult(
-  update: ApiConfig["access"]["item"]["update"],
+  update: ApiConfig['access']['item']['update'],
   ctx: AppContext,
   id: string,
   data: any,
   table: string
 ) {
   let authorized: boolean | SonicJSFilter = true;
-  if (typeof update !== "function") {
+  if (typeof update !== 'function') {
     authorized = update;
   } else {
     const doc = await getRecords(
@@ -234,7 +234,7 @@ export async function getItemUpdateResult(
       table,
       { id },
       `doc/${table}/${id}`,
-      "fastest"
+      'fastest'
     );
 
     authorized = await getAccessControlResult(update, ctx, id, data, doc);
@@ -243,13 +243,13 @@ export async function getItemUpdateResult(
 }
 
 export async function getItemDeleteResult(
-  del: ApiConfig["access"]["item"]["delete"],
+  del: ApiConfig['access']['item']['delete'],
   ctx: AppContext,
   id: string,
   table: string
 ) {
   let authorized: boolean | SonicJSFilter = true;
-  if (typeof del !== "function") {
+  if (typeof del !== 'function') {
     authorized = del;
   } else {
     const doc = await getRecords(
@@ -257,7 +257,7 @@ export async function getItemDeleteResult(
       table,
       { id },
       `doc/${table}/${id}`,
-      "fastest"
+      'fastest'
     );
 
     authorized = await getAccessControlResult(del, ctx, id, doc);
@@ -265,23 +265,23 @@ export async function getItemDeleteResult(
   return authorized;
 }
 export async function filterCreateFieldAccess<D = any>(
-  fields: ApiConfig["access"]["fields"],
+  fields: ApiConfig['access']['fields'],
   ctx: AppContext,
   data: D
 ): Promise<D> {
   let result: D = data;
   if (fields) {
-    if (typeof data === "object") {
+    if (typeof data === 'object') {
       const newResult = {} as D;
       for (const key of Object.keys(data)) {
         const value = data[key];
         const access = fields[key]?.create;
         let authorized = true;
-        if (typeof access === "boolean") {
+        if (typeof access === 'boolean') {
           authorized = access;
-        } else if (typeof access === "function") {
+        } else if (typeof access === 'function') {
           const accessResult = access(ctx, data);
-          if (typeof accessResult === "boolean") {
+          if (typeof accessResult === 'boolean') {
             authorized = accessResult;
           } else {
             authorized = await accessResult;
@@ -293,14 +293,14 @@ export async function filterCreateFieldAccess<D = any>(
       }
       result = newResult;
     } else {
-      throw new Error("Data must be an object");
+      throw new Error('Data must be an object');
     }
   }
   return result;
 }
 
 export async function filterReadFieldAccess<D = any>(
-  fields: ApiConfig["access"]["fields"],
+  fields: ApiConfig['access']['fields'],
   ctx: AppContext,
   doc: D
 ): Promise<D> {
@@ -314,24 +314,24 @@ export async function filterReadFieldAccess<D = any>(
         promises
       )) as PromiseSettledResult<D>[];
       result = fieldResults.reduce((acc: any[], r) => {
-        if (r.status === "fulfilled") {
+        if (r.status === 'fulfilled') {
           acc.push(r.value);
         } else {
           console.error(r.reason);
         }
         return acc;
       }, []) as D;
-    } else if (typeof doc === "object") {
+    } else if (typeof doc === 'object') {
       const newResult = {} as D;
       for (const key of Object.keys(doc)) {
         const value = doc[key];
         const access = fields[key]?.read;
         let authorized = true;
-        if (typeof access === "boolean") {
+        if (typeof access === 'boolean') {
           authorized = access;
-        } else if (typeof access === "function") {
+        } else if (typeof access === 'function') {
           const accessResult = access(ctx, value, doc);
-          if (typeof accessResult === "boolean") {
+          if (typeof accessResult === 'boolean') {
             authorized = accessResult;
           } else {
             authorized = await accessResult;
@@ -341,31 +341,31 @@ export async function filterReadFieldAccess<D = any>(
       }
       result = newResult;
     } else {
-      console.error("How is doc not an array or object???");
+      console.error('How is doc not an array or object???');
     }
   }
   return result;
 }
 
 export async function filterUpdateFieldAccess<D = any>(
-  fields: ApiConfig["access"]["fields"],
+  fields: ApiConfig['access']['fields'],
   ctx: AppContext,
   id: string,
   data: D
 ): Promise<D> {
   let result: D = data;
   if (fields) {
-    if (typeof data === "object") {
+    if (typeof data === 'object') {
       const newResult = {} as D;
       for (const key of Object.keys(data)) {
         const value = data[key];
         const access = fields[key]?.update;
         let authorized = true;
-        if (typeof access === "boolean") {
+        if (typeof access === 'boolean') {
           authorized = access;
-        } else if (typeof access === "function") {
+        } else if (typeof access === 'function') {
           const accessResult = access(ctx, id, data);
-          if (typeof accessResult === "boolean") {
+          if (typeof accessResult === 'boolean') {
             authorized = accessResult;
           } else {
             authorized = await accessResult;
@@ -378,7 +378,7 @@ export async function filterUpdateFieldAccess<D = any>(
       }
       result = newResult;
     } else {
-      throw new Error("Data must be an object");
+      throw new Error('Data must be an object');
     }
   }
   return result;

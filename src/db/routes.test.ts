@@ -1,6 +1,6 @@
-import { apiConfig } from "./routes";
-it("Should API Config be defined", () => {
-  console.log("apiConfig", apiConfig);
+import { apiConfig } from './routes';
+it('Should API Config be defined', () => {
+  console.log('apiConfig', apiConfig);
   expect(apiConfig).toBeDefined();
 });
 

@@ -1,5 +1,5 @@
-import { Hono } from "hono";
-import { loadForm } from "../admin/forms/form";
+import { Hono } from 'hono';
+import { loadForm } from '../admin/forms/form';
 import {
   clearAllKVRecords,
   clearKVCache,
@@ -8,32 +8,32 @@ import {
   getKVCache,
   saveContentType,
   getRecordFromKvCache,
-  addToKvCache,
-} from "../data/kv-data";
-import { Bindings } from "../types/bindings";
-import { apiConfig, config } from "../../db/routes";
-import { getD1DataByTable, getD1ByTableAndId } from "../data/d1-data";
-import { getForm } from "./forms";
-import qs from "qs";
+  addToKvCache
+} from '../data/kv-data';
+import { Bindings } from '../types/bindings';
+import { apiConfig, config } from '../../db/routes';
+import { getD1DataByTable, getD1ByTableAndId } from '../data/d1-data';
+import { getForm } from './forms';
+import qs from 'qs';
 import {
   deleteRecord,
   getRecords,
   insertRecord,
-  updateRecord,
-} from "../data/data";
-import { clearInMemoryCache, getAllFromInMemoryCache } from "../data/cache";
-import { Variables } from "../../server";
+  updateRecord
+} from '../data/data';
+import { clearInMemoryCache, getAllFromInMemoryCache } from '../data/cache';
+import { Variables } from '../../server';
 import {
   filterCreateFieldAccess,
   filterReadFieldAccess,
   filterUpdateFieldAccess,
   getApiAccessControlResult,
   getItemReadResult,
-  getOperationCreateResult,
-} from "../auth/auth-helpers";
+  getOperationCreateResult
+} from '../auth/auth-helpers';
 
 const api = new Hono<{ Bindings: Bindings; Variables: Variables }>();
-const tables = apiConfig.filter((tbl) => tbl.table !== "users");
+const tables = apiConfig.filter((tbl) => tbl.table !== 'users');
 tables.forEach((entry) => {
   // console.log("setting route for " + entry.route);
 
@@ -42,7 +42,7 @@ tables.forEach((entry) => {
     const start = Date.now();
     let { includeContentType, source, ...params } = ctx.req.query();
     if (entry.hooks?.beforeOperation) {
-      await entry.hooks.beforeOperation(ctx, "read", params.id);
+      await entry.hooks.beforeOperation(ctx, 'read', params.id);
     }
     const accessControlResult = await getApiAccessControlResult(
       entry?.access?.operation?.read || true,
@@ -53,23 +53,23 @@ tables.forEach((entry) => {
       entry.table
     );
 
-    if (typeof accessControlResult === "object") {
+    if (typeof accessControlResult === 'object') {
       params = { ...params, ...accessControlResult };
     }
 
     if (!accessControlResult) {
-      return ctx.text("Unauthorized", 401);
+      return ctx.text('Unauthorized', 401);
     }
 
     try {
-      params.limit = params.limit ?? "1000";
+      params.limit = params.limit ?? '1000';
       ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
       let data = await getRecords(
         ctx,
         entry.table,
         params,
         ctx.req.url,
-        "fastest",
+        'fastest',
         undefined
       );
 
@@ -80,7 +80,7 @@ tables.forEach((entry) => {
           data
         );
         if (!accessControlResult) {
-          return ctx.text("Unauthorized", 401);
+          return ctx.text('Unauthorized', 401);
         }
       }
       data.data = await filterReadFieldAccess(
@@ -90,7 +90,7 @@ tables.forEach((entry) => {
       );
 
       if (entry.hooks?.afterOperation) {
-        await entry.hooks.afterOperation(ctx, "read", params.id, null, data);
+        await entry.hooks.afterOperation(ctx, 'read', params.id, null, data);
       }
       const end = Date.now();
       const executionTime = end - start;
@@ -108,10 +108,10 @@ tables.forEach((entry) => {
 
     let { includeContentType, source, ...params } = ctx.req.query();
 
-    const id = ctx.req.param("id");
+    const id = ctx.req.param('id');
 
     if (entry.hooks?.beforeOperation) {
-      await entry.hooks.beforeOperation(ctx, "read", id);
+      await entry.hooks.beforeOperation(ctx, 'read', id);
     }
 
     params.id = id;
@@ -125,19 +125,19 @@ tables.forEach((entry) => {
       entry.table
     );
 
-    if (typeof accessControlResult === "object") {
+    if (typeof accessControlResult === 'object') {
       params = { ...params, ...accessControlResult };
     }
 
     if (!accessControlResult) {
-      return ctx.text("Unauthorized", 401);
+      return ctx.text('Unauthorized', 401);
     }
 
     ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
 
-    source = source || "fastest";
+    source = source || 'fastest';
     if (includeContentType !== undefined) {
-      source = "d1";
+      source = 'd1';
     }
 
     let data = await getRecords(
@@ -156,7 +156,7 @@ tables.forEach((entry) => {
         data
       );
       if (!accessControlResult) {
-        return ctx.text("Unauthorized", 401);
+        return ctx.text('Unauthorized', 401);
       }
     }
     data = await filterReadFieldAccess(entry.access?.fields, ctx, data);
@@ -165,7 +165,7 @@ tables.forEach((entry) => {
     }
 
     if (entry.hooks?.afterOperation) {
-      await entry.hooks.afterOperation(ctx, "read", id, null, data);
+      await entry.hooks.afterOperation(ctx, 'read', id, null, data);
     }
 
     const end = Date.now();
@@ -178,12 +178,12 @@ tables.forEach((entry) => {
   //TODO: support batch inserts
   api.post(`/${entry.route}`, async (ctx) => {
     let content = await ctx.req.json();
-    const route = ctx.req.path.split("/")[2];
+    const route = ctx.req.path.split('/')[2];
     const table = apiConfig.find((entry) => entry.route === route).table;
     ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
 
     if (entry.hooks?.beforeOperation) {
-      await entry.hooks.beforeOperation(ctx, "create", undefined, content);
+      await entry.hooks.beforeOperation(ctx, 'create', undefined, content);
     }
 
     content.table = table;
@@ -194,7 +194,7 @@ tables.forEach((entry) => {
       content.data
     );
     if (!authorized) {
-      return ctx.text("Unauthorized", 401);
+      return ctx.text('Unauthorized', 401);
     }
 
     try {
@@ -207,26 +207,26 @@ tables.forEach((entry) => {
       if (entry?.hooks?.resolveInput?.create) {
         content.data = await entry.hooks.resolveInput.create(ctx, content.data);
       }
-      console.log("posting new record content filtered?", content.data);
+      console.log('posting new record content filtered?', content.data);
       const result = await insertRecord(
         ctx.env.D1DATA,
         ctx.env.KVDATA,
         content
       );
-      console.log("create result", result);
+      console.log('create result', result);
 
       if (entry?.hooks?.afterOperation) {
         await entry.hooks.afterOperation(
           ctx,
-          "create",
-          result?.data?.["id"],
+          'create',
+          result?.data?.['id'],
           content,
           result
         );
       }
       return ctx.json(result?.data, 201);
     } catch (error) {
-      console.log("error posting content", error);
+      console.log('error posting content', error);
       return ctx.text(error, 500);
     }
   });
@@ -235,13 +235,13 @@ tables.forEach((entry) => {
   //TODO: support batch inserts
   api.put(`/${entry.route}/:id`, async (ctx) => {
     const payload = await ctx.req.json();
-    const id = ctx.req.param("id");
+    const id = ctx.req.param('id');
     var content: { data?: any; table?: string; id?: string } = {};
     ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
     content.data = payload.data;
-    console.log("put content", JSON.stringify(content.data, null, 2));
+    console.log('put content', JSON.stringify(content.data, null, 2));
     if (entry.hooks?.beforeOperation) {
-      await entry.hooks?.beforeOperation(ctx, "update", id, content);
+      await entry.hooks?.beforeOperation(ctx, 'update', id, content);
     }
 
     let { includeContentType, source, ...params } = ctx.req.query();
@@ -255,15 +255,15 @@ tables.forEach((entry) => {
       content.data
     );
 
-    if (typeof accessControlResult === "object") {
+    if (typeof accessControlResult === 'object') {
       params = { ...params, ...accessControlResult };
     }
 
     if (!accessControlResult) {
-      return ctx.text("Unauthorized", 401);
+      return ctx.text('Unauthorized', 401);
     }
 
-    const route = ctx.req.path.split("/")[2];
+    const route = ctx.req.path.split('/')[2];
     const table = apiConfig.find((entry) => entry.route === route).table;
 
     content.table = table;
@@ -290,23 +290,23 @@ tables.forEach((entry) => {
         params
       );
       if (entry?.hooks?.afterOperation) {
-        await entry.hooks.afterOperation(ctx, "update", id, content, result);
+        await entry.hooks.afterOperation(ctx, 'update', id, content, result);
       }
       return ctx.json(result.data, 200);
     } catch (error) {
-      console.log("error updating content", error);
+      console.log('error updating content', error);
       return ctx.text(error, 500);
     }
   });
 
   //delete
   api.delete(`/${entry.route}/:id`, async (ctx) => {
-    const id = ctx.req.param("id");
-    const table = ctx.req.path.split("/")[2];
+    const id = ctx.req.param('id');
+    const table = ctx.req.path.split('/')[2];
     ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
 
     if (entry.hooks?.beforeOperation) {
-      await entry.hooks.beforeOperation(ctx, "delete", id);
+      await entry.hooks.beforeOperation(ctx, 'delete', id);
     }
 
     let { includeContentType, source, ...params } = ctx.req.query();
@@ -320,12 +320,12 @@ tables.forEach((entry) => {
       entry.table
     );
 
-    if (typeof accessControlResult === "object") {
+    if (typeof accessControlResult === 'object') {
       params = { ...params, ...accessControlResult };
     }
 
     if (!accessControlResult) {
-      return ctx.text("Unauthorized", 401);
+      return ctx.text('Unauthorized', 401);
     }
     params.id = id;
 
@@ -334,18 +334,18 @@ tables.forEach((entry) => {
       table,
       params,
       ctx.req.path,
-      source || "fastest",
+      source || 'fastest',
       undefined
     );
 
     if (record) {
-      console.log("content found, deleting...");
+      console.log('content found, deleting...');
       const result = await deleteRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
         id,
-        table: table,
+        table: table
       });
       if (entry?.hooks?.afterOperation) {
-        await entry.hooks.afterOperation(ctx, "delete", id, record, result);
+        await entry.hooks.afterOperation(ctx, 'delete', id, record, result);
       }
       // const kvDelete = await deleteKVById(ctx.env.KVDATA, id);
       // const d1Delete = await deleteD1ByTableAndId(
@@ -353,52 +353,52 @@ tables.forEach((entry) => {
       //   content.data.table,
       //   content.data.id
       // );
-      console.log("returning 204");
-      return ctx.text("", 204);
+      console.log('returning 204');
+      return ctx.text('', 204);
     } else {
-      console.log("content not found");
-      return ctx.text("", 404);
+      console.log('content not found');
+      return ctx.text('', 404);
     }
   });
 });
 
-api.get("/ping", (c) => {
-  console.log("testing ping", Date());
+api.get('/ping', (c) => {
+  console.log('testing ping', Date());
   return c.text(Date());
 });
 
-api.get("/kv-test", async (ctx) => {
+api.get('/kv-test', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
-    return ctx.text("Unauthorized", 401);
+    return ctx.text('Unauthorized', 401);
   }
   const createdOn = new Date().getTime();
 
   await ctx.env.KVDATA.put(
-    "cache::kv-test-key",
-    JSON.stringify({ foo: "bar" }),
+    'cache::kv-test-key',
+    JSON.stringify({ foo: 'bar' }),
     {
-      metadata: { createdOn },
+      metadata: { createdOn }
     }
   );
 
   const { value, metadata } = await ctx.env.KVDATA.getWithMetadata(
-    "kv-test-key",
-    { type: "json" }
+    'kv-test-key',
+    { type: 'json' }
   );
 
   return ctx.json({ value, metadata });
 });
 
-api.get("/kv-test2", async (ctx) => {
+api.get('/kv-test2', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
-    return ctx.text("Unauthorized", 401);
+    return ctx.text('Unauthorized', 401);
   }
-  const cacheKey = "kv-test-key2";
+  const cacheKey = 'kv-test-key2';
   const total = 100;
-  const d1Data = [{ a: "1", b: "2" }];
-  const data = { data: d1Data, source: "kv", total };
+  const d1Data = [{ a: '1', b: '2' }];
+  const data = { data: d1Data, source: 'kv', total };
   await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, data);
 
   // await ctx.env.KVDATA.put(cacheKey, JSON.stringify({ foo: "bar" }), {
@@ -411,37 +411,37 @@ api.get("/kv-test2", async (ctx) => {
   const { value, metadata } = await ctx.env.KVDATA.getWithMetadata(
     `cache::${cacheKey}`,
     {
-      type: "json",
+      type: 'json'
     }
   );
 
   return ctx.json({ value, metadata });
 });
 
-api.get("/kv-list", async (ctx) => {
+api.get('/kv-list', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
-    return ctx.text("Unauthorized", 401);
+    return ctx.text('Unauthorized', 401);
   }
   const list = await ctx.env.KVDATA.list();
   return ctx.json(list);
 });
 
-api.get("/data", async (ctx) => {
+api.get('/data', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
-    return ctx.text("Unauthorized", 401);
+    return ctx.text('Unauthorized', 401);
   }
-  const data = await getDataListByPrefix(ctx.env.KVDATA, "");
+  const data = await getDataListByPrefix(ctx.env.KVDATA, '');
   return ctx.json(data);
 });
 
-api.get("/forms", async (ctx) => {
+api.get('/forms', async (ctx) => {
   return ctx.html(await loadForm(ctx));
 });
 
-api.get("/form-components/:route", async (ctx) => {
-  const route = ctx.req.param("route");
+api.get('/form-components/:route', async (ctx) => {
+  const route = ctx.req.param('route');
 
   const table = apiConfig.find((entry) => entry.route === route).table;
 
@@ -449,120 +449,120 @@ api.get("/form-components/:route", async (ctx) => {
   return ctx.json(ct);
 });
 
-api.get("/form-components/auth/users", async (ctx) => {
-  let ct = await getForm(ctx, "users");
+api.get('/form-components/auth/users', async (ctx) => {
+  let ct = await getForm(ctx, 'users');
   return ctx.json(ct);
 });
-api.post("/form-components", async (ctx) => {
+api.post('/form-components', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
-    return ctx.text("Unauthorized", 401);
+    return ctx.text('Unauthorized', 401);
   }
   const formComponents = await ctx.req.json();
 
-  console.log("formComponents-->", formComponents);
+  console.log('formComponents-->', formComponents);
   //put in kv
-  const result = await saveContentType(ctx.env.KVDATA, "site1", formComponents);
+  const result = await saveContentType(ctx.env.KVDATA, 'site1', formComponents);
 
-  console.log("form put", result);
-  return ctx.text("Created!", 201);
+  console.log('form put', result);
+  return ctx.text('Created!', 201);
 });
 
-api.get("/cache/clear-all", async (ctx) => {
+api.get('/cache/clear-all', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
 
   if (!canProceed) {
-    return ctx.text("Unauthorized", 401);
+    return ctx.text('Unauthorized', 401);
   }
-  console.log("clearing cache");
+  console.log('clearing cache');
   await clearInMemoryCache();
   await clearKVCache(ctx.env.KVDATA);
-  return ctx.text("in memory and kv caches cleared");
+  return ctx.text('in memory and kv caches cleared');
 });
 
-api.get("/cache/clear-in-memory", async (ctx) => {
+api.get('/cache/clear-in-memory', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
-    return ctx.text("Unauthorized", 401);
+    return ctx.text('Unauthorized', 401);
   }
-  console.log("clearing cache");
+  console.log('clearing cache');
   await clearInMemoryCache();
-  return ctx.text("in memory cache cleared");
+  return ctx.text('in memory cache cleared');
 });
 
-api.get("/cache/clear-kv", async (ctx) => {
+api.get('/cache/clear-kv', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
-    return ctx.text("Unauthorized", 401);
+    return ctx.text('Unauthorized', 401);
   }
-  console.log("clearing cache");
+  console.log('clearing cache');
   await clearKVCache(ctx.env.KVDATA);
-  return ctx.text("kv cache cleared");
+  return ctx.text('kv cache cleared');
 });
 
-api.get("/cache/in-memory", async (ctx) => {
+api.get('/cache/in-memory', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
-    return ctx.text("Unauthorized", 401);
+    return ctx.text('Unauthorized', 401);
   }
-  console.log("clearing cache");
+  console.log('clearing cache');
   const cacheItems = await getAllFromInMemoryCache();
   return ctx.json(cacheItems);
 });
 
-api.get("/cache/kv", async (ctx) => {
+api.get('/cache/kv', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
-    return ctx.text("Unauthorized", 401);
+    return ctx.text('Unauthorized', 401);
   }
   const cacheItems = await getKVCache(ctx.env.KVDATA);
-  console.log("getting kv cache", cacheItems);
+  console.log('getting kv cache', cacheItems);
   return ctx.json(cacheItems);
 });
 
-api.get("/cache/kv/:cacheKey", async (ctx) => {
+api.get('/cache/kv/:cacheKey', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
-    return ctx.text("Unauthorized", 401);
+    return ctx.text('Unauthorized', 401);
   }
-  const cacheKey = ctx.req.param("cacheKey");
+  const cacheKey = ctx.req.param('cacheKey');
   const cacheItem = await getRecordFromKvCache(ctx.env.KVDATA, cacheKey);
-  console.log("getting kv cache", cacheItem);
+  console.log('getting kv cache', cacheItem);
   return ctx.json(cacheItem);
 });
 
-api.get("/kv", async (ctx) => {
+api.get('/kv', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
-    return ctx.text("Unauthorized", 401);
+    return ctx.text('Unauthorized', 401);
   }
-  const allItems = await getDataByPrefix(ctx.env.KVDATA, "", 2);
+  const allItems = await getDataByPrefix(ctx.env.KVDATA, '', 2);
   return ctx.json(allItems);
 });
 
-api.get("/kv/:cacheKey", async (ctx) => {
+api.get('/kv/:cacheKey', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
-    return ctx.text("Unauthorized", 401);
+    return ctx.text('Unauthorized', 401);
   }
-  const cacheKey = ctx.req.param("cacheKey");
-  console.log("getting kv cache", cacheKey);
+  const cacheKey = ctx.req.param('cacheKey');
+  console.log('getting kv cache', cacheKey);
 
   const cacheItem = await getRecordFromKvCache(
     ctx.env.KVDATA,
-    "http://127.0.0.1:8788/admin/api/users"
+    'http://127.0.0.1:8788/admin/api/users'
   );
-  console.log("getting kv cache", cacheItem);
+  console.log('getting kv cache', cacheItem);
   return ctx.json(cacheItem);
 });
 
-api.get("/kv/delete-all", async (ctx) => {
+api.get('/kv/delete-all', async (ctx) => {
   const canProceed = await config.adminAccessControl(ctx);
   if (!canProceed) {
-    return ctx.text("Unauthorized", 401);
+    return ctx.text('Unauthorized', 401);
   }
   await clearAllKVRecords(ctx.env.KVDATA);
-  return ctx.text("ok");
+  return ctx.text('ok');
 });
 
 export { api };

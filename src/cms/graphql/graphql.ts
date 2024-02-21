@@ -1,6 +1,6 @@
-import { Hono } from "hono";
-import { graphqlServer } from "@hono/graphql-server";
-import { buildSchema } from "graphql";
+import { Hono } from 'hono';
+import { graphqlServer } from '@hono/graphql-server';
+import { buildSchema } from 'graphql';
 
 export const app = new Hono();
 
@@ -12,17 +12,17 @@ type Query {
 
 const rootResolver = (ctx) => {
   return {
-    hello: () => "Hello Hono!",
+    hello: () => 'Hello Hono!'
   };
 };
 
 export function setupGraphQl(app) {
   // app.all('/graphql', (c) => c.text('graph'))
   app.use(
-    "/graphql",
+    '/graphql',
     graphqlServer({
       schema,
-      rootResolver,
+      rootResolver
     })
   );
 }

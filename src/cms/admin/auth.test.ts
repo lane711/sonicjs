@@ -1,7 +1,7 @@
-import { drizzle } from "drizzle-orm/d1";
-import app from "../../server";
-import { sql } from "drizzle-orm";
-import { insertD1Data } from "../data/d1-data";
+import { drizzle } from 'drizzle-orm/d1';
+import app from '../../server';
+import { sql } from 'drizzle-orm';
+import { insertD1Data } from '../data/d1-data';
 
 const env = getMiniflareBindings();
 env.KVDATA = env.KVDATA;
@@ -9,26 +9,26 @@ env.D1DATA = env.__D1_BETA__D1DATA;
 
 env.useAuth = true;
 
-describe("admin should be restricted", () => {
-  it("ping should return 200", async () => {
-    const res = await app.request("http://localhost/admin/ping");
+describe('admin should be restricted', () => {
+  it('ping should return 200', async () => {
+    const res = await app.request('http://localhost/admin/ping');
     expect(res.status).toBe(200);
   });
 
-  it("user record", async () => {
+  it('user record', async () => {
     createTestTables();
 
-    await insertD1Data(env.D1DATA, env.KVDATA, "users", {
-      firstName: "John",
-      id: "aaa",
-      email: "a@a.com",
-      password: "password",
+    await insertD1Data(env.D1DATA, env.KVDATA, 'users', {
+      firstName: 'John',
+      id: 'aaa',
+      email: 'a@a.com',
+      password: 'password',
       role: 'admin'
     });
 
-    let req = new Request("http://localhost/v1/users/aaa", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
+    let req = new Request('http://localhost/v1/users/aaa', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
     });
     let res = await app.fetch(req, env);
     expect(res.status).toBe(200);
@@ -43,7 +43,7 @@ function createTestTables() {
 
 function createTestTable1() {
   const db = drizzle(env.D1DATA);
-  console.log("creating test table start");
+  console.log('creating test table start');
   db.run(sql`
       CREATE TABLE users (
         id text PRIMARY KEY NOT NULL,
@@ -56,14 +56,14 @@ function createTestTable1() {
         updatedOn integer
       );
       `);
-  console.log("creating test table end");
+  console.log('creating test table end');
 
   return db;
 }
 
 function createTestTable2() {
   const db = drizzle(env.D1DATA);
-  console.log("creating test table start");
+  console.log('creating test table start');
   db.run(sql`
     CREATE TABLE user_keys (
         id text PRIMARY KEY NOT NULL,
@@ -74,14 +74,14 @@ function createTestTable2() {
         FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE no action ON DELETE no action
       );
       `);
-  console.log("creating test table end");
+  console.log('creating test table end');
 
   return db;
 }
 
 function createTestTable3() {
   const db = drizzle(env.D1DATA);
-  console.log("creating test table start");
+  console.log('creating test table start');
   db.run(sql`
     CREATE TABLE user_sessions (
         id text PRIMARY KEY NOT NULL,
@@ -93,7 +93,7 @@ function createTestTable3() {
         FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE no action ON DELETE no action
       );
       `);
-  console.log("creating test table end");
+  console.log('creating test table end');
 
   return db;
 }

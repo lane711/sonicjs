@@ -1,9 +1,9 @@
-import { drizzle } from "drizzle-orm/d1";
-import { and, eq } from "drizzle-orm";
-import { tableSchemas } from "../../db/routes";
+import { drizzle } from 'drizzle-orm/d1';
+import { and, eq } from 'drizzle-orm';
+import { tableSchemas } from '../../db/routes';
 
 export async function getAllContent(db) {
-  const { results } = await db.prepare("SELECT * FROM users").all();
+  const { results } = await db.prepare('SELECT * FROM users').all();
   return results;
 }
 
@@ -16,31 +16,31 @@ export async function getD1DataByTable(db, table, params) {
 export function generateSelectSql(table, params) {
   // console.log("params ==>", JSON.stringify(params, null, 2));
 
-  var whereClause = "";
-  var sortBySyntax = "";
-  var limitSyntax: string = "";
-  var offsetSyntax = "";
+  var whereClause = '';
+  var sortBySyntax = '';
+  var limitSyntax: string = '';
+  var offsetSyntax = '';
 
   if (params) {
     let { sortDirection, sortBy, limit, offset, ...filters } = params;
-    sortDirection = sortDirection ?? "asc";
+    sortDirection = sortDirection ?? 'asc';
     // console.log("sortDirection ==>", sortDirection);
 
-    sortBySyntax = sortBy ? `order by ${sortBy} ${sortDirection}` : "";
+    sortBySyntax = sortBy ? `order by ${sortBy} ${sortDirection}` : '';
 
     limit = limit ?? 0;
-    limitSyntax = limit > 0 ? `limit ${limit}` : "";
+    limitSyntax = limit > 0 ? `limit ${limit}` : '';
     // console.log("limitSyntax ==>", limitSyntax);
 
     offset = offset ?? 0;
-    offsetSyntax = offset > 0 ? `offset ${offset}` : "";
+    offsetSyntax = offset > 0 ? `offset ${offset}` : '';
     whereClause = whereClauseBuilder(filters);
   }
 
   let sql = `SELECT *, COUNT() OVER() AS total FROM ${table} ${whereClause} ${sortBySyntax} ${limitSyntax} ${offsetSyntax}`;
-  sql = sql.replace(/\s+/g, " ").trim() + ";";
+  sql = sql.replace(/\s+/g, ' ').trim() + ';';
 
-  console.log("sql ==>", sql);
+  console.log('sql ==>', sql);
   return sql;
 }
 
@@ -52,7 +52,7 @@ export async function getD1ByTableAndId(db, table, id, params) {
   return results[0];
 }
 
-export function prepareD1Data(data, tbl = "") {
+export function prepareD1Data(data, tbl = '') {
   const table = data.table || tbl;
   const schema = getRepoFromTable(table);
   const now = new Date().getTime();
@@ -80,7 +80,7 @@ export async function insertD1Data(d1, kv, table, data) {
 }
 
 export async function deleteD1ByTableAndId(d1, table, id) {
-  console.log("deleteD1ByTableAndId", table, id);
+  console.log('deleteD1ByTableAndId', table, id);
   const db = drizzle(d1);
 
   const schmea = getRepoFromTable(table);
@@ -112,7 +112,7 @@ export async function updateD1Data(
   const eqArgs = [eq(repo.id, recordId)];
   if (params) {
     for (const key in params) {
-      if (key !== "id") {
+      if (key !== 'id') {
         eqArgs.push(eq(repo[key], params[key]));
       }
     }
@@ -133,7 +133,7 @@ export async function updateD1Data(
 
   // .returning().get();
 
-  const id = result && result[0] ? result[0]["0"] : undefined;
+  const id = result && result[0] ? result[0]['0'] : undefined;
 
   // console.log("updating data result ", result);
 
@@ -149,18 +149,18 @@ export function getRepoFromTable(tableName) {
 }
 
 export function whereClauseBuilder(filters: Record<string, any>) {
-  let whereClause = "";
+  let whereClause = '';
 
   if (!filters || Object.keys(filters).length === 0) {
     return whereClause;
   }
 
-  let AND = "";
-  whereClause = "WHERE";
+  let AND = '';
+  whereClause = 'WHERE';
   for (const key of Object.keys(filters)) {
     let filter = filters[key];
-    if (typeof filter === "string") {
-      if (filter.toLowerCase().includes("is")) {
+    if (typeof filter === 'string') {
+      if (filter.toLowerCase().includes('is')) {
         whereClause = `${whereClause} ${AND} ${key} ${filter}`;
       } else {
         whereClause = `${whereClause} ${AND} ${key} = '${filter}'`;
@@ -168,7 +168,7 @@ export function whereClauseBuilder(filters: Record<string, any>) {
     } else {
       whereClause = `${whereClause} ${AND} ${key} = ${filter}`;
     }
-    AND = "AND";
+    AND = 'AND';
   }
   return whereClause;
 }
