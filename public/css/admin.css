@@ -2,7 +2,7 @@
   height: 25px;
 }
 
-html[data-bs-theme='dark'] a {
+html[data-bs-theme="dark"] a {
   color: var(--bs-light) !important;
   /* Attribute has this exact value */
 }
@@ -15,7 +15,7 @@ html a:hover {
   text-decoration: underline;
 }
 
-.formio-component [name='data[submit]'] {
+.formio-component [name="data[submit]"] {
   margin: 12px 0;
 }
 
@@ -195,7 +195,7 @@ body {
   border-radius: 8px;
 }
 
-html[data-bs-theme='dark'] .btn-warning {
+html[data-bs-theme="dark"] .btn-warning {
   --bs-btn-bg: #4d3b00;
   --bs-btn-border-color: #4d3b00;
   --bs-btn-hover-color: #000;

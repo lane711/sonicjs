@@ -2,5 +2,13 @@
 export default {
   trailingComma: 'none',
   singleQuote: true,
-  jsxSingleQuote: true
+  jsxSingleQuote: true,
+  overrides: [
+    {
+      files: ['*.css'],
+      options: {
+        singleQuote: false
+      }
+    }
+  ]
 };
