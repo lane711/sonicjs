@@ -21,6 +21,12 @@ binding = "D1DATA"
 database_name = "sonicjs"
 database_id = "${DATABASE_ID}"
 
+# Using Cloudflare R2 (similar to AWS S3) is only necessary if you plan to use SonicJs to manage file assets
+# Run the `wrangler r2 bucket create sonicjs` command and uncomment the section below
+[[r2_buckets]]
+binding = 'R2STORAGE' 
+bucket_name = 'sonicjs'
+
 vars = { ENVIRONMENT = "production" }
 
 [env.development]
