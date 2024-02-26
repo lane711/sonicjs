@@ -107,12 +107,12 @@ export const hooks: ApiConfig['hooks'] = {
 export const fields: ApiConfig['fields'] = {
   image: {
     type: 'file',
-    bucket: (ctx) => ctx.env.R2_STORAGE,
+    bucket: (ctx) => ctx.env.R2STORAGE,
     path: 'images'
   },
   images: {
     type: 'file[]',
-    bucket: (ctx) => ctx.env.R2_STORAGE,
+    bucket: (ctx) => ctx.env.R2STORAGE,
     path: 'images'
   },
   tags: {
