@@ -9,35 +9,35 @@ import { clearInMemoryCache } from './cache';
 import { clearKVCache } from './kv-data';
 const ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
 
-// it('insert should return new record with id and dates', async () => {
-//   const urlKey = 'http://localhost:8888/some-cache-key-url';
-//
-//   const db = createTestTable();
-//   const newRecord = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-//     table: 'users',
-//     data: {
-//       firstName: 'John'
-//     }
-//   });
-//   console.log('newRecord', newRecord);
-//
-//   const newRecord2 = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-//     table: 'users',
-//     data: {
-//       firstName: 'Steve'
-//     }
-//   });
-//   console.log('newRecord2', newRecord2);
-//
-//   const d1Result = await getRecords(ctx, 'users', undefined, urlKey);
-//
-//   //record should be in list
-//   expect(d1Result.data.length).toBe(2);
-//   expect(d1Result.total).toBe(2);
-//   expect(d1Result.source).toBe('d1');
-//   expect(d1Result.data[0].firstName).toBe('John');
-// });
-//
+it('insert should return new record with id and dates', async () => {
+  const urlKey = 'http://localhost:8888/some-cache-key-url';
+
+  const db = await createCategoriesTestTable();
+  const newRecord = await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
+    table: 'categories',
+    data: {
+      title: 'cat 1'
+    }
+  });
+  console.log('newRecord', newRecord);
+
+  const newRecord2 = await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
+    table: 'categories',
+    data: {
+      title: 'cat 2'
+    }
+  });
+  console.log('newRecord2', newRecord2);
+
+  const d1Result = await getRecords(ctx, 'categories', undefined, urlKey);
+
+  //record should be in list
+  expect(d1Result.data.length).toBe(2);
+  expect(d1Result.total).toBe(2);
+  expect(d1Result.source).toBe('d1');
+  expect(d1Result.data[0].title).toBe('cat 1');
+});
+
 // it('CRUD', async () => {
 //   //start with a clear cache
 //   await clearInMemoryCache();
@@ -193,6 +193,23 @@ function createTestTable() {
       updatedOn integer
     );
 	`);
+
+  return db;
+}
+
+async function createCategoriesTestTable() {
+  const db = drizzle(ctx.env.D1DATA);
+  console.log('creating categories table start');
+  const result = await db.run(sql`
+    CREATE TABLE "categories" (
+      id text PRIMARY KEY NOT NULL,
+      title text,
+      body text,
+      createdOn integer,
+      updatedOn integer
+      );
+      `);
+  console.log('creating categories table end');
 
   return db;
 }

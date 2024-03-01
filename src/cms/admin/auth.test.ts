@@ -27,7 +27,7 @@ describe('admin should be restricted', () => {
     });
     let res = await app.fetch(req, env);
     expect(res.status).toBe(200);
-    //     let body = await res.json();
+    let body = await res.json();
     // expect(body.data.length).toBe(1);
   });
 
