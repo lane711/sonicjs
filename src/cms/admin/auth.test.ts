@@ -9,49 +9,46 @@ env.D1DATA = env.__D1_BETA__D1DATA;
 
 describe('admin should be restricted', () => {
   it('ping should return 200', async () => {
-    const res = await app.fetch(
-      new Request('http://localhost/v1/ping'),
-      env
-    );
+    const res = await app.fetch(new Request('http://localhost/v1/ping'), env);
     expect(res.status).toBe(200);
   });
 
-  // it('categories record', async () => {
-  //   await createCategoriesTestTable1();
+  it('categories record', async () => {
+    await createCategoriesTestTable1();
 
-  //   await insertD1Data(env.D1DATA, env.KVDATA, 'categories', {
-  //     title: 'My Title',
-  //     body: 'Body goes here',
+    await insertD1Data(env.D1DATA, env.KVDATA, 'categories', {
+      title: 'My Title',
+      body: 'Body goes here'
+    });
+
+    let req = new Request('http://localhost/v1/categories', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    let res = await app.fetch(req, env);
+    expect(res.status).toBe(200);
+    //     let body = await res.json();
+    // expect(body.data.length).toBe(1);
+  });
+
+  //   it('user record', async () => {
+  //     await createUserTestTables();
+
+  //     await insertD1Data(env.D1DATA, env.KVDATA, 'users', {
+  //       firstName: 'John',
+  //       id: 'aaa',
+  //       email: 'a@a.com',
+  //       password: 'password',
+  //       role: 'admin'
+  //     });
+
+  //     let req = new Request('http://localhost/v1/users/aaa', {
+  //       method: 'GET',
+  //       headers: { 'Content-Type': 'application/json' }
+  //     });
+  //     let res = await app.fetch(req, env);
+  //     expect(res.status).toBe(200);
   //   });
-
-  //   let req = new Request('http://localhost/v1/categories', {
-  //     method: 'GET',
-  //     headers: { 'Content-Type': 'application/json' }
-  //   });
-  //   let res = await app.fetch(req, env);
-  //   expect(res.status).toBe(200);
-  //       let body = await res.json();
-  //   expect(body.data.length).toBe(1);
-  // });
-
-//   it('user record', async () => {
-//     await createUserTestTables();
-
-//     await insertD1Data(env.D1DATA, env.KVDATA, 'users', {
-//       firstName: 'John',
-//       id: 'aaa',
-//       email: 'a@a.com',
-//       password: 'password',
-//       role: 'admin'
-//     });
-
-//     let req = new Request('http://localhost/v1/users/aaa', {
-//       method: 'GET',
-//       headers: { 'Content-Type': 'application/json' }
-//     });
-//     let res = await app.fetch(req, env);
-//     expect(res.status).toBe(200);
-//   });
 });
 
 function createUserTestTables() {
