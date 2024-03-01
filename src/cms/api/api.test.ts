@@ -1,26 +1,31 @@
-it('api.test.ts dummy', () => {});
-// import app from '../../server';
-// import { drizzle } from 'drizzle-orm/d1';
-// import { sql } from 'drizzle-orm';
-// import { insertD1Data } from '../data/d1-data';
-// import { getRecords, insertRecord } from '../data/data';
-//
-// const env = getMiniflareBindings();
-// const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
-//
-// describe('Test the application', () => {
-//   it('ping should return 200', async () => {
-//     const res = await app.request('http://localhost/v1/ping');
-//     expect(res.status).toBe(200);
-//   });
-//
-//   it('kvtest should return 200', async () => {
-//     const res = await app.fetch(
-//       new Request('http://localhost/v1/cache/kv'),
-//       env
-//     );
-//     expect(res.status).toBe(200);
-//   });
+// it('api.test.ts dummy', () => {});
+import app from '../../server';
+import { drizzle } from 'drizzle-orm/d1';
+import { sql } from 'drizzle-orm';
+import { insertD1Data } from '../data/d1-data';
+import { getRecords, insertRecord } from '../data/data';
+
+const env = getMiniflareBindings();
+const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
+
+describe('Test the APIs', () => {
+
+it('ping should return 200', async () => {
+  const res = await app.fetch(
+    new Request('http://localhost/v1/ping'),
+    env
+  );
+  expect(res.status).toBe(200);
+});
+
+  // it('kvtest should return 200', async () => {
+  //   const res = await app.fetch(
+  //     new Request('http://localhost/v1/cache/kv'),
+  //     env
+  //   );
+  //   expect(res.status).toBe(200);
+  // });
+
 //
 //   it('forms should return 200', async () => {
 //     const res = await app.request('http://localhost/v1/forms');
@@ -189,3 +194,4 @@ it('api.test.ts dummy', () => {});
 //   return db;
 // }
 //
+});
