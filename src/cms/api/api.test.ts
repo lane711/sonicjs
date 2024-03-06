@@ -12,6 +12,8 @@ describe('Test the APIs', () => {
   it('ping should return 200', async () => {
     const res = await app.fetch(new Request('http://localhost/v1/ping'), env);
     expect(res.status).toBe(200);
+    let body = await res.json();
+    expect(body).toBe('/v1/ping is all good');
   });
 
   // it('kvtest should return 200', async () => {

@@ -362,9 +362,8 @@ tables.forEach((entry) => {
   });
 });
 
-api.get('/ping', (c) => {
-  console.log('testing ping', Date());
-  return c.text(Date());
+api.get('/ping', (ctx) => {
+  return ctx.json(`${ctx.req.path} is all good`);
 });
 
 api.get('/kv-test', async (ctx) => {
