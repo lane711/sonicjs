@@ -1,36 +1,41 @@
-import { sql } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/d1";
-import { createUser } from "../auth/lucia";
-import { getD1DataByTable } from "../data/d1-data";
+import { sql } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/d1';
+import { createUser } from '../auth/lucia';
+import { getD1DataByTable } from '../data/d1-data';
 
-
-export async function createUserAndGetToken(app, ctx){
+export async function createUserAndGetToken(app, ctx) {
   await createUserTestTables(ctx);
 
   //TODO: create user properly using the lucia api so that the user keys data in populated
-  let login = {        
-    email: "a@a.com",
-    password: "password123"
-  }
+  let login = {
+    email: 'a@a.com',
+    password: 'password123'
+  };
 
-  let user = {data: {
-    email: login.email,
-    password: login.password,
-    role:'admin',
-    table:'users'
-  }};
+  let user = {
+    data: {
+      email: login.email,
+      password: login.password,
+      role: 'admin',
+      table: 'users'
+    }
+  };
   const result = await createUser({ content: user, ctx });
 
   const users = await getD1DataByTable(ctx.env.D1DATA, 'users', undefined);
   expect(users.length).toBe(1);
 
-  const usersKeys = await getD1DataByTable(ctx.env.D1DATA, 'user_keys', undefined);
+  const usersKeys = await getD1DataByTable(
+    ctx.env.D1DATA,
+    'user_keys',
+    undefined
+  );
   expect(usersKeys.length).toBe(1);
 
   //now log the users in
-  let req = new Request("http://localhost/v1/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+  let req = new Request('http://localhost/v1/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(login)
   });
   let res = await app.fetch(req, ctx.env);
