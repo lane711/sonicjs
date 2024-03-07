@@ -3,7 +3,7 @@ import app from '../../server';
 import { sql } from 'drizzle-orm';
 import { getD1DataByTable, insertD1Data } from '../data/d1-data';
 import { postData } from '../util/fetch';
-import { createCategoriesTestTable1, createUserTestTables } from '../util/testing';
+import { createCategoriesTestTable1, createUserAndGetToken, createUserTestTables } from '../util/testing';
 import { createUser } from '../auth/lucia';
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
 
@@ -41,52 +41,23 @@ describe('admin should be restricted', () => {
     expect(body.data[0].id).toBe('1');
   });
 
-    it('user record', async () => {
-      await createUserTestTables(ctx);
+    it('create and login user', async () => {
+      const token = await createUserAndGetToken(app, ctx);
+    });
 
-      //TODO: create user properly using the lucia api so that the user keys data in populated
-      let user = {data: {
-        email: "a@a.com",
-        password: "password123",
-        role:'admin',
-        table:'users'
-      }};
-      const result = await createUser({ content: user, ctx });
+    it('admin can list users', async () => {
+      const token = await createUserAndGetToken(app, ctx);
 
-
-      // const userRecord = await insertD1Data(ctx.env.D1DATA, ctx.env.KVDATA, 'users', {
-      //   firstName: 'John',
-      //   id: 'aaa',
-      //   email: 'a@a.com',
-      //   password: 'password123',
-      //   role: 'admin'
-      // });
-
-      const users = await getD1DataByTable(ctx.env.D1DATA, 'users', undefined);
-      expect(users.length).toBe(1);
-
-      //now log that users in
-      let payload = {data: {
-        email: "a@a.com",
-        password: "password123"
-      }};
-
-      let req = new Request("http://localhost/v1/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+      // use the token to get thee user info
+// TODO should be able to get users
+      let req = new Request('http://localhost/v1/categories', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
       });
       let res = await app.fetch(req, ctx.env);
       expect(res.status).toBe(200);
-
-      //use the token to get thee user info
-
-      // let req = new Request('http://localhost/v1/users/aaa', {
-      //   method: 'GET',
-      //   headers: { 'Content-Type': 'application/json' }
-      // });
-      // let res = await app.fetch(req, ctx.env);
-      // expect(res.status).toBe(200);
     });
 
 });
