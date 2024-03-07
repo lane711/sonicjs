@@ -4,13 +4,14 @@ import { drizzle } from 'drizzle-orm/d1';
 import { sql } from 'drizzle-orm';
 import { insertD1Data } from '../data/d1-data';
 import { getRecords, insertRecord } from '../data/data';
+import { createCategoriesTestTable1 } from '../util/testing';
 
-const env = getMiniflareBindings();
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
+const ctx = { env: { KVDATA: KVDATA, D1DATA: __D1_BETA__D1DATA } };
 
 describe('Test the APIs', () => {
   it('ping should return 200', async () => {
-    const res = await app.fetch(new Request('http://localhost/v1/ping'), env);
+    const res = await app.fetch(new Request('http://localhost/v1/ping'), ctx.env);
     expect(res.status).toBe(200);
     let body = await res.json();
     expect(body).toBe('/v1/ping is all good');
@@ -89,19 +90,20 @@ describe('Test the APIs', () => {
   //     expect(body2.source).toBe('cache');
   //   });
   //
-  //   it('post (insert) should return 204', async () => {
-  //     let payload = JSON.stringify({ data: { firstName: 'Joe' } });
-  //     let req = new Request('http://localhost/v1/users', {
-  //       method: 'POST',
-  //       body: payload,
-  //       headers: { 'Content-Type': 'application/json' }
-  //     });
-  //     let res = await app.fetch(req, env);
-  //     expect(res.status).toBe(201);
-  //     let body = await res.json();
-  //     expect(body.firstName).toBe('Joe');
-  //     expect(body.id.length).toBeGreaterThan(1);
-  //   });
+    it('post (insert) should return 204', async () => {
+      createCategoriesTestTable1(ctx);
+      let payload = JSON.stringify({ data: { title: 'My Category' } });
+      let req = new Request('http://localhost/v1/categories', {
+        method: 'POST',
+        body: payload,
+        headers: { 'Content-Type': 'application/json' }
+      });
+      let res = await app.fetch(req, ctx.env);
+      expect(res.status).toBe(201);
+      let body = await res.json();
+      expect(body.title).toBe('My Category');
+      expect(body.id.length).toBeGreaterThan(1);
+    });
   //
   //   it('put should return 200 and return id', async () => {
   //     //create test record to update
