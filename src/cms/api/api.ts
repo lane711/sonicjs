@@ -63,7 +63,7 @@ tables.forEach((entry) => {
 
     try {
       params.limit = params.limit ?? '1000';
-      ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
+      ctx.env.D1DATA = ctx.env.D1DATA;
       let data = await getRecords(
         ctx,
         entry.table,
@@ -133,7 +133,7 @@ tables.forEach((entry) => {
       return ctx.text('Unauthorized', 401);
     }
 
-    ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
+    ctx.env.D1DATA = ctx.env.D1DATA;
 
     source = source || 'fastest';
     if (includeContentType !== undefined) {
@@ -180,7 +180,7 @@ tables.forEach((entry) => {
     let content = await ctx.req.json();
     const route = ctx.req.path.split('/')[2];
     const table = apiConfig.find((entry) => entry.route === route).table;
-    ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
+    ctx.env.D1DATA = ctx.env.D1DATA;
 
     if (entry.hooks?.beforeOperation) {
       await entry.hooks.beforeOperation(ctx, 'create', undefined, content);
@@ -237,7 +237,7 @@ tables.forEach((entry) => {
     const payload = await ctx.req.json();
     const id = ctx.req.param('id');
     var content: { data?: any; table?: string; id?: string } = {};
-    ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
+    ctx.env.D1DATA = ctx.env.D1DATA;
     content.data = payload.data;
     console.log('put content', JSON.stringify(content.data, null, 2));
     if (entry.hooks?.beforeOperation) {
@@ -303,7 +303,7 @@ tables.forEach((entry) => {
   api.delete(`/${entry.route}/:id`, async (ctx) => {
     const id = ctx.req.param('id');
     const table = ctx.req.path.split('/')[2];
-    ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
+    ctx.env.D1DATA = ctx.env.D1DATA;
 
     if (entry.hooks?.beforeOperation) {
       await entry.hooks.beforeOperation(ctx, 'delete', id);

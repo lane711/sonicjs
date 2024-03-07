@@ -282,7 +282,7 @@ async function dataRoute(
   params.limit = params.limit ?? 1000;
 
   const table = apiConfig.find((entry) => entry.route === route).table;
-  ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
+  ctx.env.D1DATA = ctx.env.D1DATA;
 
   const records = await getRecords(
     ctx,

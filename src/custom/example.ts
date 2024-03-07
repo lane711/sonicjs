@@ -75,7 +75,7 @@ const example = new Hono();
 //
 //   params.limit = params.limit ? parseInt(params.limit) : 10;
 //   params.offset = params.offset ? parseInt(params.offset) : 0;
-//   ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
+//   ctx.env.D1DATA = ctx.env.D1DATA;
 //
 //   const data = await getPagedBlogPost(ctx, ctx.req.url, params);
 //
@@ -188,7 +188,7 @@ const example = new Hono();
 //   var params = qs.parse(ctx.req.query());
 //
 //   const table = 'posts';
-//   ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
+//   ctx.env.D1DATA = ctx.env.D1DATA;
 //
 //   const func = async function () {
 //     // const db = drizzle(d1, { schema });

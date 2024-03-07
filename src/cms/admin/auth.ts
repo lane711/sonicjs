@@ -72,7 +72,7 @@ authAPI.get(`/users/:id`, async (ctx) => {
   const start = Date.now();
 
   params.id = id;
-  ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
+  ctx.env.D1DATA = ctx.env.D1DATA;
 
   source = source || 'fastest';
   if (includeContentType !== undefined) {
@@ -319,7 +319,7 @@ authAPI.get('/logout', async (ctx) => {
 });
 
 authAPI.get('/verify', async (ctx) => {
-  ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
+  ctx.env.D1DATA = ctx.env.D1DATA;
   const auth = initializeLucia(ctx.env.D1DATA, ctx.env);
   const authRequest = auth.handleRequest(ctx);
   const authenticated = await authRequest.validateBearerToken();

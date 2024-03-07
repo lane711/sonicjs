@@ -54,19 +54,32 @@ describe('admin should be restricted', () => {
     const token = await createUserAndGetToken(app, ctx);
   });
 
-  it('admin can list users', async () => {
-    const token = await createUserAndGetToken(app, ctx);
-
-    // use the token to get thee user info
-    // TODO should be able to get users
+  it('anyone can list categories', async () => {
     let req = new Request('http://localhost/v1/categories', {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
+        'Content-Type': 'application/json'
       }
     });
     let res = await app.fetch(req, ctx.env);
     expect(res.status).toBe(200);
   });
+
+  it('admin can see there own record', async () => {
+    const user = await createUserAndGetToken(app, ctx);
+    // TODO should be able to get users
+    let req = new Request(`http://localhost/v1/auth/users/${user.id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${user.token}`
+      }
+    });
+    let res = await app.fetch(req, ctx.env);
+    expect(res.status).toBe(200);
+    let userResponse = await res.json();
+    console.log('userResponse',userResponse)
+    expect(userResponse.id).toBe(user.id);
+  });
+
 });

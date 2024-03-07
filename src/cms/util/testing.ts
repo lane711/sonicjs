@@ -42,7 +42,7 @@ export async function createUserAndGetToken(app, ctx) {
   expect(res.status).toBe(200);
   let body = await res.json();
   expect(body.bearer.length).toBeGreaterThan(10);
-  return body.bearer;
+  return {id: user.data.id, token:body.bearer};
 }
 
 export async function createUserTestTables(ctx) {

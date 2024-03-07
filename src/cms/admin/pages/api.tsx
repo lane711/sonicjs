@@ -33,7 +33,7 @@ export async function loadApis(ctx) {
   await Promise.all(
     tables.map(async (schema) => {
       const results = await getD1DataByTable(
-        ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA,
+        ctx.env.D1DATA,
         schema.table,
         {
           limit: 1
