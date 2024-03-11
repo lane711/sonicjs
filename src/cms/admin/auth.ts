@@ -19,6 +19,7 @@ import {
   filterReadFieldAccess,
   filterUpdateFieldAccess,
   getApiAccessControlResult,
+  getItemReadResult,
   getOperationCreateResult,
   hasUser
 } from '../auth/auth-helpers';
@@ -45,6 +46,73 @@ const operationAccess = userTableConfig?.access?.operation;
 const itemAccess = userTableConfig?.access?.item;
 const filterAccess = userTableConfig?.access?.filter;
 const fieldsAccess = userTableConfig?.access?.fields;
+
+// View user
+authAPI.get(`/users`, async (ctx) => {
+  if (userTableConfig.hooks?.beforeOperation) {
+    await userTableConfig.hooks?.beforeOperation(ctx, 'read');
+  }
+  let { includeContentType, source, ...params } = ctx.req.query();
+  const accessControlResult = await getApiAccessControlResult(
+    operationAccess?.read || true,
+    filterAccess?.read || true,
+    true,
+    ctx,
+    undefined,
+    'users'
+  );
+
+  if (typeof accessControlResult === 'object') {
+    params = { ...params, ...accessControlResult };
+  }
+
+  if (!accessControlResult) {
+    return ctx.text('Unauthorized', 401);
+  }
+  const start = Date.now();
+
+  try {
+    params.limit = params.limit ?? '1000';
+    ctx.env.D1DATA = ctx.env.D1DATA ?? ctx.env.__D1_BETA__D1DATA;
+    let data = await getRecords(
+      ctx,
+      'users',
+      params,
+      ctx.req.url,
+      'fastest',
+      undefined
+    );
+
+    if (itemAccess?.read) {
+      const accessControlResult = await getItemReadResult(
+        itemAccess.read,
+        ctx,
+        data
+      );
+      if (!accessControlResult) {
+        return ctx.text('Unauthorized', 401);
+      }
+    }
+    data.data = await filterReadFieldAccess(fieldsAccess, ctx, data.data);
+
+    if (userTableConfig?.hooks?.afterOperation) {
+      await userTableConfig.hooks.afterOperation(
+        ctx,
+        'read',
+        params.id,
+        null,
+        data
+      );
+    }
+    const end = Date.now();
+    const executionTime = end - start;
+
+    return ctx.json({ ...data, executionTime });
+  } catch (error) {
+    console.log(error);
+    return ctx.text(error);
+  }
+});
 
 // View user
 authAPI.get(`/users/:id`, async (ctx) => {
@@ -88,6 +156,16 @@ authAPI.get(`/users/:id`, async (ctx) => {
     undefined
   );
 
+  if (itemAccess?.read) {
+    const accessControlResult = await getItemReadResult(
+      itemAccess.read,
+      ctx,
+      data
+    );
+    if (!accessControlResult) {
+      return ctx.text('Unauthorized', 401);
+    }
+  }
   data.data = await filterReadFieldAccess(fieldsAccess, ctx, data.data);
 
   if (includeContentType !== undefined) {
