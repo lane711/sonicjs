@@ -102,6 +102,11 @@ tables.forEach((entry) => {
     }
   });
 
+  //redirect users to auth controller
+  api.get(`/users`, async (ctx) => {
+    return ctx.redirect('/v1/auth/users');
+  });
+
   //get single record
   api.get(`/${entry.route}/:id`, async (ctx) => {
     const start = Date.now();

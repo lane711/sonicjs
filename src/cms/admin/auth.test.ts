@@ -65,27 +65,26 @@ describe('admin should be restricted', () => {
     expect(res.status).toBe(200);
   });
 
-  // it('admin can see their own record', async () => {
-  //   const user = await createUserAndGetToken(app, ctx);
-  //   // TODO should be able to get users
-  //   let req = new Request(`http://localhost/v1/auth/users/${user.id}`, {
-  //     method: 'GET',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       Authorization: `Bearer ${user.token}`
-  //     }
-  //   });
-  //   let res = await app.fetch(req, ctx.env);
-  //   expect(res.status).toBe(200);
-  //   let userResponse = await res.json();
-  //   expect(userResponse.id).toBe(user.id);
-  // });
+  it('admin can see their own record', async () => {
+    const user = await createUserAndGetToken(app, ctx);
+    // TODO should be able to get users
+    let req = new Request(`http://localhost/v1/auth/users/${user.id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${user.token}`
+      }
+    });
+    let res = await app.fetch(req, ctx.env);
+    expect(res.status).toBe(200);
+    let userResponse = await res.json();
+    expect(userResponse.data.id).toBe(user.id);
+  });
 
   // it('admin can see all user records', async () => {
   //   const user = await createUserAndGetToken(app, ctx);
-  //   const user2 = await createUserAndGetToken(app, ctx, 'b@b.com', 'password', 'editor');
+  //   // const user2 = await createUserAndGetToken(app, ctx, 'b@b.com', 'password', 'editor');
 
-  //   // TODO should be able to get users
   //   let req = new Request(`http://localhost/v1/auth/users/`, {
   //     method: 'GET',
   //     headers: {
@@ -96,7 +95,7 @@ describe('admin should be restricted', () => {
   //   let res = await app.fetch(req, ctx.env);
   //   expect(res.status).toBe(200);
   //   let usersResponse = await res.json();
-  //   expect(usersResponse.data.length).toBe(2);
+  //   expect(usersResponse.data.length).toBe(1);
   // });
 
 });
