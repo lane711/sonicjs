@@ -12,6 +12,7 @@ import { tusAPI } from './cms/api/tus';
 
 import { AuthRequest, Session, User } from 'lucia';
 import { initializeLucia } from './cms/auth/lucia';
+import { rifePlayerApi } from './custom/rife-player-api';
 
 export type Variables = {
   authRequest: AuthRequest;
@@ -81,6 +82,7 @@ app.get('/public/*', async (ctx) => {
 });
 
 app.route('/v1', api);
+app.route('/v2', rifePlayerApi);
 app.route('/v1/auth', authAPI);
 app.route('/admin', admin);
 app.route('v1/migrate', migrate);

@@ -1,21 +1,26 @@
 import { Hono } from 'hono';
+import { insertRecord } from '../cms/data/data';
+import { migrateData } from './migrate-data';
 // import qs from 'qs';
 // import { getRecords } from '../cms/data/data';
 // import * as schema from '../db/routes';
 // import { drizzle } from 'drizzle-orm/d1';
 // import { sql } from 'drizzle-orm';
 // import axios from 'axios';
-const programs = require('../custom/rife-data');
 
 const migrate = new Hono();
 
-migrate.get('/', (ctx) => {
-  //get data file
-  console.log(programs);
-  //insert each record
+migrate.get('/', async (ctx) => {
+  
+  const userId = ctx.user;
 
-  return ctx.text('Migratinng data');
+  console.log('user', ctx._var.user.userId)
+
+  await migrateData(ctx);
+
+  return ctx.text(ctx._var.user.userId);
 });
+
 //
 // example.get('/users', async (ctx) => {
 //   var params = qs.parse(ctx.req.query());

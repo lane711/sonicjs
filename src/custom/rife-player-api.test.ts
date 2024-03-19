@@ -14,33 +14,39 @@ const toJson = function (json) {
 const ctx = {
   env: { KVDATA: KVDATA, D1DATA: __D1_BETA__D1DATA },
   json: toJson,
-  user: {id:'fromtest'}
+  user: { id: 'fromtest' },
+  _var: { user: { userId: 'abc123' } }
 };
 
-it('migration WIP', async () => {
+it('rp controller sanity', async () => {
   await createTestTable(ctx);
 
- 
-    // type: integer('type'),
-    // title: text('title'),
-    // description: text('description'),
-    // source: text('source'),
-    // frequencies: text('text', { mode: 'json' }),
-    // tags: text('tags', { mode: 'json' }).$type<string[]>(),
-    // sort: integer('sort').default(10),
-    // userId: text('userId'),
-    await migrateData(ctx);
+  await migrateData(ctx, 20);
 
-  //check that data is in the db
-  let data = await getRecords(
-    ctx,
-    'programs',
-    {},
-    '/any-url',
-    'fastest',
-    undefined
-  );
-  expect(data.data.length).toBeGreaterThan(1);
+  let req = new Request('http://localhost/v2', {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' }
+  });
+
+  let res = await app.fetch(req, ctx.env);
+  expect(res.status).toBe(200);
+});
+
+it('rp programs', async () => {
+  await createTestTable(ctx);
+
+  await migrateData(ctx, 20);
+
+  let req = new Request('http://localhost/v2/programs', {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' }
+  });
+  let res = await app.fetch(req, ctx.env);
+  expect(res.status).toBe(200);
+  let body = await res.json();
+  expect(body.data.length).toBe(20);
+  expect(body.data[0].frequencies).toBeInstanceOf(Array);
+
 });
 
 async function createTestTable(ctx) {

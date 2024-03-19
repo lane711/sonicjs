@@ -16,7 +16,7 @@ export const definition = {
   title: text('title'),
   description: text('description'),
   source: text('source'),
-  frequencies: text('text', { mode: 'json' }),
+  frequencies: text('frequencies', { mode: 'json' }),
   tags: text('tags', { mode: 'json' }).$type<string[]>(),
   sort: integer('sort').default(10),
   userId: text('userId'),
