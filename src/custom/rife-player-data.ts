@@ -1,25 +1,26 @@
 import { getRecords } from '../cms/data/data';
 
 export async function getPrograms(ctx) {
+
   const fn = async function () {
     const { results } = await ctx.env.D1DATA.prepare(
-      `SELECT * FROM programs where type = 'set' order by sort;`
+      `SELECT * FROM programs order by sort;`
     ).all();
 
     let data = [];
-    for(const freq of results){
+    for (const freq of results) {
       data.push({
         id: freq.id,
         title: freq.title,
         description: freq.description,
         source: freq.title,
         tags: freq.tags,
-        userId:freq.userId,
+        userId: freq.userId,
         createdOn: freq.createdOn,
         updatedOn: freq.updatedOn,
         frequencies: JSON.parse(freq.frequencies),
-        total: freq.total,
-      })
+        total: freq.total
+      });
     }
 
     return data;

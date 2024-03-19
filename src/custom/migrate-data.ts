@@ -3,6 +3,13 @@ import { insertRecord } from '../cms/data/data';
 const { programs } = require('../custom/rife-data');
 
 export async function migrateData(ctx, count = 99999) {
+
+  await ctx.env.D1DATA.prepare(`Delete from programs`).all();
+
+  // await ctx.env.D1DATA.prepare(
+  //   `DELETE FROM SQLITE_SEQUENCE WHERE name='programs';`
+  // ).all();
+
   const testPrograms = programs.slice(0, count);
 
   for (const program of testPrograms) {

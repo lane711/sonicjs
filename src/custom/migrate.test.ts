@@ -14,22 +14,12 @@ const toJson = function (json) {
 const ctx = {
   env: { KVDATA: KVDATA, D1DATA: __D1_BETA__D1DATA },
   json: toJson,
-  user: {id:'fromtest'}
+  _var: { user: { userId: 'abc123' } }
 };
 
 it('migration WIP', async () => {
   await createTestTable(ctx);
-
- 
-    // type: integer('type'),
-    // title: text('title'),
-    // description: text('description'),
-    // source: text('source'),
-    // frequencies: text('text', { mode: 'json' }),
-    // tags: text('tags', { mode: 'json' }).$type<string[]>(),
-    // sort: integer('sort').default(10),
-    // userId: text('userId'),
-    await migrateData(ctx);
+    await migrateData(ctx, 5);
 
   //check that data is in the db
   let data = await getRecords(
@@ -40,7 +30,7 @@ it('migration WIP', async () => {
     'fastest',
     undefined
   );
-  expect(data.data.length).toBeGreaterThan(1);
+  expect(data.data.length).toBe(5);
 });
 
 async function createTestTable(ctx) {

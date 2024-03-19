@@ -12,4 +12,4 @@ CREATE TABLE `programs` (
 	`updatedOn` integer
 );
 --> statement-breakpoint
-DROP TABLE `frequencies`;
+DROP TABLE IF EXISTS `frequencies`;
