@@ -6,16 +6,20 @@ import * as users from './users';
 import { ApiConfig } from '../routes';
 import { isAdminOrUser } from '../config-helpers';
 
-export const tableName = 'frequencies';
+export const tableName = 'programs';
 
-export const route = 'frequencies';
+export const route = 'programs';
 
 export const definition = {
   id: text('id').primaryKey(),
-  body: text('body'),
+  type: integer('type'),
+  title: text('title'),
+  description: text('description'),
+  source: text('source'),
+  frequencies: text('text', { mode: 'json' }),
+  tags: text('tags', { mode: 'json' }).$type<string[]>(),
+  sort: integer('sort').default(10),
   userId: text('userId'),
-  postId: integer('postId'),
-  tags: text('tags', { mode: 'json' }).$type<string[]>()
 };
 
 export const table = sqliteTable(
@@ -27,10 +31,6 @@ export const table = sqliteTable(
 );
 
 export const relation = relations(table, ({ one }) => ({
-  post: one(posts.table, {
-    fields: [table.postId],
-    references: [posts.table.id]
-  }),
   user: one(users.table, {
     fields: [table.userId],
     references: [users.table.id]
@@ -40,7 +40,7 @@ export const relation = relations(table, ({ one }) => ({
 export const access: ApiConfig['access'] = {
   operation: {
     read: true,
-    create: true,
+    create: isAdminOrUser,
     update: isAdminOrUser,
     delete: isAdminOrUser
   }

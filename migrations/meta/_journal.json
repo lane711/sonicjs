@@ -36,6 +36,20 @@
       "when": 1707536129830,
       "tag": "0004_eager_nightshade",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1710785883907,
+      "tag": "0005_sharp_tigra",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1710789024544,
+      "tag": "0006_mixed_wasp",
+      "breakpoints": true
     }
   ]
 }

@@ -5,12 +5,17 @@ import { Hono } from 'hono';
 // import { drizzle } from 'drizzle-orm/d1';
 // import { sql } from 'drizzle-orm';
 // import axios from 'axios';
+const programs = require('../custom/rife-data');
 
-const example = new Hono();
+const migrate = new Hono();
 
-// example.get('/', (ctx) => {
-//   return ctx.text('Hello SonicJs!');
-// });
+migrate.get('/', (ctx) => {
+  //get data file
+  console.log(programs);
+  //insert each record
+
+  return ctx.text('Migratinng data');
+});
 //
 // example.get('/users', async (ctx) => {
 //   var params = qs.parse(ctx.req.query());
@@ -248,4 +253,4 @@ const example = new Hono();
 // //   getPagedBlogPost(example.)
 // // })();
 //
-export { example };
+export { migrate };

@@ -5,7 +5,7 @@ import { api } from './cms/api/api';
 import { authAPI } from './cms/admin/auth';
 import { Bindings } from './cms/types/bindings';
 import { admin } from './cms/admin/admin';
-import { example } from './custom/example';
+import { migrate } from './custom/migrate';
 import { status } from './cms/api/status';
 import { log } from './cms/util/logger';
 import { tusAPI } from './cms/api/tus';
@@ -83,7 +83,7 @@ app.get('/public/*', async (ctx) => {
 app.route('/v1', api);
 app.route('/v1/auth', authAPI);
 app.route('/admin', admin);
-app.route('v1/example', example);
+app.route('v1/migrate', migrate);
 app.route('/status', status);
 app.route('/tus', tusAPI);
 
