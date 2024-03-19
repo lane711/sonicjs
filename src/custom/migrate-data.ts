@@ -2,7 +2,7 @@ import { insertRecord } from '../cms/data/data';
 
 const { programs } = require('../custom/rife-data');
 
-export async function migrateData(ctx, count = 10) {
+export async function migrateData(ctx, count = 99999) {
   const testPrograms = programs.slice(0, count);
 
   for (const program of testPrograms) {
