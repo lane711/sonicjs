@@ -28,5 +28,9 @@ export async function migrateData(ctx, count = 99999) {
         userId: ctx._var.user.userId
       }
     });
+
+    await sleep(100);
   }
 }
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
