@@ -176,6 +176,15 @@ export interface ApiConfig {
           type: 'file' | 'file[]';
           bucket: (ctx: AppContext) => R2Bucket;
           path?: string | ((ctx: AppContext) => string);
+        }
+      | {
+          type: 'password';
+        }
+      | {
+          type: 'ckeditor';
+        }
+      | {
+          type: 'quill';
         };
   };
 }

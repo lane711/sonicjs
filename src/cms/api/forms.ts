@@ -41,6 +41,31 @@ export function getForm(ctx: AppContext, table) {
           }
         ]
       };
+    } else if (formField.metaType == 'ckeditor') {
+      const c = formField;
+      formField = {
+        label: c.label || c.key,
+        editor: 'ckeditor',
+        customClass: 'pl-4 pr-4',
+        tableView: true,
+        key: c.key,
+        type: 'textarea',
+        input: true,
+        isUploadEnabled: false
+      };
+    } else if (formField.metaType == 'quill') {
+      const c = formField;
+      formField = {
+        label: c.label || c.key,
+        editor: 'quill',
+        customClass: 'pl-4 pr-4',
+        tableView: true,
+        key: c.key,
+        type: 'textarea',
+        rows: 8,
+        input: true,
+        isUploadEnabled: false
+      };
     }
     formFields.push(formField);
   }
