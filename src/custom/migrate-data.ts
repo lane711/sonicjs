@@ -17,7 +17,7 @@ export async function migrateData(ctx, count = 99999) {
 
     const type = program.sweep ? 'sweep' : 'set';
 
-    const result = insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
+    const result = await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
       table: 'programs',
       data: {
         title: program.title,
