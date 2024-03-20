@@ -3,7 +3,30 @@ import { drizzle } from 'drizzle-orm/d1';
 import { createUser } from '../auth/lucia';
 import { getD1DataByTable } from '../data/d1-data';
 
-export async function createUserAndGetToken(app, ctx, email= 'a@a.com', password = 'password123', role = 'admin') {
+export async function getTestingContext() {
+  const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
+
+  const toJson = function (json) {
+    return json;
+  };
+
+  const ctx = {
+    env: { KVDATA: KVDATA, D1DATA: __D1_BETA__D1DATA },
+    json: toJson,
+    user: { id: 'fromtest' },
+    _var: { user: { userId: 'abc123' } }
+  };
+
+  return ctx;
+}
+
+export async function createUserAndGetToken(
+  app,
+  ctx,
+  email = 'a@a.com',
+  password = 'password123',
+  role = 'admin'
+) {
   await createUserTestTables(ctx);
 
   //TODO: create user properly using the lucia api so that the user keys data in populated
@@ -42,7 +65,7 @@ export async function createUserAndGetToken(app, ctx, email= 'a@a.com', password
   expect(res.status).toBe(200);
   let body = await res.json();
   expect(body.bearer.length).toBeGreaterThan(10);
-  return {id: result.user.userId, token:body.bearer};
+  return { id: result.user.userId, token: body.bearer };
 }
 
 export async function createUserTestTables(ctx) {
