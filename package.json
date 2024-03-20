@@ -7,7 +7,6 @@
     "dev": "run-p dev:*",
     "dev:wrangler": "wrangler pages dev dist --env development --port 8786",
     "dev:esbuild": "node ./src/cms/util/build.mjs",
-    "dev:prod": "wrangler pages dev dist --env development --port 8786 --remote",
     "build": "node ./src/cms/util/build.mjs",
     "deploy": "wrangler pages deploy dist",
     "test": "jest --verbose",
