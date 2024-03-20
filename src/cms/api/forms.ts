@@ -62,7 +62,7 @@ export function getForm(ctx: AppContext, table) {
         tableView: true,
         key: c.key,
         type: 'textarea',
-        rows: 8,
+        rows: 3,
         input: true,
         isUploadEnabled: false
       };

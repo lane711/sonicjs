@@ -119,6 +119,6 @@ export const fields: ApiConfig['fields'] = {
     type: 'string[]'
   },
   body: {
-    type: 'quill'
+    type: 'ckeditor'
   }
 };
