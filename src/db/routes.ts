@@ -3,9 +3,11 @@ import * as posts from './schema/posts';
 import * as comments from './schema/comments';
 import * as categories from './schema/categories';
 import * as categoriesToPosts from './schema/categoriesToPosts';
+import * as faqs from './schema/faqs';
 import * as userKeys from './schema/userKeys';
 import * as userSessions from './schema/userSessions';
 import * as programs from './schema/programs';
+import * as contacts from './schema/contacts';
 
 import { AppContext } from '../server';
 import { isAdminOrEditor } from './config-helpers';
@@ -201,6 +203,8 @@ export const tableSchemas = {
   userKeys,
   userSessions,
   programs,
+  faqs,
+  contacts
 };
 
 for (const key of Object.keys(tableSchemas)) {

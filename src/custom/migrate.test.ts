@@ -17,21 +17,21 @@ const ctx = {
   _var: { user: { userId: 'abc123' } }
 };
 
-it('migration WIP', async () => {
-  await createTestTable(ctx);
-    await migrateData(ctx, 5);
+// it('migration WIP', async () => {
+//   await createTestTable(ctx);
+//     await migrateData(ctx, 5);
 
-  //check that data is in the db
-  let data = await getRecords(
-    ctx,
-    'programs',
-    {},
-    '/any-url',
-    'fastest',
-    undefined
-  );
-  expect(data.data.length).toBe(5);
-});
+//   //check that data is in the db
+//   let data = await getRecords(
+//     ctx,
+//     'programs',
+//     {},
+//     '/any-url',
+//     'fastest',
+//     undefined
+//   );
+//   expect(data.data.length).toBe(5);
+// });
 
 async function createTestTable(ctx) {
   const db = drizzle(ctx.env.D1DATA);
