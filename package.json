@@ -12,7 +12,7 @@
     "test": "jest --verbose",
     "generate": "drizzle-kit generate:sqlite --schema=./src/db/schema --out=./migrations",
     "up": "wrangler d1 migrations apply sonicjs --local",
-    "up:prod": "wrangler d1 migrations apply sonicjs",
+    "up:prod": "wrangler d1 migrations apply sonicjs --remote",
     "tail": "wrangler pages deployment tail",
     "check": "run-p check:*",
     "check:tsc": "tsc --noEmit",
