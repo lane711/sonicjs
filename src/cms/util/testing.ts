@@ -2,8 +2,9 @@ import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/d1';
 import { createUser } from '../auth/lucia';
 import { getD1DataByTable } from '../data/d1-data';
+import { insertRecord } from '../data/data';
 
-export async function getTestingContext() {
+export function getTestingContext() {
   const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
 
   const toJson = function (json) {
@@ -146,4 +147,13 @@ async function createUserTestTable3(ctx) {
   console.log('creating test table end');
 
   return db;
+}
+
+export async function CreateTestCategory(ctx, title){
+  return await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
+    table: 'categories',
+    data: {
+      title: title
+    }
+  });
 }

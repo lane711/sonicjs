@@ -1,24 +1,12 @@
-import { drizzle } from 'drizzle-orm/d1';
 import app from '../../server';
-import { sql } from 'drizzle-orm';
-import { getD1DataByTable, insertD1Data } from '../data/d1-data';
-import { postData } from '../util/fetch';
+import { insertD1Data } from '../data/d1-data';
 import {
   createCategoriesTestTable1,
   createUserAndGetToken,
-  createUserTestTables
+  getTestingContext
 } from '../util/testing';
-import { createUser } from '../auth/lucia';
-const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
 
-const toJson = function (json) {
-  return json;
-};
-
-const ctx = {
-  env: { KVDATA: KVDATA, D1DATA: __D1_BETA__D1DATA },
-  json: toJson
-};
+const ctx = getTestingContext();
 
 describe('admin should be restricted', () => {
   it('ping should return 200', async () => {
@@ -97,5 +85,4 @@ describe('admin should be restricted', () => {
   //   let usersResponse = await res.json();
   //   expect(usersResponse.data.length).toBe(1);
   // });
-
 });
