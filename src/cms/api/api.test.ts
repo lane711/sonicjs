@@ -157,63 +157,21 @@ describe('auto endpoints', () => {
     expect(d1Result.data[0].id).toBe(testCategory2.data.id);
   });
 
-  //
-  //   it('delete should return 200', async () => {
-  //     //create test record to update
-  //
-  //     const testRecordToUpdate = await insertRecord(__D1_BETA__D1DATA, KVDATA, {
-  //       data: {
-  //         firstName: 'John'
-  //       },
-  //       table: 'users'
-  //     });
-  //
-  //     let req = new Request(
-  //       `http://localhost/v1/users/${testRecordToUpdate.data.id}`,
-  //       {
-  //         method: 'DELETE',
-  //         headers: { 'Content-Type': 'application/json' }
-  //       }
-  //     );
-  //     let res = await app.fetch(req, env);
-  //     expect(res.status).toBe(204);
-  //
-  //     //make sure db was updated
-  //     const ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
-  //     const d1Result = await getRecords(ctx, 'users', undefined, 'urlKey');
-  //
-  //     expect(d1Result.data.length).toBe(0);
-  //   });
-  //
-  //   it('kv text should return results and 200', async () => {
-  //     let req = new Request('http://localhost/v1/kv-test2', {
-  //       method: 'GET',
-  //       headers: { 'Content-Type': 'application/json' }
-  //     });
-  //     let res = await app.fetch(req, env);
-  //     expect(res.status).toBe(200);
-  //     let body = await res.json();
-  //     expect(body.value.source).toBe('kv');
-  //   });
-  // });
-  //
-  // function createTestTable() {
-  //   const db = drizzle(__D1_BETA__D1DATA);
-  //   console.log('creating test table');
-  //   db.run(sql`
-  //     CREATE TABLE users (
-  //       id text PRIMARY KEY NOT NULL,
-  //       firstName text,
-  //       lastName text,
-  //       email text,
-  //       password text,
-  //       role text,
-  //       createdOn integer,
-  //       updatedOn integer
-  //     );
-  // 	`);
-  //
-  //   return db;
-  // }
-  //
+});
+
+describe('filters', () => {
+  it('get should return results and 200', async () => {
+    await createCategoriesTestTable1(ctx);
+    await CreateTestCategory(ctx, 'cat');
+    await CreateTestCategory(ctx, 'dog');
+
+    let req = new Request('http://localhost/v1/categories?filters[title][$eq]=dog', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    let res = await app.fetch(req, ctx.env);
+    expect(res.status).toBe(200);
+    let body = await res.json();
+    expect(body.data.length).toBe(2);
+  });
 });

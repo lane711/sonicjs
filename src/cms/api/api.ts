@@ -40,7 +40,9 @@ tables.forEach((entry) => {
   //ie /v1/users
   api.get(`/${entry.route}`, async (ctx) => {
     const start = Date.now();
-    let { includeContentType, source, ...params } = ctx.req.query();
+    const query = ctx.req.query();
+    const params = qs.parse(query);
+
     if (entry.hooks?.beforeOperation) {
       await entry.hooks.beforeOperation(ctx, 'read', params.id);
     }
@@ -54,7 +56,7 @@ tables.forEach((entry) => {
     );
 
     if (typeof accessControlResult === 'object') {
-      params = { ...params, ...accessControlResult };
+      params.accessControlResult= {...accessControlResult };
     }
 
     if (!accessControlResult) {

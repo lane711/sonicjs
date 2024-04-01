@@ -1,6 +1,7 @@
 import { drizzle } from 'drizzle-orm/d1';
 import { and, eq } from 'drizzle-orm';
 import { tableSchemas } from '../../db/routes';
+var qs = require('qs');
 
 export async function getAllContent(db) {
   const { results } = await db.prepare('SELECT * FROM users').all();
@@ -22,7 +23,7 @@ export function generateSelectSql(table, params) {
   var offsetSyntax = '';
 
   if (params) {
-    let { sortDirection, sortBy, limit, offset, ...filters } = params;
+    let { sortDirection, sortBy, limit, offset, filters } = params;
     sortDirection = sortDirection ?? 'asc';
     // console.log("sortDirection ==>", sortDirection);
 
@@ -34,6 +35,7 @@ export function generateSelectSql(table, params) {
 
     offset = offset ?? 0;
     offsetSyntax = offset > 0 ? `offset ${offset}` : '';
+
     whereClause = whereClauseBuilder(filters);
   }
 
@@ -148,7 +150,7 @@ export function getRepoFromTable(tableName) {
   return tableSchemas[tableName]?.table;
 }
 
-export function whereClauseBuilder(filters: Record<string, any>) {
+export function whereClauseBuilder(filters: any) {
   let whereClause = '';
 
   if (!filters || Object.keys(filters).length === 0) {
@@ -159,16 +161,31 @@ export function whereClauseBuilder(filters: Record<string, any>) {
   whereClause = 'WHERE';
   for (const key of Object.keys(filters)) {
     let filter = filters[key];
-    if (typeof filter === 'string') {
-      if (filter.toLowerCase().includes('is')) {
-        whereClause = `${whereClause} ${AND} ${key} ${filter}`;
-      } else {
-        whereClause = `${whereClause} ${AND} ${key} = '${filter}'`;
-      }
-    } else {
-      whereClause = `${whereClause} ${AND} ${key} = ${filter}`;
-    }
+    let condition = Object.keys(filter);
+    // if (typeof filter === 'string') {
+    //   if (filter.toLowerCase().includes('is')) {
+    //     whereClause = `${whereClause} ${AND} ${key} ${filter}`;
+    //   } else {
+    //     whereClause = `${whereClause} ${AND} ${key} = '${filter}'`;
+    //   }
+    // } else {
+    //   whereClause = `${whereClause} ${AND} ${key} = ${filter}`;
+    // }
+          whereClause = `${whereClause} ${AND} ${key} ${processCondition(condition[0])} "${filter[condition[0]]}"`;
+
+    
     AND = 'AND';
   }
   return whereClause;
+}
+
+export function processCondition(condition) {
+  switch (condition) {
+    case '$eq':
+      return '=';
+      break;
+
+    default:
+      break;
+  }
 }

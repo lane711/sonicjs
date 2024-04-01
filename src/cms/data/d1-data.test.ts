@@ -79,6 +79,16 @@ it('should return a SQL select with limit and offset', () => {
   );
 });
 
+it('should convert filters into where clause', () => {
+  const queryParams = 'limit=2&offset=2&filters[name][$eq]=joe';
+  const params = qs.parse(queryParams);
+  console.log('params ---->', params);
+  const clause = generateSelectSql('my-table', params);
+  expect(clause).toBe(
+    'SELECT *, COUNT() OVER() AS total FROM my-table WHERE name = "joe" limit 2 offset 2;'
+  );
+});
+
 //TODO: rework to hit the full api
 // it('get should return results', async () => {
 //   const db = createTestTable();
