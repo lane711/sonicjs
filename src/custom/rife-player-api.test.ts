@@ -12,7 +12,12 @@ const toJson = function (json) {
 };
 
 const ctx = {
-  env: { KVDATA: KVDATA, D1DATA: __D1_BETA__D1DATA, APIKEY:'123' },
+  env: {
+    KVDATA: KVDATA,
+    D1DATA: __D1_BETA__D1DATA,
+    APIKEY: '123',
+    SENDGRID_API_KEY : 'SG.abc'
+  },
   json: toJson,
   user: { id: 'fromtest' },
   _var: { user: { userId: 'abc123' } }
@@ -51,7 +56,7 @@ it('rp programs', async () => {
 it('contact post should (insert) and should return 204', async () => {
   await createContactTable(ctx);
   let payload = JSON.stringify({
-    data: { firstName: 'Joe' },
+    data: { firstName: 'Joe', email: 'test@test.com' },
     token: ctx.env.APIKEY
   });
   let req = new Request('http://localhost/v2/contact-submit', {

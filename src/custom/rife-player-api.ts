@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { getPrograms } from './rife-player-data';
 import { insertRecord } from '../cms/data/data';
+import { sendMail } from './send-email';
 
 const rifePlayerApi = new Hono();
 
@@ -17,7 +18,7 @@ rifePlayerApi.post('/contact-submit', async (ctx) => {
   const payload = await ctx.req.json();
 
   const token = payload.token;
-  if(token !== ctx.env.APIKEY){
+  if (token !== ctx.env.APIKEY) {
     return ctx.text('Unauthorized', 401);
   }
 
@@ -26,6 +27,14 @@ rifePlayerApi.post('/contact-submit', async (ctx) => {
   const record = await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, payload);
 
   //send email confirmations
+  const html = `Hello ${payload.data.firstName},`;
+  sendMail(
+    ctx,
+    payload.data.email,
+    'lane@rifeplayer.com',
+    'RifePlayer Message Received',
+    html
+  );
 
   return ctx.json(record.data, record.code);
 });
