@@ -1,72 +1,58 @@
-
-// export async function sendMail(ctx, to, from, subject, html) {
-
-//   sgMail.setApiKey(ctx.env.SENDGRID_API_KEY);
-
-
-//   const msg = {
-//     to,
-//     from, 
-//     subject,
-//     html
-//   };
-
-//   sgMail
-//     .send(msg)
-//     .then((response) => {
-//       console.log(response[0].statusCode);
-//       console.log(response[0].headers);
-//     })
-//     .catch((error) => {
-//       console.error(error);
-//     });
-// }
-
-export async function sendEmail(ctx, to, from, subject, html) {
+export async function sendEmail(
+  ctx,
+  to,
+  toName,
+  from,
+  fromName,
+  subject,
+  html
+) {
   const messageBody = {
     from: {
-      email: ctx.env.SENDGRID_EMAIL_SENDER,
-      name: "RifePlayer Message Received",
+      email: from,
+      name: subject
     },
     replyTo: {
-      email: ctx.env.SENDGRID_EMAIL_SENDER,
-      name: ctx.env.SENDGRID_EMAIL_SENDER_NAME,
+      email: from,
+      name: fromName
     },
-    subject: "New message from my website",
+    subject: subject,
     content: [
       {
-        type: "text/html",
-        value: html,
-      },
+        type: 'text/html',
+        value: html
+      }
     ],
     personalizations: [
       {
         from: {
-          email: ctx.env.SENDGRID_EMAIL_SENDER,
-          name: ctx.env.SENDGRID_EMAIL_SENDER_NAME,
+          email: from,
+          name: fromName
         },
         to: [
           {
             email: to,
-            name: "Recipient",
-          },
-        ],
-      },
-    ],
+            name: toName
+          }
+        ]
+      }
+    ]
   };
 
+  console.log('messageBody', messageBody);
 
   try {
-    const email = await fetch("https://api.sendgrid.com/v3/mail/send", {
-      method: "POST",
+    const email = await fetch('https://api.sendgrid.com/v3/mail/send', {
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${ctx.env.SENDGRID_API_KEY}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(messageBody),
+      body: JSON.stringify(messageBody)
     });
     return email;
   } catch (error) {
+    console.log('email error', error);
     return { status: 500, statusText: error };
   }
 }
