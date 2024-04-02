@@ -1,4 +1,3 @@
-const sgMail = require('@sendgrid/mail');
 
 // export async function sendMail(ctx, to, from, subject, html) {
 
