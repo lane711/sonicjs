@@ -16,7 +16,6 @@ const ctx = {
     KVDATA: KVDATA,
     D1DATA: __D1_BETA__D1DATA,
     APIKEY: '123',
-    SENDGRID_API_KEY : 'SG.abc'
   },
   json: toJson,
   user: { id: 'fromtest' },

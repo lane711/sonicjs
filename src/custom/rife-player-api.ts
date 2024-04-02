@@ -31,19 +31,23 @@ rifePlayerApi.post('/contact-submit', async (ctx) => {
 
   if (ctx.env.SENDGRID_ENABLED) {
     //send to visitor
-    sendEmail(
-      ctx,
-      payload.data.email,
-      payload.data.firstName,
-      ctx.env.SENDGRID_EMAIL_SENDER,
-      ctx.env.SENDGRID_EMAIL_SENDER_NAME,
-      'RifePlayer Message Received',
-      html
-    );
+    // sendEmail(
+    //   ctx,
+    //   payload.data.email,
+    //   payload.data.firstName,
+    //   ctx.env.SENDGRID_EMAIL_SENDER,
+    //   ctx.env.SENDGRID_EMAIL_SENDER_NAME,
+    //   payload.data.email,
+    //   payload.data.firstName,
+    //   'RifePlayer Message Received',
+    //   html
+    // );
 
     //send to admin
     sendEmail(
       ctx,
+      ctx.env.SENDGRID_EMAIL_SENDER,
+      ctx.env.SENDGRID_EMAIL_SENDER_NAME,
       ctx.env.SENDGRID_EMAIL_SENDER,
       ctx.env.SENDGRID_EMAIL_SENDER_NAME,
       payload.data.email,

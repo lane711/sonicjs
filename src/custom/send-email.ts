@@ -4,17 +4,19 @@ export async function sendEmail(
   toName,
   from,
   fromName,
+  replyTo,
+  replyToName,
   subject,
   html
 ) {
   const messageBody = {
     from: {
       email: from,
-      name: subject
+      name: fromName
     },
     replyTo: {
-      email: from,
-      name: fromName
+      email: replyTo,
+      name: replyToName
     },
     subject: subject,
     content: [
@@ -39,7 +41,7 @@ export async function sendEmail(
     ]
   };
 
-  console.log('messageBody', messageBody);
+  console.log('messageBody', JSON.stringify(messageBody, null, 4))
 
   try {
     const email = await fetch('https://api.sendgrid.com/v3/mail/send', {
@@ -50,6 +52,8 @@ export async function sendEmail(
       },
       body: JSON.stringify(messageBody)
     });
+    let body = await email.json();
+    console.log('result', JSON.stringify(body, null, 4))
     return email;
   } catch (error) {
     console.log('email error', error);
