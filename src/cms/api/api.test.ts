@@ -156,22 +156,68 @@ describe('auto endpoints', () => {
     expect(d1Result.data.length).toBe(1);
     expect(d1Result.data[0].id).toBe(testCategory2.data.id);
   });
-
 });
 
 describe('filters', () => {
-  it('get should return results and 200', async () => {
+  it('filter should return results and 200', async () => {
     await createCategoriesTestTable1(ctx);
     await CreateTestCategory(ctx, 'cat');
     await CreateTestCategory(ctx, 'dog');
 
-    let req = new Request('http://localhost/v1/categories?filters[title][$eq]=dog', {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
-    });
+    let req = new Request(
+      'http://localhost/v1/categories?filters[title][$eq]=dog',
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
+    let res = await app.fetch(req, ctx.env);
+    expect(res.status).toBe(200);
+    let body = await res.json();
+    expect(body.data.length).toBe(1);
+    expect(body.data[0].title).toBe('dog');
+  });
+
+  it('filter should return results and 200', async () => {
+    await createCategoriesTestTable1(ctx);
+    await CreateTestCategory(ctx, 'cat');
+    await CreateTestCategory(ctx, 'dog');
+    await CreateTestCategory(ctx, 'dog');
+
+
+    let req = new Request(
+      'http://localhost/v1/categories?filters[title][$eq]=dog',
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
     let res = await app.fetch(req, ctx.env);
     expect(res.status).toBe(200);
     let body = await res.json();
     expect(body.data.length).toBe(2);
+    expect(body.data[0].title).toBe('dog');
+    expect(body.data[1].title).toBe('dog');
   });
+
+  it('filter with 2 conditions should return results and 200', async () => {
+    await createCategoriesTestTable1(ctx);
+    await CreateTestCategory(ctx, 'dog', 'be the person your dog thinks you are');
+
+
+    let req = new Request(
+      'http://localhost/v1/categories?filters[title][$eq]=dog&filters[body][$eq]=be+the+person+your+dog+thinks+you+are',
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
+    let res = await app.fetch(req, ctx.env);
+    expect(res.status).toBe(200);
+    let body = await res.json();
+    expect(body.data.length).toBe(1);
+    expect(body.data[0].title).toBe('dog');
+    expect(body.data[0].body).toBe('be the person your dog thinks you are');
+  });
+
 });

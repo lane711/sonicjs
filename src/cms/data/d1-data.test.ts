@@ -85,7 +85,17 @@ it('should convert filters into where clause', () => {
   console.log('params ---->', params);
   const clause = generateSelectSql('my-table', params);
   expect(clause).toBe(
-    'SELECT *, COUNT() OVER() AS total FROM my-table WHERE name = "joe" limit 2 offset 2;'
+    `SELECT *, COUNT() OVER() AS total FROM my-table WHERE name = 'joe' limit 2 offset 2;`
+  );
+});
+
+it('should convert filters into where clause', () => {
+  const queryParams = 'limit=2&offset=2&filters[name][$eq]=joe&filters[country][$eq]=usa';
+  const params = qs.parse(queryParams);
+  console.log('params ---->', params);
+  const clause = generateSelectSql('my-table', params);
+  expect(clause).toBe(
+    `SELECT *, COUNT() OVER() AS total FROM my-table WHERE name = 'joe' AND country = 'usa' limit 2 offset 2;`
   );
 });
 

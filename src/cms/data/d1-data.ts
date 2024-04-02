@@ -161,7 +161,7 @@ export function whereClauseBuilder(filters: any) {
   whereClause = 'WHERE';
   for (const key of Object.keys(filters)) {
     let filter = filters[key];
-    let condition = Object.keys(filter);
+    let condition = Object.keys(filter)[0];
     // if (typeof filter === 'string') {
     //   if (filter.toLowerCase().includes('is')) {
     //     whereClause = `${whereClause} ${AND} ${key} ${filter}`;
@@ -171,7 +171,7 @@ export function whereClauseBuilder(filters: any) {
     // } else {
     //   whereClause = `${whereClause} ${AND} ${key} = ${filter}`;
     // }
-          whereClause = `${whereClause} ${AND} ${key} ${processCondition(condition[0])} "${filter[condition[0]]}"`;
+          whereClause = `${whereClause} ${AND} ${key} ${processCondition(condition)} '${filter[condition]}'`;
 
     
     AND = 'AND';
