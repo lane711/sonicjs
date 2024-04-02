@@ -22,7 +22,9 @@ export function generateSelectSql(table, params) {
   var limitSyntax: string = '';
   var offsetSyntax = '';
 
-  if (params) {
+  if (params && params.id) {
+    whereClause = `WHERE id = '${params.id}'`;
+  } else if (params) {
     let { sortDirection, sortBy, limit, offset, filters } = params;
     sortDirection = sortDirection ?? 'asc';
     // console.log("sortDirection ==>", sortDirection);
@@ -171,9 +173,10 @@ export function whereClauseBuilder(filters: any) {
     // } else {
     //   whereClause = `${whereClause} ${AND} ${key} = ${filter}`;
     // }
-          whereClause = `${whereClause} ${AND} ${key} ${processCondition(condition)} '${filter[condition]}'`;
+    whereClause = `${whereClause} ${AND} ${key} ${processCondition(
+      condition
+    )} '${filter[condition]}'`;
 
-    
     AND = 'AND';
   }
   return whereClause;
