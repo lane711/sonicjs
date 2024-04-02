@@ -38,7 +38,6 @@
   },
   "dependencies": {
     "@lucia-auth/adapter-sqlite": "^2.0.0",
-    "@sendgrid/mail": "^8.1.3",
     "@tussle/core": "^0.7.0",
     "@tussle/middleware-cloudflareworker": "^0.7.3",
     "@tussle/state-memory": "^0.7.1",
