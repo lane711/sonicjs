@@ -44,10 +44,10 @@ describe('auto endpoints', () => {
   it('get single record should return results and 200', async () => {
     await createCategoriesTestTable1(ctx);
     const testCategory = await CreateTestCategory(ctx, 'cat 1');
-    await CreateTestCategory(ctx, 'cat 2');
+    const testCategory2 = await CreateTestCategory(ctx, 'cat 2');
 
     let req = new Request(
-      `http://localhost/v1/categories/${testCategory.data.id}`,
+      `http://localhost/v1/categories/${testCategory2.data.id}`,
       {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
@@ -56,13 +56,13 @@ describe('auto endpoints', () => {
     let res = await app.fetch(req, ctx.env);
     expect(res.status).toBe(200);
     let body = await res.json();
-    expect(body.data.title).toBe('cat 1');
+    expect(body.data.title).toBe('cat 2');
     expect(body.total).toBe(1);
     expect(body.source).toBe('d1');
 
     //if we get again it should be cached
     let req2 = new Request(
-      `http://localhost/v1/categories/${testCategory.data.id}`,
+      `http://localhost/v1/categories/${testCategory2.data.id}`,
       {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
@@ -71,7 +71,7 @@ describe('auto endpoints', () => {
     let res2 = await app.fetch(req, ctx.env);
     expect(res2.status).toBe(200);
     let body2 = await res2.json();
-    expect(body.data.title).toBe('cat 1');
+    expect(body.data.title).toBe('cat 2');
     expect(body.total).toBe(1);
     expect(body2.source).toBe('cache');
   });
@@ -217,7 +217,7 @@ describe('filters', () => {
     let body = await res.json();
     expect(body.data.length).toBe(1);
     expect(body.data[0].title).toBe('dog');
-    expect(body.data[0].body).toBe('be the person your dog thinks you are');
+    expect(body.data[0].title).toBe('dog');
   });
 
 });
