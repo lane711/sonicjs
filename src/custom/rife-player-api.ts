@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { getPrograms } from './rife-player-data';
 import { insertRecord } from '../cms/data/data';
-import { sendMail } from './send-email';
+import { sendEmail } from './send-email';
 
 const rifePlayerApi = new Hono();
 
@@ -28,7 +28,7 @@ rifePlayerApi.post('/contact-submit', async (ctx) => {
 
   //send email confirmations
   const html = `Hello ${payload.data.firstName},`;
-  sendMail(
+  sendEmail(
     ctx,
     payload.data.email,
     'lane@rifeplayer.com',
