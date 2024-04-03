@@ -8,6 +8,9 @@ export const Login = (props: {
     <html lang='en' data-bs-theme='auto'>
       <Head />
       <body>
+        <button class='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>
+          Button
+        </button>
         <ToggleTheme />
         <header class='navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow'>
           <a
