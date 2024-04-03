@@ -1,47 +1,39 @@
 export async function sendEmail(
   ctx,
-  to,
+  toEmail,
   toName,
-  from,
+  fromEmail,
   fromName,
-  replyTo,
+  replyToEmail,
   replyToName,
   subject,
   html
 ) {
-  const messageBody = {
-    from: {
-      email: from,
-      name: fromName
-    },
-    replyTo: {
-      email: replyTo,
-      name: replyToName
-    },
-    subject: subject,
-    content: [
-      {
-        type: 'text/html',
-        value: html
-      }
-    ],
+
+  const example = {
     personalizations: [
       {
-        from: {
-          email: from,
-          name: fromName
-        },
-        to: [
-          {
-            email: to,
-            name: toName
-          }
-        ]
+        to: [{ email: 'john.doe@example.com', name: 'John Doe' }],
+        subject: 'Hello, World!'
       }
-    ]
+    ],
+    content: [{ type: 'text/plain', value: 'Heya!' }],
+    from: { email: 'sam.smith@example.com', name: 'Sam Smith' },
+    reply_to: { email: 'sam.smith@example.com', name: 'Sam Smith' }
   };
 
-  console.log('messageBody', JSON.stringify(messageBody, null, 4))
+  const messageBody = {
+    personalizations: [{ to: [{ email: toEmail }] }],
+    from: {
+      email: fromEmail,
+      name: fromName
+    },
+    reply_to: { email: replyToEmail, name: replyToName },
+    subject: subject,
+    content: [{ type: 'text/html', value: html }]
+  };
+
+  console.log('messageBody', JSON.stringify(messageBody, null, 4));
 
   try {
     const email = await fetch('https://api.sendgrid.com/v3/mail/send', {
@@ -53,7 +45,7 @@ export async function sendEmail(
       body: JSON.stringify(messageBody)
     });
     let body = await email.json();
-    console.log('result', JSON.stringify(body, null, 4))
+    console.log('result', JSON.stringify(body, null, 4));
     return email;
   } catch (error) {
     console.log('email error', error);

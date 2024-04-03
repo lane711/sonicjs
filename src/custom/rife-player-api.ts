@@ -27,31 +27,34 @@ rifePlayerApi.post('/contact-submit', async (ctx) => {
   const record = await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, payload);
 
   //send email confirmations
-  const html = `Hello ${payload.data.firstName},`;
+  const fullName = payload.data.lastName ? `${payload.data.firstName} ${payload.data.lastName}` : payload.data.firstName;
+  const messageHtml = payload.data.message.replace(/(?:\r\n|\r|\n)/g, '<br>');
+  const html = `<p>Hello ${payload.data.firstName},<p>Thanks for reaching out. We will get back to you asap.</p>
+  <p>For your reference, your message was:</p><p><hr></p><p>${fullName}:</p><p>${messageHtml}</p><p><hr></p><p>Thank you,<br>RifePlayer Support</p>`;
 
-  if (ctx.env.SENDGRID_ENABLED) {
+  if (ctx.env.SENDGRID_ENABLED === true) {
     //send to visitor
-    // sendEmail(
-    //   ctx,
-    //   payload.data.email,
-    //   payload.data.firstName,
-    //   ctx.env.SENDGRID_EMAIL_SENDER,
-    //   ctx.env.SENDGRID_EMAIL_SENDER_NAME,
-    //   payload.data.email,
-    //   payload.data.firstName,
-    //   'RifePlayer Message Received',
-    //   html
-    // );
+    sendEmail(
+      ctx,
+      payload.data.email,
+      payload.data.firstName,
+      ctx.env.SENDGRID_EMAIL_SENDER,
+      ctx.env.SENDGRID_EMAIL_SENDER_NAME,
+      payload.data.email,
+      payload.data.firstName,
+      'RifePlayer Message Received',
+      html
+    );
 
     //send to admin
-    sendEmail(
+    await sendEmail(
       ctx,
       ctx.env.SENDGRID_EMAIL_SENDER,
       ctx.env.SENDGRID_EMAIL_SENDER_NAME,
       ctx.env.SENDGRID_EMAIL_SENDER,
       ctx.env.SENDGRID_EMAIL_SENDER_NAME,
       payload.data.email,
-      payload.data.firstName,
+      fullName,
       'RifePlayer Message Received',
       html
     );

@@ -16,6 +16,11 @@ const ctx = {
     KVDATA: KVDATA,
     D1DATA: __D1_BETA__D1DATA,
     APIKEY: '123',
+    SENDGRID_API_KEY:
+      'SG.abc',
+    SENDGRID_EMAIL_SENDER: 'joe@test.com',
+    SENDGRID_EMAIL_SENDER_NAME: 'John @ Test',
+    SENDGRID_ENABLED: false
   },
   json: toJson,
   user: { id: 'fromtest' },
@@ -55,7 +60,12 @@ it('rp programs', async () => {
 it('contact post should (insert) and should return 204', async () => {
   await createContactTable(ctx);
   let payload = JSON.stringify({
-    data: { firstName: 'Joe', email: 'test@test.com' },
+    data: {
+      firstName: 'Joe',
+      lastName: 'Smith',
+      email: 'test@test.com',
+      message: `line one\r\nline two I'd be good`
+    },
     token: ctx.env.APIKEY
   });
   let req = new Request('http://localhost/v2/contact-submit', {
