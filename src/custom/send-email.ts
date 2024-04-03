@@ -10,6 +10,9 @@ export async function sendEmail(
   html
 ) {
 
+
+  // "{\n    \"personalizations\": [\n        {\n            \"to\": [\n                {\n                    \"email\": \"lane@rifeplayer.com\"\n                }\n            ]\n        }\n    ],\n    \"from\": {\n        \"email\": \"lane@rifeplayer.com\",\n        \"name\": \"Lane @ RifePlayer\"\n    },\n    \"reply_to\": {\n        \"email\": \"ldc0618@gmail.com\",\n        \"name\": \"Lane Campbell\"\n    },\n    \"subject\": \"RifePlayer Message Received\",\n    \"content\": [\n        {\n            \"type\": \"text/html\",\n            \"value\": \"<p>Hello Lane,<p>Thanks for reaching out. We will get back to you asap.</p>\\n  <p>For your reference, your message was:</p><p><hr></p><p>Lane Campbell:</p><p>f<br>asdf<br>adsf</p><p><hr></p><p>Thank you,<br>RifePlayer Support</p>\"\n        }\n    ]\n}
+
   const example = {
     personalizations: [
       {
