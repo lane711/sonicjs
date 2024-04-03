@@ -32,7 +32,7 @@ rifePlayerApi.post('/contact-submit', async (ctx) => {
   const html = `<p>Hello ${payload.data.firstName},<p>Thanks for reaching out. We will get back to you asap.</p>
   <p>For your reference, your message was:</p><p><hr></p><p>${fullName}:</p><p>${messageHtml}</p><p><hr></p><p>Thank you,<br>RifePlayer Support</p>`;
 
-  if (ctx.env.SENDGRID_ENABLED === true) {
+  if (ctx.env.SENDGRID_ENABLED === true || ctx.env.SENDGRID_ENABLED === 'true') {
     //send to visitor
     sendEmail(
       ctx,
