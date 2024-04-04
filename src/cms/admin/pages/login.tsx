@@ -1,5 +1,5 @@
-import { Script, ToggleTheme } from '../theme';
-import { LoginWrapper, Head } from '../theme-tailwind';
+import { ToggleTheme } from '../theme';
+import { LoginWrapper, Script, Head, ThemeToggle } from '../theme-tailwind';
 export const Login = (props: {
   children?: string;
   screenTitle?: string;
@@ -13,10 +13,13 @@ export const Login = (props: {
           screenTitle={props.screenTitle}
           errorTitle='login-errors'
           formTitle='formio-login'
+          loginScreenTitle='SonicJS'
+          loginScreenIntro='Welcome to the Admin Panel'
         >
           <DemoCredentials
             showDemoCredentials={props.showDemoCredentials}
           ></DemoCredentials>
+          <ThemeToggle />
         </LoginWrapper>
       </body>
     </html>

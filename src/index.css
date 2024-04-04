@@ -20,3 +20,140 @@
     @apply bg-amber-500 w-full hover:bg-amber-500/50 text-black tracking-wider font-bold py-2 px-4 rounded;
   }
 }
+
+:root {
+  --hue: 223;
+  --bg: hsl(var(--hue), 10%, 90%);
+  --fg: hsl(var(--hue), 10%, 10%);
+  --primary: hsl(var(--hue), 90%, 50%);
+  --trans-dur: 0.3s;
+  --trans-timing: cubic-bezier(0.76, 0.05, 0.24, 0.95);
+  --trans-timing-in: cubic-bezier(0.76, 0.05, 0.86, 0.06);
+  --trans-timing-out: cubic-bezier(0.05, 0.76, 0.06, 0.86);
+}
+
+.switch {
+  bottom: 3rem;
+  left: calc(16% - 50px);
+  margin: auto;
+  position: absolute;
+  cursor: pointer;
+}
+.switch__icon,
+.switch__input {
+  display: block;
+}
+.switch__icon {
+  position: absolute;
+  top: 0.375em;
+  right: 0.375em;
+  width: 0.75em;
+  height: 0.75em;
+  transition:
+    opacity calc(var(--trans-dur) / 2),
+    transform calc(var(--trans-dur) / 2);
+}
+.switch__icon polyline {
+  transition: stroke-dashoffset calc(var(--trans-dur) / 2);
+}
+.switch__icon--light,
+.switch__icon--light polyline {
+  transition-delay: calc(var(--trans-dur) / 2);
+  transition-timing-function: var(--trans-timing-out);
+}
+.switch__icon--dark {
+  opacity: 0;
+  transform: translateX(-0.75em) rotate(30deg) scale(0.75);
+  transition-timing-function: var(--trans-timing-in);
+}
+.switch__input {
+  background-color: hsl(210, 90%, 70%);
+  border-radius: 0.75em;
+  box-shadow:
+    0 0 0 0.125em hsla(var(--hue), 90%, 50%, 0),
+    0.125em 0.125em 0.25em hsla(var(--hue), 90%, 10%, 0.2);
+  outline: transparent;
+  position: relative;
+  width: 3em;
+  height: 1.5em;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--trans-dur) var(--trans-timing),
+    box-shadow 0.15s linear;
+}
+.switch__input:focus-visible {
+  box-shadow:
+    0 0 0 0.125em hsl(var(--hue), 90%, 50%),
+    0.125em 0.125em 0.25em hsla(var(--hue), 90%, 10%, 0.2);
+}
+.switch__input:before,
+.switch__input:after {
+  content: "";
+  display: block;
+  position: absolute;
+}
+.switch__input:before {
+  background-color: hsl(50, 90%, 50%);
+  border-radius: inherit;
+  mask-image: linear-gradient(
+    120deg,
+    hsl(0, 0%, 0%) 20%,
+    hsla(0, 0%, 0%, 0) 80%
+  );
+  -webkit-mask-image: linear-gradient(
+    120deg,
+    hsl(0, 0%, 0%) 20%,
+    hsla(0, 0%, 0%, 0) 80%
+  );
+  inset: 0;
+  transition: background-color var(--trans-dur) var(--trans-timing);
+}
+.switch__input:after {
+  background-color: hsl(0, 0%, 100%);
+  border-radius: 50%;
+  box-shadow: 0.05em 0.05em 0.05em hsla(var(--hue), 90%, 10%, 0.1);
+  top: 0.125em;
+  left: 0.125em;
+  width: 1.25em;
+  height: 1.25em;
+  transition:
+    background-color var(--trans-dur) var(--trans-timing),
+    transform var(--trans-dur) var(--trans-timing);
+  z-index: 1;
+}
+.switch__input:checked {
+  background-color: hsl(290, 90%, 40%);
+}
+.switch__input:checked:before {
+  background-color: hsl(220, 90%, 40%);
+}
+.switch__input:checked:after {
+  background-color: hsl(0, 0%, 0%);
+  transform: translateX(1.5em);
+}
+.switch__input:checked ~ .switch__icon--light,
+.switch__input:checked ~ .switch__icon--light polyline {
+  transition-delay: 0s;
+  transition-timing-function: var(--trans-timing-in);
+}
+.switch__input:checked ~ .switch__icon--light {
+  opacity: 0;
+  transform: translateX(-0.75em) rotate(-30deg) scale(0.75);
+}
+.switch__input:checked ~ .switch__icon--light polyline {
+  stroke-dashoffset: 1.5;
+}
+.switch__input:checked ~ .switch__icon--dark {
+  opacity: 1;
+  transform: translateX(-1.5em);
+  transition-delay: calc(var(--trans-dur) / 2);
+  transition-timing-function: var(--trans-timing-out);
+}
+.switch__sr {
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+}
