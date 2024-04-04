@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.grid-teste {
+  grid-template-columns: 1fr 2.5fr;
+}
+
+.login-form {
+  .col-form-label {
+    @apply block mb-2;
+  }
+  .form-group {
+    @apply mb-6;
+  }
+  .form-control {
+    @apply w-full border border-neutral-600 border-2 focus:border-dotted rounded p-2;
+  }
+  button[type="submit"] {
+    @apply bg-amber-500 w-full hover:bg-amber-500/50 text-black tracking-wider font-bold py-2 px-4 rounded;
+  }
+}

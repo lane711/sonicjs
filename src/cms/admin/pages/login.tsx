@@ -1,4 +1,5 @@
-import { Head, Script, ToggleTheme } from '../theme';
+import { Script, ToggleTheme } from '../theme';
+import { LoginWrapper, Head } from '../theme-tailwind';
 export const Login = (props: {
   children?: string;
   screenTitle?: string;
@@ -8,35 +9,15 @@ export const Login = (props: {
     <html lang='en' data-bs-theme='auto'>
       <Head />
       <body>
-        <button class='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>
-          Button
-        </button>
-        <ToggleTheme />
-        <header class='navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow'>
-          <a
-            class='navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6'
-            href='/admin'
-          >
-            <img class='logo' src='/public/images/sonicjs-logo.svg' />
-          </a>
-          <h1 class='h2 px-3 me-auto'>{props.screenTitle}</h1>
-        </header>
-
-        <div class='container-fluid'>
-          <div class='row'>
-            <main class='col-4 offset-4 px-md-4 py-md-5'>
-              <h1>Login</h1>
-              <DemoCredentials
-                showDemoCredentials={props.showDemoCredentials}
-              ></DemoCredentials>
-              <p class='text-danger' id='login-errors'></p>
-              <form id='formio-login'></form>
-              {props.children}
-            </main>
-          </div>
-        </div>
-
-        <Script />
+        <LoginWrapper
+          screenTitle={props.screenTitle}
+          errorTitle='login-errors'
+          formTitle='formio-login'
+        >
+          <DemoCredentials
+            showDemoCredentials={props.showDemoCredentials}
+          ></DemoCredentials>
+        </LoginWrapper>
       </body>
     </html>
   );
@@ -45,7 +26,10 @@ export const Login = (props: {
 export const DemoCredentials = (props: { showDemoCredentials?: boolean }) => {
   if (props.showDemoCredentials) {
     return (
-      <div class='alert alert-primary d-flex align-items-center' role='alert'>
+      <div
+        class='border-2 border-neutral-600 flex p-5 mt-10 rounded bg-slate-100'
+        role='alert'
+      >
         <svg
           xmlns='http://www.w3.org/2000/svg'
           width='24'
@@ -85,32 +69,11 @@ export const Setup = (props: { children?: string; screenTitle?: string }) => {
     <html lang='en' data-bs-theme='auto'>
       <Head />
       <body>
-        <ToggleTheme />
-        <header class='navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow'>
-          <a
-            class='navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6'
-            href='/admin'
-          >
-            <img class='logo' src='/public/images/sonicjs-logo.svg' />
-          </a>
-          <h1 class='h2 px-3 me-auto'>{props.screenTitle}</h1>
-        </header>
-
-        <div class='container-fluid'>
-          <div class='row'>
-            <main class='col-6 offset-3 px-md-4 py-md-4'>
-              <h2>Welcome to SonicJS!</h2>
-              <h3>Setup your admin user to get started.</h3>
-
-              <p class='text-danger' id='setup-errors'></p>
-
-              <form id='formio-setup'></form>
-              {props.children}
-            </main>
-          </div>
-        </div>
-
-        <Script />
+        <LoginWrapper
+          screenTitle={props.screenTitle}
+          errorTitle='setup-errors'
+          formTitle='formio-setup'
+        />
       </body>
     </html>
   );

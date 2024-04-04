@@ -7,6 +7,7 @@
     "dev": "run-p dev:*",
     "dev:wrangler": "wrangler pages dev dist --env development --port 8786",
     "dev:esbuild": "node ./src/cms/util/build.mjs",
+    "dev:tailwind": "tailwindcss -i ./src/index.css -o ./public/css/tailwind.css --watch",
     "build": "node ./src/cms/util/build.mjs",
     "deploy": "wrangler pages deploy dist",
     "test": "jest --verbose",

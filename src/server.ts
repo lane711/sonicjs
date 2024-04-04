@@ -1,6 +1,5 @@
 import { Context, Hono, Next } from 'hono';
 import { cors } from 'hono/cors';
-
 import { api } from './cms/api/api';
 import { authAPI } from './cms/admin/auth';
 import { Bindings } from './cms/types/bindings';
