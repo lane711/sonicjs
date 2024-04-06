@@ -346,7 +346,7 @@ export async function login<T extends string>(args: LuciaAPIArgs<T>) {
         status: 400
       });
     }
-    console.log(new Error(e.message, { cause: e }));
+    console.error(new Error('login ' + e.message, { cause: e }));
     return new Response('An unknown error occurred', {
       status: 500
     });
@@ -367,6 +367,7 @@ export async function logout<T extends string>(ctx: LuciaAPIArgs<T>['ctx']) {
     }
     return ctx.redirect('/admin/login');
   } catch (e) {
+    console.error(new Error('logout ' + e.message, { cause: e }));
     return new Response('An unknown error occurred', {
       status: 500
     });

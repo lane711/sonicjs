@@ -209,4 +209,13 @@ html[data-bs-theme="dark"] .btn-warning {
   --bs-btn-disabled-color: #000;
   --bs-btn-disabled-bg: #4d3b00;
   --bs-btn-disabled-border-color: #4d3b00;
+  color: #dee2e6;
+}
+.datagrid-table .formio-component-container div[ref="nested-container"] {
+  margin-top: 0;
+}
+.formio-component-container div[ref="nested-container"] {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
 }

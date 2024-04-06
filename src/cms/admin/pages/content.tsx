@@ -282,6 +282,46 @@ function editScript() {
   return console.log('hello');
 }
 
+export const RelationModal = () => {
+  return (
+    <div
+      class='modal fade'
+      id='relationModal'
+      tabindex={-1}
+      aria-labelledby='relationModalLabel'
+      aria-hidden='true'
+    >
+      <div class='modal-dialog'>
+        <div class='modal-content'>
+          <div class='modal-header'>
+            <h1 class='modal-title fs-5' id='relationModalLabel'>
+              Relation Modal
+            </h1>
+            <button
+              type='button'
+              class='btn-close'
+              data-bs-dismiss='modal'
+              aria-label='Close'
+            ></button>
+          </div>
+          <div class='modal-body'>
+            <div id='relationGrid'></div>
+          </div>
+          <div class='modal-footer'>
+            <button
+              type='button'
+              class='btn btn-secondary'
+              data-bs-dismiss='modal'
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const FileModal = () => {
   return (
     <div
@@ -390,6 +430,7 @@ export const ContentEditForm = (props: {
     >
       <div id='formio' data-id={props.contentId} data-route={props.route}></div>
       <FileModal />
+      <RelationModal />
     </Layout>
   );
 };
@@ -408,6 +449,7 @@ export const ContentNewForm = (props: {
     >
       <div id='formio' data-route={props.route}></div>
       <FileModal />
+      <RelationModal />
     </Layout>
   );
 };

@@ -32,13 +32,9 @@ export async function loadApis(ctx) {
 
   await Promise.all(
     tables.map(async (schema) => {
-      const results = await getD1DataByTable(
-        ctx.env.D1DATA,
-        schema.table,
-        {
-          limit: 1
-        }
-      );
+      const results = await getD1DataByTable(ctx.env.D1DATA, schema.table, {
+        limit: 1
+      });
       if (results.length) {
         let link: link = {
           url: `/v1/${schema.route}/${results[0].id}`,

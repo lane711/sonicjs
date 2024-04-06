@@ -90,7 +90,8 @@ it('should convert filters into where clause', () => {
 });
 
 it('should convert filters into where clause', () => {
-  const queryParams = 'limit=2&offset=2&filters[name][$eq]=joe&filters[country][$eq]=usa';
+  const queryParams =
+    'limit=2&offset=2&filters[name][$eq]=joe&filters[country][$eq]=usa';
   const params = qs.parse(queryParams);
   console.log('params ---->', params);
   const clause = generateSelectSql('my-table', params);

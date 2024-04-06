@@ -10,6 +10,7 @@ export async function getAllContent(db) {
 
 export async function getD1DataByTable(db, table, params) {
   const sql = generateSelectSql(table, params);
+
   const { results } = await db.prepare(sql).all();
   return params?.id ? results[0] : results;
 }
@@ -144,11 +145,18 @@ export async function updateD1Data(
   return { id } ?? result;
 }
 
-export function getSchemaFromTable(tableName) {
+export function getSchemaFromTable(tableName: keyof typeof tableSchemas) {
   return tableSchemas[tableName]?.definition;
 }
 
-export function getRepoFromTable(tableName) {
+export function getRelationsFromTable(tableName: keyof typeof tableSchemas) {
+  const schema = tableSchemas[tableName];
+  if ('relation' in schema && schema?.relation) {
+    return schema.relation;
+  }
+}
+
+export function getRepoFromTable(tableName: keyof typeof tableSchemas) {
   return tableSchemas[tableName]?.table;
 }
 

@@ -61,7 +61,48 @@ async function initUppy(id) {
   });
   return uppy;
 }
+let relationModal;
+async function pickRelationEventHandler(event, cb) {
+  const table = event.component.attributes['data-table'];
 
+  if (table) {
+    const grid = document.getElementById('relationGrid');
+    grid.innerHTML = '';
+    if (!relationModal) {
+      grid.addEventListener('click', function (e) {
+        if (!e.target.closest('.delete-btn') && !e.target.closest('a')) {
+          let element = e.target;
+          while (element && element.tagName !== 'TR') {
+            element = element.parentElement;
+          }
+          if (element) {
+            const deleteBtn = element.querySelector('.delete-btn');
+            if (deleteBtn) {
+              const itemId = deleteBtn.getAttribute('data-delete-id');
+              const displayText = element.querySelector(
+                '[data-column-id=record]'
+              ).innerText;
+              cb(itemId, displayText);
+            }
+          }
+        }
+      });
+    }
+    relationModal = relationModal || new bootstrap.Modal('#relationModal');
+    grid.setAttribute('data-route', table);
+    window.setupGrid(grid, {
+      style: {
+        td: {
+          cursor: 'pointer'
+        }
+      },
+      className: {
+        table: 'table table-striped table-hover'
+      }
+    });
+    relationModal.show();
+  }
+}
 function chooseFileEventHandler(uppy, event) {
   if (uppy) {
     let field = event.component.attributes['data-field'];
@@ -141,15 +182,97 @@ async function pickFileEventHandler(cb) {
     fileModal.show();
   }
 }
-
-function setupComponents(data) {
-  const fileFields = data.filter(
+function lookupRelations(relationLookups, form) {
+  for (let i = 0; i < relationLookups.length; i++) {
+    const relationLookup = relationLookups[i];
+    axios.get(relationLookup[0]).then((resp) => {
+      const item = resp.data.data;
+      const display = item.name ?? item.title ?? item.firstName ?? item.id;
+      form.getComponent(relationLookup[1]).setValue(display);
+    });
+  }
+}
+function setupComponents(contentType, data) {
+  const relationLookups = [];
+  const fileFields = contentType.filter(
     (c) => c.metaType === 'file' || c.metaType === 'file[]'
   );
   return {
+    relationLookups,
     fileFields,
-    contentType: data.reduce((acc, c) => {
-      if (c.metaType == 'file') {
+    contentType: contentType.reduce((acc, c) => {
+      if (c.relation?.table && !c.disabled) {
+        if (data) {
+          const valueId = data[c.key];
+          console.log('valueId', valueId);
+          relationLookups.push([
+            `/v1/${c.relation.table}/${valueId}`,
+            `${c.key}RelationDisplay`
+          ]);
+          axios.get(`/v1/${c.relation.table}/${valueId}`).then((resp) => {
+            console.log(resp.data);
+          });
+        }
+        acc.push(
+          {
+            ...c,
+            hidden: true,
+            disabled: true
+          },
+          {
+            ...c,
+            key: `${c.key}RelationDisplay`,
+            label: singularize(c.relation.table),
+            type: 'textfield',
+            action: 'event',
+            disabled: true
+          },
+          {
+            type: 'container',
+            components: [
+              {
+                ...c,
+                key: undefined,
+                attributes: {
+                  'data-table': c.relation.table,
+                  'data-field': c.key,
+                  key: 'relation'
+                },
+                label: `Pick ${singularize(c.relation.table)}`,
+                type: 'button',
+                action: 'event',
+                theme: 'info'
+              },
+              {
+                ...c,
+                key: undefined,
+                attributes: {
+                  'data-table': c.relation.table,
+                  'data-field': c.key,
+                  key: 'resetRelation'
+                },
+                label: `Reset ${singularize(c.relation.table)}`,
+                type: 'button',
+                action: 'event',
+                theme: 'warning'
+              },
+              {
+                ...c,
+                key: undefined,
+                attributes: {
+                  'data-table': c.relation.table,
+                  'data-field': c.key,
+                  key: 'removeRelation'
+                },
+                label: `Unlink ${singularize(c.relation.table)}`,
+                type: 'button',
+                action: 'event',
+                theme: 'danger'
+              }
+            ]
+          }
+        );
+      } else if (c.metaType == 'file') {
         acc.push({
           ...c,
           disabled: true
@@ -164,7 +287,7 @@ function setupComponents(data) {
           label: 'Upload File',
           type: 'button',
           action: 'event',
-          theme: 'secondary',
+          theme: 'success',
           readOnly: true
         });
         acc.push({
@@ -177,7 +300,7 @@ function setupComponents(data) {
           label: 'Pick Existing',
           type: 'button',
           action: 'event',
-          theme: 'secondary',
+          theme: 'info',
           readOnly: true
         });
       } else if (c.metaType == 'file[]') {
@@ -194,16 +317,34 @@ function setupComponents(data) {
             },
             {
               key: undefined,
-              label: 'Upload File',
-              attributes: {
-                'data-field': c.key,
-                array: true,
-                key: 'upload'
-              },
-              type: 'button',
-              action: 'event',
-              theme: 'secondary',
-              readOnly: true
+              type: 'container',
+              components: [
+                {
+                  key: undefined,
+                  label: 'Upload File',
+                  attributes: {
+                    'data-field': c.key,
+                    array: true,
+                    key: 'upload'
+                  },
+                  type: 'button',
+                  action: 'event',
+                  theme: 'success',
+                  readOnly: true
+                },
+                {
+                  key: undefined,
+                  attributes: {
+                    'data-field': c.key,
+                    key: 'pick'
+                  },
+                  label: 'Pick Existing',
+                  type: 'button',
+                  action: 'event',
+                  theme: 'info',
+                  readOnly: true
+                }
+              ]
             }
           ]
         });
@@ -228,6 +369,14 @@ function handleSubmitData(data) {
       data[key] = null;
     }
   });
+
+  // remove display fields
+  data = Object.fromEntries(
+    Object.entries(data).filter(
+      ([key, value]) => !key.endsWith('RelationDisplay')
+    )
+  );
+
   return data;
 }
 function getFilePreviewElement(url, isImage, i, field) {
@@ -313,46 +462,6 @@ const addPreviewElement = (value, element, i, field) => {
     );
   }
 };
-function setupPickExistingButton(fileFields, form) {
-  if (fileFields.length) {
-    for (const field of fileFields) {
-      const component = form.getComponent(field.key);
-      const element = component?.element;
-
-      const trs = element.querySelectorAll('tr');
-      if (trs.length) {
-        for (let i = 0; i < trs.length; i++) {
-          const tr = trs[i + 1];
-          if (tr) {
-            const button = tr.querySelector(
-              `button[data-field='${field.key}']`
-            );
-            const pickBtn = tr.querySelector('.btn-pick-existing');
-            if (button && !pickBtn) {
-              const td = tr.querySelector('td');
-              const newBtn = button.cloneNode();
-              newBtn.classList.add('btn-pick-existing');
-              newBtn.innerText = 'Pick Existing';
-              newBtn.style = 'margin-left: 5px';
-              newBtn.addEventListener('click', () => {
-                pickFileEventHandler((v) => {
-                  const input = td.querySelector('input');
-                  const textComponents = component.components.filter(
-                    (c) => c.type === 'textfield'
-                  );
-                  textComponents[i].setValue(v);
-                  addPreviewElement(v, input, i, field.key);
-                  fileModal.hide();
-                });
-              });
-              button.insertAdjacentElement('afterend', newBtn);
-            }
-          }
-        }
-      }
-    }
-  }
-}
 function setupFilePreviews(fileFields, form) {
   if (fileFields.length) {
     for (const field of fileFields) {
@@ -381,6 +490,39 @@ function setupFilePreviews(fileFields, form) {
     }
   }
 }
+function handleCustomEvent(event, uppy, form) {
+  if (event.component.attributes.key === 'upload') {
+    chooseFileEventHandler(uppy, event);
+  } else if (event.component.attributes.key === 'pick') {
+    pickFileEventHandler((v) => {
+      const field = event.component.attributes['data-field'];
+      const component = form.getComponent(field);
+      component.setValue(v);
+      fileModal.hide();
+    });
+  } else if (event.component.attributes.key === 'relation') {
+    pickRelationEventHandler(event, (v, dv) => {
+      const field = event.component.attributes['data-field'];
+      const component = form.getComponent(field);
+      const displayComponent = form.getComponent(`${field}RelationDisplay`);
+      component.setValue(v);
+      displayComponent.setValue(dv);
+      relationModal.hide();
+    });
+  } else if (event.component.attributes.key === 'resetRelation') {
+    const field = event.component.attributes['data-field'];
+    const component = form.getComponent(field);
+    const displayComponent = form.getComponent(`${field}RelationDisplay`);
+    component.resetValue();
+    displayComponent.resetValue();
+  } else if (event.component.attributes.key === 'removeRelation') {
+    const field = event.component.attributes['data-field'];
+    const component = form.getComponent(field);
+    const displayComponent = form.getComponent(`${field}RelationDisplay`);
+    component.setValue('');
+    displayComponent.setValue('');
+  }
+}
 function newContent() {
   console.log('contentType', route);
 
@@ -391,13 +533,16 @@ function newContent() {
     console.log(response.headers);
     console.log(response.config);
 
-    const { fileFields, contentType } = setupComponents(response.data);
+    const { fileFields, contentType, relationLookups } = setupComponents(
+      response.data
+    );
     response.data = contentType;
     Formio.icons = 'fontawesome';
     // Formio.createForm(document.getElementById("formio"), {
     Formio.createForm(document.getElementById('formio'), {
       components: response.data
     }).then(function (form) {
+      lookupRelations(relationLookups, form);
       let uppy;
       if (fileFields.length) {
         const formio = document.getElementById('formio');
@@ -412,11 +557,9 @@ function newContent() {
           .catch((e) => {
             console.log(e);
           });
-        setupPickExistingButton(fileFields, form);
       }
 
       form.on('redraw', function () {
-        setupPickExistingButton(fileFields, form);
         setupFilePreviews(fileFields, form);
       });
       form.on('submit', function (data) {
@@ -434,22 +577,12 @@ function newContent() {
             .map((f) => f.key)
             .includes(changedKey);
           if (fileFieldWasChanged) {
-            setupPickExistingButton(fileFields, form);
             setupFilePreviews(fileFields, form);
           }
         }
       });
       form.on('customEvent', function (event) {
-        if (event.component.attributes.key === 'upload') {
-          chooseFileEventHandler(uppy, event);
-        } else if (event.component.attributes.key === 'pick') {
-          pickFileEventHandler((v) => {
-            const field = event.component.attributes['data-field'];
-            const component = form.getComponent(field);
-            component.setValue(v);
-            fileModal.hide();
-          });
-        }
+        handleCustomEvent(event, uppy, form);
       });
     });
   });
@@ -478,8 +611,9 @@ function editContent() {
   axios
     .get(`/v1/${routeWithoutAuth}/${contentId}?includeContentType`)
     .then((response) => {
-      const { fileFields, contentType } = setupComponents(
-        response.data.contentType
+      const { fileFields, contentType, relationLookups } = setupComponents(
+        response.data.contentType,
+        response.data.data
       );
       response.data.contentType = contentType;
       // handle array values to the formio format
@@ -508,6 +642,7 @@ function editContent() {
       Formio.createForm(document.getElementById('formio'), {
         components: response.data.contentType
       }).then(function (form) {
+        lookupRelations(relationLookups, form);
         if (fileFields.length) {
           const formio = document.getElementById('formio');
           const childDiv = document.createElement('div');
@@ -521,7 +656,6 @@ function editContent() {
             .catch((e) => {
               console.log(e);
             });
-          setupPickExistingButton(fileFields, form);
         }
         form.on('before', function () {
           console.log('before');
@@ -530,8 +664,6 @@ function editContent() {
           console.log('render');
         });
         form.on('redraw', function () {
-          console.log('redraw');
-          setupPickExistingButton(fileFields, form);
           setupFilePreviews(fileFields, form);
         });
         form.on('submit', function ({ data }) {
@@ -561,7 +693,6 @@ function editContent() {
           $('#contentFormSaveButton').removeAttr('disabled');
           if (event.components) {
             contentTypeComponents = event.components;
-            console.log('event ->', event);
           }
           if (event && event.changed) {
             const changedKey = event.changed.component.key;
@@ -569,23 +700,13 @@ function editContent() {
               .map((f) => f.key)
               .includes(changedKey);
             if (fileFieldWasChanged) {
-              setupPickExistingButton(fileFields, form);
               setupFilePreviews(fileFields, form);
             }
           }
         });
 
         form.on('customEvent', function (event) {
-          if (event.component.attributes.key === 'upload') {
-            chooseFileEventHandler(uppy, event);
-          } else if (event.component.attributes.key === 'pick') {
-            pickFileEventHandler((v) => {
-              const field = event.component.attributes['data-field'];
-              const component = form.getComponent(field);
-              component.setValue(v);
-              fileModal.hide();
-            });
-          }
+          handleCustomEvent(event, uppy, form);
         });
       });
     });

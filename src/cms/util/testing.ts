@@ -149,7 +149,7 @@ async function createUserTestTable3(ctx) {
   return db;
 }
 
-export async function CreateTestCategory(ctx, title, body =''){
+export async function CreateTestCategory(ctx, title, body = '') {
   return await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
     table: 'categories',
     data: {

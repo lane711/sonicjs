@@ -56,7 +56,7 @@ tables.forEach((entry) => {
     );
 
     if (typeof accessControlResult === 'object') {
-      params.accessControlResult= {...accessControlResult };
+      params.accessControlResult = { ...accessControlResult };
     }
 
     if (!accessControlResult) {

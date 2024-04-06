@@ -31,13 +31,9 @@ status.get('/', async (ctx) => {
 
   //drizzle
   try {
-    const d1Data = await getD1DataByTable(
-      ctx.env.D1DATA,
-      'users',
-      {
-        limit: 1
-      }
-    );
+    const d1Data = await getD1DataByTable(ctx.env.D1DATA, 'users', {
+      limit: 1
+    });
     status.drizzle = 'ok';
   } catch (error) {
     status.drizzle = 'error: ' + error;

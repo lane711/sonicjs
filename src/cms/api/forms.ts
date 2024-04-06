@@ -1,23 +1,54 @@
 import { apiConfig } from '../../db/routes';
 import { AppContext } from '../../server';
-import { getSchemaFromTable } from '../data/d1-data';
+import { getRelationsFromTable, getSchemaFromTable } from '../data/d1-data';
 import { singularize } from '../util/utils';
+import { createTableRelationsHelpers } from 'drizzle-orm';
+interface Field {
+  type: string;
+  key?: string;
+  label: string;
+  metaType?: string;
+  disabled?: boolean;
+  placeholder?: string;
+  input?: boolean;
+  tooltip?: string;
+  description?: string;
+  action?: string;
+  defaultValue?: string;
+  editor?: string;
+  customClass?: string;
+  tableView?: boolean;
+  rows?: number;
+  isUploadEnabled?: boolean;
+  relation?: {
+    table: string;
+    fields: string[];
+    references: string[];
+    many: boolean;
+  };
+  components?: Field[];
+}
 
 export function getForm(ctx: AppContext, table) {
-  let formFields: {
-    type: string;
-    key?: string;
-    label: string;
-    action?: string;
-    defaultValue?: string;
-    disabled?: boolean;
-  }[] = [];
+  let formFields: Field[] = [];
 
   //TODO: amke dynamic
   // const schema = `${table}Schema`;
 
   const schema = getSchemaFromTable(table);
+  const relation = getRelationsFromTable(table);
+  const relationsConfig = relation?.config(
+    createTableRelationsHelpers(relation.table)
+  );
+
   const config = apiConfig.find((tbl) => tbl.table === table);
+  if (relationsConfig) {
+    const manyRelationKeys = Object.keys(relationsConfig).filter((key) => {
+      const relation = relationsConfig[key];
+      return relation?.constructor.name === '_Many';
+    });
+  }
+
   for (var field in schema) {
     let formField = getField(field);
     const metaType = config.fields?.[field]?.type || 'auto';
@@ -67,6 +98,25 @@ export function getForm(ctx: AppContext, table) {
         isUploadEnabled: false
       };
     }
+
+    if (relationsConfig) {
+      const fieldRelationKey = Object.keys(relationsConfig).find((key) => {
+        const relation = relationsConfig[key];
+        if (relation?.config?.fields) {
+          const fields = relation.config.fields;
+          return fields.find((f) => f.name === formField.key);
+        }
+      });
+      if (fieldRelationKey) {
+        const fieldRelation = relationsConfig[fieldRelationKey];
+        formField.relation = {
+          table: fieldRelation.referencedTableName as string,
+          many: fieldRelation.constructor.name === '_Many',
+          fields: fieldRelation.config.fields.map((f) => f.name),
+          references: fieldRelation.config.references.map((f) => f.name)
+        };
+      }
+    }
     formFields.push(formField);
   }
 
@@ -102,19 +152,6 @@ export function getForm(ctx: AppContext, table) {
 
   return formFields;
 }
-interface Field {
-  type: string;
-  key: string;
-  label: string;
-  metaType?: string;
-  disabled?: boolean;
-  placeholder?: string;
-  input?: boolean;
-  tooltip?: string;
-  description?: string;
-  components?: Field[];
-}
-
 function getField(fieldName): Field {
   const disabled = fieldName == 'id';
   return {
@@ -122,10 +159,6 @@ function getField(fieldName): Field {
     key: fieldName,
     label: fieldName,
     disabled
-    // placeholder: "Enter your first name.",
-    // input: true,
-    // tooltip: "Enter your <strong>First Name</strong>",
-    // description: "Enter your <strong>First Name</strong>",
   };
 }
 

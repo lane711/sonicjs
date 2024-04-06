@@ -1,4 +1,7 @@
 export function singularize(word: string) {
+  if (word === 'sizes') {
+    return 'size';
+  }
   if (word.endsWith('ses') || word.endsWith('xes') || word.endsWith('zes')) {
     return word.slice(0, -3);
   }
