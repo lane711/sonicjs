@@ -14,7 +14,7 @@ export const definition = {
   id: text('id').primaryKey(),
   type: integer('type'),
   title: text('title'),
-  slug: text('slug').unique(),
+  slug: text('slug'),
   description: text('description'),
   source: text('source'),
   frequencies: text('frequencies', { mode: 'json' }),

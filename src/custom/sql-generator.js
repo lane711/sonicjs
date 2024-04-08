@@ -3,6 +3,8 @@
 // node src/custom/sql-generator.js >  ./src/custom/import.sql
 //   wrangler d1 execute sonicjs --file ./src/custom/import.sql
 
+//   wrangler d1 execute sonicjs --local --file ./src/custom/import.sql
+
 
 const programs = require('./rife-data.json');
 
@@ -17,9 +19,10 @@ for (const program of testPrograms) {
   const id = uuidv4();
   const type = program.sweep ? 'sweep' : 'set';
   const slug = convertToSlug(program.title);
+  const date = new Date().getTime();
 
-  const sql = `insert into programs(id, type, title, slug, description, source, frequencies, sort)
- values ('${id}','${type}',"${program.title}","${slug}","${program.description}",'${program.source}','${program.frequencies}',10);`;
+  const sql = `insert into programs(id, type, title, slug, description, source, frequencies, sort, userId, createdOn, updatedOn)
+ values ('${id}','${type}',"${program.title}","${slug}","${program.description}",'${program.source}','${program.frequencies}',100, "zc55f706d6s9655", "${date}","${date}");`;
 
   console.log(sql);
 
