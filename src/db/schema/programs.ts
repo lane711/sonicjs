@@ -1,4 +1,4 @@
-import { sqliteTable, index, text, integer } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, index, text, integer, uniqueIndex } from 'drizzle-orm/sqlite-core';
 import { relations } from 'drizzle-orm';
 import { auditSchema } from './audit';
 import * as posts from './posts';
@@ -14,6 +14,7 @@ export const definition = {
   id: text('id').primaryKey(),
   type: integer('type'),
   title: text('title'),
+  slug: text('slug').unique(),
   description: text('description'),
   source: text('source'),
   frequencies: text('frequencies', { mode: 'json' }),

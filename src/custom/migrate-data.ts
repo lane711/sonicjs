@@ -17,6 +17,8 @@ export async function migrateData(ctx, count = 99999) {
 
     const type = program.sweep ? 'sweep' : 'set';
 
+    const slug = convertToSlug(program.title);
+
     const result = await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
       table: 'programs',
       data: {
@@ -31,6 +33,12 @@ export async function migrateData(ctx, count = 99999) {
 
     await sleep(100);
   }
+}
+
+function convertToSlug(Text) {
+  return Text.toLowerCase()
+    .replace(/ /g, "-")
+    .replace(/[^\w-]+/g, "");
 }
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
