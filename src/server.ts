@@ -85,7 +85,7 @@ app.route('/v1', api);
 app.route('/v2', rifePlayerApi);
 app.route('/v1/auth', authAPI);
 app.route('/admin', admin);
-// app.route('v1/migrate', migrate);
+app.route('v1/migrate', migrate);
 app.route('/status', status);
 app.route('/tus', tusAPI);
 

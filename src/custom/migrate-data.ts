@@ -3,7 +3,6 @@ import { insertRecord } from '../cms/data/data';
 const { programs } = require('../custom/rife-data');
 
 export async function migrateData(ctx, count = 99999) {
-
   await ctx.env.D1DATA.prepare(`Delete from programs`).all();
 
   // await ctx.env.D1DATA.prepare(
@@ -13,16 +12,18 @@ export async function migrateData(ctx, count = 99999) {
   const testPrograms = programs.slice(0, count);
 
   for (const program of testPrograms) {
-    console.log(program.title);
 
     const type = program.sweep ? 'sweep' : 'set';
 
     const slug = convertToSlug(program.title);
 
+    console.log(slug);
+
     const result = await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
       table: 'programs',
       data: {
         title: program.title,
+        slug,
         description: program.description,
         source: program.source,
         frequencies: program.frequencies,
@@ -31,14 +32,15 @@ export async function migrateData(ctx, count = 99999) {
       }
     });
 
-    await sleep(100);
+    // await sleep(100);
   }
 }
 
 function convertToSlug(Text) {
   return Text.toLowerCase()
-    .replace(/ /g, "-")
-    .replace(/[^\w-]+/g, "");
+    .replace('_', '')
+    .replace(/ /g, '-')
+    .replace(/[^\w-]+/g, '');
 }
 
-const sleep = ms => new Promise(r => setTimeout(r, ms));
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
