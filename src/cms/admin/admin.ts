@@ -249,21 +249,23 @@ admin.get('/api/files', async (ctx) => {
           );
           records.data.forEach((record) => {
             let value = record[field];
-            if (value.startsWith('[') && value.endsWith(']')) {
-              try {
-                value = JSON.parse(value);
-              } catch (error) {
-                console.error('error', error);
+            if (value) {
+              if (value.startsWith('[') && value.endsWith(']')) {
+                try {
+                  value = JSON.parse(value);
+                } catch (error) {
+                  console.error('error', error);
+                }
               }
+              value = !Array.isArray(value) ? [value] : value;
+              value.forEach((file) => {
+                if (isImage(file)) {
+                  images.add(file);
+                } else {
+                  files.add(file);
+                }
+              });
             }
-            value = !Array.isArray(value) ? [value] : value;
-            value.forEach((file) => {
-              if (isImage(file)) {
-                images.add(file);
-              } else {
-                files.add(file);
-              }
-            });
           });
         })()
       );
