@@ -25,11 +25,9 @@ export function generateSelectSql(table, params) {
   if (params && params.id) {
     whereClause = `WHERE id = '${params.id}'`;
   } else if (params) {
-    let { sortDirection, sortBy, limit, offset, filters } = params;
-    sortDirection = sortDirection ?? 'asc';
-    // console.log("sortDirection ==>", sortDirection);
+    let { limit, offset, filters } = params;
 
-    sortBySyntax = sortBy ? `order by ${sortBy} ${sortDirection}` : '';
+    sortBySyntax = sortClauseBuilder(params);
 
     limit = limit ?? 0;
     limitSyntax = limit > 0 ? `limit ${limit}` : '';
@@ -150,6 +148,16 @@ export function getSchemaFromTable(tableName) {
 
 export function getRepoFromTable(tableName) {
   return tableSchemas[tableName]?.table;
+}
+
+export function sortClauseBuilder(params) {
+  let sortClause = '';
+
+if(params.sort){
+  sortClause = 'order by ' + params.sort.join(", ").replace(new RegExp(":", "g"),' ')
+}
+
+  return sortClause;
 }
 
 export function whereClauseBuilder(filters: any) {

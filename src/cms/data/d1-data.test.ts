@@ -99,6 +99,16 @@ it('should convert filters into where clause', () => {
   );
 });
 
+it('should apply 2 sort fields', () => {
+  const queryParams = 'sort[0]=body:asc&sort[1]=title:desc';
+  const params = qs.parse(queryParams);
+  console.log('params ---->', params);
+  const clause = generateSelectSql('my-table', params);
+  expect(clause).toBe(
+    `SELECT *, COUNT() OVER() AS total FROM my-table order by body asc, title desc;`
+  );
+});
+
 //TODO: rework to hit the full api
 // it('get should return results', async () => {
 //   const db = createTestTable();
