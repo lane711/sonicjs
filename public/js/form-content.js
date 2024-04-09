@@ -132,9 +132,11 @@ async function pickFileEventHandler(cb) {
   if (filesResponse) {
     const chooseFileButtons =
       fileModal._dialog.querySelectorAll('.choose-file-btn');
+    console.log('chooseFileButtons', chooseFileButtons);
     chooseFileButtons.forEach((btn) => {
       let newButton = btn.cloneNode(true);
       newButton.addEventListener('click', () => {
+        console.log('file clicked', newButton.getAttribute('data-file'));
         const file = newButton.getAttribute('data-file');
         cb(file);
       });
@@ -491,12 +493,22 @@ function setupFilePreviews(fileFields, form) {
   }
 }
 function handleCustomEvent(event, uppy, form) {
+  console.log({ event });
   if (event.component.attributes.key === 'upload') {
     chooseFileEventHandler(uppy, event);
   } else if (event.component.attributes.key === 'pick') {
     pickFileEventHandler((v) => {
       const field = event.component.attributes['data-field'];
-      const component = form.getComponent(field);
+      let component = form.getComponent(field);
+      console.log({ component });
+      if (component.component.type === 'datagrid') {
+        let tr = event.event.target;
+        while (tr.tagName !== 'TR') {
+          tr = tr.parentElement;
+        }
+        const textInput = tr.querySelector('input[type="text"]');
+        component = form.getComponentById(textInput.id.split('-')[0]);
+      }
       component.setValue(v);
       fileModal.hide();
     });
