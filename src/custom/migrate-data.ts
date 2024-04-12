@@ -1,6 +1,7 @@
 import { insertRecord } from '../cms/data/data';
 
-const { programs } = require('../custom/rife-data');
+// const { programs } = require('../custom/rife-data');
+const programs = require('./rife-data.json');
 
 export async function migrateData(ctx, count = 99999) {
   await ctx.env.D1DATA.prepare(`Delete from programs`).all();

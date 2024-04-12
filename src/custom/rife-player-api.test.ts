@@ -42,11 +42,27 @@ it('rp controller sanity', async () => {
 });
 
 it('rp programs', async () => {
-  await createTestTable(ctx);
+  await createProgramTable(ctx);
 
   await migrateData(ctx, 20);
 
   let req = new Request('http://localhost/v2/programs', {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' }
+  });
+  let res = await app.fetch(req, ctx.env);
+  expect(res.status).toBe(200);
+  let body = await res.json();
+  expect(body.data.length).toBe(20);
+  expect(body.data[0].frequencies).toBeInstanceOf(Array);
+});
+
+it('sort on 2 field', async () => {
+  await createProgramTable(ctx);
+
+  await migrateData(ctx, 20);
+
+  let req = new Request('http://localhost/v1/programs&sort[0]=sort&sort[1]=slug', {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' }
   });
@@ -80,7 +96,7 @@ it('contact post should (insert) and should return 204', async () => {
   expect(body.firstName).toBe('Joe');
 });
 
-async function createTestTable(ctx) {
+async function createProgramTable(ctx) {
   const db = drizzle(ctx.env.D1DATA);
   console.log('creating programs table start');
   await db.run(sql`

@@ -1,0 +1,1 @@
+ALTER TABLE programs ADD `descriptionAI` text;

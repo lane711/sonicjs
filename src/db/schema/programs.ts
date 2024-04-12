@@ -16,6 +16,7 @@ export const definition = {
   title: text('title'),
   slug: text('slug'),
   description: text('description'),
+  descriptionAI: text('descriptionAI'),
   source: text('source'),
   frequencies: text('frequencies', { mode: 'json' }),
   tags: text('tags', { mode: 'json' }).$type<string[]>(),
