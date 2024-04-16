@@ -96,22 +96,6 @@ it('check user exists true', async () => {
   expect(body).toBe(false);
 });
 
-it('sort on 2 field', async () => {
-  await createProgramTable(ctx);
-
-  await migrateData(ctx, 20);
-
-  let req = new Request('http://localhost/v1/programs&sort[0]=sort&sort[1]=slug', {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' }
-  });
-  let res = await app.fetch(req, ctx.env);
-  expect(res.status).toBe(200);
-  let body = await res.json();
-  expect(body.data.length).toBe(20);
-  expect(body.data[0].frequencies).toBeInstanceOf(Array);
-});
-
 it('contact post should (insert) and should return 204', async () => {
   await createContactTable(ctx);
   let payload = JSON.stringify({

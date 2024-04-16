@@ -18,7 +18,7 @@ export async function migrateData(ctx, count = 99999) {
 
     const slug = convertToSlug(program.title);
 
-    console.log(slug);
+    // console.log(slug);
 
     const result = await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
       table: 'programs',
