@@ -14,6 +14,7 @@ import { AuthRequest, Session, User } from 'lucia';
 import { initializeLucia } from './cms/auth/lucia';
 import { rifePlayerApi } from './custom/rife-player-api';
 
+
 export type Variables = {
   authRequest: AuthRequest;
   session?: Session;

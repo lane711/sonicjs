@@ -1,5 +1,5 @@
-import { Hono } from 'hono';
-import { getPrograms } from './rife-player-data';
+import { Context, Env, Hono } from 'hono';
+import { getPrograms, checkUserExists } from './rife-player-data';
 import { insertRecord } from '../cms/data/data';
 import { sendEmail } from './send-email';
 
@@ -11,6 +11,13 @@ rifePlayerApi.get('/', async (ctx) => {
 
 rifePlayerApi.get('/programs', async (ctx) => {
   const data = await getPrograms(ctx);
+  return ctx.json(data);
+});
+
+rifePlayerApi.get('/check-user-exists/:email', async (ctx) => {
+  const email = ctx.req.param('email');
+
+  const data = await checkUserExists(ctx, email);
   return ctx.json(data);
 });
 
@@ -27,11 +34,16 @@ rifePlayerApi.post('/contact-submit', async (ctx) => {
   const record = await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, payload);
 
   //send email confirmations
-  const fullName = payload.data.lastName ? `${payload.data.firstName} ${payload.data.lastName}` : payload.data.firstName;
+  const fullName = payload.data.lastName
+    ? `${payload.data.firstName} ${payload.data.lastName}`
+    : payload.data.firstName;
   const messageHtml = payload.data.message.replace(/(?:\r\n|\r|\n)/g, '<br>');
   const html = `<p>Hello ${payload.data.firstName},<p>Thanks for reaching out. We will get back to you asap.</p><p>For your reference, your message was:</p><p><hr></p><p>${fullName}:</p><p>${messageHtml}</p><p><hr></p><p>Thank you,<br>RifePlayer Support</p>`;
 
-  if (ctx.env.SENDGRID_ENABLED === true || ctx.env.SENDGRID_ENABLED === 'true') {
+  if (
+    ctx.env.SENDGRID_ENABLED === true ||
+    ctx.env.SENDGRID_ENABLED === 'true'
+  ) {
     //send to visitor
     sendEmail(
       ctx,

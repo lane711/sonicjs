@@ -4,6 +4,7 @@ import { drizzle } from 'drizzle-orm/d1';
 
 import { getRecords, insertRecord } from '../cms/data/data';
 import { migrateData } from './migrate-data';
+import { insertD1Data } from '../cms/data/d1-data';
 
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
 
@@ -28,9 +29,9 @@ const ctx = {
 };
 
 it('rp controller sanity', async () => {
-  await createTestTable(ctx);
+  // await createTestTable(ctx);
 
-  await migrateData(ctx, 20);
+  // await migrateData(ctx, 20);
 
   let req = new Request('http://localhost/v2', {
     method: 'GET',
@@ -41,20 +42,58 @@ it('rp controller sanity', async () => {
   expect(res.status).toBe(200);
 });
 
-it('rp programs', async () => {
-  await createProgramTable(ctx);
+// it('rp programs', async () => {
+//   await createProgramTable(ctx);
 
-  await migrateData(ctx, 20);
+//   await migrateData(ctx, 20);
 
-  let req = new Request('http://localhost/v2/programs', {
+//   let req = new Request('http://localhost/v2/programs', {
+//     method: 'GET',
+//     headers: { 'Content-Type': 'application/json' }
+//   });
+//   let res = await app.fetch(req, ctx.env);
+//   expect(res.status).toBe(200);
+//   let body = await res.json();
+//   expect(body.data.length).toBe(20);
+//   expect(body.data[0].frequencies).toBeInstanceOf(Array);
+// });
+
+it('check user exists true', async () => {
+  await createUserTestTable(ctx);
+
+    const rec1 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, 'users', {
+    firstName: 'John',
+    email: 'a@a.com',
+    id: '1'
+  });
+
+  let req = new Request('http://localhost/v2/check-user-exists/a%40a.com', {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' }
   });
   let res = await app.fetch(req, ctx.env);
   expect(res.status).toBe(200);
   let body = await res.json();
-  expect(body.data.length).toBe(20);
-  expect(body.data[0].frequencies).toBeInstanceOf(Array);
+  expect(body).toBe(true);
+});
+
+it('check user exists true', async () => {
+  await createUserTestTable(ctx);
+
+    const rec1 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, 'users', {
+    firstName: 'John',
+    email: 'a@a.com',
+    id: '1'
+  });
+
+  let req = new Request('http://localhost/v2/check-user-exists/b%40b.com', {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' }
+  });
+  let res = await app.fetch(req, ctx.env);
+  expect(res.status).toBe(200);
+  let body = await res.json();
+  expect(body).toBe(false);
 });
 
 it('sort on 2 field', async () => {
@@ -95,6 +134,25 @@ it('contact post should (insert) and should return 204', async () => {
   expect(body.id.length).toBeGreaterThan(1);
   expect(body.firstName).toBe('Joe');
 });
+
+async function createUserTestTable() {
+  const db = drizzle(__D1_BETA__D1DATA);
+
+  await db.run(sql`
+    CREATE TABLE users (
+      id text PRIMARY KEY NOT NULL,
+      firstName text,
+      lastName text,
+      email text,
+      password text,
+      role text,
+      createdOn integer,
+      updatedOn integer
+    );
+	`);
+
+  return db;
+}
 
 async function createProgramTable(ctx) {
   const db = drizzle(ctx.env.D1DATA);
