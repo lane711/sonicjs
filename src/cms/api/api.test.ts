@@ -76,6 +76,48 @@ describe('auto endpoints', () => {
     expect(body2.source).toBe('cache');
   });
 
+  it('get sort on 2 fields', async () => {
+    await createCategoriesTestTable1(ctx);
+    await CreateTestCategory(ctx, 'cat 1', 'ccc');
+    await CreateTestCategory(ctx, 'cat 1', 'aaa');
+    await CreateTestCategory(ctx, 'cat 2', 'bbb');
+
+
+    let req = new Request('http://localhost/v1/categories?sort[0]=body&sort[1]=title', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    let res = await app.fetch(req, ctx.env);
+    expect(res.status).toBe(200);
+    let body = await res.json();
+    expect(body.data.length).toBe(3);
+    expect(body.data[0].body).toBe('aaa');
+    expect(body.data[1].body).toBe('bbb');
+    expect(body.data[2].body).toBe('ccc');
+
+  });
+
+  it('get sort desc on 2 fields', async () => {
+    await createCategoriesTestTable1(ctx);
+    await CreateTestCategory(ctx, 'cat 1', 'ccc');
+    await CreateTestCategory(ctx, 'cat 1', 'aaa');
+    await CreateTestCategory(ctx, 'cat 2', 'bbb');
+
+
+    let req = new Request('http://localhost/v1/categories?sort[0]=body:desc&sort[1]=title', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    let res = await app.fetch(req, ctx.env);
+    expect(res.status).toBe(200);
+    let body = await res.json();
+    expect(body.data.length).toBe(3);
+    expect(body.data[0].body).toBe('ccc');
+    expect(body.data[1].body).toBe('bbb');
+    expect(body.data[2].body).toBe('aaa');
+
+  });
+
   it('post (insert) should return 204', async () => {
     createCategoriesTestTable1(ctx);
     let payload = JSON.stringify({ data: { title: 'My Category' } });
