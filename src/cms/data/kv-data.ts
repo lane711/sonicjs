@@ -144,10 +144,12 @@ export function getAllKV(db) {
 }
 
 export async function clearKVCache(db) {
+  console.log('clearKVCache  start');
   const itemsToDelete = await getDataListByPrefix(db, addCachePrefix(''));
   for await (const key of itemsToDelete.keys) {
     await deleteKVById(db, key.name);
   }
+  console.log('clearKVCache  end');
 }
 
 export async function clearAllKVRecords(db) {
