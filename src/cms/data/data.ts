@@ -295,7 +295,7 @@ export async function insertRecord(d1, kv, data) {
   let result = {};
   try {
     result = await saveKVData(kv, id, content.data);
-    // console.log('result KV', result);
+    console.log('result KV', result);
     // return ctx.json(id, 201);
   } catch (error) {
     console.log('error', error);
@@ -304,8 +304,10 @@ export async function insertRecord(d1, kv, data) {
     //then also save the content to sqlite for filtering, sorting, etc
     try {
       result = await insertD1Data(d1, kv, content.table, content.data);
-      // console.log("insertD1Data --->", result);
+      console.log("insertRecord insertD1Data --->", result);
       //expire cache
+      console.log("insertRecord expiring cache --->", result);
+
       await setCacheStatusInvalid();
       await clearKVCache(kv);
 
@@ -320,13 +322,15 @@ export async function insertRecord(d1, kv, data) {
       console.log('inserting record error', error);
     }
   }
+
+  console.log("insertRecord returning", result);
+
   return { code: 500, error };
 }
 
 export async function updateRecord(d1, kv, data, params: Record<string, any>) {
   try {
     const result = await updateD1Data(d1, data.table, data, params);
-    console.log('WTF WTF');
     if ('id' in result && result.id) {
       await saveKVData(kv, data.id, data);
     }
