@@ -25,8 +25,11 @@ rifePlayerApi.post('/contact-submit', async (ctx) => {
 
   console.log('contact processing ')
   const payload = await ctx.req.json();
+  console.log('contact payload ', payload)
 
   const token = payload.token;
+  console.log('contact token ', token)
+
   if (token !== ctx.env.APIKEY) {
     console.log('contact bad token ')
     return ctx.text('Unauthorized', 401);
