@@ -189,11 +189,7 @@ export async function getRecords(
       level: 'verbose',
       message: 'getRecords getD1DataByTable start'
     });
-    d1Data = await getD1DataByTable(
-      ctx.env.D1DATA,
-      table,
-      params
-    );
+    d1Data = await getD1DataByTable(ctx.env.D1DATA, table, params);
     log(ctx, {
       level: 'verbose',
       message: 'getRecords getD1DataByTable end'
@@ -288,6 +284,7 @@ async function dataAddToInMemoryCache(
 }
 
 export async function insertRecord(d1, kv, data) {
+  console.log('inserting record');
   const content = data;
   const id = uuidv4();
   const timestamp = new Date().getTime();
@@ -314,11 +311,13 @@ export async function insertRecord(d1, kv, data) {
 
       return { code: 201, data: result };
     } catch (error) {
+      console.log('inserting record error');
       error =
         'error posting content ' +
         content.data.table +
         error +
         JSON.stringify(content.data, null, 2);
+      console.log('inserting record error', error);
     }
   }
   return { code: 500, error };
