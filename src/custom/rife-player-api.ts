@@ -22,16 +22,21 @@ rifePlayerApi.get('/check-user-exists/:email', async (ctx) => {
 });
 
 rifePlayerApi.post('/contact-submit', async (ctx) => {
+
+  console.log('contact processing ')
   const payload = await ctx.req.json();
 
   const token = payload.token;
   if (token !== ctx.env.APIKEY) {
+    console.log('contact bad token ')
     return ctx.text('Unauthorized', 401);
   }
 
   payload.table = 'contacts';
 
   const record = await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, payload);
+
+  console.log('contact record ', record)
 
   //send email confirmations
   const fullName = payload.data.lastName
@@ -45,6 +50,7 @@ rifePlayerApi.post('/contact-submit', async (ctx) => {
     ctx.env.SENDGRID_ENABLED === 'true'
   ) {
     //send to visitor
+    console.log('contact send mail enabled ')
     sendEmail(
       ctx,
       payload.data.email,
@@ -70,6 +76,8 @@ rifePlayerApi.post('/contact-submit', async (ctx) => {
       html
     );
   }
+
+  console.log('contact returning ', record.data, record.code)
 
   return ctx.json(record.data, record.code);
 });
