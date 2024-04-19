@@ -50,6 +50,7 @@ app.use(
   '/v1/*',
   cors({
     origin: (origin) => {
+      console.log('checking origin', origin)
       return origin.indexOf('localhost') > 0 || origin.endsWith('.rifeplayer.com')
         ? origin
         : 'https://app.rifeplayer.com';
