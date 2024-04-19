@@ -1,10 +1,15 @@
-it('server.test.ts dummy', () => {});
-// import app from './server';
-//
-// describe('Test the application', () => {
-//   it('should redirect to /admin', async () => {
-//     const res = await app.request('http://localhost/');
-//     expect(res.status).toBe(302);
-//   });
-// });
-//
+import app from './server';
+import { getTestingContext } from './cms/util/testing';
+
+const ctx = getTestingContext();
+
+describe('Test the APIs', () => {
+  it('ping should return 200', async () => {
+    const res = await app.fetch(
+      new Request('http://localhost/status'),
+      ctx.env
+    );
+    expect(res.status).toBe(200);
+    let body = await res.json();
+  });
+});

@@ -50,13 +50,25 @@ app.use(
   '/v1/*',
   cors({
     origin: (origin) => {
-      console.log('checking origin', origin)
-      return origin.indexOf('localhost') > 0 || origin.endsWith('.rifeplayer.com')
-        ? origin
-        : 'https://app.rifeplayer.com';
+      return checkOrigin(origin);
     }
   })
 );
+
+app.use(
+  '/v2/*',
+  cors({
+    origin: (origin) => {
+      return checkOrigin(origin);
+    }
+  })
+);
+
+function checkOrigin(origin){
+  return origin.indexOf('localhost') > 0 || origin.endsWith('.rifeplayer.com')
+  ? origin
+  : 'https://app.rifeplayer.com';
+}
 
 //request Logging
 app.use('*', async (ctx, next) => {
