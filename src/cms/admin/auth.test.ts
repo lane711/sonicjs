@@ -3,6 +3,7 @@ import { insertD1Data } from '../data/d1-data';
 import {
   createCategoriesTestTable1,
   createUserAndGetToken,
+  createUserTestTables,
   getTestingContext
 } from '../util/testing';
 
@@ -40,6 +41,34 @@ describe('admin should be restricted', () => {
 
   it('create and login user', async () => {
     const token = await createUserAndGetToken(app, ctx);
+  });
+
+  it('register user via the api', async () => {
+
+    await createUserTestTables(ctx);
+
+    const account = {
+      data: {
+        firstName: '',
+        lastName: '',
+        role: 'user',
+        email: 'a@a.com',
+        password: '12341234',
+        table: 'users'
+      }
+    };
+
+    let req = new Request(`http://localhost/v1/auth/users`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(account)
+    });
+    let res = await app.fetch(req, ctx.env);
+
+    //by default users can't register on their own
+    expect(res.status).toBe(401);
   });
 
   it('anyone can list categories', async () => {
