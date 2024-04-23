@@ -32,7 +32,14 @@ authAPI.use('*', async (ctx, next) => {
     if (path === '/v1/auth/users/setup') {
       const userExists = await hasUser(ctx);
       if (userExists) {
-        return ctx.text('Unauthorized', 401);
+        let authorized = await getOperationCreateResult(
+          operationAccess?.create,
+          ctx,
+          {}
+        );
+        if (!authorized) {
+          return ctx.text('Unauthorized', 401);
+        }
       }
     } else {
       return ctx.text('Unauthorized', 401);

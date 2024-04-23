@@ -5,28 +5,9 @@ import { drizzle } from 'drizzle-orm/d1';
 import { getRecords, insertRecord } from '../cms/data/data';
 import { migrateData } from './migrate-data';
 import { insertD1Data } from '../cms/data/d1-data';
+import { createUserTestTables, getTestingContext } from '../cms/util/testing';
 
-const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
-
-const toJson = function (json) {
-  return json;
-};
-
-const ctx = {
-  env: {
-    KVDATA: KVDATA,
-    D1DATA: __D1_BETA__D1DATA,
-    APIKEY: '123',
-    SENDGRID_API_KEY:
-      'SG.abc',
-    SENDGRID_EMAIL_SENDER: 'joe@test.com',
-    SENDGRID_EMAIL_SENDER_NAME: 'John @ Test',
-    SENDGRID_ENABLED: false
-  },
-  json: toJson,
-  user: { id: 'fromtest' },
-  _var: { user: { userId: 'abc123' } }
-};
+const ctx = getTestingContext();
 
 it('rp controller sanity', async () => {
   // await createTestTable(ctx);
@@ -61,7 +42,7 @@ it('rp controller sanity', async () => {
 it('check user exists true', async () => {
   await createUserTestTable(ctx);
 
-    const rec1 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, 'users', {
+  const rec1 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, 'users', {
     firstName: 'John',
     email: 'a@a.com',
     id: '1'
@@ -78,9 +59,9 @@ it('check user exists true', async () => {
 });
 
 it('check user exists true', async () => {
-  await createUserTestTable(ctx);
+  await createUserTestTables(ctx);
 
-    const rec1 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, 'users', {
+  const rec1 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, 'users', {
     firstName: 'John',
     email: 'a@a.com',
     id: '1'
@@ -119,24 +100,91 @@ it('contact post should (insert) and should return 204', async () => {
   expect(body.firstName).toBe('Joe');
 });
 
-async function createUserTestTable() {
-  const db = drizzle(__D1_BETA__D1DATA);
+it('register user via the api', async () => {
+  await createUserTestTables(ctx);
 
-  await db.run(sql`
-    CREATE TABLE users (
-      id text PRIMARY KEY NOT NULL,
-      firstName text,
-      lastName text,
-      email text,
-      password text,
-      role text,
-      createdOn integer,
-      updatedOn integer
-    );
-	`);
+  const account = {
+    data: {
+      firstName: '',
+      lastName: '',
+      role: 'user',
+      email: 'a@a.com',
+      password: '12341234',
+      table: 'users'
+    }
+  };
 
-  return db;
-}
+  let req = new Request(`http://localhost/v1/auth/users/setup`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(account)
+  });
+  let res = await app.fetch(req, ctx.env);
+
+  //by default users can't register on their own
+  expect(res.status).toBe(200);
+  let body = await res.json();
+
+  //check that user exists
+  let users = await getRecords(
+    ctx,
+    'users',
+    undefined,
+    '/users-url',
+    'd1',
+    undefined
+  );
+  expect(users.data.length).toBe(1);
+
+  //add another
+  account.data.email = 'b@b.com';
+
+  let req2 = new Request(`http://localhost/v1/auth/users/setup`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(account)
+  });
+  let res2 = await app.fetch(req2, ctx.env);
+
+  expect(res2.status).toBe(200);
+  let body2 = await res2.json();
+
+  //check that user exists
+  let users2 = await getRecords(
+    ctx,
+    'users',
+    undefined,
+    '/users-url',
+    'd1',
+    undefined
+  );
+  expect(users2.data.length).toBe(2);
+  expect(users2.data[1].email).toBe('b@b.com');
+
+});
+
+// async function createUserTestTable() {
+//   const db = drizzle(__D1_BETA__D1DATA);
+
+//   await db.run(sql`
+//     CREATE TABLE users (
+//       id text PRIMARY KEY NOT NULL,
+//       firstName text,
+//       lastName text,
+//       email text,
+//       password text,
+//       role text,
+//       createdOn integer,
+//       updatedOn integer
+//     );
+// 	`);
+
+//   return db;
+// }
 
 async function createProgramTable(ctx) {
   const db = drizzle(ctx.env.D1DATA);
