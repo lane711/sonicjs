@@ -124,7 +124,7 @@ it('register user via the api', async () => {
   let res = await app.fetch(req, ctx.env);
 
   //by default users can't register on their own
-  expect(res.status).toBe(200);
+  expect(res.status).toBe(201);
   let body = await res.json();
 
   //check that user exists
@@ -150,7 +150,7 @@ it('register user via the api', async () => {
   });
   let res2 = await app.fetch(req2, ctx.env);
 
-  expect(res2.status).toBe(200);
+  expect(res2.status).toBe(201);
   let body2 = await res2.json();
 
   //check that user exists
@@ -167,24 +167,6 @@ it('register user via the api', async () => {
 
 });
 
-// async function createUserTestTable() {
-//   const db = drizzle(__D1_BETA__D1DATA);
-
-//   await db.run(sql`
-//     CREATE TABLE users (
-//       id text PRIMARY KEY NOT NULL,
-//       firstName text,
-//       lastName text,
-//       email text,
-//       password text,
-//       role text,
-//       createdOn integer,
-//       updatedOn integer
-//     );
-// 	`);
-
-//   return db;
-// }
 
 async function createProgramTable(ctx) {
   const db = drizzle(ctx.env.D1DATA);
