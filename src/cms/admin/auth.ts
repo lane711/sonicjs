@@ -258,7 +258,7 @@ authAPI.post(`/users/:setup?`, async (ctx) => {
         result
       );
     }
-    return result;
+    return ctx.json(result, 201);
   } catch (error) {
     console.log('error posting user setup content', error);
     return ctx.text(error, 500);

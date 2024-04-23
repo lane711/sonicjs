@@ -123,7 +123,7 @@ describe('admin should be restricted', () => {
     let res = await app.fetch(req, ctx.env);
   
     //by default users can't register on their own
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(201);
     let body = await res.json();
   
     //check that user exists
