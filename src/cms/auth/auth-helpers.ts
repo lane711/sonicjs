@@ -1,4 +1,4 @@
-import { tableSchemas } from '../../db/routes';
+import { schema, tableSchemas } from '../../db/routes';
 import { drizzle } from 'drizzle-orm/d1';
 import { isNotNull } from 'drizzle-orm';
 import { getRecords } from '../data/data';
@@ -7,16 +7,7 @@ import type { SonicJSFilter, ApiConfig } from '../../db/routes';
 
 export const hasUser = async (ctx: AppContext) => {
   const fn = async function () {
-    const db = drizzle(ctx.env.D1DATA, {
-      schema: {
-        users: tableSchemas.users.table,
-        usersRelations: tableSchemas.users.relation,
-        userKeys: tableSchemas.userKeys.table,
-        userKeysRelations: tableSchemas.userKeys.relation,
-        userSessions: tableSchemas.userSessions.table,
-        userSessionsRelations: tableSchemas.userSessions.relation
-      }
-    });
+    const db = drizzle(ctx.env.D1DATA, schema);
     const data = await db.query.users.findMany({
       with: {
         keys: {

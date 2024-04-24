@@ -189,11 +189,7 @@ export async function getRecords(
       level: 'verbose',
       message: 'getRecords getD1DataByTable start'
     });
-    d1Data = await getD1DataByTable(
-      ctx.env.D1DATA,
-      table,
-      params
-    );
+    d1Data = await getD1DataByTable(ctx.env.D1DATA, table, params);
     log(ctx, {
       level: 'verbose',
       message: 'getRecords getD1DataByTable end'

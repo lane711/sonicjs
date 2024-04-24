@@ -226,7 +226,6 @@ describe('filters', () => {
     await CreateTestCategory(ctx, 'dog');
     await CreateTestCategory(ctx, 'dog');
 
-
     let req = new Request(
       'http://localhost/v1/categories?filters[title][$eq]=dog',
       {
@@ -244,8 +243,11 @@ describe('filters', () => {
 
   it('filter with 2 conditions should return results and 200', async () => {
     await createCategoriesTestTable1(ctx);
-    await CreateTestCategory(ctx, 'dog', 'be the person your dog thinks you are');
-
+    await CreateTestCategory(
+      ctx,
+      'dog',
+      'be the person your dog thinks you are'
+    );
 
     let req = new Request(
       'http://localhost/v1/categories?filters[title][$eq]=dog&filters[body][$eq]=be+the+person+your+dog+thinks+you+are',
@@ -261,5 +263,4 @@ describe('filters', () => {
     expect(body.data[0].title).toBe('dog');
     expect(body.data[0].title).toBe('dog');
   });
-
 });

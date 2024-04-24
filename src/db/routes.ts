@@ -201,6 +201,25 @@ export const tableSchemas = {
   userSessions
 };
 
+export const schema = {
+  schema: {
+    users: users.table,
+    usersRelations: users.relation,
+    posts: posts.table,
+    postsRelations: posts.relation,
+    comments: comments.table,
+    commentsRelations: comments.relation,
+    categories: categories.table,
+    categoriesRelations: categories.relation,
+    categoriesToPosts: categoriesToPosts.table,
+    categoriesToPostsRelations: categoriesToPosts.relation,
+    userKeys: userKeys.table,
+    userKeysRelations: userKeys.relation,
+    userSessions: userSessions.table,
+    userSessionsRelations: userSessions.relation
+  }
+};
+
 for (const key of Object.keys(tableSchemas)) {
   const table = tableSchemas[key];
   if (table.route) {
