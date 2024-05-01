@@ -314,20 +314,27 @@ export async function updateUser<T extends string>(
 }
 
 export async function login<T extends string>(args: LuciaAPIArgs<T>) {
+  console.log('login start')
   const { ctx, content } = args;
   const d1 = ctx.env.D1DATA;
   const auth = initializeLucia(d1, ctx.env);
   const email = content?.email;
   const password = content?.password;
+  console.log('login', email, password.length)
+
   const authRequest = ctx.get('authRequest');
   try {
     // find user by key
     // and validate password
     const key = await auth.useKey('email', email.toLowerCase(), password);
+    console.log('login key', key)
+
     const session = await auth.createSession({
       userId: key.userId,
       attributes: {}
     });
+    console.log('login session created')
+
     if (authRequest) {
       authRequest.setSession(session);
     }
@@ -335,6 +342,8 @@ export async function login<T extends string>(args: LuciaAPIArgs<T>) {
 
     return ctx.json({ bearer: session.sessionId });
   } catch (e) {
+    console.log('login error')
+
     if (
       e instanceof LuciaError &&
       (e.message === 'AUTH_INVALID_KEY_ID' ||
