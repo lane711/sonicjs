@@ -342,14 +342,10 @@ export async function login<T extends string>(args: LuciaAPIArgs<T>) {
     ) {
       // user does not exist
       // or invalid password
-      return new Response('Incorrect username or password', {
-        status: 400
-      });
+      return ctx.json({ message: 'Incorrect username or password' }, 400);
     }
     console.log(new Error(e.message, { cause: e }));
-    return new Response('An unknown error occurred', {
-      status: 500
-    });
+    return ctx.json({ message: 'An unknown error occurred' }, 500);
   }
 }
 

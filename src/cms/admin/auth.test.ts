@@ -3,6 +3,7 @@ import { insertD1Data } from '../data/d1-data';
 import { getRecords } from '../data/data';
 import {
   createCategoriesTestTable1,
+  createLuciaUser,
   createUserAndGetToken,
   createUserTestTables,
   getTestingContext
@@ -44,8 +45,27 @@ describe('admin should be restricted', () => {
     const token = await createUserAndGetToken(app, ctx);
   });
 
-  it('register user via the api', async () => {
+  it('create and attempt login with wrong password user', async () => {
+    const user = await createLuciaUser(app, ctx);
 
+    let login = {
+      email: user.email,
+      password: 'wrong0'
+    };
+
+    //now log the users in
+    let req = new Request('http://localhost/v1/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(login)
+    });
+    let res = await app.fetch(req, ctx.env);
+    let body = await res.json();
+    expect(res.status).toBe(400);
+    expect(body.message).toBe('Incorrect username or password');
+  });
+
+  it('register user via the api', async () => {
     await createUserTestTables(ctx);
 
     const account = {
@@ -62,7 +82,7 @@ describe('admin should be restricted', () => {
     let req = new Request(`http://localhost/v1/auth/users`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(account)
     });
@@ -101,7 +121,7 @@ describe('admin should be restricted', () => {
 
   it('register user via the api', async () => {
     await createUserTestTables(ctx);
-  
+
     const account = {
       data: {
         firstName: '',
@@ -112,7 +132,7 @@ describe('admin should be restricted', () => {
         table: 'users'
       }
     };
-  
+
     let req = new Request(`http://localhost/v1/auth/users/setup`, {
       method: 'POST',
       headers: {
@@ -121,11 +141,11 @@ describe('admin should be restricted', () => {
       body: JSON.stringify(account)
     });
     let res = await app.fetch(req, ctx.env);
-  
+
     //by default users can't register on their own
     expect(res.status).toBe(201);
     let body = await res.json();
-  
+
     //check that user exists
     let users = await getRecords(
       ctx,
@@ -136,10 +156,10 @@ describe('admin should be restricted', () => {
       undefined
     );
     expect(users.data.length).toBe(1);
-  
+
     //add another
     account.data.email = 'b@b.com';
-  
+
     let req2 = new Request(`http://localhost/v1/auth/users/setup`, {
       method: 'POST',
       headers: {
@@ -148,13 +168,12 @@ describe('admin should be restricted', () => {
       body: JSON.stringify(account)
     });
     let res2 = await app.fetch(req2, ctx.env);
-  
 
     expect(res2.status).toBe(401);
 
     // if create user (register) is allowed, you can uncomment the below
     // let body2 = await res2.json();
-  
+
     // //check that user exists
     // let users2 = await getRecords(
     //   ctx,
@@ -166,7 +185,6 @@ describe('admin should be restricted', () => {
     // );
     // expect(users2.data.length).toBe(2);
     // expect(users2.data[1].email).toBe('b@b.com');
-  
   });
   // it('admin can see all user records', async () => {
   //   const user = await createUserAndGetToken(app, ctx);
