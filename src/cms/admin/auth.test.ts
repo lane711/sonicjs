@@ -124,7 +124,7 @@ describe('admin should be restricted', () => {
 
     const account = {
       data: {
-        firstName: '',
+        firstName: 'Joe',
         lastName: '',
         role: 'user',
         email: 'a@a.com',
@@ -155,6 +155,8 @@ describe('admin should be restricted', () => {
       'd1',
       undefined
     );
+    expect(users.data[0].firstName).toBe("Joe");
+    expect(users.data[0].role).toBe("user");
     expect(users.data.length).toBe(1);
 
     //add another

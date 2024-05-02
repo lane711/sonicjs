@@ -201,7 +201,9 @@ authAPI.post(`/users/:setup?`, async (ctx) => {
   }
   content.data.table = 'users';
   content.table = 'users';
-  content.data.role = 'admin';
+  // HACK: need a better fix - this should only apply when the admin is first creating their account
+  content.data.role = content.data.role ?? 'admin';
+  
   delete content.data.submit;
   if (
     content.data?.confirmPassword &&
