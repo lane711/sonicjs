@@ -169,22 +169,22 @@ describe('admin should be restricted', () => {
     });
     let res2 = await app.fetch(req2, ctx.env);
 
-    expect(res2.status).toBe(401);
+    expect(res2.status).toBe(201);
 
     // if create user (register) is allowed, you can uncomment the below
     // let body2 = await res2.json();
 
     // //check that user exists
-    // let users2 = await getRecords(
-    //   ctx,
-    //   'users',
-    //   undefined,
-    //   '/users-url',
-    //   'd1',
-    //   undefined
-    // );
-    // expect(users2.data.length).toBe(2);
-    // expect(users2.data[1].email).toBe('b@b.com');
+    let users2 = await getRecords(
+      ctx,
+      'users',
+      undefined,
+      '/users-url',
+      'd1',
+      undefined
+    );
+    expect(users2.data.length).toBe(2);
+    expect(users2.data[1].email).toBe('b@b.com');
   });
   // it('admin can see all user records', async () => {
   //   const user = await createUserAndGetToken(app, ctx);

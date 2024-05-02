@@ -40,9 +40,9 @@ it('rp controller sanity', async () => {
 // });
 
 it('check user exists true', async () => {
-  await createUserTestTable(ctx);
+  await createUserTestTables(ctx);
 
-  const rec1 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, 'users', {
+  const rec1 = await insertD1Data(ctx.env.D1DATA, ctx.env.KVDATA, 'users', {
     firstName: 'John',
     email: 'a@a.com',
     id: '1'
@@ -61,7 +61,7 @@ it('check user exists true', async () => {
 it('check user exists true', async () => {
   await createUserTestTables(ctx);
 
-  const rec1 = await insertD1Data(__D1_BETA__D1DATA, KVDATA, 'users', {
+  const rec1 = await insertD1Data(ctx.env.D1DATA, ctx.env.KVDATA, 'users', {
     firstName: 'John',
     email: 'a@a.com',
     id: '1'
