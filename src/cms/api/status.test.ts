@@ -1,17 +1,24 @@
-it('status.test.ts dummy', () => {});
-// import app from '../../server';
-//
-// const env = getMiniflareBindings();
-//
-// describe('Test the status url', () => {
-//   it('ping should return 200', async () => {
-//     const res = await app.request('http://localhost/status');
-//     expect(res.status).toBe(200);
-//   });
-//
-//   it('log should return 200', async () => {
-//     const res = await app.request('http://localhost/status/log');
-//     expect(res.status).toBe(200);
-//   });
-// });
-//
+import app from '../../server';
+import { getTestingContext } from '../util/testing';
+
+const ctx = getTestingContext();
+
+describe('Test the status url', () => {
+  it('status should return 200', async () => {
+    const res = await app.fetch(
+      new Request('http://localhost/status'),
+      ctx.env
+    );
+    expect(res.status).toBe(200);
+    let body = await res.json();
+  });
+
+  it('log should return 200', async () => {
+    const res = await app.fetch(
+      new Request('http://localhost/status/log'),
+      ctx.env
+    );
+    expect(res.status).toBe(200);
+    let body = await res.json();
+  });
+});

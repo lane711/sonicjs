@@ -28,18 +28,41 @@ export async function createUserAndGetToken(
   password = 'password123',
   role = 'admin'
 ) {
-  await createUserTestTables(ctx);
+  const user = await createLuciaUser(app, ctx, email, password, 'admin');
 
-  //TODO: create user properly using the lucia api so that the user keys data in populated
   let login = {
-    email,
+    email: user.email,
     password
   };
 
+  //now log the users in
+  let req = new Request('http://localhost/v1/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(login)
+  });
+  let res = await app.fetch(req, ctx.env);
+  let body = await res.json();
+  expect(res.status).toBe(200);
+  expect(body.bearer.length).toBeGreaterThan(10);
+  return { id: user.id, token: body.bearer };
+}
+
+export async function createLuciaUser(
+  app,
+  ctx,
+  email = 'a@a.com',
+  password = 'password123',
+  role = 'admin'
+) {
+  await createUserTestTables(ctx);
+
+  //TODO: create user properly using the lucia api so that the user keys data in populated
+
   let user = {
     data: {
-      email: login.email,
-      password: login.password,
+      email,
+      password,
       role,
       table: 'users'
     }
@@ -55,20 +78,8 @@ export async function createUserAndGetToken(
     undefined
   );
   expect(usersKeys.length).toBe(1);
-
-  //now log the users in
-  let req = new Request('http://localhost/v1/auth/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(login)
-  });
-  let res = await app.fetch(req, ctx.env);
-  expect(res.status).toBe(200);
-  let body = await res.json();
-  expect(body.bearer.length).toBeGreaterThan(10);
-  return { id: result.user.userId, token: body.bearer };
+  return users[0];
 }
-
 export async function createUserTestTables(ctx) {
   await createUserTestTable1(ctx);
   await createUserTestTable2(ctx);
