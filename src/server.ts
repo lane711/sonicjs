@@ -65,7 +65,7 @@ app.use(
 );
 
 function checkOrigin(origin){
-  return origin.indexOf('localhost') > 0 || origin.endsWith('.rifeplayer.com')
+  return origin.indexOf('localhost') > 0 || origin.endsWith('.rifeplayer.com') || origin.endsWith('.rifeplayer.pages.dev')
   ? origin
   : 'https://app.rifeplayer.com';
 }
