@@ -338,7 +338,7 @@ admin.get('/api/auth/:route', (ctx) => dataRoute(ctx.req.param('route'), ctx));
 admin.get('/api/:route', (ctx) => dataRoute(ctx.req.param('route'), ctx));
 
 function getDisplayField(item) {
-  return item.name ?? item.title ?? item.firstName ?? item.id ?? 'record';
+  return item.name ?? item.title ?? item.email ?? item.firstName ?? item.id ?? 'record';
 }
 
 export { admin };
