@@ -123,10 +123,7 @@ export const initializeLucia = (db: D1Database, env: Bindings) => {
     middleware: hono(),
     adapter: sonicAdapter(d1Adapter, env.KVDATA),
     getUserAttributes: (data) => {
-      return {
-        email: data.email,
-        role: data.role
-      };
+      return data;
     },
     passwordHash: {
       async generate(userPassword) {
