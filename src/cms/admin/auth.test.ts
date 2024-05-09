@@ -119,6 +119,42 @@ describe('admin should be restricted', () => {
     expect(userResponse.data.id).toBe(user.id);
   });
 
+  it('user can see their own record based on user id', async () => {
+    const user = await createUserAndGetToken(app, ctx, true, 'user@user.com', '12345678', 'user');
+
+    // TODO should be able to get users
+    let req = new Request(`http://localhost/v1/auth/users/${user.id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${user.token}`
+      }
+    });
+    let res = await app.fetch(req, ctx.env);
+    expect(res.status).toBe(200);
+    let userResponse = await res.json();
+    expect(userResponse.data.id).toBe(user.id);
+  });
+
+  it('user can see their own record based on session token', async () => {
+    const user = await createUserAndGetToken(app, ctx, true, 'user@user.com', '12345678', 'user');
+
+    // TODO should be able to get users
+    let req = new Request(`http://localhost/v1/auth/user`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${user.token}`
+      }
+    });
+    let res = await app.fetch(req, ctx.env);
+    expect(res.status).toBe(200);
+    let userResponse = await res.json();
+    expect(userResponse.data.id).toBe(user.id);
+    expect(userResponse.source).toBe('session');
+
+  });
+
   it('register user via the api', async () => {
     await createUserTestTables(ctx);
 

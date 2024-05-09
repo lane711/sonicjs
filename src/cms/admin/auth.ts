@@ -122,7 +122,7 @@ authAPI.get(`/users`, async (ctx) => {
   }
 });
 
-// View user
+// View user by id
 authAPI.get(`/users/:id`, async (ctx) => {
   const id = ctx.req.param('id');
   if (userTableConfig.hooks?.beforeOperation) {
@@ -194,6 +194,19 @@ authAPI.get(`/users/:id`, async (ctx) => {
 
   return ctx.json({ ...data, executionTime });
 });
+
+//view user by session token
+authAPI.get(`/user`, async (ctx) => {
+  const start = Date.now();
+
+  const session = ctx.get('session');
+
+  const end = Date.now();
+  const executionTime = end - start;
+
+  return ctx.json({ executionTime, source: 'session', data: session.user });
+});
+
 // Create user
 authAPI.post(`/users/:setup?`, async (ctx) => {
   let content = await ctx.req.json();
