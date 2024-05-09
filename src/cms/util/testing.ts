@@ -3,6 +3,7 @@ import { drizzle } from 'drizzle-orm/d1';
 import { createUser } from '../auth/lucia';
 import { getD1DataByTable } from '../data/d1-data';
 import { insertRecord } from '../data/data';
+import { log } from './logger';
 
 export function getTestingContext() {
   const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
@@ -24,16 +25,26 @@ export function getTestingContext() {
 export async function createUserAndGetToken(
   app,
   ctx,
+  createTables = true,
   email = 'a@a.com',
   password = 'password123',
   role = 'admin'
 ) {
-  const user = await createLuciaUser(app, ctx, email, password, 'admin');
+  const user = await createLuciaUser(
+    app,
+    ctx,
+    createTables,
+    email,
+    password,
+    role
+  );
 
   let login = {
     email: user.email,
     password
   };
+
+  console.log('logging in ', login);
 
   //now log the users in
   let req = new Request('http://localhost/v1/auth/login', {
@@ -51,12 +62,14 @@ export async function createUserAndGetToken(
 export async function createLuciaUser(
   app,
   ctx,
+  createTables = true,
   email = 'a@a.com',
   password = 'password123',
   role = 'admin'
 ) {
-  await createUserTestTables(ctx);
-
+  if (createTables) {
+    await createUserTestTables(ctx);
+  }
   //TODO: create user properly using the lucia api so that the user keys data in populated
 
   let user = {
@@ -69,15 +82,16 @@ export async function createLuciaUser(
   };
   const result = await createUser({ content: user, ctx });
 
-  const users = await getD1DataByTable(ctx.env.D1DATA, 'users', undefined);
+  const users = await getD1DataByTable(ctx.env.D1DATA, 'users', { email });
   expect(users.length).toBeGreaterThan(0);
 
   const usersKeys = await getD1DataByTable(
     ctx.env.D1DATA,
     'user_keys',
-    undefined
+    { email }
   );
-  expect(usersKeys.length).toBe(1);
+  expect(usersKeys.length > 0).toBe(true);
+  // const dbUser = user.data.filter((u) => u.data.email = email);
   return users[0];
 }
 export async function createUserTestTables(ctx) {
@@ -160,7 +174,7 @@ async function createUserTestTable3(ctx) {
   return db;
 }
 
-export async function CreateTestCategory(ctx, title, body =''){
+export async function CreateTestCategory(ctx, title, body = '') {
   return await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, {
     table: 'categories',
     data: {
