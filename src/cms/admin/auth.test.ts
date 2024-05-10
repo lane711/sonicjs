@@ -120,7 +120,14 @@ describe('admin should be restricted', () => {
   });
 
   it('user can see their own record based on user id', async () => {
-    const user = await createUserAndGetToken(app, ctx, true, 'user@user.com', '12345678', 'user');
+    const user = await createUserAndGetToken(
+      app,
+      ctx,
+      true,
+      'user@user.com',
+      '12345678',
+      'user'
+    );
 
     // TODO should be able to get users
     let req = new Request(`http://localhost/v1/auth/users/${user.id}`, {
@@ -137,7 +144,14 @@ describe('admin should be restricted', () => {
   });
 
   it('user can see their own record based on session token', async () => {
-    const user = await createUserAndGetToken(app, ctx, true, 'user@user.com', '12345678', 'user');
+    const user = await createUserAndGetToken(
+      app,
+      ctx,
+      true,
+      'user@user.com',
+      '12345678',
+      'user'
+    );
 
     // TODO should be able to get users
     let req = new Request(`http://localhost/v1/auth/user`, {
@@ -152,7 +166,42 @@ describe('admin should be restricted', () => {
     let userResponse = await res.json();
     expect(userResponse.data.id).toBe(user.id);
     expect(userResponse.source).toBe('session');
+  });
 
+  it('user can update their own record', async () => {
+    const user = await createUserAndGetToken(
+      app,
+      ctx,
+      true,
+      'user@user.com',
+      '12345678',
+      'user'
+    );
+
+    let payload = JSON.stringify({
+      data: { email: 'user2@user.com', firstName: 'Uppy' }
+    });
+    let req = new Request(`http://localhost/v1/auth/users/${user.id}`, {
+      method: 'PUT',
+      body: payload,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${user.token}`
+      }
+    });
+    let res = await app.fetch(req, ctx.env);
+    expect(res.status).toBe(200);
+    let body = await res.json();
+    expect(body.data.email).toBe('user2@user.com');
+    expect(body.data.firstName).toBe('Uppy');
+
+
+    //make sure db was updated
+    const d1Result = await getRecords(ctx, 'users', { id: user.id }, undefined);
+
+    expect(d1Result.data.id).toBe(user.id);
+    expect(d1Result.data.email).toBe(body.data.email);
+    expect(d1Result.data.firstName).toBe(body.data.firstName);
   });
 
   it('register user via the api', async () => {
@@ -191,8 +240,8 @@ describe('admin should be restricted', () => {
       'd1',
       undefined
     );
-    expect(users.data[0].firstName).toBe("Joe");
-    expect(users.data[0].role).toBe("user");
+    expect(users.data[0].firstName).toBe('Joe');
+    expect(users.data[0].role).toBe('user');
     expect(users.data.length).toBe(1);
 
     //add another
