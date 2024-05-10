@@ -261,7 +261,7 @@ export async function updateUser<T extends string>(
       return ctx.text('invalid password', 400);
     }
 
-    await auth.updateUserAttributes(id, {
+    const updatedUser = await auth.updateUserAttributes(id, {
       ...d1Data
     });
 
@@ -302,7 +302,7 @@ export async function updateUser<T extends string>(
         authRequest.setSession(session);
       }
       ctx.header('Authorization', `Bearer ${session.sessionId}`);
-      return ctx.json({ bearer: session.sessionId });
+      return ctx.json({ data: updatedUser });
     } else {
       return ctx.text('', 200);
     }
