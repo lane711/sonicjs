@@ -56,6 +56,8 @@ export async function createUserAndGetToken(
   let body = await res.json();
   expect(res.status).toBe(200);
   expect(body.bearer.length).toBeGreaterThan(10);
+  expect(body.user.email).toBe(email);
+
   return { id: user.id, token: body.bearer };
 }
 

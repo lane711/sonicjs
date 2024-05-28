@@ -330,7 +330,7 @@ export async function login<T extends string>(args: LuciaAPIArgs<T>) {
     }
     ctx.header('Authorization', `Bearer ${session.sessionId}`);
 
-    return ctx.json({ bearer: session.sessionId });
+    return ctx.json({ bearer: session.sessionId, user: session.user });
   } catch (e) {
     if (
       e instanceof LuciaError &&
