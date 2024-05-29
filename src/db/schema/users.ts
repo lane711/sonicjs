@@ -17,6 +17,7 @@ export const definition = {
   lastName: text('lastName'),
   email: text('email'),
   password: text('password'),
+  plan: text('plan').default('free'),
   role: text('role').$type<'admin' | 'user'>()
 };
 

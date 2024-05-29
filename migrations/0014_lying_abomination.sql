@@ -1,0 +1,1 @@
+ALTER TABLE users ADD `plan` text DEFAULT 'free';
