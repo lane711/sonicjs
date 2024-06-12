@@ -7,6 +7,7 @@
     "dev": "run-p dev:*",
     "dev:wrangler": "wrangler pages dev dist --env development --port 8786",
     "dev:esbuild": "node ./src/cms/util/build.mjs",
+    "dev:tailwind": "tailwindcss -i ./src/index.css -o ./public/css/tailwind.css --watch",
     "build": "node ./src/cms/util/build.mjs",
     "deploy": "wrangler pages deploy dist",
     "test": "jest --verbose",
@@ -33,6 +34,7 @@
     "miniflare": "^3.20231218.4",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.0.3",
+    "tailwindcss": "^3.4.3",
     "typescript": "^5.0.4",
     "wrangler": "^3.25.0"
   },
