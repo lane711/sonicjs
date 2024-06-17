@@ -79,9 +79,11 @@ export function saveContentType(db, site, contentTypeComponents) {
   return db.put(generatedKey, JSON.stringify(contentTypeComponents));
 }
 
-export async function addToKvCache(ctx, key, value) {
+export async function addToKvCache(ctx, kv, key, value) {
   const cacheKey = addCachePrefix(key);
 
+  // console.log('*** addToKvCache db', db)
+  // console.log("*** addToKvCache adding to kv cache", cacheKey);
   const createdOn = new Date().getTime();
 
   log(ctx, {
@@ -90,7 +92,7 @@ export async function addToKvCache(ctx, key, value) {
     key,
     cacheKey,
     createdOn,
-    value,
+    value
   });
 
   await kv.put(cacheKey, JSON.stringify(value), {
@@ -106,8 +108,18 @@ export async function addToKvCache(ctx, key, value) {
     message: `addToKvCache after put`,
     cacheKey
   });
+  // await db.put(cacheKey, JSON.stringify(value));
+  // console.log("*** addToKvCache put complete");
 
-  await addToKvKeys(ctx, key);
+  // const { record, metadata } = await db.getWithMetadata(key, { type: "json" });
+
+  // console.log('getWithMetadata', key, record, metadata)
+  // log(ctx, {
+  //   level: "verbose",
+  //   message: `addToKvCache record ${createdOn}`,
+  // });
+  // console.log('confirmedRecord', confirmedRecord)
+  // return record;
 }
 
 export async function getRecordFromKvCache(db, key, ignorePrefix = false) {
