@@ -61,10 +61,10 @@ describe('test KV data access tier', () => {
 
 describe('test KV cache', () => {
   it('addToKvCache should save to kv', async () => {
-    await addToKvCache(ctx, '/some-url-key-1', {
+    await addToKvCache({}, env.KVDATA, '/some-url-key-1', {
       foo: 'bar'
     });
-    await addToKvCache(ctx, '/some-url-key-2', {
+    await addToKvCache({}, env.KVDATA, '/some-url-key-2', {
       foo: 'bear'
     });
 
