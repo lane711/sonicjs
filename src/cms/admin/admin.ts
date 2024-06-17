@@ -235,6 +235,7 @@ const isImage = (fileName: string) => {
   let regex = new RegExp(`\\.(${extensions.join('|')})$`, 'i');
   return regex.test(fileName);
 };
+
 admin.get('/api/files', async (ctx) => {
   let fileFields: Record<string, string[]> = {};
   apiConfig.forEach((entry) => {
@@ -317,6 +318,7 @@ admin.get('/api/files', async (ctx) => {
   await Promise.all(promises);
   return ctx.json({ images: Array.from(images), files: Array.from(files) });
 });
+
 async function dataRoute(
   route: string,
   ctx: Context<{ Bindings: Bindings; Variables: Variables }>
@@ -386,4 +388,4 @@ function getDisplayField(item) {
   return item.name ?? item.title ?? item.firstName ?? item.id ?? 'record';
 }
 
-export { admin };
+// export { admin };
