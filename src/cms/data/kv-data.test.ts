@@ -1,4 +1,4 @@
-import { sleep } from "../util/helpers";
+import { sleep } from '../util/helpers';
 import {
   add,
   getKey,
@@ -61,10 +61,10 @@ describe('test KV data access tier', () => {
 
 describe('test KV cache', () => {
   it('addToKvCache should save to kv', async () => {
-    await addToKvCache({}, env.KVDATA, '/some-url-key-1', {
+    await addToKvCache(ctx, '/some-url-key-1', {
       foo: 'bar'
     });
-    await addToKvCache({}, env.KVDATA, '/some-url-key-2', {
+    await addToKvCache(ctx, '/some-url-key-2', {
       foo: 'bear'
     });
 
@@ -81,7 +81,7 @@ describe('test KV cache', () => {
     });
 
     const allCacheItems = await getKVCache(env.KVDATA);
-    console.log("allCacheItems", allCacheItems);
+    console.log('allCacheItems', allCacheItems);
 
     // //clear cache
     await clearKVCache(env.KVDATA);

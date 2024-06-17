@@ -30,7 +30,6 @@ import { drizzle } from 'drizzle-orm/d1';
 import { isNotNull } from 'drizzle-orm';
 import { hasUser } from '../auth/auth-helpers';
 
-
 const admin = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 admin.use('*', async (ctx, next) => {
@@ -120,16 +119,16 @@ admin.get('/cache/kv', async (ctx) => {
   return ctx.html(await loadKVCacheTable(ctx));
 });
 
-admin.get("/cache/keys", async (ctx) => {
+admin.get('/cache/keys', async (ctx) => {
   return ctx.html(await loadKVKeysTable(ctx));
 });
 
-admin.get("/cache/clear", async (ctx) => {
+admin.get('/cache/clear', async (ctx) => {
   return ctx.html(await loadCacheClear(ctx));
 });
 
-admin.get("/cache/kv/:id", async (ctx) => {
-  const id = ctx.req.param("id");
+admin.get('/cache/kv/:id', async (ctx) => {
+  const id = ctx.req.param('id');
   const idDecoded = decodeURIComponent(id);
   console.log('idDecoded', idDecoded);
   const kv = await getRecordFromKvCache(ctx.env.KVDATA, idDecoded, true);
@@ -196,7 +195,7 @@ admin.get('/api/kv-cache', async (ctx) => {
   });
 });
 
-admin.get("/api/keys-cache", async (ctx) => {
+admin.get('/api/keys-cache', async (ctx) => {
   const start = Date.now();
 
   var params = qs.parse(ctx.req.query());
@@ -204,7 +203,7 @@ admin.get("/api/keys-cache", async (ctx) => {
 
   const records = await getKVKeys(ctx.env.KVDATA);
 
-  console.log('keys', records)
+  console.log('keys', records);
 
   const data = records.keys.map((item) => {
     const itemEncoded = encodeURIComponent(item.name);
@@ -212,8 +211,8 @@ admin.get("/api/keys-cache", async (ctx) => {
       key: item.name,
       viewLink: `<a href="/admin/cache/kv/${itemEncoded}">${item.name}</a>`,
       lastAccessedOn: item.metadata.lastAccessedOn
-        ? format(item.metadata.lastAccessedOn, "MM/dd/yyyy h:mm b")
-        : "",
+        ? format(item.metadata.lastAccessedOn, 'MM/dd/yyyy h:mm b')
+        : ''
     };
   });
 
@@ -225,11 +224,12 @@ admin.get("/api/keys-cache", async (ctx) => {
     data,
     source: records.source,
     total: records.total,
-    executionTime,
+    executionTime
   });
 });
 
-admin.get("/api/:route", async (ctx) => {
+// admin.get("/api/:route", async (ctx) => {
+
 const isImage = (fileName: string) => {
   let extensions = ['jpg', 'jpeg', 'png', 'bmp', 'gif', 'svg', 'webp', 'avif'];
   let regex = new RegExp(`\\.(${extensions.join('|')})$`, 'i');
@@ -388,4 +388,4 @@ function getDisplayField(item) {
   return item.name ?? item.title ?? item.firstName ?? item.id ?? 'record';
 }
 
-// export { admin };
+export { admin };

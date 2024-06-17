@@ -12,6 +12,7 @@ import { tusAPI } from './cms/api/tus';
 
 import { AuthRequest, Session, User } from 'lucia';
 import { initializeLucia } from './cms/auth/lucia';
+import { authAPI } from './cms/admin/auth';
 
 export type Variables = {
   authRequest: AuthRequest;
