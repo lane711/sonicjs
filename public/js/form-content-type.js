@@ -5,31 +5,30 @@ var contentTypeComponents;
   const url = window.location.href;
   var mode;
 
-  if (url.indexOf("admin/content-type/new") > 0) {
-    mode = "new";
+  if (url.indexOf('admin/content-type/new') > 0) {
+    mode = 'new';
   }
 
-  if (url.indexOf("admin/content-type/edit") > 0) {
-    mode = "edit";
+  if (url.indexOf('admin/content-type/edit') > 0) {
+    mode = 'edit';
   }
 
   if (!mode) {
     return;
   }
 
-  if (mode == "edit") {
+  if (mode == 'edit') {
     editContentType();
   }
 
-  if (mode == "new") {
+  if (mode == 'new') {
     newContentType();
   }
 })();
 
 function editContentType() {
-
-  const contentType = window.location.href.split("/").pop();
-  console.log("contentType", contentType);
+  const contentType = window.location.href.split('/').pop();
+  console.log('contentType', contentType);
 
   axios.get(`/v1/form-components/${contentType}`).then((response) => {
     console.log(response.data);
@@ -38,19 +37,19 @@ function editContentType() {
     console.log(response.headers);
     console.log(response.config);
 
-    Formio.icons = "fontawesome";
+    Formio.icons = 'fontawesome';
     // Formio.createForm(document.getElementById("formio"), {
-    Formio.builder(document.getElementById("formio"), {
-      components: response.data,
+    Formio.builder(document.getElementById('formio'), {
+      components: response.data
     }).then(function (form) {
-      form.on("submit", function (submission) {
+      form.on('submit', function (submission) {
         console.log(submission);
       });
-      form.on("change", async function (event) {
-        $("#contentFormSaveButton").removeAttr("disabled");
+      form.on('change', async function (event) {
+        $('#contentFormSaveButton').removeAttr('disabled');
         if (event.components) {
           contentTypeComponents = event.components;
-          console.log("event ->", event);
+          console.log('event ->', event);
         }
       });
     });
@@ -60,23 +59,23 @@ function editContentType() {
 function newContentType() {
   const newComponents = [
     {
-      label: "System Id",
-      labelPosition: "top",
+      label: 'System Id',
+      labelPosition: 'top',
       placeholder:
-        "Edit the default value of this field with a value that it lowercase with dashes, ie: blog-post, blog-settings",
-      description: "",
-      tooltip: "",
-      prefix: "",
-      suffix: "",
+        'Edit the default value of this field with a value that it lowercase with dashes, ie: blog-post, blog-settings',
+      description: '',
+      tooltip: '',
+      prefix: '',
+      suffix: '',
       widget: {
-        type: "input",
+        type: 'input'
       },
-      inputMask: "",
-      displayMask: "",
+      inputMask: '',
+      displayMask: '',
       allowMultipleMasks: false,
-      customClass: "",
-      tabindex: "",
-      autocomplete: "",
+      customClass: '',
+      tabindex: '',
+      autocomplete: '',
       hidden: false,
       hideLabel: false,
       showWordCount: false,
@@ -89,81 +88,81 @@ function newContentType() {
       modalEdit: false,
       multiple: false,
       persistent: true,
-      inputFormat: "plain",
+      inputFormat: 'plain',
       protected: false,
       dbIndex: false,
-      case: "",
+      case: '',
       truncateMultipleSpaces: false,
       encrypted: false,
-      redrawOn: "",
+      redrawOn: '',
       clearOnHide: true,
-      customDefaultValue: "",
-      calculateValue: "",
+      customDefaultValue: '',
+      calculateValue: '',
       calculateServer: false,
       allowCalculateOverride: false,
-      validateOn: "change",
+      validateOn: 'change',
       validate: {
         required: true,
-        pattern: "",
-        customMessage: "",
-        custom: "",
+        pattern: '',
+        customMessage: '',
+        custom: '',
         customPrivate: false,
-        json: "",
-        minLength: "",
-        maxLength: "",
+        json: '',
+        minLength: '',
+        maxLength: '',
         strictDateValidation: false,
         multiple: false,
-        unique: false,
+        unique: false
       },
       unique: false,
-      errorLabel: "",
-      errors: "",
-      key: "systemId",
+      errorLabel: '',
+      errors: '',
+      key: 'systemId',
       tags: [],
       properties: {},
       conditional: {
         show: null,
         when: null,
-        eq: "",
-        json: "",
+        eq: '',
+        json: ''
       },
-      customConditional: "",
+      customConditional: '',
       logic: [],
       attributes: {},
       overlay: {
-        style: "",
-        page: "",
-        left: "",
-        top: "",
-        width: "",
-        height: "",
+        style: '',
+        page: '',
+        left: '',
+        top: '',
+        width: '',
+        height: ''
       },
-      type: "textfield",
+      type: 'textfield',
       input: true,
-      refreshOn: "",
+      refreshOn: '',
       dataGridLabel: false,
       addons: [],
-      inputType: "text",
-      id: "systemIdComponent",
-      defaultValue: "",
+      inputType: 'text',
+      id: 'systemIdComponent',
+      defaultValue: ''
     },
     {
-      label: "Title",
-      labelPosition: "top",
-      placeholder: "",
-      description: "",
-      tooltip: "",
-      prefix: "",
-      suffix: "",
+      label: 'Title',
+      labelPosition: 'top',
+      placeholder: '',
+      description: '',
+      tooltip: '',
+      prefix: '',
+      suffix: '',
       widget: {
-        type: "input",
+        type: 'input'
       },
-      inputMask: "",
-      displayMask: "",
+      inputMask: '',
+      displayMask: '',
       allowMultipleMasks: false,
-      customClass: "",
-      tabindex: "",
-      autocomplete: "",
+      customClass: '',
+      tabindex: '',
+      autocomplete: '',
       hidden: false,
       hideLabel: false,
       showWordCount: false,
@@ -176,78 +175,78 @@ function newContentType() {
       modalEdit: false,
       multiple: false,
       persistent: true,
-      inputFormat: "plain",
+      inputFormat: 'plain',
       protected: false,
       dbIndex: false,
-      case: "",
+      case: '',
       truncateMultipleSpaces: false,
       encrypted: false,
-      redrawOn: "",
+      redrawOn: '',
       clearOnHide: true,
-      customDefaultValue: "",
-      calculateValue: "",
+      customDefaultValue: '',
+      calculateValue: '',
       calculateServer: false,
       allowCalculateOverride: false,
-      validateOn: "change",
+      validateOn: 'change',
       validate: {
         required: true,
-        pattern: "",
-        customMessage: "",
-        custom: "",
+        pattern: '',
+        customMessage: '',
+        custom: '',
         customPrivate: false,
-        json: "",
-        minLength: "",
-        maxLength: "",
+        json: '',
+        minLength: '',
+        maxLength: '',
         strictDateValidation: false,
         multiple: false,
-        unique: false,
+        unique: false
       },
       unique: false,
-      errorLabel: "",
-      errors: "",
-      key: "title",
+      errorLabel: '',
+      errors: '',
+      key: 'title',
       tags: [],
       properties: {},
       conditional: {
         show: null,
         when: null,
-        eq: "",
-        json: "",
+        eq: '',
+        json: ''
       },
-      customConditional: "",
+      customConditional: '',
       logic: [],
       attributes: {},
       overlay: {
-        style: "",
-        page: "",
-        left: "",
-        top: "",
-        width: "",
-        height: "",
+        style: '',
+        page: '',
+        left: '',
+        top: '',
+        width: '',
+        height: ''
       },
-      type: "textfield",
+      type: 'textfield',
       input: true,
-      refreshOn: "",
+      refreshOn: '',
       dataGridLabel: false,
       addons: [],
-      inputType: "text",
-      id: "elreiuy",
-      defaultValue: "",
+      inputType: 'text',
+      id: 'elreiuy',
+      defaultValue: ''
     },
     {
-      type: "button",
-      label: "Submit",
-      key: "submit",
-      size: "md",
+      type: 'button',
+      label: 'Submit',
+      key: 'submit',
+      size: 'md',
       block: false,
-      action: "submit",
+      action: 'submit',
       disableOnInvalid: true,
-      theme: "primary",
+      theme: 'primary',
       input: true,
-      placeholder: "",
-      prefix: "",
-      customClass: "",
-      suffix: "",
+      placeholder: '',
+      prefix: '',
+      customClass: '',
+      suffix: '',
       multiple: false,
       defaultValue: null,
       protected: false,
@@ -255,47 +254,47 @@ function newContentType() {
       persistent: false,
       hidden: false,
       clearOnHide: true,
-      refreshOn: "",
-      redrawOn: "",
+      refreshOn: '',
+      redrawOn: '',
       tableView: false,
       modalEdit: false,
       dataGridLabel: true,
-      labelPosition: "top",
-      description: "",
-      errorLabel: "",
-      tooltip: "",
+      labelPosition: 'top',
+      description: '',
+      errorLabel: '',
+      tooltip: '',
       hideLabel: false,
-      tabindex: "",
+      tabindex: '',
       disabled: false,
       autofocus: false,
       dbIndex: false,
-      customDefaultValue: "",
-      calculateValue: "",
+      customDefaultValue: '',
+      calculateValue: '',
       calculateServer: false,
       widget: {
-        type: "input",
+        type: 'input'
       },
       attributes: {},
-      validateOn: "change",
+      validateOn: 'change',
       validate: {
         required: false,
-        custom: "",
+        custom: '',
         customPrivate: false,
         strictDateValidation: false,
         multiple: false,
-        unique: false,
+        unique: false
       },
       conditional: {
         show: null,
         when: null,
-        eq: "",
+        eq: ''
       },
       overlay: {
-        style: "",
-        left: "",
-        top: "",
-        width: "",
-        height: "",
+        style: '',
+        left: '',
+        top: '',
+        width: '',
+        height: ''
       },
       allowCalculateOverride: false,
       encrypted: false,
@@ -304,42 +303,41 @@ function newContentType() {
       properties: {},
       allowMultipleMasks: false,
       addons: [],
-      leftIcon: "",
-      rightIcon: "",
-      id: "ez1aarp",
-    },
+      leftIcon: '',
+      rightIcon: '',
+      id: 'ez1aarp'
+    }
   ];
-  Formio.icons = "fontawesome";
+  Formio.icons = 'fontawesome';
   // Formio.createForm(document.getElementById("formio"), {
-  Formio.builder(document.getElementById("formio"), {
-    components: newComponents,
+  Formio.builder(document.getElementById('formio'), {
+    components: newComponents
   }).then(function (form) {
-    form.on("submit", function (submission) {
+    form.on('submit', function (submission) {
       console.log(submission);
     });
-    form.on("change", async function (event) {
-      $("#contentFormSaveButton").removeAttr("disabled");
+    form.on('change', async function (event) {
+      $('#contentFormSaveButton').removeAttr('disabled');
       if (event.components) {
         contentTypeComponents = event.components;
-        console.log("event ->", event);
+        console.log('event ->', event);
       }
     });
   });
 }
 
 function onContentFormSave() {
-  console.log("saving content type");
+  console.log('saving content type');
   console.log(contentTypeComponents);
 
-  axios.post("/v1/form-components", contentTypeComponents).then((response) => {
+  axios.post('/v1/form-components', contentTypeComponents).then((response) => {
     console.log(response.data);
     console.log(response.status);
     console.log(response.statusText);
     console.log(response.headers);
     console.log(response.config);
-    if(response.status === 200 || response.status === 201){
+    if (response.status === 200 || response.status === 201) {
       location.href = '/admin/content-types';
-
     }
   });
 }

@@ -31,8 +31,8 @@ import {
   getKVKeyLatest,
   getKVKeyLatestUrl,
   getRecordFromKvCache,
-  saveKVData,
-} from "./kv-data";
+  saveKVData
+} from './kv-data';
 import {
   deleteD1ByTableAndId,
   getD1ByTableAndId,
@@ -43,6 +43,7 @@ import {
 import { log } from "../util/logger";
 import { triggerUrl } from "../api/api";
 import { extraTableFromUrl } from "../util/helpers";
+
 
 // export async function getRecordOld(d1, kv, id) {
 //   const cacheKey = addCachePrefix(id);
@@ -112,35 +113,33 @@ export async function getRecords(
   table,
   params,
   cacheKey,
-  source = "fastest",
+  source = 'fastest',
   customDataFunction = undefined
-) {
-  cacheKey = addCachePrefix(cacheKey);
-  log(ctx, { level: "verbose", message: "getRecords start", cacheKey });
-
+): Promise<{ data: any; source: string; total: number; contentType?: any }> {
+  log(ctx, { level: 'verbose', message: 'getRecords start', cacheKey });
   const cacheStatusValid = await isCacheValid();
   // console.log("getRecords cacheStatusValid", cacheStatusValid);
   log(ctx, {
-    level: "verbose",
-    message: `getRecords cacheStatusValid:${cacheStatusValid}`,
+    level: 'verbose',
+    message: `getRecords cacheStatusValid:${cacheStatusValid}`
   });
 
   //return cache if available
   if (cacheStatusValid && source == "fastest") {
     log(ctx, {
-      level: "verbose",
-      message: "getRecords getFromInMemoryCache start",
+      level: 'verbose',
+      message: 'getRecords getFromInMemoryCache start'
     });
     const cacheResult = await getFromInMemoryCache(ctx, cacheKey);
     log(ctx, {
-      level: "verbose",
+      level: 'verbose',
       message: `getRecords getFromInMemoryCache end. cacheResult:${
         cacheResult && cacheResult.length
-      }`,
+      }`
     });
 
     // console.log("cacheResult", cacheResult);
-    if (cacheResult && cacheResult.length && source == "fastest") {
+    if (cacheResult && cacheResult.length && source == 'fastest') {
       const cachedData = cacheResult[0].data;
       // console.log("**** cachedData ****", cachedData);
 
@@ -153,19 +152,17 @@ export async function getRecords(
     executionCtx = ctx.executionCtx;
   } catch (err) {}
 
-  //return kv if available
-
-  if (source == "fastest" || source == "kv") {
+  if (source == 'fastest' || source == 'kv') {
     log(ctx, {
-      level: "verbose",
-      message: "getRecords getRecordFromKvCache start",
+      level: 'verbose',
+      message: 'getRecords getRecordFromKvCache start'
     });
     const kvData = await getRecordFromKvCache(ctx.env.KVDATA, cacheKey);
     log(ctx, {
-      level: "verbose",
+      level: 'verbose',
       message: `getRecords getRecordFromKvCache end. kvData:${
         kvData && kvData.length
-      }`,
+      }`
     });
 
     if (kvData) {
@@ -185,11 +182,10 @@ export async function getRecords(
   // cache and kv is not available, so get from d1
   var d1Data;
   let total = 0;
-
   if (customDataFunction) {
     log(ctx, {
-      level: "verbose",
-      message: "getRecords customDataFunction start",
+      level: 'verbose',
+      message: 'getRecords customDataFunction start'
     });
     d1Data = await customDataFunction();
     if (d1Data && d1Data[0]) {
@@ -198,94 +194,72 @@ export async function getRecords(
       total = 1;
     }
     log(ctx, {
-      level: "verbose",
-      message: "getRecords customDataFunction end",
+      level: 'verbose',
+      message: 'getRecords customDataFunction end'
     });
   } else {
-    if (params && params.id) {
-      log(ctx, {
-        level: "verbose",
-        message: "getRecords getD1ByTableAndId start",
-      });
-      d1Data = await getD1ByTableAndId(ctx.env.D1DATA, table, params.id);
-      log(ctx, {
-        level: "verbose",
-        message: "getRecords getD1ByTableAndId end",
-      });
-      total = d1Data ? 1 : 0;
-    } else {
-      log(ctx, {
-        level: "verbose",
-        message: "getRecords getD1DataByTable start",
-      });
-      d1Data = await getD1DataByTable(ctx.env.D1DATA, table, params);
-      log(ctx, {
-        level: "verbose",
-        message: "getRecords getD1DataByTable end",
-      });
-    }
+    log(ctx, {
+      level: 'verbose',
+      message: 'getRecords getD1DataByTable start'
+    });
+    d1Data = await getD1DataByTable(
+      ctx.env.D1DATA,
+      table,
+      params
+    );
+    log(ctx, {
+      level: 'verbose',
+      message: 'getRecords getD1DataByTable end'
+    });
   }
 
-  if (d1Data.length) {
+  if (d1Data?.length) {
     total = d1Data[0].total;
+  } else if (d1Data) {
+    total = 1;
+    d1Data.total = undefined;
   }
 
   log(ctx, {
-    level: "verbose",
-    message: "getRecords addToInMemoryCache start",
+    level: 'verbose',
+    message: 'getRecords addToInMemoryCache start'
   });
 
   await dataAddToInMemoryCache(ctx, executionCtx, cacheKey, d1Data, total);
 
   log(ctx, {
-    level: "verbose",
-    message: "getRecords addToInMemoryCache end",
+    level: 'verbose',
+    message: 'getRecords addToInMemoryCache end'
   });
 
   log(ctx, {
-    level: "verbose",
-    message: "getRecords addToKvCache start",
+    level: 'verbose',
+    message: 'getRecords addToKvCache start'
   });
 
-  dataAddToKVCache(ctx, executionCtx, cacheKey, d1Data, total);
+  if (executionCtx) {
+    ctx.executionCtx.waitUntil(
+      await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
+        data: d1Data,
+        source: 'kv',
+        total
+      })
+    );
+  } else {
+    await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
+      data: d1Data,
+      source: 'kv',
+      total
+    });
+  }
 
   log(ctx, {
-    level: "verbose",
-    message: "getRecords addToKvCache end",
+    level: 'verbose',
+    message: 'getRecords addToKvCache end'
   });
 
-  const result = { data: d1Data, source: "d1", total };
-  log(ctx, {
-    level: "verbose",
-    message: "getRecords end",
-    cacheKey,
-    data: result,
-  });
-  return result;
-}
-
-async function dataAddToKVCache(ctx, executionCtx, cacheKey, data, total) {
-  addToKvCache(ctx, cacheKey, {
-    data,
-    source: "kv",
-    total,
-  });
-
-  // if (executionCtx) {
-  //   ctx.executionCtx.waitUntil(
-  //     await addToKvCache(ctx, cacheKey, {
-  //       data,
-  //       source: "kv",
-  //       total,
-  //     })
-  //   );
-  // } else {
-  //   await addToKvCache(ctx, cacheKey, {
-  //     data,
-  //     source: "kv",
-  //     total,
-  //   });
-  // }
+  log(ctx, { level: 'verbose', message: 'getRecords end', cacheKey });
+  return { data: d1Data, source: 'd1', total };
 }
 
 async function dataAddToInMemoryCache(
@@ -297,13 +271,14 @@ async function dataAddToInMemoryCache(
 ) {
   addToInMemoryCache(ctx, cacheKey, { data, source: "cache", total });
   // HACK to support int testing
-  // if (executionCtx) {
-  //   ctx.executionCtx.waitUntil(
-  //     addToInMemoryCache(ctx, cacheKey, { data, source: "cache", total })
-  //   );
-  // } else {
-  //   return addToInMemoryCache(ctx, cacheKey, { data, source: "cache", total });
-  // }
+
+  if (executionCtx) {
+    ctx.executionCtx.waitUntil(
+      addToInMemoryCache(ctx, cacheKey, { data, source: 'cache', total })
+    );
+  } else {
+    return addToInMemoryCache(ctx, cacheKey, { data, source: 'cache', total });
+  }
 }
 
 //insert
@@ -312,20 +287,21 @@ export async function insertRecord(d1, kv, data) {
   const id = uuidv4();
   const timestamp = new Date().getTime();
   content.data.id = id;
-  let error = "";
+  let error = '';
 
   // console.log("insertRecord", content);
-
+  let result = {};
   try {
-    const result = await saveKVData(kv, id, content.data);
+    result = await saveKVData(kv, id, content.data);
     // console.log('result KV', result);
     // return ctx.json(id, 201);
   } catch (error) {
-    error = "error posting content" + error;
+    console.log('error', error);
+    error = 'error posting content' + error;
   } finally {
     //then also save the content to sqlite for filtering, sorting, etc
     try {
-      const result = await insertD1Data(d1, kv, content.table, content.data);
+      result = await insertD1Data(d1, kv, content.table, content.data);
       // console.log("insertD1Data --->", result);
       //expire cache
       await setCacheStatusInvalid();
@@ -334,7 +310,7 @@ export async function insertRecord(d1, kv, data) {
       return { code: 201, data: result };
     } catch (error) {
       error =
-        "error posting content " +
+        'error posting content ' +
         content.data.table +
         error +
         JSON.stringify(content.data, null, 2);
@@ -393,11 +369,12 @@ export async function updateRecord(ctx, d1, kv, data, cacheKey) {
     //   });
     // });
   } catch (error) {
-    console.log("error posting content", error);
+    console.log('error posting content', error);
     return { code: 500, message: error };
   } finally {
     //then also save the content to sqlite for filtering, sorting, etc
     try {
+      const result = await updateD1Data(d1, data.table, data);
       //expire cache
       // await setCacheStatusInvalid();
       // await clearKVCache(kv);
@@ -406,7 +383,7 @@ export async function updateRecord(ctx, d1, kv, data, cacheKey) {
       // rehydrateCacheFromKVKeys(ctx);
       // return { code: 200, data: result };
     } catch (error) {
-      console.log("error posting content", error);
+      console.log('error posting content', error);
     }
   }
 }
@@ -446,7 +423,7 @@ export async function deleteRecord(d1, kv, data) {
     await setCacheStatusInvalid();
     await clearKVCache(kv);
   } catch (error) {
-    console.log("error deleting content", error);
+    console.log('error deleting content', error);
     return { code: 500, message: error };
   }
 }

@@ -1,5 +1,4 @@
 export async function log(ctx, data) {
-
   console.log(data.message);
 
   const datadog_apikey =
@@ -7,14 +6,14 @@ export async function log(ctx, data) {
 
   if (datadog_apikey) {
     let dd_logsEndpoint =
-      "https://http-intake.logs.datadoghq.com/v1/input/" + datadog_apikey;
+      'https://http-intake.logs.datadoghq.com/v1/input/' + datadog_apikey;
 
     let datadog_service = ctx.env.datadog_service;
 
     // let hostname = request.headers.get('host') || ''
 
     // data to log
-    data.ddsource = "cloudflare";
+    data.ddsource = 'cloudflare';
 
     data.service = datadog_service;
     // ddtags: 'service:cloudflare,source:cloudflare,site:' + hostname,
@@ -42,13 +41,12 @@ export async function log(ctx, data) {
     // },
     // }
 
-
     await fetch(dd_logsEndpoint, {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify(data),
       headers: new Headers({
-        "Content-Type": "application/json",
-      }),
+        'Content-Type': 'application/json'
+      })
     });
   }
 }

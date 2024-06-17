@@ -1,17 +1,36 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-      {
-        "name": "Debug Jest Tests",
-        "type": "node",
-        "request": "launch",
-        "runtimeArgs": [
-          "--inspect-brk",
-          "${workspaceRoot}/node_modules/.bin/jest",
-          "--runInBand"
-        ],
-        "console": "integratedTerminal",
-        "internalConsoleOptions": "neverOpen"
-      }
-    ]
-  }
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Jest Tests",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": [
+        "--inspect-brk",
+        "${workspaceRoot}/node_modules/.bin/jest",
+        "--runInBand"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch via NPM",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "dev", "--exitcrash"],
+      "restart": true,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Wrangler debug",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "cwd": "/",
+      "resolveSourceMapLocations": null,
+      "attachExistingChildren": false,
+      "autoAttachChildProcesses": false
+    }
+  ]
+}

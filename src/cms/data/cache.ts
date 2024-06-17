@@ -11,6 +11,8 @@ import {
 import { getRecords } from "./data";
 var db = new loki("cache.db");
 var cache = db.addCollection("cache", { unique: "key" });
+var db = new loki('cache.db');
+var cache = db.addCollection('cache');
 
 // class CacheStatus {
 //   private static _instance: CacheStatus;
@@ -29,7 +31,7 @@ var cache = db.addCollection("cache", { unique: "key" });
 const LocalCache = {
   getCacheStatus() {
     return true;
-  },
+  }
 };
 
 export async function isCacheValid(): Promise<boolean> {
@@ -74,8 +76,8 @@ export async function addToCache(ctx = {}, key: string, data) {
     cache.insert({ key, data });
   }
   log(ctx, {
-    level: "verbose",
-    message: "addToInMemoryCache end",
+    level: 'verbose',
+    message: 'addToInMemoryCache end'
   });
 }
 
@@ -91,15 +93,15 @@ export async function getFromInMemorySystemCache(ctx = {}, key: string) {
 
 export async function getFromCache(ctx = {}, key: string) {
   log(ctx, {
-    level: "verbose",
-    message: "getFromInMemoryCache start",
-    key,
+    level: 'verbose',
+    message: 'getFromInMemoryCache start',
+    key
   });
   let data = await cache.find({ key: key });
   log(ctx, {
-    level: "verbose",
-    message: "getFromInMemoryCache end",
-    key,
+    level: 'verbose',
+    message: 'getFromInMemoryCache end',
+    key
   });
   return data;
 }
@@ -212,5 +214,5 @@ export async function rehydrateCacheItemFromKVKey(ctx, url) {
 // }
 
 function getCacheStatusKey() {
-  return "cache-status";
+  return 'cache-status';
 }

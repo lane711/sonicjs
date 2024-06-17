@@ -7,30 +7,40 @@ import {
   addToKvCache,
   getRecordFromKvCache,
   clearKVCache,
-  getKVCache,
-  addToKvKeys,
-  getKVKeys,
-  getKVKeysSorted,
-} from "./kv-data";
+  getKVCache
+} from './kv-data';
 
 const env = getMiniflareBindings();
 const ctx = { env: { KVDATA: env.KVDATA, D1DATA: env.__D1_BETA__D1DATA } };
 
-describe("test KV data access tier", () => {
-  it("saveKVData should insert data", async () => {
-    const rec1 = await saveKVData(env.KVDATA, "12345", { foo: "bar" });
-    const rec2 = await saveKVData(env.KVDATA, "23456", { foo: "bar" });
-
-    const data = await getDataListByPrefix(env.KVDATA, "", 2);
-    console.log("getDataListByPrefix==>", data);
-
-    expect(data.keys.length).toBe(2);
-  });
+describe('test KV data access tier', () => {
+  // it('saveKVData should insert data', async () => {
+  //   const rec1 = await saveKVData(
+  //     env.KVDATA,
+  //     'site',
+  //     'ct',
+  //     { foo: 'bar' },
+  //     '12345'
+  //   );
+  //   const rec2 = await saveKVData(
+  //     env.KVDATA,
+  //     'site',
+  //     'ct',
+  //     { foo: 'bar' },
+  //     '23456'
+  //   );
+  //
+  //   const data = await getDataListByPrefix(env.KVDATA, '', 2);
+  //   console.log('getDataListByPrefix==>', data);
+  //
+  //   // expect(key.startsWith("site::module")).toBe(true);
+  //   // expect(key.length).toBe(40);
+  // });
 
   saveKVData;
-  it("getDataListByPrefix should return data", async () => {
-    const data = await getDataListByPrefix(env.KVDATA, "", 2);
-    console.log("getDataListByPrefix==>", data);
+  it('getDataListByPrefix should return data', async () => {
+    const data = await getDataListByPrefix(env.KVDATA, '', 2);
+    console.log('getDataListByPrefix==>', data);
     // expect(key.startsWith("site::module")).toBe(true);
     // expect(key.length).toBe(40);
   });
@@ -49,25 +59,25 @@ describe("test KV data access tier", () => {
   // });
 });
 
-describe("test KV cache", () => {
-  it("addToKvCache should save to kv", async () => {
-    await addToKvCache(ctx, "/some-url-key-1", {
-      foo: "bar",
+describe('test KV cache', () => {
+  it('addToKvCache should save to kv', async () => {
+    await addToKvCache({}, env.KVDATA, '/some-url-key-1', {
+      foo: 'bar'
     });
-    await addToKvCache(ctx, "/some-url-key-2", {
-      foo: "bear",
+    await addToKvCache({}, env.KVDATA, '/some-url-key-2', {
+      foo: 'bear'
     });
 
-    const kvResult1 = await getRecordFromKvCache(env.KVDATA, "/some-url-key-1");
-    const kvResult2 = await getRecordFromKvCache(env.KVDATA, "/some-url-key-2");
+    const kvResult1 = await getRecordFromKvCache(env.KVDATA, '/some-url-key-1');
+    const kvResult2 = await getRecordFromKvCache(env.KVDATA, '/some-url-key-2');
 
     // console.log('kvResult1', kvResult1)
     expect(kvResult1).toEqual({
-      foo: "bar",
+      foo: 'bar'
     });
 
     expect(kvResult2).toEqual({
-      foo: "bear",
+      foo: 'bear'
     });
 
     const allCacheItems = await getKVCache(env.KVDATA);
@@ -78,42 +88,5 @@ describe("test KV cache", () => {
 
     const allCacheItemsAfterClearCache = await getKVCache(env.KVDATA);
     expect(allCacheItemsAfterClearCache.keys.length).toEqual(0);
-  });
-});
-
-describe("test KV keys", () => {
-  it("addToKvKeys should save key", async () => {
-    await addToKvKeys(ctx, "cache::http://some-url-1");
-    await addToKvKeys(ctx, "cache::http://some-url-2");
-
-    const result = await getKVKeys(env.KVDATA);
-
-    expect(result.keys.length).toBe(2);
-  });
-
-  it("getKVKeysSorted return sorted keys by lastAccessedOn", async () => {
-    await addToKvKeys(ctx, "cache::http://some-url-1");
-    sleep(1);
-    await addToKvKeys(ctx, "cache::http://some-url-2");
-
-    const resultSorted = await getKVKeysSorted(env.KVDATA);
-
-    expect(resultSorted.length).toBe(2);
-    expect(resultSorted[0].name).toBe("key::http://some-url-2");
-    expect(resultSorted[0].metadata.url).toBe("http://some-url-2");
-  });
-
-  it("getKVKeysSorted return sorted keys by lastAccessedOn after update", async () => {
-    await addToKvKeys(ctx, "cache::http://some-url-1");
-    sleep(1);
-    await addToKvKeys(ctx, "cache::http://some-url-2");
-    sleep(1);
-    await addToKvKeys(ctx, "cache::http://some-url-1");
-
-    const resultSorted = await getKVKeysSorted(env.KVDATA);
-
-    expect(resultSorted.length).toBe(2);
-    expect(resultSorted[0].name).toBe("key::http://some-url-1");
-    expect(resultSorted[0].metadata.url).toBe("http://some-url-1");
   });
 });

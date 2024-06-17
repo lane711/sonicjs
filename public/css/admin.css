@@ -39,7 +39,8 @@ html a:hover {
   background-color: rgba(0, 0, 0, 0.1);
   border: solid rgba(0, 0, 0, 0.15);
   border-width: 1px 0;
-  box-shadow: inset 0 0.5em 1.5em rgba(0, 0, 0, 0.1),
+  box-shadow:
+    inset 0 0.5em 1.5em rgba(0, 0, 0, 0.1),
     inset 0 0.125em 0.5em rgba(0, 0, 0, 0.15);
 }
 
@@ -188,8 +189,24 @@ body {
 /*
  * Form Builder
  */
-.formio-component-systemId{
+.formio-component-systemId {
   background: var(--bs-light);
   padding: 30px;
   border-radius: 8px;
+}
+
+html[data-bs-theme="dark"] .btn-warning {
+  --bs-btn-bg: #4d3b00;
+  --bs-btn-border-color: #4d3b00;
+  --bs-btn-hover-color: #000;
+  --bs-btn-hover-bg: #1d1600;
+  --bs-btn-hover-border-color: #1d1600;
+  --bs-btn-focus-shadow-rgb: 173, 127, 4;
+  --bs-btn-active-color: #000;
+  --bs-btn-active-bg: #4d3b00;
+  --bs-btn-active-border-color: #4d3b00;
+  --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  --bs-btn-disabled-color: #000;
+  --bs-btn-disabled-bg: #4d3b00;
+  --bs-btn-disabled-border-color: #4d3b00;
 }
