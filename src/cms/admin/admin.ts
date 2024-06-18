@@ -22,7 +22,7 @@ import { apiConfig, config } from '../../db/routes';
 import qs from 'qs';
 import { format } from 'date-fns';
 import { getAllFromInMemoryCache, getFromInMemoryCache } from '../data/cache';
-import { getKVCache, getRecordFromKvCache } from '../data/kv-data';
+import { getKVCache, getKVKeys, getRecordFromKvCache } from '../data/kv-data';
 import { loadLogin, loadSetup } from './pages/login';
 import { Variables } from '../../server';
 import { tableSchemas } from '../../db/routes';
