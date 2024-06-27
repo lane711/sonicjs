@@ -21,17 +21,42 @@ rifePlayerApi.get('/check-user-exists/:email', async (ctx) => {
   return ctx.json(data);
 });
 
-rifePlayerApi.post('/contact-submit', async (ctx) => {
+rifePlayerApi.post(`/stripe-rp-webhook`, async (ctx) => {
+  let event = await ctx.req.json();
 
-  console.log('contact processing ')
+  console.log(event);
+
+  // Handle the event
+  switch (event.type) {
+    case 'payment_intent.succeeded':
+      const paymentIntent = event.data.object;
+      // Then define and call a method to handle the successful payment intent.
+      // handlePaymentIntentSucceeded(paymentIntent);
+      break;
+    case 'payment_method.attached':
+      const paymentMethod = event.data.object;
+      // Then define and call a method to handle the successful attachment of a PaymentMethod.
+      // handlePaymentMethodAttached(paymentMethod);
+      break;
+    // ... handle other event types
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
+
+  // Return a response to acknowledge receipt of the event
+  return ctx.json({ received: true });
+});
+
+rifePlayerApi.post('/contact-submit', async (ctx) => {
+  console.log('contact processing ');
   const payload = await ctx.req.json();
-  console.log('contact payload ', payload)
+  console.log('contact payload ', payload);
 
   const token = payload.token;
-  console.log('contact token ', token)
+  console.log('contact token ', token);
 
   if (token !== ctx.env.APIKEY) {
-    console.log('contact bad token ')
+    console.log('contact bad token ');
     return ctx.text('Unauthorized', 401);
   }
 
@@ -39,7 +64,7 @@ rifePlayerApi.post('/contact-submit', async (ctx) => {
 
   const record = await insertRecord(ctx.env.D1DATA, ctx.env.KVDATA, payload);
 
-  console.log('contact record ', record)
+  console.log('contact record ', record);
 
   //send email confirmations
   const fullName = payload.data.lastName
@@ -53,7 +78,7 @@ rifePlayerApi.post('/contact-submit', async (ctx) => {
     ctx.env.SENDGRID_ENABLED === 'true'
   ) {
     //send to visitor
-    console.log('contact send mail enabled ')
+    console.log('contact send mail enabled ');
     sendEmail(
       ctx,
       payload.data.email,
@@ -80,7 +105,7 @@ rifePlayerApi.post('/contact-submit', async (ctx) => {
     );
   }
 
-  console.log('contact returning ', record.data, record.code)
+  console.log('contact returning ', record.data, record.code);
 
   return ctx.json(record.data, record.code);
 });

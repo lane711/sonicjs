@@ -100,6 +100,29 @@ it('contact post should (insert) and should return 204', async () => {
   expect(body.firstName).toBe('Joe');
 });
 
+it('stripe webhook handler should consume payload', async () => {
+  await createContactTable(ctx);
+  let payload = JSON.stringify({
+    data: {
+      firstName: 'Joe',
+      lastName: 'Smith',
+      email: 'test@test.com',
+      message: `line one\r\nline two I'd be good`
+    },
+    token: ctx.env.APIKEY
+  });
+
+  let req = new Request('http://localhost/v2/stripe-rp-webhook', {
+    method: 'POST',
+    body: payload,
+    headers: { 'Content-Type': 'application/json' }
+  });
+  let res = await app.fetch(req, ctx.env);
+  expect(res.status).toBe(200);
+  let body = await res.json();
+  expect(body.received).toBe(true);
+});
+
 it('register user via the api', async () => {
   await createUserTestTables(ctx);
 
@@ -164,9 +187,7 @@ it('register user via the api', async () => {
   );
   expect(users2.data.length).toBe(2);
   expect(users2.data[1].email).toBe('b@b.com');
-
 });
-
 
 async function createProgramTable(ctx) {
   const db = drizzle(ctx.env.D1DATA);
