@@ -38,7 +38,8 @@ rifePlayerApi.post(`/stripe-rp-webhook`, async (ctx) => {
     const stripe = require('stripe')(ctx.env.STRIPE_KEY)
 
     const body = await ctx.req.json();
-    event = stripe.webhooks.constructEvent(body, sig, stipeSecret);
+    event = await stripe.webhooks.constructEventAsync(body, sig, stipeSecret);
+    
     console.log(event);
   } catch (err) {
     return ctx.json(`Webhook Error: ${err.message}`,400);
