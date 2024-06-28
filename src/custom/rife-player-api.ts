@@ -2,7 +2,7 @@ import { Context, Env, Hono } from 'hono';
 import { getPrograms, checkUserExists } from './rife-player-data';
 import { insertRecord } from '../cms/data/data';
 import { sendEmail } from './send-email';
-import stripe from 'stripe';
+// import stripe from 'stripe';
 
 const rifePlayerApi = new Hono();
 
@@ -32,6 +32,8 @@ rifePlayerApi.post(`/stripe-rp-webhook`, async (ctx) => {
   let event;
 
   try {
+    const stripe = require('stripe')(ctx.env.STRIPE_KEY)
+
     const body = await ctx.req.json();
     event = stripe.webhooks.constructEvent(body, sig, stipeSecret);
     console.log(event);
