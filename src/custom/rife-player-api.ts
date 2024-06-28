@@ -26,8 +26,11 @@ rifePlayerApi.get('/check-user-exists/:email', async (ctx) => {
 rifePlayerApi.post(`/stripe-rp-webhook`, async (ctx) => {
   console.log('processing new stripe webhook')
   const stipeSecret = ctx.env.STRIPE_ENDPOINT_SECRET;
+
+  console.log('sec', stipeSecret)
   const sig = ctx.req.header('stripe-signature');
 
+  console.log('sig', sig)
 
   let event;
 
