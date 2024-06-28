@@ -14,7 +14,6 @@ import { AuthRequest, Session, User } from 'lucia';
 import { initializeLucia } from './cms/auth/lucia';
 import { rifePlayerApi } from './custom/rife-player-api';
 
-
 export type Variables = {
   authRequest: AuthRequest;
   session?: Session;
@@ -64,10 +63,13 @@ app.use(
   })
 );
 
-function checkOrigin(origin){
-  return origin.indexOf('localhost') > 0 || origin.endsWith('.rifeplayer.com') || origin.endsWith('.rifeplayer.pages.dev') || origin.includes('.stripe.com')
-  ? origin
-  : 'https://app.rifeplayer.com';
+function checkOrigin(origin) {
+  return origin.indexOf('localhost') > 0 ||
+    origin.endsWith('.rifeplayer.com') ||
+    origin.endsWith('.rifeplayer.pages.dev') ||
+    origin.endsWith('.stripe.com')
+    ? origin
+    : 'https://app.rifeplayer.com';
 }
 
 //request Logging
