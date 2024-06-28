@@ -8,7 +8,7 @@ import { insertD1Data } from '../cms/data/d1-data';
 import { createUserTestTables, getTestingContext } from '../cms/util/testing';
 
 const ctx = getTestingContext();
-
+import {stripeJson} from './mocks/stripe'
 it('rp controller sanity', async () => {
   // await createTestTable(ctx);
 
@@ -102,20 +102,16 @@ it('contact post should (insert) and should return 204', async () => {
 
 it('stripe webhook handler should consume payload', async () => {
   await createContactTable(ctx);
-  let payload = JSON.stringify({
-    data: {
-      firstName: 'Joe',
-      lastName: 'Smith',
-      email: 'test@test.com',
-      message: `line one\r\nline two I'd be good`
-    },
-    token: ctx.env.APIKEY
-  });
+
+  let payload = JSON.stringify(stripeJson);
 
   let req = new Request('http://localhost/v2/stripe-rp-webhook', {
     method: 'POST',
     body: payload,
-    headers: { 'Content-Type': 'application/json' }
+    headers: {
+      'Content-Type': 'application/json',
+      'stripe-signature': ctx.env.STRIPE_ENDPOINT_SECRET
+    }
   });
   let res = await app.fetch(req, ctx.env);
   expect(res.status).toBe(200);

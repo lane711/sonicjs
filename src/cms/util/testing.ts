@@ -13,7 +13,7 @@ export function getTestingContext() {
   };
 
   const ctx = {
-    env: { KVDATA: KVDATA, D1DATA: __D1_BETA__D1DATA },
+    env: { KVDATA: KVDATA, D1DATA: __D1_BETA__D1DATA, STRIPE_ENDPOINT_SECRET: 'abc123' },
     json: toJson,
     user: { id: 'fromtest' },
     _var: { user: { userId: 'abc123' } }
