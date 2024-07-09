@@ -1,4 +1,4 @@
-import { LuciaError, lucia } from 'lucia';
+import { Lucia } from 'lucia';
 import {
   generateLuciaPasswordHash,
   generateRandomString,
