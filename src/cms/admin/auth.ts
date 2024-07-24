@@ -212,6 +212,9 @@ authAPI.post(`/users/:setup?`, async (ctx) => {
   if (!content.data) {
     content = { data: content };
   }
+  if(content.data.email){
+    content.data.email = content.data.email.toLowerCase();
+  }
   content.data.table = 'users';
   content.table = 'users';
   // HACK: need a better fix - this should only apply when the admin is first creating their account

@@ -212,7 +212,7 @@ describe('admin should be restricted', () => {
         firstName: 'Joe',
         lastName: '',
         role: 'user',
-        email: 'a@a.com',
+        email: 'A@a.com',
         password: '12341234',
         table: 'users'
       }
@@ -240,6 +240,7 @@ describe('admin should be restricted', () => {
       'd1',
       undefined
     );
+    expect(users.data[0].email).toBe('a@a.com');
     expect(users.data[0].firstName).toBe('Joe');
     expect(users.data[0].role).toBe('user');
     expect(users.data.length).toBe(1);
