@@ -23,6 +23,12 @@ const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 export type AppContext = Context<{ Bindings: Bindings; Variables: Variables }>;
 
 app.use('*', async (ctx, next) => {
+  console.log('auth disabled?' , ctx.env.disable_auth)
+  if(ctx.env.disable_auth = true){
+    await next();
+    return;
+  }
+
   const path = ctx.req.path;
   if (!path.includes('/public')) {
     const auth = initializeLucia(ctx.env.D1DATA, ctx.env);
@@ -57,6 +63,10 @@ app.use(
 
 //request Logging
 app.use('*', async (ctx, next) => {
+  if(ctx.env.disable_logging = true){
+    await next();
+    return;
+  }
   if (ctx.req.path.indexOf('/admin') == 0 || ctx.req.path.indexOf('/v1') == 0) {
     log(ctx, { level: 'info', method: ctx.req.method, url: ctx.req.path });
   }

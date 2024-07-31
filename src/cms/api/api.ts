@@ -43,24 +43,26 @@ tables.forEach((entry) => {
     const query = ctx.req.query();
     const params = qs.parse(query);
 
-    if (entry.hooks?.beforeOperation) {
-      await entry.hooks.beforeOperation(ctx, 'read', params.id);
-    }
-    const accessControlResult = await getApiAccessControlResult(
-      entry?.access?.operation?.read || true,
-      entry?.access?.filter?.read || true,
-      true,
-      ctx,
-      params.id,
-      entry.table
-    );
+    if (ctx.env.disable_auth != true) {
+      if (entry.hooks?.beforeOperation) {
+        await entry.hooks.beforeOperation(ctx, 'read', params.id);
+      }
+      const accessControlResult = await getApiAccessControlResult(
+        entry?.access?.operation?.read || true,
+        entry?.access?.filter?.read || true,
+        true,
+        ctx,
+        params.id,
+        entry.table
+      );
 
-    if (typeof accessControlResult === 'object') {
-      params.accessControlResult= {...accessControlResult };
-    }
+      if (typeof accessControlResult === 'object') {
+        params.accessControlResult = { ...accessControlResult };
+      }
 
-    if (!accessControlResult) {
-      return ctx.text('Unauthorized', 401);
+      if (!accessControlResult) {
+        return ctx.text('Unauthorized', 401);
+      }
     }
 
     try {
@@ -75,25 +77,28 @@ tables.forEach((entry) => {
         undefined
       );
 
-      if (entry.access?.item?.read) {
-        const accessControlResult = await getItemReadResult(
-          entry.access.item.read,
+      if (ctx.env.disable_auth != true) {
+        if (entry.access?.item?.read) {
+          const accessControlResult = await getItemReadResult(
+            entry.access.item.read,
+            ctx,
+            data
+          );
+          if (!accessControlResult) {
+            return ctx.text('Unauthorized', 401);
+          }
+        }
+        data.data = await filterReadFieldAccess(
+          entry.access?.fields,
           ctx,
-          data
+          data.data
         );
-        if (!accessControlResult) {
-          return ctx.text('Unauthorized', 401);
+
+        if (entry.hooks?.afterOperation) {
+          await entry.hooks.afterOperation(ctx, 'read', params.id, null, data);
         }
       }
-      data.data = await filterReadFieldAccess(
-        entry.access?.fields,
-        ctx,
-        data.data
-      );
-
-      if (entry.hooks?.afterOperation) {
-        await entry.hooks.afterOperation(ctx, 'read', params.id, null, data);
-      }
+      
       const end = Date.now();
       const executionTime = end - start;
 

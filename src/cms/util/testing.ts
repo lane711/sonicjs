@@ -13,7 +13,12 @@ export function getTestingContext() {
   };
 
   const ctx = {
-    env: { KVDATA: KVDATA, D1DATA: __D1_BETA__D1DATA },
+    env: {
+      KVDATA: KVDATA,
+      D1DATA: __D1_BETA__D1DATA,
+      disable_auth: 'false',
+      disable_logging: 'false'
+    },
     json: toJson,
     user: { id: 'fromtest' },
     _var: { user: { userId: 'abc123' } }
@@ -87,11 +92,9 @@ export async function createLuciaUser(
   const users = await getD1DataByTable(ctx.env.D1DATA, 'users', { email });
   expect(users.length).toBeGreaterThan(0);
 
-  const usersKeys = await getD1DataByTable(
-    ctx.env.D1DATA,
-    'user_keys',
-    { email }
-  );
+  const usersKeys = await getD1DataByTable(ctx.env.D1DATA, 'user_keys', {
+    email
+  });
   expect(usersKeys.length > 0).toBe(true);
   // const dbUser = user.data.filter((u) => u.data.email = email);
   return users[0];
