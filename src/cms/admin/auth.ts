@@ -30,6 +30,7 @@ authAPI.use('*', async (ctx, next) => {
     await next();
     return;
   }
+  
   const session = ctx.get('session');
   const path = ctx.req.path;
   if (!session && path !== '/v1/auth/login' && path !== '/v1/auth/verify') {
