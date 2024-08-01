@@ -88,6 +88,10 @@ export async function getRecords(
 ): Promise<{ data: any; source: string; total: number; contentType?: any }> {
   log(ctx, { level: 'verbose', message: 'getRecords start', cacheKey });
 
+  const disableCache = ctx.env.disable_cache === 'true';
+  const disableKv = ctx.env.disable_kv === 'true'
+  console.log('disableCache / disableKv:', disableCache + ' / ' + disableKv);
+
   //cache
   if (ctx.env.disable_cache !== 'true') {
     const cacheStatusValid = await isCacheValid();
