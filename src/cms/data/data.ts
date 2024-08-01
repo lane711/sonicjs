@@ -89,11 +89,11 @@ export async function getRecords(
   log(ctx, { level: 'verbose', message: 'getRecords start', cacheKey });
 
   const disableCache = ctx.env.disable_cache === 'true';
-  const disableKv = ctx.env.disable_kv === 'true'
+  const disableKv = ctx.env.disable_kv === 'true';
   console.log('disableCache / disableKv:', disableCache + ' / ' + disableKv);
 
   //cache
-  if (ctx.env.disable_cache !== 'true') {
+  if (!disableCache) {
     const cacheStatusValid = await isCacheValid();
     // console.log("getRecords cacheStatusValid", cacheStatusValid);
     log(ctx, {
@@ -125,7 +125,7 @@ export async function getRecords(
   }
 
   //kv
-  if (ctx.env.disable_kv !== 'true') {
+  if (!disableKv) {
     var executionCtx;
     try {
       executionCtx = ctx.executionCtx;
@@ -194,11 +194,6 @@ export async function getRecords(
     d1Data.total = undefined;
   }
 
-  log(ctx, {
-    level: 'verbose',
-    message: 'getRecords addToInMemoryCache start'
-  });
-
   // HACK to support int testing
   // if (executionCtx) {
   //   ctx.executionCtx.waitUntil(
@@ -219,38 +214,42 @@ export async function getRecords(
   //     ctx.env.cache_ttl
   //   );
   // }
-  dataAddToInMemoryCache(ctx, executionCtx, cacheKey, d1Data, total);
+  if (!disableCache) {
+    dataAddToInMemoryCache(ctx, executionCtx, cacheKey, d1Data, total);
 
-  log(ctx, {
-    level: 'verbose',
-    message: 'getRecords addToInMemoryCache end'
-  });
+    log(ctx, {
+      level: 'verbose',
+      message: 'getRecords addToInMemoryCache end'
+    });
+  }
 
-  log(ctx, {
-    level: 'verbose',
-    message: 'getRecords addToKvCache start'
-  });
+  if (!disableKv) {
+    log(ctx, {
+      level: 'verbose',
+      message: 'getRecords addToKvCache start'
+    });
 
-  if (executionCtx) {
-    ctx.executionCtx.waitUntil(
+    if (executionCtx) {
+      ctx.executionCtx.waitUntil(
+        await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
+          data: d1Data,
+          source: 'kv',
+          total
+        })
+      );
+    } else {
       await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
         data: d1Data,
         source: 'kv',
         total
-      })
-    );
-  } else {
-    await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
-      data: d1Data,
-      source: 'kv',
-      total
+      });
+    }
+
+    log(ctx, {
+      level: 'verbose',
+      message: 'getRecords addToKvCache end'
     });
   }
-
-  log(ctx, {
-    level: 'verbose',
-    message: 'getRecords addToKvCache end'
-  });
 
   log(ctx, { level: 'verbose', message: 'getRecords end', cacheKey });
   return { data: d1Data, source: 'd1', total };
