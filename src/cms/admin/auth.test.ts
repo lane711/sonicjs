@@ -43,7 +43,7 @@ describe('admin should be restricted', () => {
 
   it('categories record with auth disabled', async () => {
     ctx.env.disable_auth = true;
-    
+
     await createCategoriesTestTable1(ctx);
 
     await insertD1Data(ctx.env.D1DATA, ctx.env.KVDATA, 'categories', {
@@ -87,6 +87,7 @@ describe('admin should be restricted', () => {
   });
 
   it('register user via the api', async () => {
+    ctx.env.disable_auth = false;
     await createUserTestTables(ctx);
 
     const account = {

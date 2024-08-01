@@ -87,83 +87,70 @@ export async function getRecords(
   customDataFunction = undefined
 ): Promise<{ data: any; source: string; total: number; contentType?: any }> {
   log(ctx, { level: 'verbose', message: 'getRecords start', cacheKey });
-  const cacheStatusValid = await isCacheValid();
-  // console.log("getRecords cacheStatusValid", cacheStatusValid);
-  log(ctx, {
-    level: 'verbose',
-    message: `getRecords cacheStatusValid:${cacheStatusValid}`
-  });
 
-  if (cacheStatusValid) {
+  //cache
+  if (ctx.env.disable_cache != true) {
+    const cacheStatusValid = await isCacheValid();
+    // console.log("getRecords cacheStatusValid", cacheStatusValid);
     log(ctx, {
       level: 'verbose',
-      message: 'getRecords getFromInMemoryCache start'
-    });
-    const cacheResult = await getFromInMemoryCache(ctx, cacheKey);
-    log(ctx, {
-      level: 'verbose',
-      message: `getRecords getFromInMemoryCache end. cacheResult:${
-        cacheResult && cacheResult.length
-      }`
+      message: `getRecords cacheStatusValid:${cacheStatusValid}`
     });
 
-    // console.log("cacheResult", cacheResult);
-    if (cacheResult && cacheResult.length && source == 'fastest') {
-      const cachedData = cacheResult[0].data;
-      // console.log("**** cachedData ****", cachedData);
+    if (cacheStatusValid) {
+      log(ctx, {
+        level: 'verbose',
+        message: 'getRecords getFromInMemoryCache start'
+      });
+      const cacheResult = await getFromInMemoryCache(ctx, cacheKey);
+      log(ctx, {
+        level: 'verbose',
+        message: `getRecords getFromInMemoryCache end. cacheResult:${
+          cacheResult && cacheResult.length
+        }`
+      });
 
-      return cachedData;
+      // console.log("cacheResult", cacheResult);
+      if (cacheResult && cacheResult.length && source == 'fastest') {
+        const cachedData = cacheResult[0].data;
+        // console.log("**** cachedData ****", cachedData);
+
+        return cachedData;
+      }
     }
   }
 
-  var executionCtx;
-  try {
-    executionCtx = ctx.executionCtx;
-  } catch (err) {}
+  //kv
+  if (ctx.env.disable_kv != true) {
+    var executionCtx;
+    try {
+      executionCtx = ctx.executionCtx;
+    } catch (err) {}
 
-  if (source == 'fastest' || source == 'kv') {
-    log(ctx, {
-      level: 'verbose',
-      message: 'getRecords getRecordFromKvCache start'
-    });
-    const kvData = await getRecordFromKvCache(ctx.env.KVDATA, cacheKey);
-    log(ctx, {
-      level: 'verbose',
-      message: `getRecords getRecordFromKvCache end. kvData:${
-        kvData && kvData.length
-      }`
-    });
+    if (source == 'fastest' || source == 'kv') {
+      log(ctx, {
+        level: 'verbose',
+        message: 'getRecords getRecordFromKvCache start'
+      });
+      const kvData = await getRecordFromKvCache(ctx.env.KVDATA, cacheKey);
+      log(ctx, {
+        level: 'verbose',
+        message: `getRecords getRecordFromKvCache end. kvData:${
+          kvData && kvData.length
+        }`
+      });
 
-    if (kvData) {
-      //we have the data in KV, but we should still cache it for the next matching request
-      // if (executionCtx) {
-      //   ctx.executionCtx.waitUntil(
-      //     addToInMemoryCache(
-      //       cacheKey,
-      //       { data: kvData.data, source: "cache", total: kvData.total },
-      //       ctx.env.cache_ttl
-      //     )
-      //   );
-      // } else {
-      //   await addToInMemoryCache(
-      //     cacheKey,
-      //     {
-      //       data: kvData.data,
-      //       source: "cache",
-      //       total: kvData.total,
-      //     },
-      //     ctx.env.cache_ttl
-      //   );
-      // }
-      dataAddToInMemoryCache(
-        ctx,
-        executionCtx,
-        cacheKey,
-        kvData.data,
-        kvData.total
-      );
+      if (kvData) {
+        dataAddToInMemoryCache(
+          ctx,
+          executionCtx,
+          cacheKey,
+          kvData.data,
+          kvData.total
+        );
 
-      return kvData;
+        return kvData;
+      }
     }
   }
 
@@ -189,11 +176,7 @@ export async function getRecords(
       level: 'verbose',
       message: 'getRecords getD1DataByTable start'
     });
-    d1Data = await getD1DataByTable(
-      ctx.env.D1DATA,
-      table,
-      params
-    );
+    d1Data = await getD1DataByTable(ctx.env.D1DATA, table, params);
     log(ctx, {
       level: 'verbose',
       message: 'getRecords getD1DataByTable end'
