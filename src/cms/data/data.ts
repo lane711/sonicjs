@@ -89,7 +89,7 @@ export async function getRecords(
   log(ctx, { level: 'verbose', message: 'getRecords start', cacheKey });
 
   //cache
-  if (ctx.env.disable_cache != true) {
+  if (ctx.env.disable_cache !== 'true') {
     const cacheStatusValid = await isCacheValid();
     // console.log("getRecords cacheStatusValid", cacheStatusValid);
     log(ctx, {
@@ -121,7 +121,7 @@ export async function getRecords(
   }
 
   //kv
-  if (ctx.env.disable_kv != true) {
+  if (ctx.env.disable_kv !== 'true') {
     var executionCtx;
     try {
       executionCtx = ctx.executionCtx;

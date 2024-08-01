@@ -23,9 +23,8 @@ const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 export type AppContext = Context<{ Bindings: Bindings; Variables: Variables }>;
 
 app.use('*', async (ctx, next) => {
-  console.log(ctx.env)
   console.log('auth disabled?' , ctx.env.disable_auth)
-  if(ctx.env.disable_auth = true){
+  if(ctx.env.disable_auth = 'true'){
     await next();
     return;
   }
