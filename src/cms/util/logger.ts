@@ -1,4 +1,9 @@
 export async function log(ctx, data) {
+  const disableLogging = ctx.end.disable_logging === 'true';
+  if (disableLogging) {
+    return;
+  }
+
   console.log(data.message);
 
   const datadog_apikey =
@@ -49,4 +54,8 @@ export async function log(ctx, data) {
       })
     });
   }
+}
+
+export function timerLog(message, timeStart, timeEnd) {
+  console.log(`⏰⏰⏰ ${message}`, `${timeEnd - timeStart}ms ⏰⏰⏰`);
 }

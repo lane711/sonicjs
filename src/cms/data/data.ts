@@ -22,7 +22,7 @@ import {
   insertD1Data,
   updateD1Data
 } from './d1-data';
-import { log } from '../util/logger';
+import { log, timerLog } from '../util/logger';
 
 // export async function getRecordOld(d1, kv, id) {
 //   const cacheKey = addCachePrefix(id);
@@ -122,7 +122,7 @@ export async function getRecords(
         // console.log("**** cachedData ****", cachedData);
 
         const cacheEnd = performance.now();
-        console.log('# cache timing: ', cacheEnd - cacheStart);
+        timerLog('cache get', cacheStart, cacheEnd);
 
 
         return cachedData;
@@ -163,7 +163,7 @@ export async function getRecords(
         );
 
         const kvEnd = performance.now();
-        console.log('# kv get: ', kvEnd - kvStart);
+        timerLog('kv get', kvStart, kvEnd);
 
         return kvData;
       }
@@ -201,7 +201,7 @@ export async function getRecords(
       message: 'getRecords getD1DataByTable end'
     });
     const d1End = performance.now();
-    console.log('# d1 get: ', d1End - d1Start);
+    timerLog('d1 get', d1Start, d1End);
   }
 
   if (d1Data?.length) {
@@ -241,7 +241,7 @@ export async function getRecords(
       message: 'getRecords addToInMemoryCache end'
     });
     const cacheEnd2 = performance.now();
-    console.log('# cache add timing: ', cacheEnd2 - cacheStart2);
+    timerLog('cache add', cacheStart2, cacheEnd2);
   }
 
   if (!disableKv) {
@@ -274,7 +274,8 @@ export async function getRecords(
     });
 
     const kvAddEnd = performance.now();
-    console.log('# kv add: ', kvAddEnd - kvAddStart);
+    timerLog('kv add', kvAddStart, kvAddEnd);
+
   }
 
   log(ctx, { level: 'verbose', message: 'getRecords end', cacheKey });
