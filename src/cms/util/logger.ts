@@ -1,5 +1,10 @@
 export async function log(ctx, data) {
-  const disableLogging = ctx.end.disable_logging === 'true';
+  if (!ctx || !ctx.env) {
+    //testinng hack
+    return;
+  }
+
+  const disableLogging = ctx.env.disable_logging === 'true';
   if (disableLogging) {
     return;
   }

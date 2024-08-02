@@ -94,7 +94,7 @@ export async function getRecords(
 
   //cache
   if (!disableCache) {
-    const cacheStart = performance.now();
+    const cacheStart = Date.now();
 
     const cacheStatusValid = await isCacheValid();
     // console.log("getRecords cacheStatusValid", cacheStatusValid);
@@ -121,7 +121,7 @@ export async function getRecords(
         const cachedData = cacheResult[0].data;
         // console.log("**** cachedData ****", cachedData);
 
-        const cacheEnd = performance.now();
+        const cacheEnd = Date.now();
         timerLog('cache get', cacheStart, cacheEnd);
 
 
@@ -133,7 +133,7 @@ export async function getRecords(
   //kv
   if (!disableKv) {
 
-    const kvStart = performance.now();
+    const kvStart = Date.now();
 
     var executionCtx;
     try {
@@ -153,7 +153,7 @@ export async function getRecords(
         }`
       });
       
-      const kvEnd = performance.now();
+      const kvEnd = Date.now();
       timerLog('kv get', kvStart, kvEnd);
 
       if (kvData) {
@@ -188,7 +188,7 @@ export async function getRecords(
     });
   } else {
     //d1
-    const d1Start = performance.now();
+    const d1Start = Date.now();
 
     log(ctx, {
       level: 'verbose',
@@ -199,7 +199,7 @@ export async function getRecords(
       level: 'verbose',
       message: 'getRecords getD1DataByTable end'
     });
-    const d1End = performance.now();
+    const d1End = Date.now();
     timerLog('d1 get', d1Start, d1End);
   }
 
@@ -231,7 +231,7 @@ export async function getRecords(
   //   );
   // }
   if (!disableCache) {
-    const cacheStart2 = performance.now();
+    const cacheStart2 = Date.now();
 
     dataAddToInMemoryCache(ctx, executionCtx, cacheKey, d1Data, total);
 
@@ -239,12 +239,12 @@ export async function getRecords(
       level: 'verbose',
       message: 'getRecords addToInMemoryCache end'
     });
-    const cacheEnd2 = performance.now();
+    const cacheEnd2 = Date.now();
     timerLog('cache add', cacheStart2, cacheEnd2);
   }
 
   if (!disableKv) {
-    const kvAddStart = performance.now();
+    const kvAddStart = Date.now();
 
     log(ctx, {
       level: 'verbose',
@@ -272,7 +272,7 @@ export async function getRecords(
       message: 'getRecords addToKvCache end'
     });
 
-    const kvAddEnd = performance.now();
+    const kvAddEnd = Date.now();
     timerLog('kv add', kvAddStart, kvAddEnd);
 
   }

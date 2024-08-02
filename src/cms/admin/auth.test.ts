@@ -41,27 +41,6 @@ describe('admin should be restricted', () => {
     expect(body.data[0].id).toBe('1');
   });
 
-  it('categories record with auth disabled', async () => {
-    ctx.env.disable_auth = true;
-
-    await createCategoriesTestTable1(ctx);
-
-    await insertD1Data(ctx.env.D1DATA, ctx.env.KVDATA, 'categories', {
-      id: '1',
-      title: 'My Title',
-      body: 'Body goes here'
-    });
-
-    let req = new Request('http://localhost/v1/categories', {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
-    });
-    let res = await app.fetch(req, ctx.env);
-    expect(res.status).toBe(200);
-    let body = await res.json();
-    expect(body.data[0].id).toBe('1');
-  });
-
   it('create and login user', async () => {
     const token = await createUserAndGetToken(app, ctx);
   });
@@ -87,7 +66,7 @@ describe('admin should be restricted', () => {
   });
 
   it('register user via the api', async () => {
-    ctx.env.disable_auth = false;
+    ctx.env.disable_auth = 'false';
     await createUserTestTables(ctx);
 
     const account = {
@@ -312,4 +291,25 @@ describe('admin should be restricted', () => {
   //   let usersResponse = await res.json();
   //   expect(usersResponse.data.length).toBe(1);
   // });
+
+  it('categories record with auth disabled', async () => {
+    ctx.env.disable_auth = 'true';
+
+    await createCategoriesTestTable1(ctx);
+
+    await insertD1Data(ctx.env.D1DATA, ctx.env.KVDATA, 'categories', {
+      id: '1',
+      title: 'My Title',
+      body: 'Body goes here'
+    });
+
+    let req = new Request('http://localhost/v1/categories', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    let res = await app.fetch(req, ctx.env);
+    expect(res.status).toBe(200);
+    let body = await res.json();
+    expect(body.data[0].id).toBe('1');
+  });
 });

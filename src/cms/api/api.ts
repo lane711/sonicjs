@@ -44,7 +44,7 @@ tables.forEach((entry) => {
     const query = ctx.req.query();
     const params = qs.parse(query);
 
-    if (ctx.env.disable_auth != true) {
+    if (ctx.env.disable_auth != 'true') {
       if (entry.hooks?.beforeOperation) {
         await entry.hooks.beforeOperation(ctx, 'read', params.id);
       }
@@ -78,7 +78,7 @@ tables.forEach((entry) => {
         undefined
       );
 
-      if (ctx.env.disable_auth != true) {
+      if (ctx.env.disable_auth != 'true') {
         if (entry.access?.item?.read) {
           const accessControlResult = await getItemReadResult(
             entry.access.item.read,

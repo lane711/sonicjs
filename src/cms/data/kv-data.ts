@@ -126,9 +126,9 @@ export async function getRecordFromKvCache(db, key, ignorePrefix = false) {
   var isJSon = false;
   var results;
   try {
-    const kvStart = performance.now();
+    const kvStart = Date.now();
     results = await db.get(lookupKey, { type: 'json' });
-    const kvEnd = performance.now();
+    const kvEnd = Date.now();
     timerLog('kv get getRecordFromKvCache', kvStart, kvEnd);
 
     isJSon = true;
