@@ -16,8 +16,9 @@ export function getTestingContext() {
     env: {
       KVDATA: KVDATA,
       D1DATA: __D1_BETA__D1DATA,
-      disable_auth: 'false',
-      disable_logging: 'false'
+      disable_logging: 'false',
+      disable_cache: 'false',
+      disable_kv: 'false'
     },
     json: toJson,
     user: { id: 'fromtest' },

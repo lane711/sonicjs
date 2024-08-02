@@ -26,10 +26,6 @@ import {
 
 const authAPI = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 authAPI.use('*', async (ctx, next) => {
-  if(ctx.env.disable_auth = 'true'){
-    await next();
-    return;
-  }
 
   const session = ctx.get('session');
   const path = ctx.req.path;
