@@ -152,6 +152,9 @@ export async function getRecords(
           kvData && kvData.length
         }`
       });
+      
+      const kvEnd = performance.now();
+      timerLog('kv get', kvStart, kvEnd);
 
       if (kvData) {
         dataAddToInMemoryCache(
@@ -161,10 +164,6 @@ export async function getRecords(
           kvData.data,
           kvData.total
         );
-
-        const kvEnd = performance.now();
-        timerLog('kv get', kvStart, kvEnd);
-
         return kvData;
       }
     }
