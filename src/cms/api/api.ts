@@ -31,6 +31,7 @@ import {
   getItemReadResult,
   getOperationCreateResult
 } from '../auth/auth-helpers';
+import { timerLog } from '../util/logger';
 
 const api = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 const tables = apiConfig.filter((tbl) => tbl.table !== 'users');
@@ -56,7 +57,7 @@ tables.forEach((entry) => {
     );
 
     if (typeof accessControlResult === 'object') {
-      params.accessControlResult= {...accessControlResult };
+      params.accessControlResult = { ...accessControlResult };
     }
 
     if (!accessControlResult) {
@@ -94,8 +95,10 @@ tables.forEach((entry) => {
       if (entry.hooks?.afterOperation) {
         await entry.hooks.afterOperation(ctx, 'read', params.id, null, data);
       }
+
       const end = Date.now();
       const executionTime = end - start;
+      timerLog('api get', start, end);
 
       return ctx.json({ ...data, executionTime });
     } catch (error) {

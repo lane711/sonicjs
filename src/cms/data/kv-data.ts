@@ -1,5 +1,5 @@
-import { log } from "../util/logger";
 var _ = require("lodash");
+import { log, timerLog } from '../util/logger';
 
 export function getKey(timestamp, table, id): string {
   return `${timestamp}::${table}::${id}`;
@@ -127,7 +127,11 @@ export async function getRecordFromKvCache(db, key, ignorePrefix = false) {
   var isJSon = false;
   var results;
   try {
+    const kvStart = Date.now();
     results = await db.get(lookupKey, { type: 'json' });
+    const kvEnd = Date.now();
+    timerLog('kv get getRecordFromKvCache', kvStart, kvEnd);
+
     isJSon = true;
   } catch (error) {
     results = await db.get(lookupKey);

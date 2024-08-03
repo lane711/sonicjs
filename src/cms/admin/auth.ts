@@ -26,6 +26,7 @@ import {
 
 const authAPI = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 authAPI.use('*', async (ctx, next) => {
+
   const session = ctx.get('session');
   const path = ctx.req.path;
   if (!session && path !== '/v1/auth/login' && path !== '/v1/auth/verify') {
@@ -211,6 +212,9 @@ authAPI.post(`/users/:setup?`, async (ctx) => {
   let content = await ctx.req.json();
   if (!content.data) {
     content = { data: content };
+  }
+  if(content.data.email){
+    content.data.email = content.data.email.toLowerCase();
   }
   content.data.table = 'users';
   content.table = 'users';

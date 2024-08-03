@@ -1,4 +1,14 @@
 export async function log(ctx, data) {
+  if (!ctx || !ctx.env) {
+    //testinng hack
+    return;
+  }
+
+  const disableLogging = ctx.env.disable_logging === 'true';
+  if (disableLogging) {
+    return;
+  }
+
   console.log(data.message);
 
   const datadog_apikey =
@@ -49,4 +59,8 @@ export async function log(ctx, data) {
       })
     });
   }
+}
+
+export function timerLog(message, timeStart, timeEnd) {
+  console.log(`⏰⏰⏰ ${message}`, `${timeEnd - timeStart}ms ⏰⏰⏰`);
 }

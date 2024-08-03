@@ -58,6 +58,10 @@ app.use(
 
 //request Logging
 app.use('*', async (ctx, next) => {
+  if(ctx.env.disable_logging = true){
+    await next();
+    return;
+  }
   if (ctx.req.path.indexOf('/admin') == 0 || ctx.req.path.indexOf('/v1') == 0) {
     log(ctx, { level: 'info', method: ctx.req.method, url: ctx.req.path });
   }

@@ -31,13 +31,9 @@ status.get('/', async (ctx) => {
 
   //drizzle
   try {
-    const d1Data = await getD1DataByTable(
-      ctx.env.D1DATA,
-      'users',
-      {
-        limit: 1
-      }
-    );
+    const d1Data = await getD1DataByTable(ctx.env.D1DATA, 'users', {
+      limit: 1
+    });
     status.drizzle = 'ok';
   } catch (error) {
     status.drizzle = 'error: ' + error;
@@ -68,7 +64,11 @@ status.get('/', async (ctx) => {
     var safeOutput = {};
     for (var prop in ctx.env) {
       if (Object.prototype.hasOwnProperty.call(ctx.env, prop)) {
-        safeOutput[prop] = '[redacted]';
+        if (ctx.env.show_env_vars === 'true') {
+          safeOutput[prop] = ctx.env[prop];
+        } else {
+          safeOutput[prop] = '[redacted]';
+        }
       }
       status.env = safeOutput;
     }
@@ -83,6 +83,23 @@ status.get('/log', async (ctx) => {
   log(ctx, { level: 'error', messaage: 'test from the logger 2' });
 
   return ctx.json({ ok: 'ok' });
+});
+
+status.get('/20records', async (ctx) => {
+  const start = Date.now();
+
+  try {
+    const d1Data = await getD1DataByTable(ctx.env.D1DATA, 'users', {
+      limit: 20
+    });
+
+    const end = Date.now();
+    const executionTime = end - start;
+
+    return ctx.json({ ...d1Data, executionTime, source: 'd1' });
+  } catch (error) {
+    return ctx.text(error);
+  }
 });
 
 status.get('/geo', (ctx) => {
