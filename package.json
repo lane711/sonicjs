@@ -5,7 +5,7 @@
   "main": "src/server.ts",
   "scripts": {
     "dev": "run-p dev:*",
-    "dev:wrangler": "wrangler pages dev dist --env development --port 8786",
+    "dev:wrangler": "wrangler pages dev dist --port 8786",
     "dev:esbuild": "node ./src/cms/util/build.mjs",
     "build": "node ./src/cms/util/build.mjs",
     "deploy": "wrangler pages deploy dist",
