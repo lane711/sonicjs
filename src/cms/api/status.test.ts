@@ -1,5 +1,5 @@
-import app from '../../server';
-import { getTestingContext } from '../util/testing';
+import app from '../../index';
+import { getTestingContext } from '../util/testing'
 
 const ctx = getTestingContext();
 
