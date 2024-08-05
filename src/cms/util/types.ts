@@ -6,13 +6,12 @@ export type Bindings = {
   D1DATA: D1Database;
   __D1_BETA__D1DATA: D1Database;
   AUTH_ITERATIONS?: string;
-  AUTH_HASH?: 'SHA512' | 'SHA384' | 'SHA256';
-  AUTH_KDF?: 'pbkdf2' | 'scrypt';
-  ENVIRONMENT?: 'production' | 'development';
+  AUTH_HASH?: "SHA512" | "SHA384" | "SHA256";
+  AUTH_KDF?: "pbkdf2" | "scrypt";
+  ENVIRONMENT?: "production" | "development";
   R2STORAGE?: R2Bucket;
+  DISABLE_LOGGING: string;
+  DISABLE_CACHE: string;
+  DISABLE_KV: string;
+  SHOW_ENV_VARS: string;
 };
-
-declare global {
-  function getMiniflareBindings(): Bindings;
-  const ENVIRONMENT: string;
-}

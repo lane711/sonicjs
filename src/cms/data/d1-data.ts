@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/d1';
 import { and, eq } from 'drizzle-orm';
-import { tableSchemas } from '../../db/routes';
+import { tableSchemas } from './routes';
 var qs = require('qs');
 
 export async function getAllContent(db) {

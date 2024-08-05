@@ -1,4 +1,4 @@
-import { AppContext } from '../server';
+import { AppContext } from '../../index';
 
 export function isAdminOrEditor(ctx: AppContext) {
   const user = ctx.get('user');

@@ -1,21 +1,17 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
-    "module": "esnext",
-    "target": "esnext",
-    "lib": ["esnext"],
-    "moduleResolution": "node",
-    "sourceMap": true,
-    "types": ["@cloudflare/workers-types", "jest"],
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "lib": [
+      "ESNext"
+    ],
+    "types": [
+      "@cloudflare/workers-types"
+    ],
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx",
-    "skipLibCheck": true
+    "jsxImportSource": "hono/jsx"
   },
-  "include": ["src"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "__integration-tests__",
-    "src/cms/util/build.mjs"
-  ]
 }

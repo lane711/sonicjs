@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { Bindings } from '../types/bindings';
+// import { Bindings } from '../types/bindings';
 import { getD1DataByTable } from '../data/d1-data';
 import { getById } from '../data/kv-data';
 import { log } from '../util/logger';
@@ -8,8 +8,10 @@ import {
   getFromInMemoryCache,
   isCacheValid
 } from '../data/cache';
+import { Bindings } from '../util/types';
 
 const status = new Hono<{ Bindings: Bindings }>();
+// const status = new Hono()
 
 status.get('/', async (ctx) => {
   console.log('status', Date());
@@ -17,6 +19,7 @@ status.get('/', async (ctx) => {
   var status = {} as any;
 
   status.webServer = 'ok';
+
 
   //D1
   try {
