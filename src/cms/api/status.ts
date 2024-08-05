@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { Bindings } from '../types/bindings';
 import { getD1DataByTable } from '../data/d1-data';
-import { getById } from '../data/kv-data';
+import { getById, getRecordFromKvCache } from '../data/kv-data';
 import { log } from '../util/logger';
 import {
   addToInMemoryCache,
@@ -101,6 +101,27 @@ status.get('/20records', async (ctx) => {
     return ctx.text(error);
   }
 });
+
+status.get('/20recordskv', async (ctx) => {
+  const start = Date.now();
+
+  const host = ctx.req.url.split(ctx.req.path)[0];
+  const cacheKey = `${host}/v1/posts?limit=20`; 
+  try {
+    const kvData = await getRecordFromKvCache(ctx.env.KVDATA, cacheKey);
+
+
+    const end = Date.now();
+    const executionTime = end - start;
+
+    return ctx.json({ ...kvData, executionTime, source: 'kv' });
+  } catch (error) {
+    return ctx.text(error);
+  }
+});
+
+
+
 
 status.get('/geo', (ctx) => {
   let html_content = '';

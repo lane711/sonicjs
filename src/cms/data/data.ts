@@ -86,7 +86,7 @@ export async function getRecords(
   source = 'fastest',
   customDataFunction = undefined
 ): Promise<{ data: any; source: string; total: number; contentType?: any }> {
-  log(ctx, { level: 'verbose', message: 'getRecords start', cacheKey });
+  log(ctx, { level: 'verbose', message: 'getRecords start ' + cacheKey });
 
   const disableCache = ctx.env.disable_cache === 'true';
   const disableKv = ctx.env.disable_kv === 'true';
