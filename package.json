@@ -2,7 +2,8 @@
   "name": "sonicjs-vite2",
   "scripts": {
     "dev": "wrangler dev src/index.ts",
-    "deploy": "wrangler deploy --minify src/index.ts"
+    "deploy": "wrangler deploy --minify src/index.ts",
+    "test": "vitest --run"
   },
   "dependencies": {
     "drizzle-orm": "^0.32.1",
@@ -14,7 +15,7 @@
     "@cloudflare/workers-types": "^4.20240529.0",
     "@hono/vite-cloudflare-pages": "^0.4.2",
     "@hono/vite-dev-server": "^0.13.1",
-    "vite": "^5.3.5",
+    "vitest": "^2.0.5",
     "wrangler": "^3.57.2"
   }
 }
