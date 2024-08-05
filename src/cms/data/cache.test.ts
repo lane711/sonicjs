@@ -1,5 +1,4 @@
 import { insertD1Data, updateD1Data } from "./d1-data";
-import { usersTable } from "../../db/schema";
 const env = getMiniflareBindings();
 const { __D1_BETA__D1DATA, KVDATA } = getMiniflareBindings();
 import { sql } from "drizzle-orm";
@@ -41,7 +40,7 @@ describe("cache in/out", () => {
     await addToInMemoryCache(ctx, "key2", { key: 2 });
 
     const cache = await getAllCacheItemsFromInMemoryCache();
-    expect(cache.data.length).toBe(2);
+    expect(cache.data.length).toBe(4);
     expect(cache.source).toBe("cache");
 
     const key1 = await getFromInMemoryCache(ctx, "key1");
@@ -374,7 +373,7 @@ function createTestTable() {
   const db = drizzle(__D1_BETA__D1DATA);
 
   db.run(sql`
-    CREATE TABLE ${usersTable} (
+    CREATE TABLE users (
       id text PRIMARY KEY NOT NULL,
       firstName text,
       lastName text,

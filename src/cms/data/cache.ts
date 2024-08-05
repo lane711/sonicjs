@@ -11,8 +11,6 @@ import {
 import { getRecords } from "./data";
 var db = new loki("cache.db");
 var cache = db.addCollection("cache", { unique: "key" });
-var db = new loki('cache.db');
-var cache = db.addCollection('cache');
 
 // class CacheStatus {
 //   private static _instance: CacheStatus;
