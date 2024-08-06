@@ -124,7 +124,6 @@ export async function getRecords(
         const cacheEnd = Date.now();
         timerLog('cache get', cacheStart, cacheEnd);
 
-
         return cachedData;
       }
     }
@@ -132,7 +131,6 @@ export async function getRecords(
 
   //kv
   if (!disableKv) {
-
     const kvStart = Date.now();
 
     var executionCtx;
@@ -152,19 +150,21 @@ export async function getRecords(
           kvData && kvData.length
         }`
       });
-      
+
       const kvEnd = Date.now();
       timerLog('kv get', kvStart, kvEnd);
 
       if (kvData) {
-        dataAddToInMemoryCache(
-          ctx,
-          executionCtx,
-          cacheKey,
-          kvData.data,
-          kvData.total
-        );
-        return kvData;
+        if (!disableCache) {
+          dataAddToInMemoryCache(
+            ctx,
+            executionCtx,
+            cacheKey,
+            kvData.data,
+            kvData.total
+          );
+          return kvData;
+        }
       }
     }
   }
@@ -243,6 +243,7 @@ export async function getRecords(
     timerLog('cache add', cacheStart2, cacheEnd2);
   }
 
+  //should  be  async
   if (!disableKv) {
     const kvAddStart = Date.now();
 
@@ -252,6 +253,7 @@ export async function getRecords(
     });
 
     if (executionCtx) {
+      // wait until will ensure the async operation isn't cancelled after the response is sent to  the user 
       ctx.executionCtx.waitUntil(
         await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
           data: d1Data,
@@ -260,6 +262,7 @@ export async function getRecords(
         })
       );
     } else {
+      //for testing
       await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
         data: d1Data,
         source: 'kv',
@@ -274,7 +277,6 @@ export async function getRecords(
 
     const kvAddEnd = Date.now();
     timerLog('kv add', kvAddStart, kvAddEnd);
-
   }
 
   log(ctx, { level: 'verbose', message: 'getRecords end', cacheKey });
