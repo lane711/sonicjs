@@ -12,10 +12,10 @@
     "qs": "^6.13.0"
   },
   "devDependencies": {
-    "@hono/vite-cloudflare-pages": "^0.4.2",
-    "@hono/vite-dev-server": "^0.13.1",
-    "typescript": "^5.5.4",
-    "vitest": "^2.0.5",
-    "wrangler": "^3.57.2"
+    "@cloudflare/vitest-pool-workers": "^0.2.0",
+    "@cloudflare/workers-types": "^4.20240405.0",
+    "typescript": "^5.4.5",
+    "vitest": "1.3.0",
+    "wrangler": "^3.53.0"
   }
 }
