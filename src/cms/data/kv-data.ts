@@ -39,7 +39,7 @@ export async function getDataByPrefix(
 }
 
 export async function getById(db, key) {
-  return db.get(key, { type: 'json' });
+  return db.get(key, { type: 'json', expirationTtl: getKVTTL() });
 }
 
 export async function deleteKVById(db, key) {
@@ -48,7 +48,7 @@ export async function deleteKVById(db, key) {
 }
 
 export function getAsset(db, key) {
-  return db.get(key, { type: 'text' });
+  return db.get(key, { type: 'text', expirationTtl: getKVTTL() });
 }
 
 export function saveKVData(db, id, data) {
@@ -67,7 +67,8 @@ export function saveKVDataWithMetaData(
   const generatedKey = getKey(site, contentType, key);
   console.log('generatedKey', generatedKey);
   return db.put(generatedKey, JSON.stringify(value), {
-    metadata: { value }
+    metadata: { value },
+    expirationTtl: getKVTTL()
   });
 }
 
@@ -75,7 +76,9 @@ export function saveContentType(db, site, contentTypeComponents) {
   const contentType = extractContentType(contentTypeComponents);
   const generatedKey = `${site}::content-type::${contentType}`;
   // console.log("generatedKey", generatedKey);
-  return db.put(generatedKey, JSON.stringify(contentTypeComponents));
+  return db.put(generatedKey, JSON.stringify(contentTypeComponents), {
+    expirationTtl: getKVTTL()
+  });
 }
 
 export async function addToKvCache(ctx, kv, key, value) {
@@ -95,7 +98,8 @@ export async function addToKvCache(ctx, kv, key, value) {
   });
 
   await kv.put(cacheKey, JSON.stringify(value), {
-    metadata: { createdOn }
+    metadata: { createdOn },
+    expirationTtl: getKVTTL()
   });
 
   // const result = await kv.put(cacheKey, JSON.stringify(value), {
@@ -127,13 +131,16 @@ export async function getRecordFromKvCache(db, key, ignorePrefix = false) {
   var results;
   try {
     const kvStart = Date.now();
-    results = await db.get(lookupKey, { type: 'json' });
+    results = await db.get(lookupKey, {
+      type: 'json',
+      expirationTtl: getKVTTL()
+    });
     const kvEnd = Date.now();
     timerLog('kv get getRecordFromKvCache', kvStart, kvEnd);
 
     isJSon = true;
   } catch (error) {
-    results = await db.get(lookupKey);
+    results = await db.get(lookupKey, { expirationTtl: getKVTTL() });
   }
 
   return results;
@@ -195,7 +202,7 @@ export function extractContentType(contentTypeComponents) {
 export async function getContentType(db, contentTypeSystemId) {
   const contentType = await db.get(
     `site1::content-type::${contentTypeSystemId}`,
-    { type: 'json' }
+    { type: 'json', expirationTtl: getKVTTL() }
   );
   return contentType;
 }
@@ -210,6 +217,11 @@ export async function getContentTypes(db) {
     contentTypes.push(contentType);
   }
   return contentTypes;
+}
+
+export function getKVTTL() {
+  // ctx.env.expiration_ttl
+  return 60 * 60 * 24 * 90; //90 days default
 }
 
 export function add(a, b) {
