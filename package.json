@@ -6,15 +6,15 @@
     "test": "vitest --run"
   },
   "dependencies": {
-    "drizzle-orm": "^0.32.1",
+    "drizzle-orm": "^0.32.2",
     "hono": "^4.5.3",
     "lokijs": "^1.5.12",
     "qs": "^6.13.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240529.0",
     "@hono/vite-cloudflare-pages": "^0.4.2",
     "@hono/vite-dev-server": "^0.13.1",
+    "typescript": "^5.5.4",
     "vitest": "^2.0.5",
     "wrangler": "^3.57.2"
   }
