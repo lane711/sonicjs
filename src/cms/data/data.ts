@@ -253,13 +253,13 @@ export async function getRecords(
     });
 
     if (executionCtx) {
-      // wait until will ensure the async operation isn't cancelled after the response is sent to  the user 
+      // wait until will ensure the async operation isn't cancelled after the response is sent to  the user
       log(ctx, {
         level: 'verbose',
         message: 'getRecords addToKvCache using waitUntil'
       });
       ctx.executionCtx.waitUntil(
-        await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
+        addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
           data: d1Data,
           source: 'kv',
           total
