@@ -135,19 +135,21 @@ status.get('/waituntil2', async (ctx) => {
   const data = { hello: 'ok' };
   const start = Date.now();
 
-  ctx.executionCtx.waitUntil(
-    addToKvCache(ctx, ctx.env.KVDATA, 'waituntil-test', {
-      data: data,
-      source: 'kv',
-      executionTime: 1
-    })
-  );
+  ctx.executionCtx.waitUntil(longRunningDataCall(ctx));
 
   const end = Date.now();
   const executionTime = end - start;
 
   return ctx.json({ data, executionTime, source: 'kv' });
 });
+
+const longRunningDataCall = async (ctx) => {
+  const { results } = await ctx.env.D1DATA.prepare(
+    'SELECT * FROM posts;'
+  ).all();
+  console.log('longRunningDataCall count:', results.length)
+  return results;
+};
 
 status.get('/geo', (ctx) => {
   let html_content = '';
