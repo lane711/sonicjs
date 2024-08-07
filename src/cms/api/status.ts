@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { Bindings } from '../types/bindings';
 import { getD1DataByTable } from '../data/d1-data';
-import { getById, getRecordFromKvCache } from '../data/kv-data';
+import { addToKvCache, getById, getRecordFromKvCache } from '../data/kv-data';
 import { log } from '../util/logger';
 import {
   addToInMemoryCache,
@@ -106,10 +106,9 @@ status.get('/20recordskv', async (ctx) => {
   const start = Date.now();
 
   const host = ctx.req.url.split(ctx.req.path)[0];
-  const cacheKey = `${host}/v1/posts?limit=20`; 
+  const cacheKey = `${host}/v1/posts?limit=20`;
   try {
     const kvData = await getRecordFromKvCache(ctx.env.KVDATA, cacheKey);
-
 
     const end = Date.now();
     const executionTime = end - start;
@@ -120,8 +119,35 @@ status.get('/20recordskv', async (ctx) => {
   }
 });
 
+status.get('/waituntil1', async (ctx) => {
+  const data = { hello: 'ok' };
+  const start = Date.now();
 
+  //do nothing
 
+  const end = Date.now();
+  const executionTime = end - start;
+
+  return ctx.json({ data, executionTime, source: 'kv' });
+});
+
+status.get('/waituntil2', async (ctx) => {
+  const data = { hello: 'ok' };
+  const start = Date.now();
+
+  ctx.executionCtx.waitUntil(
+    addToKvCache(ctx, ctx.env.KVDATA, 'waituntil-test', {
+      data: data,
+      source: 'kv',
+      executionTime: 1
+    })
+  );
+
+  const end = Date.now();
+  const executionTime = end - start;
+
+  return ctx.json({ data, executionTime, source: 'kv' });
+});
 
 status.get('/geo', (ctx) => {
   let html_content = '';
