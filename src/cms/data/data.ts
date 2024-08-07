@@ -258,7 +258,7 @@ export async function getRecords(
         level: 'verbose',
         message: 'getRecords addToKvCache using waitUntil'
       });
-      ctx.executionCtx.waitUntil(
+      ctx.waitUntil(
         await addToKvCache(ctx, ctx.env.KVDATA, cacheKey, {
           data: d1Data,
           source: 'kv',
