@@ -119,6 +119,47 @@ status.get('/20recordskv', async (ctx) => {
   }
 });
 
+status.get('/cc-cache', async (ctx) => {
+  const cacheVersion = 1;
+  const cacheName = `myapp-${cacheVersion}`;
+
+  // const url = "https://jsonplaceholder.typicode.com/todos/1";
+  // let cachedData = await cache. getCachedData(cacheName, url);
+
+  let cache = caches.default;
+
+  const cachedResponse = await cache.match(ctx.req.url);
+  console.log('cachedResponse', cachedResponse);
+  let cachedData = await getCachedData(cacheName, ctx.req.url);
+  console.log('cachedData', cachedData);
+
+  if (cachedResponse) {
+    console.log('cache found');
+    return cachedResponse;
+  }
+
+  const data = await longRunningDataCall(ctx);
+
+  // cache.add(ctx.req)
+  // await cache.match(ctx.req);
+
+  const response = ctx.json({ data, source: 'cc-cache' });
+  cache.put(ctx.req.raw, response.clone());
+
+  return response;
+});
+
+async function getCachedData(cacheName, url) {
+  const cacheStorage = await caches.open(cacheName);
+  const cachedResponse = await cacheStorage.match(url);
+
+  if (!cachedResponse || !cachedResponse.ok) {
+    return false;
+  }
+
+  return await cachedResponse.json();
+}
+
 status.get('/waituntil1', async (ctx) => {
   const data = { hello: 'ok' };
   const start = Date.now();
@@ -147,7 +188,7 @@ const longRunningDataCall = async (ctx) => {
   const { results } = await ctx.env.D1DATA.prepare(
     'SELECT * FROM posts;'
   ).all();
-  console.log('longRunningDataCall count:', results.length)
+  console.log('longRunningDataCall count:', results.length);
   return results;
 };
 

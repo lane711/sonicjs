@@ -13,6 +13,15 @@ describe('Test the status url', () => {
     let body = await res.json();
   });
 
+  it('cc-cache should return 200', async () => {
+    const res = await app.fetch(
+      new Request('http://localhost/status/cc-cache'),
+      ctx.env
+    );
+    expect(res.status).toBe(200);
+    let body = await res.json();
+  });
+
   it('log should return 200', async () => {
     const res = await app.fetch(
       new Request('http://localhost/status/log'),
