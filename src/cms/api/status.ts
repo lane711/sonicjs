@@ -2,12 +2,13 @@ import { Hono } from 'hono';
 import { Bindings } from '../types/bindings';
 import { getD1DataByTable } from '../data/d1-data';
 import { addToKvCache, getById, getRecordFromKvCache } from '../data/kv-data';
-import { log } from '../util/logger';
+import { log, timerLog } from '../util/logger';
 import {
   addToInMemoryCache,
   getFromInMemoryCache,
   isCacheValid
 } from '../data/cache';
+import { cache } from 'hono/cache';
 
 const status = new Hono<{ Bindings: Bindings }>();
 
@@ -119,6 +120,36 @@ status.get('/20recordskv', async (ctx) => {
   }
 });
 
+// status.get('/hono-cache', async (ctx) => {
+
+//   const  mycache =  cache({
+//     cacheName: 'my-app',
+//     cacheControl: 'max-age=3600',
+//   })
+
+// mycache.
+
+//   cache.add('/v1/posts?limit=10');
+
+//   const cachedResponse = await cache.match(ctx.req.url);
+//   console.log('cachedResponse', cachedResponse);
+//   let cachedData = await getCachedData(cacheName, ctx.req.url);
+//   console.log('cachedData', cachedData);
+
+//   if (cachedResponse) {
+//     console.log('cache found');
+//     return cachedResponse;
+//   }
+
+//   const data = await longRunningDataCall(ctx);
+
+//   // cache.add(ctx.req)
+//   // await cache.match(ctx.req);
+
+//   const response = ctx.json({ data, source: 'cc-cache' });
+//   cache.put(ctx.req.raw, response.clone());
+// });
+
 status.get('/cc-cache', async (ctx) => {
   const cacheVersion = 1;
   const cacheName = `myapp-${cacheVersion}`;
@@ -145,6 +176,54 @@ status.get('/cc-cache', async (ctx) => {
 
   const response = ctx.json({ data, source: 'cc-cache' });
   cache.put(ctx.req.raw, response.clone());
+
+  return response;
+});
+
+status.get('/cc-cache2', async (ctx) => {
+  const start = Date.now();
+
+  const cacheUrl = new URL(ctx.req.url);
+
+  // Construct the cache key from the cache URL
+  const cacheKey = new Request(cacheUrl.toString(), ctx.req);
+  const cache = caches.default;
+
+  // Check whether the value is already available in the cache
+  // if not, you will need to fetch it from origin, and store it in the cache
+  let response = await cache.match(cacheKey);
+
+  if (!response) {
+    console.log(
+      `Response for request url: ${ctx.req.url} not present in cache. Fetching and caching request.`
+    );
+    // If not in cache, get it from origin
+    // response = await fetch(ctx.req);
+
+    const data = await longRunningDataCall(ctx);
+
+    // cache.add(ctx.req)
+    // await cache.match(ctx.req);
+
+    response = ctx.json({ data, source: 'cc-cache' });
+
+    // Must use Response constructor to inherit all of response's fields
+    // response = new Response(response.body, response);
+
+    // Cache API respects Cache-Control headers. Setting s-max-age to 10
+    // will limit the response to be in cache for 10 seconds max
+
+    // Any changes made to the response here will be reflected in the cached value
+    response.headers.append('Cache-Control', 's-maxage=10');
+
+    ctx.executionCtx.waitUntil(cache.put(cacheKey, response.clone()));
+  } else {
+    console.log(`Cache hit for: ${ctx.req.url}.`);
+  }
+
+  const end = Date.now();
+  // const executionTime = end - start;
+  timerLog('cc-cache2', start, end);
 
   return response;
 });
@@ -186,7 +265,7 @@ status.get('/waituntil2', async (ctx) => {
 
 const longRunningDataCall = async (ctx) => {
   const { results } = await ctx.env.D1DATA.prepare(
-    'SELECT * FROM posts;'
+    'SELECT * FROM posts limit 200;'
   ).all();
   console.log('longRunningDataCall count:', results.length);
   return results;
