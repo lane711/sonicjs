@@ -9,6 +9,7 @@ import {
   isCacheValid
 } from '../data/cache';
 import { cache } from 'hono/cache';
+import qs from 'qs';
 
 const status = new Hono<{ Bindings: Bindings }>();
 
@@ -183,6 +184,10 @@ status.get('/cc-cache', async (ctx) => {
 status.get('/cc-cache2', async (ctx) => {
   const start = Date.now();
 
+  const query = ctx.req.query();
+  const params = qs.parse(query);
+  const limit = params?.limit ?? 20;
+
   const cacheUrl = new URL(ctx.req.url);
 
   // Construct the cache key from the cache URL
@@ -200,7 +205,7 @@ status.get('/cc-cache2', async (ctx) => {
     // If not in cache, get it from origin
     // response = await fetch(ctx.req);
 
-    const data = await longRunningDataCall(ctx);
+    const data = await longRunningDataCall(ctx, limit);
 
     // cache.add(ctx.req)
     // await cache.match(ctx.req);
@@ -263,9 +268,9 @@ status.get('/waituntil2', async (ctx) => {
   return ctx.json({ data, executionTime, source: 'kv' });
 });
 
-const longRunningDataCall = async (ctx) => {
+const longRunningDataCall = async (ctx, limit) => {
   const { results } = await ctx.env.D1DATA.prepare(
-    'SELECT * FROM posts limit 200;'
+    `SELECT * FROM posts limit ${limit};`
   ).all();
   console.log('longRunningDataCall count:', results.length);
   return results;

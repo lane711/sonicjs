@@ -15,7 +15,7 @@ describe('Test the status url', () => {
 
   it('cc-cache should return 200', async () => {
     const res = await app.fetch(
-      new Request('http://localhost/status/cc-cache2'),
+      new Request('http://localhost/status/cc-cache2?limit=1'),
       ctx.env
     );
     expect(res.status).toBe(200);
