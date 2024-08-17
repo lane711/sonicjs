@@ -1,18 +1,16 @@
-import { Hono } from 'hono'
-import { cors } from 'hono/cors'
-import { Bindings } from './bindings'
-import * as model from './model'
+import { Hono } from "hono";
+import { cors } from "hono/cors";
+import { Bindings } from "./bindings";
+import * as model from "./model";
 
-const cache = new Hono<{ Bindings: Bindings }>()
-const baseUrl = 'https://demo.sonicjs.com'
+const cache = new Hono<{ Bindings: Bindings }>();
+const baseUrl = "https://demo.sonicjs.com";
 
 // cache.get('/', (c) => {
 //   return c.json({ message: 'Hello' })
 // })
 
-
-cache.get('*', async(ctx) => {
-  
+cache.get("*", async (ctx) => {
   const cacheUrl = new URL(ctx.req.url);
 
   // Construct the cache key from the cache URL
@@ -28,9 +26,11 @@ cache.get('*', async(ctx) => {
       `Response for request url: ${ctx.req.url} not present in cache. Fetching and caching request.`
     );
 
-    console.log('--->', ctx.req.url)
-    // If not in cache, get it from origin
-    const fetchUrl = 'https://demo.sonicjs.com/v1/categories?limit=2';// `${baseUrl}${ctx.req.url}`;
+    let url = new URL(ctx.req.url);
+    let path = url.pathname + url.search;
+    const fetchUrl = `${baseUrl}${path}`;
+    console.log("--->", fetchUrl);
+
     response = await fetch(fetchUrl);
 
     // Must use Response constructor to inherit all of response's fields
@@ -47,7 +47,6 @@ cache.get('*', async(ctx) => {
     console.log(`Cache hit for: ${ctx.req.url}.`);
   }
   return response;
-
 });
 
-export default cache
+export default cache;
