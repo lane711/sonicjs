@@ -5,7 +5,7 @@ import api from './api'
 import { Bindings } from './bindings'
 
 const app = new Hono()
-app.get('/', (c) => c.text('Pretty Blog API 3'))
+app.get('/', (c) => c.text('Pretty Blog API'))
 app.notFound((c) => c.json({ message: 'Not Found', ok: false }, 404))
 
 const middleware = new Hono<{ Bindings: Bindings }>()
