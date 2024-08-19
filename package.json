@@ -5,16 +5,19 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "wrangler pages dev",
-    "deploy": "$npm_execpath run build && wrangler pages deploy"
+    "deploy": "$npm_execpath run build && wrangler pages deploy",
+    "test": "vitest"
   },
   "dependencies": {
     "hono": "^4.5.6"
   },
   "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.4.23",
     "@cloudflare/workers-types": "^4.20240529.0",
     "@hono/vite-cloudflare-pages": "^0.4.2",
     "@hono/vite-dev-server": "^0.14.0",
     "vite": "^5.2.12",
+    "vitest": "1.3.0",
     "wrangler": "^3.57.2"
   }
 }
