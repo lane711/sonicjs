@@ -9,7 +9,7 @@ export default defineConfig({
       entry: resolve(__dirname, "src/index.ts"),
       name: "soncisjs",
       // the proper extensions will be added
-      fileName: "worker",
+      fileName: "index",
     },
     rollupOptions: {
       // make sure to externalize deps that shouldn't be bundled

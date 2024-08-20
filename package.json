@@ -1,6 +1,7 @@
 {
   "name": "blog",
   "version": "0.0.1",
+  "type": "module",
   "scripts": {
     "dev": "wrangler dev src/index.ts",
     "deploy": "wrangler deploy src/index.ts",
