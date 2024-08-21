@@ -1,6 +1,6 @@
 import { env } from 'cloudflare:test'
 import { describe, expect, test } from 'vitest'
-import worker from '../src/api'
+import worker from './api'
 import type { Post } from './model'
 
 describe('Blog API', () => {

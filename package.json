@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "wrangler dev src/index.ts",
     "deploy": "wrangler deploy src/index.ts",
-    "test": "vitest --run",
+    "test": "vitest",
     "build": "vite build"
   },
   "license": "MIT",
