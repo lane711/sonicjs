@@ -5,11 +5,9 @@ import { prettyJSON } from 'hono/pretty-json'
 import { Bindings } from './bindings'
 import cache from './cache';
 import api from './api';
-const baseUrl = "https://demo.sonicjs.com";
 
 const app = new Hono()
 
-app.get('/', (c) => c.text('Caching'))
 
 // app.get("*", async (ctx) => {
 //   const cacheUrl = new URL(ctx.req.url);
