@@ -15,98 +15,112 @@ import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/d1';
 import { blob, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-it('should not return a where clause', () => {
-  const params = {};
-  const clause = whereClauseBuilder(params);
-  expect(clause).toBe('');
-});
+describe('where clause', () => {
+  it('should not return a where clause', () => {
+    const params = {};
+    const clause = whereClauseBuilder(params);
+    expect(clause).toBe('');
+  });
 
-//TODO: support id equals 100
-// it("should return a where clause with eq", () => {
-//   const queryParams = "someurl?filters[id][eq]=100";
-//   const params = qs.parse(queryParams);
-//   const clause = whereClauseBuilder(params);
-//   expect(clause).toBe("where id = 100");
-// });
+  //TODO: support id equals 100
+  // it("should return a where clause with eq", () => {
+  //   const queryParams = "someurl?filters[id][eq]=100";
+  //   const params = qs.parse(queryParams);
+  //   const clause = whereClauseBuilder(params);
+  //   expect(clause).toBe("where id = 100");
+  // });
 
-//TODO: support "in" clause
-// it("should return a where clause with multi in", () => {
-//   const queryParams = "someurl?filters[id][$in][0]=100&filters[id][$in][1]=101";
-//   const params = qs.parse(queryParams);
-//   const clause = whereClauseBuilder(params);
-//   expect(clause).toBe("");
-// });
+  //TODO: support "in" clause
+  // it("should return a where clause with multi in", () => {
+  //   const queryParams = "someurl?filters[id][$in][0]=100&filters[id][$in][1]=101";
+  //   const params = qs.parse(queryParams);
+  //   const clause = whereClauseBuilder(params);
+  //   expect(clause).toBe("");
+  // });
 
-it('should get table schema from table name', async () => {
-  const tableToFind = 'users';
-  const userTable = getSchemaFromTable(tableToFind);
-  expect(userTable).toEqual(tableSchemas.users.definition);
-});
+  it('should get table schema from table name', async () => {
+    const tableToFind = 'users';
+    const userTable = getSchemaFromTable(tableToFind);
+    expect(userTable).toEqual(tableSchemas.users.definition);
+  });
 
-it('should get table object from table name', async () => {
-  const tableToFind = 'users';
-  const findableTable = await getRepoFromTable(tableToFind);
-  expect(findableTable).toEqual(tableSchemas.users.table);
-});
+  it('should get table object from table name', async () => {
+    const tableToFind = 'users';
+    const findableTable = await getRepoFromTable(tableToFind);
+    expect(findableTable).toEqual(tableSchemas.users.table);
+  });
 
-it('should return a SQL select with limit', () => {
-  const queryParams = 'limit=2';
-  const params = qs.parse(queryParams);
-  console.log('params ---->', params);
-  const clause = generateSelectSql('my-table', params);
-  expect(clause).toBe(
-    'SELECT *, COUNT() OVER() AS total FROM my-table limit 2;'
-  );
-});
+  it('should return a SQL select with limit', () => {
+    const queryParams = 'limit=2';
+    const params = qs.parse(queryParams);
+    console.log('params ---->', params);
+    const clause = generateSelectSql('my-table', params);
+    expect(clause).toBe(
+      'SELECT *, COUNT() OVER() AS total FROM my-table limit 2;'
+    );
+  });
 
-it('should return a SQL select with offset', () => {
-  const queryParams = 'offset=2';
-  const params = qs.parse(queryParams);
-  console.log('params ---->', params);
-  const clause = generateSelectSql('my-table', params);
-  expect(clause).toBe(
-    'SELECT *, COUNT() OVER() AS total FROM my-table offset 2;'
-  );
-});
+  it('should return a SQL select with offset', () => {
+    const queryParams = 'offset=2';
+    const params = qs.parse(queryParams);
+    console.log('params ---->', params);
+    const clause = generateSelectSql('my-table', params);
+    expect(clause).toBe(
+      'SELECT *, COUNT() OVER() AS total FROM my-table offset 2;'
+    );
+  });
 
-it('should return a SQL select with limit and offset', () => {
-  const queryParams = 'limit=2&offset=2';
-  const params = qs.parse(queryParams);
-  console.log('params ---->', params);
-  const clause = generateSelectSql('my-table', params);
-  expect(clause).toBe(
-    'SELECT *, COUNT() OVER() AS total FROM my-table limit 2 offset 2;'
-  );
-});
+  it('should return a SQL select with limit and offset', () => {
+    const queryParams = 'limit=2&offset=2';
+    const params = qs.parse(queryParams);
+    console.log('params ---->', params);
+    const clause = generateSelectSql('my-table', params);
+    expect(clause).toBe(
+      'SELECT *, COUNT() OVER() AS total FROM my-table limit 2 offset 2;'
+    );
+  });
 
-it('should convert filters into where clause', () => {
-  const queryParams = 'limit=2&offset=2&filters[name][$eq]=joe';
-  const params = qs.parse(queryParams);
-  console.log('params ---->', params);
-  const clause = generateSelectSql('my-table', params);
-  expect(clause).toBe(
-    `SELECT *, COUNT() OVER() AS total FROM my-table WHERE name = 'joe' limit 2 offset 2;`
-  );
-});
+  it('should convert filters into where clause', () => {
+    const queryParams = 'limit=2&offset=2&filters[name][$eq]=joe';
+    const params = qs.parse(queryParams);
+    console.log('params ---->', params);
+    const clause = generateSelectSql('my-table', params);
+    expect(clause).toBe(
+      `SELECT *, COUNT() OVER() AS total FROM my-table WHERE name = 'joe' limit 2 offset 2;`
+    );
+  });
 
-it('should convert filters into where clause', () => {
-  const queryParams = 'limit=2&offset=2&filters[name][$eq]=joe&filters[country][$eq]=usa';
-  const params = qs.parse(queryParams);
-  console.log('params ---->', params);
-  const clause = generateSelectSql('my-table', params);
-  expect(clause).toBe(
-    `SELECT *, COUNT() OVER() AS total FROM my-table WHERE name = 'joe' AND country = 'usa' limit 2 offset 2;`
-  );
-});
+  it('should convert filters into where clause', () => {
+    const queryParams =
+      'limit=2&offset=2&filters[name][$eq]=joe&filters[country][$eq]=usa';
+    const params = qs.parse(queryParams);
+    console.log('params ---->', params);
+    const clause = generateSelectSql('my-table', params);
+    expect(clause).toBe(
+      `SELECT *, COUNT() OVER() AS total FROM my-table WHERE name = 'joe' AND country = 'usa' limit 2 offset 2;`
+    );
+  });
 
-it('should apply 2 sort fields', () => {
-  const queryParams = 'sort[0]=body:asc&sort[1]=title:desc';
-  const params = qs.parse(queryParams);
-  console.log('params ---->', params);
-  const clause = generateSelectSql('my-table', params);
-  expect(clause).toBe(
-    `SELECT *, COUNT() OVER() AS total FROM my-table order by body asc, title desc;`
-  );
+  it('should convert filters into where clause or condifition is multiple params of same type', () => {
+    const queryParams =
+      'limit=2&offset=2&filters[name][$eq]=joe&filters[country][$eq]=usa&filters[country][$eq]=uk&filters[gender][$eq]=male';
+    const params = qs.parse(queryParams);
+    console.log('params ---->', params);
+    const clause = generateSelectSql('my-table', params);
+    expect(clause).toBe(
+      `SELECT *, COUNT() OVER() AS total FROM my-table WHERE name = 'joe' AND (country = 'usa' OR country = 'uk') AND gender = 'male' limit 2 offset 2;`
+    );
+  });
+
+  it('should apply 2 sort fields', () => {
+    const queryParams = 'sort[0]=body:asc&sort[1]=title:desc';
+    const params = qs.parse(queryParams);
+    console.log('params ---->', params);
+    const clause = generateSelectSql('my-table', params);
+    expect(clause).toBe(
+      `SELECT *, COUNT() OVER() AS total FROM my-table order by body asc, title desc;`
+    );
+  });
 });
 
 //TODO: rework to hit the full api

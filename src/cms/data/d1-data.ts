@@ -153,9 +153,10 @@ export function getRepoFromTable(tableName) {
 export function sortClauseBuilder(params) {
   let sortClause = '';
 
-if(params.sort){
-  sortClause = 'order by ' + params.sort.join(", ").replace(new RegExp(":", "g"),' ')
-}
+  if (params.sort) {
+    sortClause =
+      'order by ' + params.sort.join(', ').replace(new RegExp(':', 'g'), ' ');
+  }
 
   return sortClause;
 }
@@ -172,6 +173,20 @@ export function whereClauseBuilder(filters: any) {
   for (const key of Object.keys(filters)) {
     let filter = filters[key];
     let condition = Object.keys(filter)[0];
+
+    if (Array.isArray(filter[condition])) {
+      // AND (country = 'usa' OR contry = 'uk')
+      const arr = filter[condition];
+      let multiArr = [];
+      for (const prop of arr) {
+        multiArr.push(`${key} = '${prop}'`);
+      }
+      whereClause = `${whereClause} ${AND} (${multiArr.join(` OR `)})`;
+    } else {
+      whereClause = `${whereClause} ${AND} ${key} ${processCondition(
+        condition
+      )} '${filter[condition]}'`;
+    }
     // if (typeof filter === 'string') {
     //   if (filter.toLowerCase().includes('is')) {
     //     whereClause = `${whereClause} ${AND} ${key} ${filter}`;
@@ -181,9 +196,6 @@ export function whereClauseBuilder(filters: any) {
     // } else {
     //   whereClause = `${whereClause} ${AND} ${key} = ${filter}`;
     // }
-    whereClause = `${whereClause} ${AND} ${key} ${processCondition(
-      condition
-    )} '${filter[condition]}'`;
 
     AND = 'AND';
   }
