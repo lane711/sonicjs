@@ -21,8 +21,8 @@
     "fix:prettier": "prettier --write --cache . **/*.css"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Lane C.",
+  "license": "MIT",
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240208.0",
     "@types/jest": "^29.5.12",
