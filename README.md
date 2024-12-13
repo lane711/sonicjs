@@ -25,6 +25,7 @@ Details of our performance benchmark can be found at SonicJs.com. Here is a part
 
 
 ## Features
+- **Extreme Performance**: By deploying your code and synchronizing your entire database across Cloudflare's vast edge network of over 200 nodes worldwide, SonicJs drastically reduces network latency.
 - **Auto-Generated CRUD Endpoints**: Define your data schmea and permission rules in code and SonicJs will automatically generate the associated endpoints at runtime (not using code generation like other tools)
 - **Admin UI**: Manage all data from the dynamic administrative console. This includes the ability to search and sort, edit, create new records, etc.
 - **Built on Astro**: The Admin UI leverages the power of Astro for fast and optimized static site generation. You can also build you website/app on top on this repo for a single front end/back end/API deployment.
@@ -36,12 +37,12 @@ Details of our performance benchmark can be found at SonicJs.com. Here is a part
 - **Authentication**: Manage user registration/login from your app with the built in API endpoints.
 
 
-## Getting Started
+# Getting Started
 
-### Prerequisites
+## Prerequisites
 1. You will need a free Cloudflare account: [https://dash.cloudflare.com/sign-up](https://dash.cloudflare.com/sign-up)
 
-### Installation
+## Installation
 1. Clone the repository:
    ```sh
    git clone https://github.com/lane711/sonicjs.git
@@ -52,26 +53,27 @@ Details of our performance benchmark can be found at SonicJs.com. Here is a part
    ```sh
    cp wrangler.example.toml wrangler.toml
    ```
-1. Login to Cloudflare via the command line:
    
-2. Create your Cloudflare D1 database with the following command:
+1. Create your Cloudflare D1 database with the following command:
    ```sh
    npx wrangler d1 create sonicjs
    ```
+   You will be prompted to login to your Cloudflare account, follow the prompts.
+   
    The output of the above command will include a database id, **copy it to your clipboard**.
-
-3. Update your `wrangler.toml` file to inclde the datbase id from step #3. It should look something like this:
+   <br>
+2. Update your `wrangler.toml` file to inclde the datbase id from step #3. It should look something like this:
    ```sh
    [[d1_databases]]
    binding = "D1"
    database_name = "sonicjs"
    database_id = "ba4f63aa-161d-4d12-aca7-b59761701871"
    ```
-4. Run the app:
+3. Run the app:
    ```sh
    npm run dev
    ```
-5. Visit the Admin UI in your browser:
+4. Visit the Admin UI in your browser:
    [http://localhost:4321](http://localhost:4321)
    ![Admin UI](https://sonicjs.com/images/sonicJs-admin-ui.png)
 
