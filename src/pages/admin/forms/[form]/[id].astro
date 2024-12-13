@@ -1,0 +1,79 @@
+---
+import AdminLayout from "../../layouts/admin-layout.astro";
+import FormComponent from "../form-component.astro";
+import { apiConfig } from "../../../../db/routes";
+const { form, id } = Astro.params;
+import { getFieldDefinitions } from "../../../../services/fields";
+
+const tableConfigRecord = apiConfig.find((t) => t.route === form);
+// const tableConfig = getFieldDefinitions(tableConfigRecord);
+
+//get existing record
+const getRecord = async (table, id) => {
+  const baseURl = Astro.request.url.split("/admin/")[0];
+  const getUrl = `${baseURl}/api/v1/${tableConfigRecord.route}/${id}`;
+  let result;
+  try {
+    result = await fetch(getUrl).then((response) => response.json());
+
+    // console.log("Success:", result);
+    return result.data;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
+
+const record = await getRecord(tableConfigRecord.route, id);
+
+
+
+if (Astro.request.method === "POST") {
+  try {
+    const formData = await Astro.request.formData();
+    var object = {};
+    formData.forEach((value, key) => {
+      // Reflect.has in favor of: object.hasOwnProperty(key)
+      if (!Reflect.has(object, key)) {
+        object[key] = value;
+        return;
+      }
+      if (!Array.isArray(object[key])) {
+        object[key] = [object[key]];
+      }
+      object[key].push(value);
+    });
+    var json = JSON.stringify(object);
+
+    //now post to our own post api
+    const baseURl = Astro.request.url.split("/admin/")[0];
+    const postUrl = `${baseURl}/api/v1/${tableConfigRecord.route}/${id}`;
+    try {
+      const response = await fetch(postUrl, {
+        method: "PUT",
+        body: json,
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const result = await response.json();
+      // console.log("Success:", result);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+
+    // Do something with the data
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+  } finally {
+    return Astro.redirect(`/admin/tables/${tableConfigRecord.route}`);
+  }
+}
+---
+
+<AdminLayout title=`SonicJs Admin` | {form} `>
+  <FormComponent record={record.data}/>
+</AdminLayout>

@@ -1,0 +1,8 @@
+# Run the `npx wrangler d1 create sonicjs` command and copy the id to the database_id attribute below
+
+
+[[d1_databases]]
+binding = "D1"
+database_name = "sonicjs"
+database_id = "123456-1234567890lkasfjlkasjdf" # This is the id of the database you created in step #3 of getting started
+

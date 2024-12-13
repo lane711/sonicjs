@@ -1,0 +1,14 @@
+{
+  "extends": "astro/tsconfigs/base",
+  "compilerOptions": {
+    "baseUrl": "src",
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "module": "es2020",
+    "paths": {
+      "@services/*": ["./services/*"],
+      "@schema/*": ["./db/schema/*"],
+
+    }
+  }
+}

@@ -1,36 +1,32 @@
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Debug Jest Tests",
-      "type": "node",
-      "request": "launch",
-      "runtimeArgs": [
-        "--inspect-brk",
-        "${workspaceRoot}/node_modules/.bin/jest",
-        "--runInBand"
-      ],
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch via NPM",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run-script", "dev", "--exitcrash"],
-      "restart": true,
-      "console": "integratedTerminal"
-    },
-    {
-      "name": "Wrangler debug",
-      "type": "node",
-      "request": "attach",
-      "port": 9229,
-      "cwd": "/",
-      "resolveSourceMapLocations": null,
-      "attachExistingChildren": false,
-      "autoAttachChildProcesses": false
-    }
-  ]
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"command": "./node_modules/.bin/astro dev",
+			"name": "Back End",
+			"request": "launch",
+			"type": "node-terminal",
+			"skipFiles": ["**/node_modules/**"]
+		},
+		{
+			"type": "chrome",
+			"request": "launch",
+			"name": "Front End",
+			"url": "http://localhost:4321",
+			"webRoot": "${workspaceFolder}/src",
+			"sourceMapPathOverrides": {
+				"vite:///src/*": "${webRoot}/*"
+			},
+			"skipFiles": ["**/node_modules/**"]
+		}
+	],
+	"compounds": [
+		{
+			"name": "Back End + Front End",
+			"configurations": [
+				"Back End",
+				"Front End"
+			]
+		}
+	]
 }

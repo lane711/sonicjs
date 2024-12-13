@@ -1,0 +1,20 @@
+---
+import { invalidateSession } from "@services/sessions";
+
+if (Astro.cookies.has('session')) {
+    const sessionId = Astro.cookies.get('session')?.value;
+    try {
+      if (sessionId) {
+        await invalidateSession(Astro.locals.runtime.env.D1, sessionId);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error('Error invalidating session:', error.message);
+      }
+    }
+    Astro.cookies.delete('session', {
+      path: '/'
+    });
+  }
+  return Astro.redirect('/admin/login');
+---

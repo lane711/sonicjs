@@ -1,7 +1,4 @@
 {
-  "recommendations": [
-    "esbenp.prettier-vscode",
-    "davidanson.vscode-markdownlint",
-    "editorconfig.editorconfig"
-  ]
+  "recommendations": ["astro-build.astro-vscode"],
+  "unwantedRecommendations": []
 }
