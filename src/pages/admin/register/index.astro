@@ -18,7 +18,7 @@ if (Astro.request.method === "POST") {
     if(!isAdminAccountCreated){
       data.role = "admin";
     }
-    var json = JSON.stringify(data);
+    var json = JSON.stringify({data});
 
     console.log('json register', json)
 
@@ -30,6 +30,7 @@ if (Astro.request.method === "POST") {
     // });
 
     //now post to our own post api
+    debugger;
     const baseURl = Astro.request.url.split("/admin/")[0];
     const postUrl = `${baseURl}/api/v1/users`;
     try {
@@ -155,7 +156,6 @@ if (Astro.request.method === "POST") {
               name="email"
               type="email"
               autocomplete="email"
-              value="b@b.com"
               required
               class="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
             />
@@ -178,7 +178,6 @@ if (Astro.request.method === "POST") {
               type="password"
               autocomplete="current-password"
               required
-              value="password"
               class="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
             />
           </div>

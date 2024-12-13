@@ -11,8 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest run",
     "generate": "drizzle-kit generate",
-    "up": "wrangler d1 migrations apply sonicjs-astro --local",
-    "up:prod": "wrangler d1 migrations apply sonicjs-astro  --remote",
+    "up": "wrangler d1 migrations apply sonicjs --local",
+    "up:prod": "wrangler d1 migrations apply sonicjs  --remote"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.3",

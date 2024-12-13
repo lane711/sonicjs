@@ -135,7 +135,7 @@ export const PUT: APIRoute = async (context) => {
   const payload = await context.request.json();
 
   var content: { data?: any; table?: string; id?: string } = {};
-  content.data = payload;
+  content = payload;
 
   console.log("put content", JSON.stringify(content.data, null, 2));
 

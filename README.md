@@ -52,24 +52,26 @@ Details of our performance benchmark can be found at SonicJs.com. Here is a part
    ```sh
    cp wrangler.example.toml wrangler.toml
    ```
-1. Create your Cloudflare D1 database with the following command:
+1. Login to Cloudflare via the command line:
+   
+2. Create your Cloudflare D1 database with the following command:
    ```sh
    npx wrangler d1 create sonicjs
    ```
    The output of the above command will include a database id, **copy it to your clipboard**.
 
-1. Update your `wrangler.toml` file to inclde the datbase id from step #3. It should look something like this:
+3. Update your `wrangler.toml` file to inclde the datbase id from step #3. It should look something like this:
    ```sh
    [[d1_databases]]
    binding = "D1"
    database_name = "sonicjs"
    database_id = "ba4f63aa-161d-4d12-aca7-b59761701871"
    ```
-1. Run the app:
+4. Run the app:
    ```sh
    npm run dev
    ```
-1. Visit the Admin UI in your browser:
+5. Visit the Admin UI in your browser:
    [http://localhost:4321](http://localhost:4321)
    ![Admin UI](https://sonicjs.com/images/sonicJs-admin-ui.png)
 
