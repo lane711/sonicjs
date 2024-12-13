@@ -2,13 +2,13 @@
 
 ## Overview
 
-**SonicJs is the Fastest Headless CMS / API Framework in the World.**
+🚀🚀🚀 **SonicJs is the Fastest Headless CMS / API Framework in the World** 🚀🚀🚀
 
 It is capable of delivering API requests anywhere in the world in under 100 milliseconds in most cases.
 
 This results in extremely fast page/app loads for end users.
 
-SonicJs is a headless CMS built on Astro and designed to run on Cloudflare. It provides a flexible and scalable solution for managing content, leveraging modern web technologies.
+Built on Astro and optimized for Cloudflare, SonicJs is a headless CMS that offers a flexible and scalable content management solution, utilizing the latest web technologies.
 
 ## Dedicated Documentation Website
 Read the docs here [https://sonicjs.com](https://sonicjs.com])
@@ -82,4 +82,4 @@ Details of our performance benchmark can be found at SonicJs.com. Here is a part
 We gladly accept Pull Requests (PRs) from the community.
 
 ## Licensing (MIT)
-This project is licensed under the MIT License. This means you are free to use, modify, and distribute this software under the following conditions:
+This project is licensed under the MIT License. This means you are free to use, modify, and distribute this software under the  conditions specified.

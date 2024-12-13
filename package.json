@@ -10,10 +10,9 @@
     "astro": "astro",
     "test": "vitest run",
     "test:watch": "vitest run",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate:local": "wrangler d1 migrations apply sonicjs-astro --local",
-    "db:migrate:prod": "wrangler d1 migrations apply sonicjs-astro  --remote",
-    "db:migrate:preview": "wrangler d1 migrations apply --env preview sonicjs-astro --remote"
+    "generate": "drizzle-kit generate",
+    "up": "wrangler d1 migrations apply sonicjs-astro --local",
+    "up:prod": "wrangler d1 migrations apply sonicjs-astro  --remote",
   },
   "dependencies": {
     "@astrojs/check": "^0.9.3",
