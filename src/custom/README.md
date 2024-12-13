@@ -1,1 +1,0 @@
-Keep all of your customizations in this folder. This makes it easier to upgrade to a newer version.

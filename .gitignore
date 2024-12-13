@@ -1,6 +1,0 @@
-node_modules
-dist
-.wrangler/state
-.wrangler/tmp
-wrangler.toml
-
