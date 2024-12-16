@@ -62,18 +62,22 @@ Details of our performance benchmark can be found at SonicJs.com. Here is a part
    
    The output of the above command will include a database id, **copy it to your clipboard**.
    <br>
-2. Update your `wrangler.toml` file to inclde the datbase id from step #3. It should look something like this:
+2. Update your `wrangler.toml` file to include the datbase id from step #3. It should look something like this:
    ```sh
    [[d1_databases]]
    binding = "D1"
    database_name = "sonicjs"
    database_id = "ba4f63aa-161d-4d12-aca7-b59761701871"
    ```
-3. Run the app:
+1. Apply the default database schema to your database:
+   ```sh
+   npm run up
+   ```
+2. Run the app:
    ```sh
    npm run dev
    ```
-4. Visit the Admin UI in your browser:
+3. Visit the Admin UI in your browser:
    [http://localhost:4321](http://localhost:4321)
    ![Admin UI](https://sonicjs.com/images/sonicJs-admin-ui.png)
 
