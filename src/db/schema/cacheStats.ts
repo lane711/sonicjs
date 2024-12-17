@@ -28,7 +28,7 @@ export const table = sqliteTable(tableName, {
 export const relation = relations(table, ({ one }) => ({
   url: one(cacheRequests.table, {
     fields: [table.url],
-    references: [cacheRequests.table.url],
+    references: [cacheRequests.table.id],
   }),
 }));
 

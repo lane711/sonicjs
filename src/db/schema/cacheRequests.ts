@@ -13,7 +13,7 @@ export const name = "Cache Requests";
 export const route = "cache-requests";
 
 export const definition = {
-  url: text("url").primaryKey(),
+  id: text("id").primaryKey(),
   createdOn: integer('createdOn').notNull(),
 };
 
