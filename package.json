@@ -9,7 +9,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "test": "vitest run",
-    "test:watch": "vitest run",
+    "test:watch": "vitest",
     "generate": "drizzle-kit generate",
     "up": "wrangler d1 migrations apply sonicjs --local",
     "up:prod": "wrangler d1 migrations apply sonicjs  --remote"

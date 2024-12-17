@@ -34,6 +34,7 @@ export const GET: APIRoute = async (context) => {
   let entry;
   try {
     entry = apiConfig.filter((tbl) => tbl.route === tableName)[0];
+    if(!entry){throw new Error()};
   } catch (error) {
     return new Response(
       JSON.stringify({

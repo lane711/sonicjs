@@ -22,3 +22,7 @@ export function convertFormDataToObject(formData) {
   });
   return object;
 }
+
+export const getEntryByRoute = (apiConfig, route) => {
+  return apiConfig.find((tbl) => tbl.route === route);
+};
