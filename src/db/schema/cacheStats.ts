@@ -17,7 +17,7 @@ export const route = "cache-stats";
 export const definition = {
   id: text("id").primaryKey(),
   url: text("url").notNull(),
-  createdOn: integer('createdOn').notNull().default(Date.now()),
+  createdOn: integer('createdOn').notNull(),
   executionTime: integer('executionTime').notNull(),
 };
 

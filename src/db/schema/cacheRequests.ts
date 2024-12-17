@@ -14,7 +14,7 @@ export const route = "cache-requests";
 
 export const definition = {
   url: text("url").primaryKey(),
-  createdOn: integer('createdOn').notNull().default(Date.now()),
+  createdOn: integer('createdOn').notNull(),
 };
 
 export const table = sqliteTable(tableName, {
