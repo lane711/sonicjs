@@ -44,7 +44,7 @@ describe('GET /api/v1/:table', () => {
     };
 
     const response = await GET(context as any);
-    const result = await response.json();
+    const result = await response.json() as { error: string };
 
     expect(response.status).toBe(500);
     expect(result.error).toBe('Table "undefined-table" not defined in your schema');
@@ -60,7 +60,7 @@ describe('GET /api/v1/:table', () => {
     (getApiAccessControlResult as any).mockResolvedValue(false);
 
     const response = await GET(context as any);
-    const result = await response.json();
+    const result = await response.json() as { error: string };
 
     expect(response.status).toBe(401);
     expect(result.error).toBe('Unauthorized');
