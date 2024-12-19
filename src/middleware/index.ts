@@ -7,28 +7,39 @@ import {
 import { sequence } from "astro:middleware";
 
 async function cache(context, next) {
-	console.log("cache middleware");
-
-	const { request } = context;
-    const { url } = request;
-
-    const cache = context.locals.runtime.caches.default;
-
-    const cacheResponse = await cache.match(url);
-    if (cacheResponse) {
-        console.log("---> Cache hit");
-        return cacheResponse;
-    }
-
-    const response = await next();
-
-    response.headers.set("cache-control", "public, max-age=60");
-    response.headers.set("content-type", "application/json");
-
-    await cache.put(url, new Response(response.body, response));
-
-    return response;
-		// return next();
+	console.log('Handling GET request for character');
+	const request = context.request;
+	const cacheUrl = new URL(request.url);
+  
+	// Construct the cache key from the cache URL
+	const cacheKey = new Request(cacheUrl.toString(), request);
+	const cache = context.locals.runtime.caches.default;
+  
+	let response = await cache.match(cacheKey);
+	let nextResponse;
+  
+	if (!response) {
+	  console.log(
+		`MISS ** Response for request url: ${request.url} not present in cache. Fetching and caching request.`
+	  );
+  
+	  response = await next();
+  
+	  response.headers.append("Cache-Control", "s-maxage=10");
+	  await cache.put(cacheKey, response.clone());
+	  nextResponse = response;
+	} else {
+	  console.log(`Cache hit for: ${request.url}.`);
+	  nextResponse = await next();
+	}
+  
+	// clone and create a new response because
+	// otherwise you get errors modifying the content type
+	const clonedResponse = nextResponse.clone();
+	const finalResponse = new Response(response.body, clonedResponse);
+  
+	finalResponse.headers.append("Content-Type", "application/json");
+	return new Response(finalResponse.body, finalResponse);
 
 }
 
