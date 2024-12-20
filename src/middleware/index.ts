@@ -106,4 +106,5 @@ async function auth(context, next) {
   return next();
 }
 
-export const onRequest = sequence(cache, auth);
+export const onRequest = sequence( auth);
+// export const onRequest = sequence(cache, auth);
