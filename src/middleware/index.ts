@@ -13,7 +13,7 @@ async function cache(context, next) {
   
 	// Construct the cache key from the cache URL
 	const cacheKey = new Request(cacheUrl.toString(), request);
-	const cache = context.locals.runtime.caches.default;
+	const cache = context.locals.runtime.caches?.default;
   
 	let response = await cache.match(cacheKey);
 	let nextResponse;
