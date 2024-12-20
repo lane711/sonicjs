@@ -6,3 +6,9 @@ binding = "D1"
 database_name = "sonicjs"
 database_id = "123456-1234567890lkasfjlkasjdf" # This is the id of the database you created in step #3 of getting started
 
+# Run the `npx wrangler kv:namespace create sonicjs` command and copy the id below
+# Run the `wrangler kv:namespace create sonicjs --preview` command and copy the preview_id below
+# Only update the preview_id and id, leave the binding name as "KVDATA"
+kv_namespaces = [
+  { binding = "KVDATA", preview_id="d88971d3bca042ca97b3efba5865bd97", id = "d88971d3bca042ca97b3efba5865bd97" }
+]

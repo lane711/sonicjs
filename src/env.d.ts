@@ -6,6 +6,7 @@ type ENV = {
   //   MY_KV: KVNamespace;
   D1: D1Namespace;
   R2: R2Namespace;
+  KV: KVNamespace;
 };
 
 // use a default runtime configuration (advanced mode).
