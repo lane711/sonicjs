@@ -1,4 +1,4 @@
-import { return200WithObject } from '@services/return-types';
+import { return200 } from '@services/return-types';
 import type { APIRoute } from "astro";
 
 export const GET: APIRoute = async (context) => {
@@ -15,8 +15,8 @@ export const GET: APIRoute = async (context) => {
         { id: 10, title: 'Tenth Blog Post', content: 'This is the content of the tenth blog post.' },
     ];
 
+    console.log('context.locals.runtime.env', context.locals.runtime.env);
     let value = await context.locals.runtime.env.KV.put('test', JSON.stringify(blogPosts));
 
-    console.log("kv set", value);
-    return return200WithObject(blogPosts);
+    return return200("success");
 };
