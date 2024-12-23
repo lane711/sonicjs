@@ -91,7 +91,7 @@ export const GET: APIRoute = async (context) => {
     let data = await getRecords(
       context,
       entry.table,
-      params,
+      queryParams,
       request.url,
       "fastest",
       undefined
