@@ -19,6 +19,7 @@ import {
   return500,
 } from "../../../services/return-types";
 import { hashString } from "@services/cyrpt";
+import { kvPut } from "@services/kv";
 
 export const GET: APIRoute = async (context) => {
   const start = Date.now();
@@ -34,7 +35,9 @@ export const GET: APIRoute = async (context) => {
   let entry;
   try {
     entry = apiConfig.filter((tbl) => tbl.route === tableName)[0];
-    if(!entry){throw new Error()};
+    if (!entry) {
+      throw new Error();
+    }
   } catch (error) {
     return new Response(
       JSON.stringify({
@@ -53,7 +56,7 @@ export const GET: APIRoute = async (context) => {
     request.url.indexOf("?") > 0 ? request.url.split("?")[1] : request.url;
   const queryParams = qs.parse(query, { duplicates: "combine" });
 
-  console.log("queryParams", queryParams);
+  // console.log("queryParams", queryParams);
 
   // let data = await getD1DataByTable(env.D1, tableName, queryParams);
 
@@ -88,7 +91,13 @@ export const GET: APIRoute = async (context) => {
     params.limit = params.limit ?? "100";
 
     // let data = await getD1DataByTable(env.D1, tableName, queryParams);
-    let data = await getRecords(
+    let data: {
+      data: any;
+      source: string;
+      total: number;
+      contentType?: any;
+      executionTime?: number;
+    } = await getRecords(
       context,
       entry.table,
       queryParams,
@@ -117,19 +126,12 @@ export const GET: APIRoute = async (context) => {
       await entry.hooks.afterOperation(context, "read", params.id, null, data);
     }
 
+    //store in kv cache
+    kvPut(context, context.url.href, data);
+
     const end = Date.now();
     const executionTime = end - start;
-    // timerLog('api get', start, end);
-
-    // return context.json({ ...data, executionTime });
-    // return new Response(
-    //   JSON.stringify({
-    //     data,
-    //     executionTime,
-    //   }, {headers: {
-    //     "Content-Type": "application/json",
-    //   }})
-    // );
+    data.executionTime = executionTime;
 
     return new Response(JSON.stringify(data), {
       headers: { "Content-Type": "application/json" },
@@ -227,7 +229,6 @@ export const POST: APIRoute = async (context) => {
       status: result?.status || 500,
       headers: { "Content-Type": "application/json" },
     });
-
   } catch (error) {
     console.log("error posting content", error);
     return return500(error);

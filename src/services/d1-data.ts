@@ -42,7 +42,7 @@ export function generateSelectSql(table, params) {
   let sql = `SELECT *, COUNT() OVER() AS total FROM ${table} ${whereClause} ${sortBySyntax} ${limitSyntax} ${offsetSyntax}`;
   sql = sql.replace(/\s+/g, " ").trim() + ";";
 
-  console.log("sql ==>", sql);
+  // console.log("sql ==>", sql);
   return sql;
 }
 
