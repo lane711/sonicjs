@@ -1,7 +1,7 @@
 import qs from "qs";
 
 import type { APIRoute } from "astro";
-import { getD1DataByTable } from "../../../services/d1-data";
+import { getD1DataByTable } from "../../../services/d1";
 import { drizzle } from "drizzle-orm/d1";
 import { apiConfig, sonicJsConfig } from "../../../db/routes";
 import {
@@ -20,6 +20,7 @@ import {
 } from "../../../services/return-types";
 import { hashString } from "@services/cyrpt";
 import { kvPut } from "@services/kv";
+import { inMemoryPut } from "@services/memory";
 
 export const GET: APIRoute = async (context) => {
   const start = Date.now();
@@ -128,6 +129,8 @@ export const GET: APIRoute = async (context) => {
 
     //store in kv cache
     kvPut(context, context.url.href, data);
+    //store in kv cache
+    inMemoryPut(context, context.url.href, data);
 
     const end = Date.now();
     const executionTime = end - start;

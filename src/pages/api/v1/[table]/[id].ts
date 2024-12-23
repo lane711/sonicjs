@@ -1,7 +1,7 @@
 import qs from "qs";
 
 import type { APIRoute } from "astro";
-import { getD1DataByTable } from "../../../../services/d1-data";
+import { getD1DataByTable } from "../../../../services/d1";
 import { drizzle } from "drizzle-orm/d1";
 import { apiConfig, sonicJsConfig } from "../../../../db/routes";
 // import {

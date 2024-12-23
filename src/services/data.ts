@@ -21,7 +21,7 @@ import {
   getD1DataByTable,
   insertD1Data,
   updateD1Data,
-} from "./d1-data";
+} from "./d1";
 import { log, timerLog } from "../services/logger";
 import { uuid } from "./utils";
 

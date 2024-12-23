@@ -11,7 +11,7 @@ import {
 } from "@oslojs/encoding";
 import { sha256 } from "@oslojs/crypto/sha2";
 import { drizzle, type DrizzleD1Database } from "drizzle-orm/d1";
-import { getRepoFromTable } from "./d1-data";
+import { getRepoFromTable } from "./d1";
 import { tableSchemas } from "db/routes";
 
 // import type { User, Session } from "./db.js";

@@ -6,8 +6,32 @@ import {
 } from "@services/sessions";
 import { sequence } from "astro:middleware";
 import { kvGet } from "@services/kv";
+import { inMemoryGet } from "@services/memory";
 
-async function cache(context, next) {
+async function inMemoryCache(context, next) {
+	const start = Date.now();
+  
+	//   console.log("Handling KV Cache");
+  
+	const cachedData = await inMemoryGet(context, context.url.href);
+  
+	if (cachedData) {
+	  const end = Date.now();
+	  const executionTime = end - start;
+	  cachedData.executionTime = executionTime;
+	  cachedData.source = "InMemory";
+	  return new Response(JSON.stringify(cachedData), {
+		status: 200,
+		headers: { "Content-Type": "application/json" },
+	  });
+	} else{
+	  console.log("Cache miss on " + context.url.href);
+	}
+  
+	return next();
+  }
+
+async function kvCache(context, next) {
   const start = Date.now();
 
   //   console.log("Handling KV Cache");
@@ -94,4 +118,6 @@ async function auth(context, next) {
 }
 
 // export const onRequest = sequence( auth);
-export const onRequest = sequence(cache, auth);
+export const onRequest = sequence(inMemoryCache, auth);
+
+// export const onRequest = sequence(inMemoryCache, kvCache, auth);
