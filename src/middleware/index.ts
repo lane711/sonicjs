@@ -23,6 +23,8 @@ async function cache(context, next) {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
+  } else{
+	console.log("Cache miss on " + context.url.href);
   }
 
   return next();
