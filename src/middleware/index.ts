@@ -118,6 +118,6 @@ async function auth(context, next) {
 }
 
 // export const onRequest = sequence( auth);
-export const onRequest = sequence(inMemoryCache, auth);
+// export const onRequest = sequence(inMemoryCache, auth);
 
-// export const onRequest = sequence(inMemoryCache, kvCache, auth);
+export const onRequest = sequence(inMemoryCache, kvCache, auth);
