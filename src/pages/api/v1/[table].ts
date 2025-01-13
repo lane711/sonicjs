@@ -127,7 +127,7 @@ export const GET: APIRoute = async (context) => {
     }
 
     //store in kv cache
-    kvPut(context, context.url.href, data);
+    kvPut(context, context.request.url, data);
 
     const end = Date.now();
     const executionTime = end - start;
