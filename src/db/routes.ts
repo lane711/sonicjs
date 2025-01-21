@@ -5,8 +5,8 @@ import * as categories from "./schema/categories";
 import * as categoriesToPosts from "./schema/categoriesToPosts";
 // import * as userKeys from "./schema/userKeys";
 import * as userSessions from "./schema/userSessions";
-// import * as cacheRequests from "./schema/cacheRequests";
-// import * as cacheStats from "./schema/cacheStats";
+import * as cacheRequests from "./schema/cacheRequests";
+import * as cacheStats from "./schema/cacheStats";
 
 
 // import { AppContext } from '../server';
@@ -217,8 +217,8 @@ export const tableSchemas = {
   categories,
   categoriesToPosts,
   userSessions,
-  // cacheRequests,
-  // cacheStats,
+  cacheRequests,
+  cacheStats,
 };
 
 for (const key of Object.keys(tableSchemas)) {

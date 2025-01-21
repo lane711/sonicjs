@@ -6,9 +6,15 @@ import {
 } from "@services/sessions";
 import { sequence } from "astro:middleware";
 import { kvGet } from "@services/kv";
+import { cacheRequestInsert } from "@services/kv-data";
 
 async function cache(context, next) {
   const start = Date.now();
+
+  //only attempt to retrieve cache on urls starting with /api
+  if (!context.url.pathname.startsWith("/api")) {
+    return next();
+  }
 
   //   console.log("Handling KV Cache");
 
@@ -17,14 +23,22 @@ async function cache(context, next) {
   if (cachedData) {
     const end = Date.now();
     const executionTime = end - start;
-	cachedData.executionTime = executionTime;
-	cachedData.source = "KV";
+    cachedData.executionTime = executionTime;
+    cachedData.source = "KV";
     return new Response(JSON.stringify(cachedData), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } else{
-	console.log("Cache miss on " + context.url.href);
+  } else {
+    console.log("Cache miss on " + context.url.href);
+    //add url to cache request
+    
+    cacheRequestInsert(
+      context,
+      context.locals.runtime.env.D1,
+      context.locals.runtime.env.KV,
+      context.url.href 
+    );
   }
 
   return next();

@@ -1,4 +1,4 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 import { isAdminOrEditor } from "../config-helpers";
 import type { ApiConfig } from "../routes";
@@ -14,13 +14,17 @@ export const route = "cache-requests";
 
 export const definition = {
   id: text("id").primaryKey(),
+  url: text("url").notNull().unique().default(""),
   createdOn: integer('createdOn').notNull(),
 };
 
 export const table = sqliteTable(tableName, {
   ...definition,
+}, (table) => {
+  return {
+    urlIdx: uniqueIndex("url").on(table.url),
+  };
 });
-
 
 export const access: ApiConfig["access"] = {
   operation: {
