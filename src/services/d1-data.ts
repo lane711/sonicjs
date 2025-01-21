@@ -2,6 +2,7 @@ import { drizzle } from "drizzle-orm/d1";
 import { and, eq } from "drizzle-orm";
 import { tableSchemas } from "../db/routes";
 import qs from "qs";
+import { uuid } from "./utils";
 
 // export async function getAllContent(db) {
 //   const { results } = await db.prepare("SELECT * FROM users").all();
@@ -61,6 +62,10 @@ export function prepareD1Data(data, tbl = "") {
   data.createdOn = now;
   data.updatedOn = now;
   delete data.table;
+
+  if(!data.id){ 
+    data.id =   uuid();
+  }
 
   if (!schema.id) {
     delete data.id;

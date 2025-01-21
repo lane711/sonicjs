@@ -250,9 +250,9 @@ async function dataAddToInMemoryCache(
 
 export async function insertRecord(d1, kv, data) {
   const content = data;
-  const id = uuid();
+  // const id = uuid();
   const timestamp = new Date().getTime();
-  content.data.id = id;
+  // content.data.id = id;
   let error = "";
 
   let result = { error:{message:""} };
