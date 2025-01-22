@@ -19,7 +19,7 @@ export const kvGet = async (context, key, options = { type: "json" }) => {
 export const kvGetAll = async (context) => {
   try {
     const list = await context.locals.runtime.env.KV.list();
-    return JSON.stringify(list.keys);
+    return list.keys;
   } catch (error) {
     console.error(error);
   }
