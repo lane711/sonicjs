@@ -16,6 +16,15 @@ async function cache(context, next) {
     return next();
   }
 
+  //ignore route with auth, cacheRequests, and kv
+  if (
+    context.url.pathname.startsWith("/api/auth") ||
+    context.url.pathname.startsWith("/api/cacheRequests") ||
+    context.url.pathname.startsWith("/api/kv")
+  ) {
+    return next();
+  }
+
   //   console.log("Handling KV Cache");
 
   const cachedData = await kvGet(context, context.url.href);

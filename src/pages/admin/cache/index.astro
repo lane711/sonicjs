@@ -1,16 +1,40 @@
 ---
+import { getAdminKvData } from "@services/kv-data";
 import { apiConfig } from "../../../db/routes";
 import AdminLayout from "../layouts/admin-layout.astro";
+
+const data = await getAdminKvData(Astro);
 ---
 
 <AdminLayout title=`SonicJs Admin` | Cache `>
   <h1 class="text-base font-semibold leading-6 text-white">Coming Soon</h1>
-    <p class="mt-4">Cache management will be available in a future release.</p>
-    <p>cache request page, <br>show if data and kv list in sync. 
-      <br>if not, sync not, show total count records and kv entires. 
-      <br>show green dot next to record indicating it has associated kv entry.
-    <br>show last sync date and time. (sync'd 3 days ago)
-    <br>sync now for each record
-    <br>really need to know that cached data is not stale regardless of record and kv entry
+  <p class="mt-4">Cache management will be available in a future release.</p>
+  <p>
+    cache request page, <br />show if data and kv list in sync.
+    <br />if not, sync not, show total count records and kv entires.
+    <br />show green dot next to record indicating it has associated kv entry.
+    <br />show last sync date and time. (sync'd 3 days ago)
+    <br />sync now for each record
+    <br />really need to know that cached data is not stale regardless of record
+    and kv entry
   </p>
+  <div>
+    KV Count: {data.kvRecordsCount}
+  </div>
+  <div>
+    Records Count: {data.cacheRequestsCount}
+  </div>
+  <div>
+    <!-- show table that loops thru data.data -->
+     {data.data.map((item) => (
+      <div>
+        <div>
+          <span>{item.id}</span> |
+          <span>{item.url}</span> |
+          <span>{item.matchingKvRecord}</span> |
+
+        </div>
+      </div>
+     ))}
+  </div>
 </AdminLayout>
