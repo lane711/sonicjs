@@ -16,12 +16,13 @@ export const route = "cache-requests";
 export const definition = {
   id: text("id").primaryKey(),
   url: text("url").notNull().unique().default(""),
+  createdOn: integer('createdOn'),
+  updatedOn: integer('updatedOn'),
   deletedOn: integer('deletedOn'),
 };
 
 export const table = sqliteTable(tableName, {
   ...definition,
-  ...auditSchema,
 }, (table) => {
   return {
     urlIdx: uniqueIndex("url").on(table.url),

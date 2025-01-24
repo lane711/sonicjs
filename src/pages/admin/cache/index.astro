@@ -9,6 +9,11 @@ const data = await getAdminKvData(Astro);
 
 const tableConfigRecord = apiConfig.find((t) => t.route === 'cache-requests');
 const tableConfig = getFieldDefinitions(tableConfigRecord);
+
+//add fields
+tableConfig.formFields.push({key: 'matchingKvRecord', label: 'Matching KV Record', type: 'textField'});
+
+let x;
 ---
 
 <AdminLayout title=`SonicJs Admin` | Cache `>
@@ -32,7 +37,7 @@ const tableConfig = getFieldDefinitions(tableConfigRecord);
   </div>
   <div>
 
-    <TableCacheRequests client:load tableConfig={tableConfig} />
+    <TableCacheRequests client:load tableConfig={tableConfig} data={data} />
 
     <!-- show table that loops thru data.data -->
       <table>

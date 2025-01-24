@@ -31,7 +31,7 @@ const fallbackData = [
   },
 ];
 
-function TableCacheRequests({ tableConfig }) {
+function TableCacheRequests({ tableConfig  }) {
   // debugger;
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -56,7 +56,7 @@ function TableCacheRequests({ tableConfig }) {
       cell: (info) =>
         formField.key === "id"
           ? truncateText(info.getValue(), 5)
-          : truncateText(info.getValue(), 30),
+          : truncateText(info.getValue(), 60),
     });
   });
 
@@ -113,7 +113,7 @@ function TableCacheRequests({ tableConfig }) {
 
     const offset = page * pageSize;
 
-    const originPath = `/api/v1/${tableConfig.route}?limit=${pageSize}&offset=${offset}`;
+    const originPath = `/api/v1/admin/cache-requests`;
 
     getData(originPath);
   }, []);
@@ -131,8 +131,9 @@ function TableCacheRequests({ tableConfig }) {
   const getData = (originPath) => {
       if (originPath) {
         fetch(`${originPath}`).then(async (response) => {
+          debugger;
           const responseData: { data: any } = await response.json();
-          setData(responseData.data);
+          setData(responseData.data.data);
           setLoading(false);
         });
       }
