@@ -37,7 +37,7 @@ function TableCacheRequests({ tableConfig }) {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [data, setData] = useState(null);
-  const [sorting, setSorting] = useState<SortingState>([]); // can set initial sorting state here
+  const [sorting, setSorting] = useState<SortingState>([{id:'createdOn', desc: true}]); // can set initial sorting state here
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState(false);
@@ -45,8 +45,10 @@ function TableCacheRequests({ tableConfig }) {
     { id: "title", value: "" },
   ]);
 
+
   const pageSize = 18;
 
+  // setSorting({ id: "title", desc: true });
   // const columns = Object.entries(tableConfig.formFields).map(([key, value]) =>
   //   columnHelper.accessor(key, {
   //     header: value.header || key.charAt(0).toUpperCase() + key.slice(1),
