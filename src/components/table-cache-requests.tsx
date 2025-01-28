@@ -21,6 +21,7 @@ import { useEffect, useMemo, useState } from "react";
 import DeleteConfirmation from "./delete-confirmation";
 import { Button } from "@headlessui/react";
 import { TableSearch } from "./table-search";
+import { renderHTMLElement } from "astro/runtime/server/index.js";
 
 const columnHelper = createColumnHelper();
 
@@ -31,7 +32,7 @@ const fallbackData = [
   },
 ];
 
-function TableCacheRequests({ tableConfig  }) {
+function TableCacheRequests({ tableConfig }) {
   // debugger;
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -40,7 +41,9 @@ function TableCacheRequests({ tableConfig  }) {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState(false);
-  const [columnFilters, setColumnFilters] = useState([{id:'title', value: ''}]);
+  const [columnFilters, setColumnFilters] = useState([
+    { id: "title", value: "" },
+  ]);
 
   const pageSize = 18;
 
@@ -53,10 +56,22 @@ function TableCacheRequests({ tableConfig  }) {
   const columns = tableConfig.formFields.map((formField) => {
     return columnHelper.accessor(formField.key, {
       header: formField.key.charAt(0).toUpperCase() + formField.key.slice(1),
-      cell: (info) =>
-        formField.key === "id"
-          ? truncateText(info.getValue(), 5)
-          : truncateText(info.getValue(), 60),
+      cell: (info) => {
+        switch (formField.key) {
+          case "id":
+            return truncateText(info.getValue(), 5);
+          case "url":
+            return (
+              <a href={info.getValue()} target="_blank">
+                {info.getValue()}
+              </a>
+            );
+          case "matchingKvRecord":
+            return info.getValue() ? "Yes" : "No";
+          default:
+            return truncateText(info.getValue(), 60);
+        }
+      },
     });
   });
 
@@ -91,7 +106,6 @@ function TableCacheRequests({ tableConfig  }) {
   //   }),
   // ];
 
-
   const table = useReactTable({
     data: data ?? fallbackData,
     columns,
@@ -99,7 +113,7 @@ function TableCacheRequests({ tableConfig  }) {
     getCoreRowModel: getCoreRowModel(),
     state: {
       sorting,
-      columnFilters
+      columnFilters,
     },
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
@@ -129,15 +143,15 @@ function TableCacheRequests({ tableConfig  }) {
   }, [confirmDelete]);
 
   const getData = (originPath) => {
-      if (originPath) {
-        fetch(`${originPath}`).then(async (response) => {
-          debugger;
-          const responseData: { data: any } = await response.json();
-          setData(responseData.data.data);
-          setLoading(false);
-        });
-      }
-    };
+    if (originPath) {
+      fetch(`${originPath}`).then(async (response) => {
+        debugger;
+        const responseData: { data: any } = await response.json();
+        setData(responseData.data.data);
+        setLoading(false);
+      });
+    }
+  };
 
   const deleteData = (id) => {
     if (id) {
@@ -155,8 +169,10 @@ function TableCacheRequests({ tableConfig  }) {
   };
 
   const pagerColor = (pageNumber) => {
-  return pageNumber === table.getState().pagination.pageIndex + 1 ? "border-indigo-500 text-indigo-600" : "border-transparent text-gray-500 hover:text-gray-300";
-  }
+    return pageNumber === table.getState().pagination.pageIndex + 1
+      ? "border-indigo-500 text-indigo-600"
+      : "border-transparent text-gray-500 hover:text-gray-300";
+  };
 
   if (table) {
     console.log("sorting", table.getState().sorting);
@@ -196,7 +212,13 @@ function TableCacheRequests({ tableConfig  }) {
                   </button>
                 </div>
               </div>
-              <div className="mt-8 flow-root">  <TableSearch columnFilters={columnFilters} setColumnFilters={setColumnFilters} /></div>
+              <div className="mt-8 flow-root">
+                {" "}
+                <TableSearch
+                  columnFilters={columnFilters}
+                  setColumnFilters={setColumnFilters}
+                />
+              </div>
               <div className="mt-8 flow-root">
                 <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                   <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
@@ -334,17 +356,22 @@ function TableCacheRequests({ tableConfig  }) {
                   </Button>
                 </div>
                 <div className="hidden md:-mt-px md:flex">
-                  {pageArray.map((pageNumber) => 
-                    <Button onClick={() => table.setPageIndex(pageNumber-1)} className={"inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium hover:border-gray-300 hover:text-gray-300" + pagerColor(pageNumber)}>
+                  {pageArray.map((pageNumber) => (
+                    <Button
+                      onClick={() => table.setPageIndex(pageNumber - 1)}
+                      className={
+                        "inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium hover:border-gray-300 hover:text-gray-300" +
+                        pagerColor(pageNumber)
+                      }
+                    >
                       {pageNumber}
                     </Button>
-                  )}
-                
-                {/* TODO: split page buttons when there are many pages */}
+                  ))}
+
+                  {/* TODO: split page buttons when there are many pages */}
                   {/* <span className="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500">
                     ...
                   </span> */}
-                 
                 </div>
                 <div className="-mt-px flex w-0 flex-1 justify-end">
                   <Button

@@ -228,3 +228,9 @@ export function processCondition(condition) {
       break;
   }
 }
+
+export async function purgeD1Table(db, table) {
+  const sql = `DELETE FROM ${table}`;
+  const { results } = await db.prepare(sql).all();
+  return {status: "success"};
+}

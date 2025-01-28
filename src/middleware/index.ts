@@ -18,9 +18,10 @@ async function cache(context, next) {
 
   //ignore route with auth, cacheRequests, and kv
   if (
-    context.url.pathname.startsWith("/api/auth") ||
-    context.url.pathname.startsWith("/api/cacheRequests") ||
-    context.url.pathname.startsWith("/api/kv")
+    context.url.pathname.startsWith("/api/v1/auth") ||
+    context.url.pathname.startsWith("/api/v1/cacheRequests") ||
+    context.url.pathname.startsWith("/api/v1/kv") ||
+    context.url.pathname.startsWith("/api/v1/admin")
   ) {
     return next();
   }

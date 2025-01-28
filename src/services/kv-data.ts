@@ -42,3 +42,7 @@ export const cacheRequestInsert = async (context, d1, kv, url) => {
     console.error(error);
   }
 };
+
+export const purgeKvData = async (context) => {
+
+}

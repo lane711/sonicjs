@@ -24,3 +24,15 @@ export const kvGetAll = async (context) => {
     console.error(error);
   }
 };
+
+export const kvPurgeAll = async (context) => {
+  try {
+    const list = await context.locals.runtime.env.KV.list();
+    for (const key of list.keys) {
+      await context.locals.runtime.env.KV.delete(key.name);
+    }
+    return { status: "success" };
+  } catch (error) {
+    console.error(error);
+  }
+};

@@ -7,11 +7,15 @@ import { getFieldDefinitions } from "@services/fields";
 
 const data = await getAdminKvData(Astro);
 
-const tableConfigRecord = apiConfig.find((t) => t.route === 'cache-requests');
+const tableConfigRecord = apiConfig.find((t) => t.route === "cache-requests");
 const tableConfig = getFieldDefinitions(tableConfigRecord);
 
 //add fields
-tableConfig.formFields.push({key: 'matchingKvRecord', label: 'Matching KV Record', type: 'textField'});
+tableConfig.formFields.push({
+  key: "matchingKvRecord",
+  label: "Matching KV Record",
+  type: "textField",
+});
 
 let x;
 ---
@@ -28,6 +32,24 @@ let x;
     <br />really need to know that cached data is not stale regardless of record
     and kv entry
   </p>
+  <div class="mt-6 flex items-center justify-end gap-x-6">
+    <button type="button" class="text-sm font-semibold leading-6 text-white"
+      >Cancel</button
+    >
+    <a
+      href="/api/v1/admin/purge-kv-cache-requests"
+      type="submit"
+      class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+      >Purge KV</a
+    >
+    <a
+    href="/api/v1/admin/purge-d1-cache-requests"
+    type="submit"
+    class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+    >Purge D1 Requests</a
+  >
+  </div>
+  <a href="/">test link</a>
   <div>[purge records] | [purge kv] | [resync all]</div>
   <div>
     KV Count: {data.kvRecordsCount}
@@ -36,35 +58,6 @@ let x;
     Records Count: {data.cacheRequestsCount}
   </div>
   <div>
-
     <TableCacheRequests client:load tableConfig={tableConfig} data={data} />
-
-    <!-- show table that loops thru data.data -->
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>URL</th>
-            <th>Matching KV Record</th>
-            <th>Created</th>
-            <th>Updated</th>
-            <th>Deleted</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.data.map((item) => (
-            <tr>
-              <td>{item.id}</td>
-              <td>{item.url}</td>
-              <td>{item.matchingKvRecord}</td>
-              <td>{item.createdOn}</td>
-              <td>{item.updatedOn}</td>
-              <td>{item.deletedOn}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-     
   </div>
 </AdminLayout>
