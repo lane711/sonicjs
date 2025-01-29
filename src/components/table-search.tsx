@@ -1,11 +1,14 @@
 import { useCallback } from "react";
 
 export const TableSearch = ({ columnFilters, setColumnFilters }) => {
-    // TODO: title should not be hard coded, the developer should be to specify which fields are searchable
-  const filterValue =
-    columnFilters.find((filter) => filter.id === "title")?.value || "";
+  // TODO: title should not be hard coded, the developer should be to specify which fields are searchable
+  debugger;
 
-    const onFilterChange = (id, value) =>
+  const fieldToFilterOn = columnFilters[0].id;
+  const filterValue =
+    columnFilters.find((filter) => filter.id === fieldToFilterOn)?.value || "";
+
+  const onFilterChange = (id, value) =>
     setColumnFilters((prev) =>
       prev.filter((f) => f.id !== id).concat({ id, value })
     );
@@ -26,7 +29,7 @@ export const TableSearch = ({ columnFilters, setColumnFilters }) => {
             id="search"
             value={filterValue}
             onChange={(e) => {
-              onFilterChange("title", e.target.value);
+              onFilterChange(fieldToFilterOn, e.target.value);
             }}
             className="flex-1 border-0 bg-transparent py-1.5 pl-2 text-white focus:ring-0 sm:text-sm sm:leading-6"
             placeholder="Search"

@@ -47,7 +47,7 @@ function TableCacheRequests({ tableConfig }) {
   const [recordToDelete, setRecordToDelete] = useState(false);
   const [reload, setReload] = useState(false);
   const [columnFilters, setColumnFilters] = useState([
-    { id: "title", value: "" },
+    { id: "url", value: "" },
   ]);
 
   const pageSize = 20;
