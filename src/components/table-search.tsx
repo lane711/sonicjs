@@ -2,7 +2,7 @@ import { useCallback } from "react";
 
 export const TableSearch = ({ columnFilters, setColumnFilters }) => {
   // TODO: title should not be hard coded, the developer should be to specify which fields are searchable
-  debugger;
+  // debugger;
 
   const fieldToFilterOn = columnFilters[0].id;
   const filterValue =

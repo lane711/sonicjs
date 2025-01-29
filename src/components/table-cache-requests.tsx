@@ -22,6 +22,7 @@ import DeleteConfirmation from "./delete-confirmation";
 import { Button } from "@headlessui/react";
 import { TableSearch } from "./table-search";
 import { renderHTMLElement } from "astro/runtime/server/index.js";
+import Toggle from "./toggle";
 
 const columnHelper = createColumnHelper();
 
@@ -73,7 +74,7 @@ function TableCacheRequests({ tableConfig }) {
               </a>
             );
           case "matchingKvRecord":
-            return info.getValue() ? "Yes" : "No";
+            return <Toggle isSet={info.getValue()}></Toggle>; // info.getValue() ? "Yes" : "No";
           default:
             return truncateText(info.getValue(), 60);
         }
