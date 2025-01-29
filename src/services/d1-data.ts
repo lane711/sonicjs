@@ -223,6 +223,7 @@ export function processCondition(condition) {
     case "$eq":
       return "=";
       break;
+      
 
     default:
       break;

@@ -31,6 +31,7 @@
     "@types/react-dom": "^18.3.0",
     "astro": "^4.15.9",
     "drizzle-orm": "^0.33.0",
+    "javascript-time-ago": "^2.5.11",
     "nodemailer": "^6.9.16",
     "qs": "^6.13.0",
     "react": "^18.3.1",

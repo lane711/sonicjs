@@ -1,6 +1,15 @@
 import { getD1DataByTable, insertD1Data } from "./d1-data";
 import { getRecords, insertRecord } from "./data";
 import { kvGetAll } from "./kv";
+import TimeAgo from 'javascript-time-ago'
+
+// English.
+import en from 'javascript-time-ago/locale/en'
+
+TimeAgo.addDefaultLocale(en)
+
+// Create formatter (English).
+const timeAgo = new TimeAgo('en-US')
 
 export const getAdminKvData = async (context) => {
   try {
@@ -18,6 +27,7 @@ export const getAdminKvData = async (context) => {
     const data = cacheRequests.map((item) => {
       item.url = item.url;
       item.matchingKvRecord = kvRecords.find((record) => record.name === item.url) != null || false;
+      item.createdOnAgo = timeAgo.format(new Date(item.createdOn));
       return item;
     });
 

@@ -46,7 +46,7 @@ function TableCacheRequests({ tableConfig }) {
   ]);
 
 
-  const pageSize = 18;
+  const pageSize = 20;
 
   // setSorting({ id: "title", desc: true });
   // const columns = Object.entries(tableConfig.formFields).map(([key, value]) =>
