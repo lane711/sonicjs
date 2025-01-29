@@ -32,19 +32,23 @@ const fallbackData = [
   },
 ];
 
+const originPath = `/api/v1/admin/cache-requests`;
+
 function TableCacheRequests({ tableConfig }) {
   // debugger;
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [data, setData] = useState(null);
-  const [sorting, setSorting] = useState<SortingState>([{id:'createdOn', desc: true}]); // can set initial sorting state here
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "createdOn", desc: true },
+  ]); // can set initial sorting state here
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState(false);
+  const [reload, setReload] = useState(false);
   const [columnFilters, setColumnFilters] = useState([
     { id: "title", value: "" },
   ]);
-
 
   const pageSize = 20;
 
@@ -77,8 +81,8 @@ function TableCacheRequests({ tableConfig }) {
     });
   });
 
-  const handleDeleteClick = (id) => {
-    setRecordToDelete(id);
+  const handleDeleteClick = (row, id, url) => {
+    setRecordToDelete({ id, url });
     setShowDeleteConfirmation(true);
   };
 
@@ -129,25 +133,23 @@ function TableCacheRequests({ tableConfig }) {
 
     const offset = page * pageSize;
 
-    const originPath = `/api/v1/admin/cache-requests`;
-
     getData(originPath);
-  }, []);
+  }, [reload]);
 
   useEffect(() => {
     if (confirmDelete) {
       deleteData(recordToDelete);
       console.log("record deleted");
       setConfirmDelete(false);
-      //redirect to table
-      window.location.href = `/admin/tables/${tableConfig.route}`;
+
+      // remove record from table
+      window.location.href = `/admin/cache`;
     }
   }, [confirmDelete]);
 
   const getData = (originPath) => {
     if (originPath) {
       fetch(`${originPath}`).then(async (response) => {
-        debugger;
         const responseData: { data: any } = await response.json();
         setData(responseData.data.data);
         setLoading(false);
@@ -155,9 +157,9 @@ function TableCacheRequests({ tableConfig }) {
     }
   };
 
-  const deleteData = (id) => {
-    if (id) {
-      const path = `/api/v1/${tableConfig.route}/${id}`;
+  const deleteData = ({ id, url }) => {
+    if (id && url) {
+      const path = `/api/v1/admin/cache-requests?id=${id}&url=${url}`;
 
       // const path = `/api/v1/${tableConfig.route}`;
 
@@ -324,7 +326,11 @@ function TableCacheRequests({ tableConfig }) {
                               <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                                 <button
                                   onClick={() =>
-                                    handleDeleteClick(row.getValue("id"))
+                                    handleDeleteClick(
+                                      row,
+                                      row.getValue("id"),
+                                      row.getValue("url")
+                                    )
                                   }
                                   className="text-indigo-400 hover:text-indigo-300"
                                 >
