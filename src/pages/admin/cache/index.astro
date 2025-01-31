@@ -10,10 +10,42 @@ const data = await getAdminKvData(Astro);
 const tableConfigRecord = apiConfig.find((t) => t.route === "cache-requests");
 const tableConfig = getFieldDefinitions(tableConfigRecord);
 
+//remove fields
+
+tableConfig.formFields = tableConfig.formFields.filter(
+  (f) => f.key !== "createdOn"
+);
+
+tableConfig.formFields = tableConfig.formFields.filter(
+  (f) => f.key !== "updatedOn"
+);
+
+tableConfig.formFields = tableConfig.formFields.filter(
+  (f) => f.key !== "deletedOn"
+);
 //add fields
+
+tableConfig.formFields.push({
+  key: "createdOnAgo",
+  label: "Created On",
+  type: "textField",
+});
+
 tableConfig.formFields.push({
   key: "matchingKvRecord",
   label: "Matching KV Record",
+  type: "textField",
+});
+
+tableConfig.formFields.push({
+  key: "kvUpdatedOnAgo",
+  label: "KV Updated",
+  type: "textField",
+});
+
+tableConfig.formFields.push({
+  key: "kvTTL",
+  label: "KV TTL",
   type: "textField",
 });
 
@@ -21,15 +53,7 @@ let x;
 ---
 
 <AdminLayout title=`SonicJs Admin` | Cache `>
-  <p>
-    cache request page, <br />show if data and kv list in sync.
-    <br />if not, sync not, show total count records and kv entires.
-    <br />show green dot next to record indicating it has associated kv entry.
-    <br />show last sync date and time. (sync'd 3 days ago)
-    <br />sync now for each record
-    <br />really need to know that cached data is not stale regardless of record
-    and kv entry
-  </p>
+
   <div class="mt-6 flex items-center justify-end gap-x-6">
     <button type="button" class="text-sm font-semibold leading-6 text-white"
       >Cancel</button
@@ -47,7 +71,6 @@ let x;
     >Purge D1 Requests</a
   >
   </div>
-  <a href="/">test link</a>
   <div>[purge records] | [purge kv] | [resync all]</div>
   <div>
     KV Count: {data.kvRecordsCount}
@@ -58,4 +81,13 @@ let x;
   <div>
     <TableCacheRequests client:load tableConfig={tableConfig} data={data} />
   </div>
+  <p>
+    cache request page, <br />show if data and kv list in sync.
+    <br />if not, sync not, show total count records and kv entires.
+    <br />show green dot next to record indicating it has associated kv entry.
+    <br />show last sync date and time. (sync'd 3 days ago)
+    <br />sync now for each record
+    <br />really need to know that cached data is not stale regardless of record
+    and kv entry
+  </p>
 </AdminLayout>
