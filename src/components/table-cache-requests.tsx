@@ -45,7 +45,7 @@ function TableCacheRequests({ tableConfig }) {
   ]); // can set initial sorting state here
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [recordToDelete, setRecordToDelete] = useState(false);
+  const [recordToDelete, setRecordToDelete] = useState<{ id: string; url: string } | null>(null);
   const [reload, setReload] = useState(false);
   const [columnFilters, setColumnFilters] = useState([
     { id: "url", value: "" },
@@ -138,7 +138,7 @@ function TableCacheRequests({ tableConfig }) {
   }, [reload]);
 
   useEffect(() => {
-    if (confirmDelete) {
+    if (confirmDelete && recordToDelete) {
       deleteData(recordToDelete);
       console.log("record deleted");
       setConfirmDelete(false);
@@ -205,7 +205,22 @@ function TableCacheRequests({ tableConfig }) {
                     {tableConfig.name.toUpperCase()}
                   </h1>
                 </div>
-                <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+                <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none flex items-center justify-end gap-x-6">
+                  <a
+                    href="/api/v1/admin/purge-kv-cache-requests"
+                    type="submit"
+                    className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  >
+                    Purge KV
+                  </a>
+                  <a
+                    href="/api/v1/admin/purge-d1-cache-requests"
+                    type="submit"
+                    className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  >
+                    Purge D1 Requests
+                  </a>
+
                   <button
                     type="button"
                     className="rounded-full bg-indigo-600 p-2 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"

@@ -5,7 +5,7 @@ import AdminLayout from "../layouts/admin-layout.astro";
 import TableCacheRequests from "components/table-cache-requests";
 import { getFieldDefinitions } from "@services/fields";
 
-const data = await getAdminKvData(Astro);
+// const data = await getAdminKvData(Astro);
 
 const tableConfigRecord = apiConfig.find((t) => t.route === "cache-requests");
 const tableConfig = getFieldDefinitions(tableConfigRecord);
@@ -54,32 +54,10 @@ let x;
 
 <AdminLayout title=`SonicJs Admin` | Cache `>
 
-  <div class="mt-6 flex items-center justify-end gap-x-6">
-    <button type="button" class="text-sm font-semibold leading-6 text-white"
-      >Cancel</button
-    >
-    <a
-      href="/api/v1/admin/purge-kv-cache-requests"
-      type="submit"
-      class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-      >Purge KV</a
-    >
-    <a
-    href="/api/v1/admin/purge-d1-cache-requests"
-    type="submit"
-    class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-    >Purge D1 Requests</a
-  >
-  </div>
-  <div>[purge records] | [purge kv] | [resync all]</div>
+
+
   <div>
-    KV Count: {data.kvRecordsCount}
-  </div>
-  <div>
-    Records Count: {data.cacheRequestsCount}
-  </div>
-  <div>
-    <TableCacheRequests client:load tableConfig={tableConfig} data={data} />
+    <TableCacheRequests client:load tableConfig={tableConfig} />
   </div>
   <p>
     cache request page, <br />show if data and kv list in sync.
@@ -90,4 +68,9 @@ let x;
     <br />really need to know that cached data is not stale regardless of record
     and kv entry
   </p>
+
+  <!-- <div>
+    KV Count: {data.kvRecordsCount} | Records Count: {data.cacheRequestsCount}
+  </div> -->
+
 </AdminLayout>
