@@ -16,7 +16,7 @@ export function isAdmin(ctx: AppContext) {
   if (role === "admin") {
     return true;
   }
-  return true;
+  return false;
 }
 
 export function isUser(ctx: AppContext, id: string) {

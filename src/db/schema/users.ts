@@ -47,17 +47,19 @@ export const relation = relations(table, ({ many }) => ({
 
 export const access: ApiConfig["access"] = {
   operation: {
+    read: false,
     create: isAdmin,
     delete: isAdmin,
   },
   item: {
     // if a user tries to update a user and isn't the user that created the user the update will return unauthorized response
     update: isAdminOrUser,
+    read:false
   },
   fields: {
     id: {
       read: (ctx, value, doc) => {
-        return isAdminOrEditor(ctx) || isAdminOrUser(ctx, doc.id);
+        return isAdmin(ctx) || isAdminOrUser(ctx, doc.id);
       },
     },
     email: {
@@ -66,6 +68,7 @@ export const access: ApiConfig["access"] = {
       },
     },
     password: {
+      read:false,
       update: isAdminOrUser,
     },
     role: {

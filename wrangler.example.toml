@@ -10,3 +10,6 @@ kv_namespaces = [
 binding = "D1"
 database_name = "sonicjs"
 database_id = "?????"
+
+[vars]
+DISABLED_CACHE = true

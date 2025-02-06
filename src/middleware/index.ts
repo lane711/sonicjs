@@ -11,6 +11,10 @@ import { cacheRequestInsert } from "@services/kv-data";
 async function cache(context, next) {
   const start = Date.now();
 
+  if (context.locals.runtime.env.DISABLED_CACHE) {
+    return next();
+  }
+
   //only attempt to retrieve cache on urls starting with /api
   if (!context.url.pathname.startsWith("/api")) {
     return next();
