@@ -3,6 +3,8 @@ import { convertFormDataToObject } from "@services/utils";
 import LoginLayout from "../layouts/admin-login.astro";
 import { setSessionTokenCookie } from "@services/cookies";
 import { doesAdminAccountExist } from "@services/auth";
+import { Image } from "astro:assets";
+import SonicJsLogo from "../../../../public/images/sonicjs-logo.svg";
 
 //check if there is an admin account, if not redirect admin to register
 let isAdminAccount = await doesAdminAccountExist(Astro.locals.runtime.env.D1);
@@ -72,10 +74,13 @@ if (Astro.request.method === "POST") {
 <LoginLayout title="Login: SonicJs Admin">
   <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-      <img
+      <Image
+        src={SonicJsLogo}
         class="mx-auto h-10 w-auto"
-        src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500"
-        alt="Your Company"
+        format="svg"
+        alt="Logo"
+        height={26}
+        loading="lazy"
       />
       <h2
         class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-white"
