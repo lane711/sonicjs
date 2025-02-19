@@ -1,4 +1,4 @@
-CREATE TABLE `categories` (
+CREATE TABLE  IF NOT EXISTS `categories` (
 	`id` text PRIMARY KEY NOT NULL,
 	`title` text NOT NULL,
 	`body` text,
@@ -6,7 +6,7 @@ CREATE TABLE `categories` (
 	`updatedOn` integer
 );
 --> statement-breakpoint
-CREATE TABLE `categoriesToPosts` (
+CREATE TABLE  IF NOT EXISTS `categoriesToPosts` (
 	`id` text NOT NULL,
 	`postId` text NOT NULL,
 	`categoryId` text NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE `categoriesToPosts` (
 	FOREIGN KEY (`categoryId`) REFERENCES `categories`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
-CREATE TABLE `comments` (
+CREATE TABLE  IF NOT EXISTS `comments` (
 	`id` text PRIMARY KEY NOT NULL,
 	`body` text NOT NULL,
 	`userId` text NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE `comments` (
 	`updatedOn` integer
 );
 --> statement-breakpoint
-CREATE TABLE `posts` (
+CREATE TABLE  IF NOT EXISTS `posts` (
 	`id` text PRIMARY KEY NOT NULL,
 	`title` text NOT NULL,
 	`body` text NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE `posts` (
 	`updatedOn` integer
 );
 --> statement-breakpoint
-CREATE TABLE `userSessions` (
+CREATE TABLE  IF NOT EXISTS `userSessions` (
 	`id` text PRIMARY KEY NOT NULL,
 	`userId` text NOT NULL,
 	`activeExpires` integer NOT NULL,
@@ -49,7 +49,7 @@ CREATE TABLE `userSessions` (
 	FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
-CREATE TABLE `users` (
+CREATE TABLE  IF NOT EXISTS `users` (
 	`id` text PRIMARY KEY NOT NULL,
 	`firstName` text,
 	`lastName` text,
@@ -60,8 +60,8 @@ CREATE TABLE `users` (
 	`updatedOn` integer
 );
 --> statement-breakpoint
-CREATE INDEX `commentsUserIdIndex` ON `comments` (`userId`);--> statement-breakpoint
-CREATE INDEX `commentsPostIdIndex` ON `comments` (`postId`);--> statement-breakpoint
-CREATE INDEX `postUserIdIndex` ON `posts` (`userId`);--> statement-breakpoint
-CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);--> statement-breakpoint
-CREATE UNIQUE INDEX `email_idx` ON `users` (`email`);
+CREATE INDEX IF NOT EXISTS `commentsUserIdIndex` ON `comments` (`userId`);--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS `commentsPostIdIndex` ON `comments` (`postId`);--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS `postUserIdIndex` ON `posts` (`userId`);--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS `users_email_unique` ON `users` (`email`);--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS `email_idx` ON `users` (`email`);
