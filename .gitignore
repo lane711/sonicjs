@@ -27,3 +27,9 @@ pnpm-debug.log*
 wrangler.toml
 
 TEMP.md
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
