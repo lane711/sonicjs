@@ -1,48 +1,144 @@
+/**
+ * SonicJs has a flexible authentication system allowing you to set various data access controls at a table and/or field level.
+ * 
+ * The access property defines access control rules for interacting with the data. It allows granular control over who can perform what actions.
+ * 
+ * By default operations are always allowed.
+ * 
+ * ## Admin Panel Access
+ * In schema.ts a variable config should be exported with an adminAccessControl property.
+ * 
+ * ```typescript
+ * export type SonicJSConfig = {
+ *   tablesConfig: ApiConfig[];
+ *   adminAccessControl: (ctx: AppContext) => boolean;
+ * };
+ * ```
+ * 
+ * If adminAccessControl returns true the user will be allowed access to the /admin route and be able to perform operations like clearing cache.
+ * 
+ * ## Operation Access
+ * The operation property controls access to CRUD operations. It contains sub-properties for each operation:
+ * 
+ * - `ctx`: AppContext
+ * - `id`: the id of the document (or undefined if reading multiple rows)
+ * - `data`: the data passed to the update/create operation
+ * 
+ * ### Create
+ * ```typescript
+ * create: boolean | (ctx?: AppContext, data?: any) => boolean | Promise<boolean>
+ * ```
+ * Used to check if the user can create the provided input. Should return true to allow create or false to deny.
+ * 
+ * ### Read
+ * ```typescript
+ * read: boolean | (ctx?: AppContext, id?: string) => boolean | Promise<boolean>
+ * ```
+ * Determines if reading/querying items is allowed.
+ * 
+ * ### Update
+ * ```typescript
+ * update: boolean | (ctx?: AppContext, id?: string, data:any) => boolean | Promise<boolean>
+ * ```
+ * Determines if updating items is allowed.
+ * 
+ * ### Delete
+ * ```typescript
+ * delete: boolean | (ctx: AppContext, id: string) => boolean | Promise<boolean>
+ * ```
+ * Determines if deleting items is allowed.
+ * 
+ * ## Filter Access
+ * The filter property allows modifying the data returned from CRUD operations by applying additional filters. It contains sub-properties for each operation:
+ * 
+ * - `ctx`: AppContext
+ * - `id`: the id of the document (or undefined if reading multiple rows)
+ * - `data`: the data passed to the update/create operation
+ * 
+ * ### Read
+ * ```typescript
+ * read: SonicJSFilter | ((ctx?: AppContext, id?: string) => SonicJSFilter | Promise<SonicJSFilter>) | boolean | ((ctx: AppContext, id: string) => boolean | Promise<boolean>)
+ * ```
+ * Allows modifying the data returned on a read by adding filters. Should return a filter or boolean to allow/deny reading.
+ * 
+ * ### Update
+ * ```typescript
+ * update: SonicJSFilter | ((ctx?: AppContext, id?: string, data?: any) => SonicJSFilter | Promise<SonicJSFilter>) | boolean | ((ctx?: AppContext, id?: string, data?: any) => boolean | Promise<boolean>)
+ * ```
+ * Allows modifying the data passed to an update by adding filters. Should return a filter or boolean to allow/deny updating.
+ * 
+ * ### Delete
+ * ```typescript
+ * delete: SonicJSFilter | ((ctx?: AppContext, id?: string) => SonicJSFilter | Promise<SonicJSFilter>) | boolean | ((ctx?: AppContext, id?: string) => boolean | Promise<boolean>)
+ * ```
+ * Allows modifying delete operation by adding filters. Should return a filter or boolean to allow/deny deleting.
+ * 
+ * ## Item Access
+ * The item property allows more granular access control based on the document being accessed. Also less performant access control because the doc being requested/updated/deleted is read passed in. It contains sub-properties for each operation:
+ * 
+ * - `ctx`: AppContext
+ * - `id`: the id of the document
+ * - `data`: the data passed to the update/create operation
+ * - `doc`: the document being accessed
+ * 
+ * ### Read
+ * ```typescript
+ * read: boolean | (ctx?: AppContext, id?: string, doc?: any) => boolean | Promise<boolean>
+ * ```
+ * Allows checking the actual document content to determine read access. Should return true to allow read or false to deny.
+ * 
+ * ### Update
+ * ```typescript
+ * update: boolean | (ctx?: AppContext, id?: string, data?: any, doc?: any) => boolean | Promise<boolean>
+ * ```
+ * Allows checking the actual document content to determine update access. Should return true to allow update or false to deny.
+ * 
+ * ### Delete
+ * ```typescript
+ * delete: boolean | (ctx?: AppContext, id?: string, doc?: any) => boolean | Promise<boolean>
+ * ```
+ * Allows checking the actual document content to determine delete access. Should return true to allow delete or false to deny.
+ * 
+ * ## Field Level Access
+ * The fields property controls access at the individual field level. It contains sub-properties for each field name.
+ * 
+ * - `ctx`: AppContext
+ * - `id`: the id of the document
+ * - `data`: the data passed to the update/create operation
+ * - `value`: the value of the field
+ * 
+ * ### Create
+ * ```typescript
+ * create: boolean | (ctx?: AppContext, data?: any) => boolean | Promise<boolean>
+ * ```
+ * Used to check if the field can be set on create. Should return true to allow setting the field or false to discard the value.
+ * 
+ * ### Read
+ * ```typescript
+ * read: boolean | (ctx?: AppContext, value?: any, doc?: any) => boolean | Promise<boolean>
+ * ```
+ * Determines if reading the field is allowed. Should return true to return the field or false to omit.
+ * 
+ * ### Update
+ * ```typescript
+ * update: boolean | (ctx?: AppContext, id?: string, data?: any) => boolean | Promise<boolean>
+ * ```
+ * Used to check if the field can be updated. Should return true to allow update or false to discard the value.
+ * 
+ * ## AppContext
+ * The context provides user, role, group, etc information to use in the access control checks. It is passed to all the access functions. Its shape depends on your application's auth implementation.
+ * 
+ * Get the user: `ctx.get("user")`
+ * Get the session: `ctx.get("session")`
+ */
+
 import { tableSchemas } from '../db/routes';
 import { drizzle } from 'drizzle-orm/d1';
 import { isNotNull } from 'drizzle-orm';
-// import { getRecords } from '../data/data';
-// import { AppContext as APIContext } from '../../server';
 import type { APIContext as AppContext } from "astro";
-
 import type { SonicJSFilter, ApiConfig } from '../db/routes';
 import { getRecords } from '@services/data';
 
-// export const hasUser = async (ctx: AppContext) => {
-//   const fn = async function () {
-//     const db = drizzle(ctx.env.D1DATA, {
-//       schema: {
-//         users: tableSchemas.users.table,
-//         usersRelations: tableSchemas.users.relation,
-//         // userKeys: tableSchemas.userKeys.table,
-//         // userKeysRelations: tableSchemas.userKeys.relation,
-//         userSessions: tableSchemas.userSessions.table,
-//         userSessionsRelations: tableSchemas.userSessions.relation
-//       }
-//     });
-//     const data = await db.query.users.findMany({
-//       with: {
-//         keys: {
-//           where(fields) {
-//             return isNotNull(fields.hashed_password);
-//           }
-//         }
-//       }
-//     });
-//     const result = data.filter((user) => user.keys?.length > 0);
-//     return result;
-//   };
-
-//   const result = await getRecords(
-//     ctx,
-//     'custom',
-//     {},
-//     'hasUserWithKeyCheck',
-//     'd1',
-//     fn
-//   );
-//   return result.data.length > 0;
-// };
 export async function getApiAccessControlResult(
   operationAccessControl:
     | boolean
@@ -113,6 +209,7 @@ export async function getOperationCreateResult(
 ) {
   return !!(await getAccessControlResult(create, ctx, data));
 }
+
 export async function getOperationReadResult(
   read: ApiConfig['access']['operation']['read'],
   ctx: AppContext,
@@ -267,6 +364,7 @@ export async function getItemDeleteResult(
   }
   return authorized;
 }
+
 export async function filterCreateFieldAccess<D = any>(
   fields: ApiConfig['access']['fields'],
   ctx: AppContext,

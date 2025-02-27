@@ -66,8 +66,8 @@ export const GET: APIRoute = async (context) => {
 
   let accessControlResult = {};
   accessControlResult = (await getApiAccessControlResult(
-    entry?.access?.operation?.read || true,
-    entry?.access?.filter?.read || true,
+    entry?.access?.operation?.read || false,
+    entry?.access?.filter?.read || false,
     true,
     context,
     params.id,

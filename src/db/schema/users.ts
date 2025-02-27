@@ -54,7 +54,7 @@ export const access: ApiConfig["access"] = {
   item: {
     // if a user tries to update a user and isn't the user that created the user the update will return unauthorized response
     update: isAdminOrUser,
-    read:false
+    read:true
   },
   fields: {
     id: {
@@ -83,7 +83,7 @@ export const access: ApiConfig["access"] = {
 export const hooks: ApiConfig["hooks"] = {
   resolveInput: {
     create: async (context, data) => {
-      if (data.password) {
+      if (data && data.password) {
         data.password = await hashString(data.password);
       }
       if (context.locals.user?.id) {
