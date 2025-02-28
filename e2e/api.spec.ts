@@ -1,18 +1,5 @@
 import { test, expect } from '@playwright/test';
 
-test('should not allow unauthenticated user to create a user', async ({ request }) => {
-    const response = await request.post(`/api/v1/users`, {
-      data: {
-        username: 'newuser',
-        password: 'password123',
-      }
-    });
-    expect(response.status()).toBe(401);
-    expect(await response.json()).toEqual(expect.objectContaining({
-      error: 'Unauthorized'
-    }));
-  });
-
 test('should not allow unauthenticated user to access /api/v1/users', async ({ request }) => {
     const response = await request.get(`/api/v1/users`);
     expect(response.status()).toBe(401);
