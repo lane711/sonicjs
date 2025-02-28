@@ -15,6 +15,7 @@ import { deleteRecord, getRecords, insertRecord } from "../../../services/data";
 import {
   return204,
   return400,
+  return401,
   return404,
   return500,
 } from "../../../services/return-types";
@@ -65,9 +66,11 @@ export const GET: APIRoute = async (context) => {
   }
 
   let accessControlResult = {};
+  const operationRead = entry?.access?.operation?.read;
+  const filterRead = entry?.access?.filter?.read;
   accessControlResult = (await getApiAccessControlResult(
-    entry?.access?.operation?.read || false,
-    entry?.access?.filter?.read || false,
+    operationRead ?? true,
+    filterRead ?? true,
     true,
     context,
     params.id,
@@ -81,7 +84,7 @@ export const GET: APIRoute = async (context) => {
   if (!accessControlResult) {
     return new Response(
       JSON.stringify({
-        error: `Unauthorized`,
+        message: `Unauthorized`,
       }),
       { status: 401 }
     );
@@ -186,14 +189,14 @@ export const POST: APIRoute = async (context) => {
 
   content.table = entry.table;
 
-  // let authorized = await getOperationCreateResult(
-  //   entry?.access?.operation?.create,
-  //   content,
-  //   content.data
-  // );
-  // if (!authorized) {
-  //   return return400();
-  // }
+  let authorized = await getOperationCreateResult(
+    entry?.access?.operation?.create,
+    context,
+    content.data
+  );
+  if (!authorized) {
+    return return401();
+  }
 
   try {
     // console.log("posting new record content", JSON.stringify(content, null, 2));
