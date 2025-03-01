@@ -11,7 +11,34 @@ test("should not allow unauthenticated user to access /api/v1/users", async ({
     })
   );
 });
+test("should not allow unauthenticated user to delete a user", async ({
+  request,
+}) => {
+  const response = await request.delete(`/api/v1/users/1`);
+  expect(response.status()).toBe(401);
+  expect(await response.json()).toEqual(
+    expect.objectContaining({
+      message: "Unauthorized",
+    })
+  );
+});
 
+test("should not allow unauthenticated user to update a user", async ({
+  request,
+}) => {
+  const response = await request.put(`/api/v1/users/1`, {
+    data: {
+      username: "updateduser",
+      password: "newpassword123",
+    },
+  });
+  expect(response.status()).toBe(401);
+  expect(await response.json()).toEqual(
+    expect.objectContaining({
+      message: "Unauthorized",
+    })
+  );
+});
 test("should allow unauthenticated user to access /api/v1/posts", async ({
   request,
 }) => {

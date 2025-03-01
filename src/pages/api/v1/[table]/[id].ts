@@ -137,29 +137,29 @@ export const PUT: APIRoute = async (context) => {
   var content: { data?: any; table?: string; id?: string } = {};
   content = payload;
 
-  console.log("put content", JSON.stringify(content.data, null, 2));
+  // console.log("put content", JSON.stringify(content.data, null, 2));
 
   if (entry.hooks?.beforeOperation) {
     await entry.hooks?.beforeOperation(context, "update", params.id, content);
   }
 
-  // const accessControlResult = await getApiAccessControlResult(
-  //   entry?.access?.operation?.update || true,
-  //   entry?.access?.filter?.update || true,
-  //   entry?.access?.item?.update || true,
-  //   context,
-  //   params.id,
-  //   entry.table,
-  //   content.data
-  // );
+  const accessControlResult = await getApiAccessControlResult(
+    entry?.access?.operation?.update || true,
+    entry?.access?.filter?.update || true,
+    entry?.access?.item?.update || true,
+    context,
+    params.id,
+    entry.table,
+    content.data
+  );
 
   // if (typeof accessControlResult === "object") {
   //   params = { ...params, ...accessControlResult };
   // }
 
-  // if (!accessControlResult) {
-  //   return return401();
-  // }
+  if (!accessControlResult) {
+    return return401();
+  }
 
   // const route = context.request.path.split('/')[2];
   const table = apiConfig.find((entry) => entry.route === route).table;
@@ -226,26 +226,26 @@ export const DELETE: APIRoute = async (context) => {
 
   // context.env.D1DATA = context.env.D1DATA;
 
-  // if (entry.hooks?.beforeOperation) {
-  //   await entry.hooks.beforeOperation(context, 'delete', id);
-  // }
+  if (entry.hooks?.beforeOperation) {
+    await entry.hooks.beforeOperation(context, "delete", id);
+  }
 
-  // const accessControlResult = await getApiAccessControlResult(
-  //   entry?.access?.operation?.delete || true,
-  //   entry?.access?.filter?.delete || true,
-  //   entry?.access?.item?.delete || true,
-  //   context,
-  //   id,
-  //   entry.table
-  // );
+  const accessControlResult = await getApiAccessControlResult(
+    entry?.access?.operation?.delete || true,
+    entry?.access?.filter?.delete || true,
+    entry?.access?.item?.delete || true,
+    context,
+    id,
+    entry.table
+  );
 
   // if (typeof accessControlResult === 'object') {
   //   params = { ...params, ...accessControlResult };
   // }
 
-  // if (!accessControlResult) {
-  //   return context.text('Unauthorized', 401);
-  // }
+  if (!accessControlResult) {
+    return return401();
+  }
   // params.id = id;
 
   // const record = await getRecords(
