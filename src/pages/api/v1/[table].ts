@@ -21,6 +21,7 @@ import {
 } from "../../../services/return-types";
 import { hashString } from "@services/cyrpt";
 import { kvPut } from "@services/kv";
+import { validateSessionToken } from "@services/sessions";
 
 export const GET: APIRoute = async (context) => {
   const start = Date.now();
@@ -30,6 +31,39 @@ export const GET: APIRoute = async (context) => {
     accessControlResult?: {};
     limit?: string;
   } = {};
+
+  // get header for token and lookup user and attached to context
+  const token = context.request.headers.get("Authorization")?.replace("Bearer ", "");
+  if (!token) {
+    return new Response(
+      JSON.stringify({
+        message: "Unauthorized",
+      }),
+      { status: 401 }
+    );
+  }
+
+  try {
+    const user = await validateSessionToken(context.locals.runtime.env.D1, token);
+    if (!user) {
+      return new Response(
+        JSON.stringify({
+          message: "Unauthorized",
+        }),
+        { status: 401 }
+      );
+    }
+    context.locals.user = user;
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        message: "Unauthorized",
+      }),
+      { status: 401 }
+    );
+  }
+
+
   params = context.params;
 
   const tableName = params.table;

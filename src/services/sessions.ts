@@ -58,7 +58,7 @@ export async function validateSessionToken(
   const result = await db
     .select({ user: tableSchemas.users.table, session: tableSchemas.userSessions.table })
     .from(tableSchemas.userSessions.table)
-    .innerJoin(tableSchemas.users.table, eq(tableSchemas.userSessions.table .userId, tableSchemas.users.table.id))
+    .innerJoin(tableSchemas.users.table, eq(tableSchemas.userSessions.table.userId, tableSchemas.users.table.id))
     .where(eq(tableSchemas.userSessions.table.id, sessionId));
   if (result.length < 1) {
     return { session: null, user: null };

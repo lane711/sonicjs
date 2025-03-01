@@ -47,7 +47,7 @@ export const relation = relations(table, ({ many }) => ({
 
 export const access: ApiConfig["access"] = {
   operation: {
-    read: false,
+    read: isAdmin,
     create: isAdmin,
     delete: isAdmin,
   },

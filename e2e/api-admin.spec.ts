@@ -7,10 +7,13 @@ const adminCredentials = {
 
 async function loginAsAdmin(request) {
   const response = await request.post(`/api/v1/auth/login`, {
-     adminCredentials,
+    data: adminCredentials,
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
   const { bearer } = await response.json();
-  console.log('bearer', bearer);
+  console.log("bearer", bearer);
   return bearer;
 }
 
@@ -51,7 +54,9 @@ test("should allow admin to update a user", async ({ request }) => {
   expect(response.status()).toBe(200);
 });
 
-test("should allow unauthenticated user to access /api/v1/posts", async ({ request }) => {
+test("should allow unauthenticated user to access /api/v1/posts", async ({
+  request,
+}) => {
   const response = await request.get(`/api/v1/posts?limit=2`);
   expect(response.status()).toBe(200);
   const { data } = await response.json();
