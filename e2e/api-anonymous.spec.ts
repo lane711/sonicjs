@@ -45,7 +45,6 @@ test("should allow unauthenticated user to access /api/v1/posts", async ({
   const response = await request.get(`/api/v1/posts?limit=2`);
   expect(response.status()).toBe(200);
   const { data } = await response.json();
-  console.log(data);
   expect(Array.isArray(data)).toBe(true);
   expect(data.length).toBeGreaterThan(0);
 });

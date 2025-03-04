@@ -1,6 +1,6 @@
 import qs from "qs";
 
-import type { APIRoute } from "astro";
+import type { APIContext, APIRoute } from "astro";
 import { getD1DataByTable } from "../../../services/d1-data";
 import { drizzle } from "drizzle-orm/d1";
 import { apiConfig, sonicJsConfig } from "../../../db/routes";
@@ -22,6 +22,7 @@ import {
 import { hashString } from "@services/cyrpt";
 import { kvPut } from "@services/kv";
 import { validateSessionToken } from "@services/sessions";
+import { checkToken } from "@services/token";
 
 export const GET: APIRoute = async (context) => {
   const start = Date.now();
@@ -32,29 +33,8 @@ export const GET: APIRoute = async (context) => {
     limit?: string;
   } = {};
 
-  // get header for token and lookup user and attached to context
-  const token = context.request.headers.get("Authorization")?.replace("Bearer ", "");
+  const token = await checkToken(context);
   if (!token) {
-    return new Response(
-      JSON.stringify({
-        message: "Unauthorized",
-      }),
-      { status: 401 }
-    );
-  }
-
-  try {
-    const user = await validateSessionToken(context.locals.runtime.env.D1, token);
-    if (!user) {
-      return new Response(
-        JSON.stringify({
-          message: "Unauthorized",
-        }),
-        { status: 401 }
-      );
-    }
-    context.locals.user = user;
-  } catch (error) {
     return new Response(
       JSON.stringify({
         message: "Unauthorized",
@@ -88,8 +68,8 @@ export const GET: APIRoute = async (context) => {
   const request = context.request;
 
   const query =
-    request.url.indexOf("?") > 0 ? request.url.split("?")[1] : request.url;
-  const queryParams = qs.parse(query, { duplicates: "combine" });
+    request.url.indexOf("?") > 0 ? request.url.split("?")[1] : undefined;
+  const queryParams = query ? qs.parse(query, { duplicates: "combine" }) : {};
 
   // console.log("queryParams", queryParams);
 
@@ -187,6 +167,17 @@ export const GET: APIRoute = async (context) => {
 //create single record
 //TODO: support batch inserts
 export const POST: APIRoute = async (context) => {
+
+  const token = await checkToken(context);
+  if (!token) {
+    return new Response(
+      JSON.stringify({
+        message: "Unauthorized",
+      }),
+      { status: 401 }
+    );
+  }
+  
   // api.post(`/${entry.route}`, async (ctx) => {
   const { env } = context.locals.runtime;
 

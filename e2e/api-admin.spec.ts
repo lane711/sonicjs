@@ -30,6 +30,20 @@ test("should allow admin to access /api/v1/users", async ({ request }) => {
   expect(Array.isArray(data)).toBe(true);
 });
 
+test("should allow admin to create a user", async ({ request }) => {
+  const token = await loginAsAdmin(request);
+  const response = await request.post(`/api/v1/users`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    data: {
+      username: "newuser",
+      password: "password123",
+    },
+  });
+  expect(response.status()).toBe(201);
+});
+
 test("should allow admin to delete a user", async ({ request }) => {
   const token = await loginAsAdmin(request);
   const response = await request.delete(`/api/v1/users/1`, {
@@ -63,18 +77,4 @@ test("should allow unauthenticated user to access /api/v1/posts", async ({
   console.log(data);
   expect(Array.isArray(data)).toBe(true);
   expect(data.length).toBeGreaterThan(0);
-});
-
-test("should allow admin to create a user", async ({ request }) => {
-  const token = await loginAsAdmin(request);
-  const response = await request.post(`/api/v1/users`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    data: {
-      username: "newuser",
-      password: "password123",
-    },
-  });
-  expect(response.status()).toBe(201);
 });
