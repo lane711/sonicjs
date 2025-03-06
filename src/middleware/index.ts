@@ -66,10 +66,15 @@ async function auth(context, next) {
   //   context.locals.auth = new Auth(config);
 
   // Get session token from cookie
-  const sessionId = context.cookies.get("session")?.value;
+  const sessionId = context.cookies.get("session")?.value ?? 
+  context.request.headers
+  .get("Authorization")?.toLowerCase()
+  ?.replace("bearer ", "");
 
   // Check if we're already on the login or register page
   const isAuthPage = context.url.pathname.match(/^\/admin\/(login|register)/);
+  const isApi = context.url.pathname.match(/^\/api\/(v1|v2|v3)/);
+
 
   try {
     if (sessionId) {
@@ -92,7 +97,7 @@ async function auth(context, next) {
     }
 
     // Don't redirect if already on auth pages
-    if (isAuthPage) {
+    if (isAuthPage || isApi) {
       return next();
     }
 
@@ -106,11 +111,6 @@ async function auth(context, next) {
 
     // Clear invalid session cookie
     context.cookies.delete("session", { path: "/" });
-
-    // Don't redirect if already on auth pages
-    if (isAuthPage) {
-      return next();
-    }
 
     // Redirect to login for protected routes
     if (context.url.pathname.startsWith("/admin")) {

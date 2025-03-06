@@ -39,7 +39,7 @@ test("should allow admin to create a user", async ({ request }) => {
 
 test("should allow admin to delete a user", async ({ request }) => {
   const token = await loginAsAdmin(request);
-  
+
   const createUserResponse = await createTestUser(request, token);
   expect(createUserResponse.status()).toBe(201);
   const { data } = await createUserResponse.json();
@@ -49,10 +49,8 @@ test("should allow admin to delete a user", async ({ request }) => {
       Authorization: `Bearer ${token}`,
     },
   });
-  expect(response.status()).toBe(200);
+  expect(response.status()).toBe(204);
 });
-
-
 
 test("should allow admin to update a user", async ({ request }) => {
   const token = await loginAsAdmin(request);
@@ -81,8 +79,8 @@ test("should allow unauthenticated user to access /api/v1/posts", async ({
   expect(data.length).toBeGreaterThan(0);
 });
 
-test.afterEach(async ({request}) => {
-  console.log('e2e cleanup...');
+test.afterEach(async ({ request }) => {
+  console.log("e2e cleanup...");
 
   const token = await loginAsAdmin(request);
   const response = await request.post(`/api/v1/test/e2e/cleanup`, {
@@ -93,7 +91,7 @@ test.afterEach(async ({request}) => {
 
   expect(response.status()).toBe(200);
 
-  console.log('Done with tests');
+  console.log("Done with tests");
   // ...
 });
 
@@ -111,8 +109,5 @@ const createTestUser = async (request, token) => {
   });
 
   return response;
-}
-// test.afterAll(async (context ) => {
-//   const data = await purgeE2eTestData(context.locals.runtime.env.D1, "users", "email");
+};
 
-// });

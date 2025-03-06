@@ -28,6 +28,7 @@ import {
   return404,
   return500,
 } from "../../../../services/return-types";
+import { checkToken } from "@services/token";
 
 //get single record
 export const GET = async (context) => {
@@ -206,6 +207,17 @@ export const PUT: APIRoute = async (context) => {
 };
 
 export const DELETE: APIRoute = async (context) => {
+
+    // const token = await checkToken(context);
+    // if (!token) {
+    //   return new Response(
+    //     JSON.stringify({
+    //       message: "Unauthorized",
+    //     }),
+    //     { status: 401 }
+    //   );
+    // }
+    
   const params = context.params;
 
   const id = params.id;
@@ -231,9 +243,9 @@ export const DELETE: APIRoute = async (context) => {
   }
 
   const accessControlResult = await getApiAccessControlResult(
-    entry?.access?.operation?.delete || true,
-    entry?.access?.filter?.delete || true,
-    entry?.access?.item?.delete || true,
+    entry?.access?.operation?.delete ?? true,
+    entry?.access?.filter?.delete ?? true,
+    entry?.access?.item?.delete ?? true,
     context,
     id,
     entry.table

@@ -13,7 +13,7 @@ export const GET: APIRoute = async (context) => {
 };
 export const POST: APIRoute = async (context ) => {
   const token = await checkToken(context);
-  if (!token) {
+  if (context.locals.user.role !== 'admin') {
     return new Response(
       JSON.stringify({
         message: "Unauthorized",
