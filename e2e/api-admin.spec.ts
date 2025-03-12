@@ -1,6 +1,9 @@
 import { test, expect } from "@playwright/test";
 import { purgeE2eTestData } from "@services/e2e";
 
+// Annotate entire file as serial.
+test.describe.configure({ mode: 'serial' });
+
 const adminCredentials = {
   email: "demo@demo.com",
   password: "sonicjs!",
