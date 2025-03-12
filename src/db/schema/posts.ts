@@ -57,7 +57,8 @@ export const access: ApiConfig["access"] = {
   },
   // filter: {
   //   // if a user tries to update a post and isn't the user that created the post the update won't happen
-  //   update: (ctx) => {
+  //   update: (ctx) => {nx run inventory-tracking:serve-mfe
+
   //     if (isAdmin(ctx)) {
   //       return true;
   //     } else {

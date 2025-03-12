@@ -18,14 +18,7 @@ export const checkToken = async (context: Context) => {
     if (userSession.user == null || userSession.session == null) {
       return false;
     }
-    // if (!userSession) {
-    //   return new Response(
-    //     JSON.stringify({
-    //       message: "Unauthorized",
-    //     }),
-    //     { status: 401 }
-    //   );
-    // }
+
     context.locals.user = userSession.user;
   } catch (error) {
     return false;

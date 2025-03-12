@@ -32,18 +32,6 @@ export const GET: APIRoute = async (context) => {
     accessControlResult?: {};
     limit?: string;
   } = {};
-
-  // const token = await checkToken(context);
-  // if (!token) {
-  //   return new Response(
-  //     JSON.stringify({
-  //       message: "Unauthorized",
-  //     }),
-  //     { status: 401 }
-  //   );
-  // }
-
-
   params = context.params;
 
   const tableName = params.table;
@@ -167,18 +155,6 @@ export const GET: APIRoute = async (context) => {
 //create single record
 //TODO: support batch inserts
 export const POST: APIRoute = async (context) => {
-
-  // const token = await checkToken(context);
-  // if (!token) {
-  //   return new Response(
-  //     JSON.stringify({
-  //       message: "Unauthorized",
-  //     }),
-  //     { status: 401 }
-  //   );
-  // }
-  
-  // api.post(`/${entry.route}`, async (ctx) => {
   const { env } = context.locals.runtime;
 
   const params = context.params;

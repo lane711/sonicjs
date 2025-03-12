@@ -13,7 +13,6 @@ var token = "";
 test.beforeAll(async ({ request }) => {
   token = await loginAsAdmin(request);
   await cleanup(request, token);
-
 });
 
 async function loginAsAdmin(request) {
@@ -24,7 +23,6 @@ async function loginAsAdmin(request) {
     },
   });
   const { bearer } = await response.json();
-  // console.log("bearer", bearer);
   return bearer;
 }
 
@@ -36,7 +34,6 @@ test("should allow admin to access /api/v1/users", async ({ request }) => {
   });
   expect(response.status()).toBe(200);
   const { data } = await response.json();
-  // console.log(data);
   expect(Array.isArray(data)).toBe(true);
 });
 
@@ -46,8 +43,6 @@ test("should allow admin to create a user", async ({ request }) => {
 });
 
 test("should allow admin to delete a user", async ({ request }) => {
-  // const token = await loginAsAdmin(request);
-
   const createUserResponse = await createTestUser(request, token);
   expect(createUserResponse.status()).toBe(201);
   const { data } = await createUserResponse.json();
@@ -90,23 +85,15 @@ test("should allow admin to update a user", async ({ request }) => {
   expect(response2.status()).toBe(200);
 
   const { data: updatedData } = await response2.json();
-  console.log(updatedData);
   expect(typeof updatedData === 'object').toBe(true);
   expect(updatedData.data.firstName).toBe('updated');
-
 });
 
 test.afterEach(async ({ request }) => {
-  console.log("e2e cleanup...");
-
   await cleanup(request, token);
-
-  console.log("Done with tests");
-  // ...
 });
 
-const cleanup = async (request, token) =>{
-  // const token = await loginAsAdmin(request);
+const cleanup = async (request, token) => {
   const response = await request.post(`/api/v1/test/e2e/cleanup`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -114,7 +101,7 @@ const cleanup = async (request, token) =>{
   });
 
   expect(response.status()).toBe(200);
-}
+};
 
 const createTestUser = async (request, token) => {
   const response = await request.post(`/api/v1/users`, {

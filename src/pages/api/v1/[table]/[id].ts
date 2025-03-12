@@ -207,17 +207,6 @@ export const PUT: APIRoute = async (context) => {
 };
 
 export const DELETE: APIRoute = async (context) => {
-
-    // const token = await checkToken(context);
-    // if (!token) {
-    //   return new Response(
-    //     JSON.stringify({
-    //       message: "Unauthorized",
-    //     }),
-    //     { status: 401 }
-    //   );
-    // }
-    
   const params = context.params;
 
   const id = params.id;
