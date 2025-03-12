@@ -5,7 +5,7 @@ import { auditSchema } from "./audit";
 import * as users from "./users";
 import * as categoriesToPosts from "./categoriesToPosts";
 import * as comments from "./comments";
-import { isAdmin, isAdminOrEditor } from "../config-helpers";
+import { isAdmin, isAdminOrEditor, isAdminOrUser } from "../config-helpers";
 import type { ApiConfig } from "../routes";
 
 export const tableName = "posts";
@@ -52,6 +52,8 @@ export const access: ApiConfig["access"] = {
   operation: {
     read: true,
     create: isAdminOrEditor,
+    update: isAdminOrUser,
+    delete: isAdminOrUser,
   },
   // filter: {
   //   // if a user tries to update a post and isn't the user that created the post the update won't happen
