@@ -21,23 +21,24 @@ export async function getApiAccessControlResult(
     args[0],
     args[2]
   );
-  if (authorized) {
-    authorized = await getItemAccessControlResult(
-      itemAccessControl,
-      ctx,
-      args[0],
-      args[1],
-      args[2]
-    );
-  }
-  if (authorized) {
-    authorized = await getAccessControlResult(
-      filterAccessControl,
-      ctx,
-      args[0],
-      args[2]
-    );
-  }
+  //TODO: figure out if we really need item level control, what is the use case?
+  // if (authorized) {
+  //   authorized = await getItemAccessControlResult(
+  //     itemAccessControl,
+  //     ctx,
+  //     args[0],
+  //     args[1],
+  //     args[2]
+  //   );f
+  // }
+  // if (authorized) {
+  //   authorized = await getAccessControlResult(
+  //     filterAccessControl,
+  //     ctx,
+  //     args[0],
+  //     args[2]
+  //   );
+  // }
 
   return authorized;
 }

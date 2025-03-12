@@ -50,12 +50,13 @@ export const access: ApiConfig["access"] = {
     read: isAdmin,
     create: isAdmin,
     delete: isAdmin,
-  },
-  item: {
-    // if a user tries to update a user and isn't the user that created the user the update will return unauthorized response
     update: isAdminOrUser,
-    read:true
   },
+  // item: {
+  //   // if a user tries to update a user and isn't the user that created the user the update will return unauthorized response
+  //   update: isAdminOrUser,
+  //   read:true
+  // },
   fields: {
     id: {
       read: (ctx, value, doc) => {

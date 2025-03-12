@@ -72,20 +72,23 @@ async function auth(context, next) {
   ?.replace("bearer ", "");
 
   // Check if we're already on the login or register page
-  const isAuthPage = context.url.pathname.match(/^\/admin\/(login|register)/);
+  const isAuthPage = context.
+  url.pathname.match(/^\/admin\/(login|register)/);
   const isApi = context.url.pathname.match(/^\/api\/(v1|v2|v3)/);
 
 
   try {
     if (sessionId) {
       // Validate the session
-      const { user } = await validateSessionToken(
+      const { user, session } = await validateSessionToken(
         context.locals.runtime.env.D1,
         sessionId
       );
       //   const { user } = await context.locals.auth.validateSession(sessionId);
       if (user) {
         context.locals.user = user;
+        context.locals.session = session;
+
 
         // If user is logged in and tries to access login/register, redirect to admin
         if (isAuthPage) {

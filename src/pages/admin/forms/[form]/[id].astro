@@ -12,20 +12,19 @@ const tableConfigRecord = apiConfig.find((t) => t.route === form);
 const getRecord = async (table, id) => {
   const baseURl = Astro.request.url.split("/admin/")[0];
   const getUrl = `${baseURl}/api/v1/${tableConfigRecord.route}/${id}`;
-  let result;
-  try {
-    result = await fetch(getUrl).then((response) => response.json());
 
-    // console.log("Success:", result);
-    return result.data;
-  } catch (error) {
-    console.error("Error:", error);
+  const session = Astro.cookies.get("session")?.value;
+  const response = await fetch(getUrl, {
+    headers: new Headers({ Authorization: `Bearer ${session}` }),
+  });
+  if (response.ok) {
+    const { data } = await response.json();
+    return data
   }
 };
 
 const record = await getRecord(tableConfigRecord.route, id);
-
-
+// console.log("record====>", record);
 
 if (Astro.request.method === "POST") {
   try {
@@ -42,15 +41,17 @@ if (Astro.request.method === "POST") {
       }
       data[key].push(value);
     });
-    var json = JSON.stringify({data});
+    var json = JSON.stringify({ data });
 
     //now post to our own post api
     const baseURl = Astro.request.url.split("/admin/")[0];
     const postUrl = `${baseURl}/api/v1/${tableConfigRecord.route}/${id}`;
     try {
+      const session = Astro.cookies.get("session")?.value;
       const response = await fetch(postUrl, {
         method: "PUT",
         body: json,
+        headers: new Headers({ Authorization: `Bearer ${session}` }),
       });
 
       if (!response.ok) {
@@ -75,5 +76,5 @@ if (Astro.request.method === "POST") {
 ---
 
 <AdminLayout title=`SonicJs Admin` | {form} `>
-  <FormComponent record={record.data}/>
+  <FormComponent record={record.data} />
 </AdminLayout>

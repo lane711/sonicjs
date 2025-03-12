@@ -59,8 +59,8 @@ export const GET = async (context) => {
   // params.id = id;
   // will check the item result when we get the data
   const accessControlResult = await getApiAccessControlResult(
-    entry?.access?.operation?.read || true,
-    entry?.access?.filter?.read || true,
+    entry?.access?.operation?.read ?? false,
+    entry?.access?.filter?.read  ?? false,
     true,
     context,
     id,
@@ -145,9 +145,9 @@ export const PUT: APIRoute = async (context) => {
   }
 
   const accessControlResult = await getApiAccessControlResult(
-    entry?.access?.operation?.update || true,
-    entry?.access?.filter?.update || true,
-    entry?.access?.item?.update || true,
+    entry?.access?.operation?.update ?? false,
+    entry?.access?.filter?.update ?? false,
+    entry?.access?.item?.update ?? false,
     context,
     params.id,
     entry.table,
@@ -163,9 +163,9 @@ export const PUT: APIRoute = async (context) => {
   }
 
   // const route = context.request.path.split('/')[2];
-  const table = apiConfig.find((entry) => entry.route === route).table;
+  // const table = apiConfig.find((entry) => entry.route === route).table;
 
-  content.table = table;
+  content.table = entry.table;
   content.id = params.id;
 
   try {

@@ -53,39 +53,39 @@ export const access: ApiConfig["access"] = {
     read: true,
     create: isAdminOrEditor,
   },
-  filter: {
-    // if a user tries to update a post and isn't the user that created the post the update won't happen
-    update: (ctx) => {
-      if (isAdmin(ctx)) {
-        return true;
-      } else {
-        const user = Astro.locals.user;
-        if (user?.userId) {
-          // Return filter so update doesn't happen if userId doesn't match
-          return {
-            userId: user.userId,
-          };
-        } else {
-          return false;
-        }
-      }
-    },
-    delete: (ctx) => {
-      if (isAdmin(ctx)) {
-        return true;
-      } else {
-        const user = Astro.locals.user;
-        if (user?.userId) {
-          // Return filter so update doesn't happen if userId doesn't match
-          return {
-            userId: user.userId,
-          };
-        } else {
-          return false;
-        }
-      }
-    },
-  },
+  // filter: {
+  //   // if a user tries to update a post and isn't the user that created the post the update won't happen
+  //   update: (ctx) => {
+  //     if (isAdmin(ctx)) {
+  //       return true;
+  //     } else {
+  //       const user = Astro.locals.user;
+  //       if (user?.userId) {
+  //         // Return filter so update doesn't happen if userId doesn't match
+  //         return {
+  //           userId: user.userId,
+  //         };
+  //       } else {
+  //         return false;
+  //       }
+  //     }
+  //   },
+  //   delete: (ctx) => {
+  //     if (isAdmin(ctx)) {
+  //       return true;
+  //     } else {
+  //       const user = Astro.locals.user;
+  //       if (user?.userId) {
+  //         // Return filter so update doesn't happen if userId doesn't match
+  //         return {
+  //           userId: user.userId,
+  //         };
+  //       } else {
+  //         return false;
+  //       }
+  //     }
+  //   },
+  // },
   fields: {
     userId: {
       update: false,
