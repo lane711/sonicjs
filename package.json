@@ -43,7 +43,7 @@
     "@types/node": "^22.7.3",
     "drizzle-kit": "^0.24.2",
     "vitest": "^2.1.1",
-    "wrangler": "^3.78.11"
+    "wrangler": "^4.0.0"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "4.6.1"

@@ -27,3 +27,7 @@ pnpm-debug.log*
 wrangler.toml
 
 TEMP.md
+
+# e2e
+playwright-report/
+test-results/

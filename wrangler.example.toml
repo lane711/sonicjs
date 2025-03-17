@@ -1,15 +1,18 @@
-# Run the `wrangler kv:namespace create sonicjs` command and copy the id below
-# Run the `wrangler kv:namespace create sonicjs --preview` command and copy the preview_id below
+# Run the `npx wrangler kv namespace create sonicjs` command and copy the id below
+# Run the `npx wrangler kv namespace create sonicjs --preview` command and copy the preview_id below
 # Only update the preview_id and id, leave the binding name as "KVDATA"
 kv_namespaces = [
-  { binding = "KV", preview_id="?????", id = "?????" }
+  { binding = "KV", preview_id="CHANGEME", id = "CHANGEME" }
 ]
 
-# Run the `wrangler d1 create sonicjs` command and copy the id below
+# Run the `npx wrangler d1 create sonicjs` command and copy the id below to the database_id field
 [[d1_databases]]
 binding = "D1"
 database_name = "sonicjs"
-database_id = "?????"
+database_id = "CHANGEME"
 
 [vars]
 DISABLED_CACHE = true
+
+
+
