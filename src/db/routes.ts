@@ -1,17 +1,10 @@
-import * as users from "./schema/users";
-import * as posts from "./schema/posts";
-import * as comments from "./schema/comments";
-import * as categories from "./schema/categories";
-import * as categoriesToPosts from "./schema/categoriesToPosts";
-// import * as userKeys from "./schema/userKeys";
-import * as userSessions from "./schema/userSessions";
-import * as cacheRequests from "./schema/cacheRequests";
-import * as cacheStats from "./schema/cacheStats";
-
-
-// import { AppContext } from '../server';
 import { isAdminOrEditor } from "./config-helpers";
 import type { APIContext as AppContext } from "astro";
+
+import { tableSchemas as coreTableSchemas } from "@schema/schema.config";
+import { tableSchemas as customTableSchemas } from "@custom/custom.config";
+
+export const tableSchemas = { ...coreTableSchemas, ...customTableSchemas };
 
 export type SonicJSConfig = {
   apiConfig: ApiConfig[];
@@ -210,19 +203,9 @@ export interface ApiConfig {
 
 export const apiConfig: ApiConfig[] = [];
 
-export const tableSchemas = {
-  users,
-  posts,
-  comments,
-  categories,
-  categoriesToPosts,
-  userSessions,
-  cacheRequests,
-  cacheStats,
-};
-
 for (const key of Object.keys(tableSchemas)) {
   const table = tableSchemas[key];
+  console.log('table', table);
   if (table.route) {
     apiConfig.push({
       table: table.tableName,

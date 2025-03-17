@@ -8,7 +8,7 @@
     "paths": {
       "@services/*": ["./services/*"],
       "@schema/*": ["./db/schema/*"],
-
+      "@custom/*": ["./custom/*"],
     }
   }
 }
