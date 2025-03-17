@@ -46,9 +46,11 @@ if (Astro.request.method === "POST") {
     const baseURl = Astro.request.url.split("/admin/")[0];
     const postUrl = `${baseURl}/api/v1/${tableConfigRecord.route}`;
     try {
+      const session = Astro.cookies.get("session")?.value;
       const response = await fetch(postUrl, {
         method: "POST",
         body: json,
+        headers: new Headers({ Authorization: `Bearer ${session}` }),
       });
 
       if (!response.ok) {

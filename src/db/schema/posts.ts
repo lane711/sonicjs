@@ -5,7 +5,7 @@ import { auditSchema } from "./audit";
 import * as users from "./users";
 import * as categoriesToPosts from "./categoriesToPosts";
 import * as comments from "./comments";
-import { isAdmin, isAdminOrEditor } from "../config-helpers";
+import { isAdmin, isAdminOrEditor, isAdminOrUser } from "../config-helpers";
 import type { ApiConfig } from "../routes";
 
 export const tableName = "posts";
@@ -52,40 +52,43 @@ export const access: ApiConfig["access"] = {
   operation: {
     read: true,
     create: isAdminOrEditor,
+    update: isAdminOrUser,
+    delete: isAdminOrUser,
   },
-  filter: {
-    // if a user tries to update a post and isn't the user that created the post the update won't happen
-    update: (ctx) => {
-      if (isAdmin(ctx)) {
-        return true;
-      } else {
-        const user = Astro.locals.user;
-        if (user?.userId) {
-          // Return filter so update doesn't happen if userId doesn't match
-          return {
-            userId: user.userId,
-          };
-        } else {
-          return false;
-        }
-      }
-    },
-    delete: (ctx) => {
-      if (isAdmin(ctx)) {
-        return true;
-      } else {
-        const user = Astro.locals.user;
-        if (user?.userId) {
-          // Return filter so update doesn't happen if userId doesn't match
-          return {
-            userId: user.userId,
-          };
-        } else {
-          return false;
-        }
-      }
-    },
-  },
+  // filter: {
+  //   // if a user tries to update a post and isn't the user that created the post the update won't happen
+  //   update: (ctx) => {nx run inventory-tracking:serve-mfe
+
+  //     if (isAdmin(ctx)) {
+  //       return true;
+  //     } else {
+  //       const user = Astro.locals.user;
+  //       if (user?.userId) {
+  //         // Return filter so update doesn't happen if userId doesn't match
+  //         return {
+  //           userId: user.userId,
+  //         };
+  //       } else {
+  //         return false;
+  //       }
+  //     }
+  //   },
+  //   delete: (ctx) => {
+  //     if (isAdmin(ctx)) {
+  //       return true;
+  //     } else {
+  //       const user = Astro.locals.user;
+  //       if (user?.userId) {
+  //         // Return filter so update doesn't happen if userId doesn't match
+  //         return {
+  //           userId: user.userId,
+  //         };
+  //       } else {
+  //         return false;
+  //       }
+  //     }
+  //   },
+  // },
   fields: {
     userId: {
       update: false,

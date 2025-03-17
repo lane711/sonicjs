@@ -58,12 +58,15 @@ export async function validateSessionToken(
   const result = await db
     .select({ user: tableSchemas.users.table, session: tableSchemas.userSessions.table })
     .from(tableSchemas.userSessions.table)
-    .innerJoin(tableSchemas.users.table, eq(tableSchemas.userSessions.table .userId, tableSchemas.users.table.id))
+    .innerJoin(tableSchemas.users.table, eq(tableSchemas.userSessions.table.userId, tableSchemas.users.table.id))
     .where(eq(tableSchemas.userSessions.table.id, sessionId));
+
   if (result.length < 1) {
     return { session: null, user: null };
   }
   const { user, session } = result[0];
+  delete user.password;
+  
   if (Date.now() >= session.activeExpires) {
     await db.delete(userSessions).where(eq(userSessions.id, session.id));
     return { session: null, user: null };

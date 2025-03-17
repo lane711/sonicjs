@@ -1,48 +1,7 @@
-import { tableSchemas } from '../db/routes';
-import { drizzle } from 'drizzle-orm/d1';
-import { isNotNull } from 'drizzle-orm';
-// import { getRecords } from '../data/data';
-// import { AppContext as APIContext } from '../../server';
 import type { APIContext as AppContext } from "astro";
-
 import type { SonicJSFilter, ApiConfig } from '../db/routes';
 import { getRecords } from '@services/data';
 
-// export const hasUser = async (ctx: AppContext) => {
-//   const fn = async function () {
-//     const db = drizzle(ctx.env.D1DATA, {
-//       schema: {
-//         users: tableSchemas.users.table,
-//         usersRelations: tableSchemas.users.relation,
-//         // userKeys: tableSchemas.userKeys.table,
-//         // userKeysRelations: tableSchemas.userKeys.relation,
-//         userSessions: tableSchemas.userSessions.table,
-//         userSessionsRelations: tableSchemas.userSessions.relation
-//       }
-//     });
-//     const data = await db.query.users.findMany({
-//       with: {
-//         keys: {
-//           where(fields) {
-//             return isNotNull(fields.hashed_password);
-//           }
-//         }
-//       }
-//     });
-//     const result = data.filter((user) => user.keys?.length > 0);
-//     return result;
-//   };
-
-//   const result = await getRecords(
-//     ctx,
-//     'custom',
-//     {},
-//     'hasUserWithKeyCheck',
-//     'd1',
-//     fn
-//   );
-//   return result.data.length > 0;
-// };
 export async function getApiAccessControlResult(
   operationAccessControl:
     | boolean
@@ -62,23 +21,24 @@ export async function getApiAccessControlResult(
     args[0],
     args[2]
   );
-  if (authorized) {
-    authorized = await getItemAccessControlResult(
-      itemAccessControl,
-      ctx,
-      args[0],
-      args[1],
-      args[2]
-    );
-  }
-  if (authorized) {
-    authorized = await getAccessControlResult(
-      filterAccessControl,
-      ctx,
-      args[0],
-      args[2]
-    );
-  }
+  //TODO: figure out if we really need item level control, what is the use case?
+  // if (authorized) {
+  //   authorized = await getItemAccessControlResult(
+  //     itemAccessControl,
+  //     ctx,
+  //     args[0],
+  //     args[1],
+  //     args[2]
+  //   );f
+  // }
+  // if (authorized) {
+  //   authorized = await getAccessControlResult(
+  //     filterAccessControl,
+  //     ctx,
+  //     args[0],
+  //     args[2]
+  //   );
+  // }
 
   return authorized;
 }
@@ -113,6 +73,7 @@ export async function getOperationCreateResult(
 ) {
   return !!(await getAccessControlResult(create, ctx, data));
 }
+
 export async function getOperationReadResult(
   read: ApiConfig['access']['operation']['read'],
   ctx: AppContext,
@@ -267,6 +228,7 @@ export async function getItemDeleteResult(
   }
   return authorized;
 }
+
 export async function filterCreateFieldAccess<D = any>(
   fields: ApiConfig['access']['fields'],
   ctx: AppContext,

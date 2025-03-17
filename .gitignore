@@ -28,6 +28,8 @@ wrangler.toml
 
 TEMP.md
 
-# e2e
-playwright-report/
-test-results/
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

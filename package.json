@@ -10,6 +10,7 @@
     "astro": "astro",
     "test": "vitest run",
     "test:watch": "vitest",
+    "e2e":"npx playwright test --ui",
     "generate": "drizzle-kit generate",
     "up": "wrangler d1 migrations apply sonicjs --local",
     "up:prod": "wrangler d1 migrations apply sonicjs  --remote"
@@ -40,6 +41,7 @@
     "typescript": "^5.6.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.50.1",
     "@types/node": "^22.7.3",
     "drizzle-kit": "^0.24.2",
     "vitest": "^2.1.1",

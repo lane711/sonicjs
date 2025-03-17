@@ -47,15 +47,16 @@ export const relation = relations(table, ({ many }) => ({
 
 export const access: ApiConfig["access"] = {
   operation: {
-    read: false,
+    read: isAdmin,
     create: isAdmin,
     delete: isAdmin,
-  },
-  item: {
-    // if a user tries to update a user and isn't the user that created the user the update will return unauthorized response
     update: isAdminOrUser,
-    read:false
   },
+  // item: {
+  //   // if a user tries to update a user and isn't the user that created the user the update will return unauthorized response
+  //   update: isAdminOrUser,
+  //   read:true
+  // },
   fields: {
     id: {
       read: (ctx, value, doc) => {
@@ -83,7 +84,7 @@ export const access: ApiConfig["access"] = {
 export const hooks: ApiConfig["hooks"] = {
   resolveInput: {
     create: async (context, data) => {
-      if (data.password) {
+      if (data && data.password) {
         data.password = await hashString(data.password);
       }
       if (context.locals.user?.id) {
