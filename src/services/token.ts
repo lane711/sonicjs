@@ -1,6 +1,6 @@
 import { validateSessionToken } from "./sessions";
 
-export const checkToken = async (context: Context) => {
+export const checkToken = async (context: any) => {
   // get header for token and lookup user and attached to context
   const token = context.request.headers
     .get("Authorization").toLowerCase()

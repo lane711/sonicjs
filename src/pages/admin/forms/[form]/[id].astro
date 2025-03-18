@@ -18,7 +18,8 @@ const getRecord = async (table, id) => {
     headers: new Headers({ Authorization: `Bearer ${session}` }),
   });
   if (response.ok) {
-    const { data } = await response.json();
+    const responseData: { data: any } = await response.json();
+    const { data } = responseData;
     return data
   }
 };
