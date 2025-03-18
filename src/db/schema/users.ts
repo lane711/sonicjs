@@ -18,6 +18,7 @@ export const definition = {
   id: text("id").primaryKey(),
   firstName: text("firstName"),
   lastName: text("lastName"),
+  profile: text("profile"),
   email: text("email").unique(),
   password: text("password").notNull(),
   role: text("role").$type<"admin" | "user">().default("user"),
