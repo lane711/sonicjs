@@ -1,12 +1,12 @@
 import { sqliteTable, index, text } from "drizzle-orm/sqlite-core";
 
 import { relations } from "drizzle-orm";
-import { auditSchema } from "./audit";
-import * as users from "./users";
+import { auditSchema } from "@schema/audit";
+import * as users from "@schema/users";
 import * as categoriesToPosts from "./categoriesToPosts";
 import * as comments from "./comments";
-import { isAdmin, isAdminOrEditor, isAdminOrUser } from "../config-helpers";
-import type { ApiConfig } from "../routes";
+import { isAdminOrEditor, isAdminOrUser } from "db/config-helpers";
+import type { ApiConfig } from "db/routes";
 
 export const tableName = "posts";
 

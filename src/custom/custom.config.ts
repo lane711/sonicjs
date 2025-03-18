@@ -1,7 +1,7 @@
-import * as posts from "@schema/posts";
-import * as comments from "@schema/comments";
-import * as categories from "@schema/categories";
-import * as categoriesToPosts from "@schema/categoriesToPosts";
+import * as posts from "@custom/db/schema/posts";
+import * as comments from "@custom/db/schema/comments";
+import * as categories from "@custom/db/schema/categories";
+import * as categoriesToPosts from "@custom/db/schema/categoriesToPosts";
 
 export const tableSchemas = {
     posts,

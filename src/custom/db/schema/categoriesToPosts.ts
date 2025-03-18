@@ -1,10 +1,11 @@
 import { primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { relations } from 'drizzle-orm';
-import { auditSchema } from './audit';
+import { auditSchema } from '@schema/audit';
 import * as categories from './categories';
 import * as posts from './posts';
-import { isAdminOrEditor } from '../config-helpers';
-import type { ApiConfig } from "../routes";
+import { isAdminOrEditor } from 'db/config-helpers';
+import type { ApiConfig } from 'db/routes';
+
 
 export const tableName = 'categoriesToPosts';
 

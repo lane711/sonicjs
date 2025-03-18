@@ -1,8 +1,8 @@
 import { sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 import { relations, type InferSelectModel } from "drizzle-orm";
 import { auditSchema } from "./audit";
-import * as posts from "./posts";
-import * as comments from "./comments";
+import * as posts from "@custom/db/schema/posts";
+import * as comments from "@custom/db/schema/comments";
 // import * as userKeys from "./userKeys";
 // import * as userSessions from "./userSessions";
 import { isAdmin, isAdminOrEditor, isAdminOrUser } from "../config-helpers";
