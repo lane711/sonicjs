@@ -205,7 +205,6 @@ export const apiConfig: ApiConfig[] = [];
 
 for (const key of Object.keys(tableSchemas)) {
   const table = tableSchemas[key];
-  console.log('table', table);
   if (table.route) {
     apiConfig.push({
       table: table.tableName,

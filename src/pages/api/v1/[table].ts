@@ -195,7 +195,8 @@ export const POST: APIRoute = async (context) => {
     context,
     content.data
   );
-  if (!authorized) {
+  const isAdminAccountCreated = context.locals.runtime.env.isAdminAccountCreated ?? true;
+  if (!authorized && isAdminAccountCreated) {
     return return401();
   }
 

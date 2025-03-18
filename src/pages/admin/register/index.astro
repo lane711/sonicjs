@@ -8,7 +8,9 @@ import { doesAdminAccountExist } from "@services/auth";
 
 let isAdminAccountCreated = await doesAdminAccountExist(Astro.locals.runtime.env.D1) ;
 console.log('isAdminAccountCreated register', isAdminAccountCreated)
-
+if(!isAdminAccountCreated){
+  Astro.locals.runtime.env.isAdminAccountCreated = false;
+}
 
 
 if (Astro.request.method === "POST") {
