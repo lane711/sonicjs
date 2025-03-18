@@ -28,6 +28,7 @@ export const login = async (
   const isPasswordCorrect = await compareStringToHash(password, userPassword);
 
   if (isPasswordCorrect) {
+    console.log("password correct for ", user.email);
     const token = generateSessionToken();
     // TODO: invalidate all user sessions could be async if we send session id that we don't want to invalidate
     await invalidateUserSessions(d1, user.id);
@@ -35,6 +36,9 @@ export const login = async (
     const session = await createSession(d1, token, user.id);
 
     return { bearer: token, expires: session.activeExpires };
+  }else{
+    console.log("login failed, password incorrect for ", user.email);
+
   }
 };
 
