@@ -66,6 +66,7 @@ export async function validateSessionToken(
   }
   const { user, session } = result[0];
   delete user.password;
+  user.profile = user.profile ? JSON.parse(user.profile) : {};
   
   if (Date.now() >= session.activeExpires) {
     await db.delete(userSessions).where(eq(userSessions.id, session.id));
