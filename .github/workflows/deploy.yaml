@@ -7,8 +7,8 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
-      DEPLOYMENT_ENVIRONMENT:
-        description: "Deployment environment"
+      DEPLOY_ENV:
+        description: Deployment environment
         required: true
         type: choice
         options:
@@ -35,7 +35,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.event.inputs.DEPLOYMENT_ENVIRONMENT }}
+      name: ${{ github.event.inputs.DEPLOY_ENV }}
     steps:
       - name: 🛎 Checkout
         uses: actions/checkout@v4
@@ -50,6 +50,6 @@ jobs:
         run: npm run build
       - name: 🚦 Apply DB migration
         if: ${{ github.event.inputs.APPLY_MIGRATION }}
-        run: npm run up:prod
-      - name: 🚀 Deploy to Cloudflare Pages [${{ inputs.DEPLOYMENT_ENVIRONMENT }}]
-        run: npm run deploy
+        run: npm run up:prod -- --config wrangler.deploy.jsonc ${{ github.event.inputs.DEPLOY_ENV == 'production' && '' || '--preview'  }}
+      - name: 🚀 Deploy to Cloudflare Pages [${{ inputs.DEPLOY_ENV }}]
+        run: npm run deploy -- --branch ${{ github.event.inputs.DEPLOY_ENV == 'production' && 'main' || 'preview' }}

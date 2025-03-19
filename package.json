@@ -13,7 +13,7 @@
     "e2e": "npx playwright test --ui",
     "generate": "drizzle-kit generate",
     "up": "wrangler d1 migrations apply sonicjs",
-    "up:prod": "wrangler d1 migrations apply sonicjs --remote -c wrangler.deploy.jsonc",
+    "up:prod": "wrangler d1 migrations apply sonicjs --remote",
     "deploy": "wrangler pages deploy"
   },
   "dependencies": {
