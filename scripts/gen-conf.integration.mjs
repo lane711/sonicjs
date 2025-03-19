@@ -28,6 +28,16 @@ export default function genConfig() {
         if (!CLOUDFLARE_KV_ID) console.warn(missing("CLOUDFLARE_KV_ID"));
         if (!CLOUDFLARE_D1_ID) console.warn(missing("CLOUDFLARE_D1_ID"));
 
+        const kvConfig = (id) => [{ binding: "KV", id }];
+        const d1Config = (id) => [
+          {
+            binding: "D1",
+            database_name: "sonicjs",
+            database_id: id,
+            migrations_dir: "./migrations",
+          },
+        ];
+
         // Config files to generate
         const configs = {
           // https://developers.cloudflare.com/workers/wrangler/configuration/#generated-wrangler-configuration
@@ -41,24 +51,16 @@ export default function genConfig() {
             pages_build_output_dir: "./dist",
             compatibility_date: "2025-03-14",
             compatibility_flags: ["nodejs_compat"],
-            kv_namespaces: [
-              {
-                binding: "KV",
-                id: CLOUDFLARE_KV_ID,
-                preview_id: CLOUDFLARE_KV_PREVIEW_ID,
+            vars: { DISABLE_CACHE: true },
+            env: {
+              preview: {
+                kv_namespaces: kvConfig(CLOUDFLARE_KV_PREVIEW_ID),
+                d1_databases: d1Config(CLOUDFLARE_D1_PREVIEW_ID),
               },
-            ],
-            d1_databases: [
-              {
-                binding: "D1",
-                database_name: "sonicjs",
-                database_id: CLOUDFLARE_D1_ID,
-                preview_database_id: CLOUDFLARE_D1_PREVIEW_ID,
-                migrations_dir: "./migrations",
+              production: {
+                kv_namespaces: kvConfig(CLOUDFLARE_KV_ID),
+                d1_databases: d1Config(CLOUDFLARE_D1_ID),
               },
-            ],
-            vars: {
-              DISABLE_CACHE: true,
             },
           },
         };
