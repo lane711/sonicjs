@@ -12,8 +12,9 @@
     "test:watch": "vitest",
     "e2e": "npx playwright test --ui",
     "generate": "drizzle-kit generate",
-    "up": "wrangler d1 migrations apply sonicjs --local",
-    "up:prod": "wrangler d1 migrations apply sonicjs  --remote"
+    "up": "wrangler d1 migrations apply sonicjs",
+    "up:prod": "wrangler d1 migrations apply sonicjs --remote -c wrangler.deploy.jsonc",
+    "deploy": "wrangler pages deploy"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.3",
