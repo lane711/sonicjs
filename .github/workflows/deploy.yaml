@@ -15,6 +15,10 @@ on:
           - preview
           - production
         default: "production"
+      APPLY_MIGRATION:
+        description: "Apply DB migration"
+        required: true
+        type: boolean
 
 env:
   # Variables
@@ -44,5 +48,8 @@ jobs:
         run: npm ci
       - name: ⛑ Build
         run: npm run build
+      - name: 🚦 Apply DB migration
+        if: ${{ github.event.inputs.APPLY_MIGRATION }}
+        run: npm run up:prod
       - name: 🚀 Deploy to Cloudflare Pages [${{ inputs.DEPLOYMENT_ENVIRONMENT }}]
         run: npm run deploy
