@@ -8,6 +8,7 @@
     "paths": {
       "@services/*": ["./services/*"],
       "@schema/*": ["./db/schema/*"],
+      "@routes": ["./db/routes.ts"],
       "@custom/*": ["./custom/*"],
     }
   }
