@@ -13,6 +13,6 @@ database_id = "CHANGEME"
 
 [vars]
 DISABLED_CACHE = true
-
+DEPOLY_URL  = "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/<ADD-ID-HERE>"
 
 

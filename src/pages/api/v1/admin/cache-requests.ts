@@ -2,7 +2,6 @@ import { deleteD1ByTableAndId } from "@services/d1-data";
 import { kvDelete, kvGetAll } from "@services/kv";
 import { getAdminKvData } from "@services/kv-data";
 import { return200 } from "@services/return-types";
-import qs from "qs";
 
 export const GET = async (context) => {
   const data = await getAdminKvData(context);
