@@ -9,6 +9,8 @@
       "@services/*": ["./services/*"],
       "@schema/*": ["./db/schema/*"],
       "@custom/*": ["./custom/*"],
+      "@emails/*": ["./emails/*"],
+
     }
   }
 }

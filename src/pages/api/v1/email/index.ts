@@ -1,4 +1,6 @@
 import { Resend } from "resend";
+import MagicLinkEmail from "@emails/magic-link";
+import React from "react";
 
 export const GET = async (context) => {
   const { request } = context;
@@ -10,7 +12,7 @@ export const GET = async (context) => {
       from: "lane@sonicjs.com",
       to: ["ldc0618@gmail.com"],
       subject: "Hello World",
-      html: "<strong>It works!</strong>",
+      react: React.createElement(MagicLinkEmail),
     });
 
     if (error) {
