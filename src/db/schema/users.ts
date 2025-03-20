@@ -8,6 +8,7 @@ import * as comments from "@custom/db/schema/comments";
 import { isAdmin, isAdminOrEditor, isAdminOrUser } from "../config-helpers";
 import type { ApiConfig } from "../routes";
 import { hashString } from "@services/cyrpt";
+import { boolean } from "drizzle-orm/mysql-core";
 export const tableName = "users";
 export const name = "Users";
 
@@ -21,6 +22,8 @@ export const definition = {
   profile: text("profile"),
   email: text("email").unique(),
   password: text("password").notNull(),
+  passwordExpired: boolean("passwordExpired").default(false),
+  passwordOTP: text("passwordOTP"),
   role: text("role").$type<"admin" | "user">().default("user"),
 };
 
