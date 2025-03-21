@@ -1,0 +1,55 @@
+name: Deploy to Cloudflare Pages
+
+on:
+  # push:
+  #  branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      DEPLOY_ENV:
+        description: Deployment environment
+        required: true
+        type: choice
+        options:
+          - preview
+          - production
+        default: "production"
+      APPLY_MIGRATION:
+        description: "Apply DB migration"
+        required: true
+        type: boolean
+
+env:
+  # Variables
+  CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+  CLOUDFLARE_PROJECT_NAME: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
+  CLOUDFLARE_KV_ID: ${{ vars.CLOUDFLARE_KV_ID }}
+  CLOUDFLARE_KV_PREVIEW_ID: ${{ vars.CLOUDFLARE_KV_PREVIEW_ID }}
+  CLOUDFLARE_D1_ID: ${{ vars.CLOUDFLARE_D1_ID }}
+  CLOUDFLARE_D1_PREVIEW_ID: ${{ vars.CLOUDFLARE_D1_PREVIEW_ID }}
+  # Secrets
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.DEPLOY_ENV }}
+    steps:
+      - name: 🛎 Checkout
+        uses: actions/checkout@v4
+      - name: 🏗 Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: "npm"
+      - name: 📦 Install dependencies
+        run: npm ci
+      - name: ⛑ Build
+        run: npm run build
+      - name: 🚦 Apply DB migration
+        if: ${{ github.event.inputs.APPLY_MIGRATION }}
+        run: npm run up:prod -- --config wrangler.deploy.jsonc --env ${{ github.event.inputs.DEPLOY_ENV }}
+      - name: 🚀 Deploy to Cloudflare Pages [${{ inputs.DEPLOY_ENV }}]
+        run: npm run deploy -- --branch ${{ github.event.inputs.DEPLOY_ENV == 'production' && 'main' || 'preview' }}

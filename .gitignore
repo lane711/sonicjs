@@ -33,3 +33,6 @@ TEMP.md
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Deployment config
+wrangler.deploy.jsonc
