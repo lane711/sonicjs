@@ -238,11 +238,64 @@ export function processCondition(condition) {
   switch (condition) {
     case "$eq":
       return "=";
-      break;
-      
-
+    case "$neq":
+      return "!=";
+    case "$lt":
+      return "<";
+    case "$lte":
+      return "<=";
+    case "$gt":
+      return ">";
+    case "$gte":
+      return ">=";
+    case "$in":
+      return "IN";
+    case "$nin":
+      return "NOT IN";
+    case "$null":
+      return "IS NULL";
+    case "$nnull":
+      return "IS NOT NULL";
+    case "$contains":
+      return "LIKE";
+    case "$icontains":
+      return "ILIKE";
+    case "$ncontains":
+      return "NOT LIKE";
+    case "$starts_with":
+      return "LIKE";
+    case "$istarts_with":
+      return "ILIKE";
+    case "$nstarts_with":
+      return "NOT LIKE";
+    case "$nistarts_with":
+      return "NOT ILIKE";
+    case "$ends_with":
+      return "LIKE";
+    case "$iends_with":
+      return "ILIKE";
+    case "$nends_with":
+      return "NOT LIKE";
+    case "$niends_with":
+      return "NOT ILIKE";
+    case "$between":
+      return "BETWEEN";
+    case "$nbetween":
+      return "NOT BETWEEN";
+    case "$empty":
+      return "= ''";
+    case "$nempty":
+      return "!= ''";
+    case "$intersects":
+      return "&&";
+    case "$nintersects":
+      return "NOT &&";
+    case "$intersects_bbox":
+      return "&&";
+    case "$nintersects_bbox":
+      return "NOT &&";
     default:
-      break;
+      throw new Error(`Unsupported condition: ${condition}`);
   }
 }
 
