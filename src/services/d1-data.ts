@@ -223,7 +223,7 @@ export function whereClauseBuilder(filters: any) {
 
     AND = "AND";
   }
-  return whereClause;
+  return whereClause.replace(/\s+/g, " ");
 }
 
 export async function getTableCounts(db, table) {
