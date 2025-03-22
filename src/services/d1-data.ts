@@ -167,14 +167,22 @@ export function getRepoFromTable(tableName) {
 }
 
 export function sortClauseBuilder(params) {
-  let sortClause = "";
-
-  if (params.sort) {
-    sortClause =
-      "order by " + params.sort.join(", ").replace(new RegExp(":", "g"), " ");
+  if (!params.sort) {
+    return "";
   }
 
-  return sortClause;
+  let sortClause = "";
+
+  if (Array.isArray(params.sort)) {
+    sortClause =
+      "order by " + params.sort.join(", ").replace(new RegExp(":", "g"), " ");
+  }else{
+    const direction = params.sort.includes(":desc") ? "desc" : "asc";
+    const sort = params.sort.replace(":desc", "").replace(":asc", "");
+    sortClause = `order by ${sort} ${direction}`;
+  }
+
+  return sortClause.replace(/\s+/g, " ").trim();
 }
 
 export function whereClauseBuilder(filters: any) {
