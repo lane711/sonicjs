@@ -206,6 +206,10 @@ export function whereClauseBuilder(filters: any) {
         multiArr.push(`${key} = '${prop}'`);
       }
       whereClause = `${whereClause} ${AND} (${multiArr.join(` OR `)})`;
+    }else if(condition === '$null' || condition === '$nnull'){
+      whereClause = `${whereClause} ${AND} ${key} ${processCondition(
+        condition
+      )}`;
     } else {
       whereClause = `${whereClause} ${AND} ${key} ${processCondition(
         condition
