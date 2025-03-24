@@ -143,7 +143,7 @@ describe("whereClauseBuilder", () => {
       const result = whereClauseBuilder(filters);
       expect(result).toBe("WHERE name = 'John' AND age > '30'");
     });
-  
+
     it("should handle filters with different conditions", () => {
       const filters = { name: { $eq: "John" }, age: { $lt: 30 }, country: { $neq: "USA" } };
       const result = whereClauseBuilder(filters);
@@ -159,7 +159,7 @@ describe("whereClauseBuilder", () => {
     it("should handle filters with LIKE condition", () => {
       const filters = { name: { $contains: "John" } };
       const result = whereClauseBuilder(filters);
-      expect(result).toBe("WHERE name LIKE 'John'");
+      expect(result).toBe("WHERE name LIKE '%John%'");
     });
   
     it("should handle filters with greater than condition", () => {
@@ -198,12 +198,21 @@ describe("generateSelectSql via query string", () => {
 
   it("should generate SQL with filters", () => {
     const table = "users";
-    // const params = { filters: { name: { $eq: "John" }, age: { $gt: 30 } } };
     const query = "filters[name][$eq]=John&filters[age][$gt]=30";
     const params = query ? qs.parse(query, { duplicates: "combine" }) : {};
     const result = generateSelectSql(table, params);
     expect(result).toBe(
       "SELECT *, COUNT() OVER() AS total FROM users WHERE name = 'John' AND age > '30';"
+    );
+  });
+
+  it("should generate SQL with multiple filters of same field", () => {
+    const table = "users";
+    const query = "filters[name][$starts_with]=John&filters[name][$contains]=Free";
+    const params = query ? qs.parse(query, { duplicates: "combine" }) : {};
+    const result = generateSelectSql(table, params);
+    expect(result).toBe(
+      "SELECT *, COUNT() OVER() AS total FROM users WHERE name LIKE 'John%' AND name LIKE '%Free%';"
     );
   });
 });

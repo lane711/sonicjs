@@ -11,6 +11,7 @@ import { uuid } from "./utils";
 
 export async function getD1DataByTable(db, table, params) {
   const sql = generateSelectSql(table, params);
+  console.log("sql ==>", sql);
   const { results } = await db.prepare(sql).all();
   return params?.id ? results[0] : results;
 }
@@ -196,10 +197,14 @@ export function whereClauseBuilder(filters: any) {
   whereClause = "WHERE";
   for (const key of Object.keys(filters)) {
     let filter = filters[key];
-    let condition = Object.keys(filter)[0];
+
+    //need to first loop over the object keys in the case of multiple filters on the same field
+    for (const condition of Object.keys(filter)) {
+
+    // let condition = Object.keys(filter)[0];
 
     if (Array.isArray(filter[condition])) {
-      // AND (country = 'usa' OR contry = 'uk')
+      // AND (country = 'usa' OR country = 'uk')
       const arr = filter[condition];
       let multiArr = [];
       for (const prop of arr) {
@@ -210,6 +215,18 @@ export function whereClauseBuilder(filters: any) {
       whereClause = `${whereClause} ${AND} ${key} ${processCondition(
         condition
       )}`;
+    }else if(condition === '$contains'){
+      whereClause = `${whereClause} ${AND} ${key} ${processCondition(
+        condition
+      )} '%${filter[condition]}%'`;
+    }else if(condition === '$starts_with' || condition === '$nstarts_with'){
+      whereClause = `${whereClause} ${AND} ${key} ${processCondition(
+        condition
+      )} '${filter[condition]}%'`;
+    }else if(condition === '$ends_with' || condition === '$nends_with'){
+      whereClause = `${whereClause} ${AND} ${key} ${processCondition(
+        condition
+      )} '%${filter[condition]}'`;
     } else {
       whereClause = `${whereClause} ${AND} ${key} ${processCondition(
         condition
@@ -227,6 +244,7 @@ export function whereClauseBuilder(filters: any) {
 
     AND = "AND";
   }
+}
   return whereClause.replace(/\s+/g, " ");
 }
 
@@ -262,26 +280,16 @@ export function processCondition(condition) {
       return "IS NOT NULL";
     case "$contains":
       return "LIKE";
-    case "$icontains":
-      return "ILIKE";
     case "$ncontains":
       return "NOT LIKE";
     case "$starts_with":
       return "LIKE";
-    case "$istarts_with":
-      return "ILIKE";
     case "$nstarts_with":
       return "NOT LIKE";
-    case "$nistarts_with":
-      return "NOT ILIKE";
     case "$ends_with":
       return "LIKE";
-    case "$iends_with":
-      return "ILIKE";
     case "$nends_with":
       return "NOT LIKE";
-    case "$niends_with":
-      return "NOT ILIKE";
     case "$between":
       return "BETWEEN";
     case "$nbetween":
