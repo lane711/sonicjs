@@ -31,14 +31,15 @@ export async function getApiAccessControlResult(
   //     args[2]
   //   );f
   // }
-  // if (authorized) {
-  //   authorized = await getAccessControlResult(
-  //     filterAccessControl,
-  //     ctx,
-  //     args[0],
-  //     args[2]
-  //   );
-  // }
+  // There is still a test for this, so we either need to remove the test or keep this in.
+  if (authorized) {
+    authorized = await getAccessControlResult(
+      filterAccessControl,
+      ctx,
+      args[0],
+      args[2]
+    );
+  }
 
   return authorized;
 }
