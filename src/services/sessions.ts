@@ -40,10 +40,9 @@ export async function createSession(
 
   const db = drizzle(d1);
   try {
-      await db.insert(tableSchemas.userSessions.table).values(session);
-
+    await db.insert(tableSchemas.userSessions.table).values(session);
   } catch (error) {
-    console.error('error', error);
+    console.error("error", error);
   }
   return session;
 }
@@ -56,9 +55,15 @@ export async function validateSessionToken(
   const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 
   const result = await db
-    .select({ user: tableSchemas.users.table, session: tableSchemas.userSessions.table })
+    .select({
+      user: tableSchemas.users.table,
+      session: tableSchemas.userSessions.table,
+    })
     .from(tableSchemas.userSessions.table)
-    .innerJoin(tableSchemas.users.table, eq(tableSchemas.userSessions.table.userId, tableSchemas.users.table.id))
+    .innerJoin(
+      tableSchemas.users.table,
+      eq(tableSchemas.userSessions.table.userId, tableSchemas.users.table.id)
+    )
     .where(eq(tableSchemas.userSessions.table.id, sessionId));
 
   if (result.length < 1) {
@@ -67,7 +72,7 @@ export async function validateSessionToken(
   const { user, session } = result[0];
   delete user.password;
   user.profile = user.profile ? JSON.parse(user.profile) : {};
-  
+
   if (Date.now() >= session.activeExpires) {
     await db.delete(userSessions).where(eq(userSessions.id, session.id));
     return { session: null, user: null };
@@ -86,11 +91,15 @@ export async function validateSessionToken(
 
 export async function invalidateSession(
   d1: D1Database,
-  sessionId: string
+  token: string
 ): Promise<void> {
+  const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
   const db = drizzle(d1);
-  const schema = getRepoFromTable('userSessions');
-  await db.delete(userSessions).where(eq(userSessions.id, sessionId));
+  const schema = getRepoFromTable("userSessions");
+  const result = await db
+    .delete(userSessions)
+    .where(eq(userSessions.id, sessionId));
+  const x = result;
 }
 
 export async function invalidateUserSessions(
@@ -98,7 +107,7 @@ export async function invalidateUserSessions(
   userId: string
 ): Promise<void> {
   const db = drizzle(d1);
-  const schema = getRepoFromTable('userSessions');
+  const schema = getRepoFromTable("userSessions");
   await db.delete(userSessions).where(eq(userSessions.userId, userId));
 }
 
