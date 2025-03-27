@@ -89,6 +89,19 @@ test("should allow admin to update a user", async ({ request }) => {
   expect(updatedData.firstName).toBe('updated');
 });
 
+test("should allow admin to access /api/v1/auth/user for session and user info", async ({ request }) => {
+  const response = await request.get(`/api/v1/auth/user`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  expect(response.status()).toBe(200);
+  const { data } = await response.json();
+  expect(typeof data.user).toBe("object");
+  expect(data.user.email.length).toBeGreaterThan(0);
+  expect(typeof data.session).toBe("object");
+});
+
 test.afterEach(async ({ request }) => {
   await cleanup(request, token);
 });
@@ -112,6 +125,8 @@ const createTestUser = async (request, token) => {
       data: {
         email: "e2e!!@test.com",
         password: "newpassword123abc",
+        firstName: "Demo",
+        lastName: "User",
       },
     },
   });
