@@ -23,6 +23,7 @@ import {
 } from "../../../../auth/auth-helpers";
 import {
   return200,
+  return200WithObject,
   return204,
   return401,
   return404,
@@ -32,7 +33,7 @@ import { checkToken } from "@services/token";
 
 //get single record
 export const GET = async (context) => {
-  // const start = Date.now();
+  const start = Date.now();
   let params = context.params;
 
   const tableName = params.table;
@@ -60,7 +61,7 @@ export const GET = async (context) => {
   // will check the item result when we get the data
   const accessControlResult = await getApiAccessControlResult(
     entry?.access?.operation?.read ?? false,
-    entry?.access?.filter?.read  ?? false,
+    entry?.access?.filter?.read ?? false,
     true,
     context,
     id,
@@ -109,10 +110,13 @@ export const GET = async (context) => {
   //   await entry.hooks.afterOperation(context, 'read', id, null, data);
   // }
 
-  // const end = Date.now();
-  // const executionTime = end - start;
+  const end = Date.now();
+  const executionTime = end - start;
 
-  return return200(data);
+
+    data.executionTime = executionTime;
+
+  return return200WithObject(data);
 };
 
 export const PUT: APIRoute = async (context) => {

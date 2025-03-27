@@ -49,7 +49,9 @@ export async function getRecords(
   cacheKey,
   source = "fastest",
   customDataFunction = undefined
-): Promise<{ data: any; source: string; total: number; contentType?: any }> {
+): Promise<{
+  executionTime: number; data: any; source: string; total: number; contentType?: any 
+}> {
   log(context, { level: "verbose", message: "getRecords start " + cacheKey });
 
   //   const disableCache = context.env.disable_cache === 'true';

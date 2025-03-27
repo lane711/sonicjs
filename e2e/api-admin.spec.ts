@@ -86,7 +86,7 @@ test("should allow admin to update a user", async ({ request }) => {
 
   const { data: updatedData } = await response2.json();
   expect(typeof updatedData === 'object').toBe(true);
-  expect(updatedData.data.firstName).toBe('updated');
+  expect(updatedData.firstName).toBe('updated');
 });
 
 test.afterEach(async ({ request }) => {
