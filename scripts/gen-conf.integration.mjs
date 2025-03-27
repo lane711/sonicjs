@@ -11,8 +11,8 @@ export default function genConfig() {
   return {
     name: "gen-conf",
     hooks: {
-      "astro:build:done": async () => {
-        console.log("⚡️ Loading environment variables...", process.cwd());
+      "astro:build:done": async ({ logger }) => {
+        logger.info("⚡️ Loading environment variables...");
         const {
           CLOUDFLARE_PROJECT_NAME,
           CLOUDFLARE_KV_ID,
@@ -22,11 +22,13 @@ export default function genConfig() {
         } = loadEnv(process.env.NODE_ENV, process.cwd(), "");
 
         const missing = (name) =>
-          `⚠️ The environment variable ${name} is not set. This will cause your application to fail when deploying to Cloudflare.`;
-        if (!CLOUDFLARE_PROJECT_NAME)
-          console.warn(missing("CLOUDFLARE_PROJECT_NAME"));
-        if (!CLOUDFLARE_KV_ID) console.warn(missing("CLOUDFLARE_KV_ID"));
-        if (!CLOUDFLARE_D1_ID) console.warn(missing("CLOUDFLARE_D1_ID"));
+          logger.warn(
+            `⚠️ The environment variable ${name} is not set. Skipping deployment config generation...`,
+          );
+
+        if (!CLOUDFLARE_PROJECT_NAME) return missing("CLOUDFLARE_PROJECT_NAME");
+        if (!CLOUDFLARE_KV_ID) return missing("CLOUDFLARE_KV_ID");
+        if (!CLOUDFLARE_D1_ID) return missing("CLOUDFLARE_D1_ID");
 
         const kvConfig = (id) => [{ binding: "KV", id }];
         const d1Config = (id) => [
@@ -66,13 +68,13 @@ export default function genConfig() {
         };
 
         for (const [path, data] of Object.entries(configs)) {
-          console.log(`💾 Generating ${path}...`);
+          logger.info(`💾 Generating ${path}...`);
           // Ensure the directory exists
           mkdirSync(dirname(path), { recursive: true });
           // Write the configs
           writeFileSync(path, JSON.stringify(data, null, 2));
         }
-        console.log("✅ Wrangler deployment config generated!");
+        logger.info("✅ Wrangler deployment config generated!");
       },
     },
   };
