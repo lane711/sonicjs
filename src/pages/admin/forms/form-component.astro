@@ -3,7 +3,7 @@ import { apiConfig } from "../../../db/routes";
 import { getFieldDefinitions } from "../../../services/fields";
 import TextField from "./fields/text-field.astro";
 import TextArea from "./fields/text-area.astro";
-
+import MDXEditor from "./fields/mdx-editor.astro";
 const { record, title = "Edit" } = Astro.props;
 const { form } = Astro.params;
 const tableConfigRecord = apiConfig.find((t) => t.route === form);
@@ -25,6 +25,7 @@ const tableConfig = getFieldDefinitions(tableConfigRecord, record);
               <div class="mt-4">
                 <TextField field={field} />
                 <TextArea field={field} />
+                <MDXEditor field={field} />
               </div>
             ))
           }

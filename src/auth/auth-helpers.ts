@@ -31,6 +31,7 @@ export async function getApiAccessControlResult(
   //     args[2]
   //   );f
   // }
+  // There is still a test for this, so we either need to remove the test or keep this in.
   // if (authorized) {
   //   authorized = await getAccessControlResult(
   //     filterAccessControl,
