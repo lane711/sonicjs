@@ -208,6 +208,7 @@ function Table({ tableConfig }) {
                                 return (
                                   <th
                                     scope="col"
+                                    key={header.id}
                                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-100"
                                     onClick={header.column.getToggleSortingHandler()}
                                   >
@@ -334,7 +335,10 @@ function Table({ tableConfig }) {
                 </div>
                 <div className="hidden md:-mt-px md:flex">
                   {pageArray.map((pageNumber) => 
-                    <Button onClick={() => table.setPageIndex(pageNumber-1)} className={"inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium hover:border-gray-300 hover:text-gray-300" + pagerColor(pageNumber)}>
+                    <Button
+                      key={pageNumber}
+                      onClick={() => table.setPageIndex(pageNumber-1)}
+                      className={"inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium hover:border-gray-300 hover:text-gray-300" + pagerColor(pageNumber)}>
                       {pageNumber}
                     </Button>
                   )}
