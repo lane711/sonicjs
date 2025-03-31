@@ -1,7 +1,7 @@
 {
   "name": "sonicjs",
   "type": "module",
-  "version": "0.3.0",
+  "version": "0.3.2",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
