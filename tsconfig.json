@@ -11,5 +11,6 @@
       "@routes": ["./db/routes.ts"],
       "@custom/*": ["./custom/*"],
     }
-  }
+  },
+  "exclude": ["playwright-report", "dist", "node_modules"]
 }
