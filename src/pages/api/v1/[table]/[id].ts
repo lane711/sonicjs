@@ -24,7 +24,6 @@ import {
 import {
   return200,
   return200WithObject,
-  return204,
   return401,
   return404,
   return500,
