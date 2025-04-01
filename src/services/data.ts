@@ -230,7 +230,7 @@ export async function getRecords(
   //   }
 
   log(context, { level: "verbose", message: "getRecords end", cacheKey });
-  return { data: d1Data, source: "d1", total };
+  return { data: d1Data, source: "d1", total, executionTime: 0 };
 }
 
 async function dataAddToInMemoryCache(

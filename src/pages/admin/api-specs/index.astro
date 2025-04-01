@@ -14,7 +14,6 @@ const fullName = `${user.firstName} ${user.lastName}`;
 
 import { apiConfig, type ApiConfig } from "@routes";
 import AdminLayout from "../layouts/admin-layout.astro";
-import { getTableCounts } from "@services/d1-data";
 
 const tables = apiConfig;
 const domain = Astro.request.url.split("/admin")[0];

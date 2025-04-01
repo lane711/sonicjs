@@ -1,5 +1,3 @@
-// import { db, userSessions } from "./db.js";
-import { table as userTable } from "@schema/users";
 import type { User } from "@schema/users";
 import { table as userSessions } from "@schema/userSessions";
 import type { Session } from "@schema/userSessions";
@@ -11,10 +9,13 @@ import {
 } from "@oslojs/encoding";
 import { sha256 } from "@oslojs/crypto/sha2";
 import { drizzle, type DrizzleD1Database } from "drizzle-orm/d1";
-import { getRepoFromTable } from "./d1-data";
 import { tableSchemas } from "db/routes";
 
 // import type { User, Session } from "./db.js";
+
+type SessionWithToken = Session & {
+  token: string;
+};
 
 export function generateSessionToken(): string {
   const bytes = new Uint8Array(20);
@@ -73,22 +74,22 @@ export async function validateSessionToken(
   delete user.password;
   user.profile = user.profile ? JSON.parse(user.profile) : {};
   delete session.id;
-  session.token = token;
+  const sessionWithToken: SessionWithToken = { ...session, token };
 
-  if (Date.now() >= session.activeExpires) {
-    await db.delete(userSessions).where(eq(userSessions.id, session.id));
+  if (Date.now() >= sessionWithToken.activeExpires) {
+    await db.delete(userSessions).where(eq(userSessions.id, sessionWithToken.id));
     return { session: null, user: null };
   }
-  if (Date.now() >= session.activeExpires - 1000 * 60 * 60 * 24 * 15) {
-    session.activeExpires = Date.now() + 1000 * 60 * 60 * 24 * 30;
+  if (Date.now() >= sessionWithToken.activeExpires - 1000 * 60 * 60 * 24 * 15) {
+    sessionWithToken.activeExpires = Date.now() + 1000 * 60 * 60 * 24 * 30;
     await db
       .update(userSessions)
       .set({
-        activeExpires: session.activeExpires,
+        activeExpires: sessionWithToken.activeExpires,
       })
-      .where(eq(userSessions.id, session.id));
+      .where(eq(userSessions.id, sessionWithToken.id));
   }
-  return { session, user };
+  return { session: sessionWithToken, user };
 }
 
 export async function invalidateSession(
@@ -97,11 +98,9 @@ export async function invalidateSession(
 ): Promise<void> {
   const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
   const db = drizzle(d1);
-  const schema = getRepoFromTable("userSessions");
-  const result = await db
+  await db
     .delete(userSessions)
     .where(eq(userSessions.id, sessionId));
-  const x = result;
 }
 
 export async function invalidateUserSessions(
@@ -109,7 +108,6 @@ export async function invalidateUserSessions(
   userId: string
 ): Promise<void> {
   const db = drizzle(d1);
-  const schema = getRepoFromTable("userSessions");
   await db.delete(userSessions).where(eq(userSessions.userId, userId));
 }
 
