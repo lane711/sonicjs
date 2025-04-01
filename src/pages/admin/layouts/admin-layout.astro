@@ -10,8 +10,12 @@ const tables = apiConfig.filter((t) => t.route !== 'users')
 import SonicJsLogo from '../../../../public/images/sonicjs-logo.svg';
 import { Picture } from "astro:assets";
 import { Image } from 'astro:assets';
+import pkg from '../../../../package.json';
 
 const profileLink = '/admin/forms/users/' + Astro.locals.user.id;
+
+const version = pkg.version;
+console.log(version)
 ---
 
 <html lang="en" class="h-full bg-gray-900"></html>
@@ -376,10 +380,13 @@ const profileLink = '/admin/forms/users/' + Astro.locals.user.id;
         class="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4 border-e border-gray-800"
       >
         <div class="flex h-16 shrink-0 items-center">
-          <a href="/admin" class="p-0 m-0"> 
-         <Image  src={SonicJsLogo} format="svg" alt="Logo" height={26} loading="lazy" />
-        </a>
+          <a href="/admin" class="p-0 m-0 flex items-center gap-2"> 
+            <Image  src={SonicJsLogo} format="svg" alt="Logo" height={26} loading="lazy" />
+         
+          </a>
+          
         </div>
+
         <nav class="flex flex-1 flex-col">
 
           <ul role="list" class="flex flex-1 flex-col gap-y-7">
@@ -745,8 +752,16 @@ const profileLink = '/admin/forms/users/' + Astro.locals.user.id;
         <div class="px-4 sm:px-6 lg:px-8 text-white">
           <slot />
         </div>
-      </main>
+
+    <div class="absolute top-5 left-[180px] inline-flex items-center rounded-md bg-indigo-500/10 px-2 py-1 text-xs font-medium text-indigo-400 ring-1 ring-inset ring-indigo-500/20 z-[100]">
+      v{version}
     </div>
+  </main>
+
   </div>
+
+  </div>
+
+
 
 </body>
