@@ -15,7 +15,7 @@ import {
   import * as React from 'react';
   
   interface SlackConfirmEmailProps {
-    validationCode?: string;
+    otp?: string;
   }
   
   const baseUrl = process.env.VERCEL_URL
@@ -23,7 +23,7 @@ import {
     : '';
 
 export const MagicLinkEmail = ({
-    validationCode,
+    otp,
   }: SlackConfirmEmailProps) => (
     <Html>
       <Head />
@@ -45,7 +45,7 @@ export const MagicLinkEmail = ({
           </Text>
   
           <Section style={codeBox}>
-            <Text style={confirmationCodeText}>{validationCode}</Text>
+            <Text style={confirmationCodeText}>{otp}</Text>
           </Section>
   
           <Text style={text}>
@@ -156,7 +156,7 @@ export const MagicLinkEmail = ({
   );
   
   MagicLinkEmail.PreviewProps = {
-    validationCode: 'DJZ-TLX',
+    otp: 'DJZ-TLX',
   } as SlackConfirmEmailProps;
   
   export default MagicLinkEmail;
