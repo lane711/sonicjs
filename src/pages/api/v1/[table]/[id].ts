@@ -23,7 +23,7 @@ import {
 } from "../../../../auth/auth-helpers";
 import {
   return200,
-  return200WithObject,
+  return200,
   return401,
   return404,
   return500,
@@ -115,7 +115,7 @@ export const GET = async (context) => {
 
     data.executionTime = executionTime;
 
-  return return200WithObject(data);
+  return return200(data);
 };
 
 export const PUT: APIRoute = async (context) => {

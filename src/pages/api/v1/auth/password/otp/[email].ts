@@ -1,5 +1,5 @@
 import { sendEmailResend } from "@services/email";
-import { return200, return200WithObject, return404 } from "@services/return-types";
+import { return200, return200, return404 } from "@services/return-types";
 import MagicLinkEmail from "@emails/magic-link";
 import React from "react";
 import { Resend } from "resend";
@@ -46,7 +46,7 @@ export const GET = async (context) => {
     {}
   );
 
-  return return200WithObject(updated);
+  return return200(updated);
 
 //   const react = React.createElement(<MagicLinkEmail otp={otp} />)
 
@@ -68,7 +68,7 @@ export const GET = async (context) => {
     
 //   );
 
-  return return200WithObject(result);
+  return return200(result);
 };
 
 // declare all characters

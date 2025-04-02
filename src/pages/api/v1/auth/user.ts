@@ -1,6 +1,6 @@
 import {
   return200,
-  return200WithObject,
+  return200,
   return401,
 } from "@services/return-types";
 import { validateSessionToken } from "@services/sessions";
@@ -28,5 +28,5 @@ export const GET: APIRoute = async (context) => {
     return return401();
   }
 
-  return return200WithObject({ data: validSession });
+  return return200({ data: validSession });
 };

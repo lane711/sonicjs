@@ -1,4 +1,4 @@
-import { return200WithObject } from "@services/return-types";
+import { return200 } from "@services/return-types";
 
 export const GET = async (context) => {
   const status = {
@@ -18,5 +18,5 @@ export const GET = async (context) => {
       KVDATA: {},
     },
   };
-  return return200WithObject(status);
+  return return200(status);
 };
