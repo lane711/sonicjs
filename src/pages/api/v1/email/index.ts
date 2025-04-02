@@ -1,7 +1,7 @@
 import { Resend } from "resend";
 import MagicLinkEmail from "@emails/magic-link";
 import React from "react";
-import {  return400 } from "@services/return-types";
+import {  return200, return400, return500 } from "@services/return-types";
 import type { APIRoute } from "astro";
 
 export const POST: APIRoute = async (context) => {
@@ -17,6 +17,9 @@ export const POST: APIRoute = async (context) => {
   }
 
   // Additional optional parameters
+  const to = content.to;
+  const subject = content.subject;
+  const text = content.text;
   const from = content.from || "noreply@example.com"; // Default from address
   const templateData = content.templateData || {}; // Data to pass to email template
   const replyTo = content.replyTo; // Optional reply-to address
@@ -28,10 +31,10 @@ export const POST: APIRoute = async (context) => {
 
   (async function () {
     const { data, error } = await resend.emails.send({
-      from: "lane@sonicjs.com",
-      to: ["ldc0618@gmail.com"],
-      subject: "Hello World",
-      text: "Hello World",
+      from: from,
+      to: [to],
+      subject,
+      text: text,
     });
 
     if (error) {
