@@ -3,11 +3,11 @@ import { return200, return200WithObject, return404 } from "@services/return-type
 import MagicLinkEmail from "@emails/magic-link";
 import React from "react";
 import { Resend } from "resend";
-import { getRecords } from "@services/data";
+import { getRecords, updateRecord } from "@services/data";
 
 export const GET = async (context) => {
   let params = context.params;
-  const email = params.email;
+  const email = params.email.trim().toLowerCase();
 
   const otp = generateOTPPassword(5);
 
@@ -17,7 +17,7 @@ export const GET = async (context) => {
     {
       filters: {
         email: {
-          $eq: email // the email address you want to look up
+          $contains: email // the email address you want to look up
         }
       }
     },
@@ -28,6 +28,25 @@ export const GET = async (context) => {
   if(!user.data.length){
     return return404()
   }
+
+  const now = new Date();
+  const expiresOn = now.getTime() + (4 * 60 * 60 * 1000); // 4 hours in future
+
+  const updated = await updateRecord(
+    context.locals.runtime.env.D1,
+    {},
+    {
+      table: "users",
+      id: user.data[0].id,
+      data: {
+        passwordOTP: otp,
+        passwordOTPExpiresOn: expiresOn
+      }
+    },
+    {}
+  );
+
+  return return200WithObject(updated);
 
 //   const react = React.createElement(<MagicLinkEmail otp={otp} />)
 
