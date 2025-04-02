@@ -1,7 +1,0 @@
-
-> sonicjs@0.3.2 build
-> astro check && astro build
-
-14:37:28 [WARN] The currently selected adapter `@astrojs/cloudflare` is not compatible with the image service "Sharp".
-14:37:28 [types] Generated 36ms
-14:37:28 [check] Getting diagnostics for Astro files in /Users/8349/Dev/refs/sonicjs...
