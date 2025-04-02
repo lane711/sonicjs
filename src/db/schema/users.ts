@@ -1,4 +1,4 @@
-import { sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, uniqueIndex, integer } from "drizzle-orm/sqlite-core";
 import { relations, type InferSelectModel } from "drizzle-orm";
 import { auditSchema } from "./audit";
 import * as posts from "@custom/db/schema/posts";
@@ -8,8 +8,6 @@ import * as comments from "@custom/db/schema/comments";
 import { isAdmin, isAdminOrEditor, isAdminOrUser } from "../config-helpers";
 import type { ApiConfig } from "../routes";
 import { hashString } from "@services/cyrpt";
-import { boolean } from "drizzle-orm/mysql-core";
-import { integer } from "drizzle-orm/pg-core";
 export const tableName = "users";
 export const name = "Users";
 
