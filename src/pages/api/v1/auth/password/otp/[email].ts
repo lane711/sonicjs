@@ -1,5 +1,5 @@
 import { sendEmailResend } from "@services/email";
-import { return200, return200, return404 } from "@services/return-types";
+import { return200, return404 } from "@services/return-types";
 import MagicLinkEmail from "@emails/magic-link";
 import React from "react";
 import { Resend } from "resend";
@@ -17,20 +17,20 @@ export const GET = async (context) => {
     {
       filters: {
         email: {
-          $contains: email // the email address you want to look up
-        }
-      }
+          $contains: email, // the email address you want to look up
+        },
+      },
     },
     `user-lookup-${email}`, // cache key
     "fastest"
   );
 
-  if(!user.data.length){
-    return return404()
+  if (!user.data.length) {
+    return return404();
   }
 
   const now = new Date();
-  const expiresOn = now.getTime() + (4 * 60 * 60 * 1000); // 4 hours in future
+  const expiresOn = now.getTime() + 4 * 60 * 60 * 1000; // 4 hours in future
 
   const updated = await updateRecord(
     context.locals.runtime.env.D1,
@@ -40,33 +40,35 @@ export const GET = async (context) => {
       id: user.data[0].id,
       data: {
         passwordOTP: otp,
-        passwordOTPExpiresOn: expiresOn
-      }
+        passwordOTPExpiresOn: expiresOn,
+      },
     },
     {}
   );
 
   return return200(updated);
 
-//   const react = React.createElement(<MagicLinkEmail otp={otp} />)
+  //   const react = React.createElement(<MagicLinkEmail otp={otp} />)
 
   const resend = new Resend(context.locals.runtime.env.RESEND_API_KEY);
 
-
   const result = await resend.emails.send({
     from: context.locals.runtime.env.EMAIL_FROM,
-    to :email,
+    to: email,
     subject: "One Time Password",
-    react: MagicLinkEmail({ otp, baseUrl: context.locals.runtime.env.BASE_URL }),
+    react: MagicLinkEmail({
+      otp,
+      baseUrl: context.locals.runtime.env.BASE_URL,
+    }),
   });
 
-//   const result = await sendEmailResend(
-//     context,
-//     context.locals.runtime.env.SEND_EMAIL_FROM,
-//     params.email,
-//     "One Time Password",
-    
-//   );
+  //   const result = await sendEmailResend(
+  //     context,
+  //     context.locals.runtime.env.SEND_EMAIL_FROM,
+  //     params.email,
+  //     "One Time Password",
+
+  //   );
 
   return return200(result);
 };
@@ -74,7 +76,7 @@ export const GET = async (context) => {
 // declare all characters
 const characters = "ABCDEFGHJKLMNPQRTUVWXY123456789";
 
-function generateOTPPassword(length) {
+function generateOTPPassword(length: number) {
   let result = " ";
   const charactersLength = characters.length;
   for (let i = 0; i < length; i++) {

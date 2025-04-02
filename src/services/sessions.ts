@@ -72,7 +72,7 @@ export async function validateSessionToken(
   }
   const { user, session } = result[0];
   delete user.password;
-  user.profile = user.profile ? JSON.parse(user.profile) : {};
+  user.profile = user.profile ? JSON.parse(user.profile as string) : {};
   delete session.id;
   const sessionWithToken: SessionWithToken = { ...session, token };
 

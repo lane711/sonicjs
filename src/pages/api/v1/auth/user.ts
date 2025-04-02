@@ -1,6 +1,5 @@
 import {
   return200,
-  return200,
   return401,
 } from "@services/return-types";
 import { validateSessionToken } from "@services/sessions";

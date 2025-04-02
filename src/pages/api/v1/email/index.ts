@@ -1,7 +1,12 @@
 import { Resend } from "resend";
 import MagicLinkEmail from "@emails/magic-link";
 import React from "react";
-import {  return200, return400, return500 } from "@services/return-types";
+import {
+  return200,
+  return400,
+  return401,
+  return500,
+} from "@services/return-types";
 import type { APIRoute } from "astro";
 
 export const POST: APIRoute = async (context) => {
@@ -10,10 +15,31 @@ export const POST: APIRoute = async (context) => {
   const params = context.params;
 
   const request = context.request;
-  const content = await request.json();
+  const json = await request.json() as { data: { 
+    to?: string;
+    subject?: string;
+    token?: string;
+    text?: string;
+    from?: string;
+    templateData?: Record<string, unknown>;
+    replyTo?: string;
+    cc?: string[];
+    bcc?: string[];
+    attachments?: any[];
+  }};
+  const content = json.data;
 
-  if (!content.to || !content.subject || !content.template) {
-    return return400("Missing required parameters: 'to', 'subject', and 'template' are required")
+  if (!content.to || !content.subject) {
+    return return400(
+      "Missing required parameters: 'to', 'subject', and 'template' are required"
+    );
+  }
+
+  if (
+    !content.token ||
+    content.token !== context.locals.runtime.env.EMAIL_CLIENT_TOKEN
+  ) {
+    return return401();
   }
 
   // Additional optional parameters
@@ -27,25 +53,21 @@ export const POST: APIRoute = async (context) => {
   const bcc = content.bcc; // Optional BCC recipients
   const attachments = content.attachments; // Optional attachments
 
-  const resend = new Resend(context.locals.runtime.env.RESEND_API_KEY);
+  const resend = new Resend(context.locals.runtime.env.RESEND_API_KEY as string);
 
-  (async function () {
-    const { data, error } = await resend.emails.send({
-      from: from,
-      to: [to],
-      subject,
-      text: text,
-    });
+  const { data, error } = await resend.emails.send({
+    from: from,
+    to: [to],
+    subject,
+    text: text,
+  });
 
-    if (error) {
-      return return500(error);
-    }
-    return return200(data);
-
-  })();
+  if (error) {
+    return return500(error);
+  }
+  return return200(data);
 
   // return new Response(JSON.stringify({ message: "email test" }), {
   //   status: 200,
   // });
-
 };
