@@ -1,20 +1,19 @@
-export const return200 = (data = {}) => {
+export function return200(): Response;
+export function return200(data: object): Response;
+export function return200(data: object = {}): Response {
+  if (Object.keys(data).length === 0) {
+    return new Response(
+      JSON.stringify({
+        data,
+      }),
+      { status: 200 }
+    );
+  }
   return new Response(
-    JSON.stringify({
-      data,
-    }),
+    JSON.stringify(data),
     { status: 200 }
   );
-};
-
-export const return200WithObject = (object) => {
-  return new Response(
-    JSON.stringify(
-      object,
-    ),
-    { status: 200 }
-  );
-};
+}
 
 export const return201 = (message = "Record Created") => {
   return new Response(
@@ -61,11 +60,20 @@ export const return404 = (message = "Not Found") => {
   );
 };
 
-export const return500 = (message = "Internal Server Error") => {
+export function return500(): Response;
+export function return500(message: string): Response;
+export function return500(object: object): Response;
+export function return500(messageOrObject: string | object = "Internal Server Error"): Response {
+  if (typeof messageOrObject === "string") {
+    return new Response(
+      JSON.stringify({
+        message: messageOrObject,
+      }),
+      { status: 500 }
+    );
+  }
   return new Response(
-    JSON.stringify({
-      message,
-    }),
+    JSON.stringify(messageOrObject),
     { status: 500 }
   );
-};
+}

@@ -1,5 +1,4 @@
 import { sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { relations } from "drizzle-orm";
 import { auditSchema } from "@schema/audit";
 import { isAdminOrEditor } from "db/config-helpers";
 import type { ApiConfig } from "db/routes";
@@ -9,9 +8,9 @@ export const icon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox
   <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
 </svg>
 `;
+
 export const tableName = "categories";
 export const name = "Categories";
-
 export const route = "categories";
 
 export const definition = {

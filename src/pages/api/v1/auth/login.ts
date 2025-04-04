@@ -2,7 +2,6 @@ import { login } from "@services/auth";
 import { hashString } from "@services/cyrpt";
 import {
   return200,
-  return200WithObject,
   return401,
   return500,
 } from "@services/return-types";
@@ -23,7 +22,7 @@ export const POST: APIRoute = async (context) => {
     ) as { bearer: string; expires: string };
 
     if (loginResult) {
-      return return200WithObject({
+      return return200({
         bearer: loginResult.bearer,
         expires: loginResult.expires,
       });

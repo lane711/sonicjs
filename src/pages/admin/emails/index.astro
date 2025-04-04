@@ -1,0 +1,9 @@
+---
+import WelcomeEmail from "@emails/welcome";
+import AdminLayout from "../layouts/admin-layout.astro";
+import React from "react";
+
+const baseUrl = Astro.url.origin;
+---
+
+<WelcomeEmail data={{ firstName: "John" }} />
