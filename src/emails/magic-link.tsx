@@ -1,235 +1,148 @@
 import {
-    Body,
-    Column,
-    Container,
-    Head,
-    Heading,
-    Html,
-    Img,
-    Link,
-    Preview,
-    Row,
-    Section,
-    Text,
-  } from '@react-email/components';
-  import * as React from 'react';
-  
-  interface SlackConfirmEmailProps {
-    otp?: string;
-    baseUrl?: string;
-  }
-  
-export const MagicLinkEmail = ({
-    otp,
-    baseUrl
-  }: SlackConfirmEmailProps) => (
-    <Html>
-      <Head />
-      <Body style={main}>
-        <Preview>Confirm your email address</Preview>
-        <Container style={container}>
-          <Section style={logoContainer}>
-            <Img
-              src={`${baseUrl}/static/slack-logo.png`}
-              width="120"
-              height="36"
-              alt="Slack"
-            />
-          </Section>
-          <Heading style={h1}>Confirm your email address</Heading>
-          <Text style={heroText}>
-            Your confirmation code is below - enter it in your open browser window
-            and we'll help you get signed in.
+  Body,
+  Button,
+  Container,
+  Head,
+  Hr,
+  Html,
+  Img,
+  Link,
+  Preview,
+  Section,
+  Text,
+} from '@react-email/components';
+
+const baseUrl = process.env.EMAIL_BASE_URL
+  ? `https://${process.env.EMAIL_BASE_URL}`
+  : '';
+
+export const StripeWelcomeEmail = () => (
+  <Html>
+    <Head />
+    <Body style={main}>
+      <Preview>You're now ready to make live transactions with Stripe!</Preview>
+      <Container style={container}>
+        <Section style={box}>
+          <Img
+            src={`${baseUrl}/public/images/sonicjs-logo-dark.svg`}
+            width="300"
+            alt="SonicJs"
+          />
+          <Hr style={hr} />
+          <Text style={paragraph}>
+            Thanks for submitting your account information. You're now ready to
+            make live transactions with Stripe!
           </Text>
-  
-          <Section style={codeBox}>
-            <Text style={confirmationCodeText}>{otp}</Text>
-          </Section>
-  
-          <Text style={text}>
-            If you didn't request this email, there's nothing to worry about, you
-            can safely ignore it.
+          <Text style={paragraph}>
+            You can view your payments and a variety of other information about
+            your account right from your dashboard.
           </Text>
-  
-          <Section>
-            <Row style={footerLogos}>
-              <Column style={{ width: '66%' }}>
-                <Img
-                  src={`${baseUrl}/static/slack-logo.png`}
-                  width="120"
-                  height="36"
-                  alt="Slack"
-                />
-              </Column>
-              <Column>
-                <Section>
-                  <Row>
-                    <Column>
-                      <Link href="/">
-                        <Img
-                          src={`${baseUrl}/static/slack-twitter.png`}
-                          width="32"
-                          height="32"
-                          alt="Slack"
-                          style={socialMediaIcon}
-                        />
-                      </Link>
-                    </Column>
-                    <Column>
-                      <Link href="/">
-                        <Img
-                          src={`${baseUrl}/static/slack-facebook.png`}
-                          width="32"
-                          height="32"
-                          alt="Slack"
-                          style={socialMediaIcon}
-                        />
-                      </Link>
-                    </Column>
-                    <Column>
-                      <Link href="/">
-                        <Img
-                          src={`${baseUrl}/static/slack-linkedin.png`}
-                          width="32"
-                          height="32"
-                          alt="Slack"
-                          style={socialMediaIcon}
-                        />
-                      </Link>
-                    </Column>
-                  </Row>
-                </Section>
-              </Column>
-            </Row>
-          </Section>
-  
-          <Section>
+          <Button style={button} href="https://dashboard.stripe.com/login">
+            View your Stripe Dashboard
+          </Button>
+          <Hr style={hr} />
+          <Text style={paragraph}>
+            If you haven't finished your integration, you might find our{' '}
+            <Link style={anchor} href="https://docs.stripe.com/dashboard/basics">
+              docs
+            </Link>{' '}
+            handy.
+          </Text>
+          <Text style={paragraph}>
+            Once you're ready to start accepting payments, you'll just need to
+            use your live{' '}
             <Link
-              style={footerLink}
-              href="https://slackhq.com"
-              target="_blank"
-              rel="noopener noreferrer"
+              style={anchor}
+              href="https://dashboard.stripe.com/login?redirect=%2Fapikeys"
             >
-              Our blog
+              API keys
+            </Link>{' '}
+            instead of your test API keys. Your account can simultaneously be
+            used for both test and live requests, so you can continue testing
+            while accepting live payments. Check out our{' '}
+            <Link style={anchor} href="https://docs.stripe.com/dashboard/basics">
+              tutorial about account basics
             </Link>
-            &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+            .
+          </Text>
+          <Text style={paragraph}>
+            Finally, we've put together a{' '}
             <Link
-              style={footerLink}
-              href="https://slack.com/legal"
-              target="_blank"
-              rel="noopener noreferrer"
+              style={anchor}
+              href="https://docs.stripe.com/get-started/checklist/website"
             >
-              Policies
+              quick checklist
+            </Link>{' '}
+            to ensure your website conforms to card network standards.
+          </Text>
+          <Text style={paragraph}>
+            We'll be here to help you with any step along the way. You can find
+            answers to most questions and get in touch with us on our{' '}
+            <Link style={anchor} href="https://support.stripe.com">
+              support site
             </Link>
-            &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-            <Link
-              style={footerLink}
-              href="https://slack.com/help"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Help center
-            </Link>
-            &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-            <Link
-              style={footerLink}
-              href="https://slack.com/community"
-              target="_blank"
-              rel="noopener noreferrer"
-              data-auth="NotApplicable"
-              data-linkindex="6"
-            >
-              Slack Community
-            </Link>
-            <Text style={footerText}>
-              ©2022 Slack Technologies, LLC, a Salesforce company. <br />
-              500 Howard Street, San Francisco, CA 94105, USA <br />
-              <br />
-              All rights reserved.
-            </Text>
-          </Section>
-        </Container>
-      </Body>
-    </Html>
-  );
-  
-  MagicLinkEmail.PreviewProps = {
-    otp: 'DJZ-TLX',
-  } as SlackConfirmEmailProps;
-  
-  export default MagicLinkEmail;
-  
-  const footerText = {
-    fontSize: '12px',
-    color: '#b7b7b7',
-    lineHeight: '15px',
-    textAlign: 'left' as const,
-    marginBottom: '50px',
-  };
-  
-  const footerLink = {
-    color: '#b7b7b7',
-    textDecoration: 'underline',
-  };
-  
-  const footerLogos = {
-    marginBottom: '32px',
-    paddingLeft: '8px',
-    paddingRight: '8px',
-    display: 'block',
-  };
-  
-  const socialMediaIcon = {
-    display: 'inline',
-    marginLeft: '32px',
-  };
-  
-  const main = {
-    backgroundColor: '#ffffff',
-    margin: '0 auto',
-    fontFamily:
-      "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
-  };
-  
-  const container = {
-    margin: '0 auto',
-    padding: '0px 20px',
-  };
-  
-  const logoContainer = {
-    marginTop: '32px',
-  };
-  
-  const h1 = {
-    color: '#1d1c1d',
-    fontSize: '36px',
-    fontWeight: '700',
-    margin: '30px 0',
-    padding: '0',
-    lineHeight: '42px',
-  };
-  
-  const heroText = {
-    fontSize: '20px',
-    lineHeight: '28px',
-    marginBottom: '30px',
-  };
-  
-  const codeBox = {
-    background: 'rgb(245, 244, 245)',
-    borderRadius: '4px',
-    marginBottom: '30px',
-    padding: '40px 10px',
-  };
-  
-  const confirmationCodeText = {
-    fontSize: '30px',
-    textAlign: 'center' as const,
-    verticalAlign: 'middle',
-  };
-  
-  const text = {
-    color: '#000',
-    fontSize: '14px',
-    lineHeight: '24px',
-  };
+            .
+          </Text>
+          <Text style={paragraph}>— The Stripe team</Text>
+          <Hr style={hr} />
+          <Text style={footer}>
+            Stripe, 354 Oyster Point Blvd, South San Francisco, CA 94080
+          </Text>
+        </Section>
+      </Container>
+    </Body>
+  </Html>
+);
+
+export default StripeWelcomeEmail;
+
+const main = {
+  backgroundColor: '#f6f9fc',
+  fontFamily:
+    '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif',
+};
+
+const container = {
+  backgroundColor: '#ffffff',
+  margin: '0 auto',
+  padding: '20px 0 48px',
+  marginBottom: '64px',
+};
+
+const box = {
+  padding: '0 48px',
+};
+
+const hr = {
+  borderColor: '#e6ebf1',
+  margin: '20px 0',
+};
+
+const paragraph = {
+  color: '#525f7f',
+  fontSize: '16px',
+  lineHeight: '24px',
+  textAlign: 'left' as const,
+};
+
+const anchor = {
+  color: '#556cd6',
+};
+
+const button = {
+  backgroundColor: '#656ee8',
+  borderRadius: '5px',
+  color: '#fff',
+  fontSize: '16px',
+  fontWeight: 'bold',
+  textDecoration: 'none',
+  textAlign: 'center' as const,
+  display: 'block',
+  padding: '10px',
+};
+
+const footer = {
+  color: '#8898aa',
+  fontSize: '12px',
+  lineHeight: '16px',
+};
