@@ -1,6 +1,6 @@
 import { sendEmailResend } from "@services/email";
 import { return200, return404 } from "@services/return-types";
-import MagicLinkEmail from "@emails/magic-link";
+import MagicLinkEmail from "@emails/welcome";
 import React from "react";
 import { Resend } from "resend";
 import { getRecords, updateRecord } from "@services/data";

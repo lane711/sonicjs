@@ -1,5 +1,5 @@
 import { Resend } from "resend";
-import MagicLinkEmail from "@emails/magic-link";
+import WelcomeEmail from "@emails/welcome";
 import React from "react";
 import {
   return200,
@@ -21,6 +21,7 @@ export const POST: APIRoute = async (context) => {
     token?: string;
     text?: string;
     from?: string;
+    data?: Record<string, unknown>;
     templateData?: Record<string, unknown>;
     replyTo?: string;
     cc?: string[];
@@ -59,7 +60,9 @@ export const POST: APIRoute = async (context) => {
     from: from,
     to: [to],
     subject,
-    text: text,
+    react: WelcomeEmail({
+      data: templateData
+    }),
   });
 
   if (error) {

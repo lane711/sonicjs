@@ -16,12 +16,15 @@ const baseUrl = process.env.EMAIL_BASE_URL
   ? `https://${process.env.EMAIL_BASE_URL}`
   : '';
 
-export const StripeWelcomeEmail = () => (
+
+
+export const WelcomeEmail = ({data}) => (
   <Html>
     <Head />
     <Body style={main}>
       <Preview>You're now ready to make live transactions with Stripe!</Preview>
       <Container style={container}>
+      <Container style={containerPadding}>
         <Section style={box}>
           <Img
             src={`${baseUrl}/public/images/sonicjs-logo-dark.svg`}
@@ -30,6 +33,7 @@ export const StripeWelcomeEmail = () => (
           />
           <Hr style={hr} />
           <Text style={paragraph}>
+            Hi {data.firstName},<br />
             Thanks for submitting your account information. You're now ready to
             make live transactions with Stripe!
           </Text>
@@ -48,53 +52,19 @@ export const StripeWelcomeEmail = () => (
             </Link>{' '}
             handy.
           </Text>
-          <Text style={paragraph}>
-            Once you're ready to start accepting payments, you'll just need to
-            use your live{' '}
-            <Link
-              style={anchor}
-              href="https://dashboard.stripe.com/login?redirect=%2Fapikeys"
-            >
-              API keys
-            </Link>{' '}
-            instead of your test API keys. Your account can simultaneously be
-            used for both test and live requests, so you can continue testing
-            while accepting live payments. Check out our{' '}
-            <Link style={anchor} href="https://docs.stripe.com/dashboard/basics">
-              tutorial about account basics
-            </Link>
-            .
-          </Text>
-          <Text style={paragraph}>
-            Finally, we've put together a{' '}
-            <Link
-              style={anchor}
-              href="https://docs.stripe.com/get-started/checklist/website"
-            >
-              quick checklist
-            </Link>{' '}
-            to ensure your website conforms to card network standards.
-          </Text>
-          <Text style={paragraph}>
-            We'll be here to help you with any step along the way. You can find
-            answers to most questions and get in touch with us on our{' '}
-            <Link style={anchor} href="https://support.stripe.com">
-              support site
-            </Link>
-            .
-          </Text>
-          <Text style={paragraph}>— The Stripe team</Text>
+          <Text style={paragraph}>— The SonicJs team</Text>
           <Hr style={hr} />
           <Text style={footer}>
             Stripe, 354 Oyster Point Blvd, South San Francisco, CA 94080
           </Text>
         </Section>
+        </Container>
       </Container>
     </Body>
   </Html>
 );
 
-export default StripeWelcomeEmail;
+export default WelcomeEmail;
 
 const main = {
   backgroundColor: '#f6f9fc',
@@ -107,6 +77,11 @@ const container = {
   margin: '0 auto',
   padding: '20px 0 48px',
   marginBottom: '64px',
+};
+
+
+const containerPadding = {
+  margine: '48px',
 };
 
 const box = {

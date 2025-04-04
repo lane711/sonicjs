@@ -1,19 +1,9 @@
 ---
-import MagicLinkEmail from "@emails/magic-link";
+import WelcomeEmail from "@emails/welcome";
 import AdminLayout from "../layouts/admin-layout.astro";
 import React from "react";
 
 const baseUrl = Astro.url.origin;
 ---
 
-<AdminLayout title=`SonicJs Admin` | Settings `>
-  <h1 class="text-base font-semibold leading-6 ">Emails</h1>
-    <p class="mt-4">Settings management will be available in a future release.</p>
-    <div class="mt-8">
-        <h2 class="text-base font-semibold leading-6 ">Magic Link Email Template Preview</h2>
-        <div class="mt-4  p-6 rounded-lg">
-            <MagicLinkEmail otp="ABC123" baseUrl={baseUrl} />
-        </div>
-
-    </div>
-</AdminLayout>
+<WelcomeEmail data={{ firstName: "John" }} />
