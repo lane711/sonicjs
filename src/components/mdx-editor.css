@@ -1,0 +1,9 @@
+.editor-textbox:not([class*="_placeholder_"]) {
+    @apply w-full mt-1 rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm min-h-64;
+    @apply ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500;
+}
+
+.mdxeditor-popup-container div[role="dialog"] {
+    @apply bg-gray-900;
+}
+

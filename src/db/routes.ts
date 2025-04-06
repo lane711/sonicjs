@@ -179,6 +179,9 @@ export interface ApiConfig {
           type: "textArea";
         }
       | {
+          type: "mdxEditor";
+        }
+      | {
           type: "auto" | "string[]";
         }
       | {

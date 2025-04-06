@@ -4,6 +4,8 @@ import { apiConfig } from '../../../db/routes';
 import { getApiAccessControlResult, getItemReadResult } from '../../../auth/auth-helpers';
 import { getRecords } from '../../../services/data';
 
+const baseURL = 'http://localhost/api/v1/';
+
 vi.mock('../../../db/routes', () => ({
   apiConfig: [
     {
@@ -40,7 +42,7 @@ describe('GET /api/v1/:table', () => {
     const context = {
       params: { table: 'undefined-table' },
       locals: { runtime: { env: {} } },
-      request: { url: 'http://localhost/api/v1/undefined-table' },
+      request: { url: `${baseURL}undefined-table` },
     };
 
     const response = await GET(context as any);
@@ -54,23 +56,23 @@ describe('GET /api/v1/:table', () => {
     const context = {
       params: { table: 'test-table' },
       locals: { runtime: { env: {} } },
-      request: { url: 'http://localhost/api/v1/test-table' },
+      request: { url: `${baseURL}test-table` },
     };
 
     (getApiAccessControlResult as any).mockResolvedValue(false);
 
     const response = await GET(context as any);
-    const result = await response.json() as { error: string };
-
+    const result = await response.json() as { message: string };
+    
     expect(response.status).toBe(401);
-    expect(result.error).toBe('Unauthorized');
+    expect(result.message).toBe('Unauthorized');
   });
 
   test('returns data if access control passes', async () => {
     const context = {
       params: { table: 'test-table' },
       locals: { runtime: { env: {} } },
-      request: { url: 'http://localhost/api/v1/test-table' },
+      request: { url: `${baseURL}test-table` },
     };
 
     const mockData = { data: [{ id: 1, name: 'test' }] };
