@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/d1";
 import { and, eq } from "drizzle-orm";
-import { tableSchemas } from "../db/routes";
+import { tableSchemas } from "@custom/custom.config";
 import qs from "qs";
 import { uuid } from "./utils";
 

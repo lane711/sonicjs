@@ -1,10 +1,7 @@
 import { isAdminOrEditor } from "./config-helpers";
 import type { APIContext as AppContext } from "astro";
 
-import { tableSchemas as coreTableSchemas } from "@schema/schema.config";
-import { tableSchemas as customTableSchemas } from "@custom/custom.config";
-
-export const tableSchemas = { ...coreTableSchemas, ...customTableSchemas };
+import { tableSchemas } from "@custom/custom.config";
 
 export type SonicJSConfig = {
   apiConfig: ApiConfig[];
