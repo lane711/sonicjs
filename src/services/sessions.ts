@@ -9,7 +9,7 @@ import {
 } from "@oslojs/encoding";
 import { sha256 } from "@oslojs/crypto/sha2";
 import { drizzle, type DrizzleD1Database } from "drizzle-orm/d1";
-import { tableSchemas } from "db/routes";
+import { tableSchemas } from "@custom/custom.config";
 
 // import type { User, Session } from "./db.js";
 
