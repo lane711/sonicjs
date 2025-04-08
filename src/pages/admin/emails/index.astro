@@ -1,9 +1,17 @@
 ---
 import WelcomeEmail from "@emails/welcome";
 import AdminLayout from "../layouts/admin-layout.astro";
-import React from "react";
+import { availableEmails } from "@emails/index";
 
 const baseUrl = Astro.url.origin;
 ---
 
-<WelcomeEmail data={{ firstName: "John" }} />
+<AdminLayout title=`SonicJs Admin` | Settings `>
+    <div>
+        {availableEmails.map((email) => (
+            <div>
+                <h1><a target="_blank" href={`/admin/emails/${email}`}>{email}</a></h1>
+            </div>
+        ))}
+    </div>
+</AdminLayout>
