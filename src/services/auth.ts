@@ -45,10 +45,16 @@ export const login = async (
 export const doesAdminAccountExist = async (d1): Promise<boolean> => {
   const db = drizzle(d1);
 
-  const record = await db
-    .select()
-    .from(userTable)
-    .where(eq(userTable.role, "admin"));
+  let record;
+  try {
+    record = await db
+      .select()
+      .from(userTable)
+      .where(eq(userTable.role, "admin"));
+  } catch (error) {
+    console.error("\x1b[31m\x1b[1m\n\n\nSonicJs Error checking for admin account. Please ensure that your database has been created, tables exist, and that your wrangler.toml (if local) or you variables are set (if on cloudflare). \n\nAlso make sure that you have run the migrations per the readme (for local) and the docs (for cloudflare) https://sonicjs.com/deploy.\n\n\n\x1b[0m", error);
+    throw error;
+  }
   const adminUser = record[0];
 
   if (!adminUser) {
