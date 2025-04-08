@@ -2,7 +2,6 @@ import { login } from "@services/auth";
 import { hashString } from "@services/cyrpt";
 import {
   return200,
-  return200WithObject,
   return401,
   return500,
 } from "@services/return-types";
@@ -21,7 +20,7 @@ export const POST: APIRoute = async (context) => {
       await invalidateSession(context.locals.runtime.env.D1, sessionId);
     }
 
-    return return200WithObject({
+    return return200({
       message: "Successfully logged out",
     });
   } else {

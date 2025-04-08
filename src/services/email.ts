@@ -1,4 +1,6 @@
 import { createTransport, type Transporter } from "nodemailer";
+import React from "react";
+import { Resend } from "resend";
 
 type SendEmailOptions = {
   /** Email address of the recipient */
@@ -9,7 +11,27 @@ type SendEmailOptions = {
   html: string;
 };
 
-export async function sendEmail(options: SendEmailOptions): Promise<Transporter> {
+
+export async function sendEmailResend(context, from, to, subject, template) {
+  const resend = new Resend(context.locals.runtime.env.RESEND_API_KEY);
+
+  (async function () {
+    const { data, error } = await resend.emails.send({
+      from,
+      to,
+      subject,
+      react: React.createElement(template),
+    });
+
+    if (error) {
+      return console.error({ error });
+    }
+
+    return data;
+  })();
+}
+
+export async function sendEmailNodeMail(options: SendEmailOptions): Promise<Transporter> {
   const transporter = await getEmailTransporter();
   return new Promise(async (resolve, reject) => {
     // Build the email message
