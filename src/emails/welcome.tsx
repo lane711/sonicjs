@@ -34,6 +34,7 @@ export const WelcomeEmail = ({data}) => (
           <Hr style={hr} />
           <Text style={paragraph}>
             Hi {data.firstName},<br />
+            Welcome to SonicJs!
             Thanks for submitting your account information. You're now ready to
             make live transactions with Stripe!
           </Text>

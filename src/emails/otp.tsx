@@ -33,6 +33,7 @@ export const OTPEmail: React.FC<EmailProps> = ({ data }) => (
           <Hr style={hr} />
           <Text style={paragraph}>
             Hi {data.firstName},<br />
+            One time password for your account is {data.otp}
             Thanks for submitting your account information. You're now ready to
             make live transactions with Stripe!
           </Text>
