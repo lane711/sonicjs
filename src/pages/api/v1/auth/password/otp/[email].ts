@@ -4,6 +4,7 @@ import MagicLinkEmail from "@emails/welcome";
 import React from "react";
 import { Resend } from "resend";
 import { getRecords, updateRecord } from "@services/data";
+import { OTPEmail } from "@emails/otp";
 
 export const GET = async (context) => {
   let params = context.params;
@@ -46,19 +47,18 @@ export const GET = async (context) => {
     {}
   );
 
-  return return200(updated);
-
   //   const react = React.createElement(<MagicLinkEmail otp={otp} />)
 
   const resend = new Resend(context.locals.runtime.env.RESEND_API_KEY);
+  const firstName = user.data[0].firstName;
 
   const result = await resend.emails.send({
     from: context.locals.runtime.env.EMAIL_FROM,
     to: email,
     subject: "One Time Password",
-    react: MagicLinkEmail({
+    react: OTPEmail({
       otp,
-      baseUrl: context.locals.runtime.env.BASE_URL,
+      firstName: firstName,
     }),
   });
 
