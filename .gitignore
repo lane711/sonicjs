@@ -33,3 +33,7 @@ TEMP.md
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+
+# local sonicjs-core
+_sonicjs-core
