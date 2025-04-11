@@ -90,7 +90,7 @@ Details of our performance benchmark can be found at SonicJs.com. Here is a part
 We gladly accept Pull Requests (PRs) from the community.
 
 ## Road Map
-Curious what's on the horizon for SonicJs? Check out our (Project Backlog)[https://github.com/users/lane711/projects/2].
+Curious what's on the horizon for SonicJs? Check out our [Project Backlog](https://github.com/users/lane711/projects/2).
 
 While you're there, please consider picking up a story in the backlog. 
 
