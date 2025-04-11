@@ -7,11 +7,9 @@ import {
 import { sequence } from "astro:middleware";
 import { kvGet } from "@services/kv";
 import { cacheRequestInsert } from "@services/kv-data";
-import { echo } from "sonicjs-core";
 
 async function cache(context, next) {
-  const test = echo("test");
-  console.log("soncijs core echo test", test);
+
   const start = Date.now();
 
   if (context.locals.runtime.env.DISABLED_CACHE) {

@@ -2,7 +2,7 @@ import { drizzle } from "drizzle-orm/d1";
 import { and, eq } from "drizzle-orm";
 import { tableSchemas } from "@custom/custom.config";
 import qs from "qs";
-import { uuid } from "sonicjs-core";
+import { uuid } from "./utils";
 
 // export async function getAllContent(db) {
 //   const { results } = await db.prepare("SELECT * FROM users").all();

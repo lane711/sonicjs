@@ -1,10 +1,10 @@
 ---
-import { convertFormDataToObject } from "sonicjs-core";
 import LoginLayout from "../layouts/admin-login.astro";
 import { setSessionTokenCookie } from "@services/cookies";
 import { doesAdminAccountExist } from "@services/auth";
 import { Image } from "astro:assets";
 import SonicJsLogo from "../../../../public/images/sonicjs-logo.svg";
+import { convertFormDataToObject } from "@services/utils";
 
 //check if there is an admin account, if not redirect admin to register
 let isAdminAccount = await doesAdminAccountExist(Astro.locals.runtime.env.D1);
