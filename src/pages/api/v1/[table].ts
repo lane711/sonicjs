@@ -181,6 +181,10 @@ export const POST: APIRoute = async (context) => {
 
   let content: { data: any; table?: string } = { data: {} };
   content = await request.json();
+
+  if(!content.data){
+    return return500("Data must be wrapped in a data object");
+  }
   // const table = apiConfig.find((entry) => entry.route === route).table;
   // context.env.D1DATA = context.env.D1DATA;
 
