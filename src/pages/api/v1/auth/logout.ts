@@ -2,7 +2,6 @@ import { login } from "@services/auth";
 import { hashString } from "@services/cyrpt";
 import {
   return200,
-  return200WithObject,
   return401,
   return500,
 } from "@services/return-types";
