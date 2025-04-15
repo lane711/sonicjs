@@ -24,10 +24,11 @@ import { kvPut } from "@services/kv";
 import { validateSessionToken } from "@services/sessions";
 import { checkToken } from "@services/token";
 
-const corsHeaders = {
+const headers = {
   "Access-Control-Allow-Origin": "*", // Replace " with your specific origin if needed
   "Access-Control-Allow-Methods": "GET" /*, POST, OPTIONS'*/,
   "Access-Control-Allow-Headers": "Content-Type",
+  "Content-Type": "application/json"
 };
 
 export const OPTIONS: APIRoute = async (context) => {
@@ -156,7 +157,7 @@ export const GET: APIRoute = async (context) => {
     data.executionTime = executionTime;
 
     return new Response(JSON.stringify(data), {
-      headers: { "Content-Type": "application/json" },
+      headers: headers,
     });
   } catch (error) {
     console.log(error);
