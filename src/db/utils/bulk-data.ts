@@ -5,7 +5,7 @@
 // npx wrangler d1 execute sonicjs --remote --file=./src/db/utils/output/inserts.sql
 
 import { faker } from "@faker-js/faker";
-const recordCount = 200000;
+const recordCount = 100;
 
 const main = async () => {
   for (let i = 0; i < recordCount; i++) {
