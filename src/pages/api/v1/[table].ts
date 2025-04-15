@@ -129,13 +129,7 @@ export const GET: APIRoute = async (context) => {
     const executionTime = end - start;
     data.executionTime = executionTime;
 
-<<<<<<< HEAD
-    return new Response(JSON.stringify(data), {
-      headers: { ...corsHeaders },
-    });
-=======
     return return200(data);
->>>>>>> feature/employee-directory-demo
   } catch (error) {
     console.log(error);
     return return500(error);
