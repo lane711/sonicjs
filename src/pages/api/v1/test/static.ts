@@ -1,4 +1,3 @@
-import { return200WithObject } from '@services/return-types';
 import type { APIRoute } from "astro";
 
 export const GET: APIRoute = async (context) => {
@@ -15,5 +14,14 @@ export const GET: APIRoute = async (context) => {
         { id: 10, title: 'Tenth Blog Post', content: 'This is the content of the tenth blog post.' },
     ];
 
-    return return200WithObject(blogPosts);
+
+    return new Response(JSON.stringify(blogPosts), {
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+            'Access-Control-Max-Age': '86400', // 24 hours
+        },
+    });
 };

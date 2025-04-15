@@ -14,6 +14,7 @@ const adminCredentials = {
 };
 
 const generateViaApi = false;
+const employeeCount = 0;
 
 var token = "";
 

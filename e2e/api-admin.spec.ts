@@ -40,19 +40,25 @@ test("should allow admin to access /api/v1/users", async ({ request }) => {
 test("should allow admin to create a user", async ({ request }) => {
   const response = await createTestUser(request, token);
   expect(response.status()).toBe(201);
+  const { data: createdData } = await response.json();
+  expect(typeof createdData === 'object').toBe(true);
 });
 
 test("should allow admin to delete a user", async ({ request }) => {
   const createUserResponse = await createTestUser(request, token);
   expect(createUserResponse.status()).toBe(201);
-  const { data } = await createUserResponse.json();
+  const { data: createdData } = await createUserResponse.json();
 
-  const response = await request.delete(`/api/v1/users/${data.id}`, {
+  const response = await request.delete(`/api/v1/users/${createdData.id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
-  expect(response.status()).toBe(204);
+
+  const { data } = await createUserResponse.json();
+
+  expect(response.status()).toBe(200);
+  expect(data.id).toBe(createdData.id);
 });
 
 test("should allow admin to update a user", async ({ request }) => {

@@ -24,7 +24,7 @@ export const POST: APIRoute = async (context) => {
     ) as { bearer: string; expires: string };
 
     if (loginResult) {
-      return return200WithObject({
+      return return200({
         bearer: loginResult.bearer,
         expires: loginResult.expires,
       });

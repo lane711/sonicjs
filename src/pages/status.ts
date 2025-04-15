@@ -18,5 +18,5 @@ export const GET = async (context) => {
       KVDATA: {},
     },
   };
-  return return200WithObject(status);
+  return return200(status);
 };
