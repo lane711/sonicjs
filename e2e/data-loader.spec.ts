@@ -1,12 +1,12 @@
 // this is a script to load data into the database for performance testing purposes
 
 import { test, expect } from "@playwright/test";
-import { faker } from '@faker-js/faker';
+import { faker } from "@faker-js/faker";
 
 // Annotate entire file as serial.
-test.describe.configure({ mode: 'serial', timeout: 100 * 60 * 1000 });
+test.describe.configure({ mode: "serial", timeout: 100 * 60 * 1000 });
 
-const baseUrl = 'https://demo.sonicjs.com';
+const baseUrl = "https://demo.sonicjs.com";
 
 const adminCredentials = {
   email: "demo@demo.com",
@@ -19,7 +19,7 @@ var token = "";
 
 test.beforeAll(async ({ request }) => {
   token = await loginAsAdmin(request);
-  console.log('token', token);
+  console.log("token", token);
 });
 
 async function loginAsAdmin(request) {
@@ -33,17 +33,17 @@ async function loginAsAdmin(request) {
   return bearer;
 }
 
-
 test("create test employees", async ({ request }) => {
   for (let i = 0; i < 10; i++) {
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
     const employee = generateEmployee();
     // console.log('employee', employee);
 
     // create via api
-    if(generateViaApi) {
+    if (generateViaApi) {
       const response = await createEmployee(request, token, employee);
       expect(response.status()).toBe(201);
+    }
   }
 });
 
@@ -52,7 +52,7 @@ const createEmployee = async (request, token, employee) => {
     headers: {
       Authorization: `Bearer ${token}`,
     },
-    data: {data: employee},
+    data: { data: employee },
   });
 
   return response;
@@ -73,7 +73,9 @@ const regions = ["Northeast", "Southwest", "West", "Southeast", "Midwest"];
 
 function generateEmployee() {
   const gender = genders[randomIntFromInterval(0, 1)];
-  const firstName = faker.person.firstName(gender.toLowerCase() as "female" | "male");
+  const firstName = faker.person.firstName(
+    gender.toLowerCase() as "female" | "male"
+  );
   const lastName = faker.person.lastName();
   const fullName = `${firstName} ${lastName}`;
   const department =
@@ -98,7 +100,6 @@ function generateEmployee() {
     region,
   };
 }
-
 
 function randomIntFromInterval(min, max) {
   // min and max included
