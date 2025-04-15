@@ -28,5 +28,5 @@ export const GET: APIRoute = async (context) => {
     return return401();
   }
 
-  return return200WithObject({ data: validSession });
+  return return200({ data: validSession });
 };

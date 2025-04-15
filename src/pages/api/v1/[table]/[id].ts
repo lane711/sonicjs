@@ -23,7 +23,6 @@ import {
 } from "../../../../auth/auth-helpers";
 import {
   return200,
-  return200WithObject,
   return401,
   return404,
   return500,
@@ -40,12 +39,7 @@ export const GET = async (context) => {
   try {
     entry = apiConfig.filter((tbl) => tbl.route === tableName)[0];
   } catch (error) {
-    return new Response(
-      JSON.stringify({
-        error: `Table "${tableName}" not defined in your schema`,
-      }),
-      { status: 500 }
-    );
+    return return500(`Table "${tableName}" not defined in your schema`);
   }
 
   // let { includeContentType, source, ...params } =  context.request.query();
@@ -112,10 +106,9 @@ export const GET = async (context) => {
   const end = Date.now();
   const executionTime = end - start;
 
+  data.executionTime = executionTime;
 
-    data.executionTime = executionTime;
-
-  return return200WithObject(data);
+  return return200(data);
 };
 
 export const PUT: APIRoute = async (context) => {
@@ -128,12 +121,7 @@ export const PUT: APIRoute = async (context) => {
   try {
     entry = apiConfig.filter((tbl) => tbl.route === route)[0];
   } catch (error) {
-    return new Response(
-      JSON.stringify({
-        error: `Table "${route}" not defined in your schema`,
-      }),
-      { status: 500 }
-    );
+    return return500(`Table "${route}" not defined in your schema`);
   }
 
   const payload = await context.request.json();
@@ -201,13 +189,12 @@ export const PUT: APIRoute = async (context) => {
         result
       );
     }
-    return return200(result.data);
+    return return200({ data: result.data });
   } catch (error) {
     console.log("error updating content", error);
     return return500(error);
   }
 
-  return return200();
 };
 
 export const DELETE: APIRoute = async (context) => {
@@ -221,12 +208,7 @@ export const DELETE: APIRoute = async (context) => {
   try {
     entry = apiConfig.filter((tbl) => tbl.route === tableName)[0];
   } catch (error) {
-    return new Response(
-      JSON.stringify({
-        error: `Table "${tableName}" not defined in your schema`,
-      }),
-      { status: 500 }
-    );
+    return return500(`Table "${tableName}" not defined in your schema`);
   }
 
   // context.env.D1DATA = context.env.D1DATA;
@@ -281,13 +263,7 @@ export const DELETE: APIRoute = async (context) => {
     //   await entry.hooks.afterOperation(context, 'delete', id, record, result);
     // }
 
-    return new Response(JSON.stringify(result), {
-      status: 204,
-      headers: { "Content-Type": "application/json" },
-    });
-
-    // console.log("returning 204");
-    // return return204();
+    return return200({ data: record.data });
   } else {
     console.log("content not found");
     return return404();

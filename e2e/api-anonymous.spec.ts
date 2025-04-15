@@ -53,8 +53,10 @@ test("should not allow unauthenticated user to create a user", async ({
 }) => {
   const response = await request.post(`/api/v1/users`, {
     data: {
-      username: "newuser",
-      password: "password123",
+      data: {
+        username: "newuser",
+        password: "password123",
+      },
     },
   });
   expect(response.status()).toBe(401);

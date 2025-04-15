@@ -13,7 +13,8 @@ import {
 } from "../../../auth/auth-helpers";
 import { deleteRecord, getRecords, insertRecord } from "../../../services/data";
 import {
-  return204,
+  return200,
+  return201,
   return400,
   return401,
   return404,
@@ -24,36 +25,7 @@ import { kvPut } from "@services/kv";
 import { validateSessionToken } from "@services/sessions";
 import { checkToken } from "@services/token";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*", // Replace " with your specific origin if needed
-  "Access-Control-Allow-Methods": "GET" /*, POST, OPTIONS'*/,
-  "Access-Control-Allow-Headers": "Content-Type",
-};
-
-export const OPTIONS: APIRoute = async (context) => {
-  return new Response(null, {
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-      "Access-Control-Max-Age": "86400", // 24 hours
-    },
-  });
-};
-
 export const GET: APIRoute = async (context) => {
-
-  return new Response(JSON.stringify([]), {
-    headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        'Access-Control-Max-Age': '86400', // 24 hours
-    },
-  });
-
-
   const start = Date.now();
   let params: {
     table?: string;
@@ -71,12 +43,7 @@ export const GET: APIRoute = async (context) => {
       throw new Error();
     }
   } catch (error) {
-    return new Response(
-      JSON.stringify({
-        error: `Table "${tableName}" not defined in your schema`,
-      }),
-      { status: 500 }
-    );
+    return return500(`Table "${tableName}" not defined in your schema`);
   }
 
   const { env } = context.locals.runtime;
@@ -113,12 +80,7 @@ export const GET: APIRoute = async (context) => {
   }
 
   if (!accessControlResult) {
-    return new Response(
-      JSON.stringify({
-        message: `Unauthorized`,
-      }),
-      { status: 401 }
-    );
+    return return401();
   }
 
   try {
@@ -167,23 +129,10 @@ export const GET: APIRoute = async (context) => {
     const executionTime = end - start;
     data.executionTime = executionTime;
 
-    return new Response(JSON.stringify(data), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        'Access-Control-Max-Age': '86400', // 24 hours
-    }
-    });
+    return return200(data);
   } catch (error) {
     console.log(error);
-    return new Response(
-      JSON.stringify({
-        error,
-      }),
-      { status: 500 }
-    );
+    return return500(error);
   }
 };
 
@@ -202,12 +151,7 @@ export const POST: APIRoute = async (context) => {
       throw new Error(`Table "${route}" not defined in your schema`);
     }
   } catch (error) {
-    return new Response(
-      JSON.stringify({
-        error: `Table "${route}" not defined in your schema`,
-      }),
-      { status: 500 }
-    );
+    return return500(`Table "${route}" not defined in your schema`);
   }
 
   // const db = drizzle(env.D1);
@@ -270,10 +214,7 @@ export const POST: APIRoute = async (context) => {
         result
       );
     }
-    return new Response(JSON.stringify(result), {
-      status: result?.status || 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return return201({ data: result.data });
   } catch (error) {
     console.log("error posting content", error);
     return return500(error);

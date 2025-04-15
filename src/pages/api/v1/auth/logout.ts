@@ -21,7 +21,7 @@ export const POST: APIRoute = async (context) => {
       await invalidateSession(context.locals.runtime.env.D1, sessionId);
     }
 
-    return return200WithObject({
+    return return200({
       message: "Successfully logged out",
     });
   } else {
