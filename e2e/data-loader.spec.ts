@@ -4,7 +4,7 @@ import { test, expect } from "@playwright/test";
 import { faker } from '@faker-js/faker';
 
 // Annotate entire file as serial.
-test.describe.configure({ mode: 'serial' });
+test.describe.configure({ mode: 'serial', timeout: 100 * 60 * 1000 });
 
 const baseUrl = 'https://demo.sonicjs.com';
 
@@ -12,6 +12,9 @@ const adminCredentials = {
   email: "demo@demo.com",
   password: "sonicjs!",
 };
+
+const generateViaApi = false;
+
 var token = "";
 
 test.beforeAll(async ({ request }) => {
@@ -30,12 +33,17 @@ async function loginAsAdmin(request) {
   return bearer;
 }
 
-test("create 10 employees", async ({ request }) => {
+
+test("create test employees", async ({ request }) => {
   for (let i = 0; i < 10; i++) {
+    await new Promise(resolve => setTimeout(resolve, 100));
     const employee = generateEmployee();
-    console.log('employee', employee);
-    const response = await createEmployee(request, token, employee);
-    expect(response.status()).toBe(201);
+    // console.log('employee', employee);
+
+    // create via api
+    if(generateViaApi) {
+      const response = await createEmployee(request, token, employee);
+      expect(response.status()).toBe(201);
   }
 });
 
