@@ -64,8 +64,8 @@ const regions = ['Northeast', 'Southwest', 'West', 'Southeast', 'Midwest'];
 function generateEmployee(){
   const gender = genders[randomIntFromInterval(0, 1)];
   const firstName = faker.person.firstName(gender.toLowerCase());
-  const lasttName = faker.person.lastName();
-  const fullName = `${firstName} ${lasttName}`;
+  const lastName = faker.person.lastName();
+  const fullName = `${firstName} ${lastName}`;
   const department =
     departments[randomIntFromInterval(0, departments.length - 1)];
   const jobTitle = faker.person.jobTitle();
@@ -74,7 +74,7 @@ function generateEmployee(){
     990
   )}-${randomIntFromInterval(1000, 9999)}`;
   const region = regions[randomIntFromInterval(0, regions.length - 1)];
-  const email = `${firstName.toLowerCase()}.${lasttName.toLowerCase()}@nowhere.com`;
+  const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@nowhere.com`;
   // console.log(firstName, gender)
   return {firstName, lastName, fullName, email, phone, jobTitle, department, gender, region}
 }
