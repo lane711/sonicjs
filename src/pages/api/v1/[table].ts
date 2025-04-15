@@ -24,6 +24,23 @@ import { kvPut } from "@services/kv";
 import { validateSessionToken } from "@services/sessions";
 import { checkToken } from "@services/token";
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*", // Replace " with your specific origin if needed
+  "Access-Control-Allow-Methods": "GET" /*, POST, OPTIONS'*/,
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
+export const OPTIONS: APIRoute = async (context) => {
+  return new Response(null, {
+    headers: {
+      "Access-Control-Allow-Origin": "**",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      "Access-Control-Max-Age": "86400", // 24 hours
+    },
+  });
+};
+
 export const GET: APIRoute = async (context) => {
   const start = Date.now();
   let params: {
@@ -181,6 +198,10 @@ export const POST: APIRoute = async (context) => {
 
   let content: { data: any; table?: string } = { data: {} };
   content = await request.json();
+
+  if (!content.data) {
+    return return500("Data must be wrapped in a data object");
+  }
   // const table = apiConfig.find((entry) => entry.route === route).table;
   // context.env.D1DATA = context.env.D1DATA;
 
@@ -195,7 +216,8 @@ export const POST: APIRoute = async (context) => {
     context,
     content.data
   );
-  const isAdminAccountCreated = context.locals.runtime.env.isAdminAccountCreated ?? true;
+  const isAdminAccountCreated =
+    context.locals.runtime.env.isAdminAccountCreated ?? true;
   if (!authorized && isAdminAccountCreated) {
     return return401();
   }
