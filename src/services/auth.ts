@@ -11,7 +11,8 @@ import { compareStringToHash } from "./cyrpt";
 export const login = async (
   d1,
   email: string,
-  password: string
+  password: string,
+  context: any
 ): Promise<object> => {
   const db = drizzle(d1);
 
@@ -30,15 +31,18 @@ export const login = async (
   if (isPasswordCorrect) {
     console.log("password correct for ", user.email);
     const token = generateSessionToken();
-    // TODO: invalidate all user sessions could be async if we send session id that we don't want to invalidate
-    await invalidateUserSessions(d1, user.id);
+    const invalidateUserSessionsOption =
+      context.locals.runtime.env.INVALIDATE_USER_SESSIONS ?? true;
+    if (invalidateUserSessionsOption) {
+      // TODO: invalidate all user sessions could be async if we send session id that we don't want to invalidate
+      await invalidateUserSessions(d1, user.id);
+    }
 
     const session = await createSession(d1, token, user.id);
 
     return { bearer: token, expires: session.activeExpires };
-  }else{
+  } else {
     console.log("login failed, password incorrect for ", user.email);
-
   }
 };
 
@@ -52,7 +56,10 @@ export const doesAdminAccountExist = async (d1): Promise<boolean> => {
       .from(userTable)
       .where(eq(userTable.role, "admin"));
   } catch (error) {
-    console.error("\x1b[31m\x1b[1m\n\n\nSonicJs Error checking for admin account. Please ensure that your database has been created, tables exist, and that your wrangler.toml (if local) or you variables are set (if on cloudflare). \n\nAlso make sure that you have run the migrations per the readme (for local) and the docs (for cloudflare) https://sonicjs.com/deploy.\n\n\n\x1b[0m", error);
+    console.error(
+      "\x1b[31m\x1b[1m\n\n\nSonicJs Error checking for admin account. Please ensure that your database has been created, tables exist, and that your wrangler.toml (if local) or you variables are set (if on cloudflare). \n\nAlso make sure that you have run the migrations per the readme (for local) and the docs (for cloudflare) https://sonicjs.com/deploy.\n\n\n\x1b[0m",
+      error
+    );
     throw error;
   }
   const adminUser = record[0];

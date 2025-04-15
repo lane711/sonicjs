@@ -19,7 +19,8 @@ export const POST: APIRoute = async (context) => {
     const loginResult = await login(
       context.locals.runtime.env.D1,
       email,
-      password
+      password,
+      context
     ) as { bearer: string; expires: string };
 
     if (loginResult) {
