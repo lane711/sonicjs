@@ -24,6 +24,7 @@ import { hashString } from "@services/cyrpt";
 import { kvPut } from "@services/kv";
 import { validateSessionToken } from "@services/sessions";
 import { checkToken } from "@services/token";
+import { cacheRequestInsert } from "@services/kv-data";
 
 export const GET: APIRoute = async (context) => {
   
@@ -125,6 +126,9 @@ export const GET: APIRoute = async (context) => {
 
     //store in kv cache
     kvPut(context, context.request.url, data);
+
+    //add cache request entry
+    cacheRequestInsert(context, context.locals.runtime.env.D1, context.locals.runtime.env.KV, context.request.url);
 
     const end = Date.now();
     const executionTime = end - start;
