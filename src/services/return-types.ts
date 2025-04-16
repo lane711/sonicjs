@@ -7,10 +7,22 @@ const commonHeaders = {
 };
 
 export const return200 = (data = {}) => {
+
   return new Response(JSON.stringify(data), {
-    headers: { ...commonHeaders },
+    headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Max-Age': '86400', // 24 hours
+    },
     status: 200,
-  });
+});
+
+  // return new Response(JSON.stringify(data), {
+  //   headers: { ...commonHeaders },
+  //   status: 200,
+  // });
 };
 
 export const return201 = (data) => {
