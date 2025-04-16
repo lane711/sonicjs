@@ -32,7 +32,7 @@ export const login = async (
     console.log("password correct for ", user.email);
     const token = generateSessionToken();
     const invalidateUserSessionsOption =
-      context.locals.runtime.env.INVALIDATE_USER_SESSIONS ?? true;
+      context.locals.runtime.env.INVALIDATE_USER_SESSIONS === "true" ? true : false;
     if (invalidateUserSessionsOption) {
       // TODO: invalidate all user sessions could be async if we send session id that we don't want to invalidate
       await invalidateUserSessions(d1, user.id);
