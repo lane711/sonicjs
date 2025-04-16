@@ -8,7 +8,7 @@ const commonHeaders = {
 
 export const return200 = (data = {}) => {
   return new Response(JSON.stringify(data), {
-    headers: commonHeaders,
+    headers: { ...commonHeaders },
     status: 200,
   });
 };
