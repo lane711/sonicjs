@@ -153,7 +153,7 @@ function TableCacheRequests({ tableConfig }) {
   const getData = (originPath) => {
     if (originPath) {
       fetch(`${originPath}`).then(async (response) => {
-        const responseData: { data: any } = await response.json();
+        const responseData: { data: any, kvRecordsCount: number, cacheRequestsCount: number } = await response.json();
         setData(responseData.data);
         setKvCount(responseData.kvRecordsCount);
         setCacheRequestCount(responseData.cacheRequestsCount);
