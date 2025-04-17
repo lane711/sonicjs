@@ -11,7 +11,7 @@ import { cacheRequestInsert } from "@services/kv-data";
 async function cache(context, next) {
   const start = Date.now();
 
-  if (context.locals.runtime.env.DISABLED_CACHE) {
+  if (context.locals.runtime.env.DISABLED_CACHE?.toLowerCase() === "true") {
     return next();
   }
 
