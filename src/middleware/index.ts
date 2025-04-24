@@ -12,7 +12,7 @@ import { return200 } from "@services/return-types";
 async function cache(context, next) {
   const start = Date.now();
 
-  if (context.locals.runtime.env.DISABLED_CACHE?.toLowerCase() === "true") {
+  if (context.locals.runtime.env.DISABLED_CACHE?.toString().toLowerCase() === "true") {
     return next();
   }
 
