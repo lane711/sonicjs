@@ -8,6 +8,21 @@ import { sequence } from "astro:middleware";
 import { kvGet } from "@services/kv";
 import { cacheRequestInsert } from "@services/kv-data";
 import { return200 } from "@services/return-types";
+import { data1, data2, data3, data4, data5 } from "./demo/employee-data";
+async function memoryCache(context, next) {
+  
+  if (
+    !context.url.pathname.startsWith("/api/v1/employees") 
+  ) {
+    return next();
+  }
+
+  const dataOptions = [data1, data2, data3, data4, data5];
+  const data = dataOptions[Math.floor(Math.random() * dataOptions.length)];
+  return return200(data);
+
+
+}
 
 async function cache(context, next) {
   const start = Date.now();
@@ -123,4 +138,4 @@ async function auth(context, next) {
 }
 
 // export const onRequest = sequence( auth);
-export const onRequest = sequence(cache, auth);
+export const onRequest = sequence(memoryCache, cache, auth);
