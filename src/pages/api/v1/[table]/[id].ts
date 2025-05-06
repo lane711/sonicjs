@@ -117,6 +117,12 @@ export const PUT: APIRoute = async (context) => {
   var params = context.params;
 
   const route = params.table;
+
+  if (route === "users" && context.request.url.includes("demo.sonicjs.com/api/v1/users")) {
+    return return401("Can not update users on demo.sonicjs.com");
+  }
+
+
   let entry;
   try {
     entry = apiConfig.filter((tbl) => tbl.route === route)[0];
