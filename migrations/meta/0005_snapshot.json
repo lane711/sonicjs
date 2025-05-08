@@ -101,8 +101,6 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-<<<<<<< HEAD
-=======
     "categories": {
       "name": "categories",
       "columns": {
@@ -486,7 +484,6 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
->>>>>>> main
     "userSessions": {
       "name": "userSessions",
       "columns": {
@@ -597,16 +594,6 @@
           "notNull": true,
           "autoincrement": false
         },
-<<<<<<< HEAD
-        "passwordExpiresOn": {
-          "name": "passwordExpiresOn",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-=======
->>>>>>> main
         "passwordOTP": {
           "name": "passwordOTP",
           "type": "text",

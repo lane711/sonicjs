@@ -101,8 +101,6 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-<<<<<<< HEAD
-=======
     "categories": {
       "name": "categories",
       "columns": {
@@ -486,7 +484,6 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
->>>>>>> main
     "userSessions": {
       "name": "userSessions",
       "columns": {
@@ -597,24 +594,6 @@
           "notNull": true,
           "autoincrement": false
         },
-<<<<<<< HEAD
-        "passwordExpired": {
-          "name": "passwordExpired",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": false
-        },
-        "passwordOTP": {
-          "name": "passwordOTP",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-=======
->>>>>>> main
         "role": {
           "name": "role",
           "type": "text",
