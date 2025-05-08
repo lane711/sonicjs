@@ -21,7 +21,6 @@ export const definition = {
   profile: text("profile"),
   email: text("email").unique(),
   password: text("password").notNull(),
-  passwordExpiresOn: integer("passwordExpiresOn"),
   passwordOTP: text("passwordOTP"),
   passwordOTPExpiresOn: integer("passwordOTPExpiresOn"),
   role: text("role").$type<"admin" | "user">().default("user"),
