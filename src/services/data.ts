@@ -23,7 +23,6 @@ import {
   updateD1Data,
 } from "./d1-data";
 import { log, timerLog } from "../services/logger";
-import { uuid } from "./utils";
 
 // export async function getRecordOld(d1, kv, id) {
 //   const cacheKey = addCachePrefix(id);

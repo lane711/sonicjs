@@ -40,6 +40,8 @@ function TableCacheRequests({ tableConfig }) {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [data, setData] = useState(null);
+  const [kvCount, setKvCount] = useState(0);
+  const [cacheRequestCount, setCacheRequestCount] = useState(0);
   const [sorting, setSorting] = useState<SortingState>([
     { id: "createdOn", desc: true },
   ]); // can set initial sorting state here
@@ -151,8 +153,10 @@ function TableCacheRequests({ tableConfig }) {
   const getData = (originPath) => {
     if (originPath) {
       fetch(`${originPath}`).then(async (response) => {
-        const responseData: { data: any } = await response.json();
-        setData(responseData.data.data);
+        const responseData: { data: any, kvRecordsCount: number, cacheRequestsCount: number } = await response.json();
+        setData(responseData.data);
+        setKvCount(responseData.kvRecordsCount);
+        setCacheRequestCount(responseData.cacheRequestsCount);
         setLoading(false);
       });
     }
@@ -211,7 +215,10 @@ function TableCacheRequests({ tableConfig }) {
                     type="submit"
                     className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   >
-                    Purge KV
+                    Purge KV 
+                    <span className="inline-flex items-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-medium text-indigo-800 ml-2">
+                      {kvCount}
+                    </span>
                   </a>
                   <a
                     href="/api/v1/admin/purge-d1-cache-requests"
@@ -219,6 +226,9 @@ function TableCacheRequests({ tableConfig }) {
                     className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   >
                     Purge D1 Requests
+                    <span className="inline-flex items-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-medium text-indigo-800 ml-2">
+                      {cacheRequestCount}
+                    </span>
                   </a>
 
                   <button

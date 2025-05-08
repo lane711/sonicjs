@@ -75,6 +75,7 @@ export function prepareD1Data(data, tbl = "") {
 }
 
 export async function insertD1Data(d1, kv, table, data) {
+  console.log("insertD1Data", table, data);
   const db = drizzle(d1);
   data = prepareD1Data(data, table);
   const schema = getRepoFromTable(table);

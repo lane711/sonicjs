@@ -1,7 +1,7 @@
 {
   "name": "sonicjs",
   "type": "module",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -41,6 +41,7 @@
     "typescript": "^5.6.2"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.6.0",
     "@playwright/test": "^1.50.1",
     "@types/node": "^22.7.3",
     "drizzle-kit": "^0.24.2",

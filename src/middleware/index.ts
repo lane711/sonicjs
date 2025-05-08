@@ -7,11 +7,12 @@ import {
 import { sequence } from "astro:middleware";
 import { kvGet } from "@services/kv";
 import { cacheRequestInsert } from "@services/kv-data";
+import { return200 } from "@services/return-types";
 
 async function cache(context, next) {
   const start = Date.now();
 
-  if (context.locals.runtime.env.DISABLED_CACHE) {
+  if (context.locals.runtime.env.DISABLED_CACHE?.toString().toLowerCase() === "true") {
     return next();
   }
 
@@ -39,10 +40,7 @@ async function cache(context, next) {
     const executionTime = end - start;
     cachedData.executionTime = executionTime;
     cachedData.source = "KV";
-    return new Response(JSON.stringify(cachedData), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return return200(cachedData);
   } else {
     console.log("Cache miss on " + context.url.href);
     //add url to cache request

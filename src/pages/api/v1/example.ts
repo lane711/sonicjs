@@ -1,7 +1,6 @@
 import {
   return200,
   return201,
-  return204,
   return500,
 } from "@services/return-types";
 import type { APIRoute } from "astro";
@@ -21,7 +20,7 @@ export const POST: APIRoute = async ({ request }) => {
 };
 
 export const DELETE: APIRoute = ({ request }) => {
-  return return204();
+  return return200({ message: "wildcard" });
 };
 
 export const ALL: APIRoute = ({ request }) => {

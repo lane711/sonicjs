@@ -42,7 +42,7 @@ function Table({ tableConfig }) {
   const [recordToDelete, setRecordToDelete] = useState(false);
   const [columnFilters, setColumnFilters] = useState([{id:'title', value: ''}]);
 
-  const pageSize = 18;
+  const pageSize = 100;
 
   // const columns = Object.entries(tableConfig.formFields).map(([key, value]) =>
   //   columnHelper.accessor(key, {
