@@ -5,14 +5,19 @@ import React from "react";
 import { Resend } from "resend";
 import { getRecords, updateRecord } from "@services/data";
 import { OTPEmail } from "@emails/otp";
+import { formatMilliseconds } from "@services/time";
 
 export const GET = async (context) => {
   let params = context.params;
-  const email = params.email.trim().toLowerCase();
+  const emailEncoded = params.email.trim().toLowerCase();
 
-  const otp = generateOTPPassword(5);
+  const email = decodeURIComponent(emailEncoded);
 
-  const user = await getRecords(
+  const otp = generateOTPPassword(context.locals.runtime.env.ONE_TIME_PASSWORD_CHARACTER_LENGTH ?? 8);
+
+
+
+  const userRecord = await getRecords(
     context,
     "users", // table name
     {
@@ -26,19 +31,23 @@ export const GET = async (context) => {
     "fastest"
   );
 
-  if (!user.data.length) {
+  if (!userRecord.data.length) {
     return return404();
   }
 
+  const user = userRecord.data[0];
+
   const now = new Date();
-  const expiresOn = now.getTime() + 4 * 60 * 60 * 1000; // 4 hours in future
+
+  const expiresOn = now.getTime() + context.locals.runtime.env.ONE_TIME_PASSWORD_EXPIRATION_TIME;
+  const expirationTime = formatMilliseconds(expiresOn - now.getTime());
 
   const updated = await updateRecord(
     context.locals.runtime.env.D1,
     {},
     {
       table: "users",
-      id: user.data[0].id,
+      id: user.id,
       data: {
         passwordOTP: otp,
         passwordOTPExpiresOn: expiresOn,
@@ -50,7 +59,7 @@ export const GET = async (context) => {
   //   const react = React.createElement(<MagicLinkEmail otp={otp} />)
 
   const resend = new Resend(context.locals.runtime.env.RESEND_API_KEY);
-  const firstName = user.data[0].firstName;
+  const firstName = user.firstName;
 
   const result = await resend.emails.send({
     from: context.locals.runtime.env.EMAIL_FROM,
@@ -59,6 +68,7 @@ export const GET = async (context) => {
     react: OTPEmail({
       otp,
       firstName: firstName,
+      expirationTime: expirationTime,
     }),
   });
 

@@ -13,6 +13,13 @@ database_id = "CHANGEME"
 
 [vars]
 DISABLED_CACHE = true
+RESEND_API_KEY = "re_???"
+EMAIL_FROM="me@somewhere.com"
+EMAIL_BASE_URL="https://sonicjs.com"
+EMAIL_FROM_NAME="SonicJS"
+EMAIL_CLIENT_TOKEN="???"
+INVALIDATE_USER_SESSIONS = false # set to true if you want user to only login in one browser at a time
 
-
+ONE_TIME_PASSWORD_EXPIRATION_TIME = 3600000 # 1 hour in milliseconds
+ONE_TIME_PASSWORD_CHARACTER_LENGTH = 5
 
