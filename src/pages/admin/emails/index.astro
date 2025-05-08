@@ -1,0 +1,44 @@
+---
+import WelcomeEmail from "@emails/welcome";
+import AdminLayout from "../layouts/admin-layout.astro";
+import { availableEmails } from "@emails/index";
+
+const baseUrl = Astro.url.origin;
+---
+
+<AdminLayout title=`SonicJs Admin` | Settings `>
+  <div class="bg-gray-900">
+    <div class="mx-auto max-w-7xl">
+      <div class="bg-gray-900 py-10">
+        <div class="px-4 sm:px-6 lg:px-8">
+          <div>
+            <h3 class="text-base font-semibold text-white pb-8">Email Templates</h3>
+
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              {
+                availableEmails.map((email) => (
+                  <div class="relative flex items-center space-x-3 rounded-lg border border-gray-700 bg-gray-800 px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-600">
+                    <div class="shrink-0">
+                      <svg class="size-10 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                      </svg>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <a
+                        href={`/admin/emails/${email}`}
+                        class="focus:outline-none"
+                      >
+                        <span class="absolute inset-0" aria-hidden="true" />
+                        <p class="text-md font-medium text-gray-100">{email}</p>
+                      </a>
+                    </div>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div></AdminLayout
+>

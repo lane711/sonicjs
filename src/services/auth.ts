@@ -26,7 +26,7 @@ export const login = async (
   if (!user) {
     return null;
   }
-  const isPasswordCorrect = await compareStringToHash(password, userPassword);
+  const isPasswordCorrect = await compareStringToHash(password, userPassword as string);
 
   if (isPasswordCorrect) {
     console.log("password correct for ", user.email);
@@ -38,7 +38,7 @@ export const login = async (
       await invalidateUserSessions(d1, user.id);
     }
 
-    const session = await createSession(d1, token, user.id);
+    const session = await createSession(d1, token, user.id as string);
 
     return { bearer: token, expires: session.activeExpires };
   } else {
