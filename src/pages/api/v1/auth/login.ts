@@ -12,23 +12,24 @@ export const POST: APIRoute = async (context) => {
   const contentType = context.request.headers.get("content-type");
   if (context.request.headers.get("content-type") === "application/json") {
     // Get the body of the request
-    const body: { email: string; password: string } = await context.request.json();
-    const { email, password } = body;
+    const body: { email: string; password?: string, otp?: string } = await context.request.json();
+    const { email, password, otp } = body;
 
     const loginResult = await login(
       context.locals.runtime.env.D1,
       email,
       password,
+      otp,
       context
-    ) as { bearer: string; expires: string };
+    ) as { bearer: string; expires: string, error?: string };
 
-    if (loginResult) {
+    if (loginResult.error) {
+      return return401(loginResult.error);
+    } else {
       return return200({
         bearer: loginResult.bearer,
         expires: loginResult.expires,
       });
-    } else {
-      return return401("Error: Invalid email or password");
     }
   }
 

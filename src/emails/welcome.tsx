@@ -9,23 +9,19 @@ import { EmailLayout } from './components/EmailLayout';
 export const WelcomeEmail: React.FC<EmailProps> = ({ data }) => (
   <EmailLayout preview="You're now ready to make live transactions with Stripe!">
     <Text style={paragraph}>
-      Hi {data.firstName},<br />
+      Hi {data.firstName},<br /><br />
       Thanks for submitting your account information. You're now ready to
-      make live transactions with Stripe!
-    </Text>
-    <Text style={paragraph}>
-      You can view your payments and a variety of other information about
-      your account right from your dashboard.
+      login to SonicJs!
     </Text>
     <Button style={button} href="https://dashboard.stripe.com/login">
-      View your Stripe Dashboard
+      Login to SonicJs
     </Button>
     <Text style={paragraph}>
-      If you haven't finished your integration, you might find our{' '}
-      <Link style={anchor} href="https://docs.stripe.com/dashboard/basics">
-        docs
+      If you haven't already {' '}
+      <Link style={anchor} href="https://sonicjs.com/docs">
+      reviewed the docs
       </Link>{' '}
-      handy.
+      , you might find them handy.
     </Text>
     <Text style={paragraph}>— The SonicJs team</Text>
   </EmailLayout>

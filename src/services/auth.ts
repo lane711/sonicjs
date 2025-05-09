@@ -7,11 +7,13 @@ import { eq } from "drizzle-orm";
 import { drizzle, type DrizzleD1Database } from "drizzle-orm/d1";
 import { table as userTable } from "@schema/users";
 import { compareStringToHash } from "./cyrpt";
+import { updateRecord } from "./data";
 
 export const login = async (
   d1,
   email: string,
   password: string,
+  otp: string,
   context: any
 ): Promise<object> => {
   const db = drizzle(d1);
@@ -26,13 +28,64 @@ export const login = async (
   if (!user) {
     return null;
   }
-  const isPasswordCorrect = await compareStringToHash(password, userPassword as string);
 
-  if (isPasswordCorrect) {
-    console.log("password correct for ", user.email);
+  let isPasswordCorrect = false;
+  let isOTPCorrect = false;
+  let error = null;
+
+  if (password) {
+    isPasswordCorrect = await compareStringToHash(
+      password,
+      userPassword as string
+    );
+    if(!isPasswordCorrect) {
+      error = "Email/Password combination invalid";
+      console.log("password incorrect for ", user.email );
+    }
+  }
+  if (otp && !password) {
+    isOTPCorrect = otp === user.passwordOTP;
+    // Check if OTP is expired by comparing current time with OTP timestamp
+    if (user.passwordOTPExpiresOn) {
+      const otpExpirationTime = context.locals.runtime.env.ONE_TIME_PASSWORD_EXPIRATION_TIME;
+      const now = Date.now();
+      const otpTimestamp = new Date(user.passwordOTPExpiresOn).getTime();
+      if (now - otpTimestamp > otpExpirationTime) {
+        isOTPCorrect = false;
+        error = "OTP Expired";
+        console.log("OTP expired for", user.email);
+      }
+    }
+    if (isOTPCorrect) {
+      console.log("otp correct for ", user.email);
+      // invalidate the otp so user can only use it once
+      const updated = await updateRecord(
+        context.locals.runtime.env.D1,
+        {},
+        {
+          table: "users",
+          id: user.id,
+          data: {
+            passwordOTP: null,
+            passwordOTPExpiresOn: null,
+          },
+        },
+        {}
+      );
+    } else {
+      console.log("otp incorrect for ", user.email);
+      error = "OTP Not Valid";
+
+    }
+  }
+
+  if (isPasswordCorrect || isOTPCorrect) {
+    console.log("password or otp correct for ", user.email);
     const token = generateSessionToken();
     const invalidateUserSessionsOption =
-      context.locals.runtime.env.INVALIDATE_USER_SESSIONS === "true" ? true : false;
+      context.locals.runtime.env.INVALIDATE_USER_SESSIONS === "true"
+        ? true
+        : false;
     if (invalidateUserSessionsOption) {
       // TODO: invalidate all user sessions could be async if we send session id that we don't want to invalidate
       await invalidateUserSessions(d1, user.id);
@@ -43,6 +96,7 @@ export const login = async (
     return { bearer: token, expires: session.activeExpires };
   } else {
     console.log("login failed, password incorrect for ", user.email);
+    return { error };
   }
 };
 

@@ -15,8 +15,6 @@ export const GET = async (context) => {
 
   const otp = generateOTPPassword(context.locals.runtime.env.ONE_TIME_PASSWORD_CHARACTER_LENGTH ?? 8);
 
-
-
   const userRecord = await getRecords(
     context,
     "users", // table name
@@ -64,21 +62,13 @@ export const GET = async (context) => {
   const result = await resend.emails.send({
     from: context.locals.runtime.env.EMAIL_FROM,
     to: email,
-    subject: "One Time Password",
+    subject: context.locals.runtime.env.ONE_TIME_PASSWORD_EMAIL_SUBJECT,
     react: OTPEmail({
       otp,
       firstName: firstName,
       expirationTime: expirationTime,
     }),
   });
-
-  //   const result = await sendEmailResend(
-  //     context,
-  //     context.locals.runtime.env.SEND_EMAIL_FROM,
-  //     params.email,
-  //     "One Time Password",
-
-  //   );
 
   return return200(result);
 };
