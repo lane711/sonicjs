@@ -7,13 +7,13 @@ import type { EmailProps } from './types';
 import { EmailLayout } from './components/EmailLayout';
 
 export const WelcomeEmail: React.FC<EmailProps> = ({ data }) => (
-  <EmailLayout preview="You're now ready to make live transactions with Stripe!">
+  <EmailLayout preview="You're now ready to login to SonicJs!">
     <Text style={paragraph}>
       Hi {data.firstName},<br /><br />
       Thanks for submitting your account information. You're now ready to
       login to SonicJs!
     </Text>
-    <Button style={button} href="https://dashboard.stripe.com/login">
+    <Button style={button} href="https://sonicjs.com/login">
       Login to SonicJs
     </Button>
     <Text style={paragraph}>
