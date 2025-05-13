@@ -3,10 +3,9 @@ import {
   Link,
   Text,
 } from '@react-email/components';
-import type { EmailProps } from './types';
 import { EmailLayout } from './components/EmailLayout';
 
-export const WelcomeEmail: React.FC<EmailProps> = ({ data }) => (
+export const WelcomeEmail = ({ data }) => (
   <EmailLayout preview="You're now ready to login to SonicJs!">
     <Text style={paragraph}>
       Hi {data.firstName},<br /><br />

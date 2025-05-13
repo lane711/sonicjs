@@ -1,8 +1,7 @@
 import { Button, Link, Text } from "@react-email/components";
-import type { EmailProps } from "./types";
 import { EmailLayout } from "./components/EmailLayout";
 
-export const OTPEmail: React.FC<EmailProps> = ( data ) => (
+export const OTPEmail= ( data ) => (
   <EmailLayout preview="You're now ready to make live transactions with Stripe!">
     <Text style={paragraph}>Hi {data.firstName},</Text>
     <Text style={paragraph}>Please find your one-time password below:</Text>

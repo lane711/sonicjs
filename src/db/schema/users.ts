@@ -8,6 +8,7 @@ import * as comments from "@custom/db/schema/comments";
 import { isAdmin, isAdminOrEditor, isAdminOrUser } from "../config-helpers";
 import type { ApiConfig } from "../routes";
 import { hashString } from "@services/cyrpt";
+import { sendWelcomeEmail } from "@services/email";
 export const tableName = "users";
 export const name = "Users";
 
@@ -94,7 +95,7 @@ export const hooks: ApiConfig["hooks"] = {
         data.userId = context.locals.user.id;
       }
       if (context.locals.runtime.env.EMAIL_SEND_WELCOME_EMAIL) {
-        sendWelcomeEmail(data);
+        sendWelcomeEmail(context, data);
       }
       return data;
     },
