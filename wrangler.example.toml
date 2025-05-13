@@ -12,14 +12,23 @@ database_name = "sonicjs"
 database_id = "CHANGEME"
 
 [vars]
+#auth settings
+INVALIDATE_USER_SESSIONS = false
+
+# cache
 DISABLED_CACHE = true
-RESEND_API_KEY = "re_???"
-EMAIL_FROM="me@somewhere.com"
+
+# reset email service
+RESEND_API_KEY = "CHANGEME"
+
+#email settubgs
+EMAIL_FROM="lane@sonicjs.com"
 EMAIL_BASE_URL="https://sonicjs.com"
 EMAIL_FROM_NAME="SonicJS"
-EMAIL_CLIENT_TOKEN="???"
-INVALIDATE_USER_SESSIONS = false # set to true if you want user to only login in one browser at a time
+EMAIL_SEND_WELCOME_EMAIL = true
+# EMAIL_CLIENT_TOKEN="n62jk0uekly8gxn4n697yy9v"
 
-ONE_TIME_PASSWORD_EXPIRATION_TIME = 3600000 # 1 hour in milliseconds
+#one time password settings
 ONE_TIME_PASSWORD_CHARACTER_LENGTH = 5
-
+ONE_TIME_PASSWORD_EXPIRATION_TIME = 1200000 # 20 minutes in milliseconds
+ONE_TIME_PASSWORD_EMAIL_SUBJECT="Your SonicJS OTP"

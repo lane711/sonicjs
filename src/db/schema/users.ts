@@ -93,6 +93,9 @@ export const hooks: ApiConfig["hooks"] = {
       if (context.locals.user?.id) {
         data.userId = context.locals.user.id;
       }
+      if (context.locals.runtime.env.EMAIL_SEND_WELCOME_EMAIL) {
+        sendWelcomeEmail(data);
+      }
       return data;
     },
     update: (context, id, data) => {

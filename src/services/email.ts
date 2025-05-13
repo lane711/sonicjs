@@ -1,3 +1,4 @@
+import OTPEmail from "@emails/otp";
 import React from "react";
 import { Resend } from "resend";
 
@@ -10,9 +11,8 @@ type SendEmailOptions = {
   html: string;
 };
 
-
 export async function sendEmailResend(context, from, to, subject, template) {
-  const resend = new Resend(context.locals.runtime.env.RESEND_API_KEY);
+  const resend = getResendClient(context);
 
   (async function () {
     const { data, error } = await resend.emails.send({
@@ -28,6 +28,41 @@ export async function sendEmailResend(context, from, to, subject, template) {
 
     return data;
   })();
+}
+
+export async function sendWelcomeEmail(context, user) {
+  const resend = getResendClient(context);
+  const firstName = user.firstName;
+  // const result = await resend.emails.send({
+  //   from: context.locals.runtime.env.EMAIL_FROM,
+  //   to: email,
+  //   subject: context.locals.runtime.env.ONE_TIME_PASSWORD_EMAIL_SUBJECT,
+  //   react: OTPEmail({
+  //     otp,
+  //     firstName: firstName,
+  //     expirationTime: expirationTime,
+  //   }),
+  // });
+  // return result;
+}
+
+export async function sendOTPEmail(context, user, otp, expirationTime) {
+  const resend = getResendClient(context);
+  const result = await resend.emails.send({
+    from: context.locals.runtime.env.EMAIL_FROM,
+    to: user.email,
+    subject: context.locals.runtime.env.ONE_TIME_PASSWORD_EMAIL_SUBJECT,
+    react: OTPEmail({
+      otp,
+      firstName: user.firstName,
+      expirationTime: expirationTime,
+    }),
+  });
+  return result;
+}
+
+function getResendClient(context) {
+  return new Resend(context.locals.runtime.env.RESEND_API_KEY);
 }
 
 // export async function sendEmailNodeMail(options: SendEmailOptions): Promise<Transporter> {

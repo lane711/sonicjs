@@ -1,4 +1,4 @@
-import { sendEmailResend } from "@services/email";
+import { sendEmailResend, sendOTPEmail } from "@services/email";
 import { return200, return404 } from "@services/return-types";
 import MagicLinkEmail from "@emails/welcome";
 import React from "react";
@@ -54,21 +54,7 @@ export const GET = async (context) => {
     {}
   );
 
-  //   const react = React.createElement(<MagicLinkEmail otp={otp} />)
-
-  const resend = new Resend(context.locals.runtime.env.RESEND_API_KEY);
-  const firstName = user.firstName;
-
-  const result = await resend.emails.send({
-    from: context.locals.runtime.env.EMAIL_FROM,
-    to: email,
-    subject: context.locals.runtime.env.ONE_TIME_PASSWORD_EMAIL_SUBJECT,
-    react: OTPEmail({
-      otp,
-      firstName: firstName,
-      expirationTime: expirationTime,
-    }),
-  });
+  const result = await sendOTPEmail(context, user, otp, expirationTime);
 
   return return200(result);
 };
