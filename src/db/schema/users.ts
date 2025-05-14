@@ -1,4 +1,9 @@
-import { sqliteTable, text, uniqueIndex, integer } from "drizzle-orm/sqlite-core";
+import {
+  sqliteTable,
+  text,
+  uniqueIndex,
+  integer,
+} from "drizzle-orm/sqlite-core";
 import { relations, type InferSelectModel } from "drizzle-orm";
 import { auditSchema } from "./audit";
 import * as posts from "@custom/db/schema/posts";
@@ -22,7 +27,7 @@ export const definition = {
   lastName: text("lastName"),
   profile: text("profile"),
   email: text("email").unique(),
-  emailConfirmed: integer('updatedOn'),
+  emailConfirmedOn: integer("emailConfirmedOn"),
   emailConfirmationToken: text("emailConfirmationToken"),
   password: text("password").notNull(),
   passwordOTP: text("passwordOTP"),
@@ -76,7 +81,7 @@ export const access: ApiConfig["access"] = {
       },
     },
     password: {
-      read:false,
+      read: false,
       update: isAdminOrUser,
     },
     role: {

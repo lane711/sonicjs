@@ -2,7 +2,7 @@ import { Button, Link, Text } from "@react-email/components";
 import { EmailLayout } from "./components/EmailLayout";
 
 export const OTPEmail= ( data ) => (
-  <EmailLayout preview="You're now ready to make live transactions with Stripe!">
+  <EmailLayout preview="Let's get your email confirmed!">
     <Text style={paragraph}>Hi {data.firstName},</Text>
     <Text style={paragraph}>Please find your one-time password below:</Text>
     <Text style={otp}>{data.otp ?? "ABC123"} </Text>
