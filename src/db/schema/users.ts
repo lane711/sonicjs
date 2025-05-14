@@ -9,6 +9,7 @@ import { isAdmin, isAdminOrEditor, isAdminOrUser } from "../config-helpers";
 import type { ApiConfig } from "../routes";
 import { hashString } from "@services/cyrpt";
 import { sendWelcomeEmail } from "@services/email";
+import { sendEmailConfirmationEmail } from "@services/auth";
 export const tableName = "users";
 export const name = "Users";
 
@@ -21,6 +22,8 @@ export const definition = {
   lastName: text("lastName"),
   profile: text("profile"),
   email: text("email").unique(),
+  emailConfirmed: integer('updatedOn'),
+  emailConfirmationToken: text("emailConfirmationToken"),
   password: text("password").notNull(),
   passwordOTP: text("passwordOTP"),
   passwordOTPExpiresOn: integer("passwordOTPExpiresOn"),
@@ -93,6 +96,9 @@ export const hooks: ApiConfig["hooks"] = {
       }
       if (context.locals.user?.id) {
         data.userId = context.locals.user.id;
+      }
+      if (context.locals.runtime.env.REQUIRE_EMAIL_CONFIRMATION) {
+        sendEmailConfirmationEmail(context, data);
       }
       if (context.locals.runtime.env.EMAIL_SEND_WELCOME_EMAIL) {
         sendWelcomeEmail(context, data);

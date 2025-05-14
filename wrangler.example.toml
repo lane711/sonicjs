@@ -14,6 +14,7 @@ database_id = "CHANGEME"
 [vars]
 #auth settings
 INVALIDATE_USER_SESSIONS = false
+REQUIRE_EMAIL_CONFIRMATION = true
 
 # cache
 DISABLED_CACHE = true

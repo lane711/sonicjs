@@ -100,6 +100,27 @@ export const login = async (
   }
 };
 
+export const doesEmailExist = async (d1, email: string): Promise<{exists: boolean, confirmed: boolean}> => {
+  const db = drizzle(d1);
+
+  let record;
+  try {
+    record = await db
+      .select()
+      .from(userTable)
+      .where(eq(userTable.email, email));
+  } catch (error) {
+    throw error;
+  }
+  const user = record[0];
+
+  if (!user) {
+    return {exists: false, confirmed: false};
+  }
+  const confirmed = user.confirmed;
+  return {exists: true, confirmed};
+};
+
 export const doesAdminAccountExist = async (d1): Promise<boolean> => {
   const db = drizzle(d1);
 
@@ -122,4 +143,12 @@ export const doesAdminAccountExist = async (d1): Promise<boolean> => {
     return false;
   }
   return true;
+};
+
+export const sendEmailConfirmationEmail = async (context, data: any) => {
+  const db = drizzle(context.locals.runtime.env.D1);
+
+  data.emailConfirmationToken = crypto.randomUUID();
+
+  const user = await db.select().from(userTable).where(eq(userTable.email, data.email));
 };
