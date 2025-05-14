@@ -151,4 +151,12 @@ export const sendEmailConfirmationEmail = async (context, data: any) => {
   data.emailConfirmationToken = crypto.randomUUID();
 
   const user = await db.select().from(userTable).where(eq(userTable.email, data.email));
+
+  //user should not exist
+  if (user.length > 0) {
+    throw new Error("User already exists");
+  }
+
+  //
+  
 };

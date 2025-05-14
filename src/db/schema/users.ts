@@ -60,7 +60,7 @@ export const relation = relations(table, ({ many }) => ({
 export const access: ApiConfig["access"] = {
   operation: {
     read: isAdmin,
-    create: isAdmin,
+    create: true, // anyone can register
     delete: isAdmin,
     update: isAdminOrUser,
   },
@@ -93,6 +93,14 @@ export const access: ApiConfig["access"] = {
   },
 };
 
+export const addEmailToken = (context, operation, id, {data}, result) => {
+  if(result.status === 201){
+    if (context.locals.runtime.env.REQUIRE_EMAIL_CONFIRMATION) {
+      sendEmailConfirmationEmail(context, data);
+    }
+  }
+  };
+
 export const hooks: ApiConfig["hooks"] = {
   resolveInput: {
     create: async (context, data) => {
@@ -101,12 +109,6 @@ export const hooks: ApiConfig["hooks"] = {
       }
       if (context.locals.user?.id) {
         data.userId = context.locals.user.id;
-      }
-      if (context.locals.runtime.env.REQUIRE_EMAIL_CONFIRMATION) {
-        sendEmailConfirmationEmail(context, data);
-      }
-      if (context.locals.runtime.env.EMAIL_SEND_WELCOME_EMAIL) {
-        sendWelcomeEmail(context, data);
       }
       return data;
     },
@@ -117,4 +119,5 @@ export const hooks: ApiConfig["hooks"] = {
       return data;
     },
   },
+  afterOperation: addEmailToken,
 };
