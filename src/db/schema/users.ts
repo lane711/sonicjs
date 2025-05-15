@@ -93,13 +93,24 @@ export const access: ApiConfig["access"] = {
   },
 };
 
+export const userRegistrationAfterOperation = (context, operation, id, {data}, result) => {
+  removePassword(context, operation, id, {data}, result)
+  addEmailToken(context, operation, id, {data}, result)
+  };
+
 export const addEmailToken = (context, operation, id, {data}, result) => {
   if(operation === "create" && result.status === 201){
     if (context.locals.runtime.env.REQUIRE_EMAIL_CONFIRMATION) {
-      sendEmailConfirmationEmail(context, data);
+      sendEmailConfirmationEmail(context, result);
     }
   }
   };
+
+export const removePassword = (context, operation, id, {data}, result) => {
+  if(operation === "create" && result.status === 201){
+    delete result.data.password;
+  }
+}
 
 export const hooks: ApiConfig["hooks"] = {
   resolveInput: {
@@ -119,5 +130,5 @@ export const hooks: ApiConfig["hooks"] = {
       return data;
     },
   },
-  afterOperation: addEmailToken,
+  afterOperation: userRegistrationAfterOperation,
 };

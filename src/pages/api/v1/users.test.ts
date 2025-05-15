@@ -8,36 +8,20 @@ vi.mock('@services/cyrpt', () => ({
   hashString: vi.fn().mockResolvedValue('hashed_password')
 }));
 
-vi.mock('../../../db/routes', () => ({
-  apiConfig: [{
-    route: 'users',
-    table: 'users',
-    access: {
-      operation: {
-        create: vi.fn().mockReturnValue(true),
-        read: true,
-        update: true,
-        delete: true
-      },
-      fields: {
-        password: {
-          read: false,
-          update: true
-        }
+vi.mock('@services/data', () => ({
+  insertRecord: vi.fn().mockImplementation(async (d1, kv, content) => {
+    return {
+      status: 201,
+      data: {
+        id: 'test-id',
+        ...content.data,
+        password: 'hashed_password' // The password should be hashed
       }
-    },
-    hooks: {
-      resolveInput: {
-        create: vi.fn().mockImplementation(async (context, data) => {
-          if (data.password) {
-            data.password = await hashString(data.password);
-          }
-          return data;
-        })
-      }
-    }
-  }]
+    };
+  })
 }));
+
+
 
 describe('User Registration Endpoint', () => {
   const createMockContext = (requestData: any) => ({
@@ -77,14 +61,14 @@ describe('User Registration Endpoint', () => {
     });
 
     const response = await POST(context);
-    const data = await response.json() as { data: { email: string; firstName: string; lastName: string } };
+    const user = await response.json() as { data: { email: string; firstName: string; lastName: string } };
 
     expect(response.status).toBe(201);
-    expect(data).toHaveProperty('data');
-    expect(data.data).toHaveProperty('email', 'test@example.com');
-    expect(data.data).toHaveProperty('firstName', 'John');
-    expect(data.data).toHaveProperty('lastName', 'Doe');
-    expect(data.data).not.toHaveProperty('password'); // Password should not be returned
+    expect(user).toHaveProperty('data');
+    expect(user.data).toHaveProperty('email', 'test@example.com');
+    expect(user.data).toHaveProperty('firstName', 'John');
+    expect(user.data).toHaveProperty('lastName', 'Doe');
+    expect(user.data).not.toHaveProperty('password'); // Password should not be returned
     expect(hashString).toHaveBeenCalledWith('password123');
   });
 
