@@ -94,7 +94,7 @@ export const access: ApiConfig["access"] = {
 };
 
 export const addEmailToken = (context, operation, id, {data}, result) => {
-  if(result.status === 201){
+  if(operation === "create" && result.status === 201){
     if (context.locals.runtime.env.REQUIRE_EMAIL_CONFIRMATION) {
       sendEmailConfirmationEmail(context, data);
     }
