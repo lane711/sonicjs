@@ -8,13 +8,13 @@ import { EmailLayout } from './components/EmailLayout';
 import { button } from './styles';
 import { paragraph } from './styles';
 
-export const ConfirmationEmail = ({ data }) => (
+export const ConfirmationEmail = ( user, code, baseUrl) => (
   <EmailLayout preview="Confirm your email address">
     <Text style={paragraph}>
-      Hi {data.firstName},<br /><br />
+      {user.firstName ? `Hi ${user.firstName},<br /><br />` : ''}
       Please confirm your email by clicking the link below:
     </Text>
-    <Button style={button} href={`${process.env.EMAIL_BASE_URL}/api/v1/auth/email-confirmation/receive/${data.code}`}>
+    <Button style={button} href={`${baseUrl}/api/v1/auth/email-confirmation/receive/${code}`}>
       Confirm Email Address
     </Button>
     <Text style={paragraph}>

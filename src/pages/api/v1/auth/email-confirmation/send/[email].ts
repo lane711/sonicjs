@@ -7,5 +7,5 @@ export async function GET(context) {
   if (result.error) {
     return return500({ error: result.error });
   }
-  return return200({ result });
+  return return200({ message: "Confirmation email sent" });
 }

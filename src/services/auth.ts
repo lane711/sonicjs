@@ -40,16 +40,17 @@ export const login = async (
       password,
       userPassword as string
     );
-    if(!isPasswordCorrect) {
+    if (!isPasswordCorrect) {
       error = "Email/Password combination invalid";
-      console.log("password incorrect for ", user.email );
+      console.log("password incorrect for ", user.email);
     }
   }
   if (otp && !password) {
     isOTPCorrect = otp === user.passwordOTP;
     // Check if OTP is expired by comparing current time with OTP timestamp
     if (user.passwordOTPExpiresOn) {
-      const otpExpirationTime = context.locals.runtime.env.ONE_TIME_PASSWORD_EXPIRATION_TIME;
+      const otpExpirationTime =
+        context.locals.runtime.env.ONE_TIME_PASSWORD_EXPIRATION_TIME;
       const now = Date.now();
       const otpTimestamp = new Date(user.passwordOTPExpiresOn).getTime();
       if (now - otpTimestamp > otpExpirationTime) {
@@ -77,7 +78,6 @@ export const login = async (
     } else {
       console.log("otp incorrect for ", user.email);
       error = "OTP Not Valid";
-
     }
   }
 
@@ -102,7 +102,10 @@ export const login = async (
   }
 };
 
-export const doesEmailExist = async (d1, email: string): Promise<{exists: boolean, confirmed: boolean}> => {
+export const doesEmailExist = async (
+  d1,
+  email: string
+): Promise<{ exists: boolean; confirmed: boolean }> => {
   const db = drizzle(d1);
 
   let record;
@@ -117,10 +120,10 @@ export const doesEmailExist = async (d1, email: string): Promise<{exists: boolea
   const user = record[0];
 
   if (!user) {
-    return {exists: false, confirmed: false};
+    return { exists: false, confirmed: false };
   }
   const confirmed = user.confirmed;
-  return {exists: true, confirmed};
+  return { exists: true, confirmed };
 };
 
 export const doesAdminAccountExist = async (d1): Promise<boolean> => {
@@ -150,13 +153,19 @@ export const doesAdminAccountExist = async (d1): Promise<boolean> => {
 export const sendEmailConfirmation = async (context, email: string) => {
   const db = drizzle(context.locals.runtime.env.D1);
 
-  const emailConfirmationToken = generateRandomString(32);
+  const emailConfirmationToken = generateRandomString(64);
 
-  const userRecord = await db.select().from(userTable).where(eq(userTable.email, email));
+  const userRecord = await db
+    .select()
+    .from(userTable)
+    .where(eq(userTable.email, email));
+  if (userRecord.length === 0) {
+    return { error: "User not found" };
+  }
   let user = userRecord[0];
   //user should not exist
   if (user && user.emailConfirmedOn) {
-    return {error: "User already confirmed"};
+    return { error: "User already confirmed" };
   } else if (user) {
     const updated = await updateRecord(
       context.locals.runtime.env.D1,
@@ -165,28 +174,34 @@ export const sendEmailConfirmation = async (context, email: string) => {
         table: "users",
         id: user.id,
         data: {
-            emailConfirmationToken: emailConfirmationToken,
+          emailConfirmationToken: emailConfirmationToken,
         },
       },
       {}
     );
 
-    return await sendEmailConfirmationEmail(context, user[0], emailConfirmationToken);
-
+    return await sendEmailConfirmationEmail(
+      context,
+      user,
+      emailConfirmationToken
+    );
   }
 };
 
 export const confirmEmail = async (context, code: string) => {
   const db = drizzle(context.locals.runtime.env.D1);
-
-  const userRecord = await getRecords(context.locals.runtime.env.D1, "users", {emailConfirmationToken: code}, {}, {});
-  const user = userRecord[0];
+  const userRecord = await getRecords(context, "users", {
+    filters: { emailConfirmationToken: { $eq: code } },
+  });
+  const user = userRecord.data[0];
   if (!user) {
-    return {error: "User not found"};
+    return { error: "User not found" };
   }
-  const updated = await updateRecord(context.locals.runtime.env.D1, {}, {table: "users", id: user.id, data: {emailConfirmedOn: new Date()}}, {});
-  return {success: "Email confirmed"};
-}
-
-
-
+  const updated = await updateRecord(
+    context.locals.runtime.env.D1,
+    {},
+    { table: "users", id: user.id, data: { emailConfirmedOn: new Date().getTime() } },
+    {}
+  );
+  return { success: "Email confirmed" };
+};

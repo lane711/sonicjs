@@ -14,7 +14,7 @@ export const button = {
     backgroundColor: '#656ee8',
     borderRadius: '5px',
     color: '#fff',
-    fontSize: '16px',
+    fontSize: '24px',
     fontWeight: 'bold',
     textDecoration: 'none',
     textAlign: 'center' as const,

@@ -68,10 +68,7 @@ export async function sendEmailConfirmationEmail(context, user, code) {
     from: context.locals.runtime.env.EMAIL_FROM,
     to: user.email,
     subject: context.locals.runtime.env.EMAIL_CONFIRMATION_SUBJECT,
-    react: ConfirmationEmail({
-      code,
-      firstName: user.firstName,
-    }),
+    react: ConfirmationEmail(user, code, context.locals.runtime.env.EMAIL_BASE_URL),
   });
   return result;
 }

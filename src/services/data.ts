@@ -45,7 +45,7 @@ export async function getRecords(
   context,
   table,
   params,
-  cacheKey,
+  cacheKey = undefined,
   source = "fastest",
   customDataFunction = undefined
 ): Promise<{
