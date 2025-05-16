@@ -1,11 +1,12 @@
 // Import all email components
 import { OTPEmail } from './otp';
 import { WelcomeEmail } from './welcome';
-
+import { ConfirmationEmail } from './confirmation';
 // Map of email components
 const emailComponents = {
     'otp': OTPEmail,
     'welcome': WelcomeEmail,
+    'confirmation': ConfirmationEmail,
 };
 
 // Function to get email component by name

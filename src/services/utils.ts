@@ -6,6 +6,20 @@ export function uuid() {
       ).toString(16)
     );
   }
+
+  export function generateRandomString(length: number): string {
+    const urlSafeChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_';
+    const randomValues = new Uint8Array(length);
+    crypto.getRandomValues(randomValues);
+    let result = '';
+    
+    for (let i = 0; i < length; i++) {
+      // Map the random byte to our character set
+      result += urlSafeChars[randomValues[i] % urlSafeChars.length];
+    }
+    
+    return result;
+  }
   
   export function convertFormDataToObject(formData) {
     var object = {};

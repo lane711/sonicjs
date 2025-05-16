@@ -127,12 +127,12 @@ export async function updateD1Data(
     }
   }
 
-  const sql = await db
-    .update(repo)
-    .set(data.data)
-    .where(and(...eqArgs))
-    .returning({ id: repo.id })
-    .toSQL();
+  // const sql = await db
+  //   .update(repo)
+  //   .set(data.data)
+  //   .where(and(...eqArgs))
+  //   .returning({ id: repo.id })
+  //   .toSQL();
 
   let result = await db
     .update(repo)

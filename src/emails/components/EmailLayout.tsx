@@ -56,7 +56,7 @@ const main = {
 const container = {
   backgroundColor: '#ffffff',
   margin: '40px auto',
-  padding: '20px 0 48px',
+  padding: '20px 0',
   marginBottom: '64px',
 };
 

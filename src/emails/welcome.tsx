@@ -4,6 +4,9 @@ import {
   Text,
 } from '@react-email/components';
 import { EmailLayout } from './components/EmailLayout';
+import { button } from './styles';
+import { anchor } from './styles';
+import { paragraph } from './styles';
 
 export const WelcomeEmail = ({ data }) => (
   <EmailLayout preview="You're now ready to login to SonicJs!">
@@ -27,27 +30,3 @@ export const WelcomeEmail = ({ data }) => (
 );
 
 export default WelcomeEmail;
-
-// Styles for the unique content
-const paragraph = {
-  color: '#525f7f',
-  fontSize: '16px',
-  lineHeight: '24px',
-  textAlign: 'left' as const,
-};
-
-const anchor = {
-  color: '#556cd6',
-};
-
-const button = {
-  backgroundColor: '#656ee8',
-  borderRadius: '5px',
-  color: '#fff',
-  fontSize: '16px',
-  fontWeight: 'bold',
-  textDecoration: 'none',
-  textAlign: 'center' as const,
-  display: 'block',
-  padding: '10px',
-};

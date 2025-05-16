@@ -1,9 +1,9 @@
-import { doesEmailExist, sendEmailConfirmation } from "@services/auth";
+import { confirmEmail, doesEmailExist, sendEmailConfirmation } from "@services/auth";
 import { return200, return500 } from "@services/return-types";
 
 export async function GET(context) {
-  const email = context.params.email;
-  const result = await sendEmailConfirmation(context, decodeURIComponent(email));
+  const code = context.params.code;
+  const result = await confirmEmail(context, code);
   if (result.error) {
     return return500({ error: result.error });
   }

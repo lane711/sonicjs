@@ -7,8 +7,9 @@ import { eq } from "drizzle-orm";
 import { drizzle, type DrizzleD1Database } from "drizzle-orm/d1";
 import { table as userTable } from "@schema/users";
 import { compareStringToHash } from "./cyrpt";
-import { updateRecord } from "./data";
+import { getRecords, updateRecord } from "./data";
 import { sendEmailConfirmationEmail } from "./email";
+import { generateRandomString } from "./utils";
 
 export const login = async (
   d1,
@@ -149,18 +150,43 @@ export const doesAdminAccountExist = async (d1): Promise<boolean> => {
 export const sendEmailConfirmation = async (context, email: string) => {
   const db = drizzle(context.locals.runtime.env.D1);
 
-  const emailConfirmationToken = crypto.randomUUID();
+  const emailConfirmationToken = generateRandomString(32);
 
-  const user = await db.select().from(userTable).where(eq(userTable.email, email));
-
+  const userRecord = await db.select().from(userTable).where(eq(userTable.email, email));
+  let user = userRecord[0];
   //user should not exist
-  if (user.length > 0 && user[0].emailConfirmedOn) {
-    throw new Error("User already confirmed");
-  }
+  if (user && user.emailConfirmedOn) {
+    return {error: "User already confirmed"};
+  } else if (user) {
+    const updated = await updateRecord(
+      context.locals.runtime.env.D1,
+      {},
+      {
+        table: "users",
+        id: user.id,
+        data: {
+            emailConfirmationToken: emailConfirmationToken,
+        },
+      },
+      {}
+    );
 
-  await sendEmailConfirmationEmail(context, user[0], emailConfirmationToken);
-  
+    return await sendEmailConfirmationEmail(context, user[0], emailConfirmationToken);
+
+  }
 };
+
+export const confirmEmail = async (context, code: string) => {
+  const db = drizzle(context.locals.runtime.env.D1);
+
+  const userRecord = await getRecords(context.locals.runtime.env.D1, "users", {emailConfirmationToken: code}, {}, {});
+  const user = userRecord[0];
+  if (!user) {
+    return {error: "User not found"};
+  }
+  const updated = await updateRecord(context.locals.runtime.env.D1, {}, {table: "users", id: user.id, data: {emailConfirmedOn: new Date()}}, {});
+  return {success: "Email confirmed"};
+}
 
 
 

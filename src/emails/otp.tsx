@@ -34,7 +34,7 @@ const otp = {
   fontSize: "46px",
   lineHeight: "48px",
   textAlign: "center" as const,
-  backgroundColor: "#555",
+  backgroundColor: "#656ee8",
   padding: "40px",
   margin: "60px",
   borderRadius: "5px",
