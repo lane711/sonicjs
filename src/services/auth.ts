@@ -8,6 +8,7 @@ import { drizzle, type DrizzleD1Database } from "drizzle-orm/d1";
 import { table as userTable } from "@schema/users";
 import { compareStringToHash } from "./cyrpt";
 import { updateRecord } from "./data";
+import { sendEmailConfirmationEmail } from "./email";
 
 export const login = async (
   d1,
@@ -145,18 +146,21 @@ export const doesAdminAccountExist = async (d1): Promise<boolean> => {
   return true;
 };
 
-export const sendEmailConfirmationEmail = async (context, data: any) => {
+export const sendEmailConfirmation = async (context, email: string) => {
   const db = drizzle(context.locals.runtime.env.D1);
 
-  data.emailConfirmationToken = crypto.randomUUID();
+  const emailConfirmationToken = crypto.randomUUID();
 
-  const user = await db.select().from(userTable).where(eq(userTable.email, data.email));
+  const user = await db.select().from(userTable).where(eq(userTable.email, email));
 
   //user should not exist
-  if (user.length > 0) {
-    throw new Error("User already exists");
+  if (user.length > 0 && user[0].emailConfirmedOn) {
+    throw new Error("User already confirmed");
   }
 
-  //
+  await sendEmailConfirmationEmail(context, user[0], emailConfirmationToken);
   
 };
+
+
+

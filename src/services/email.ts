@@ -1,3 +1,4 @@
+import ConfirmationEmail from "@emails/confirmation";
 import OTPEmail from "@emails/otp";
 import React from "react";
 import { Resend } from "resend";
@@ -61,7 +62,21 @@ export async function sendOTPEmail(context, user, otp, expirationTime) {
   return result;
 }
 
-function getResendClient(context) {
+export async function sendEmailConfirmationEmail(context, user, code) {
+  const resend = getResendClient(context);
+  const result = await resend.emails.send({
+    from: context.locals.runtime.env.EMAIL_FROM,
+    to: user.email,
+    subject: context.locals.runtime.env.EMAIL_CONFIRMATION_SUBJECT,
+    react: ConfirmationEmail({
+      code,
+      firstName: user.firstName,
+    }),
+  });
+  return result;
+}
+
+export function getResendClient(context) {
   return new Resend(context.locals.runtime.env.RESEND_API_KEY);
 }
 
