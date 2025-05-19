@@ -10,11 +10,11 @@ import * as posts from "@custom/db/schema/posts";
 import * as comments from "@custom/db/schema/comments";
 // import * as userKeys from "./userKeys";
 // import * as userSessions from "./userSessions";
-import { isAdmin, isAdminOrEditor, isAdminOrUser } from "../config-helpers";
+import { isAdmin, isAdminOrEditor, isAdminOrUser, usersCanRegister } from "../config-helpers";
 import type { ApiConfig } from "../routes";
 import { hashString } from "@services/cyrpt";
-import { sendWelcomeEmail } from "@services/email";
-import { sendEmailConfirmationEmail } from "@services/auth";
+import { sendEmailConfirmationEmail, sendWelcomeEmail } from "@services/email";
+import { sendEmailConfirmation } from "@services/auth";
 export const tableName = "users";
 export const name = "Users";
 
@@ -60,7 +60,7 @@ export const relation = relations(table, ({ many }) => ({
 export const access: ApiConfig["access"] = {
   operation: {
     read: isAdmin,
-    create: true, // anyone can register
+    create: usersCanRegister,
     delete: isAdmin,
     update: isAdminOrUser,
   },
@@ -93,24 +93,30 @@ export const access: ApiConfig["access"] = {
   },
 };
 
-export const userRegistrationAfterOperation = (context, operation, id, {data}, result) => {
-  removePassword(context, operation, id, {data}, result)
-  addEmailToken(context, operation, id, {data}, result)
-  };
+export const userRegistrationAfterOperation = (
+  context,
+  operation,
+  id,
+  data,
+  result
+) => {
+  removePassword(context, operation, id, data, result);
+  addEmailToken(context, operation, id, data, result);
+};
 
-export const addEmailToken = (context, operation, id, {data}, result) => {
-  if(operation === "create" && result.status === 201){
-    if (context.locals.runtime.env.REQUIRE_EMAIL_CONFIRMATION) {
-      sendEmailConfirmationEmail(context, result);
+export const addEmailToken = (context, operation, id, data, result) => {
+  if (operation === "create" && result.status === 201) {
+    if (result.data.email && context.locals.runtime.env.REQUIRE_EMAIL_CONFIRMATION) {
+      sendEmailConfirmation(context, result.data.email);
     }
   }
-  };
+};
 
-export const removePassword = (context, operation, id, {data}, result) => {
-  if(operation === "create" && result.status === 201){
+export const removePassword = (context, operation, id, data, result) => {
+  if (operation === "create" && result.status === 201) {
     delete result.data.password;
   }
-}
+};
 
 export const hooks: ApiConfig["hooks"] = {
   resolveInput: {
