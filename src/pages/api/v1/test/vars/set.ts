@@ -1,10 +1,14 @@
-import { return200, return400 } from "@services/return-types";
+import { return200, return400, return401 } from "@services/return-types";
 import type { APIRoute } from "astro";
 import qs from "qs";
 
 export const GET: APIRoute = async (context) => {
   if (!context.locals.runtime.env.TESTING_MODE) {
     return return400("Testing mode is not enabled");
+  }
+
+  if (context.locals?.user?.role !== 'admin') {
+    return return401();
   }
 
   const queryParams = qs.parse(context.request.url.split("?")[1]);
@@ -24,4 +28,5 @@ export const GET: APIRoute = async (context) => {
     value: updatedEnv,
   });
 };
+
 

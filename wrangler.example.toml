@@ -37,3 +37,6 @@ ONE_TIME_PASSWORD_EMAIL_SUBJECT="Your SonicJS OTP"
 
 # testing
 TESTING_MODE = true # do not set to false in production
+
+# general
+HIDE_STARTUP_LOGO = false

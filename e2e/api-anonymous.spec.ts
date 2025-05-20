@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { cleanup, loginAsAdmin } from "./helpers";
+import { cleanup, loginAsAdmin, updateEnvVar } from "./e2e-helpers";
 
 test.describe.configure({ mode: 'serial' });
 
@@ -11,11 +11,11 @@ var token = "";
 
 test.beforeAll(async ({ request }) => {
   token = await loginAsAdmin(request);
-  await cleanup(request, token, expect);
+  await cleanup(request, token);
 });
 
 test.afterEach(async ({ request }) => {
-  await cleanup(request, token, expect);
+  await cleanup(request, token);
 });
 
 test("should not allow unauthenticated user to access /api/v1/users", async ({
@@ -67,26 +67,29 @@ test("should allow unauthenticated user to access /api/v1/posts", async ({
   expect(data.length).toBeGreaterThan(0);
 });
 
-// test("should not allow unauthenticated user to create a user", async ({
-//   request,
-// }) => {
-//   const response = await request.post(`/api/v1/users`, {
-//     data: {
-//       data: {
-//         username: "newuser",
-//         password: "password123",
-//       },
-//     },
-//   });
-//   expect(response.status()).toBe(401);
-//   expect(await response.json()).toEqual(
-//     expect.objectContaining({
-//       message: "Unauthorized",
-//     })
-//   );
-// });
+test("should not allow unauthenticated user to create a user", async ({
+  request,
+}) => {
+  await updateEnvVar(request, "USERS_CAN_REGISTER", "false");
+  const response = await request.post(`/api/v1/users`, {
+    data: {
+      data: {
+        username: "newuser",
+        password: "password123",
+      },
+    },
+  });
+  expect(response.status()).toBe(401);
+  const json = await response.json();
+  expect(await response.json()).toEqual(
+    expect.objectContaining({
+      message: "Unauthorized",
+    })
+  );
+});
 
 test("should allow unauthenticated user to register", async ({ request }) => {
+  await updateEnvVar(request, "USERS_CAN_REGISTER", "true");
   const response = await request.post(`/api/v1/users`, {
     data: {
       data: {
@@ -101,7 +104,7 @@ test("should allow unauthenticated user to register", async ({ request }) => {
   const { data } = await response.json();
   console.log('data-->',data);
 
-  expect(data.email).toEqual(
+  expect(data.id).toEqual(
     expect.any(String)
   );
 });

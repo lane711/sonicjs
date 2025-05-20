@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { cleanup, loginAsAdmin, createTestUser } from "./helpers";
+import { cleanup, loginAsAdmin, createTestUser } from "./e2e-helpers";
 // Annotate entire file as serial.
 test.describe.configure({ mode: 'serial' });
 
@@ -8,7 +8,7 @@ var token = "";
 
 test.beforeAll(async ({ request }) => {
   token = await loginAsAdmin(request);
-  await cleanup(request, token, expect);
+  await cleanup(request, token);
 });
 
 
@@ -96,7 +96,7 @@ test("should allow admin to access /api/v1/auth/user for session and user info",
 });
 
 test.afterEach(async ({ request }) => {
-  await cleanup(request, token, expect);
+  await cleanup(request, token);
 });
 
 
