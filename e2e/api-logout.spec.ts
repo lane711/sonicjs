@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { purgeE2eTestData } from "@services/e2e";
 import { adminCredentials } from "./settings";
+import { cleanup, loginAsAdmin } from "./e2e-helpers";
 
 // Annotate entire file as serial.
 test.describe.configure({ mode: 'serial' });
@@ -9,19 +10,9 @@ var token = "";
 
 test.beforeAll(async ({ request }) => {
   token = await loginAsAdmin(request);
-  await cleanup(request, token);
+  // await cleanup(request, token, "users", "email", "e2e!!");
 });
 
-async function loginAsAdmin(request) {
-  const response = await request.post(`/api/v1/auth/login`, {
-    data: adminCredentials,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const { bearer } = await response.json();
-  return bearer;
-}
 
 
 test("logout should invalidate session", async ({ request }) => {
@@ -56,28 +47,3 @@ test.afterEach(async ({ request }) => {
   // await cleanup(request, token);
 });
 
-const cleanup = async (request, token) => {
-  const response = await request.post(`/api/v1/test/e2e/cleanup`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  expect(response.status()).toBe(200);
-};
-
-const createTestUser = async (request, token) => {
-  const response = await request.post(`/api/v1/users`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    data: {
-      data: {
-        email: "e2e!!@test.com",
-        password: "newpassword123abc",
-      },
-    },
-  });
-
-  return response;
-};

@@ -106,7 +106,7 @@ export const userRegistrationAfterOperation = (
 
 export const addEmailToken = (context, operation, id, data, result) => {
   if (operation === "create" && result.status === 201) {
-    if (result.data.email && context.locals.runtime.env.REQUIRE_EMAIL_CONFIRMATION) {
+    if (result.data.email && context.locals.runtime.env.REQUIRE_EMAIL_CONFIRMATION?.toString().toLowerCase() === "true") {
       sendEmailConfirmation(context, result.data.email);
     }
   }

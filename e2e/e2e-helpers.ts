@@ -1,15 +1,6 @@
 import { expect } from "@playwright/test";
 import { adminCredentials } from "./settings";
 
-export const cleanup = async (request, token) => {
-    const response = await request.post(`/api/v1/test/e2e/cleanup`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  
-    expect(response.status()).toBe(200);
-  };
 
   export const loginAsAdmin = async (request) => {
     const response = await request.post(`/api/v1/auth/login`, {
@@ -22,7 +13,7 @@ export const cleanup = async (request, token) => {
     return bearer;
   }
 
-  export const createTestUser = async (request, token) => {
+  export const createTestUser = async (request, token, e2ePrefix = "e2e!!") => {
     await updateEnvVar(request, "USERS_CAN_REGISTER", "true");
 
     const response = await request.post(`/api/v1/users`, {
@@ -31,14 +22,30 @@ export const cleanup = async (request, token) => {
       },
       data: {
         data: {
-          email: "e2e!!@test.com",
-          password: "newpassword123abc",
+          email: `${e2ePrefix}@test.com`,
+          password: "password",
           firstName: "Demo",
           lastName: "User",
         },
       },
     });
 
+    return response;
+  };
+
+  export const createTestPost = async (request, token, body) => {
+    const response = await request.post(`/api/v1/posts`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: {
+        data: {
+          title: "e2e!! test title",
+          body,
+        },
+      },
+    });
+  
     return response;
   };
 
@@ -60,3 +67,21 @@ export const cleanup = async (request, token) => {
 
     return response;
   }
+
+  export const cleanup = async (request, token, table, field, likeValue) => {
+    console.log("Cleaning up", table, field, likeValue);
+    if (table && field && likeValue) {
+      const response = await request.post(`/api/v1/test/e2e/cleanup`, {
+        headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: {
+        table: table,
+        field: field,
+        likeValue: likeValue,
+      },
+    });
+  
+      expect(response.status()).toBe(200);
+    }
+  };

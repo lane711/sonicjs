@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
-import { purgeE2eTestData } from "@services/e2e";
 import { adminCredentials } from "./settings";
+import { cleanup, loginAsAdmin, createTestPost } from "./e2e-helpers";
 
 // Annotate entire file as serial.
 test.describe.configure({ mode: 'serial' });
@@ -9,22 +9,11 @@ var token = "";
 
 test.beforeAll(async ({ request }) => {
   token = await loginAsAdmin(request);
-  await cleanup(request, token);
+  await cleanup(request, token, "posts", "title", "e2e!!");
 });
 
-async function loginAsAdmin(request) {
-  const response = await request.post(`/api/v1/auth/login`, {
-    data: adminCredentials,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const { bearer } = await response.json();
-  return bearer;
-}
-
 test("should allow admin to create a post", async ({ request }) => {
-  const response = await createTestPost(request, token, 'create');
+  const response = await createTestPost(request, token, 'create post');
   expect(response.status()).toBe(201);
 });
 
@@ -79,28 +68,5 @@ test.afterEach(async ({ request }) => {
   // await cleanup(request, token);
 });
 
-const cleanup = async (request, token) => {
-  const response = await request.post(`/api/v1/test/e2e/cleanup`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
 
-  expect(response.status()).toBe(200);
-};
 
-const createTestPost = async (request, token, body) => {
-  const response = await request.post(`/api/v1/posts`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    data: {
-      data: {
-        title: "e2e!! test title",
-        body,
-      },
-    },
-  });
-
-  return response;
-};

@@ -219,7 +219,11 @@ export const POST: APIRoute = async (context) => {
         result
       );
     }
-    return return201({ data: result.data });
+    if(result.status === 201) {
+      return return201({ data: result.data });
+    } else {
+      return return500(result.message ?? "Error creating record");
+    }
   } catch (error) {
     console.log("error posting content", error);
     return return500(error);

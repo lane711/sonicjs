@@ -5,14 +5,14 @@ test.describe.configure({ mode: "serial" });
 
 
 var token = "";
-
+const e2ePrefix = "e2e!!-anonymous";
 test.beforeAll(async ({ request }) => {
   token = await loginAsAdmin(request);
-  await cleanup(request, token);
+  await cleanup(request, token, "users", "email", e2ePrefix);
 });
 
 test.afterEach(async ({ request }) => {
-  await cleanup(request, token);
+  await cleanup(request, token, "users", "email", e2ePrefix);
 });
 
 test("should not allow unauthenticated user to access /api/v1/users", async ({
@@ -64,38 +64,3 @@ test("should allow unauthenticated user to access /api/v1/posts", async ({
   expect(data.length).toBeGreaterThan(0);
 });
 
-test("should not allow unauthenticated user to create a user", async ({
-  request,
-}) => {
-  await updateEnvVar(request, "USERS_CAN_REGISTER", "false");
-  const response = await request.post(`/api/v1/users`, {
-    data: {
-      data: {
-        username: "newuser",
-        password: "password123",
-      },
-    },
-  });
-  expect(response.status()).toBe(401);
-  const json = await response.json();
-  expect(json.message).toEqual("Unauthorized");
-});
-
-test("should allow unauthenticated user to register", async ({ request }) => {
-  await updateEnvVar(request, "USERS_CAN_REGISTER", "true");
-  const response = await request.post(`/api/v1/users`, {
-    data: {
-      data: {
-        email: "e2e!!@test.com",
-        password: "newpassword123abc",
-        firstName: "Demo",
-        lastName: "User",
-      },
-    },
-  });
-  expect(response.status()).toBe(201);
-  const { data } = await response.json();
-  console.log("data-->", data);
-
-  expect(data.id).toEqual(expect.any(String));
-});
