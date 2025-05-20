@@ -23,6 +23,8 @@ export const cleanup = async (request, token) => {
   }
 
   export const createTestUser = async (request, token) => {
+    await updateEnvVar(request, "USERS_CAN_REGISTER", "true");
+
     const response = await request.post(`/api/v1/users`, {
       headers: {
         Authorization: `Bearer ${token}`,

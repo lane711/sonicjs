@@ -1,10 +1,7 @@
+import { adminCredentials } from "../../e2e/settings";
+
 const { faker } = require("@faker-js/faker");
 const baseUrl = "http://localhost:4321";
-
-const adminCredentials = {
-  email: "demo@demo.com",
-  password: "sonicjs!",
-};
 
 (async () => {
   try {

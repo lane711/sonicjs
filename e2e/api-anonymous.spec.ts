@@ -1,12 +1,9 @@
 import { test, expect } from "@playwright/test";
 import { cleanup, loginAsAdmin, updateEnvVar } from "./e2e-helpers";
+  
+test.describe.configure({ mode: "serial" });
 
-test.describe.configure({ mode: 'serial' });
 
-const adminCredentials = {
-  email: "demo@demo.com",
-  password: "sonicjs!",
-};
 var token = "";
 
 test.beforeAll(async ({ request }) => {
@@ -81,11 +78,7 @@ test("should not allow unauthenticated user to create a user", async ({
   });
   expect(response.status()).toBe(401);
   const json = await response.json();
-  expect(await response.json()).toEqual(
-    expect.objectContaining({
-      message: "Unauthorized",
-    })
-  );
+  expect(json.message).toEqual("Unauthorized");
 });
 
 test("should allow unauthenticated user to register", async ({ request }) => {
@@ -102,11 +95,7 @@ test("should allow unauthenticated user to register", async ({ request }) => {
   });
   expect(response.status()).toBe(201);
   const { data } = await response.json();
-  console.log('data-->',data);
+  console.log("data-->", data);
 
-  expect(data.id).toEqual(
-    expect.any(String)
-  );
+  expect(data.id).toEqual(expect.any(String));
 });
-
-

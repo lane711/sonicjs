@@ -2,16 +2,12 @@
 
 import { test, expect } from "@playwright/test";
 import { faker } from "@faker-js/faker";
+import { adminCredentials } from "./settings";
 
 // Annotate entire file as serial.
 test.describe.configure({ mode: "serial", timeout: 100 * 60 * 1000 });
 
 const baseUrl = "https://demo.sonicjs.com";
-
-const adminCredentials = {
-  email: "demo@demo.com",
-  password: "sonicjs!",
-};
 
 const generateViaApi = false;
 const employeeCount = 0;
