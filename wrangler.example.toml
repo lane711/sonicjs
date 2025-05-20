@@ -15,6 +15,7 @@ database_id = "CHANGEME"
 #auth settings
 INVALIDATE_USER_SESSIONS = false
 REQUIRE_EMAIL_CONFIRMATION = true
+USERS_CAN_REGISTER = true
 
 # cache
 DISABLED_CACHE = true
@@ -29,7 +30,10 @@ EMAIL_FROM_NAME="SonicJS"
 EMAIL_SEND_WELCOME_EMAIL = true
 # EMAIL_CLIENT_TOKEN="n62jk0uekly8gxn4n697yy9v"
 
-#one time password settings
+# one time password settings
 ONE_TIME_PASSWORD_CHARACTER_LENGTH = 5
 ONE_TIME_PASSWORD_EXPIRATION_TIME = 1200000 # 20 minutes in milliseconds
 ONE_TIME_PASSWORD_EMAIL_SUBJECT="Your SonicJS OTP"
+
+# testing
+TESTING_MODE = true # do not set to false in production

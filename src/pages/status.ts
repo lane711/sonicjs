@@ -56,8 +56,8 @@ const getStatus = async (context) => {
   try {
     // status.env = ctx.env;
     var safeOutput = {};
-    for (var prop in context.env) {
-      if (Object.prototype.hasOwnProperty.call(context.env, prop)) {
+    for (var prop in context.locals.runtime.env) {
+      if (Object.prototype.hasOwnProperty.call(context.locals.runtime.env, prop)) {
         safeOutput[prop] = "[redacted]";
       }
       status.env = safeOutput;
