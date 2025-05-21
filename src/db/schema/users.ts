@@ -13,7 +13,6 @@ import * as comments from "@custom/db/schema/comments";
 import { isAdmin, isAdminOrEditor, isAdminOrUser, usersCanRegister } from "../config-helpers";
 import type { ApiConfig } from "../routes";
 import { hashString } from "@services/cyrpt";
-import { sendEmailConfirmationEmail, sendWelcomeEmail } from "@services/email";
 import { sendEmailConfirmation } from "@services/auth";
 export const tableName = "users";
 export const name = "Users";

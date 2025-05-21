@@ -50,6 +50,13 @@
       "when": 1747246898580,
       "tag": "0006_long_sauron",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1747867509179,
+      "tag": "0007_fresh_mongoose",
+      "breakpoints": true
     }
   ]
 }
