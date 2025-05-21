@@ -25,7 +25,7 @@ export function generateSessionToken(): string {
 }
 
 export async function createSession(
-  d1: D1Database,
+  d1: IDBDatabase,
   token: string,
   userId: string
 ): Promise<Session> {
@@ -49,7 +49,7 @@ export async function createSession(
 }
 
 export async function validateSessionToken(
-  d1: D1Database,
+  d1: IDBDatabase,
   token: string
 ): Promise<SessionValidationResult> {
   const db = drizzle(d1);
@@ -93,7 +93,7 @@ export async function validateSessionToken(
 }
 
 export async function invalidateSession(
-  d1: D1Database,
+  d1: IDBDatabase,
   token: string
 ): Promise<void> {
   const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
@@ -104,7 +104,7 @@ export async function invalidateSession(
 }
 
 export async function invalidateUserSessions(
-  d1: D1Database,
+  d1: IDBDatabase,
   userId: string
 ): Promise<void> {
   const db = drizzle(d1);

@@ -1,5 +1,6 @@
 import ConfirmationEmail from "@emails/confirmation";
 import OTPEmail from "@emails/otp";
+import PasswordResetEmail from "@emails/reset";
 import React from "react";
 import { Resend } from "resend";
 
@@ -68,11 +69,11 @@ export async function sendPasswordResetEmail(context, user, code, expirationTime
     from: context.locals.runtime.env.EMAIL_FROM,
     to: user.email,
     subject: context.locals.runtime.env.ONE_TIME_PASSWORD_EMAIL_SUBJECT,
-    react: OTPEmail({
-      otp,
-      firstName: user.firstName,
-      expirationTime: expirationTime,
-    }),
+    react: PasswordResetEmail(
+      user,
+      code,
+      context.locals.runtime.env.EMAIL_BASE_URL
+    ),
   });
   return result;
 }

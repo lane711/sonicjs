@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from 'vitest';
-import { GET, POST } from './set';
+import { GET } from './set';
 import type { APIContext } from 'astro';
 import type { Runtime } from '@astrojs/cloudflare';
 import type { AstroCookies } from 'astro';
@@ -9,7 +9,6 @@ describe('Vars Set Endpoint', () => {
     locals: {
       runtime: {
         env: {
-          ASSETS: {},
           CF_PAGES: '1',
           CF_PAGES_BRANCH: 'main',
           CF_PAGES_COMMIT_SHA: '450099b920e1ea178a5bf0c48619c40d25ecd4ae',

@@ -2,6 +2,7 @@
 import { OTPEmail } from './otp';
 import { WelcomeEmail } from './welcome';
 import { ConfirmationEmail } from './confirmation';
+import { PasswordResetEmail } from './reset';
 // Map of email components
 const emailComponents = {
     'otp': OTPEmail,
