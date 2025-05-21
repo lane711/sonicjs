@@ -1,7 +1,3 @@
-/* @ts-nocheck */
-// @ts-nocheck
-// @preserve
-
 import { Button, Link, Text } from "@react-email/components";
 import { EmailLayout } from "./components/EmailLayout";
 
