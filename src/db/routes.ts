@@ -180,7 +180,7 @@ export interface ApiConfig {
         }
       | {
           type: "file" | "file[]";
-          bucket: (ctx: AppContext) => R2Bucket;
+          bucket: (ctx: AppContext) => any;
           path?: string | ((ctx: AppContext) => string);
         }
       | {
