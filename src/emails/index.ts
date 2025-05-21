@@ -7,6 +7,7 @@ const emailComponents = {
     'otp': OTPEmail,
     'welcome': WelcomeEmail,
     'confirmation': ConfirmationEmail,
+    'passwordReset': PasswordResetEmail,
 };
 
 // Function to get email component by name

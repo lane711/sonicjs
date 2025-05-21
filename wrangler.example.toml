@@ -16,6 +16,7 @@ database_id = "CHANGEME"
 INVALIDATE_USER_SESSIONS = false
 REQUIRE_EMAIL_CONFIRMATION = true
 USERS_CAN_REGISTER = true
+RESET_PASSWORD_EXPIRATION_TIME = 1200000          # 20 minutes in milliseconds
 
 # cache
 DISABLED_CACHE = true
@@ -23,12 +24,11 @@ DISABLED_CACHE = true
 # reset email service
 RESEND_API_KEY = "CHANGEME"
 
-#email settubgs
-EMAIL_FROM="lane@sonicjs.com"
-EMAIL_BASE_URL="https://sonicjs.com"
-EMAIL_FROM_NAME="SonicJS"
+#email settings
+EMAIL_FROM="me@example.com"
+EMAIL_BASE_URL="https://example.com"
+EMAIL_FROM_NAME="Example"
 EMAIL_SEND_WELCOME_EMAIL = true
-# EMAIL_CLIENT_TOKEN="n62jk0uekly8gxn4n697yy9v"
 
 # one time password settings
 ONE_TIME_PASSWORD_CHARACTER_LENGTH = 5
@@ -36,7 +36,4 @@ ONE_TIME_PASSWORD_EXPIRATION_TIME = 1200000 # 20 minutes in milliseconds
 ONE_TIME_PASSWORD_EMAIL_SUBJECT="Your SonicJS OTP"
 
 # testing
-TESTING_MODE = true # do not set to false in production
-
-# general
-HIDE_STARTUP_LOGO = false
+TESTING_MODE = true # do not set to true in production, enabled e2e endpoints

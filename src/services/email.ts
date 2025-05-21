@@ -62,6 +62,21 @@ export async function sendOTPEmail(context, user, otp, expirationTime) {
   return result;
 }
 
+export async function sendPasswordResetEmail(context, user, code, expirationTime) {
+  const resend = getResendClient(context);
+  const result = await resend.emails.send({
+    from: context.locals.runtime.env.EMAIL_FROM,
+    to: user.email,
+    subject: context.locals.runtime.env.ONE_TIME_PASSWORD_EMAIL_SUBJECT,
+    react: OTPEmail({
+      otp,
+      firstName: user.firstName,
+      expirationTime: expirationTime,
+    }),
+  });
+  return result;
+}
+
 export async function sendEmailConfirmationEmail(context, user, code) {
   const resend = getResendClient(context);
   const result = await resend.emails.send({

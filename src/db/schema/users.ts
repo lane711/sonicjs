@@ -32,6 +32,8 @@ export const definition = {
   password: text("password").notNull(),
   passwordOTP: text("passwordOTP"),
   passwordOTPExpiresOn: integer("passwordOTPExpiresOn"),
+  passwordResetCode: text("passwordResetCode"),
+  passwordResetCodeExpiresOn: integer("passwordResetCodeExpiresOn"),
   role: text("role").$type<"admin" | "user">().default("user"),
 };
 
