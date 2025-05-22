@@ -30,7 +30,7 @@ import { adminCredentials } from "./settings";
       },
     });
 
-    return response;
+    return response.json();
   };
 
   export const createTestPost = async (request, token, body) => {

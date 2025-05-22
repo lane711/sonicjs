@@ -21,7 +21,7 @@ export const GET = async (context) => {
     {
       filters: {
         email: {
-          $contains: email, // the email address you want to look up
+          $eq: email, // the email address you want to look up
         },
       },
     },

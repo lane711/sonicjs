@@ -16,7 +16,10 @@ database_id = "CHANGEME"
 INVALIDATE_USER_SESSIONS = false
 REQUIRE_EMAIL_CONFIRMATION = true
 USERS_CAN_REGISTER = true
+
+# password reset settings
 RESET_PASSWORD_EXPIRATION_TIME = 1200000          # 20 minutes in milliseconds
+PASSWORD_RESET_EMAIL_SUBJECT="SonicJS Password Reset"
 
 # cache
 DISABLED_CACHE = true
@@ -25,6 +28,7 @@ DISABLED_CACHE = true
 RESEND_API_KEY = "CHANGEME"
 
 #email settings
+EMAIL_ENABLED = true
 EMAIL_FROM="me@example.com"
 EMAIL_BASE_URL="https://example.com"
 EMAIL_FROM_NAME="Example"

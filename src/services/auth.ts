@@ -82,7 +82,6 @@ export const login = async (
   }
 
   if (isPasswordCorrect || isOTPCorrect) {
-    console.log("password or otp correct for ", user.email);
     const token = generateSessionToken();
     const invalidateUserSessionsOption =
       context.locals.runtime.env.INVALIDATE_USER_SESSIONS === "true"

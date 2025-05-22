@@ -1,4 +1,4 @@
-import { sendEmailResend, sendOTPEmail } from "@services/email";
+import { sendEmailResend, sendOTPEmail, sendPasswordResetEmail } from "@services/email";
 import { return200, return404 } from "@services/return-types";
 import MagicLinkEmail from "@emails/welcome";
 import React from "react";
@@ -14,7 +14,6 @@ export const GET = async (context) => {
 
   const email = decodeURIComponent(emailEncoded);
 
-  const passwordResetCode = generateRandomString(48)
 
   const userRecord = await getRecords(
     context,
@@ -22,7 +21,7 @@ export const GET = async (context) => {
     {
       filters: {
         email: {
-          $contains: email, // the email address you want to look up
+          $eq: email, // the email address you want to look up
         },
       },
     },
@@ -33,6 +32,9 @@ export const GET = async (context) => {
   if (!userRecord.data.length) {
     return return404();
   }
+
+  const passwordResetCode = generateRandomString(48)
+
 
   const user = userRecord.data[0];
 
@@ -55,7 +57,7 @@ export const GET = async (context) => {
     {}
   );
 
-  const result = await sendOTPEmail(context, user, otp, expirationTime);
+  const result = await sendPasswordResetEmail(context, user, passwordResetCode, expirationTime);
 
   return return200(result);
 };

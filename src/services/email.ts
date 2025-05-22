@@ -68,11 +68,12 @@ export async function sendPasswordResetEmail(context, user, code, expirationTime
   const result = await resend.emails.send({
     from: context.locals.runtime.env.EMAIL_FROM,
     to: user.email,
-    subject: context.locals.runtime.env.ONE_TIME_PASSWORD_EMAIL_SUBJECT,
+    subject: context.locals.runtime.env.PASSWORD_RESET_EMAIL_SUBJECT,
     react: PasswordResetEmail(
+      context.locals.runtime.env.EMAIL_BASE_URL,
       user,
       code,
-      context.locals.runtime.env.EMAIL_BASE_URL
+      expirationTime
     ),
   });
   return result;
