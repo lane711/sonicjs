@@ -2,6 +2,8 @@ import test, { expect } from "@playwright/test";
 import {
   cleanup,
   createTestUser,
+  getEnvVar,
+  getTestUser,
   loginAsAdmin,
   updateEnvVar,
 } from "./e2e-helpers";
@@ -14,20 +16,33 @@ test.describe("Preset Password API Tests", () => {
 
   test.beforeAll(async ({ request }) => {
     token = await loginAsAdmin(request);
+    await updateEnvVar(request, "EMAIL_ENABLED", "false");
     await cleanup(request, token, "users", "email", e2ePrefix);
+  });
+
+  test("should get and set testing env vars", async ({ request }) => {
+
+    const updatedVars =await updateEnvVar(request, "e2e_reset_test", "abc");
+    expect(updatedVars.key).toEqual("e2e_reset_test");
+    expect(updatedVars.value).toEqual("abc");
+
+    const envVar = await getEnvVar(request, "e2e_reset_test");
+    expect(envVar.value).toEqual("abc");
+
   });
 
   test("should return 404 for non-existent email", async ({ request }) => {
     const response = await request.get(
       `/api/v1/auth/password/reset/test@test.com`
     );
-    expect(response.status()).toBe(404);
+    expect(response.status()).toBe(200);
     const json = await response.json();
-    expect(json.message).toEqual("Not Found");
+    expect(json.message).toEqual("If the email address is valid, a password reset email has been sent");
+    const envVar = await getEnvVar(request, "e2e_forgot_password");
+    expect(envVar.value).toEqual("user not found");
   });
 
   test("should send password reset email", async ({ request }) => {
-    await updateEnvVar(request, "EMAIL_ENABLED", "false");
     const userEmail = `${e2ePrefix}-no-confirmation`;
 
     const createUserResponse = await createTestUser(request, token, userEmail);
@@ -37,19 +52,16 @@ test.describe("Preset Password API Tests", () => {
       `/api/v1/auth/password/reset/${encodeURIComponent(createUserResponse.data.email)}`
     );
     expect(response.status()).toBe(200);
+    const json = await response.json();
+    expect(json.message).toEqual("If the email address is valid, a password reset email has been sent");
 
     //check that the user has a password reset code
-    const user = await getRecords(request, "users", {
-      filters: {
-        email: {
-          $eq: userEmail,
-        },
-      },
-    });
+    const user = await getTestUser(request, token, createUserResponse.data.id);
 
-    expect(user.data.length).toBe(1);
-    expect(user.data[0].passwordResetCode).toBeDefined();
-    expect(user.data[0].passwordResetCodeExpiresOn).toBeDefined();
+    expect(user.data.passwordResetCode).toBeDefined();
+    expect(user.data.passwordResetCodeExpiresOn).toBeDefined();
+    const envVar = await getEnvVar(request, "e2e_forgot_password");
+    expect(envVar.value).toEqual("email sent");
   });
 
   test("should allow unauthenticated user to register with email confirmation", async ({

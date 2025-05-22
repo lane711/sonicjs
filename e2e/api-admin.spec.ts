@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { cleanup, loginAsAdmin, createTestUser } from "./e2e-helpers";
+import { cleanup, loginAsAdmin, createTestUser, getTestUser } from "./e2e-helpers";
 // Annotate entire file as serial.
 test.describe("Admin API Tests", () => {
   test.describe.configure({ mode: "serial" });
@@ -30,11 +30,10 @@ test.describe("Admin API Tests", () => {
   });
 
   test("should allow admin to update a user", async ({ request }) => {
-    const createUserResponse = await createTestUser(request, token, `${e2ePrefix}-update`);
-    expect(createUserResponse.status()).toBe(201);
-    const { data } = await createUserResponse.json();
+    const createUserData = await createTestUser(request, token, `${e2ePrefix}-update`);
 
-    const response = await request.put(`/api/v1/users/${data.id}`, {
+
+    const response = await request.put(`/api/v1/users/${createUserData.data.id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -48,19 +47,14 @@ test.describe("Admin API Tests", () => {
       },
     });
 
-    expect(response.status()).toBe(200);
+    expect(response.status()).toBe(200);  
 
-    const response2 = await request.get(`/api/v1/users/${data.id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    expect(response2.status()).toBe(200);
-
-    const { data: updatedData } = await response2.json();
-    expect(typeof updatedData === "object").toBe(true);
-    expect(updatedData.firstName).toBe("updated");
+    const updatedUser = await getTestUser(request, token, createUserData.data.id);
+    
+    expect(updatedUser.data.firstName).toBe("updated");
+    expect(updatedUser.data.lastName).toBe("user");
+    expect(updatedUser.data.email).toBe(`${e2ePrefix}-updated@test.com`);
+    expect(updatedUser.data.password).toBe("updatedPassword");
   });
 
   test("should allow admin to delete a user", async ({ request }) => {

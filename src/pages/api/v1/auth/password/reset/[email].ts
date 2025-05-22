@@ -29,8 +29,14 @@ export const GET = async (context) => {
     "fastest"
   );
 
+  const returnMessage = "If the email address is valid, a password reset email has been sent";
+
   if (!userRecord.data.length) {
-    return return404();
+    console.log("password reset: user not found", email);
+    // add a random delay of 50ms to 2000ms to prevent timing attacks
+    await new Promise(resolve => setTimeout(resolve, Math.random() * 1950 + 50));
+    context.locals.runtime.env.e2e_forgot_password = 'user not found';
+    return return200({ message: returnMessage });
   }
 
   const passwordResetCode = generateRandomString(48)
@@ -59,6 +65,10 @@ export const GET = async (context) => {
 
   const result = await sendPasswordResetEmail(context, user, passwordResetCode, expirationTime);
 
-  return return200(result);
+  console.log("password reset: email sent", email);
+  context.locals.runtime.env.e2e_forgot_password = 'email sent';
+
+
+  return return200({ message: returnMessage });
 };
 
