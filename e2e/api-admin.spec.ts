@@ -23,10 +23,8 @@ test.describe("Admin API Tests", () => {
   });
 
   test("should allow admin to create a user", async ({ request }) => {
-    const response = await createTestUser(request, token, e2ePrefix);
-    expect(response.status()).toBe(201);
-    const { data: createdData } = await response.json();
-    expect(typeof createdData === "object").toBe(true);
+    const user = await createTestUser(request, token, e2ePrefix);
+    expect(typeof user === "object").toBe(true);
   });
 
   test("should allow admin to update a user", async ({ request }) => {
@@ -58,20 +56,16 @@ test.describe("Admin API Tests", () => {
   });
 
   test("should allow admin to delete a user", async ({ request }) => {
-    const createUserResponse = await createTestUser(request, token, `${e2ePrefix}-delete`);
-    expect(createUserResponse.status()).toBe(201);
-    const { data: createdData } = await createUserResponse.json();
+    const user = await createTestUser(request, token, `${e2ePrefix}-delete`);
 
-    const response = await request.delete(`/api/v1/users/${createdData.id}`, {
+    const response = await request.delete(`/api/v1/users/${user.id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
-    const { data } = await createUserResponse.json();
-
+    const deleteResponse = await response.json();
     expect(response.status()).toBe(200);
-    expect(data.id).toBe(createdData.id);
   });
 
   test("should allow admin to access /api/v1/auth/user for session and user info", async ({
