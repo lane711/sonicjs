@@ -5,7 +5,7 @@ test.describe("Admin API Tests", () => {
   test.describe.configure({ mode: "serial" });
 
   var token = "";
-  const e2ePrefix = "e2e-admin!!";
+  const e2ePrefix = "e2e-admin";
   test.beforeAll(async ({ request }) => {
     token = await loginAsAdmin(request);
     await cleanup(request, token, "users", "email", e2ePrefix);
@@ -58,13 +58,15 @@ test.describe("Admin API Tests", () => {
   test("should allow admin to delete a user", async ({ request }) => {
     const user = await createTestUser(request, token, `${e2ePrefix}-delete`);
 
-    const response = await request.delete(`/api/v1/users/${user.id}`, {
+    const response = await request.delete(`/api/v1/users/${user.data.id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
     const deleteResponse = await response.json();
+    expect(deleteResponse.success).toBe(true);
+    expect(deleteResponse.id).toBe(user.data.id);
     expect(response.status()).toBe(200);
   });
 
