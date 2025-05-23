@@ -64,8 +64,8 @@ export function prepareD1Data(data, tbl = "") {
   data.updatedOn = now;
   delete data.table;
 
-  if(!data.id){ 
-    data.id =   uuid();
+  if (!data.id) {
+    data.id = uuid();
   }
 
   if (!schema.id) {
@@ -88,16 +88,23 @@ export async function insertD1Data(d1, kv, table, data) {
   }
 }
 
-export async function deleteD1ByTableAndId(d1, table, id) {
+export async function deleteD1ByTableAndId(
+  d1,
+  table,
+  id
+): Promise<boolean | { code: number; message: string }> {
   console.log("deleteD1ByTableAndId", table, id);
   const db = drizzle(d1);
 
   const schmea = getRepoFromTable(table);
   let sql = await db.delete(schmea).where(eq(schmea.id, id)).toSQL();
 
-  let result = await db.delete(schmea).where(eq(schmea.id, id)).run();
-
-  return result;
+  try {
+    let result = await db.delete(schmea).where(eq(schmea.id, id)).run();
+    return result.success;
+  } catch (error) {
+    return { code: 500, message: error };
+  }
 }
 
 export async function updateD1Data(
@@ -178,7 +185,7 @@ export function sortClauseBuilder(params) {
   if (Array.isArray(params.sort)) {
     sortClause =
       "order by " + params.sort.join(", ").replace(new RegExp(":", "g"), " ");
-  }else{
+  } else {
     const direction = params.sort.includes(":desc") ? "desc" : "asc";
     const sort = params.sort.replace(":desc", "").replace(":asc", "");
     sortClause = `order by ${sort} ${direction}`;
@@ -201,51 +208,53 @@ export function whereClauseBuilder(filters: any) {
 
     //need to first loop over the object keys in the case of multiple filters on the same field
     for (const condition of Object.keys(filter)) {
+      // let condition = Object.keys(filter)[0];
 
-    // let condition = Object.keys(filter)[0];
-
-    if (Array.isArray(filter[condition])) {
-      // AND (country = 'usa' OR country = 'uk')
-      const arr = filter[condition];
-      let multiArr = [];
-      for (const prop of arr) {
-        multiArr.push(`${key} = '${prop}'`);
+      if (Array.isArray(filter[condition])) {
+        // AND (country = 'usa' OR country = 'uk')
+        const arr = filter[condition];
+        let multiArr = [];
+        for (const prop of arr) {
+          multiArr.push(`${key} = '${prop}'`);
+        }
+        whereClause = `${whereClause} ${AND} (${multiArr.join(` OR `)})`;
+      } else if (condition === "$null" || condition === "$nnull") {
+        whereClause = `${whereClause} ${AND} ${key} ${processCondition(
+          condition
+        )}`;
+      } else if (condition === "$contains") {
+        whereClause = `${whereClause} ${AND} ${key} ${processCondition(
+          condition
+        )} '%${filter[condition]}%'`;
+      } else if (
+        condition === "$starts_with" ||
+        condition === "$nstarts_with"
+      ) {
+        whereClause = `${whereClause} ${AND} ${key} ${processCondition(
+          condition
+        )} '${filter[condition]}%'`;
+      } else if (condition === "$ends_with" || condition === "$nends_with") {
+        whereClause = `${whereClause} ${AND} ${key} ${processCondition(
+          condition
+        )} '%${filter[condition]}'`;
+      } else {
+        whereClause = `${whereClause} ${AND} ${key} ${processCondition(
+          condition
+        )} '${filter[condition]}'`;
       }
-      whereClause = `${whereClause} ${AND} (${multiArr.join(` OR `)})`;
-    }else if(condition === '$null' || condition === '$nnull'){
-      whereClause = `${whereClause} ${AND} ${key} ${processCondition(
-        condition
-      )}`;
-    }else if(condition === '$contains'){
-      whereClause = `${whereClause} ${AND} ${key} ${processCondition(
-        condition
-      )} '%${filter[condition]}%'`;
-    }else if(condition === '$starts_with' || condition === '$nstarts_with'){
-      whereClause = `${whereClause} ${AND} ${key} ${processCondition(
-        condition
-      )} '${filter[condition]}%'`;
-    }else if(condition === '$ends_with' || condition === '$nends_with'){
-      whereClause = `${whereClause} ${AND} ${key} ${processCondition(
-        condition
-      )} '%${filter[condition]}'`;
-    } else {
-      whereClause = `${whereClause} ${AND} ${key} ${processCondition(
-        condition
-      )} '${filter[condition]}'`;
-    }
-    // if (typeof filter === 'string') {
-    //   if (filter.toLowerCase().includes('is')) {
-    //     whereClause = `${whereClause} ${AND} ${key} ${filter}`;
-    //   } else {
-    //     whereClause = `${whereClause} ${AND} ${key} = '${filter}'`;
-    //   }
-    // } else {
-    //   whereClause = `${whereClause} ${AND} ${key} = ${filter}`;
-    // }
+      // if (typeof filter === 'string') {
+      //   if (filter.toLowerCase().includes('is')) {
+      //     whereClause = `${whereClause} ${AND} ${key} ${filter}`;
+      //   } else {
+      //     whereClause = `${whereClause} ${AND} ${key} = '${filter}'`;
+      //   }
+      // } else {
+      //   whereClause = `${whereClause} ${AND} ${key} = ${filter}`;
+      // }
 
-    AND = "AND";
+      AND = "AND";
+    }
   }
-}
   return whereClause.replace(/\s+/g, " ");
 }
 
@@ -315,5 +324,5 @@ export function processCondition(condition) {
 export async function purgeD1Table(db, table) {
   const sql = `DELETE FROM ${table}`;
   const { results } = await db.prepare(sql).all();
-  return {status: "success"};
+  return { status: "success" };
 }

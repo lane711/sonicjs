@@ -304,13 +304,13 @@ export async function updateRecord(d1, kv, data, params: Record<string, any>) {
   }
 }
 
-export async function deleteRecord(d1, data) {
-  const timestamp = new Date().getTime();
+export async function deleteRecord(d1, data) : Promise<boolean | { code: number; message: string }> {
 
   try {
     // const kvResult = await deleteKVById(kv, data.id);
     const d1Result = await deleteD1ByTableAndId(d1, data.table, data.id);
 
+    return d1Result;
     // await setCacheStatusInvalid();
     // await clearKVCache(kv);
   } catch (error) {
