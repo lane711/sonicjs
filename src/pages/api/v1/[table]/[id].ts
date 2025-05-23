@@ -271,8 +271,10 @@ export const DELETE: APIRoute = async (context) => {
 
     if(result === true){
       return return200({ success: true, id });
-    } else {
+    } else if (typeof result === 'object' && 'message' in result) {
       return return500(result.message);
+    } else {
+      return return500('Delete operation failed');
     }
   } else {
     console.log("content not found");
