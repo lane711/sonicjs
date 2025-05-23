@@ -138,29 +138,31 @@ function Table({ tableConfig, token }) {
       }
     };
 
-  const deleteData = (id) => {
+  const deleteData = async (id) => {
     console.log("deleteData with id", id);
 
     if (id) {
       const path = `/api/v1/${tableConfig.route}/${id}`;
 
-      fetch(path, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-      })
-        .then(async (res) => {
-          const responseData: { data: any, success: boolean } = await res.json();
-          if (responseData.success) {
-            console.log("record deleted");
-          } else {
-            console.error("Failed to delete record");
+
+      try {
+        const response = await fetch(path, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
           }
-        }).catch((error) => {
-          console.error("Failed to delete record", error);
         });
+    
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+    
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error("There was an error deleting the data:", error);
+        throw error;
+      }
     }
   };
 
