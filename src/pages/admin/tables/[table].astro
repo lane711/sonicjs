@@ -4,12 +4,16 @@ import AdminLayout from "../layouts/admin-layout.astro";
 import Table from "../../../components/table";
 import { getFieldDefinitions } from "../../../services/fields";
 import DeleteConfirmation from "../../../components/delete-confirmation";
+import { getToken } from "@services/token";
 
 const tableConfigRecord = apiConfig.find((t) => t.route === Astro.params.table);
 const tableConfig = getFieldDefinitions(tableConfigRecord);
 
+
+const token = getToken(Astro);
+
 ---
 
 <AdminLayout title=`SonicJs Admin` | {Astro.params.table} `>
-  <Table client:load tableConfig={tableConfig} />
+  <Table client:load tableConfig={tableConfig} token={token} />
 </AdminLayout>

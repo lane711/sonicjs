@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { cleanup, loginAsAdmin, createTestUser, getTestUser } from "./e2e-helpers";
+import { cleanup, loginAsAdmin, createTestUser, getTestUser, createTestPost } from "./e2e-helpers";
 // Annotate entire file as serial.
 test.describe("Admin API Tests", () => {
   test.describe.configure({ mode: "serial" });
@@ -68,6 +68,21 @@ test.describe("Admin API Tests", () => {
     expect(deleteResponse.success).toBe(true);
     expect(deleteResponse.id).toBe(user.data.id);
     expect(response.status()).toBe(200);
+  });
+
+  test("should allow admin to delete a post", async ({ request }) => {
+    const post = await createTestPost(request, token, 'test body', `${e2ePrefix}-delete`);
+
+    const response = await request.delete(`/api/v1/posts/${post.data.id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    expect(response.status()).toBe(200);
+    const deleteResponse = await response.json();
+    expect(deleteResponse.success).toBe(true);
+    expect(deleteResponse.id).toBe(post.data.id);
   });
 
   test("should allow admin to access /api/v1/auth/user for session and user info", async ({

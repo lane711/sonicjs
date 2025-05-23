@@ -34,7 +34,7 @@ export const createTestUser = async (request, token, e2ePrefix = "e2e!!") => {
   return response.json();
 };
 
-export const createTestPost = async (request, token, body) => {
+export const createTestPost = async (request, token, body, e2ePrefix = "e2e!!") => {
   const response = await request.post(`/api/v1/posts`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -47,7 +47,12 @@ export const createTestPost = async (request, token, body) => {
     },
   });
 
-  return response;
+  expect(response.status()).toBe(201);
+  const data = await response.json();
+  expect(data.data.title).toBe("e2e!! test title");
+  expect(data.data.body).toBe(body);
+
+  return response.json();
 };
 
 export const getTestUser = async (request, token, id) => {

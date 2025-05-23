@@ -8,6 +8,7 @@ import { sequence } from "astro:middleware";
 import { kvGet } from "@services/kv";
 import { cacheRequestInsert } from "@services/kv-data";
 import { return200 } from "@services/return-types";
+import { getToken } from "@services/token";
 
 async function cache(context, next) {
   const start = Date.now();
@@ -64,10 +65,7 @@ async function auth(context, next) {
   //   context.locals.auth = new Auth(config);
 
   // Get session token from cookie
-  const sessionId = context.cookies.get("session")?.value ?? 
-  context.request.headers
-  .get("Authorization")?.toLowerCase()
-  ?.replace("bearer ", "");
+  const sessionId = getToken(context);
 
   // Check if we're already on the login or register page
   const isAuthPage = context.

@@ -31,7 +31,7 @@ const fallbackData = [
   },
 ];
 
-function Table({ tableConfig }) {
+function Table({ tableConfig, token }) {
   // debugger;
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -139,17 +139,28 @@ function Table({ tableConfig }) {
     };
 
   const deleteData = (id) => {
+    console.log("deleteData with id", id);
+
     if (id) {
       const path = `/api/v1/${tableConfig.route}/${id}`;
 
-      // const path = `/api/v1/${tableConfig.route}`;
-
       fetch(path, {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
       })
-        .then((res) => res.text()) // or res.json()
-        .then((res) => console.log(res));
-      console.log("delete record with id", id);
+        .then(async (res) => {
+          const responseData: { data: any, success: boolean } = await res.json();
+          if (responseData.success) {
+            console.log("record deleted");
+          } else {
+            console.error("Failed to delete record");
+          }
+        }).catch((error) => {
+          console.error("Failed to delete record", error);
+        });
     }
   };
 
@@ -273,6 +284,7 @@ function Table({ tableConfig }) {
                       </thead>
                       <tbody>
                         {table.getRowModel().rows.map((row) => {
+                          console.log("row", row);
                           return (
                             <tr key={row.id}>
                               {row.getVisibleCells().map((cell) => {
