@@ -13,8 +13,9 @@ test.beforeAll(async ({ request }) => {
 });
 
 test("should allow admin to create a post", async ({ request }) => {
-  const response = await createTestPost(request, token, 'create post');
-  expect(response.status()).toBe(201);
+  const post = await createTestPost(request, token, 'create post');
+
+  expect(post.data.body).toBe("create post");
 });
 
 // test("should allow admin to delete a user", async ({ request }) => {

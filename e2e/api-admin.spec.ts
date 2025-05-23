@@ -64,10 +64,10 @@ test.describe("Admin API Tests", () => {
       },
     });
 
+    expect(response.status()).toBe(200);
     const deleteResponse = await response.json();
     expect(deleteResponse.success).toBe(true);
     expect(deleteResponse.id).toBe(user.data.id);
-    expect(response.status()).toBe(200);
   });
 
   test("should allow admin to delete a post", async ({ request }) => {
