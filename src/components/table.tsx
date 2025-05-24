@@ -120,11 +120,15 @@ function Table({ tableConfig, token }) {
 
   useEffect(() => {
     if (confirmDelete) {
-      deleteData(recordToDelete);
-      console.log("record deleted");
-      setConfirmDelete(false);
-      //redirect to table
-      window.location.href = `/admin/tables/${tableConfig.route}`;
+      (async () => {
+        const result = await deleteData(recordToDelete);
+        console.log("record deleted");
+        // setConfirmDelete(false);
+        //redirect to table
+        if (result.success) {
+          window.location.href = `/admin/tables/${tableConfig.route}`;
+        }
+      })();
     }
   }, [confirmDelete]);
 
