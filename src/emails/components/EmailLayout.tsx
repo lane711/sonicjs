@@ -11,16 +11,13 @@ import {
 } from '@react-email/components';
 import * as React from 'react';
 
-const baseUrl = process.env.EMAIL_BASE_URL
-  ? `https://${process.env.EMAIL_BASE_URL}`
-  : '';
-
 interface EmailLayoutProps {
   preview: string;
   children: React.ReactNode;
+  baseUrl: string;
 }
 
-export const EmailLayout = ({ preview, children }: EmailLayoutProps) => (
+export const EmailLayout = ({ preview, children, baseUrl }: EmailLayoutProps) => (
   <Html>
     <Head />
     <Body style={main}>
@@ -28,7 +25,7 @@ export const EmailLayout = ({ preview, children }: EmailLayoutProps) => (
       <Container style={container}>
           <Section style={box}>
             <Img
-              src={`${baseUrl}/public/images/sonicjs-logo-dark.svg`}
+              src="https://demo.sonicjs.com/images/sonicjs-logo-dark.svg"
               width="300"
               alt="SonicJs"
             />

@@ -1,7 +1,4 @@
 ---
-import WelcomeEmail from "@emails/welcome";
-
-
 
 interface Params {
     emailName: string;
@@ -16,8 +13,8 @@ if (!EmailComponent) {
 }
 
 
-
-
+const baseUrl = Astro.locals.runtime.env.EMAIL_BASE_URL;
+console.log(baseUrl);
 ---
 
-<EmailComponent data={{ firstName: "John" }} />
+<EmailComponent baseUrl={baseUrl} />

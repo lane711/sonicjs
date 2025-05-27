@@ -58,6 +58,7 @@ export async function sendOTPEmail(context, user, otp, expirationTime) {
       otp,
       firstName: user.firstName,
       expirationTime: expirationTime,
+      baseUrl: context.locals.runtime.env.EMAIL_BASE_URL,
     }),
   });
   return result;
@@ -65,12 +66,14 @@ export async function sendOTPEmail(context, user, otp, expirationTime) {
 
 export async function sendPasswordResetEmail(context, user, code, expirationTime) {
   const resend = getResendClient(context);
+  const baseUrl = context.locals.runtime.env.EMAIL_BASE_URL;
+  console.log('baseUrl', baseUrl);
   const result = await resend.emails.send({
     from: context.locals.runtime.env.EMAIL_FROM,
     to: user.email,
     subject: context.locals.runtime.env.PASSWORD_RESET_EMAIL_SUBJECT,
     react: PasswordResetEmail(
-      context.locals.runtime.env.EMAIL_BASE_URL,
+      baseUrl,
       user,
       code,
       expirationTime

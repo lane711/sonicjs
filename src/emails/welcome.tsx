@@ -9,7 +9,7 @@ import { anchor } from './styles';
 import { paragraph } from './styles';
 
 export const WelcomeEmail = ({ data }) => (
-  <EmailLayout preview="You're now ready to login to SonicJs!">
+  <EmailLayout preview="You're now ready to login to SonicJs!" baseUrl={data.baseUrl}>
     <Text style={paragraph}>
       Hi {data.firstName},<br /><br />
       Thanks for submitting your account information. You're now ready to

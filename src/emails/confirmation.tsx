@@ -8,7 +8,7 @@ import { button } from './styles';
 import { paragraph } from './styles';
 
 export const ConfirmationEmail = ( user, code, baseUrl) => (
-  <EmailLayout preview="Confirm your email address">
+  <EmailLayout preview="Confirm your email address" baseUrl={baseUrl}>
     <Text style={paragraph}>
       {user.firstName ? `Hi ${user.firstName},<br /><br />` : ''}
       Please confirm your email by clicking the link below:

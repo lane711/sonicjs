@@ -1,10 +1,6 @@
-import { sendEmailResend, sendOTPEmail } from "@services/email";
+import { sendOTPEmail } from "@services/email";
 import { return200, return404 } from "@services/return-types";
-import MagicLinkEmail from "@emails/welcome";
-import React from "react";
-import { Resend } from "resend";
 import { getRecords, updateRecord } from "@services/data";
-import { OTPEmail } from "@emails/otp";
 import { formatMilliseconds } from "@services/time";
 
 export const GET = async (context) => {
