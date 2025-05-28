@@ -121,7 +121,7 @@ export const doesEmailExist = async (
   if (!user) {
     return { exists: false, confirmed: false };
   }
-  const confirmed = user.confirmed;
+  const confirmed = user.emailConfirmedOn > 0 ;
   return { exists: true, confirmed };
 };
 
