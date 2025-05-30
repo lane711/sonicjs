@@ -170,7 +170,8 @@ test.describe("Register API Tests", () => {
     const response3 = await request.get(
       `/api/v1/auth/email-confirmation/receive/${userData.emailConfirmationToken}`
     );
-    const { data: loginData } = await response3.json();
+    const loginData = await response3.json();
+    expect(loginData.userId).toEqual(expect.any(String));
     expect(loginData.token).toEqual(expect.any(String));
     expect(loginData.expires).toEqual(expect.any(Number));
 

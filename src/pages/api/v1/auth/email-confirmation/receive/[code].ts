@@ -19,7 +19,7 @@ export async function GET(context) {
 
   if(autoLogin){
     const loginResult = await getLoginTokenAndSession(result.user.id, context);
-    return return200({ message: "Email confirmed", token: loginResult.token, expires: loginResult.session.activeExpires });
+    return return200({ message: "Email confirmed", userId: result.user.id, token: loginResult.token, expires: loginResult.session.activeExpires });
   }
 
   return return200({ message: "Email confirmed" });
