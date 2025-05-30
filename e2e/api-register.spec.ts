@@ -125,6 +125,66 @@ test.describe("Register API Tests", () => {
     expect(userDataAfterConfirmation.emailConfirmedOn).not.toBeNull();
   });
 
+  test("should allow unauthenticated user to register with email confirmation and auto login", async ({
+    request,
+  }) => {
+    await updateEnvVar(request, "USERS_CAN_REGISTER", "true");
+    await updateEnvVar(request, "REQUIRE_EMAIL_CONFIRMATION", "true");
+    await updateEnvVar(
+      request,
+      "EMAIL_CONFIRMATION_REDIRECT_URL",
+      ""
+    );
+    await updateEnvVar(request, "AUTO_LOGIN_AFTER_EMAIL_CONFIRMATION", "true");
+
+    const response = await request.post(`/api/v1/users`, {
+      data: {
+        data: {
+          email: `${e2ePrefix}-with-confirmation-and-auto-login@test.com`,
+          password: "newpassword123abc",
+          firstName: "Demo",
+          lastName: "User",
+        },
+      },
+    });
+    expect(response.status()).toBe(201);
+    const { data } = await response.json();
+
+    expect(data.id).toEqual(expect.any(String));
+    expect(data.email).toEqual(`${e2ePrefix}-with-confirmation-and-auto-login@test.com`);
+    expect(data.firstName).toEqual("Demo");
+    expect(data.lastName).toEqual("User");
+
+    //now get user again so we can check the email confirmed status
+    const response2 = await request.get(`/api/v1/users/${data.id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    expect(response2.status()).toBe(200);
+    const { data: userData } = await response2.json();
+    expect(userData.role).toEqual("user");
+    expect(userData.emailConfirmationToken).toEqual(expect.any(String));
+
+    //now simulate the email confirmation link being clicked
+    const response3 = await request.get(
+      `/api/v1/auth/email-confirmation/receive/${userData.emailConfirmationToken}`
+    );
+    const { data: loginData } = await response3.json();
+    expect(loginData.token).toEqual(expect.any(String));
+    expect(loginData.expires).toEqual(expect.any(Number));
+
+    //now confirm user has been confirmed
+    const response4 = await request.get(`/api/v1/users/${data.id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    expect(response4.status()).toBe(200);
+    const { data: userDataAfterConfirmation } = await response4.json();
+    expect(userDataAfterConfirmation.emailConfirmedOn).not.toBeNull();
+  });
+
   test("should not allow duplicate email to register", async ({ request }) => {
     await updateEnvVar(request, "USERS_CAN_REGISTER", "true");
     await updateEnvVar(request, "REQUIRE_EMAIL_CONFIRMATION", "false");

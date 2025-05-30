@@ -1,4 +1,4 @@
-import { confirmEmail, doesEmailExist, sendEmailConfirmation } from "@services/auth";
+import { confirmEmail, doesEmailExist, getLoginTokenAndSession, login, sendEmailConfirmation } from "@services/auth";
 import { return200, return500 } from "@services/return-types";
 
 export async function GET(context) {
@@ -8,5 +8,19 @@ export async function GET(context) {
     return return500({ error: result.error });
   }
 
-  return context.redirect(context.locals.runtime.env.EMAIL_CONFIRMATION_REDIRECT_URL);
+  const redirectUrl = context.locals.runtime.env.EMAIL_CONFIRMATION_REDIRECT_URL;
+
+  if(redirectUrl){
+    return context.redirect(redirectUrl);
+
+  }
+
+  const autoLogin = context.locals.runtime.env.AUTO_LOGIN_AFTER_EMAIL_CONFIRMATION;
+
+  if(autoLogin){
+    const loginResult = await getLoginTokenAndSession(result.user.id, context);
+    return return200({ message: "Email confirmed", token: loginResult.token, expires: loginResult.session.activeExpires });
+  }
+
+  return return200({ message: "Email confirmed" });
 }

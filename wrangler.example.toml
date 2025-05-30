@@ -39,5 +39,10 @@ ONE_TIME_PASSWORD_CHARACTER_LENGTH = 5
 ONE_TIME_PASSWORD_EXPIRATION_TIME = 1200000 # 20 minutes in milliseconds
 ONE_TIME_PASSWORD_EMAIL_SUBJECT="Your SonicJS OTP"
 
+#email confirmation settings
+EMAIL_CONFIRMATION_SUBJECT = "Your SonicJS Email Confirmation"
+EMAIL_CONFIRMATION_REDIRECT_URL = "https://sonicjs.com/login" # after user clicks confirmation link, they will be redirected to this url
+AUTO_LOGIN_AFTER_EMAIL_CONFIRMATION = true
+
 # testing
-TESTING_MODE = true # do not set to true in production, enabled e2e endpoints
+TESTING_MODE = true # do not set to true in production, it enables e2e endpoints

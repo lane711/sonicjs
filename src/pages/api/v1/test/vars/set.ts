@@ -21,7 +21,7 @@ export const GET: APIRoute = async (context) => {
   const value = queryParams[key];
 
   // Validate key and value exist
-  if (!key || !value) {
+  if (!key) {
     return return400("Missing key or value");
   }
 

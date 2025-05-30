@@ -8,8 +8,6 @@ import { EmailLayout } from './components/EmailLayout';
 import { button } from './styles';
 import { paragraph } from './styles';
 
-debugger;
-
 export const PasswordResetEmail = (baseUrl, user = { firstName: 'John' }, code = '123456', expirationTime = '10 minutes') => (
   <EmailLayout preview="Reset your password" baseUrl={baseUrl}>
     {user.firstName && (

@@ -82,23 +82,33 @@ export const login = async (
   }
 
   if (isPasswordCorrect || isOTPCorrect) {
-    const token = generateSessionToken();
-    const invalidateUserSessionsOption =
-      context.locals.runtime.env.INVALIDATE_USER_SESSIONS === "true"
-        ? true
-        : false;
-    if (invalidateUserSessionsOption) {
-      // TODO: invalidate all user sessions could be async if we send session id that we don't want to invalidate
-      await invalidateUserSessions(d1, user.id);
-    }
-
-    const session = await createSession(d1, token, user.id as string);
-
+    const { token, session } = await getLoginTokenAndSession(user.id as string, context);
     return { bearer: token, expires: session.activeExpires };
   } else {
     console.log("login failed, password incorrect for ", user.email);
     return { error };
   }
+};
+
+export const getLoginTokenAndSession = async (userId: string, context: any) => {
+  const token = generateSessionToken();
+  const invalidateUserSessionsOption =
+    context.locals.runtime.env.INVALIDATE_USER_SESSIONS === "true"
+      ? true
+      : false;
+  if (invalidateUserSessionsOption) {
+    // TODO: invalidate all user sessions could be async if we send session id that we don't want to invalidate
+    await invalidateUserSessions(context.locals.runtime.env.D1, userId);
+  }
+
+  const session = await createSession(context.locals.runtime.env.D1, token, userId);
+  return { token, session };
+};
+
+export const getUserFromEmail = async (email: string, context: any) => {
+  const db = drizzle(context.locals.runtime.env.D1);
+  const user = await db.select().from(userTable).where(eq(userTable.email, email)); 
+  return user[0] ?? null;
 };
 
 export const doesEmailExist = async (
@@ -121,7 +131,7 @@ export const doesEmailExist = async (
   if (!user) {
     return { exists: false, confirmed: false };
   }
-  const confirmed = user.emailConfirmedOn > 0 ;
+  const confirmed = user.emailConfirmedOn > 0;
   return { exists: true, confirmed };
 };
 
@@ -199,8 +209,12 @@ export const confirmEmail = async (context, code: string) => {
   const updated = await updateRecord(
     context.locals.runtime.env.D1,
     {},
-    { table: "users", id: user.id, data: { emailConfirmedOn: new Date().getTime() } },
+    {
+      table: "users",
+      id: user.id,
+      data: { emailConfirmedOn: new Date().getTime() },
+    },
     {}
   );
-  return { success: "Email confirmed" };
+  return { success: "Email confirmed", user };
 };

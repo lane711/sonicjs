@@ -1,4 +1,4 @@
-import { purgeE2eTestData } from "@services/e2e";
+import { purgeE2eTestData, purgeE2eUserSessions } from "@services/e2e";
 import { return200, return400, return401 } from "@services/return-types";
 import { checkToken } from "@services/token";
 import type { APIRoute } from "astro";
@@ -14,6 +14,11 @@ export const POST: APIRoute = async (context) => {
   if (context.locals?.user?.role !== "admin") {
     return return401("Unauthorized");
   }
+
+  const result = await purgeE2eUserSessions(
+    context.locals.runtime.env.D1,
+    likeValue
+  );
 
   await purgeE2eTestData(
     context.locals.runtime.env.D1,
