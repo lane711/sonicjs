@@ -212,7 +212,7 @@ export const confirmEmail = async (context, code: string) => {
     {
       table: "users",
       id: user.id,
-      data: { emailConfirmedOn: new Date().getTime() },
+      data: { emailConfirmedOn: new Date().getTime(), emailConfirmationToken: null },
     },
     {}
   );
