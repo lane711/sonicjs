@@ -7,14 +7,14 @@ export default function Home() {
             SonicJS AI
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            A modern, TypeScript-first headless CMS built specifically for Cloudflare's edge platform
+            A modern, TypeScript-first headless CMS built specifically for Cloudflare&apos;s edge platform
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 max-w-4xl mx-auto">
             <div className="bg-white p-6 rounded-lg shadow-md">
               <h3 className="text-xl font-semibold mb-4 text-gray-900">⚡ Edge-First</h3>
               <p className="text-gray-600">
-                Built for Cloudflare's global edge network with D1, R2, and Workers
+                Built for Cloudflare&apos;s global edge network with D1, R2, and Workers
               </p>
             </div>
             

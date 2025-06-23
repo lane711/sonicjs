@@ -35,7 +35,7 @@ export async function generateCollection(name: string, options: { fields?: strin
 }
 
 function parseFields(fieldsString: string) {
-  const fields: Record<string, any> = {};
+  const fields: Record<string, { type: string; title: string; description?: string }> = {};
   
   const fieldPairs = fieldsString.split(',').map(f => f.trim());
   
