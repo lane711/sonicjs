@@ -1,6 +1,10 @@
 name = "sonicjs-ai"
 compatibility_date = "2024-06-01"
 compatibility_flags = ["nodejs_compat"]
+node_compat = true
+
+[vars]
+NODE_VERSION = "20"
 
 [env.development]
 name = "sonicjs-ai-dev"
