@@ -23,6 +23,7 @@
     "commander": "^14.0.0",
     "drizzle-kit": "^0.31.2",
     "drizzle-orm": "^0.44.2",
+    "drizzle-zod": "^0.8.2",
     "next": "15.3.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

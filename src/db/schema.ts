@@ -1,6 +1,5 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
 
 // Users table for authentication and user management
 export const users = sqliteTable('users', {
@@ -80,47 +79,45 @@ export const apiTokens = sqliteTable('api_tokens', {
 
 // Zod schemas for validation
 export const insertUserSchema = createInsertSchema(users, {
-  email: z.string().email(),
-  name: z.string().min(1),
-  role: z.enum(['admin', 'editor', 'user']),
+  email: (schema) => schema.email(),
+  name: (schema) => schema.min(1),
+  role: (schema) => schema,
 });
 
 export const selectUserSchema = createSelectSchema(users);
 
 export const insertCollectionSchema = createInsertSchema(collections, {
-  name: z.string().min(1).regex(/^[a-z0-9_]+$/, 'Collection name must be lowercase with underscores'),
-  displayName: z.string().min(1),
-  schema: z.record(z.any()), // JSON schema validation
+  name: (schema) => schema.min(1).regex(/^[a-z0-9_]+$/, 'Collection name must be lowercase with underscores'),
+  displayName: (schema) => schema.min(1),
 });
 
 export const selectCollectionSchema = createSelectSchema(collections);
 
 export const insertContentSchema = createInsertSchema(content, {
-  slug: z.string().min(1).regex(/^[a-z0-9-]+$/, 'Slug must be lowercase with dashes'),
-  title: z.string().min(1),
-  status: z.enum(['draft', 'published', 'archived']),
-  data: z.record(z.any()),
+  slug: (schema) => schema.min(1).regex(/^[a-z0-9-]+$/, 'Slug must be lowercase with dashes'),
+  title: (schema) => schema.min(1),
+  status: (schema) => schema,
 });
 
 export const selectContentSchema = createSelectSchema(content);
 
 export const insertMediaSchema = createInsertSchema(media, {
-  filename: z.string().min(1),
-  originalName: z.string().min(1),
-  mimeType: z.string().min(1),
-  size: z.number().positive(),
-  path: z.string().min(1),
-  url: z.string().url(),
+  filename: (schema) => schema.min(1),
+  originalName: (schema) => schema.min(1),
+  mimeType: (schema) => schema.min(1),
+  size: (schema) => schema.positive(),
+  path: (schema) => schema.min(1),
+  url: (schema) => schema.url(),
 });
 
 export const selectMediaSchema = createSelectSchema(media);
 
 // Type exports
-export type User = z.infer<typeof selectUserSchema>;
-export type NewUser = z.infer<typeof insertUserSchema>;
-export type Collection = z.infer<typeof selectCollectionSchema>;
-export type NewCollection = z.infer<typeof insertCollectionSchema>;
-export type Content = z.infer<typeof selectContentSchema>;
-export type NewContent = z.infer<typeof insertContentSchema>;
-export type Media = z.infer<typeof selectMediaSchema>;
-export type NewMedia = z.infer<typeof insertMediaSchema>;
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+export type Collection = typeof collections.$inferSelect;
+export type NewCollection = typeof collections.$inferInsert;
+export type Content = typeof content.$inferSelect;
+export type NewContent = typeof content.$inferInsert;
+export type Media = typeof media.$inferSelect;
+export type NewMedia = typeof media.$inferInsert;
