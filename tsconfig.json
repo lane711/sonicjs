@@ -28,6 +28,8 @@
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "src/utils/api-generator.ts",
+    "src/utils/openapi-generator.ts"
   ]
 }

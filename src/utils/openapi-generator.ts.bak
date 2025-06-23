@@ -1,0 +1,346 @@
+import { OpenAPIHono, z } from '@hono/zod-openapi'
+import { createRoute } from '@hono/zod-openapi'
+import { SchemaDefinition } from './api-generator'
+
+type Bindings = {
+  DB: D1Database
+  KV: KVNamespace
+}
+
+export class OpenAPIGenerator {
+  private app: OpenAPIHono<{ Bindings: Bindings }>
+
+  constructor() {
+    this.app = new OpenAPIHono<{ Bindings: Bindings }>()
+  }
+
+  generateOpenAPIRoutes(schema: SchemaDefinition): OpenAPIHono<{ Bindings: Bindings }> {
+    const routes = new OpenAPIHono<{ Bindings: Bindings }>()
+    const { name, schema: zodSchema } = schema
+
+    // Base response schemas
+    const errorSchema = z.object({
+      error: z.string()
+    })
+
+    const metaSchema = z.object({
+      count: z.number(),
+      limit: z.number().optional(),
+      offset: z.number().optional(),
+      timestamp: z.string()
+    })
+
+    const listResponseSchema = z.object({
+      data: z.array(zodSchema.extend({
+        id: z.string(),
+        createdAt: z.number(),
+        updatedAt: z.number()
+      })),
+      meta: metaSchema
+    })
+
+    const singleResponseSchema = z.object({
+      data: zodSchema.extend({
+        id: z.string(),
+        createdAt: z.number(),
+        updatedAt: z.number()
+      })
+    })
+
+    const createResponseSchema = z.object({
+      data: zodSchema.extend({
+        id: z.string(),
+        createdAt: z.string()
+      })
+    })
+
+    // GET /{resource} - List all items
+    const listRoute = createRoute({
+      method: 'get',
+      path: `/${name}`,
+      summary: `List all ${name}`,
+      description: `Retrieve a list of all ${name} items with optional filtering and pagination`,
+      request: {
+        query: z.object({
+          limit: z.string().transform(Number).optional().openapi({ 
+            description: 'Maximum number of items to return (max 100)',
+            example: '50'
+          }),
+          offset: z.string().transform(Number).optional().openapi({
+            description: 'Number of items to skip',
+            example: '0'
+          }),
+          status: z.string().optional().openapi({
+            description: 'Filter by status',
+            example: 'published'
+          }),
+          search: z.string().optional().openapi({
+            description: 'Search query for title and content',
+            example: 'example search'
+          })
+        })
+      },
+      responses: {
+        200: {
+          content: {
+            'application/json': {
+              schema: listResponseSchema
+            }
+          },
+          description: `List of ${name} items`
+        },
+        500: {
+          content: {
+            'application/json': {
+              schema: errorSchema
+            }
+          },
+          description: 'Internal server error'
+        }
+      },
+      tags: [name]
+    })
+
+    routes.openapi(listRoute, async (c) => {
+      // Implementation would go here - for now return placeholder
+      return c.json({ data: [], meta: { count: 0, timestamp: new Date().toISOString() } })
+    })
+
+    // GET /{resource}/{id} - Get single item
+    const getRoute = createRoute({
+      method: 'get',
+      path: `/${name}/{id}`,
+      summary: `Get ${name} by ID`,
+      description: `Retrieve a single ${name} item by its ID`,
+      request: {
+        params: z.object({
+          id: z.string().openapi({
+            description: `The ID of the ${name} item`,
+            example: '123e4567-e89b-12d3-a456-426614174000'
+          })
+        })
+      },
+      responses: {
+        200: {
+          content: {
+            'application/json': {
+              schema: singleResponseSchema
+            }
+          },
+          description: `${name} item`
+        },
+        404: {
+          content: {
+            'application/json': {
+              schema: errorSchema
+            }
+          },
+          description: `${name} not found`
+        },
+        500: {
+          content: {
+            'application/json': {
+              schema: errorSchema
+            }
+          },
+          description: 'Internal server error'
+        }
+      },
+      tags: [name]
+    })
+
+    routes.openapi(getRoute, async (c) => {
+      // Implementation would go here
+      const id = c.req.param('id')
+      return c.json({ error: `${name} not found` }, 404)
+    })
+
+    // POST /{resource} - Create new item
+    const createRoute = createRoute({
+      method: 'post',
+      path: `/${name}`,
+      summary: `Create new ${name}`,
+      description: `Create a new ${name} item`,
+      request: {
+        body: {
+          content: {
+            'application/json': {
+              schema: zodSchema
+            }
+          }
+        }
+      },
+      responses: {
+        201: {
+          content: {
+            'application/json': {
+              schema: createResponseSchema
+            }
+          },
+          description: `${name} created successfully`
+        },
+        400: {
+          content: {
+            'application/json': {
+              schema: errorSchema
+            }
+          },
+          description: 'Validation error'
+        },
+        500: {
+          content: {
+            'application/json': {
+              schema: errorSchema
+            }
+          },
+          description: 'Internal server error'
+        }
+      },
+      tags: [name]
+    })
+
+    routes.openapi(createRoute, async (c) => {
+      // Implementation would go here
+      return c.json({ error: 'Not implemented' }, 500)
+    })
+
+    // PUT /{resource}/{id} - Update item
+    const updateRoute = createRoute({
+      method: 'put',
+      path: `/${name}/{id}`,
+      summary: `Update ${name}`,
+      description: `Update an existing ${name} item`,
+      request: {
+        params: z.object({
+          id: z.string().openapi({
+            description: `The ID of the ${name} item to update`
+          })
+        }),
+        body: {
+          content: {
+            'application/json': {
+              schema: zodSchema.partial()
+            }
+          }
+        }
+      },
+      responses: {
+        200: {
+          content: {
+            'application/json': {
+              schema: singleResponseSchema
+            }
+          },
+          description: `${name} updated successfully`
+        },
+        404: {
+          content: {
+            'application/json': {
+              schema: errorSchema
+            }
+          },
+          description: `${name} not found`
+        },
+        400: {
+          content: {
+            'application/json': {
+              schema: errorSchema
+            }
+          },
+          description: 'Validation error'
+        },
+        500: {
+          content: {
+            'application/json': {
+              schema: errorSchema
+            }
+          },
+          description: 'Internal server error'
+        }
+      },
+      tags: [name]
+    })
+
+    routes.openapi(updateRoute, async (c) => {
+      // Implementation would go here
+      return c.json({ error: 'Not implemented' }, 500)
+    })
+
+    // DELETE /{resource}/{id} - Delete item
+    const deleteRoute = createRoute({
+      method: 'delete',
+      path: `/${name}/{id}`,
+      summary: `Delete ${name}`,
+      description: `Delete a ${name} item`,
+      request: {
+        params: z.object({
+          id: z.string().openapi({
+            description: `The ID of the ${name} item to delete`
+          })
+        })
+      },
+      responses: {
+        200: {
+          content: {
+            'application/json': {
+              schema: z.object({
+                message: z.string()
+              })
+            }
+          },
+          description: `${name} deleted successfully`
+        },
+        404: {
+          content: {
+            'application/json': {
+              schema: errorSchema
+            }
+          },
+          description: `${name} not found`
+        },
+        500: {
+          content: {
+            'application/json': {
+              schema: errorSchema
+            }
+          },
+          description: 'Internal server error'
+        }
+      },
+      tags: [name]
+    })
+
+    routes.openapi(deleteRoute, async (c) => {
+      // Implementation would go here
+      return c.json({ error: 'Not implemented' }, 500)
+    })
+
+    return routes
+  }
+
+  getApp(): OpenAPIHono<{ Bindings: Bindings }> {
+    return this.app
+  }
+
+  registerSchema(schema: SchemaDefinition): void {
+    const routes = this.generateOpenAPIRoutes(schema)
+    this.app.route('/', routes)
+  }
+
+  generateOpenAPISpec() {
+    return this.app.getOpenAPIDocument({
+      openapi: '3.0.0',
+      info: {
+        version: '1.0.0',
+        title: 'SonicJS AI API',
+        description: 'Auto-generated REST API for SonicJS AI headless CMS'
+      },
+      servers: [
+        {
+          url: '/api',
+          description: 'API Server'
+        }
+      ]
+    })
+  }
+}

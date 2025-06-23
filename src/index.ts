@@ -4,6 +4,9 @@ import { logger } from 'hono/logger'
 import { prettyJSON } from 'hono/pretty-json'
 import { apiRoutes } from './routes/api'
 import { adminRoutes } from './routes/admin'
+import { docsRoutes } from './routes/docs'
+import { authRoutes } from './routes/auth'
+import { requireAuth, requireRole, optionalAuth } from './middleware/auth'
 
 // Define the Cloudflare Workers environment
 type Bindings = {
@@ -18,8 +21,17 @@ app.use('*', logger())
 app.use('*', cors())
 app.use('/api/*', prettyJSON())
 
-// Routes
+// Public routes
+app.route('/auth', authRoutes)
+app.route('/docs', docsRoutes)
+
+// API routes with optional auth (for public content)
+app.use('/api/*', optionalAuth())
 app.route('/api', apiRoutes)
+
+// Admin routes require authentication and admin/editor role
+app.use('/admin/*', requireAuth())
+app.use('/admin/*', requireRole(['admin', 'editor']))
 app.route('/admin', adminRoutes)
 
 // Health check
