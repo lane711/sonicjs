@@ -1,7 +1,7 @@
 # SonicJS AI - Headless CMS Rebuild Instructions
 
 ## Project Vision
-Rebuild SonicJS (https://sonicjs.com) as the most comprehensive, developer-centric headless CMS leveraging the full power of the Cloudflare stack. This will be an AI-friendly, TypeScript-first platform designed for maximum extensibility and performance.
+Rebuild SonicJS (https://sonicjs.com) as the most comprehensive, developer-centric headless CMS leveraging the full power of the Cloudflare stack. This will be an AI-friendly, TypeScript-first platform built with Hono.js and designed for maximum extensibility and performance on Cloudflare Workers.
 
 ## Core Philosophy
 - **Developer-Centric**: Configuration over UI, code-first approach
@@ -13,30 +13,30 @@ Rebuild SonicJS (https://sonicjs.com) as the most comprehensive, developer-centr
 ## Technology Stack
 
 ### Core Framework
-- **Next.js**: React framework with App Router
+- **Hono.js**: Ultrafast web framework for Cloudflare Workers
 - **TypeScript**: Strict type safety throughout
-- **Tailwind CSS**: Utility-first styling
-- **React**: Client-side interactivity
+- **HTMX**: Enhanced HTML for dynamic interfaces
+- **Cloudflare Workers**: Serverless runtime environment
 
 ### Cloudflare Services
 - **Cloudflare D1**: SQLite database at the edge
 - **Cloudflare KV**: Key-value storage for caching
 - **Cloudflare R2**: Object storage for media
 - **Cloudflare Images API**: Image optimization and transformation
-- **Cloudflare Workers**: Serverless compute
-- **Cloudflare Pages**: Static site hosting
+- **Cloudflare Workers**: Serverless compute (primary runtime)
+- **Cloudflare Analytics**: Real-time performance monitoring
 
 ### Development & Testing
-- **Jest**: Unit and integration testing
+- **Vitest**: Fast unit testing (primary test runner)
 - **Playwright**: End-to-end testing
-- **Vitest**: Fast unit testing
+- **Wrangler**: Local development and deployment
 - **TypeScript**: Compile-time error checking
 
 ### Data Management
-- **React TanStack Query**: Server state management
-- **React TanStack Table**: Advanced data grids with filtering, sorting, pagination
-- **Zod**: Runtime type validation
-- **Drizzle ORM**: Type-safe database queries
+- **Drizzle ORM**: Type-safe database queries for D1
+- **Zod**: Runtime type validation and schema definition
+- **HTMX**: Dynamic frontend interactions
+- **OpenAPI**: API documentation and type generation
 
 ## Competitive Feature Analysis
 
@@ -49,15 +49,15 @@ Based on comprehensive analysis of Strapi, Directus, and Payload CMS, SonicJS wi
    - Runtime validation with Zod
 
 2. **Edge-Optimized APIs**
-   - Auto-generated REST endpoints
-   - GraphQL support
-   - Real-time subscriptions via WebSockets
-   - Serverless-optimized performance
+   - Auto-generated REST endpoints with Hono.js
+   - OpenAPI schema generation
+   - Real-time features with WebSockets/Server-Sent Events
+   - Workers-optimized performance
 
 3. **Developer Experience**
-   - Hot reload development
+   - Hot reload with Wrangler dev
    - CLI tools and generators
-   - Local API access
+   - Local Workers environment
    - Comprehensive TypeScript support
 
 4. **Plugin Framework**
@@ -74,10 +74,10 @@ Based on comprehensive analysis of Strapi, Directus, and Payload CMS, SonicJS wi
 
 ### Medium Priority Features
 1. **Content Management**
-   - Visual content editor
+   - HTMX-powered content editor
    - Draft/published workflows
    - Content versioning
-   - Bulk operations
+   - Bulk operations via API
 
 2. **Media Management**
    - Cloudflare R2 integration
@@ -141,17 +141,17 @@ Based on comprehensive analysis of Strapi, Directus, and Payload CMS, SonicJS wi
 src/
 ├── core/           # Core CMS functionality
 ├── plugins/        # Built-in plugins
-├── api/           # API routes and handlers
-├── types/         # TypeScript type definitions
-├── utils/         # Utility functions
-├── hooks/         # Custom React hooks
-├── components/    # React components
-└── tests/         # Test files
+├── routes/         # Hono.js route handlers
+├── types/          # TypeScript type definitions
+├── utils/          # Utility functions
+├── middleware/     # Hono.js middleware
+├── templates/      # HTML templates
+└── tests/          # Test files
 ```
 
 ### Naming Conventions
 - **Files**: kebab-case (`content-model.ts`)
-- **Components**: PascalCase (`ContentEditor.tsx`)
+- **Templates**: PascalCase (`ContentEditor.html`)
 - **Functions**: camelCase (`getUserById`)
 - **Types**: PascalCase (`ContentModel`)
 - **Constants**: SCREAMING_SNAKE_CASE (`MAX_FILE_SIZE`)
@@ -163,9 +163,9 @@ src/
 - Implement proper error handling with Result types
 
 ### Testing Strategy
-- Unit tests for utilities and core logic
-- Integration tests for API endpoints
-- E2E tests for critical user flows
+- Unit tests for utilities and core logic with Vitest
+- Integration tests for Hono.js endpoints
+- E2E tests for critical user flows with Playwright
 - Minimum 80% code coverage
 
 ## AI-Friendly Documentation Standards
@@ -215,10 +215,10 @@ src/
 - Extensible design
 
 ### 4. Modern Tech Stack
-- Latest React features
+- Latest Hono.js features
 - Advanced TypeScript usage
-- Modern testing tools
-- Performance optimizations
+- Modern testing tools (Vitest)
+- Edge performance optimizations
 
 ## Success Metrics
 
@@ -240,6 +240,6 @@ src/
 - Extensible plugin system
 - Enterprise-ready capabilities
 
-This enhanced instruction set provides a comprehensive foundation for building SonicJS as a world-class headless CMS that leverages Cloudflare's unique advantages while maintaining developer-first principles and AI-friendly architecture.
+This enhanced instruction set provides a comprehensive foundation for building SonicJS as a world-class headless CMS that leverages Cloudflare's unique advantages with Hono.js, while maintaining developer-first principles and AI-friendly architecture.
 
 

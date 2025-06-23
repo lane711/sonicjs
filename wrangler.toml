@@ -1,0 +1,30 @@
+name = "sonicjs-ai"
+main = "src/index.ts"
+compatibility_date = "2024-06-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "development"
+
+[env.preview]
+name = "sonicjs-ai-preview"
+
+[env.preview.vars]
+ENVIRONMENT = "preview"
+
+[[env.preview.d1_databases]]
+binding = "DB"
+database_name = "sonicjs-dev"
+database_id = "874cad37-313c-4d71-97fa-ad7184526f5a"
+
+[env.production]
+name = "sonicjs-ai-prod"
+
+[env.production.vars]
+ENVIRONMENT = "production"
+
+# Production D1 database will be created separately
+# [[env.production.d1_databases]]
+# binding = "DB"
+# database_name = "sonicjs-prod"
+# database_id = "TBD"

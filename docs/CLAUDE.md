@@ -1,7 +1,28 @@
-1. First think through the problem, read the codebase for relevant files, and write a plan to project-plan.md.
-2. The plan should have a list of todo items that you can check off as you complete them
-3. Before you begin working, check in with me and I will verify the plan.
-4. Then, begin working on the todo items, marking them as complete as you go.
-5. Please every step of the way just give me a high level explanation of what changes you made
-6. Make every task and code change you do as simple as possible. We want to avoid making any massive or complex changes. Every change should impact as little code as possible. Everything is about simplicity.
-7. Finally, add a review section to the project-plan.md file with a summary of the changes you made and any other relevant information.
+# SonicJS AI Development Guidelines
+
+This project is a Cloudflare-native headless CMS built with **Hono.js** and TypeScript.
+
+## Core Technology Stack
+- **Framework**: Hono.js (ultrafast web framework)
+- **Runtime**: Cloudflare Workers
+- **Database**: Cloudflare D1 (SQLite) with Drizzle ORM
+- **Validation**: Zod schemas
+- **Testing**: Vitest (unit tests) + Playwright (E2E)
+- **Frontend**: HTMX + HTML for admin interface
+- **Deployment**: Wrangler CLI
+
+## Development Workflow
+
+1. **Plan First**: Read the codebase, understand the problem, and write a plan to project-plan.md
+2. **Todo Management**: Create specific todo items that can be checked off as you complete them
+3. **Get Approval**: Before starting work, check in with me to verify the plan
+4. **Iterative Development**: Work through todo items, marking them complete as you go
+5. **High-Level Updates**: Give brief explanations of changes made at each step
+6. **Simplicity Focus**: Make minimal, targeted changes. Avoid complex refactoring.
+7. **Documentation**: Add a review section to project-plan.md summarizing changes
+
+## Key Principles
+- **Edge-First**: Leverage Cloudflare's global edge network
+- **TypeScript-First**: Strong typing throughout the application
+- **Configuration over UI**: Developer-centric approach
+- **AI-Friendly**: Clean, structured codebase for AI assistance

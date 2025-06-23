@@ -1,0 +1,37 @@
+{
+  "name": "sonicjs-ai",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "tsc && wrangler deploy --dry-run",
+    "deploy": "wrangler deploy",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "wrangler d1 migrations apply sonicjs-dev --local",
+    "db:migrate:prod": "wrangler d1 migrations apply sonicjs-prod",
+    "db:studio": "drizzle-kit studio",
+    "sonicjs": "tsx src/cli/index.ts"
+  },
+  "dependencies": {
+    "@hono/zod-validator": "^0.7.0",
+    "commander": "^14.0.0",
+    "drizzle-kit": "^0.31.2",
+    "drizzle-orm": "^0.44.2",
+    "drizzle-zod": "^0.8.2",
+    "hono": "^4.7.3",
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250620.0",
+    "@playwright/test": "^1.53.1",
+    "@types/node": "^20.19.1",
+    "tsx": "^4.20.3",
+    "typescript": "^5",
+    "vitest": "^2.1.8",
+    "wrangler": "^4.20.5"
+  }
+}
