@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "build": "tsc && wrangler deploy --dry-run",
+    "predeploy": "npm test && npm run build",
     "deploy": "wrangler deploy",
     "test": "vitest",
     "test:watch": "vitest --watch",
