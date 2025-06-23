@@ -1,0 +1,49 @@
+{
+  "name": "sonicjs-ai",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "wrangler d1 migrations apply sonicjs-dev --local",
+    "db:migrate:prod": "wrangler d1 migrations apply sonicjs-prod",
+    "db:studio": "drizzle-kit studio",
+    "db:drop": "wrangler d1 migrations list sonicjs-dev --local",
+    "deploy": "wrangler pages deploy",
+    "sonicjs": "tsx src/cli/index.ts"
+  },
+  "dependencies": {
+    "commander": "^14.0.0",
+    "drizzle-kit": "^0.31.2",
+    "drizzle-orm": "^0.44.2",
+    "next": "15.3.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250620.0",
+    "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.53.1",
+    "@tailwindcss/postcss": "^4",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20.19.1",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.4",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "tailwindcss": "^4",
+    "tsx": "^4.20.3",
+    "typescript": "^5",
+    "wrangler": "^4.20.5"
+  }
+}

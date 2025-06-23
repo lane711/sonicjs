@@ -118,7 +118,8 @@
       "Bash(npx prisma migrate dev:*)",
       "Bash(tsx prisma/seed-large.ts:*)",
       "Bash(npx tsx:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }
