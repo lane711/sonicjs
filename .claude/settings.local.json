@@ -120,7 +120,8 @@
       "Bash(npx tsx:*)",
       "Bash(ls:*)",
       "Bash(curl:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(rg:*)"
     ],
     "deny": []
   }
