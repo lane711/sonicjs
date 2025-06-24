@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { html } from 'hono/html'
+import { html, raw } from 'hono/html'
 
 type Bindings = {
   DB: D1Database
@@ -136,6 +136,20 @@ adminRoutes.get('/collections', async (c) => {
     const stmt = db.prepare('SELECT * FROM collections WHERE is_active = 1 ORDER BY created_at DESC')
     const { results } = await stmt.all()
     
+    // Generate table rows as plain HTML string
+    const tableRows = results.map((collection: any) => `
+      <tr>
+        <td><code>${collection.name}</code></td>
+        <td>${collection.display_name}</td>
+        <td>${collection.description || '-'}</td>
+        <td>${new Date(collection.created_at).toLocaleDateString()}</td>
+        <td>
+          <a href="/admin/collections/${collection.id}" class="btn btn-sm">Edit</a>
+          <a href="/admin/collections/${collection.name}/content" class="btn btn-sm">Content</a>
+        </td>
+      </tr>
+    `).join('')
+    
     return c.html(html`
       <!DOCTYPE html>
       <html lang="en">
@@ -192,18 +206,7 @@ adminRoutes.get('/collections', async (c) => {
                 </tr>
               </thead>
               <tbody>
-                ${results.map((collection: any) => html`
-                  <tr>
-                    <td><code>${collection.name}</code></td>
-                    <td>${collection.display_name}</td>
-                    <td>${collection.description || '-'}</td>
-                    <td>${new Date(collection.created_at).toLocaleDateString()}</td>
-                    <td>
-                      <a href="/admin/collections/${collection.id}" class="btn btn-sm">Edit</a>
-                      <a href="/admin/collections/${collection.name}/content" class="btn btn-sm">Content</a>
-                    </td>
-                  </tr>
-                `).join('')}
+                ${raw(tableRows)}
               </tbody>
             </table>
             

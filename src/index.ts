@@ -4,7 +4,7 @@ import { logger } from 'hono/logger'
 import { prettyJSON } from 'hono/pretty-json'
 import { apiRoutes } from './routes/api'
 import { adminRoutes } from './routes/admin'
-// import { adminContentRoutes } from './routes/admin-content'
+import { adminContentRoutes } from './routes/admin-content'
 import { docsRoutes } from './routes/docs'
 import { authRoutes } from './routes/auth'
 import { contentRoutes } from './routes/content'
@@ -54,7 +54,7 @@ app.use('/admin/*', async (c, next) => {
 app.use('/admin/*', requireRole(['admin', 'editor']))
 app.route('/admin', adminRoutes)
 app.route('/admin/media', adminMediaRoutes)
-// app.route('/admin/content', adminContentRoutes)
+app.route('/admin/content', adminContentRoutes)
 
 // Root redirect to login
 app.get('/', (c) => {

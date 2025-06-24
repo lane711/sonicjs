@@ -360,3 +360,410 @@ export function getMediaConfigByType(type: 'image' | 'document' | 'video' | 'aud
   
   return configs[type] || MEDIA_CONFIG.images
 }
+
+// Media storage and processing utilities for Cloudflare R2
+import { z } from 'zod'
+
+// File validation schemas
+export const fileValidationSchema = z.object({
+  filename: z.string().min(1),
+  size: z.number().positive().max(50 * 1024 * 1024), // 50MB max
+  type: z.string().min(1),
+})
+
+// Supported file types
+export const SUPPORTED_FILE_TYPES = {
+  images: [
+    'image/jpeg',
+    'image/jpg', 
+    'image/png',
+    'image/webp',
+    'image/gif',
+    'image/svg+xml'
+  ],
+  documents: [
+    'application/pdf',
+    'text/plain',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  ],
+  videos: [
+    'video/mp4',
+    'video/webm',
+    'video/quicktime',
+    'video/x-msvideo'
+  ],
+  audio: [
+    'audio/mpeg',
+    'audio/wav',
+    'audio/mp4',
+    'audio/webm'
+  ]
+}
+
+// Cloudflare API response types
+interface CloudflareAPIResponse {
+  success: boolean
+  result?: {
+    id: string
+    variants: string[]
+    [key: string]: any
+  }
+  errors?: Array<{
+    message: string
+    [key: string]: any
+  }>
+}
+
+// File type detection
+export function getFileCategory(mimeType: string): string {
+  if (SUPPORTED_FILE_TYPES.images.includes(mimeType)) return 'image'
+  if (SUPPORTED_FILE_TYPES.documents.includes(mimeType)) return 'document'
+  if (SUPPORTED_FILE_TYPES.videos.includes(mimeType)) return 'video'
+  if (SUPPORTED_FILE_TYPES.audio.includes(mimeType)) return 'audio'
+  return 'other'
+}
+
+// Generate safe filename
+export function generateSafeFilename(originalName: string): string {
+  const timestamp = Date.now()
+  const randomString = Math.random().toString(36).substring(2, 8)
+  const extension = originalName.split('.').pop()?.toLowerCase() || ''
+  const baseName = originalName.split('.')[0]
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '-')
+    .replace(/-+/g, '-')
+    .substring(0, 50)
+  
+  return `${baseName}-${timestamp}-${randomString}.${extension}`
+}
+
+// Generate R2 key path
+export function generateR2Key(filename: string, folder: string = 'uploads'): string {
+  const date = new Date()
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  
+  return `${folder}/${year}/${month}/${filename}`
+}
+
+// File validation
+export function validateFile(file: File): { valid: boolean; errors: string[] } {
+  const errors: string[] = []
+  
+  // Check file size (50MB limit)
+  if (file.size > 50 * 1024 * 1024) {
+    errors.push('File size exceeds 50MB limit')
+  }
+  
+  // Check file type
+  const allSupportedTypes = [
+    ...SUPPORTED_FILE_TYPES.images,
+    ...SUPPORTED_FILE_TYPES.documents,
+    ...SUPPORTED_FILE_TYPES.videos,
+    ...SUPPORTED_FILE_TYPES.audio
+  ]
+  
+  if (!allSupportedTypes.includes(file.type)) {
+    errors.push(`Unsupported file type: ${file.type}`)
+  }
+  
+  // Check filename
+  if (!file.name || file.name.length === 0) {
+    errors.push('Filename is required')
+  }
+  
+  return {
+    valid: errors.length === 0,
+    errors
+  }
+}
+
+// Image processing utilities
+export interface ImageDimensions {
+  width: number
+  height: number
+}
+
+export async function getImageDimensions(file: File): Promise<ImageDimensions | null> {
+  if (!file.type.startsWith('image/')) return null
+  
+  return new Promise((resolve) => {
+    const img = new Image()
+    img.onload = () => {
+      resolve({ width: img.width, height: img.height })
+    }
+    img.onerror = () => resolve(null)
+    img.src = URL.createObjectURL(file)
+  })
+}
+
+// R2 Storage Manager
+export class R2StorageManager {
+  private bucket: R2Bucket
+  private cdnDomain?: string
+  
+  constructor(bucket: R2Bucket, cdnDomain?: string) {
+    this.bucket = bucket
+    this.cdnDomain = cdnDomain
+  }
+  
+  // Upload file to R2
+  async uploadFile(
+    file: File,
+    key: string,
+    metadata: Record<string, string> = {}
+  ): Promise<{ success: boolean; key: string; publicUrl: string; error?: string }> {
+    try {
+      const buffer = await file.arrayBuffer()
+      
+      await this.bucket.put(key, buffer, {
+        httpMetadata: {
+          contentType: file.type,
+        },
+        customMetadata: {
+          originalName: file.name,
+          uploadedAt: new Date().toISOString(),
+          ...metadata
+        }
+      })
+      
+      const publicUrl = this.cdnDomain ? 
+        `https://${this.cdnDomain}/${key}` : 
+        `https://pub-${this.bucket.toString()}/${key}` // Fallback, need actual domain
+      
+      return {
+        success: true,
+        key,
+        publicUrl
+      }
+    } catch (error) {
+      console.error('Error uploading file to R2:', error)
+      return {
+        success: false,
+        key,
+        publicUrl: '',
+        error: error instanceof Error ? error.message : 'Upload failed'
+      }
+    }
+  }
+  
+  // Delete file from R2
+  async deleteFile(key: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      await this.bucket.delete(key)
+      return { success: true }
+    } catch (error) {
+      console.error('Error deleting file from R2:', error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Delete failed'
+      }
+    }
+  }
+  
+  // Get file from R2
+  async getFile(key: string): Promise<R2Object | null> {
+    try {
+      return await this.bucket.get(key)
+    } catch (error) {
+      console.error('Error getting file from R2:', error)
+      return null
+    }
+  }
+  
+  // Generate presigned URL for direct uploads
+  async generatePresignedUrl(
+    key: string,
+    expiresIn: number = 3600
+  ): Promise<{ success: boolean; url?: string; error?: string }> {
+    try {
+      // Note: R2 presigned URLs would need to be implemented via CF API
+      // For now, we'll use direct upload through our API
+      return {
+        success: false,
+        error: 'Presigned URLs not implemented yet'
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to generate presigned URL'
+      }
+    }
+  }
+}
+
+// Cloudflare Images integration
+export class CloudflareImagesManager {
+  private accountId: string
+  private apiToken: string
+  
+  constructor(accountId: string, apiToken: string) {
+    this.accountId = accountId
+    this.apiToken = apiToken
+  }
+  
+  // Upload image to Cloudflare Images
+  async uploadImage(
+    file: File,
+    metadata: Record<string, string> = {}
+  ): Promise<{ success: boolean; id?: string; url?: string; error?: string }> {
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      
+      Object.entries(metadata).forEach(([key, value]) => {
+        formData.append(`metadata[${key}]`, value)
+      })
+      
+      const response = await fetch(
+        `https://api.cloudflare.com/client/v4/accounts/${this.accountId}/images/v1`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.apiToken}`,
+          },
+          body: formData
+        }
+      )
+      
+      const result = await response.json() as CloudflareAPIResponse
+      
+      if (result.success && result.result) {
+        return {
+          success: true,
+          id: result.result.id,
+          url: result.result.variants[0] // Default variant
+        }
+      } else {
+        return {
+          success: false,
+          error: result.errors?.[0]?.message || 'Upload failed'
+        }
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Upload failed'
+      }
+    }
+  }
+  
+  // Delete image from Cloudflare Images
+  async deleteImage(imageId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const response = await fetch(
+        `https://api.cloudflare.com/client/v4/accounts/${this.accountId}/images/v1/${imageId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${this.apiToken}`,
+          }
+        }
+      )
+      
+      const result = await response.json() as CloudflareAPIResponse
+      
+      if (result.success) {
+        return { success: true }
+      } else {
+        return {
+          success: false,
+          error: result.errors?.[0]?.message || 'Delete failed'
+        }
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Delete failed'
+      }
+    }
+  }
+  
+  // Generate image URL with transformations
+  generateImageUrl(
+    imageId: string,
+    transformations: {
+      width?: number
+      height?: number
+      fit?: 'scale-down' | 'contain' | 'cover' | 'crop' | 'pad'
+      format?: 'webp' | 'avif' | 'jpeg' | 'png'
+      quality?: number
+    } = {}
+  ): string {
+    const params = new URLSearchParams()
+    
+    if (transformations.width) params.set('width', transformations.width.toString())
+    if (transformations.height) params.set('height', transformations.height.toString())
+    if (transformations.fit) params.set('fit', transformations.fit)
+    if (transformations.format) params.set('format', transformations.format)
+    if (transformations.quality) params.set('quality', transformations.quality.toString())
+    
+    const queryString = params.toString()
+    const baseUrl = `https://imagedelivery.net/${this.accountId}/${imageId}/public`
+    
+    return queryString ? `${baseUrl}?${queryString}` : baseUrl
+  }
+}
+
+// File size formatting
+export function formatFileSize(bytes: number): string {
+  if (bytes === 0) return '0 Bytes'
+  
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
+
+// Generate thumbnail for images
+export async function generateThumbnail(
+  file: File,
+  maxWidth: number = 300,
+  maxHeight: number = 300
+): Promise<Blob | null> {
+  if (!file.type.startsWith('image/')) return null
+  
+  return new Promise((resolve) => {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    const img = new Image()
+    
+    img.onload = () => {
+      // Calculate thumbnail dimensions
+      let { width, height } = img
+      
+      if (width > height) {
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width
+          width = maxWidth
+        }
+      } else {
+        if (height > maxHeight) {
+          width = (width * maxHeight) / height
+          height = maxHeight
+        }
+      }
+      
+      canvas.width = width
+      canvas.height = height
+      
+      // Draw and compress
+      if (ctx) {
+        ctx.drawImage(img, 0, 0, width, height)
+      }
+      
+      canvas.toBlob(
+        (blob) => resolve(blob || null),
+        'image/jpeg',
+        0.8
+      )
+    }
+    
+    img.onerror = () => resolve(null)
+    img.src = URL.createObjectURL(file)
+  })
+}

@@ -41,15 +41,15 @@ adminContentRoutes.get('/', async (c) => {
     
     // Build query
     let query = `
-      SELECT c.*, u.firstName, u.lastName 
+      SELECT c.*, u.first_name, u.last_name 
       FROM content c 
-      LEFT JOIN users u ON c.authorId = u.id
+      LEFT JOIN users u ON c.author_id = u.id
     `
     const params: any[] = []
     const conditions: string[] = []
     
     if (modelName !== 'all') {
-      conditions.push('c.modelName = ?')
+      conditions.push('c.collection_id = ?')
       params.push(modelName)
     }
     
@@ -62,7 +62,7 @@ adminContentRoutes.get('/', async (c) => {
       query += ` WHERE ${conditions.join(' AND ')}`
     }
     
-    query += ` ORDER BY c.updatedAt DESC LIMIT ${limit} OFFSET ${offset}`
+    query += ` ORDER BY c.updated_at DESC LIMIT ${limit} OFFSET ${offset}`
     
     const stmt = db.prepare(query)
     const { results } = await stmt.bind(...params).all()
@@ -76,13 +76,13 @@ adminContentRoutes.get('/', async (c) => {
       return {
         ...row,
         data,
-        authorName: `${row.firstName || ''} ${row.lastName || ''}`.trim() || 'Unknown',
-        formattedDate: new Date(row.updatedAt).toLocaleDateString(),
+        authorName: `${row.first_name || ''} ${row.last_name || ''}`.trim() || 'Unknown',
+        formattedDate: new Date(row.updated_at).toLocaleDateString(),
         statusBadge: ContentWorkflow.generateStatusBadge(row.status as ContentStatus),
         availableActions: ContentWorkflow.getAvailableActions(
           row.status as ContentStatus,
           user.role,
-          row.authorId === user.userId
+          row.author_id === user.userId
         )
       }
     })
@@ -142,7 +142,7 @@ adminContentRoutes.get('/', async (c) => {
                     hx-include="[name='status']"
                   >
                     <option value="all" ${modelName === 'all' ? 'selected' : ''}>All Models</option>
-                    ${models.map(model => html`
+                    ${models.map(model => `
                       <option value="${model.name}" ${modelName === model.name ? 'selected' : ''}>
                         ${model.displayName}
                       </option>
@@ -200,7 +200,7 @@ adminContentRoutes.get('/', async (c) => {
                     </tr>
                   </thead>
                   <tbody class="bg-white divide-y divide-gray-200">
-                    ${contentItems.map(item => html`
+                    ${contentItems.map(item => `
                       <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap">
                           <input type="checkbox" class="rounded content-checkbox" value="${item.id}">
@@ -239,13 +239,13 @@ adminContentRoutes.get('/', async (c) => {
                             >
                               History
                             </button>
-                            ${item.availableActions.length > 0 ? html`
+                            ${item.availableActions.length > 0 ? `
                               <div class="relative inline-block text-left">
                                 <button class="btn btn-sm btn-secondary" onclick="toggleDropdown('${item.id}')">
                                   Actions ▼
                                 </button>
                                 <div id="dropdown-${item.id}" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
-                                  ${item.availableActions.map((action: string) => html`
+                                  ${item.availableActions.map((action: string) => `
                                     <button 
                                       class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                       hx-post="/admin/content/${item.id}/workflow"
@@ -282,7 +282,7 @@ adminContentRoutes.get('/', async (c) => {
                     </p>
                   </div>
                   <div class="flex space-x-2">
-                    ${page > 1 ? html`
+                    ${page > 1 ? `
                       <a href="/admin/content?page=${page - 1}&model=${modelName}&status=${status}" 
                          class="btn btn-secondary">Previous</a>
                     ` : ''}
@@ -387,7 +387,7 @@ adminContentRoutes.get('/new', async (c) => {
                   hx-target="#dynamic-fields"
                   required
                 >
-                  ${models.map(model => html`
+                  ${models.map(model => `
                     <option value="${model.name}">${model.displayName}</option>
                   `).join('')}
                 </select>

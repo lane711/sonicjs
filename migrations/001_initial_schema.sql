@@ -1,6 +1,6 @@
 -- Initial schema for SonicJS AI
--- Users table for authentication and user management
-CREATE TABLE users (
+-- Create users table for authentication
+CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY,
   email TEXT NOT NULL UNIQUE,
   username TEXT NOT NULL UNIQUE,
@@ -15,8 +15,8 @@ CREATE TABLE users (
   updated_at INTEGER NOT NULL
 );
 
--- Content collections - dynamic schema definitions
-CREATE TABLE collections (
+-- Create collections table for content schema definitions
+CREATE TABLE IF NOT EXISTS collections (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL UNIQUE,
   display_name TEXT NOT NULL,
@@ -27,8 +27,8 @@ CREATE TABLE collections (
   updated_at INTEGER NOT NULL
 );
 
--- Content items - actual content data
-CREATE TABLE content (
+-- Create content table for actual content data
+CREATE TABLE IF NOT EXISTS content (
   id TEXT PRIMARY KEY,
   collection_id TEXT NOT NULL REFERENCES collections(id),
   slug TEXT NOT NULL,
@@ -41,18 +41,18 @@ CREATE TABLE content (
   updated_at INTEGER NOT NULL
 );
 
--- Content versions for versioning system
-CREATE TABLE content_versions (
+-- Create content_versions table for versioning
+CREATE TABLE IF NOT EXISTS content_versions (
   id TEXT PRIMARY KEY,
   content_id TEXT NOT NULL REFERENCES content(id),
   version INTEGER NOT NULL,
-  data TEXT NOT NULL, -- JSON content data
+  data TEXT NOT NULL, -- JSON data
   author_id TEXT NOT NULL REFERENCES users(id),
   created_at INTEGER NOT NULL
 );
 
--- Media/Files table
-CREATE TABLE media (
+-- Create media/files table with comprehensive R2 integration
+CREATE TABLE IF NOT EXISTS media (
   id TEXT PRIMARY KEY,
   filename TEXT NOT NULL,
   original_name TEXT NOT NULL,
@@ -61,9 +61,9 @@ CREATE TABLE media (
   width INTEGER,
   height INTEGER,
   folder TEXT NOT NULL DEFAULT 'uploads',
-  r2_key TEXT NOT NULL,
-  public_url TEXT NOT NULL,
-  thumbnail_url TEXT,
+  r2_key TEXT NOT NULL, -- R2 storage key
+  public_url TEXT NOT NULL, -- CDN URL
+  thumbnail_url TEXT, -- Cloudflare Images URL
   alt TEXT,
   caption TEXT,
   tags TEXT, -- JSON array of tags
@@ -76,8 +76,8 @@ CREATE TABLE media (
   deleted_at INTEGER
 );
 
--- API tokens for programmatic access
-CREATE TABLE api_tokens (
+-- Create API tokens table for programmatic access
+CREATE TABLE IF NOT EXISTS api_tokens (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   token TEXT NOT NULL UNIQUE,
@@ -88,15 +88,91 @@ CREATE TABLE api_tokens (
   created_at INTEGER NOT NULL
 );
 
+-- Create workflow history table for content workflow tracking
+CREATE TABLE IF NOT EXISTS workflow_history (
+  id TEXT PRIMARY KEY,
+  content_id TEXT NOT NULL REFERENCES content(id),
+  action TEXT NOT NULL,
+  from_status TEXT NOT NULL,
+  to_status TEXT NOT NULL,
+  user_id TEXT NOT NULL REFERENCES users(id),
+  comment TEXT,
+  created_at INTEGER NOT NULL
+);
+
 -- Create indexes for better performance
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_username ON users(username);
-CREATE INDEX idx_content_collection_id ON content(collection_id);
-CREATE INDEX idx_content_slug ON content(slug);
-CREATE INDEX idx_content_status ON content(status);
-CREATE INDEX idx_content_author_id ON content(author_id);
-CREATE INDEX idx_media_folder ON media(folder);
-CREATE INDEX idx_media_mime_type ON media(mime_type);
-CREATE INDEX idx_media_uploaded_by ON media(uploaded_by);
-CREATE INDEX idx_api_tokens_user_id ON api_tokens(user_id);
-CREATE INDEX idx_api_tokens_token ON api_tokens(token);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
+
+CREATE INDEX IF NOT EXISTS idx_collections_name ON collections(name);
+CREATE INDEX IF NOT EXISTS idx_collections_active ON collections(is_active);
+
+CREATE INDEX IF NOT EXISTS idx_content_collection ON content(collection_id);
+CREATE INDEX IF NOT EXISTS idx_content_author ON content(author_id);
+CREATE INDEX IF NOT EXISTS idx_content_status ON content(status);
+CREATE INDEX IF NOT EXISTS idx_content_published ON content(published_at);
+CREATE INDEX IF NOT EXISTS idx_content_slug ON content(slug);
+
+CREATE INDEX IF NOT EXISTS idx_content_versions_content ON content_versions(content_id);
+CREATE INDEX IF NOT EXISTS idx_content_versions_version ON content_versions(version);
+
+CREATE INDEX IF NOT EXISTS idx_media_folder ON media(folder);
+CREATE INDEX IF NOT EXISTS idx_media_type ON media(mime_type);
+CREATE INDEX IF NOT EXISTS idx_media_uploaded_by ON media(uploaded_by);
+CREATE INDEX IF NOT EXISTS idx_media_uploaded_at ON media(uploaded_at);
+CREATE INDEX IF NOT EXISTS idx_media_deleted ON media(deleted_at);
+
+CREATE INDEX IF NOT EXISTS idx_api_tokens_user ON api_tokens(user_id);
+CREATE INDEX IF NOT EXISTS idx_api_tokens_token ON api_tokens(token);
+
+CREATE INDEX IF NOT EXISTS idx_workflow_history_content ON workflow_history(content_id);
+CREATE INDEX IF NOT EXISTS idx_workflow_history_user ON workflow_history(user_id);
+
+-- Insert default admin user (password: admin123)
+INSERT OR IGNORE INTO users (
+  id, email, username, first_name, last_name, password_hash, 
+  role, is_active, created_at, updated_at
+) VALUES (
+  'admin-user-id',
+  'admin@sonicjs.com',
+  'admin',
+  'Admin',
+  'User',
+  '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', -- bcrypt hash of 'admin123'
+  'admin',
+  1,
+  strftime('%s', 'now') * 1000,
+  strftime('%s', 'now') * 1000
+);
+
+-- Insert sample collection
+INSERT OR IGNORE INTO collections (
+  id, name, display_name, description, schema, 
+  is_active, created_at, updated_at
+) VALUES (
+  'blog-posts-collection',
+  'blog_posts',
+  'Blog Posts',
+  'Blog post content collection',
+  '{"type":"object","properties":{"title":{"type":"string","title":"Title","required":true},"content":{"type":"string","title":"Content","format":"richtext"},"excerpt":{"type":"string","title":"Excerpt"},"featured_image":{"type":"string","title":"Featured Image","format":"media"},"tags":{"type":"array","title":"Tags","items":{"type":"string"}},"status":{"type":"string","title":"Status","enum":["draft","published","archived"],"default":"draft"}},"required":["title"]}',
+  1,
+  strftime('%s', 'now') * 1000,
+  strftime('%s', 'now') * 1000
+);
+
+-- Insert sample content
+INSERT OR IGNORE INTO content (
+  id, collection_id, slug, title, data, status, 
+  author_id, created_at, updated_at
+) VALUES (
+  'welcome-blog-post',
+  'blog-posts-collection',
+  'welcome-to-sonicjs-ai',
+  'Welcome to SonicJS AI',
+  '{"title":"Welcome to SonicJS AI","content":"<h1>Welcome to SonicJS AI</h1><p>This is your first blog post created with SonicJS AI, a modern headless CMS built on Cloudflare Workers.</p><h2>Features</h2><ul><li>Cloudflare-native architecture</li><li>TypeScript-first development</li><li>Hono.js framework</li><li>D1 database</li><li>R2 media storage</li><li>Edge computing</li></ul><p>Get started by exploring the admin interface and creating your own content!</p>","excerpt":"Welcome to SonicJS AI, a modern headless CMS built on Cloudflare Workers with TypeScript and Hono.js.","status":"published","tags":["welcome","cms","cloudflare"]}',
+  'published',
+  'admin-user-id',
+  strftime('%s', 'now') * 1000,
+  strftime('%s', 'now') * 1000
+);

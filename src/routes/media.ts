@@ -3,11 +3,23 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 // import { MediaStorage, FileMetadata, MEDIA_CONFIG, MEDIA_FOLDERS, getMediaConfigByType } from '../media/storage'
 import { requireAuth, requireRole } from '../middleware/auth'
+import { 
+  R2StorageManager, 
+  CloudflareImagesManager,
+  validateFile,
+  generateSafeFilename,
+  generateR2Key,
+  getFileCategory,
+  formatFileSize
+} from '../media/storage'
 
 type Bindings = {
   DB: D1Database
   KV: KVNamespace
   MEDIA_BUCKET?: R2Bucket
+  CF_ACCOUNT_ID?: string
+  CF_IMAGES_TOKEN?: string
+  CDN_DOMAIN?: string
 }
 
 type Variables = {
@@ -27,82 +39,160 @@ const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp
 const ALLOWED_DOCUMENT_TYPES = ['application/pdf', 'text/plain']
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 
-// Get all media files with filtering
+// Media upload schema
+const uploadSchema = z.object({
+  folder: z.string().optional().default('uploads'),
+  alt: z.string().optional(),
+  caption: z.string().optional(),
+  tags: z.array(z.string()).optional()
+})
+
+// Media update schema
+const updateMediaSchema = z.object({
+  alt: z.string().optional(),
+  caption: z.string().optional(),
+  tags: z.array(z.string()).optional(),
+  folder: z.string().optional()
+})
+
+// Get all media files with filtering and pagination
 mediaRoutes.get('/', async (c) => {
   try {
-    const user = c.get('user')
     const { searchParams } = new URL(c.req.url)
-    
-    // Query parameters
-    const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100)
+    const limit = Math.min(parseInt(searchParams.get('limit') || '24'), 100)
     const offset = parseInt(searchParams.get('offset') || '0')
     const folder = searchParams.get('folder')
-    const type = searchParams.get('type') // image, document, video, audio
+    const type = searchParams.get('type')
     const search = searchParams.get('search')
+    const sort = searchParams.get('sort') || 'newest'
     
     const db = c.env.DB
-    let query = 'SELECT * FROM media'
+    let query = 'SELECT * FROM media WHERE deleted_at IS NULL'
     const params: any[] = []
-    const conditions: string[] = []
     
-    // Filter by folder
-    if (folder) {
-      conditions.push('folder = ?')
+    // Apply filters
+    if (folder && folder !== 'all') {
+      query += ' AND folder = ?'
       params.push(folder)
     }
     
-    // Filter by media type
-    if (type) {
+    if (type && type !== 'all') {
       switch (type) {
-        case 'image':
-          conditions.push('mime_type LIKE ?')
+        case 'images':
+          query += ' AND mime_type LIKE ?'
           params.push('image/%')
           break
-        case 'document':
-          conditions.push('mime_type IN (?, ?)')
-          params.push('application/pdf', 'text/plain')
+        case 'documents':
+          query += ' AND mime_type IN (?, ?, ?, ?, ?, ?)'
+          params.push('application/pdf', 'text/plain', 'application/msword', 
+                     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                     'application/vnd.ms-excel', 
+                     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
           break
-        case 'video':
-          conditions.push('mime_type LIKE ?')
+        case 'videos':
+          query += ' AND mime_type LIKE ?'
           params.push('video/%')
           break
         case 'audio':
-          conditions.push('mime_type LIKE ?')
+          query += ' AND mime_type LIKE ?'
           params.push('audio/%')
           break
       }
     }
     
-    // Search in filename and alt text
+    // Search functionality
     if (search) {
-      conditions.push('(filename LIKE ? OR original_name LIKE ? OR alt LIKE ?)')
+      query += ' AND (filename LIKE ? OR original_name LIKE ? OR alt LIKE ? OR caption LIKE ?)'
       const searchTerm = `%${search}%`
-      params.push(searchTerm, searchTerm, searchTerm)
+      params.push(searchTerm, searchTerm, searchTerm, searchTerm)
     }
     
-    // Build final query
-    if (conditions.length > 0) {
-      query += ` WHERE ${conditions.join(' AND ')}`
+    // Apply sorting
+    switch (sort) {
+      case 'newest':
+        query += ' ORDER BY uploaded_at DESC'
+        break
+      case 'oldest':
+        query += ' ORDER BY uploaded_at ASC'
+        break
+      case 'name':
+        query += ' ORDER BY original_name ASC'
+        break
+      case 'size':
+        query += ' ORDER BY size DESC'
+        break
+      default:
+        query += ' ORDER BY uploaded_at DESC'
     }
     
-    query += ` ORDER BY uploaded_at DESC LIMIT ${limit} OFFSET ${offset}`
+    query += ` LIMIT ${limit} OFFSET ${offset}`
     
     const stmt = db.prepare(query)
     const { results } = await stmt.bind(...params).all()
     
-    // Parse metadata for each file
-    const mediaFiles = results.map((row: any) => ({
+    // Get total count for pagination
+    let countQuery = 'SELECT COUNT(*) as total FROM media WHERE deleted_at IS NULL'
+    let countParams: any[] = []
+    
+    if (folder && folder !== 'all') {
+      countQuery += ' AND folder = ?'
+      countParams.push(folder)
+    }
+    
+    if (type && type !== 'all') {
+      switch (type) {
+        case 'images':
+          countQuery += ' AND mime_type LIKE ?'
+          countParams.push('image/%')
+          break
+        case 'documents':
+          countQuery += ' AND mime_type IN (?, ?, ?, ?, ?, ?)'
+          countParams.push('application/pdf', 'text/plain', 'application/msword', 
+                          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                          'application/vnd.ms-excel', 
+                          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+          break
+        case 'videos':
+          countQuery += ' AND mime_type LIKE ?'
+          countParams.push('video/%')
+          break
+        case 'audio':
+          countQuery += ' AND mime_type LIKE ?'
+          countParams.push('audio/%')
+          break
+      }
+    }
+    
+    if (search) {
+      countQuery += ' AND (filename LIKE ? OR original_name LIKE ? OR alt LIKE ? OR caption LIKE ?)'
+      const searchTerm = `%${search}%`
+      countParams.push(searchTerm, searchTerm, searchTerm, searchTerm)
+    }
+    
+    const countStmt = db.prepare(countQuery)
+    const countResult = await countStmt.bind(...countParams).first() as any
+    const total = countResult?.total || 0
+    
+    // Process results
+    const processedResults = results.map((row: any) => ({
       ...row,
       tags: row.tags ? JSON.parse(row.tags) : [],
-      uploadedAt: new Date(row.uploaded_at).toISOString()
+      uploadedAt: new Date(row.uploaded_at).toISOString(),
+      fileSize: formatFileSize(row.size),
+      category: getFileCategory(row.mime_type),
+      isImage: row.mime_type.startsWith('image/'),
+      isVideo: row.mime_type.startsWith('video/'),
+      isDocument: !row.mime_type.startsWith('image/') && !row.mime_type.startsWith('video/')
     }))
     
     return c.json({
-      data: mediaFiles,
+      data: processedResults,
       meta: {
+        total,
         count: results.length,
         limit,
         offset,
+        hasMore: offset + limit < total,
         timestamp: new Date().toISOString()
       }
     })
@@ -112,276 +202,221 @@ mediaRoutes.get('/', async (c) => {
   }
 })
 
-// Get single media file
-mediaRoutes.get('/:id', async (c) => {
-  try {
-    const id = c.req.param('id')
-    const db = c.env.DB
-    
-    const stmt = db.prepare('SELECT * FROM media WHERE id = ?')
-    const result = await stmt.bind(id).first() as any
-    
-    if (!result) {
-      return c.json({ error: 'Media file not found' }, 404)
-    }
-    
-    // Parse tags
-    const mediaFile = {
-      ...result,
-      tags: result.tags ? JSON.parse(result.tags) : [],
-      uploadedAt: new Date(result.uploaded_at).toISOString()
-    }
-    
-    return c.json({ data: mediaFile })
-  } catch (error) {
-    console.error('Error fetching media file:', error)
-    return c.json({ error: 'Failed to fetch media file' }, 500)
-  }
-})
-
-// Upload file endpoint
+// Upload media files
 mediaRoutes.post('/upload',
   requireAuth(),
   async (c) => {
     try {
       const user = c.get('user')
       const db = c.env.DB
-      const bucket = c.env.MEDIA_BUCKET
       
+      // Check if R2 bucket is configured
+      const bucket = c.env.MEDIA_BUCKET
       if (!bucket) {
         return c.json({ error: 'Media storage not configured' }, 500)
       }
       
       // Parse multipart form data
       const formData = await c.req.formData()
-      const file = formData.get('file') as File
-      const folder = (formData.get('folder') as string) || 'uploads'
+      const files = formData.getAll('files') as File[]
+      const folder = formData.get('folder') as string || 'uploads'
       const alt = formData.get('alt') as string
       const caption = formData.get('caption') as string
-      const tags = formData.get('tags') as string
-      
-      if (!file) {
-        return c.json({ error: 'No file provided' }, 400)
-      }
-      
-      // Validate file
-      const validation = validateUploadedFile(file)
-      if (!validation.valid) {
-        return c.json({ error: 'Invalid file', details: validation.errors }, 400)
-      }
-      
-      // Generate file metadata
-      const fileId = crypto.randomUUID()
-      const timestamp = Date.now()
-      const extension = file.name.split('.').pop()?.toLowerCase()
-      const sanitizedName = sanitizeFilename(file.name)
-      const r2Key = `${folder}/${timestamp}-${fileId}.${extension}`
-      
-      // Upload to R2
-      const fileBuffer = await file.arrayBuffer()
-      await bucket.put(r2Key, fileBuffer, {
-        httpMetadata: {
-          contentType: file.type,
-          cacheControl: 'public, max-age=31536000', // 1 year
-        },
-        customMetadata: {
-          originalName: file.name,
-          uploadedBy: user.userId,
-          uploadedAt: timestamp.toString(),
-          alt: alt || '',
-          caption: caption || ''
-        }
-      })
-      
-      // Generate public URL (this would be your R2 custom domain)
-      const publicUrl = `https://media.yourdomain.com/${r2Key}`
-      
-      // Get image dimensions if it's an image
-      let width: number | undefined
-      let height: number | undefined
-      
-      if (file.type.startsWith('image/')) {
-        // In production, you'd extract actual dimensions
-        // For now, set placeholder values
-        width = 800
-        height = 600
-      }
-      
-      // Save to database
-      const insertStmt = db.prepare(`
-        INSERT INTO media (
-          id, filename, original_name, mime_type, size, width, height,
-          folder, uploaded_by, uploaded_at, tags, alt, caption, r2_key, public_url
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `)
-      
-      await insertStmt.bind(
-        fileId,
-        sanitizedName,
-        file.name,
-        file.type,
-        file.size,
-        width || null,
-        height || null,
-        folder,
-        user.userId,
-        timestamp,
-        tags ? JSON.stringify(tags.split(',').map(t => t.trim())) : JSON.stringify([]),
-        alt || null,
-        caption || null,
-        r2Key,
-        publicUrl
-      ).run()
-      
-      const mediaFile = {
-        id: fileId,
-        filename: sanitizedName,
-        originalName: file.name,
-        mimeType: file.type,
-        size: file.size,
-        width,
-        height,
-        folder,
-        uploadedBy: user.userId,
-        uploadedAt: new Date(timestamp).toISOString(),
-        tags: tags ? tags.split(',').map(t => t.trim()) : [],
-        alt,
-        caption,
-        publicUrl
-      }
-      
-      return c.json({
-        message: 'File uploaded successfully',
-        data: mediaFile
-      }, 201)
-    } catch (error) {
-      console.error('Error uploading file:', error)
-      return c.json({ error: 'Failed to upload file' }, 500)
-    }
-  }
-)
-
-// Bulk upload endpoint
-mediaRoutes.post('/upload/bulk',
-  requireAuth(),
-  async (c) => {
-    try {
-      const user = c.get('user')
-      const db = c.env.DB
-      const bucket = c.env.MEDIA_BUCKET
-      
-      if (!bucket) {
-        return c.json({ error: 'Media storage not configured' }, 500)
-      }
-      
-      const formData = await c.req.formData()
-      const files = formData.getAll('files') as File[]
-      const folder = (formData.get('folder') as string) || 'uploads'
+      const tagsString = formData.get('tags') as string
+      const tags = tagsString ? tagsString.split(',').map(t => t.trim()) : []
       
       if (!files || files.length === 0) {
         return c.json({ error: 'No files provided' }, 400)
       }
       
-      const results: Array<{ success: boolean; file?: any; error?: string; filename: string }> = []
+      const r2Manager = new R2StorageManager(bucket, c.env.CDN_DOMAIN)
+      const imagesManager = c.env.CF_ACCOUNT_ID && c.env.CF_IMAGES_TOKEN ? 
+        new CloudflareImagesManager(c.env.CF_ACCOUNT_ID, c.env.CF_IMAGES_TOKEN) : null
       
-      // Process each file
+      const uploadResults = []
+      
       for (const file of files) {
         try {
-          const validation = validateUploadedFile(file)
+          // Validate file
+          const validation = validateFile(file)
           if (!validation.valid) {
-            results.push({
+            uploadResults.push({
+              filename: file.name,
               success: false,
-              error: validation.errors.join(', '),
-              filename: file.name
+              errors: validation.errors
             })
             continue
           }
           
-          // Upload file (simplified version of single upload)
-          const fileId = crypto.randomUUID()
-          const timestamp = Date.now()
-          const extension = file.name.split('.').pop()?.toLowerCase()
-          const sanitizedName = sanitizeFilename(file.name)
-          const r2Key = `${folder}/${timestamp}-${fileId}.${extension}`
+          // Generate safe filename and R2 key
+          const safeFilename = generateSafeFilename(file.name)
+          const r2Key = generateR2Key(safeFilename, folder)
           
-          const fileBuffer = await file.arrayBuffer()
-          await bucket.put(r2Key, fileBuffer, {
-            httpMetadata: {
-              contentType: file.type,
-              cacheControl: 'public, max-age=31536000',
-            }
+          // Upload to R2
+          const uploadResult = await r2Manager.uploadFile(file, r2Key, {
+            userId: user.userId,
+            folder: folder,
+            originalName: file.name
           })
           
-          const publicUrl = `https://media.yourdomain.com/${r2Key}`
+          if (!uploadResult.success) {
+            uploadResults.push({
+              filename: file.name,
+              success: false,
+              error: uploadResult.error
+            })
+            continue
+          }
+          
+          // Get image dimensions if it's an image
+          let width: number | null = null
+          let height: number | null = null
+          let thumbnailUrl: string | null = null
+          
+          if (file.type.startsWith('image/')) {
+            // Try to get dimensions from file
+            try {
+              const img = new Image()
+              const imageUrl = URL.createObjectURL(file)
+              
+              await new Promise((resolve, reject) => {
+                img.onload = () => {
+                  width = img.width
+                  height = img.height
+                  resolve(true)
+                }
+                img.onerror = reject
+                img.src = imageUrl
+              })
+              
+              URL.revokeObjectURL(imageUrl)
+            } catch (error) {
+              console.warn('Could not get image dimensions:', error)
+            }
+            
+            // Upload to Cloudflare Images for optimization if available
+            if (imagesManager) {
+              try {
+                const cfResult = await imagesManager.uploadImage(file, {
+                  originalName: file.name,
+                  userId: user.userId,
+                  folder: folder
+                })
+                
+                if (cfResult.success && cfResult.url) {
+                  thumbnailUrl = cfResult.url
+                }
+              } catch (error) {
+                console.warn('Cloudflare Images upload failed:', error)
+              }
+            }
+          }
           
           // Save to database
+          const mediaId = crypto.randomUUID()
+          const now = Date.now()
+          
           const insertStmt = db.prepare(`
             INSERT INTO media (
-              id, filename, original_name, mime_type, size, folder,
-              uploaded_by, uploaded_at, tags, r2_key, public_url
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              id, filename, original_name, mime_type, size, width, height,
+              folder, r2_key, public_url, thumbnail_url, alt, caption, tags,
+              uploaded_by, uploaded_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           `)
           
           await insertStmt.bind(
-            fileId,
-            sanitizedName,
+            mediaId,
+            safeFilename,
             file.name,
             file.type,
             file.size,
+            width,
+            height,
             folder,
-            user.userId,
-            timestamp,
-            JSON.stringify([]),
             r2Key,
-            publicUrl
+            uploadResult.publicUrl,
+            thumbnailUrl,
+            alt || null,
+            caption || null,
+            tags.length > 0 ? JSON.stringify(tags) : null,
+            user.userId,
+            now,
+            now
           ).run()
           
-          results.push({
-            success: true,
+          uploadResults.push({
+            id: mediaId,
             filename: file.name,
-            file: {
-              id: fileId,
-              filename: sanitizedName,
-              publicUrl
-            }
+            success: true,
+            url: uploadResult.publicUrl,
+            thumbnailUrl: thumbnailUrl,
+            size: formatFileSize(file.size),
+            dimensions: width && height ? { width, height } : null
           })
+          
         } catch (error) {
-          console.error(`Error uploading ${file.name}:`, error)
-          results.push({
+          console.error(`Error uploading file ${file.name}:`, error)
+          uploadResults.push({
+            filename: file.name,
             success: false,
-            error: 'Upload failed',
-            filename: file.name
+            error: error instanceof Error ? error.message : 'Upload failed'
           })
         }
       }
       
-      const successCount = results.filter(r => r.success).length
-      const errorCount = results.filter(r => !r.success).length
+      const successCount = uploadResults.filter(r => r.success).length
+      const failCount = uploadResults.filter(r => !r.success).length
       
       return c.json({
-        message: `Bulk upload completed: ${successCount} successful, ${errorCount} failed`,
-        results,
+        message: `Upload completed: ${successCount} successful, ${failCount} failed`,
+        results: uploadResults,
         summary: {
-          total: files.length,
+          total: uploadResults.length,
           successful: successCount,
-          failed: errorCount
+          failed: failCount
         }
       })
+      
     } catch (error) {
-      console.error('Error in bulk upload:', error)
-      return c.json({ error: 'Bulk upload failed' }, 500)
+      console.error('Error in media upload:', error)
+      return c.json({ error: 'Upload failed' }, 500)
     }
   }
 )
 
-// Update media metadata
-const updateMediaSchema = z.object({
-  alt: z.string().optional(),
-  caption: z.string().optional(),
-  tags: z.array(z.string()).optional(),
-  folder: z.string().optional()
+// Get single media file
+mediaRoutes.get('/:id', async (c) => {
+  try {
+    const id = c.req.param('id')
+    const db = c.env.DB
+    
+    const stmt = db.prepare('SELECT * FROM media WHERE id = ? AND deleted_at IS NULL')
+    const result = await stmt.bind(id).first() as any
+    
+    if (!result) {
+      return c.json({ error: 'Media file not found' }, 404)
+    }
+    
+    // Process result
+    const processedResult = {
+      ...result,
+      tags: result.tags ? JSON.parse(result.tags) : [],
+      uploadedAt: new Date(result.uploaded_at).toISOString(),
+      fileSize: formatFileSize(result.size),
+      category: getFileCategory(result.mime_type),
+      isImage: result.mime_type.startsWith('image/'),
+      isVideo: result.mime_type.startsWith('video/'),
+      isDocument: !result.mime_type.startsWith('image/') && !result.mime_type.startsWith('video/')
+    }
+    
+    return c.json({ data: processedResult })
+  } catch (error) {
+    console.error('Error fetching media file:', error)
+    return c.json({ error: 'Failed to fetch media file' }, 500)
+  }
 })
 
+// Update media file metadata
 mediaRoutes.put('/:id',
   requireAuth(),
   zValidator('json', updateMediaSchema),
@@ -389,41 +424,61 @@ mediaRoutes.put('/:id',
     try {
       const id = c.req.param('id')
       const user = c.get('user')
-      const updateData = c.req.valid('json')
+      const updates = c.req.valid('json')
       const db = c.env.DB
       
-      // Check if file exists
-      const existingStmt = db.prepare('SELECT * FROM media WHERE id = ?')
-      const existing = await existingStmt.bind(id).first() as any
+      // Check if media file exists
+      const checkStmt = db.prepare('SELECT * FROM media WHERE id = ? AND deleted_at IS NULL')
+      const existing = await checkStmt.bind(id).first() as any
       
       if (!existing) {
         return c.json({ error: 'Media file not found' }, 404)
       }
       
-      // Check permissions (authors can only edit their own files)
-      if (user.role === 'author' && existing.uploaded_by !== user.userId) {
-        return c.json({ error: 'Insufficient permissions' }, 403)
+      // Check permissions (only owner or admin/editor can edit)
+      if (existing.uploaded_by !== user.userId && !['admin', 'editor'].includes(user.role)) {
+        return c.json({ error: 'Permission denied' }, 403)
       }
       
-      // Update metadata
+      // Build update query
+      const updateFields: string[] = []
+      const updateParams: any[] = []
+      
+      if (updates.alt !== undefined) {
+        updateFields.push('alt = ?')
+        updateParams.push(updates.alt)
+      }
+      
+      if (updates.caption !== undefined) {
+        updateFields.push('caption = ?')
+        updateParams.push(updates.caption)
+      }
+      
+      if (updates.tags !== undefined) {
+        updateFields.push('tags = ?')
+        updateParams.push(updates.tags.length > 0 ? JSON.stringify(updates.tags) : null)
+      }
+      
+      if (updates.folder !== undefined) {
+        updateFields.push('folder = ?')
+        updateParams.push(updates.folder)
+      }
+      
+      if (updateFields.length === 0) {
+        return c.json({ error: 'No fields to update' }, 400)
+      }
+      
+      updateFields.push('updated_at = ?')
+      updateParams.push(Date.now())
+      updateParams.push(id)
+      
       const updateStmt = db.prepare(`
         UPDATE media 
-        SET alt = COALESCE(?, alt),
-            caption = COALESCE(?, caption),
-            tags = COALESCE(?, tags),
-            folder = COALESCE(?, folder),
-            updated_at = ?
+        SET ${updateFields.join(', ')}
         WHERE id = ?
       `)
       
-      await updateStmt.bind(
-        updateData.alt || null,
-        updateData.caption || null,
-        updateData.tags ? JSON.stringify(updateData.tags) : null,
-        updateData.folder || null,
-        Date.now(),
-        id
-      ).run()
+      await updateStmt.bind(...updateParams).run()
       
       return c.json({ message: 'Media file updated successfully' })
     } catch (error) {
@@ -436,34 +491,42 @@ mediaRoutes.put('/:id',
 // Delete media file
 mediaRoutes.delete('/:id',
   requireAuth(),
-  requireRole(['admin', 'editor']),
   async (c) => {
     try {
       const id = c.req.param('id')
+      const user = c.get('user')
       const db = c.env.DB
-      const bucket = c.env.MEDIA_BUCKET
       
-      // Get file info
-      const stmt = db.prepare('SELECT * FROM media WHERE id = ?')
-      const mediaFile = await stmt.bind(id).first() as any
+      // Check if media file exists
+      const checkStmt = db.prepare('SELECT * FROM media WHERE id = ? AND deleted_at IS NULL')
+      const existing = await checkStmt.bind(id).first() as any
       
-      if (!mediaFile) {
+      if (!existing) {
         return c.json({ error: 'Media file not found' }, 404)
       }
       
-      // Delete from R2 if bucket is available
-      if (bucket && mediaFile.r2_key) {
-        try {
-          await bucket.delete(mediaFile.r2_key)
-        } catch (error) {
-          console.error('Error deleting from R2:', error)
-          // Continue with database deletion even if R2 deletion fails
-        }
+      // Check permissions (only owner or admin/editor can delete)
+      if (existing.uploaded_by !== user.userId && !['admin', 'editor'].includes(user.role)) {
+        return c.json({ error: 'Permission denied' }, 403)
       }
       
-      // Delete from database
-      const deleteStmt = db.prepare('DELETE FROM media WHERE id = ?')
-      await deleteStmt.bind(id).run()
+      // Soft delete in database
+      const deleteStmt = db.prepare(`
+        UPDATE media 
+        SET deleted_at = ?, updated_at = ?
+        WHERE id = ?
+      `)
+      
+      const now = Date.now()
+      await deleteStmt.bind(now, now, id).run()
+      
+      // Try to delete from R2 (async, don't wait for completion)
+      if (c.env.MEDIA_BUCKET) {
+        const r2Manager = new R2StorageManager(c.env.MEDIA_BUCKET)
+        r2Manager.deleteFile(existing.r2_key).catch(error => {
+          console.error('Error deleting file from R2:', error)
+        })
+      }
       
       return c.json({ message: 'Media file deleted successfully' })
     } catch (error) {
@@ -472,6 +535,153 @@ mediaRoutes.delete('/:id',
     }
   }
 )
+
+// Bulk operations
+mediaRoutes.post('/bulk',
+  requireAuth(),
+  requireRole(['admin', 'editor']),
+  zValidator('json', z.object({
+    operation: z.enum(['delete', 'move', 'tag']),
+    mediaIds: z.array(z.string()).min(1),
+    folder: z.string().optional(),
+    tags: z.array(z.string()).optional()
+  })),
+  async (c) => {
+    try {
+      const user = c.get('user')
+      const { operation, mediaIds, folder, tags } = c.req.valid('json')
+      const db = c.env.DB
+      
+      const results = []
+      
+      for (const mediaId of mediaIds) {
+        try {
+          switch (operation) {
+            case 'delete':
+              const deleteStmt = db.prepare(`
+                UPDATE media 
+                SET deleted_at = ?, updated_at = ?
+                WHERE id = ? AND deleted_at IS NULL
+              `)
+              
+              const now = Date.now()
+              await deleteStmt.bind(now, now, mediaId).run()
+              results.push({ id: mediaId, success: true })
+              break
+              
+            case 'move':
+              if (!folder) {
+                results.push({ id: mediaId, success: false, error: 'Folder required for move operation' })
+                continue
+              }
+              
+              const moveStmt = db.prepare(`
+                UPDATE media 
+                SET folder = ?, updated_at = ?
+                WHERE id = ? AND deleted_at IS NULL
+              `)
+              
+              await moveStmt.bind(folder, Date.now(), mediaId).run()
+              results.push({ id: mediaId, success: true })
+              break
+              
+            case 'tag':
+              if (!tags) {
+                results.push({ id: mediaId, success: false, error: 'Tags required for tag operation' })
+                continue
+              }
+              
+              const tagStmt = db.prepare(`
+                UPDATE media 
+                SET tags = ?, updated_at = ?
+                WHERE id = ? AND deleted_at IS NULL
+              `)
+              
+              await tagStmt.bind(JSON.stringify(tags), Date.now(), mediaId).run()
+              results.push({ id: mediaId, success: true })
+              break
+          }
+        } catch (error) {
+          results.push({ 
+            id: mediaId, 
+            success: false, 
+            error: error instanceof Error ? error.message : 'Operation failed' 
+          })
+        }
+      }
+      
+      const successCount = results.filter(r => r.success).length
+      const failCount = results.filter(r => !r.success).length
+      
+      return c.json({
+        message: `Bulk ${operation} completed: ${successCount} successful, ${failCount} failed`,
+        results,
+        summary: {
+          total: results.length,
+          successful: successCount,
+          failed: failCount
+        }
+      })
+    } catch (error) {
+      console.error('Error in bulk operation:', error)
+      return c.json({ error: 'Bulk operation failed' }, 500)
+    }
+  }
+)
+
+// Get media statistics
+mediaRoutes.get('/stats/overview', async (c) => {
+  try {
+    const db = c.env.DB
+    
+    // Get total counts by type
+    const statsStmt = db.prepare(`
+      SELECT 
+        COUNT(*) as total_files,
+        SUM(size) as total_size,
+        SUM(CASE WHEN mime_type LIKE 'image/%' THEN 1 ELSE 0 END) as image_count,
+        SUM(CASE WHEN mime_type LIKE 'video/%' THEN 1 ELSE 0 END) as video_count,
+        SUM(CASE WHEN mime_type LIKE 'audio/%' THEN 1 ELSE 0 END) as audio_count,
+        SUM(CASE WHEN mime_type NOT LIKE 'image/%' AND mime_type NOT LIKE 'video/%' AND mime_type NOT LIKE 'audio/%' THEN 1 ELSE 0 END) as document_count
+      FROM media 
+      WHERE deleted_at IS NULL
+    `)
+    
+    const stats = await statsStmt.first() as any
+    
+    // Get folder breakdown
+    const folderStmt = db.prepare(`
+      SELECT folder, COUNT(*) as count, SUM(size) as total_size
+      FROM media 
+      WHERE deleted_at IS NULL
+      GROUP BY folder
+      ORDER BY count DESC
+    `)
+    
+    const { results: folders } = await folderStmt.all()
+    
+    return c.json({
+      data: {
+        overview: {
+          totalFiles: stats.total_files || 0,
+          totalSize: formatFileSize(stats.total_size || 0),
+          totalSizeBytes: stats.total_size || 0,
+          imageCount: stats.image_count || 0,
+          videoCount: stats.video_count || 0,
+          audioCount: stats.audio_count || 0,
+          documentCount: stats.document_count || 0
+        },
+        folders: folders.map((folder: any) => ({
+          ...folder,
+          totalSize: formatFileSize(folder.total_size || 0)
+        }))
+      }
+    })
+  } catch (error) {
+    console.error('Error fetching media stats:', error)
+    return c.json({ error: 'Failed to fetch media statistics' }, 500)
+  }
+})
 
 // Get media folders
 mediaRoutes.get('/folders', async (c) => {

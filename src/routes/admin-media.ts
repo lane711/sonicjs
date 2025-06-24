@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { html } from 'hono/html'
+import { html, raw } from 'hono/html'
 import { requireAuth, requireRole } from '../middleware/auth'
 
 type Bindings = {
@@ -105,6 +105,29 @@ adminMediaRoutes.get('/', async (c) => {
       isDocument: !row.mime_type.startsWith('image/') && !row.mime_type.startsWith('video/')
     }))
     
+    // Generate folder list HTML
+    const folderListHTML = folders.map((f: any) => `
+      <li>
+        <a href="/admin/media?folder=${f.folder}" 
+           class="block px-3 py-2 text-sm rounded-md ${folder === f.folder ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}">
+          ${f.folder} (${f.count})
+        </a>
+      </li>
+    `).join('')
+    
+    // Generate type list HTML
+    const typeListHTML = types.map((t: any) => `
+      <li>
+        <a href="/admin/media?type=${t.type}" 
+           class="block px-3 py-2 text-sm rounded-md ${type === t.type ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}">
+          ${t.type.charAt(0).toUpperCase() + t.type.slice(1)} (${t.count})
+        </a>
+      </li>
+    `).join('')
+    
+    // Generate media grid HTML
+    const mediaGridHTML = mediaFiles.map(file => generateMediaItemHTML(file)).join('')
+    
     return c.html(html`
       <!DOCTYPE html>
       <html lang="en">
@@ -169,14 +192,7 @@ adminMediaRoutes.get('/', async (c) => {
                           All Files (${results.length})
                         </a>
                       </li>
-                      ${folders.map((f: any) => html`
-                        <li>
-                          <a href="/admin/media?folder=${f.folder}" 
-                             class="block px-3 py-2 text-sm rounded-md ${folder === f.folder ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}">
-                            ${f.folder} (${f.count})
-                          </a>
-                        </li>
-                      `).join('')}
+                      ${raw(folderListHTML)}
                     </ul>
                   </div>
                   
@@ -190,14 +206,7 @@ adminMediaRoutes.get('/', async (c) => {
                           All Types
                         </a>
                       </li>
-                      ${types.map((t: any) => html`
-                        <li>
-                          <a href="/admin/media?type=${t.type}" 
-                             class="block px-3 py-2 text-sm rounded-md ${type === t.type ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}">
-                            ${t.type.charAt(0).toUpperCase() + t.type.slice(1)} (${t.count})
-                          </a>
-                        </li>
-                      `).join('')}
+                      ${raw(typeListHTML)}
                     </ul>
                   </div>
                   
@@ -268,14 +277,14 @@ adminMediaRoutes.get('/', async (c) => {
                 
                 <!-- Media Grid -->
                 <div id="media-grid" class="media-grid">
-                  ${mediaFiles.map(file => generateMediaItemHTML(file)).join('')}
+                  ${raw(mediaGridHTML)}
                 </div>
                 
                 <!-- Pagination -->
                 ${results.length === limit ? html`
                   <div class="mt-6 flex justify-center">
                     <div class="flex space-x-2">
-                      ${page > 1 ? html`
+                      ${page > 1 ? `
                         <a href="/admin/media?page=${page - 1}&folder=${folder}&type=${type}" 
                            class="px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
                           Previous
@@ -309,7 +318,7 @@ adminMediaRoutes.get('/', async (c) => {
             <!-- Upload Form -->
             <form 
               id="upload-form"
-              hx-post="/media/upload/bulk"
+              hx-post="/media/upload"
               hx-encoding="multipart/form-data"
               hx-target="#upload-results"
               class="space-y-4"
@@ -618,7 +627,7 @@ adminMediaRoutes.get('/search', async (c) => {
     
     const gridHTML = mediaFiles.map(file => generateMediaItemHTML(file)).join('')
     
-    return c.html(gridHTML)
+    return c.html(raw(gridHTML))
   } catch (error) {
     console.error('Error searching media:', error)
     return c.html('<div class="text-red-500">Error searching files</div>')
