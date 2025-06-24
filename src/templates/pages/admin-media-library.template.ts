@@ -379,6 +379,13 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
       
       function handleFileSelect(files) {
         dragDropFiles = Array.from(files);
+        
+        // Update the actual file input with the selected files
+        const fileInput = document.getElementById('file-input');
+        const dt = new DataTransfer();
+        dragDropFiles.forEach(file => dt.items.add(file));
+        fileInput.files = dt.files;
+        
         displaySelectedFiles();
         document.getElementById('upload-btn').disabled = false;
       }

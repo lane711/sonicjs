@@ -21,6 +21,7 @@ export interface FormData {
   action?: string
   method?: string
   hxPost?: string
+  hxPut?: string
   hxTarget?: string
   fields: FormField[]
   submitButtons: Array<{
@@ -40,7 +41,7 @@ export function renderForm(data: FormData): string {
   return `
     <form 
       ${data.id ? `id="${data.id}"` : ''}
-      ${data.hxPost ? `hx-post="${data.hxPost}"` : data.action ? `action="${data.action}"` : ''}
+      ${data.hxPost ? `hx-post="${data.hxPost}"` : data.hxPut ? `hx-put="${data.hxPut}"` : data.action ? `action="${data.action}"` : ''}
       ${data.hxTarget ? `hx-target="${data.hxTarget}"` : ''}
       method="${data.method || 'POST'}"
       class="${data.className || 'space-y-6'}"

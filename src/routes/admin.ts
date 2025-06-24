@@ -79,14 +79,16 @@ adminRoutes.get('/collections', async (c) => {
     const stmt = db.prepare('SELECT * FROM collections WHERE is_active = 1 ORDER BY created_at DESC')
     const { results } = await stmt.all()
     
-    const collections: Collection[] = results.map((collection: any) => ({
-      id: collection.id,
-      name: collection.name,
-      display_name: collection.display_name,
-      description: collection.description,
-      created_at: collection.created_at,
-      formattedDate: new Date(collection.created_at).toLocaleDateString()
-    }))
+    const collections: Collection[] = (results || [])
+      .filter((collection: any) => collection && collection.id)
+      .map((collection: any) => ({
+        id: collection.id,
+        name: collection.name || `collection-${collection.id}`,
+        display_name: collection.display_name || collection.name || `Collection ${collection.id}`,
+        description: collection.description,
+        created_at: collection.created_at,
+        formattedDate: collection.created_at ? new Date(collection.created_at).toLocaleDateString() : 'Unknown'
+      }))
     
     const pageData: CollectionsListPageData = {
       collections,

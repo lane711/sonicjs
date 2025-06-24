@@ -7,6 +7,7 @@ import { ContentVersioning } from '../content/versioning'
 import { requireAuth, requireRole } from '../middleware/auth'
 import { renderContentListPage, ContentListPageData } from '../templates/pages/admin-content-list.template'
 import { renderContentNewPage, ContentNewPageData } from '../templates/pages/admin-content-new.template'
+import { renderContentEditPage, ContentEditPageData } from '../templates/pages/admin-content-edit.template'
 
 type Bindings = {
   DB: D1Database
@@ -294,6 +295,307 @@ adminContentRoutes.post('/', async (c) => {
         <p>An error occurred while creating the content. Please try again.</p>
       </div>
     `)
+  }
+})
+
+// Edit content form
+adminContentRoutes.get('/:id/edit', async (c) => {
+  try {
+    const user = c.get('user')
+    const contentId = c.req.param('id')
+    const db = c.env.DB
+    
+    // Get content item
+    const contentResult = await db.prepare('SELECT * FROM content WHERE id = ?').bind(contentId).first()
+    
+    if (!contentResult) {
+      return c.html(`
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <p>Content not found.</p>
+        </div>
+      `)
+    }
+    
+    // Parse content data
+    const contentData = contentResult.data ? JSON.parse(contentResult.data as string) : {}
+    
+    const content = {
+      id: contentResult.id as string,
+      title: contentResult.title as string,
+      slug: contentResult.slug as string,
+      status: contentResult.status as string,
+      data: contentData,
+      collection_id: contentResult.collection_id as string,
+      created_at: contentResult.created_at as string,
+      updated_at: contentResult.updated_at as string
+    }
+    
+    // Get available models
+    const models = modelManager.getAllModels()
+    
+    // Find the model for this content
+    const selectedModel = models.find(model => 
+      model.name === content.collection_id || 
+      content.collection_id.includes(model.name)
+    ) || models[0]
+    
+    const pageData: ContentEditPageData = {
+      content,
+      models: models.map(model => ({
+        name: model.name,
+        displayName: model.displayName,
+        fields: model.fields
+      })),
+      selectedModel: selectedModel ? {
+        name: selectedModel.name,
+        displayName: selectedModel.displayName,
+        fields: selectedModel.fields
+      } : undefined,
+      user: {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      }
+    }
+    
+    return c.html(renderContentEditPage(pageData))
+  } catch (error) {
+    console.error('Error loading content for edit:', error)
+    return c.html(`
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <p>Error loading content. Please try again.</p>
+      </div>
+    `)
+  }
+})
+
+// Handle POST to edit route (fallback for non-HTMX forms)
+adminContentRoutes.post('/:id/edit', async (c) => {
+  // Redirect POST requests to the PUT handler
+  const contentId = c.req.param('id')
+  const formData = await c.req.formData()
+  
+  // Create a new request object for the PUT route
+  const putUrl = `/admin/content/${contentId}`
+  const putRequest = new Request(putUrl, {
+    method: 'PUT',
+    body: formData,
+    headers: c.req.raw.headers
+  })
+  
+  // Forward to PUT handler by creating new context
+  try {
+    const user = c.get('user')
+    const title = formData.get('title')?.toString() || ''
+    const slug = formData.get('slug')?.toString() || ''
+    const status = formData.get('status')?.toString() || 'draft'
+    
+    // Validate required fields
+    if (!title || !slug) {
+      return c.html(`
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <p>Please fill in all required fields: Title and Slug.</p>
+        </div>
+      `)
+    }
+    
+    const db = c.env.DB
+    
+    // Get existing content
+    const existingContent = await db.prepare('SELECT * FROM content WHERE id = ?').bind(contentId).first()
+    if (!existingContent) {
+      return c.html(`
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <p>Content not found.</p>
+        </div>
+      `)
+    }
+    
+    // Check if slug already exists (excluding current content)
+    const slugCheck = await db.prepare('SELECT id FROM content WHERE slug = ? AND id != ?').bind(slug, contentId).first()
+    if (slugCheck) {
+      return c.html(`
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <p>A content item with this slug already exists. Please choose a different slug.</p>
+        </div>
+      `)
+    }
+    
+    // Build updated content data
+    const existingData = existingContent.data ? JSON.parse(existingContent.data as string) : {}
+    const updatedData = { ...existingData, title, slug }
+    
+    // Extract dynamic fields from form
+    for (const [key, value] of formData.entries()) {
+      if (!['title', 'slug', 'status'].includes(key)) {
+        updatedData[key] = value.toString()
+      }
+    }
+    
+    // Update content
+    const now = new Date().toISOString()
+    
+    await db.prepare(`
+      UPDATE content 
+      SET title = ?, slug = ?, status = ?, data = ?, updated_at = ?
+      WHERE id = ?
+    `).bind(
+      title,
+      slug,
+      status,
+      JSON.stringify(updatedData),
+      now,
+      contentId
+    ).run()
+    
+    // Check if this is an HTMX request
+    const isHtmxRequest = c.req.header('HX-Request') === 'true'
+    
+    if (isHtmxRequest) {
+      return c.html(`
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+          <p>Content updated successfully!</p>
+          <script>
+            setTimeout(() => {
+              window.location.href = '/admin/content';
+            }, 1500);
+          </script>
+        </div>
+      `)
+    }
+    
+    // Redirect to content list with success message
+    return c.redirect('/admin/content?success=Content updated successfully')
+    
+  } catch (error) {
+    console.error('Error updating content:', error)
+    return c.html(`
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <p>An error occurred while updating the content. Please try again.</p>
+      </div>
+    `)
+  }
+})
+
+// Update content
+adminContentRoutes.put('/:id', async (c) => {
+  try {
+    const user = c.get('user')
+    const contentId = c.req.param('id')
+    const formData = await c.req.formData()
+    
+    // Extract form data
+    const title = formData.get('title')?.toString() || ''
+    const slug = formData.get('slug')?.toString() || ''
+    const status = formData.get('status')?.toString() || 'draft'
+    
+    // Validate required fields
+    if (!title || !slug) {
+      return c.html(`
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <p>Please fill in all required fields: Title and Slug.</p>
+        </div>
+      `)
+    }
+    
+    const db = c.env.DB
+    
+    // Get existing content
+    const existingContent = await db.prepare('SELECT * FROM content WHERE id = ?').bind(contentId).first()
+    if (!existingContent) {
+      return c.html(`
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <p>Content not found.</p>
+        </div>
+      `)
+    }
+    
+    // Check if slug already exists (excluding current content)
+    const slugCheck = await db.prepare('SELECT id FROM content WHERE slug = ? AND id != ?').bind(slug, contentId).first()
+    if (slugCheck) {
+      return c.html(`
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <p>A content item with this slug already exists. Please choose a different slug.</p>
+        </div>
+      `)
+    }
+    
+    // Build updated content data
+    const existingData = existingContent.data ? JSON.parse(existingContent.data as string) : {}
+    const updatedData = { ...existingData, title, slug }
+    
+    // Extract dynamic fields from form
+    for (const [key, value] of formData.entries()) {
+      if (!['title', 'slug', 'status'].includes(key)) {
+        updatedData[key] = value.toString()
+      }
+    }
+    
+    // Update content
+    const now = new Date().toISOString()
+    
+    await db.prepare(`
+      UPDATE content 
+      SET title = ?, slug = ?, status = ?, data = ?, updated_at = ?
+      WHERE id = ?
+    `).bind(
+      title,
+      slug,
+      status,
+      JSON.stringify(updatedData),
+      now,
+      contentId
+    ).run()
+    
+    // Check if this is an HTMX request
+    const isHtmxRequest = c.req.header('HX-Request') === 'true'
+    
+    if (isHtmxRequest) {
+      return c.html(`
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+          <p>Content updated successfully!</p>
+          <script>
+            setTimeout(() => {
+              window.location.href = '/admin/content';
+            }, 1500);
+          </script>
+        </div>
+      `)
+    }
+    
+    // Redirect to content list with success message
+    return c.redirect('/admin/content?success=Content updated successfully')
+    
+  } catch (error) {
+    console.error('Error updating content:', error)
+    return c.html(`
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <p>An error occurred while updating the content. Please try again.</p>
+      </div>
+    `)
+  }
+})
+
+// Delete content
+adminContentRoutes.delete('/:id', async (c) => {
+  try {
+    const contentId = c.req.param('id')
+    const db = c.env.DB
+    
+    // Check if content exists
+    const existingContent = await db.prepare('SELECT id FROM content WHERE id = ?').bind(contentId).first()
+    if (!existingContent) {
+      return c.json({ error: 'Content not found' }, 404)
+    }
+    
+    // Delete content
+    await db.prepare('DELETE FROM content WHERE id = ?').bind(contentId).run()
+    
+    return c.json({ success: true, message: 'Content deleted successfully' })
+    
+  } catch (error) {
+    console.error('Error deleting content:', error)
+    return c.json({ error: 'An error occurred while deleting the content' }, 500)
   }
 })
 

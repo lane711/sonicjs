@@ -12,12 +12,6 @@ const sizeClasses = {
   xl: 'h-16 w-auto'
 }
 
-const textSizeClasses = {
-  sm: 'text-lg',
-  md: 'text-xl',
-  lg: 'text-2xl',
-  xl: 'text-3xl'
-}
 
 export function renderLogo(data: LogoData = {}): string {
   const {
@@ -28,7 +22,6 @@ export function renderLogo(data: LogoData = {}): string {
   } = data
 
   const sizeClass = sizeClasses[size]
-  const textSizeClass = textSizeClasses[size]
   
   // Official SonicJS logo SVG from sonicjs.com
   const logoSvg = `
@@ -48,8 +41,6 @@ export function renderLogo(data: LogoData = {}): string {
   if (!showText) {
     return logoSvg
   }
-
-  const textColor = variant === 'white' ? 'text-white' : variant === 'dark' ? 'text-gray-900' : 'text-gray-900'
   
   return `
     <div class="flex items-center space-x-3 ${className}">

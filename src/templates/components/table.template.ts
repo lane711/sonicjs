@@ -54,24 +54,27 @@ export function renderTable<T = any>(data: TableData<T>): string {
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            ${data.rows.map(row => `
-              <tr class="hover:bg-gray-50">
-                ${data.selectable ? `
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <input type="checkbox" class="rounded row-checkbox" value="${row.id || ''}">
-                  </td>
-                ` : ''}
-                ${data.columns.map(column => {
-                  const value = row[column.key]
-                  const displayValue = column.render ? column.render(value, row) : value
-                  return `
-                    <td class="px-6 py-4 whitespace-nowrap ${column.className || ''}">
-                      ${displayValue}
+            ${data.rows.map(row => {
+              if (!row) return ''
+              return `
+                <tr class="hover:bg-gray-50">
+                  ${data.selectable ? `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <input type="checkbox" class="rounded row-checkbox" value="${row.id || ''}">
                     </td>
-                  `
-                }).join('')}
-              </tr>
-            `).join('')}
+                  ` : ''}
+                  ${data.columns.map(column => {
+                    const value = row[column.key]
+                    const displayValue = column.render ? column.render(value, row) : value
+                    return `
+                      <td class="px-6 py-4 whitespace-nowrap ${column.className || ''}">
+                        ${displayValue || ''}
+                      </td>
+                    `
+                  }).join('')}
+                </tr>
+              `
+            }).join('')}
           </tbody>
         </table>
       </div>

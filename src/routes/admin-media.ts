@@ -40,7 +40,7 @@ adminMediaRoutes.get('/', async (c) => {
     // Build query for media files
     let query = 'SELECT * FROM media'
     const params: any[] = []
-    const conditions: string[] = []
+    const conditions: string[] = ['deleted_at IS NULL']
     
     if (folder !== 'all') {
       conditions.push('folder = ?')

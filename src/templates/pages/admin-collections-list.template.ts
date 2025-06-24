@@ -46,16 +46,19 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
       {
         key: 'actions',
         label: 'Actions',
-        render: (collection) => `
-          <div class="flex items-center space-x-2">
-            <a href="/admin/collections/${collection.id}" class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-              Edit
-            </a>
-            <a href="/admin/collections/${collection.name}/content" class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-              Content
-            </a>
-          </div>
-        `
+        render: (value, collection) => {
+          if (!collection || !collection.id) return '<span class="text-gray-400">-</span>'
+          return `
+            <div class="flex items-center space-x-2">
+              <a href="/admin/collections/${collection.id}" class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Edit
+              </a>
+              <a href="/admin/collections/${collection.name || collection.id}/content" class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Content
+              </a>
+            </div>
+          `
+        }
       }
     ],
     rows: data.collections,

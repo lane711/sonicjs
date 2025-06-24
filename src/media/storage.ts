@@ -530,9 +530,11 @@ export class R2StorageManager {
         }
       })
       
+      // Generate public URL - for now we'll use a placeholder that can be configured
+      // In production, this should be set to your actual R2 bucket public domain
       const publicUrl = this.cdnDomain ? 
         `https://${this.cdnDomain}/${key}` : 
-        `https://pub-${this.bucket.toString()}/${key}` // Fallback, need actual domain
+        `/media/serve/${encodeURIComponent(key)}` // Serve through our API endpoint
       
       return {
         success: true,

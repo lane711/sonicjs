@@ -39,6 +39,38 @@ const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp
 const ALLOWED_DOCUMENT_TYPES = ['application/pdf', 'text/plain']
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 
+// Serve media files from R2
+mediaRoutes.get('/serve/:key{.*}', async (c) => {
+  try {
+    const key = decodeURIComponent(c.req.param('key'))
+    const bucket = c.env.MEDIA_BUCKET
+    
+    if (!bucket) {
+      return c.text('Media storage not configured', 500)
+    }
+    
+    const file = await bucket.get(key)
+    
+    if (!file) {
+      return c.text('File not found', 404)
+    }
+    
+    // Set appropriate headers
+    const headers = new Headers()
+    if (file.httpMetadata?.contentType) {
+      headers.set('Content-Type', file.httpMetadata.contentType)
+    }
+    headers.set('Cache-Control', 'public, max-age=31536000') // Cache for 1 year
+    
+    return new Response(file.body, {
+      headers
+    })
+  } catch (error) {
+    console.error('Error serving media file:', error)
+    return c.text('Error serving file', 500)
+  }
+})
+
 // Media upload schema
 const uploadSchema = z.object({
   folder: z.string().optional().default('uploads'),
