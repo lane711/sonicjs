@@ -76,7 +76,8 @@ function renderAdminHeader(data: AdminHeaderData): string {
     { path: '/admin/content', label: 'Content' },
     { path: '/admin/collections', label: 'Collections' },
     { path: '/admin/media', label: 'Media' },
-    { path: '/admin/users', label: 'Users' }
+    { path: '/admin/users', label: 'Users' },
+    { path: '/docs', label: 'Docs' }
   ]
 
   return `

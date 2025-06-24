@@ -24,7 +24,9 @@
     "drizzle-kit": "^0.31.2",
     "drizzle-orm": "^0.44.2",
     "drizzle-zod": "^0.8.2",
+    "highlight.js": "^11.11.1",
     "hono": "^4.7.3",
+    "marked": "^15.0.12",
     "zod": "^3.25.67"
   },
   "devDependencies": {

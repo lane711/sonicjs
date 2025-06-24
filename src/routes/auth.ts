@@ -4,6 +4,8 @@ import { z } from 'zod'
 import { setCookie } from 'hono/cookie'
 import { html } from 'hono/html'
 import { AuthManager, requireAuth } from '../middleware/auth'
+import { renderLoginPage, LoginPageData } from '../templates/pages/auth-login.template'
+import { renderRegisterPage, RegisterPageData } from '../templates/pages/auth-register.template'
 
 type Bindings = {
   DB: D1Database
@@ -27,205 +29,23 @@ authRoutes.get('/login', (c) => {
   const error = c.req.query('error')
   const message = c.req.query('message')
   
-  return c.html(html`
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Login - SonicJS AI</title>
-      <script src="https://unpkg.com/htmx.org@2.0.3"></script>
-      <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    </head>
-    <body class="bg-gray-50 min-h-screen flex items-center justify-center">
-      <div class="max-w-md w-full space-y-8">
-        <div>
-          <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to SonicJS AI
-          </h2>
-          <p class="mt-2 text-center text-sm text-gray-600">
-            Or <a href="/auth/register" class="font-medium text-blue-600 hover:text-blue-500">create a new account</a>
-          </p>
-        </div>
-        
-        ${error ? html`
-          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            ${error}
-          </div>
-        ` : ''}
-        
-        ${message ? html`
-          <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-            ${message}
-          </div>
-        ` : ''}
-        
-        <form 
-          id="login-form"
-          hx-post="/auth/login/form"
-          hx-target="#form-response"
-          hx-swap="innerHTML"
-          class="mt-8 space-y-6"
-        >
-          <div class="space-y-4">
-            <div>
-              <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
-              <input 
-                id="email" 
-                name="email" 
-                type="email" 
-                autocomplete="email" 
-                required 
-                class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" 
-                placeholder="Email address"
-              >
-            </div>
-            <div>
-              <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-              <input 
-                id="password" 
-                name="password" 
-                type="password" 
-                autocomplete="current-password" 
-                required 
-                class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" 
-                placeholder="Password"
-              >
-            </div>
-          </div>
-
-          <div>
-            <button 
-              type="submit"
-              class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Sign in
-            </button>
-          </div>
-        </form>
-        
-        <div id="form-response"></div>
-      </div>
-    </body>
-    </html>
-  `)
+  const pageData: LoginPageData = {
+    error: error || undefined,
+    message: message || undefined
+  }
+  
+  return c.html(renderLoginPage(pageData))
 })
 
 // Registration page (HTML form)
 authRoutes.get('/register', (c) => {
   const error = c.req.query('error')
   
-  return c.html(html`
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Register - SonicJS AI</title>
-      <script src="https://unpkg.com/htmx.org@2.0.3"></script>
-      <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    </head>
-    <body class="bg-gray-50 min-h-screen flex items-center justify-center">
-      <div class="max-w-md w-full space-y-8">
-        <div>
-          <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create your account
-          </h2>
-          <p class="mt-2 text-center text-sm text-gray-600">
-            Or <a href="/auth/login" class="font-medium text-blue-600 hover:text-blue-500">sign in to existing account</a>
-          </p>
-        </div>
-        
-        ${error ? html`
-          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            ${error}
-          </div>
-        ` : ''}
-        
-        <form 
-          id="register-form"
-          hx-post="/auth/register/form"
-          hx-target="#form-response"
-          hx-swap="innerHTML"
-          class="mt-8 space-y-6"
-        >
-          <div class="space-y-4">
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label for="firstName" class="block text-sm font-medium text-gray-700">First name</label>
-                <input 
-                  id="firstName" 
-                  name="firstName" 
-                  type="text" 
-                  required 
-                  class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" 
-                  placeholder="First name"
-                >
-              </div>
-              <div>
-                <label for="lastName" class="block text-sm font-medium text-gray-700">Last name</label>
-                <input 
-                  id="lastName" 
-                  name="lastName" 
-                  type="text" 
-                  required 
-                  class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" 
-                  placeholder="Last name"
-                >
-              </div>
-            </div>
-            <div>
-              <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
-              <input 
-                id="username" 
-                name="username" 
-                type="text" 
-                required 
-                class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" 
-                placeholder="Username"
-              >
-            </div>
-            <div>
-              <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
-              <input 
-                id="email" 
-                name="email" 
-                type="email" 
-                autocomplete="email" 
-                required 
-                class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" 
-                placeholder="Email address"
-              >
-            </div>
-            <div>
-              <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-              <input 
-                id="password" 
-                name="password" 
-                type="password" 
-                autocomplete="new-password" 
-                required 
-                class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" 
-                placeholder="Password (min. 8 characters)"
-              >
-            </div>
-          </div>
-
-          <div>
-            <button 
-              type="submit"
-              class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Create account
-            </button>
-          </div>
-        </form>
-        
-        <div id="form-response"></div>
-      </div>
-    </body>
-    </html>
-  `)
+  const pageData: RegisterPageData = {
+    error: error || undefined
+  }
+  
+  return c.html(renderRegisterPage(pageData))
 })
 
 // Registration schema
