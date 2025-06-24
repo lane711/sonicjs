@@ -60,11 +60,11 @@ export function renderTable<T = any>(data: TableData<T>): string {
                 <tr class="hover:bg-gray-50">
                   ${data.selectable ? `
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <input type="checkbox" class="rounded row-checkbox" value="${row.id || ''}">
+                      <input type="checkbox" class="rounded row-checkbox" value="${(row as any).id || ''}">
                     </td>
                   ` : ''}
                   ${data.columns.map(column => {
-                    const value = row[column.key]
+                    const value = (row as any)[column.key]
                     const displayValue = column.render ? column.render(value, row) : value
                     return `
                       <td class="px-6 py-4 whitespace-nowrap ${column.className || ''}">

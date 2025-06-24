@@ -401,28 +401,30 @@ export class ContentModelManager {
         case FieldType.RICH_TEXT:
         case FieldType.EMAIL:
         case FieldType.URL:
-          fieldSchema = z.string()
+          let stringSchema = z.string()
           if (fieldConfig.validation?.min) {
-            fieldSchema = fieldSchema.min(fieldConfig.validation.min)
+            stringSchema = stringSchema.min(fieldConfig.validation.min)
           }
           if (fieldConfig.validation?.max) {
-            fieldSchema = fieldSchema.max(fieldConfig.validation.max)
+            stringSchema = stringSchema.max(fieldConfig.validation.max)
           }
           if (fieldConfig.type === FieldType.EMAIL) {
-            fieldSchema = fieldSchema.email()
+            stringSchema = stringSchema.email()
           }
           if (fieldConfig.type === FieldType.URL) {
-            fieldSchema = fieldSchema.url()
+            stringSchema = stringSchema.url()
           }
+          fieldSchema = stringSchema
           break
         case FieldType.NUMBER:
-          fieldSchema = z.number()
+          let numberSchema = z.number()
           if (fieldConfig.validation?.min !== undefined) {
-            fieldSchema = fieldSchema.min(fieldConfig.validation.min)
+            numberSchema = numberSchema.min(fieldConfig.validation.min)
           }
           if (fieldConfig.validation?.max !== undefined) {
-            fieldSchema = fieldSchema.max(fieldConfig.validation.max)
+            numberSchema = numberSchema.max(fieldConfig.validation.max)
           }
+          fieldSchema = numberSchema
           break
         case FieldType.BOOLEAN:
           fieldSchema = z.boolean()

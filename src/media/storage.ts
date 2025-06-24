@@ -431,7 +431,8 @@ export function generateSafeFilename(originalName: string): string {
   const timestamp = Date.now()
   const randomString = Math.random().toString(36).substring(2, 8)
   const extension = originalName.split('.').pop()?.toLowerCase() || ''
-  const baseName = originalName.split('.')[0]
+  const nameParts = originalName.split('.')
+  const baseName = (nameParts.length > 0 && nameParts[0] ? nameParts[0] : originalName)
     .toLowerCase()
     .replace(/[^a-z0-9]/g, '-')
     .replace(/-+/g, '-')

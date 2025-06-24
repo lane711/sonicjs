@@ -123,7 +123,7 @@ export function renderContentNewPage(data: ContentNewPageData): string {
   ]
 
   // Combine base fields with dynamic model fields
-  const allFields = [...baseFields, ...generateModelFields(selectedModel)]
+  const allFields = [...baseFields, ...generateModelFields(selectedModel || undefined)]
 
   const formData: FormData = {
     id: 'content-form',

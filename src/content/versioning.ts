@@ -48,8 +48,8 @@ export class ContentVersioning {
   static createVersion(
     contentId: string,
     currentContent: any,
-    previousVersion?: ContentVersion,
     userId: string,
+    previousVersion?: ContentVersion,
     changeType: ContentVersion['changeType'] = 'update',
     comment?: string
   ): ContentVersion {
@@ -242,8 +242,8 @@ export class ContentVersioning {
           status: version.status,
           authorId: version.authorId
         },
-        undefined,
         userId,
+        undefined,
         'update',
         `Restored to version ${targetVersion}`
       )

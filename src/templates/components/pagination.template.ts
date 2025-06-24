@@ -83,15 +83,19 @@ export function renderPagination(data: PaginationData): string {
           <!-- Page Numbers -->
           ${data.showPageNumbers !== false ? `
             <!-- First page if not in range -->
-            ${generatePageNumbers()[0] > 1 ? `
-              <a href="${buildUrl(1)}" 
-                 class="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
-                1
-              </a>
-              ${generatePageNumbers()[0] > 2 ? `
-                <span class="px-3 py-2 text-sm text-gray-500">...</span>
-              ` : ''}
-            ` : ''}
+            ${(() => {
+              const pageNumbers = generatePageNumbers()
+              const firstPage = pageNumbers.length > 0 ? pageNumbers[0] : null
+              return firstPage && firstPage > 1 ? `
+                <a href="${buildUrl(1)}" 
+                   class="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
+                  1
+                </a>
+                ${firstPage > 2 ? `
+                  <span class="px-3 py-2 text-sm text-gray-500">...</span>
+                ` : ''}
+              ` : ''
+            })()}
             
             <!-- Page number buttons -->
             ${generatePageNumbers().map(pageNum => `
@@ -108,15 +112,19 @@ export function renderPagination(data: PaginationData): string {
             `).join('')}
             
             <!-- Last page if not in range -->
-            ${generatePageNumbers().slice(-1)[0] < data.totalPages ? `
-              ${generatePageNumbers().slice(-1)[0] < data.totalPages - 1 ? `
-                <span class="px-3 py-2 text-sm text-gray-500">...</span>
-              ` : ''}
-              <a href="${buildUrl(data.totalPages)}" 
-                 class="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
-                ${data.totalPages}
-              </a>
-            ` : ''}
+            ${(() => {
+              const pageNumbers = generatePageNumbers()
+              const lastPageNum = pageNumbers.length > 0 ? pageNumbers.slice(-1)[0] : null
+              return lastPageNum && lastPageNum < data.totalPages ? `
+                ${lastPageNum < data.totalPages - 1 ? `
+                  <span class="px-3 py-2 text-sm text-gray-500">...</span>
+                ` : ''}
+                <a href="${buildUrl(data.totalPages)}" 
+                   class="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
+                  ${data.totalPages}
+                </a>
+              ` : ''
+            })()}
           ` : ''}
           
           <!-- Next Button -->

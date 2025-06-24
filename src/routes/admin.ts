@@ -58,10 +58,10 @@ adminRoutes.get('/api/stats', async (c) => {
     const usersResult = await usersStmt.first()
     
     const stats: DashboardStats = {
-      collections: collectionsResult?.count || 0,
-      contentItems: contentResult?.count || 0,
-      mediaFiles: mediaResult?.count || 0,
-      users: usersResult?.count || 0
+      collections: (collectionsResult as any)?.count || 0,
+      contentItems: (contentResult as any)?.count || 0,
+      mediaFiles: (mediaResult as any)?.count || 0,
+      users: (usersResult as any)?.count || 0
     }
     
     return c.html(renderStatsCards(stats))

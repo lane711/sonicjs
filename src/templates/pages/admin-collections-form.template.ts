@@ -57,7 +57,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
   ]
 
   // Make name field readonly for edit
-  if (isEdit) {
+  if (isEdit && fields.length > 0 && fields[0]) {
     fields[0].placeholder = undefined
     fields[0].helpText = 'Collection name cannot be changed'
   }
