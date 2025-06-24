@@ -111,7 +111,7 @@ export function renderAdminLayout(data: AdminLayoutData): string {
   <!-- Additional Scripts -->
   ${data.scripts ? data.scripts.map(script => `<script src="${script}"></script>`).join('\n  ') : ''}
 </head>
-<body class="bg-gradient-to-br from-gray-900 via-purple-900 to-slate-900 min-h-screen">
+<body class="bg-gradient-to-br from-purple-900 via-purple-800 to-gray-900 min-h-screen">
   <div class="min-h-screen">
     ${renderAdminHeader({ pageTitle: data.pageTitle, currentPath: data.currentPath, user: data.user })}
     
