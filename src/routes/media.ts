@@ -55,19 +55,19 @@ mediaRoutes.get('/', async (c) => {
     if (type) {
       switch (type) {
         case 'image':
-          conditions.push('mimeType LIKE ?')
+          conditions.push('mime_type LIKE ?')
           params.push('image/%')
           break
         case 'document':
-          conditions.push('mimeType IN (?, ?)')
+          conditions.push('mime_type IN (?, ?)')
           params.push('application/pdf', 'text/plain')
           break
         case 'video':
-          conditions.push('mimeType LIKE ?')
+          conditions.push('mime_type LIKE ?')
           params.push('video/%')
           break
         case 'audio':
-          conditions.push('mimeType LIKE ?')
+          conditions.push('mime_type LIKE ?')
           params.push('audio/%')
           break
       }
@@ -75,7 +75,7 @@ mediaRoutes.get('/', async (c) => {
     
     // Search in filename and alt text
     if (search) {
-      conditions.push('(filename LIKE ? OR originalName LIKE ? OR alt LIKE ?)')
+      conditions.push('(filename LIKE ? OR original_name LIKE ? OR alt LIKE ?)')
       const searchTerm = `%${search}%`
       params.push(searchTerm, searchTerm, searchTerm)
     }
@@ -85,7 +85,7 @@ mediaRoutes.get('/', async (c) => {
       query += ` WHERE ${conditions.join(' AND ')}`
     }
     
-    query += ` ORDER BY uploadedAt DESC LIMIT ${limit} OFFSET ${offset}`
+    query += ` ORDER BY uploaded_at DESC LIMIT ${limit} OFFSET ${offset}`
     
     const stmt = db.prepare(query)
     const { results } = await stmt.bind(...params).all()
@@ -94,7 +94,7 @@ mediaRoutes.get('/', async (c) => {
     const mediaFiles = results.map((row: any) => ({
       ...row,
       tags: row.tags ? JSON.parse(row.tags) : [],
-      uploadedAt: new Date(row.uploadedAt).toISOString()
+      uploadedAt: new Date(row.uploaded_at).toISOString()
     }))
     
     return c.json({
@@ -129,7 +129,7 @@ mediaRoutes.get('/:id', async (c) => {
     const mediaFile = {
       ...result,
       tags: result.tags ? JSON.parse(result.tags) : [],
-      uploadedAt: new Date(result.uploadedAt).toISOString()
+      uploadedAt: new Date(result.uploaded_at).toISOString()
     }
     
     return c.json({ data: mediaFile })

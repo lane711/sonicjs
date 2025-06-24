@@ -83,9 +83,9 @@ adminMediaRoutes.get('/', async (c) => {
     const typesStmt = db.prepare(`
       SELECT 
         CASE 
-          WHEN mimeType LIKE 'image/%' THEN 'images'
-          WHEN mimeType LIKE 'video/%' THEN 'videos'
-          WHEN mimeType IN ('application/pdf', 'text/plain') THEN 'documents'
+          WHEN mime_type LIKE 'image/%' THEN 'images'
+          WHEN mime_type LIKE 'video/%' THEN 'videos'
+          WHEN mime_type IN ('application/pdf', 'text/plain') THEN 'documents'
           ELSE 'other'
         END as type,
         COUNT(*) as count
@@ -570,7 +570,7 @@ adminMediaRoutes.get('/search', async (c) => {
     const conditions: string[] = []
     
     if (search.trim()) {
-      conditions.push('(filename LIKE ? OR originalName LIKE ? OR alt LIKE ?)')
+      conditions.push('(filename LIKE ? OR original_name LIKE ? OR alt LIKE ?)')
       const searchTerm = `%${search}%`
       params.push(searchTerm, searchTerm, searchTerm)
     }

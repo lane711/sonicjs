@@ -78,7 +78,7 @@ contentRoutes.get('/', async (c) => {
     
     // Filter by author
     if (authorId) {
-      conditions.push('authorId = ?')
+      conditions.push('author_id = ?')
       params.push(authorId)
     }
     
@@ -94,7 +94,7 @@ contentRoutes.get('/', async (c) => {
       query += ` WHERE ${conditions.join(' AND ')}`
     }
     
-    query += ` ORDER BY createdAt DESC LIMIT ${limit} OFFSET ${offset}`
+    query += ` ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`
     
     const stmt = db.prepare(query)
     const { results } = await stmt.bind(...params).all()
