@@ -5,6 +5,7 @@ import { ContentWorkflow, ContentStatus } from '../content/workflow'
 import { ContentVersioning } from '../content/versioning'
 import { generateMarkdownHTML, defaultMarkdownConfig } from '../content/rich-text'
 import { requireAuth, requireRole } from '../middleware/auth'
+// Template example available in: src/templates/admin/content-list.template.ts
 
 type Bindings = {
   DB: D1Database
