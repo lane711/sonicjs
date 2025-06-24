@@ -54,12 +54,6 @@ export function renderLogo(data: LogoData = {}): string {
   return `
     <div class="flex items-center space-x-3 ${className}">
       ${logoSvg}
-      ${showText ? `
-        <div class="flex flex-col">
-          <span class="${textSizeClass} font-bold ${textColor} leading-tight">SonicJS</span>
-          <span class="text-xs ${textColor} opacity-75 leading-tight">AI</span>
-        </div>
-      ` : ''}
     </div>
   `
 }
