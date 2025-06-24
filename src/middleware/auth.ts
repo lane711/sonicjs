@@ -75,11 +75,21 @@ export const requireAuth = () => {
       }
       
       if (!token) {
+        // Check if this is a browser request (HTML accept header)
+        const acceptHeader = c.req.header('Accept') || ''
+        if (acceptHeader.includes('text/html')) {
+          return c.redirect('/auth/login?error=Please login to access the admin area')
+        }
         return c.json({ error: 'Authentication required' }, 401)
       }
       
       const payload = await AuthManager.verifyToken(token)
       if (!payload) {
+        // Check if this is a browser request (HTML accept header)
+        const acceptHeader = c.req.header('Accept') || ''
+        if (acceptHeader.includes('text/html')) {
+          return c.redirect('/auth/login?error=Your session has expired, please login again')
+        }
         return c.json({ error: 'Invalid or expired token' }, 401)
       }
       
@@ -89,6 +99,11 @@ export const requireAuth = () => {
       return await next()
     } catch (error) {
       console.error('Auth middleware error:', error)
+      // Check if this is a browser request (HTML accept header)
+      const acceptHeader = c.req.header('Accept') || ''
+      if (acceptHeader.includes('text/html')) {
+        return c.redirect('/auth/login?error=Authentication failed, please login again')
+      }
       return c.json({ error: 'Authentication failed' }, 401)
     }
   }
@@ -100,12 +115,22 @@ export const requireRole = (requiredRole: string | string[]) => {
     const user = c.get('user') as JWTPayload
     
     if (!user) {
+      // Check if this is a browser request (HTML accept header)
+      const acceptHeader = c.req.header('Accept') || ''
+      if (acceptHeader.includes('text/html')) {
+        return c.redirect('/auth/login?error=Please login to access the admin area')
+      }
       return c.json({ error: 'Authentication required' }, 401)
     }
     
     const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole]
     
     if (!roles.includes(user.role)) {
+      // Check if this is a browser request (HTML accept header)
+      const acceptHeader = c.req.header('Accept') || ''
+      if (acceptHeader.includes('text/html')) {
+        return c.redirect('/auth/login?error=You do not have permission to access this area')
+      }
       return c.json({ error: 'Insufficient permissions' }, 403)
     }
     

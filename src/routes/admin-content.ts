@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { html } from 'hono/html'
+import { html, raw } from 'hono/html'
 import { ContentModelManager } from '../content/models'
 import { ContentWorkflow, ContentStatus } from '../content/workflow'
 import { ContentVersioning } from '../content/versioning'
@@ -331,12 +331,171 @@ adminContentRoutes.get('/', async (c) => {
   }
 })
 
+// Helper function to generate form fields for a model
+function generateModelFields(model: any): string {
+  if (!model || !model.fields) return ''
+  
+  const fieldEntries = Object.entries(model.fields).sort(([, a]: any, [, b]: any) => 
+    (a.ui?.position || 999) - (b.ui?.position || 999)
+  )
+  
+  return fieldEntries.map(([fieldName, fieldConfig]: any) => {
+    const required = fieldConfig.required ? 'required' : ''
+    const placeholder = fieldConfig.ui?.placeholder || ''
+    const helpText = fieldConfig.ui?.helpText || fieldConfig.description || ''
+    
+    let fieldHTML = ''
+    
+    switch (fieldConfig.type) {
+      case 'text':
+      case 'email':
+      case 'url':
+        fieldHTML = `
+          <input 
+            type="${fieldConfig.type}" 
+            name="${fieldName}" 
+            class="form-input" 
+            placeholder="${placeholder}"
+            ${required}
+          >
+        `
+        break
+      case 'textarea':
+        fieldHTML = `
+          <textarea 
+            name="${fieldName}" 
+            class="form-textarea" 
+            rows="4"
+            placeholder="${placeholder}"
+            ${required}
+          ></textarea>
+        `
+        break
+      case 'rich_text':
+        fieldHTML = `
+          <textarea 
+            name="${fieldName}" 
+            class="form-textarea" 
+            rows="8"
+            placeholder="${placeholder}"
+            ${required}
+          ></textarea>
+          <script>
+            if (typeof tinymce !== 'undefined') {
+              tinymce.init({
+                selector: 'textarea[name="${fieldName}"]',
+                height: 300,
+                menubar: false,
+                plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table code help wordcount',
+                toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help'
+              });
+            }
+          </script>
+        `
+        break
+      case 'number':
+        fieldHTML = `
+          <input 
+            type="number" 
+            name="${fieldName}" 
+            class="form-input" 
+            placeholder="${placeholder}"
+            ${fieldConfig.validation?.min !== undefined ? `min="${fieldConfig.validation.min}"` : ''}
+            ${fieldConfig.validation?.max !== undefined ? `max="${fieldConfig.validation.max}"` : ''}
+            ${required}
+          >
+        `
+        break
+      case 'select':
+        const options = fieldConfig.validation?.options || []
+        fieldHTML = `
+          <select name="${fieldName}" class="form-input" ${required}>
+            <option value="">Select ${fieldConfig.label}</option>
+            ${options.map((option: string) => `<option value="${option}">${option}</option>`).join('')}
+          </select>
+        `
+        break
+      case 'multi_select':
+        const multiOptions = fieldConfig.validation?.options || []
+        fieldHTML = `
+          <select name="${fieldName}" class="form-input" multiple ${required}>
+            ${multiOptions.map((option: string) => `<option value="${option}">${option}</option>`).join('')}
+          </select>
+        `
+        break
+      case 'boolean':
+        fieldHTML = `
+          <input type="checkbox" name="${fieldName}" class="rounded" ${required}>
+        `
+        break
+      case 'date':
+        fieldHTML = `
+          <input type="datetime-local" name="${fieldName}" class="form-input" ${required}>
+        `
+        break
+      default:
+        fieldHTML = `
+          <input type="text" name="${fieldName}" class="form-input" placeholder="${placeholder}" ${required}>
+        `
+        break
+    }
+    
+    return `
+      <div class="form-group">
+        <label class="form-label">
+          ${fieldConfig.label}${fieldConfig.required ? ' *' : ''}
+        </label>
+        ${fieldHTML}
+        ${helpText ? `<p class="text-sm text-gray-600 mt-1">${helpText}</p>` : ''}
+      </div>
+    `
+  }).join('')
+}
+
 // New content form
 adminContentRoutes.get('/new', async (c) => {
-  const models = modelManager.getAllModels()
-  const selectedModel = models[0] // Default to first model
-  
-  return c.html(html`
+  try {
+    const models = modelManager.getAllModels()
+    if (models.length === 0) {
+      return c.html(html`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>New Content - SonicJS AI Admin</title>
+          <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+        </head>
+        <body class="bg-gray-50">
+          <div class="min-h-screen">
+            <header class="bg-white shadow-sm border-b">
+              <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-4">
+                  <div class="flex items-center space-x-4">
+                    <a href="/admin/content" class="text-gray-600 hover:text-gray-900">← Back to Content</a>
+                    <h1 class="text-2xl font-bold text-gray-900">Create New Content</h1>
+                  </div>
+                </div>
+              </div>
+            </header>
+            
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+              <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
+                  <p>No content models are available. Please create a collection first.</p>
+                  <a href="/admin/collections/new" class="text-yellow-800 underline">Create a collection</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </body>
+        </html>
+      `)
+    }
+    
+    const selectedModel = models[0] // Default to first model
+    
+    return c.html(html`
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -387,15 +546,15 @@ adminContentRoutes.get('/new', async (c) => {
                   hx-target="#dynamic-fields"
                   required
                 >
-                  ${models.map(model => `
+                  ${raw(models.map(model => `
                     <option value="${model.name}">${model.displayName}</option>
-                  `).join('')}
+                  `).join(''))}
                 </select>
               </div>
               
               <!-- Dynamic Fields -->
               <div id="dynamic-fields">
-                ${this.generateModelFields(selectedModel)}
+                ${raw(generateModelFields(selectedModel))}
               </div>
               
               <!-- Actions -->
@@ -442,117 +601,28 @@ adminContentRoutes.get('/new', async (c) => {
     </body>
     </html>
   `)
+  } catch (error) {
+    console.error('Error loading content form:', error)
+    return c.html(html`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Error - SonicJS AI Admin</title>
+        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+      </head>
+      <body class="bg-gray-50">
+        <div class="min-h-screen flex items-center justify-center">
+          <div class="bg-white p-6 rounded-lg shadow-sm">
+            <h1 class="text-2xl font-bold text-red-600 mb-4">Error Loading Form</h1>
+            <p class="text-gray-600 mb-4">There was an error loading the content creation form.</p>
+            <a href="/admin/content" class="text-blue-600 hover:underline">← Back to Content</a>
+          </div>
+        </div>
+      </body>
+      </html>
+    `)
+  }
 })
 
-// Helper method to generate form fields for a model
-adminContentRoutes.generateModelFields = function(model: any): string {
-  if (!model || !model.fields) return ''
-  
-  const fieldEntries = Object.entries(model.fields).sort(([, a]: any, [, b]: any) => 
-    (a.ui?.position || 999) - (b.ui?.position || 999)
-  )
-  
-  return fieldEntries.map(([fieldName, fieldConfig]: any) => {
-    const required = fieldConfig.required ? 'required' : ''
-    const placeholder = fieldConfig.ui?.placeholder || ''
-    const helpText = fieldConfig.ui?.helpText || fieldConfig.description || ''
-    
-    let fieldHTML = ''
-    
-    switch (fieldConfig.type) {
-      case 'text':
-      case 'email':
-      case 'url':
-        fieldHTML = `
-          <input 
-            type="${fieldConfig.type}" 
-            name="${fieldName}" 
-            class="form-input" 
-            placeholder="${placeholder}"
-            ${required}
-          >
-        `
-        break
-      case 'textarea':
-        fieldHTML = `
-          <textarea 
-            name="${fieldName}" 
-            class="form-textarea" 
-            rows="4"
-            placeholder="${placeholder}"
-            ${required}
-          ></textarea>
-        `
-        break
-      case 'rich_text':
-        fieldHTML = generateRichTextHTML(fieldName, '', defaultRichTextConfig)
-        break
-      case 'number':
-        fieldHTML = `
-          <input 
-            type="number" 
-            name="${fieldName}" 
-            class="form-input" 
-            placeholder="${placeholder}"
-            ${fieldConfig.validation?.min !== undefined ? `min="${fieldConfig.validation.min}"` : ''}
-            ${fieldConfig.validation?.max !== undefined ? `max="${fieldConfig.validation.max}"` : ''}
-            ${required}
-          >
-        `
-        break
-      case 'boolean':
-        fieldHTML = `
-          <div class="flex items-center">
-            <input 
-              type="checkbox" 
-              name="${fieldName}" 
-              value="true"
-              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            >
-            <span class="ml-2 text-sm text-gray-600">${fieldConfig.label}</span>
-          </div>
-        `
-        break
-      case 'select':
-        const options = fieldConfig.validation?.options || []
-        fieldHTML = `
-          <select name="${fieldName}" class="form-input" ${required}>
-            <option value="">Select ${fieldConfig.label}</option>
-            ${options.map((option: string) => `<option value="${option}">${option}</option>`).join('')}
-          </select>
-        `
-        break
-      case 'date':
-        fieldHTML = `
-          <input 
-            type="datetime-local" 
-            name="${fieldName}" 
-            class="form-input" 
-            ${required}
-          >
-        `
-        break
-      default:
-        fieldHTML = `
-          <input 
-            type="text" 
-            name="${fieldName}" 
-            class="form-input" 
-            placeholder="${placeholder}"
-            ${required}
-          >
-        `
-    }
-    
-    return `
-      <div class="form-group">
-        <label class="form-label">
-          ${fieldConfig.label}
-          ${fieldConfig.required ? '<span class="text-red-500">*</span>' : ''}
-        </label>
-        ${fieldHTML}
-        ${helpText ? `<p class="mt-1 text-sm text-gray-500">${helpText}</p>` : ''}
-      </div>
-    `
-  }).join('')
-}
