@@ -1,3 +1,5 @@
+import { renderLogo } from '../components/logo.template'
+
 export interface AdminLayoutData {
   title: string
   pageTitle: string
@@ -11,6 +13,8 @@ export interface AdminLayoutData {
   styles?: string[]
   content: string
 }
+
+
 
 export function renderAdminLayout(data: AdminLayoutData): string {
   return `<!DOCTYPE html>
@@ -85,6 +89,7 @@ function renderAdminHeader(data: AdminHeaderData): string {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center py-4">
           <div class="flex items-center space-x-4">
+            ${renderLogo({ size: 'md', showText: true })}
             <h1 class="text-2xl font-bold text-gray-900">${data.pageTitle}</h1>
             <nav class="flex space-x-4">
               ${navItems.map(item => `

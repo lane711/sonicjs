@@ -1,5 +1,6 @@
 import { renderForm, FormData, FormField } from '../components/form.template'
 import { renderAlert } from '../components/alert.template'
+import { renderLogo } from '../components/logo.template'
 
 export interface LoginPageData {
   error?: string
@@ -93,7 +94,10 @@ export function renderLoginPage(data: LoginPageData): string {
     </head>
     <body class="bg-gray-50 min-h-screen flex items-center justify-center">
       <div class="max-w-md w-full space-y-8">
-        <div>
+        <div class="text-center">
+          <div class="flex justify-center mb-6">
+            ${renderLogo({ size: 'xl', showText: true })}
+          </div>
           <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Sign in to SonicJS AI
           </h2>
