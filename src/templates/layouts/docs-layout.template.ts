@@ -47,10 +47,42 @@ export function renderDocsLayout(data: DocsLayoutData): string {
       background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
     }
     
-    /* Typography and content styling */
+    /* Typography and content styling - Dark Mode */
     .prose { 
       @apply max-w-none;
       line-height: 1.7;
+      color: #d1d5db !important; /* Default light text color for all prose content */
+    }
+    
+    /* Ensure all text elements are light colored */
+    .prose *,
+    .prose p,
+    .prose div,
+    .prose span,
+    .prose td,
+    .prose th,
+    .prose li {
+      color: inherit !important;
+    }
+    
+    /* Override any potential dark text */
+    .prose {
+      --tw-prose-body: #d1d5db !important;
+      --tw-prose-headings: #f9fafb !important;
+      --tw-prose-lead: #d1d5db !important;
+      --tw-prose-links: #a855f7 !important;
+      --tw-prose-bold: #f9fafb !important;
+      --tw-prose-counters: #9ca3af !important;
+      --tw-prose-bullets: #6b7280 !important;
+      --tw-prose-hr: #374151 !important;
+      --tw-prose-quotes: #d1d5db !important;
+      --tw-prose-quote-borders: #8b5cf6 !important;
+      --tw-prose-captions: #9ca3af !important;
+      --tw-prose-code: #c4b5fd !important;
+      --tw-prose-pre-code: #e5e7eb !important;
+      --tw-prose-pre-bg: #1e293b !important;
+      --tw-prose-th-borders: #374151 !important;
+      --tw-prose-td-borders: #374151 !important;
     }
     
     /* Enhanced Heading Styles - Much Bigger - Maximum Specificity - Dark Mode */
@@ -113,7 +145,7 @@ export function renderDocsLayout(data: DocsLayoutData): string {
       top: 0.5rem !important;
       font-size: 1rem !important;
       font-weight: 700 !important;
-      color: #1f2937 !important;
+      color: #ffffff !important;
       background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%) !important;
       width: 3rem !important;
       height: 3rem !important;
