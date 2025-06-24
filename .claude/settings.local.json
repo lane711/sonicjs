@@ -119,7 +119,8 @@
       "Bash(tsx prisma/seed-large.ts:*)",
       "Bash(npx tsx:*)",
       "Bash(ls:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(pkill:*)"
     ],
     "deny": []
   }

@@ -6,6 +6,11 @@ compatibility_flags = ["nodejs_compat"]
 [vars]
 ENVIRONMENT = "development"
 
+[[d1_databases]]
+binding = "DB"
+database_name = "sonicjs-dev"
+database_id = "874cad37-313c-4d71-97fa-ad7184526f5a"
+
 [env.preview]
 name = "sonicjs-ai-preview"
 

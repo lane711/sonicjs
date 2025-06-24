@@ -4,14 +4,19 @@ import { logger } from 'hono/logger'
 import { prettyJSON } from 'hono/pretty-json'
 import { apiRoutes } from './routes/api'
 import { adminRoutes } from './routes/admin'
+// import { adminContentRoutes } from './routes/admin-content'
 import { docsRoutes } from './routes/docs'
 import { authRoutes } from './routes/auth'
+import { contentRoutes } from './routes/content'
+import { mediaRoutes } from './routes/media'
+import { adminMediaRoutes } from './routes/admin-media'
 import { requireAuth, requireRole, optionalAuth } from './middleware/auth'
 
 // Define the Cloudflare Workers environment
 type Bindings = {
   DB: D1Database
   KV: KVNamespace
+  MEDIA_BUCKET?: R2Bucket
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
@@ -29,13 +34,35 @@ app.route('/docs', docsRoutes)
 app.use('/api/*', optionalAuth())
 app.route('/api', apiRoutes)
 
+// Content API routes with optional auth
+app.use('/content/*', optionalAuth())
+app.route('/content', contentRoutes)
+
+// Media API routes (require auth for uploads)
+app.use('/media/*', requireAuth())
+app.route('/media', mediaRoutes)
+
 // Admin routes require authentication and admin/editor role
-app.use('/admin/*', requireAuth())
+app.use('/admin/*', async (c, next) => {
+  try {
+    return await requireAuth()(c, next)
+  } catch (error) {
+    // Redirect to login page if not authenticated
+    return c.redirect('/auth/login?error=Please login to access the admin area')
+  }
+})
 app.use('/admin/*', requireRole(['admin', 'editor']))
 app.route('/admin', adminRoutes)
+app.route('/admin/media', adminMediaRoutes)
+// app.route('/admin/content', adminContentRoutes)
+
+// Root redirect to login
+app.get('/', (c) => {
+  return c.redirect('/auth/login')
+})
 
 // Health check
-app.get('/', (c) => {
+app.get('/health', (c) => {
   return c.json({
     name: 'SonicJS AI',
     version: '0.1.0',

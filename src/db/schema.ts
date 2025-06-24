@@ -5,13 +5,16 @@ import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 export const users = sqliteTable('users', {
   id: text('id').primaryKey(),
   email: text('email').notNull().unique(),
-  password: text('password'), // Hashed password, nullable for OAuth users
-  name: text('name').notNull(),
-  role: text('role').notNull().default('user'), // 'admin', 'editor', 'user'
+  username: text('username').notNull().unique(),
+  firstName: text('first_name').notNull(),
+  lastName: text('last_name').notNull(),
+  passwordHash: text('password_hash'), // Hashed password, nullable for OAuth users
+  role: text('role').notNull().default('viewer'), // 'admin', 'editor', 'author', 'viewer'
   avatar: text('avatar'),
   isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  lastLoginAt: integer('last_login_at'),
+  createdAt: integer('created_at').notNull(),
+  updatedAt: integer('updated_at').notNull(),
 });
 
 // Content collections - dynamic schema definitions
@@ -57,12 +60,22 @@ export const media = sqliteTable('media', {
   originalName: text('original_name').notNull(),
   mimeType: text('mime_type').notNull(),
   size: integer('size').notNull(),
-  path: text('path').notNull(), // R2 path
-  url: text('url').notNull(), // CDN URL
+  width: integer('width'),
+  height: integer('height'),
+  folder: text('folder').notNull().default('uploads'),
+  r2Key: text('r2_key').notNull(), // R2 storage key
+  publicUrl: text('public_url').notNull(), // CDN URL
+  thumbnailUrl: text('thumbnail_url'),
   alt: text('alt'),
-  title: text('title'),
+  caption: text('caption'),
+  tags: text('tags', { mode: 'json' }), // JSON array of tags
   uploadedBy: text('uploaded_by').notNull().references(() => users.id),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  uploadedAt: integer('uploaded_at').notNull(),
+  updatedAt: integer('updated_at'),
+  publishedAt: integer('published_at'),
+  scheduledAt: integer('scheduled_at'),
+  archivedAt: integer('archived_at'),
+  deletedAt: integer('deleted_at'),
 });
 
 // API tokens for programmatic access
@@ -80,8 +93,9 @@ export const apiTokens = sqliteTable('api_tokens', {
 // Zod schemas for validation
 export const insertUserSchema = createInsertSchema(users, {
   email: (schema) => schema.email(),
-  name: (schema) => schema.min(1),
-  role: (schema) => schema,
+  firstName: (schema) => schema.min(1),
+  lastName: (schema) => schema.min(1),
+  username: (schema) => schema.min(3),
 });
 
 export const selectUserSchema = createSelectSchema(users);
@@ -106,8 +120,9 @@ export const insertMediaSchema = createInsertSchema(media, {
   originalName: (schema) => schema.min(1),
   mimeType: (schema) => schema.min(1),
   size: (schema) => schema.positive(),
-  path: (schema) => schema.min(1),
-  url: (schema) => schema.url(),
+  r2Key: (schema) => schema.min(1),
+  publicUrl: (schema) => schema.url(),
+  folder: (schema) => schema.min(1),
 });
 
 export const selectMediaSchema = createSelectSchema(media);

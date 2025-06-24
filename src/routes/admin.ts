@@ -41,10 +41,11 @@ adminRoutes.get('/', (c) => {
         
         <nav class="nav">
           <a href="/admin">Dashboard</a>
-          <a href="/admin/collections">Collections</a>
           <a href="/admin/content">Content</a>
+          <a href="/admin/collections">Collections</a>
           <a href="/admin/media">Media</a>
           <a href="/admin/users">Users</a>
+          <a href="/auth/logout" style="margin-left: auto; background: #dc3545; color: white;">Logout</a>
         </nav>
         
         <div id="main-content">
@@ -89,7 +90,7 @@ adminRoutes.get('/api/stats', async (c) => {
     const db = c.env.DB
     
     // Get collections count
-    const collectionsStmt = db.prepare('SELECT COUNT(*) as count FROM collections WHERE isActive = 1')
+    const collectionsStmt = db.prepare('SELECT COUNT(*) as count FROM collections WHERE is_active = 1')
     const collectionsResult = await collectionsStmt.first()
     
     // Get content count
@@ -101,7 +102,7 @@ adminRoutes.get('/api/stats', async (c) => {
     const mediaResult = await mediaStmt.first()
     
     // Get users count
-    const usersStmt = db.prepare('SELECT COUNT(*) as count FROM users WHERE isActive = 1')
+    const usersStmt = db.prepare('SELECT COUNT(*) as count FROM users WHERE is_active = 1')
     const usersResult = await usersStmt.first()
     
     return c.html(html`
@@ -132,7 +133,7 @@ adminRoutes.get('/api/stats', async (c) => {
 adminRoutes.get('/collections', async (c) => {
   try {
     const db = c.env.DB
-    const stmt = db.prepare('SELECT * FROM collections WHERE isActive = 1 ORDER BY createdAt DESC')
+    const stmt = db.prepare('SELECT * FROM collections WHERE is_active = 1 ORDER BY created_at DESC')
     const { results } = await stmt.all()
     
     return c.html(html`
@@ -196,7 +197,7 @@ adminRoutes.get('/collections', async (c) => {
                     <td><code>${collection.name}</code></td>
                     <td>${collection.displayName}</td>
                     <td>${collection.description || '-'}</td>
-                    <td>${new Date(collection.createdAt).toLocaleDateString()}</td>
+                    <td>${new Date(collection.created_at).toLocaleDateString()}</td>
                     <td>
                       <a href="/admin/collections/${collection.id}" class="btn btn-sm">Edit</a>
                       <a href="/admin/collections/${collection.name}/content" class="btn btn-sm">Content</a>
