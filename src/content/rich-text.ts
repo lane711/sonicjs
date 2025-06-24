@@ -1,92 +1,99 @@
-// Rich text editor configuration and utilities
-export interface RichTextConfig {
-  toolbar: string[]
-  plugins: string[]
+// Markdown editor configuration and utilities
+export interface MarkdownConfig {
+  toolbar?: string[]
   height?: number
-  menubar?: boolean
-  statusbar?: boolean
-  branding?: boolean
+  autosave?: {
+    enabled: boolean
+    delay?: number
+    uniqueId: string
+  }
+  spellChecker?: boolean
+  status?: string[] | false
+  placeholder?: string
   imageUploadUrl?: string
   maxImageSize?: number
   allowedImageTypes?: string[]
 }
 
-// Default TinyMCE configuration
-export const defaultRichTextConfig: RichTextConfig = {
+// Default EasyMDE configuration
+export const defaultMarkdownConfig: MarkdownConfig = {
   toolbar: [
-    'undo redo | blocks fontfamily fontsize',
-    'bold italic underline strikethrough | link image media table mergetags',
-    'align lineheight | checklist numlist bullist indent outdent',
-    'emoticons charmap | removeformat | code fullscreen preview'
-  ],
-  plugins: [
-    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-    'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons'
+    'bold', 'italic', 'strikethrough', '|',
+    'heading', 'heading-smaller', 'heading-bigger', '|',
+    'code', 'quote', 'unordered-list', 'ordered-list', '|',
+    'link', 'image', 'table', '|',
+    'preview', 'side-by-side', 'fullscreen', '|',
+    'guide'
   ],
   height: 400,
-  menubar: false,
-  statusbar: true,
-  branding: false,
+  autosave: {
+    enabled: true,
+    delay: 1000,
+    uniqueId: 'default-markdown-editor'
+  },
+  spellChecker: false,
+  status: ['autosave', 'lines', 'words', 'cursor'],
   maxImageSize: 5 * 1024 * 1024, // 5MB
   allowedImageTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
 }
 
 // Minimal editor configuration for simple text
-export const minimalRichTextConfig: RichTextConfig = {
-  toolbar: ['bold italic underline | link | removeformat'],
-  plugins: ['link'],
+export const minimalMarkdownConfig: MarkdownConfig = {
+  toolbar: ['bold', 'italic', '|', 'link', '|', 'preview'],
   height: 200,
-  menubar: false,
-  statusbar: false,
-  branding: false
+  spellChecker: false,
+  status: false
 }
 
 // Blog editor configuration
-export const blogRichTextConfig: RichTextConfig = {
+export const blogMarkdownConfig: MarkdownConfig = {
   toolbar: [
-    'undo redo | blocks fontsize',
-    'bold italic underline | link image media',
-    'align | bullist numlist | outdent indent',
-    'code removeformat | fullscreen preview'
-  ],
-  plugins: [
-    'lists', 'link', 'image', 'preview', 'code', 'fullscreen',
-    'media', 'table', 'help', 'wordcount'
+    'bold', 'italic', 'strikethrough', '|',
+    'heading', 'heading-smaller', 'heading-bigger', '|',
+    'quote', 'unordered-list', 'ordered-list', '|',
+    'link', 'image', '|',
+    'preview', 'side-by-side', 'fullscreen'
   ],
   height: 500,
-  menubar: false,
-  statusbar: true,
-  branding: false
+  autosave: {
+    enabled: true,
+    delay: 1000,
+    uniqueId: 'blog-markdown-editor'
+  },
+  spellChecker: true,
+  status: ['autosave', 'lines', 'words']
 }
 
-// Rich text processing utilities
-export class RichTextProcessor {
-  // Clean HTML content (remove scripts, unsafe attributes, etc.)
-  static sanitize(html: string): string {
-    // This is a basic implementation - in production you'd want to use a proper HTML sanitizer
-    return html
-      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-      .replace(/on\w+="[^"]*"/g, '')
-      .replace(/javascript:/gi, '')
-      .replace(/<iframe(?![^>]*src="https:\/\/(www\.)?(youtube\.com|vimeo\.com))[^>]*>.*?<\/iframe>/gi, '')
-  }
-
-  // Extract plain text from HTML
-  static extractText(html: string): string {
-    return html
-      .replace(/<[^>]*>/g, '')
-      .replace(/&nbsp;/g, ' ')
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
+// Markdown processing utilities
+export class MarkdownProcessor {
+  // Extract plain text from Markdown
+  static extractText(markdown: string): string {
+    return markdown
+      // Remove headers
+      .replace(/^#{1,6}\s+/gm, '')
+      // Remove bold/italic
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      .replace(/\*([^*]+)\*/g, '$1')
+      .replace(/__([^_]+)__/g, '$1')
+      .replace(/_([^_]+)_/g, '$1')
+      // Remove links
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      // Remove images
+      .replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1')
+      // Remove code blocks
+      .replace(/```[\s\S]*?```/g, '')
+      .replace(/`([^`]+)`/g, '$1')
+      // Remove blockquotes
+      .replace(/^>\s+/gm, '')
+      // Remove list markers
+      .replace(/^[\s]*[-*+]\s+/gm, '')
+      .replace(/^[\s]*\d+\.\s+/gm, '')
       .trim()
   }
 
-  // Generate excerpt from rich text content
-  static generateExcerpt(html: string, maxLength: number = 160): string {
-    const text = this.extractText(html)
+  // Generate excerpt from markdown content
+  static generateExcerpt(markdown: string, maxLength: number = 160): string {
+    const text = this.extractText(markdown)
     if (text.length <= maxLength) return text
     
     const trimmed = text.substring(0, maxLength)
@@ -95,65 +102,63 @@ export class RichTextProcessor {
     return lastSpace > 0 ? trimmed.substring(0, lastSpace) + '...' : trimmed + '...'
   }
 
-  // Count words in rich text content
-  static countWords(html: string): number {
-    const text = this.extractText(html)
+  // Count words in markdown content
+  static countWords(markdown: string): number {
+    const text = this.extractText(markdown)
     return text.split(/\s+/).filter(word => word.length > 0).length
   }
 
   // Estimate reading time (assumes 200 words per minute)
-  static estimateReadingTime(html: string): number {
-    const wordCount = this.countWords(html)
+  static estimateReadingTime(markdown: string): number {
+    const wordCount = this.countWords(markdown)
     return Math.ceil(wordCount / 200)
   }
 
-  // Extract all images from rich text content
-  static extractImages(html: string): string[] {
-    const imgRegex = /<img[^>]+src="([^">]+)"/gi
-    const images: string[] = []
+  // Extract all images from markdown content
+  static extractImages(markdown: string): Array<{ alt: string; url: string }> {
+    const imgRegex = /!\[([^\]]*)\]\(([^)]+)\)/g
+    const images: Array<{ alt: string; url: string }> = []
     let match
     
-    while ((match = imgRegex.exec(html)) !== null) {
-      images.push(match[1])
+    while ((match = imgRegex.exec(markdown)) !== null) {
+      images.push({
+        alt: match[1] || '',
+        url: match[2] || ''
+      })
     }
     
     return images
   }
 
-  // Extract all links from rich text content
-  static extractLinks(html: string): Array<{ url: string; text: string }> {
-    const linkRegex = /<a[^>]+href="([^">]+)"[^>]*>(.*?)<\/a>/gi
+  // Extract all links from markdown content
+  static extractLinks(markdown: string): Array<{ url: string; text: string }> {
+    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
     const links: Array<{ url: string; text: string }> = []
     let match
     
-    while ((match = linkRegex.exec(html)) !== null) {
+    while ((match = linkRegex.exec(markdown)) !== null) {
       links.push({
-        url: match[1],
-        text: this.extractText(match[2])
+        text: match[1] || '',
+        url: match[2] || ''
       })
     }
     
     return links
   }
 
-  // Generate table of contents from headings
-  static generateTableOfContents(html: string): Array<{ level: number; text: string; id: string }> {
-    const headingRegex = /<h([1-6])[^>]*(?:id="([^"]*)")?[^>]*>(.*?)<\/h[1-6]>/gi
+  // Generate table of contents from markdown headings
+  static generateTableOfContents(markdown: string): Array<{ level: number; text: string; id: string }> {
+    const headingRegex = /^(#{1,6})\s+(.+)$/gm
     const toc: Array<{ level: number; text: string; id: string }> = []
     let match
     
-    while ((match = headingRegex.exec(html)) !== null) {
-      const level = parseInt(match[1])
-      const text = this.extractText(match[3])
-      let id = match[2]
-      
-      // Generate ID if not present
-      if (!id) {
-        id = text.toLowerCase()
-          .replace(/[^\w\s-]/g, '')
-          .replace(/\s+/g, '-')
-          .trim()
-      }
+    while ((match = headingRegex.exec(markdown)) !== null) {
+      const level = match[1]?.length || 1
+      const text = match[2]?.trim() || ''
+      const id = text.toLowerCase()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .trim()
       
       toc.push({ level, text, id })
     }
@@ -161,76 +166,62 @@ export class RichTextProcessor {
     return toc
   }
 
-  // Add IDs to headings for table of contents
-  static addHeadingIds(html: string): string {
-    return html.replace(/<h([1-6])([^>]*)>(.*?)<\/h[1-6]>/gi, (match, level, attrs, content) => {
-      // Check if ID already exists
-      if (attrs.includes('id=')) return match
-      
-      const text = this.extractText(content)
-      const id = text.toLowerCase()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .trim()
-      
-      return `<h${level}${attrs} id="${id}">${content}</h${level}>`
-    })
+  // Convert markdown to HTML (basic implementation)
+  static toHTML(markdown: string): string {
+    return markdown
+      // Headers
+      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+      .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+      .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+      // Bold/Italic
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+      // Links
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+      // Images
+      .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">')
+      // Line breaks
+      .replace(/\n/g, '<br>')
   }
 
-  // Optimize images in rich text content
-  static optimizeImages(html: string, baseUrl: string = ''): string {
-    return html.replace(/<img([^>]*)>/gi, (match, attrs) => {
-      // Add loading="lazy" if not present
-      if (!attrs.includes('loading=')) {
-        attrs += ' loading="lazy"'
-      }
-      
-      // Add alt attribute if missing
-      if (!attrs.includes('alt=')) {
-        attrs += ' alt=""'
-      }
-      
-      // Convert relative URLs to absolute if baseUrl provided
-      if (baseUrl && attrs.includes('src="') && !attrs.includes('src="http')) {
-        attrs = attrs.replace(/src="([^"]+)"/i, (srcMatch, src) => {
-          if (src.startsWith('/')) {
-            return `src="${baseUrl}${src}"`
-          }
-          return srcMatch
-        })
-      }
-      
-      return `<img${attrs}>`
-    })
+  // Sanitize markdown content
+  static sanitize(markdown: string): string {
+    // Remove potentially dangerous content
+    return markdown
+      .replace(/javascript:/gi, '')
+      .replace(/data:/gi, '')
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
   }
 }
 
-// Rich text field component for forms
-export function generateRichTextHTML(fieldName: string, value: string = '', config: RichTextConfig = defaultRichTextConfig): string {
-  const configJson = JSON.stringify({
-    selector: `#${fieldName}`,
-    ...config,
-    setup: `function(editor) {
-      editor.on('change', function() {
-        editor.save();
-      });
-    }`
-  })
-
+// Markdown field component for forms
+export function generateMarkdownHTML(fieldName: string, value: string = '', config: MarkdownConfig = defaultMarkdownConfig): string {
+  const uniqueId = `${fieldName}-${Date.now()}`
+  
   return `
-    <div class="rich-text-field">
-      <textarea id="${fieldName}" name="${fieldName}">${value}</textarea>
+    <div class="markdown-field">
+      <textarea id="${uniqueId}" name="${fieldName}">${value}</textarea>
       <script>
-        if (typeof tinymce !== 'undefined') {
-          tinymce.init(${configJson});
+        if (typeof EasyMDE !== 'undefined') {
+          new EasyMDE({
+            element: document.getElementById('${uniqueId}'),
+            toolbar: ${JSON.stringify(config.toolbar)},
+            ${config.height ? `minHeight: '${config.height}px',` : ''}
+            ${config.placeholder ? `placeholder: '${config.placeholder}',` : ''}
+            ${config.spellChecker !== undefined ? `spellChecker: ${config.spellChecker},` : ''}
+            ${config.status ? `status: ${JSON.stringify(config.status)},` : 'status: false,'}
+            ${config.autosave ? `autosave: {
+              enabled: ${config.autosave.enabled},
+              uniqueId: '${config.autosave.uniqueId || uniqueId}',
+              delay: ${config.autosave.delay || 1000}
+            },` : ''}
+            renderingConfig: {
+              singleLineBreaks: false,
+              codeSyntaxHighlighting: true
+            }
+          });
         } else {
-          // Load TinyMCE if not already loaded
-          const script = document.createElement('script');
-          script.src = 'https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js';
-          script.onload = function() {
-            tinymce.init(${configJson});
-          };
-          document.head.appendChild(script);
+          console.warn('EasyMDE not loaded. Please include EasyMDE library.');
         }
       </script>
     </div>

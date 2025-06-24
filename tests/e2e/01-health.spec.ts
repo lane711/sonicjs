@@ -12,11 +12,18 @@ test.describe('Health Checks', () => {
   });
 
   test('Home page should redirect to login', async ({ page }) => {
-    await page.goto('/');
+    const response = await page.goto('/');
+    expect(response?.status()).toBe(200);
     
     // Should redirect to login page
-    await page.waitForURL('/auth/login');
-    await expect(page.locator('h1')).toContainText('Login');
+    await page.waitForURL(/\/auth\/login/);
+    
+    // Verify we're on the login page
+    expect(page.url()).toContain('/auth/login');
+    await expect(page.locator('h2')).toContainText('SonicJS');
+    
+    // Verify no error message is shown
+    await expect(page.locator('.error-message')).toHaveCount(0);
   });
 
   test('Admin routes should require authentication', async ({ page }) => {
@@ -25,7 +32,13 @@ test.describe('Health Checks', () => {
     
     // Should redirect to login
     await page.waitForURL(/\/auth\/login/);
-    await expect(page.locator('h1')).toContainText('Login');
+    
+    // Verify we're on the login page
+    expect(page.url()).toContain('/auth/login');
+    await expect(page.locator('h2')).toContainText('SonicJS');
+    
+    // Verify error message is shown in login form
+    await expect(page.locator('#login-form-error')).toContainText('Please login to access the admin area');
   });
 
   test('404 routes should return not found', async ({ page }) => {

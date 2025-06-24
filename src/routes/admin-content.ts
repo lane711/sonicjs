@@ -3,7 +3,7 @@ import { html, raw } from 'hono/html'
 import { ContentModelManager } from '../content/models'
 import { ContentWorkflow, ContentStatus } from '../content/workflow'
 import { ContentVersioning } from '../content/versioning'
-import { RichTextProcessor, generateRichTextHTML, defaultRichTextConfig } from '../content/rich-text'
+import { generateMarkdownHTML, defaultMarkdownConfig } from '../content/rich-text'
 import { requireAuth, requireRole } from '../middleware/auth'
 
 type Bindings = {
@@ -95,7 +95,8 @@ adminContentRoutes.get('/', async (c) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Content Management - SonicJS AI Admin</title>
         <script src="https://unpkg.com/htmx.org@2.0.3"></script>
-        <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+        <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
         <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
         <style>
           .btn { @apply px-4 py-2 rounded font-medium transition-colors; }
@@ -142,11 +143,11 @@ adminContentRoutes.get('/', async (c) => {
                     hx-include="[name='status']"
                   >
                     <option value="all" ${modelName === 'all' ? 'selected' : ''}>All Models</option>
-                    ${models.map(model => `
+                    ${raw(models.map(model => `
                       <option value="${model.name}" ${modelName === model.name ? 'selected' : ''}>
                         ${model.displayName}
                       </option>
-                    `).join('')}
+                    `).join(''))}
                   </select>
                 </div>
                 
@@ -200,7 +201,7 @@ adminContentRoutes.get('/', async (c) => {
                     </tr>
                   </thead>
                   <tbody class="bg-white divide-y divide-gray-200">
-                    ${contentItems.map(item => `
+                    ${raw(contentItems.map(item => `
                       <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap">
                           <input type="checkbox" class="rounded content-checkbox" value="${item.id}">
@@ -262,7 +263,7 @@ adminContentRoutes.get('/', async (c) => {
                           </div>
                         </td>
                       </tr>
-                    `).join('')}
+                    `).join(''))}
                   </tbody>
                 </table>
               </div>
@@ -372,26 +373,7 @@ function generateModelFields(model: any): string {
         `
         break
       case 'rich_text':
-        fieldHTML = `
-          <textarea 
-            name="${fieldName}" 
-            class="form-textarea" 
-            rows="8"
-            placeholder="${placeholder}"
-            ${required}
-          ></textarea>
-          <script>
-            if (typeof tinymce !== 'undefined') {
-              tinymce.init({
-                selector: 'textarea[name="${fieldName}"]',
-                height: 300,
-                menubar: false,
-                plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table code help wordcount',
-                toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help'
-              });
-            }
-          </script>
-        `
+        fieldHTML = generateMarkdownHTML(fieldName, '', defaultMarkdownConfig)
         break
       case 'number':
         fieldHTML = `
@@ -503,7 +485,8 @@ adminContentRoutes.get('/new', async (c) => {
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>New Content - SonicJS AI Admin</title>
       <script src="https://unpkg.com/htmx.org@2.0.3"></script>
-      <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js"></script>
+      <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+      <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
       <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
       <style>
         .btn { @apply px-4 py-2 rounded font-medium transition-colors; }
@@ -532,7 +515,7 @@ adminContentRoutes.get('/new', async (c) => {
         <!-- Form -->
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div class="bg-white rounded-lg shadow-sm p-6">
-            <form hx-post="/content" hx-target="#form-messages">
+            <form hx-post="/admin/content" hx-target="#form-messages">
               <div id="form-messages"></div>
               
               <!-- Model Selection -->
@@ -622,6 +605,137 @@ adminContentRoutes.get('/new', async (c) => {
         </div>
       </body>
       </html>
+    `)
+  }
+})
+
+// Create new content
+adminContentRoutes.post('/', async (c) => {
+  try {
+    const user = c.get('user')
+    const formData = await c.req.formData()
+    
+    // Extract form data
+    const title = formData.get('title')?.toString() || ''
+    const slug = formData.get('slug')?.toString() || ''
+    const status = formData.get('status')?.toString() || 'draft'
+    const modelName = formData.get('modelName')?.toString() || ''
+    
+    // Validate required fields
+    if (!title || !slug || !modelName) {
+      return c.html(`
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <p>Please fill in all required fields: Title, Slug, and Content Type.</p>
+        </div>
+      `)
+    }
+    
+    const db = c.env.DB
+    
+    // Get model configuration
+    const models = modelManager.getAllModels()
+    const model = models.find(m => m.name === modelName)
+    
+    if (!model) {
+      return c.html(`
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <p>Invalid content type selected.</p>
+        </div>
+      `)
+    }
+    
+    // Ensure the collection exists in the database
+    let collectionId = modelName
+    
+    // Check if collection exists, if not create it
+    const existingCollection = await db.prepare('SELECT id FROM collections WHERE name = ?').bind(modelName).first()
+    
+    if (!existingCollection) {
+      // Create the collection
+      collectionId = `${modelName}-collection`
+      const now = Date.now()
+      
+      try {
+        await db.prepare(`
+          INSERT INTO collections (id, name, display_name, description, schema, is_active, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `).bind(
+          collectionId,
+          modelName,
+          model.displayName,
+          model.description || `Collection for ${model.displayName}`,
+          JSON.stringify(model),
+          1,
+          now,
+          now
+        ).run()
+      } catch (error) {
+        console.log('Collection might already exist:', error)
+        // If collection creation fails, try to find existing one by different criteria
+        const fallbackCollection = await db.prepare('SELECT id FROM collections LIMIT 1').first()
+        if (fallbackCollection) {
+          collectionId = fallbackCollection.id as string
+        } else {
+          // Use the blog collection as fallback
+          collectionId = 'blog-posts-collection'
+        }
+      }
+    } else {
+      collectionId = existingCollection.id as string
+    }
+    
+    // Build content data from form fields
+    const contentData: any = { title, slug }
+    
+    // Extract dynamic fields based on model configuration
+    if (model.fields) {
+      Object.keys(model.fields).forEach(fieldName => {
+        const fieldValue = formData.get(fieldName)
+        if (fieldValue !== null) {
+          contentData[fieldName] = fieldValue.toString()
+        }
+      })
+    }
+    
+    // Check if slug already exists
+    const existingContent = await db.prepare('SELECT id FROM content WHERE slug = ?').bind(slug).first()
+    if (existingContent) {
+      return c.html(`
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <p>A content item with this slug already exists. Please choose a different slug.</p>
+        </div>
+      `)
+    }
+    
+    // Insert new content
+    const contentId = crypto.randomUUID()
+    const now = new Date().toISOString()
+    
+    await db.prepare(`
+      INSERT INTO content (
+        id, title, slug, collection_id, status, data, author_id, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      contentId,
+      title,
+      slug,
+      collectionId,
+      status,
+      JSON.stringify(contentData),
+      user.userId,
+      now,
+      now
+    ).run()
+    
+    // Redirect to content list with success message
+    return c.redirect('/admin/content?success=Content created successfully')
+    
+  } catch (error) {
+    console.error('Error creating content:', error)
+    return c.html(`
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <p>An error occurred while creating the content. Please try again.</p>
+      </div>
     `)
   }
 })

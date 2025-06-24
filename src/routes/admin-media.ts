@@ -284,12 +284,12 @@ adminMediaRoutes.get('/', async (c) => {
                 ${results.length === limit ? html`
                   <div class="mt-6 flex justify-center">
                     <div class="flex space-x-2">
-                      ${page > 1 ? `
+                      ${raw(page > 1 ? `
                         <a href="/admin/media?page=${page - 1}&folder=${folder}&type=${type}" 
                            class="px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
                           Previous
                         </a>
-                      ` : ''}
+                      ` : '')}
                       <span class="px-3 py-2 text-sm text-gray-700">Page ${page}</span>
                       <a href="/admin/media?page=${page + 1}&folder=${folder}&type=${type}" 
                          class="px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
