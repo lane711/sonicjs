@@ -1,4 +1,4 @@
-import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout.template'
+import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout-v2.template'
 
 export interface DashboardStats {
   collections: number

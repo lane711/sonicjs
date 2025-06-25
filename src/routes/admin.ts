@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { html, raw } from 'hono/html'
-import { renderDashboardPage, renderStatsCards, DashboardPageData, DashboardStats } from '../templates/pages/admin-dashboard.template'
+import { renderDashboardPage, renderStatsCards, DashboardPageData, DashboardStats } from '../templates/pages/admin-dashboard-v2.template'
 import { renderCollectionsListPage, CollectionsListPageData, Collection } from '../templates/pages/admin-collections-list.template'
 import { renderCollectionFormPage, CollectionFormData } from '../templates/pages/admin-collections-form.template'
 

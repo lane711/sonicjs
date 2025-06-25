@@ -1,4 +1,4 @@
-import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout.template'
+import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout-v2.template'
 import { renderMediaGrid, MediaFile, MediaGridData } from '../components/media-grid.template'
 
 export interface FolderStats {

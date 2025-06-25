@@ -1,4 +1,4 @@
-import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout.template'
+import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout-v2.template'
 import { renderTable, TableData } from '../components/table.template'
 
 export interface Collection {

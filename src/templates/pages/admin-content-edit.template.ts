@@ -1,4 +1,4 @@
-import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout.template'
+import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout-v2.template'
 import { renderForm, FormData, FormField } from '../components/form.template'
 import { renderAlert } from '../components/alert.template'
 

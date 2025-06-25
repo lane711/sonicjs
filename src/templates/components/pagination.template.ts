@@ -41,7 +41,7 @@ export function renderPagination(data: PaginationData): string {
   }
 
   return `
-    <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200">
+    <div class="bg-gray-8 px-4 py-3 flex items-center justify-between border-t border-gray-7">
       <!-- Mobile Pagination -->
       <div class="flex-1 flex justify-between sm:hidden">
         ${data.currentPage > 1 ? `
@@ -64,7 +64,7 @@ export function renderPagination(data: PaginationData): string {
       <!-- Desktop Pagination -->
       <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
         <div>
-          <p class="text-sm text-gray-700">
+          <p class="text-sm text-gray-3">
             Showing <span class="font-medium">${data.startItem}</span> to 
             <span class="font-medium">${data.endItem}</span> of 
             <span class="font-medium">${data.totalItems}</span> results
@@ -75,7 +75,7 @@ export function renderPagination(data: PaginationData): string {
           <!-- Previous Button -->
           ${data.currentPage > 1 ? `
             <a href="${buildUrl(data.currentPage - 1)}" 
-               class="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
+               class="px-3 py-2 text-sm border border-gray-6 bg-gray-7 text-gray-3 rounded-md hover:bg-gray-6 hover:text-gray-1">
               Previous
             </a>
           ` : ''}
@@ -88,11 +88,11 @@ export function renderPagination(data: PaginationData): string {
               const firstPage = pageNumbers.length > 0 ? pageNumbers[0] : null
               return firstPage && firstPage > 1 ? `
                 <a href="${buildUrl(1)}" 
-                   class="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
+                   class="px-3 py-2 text-sm border border-gray-6 bg-gray-7 text-gray-3 rounded-md hover:bg-gray-6 hover:text-gray-1">
                   1
                 </a>
                 ${firstPage > 2 ? `
-                  <span class="px-3 py-2 text-sm text-gray-500">...</span>
+                  <span class="px-3 py-2 text-sm text-gray-4">...</span>
                 ` : ''}
               ` : ''
             })()}
@@ -100,12 +100,12 @@ export function renderPagination(data: PaginationData): string {
             <!-- Page number buttons -->
             ${generatePageNumbers().map(pageNum => `
               ${pageNum === data.currentPage ? `
-                <span class="px-3 py-2 text-sm bg-blue-600 text-white border border-blue-600 rounded-md">
+                <span class="px-3 py-2 text-sm bg-primary text-white border border-primary rounded-md">
                   ${pageNum}
                 </span>
               ` : `
                 <a href="${buildUrl(pageNum)}" 
-                   class="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
+                   class="px-3 py-2 text-sm border border-gray-6 bg-gray-7 text-gray-3 rounded-md hover:bg-gray-6 hover:text-gray-1">
                   ${pageNum}
                 </a>
               `}
@@ -117,10 +117,10 @@ export function renderPagination(data: PaginationData): string {
               const lastPageNum = pageNumbers.length > 0 ? pageNumbers.slice(-1)[0] : null
               return lastPageNum && lastPageNum < data.totalPages ? `
                 ${lastPageNum < data.totalPages - 1 ? `
-                  <span class="px-3 py-2 text-sm text-gray-500">...</span>
+                  <span class="px-3 py-2 text-sm text-gray-4">...</span>
                 ` : ''}
                 <a href="${buildUrl(data.totalPages)}" 
-                   class="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
+                   class="px-3 py-2 text-sm border border-gray-6 bg-gray-7 text-gray-3 rounded-md hover:bg-gray-6 hover:text-gray-1">
                   ${data.totalPages}
                 </a>
               ` : ''
@@ -130,7 +130,7 @@ export function renderPagination(data: PaginationData): string {
           <!-- Next Button -->
           ${data.currentPage < data.totalPages ? `
             <a href="${buildUrl(data.currentPage + 1)}" 
-               class="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
+               class="px-3 py-2 text-sm border border-gray-6 bg-gray-7 text-gray-3 rounded-md hover:bg-gray-6 hover:text-gray-1">
               Next
             </a>
           ` : ''}

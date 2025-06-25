@@ -49,8 +49,8 @@ export function renderForm(data: FormData): string {
     >
       ${data.title ? `
         <div class="mb-6">
-          <h2 class="text-lg font-medium text-gray-900">${data.title}</h2>
-          ${data.description ? `<p class="mt-1 text-sm text-gray-600">${data.description}</p>` : ''}
+          <h2 class="text-lg font-medium text-gray-1">${data.title}</h2>
+          ${data.description ? `<p class="mt-1 text-sm text-gray-4">${data.description}</p>` : ''}
         </div>
       ` : ''}
       
@@ -58,7 +58,7 @@ export function renderForm(data: FormData): string {
       
       ${data.fields.map(field => renderFormField(field)).join('')}
       
-      <div class="flex justify-between items-center pt-6 border-t">
+      <div class="flex justify-between items-center pt-6 border-t border-gray-7">
         <div class="flex space-x-4">
           ${data.submitButtons.map(button => `
             <button 
@@ -192,7 +192,7 @@ export function renderFormField(field: FormField): string {
           ${field.value ? 'checked' : ''}
           ${required}
         >
-        <label for="${fieldId}" class="ml-2 text-sm text-gray-700">${field.label}</label>
+        <label for="${fieldId}" class="ml-2 text-sm text-gray-3">${field.label}</label>
       `
       break
       
@@ -218,7 +218,7 @@ export function renderFormField(field: FormField): string {
         <div class="flex items-center">
           ${fieldHTML}
         </div>
-        ${field.helpText ? `<p class="text-sm text-gray-600 mt-1 ml-6">${field.helpText}</p>` : ''}
+        ${field.helpText ? `<p class="text-sm text-gray-4 mt-1 ml-6">${field.helpText}</p>` : ''}
       </div>
     `
   }
@@ -229,7 +229,7 @@ export function renderFormField(field: FormField): string {
         ${field.label}${field.required ? ' *' : ''}
       </label>
       ${fieldHTML}
-      ${field.helpText ? `<p class="text-sm text-gray-600 mt-1">${field.helpText}</p>` : ''}
+      ${field.helpText ? `<p class="text-sm text-gray-4 mt-1">${field.helpText}</p>` : ''}
     </div>
   `
 }

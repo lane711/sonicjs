@@ -56,7 +56,7 @@ export async function loginAsAdmin(page: Page) {
   
   // Wait for JavaScript redirect to admin dashboard (up to 3 seconds)
   await page.waitForURL('/admin', { timeout: 3000 });
-  await expect(page.locator('h1').first()).toContainText('SonicJS AI Admin');
+  await expect(page.locator('h1').first()).toContainText('Dashboard');
 }
 
 /**

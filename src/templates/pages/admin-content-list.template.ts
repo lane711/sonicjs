@@ -1,4 +1,4 @@
-import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout.template'
+import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout-v2.template'
 import { renderTable, TableData, TableColumn } from '../components/table.template'
 import { renderFilterBar, FilterBarData } from '../components/filter-bar.template'
 import { renderPagination, PaginationData } from '../components/pagination.template'

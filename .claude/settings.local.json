@@ -122,7 +122,9 @@
       "Bash(curl:*)",
       "Bash(pkill:*)",
       "Bash(rg:*)",
-      "Bash(wrangler r2 bucket:*)"
+      "Bash(wrangler r2 bucket:*)",
+      "WebFetch(domain:demo.tailadmin.com)",
+      "WebFetch(domain:tailadmin.com)"
     ],
     "deny": []
   }
