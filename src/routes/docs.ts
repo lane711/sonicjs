@@ -3355,50 +3355,30 @@ docsRoutes.get('/deployment', async (c) => {
   return c.html(html)
 })
 
-// Placeholder routes for future documentation
+// Documentation routes with full content
 docsRoutes.get('/media-management', async (c) => {
-  return c.html(renderDocsLayout({
-    title: 'Media Management',
-    content: '<h1>Media Management</h1><p>Documentation coming soon...</p>',
-    currentPath: '/docs/media-management',
-    navigation
-  }))
+  const html = await renderMarkdownPage('media-management.md', '/docs/media-management')
+  return c.html(html)
 })
 
 docsRoutes.get('/troubleshooting', async (c) => {
-  return c.html(renderDocsLayout({
-    title: 'Troubleshooting',
-    content: '<h1>Troubleshooting</h1><p>Documentation coming soon...</p>',
-    currentPath: '/docs/troubleshooting',
-    navigation
-  }))
+  const html = await renderMarkdownPage('troubleshooting.md', '/docs/troubleshooting')
+  return c.html(html)
 })
 
 docsRoutes.get('/configuration', async (c) => {
-  return c.html(renderDocsLayout({
-    title: 'Configuration',
-    content: '<h1>Configuration</h1><p>Documentation coming soon...</p>',
-    currentPath: '/docs/configuration',
-    navigation
-  }))
+  const html = await renderMarkdownPage('configuration.md', '/docs/configuration')
+  return c.html(html)
 })
 
 docsRoutes.get('/architecture', async (c) => {
-  return c.html(renderDocsLayout({
-    title: 'Architecture',
-    content: '<h1>Architecture</h1><p>Documentation coming soon...</p>',
-    currentPath: '/docs/architecture',
-    navigation
-  }))
+  const html = await renderMarkdownPage('architecture.md', '/docs/architecture')
+  return c.html(html)
 })
 
 docsRoutes.get('/user-guide', async (c) => {
-  return c.html(renderDocsLayout({
-    title: 'User Guide',
-    content: '<h1>User Guide</h1><p>Documentation coming soon...</p>',
-    currentPath: '/docs/user-guide',
-    navigation
-  }))
+  const html = await renderMarkdownPage('user-guide.md', '/docs/user-guide')
+  return c.html(html)
 })
 
 // API documentation UI routes
