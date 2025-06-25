@@ -126,16 +126,15 @@ adminMediaRoutes.get('/', async (c) => {
     `)
     const { results: types } = await typesStmt.all()
     
-    // Process media files with CDN URLs
-    const cdnService = createCDNService(c.env)
+    // Process media files with local serving URLs
     const mediaFiles: MediaFile[] = results.map((row: any) => ({
       id: row.id,
       filename: row.filename,
       original_name: row.original_name,
       mime_type: row.mime_type,
       size: row.size,
-      public_url: cdnService.getAssetUrl(row.r2_key, row.mime_type, 'display'),
-      thumbnail_url: cdnService.getAssetUrl(row.r2_key, row.mime_type, 'thumbnail'),
+      public_url: `/admin/media/file/${row.r2_key}`,
+      thumbnail_url: row.mime_type.startsWith('image/') ? `/admin/media/file/${row.r2_key}` : undefined,
       alt: row.alt,
       caption: row.caption,
       tags: row.tags ? JSON.parse(row.tags) : [],
@@ -229,11 +228,10 @@ adminMediaRoutes.get('/search', async (c) => {
     const stmt = db.prepare(query)
     const { results } = await stmt.bind(...params).all()
     
-    const cdnService = createCDNService(c.env)
     const mediaFiles = results.map((row: any) => ({
       ...row,
-      public_url: cdnService.getAssetUrl(row.r2_key, row.mime_type, 'display'),
-      thumbnail_url: cdnService.getAssetUrl(row.r2_key, row.mime_type, 'thumbnail'),
+      public_url: `/admin/media/file/${row.r2_key}`,
+      thumbnail_url: row.mime_type.startsWith('image/') ? `/admin/media/file/${row.r2_key}` : undefined,
       tags: row.tags ? JSON.parse(row.tags) : [],
       uploadedAt: new Date(row.uploaded_at).toLocaleDateString(),
       fileSize: formatFileSize(row.size),
@@ -264,15 +262,14 @@ adminMediaRoutes.get('/:id/details', async (c) => {
       return c.html('<div class="text-red-500">File not found</div>')
     }
     
-    const cdnService = createCDNService(c.env)
     const file: MediaFile & { width?: number; height?: number; folder: string; uploadedAt: string } = {
       id: result.id,
       filename: result.filename,
       original_name: result.original_name,
       mime_type: result.mime_type,
       size: result.size,
-      public_url: cdnService.getAssetUrl(result.r2_key, result.mime_type, 'display'),
-      thumbnail_url: cdnService.getAssetUrl(result.r2_key, result.mime_type, 'thumbnail'),
+      public_url: `/admin/media/file/${result.r2_key}`,
+      thumbnail_url: result.mime_type.startsWith('image/') ? `/admin/media/file/${result.r2_key}` : undefined,
       alt: result.alt,
       caption: result.caption,
       tags: result.tags ? JSON.parse(result.tags) : [],
@@ -376,10 +373,9 @@ adminMediaRoutes.post('/upload', async (c) => {
           }
         }
 
-        // Generate optimized URLs using CDN service
-        const cdnService = createCDNService(c.env)
-        const publicUrl = cdnService.getAssetUrl(r2Key, file.type, 'display')
-        const thumbnailUrl = cdnService.getAssetUrl(r2Key, file.type, 'thumbnail')
+        // Generate URLs - use local serving route for development
+        const publicUrl = `/admin/media/file/${r2Key}`
+        const thumbnailUrl = file.type.startsWith('image/') ? publicUrl : undefined
 
         // Save to database
         const stmt = c.env.DB.prepare(`
@@ -460,6 +456,37 @@ adminMediaRoutes.post('/upload', async (c) => {
         </div>
       </div>
     `)
+  }
+})
+
+// Serve files from R2 storage
+adminMediaRoutes.get('/file/*', async (c) => {
+  try {
+    const r2Key = c.req.path.replace('/admin/media/file/', '')
+    
+    if (!r2Key) {
+      return c.notFound()
+    }
+
+    // Get file from R2
+    const object = await c.env.MEDIA_BUCKET.get(r2Key)
+    
+    if (!object) {
+      return c.notFound()
+    }
+
+    // Set appropriate headers
+    const headers = new Headers()
+    object.httpMetadata?.contentType && headers.set('Content-Type', object.httpMetadata.contentType)
+    object.httpMetadata?.contentDisposition && headers.set('Content-Disposition', object.httpMetadata.contentDisposition)
+    headers.set('Cache-Control', 'public, max-age=31536000') // 1 year cache
+    
+    return new Response(object.body, {
+      headers
+    })
+  } catch (error) {
+    console.error('Error serving file:', error)
+    return c.notFound()
   }
 })
 

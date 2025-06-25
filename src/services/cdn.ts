@@ -160,12 +160,15 @@ export class CDNService {
  */
 export function createCDNService(env: {
   IMAGES_ACCOUNT_ID?: string
-  MEDIA_BUCKET?: { name?: string }
+  MEDIA_BUCKET?: R2Bucket
   CDN_DOMAIN?: string
-}): CDNService {
+}, bucketName?: string): CDNService {
+  // Default bucket names based on environment
+  const defaultBucketName = bucketName || 'sonicjs-media-dev'
+  
   return new CDNService(
     env.IMAGES_ACCOUNT_ID,
-    env.MEDIA_BUCKET?.name,
+    defaultBucketName,
     env.CDN_DOMAIN
   )
 }

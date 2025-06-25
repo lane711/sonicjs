@@ -121,7 +121,8 @@
       "Bash(ls:*)",
       "Bash(curl:*)",
       "Bash(pkill:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(wrangler r2 bucket:*)"
     ],
     "deny": []
   }
