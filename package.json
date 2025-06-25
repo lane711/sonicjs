@@ -20,6 +20,7 @@
   "dependencies": {
     "@hono/zod-openapi": "^0.19.8",
     "@hono/zod-validator": "^0.7.0",
+    "@libsql/client": "^0.15.9",
     "commander": "^14.0.0",
     "drizzle-kit": "^0.31.2",
     "drizzle-orm": "^0.44.2",
