@@ -6,6 +6,7 @@ import { html } from 'hono/html'
 import { AuthManager, requireAuth } from '../middleware/auth'
 import { renderLoginPage, LoginPageData } from '../templates/pages/auth-login.template'
 import { renderRegisterPage, RegisterPageData } from '../templates/pages/auth-register.template'
+import { normalizeExistingEmails } from '../scripts/normalize-emails'
 
 type Bindings = {
   DB: D1Database
@@ -71,9 +72,12 @@ authRoutes.post('/register',
       const { email, password, username, firstName, lastName } = c.req.valid('json')
       const db = c.env.DB
       
+      // Normalize email to lowercase
+      const normalizedEmail = email.toLowerCase()
+      
       // Check if user already exists
       const existingUser = await db.prepare('SELECT id FROM users WHERE email = ? OR username = ?')
-        .bind(email, username)
+        .bind(normalizedEmail, username)
         .first()
       
       if (existingUser) {
@@ -92,7 +96,7 @@ authRoutes.post('/register',
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).bind(
         userId,
-        email,
+        normalizedEmail,
         username,
         firstName,
         lastName,
@@ -104,7 +108,7 @@ authRoutes.post('/register',
       ).run()
       
       // Generate JWT token
-      const token = await AuthManager.generateToken(userId, email, 'viewer')
+      const token = await AuthManager.generateToken(userId, normalizedEmail, 'viewer')
       
       // Set HTTP-only cookie
       setCookie(c, 'auth_token', token, {
@@ -117,7 +121,7 @@ authRoutes.post('/register',
       return c.json({
         user: {
           id: userId,
-          email,
+          email: normalizedEmail,
           username,
           firstName,
           lastName,
@@ -140,9 +144,12 @@ authRoutes.post('/login',
       const { email, password } = c.req.valid('json')
       const db = c.env.DB
       
+      // Normalize email to lowercase
+      const normalizedEmail = email.toLowerCase()
+      
       // Find user
       const user = await db.prepare('SELECT * FROM users WHERE email = ? AND is_active = 1')
-        .bind(email)
+        .bind(normalizedEmail)
         .first() as any
       
       if (!user) {
@@ -277,9 +284,12 @@ authRoutes.post('/register/form', async (c) => {
     const firstName = formData.get('firstName') as string
     const lastName = formData.get('lastName') as string
 
+    // Normalize email to lowercase
+    const normalizedEmail = email.toLowerCase()
+
     // Validate the data
     const validation = registerSchema.safeParse({
-      email, password, username, firstName, lastName
+      email: normalizedEmail, password, username, firstName, lastName
     })
 
     if (!validation.success) {
@@ -294,7 +304,7 @@ authRoutes.post('/register/form', async (c) => {
     
     // Check if user already exists
     const existingUser = await db.prepare('SELECT id FROM users WHERE email = ? OR username = ?')
-      .bind(email, username)
+      .bind(normalizedEmail, username)
       .first()
     
     if (existingUser) {
@@ -317,7 +327,7 @@ authRoutes.post('/register/form', async (c) => {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       userId,
-      email,
+      normalizedEmail,
       username,
       firstName,
       lastName,
@@ -329,7 +339,7 @@ authRoutes.post('/register/form', async (c) => {
     ).run()
     
     // Generate JWT token
-    const token = await AuthManager.generateToken(userId, email, 'admin')
+    const token = await AuthManager.generateToken(userId, normalizedEmail, 'admin')
     
     // Set HTTP-only cookie
     setCookie(c, 'auth_token', token, {
@@ -366,8 +376,11 @@ authRoutes.post('/login/form', async (c) => {
     const email = formData.get('email') as string
     const password = formData.get('password') as string
 
+    // Normalize email to lowercase
+    const normalizedEmail = email.toLowerCase()
+
     // Validate the data
-    const validation = loginSchema.safeParse({ email, password })
+    const validation = loginSchema.safeParse({ email: normalizedEmail, password })
 
     if (!validation.success) {
       return c.html(html`
@@ -381,7 +394,7 @@ authRoutes.post('/login/form', async (c) => {
     
     // Find user
     const user = await db.prepare('SELECT * FROM users WHERE email = ? AND is_active = 1')
-      .bind(email)
+      .bind(normalizedEmail)
       .first() as any
     
     if (!user) {
@@ -472,13 +485,14 @@ authRoutes.post('/seed-admin', async (c) => {
     // Create admin user
     const userId = 'admin-user-id'
     const now = Date.now()
+    const adminEmail = 'admin@sonicjs.com'.toLowerCase()
     
     await db.prepare(`
       INSERT INTO users (id, email, username, first_name, last_name, password_hash, role, is_active, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       userId,
-      'admin@sonicjs.com',
+      adminEmail,
       'admin',
       'Admin',
       'User',
@@ -493,7 +507,7 @@ authRoutes.post('/seed-admin', async (c) => {
       message: 'Admin user created successfully',
       user: {
         id: userId,
-        email: 'admin@sonicjs.com',
+        email: adminEmail,
         username: 'admin',
         role: 'admin'
       },
@@ -502,5 +516,31 @@ authRoutes.post('/seed-admin', async (c) => {
   } catch (error) {
     console.error('Seed admin error:', error)
     return c.json({ error: 'Failed to create admin user', details: error instanceof Error ? error.message : String(error) }, 500)
+  }
+})
+
+// Normalize existing emails endpoint (temporary - for migration)
+authRoutes.post('/normalize-emails', requireAuth(), async (c) => {
+  try {
+    const user = c.get('user')
+    
+    // Only allow admin users to run this
+    if (!user || user.role !== 'admin') {
+      return c.json({ error: 'Admin access required' }, 403)
+    }
+    
+    const db = c.env.DB
+    await normalizeExistingEmails(db)
+    
+    return c.json({ 
+      message: 'Email normalization completed successfully',
+      timestamp: new Date().toISOString()
+    })
+  } catch (error) {
+    console.error('Email normalization error:', error)
+    return c.json({ 
+      error: 'Email normalization failed', 
+      details: error instanceof Error ? error.message : String(error) 
+    }, 500)
   }
 })

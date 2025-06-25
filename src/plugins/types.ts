@@ -63,7 +63,7 @@ export interface PluginContext {
     media: MediaService
   }
   /** Hook system for inter-plugin communication */
-  hooks: HookSystem
+  hooks: HookSystem | ScopedHookSystem
   /** Logging utilities */
   logger: PluginLogger
 }
@@ -228,6 +228,20 @@ export interface HookSystem {
   unregister(hookName: string, handler: HookHandler): void
   /** Get all registered hooks */
   getHooks(hookName: string): PluginHook[]
+  /** Create a scoped hook system (optional) */
+  createScope?(pluginName: string): ScopedHookSystem
+}
+
+// Scoped hook system for plugins
+export interface ScopedHookSystem {
+  /** Register a hook handler */
+  register(hookName: string, handler: HookHandler, priority?: number): void
+  /** Execute all handlers for a hook */
+  execute(hookName: string, data: any, context?: any): Promise<any>
+  /** Remove a hook handler */
+  unregister(hookName: string, handler: HookHandler): void
+  /** Remove all hooks for this scope */
+  unregisterAll(): void
 }
 
 // Plugin registry
@@ -248,6 +262,16 @@ export interface PluginRegistry {
   activate(name: string): Promise<void>
   /** Deactivate a plugin */
   deactivate(name: string): Promise<void>
+  /** Get plugin configuration */
+  getConfig(name: string): PluginConfig | undefined
+  /** Set plugin configuration */
+  setConfig(name: string, config: PluginConfig): void
+  /** Get plugin status */
+  getStatus(name: string): PluginStatus | undefined
+  /** Get all plugin statuses */
+  getAllStatuses(): Map<string, PluginStatus>
+  /** Resolve plugin load order based on dependencies */
+  resolveLoadOrder(): string[]
 }
 
 // Plugin manager
@@ -320,21 +344,7 @@ export interface PluginLogger {
   error(message: string, error?: Error, data?: any): void
 }
 
-// Plugin development utilities
-export interface PluginBuilder {
-  /** Create a new plugin */
-  create(options: PluginBuilderOptions): Plugin
-  /** Add routes to plugin */
-  addRoutes(routes: PluginRoutes[]): PluginBuilder
-  /** Add middleware to plugin */
-  addMiddleware(middleware: PluginMiddleware[]): PluginBuilder
-  /** Add models to plugin */
-  addModels(models: PluginModel[]): PluginBuilder
-  /** Add admin pages to plugin */
-  addAdminPages(pages: PluginAdminPage[]): PluginBuilder
-  /** Build the plugin */
-  build(): Plugin
-}
+// Plugin development utilities interface
 
 export interface PluginBuilderOptions {
   name: string
@@ -376,12 +386,15 @@ export const HOOKS = {
   AUTH_LOGIN: 'auth:login',
   AUTH_LOGOUT: 'auth:logout',
   AUTH_REGISTER: 'auth:register',
+  USER_LOGIN: 'user:login',
+  USER_LOGOUT: 'user:logout',
   
   // Content lifecycle
   CONTENT_CREATE: 'content:create',
   CONTENT_UPDATE: 'content:update',
   CONTENT_DELETE: 'content:delete',
   CONTENT_PUBLISH: 'content:publish',
+  CONTENT_SAVE: 'content:save',
   
   // Media lifecycle
   MEDIA_UPLOAD: 'media:upload',
