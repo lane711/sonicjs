@@ -10,13 +10,16 @@ import { authRoutes } from './routes/auth'
 import { contentRoutes } from './routes/content'
 import { mediaRoutes } from './routes/media'
 import { adminMediaRoutes } from './routes/admin-media'
+import { apiMediaRoutes } from './routes/api-media'
 import { requireAuth, requireRole, optionalAuth } from './middleware/auth'
 
 // Define the Cloudflare Workers environment
 type Bindings = {
   DB: D1Database
   KV: KVNamespace
-  MEDIA_BUCKET?: R2Bucket
+  MEDIA_BUCKET: R2Bucket
+  IMAGES_ACCOUNT_ID?: string
+  IMAGES_API_TOKEN?: string
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
@@ -33,6 +36,7 @@ app.route('/docs', docsRoutes)
 // API routes with optional auth (for public content)
 app.use('/api/*', optionalAuth())
 app.route('/api', apiRoutes)
+app.route('/api/media', apiMediaRoutes)
 
 // Content API routes with optional auth
 app.use('/content/*', optionalAuth())

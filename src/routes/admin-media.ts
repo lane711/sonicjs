@@ -1,14 +1,20 @@
 import { Hono } from 'hono'
 import { html, raw } from 'hono/html'
+import { z } from 'zod'
+import { nanoid } from 'nanoid'
 import { requireAuth, requireRole } from '../middleware/auth'
 import { renderMediaLibraryPage, MediaLibraryPageData, FolderStats, TypeStats } from '../templates/pages/admin-media-library.template'
 import { renderMediaFileDetails, MediaFileDetailsData } from '../templates/components/media-file-details.template'
 import { MediaFile } from '../templates/components/media-grid.template'
+import { createCDNService } from '../services/cdn'
 
 type Bindings = {
   DB: D1Database
   KV: KVNamespace
-  MEDIA_BUCKET?: R2Bucket
+  MEDIA_BUCKET: R2Bucket
+  IMAGES_ACCOUNT_ID?: string
+  IMAGES_API_TOKEN?: string
+  CDN_DOMAIN?: string
 }
 
 type Variables = {
@@ -20,6 +26,29 @@ type Variables = {
     iat: number
   }
 }
+
+// File validation schema
+const fileValidationSchema = z.object({
+  name: z.string().min(1).max(255),
+  type: z.string().refine(
+    (type) => {
+      const allowedTypes = [
+        // Images
+        'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
+        // Documents
+        'application/pdf', 'text/plain', 'application/msword', 
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        // Videos
+        'video/mp4', 'video/webm', 'video/ogg', 'video/avi', 'video/mov',
+        // Audio
+        'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/m4a'
+      ]
+      return allowedTypes.includes(type)
+    },
+    { message: 'Unsupported file type' }
+  ),
+  size: z.number().min(1).max(50 * 1024 * 1024) // 50MB max
+})
 
 export const adminMediaRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
@@ -97,15 +126,16 @@ adminMediaRoutes.get('/', async (c) => {
     `)
     const { results: types } = await typesStmt.all()
     
-    // Process media files
+    // Process media files with CDN URLs
+    const cdnService = createCDNService(c.env)
     const mediaFiles: MediaFile[] = results.map((row: any) => ({
       id: row.id,
       filename: row.filename,
       original_name: row.original_name,
       mime_type: row.mime_type,
       size: row.size,
-      public_url: row.public_url,
-      thumbnail_url: row.thumbnail_url,
+      public_url: cdnService.getAssetUrl(row.r2_key, row.mime_type, 'display'),
+      thumbnail_url: cdnService.getAssetUrl(row.r2_key, row.mime_type, 'thumbnail'),
       alt: row.alt,
       caption: row.caption,
       tags: row.tags ? JSON.parse(row.tags) : [],
@@ -199,8 +229,11 @@ adminMediaRoutes.get('/search', async (c) => {
     const stmt = db.prepare(query)
     const { results } = await stmt.bind(...params).all()
     
+    const cdnService = createCDNService(c.env)
     const mediaFiles = results.map((row: any) => ({
       ...row,
+      public_url: cdnService.getAssetUrl(row.r2_key, row.mime_type, 'display'),
+      thumbnail_url: cdnService.getAssetUrl(row.r2_key, row.mime_type, 'thumbnail'),
       tags: row.tags ? JSON.parse(row.tags) : [],
       uploadedAt: new Date(row.uploaded_at).toLocaleDateString(),
       fileSize: formatFileSize(row.size),
@@ -231,14 +264,15 @@ adminMediaRoutes.get('/:id/details', async (c) => {
       return c.html('<div class="text-red-500">File not found</div>')
     }
     
+    const cdnService = createCDNService(c.env)
     const file: MediaFile & { width?: number; height?: number; folder: string; uploadedAt: string } = {
       id: result.id,
       filename: result.filename,
       original_name: result.original_name,
       mime_type: result.mime_type,
       size: result.size,
-      public_url: result.public_url,
-      thumbnail_url: result.thumbnail_url,
+      public_url: cdnService.getAssetUrl(result.r2_key, result.mime_type, 'display'),
+      thumbnail_url: cdnService.getAssetUrl(result.r2_key, result.mime_type, 'thumbnail'),
       alt: result.alt,
       caption: result.caption,
       tags: result.tags ? JSON.parse(result.tags) : [],
@@ -261,6 +295,212 @@ adminMediaRoutes.get('/:id/details', async (c) => {
     return c.html('<div class="text-red-500">Error loading file details</div>')
   }
 })
+
+// Upload files endpoint (HTMX compatible)
+adminMediaRoutes.post('/upload', async (c) => {
+  try {
+    const user = c.get('user')
+    const formData = await c.req.formData()
+    const files = formData.getAll('files') as File[]
+    
+    if (!files || files.length === 0) {
+      return c.html(html`
+        <div id="upload-results" class="mt-4">
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            No files provided
+          </div>
+        </div>
+      `)
+    }
+
+    const uploadResults = []
+    const errors = []
+
+    for (const file of files) {
+      try {
+        // Validate file
+        const validation = fileValidationSchema.safeParse({
+          name: file.name,
+          type: file.type,
+          size: file.size
+        })
+
+        if (!validation.success) {
+          errors.push({
+            filename: file.name,
+            error: validation.error.issues[0]?.message || 'Validation failed'
+          })
+          continue
+        }
+
+        // Generate unique filename and R2 key
+        const fileId = nanoid()
+        const fileExtension = file.name.split('.').pop() || ''
+        const filename = `${fileId}.${fileExtension}`
+        const folder = formData.get('folder') as string || 'uploads'
+        const r2Key = `${folder}/${filename}`
+
+        // Upload to R2
+        const arrayBuffer = await file.arrayBuffer()
+        const uploadResult = await c.env.MEDIA_BUCKET.put(r2Key, arrayBuffer, {
+          httpMetadata: {
+            contentType: file.type,
+            contentDisposition: `inline; filename="${file.name}"`
+          },
+          customMetadata: {
+            originalName: file.name,
+            uploadedBy: user.userId,
+            uploadedAt: new Date().toISOString()
+          }
+        })
+
+        if (!uploadResult) {
+          errors.push({
+            filename: file.name,
+            error: 'Failed to upload to storage'
+          })
+          continue
+        }
+
+        // Extract image dimensions if it's an image
+        let width: number | undefined
+        let height: number | undefined
+        
+        if (file.type.startsWith('image/') && !file.type.includes('svg')) {
+          try {
+            const dimensions = await getImageDimensions(arrayBuffer)
+            width = dimensions.width
+            height = dimensions.height
+          } catch (error) {
+            console.warn('Failed to extract image dimensions:', error)
+          }
+        }
+
+        // Generate optimized URLs using CDN service
+        const cdnService = createCDNService(c.env)
+        const publicUrl = cdnService.getAssetUrl(r2Key, file.type, 'display')
+        const thumbnailUrl = cdnService.getAssetUrl(r2Key, file.type, 'thumbnail')
+
+        // Save to database
+        const stmt = c.env.DB.prepare(`
+          INSERT INTO media (
+            id, filename, original_name, mime_type, size, width, height, 
+            folder, r2_key, public_url, thumbnail_url, uploaded_by, uploaded_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `)
+        
+        await stmt.bind(
+          fileId,
+          filename,
+          file.name,
+          file.type,
+          file.size,
+          width,
+          height,
+          folder,
+          r2Key,
+          publicUrl,
+          thumbnailUrl,
+          user.userId,
+          Math.floor(Date.now() / 1000)
+        ).run()
+
+        uploadResults.push({
+          id: fileId,
+          filename: filename,
+          originalName: file.name,
+          mimeType: file.type,
+          size: file.size,
+          publicUrl: publicUrl
+        })
+      } catch (error) {
+        errors.push({
+          filename: file.name,
+          error: 'Upload failed: ' + (error instanceof Error ? error.message : 'Unknown error')
+        })
+      }
+    }
+
+    // Return HTMX response with results
+    return c.html(html`
+      <div id="upload-results" class="mt-4">
+        ${uploadResults.length > 0 ? html`
+          <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            Successfully uploaded ${uploadResults.length} file${uploadResults.length > 1 ? 's' : ''}
+          </div>
+        ` : ''}
+        
+        ${errors.length > 0 ? html`
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <p class="font-medium">Upload errors:</p>
+            <ul class="list-disc list-inside mt-2">
+              ${errors.map(error => html`
+                <li>${error.filename}: ${error.error}</li>
+              `)}
+            </ul>
+          </div>
+        ` : ''}
+        
+        <script>
+          // Refresh the media grid after upload
+          if (${uploadResults.length} > 0) {
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+          }
+        </script>
+      </div>
+    `)
+  } catch (error) {
+    console.error('Upload error:', error)
+    return c.html(html`
+      <div id="upload-results" class="mt-4">
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}
+        </div>
+      </div>
+    `)
+  }
+})
+
+// Helper function to extract image dimensions
+async function getImageDimensions(arrayBuffer: ArrayBuffer): Promise<{ width: number; height: number }> {
+  const uint8Array = new Uint8Array(arrayBuffer)
+  
+  // Check for JPEG
+  if (uint8Array[0] === 0xFF && uint8Array[1] === 0xD8) {
+    return getJPEGDimensions(uint8Array)
+  }
+  
+  // Check for PNG
+  if (uint8Array[0] === 0x89 && uint8Array[1] === 0x50 && uint8Array[2] === 0x4E && uint8Array[3] === 0x47) {
+    return getPNGDimensions(uint8Array)
+  }
+  
+  // Default fallback
+  return { width: 0, height: 0 }
+}
+
+function getJPEGDimensions(uint8Array: Uint8Array): { width: number; height: number } {
+  let i = 2
+  while (i < uint8Array.length) {
+    if (uint8Array[i] === 0xFF && uint8Array[i + 1] === 0xC0) {
+      return {
+        height: (uint8Array[i + 5] << 8) | uint8Array[i + 6],
+        width: (uint8Array[i + 7] << 8) | uint8Array[i + 8]
+      }
+    }
+    i += 2 + ((uint8Array[i + 2] << 8) | uint8Array[i + 3])
+  }
+  return { width: 0, height: 0 }
+}
+
+function getPNGDimensions(uint8Array: Uint8Array): { width: number; height: number } {
+  return {
+    width: (uint8Array[16] << 24) | (uint8Array[17] << 16) | (uint8Array[18] << 8) | uint8Array[19],
+    height: (uint8Array[20] << 24) | (uint8Array[21] << 16) | (uint8Array[22] << 8) | uint8Array[23]
+  }
+}
 
 // Helper function to generate media item HTML
 function generateMediaItemHTML(file: any): string {

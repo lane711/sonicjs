@@ -206,7 +206,7 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
         <!-- Upload Form -->
         <form 
           id="upload-form"
-          hx-post="/media/upload"
+          hx-post="/admin/media/upload"
           hx-encoding="multipart/form-data"
           hx-target="#upload-results"
           class="space-y-4"

@@ -5,6 +5,9 @@ compatibility_flags = ["nodejs_compat"]
 
 [vars]
 ENVIRONMENT = "development"
+# Cloudflare Images configuration (optional)
+# IMAGES_ACCOUNT_ID = "your-account-id"
+# CDN_DOMAIN = "media.yourdomain.com"
 
 [[d1_databases]]
 binding = "DB"
@@ -21,6 +24,8 @@ name = "sonicjs-ai-preview"
 
 [env.preview.vars]
 ENVIRONMENT = "preview"
+# IMAGES_ACCOUNT_ID = "your-account-id"
+# CDN_DOMAIN = "media-preview.yourdomain.com"
 
 [[env.preview.d1_databases]]
 binding = "DB"

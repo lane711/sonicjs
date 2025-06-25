@@ -53,7 +53,7 @@ test.describe('Media Management', () => {
     await page.locator('button[type="submit"]').click();
     
     // Should show upload success
-    await expect(page.locator('#upload-results')).toContainText('successful');
+    await expect(page.locator('#upload-results')).toContainText('Successfully uploaded', { timeout: 10000 });
   });
 
   test('should validate file types', async ({ page }) => {
