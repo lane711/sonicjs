@@ -21,6 +21,7 @@ export function renderAdminLayout(data: AdminLayoutData): string {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${data.title} - SonicJS AI Admin</title>
+  <link rel="icon" type="image/x-icon" href="https://demo.sonicjs.com/images/favicon.ico">
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
