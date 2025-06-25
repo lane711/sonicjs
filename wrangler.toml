@@ -42,13 +42,11 @@ name = "sonicjs-ai-prod"
 [env.production.vars]
 ENVIRONMENT = "production"
 
-# Production D1 database will be created separately
-# [[env.production.d1_databases]]
-# binding = "DB"
-# database_name = "sonicjs-prod"
-# database_id = "TBD"
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "sonicjs-prod"
+database_id = "799a0481-a046-4047-bcc8-9d9b57fd777e"
 
-# Production R2 bucket
-# [[env.production.r2_buckets]]
-# binding = "MEDIA_BUCKET"
-# bucket_name = "sonicjs-media-prod"
+[[env.production.r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "sonicjs-media-prod"

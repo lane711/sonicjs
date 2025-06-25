@@ -27,12 +27,14 @@
     "highlight.js": "^11.11.1",
     "hono": "^4.7.3",
     "marked": "^15.0.12",
+    "semver": "^7.7.2",
     "zod": "^3.25.67"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250620.0",
     "@playwright/test": "^1.53.1",
     "@types/node": "^20.19.1",
+    "@types/semver": "^7.7.0",
     "playwright": "^1.53.1",
     "tsx": "^4.20.3",
     "typescript": "^5",
