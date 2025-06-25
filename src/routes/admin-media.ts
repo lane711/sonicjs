@@ -490,6 +490,136 @@ adminMediaRoutes.get('/file/*', async (c) => {
   }
 })
 
+// Update media file metadata (HTMX compatible)
+adminMediaRoutes.put('/:id', async (c) => {
+  try {
+    const user = c.get('user')
+    const fileId = c.req.param('id')
+    const formData = await c.req.formData()
+    
+    // Get file record
+    const stmt = c.env.DB.prepare('SELECT * FROM media WHERE id = ? AND deleted_at IS NULL')
+    const fileRecord = await stmt.bind(fileId).first() as any
+    
+    if (!fileRecord) {
+      return c.html(html`
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          File not found
+        </div>
+      `)
+    }
+
+    // Check permissions (only allow updates by uploader or admin)
+    if (fileRecord.uploaded_by !== user.userId && user.role !== 'admin') {
+      return c.html(html`
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          Permission denied
+        </div>
+      `)
+    }
+
+    // Extract form data
+    const alt = formData.get('alt') as string || null
+    const caption = formData.get('caption') as string || null
+    const tagsString = formData.get('tags') as string || ''
+    const tags = tagsString ? tagsString.split(',').map(tag => tag.trim()).filter(tag => tag) : []
+
+    // Update database
+    const updateStmt = c.env.DB.prepare(`
+      UPDATE media 
+      SET alt = ?, caption = ?, tags = ?, updated_at = ?
+      WHERE id = ?
+    `)
+    await updateStmt.bind(
+      alt,
+      caption,
+      JSON.stringify(tags),
+      Math.floor(Date.now() / 1000),
+      fileId
+    ).run()
+
+    return c.html(html`
+      <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+        File updated successfully
+      </div>
+      <script>
+        // Refresh the file details
+        setTimeout(() => {
+          htmx.trigger('#file-modal-content', 'htmx:load');
+        }, 1000);
+      </script>
+    `)
+  } catch (error) {
+    console.error('Update error:', error)
+    return c.html(html`
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        Update failed: ${error instanceof Error ? error.message : 'Unknown error'}
+      </div>
+    `)
+  }
+})
+
+// Delete media file (HTMX compatible)
+adminMediaRoutes.delete('/:id', async (c) => {
+  try {
+    const user = c.get('user')
+    const fileId = c.req.param('id')
+    
+    // Get file record
+    const stmt = c.env.DB.prepare('SELECT * FROM media WHERE id = ? AND deleted_at IS NULL')
+    const fileRecord = await stmt.bind(fileId).first() as any
+    
+    if (!fileRecord) {
+      return c.html(html`
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          File not found
+        </div>
+      `)
+    }
+
+    // Check permissions (only allow deletion by uploader or admin)
+    if (fileRecord.uploaded_by !== user.userId && user.role !== 'admin') {
+      return c.html(html`
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          Permission denied
+        </div>
+      `)
+    }
+
+    // Delete from R2
+    try {
+      await c.env.MEDIA_BUCKET.delete(fileRecord.r2_key)
+    } catch (error) {
+      console.warn('Failed to delete from R2:', error)
+      // Continue with database deletion even if R2 deletion fails
+    }
+
+    // Soft delete in database
+    const deleteStmt = c.env.DB.prepare('UPDATE media SET deleted_at = ? WHERE id = ?')
+    await deleteStmt.bind(Math.floor(Date.now() / 1000), fileId).run()
+
+    // Return HTMX response that redirects to media library
+    return c.html(html`
+      <script>
+        // Close modal if open
+        const modal = document.getElementById('file-modal');
+        if (modal) {
+          modal.classList.add('hidden');
+        }
+        // Redirect to media library
+        window.location.href = '/admin/media';
+      </script>
+    `)
+  } catch (error) {
+    console.error('Delete error:', error)
+    return c.html(html`
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        Delete failed: ${error instanceof Error ? error.message : 'Unknown error'}
+      </div>
+    `)
+  }
+})
+
 // Helper function to extract image dimensions
 async function getImageDimensions(arrayBuffer: ArrayBuffer): Promise<{ width: number; height: number }> {
   const uint8Array = new Uint8Array(arrayBuffer)
@@ -510,22 +640,26 @@ async function getImageDimensions(arrayBuffer: ArrayBuffer): Promise<{ width: nu
 
 function getJPEGDimensions(uint8Array: Uint8Array): { width: number; height: number } {
   let i = 2
-  while (i < uint8Array.length) {
+  while (i < uint8Array.length - 8) {
     if (uint8Array[i] === 0xFF && uint8Array[i + 1] === 0xC0) {
       return {
-        height: (uint8Array[i + 5] << 8) | uint8Array[i + 6],
-        width: (uint8Array[i + 7] << 8) | uint8Array[i + 8]
+        height: (uint8Array[i + 5]! << 8) | uint8Array[i + 6]!,
+        width: (uint8Array[i + 7]! << 8) | uint8Array[i + 8]!
       }
     }
-    i += 2 + ((uint8Array[i + 2] << 8) | uint8Array[i + 3])
+    const segmentLength = (uint8Array[i + 2]! << 8) | uint8Array[i + 3]!
+    i += 2 + segmentLength
   }
   return { width: 0, height: 0 }
 }
 
 function getPNGDimensions(uint8Array: Uint8Array): { width: number; height: number } {
+  if (uint8Array.length < 24) {
+    return { width: 0, height: 0 }
+  }
   return {
-    width: (uint8Array[16] << 24) | (uint8Array[17] << 16) | (uint8Array[18] << 8) | uint8Array[19],
-    height: (uint8Array[20] << 24) | (uint8Array[21] << 16) | (uint8Array[22] << 8) | uint8Array[23]
+    width: (uint8Array[16]! << 24) | (uint8Array[17]! << 16) | (uint8Array[18]! << 8) | uint8Array[19]!,
+    height: (uint8Array[20]! << 24) | (uint8Array[21]! << 16) | (uint8Array[22]! << 8) | uint8Array[23]!
   }
 }
 

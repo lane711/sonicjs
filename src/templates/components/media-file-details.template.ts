@@ -98,7 +98,7 @@ export function renderMediaFileDetails(data: MediaFileDetailsData): string {
         </div>
         
         <!-- Editable Fields -->
-        <form hx-put="/media/${file.id}" hx-target="#file-modal-content" class="space-y-4">
+        <form hx-put="/admin/media/${file.id}" hx-target="#file-modal-content" class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Alt Text</label>
             <input 
@@ -140,7 +140,7 @@ export function renderMediaFileDetails(data: MediaFileDetailsData): string {
             </button>
             <button 
               type="button"
-              hx-delete="/media/${file.id}"
+              hx-delete="/admin/media/${file.id}"
               hx-confirm="Are you sure you want to delete this file?"
               hx-target="body"
               class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
