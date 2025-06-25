@@ -80,28 +80,44 @@ export async function createTestCollection(page: Page, collectionData = TEST_DAT
   
   await page.click('button[type="submit"]');
   
-  // Wait for success message or redirect
-  await expect(page.locator('.bg-green-100')).toBeVisible();
+  // Wait for HTMX response and success message in the form-messages div
+  await expect(page.locator('#form-messages .bg-green-100')).toBeVisible({ timeout: 10000 });
+  
+  // Wait for redirect to collections page (JavaScript redirect with 1.5s delay)
+  await page.waitForURL('/admin/collections', { timeout: 15000 });
 }
 
 /**
  * Delete a test collection
  */
 export async function deleteTestCollection(page: Page, collectionName: string) {
-  await navigateToAdminSection(page, 'collections');
-  
-  // Find the collection row and click edit
-  const collectionRow = page.locator('tr').filter({ hasText: collectionName });
-  await collectionRow.locator('a').filter({ hasText: 'Edit' }).click();
-  
-  // Click delete button
-  await page.locator('button').filter({ hasText: 'Delete Collection' }).click();
-  
-  // Confirm deletion
-  page.on('dialog', dialog => dialog.accept());
-  
-  // Wait for redirect back to collections list
-  await page.waitForURL('/admin/collections');
+  try {
+    await navigateToAdminSection(page, 'collections');
+    
+    // Check if collection exists
+    const collectionRow = page.locator('tr').filter({ hasText: collectionName });
+    const isVisible = await collectionRow.isVisible({ timeout: 2000 });
+    
+    if (!isVisible) {
+      // Collection doesn't exist, nothing to delete
+      return;
+    }
+    
+    // Click edit link
+    await collectionRow.locator('a').filter({ hasText: 'Edit' }).click();
+    
+    // Set up dialog handler before clicking delete
+    page.on('dialog', dialog => dialog.accept());
+    
+    // Click delete button
+    await page.locator('button').filter({ hasText: 'Delete Collection' }).click();
+    
+    // Wait for redirect back to collections list (shorter timeout for cleanup)
+    await page.waitForURL('/admin/collections', { timeout: 5000 });
+  } catch (error) {
+    // If deletion fails, just continue - this is cleanup, don't log noise
+    // Silent failure for cleanup operations
+  }
 }
 
 /**

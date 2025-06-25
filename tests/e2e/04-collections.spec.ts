@@ -2,17 +2,25 @@ import { test, expect } from '@playwright/test';
 import { loginAsAdmin, navigateToAdminSection, createTestCollection, deleteTestCollection, TEST_DATA } from './utils/test-helpers';
 
 test.describe('Collections Management', () => {
-  test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
     await navigateToAdminSection(page, 'collections');
   });
 
-  test.afterEach(async ({ page }) => {
-    // Clean up any test collections
-    try {
-      await deleteTestCollection(page, TEST_DATA.collection.name);
-    } catch {
-      // Collection might not exist
+  test.afterEach(async ({ page }, testInfo) => {
+    // Only clean up if the test might have created a collection
+    const needsCleanup = [
+      'should create a new collection',
+      'should prevent duplicate collection names', 
+      'should edit an existing collection'
+    ].some(name => testInfo.title.includes(name));
+    
+    if (needsCleanup) {
+      try {
+        await deleteTestCollection(page, TEST_DATA.collection.name);
+      } catch (error) {
+        // Silently ignore cleanup errors
+      }
     }
   });
 
@@ -34,12 +42,22 @@ test.describe('Collections Management', () => {
     
     await page.click('button[type="submit"]');
     
-    // Should show success message
-    await expect(page.locator('.bg-green-100')).toBeVisible();
+    // Wait for HTMX response and success message
+    await expect(page.locator('#form-messages .bg-green-100')).toBeVisible({ timeout: 10000 });
+    
+    // Should redirect to collections list (JavaScript redirect with 1.5s delay)
+    await page.waitForURL('/admin/collections', { timeout: 15000 });
+    
+    // Should show the new collection in the list
+    await expect(page.locator('tr').filter({ hasText: TEST_DATA.collection.name })).toBeVisible();
   });
 
   test('should validate collection name format', async ({ page }) => {
     await page.click('a[href="/admin/collections/new"]');
+    
+    // Wait for form to load
+    await expect(page.locator('form')).toBeVisible();
+    await expect(page.locator('[name="name"]')).toBeVisible();
     
     // Try invalid name with spaces and uppercase
     await page.fill('[name="name"]', 'Invalid Collection Name');
@@ -47,8 +65,16 @@ test.describe('Collections Management', () => {
     
     await page.click('button[type="submit"]');
     
-    // Should show validation error
-    await expect(page.locator('.bg-red-100')).toBeVisible();
+    // Should show validation error in form messages (try different selectors)
+    try {
+      await expect(page.locator('#form-messages .bg-red-100')).toBeVisible({ timeout: 5000 });
+    } catch {
+      // If that fails, check if any error message appears anywhere
+      await expect(page.locator('.bg-red-100')).toBeVisible({ timeout: 2000 });
+    }
+    
+    // Should contain validation message about format
+    await expect(page.getByText('Collection name must contain only lowercase letters, numbers, and underscores')).toBeVisible({ timeout: 5000 });
   });
 
   test('should prevent duplicate collection names', async ({ page }) => {
@@ -63,7 +89,8 @@ test.describe('Collections Management', () => {
     await page.click('button[type="submit"]');
     
     // Should show error about duplicate name
-    await expect(page.locator('.bg-red-100')).toBeVisible();
+    await expect(page.locator('#form-messages .bg-red-100')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('#form-messages')).toContainText('already exists');
   });
 
   test('should edit an existing collection', async ({ page }) => {
@@ -80,8 +107,9 @@ test.describe('Collections Management', () => {
     await page.fill('[name="displayName"]', 'Updated Test Collection');
     await page.click('button[type="submit"]');
     
-    // Should show success message
-    await expect(page.locator('.bg-green-100')).toBeVisible();
+    // Should show success message in form messages area  
+    await expect(page.locator('#form-messages .bg-green-100')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('#form-messages')).toContainText('updated successfully');
   });
 
   test('should delete a collection', async ({ page }) => {
@@ -99,8 +127,8 @@ test.describe('Collections Management', () => {
     
     await page.locator('button').filter({ hasText: 'Delete Collection' }).click();
     
-    // Should redirect to collections list
-    await page.waitForURL('/admin/collections');
+    // Should redirect to collections list  
+    await page.waitForURL('/admin/collections', { timeout: 15000 });
     
     // Collection should no longer be visible
     await expect(page.locator('tr').filter({ hasText: TEST_DATA.collection.name })).not.toBeVisible();

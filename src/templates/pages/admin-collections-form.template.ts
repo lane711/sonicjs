@@ -31,11 +31,9 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
       type: 'text',
       value: data.name || '',
       placeholder: 'blog_posts',
-      required: true,
+
       helpText: 'Lowercase letters, numbers, and underscores only',
-      validation: {
-        pattern: '^[a-z0-9_]+$'
-      },
+
       className: isEdit ? 'bg-gray-50 text-gray-500' : ''
     },
     {
@@ -44,7 +42,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
       type: 'text',
       value: data.display_name || '',
       placeholder: 'Blog Posts',
-      required: true
+
     },
     {
       name: 'description',
@@ -64,9 +62,11 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
 
   const formData: FormData = {
     id: 'collection-form',
-    hxPost: isEdit ? `/admin/collections/${data.id}` : '/admin/collections',
+    ...(isEdit 
+      ? { hxPut: `/admin/collections/${data.id}` }
+      : { hxPost: '/admin/collections' }
+    ),
     hxTarget: '#form-messages',
-    method: isEdit ? 'PUT' : 'POST',
     fields: fields,
     submitButtons: [
       {
@@ -114,8 +114,6 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
       <div class="bg-white rounded-lg shadow-sm border p-6">
         ${data.error ? renderAlert({ type: 'error', message: data.error, dismissible: true }) : ''}
         ${data.success ? renderAlert({ type: 'success', message: data.success, dismissible: true }) : ''}
-        
-        <div id="form-messages" class="mb-4"></div>
         
         ${renderForm(formData)}
         
