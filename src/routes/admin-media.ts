@@ -302,10 +302,8 @@ adminMediaRoutes.post('/upload', async (c) => {
     
     if (!files || files.length === 0) {
       return c.html(html`
-        <div id="upload-results" class="mt-4">
-          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            No files provided
-          </div>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          No files provided
         </div>
       `)
     }
@@ -419,41 +417,37 @@ adminMediaRoutes.post('/upload', async (c) => {
 
     // Return HTMX response with results
     return c.html(html`
-      <div id="upload-results" class="mt-4">
-        ${uploadResults.length > 0 ? html`
-          <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-            Successfully uploaded ${uploadResults.length} file${uploadResults.length > 1 ? 's' : ''}
-          </div>
-        ` : ''}
-        
-        ${errors.length > 0 ? html`
-          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            <p class="font-medium">Upload errors:</p>
-            <ul class="list-disc list-inside mt-2">
-              ${errors.map(error => html`
-                <li>${error.filename}: ${error.error}</li>
-              `)}
-            </ul>
-          </div>
-        ` : ''}
-        
-        <script>
-          // Refresh the media grid after upload
-          if (${uploadResults.length} > 0) {
-            setTimeout(() => {
-              window.location.reload();
-            }, 2000);
-          }
-        </script>
-      </div>
+      ${uploadResults.length > 0 ? html`
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+          Successfully uploaded ${uploadResults.length} file${uploadResults.length > 1 ? 's' : ''}
+        </div>
+      ` : ''}
+      
+      ${errors.length > 0 ? html`
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <p class="font-medium">Upload errors:</p>
+          <ul class="list-disc list-inside mt-2">
+            ${errors.map(error => html`
+              <li>${error.filename}: ${error.error}</li>
+            `)}
+          </ul>
+        </div>
+      ` : ''}
+      
+      <script>
+        // Refresh the media grid after upload
+        if (${uploadResults.length} > 0) {
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+        }
+      </script>
     `)
   } catch (error) {
     console.error('Upload error:', error)
     return c.html(html`
-      <div id="upload-results" class="mt-4">
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}
-        </div>
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}
       </div>
     `)
   }
