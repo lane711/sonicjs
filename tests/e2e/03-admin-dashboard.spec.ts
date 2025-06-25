@@ -7,7 +7,7 @@ test.describe('Admin Dashboard', () => {
   });
 
   test('should display admin dashboard with navigation', async ({ page }) => {
-    await expect(page.locator('h1')).toContainText('SonicJS AI Admin');
+    await expect(page.locator('h1').first()).toContainText('SonicJS AI Admin');
     
     // Check navigation links
     await expect(page.locator('a[href="/admin"]')).toBeVisible();
@@ -44,7 +44,7 @@ test.describe('Admin Dashboard', () => {
   test('should navigate to media page', async ({ page }) => {
     await navigateToAdminSection(page, 'media');
     
-    await expect(page.locator('h1')).toContainText('Media Library');
+    await expect(page.locator('h1').first()).toContainText('Media Library');
     await expect(page.locator('button').filter({ hasText: 'Upload Files' })).toBeVisible();
   });
 

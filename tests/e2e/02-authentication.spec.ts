@@ -10,7 +10,7 @@ test.describe('Authentication', () => {
   test('should display login form', async ({ page }) => {
     await page.goto('/auth/login');
     
-    await expect(page.locator('h1')).toContainText('Login');
+    await expect(page.locator('h2')).toContainText('Sign in to SonicJS AI');
     await expect(page.locator('[name="email"]')).toBeVisible();
     await expect(page.locator('[name="password"]')).toBeVisible();
     await expect(page.locator('button[type="submit"]')).toBeVisible();
@@ -20,7 +20,7 @@ test.describe('Authentication', () => {
     await loginAsAdmin(page);
     
     // Should be on admin dashboard
-    await expect(page.locator('h1')).toContainText('SonicJS AI Admin');
+    await expect(page.locator('h1').first()).toContainText('SonicJS AI Admin');
     await expect(page).toHaveURL('/admin');
   });
 
@@ -44,7 +44,7 @@ test.describe('Authentication', () => {
     await logout(page);
     
     // Should be redirected to login
-    await expect(page).toHaveURL('/auth/login');
+    await expect(page).toHaveURL(/\/auth\/login/);
     await expect(await isAuthenticated(page)).toBe(false);
   });
 
@@ -61,7 +61,7 @@ test.describe('Authentication', () => {
       await page.goto(route);
       // Should redirect to login
       await page.waitForURL(/\/auth\/login/);
-      await expect(page.locator('h1')).toContainText('Login');
+      await expect(page.locator('h2')).toContainText('Sign in to SonicJS AI');
     }
   });
 
@@ -72,7 +72,7 @@ test.describe('Authentication', () => {
     await page.reload();
     
     // Should still be authenticated
-    await expect(page.locator('h1')).toContainText('SonicJS AI Admin');
+    await expect(page.locator('h1').first()).toContainText('SonicJS AI Admin');
     await expect(await isAuthenticated(page)).toBe(true);
   });
 }); 

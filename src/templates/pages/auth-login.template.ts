@@ -106,7 +106,7 @@ export function renderLoginPage(data: LoginPageData): string {
           </p>
         </div>
         
-        ${data.error ? renderAlert({ type: 'error', message: data.error }) : ''}
+        ${data.error ? `<div id="login-form-error">${renderAlert({ type: 'error', message: data.error })}</div>` : ''}
         ${data.message ? renderAlert({ type: 'success', message: data.message }) : ''}
         
         ${renderForm(formData)}

@@ -139,14 +139,14 @@ INSERT OR IGNORE INTO users (
   'admin',
   'Admin',
   'User',
-  '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', -- bcrypt hash of 'admin123'
+  'd1c379e871838f44e21d5a55841349e50636f06df139bfef11870eec74c381db', -- SHA-256 hash of 'admin123'
   'admin',
   1,
   strftime('%s', 'now') * 1000,
   strftime('%s', 'now') * 1000
 );
 
--- Insert sample collection
+-- Insert sample collections
 INSERT OR IGNORE INTO collections (
   id, name, display_name, description, schema, 
   is_active, created_at, updated_at
@@ -156,6 +156,26 @@ INSERT OR IGNORE INTO collections (
   'Blog Posts',
   'Blog post content collection',
   '{"type":"object","properties":{"title":{"type":"string","title":"Title","required":true},"content":{"type":"string","title":"Content","format":"richtext"},"excerpt":{"type":"string","title":"Excerpt"},"featured_image":{"type":"string","title":"Featured Image","format":"media"},"tags":{"type":"array","title":"Tags","items":{"type":"string"}},"status":{"type":"string","title":"Status","enum":["draft","published","archived"],"default":"draft"}},"required":["title"]}',
+  1,
+  strftime('%s', 'now') * 1000,
+  strftime('%s', 'now') * 1000
+),
+(
+  'pages-collection',
+  'pages',
+  'Pages',
+  'Static page content collection',
+  '{"type":"object","properties":{"title":{"type":"string","title":"Title","required":true},"content":{"type":"string","title":"Content","format":"richtext"},"slug":{"type":"string","title":"Slug"},"meta_description":{"type":"string","title":"Meta Description"},"featured_image":{"type":"string","title":"Featured Image","format":"media"}},"required":["title"]}',
+  1,
+  strftime('%s', 'now') * 1000,
+  strftime('%s', 'now') * 1000
+),
+(
+  'news-collection',
+  'news',
+  'News',
+  'News article content collection',
+  '{"type":"object","properties":{"title":{"type":"string","title":"Title","required":true},"content":{"type":"string","title":"Content","format":"richtext"},"publish_date":{"type":"string","title":"Publish Date","format":"date"},"author":{"type":"string","title":"Author"},"category":{"type":"string","title":"Category","enum":["technology","business","general"]}},"required":["title"]}',
   1,
   strftime('%s', 'now') * 1000,
   strftime('%s', 'now') * 1000

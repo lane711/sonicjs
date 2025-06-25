@@ -26,7 +26,7 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
         key: 'name',
         label: 'Name',
         sortable: true,
-        render: (collection) => `<code class="text-sm bg-gray-100 px-2 py-1 rounded">${collection.name}</code>`
+        render: (value, collection) => `<code class="text-sm bg-gray-100 px-2 py-1 rounded">${collection.name}</code>`
       },
       {
         key: 'display_name',
@@ -36,7 +36,7 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
       {
         key: 'description',
         label: 'Description',
-        render: (collection) => collection.description || '<span class="text-gray-400">-</span>'
+        render: (value, collection) => collection.description || '<span class="text-gray-400">-</span>'
       },
       {
         key: 'formattedDate',

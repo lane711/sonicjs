@@ -8,7 +8,7 @@ test.describe('Content Management', () => {
   });
 
   test('should display content list', async ({ page }) => {
-    await expect(page.locator('h1')).toContainText('Content Management');
+    await expect(page.locator('h1').first()).toContainText('Content Management');
     await expect(page.locator('table')).toBeVisible();
     
     // Should have filter dropdowns
@@ -49,7 +49,7 @@ test.describe('Content Management', () => {
   test('should navigate to new content form', async ({ page }) => {
     await page.click('a[href="/admin/content/new"]');
     
-    await expect(page.locator('h1')).toContainText('Create New Content');
+    await expect(page.locator('h1').first()).toContainText('Create New Content');
     await expect(page.locator('form')).toBeVisible();
   });
 
@@ -94,7 +94,7 @@ test.describe('Content Management', () => {
     await page.locator('button').filter({ hasText: 'Refresh' }).click();
     
     // Page should reload
-    await expect(page.locator('h1')).toContainText('Content Management');
+    await expect(page.locator('h1').first()).toContainText('Content Management');
   });
 
   test('should handle pagination', async ({ page }) => {
@@ -123,7 +123,7 @@ test.describe('Content Management', () => {
     await page.setViewportSize({ width: 375, height: 667 });
     
     // Content should still be accessible
-    await expect(page.locator('h1')).toContainText('Content Management');
+    await expect(page.locator('h1').first()).toContainText('Content Management');
     
     // Table should be scrollable or reorganized
     await expect(page.locator('table, .overflow-x-auto')).toBeVisible();

@@ -18,7 +18,7 @@ test.describe('Responsive Design', () => {
       await loginAsAdmin(page);
       
       // Admin dashboard should be accessible
-      await expect(page.locator('h1')).toContainText('SonicJS AI Admin');
+      await expect(page.locator('h1').first()).toContainText('SonicJS AI Admin');
       
       // Navigation should be visible or accessible
       const nav = page.locator('nav');
@@ -132,13 +132,13 @@ test.describe('Responsive Design', () => {
     await loginAsAdmin(page);
     
     // Verify content is accessible
-    await expect(page.locator('h1')).toContainText('SonicJS AI Admin');
+    await expect(page.locator('h1').first()).toContainText('SonicJS AI Admin');
     
     // Switch to landscape
     await page.setViewportSize({ width: 667, height: 375 });
     
     // Content should still be accessible
-    await expect(page.locator('h1')).toContainText('SonicJS AI Admin');
+    await expect(page.locator('h1').first()).toContainText('SonicJS AI Admin');
     await expect(page.locator('nav')).toBeVisible();
   });
 

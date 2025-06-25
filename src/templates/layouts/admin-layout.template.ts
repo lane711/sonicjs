@@ -160,15 +160,22 @@ function renderAdminHeader(data: AdminHeaderData): string {
           
           <div class="flex items-center space-x-4">
             ${data.user ? `
-              <div class="relative group">
-                <button class="flex items-center space-x-2 text-gray-300 hover:text-gray-100">
+              <div class="relative">
+                <button 
+                  id="user-menu-button"
+                  onclick="toggleUserMenu()"
+                  class="flex items-center space-x-2 text-gray-300 hover:text-gray-100"
+                >
                   <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-full flex items-center justify-center">
                     <span class="text-sm font-medium text-white">${data.user.name.charAt(0).toUpperCase()}</span>
                   </div>
                   <span class="text-sm">${data.user.name}</span>
                 </button>
                 
-                <div class="absolute right-0 mt-2 w-48 bg-gray-800 backdrop-blur-sm rounded-md shadow-xl border border-gray-700 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div 
+                  id="user-menu"
+                  class="hidden absolute right-0 mt-2 w-48 bg-gray-800 backdrop-blur-sm rounded-md shadow-xl border border-gray-700 z-50"
+                >
                   <div class="py-1">
                     <div class="px-4 py-2 text-sm text-gray-300 border-b border-gray-700">
                       <div class="font-medium text-gray-200">${data.user.name}</div>
@@ -180,6 +187,23 @@ function renderAdminHeader(data: AdminHeaderData): string {
                   </div>
                 </div>
               </div>
+              
+              <script>
+                function toggleUserMenu() {
+                  const menu = document.getElementById('user-menu');
+                  menu.classList.toggle('hidden');
+                }
+                
+                // Close menu when clicking outside
+                document.addEventListener('click', function(event) {
+                  const menu = document.getElementById('user-menu');
+                  const button = document.getElementById('user-menu-button');
+                  
+                  if (!button.contains(event.target) && !menu.contains(event.target)) {
+                    menu.classList.add('hidden');
+                  }
+                });
+              </script>
             ` : `
               <a href="/auth/login" class="btn btn-primary">Login</a>
             `}

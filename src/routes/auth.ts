@@ -437,3 +437,70 @@ authRoutes.post('/login/form', async (c) => {
     `)
   }
 })
+
+// Test seeding endpoint (only for development/testing)
+authRoutes.post('/seed-admin', async (c) => {
+  try {
+    const db = c.env.DB
+    
+    // First ensure the users table exists
+    await db.prepare(`
+      CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY,
+        email TEXT NOT NULL UNIQUE,
+        username TEXT NOT NULL UNIQUE,
+        first_name TEXT NOT NULL,
+        last_name TEXT NOT NULL,
+        password_hash TEXT,
+        role TEXT NOT NULL DEFAULT 'viewer',
+        avatar TEXT,
+        is_active INTEGER NOT NULL DEFAULT 1,
+        last_login_at INTEGER,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL
+      )
+    `).run()
+    
+    // Delete existing admin user if exists
+    await db.prepare('DELETE FROM users WHERE email = ? OR username = ?')
+      .bind('admin@sonicjs.com', 'admin')
+      .run()
+    
+    // Hash password
+    const passwordHash = await AuthManager.hashPassword('admin123')
+    
+    // Create admin user
+    const userId = 'admin-user-id'
+    const now = Date.now()
+    
+    await db.prepare(`
+      INSERT INTO users (id, email, username, first_name, last_name, password_hash, role, is_active, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      userId,
+      'admin@sonicjs.com',
+      'admin',
+      'Admin',
+      'User',
+      passwordHash,
+      'admin',
+      1, // is_active
+      now,
+      now
+    ).run()
+    
+    return c.json({ 
+      message: 'Admin user created successfully',
+      user: {
+        id: userId,
+        email: 'admin@sonicjs.com',
+        username: 'admin',
+        role: 'admin'
+      },
+      passwordHash: passwordHash // For debugging
+    })
+  } catch (error) {
+    console.error('Seed admin error:', error)
+    return c.json({ error: 'Failed to create admin user', details: error instanceof Error ? error.message : String(error) }, 500)
+  }
+})

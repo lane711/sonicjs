@@ -17,7 +17,7 @@ test.describe('Collections Management', () => {
   });
 
   test('should display collections list', async ({ page }) => {
-    await expect(page.locator('h2')).toContainText('Collections');
+    await expect(page.locator('h1').first()).toContainText('Collections');
     await expect(page.locator('table')).toBeVisible();
     
     // Should show default blog_posts collection

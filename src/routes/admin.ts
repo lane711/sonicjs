@@ -71,24 +71,27 @@ adminRoutes.get('/api/stats', async (c) => {
   }
 })
 
+
 // Collections management
 adminRoutes.get('/collections', async (c) => {
   try {
     const user = c.get('user')
     const db = c.env.DB
-    const stmt = db.prepare('SELECT * FROM collections WHERE is_active = 1 ORDER BY created_at DESC')
+    const stmt = db.prepare('SELECT id, name, display_name, description, created_at FROM collections WHERE is_active = 1 ORDER BY created_at DESC')
     const { results } = await stmt.all()
     
     const collections: Collection[] = (results || [])
-      .filter((collection: any) => collection && collection.id)
-      .map((collection: any) => ({
-        id: collection.id,
-        name: collection.name || `collection-${collection.id}`,
-        display_name: collection.display_name || collection.name || `Collection ${collection.id}`,
-        description: collection.description,
-        created_at: collection.created_at,
-        formattedDate: collection.created_at ? new Date(collection.created_at).toLocaleDateString() : 'Unknown'
-      }))
+      .filter((row: any) => row && row.id)
+      .map((row: any) => {
+        return {
+          id: String(row.id || ''),
+          name: String(row.name || ''),
+          display_name: String(row.display_name || ''),
+          description: row.description ? String(row.description) : undefined,
+          created_at: Number(row.created_at || 0),
+          formattedDate: row.created_at ? new Date(Number(row.created_at)).toLocaleDateString() : 'Unknown'
+        }
+      })
     
     const pageData: CollectionsListPageData = {
       collections,

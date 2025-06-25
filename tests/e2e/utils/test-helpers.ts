@@ -29,17 +29,34 @@ export const TEST_DATA = {
 };
 
 /**
+ * Ensure admin user exists (for testing)
+ */
+export async function ensureAdminUserExists(page: Page) {
+  try {
+    await page.request.post('/auth/seed-admin');
+  } catch (error) {
+    // Admin might already exist, ignore errors
+  }
+}
+
+/**
  * Login as admin user
  */
 export async function loginAsAdmin(page: Page) {
+  // Ensure admin user exists first
+  await ensureAdminUserExists(page);
+  
   await page.goto('/auth/login');
   await page.fill('[name="email"]', ADMIN_CREDENTIALS.email);
   await page.fill('[name="password"]', ADMIN_CREDENTIALS.password);
   await page.click('button[type="submit"]');
   
-  // Wait for redirect to admin dashboard
-  await page.waitForURL('/admin');
-  await expect(page.locator('h1')).toContainText('SonicJS AI Admin');
+  // Wait for HTMX response and success message
+  await expect(page.locator('#form-response .bg-green-100')).toBeVisible();
+  
+  // Wait for JavaScript redirect to admin dashboard (up to 3 seconds)
+  await page.waitForURL('/admin', { timeout: 3000 });
+  await expect(page.locator('h1').first()).toContainText('SonicJS AI Admin');
 }
 
 /**
@@ -141,7 +158,13 @@ export async function waitForHTMX(page: Page) {
 export async function isAuthenticated(page: Page): Promise<boolean> {
   try {
     await page.goto('/admin', { waitUntil: 'networkidle' });
-    const title = await page.textContent('h1');
+    // Check if we're still on admin page or redirected to login
+    const currentUrl = page.url();
+    if (currentUrl.includes('/auth/login')) {
+      return false;
+    }
+    // Check for the first h1 to see if it contains admin text
+    const title = await page.locator('h1').first().textContent();
     return title?.includes('SonicJS AI Admin') || false;
   } catch {
     return false;
@@ -153,7 +176,7 @@ export async function isAuthenticated(page: Page): Promise<boolean> {
  */
 export async function logout(page: Page) {
   await page.goto('/auth/logout');
-  await page.waitForURL('/auth/login');
+  await page.waitForURL(/\/auth\/login/);
 }
 
 /**
