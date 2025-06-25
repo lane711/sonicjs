@@ -6,6 +6,7 @@ import { requireAuth } from '../middleware/auth'
 type Bindings = {
   DB: D1Database
   MEDIA_BUCKET: R2Bucket
+  BUCKET_NAME?: string
   IMAGES_ACCOUNT_ID?: string
   IMAGES_API_TOKEN?: string
 }
@@ -46,7 +47,7 @@ const fileValidationSchema = z.object({
 export const apiMediaRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
 // Apply auth middleware to all routes
-apiMediaRoutes.use('*', requireAuth)
+apiMediaRoutes.use('*', requireAuth())
 
 // Upload single file
 apiMediaRoutes.post('/upload', async (c) => {
@@ -98,8 +99,9 @@ apiMediaRoutes.post('/upload', async (c) => {
       return c.json({ error: 'Failed to upload file to storage' }, 500)
     }
 
-    // Generate public URL
-    const publicUrl = `https://pub-${c.env.MEDIA_BUCKET.name}.r2.dev/${r2Key}`
+    // Generate public URL using environment variable for bucket name
+    const bucketName = c.env.BUCKET_NAME || 'sonicjs-media-dev'
+    const publicUrl = `https://pub-${bucketName}.r2.dev/${r2Key}`
     
     // Extract image dimensions if it's an image
     let width: number | undefined
@@ -244,8 +246,9 @@ apiMediaRoutes.post('/upload-multiple', async (c) => {
           continue
         }
 
-        // Generate public URL
-        const publicUrl = `https://pub-${c.env.MEDIA_BUCKET.name}.r2.dev/${r2Key}`
+        // Generate public URL using environment variable for bucket name
+        const bucketName = c.env.BUCKET_NAME || 'sonicjs-media-dev'
+        const publicUrl = `https://pub-${bucketName}.r2.dev/${r2Key}`
         
         // Extract image dimensions if it's an image
         let width: number | undefined
@@ -457,20 +460,30 @@ async function getImageDimensions(arrayBuffer: ArrayBuffer): Promise<{ width: nu
 function getJPEGDimensions(uint8Array: Uint8Array): { width: number; height: number } {
   let i = 2
   while (i < uint8Array.length) {
+    if (i + 8 >= uint8Array.length) break
     if (uint8Array[i] === 0xFF && uint8Array[i + 1] === 0xC0) {
-      return {
-        height: (uint8Array[i + 5] << 8) | uint8Array[i + 6],
-        width: (uint8Array[i + 7] << 8) | uint8Array[i + 8]
+      if (i + 8 < uint8Array.length) {
+        return {
+          height: (uint8Array[i + 5]! << 8) | uint8Array[i + 6]!,
+          width: (uint8Array[i + 7]! << 8) | uint8Array[i + 8]!
+        }
       }
     }
-    i += 2 + ((uint8Array[i + 2] << 8) | uint8Array[i + 3])
+    if (i + 3 < uint8Array.length) {
+      i += 2 + ((uint8Array[i + 2]! << 8) | uint8Array[i + 3]!)
+    } else {
+      break
+    }
   }
   return { width: 0, height: 0 }
 }
 
 function getPNGDimensions(uint8Array: Uint8Array): { width: number; height: number } {
+  if (uint8Array.length < 24) {
+    return { width: 0, height: 0 }
+  }
   return {
-    width: (uint8Array[16] << 24) | (uint8Array[17] << 16) | (uint8Array[18] << 8) | uint8Array[19],
-    height: (uint8Array[20] << 24) | (uint8Array[21] << 16) | (uint8Array[22] << 8) | uint8Array[23]
+    width: (uint8Array[16]! << 24) | (uint8Array[17]! << 16) | (uint8Array[18]! << 8) | uint8Array[19]!,
+    height: (uint8Array[20]! << 24) | (uint8Array[21]! << 16) | (uint8Array[22]! << 8) | uint8Array[23]!
   }
 }
