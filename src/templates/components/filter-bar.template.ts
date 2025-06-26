@@ -25,11 +25,11 @@ export interface FilterBarData {
 
 export function renderFilterBar(data: FilterBarData): string {
   return `
-    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6 mb-6">
       <div class="flex flex-wrap gap-4 items-center">
         ${data.filters.map(filter => `
           <div class="flex items-center space-x-2">
-            <label class="text-sm font-medium text-gray-700">${filter.label}:</label>
+            <label class="text-sm font-medium text-gray-300">${filter.label}:</label>
             <select 
               name="${filter.name}" 
               class="border border-gray-300 rounded-md px-3 py-1"

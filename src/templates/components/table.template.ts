@@ -21,7 +21,7 @@ export function renderTable<T = any>(data: TableData<T>): string {
   
   if (data.rows.length === 0) {
     return `
-      <div class="bg-gray-8 rounded-sm border border-gray-7 p-8 text-center shadow-default">
+      <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-8 text-center">
         <div class="text-gray-4">
           <svg class="mx-auto h-12 w-12 text-gray-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -33,10 +33,10 @@ export function renderTable<T = any>(data: TableData<T>): string {
   }
 
   return `
-    <div class="bg-gray-8 rounded-sm border border-gray-7 shadow-default overflow-hidden ${data.className || ''}" id="${tableId}">
+    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl overflow-hidden ${data.className || ''}" id="${tableId}">
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-7 sortable-table">
-          <thead class="bg-gray-7">
+        <table class="min-w-full divide-y divide-white/10 sortable-table">
+          <thead class="bg-white/5">
             <tr>
               ${data.selectable ? `
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-3 uppercase tracking-wider">

@@ -167,7 +167,7 @@ export function renderStatsCards(stats: DashboardStats): string {
   return `
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
       ${cards.map(card => `
-        <div class="card-hover rounded-sm border border-gray-7 bg-gray-8 py-6 px-7.5 shadow-default">
+        <div class="card-hover backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl py-6 px-7.5">
           <div class="flex h-11.5 w-11.5 items-center justify-center rounded-full ${card.color}">
             <div class="text-white">
               ${card.icon}
@@ -199,7 +199,7 @@ function renderStatsCardsSkeleton(): string {
   return `
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
       ${Array(4).fill(0).map(() => `
-        <div class="rounded-sm border border-gray-7 bg-gray-8 py-6 px-7.5 shadow-default animate-pulse">
+        <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl py-6 px-7.5 animate-pulse">
           <div class="h-11.5 w-11.5 rounded-full bg-gray-6"></div>
           <div class="mt-4">
             <div class="h-8 w-16 bg-gray-6 rounded mb-2"></div>
@@ -213,7 +213,7 @@ function renderStatsCardsSkeleton(): string {
 
 function renderAnalyticsChart(): string {
   return `
-    <div class="rounded-sm border border-gray-7 bg-gray-8 px-5 pt-7.5 pb-5 shadow-default sm:px-7.5">
+    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl px-5 pt-7.5 pb-5 sm:px-7.5">
       <div class="flex flex-wrap items-start justify-between gap-3 sm:flex-nowrap">
         <div class="flex w-full flex-wrap gap-3 sm:gap-5">
           <div class="flex min-w-47.5">
@@ -297,7 +297,7 @@ function renderRecentActivity(): string {
   ]
 
   return `
-    <div class="rounded-sm border border-gray-7 bg-gray-8 py-6 px-4 shadow-default sm:px-6">
+    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl py-6 px-4 sm:px-6">
       <div class="mb-4 justify-between sm:flex">
         <div>
           <h4 class="text-xl font-semibold text-gray-1">Recent Activity</h4>
@@ -373,7 +373,7 @@ function renderQuickActions(): string {
   ]
 
   return `
-    <div class="rounded-sm border border-gray-7 bg-gray-8 py-6 px-4 shadow-default sm:px-6">
+    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl py-6 px-4 sm:px-6">
       <h4 class="mb-6 text-xl font-semibold text-gray-1">Quick Actions</h4>
       
       <div class="space-y-3">
@@ -407,7 +407,7 @@ function renderSystemStatus(): string {
   ]
 
   return `
-    <div class="rounded-sm border border-gray-7 bg-gray-8 py-6 px-4 shadow-default sm:px-6">
+    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl py-6 px-4 sm:px-6">
       <h4 class="mb-6 text-xl font-semibold text-gray-1">System Status</h4>
       
       <div class="space-y-4">
@@ -433,7 +433,7 @@ function renderSystemStatus(): string {
 
 function renderStorageUsage(): string {
   return `
-    <div class="rounded-sm border border-gray-7 bg-gray-8 py-6 px-4 shadow-default sm:px-6">
+    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl py-6 px-4 sm:px-6">
       <h4 class="mb-6 text-xl font-semibold text-gray-1">Storage Usage</h4>
       
       <div class="space-y-4">

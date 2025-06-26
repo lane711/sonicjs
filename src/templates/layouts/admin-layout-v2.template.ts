@@ -30,6 +30,9 @@ export function renderAdminLayout(data: AdminLayoutData): string {
       darkMode: 'class',
       theme: {
         extend: {
+          backdropBlur: {
+            xs: '2px',
+          },
           colors: {
             primary: '#465FFF',
             secondary: '#212A3E',
@@ -172,8 +175,10 @@ export function renderAdminLayout(data: AdminLayoutData): string {
   ${data.styles ? data.styles.map(style => `<link rel="stylesheet" href="${style}">`).join('\n  ') : ''}
   ${data.scripts ? data.scripts.map(script => `<script src="${script}"></script>`).join('\n  ') : ''}
 </head>
-<body class="bg-gray-9 text-gray-1">
-  <div class="flex h-screen overflow-hidden">
+<body class="bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800 min-h-screen text-gray-1">
+  <!-- Background overlay with glass effect -->
+  <div class="fixed inset-0 bg-black/20 backdrop-blur-sm"></div>
+  <div class="relative z-10 flex h-screen overflow-hidden">
     ${renderSidebar(data.currentPath, data.user)}
     
     <div class="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
@@ -328,7 +333,7 @@ function renderSidebar(currentPath: string, user?: any): string {
     <!-- Sidebar -->
     <aside 
       id="sidebar"
-      class="absolute left-0 top-0 z-40 flex h-screen w-72 flex-col overflow-y-hidden bg-gray-8 duration-300 ease-linear lg:static lg:translate-x-0 -translate-x-full"
+      class="absolute left-0 top-0 z-40 flex h-screen w-72 flex-col overflow-y-hidden backdrop-blur-md bg-black/30 border-r border-white/10 shadow-xl duration-300 ease-linear lg:static lg:translate-x-0 -translate-x-full"
     >
       <!-- Sidebar Header -->
       <div class="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
@@ -357,7 +362,7 @@ function renderSidebar(currentPath: string, user?: any): string {
                   <li>
                     <a 
                       href="${item.path}"
-                      class="sidebar-item group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-gray-3 duration-300 ease-in-out hover:bg-gray-7 hover:text-white ${isActive ? 'bg-primary text-white' : ''}"
+                      class="sidebar-item group relative flex items-center gap-2.5 rounded-lg py-2 px-4 font-medium text-gray-300 duration-300 ease-in-out hover:bg-white/10 hover:text-white transition-all ${isActive ? 'bg-white/20 text-white' : ''}"
                     >
                       ${item.icon}
                       ${item.label}
@@ -379,7 +384,7 @@ function renderSidebar(currentPath: string, user?: any): string {
 function renderTopBar(pageTitle: string, user?: any): string {
   return `
     <!-- Top Bar -->
-    <header class="sticky top-0 z-30 flex w-full bg-gray-8 drop-shadow-1 dark:bg-gray-8 dark:drop-shadow-none border-b border-gray-7">
+    <header class="sticky top-0 z-30 flex w-full backdrop-blur-md bg-white/10 drop-shadow-1 shadow-lg border-b border-white/20">
       <div class="flex flex-grow items-center justify-between px-4 py-4 shadow-2 md:px-6 2xl:px-11">
         <div class="flex items-center gap-2 sm:gap-4">
           <!-- Sidebar Toggle -->
@@ -446,26 +451,26 @@ function renderTopBar(pageTitle: string, user?: any): string {
                 x-transition:leave="transition ease-in duration-75"
                 x-transition:leave-start="transform opacity-100 scale-100"
                 x-transition:leave-end="transform opacity-0 scale-95"
-                class="absolute right-0 mt-2 w-48 rounded-sm border border-gray-6 bg-gray-8 py-1.5 shadow-default"
+                class="absolute right-0 mt-2 w-48 backdrop-blur-md bg-black/40 rounded-xl border border-white/10 shadow-xl py-1.5 z-[9999]"
               >
-                <div class="px-4 py-2 border-b border-gray-7">
+                <div class="px-4 py-2 border-b border-white/10">
                   <p class="text-sm font-medium text-gray-1">${user.name}</p>
                   <p class="text-xs text-gray-4">${user.email}</p>
                 </div>
-                <a href="/admin/profile" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-3 hover:bg-gray-7 hover:text-white">
+                <a href="/admin/profile" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                   </svg>
                   My Profile
                 </a>
-                <a href="/admin/settings" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-3 hover:bg-gray-7 hover:text-white">
+                <a href="/admin/settings" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                   </svg>
                   Settings
                 </a>
-                <a href="/auth/logout" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-3 hover:bg-gray-7 hover:text-white">
+                <a href="/auth/logout" class="flex items-center gap-3 px-4 py-2 text-sm text-red-300 hover:bg-red-500/10 hover:text-red-200 transition-colors">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                   </svg>
