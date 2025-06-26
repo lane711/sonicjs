@@ -126,7 +126,9 @@
       "WebFetch(domain:demo.tailadmin.com)",
       "WebFetch(domain:tailadmin.com)",
       "Bash(wrangler d1 execute:*)",
-      "WebFetch(domain:demo.sonicjs.com)"
+      "WebFetch(domain:demo.sonicjs.com)",
+      "Bash(rm:*)",
+      "Bash(timeout 10s npm run dev)"
     ],
     "deny": []
   }

@@ -151,6 +151,18 @@ export const emailVariables = sqliteTable('email_variables', {
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
 });
 
+// Workflow history for content workflow tracking
+export const workflowHistory = sqliteTable('workflow_history', {
+  id: text('id').primaryKey(),
+  contentId: text('content_id').notNull().references(() => content.id),
+  action: text('action').notNull(),
+  fromStatus: text('from_status').notNull(),
+  toStatus: text('to_status').notNull(),
+  userId: text('user_id').notNull().references(() => users.id),
+  comment: text('comment'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+});
+
 // Zod schemas for validation
 export const insertUserSchema = createInsertSchema(users, {
   email: (schema) => schema.email(),
@@ -221,6 +233,14 @@ export const insertEmailVariableSchema = createInsertSchema(emailVariables, {
 
 export const selectEmailVariableSchema = createSelectSchema(emailVariables);
 
+export const insertWorkflowHistorySchema = createInsertSchema(workflowHistory, {
+  action: (schema) => schema.min(1),
+  fromStatus: (schema) => schema.min(1),
+  toStatus: (schema) => schema.min(1),
+});
+
+export const selectWorkflowHistorySchema = createSelectSchema(workflowHistory);
+
 // Type exports
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -238,3 +258,5 @@ export type EmailLog = typeof emailLogs.$inferSelect;
 export type NewEmailLog = typeof emailLogs.$inferInsert;
 export type EmailVariable = typeof emailVariables.$inferSelect;
 export type NewEmailVariable = typeof emailVariables.$inferInsert;
+export type WorkflowHistory = typeof workflowHistory.$inferSelect;
+export type NewWorkflowHistory = typeof workflowHistory.$inferInsert;

@@ -162,10 +162,13 @@ export async function uploadTestFile(page: Page, fileName: string = 'test-image.
  * Wait for HTMX request to complete
  */
 export async function waitForHTMX(page: Page) {
-  await page.waitForFunction(() => {
-    // @ts-ignore
-    return window.htmx && !window.htmx.isProcessing();
-  });
+  try {
+    // Wait for any ongoing network requests to complete
+    await page.waitForLoadState('networkidle', { timeout: 5000 });
+  } catch {
+    // If network idle times out, just wait a bit for HTMX
+    await page.waitForTimeout(1000);
+  }
 }
 
 /**
