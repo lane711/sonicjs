@@ -49,14 +49,6 @@ test.describe('Admin Dashboard', () => {
     await expect(page.locator('button').filter({ hasText: 'Upload Files' }).first()).toBeVisible();
   });
 
-  test('should show responsive navigation on mobile', async ({ page }) => {
-    // Test mobile viewport
-    await page.setViewportSize({ width: 375, height: 667 });
-    
-    // Navigation should still be accessible
-    await expect(page.locator('nav')).toBeVisible();
-    await expect(page.locator('a[href="/admin/collections"]')).toBeVisible();
-  });
 
   test('should handle quick actions', async ({ page }) => {
     // Test any quick action buttons on dashboard

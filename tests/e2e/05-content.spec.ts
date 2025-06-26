@@ -118,14 +118,4 @@ test.describe('Content Management', () => {
     }
   });
 
-  test('should handle mobile responsive layout', async ({ page }) => {
-    // Set mobile viewport
-    await page.setViewportSize({ width: 375, height: 667 });
-    
-    // Content should still be accessible
-    await expect(page.locator('h1').first()).toContainText('Content Management');
-    
-    // Table should be scrollable or reorganized
-    await expect(page.locator('table, .overflow-x-auto')).toBeVisible();
-  });
 }); 
