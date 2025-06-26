@@ -74,7 +74,7 @@ export class DatabaseEmailManagementService implements EmailManagementService {
   async getThemes(): Promise<EmailTheme[]> {
     const stmt = this.db.prepare('SELECT * FROM email_themes ORDER BY is_default DESC, name ASC');
     const results = await stmt.all();
-    return results.map(this.mapThemeFromDb);
+    return results.results.map(this.mapThemeFromDb);
   }
 
   async getThemeById(id: string): Promise<EmailTheme | null> {
@@ -194,7 +194,7 @@ export class DatabaseEmailManagementService implements EmailManagementService {
       ORDER BY t.name ASC
     `);
     const results = await stmt.all();
-    return results.map(this.mapTemplateFromDb);
+    return results.results.map(this.mapTemplateFromDb);
   }
 
   async getTemplateById(id: string): Promise<EmailTemplate | null> {
@@ -299,13 +299,13 @@ export class DatabaseEmailManagementService implements EmailManagementService {
   async getVariables(): Promise<EmailVariable[]> {
     const stmt = this.db.prepare('SELECT * FROM email_variables ORDER BY is_system DESC, name ASC');
     const results = await stmt.all();
-    return results.map(this.mapVariableFromDb);
+    return results.results.map(this.mapVariableFromDb);
   }
 
   async getSystemVariables(): Promise<EmailVariable[]> {
     const stmt = this.db.prepare('SELECT * FROM email_variables WHERE is_system = 1 ORDER BY name ASC');
     const results = await stmt.all();
-    return results.map(this.mapVariableFromDb);
+    return results.results.map(this.mapVariableFromDb);
   }
 
   // Setup and initialization
