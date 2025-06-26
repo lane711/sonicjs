@@ -21,31 +21,38 @@ export interface CollectionsListPageData {
 
 export function renderCollectionsListPage(data: CollectionsListPageData): string {
   const tableData: TableData<Collection> = {
+    tableId: 'collections-table',
     columns: [
       {
         key: 'name',
         label: 'Name',
         sortable: true,
+        sortType: 'string',
         render: (value, collection) => `<code class="text-sm bg-gray-100 px-2 py-1 rounded">${collection.name}</code>`
       },
       {
         key: 'display_name',
         label: 'Display Name',
-        sortable: true
+        sortable: true,
+        sortType: 'string'
       },
       {
         key: 'description',
         label: 'Description',
+        sortable: true,
+        sortType: 'string',
         render: (value, collection) => collection.description || '<span class="text-gray-400">-</span>'
       },
       {
         key: 'formattedDate',
         label: 'Created',
-        sortable: true
+        sortable: true,
+        sortType: 'date'
       },
       {
         key: 'actions',
         label: 'Actions',
+        sortable: false,
         render: (value, collection) => {
           if (!collection || !collection.id) return '<span class="text-gray-400">-</span>'
           return `

@@ -85,6 +85,8 @@ export function renderContentListPage(data: ContentListPageData): string {
     {
       key: 'title',
       label: 'Title',
+      sortable: true,
+      sortType: 'string',
       render: (value, row) => `
         <div class="flex items-center">
           <div>
@@ -99,26 +101,35 @@ export function renderContentListPage(data: ContentListPageData): string {
     {
       key: 'modelName',
       label: 'Model',
+      sortable: true,
+      sortType: 'string',
       className: 'text-sm text-gray-900'
     },
     {
       key: 'statusBadge',
       label: 'Status',
+      sortable: true,
+      sortType: 'string',
       render: (value) => value
     },
     {
       key: 'authorName',
       label: 'Author',
+      sortable: true,
+      sortType: 'string',
       className: 'text-sm text-gray-900'
     },
     {
       key: 'formattedDate',
       label: 'Updated',
+      sortable: true,
+      sortType: 'date',
       className: 'text-sm text-gray-500'
     },
     {
       key: 'actions',
       label: 'Actions',
+      sortable: false,
       className: 'text-sm font-medium',
       render: (value, row) => `
         <div class="flex space-x-2">
@@ -156,6 +167,7 @@ export function renderContentListPage(data: ContentListPageData): string {
   ]
 
   const tableData: TableData<ContentItem> = {
+    tableId: 'content-table',
     columns: tableColumns,
     rows: data.contentItems,
     selectable: true,

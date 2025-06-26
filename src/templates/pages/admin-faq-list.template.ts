@@ -95,12 +95,13 @@ export function renderFAQList(data: FAQListData): string {
       <!-- FAQ List -->
       <div id="faq-list">
         ${faqs.length > 0 ? renderTable({
+          tableId: 'faq-table',
           columns: [
-            { key: 'question', label: 'Question', sortable: true },
-            { key: 'category', label: 'Category', sortable: true },
-            { key: 'isPublished', label: 'Status', sortable: true },
-            { key: 'sortOrder', label: 'Order', sortable: true },
-            { key: 'created_at', label: 'Created', sortable: true },
+            { key: 'question', label: 'Question', sortable: true, sortType: 'string' },
+            { key: 'category', label: 'Category', sortable: true, sortType: 'string' },
+            { key: 'isPublished', label: 'Status', sortable: true, sortType: 'boolean' },
+            { key: 'sortOrder', label: 'Order', sortable: true, sortType: 'number' },
+            { key: 'created_at', label: 'Created', sortable: true, sortType: 'date' },
             { key: 'actions', label: 'Actions', sortable: false }
           ],
           rows: faqs.map(faq => ({

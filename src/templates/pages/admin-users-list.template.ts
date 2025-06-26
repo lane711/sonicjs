@@ -40,6 +40,7 @@ export function renderUsersListPage(data: UsersListPageData): string {
       key: 'avatar',
       label: '',
       className: 'w-12',
+      sortable: false,
       render: (value: string | null, row: User) => {
         const initials = `${row.firstName.charAt(0)}${row.lastName.charAt(0)}`.toUpperCase()
         if (value) {
@@ -55,6 +56,8 @@ export function renderUsersListPage(data: UsersListPageData): string {
     {
       key: 'name',
       label: 'Name',
+      sortable: true,
+      sortType: 'string',
       render: (value: any, row: User) => {
         const fullName = `${row.firstName} ${row.lastName}`
         const statusBadge = row.isActive ? 
@@ -71,11 +74,15 @@ export function renderUsersListPage(data: UsersListPageData): string {
     {
       key: 'email',
       label: 'Email',
+      sortable: true,
+      sortType: 'string',
       render: (value: string) => `<a href="mailto:${value}" class="text-blue-600 hover:text-blue-900">${value}</a>`
     },
     {
       key: 'role',
       label: 'Role',
+      sortable: true,
+      sortType: 'string',
       render: (value: string) => {
         const roleColors = {
           admin: 'bg-red-100 text-red-800',
@@ -90,6 +97,8 @@ export function renderUsersListPage(data: UsersListPageData): string {
     {
       key: 'lastLoginAt',
       label: 'Last Login',
+      sortable: true,
+      sortType: 'date',
       render: (value: number | null) => {
         if (!value) return '<span class="text-gray-400">Never</span>'
         return `<span class="text-sm text-gray-900">${new Date(value).toLocaleDateString()}</span>`
@@ -98,12 +107,15 @@ export function renderUsersListPage(data: UsersListPageData): string {
     {
       key: 'createdAt',
       label: 'Created',
+      sortable: true,
+      sortType: 'date',
       render: (value: number) => `<span class="text-sm text-gray-900">${new Date(value).toLocaleDateString()}</span>`
     },
     {
       key: 'actions',
       label: 'Actions',
       className: 'text-right',
+      sortable: false,
       render: (value: any, row: User) => `
         <div class="flex justify-end space-x-2">
           <a href="/admin/users/${row.id}" class="text-blue-600 hover:text-blue-900 text-sm">View</a>
@@ -118,6 +130,7 @@ export function renderUsersListPage(data: UsersListPageData): string {
   ]
 
   const tableData: TableData<User> = {
+    tableId: 'users-table',
     columns,
     rows: data.users,
     selectable: false,
