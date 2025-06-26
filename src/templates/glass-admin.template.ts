@@ -130,7 +130,7 @@ export function renderGlassAdminTemplate(): string {
             <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
                 <!-- Sidebar -->
                 <div class="lg:col-span-1">
-                    <nav class="backdrop-blur-md bg-black/30 rounded-xl border border-white/10 shadow-xl p-6">
+                    <nav class="backdrop-blur-md bg-black/30 rounded-xl border border-white/10 shadow-xl p-6 h-[calc(100vh-9.5rem)] sticky top-8">
                         <div class="space-y-4">
                             <a href="#" class="flex items-center space-x-3 text-white bg-white/20 rounded-lg px-3 py-2 transition-all hover:bg-white/30">
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
