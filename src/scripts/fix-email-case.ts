@@ -51,10 +51,10 @@ async function fixEmailCases() {
       
       if (currentEmail !== normalizedEmail) {
         try {
-          await db.execute({
-            sql: 'UPDATE users SET email = ?, updated_at = ? WHERE id = ?',
-            args: [normalizedEmail, Date.now(), user.id]
-          })
+          await db.execute(
+            'UPDATE users SET email = ?, updated_at = ? WHERE id = ?',
+            [normalizedEmail, Date.now(), user.id || '']
+          )
           
           console.log(`✅ Normalized: ${currentEmail} → ${normalizedEmail}`)
           normalizedCount++

@@ -12,6 +12,7 @@ import { contentRoutes } from './routes/content'
 import { mediaRoutes } from './routes/media'
 import { adminMediaRoutes } from './routes/admin-media'
 import { apiMediaRoutes } from './routes/api-media'
+import emailRoutes from './routes/admin/email'
 import { requireAuth, requireRole, optionalAuth } from './middleware/auth'
 
 // Define the Cloudflare Workers environment
@@ -19,6 +20,9 @@ type Bindings = {
   DB: D1Database
   KV: KVNamespace
   MEDIA_BUCKET: R2Bucket
+  EMAIL_QUEUE?: Queue
+  SENDGRID_API_KEY?: string
+  DEFAULT_FROM_EMAIL?: string
   IMAGES_ACCOUNT_ID?: string
   IMAGES_API_TOKEN?: string
 }
@@ -61,6 +65,7 @@ app.route('/admin', adminRoutes)
 app.route('/admin/media', adminMediaRoutes)
 app.route('/admin/content', adminContentRoutes)
 app.route('/admin/faq', adminFAQRoutes)
+app.route('/admin/email', emailRoutes)
 
 // Root redirect to login
 app.get('/', (c) => {

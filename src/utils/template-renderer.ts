@@ -126,3 +126,9 @@ export class TemplateRenderer {
 
 // Export singleton instance
 export const templateRenderer = new TemplateRenderer()
+
+// Utility function to render template strings directly
+export function renderTemplate(template: string, data: TemplateData = {}): string {
+  const renderer = new TemplateRenderer()
+  return renderer['renderTemplate'](template, data)
+}
