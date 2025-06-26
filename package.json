@@ -37,7 +37,7 @@
     "@types/semver": "^7.7.0",
     "playwright": "^1.53.1",
     "tsx": "^4.20.3",
-    "typescript": "^5",
+    "typescript": "^5.8.3",
     "vitest": "^2.1.8",
     "wrangler": "^4.20.5"
   }

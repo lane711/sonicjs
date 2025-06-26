@@ -5,6 +5,7 @@ import { prettyJSON } from 'hono/pretty-json'
 import { apiRoutes } from './routes/api'
 import { adminRoutes } from './routes/admin'
 import { adminContentRoutes } from './routes/admin-content'
+import adminFAQRoutes from './routes/admin-faq'
 import { docsRoutes } from './routes/docs'
 import { authRoutes } from './routes/auth'
 import { contentRoutes } from './routes/content'
@@ -59,6 +60,7 @@ app.use('/admin/*', requireRole(['admin', 'editor']))
 app.route('/admin', adminRoutes)
 app.route('/admin/media', adminMediaRoutes)
 app.route('/admin/content', adminContentRoutes)
+app.route('/admin/faq', adminFAQRoutes)
 
 // Root redirect to login
 app.get('/', (c) => {
