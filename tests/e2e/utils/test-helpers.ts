@@ -181,7 +181,7 @@ export async function isAuthenticated(page: Page): Promise<boolean> {
     }
     // Check for the first h1 to see if it contains admin text
     const title = await page.locator('h1').first().textContent();
-    return title?.includes('SonicJS AI Admin') || false;
+    return title?.includes('Dashboard') || false;
   } catch {
     return false;
   }

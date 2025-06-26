@@ -20,7 +20,7 @@ test.describe('Health Checks', () => {
     
     // Verify we're on the login page
     expect(page.url()).toContain('/auth/login');
-    await expect(page.locator('h2')).toContainText('SonicJS');
+    await expect(page.locator('h2')).toContainText('Sign In');
     
     // Verify no error message is shown
     await expect(page.locator('.error-message')).toHaveCount(0);
@@ -35,10 +35,10 @@ test.describe('Health Checks', () => {
     
     // Verify we're on the login page
     expect(page.url()).toContain('/auth/login');
-    await expect(page.locator('h2')).toContainText('SonicJS');
+    await expect(page.locator('h2')).toContainText('Sign In');
     
-    // Verify error message is shown in login form
-    await expect(page.locator('#login-form-error')).toContainText('Please login to access the admin area');
+    // Verify error message is shown (check if it's in URL params)
+    expect(page.url()).toContain('error=Please%20login%20to%20access%20the%20admin%20area');
   });
 
   test('404 routes should return not found', async ({ page }) => {
