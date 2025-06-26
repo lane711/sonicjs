@@ -1,5 +1,5 @@
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
+// Template renderer compatible with Cloudflare Workers
+// No filesystem access available
 
 interface TemplateData {
   [key: string]: any
@@ -7,28 +7,9 @@ interface TemplateData {
 
 export class TemplateRenderer {
   private templateCache = new Map<string, string>()
-  private templatesPath: string
 
-  constructor(templatesPath: string = 'src/templates') {
-    this.templatesPath = templatesPath
-  }
-
-  /**
-   * Load template from file system
-   */
-  private loadTemplate(templatePath: string): string {
-    if (this.templateCache.has(templatePath)) {
-      return this.templateCache.get(templatePath)!
-    }
-
-    try {
-      const fullPath = join(process.cwd(), this.templatesPath, templatePath)
-      const template = readFileSync(fullPath, 'utf-8')
-      this.templateCache.set(templatePath, template)
-      return template
-    } catch (error) {
-      throw new Error(`Failed to load template: ${templatePath}`)
-    }
+  constructor() {
+    // Cloudflare Workers compatible - no filesystem access
   }
 
   /**
@@ -102,11 +83,9 @@ export class TemplateRenderer {
   }
 
   /**
-   * Render a template with data
+   * Render a template string with data
    */
-  render(templatePath: string, data: TemplateData = {}): string {
-    const template = this.loadTemplate(templatePath)
-    
+  render(template: string, data: TemplateData = {}): string {
     // Add helper functions to data
     const templateData = {
       ...data,
