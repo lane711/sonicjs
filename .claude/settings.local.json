@@ -128,7 +128,8 @@
       "Bash(wrangler d1 execute:*)",
       "WebFetch(domain:demo.sonicjs.com)",
       "Bash(rm:*)",
-      "Bash(timeout 10s npm run dev)"
+      "Bash(timeout 10s npm run dev)",
+      "Bash(timeout 180s npm run test:e2e)"
     ],
     "deny": []
   }
