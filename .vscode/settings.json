@@ -18,5 +18,10 @@
         "titleBar.inactiveBackground": "#dd053199",
         "titleBar.inactiveForeground": "#e7e7e799"
     },
-    "peacock.color": "#dd0531"
+    "peacock.color": "#dd0531",
+    "playwright.reuseBrowser": false,
+    "playwright.showTrace": false,
+    "files.associations": {
+        "*.spec.ts": "typescript"
+    }
 }

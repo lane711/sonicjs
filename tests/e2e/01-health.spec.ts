@@ -37,8 +37,8 @@ test.describe('Health Checks', () => {
     expect(page.url()).toContain('/auth/login');
     await expect(page.locator('h2')).toContainText('Sign In');
     
-    // Verify error message is shown (check if it's in URL params)
-    expect(page.url()).toContain('error=Please%20login%20to%20access%20the%20admin%20area');
+    // Verify error message is shown
+    await expect(page.locator('.bg-error\\/10')).toContainText('Please login to access the admin area');
   });
 
   test('404 routes should return not found', async ({ page }) => {
