@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+export function renderGlassAdminTemplate(): string {
+  return `<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
@@ -25,7 +26,7 @@
     <!-- Main container -->
     <div class="relative z-10 min-h-screen">
         <!-- Header -->
-        <header class="backdrop-blur-md bg-white/10 border-b border-white/20 shadow-lg">
+        <header class="backdrop-blur-md bg-white/10 border-b border-white/20 shadow-lg relative z-[9998]">
             <div class="px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center py-4">
                     <div class="flex items-center space-x-4">
@@ -51,14 +52,14 @@
                         </button>
                         
                         <!-- User Dropdown -->
-                        <div class="relative">
+                        <div class="relative z-[9999]">
                             <button class="flex items-center space-x-3 p-2 rounded-lg hover:bg-white/10 transition-colors group" onclick="toggleUserDropdown()">
                                 <div class="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center">
                                     <span class="text-white text-sm font-medium">JD</span>
                                 </div>
                                 <div class="hidden md:block text-left">
                                     <div class="text-white text-sm font-medium">John Doe</div>
-                                    <div class="text-gray-400 text-xs">Administrator</div>
+                                    <div class="text-gray-400 text-xs">Administrator TS</div>
                                 </div>
                                 <svg class="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -66,7 +67,7 @@
                             </button>
                             
                             <!-- Dropdown Menu -->
-                            <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 backdrop-blur-md bg-black/40 rounded-xl border border-white/10 shadow-xl z-50">
+                            <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 backdrop-blur-md bg-black/95 rounded-xl border border-white/10 shadow-xl z-[9999]">
                                 <div class="py-2">
                                     <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-colors">
                                         <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -284,4 +285,5 @@
         </div>
     </div>
 </body>
-</html>
+</html>`
+}
