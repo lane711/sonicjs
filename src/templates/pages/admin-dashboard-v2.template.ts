@@ -42,23 +42,7 @@ export interface DashboardPageData {
 
 export function renderDashboardPage(data: DashboardPageData): string {
   const pageContent = `
-    <!-- Dashboard Header -->
-    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <h2 class="text-title-md2 font-semibold text-gray-1">
-        Welcome back, ${data.user?.name || 'Admin'}! 👋
-      </h2>
-      <div class="flex items-center gap-2">
-        <button 
-          onclick="refreshDashboard()"
-          class="flex items-center gap-2 rounded-md bg-gray-7 px-4 py-2 text-sm font-medium text-gray-3 hover:bg-gray-6 hover:text-white"
-        >
-          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-          </svg>
-          Refresh
-        </button>
-      </div>
-    </div>
+    
 
     <!-- Stats Cards -->
     <div 
@@ -125,70 +109,50 @@ export function renderStatsCards(stats: DashboardStats): string {
     {
       title: 'Total Collections',
       value: stats.collections.toString(),
-      change: '+4.5%',
-      changeType: 'positive',
-      icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-      </svg>`,
-      color: 'bg-blue-500'
+      icon: `<svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+          </svg>`,
+      color: 'bg-gradient-to-br from-blue-400 to-purple-500'
     },
     {
       title: 'Content Items',
       value: stats.contentItems.toString(),
-      change: '+12.3%',
-      changeType: 'positive',
-      icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-      </svg>`,
-      color: 'bg-green-500'
+      icon: `<svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"/>
+          </svg>`,
+      color: 'bg-gradient-to-br from-green-400 to-teal-500'
     },
     {
       title: 'Media Files',
       value: stats.mediaFiles.toString(),
-      change: '+8.1%',
-      changeType: 'positive',
-      icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-      </svg>`,
-      color: 'bg-purple-500'
+      icon: `<svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 2L3 7v11a1 1 0 001 1h12a1 1 0 001-1V7l-7-5zM10 12a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+          </svg>`,
+      color: 'bg-gradient-to-br from-orange-400 to-pink-500'
     },
     {
       title: 'Active Users',
       value: stats.users.toString(),
-      change: '+2.4%',
-      changeType: 'positive',
-      icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
-      </svg>`,
-      color: 'bg-orange-500'
+      icon: `<svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+          </svg>`,
+      color: 'bg-gradient-to-br from-cyan-400 to-blue-600'
     }
   ]
 
   return `
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
       ${cards.map(card => `
-        <div class="card-hover backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl py-6 px-7.5">
-          <div class="flex h-11.5 w-11.5 items-center justify-center rounded-full ${card.color}">
-            <div class="text-white">
-              ${card.icon}
+        <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-300 text-sm">${card.title}</p>
+                    <p class="text-white text-2xl font-bold">${card.value}</p>
+                </div>
+                <div class="w-12 h-12 ${card.color} rounded-lg flex items-center justify-center">
+                    ${card.icon}
+                </div>
             </div>
-          </div>
-          
-          <div class="mt-4 flex items-end justify-between">
-            <div>
-              <h4 class="text-title-md font-bold text-gray-1">
-                ${card.value}
-              </h4>
-              <span class="text-sm font-medium text-gray-4">${card.title}</span>
-            </div>
-            
-            <span class="flex items-center gap-1 text-sm font-medium ${card.changeType === 'positive' ? 'text-success' : 'text-error'}">
-              ${card.change}
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${card.changeType === 'positive' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"/>
-              </svg>
-            </span>
-          </div>
         </div>
       `).join('')}
     </div>
@@ -197,13 +161,15 @@ export function renderStatsCards(stats: DashboardStats): string {
 
 function renderStatsCardsSkeleton(): string {
   return `
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
       ${Array(4).fill(0).map(() => `
-        <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl py-6 px-7.5 animate-pulse">
-          <div class="h-11.5 w-11.5 rounded-full bg-gray-6"></div>
-          <div class="mt-4">
-            <div class="h-8 w-16 bg-gray-6 rounded mb-2"></div>
-            <div class="h-4 w-24 bg-gray-6 rounded"></div>
+        <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6 animate-pulse">
+          <div class="flex items-center justify-between">
+              <div>
+                  <div class="h-4 w-24 bg-gray-6 rounded mb-2"></div>
+                  <div class="h-8 w-16 bg-gray-6 rounded"></div>
+              </div>
+              <div class="w-12 h-12 bg-gray-6 rounded-lg"></div>
           </div>
         </div>
       `).join('')}
@@ -213,7 +179,7 @@ function renderStatsCardsSkeleton(): string {
 
 function renderAnalyticsChart(): string {
   return `
-    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl px-5 pt-7.5 pb-5 sm:px-7.5">
+    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6">
       <div class="flex flex-wrap items-start justify-between gap-3 sm:flex-nowrap">
         <div class="flex w-full flex-wrap gap-3 sm:gap-5">
           <div class="flex min-w-47.5">
@@ -237,13 +203,13 @@ function renderAnalyticsChart(): string {
         </div>
         <div class="flex w-full max-w-45 justify-end">
           <div class="inline-flex items-center rounded-md bg-gray-7 p-1.5">
-            <button class="rounded bg-white py-1 px-3 text-xs font-medium text-gray-8 shadow-card hover:bg-gray-1">
+            <button class="rounded bg-white/10 py-1 px-3 text-xs font-medium text-gray-300 shadow-card hover:bg-white/20">
               Day
             </button>
-            <button class="py-1 px-3 text-xs font-medium text-gray-4 hover:bg-gray-6 hover:text-white">
+            <button class="py-1 px-3 text-xs font-medium text-gray-300 hover:bg-white/10">
               Week
             </button>
-            <button class="py-1 px-3 text-xs font-medium text-gray-4 hover:bg-gray-6 hover:text-white">
+            <button class="py-1 px-3 text-xs font-medium text-gray-300 hover:bg-white/10">
               Month
             </button>
           </div>
@@ -304,7 +270,7 @@ function renderRecentActivity(): string {
         </div>
         <div>
           <div class="relative z-20 inline-block">
-            <select class="relative z-20 inline-flex appearance-none bg-transparent py-1 pl-3 pr-8 text-sm font-medium outline-none text-gray-4">
+            <select class="relative z-20 inline-flex appearance-none bg-transparent py-1 pl-3 pr-8 text-sm font-medium outline-none text-gray-300">
               <option value="" class="text-gray-8">Today</option>
               <option value="" class="text-gray-8">This Week</option>
               <option value="" class="text-gray-8">This Month</option>
@@ -321,19 +287,19 @@ function renderRecentActivity(): string {
       <div class="space-y-4">
         ${activities.map(activity => `
           <div class="flex items-center gap-3">
-            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-7">
+            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white/10">
               ${activity.icon}
             </div>
             <div class="flex-1">
               <p class="text-sm font-medium text-gray-1">${activity.description}</p>
-              <p class="text-xs text-gray-4">by ${activity.user} • ${activity.time}</p>
+              <p class="text-xs text-gray-4">${activity.user} • ${activity.time}</p>
             </div>
           </div>
         `).join('')}
       </div>
       
       <div class="mt-6">
-        <a href="/admin/activity" class="flex w-full items-center justify-center rounded bg-gray-7 py-2 px-4 text-sm font-medium text-gray-3 hover:bg-gray-6 hover:text-white">
+        <a href="/admin/activity" class="flex w-full items-center justify-center rounded bg-white/10 py-2 px-4 text-sm font-medium text-gray-300 hover:bg-white/20">
           View All Activity
         </a>
       </div>
@@ -373,13 +339,13 @@ function renderQuickActions(): string {
   ]
 
   return `
-    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl py-6 px-4 sm:px-6">
+    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6">
       <h4 class="mb-6 text-xl font-semibold text-gray-1">Quick Actions</h4>
       
       <div class="space-y-3">
         ${actions.map(action => `
           <a href="${action.href}" class="block group">
-            <div class="flex items-center gap-3 rounded-lg bg-gray-7 p-3 hover:bg-gray-6 transition-colors">
+            <div class="flex items-center gap-3 rounded-lg bg-white/10 p-3 hover:bg-white/20 transition-colors">
               <div class="flex h-10 w-10 items-center justify-center rounded-lg ${action.color}">
                 ${action.icon}
               </div>
@@ -407,7 +373,7 @@ function renderSystemStatus(): string {
   ]
 
   return `
-    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl py-6 px-4 sm:px-6">
+    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6">
       <h4 class="mb-6 text-xl font-semibold text-gray-1">System Status</h4>
       
       <div class="space-y-4">
@@ -423,7 +389,7 @@ function renderSystemStatus(): string {
       </div>
       
       <div class="mt-6">
-        <button class="flex w-full items-center justify-center rounded bg-gray-7 py-2 px-4 text-sm font-medium text-gray-3 hover:bg-gray-6 hover:text-white">
+        <button class="flex w-full items-center justify-center rounded bg-white/10 py-2 px-4 text-sm font-medium text-gray-300 hover:bg-white/20">
           View Details
         </button>
       </div>
@@ -433,7 +399,7 @@ function renderSystemStatus(): string {
 
 function renderStorageUsage(): string {
   return `
-    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl py-6 px-4 sm:px-6">
+    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6">
       <h4 class="mb-6 text-xl font-semibold text-gray-1">Storage Usage</h4>
       
       <div class="space-y-4">
@@ -442,7 +408,7 @@ function renderStorageUsage(): string {
             <span class="text-sm text-gray-3">Database</span>
             <span class="text-sm text-gray-1">2.3 GB / 10 GB</span>
           </div>
-          <div class="w-full bg-gray-7 rounded-full h-2">
+          <div class="w-full bg-white/10 rounded-full h-2">
             <div class="bg-primary h-2 rounded-full" style="width: 23%"></div>
           </div>
         </div>
@@ -452,7 +418,7 @@ function renderStorageUsage(): string {
             <span class="text-sm text-gray-3">Media Files</span>
             <span class="text-sm text-gray-1">4.7 GB / 20 GB</span>
           </div>
-          <div class="w-full bg-gray-7 rounded-full h-2">
+          <div class="w-full bg-white/10 rounded-full h-2">
             <div class="bg-success h-2 rounded-full" style="width: 23.5%"></div>
           </div>
         </div>
@@ -462,14 +428,14 @@ function renderStorageUsage(): string {
             <span class="text-sm text-gray-3">Backup</span>
             <span class="text-sm text-gray-1">1.2 GB / 5 GB</span>
           </div>
-          <div class="w-full bg-gray-7 rounded-full h-2">
+          <div class="w-full bg-white/10 rounded-full h-2">
             <div class="bg-warning h-2 rounded-full" style="width: 24%"></div>
           </div>
         </div>
       </div>
       
       <div class="mt-6">
-        <button class="flex w-full items-center justify-center rounded bg-gray-7 py-2 px-4 text-sm font-medium text-gray-3 hover:bg-gray-6 hover:text-white">
+        <button class="flex w-full items-center justify-center rounded bg-white/10 py-2 px-4 text-sm font-medium text-gray-300 hover:bg-white/20">
           Manage Storage
         </button>
       </div>

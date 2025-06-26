@@ -41,12 +41,20 @@ export function renderTable<T = any>(data: TableData<T>): string {
         </div>
       ` : ''}
       <div class="overflow-x-auto">
+<<<<<<< Updated upstream
         <table class="w-full sortable-table">
+=======
+        <table class="w-full divide-y divide-white/10 sortable-table">
+>>>>>>> Stashed changes
           <thead class="bg-white/5">
             <tr>
               ${data.selectable ? `
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+<<<<<<< Updated upstream
                   <input type="checkbox" class="rounded bg-gray-800 border-gray-600 text-blue-500 focus:ring-blue-500" id="select-all-${tableId}">
+=======
+                  <input type="checkbox" class="rounded bg-white/10 border-white/30 text-blue-400 focus:ring-blue-400 row-checkbox" id="select-all-${tableId}">
+>>>>>>> Stashed changes
                 </th>
               ` : ''}
               ${data.columns.map((column, index) => `
@@ -88,7 +96,11 @@ export function renderTable<T = any>(data: TableData<T>): string {
                     const value = (row as any)[column.key]
                     const displayValue = column.render ? column.render(value, row) : value
                     return `
+<<<<<<< Updated upstream
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300 ${column.className || ''}">
+=======
+                      <td class="px-6 py-4 whitespace-nowrap text-gray-300 ${column.className || ''}">
+>>>>>>> Stashed changes
                         ${displayValue || ''}
                       </td>
                     `
