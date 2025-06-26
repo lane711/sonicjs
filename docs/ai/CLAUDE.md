@@ -26,3 +26,33 @@ This project is a Cloudflare-native headless CMS built with **Hono.js** and Type
 - **TypeScript-First**: Strong typing throughout the application
 - **Configuration over UI**: Developer-centric approach
 - **AI-Friendly**: Clean, structured codebase for AI assistance
+
+## Claude AI Memory Setup
+
+This project uses Claude's memory MCP server to maintain context across sessions. The memory is stored in a shared file so all developers benefit from accumulated project knowledge.
+
+### Setup for New Developers
+
+1. **Copy shared settings**:
+   ```bash
+   cp .claude/settings.shared.json .claude/settings.local.json
+   ```
+
+2. **Install memory MCP server**:
+   ```bash
+   npm install -g @modelcontextprotocol/server-memory
+   ```
+
+3. **Restart Claude Desktop** to load the MCP server
+
+### Memory Storage
+
+- **Location**: `docs/ai/claude-memory.json`
+- **Tracked in Git**: Yes, so all developers share the same context
+- **Contains**: Project facts, user preferences, development patterns, and accumulated knowledge
+
+### Benefits
+
+- **Persistent Context**: Claude remembers project details across sessions
+- **Team Knowledge**: Shared memory means consistent AI assistance for all developers
+- **Learning**: Memory improves over time as more context is added

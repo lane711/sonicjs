@@ -72,3 +72,6 @@ coverage/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Claude AI memory (shared across developers)
+!docs/ai/claude-memory.json
