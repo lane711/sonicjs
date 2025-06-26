@@ -1,4 +1,11 @@
 {
+  "mcpServers": {
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    }
+  },
+
   "permissions": {
     "allow": [
       "Bash(source:*)",

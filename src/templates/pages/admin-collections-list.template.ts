@@ -28,9 +28,6 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
         label: 'Name',
         sortable: true,
         sortType: 'string',
-<<<<<<< Updated upstream
-        render: (value, collection) => `<code class="text-sm bg-white/10 text-gray-300 px-2 py-1 rounded">${collection.name}</code>`
-=======
         render: (value, collection) => `
             <div class="flex items-center">
                 <div class="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full mr-3 flex items-center justify-center">
@@ -39,7 +36,6 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
                 <div class="text-sm font-medium text-white">${collection.name}</div>
             </div>
           `
->>>>>>> Stashed changes
       },
       {
         key: 'display_name',
@@ -84,13 +80,6 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
   }
 
   const pageContent = `
-<<<<<<< Updated upstream
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
-      <div>
-        <h1 class="text-3xl font-bold text-white">Collections</h1>
-        <p class="text-gray-300 mt-2">Manage your content collections and their schemas</p>
-=======
     <div class="py-6">
       <!-- Header -->
       <div class="flex justify-between items-center mb-6">
@@ -125,7 +114,6 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
             </div>
           </div>
         `}
->>>>>>> Stashed changes
       </div>
       <a href="/admin/collections/new" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all">
         <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,29 +122,6 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
         New Collection
       </a>
     </div>
-<<<<<<< Updated upstream
-    
-    <!-- Collections Table -->
-    ${data.collections.length > 0 ? renderTable(tableData) : `
-      <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl overflow-hidden">
-        <div class="text-center py-12">
-          <svg class="mx-auto h-12 w-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-          </svg>
-          <h3 class="mt-2 text-sm font-medium text-white">No collections</h3>
-          <p class="mt-1 text-sm text-gray-300">Get started by creating your first collection.</p>
-          <div class="mt-6">
-            <a href="/admin/collections/new" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all">
-              <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-              </svg>
-              New Collection
-            </a>
-          </div>
-        </div>
-      </div>
-    `}
-=======
 
     <!-- Recent Activity Table from glass-admin.template.ts for comparison -->
     <div class="mt-8 backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl overflow-hidden">
@@ -217,7 +182,6 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
             </table>
         </div>
     </div>
->>>>>>> Stashed changes
   `
 
   const layoutData: AdminLayoutData = {

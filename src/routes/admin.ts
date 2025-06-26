@@ -3,6 +3,7 @@ import { html, raw } from 'hono/html'
 import { renderDashboardPage, renderStatsCards, DashboardPageData, DashboardStats } from '../templates/pages/admin-dashboard-v2.template'
 import { renderCollectionsListPage, CollectionsListPageData, Collection } from '../templates/pages/admin-collections-list.template'
 import { renderCollectionFormPage, CollectionFormData } from '../templates/pages/admin-collections-form.template'
+import { renderPluginsListPage, PluginsListPageData, generateMockPlugins } from '../templates/pages/admin-plugins-list.template'
 
 type Bindings = {
   DB: D1Database
@@ -522,6 +523,31 @@ adminRoutes.get('/users/export', async (c) => {
     console.error('Error exporting users:', error)
     return c.json({ error: 'Failed to export users' }, 500)
   }
+})
+
+// Plugins management
+adminRoutes.get('/plugins', (c) => {
+  const user = c.get('user')
+  const plugins = generateMockPlugins()
+  
+  const stats = {
+    total: plugins.length,
+    active: plugins.filter(p => p.status === 'active').length,
+    inactive: plugins.filter(p => p.status === 'inactive').length,
+    errors: plugins.filter(p => p.status === 'error').length
+  }
+  
+  const pageData: PluginsListPageData = {
+    plugins,
+    stats,
+    user: user ? {
+      name: user.email,
+      email: user.email,
+      role: user.role
+    } : undefined
+  }
+  
+  return c.html(renderPluginsListPage(pageData))
 })
 
 export default adminRoutes
