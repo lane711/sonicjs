@@ -124,7 +124,8 @@
       "Bash(rg:*)",
       "Bash(wrangler r2 bucket:*)",
       "WebFetch(domain:demo.tailadmin.com)",
-      "WebFetch(domain:tailadmin.com)"
+      "WebFetch(domain:tailadmin.com)",
+      "Bash(wrangler d1 execute:*)"
     ],
     "deny": []
   }
