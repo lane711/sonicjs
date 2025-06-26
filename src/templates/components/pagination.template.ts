@@ -41,33 +41,33 @@ export function renderPagination(data: PaginationData): string {
   }
 
   return `
-    <div class="bg-gray-8 px-4 py-3 flex items-center justify-between border-t border-gray-7">
+    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl px-4 py-3 flex items-center justify-between mt-4">
       <!-- Mobile Pagination -->
       <div class="flex-1 flex justify-between sm:hidden">
         ${data.currentPage > 1 ? `
-          <a href="${buildUrl(data.currentPage - 1)}" class="btn btn-secondary">
+          <a href="${buildUrl(data.currentPage - 1)}" class="inline-flex items-center px-3 py-1 border border-white/20 text-sm leading-4 font-medium rounded-md text-gray-300 bg-white/10 hover:bg-white/20 hover:text-white transition-colors">
             Previous
           </a>
         ` : `
-          <span class="btn btn-secondary opacity-50 cursor-not-allowed">Previous</span>
+          <span class="inline-flex items-center px-3 py-1 border border-white/20 text-sm leading-4 font-medium rounded-md text-gray-500 bg-white/5 opacity-50 cursor-not-allowed">Previous</span>
         `}
         
         ${data.currentPage < data.totalPages ? `
-          <a href="${buildUrl(data.currentPage + 1)}" class="btn btn-secondary">
+          <a href="${buildUrl(data.currentPage + 1)}" class="inline-flex items-center px-3 py-1 border border-white/20 text-sm leading-4 font-medium rounded-md text-gray-300 bg-white/10 hover:bg-white/20 hover:text-white transition-colors">
             Next
           </a>
         ` : `
-          <span class="btn btn-secondary opacity-50 cursor-not-allowed">Next</span>
+          <span class="inline-flex items-center px-3 py-1 border border-white/20 text-sm leading-4 font-medium rounded-md text-gray-500 bg-white/5 opacity-50 cursor-not-allowed">Next</span>
         `}
       </div>
       
       <!-- Desktop Pagination -->
       <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
         <div>
-          <p class="text-sm text-gray-3">
-            Showing <span class="font-medium">${data.startItem}</span> to 
-            <span class="font-medium">${data.endItem}</span> of 
-            <span class="font-medium">${data.totalItems}</span> results
+          <p class="text-sm text-gray-300">
+            Showing <span class="font-medium text-white">${data.startItem}</span> to 
+            <span class="font-medium text-white">${data.endItem}</span> of 
+            <span class="font-medium text-white">${data.totalItems}</span> results
           </p>
         </div>
         
@@ -75,7 +75,7 @@ export function renderPagination(data: PaginationData): string {
           <!-- Previous Button -->
           ${data.currentPage > 1 ? `
             <a href="${buildUrl(data.currentPage - 1)}" 
-               class="px-3 py-2 text-sm border border-gray-6 bg-gray-7 text-gray-3 rounded-md hover:bg-gray-6 hover:text-gray-1">
+               class="px-3 py-2 text-sm border border-white/20 bg-white/10 text-gray-300 rounded-md hover:bg-white/20 hover:text-white transition-colors">
               Previous
             </a>
           ` : ''}
@@ -88,11 +88,11 @@ export function renderPagination(data: PaginationData): string {
               const firstPage = pageNumbers.length > 0 ? pageNumbers[0] : null
               return firstPage && firstPage > 1 ? `
                 <a href="${buildUrl(1)}" 
-                   class="px-3 py-2 text-sm border border-gray-6 bg-gray-7 text-gray-3 rounded-md hover:bg-gray-6 hover:text-gray-1">
+                   class="px-3 py-2 text-sm border border-white/20 bg-white/10 text-gray-300 rounded-md hover:bg-white/20 hover:text-white transition-colors">
                   1
                 </a>
                 ${firstPage > 2 ? `
-                  <span class="px-3 py-2 text-sm text-gray-4">...</span>
+                  <span class="px-3 py-2 text-sm text-gray-500">...</span>
                 ` : ''}
               ` : ''
             })()}
@@ -100,12 +100,12 @@ export function renderPagination(data: PaginationData): string {
             <!-- Page number buttons -->
             ${generatePageNumbers().map(pageNum => `
               ${pageNum === data.currentPage ? `
-                <span class="px-3 py-2 text-sm bg-primary text-white border border-primary rounded-md">
+                <span class="px-3 py-2 text-sm bg-blue-500/30 text-white border border-blue-500/50 rounded-md">
                   ${pageNum}
                 </span>
               ` : `
                 <a href="${buildUrl(pageNum)}" 
-                   class="px-3 py-2 text-sm border border-gray-6 bg-gray-7 text-gray-3 rounded-md hover:bg-gray-6 hover:text-gray-1">
+                   class="px-3 py-2 text-sm border border-white/20 bg-white/10 text-gray-300 rounded-md hover:bg-white/20 hover:text-white transition-colors">
                   ${pageNum}
                 </a>
               `}
@@ -117,10 +117,10 @@ export function renderPagination(data: PaginationData): string {
               const lastPageNum = pageNumbers.length > 0 ? pageNumbers.slice(-1)[0] : null
               return lastPageNum && lastPageNum < data.totalPages ? `
                 ${lastPageNum < data.totalPages - 1 ? `
-                  <span class="px-3 py-2 text-sm text-gray-4">...</span>
+                  <span class="px-3 py-2 text-sm text-gray-500">...</span>
                 ` : ''}
                 <a href="${buildUrl(data.totalPages)}" 
-                   class="px-3 py-2 text-sm border border-gray-6 bg-gray-7 text-gray-3 rounded-md hover:bg-gray-6 hover:text-gray-1">
+                   class="px-3 py-2 text-sm border border-white/20 bg-white/10 text-gray-300 rounded-md hover:bg-white/20 hover:text-white transition-colors">
                   ${data.totalPages}
                 </a>
               ` : ''
@@ -130,7 +130,7 @@ export function renderPagination(data: PaginationData): string {
           <!-- Next Button -->
           ${data.currentPage < data.totalPages ? `
             <a href="${buildUrl(data.currentPage + 1)}" 
-               class="px-3 py-2 text-sm border border-gray-6 bg-gray-7 text-gray-3 rounded-md hover:bg-gray-6 hover:text-gray-1">
+               class="px-3 py-2 text-sm border border-white/20 bg-white/10 text-gray-300 rounded-md hover:bg-white/20 hover:text-white transition-colors">
               Next
             </a>
           ` : ''}

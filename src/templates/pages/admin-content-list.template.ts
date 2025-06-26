@@ -103,7 +103,7 @@ export function renderContentListPage(data: ContentListPageData): string {
       label: 'Model',
       sortable: true,
       sortType: 'string',
-      className: 'text-sm text-gray-900'
+      className: 'text-sm text-gray-300'
     },
     {
       key: 'statusBadge',
@@ -117,7 +117,7 @@ export function renderContentListPage(data: ContentListPageData): string {
       label: 'Author',
       sortable: true,
       sortType: 'string',
-      className: 'text-sm text-gray-900'
+      className: 'text-sm text-gray-300'
     },
     {
       key: 'formattedDate',

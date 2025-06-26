@@ -32,7 +32,7 @@ export function renderFilterBar(data: FilterBarData): string {
             <label class="text-sm font-medium text-gray-300">${filter.label}:</label>
             <select 
               name="${filter.name}" 
-              class="border border-gray-300 rounded-md px-3 py-1"
+              class="backdrop-blur-md bg-black/40 border border-white/20 rounded-md px-3 py-1 text-gray-300 focus:border-blue-400 focus:outline-none transition-colors"
               ${filter.hxTarget ? `hx-get="/admin/content" hx-trigger="change" hx-target="${filter.hxTarget}"` : ''}
               ${filter.hxInclude ? `hx-include="${filter.hxInclude}"` : ''}
             >
@@ -49,7 +49,7 @@ export function renderFilterBar(data: FilterBarData): string {
           <div class="flex items-center space-x-2 ml-auto">
             ${data.actions.map(action => `
               <button 
-                class="btn ${action.className || 'btn-secondary'}"
+                class="inline-flex items-center px-3 py-1 border border-white/20 text-sm leading-4 font-medium rounded-md text-gray-300 bg-white/10 hover:bg-white/20 hover:text-white transition-colors"
                 ${action.onclick ? `onclick="${action.onclick}"` : ''}
                 ${action.hxGet ? `hx-get="${action.hxGet}"` : ''}
                 ${action.hxTarget ? `hx-target="${action.hxTarget}"` : ''}

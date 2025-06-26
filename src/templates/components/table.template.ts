@@ -14,6 +14,7 @@ export interface TableData<T = any> {
   className?: string
   emptyMessage?: string
   tableId?: string
+  title?: string
 }
 
 export function renderTable<T = any>(data: TableData<T>): string {
@@ -22,11 +23,11 @@ export function renderTable<T = any>(data: TableData<T>): string {
   if (data.rows.length === 0) {
     return `
       <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-8 text-center">
-        <div class="text-gray-4">
-          <svg class="mx-auto h-12 w-12 text-gray-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div class="text-gray-400">
+          <svg class="mx-auto h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          <p class="mt-2 text-lg text-gray-3">${data.emptyMessage || 'No data available'}</p>
+          <p class="mt-2 text-lg text-gray-300">${data.emptyMessage || 'No data available'}</p>
         </div>
       </div>
     `
@@ -34,20 +35,25 @@ export function renderTable<T = any>(data: TableData<T>): string {
 
   return `
     <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl overflow-hidden ${data.className || ''}" id="${tableId}">
+      ${data.title ? `
+        <div class="px-6 py-4 border-b border-white/10">
+          <h3 class="text-lg font-semibold text-white">${data.title}</h3>
+        </div>
+      ` : ''}
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-white/10 sortable-table">
+        <table class="w-full sortable-table">
           <thead class="bg-white/5">
             <tr>
               ${data.selectable ? `
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-3 uppercase tracking-wider">
-                  <input type="checkbox" class="rounded bg-gray-8 border-gray-6 text-primary focus:ring-primary" id="select-all-${tableId}">
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                  <input type="checkbox" class="rounded bg-gray-800 border-gray-600 text-blue-500 focus:ring-blue-500" id="select-all-${tableId}">
                 </th>
               ` : ''}
               ${data.columns.map((column, index) => `
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-3 uppercase tracking-wider ${column.className || ''}">
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider ${column.className || ''}">
                   ${column.sortable ? `
                     <button 
-                      class="flex items-center space-x-1 hover:text-gray-1 transition-colors sort-btn w-full text-left"
+                      class="flex items-center space-x-1 hover:text-white transition-colors sort-btn w-full text-left"
                       data-column="${column.key}"
                       data-sort-type="${column.sortType || 'string'}"
                       data-sort-direction="none"
@@ -68,21 +74,21 @@ export function renderTable<T = any>(data: TableData<T>): string {
               `).join('')}
             </tr>
           </thead>
-          <tbody class="bg-gray-8 divide-y divide-gray-7">
+          <tbody class="divide-y divide-white/10">
             ${data.rows.map(row => {
               if (!row) return ''
               return `
-                <tr class="hover:bg-gray-7 transition-colors">
+                <tr class="hover:bg-white/5 transition-colors">
                   ${data.selectable ? `
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <input type="checkbox" class="rounded bg-gray-8 border-gray-6 text-primary focus:ring-primary row-checkbox" value="${(row as any).id || ''}">
+                      <input type="checkbox" class="rounded bg-gray-800 border-gray-600 text-blue-500 focus:ring-blue-500 row-checkbox" value="${(row as any).id || ''}">
                     </td>
                   ` : ''}
                   ${data.columns.map(column => {
                     const value = (row as any)[column.key]
                     const displayValue = column.render ? column.render(value, row) : value
                     return `
-                      <td class="px-6 py-4 whitespace-nowrap text-gray-1 ${column.className || ''}">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300 ${column.className || ''}">
                         ${displayValue || ''}
                       </td>
                     `
