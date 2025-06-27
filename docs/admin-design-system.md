@@ -192,26 +192,260 @@ p-4           /* 16px - Small container padding */
 
 ### Tables
 
+All admin tables must implement standardized filtering, sorting, and pagination features to ensure consistent user experience across the platform.
+
+#### Standard Table Features
+
+**Required Components:**
+1. **Filters Bar** - Common field filtering (status, date range, search)
+2. **Sortable Headers** - Click to sort by column
+3. **Pagination Controls** - Navigation and page size options
+4. **Row Actions** - Edit, delete, and other item-specific actions
+5. **Bulk Actions** - Multi-select with batch operations
+
+#### Table Container Structure
+
 ```html
-<div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl overflow-hidden">
-  <table class="w-full">
-    <thead class="bg-white/5">
-      <tr>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-          Column Header
-        </th>
-      </tr>
-    </thead>
-    <tbody class="divide-y divide-white/10">
-      <tr class="hover:bg-white/5 transition-colors">
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
-          Cell Content
-        </td>
-      </tr>
-    </tbody>
-  </table>
+<div class="w-full space-y-6">
+  <!-- Filters and Search Bar -->
+  <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <!-- Search Input -->
+      <div>
+        <label class="block text-sm font-medium text-white mb-2">Search</label>
+        <input type="text" 
+               placeholder="Search items..." 
+               class="w-full px-3 py-2 backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors">
+      </div>
+      
+      <!-- Status Filter -->
+      <div>
+        <label class="block text-sm font-medium text-white mb-2">Status</label>
+        <select class="w-full px-3 py-2 backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl text-white focus:border-blue-400 focus:outline-none transition-colors">
+          <option value="">All Statuses</option>
+          <option value="published">Published</option>
+          <option value="draft">Draft</option>
+          <option value="archived">Archived</option>
+        </select>
+      </div>
+      
+      <!-- Date Range Filter -->
+      <div>
+        <label class="block text-sm font-medium text-white mb-2">Date Range</label>
+        <select class="w-full px-3 py-2 backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl text-white focus:border-blue-400 focus:outline-none transition-colors">
+          <option value="">All Time</option>
+          <option value="today">Today</option>
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+        </select>
+      </div>
+      
+      <!-- Category/Type Filter -->
+      <div>
+        <label class="block text-sm font-medium text-white mb-2">Category</label>
+        <select class="w-full px-3 py-2 backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl text-white focus:border-blue-400 focus:outline-none transition-colors">
+          <option value="">All Categories</option>
+          <!-- Dynamic options based on context -->
+        </select>
+      </div>
+    </div>
+    
+    <!-- Filter Actions -->
+    <div class="flex justify-between items-center mt-4">
+      <button class="text-sm text-gray-300 hover:text-white transition-colors">
+        Clear Filters
+      </button>
+      <div class="flex items-center space-x-2">
+        <span class="text-sm text-gray-300">Show:</span>
+        <select class="px-2 py-1 backdrop-blur-sm bg-white/10 border border-white/20 rounded text-white text-sm">
+          <option value="20">20</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+        <span class="text-sm text-gray-300">items per page</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bulk Actions Bar (shown when items selected) -->
+  <div class="backdrop-blur-xl bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 hidden" id="bulk-actions">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-4">
+        <span class="text-sm text-amber-300">
+          <span id="selected-count">0</span> items selected
+        </span>
+        <button class="text-sm text-amber-300 hover:text-amber-200 transition-colors">
+          Select All
+        </button>
+        <button class="text-sm text-amber-300 hover:text-amber-200 transition-colors">
+          Clear Selection
+        </button>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button class="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 transition-colors text-sm">
+          Bulk Edit
+        </button>
+        <button class="px-3 py-1 bg-red-500/20 text-red-300 rounded-lg hover:bg-red-500/30 transition-colors text-sm">
+          Bulk Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Container -->
+  <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl overflow-hidden">
+    <table class="w-full">
+      <thead class="bg-white/5">
+        <tr>
+          <!-- Bulk Select Header -->
+          <th class="px-6 py-3 text-left">
+            <input type="checkbox" 
+                   id="select-all"
+                   class="rounded border-white/20 bg-white/10 text-blue-500 focus:ring-blue-500 focus:ring-offset-0">
+          </th>
+          
+          <!-- Sortable Column Headers -->
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:text-white transition-colors group">
+            <div class="flex items-center space-x-1">
+              <span>Title</span>
+              <svg class="w-4 h-4 text-gray-400 group-hover:text-gray-300 transition-colors">
+                <!-- Sort icon -->
+                <path d="M8 4l4 4H4l4-4zm0 6l4 4H4l4-4z"/>
+              </svg>
+            </div>
+          </th>
+          
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:text-white transition-colors group">
+            <div class="flex items-center space-x-1">
+              <span>Status</span>
+              <svg class="w-4 h-4 text-gray-400 group-hover:text-gray-300 transition-colors">
+                <path d="M8 4l4 4H4l4-4zm0 6l4 4H4l4-4z"/>
+              </svg>
+            </div>
+          </th>
+          
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:text-white transition-colors group">
+            <div class="flex items-center space-x-1">
+              <span>Created</span>
+              <svg class="w-4 h-4 text-gray-400 group-hover:text-gray-300 transition-colors">
+                <path d="M8 4l4 4H4l4-4zm0 6l4 4H4l4-4z"/>
+              </svg>
+            </div>
+          </th>
+          
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider">
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-white/10">
+        <tr class="hover:bg-white/5 transition-colors">
+          <!-- Row Select -->
+          <td class="px-6 py-4">
+            <input type="checkbox" 
+                   class="row-select rounded border-white/20 bg-white/10 text-blue-500 focus:ring-blue-500 focus:ring-offset-0">
+          </td>
+          
+          <!-- Data Cells -->
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center">
+              <div class="text-sm font-medium text-white">Item Title</div>
+            </div>
+          </td>
+          
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-300">
+              Published
+            </span>
+          </td>
+          
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+            Dec 27, 2024
+          </td>
+          
+          <!-- Row Actions -->
+          <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
+            <button class="text-blue-300 hover:text-blue-200 transition-colors">
+              Edit
+            </button>
+            <button class="text-gray-300 hover:text-white transition-colors">
+              View
+            </button>
+            <button class="text-red-300 hover:text-red-200 transition-colors">
+              Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6">
+    <div class="flex items-center justify-between">
+      <!-- Results Summary -->
+      <div class="text-sm text-gray-300">
+        Showing <span class="font-medium text-white">1-20</span> of <span class="font-medium text-white">247</span> results
+      </div>
+      
+      <!-- Pagination Controls -->
+      <div class="flex items-center space-x-2">
+        <!-- Previous Button -->
+        <button class="px-3 py-2 rounded-lg backdrop-blur-sm bg-white/10 border border-white/20 text-gray-300 hover:bg-white/20 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+          Previous
+        </button>
+        
+        <!-- Page Numbers -->
+        <div class="flex items-center space-x-1">
+          <button class="px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-all">1</button>
+          <button class="px-3 py-2 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-500/30">2</button>
+          <button class="px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-all">3</button>
+          <span class="px-2 text-gray-400">...</span>
+          <button class="px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-all">13</button>
+        </div>
+        
+        <!-- Next Button -->
+        <button class="px-3 py-2 rounded-lg backdrop-blur-sm bg-white/10 border border-white/20 text-gray-300 hover:bg-white/20 hover:text-white transition-all">
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 ```
+
+#### Status Badge Variants
+
+```css
+/* Status badge styles */
+.status-published { @apply bg-green-500/20 text-green-300; }
+.status-draft { @apply bg-yellow-500/20 text-yellow-300; }
+.status-archived { @apply bg-gray-500/20 text-gray-300; }
+.status-error { @apply bg-red-500/20 text-red-300; }
+```
+
+#### Sort State Indicators
+
+```html
+<!-- Ascending Sort -->
+<svg class="w-4 h-4 text-blue-400">
+  <path d="M8 4l4 4H4l4-4z"/>
+</svg>
+
+<!-- Descending Sort -->
+<svg class="w-4 h-4 text-blue-400 rotate-180">
+  <path d="M8 4l4 4H4l4-4z"/>
+</svg>
+```
+
+#### Standard Table Interactions
+
+1. **Column Sorting**: Click header to sort, show visual indicator
+2. **Multi-select**: Checkbox selection with bulk action bar
+3. **Row Hover**: Subtle highlight on row hover
+4. **Pagination**: Standard controls with page numbers
+5. **Filtering**: Real-time filter application
+6. **Search**: Debounced search with clear option
 
 ### Cards
 
