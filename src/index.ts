@@ -6,6 +6,7 @@ import { apiRoutes } from './routes/api'
 import { adminRoutes } from './routes/admin'
 import { adminContentRoutes } from './routes/admin-content'
 import adminFAQRoutes from './routes/admin-faq'
+import { adminDesignRoutes } from './routes/admin-design'
 import { docsRoutes } from './routes/docs'
 import { authRoutes } from './routes/auth'
 import { contentRoutes } from './routes/content'
@@ -65,6 +66,7 @@ app.route('/admin', adminRoutes)
 app.route('/admin/media', adminMediaRoutes)
 app.route('/admin/content', adminContentRoutes)
 app.route('/admin/faq', adminFAQRoutes)
+app.route('/admin/design', adminDesignRoutes)
 app.route('/admin/email', emailRoutes)
 
 // Root redirect to login
