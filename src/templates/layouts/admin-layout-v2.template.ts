@@ -243,7 +243,7 @@ export function renderAdminLayout(data: AdminLayoutData): string {
   ${data.styles ? data.styles.map(style => `<link rel="stylesheet" href="${style}">`).join('\n  ') : ''}
   ${data.scripts ? data.scripts.map(script => `<script src="${script}"></script>`).join('\n  ') : ''}
 </head>
-<body class="bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800 min-h-screen text-gray-1">
+<body class="bg-gradient-to-br from-slate-900 via-gray-900 to-black min-h-screen text-gray-1">
   <!-- Background overlay with glass effect -->
   <div id="background-overlay" class="fixed inset-0 backdrop-blur-sm" style="background-color: rgba(0, 0, 0, 0.2);"></div>
   <!-- Main container -->
@@ -354,12 +354,12 @@ export function renderAdminLayout(data: AdminLayoutData): string {
     
     // Background themes
     const backgroundThemes = {
-      'default': 'bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800',
+      'default': 'bg-gradient-to-br from-slate-900 via-gray-900 to-black',
       'cosmic-blue': 'bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900',
       'matrix-green': 'bg-gradient-to-br from-gray-900 via-emerald-900 to-green-900',
       'cyber-pink': 'bg-gradient-to-br from-gray-900 via-pink-900 to-rose-900',
       'neon-orange': 'bg-gradient-to-br from-gray-900 via-orange-900 to-amber-900',
-      'deep-space': 'bg-gradient-to-br from-slate-900 via-gray-900 to-black',
+      'purple-space': 'bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800',
       'blue-waves': 'svg-pattern-blue-waves',
       'blue-crescent': 'svg-pattern-blue-crescent',
       'blue-stars': 'svg-pattern-blue-stars',
@@ -608,8 +608,8 @@ function renderTopBar(pageTitle: string, user?: any): string {
                   <!-- Background Options -->
                   <div class="space-y-3 mb-6">
                     <div class="grid grid-cols-2 gap-3">
-                      <!-- Default -->
-                      <button onclick="setBackground('default')" class="bg-preview bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800 h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group">
+                      <!-- Default (Deep Space) -->
+                      <button onclick="setBackground('default')" class="bg-preview bg-gradient-to-br from-slate-900 via-gray-900 to-black h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group">
                         <div class="absolute inset-0 bg-black/20 rounded-lg"></div>
                         <div class="absolute bottom-1 left-2 text-xs text-white font-medium">Default</div>
                       </button>
@@ -638,10 +638,10 @@ function renderTopBar(pageTitle: string, user?: any): string {
                         <div class="absolute bottom-1 left-2 text-xs text-white font-medium">Neon</div>
                       </button>
                       
-                      <!-- Deep Space -->
-                      <button onclick="setBackground('deep-space')" class="bg-preview bg-gradient-to-br from-slate-900 via-gray-900 to-black h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group">
+                      <!-- Purple Space -->
+                      <button onclick="setBackground('purple-space')" class="bg-preview bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800 h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group">
                         <div class="absolute inset-0 bg-black/20 rounded-lg"></div>
-                        <div class="absolute bottom-1 left-2 text-xs text-white font-medium">Space</div>
+                        <div class="absolute bottom-1 left-2 text-xs text-white font-medium">Purple</div>
                       </button>
                     </div>
                     
