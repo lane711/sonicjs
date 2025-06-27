@@ -26,28 +26,30 @@ export function renderFAQForm(data: FAQFormData): string {
   const pageTitle = isEdit ? 'Edit FAQ' : 'New FAQ'
 
   const pageContent = `
-    <div class="space-y-6">
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       <!-- Header -->
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
-          <h1 class="text-2xl font-semibold text-gray-100">${pageTitle}</h1>
-          <p class="mt-2 text-sm text-gray-400">
+          <h1 class="text-2xl font-semibold text-white">${pageTitle}</h1>
+          <p class="mt-2 text-sm text-gray-300">
             ${isEdit ? 'Update the FAQ details below' : 'Create a new frequently asked question'}
           </p>
         </div>
-        <a href="/admin/faq" 
-           class="inline-flex items-center px-3 py-2 border border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-300 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-          <svg class="-ml-0.5 mr-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Back to List
-        </a>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+          <a href="/admin/faq" 
+             class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/10 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all">
+            <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to List
+          </a>
+        </div>
       </div>
 
       ${message ? renderAlert({ type: messageType || 'info', message, dismissible: true }) : ''}
 
       <!-- Form -->
-      <div class="bg-gray-800 shadow rounded-lg">
+      <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl">
         <form ${isEdit ? `hx-put="/admin/faq/${faq?.id}"` : 'hx-post="/admin/faq"'} 
               hx-target="body" 
               hx-swap="outerHTML"
@@ -55,7 +57,7 @@ export function renderFAQForm(data: FAQFormData): string {
           
           <!-- Question -->
           <div>
-            <label for="question" class="block text-sm font-medium text-gray-300">
+            <label for="question" class="block text-sm font-medium text-white">
               Question <span class="text-red-400">*</span>
             </label>
             <div class="mt-1">
@@ -64,9 +66,9 @@ export function renderFAQForm(data: FAQFormData): string {
                         rows="3" 
                         required
                         maxlength="500"
-                        class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                        class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors w-full"
                         placeholder="Enter the frequently asked question...">${faq?.question || ''}</textarea>
-              <p class="mt-1 text-sm text-gray-400">
+              <p class="mt-1 text-sm text-gray-300">
                 <span id="question-count">0</span>/500 characters
               </p>
             </div>
@@ -81,7 +83,7 @@ export function renderFAQForm(data: FAQFormData): string {
 
           <!-- Answer -->
           <div>
-            <label for="answer" class="block text-sm font-medium text-gray-300">
+            <label for="answer" class="block text-sm font-medium text-white">
               Answer <span class="text-red-400">*</span>
             </label>
             <div class="mt-1">
@@ -90,9 +92,9 @@ export function renderFAQForm(data: FAQFormData): string {
                         rows="6" 
                         required
                         maxlength="2000"
-                        class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                        class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors w-full"
                         placeholder="Enter the detailed answer...">${faq?.answer || ''}</textarea>
-              <p class="mt-1 text-sm text-gray-400">
+              <p class="mt-1 text-sm text-gray-300">
                 <span id="answer-count">0</span>/2000 characters. You can use basic HTML for formatting.
               </p>
             </div>
@@ -109,7 +111,7 @@ export function renderFAQForm(data: FAQFormData): string {
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Category -->
             <div>
-              <label for="category" class="block text-sm font-medium text-gray-300">Category</label>
+              <label for="category" class="block text-sm font-medium text-white">Category</label>
               <div class="mt-1">
                 <select name="category" 
                         id="category" 
@@ -134,7 +136,7 @@ export function renderFAQForm(data: FAQFormData): string {
 
             <!-- Tags -->
             <div>
-              <label for="tags" class="block text-sm font-medium text-gray-300">Tags</label>
+              <label for="tags" class="block text-sm font-medium text-white">Tags</label>
               <div class="mt-1">
                 <input type="text" 
                        name="tags" 
@@ -142,7 +144,7 @@ export function renderFAQForm(data: FAQFormData): string {
                        value="${faq?.tags || ''}"
                        class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                        placeholder="e.g., payment, setup, troubleshooting">
-                <p class="mt-1 text-sm text-gray-400">Separate multiple tags with commas</p>
+                <p class="mt-1 text-sm text-gray-300">Separate multiple tags with commas</p>
               </div>
               ${errors?.tags ? `
                 <div class="mt-1">
@@ -158,7 +160,7 @@ export function renderFAQForm(data: FAQFormData): string {
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Published Status -->
             <div>
-              <label class="block text-sm font-medium text-gray-300">Status</label>
+              <label class="block text-sm font-medium text-white">Status</label>
               <div class="mt-2 space-y-2">
                 <div class="flex items-center">
                   <input id="published" 
@@ -167,8 +169,8 @@ export function renderFAQForm(data: FAQFormData): string {
                          value="true"
                          ${!faq || faq.isPublished ? 'checked' : ''}
                          class="h-4 w-4 text-blue-600 focus:ring-blue-600 border-gray-600 bg-gray-700">
-                  <label for="published" class="ml-2 block text-sm text-gray-300">
-                    Published <span class="text-gray-400">(visible to users)</span>
+                  <label for="published" class="ml-2 block text-sm text-white">
+                    Published <span class="text-gray-300">(visible to users)</span>
                   </label>
                 </div>
                 <div class="flex items-center">
@@ -178,8 +180,8 @@ export function renderFAQForm(data: FAQFormData): string {
                          value="false"
                          ${faq && !faq.isPublished ? 'checked' : ''}
                          class="h-4 w-4 text-blue-600 focus:ring-blue-600 border-gray-600 bg-gray-700">
-                  <label for="draft" class="ml-2 block text-sm text-gray-300">
-                    Draft <span class="text-gray-400">(not visible to users)</span>
+                  <label for="draft" class="ml-2 block text-sm text-white">
+                    Draft <span class="text-gray-300">(not visible to users)</span>
                   </label>
                 </div>
               </div>
@@ -187,7 +189,7 @@ export function renderFAQForm(data: FAQFormData): string {
 
             <!-- Sort Order -->
             <div>
-              <label for="sortOrder" class="block text-sm font-medium text-gray-300">Sort Order</label>
+              <label for="sortOrder" class="block text-sm font-medium text-white">Sort Order</label>
               <div class="mt-1">
                 <input type="number" 
                        name="sortOrder" 
@@ -196,7 +198,7 @@ export function renderFAQForm(data: FAQFormData): string {
                        min="0"
                        step="1"
                        class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
-                <p class="mt-1 text-sm text-gray-400">Lower numbers appear first (0 = highest priority)</p>
+                <p class="mt-1 text-sm text-gray-300">Lower numbers appear first (0 = highest priority)</p>
               </div>
               ${errors?.sortOrder ? `
                 <div class="mt-1">
@@ -209,14 +211,14 @@ export function renderFAQForm(data: FAQFormData): string {
           </div>
 
           <!-- Form Actions -->
-          <div class="flex items-center justify-end space-x-3 pt-6 border-t border-gray-700">
+          <div class="flex items-center justify-end space-x-3 pt-6 border-t border-white/20">
             <a href="/admin/faq" 
-               class="inline-flex items-center px-4 py-2 border border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-300 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+               class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/10 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all">
               Cancel
             </a>
             <button type="submit" 
-                    class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-              <svg class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-blue-500/80 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-blue-500 transition-all">
+              <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
               ${isEdit ? 'Update FAQ' : 'Create FAQ'}

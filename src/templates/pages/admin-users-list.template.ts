@@ -61,12 +61,12 @@ export function renderUsersListPage(data: UsersListPageData): string {
       render: (value: any, row: User) => {
         const fullName = `${row.firstName} ${row.lastName}`
         const statusBadge = row.isActive ? 
-          '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 ml-2">Active</span>' :
-          '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 ml-2">Inactive</span>'
+          '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-300 ml-2">Active</span>' :
+          '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/20 text-red-300 ml-2">Inactive</span>'
         return `
           <div>
-            <div class="text-sm font-medium text-gray-900">${fullName}${statusBadge}</div>
-            <div class="text-sm text-gray-500">@${row.username}</div>
+            <div class="text-sm font-medium text-white">${fullName}${statusBadge}</div>
+            <div class="text-sm text-gray-400">@${row.username}</div>
           </div>
         `
       }
@@ -76,7 +76,7 @@ export function renderUsersListPage(data: UsersListPageData): string {
       label: 'Email',
       sortable: true,
       sortType: 'string',
-      render: (value: string) => `<a href="mailto:${value}" class="text-blue-600 hover:text-blue-900">${value}</a>`
+      render: (value: string) => `<a href="mailto:${value}" class="text-blue-400 hover:text-blue-300">${value}</a>`
     },
     {
       key: 'role',
@@ -85,12 +85,12 @@ export function renderUsersListPage(data: UsersListPageData): string {
       sortType: 'string',
       render: (value: string) => {
         const roleColors = {
-          admin: 'bg-red-100 text-red-800',
-          editor: 'bg-blue-100 text-blue-800',
-          author: 'bg-green-100 text-green-800',
-          viewer: 'bg-gray-100 text-gray-800'
+          admin: 'bg-red-500/20 text-red-300',
+          editor: 'bg-blue-500/20 text-blue-300',
+          author: 'bg-green-500/20 text-green-300',
+          viewer: 'bg-gray-500/20 text-gray-300'
         }
-        const colorClass = roleColors[value as keyof typeof roleColors] || 'bg-gray-100 text-gray-800'
+        const colorClass = roleColors[value as keyof typeof roleColors] || 'bg-gray-500/20 text-gray-300'
         return `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${colorClass}">${value.charAt(0).toUpperCase() + value.slice(1)}</span>`
       }
     },
@@ -101,7 +101,7 @@ export function renderUsersListPage(data: UsersListPageData): string {
       sortType: 'date',
       render: (value: number | null) => {
         if (!value) return '<span class="text-gray-400">Never</span>'
-        return `<span class="text-sm text-gray-900">${new Date(value).toLocaleDateString()}</span>`
+        return `<span class="text-sm text-gray-300">${new Date(value).toLocaleDateString()}</span>`
       }
     },
     {
@@ -109,7 +109,7 @@ export function renderUsersListPage(data: UsersListPageData): string {
       label: 'Created',
       sortable: true,
       sortType: 'date',
-      render: (value: number) => `<span class="text-sm text-gray-900">${new Date(value).toLocaleDateString()}</span>`
+      render: (value: number) => `<span class="text-sm text-gray-300">${new Date(value).toLocaleDateString()}</span>`
     },
     {
       key: 'actions',
@@ -118,11 +118,11 @@ export function renderUsersListPage(data: UsersListPageData): string {
       sortable: false,
       render: (value: any, row: User) => `
         <div class="flex justify-end space-x-2">
-          <a href="/admin/users/${row.id}" class="text-blue-600 hover:text-blue-900 text-sm">View</a>
-          <a href="/admin/users/${row.id}/edit" class="text-gray-600 hover:text-gray-900 text-sm">Edit</a>
+          <a href="/admin/users/${row.id}" class="inline-flex items-center px-3 py-1 backdrop-blur-sm bg-blue-500/80 text-white text-sm rounded-xl border border-white/20 hover:bg-blue-500 transition-all">View</a>
+          <a href="/admin/users/${row.id}/edit" class="inline-flex items-center px-3 py-1 backdrop-blur-sm bg-white/10 text-white text-sm rounded-xl border border-white/20 hover:bg-white/20 transition-all">Edit</a>
           ${row.isActive ? 
-            `<button onclick="toggleUserStatus('${row.id}', false)" class="text-red-600 hover:text-red-900 text-sm">Deactivate</button>` :
-            `<button onclick="toggleUserStatus('${row.id}', true)" class="text-green-600 hover:text-green-900 text-sm">Activate</button>`
+            `<button onclick="toggleUserStatus('${row.id}', false)" class="inline-flex items-center px-3 py-1 backdrop-blur-sm bg-red-500/80 text-white text-sm rounded-xl border border-white/20 hover:bg-red-500 transition-all">Deactivate</button>` :
+            `<button onclick="toggleUserStatus('${row.id}', true)" class="inline-flex items-center px-3 py-1 backdrop-blur-sm bg-green-500/80 text-white text-sm rounded-xl border border-white/20 hover:bg-green-500 transition-all">Activate</button>`
           }
         </div>
       `
@@ -138,22 +138,22 @@ export function renderUsersListPage(data: UsersListPageData): string {
   }
 
   const pageContent = `
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
       <!-- Header -->
-      <div class="sm:flex sm:items-center sm:justify-between mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
-          <h1 class="text-3xl font-bold text-gray-100">Users</h1>
+          <h1 class="text-2xl font-semibold text-white">User Management</h1>
           <p class="mt-2 text-sm text-gray-300">Manage user accounts and permissions</p>
         </div>
-        <div class="mt-4 sm:mt-0 flex space-x-3">
-          <a href="/admin/users/new" class="btn btn-primary">
-            <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none flex space-x-3">
+          <a href="/admin/users/new" class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/20 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/30 transition-all">
+            <svg class="-ml-0.5 mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
             </svg>
             Add User
           </a>
-          <button class="btn btn-secondary" onclick="exportUsers()">
-            <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <button class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/10 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all" onclick="exportUsers()">
+            <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
             </svg>
             Export
@@ -166,14 +166,14 @@ export function renderUsersListPage(data: UsersListPageData): string {
       ${data.success ? renderAlert({ type: 'success', message: data.success, dismissible: true }) : ''}
 
       <!-- Filters -->
-      <div class="bg-gray-800/50 backdrop-blur-sm rounded-lg p-4 mb-6">
+      <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6 mb-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1">Search</label>
             <input 
               type="text" 
               placeholder="Search users..."
-              class="form-input"
+              class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors"
               hx-get="/admin/users"
               hx-trigger="keyup changed delay:300ms"
               hx-target="body"
@@ -184,7 +184,7 @@ export function renderUsersListPage(data: UsersListPageData): string {
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1">Role</label>
             <select 
-              class="form-input"
+              class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors"
               name="role"
               hx-get="/admin/users"
               hx-trigger="change"
@@ -201,7 +201,7 @@ export function renderUsersListPage(data: UsersListPageData): string {
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1">Status</label>
             <select 
-              class="form-input"
+              class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors"
               name="status"
               hx-get="/admin/users"
               hx-trigger="change"
@@ -215,7 +215,7 @@ export function renderUsersListPage(data: UsersListPageData): string {
           </div>
           <div class="flex items-end">
             <button 
-              class="btn btn-secondary w-full"
+              class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/10 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all w-full"
               onclick="clearFilters()"
             >
               Clear Filters
@@ -231,7 +231,7 @@ export function renderUsersListPage(data: UsersListPageData): string {
       ${data.pagination ? renderPagination(data.pagination) : ''}
 
       <!-- Stats -->
-      <div class="mt-6 bg-gray-800/50 backdrop-blur-sm rounded-lg p-4">
+      <div class="mt-6 backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
           <div>
             <div class="text-2xl font-bold text-purple-400">${data.totalUsers}</div>
