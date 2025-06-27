@@ -201,6 +201,27 @@ export function renderAdminLayout(data: AdminLayoutData): string {
       background: rgba(255, 255, 255, 0.2);
       border: none;
     }
+    
+    /* SVG Pattern Backgrounds */
+    .svg-pattern-circuit {
+      background-color: #111827;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='none' stroke='%2310b981' stroke-width='1'%3E%3Ccircle cx='15' cy='15' r='3' fill='%2310b981'/%3E%3Ccircle cx='45' cy='15' r='3' fill='%2310b981'/%3E%3Ccircle cx='15' cy='45' r='3' fill='%2310b981'/%3E%3Ccircle cx='45' cy='45' r='3' fill='%2310b981'/%3E%3Cpath d='M15 15h30M15 45h30M15 15v30M45 15v30' stroke='%23059669' stroke-width='0.8'/%3E%3Cpath d='M10 10h10v10h-10zM40 10h10v10h-10zM10 40h10v10h-10zM40 40h10v10h-10z' stroke='%23065f46' stroke-width='0.5' fill='none'/%3E%3C/g%3E%3C/svg%3E");
+    }
+    
+    .svg-pattern-neural {
+      background-color: #111827;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='none'%3E%3Ccircle cx='40' cy='40' r='4' fill='%233b82f6'/%3E%3Ccircle cx='20' cy='20' r='3' fill='%2360a5fa'/%3E%3Ccircle cx='60' cy='20' r='3' fill='%2360a5fa'/%3E%3Ccircle cx='20' cy='60' r='3' fill='%2360a5fa'/%3E%3Ccircle cx='60' cy='60' r='3' fill='%2360a5fa'/%3E%3Cpath d='M40 40L20 20M40 40L60 20M40 40L20 60M40 40L60 60' stroke='%232563eb' stroke-width='1' opacity='0.6'/%3E%3Ccircle cx='10' cy='40' r='2' fill='%2393c5fd'/%3E%3Ccircle cx='70' cy='40' r='2' fill='%2393c5fd'/%3E%3Ccircle cx='40' cy='10' r='2' fill='%2393c5fd'/%3E%3Ccircle cx='40' cy='70' r='2' fill='%2393c5fd'/%3E%3Cpath d='M40 40L10 40M40 40L70 40M40 40L40 10M40 40L40 70' stroke='%233b82f6' stroke-width='0.8' opacity='0.4'/%3E%3C/g%3E%3C/svg%3E");
+    }
+    
+    .svg-pattern-grid {
+      background-color: #111827;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Cg fill='none'%3E%3Crect x='5' y='5' width='40' height='40' stroke='%237c3aed' stroke-width='0.8' fill='none'/%3E%3Crect x='12' y='12' width='26' height='26' stroke='%23a855f7' stroke-width='0.6' fill='none'/%3E%3Crect x='18' y='18' width='14' height='14' stroke='%23c084fc' stroke-width='0.4' fill='none'/%3E%3Crect x='22' y='22' width='6' height='6' fill='%238b5cf6' opacity='0.3'/%3E%3Cpath d='M25 5v40M5 25h40' stroke='%236d28d9' stroke-width='0.3' opacity='0.5'/%3E%3Ccircle cx='25' cy='25' r='1' fill='%23a855f7'/%3E%3C/g%3E%3C/svg%3E");
+    }
+    
+    .svg-pattern-flow {
+      background-color: #111827;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='60' viewBox='0 0 100 60'%3E%3Cg fill='none'%3E%3Cpath d='M0 30Q25 15 50 30T100 30' stroke='%23f59e0b' stroke-width='1.5' fill='none' opacity='0.7'/%3E%3Cpath d='M0 20Q30 5 60 20T120 20' stroke='%23f97316' stroke-width='1.2' fill='none' opacity='0.5'/%3E%3Cpath d='M0 40Q20 25 40 40T80 40' stroke='%23fb923c' stroke-width='1' fill='none' opacity='0.6'/%3E%3Ccircle cx='25' cy='30' r='2' fill='%23fbbf24' opacity='0.8'/%3E%3Ccircle cx='75' cy='30' r='2' fill='%23fbbf24' opacity='0.8'/%3E%3Ccircle cx='15' cy='20' r='1.5' fill='%23fed7aa' opacity='0.6'/%3E%3Ccircle cx='45' cy='40' r='1.5' fill='%23fed7aa' opacity='0.6'/%3E%3Cpath d='M10 10l5 5m5-5l-5 5M80 10l5 5m5-5l-5 5' stroke='%23fdba74' stroke-width='1' opacity='0.4'/%3E%3C/g%3E%3C/svg%3E");
+    }
   </style>
   
   <!-- Scripts -->
@@ -326,21 +347,35 @@ export function renderAdminLayout(data: AdminLayoutData): string {
       'matrix-green': 'bg-gradient-to-br from-gray-900 via-emerald-900 to-green-900',
       'cyber-pink': 'bg-gradient-to-br from-gray-900 via-pink-900 to-rose-900',
       'neon-orange': 'bg-gradient-to-br from-gray-900 via-orange-900 to-amber-900',
-      'deep-space': 'bg-gradient-to-br from-slate-900 via-gray-900 to-black'
+      'deep-space': 'bg-gradient-to-br from-slate-900 via-gray-900 to-black',
+      'circuit-board': 'svg-pattern-circuit',
+      'neural-network': 'svg-pattern-neural',
+      'geometric-grid': 'svg-pattern-grid',
+      'data-flow': 'svg-pattern-flow'
     };
     
     // Set background theme
     function setBackground(theme) {
       const body = document.body;
       
-      // Remove all existing background classes
+      // Remove all existing background classes and SVG patterns
       Object.values(backgroundThemes).forEach(bgClass => {
-        body.classList.remove(...bgClass.split(' ').slice(1)); // Remove 'bg-gradient-to-br' prefix
+        if (bgClass.startsWith('svg-pattern-')) {
+          body.classList.remove(bgClass);
+        } else {
+          body.classList.remove(...bgClass.split(' ').slice(1)); // Remove 'bg-gradient-to-br' prefix
+        }
       });
+      body.classList.remove('bg-gradient-to-br');
       
-      // Add new background classes
-      const newClasses = backgroundThemes[theme].split(' ').slice(1); // Remove 'bg-gradient-to-br' prefix
-      body.classList.add('bg-gradient-to-br', ...newClasses);
+      // Add new background
+      const themeClass = backgroundThemes[theme];
+      if (themeClass.startsWith('svg-pattern-')) {
+        body.classList.add(themeClass);
+      } else {
+        const newClasses = themeClass.split(' ').slice(1); // Remove 'bg-gradient-to-br' prefix
+        body.classList.add('bg-gradient-to-br', ...newClasses);
+      }
       
       // Save preference
       localStorage.setItem('backgroundTheme', theme);
@@ -373,11 +408,25 @@ export function renderAdminLayout(data: AdminLayoutData): string {
       // Set background theme
       if (savedTheme !== 'default') {
         const body = document.body;
+        const themeClass = backgroundThemes[savedTheme];
+        
+        // Remove all existing backgrounds first
         Object.values(backgroundThemes).forEach(bgClass => {
-          body.classList.remove(...bgClass.split(' ').slice(1));
+          if (bgClass.startsWith('svg-pattern-')) {
+            body.classList.remove(bgClass);
+          } else {
+            body.classList.remove(...bgClass.split(' ').slice(1));
+          }
         });
-        const newClasses = backgroundThemes[savedTheme].split(' ').slice(1);
-        body.classList.add('bg-gradient-to-br', ...newClasses);
+        body.classList.remove('bg-gradient-to-br');
+        
+        // Apply saved theme
+        if (themeClass.startsWith('svg-pattern-')) {
+          body.classList.add(themeClass);
+        } else {
+          const newClasses = themeClass.split(' ').slice(1);
+          body.classList.add('bg-gradient-to-br', ...newClasses);
+        }
       }
       
       // Set darkness
@@ -527,8 +576,8 @@ function renderTopBar(pageTitle: string, user?: any): string {
             <!-- Background Customizer -->
             <div class="relative z-[9999]">
               <button class="p-2 text-gray-300 hover:text-white transition-colors rounded-lg hover:bg-white/10" onclick="toggleBackgroundCustomizer()">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"/>
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.098 19.902a3.75 3.75 0 0 0 5.304 0l6.401-6.402M6.75 21A3.75 3.75 0 0 1 3 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 0 0 3.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008Z" />
                 </svg>
               </button>
               
@@ -583,6 +632,88 @@ function renderTopBar(pageTitle: string, user?: any): string {
                         <div class="absolute bottom-1 left-2 text-xs text-white font-medium">Space</div>
                       </button>
                     </div>
+                    
+                    <!-- SVG Pattern Backgrounds -->
+                    <div class="mt-4">
+                      <h4 class="text-sm font-medium text-gray-300 mb-3">Abstract Patterns</h4>
+                      <div class="grid grid-cols-2 gap-3">
+                        <!-- Circuit Board -->
+                        <button onclick="setBackground('circuit-board')" class="h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group bg-gray-900 overflow-hidden">
+                          <div class="absolute inset-0 opacity-30">
+                            <svg class="w-full h-full" viewBox="0 0 100 100" fill="none">
+                              <defs>
+                                <pattern id="circuit" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                                  <rect width="20" height="20" fill="#1f2937"/>
+                                  <circle cx="5" cy="5" r="1" fill="#10b981"/>
+                                  <circle cx="15" cy="5" r="1" fill="#10b981"/>
+                                  <circle cx="5" cy="15" r="1" fill="#10b981"/>
+                                  <circle cx="15" cy="15" r="1" fill="#10b981"/>
+                                  <path d="M5 5h10M5 15h10M5 5v10M15 5v10" stroke="#059669" stroke-width="0.5"/>
+                                </pattern>
+                              </defs>
+                              <rect width="100" height="100" fill="url(#circuit)"/>
+                            </svg>
+                          </div>
+                          <div class="absolute bottom-1 left-2 text-xs text-white font-medium">Circuit</div>
+                        </button>
+                        
+                        <!-- Neural Network -->
+                        <button onclick="setBackground('neural-network')" class="h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group bg-gray-900 overflow-hidden">
+                          <div class="absolute inset-0 opacity-30">
+                            <svg class="w-full h-full" viewBox="0 0 100 100" fill="none">
+                              <defs>
+                                <pattern id="neural" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
+                                  <rect width="30" height="30" fill="#1f2937"/>
+                                  <circle cx="15" cy="15" r="2" fill="#3b82f6"/>
+                                  <circle cx="5" cy="8" r="1.5" fill="#60a5fa"/>
+                                  <circle cx="25" cy="22" r="1.5" fill="#60a5fa"/>
+                                  <path d="M15 15L5 8M15 15L25 22" stroke="#2563eb" stroke-width="1" opacity="0.6"/>
+                                </pattern>
+                              </defs>
+                              <rect width="100" height="100" fill="url(#neural)"/>
+                            </svg>
+                          </div>
+                          <div class="absolute bottom-1 left-2 text-xs text-white font-medium">Neural</div>
+                        </button>
+                        
+                        <!-- Geometric Grid -->
+                        <button onclick="setBackground('geometric-grid')" class="h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group bg-gray-900 overflow-hidden">
+                          <div class="absolute inset-0 opacity-30">
+                            <svg class="w-full h-full" viewBox="0 0 100 100" fill="none">
+                              <defs>
+                                <pattern id="grid" x="0" y="0" width="25" height="25" patternUnits="userSpaceOnUse">
+                                  <rect width="25" height="25" fill="#1f2937"/>
+                                  <rect x="2" y="2" width="21" height="21" fill="none" stroke="#7c3aed" stroke-width="0.5"/>
+                                  <rect x="6" y="6" width="13" height="13" fill="none" stroke="#a855f7" stroke-width="0.5"/>
+                                  <rect x="10" y="10" width="5" height="5" fill="#8b5cf6" opacity="0.3"/>
+                                </pattern>
+                              </defs>
+                              <rect width="100" height="100" fill="url(#grid)"/>
+                            </svg>
+                          </div>
+                          <div class="absolute bottom-1 left-2 text-xs text-white font-medium">Grid</div>
+                        </button>
+                        
+                        <!-- Data Flow -->
+                        <button onclick="setBackground('data-flow')" class="h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group bg-gray-900 overflow-hidden">
+                          <div class="absolute inset-0 opacity-30">
+                            <svg class="w-full h-full" viewBox="0 0 100 100" fill="none">
+                              <defs>
+                                <pattern id="flow" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+                                  <rect width="40" height="40" fill="#1f2937"/>
+                                  <path d="M0 20Q10 10 20 20T40 20" stroke="#f59e0b" stroke-width="1" fill="none" opacity="0.6"/>
+                                  <path d="M0 30Q15 20 30 30T60 30" stroke="#f97316" stroke-width="1" fill="none" opacity="0.4"/>
+                                  <circle cx="10" cy="20" r="1" fill="#fbbf24"/>
+                                  <circle cx="30" cy="20" r="1" fill="#fbbf24"/>
+                                </pattern>
+                              </defs>
+                              <rect width="100" height="100" fill="url(#flow)"/>
+                            </svg>
+                          </div>
+                          <div class="absolute bottom-1 left-2 text-xs text-white font-medium">Flow</div>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                   
                   <!-- Darkness Slider -->
@@ -596,7 +727,7 @@ function renderTopBar(pageTitle: string, user?: any): string {
                         type="range" 
                         id="darknessSlider" 
                         min="10" 
-                        max="60" 
+                        max="100" 
                         value="20" 
                         class="flex-1 h-2 bg-white/20 rounded-lg appearance-none cursor-pointer slider"
                         oninput="adjustDarkness(this.value)"
