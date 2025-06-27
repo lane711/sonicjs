@@ -65,33 +65,31 @@ export function renderSettingsPage(data: SettingsPageData): string {
   const activeTab = data.activeTab || 'general'
   
   const pageContent = `
-    <div class="space-y-6">
-      <!-- Page Header -->
-      <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <h1 class="text-2xl font-bold text-white">Settings</h1>
-            <p class="text-gray-300 mt-1">Manage your application settings and preferences</p>
-          </div>
-          <div class="flex space-x-3">
-            <button 
-              onclick="resetSettings()" 
-              class="px-4 py-2 bg-white/10 text-gray-300 rounded-lg hover:bg-white/20 transition-colors border border-white/10"
-            >
-              Reset to Defaults
-            </button>
-            <button 
-              onclick="saveAllSettings()" 
-              class="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all font-medium"
-            >
-              Save All Changes
-            </button>
-          </div>
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-semibold text-white">Settings</h1>
+          <p class="mt-2 text-sm text-gray-300">Manage your application settings and preferences</p>
+        </div>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none flex space-x-3">
+          <button 
+            onclick="resetSettings()" 
+            class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/10 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all"
+          >
+            Reset to Defaults
+          </button>
+          <button 
+            onclick="saveAllSettings()" 
+            class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/20 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/30 transition-all"
+          >
+            Save All Changes
+          </button>
         </div>
       </div>
 
       <!-- Settings Navigation Tabs -->
-      <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl overflow-hidden">
+      <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl overflow-hidden mb-6">
         <nav class="flex space-x-0" role="tablist">
           ${renderTabButton('general', 'General', 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z', activeTab)}
           ${renderTabButton('appearance', 'Appearance', 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z', activeTab)}

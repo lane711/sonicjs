@@ -86,87 +86,67 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
   }
 
   const pageContent = `
-    <div class="space-y-6">
-      <!-- Page Header -->
-      <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <h1 class="text-2xl font-bold text-white">Collections</h1>
-            <p class="text-gray-300 mt-1">Manage your content collections and their schemas</p>
-          </div>
-          <a href="/admin/collections/new" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all font-medium">
-            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-semibold text-white">Collections</h1>
+          <p class="mt-2 text-sm text-gray-300">Manage your content collections and their schemas</p>
+        </div>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+          <a href="/admin/collections/new" class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/20 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/30 transition-all">
+            <svg class="-ml-0.5 mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
             </svg>
             New Collection
           </a>
         </div>
       </div>
       
-      <!-- Collections Table -->
-      <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl overflow-hidden">
-        ${data.collections.length > 0 ? renderTable(tableData) : `
-          <div class="text-center py-16">
-            <div class="flex justify-center mb-4">
-              <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                </svg>
-              </div>
+      <!-- Filters -->
+      <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6 mb-6">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2">
+              <input 
+                type="text" 
+                placeholder="Search collections..." 
+                class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-sm w-64 text-white placeholder-gray-300"
+                hx-get="/admin/collections/search"
+                hx-trigger="keyup changed delay:300ms"
+                hx-target="#collections-list"
+              >
             </div>
-            <h3 class="text-lg font-semibold text-white mb-2">No collections found</h3>
-            <p class="text-gray-300 mb-6">Get started by creating your first collection to organize your content.</p>
-            <a href="/admin/collections/new" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all font-medium">
-              <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-              </svg>
-              Create Your First Collection
-            </a>
           </div>
-        `}
-      </div>
-      
-      <!-- Quick Actions -->
-      <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6">
-        <h3 class="text-lg font-semibold text-white mb-4">Quick Actions</h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <a href="/admin/collections/new" class="flex items-center p-4 bg-white/10 rounded-lg hover:bg-white/20 transition-colors border border-white/10 group">
-            <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg flex items-center justify-center mr-3 group-hover:scale-105 transition-transform">
-              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-              </svg>
-            </div>
-            <div>
-              <h4 class="text-sm font-medium text-white">New Collection</h4>
-              <p class="text-xs text-gray-300">Create a new content collection</p>
-            </div>
-          </a>
-          
-          <a href="/admin/content" class="flex items-center p-4 bg-white/10 rounded-lg hover:bg-white/20 transition-colors border border-white/10 group">
-            <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-teal-500 rounded-lg flex items-center justify-center mr-3 group-hover:scale-105 transition-transform">
-              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
-            </div>
-            <div>
-              <h4 class="text-sm font-medium text-white">Manage Content</h4>
-              <p class="text-xs text-gray-300">View and edit all content</p>
-            </div>
-          </a>
-          
-          <a href="/admin/collections/import" class="flex items-center p-4 bg-white/10 rounded-lg hover:bg-white/20 transition-colors border border-white/10 group">
-            <div class="w-10 h-10 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg flex items-center justify-center mr-3 group-hover:scale-105 transition-transform">
-              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-              </svg>
-            </div>
-            <div>
-              <h4 class="text-sm font-medium text-white">Import Data</h4>
-              <p class="text-xs text-gray-300">Import from external sources</p>
-            </div>
-          </a>
+          <div class="flex items-center space-x-2">
+            <span class="text-sm text-gray-300">${data.collections.length} collections</span>
+            <button 
+              class="inline-flex items-center px-3 py-1 backdrop-blur-sm bg-white/10 text-white text-sm rounded-xl border border-white/20 hover:bg-white/20 transition-all"
+              onclick="location.reload()"
+            >
+              Refresh
+            </button>
+          </div>
         </div>
       </div>
+      
+      <!-- Collections List -->
+      <div id="collections-list">
+        ${renderTable(tableData)}
+      </div>
+      
+      <!-- Empty State -->
+      ${data.collections.length === 0 ? `
+        <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-8 text-center">
+          <div class="text-gray-400">
+            <svg class="mx-auto h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+            </svg>
+            <p class="mt-2 text-lg text-gray-300">No collections found</p>
+            <p class="mt-1 text-sm text-gray-400">Get started by creating your first collection</p>
+          </div>
+        </div>
+      ` : ''}
     </div>
   `
 

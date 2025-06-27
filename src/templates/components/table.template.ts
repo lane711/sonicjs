@@ -45,8 +45,8 @@ export function renderTable<T = any>(data: TableData<T>): string {
           <thead class="bg-white/5">
             <tr>
               ${data.selectable ? `
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                  <input type="checkbox" class="rounded bg-white/10 border-white/30 text-blue-400 focus:ring-blue-400 row-checkbox" id="select-all-${tableId}">
+                <th class="px-6 py-3 text-left">
+                  <input type="checkbox" class="rounded border-white/20 bg-white/10 text-blue-500 focus:ring-blue-500 focus:ring-offset-0 row-checkbox" id="select-all-${tableId}">
                 </th>
               ` : ''}
               ${data.columns.map((column, index) => `
@@ -81,7 +81,7 @@ export function renderTable<T = any>(data: TableData<T>): string {
                 <tr class="hover:bg-white/5 transition-colors">
                   ${data.selectable ? `
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <input type="checkbox" class="rounded bg-gray-800 border-gray-600 text-blue-500 focus:ring-blue-500 row-checkbox" value="${(row as any).id || ''}">
+                      <input type="checkbox" class="rounded border-white/20 bg-white/10 text-blue-500 focus:ring-blue-500 focus:ring-offset-0 row-checkbox" value="${(row as any).id || ''}">
                     </td>
                   ` : ''}
                   ${data.columns.map(column => {

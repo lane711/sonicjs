@@ -10,24 +10,25 @@ export interface DesignPageData {
 
 export function renderDesignPage(data: DesignPageData): string {
   const pageContent = `
-    <!-- Page Header -->
-    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6 mb-8">
-      <div class="flex items-center justify-between">
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
-          <h1 class="text-2xl font-bold text-white">Design System</h1>
-          <p class="text-gray-300 mt-1">Comprehensive showcase of all design system components and patterns</p>
+          <h1 class="text-2xl font-semibold text-white">Design System</h1>
+          <p class="mt-2 text-sm text-gray-300">Comprehensive showcase of all design system components and patterns</p>
         </div>
-        <div class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium">
-          <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"/>
-          </svg>
-          Components
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+          <a href="/docs/design-system" class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/20 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/30 transition-all">
+            <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            Documentation
+          </a>
         </div>
       </div>
-    </div>
 
-    <!-- Components Showcase -->
-    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6 mb-8">
+      <!-- Components Showcase -->
+      <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 mb-6">
       <div class="flex items-center justify-between mb-4">
         <div>
           <h2 class="text-2xl font-bold text-white">Components Showcase</h2>
@@ -196,7 +197,7 @@ export function renderDesignPage(data: DesignPageData): string {
     <div id="forms" class="mb-8">
       <h2 class="text-2xl font-bold text-white mb-6">Form Components</h2>
       
-      <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl overflow-hidden">
+      <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl overflow-hidden">
         <!-- Form Header -->
         <div class="relative px-8 py-6 border-b border-white/10">
           <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10"></div>
@@ -252,19 +253,19 @@ export function renderDesignPage(data: DesignPageData): string {
       
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Basic Card -->
-        <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6">
+        <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6">
           <h3 class="text-lg font-semibold text-white mb-4">Basic Card</h3>
           <p class="text-gray-300">This is a standard card component with glass morphism styling.</p>
         </div>
 
         <!-- Interactive Card -->
-        <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6 hover:shadow-3xl hover:scale-[1.02] transition-all cursor-pointer">
+        <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 hover:shadow-3xl hover:scale-[1.02] transition-all cursor-pointer">
           <h3 class="text-lg font-semibold text-white mb-4">Interactive Card</h3>
           <p class="text-gray-300">This card has hover effects with scale and shadow changes.</p>
         </div>
 
         <!-- Status Card -->
-        <div class="backdrop-blur-xl bg-green-500/10 rounded-3xl border border-green-500/20 shadow-2xl p-6">
+        <div class="backdrop-blur-xl bg-green-500/10 rounded-xl border border-green-500/20 shadow-2xl p-6">
           <h3 class="text-lg font-semibold text-green-300 mb-4">Status Card</h3>
           <p class="text-green-200">This card shows status-specific styling with success colors.</p>
         </div>

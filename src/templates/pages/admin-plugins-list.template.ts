@@ -35,50 +35,63 @@ export interface PluginsListPageData {
 
 export function renderPluginsListPage(data: PluginsListPageData): string {
   const pageContent = `
-    <!-- Stats Cards -->
-    <div class="mb-8 grid grid-cols-1 md:grid-cols-4 gap-6">
-      ${renderPluginStatsCards(data.stats)}
-    </div>
-
-    <!-- Plugin Filters -->
-    <div class="mb-6 backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6">
-      <div class="flex flex-wrap gap-4 items-center justify-between">
-        <div class="flex flex-wrap gap-4">
-          <select class="bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            <option value="">All Categories</option>
-            <option value="content">Content Management</option>
-            <option value="media">Media</option>
-            <option value="seo">SEO & Analytics</option>
-            <option value="security">Security</option>
-            <option value="utilities">Utilities</option>
-          </select>
-          
-          <select class="bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            <option value="">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-            <option value="error">Error</option>
-          </select>
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-semibold text-white">Plugins</h1>
+          <p class="mt-2 text-sm text-gray-300">Manage and extend functionality with plugins</p>
         </div>
-        
-        <div class="flex gap-3">
-          <div class="relative">
-            <input type="text" placeholder="Search plugins..." 
-                   class="bg-white/10 border border-white/20 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-400 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64">
-            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
-          </div>
-          
-          <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+          <button class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/20 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/30 transition-all">
+            <svg class="-ml-0.5 mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
             </svg>
             Install Plugin
           </button>
         </div>
       </div>
-    </div>
+
+      <!-- Stats Cards -->
+      <div class="mb-6 grid grid-cols-1 md:grid-cols-4 gap-6">
+        ${renderPluginStatsCards(data.stats)}
+      </div>
+
+      <!-- Filters -->
+      <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Category</label>
+            <select class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors w-full">
+              <option value="">All Categories</option>
+              <option value="content">Content Management</option>
+              <option value="media">Media</option>
+              <option value="seo">SEO & Analytics</option>
+              <option value="security">Security</option>
+              <option value="utilities">Utilities</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Status</label>
+            <select class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors w-full">
+              <option value="">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="error">Error</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Search</label>
+            <input type="text" placeholder="Search plugins..." 
+                   class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors w-full">
+          </div>
+          <div class="flex items-end">
+            <button class="inline-flex items-center px-3 py-2 backdrop-blur-sm bg-white/10 text-white text-sm rounded-xl border border-white/20 hover:bg-white/20 transition-all w-full justify-center">
+              Refresh
+            </button>
+          </div>
+        </div>
+      </div>
 
     <!-- Plugins Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
