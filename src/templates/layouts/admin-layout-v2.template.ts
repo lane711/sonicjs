@@ -166,6 +166,41 @@ export function renderAdminLayout(data: AdminLayoutData): string {
         opacity: 1;
       }
     }
+    
+    /* Custom slider styles */
+    .slider::-webkit-slider-thumb {
+      appearance: none;
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background: #465FFF;
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .slider::-moz-range-thumb {
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background: #465FFF;
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .slider::-webkit-slider-track {
+      height: 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .slider::-moz-range-track {
+      height: 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+    }
   </style>
   
   <!-- Scripts -->
@@ -177,7 +212,7 @@ export function renderAdminLayout(data: AdminLayoutData): string {
 </head>
 <body class="bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800 min-h-screen text-gray-1">
   <!-- Background overlay with glass effect -->
-  <div class="fixed inset-0 bg-black/20 backdrop-blur-sm"></div>
+  <div id="background-overlay" class="fixed inset-0 backdrop-blur-sm" style="background-color: rgba(0, 0, 0, 0.2);"></div>
   <!-- Main container -->
   <div class="relative z-10 min-h-screen">
     <!-- Header -->
@@ -277,6 +312,104 @@ export function renderAdminLayout(data: AdminLayoutData): string {
         }
       }, 5000);
     }
+    
+    // Background customizer functionality
+    function toggleBackgroundCustomizer() {
+      const dropdown = document.getElementById('backgroundCustomizer');
+      dropdown.classList.toggle('hidden');
+    }
+    
+    // Background themes
+    const backgroundThemes = {
+      'default': 'bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800',
+      'cosmic-blue': 'bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900',
+      'matrix-green': 'bg-gradient-to-br from-gray-900 via-emerald-900 to-green-900',
+      'cyber-pink': 'bg-gradient-to-br from-gray-900 via-pink-900 to-rose-900',
+      'neon-orange': 'bg-gradient-to-br from-gray-900 via-orange-900 to-amber-900',
+      'deep-space': 'bg-gradient-to-br from-slate-900 via-gray-900 to-black'
+    };
+    
+    // Set background theme
+    function setBackground(theme) {
+      const body = document.body;
+      
+      // Remove all existing background classes
+      Object.values(backgroundThemes).forEach(bgClass => {
+        body.classList.remove(...bgClass.split(' ').slice(1)); // Remove 'bg-gradient-to-br' prefix
+      });
+      
+      // Add new background classes
+      const newClasses = backgroundThemes[theme].split(' ').slice(1); // Remove 'bg-gradient-to-br' prefix
+      body.classList.add('bg-gradient-to-br', ...newClasses);
+      
+      // Save preference
+      localStorage.setItem('backgroundTheme', theme);
+      
+      // Close dropdown
+      toggleBackgroundCustomizer();
+      
+      // Show notification
+      showNotification('Background changed to ' + theme.replace('-', ' '), 'success');
+    }
+    
+    // Adjust background darkness
+    function adjustDarkness(value) {
+      const overlay = document.getElementById('background-overlay');
+      if (overlay) {
+        const opacity = value / 100; // Convert percentage to decimal
+        overlay.style.backgroundColor = 'rgba(0, 0, 0, ' + opacity + ')';
+        localStorage.setItem('backgroundDarkness', value);
+        console.log('Darkness adjusted to:', value + '%', 'Opacity:', opacity);
+      } else {
+        console.log('Overlay element not found');
+      }
+    }
+    
+    // Initialize background on page load
+    function initializeBackground() {
+      const savedTheme = localStorage.getItem('backgroundTheme') || 'default';
+      const savedDarkness = localStorage.getItem('backgroundDarkness') || '20';
+      
+      // Set background theme
+      if (savedTheme !== 'default') {
+        const body = document.body;
+        Object.values(backgroundThemes).forEach(bgClass => {
+          body.classList.remove(...bgClass.split(' ').slice(1));
+        });
+        const newClasses = backgroundThemes[savedTheme].split(' ').slice(1);
+        body.classList.add('bg-gradient-to-br', ...newClasses);
+      }
+      
+      // Set darkness
+      const overlay = document.getElementById('background-overlay');
+      if (overlay) {
+        const opacity = savedDarkness / 100;
+        overlay.style.backgroundColor = 'rgba(0, 0, 0, ' + opacity + ')';
+      }
+      
+      // Set slider value
+      const slider = document.getElementById('darknessSlider');
+      if (slider) {
+        slider.value = savedDarkness;
+      }
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+      const dropdown = document.getElementById('backgroundCustomizer');
+      const button = event.target.closest('button');
+      const slider = event.target.closest('#darknessSlider');
+      const dropdownContainer = event.target.closest('#backgroundCustomizer');
+      
+      // Don't close if clicking inside the dropdown, on the toggle button, or on the slider
+      if (!button?.getAttribute('onclick')?.includes('toggleBackgroundCustomizer') && 
+          !slider && !dropdownContainer) {
+        dropdown?.classList.add('hidden');
+      }
+    });
+    
+    // Initialize background when page loads
+    document.addEventListener('DOMContentLoaded', initializeBackground);
   </script>
 </body>
 </html>`
@@ -390,6 +523,94 @@ function renderTopBar(pageTitle: string, user?: any): string {
               </svg>
               <span class="absolute top-1 right-1 w-2 h-2 bg-red-400 rounded-full"></span>
             </button>
+
+            <!-- Background Customizer -->
+            <div class="relative z-[9999]">
+              <button class="p-2 text-gray-300 hover:text-white transition-colors rounded-lg hover:bg-white/10" onclick="toggleBackgroundCustomizer()">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"/>
+                </svg>
+              </button>
+              
+              <!-- Background Customizer Dropdown -->
+              <div id="backgroundCustomizer" class="hidden absolute right-0 mt-2 w-80 backdrop-blur-md bg-black/95 rounded-xl border border-white/10 shadow-xl z-[9999]">
+                <div class="p-6">
+                  <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-white">Background Themes</h3>
+                    <button onclick="toggleBackgroundCustomizer()" class="text-gray-400 hover:text-white">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  <!-- Background Options -->
+                  <div class="space-y-3 mb-6">
+                    <div class="grid grid-cols-2 gap-3">
+                      <!-- Default -->
+                      <button onclick="setBackground('default')" class="bg-preview bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800 h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group">
+                        <div class="absolute inset-0 bg-black/20 rounded-lg"></div>
+                        <div class="absolute bottom-1 left-2 text-xs text-white font-medium">Default</div>
+                      </button>
+                      
+                      <!-- Cosmic Blue -->
+                      <button onclick="setBackground('cosmic-blue')" class="bg-preview bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group">
+                        <div class="absolute inset-0 bg-black/20 rounded-lg"></div>
+                        <div class="absolute bottom-1 left-2 text-xs text-white font-medium">Cosmic</div>
+                      </button>
+                      
+                      <!-- Matrix Green -->
+                      <button onclick="setBackground('matrix-green')" class="bg-preview bg-gradient-to-br from-gray-900 via-emerald-900 to-green-900 h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group">
+                        <div class="absolute inset-0 bg-black/20 rounded-lg"></div>
+                        <div class="absolute bottom-1 left-2 text-xs text-white font-medium">Matrix</div>
+                      </button>
+                      
+                      <!-- Cyber Pink -->
+                      <button onclick="setBackground('cyber-pink')" class="bg-preview bg-gradient-to-br from-gray-900 via-pink-900 to-rose-900 h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group">
+                        <div class="absolute inset-0 bg-black/20 rounded-lg"></div>
+                        <div class="absolute bottom-1 left-2 text-xs text-white font-medium">Cyber</div>
+                      </button>
+                      
+                      <!-- Neon Orange -->
+                      <button onclick="setBackground('neon-orange')" class="bg-preview bg-gradient-to-br from-gray-900 via-orange-900 to-amber-900 h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group">
+                        <div class="absolute inset-0 bg-black/20 rounded-lg"></div>
+                        <div class="absolute bottom-1 left-2 text-xs text-white font-medium">Neon</div>
+                      </button>
+                      
+                      <!-- Deep Space -->
+                      <button onclick="setBackground('deep-space')" class="bg-preview bg-gradient-to-br from-slate-900 via-gray-900 to-black h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group">
+                        <div class="absolute inset-0 bg-black/20 rounded-lg"></div>
+                        <div class="absolute bottom-1 left-2 text-xs text-white font-medium">Space</div>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- Darkness Slider -->
+                  <div class="space-y-3">
+                    <label class="block text-sm font-medium text-white">Background Darkness</label>
+                    <div class="flex items-center space-x-3">
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/>
+                      </svg>
+                      <input 
+                        type="range" 
+                        id="darknessSlider" 
+                        min="10" 
+                        max="60" 
+                        value="20" 
+                        class="flex-1 h-2 bg-white/20 rounded-lg appearance-none cursor-pointer slider"
+                        oninput="adjustDarkness(this.value)"
+                        onchange="adjustDarkness(this.value)"
+                      >
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                      </svg>
+                    </div>
+                    <div class="text-xs text-gray-400 text-center">Adjust overlay darkness</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           
             <!-- User Dropdown -->
             ${user ? `
@@ -408,7 +629,7 @@ function renderTopBar(pageTitle: string, user?: any): string {
                 </button>
                 
                 <!-- Dropdown Menu -->
-                <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 backdrop-blur-md bg-black/40 rounded-xl border border-white/10 shadow-xl z-[9999]">
+                <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 backdrop-blur-md bg-black/95 rounded-xl border border-white/10 shadow-xl z-[9999]">
                   <div class="py-2">
                     <div class="px-4 py-2 border-b border-white/10">
                       <p class="text-sm font-medium text-gray-1">${user.name}</p>

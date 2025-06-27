@@ -50,6 +50,7 @@ export function renderDesignPage(data: DesignPageData): string {
         <a href="#tables" class="text-blue-300 hover:text-blue-200 transition-colors">Tables</a>
         <a href="#alerts" class="text-blue-300 hover:text-blue-200 transition-colors">Alerts</a>
         <a href="#spacing" class="text-blue-300 hover:text-blue-200 transition-colors">Spacing</a>
+        <a href="#overlays" class="text-blue-300 hover:text-blue-200 transition-colors">Overlays</a>
       </div>
     </div>
 
@@ -427,6 +428,55 @@ export function renderDesignPage(data: DesignPageData): string {
               p-6           /* 24px - Medium container padding */<br>
               p-4           /* 16px - Small container padding */
             </code>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dropdown & Popup Overlays Section -->
+    <div id="overlays" class="mb-8">
+      <h2 class="text-2xl font-bold text-white mb-6">Dropdown & Popup Overlays</h2>
+      
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-lg font-semibold text-white mb-4">Standard Popup Overlay</h3>
+          <div class="relative inline-block">
+            <button class="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all font-medium">
+              Example Dropdown
+            </button>
+            <!-- Popup Example -->
+            <div class="absolute top-full left-0 mt-2 w-64 backdrop-blur-md bg-black/95 rounded-xl border border-white/10 shadow-xl z-50">
+              <div class="p-4">
+                <h4 class="text-white font-medium mb-2">Popup Overlay Example</h4>
+                <p class="text-gray-300 text-sm mb-3">This demonstrates the standard 95% opacity for popup overlays.</p>
+                <div class="space-y-2">
+                  <a href="#" class="block text-gray-300 hover:text-white transition-colors text-sm">Menu Item 1</a>
+                  <a href="#" class="block text-gray-300 hover:text-white transition-colors text-sm">Menu Item 2</a>
+                  <a href="#" class="block text-gray-300 hover:text-white transition-colors text-sm">Menu Item 3</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4">
+            <code class="text-xs text-gray-400 bg-black/20 px-2 py-1 rounded">backdrop-blur-md bg-black/95 rounded-xl border border-white/10 shadow-xl</code>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-semibold text-white mb-4">Opacity Standards</h3>
+          <div class="space-y-3">
+            <div class="flex items-center space-x-4">
+              <div class="w-16 h-8 bg-black/95 rounded border border-white/10"></div>
+              <span class="text-sm text-gray-300">bg-black/95 - Popup overlays (95% opacity)</span>
+            </div>
+            <div class="flex items-center space-x-4">
+              <div class="w-16 h-8 bg-black/20 rounded border border-white/10"></div>
+              <span class="text-sm text-gray-300">bg-black/20 - Background overlays (20% opacity)</span>
+            </div>
+            <div class="flex items-center space-x-4">
+              <div class="w-16 h-8 bg-white/10 rounded border border-white/10"></div>
+              <span class="text-sm text-gray-300">bg-white/10 - Glass containers (10% opacity)</span>
+            </div>
           </div>
         </div>
       </div>

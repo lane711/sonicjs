@@ -1,6 +1,19 @@
 import { Hono } from 'hono'
 import { renderDesignPage, DesignPageData } from '../templates/pages/admin-design.template'
 
+type Bindings = {
+  DB: D1Database
+  KV: KVNamespace
+}
+
+type Variables = {
+  user: {
+    userId: string
+    email: string
+    role: string
+  }
+}
+
 export const adminDesignRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
 adminDesignRoutes.get('/', (c) => {
