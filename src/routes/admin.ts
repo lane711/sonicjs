@@ -739,4 +739,33 @@ adminRoutes.get('/api-reference', (c) => {
   return c.html(renderAPIReferencePage(pageData))
 })
 
+// Populate database with dummy content (development only)
+adminRoutes.post('/populate-dummy-content', async (c) => {
+  try {
+    const user = c.get('user')
+    
+    // Only allow admin users to populate dummy content
+    if (!user || user.role !== 'admin') {
+      return c.json({ error: 'Unauthorized. Admin access required.' }, 403)
+    }
+    
+    const db = c.env.DB
+    
+    // Import the populate function
+    const { populateDatabase } = await import('../scripts/populate-dummy-content')
+    
+    // Execute the population
+    const result = await populateDatabase(db)
+    
+    return c.json(result)
+  } catch (error) {
+    console.error('Error in populate-dummy-content route:', error)
+    return c.json({ 
+      success: false, 
+      message: `Failed to populate database: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      count: 0
+    }, 500)
+  }
+})
+
 export default adminRoutes
