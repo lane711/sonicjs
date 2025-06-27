@@ -64,10 +64,16 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
           if (!collection || !collection.id) return '<span class="text-gray-500">-</span>'
           return `
             <div class="flex items-center space-x-2">
-              <a href="/admin/collections/${collection.id}" class="inline-flex items-center px-3 py-1 border border-white/20 text-sm leading-4 font-medium rounded-md text-gray-300 bg-white/10 hover:bg-white/20 hover:text-white transition-colors">
+              <a href="/admin/collections/${collection.id}" class="inline-flex items-center px-3 py-1 text-sm leading-4 font-medium rounded-lg text-gray-300 bg-white/10 hover:bg-white/20 hover:text-white transition-colors border border-white/20">
+                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
                 Edit
               </a>
-              <a href="/admin/collections/${collection.name || collection.id}/content" class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-500/20 hover:bg-blue-500/30 transition-colors">
+              <a href="/admin/collections/${collection.name || collection.id}/content" class="inline-flex items-center px-3 py-1 text-sm leading-4 font-medium rounded-lg text-white bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/30 hover:to-purple-500/30 transition-all border border-blue-500/30">
+                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
                 Content
               </a>
             </div>
@@ -80,107 +86,87 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
   }
 
   const pageContent = `
-    <div class="py-6">
-      <!-- Header -->
-      <div class="flex justify-between items-center mb-6">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900">Collections</h1>
-          <p class="text-gray-600 mt-2">Manage your content collections and their schemas</p>
+    <div class="space-y-6">
+      <!-- Page Header -->
+      <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-bold text-white">Collections</h1>
+            <p class="text-gray-300 mt-1">Manage your content collections and their schemas</p>
+          </div>
+          <a href="/admin/collections/new" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all font-medium">
+            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            New Collection
+          </a>
         </div>
-        <a href="/admin/collections/new" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 backdrop-blur-md bg-white/10 hover:bg-white/20">
-          <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-          </svg>
-          New Collection
-        </a>
       </div>
       
       <!-- Collections Table -->
-      <div class="backdrop-blur-md bg-black/20 rounded-lg shadow-sm border border-white/10">
+      <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl overflow-hidden">
         ${data.collections.length > 0 ? renderTable(tableData) : `
-          <div class="text-center py-12">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-            </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">No collections</h3>
-            <p class="mt-1 text-sm text-gray-500">Get started by creating your first collection.</p>
-            <div class="mt-6">
-              <a href="/admin/collections/new" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 backdrop-blur-md bg-white/10 hover:bg-white/20">
-                <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          <div class="text-center py-16">
+            <div class="flex justify-center mb-4">
+              <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                 </svg>
-                New Collection
-              </a>
+              </div>
             </div>
+            <h3 class="text-lg font-semibold text-white mb-2">No collections found</h3>
+            <p class="text-gray-300 mb-6">Get started by creating your first collection to organize your content.</p>
+            <a href="/admin/collections/new" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all font-medium">
+              <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              Create Your First Collection
+            </a>
           </div>
         `}
       </div>
-      <a href="/admin/collections/new" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all">
-        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-        </svg>
-        New Collection
-      </a>
-    </div>
-
-    <!-- Recent Activity Table from glass-admin.template.ts for comparison -->
-    <div class="mt-8 backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl overflow-hidden">
-        <div class="px-6 py-4 border-b border-white/10">
-            <h3 class="text-lg font-semibold text-white">Recent Activity (Reference)</h3>
+      
+      <!-- Quick Actions -->
+      <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6">
+        <h3 class="text-lg font-semibold text-white mb-4">Quick Actions</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <a href="/admin/collections/new" class="flex items-center p-4 bg-white/10 rounded-lg hover:bg-white/20 transition-colors border border-white/10 group">
+            <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg flex items-center justify-center mr-3 group-hover:scale-105 transition-transform">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-sm font-medium text-white">New Collection</h4>
+              <p class="text-xs text-gray-300">Create a new content collection</p>
+            </div>
+          </a>
+          
+          <a href="/admin/content" class="flex items-center p-4 bg-white/10 rounded-lg hover:bg-white/20 transition-colors border border-white/10 group">
+            <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-teal-500 rounded-lg flex items-center justify-center mr-3 group-hover:scale-105 transition-transform">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-sm font-medium text-white">Manage Content</h4>
+              <p class="text-xs text-gray-300">View and edit all content</p>
+            </div>
+          </a>
+          
+          <a href="/admin/collections/import" class="flex items-center p-4 bg-white/10 rounded-lg hover:bg-white/20 transition-colors border border-white/10 group">
+            <div class="w-10 h-10 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg flex items-center justify-center mr-3 group-hover:scale-105 transition-transform">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-sm font-medium text-white">Import Data</h4>
+              <p class="text-xs text-gray-300">Import from external sources</p>
+            </div>
+          </a>
         </div>
-        <div class="overflow-x-auto">
-            <table class="w-full">
-                <thead class="bg-white/5">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">User</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Action</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-white/10">
-                    <tr class="hover:bg-white/5 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full mr-3"></div>
-                                <div class="text-sm font-medium text-white">John Doe</div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">Login</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">2 hours ago</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-400/20 text-green-300">Success</span>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-white/5 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 bg-gradient-to-br from-blue-400 to-teal-500 rounded-full mr-3"></div>
-                                <div class="text-sm font-medium text-white">Jane Smith</div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">Purchase</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">3 hours ago</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-400/20 text-blue-300">Completed</span>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-white/5 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 bg-gradient-to-br from-orange-400 to-red-500 rounded-full mr-3"></div>
-                                <div class="text-sm font-medium text-white">Mike Johnson</div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">Failed Login</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">5 hours ago</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-400/20 text-red-300">Failed</span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+      </div>
     </div>
   `
 
