@@ -90,10 +90,10 @@ export function renderContentListPage(data: ContentListPageData): string {
       render: (value, row) => `
         <div class="flex items-center">
           <div>
-            <div class="text-sm font-medium text-gray-900">
-              <a href="/admin/content/${row.id}" class="hover:text-blue-600">${row.title}</a>
+            <div class="text-sm font-medium text-white">
+              <a href="/admin/content/${row.id}" class="hover:text-blue-400">${row.title}</a>
             </div>
-            <div class="text-sm text-gray-500">${row.slug}</div>
+            <div class="text-sm text-gray-400">${row.slug}</div>
           </div>
         </div>
       `
@@ -124,7 +124,7 @@ export function renderContentListPage(data: ContentListPageData): string {
       label: 'Updated',
       sortable: true,
       sortType: 'date',
-      className: 'text-sm text-gray-500'
+      className: 'text-sm text-gray-400'
     },
     {
       key: 'actions',
@@ -133,9 +133,9 @@ export function renderContentListPage(data: ContentListPageData): string {
       className: 'text-sm font-medium',
       render: (value, row) => `
         <div class="flex space-x-2">
-          <a href="/admin/content/${row.id}/edit" class="btn btn-sm btn-primary">Edit</a>
+          <a href="/admin/content/${row.id}/edit" class="inline-flex items-center px-3 py-1 backdrop-blur-sm bg-blue-500/80 text-white text-sm rounded-xl border border-white/20 hover:bg-blue-500 transition-all">Edit</a>
           <button 
-            class="btn btn-sm btn-secondary"
+            class="inline-flex items-center px-3 py-1 backdrop-blur-sm bg-white/10 text-white text-sm rounded-xl border border-white/20 hover:bg-white/20 transition-all"
             hx-get="/admin/content/${row.id}/versions"
             hx-target="#versions-modal"
           >
@@ -143,13 +143,13 @@ export function renderContentListPage(data: ContentListPageData): string {
           </button>
           ${row.availableActions.length > 0 ? `
             <div class="relative inline-block text-left">
-              <button class="btn btn-sm btn-secondary" onclick="toggleDropdown('${row.id}')">
+              <button class="inline-flex items-center px-3 py-1 backdrop-blur-sm bg-white/10 text-white text-sm rounded-xl border border-white/20 hover:bg-white/20 transition-all" onclick="toggleDropdown('${row.id}')">
                 Actions ▼
               </button>
-              <div id="dropdown-${row.id}" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+              <div id="dropdown-${row.id}" class="hidden absolute right-0 mt-2 w-48 backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl z-10">
                 ${row.availableActions.map((action: string) => `
                   <button 
-                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-white/10 transition-all"
                     hx-post="/admin/content/${row.id}/workflow"
                     hx-vals='{"action": "${action}"}'
                     hx-target="#content-list"
@@ -195,7 +195,22 @@ export function renderContentListPage(data: ContentListPageData): string {
 
   // Generate page content
   const pageContent = `
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-semibold text-white">Content Management</h1>
+          <p class="mt-2 text-sm text-gray-300">Manage and organize your content items</p>
+        </div>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+          <a href="/admin/content/new" class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/20 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/30 transition-all">
+            <svg class="-ml-0.5 mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+            </svg>
+            New Content
+          </a>
+        </div>
+      </div>
       <!-- Filters -->
       ${renderFilterBar(filterBarData)}
       
@@ -205,15 +220,6 @@ export function renderContentListPage(data: ContentListPageData): string {
         ${renderPagination(paginationData)}
       </div>
       
-      <!-- Action Button -->
-      <div class="fixed bottom-6 right-6">
-        <a href="/admin/content/new" class="btn btn-primary shadow-lg">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-          </svg>
-          New Content
-        </a>
-      </div>
     </div>
     
     <!-- Modals -->

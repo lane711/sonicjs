@@ -4,6 +4,7 @@ import { renderDashboardPage, renderStatsCards, DashboardPageData, DashboardStat
 import { renderCollectionsListPage, CollectionsListPageData, Collection } from '../templates/pages/admin-collections-list.template'
 import { renderCollectionFormPage, CollectionFormData } from '../templates/pages/admin-collections-form.template'
 import { renderPluginsListPage, PluginsListPageData, generateMockPlugins } from '../templates/pages/admin-plugins-list.template'
+import { renderSettingsPage, SettingsPageData } from '../templates/pages/admin-settings.template'
 
 type Bindings = {
   DB: D1Database
@@ -548,6 +549,97 @@ adminRoutes.get('/plugins', (c) => {
   }
   
   return c.html(renderPluginsListPage(pageData))
+})
+
+// Settings page
+adminRoutes.get('/settings', (c) => {
+  const user = c.get('user')
+  const url = new URL(c.req.url)
+  const activeTab = url.searchParams.get('tab') || 'general'
+  
+  // Mock settings data - in a real app, this would come from database
+  const mockSettings = {
+    general: {
+      siteName: 'SonicJS AI',
+      siteDescription: 'A modern headless CMS powered by AI',
+      adminEmail: user?.email || 'admin@example.com',
+      timezone: 'UTC',
+      language: 'en',
+      maintenanceMode: false
+    },
+    appearance: {
+      theme: 'dark' as const,
+      primaryColor: '#465FFF',
+      logoUrl: '',
+      favicon: '',
+      customCSS: ''
+    },
+    security: {
+      twoFactorEnabled: false,
+      sessionTimeout: 30,
+      passwordRequirements: {
+        minLength: 8,
+        requireUppercase: true,
+        requireNumbers: true,
+        requireSymbols: false
+      },
+      ipWhitelist: []
+    },
+    notifications: {
+      emailNotifications: true,
+      contentUpdates: true,
+      systemAlerts: true,
+      userRegistrations: false,
+      emailFrequency: 'immediate' as const
+    },
+    storage: {
+      maxFileSize: 10,
+      allowedFileTypes: ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'docx'],
+      storageProvider: 'cloudflare' as const,
+      backupFrequency: 'daily' as const,
+      retentionPeriod: 30
+    }
+  }
+  
+  const pageData: SettingsPageData = {
+    user: user ? {
+      name: user.email,
+      email: user.email,
+      role: user.role
+    } : undefined,
+    settings: mockSettings,
+    activeTab
+  }
+  
+  return c.html(renderSettingsPage(pageData))
+})
+
+// Save settings
+adminRoutes.post('/settings', async (c) => {
+  try {
+    const formData = await c.req.formData()
+    
+    // Here you would save the settings to your database
+    // For now, we'll just return a success message
+    
+    return c.html(html`
+      <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+        Settings saved successfully!
+        <script>
+          setTimeout(() => {
+            showNotification('Settings saved successfully!', 'success');
+          }, 100);
+        </script>
+      </div>
+    `)
+  } catch (error) {
+    console.error('Error saving settings:', error)
+    return c.html(html`
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        Failed to save settings. Please try again.
+      </div>
+    `)
+  }
 })
 
 export default adminRoutes
