@@ -11,31 +11,35 @@ export interface DesignPageData {
 export function renderDesignPage(data: DesignPageData): string {
   const pageContent = `
     <!-- Page Header -->
-    <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-8 mb-8">
-      <!-- Breadcrumb -->
-      <nav class="flex mb-6" aria-label="Breadcrumb">
-        <ol class="flex items-center space-x-3">
-          <li>
-            <a href="/admin" class="text-gray-300 hover:text-white transition-colors">Admin</a>
-          </li>
-          <li class="text-gray-400">/</li>
-          <li class="text-white font-medium">Design System</li>
-        </ol>
-      </nav>
-      
-      <!-- Title Section with Gradient -->
-      <div class="relative">
-        <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-3xl"></div>
-        <div class="relative">
-          <h1 class="text-4xl font-bold text-white mb-3">Design System</h1>
-          <p class="text-gray-300 text-lg">Comprehensive showcase of all design system components and patterns</p>
+    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6 mb-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-white">Design System</h1>
+          <p class="text-gray-300 mt-1">Comprehensive showcase of all design system components and patterns</p>
+        </div>
+        <div class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium">
+          <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"/>
+          </svg>
+          Components
         </div>
       </div>
     </div>
 
-    <!-- Table of Contents -->
-    <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6 mb-8">
-      <h2 class="text-2xl font-bold text-white mb-4">Components Showcase</h2>
+    <!-- Components Showcase -->
+    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6 mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-2xl font-bold text-white">Components Showcase</h2>
+          <p class="text-gray-300 mt-1">Quick navigation to all design system components</p>
+        </div>
+        <div class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium">
+          <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+          Quick Nav
+        </div>
+      </div>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <a href="#typography" class="text-blue-300 hover:text-blue-200 transition-colors">Typography</a>
         <a href="#colors" class="text-blue-300 hover:text-blue-200 transition-colors">Colors</a>
