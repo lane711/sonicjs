@@ -5,6 +5,7 @@ import { renderCollectionsListPage, CollectionsListPageData, Collection } from '
 import { renderCollectionFormPage, CollectionFormData } from '../templates/pages/admin-collections-form.template'
 import { renderPluginsListPage, PluginsListPageData, generateMockPlugins } from '../templates/pages/admin-plugins-list.template'
 import { renderSettingsPage, SettingsPageData } from '../templates/pages/admin-settings.template'
+import { renderAPIReferencePage, APIReferencePageData, APIEndpoint } from '../templates/pages/admin-api-reference.template'
 
 type Bindings = {
   DB: D1Database
@@ -640,6 +641,102 @@ adminRoutes.post('/settings', async (c) => {
       </div>
     `)
   }
+})
+
+// API Reference page
+adminRoutes.get('/api-reference', (c) => {
+  const user = c.get('user')
+  
+  // Define all API endpoints
+  const endpoints: APIEndpoint[] = [
+    // API Routes
+    { method: 'GET', path: '/api/', description: 'Returns OpenAPI specification for the API', authentication: false, category: 'System' },
+    { method: 'GET', path: '/api/health', description: 'Health check endpoint that returns status, timestamp, and available schemas', authentication: false, category: 'System' },
+    { method: 'GET', path: '/api/collections', description: 'Retrieves all active collections from the database', authentication: false, category: 'Content' },
+    { method: 'GET', path: '/api/content', description: 'Retrieves content items with pagination (limit 50)', authentication: false, category: 'Content' },
+    { method: 'GET', path: '/api/collections/:collection/content', description: 'Gets content for a specific collection', authentication: false, category: 'Content' },
+    
+    // API Media Routes
+    { method: 'POST', path: '/api/media/upload', description: 'Upload a single file to R2 storage', authentication: true, category: 'Media' },
+    { method: 'POST', path: '/api/media/upload-multiple', description: 'Upload multiple files at once (batch upload)', authentication: true, category: 'Media' },
+    { method: 'POST', path: '/api/media/bulk-delete', description: 'Delete multiple files (max 50 per operation)', authentication: true, category: 'Media' },
+    { method: 'DELETE', path: '/api/media/:id', description: 'Delete a single media file (soft delete)', authentication: true, category: 'Media' },
+    { method: 'PATCH', path: '/api/media/:id', description: 'Update file metadata (alt text, caption, tags, folder)', authentication: true, category: 'Media' },
+    
+    // Auth Routes
+    { method: 'GET', path: '/auth/login', description: 'Display login page HTML form', authentication: false, category: 'Auth' },
+    { method: 'GET', path: '/auth/register', description: 'Display registration page HTML form', authentication: false, category: 'Auth' },
+    { method: 'POST', path: '/auth/register', description: 'Register new user (JSON API)', authentication: false, category: 'Auth' },
+    { method: 'POST', path: '/auth/login', description: 'User login (JSON API)', authentication: false, category: 'Auth' },
+    { method: 'POST', path: '/auth/logout', description: 'Log out user (clears auth cookie)', authentication: false, category: 'Auth' },
+    { method: 'GET', path: '/auth/logout', description: 'Log out user and redirect to login page', authentication: false, category: 'Auth' },
+    { method: 'GET', path: '/auth/me', description: 'Get current authenticated user details', authentication: true, category: 'Auth' },
+    { method: 'POST', path: '/auth/refresh', description: 'Refresh authentication token', authentication: true, category: 'Auth' },
+    { method: 'POST', path: '/auth/register/form', description: 'Form-based registration handler for HTML forms', authentication: false, category: 'Auth' },
+    { method: 'POST', path: '/auth/login/form', description: 'Form-based login handler for HTML forms', authentication: false, category: 'Auth' },
+    { method: 'POST', path: '/auth/seed-admin', description: 'Create test admin user (development only)', authentication: false, category: 'Auth' },
+    { method: 'POST', path: '/auth/normalize-emails', description: 'Normalize existing emails to lowercase (migration tool)', authentication: true, category: 'Auth' },
+    
+    // Content Routes
+    { method: 'GET', path: '/content/health', description: 'Health check for content API', authentication: false, category: 'System' },
+    
+    // Media Routes
+    { method: 'GET', path: '/media/serve/:key', description: 'Serve media files from R2 storage', authentication: false, category: 'Media' },
+    { method: 'GET', path: '/media/', description: 'Get all media files with filtering and pagination', authentication: false, category: 'Media' },
+    { method: 'POST', path: '/media/upload', description: 'Upload media files (with HTMX support)', authentication: true, category: 'Media' },
+    { method: 'GET', path: '/media/:id', description: 'Get single media file details', authentication: false, category: 'Media' },
+    { method: 'PUT', path: '/media/:id', description: 'Update media file metadata', authentication: true, category: 'Media' },
+    { method: 'DELETE', path: '/media/:id', description: 'Delete media file (soft delete)', authentication: true, category: 'Media' },
+    { method: 'POST', path: '/media/bulk', description: 'Bulk operations on media (delete, move, tag)', authentication: true, category: 'Media' },
+    { method: 'GET', path: '/media/stats/overview', description: 'Get media statistics and overview', authentication: false, category: 'Media' },
+    { method: 'GET', path: '/media/folders', description: 'Get list of media folders with file counts', authentication: false, category: 'Media' },
+    
+    // Admin Routes
+    { method: 'GET', path: '/admin/', description: 'Admin dashboard main page', authentication: true, category: 'Admin' },
+    { method: 'GET', path: '/admin/api/stats', description: 'Get dashboard statistics (HTMX endpoint)', authentication: true, category: 'Admin' },
+    { method: 'GET', path: '/admin/collections', description: 'List all collections', authentication: true, category: 'Admin' },
+    { method: 'GET', path: '/admin/collections/new', description: 'New collection form', authentication: true, category: 'Admin' },
+    { method: 'POST', path: '/admin/collections', description: 'Create new collection', authentication: true, category: 'Admin' },
+    { method: 'GET', path: '/admin/collections/:id', description: 'Edit collection form', authentication: true, category: 'Admin' },
+    { method: 'PUT', path: '/admin/collections/:id', description: 'Update collection', authentication: true, category: 'Admin' },
+    { method: 'DELETE', path: '/admin/collections/:id', description: 'Delete collection', authentication: true, category: 'Admin' },
+    { method: 'GET', path: '/admin/users', description: 'List users with pagination and filtering', authentication: true, category: 'Admin' },
+    { method: 'POST', path: '/admin/users/:id/toggle', description: 'Toggle user active status', authentication: true, category: 'Admin' },
+    { method: 'GET', path: '/admin/users/export', description: 'Export users to CSV', authentication: true, category: 'Admin' },
+    { method: 'GET', path: '/admin/plugins', description: 'List plugins page', authentication: true, category: 'Admin' },
+    { method: 'GET', path: '/admin/settings', description: 'Settings page with tabs', authentication: true, category: 'Admin' },
+    { method: 'POST', path: '/admin/settings', description: 'Save settings', authentication: true, category: 'Admin' },
+    { method: 'GET', path: '/admin/content/', description: 'List content with filtering and pagination', authentication: true, category: 'Admin' },
+    { method: 'GET', path: '/admin/content/new', description: 'New content form', authentication: true, category: 'Admin' },
+    { method: 'POST', path: '/admin/content/', description: 'Create new content', authentication: true, category: 'Admin' },
+    { method: 'GET', path: '/admin/content/:id/edit', description: 'Edit content form', authentication: true, category: 'Admin' },
+    { method: 'PUT', path: '/admin/content/:id', description: 'Update content', authentication: true, category: 'Admin' },
+    { method: 'DELETE', path: '/admin/content/:id', description: 'Delete content', authentication: true, category: 'Admin' },
+    { method: 'GET', path: '/admin/media/', description: 'Media library main page with grid/list view', authentication: true, category: 'Admin' },
+    { method: 'GET', path: '/admin/media/search', description: 'Search media files (HTMX endpoint)', authentication: true, category: 'Admin' },
+    { method: 'GET', path: '/admin/media/:id/details', description: 'Get file details modal (HTMX endpoint)', authentication: true, category: 'Admin' },
+    { method: 'POST', path: '/admin/media/upload', description: 'Upload files (HTMX compatible)', authentication: true, category: 'Admin' },
+    { method: 'PUT', path: '/admin/media/:id', description: 'Update media file metadata (HTMX compatible)', authentication: true, category: 'Admin' },
+    { method: 'DELETE', path: '/admin/media/:id', description: 'Delete media file (HTMX compatible)', authentication: true, category: 'Admin' },
+    { method: 'GET', path: '/admin/faq/', description: 'List FAQs with filtering and pagination', authentication: true, category: 'Admin' },
+    { method: 'GET', path: '/admin/faq/new', description: 'New FAQ form', authentication: true, category: 'Admin' },
+    { method: 'POST', path: '/admin/faq/', description: 'Create new FAQ', authentication: true, category: 'Admin' },
+    { method: 'GET', path: '/admin/faq/:id', description: 'Edit FAQ form', authentication: true, category: 'Admin' },
+    { method: 'PUT', path: '/admin/faq/:id', description: 'Update FAQ', authentication: true, category: 'Admin' },
+    { method: 'DELETE', path: '/admin/faq/:id', description: 'Delete FAQ', authentication: true, category: 'Admin' },
+    { method: 'GET', path: '/admin/api-reference', description: 'API documentation and reference', authentication: true, category: 'Admin' }
+  ]
+
+  const pageData: APIReferencePageData = {
+    endpoints,
+    user: user ? {
+      name: user.email,
+      email: user.email,
+      role: user.role
+    } : undefined
+  }
+
+  return c.html(renderAPIReferencePage(pageData))
 })
 
 export default adminRoutes
