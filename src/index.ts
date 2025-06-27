@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 import { prettyJSON } from 'hono/pretty-json'
+import { serveStatic } from 'hono/cloudflare-workers'
 import { apiRoutes } from './routes/api'
 import { adminRoutes } from './routes/admin'
 import { adminContentRoutes } from './routes/admin-content'
@@ -21,6 +22,7 @@ type Bindings = {
   DB: D1Database
   KV: KVNamespace
   MEDIA_BUCKET: R2Bucket
+  ASSETS: Fetcher
   EMAIL_QUEUE?: Queue
   SENDGRID_API_KEY?: string
   DEFAULT_FROM_EMAIL?: string
@@ -34,6 +36,21 @@ const app = new Hono<{ Bindings: Bindings }>()
 app.use('*', logger())
 app.use('*', cors())
 app.use('/api/*', prettyJSON())
+
+// Static file serving for images
+app.get('/images/*', async (c) => {
+  const path = c.req.path.replace('/images/', '')
+  try {
+    const response = await c.env.ASSETS.fetch(new Request(`http://localhost/images/${path}`))
+    if (response.ok) {
+      return response
+    }
+    return c.notFound()
+  } catch (error) {
+    console.error('Error serving static file:', error)
+    return c.notFound()
+  }
+})
 
 // Public routes
 app.route('/auth', authRoutes)

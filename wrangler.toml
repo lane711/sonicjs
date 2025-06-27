@@ -3,6 +3,11 @@ main = "src/index.ts"
 compatibility_date = "2024-06-01"
 compatibility_flags = ["nodejs_compat"]
 
+# Static assets
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
 [vars]
 ENVIRONMENT = "development"
 # Cloudflare Images configuration (optional)

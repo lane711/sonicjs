@@ -202,25 +202,45 @@ export function renderAdminLayout(data: AdminLayoutData): string {
       border: none;
     }
     
-    /* SVG Pattern Backgrounds */
+    /* PNG Background Images */
     .svg-pattern-circuit {
       background-color: #111827;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='none' stroke='%2310b981' stroke-width='1'%3E%3Ccircle cx='15' cy='15' r='3' fill='%2310b981'/%3E%3Ccircle cx='45' cy='15' r='3' fill='%2310b981'/%3E%3Ccircle cx='15' cy='45' r='3' fill='%2310b981'/%3E%3Ccircle cx='45' cy='45' r='3' fill='%2310b981'/%3E%3Cpath d='M15 15h30M15 45h30M15 15v30M45 15v30' stroke='%23059669' stroke-width='0.8'/%3E%3Cpath d='M10 10h10v10h-10zM40 10h10v10h-10zM10 40h10v10h-10zM40 40h10v10h-10z' stroke='%23065f46' stroke-width='0.5' fill='none'/%3E%3C/g%3E%3C/svg%3E");
+      background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=1920&q=80');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
     }
     
     .svg-pattern-neural {
       background-color: #111827;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='none'%3E%3Ccircle cx='40' cy='40' r='4' fill='%233b82f6'/%3E%3Ccircle cx='20' cy='20' r='3' fill='%2360a5fa'/%3E%3Ccircle cx='60' cy='20' r='3' fill='%2360a5fa'/%3E%3Ccircle cx='20' cy='60' r='3' fill='%2360a5fa'/%3E%3Ccircle cx='60' cy='60' r='3' fill='%2360a5fa'/%3E%3Cpath d='M40 40L20 20M40 40L60 20M40 40L20 60M40 40L60 60' stroke='%232563eb' stroke-width='1' opacity='0.6'/%3E%3Ccircle cx='10' cy='40' r='2' fill='%2393c5fd'/%3E%3Ccircle cx='70' cy='40' r='2' fill='%2393c5fd'/%3E%3Ccircle cx='40' cy='10' r='2' fill='%2393c5fd'/%3E%3Ccircle cx='40' cy='70' r='2' fill='%2393c5fd'/%3E%3Cpath d='M40 40L10 40M40 40L70 40M40 40L40 10M40 40L40 70' stroke='%233b82f6' stroke-width='0.8' opacity='0.4'/%3E%3C/g%3E%3C/svg%3E");
+      background-image: url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1920&q=80');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
     }
     
     .svg-pattern-grid {
       background-color: #111827;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Cg fill='none'%3E%3Crect x='5' y='5' width='40' height='40' stroke='%237c3aed' stroke-width='0.8' fill='none'/%3E%3Crect x='12' y='12' width='26' height='26' stroke='%23a855f7' stroke-width='0.6' fill='none'/%3E%3Crect x='18' y='18' width='14' height='14' stroke='%23c084fc' stroke-width='0.4' fill='none'/%3E%3Crect x='22' y='22' width='6' height='6' fill='%238b5cf6' opacity='0.3'/%3E%3Cpath d='M25 5v40M5 25h40' stroke='%236d28d9' stroke-width='0.3' opacity='0.5'/%3E%3Ccircle cx='25' cy='25' r='1' fill='%23a855f7'/%3E%3C/g%3E%3C/svg%3E");
+      background-image: url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=1920&q=80');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
     }
     
     .svg-pattern-flow {
       background-color: #111827;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='60' viewBox='0 0 100 60'%3E%3Cg fill='none'%3E%3Cpath d='M0 30Q25 15 50 30T100 30' stroke='%23f59e0b' stroke-width='1.5' fill='none' opacity='0.7'/%3E%3Cpath d='M0 20Q30 5 60 20T120 20' stroke='%23f97316' stroke-width='1.2' fill='none' opacity='0.5'/%3E%3Cpath d='M0 40Q20 25 40 40T80 40' stroke='%23fb923c' stroke-width='1' fill='none' opacity='0.6'/%3E%3Ccircle cx='25' cy='30' r='2' fill='%23fbbf24' opacity='0.8'/%3E%3Ccircle cx='75' cy='30' r='2' fill='%23fbbf24' opacity='0.8'/%3E%3Ccircle cx='15' cy='20' r='1.5' fill='%23fed7aa' opacity='0.6'/%3E%3Ccircle cx='45' cy='40' r='1.5' fill='%23fed7aa' opacity='0.6'/%3E%3Cpath d='M10 10l5 5m5-5l-5 5M80 10l5 5m5-5l-5 5' stroke='%23fdba74' stroke-width='1' opacity='0.4'/%3E%3C/g%3E%3C/svg%3E");
+      background-image: url('https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1920&q=80');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    
+    .svg-pattern-blue-waves {
+      background-color: #111827;
+      background-image: url('/images/backgrounds/blue-waves.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
     }
   </style>
   
@@ -351,7 +371,8 @@ export function renderAdminLayout(data: AdminLayoutData): string {
       'circuit-board': 'svg-pattern-circuit',
       'neural-network': 'svg-pattern-neural',
       'geometric-grid': 'svg-pattern-grid',
-      'data-flow': 'svg-pattern-flow'
+      'data-flow': 'svg-pattern-flow',
+      'blue-waves': 'svg-pattern-blue-waves'
     };
     
     // Set background theme
@@ -711,6 +732,14 @@ function renderTopBar(pageTitle: string, user?: any): string {
                             </svg>
                           </div>
                           <div class="absolute bottom-1 left-2 text-xs text-white font-medium">Flow</div>
+                        </button>
+                        
+                        <!-- Blue Waves -->
+                        <button onclick="setBackground('blue-waves')" class="h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group overflow-hidden">
+                          <div class="absolute inset-0">
+                            <img src="/images/backgrounds/blue-waves.png" alt="Blue Waves" class="w-full h-full object-cover opacity-60">
+                          </div>
+                          <div class="absolute bottom-1 left-2 text-xs text-white font-medium bg-black/50 px-2 py-1 rounded">Waves</div>
                         </button>
                       </div>
                     </div>
