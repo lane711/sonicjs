@@ -242,6 +242,30 @@ export function renderAdminLayout(data: AdminLayoutData): string {
       background-position: center;
       background-repeat: no-repeat;
     }
+    
+    .svg-pattern-blue-crescent {
+      background-color: #111827;
+      background-image: url('/images/backgrounds/blue-crescent.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    
+    .svg-pattern-blue-stars {
+      background-color: #111827;
+      background-image: url('/images/backgrounds/blue-stars.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    
+    .svg-pattern-blue-waves-3d {
+      background-color: #111827;
+      background-image: url('/images/backgrounds/blue-waves-3d.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
   </style>
   
   <!-- Scripts -->
@@ -372,7 +396,10 @@ export function renderAdminLayout(data: AdminLayoutData): string {
       'neural-network': 'svg-pattern-neural',
       'geometric-grid': 'svg-pattern-grid',
       'data-flow': 'svg-pattern-flow',
-      'blue-waves': 'svg-pattern-blue-waves'
+      'blue-waves': 'svg-pattern-blue-waves',
+      'blue-crescent': 'svg-pattern-blue-crescent',
+      'blue-stars': 'svg-pattern-blue-stars',
+      'blue-waves-3d': 'svg-pattern-blue-waves-3d'
     };
     
     // Set background theme
@@ -740,6 +767,33 @@ function renderTopBar(pageTitle: string, user?: any): string {
                             <img src="/images/backgrounds/blue-waves.png" alt="Blue Waves" class="w-full h-full object-cover opacity-60">
                           </div>
                           <div class="absolute bottom-1 left-2 text-xs text-white font-medium bg-black/50 px-2 py-1 rounded">Waves</div>
+                        </button>
+                        
+                        <!-- Blue Crescent -->
+                        <button onclick="setBackground('blue-crescent')" class="h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group overflow-hidden">
+                          <div class="absolute inset-0">
+                            <img src="/images/backgrounds/blue-crescent.png" alt="Blue Crescent" class="w-full h-full object-cover opacity-60">
+                          </div>
+                          <div class="absolute bottom-1 left-2 text-xs text-white font-medium bg-black/50 px-2 py-1 rounded">Crescent</div>
+                        </button>
+                      </div>
+                      
+                      <!-- Additional row for more backgrounds -->
+                      <div class="grid grid-cols-2 gap-3 mt-3">
+                        <!-- Blue Stars -->
+                        <button onclick="setBackground('blue-stars')" class="h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group overflow-hidden">
+                          <div class="absolute inset-0">
+                            <img src="/images/backgrounds/blue-stars.png" alt="Blue Stars" class="w-full h-full object-cover opacity-60">
+                          </div>
+                          <div class="absolute bottom-1 left-2 text-xs text-white font-medium bg-black/50 px-2 py-1 rounded">Stars</div>
+                        </button>
+                        
+                        <!-- Blue Waves 3D -->
+                        <button onclick="setBackground('blue-waves-3d')" class="h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group overflow-hidden">
+                          <div class="absolute inset-0">
+                            <img src="/images/backgrounds/blue-waves-3d.png" alt="Blue Waves 3D" class="w-full h-full object-cover opacity-60">
+                          </div>
+                          <div class="absolute bottom-1 left-2 text-xs text-white font-medium bg-black/50 px-2 py-1 rounded">3D Waves</div>
                         </button>
                       </div>
                     </div>
