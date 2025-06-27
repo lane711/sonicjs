@@ -167,13 +167,26 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
                 >
                   Select All
                 </button>
-                <button 
-                  id="bulk-actions-btn"
-                  class="px-3 py-1 text-sm bg-black/20 text-gray-400 rounded-xl cursor-not-allowed"
-                  disabled
-                >
-                  Bulk Actions
-                </button>
+                <div class="relative">
+                  <button 
+                    id="bulk-actions-btn"
+                    class="px-3 py-1 text-sm bg-black/20 text-gray-400 rounded-xl cursor-not-allowed"
+                    disabled
+                    onclick="toggleBulkActionsDropdown()"
+                  >
+                    Bulk Actions
+                  </button>
+                  <div id="bulk-actions-dropdown" class="hidden absolute right-0 mt-2 w-48 backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl z-50">
+                    <div class="py-1">
+                      <button 
+                        onclick="performBulkDelete()"
+                        class="w-full text-left px-4 py-2 text-sm text-red-300 hover:text-red-200 hover:bg-white/10 transition-all"
+                      >
+                        Delete Selected Files
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -358,7 +371,105 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
           btn.disabled = true;
           btn.className = 'px-3 py-1 text-sm bg-black/20 text-gray-400 rounded-xl cursor-not-allowed';
           btn.textContent = 'Bulk Actions';
+          // Hide dropdown when no files selected
+          document.getElementById('bulk-actions-dropdown').classList.add('hidden');
         }
+      }
+      
+      function toggleBulkActionsDropdown() {
+        if (selectedFiles.size === 0) return;
+        const dropdown = document.getElementById('bulk-actions-dropdown');
+        dropdown.classList.toggle('hidden');
+      }
+      
+      async function performBulkDelete() {
+        if (selectedFiles.size === 0) return;
+        
+        const fileCount = selectedFiles.size;
+        const confirmed = confirm(\`Are you sure you want to delete \${fileCount} selected file\${fileCount > 1 ? 's' : ''}? This action cannot be undone.\`);
+        
+        if (!confirmed) return;
+        
+        try {
+          // Show loading state
+          const btn = document.getElementById('bulk-actions-btn');
+          const originalText = btn.textContent;
+          btn.textContent = 'Deleting...';
+          btn.disabled = true;
+          
+          // Hide dropdown
+          document.getElementById('bulk-actions-dropdown').classList.add('hidden');
+          
+          const response = await fetch('/api/media/bulk-delete', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              fileIds: Array.from(selectedFiles)
+            })
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            // Show success notification
+            showNotification(\`Successfully deleted \${result.summary.successful} file\${result.summary.successful > 1 ? 's' : ''}\`, 'success');
+            
+            // Remove deleted files from DOM
+            result.deleted.forEach(item => {
+              const element = document.querySelector(\`[data-file-id="\${item.fileId}"]\`);
+              if (element) {
+                element.remove();
+              }
+            });
+            
+            // Show errors if any
+            if (result.errors.length > 0) {
+              console.warn('Some files failed to delete:', result.errors);
+              showNotification(\`\${result.errors.length} file\${result.errors.length > 1 ? 's' : ''} failed to delete\`, 'warning');
+            }
+            
+            // Clear selection
+            selectedFiles.clear();
+            updateBulkActionsButton();
+            document.getElementById('select-all-btn').textContent = 'Select All';
+          } else {
+            showNotification('Failed to delete files', 'error');
+          }
+        } catch (error) {
+          console.error('Bulk delete error:', error);
+          showNotification('An error occurred while deleting files', 'error');
+        } finally {
+          // Reset button state
+          updateBulkActionsButton();
+        }
+      }
+      
+      function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        const bgColor = type === 'success' ? 'bg-green-500/90' : 
+                       type === 'warning' ? 'bg-yellow-500/90' : 
+                       type === 'error' ? 'bg-red-500/90' : 'bg-blue-500/90';
+        
+        notification.className = \`fixed top-4 right-4 backdrop-blur-xl \${bgColor} text-white px-4 py-2 rounded-xl shadow-2xl z-50 transition-all transform translate-x-full\`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        // Animate in
+        setTimeout(() => {
+          notification.classList.remove('translate-x-full');
+        }, 100);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+          notification.classList.add('translate-x-full');
+          setTimeout(() => {
+            if (document.body.contains(notification)) {
+              document.body.removeChild(notification);
+            }
+          }, 300);
+        }, 3000);
       }
       
       // URL parameter helpers
@@ -472,6 +583,15 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
       document.getElementById('file-modal').addEventListener('click', function(e) {
         if (e.target === this) {
           this.classList.add('hidden');
+        }
+      });
+      
+      // Close bulk actions dropdown when clicking outside
+      document.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('bulk-actions-dropdown');
+        const button = document.getElementById('bulk-actions-btn');
+        if (!dropdown.contains(e.target) && !button.contains(e.target)) {
+          dropdown.classList.add('hidden');
         }
       });
     </script>

@@ -347,6 +347,84 @@ apiMediaRoutes.post('/upload-multiple', async (c) => {
   }
 })
 
+// Bulk delete files
+apiMediaRoutes.post('/bulk-delete', async (c) => {
+  try {
+    const user = c.get('user')
+    const body = await c.req.json()
+    const fileIds = body.fileIds as string[]
+    
+    if (!fileIds || !Array.isArray(fileIds) || fileIds.length === 0) {
+      return c.json({ error: 'No file IDs provided' }, 400)
+    }
+
+    // Limit bulk operations to prevent abuse
+    if (fileIds.length > 50) {
+      return c.json({ error: 'Too many files selected. Maximum 50 files per operation.' }, 400)
+    }
+
+    const results = []
+    const errors = []
+
+    for (const fileId of fileIds) {
+      try {
+        // Get file record
+        const stmt = c.env.DB.prepare('SELECT * FROM media WHERE id = ? AND deleted_at IS NULL')
+        const fileRecord = await stmt.bind(fileId).first() as any
+        
+        if (!fileRecord) {
+          errors.push({ fileId, error: 'File not found' })
+          continue
+        }
+
+        // Check permissions (only allow deletion by uploader or admin)
+        if (fileRecord.uploaded_by !== user.userId && user.role !== 'admin') {
+          errors.push({ fileId, error: 'Permission denied' })
+          continue
+        }
+
+        // Delete from R2
+        try {
+          await c.env.MEDIA_BUCKET.delete(fileRecord.r2_key)
+        } catch (error) {
+          console.warn(`Failed to delete from R2 for file ${fileId}:`, error)
+          // Continue with database deletion even if R2 deletion fails
+        }
+
+        // Soft delete in database
+        const deleteStmt = c.env.DB.prepare('UPDATE media SET deleted_at = ? WHERE id = ?')
+        await deleteStmt.bind(Math.floor(Date.now() / 1000), fileId).run()
+
+        results.push({ 
+          fileId, 
+          filename: fileRecord.original_name,
+          success: true 
+        })
+      } catch (error) {
+        errors.push({ 
+          fileId, 
+          error: 'Delete failed', 
+          details: error instanceof Error ? error.message : 'Unknown error' 
+        })
+      }
+    }
+
+    return c.json({
+      success: results.length > 0,
+      deleted: results,
+      errors: errors,
+      summary: {
+        total: fileIds.length,
+        successful: results.length,
+        failed: errors.length
+      }
+    })
+  } catch (error) {
+    console.error('Bulk delete error:', error)
+    return c.json({ error: 'Bulk delete failed' }, 500)
+  }
+})
+
 // Delete file
 apiMediaRoutes.delete('/:id', async (c) => {
   try {

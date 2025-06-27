@@ -50,11 +50,11 @@ export function renderMediaGrid(data: MediaGridData): string {
 export function renderMediaFileCard(file: MediaFile, viewMode: 'grid' | 'list' = 'grid', selectable: boolean = false): string {
   if (viewMode === 'list') {
     return `
-      <div class="media-item backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl hover:shadow-3xl transition-all">
+      <div class="media-item backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl hover:shadow-3xl transition-all" data-file-id="${file.id}">
         <div class="flex items-center p-4">
           ${selectable ? `
             <div class="flex-shrink-0 mr-4">
-              <input type="checkbox" class="rounded media-checkbox" value="${file.id}">
+              <input type="checkbox" class="rounded media-checkbox" value="${file.id}" onchange="toggleFileSelection('${file.id}')">
             </div>
           ` : ''}
           
@@ -110,10 +110,10 @@ export function renderMediaFileCard(file: MediaFile, viewMode: 'grid' | 'list' =
 
   // Grid view
   return `
-    <div class="media-item relative backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-200 overflow-hidden group">
+    <div class="media-item relative backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-200 overflow-hidden group" data-file-id="${file.id}">
       ${selectable ? `
         <div class="absolute top-2 left-2 z-10">
-          <input type="checkbox" class="rounded media-checkbox" value="${file.id}">
+          <input type="checkbox" class="rounded media-checkbox" value="${file.id}" onchange="toggleFileSelection('${file.id}')">
         </div>
       ` : ''}
       
