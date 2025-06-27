@@ -58,7 +58,7 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
       </div>
 
       <!-- Filters -->
-      <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6 mb-6">
+      <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 mb-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1">Category</label>

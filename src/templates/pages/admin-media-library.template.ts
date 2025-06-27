@@ -53,7 +53,7 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
       
       <div class="flex gap-6">
         <!-- Sidebar -->
-        <div class="w-64 backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6">
+        <div class="w-64 backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6">
           <div class="space-y-6">
             <!-- Upload Button -->
             <div>
@@ -129,7 +129,7 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
         <!-- Main Content -->
         <div class="flex-1">
           <!-- Toolbar -->
-          <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-4 mb-6">
+          <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-4 mb-6">
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-4">
                 <div class="flex items-center space-x-2">
@@ -225,7 +225,7 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
     
     <!-- Upload Modal -->
     <div id="upload-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-      <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6 w-full max-w-2xl">
+      <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 w-full max-w-2xl">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-medium text-white">Upload Files</h3>
           <button onclick="document.getElementById('upload-modal').classList.add('hidden')" class="text-gray-300 hover:text-white">
@@ -311,7 +311,7 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
     
     <!-- File Details Modal -->
     <div id="file-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-      <div id="file-modal-content" class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6 w-full max-w-4xl max-h-screen overflow-y-auto">
+      <div id="file-modal-content" class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 w-full max-w-4xl max-h-screen overflow-y-auto">
         <!-- Content loaded via HTMX -->
       </div>
     </div>

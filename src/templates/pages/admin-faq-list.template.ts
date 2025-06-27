@@ -50,7 +50,7 @@ export function renderFAQList(data: FAQListData): string {
       ${message ? renderAlert({ type: messageType || 'info', message, dismissible: true }) : ''}
 
       <!-- Filters -->
-      <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6">
+      <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label for="category" class="block text-sm font-medium text-gray-300 mb-1">Category</label>
@@ -147,7 +147,7 @@ export function renderFAQList(data: FAQListData): string {
           })),
           selectable: true
         }) : `
-          <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-8 text-center">
+          <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-8 text-center">
             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>

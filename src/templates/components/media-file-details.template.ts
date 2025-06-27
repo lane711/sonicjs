@@ -25,7 +25,7 @@ export function renderMediaFileDetails(data: MediaFileDetailsData): string {
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Preview -->
       <div class="space-y-4">
-        <div class="backdrop-blur-sm bg-white/10 rounded-3xl p-4">
+        <div class="backdrop-blur-sm bg-white/10 rounded-xl p-4">
           ${file.isImage ? `
             <img src="${file.public_url}" alt="${file.alt || file.filename}" class="w-full h-auto rounded">
           ` : file.isVideo ? `

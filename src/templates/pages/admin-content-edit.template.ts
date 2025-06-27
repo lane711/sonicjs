@@ -115,7 +115,7 @@ export function renderContentEditPage(data: ContentEditPageData): string {
     <div class="min-h-screen py-8">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Glass Morphism Header Card -->
-        <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-8 mb-8">
+        <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-8 mb-8">
           <!-- Breadcrumb -->
           <nav class="flex mb-6" aria-label="Breadcrumb">
             <ol class="flex items-center space-x-3">
@@ -158,7 +158,7 @@ export function renderContentEditPage(data: ContentEditPageData): string {
         ` : ''}
         
         <!-- Glass Morphism Form Container -->
-        <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl overflow-hidden">
+        <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl overflow-hidden">
           <!-- Form Header with Gradient Background -->
           <div class="relative px-8 py-6 border-b border-white/10">
             <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10"></div>

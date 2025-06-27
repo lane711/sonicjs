@@ -49,7 +49,7 @@ export function renderFAQForm(data: FAQFormData): string {
       ${message ? renderAlert({ type: messageType || 'info', message, dismissible: true }) : ''}
 
       <!-- Form -->
-      <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl">
+      <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl">
         <form ${isEdit ? `hx-put="/admin/faq/${faq?.id}"` : 'hx-post="/admin/faq"'} 
               hx-target="body" 
               hx-swap="outerHTML"

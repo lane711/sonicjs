@@ -76,26 +76,26 @@ export function renderAPIReferencePage(data: APIReferencePageData): string {
 
       <!-- Overview Stats -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6 text-center">
+        <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 text-center">
           <div class="text-2xl font-bold text-blue-400">${data.endpoints.length}</div>
           <div class="text-sm text-gray-300">Total Endpoints</div>
         </div>
-        <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6 text-center">
+        <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 text-center">
           <div class="text-2xl font-bold text-green-400">${data.endpoints.filter(e => !e.authentication).length}</div>
           <div class="text-sm text-gray-300">Public Endpoints</div>
         </div>
-        <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6 text-center">
+        <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 text-center">
           <div class="text-2xl font-bold text-yellow-400">${data.endpoints.filter(e => e.authentication).length}</div>
           <div class="text-sm text-gray-300">Protected Endpoints</div>
         </div>
-        <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6 text-center">
+        <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 text-center">
           <div class="text-2xl font-bold text-purple-400">${Object.keys(endpointsByCategory).length}</div>
           <div class="text-sm text-gray-300">Categories</div>
         </div>
       </div>
 
       <!-- Search and Filter -->
-      <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6 mb-6">
+      <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 mb-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label class="block text-sm font-medium text-white mb-1">Search Endpoints</label>
@@ -141,7 +141,7 @@ export function renderAPIReferencePage(data: APIReferencePageData): string {
           const info = categoryInfo[category] || { title: category, description: '', icon: '📋' }
           return `
             <div class="api-category" data-category="${category}">
-              <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl overflow-hidden">
+              <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl overflow-hidden">
                 <!-- Category Header -->
                 <div class="bg-white/5 px-6 py-4 border-b border-white/10">
                   <div class="flex items-center">
@@ -197,7 +197,7 @@ export function renderAPIReferencePage(data: APIReferencePageData): string {
       </div>
 
       <!-- No Results Message -->
-      <div id="no-results" class="hidden backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-8 text-center">
+      <div id="no-results" class="hidden backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-8 text-center">
         <div class="text-gray-300">
           <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

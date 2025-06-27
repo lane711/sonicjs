@@ -166,7 +166,7 @@ export function renderUsersListPage(data: UsersListPageData): string {
       ${data.success ? renderAlert({ type: 'success', message: data.success, dismissible: true }) : ''}
 
       <!-- Filters -->
-      <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6 mb-6">
+      <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 mb-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1">Search</label>
@@ -231,7 +231,7 @@ export function renderUsersListPage(data: UsersListPageData): string {
       ${data.pagination ? renderPagination(data.pagination) : ''}
 
       <!-- Stats -->
-      <div class="mt-6 backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6">
+      <div class="mt-6 backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
           <div>
             <div class="text-2xl font-bold text-purple-400">${data.totalUsers}</div>

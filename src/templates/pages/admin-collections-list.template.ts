@@ -104,7 +104,7 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
       </div>
       
       <!-- Filters -->
-      <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6 mb-6">
+      <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 mb-6">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-4">
             <div class="flex items-center space-x-2">
@@ -137,7 +137,7 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
       
       <!-- Empty State -->
       ${data.collections.length === 0 ? `
-        <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-8 text-center">
+        <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-8 text-center">
           <div class="text-gray-400">
             <svg class="mx-auto h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
