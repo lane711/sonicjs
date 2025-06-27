@@ -21,23 +21,57 @@ apiRoutes.use('*', cors({
 
 // OpenAPI specification endpoint
 apiRoutes.get('/', (c) => {
+  const baseUrl = c.req.url.replace(c.req.path, '')
+  
   const openApiSpec = {
     openapi: '3.0.0',
     info: {
       title: 'SonicJS AI API',
       version: '0.1.0',
-      description: 'RESTful API for SonicJS AI CMS'
+      description: 'RESTful API for SonicJS AI - A modern headless CMS built for Cloudflare\'s edge platform',
+      contact: {
+        name: 'SonicJS AI',
+        url: `${baseUrl}/docs`
+      }
     },
     servers: [
       {
-        url: c.req.url.replace(c.req.path, ''),
+        url: baseUrl,
         description: 'Current server'
       }
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT'
+        }
+      }
+    },
     paths: {
+      '/api/': {
+        get: {
+          summary: 'Get OpenAPI specification',
+          description: 'Returns the OpenAPI 3.0 specification for this API',
+          responses: {
+            '200': {
+              description: 'OpenAPI specification',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object'
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       '/api/health': {
         get: {
-          summary: 'Health check',
+          summary: 'Health check endpoint',
+          description: 'Returns status, timestamp, and available schemas',
           responses: {
             '200': {
               description: 'API is healthy',
@@ -46,8 +80,13 @@ apiRoutes.get('/', (c) => {
                   schema: {
                     type: 'object',
                     properties: {
-                      status: { type: 'string' },
-                      timestamp: { type: 'string' }
+                      status: { type: 'string', example: 'healthy' },
+                      timestamp: { type: 'string', format: 'date-time' },
+                      schemas: { 
+                        type: 'array',
+                        items: { type: 'string' },
+                        description: 'Available content schemas'
+                      }
                     }
                   }
                 }
@@ -59,6 +98,7 @@ apiRoutes.get('/', (c) => {
       '/api/collections': {
         get: {
           summary: 'Get all collections',
+          description: 'Retrieves all active collections from the database',
           responses: {
             '200': {
               description: 'List of collections',
@@ -67,8 +107,42 @@ apiRoutes.get('/', (c) => {
                   schema: {
                     type: 'object',
                     properties: {
-                      data: { type: 'array' },
-                      meta: { type: 'object' }
+                      data: {
+                        type: 'array',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            id: { type: 'string' },
+                            name: { type: 'string' },
+                            displayName: { type: 'string' },
+                            description: { type: 'string' },
+                            schema: { type: 'object' },
+                            isActive: { type: 'boolean' },
+                            createdAt: { type: 'integer' },
+                            updatedAt: { type: 'integer' }
+                          }
+                        }
+                      },
+                      meta: {
+                        type: 'object',
+                        properties: {
+                          count: { type: 'integer' },
+                          timestamp: { type: 'string', format: 'date-time' }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            '500': {
+              description: 'Internal server error',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: { type: 'string' }
                     }
                   }
                 }
@@ -80,16 +154,132 @@ apiRoutes.get('/', (c) => {
       '/api/content': {
         get: {
           summary: 'Get all content',
+          description: 'Retrieves content items with pagination (limit 50)',
           responses: {
             '200': {
-              description: 'List of content',
+              description: 'List of content items',
               content: {
                 'application/json': {
                   schema: {
                     type: 'object',
                     properties: {
-                      data: { type: 'array' },
-                      meta: { type: 'object' }
+                      data: {
+                        type: 'array',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            id: { type: 'string' },
+                            title: { type: 'string' },
+                            slug: { type: 'string' },
+                            status: { type: 'string' },
+                            collectionId: { type: 'string' },
+                            data: { type: 'object' },
+                            createdAt: { type: 'string', format: 'date-time' },
+                            updatedAt: { type: 'string', format: 'date-time' }
+                          }
+                        }
+                      },
+                      meta: {
+                        type: 'object',
+                        properties: {
+                          count: { type: 'integer' },
+                          timestamp: { type: 'string', format: 'date-time' }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            '500': {
+              description: 'Internal server error',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: { type: 'string' }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      '/api/collections/{collection}/content': {
+        get: {
+          summary: 'Get content for specific collection',
+          description: 'Gets content for a specific collection by collection name',
+          parameters: [
+            {
+              name: 'collection',
+              in: 'path',
+              required: true,
+              schema: {
+                type: 'string'
+              },
+              description: 'Collection name'
+            }
+          ],
+          responses: {
+            '200': {
+              description: 'Content for the specified collection',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      data: {
+                        type: 'array',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            id: { type: 'string' },
+                            title: { type: 'string' },
+                            slug: { type: 'string' },
+                            status: { type: 'string' },
+                            collectionId: { type: 'string' },
+                            data: { type: 'object' },
+                            createdAt: { type: 'string', format: 'date-time' },
+                            updatedAt: { type: 'string', format: 'date-time' }
+                          }
+                        }
+                      },
+                      meta: {
+                        type: 'object',
+                        properties: {
+                          collection: { type: 'object' },
+                          count: { type: 'integer' },
+                          timestamp: { type: 'string', format: 'date-time' }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            '404': {
+              description: 'Collection not found',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: { type: 'string' }
+                    }
+                  }
+                }
+              }
+            },
+            '500': {
+              description: 'Internal server error',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: { type: 'string' }
                     }
                   }
                 }
@@ -124,7 +314,7 @@ apiRoutes.get('/health', (c) => {
 apiRoutes.get('/collections', async (c) => {
   try {
     const db = c.env.DB
-    const stmt = db.prepare('SELECT * FROM collections WHERE isActive = 1')
+    const stmt = db.prepare('SELECT * FROM collections WHERE is_active = 1')
     const { results } = await stmt.all()
     
     return c.json({
@@ -144,7 +334,7 @@ apiRoutes.get('/collections', async (c) => {
 apiRoutes.get('/content', async (c) => {
   try {
     const db = c.env.DB
-    const stmt = db.prepare('SELECT * FROM content ORDER BY createdAt DESC LIMIT 50')
+    const stmt = db.prepare('SELECT * FROM content ORDER BY created_at DESC LIMIT 50')
     const { results } = await stmt.all()
     
     // Parse JSON data field for each result
@@ -173,7 +363,7 @@ apiRoutes.get('/collections/:collection/content', async (c) => {
     const db = c.env.DB
     
     // First check if collection exists
-    const collectionStmt = db.prepare('SELECT * FROM collections WHERE name = ? AND isActive = 1')
+    const collectionStmt = db.prepare('SELECT * FROM collections WHERE name = ? AND is_active = 1')
     const collectionResult = await collectionStmt.first()
     
     if (!collectionResult) {
