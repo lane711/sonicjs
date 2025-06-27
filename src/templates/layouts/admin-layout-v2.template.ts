@@ -203,38 +203,6 @@ export function renderAdminLayout(data: AdminLayoutData): string {
     }
     
     /* PNG Background Images */
-    .svg-pattern-circuit {
-      background-color: #111827;
-      background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=1920&q=80');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-    
-    .svg-pattern-neural {
-      background-color: #111827;
-      background-image: url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1920&q=80');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-    
-    .svg-pattern-grid {
-      background-color: #111827;
-      background-image: url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=1920&q=80');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-    
-    .svg-pattern-flow {
-      background-color: #111827;
-      background-image: url('https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1920&q=80');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-    
     .svg-pattern-blue-waves {
       background-color: #111827;
       background-image: url('/images/backgrounds/blue-waves.png');
@@ -392,10 +360,6 @@ export function renderAdminLayout(data: AdminLayoutData): string {
       'cyber-pink': 'bg-gradient-to-br from-gray-900 via-pink-900 to-rose-900',
       'neon-orange': 'bg-gradient-to-br from-gray-900 via-orange-900 to-amber-900',
       'deep-space': 'bg-gradient-to-br from-slate-900 via-gray-900 to-black',
-      'circuit-board': 'svg-pattern-circuit',
-      'neural-network': 'svg-pattern-neural',
-      'geometric-grid': 'svg-pattern-grid',
-      'data-flow': 'svg-pattern-flow',
       'blue-waves': 'svg-pattern-blue-waves',
       'blue-crescent': 'svg-pattern-blue-crescent',
       'blue-stars': 'svg-pattern-blue-stars',
@@ -681,86 +645,10 @@ function renderTopBar(pageTitle: string, user?: any): string {
                       </button>
                     </div>
                     
-                    <!-- SVG Pattern Backgrounds -->
+                    <!-- Custom Backgrounds -->
                     <div class="mt-4">
-                      <h4 class="text-sm font-medium text-gray-300 mb-3">Abstract Patterns</h4>
+                      <h4 class="text-sm font-medium text-gray-300 mb-3">Custom Backgrounds</h4>
                       <div class="grid grid-cols-2 gap-3">
-                        <!-- Circuit Board -->
-                        <button onclick="setBackground('circuit-board')" class="h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group bg-gray-900 overflow-hidden">
-                          <div class="absolute inset-0 opacity-30">
-                            <svg class="w-full h-full" viewBox="0 0 100 100" fill="none">
-                              <defs>
-                                <pattern id="circuit" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                                  <rect width="20" height="20" fill="#1f2937"/>
-                                  <circle cx="5" cy="5" r="1" fill="#10b981"/>
-                                  <circle cx="15" cy="5" r="1" fill="#10b981"/>
-                                  <circle cx="5" cy="15" r="1" fill="#10b981"/>
-                                  <circle cx="15" cy="15" r="1" fill="#10b981"/>
-                                  <path d="M5 5h10M5 15h10M5 5v10M15 5v10" stroke="#059669" stroke-width="0.5"/>
-                                </pattern>
-                              </defs>
-                              <rect width="100" height="100" fill="url(#circuit)"/>
-                            </svg>
-                          </div>
-                          <div class="absolute bottom-1 left-2 text-xs text-white font-medium">Circuit</div>
-                        </button>
-                        
-                        <!-- Neural Network -->
-                        <button onclick="setBackground('neural-network')" class="h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group bg-gray-900 overflow-hidden">
-                          <div class="absolute inset-0 opacity-30">
-                            <svg class="w-full h-full" viewBox="0 0 100 100" fill="none">
-                              <defs>
-                                <pattern id="neural" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
-                                  <rect width="30" height="30" fill="#1f2937"/>
-                                  <circle cx="15" cy="15" r="2" fill="#3b82f6"/>
-                                  <circle cx="5" cy="8" r="1.5" fill="#60a5fa"/>
-                                  <circle cx="25" cy="22" r="1.5" fill="#60a5fa"/>
-                                  <path d="M15 15L5 8M15 15L25 22" stroke="#2563eb" stroke-width="1" opacity="0.6"/>
-                                </pattern>
-                              </defs>
-                              <rect width="100" height="100" fill="url(#neural)"/>
-                            </svg>
-                          </div>
-                          <div class="absolute bottom-1 left-2 text-xs text-white font-medium">Neural</div>
-                        </button>
-                        
-                        <!-- Geometric Grid -->
-                        <button onclick="setBackground('geometric-grid')" class="h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group bg-gray-900 overflow-hidden">
-                          <div class="absolute inset-0 opacity-30">
-                            <svg class="w-full h-full" viewBox="0 0 100 100" fill="none">
-                              <defs>
-                                <pattern id="grid" x="0" y="0" width="25" height="25" patternUnits="userSpaceOnUse">
-                                  <rect width="25" height="25" fill="#1f2937"/>
-                                  <rect x="2" y="2" width="21" height="21" fill="none" stroke="#7c3aed" stroke-width="0.5"/>
-                                  <rect x="6" y="6" width="13" height="13" fill="none" stroke="#a855f7" stroke-width="0.5"/>
-                                  <rect x="10" y="10" width="5" height="5" fill="#8b5cf6" opacity="0.3"/>
-                                </pattern>
-                              </defs>
-                              <rect width="100" height="100" fill="url(#grid)"/>
-                            </svg>
-                          </div>
-                          <div class="absolute bottom-1 left-2 text-xs text-white font-medium">Grid</div>
-                        </button>
-                        
-                        <!-- Data Flow -->
-                        <button onclick="setBackground('data-flow')" class="h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group bg-gray-900 overflow-hidden">
-                          <div class="absolute inset-0 opacity-30">
-                            <svg class="w-full h-full" viewBox="0 0 100 100" fill="none">
-                              <defs>
-                                <pattern id="flow" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-                                  <rect width="40" height="40" fill="#1f2937"/>
-                                  <path d="M0 20Q10 10 20 20T40 20" stroke="#f59e0b" stroke-width="1" fill="none" opacity="0.6"/>
-                                  <path d="M0 30Q15 20 30 30T60 30" stroke="#f97316" stroke-width="1" fill="none" opacity="0.4"/>
-                                  <circle cx="10" cy="20" r="1" fill="#fbbf24"/>
-                                  <circle cx="30" cy="20" r="1" fill="#fbbf24"/>
-                                </pattern>
-                              </defs>
-                              <rect width="100" height="100" fill="url(#flow)"/>
-                            </svg>
-                          </div>
-                          <div class="absolute bottom-1 left-2 text-xs text-white font-medium">Flow</div>
-                        </button>
-                        
                         <!-- Blue Waves -->
                         <button onclick="setBackground('blue-waves')" class="h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group overflow-hidden">
                           <div class="absolute inset-0">
@@ -776,10 +664,7 @@ function renderTopBar(pageTitle: string, user?: any): string {
                           </div>
                           <div class="absolute bottom-1 left-2 text-xs text-white font-medium bg-black/50 px-2 py-1 rounded">Crescent</div>
                         </button>
-                      </div>
-                      
-                      <!-- Additional row for more backgrounds -->
-                      <div class="grid grid-cols-2 gap-3 mt-3">
+                        
                         <!-- Blue Stars -->
                         <button onclick="setBackground('blue-stars')" class="h-16 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all relative group overflow-hidden">
                           <div class="absolute inset-0">
