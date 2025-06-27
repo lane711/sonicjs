@@ -31,7 +31,26 @@ export interface MediaLibraryPageData {
 
 export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
   const pageContent = `
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-semibold text-white">Media Library</h1>
+          <p class="mt-2 text-sm text-gray-300">Manage your media files and assets</p>
+        </div>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+          <button 
+            class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/20 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/30 transition-all"
+            onclick="document.getElementById('upload-modal').classList.remove('hidden')"
+          >
+            <svg class="-ml-0.5 mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+            </svg>
+            Upload Media
+          </button>
+        </div>
+      </div>
+      
       <div class="flex gap-6">
         <!-- Sidebar -->
         <div class="w-64 backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6">
