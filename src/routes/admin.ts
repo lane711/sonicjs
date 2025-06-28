@@ -254,12 +254,31 @@ adminRoutes.get('/collections/:id', async (c) => {
       }
       return c.html(renderCollectionFormPage(formData))
     }
+
+    // Get collection fields
+    const fieldsStmt = db.prepare(`
+      SELECT * FROM content_fields 
+      WHERE collection_id = ? 
+      ORDER BY field_order ASC
+    `)
+    const { results: fieldsResults } = await fieldsStmt.bind(id).all()
+    const fields = (fieldsResults || []).map((row: any) => ({
+      id: row.id,
+      field_name: row.field_name,
+      field_type: row.field_type,
+      field_label: row.field_label,
+      field_options: row.field_options ? JSON.parse(row.field_options) : {},
+      field_order: row.field_order,
+      is_required: row.is_required === 1,
+      is_searchable: row.is_searchable === 1
+    }))
     
     const formData: CollectionFormData = {
       id: collection.id,
       name: collection.name,
       display_name: collection.display_name,
       description: collection.description,
+      fields: fields,
       isEdit: true,
       user: user ? {
         name: user.email,
@@ -344,6 +363,10 @@ adminRoutes.delete('/collections/:id', async (c) => {
       `)
     }
     
+    // Delete collection fields first
+    const deleteFieldsStmt = db.prepare('DELETE FROM content_fields WHERE collection_id = ?')
+    await deleteFieldsStmt.bind(id).run()
+    
     // Delete collection
     const deleteStmt = db.prepare('DELETE FROM collections WHERE id = ?')
     await deleteStmt.bind(id).run()
@@ -360,6 +383,147 @@ adminRoutes.delete('/collections/:id', async (c) => {
         Failed to delete collection. Please try again.
       </div>
     `)
+  }
+})
+
+// Add field to collection
+adminRoutes.post('/collections/:id/fields', async (c) => {
+  try {
+    const collectionId = c.req.param('id')
+    const formData = await c.req.formData()
+    const fieldName = formData.get('field_name') as string
+    const fieldType = formData.get('field_type') as string
+    const fieldLabel = formData.get('field_label') as string
+    const isRequired = formData.get('is_required') === '1'
+    const isSearchable = formData.get('is_searchable') === '1'
+    const fieldOptions = formData.get('field_options') as string || '{}'
+    
+    if (!fieldName || !fieldType || !fieldLabel) {
+      return c.json({ success: false, error: 'Field name, type, and label are required.' })
+    }
+
+    // Validate field name format
+    if (!/^[a-z0-9_]+$/.test(fieldName)) {
+      return c.json({ success: false, error: 'Field name must contain only lowercase letters, numbers, and underscores.' })
+    }
+    
+    const db = c.env.DB
+    
+    // Check if field already exists
+    const existingStmt = db.prepare('SELECT id FROM content_fields WHERE collection_id = ? AND field_name = ?')
+    const existing = await existingStmt.bind(collectionId, fieldName).first()
+    
+    if (existing) {
+      return c.json({ success: false, error: 'A field with this name already exists.' })
+    }
+    
+    // Get next field order
+    const orderStmt = db.prepare('SELECT MAX(field_order) as max_order FROM content_fields WHERE collection_id = ?')
+    const orderResult = await orderStmt.bind(collectionId).first() as any
+    const nextOrder = (orderResult?.max_order || 0) + 1
+    
+    // Create field
+    const fieldId = crypto.randomUUID()
+    const now = Date.now()
+    
+    const insertStmt = db.prepare(`
+      INSERT INTO content_fields (
+        id, collection_id, field_name, field_type, field_label, 
+        field_options, field_order, is_required, is_searchable, 
+        created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `)
+    
+    await insertStmt.bind(
+      fieldId,
+      collectionId,
+      fieldName,
+      fieldType,
+      fieldLabel,
+      fieldOptions,
+      nextOrder,
+      isRequired ? 1 : 0,
+      isSearchable ? 1 : 0,
+      now,
+      now
+    ).run()
+    
+    return c.json({ success: true, fieldId })
+  } catch (error) {
+    console.error('Error adding field:', error)
+    return c.json({ success: false, error: 'Failed to add field.' })
+  }
+})
+
+// Update field
+adminRoutes.put('/collections/:collectionId/fields/:fieldId', async (c) => {
+  try {
+    const fieldId = c.req.param('fieldId')
+    const formData = await c.req.formData()
+    const fieldLabel = formData.get('field_label') as string
+    const isRequired = formData.get('is_required') === '1'
+    const isSearchable = formData.get('is_searchable') === '1'
+    const fieldOptions = formData.get('field_options') as string || '{}'
+    
+    if (!fieldLabel) {
+      return c.json({ success: false, error: 'Field label is required.' })
+    }
+    
+    const db = c.env.DB
+    
+    const updateStmt = db.prepare(`
+      UPDATE content_fields 
+      SET field_label = ?, field_options = ?, is_required = ?, is_searchable = ?, updated_at = ?
+      WHERE id = ?
+    `)
+    
+    await updateStmt.bind(fieldLabel, fieldOptions, isRequired ? 1 : 0, isSearchable ? 1 : 0, Date.now(), fieldId).run()
+    
+    return c.json({ success: true })
+  } catch (error) {
+    console.error('Error updating field:', error)
+    return c.json({ success: false, error: 'Failed to update field.' })
+  }
+})
+
+// Delete field
+adminRoutes.delete('/collections/:collectionId/fields/:fieldId', async (c) => {
+  try {
+    const fieldId = c.req.param('fieldId')
+    const db = c.env.DB
+    
+    const deleteStmt = db.prepare('DELETE FROM content_fields WHERE id = ?')
+    await deleteStmt.bind(fieldId).run()
+    
+    return c.json({ success: true })
+  } catch (error) {
+    console.error('Error deleting field:', error)
+    return c.json({ success: false, error: 'Failed to delete field.' })
+  }
+})
+
+// Update field order
+adminRoutes.post('/collections/:collectionId/fields/reorder', async (c) => {
+  try {
+    const body = await c.req.json()
+    const fieldIds = body.fieldIds as string[]
+    
+    if (!Array.isArray(fieldIds)) {
+      return c.json({ success: false, error: 'Invalid field order data.' })
+    }
+    
+    const db = c.env.DB
+    
+    // Update field order
+    for (let i = 0; i < fieldIds.length; i++) {
+      const updateStmt = db.prepare('UPDATE content_fields SET field_order = ?, updated_at = ? WHERE id = ?')
+      await updateStmt.bind(i + 1, Date.now(), fieldIds[i]).run()
+    }
+    
+    return c.json({ success: true })
+  } catch (error) {
+    console.error('Error reordering fields:', error)
+    return c.json({ success: false, error: 'Failed to reorder fields.' })
   }
 })
 

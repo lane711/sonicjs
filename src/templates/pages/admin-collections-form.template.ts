@@ -2,11 +2,23 @@ import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout-v2.t
 import { renderForm, FormData, FormField } from '../components/form.template'
 import { renderAlert } from '../components/alert.template'
 
+export interface CollectionField {
+  id: string
+  field_name: string
+  field_type: string
+  field_label: string
+  field_options: any
+  field_order: number
+  is_required: boolean
+  is_searchable: boolean
+}
+
 export interface CollectionFormData {
   id?: string
   name?: string
   display_name?: string
   description?: string
+  fields?: CollectionField[]
   isEdit?: boolean
   error?: string
   success?: string
@@ -208,23 +220,108 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
           
           ${renderForm(formData)}
           
-          ${!isEdit ? `
-            <div class="mt-6 backdrop-blur-sm bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
+          ${isEdit ? `
+            <!-- Fields Management Section -->
+            <div class="mt-8 pt-8 border-t border-white/10">
+              <div class="flex items-center justify-between mb-6">
+                <div>
+                  <h3 class="text-lg font-semibold text-white">Collection Fields</h3>
+                  <p class="text-sm text-gray-300 mt-1">Define the fields that content in this collection will have</p>
+                </div>
+                <button 
+                  type="button" 
+                  onclick="showAddFieldModal()"
+                  class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all"
+                >
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                  </svg>
+                  Add Field
+                </button>
+              </div>
+              
+              <!-- Fields List -->
+              <div id="fields-list" class="space-y-3">
+                ${(data.fields || []).map(field => `
+                  <div class="field-item backdrop-blur-sm bg-white/5 rounded-xl border border-white/10 p-4" data-field-id="${field.id}">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center space-x-4">
+                        <div class="drag-handle cursor-move text-gray-400 hover:text-white">
+                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/>
+                          </svg>
+                        </div>
+                        <div>
+                          <div class="flex items-center space-x-2">
+                            <span class="text-white font-medium">${field.field_label}</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-500/20 text-blue-300">
+                              ${field.field_type}
+                            </span>
+                            ${field.is_required ? `
+                              <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-500/20 text-red-300">
+                                Required
+                              </span>
+                            ` : ''}
+                          </div>
+                          <div class="text-sm text-gray-400 mt-1">
+                            Field name: <code class="text-gray-300">${field.field_name}</code>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex items-center space-x-2">
+                        <button 
+                          type="button" 
+                          onclick="editField('${field.id}')"
+                          class="inline-flex items-center px-3 py-1 text-sm text-blue-300 hover:text-blue-200 transition-colors"
+                        >
+                          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                          </svg>
+                          Edit
+                        </button>
+                        <button 
+                          type="button" 
+                          onclick="deleteField('${field.id}')"
+                          class="inline-flex items-center px-3 py-1 text-sm text-red-300 hover:text-red-200 transition-colors"
+                        >
+                          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                          </svg>
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                `).join('')}
+                
+                ${(data.fields || []).length === 0 ? `
+                  <div class="text-center py-8 text-gray-400">
+                    <svg class="w-12 h-12 mx-auto mb-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <p class="text-lg font-medium">No fields defined</p>
+                    <p class="text-sm mt-1">Add your first field to get started</p>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          ` : `
+            <div class="mt-6 backdrop-blur-sm bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
               <div class="flex items-start space-x-3">
-                <svg class="w-5 h-5 text-amber-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                <svg class="w-5 h-5 text-blue-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                 </svg>
                 <div>
-                  <h3 class="text-sm font-medium text-amber-300">
-                    Basic Collection Creation
+                  <h3 class="text-sm font-medium text-blue-300">
+                    Create Collection First
                   </h3>
-                  <p class="text-sm text-amber-200 mt-1">
-                    This creates a basic collection. Advanced field definitions and schema management will be available in Stage 5.
+                  <p class="text-sm text-blue-200 mt-1">
+                    After creating the collection, you'll be able to add and configure custom fields.
                   </p>
                 </div>
               </div>
             </div>
-          ` : ''}
+          `}
           
           <!-- Action Buttons -->
           <div class="mt-6 pt-6 border-t border-white/10 flex justify-between">
@@ -253,6 +350,242 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
         </div>
       </div>
     </div>
+
+    <!-- Add/Edit Field Modal -->
+    <div id="field-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+      <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl w-full max-w-lg mx-4">
+        <div class="relative px-6 py-4 border-b border-white/10">
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10"></div>
+          <div class="relative flex items-center justify-between">
+            <h3 id="modal-title" class="text-lg font-semibold text-white">Add Field</h3>
+            <button onclick="closeFieldModal()" class="text-gray-300 hover:text-white">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <form id="field-form" class="p-6 space-y-4">
+          <input type="hidden" id="field-id" name="field_id">
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Field Name</label>
+            <input 
+              type="text" 
+              id="field-name" 
+              name="field_name" 
+              required
+              pattern="[a-z0-9_]+"
+              class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all"
+              placeholder="field_name"
+            >
+            <p class="text-xs text-gray-400 mt-1">Lowercase letters, numbers, and underscores only</p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Field Type</label>
+            <select 
+              id="field-type" 
+              name="field_type" 
+              required
+              class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all"
+            >
+              <option value="">Select field type...</option>
+              <option value="text">Text</option>
+              <option value="richtext">Rich Text</option>
+              <option value="number">Number</option>
+              <option value="boolean">Boolean</option>
+              <option value="date">Date</option>
+              <option value="select">Select</option>
+              <option value="media">Media</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Field Label</label>
+            <input 
+              type="text" 
+              id="field-label" 
+              name="field_label" 
+              required
+              class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all"
+              placeholder="Field Label"
+            >
+          </div>
+
+          <div class="flex items-center space-x-4">
+            <label class="flex items-center">
+              <input type="checkbox" id="field-required" name="is_required" value="1" class="mr-2 rounded">
+              <span class="text-sm text-gray-300">Required</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" id="field-searchable" name="is_searchable" value="1" class="mr-2 rounded">
+              <span class="text-sm text-gray-300">Searchable</span>
+            </label>
+          </div>
+
+          <div id="field-options-container" class="hidden">
+            <label class="block text-sm font-medium text-gray-300 mb-2">Field Options (JSON)</label>
+            <textarea 
+              id="field-options" 
+              name="field_options" 
+              rows="3"
+              class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all"
+              placeholder='{"maxLength": 200, "placeholder": "Enter text..."}'
+            ></textarea>
+            <p class="text-xs text-gray-400 mt-1">JSON configuration for field-specific options</p>
+          </div>
+
+          <div class="flex justify-end space-x-3 pt-4 border-t border-white/10">
+            <button 
+              type="button" 
+              onclick="closeFieldModal()"
+              class="px-4 py-2 bg-white/10 text-white rounded-xl border border-white/20 hover:bg-white/20 transition-all"
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit"
+              class="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all"
+            >
+              <span id="submit-text">Add Field</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const collectionId = '${data.id || ''}';
+      let currentEditingField = null;
+
+      // Field modal functions
+      function showAddFieldModal() {
+        document.getElementById('modal-title').textContent = 'Add Field';
+        document.getElementById('submit-text').textContent = 'Add Field';
+        document.getElementById('field-form').reset();
+        document.getElementById('field-id').value = '';
+        document.getElementById('field-name').disabled = false;
+        currentEditingField = null;
+        document.getElementById('field-modal').classList.remove('hidden');
+      }
+
+      function editField(fieldId) {
+        const fieldItem = document.querySelector(\`[data-field-id="\${fieldId}"]\`);
+        if (!fieldItem) return;
+
+        // Get field data from the DOM or make an API call
+        // For now, we'll show the modal and populate it
+        document.getElementById('modal-title').textContent = 'Edit Field';
+        document.getElementById('submit-text').textContent = 'Update Field';
+        document.getElementById('field-id').value = fieldId;
+        document.getElementById('field-name').disabled = true;
+        currentEditingField = fieldId;
+        document.getElementById('field-modal').classList.remove('hidden');
+
+        // TODO: Populate form with existing field data
+      }
+
+      function closeFieldModal() {
+        document.getElementById('field-modal').classList.add('hidden');
+        currentEditingField = null;
+      }
+
+      function deleteField(fieldId) {
+        if (!confirm('Are you sure you want to delete this field? This action cannot be undone.')) {
+          return;
+        }
+
+        fetch(\`/admin/collections/\${collectionId}/fields/\${fieldId}\`, {
+          method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            location.reload();
+          } else {
+            alert('Error deleting field: ' + data.error);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Error deleting field');
+        });
+      }
+
+      // Field form submission
+      document.getElementById('field-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const isEditing = currentEditingField !== null;
+        
+        const url = isEditing 
+          ? \`/admin/collections/\${collectionId}/fields/\${currentEditingField}\`
+          : \`/admin/collections/\${collectionId}/fields\`;
+        
+        const method = isEditing ? 'PUT' : 'POST';
+        
+        fetch(url, {
+          method: method,
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            location.reload();
+          } else {
+            alert('Error saving field: ' + data.error);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Error saving field');
+        });
+      });
+
+      // Field type change handler
+      document.getElementById('field-type').addEventListener('change', function() {
+        const optionsContainer = document.getElementById('field-options-container');
+        const fieldOptions = document.getElementById('field-options');
+        
+        // Show/hide options based on field type
+        if (['select', 'media', 'richtext'].includes(this.value)) {
+          optionsContainer.classList.remove('hidden');
+          
+          // Set default options based on type
+          switch (this.value) {
+            case 'select':
+              fieldOptions.value = '{"options": ["Option 1", "Option 2"], "multiple": false}';
+              break;
+            case 'media':
+              fieldOptions.value = '{"accept": "image/*", "maxSize": "10MB"}';
+              break;
+            case 'richtext':
+              fieldOptions.value = '{"toolbar": "full", "height": 400}';
+              break;
+          }
+        } else {
+          optionsContainer.classList.add('hidden');
+          fieldOptions.value = '{}';
+        }
+      });
+
+      // Close modal on escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !document.getElementById('field-modal').classList.contains('hidden')) {
+          closeFieldModal();
+        }
+      });
+
+      // Close modal on backdrop click
+      document.getElementById('field-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          closeFieldModal();
+        }
+      });
+    </script>
   `
 
   const layoutData: AdminLayoutData = {
