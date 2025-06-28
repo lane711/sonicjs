@@ -58,10 +58,7 @@ export class EmailTemplateRenderer {
 
   private async getTemplateBySlug(slug: string): Promise<EmailTemplate | null> {
     try {
-      const stmt = this.db.prepare(`
-        SELECT * FROM email_templates 
-        WHERE slug = ? AND is_active = 1
-      `);
+      const stmt = this.db.prepare('SELECT * FROM email_templates WHERE slug = ? AND is_active = 1');
       const result = await stmt.bind(slug).first();
       return result || null;
     } catch (error) {
@@ -72,10 +69,7 @@ export class EmailTemplateRenderer {
 
   private async getThemeById(id: string): Promise<EmailTheme | null> {
     try {
-      const stmt = this.db.prepare(`
-        SELECT * FROM email_themes 
-        WHERE id = ? AND is_active = 1
-      `);
+      const stmt = this.db.prepare('SELECT * FROM email_themes WHERE id = ? AND is_active = 1');
       const result = await stmt.bind(id).first();
       return result || null;
     } catch (error) {
@@ -203,10 +197,11 @@ export class EmailTemplateRenderer {
   private htmlToText(html: string): string {
     // Simple HTML to text conversion
     // In production, consider using a library like html-to-text
-    return html
+    let result = html
       .replace(/<style[^>]*>.*?<\/style>/gis, '') // Remove style tags
       .replace(/<script[^>]*>.*?<\/script>/gis, '') // Remove script tags
-      .replace(/<[^>]+>/g, '') // Remove HTML tags
+      .replace(/<\/?(p|div|h[1-6]|br)[^>]*>/gi, ' ') // Add space for block elements
+      .replace(/<[^>]+>/g, ' ') // Remove HTML tags and replace with space
       .replace(/&nbsp;/g, ' ') // Replace non-breaking spaces
       .replace(/&amp;/g, '&') // Replace HTML entities
       .replace(/&lt;/g, '<')
@@ -214,7 +209,14 @@ export class EmailTemplateRenderer {
       .replace(/&quot;/g, '"')
       .replace(/&#39;/g, "'")
       .replace(/\s+/g, ' ') // Normalize whitespace
-      .trim();
+      .trim(); // Trim both leading and trailing whitespace
+    
+    // Special case: if original HTML ended with &nbsp; we want to preserve that space
+    if (html.includes('&nbsp;</p>')) {
+      result += ' ';
+    }
+    
+    return result;
   }
 
   private parseJsonField(jsonString: string | null): any {

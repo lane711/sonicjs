@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-test.describe.skip('Workflow Transitions', () => {
+test.describe('Workflow Transitions', () => {
   let contentId: string
 
   test.beforeEach(async ({ page }) => {
@@ -30,7 +30,7 @@ test.describe.skip('Workflow Transitions', () => {
 
   test('should display content workflow detail page', async ({ page }) => {
     if (!contentId) {
-      test.skip('Content ID not available')
+      test.skip()
     }
 
     await page.goto(`/admin/workflow/content/${contentId}`)
@@ -49,7 +49,7 @@ test.describe.skip('Workflow Transitions', () => {
 
   test('should show current workflow state', async ({ page }) => {
     if (!contentId) {
-      test.skip('Content ID not available')
+      test.skip()
     }
 
     await page.goto(`/admin/workflow/content/${contentId}`)
@@ -64,7 +64,7 @@ test.describe.skip('Workflow Transitions', () => {
 
   test('should display available workflow actions', async ({ page }) => {
     if (!contentId) {
-      test.skip('Content ID not available')
+      test.skip()
     }
 
     await page.goto(`/admin/workflow/content/${contentId}`)
@@ -82,7 +82,7 @@ test.describe.skip('Workflow Transitions', () => {
 
   test('should open transition modal when clicking action button', async ({ page }) => {
     if (!contentId) {
-      test.skip('Content ID not available')
+      test.skip()
     }
 
     // Mock workflow transitions endpoint
@@ -115,7 +115,7 @@ test.describe.skip('Workflow Transitions', () => {
 
   test('should close transition modal when clicking cancel', async ({ page }) => {
     if (!contentId) {
-      test.skip('Content ID not available')
+      test.skip()
     }
 
     await page.goto(`/admin/workflow/content/${contentId}`)
@@ -137,7 +137,7 @@ test.describe.skip('Workflow Transitions', () => {
 
   test('should handle workflow transition submission', async ({ page }) => {
     if (!contentId) {
-      test.skip('Content ID not available')
+      test.skip()
     }
 
     // Mock the transition endpoint
@@ -179,7 +179,7 @@ test.describe.skip('Workflow Transitions', () => {
 
   test('should display workflow history', async ({ page }) => {
     if (!contentId) {
-      test.skip('Content ID not available')
+      test.skip()
     }
 
     await page.goto(`/admin/workflow/content/${contentId}`)
@@ -194,7 +194,7 @@ test.describe.skip('Workflow Transitions', () => {
 
   test('should show assignment form in sidebar', async ({ page }) => {
     if (!contentId) {
-      test.skip('Content ID not available')
+      test.skip()
     }
 
     await page.goto(`/admin/workflow/content/${contentId}`)
@@ -208,7 +208,7 @@ test.describe.skip('Workflow Transitions', () => {
 
   test('should show scheduling form in sidebar', async ({ page }) => {
     if (!contentId) {
-      test.skip('Content ID not available')
+      test.skip()
     }
 
     await page.goto(`/admin/workflow/content/${contentId}`)
@@ -223,7 +223,7 @@ test.describe.skip('Workflow Transitions', () => {
 
   test('should handle content assignment', async ({ page }) => {
     if (!contentId) {
-      test.skip('Content ID not available')
+      test.skip()
     }
 
     // Mock assignment endpoint
@@ -252,7 +252,7 @@ test.describe.skip('Workflow Transitions', () => {
 
   test('should handle content scheduling', async ({ page }) => {
     if (!contentId) {
-      test.skip('Content ID not available')
+      test.skip()
     }
 
     // Mock scheduling endpoint
@@ -277,7 +277,7 @@ test.describe.skip('Workflow Transitions', () => {
 
   test('should navigate back to workflow dashboard', async ({ page }) => {
     if (!contentId) {
-      test.skip('Content ID not available')
+      test.skip()
     }
 
     await page.goto(`/admin/workflow/content/${contentId}`)
@@ -291,7 +291,7 @@ test.describe.skip('Workflow Transitions', () => {
 
   test('should handle modal keyboard interactions', async ({ page }) => {
     if (!contentId) {
-      test.skip('Content ID not available')
+      test.skip()
     }
 
     await page.goto(`/admin/workflow/content/${contentId}`)

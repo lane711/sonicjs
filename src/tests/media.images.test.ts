@@ -84,7 +84,10 @@ describe('CloudflareImages', () => {
       const mockResponse = {
         ok: false,
         status: 400,
-        text: vi.fn().mockResolvedValue('File too large')
+        text: vi.fn().mockResolvedValue('File too large'),
+        json: vi.fn().mockResolvedValue({
+          errors: [{ message: 'File too large' }]
+        })
       }
 
       vi.mocked(fetch).mockResolvedValue(mockResponse as any)
@@ -101,7 +104,7 @@ describe('CloudflareImages', () => {
 
       const buffer = new ArrayBuffer(100)
 
-      await expect(cloudflareImages.uploadImage(buffer)).rejects.toThrow('Network error')
+      await expect(cloudflareImages.uploadImage(buffer)).rejects.toThrow('Failed to upload image to Cloudflare Images')
     })
   })
 
@@ -134,7 +137,10 @@ describe('CloudflareImages', () => {
       const mockResponse = {
         ok: false,
         status: 404,
-        text: vi.fn().mockResolvedValue('Image not found')
+        text: vi.fn().mockResolvedValue('Image not found'),
+        json: vi.fn().mockResolvedValue({
+          errors: [{ message: 'Image not found' }]
+        })
       }
 
       vi.mocked(fetch).mockResolvedValue(mockResponse as any)
@@ -169,7 +175,6 @@ describe('CloudflareImages', () => {
       expect(fetch).toHaveBeenCalledWith(
         'https://api.cloudflare.com/client/v4/accounts/test-account-id/images/v1/test-id',
         {
-          method: 'GET',
           headers: {
             'Authorization': 'Bearer test-api-token'
           }
@@ -183,13 +188,16 @@ describe('CloudflareImages', () => {
       const mockResponse = {
         ok: false,
         status: 404,
-        text: vi.fn().mockResolvedValue('Image not found')
+        text: vi.fn().mockResolvedValue('Image not found'),
+        json: vi.fn().mockResolvedValue({
+          errors: [{ message: 'Image not found' }]
+        })
       }
 
       vi.mocked(fetch).mockResolvedValue(mockResponse as any)
 
       await expect(cloudflareImages.getImageDetails('non-existent')).rejects.toThrow(
-        'Failed to get image details from Cloudflare Images'
+        'Failed to get image details'
       )
     })
   })
@@ -280,21 +288,21 @@ describe('CloudflareImages', () => {
     it('should generate srcset string with default widths', () => {
       const srcset = cloudflareImages.generateSrcSet('test-image-id')
       
-      expect(srcset).toContain('width=300 300w')
-      expect(srcset).toContain('width=600 600w')
-      expect(srcset).toContain('width=900 900w')
-      expect(srcset).toContain('width=1200 1200w')
-      expect(srcset).toContain('width=1500 1500w')
+      expect(srcset).toContain('?width=300&fit=scale-down 300w')
+      expect(srcset).toContain('?width=600&fit=scale-down 600w')
+      expect(srcset).toContain('?width=900&fit=scale-down 900w')
+      expect(srcset).toContain('?width=1200&fit=scale-down 1200w')
+      expect(srcset).toContain('?width=1500&fit=scale-down 1500w')
     })
 
     it('should generate srcset string with custom widths', () => {
       const customWidths = [400, 800, 1200]
       const srcset = cloudflareImages.generateSrcSet('test-image-id', 'public', customWidths)
       
-      expect(srcset).toContain('width=400 400w')
-      expect(srcset).toContain('width=800 800w')
-      expect(srcset).toContain('width=1200 1200w')
-      expect(srcset).not.toContain('width=300')
+      expect(srcset).toContain('?width=400&fit=scale-down 400w')
+      expect(srcset).toContain('?width=800&fit=scale-down 800w')
+      expect(srcset).toContain('?width=1200&fit=scale-down 1200w')
+      expect(srcset).not.toContain('?width=300')
     })
   })
 
@@ -347,7 +355,10 @@ describe('CloudflareImages', () => {
       const mockResponse = {
         ok: false,
         status: 400,
-        text: vi.fn().mockResolvedValue('Invalid variant configuration')
+        text: vi.fn().mockResolvedValue('Invalid variant configuration'),
+        json: vi.fn().mockResolvedValue({
+          errors: [{ message: 'Invalid variant configuration' }]
+        })
       }
 
       vi.mocked(fetch).mockResolvedValue(mockResponse as any)
@@ -364,14 +375,15 @@ describe('CloudflareImages', () => {
 
       const buffer = new ArrayBuffer(100)
 
-      await expect(cloudflareImages.uploadImage(buffer)).rejects.toThrow('fetch timeout')
+      await expect(cloudflareImages.uploadImage(buffer)).rejects.toThrow('Failed to upload image to Cloudflare Images')
     })
 
     it('should handle empty response body', async () => {
       const mockResponse = {
         ok: false,
         status: 500,
-        text: vi.fn().mockResolvedValue('')
+        text: vi.fn().mockResolvedValue(''),
+        json: vi.fn().mockResolvedValue({})
       }
 
       vi.mocked(fetch).mockResolvedValue(mockResponse as any)

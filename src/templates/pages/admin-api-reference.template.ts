@@ -23,7 +23,7 @@ export function renderAPIReferencePage(data: APIReferencePageData): string {
     if (!acc[endpoint.category]) {
       acc[endpoint.category] = []
     }
-    acc[endpoint.category].push(endpoint)
+    acc[endpoint.category]!.push(endpoint)
     return acc
   }, {} as Record<string, APIEndpoint[]>)
 
@@ -128,7 +128,7 @@ export function renderAPIReferencePage(data: APIReferencePageData): string {
             >
               <option value="">All Categories</option>
               ${Object.keys(categoryInfo).map(category => `
-                <option value="${category}">${categoryInfo[category].title}</option>
+                <option value="${category}">${(categoryInfo as any)[category].title}</option>
               `).join('')}
             </select>
           </div>
@@ -138,7 +138,7 @@ export function renderAPIReferencePage(data: APIReferencePageData): string {
       <!-- API Categories -->
       <div class="space-y-8">
         ${Object.entries(endpointsByCategory).map(([category, endpoints]) => {
-          const info = categoryInfo[category] || { title: category, description: '', icon: '📋' }
+          const info = (categoryInfo as any)[category] || { title: category, description: '', icon: '📋' }
           return `
             <div class="api-category" data-category="${category}">
               <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl overflow-hidden">

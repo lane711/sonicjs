@@ -15,6 +15,8 @@ import { mediaRoutes } from './routes/media'
 import { adminMediaRoutes } from './routes/admin-media'
 import { apiMediaRoutes } from './routes/api-media'
 import emailRoutes from './routes/admin/email'
+import workflowRoutes from './routes/admin-workflow'
+import { userRoutes } from './routes/admin-users'
 import { requireAuth, requireRole, optionalAuth } from './middleware/auth'
 
 // Define the Cloudflare Workers environment
@@ -85,6 +87,8 @@ app.route('/admin/content', adminContentRoutes)
 app.route('/admin/faq', adminFAQRoutes)
 app.route('/admin/design', adminDesignRoutes)
 app.route('/admin/email', emailRoutes)
+app.route('/admin/workflow', workflowRoutes)
+app.route('/admin/users', userRoutes)
 
 // Root redirect to login
 app.get('/', (c) => {

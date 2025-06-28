@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-test.describe.skip('Notification System', () => {
+test.describe('Notification System', () => {
   test.beforeEach(async ({ page }) => {
     // Login as admin
     await page.goto('/auth/login')

@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-test.describe.skip('Scheduled Content Management', () => {
+test.describe('Scheduled Content Management', () => {
   test.beforeEach(async ({ page }) => {
     // Login as admin
     await page.goto('/auth/login')

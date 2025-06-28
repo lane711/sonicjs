@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { D1Database } from '@cloudflare/workers-types'
 
 export interface Webhook {

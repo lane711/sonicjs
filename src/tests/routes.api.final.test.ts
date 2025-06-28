@@ -230,11 +230,20 @@ describe('API Routes - Final Working Tests', () => {
       const app = new Hono<{ Bindings: typeof mockEnv }>()
       app.route('/api', apiRoutes)
       
-      const req = new Request('https://test.com/api/')
+      const req = new Request('https://test.com/api')
       const res = await app.fetch(req, mockEnv)
-      const data = await res.json()
       
       expect(res.status).toBe(200)
+      
+      const responseText = await res.text()
+      let data
+      try {
+        data = JSON.parse(responseText)
+      } catch (error) {
+        console.error('Response is not valid JSON:', responseText)
+        throw error
+      }
+      
       expect(data.openapi).toBe('3.0.0')
     })
 

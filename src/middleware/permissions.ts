@@ -51,7 +51,18 @@ export class PermissionManager {
     `)
     const { results: rolePermissions } = await rolePermStmt.bind(user.role).all()
     
-    const permissions = (rolePermissions || []).map((row: any) => row.name)
+    // Get individual user permissions
+    const userPermStmt = db.prepare(`
+      SELECT p.name 
+      FROM user_permissions up
+      JOIN permissions p ON up.permission_id = p.id
+      WHERE up.user_id = ?
+    `)
+    const { results: userPermResults } = await userPermStmt.bind(userId).all()
+    
+    const rolePerms = (rolePermissions || []).map((row: any) => row.name)
+    const userPerms = (userPermResults || []).map((row: any) => row.name)
+    const permissions = [...rolePerms, ...userPerms]
 
     // Get team permissions (if user is in teams)
     const teamPermStmt = db.prepare(`
@@ -91,19 +102,29 @@ export class PermissionManager {
    * Check if user has a specific permission
    */
   static async hasPermission(db: D1Database, userId: string, permission: string, teamId?: string): Promise<boolean> {
-    const userPerms = await this.getUserPermissions(db, userId)
-    
-    // Check global permissions
-    if (userPerms.permissions.includes(permission)) {
-      return true
-    }
+    try {
+      const userPerms = await this.getUserPermissions(db, userId)
+      
+      // Check global permissions
+      if (userPerms.permissions.includes(permission)) {
+        return true
+      }
 
-    // Check team-specific permissions
-    if (teamId && userPerms.teamPermissions && userPerms.teamPermissions[teamId]) {
-      return userPerms.teamPermissions[teamId].includes(permission)
-    }
+      // Check team-specific permissions
+      if (teamId && userPerms.teamPermissions && userPerms.teamPermissions[teamId]) {
+        return userPerms.teamPermissions[teamId].includes(permission)
+      }
 
-    return false
+      return false
+    } catch (error) {
+      // For user-specific errors (like "User not found"), return false
+      // For database connection errors, we should re-throw to let middleware handle them
+      if (error instanceof Error && error.message === 'User not found') {
+        return false
+      }
+      // Re-throw other errors (like database connection issues)
+      throw error
+    }
   }
 
   /**
@@ -121,6 +142,75 @@ export class PermissionManager {
   static clearAllCache() {
     this.permissionCache.clear()
     this.cacheExpiry.clear()
+  }
+
+  /**
+   * Clear all permission cache (alias for clearAllCache)
+   */
+  static clearCache() {
+    this.clearAllCache()
+  }
+
+  /**
+   * Check multiple permissions at once
+   */
+  static async checkMultiplePermissions(
+    db: D1Database, 
+    userId: string, 
+    permissions: string[], 
+    teamId?: string
+  ): Promise<Record<string, boolean>> {
+    const result: Record<string, boolean> = {}
+    
+    for (const permission of permissions) {
+      result[permission] = await this.hasPermission(db, userId, permission, teamId)
+    }
+    
+    return result
+  }
+
+  /**
+   * Middleware factory to require specific permissions
+   */
+  static requirePermissions(permissions: string[], teamIdParam?: string) {
+    return async (c: Context, next: Next) => {
+      const user = c.get('user')
+      if (!user) {
+        return c.json({ error: 'Authentication required' }, 401)
+      }
+
+      const db = c.env.DB
+      const teamId = teamIdParam ? c.req.param(teamIdParam) : undefined
+
+      try {
+        for (const permission of permissions) {
+          const hasPermission = await PermissionManager.hasPermission(db, user.userId, permission, teamId)
+          if (!hasPermission) {
+            return c.json({ error: `Permission denied: ${permission}` }, 403)
+          }
+        }
+
+        return await next()
+      } catch (error) {
+        console.error('Permission check error:', error)
+        return c.json({ error: 'Permission check failed' }, 500)
+      }
+    }
+  }
+
+  /**
+   * Get all available permissions from database
+   */
+  static async getAllPermissions(db: D1Database): Promise<Permission[]> {
+    const stmt = db.prepare('SELECT * FROM permissions ORDER BY category, name')
+    const { results } = await stmt.all()
+    
+    return (results || []).map((row: any) => ({
+      id: row.id,
+      name: row.name,
+      description: row.description,
+      category: row.category
+    }))
   }
 }
 

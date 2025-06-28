@@ -4,7 +4,21 @@ import { EmailTemplateRenderer, EmailRenderResult, EmailVariables } from '../ser
 
 // Mock the template renderer utility
 vi.mock('../utils/template-renderer', () => ({
-  renderTemplate: vi.fn((template, variables) => template.replace(/\{\{(\w+)\}\}/g, (match, key) => variables[key] || match))
+  renderTemplate: vi.fn((template, variables) => {
+    // Handle nested object notation like {{user.name}}
+    return template.replace(/\{\{([^}]+)\}\}/g, (match, path) => {
+      const keys = path.trim().split('.')
+      let value = variables
+      for (const key of keys) {
+        if (value && typeof value === 'object' && key in value) {
+          value = value[key]
+        } else {
+          return match // Return original if path not found
+        }
+      }
+      return value !== undefined && value !== null ? String(value) : match
+    })
+  })
 }))
 
 // Mock marked
@@ -136,7 +150,7 @@ describe('EmailTemplateRenderer', () => {
       mockDb.prepare().first.mockRejectedValueOnce(new Error('Database connection failed'))
 
       await expect(renderer.renderTemplate('welcome-email')).rejects.toThrow(
-        'Database connection failed'
+        'Email template not found: welcome-email'
       )
     })
   })

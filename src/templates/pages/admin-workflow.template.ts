@@ -142,9 +142,10 @@ export function renderWorkflowDashboard(data: WorkflowDashboardData): string {
 
   return renderAdminLayout({
     title: 'Workflow Dashboard - SonicJS AI',
+    pageTitle: 'Workflow Dashboard',
     content,
     user: data.user,
-    currentPage: 'workflow'
+    currentPath: 'workflow'
   })
 }
 

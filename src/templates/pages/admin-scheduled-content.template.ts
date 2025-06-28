@@ -400,8 +400,9 @@ export function renderScheduledContent(data: ScheduledContentData): string {
 
   return renderAdminLayout({
     title: 'Scheduled Content - SonicJS AI',
+    pageTitle: 'Scheduled Content',
     content,
     user: data.user,
-    currentPage: 'workflow'
+    currentPath: 'workflow'
   })
 }

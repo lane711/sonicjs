@@ -296,8 +296,9 @@ export function renderWorkflowContentDetail(data: WorkflowContentDetailData): st
 
   return renderAdminLayout({
     title: `${data.content.title} - Workflow - SonicJS AI`,
+    pageTitle: `${data.content.title} - Workflow`,
     content,
     user: data.user,
-    currentPage: 'workflow'
+    currentPath: 'workflow'
   })
 }

@@ -12,6 +12,37 @@ const createMockDb = () => ({
   })
 })
 
+// Helper to setup getUserPermissions mocks
+const setupUserPermissionsMocks = (
+  mockDb: any, 
+  user: any, 
+  rolePermissions: any[] = [], 
+  userPermissions: any[] = [], 
+  teamMemberships: any[] = []
+) => {
+  mockDb.prepare
+    .mockReturnValueOnce({
+      bind: vi.fn().mockReturnValue({
+        first: vi.fn().mockResolvedValue(user)
+      })
+    })
+    .mockReturnValueOnce({
+      bind: vi.fn().mockReturnValue({
+        all: vi.fn().mockResolvedValue({ results: rolePermissions })
+      })
+    })
+    .mockReturnValueOnce({
+      bind: vi.fn().mockReturnValue({
+        all: vi.fn().mockResolvedValue({ results: userPermissions })
+      })
+    })
+    .mockReturnValueOnce({
+      bind: vi.fn().mockReturnValue({
+        all: vi.fn().mockResolvedValue({ results: teamMemberships })
+      })
+    })
+}
+
 describe('PermissionManager', () => {
   let mockDb: any
 
@@ -42,22 +73,7 @@ describe('PermissionManager', () => {
         { name: 'content.delete' }
       ]
 
-      mockDb.prepare
-        .mockReturnValueOnce({
-          bind: vi.fn().mockReturnValue({
-            first: vi.fn().mockResolvedValue(mockUser)
-          })
-        })
-        .mockReturnValueOnce({
-          bind: vi.fn().mockReturnValue({
-            all: vi.fn().mockResolvedValue({ results: mockRolePermissions })
-          })
-        })
-        .mockReturnValueOnce({
-          bind: vi.fn().mockReturnValue({
-            all: vi.fn().mockResolvedValue({ results: mockUserPermissions })
-          })
-        })
+      setupUserPermissionsMocks(mockDb, mockUser, mockRolePermissions, mockUserPermissions)
 
       const result = await PermissionManager.getUserPermissions(mockDb, 'user-1')
 
@@ -72,6 +88,7 @@ describe('PermissionManager', () => {
       expect(mockDb.prepare).toHaveBeenCalledWith('SELECT id, role FROM users WHERE id = ? AND is_active = 1')
       expect(mockDb.prepare).toHaveBeenCalledWith(expect.stringContaining('FROM role_permissions'))
       expect(mockDb.prepare).toHaveBeenCalledWith(expect.stringContaining('FROM user_permissions'))
+      expect(mockDb.prepare).toHaveBeenCalledWith(expect.stringContaining('FROM team_memberships'))
     })
 
     it('should throw error for non-existent user', async () => {
@@ -91,22 +108,7 @@ describe('PermissionManager', () => {
       const mockRolePermissions = [{ name: 'content.read' }]
       const mockUserPermissions: any[] = []
 
-      mockDb.prepare
-        .mockReturnValueOnce({
-          bind: vi.fn().mockReturnValue({
-            first: vi.fn().mockResolvedValue(mockUser)
-          })
-        })
-        .mockReturnValueOnce({
-          bind: vi.fn().mockReturnValue({
-            all: vi.fn().mockResolvedValue({ results: mockRolePermissions })
-          })
-        })
-        .mockReturnValueOnce({
-          bind: vi.fn().mockReturnValue({
-            all: vi.fn().mockResolvedValue({ results: mockUserPermissions })
-          })
-        })
+      setupUserPermissionsMocks(mockDb, mockUser, mockRolePermissions, mockUserPermissions)
 
       // First call
       const result1 = await PermissionManager.getUserPermissions(mockDb, 'user-1')
@@ -140,6 +142,7 @@ describe('PermissionManager', () => {
             all: vi.fn()
               .mockResolvedValueOnce({ results: mockRolePermissions })
               .mockResolvedValueOnce({ results: mockUserPermissions })
+              .mockResolvedValueOnce({ results: [] }) // team memberships
           })
         })
 
@@ -159,6 +162,7 @@ describe('PermissionManager', () => {
             all: vi.fn()
               .mockResolvedValueOnce({ results: mockRolePermissions })
               .mockResolvedValueOnce({ results: mockUserPermissions })
+              .mockResolvedValueOnce({ results: [] }) // team memberships
           })
         })
 
@@ -188,22 +192,7 @@ describe('PermissionManager', () => {
       const mockRolePermissions: any[] = []
       const mockUserPermissions: any[] = []
 
-      mockDb.prepare
-        .mockReturnValueOnce({
-          bind: vi.fn().mockReturnValue({
-            first: vi.fn().mockResolvedValue(mockUser)
-          })
-        })
-        .mockReturnValueOnce({
-          bind: vi.fn().mockReturnValue({
-            all: vi.fn().mockResolvedValue({ results: mockRolePermissions })
-          })
-        })
-        .mockReturnValueOnce({
-          bind: vi.fn().mockReturnValue({
-            all: vi.fn().mockResolvedValue({ results: mockUserPermissions })
-          })
-        })
+      setupUserPermissionsMocks(mockDb, mockUser, mockRolePermissions, mockUserPermissions)
 
       const result = await PermissionManager.getUserPermissions(mockDb, 'user-1')
 
@@ -226,22 +215,7 @@ describe('PermissionManager', () => {
         { name: 'media.upload' }
       ]
 
-      mockDb.prepare
-        .mockReturnValueOnce({
-          bind: vi.fn().mockReturnValue({
-            first: vi.fn().mockResolvedValue(mockUser)
-          })
-        })
-        .mockReturnValueOnce({
-          bind: vi.fn().mockReturnValue({
-            all: vi.fn().mockResolvedValue({ results: mockRolePermissions })
-          })
-        })
-        .mockReturnValueOnce({
-          bind: vi.fn().mockReturnValue({
-            all: vi.fn().mockResolvedValue({ results: mockUserPermissions })
-          })
-        })
+      setupUserPermissionsMocks(mockDb, mockUser, mockRolePermissions, mockUserPermissions)
 
       const result = await PermissionManager.getUserPermissions(mockDb, 'user-1')
 
@@ -346,7 +320,9 @@ describe('PermissionManager', () => {
 
       const mockContext = {
         get: vi.fn().mockReturnValue({ id: 'user-1' }),
-        json: vi.fn()
+        json: vi.fn(),
+        env: { DB: mockDb },
+        req: { param: vi.fn() }
       }
       const mockNext = vi.fn()
 
@@ -369,7 +345,9 @@ describe('PermissionManager', () => {
 
       const mockContext = {
         get: vi.fn().mockReturnValue({ id: 'user-1' }),
-        json: vi.fn()
+        json: vi.fn(),
+        env: { DB: mockDb },
+        req: { param: vi.fn() }
       }
       const mockNext = vi.fn()
 
@@ -378,7 +356,7 @@ describe('PermissionManager', () => {
 
       expect(mockNext).not.toHaveBeenCalled()
       expect(mockContext.json).toHaveBeenCalledWith(
-        { error: 'Insufficient permissions' },
+        { error: 'Permission denied: content.write' },
         403
       )
     })
@@ -403,7 +381,9 @@ describe('PermissionManager', () => {
     it('should handle database errors in middleware', async () => {
       const mockContext = {
         get: vi.fn().mockReturnValue({ id: 'user-1' }),
-        json: vi.fn()
+        json: vi.fn(),
+        env: { DB: mockDb },
+        req: { param: vi.fn() }
       }
       const mockNext = vi.fn()
 

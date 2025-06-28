@@ -31,7 +31,7 @@ apiRoutes.get('/', (c) => {
       description: 'RESTful API for SonicJS AI - A modern headless CMS built for Cloudflare\'s edge platform',
       contact: {
         name: 'SonicJS AI',
-        url: `${baseUrl}/docs`
+        url: `${baseUrl.replace(/\/$/, '')}/docs`
       }
     },
     servers: [
