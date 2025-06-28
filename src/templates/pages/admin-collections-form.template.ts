@@ -458,6 +458,12 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
 
     <script>
       const collectionId = '${data.id || ''}';
+      console.log('Collection ID for field management:', collectionId);
+      
+      if (!collectionId) {
+        console.error('Collection ID is missing! Field management will not work.');
+      }
+      
       let currentEditingField = null;
 
       // Field modal functions
@@ -518,6 +524,11 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
       document.getElementById('field-form').addEventListener('submit', function(e) {
         e.preventDefault();
         
+        if (!collectionId) {
+          alert('Error: Collection ID is missing. Cannot save field.');
+          return;
+        }
+        
         const formData = new FormData(this);
         const isEditing = currentEditingField !== null;
         
@@ -527,21 +538,31 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
         
         const method = isEditing ? 'PUT' : 'POST';
         
+        console.log('Submitting field form:', { url, method, isEditing });
+        
         fetch(url, {
           method: method,
           body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+          console.log('Field submission response status:', response.status);
+          if (!response.ok) {
+            throw new Error(\`HTTP \${response.status}: \${response.statusText}\`);
+          }
+          return response.json();
+        })
         .then(data => {
+          console.log('Field submission response data:', data);
           if (data.success) {
+            console.log('Field saved successfully, reloading page...');
             location.reload();
           } else {
-            alert('Error saving field: ' + data.error);
+            alert('Error saving field: ' + (data.error || 'Unknown error'));
           }
         })
         .catch(error => {
-          console.error('Error:', error);
-          alert('Error saving field');
+          console.error('Field submission error:', error);
+          alert('Error saving field: ' + error.message);
         });
       });
 

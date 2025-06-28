@@ -547,6 +547,14 @@ function renderSidebar(currentPath: string, user?: any): string {
       icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
       </svg>`
+    },
+    {
+      label: 'API Spec',
+      path: '/api',
+      target: '_blank',
+      icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      </svg>`
     }
   ]
 
@@ -555,8 +563,9 @@ function renderSidebar(currentPath: string, user?: any): string {
       <div class="space-y-4">
         ${menuItems.map(item => {
           const isActive = currentPath === item.path || (item.path !== '/admin' && currentPath.startsWith(item.path))
+          const targetAttr = (item as any).target ? ` target="${(item as any).target}"` : ''
           return `
-            <a href="${item.path}" class="flex items-center space-x-3 ${isActive ? 'text-white bg-white/20' : 'text-gray-300 hover:text-white'} rounded-lg px-3 py-2 transition-all hover:bg-white/10">
+            <a href="${item.path}"${targetAttr} class="flex items-center space-x-3 ${isActive ? 'text-white bg-white/20' : 'text-gray-300 hover:text-white'} rounded-lg px-3 py-2 transition-all hover:bg-white/10">
               ${item.icon}
               <span>${item.label}</span>
             </a>
