@@ -59,14 +59,26 @@ export function renderUsersListPage(data: UsersListPageData): string {
       sortable: true,
       sortType: 'string',
       render: (value: any, row: User) => {
-        const fullName = `${row.firstName} ${row.lastName}`
+        const escapeHtml = (text: string) => text.replace(/[&<>"']/g, (char) => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[char] || char))
+        
+        const truncatedFirstName = row.firstName.length > 25 ? row.firstName.substring(0, 25) + '...' : row.firstName
+        const truncatedLastName = row.lastName.length > 25 ? row.lastName.substring(0, 25) + '...' : row.lastName
+        const fullName = escapeHtml(`${truncatedFirstName} ${truncatedLastName}`)
+        const truncatedUsername = row.username.length > 100 ? row.username.substring(0, 100) + '...' : row.username
+        const username = escapeHtml(truncatedUsername)
         const statusBadge = row.isActive ? 
           '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-300 ml-2">Active</span>' :
           '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/20 text-red-300 ml-2">Inactive</span>'
         return `
           <div>
             <div class="text-sm font-medium text-white">${fullName}${statusBadge}</div>
-            <div class="text-sm text-gray-400">@${row.username}</div>
+            <div class="text-sm text-gray-400">@${username}</div>
           </div>
         `
       }
@@ -76,7 +88,17 @@ export function renderUsersListPage(data: UsersListPageData): string {
       label: 'Email',
       sortable: true,
       sortType: 'string',
-      render: (value: string) => `<a href="mailto:${value}" class="text-blue-400 hover:text-blue-300">${value}</a>`
+      render: (value: string) => {
+        const escapeHtml = (text: string) => text.replace(/[&<>"']/g, (char) => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[char] || char))
+        const escapedEmail = escapeHtml(value)
+        return `<a href="mailto:${escapedEmail}" class="text-blue-400 hover:text-blue-300">${escapedEmail}</a>`
+      }
     },
     {
       key: 'role',

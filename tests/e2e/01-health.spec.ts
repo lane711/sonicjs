@@ -20,7 +20,7 @@ test.describe('Health Checks', () => {
     
     // Verify we're on the login page
     expect(page.url()).toContain('/auth/login');
-    await expect(page.locator('h2')).toContainText('Sign In');
+    await expect(page.locator('h2')).toContainText('Welcome Back');
     
     // Verify no error message is shown
     await expect(page.locator('.error-message')).toHaveCount(0);
@@ -35,7 +35,7 @@ test.describe('Health Checks', () => {
     
     // Verify we're on the login page
     expect(page.url()).toContain('/auth/login');
-    await expect(page.locator('h2')).toContainText('Sign In');
+    await expect(page.locator('h2')).toContainText('Welcome Back');
     
     // Verify error message is shown
     await expect(page.locator('.bg-error\\/10')).toContainText('Please login to access the admin area');

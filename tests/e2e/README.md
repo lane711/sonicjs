@@ -7,6 +7,7 @@ This directory contains end-to-end tests for SonicJS AI using Playwright.
 ### Core Tests
 - `01-health.spec.ts` - Basic health and connectivity tests
 - `02-authentication.spec.ts` - Login/logout functionality
+- `02b-authentication-api.spec.ts` - **Authentication API component tests**
 - `03-admin-dashboard.spec.ts` - Admin dashboard functionality
 - `04-collections.spec.ts` - Collections management UI tests
 - `05-content.spec.ts` - Content management tests
@@ -19,6 +20,22 @@ This directory contains end-to-end tests for SonicJS AI using Playwright.
 
 ### Integration Tests
 - `09-integration.spec.ts` - Full workflow integration tests
+
+## Authentication API Tests
+
+The Authentication API tests provide comprehensive coverage of:
+
+### Authentication Endpoints (`02b-authentication-api.spec.ts`)
+- **POST /auth/register** - User registration with validation
+- **POST /auth/login** - User authentication
+- **POST /auth/logout** - Session termination
+- **GET /auth/logout** - Logout with redirect
+- **GET /auth/me** - Get current authenticated user
+- **POST /auth/refresh** - Refresh authentication token
+- **Security testing** - XSS, SQL injection, sensitive data exposure
+- **Session management** - Cookie handling, concurrent requests
+- **Error handling** - Malformed requests, validation errors
+- **Rate limiting** - Brute force protection
 
 ## Collections API Tests
 

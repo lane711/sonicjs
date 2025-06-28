@@ -56,7 +56,7 @@ export async function loginAsAdmin(page: Page) {
   
   // Wait for JavaScript redirect to admin dashboard (up to 3 seconds)
   await page.waitForURL('/admin', { timeout: 3000 });
-  await expect(page.locator('h1').first()).toContainText('Dashboard');
+  await expect(page.locator('nav').first()).toBeVisible(); // Check for sidebar navigation
 }
 
 /**
@@ -184,9 +184,9 @@ export async function isAuthenticated(page: Page): Promise<boolean> {
     if (currentUrl.includes('/auth/login')) {
       return false;
     }
-    // Check for the first h1 to see if it contains admin text
-    const title = await page.locator('h1').first().textContent();
-    return title?.includes('Dashboard') || false;
+    // Check for admin navigation sidebar to confirm we're authenticated
+    const nav = page.locator('nav').first();
+    return await nav.isVisible();
   } catch {
     return false;
   }

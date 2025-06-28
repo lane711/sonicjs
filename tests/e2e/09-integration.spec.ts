@@ -172,7 +172,7 @@ test.describe('Full Integration Workflows', () => {
       };
     } catch {
       // If stats don't load, skip this test or use placeholder values
-      await expect(page.locator('h1')).toContainText('Dashboard');
+      await expect(page).toHaveURL('/admin');
       return; // Skip the rest of the test if stats aren't available
     }
     

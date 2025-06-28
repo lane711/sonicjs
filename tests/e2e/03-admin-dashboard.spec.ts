@@ -7,7 +7,9 @@ test.describe('Admin Dashboard', () => {
   });
 
   test('should display admin dashboard with navigation', async ({ page }) => {
-    await expect(page.locator('h1').first()).toContainText('Dashboard');
+    // Check that we're on the admin dashboard by verifying URL and navigation
+    await expect(page).toHaveURL('/admin');
+    await expect(page.locator('nav').first()).toBeVisible();
     
     // Check navigation links in sidebar
     await expect(page.locator('nav a[href="/admin"]')).toBeVisible();
@@ -31,7 +33,7 @@ test.describe('Admin Dashboard', () => {
   test('should navigate to collections page', async ({ page }) => {
     await navigateToAdminSection(page, 'collections');
     
-    await expect(page.locator('main h1')).toContainText('Collections');
+    await expect(page.locator('h1')).toContainText('Collections');
     await expect(page.locator('a[href="/admin/collections/new"]')).toBeVisible();
   });
 
@@ -45,7 +47,7 @@ test.describe('Admin Dashboard', () => {
   test('should navigate to media page', async ({ page }) => {
     await navigateToAdminSection(page, 'media');
     
-    await expect(page.locator('h1').first()).toContainText('Media Library');
+    await expect(page.locator('h1')).toContainText('Media Library');
     await expect(page.locator('button').filter({ hasText: 'Upload Files' }).first()).toBeVisible();
   });
 

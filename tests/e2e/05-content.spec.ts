@@ -78,13 +78,16 @@ test.describe('Content Management', () => {
   });
 
   test('should display content actions', async ({ page }) => {
-    // Find a content row
-    const contentRow = page.locator('tr').filter({ hasText: 'Welcome to SonicJS AI' });
+    // Find any content row in the table
+    const contentRows = page.locator('tbody tr');
     
-    if (await contentRow.count() > 0) {
-      // Should have Edit and History buttons
-      await expect(contentRow.locator('.btn').filter({ hasText: 'Edit' })).toBeVisible();
-      await expect(contentRow.locator('.btn').filter({ hasText: 'History' })).toBeVisible();
+    if (await contentRows.count() > 0) {
+      // Check the first content row for action buttons
+      const firstRow = contentRows.first();
+      // Should have Edit link/button
+      await expect(firstRow.locator('a').filter({ hasText: 'Edit' })).toBeVisible();
+      // Should have History button
+      await expect(firstRow.locator('button').filter({ hasText: 'History' })).toBeVisible();
     }
   });
 
