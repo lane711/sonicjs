@@ -1,13 +1,7 @@
 import { Hono } from 'hono'
 import { html } from 'hono/html'
-import { ContentModelManager } from '../content/models'
-import { ContentWorkflow, ContentStatus } from '../content/workflow'
-import { ContentVersioning } from '../content/versioning'
-// Rich text now handled by form templates
-import { requireAuth, requireRole } from '../middleware/auth'
-import { renderContentListPage, ContentListPageData } from '../templates/pages/admin-content-list.template'
-import { renderContentNewPage, ContentNewPageData } from '../templates/pages/admin-content-new.template'
-import { renderContentEditPage, ContentEditPageData } from '../templates/pages/admin-content-edit.template'
+import { renderContentFormPage, ContentFormData } from '../templates/pages/admin-content-form.template'
+import { renderVersionHistory, VersionHistoryData, ContentVersion } from '../templates/components/version-history.template'
 
 type Bindings = {
   DB: D1Database
@@ -15,7 +9,7 @@ type Bindings = {
 }
 
 type Variables = {
-  user: {
+  user?: {
     userId: string
     email: string
     role: string
@@ -26,452 +20,357 @@ type Variables = {
 
 export const adminContentRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
-// Initialize content model manager
-const modelManager = new ContentModelManager()
+// Get collection fields
+async function getCollectionFields(db: D1Database, collectionId: string) {
+  const stmt = db.prepare(`
+    SELECT * FROM content_fields 
+    WHERE collection_id = ? 
+    ORDER BY field_order ASC
+  `)
+  const { results } = await stmt.bind(collectionId).all()
+  
+  return (results || []).map((row: any) => ({
+    id: row.id,
+    field_name: row.field_name,
+    field_type: row.field_type,
+    field_label: row.field_label,
+    field_options: row.field_options ? JSON.parse(row.field_options) : {},
+    field_order: row.field_order,
+    is_required: row.is_required === 1,
+    is_searchable: row.is_searchable === 1
+  }))
+}
 
-// Content list page
-adminContentRoutes.get('/', async (c) => {
-  try {
-    const user = c.get('user')
-    const { searchParams } = new URL(c.req.url)
-    const modelName = searchParams.get('model') || 'all'
-    const status = searchParams.get('status') || 'all'
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = 20
-    const offset = (page - 1) * limit
-    
-    const db = c.env.DB
-    
-    // Build query
-    let query = `
-      SELECT c.*, u.first_name, u.last_name 
-      FROM content c 
-      LEFT JOIN users u ON c.author_id = u.id
-    `
-    const params: any[] = []
-    const conditions: string[] = []
-    
-    if (modelName !== 'all') {
-      conditions.push('c.collection_id = ?')
-      params.push(modelName)
-    }
-    
-    if (status !== 'all') {
-      conditions.push('c.status = ?')
-      params.push(status)
-    }
-    
-    if (conditions.length > 0) {
-      query += ` WHERE ${conditions.join(' AND ')}`
-    }
-    
-    query += ` ORDER BY c.updated_at DESC LIMIT ${limit} OFFSET ${offset}`
-    
-    const stmt = db.prepare(query)
-    const { results } = await stmt.bind(...params).all()
-    
-    // Get available models
-    const models = modelManager.getAllModels()
-    
-    // Process results
-    const contentItems = results.map((row: any) => {
-      const data = row.data ? JSON.parse(row.data) : {}
-      return {
-        ...row,
-        data,
-        authorName: `${row.first_name || ''} ${row.last_name || ''}`.trim() || 'Unknown',
-        formattedDate: new Date(row.updated_at).toLocaleDateString(),
-        statusBadge: ContentWorkflow.generateStatusBadge(row.status as ContentStatus),
-        availableActions: ContentWorkflow.getAvailableActions(
-          row.status as ContentStatus,
-          user.role,
-          row.author_id === user.userId
-        )
-      }
-    })
-    
-    const pageData: ContentListPageData = {
-      modelName,
-      status,
-      page,
-      models: models.map(model => ({
-        name: model.name,
-        displayName: model.displayName
-      })),
-      contentItems: contentItems.map(item => ({
-        id: item.id,
-        title: item.title,
-        slug: item.slug,
-        modelName: item.modelName || 'Unknown',
-        statusBadge: item.statusBadge,
-        authorName: item.authorName,
-        formattedDate: item.formattedDate,
-        availableActions: item.availableActions || []
-      })),
-      totalItems: contentItems.length, // This should come from a proper count query
-      itemsPerPage: limit,
-      user: {
-        name: `${user.email}`,
-        email: user.email,
-        role: user.role
-      }
-    }
-
-    return c.html(renderContentListPage(pageData))
-  } catch (error) {
-    console.error('Error loading content list:', error)
-    return c.html(html`<p>Error loading content</p>`)
+// Get collection by ID
+async function getCollection(db: D1Database, collectionId: string) {
+  const stmt = db.prepare('SELECT * FROM collections WHERE id = ? AND is_active = 1')
+  const collection = await stmt.bind(collectionId).first() as any
+  
+  if (!collection) return null
+  
+  return {
+    id: collection.id,
+    name: collection.name,
+    display_name: collection.display_name,
+    description: collection.description,
+    schema: collection.schema ? JSON.parse(collection.schema) : {}
   }
-})
-
+}
 
 // New content form
 adminContentRoutes.get('/new', async (c) => {
   try {
     const user = c.get('user')
-    const models = modelManager.getAllModels()
+    const url = new URL(c.req.url)
+    const collectionId = url.searchParams.get('collection')
     
-    const pageData: ContentNewPageData = {
-      models: models.map(model => ({
-        name: model.name,
-        displayName: model.displayName,
-        fields: model.fields
-      })),
-      selectedModel: models.length > 0 ? {
-        name: models[0]?.name || '',
-        displayName: models[0]?.displayName || '',
-        fields: models[0]?.fields
-      } : undefined,
-      user: {
-        name: user.email,
-        email: user.email,
-        role: user.role
-      }
-    }
-    
-    return c.html(renderContentNewPage(pageData))
-  } catch (error) {
-    console.error('Error loading content form:', error)
-    
-    const pageData: ContentNewPageData = {
-      models: [],
-      error: 'Failed to load content form. Please try again.',
-      user: {
-        name: c.get('user')?.email || 'Unknown',
-        email: c.get('user')?.email || '',
-        role: c.get('user')?.role || 'viewer'
-      }
-    }
-    
-    return c.html(renderContentNewPage(pageData))
-  }
-})
-
-// Create new content
-adminContentRoutes.post('/', async (c) => {
-  try {
-    const user = c.get('user')
-    const formData = await c.req.formData()
-    
-    // Extract form data
-    const title = formData.get('title')?.toString() || ''
-    const slug = formData.get('slug')?.toString() || ''
-    const status = formData.get('status')?.toString() || 'draft'
-    const modelName = formData.get('modelName')?.toString() || ''
-    
-    // Validate required fields
-    if (!title || !slug || !modelName) {
-      return c.html(`
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          <p>Please fill in all required fields: Title, Slug, and Content Type.</p>
-        </div>
-      `)
+    if (!collectionId) {
+      return c.redirect('/admin/content')
     }
     
     const db = c.env.DB
+    const collection = await getCollection(db, collectionId)
     
-    // Get model configuration
-    const models = modelManager.getAllModels()
-    const model = models.find(m => m.name === modelName)
-    
-    if (!model) {
-      return c.html(`
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          <p>Invalid content type selected.</p>
-        </div>
-      `)
-    }
-    
-    // Ensure the collection exists in the database
-    let collectionId = modelName
-    
-    // Check if collection exists, if not create it
-    const existingCollection = await db.prepare('SELECT id FROM collections WHERE name = ?').bind(modelName).first()
-    
-    if (!existingCollection) {
-      // Create the collection
-      collectionId = `${modelName}-collection`
-      const now = Date.now()
-      
-      try {
-        await db.prepare(`
-          INSERT INTO collections (id, name, display_name, description, schema, is_active, created_at, updated_at)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `).bind(
-          collectionId,
-          modelName,
-          model.displayName,
-          model.description || `Collection for ${model.displayName}`,
-          JSON.stringify(model),
-          1,
-          now,
-          now
-        ).run()
-      } catch (error) {
-        console.log('Collection might already exist:', error)
-        // If collection creation fails, try to find existing one by different criteria
-        const fallbackCollection = await db.prepare('SELECT id FROM collections LIMIT 1').first()
-        if (fallbackCollection) {
-          collectionId = fallbackCollection.id as string
-        } else {
-          // Use the blog collection as fallback
-          collectionId = 'blog-posts-collection'
-        }
+    if (!collection) {
+      const formData: ContentFormData = {
+        collection: { id: '', name: '', display_name: 'Unknown' },
+        fields: [],
+        error: 'Collection not found.',
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : undefined
       }
-    } else {
-      collectionId = existingCollection.id as string
+      return c.html(renderContentFormPage(formData))
     }
     
-    // Build content data from form fields
-    const contentData: any = { title, slug }
+    const fields = await getCollectionFields(db, collectionId)
     
-    // Extract dynamic fields based on model configuration
-    if (model.fields) {
-      Object.keys(model.fields).forEach(fieldName => {
-        const fieldValue = formData.get(fieldName)
-        if (fieldValue !== null) {
-          contentData[fieldName] = fieldValue.toString()
-        }
-      })
+    const formData: ContentFormData = {
+      collection,
+      fields,
+      isEdit: false,
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : undefined
     }
     
-    // Check if slug already exists
-    const existingContent = await db.prepare('SELECT id FROM content WHERE slug = ?').bind(slug).first()
-    if (existingContent) {
-      return c.html(`
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          <p>A content item with this slug already exists. Please choose a different slug.</p>
-        </div>
-      `)
-    }
-    
-    // Insert new content
-    const contentId = crypto.randomUUID()
-    const now = new Date().toISOString()
-    
-    await db.prepare(`
-      INSERT INTO content (
-        id, title, slug, collection_id, status, data, author_id, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).bind(
-      contentId,
-      title,
-      slug,
-      collectionId,
-      status,
-      JSON.stringify(contentData),
-      user.userId,
-      now,
-      now
-    ).run()
-    
-    // Redirect to content list with success message
-    return c.redirect('/admin/content?success=Content created successfully')
-    
+    return c.html(renderContentFormPage(formData))
   } catch (error) {
-    console.error('Error creating content:', error)
-    return c.html(`
-      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-        <p>An error occurred while creating the content. Please try again.</p>
-      </div>
-    `)
+    console.error('Error loading new content form:', error)
+    const formData: ContentFormData = {
+      collection: { id: '', name: '', display_name: 'Unknown' },
+      fields: [],
+      error: 'Failed to load content form.',
+      user: c.get('user') ? {
+        name: c.get('user')!.email,
+        email: c.get('user')!.email,
+        role: c.get('user')!.role
+      } : undefined
+    }
+    return c.html(renderContentFormPage(formData))
   }
 })
 
 // Edit content form
 adminContentRoutes.get('/:id/edit', async (c) => {
   try {
+    const id = c.req.param('id')
     const user = c.get('user')
-    const contentId = c.req.param('id')
     const db = c.env.DB
     
-    // Get content item
-    const contentResult = await db.prepare('SELECT * FROM content WHERE id = ?').bind(contentId).first()
+    // Get content
+    const contentStmt = db.prepare(`
+      SELECT c.*, col.id as collection_id, col.name as collection_name, 
+             col.display_name as collection_display_name, col.description as collection_description,
+             col.schema as collection_schema
+      FROM content c
+      JOIN collections col ON c.collection_id = col.id
+      WHERE c.id = ?
+    `)
+    const content = await contentStmt.bind(id).first() as any
     
-    if (!contentResult) {
-      return c.html(`
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          <p>Content not found.</p>
-        </div>
-      `)
+    if (!content) {
+      const formData: ContentFormData = {
+        collection: { id: '', name: '', display_name: 'Unknown' },
+        fields: [],
+        error: 'Content not found.',
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : undefined
+      }
+      return c.html(renderContentFormPage(formData))
     }
     
-    // Parse content data
-    const contentData = contentResult.data ? JSON.parse(contentResult.data as string) : {}
+    const collection = {
+      id: content.collection_id,
+      name: content.collection_name,
+      display_name: content.collection_display_name,
+      description: content.collection_description,
+      schema: content.collection_schema ? JSON.parse(content.collection_schema) : {}
+    }
     
-    const content = {
-      id: contentResult.id as string,
-      title: contentResult.title as string,
-      slug: contentResult.slug as string,
-      status: contentResult.status as string,
+    const fields = await getCollectionFields(db, content.collection_id)
+    const contentData = content.data ? JSON.parse(content.data) : {}
+    
+    const formData: ContentFormData = {
+      id: content.id,
+      title: content.title,
+      slug: content.slug,
       data: contentData,
-      collection_id: contentResult.collection_id as string,
-      created_at: contentResult.created_at as string,
-      updated_at: contentResult.updated_at as string
-    }
-    
-    // Get available models
-    const models = modelManager.getAllModels()
-    
-    // Find the model for this content
-    const selectedModel = models.find(model => 
-      model.name === content.collection_id || 
-      content.collection_id.includes(model.name)
-    ) || models[0]
-    
-    const pageData: ContentEditPageData = {
-      content,
-      models: models.map(model => ({
-        name: model.name,
-        displayName: model.displayName,
-        fields: model.fields
-      })),
-      selectedModel: selectedModel ? {
-        name: selectedModel.name,
-        displayName: selectedModel.displayName,
-        fields: selectedModel.fields
-      } : undefined,
-      user: {
+      status: content.status,
+      scheduled_publish_at: content.scheduled_publish_at,
+      scheduled_unpublish_at: content.scheduled_unpublish_at,
+      review_status: content.review_status,
+      meta_title: content.meta_title,
+      meta_description: content.meta_description,
+      collection,
+      fields,
+      isEdit: true,
+      user: user ? {
         name: user.email,
         email: user.email,
         role: user.role
-      }
+      } : undefined
     }
     
-    return c.html(renderContentEditPage(pageData))
+    return c.html(renderContentFormPage(formData))
   } catch (error) {
-    console.error('Error loading content for edit:', error)
-    return c.html(`
-      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-        <p>Error loading content. Please try again.</p>
-      </div>
-    `)
+    console.error('Error loading edit content form:', error)
+    const formData: ContentFormData = {
+      collection: { id: '', name: '', display_name: 'Unknown' },
+      fields: [],
+      error: 'Failed to load content for editing.',
+      user: c.get('user') ? {
+        name: c.get('user')!.email,
+        email: c.get('user')!.email,
+        role: c.get('user')!.role
+      } : undefined
+    }
+    return c.html(renderContentFormPage(formData))
   }
 })
 
-// Handle POST to edit route (fallback for non-HTMX forms)
-adminContentRoutes.post('/:id/edit', async (c) => {
-  // Redirect POST requests to the PUT handler
-  const contentId = c.req.param('id')
-  const formData = await c.req.formData()
-  
-  // Create a new request object for the PUT route
-  const putUrl = `/admin/content/${contentId}`
-  const putRequest = new Request(putUrl, {
-    method: 'PUT',
-    body: formData,
-    headers: c.req.raw.headers
-  })
-  
-  // Forward to PUT handler by creating new context
+// Create content
+adminContentRoutes.post('/', async (c) => {
   try {
     const user = c.get('user')
-    const title = formData.get('title')?.toString() || ''
-    const slug = formData.get('slug')?.toString() || ''
-    const status = formData.get('status')?.toString() || 'draft'
+    const formData = await c.req.formData()
+    const collectionId = formData.get('collection_id') as string
+    const action = formData.get('action') as string
     
-    // Validate required fields
-    if (!title || !slug) {
-      return c.html(`
+    if (!collectionId) {
+      return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          <p>Please fill in all required fields: Title and Slug.</p>
+          Collection ID is required.
         </div>
       `)
     }
     
     const db = c.env.DB
+    const collection = await getCollection(db, collectionId)
     
-    // Get existing content
-    const existingContent = await db.prepare('SELECT * FROM content WHERE id = ?').bind(contentId).first()
-    if (!existingContent) {
-      return c.html(`
+    if (!collection) {
+      return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          <p>Content not found.</p>
+          Collection not found.
         </div>
       `)
     }
     
-    // Check if slug already exists (excluding current content)
-    const slugCheck = await db.prepare('SELECT id FROM content WHERE slug = ? AND id != ?').bind(slug, contentId).first()
-    if (slugCheck) {
-      return c.html(`
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          <p>A content item with this slug already exists. Please choose a different slug.</p>
-        </div>
-      `)
-    }
+    const fields = await getCollectionFields(db, collectionId)
     
-    // Build updated content data
-    const existingData = existingContent.data ? JSON.parse(existingContent.data as string) : {}
-    const updatedData = { ...existingData, title, slug }
+    // Extract field data
+    const data: any = {}
+    const errors: Record<string, string[]> = {}
     
-    // Extract dynamic fields from form
-    for (const [key, value] of formData.entries()) {
-      if (!['title', 'slug', 'status'].includes(key)) {
-        updatedData[key] = value.toString()
+    for (const field of fields) {
+      const value = formData.get(field.field_name)
+      
+      // Validation
+      if (field.is_required && (!value || value.toString().trim() === '')) {
+        errors[field.field_name] = [`${field.field_label} is required`]
+        continue
+      }
+      
+      // Type conversion and validation
+      switch (field.field_type) {
+        case 'number':
+          if (value && isNaN(Number(value))) {
+            errors[field.field_name] = [`${field.field_label} must be a valid number`]
+          } else {
+            data[field.field_name] = value ? Number(value) : null
+          }
+          break
+        case 'boolean':
+          data[field.field_name] = formData.get(`${field.field_name}_submitted`) ? (value === 'true') : false
+          break
+        case 'select':
+          if (field.field_options?.multiple) {
+            data[field.field_name] = formData.getAll(`${field.field_name}[]`)
+          } else {
+            data[field.field_name] = value
+          }
+          break
+        default:
+          data[field.field_name] = value
       }
     }
     
-    // Update content
-    const now = new Date().toISOString()
-    
-    await db.prepare(`
-      UPDATE content 
-      SET title = ?, slug = ?, status = ?, data = ?, updated_at = ?
-      WHERE id = ?
-    `).bind(
-      title,
-      slug,
-      status,
-      JSON.stringify(updatedData),
-      now,
-      contentId
-    ).run()
-    
-    // Check if this is an HTMX request
-    const isHtmxRequest = c.req.header('HX-Request') === 'true'
-    
-    if (isHtmxRequest) {
-      return c.html(`
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-          <p>Content updated successfully!</p>
-          <script>
-            setTimeout(() => {
-              window.location.href = '/admin/content';
-            }, 1500);
-          </script>
-        </div>
-      `)
+    // Check for validation errors
+    if (Object.keys(errors).length > 0) {
+      const formDataWithErrors: ContentFormData = {
+        collection,
+        fields,
+        data,
+        validationErrors: errors,
+        error: 'Please fix the validation errors below.',
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : undefined
+      }
+      return c.html(renderContentFormPage(formDataWithErrors))
     }
     
-    // Redirect to content list with success message
-    return c.redirect('/admin/content?success=Content updated successfully')
+    // Generate slug if not provided
+    let slug = data.slug || data.title
+    if (slug) {
+      slug = slug.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim('-')
+    }
+    
+    // Determine status
+    let status = formData.get('status') as string || 'draft'
+    if (action === 'save_and_publish') {
+      status = 'published'
+    }
+    
+    // Handle scheduling
+    const scheduledPublishAt = formData.get('scheduled_publish_at') as string
+    const scheduledUnpublishAt = formData.get('scheduled_unpublish_at') as string
+    
+    // Create content
+    const contentId = crypto.randomUUID()
+    const now = Date.now()
+    
+    const insertStmt = db.prepare(`
+      INSERT INTO content (
+        id, collection_id, slug, title, data, status, 
+        scheduled_publish_at, scheduled_unpublish_at,
+        meta_title, meta_description, author_id, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `)
+    
+    await insertStmt.bind(
+      contentId,
+      collectionId,
+      slug,
+      data.title || 'Untitled',
+      JSON.stringify(data),
+      status,
+      scheduledPublishAt ? new Date(scheduledPublishAt).getTime() : null,
+      scheduledUnpublishAt ? new Date(scheduledUnpublishAt).getTime() : null,
+      data.meta_title || null,
+      data.meta_description || null,
+      user?.userId || 'unknown',
+      now,
+      now
+    ).run()
+    
+    // Create initial version
+    const versionStmt = db.prepare(`
+      INSERT INTO content_versions (id, content_id, version, data, author_id, created_at)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `)
+    
+    await versionStmt.bind(
+      crypto.randomUUID(),
+      contentId,
+      1,
+      JSON.stringify(data),
+      user?.userId || 'unknown',
+      now
+    ).run()
+    
+    // Log workflow action
+    const workflowStmt = db.prepare(`
+      INSERT INTO workflow_history (id, content_id, action, from_status, to_status, user_id, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `)
+    
+    await workflowStmt.bind(
+      crypto.randomUUID(),
+      contentId,
+      'created',
+      'none',
+      status,
+      user?.userId || 'unknown',
+      now
+    ).run()
+    
+    // Handle different actions
+    if (action === 'save_and_continue') {
+      return c.redirect(`/admin/content/${contentId}/edit?success=Content saved successfully!`)
+    } else {
+      return c.redirect(`/admin/content?collection=${collectionId}&success=Content created successfully!`)
+    }
     
   } catch (error) {
-    console.error('Error updating content:', error)
-    return c.html(`
+    console.error('Error creating content:', error)
+    return c.html(html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-        <p>An error occurred while updating the content. Please try again.</p>
+        Failed to create content. Please try again.
       </div>
     `)
   }
@@ -480,122 +379,538 @@ adminContentRoutes.post('/:id/edit', async (c) => {
 // Update content
 adminContentRoutes.put('/:id', async (c) => {
   try {
+    const id = c.req.param('id')
     const user = c.get('user')
-    const contentId = c.req.param('id')
     const formData = await c.req.formData()
-    
-    // Extract form data
-    const title = formData.get('title')?.toString() || ''
-    const slug = formData.get('slug')?.toString() || ''
-    const status = formData.get('status')?.toString() || 'draft'
-    
-    // Validate required fields
-    if (!title || !slug) {
-      return c.html(`
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          <p>Please fill in all required fields: Title and Slug.</p>
-        </div>
-      `)
-    }
+    const action = formData.get('action') as string
     
     const db = c.env.DB
     
     // Get existing content
-    const existingContent = await db.prepare('SELECT * FROM content WHERE id = ?').bind(contentId).first()
+    const contentStmt = db.prepare('SELECT * FROM content WHERE id = ?')
+    const existingContent = await contentStmt.bind(id).first() as any
+    
     if (!existingContent) {
-      return c.html(`
+      return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          <p>Content not found.</p>
+          Content not found.
         </div>
       `)
     }
     
-    // Check if slug already exists (excluding current content)
-    const slugCheck = await db.prepare('SELECT id FROM content WHERE slug = ? AND id != ?').bind(slug, contentId).first()
-    if (slugCheck) {
-      return c.html(`
+    const collection = await getCollection(db, existingContent.collection_id)
+    if (!collection) {
+      return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          <p>A content item with this slug already exists. Please choose a different slug.</p>
+          Collection not found.
         </div>
       `)
     }
     
-    // Build updated content data
-    const existingData = existingContent.data ? JSON.parse(existingContent.data as string) : {}
-    const updatedData = { ...existingData, title, slug }
+    const fields = await getCollectionFields(db, existingContent.collection_id)
     
-    // Extract dynamic fields from form
-    for (const [key, value] of formData.entries()) {
-      if (!['title', 'slug', 'status'].includes(key)) {
-        updatedData[key] = value.toString()
+    // Extract and validate field data (same as create)
+    const data: any = {}
+    const errors: Record<string, string[]> = {}
+    
+    for (const field of fields) {
+      const value = formData.get(field.field_name)
+      
+      if (field.is_required && (!value || value.toString().trim() === '')) {
+        errors[field.field_name] = [`${field.field_label} is required`]
+        continue
+      }
+      
+      switch (field.field_type) {
+        case 'number':
+          if (value && isNaN(Number(value))) {
+            errors[field.field_name] = [`${field.field_label} must be a valid number`]
+          } else {
+            data[field.field_name] = value ? Number(value) : null
+          }
+          break
+        case 'boolean':
+          data[field.field_name] = formData.get(`${field.field_name}_submitted`) ? (value === 'true') : false
+          break
+        case 'select':
+          if (field.field_options?.multiple) {
+            data[field.field_name] = formData.getAll(`${field.field_name}[]`)
+          } else {
+            data[field.field_name] = value
+          }
+          break
+        default:
+          data[field.field_name] = value
       }
     }
     
-    // Update content
-    const now = new Date().toISOString()
-    
-    await db.prepare(`
-      UPDATE content 
-      SET title = ?, slug = ?, status = ?, data = ?, updated_at = ?
-      WHERE id = ?
-    `).bind(
-      title,
-      slug,
-      status,
-      JSON.stringify(updatedData),
-      now,
-      contentId
-    ).run()
-    
-    // Check if this is an HTMX request
-    const isHtmxRequest = c.req.header('HX-Request') === 'true'
-    
-    if (isHtmxRequest) {
-      return c.html(`
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-          <p>Content updated successfully!</p>
-          <script>
-            setTimeout(() => {
-              window.location.href = '/admin/content';
-            }, 1500);
-          </script>
-        </div>
-      `)
+    if (Object.keys(errors).length > 0) {
+      const formDataWithErrors: ContentFormData = {
+        id,
+        collection,
+        fields,
+        data,
+        validationErrors: errors,
+        error: 'Please fix the validation errors below.',
+        isEdit: true,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : undefined
+      }
+      return c.html(renderContentFormPage(formDataWithErrors))
     }
     
-    // Redirect to content list with success message
-    return c.redirect('/admin/content?success=Content updated successfully')
+    // Update slug if title changed
+    let slug = data.slug || data.title
+    if (slug) {
+      slug = slug.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim('-')
+    }
+    
+    // Determine status
+    let status = formData.get('status') as string || existingContent.status
+    if (action === 'save_and_publish') {
+      status = 'published'
+    }
+    
+    // Handle scheduling
+    const scheduledPublishAt = formData.get('scheduled_publish_at') as string
+    const scheduledUnpublishAt = formData.get('scheduled_unpublish_at') as string
+    
+    // Update content
+    const now = Date.now()
+    
+    const updateStmt = db.prepare(`
+      UPDATE content SET
+        slug = ?, title = ?, data = ?, status = ?,
+        scheduled_publish_at = ?, scheduled_unpublish_at = ?,
+        meta_title = ?, meta_description = ?, updated_at = ?
+      WHERE id = ?
+    `)
+    
+    await updateStmt.bind(
+      slug,
+      data.title || 'Untitled',
+      JSON.stringify(data),
+      status,
+      scheduledPublishAt ? new Date(scheduledPublishAt).getTime() : null,
+      scheduledUnpublishAt ? new Date(scheduledUnpublishAt).getTime() : null,
+      data.meta_title || null,
+      data.meta_description || null,
+      now,
+      id
+    ).run()
+    
+    // Create new version if content changed
+    const existingData = JSON.parse(existingContent.data || '{}')
+    if (JSON.stringify(existingData) !== JSON.stringify(data)) {
+      // Get next version number
+      const versionCountStmt = db.prepare('SELECT MAX(version) as max_version FROM content_versions WHERE content_id = ?')
+      const versionResult = await versionCountStmt.bind(id).first() as any
+      const nextVersion = (versionResult?.max_version || 0) + 1
+      
+      const versionStmt = db.prepare(`
+        INSERT INTO content_versions (id, content_id, version, data, author_id, created_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `)
+      
+      await versionStmt.bind(
+        crypto.randomUUID(),
+        id,
+        nextVersion,
+        JSON.stringify(data),
+        user?.userId || 'unknown',
+        now
+      ).run()
+    }
+    
+    // Log workflow action if status changed
+    if (status !== existingContent.status) {
+      const workflowStmt = db.prepare(`
+        INSERT INTO workflow_history (id, content_id, action, from_status, to_status, user_id, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `)
+      
+      await workflowStmt.bind(
+        crypto.randomUUID(),
+        id,
+        'status_changed',
+        existingContent.status,
+        status,
+        user?.userId || 'unknown',
+        now
+      ).run()
+    }
+    
+    // Handle different actions
+    if (action === 'save_and_continue') {
+      return c.redirect(`/admin/content/${id}/edit?success=Content updated successfully!`)
+    } else {
+      return c.redirect(`/admin/content?collection=${existingContent.collection_id}&success=Content updated successfully!`)
+    }
     
   } catch (error) {
     console.error('Error updating content:', error)
-    return c.html(`
+    return c.html(html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-        <p>An error occurred while updating the content. Please try again.</p>
+        Failed to update content. Please try again.
       </div>
     `)
   }
 })
 
-// Delete content
-adminContentRoutes.delete('/:id', async (c) => {
+// Content preview
+adminContentRoutes.post('/preview', async (c) => {
   try {
-    const contentId = c.req.param('id')
-    const db = c.env.DB
+    const formData = await c.req.formData()
+    const collectionId = formData.get('collection_id') as string
     
-    // Check if content exists
-    const existingContent = await db.prepare('SELECT id FROM content WHERE id = ?').bind(contentId).first()
-    if (!existingContent) {
-      return c.json({ error: 'Content not found' }, 404)
+    const db = c.env.DB
+    const collection = await getCollection(db, collectionId)
+    
+    if (!collection) {
+      return c.html('<p>Collection not found</p>')
     }
     
-    // Delete content
-    await db.prepare('DELETE FROM content WHERE id = ?').bind(contentId).run()
+    const fields = await getCollectionFields(db, collectionId)
     
-    return c.json({ success: true, message: 'Content deleted successfully' })
+    // Extract field data for preview
+    const data: any = {}
+    for (const field of fields) {
+      const value = formData.get(field.field_name)
+      
+      switch (field.field_type) {
+        case 'number':
+          data[field.field_name] = value ? Number(value) : null
+          break
+        case 'boolean':
+          data[field.field_name] = value === 'true'
+          break
+        case 'select':
+          if (field.field_options?.multiple) {
+            data[field.field_name] = formData.getAll(`${field.field_name}[]`)
+          } else {
+            data[field.field_name] = value
+          }
+          break
+        default:
+          data[field.field_name] = value
+      }
+    }
     
+    // Generate preview HTML
+    const previewHTML = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Preview: ${data.title || 'Untitled'}</title>
+        <style>
+          body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+          h1 { color: #333; }
+          .meta { color: #666; font-size: 14px; margin-bottom: 20px; }
+          .content { line-height: 1.6; }
+        </style>
+      </head>
+      <body>
+        <h1>${data.title || 'Untitled'}</h1>
+        <div class="meta">
+          <strong>Collection:</strong> ${collection.display_name}<br>
+          <strong>Status:</strong> ${formData.get('status') || 'draft'}<br>
+          ${data.meta_description ? `<strong>Description:</strong> ${data.meta_description}<br>` : ''}
+        </div>
+        <div class="content">
+          ${data.content || '<p>No content provided.</p>'}
+        </div>
+        
+        <h3>All Fields:</h3>
+        <table border="1" style="border-collapse: collapse; width: 100%;">
+          <tr><th>Field</th><th>Value</th></tr>
+          ${fields.map(field => `
+            <tr>
+              <td><strong>${field.field_label}</strong></td>
+              <td>${data[field.field_name] || '<em>empty</em>'}</td>
+            </tr>
+          `).join('')}
+        </table>
+      </body>
+      </html>
+    `
+    
+    return c.html(previewHTML)
   } catch (error) {
-    console.error('Error deleting content:', error)
-    return c.json({ error: 'An error occurred while deleting the content' }, 500)
+    console.error('Error generating preview:', error)
+    return c.html('<p>Error generating preview</p>')
   }
 })
 
+// Duplicate content
+adminContentRoutes.post('/duplicate', async (c) => {
+  try {
+    const user = c.get('user')
+    const formData = await c.req.formData()
+    const originalId = formData.get('id') as string
+    
+    if (!originalId) {
+      return c.json({ success: false, error: 'Content ID required' })
+    }
+    
+    const db = c.env.DB
+    
+    // Get original content
+    const contentStmt = db.prepare('SELECT * FROM content WHERE id = ?')
+    const original = await contentStmt.bind(originalId).first() as any
+    
+    if (!original) {
+      return c.json({ success: false, error: 'Content not found' })
+    }
+    
+    // Create duplicate
+    const newId = crypto.randomUUID()
+    const now = Date.now()
+    const originalData = JSON.parse(original.data || '{}')
+    
+    // Modify title to indicate it's a copy
+    originalData.title = `${originalData.title || 'Untitled'} (Copy)`
+    
+    const insertStmt = db.prepare(`
+      INSERT INTO content (
+        id, collection_id, slug, title, data, status, 
+        author_id, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `)
+    
+    await insertStmt.bind(
+      newId,
+      original.collection_id,
+      `${original.slug}-copy-${Date.now()}`,
+      originalData.title,
+      JSON.stringify(originalData),
+      'draft', // Always start as draft
+      user?.userId || 'unknown',
+      now,
+      now
+    ).run()
+    
+    return c.json({ success: true, id: newId })
+  } catch (error) {
+    console.error('Error duplicating content:', error)
+    return c.json({ success: false, error: 'Failed to duplicate content' })
+  }
+})
+
+// Get version history
+adminContentRoutes.get('/:id/versions', async (c) => {
+  try {
+    const id = c.req.param('id')
+    const db = c.env.DB
+    
+    // Get current content
+    const contentStmt = db.prepare('SELECT * FROM content WHERE id = ?')
+    const content = await contentStmt.bind(id).first() as any
+    
+    if (!content) {
+      return c.html('<p>Content not found</p>')
+    }
+    
+    // Get all versions with author info
+    const versionsStmt = db.prepare(`
+      SELECT cv.*, u.first_name, u.last_name, u.email
+      FROM content_versions cv
+      LEFT JOIN users u ON cv.author_id = u.id
+      WHERE cv.content_id = ?
+      ORDER BY cv.version DESC
+    `)
+    const { results } = await versionsStmt.bind(id).all()
+    
+    const versions: ContentVersion[] = (results || []).map((row: any) => ({
+      id: row.id,
+      version: row.version,
+      data: JSON.parse(row.data || '{}'),
+      author_id: row.author_id,
+      author_name: row.first_name && row.last_name ? `${row.first_name} ${row.last_name}` : row.email,
+      created_at: row.created_at,
+      is_current: false // Will be set below
+    }))
+    
+    // Mark the latest version as current
+    if (versions.length > 0) {
+      versions[0].is_current = true
+    }
+    
+    const data: VersionHistoryData = {
+      contentId: id,
+      versions,
+      currentVersion: versions.length > 0 ? versions[0].version : 1
+    }
+    
+    return c.html(renderVersionHistory(data))
+  } catch (error) {
+    console.error('Error loading version history:', error)
+    return c.html('<p>Error loading version history</p>')
+  }
+})
+
+// Restore version
+adminContentRoutes.post('/:id/restore/:version', async (c) => {
+  try {
+    const id = c.req.param('id')
+    const version = parseInt(c.req.param('version'))
+    const user = c.get('user')
+    const db = c.env.DB
+    
+    // Get the specific version
+    const versionStmt = db.prepare(`
+      SELECT * FROM content_versions 
+      WHERE content_id = ? AND version = ?
+    `)
+    const versionData = await versionStmt.bind(id, version).first() as any
+    
+    if (!versionData) {
+      return c.json({ success: false, error: 'Version not found' })
+    }
+    
+    // Get current content
+    const contentStmt = db.prepare('SELECT * FROM content WHERE id = ?')
+    const currentContent = await contentStmt.bind(id).first() as any
+    
+    if (!currentContent) {
+      return c.json({ success: false, error: 'Content not found' })
+    }
+    
+    const restoredData = JSON.parse(versionData.data)
+    const now = Date.now()
+    
+    // Update content with restored data
+    const updateStmt = db.prepare(`
+      UPDATE content SET
+        title = ?, data = ?, updated_at = ?
+      WHERE id = ?
+    `)
+    
+    await updateStmt.bind(
+      restoredData.title || 'Untitled',
+      versionData.data,
+      now,
+      id
+    ).run()
+    
+    // Create new version for the restoration
+    const nextVersionStmt = db.prepare('SELECT MAX(version) as max_version FROM content_versions WHERE content_id = ?')
+    const nextVersionResult = await nextVersionStmt.bind(id).first() as any
+    const nextVersion = (nextVersionResult?.max_version || 0) + 1
+    
+    const newVersionStmt = db.prepare(`
+      INSERT INTO content_versions (id, content_id, version, data, author_id, created_at)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `)
+    
+    await newVersionStmt.bind(
+      crypto.randomUUID(),
+      id,
+      nextVersion,
+      versionData.data,
+      user?.userId || 'unknown',
+      now
+    ).run()
+    
+    // Log workflow action
+    const workflowStmt = db.prepare(`
+      INSERT INTO workflow_history (id, content_id, action, from_status, to_status, user_id, comment, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `)
+    
+    await workflowStmt.bind(
+      crypto.randomUUID(),
+      id,
+      'version_restored',
+      currentContent.status,
+      currentContent.status,
+      user?.userId || 'unknown',
+      `Restored to version ${version}`,
+      now
+    ).run()
+    
+    return c.json({ success: true })
+  } catch (error) {
+    console.error('Error restoring version:', error)
+    return c.json({ success: false, error: 'Failed to restore version' })
+  }
+})
+
+// Preview specific version
+adminContentRoutes.get('/:id/version/:version/preview', async (c) => {
+  try {
+    const id = c.req.param('id')
+    const version = parseInt(c.req.param('version'))
+    const db = c.env.DB
+    
+    // Get the specific version
+    const versionStmt = db.prepare(`
+      SELECT cv.*, c.collection_id, col.display_name as collection_name
+      FROM content_versions cv
+      JOIN content c ON cv.content_id = c.id
+      JOIN collections col ON c.collection_id = col.id
+      WHERE cv.content_id = ? AND cv.version = ?
+    `)
+    const versionData = await versionStmt.bind(id, version).first() as any
+    
+    if (!versionData) {
+      return c.html('<p>Version not found</p>')
+    }
+    
+    const data = JSON.parse(versionData.data || '{}')
+    
+    // Generate preview HTML
+    const previewHTML = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Version ${version} Preview: ${data.title || 'Untitled'}</title>
+        <style>
+          body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+          h1 { color: #333; }
+          .meta { color: #666; font-size: 14px; margin-bottom: 20px; padding: 10px; background: #f5f5f5; border-radius: 5px; }
+          .content { line-height: 1.6; }
+          .version-badge { background: #007cba; color: white; padding: 5px 10px; border-radius: 15px; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="meta">
+          <span class="version-badge">Version ${version}</span>
+          <strong>Collection:</strong> ${versionData.collection_name}<br>
+          <strong>Created:</strong> ${new Date(versionData.created_at).toLocaleString()}<br>
+          <em>This is a historical version preview</em>
+        </div>
+        
+        <h1>${data.title || 'Untitled'}</h1>
+        
+        <div class="content">
+          ${data.content || '<p>No content provided.</p>'}
+        </div>
+        
+        ${data.excerpt ? `<h3>Excerpt:</h3><p>${data.excerpt}</p>` : ''}
+        
+        <h3>All Field Data:</h3>
+        <pre style="background: #f5f5f5; padding: 15px; border-radius: 5px; overflow-x: auto;">
+${JSON.stringify(data, null, 2)}
+        </pre>
+      </body>
+      </html>
+    `
+    
+    return c.html(previewHTML)
+  } catch (error) {
+    console.error('Error generating version preview:', error)
+    return c.html('<p>Error generating preview</p>')
+  }
+})

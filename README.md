@@ -4,11 +4,23 @@ A modern, TypeScript-first headless CMS built for Cloudflare's edge platform wit
 
 ## 🚀 Features
 
+### Core Platform
 - **⚡ Edge-First**: Built specifically for Cloudflare Workers with global performance
 - **🔧 Developer-Centric**: Configuration over UI, TypeScript-first approach  
 - **🤖 AI-Friendly**: Structured codebase designed for AI-assisted development
 - **🔌 Plugin System**: Extensible architecture without core modifications
 - **📱 Modern Stack**: Hono.js, TypeScript, D1, R2, and HTMX
+
+### Advanced Content Management (Stage 5)
+- **📝 Rich Text Editor**: TinyMCE integration with customizable toolbars
+- **🎛️ Dynamic Fields**: Custom field types (text, number, date, boolean, select, media)
+- **📚 Content Versioning**: Complete revision history with restore functionality
+- **⏰ Content Scheduling**: Publish/unpublish automation with date controls
+- **🔄 Workflow System**: Draft → Review → Published → Archived with role-based permissions
+- **💾 Auto-Save**: Automatic content saving every 30 seconds
+- **👁️ Live Preview**: Real-time content preview before publishing
+- **📋 Content Duplication**: One-click content copying and templates
+- **🛡️ XSS Protection**: Comprehensive input validation and HTML escaping
 
 ## 🛠 Technology Stack
 
@@ -82,43 +94,96 @@ npm run db:studio      # Open database studio
 
 ```
 src/
-├── core/           # Core CMS functionality
-├── plugins/        # Built-in plugins
-├── routes/         # Hono.js route handlers
-├── middleware/     # Hono.js middleware
-├── types/          # TypeScript type definitions
-├── utils/          # Utility functions
-├── templates/      # HTML templates
-└── tests/          # Test files
+├── routes/           # Hono.js route handlers
+│   ├── admin*.ts     # Admin interface routes
+│   ├── api*.ts       # REST API endpoints
+│   └── auth.ts       # Authentication routes
+├── templates/        # HTML templates & components
+│   ├── layouts/      # Page layouts (admin, public)
+│   ├── pages/        # Full page templates
+│   └── components/   # Reusable UI components
+├── middleware/       # Hono.js middleware
+│   └── auth.ts       # Authentication & authorization
+├── utils/           # Utility functions
+├── scripts/         # Database & deployment scripts
+├── migrations/      # Database migration files
+└── tests/           # Unit & integration tests
+    └── e2e/         # End-to-end test suites
 ```
 
-## 🔧 Configuration
+## 🔧 Content Management
 
-SonicJS uses a configuration-first approach. Define your content models in TypeScript:
+### Creating Collections
+SonicJS uses a dynamic field system. Create collections through the admin interface or define them in the database:
 
-```typescript
-// src/config/content-models.ts
-export const blogPost = {
-  name: 'blog_posts',
-  fields: {
-    title: { type: 'string', required: true },
-    content: { type: 'text' },
-    publishedAt: { type: 'datetime' },
-    author: { type: 'relation', collection: 'users' }
-  }
-}
+```sql
+-- Example: Blog Posts collection with custom fields
+INSERT INTO collections (id, name, display_name, description, schema) VALUES (
+  'blog-posts', 'blog_posts', 'Blog Posts', 'Article content collection',
+  '{"type":"object","properties":{"title":{"type":"string","required":true}}}'
+);
+
+-- Add dynamic fields
+INSERT INTO content_fields (collection_id, field_name, field_type, field_label, field_options) VALUES
+  ('blog-posts', 'title', 'text', 'Title', '{"maxLength": 200, "required": true}'),
+  ('blog-posts', 'content', 'richtext', 'Content', '{"toolbar": "full", "height": 400}'),
+  ('blog-posts', 'excerpt', 'text', 'Excerpt', '{"maxLength": 500, "rows": 3}'),
+  ('blog-posts', 'featured_image', 'media', 'Featured Image', '{"accept": "image/*"}'),
+  ('blog-posts', 'publish_date', 'date', 'Publish Date', '{"defaultToday": true}'),
+  ('blog-posts', 'is_featured', 'boolean', 'Featured Post', '{"default": false}');
 ```
+
+### Field Types
+- **text**: Single-line text with validation
+- **richtext**: WYSIWYG editor with TinyMCE
+- **number**: Numeric input with min/max constraints
+- **boolean**: Checkbox with custom labels
+- **date**: Date picker with format options
+- **select**: Dropdown with single/multi-select
+- **media**: File picker with preview
+
+## 🌐 API Endpoints
+
+### Content Management
+- `GET /admin/content/new?collection=id` - Create new content form
+- `GET /admin/content/:id/edit` - Edit content form
+- `POST /admin/content/` - Create content with validation
+- `PUT /admin/content/:id` - Update content with versioning
+- `DELETE /admin/content/:id` - Delete content
+
+### Advanced Features
+- `POST /admin/content/preview` - Preview content before publishing
+- `POST /admin/content/duplicate` - Duplicate existing content
+- `GET /admin/content/:id/versions` - Get version history
+- `POST /admin/content/:id/restore/:version` - Restore specific version
+- `GET /admin/content/:id/version/:version/preview` - Preview historical version
+
+### Public API
+- `GET /api/content` - Get published content (paginated)
+- `GET /api/collections/:collection/content` - Get content by collection
+- `GET /api/collections` - List all collections
 
 ## 🚀 Deployment
 
-Deploy to Cloudflare Workers:
+### Development Setup
+```bash
+# Run database migrations (includes Stage 5 enhancements)
+npm run db:migrate
 
+# Apply Stage 5 schema updates
+wrangler d1 migrations apply sonicjs-ai --local
+```
+
+### Production Deployment
 ```bash
 # Deploy to production
 npm run deploy
 
 # Deploy with custom environment
 wrangler deploy --env production
+
+# Apply migrations to production database
+wrangler d1 migrations apply sonicjs-ai --remote
 ```
 
 ## 🧪 Testing
