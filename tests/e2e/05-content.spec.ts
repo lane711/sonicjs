@@ -65,16 +65,20 @@ test.describe('Content Management', () => {
     // Wait for navigation to complete
     await page.waitForURL('/admin/content/new', { timeout: 10000 });
     
-    // Check for either "Create New Content" or "Content Management" (both are valid)
-    try {
-      await expect(page.locator('h1').first()).toContainText('Create New Content', { timeout: 5000 });
-    } catch {
-      // If not on create page, verify we're at least on a content-related page
-      await expect(page.locator('h1').first()).toContainText('Content', { timeout: 5000 });
-    }
+    // Should show collection selection page
+    await expect(page.locator('h1')).toContainText('Create New Content');
+    await expect(page.locator('text=Select a collection to create content in:')).toBeVisible();
     
-    // Verify form is present (either creation form or content interface)
-    await expect(page.locator('form, table')).toBeVisible();
+    // Should have at least one collection to select
+    const collectionLinks = page.locator('a[href^="/admin/content/new?collection="]');
+    const count = await collectionLinks.count();
+    expect(count).toBeGreaterThan(0);
+    
+    // Click on the first collection
+    await collectionLinks.first().click();
+    
+    // Should now be on the actual content creation form
+    await expect(page.locator('form')).toBeVisible();
   });
 
   test('should display content actions', async ({ page }) => {
@@ -139,12 +143,14 @@ test.describe('Content Management', () => {
   });
 
   test('should handle pagination', async ({ page }) => {
-    // Check if pagination exists
-    const pagination = page.locator('.pagination, a').filter({ hasText: 'Next' });
+    // Just verify the page loads properly (pagination is optional)
+    await expect(page.locator('h1')).toContainText('Content Management');
+    await expect(page.locator('table')).toBeVisible();
     
-    if (await pagination.count() > 0) {
-      // Pagination should be functional
-      await expect(pagination.first()).toBeVisible();
+    // If pagination exists, it should be functional
+    const paginationText = page.locator('text=Showing');
+    if (await paginationText.count() > 0) {
+      await expect(paginationText).toBeVisible();
     }
   });
 

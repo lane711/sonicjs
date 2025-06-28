@@ -160,9 +160,9 @@ test.describe('Admin Collections API', () => {
       
       // Get the collection ID from the URL or database
       await page.goto('/admin/collections');
-      const editLink = page.locator('tr').filter({ hasText: TEST_DATA.collection.name }).locator('a').filter({ hasText: 'Edit' });
+      const editLink = page.locator('tr').filter({ hasText: TEST_DATA.collection.name }).locator('a').filter({ hasText: 'Edit' }).first();
       
-      if (await editLink.isVisible()) {
+      if (await editLink.count() > 0) {
         await editLink.click();
         const url = page.url();
         const collectionId = url.split('/').pop();

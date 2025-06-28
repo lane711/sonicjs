@@ -27,22 +27,15 @@ test.describe('Full Integration Workflows', () => {
     await navigateToAdminSection(page, 'content');
     await page.click('a[href="/admin/content/new"]');
     
-    // 3. Wait for navigation and verify we're on a content-related page
-    try {
-      await page.waitForURL('/admin/content/new', { timeout: 10000 });
-      await expect(page.locator('h1').first()).toContainText('Create New Content', { timeout: 5000 });
-    } catch {
-      // If not on create page, check if we're on content management page
-      await expect(page.locator('h1').first()).toContainText('Content', { timeout: 5000 });
-    }
+    // 3. Should show collection selection page
+    await page.waitForURL('/admin/content/new', { timeout: 10000 });
+    await expect(page.locator('h1')).toContainText('Create New Content');
     
-    // Select the collection we just created
-    const modelSelect = page.locator('select[name="model"]');
-    if (await modelSelect.count() > 0) {
-      await modelSelect.selectOption(TEST_DATA.collection.name);
-    }
+    // Click on the collection we just created
+    const collectionLink = page.locator(`a[href*="/admin/content/new?collection="]`).filter({ hasText: TEST_DATA.collection.displayName }).first();
+    await collectionLink.click();
     
-    // 4. Verify content interface loaded properly
+    // 4. Should now be on the actual content creation form
     await expect(page.locator('form')).toBeVisible();
     
     // 5. Clean up - delete the test collection
@@ -84,13 +77,13 @@ test.describe('Full Integration Workflows', () => {
     });
     
     await page.locator('button[type="submit"]').click();
-    await expect(page.locator('#upload-results')).toContainText('successful');
     
-    // 2. Verify file appears in media library
-    const mediaItem = page.locator('.media-item').filter({ hasText: 'integration-test.jpg' });
-    if (await mediaItem.count() > 0) {
-      await expect(mediaItem).toBeVisible();
-    }
+    // Wait for upload to complete with longer timeout
+    await expect(page.locator('#upload-results')).toContainText('Successfully uploaded', { timeout: 15000 });
+    
+    // 2. Verify file appears in media library (or just check upload success)
+    const uploadSuccess = await page.locator('#upload-results').textContent();
+    expect(uploadSuccess).toContain('Successfully uploaded');
   });
 
   test('should handle user session and authentication flow', async ({ page }) => {

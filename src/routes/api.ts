@@ -317,8 +317,15 @@ apiRoutes.get('/collections', async (c) => {
     const stmt = db.prepare('SELECT * FROM collections WHERE is_active = 1')
     const { results } = await stmt.all()
     
+    // Parse schema and format results
+    const transformedResults = results.map((row: any) => ({
+      ...row,
+      schema: row.schema ? JSON.parse(row.schema) : {},
+      is_active: row.is_active // Keep as number (1 or 0)
+    }))
+    
     return c.json({
-      data: results,
+      data: transformedResults,
       meta: {
         count: results.length,
         timestamp: new Date().toISOString()
@@ -337,14 +344,20 @@ apiRoutes.get('/content', async (c) => {
     const stmt = db.prepare('SELECT * FROM content ORDER BY created_at DESC LIMIT 50')
     const { results } = await stmt.all()
     
-    // Parse JSON data field for each result
-    const parsedResults = results.map((row: any) => ({
-      ...row,
-      data: row.data ? JSON.parse(row.data) : {}
+    // Transform results to match API spec (camelCase)
+    const transformedResults = results.map((row: any) => ({
+      id: row.id,
+      title: row.title,
+      slug: row.slug,
+      status: row.status,
+      collectionId: row.collection_id,
+      data: row.data ? JSON.parse(row.data) : {},
+      created_at: row.created_at,
+      updated_at: row.updated_at
     }))
     
     return c.json({
-      data: parsedResults,
+      data: transformedResults,
       meta: {
         count: results.length,
         timestamp: new Date().toISOString()
@@ -364,26 +377,35 @@ apiRoutes.get('/collections/:collection/content', async (c) => {
     
     // First check if collection exists
     const collectionStmt = db.prepare('SELECT * FROM collections WHERE name = ? AND is_active = 1')
-    const collectionResult = await collectionStmt.first()
+    const collectionResult = await collectionStmt.bind(collection).first()
     
     if (!collectionResult) {
       return c.json({ error: 'Collection not found' }, 404)
     }
     
     // Get content for this collection
-    const contentStmt = db.prepare('SELECT * FROM content WHERE collectionId = ? ORDER BY createdAt DESC')
+    const contentStmt = db.prepare('SELECT * FROM content WHERE collection_id = ? ORDER BY created_at DESC')
     const { results } = await contentStmt.bind(collectionResult.id).all()
     
-    // Parse JSON data field for each result
-    const parsedResults = results.map((row: any) => ({
-      ...row,
-      data: row.data ? JSON.parse(row.data) : {}
+    // Transform results to match API spec (camelCase)
+    const transformedResults = results.map((row: any) => ({
+      id: row.id,
+      title: row.title,
+      slug: row.slug,
+      status: row.status,
+      collectionId: row.collection_id,
+      data: row.data ? JSON.parse(row.data) : {},
+      created_at: row.created_at,
+      updated_at: row.updated_at
     }))
     
     return c.json({
-      data: parsedResults,
+      data: transformedResults,
       meta: {
-        collection: collectionResult,
+        collection: {
+          ...collectionResult,
+          schema: (collectionResult as any).schema ? JSON.parse((collectionResult as any).schema) : {}
+        },
         count: results.length,
         timestamp: new Date().toISOString()
       }

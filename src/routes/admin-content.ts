@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { html } from 'hono/html'
 import { renderContentFormPage, ContentFormData } from '../templates/pages/admin-content-form.template'
+import { renderContentListPage, ContentListPageData } from '../templates/pages/admin-content-list.template'
 import { renderVersionHistory, VersionHistoryData, ContentVersion } from '../templates/components/version-history.template'
 
 type Bindings = {
@@ -57,6 +58,147 @@ async function getCollection(db: D1Database, collectionId: string) {
   }
 }
 
+// Content list (main page)
+adminContentRoutes.get('/', async (c) => {
+  try {
+    const user = c.get('user')
+    const url = new URL(c.req.url)
+    const db = c.env.DB
+    
+    // Get query parameters
+    const page = parseInt(url.searchParams.get('page') || '1')
+    const limit = parseInt(url.searchParams.get('limit') || '20')
+    const modelName = url.searchParams.get('model') || 'all'
+    const status = url.searchParams.get('status') || 'all'
+    const search = url.searchParams.get('search') || ''
+    const offset = (page - 1) * limit
+    
+    // Get all collections for filter dropdown
+    const collectionsStmt = db.prepare('SELECT id, name, display_name FROM collections WHERE is_active = 1 ORDER BY display_name')
+    const { results: collectionsResults } = await collectionsStmt.all()
+    const models = (collectionsResults || []).map((row: any) => ({
+      name: row.name,
+      displayName: row.display_name
+    }))
+    
+    // Build where conditions
+    const conditions: string[] = []
+    const params: any[] = []
+    
+    if (search) {
+      conditions.push('(c.title LIKE ? OR c.slug LIKE ?)')
+      params.push(`%${search}%`, `%${search}%`)
+    }
+    
+    if (modelName !== 'all') {
+      conditions.push('col.name = ?')
+      params.push(modelName)
+    }
+    
+    if (status !== 'all') {
+      conditions.push('c.status = ?')
+      params.push(status)
+    }
+    
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+    
+    // Get total count
+    const countStmt = db.prepare(`
+      SELECT COUNT(*) as count 
+      FROM content c
+      JOIN collections col ON c.collection_id = col.id
+      ${whereClause}
+    `)
+    const countResult = await countStmt.bind(...params).first() as any
+    const totalItems = countResult?.count || 0
+    
+    // Get content items
+    const contentStmt = db.prepare(`
+      SELECT c.id, c.title, c.slug, c.status, c.created_at, c.updated_at,
+             col.name as collection_name, col.display_name as collection_display_name,
+             u.first_name, u.last_name, u.email as author_email
+      FROM content c
+      JOIN collections col ON c.collection_id = col.id
+      LEFT JOIN users u ON c.author_id = u.id
+      ${whereClause}
+      ORDER BY c.updated_at DESC
+      LIMIT ? OFFSET ?
+    `)
+    const { results } = await contentStmt.bind(...params, limit, offset).all()
+    
+    // Process content items
+    const contentItems = (results || []).map((row: any) => {
+      const statusColors: Record<string, string> = {
+        draft: 'bg-gray-500',
+        review: 'bg-yellow-500',
+        scheduled: 'bg-blue-500',
+        published: 'bg-green-500',
+        archived: 'bg-red-500'
+      }
+      
+      const statusBadge = `
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[row.status] || 'bg-gray-500'} text-white">
+          ${row.status}
+        </span>
+      `
+      
+      const authorName = row.first_name && row.last_name 
+        ? `${row.first_name} ${row.last_name}`
+        : row.author_email || 'Unknown'
+      
+      const formattedDate = new Date(row.updated_at).toLocaleDateString()
+      
+      // Determine available workflow actions based on status
+      const availableActions: string[] = []
+      switch (row.status) {
+        case 'draft':
+          availableActions.push('submit_for_review', 'publish')
+          break
+        case 'review':
+          availableActions.push('approve', 'request_changes')
+          break
+        case 'published':
+          availableActions.push('unpublish', 'archive')
+          break
+        case 'scheduled':
+          availableActions.push('unschedule')
+          break
+      }
+      
+      return {
+        id: row.id,
+        title: row.title,
+        slug: row.slug,
+        modelName: row.collection_display_name,
+        statusBadge,
+        authorName,
+        formattedDate,
+        availableActions
+      }
+    })
+    
+    const pageData: ContentListPageData = {
+      modelName,
+      status,
+      page,
+      models,
+      contentItems,
+      totalItems,
+      itemsPerPage: limit,
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : undefined
+    }
+    
+    return c.html(renderContentListPage(pageData))
+  } catch (error) {
+    console.error('Error fetching content list:', error)
+    return c.html(`<p>Error loading content: ${error}</p>`)
+  }
+})
+
 // New content form
 adminContentRoutes.get('/new', async (c) => {
   try {
@@ -65,7 +207,52 @@ adminContentRoutes.get('/new', async (c) => {
     const collectionId = url.searchParams.get('collection')
     
     if (!collectionId) {
-      return c.redirect('/admin/content')
+      // Show collection selection page
+      const db = c.env.DB
+      const collectionsStmt = db.prepare('SELECT id, name, display_name, description FROM collections WHERE is_active = 1 ORDER BY display_name')
+      const { results } = await collectionsStmt.all()
+      
+      const collections = (results || []).map((row: any) => ({
+        id: row.id,
+        name: row.name,
+        display_name: row.display_name,
+        description: row.description
+      }))
+      
+      // Render collection selection page
+      const selectionHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Select Collection - SonicJS AI Admin</title>
+          <script src="https://cdn.tailwindcss.com"></script>
+        </head>
+        <body class="bg-gray-900 text-white">
+          <div class="min-h-screen flex items-center justify-center">
+            <div class="max-w-2xl w-full mx-auto p-8">
+              <h1 class="text-3xl font-bold mb-8 text-center">Create New Content</h1>
+              <p class="text-gray-300 text-center mb-8">Select a collection to create content in:</p>
+              
+              <div class="grid gap-4">
+                ${collections.map(collection => `
+                  <a href="/admin/content/new?collection=${collection.id}" 
+                     class="block p-6 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700">
+                    <h3 class="text-xl font-semibold mb-2">${collection.display_name}</h3>
+                    <p class="text-gray-400">${collection.description || 'No description'}</p>
+                  </a>
+                `).join('')}
+              </div>
+              
+              <div class="mt-8 text-center">
+                <a href="/admin/content" class="text-blue-400 hover:text-blue-300">← Back to Content List</a>
+              </div>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+      
+      return c.html(selectionHTML)
     }
     
     const db = c.env.DB
@@ -73,7 +260,7 @@ adminContentRoutes.get('/new', async (c) => {
     
     if (!collection) {
       const formData: ContentFormData = {
-        collection: { id: '', name: '', display_name: 'Unknown' },
+        collection: { id: '', name: '', display_name: 'Unknown', schema: {} },
         fields: [],
         error: 'Collection not found.',
         user: user ? {
@@ -102,7 +289,7 @@ adminContentRoutes.get('/new', async (c) => {
   } catch (error) {
     console.error('Error loading new content form:', error)
     const formData: ContentFormData = {
-      collection: { id: '', name: '', display_name: 'Unknown' },
+      collection: { id: '', name: '', display_name: 'Unknown', schema: {} },
       fields: [],
       error: 'Failed to load content form.',
       user: c.get('user') ? {
@@ -135,7 +322,7 @@ adminContentRoutes.get('/:id/edit', async (c) => {
     
     if (!content) {
       const formData: ContentFormData = {
-        collection: { id: '', name: '', display_name: 'Unknown' },
+        collection: { id: '', name: '', display_name: 'Unknown', schema: {} },
         fields: [],
         error: 'Content not found.',
         user: user ? {
@@ -183,7 +370,7 @@ adminContentRoutes.get('/:id/edit', async (c) => {
   } catch (error) {
     console.error('Error loading edit content form:', error)
     const formData: ContentFormData = {
-      collection: { id: '', name: '', display_name: 'Unknown' },
+      collection: { id: '', name: '', display_name: 'Unknown', schema: {} },
       fields: [],
       error: 'Failed to load content for editing.',
       user: c.get('user') ? {
@@ -742,13 +929,13 @@ adminContentRoutes.get('/:id/versions', async (c) => {
     
     // Mark the latest version as current
     if (versions.length > 0) {
-      versions[0].is_current = true
+      versions[0]!.is_current = true
     }
     
     const data: VersionHistoryData = {
       contentId: id,
       versions,
-      currentVersion: versions.length > 0 ? versions[0].version : 1
+      currentVersion: versions.length > 0 ? versions[0]!.version : 1
     }
     
     return c.html(renderVersionHistory(data))

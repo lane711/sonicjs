@@ -474,10 +474,22 @@ authRoutes.post('/seed-admin', async (c) => {
       )
     `).run()
     
-    // Delete existing admin user if exists
-    await db.prepare('DELETE FROM users WHERE email = ? OR username = ?')
+    // Check if admin user already exists
+    const existingAdmin = await db.prepare('SELECT id FROM users WHERE email = ? OR username = ?')
       .bind('admin@sonicjs.com', 'admin')
-      .run()
+      .first()
+    
+    if (existingAdmin) {
+      return c.json({ 
+        message: 'Admin user already exists',
+        user: {
+          id: existingAdmin.id,
+          email: 'admin@sonicjs.com',
+          username: 'admin',
+          role: 'admin'
+        }
+      })
+    }
     
     // Hash password
     const passwordHash = await AuthManager.hashPassword('admin123')
