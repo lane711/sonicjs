@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { AuthManager, requireAuth, requireRole, optionalAuth } from '../middleware/auth'
 

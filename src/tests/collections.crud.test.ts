@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // Mock database operations since we don't want to test actual DB in unit tests

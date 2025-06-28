@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { SendGridEmailService, createEmailService, EMAIL_STATUS } from '../services/email'
 

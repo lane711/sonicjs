@@ -8,7 +8,28 @@ import { renderWorkflowDashboard } from '../templates/pages/admin-workflow.templ
 import { renderWorkflowContentDetail } from '../templates/pages/admin-workflow-content.template'
 import { renderScheduledContent } from '../templates/pages/admin-scheduled-content.template'
 
-const workflowRoutes = new Hono()
+type Bindings = {
+  DB: D1Database
+  KV: KVNamespace
+  MEDIA_BUCKET: R2Bucket
+  EMAIL_QUEUE?: Queue
+  SENDGRID_API_KEY?: string
+  DEFAULT_FROM_EMAIL?: string
+  IMAGES_ACCOUNT_ID?: string
+  IMAGES_API_TOKEN?: string
+}
+
+type Variables = {
+  user: {
+    userId: string
+    email: string
+    role: string
+    exp: number
+    iat: number
+  }
+}
+
+const workflowRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
 // Workflow Dashboard
 workflowRoutes.get('/dashboard', async (c) => {

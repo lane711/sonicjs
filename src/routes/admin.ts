@@ -918,7 +918,7 @@ adminRoutes.post('/populate-dummy-content', async (c) => {
     const db = c.env.DB
     
     // Import the populate function
-    const { populateDatabase } = await import('../scripts/populate-dummy-content')
+    const { populateDatabase } = await import('../../scripts/populate-dummy-content')
     
     // Execute the population
     const result = await populateDatabase(db)

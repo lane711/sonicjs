@@ -6,7 +6,28 @@ import { renderAlert } from '../templates/components/alert.template'
 import { AuthManager } from '../middleware/auth'
 import { renderActivityLogsPage, ActivityLogsPageData, ActivityLog } from '../templates/pages/admin-activity-logs.template'
 
-const userRoutes = new Hono()
+type Bindings = {
+  DB: D1Database
+  KV: KVNamespace
+  MEDIA_BUCKET: R2Bucket
+  EMAIL_QUEUE?: Queue
+  SENDGRID_API_KEY?: string
+  DEFAULT_FROM_EMAIL?: string
+  IMAGES_ACCOUNT_ID?: string
+  IMAGES_API_TOKEN?: string
+}
+
+type Variables = {
+  user: {
+    userId: string
+    email: string
+    role: string
+    exp: number
+    iat: number
+  }
+}
+
+const userRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
 // Apply authentication middleware to all routes
 userRoutes.use('*', requireAuth())
@@ -87,7 +108,7 @@ userRoutes.get('/profile', async (c) => {
       timezones: TIMEZONES,
       languages: LANGUAGES,
       user: {
-        name: user.name,
+        name: `${profile.first_name} ${profile.last_name}`.trim() || profile.username || user.email,
         email: user.email,
         role: user.role
       }
@@ -103,7 +124,7 @@ userRoutes.get('/profile', async (c) => {
       languages: LANGUAGES,
       error: 'Failed to load profile. Please try again.',
       user: {
-        name: user.name,
+        name: user.email,
         email: user.email,
         role: user.role
       }
@@ -437,7 +458,7 @@ userRoutes.get('/users', requirePermission('users.read'), async (c) => {
 
     // Log the activity
     await logActivity(
-      db, user.userId, 'users.list_view', 'users', null,
+      db, user.userId, 'users.list_view', 'users', undefined,
       { search, page, limit },
       c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
       c.req.header('user-agent')
@@ -740,7 +761,7 @@ userRoutes.get('/activity-logs', requirePermission('activity.read'), async (c) =
 
     // Log the activity
     await logActivity(
-      db, user.userId, 'activity.logs_viewed', null, null,
+      db, user.userId, 'activity.logs_viewed', undefined, undefined,
       { filters, page, limit },
       c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
       c.req.header('user-agent')
@@ -756,7 +777,7 @@ userRoutes.get('/activity-logs', requirePermission('activity.read'), async (c) =
       },
       filters,
       user: {
-        name: user.name,
+        name: user.email.split('@')[0] || user.email, // Use email username as fallback
         email: user.email,
         role: user.role
       }
@@ -772,7 +793,7 @@ userRoutes.get('/activity-logs', requirePermission('activity.read'), async (c) =
       pagination: { page: 1, limit: 50, total: 0, pages: 0 },
       filters: {},
       user: {
-        name: user.name,
+        name: user.email,
         email: user.email,
         role: user.role
       }
@@ -870,7 +891,7 @@ userRoutes.get('/activity-logs/export', requirePermission('activity.read'), asyn
 
     // Log the export activity
     await logActivity(
-      db, user.userId, 'activity.logs_exported', null, null,
+      db, user.userId, 'activity.logs_exported', undefined, undefined,
       { filters, count: logs?.length || 0 },
       c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
       c.req.header('user-agent')

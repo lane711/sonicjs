@@ -332,3 +332,224 @@ export class ContentWorkflow {
     return `<div class="workflow-actions flex gap-2">${buttons}</div>`
   }
 }
+
+// Database-backed workflow manager for testing compatibility
+export class WorkflowManager {
+  private db: any
+  private permissions: WorkflowPermissions
+
+  constructor(db: any, permissions: WorkflowPermissions = defaultWorkflowPermissions) {
+    this.db = db
+    this.permissions = permissions
+  }
+
+  // Check if user can perform action on content
+  async canPerformAction(
+    contentId: string,
+    action: WorkflowAction,
+    userId: string,
+    userRole: string
+  ): Promise<boolean> {
+    try {
+      // Get content from database
+      const stmt = this.db.prepare('SELECT * FROM content WHERE id = ?')
+      const content = await stmt.bind(contentId).first()
+      
+      if (!content) {
+        return false
+      }
+
+      const isAuthor = content.author_id === userId
+      return ContentWorkflow.canPerformAction(
+        action,
+        content.status as ContentStatus,
+        userRole,
+        isAuthor,
+        this.permissions
+      )
+    } catch (error) {
+      return false
+    }
+  }
+
+  // Perform workflow action
+  async performAction(
+    contentId: string,
+    action: WorkflowAction,
+    userId: string,
+    userRole: string,
+    metadata?: any
+  ): Promise<{ success: boolean; newStatus?: ContentStatus; error?: string }> {
+    try {
+      // Check permissions first
+      const canPerform = await this.canPerformAction(contentId, action, userId, userRole)
+      if (!canPerform) {
+        return { success: false, error: 'Action not allowed' }
+      }
+
+      // Get content
+      const stmt = this.db.prepare('SELECT * FROM content WHERE id = ?')
+      const content = await stmt.bind(contentId).first()
+      
+      if (!content) {
+        return { success: false, error: 'Content not found' }
+      }
+
+      // Apply workflow logic
+      const { content: updatedContent, historyEntry } = ContentWorkflow.applyAction(
+        {
+          id: content.id,
+          title: content.title,
+          slug: content.slug,
+          content: content.data || '',
+          status: content.status as ContentStatus,
+          authorId: content.author_id,
+          modelName: content.model_name || '',
+          data: content.data ? JSON.parse(content.data) : {},
+          createdAt: content.created_at,
+          updatedAt: content.updated_at,
+          version: 1
+        },
+        action,
+        userId,
+        metadata?.scheduledAt,
+        metadata?.comment
+      )
+
+      // Update content in database
+      const updateStmt = this.db.prepare(`
+        UPDATE content 
+        SET status = ?, updated_at = ? 
+        WHERE id = ?
+      `)
+      await updateStmt.bind(updatedContent.status, updatedContent.updatedAt, contentId).run()
+
+      // Log action to audit trail
+      const auditStmt = this.db.prepare(`
+        INSERT INTO content_audit_log 
+        (id, content_id, action, from_status, to_status, user_id, timestamp, metadata)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `)
+      await auditStmt.bind(
+        historyEntry.id,
+        historyEntry.contentId,
+        historyEntry.action,
+        historyEntry.fromStatus,
+        historyEntry.toStatus,
+        historyEntry.userId,
+        historyEntry.createdAt,
+        JSON.stringify(metadata || {})
+      ).run()
+
+      return { success: true, newStatus: updatedContent.status }
+    } catch (error) {
+      return { success: false, error: (error as Error).message }
+    }
+  }
+
+  // Get workflow history for content
+  async getWorkflowHistory(contentId: string): Promise<any[]> {
+    const stmt = this.db.prepare(`
+      SELECT * FROM content_audit_log 
+      WHERE content_id = ? 
+      ORDER BY timestamp DESC
+    `)
+    const result = await stmt.bind(contentId).all()
+    
+    return (result.results || []).map((entry: any) => ({
+      ...entry,
+      metadata: this.parseMetadata(entry.metadata)
+    }))
+  }
+
+  // Get available actions for content
+  async getAvailableActions(
+    contentId: string,
+    userId: string,
+    userRole: string
+  ): Promise<WorkflowAction[]> {
+    try {
+      const stmt = this.db.prepare('SELECT * FROM content WHERE id = ?')
+      const content = await stmt.bind(contentId).first()
+      
+      if (!content) {
+        return []
+      }
+
+      const isAuthor = content.author_id === userId
+      return ContentWorkflow.getAvailableActions(
+        content.status as ContentStatus,
+        userRole,
+        isAuthor,
+        this.permissions
+      )
+    } catch (error) {
+      return []
+    }
+  }
+
+  // Bulk update status
+  async bulkUpdateStatus(
+    contentIds: string[],
+    newStatus: ContentStatus,
+    userId: string,
+    userRole: string,
+    metadata?: any
+  ): Promise<{ success: boolean; updatedCount?: number; errors?: string[]; error?: string }> {
+    // Check bulk permissions
+    if (!this.hasPermissionForStatus(userRole, newStatus)) {
+      return { success: false, error: 'Insufficient permissions for bulk operation' }
+    }
+
+    const errors: string[] = []
+    let updatedCount = 0
+
+    for (const contentId of contentIds) {
+      try {
+        // Update content status
+        const updateStmt = this.db.prepare('UPDATE content SET status = ?, updated_at = ? WHERE id = ?')
+        await updateStmt.bind(newStatus, Date.now(), contentId).run()
+
+        // Log audit entry
+        const auditStmt = this.db.prepare(`
+          INSERT INTO content_audit_log 
+          (id, content_id, action, from_status, to_status, user_id, timestamp, metadata)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `)
+        await auditStmt.bind(
+          globalThis.crypto.randomUUID(),
+          contentId,
+          'bulk_update',
+          'unknown',
+          newStatus,
+          userId,
+          Date.now(),
+          JSON.stringify(metadata || {})
+        ).run()
+
+        updatedCount++
+      } catch (error) {
+        errors.push(`Failed to update ${contentId}: ${(error as Error).message}`)
+      }
+    }
+
+    return errors.length > 0
+      ? { success: false, errors }
+      : { success: true, updatedCount }
+  }
+
+  // Check if user role has permission for status
+  private hasPermissionForStatus(userRole: string, status: ContentStatus): boolean {
+    return this.permissions[status].includes(userRole)
+  }
+
+  // Parse metadata JSON safely
+  private parseMetadata(metadata: string | null): any {
+    if (!metadata) return {}
+    try {
+      return JSON.parse(metadata)
+    } catch {
+      return {}
+    }
+  }
+}

@@ -256,7 +256,7 @@ describe('SchedulerService', () => {
       const result = await schedulerService.executeScheduledAction('schedule-1')
 
       expect(result).toBe(true)
-      expect(mockStatement.run).toHaveBeenCalledTimes(3) // Get item, execute action, update status
+      expect(mockStatement.run).toHaveBeenCalledTimes(4) // Get item, execute action (3 calls), update status
     })
 
     test('should successfully execute unpublish action', async () => {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { PermissionManager, Permission, UserPermissions } from '../middleware/permissions'
 

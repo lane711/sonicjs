@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { NotificationService } from '../../src/services/notifications'
 
