@@ -35,8 +35,8 @@ test.describe('Collections Management', () => {
   test('should create a new collection', async ({ page }) => {
     await page.click('a[href="/admin/collections/new"]');
     
-    // Wait for form to be visible
-    await expect(page.locator('form')).toBeVisible();
+    // Wait for collection form to be visible
+    await expect(page.locator('#collection-form')).toBeVisible();
     
     // Fill form
     await page.fill('[name="name"]', TEST_DATA.collection.name);
@@ -60,8 +60,8 @@ test.describe('Collections Management', () => {
   test('should validate collection name format', async ({ page }) => {
     await page.click('a[href="/admin/collections/new"]');
     
-    // Wait for form to load
-    await expect(page.locator('form')).toBeVisible();
+    // Wait for collection form to load
+    await expect(page.locator('#collection-form')).toBeVisible();
     await expect(page.locator('[name="name"]')).toBeVisible();
     
     // Try invalid name with spaces and uppercase

@@ -1,12 +1,18 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { SendGridEmailService, createEmailService, EMAIL_STATUS } from '../services/email'
 
-// Mock EmailTemplateRenderer
-vi.mock('../services/email-renderer', () => ({
-  EmailTemplateRenderer: vi.fn().mockImplementation(() => ({
-    renderTemplate: vi.fn()
-  }))
-}))
+// Mock EmailTemplateRenderer using vi.hoisted
+const mockRenderTemplate = vi.hoisted(() => vi.fn())
+
+vi.mock('../services/email-renderer', () => {
+  return {
+    EmailTemplateRenderer: vi.fn().mockImplementation(() => {
+      return {
+        renderTemplate: mockRenderTemplate
+      }
+    })
+  }
+})
 
 // Mock crypto.randomUUID
 const mockRandomUUID = vi.fn()
@@ -23,11 +29,8 @@ global.fetch = vi.fn()
 describe('Email Service', () => {
   let emailService: SendGridEmailService
   let mockDb: any
-  let mockRenderer: any
 
   beforeEach(() => {
-    vi.clearAllMocks()
-    
     // Create mock database
     mockDb = {
       prepare: vi.fn().mockReturnValue({
@@ -40,20 +43,21 @@ describe('Email Service', () => {
     // Mock UUID generation
     mockRandomUUID.mockReturnValue('test-uuid-123')
 
+    // Clear the renderTemplate mock calls (but keep the mock functions)
+    mockRenderTemplate.mockClear()
+    vi.mocked(fetch).mockClear()
+
     // Create email service instance
     emailService = new SendGridEmailService(
       'test-api-key',
       'noreply@example.com',
       mockDb
     )
-
-    // Get the renderer mock instance
-    const { EmailTemplateRenderer } = require('../services/email-renderer')
-    mockRenderer = new EmailTemplateRenderer()
   })
 
   afterEach(() => {
-    vi.restoreAllMocks()
+    // Don't restore all mocks - this breaks the email renderer mock
+    // vi.restoreAllMocks()
   })
 
   describe('SendGridEmailService', () => {
@@ -202,7 +206,7 @@ describe('Email Service', () => {
     describe('sendTemplatedEmail', () => {
       it('should send templated email successfully', async () => {
         // Mock template rendering
-        mockRenderer.renderTemplate.mockResolvedValue({
+        mockRenderTemplate.mockResolvedValue({
           subject: 'Welcome to SonicJS',
           html: '<h1>Welcome John!</h1>',
           text: 'Welcome John!'
@@ -230,7 +234,7 @@ describe('Email Service', () => {
         expect(result.emailLogId).toBe('test-uuid-123')
 
         // Verify template was rendered with correct variables
-        expect(mockRenderer.renderTemplate).toHaveBeenCalledWith(
+        expect(mockRenderTemplate).toHaveBeenCalledWith(
           'welcome-email',
           { name: 'John', company: 'SonicJS' }
         )
@@ -244,7 +248,7 @@ describe('Email Service', () => {
 
       it('should handle template rendering errors', async () => {
         // Mock template rendering error
-        mockRenderer.renderTemplate.mockRejectedValue(new Error('Template not found'))
+        mockRenderTemplate.mockRejectedValue(new Error('Template not found'))
 
         const result = await emailService.sendTemplatedEmail({
           to: 'test@example.com',
@@ -265,7 +269,7 @@ describe('Email Service', () => {
         mockDb.prepare().first.mockResolvedValue(null)
 
         // Mock template rendering success (template could exist in file system)
-        mockRenderer.renderTemplate.mockResolvedValue({
+        mockRenderTemplate.mockResolvedValue({
           subject: 'Test Subject',
           html: '<h1>Test</h1>',
           text: 'Test'

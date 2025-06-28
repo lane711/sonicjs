@@ -1,15 +1,4 @@
 {
-  "mcpServers": {
-    "memory": {
-      "command": "npx",
-      "args": ["@modelcontextprotocol/server-memory"],
-      "env": {
-        "MEMORY_PERSIST": "true",
-        "MEMORY_PATH": "./docs/ai/claude-memory.json"
-      }
-    }
-  },
-
   "permissions": {
     "allow": [
       "Bash(source:*)",
@@ -140,8 +129,22 @@
       "WebFetch(domain:demo.sonicjs.com)",
       "Bash(rm:*)",
       "Bash(timeout 10s npm run dev)",
-      "Bash(timeout 180s npm run test:e2e)"
+      "Bash(timeout 180s npm run test:e2e)",
+      "Bash(timeout 30s npm run test -- src/tests/utils.template-renderer.test.ts)",
+      "Bash(timeout 30 npx vitest --run --coverage --reporter=verbose 2 > /dev/null)"
     ],
     "deny": []
+  },
+  "mcpServers": {
+    "memory": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-memory"
+      ],
+      "env": {
+        "MEMORY_PERSIST": "true",
+        "MEMORY_PATH": "./docs/ai/claude-memory.json"
+      }
+    }
   }
 }

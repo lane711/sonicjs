@@ -18,48 +18,50 @@ export class TemplateRenderer {
   private renderTemplate(template: string, data: TemplateData): string {
     let rendered = template
 
-    // Handle each loops - process outermost loops first for proper nesting
-    rendered = rendered.replace(/\{\{#each\s+([^}]+)\}\}([\s\S]*?)\{\{\/each\}\}/g, (match, arrayName, content) => {
-      const array = this.getNestedValue(data, arrayName.trim())
-      if (!Array.isArray(array)) return ''
-      
-      return array.map((item, index) => {
-        // Create context with array item and special variables
-        const itemContext = {
-          ...data,
-          // Handle primitive items (for {{.}} syntax)
-          '.': item,
-          // Spread item properties if it's an object
-          ...(typeof item === 'object' && item !== null ? item : {}),
-          '@index': index,
-          '@first': index === 0,
-          '@last': index === array.length - 1
-        }
-        return this.renderTemplate(content, itemContext)
-      }).join('')
-    })
-
-    // Second pass: Handle conditionals
-    let ifCount = 0
-    while (rendered.includes('{{#if ') && ifCount < 100) {
-      const previousRendered = rendered
-      rendered = rendered.replace(/\{\{#if\s+([^}]+)\}\}([\s\S]*?)\{\{\/if\}\}/g, (match, condition, content) => {
-        const value = this.getNestedValue(data, condition.trim())
-        // Handle boolean values properly - @first/@last are explicitly boolean
-        const isTruthy = value === true || (value && value !== 0 && value !== '' && value !== null && value !== undefined)
-        return isTruthy ? this.renderTemplate(content, data) : ''
-      })
-      if (previousRendered === rendered) break
-      ifCount++
-    }
-
-    // Third pass: Handle triple braces for raw HTML {{{variable}}}
+    // Handle triple braces for raw HTML {{{variable}}} FIRST
     rendered = rendered.replace(/\{\{\{([^}]+)\}\}\}/g, (match, variable) => {
       const value = this.getNestedValue(data, variable.trim())
       return value !== undefined && value !== null ? String(value) : ''
     })
 
-    // Fourth pass: Handle helper functions like {{titleCase field}}
+    // Handle #if conditionals (process multiple times for nested conditionals)
+    let previousConditional = ''
+    while (previousConditional !== rendered) {
+      previousConditional = rendered
+      rendered = rendered.replace(/\{\{#if\s+([^}]+)\}\}([\s\S]*?)\{\{\/if\}\}/g, (match, condition, content) => {
+        const value = this.getNestedValue(data, condition.trim())
+        // Handle boolean values properly
+        const isTruthy = value === true || (value && value !== 0 && value !== '' && value !== null && value !== undefined)
+        return isTruthy ? this.renderTemplate(content, data) : ''
+      })
+    }
+
+    // Handle #each loops (process multiple times for nested loops)
+    let previousRendered = ''
+    while (previousRendered !== rendered) {
+      previousRendered = rendered
+      rendered = rendered.replace(/\{\{#each\s+([^}]+)\}\}([\s\S]*?)\{\{\/each\}\}/g, (match, arrayName, content) => {
+        const array = this.getNestedValue(data, arrayName.trim())
+        if (!Array.isArray(array)) return ''
+        
+        return array.map((item, index) => {
+          // Create context with array item and special variables
+          const itemContext = {
+            ...data,
+            // Handle primitive items (for {{.}} syntax)
+            '.': item,
+            // Spread item properties if it's an object
+            ...(typeof item === 'object' && item !== null ? item : {}),
+            '@index': index,
+            '@first': index === 0,
+            '@last': index === array.length - 1
+          }
+          return this.renderTemplate(content, itemContext)
+        }).join('')
+      })
+    }
+
+    // Handle helper functions like {{titleCase field}}
     rendered = rendered.replace(/\{\{([^}#\/]+)\s+([^}]+)\}\}/g, (match, helper, variable) => {
       const helperName = helper.trim()
       const varName = variable.trim()
@@ -74,7 +76,7 @@ export class TemplateRenderer {
       return match // Return original if helper not found
     })
 
-    // Final pass: Handle simple variables {{variable}}
+    // Handle simple variables {{variable}} LAST
     rendered = rendered.replace(/\{\{([^}#\/]+)\}\}/g, (match, variable) => {
       const trimmed = variable.trim()
       

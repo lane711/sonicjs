@@ -578,7 +578,7 @@ describe('Content Models', () => {
       // Multiple validation failures
       const invalidResult = modelManager.validateField(complexField, 'x')
       expect(invalidResult.valid).toBe(false)
-      expect(invalidResult.errors).toHaveLength(3) // required, min length, pattern
+      expect(invalidResult.errors).toHaveLength(2) // min length, pattern (not required since 'x' is not empty)
     })
 
     it('should handle zero values for number fields', () => {

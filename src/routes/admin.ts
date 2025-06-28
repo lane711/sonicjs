@@ -6,6 +6,8 @@ import { renderCollectionFormPage, CollectionFormData } from '../templates/pages
 import { renderPluginsListPage, PluginsListPageData, generateMockPlugins } from '../templates/pages/admin-plugins-list.template'
 import { renderSettingsPage, SettingsPageData } from '../templates/pages/admin-settings.template'
 import { renderAPIReferencePage, APIReferencePageData, APIEndpoint } from '../templates/pages/admin-api-reference.template'
+import { userRoutes } from './admin-users'
+import workflowRoutes from './admin-workflow'
 
 type Bindings = {
   DB: D1Database
@@ -193,7 +195,7 @@ adminRoutes.post('/collections', async (c) => {
     }
     
     // Create collection
-    const collectionId = crypto.randomUUID()
+    const collectionId = globalThis.crypto.randomUUID()
     const now = Date.now()
     
     const insertStmt = db.prepare(`
@@ -423,7 +425,7 @@ adminRoutes.post('/collections/:id/fields', async (c) => {
     const nextOrder = (orderResult?.max_order || 0) + 1
     
     // Create field
-    const fieldId = crypto.randomUUID()
+    const fieldId = globalThis.crypto.randomUUID()
     const now = Date.now()
     
     const insertStmt = db.prepare(`
@@ -931,5 +933,9 @@ adminRoutes.post('/populate-dummy-content', async (c) => {
     }, 500)
   }
 })
+
+// Mount user management routes
+adminRoutes.route('/', userRoutes)
+adminRoutes.route('/workflow', workflowRoutes)
 
 export default adminRoutes
