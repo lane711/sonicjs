@@ -153,17 +153,29 @@ test.describe('Database Tools', () => {
     // Wait for initial load
     await page.waitForTimeout(1000);
     
-    // Setup dialog handler to cancel the confirmation
+    let dialogCount = 0;
+    // Setup dialog handler to handle both prompt and alert
     page.on('dialog', async dialog => {
-      expect(dialog.message()).toContain('WARNING: This will delete ALL data');
-      expect(dialog.message()).toContain('TRUNCATE ALL DATA');
-      await dialog.dismiss();
+      dialogCount++;
+      if (dialog.type() === 'prompt') {
+        expect(dialog.message()).toContain('WARNING: This will delete ALL data except your admin account!');
+        expect(dialog.message()).toContain('Type "TRUNCATE ALL DATA" to confirm:');
+        await dialog.accept('wrong text'); // Provide wrong confirmation text
+      } else if (dialog.type() === 'alert') {
+        expect(dialog.message()).toContain('Operation cancelled. Confirmation text did not match.');
+        await dialog.accept();
+      }
     });
     
     // Click truncate button (should trigger confirmation dialog)
     await page.click('button:has-text("Truncate All Data")');
     
-    // The dialog should have been triggered and dismissed
+    // Wait a bit for dialogs to appear and be handled
+    await page.waitForTimeout(1000);
+    
+    // Both prompt and alert should have been triggered
+    expect(dialogCount).toBe(2);
+    
     // Button should still be enabled since we cancelled
     await expect(page.locator('button:has-text("Truncate All Data")')).toBeEnabled();
   });
