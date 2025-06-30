@@ -7,7 +7,7 @@ import { renderPluginsListPage, PluginsListPageData, generateMockPlugins } from 
 import { renderSettingsPage, SettingsPageData } from '../templates/pages/admin-settings.template'
 import { renderAPIReferencePage, APIReferencePageData, APIEndpoint } from '../templates/pages/admin-api-reference.template'
 import { userRoutes } from './admin-users'
-import workflowRoutes from './admin-workflow'
+import { createWorkflowAdminRoutes } from '../plugins/core-plugins/workflow-plugin/admin-routes'
 import { adminPluginRoutes } from './admin-plugins'
 
 type Bindings = {
@@ -915,6 +915,6 @@ adminRoutes.post('/populate-dummy-content', async (c) => {
 
 // Mount user management routes
 adminRoutes.route('/', userRoutes)
-adminRoutes.route('/workflow', workflowRoutes)
+adminRoutes.route('/workflow', createWorkflowAdminRoutes())
 
 export default adminRoutes

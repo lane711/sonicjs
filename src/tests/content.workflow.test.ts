@@ -7,7 +7,7 @@ import {
   WorkflowPermissions,
   defaultWorkflowPermissions,
   workflowTransitions
-} from '../content/workflow'
+} from '../plugins/core-plugins/workflow-plugin/services/content-workflow'
 
 // Mock dependencies
 const createMockDb = () => ({

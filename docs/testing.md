@@ -287,7 +287,7 @@ describe('Authentication', () => {
 // tests/unit/content.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { ContentModelManager } from '@/content/models'
-import { ContentWorkflow } from '@/content/workflow'
+import { ContentWorkflow } from '@/plugins/core-plugins/workflow-plugin/services/content-workflow'
 
 describe('Content Management', () => {
   let modelManager: ContentModelManager

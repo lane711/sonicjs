@@ -15,7 +15,7 @@ import { mediaRoutes } from './routes/media'
 import { adminMediaRoutes } from './routes/admin-media'
 import { apiMediaRoutes } from './routes/api-media'
 import emailRoutes from './routes/admin/email'
-import workflowRoutes from './routes/admin-workflow'
+import { createWorkflowRoutes } from './plugins/core-plugins/workflow-plugin/routes'
 import { userRoutes } from './routes/admin-users'
 import { requireAuth, requireRole, optionalAuth } from './middleware/auth'
 
@@ -62,6 +62,7 @@ app.route('/docs', docsRoutes)
 app.use('/api/*', optionalAuth())
 app.route('/api', apiRoutes)
 app.route('/api/media', apiMediaRoutes)
+app.route('/api/workflow', createWorkflowRoutes())
 
 // Content API routes with optional auth
 app.use('/content/*', optionalAuth())
@@ -87,7 +88,6 @@ app.route('/admin/content', adminContentRoutes)
 app.route('/admin/faq', adminFAQRoutes)
 app.route('/admin/design', adminDesignRoutes)
 app.route('/admin/email', emailRoutes)
-app.route('/admin/workflow', workflowRoutes)
 app.route('/admin/users', userRoutes)
 
 // Root redirect to login

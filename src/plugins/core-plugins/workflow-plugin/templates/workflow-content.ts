@@ -1,4 +1,4 @@
-import { renderAdminLayout } from '../layouts/admin-layout-v2.template'
+import { renderAdminLayout } from '../../../../templates/layouts/admin-layout-v2.template'
 
 export interface WorkflowContentDetailData {
   user: any
