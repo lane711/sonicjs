@@ -12,6 +12,7 @@ export interface SettingsPageData {
     security?: SecuritySettings
     notifications?: NotificationSettings
     storage?: StorageSettings
+    migrations?: MigrationSettings
   }
   activeTab?: string
 }
@@ -61,6 +62,22 @@ export interface StorageSettings {
   retentionPeriod: number
 }
 
+export interface MigrationSettings {
+  totalMigrations: number
+  appliedMigrations: number
+  pendingMigrations: number
+  lastApplied?: string
+  migrations: Array<{
+    id: string
+    name: string
+    filename: string
+    description?: string
+    applied: boolean
+    appliedAt?: string
+    size?: number
+  }>
+}
+
 export function renderSettingsPage(data: SettingsPageData): string {
   const activeTab = data.activeTab || 'general'
   
@@ -96,6 +113,7 @@ export function renderSettingsPage(data: SettingsPageData): string {
           ${renderTabButton('security', 'Security', 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', activeTab)}
           ${renderTabButton('notifications', 'Notifications', 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9', activeTab)}
           ${renderTabButton('storage', 'Storage', 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12', activeTab)}
+          ${renderTabButton('migrations', 'Migrations', 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4', activeTab)}
         </nav>
       </div>
 
@@ -130,24 +148,58 @@ export function renderSettingsPage(data: SettingsPageData): string {
         setTimeout(() => {
           content.innerHTML = getTabContent(tab);
           currentTab = tab;
+          
+          // Initialize migrations if switching to migrations tab
+          if (tab === 'migrations') {
+            setTimeout(refreshMigrationStatus, 500);
+          }
         }, 300);
       }
       
       function getTabContent(tab) {
+        // Return content for each tab, handling migrations specially
         switch(tab) {
           case 'general':
-            return \`${renderGeneralSettings(data.settings?.general).replace(/`/g, '\\`')}\`;
+            return getGeneralContent();
           case 'appearance':
-            return \`${renderAppearanceSettings(data.settings?.appearance).replace(/`/g, '\\`')}\`;
+            return getAppearanceContent();
           case 'security':
-            return \`${renderSecuritySettings(data.settings?.security).replace(/`/g, '\\`')}\`;
+            return getSecurityContent();
           case 'notifications':
-            return \`${renderNotificationSettings(data.settings?.notifications).replace(/`/g, '\\`')}\`;
+            return getNotificationsContent();
           case 'storage':
-            return \`${renderStorageSettings(data.settings?.storage).replace(/`/g, '\\`')}\`;
+            return getStorageContent();
+          case 'migrations':
+            return getMigrationsContent();
           default:
             return '<p class="text-gray-300">Content not found</p>';
         }
+      }
+      
+      function getGeneralContent() {
+        return \`${renderGeneralSettings(data.settings?.general).replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
+      }
+      
+      function getAppearanceContent() {
+        return \`${renderAppearanceSettings(data.settings?.appearance).replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
+      }
+      
+      function getSecurityContent() {
+        return \`${renderSecuritySettings(data.settings?.security).replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
+      }
+      
+      function getNotificationsContent() {
+        return \`${renderNotificationSettings(data.settings?.notifications).replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
+      }
+      
+      function getStorageContent() {
+        return \`${renderStorageSettings(data.settings?.storage).replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
+      }
+      
+      function getMigrationsContent() {
+        // Return migrations content without the embedded script tags
+        const migrationsHTML = \`${renderMigrationSettings(data.settings?.migrations).replace(/<script[^>]*>.*?<\/script>/gs, '').replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
+        return migrationsHTML;
       }
       
       function saveAllSettings() {
@@ -183,6 +235,130 @@ export function renderSettingsPage(data: SettingsPageData): string {
           setTimeout(() => {
             window.location.reload();
           }, 1000);
+        }
+      }
+      
+      // Migration functions
+      window.refreshMigrationStatus = async function() {
+        try {
+          const response = await fetch('/admin/api/migrations/status');
+          const result = await response.json();
+          
+          if (result.success) {
+            updateMigrationUI(result.data);
+          } else {
+            console.error('Failed to refresh migration status');
+          }
+        } catch (error) {
+          console.error('Error loading migration status:', error);
+        }
+      };
+
+      window.runPendingMigrations = async function() {
+        const btn = document.getElementById('run-migrations-btn');
+        if (!btn || btn.disabled) return;
+        
+        if (!confirm('Are you sure you want to run pending migrations? This action cannot be undone.')) {
+          return;
+        }
+        
+        btn.disabled = true;
+        btn.innerHTML = 'Running...';
+        
+        try {
+          const response = await fetch('/admin/api/migrations/run', {
+            method: 'POST'
+          });
+          const result = await response.json();
+          
+          if (result.success) {
+            alert(result.message);
+            setTimeout(() => refreshMigrationStatus(), 1000);
+          } else {
+            alert(result.error || 'Failed to run migrations');
+          }
+        } catch (error) {
+          alert('Error running migrations');
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = 'Run Pending';
+        }
+      };
+
+      window.validateSchema = async function() {
+        try {
+          const response = await fetch('/admin/api/migrations/validate');
+          const result = await response.json();
+          
+          if (result.success) {
+            if (result.data.valid) {
+              alert('Database schema is valid');
+            } else {
+              alert(\`Schema validation failed: \${result.data.issues.join(', ')}\`);
+            }
+          } else {
+            alert('Failed to validate schema');
+          }
+        } catch (error) {
+          alert('Error validating schema');
+        }
+      };
+
+      window.updateMigrationUI = function(data) {
+        const totalEl = document.getElementById('total-migrations');
+        const appliedEl = document.getElementById('applied-migrations');
+        const pendingEl = document.getElementById('pending-migrations');
+        
+        if (totalEl) totalEl.textContent = data.totalMigrations;
+        if (appliedEl) appliedEl.textContent = data.appliedMigrations;
+        if (pendingEl) pendingEl.textContent = data.pendingMigrations;
+        
+        const runBtn = document.getElementById('run-migrations-btn');
+        if (runBtn) {
+          runBtn.disabled = data.pendingMigrations === 0;
+        }
+        
+        // Update migrations list
+        const listContainer = document.getElementById('migrations-list');
+        if (listContainer && data.migrations && data.migrations.length > 0) {
+          listContainer.innerHTML = data.migrations.map(migration => \`
+            <div class="px-6 py-4 flex items-center justify-between">
+              <div class="flex-1">
+                <div class="flex items-center space-x-3">
+                  <div class="flex-shrink-0">
+                    \${migration.applied 
+                      ? '<svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+                      : '<svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+                    }
+                  </div>
+                  <div>
+                    <h5 class="text-white font-medium">\${migration.name}</h5>
+                    <p class="text-sm text-gray-300">\${migration.filename}</p>
+                    \${migration.description ? \`<p class="text-xs text-gray-400 mt-1">\${migration.description}</p>\` : ''}
+                  </div>
+                </div>
+              </div>
+              
+              <div class="flex items-center space-x-4 text-sm">
+                \${migration.size ? \`<span class="text-gray-400">\${(migration.size / 1024).toFixed(1)} KB</span>\` : ''}
+                <span class="px-2 py-1 rounded-full text-xs font-medium \${
+                  migration.applied 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-orange-100 text-orange-800'
+                }">
+                  \${migration.applied ? 'Applied' : 'Pending'}
+                </span>
+                \${migration.appliedAt ? \`<span class="text-gray-400">\${new Date(migration.appliedAt).toLocaleDateString()}</span>\` : ''}
+              </div>
+            </div>
+          \`).join('');
+        }
+      };
+      
+      // Auto-load migrations when switching to that tab
+      function initializeMigrations() {
+        if (currentTab === 'migrations') {
+          setTimeout(refreshMigrationStatus, 500);
         }
       }
     </script>
@@ -230,6 +406,8 @@ function renderTabContent(activeTab: string, settings?: SettingsPageData['settin
       return renderNotificationSettings(settings?.notifications)
     case 'storage':
       return renderStorageSettings(settings?.storage)
+    case 'migrations':
+      return renderMigrationSettings(settings?.migrations)
     default:
       return renderGeneralSettings(settings?.general)
   }
@@ -706,5 +884,233 @@ function renderStorageSettings(settings?: StorageSettings): string {
         </div>
       </div>
     </div>
+  `
+}
+
+function renderMigrationSettings(settings?: MigrationSettings): string {
+  return `
+    <div class="space-y-6">
+      <div>
+        <h3 class="text-lg font-semibold text-white mb-4">Database Migrations</h3>
+        <p class="text-gray-300 mb-6">View and manage database migrations to keep your schema up to date.</p>
+      </div>
+      
+      <!-- Migration Status Overview -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="backdrop-blur-md bg-blue-500/20 rounded-lg border border-blue-500/30 p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-blue-300">Total Migrations</p>
+              <p id="total-migrations" class="text-2xl font-bold text-white">${settings?.totalMigrations || '0'}</p>
+            </div>
+            <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
+            </svg>
+          </div>
+        </div>
+        
+        <div class="backdrop-blur-md bg-green-500/20 rounded-lg border border-green-500/30 p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-green-300">Applied</p>
+              <p id="applied-migrations" class="text-2xl font-bold text-white">${settings?.appliedMigrations || '0'}</p>
+            </div>
+            <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+        </div>
+        
+        <div class="backdrop-blur-md bg-orange-500/20 rounded-lg border border-orange-500/30 p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-orange-300">Pending</p>
+              <p id="pending-migrations" class="text-2xl font-bold text-white">${settings?.pendingMigrations || '0'}</p>
+            </div>
+            <svg class="w-8 h-8 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Migration Actions -->
+      <div class="flex items-center space-x-4 mb-6">
+        <button 
+          onclick="refreshMigrationStatus()" 
+          class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+        >
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          Refresh Status
+        </button>
+        
+        <button 
+          onclick="runPendingMigrations()" 
+          id="run-migrations-btn"
+          class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
+          ${(settings?.pendingMigrations || 0) === 0 ? 'disabled' : ''}
+        >
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293H15M9 10v4.586a1 1 0 00.293.707l2.414 2.414a1 1 0 00.707.293H15M9 10V9a2 2 0 012-2h2a2 2 0 012 2v1"/>
+          </svg>
+          Run Pending
+        </button>
+
+        <button 
+          onclick="validateSchema()" 
+          class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors"
+        >
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          Validate Schema
+        </button>
+      </div>
+
+      <!-- Migrations List -->
+      <div class="backdrop-blur-md bg-white/10 rounded-lg border border-white/20 overflow-hidden">
+        <div class="px-6 py-4 border-b border-white/10">
+          <h4 class="text-lg font-medium text-white">Migration History</h4>
+          <p class="text-sm text-gray-300 mt-1">List of all available database migrations</p>
+        </div>
+        
+        <div id="migrations-list" class="divide-y divide-white/10">
+          <div class="px-6 py-8 text-center">
+            <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
+            </svg>
+            <p class="text-gray-300">Loading migration status...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Load migration status when tab becomes active
+      if (typeof refreshMigrationStatus === 'undefined') {
+        window.refreshMigrationStatus = async function() {
+          try {
+            const response = await fetch('/admin/api/migrations/status');
+            const result = await response.json();
+            
+            if (result.success) {
+              updateMigrationUI(result.data);
+            } else {
+              console.error('Failed to refresh migration status');
+            }
+          } catch (error) {
+            console.error('Error loading migration status:', error);
+          }
+        };
+
+        window.runPendingMigrations = async function() {
+          const btn = document.getElementById('run-migrations-btn');
+          if (!btn || btn.disabled) return;
+          
+          if (!confirm('Are you sure you want to run pending migrations? This action cannot be undone.')) {
+            return;
+          }
+          
+          btn.disabled = true;
+          btn.innerHTML = 'Running...';
+          
+          try {
+            const response = await fetch('/admin/api/migrations/run', {
+              method: 'POST'
+            });
+            const result = await response.json();
+            
+            if (result.success) {
+              alert(result.message);
+              setTimeout(() => refreshMigrationStatus(), 1000);
+            } else {
+              alert(result.error || 'Failed to run migrations');
+            }
+          } catch (error) {
+            alert('Error running migrations');
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'Run Pending';
+          }
+        };
+
+        window.validateSchema = async function() {
+          try {
+            const response = await fetch('/admin/api/migrations/validate');
+            const result = await response.json();
+            
+            if (result.success) {
+              if (result.data.valid) {
+                alert('Database schema is valid');
+              } else {
+                alert(\`Schema validation failed: \${result.data.issues.join(', ')}\`);
+              }
+            } else {
+              alert('Failed to validate schema');
+            }
+          } catch (error) {
+            alert('Error validating schema');
+          }
+        };
+
+        window.updateMigrationUI = function(data) {
+          const totalEl = document.getElementById('total-migrations');
+          const appliedEl = document.getElementById('applied-migrations');
+          const pendingEl = document.getElementById('pending-migrations');
+          
+          if (totalEl) totalEl.textContent = data.totalMigrations;
+          if (appliedEl) appliedEl.textContent = data.appliedMigrations;
+          if (pendingEl) pendingEl.textContent = data.pendingMigrations;
+          
+          const runBtn = document.getElementById('run-migrations-btn');
+          if (runBtn) {
+            runBtn.disabled = data.pendingMigrations === 0;
+          }
+          
+          // Update migrations list
+          const listContainer = document.getElementById('migrations-list');
+          if (listContainer && data.migrations && data.migrations.length > 0) {
+            listContainer.innerHTML = data.migrations.map(migration => \`
+              <div class="px-6 py-4 flex items-center justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center space-x-3">
+                    <div class="flex-shrink-0">
+                      \${migration.applied 
+                        ? '<svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+                        : '<svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+                      }
+                    </div>
+                    <div>
+                      <h5 class="text-white font-medium">\${migration.name}</h5>
+                      <p class="text-sm text-gray-300">\${migration.filename}</p>
+                      \${migration.description ? \`<p class="text-xs text-gray-400 mt-1">\${migration.description}</p>\` : ''}
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="flex items-center space-x-4 text-sm">
+                  \${migration.size ? \`<span class="text-gray-400">\${(migration.size / 1024).toFixed(1)} KB</span>\` : ''}
+                  <span class="px-2 py-1 rounded-full text-xs font-medium \${
+                    migration.applied 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-orange-100 text-orange-800'
+                  }">
+                    \${migration.applied ? 'Applied' : 'Pending'}
+                  </span>
+                  \${migration.appliedAt ? \`<span class="text-gray-400">\${new Date(migration.appliedAt).toLocaleDateString()}</span>\` : ''}
+                </div>
+              </div>
+            \`).join('');
+          }
+        };
+      }
+      
+      // Auto-load when tab becomes active
+      if (currentTab === 'migrations') {
+        setTimeout(refreshMigrationStatus, 500);
+      }
+    </script>
   `
 }

@@ -40,6 +40,85 @@ export async function ensureAdminUserExists(page: Page) {
 }
 
 /**
+ * Ensure workflow tables exist (for testing)
+ */
+export async function ensureWorkflowTablesExist(page: Page) {
+  try {
+    // First ensure admin user exists so we can call admin endpoints
+    await ensureAdminUserExists(page);
+    
+    // Try to call the migration endpoint to set up workflow tables
+    const response = await page.request.post('/admin/api/migrations/run');
+    console.log('Migration response status:', response.status());
+  } catch (error) {
+    // Migration might already be applied, ignore errors
+    console.log('Migration might already be applied or endpoint not available:', error);
+  }
+}
+
+/**
+ * Create test workflow content (assumes user is already logged in)
+ */
+export async function createTestWorkflowContent(page: Page) {
+  try {
+    // Ensure we have a collection first
+    await ensureTestCollectionExists(page);
+    
+    // Navigate to content creation
+    await page.goto('/admin/content/new');
+    
+    // Wait for the page to load and check if collection select exists
+    try {
+      await page.waitForSelector('select[name="collection_id"]', { timeout: 5000 });
+      const collections = await page.locator('select[name="collection_id"] option').count();
+      
+      if (collections > 1) { // Skip the first placeholder option
+        await page.selectOption('select[name="collection_id"]', { index: 1 });
+        await page.fill('input[name="title"]', 'Workflow Transition Test');
+        await page.fill('input[name="slug"]', 'workflow-transition-test');
+        await page.fill('textarea[name="content"]', 'Test content for workflow transitions.');
+        
+        // Submit the form
+        await page.click('button[type="submit"]');
+        
+        // Wait for success response
+        await page.waitForTimeout(2000);
+      } else {
+        console.log('No collections available for content creation');
+      }
+    } catch (selectorError) {
+      console.log('Collection selector not found or content creation not available');
+    }
+  } catch (error) {
+    // Content might already exist, ignore errors
+    console.log('Test content creation failed:', error);
+  }
+}
+
+/**
+ * Ensure test collection exists
+ */
+export async function ensureTestCollectionExists(page: Page) {
+  try {
+    // First check if collection already exists
+    await page.goto('/admin/collections');
+    
+    const collectionExists = await page.locator('td').filter({ hasText: TEST_DATA.collection.name }).first().isVisible({ timeout: 2000 });
+    
+    if (!collectionExists) {
+      await createTestCollection(page);
+    }
+  } catch (error) {
+    // Try to create collection anyway
+    try {
+      await createTestCollection(page);
+    } catch (createError) {
+      console.log('Failed to create test collection:', createError);
+    }
+  }
+}
+
+/**
  * Login as admin user
  */
 export async function loginAsAdmin(page: Page) {
@@ -57,6 +136,9 @@ export async function loginAsAdmin(page: Page) {
   // Wait for JavaScript redirect to admin dashboard (up to 10 seconds)
   await page.waitForURL('/admin', { timeout: 10000 });
   await expect(page.locator('nav').first()).toBeVisible(); // Check for sidebar navigation
+  
+  // Ensure workflow tables exist for workflow tests (after login)
+  await ensureWorkflowTablesExist(page);
 }
 
 /**
