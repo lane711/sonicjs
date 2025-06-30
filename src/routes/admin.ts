@@ -10,6 +10,7 @@ import { userRoutes } from './admin-users'
 import { createWorkflowAdminRoutes } from '../plugins/core-plugins/workflow-plugin/admin-routes'
 import { adminPluginRoutes } from './admin-plugins'
 import { MigrationService } from '../services/migrations'
+import { createDatabaseToolsAdminRoutes } from '../plugins/core-plugins/database-tools-plugin/admin-routes'
 
 type Bindings = {
   DB: D1Database
@@ -698,6 +699,9 @@ adminRoutes.get('/users/export', async (c) => {
 // Plugins management
 adminRoutes.route('/plugins', adminPluginRoutes)
 
+// Database tools
+adminRoutes.route('/database-tools', createDatabaseToolsAdminRoutes())
+
 // Settings page
 adminRoutes.get('/settings', (c) => {
   const user = c.get('user')
@@ -752,6 +756,13 @@ adminRoutes.get('/settings', (c) => {
       pendingMigrations: 0,
       lastApplied: undefined,
       migrations: []
+    },
+    databaseTools: {
+      totalTables: 0,
+      totalRows: 0,
+      lastBackup: undefined,
+      databaseSize: '0 MB',
+      tables: []
     }
   }
   
