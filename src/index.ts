@@ -18,6 +18,7 @@ import emailRoutes from './routes/admin/email'
 import { createWorkflowRoutes } from './plugins/core-plugins/workflow-plugin/routes'
 import { userRoutes } from './routes/admin-users'
 import { requireAuth, requireRole, optionalAuth } from './middleware/auth'
+import { requireActivePlugin } from './middleware/plugin-middleware'
 
 // Define the Cloudflare Workers environment
 type Bindings = {
@@ -85,6 +86,8 @@ app.use('/admin/*', requireRole(['admin', 'editor']))
 app.route('/admin', adminRoutes)
 app.route('/admin/media', adminMediaRoutes)
 app.route('/admin/content', adminContentRoutes)
+// FAQ routes with plugin activation check
+app.use('/admin/faq/*', requireActivePlugin('faq'))
 app.route('/admin/faq', adminFAQRoutes)
 app.route('/admin/design', adminDesignRoutes)
 app.route('/admin/email', emailRoutes)

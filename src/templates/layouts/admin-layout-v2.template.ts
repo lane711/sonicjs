@@ -12,6 +12,11 @@ export interface AdminLayoutData {
   scripts?: string[]
   styles?: string[]
   content: string
+  dynamicMenuItems?: Array<{
+    label: string
+    path: string
+    icon: string
+  }>
 }
 
 export function renderAdminLayout(data: AdminLayoutData): string {
@@ -256,7 +261,7 @@ export function renderAdminLayout(data: AdminLayoutData): string {
       <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
         <!-- Sidebar -->
         <div class="lg:col-span-1">
-          ${renderSidebar(data.currentPath, data.user)}
+          ${renderSidebar(data.currentPath, data.user, data.dynamicMenuItems)}
         </div>
         
         <!-- Main content -->
@@ -476,8 +481,12 @@ export function renderAdminLayout(data: AdminLayoutData): string {
 </html>`
 }
 
-function renderSidebar(currentPath: string, user?: any): string {
-  const menuItems = [
+function renderSidebar(currentPath: string, user?: any, dynamicMenuItems?: Array<{
+  label: string
+  path: string
+  icon: string
+}>): string {
+  const baseMenuItems = [
     {
       label: 'Dashboard',
       path: '/admin',
@@ -518,13 +527,6 @@ function renderSidebar(currentPath: string, user?: any): string {
       path: '/admin/workflow/dashboard',
       icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
-      </svg>`
-    },
-    {
-      label: 'FAQ',
-      path: '/admin/faq',
-      icon: `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-4a1 1 0 00-1 1v3a1 1 0 002 0V7a1 1 0 00-1-1zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
       </svg>`
     },
     {
@@ -572,10 +574,29 @@ function renderSidebar(currentPath: string, user?: any): string {
     }
   ]
 
+  // Combine base menu items with dynamic menu items from active plugins
+  const allMenuItems = [...baseMenuItems]
+  
+  // Insert dynamic menu items after "Users" and before "Workflow"
+  if (dynamicMenuItems && dynamicMenuItems.length > 0) {
+    const workflowIndex = allMenuItems.findIndex(item => item.path === '/admin/workflow/dashboard')
+    if (workflowIndex !== -1) {
+      allMenuItems.splice(workflowIndex, 0, ...dynamicMenuItems)
+    } else {
+      // If Workflow not found, add at the end before settings
+      const settingsIndex = allMenuItems.findIndex(item => item.path === '/admin/settings')
+      if (settingsIndex !== -1) {
+        allMenuItems.splice(settingsIndex, 0, ...dynamicMenuItems)
+      } else {
+        allMenuItems.push(...dynamicMenuItems)
+      }
+    }
+  }
+
   return `
     <nav class="backdrop-blur-md bg-black/30 rounded-xl border border-white/10 shadow-xl p-6 h-[calc(100vh-9.5rem)] sticky top-8">
       <div class="space-y-4">
-        ${menuItems.map(item => {
+        ${allMenuItems.map(item => {
           const isActive = currentPath === item.path || (item.path !== '/admin' && currentPath.startsWith(item.path))
           const targetAttr = (item as any).target ? ` target="${(item as any).target}"` : ''
           return `

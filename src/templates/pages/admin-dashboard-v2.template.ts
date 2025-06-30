@@ -104,6 +104,64 @@ export function renderDashboardPage(data: DashboardPageData): string {
   return renderAdminLayout(layoutData)
 }
 
+export function renderDashboardPageWithDynamicMenu(
+  data: DashboardPageData,
+  dynamicMenuItems: Array<{ label: string; path: string; icon: string }>
+): string {
+  const pageContent = `
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-white mb-2">Dashboard</h1>
+      <p class="text-gray-300">Welcome to your SonicJS AI admin dashboard</p>
+    </div>
+
+    <div id="stats-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8" hx-get="/admin/api/stats" hx-trigger="load">
+      ${renderStatsCards({ collections: 0, contentItems: 0, mediaFiles: 0, users: 0 })}
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+      <!-- Recent Activity -->
+      <div class="xl:col-span-2">
+        ${renderRecentActivity()}
+      </div>
+      
+      <!-- Quick Actions -->
+      <div class="xl:col-span-1">
+        ${renderQuickActions()}
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-5 gap-6">
+      <!-- Analytics Chart -->
+      <div class="col-span-12 xl:col-span-4">
+        ${renderAnalyticsChart()}
+      </div>
+      
+      <!-- Storage Usage -->
+      <div class="col-span-12 xl:col-span-1">
+        ${renderStorageUsage()}
+      </div>
+    </div>
+
+    <script>
+      function refreshDashboard() {
+        htmx.trigger('#stats-container', 'htmx:load');
+        showNotification('Dashboard refreshed', 'success');
+      }
+    </script>
+  `
+
+  const layoutData: AdminLayoutData = {
+    title: 'Dashboard',
+    pageTitle: 'Dashboard',
+    currentPath: '/admin',
+    user: data.user,
+    content: pageContent,
+    dynamicMenuItems
+  }
+
+  return renderAdminLayout(layoutData)
+}
+
 export function renderStatsCards(stats: DashboardStats): string {
   const cards = [
     {

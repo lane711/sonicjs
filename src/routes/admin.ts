@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { html, raw } from 'hono/html'
-import { renderDashboardPage, renderStatsCards, DashboardPageData, DashboardStats } from '../templates/pages/admin-dashboard-v2.template'
+import { renderDashboardPage, renderDashboardPageWithDynamicMenu, renderStatsCards, DashboardPageData, DashboardStats } from '../templates/pages/admin-dashboard-v2.template'
 import { renderCollectionsListPage, CollectionsListPageData, Collection } from '../templates/pages/admin-collections-list.template'
 import { renderCollectionFormPage, CollectionFormData } from '../templates/pages/admin-collections-form.template'
 import { renderPluginsListPage, PluginsListPageData, generateMockPlugins } from '../templates/pages/admin-plugins-list.template'
@@ -11,6 +11,7 @@ import { createWorkflowAdminRoutes } from '../plugins/core-plugins/workflow-plug
 import { adminPluginRoutes } from './admin-plugins'
 import { MigrationService } from '../services/migrations'
 import { createDatabaseToolsAdminRoutes } from '../plugins/core-plugins/database-tools-plugin/admin-routes'
+import { getActivePlugins } from '../middleware/plugin-middleware'
 
 type Bindings = {
   DB: D1Database
@@ -25,13 +26,72 @@ type Variables = {
     exp: number
     iat: number
   }
+  dynamicMenuItems?: Array<{
+    label: string
+    path: string
+    icon: string
+  }>
 }
 
 export const adminRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
+/**
+ * Helper function to get dynamic menu items from active plugins
+ */
+async function getDynamicMenuItems(db: D1Database): Promise<Array<{
+  label: string
+  path: string
+  icon: string
+}>> {
+  try {
+    console.log('getDynamicMenuItems: Starting to fetch active plugins')
+    const activePlugins = await getActivePlugins(db)
+    console.log('getDynamicMenuItems: Active plugins found:', activePlugins)
+    const menuItems: Array<{ label: string; path: string; icon: string }> = []
+    
+    for (const plugin of activePlugins) {
+      console.log('getDynamicMenuItems: Processing plugin:', plugin.name)
+      // Add menu items for plugins that have admin interfaces
+      if (plugin.name === 'faq') {
+        console.log('getDynamicMenuItems: Adding FAQ menu item')
+        menuItems.push({
+          label: 'FAQ',
+          path: '/admin/faq',
+          icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>`
+        })
+      }
+      // Add more plugin-specific menu items here as needed
+    }
+    
+    console.log('getDynamicMenuItems: Final menu items:', menuItems)
+    return menuItems
+  } catch (error) {
+    console.error('Error getting dynamic menu items:', error)
+    return []
+  }
+}
+
+/**
+ * Middleware to add dynamic menu items to all admin routes
+ */
+adminRoutes.use('*', async (c, next) => {
+  try {
+    const db = c.env.DB
+    const dynamicMenuItems = await getDynamicMenuItems(db)
+    c.set('dynamicMenuItems', dynamicMenuItems)
+  } catch (error) {
+    console.error('Error setting dynamic menu items:', error)
+    c.set('dynamicMenuItems', [])
+  }
+  await next()
+})
+
 // Admin dashboard
-adminRoutes.get('/', (c) => {
+adminRoutes.get('/', async (c) => {
   const user = c.get('user')
+  const dynamicMenuItems = c.get('dynamicMenuItems') || []
   
   const pageData: DashboardPageData = {
     user: user ? {
@@ -41,7 +101,7 @@ adminRoutes.get('/', (c) => {
     } : undefined
   }
   
-  return c.html(renderDashboardPage(pageData))
+  return c.html(renderDashboardPageWithDynamicMenu(pageData, dynamicMenuItems))
 })
 
 // Admin API endpoints for HTMX

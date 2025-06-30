@@ -15,8 +15,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "wrangler d1 migrations apply sonicjs-dev --local",
-    "db:migrate:prod": "wrangler d1 migrations apply sonicjs-prod",
+    "db:migrate": "wrangler d1 migrations apply DB --local",
+    "db:migrate:prod": "wrangler d1 migrations apply DB --env production",
     "db:studio": "drizzle-kit studio",
     "sonicjs": "tsx src/cli/index.ts"
   },

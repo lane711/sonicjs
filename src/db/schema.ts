@@ -163,6 +163,72 @@ export const workflowHistory = sqliteTable('workflow_history', {
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
 });
 
+// Plugin system tables
+export const plugins = sqliteTable('plugins', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull().unique(),
+  displayName: text('display_name').notNull(),
+  description: text('description'),
+  version: text('version').notNull(),
+  author: text('author').notNull(),
+  category: text('category').notNull(),
+  icon: text('icon'),
+  status: text('status').notNull().default('inactive'), // 'active', 'inactive', 'error'
+  isCore: integer('is_core', { mode: 'boolean' }).notNull().default(false),
+  settings: text('settings', { mode: 'json' }),
+  permissions: text('permissions', { mode: 'json' }),
+  dependencies: text('dependencies', { mode: 'json' }),
+  downloadCount: integer('download_count').notNull().default(0),
+  rating: integer('rating').notNull().default(0),
+  installedAt: integer('installed_at').notNull(),
+  activatedAt: integer('activated_at'),
+  lastUpdated: integer('last_updated').notNull(),
+  errorMessage: text('error_message'),
+  createdAt: integer('created_at').notNull().$defaultFn(() => Math.floor(Date.now() / 1000)),
+  updatedAt: integer('updated_at').notNull().$defaultFn(() => Math.floor(Date.now() / 1000)),
+});
+
+export const pluginHooks = sqliteTable('plugin_hooks', {
+  id: text('id').primaryKey(),
+  pluginId: text('plugin_id').notNull().references(() => plugins.id),
+  hookName: text('hook_name').notNull(),
+  handlerName: text('handler_name').notNull(),
+  priority: integer('priority').notNull().default(10),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  createdAt: integer('created_at').notNull().$defaultFn(() => Math.floor(Date.now() / 1000)),
+});
+
+export const pluginRoutes = sqliteTable('plugin_routes', {
+  id: text('id').primaryKey(),
+  pluginId: text('plugin_id').notNull().references(() => plugins.id),
+  path: text('path').notNull(),
+  method: text('method').notNull(),
+  handlerName: text('handler_name').notNull(),
+  middleware: text('middleware', { mode: 'json' }),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  createdAt: integer('created_at').notNull().$defaultFn(() => Math.floor(Date.now() / 1000)),
+});
+
+export const pluginAssets = sqliteTable('plugin_assets', {
+  id: text('id').primaryKey(),
+  pluginId: text('plugin_id').notNull().references(() => plugins.id),
+  assetType: text('asset_type').notNull(), // 'css', 'js', 'image', 'font'
+  assetPath: text('asset_path').notNull(),
+  loadOrder: integer('load_order').notNull().default(100),
+  loadLocation: text('load_location').notNull().default('footer'), // 'header', 'footer'
+  isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  createdAt: integer('created_at').notNull().$defaultFn(() => Math.floor(Date.now() / 1000)),
+});
+
+export const pluginActivityLog = sqliteTable('plugin_activity_log', {
+  id: text('id').primaryKey(),
+  pluginId: text('plugin_id').notNull().references(() => plugins.id),
+  action: text('action').notNull(),
+  userId: text('user_id'),
+  details: text('details', { mode: 'json' }),
+  timestamp: integer('timestamp').notNull().$defaultFn(() => Math.floor(Date.now() / 1000)),
+});
+
 // Zod schemas for validation
 export const insertUserSchema = createInsertSchema(users, {
   email: (schema) => schema.email(),
@@ -241,6 +307,44 @@ export const insertWorkflowHistorySchema = createInsertSchema(workflowHistory, {
 
 export const selectWorkflowHistorySchema = createSelectSchema(workflowHistory);
 
+export const insertPluginSchema = createInsertSchema(plugins, {
+  name: (schema) => schema.min(1),
+  displayName: (schema) => schema.min(1),
+  version: (schema) => schema.min(1),
+  author: (schema) => schema.min(1),
+  category: (schema) => schema.min(1),
+});
+
+export const selectPluginSchema = createSelectSchema(plugins);
+
+export const insertPluginHookSchema = createInsertSchema(pluginHooks, {
+  hookName: (schema) => schema.min(1),
+  handlerName: (schema) => schema.min(1),
+});
+
+export const selectPluginHookSchema = createSelectSchema(pluginHooks);
+
+export const insertPluginRouteSchema = createInsertSchema(pluginRoutes, {
+  path: (schema) => schema.min(1),
+  method: (schema) => schema.min(1),
+  handlerName: (schema) => schema.min(1),
+});
+
+export const selectPluginRouteSchema = createSelectSchema(pluginRoutes);
+
+export const insertPluginAssetSchema = createInsertSchema(pluginAssets, {
+  assetType: (schema) => schema.min(1),
+  assetPath: (schema) => schema.min(1),
+});
+
+export const selectPluginAssetSchema = createSelectSchema(pluginAssets);
+
+export const insertPluginActivityLogSchema = createInsertSchema(pluginActivityLog, {
+  action: (schema) => schema.min(1),
+});
+
+export const selectPluginActivityLogSchema = createSelectSchema(pluginActivityLog);
+
 // Type exports
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -260,3 +364,13 @@ export type EmailVariable = typeof emailVariables.$inferSelect;
 export type NewEmailVariable = typeof emailVariables.$inferInsert;
 export type WorkflowHistory = typeof workflowHistory.$inferSelect;
 export type NewWorkflowHistory = typeof workflowHistory.$inferInsert;
+export type Plugin = typeof plugins.$inferSelect;
+export type NewPlugin = typeof plugins.$inferInsert;
+export type PluginHook = typeof pluginHooks.$inferSelect;
+export type NewPluginHook = typeof pluginHooks.$inferInsert;
+export type PluginRoute = typeof pluginRoutes.$inferSelect;
+export type NewPluginRoute = typeof pluginRoutes.$inferInsert;
+export type PluginAsset = typeof pluginAssets.$inferSelect;
+export type NewPluginAsset = typeof pluginAssets.$inferInsert;
+export type PluginActivityLog = typeof pluginActivityLog.$inferSelect;
+export type NewPluginActivityLog = typeof pluginActivityLog.$inferInsert;

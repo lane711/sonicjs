@@ -258,6 +258,91 @@ adminPluginRoutes.post('/install', async (c) => {
       
       return c.json({ success: true, plugin: demoPlugin })
     }
+
+    // Handle core Authentication System plugin installation
+    if (body.name === 'core-auth') {
+      const authPlugin = await pluginService.installPlugin({
+        id: 'core-auth',
+        name: 'core-auth',
+        display_name: 'Authentication System',
+        description: 'Core authentication and user management system',
+        version: '1.0.0',
+        author: 'SonicJS Team',
+        category: 'security',
+        icon: '🔐',
+        permissions: ['manage:users', 'manage:roles', 'manage:permissions'],
+        dependencies: [],
+        is_core: true,
+        settings: {}
+      })
+      
+      return c.json({ success: true, plugin: authPlugin })
+    }
+
+    // Handle core Media Manager plugin installation
+    if (body.name === 'core-media') {
+      const mediaPlugin = await pluginService.installPlugin({
+        id: 'core-media',
+        name: 'core-media',
+        display_name: 'Media Manager',
+        description: 'Core media upload and management system',
+        version: '1.0.0',
+        author: 'SonicJS Team',
+        category: 'media',
+        icon: '📸',
+        permissions: ['manage:media', 'upload:files'],
+        dependencies: [],
+        is_core: true,
+        settings: {}
+      })
+      
+      return c.json({ success: true, plugin: mediaPlugin })
+    }
+
+    // Handle core Workflow Engine plugin installation
+    if (body.name === 'core-workflow') {
+      const workflowPlugin = await pluginService.installPlugin({
+        id: 'core-workflow',
+        name: 'core-workflow',
+        display_name: 'Workflow Engine',
+        description: 'Content workflow and approval system',
+        version: '1.0.0',
+        author: 'SonicJS Team',
+        category: 'content',
+        icon: '🔄',
+        permissions: ['manage:workflows', 'approve:content'],
+        dependencies: [],
+        is_core: true,
+        settings: {}
+      })
+      
+      return c.json({ success: true, plugin: workflowPlugin })
+    }
+
+    // Handle Database Tools plugin installation
+    if (body.name === 'database-tools') {
+      const databaseToolsPlugin = await pluginService.installPlugin({
+        id: 'database-tools',
+        name: 'database-tools',
+        display_name: 'Database Tools',
+        description: 'Database management tools including truncate, backup, and validation',
+        version: '1.0.0',
+        author: 'SonicJS Team',
+        category: 'system',
+        icon: '🗄️',
+        permissions: ['manage:database', 'admin'],
+        dependencies: [],
+        is_core: false,
+        settings: {
+          enableTruncate: true,
+          enableBackup: true,
+          enableValidation: true,
+          requireConfirmation: true
+        }
+      })
+      
+      return c.json({ success: true, plugin: databaseToolsPlugin })
+    }
     
     return c.json({ error: 'Plugin not found in registry' }, 404)
   } catch (error) {

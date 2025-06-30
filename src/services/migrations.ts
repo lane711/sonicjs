@@ -151,7 +151,7 @@ export class MigrationService {
 
     // Check if plugin system tables exist (migration 006)
     if (!appliedMigrations.has('006')) {
-      const hasPluginTables = await this.checkTablesExist(['plugins', 'plugin_settings'])
+      const hasPluginTables = await this.checkTablesExist(['plugins', 'plugin_hooks'])
       if (hasPluginTables) {
         appliedMigrations.set('006', { 
           id: '006', 
@@ -344,10 +344,170 @@ export class MigrationService {
   private async getMigrationSQL(migrationId: string): Promise<string | null> {
     // Import actual migration SQL based on ID
     switch (migrationId) {
+      case '002':
+        // FAQ Plugin migration
+        return `
+          CREATE TABLE IF NOT EXISTS faqs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            question TEXT NOT NULL,
+            answer TEXT NOT NULL,
+            category TEXT,
+            tags TEXT,
+            isPublished INTEGER NOT NULL DEFAULT 1,
+            sortOrder INTEGER NOT NULL DEFAULT 0,
+            created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+            updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+          );
+
+          CREATE INDEX IF NOT EXISTS idx_faqs_category ON faqs(category);
+          CREATE INDEX IF NOT EXISTS idx_faqs_published ON faqs(isPublished);
+          CREATE INDEX IF NOT EXISTS idx_faqs_sort_order ON faqs(sortOrder);
+
+          CREATE TRIGGER IF NOT EXISTS faqs_updated_at
+            AFTER UPDATE ON faqs
+          BEGIN
+            UPDATE faqs SET updated_at = strftime('%s', 'now') WHERE id = NEW.id;
+          END;
+        `
       case '005':
         // Import workflow migration
         const { workflowMigration } = await import('../plugins/core-plugins/workflow-plugin/migrations')
         return workflowMigration
+      case '006':
+        // Plugin system migration
+        return `
+          -- Plugin System Tables
+          CREATE TABLE IF NOT EXISTS plugins (
+              id TEXT PRIMARY KEY,
+              name TEXT NOT NULL UNIQUE,
+              display_name TEXT NOT NULL,
+              description TEXT,
+              version TEXT NOT NULL,
+              author TEXT NOT NULL,
+              category TEXT NOT NULL,
+              icon TEXT,
+              status TEXT DEFAULT 'inactive' CHECK (status IN ('active', 'inactive', 'error')),
+              is_core BOOLEAN DEFAULT FALSE,
+              settings JSON,
+              permissions JSON,
+              dependencies JSON,
+              download_count INTEGER DEFAULT 0,
+              rating REAL DEFAULT 0,
+              installed_at INTEGER NOT NULL,
+              activated_at INTEGER,
+              last_updated INTEGER NOT NULL,
+              error_message TEXT,
+              created_at INTEGER DEFAULT (unixepoch()),
+              updated_at INTEGER DEFAULT (unixepoch())
+          );
+
+          CREATE TABLE IF NOT EXISTS plugin_hooks (
+              id TEXT PRIMARY KEY,
+              plugin_id TEXT NOT NULL,
+              hook_name TEXT NOT NULL,
+              handler_name TEXT NOT NULL,
+              priority INTEGER DEFAULT 10,
+              is_active BOOLEAN DEFAULT TRUE,
+              created_at INTEGER DEFAULT (unixepoch()),
+              FOREIGN KEY (plugin_id) REFERENCES plugins(id) ON DELETE CASCADE,
+              UNIQUE(plugin_id, hook_name, handler_name)
+          );
+
+          CREATE TABLE IF NOT EXISTS plugin_routes (
+              id TEXT PRIMARY KEY,
+              plugin_id TEXT NOT NULL,
+              path TEXT NOT NULL,
+              method TEXT NOT NULL,
+              handler_name TEXT NOT NULL,
+              middleware JSON,
+              is_active BOOLEAN DEFAULT TRUE,
+              created_at INTEGER DEFAULT (unixepoch()),
+              FOREIGN KEY (plugin_id) REFERENCES plugins(id) ON DELETE CASCADE,
+              UNIQUE(plugin_id, path, method)
+          );
+
+          CREATE TABLE IF NOT EXISTS plugin_assets (
+              id TEXT PRIMARY KEY,
+              plugin_id TEXT NOT NULL,
+              asset_type TEXT NOT NULL CHECK (asset_type IN ('css', 'js', 'image', 'font')),
+              asset_path TEXT NOT NULL,
+              load_order INTEGER DEFAULT 100,
+              load_location TEXT DEFAULT 'footer' CHECK (load_location IN ('header', 'footer')),
+              is_active BOOLEAN DEFAULT TRUE,
+              created_at INTEGER DEFAULT (unixepoch()),
+              FOREIGN KEY (plugin_id) REFERENCES plugins(id) ON DELETE CASCADE
+          );
+
+          CREATE TABLE IF NOT EXISTS plugin_activity_log (
+              id TEXT PRIMARY KEY,
+              plugin_id TEXT NOT NULL,
+              action TEXT NOT NULL,
+              user_id TEXT,
+              details JSON,
+              timestamp INTEGER DEFAULT (unixepoch()),
+              FOREIGN KEY (plugin_id) REFERENCES plugins(id) ON DELETE CASCADE
+          );
+
+          -- Create indexes
+          CREATE INDEX IF NOT EXISTS idx_plugins_status ON plugins(status);
+          CREATE INDEX IF NOT EXISTS idx_plugins_category ON plugins(category);
+          CREATE INDEX IF NOT EXISTS idx_plugin_hooks_plugin ON plugin_hooks(plugin_id);
+          CREATE INDEX IF NOT EXISTS idx_plugin_routes_plugin ON plugin_routes(plugin_id);
+          CREATE INDEX IF NOT EXISTS idx_plugin_assets_plugin ON plugin_assets(plugin_id);
+          CREATE INDEX IF NOT EXISTS idx_plugin_activity_plugin ON plugin_activity_log(plugin_id);
+          CREATE INDEX IF NOT EXISTS idx_plugin_activity_timestamp ON plugin_activity_log(timestamp);
+
+          -- Insert core plugins
+          INSERT INTO plugins (
+              id, name, display_name, description, version, author, category, icon, 
+              status, is_core, permissions, installed_at, last_updated
+          ) VALUES 
+          (
+              'core-auth',
+              'core-auth',
+              'Authentication System',
+              'Core authentication and user management system',
+              '1.0.0',
+              'SonicJS Team',
+              'security',
+              '🔐',
+              'active',
+              TRUE,
+              '["manage:users", "manage:roles", "manage:permissions"]',
+              unixepoch(),
+              unixepoch()
+          ),
+          (
+              'core-media',
+              'core-media', 
+              'Media Manager',
+              'Core media upload and management system',
+              '1.0.0',
+              'SonicJS Team',
+              'media',
+              '📸',
+              'active',
+              TRUE,
+              '["manage:media", "upload:files"]',
+              unixepoch(),
+              unixepoch()
+          ),
+          (
+              'core-workflow',
+              'core-workflow',
+              'Workflow Engine',
+              'Content workflow and approval system',
+              '1.0.0',
+              'SonicJS Team',
+              'content',
+              '🔄',
+              'active',
+              TRUE,
+              '["manage:workflows", "approve:content"]',
+              unixepoch(),
+              unixepoch()
+          );
+        `
       default:
         return null
     }
