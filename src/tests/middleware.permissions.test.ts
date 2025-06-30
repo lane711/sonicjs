@@ -17,7 +17,7 @@ const setupUserPermissionsMocks = (
   mockDb: any, 
   user: any, 
   rolePermissions: any[] = [], 
-  userPermissions: any[] = [], 
+  userPermissions: any[] = [], // This parameter is kept for compatibility but not used in new implementation
   teamMemberships: any[] = []
 ) => {
   mockDb.prepare
@@ -29,11 +29,6 @@ const setupUserPermissionsMocks = (
     .mockReturnValueOnce({
       bind: vi.fn().mockReturnValue({
         all: vi.fn().mockResolvedValue({ results: rolePermissions })
-      })
-    })
-    .mockReturnValueOnce({
-      bind: vi.fn().mockReturnValue({
-        all: vi.fn().mockResolvedValue({ results: userPermissions })
       })
     })
     .mockReturnValueOnce({
@@ -80,14 +75,14 @@ describe('PermissionManager', () => {
       expect(result).toEqual({
         userId: 'user-1',
         role: 'admin',
-        permissions: ['content.read', 'content.write', 'users.manage', 'content.delete'],
+        permissions: ['content.read', 'content.write', 'users.manage'], // Only role permissions, no user-specific permissions
         teamPermissions: {}
       })
 
       // Verify database queries
       expect(mockDb.prepare).toHaveBeenCalledWith('SELECT id, role FROM users WHERE id = ? AND is_active = 1')
       expect(mockDb.prepare).toHaveBeenCalledWith(expect.stringContaining('FROM role_permissions'))
-      expect(mockDb.prepare).toHaveBeenCalledWith(expect.stringContaining('FROM user_permissions'))
+      // Note: user_permissions table query removed in new implementation
       expect(mockDb.prepare).toHaveBeenCalledWith(expect.stringContaining('FROM team_memberships'))
     })
 
@@ -141,8 +136,7 @@ describe('PermissionManager', () => {
             first: vi.fn().mockResolvedValue(mockUser),
             all: vi.fn()
               .mockResolvedValueOnce({ results: mockRolePermissions })
-              .mockResolvedValueOnce({ results: mockUserPermissions })
-              .mockResolvedValueOnce({ results: [] }) // team memberships
+              .mockResolvedValueOnce({ results: [] }) // team memberships (removed user permissions)
           })
         })
 
@@ -161,8 +155,7 @@ describe('PermissionManager', () => {
             first: vi.fn().mockResolvedValue(mockUser),
             all: vi.fn()
               .mockResolvedValueOnce({ results: mockRolePermissions })
-              .mockResolvedValueOnce({ results: mockUserPermissions })
-              .mockResolvedValueOnce({ results: [] }) // team memberships
+              .mockResolvedValueOnce({ results: [] }) // team memberships (removed user permissions)
           })
         })
 
@@ -221,9 +214,8 @@ describe('PermissionManager', () => {
 
       expect(result.permissions).toEqual([
         'content.read',
-        'content.write',
-        'content.publish',
-        'media.upload'
+        'content.write'
+        // Note: user-specific permissions (content.publish, media.upload) are not included in new implementation
       ])
     })
   })
