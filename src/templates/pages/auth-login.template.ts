@@ -5,7 +5,7 @@ export interface LoginPageData {
   message?: string
 }
 
-export function renderLoginPage(data: LoginPageData): string {
+export function renderLoginPage(data: LoginPageData, demoLoginActive: boolean = false): string {
   return `
     <!DOCTYPE html>
     <html lang="en" class="dark">
@@ -180,6 +180,49 @@ export function renderLoginPage(data: LoginPageData): string {
           </div>
         </div>
       </div>
+      
+      ${demoLoginActive ? `
+      <script>
+        // Demo Login Prefill Script
+        (function() {
+          'use strict';
+          
+          function prefillLoginForm() {
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            
+            if (emailInput && passwordInput) {
+              emailInput.value = 'admin@sonicjs.com';
+              passwordInput.value = 'admin123';
+              
+              // Add visual indication that form is prefilled
+              const form = emailInput.closest('form');
+              if (form) {
+                const notice = document.createElement('div');
+                notice.className = 'mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-800 text-sm backdrop-blur-sm bg-blue-500/10 border-blue-400/30';
+                notice.innerHTML = '🎯 <strong>Demo Mode:</strong> Login form prefilled with demo credentials';
+                form.insertBefore(notice, form.firstChild);
+              }
+            }
+          }
+          
+          // Prefill on page load
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', prefillLoginForm);
+          } else {
+            prefillLoginForm();
+          }
+          
+          // Also handle HTMX page changes (for SPA-like navigation)
+          document.addEventListener('htmx:afterSwap', function(event) {
+            if (event.detail.target.id === 'main-content' || 
+                document.getElementById('email')) {
+              setTimeout(prefillLoginForm, 100);
+            }
+          });
+        })();
+      </script>
+      ` : ''}
     </body>
     </html>
   `

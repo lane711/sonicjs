@@ -36,7 +36,7 @@ adminPluginRoutes.get('/', async (c) => {
     const pluginService = new PluginService(db)
     
     // Get all plugins with error handling
-    let plugins = []
+    let plugins: any[] = []
     let stats = { total: 0, active: 0, inactive: 0, errors: 0 }
     
     try {
@@ -169,11 +169,10 @@ adminPluginRoutes.post('/install', async (c) => {
     
     const body = await c.req.json()
     
-    // For now, we'll handle the FAQ plugin installation
+    const pluginService = new PluginService(db)
+    
+    // Handle FAQ plugin installation
     if (body.name === 'faq-plugin') {
-      const pluginService = new PluginService(db)
-      
-      // Install the FAQ plugin
       const faqPlugin = await pluginService.installPlugin({
         id: 'third-party-faq',
         name: 'faq-plugin',
@@ -193,6 +192,29 @@ adminPluginRoutes.post('/install', async (c) => {
       })
       
       return c.json({ success: true, plugin: faqPlugin })
+    }
+    
+    // Handle Demo Login plugin installation
+    if (body.name === 'demo-login-plugin') {
+      const demoPlugin = await pluginService.installPlugin({
+        id: 'demo-login-prefill',
+        name: 'demo-login-plugin',
+        display_name: 'Demo Login Prefill',
+        description: 'Prefills login form with demo credentials (admin@sonicjs.com/admin123) for easy site demonstration',
+        version: '1.0.0',
+        author: 'SonicJS',
+        category: 'demo',
+        icon: '🎯',
+        permissions: [],
+        dependencies: [],
+        settings: {
+          enableNotice: true,
+          demoEmail: 'admin@sonicjs.com',
+          demoPassword: 'admin123'
+        }
+      })
+      
+      return c.json({ success: true, plugin: demoPlugin })
     }
     
     return c.json({ error: 'Plugin not found in registry' }, 404)

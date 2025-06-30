@@ -26,7 +26,7 @@ type Variables = {
 export const authRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
 // Login page (HTML form)
-authRoutes.get('/login', (c) => {
+authRoutes.get('/login', async (c) => {
   const error = c.req.query('error')
   const message = c.req.query('message')
   
@@ -35,7 +35,19 @@ authRoutes.get('/login', (c) => {
     message: message || undefined
   }
   
-  return c.html(renderLoginPage(pageData))
+  // Check if demo login plugin is active
+  const db = c.env.DB
+  let demoLoginActive = false
+  try {
+    const plugin = await db.prepare('SELECT * FROM plugins WHERE id = ? AND status = ?')
+      .bind('demo-login-prefill', 'active')
+      .first()
+    demoLoginActive = !!plugin
+  } catch (error) {
+    // Ignore database errors - plugin system might not be initialized
+  }
+  
+  return c.html(renderLoginPage(pageData, demoLoginActive))
 })
 
 // Registration page (HTML form)
