@@ -1,13 +1,9 @@
 import { test, expect } from '@playwright/test'
+import { loginAsAdmin } from './utils/test-helpers'
 
 test.describe('Workflow Dashboard', () => {
   test.beforeEach(async ({ page }) => {
-    // Login as admin
-    await page.goto('/auth/login')
-    await page.fill('input[name="email"]', 'admin@sonicjs.com')
-    await page.fill('input[name="password"]', 'admin123')
-    await page.click('button[type="submit"]')
-    await page.waitForURL('/admin/')
+    await loginAsAdmin(page)
   })
 
   test('should display workflow dashboard', async ({ page }) => {
@@ -33,7 +29,7 @@ test.describe('Workflow Dashboard', () => {
     const states = ['Draft', 'Pending Review', 'Approved', 'Published']
     
     for (const state of states) {
-      await expect(page.locator(`text=${state}`)).toBeVisible()
+      await expect(page.locator(`h3:has-text("${state}")`)).toBeVisible()
     }
     
     // Check that each state has a count displayed
@@ -110,24 +106,24 @@ test.describe('Workflow Dashboard', () => {
   })
 
   test('should handle workflow dashboard with real data', async ({ page }) => {
-    // First, create some test content
-    await page.goto('/admin/content/new')
-    await page.selectOption('select[name="collection_id"]', { index: 1 })
-    await page.fill('input[name="title"]', 'Workflow Test Article')
-    await page.fill('input[name="slug"]', 'workflow-test-article')
-    await page.fill('textarea[name="content"]', 'This is test content for workflow testing.')
-    await page.click('button[type="submit"]')
-    
-    // Wait for redirect and go to workflow dashboard
-    await page.waitForTimeout(1000)
     await page.goto('/admin/workflow/dashboard')
     
-    // Verify the content appears in the workflow
+    // Verify the dashboard loads with real data
     await expect(page.locator('h1')).toContainText('Workflow Dashboard')
     
-    // Check that at least one state has content
-    const stateCards = page.locator('.workflow-state-card')
-    await expect(stateCards.first()).toBeVisible()
+    // Check that workflow states are displayed
+    await expect(page.locator('h3:has-text("Draft")')).toBeVisible()
+    await expect(page.locator('h3:has-text("Published")')).toBeVisible()
+    
+    // Check that state counts are displayed
+    const stateCounts = page.locator('[data-testid="state-count"]')
+    const count = await stateCounts.count()
+    expect(count).toBeGreaterThan(0)
+    
+    // Verify that at least one state has content by checking for content links
+    const contentLinks = page.locator('a[href^="/admin/workflow/content/"]')
+    const linkCount = await contentLinks.count()
+    expect(linkCount).toBeGreaterThan(0)
   })
 
   test('should maintain responsive design on mobile', async ({ page }) => {

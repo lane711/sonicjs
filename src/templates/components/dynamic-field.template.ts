@@ -30,6 +30,52 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
   
   switch (field.field_type) {
     case 'text':
+      let patternHelp = ''
+      let autoSlugScript = ''
+      
+      if (opts.pattern) {
+        if (opts.pattern === '^[a-z0-9-]+$') {
+          patternHelp = '<p class="mt-1 text-xs text-gray-400">Only lowercase letters, numbers, and hyphens allowed</p>'
+          
+          // Add auto-slug generation for slug fields
+          if (fieldName === 'slug') {
+            patternHelp += '<button type="button" class="mt-1 text-xs text-blue-400 hover:text-blue-300" onclick="generateSlugFromTitle(\'${fieldId}\')">Generate from title</button>'
+            autoSlugScript = `
+              <script>
+                function generateSlugFromTitle(slugFieldId) {
+                  const titleField = document.querySelector('input[name="title"]');
+                  const slugField = document.getElementById(slugFieldId);
+                  if (titleField && slugField) {
+                    const slug = titleField.value
+                      .toLowerCase()
+                      .replace(/[^a-z0-9\\s-]/g, '')
+                      .replace(/\\s+/g, '-')
+                      .replace(/-+/g, '-')
+                      .replace(/^-|-$/g, '');
+                    slugField.value = slug;
+                  }
+                }
+                
+                // Auto-generate slug when title changes
+                document.addEventListener('DOMContentLoaded', function() {
+                  const titleField = document.querySelector('input[name="title"]');
+                  const slugField = document.getElementById('${fieldId}');
+                  if (titleField && slugField && !slugField.value) {
+                    titleField.addEventListener('input', function() {
+                      if (!slugField.value) {
+                        generateSlugFromTitle('${fieldId}');
+                      }
+                    });
+                  }
+                });
+              </script>
+            `
+          }
+        } else {
+          patternHelp = '<p class="mt-1 text-xs text-gray-400">Must match required format</p>'
+        }
+      }
+      
       fieldHTML = `
         <input 
           type="text" 
@@ -43,6 +89,8 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
           ${required}
           ${disabled ? 'disabled' : ''}
         >
+        ${patternHelp}
+        ${autoSlugScript}
       `
       break
       

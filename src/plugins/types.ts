@@ -6,6 +6,7 @@
 
 import { Hono, Context, Next, MiddlewareHandler } from 'hono'
 import { z } from 'zod'
+import type { D1Database, KVNamespace, R2Bucket } from '@cloudflare/workers-types'
 
 // Core plugin definition
 export interface Plugin {

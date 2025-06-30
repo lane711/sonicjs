@@ -1,30 +1,26 @@
 import { test, expect } from '@playwright/test'
+import { loginAsAdmin } from './utils/test-helpers'
 
 test.describe('Workflow Transitions', () => {
   let contentId: string
 
   test.beforeEach(async ({ page }) => {
-    // Login as admin
-    await page.goto('/auth/login')
-    await page.fill('input[name="email"]', 'admin@sonicjs.com')
-    await page.fill('input[name="password"]', 'admin123')
-    await page.click('button[type="submit"]')
-    await page.waitForURL('/admin/')
+    await loginAsAdmin(page)
 
-    // Create test content for workflow testing
-    await page.goto('/admin/content/new')
-    await page.selectOption('select[name="collection_id"]', { index: 1 })
-    await page.fill('input[name="title"]', 'Workflow Transition Test')
-    await page.fill('input[name="slug"]', 'workflow-transition-test')
-    await page.fill('textarea[name="content"]', 'Content for testing workflow transitions.')
-    await page.click('button[type="submit"]')
+    // Use existing content from the workflow dashboard
+    await page.goto('/admin/workflow/dashboard')
     
-    // Extract content ID from URL after creation
-    await page.waitForTimeout(1000)
-    const currentUrl = page.url()
-    const match = currentUrl.match(/\/admin\/content\/([^\/]+)/)
-    if (match) {
-      contentId = match[1]
+    // Find an existing content link to use for testing
+    const contentLinks = page.locator('a[href^="/admin/workflow/content/"]')
+    const firstContentLink = contentLinks.first()
+    
+    // Extract content ID from the first available content link
+    const href = await firstContentLink.getAttribute('href')
+    if (href) {
+      const match = href.match(/\/admin\/workflow\/content\/([^\/]+)/)
+      if (match) {
+        contentId = match[1]
+      }
     }
   })
 

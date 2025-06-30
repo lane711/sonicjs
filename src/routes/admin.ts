@@ -8,6 +8,7 @@ import { renderSettingsPage, SettingsPageData } from '../templates/pages/admin-s
 import { renderAPIReferencePage, APIReferencePageData, APIEndpoint } from '../templates/pages/admin-api-reference.template'
 import { userRoutes } from './admin-users'
 import workflowRoutes from './admin-workflow'
+import { adminPluginRoutes } from './admin-plugins'
 
 type Bindings = {
   DB: D1Database
@@ -694,29 +695,7 @@ adminRoutes.get('/users/export', async (c) => {
 })
 
 // Plugins management
-adminRoutes.get('/plugins', (c) => {
-  const user = c.get('user')
-  const plugins = generateMockPlugins()
-  
-  const stats = {
-    total: plugins.length,
-    active: plugins.filter(p => p.status === 'active').length,
-    inactive: plugins.filter(p => p.status === 'inactive').length,
-    errors: plugins.filter(p => p.status === 'error').length
-  }
-  
-  const pageData: PluginsListPageData = {
-    plugins,
-    stats,
-    user: user ? {
-      name: user.email,
-      email: user.email,
-      role: user.role
-    } : undefined
-  }
-  
-  return c.html(renderPluginsListPage(pageData))
-})
+adminRoutes.route('/plugins', adminPluginRoutes)
 
 // Settings page
 adminRoutes.get('/settings', (c) => {

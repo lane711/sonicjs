@@ -1,13 +1,9 @@
 import { test, expect } from '@playwright/test'
+import { loginAsAdmin } from './utils/test-helpers'
 
 test.describe('Notification System', () => {
   test.beforeEach(async ({ page }) => {
-    // Login as admin
-    await page.goto('/auth/login')
-    await page.fill('input[name="email"]', 'admin@sonicjs.com')
-    await page.fill('input[name="password"]', 'admin123')
-    await page.click('button[type="submit"]')
-    await page.waitForURL('/admin/')
+    await loginAsAdmin(page)
   })
 
   test('should display notification icon in navigation', async ({ page }) => {

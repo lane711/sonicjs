@@ -31,6 +31,115 @@ type Variables = {
 
 const workflowRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
+// Debug endpoint to check workflow functionality
+workflowRoutes.get('/debug', async (c) => {
+  const user = c.get('user')
+  if (!user || user.role !== 'admin') {
+    return c.json({ error: 'Unauthorized' }, 403)
+  }
+
+  const workflowEngine = new WorkflowEngine(c.env.DB)
+  const debug: any = {
+    timestamp: new Date().toISOString(),
+    tests: {}
+  }
+
+  try {
+    // Test 1: Check workflow states
+    debug.tests.workflowStates = {
+      status: 'testing',
+      error: null,
+      result: null
+    }
+    
+    const states = await workflowEngine.getWorkflowStates()
+    debug.tests.workflowStates.status = 'success'
+    debug.tests.workflowStates.result = {
+      count: states.length,
+      states: states.map(s => ({ id: s.id, name: s.name, color: s.color }))
+    }
+  } catch (error: any) {
+    debug.tests.workflowStates.status = 'error'
+    debug.tests.workflowStates.error = error.message
+  }
+
+  try {
+    // Test 2: Check database tables exist
+    debug.tests.tableCheck = {
+      status: 'testing',
+      error: null,
+      result: null
+    }
+
+    const tableResults: any = {}
+    const tables = ['workflow_states', 'workflows', 'content_workflow_status', 'workflow_history']
+    
+    for (const table of tables) {
+      const result = await c.env.DB.prepare(`
+        SELECT COUNT(*) as count FROM ${table}
+      `).first()
+      tableResults[table] = result?.count || 0
+    }
+    
+    debug.tests.tableCheck.status = 'success'
+    debug.tests.tableCheck.result = tableResults
+  } catch (error: any) {
+    debug.tests.tableCheck.status = 'error'
+    debug.tests.tableCheck.error = error.message
+  }
+
+  try {
+    // Test 3: Check content by state for each state
+    debug.tests.contentByState = {
+      status: 'testing',
+      error: null,
+      result: null
+    }
+
+    const states = await workflowEngine.getWorkflowStates()
+    const stateResults: any = {}
+    
+    for (const state of states) {
+      const content = await workflowEngine.getContentByState(state.id, 5)
+      stateResults[state.name] = {
+        id: state.id,
+        count: content.length,
+        sampleContent: content.map((c: any) => ({ id: c.id, title: c.title }))
+      }
+    }
+    
+    debug.tests.contentByState.status = 'success'
+    debug.tests.contentByState.result = stateResults
+  } catch (error: any) {
+    debug.tests.contentByState.status = 'error'
+    debug.tests.contentByState.error = error.message
+  }
+
+  try {
+    // Test 4: Raw database query test
+    debug.tests.rawQuery = {
+      status: 'testing',
+      error: null,
+      result: null
+    }
+
+    const rawStates = await c.env.DB.prepare(`
+      SELECT * FROM workflow_states ORDER BY is_initial DESC, name ASC
+    `).all()
+    
+    debug.tests.rawQuery.status = 'success'
+    debug.tests.rawQuery.result = {
+      count: rawStates.results.length,
+      states: rawStates.results
+    }
+  } catch (error: any) {
+    debug.tests.rawQuery.status = 'error'
+    debug.tests.rawQuery.error = error.message
+  }
+
+  return c.json(debug)
+})
+
 // Workflow Dashboard
 workflowRoutes.get('/dashboard', async (c) => {
   const user = c.get('user')
@@ -43,31 +152,75 @@ workflowRoutes.get('/dashboard', async (c) => {
     return c.text('Forbidden', 403)
   }
 
-  const workflowEngine = new WorkflowEngine(c.env.DB)
-  
-  // Get workflow states and counts
-  const states = await workflowEngine.getWorkflowStates()
-  const stateData = []
-  
-  for (const state of states) {
-    const content = await workflowEngine.getContentByState(state.id, 10)
-    stateData.push({
-      ...state,
-      count: content.length,
-      content: content.slice(0, 5) // Show first 5 items
+  try {
+    const workflowEngine = new WorkflowEngine(c.env.DB)
+    
+    // Get workflow states and counts with error handling
+    console.log('Fetching workflow states...')
+    const states = await workflowEngine.getWorkflowStates()
+    console.log(`Found ${states.length} workflow states:`, states.map(s => s.name))
+    
+    const stateData = []
+    
+    for (const state of states) {
+      console.log(`Processing state: ${state.name} (${state.id})`)
+      try {
+        const content = await workflowEngine.getContentByState(state.id, 10)
+        console.log(`Found ${content.length} content items for state ${state.name}`)
+        
+        stateData.push({
+          ...state,
+          count: content.length,
+          content: content.slice(0, 5) // Show first 5 items
+        })
+      } catch (stateError) {
+        console.error(`Error getting content for state ${state.name}:`, stateError)
+        // Add state with zero count if there's an error
+        stateData.push({
+          ...state,
+          count: 0,
+          content: []
+        })
+      }
+    }
+
+    // Get assigned content with error handling
+    console.log('Fetching assigned content...')
+    let assignedContent = []
+    try {
+      assignedContent = await workflowEngine.getAssignedContent(user.userId)
+      console.log(`Found ${assignedContent.length} assigned content items`)
+    } catch (assignedError) {
+      console.error('Error getting assigned content:', assignedError)
+    }
+
+    const data = {
+      user,
+      states: stateData,
+      assignedContent
+    }
+
+    console.log('Dashboard data prepared:', {
+      stateCount: data.states.length,
+      assignedCount: data.assignedContent.length
     })
+
+    return c.html(renderWorkflowDashboard(data))
+  } catch (error) {
+    console.error('Critical error in workflow dashboard:', error)
+    
+    // Return error page or basic HTML with error info
+    return c.html(`
+      <div style="padding: 20px; font-family: Arial, sans-serif;">
+        <h1>Workflow Dashboard Error</h1>
+        <p><strong>Error:</strong> ${(error as Error).message}</p>
+        <p><strong>Stack:</strong> <pre>${(error as Error).stack}</pre></p>
+        <hr>
+        <p><a href="/admin/workflow/debug">Check Debug Endpoint</a></p>
+        <p><a href="/admin">Return to Admin</a></p>
+      </div>
+    `)
   }
-
-  // Get assigned content
-  const assignedContent = await workflowEngine.getAssignedContent(user.userId)
-
-  const data = {
-    user,
-    states: stateData,
-    assignedContent
-  }
-
-  return c.html(renderWorkflowDashboard(data))
 })
 
 // Get content by workflow state

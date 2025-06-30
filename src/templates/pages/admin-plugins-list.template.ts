@@ -43,12 +43,42 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
           <p class="mt-2 text-sm text-gray-300">Manage and extend functionality with plugins</p>
         </div>
         <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <button class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/20 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/30 transition-all">
-            <svg class="-ml-0.5 mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
-            </svg>
-            Install Plugin
-          </button>
+          <div class="relative inline-block text-left">
+            <button onclick="toggleDropdown()" class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/20 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/30 transition-all">
+              <svg class="-ml-0.5 mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+              </svg>
+              Install Plugin
+              <svg class="-mr-1 ml-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
+            <div id="plugin-dropdown" class="hidden absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-gray-900 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <div class="py-1">
+                <button onclick="installPlugin('faq-plugin')" class="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white">
+                  <div class="flex items-center">
+                    <span class="text-lg mr-2">❓</span>
+                    <div>
+                      <div class="font-medium">FAQ System</div>
+                      <div class="text-xs text-gray-400">Community FAQ management plugin</div>
+                    </div>
+                  </div>
+                </button>
+                <div class="border-t border-gray-800 my-1"></div>
+                <button onclick="showNotification('Plugin marketplace coming soon!', 'info')" class="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white">
+                  <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <div>
+                      <div class="font-medium">Browse Marketplace</div>
+                      <div class="text-xs text-gray-400">Discover more plugins</div>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -99,40 +129,126 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
     </div>
 
     <script>
-      function togglePlugin(pluginId, action) {
+      async function togglePlugin(pluginId, action) {
         const button = event.target;
         const originalText = button.textContent;
         button.disabled = true;
         button.textContent = action === 'activate' ? 'Activating...' : 'Deactivating...';
         
-        // Simulate API call
-        setTimeout(() => {
-          const card = button.closest('.plugin-card');
-          const statusBadge = card.querySelector('.status-badge');
+        try {
+          const response = await fetch(\`/admin/plugins/\${pluginId}/\${action}\`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
           
-          if (action === 'activate') {
-            statusBadge.className = 'status-badge inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-900/50 text-green-300 border border-green-600/30';
-            statusBadge.innerHTML = '<div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>Active';
-            button.textContent = 'Deactivate';
-            button.onclick = () => togglePlugin(pluginId, 'deactivate');
-            button.className = 'bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors';
+          const result = await response.json();
+          
+          if (result.success) {
+            // Update UI
+            const card = button.closest('.plugin-card');
+            const statusBadge = card.querySelector('.status-badge');
+            
+            if (action === 'activate') {
+              statusBadge.className = 'status-badge inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-900/50 text-green-300 border border-green-600/30';
+              statusBadge.innerHTML = '<div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>Active';
+              button.textContent = 'Deactivate';
+              button.onclick = () => togglePlugin(pluginId, 'deactivate');
+              button.className = 'bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors';
+            } else {
+              statusBadge.className = 'status-badge inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-800/50 text-gray-400 border border-gray-600/30';
+              statusBadge.innerHTML = '<div class="w-2 h-2 bg-gray-500 rounded-full mr-2"></div>Inactive';
+              button.textContent = 'Activate';
+              button.onclick = () => togglePlugin(pluginId, 'activate');
+              button.className = 'bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors';
+            }
+            
+            showNotification(\`Plugin \${action}d successfully\`, 'success');
           } else {
-            statusBadge.className = 'status-badge inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-800/50 text-gray-400 border border-gray-600/30';
-            statusBadge.innerHTML = '<div class="w-2 h-2 bg-gray-500 rounded-full mr-2"></div>Inactive';
-            button.textContent = 'Activate';
-            button.onclick = () => togglePlugin(pluginId, 'activate');
-            button.className = 'bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors';
+            throw new Error(result.error || \`Failed to \${action} plugin\`);
           }
-          
+        } catch (error) {
+          showNotification(error.message, 'error');
+          button.textContent = originalText;
+        } finally {
           button.disabled = false;
-          showNotification(\`Plugin \${action}d successfully\`, 'success');
-        }, 1000);
+        }
+      }
+      
+      async function installPlugin(pluginName) {
+        const button = event.target;
+        button.disabled = true;
+        button.textContent = 'Installing...';
+        
+        try {
+          const response = await fetch('/admin/plugins/install', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name: pluginName })
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            showNotification('Plugin installed successfully!', 'success');
+            setTimeout(() => location.reload(), 1500);
+          } else {
+            throw new Error(result.error || 'Failed to install plugin');
+          }
+        } catch (error) {
+          showNotification(error.message, 'error');
+          button.disabled = false;
+          button.textContent = 'Install';
+        }
+      }
+      
+      async function uninstallPlugin(pluginId) {
+        if (!confirm('Are you sure you want to uninstall this plugin? This action cannot be undone.')) {
+          return;
+        }
+        
+        const button = event.target;
+        button.disabled = true;
+        
+        try {
+          const response = await fetch(\`/admin/plugins/\${pluginId}/uninstall\`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            showNotification('Plugin uninstalled successfully!', 'success');
+            setTimeout(() => location.reload(), 1500);
+          } else {
+            throw new Error(result.error || 'Failed to uninstall plugin');
+          }
+        } catch (error) {
+          showNotification(error.message, 'error');
+          button.disabled = false;
+        }
+      }
+      
+      function openPluginSettings(pluginId) {
+        // TODO: Implement plugin settings modal
+        showNotification('Plugin settings coming soon!', 'info');
+      }
+      
+      function showPluginDetails(pluginId) {
+        // TODO: Implement plugin details modal
+        showNotification('Plugin details coming soon!', 'info');
       }
       
       function showNotification(message, type) {
-        // Simple notification implementation
         const notification = document.createElement('div');
-        notification.className = \`fixed top-4 right-4 px-4 py-2 rounded-lg text-white z-50 \${type === 'success' ? 'bg-green-600' : 'bg-red-600'}\`;
+        const bgColor = type === 'success' ? 'bg-green-600' : type === 'error' ? 'bg-red-600' : 'bg-blue-600';
+        notification.className = \`fixed top-4 right-4 px-4 py-2 rounded-lg text-white z-50 \${bgColor}\`;
         notification.textContent = message;
         document.body.appendChild(notification);
         
@@ -140,6 +256,21 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
           notification.remove();
         }, 3000);
       }
+      
+      function toggleDropdown() {
+        const dropdown = document.getElementById('plugin-dropdown');
+        dropdown.classList.toggle('hidden');
+      }
+      
+      // Close dropdown when clicking outside
+      document.addEventListener('click', (event) => {
+        const dropdown = document.getElementById('plugin-dropdown');
+        const button = event.target.closest('button[onclick="toggleDropdown()"]');
+        
+        if (!button && !dropdown.contains(event.target)) {
+          dropdown.classList.add('hidden');
+        }
+      });
     </script>
   `
 
@@ -294,20 +425,20 @@ function renderPluginCard(plugin: Plugin): string {
       <div class="flex items-center justify-between">
         <div class="flex gap-2">
           ${!plugin.isCore ? actionButton : ''}
-          <button class="bg-white/10 hover:bg-white/20 text-gray-300 px-3 py-1.5 rounded text-sm font-medium transition-colors">
+          <button onclick="openPluginSettings('${plugin.id}')" class="bg-white/10 hover:bg-white/20 text-gray-300 px-3 py-1.5 rounded text-sm font-medium transition-colors">
             Settings
           </button>
         </div>
         
         <div class="flex items-center gap-2">
-          <button class="text-gray-400 hover:text-gray-300 p-1.5 rounded hover:bg-white/10 transition-colors" title="Plugin Details">
+          <button onclick="showPluginDetails('${plugin.id}')" class="text-gray-400 hover:text-gray-300 p-1.5 rounded hover:bg-white/10 transition-colors" title="Plugin Details">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
           </button>
           
           ${!plugin.isCore ? `
-          <button class="text-gray-400 hover:text-red-400 p-1.5 rounded hover:bg-white/10 transition-colors" title="Uninstall Plugin">
+          <button onclick="uninstallPlugin('${plugin.id}')" class="text-gray-400 hover:text-red-400 p-1.5 rounded hover:bg-white/10 transition-colors" title="Uninstall Plugin">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
             </svg>

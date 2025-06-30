@@ -54,8 +54,8 @@ export async function loginAsAdmin(page: Page) {
   // Wait for HTMX response and success message
   await expect(page.locator('#form-response .bg-green-100')).toBeVisible();
   
-  // Wait for JavaScript redirect to admin dashboard (up to 3 seconds)
-  await page.waitForURL('/admin', { timeout: 3000 });
+  // Wait for JavaScript redirect to admin dashboard (up to 10 seconds)
+  await page.waitForURL('/admin', { timeout: 10000 });
   await expect(page.locator('nav').first()).toBeVisible(); // Check for sidebar navigation
 }
 

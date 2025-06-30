@@ -131,7 +131,9 @@
       "Bash(timeout 10s npm run dev)",
       "Bash(timeout 180s npm run test:e2e)",
       "Bash(timeout 30s npm run test -- src/tests/utils.template-renderer.test.ts)",
-      "Bash(timeout 30 npx vitest --run --coverage --reporter=verbose 2 > /dev/null)"
+      "Bash(timeout 30 npx vitest --run --coverage --reporter=verbose 2 > /dev/null)",
+      "Bash(wrangler d1 migrations list:*)",
+      "Bash(wrangler d1 migrations apply:*)"
     ],
     "deny": []
   },

@@ -1,5 +1,7 @@
--- FAQ Plugin Migration
+-- FAQ Plugin Migration (DEPRECATED - Now managed by third-party plugin)
 -- Creates FAQ table for the FAQ plugin
+-- NOTE: This migration is kept for historical purposes. 
+-- The FAQ functionality is now provided by the faq-plugin third-party plugin.
 
 CREATE TABLE IF NOT EXISTS faqs (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

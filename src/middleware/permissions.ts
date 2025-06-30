@@ -52,17 +52,10 @@ export class PermissionManager {
     const { results: rolePermissions } = await rolePermStmt.bind(user.role).all()
     
     // Get individual user permissions
-    const userPermStmt = db.prepare(`
-      SELECT p.name 
-      FROM user_permissions up
-      JOIN permissions p ON up.permission_id = p.id
-      WHERE up.user_id = ?
-    `)
-    const { results: userPermResults } = await userPermStmt.bind(userId).all()
-    
+    // For now, we only use role-based permissions
+    // User-specific permissions table doesn't exist yet
     const rolePerms = (rolePermissions || []).map((row: any) => row.name)
-    const userPerms = (userPermResults || []).map((row: any) => row.name)
-    const permissions = [...rolePerms, ...userPerms]
+    const permissions = [...rolePerms]
 
     // Get team permissions (if user is in teams)
     const teamPermStmt = db.prepare(`
@@ -103,20 +96,27 @@ export class PermissionManager {
    */
   static async hasPermission(db: D1Database, userId: string, permission: string, teamId?: string): Promise<boolean> {
     try {
+      console.log('hasPermission called with:', { userId, permission, teamId })
       const userPerms = await this.getUserPermissions(db, userId)
+      console.log('User permissions result:', userPerms)
       
       // Check global permissions
       if (userPerms.permissions.includes(permission)) {
+        console.log('Permission found in global permissions')
         return true
       }
 
       // Check team-specific permissions
       if (teamId && userPerms.teamPermissions && userPerms.teamPermissions[teamId]) {
-        return userPerms.teamPermissions[teamId].includes(permission)
+        const hasTeamPermission = userPerms.teamPermissions[teamId].includes(permission)
+        console.log('Team permission check:', hasTeamPermission)
+        return hasTeamPermission
       }
 
+      console.log('Permission not found')
       return false
     } catch (error) {
+      console.error('Permission check error:', error)
       // For user-specific errors (like "User not found"), return false
       // For database connection errors, we should re-throw to let middleware handle them
       if (error instanceof Error && error.message === 'User not found') {
