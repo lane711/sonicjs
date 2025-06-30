@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import type { D1Database, KVNamespace } from '@cloudflare/workers-types'
 import { renderPluginsListPage, PluginsListPageData, Plugin } from '../templates/pages/admin-plugins-list.template'
+import { renderPluginSettingsPage, PluginSettingsPageData } from '../templates/pages/admin-plugin-settings.template'
 import { PluginService } from '../services/plugin-service'
 import { PermissionManager } from '../middleware/permissions'
 
@@ -83,30 +84,71 @@ adminPluginRoutes.get('/', async (c) => {
   }
 })
 
-// Get plugin details
+// Get plugin settings page
 adminPluginRoutes.get('/:id', async (c) => {
   try {
     const user = c.get('user')
     const db = c.env.DB
     const pluginId = c.req.param('id')
     
+    // Check authorization
+    if (user?.role !== 'admin') {
+      return c.redirect('/admin/plugins')
+    }
+    
     const pluginService = new PluginService(db)
     const plugin = await pluginService.getPlugin(pluginId)
     
     if (!plugin) {
-      return c.json({ error: 'Plugin not found' }, 404)
+      return c.text('Plugin not found', 404)
     }
     
     // Get activity log
     const activity = await pluginService.getPluginActivity(pluginId, 20)
     
-    return c.json({
-      plugin,
-      activity
-    })
+    // Map plugin data to template format
+    const templatePlugin = {
+      id: plugin.id,
+      name: plugin.name,
+      displayName: plugin.display_name,
+      description: plugin.description,
+      version: plugin.version,
+      author: plugin.author,
+      status: plugin.status,
+      category: plugin.category,
+      icon: plugin.icon,
+      downloadCount: plugin.download_count,
+      rating: plugin.rating,
+      lastUpdated: formatLastUpdated(plugin.last_updated),
+      dependencies: plugin.dependencies,
+      permissions: plugin.permissions,
+      isCore: plugin.is_core,
+      settings: plugin.settings
+    }
+    
+    // Map activity data
+    const templateActivity = (activity || []).map(item => ({
+      id: item.id,
+      action: item.action,
+      message: item.message,
+      timestamp: item.timestamp,
+      user: item.user_email
+    }))
+    
+    const pageData: PluginSettingsPageData = {
+      plugin: templatePlugin,
+      activity: templateActivity,
+      user: {
+        name: user?.email || 'User',
+        email: user?.email || '',
+        role: user?.role || 'user'
+      }
+    }
+    
+    return c.html(renderPluginSettingsPage(pageData))
   } catch (error) {
-    console.error('Error getting plugin details:', error)
-    return c.json({ error: 'Internal server error' }, 500)
+    console.error('Error getting plugin settings page:', error)
+    return c.text('Internal server error', 500)
   }
 })
 

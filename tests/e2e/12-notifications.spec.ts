@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { loginAsAdmin } from './utils/test-helpers'
+import { loginAsAdmin, createTestWorkflowContent } from './utils/test-helpers'
 
 test.describe('Notification System', () => {
   test.beforeEach(async ({ page }) => {

@@ -1,0 +1,480 @@
+import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout-v2.template'
+
+export interface PluginSettings {
+  [key: string]: any
+}
+
+export interface PluginActivity {
+  id: string
+  action: string
+  message: string
+  timestamp: number
+  user?: string
+}
+
+export interface PluginSettingsPageData {
+  plugin: {
+    id: string
+    name: string
+    displayName: string
+    description: string
+    version: string
+    author: string
+    status: 'active' | 'inactive' | 'error'
+    category: string
+    icon: string
+    downloadCount?: number
+    rating?: number
+    lastUpdated: string
+    dependencies?: string[]
+    permissions?: string[]
+    isCore?: boolean
+    settings?: PluginSettings
+  }
+  activity?: PluginActivity[]
+  user?: {
+    name: string
+    email: string
+    role: string
+  }
+}
+
+export function renderPluginSettingsPage(data: PluginSettingsPageData): string {
+  const { plugin, activity = [], user } = data
+  
+  const pageContent = `
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
+      <!-- Header with breadcrumb -->
+      <div class="flex items-center mb-6">
+        <nav class="flex" aria-label="Breadcrumb">
+          <ol class="flex items-center space-x-2">
+            <li>
+              <a href="/admin/plugins" class="text-gray-400 hover:text-white transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                </svg>
+                Plugins
+              </a>
+            </li>
+            <li>
+              <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+              </svg>
+            </li>
+            <li>
+              <span class="text-gray-300">${plugin.displayName}</span>
+            </li>
+          </ol>
+        </nav>
+      </div>
+
+      <!-- Plugin Header -->
+      <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6 mb-6">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white text-2xl font-bold">
+              ${plugin.icon || plugin.displayName.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <h1 class="text-2xl font-semibold text-white mb-1">${plugin.displayName}</h1>
+              <p class="text-gray-300 mb-2">${plugin.description}</p>
+              <div class="flex items-center gap-4 text-sm text-gray-400">
+                <span>v${plugin.version}</span>
+                <span>by ${plugin.author}</span>
+                <span>${plugin.category}</span>
+                ${plugin.downloadCount ? `<span>${plugin.downloadCount.toLocaleString()} downloads</span>` : ''}
+                ${plugin.rating ? `<span>★ ${plugin.rating}</span>` : ''}
+              </div>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-3">
+            ${renderStatusBadge(plugin.status)}
+            ${renderToggleButton(plugin)}
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="mb-6">
+        <nav class="flex space-x-8" aria-label="Tabs">
+          <button onclick="showTab('settings')" id="settings-tab" class="tab-button active border-b-2 border-blue-400 py-2 px-1 text-sm font-medium text-blue-400">
+            Settings
+          </button>
+          <button onclick="showTab('activity')" id="activity-tab" class="tab-button border-b-2 border-transparent py-2 px-1 text-sm font-medium text-gray-400 hover:text-gray-300">
+            Activity Log
+          </button>
+          <button onclick="showTab('info')" id="info-tab" class="tab-button border-b-2 border-transparent py-2 px-1 text-sm font-medium text-gray-400 hover:text-gray-300">
+            Information
+          </button>
+        </nav>
+      </div>
+
+      <!-- Tab Content -->
+      <div id="tab-content">
+        <!-- Settings Tab -->
+        <div id="settings-content" class="tab-content">
+          ${renderSettingsTab(plugin)}
+        </div>
+
+        <!-- Activity Tab -->
+        <div id="activity-content" class="tab-content hidden">
+          ${renderActivityTab(activity)}
+        </div>
+
+        <!-- Information Tab -->
+        <div id="info-content" class="tab-content hidden">
+          ${renderInformationTab(plugin)}
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function showTab(tabName) {
+        // Hide all tab contents
+        document.querySelectorAll('.tab-content').forEach(content => {
+          content.classList.add('hidden');
+        });
+        
+        // Remove active class from all tabs
+        document.querySelectorAll('.tab-button').forEach(tab => {
+          tab.classList.remove('active', 'border-blue-400', 'text-blue-400');
+          tab.classList.add('border-transparent', 'text-gray-400');
+        });
+        
+        // Show selected tab content
+        document.getElementById(tabName + '-content').classList.remove('hidden');
+        
+        // Add active class to selected tab
+        const activeTab = document.getElementById(tabName + '-tab');
+        activeTab.classList.add('active', 'border-blue-400', 'text-blue-400');
+        activeTab.classList.remove('border-transparent', 'text-gray-400');
+      }
+
+      async function togglePlugin(pluginId, action) {
+        const button = event.target;
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = action === 'activate' ? 'Activating...' : 'Deactivating...';
+        
+        try {
+          const response = await fetch(\`/admin/plugins/\${pluginId}/\${action}\`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            showNotification(\`Plugin \${action}d successfully\`, 'success');
+            setTimeout(() => location.reload(), 1000);
+          } else {
+            throw new Error(result.error || \`Failed to \${action} plugin\`);
+          }
+        } catch (error) {
+          showNotification(error.message, 'error');
+          button.textContent = originalText;
+          button.disabled = false;
+        }
+      }
+
+      async function saveSettings() {
+        const form = document.getElementById('settings-form');
+        const formData = new FormData(form);
+        const settings = {};
+        
+        for (let [key, value] of formData.entries()) {
+          if (key.startsWith('setting_')) {
+            const settingKey = key.replace('setting_', '');
+            
+            // Handle different input types
+            const input = form.querySelector(\`[name="\${key}"]\`);
+            if (input.type === 'checkbox') {
+              settings[settingKey] = input.checked;
+            } else if (input.type === 'number') {
+              settings[settingKey] = parseInt(value) || 0;
+            } else {
+              settings[settingKey] = value;
+            }
+          }
+        }
+        
+        const saveButton = document.getElementById('save-button');
+        saveButton.disabled = true;
+        saveButton.textContent = 'Saving...';
+        
+        try {
+          const response = await fetch(\`/admin/plugins/${plugin.id}/settings\`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(settings)
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            showNotification('Settings saved successfully', 'success');
+          } else {
+            throw new Error(result.error || 'Failed to save settings');
+          }
+        } catch (error) {
+          showNotification(error.message, 'error');
+        } finally {
+          saveButton.disabled = false;
+          saveButton.textContent = 'Save Settings';
+        }
+      }
+
+      function showNotification(message, type) {
+        const notification = document.createElement('div');
+        const bgColor = type === 'success' ? 'bg-green-600' : type === 'error' ? 'bg-red-600' : 'bg-blue-600';
+        notification.className = \`fixed top-4 right-4 px-4 py-2 rounded-lg text-white z-50 \${bgColor}\`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+          notification.remove();
+        }, 3000);
+      }
+    </script>
+  `
+
+  const layoutData: AdminLayoutData = {
+    title: `${plugin.displayName} Settings`,
+    pageTitle: `${plugin.displayName} Settings`,
+    currentPath: `/admin/plugins/${plugin.id}`,
+    user,
+    content: pageContent
+  }
+
+  return renderAdminLayout(layoutData)
+}
+
+function renderStatusBadge(status: string): string {
+  const statusColors: Record<string, string> = {
+    active: 'bg-green-900/50 text-green-300 border-green-600/30',
+    inactive: 'bg-gray-800/50 text-gray-400 border-gray-600/30',
+    error: 'bg-red-900/50 text-red-300 border-red-600/30'
+  }
+
+  const statusIcons: Record<string, string> = {
+    active: '<div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>',
+    inactive: '<div class="w-2 h-2 bg-gray-500 rounded-full mr-2"></div>',
+    error: '<div class="w-2 h-2 bg-red-400 rounded-full mr-2"></div>'
+  }
+
+  return `
+    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${statusColors[status] || statusColors.inactive} border">
+      ${statusIcons[status] || statusIcons.inactive}${status.charAt(0).toUpperCase() + status.slice(1)}
+    </span>
+  `
+}
+
+function renderToggleButton(plugin: any): string {
+  if (plugin.isCore) {
+    return '<span class="text-sm text-gray-400">Core Plugin</span>'
+  }
+
+  return plugin.status === 'active' 
+    ? `<button onclick="togglePlugin('${plugin.id}', 'deactivate')" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">Deactivate</button>`
+    : `<button onclick="togglePlugin('${plugin.id}', 'activate')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">Activate</button>`
+}
+
+function renderSettingsTab(plugin: any): string {
+  const settings = plugin.settings || {}
+  
+  return `
+    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6">
+      <h2 class="text-xl font-semibold text-white mb-4">Plugin Settings</h2>
+      
+      <form id="settings-form" class="space-y-6">
+        ${Object.keys(settings).length > 0 ? renderSettingsFields(settings) : renderNoSettings()}
+        
+        ${Object.keys(settings).length > 0 ? `
+        <div class="flex items-center justify-end pt-6 border-t border-white/10">
+          <button 
+            type="button" 
+            id="save-button"
+            onclick="saveSettings()" 
+            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+          >
+            Save Settings
+          </button>
+        </div>
+        ` : ''}
+      </form>
+    </div>
+  `
+}
+
+function renderSettingsFields(settings: PluginSettings): string {
+  return Object.entries(settings).map(([key, value]) => {
+    const fieldId = `setting_${key}`
+    const displayName = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())
+    
+    if (typeof value === 'boolean') {
+      return `
+        <div class="flex items-center justify-between">
+          <div>
+            <label for="${fieldId}" class="text-sm font-medium text-gray-300">${displayName}</label>
+            <p class="text-xs text-gray-400">Enable or disable this feature</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" name="${fieldId}" id="${fieldId}" ${value ? 'checked' : ''} class="sr-only peer">
+            <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+          </label>
+        </div>
+      `
+    } else if (typeof value === 'number') {
+      return `
+        <div>
+          <label for="${fieldId}" class="block text-sm font-medium text-gray-300 mb-2">${displayName}</label>
+          <input 
+            type="number" 
+            name="${fieldId}" 
+            id="${fieldId}" 
+            value="${value}"
+            class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors w-full"
+          >
+        </div>
+      `
+    } else {
+      return `
+        <div>
+          <label for="${fieldId}" class="block text-sm font-medium text-gray-300 mb-2">${displayName}</label>
+          <input 
+            type="text" 
+            name="${fieldId}" 
+            id="${fieldId}" 
+            value="${value}"
+            class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors w-full"
+          >
+        </div>
+      `
+    }
+  }).join('')
+}
+
+function renderNoSettings(): string {
+  return `
+    <div class="text-center py-8">
+      <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+      </svg>
+      <h3 class="text-lg font-medium text-gray-300 mb-2">No Settings Available</h3>
+      <p class="text-gray-400">This plugin doesn't have any configurable settings.</p>
+    </div>
+  `
+}
+
+function renderActivityTab(activity: PluginActivity[]): string {
+  return `
+    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6">
+      <h2 class="text-xl font-semibold text-white mb-4">Activity Log</h2>
+      
+      ${activity.length > 0 ? `
+        <div class="space-y-4">
+          ${activity.map(item => `
+            <div class="flex items-start gap-3 p-3 rounded-lg bg-white/5">
+              <div class="w-2 h-2 bg-blue-400 rounded-full mt-2"></div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium text-white">${item.action}</span>
+                  <span class="text-xs text-gray-400">${formatTimestamp(item.timestamp)}</span>
+                </div>
+                <p class="text-sm text-gray-300 mt-1">${item.message}</p>
+                ${item.user ? `<p class="text-xs text-gray-400 mt-1">by ${item.user}</p>` : ''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      ` : `
+        <div class="text-center py-8">
+          <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+          <h3 class="text-lg font-medium text-gray-300 mb-2">No Activity</h3>
+          <p class="text-gray-400">No recent activity for this plugin.</p>
+        </div>
+      `}
+    </div>
+  `
+}
+
+function renderInformationTab(plugin: any): string {
+  return `
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Plugin Details -->
+      <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6">
+        <h2 class="text-xl font-semibold text-white mb-4">Plugin Details</h2>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-gray-400">Name:</span>
+            <span class="text-white">${plugin.displayName}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-400">Version:</span>
+            <span class="text-white">${plugin.version}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-400">Author:</span>
+            <span class="text-white">${plugin.author}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-400">Category:</span>
+            <span class="text-white">${plugin.category}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-400">Status:</span>
+            <span class="text-white">${plugin.status}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-400">Last Updated:</span>
+            <span class="text-white">${plugin.lastUpdated}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dependencies & Permissions -->
+      <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6">
+        <h2 class="text-xl font-semibold text-white mb-4">Dependencies & Permissions</h2>
+        
+        ${plugin.dependencies && plugin.dependencies.length > 0 ? `
+          <div class="mb-6">
+            <h3 class="text-sm font-medium text-gray-300 mb-2">Dependencies:</h3>
+            <div class="space-y-1">
+              ${plugin.dependencies.map((dep: string) => `
+                <div class="inline-block bg-white/10 text-gray-300 text-sm px-2 py-1 rounded mr-2">${dep}</div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        ${plugin.permissions && plugin.permissions.length > 0 ? `
+          <div>
+            <h3 class="text-sm font-medium text-gray-300 mb-2">Permissions:</h3>
+            <div class="space-y-1">
+              ${plugin.permissions.map((perm: string) => `
+                <div class="inline-block bg-white/10 text-gray-300 text-sm px-2 py-1 rounded mr-2">${perm}</div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        ${(!plugin.dependencies || plugin.dependencies.length === 0) && (!plugin.permissions || plugin.permissions.length === 0) ? `
+          <p class="text-gray-400">No dependencies or special permissions required.</p>
+        ` : ''}
+      </div>
+    </div>
+  `
+}
+
+function formatTimestamp(timestamp: number): string {
+  const date = new Date(timestamp * 1000)
+  return date.toLocaleString()
+}

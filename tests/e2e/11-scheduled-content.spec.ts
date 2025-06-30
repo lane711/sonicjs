@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { loginAsAdmin } from './utils/test-helpers'
+import { loginAsAdmin, createTestWorkflowContent } from './utils/test-helpers'
 
 test.describe('Scheduled Content Management', () => {
   test.beforeEach(async ({ page }) => {
@@ -14,7 +14,7 @@ test.describe('Scheduled Content Management', () => {
     await expect(page.locator('h1')).toContainText('Scheduled Content')
     
     // Check breadcrumb navigation
-    await expect(page.locator('a[href="/admin/workflow/dashboard"]')).toBeVisible()
+    await expect(page.locator('a[href="/admin/workflow/dashboard"]').first()).toBeVisible()
     
     // Check action buttons
     await expect(page.locator('button:has-text("Bulk Schedule")')).toBeVisible()

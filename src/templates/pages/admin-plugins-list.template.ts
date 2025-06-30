@@ -236,8 +236,7 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
       }
       
       function openPluginSettings(pluginId) {
-        // TODO: Implement plugin settings modal
-        showNotification('Plugin settings coming soon!', 'info');
+        window.location.href = \`/admin/plugins/\${pluginId}\`;
       }
       
       function showPluginDetails(pluginId) {
