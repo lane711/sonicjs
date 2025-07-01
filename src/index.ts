@@ -19,6 +19,7 @@ import { createWorkflowRoutes } from './plugins/core-plugins/workflow-plugin/rou
 import { userRoutes } from './routes/admin-users'
 import { requireAuth, requireRole, optionalAuth } from './middleware/auth'
 import { requireActivePlugin } from './middleware/plugin-middleware'
+import { bootstrapMiddleware } from './middleware/bootstrap'
 
 // Define the Cloudflare Workers environment
 type Bindings = {
@@ -34,6 +35,9 @@ type Bindings = {
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
+
+// Bootstrap middleware - runs system initialization
+app.use('*', bootstrapMiddleware())
 
 // Middleware
 app.use('*', logger())
