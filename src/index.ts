@@ -15,8 +15,10 @@ import { mediaRoutes } from './routes/media'
 import { adminMediaRoutes } from './routes/admin-media'
 import { apiMediaRoutes } from './routes/api-media'
 import emailRoutes from './routes/admin/email'
-import { createWorkflowRoutes } from './plugins/core-plugins/workflow-plugin/routes'
 import { userRoutes } from './routes/admin-users'
+// Workflow routes are loaded dynamically through plugin system
+import { createWorkflowRoutes } from './plugins/available/workflow-plugin/routes'
+import { createWorkflowAdminRoutes } from './plugins/available/workflow-plugin/admin-routes'
 import { requireAuth, requireRole, optionalAuth } from './middleware/auth'
 import { requireActivePlugin } from './middleware/plugin-middleware'
 import { bootstrapMiddleware } from './middleware/bootstrap'
@@ -67,7 +69,7 @@ app.route('/docs', docsRoutes)
 app.use('/api/*', optionalAuth())
 app.route('/api', apiRoutes)
 app.route('/api/media', apiMediaRoutes)
-app.route('/api/workflow', createWorkflowRoutes())
+// Workflow API routes are loaded dynamically through plugin system
 
 // Content API routes with optional auth
 app.use('/content/*', optionalAuth())
@@ -93,6 +95,11 @@ app.route('/admin/content', adminContentRoutes)
 // FAQ routes with plugin activation check
 app.use('/admin/faq/*', requireActivePlugin('faq'))
 app.route('/admin/faq', adminFAQRoutes)
+// Workflow routes with plugin activation check
+app.use('/admin/workflow/*', requireActivePlugin('workflow'))
+app.route('/admin/workflow', createWorkflowAdminRoutes())
+app.use('/api/workflow/*', requireActivePlugin('workflow'))
+app.route('/api/workflow', createWorkflowRoutes())
 app.route('/admin/design', adminDesignRoutes)
 app.route('/admin/email', emailRoutes)
 app.route('/admin/users', userRoutes)

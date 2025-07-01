@@ -3,6 +3,7 @@ import { html } from 'hono/html'
 import { renderContentFormPage, ContentFormData } from '../templates/pages/admin-content-form.template'
 import { renderContentListPage, ContentListPageData } from '../templates/pages/admin-content-list.template'
 import { renderVersionHistory, VersionHistoryData, ContentVersion } from '../templates/components/version-history.template'
+import { isPluginActive } from '../middleware/plugin-middleware'
 
 type Bindings = {
   DB: D1Database
@@ -274,10 +275,14 @@ adminContentRoutes.get('/new', async (c) => {
     
     const fields = await getCollectionFields(db, collectionId)
     
+    // Check if workflow plugin is active
+    const workflowEnabled = await isPluginActive(db, 'workflow')
+    
     const formData: ContentFormData = {
       collection,
       fields,
       isEdit: false,
+      workflowEnabled,
       user: user ? {
         name: user.email,
         email: user.email,
@@ -345,6 +350,9 @@ adminContentRoutes.get('/:id/edit', async (c) => {
     const fields = await getCollectionFields(db, content.collection_id)
     const contentData = content.data ? JSON.parse(content.data) : {}
     
+    // Check if workflow plugin is active
+    const workflowEnabled = await isPluginActive(db, 'workflow')
+    
     const formData: ContentFormData = {
       id: content.id,
       title: content.title,
@@ -359,6 +367,7 @@ adminContentRoutes.get('/:id/edit', async (c) => {
       collection,
       fields,
       isEdit: true,
+      workflowEnabled,
       user: user ? {
         name: user.email,
         email: user.email,

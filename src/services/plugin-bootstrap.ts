@@ -53,19 +53,6 @@ export class PluginBootstrapService {
       settings: {}
     },
     {
-      id: 'core-workflow',
-      name: 'core-workflow',
-      display_name: 'Workflow Engine',
-      description: 'Content workflow and approval system',
-      version: '1.0.0',
-      author: 'SonicJS Team',
-      category: 'content',
-      icon: '🔄',
-      permissions: ['manage:workflows', 'approve:content'],
-      dependencies: [],
-      settings: {}
-    },
-    {
       id: 'database-tools',
       name: 'database-tools',
       display_name: 'Database Tools',
@@ -198,6 +185,24 @@ export class PluginBootstrapService {
    */
   async installDemoPlugins(): Promise<void> {
     const demoPlugins: CorePlugin[] = [
+      {
+        id: 'workflow',
+        name: 'workflow',
+        display_name: 'Workflow Management',
+        description: 'Content workflow management with approval chains, scheduling, and automation',
+        version: '1.0.0',
+        author: 'SonicJS Team',
+        category: 'content',
+        icon: '🔄',
+        permissions: ['manage:workflows', 'approve:content'],
+        dependencies: [],
+        settings: {
+          enableApprovalChains: true,
+          enableScheduling: true,
+          enableNotifications: true,
+          defaultWorkflow: 'simple'
+        }
+      },
       {
         id: 'third-party-faq',
         name: 'faq-plugin',

@@ -7,7 +7,7 @@ import { renderPluginsListPage, PluginsListPageData, generateMockPlugins } from 
 import { renderSettingsPage, SettingsPageData } from '../templates/pages/admin-settings.template'
 import { renderAPIReferencePage, APIReferencePageData, APIEndpoint } from '../templates/pages/admin-api-reference.template'
 import { userRoutes } from './admin-users'
-import { createWorkflowAdminRoutes } from '../plugins/core-plugins/workflow-plugin/admin-routes'
+// Workflow admin routes are now loaded dynamically through plugin system
 import { adminPluginRoutes } from './admin-plugins'
 import { MigrationService } from '../services/migrations'
 import { createDatabaseToolsAdminRoutes } from '../plugins/core-plugins/database-tools-plugin/admin-routes'
@@ -62,6 +62,18 @@ async function getDynamicMenuItems(db: D1Database): Promise<Array<{
           </svg>`
         })
       }
+      
+      if (plugin.name === 'workflow') {
+        console.log('getDynamicMenuItems: Adding Workflow menu item')
+        menuItems.push({
+          label: 'Workflow',
+          path: '/admin/workflow',
+          icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>`
+        })
+      }
+      
       // Add more plugin-specific menu items here as needed
     }
     
@@ -1065,6 +1077,6 @@ adminRoutes.post('/populate-dummy-content', async (c) => {
 
 // Mount user management routes
 adminRoutes.route('/', userRoutes)
-adminRoutes.route('/workflow', createWorkflowAdminRoutes())
+// Workflow admin routes are now mounted dynamically through plugin system
 
 export default adminRoutes

@@ -34,11 +34,11 @@ export function requireActivePlugin(pluginName: string) {
       }
 
       // Plugin is active, continue to the route
-      await next()
+      return await next()
     } catch (error) {
       console.error(`Error checking plugin status for ${pluginName}:`, error)
       // On error, allow access (fail open for stability)
-      await next()
+      return await next()
     }
   }
 }
@@ -72,11 +72,11 @@ export function requireActivePlugins(pluginNames: string[]) {
         }
       }
 
-      await next()
+      return await next()
     } catch (error) {
       console.error(`Error checking plugin status for plugins:`, pluginNames, error)
       // On error, allow access (fail open for stability)
-      await next()
+      return await next()
     }
   }
 }
@@ -104,5 +104,21 @@ export async function getActivePlugins(db: D1Database): Promise<Array<{
   } catch (error) {
     console.error('Error fetching active plugins:', error)
     return []
+  }
+}
+
+/**
+ * Check if a specific plugin is active
+ */
+export async function isPluginActive(db: D1Database, pluginName: string): Promise<boolean> {
+  try {
+    const result = await db.prepare(
+      'SELECT id FROM plugins WHERE name = ? AND status = ?'
+    ).bind(pluginName, 'active').first()
+    
+    return !!result
+  } catch (error) {
+    console.error(`Error checking if plugin ${pluginName} is active:`, error)
+    return false
   }
 }

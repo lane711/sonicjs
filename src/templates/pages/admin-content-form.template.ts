@@ -27,6 +27,7 @@ export interface ContentFormData {
   error?: string
   success?: string
   validationErrors?: Record<string, string[]>
+  workflowEnabled?: boolean // New flag to indicate if workflow plugin is active
   user?: {
     name: string
     email: string
@@ -153,46 +154,62 @@ export function renderContentFormPage(data: ContentFormData): string {
           <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6">
             <h3 class="text-lg font-semibold text-white mb-4">Publishing</h3>
             
-            <!-- Status -->
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-300 mb-2">Status</label>
-              <select 
-                name="status" 
-                form="content-form"
-                class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all"
-              >
-                <option value="draft" ${data.status === 'draft' ? 'selected' : ''}>Draft</option>
-                <option value="review" ${data.status === 'review' ? 'selected' : ''}>Under Review</option>
-                <option value="published" ${data.status === 'published' ? 'selected' : ''}>Published</option>
-                <option value="archived" ${data.status === 'archived' ? 'selected' : ''}>Archived</option>
-              </select>
-            </div>
+            ${data.workflowEnabled ? `
+              <!-- Workflow Status (when workflow plugin is enabled) -->
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300 mb-2">Status</label>
+                <select 
+                  name="status" 
+                  form="content-form"
+                  class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all"
+                >
+                  <option value="draft" ${data.status === 'draft' ? 'selected' : ''}>Draft</option>
+                  <option value="review" ${data.status === 'review' ? 'selected' : ''}>Under Review</option>
+                  <option value="published" ${data.status === 'published' ? 'selected' : ''}>Published</option>
+                  <option value="archived" ${data.status === 'archived' ? 'selected' : ''}>Archived</option>
+                </select>
+              </div>
 
-            <!-- Scheduled Publishing -->
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-300 mb-2">Schedule Publish</label>
-              <input 
-                type="datetime-local" 
-                name="scheduled_publish_at"
-                form="content-form"
-                value="${data.scheduled_publish_at ? new Date(data.scheduled_publish_at).toISOString().slice(0, 16) : ''}"
-                class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all"
-              >
-              <p class="text-xs text-gray-400 mt-1">Leave empty to publish immediately</p>
-            </div>
+              <!-- Scheduled Publishing -->
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300 mb-2">Schedule Publish</label>
+                <input 
+                  type="datetime-local" 
+                  name="scheduled_publish_at"
+                  form="content-form"
+                  value="${data.scheduled_publish_at ? new Date(data.scheduled_publish_at).toISOString().slice(0, 16) : ''}"
+                  class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all"
+                >
+                <p class="text-xs text-gray-400 mt-1">Leave empty to publish immediately</p>
+              </div>
 
-            <!-- Scheduled Unpublishing -->
-            <div class="mb-6">
-              <label class="block text-sm font-medium text-gray-300 mb-2">Schedule Unpublish</label>
-              <input 
-                type="datetime-local" 
-                name="scheduled_unpublish_at"
-                form="content-form"
-                value="${data.scheduled_unpublish_at ? new Date(data.scheduled_unpublish_at).toISOString().slice(0, 16) : ''}"
-                class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all"
-              >
-              <p class="text-xs text-gray-400 mt-1">Automatically unpublish at this time</p>
-            </div>
+              <!-- Scheduled Unpublishing -->
+              <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-300 mb-2">Schedule Unpublish</label>
+                <input 
+                  type="datetime-local" 
+                  name="scheduled_unpublish_at"
+                  form="content-form"
+                  value="${data.scheduled_unpublish_at ? new Date(data.scheduled_unpublish_at).toISOString().slice(0, 16) : ''}"
+                  class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all"
+                >
+                <p class="text-xs text-gray-400 mt-1">Automatically unpublish at this time</p>
+              </div>
+            ` : `
+              <!-- Simple Status (when workflow plugin is disabled) -->
+              <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-300 mb-2">Status</label>
+                <select 
+                  name="status" 
+                  form="content-form"
+                  class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all"
+                >
+                  <option value="draft" ${data.status === 'draft' ? 'selected' : ''}>Draft</option>
+                  <option value="published" ${data.status === 'published' ? 'selected' : ''}>Published</option>
+                </select>
+                <p class="text-xs text-gray-400 mt-1">Enable Workflow plugin for advanced status management</p>
+              </div>
+            `}
 
             <!-- Action Buttons -->
             <div class="space-y-3">
