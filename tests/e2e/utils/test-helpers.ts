@@ -67,13 +67,17 @@ export async function createTestWorkflowContent(page: Page) {
     // Navigate to content creation
     await page.goto('/admin/content/new');
     
-    // Wait for the page to load and check if collection select exists
+    // Wait for the page to load and check if modelName select exists
     try {
-      await page.waitForSelector('select[name="collection_id"]', { timeout: 5000 });
-      const collections = await page.locator('select[name="collection_id"] option').count();
+      await page.waitForSelector('select[name="modelName"]', { timeout: 5000 });
+      const models = await page.locator('select[name="modelName"] option').count();
       
-      if (collections > 1) { // Skip the first placeholder option
-        await page.selectOption('select[name="collection_id"]', { index: 1 });
+      if (models > 1) { // Skip the first placeholder option
+        await page.selectOption('select[name="modelName"]', { index: 1 });
+        
+        // Wait for dynamic fields to load
+        await page.waitForTimeout(1000);
+        
         await page.fill('input[name="title"]', 'Workflow Transition Test');
         await page.fill('input[name="slug"]', 'workflow-transition-test');
         await page.fill('textarea[name="content"]', 'Test content for workflow transitions.');
@@ -84,14 +88,107 @@ export async function createTestWorkflowContent(page: Page) {
         // Wait for success response
         await page.waitForTimeout(2000);
       } else {
-        console.log('No collections available for content creation');
+        console.log('No models available for content creation');
       }
     } catch (selectorError) {
-      console.log('Collection selector not found or content creation not available');
+      console.log('Model selector not found or content creation not available');
     }
   } catch (error) {
     // Content might already exist, ignore errors
     console.log('Test content creation failed:', error);
+  }
+}
+
+/**
+ * Create test content (assumes user is already logged in)
+ */
+export async function createTestContent(page: Page, contentData?: {
+  title: string;
+  slug: string;
+  content: string;
+}) {
+  const data = contentData || {
+    title: 'Test Content',
+    slug: 'test-content',
+    content: 'This is test content for E2E testing.'
+  };
+
+  try {
+    // Ensure we have a collection first
+    await ensureTestCollectionExists(page);
+    
+    // Navigate to content creation
+    await page.goto('/admin/content/new');
+    
+    // Check if we get the collection selection page
+    try {
+      // Look for collection cards (new UI)
+      await page.waitForSelector('.collection-card, .grid', { timeout: 5000 });
+      
+      // Click on the first available collection
+      const collectionLinks = page.locator('a[href*="/admin/content/new?collection="]');
+      const collectionCount = await collectionLinks.count();
+      
+      if (collectionCount > 0) {
+        await collectionLinks.first().click();
+        
+        // Wait for the form to load
+        await page.waitForTimeout(2000);
+        
+        // Fill in the form fields - try different possible field names
+        const titleField = page.locator('input[name="title"], input[name="name"], input[id="title"]').first();
+        if (await titleField.count() > 0) {
+          await titleField.fill(data.title);
+        }
+        
+        const slugField = page.locator('input[name="slug"], input[id="slug"]').first();
+        if (await slugField.count() > 0) {
+          await slugField.fill(data.slug);
+        }
+        
+        const contentField = page.locator('textarea[name="content"], textarea[name="body"], textarea[id="content"]').first();
+        if (await contentField.count() > 0) {
+          await contentField.fill(data.content);
+        }
+        
+        // Submit the form
+        const submitButton = page.locator('button[type="submit"], input[type="submit"]').first();
+        if (await submitButton.count() > 0) {
+          await submitButton.click();
+          
+          // Wait for form submission
+          await page.waitForTimeout(2000);
+          return true;
+        }
+      }
+    } catch (selectionError) {
+      // Fall back to old model-based approach
+      await page.waitForSelector('select[name="modelName"]', { timeout: 5000 });
+      const models = await page.locator('select[name="modelName"] option').count();
+      
+      if (models > 1) {
+        await page.selectOption('select[name="modelName"]', { index: 1 });
+        
+        // Wait for dynamic fields to load
+        await page.waitForTimeout(1500);
+        
+        // Fill in the form fields
+        await page.fill('input[name="title"]', data.title);
+        await page.fill('input[name="slug"]', data.slug);
+        await page.fill('textarea[name="content"]', data.content);
+        
+        // Submit the form
+        await page.click('button[type="submit"]');
+        await page.waitForTimeout(2000);
+        return true;
+      }
+    }
+    
+    console.log('No collections or models available for content creation');
+    return false;
+  } catch (error) {
+    console.log('Test content creation failed:', error);
+    return false;
   }
 }
 

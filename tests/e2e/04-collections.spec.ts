@@ -125,8 +125,23 @@ test.describe('Collections Management', () => {
     // Navigate back to collections list and edit
     await navigateToAdminSection(page, 'collections');
     
-    // Find collection by name (more reliable than display name)
-    const collectionRow = page.locator('tr').filter({ has: page.locator('div.text-sm.font-medium.text-white', { hasText: TEST_DATA.collection.name }) }).first();
+    // Wait for collections table to load
+    await page.waitForSelector('table', { timeout: 10000 });
+    
+    // Find collection by name - try multiple selectors
+    let collectionRow = page.locator('tr').filter({ 
+      has: page.locator('td').filter({ hasText: TEST_DATA.collection.name })
+    }).first();
+    
+    // If not found, try looking for display name
+    if (await collectionRow.count() === 0) {
+      collectionRow = page.locator('tr').filter({ 
+        has: page.locator('td').filter({ hasText: TEST_DATA.collection.displayName })
+      }).first();
+    }
+    
+    // Wait for the row to be visible and click edit
+    await expect(collectionRow).toBeVisible({ timeout: 10000 });
     await collectionRow.locator('a').filter({ hasText: 'Edit' }).click();
     
     // Update display name
@@ -149,8 +164,23 @@ test.describe('Collections Management', () => {
     // Navigate to edit page and delete
     await navigateToAdminSection(page, 'collections');
     
-    // Find collection by name (more reliable than display name)
-    const collectionRow = page.locator('tr').filter({ has: page.locator('div.text-sm.font-medium.text-white', { hasText: TEST_DATA.collection.name }) }).first();
+    // Wait for collections table to load
+    await page.waitForSelector('table', { timeout: 10000 });
+    
+    // Find collection by name - try multiple selectors
+    let collectionRow = page.locator('tr').filter({ 
+      has: page.locator('td').filter({ hasText: TEST_DATA.collection.name })
+    }).first();
+    
+    // If not found, try looking for display name
+    if (await collectionRow.count() === 0) {
+      collectionRow = page.locator('tr').filter({ 
+        has: page.locator('td').filter({ hasText: TEST_DATA.collection.displayName })
+      }).first();
+    }
+    
+    // Wait for the row to be visible and click edit
+    await expect(collectionRow).toBeVisible({ timeout: 10000 });
     await collectionRow.locator('a').filter({ hasText: 'Edit' }).click();
     
     // Set up dialog handler before clicking delete

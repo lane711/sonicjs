@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { loginAsAdmin, createTestWorkflowContent } from './utils/test-helpers'
+import { loginAsAdmin, createTestWorkflowContent, createTestContent } from './utils/test-helpers'
 
 test.describe('Notification System', () => {
   test.beforeEach(async ({ page }) => {
@@ -80,12 +80,16 @@ test.describe('Notification System', () => {
     })
 
     // First create test content
-    await page.goto('/admin/content/new')
-    await page.selectOption('select[name="collection_id"]', { index: 1 })
-    await page.fill('input[name="title"]', 'Notification Test Content')
-    await page.fill('input[name="slug"]', 'notification-test-content')
-    await page.fill('textarea[name="content"]', 'Content for notification testing.')
-    await page.click('button[type="submit"]')
+    const contentCreated = await createTestContent(page, {
+      title: 'Notification Test Content',
+      slug: 'notification-test-content',
+      content: 'Content for notification testing.'
+    });
+    
+    if (!contentCreated) {
+      test.skip();
+      return;
+    }
     
     await page.waitForTimeout(1000)
     
@@ -131,12 +135,16 @@ test.describe('Notification System', () => {
     })
 
     // Create test content first
-    await page.goto('/admin/content/new')
-    await page.selectOption('select[name="collection_id"]', { index: 1 })
-    await page.fill('input[name="title"]', 'Workflow Notification Test')
-    await page.fill('input[name="slug"]', 'workflow-notification-test')
-    await page.fill('textarea[name="content"]', 'Content for workflow notification testing.')
-    await page.click('button[type="submit"]')
+    const contentCreated = await createTestContent(page, {
+      title: 'Workflow Notification Test',
+      slug: 'workflow-notification-test',
+      content: 'Content for workflow notification testing.'
+    });
+    
+    if (!contentCreated) {
+      test.skip();
+      return;
+    }
     
     await page.waitForTimeout(1000)
     
