@@ -100,6 +100,49 @@ export async function createTestWorkflowContent(page: Page) {
 }
 
 /**
+ * Ensure test content exists for content management tests
+ */
+export async function ensureTestContentExists(page: Page) {
+  try {
+    // Navigate to content list to check if content exists
+    await page.goto('/admin/content/');
+    await page.waitForTimeout(1000);
+    
+    // Check if there's already content
+    const table = page.locator('table');
+    const hasTable = await table.count() > 0;
+    
+    if (hasTable) {
+      const contentRows = page.locator('tbody tr');
+      const rowCount = await contentRows.count();
+      
+      if (rowCount > 0) {
+        // Content already exists
+        console.log('Test content already exists');
+        return;
+      }
+    }
+    
+    // No content exists, try to create individual test content using existing collections
+    console.log('Creating test content...');
+    const created = await createTestContent(page, {
+      title: 'Test Article for E2E Testing',
+      slug: 'test-article-e2e-testing',
+      content: 'This is a test article created for E2E testing purposes. It contains sample content to verify that the content management system is working correctly.'
+    });
+    
+    if (created) {
+      console.log('Successfully created test content');
+    } else {
+      console.log('Could not create test content - this is expected if no collections exist');
+    }
+    
+  } catch (error) {
+    console.log('Could not ensure test content exists:', error);
+  }
+}
+
+/**
  * Create test content (assumes user is already logged in)
  */
 export async function createTestContent(page: Page, contentData?: {
