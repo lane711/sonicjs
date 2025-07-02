@@ -15,9 +15,14 @@ test.describe('Notification System', () => {
     // Look for notification bell icon or indicator in admin layout
     const notificationIcon = page.locator('[class*="notification"], [data-testid="notifications"], .fa-bell')
     
-    // May or may not be visible depending on implementation
-    // Just verify admin page loads successfully with navigation present
-    await expect(page.locator('nav, .sidebar, .content, h1, a').first()).toBeVisible()
+    // Verify admin page loads successfully
+    // Use more flexible selectors that should exist in any admin layout
+    const adminContent = page.locator('body').first()
+    await expect(adminContent).toBeVisible()
+    
+    // Check for any heading or title that confirms we're on admin
+    const hasAdminElements = await page.locator('h1, h2, [class*="dashboard"], [class*="admin"]').first().count() > 0
+    expect(hasAdminElements).toBeTruthy()
     
     // Verify we're on the admin page
     expect(page.url()).toContain('/admin')
@@ -51,8 +56,14 @@ test.describe('Notification System', () => {
     // Check if notification count badge is displayed
     const notificationBadge = page.locator('[class*="badge"], [class*="count"]')
     
-    // May not be implemented yet, just verify page functionality
-    await expect(page.locator('nav, .sidebar, .content, h1, a').first()).toBeVisible()
+    // Verify admin page loads successfully
+    const adminContent = page.locator('body').first()
+    await expect(adminContent).toBeVisible()
+    
+    // Check for any admin element
+    const hasAdminElements = await page.locator('h1, h2, [class*="dashboard"], [class*="admin"]').first().count() > 0
+    expect(hasAdminElements).toBeTruthy()
+    
     expect(page.url()).toContain('/admin')
   })
 

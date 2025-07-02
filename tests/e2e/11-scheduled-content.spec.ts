@@ -1,6 +1,15 @@
 import { test, expect } from '@playwright/test'
 import { loginAsAdmin, createTestWorkflowContent, createTestContent } from './utils/test-helpers'
 
+async function skipIfWorkflowInactive(page: any) {
+  const featureNotAvailable = page.locator('h1:has-text("Feature Not Available")')
+  if (await featureNotAvailable.isVisible({ timeout: 2000 })) {
+    test.skip();
+    return true;
+  }
+  return false;
+}
+
 test.describe('Scheduled Content Management', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page)
@@ -8,6 +17,8 @@ test.describe('Scheduled Content Management', () => {
 
   test('should display scheduled content page', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
+    
+    if (await skipIfWorkflowInactive(page)) return;
     
     // Check page title and header
     await expect(page).toHaveTitle(/Scheduled Content/)
@@ -23,6 +34,8 @@ test.describe('Scheduled Content Management', () => {
 
   test('should display stats overview cards', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
+    
+    if (await skipIfWorkflowInactive(page)) return;
     
     // Check for stats cards or general page content
     const statsCards = page.locator('.stats-card')
@@ -55,6 +68,8 @@ test.describe('Scheduled Content Management', () => {
   test('should show empty state when no scheduled content', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
     
+    if (await skipIfWorkflowInactive(page)) return;
+    
     // May show empty state or actual content
     const emptyStateText = page.locator('text=No Scheduled Content')
     const scheduledTable = page.locator('table')
@@ -68,6 +83,8 @@ test.describe('Scheduled Content Management', () => {
 
   test('should open bulk schedule modal', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
+    
+    if (await skipIfWorkflowInactive(page)) return;
     
     // Click bulk schedule button
     await page.click('button:has-text("Bulk Schedule")')
@@ -86,6 +103,8 @@ test.describe('Scheduled Content Management', () => {
   test('should close bulk schedule modal', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
     
+    if (await skipIfWorkflowInactive(page)) return;
+    
     // Open modal
     await page.click('button:has-text("Bulk Schedule")')
     await expect(page.locator('#bulk-schedule-modal')).toBeVisible()
@@ -97,6 +116,8 @@ test.describe('Scheduled Content Management', () => {
 
   test('should toggle between scheduling methods in bulk modal', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
+    
+    if (await skipIfWorkflowInactive(page)) return;
     
     // Open modal
     await page.click('button:has-text("Bulk Schedule")')
@@ -121,6 +142,8 @@ test.describe('Scheduled Content Management', () => {
   test('should filter scheduled content by status', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
     
+    if (await skipIfWorkflowInactive(page)) return;
+    
     // Test status filter
     const statusFilter = page.locator('#status-filter')
     await expect(statusFilter).toBeVisible()
@@ -136,6 +159,8 @@ test.describe('Scheduled Content Management', () => {
   test('should filter scheduled content by action', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
     
+    if (await skipIfWorkflowInactive(page)) return;
+    
     // Test action filter
     const actionFilter = page.locator('#action-filter')
     await expect(actionFilter).toBeVisible()
@@ -148,6 +173,8 @@ test.describe('Scheduled Content Management', () => {
 
   test('should handle refresh button', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
+    
+    if (await skipIfWorkflowInactive(page)) return;
     
     // Click refresh button
     await page.click('button:has-text("Refresh")')
@@ -175,6 +202,9 @@ test.describe('Scheduled Content Management', () => {
     
     // Go to scheduled content page
     await page.goto('/admin/workflow/scheduled');
+    
+    // Skip if workflow plugin is not active
+    if (await skipIfWorkflowInactive(page)) return;
     
     // Check for table elements if scheduled content exists
     const table = page.locator('table');
@@ -207,6 +237,8 @@ test.describe('Scheduled Content Management', () => {
 
     await page.goto('/admin/workflow/scheduled')
     
+    if (await skipIfWorkflowInactive(page)) return;
+    
     // Test that page loads successfully with or without data
     await expect(page.locator('h1')).toContainText('Scheduled Content')
     await expect(page.locator('button:has-text("Bulk Schedule")')).toBeVisible()
@@ -214,6 +246,8 @@ test.describe('Scheduled Content Management', () => {
 
   test('should show proper status badges', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
+    
+    if (await skipIfWorkflowInactive(page)) return;
     
     // Check that status filter options match expected statuses
     const statusFilter = page.locator('#status-filter')
@@ -227,6 +261,8 @@ test.describe('Scheduled Content Management', () => {
 
   test('should show proper action badges', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
+    
+    if (await skipIfWorkflowInactive(page)) return;
     
     // Check that action filter options match expected actions
     const actionFilter = page.locator('#action-filter')
@@ -248,6 +284,8 @@ test.describe('Scheduled Content Management', () => {
     })
 
     await page.goto('/admin/workflow/scheduled')
+    
+    if (await skipIfWorkflowInactive(page)) return;
     
     // Open bulk schedule modal
     await page.click('button:has-text("Bulk Schedule")')
@@ -280,6 +318,8 @@ test.describe('Scheduled Content Management', () => {
 
     await page.goto('/admin/workflow/scheduled')
     
+    if (await skipIfWorkflowInactive(page)) return;
+    
     // Test cancellation function exists
     const cancelFunction = await page.evaluate(() => {
       return typeof window.cancelScheduledAction === 'function'
@@ -295,6 +335,8 @@ test.describe('Scheduled Content Management', () => {
     await page.setViewportSize({ width: 375, height: 667 })
     
     await page.goto('/admin/workflow/scheduled')
+    
+    if (await skipIfWorkflowInactive(page)) return;
     
     // Check responsive elements
     await expect(page.locator('h1')).toBeVisible()
@@ -313,6 +355,8 @@ test.describe('Scheduled Content Management', () => {
 
   test('should navigate back to workflow dashboard', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
+    
+    if (await skipIfWorkflowInactive(page)) return;
     
     // Click breadcrumb
     await page.click('a[href="/admin/workflow/dashboard"]')

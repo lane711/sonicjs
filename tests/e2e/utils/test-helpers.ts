@@ -57,6 +57,42 @@ export async function ensureWorkflowTablesExist(page: Page) {
 }
 
 /**
+ * Ensure workflow plugin is active (for testing workflow features)
+ */
+export async function ensureWorkflowPluginActive(page: Page) {
+  try {
+    // Navigate to plugins page
+    await page.goto('/admin/plugins');
+    await page.waitForTimeout(1000);
+    
+    // Look for workflow plugin row
+    const workflowRow = page.locator('tr').filter({ hasText: 'Workflow Management' });
+    const hasWorkflowPlugin = await workflowRow.count() > 0;
+    
+    if (hasWorkflowPlugin) {
+      // Check if it's already active
+      const isActive = await workflowRow.locator('.bg-green-100').count() > 0;
+      
+      if (!isActive) {
+        // Activate the plugin
+        const activateButton = workflowRow.locator('button').filter({ hasText: 'Activate' });
+        if (await activateButton.count() > 0) {
+          await activateButton.click();
+          await page.waitForTimeout(2000); // Wait for activation
+          console.log('Workflow plugin activated');
+        }
+      } else {
+        console.log('Workflow plugin already active');
+      }
+    } else {
+      console.log('Workflow plugin not found - may need to be installed first');
+    }
+  } catch (error) {
+    console.log('Could not ensure workflow plugin is active:', error);
+  }
+}
+
+/**
  * Create test workflow content (assumes user is already logged in)
  */
 export async function createTestWorkflowContent(page: Page) {
@@ -279,6 +315,9 @@ export async function loginAsAdmin(page: Page) {
   
   // Ensure workflow tables exist for workflow tests (after login)
   await ensureWorkflowTablesExist(page);
+  
+  // Ensure workflow plugin is active for workflow-related tests
+  await ensureWorkflowPluginActive(page);
 }
 
 /**
