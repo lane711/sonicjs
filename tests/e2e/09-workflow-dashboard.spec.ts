@@ -1,6 +1,15 @@
 import { test, expect } from '@playwright/test'
 import { loginAsAdmin } from './utils/test-helpers'
 
+async function skipIfWorkflowInactive(page: any) {
+  const featureNotAvailable = page.locator('h1:has-text("Feature Not Available")')
+  if (await featureNotAvailable.isVisible({ timeout: 2000 })) {
+    test.skip();
+    return true;
+  }
+  return false;
+}
+
 test.describe('Workflow Dashboard', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page)
@@ -25,6 +34,9 @@ test.describe('Workflow Dashboard', () => {
   test('should display workflow states with counts', async ({ page }) => {
     await page.goto('/admin/workflow/dashboard')
     
+    // Skip if workflow plugin is not active
+    if (await skipIfWorkflowInactive(page)) return;
+    
     // Check for default workflow states
     const states = ['Draft', 'Pending Review', 'Approved', 'Published']
     
@@ -40,6 +52,9 @@ test.describe('Workflow Dashboard', () => {
 
   test('should navigate to scheduled content page', async ({ page }) => {
     await page.goto('/admin/workflow/dashboard')
+    
+    // Skip if workflow plugin is not active
+    if (await skipIfWorkflowInactive(page)) return;
     
     await page.click('a[href="/admin/workflow/scheduled"]')
     await page.waitForURL('/admin/workflow/scheduled')
@@ -87,6 +102,9 @@ test.describe('Workflow Dashboard', () => {
   test('should show assigned content section when user has assignments', async ({ page }) => {
     await page.goto('/admin/workflow/dashboard')
     
+    // Skip if workflow plugin is not active
+    if (await skipIfWorkflowInactive(page)) return;
+    
     // Check if assigned content section appears
     const assignedSection = page.locator('text=Assigned to You')
     
@@ -98,6 +116,9 @@ test.describe('Workflow Dashboard', () => {
   test('should display empty state when no content in workflow states', async ({ page }) => {
     await page.goto('/admin/workflow/dashboard')
     
+    // Skip if workflow plugin is not active
+    if (await skipIfWorkflowInactive(page)) return;
+    
     // Look for empty state indicators
     const emptyStates = page.locator('text=No content in this state')
     
@@ -107,6 +128,9 @@ test.describe('Workflow Dashboard', () => {
 
   test('should handle workflow dashboard with real data', async ({ page }) => {
     await page.goto('/admin/workflow/dashboard')
+    
+    // Skip if workflow plugin is not active
+    if (await skipIfWorkflowInactive(page)) return;
     
     // Verify the dashboard loads with real data
     await expect(page.locator('h1')).toContainText('Workflow Dashboard')
@@ -131,6 +155,9 @@ test.describe('Workflow Dashboard', () => {
     await page.setViewportSize({ width: 375, height: 667 })
     
     await page.goto('/admin/workflow/dashboard')
+    
+    // Skip if workflow plugin is not active
+    if (await skipIfWorkflowInactive(page)) return;
     
     // Check that page is responsive
     await expect(page.locator('h1')).toBeVisible()

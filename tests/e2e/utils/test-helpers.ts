@@ -61,6 +61,8 @@ export async function ensureWorkflowTablesExist(page: Page) {
  */
 export async function ensureWorkflowPluginActive(page: Page) {
   try {
+    const currentUrl = page.url();
+    
     // Navigate to plugins page
     await page.goto('/admin/plugins');
     await page.waitForTimeout(1000);
@@ -86,6 +88,12 @@ export async function ensureWorkflowPluginActive(page: Page) {
       }
     } else {
       console.log('Workflow plugin not found - may need to be installed first');
+    }
+    
+    // Return to the original URL if it was an admin page
+    if (currentUrl.includes('/admin') && !currentUrl.includes('/admin/plugins')) {
+      await page.goto(currentUrl);
+      await page.waitForTimeout(500);
     }
   } catch (error) {
     console.log('Could not ensure workflow plugin is active:', error);
@@ -318,6 +326,10 @@ export async function loginAsAdmin(page: Page) {
   
   // Ensure workflow plugin is active for workflow-related tests
   await ensureWorkflowPluginActive(page);
+  
+  // Navigate back to admin dashboard after plugin setup
+  await page.goto('/admin');
+  await page.waitForLoadState('networkidle');
 }
 
 /**
