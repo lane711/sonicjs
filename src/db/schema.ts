@@ -345,6 +345,56 @@ export const insertPluginActivityLogSchema = createInsertSchema(pluginActivityLo
 
 export const selectPluginActivityLogSchema = createSelectSchema(pluginActivityLog);
 
+// System logs table for comprehensive logging
+export const systemLogs = sqliteTable('system_logs', {
+  id: text('id').primaryKey(),
+  level: text('level').notNull(), // 'debug', 'info', 'warn', 'error', 'fatal'
+  category: text('category').notNull(), // 'auth', 'api', 'workflow', 'plugin', 'media', 'system', etc.
+  message: text('message').notNull(),
+  data: text('data', { mode: 'json' }), // Additional structured data
+  userId: text('user_id').references(() => users.id),
+  sessionId: text('session_id'),
+  requestId: text('request_id'),
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  method: text('method'), // HTTP method for API logs
+  url: text('url'), // Request URL for API logs
+  statusCode: integer('status_code'), // HTTP status code for API logs
+  duration: integer('duration'), // Request duration in milliseconds
+  stackTrace: text('stack_trace'), // Error stack trace for error logs
+  tags: text('tags', { mode: 'json' }), // Array of tags for categorization
+  source: text('source'), // Source component/module that generated the log
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+});
+
+// Log configuration table
+export const logConfig = sqliteTable('log_config', {
+  id: text('id').primaryKey(),
+  category: text('category').notNull().unique(),
+  enabled: integer('enabled', { mode: 'boolean' }).notNull().default(true),
+  level: text('level').notNull().default('info'), // minimum log level to store
+  retention: integer('retention').notNull().default(30), // days to keep logs
+  maxSize: integer('max_size').default(10000), // max number of logs per category
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+});
+
+// Insert and select schemas for system logs
+export const insertSystemLogSchema = createInsertSchema(systemLogs, {
+  level: (schema) => schema.min(1),
+  category: (schema) => schema.min(1),
+  message: (schema) => schema.min(1),
+});
+
+export const selectSystemLogSchema = createSelectSchema(systemLogs);
+
+export const insertLogConfigSchema = createInsertSchema(logConfig, {
+  category: (schema) => schema.min(1),
+  level: (schema) => schema.min(1),
+});
+
+export const selectLogConfigSchema = createSelectSchema(logConfig);
+
 // Type exports
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -374,3 +424,7 @@ export type PluginAsset = typeof pluginAssets.$inferSelect;
 export type NewPluginAsset = typeof pluginAssets.$inferInsert;
 export type PluginActivityLog = typeof pluginActivityLog.$inferSelect;
 export type NewPluginActivityLog = typeof pluginActivityLog.$inferInsert;
+export type SystemLog = typeof systemLogs.$inferSelect;
+export type NewSystemLog = typeof systemLogs.$inferInsert;
+export type LogConfig = typeof logConfig.$inferSelect;
+export type NewLogConfig = typeof logConfig.$inferInsert;

@@ -140,13 +140,15 @@
   "mcpServers": {
     "memory": {
       "command": "npx",
-      "args": [
-        "@modelcontextprotocol/server-memory"
-      ],
+      "args": ["@modelcontextprotocol/server-memory"],
       "env": {
         "MEMORY_PERSIST": "true",
         "MEMORY_PATH": "./docs/ai/claude-memory.json"
       }
+    },
+    "graphiti": {
+      "transport": "sse",
+      "url": "http://localhost:8000/sse"
     }
   }
 }

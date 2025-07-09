@@ -481,16 +481,41 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
         const fieldItem = document.querySelector(\`[data-field-id="\${fieldId}"]\`);
         if (!fieldItem) return;
 
-        // Get field data from the DOM or make an API call
-        // For now, we'll show the modal and populate it
+        // Find the field data from the collection's fields array
+        const field = ${JSON.stringify(data.fields || [])}.find(f => f.id === fieldId);
+        if (!field) return;
+
+        // Set up the modal for editing
         document.getElementById('modal-title').textContent = 'Edit Field';
         document.getElementById('submit-text').textContent = 'Update Field';
         document.getElementById('field-id').value = fieldId;
-        document.getElementById('field-name').disabled = true;
         currentEditingField = fieldId;
-        document.getElementById('field-modal').classList.remove('hidden');
 
-        // TODO: Populate form with existing field data
+        // Populate form with existing field data
+        document.getElementById('field-name').value = field.field_name;
+        document.getElementById('field-name').disabled = true;
+        document.getElementById('field-label').value = field.field_label;
+        document.getElementById('field-type').value = field.field_type;
+        document.getElementById('field-required').checked = field.is_required == 1;
+        document.getElementById('field-searchable').checked = field.is_searchable == 1;
+        
+        // Handle field options
+        if (field.field_options) {
+          document.getElementById('field-options').value = field.field_options;
+        } else {
+          document.getElementById('field-options').value = '';
+        }
+
+        // Show/hide options container based on field type
+        const fieldType = field.field_type;
+        const optionsContainer = document.getElementById('field-options-container');
+        if (fieldType === 'select' || fieldType === 'media') {
+          optionsContainer.classList.remove('hidden');
+        } else {
+          optionsContainer.classList.add('hidden');
+        }
+
+        document.getElementById('field-modal').classList.remove('hidden');
       }
 
       function closeFieldModal() {

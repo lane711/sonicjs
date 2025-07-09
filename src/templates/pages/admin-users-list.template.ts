@@ -141,7 +141,6 @@ export function renderUsersListPage(data: UsersListPageData): string {
       render: (value: any, row: User) => `
         <div class="flex justify-end space-x-2">
           <a href="/admin/users/${row.id}" class="inline-flex items-center px-3 py-1 backdrop-blur-sm bg-blue-500/80 text-white text-sm rounded-xl border border-white/20 hover:bg-blue-500 transition-all">View</a>
-          <a href="/admin/users/${row.id}/edit" class="inline-flex items-center px-3 py-1 backdrop-blur-sm bg-white/10 text-white text-sm rounded-xl border border-white/20 hover:bg-white/20 transition-all">Edit</a>
           ${row.isActive ? 
             `<button onclick="toggleUserStatus('${row.id}', false)" class="inline-flex items-center px-3 py-1 backdrop-blur-sm bg-red-500/80 text-white text-sm rounded-xl border border-white/20 hover:bg-red-500 transition-all">Deactivate</button>` :
             `<button onclick="toggleUserStatus('${row.id}', true)" class="inline-flex items-center px-3 py-1 backdrop-blur-sm bg-green-500/80 text-white text-sm rounded-xl border border-white/20 hover:bg-green-500 transition-all">Activate</button>`
@@ -156,6 +155,8 @@ export function renderUsersListPage(data: UsersListPageData): string {
     columns,
     rows: data.users,
     selectable: false,
+    rowClickable: true,
+    rowClickUrl: (row: User) => `/admin/users/${row.id}/edit`,
     emptyMessage: 'No users found'
   }
 

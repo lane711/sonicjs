@@ -22,6 +22,7 @@ import { createWorkflowAdminRoutes } from './plugins/available/workflow-plugin/a
 import { requireAuth, requireRole, optionalAuth } from './middleware/auth'
 import { requireActivePlugin } from './middleware/plugin-middleware'
 import { bootstrapMiddleware } from './middleware/bootstrap'
+import { loggingMiddleware, securityLoggingMiddleware, performanceLoggingMiddleware } from './middleware/logging'
 
 // Define the Cloudflare Workers environment
 type Bindings = {
@@ -36,10 +37,27 @@ type Bindings = {
   IMAGES_API_TOKEN?: string
 }
 
-const app = new Hono<{ Bindings: Bindings }>()
+type Variables = {
+  user?: {
+    userId: string
+    email: string
+    role: string
+    exp: number
+    iat: number
+  }
+  requestId?: string
+  startTime?: number
+}
+
+const app = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
 // Bootstrap middleware - runs system initialization
 app.use('*', bootstrapMiddleware())
+
+// Logging middleware - capture all requests
+app.use('*', loggingMiddleware())
+app.use('*', securityLoggingMiddleware())
+app.use('*', performanceLoggingMiddleware(1000)) // Log requests slower than 1 second
 
 // Middleware
 app.use('*', logger())
@@ -126,8 +144,29 @@ app.notFound((c) => {
 })
 
 // Error handler
-app.onError((err, c) => {
+app.onError(async (err, c) => {
   console.error(err)
+  
+  // Log the error using our logging system
+  try {
+    const { getLogger } = await import('./services/logger')
+    const logger = getLogger(c.env.DB)
+    const user = c.get('user')
+    
+    await logger.error('system', `Unhandled application error: ${err.message}`, err, {
+      userId: user?.userId,
+      requestId: c.get('requestId'),
+      ipAddress: c.req.header('cf-connecting-ip') || 'unknown',
+      userAgent: c.req.header('user-agent') || '',
+      method: c.req.method,
+      url: c.req.url,
+      source: 'error-handler',
+      tags: ['unhandled-error', 'application-error']
+    })
+  } catch (logError) {
+    console.error('Failed to log application error:', logError)
+  }
+  
   return c.json({ error: 'Internal Server Error', status: 500 }, 500)
 })
 

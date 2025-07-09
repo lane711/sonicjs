@@ -9,6 +9,7 @@ import { renderAPIReferencePage, APIReferencePageData, APIEndpoint } from '../te
 import { userRoutes } from './admin-users'
 // Workflow admin routes are now loaded dynamically through plugin system
 import { adminPluginRoutes } from './admin-plugins'
+import { adminLogsRoutes } from './admin-logs'
 import { MigrationService } from '../services/migrations'
 import { createDatabaseToolsAdminRoutes } from '../plugins/core-plugins/database-tools-plugin/admin-routes'
 import { getActivePlugins } from '../middleware/plugin-middleware'
@@ -770,6 +771,9 @@ adminRoutes.get('/users/export', async (c) => {
 
 // Plugins management
 adminRoutes.route('/plugins', adminPluginRoutes)
+
+// Logs management
+adminRoutes.route('/logs', adminLogsRoutes)
 
 // Database tools
 adminRoutes.route('/database-tools', createDatabaseToolsAdminRoutes())

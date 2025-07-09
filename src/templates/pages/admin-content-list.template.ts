@@ -133,7 +133,6 @@ export function renderContentListPage(data: ContentListPageData): string {
       className: 'text-sm font-medium',
       render: (value, row) => `
         <div class="flex space-x-2">
-          <a href="/admin/content/${row.id}/edit" class="inline-flex items-center px-3 py-1 backdrop-blur-sm bg-blue-500/80 text-white text-sm rounded-xl border border-white/20 hover:bg-blue-500 transition-all">Edit</a>
           <button 
             class="inline-flex items-center px-3 py-1 backdrop-blur-sm bg-white/10 text-white text-sm rounded-xl border border-white/20 hover:bg-white/20 transition-all"
             hx-get="/admin/content/${row.id}/versions"
@@ -171,6 +170,8 @@ export function renderContentListPage(data: ContentListPageData): string {
     columns: tableColumns,
     rows: data.contentItems,
     selectable: true,
+    rowClickable: true,
+    rowClickUrl: (row: ContentItem) => `/admin/content/${row.id}/edit`,
     emptyMessage: 'No content found. Create your first content item to get started.'
   }
 

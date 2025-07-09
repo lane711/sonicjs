@@ -15,6 +15,8 @@ export interface TableData<T = any> {
   emptyMessage?: string
   tableId?: string
   title?: string
+  rowClickable?: boolean
+  rowClickUrl?: (row: T) => string
 }
 
 export function renderTable<T = any>(data: TableData<T>): string {
@@ -77,18 +79,21 @@ export function renderTable<T = any>(data: TableData<T>): string {
           <tbody class="divide-y divide-white/10">
             ${data.rows.map(row => {
               if (!row) return ''
+              const clickableClass = data.rowClickable ? 'cursor-pointer' : ''
+              const clickHandler = data.rowClickable && data.rowClickUrl ? `onclick="window.location.href='${data.rowClickUrl(row)}'"` : ''
               return `
-                <tr class="hover:bg-white/5 transition-colors">
+                <tr class="hover:bg-white/5 transition-colors ${clickableClass}" ${clickHandler}>
                   ${data.selectable ? `
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-6 py-4 whitespace-nowrap" onclick="event.stopPropagation()">
                       <input type="checkbox" class="rounded border-white/20 bg-white/10 text-blue-500 focus:ring-blue-500 focus:ring-offset-0 row-checkbox" value="${(row as any).id || ''}">
                     </td>
                   ` : ''}
                   ${data.columns.map(column => {
                     const value = (row as any)[column.key]
                     const displayValue = column.render ? column.render(value, row) : value
+                    const stopPropagation = column.key === 'actions' ? 'onclick="event.stopPropagation()"' : ''
                     return `
-                      <td class="px-6 py-4 whitespace-nowrap text-gray-300 ${column.className || ''}">
+                      <td class="px-6 py-4 whitespace-nowrap text-gray-300 ${column.className || ''}" ${stopPropagation}>
                         ${displayValue || ''}
                       </td>
                     `

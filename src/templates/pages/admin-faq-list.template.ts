@@ -96,6 +96,8 @@ export function renderFAQList(data: FAQListData): string {
       <div id="faq-list">
         ${faqs.length > 0 ? renderTable({
           tableId: 'faq-table',
+          rowClickable: true,
+          rowClickUrl: (row: any) => `/admin/faq/${row.id}`,
           columns: [
             { key: 'question', label: 'Question', sortable: true, sortType: 'string' },
             { key: 'category', label: 'Category', sortable: true, sortType: 'string' },
@@ -130,10 +132,6 @@ export function renderFAQList(data: FAQListData): string {
             created_at: new Date(faq.created_at * 1000).toLocaleDateString(),
             actions: `
               <div class="flex items-center space-x-2">
-                <a href="/admin/faq/${faq.id}" 
-                   class="inline-flex items-center px-3 py-1 backdrop-blur-sm bg-blue-500/80 text-white text-sm rounded-xl border border-white/20 hover:bg-blue-500 transition-all">
-                  Edit
-                </a>
                 <button type="button" 
                         class="inline-flex items-center px-3 py-1 backdrop-blur-sm bg-red-500/80 text-white text-sm rounded-xl border border-white/20 hover:bg-red-500 transition-all"
                         hx-delete="/admin/faq/${faq.id}"
