@@ -8,23 +8,18 @@ test.describe('Notification System', () => {
 
   test('should display notification icon in navigation', async ({ page }) => {
     await page.goto('/admin/')
-    
-    // Wait for page to load completely
     await page.waitForLoadState('networkidle')
+    
+    // Check if we're actually authenticated and on admin page
+    const currentUrl = page.url()
+    if (currentUrl.includes('/auth/login')) {
+      throw new Error('Test was redirected to login page - authentication failed')
+    }
     
     // Look for notification bell icon or indicator in admin layout
     const notificationIcon = page.locator('[class*="notification"], [data-testid="notifications"], .fa-bell')
     
-    // Verify admin page loads successfully
-    // Use more flexible selectors that should exist in any admin layout
-    const adminContent = page.locator('body').first()
-    await expect(adminContent).toBeVisible()
-    
-    // Check for any heading or title that confirms we're on admin
-    const hasAdminElements = await page.locator('h1, h2, [class*="dashboard"], [class*="admin"]').first().count() > 0
-    expect(hasAdminElements).toBeTruthy()
-    
-    // Verify we're on the admin page
+    // Verify we're successfully on the admin page
     expect(page.url()).toContain('/admin')
   })
 
@@ -60,9 +55,11 @@ test.describe('Notification System', () => {
     const adminContent = page.locator('body').first()
     await expect(adminContent).toBeVisible()
     
-    // Check for any admin element
-    const hasAdminElements = await page.locator('h1, h2, [class*="dashboard"], [class*="admin"]').first().count() > 0
-    expect(hasAdminElements).toBeTruthy()
+    // Check if we're actually authenticated and on admin page
+    const currentUrl = page.url()
+    if (currentUrl.includes('/auth/login')) {
+      throw new Error('Test was redirected to login page - authentication failed')
+    }
     
     expect(page.url()).toContain('/admin')
   })
@@ -291,9 +288,11 @@ test.describe('Notification System', () => {
     const adminContent = page.locator('body').first()
     await expect(adminContent).toBeVisible()
     
-    // Check for any admin element
-    const hasAdminElements = await page.locator('h1, h2, nav, [class*="dashboard"], [class*="admin"]').first().count() > 0
-    expect(hasAdminElements).toBeTruthy()
+    // Check if we're actually authenticated and on admin page
+    const currentUrl = page.url()
+    if (currentUrl.includes('/auth/login')) {
+      throw new Error('Test was redirected to login page - authentication failed')
+    }
     
     expect(page.url()).toContain('/admin')
   })

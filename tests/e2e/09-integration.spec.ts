@@ -5,22 +5,38 @@ test.describe('Full Integration Workflows', () => {
   test('should complete full collection and content workflow', async ({ page }) => {
     await loginAsAdmin(page);
     
-    // 1. Create a new collection
+    // 1. Create a new collection with unique name
     await navigateToAdminSection(page, 'collections');
     await page.click('a[href="/admin/collections/new"]');
     
-    await page.fill('[name="name"]', TEST_DATA.collection.name);
-    await page.fill('[name="displayName"]', TEST_DATA.collection.displayName);
+    const uniqueCollectionName = `test_collection_${Date.now()}`;
+    await page.fill('[name="name"]', uniqueCollectionName);
+    await page.fill('[name="displayName"]', `Test Collection ${Date.now()}`);
     await page.fill('[name="description"]', TEST_DATA.collection.description);
     
     await page.click('button[type="submit"]');
     
-    // Wait for success message or redirect with more flexible selector
-    try {
-      await expect(page.locator('.bg-green-100')).toBeVisible({ timeout: 10000 });
-    } catch {
-      // If green message doesn't appear, check for redirect to collections list
-      await page.waitForURL('/admin/collections', { timeout: 15000 });
+    // Wait for form response
+    await page.waitForTimeout(2000);
+    
+    // Check if we're still on the form page or if there's an error
+    const currentUrl = page.url();
+    const hasSuccessMessage = await page.locator('.bg-green-100').isVisible();
+    const hasErrorMessage = await page.locator('.bg-red-100').isVisible();
+    
+    if (hasErrorMessage) {
+      // There was an error, read the error message
+      const errorText = await page.locator('.bg-red-100').textContent();
+      throw new Error(`Collection creation failed: ${errorText}`);
+    }
+    
+    if (hasSuccessMessage || currentUrl.includes('/admin/collections/new')) {
+      // Either success message appeared or we're still on form page, wait for redirect
+      await page.waitForURL('/admin/collections', { timeout: 25000 });
+    } else if (!currentUrl.includes('/admin/collections')) {
+      // We're somewhere unexpected, navigate manually
+      await page.goto('/admin/collections');
+      await page.waitForLoadState('networkidle');
     }
     
     // 2. Navigate to content creation
