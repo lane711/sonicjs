@@ -247,7 +247,7 @@ export const insertCollectionSchema = createInsertSchema(collections, {
 export const selectCollectionSchema = createSelectSchema(collections);
 
 export const insertContentSchema = createInsertSchema(content, {
-  slug: (schema) => schema.min(1).regex(/^[a-z0-9-]+$/, 'Slug must be lowercase with dashes'),
+  slug: (schema) => schema.min(1).regex(/^[a-zA-Z0-9_-]+$/, 'Slug must contain only letters, numbers, underscores, and hyphens'),
   title: (schema) => schema.min(1),
   status: (schema) => schema,
 });

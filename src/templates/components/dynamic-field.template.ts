@@ -34,8 +34,8 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
       let autoSlugScript = ''
       
       if (opts.pattern) {
-        if (opts.pattern === '^[a-z0-9-]+$') {
-          patternHelp = '<p class="mt-1 text-xs text-gray-400">Only lowercase letters, numbers, and hyphens allowed</p>'
+        if (opts.pattern === '^[a-z0-9-]+$' || opts.pattern === '^[a-zA-Z0-9_-]+$') {
+          patternHelp = '<p class="mt-1 text-xs text-gray-400">Use letters, numbers, underscores, and hyphens only</p>'
           
           // Add auto-slug generation for slug fields
           if (fieldName === 'slug') {
@@ -48,10 +48,10 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
                   if (titleField && slugField) {
                     const slug = titleField.value
                       .toLowerCase()
-                      .replace(/[^a-z0-9\\s-]/g, '')
+                      .replace(/[^a-z0-9\\s_-]/g, '')
                       .replace(/\\s+/g, '-')
-                      .replace(/-+/g, '-')
-                      .replace(/^-|-$/g, '');
+                      .replace(/[-_]+/g, '-')
+                      .replace(/^[-_]|[-_]$/g, '');
                     slugField.value = slug;
                   }
                 }
@@ -84,13 +84,37 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
           value="${escapeHtml(value)}"
           placeholder="${opts.placeholder || ''}"
           maxlength="${opts.maxLength || ''}"
-          pattern="${opts.pattern || ''}"
+          ${opts.pattern ? `data-pattern="${opts.pattern}"` : ''}
           class="${baseClasses} ${errorClasses}"
           ${required}
           ${disabled ? 'disabled' : ''}
         >
         ${patternHelp}
         ${autoSlugScript}
+        ${opts.pattern ? `
+        <script>
+          (function() {
+            const field = document.getElementById('${fieldId}');
+            const pattern = new RegExp('${opts.pattern}');
+            
+            field.addEventListener('input', function() {
+              if (this.value && !pattern.test(this.value)) {
+                if ('${opts.pattern}' === '^[a-zA-Z0-9_-]+$' || '${opts.pattern}' === '^[a-z0-9-]+$') {
+                  this.setCustomValidity('Please use only letters, numbers, underscores, and hyphens.');
+                } else {
+                  this.setCustomValidity('Please enter a valid format.');
+                }
+              } else {
+                this.setCustomValidity('');
+              }
+            });
+            
+            field.addEventListener('blur', function() {
+              this.reportValidity();
+            });
+          })();
+        </script>
+        ` : ''}
       `
       break
       
