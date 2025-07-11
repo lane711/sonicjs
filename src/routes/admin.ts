@@ -6,6 +6,7 @@ import { renderCollectionFormPage, CollectionFormData } from '../templates/pages
 import { renderPluginsListPage, PluginsListPageData, generateMockPlugins } from '../templates/pages/admin-plugins-list.template'
 import { renderSettingsPage, SettingsPageData } from '../templates/pages/admin-settings.template'
 import { renderAPIReferencePage, APIReferencePageData, APIEndpoint } from '../templates/pages/admin-api-reference.template'
+import { renderFieldTypesPage, FieldTypesPageData, getFieldTypeDefinitions } from '../templates/pages/admin-field-types.template'
 import { userRoutes } from './admin-users'
 // Workflow admin routes are now loaded dynamically through plugin system
 import { adminPluginRoutes } from './admin-plugins'
@@ -1035,7 +1036,8 @@ adminRoutes.get('/api-reference', (c) => {
     { method: 'GET', path: '/admin/faq/:id', description: 'Edit FAQ form', authentication: true, category: 'Admin' },
     { method: 'PUT', path: '/admin/faq/:id', description: 'Update FAQ', authentication: true, category: 'Admin' },
     { method: 'DELETE', path: '/admin/faq/:id', description: 'Delete FAQ', authentication: true, category: 'Admin' },
-    { method: 'GET', path: '/admin/api-reference', description: 'API documentation and reference', authentication: true, category: 'Admin' }
+    { method: 'GET', path: '/admin/api-reference', description: 'API documentation and reference', authentication: true, category: 'Admin' },
+    { method: 'GET', path: '/admin/field-types', description: 'Field types reference with validations and examples', authentication: true, category: 'Admin' }
   ]
 
   const pageData: APIReferencePageData = {
@@ -1048,6 +1050,22 @@ adminRoutes.get('/api-reference', (c) => {
   }
 
   return c.html(renderAPIReferencePage(pageData))
+})
+
+// Field Types Reference page
+adminRoutes.get('/field-types', (c) => {
+  const user = c.get('user')
+  
+  const pageData: FieldTypesPageData = {
+    fieldTypes: getFieldTypeDefinitions(),
+    user: user ? {
+      name: user.email,
+      email: user.email,
+      role: user.role
+    } : undefined
+  }
+
+  return c.html(renderFieldTypesPage(pageData))
 })
 
 // Populate database with dummy content (development only)
