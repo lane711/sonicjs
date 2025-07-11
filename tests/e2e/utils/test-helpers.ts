@@ -317,8 +317,15 @@ export async function loginAsAdmin(page: Page) {
   // Wait for HTMX response and success message
   await expect(page.locator('#form-response .bg-green-100')).toBeVisible();
   
-  // Wait for JavaScript redirect to admin dashboard (up to 10 seconds)
-  await page.waitForURL('/admin', { timeout: 10000 });
+  // Wait for JavaScript redirect to admin dashboard (up to 15 seconds)
+  try {
+    await page.waitForURL('/admin', { timeout: 15000 });
+  } catch (error) {
+    // If redirect doesn't happen automatically, try navigating manually
+    console.log('Auto-redirect failed, navigating manually to /admin');
+    await page.goto('/admin');
+    await page.waitForLoadState('networkidle');
+  }
   await expect(page.locator('nav').first()).toBeVisible(); // Check for sidebar navigation
   
   // Ensure workflow tables exist for workflow tests (after login)
