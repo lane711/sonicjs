@@ -458,11 +458,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
 
     <script>
       const collectionId = '${data.id || ''}';
-      console.log('Collection ID for field management:', collectionId);
       
-      if (!collectionId) {
-        console.error('Collection ID is missing! Field management will not work.');
-      }
       
       let currentEditingField = null;
 
@@ -492,16 +488,18 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
         currentEditingField = fieldId;
 
         // Populate form with existing field data
-        document.getElementById('field-name').value = field.field_name;
+        document.getElementById('field-name').value = field.field_name || '';
         document.getElementById('field-name').disabled = true;
-        document.getElementById('field-label').value = field.field_label;
-        document.getElementById('field-type').value = field.field_type;
-        document.getElementById('field-required').checked = field.is_required == 1;
-        document.getElementById('field-searchable').checked = field.is_searchable == 1;
+        document.getElementById('field-label').value = field.field_label || '';
+        document.getElementById('field-type').value = field.field_type || '';
+        document.getElementById('field-required').checked = Boolean(field.is_required);
+        document.getElementById('field-searchable').checked = Boolean(field.is_searchable);
         
-        // Handle field options
+        // Handle field options - serialize object back to JSON string
         if (field.field_options) {
-          document.getElementById('field-options').value = field.field_options;
+          document.getElementById('field-options').value = typeof field.field_options === 'string' 
+            ? field.field_options 
+            : JSON.stringify(field.field_options, null, 2);
         } else {
           document.getElementById('field-options').value = '';
         }
@@ -563,30 +561,25 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
         
         const method = isEditing ? 'PUT' : 'POST';
         
-        console.log('Submitting field form:', { url, method, isEditing });
         
         fetch(url, {
           method: method,
           body: formData
         })
         .then(response => {
-          console.log('Field submission response status:', response.status);
           if (!response.ok) {
             throw new Error(\`HTTP \${response.status}: \${response.statusText}\`);
           }
           return response.json();
         })
         .then(data => {
-          console.log('Field submission response data:', data);
           if (data.success) {
-            console.log('Field saved successfully, reloading page...');
             location.reload();
           } else {
             alert('Error saving field: ' + (data.error || 'Unknown error'));
           }
         })
         .catch(error => {
-          console.error('Field submission error:', error);
           alert('Error saving field: ' + error.message);
         });
       });
