@@ -228,6 +228,6 @@ export function renderLogDetailsPage(data: LogDetailsPageData) {
   return adminLayoutV2({
     title: `Log Details - ${log.id}`,
     user,
-    content
+    content: content as string
   })
 }

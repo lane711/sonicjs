@@ -1,5 +1,5 @@
-import { EmailTemplate, EmailTheme } from '../db/schema';
-import { renderTemplate } from '../utils/template-renderer';
+import { EmailTemplate, EmailTheme } from '../schema';
+import { renderTemplate } from '../../../../utils/template-renderer';
 import { marked, Renderer } from 'marked';
 
 export interface EmailRenderResult {

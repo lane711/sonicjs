@@ -14,7 +14,7 @@ import { contentRoutes } from './routes/content'
 import { mediaRoutes } from './routes/media'
 import { adminMediaRoutes } from './routes/admin-media'
 import { apiMediaRoutes } from './routes/api-media'
-import emailRoutes from './routes/admin/email'
+// import emailRoutes from './routes/admin/email'
 import { userRoutes } from './routes/admin-users'
 // Workflow routes are loaded dynamically through plugin system
 import { createWorkflowRoutes } from './plugins/available/workflow-plugin/routes'
@@ -119,7 +119,7 @@ app.route('/admin/workflow', createWorkflowAdminRoutes())
 app.use('/api/workflow/*', requireActivePlugin('workflow'))
 app.route('/api/workflow', createWorkflowRoutes())
 app.route('/admin/design', adminDesignRoutes)
-app.route('/admin/email', emailRoutes)
+// app.route('/admin/email', emailRoutes)
 app.route('/admin/users', userRoutes)
 
 // Root redirect to login

@@ -245,6 +245,6 @@ export function renderLogConfigPage(data: LogConfigPageData) {
   return adminLayoutV2({
     title: 'Log Configuration',
     user,
-    content
+    content: content as string
   })
 }

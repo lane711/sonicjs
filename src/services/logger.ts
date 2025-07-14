@@ -240,11 +240,7 @@ export class Logger {
       
       if (filter.search) {
         conditions.push(
-          or(
-            like(systemLogs.message, `%${filter.search}%`),
-            like(systemLogs.data, `%${filter.search}%`),
-            like(systemLogs.url, `%${filter.search}%`)
-          )
+          like(systemLogs.message, `%${filter.search}%`)
         )
       }
       

@@ -27,17 +27,19 @@ adminLogsRoutes.get('/', async (c) => {
   try {
     const user = c.get('user')
     const logger = getLogger(c.env.DB)
-    const url = new URL(c.req.url)
+    
+    // Use Hono's built-in query method instead of parsing URL
+    const query = c.req.query()
     
     // Parse query parameters
-    const page = parseInt(url.searchParams.get('page') || '1')
-    const limit = parseInt(url.searchParams.get('limit') || '50')
-    const level = url.searchParams.get('level')
-    const category = url.searchParams.get('category')
-    const search = url.searchParams.get('search')
-    const startDate = url.searchParams.get('start_date')
-    const endDate = url.searchParams.get('end_date')
-    const source = url.searchParams.get('source')
+    const page = parseInt(query.page || '1')
+    const limit = parseInt(query.limit || '50')
+    const level = query.level
+    const category = query.category
+    const search = query.search
+    const startDate = query.start_date
+    const endDate = query.end_date
+    const source = query.source
     
     // Build filter
     const filter: LogFilter = {
@@ -228,12 +230,12 @@ adminLogsRoutes.post('/config/:category', async (c) => {
 // Export logs
 adminLogsRoutes.get('/export', async (c) => {
   try {
-    const url = new URL(c.req.url)
-    const format = url.searchParams.get('format') || 'csv'
-    const level = url.searchParams.get('level')
-    const category = url.searchParams.get('category')
-    const startDate = url.searchParams.get('start_date')
-    const endDate = url.searchParams.get('end_date')
+    const query = c.req.query()
+    const format = query.format || 'csv'
+    const level = query.level
+    const category = query.category
+    const startDate = query.start_date
+    const endDate = query.end_date
     
     const logger = getLogger(c.env.DB)
     

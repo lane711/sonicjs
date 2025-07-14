@@ -5,7 +5,7 @@ import {
   NewEmailTemplate,
   EmailVariable,
   NewEmailVariable
-} from '../db/schema';
+} from '../schema';
 import { DEFAULT_EMAIL_THEME, SAMPLE_EMAIL_TEMPLATES } from '../data/default-email-theme';
 
 export interface EmailManagementService {

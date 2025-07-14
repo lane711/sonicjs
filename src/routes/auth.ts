@@ -6,7 +6,6 @@ import { html } from 'hono/html'
 import { AuthManager, requireAuth } from '../middleware/auth'
 import { renderLoginPage, LoginPageData } from '../templates/pages/auth-login.template'
 import { renderRegisterPage, RegisterPageData } from '../templates/pages/auth-register.template'
-import { normalizeExistingEmails } from '../scripts/normalize-emails'
 
 type Bindings = {
   DB: D1Database
@@ -543,31 +542,6 @@ authRoutes.post('/seed-admin', async (c) => {
   }
 })
 
-// Normalize existing emails endpoint (temporary - for migration)
-authRoutes.post('/normalize-emails', requireAuth(), async (c) => {
-  try {
-    const user = c.get('user')
-    
-    // Only allow admin users to run this
-    if (!user || user.role !== 'admin') {
-      return c.json({ error: 'Admin access required' }, 403)
-    }
-    
-    const db = c.env.DB
-    await normalizeExistingEmails(db)
-    
-    return c.json({ 
-      message: 'Email normalization completed successfully',
-      timestamp: new Date().toISOString()
-    })
-  } catch (error) {
-    console.error('Email normalization error:', error)
-    return c.json({ 
-      error: 'Email normalization failed', 
-      details: error instanceof Error ? error.message : String(error) 
-    }, 500)
-  }
-})
 
 // Accept invitation page
 authRoutes.get('/accept-invitation', async (c) => {

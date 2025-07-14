@@ -359,6 +359,6 @@ export function renderLogsListPage(data: LogsListPageData) {
   return adminLayoutV2({
     title: 'System Logs',
     user,
-    content
+    content: content as string
   })
 }

@@ -556,10 +556,21 @@ adminContentRoutes.post('/', async (c) => {
     ).run()
     
     // Handle different actions
-    if (action === 'save_and_continue') {
-      return c.redirect(`/admin/content/${contentId}/edit?success=Content saved successfully!`)
+    const redirectUrl = action === 'save_and_continue' 
+      ? `/admin/content/${contentId}/edit?success=Content saved successfully!`
+      : `/admin/content?collection=${collectionId}&success=Content created successfully!`
+    
+    // Check if this is an HTMX request
+    const isHTMX = c.req.header('HX-Request') === 'true'
+    
+    if (isHTMX) {
+      // For HTMX requests, use HX-Redirect header to trigger client-side redirect
+      return c.text('', 200, {
+        'HX-Redirect': redirectUrl
+      })
     } else {
-      return c.redirect(`/admin/content?collection=${collectionId}&success=Content created successfully!`)
+      // For regular requests, use server-side redirect
+      return c.redirect(redirectUrl)
     }
     
   } catch (error) {
@@ -744,10 +755,21 @@ adminContentRoutes.put('/:id', async (c) => {
     }
     
     // Handle different actions
-    if (action === 'save_and_continue') {
-      return c.redirect(`/admin/content/${id}/edit?success=Content updated successfully!`)
+    const redirectUrl = action === 'save_and_continue' 
+      ? `/admin/content/${id}/edit?success=Content updated successfully!`
+      : `/admin/content?collection=${existingContent.collection_id}&success=Content updated successfully!`
+    
+    // Check if this is an HTMX request
+    const isHTMX = c.req.header('HX-Request') === 'true'
+    
+    if (isHTMX) {
+      // For HTMX requests, use HX-Redirect header to trigger client-side redirect
+      return c.text('', 200, {
+        'HX-Redirect': redirectUrl
+      })
     } else {
-      return c.redirect(`/admin/content?collection=${existingContent.collection_id}&success=Content updated successfully!`)
+      // For regular requests, use server-side redirect
+      return c.redirect(redirectUrl)
     }
     
   } catch (error) {

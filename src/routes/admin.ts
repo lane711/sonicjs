@@ -987,7 +987,6 @@ adminRoutes.get('/api-reference', (c) => {
     { method: 'POST', path: '/auth/register/form', description: 'Form-based registration handler for HTML forms', authentication: false, category: 'Auth' },
     { method: 'POST', path: '/auth/login/form', description: 'Form-based login handler for HTML forms', authentication: false, category: 'Auth' },
     { method: 'POST', path: '/auth/seed-admin', description: 'Create test admin user (development only)', authentication: false, category: 'Auth' },
-    { method: 'POST', path: '/auth/normalize-emails', description: 'Normalize existing emails to lowercase (migration tool)', authentication: true, category: 'Auth' },
     
     // Content Routes
     { method: 'GET', path: '/content/health', description: 'Health check for content API', authentication: false, category: 'System' },

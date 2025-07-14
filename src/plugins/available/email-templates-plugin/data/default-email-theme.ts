@@ -1,4 +1,4 @@
-import { NewEmailTheme } from '../db/schema';
+import { NewEmailTheme } from '../schema';
 
 export const DEFAULT_EMAIL_THEME: Omit<NewEmailTheme, 'id' | 'createdBy' | 'createdAt' | 'updatedAt'> = {
   name: 'SonicJS AI Default',

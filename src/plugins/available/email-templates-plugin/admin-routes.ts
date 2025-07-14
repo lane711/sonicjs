@@ -1,11 +1,11 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
-import { requireAuth, requireRole } from '../../middleware/auth';
-import { createEmailManagementService } from '../../services/email-management';
-import { createEmailService } from '../../services/email';
-import { EmailTemplateRenderer } from '../../services/email-renderer';
-import { renderAdminLayout } from '../../templates/layouts/admin-layout-v2.template';
+import { requireAuth, requireRole } from '../../../middleware/auth';
+import { createEmailManagementService } from './services/email-management';
+import { createEmailService } from './services/email';
+import { EmailTemplateRenderer } from './services/email-renderer';
+import { renderAdminLayout } from '../../../templates/layouts/admin-layout-v2.template';
 
 type Bindings = {
   DB: D1Database;

@@ -1,4 +1,4 @@
-import { EmailTemplate, EmailTheme, EmailLog, NewEmailLog } from '../db/schema';
+import { EmailTemplate, EmailTheme, EmailLog, NewEmailLog } from '../schema';
 import { EmailTemplateRenderer } from './email-renderer';
 
 export interface EmailService {

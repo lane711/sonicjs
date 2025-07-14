@@ -10,7 +10,7 @@
  *   npm run sonicjs init-email
  */
 
-import { createEmailManagementService } from '../services/email-management';
+import { createEmailManagementService } from './services/email-management';
 
 interface InitOptions {
   dbUrl?: string;
