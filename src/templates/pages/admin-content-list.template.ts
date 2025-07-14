@@ -133,6 +133,12 @@ export function renderContentListPage(data: ContentListPageData): string {
       className: 'text-sm font-medium',
       render: (value, row) => `
         <div class="flex space-x-2">
+          <a 
+            href="/admin/content/${row.id}/edit"
+            class="inline-flex items-center px-3 py-1 backdrop-blur-sm bg-blue-600/20 text-white text-sm rounded-xl border border-blue-400/20 hover:bg-blue-600/30 transition-all"
+          >
+            Edit
+          </a>
           <button 
             class="inline-flex items-center px-3 py-1 backdrop-blur-sm bg-white/10 text-white text-sm rounded-xl border border-white/20 hover:bg-white/20 transition-all"
             hx-get="/admin/content/${row.id}/versions"
