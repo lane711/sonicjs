@@ -11,7 +11,7 @@ This results in extremely fast page/app loads for end users.
 Built on Astro and optimized for Cloudflare, SonicJs is a headless CMS that offers a flexible and scalable content management solution, utilizing the latest web technologies.
 
 ## Dedicated Documentation Website
-Read the docs here [https://sonicjs.com](https://sonicjs.com])
+Read the docs here [https://sonicjs.com](https://sonicjs.com)
 
 ## How Fast is "Blazingly" Fast?
 
