@@ -71,13 +71,13 @@ export function renderContentFormPage(data: ContentFormData): string {
       <!-- Header -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
-          <h1 class="text-2xl font-semibold text-white">${title}</h1>
-          <p class="mt-2 text-sm text-gray-300">
+          <h1 class="text-2xl font-semibold text-zinc-950 dark:text-white">${title}</h1>
+          <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
             ${data.collection.description || `Manage ${data.collection.display_name.toLowerCase()} content`}
           </p>
         </div>
         <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <a href="/admin/content?collection=${data.collection.id}" class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/10 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all">
+          <a href="/admin/content?collection=${data.collection.id}" class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-zinc-800 px-4 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
             <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
             </svg>
@@ -90,29 +90,29 @@ export function renderContentFormPage(data: ContentFormData): string {
       <nav class="flex mb-6" aria-label="Breadcrumb">
         <ol class="flex items-center space-x-3">
           <li>
-            <a href="/admin" class="text-gray-300 hover:text-white transition-colors">
+            <a href="/admin" class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors">
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
               </svg>
             </a>
           </li>
           <li class="flex items-center">
-            <svg class="h-5 w-5 text-gray-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
+            <svg class="h-5 w-5 text-zinc-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
             </svg>
-            <a href="/admin/content" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">Content</a>
+            <a href="/admin/content" class="text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors">Content</a>
           </li>
           <li class="flex items-center">
-            <svg class="h-5 w-5 text-gray-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
+            <svg class="h-5 w-5 text-zinc-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
             </svg>
-            <a href="/admin/content?collection=${data.collection.id}" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">${data.collection.display_name}</a>
+            <a href="/admin/content?collection=${data.collection.id}" class="text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors">${data.collection.display_name}</a>
           </li>
           <li class="flex items-center">
-            <svg class="h-5 w-5 text-gray-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
+            <svg class="h-5 w-5 text-zinc-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
             </svg>
-            <span class="text-sm font-medium text-gray-200">${isEdit ? 'Edit' : 'New'}</span>
+            <span class="text-sm font-medium text-zinc-950 dark:text-white">${isEdit ? 'Edit' : 'New'}</span>
           </li>
         </ol>
       </nav>
@@ -151,17 +151,17 @@ export function renderContentFormPage(data: ContentFormData): string {
         <!-- Sidebar -->
         <div class="lg:col-span-1 space-y-6">
           <!-- Publishing Options -->
-          <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6">
-            <h3 class="text-lg font-semibold text-white mb-4">Publishing</h3>
-            
+          <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
+            <h3 class="text-lg font-semibold text-zinc-950 dark:text-white mb-4">Publishing</h3>
+
             ${data.workflowEnabled ? `
               <!-- Workflow Status (when workflow plugin is enabled) -->
               <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-300 mb-2">Status</label>
-                <select 
-                  name="status" 
+                <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Status</label>
+                <select
+                  name="status"
                   form="content-form"
-                  class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all"
+                  class="w-full rounded-lg bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-500 focus:outline-none transition-colors"
                 >
                   <option value="draft" ${data.status === 'draft' ? 'selected' : ''}>Draft</option>
                   <option value="review" ${data.status === 'review' ? 'selected' : ''}>Under Review</option>
@@ -172,74 +172,74 @@ export function renderContentFormPage(data: ContentFormData): string {
 
               <!-- Scheduled Publishing -->
               <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-300 mb-2">Schedule Publish</label>
-                <input 
-                  type="datetime-local" 
+                <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Schedule Publish</label>
+                <input
+                  type="datetime-local"
                   name="scheduled_publish_at"
                   form="content-form"
                   value="${data.scheduled_publish_at ? new Date(data.scheduled_publish_at).toISOString().slice(0, 16) : ''}"
-                  class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all"
+                  class="w-full rounded-lg bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-500 focus:outline-none transition-colors"
                 >
-                <p class="text-xs text-gray-400 mt-1">Leave empty to publish immediately</p>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Leave empty to publish immediately</p>
               </div>
 
               <!-- Scheduled Unpublishing -->
               <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-300 mb-2">Schedule Unpublish</label>
-                <input 
-                  type="datetime-local" 
+                <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Schedule Unpublish</label>
+                <input
+                  type="datetime-local"
                   name="scheduled_unpublish_at"
                   form="content-form"
                   value="${data.scheduled_unpublish_at ? new Date(data.scheduled_unpublish_at).toISOString().slice(0, 16) : ''}"
-                  class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all"
+                  class="w-full rounded-lg bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-500 focus:outline-none transition-colors"
                 >
-                <p class="text-xs text-gray-400 mt-1">Automatically unpublish at this time</p>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Automatically unpublish at this time</p>
               </div>
             ` : `
               <!-- Simple Status (when workflow plugin is disabled) -->
               <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-300 mb-2">Status</label>
-                <select 
-                  name="status" 
+                <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Status</label>
+                <select
+                  name="status"
                   form="content-form"
-                  class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all"
+                  class="w-full rounded-lg bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-500 focus:outline-none transition-colors"
                 >
                   <option value="draft" ${data.status === 'draft' ? 'selected' : ''}>Draft</option>
                   <option value="published" ${data.status === 'published' ? 'selected' : ''}>Published</option>
                 </select>
-                <p class="text-xs text-gray-400 mt-1">Enable Workflow plugin for advanced status management</p>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Enable Workflow plugin for advanced status management</p>
               </div>
             `}
 
             <!-- Action Buttons -->
             <div class="space-y-3">
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 form="content-form"
                 name="action"
                 value="save"
-                class="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent transition-all"
+                class="w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 transition-colors"
               >
                 ${isEdit ? 'Update' : 'Save'} Content
               </button>
-              
-              <button 
-                type="submit" 
+
+              <button
+                type="submit"
                 form="content-form"
                 name="action"
                 value="save_and_continue"
-                class="w-full px-4 py-3 bg-white/10 text-white font-medium rounded-xl border border-white/20 hover:bg-white/20 transition-all"
+                class="w-full rounded-lg bg-white dark:bg-zinc-800 px-4 py-3 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
               >
                 Save & Continue Editing
               </button>
-              
+
               ${data.user?.role !== 'viewer' ? `
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   form="content-form"
                   name="action"
                   value="save_and_publish"
-                  class="w-full px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-transparent transition-all"
+                  class="w-full rounded-lg bg-green-600 px-4 py-3 text-sm font-semibold text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 transition-colors"
                 >
                   ${isEdit ? 'Update' : 'Save'} & Publish
                 </button>
@@ -249,35 +249,35 @@ export function renderContentFormPage(data: ContentFormData): string {
 
           <!-- Content Info -->
           ${isEdit ? `
-            <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6">
-              <h3 class="text-lg font-semibold text-white mb-4">Content Info</h3>
-              
+            <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
+              <h3 class="text-lg font-semibold text-zinc-950 dark:text-white mb-4">Content Info</h3>
+
               <div class="space-y-3 text-sm">
                 <div>
-                  <span class="text-gray-400">Created:</span>
-                  <span class="text-white ml-2">${data.data?.created_at ? new Date(data.data.created_at).toLocaleDateString() : 'Unknown'}</span>
+                  <span class="text-zinc-500 dark:text-zinc-400">Created:</span>
+                  <span class="text-zinc-950 dark:text-white ml-2">${data.data?.created_at ? new Date(data.data.created_at).toLocaleDateString() : 'Unknown'}</span>
                 </div>
                 <div>
-                  <span class="text-gray-400">Last Modified:</span>
-                  <span class="text-white ml-2">${data.data?.updated_at ? new Date(data.data.updated_at).toLocaleDateString() : 'Unknown'}</span>
+                  <span class="text-zinc-500 dark:text-zinc-400">Last Modified:</span>
+                  <span class="text-zinc-950 dark:text-white ml-2">${data.data?.updated_at ? new Date(data.data.updated_at).toLocaleDateString() : 'Unknown'}</span>
                 </div>
                 <div>
-                  <span class="text-gray-400">Author:</span>
-                  <span class="text-white ml-2">${data.data?.author || 'Unknown'}</span>
+                  <span class="text-zinc-500 dark:text-zinc-400">Author:</span>
+                  <span class="text-zinc-950 dark:text-white ml-2">${data.data?.author || 'Unknown'}</span>
                 </div>
                 ${data.data?.published_at ? `
                   <div>
-                    <span class="text-gray-400">Published:</span>
-                    <span class="text-white ml-2">${new Date(data.data.published_at).toLocaleDateString()}</span>
+                    <span class="text-zinc-500 dark:text-zinc-400">Published:</span>
+                    <span class="text-zinc-950 dark:text-white ml-2">${new Date(data.data.published_at).toLocaleDateString()}</span>
                   </div>
                 ` : ''}
               </div>
-              
-              <div class="mt-4 pt-4 border-t border-white/10">
-                <button 
-                  type="button" 
+
+              <div class="mt-4 pt-4 border-t border-zinc-950/5 dark:border-white/10">
+                <button
+                  type="button"
                   onclick="showVersionHistory('${data.id}')"
-                  class="text-blue-400 hover:text-blue-300 text-sm transition-colors"
+                  class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium transition-colors"
                 >
                   View Version History
                 </button>
@@ -286,14 +286,14 @@ export function renderContentFormPage(data: ContentFormData): string {
           ` : ''}
 
           <!-- Quick Actions -->
-          <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6">
-            <h3 class="text-lg font-semibold text-white mb-4">Quick Actions</h3>
-            
+          <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
+            <h3 class="text-lg font-semibold text-zinc-950 dark:text-white mb-4">Quick Actions</h3>
+
             <div class="space-y-2">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onclick="previewContent()"
-                class="w-full text-left px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                class="w-full text-left px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50 rounded-lg transition-colors"
               >
                 <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -301,23 +301,23 @@ export function renderContentFormPage(data: ContentFormData): string {
                 </svg>
                 Preview Content
               </button>
-              
-              <button 
-                type="button" 
+
+              <button
+                type="button"
                 onclick="duplicateContent()"
-                class="w-full text-left px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                class="w-full text-left px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50 rounded-lg transition-colors"
               >
                 <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                 </svg>
                 Duplicate Content
               </button>
-              
+
               ${isEdit ? `
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onclick="deleteContent('${data.id}')"
-                  class="w-full text-left px-3 py-2 text-sm text-red-300 hover:text-red-200 hover:bg-red-500/10 rounded-xl transition-all"
+                  class="w-full text-left px-3 py-2 text-sm text-red-700 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
                 >
                   <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -356,11 +356,11 @@ export function renderContentFormPage(data: ContentFormData): string {
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50';
         modal.innerHTML = \`
-          <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <h3 class="text-lg font-medium text-white mb-4">Select Media</h3>
+          <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-xl ring-1 ring-zinc-950/5 dark:ring-white/10 p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <h3 class="text-lg font-semibold text-zinc-950 dark:text-white mb-4">Select Media</h3>
             <div id="media-grid-container" hx-get="/admin/media/selector" hx-trigger="load"></div>
             <div class="mt-4 flex justify-end space-x-2">
-              <button onclick="this.closest('.fixed').remove()" class="px-4 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-700">Cancel</button>
+              <button onclick="this.closest('.fixed').remove()" class="rounded-lg bg-white dark:bg-zinc-800 px-4 py-2 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">Cancel</button>
             </div>
           </div>
         \`;
@@ -375,9 +375,9 @@ export function renderContentFormPage(data: ContentFormData): string {
       function setMediaField(fieldId, mediaUrl) {
         document.getElementById(fieldId).value = mediaUrl;
         const preview = document.getElementById(fieldId + '-preview');
-        preview.innerHTML = \`<img src="\${mediaUrl}" alt="Selected media" class="w-32 h-32 object-cover rounded-lg border border-white/20">\`;
+        preview.innerHTML = \`<img src="\${mediaUrl}" alt="Selected media" class="w-32 h-32 object-cover rounded-lg ring-1 ring-zinc-950/10 dark:ring-white/10">\`;
         preview.classList.remove('hidden');
-        
+
         // Close modal
         document.querySelector('.fixed.inset-0')?.remove();
       }
@@ -463,12 +463,12 @@ export function renderContentFormPage(data: ContentFormData): string {
         modal.innerHTML = \`
           <div id="version-history-content">
             <div class="flex items-center justify-center h-32">
-              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400"></div>
             </div>
           </div>
         \`;
         document.body.appendChild(modal);
-        
+
         // Load version history
         fetch(\`/admin/content/\${contentId}/versions\`)
         .then(response => response.text())
@@ -477,7 +477,7 @@ export function renderContentFormPage(data: ContentFormData): string {
         })
         .catch(error => {
           console.error('Error loading version history:', error);
-          document.getElementById('version-history-content').innerHTML = '<p class="text-white">Error loading version history</p>';
+          document.getElementById('version-history-content').innerHTML = '<p class="text-zinc-950 dark:text-white">Error loading version history</p>';
         });
       }
 

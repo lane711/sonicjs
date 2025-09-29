@@ -129,15 +129,13 @@ export function renderAdminLayoutCatalyst(data: AdminLayoutCatalystData): string
           </svg>
         </button>
         <div class="ml-4 flex-1">
-          ${renderLogo({ size: 'sm', showText: true, variant: 'dark' })}
+          ${renderLogo({ size: 'sm', showText: true, variant: 'white' })}
         </div>
       </header>
 
       <!-- Content -->
       <div class="grow p-6 lg:rounded-lg lg:bg-white lg:p-10 lg:shadow-sm lg:ring-1 lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
-        <div class="mx-auto max-w-6xl">
-          ${data.content}
-        </div>
+        ${data.content}
       </div>
     </main>
   </div>
@@ -337,7 +335,7 @@ function renderCatalystSidebar(
 
       <!-- Sidebar Header -->
       <div class="flex flex-col border-b border-zinc-950/5 p-4 dark:border-white/5">
-        ${renderLogo({ size: 'md', showText: true, variant: 'dark' })}
+        ${renderLogo({ size: 'md', showText: true, variant: 'white' })}
       </div>
 
       <!-- Sidebar Body -->

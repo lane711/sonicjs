@@ -36,33 +36,36 @@ export function renderTable<T = any>(data: TableData<T>): string {
   }
 
   return `
-    <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 overflow-hidden ${data.className || ''}" id="${tableId}">
+    <div class="${data.className || ''}" id="${tableId}">
       ${data.title ? `
-        <div class="px-6 py-4 border-b border-zinc-950/5 dark:border-white/5">
+        <div class="px-4 sm:px-0 mb-4">
           <h3 class="text-base font-semibold text-zinc-950 dark:text-white">${data.title}</h3>
         </div>
       ` : ''}
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-zinc-950/5 dark:divide-white/5 sortable-table">
-          <thead class="bg-zinc-50 dark:bg-zinc-800/50">
+        <table class="min-w-full sortable-table">
+          <thead>
             <tr>
               ${data.selectable ? `
-                <th class="px-6 py-3 text-left">
+                <th class="px-4 py-3.5 text-left sm:pl-0">
                   <input type="checkbox" class="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white focus:ring-offset-0 row-checkbox" id="select-all-${tableId}">
                 </th>
               ` : ''}
-              ${data.columns.map((column, index) => `
-                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400 ${column.className || ''}">
+              ${data.columns.map((column, index) => {
+                const isFirst = index === 0 && !data.selectable
+                const isLast = index === data.columns.length - 1
+                return `
+                <th class="px-4 py-3.5 text-left text-sm font-semibold text-zinc-950 dark:text-white ${isFirst ? 'sm:pl-0' : ''} ${isLast ? 'sm:pr-0' : ''} ${column.className || ''}">
                   ${column.sortable ? `
                     <button
-                      class="flex items-center gap-x-2 hover:text-zinc-950 dark:hover:text-white transition-colors sort-btn w-full text-left"
+                      class="flex items-center gap-x-2 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors sort-btn text-left"
                       data-column="${column.key}"
                       data-sort-type="${column.sortType || 'string'}"
                       data-sort-direction="none"
                       onclick="sortTable('${tableId}', '${column.key}', '${column.sortType || 'string'}')"
                     >
                       <span>${column.label}</span>
-                      <div class="sort-icons flex flex-col ml-auto">
+                      <div class="sort-icons flex flex-col">
                         <svg class="w-3 h-3 sort-up opacity-30" fill="currentColor" viewBox="0 0 20 20">
                           <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
                         </svg>
@@ -73,27 +76,29 @@ export function renderTable<T = any>(data: TableData<T>): string {
                     </button>
                   ` : column.label}
                 </th>
-              `).join('')}
+              `}).join('')}
             </tr>
           </thead>
-          <tbody class="divide-y divide-zinc-950/5 dark:divide-white/5">
-            ${data.rows.map(row => {
+          <tbody>
+            ${data.rows.map((row, rowIndex) => {
               if (!row) return ''
               const clickableClass = data.rowClickable ? 'cursor-pointer' : ''
               const clickHandler = data.rowClickable && data.rowClickUrl ? `onclick="window.location.href='${data.rowClickUrl(row)}'"` : ''
               return `
-                <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors ${clickableClass}" ${clickHandler}>
+                <tr class="border-t border-zinc-950/5 dark:border-white/5 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors ${clickableClass}" ${clickHandler}>
                   ${data.selectable ? `
-                    <td class="px-6 py-4 whitespace-nowrap" onclick="event.stopPropagation()">
+                    <td class="px-4 py-4 sm:pl-0" onclick="event.stopPropagation()">
                       <input type="checkbox" class="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white focus:ring-offset-0 row-checkbox" value="${(row as any).id || ''}">
                     </td>
                   ` : ''}
-                  ${data.columns.map(column => {
+                  ${data.columns.map((column, colIndex) => {
                     const value = (row as any)[column.key]
                     const displayValue = column.render ? column.render(value, row) : value
                     const stopPropagation = column.key === 'actions' ? 'onclick="event.stopPropagation()"' : ''
+                    const isFirst = colIndex === 0 && !data.selectable
+                    const isLast = colIndex === data.columns.length - 1
                     return `
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-950 dark:text-white ${column.className || ''}" ${stopPropagation}>
+                      <td class="px-4 py-4 text-sm text-zinc-500 dark:text-zinc-400 ${isFirst ? 'sm:pl-0 font-medium text-zinc-950 dark:text-white' : ''} ${isLast ? 'sm:pr-0' : ''} ${column.className || ''}" ${stopPropagation}>
                         ${displayValue || ''}
                       </td>
                     `

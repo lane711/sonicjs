@@ -35,12 +35,12 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
       <!-- Header -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
-          <h1 class="text-2xl font-semibold text-white">Media Library</h1>
-          <p class="mt-2 text-sm text-gray-300">Manage your media files and assets</p>
+          <h1 class="text-2xl font-semibold text-zinc-950 dark:text-white">Media Library</h1>
+          <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">Manage your media files and assets</p>
         </div>
         <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <button 
-            class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/20 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/30 transition-all"
+          <button
+            class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
             onclick="document.getElementById('upload-modal').classList.remove('hidden')"
           >
             <svg class="-ml-0.5 mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -53,69 +53,69 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
       
       <div class="flex gap-6">
         <!-- Sidebar -->
-        <div class="w-64 backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6">
+        <div class="w-64 rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
           <div class="space-y-6">
             <!-- Upload Button -->
             <div>
-              <button 
-                class="w-full px-4 py-2 backdrop-blur-sm bg-white/20 text-white rounded-xl border border-white/20 hover:bg-white/30 transition-all"
+              <button
+                class="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
                 onclick="document.getElementById('upload-modal').classList.remove('hidden')"
               >
                 Upload Files
               </button>
             </div>
-            
+
             <!-- Folders -->
             <div>
-              <h3 class="text-sm font-medium text-white mb-3">Folders</h3>
+              <h3 class="text-sm font-medium text-zinc-950 dark:text-white mb-3">Folders</h3>
               <ul class="space-y-1">
                 <li>
-                  <a href="/admin/media?folder=all" 
-                     class="block px-3 py-2 text-sm rounded-xl transition-all ${data.currentFolder === 'all' ? 'bg-white/20 text-white' : 'text-gray-300 hover:text-white hover:bg-white/10'}">'
+                  <a href="/admin/media?folder=all"
+                     class="block px-3 py-2 text-sm rounded-lg transition-colors ${data.currentFolder === 'all' ? 'bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-medium' : 'text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50'}">
                     All Files (${data.totalFiles})
                   </a>
                 </li>
                 ${data.folders.map(folder => `
                   <li>
-                    <a href="/admin/media?folder=${folder.folder}" 
-                       class="block px-3 py-2 text-sm rounded-xl transition-all ${data.currentFolder === folder.folder ? 'bg-white/20 text-white' : 'text-gray-300 hover:text-white hover:bg-white/10'}">'
+                    <a href="/admin/media?folder=${folder.folder}"
+                       class="block px-3 py-2 text-sm rounded-lg transition-colors ${data.currentFolder === folder.folder ? 'bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-medium' : 'text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50'}">
                       ${folder.folder} (${folder.count})
                     </a>
                   </li>
                 `).join('')}
               </ul>
             </div>
-            
+
             <!-- File Types -->
             <div>
-              <h3 class="text-sm font-medium text-white mb-3">File Types</h3>
+              <h3 class="text-sm font-medium text-zinc-950 dark:text-white mb-3">File Types</h3>
               <ul class="space-y-1">
                 <li>
-                  <a href="/admin/media?type=all" 
-                     class="block px-3 py-2 text-sm rounded-xl transition-all ${data.currentType === 'all' ? 'bg-white/20 text-white' : 'text-gray-300 hover:text-white hover:bg-white/10'}">'
+                  <a href="/admin/media?type=all"
+                     class="block px-3 py-2 text-sm rounded-lg transition-colors ${data.currentType === 'all' ? 'bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-medium' : 'text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50'}">
                     All Types
                   </a>
                 </li>
                 ${data.types.map(type => `
                   <li>
-                    <a href="/admin/media?type=${type.type}" 
-                       class="block px-3 py-2 text-sm rounded-xl transition-all ${data.currentType === type.type ? 'bg-white/20 text-white' : 'text-gray-300 hover:text-white hover:bg-white/10'}">'
+                    <a href="/admin/media?type=${type.type}"
+                       class="block px-3 py-2 text-sm rounded-lg transition-colors ${data.currentType === type.type ? 'bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-medium' : 'text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50'}">
                       ${type.type.charAt(0).toUpperCase() + type.type.slice(1)} (${type.count})
                     </a>
                   </li>
                 `).join('')}
               </ul>
             </div>
-            
+
             <!-- Quick Actions -->
             <div>
-              <h3 class="text-sm font-medium text-white mb-3">Quick Actions</h3>
+              <h3 class="text-sm font-medium text-zinc-950 dark:text-white mb-3">Quick Actions</h3>
               <div class="space-y-2">
-                <button class="w-full text-left px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all">
+                <button class="w-full text-left px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50 rounded-lg transition-colors">
                   Create Folder
                 </button>
-                <button 
-                  class="w-full text-left px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                <button
+                  class="w-full text-left px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50 rounded-lg transition-colors"
                   hx-delete="/media/cleanup"
                   hx-confirm="Delete unused files?"
                 >
@@ -129,25 +129,25 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
         <!-- Main Content -->
         <div class="flex-1">
           <!-- Toolbar -->
-          <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-4 mb-6">
+          <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-4 mb-6">
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-4">
                 <div class="flex items-center space-x-2">
-                  <label class="text-sm font-medium text-white">View:</label>
-                  <select 
-                    class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-1 text-sm text-white"
+                  <label class="text-sm font-medium text-zinc-950 dark:text-white">View:</label>
+                  <select
+                    class="rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-500 focus:outline-none transition-colors"
                     onchange="window.location.href = updateUrlParam('view', this.value)"
                   >
                     <option value="grid" ${data.currentView === 'grid' ? 'selected' : ''}>Grid</option>
                     <option value="list" ${data.currentView === 'list' ? 'selected' : ''}>List</option>
                   </select>
                 </div>
-                
+
                 <div class="flex items-center space-x-2">
-                  <input 
-                    type="text" 
-                    placeholder="Search files..." 
-                    class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-1 text-sm w-64 text-white placeholder-gray-300"
+                  <input
+                    type="text"
+                    placeholder="Search files..."
+                    class="rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm w-64 text-zinc-950 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-500 focus:outline-none transition-colors"
                     hx-get="/admin/media/search"
                     hx-trigger="keyup changed delay:300ms"
                     hx-target="#media-grid"
@@ -157,30 +157,30 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
                   <input type="hidden" name="type" value="${data.currentType}">
                 </div>
               </div>
-              
+
               <div class="flex items-center space-x-2">
-                <span class="text-sm text-gray-300">${data.files.length} files</span>
-                <button 
+                <span class="text-sm text-zinc-500 dark:text-zinc-400">${data.files.length} files</span>
+                <button
                   id="select-all-btn"
-                  class="px-3 py-1 text-sm backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl hover:bg-white/20 transition-all text-white"
+                  class="rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
                   onclick="toggleSelectAll()"
                 >
                   Select All
                 </button>
                 <div class="relative">
-                  <button 
+                  <button
                     id="bulk-actions-btn"
-                    class="px-3 py-1 text-sm bg-black/20 text-gray-400 rounded-xl cursor-not-allowed"
+                    class="rounded-lg bg-zinc-100 dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-400 dark:text-zinc-600 cursor-not-allowed"
                     disabled
                     onclick="toggleBulkActionsDropdown()"
                   >
                     Bulk Actions
                   </button>
-                  <div id="bulk-actions-dropdown" class="hidden absolute right-0 mt-2 w-48 backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl z-50">
+                  <div id="bulk-actions-dropdown" class="hidden absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-zinc-900 ring-1 ring-zinc-950/5 dark:ring-white/10 shadow-xl z-50">
                     <div class="py-1">
-                      <button 
+                      <button
                         onclick="performBulkDelete()"
-                        class="w-full text-left px-4 py-2 text-sm text-red-300 hover:text-red-200 hover:bg-white/10 transition-all"
+                        class="w-full text-left px-4 py-2 text-sm text-red-700 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
                       >
                         Delete Selected Files
                       </button>
@@ -206,14 +206,14 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
             <div class="mt-6 flex justify-center">
               <div class="flex space-x-2">
                 ${data.currentPage > 1 ? `
-                  <a href="${buildPageUrl(data.currentPage - 1, data.currentFolder, data.currentType)}" 
-                     class="px-3 py-2 backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl text-sm hover:bg-white/20 transition-all text-white">'
+                  <a href="${buildPageUrl(data.currentPage - 1, data.currentFolder, data.currentType)}"
+                     class="rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
                     Previous
                   </a>
                 ` : ''}
-                <span class="px-3 py-2 text-sm text-gray-300">Page ${data.currentPage}</span>
-                <a href="${buildPageUrl(data.currentPage + 1, data.currentFolder, data.currentType)}" 
-                   class="px-3 py-2 backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl text-sm hover:bg-white/20 transition-all text-white">'
+                <span class="px-3 py-2 text-sm text-zinc-500 dark:text-zinc-400">Page ${data.currentPage}</span>
+                <a href="${buildPageUrl(data.currentPage + 1, data.currentFolder, data.currentType)}"
+                   class="rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
                   Next
                 </a>
               </div>
@@ -225,10 +225,10 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
     
     <!-- Upload Modal -->
     <div id="upload-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-      <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 w-full max-w-2xl">
+      <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-xl ring-1 ring-zinc-950/5 dark:ring-white/10 p-6 w-full max-w-2xl">
         <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-medium text-white">Upload Files</h3>
-          <button onclick="document.getElementById('upload-modal').classList.add('hidden')" class="text-gray-300 hover:text-white">
+          <h3 class="text-lg font-semibold text-zinc-950 dark:text-white">Upload Files</h3>
+          <button onclick="document.getElementById('upload-modal').classList.add('hidden')" class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
@@ -244,17 +244,17 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
           class="space-y-4"
         >
           <!-- Drag and Drop Zone -->
-          <div 
+          <div
             id="upload-zone"
-            class="upload-zone border-2 border-dashed border-white/20 rounded-xl p-8 text-center cursor-pointer backdrop-blur-sm bg-white/10"
+            class="upload-zone border-2 border-dashed border-zinc-950/10 dark:border-white/20 rounded-xl p-8 text-center cursor-pointer bg-zinc-50 dark:bg-zinc-800/50 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
             onclick="document.getElementById('file-input').click()"
           >
-            <svg class="mx-auto h-12 w-12 text-gray-300" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+            <svg class="mx-auto h-12 w-12 text-zinc-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
               <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
             <div class="mt-4">
-              <p class="text-lg text-white">Drop files here or click to upload</p>
-              <p class="text-sm text-gray-300">PNG, JPG, GIF, PDF up to 10MB</p>
+              <p class="text-lg text-zinc-950 dark:text-white">Drop files here or click to upload</p>
+              <p class="text-sm text-zinc-500 dark:text-zinc-400">PNG, JPG, GIF, PDF up to 10MB</p>
             </div>
           </div>
           
@@ -270,33 +270,33 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
           
           <!-- Folder Selection -->
           <div>
-            <label class="block text-sm font-medium text-white mb-2">Upload to folder:</label>
-            <select name="folder" class="w-full backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white">
+            <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Upload to folder:</label>
+            <select name="folder" class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-500 focus:outline-none transition-colors">
               <option value="uploads">uploads</option>
               <option value="images">images</option>
               <option value="documents">documents</option>
             </select>
           </div>
-          
+
           <!-- File List -->
           <div id="file-list" class="hidden">
-            <h4 class="text-sm font-medium text-white mb-2">Selected Files:</h4>
+            <h4 class="text-sm font-medium text-zinc-950 dark:text-white mb-2">Selected Files:</h4>
             <div id="selected-files" class="space-y-2 max-h-40 overflow-y-auto"></div>
           </div>
-          
+
           <!-- Upload Button -->
           <div class="flex justify-end space-x-2">
-            <button 
-              type="button" 
+            <button
+              type="button"
               onclick="document.getElementById('upload-modal').classList.add('hidden')"
-              class="px-4 py-2 backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl text-sm hover:bg-white/20 transition-all text-white"
+              class="rounded-lg bg-white dark:bg-zinc-800 px-4 py-2 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
             >
               Cancel
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               id="upload-btn"
-              class="px-4 py-2 backdrop-blur-sm bg-white/20 text-white rounded-xl border border-white/20 hover:bg-white/30 disabled:opacity-50 transition-all"
+              class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
               disabled
             >
               Upload Files
@@ -311,7 +311,7 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
     
     <!-- File Details Modal -->
     <div id="file-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-      <div id="file-modal-content" class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 w-full max-w-4xl max-h-screen overflow-y-auto">
+      <div id="file-modal-content" class="rounded-xl bg-white dark:bg-zinc-900 shadow-xl ring-1 ring-zinc-950/5 dark:ring-white/10 p-6 w-full max-w-4xl max-h-screen overflow-y-auto">
         <!-- Content loaded via HTMX -->
       </div>
     </div>
@@ -365,11 +365,11 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
         const btn = document.getElementById('bulk-actions-btn');
         if (selectedFiles.size > 0) {
           btn.disabled = false;
-          btn.className = 'px-3 py-1 text-sm backdrop-blur-sm bg-white/20 text-white rounded-xl border border-white/20 hover:bg-white/30 transition-all';
+          btn.className = 'rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors';
           btn.textContent = \`Actions (\${selectedFiles.size})\`;
         } else {
           btn.disabled = true;
-          btn.className = 'px-3 py-1 text-sm bg-black/20 text-gray-400 rounded-xl cursor-not-allowed';
+          btn.className = 'rounded-lg bg-zinc-100 dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-400 dark:text-zinc-600 cursor-not-allowed';
           btn.textContent = 'Bulk Actions';
           // Hide dropdown when no files selected
           document.getElementById('bulk-actions-dropdown').classList.add('hidden');
@@ -448,19 +448,19 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
       
       function showNotification(message, type = 'info') {
         const notification = document.createElement('div');
-        const bgColor = type === 'success' ? 'bg-green-500/90' : 
-                       type === 'warning' ? 'bg-yellow-500/90' : 
-                       type === 'error' ? 'bg-red-500/90' : 'bg-blue-500/90';
-        
-        notification.className = \`fixed top-4 right-4 backdrop-blur-xl \${bgColor} text-white px-4 py-2 rounded-xl shadow-2xl z-50 transition-all transform translate-x-full\`;
+        const bgColor = type === 'success' ? 'bg-green-600' :
+                       type === 'warning' ? 'bg-yellow-600' :
+                       type === 'error' ? 'bg-red-600' : 'bg-blue-600';
+
+        notification.className = \`fixed top-4 right-4 \${bgColor} text-white px-4 py-3 rounded-lg shadow-xl ring-1 ring-white/10 z-50 transition-all transform translate-x-full\`;
         notification.textContent = message;
         document.body.appendChild(notification);
-        
+
         // Animate in
         setTimeout(() => {
           notification.classList.remove('translate-x-full');
         }, 100);
-        
+
         // Remove after 3 seconds
         setTimeout(() => {
           notification.classList.add('translate-x-full');
@@ -523,18 +523,18 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
       function displaySelectedFiles() {
         const fileList = document.getElementById('file-list');
         const selectedFilesDiv = document.getElementById('selected-files');
-        
+
         selectedFilesDiv.innerHTML = '';
-        
+
         dragDropFiles.forEach((file, index) => {
           const fileItem = document.createElement('div');
-          fileItem.className = 'flex items-center justify-between p-2 backdrop-blur-sm bg-white/10 rounded-xl';
+          fileItem.className = 'flex items-center justify-between p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10';
           fileItem.innerHTML = \`
             <div class="flex items-center space-x-2">
-              <span class="text-sm text-white">\${file.name}</span>
-              <span class="text-xs text-gray-300">(\${formatFileSize(file.size)})</span>
+              <span class="text-sm text-zinc-950 dark:text-white">\${file.name}</span>
+              <span class="text-xs text-zinc-500 dark:text-zinc-400">(\${formatFileSize(file.size)})</span>
             </div>
-            <button onclick="removeFile(\${index})" class="text-red-400 hover:text-red-300">
+            <button onclick="removeFile(\${index})" class="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
@@ -542,7 +542,7 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
           \`;
           selectedFilesDiv.appendChild(fileItem);
         });
-        
+
         fileList.classList.toggle('hidden', dragDropFiles.length === 0);
       }
       
@@ -570,7 +570,7 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
       function copyToClipboard(text) {
         navigator.clipboard.writeText(text).then(() => {
           const notification = document.createElement('div');
-          notification.className = 'fixed top-4 right-4 backdrop-blur-xl bg-green-500/90 text-white px-4 py-2 rounded-xl shadow-2xl z-50';
+          notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-3 rounded-lg shadow-xl ring-1 ring-white/10 z-50';
           notification.textContent = 'URL copied to clipboard!';
           document.body.appendChild(notification);
           setTimeout(() => document.body.removeChild(notification), 2000);
