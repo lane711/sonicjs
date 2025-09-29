@@ -21,7 +21,9 @@ export interface AdminLayoutData {
 }
 
 export function renderAdminLayout(data: AdminLayoutData): string {
-  return adminLayoutV2(data);
+  // Import and use the new Catalyst layout
+  const { renderAdminLayoutCatalyst } = require('./admin-layout-catalyst.template')
+  return renderAdminLayoutCatalyst(data);
 }
 
 export function adminLayoutV2(data: AdminLayoutData): string {
