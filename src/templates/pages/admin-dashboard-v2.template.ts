@@ -199,18 +199,18 @@ export function renderStatsCards(stats: DashboardStats): string {
   ]
 
   return `
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
       ${cards.map(card => `
         <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm text-zinc-500 dark:text-zinc-400">${card.title}</p>
-                    <p class="mt-2 text-2xl font-semibold text-zinc-950 dark:text-white">${card.value}</p>
-                </div>
-                <div class="flex h-12 w-12 items-center justify-center rounded-lg ${card.iconBg}">
-                    <div class="${card.iconColor}">${card.icon}</div>
-                </div>
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">${card.title}</p>
+              <p class="text-2xl font-semibold text-zinc-950 dark:text-white">${card.value}</p>
             </div>
+            <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg ${card.iconBg}">
+              <div class="${card.iconColor}">${card.icon}</div>
+            </div>
+          </div>
         </div>
       `).join('')}
     </div>
@@ -219,15 +219,15 @@ export function renderStatsCards(stats: DashboardStats): string {
 
 function renderStatsCardsSkeleton(): string {
   return `
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
       ${Array(4).fill(0).map(() => `
         <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6 animate-pulse">
-          <div class="flex items-center justify-between">
-              <div>
-                  <div class="h-4 w-24 bg-zinc-200 dark:bg-zinc-700 rounded mb-3"></div>
-                  <div class="h-8 w-16 bg-zinc-200 dark:bg-zinc-700 rounded"></div>
-              </div>
-              <div class="h-12 w-12 bg-zinc-200 dark:bg-zinc-700 rounded-lg"></div>
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex-1 min-w-0">
+              <div class="h-4 w-28 bg-zinc-200 dark:bg-zinc-700 rounded mb-2"></div>
+              <div class="h-8 w-16 bg-zinc-200 dark:bg-zinc-700 rounded"></div>
+            </div>
+            <div class="h-12 w-12 flex-shrink-0 bg-zinc-200 dark:bg-zinc-700 rounded-lg"></div>
           </div>
         </div>
       `).join('')}
