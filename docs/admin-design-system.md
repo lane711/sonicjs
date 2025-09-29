@@ -2,69 +2,87 @@
 
 ## Overview
 
-This document defines the comprehensive design system for SonicJS AI admin interfaces. All admin screens must follow these specifications to ensure visual consistency and maintainability.
+This document defines the comprehensive design system for SonicJS AI admin interfaces based on the Catalyst UI Kit design principles. All admin screens must follow these specifications to ensure visual consistency and maintainability.
 
 ## Design Philosophy
 
-The admin interface uses a **Glass Morphism** design pattern, creating a modern, sophisticated experience with depth and layering through translucent elements and backdrop blur effects.
+The admin interface uses a **clean, professional** design pattern inspired by Catalyst UI Kit, emphasizing clarity, simplicity, and accessibility with a modern zinc-based color palette.
 
 ### Core Principles
-- **Clarity through translucency**: Semi-transparent layers create visual hierarchy
-- **Depth and dimension**: Multiple glass layers suggest spatial relationships
+- **Clarity and simplicity**: Clean interfaces with clear hierarchy
+- **Professional aesthetic**: Minimal, refined design language
 - **Consistent spacing**: Predictable rhythm improves usability
 - **Smooth interactions**: Transitions enhance perceived performance
-- **Dark-first design**: Optimized for extended use and reduced eye strain
+- **Dark mode support**: Built-in support for light and dark themes
 
 ## Color Palette
 
-### Background Colors
+### Primary Colors (Zinc Scale)
 ```css
-/* Primary backgrounds */
-bg-black/20        /* Main glass containers */
-bg-white/10        /* Secondary containers */
-bg-white/5         /* Subtle backgrounds */
-bg-white/20        /* Hover states */
+/* Light mode */
+text-zinc-950       /* Primary text */
+text-zinc-500       /* Secondary text */
+text-zinc-400       /* Tertiary text/placeholders */
+bg-white            /* Main backgrounds */
+bg-zinc-50          /* Subtle backgrounds */
+bg-zinc-100         /* Hover states */
 
-/* Status backgrounds */
-bg-red-500/10      /* Error states */
-bg-green-500/10    /* Success states */
-bg-amber-500/20    /* Warning states */
-bg-blue-500/10     /* Info states */
+/* Dark mode */
+dark:text-white     /* Primary text */
+dark:text-zinc-400  /* Secondary text */
+dark:text-zinc-500  /* Tertiary text/placeholders */
+dark:bg-zinc-900    /* Main backgrounds */
+dark:bg-zinc-800    /* Subtle backgrounds */
+dark:bg-zinc-700    /* Hover states */
 ```
 
-### Text Colors
+### Semantic Colors
 ```css
-/* Primary text */
-text-white         /* Primary headings and content */
-text-gray-300      /* Secondary text and descriptions */
-text-gray-400      /* Tertiary text and metadata */
+/* Success */
+bg-green-50 dark:bg-green-500/10
+text-green-700 dark:text-green-400
+ring-green-600/20 dark:ring-green-500/20
 
-/* Interactive text */
-text-white hover:text-gray-300    /* Links and buttons */
-text-gray-300 hover:text-white    /* Secondary actions */
+/* Error */
+bg-red-50 dark:bg-red-500/10
+text-red-700 dark:text-red-400
+ring-red-600/20 dark:ring-red-500/20
+
+/* Warning */
+bg-amber-50 dark:bg-amber-500/10
+text-amber-700 dark:text-amber-400
+ring-amber-600/20 dark:ring-amber-500/20
+
+/* Info */
+bg-blue-50 dark:bg-blue-500/10
+text-blue-700 dark:text-blue-400
+ring-blue-600/20 dark:ring-blue-500/20
 ```
 
-### Border Colors
+### Border & Ring Colors
 ```css
-border-white/10    /* Default borders */
-border-white/20    /* Emphasized borders */
-border-white/30    /* Focus states */
+/* Light mode */
+ring-1 ring-zinc-950/5        /* Subtle borders */
+ring-1 ring-zinc-950/10       /* Standard borders */
+
+/* Dark mode */
+dark:ring-white/5             /* Subtle borders */
+dark:ring-white/10            /* Standard borders */
 ```
 
 ## Typography
 
 ### Font Hierarchy
-1. **Page Titles**: `text-4xl font-bold text-white` (40px)
-2. **Section Headings**: `text-2xl font-bold text-white` (24px)
-3. **Subsection Headings**: `text-xl font-semibold text-white` (20px)
-4. **Card Titles**: `text-lg font-semibold text-white` (18px)
-5. **Body Text**: `text-sm text-gray-300` (14px)
-6. **Small Text**: `text-xs text-gray-400` (12px)
+1. **Page Titles**: `text-2xl font-semibold text-zinc-950 dark:text-white`
+2. **Section Headings**: `text-xl font-semibold text-zinc-950 dark:text-white`
+3. **Subsection Headings**: `text-base font-semibold text-zinc-950 dark:text-white`
+4. **Body Text**: `text-sm text-zinc-950 dark:text-white`
+5. **Secondary Text**: `text-sm text-zinc-500 dark:text-zinc-400`
+6. **Small Text**: `text-xs text-zinc-500 dark:text-zinc-400`
 
 ### Font Weights
-- **Bold**: 700 (headings)
-- **Semibold**: 600 (subheadings, emphasis)
-- **Medium**: 500 (buttons, labels)
+- **Semibold**: 600 (headings, buttons)
+- **Medium**: 500 (labels, emphasis)
 - **Regular**: 400 (body text)
 
 ## Spacing System
@@ -72,9 +90,10 @@ border-white/30    /* Focus states */
 ### Base Unit: 0.25rem (4px)
 ```css
 /* Common spacing values */
-space-y-6     /* 24px - Between major sections */
+space-y-8     /* 32px - Between major sections */
+space-y-6     /* 24px - Between form sections */
 space-y-4     /* 16px - Between form fields */
-space-x-3     /* 12px - Horizontal spacing */
+gap-x-3       /* 12px - Horizontal gaps */
 p-8           /* 32px - Large container padding */
 p-6           /* 24px - Medium container padding */
 p-4           /* 16px - Small container padding */
@@ -82,529 +101,359 @@ p-4           /* 16px - Small container padding */
 
 ## Component Specifications
 
-### Page Layout
+### Containers
 
+#### Primary Container
 ```html
-<div class="min-h-screen py-8">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <!-- Page content -->
-  </div>
+<div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-8">
+  <!-- Content -->
 </div>
 ```
 
-### Glass Containers
-
-#### Primary Container
-```css
-.glass-container {
-  @apply backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl;
-}
-```
-
-#### Secondary Container
-```css
-.glass-container-secondary {
-  @apply backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl;
-}
-```
-
-### Page Headers
-
+#### Card Container
 ```html
-<!-- Glass Morphism Header Card -->
-<div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-8 mb-8">
-  <!-- Breadcrumb -->
-  <nav class="flex mb-6" aria-label="Breadcrumb">
-    <ol class="flex items-center space-x-3">
-      <!-- Breadcrumb items -->
-    </ol>
-  </nav>
-  
-  <!-- Title Section with Gradient -->
-  <div class="relative">
-    <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-3xl"></div>
-    <div class="relative">
-      <h1 class="text-4xl font-bold text-white mb-3">Page Title</h1>
-      <p class="text-gray-300 text-lg">Page description</p>
-    </div>
-  </div>
+<div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
+  <!-- Content -->
 </div>
 ```
 
 ### Buttons
 
-#### Primary Button (Gradient)
+#### Primary Button
 ```html
-<button class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all font-medium">
-  <svg class="w-5 h-5 mr-2"><!-- Icon --></svg>
+<button class="rounded-lg bg-zinc-950 dark:bg-white px-4 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors">
   Button Text
 </button>
 ```
 
-#### Secondary Button (Glass)
+#### Primary Button with Icon
 ```html
-<button class="inline-flex items-center px-4 py-2 bg-white/10 text-gray-300 rounded-lg hover:bg-white/20 hover:text-white transition-colors border border-white/10">
-  <svg class="w-4 h-4 mr-2"><!-- Icon --></svg>
+<button class="inline-flex items-center gap-x-2 rounded-lg bg-zinc-950 dark:bg-white px-4 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors">
+  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <!-- Icon path -->
+  </svg>
+  Button Text
+</button>
+```
+
+#### Secondary Button
+```html
+<button class="rounded-lg bg-white dark:bg-zinc-800 px-4 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
   Button Text
 </button>
 ```
 
 #### Danger Button
 ```html
-<button class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all font-medium">
-  <svg class="w-4 h-4 mr-2"><!-- Icon --></svg>
+<button class="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition-colors">
   Delete
+</button>
+```
+
+#### Link Button
+```html
+<button class="text-sm font-semibold text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">
+  Learn more →
 </button>
 ```
 
 ### Forms
 
-#### Form Container
+#### Text Input
 ```html
-<div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl overflow-hidden">
-  <!-- Form Header -->
-  <div class="relative px-8 py-6 border-b border-white/10">
-    <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10"></div>
-    <div class="relative flex items-center gap-3">
-      <div class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
-        <!-- Icon -->
-      </div>
-      <div>
-        <h2 class="text-xl font-semibold text-white">Form Title</h2>
-        <p class="text-sm text-gray-300">Form description</p>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Form Content -->
-  <div class="p-8">
-    <!-- Form fields -->
-  </div>
+<div>
+  <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">
+    Label Text
+  </label>
+  <input
+    type="text"
+    placeholder="Enter text..."
+    class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
+  />
 </div>
 ```
 
-#### Form Inputs
-```css
-.form-input {
-  @apply w-full px-3 py-2 bg-white/5 backdrop-filter backdrop-blur-sm border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all;
-}
+#### Select Dropdown
+```html
+<div>
+  <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">
+    Label Text
+  </label>
+  <select class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow">
+    <option value="">Choose an option</option>
+  </select>
+</div>
+```
+
+#### Textarea
+```html
+<div>
+  <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">
+    Label Text
+  </label>
+  <textarea
+    rows="3"
+    placeholder="Enter description..."
+    class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
+  ></textarea>
+</div>
+```
+
+#### Checkbox
+```html
+<div class="flex items-center gap-x-2">
+  <input
+    type="checkbox"
+    id="checkbox-id"
+    class="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white focus:ring-offset-0"
+  />
+  <label for="checkbox-id" class="text-sm text-zinc-950 dark:text-white">
+    Checkbox label
+  </label>
+</div>
+```
+
+#### Radio Button
+```html
+<div class="flex items-center gap-x-2">
+  <input
+    type="radio"
+    id="radio-id"
+    name="radio-group"
+    class="h-4 w-4 border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white focus:ring-offset-0"
+  />
+  <label for="radio-id" class="text-sm text-zinc-950 dark:text-white">
+    Radio label
+  </label>
+</div>
 ```
 
 ### Tables
 
-All admin tables must implement standardized filtering, sorting, and pagination features to ensure consistent user experience across the platform.
-
-#### Standard Table Features
-
-**Required Components:**
-1. **Filters Bar** - Common field filtering (status, date range, search)
-2. **Sortable Headers** - Click to sort by column
-3. **Pagination Controls** - Navigation and page size options
-4. **Row Actions** - Edit, delete, and other item-specific actions
-5. **Bulk Actions** - Multi-select with batch operations
-
-#### Table Container Structure
-
+#### Table Container
 ```html
-<div class="w-full space-y-6">
-  <!-- Filters and Search Bar -->
-  <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <!-- Search Input -->
-      <div>
-        <label class="block text-sm font-medium text-white mb-2">Search</label>
-        <input type="text" 
-               placeholder="Search items..." 
-               class="w-full px-3 py-2 backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors">
-      </div>
-      
-      <!-- Status Filter -->
-      <div>
-        <label class="block text-sm font-medium text-white mb-2">Status</label>
-        <select class="w-full px-3 py-2 backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl text-white focus:border-blue-400 focus:outline-none transition-colors">
-          <option value="">All Statuses</option>
-          <option value="published">Published</option>
-          <option value="draft">Draft</option>
-          <option value="archived">Archived</option>
-        </select>
-      </div>
-      
-      <!-- Date Range Filter -->
-      <div>
-        <label class="block text-sm font-medium text-white mb-2">Date Range</label>
-        <select class="w-full px-3 py-2 backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl text-white focus:border-blue-400 focus:outline-none transition-colors">
-          <option value="">All Time</option>
-          <option value="today">Today</option>
-          <option value="week">This Week</option>
-          <option value="month">This Month</option>
-        </select>
-      </div>
-      
-      <!-- Category/Type Filter -->
-      <div>
-        <label class="block text-sm font-medium text-white mb-2">Category</label>
-        <select class="w-full px-3 py-2 backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl text-white focus:border-blue-400 focus:outline-none transition-colors">
-          <option value="">All Categories</option>
-          <!-- Dynamic options based on context -->
-        </select>
-      </div>
-    </div>
-    
-    <!-- Filter Actions -->
-    <div class="flex justify-between items-center mt-4">
-      <button class="text-sm text-gray-300 hover:text-white transition-colors">
-        Clear Filters
-      </button>
-      <div class="flex items-center space-x-2">
-        <span class="text-sm text-gray-300">Show:</span>
-        <select class="px-2 py-1 backdrop-blur-sm bg-white/10 border border-white/20 rounded text-white text-sm">
-          <option value="20">20</option>
-          <option value="50">50</option>
-          <option value="100">100</option>
-        </select>
-        <span class="text-sm text-gray-300">items per page</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bulk Actions Bar (shown when items selected) -->
-  <div class="backdrop-blur-xl bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 hidden" id="bulk-actions">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center space-x-4">
-        <span class="text-sm text-amber-300">
-          <span id="selected-count">0</span> items selected
-        </span>
-        <button class="text-sm text-amber-300 hover:text-amber-200 transition-colors">
-          Select All
-        </button>
-        <button class="text-sm text-amber-300 hover:text-amber-200 transition-colors">
-          Clear Selection
-        </button>
-      </div>
-      <div class="flex items-center space-x-2">
-        <button class="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 transition-colors text-sm">
-          Bulk Edit
-        </button>
-        <button class="px-3 py-1 bg-red-500/20 text-red-300 rounded-lg hover:bg-red-500/30 transition-colors text-sm">
-          Bulk Delete
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Table Container -->
-  <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl overflow-hidden">
-    <table class="w-full">
-      <thead class="bg-white/5">
-        <tr>
-          <!-- Bulk Select Header -->
-          <th class="px-6 py-3 text-left">
-            <input type="checkbox" 
-                   id="select-all"
-                   class="rounded border-white/20 bg-white/10 text-blue-500 focus:ring-blue-500 focus:ring-offset-0">
-          </th>
-          
-          <!-- Sortable Column Headers -->
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:text-white transition-colors group">
-            <div class="flex items-center space-x-1">
-              <span>Title</span>
-              <svg class="w-4 h-4 text-gray-400 group-hover:text-gray-300 transition-colors">
-                <!-- Sort icon -->
-                <path d="M8 4l4 4H4l4-4zm0 6l4 4H4l4-4z"/>
-              </svg>
-            </div>
-          </th>
-          
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:text-white transition-colors group">
-            <div class="flex items-center space-x-1">
-              <span>Status</span>
-              <svg class="w-4 h-4 text-gray-400 group-hover:text-gray-300 transition-colors">
-                <path d="M8 4l4 4H4l4-4zm0 6l4 4H4l4-4z"/>
-              </svg>
-            </div>
-          </th>
-          
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:text-white transition-colors group">
-            <div class="flex items-center space-x-1">
-              <span>Created</span>
-              <svg class="w-4 h-4 text-gray-400 group-hover:text-gray-300 transition-colors">
-                <path d="M8 4l4 4H4l4-4zm0 6l4 4H4l4-4z"/>
-              </svg>
-            </div>
-          </th>
-          
-          <th class="px-6 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider">
-            Actions
-          </th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-white/10">
-        <tr class="hover:bg-white/5 transition-colors">
-          <!-- Row Select -->
-          <td class="px-6 py-4">
-            <input type="checkbox" 
-                   class="row-select rounded border-white/20 bg-white/10 text-blue-500 focus:ring-blue-500 focus:ring-offset-0">
-          </td>
-          
-          <!-- Data Cells -->
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="flex items-center">
-              <div class="text-sm font-medium text-white">Item Title</div>
-            </div>
-          </td>
-          
-          <td class="px-6 py-4 whitespace-nowrap">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-300">
-              Published
-            </span>
-          </td>
-          
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-            Dec 27, 2024
-          </td>
-          
-          <!-- Row Actions -->
-          <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
-            <button class="text-blue-300 hover:text-blue-200 transition-colors">
-              Edit
-            </button>
-            <button class="text-gray-300 hover:text-white transition-colors">
-              View
-            </button>
-            <button class="text-red-300 hover:text-red-200 transition-colors">
-              Delete
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Pagination -->
-  <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6">
-    <div class="flex items-center justify-between">
-      <!-- Results Summary -->
-      <div class="text-sm text-gray-300">
-        Showing <span class="font-medium text-white">1-20</span> of <span class="font-medium text-white">247</span> results
-      </div>
-      
-      <!-- Pagination Controls -->
-      <div class="flex items-center space-x-2">
-        <!-- Previous Button -->
-        <button class="px-3 py-2 rounded-lg backdrop-blur-sm bg-white/10 border border-white/20 text-gray-300 hover:bg-white/20 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-          Previous
-        </button>
-        
-        <!-- Page Numbers -->
-        <div class="flex items-center space-x-1">
-          <button class="px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-all">1</button>
-          <button class="px-3 py-2 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-500/30">2</button>
-          <button class="px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-all">3</button>
-          <span class="px-2 text-gray-400">...</span>
-          <button class="px-3 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-all">13</button>
-        </div>
-        
-        <!-- Next Button -->
-        <button class="px-3 py-2 rounded-lg backdrop-blur-sm bg-white/10 border border-white/20 text-gray-300 hover:bg-white/20 hover:text-white transition-all">
-          Next
-        </button>
-      </div>
-    </div>
-  </div>
+<div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 overflow-hidden">
+  <table class="min-w-full divide-y divide-zinc-950/5 dark:divide-white/5">
+    <thead class="bg-zinc-50 dark:bg-zinc-800/50">
+      <tr>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+          Column Name
+        </th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-zinc-950/5 dark:divide-white/5">
+      <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+        <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-zinc-950 dark:text-white">
+          Cell Content
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 ```
 
-#### Status Badge Variants
+### Badges
 
-```css
-/* Status badge styles */
-.status-published { @apply bg-green-500/20 text-green-300; }
-.status-draft { @apply bg-yellow-500/20 text-yellow-300; }
-.status-archived { @apply bg-gray-500/20 text-gray-300; }
-.status-error { @apply bg-red-500/20 text-red-300; }
-```
-
-#### Sort State Indicators
-
+#### Status Badges
 ```html
-<!-- Ascending Sort -->
-<svg class="w-4 h-4 text-blue-400">
-  <path d="M8 4l4 4H4l4-4z"/>
-</svg>
+<!-- Success -->
+<span class="inline-flex items-center rounded-md bg-green-50 dark:bg-green-500/10 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-600/20 dark:ring-green-500/20">
+  Published
+</span>
 
-<!-- Descending Sort -->
-<svg class="w-4 h-4 text-blue-400 rotate-180">
-  <path d="M8 4l4 4H4l4-4z"/>
-</svg>
-```
+<!-- Warning -->
+<span class="inline-flex items-center rounded-md bg-amber-50 dark:bg-amber-500/10 px-2 py-1 text-xs font-medium text-amber-700 dark:text-amber-400 ring-1 ring-inset ring-amber-600/20 dark:ring-amber-500/20">
+  Draft
+</span>
 
-#### Standard Table Interactions
+<!-- Error -->
+<span class="inline-flex items-center rounded-md bg-red-50 dark:bg-red-500/10 px-2 py-1 text-xs font-medium text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-600/20 dark:ring-red-500/20">
+  Failed
+</span>
 
-1. **Column Sorting**: Click header to sort, show visual indicator
-2. **Multi-select**: Checkbox selection with bulk action bar
-3. **Row Hover**: Subtle highlight on row hover
-4. **Pagination**: Standard controls with page numbers
-5. **Filtering**: Real-time filter application
-6. **Search**: Debounced search with clear option
-
-### Cards
-
-#### Basic Card
-```html
-<div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6">
-  <h3 class="text-lg font-semibold text-white mb-4">Card Title</h3>
-  <p class="text-gray-300">Card content</p>
-</div>
-```
-
-#### Interactive Card
-```html
-<div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-6 hover:shadow-3xl hover:scale-[1.02] transition-all cursor-pointer">
-  <!-- Card content -->
-</div>
+<!-- Default -->
+<span class="inline-flex items-center rounded-md bg-zinc-50 dark:bg-zinc-800 px-2 py-1 text-xs font-medium text-zinc-600 dark:text-zinc-400 ring-1 ring-inset ring-zinc-500/10 dark:ring-zinc-400/20">
+  Default
+</span>
 ```
 
 ### Alerts and Notifications
 
 #### Success Alert
 ```html
-<div class="backdrop-blur-xl bg-green-500/10 border border-green-500/20 rounded-2xl p-4">
-  <div class="flex items-start space-x-3">
-    <svg class="w-5 h-5 text-green-400 mt-0.5"><!-- Icon --></svg>
+<div class="rounded-lg bg-green-50 dark:bg-green-500/10 p-4 ring-1 ring-green-600/20 dark:ring-green-500/20">
+  <div class="flex items-start gap-x-3">
+    <svg class="h-5 w-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
     <div>
-      <h5 class="text-sm font-medium text-green-300">Success</h5>
-      <p class="text-sm text-green-200 mt-1">Operation completed successfully.</p>
+      <h3 class="text-sm font-semibold text-green-900 dark:text-green-300">Success</h3>
+      <p class="mt-1 text-sm text-green-700 dark:text-green-400">Your changes have been saved successfully.</p>
     </div>
   </div>
 </div>
 ```
 
-### Navigation
-
-#### Sidebar Navigation
+#### Error Alert
 ```html
-<nav class="backdrop-blur-md bg-black/30 rounded-xl border border-white/10 shadow-xl p-6">
-  <a href="/admin/path" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-white/10 hover:text-white transition-all">
-    <svg class="w-5 h-5"><!-- Icon --></svg>
-    <span class="font-medium">Navigation Item</span>
-  </a>
-</nav>
-```
-
-### Empty States
-
-```html
-<div class="text-center py-16">
-  <div class="flex justify-center mb-4">
-    <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center">
-      <svg class="w-8 h-8 text-white"><!-- Icon --></svg>
+<div class="rounded-lg bg-red-50 dark:bg-red-500/10 p-4 ring-1 ring-red-600/20 dark:ring-red-500/20">
+  <div class="flex items-start gap-x-3">
+    <svg class="h-5 w-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <div>
+      <h3 class="text-sm font-semibold text-red-900 dark:text-red-300">Error</h3>
+      <p class="mt-1 text-sm text-red-700 dark:text-red-400">There was a problem with your request.</p>
     </div>
   </div>
-  <h3 class="text-lg font-semibold text-white mb-2">No items found</h3>
-  <p class="text-gray-300 mb-6">Get started by creating your first item.</p>
-  <button class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all font-medium">
-    Create New Item
-  </button>
+</div>
+```
+
+#### Warning Alert
+```html
+<div class="rounded-lg bg-amber-50 dark:bg-amber-500/10 p-4 ring-1 ring-amber-600/20 dark:ring-amber-500/20">
+  <div class="flex items-start gap-x-3">
+    <svg class="h-5 w-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.865-.833-2.632 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+    </svg>
+    <div>
+      <h3 class="text-sm font-semibold text-amber-900 dark:text-amber-300">Warning</h3>
+      <p class="mt-1 text-sm text-amber-700 dark:text-amber-400">Please review your changes before continuing.</p>
+    </div>
+  </div>
+</div>
+```
+
+#### Info Alert
+```html
+<div class="rounded-lg bg-blue-50 dark:bg-blue-500/10 p-4 ring-1 ring-blue-600/20 dark:ring-blue-500/20">
+  <div class="flex items-start gap-x-3">
+    <svg class="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <div>
+      <h3 class="text-sm font-semibold text-blue-900 dark:text-blue-300">Information</h3>
+      <p class="mt-1 text-sm text-blue-700 dark:text-blue-400">Here's some helpful information about this feature.</p>
+    </div>
+  </div>
+</div>
+```
+
+### Cards
+
+#### Basic Card
+```html
+<div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
+  <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-2">Card Title</h3>
+  <p class="text-sm text-zinc-500 dark:text-zinc-400">Card content</p>
+</div>
+```
+
+#### Interactive Card
+```html
+<div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6 hover:shadow-md hover:ring-zinc-950/10 dark:hover:ring-white/20 transition-all cursor-pointer">
+  <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-2">Card Title</h3>
+  <p class="text-sm text-zinc-500 dark:text-zinc-400">Card content</p>
+</div>
+```
+
+#### Card with Icon
+```html
+<div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
+  <div class="flex items-center gap-x-3 mb-3">
+    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-950 dark:bg-white">
+      <svg class="h-5 w-5 text-white dark:text-zinc-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- Icon path -->
+      </svg>
+    </div>
+    <h3 class="text-base font-semibold text-zinc-950 dark:text-white">Card Title</h3>
+  </div>
+  <p class="text-sm text-zinc-500 dark:text-zinc-400">Card content</p>
 </div>
 ```
 
 ## Interaction Patterns
 
 ### Hover States
-- **Containers**: Add `hover:bg-white/20` or increase opacity
-- **Buttons**: Darken gradients or increase glass opacity
-- **Links**: Change from `text-gray-300` to `text-white`
-- **Cards**: Add `hover:shadow-3xl` and subtle scale `hover:scale-[1.02]`
+- **Buttons**: Darken background color by one shade
+- **Links**: Change from `text-zinc-950` to `text-zinc-600` (light) or `text-white` to `text-zinc-300` (dark)
+- **Cards**: Increase shadow and ring opacity
+- **Table rows**: Subtle background change with `hover:bg-zinc-50 dark:hover:bg-zinc-800/50`
 
 ### Focus States
-- **Inputs**: Show ring with `focus:ring-2 focus:ring-white/20`
-- **Buttons**: Add outline with `focus:outline-none focus:ring-2 focus:ring-white/30`
+- **Inputs**: Show 2px ring with `focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white`
+- **Buttons**: Use browser default focus styles
+- **Links**: Use `focus:outline-none focus:ring-2`
 
 ### Transitions
-- **Default**: `transition-all` for smooth state changes
-- **Colors**: `transition-colors` for color-only changes
-- **Transform**: `transition-transform` for scale/rotate changes
-- **Duration**: Default 200ms, use `duration-300` for slower animations
+- **Default**: `transition-colors` for color-only changes
+- **Complex**: `transition-all` for multiple property changes
+- **Shadow**: `transition-shadow` for shadow-only changes
+- **Duration**: Default 150ms (Tailwind default)
 
 ## Responsive Design
 
 ### Breakpoints
 - **Mobile**: Default (< 640px)
 - **Tablet**: `sm:` (640px+)
-- **Desktop**: `lg:` (1024px+)
-- **Wide**: `xl:` (1280px+)
+- **Desktop**: `md:` (768px+)
+- **Large**: `lg:` (1024px+)
 
 ### Mobile Adaptations
 - Stack horizontal layouts vertically
-- Reduce padding: `p-4` instead of `p-8`
+- Reduce padding on mobile
 - Full-width buttons on mobile
-- Simplified navigation (hamburger menu)
+- Simplified navigation
 
 ## Accessibility Guidelines
 
 ### Color Contrast
-- Ensure 4.5:1 contrast ratio for normal text
-- Ensure 3:1 contrast ratio for large text
-- Test with translucent backgrounds
+- Ensure WCAG AA compliance (4.5:1 for normal text, 3:1 for large text)
+- Test in both light and dark modes
+- Use semantic colors appropriately
 
 ### Interactive Elements
 - Minimum touch target: 44x44px
 - Clear focus indicators
 - Keyboard navigation support
-- ARIA labels for icons
+- ARIA labels for icons and interactive elements
 
 ### Motion
 - Respect `prefers-reduced-motion`
-- Provide alternatives to animated content
 - Keep transitions under 300ms
+- Provide alternatives to animated content
 
-## Implementation Examples
+## Dark Mode Implementation
 
-### Complete Page Template
+All components must support both light and dark modes using Tailwind's `dark:` prefix:
+
 ```html
-<div class="min-h-screen py-8">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-    <!-- Page Header -->
-    <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-8">
-      <!-- Header content -->
-    </div>
-    
-    <!-- Main Content -->
-    <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl">
-      <!-- Content -->
-    </div>
-    
-    <!-- Quick Actions -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <!-- Action cards -->
-    </div>
-  </div>
+<!-- Example with dark mode support -->
+<div class="bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white">
+  Content
 </div>
-```
-
-## CSS Variables (Future Enhancement)
-
-```css
-:root {
-  --glass-bg: rgba(255, 255, 255, 0.1);
-  --glass-border: rgba(255, 255, 255, 0.2);
-  --glass-hover: rgba(255, 255, 255, 0.2);
-  --text-primary: #ffffff;
-  --text-secondary: #d1d5db;
-  --text-tertiary: #9ca3af;
-}
 ```
 
 ## Maintenance Notes
 
 1. **Consistency**: Always use the predefined classes and patterns
-2. **Performance**: Limit backdrop-blur usage on mobile devices
-3. **Testing**: Verify glass effects across different backgrounds
+2. **Dark Mode**: Test all components in both light and dark modes
+3. **Accessibility**: Verify keyboard navigation and screen reader support
 4. **Updates**: Document any new patterns in this specification
 5. **Reviews**: Regular design audits to ensure adherence
 
+## Migration from Glass Morphism
+
+If migrating from the previous glass morphism design:
+
+1. Replace `backdrop-blur-xl bg-white/10` with `bg-white dark:bg-zinc-900`
+2. Replace gradient colors with solid zinc colors
+3. Update border styles from `border-white/20` to `ring-1 ring-zinc-950/5 dark:ring-white/10`
+4. Update text colors to use zinc scale
+5. Add dark mode variants to all components
+
 ---
 
-**Last Updated**: December 2024
-**Version**: 1.0.0
+**Last Updated**: January 2025
+**Version**: 2.0.0 (Catalyst-inspired)
 **Maintained By**: SonicJS AI Development Team

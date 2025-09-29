@@ -7,7 +7,7 @@ export interface RegisterPageData {
 export function renderRegisterPage(data: RegisterPageData): string {
   return `
     <!DOCTYPE html>
-    <html lang="en" class="dark">
+    <html lang="en" class="h-full dark">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,216 +19,141 @@ export function renderRegisterPage(data: RegisterPageData): string {
         tailwind.config = {
           darkMode: 'class',
           theme: {
-            extend: {
-              backdropBlur: {
-                xs: '2px',
-              }
-            }
+            extend: {}
           }
         }
       </script>
       <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
+
         body {
           font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
-        
-        .floating-element {
-          position: absolute;
-          background: rgba(255, 255, 255, 0.05);
-          border-radius: 50%;
-          backdrop-filter: blur(10px);
-        }
-        .floating-1 {
-          width: 100px;
-          height: 100px;
-          top: 15%;
-          left: 15%;
-          animation: float 6s ease-in-out infinite;
-        }
-        .floating-2 {
-          width: 60px;
-          height: 60px;
-          top: 70%;
-          right: 20%;
-          animation: float 8s ease-in-out infinite reverse;
-        }
-        .floating-3 {
-          width: 80px;
-          height: 80px;
-          bottom: 15%;
-          left: 25%;
-          animation: float 7s ease-in-out infinite;
-        }
-        .floating-4 {
-          width: 40px;
-          height: 40px;
-          top: 40%;
-          right: 10%;
-          animation: float 5s ease-in-out infinite;
-        }
-        .floating-5 {
-          width: 90px;
-          height: 90px;
-          top: 10%;
-          right: 25%;
-          animation: float 9s ease-in-out infinite;
-        }
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
       </style>
     </head>
-    <body class="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black flex">
-      <!-- Background Pattern -->
-      <div class="fixed inset-0 opacity-30">
-        <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Ccircle cx="30" cy="30" r="1.5"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] bg-repeat"></div>
-      </div>
-      
-      <!-- Floating Elements -->
-      <div class="floating-element floating-1"></div>
-      <div class="floating-element floating-2"></div>
-      <div class="floating-element floating-3"></div>
-      <div class="floating-element floating-4"></div>
-      <div class="floating-element floating-5"></div>
-      
-      <!-- Main Content -->
-      <div class="relative z-10 w-full flex items-center justify-center px-4 py-8">
-        <div class="w-full max-w-md">
-          <!-- Logo Section -->
-          <div class="text-center mb-8">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
-              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-              </svg>
-            </div>
-            <h1 class="text-2xl font-bold text-white mb-2">SonicJS AI</h1>
-            <p class="text-gray-300">AI-Powered Content Management</p>
+    <body class="h-full bg-zinc-950">
+      <div class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <!-- Logo Section -->
+        <div class="sm:mx-auto sm:w-full sm:max-w-md text-center">
+          <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-white">
+            <svg class="h-7 w-7 text-zinc-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
           </div>
-          
-          <!-- Form Container -->
-          <div class="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl overflow-hidden">
-            <!-- Form Header -->
-            <div class="relative px-8 py-6 border-b border-white/10">
-              <div class="absolute inset-0 bg-gradient-to-r from-green-600/10 via-blue-600/10 to-purple-600/10"></div>
-              <div class="relative text-center">
-                <h2 class="text-xl font-semibold text-white mb-2">Join Us Today</h2>
-                <p class="text-sm text-gray-300">Create your account and get started</p>
-              </div>
-            </div>
-            
-            <!-- Form Content -->
-            <div class="p-8">
-              <!-- Alerts -->
-              ${data.error ? `<div class="mb-6">${renderAlert({ type: 'error', message: data.error })}</div>` : ''}
-              
-              <!-- Form -->
-              <form 
-                id="register-form"
-                hx-post="/auth/register/form"
-                hx-target="#form-response"
-                hx-swap="innerHTML"
-                class="space-y-6"
-              >
-                <!-- First and Last Name -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label for="firstName" class="block text-sm font-medium text-gray-300 mb-2">
-                      First Name
-                    </label>
-                    <input 
-                      id="firstName" 
-                      name="firstName" 
-                      type="text" 
-                      required 
-                      class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all" 
-                      placeholder="First name"
-                    >
-                  </div>
-                  <div>
-                    <label for="lastName" class="block text-sm font-medium text-gray-300 mb-2">
-                      Last Name
-                    </label>
-                    <input 
-                      id="lastName" 
-                      name="lastName" 
-                      type="text" 
-                      required 
-                      class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all" 
-                      placeholder="Last name"
-                    >
-                  </div>
-                </div>
-                
-                <!-- Username -->
-                <div>
-                  <label for="username" class="block text-sm font-medium text-gray-300 mb-2">
-                    Username
-                  </label>
-                  <input 
-                    id="username" 
-                    name="username" 
-                    type="text" 
-                    required 
-                    class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all" 
-                    placeholder="Choose a username"
-                  >
-                </div>
-                
-                <!-- Email -->
-                <div>
-                  <label for="email" class="block text-sm font-medium text-gray-300 mb-2">
-                    Email Address
-                  </label>
-                  <input 
-                    id="email" 
-                    name="email" 
-                    type="email" 
-                    autocomplete="email"
-                    required 
-                    class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all" 
-                    placeholder="Enter your email"
-                  >
-                </div>
-                
-                <!-- Password -->
-                <div>
-                  <label for="password" class="block text-sm font-medium text-gray-300 mb-2">
-                    Password
-                  </label>
-                  <input 
-                    id="password" 
-                    name="password" 
-                    type="password" 
-                    autocomplete="new-password"
-                    required 
-                    minlength="8"
-                    class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all" 
-                    placeholder="Create a password (min. 8 characters)"
-                  >
-                </div>
+          <h1 class="mt-6 text-3xl font-semibold tracking-tight text-white">SonicJS AI</h1>
+          <p class="mt-2 text-sm text-zinc-400">Create your account and get started</p>
+        </div>
 
-                <!-- Submit Button -->
-                <button 
-                  type="submit" 
-                  class="w-full px-4 py-3 bg-gradient-to-r from-green-600 to-blue-600 text-white font-semibold rounded-xl hover:from-green-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-transparent transition-all transform hover:scale-[1.02] hover:shadow-lg"
-                >
-                  Create Account
-                </button>
-              </form>
-              
-              <!-- Links -->
-              <div class="mt-6 text-center">
-                <p class="text-gray-300">
-                  Already have an account? 
-                  <a href="/auth/login" class="text-green-400 hover:text-green-300 font-medium transition-colors">Sign in here</a>
-                </p>
+        <!-- Form Container -->
+        <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+          <div class="bg-zinc-900 shadow-sm ring-1 ring-white/10 rounded-xl px-6 py-8 sm:px-10">
+            <!-- Alerts -->
+            ${data.error ? `<div class="mb-6">${renderAlert({ type: 'error', message: data.error })}</div>` : ''}
+
+            <!-- Form -->
+            <form
+              id="register-form"
+              hx-post="/auth/register/form"
+              hx-target="#form-response"
+              hx-swap="innerHTML"
+              class="space-y-6"
+            >
+              <!-- First and Last Name -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="firstName" class="block text-sm font-medium text-white mb-2">
+                    First Name
+                  </label>
+                  <input
+                    id="firstName"
+                    name="firstName"
+                    type="text"
+                    required
+                    class="w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white shadow-sm ring-1 ring-inset ring-white/10 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-white transition-shadow"
+                    placeholder="First name"
+                  >
+                </div>
+                <div>
+                  <label for="lastName" class="block text-sm font-medium text-white mb-2">
+                    Last Name
+                  </label>
+                  <input
+                    id="lastName"
+                    name="lastName"
+                    type="text"
+                    required
+                    class="w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white shadow-sm ring-1 ring-inset ring-white/10 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-white transition-shadow"
+                    placeholder="Last name"
+                  >
+                </div>
               </div>
-              
-              <div id="form-response"></div>
+
+              <!-- Username -->
+              <div>
+                <label for="username" class="block text-sm font-medium text-white mb-2">
+                  Username
+                </label>
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  required
+                  class="w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white shadow-sm ring-1 ring-inset ring-white/10 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-white transition-shadow"
+                  placeholder="Choose a username"
+                >
+              </div>
+
+              <!-- Email -->
+              <div>
+                <label for="email" class="block text-sm font-medium text-white mb-2">
+                  Email Address
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autocomplete="email"
+                  required
+                  class="w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white shadow-sm ring-1 ring-inset ring-white/10 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-white transition-shadow"
+                  placeholder="Enter your email"
+                >
+              </div>
+
+              <!-- Password -->
+              <div>
+                <label for="password" class="block text-sm font-medium text-white mb-2">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autocomplete="new-password"
+                  required
+                  minlength="8"
+                  class="w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white shadow-sm ring-1 ring-inset ring-white/10 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-white transition-shadow"
+                  placeholder="Create a password (min. 8 characters)"
+                >
+              </div>
+
+              <!-- Submit Button -->
+              <button
+                type="submit"
+                class="w-full rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-zinc-950 hover:bg-zinc-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-zinc-900 transition-colors"
+              >
+                Create Account
+              </button>
+            </form>
+
+            <!-- Links -->
+            <div class="mt-6 text-center">
+              <p class="text-sm text-zinc-400">
+                Already have an account?
+                <a href="/auth/login" class="font-semibold text-white hover:text-zinc-300 transition-colors">Sign in here</a>
+              </p>
             </div>
+
+            <div id="form-response"></div>
           </div>
         </div>
       </div>

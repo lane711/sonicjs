@@ -10,16 +10,21 @@ export interface DesignPageData {
 
 export function renderDesignPage(data: DesignPageData): string {
   const pageContent = `
-    <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
+    <div class="w-full space-y-8 px-4 sm:px-6 lg:px-8 py-8">
       <!-- Header -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+      <div class="sm:flex sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-2xl font-semibold text-white">Design System</h1>
-          <p class="mt-2 text-sm text-gray-300">Comprehensive showcase of all design system components and patterns</p>
+          <h1 class="text-2xl font-semibold text-zinc-950 dark:text-white">Catalyst Design System</h1>
+          <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+            A comprehensive showcase of all UI components and design patterns
+          </p>
         </div>
-        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <a href="/docs/design-system" class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/20 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/30 transition-all">
-            <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="mt-4 sm:mt-0">
+          <a
+            href="/docs/design-system"
+            class="inline-flex items-center gap-x-2 rounded-lg bg-zinc-950 dark:bg-white px-4 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors"
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
             Documentation
@@ -27,484 +32,477 @@ export function renderDesignPage(data: DesignPageData): string {
         </div>
       </div>
 
-      <!-- Components Showcase -->
-      <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 mb-6">
-      <div class="flex items-center justify-between mb-4">
-        <div>
-          <h2 class="text-2xl font-bold text-white">Components Showcase</h2>
-          <p class="text-gray-300 mt-1">Quick navigation to all design system components</p>
-        </div>
-        <div class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium">
-          <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-          </svg>
-          Quick Nav
-        </div>
-      </div>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <a href="#typography" class="text-blue-300 hover:text-blue-200 transition-colors">Typography</a>
-        <a href="#colors" class="text-blue-300 hover:text-blue-200 transition-colors">Colors</a>
-        <a href="#buttons" class="text-blue-300 hover:text-blue-200 transition-colors">Buttons</a>
-        <a href="#forms" class="text-blue-300 hover:text-blue-200 transition-colors">Forms</a>
-        <a href="#cards" class="text-blue-300 hover:text-blue-200 transition-colors">Cards</a>
-        <a href="#tables" class="text-blue-300 hover:text-blue-200 transition-colors">Tables</a>
-        <a href="#alerts" class="text-blue-300 hover:text-blue-200 transition-colors">Alerts</a>
-        <a href="#spacing" class="text-blue-300 hover:text-blue-200 transition-colors">Spacing</a>
-        <a href="#overlays" class="text-blue-300 hover:text-blue-200 transition-colors">Overlays</a>
-      </div>
-    </div>
-
-    <!-- Typography Section -->
-    <div id="typography" class="mb-8">
-      <h2 class="text-2xl font-bold text-white mb-6">Typography</h2>
-      
-      <div class="space-y-6">
-        <div>
-          <h1 class="text-4xl font-bold text-white mb-2">Page Title (text-4xl font-bold)</h1>
-          <code class="text-xs text-gray-400 bg-black/20 px-2 py-1 rounded">text-4xl font-bold text-white</code>
-        </div>
-        
-        <div>
-          <h2 class="text-2xl font-bold text-white mb-2">Section Heading (text-2xl font-bold)</h2>
-          <code class="text-xs text-gray-400 bg-black/20 px-2 py-1 rounded">text-2xl font-bold text-white</code>
-        </div>
-        
-        <div>
-          <h3 class="text-xl font-semibold text-white mb-2">Subsection Heading (text-xl font-semibold)</h3>
-          <code class="text-xs text-gray-400 bg-black/20 px-2 py-1 rounded">text-xl font-semibold text-white</code>
-        </div>
-        
-        <div>
-          <h4 class="text-lg font-semibold text-white mb-2">Card Title (text-lg font-semibold)</h4>
-          <code class="text-xs text-gray-400 bg-black/20 px-2 py-1 rounded">text-lg font-semibold text-white</code>
-        </div>
-        
-        <div>
-          <p class="text-sm text-gray-300 mb-2">Body Text - This is the standard body text used throughout the interface for content and descriptions.</p>
-          <code class="text-xs text-gray-400 bg-black/20 px-2 py-1 rounded">text-sm text-gray-300</code>
-        </div>
-        
-        <div>
-          <p class="text-xs text-gray-400 mb-2">Small Text - Used for metadata, timestamps, and secondary information.</p>
-          <code class="text-xs text-gray-400 bg-black/20 px-2 py-1 rounded">text-xs text-gray-400</code>
-        </div>
-      </div>
-    </div>
-
-    <!-- Colors Section -->
-    <div id="colors" class="mb-8">
-      <h2 class="text-2xl font-bold text-white mb-6">Color Palette</h2>
-      
-      <!-- Background Colors -->
-      <div class="mb-8">
-        <h3 class="text-xl font-semibold text-white mb-4">Background Colors</h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div class="bg-black/20 p-4 rounded-xl border border-white/10">
-            <div class="text-sm text-white mb-1">Primary Glass</div>
-            <code class="text-xs text-gray-400">bg-black/20</code>
-          </div>
-          <div class="bg-white/10 p-4 rounded-xl border border-white/10">
-            <div class="text-sm text-white mb-1">Secondary Glass</div>
-            <code class="text-xs text-gray-400">bg-white/10</code>
-          </div>
-          <div class="bg-white/5 p-4 rounded-xl border border-white/10">
-            <div class="text-sm text-white mb-1">Subtle Background</div>
-            <code class="text-xs text-gray-400">bg-white/5</code>
-          </div>
-          <div class="bg-white/20 p-4 rounded-xl border border-white/10">
-            <div class="text-sm text-white mb-1">Hover State</div>
-            <code class="text-xs text-gray-400">bg-white/20</code>
-          </div>
-        </div>
-      </div>
-
-      <!-- Status Colors -->
-      <div class="mb-8">
-        <h3 class="text-xl font-semibold text-white mb-4">Status Colors</h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div class="bg-green-500/10 p-4 rounded-xl border border-green-500/20">
-            <div class="text-sm text-green-300 mb-1">Success</div>
-            <code class="text-xs text-gray-400">bg-green-500/10</code>
-          </div>
-          <div class="bg-red-500/10 p-4 rounded-xl border border-red-500/20">
-            <div class="text-sm text-red-300 mb-1">Error</div>
-            <code class="text-xs text-gray-400">bg-red-500/10</code>
-          </div>
-          <div class="bg-amber-500/20 p-4 rounded-xl border border-amber-500/20">
-            <div class="text-sm text-amber-300 mb-1">Warning</div>
-            <code class="text-xs text-gray-400">bg-amber-500/20</code>
-          </div>
-          <div class="bg-blue-500/10 p-4 rounded-xl border border-blue-500/20">
-            <div class="text-sm text-blue-300 mb-1">Info</div>
-            <code class="text-xs text-gray-400">bg-blue-500/10</code>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Buttons Section -->
-    <div id="buttons" class="mb-8">
-      <h2 class="text-2xl font-bold text-white mb-6">Buttons</h2>
-      
-      <div class="space-y-6">
-        <!-- Primary Buttons -->
-        <div>
-          <h3 class="text-lg font-semibold text-white mb-4">Primary Buttons</h3>
-          <div class="flex flex-wrap gap-4">
-            <button class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all font-medium">
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-              </svg>
-              Create New
-            </button>
-            <button class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all font-medium">
-              Large Button
-            </button>
-          </div>
-        </div>
-
-        <!-- Secondary Buttons -->
-        <div>
-          <h3 class="text-lg font-semibold text-white mb-4">Secondary Buttons</h3>
-          <div class="flex flex-wrap gap-4">
-            <button class="inline-flex items-center px-4 py-2 bg-white/10 text-gray-300 rounded-lg hover:bg-white/20 hover:text-white transition-colors border border-white/10">
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 11V5a2 2 0 012-2h7a2 2 0 012 2v6"></path>
-              </svg>
-              Edit
-            </button>
-            <button class="inline-flex items-center px-4 py-2 bg-white/10 text-gray-300 rounded-lg hover:bg-white/20 hover:text-white transition-colors border border-white/10">
-              View Details
-            </button>
-          </div>
-        </div>
-
-        <!-- Danger Buttons -->
-        <div>
-          <h3 class="text-lg font-semibold text-white mb-4">Danger Buttons</h3>
-          <div class="flex flex-wrap gap-4">
-            <button class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all font-medium">
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-              </svg>
-              Delete
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Forms Section -->
-    <div id="forms" class="mb-8">
-      <h2 class="text-2xl font-bold text-white mb-6">Form Components</h2>
-      
-      <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl overflow-hidden">
-        <!-- Form Header -->
-        <div class="relative px-8 py-6 border-b border-white/10">
-          <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10"></div>
-          <div class="relative flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
-            </div>
-            <div>
-              <h3 class="text-xl font-semibold text-white">Sample Form</h3>
-              <p class="text-sm text-gray-300">Demonstrating form input styles</p>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Form Content -->
-        <div class="p-8 space-y-6">
-          <!-- Text Input -->
+      <!-- Quick Navigation -->
+      <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
+        <div class="flex items-center justify-between mb-6">
           <div>
-            <label class="block text-sm font-medium text-white mb-2">Text Input</label>
-            <input type="text" placeholder="Enter text..." class="w-full px-3 py-2 bg-white/5 backdrop-filter backdrop-blur-sm border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all">
+            <h2 class="text-lg font-semibold text-zinc-950 dark:text-white">Component Library</h2>
+            <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Browse all available components</p>
           </div>
-
-          <!-- Select -->
-          <div>
-            <label class="block text-sm font-medium text-white mb-2">Select Dropdown</label>
-            <select class="w-full px-3 py-2 bg-white/5 backdrop-filter backdrop-blur-sm border border-white/10 rounded-lg text-white focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all">
-              <option value="">Choose an option</option>
-              <option value="option1">Option 1</option>
-              <option value="option2">Option 2</option>
-            </select>
-          </div>
-
-          <!-- Textarea -->
-          <div>
-            <label class="block text-sm font-medium text-white mb-2">Textarea</label>
-            <textarea rows="3" placeholder="Enter description..." class="w-full px-3 py-2 bg-white/5 backdrop-filter backdrop-blur-sm border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all"></textarea>
-          </div>
-
-          <!-- Checkbox -->
-          <div class="flex items-center">
-            <input type="checkbox" id="checkbox-demo" class="rounded border-white/20 bg-white/10 text-blue-500 focus:ring-blue-500 focus:ring-offset-0">
-            <label for="checkbox-demo" class="ml-2 text-sm text-gray-300">Checkbox option</label>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Cards Section -->
-    <div id="cards" class="mb-8">
-      <h2 class="text-2xl font-bold text-white mb-6">Cards</h2>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Basic Card -->
-        <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6">
-          <h3 class="text-lg font-semibold text-white mb-4">Basic Card</h3>
-          <p class="text-gray-300">This is a standard card component with glass morphism styling.</p>
-        </div>
-
-        <!-- Interactive Card -->
-        <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 hover:shadow-3xl hover:scale-[1.02] transition-all cursor-pointer">
-          <h3 class="text-lg font-semibold text-white mb-4">Interactive Card</h3>
-          <p class="text-gray-300">This card has hover effects with scale and shadow changes.</p>
-        </div>
-
-        <!-- Status Card -->
-        <div class="backdrop-blur-xl bg-green-500/10 rounded-xl border border-green-500/20 shadow-2xl p-6">
-          <h3 class="text-lg font-semibold text-green-300 mb-4">Status Card</h3>
-          <p class="text-green-200">This card shows status-specific styling with success colors.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tables Section -->
-    <div id="tables" class="mb-8">
-      <h2 class="text-2xl font-bold text-white mb-6">Table Components</h2>
-      
-      <!-- Table Container -->
-      <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl overflow-hidden">
-        <table class="w-full">
-          <thead class="bg-white/5">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:text-white transition-colors group">
-                <div class="flex items-center space-x-1">
-                  <span>Name</span>
-                  <svg class="w-4 h-4 text-gray-400 group-hover:text-gray-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path>
-                  </svg>
-                </div>
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Created</th>
-              <th class="px-6 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-white/10">
-            <tr class="hover:bg-white/5 transition-colors">
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm font-medium text-white">Sample Item 1</div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-300">
-                  Published
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                Dec 27, 2024
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
-                <button class="text-blue-300 hover:text-blue-200 transition-colors">Edit</button>
-                <button class="text-red-300 hover:text-red-200 transition-colors">Delete</button>
-              </td>
-            </tr>
-            <tr class="hover:bg-white/5 transition-colors">
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm font-medium text-white">Sample Item 2</div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-300">
-                  Draft
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                Dec 26, 2024
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
-                <button class="text-blue-300 hover:text-blue-200 transition-colors">Edit</button>
-                <button class="text-red-300 hover:text-red-200 transition-colors">Delete</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Alerts Section -->
-    <div id="alerts" class="mb-8">
-      <h2 class="text-2xl font-bold text-white mb-6">Alerts & Notifications</h2>
-      
-      <div class="space-y-4">
-        <!-- Success Alert -->
-        <div class="backdrop-blur-xl bg-green-500/10 border border-green-500/20 rounded-2xl p-4">
-          <div class="flex items-start space-x-3">
-            <svg class="w-5 h-5 text-green-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          <span class="inline-flex items-center gap-x-1.5 rounded-lg bg-zinc-950 dark:bg-white px-3 py-1.5 text-xs font-semibold text-white dark:text-zinc-950">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
             </svg>
-            <div>
-              <h5 class="text-sm font-medium text-green-300">Success</h5>
-              <p class="text-sm text-green-200 mt-1">Operation completed successfully.</p>
-            </div>
-          </div>
+            Quick Nav
+          </span>
         </div>
-
-        <!-- Error Alert -->
-        <div class="backdrop-blur-xl bg-red-500/10 border border-red-500/20 rounded-2xl p-4">
-          <div class="flex items-start space-x-3">
-            <svg class="w-5 h-5 text-red-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <div>
-              <h5 class="text-sm font-medium text-red-300">Error</h5>
-              <p class="text-sm text-red-200 mt-1">Something went wrong. Please try again.</p>
-            </div>
-          </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <a href="#typography" class="text-sm font-medium text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Typography</a>
+          <a href="#colors" class="text-sm font-medium text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Colors</a>
+          <a href="#buttons" class="text-sm font-medium text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Buttons</a>
+          <a href="#forms" class="text-sm font-medium text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Forms</a>
+          <a href="#tables" class="text-sm font-medium text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Tables</a>
+          <a href="#alerts" class="text-sm font-medium text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Alerts</a>
+          <a href="#badges" class="text-sm font-medium text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Badges</a>
+          <a href="#cards" class="text-sm font-medium text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Cards</a>
         </div>
+      </div>
 
-        <!-- Warning Alert -->
-        <div class="backdrop-blur-xl bg-amber-500/20 border border-amber-500/20 rounded-2xl p-4">
-          <div class="flex items-start space-x-3">
-            <svg class="w-5 h-5 text-amber-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.865-.833-2.632 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-            </svg>
+      <!-- Typography Section -->
+      <div id="typography">
+        <h2 class="text-xl font-semibold text-zinc-950 dark:text-white mb-6">Typography</h2>
+
+        <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-8">
+          <div class="space-y-8">
             <div>
-              <h5 class="text-sm font-medium text-amber-300">Warning</h5>
-              <p class="text-sm text-amber-200 mt-1">Please review this action before proceeding.</p>
+              <h1 class="text-3xl font-semibold text-zinc-950 dark:text-white">Heading 1</h1>
+              <code class="mt-2 block text-xs text-zinc-500 dark:text-zinc-400">text-3xl font-semibold</code>
             </div>
-          </div>
-        </div>
 
-        <!-- Info Alert -->
-        <div class="backdrop-blur-xl bg-blue-500/10 border border-blue-500/20 rounded-2xl p-4">
-          <div class="flex items-start space-x-3">
-            <svg class="w-5 h-5 text-blue-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
             <div>
-              <h5 class="text-sm font-medium text-blue-300">Information</h5>
-              <p class="text-sm text-blue-200 mt-1">Here's some helpful information about this feature.</p>
+              <h2 class="text-2xl font-semibold text-zinc-950 dark:text-white">Heading 2</h2>
+              <code class="mt-2 block text-xs text-zinc-500 dark:text-zinc-400">text-2xl font-semibold</code>
+            </div>
+
+            <div>
+              <h3 class="text-xl font-semibold text-zinc-950 dark:text-white">Heading 3</h3>
+              <code class="mt-2 block text-xs text-zinc-500 dark:text-zinc-400">text-xl font-semibold</code>
+            </div>
+
+            <div>
+              <p class="text-base text-zinc-950 dark:text-white">Body text - This is the standard body text used throughout the interface for content and descriptions.</p>
+              <code class="mt-2 block text-xs text-zinc-500 dark:text-zinc-400">text-base</code>
+            </div>
+
+            <div>
+              <p class="text-sm text-zinc-500 dark:text-zinc-400">Small text - Used for secondary information and metadata.</p>
+              <code class="mt-2 block text-xs text-zinc-500 dark:text-zinc-400">text-sm text-zinc-500</code>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Spacing Section -->
-    <div id="spacing" class="mb-8">
-      <h2 class="text-2xl font-bold text-white mb-6">Spacing System</h2>
-      
-      <div class="space-y-6">
-        <div>
-          <h3 class="text-lg font-semibold text-white mb-4">Base Unit: 0.25rem (4px)</h3>
-          <div class="space-y-3">
-            <div class="flex items-center space-x-4">
-              <div class="w-16 h-4 bg-blue-500/30 rounded"></div>
-              <span class="text-sm text-gray-300">p-4 (16px)</span>
-            </div>
-            <div class="flex items-center space-x-4">
-              <div class="w-24 h-4 bg-blue-500/30 rounded"></div>
-              <span class="text-sm text-gray-300">p-6 (24px)</span>
-            </div>
-            <div class="flex items-center space-x-4">
-              <div class="w-32 h-4 bg-blue-500/30 rounded"></div>
-              <span class="text-sm text-gray-300">p-8 (32px)</span>
-            </div>
-          </div>
-        </div>
+      <!-- Colors Section -->
+      <div id="colors">
+        <h2 class="text-xl font-semibold text-zinc-950 dark:text-white mb-6">Color Palette</h2>
 
-        <div>
-          <h3 class="text-lg font-semibold text-white mb-4">Common Spacing Values</h3>
-          <div class="bg-black/20 rounded-xl p-4">
-            <code class="text-xs text-gray-300">
-              space-y-6     /* 24px - Between major sections */<br>
-              space-y-4     /* 16px - Between form fields */<br>
-              space-x-3     /* 12px - Horizontal spacing */<br>
-              p-8           /* 32px - Large container padding */<br>
-              p-6           /* 24px - Medium container padding */<br>
-              p-4           /* 16px - Small container padding */
-            </code>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Dropdown & Popup Overlays Section -->
-    <div id="overlays" class="mb-8">
-      <h2 class="text-2xl font-bold text-white mb-6">Dropdown & Popup Overlays</h2>
-      
-      <div class="space-y-6">
-        <div>
-          <h3 class="text-lg font-semibold text-white mb-4">Standard Popup Overlay</h3>
-          <div class="relative inline-block">
-            <button class="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all font-medium">
-              Example Dropdown
-            </button>
-            <!-- Popup Example -->
-            <div class="absolute top-full left-0 mt-2 w-64 backdrop-blur-md bg-black/95 rounded-xl border border-white/10 shadow-xl z-50">
-              <div class="p-4">
-                <h4 class="text-white font-medium mb-2">Popup Overlay Example</h4>
-                <p class="text-gray-300 text-sm mb-3">This demonstrates the standard 95% opacity for popup overlays.</p>
-                <div class="space-y-2">
-                  <a href="#" class="block text-gray-300 hover:text-white transition-colors text-sm">Menu Item 1</a>
-                  <a href="#" class="block text-gray-300 hover:text-white transition-colors text-sm">Menu Item 2</a>
-                  <a href="#" class="block text-gray-300 hover:text-white transition-colors text-sm">Menu Item 3</a>
-                </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Zinc Scale -->
+          <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
+            <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">Zinc (Primary)</h3>
+            <div class="space-y-2">
+              <div class="flex items-center gap-x-3">
+                <div class="h-10 w-10 rounded-lg bg-zinc-50 ring-1 ring-inset ring-zinc-950/10"></div>
+                <span class="text-sm text-zinc-950 dark:text-white">zinc-50</span>
+              </div>
+              <div class="flex items-center gap-x-3">
+                <div class="h-10 w-10 rounded-lg bg-zinc-100 ring-1 ring-inset ring-zinc-950/10"></div>
+                <span class="text-sm text-zinc-950 dark:text-white">zinc-100</span>
+              </div>
+              <div class="flex items-center gap-x-3">
+                <div class="h-10 w-10 rounded-lg bg-zinc-500"></div>
+                <span class="text-sm text-zinc-950 dark:text-white">zinc-500</span>
+              </div>
+              <div class="flex items-center gap-x-3">
+                <div class="h-10 w-10 rounded-lg bg-zinc-900"></div>
+                <span class="text-sm text-zinc-950 dark:text-white">zinc-900</span>
+              </div>
+              <div class="flex items-center gap-x-3">
+                <div class="h-10 w-10 rounded-lg bg-zinc-950"></div>
+                <span class="text-sm text-zinc-950 dark:text-white">zinc-950</span>
               </div>
             </div>
           </div>
-          <div class="mt-4">
-            <code class="text-xs text-gray-400 bg-black/20 px-2 py-1 rounded">backdrop-blur-md bg-black/95 rounded-xl border border-white/10 shadow-xl</code>
-          </div>
-        </div>
 
-        <div>
-          <h3 class="text-lg font-semibold text-white mb-4">Opacity Standards</h3>
-          <div class="space-y-3">
-            <div class="flex items-center space-x-4">
-              <div class="w-16 h-8 bg-black/95 rounded border border-white/10"></div>
-              <span class="text-sm text-gray-300">bg-black/95 - Popup overlays (95% opacity)</span>
-            </div>
-            <div class="flex items-center space-x-4">
-              <div class="w-16 h-8 bg-black/20 rounded border border-white/10"></div>
-              <span class="text-sm text-gray-300">bg-black/20 - Background overlays (20% opacity)</span>
-            </div>
-            <div class="flex items-center space-x-4">
-              <div class="w-16 h-8 bg-white/10 rounded border border-white/10"></div>
-              <span class="text-sm text-gray-300">bg-white/10 - Glass containers (10% opacity)</span>
+          <!-- Semantic Colors -->
+          <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
+            <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">Semantic Colors</h3>
+            <div class="space-y-2">
+              <div class="flex items-center gap-x-3">
+                <div class="h-10 w-10 rounded-lg bg-blue-500"></div>
+                <span class="text-sm text-zinc-950 dark:text-white">Info - blue-500</span>
+              </div>
+              <div class="flex items-center gap-x-3">
+                <div class="h-10 w-10 rounded-lg bg-green-500"></div>
+                <span class="text-sm text-zinc-950 dark:text-white">Success - green-500</span>
+              </div>
+              <div class="flex items-center gap-x-3">
+                <div class="h-10 w-10 rounded-lg bg-amber-500"></div>
+                <span class="text-sm text-zinc-950 dark:text-white">Warning - amber-500</span>
+              </div>
+              <div class="flex items-center gap-x-3">
+                <div class="h-10 w-10 rounded-lg bg-red-500"></div>
+                <span class="text-sm text-zinc-950 dark:text-white">Error - red-500</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Empty State Example -->
-    <div class="mb-8">
-      <h2 class="text-2xl font-bold text-white mb-6">Empty State</h2>
-      
-      <div class="text-center py-16">
-        <div class="flex justify-center mb-4">
-          <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-            </svg>
+      <!-- Buttons Section -->
+      <div id="buttons">
+        <h2 class="text-xl font-semibold text-zinc-950 dark:text-white mb-6">Buttons</h2>
+
+        <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-8">
+          <div class="space-y-8">
+            <!-- Primary Buttons -->
+            <div>
+              <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">Primary</h3>
+              <div class="flex flex-wrap gap-3">
+                <button class="inline-flex items-center gap-x-2 rounded-lg bg-zinc-950 dark:bg-white px-4 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors">
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                  </svg>
+                  Create New
+                </button>
+                <button class="rounded-lg bg-zinc-950 dark:bg-white px-5 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors">
+                  Save Changes
+                </button>
+              </div>
+            </div>
+
+            <!-- Secondary Buttons -->
+            <div>
+              <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">Secondary</h3>
+              <div class="flex flex-wrap gap-3">
+                <button class="inline-flex items-center gap-x-2 rounded-lg bg-white dark:bg-zinc-800 px-4 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                  </svg>
+                  Edit
+                </button>
+                <button class="rounded-lg bg-white dark:bg-zinc-800 px-5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
+                  Cancel
+                </button>
+              </div>
+            </div>
+
+            <!-- Danger Buttons -->
+            <div>
+              <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">Danger</h3>
+              <div class="flex flex-wrap gap-3">
+                <button class="inline-flex items-center gap-x-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition-colors">
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                  Delete
+                </button>
+              </div>
+            </div>
+
+            <!-- Link Buttons -->
+            <div>
+              <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">Link Style</h3>
+              <div class="flex flex-wrap gap-3">
+                <button class="text-sm font-semibold text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">
+                  Learn more →
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-        <h3 class="text-lg font-semibold text-white mb-2">No items found</h3>
-        <p class="text-gray-300 mb-6">Get started by creating your first item.</p>
-        <button class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all font-medium">
-          Create New Item
-        </button>
       </div>
+
+      <!-- Forms Section -->
+      <div id="forms">
+        <h2 class="text-xl font-semibold text-zinc-950 dark:text-white mb-6">Form Components</h2>
+
+        <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-8">
+          <form class="space-y-6">
+            <!-- Text Input -->
+            <div>
+              <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">
+                Text Input
+              </label>
+              <input
+                type="text"
+                placeholder="Enter text..."
+                class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
+              />
+            </div>
+
+            <!-- Select -->
+            <div>
+              <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">
+                Select Dropdown
+              </label>
+              <select class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow">
+                <option value="">Choose an option</option>
+                <option value="1">Option 1</option>
+                <option value="2">Option 2</option>
+                <option value="3">Option 3</option>
+              </select>
+            </div>
+
+            <!-- Textarea -->
+            <div>
+              <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">
+                Textarea
+              </label>
+              <textarea
+                rows="3"
+                placeholder="Enter description..."
+                class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
+              ></textarea>
+            </div>
+
+            <!-- Checkbox -->
+            <div class="flex items-center gap-x-2">
+              <input
+                type="checkbox"
+                id="checkbox-demo"
+                class="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white focus:ring-offset-0"
+              />
+              <label for="checkbox-demo" class="text-sm text-zinc-950 dark:text-white">
+                I agree to the terms and conditions
+              </label>
+            </div>
+
+            <!-- Radio -->
+            <div>
+              <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-3">
+                Radio Group
+              </label>
+              <div class="space-y-2">
+                <div class="flex items-center gap-x-2">
+                  <input
+                    type="radio"
+                    id="radio-1"
+                    name="radio-demo"
+                    class="h-4 w-4 border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white focus:ring-offset-0"
+                  />
+                  <label for="radio-1" class="text-sm text-zinc-950 dark:text-white">
+                    Option 1
+                  </label>
+                </div>
+                <div class="flex items-center gap-x-2">
+                  <input
+                    type="radio"
+                    id="radio-2"
+                    name="radio-demo"
+                    class="h-4 w-4 border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white focus:ring-offset-0"
+                  />
+                  <label for="radio-2" class="text-sm text-zinc-950 dark:text-white">
+                    Option 2
+                  </label>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Tables Section -->
+      <div id="tables">
+        <h2 class="text-xl font-semibold text-zinc-950 dark:text-white mb-6">Tables</h2>
+
+        <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 overflow-hidden">
+          <table class="min-w-full divide-y divide-zinc-950/5 dark:divide-white/5">
+            <thead class="bg-zinc-50 dark:bg-zinc-800/50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                  Name
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                  Status
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                  Created
+                </th>
+                <th scope="col" class="relative px-6 py-3">
+                  <span class="sr-only">Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-zinc-950/5 dark:divide-white/5">
+              <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-zinc-950 dark:text-white">
+                  Sample Item 1
+                </td>
+                <td class="whitespace-nowrap px-6 py-4">
+                  <span class="inline-flex items-center rounded-md bg-green-50 dark:bg-green-500/10 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-600/20 dark:ring-green-500/20">
+                    Published
+                  </span>
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-zinc-500 dark:text-zinc-400">
+                  Jan 15, 2025
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                  <div class="flex justify-end gap-x-2">
+                    <a href="#" class="text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">
+                      Edit
+                    </a>
+                    <a href="#" class="text-red-600 hover:text-red-700 dark:hover:text-red-500 transition-colors">
+                      Delete
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-zinc-950 dark:text-white">
+                  Sample Item 2
+                </td>
+                <td class="whitespace-nowrap px-6 py-4">
+                  <span class="inline-flex items-center rounded-md bg-amber-50 dark:bg-amber-500/10 px-2 py-1 text-xs font-medium text-amber-700 dark:text-amber-400 ring-1 ring-inset ring-amber-600/20 dark:ring-amber-500/20">
+                    Draft
+                  </span>
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-zinc-500 dark:text-zinc-400">
+                  Jan 14, 2025
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                  <div class="flex justify-end gap-x-2">
+                    <a href="#" class="text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">
+                      Edit
+                    </a>
+                    <a href="#" class="text-red-600 hover:text-red-700 dark:hover:text-red-500 transition-colors">
+                      Delete
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Alerts Section -->
+      <div id="alerts">
+        <h2 class="text-xl font-semibold text-zinc-950 dark:text-white mb-6">Alerts</h2>
+
+        <div class="space-y-4">
+          <!-- Success Alert -->
+          <div class="rounded-lg bg-green-50 dark:bg-green-500/10 p-4 ring-1 ring-green-600/20 dark:ring-green-500/20">
+            <div class="flex items-start gap-x-3">
+              <svg class="h-5 w-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <div>
+                <h3 class="text-sm font-semibold text-green-900 dark:text-green-300">Success</h3>
+                <p class="mt-1 text-sm text-green-700 dark:text-green-400">Your changes have been saved successfully.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error Alert -->
+          <div class="rounded-lg bg-red-50 dark:bg-red-500/10 p-4 ring-1 ring-red-600/20 dark:ring-red-500/20">
+            <div class="flex items-start gap-x-3">
+              <svg class="h-5 w-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <div>
+                <h3 class="text-sm font-semibold text-red-900 dark:text-red-300">Error</h3>
+                <p class="mt-1 text-sm text-red-700 dark:text-red-400">There was a problem with your request.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Warning Alert -->
+          <div class="rounded-lg bg-amber-50 dark:bg-amber-500/10 p-4 ring-1 ring-amber-600/20 dark:ring-amber-500/20">
+            <div class="flex items-start gap-x-3">
+              <svg class="h-5 w-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.865-.833-2.632 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+              </svg>
+              <div>
+                <h3 class="text-sm font-semibold text-amber-900 dark:text-amber-300">Warning</h3>
+                <p class="mt-1 text-sm text-amber-700 dark:text-amber-400">Please review your changes before continuing.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Info Alert -->
+          <div class="rounded-lg bg-blue-50 dark:bg-blue-500/10 p-4 ring-1 ring-blue-600/20 dark:ring-blue-500/20">
+            <div class="flex items-start gap-x-3">
+              <svg class="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <div>
+                <h3 class="text-sm font-semibold text-blue-900 dark:text-blue-300">Information</h3>
+                <p class="mt-1 text-sm text-blue-700 dark:text-blue-400">Here's some helpful information about this feature.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Badges Section -->
+      <div id="badges">
+        <h2 class="text-xl font-semibold text-zinc-950 dark:text-white mb-6">Badges</h2>
+
+        <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-8">
+          <div class="flex flex-wrap gap-2">
+            <span class="inline-flex items-center rounded-md bg-zinc-50 dark:bg-zinc-800 px-2 py-1 text-xs font-medium text-zinc-600 dark:text-zinc-400 ring-1 ring-inset ring-zinc-500/10 dark:ring-zinc-400/20">
+              Default
+            </span>
+            <span class="inline-flex items-center rounded-md bg-blue-50 dark:bg-blue-500/10 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-400/20">
+              Info
+            </span>
+            <span class="inline-flex items-center rounded-md bg-green-50 dark:bg-green-500/10 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-600/20 dark:ring-green-500/20">
+              Success
+            </span>
+            <span class="inline-flex items-center rounded-md bg-amber-50 dark:bg-amber-500/10 px-2 py-1 text-xs font-medium text-amber-700 dark:text-amber-400 ring-1 ring-inset ring-amber-600/20 dark:ring-amber-500/20">
+              Warning
+            </span>
+            <span class="inline-flex items-center rounded-md bg-red-50 dark:bg-red-500/10 px-2 py-1 text-xs font-medium text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-600/20 dark:ring-red-500/20">
+              Error
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cards Section -->
+      <div id="cards">
+        <h2 class="text-xl font-semibold text-zinc-950 dark:text-white mb-6">Cards</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Basic Card -->
+          <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
+            <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-2">Basic Card</h3>
+            <p class="text-sm text-zinc-500 dark:text-zinc-400">
+              A simple card with a title and description.
+            </p>
+          </div>
+
+          <!-- Interactive Card -->
+          <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6 hover:shadow-md hover:ring-zinc-950/10 dark:hover:ring-white/20 transition-all cursor-pointer">
+            <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-2">Interactive Card</h3>
+            <p class="text-sm text-zinc-500 dark:text-zinc-400">
+              This card has hover effects and is clickable.
+            </p>
+          </div>
+
+          <!-- Card with Icon -->
+          <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
+            <div class="flex items-center gap-x-3 mb-3">
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-950 dark:bg-white">
+                <svg class="h-5 w-5 text-white dark:text-zinc-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+              </div>
+              <h3 class="text-base font-semibold text-zinc-950 dark:text-white">With Icon</h3>
+            </div>
+            <p class="text-sm text-zinc-500 dark:text-zinc-400">
+              Card with an icon in the header.
+            </p>
+          </div>
+        </div>
+      </div>
+
     </div>
   `
 
   const layoutData: AdminLayoutData = {
-    title: 'Design System',
+    title: 'Catalyst Design System',
     pageTitle: 'Design System',
     currentPath: '/admin/design',
     user: data.user,

@@ -11,17 +11,31 @@ export interface AlertData {
 
 export function renderAlert(data: AlertData): string {
   const typeClasses = {
-    success: 'bg-success/10 border-success/20 text-success',
-    error: 'bg-error/10 border-error/20 text-error',
-    warning: 'bg-warning/10 border-warning/20 text-warning',
-    info: 'bg-info/10 border-info/20 text-info'
+    success: 'bg-green-50 dark:bg-green-500/10 border border-green-600/20 dark:border-green-500/20',
+    error: 'bg-red-50 dark:bg-red-500/10 border border-red-600/20 dark:border-red-500/20',
+    warning: 'bg-amber-50 dark:bg-amber-500/10 border border-amber-600/20 dark:border-amber-500/20',
+    info: 'bg-blue-50 dark:bg-blue-500/10 border border-blue-600/20 dark:border-blue-500/20'
   }
 
   const iconClasses = {
-    success: 'text-success',
-    error: 'text-error',
-    warning: 'text-warning',
-    info: 'text-info'
+    success: 'text-green-600 dark:text-green-400',
+    error: 'text-red-600 dark:text-red-400',
+    warning: 'text-amber-600 dark:text-amber-400',
+    info: 'text-blue-600 dark:text-blue-400'
+  }
+
+  const textClasses = {
+    success: 'text-green-900 dark:text-green-300',
+    error: 'text-red-900 dark:text-red-300',
+    warning: 'text-amber-900 dark:text-amber-300',
+    info: 'text-blue-900 dark:text-blue-300'
+  }
+
+  const messageTextClasses = {
+    success: 'text-green-700 dark:text-green-400',
+    error: 'text-red-700 dark:text-red-400',
+    warning: 'text-amber-700 dark:text-amber-400',
+    info: 'text-blue-700 dark:text-blue-400'
   }
 
   const icons = {
@@ -32,7 +46,7 @@ export function renderAlert(data: AlertData): string {
   }
 
   return `
-    <div class="rounded-md border p-4 ${typeClasses[data.type]} ${data.className || ''}" ${data.dismissible ? 'id="dismissible-alert"' : ''}>
+    <div class="rounded-lg p-4 ${typeClasses[data.type]} ${data.className || ''}" ${data.dismissible ? 'id="dismissible-alert"' : ''}>
       <div class="flex">
         ${data.icon !== false ? `
           <div class="flex-shrink-0">
@@ -43,19 +57,19 @@ export function renderAlert(data: AlertData): string {
         ` : ''}
         <div class="${data.icon !== false ? 'ml-3' : ''}">
           ${data.title ? `
-            <h3 class="text-sm font-medium">
+            <h3 class="text-sm font-semibold ${textClasses[data.type]}">
               ${data.title}
             </h3>
           ` : ''}
-          <div class="${data.title ? 'mt-2 text-sm' : 'text-sm'}">
+          <div class="${data.title ? 'mt-1 text-sm' : 'text-sm'} ${messageTextClasses[data.type]}">
             <p>${data.message}</p>
           </div>
         </div>
         ${data.dismissible ? `
           <div class="ml-auto pl-3">
             <div class="-mx-1.5 -my-1.5">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 class="inline-flex rounded-md p-1.5 ${iconClasses[data.type]} hover:bg-opacity-20 focus:outline-none focus:ring-2 focus:ring-offset-2"
                 onclick="document.getElementById('dismissible-alert').remove()"
               >
