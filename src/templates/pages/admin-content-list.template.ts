@@ -1,4 +1,4 @@
-import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout-v2.template'
+import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
 import { renderTable, TableData, TableColumn } from '../components/table.template'
 import { renderFilterBar, FilterBarData } from '../components/filter-bar.template'
 import { renderPagination, PaginationData } from '../components/pagination.template'
@@ -202,15 +202,15 @@ export function renderContentListPage(data: ContentListPageData): string {
 
   // Generate page content
   const pageContent = `
-    <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
+    <div>
       <!-- Header -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
-          <h1 class="text-2xl font-semibold text-zinc-950 dark:text-white">Content Management</h1>
-          <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">Manage and organize your content items</p>
+          <h1 class="text-2xl/8 font-semibold text-zinc-950 dark:text-white sm:text-xl/8">Content Management</h1>
+          <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">Manage and organize your content items</p>
         </div>
         <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <a href="/admin/content/new" class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-colors">
+          <a href="/admin/content/new" class="inline-flex items-center justify-center rounded-lg bg-zinc-950 dark:bg-white px-3.5 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm">
             <svg class="-ml-0.5 mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
             </svg>
@@ -268,7 +268,7 @@ export function renderContentListPage(data: ContentListPageData): string {
   `
 
   // Prepare layout data
-  const layoutData: AdminLayoutData = {
+  const layoutData: AdminLayoutCatalystData = {
     title: 'Content Management',
     pageTitle: 'Content Management',
     currentPath: '/admin/content',
@@ -276,5 +276,5 @@ export function renderContentListPage(data: ContentListPageData): string {
     content: pageContent
   }
 
-  return renderAdminLayout(layoutData)
+  return renderAdminLayoutCatalyst(layoutData)
 }

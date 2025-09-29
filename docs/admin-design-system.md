@@ -434,6 +434,120 @@ All components must support both light and dark modes using Tailwind's `dark:` p
 </div>
 ```
 
+## Advanced Component Patterns
+
+### Collections List Page Enhancements
+
+The Collections list page demonstrates modern UI patterns with colorful accents and smooth interactions.
+
+#### Gradient Filter Bar
+```html
+<!-- Container with gradient background and glassmorphism -->
+<div class="relative rounded-xl overflow-hidden mb-6">
+  <!-- Gradient Background Layer -->
+  <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 dark:from-cyan-400/20 dark:via-blue-400/20 dark:to-purple-400/20"></div>
+
+  <!-- Content Layer with backdrop blur -->
+  <div class="relative bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10">
+    <div class="px-6 py-5">
+      <!-- Filter content -->
+    </div>
+  </div>
+</div>
+```
+
+#### Modern Search Input
+```html
+<!-- Search box with rounded-full style, gradient icon, and color transitions -->
+<div class="relative group">
+  <input
+    type="text"
+    placeholder="Search collections..."
+    class="rounded-full bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm px-4 py-2.5 pl-11 text-sm w-72 text-zinc-950 dark:text-white border-2 border-cyan-200/50 dark:border-cyan-700/50 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:bg-white dark:focus:bg-zinc-800 focus:shadow-lg focus:shadow-cyan-500/20 dark:focus:shadow-cyan-400/20 transition-all duration-300"
+  >
+  <!-- Gradient search icon -->
+  <div class="absolute left-3.5 top-2.5 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 dark:from-cyan-300 dark:to-blue-400 opacity-90 group-focus-within:opacity-100 transition-opacity">
+    <svg class="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+    </svg>
+  </div>
+</div>
+```
+
+**Key Features:**
+- **Rounded-full shape**: Modern, pill-shaped input
+- **Gradient icon**: Cyan-to-blue gradient circle background
+- **Focus glow**: Cyan shadow appears on focus with smooth transition
+- **Border color animation**: Border transitions from subtle to vibrant cyan
+- **Backdrop blur**: Subtle glassmorphism effect on background
+
+#### Collection Name Badge (Lime/Green)
+```html
+<!-- Name displayed as a lime green badge -->
+<span class="inline-flex items-center rounded-md bg-lime-50 dark:bg-lime-500/10 px-2.5 py-1 text-sm font-medium text-lime-700 dark:text-lime-300 ring-1 ring-inset ring-lime-700/10 dark:ring-lime-400/20">
+  collection_name
+</span>
+```
+
+**Usage**: Replaces the previous icon-based display with a clean, colorful tag representing the collection name.
+
+#### Field Count Badge (Pink)
+```html
+<!-- Field count displayed as a pink badge -->
+<span class="inline-flex items-center rounded-md bg-pink-50 dark:bg-pink-500/10 px-2.5 py-1 text-sm font-medium text-pink-700 dark:text-pink-300 ring-1 ring-inset ring-pink-700/10 dark:ring-pink-400/20">
+  5 fields
+</span>
+```
+
+**Color System**: Uses dashboard color palette:
+- **Lime/Green** (lime-500/lime-400): For collection names
+- **Pink** (pink-500/pink-400): For field counts
+- **Cyan** (cyan-500/cyan-400): For interactive elements and accents
+
+#### Enhanced Table Row Hover
+```html
+<!-- Table row with gradient hover effect -->
+<tr class="group border-t border-zinc-950/5 dark:border-white/5 hover:bg-gradient-to-r hover:from-cyan-50/50 hover:via-blue-50/30 hover:to-purple-50/50 dark:hover:from-cyan-900/20 dark:hover:via-blue-900/10 dark:hover:to-purple-900/20 hover:shadow-sm hover:shadow-cyan-500/5 dark:hover:shadow-cyan-400/5 hover:border-l-2 hover:border-l-cyan-500 dark:hover:border-l-cyan-400 transition-all duration-300">
+  <!-- Table cells -->
+</tr>
+```
+
+**Hover Effects:**
+1. **Gradient background**: Cyan → Blue → Purple subtle gradient
+2. **Left border accent**: 2px cyan border appears on left edge
+3. **Shadow glow**: Subtle cyan-tinted shadow
+4. **Smooth transition**: 300ms duration for elegant effect
+
+#### Refresh Button with Gradient Hover
+```html
+<button class="inline-flex items-center gap-x-1.5 px-3 py-1.5 bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm text-zinc-950 dark:text-white text-sm font-medium rounded-full ring-1 ring-inset ring-cyan-200/50 dark:ring-cyan-700/50 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 dark:hover:from-cyan-900/30 dark:hover:to-blue-900/30 hover:ring-cyan-300 dark:hover:ring-cyan-600 transition-all duration-200">
+  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+  </svg>
+  Refresh
+</button>
+```
+
+**Design Principles:**
+- **Rounded-full**: Matches search input style for consistency
+- **Gradient on hover**: Cyan-to-blue gradient provides visual feedback
+- **Ring transitions**: Border color intensifies on hover
+- **Glassmorphism**: Transparent background with backdrop blur
+
+### Design Pattern Notes
+
+**When to Use Colorful Accents:**
+- Use gradient backgrounds sparingly for visual hierarchy (filter bars, featured sections)
+- Colored badges for categorical information (status, types, counts)
+- Cyan/blue gradients for interactive elements and primary actions
+- Pink/purple for secondary metrics and counts
+- Lime/green for labels and identifiers
+
+**Transition Timing:**
+- Quick interactions: 200ms (buttons, simple hovers)
+- Standard transitions: 300ms (table rows, cards)
+- Smooth entrances: 300-400ms (modals, dropdowns)
+
 ## Maintenance Notes
 
 1. **Consistency**: Always use the predefined classes and patterns

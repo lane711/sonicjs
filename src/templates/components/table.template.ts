@@ -85,7 +85,7 @@ export function renderTable<T = any>(data: TableData<T>): string {
               const clickableClass = data.rowClickable ? 'cursor-pointer' : ''
               const clickHandler = data.rowClickable && data.rowClickUrl ? `onclick="window.location.href='${data.rowClickUrl(row)}'"` : ''
               return `
-                <tr class="border-t border-zinc-950/5 dark:border-white/5 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors ${clickableClass}" ${clickHandler}>
+                <tr class="group border-t border-zinc-950/5 dark:border-white/5 hover:bg-gradient-to-r hover:from-cyan-50/50 hover:via-blue-50/30 hover:to-purple-50/50 dark:hover:from-cyan-900/20 dark:hover:via-blue-900/10 dark:hover:to-purple-900/20 hover:shadow-sm hover:shadow-cyan-500/5 dark:hover:shadow-cyan-400/5 hover:border-l-2 hover:border-l-cyan-500 dark:hover:border-l-cyan-400 transition-all duration-300 ${clickableClass}" ${clickHandler}>
                   ${data.selectable ? `
                     <td class="px-4 py-4 sm:pl-0" onclick="event.stopPropagation()">
                       <input type="checkbox" class="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white focus:ring-offset-0 row-checkbox" value="${(row as any).id || ''}">
