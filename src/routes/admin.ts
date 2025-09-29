@@ -161,7 +161,12 @@ adminRoutes.get('/collections', async (c) => {
     const db = c.env.DB
     const stmt = db.prepare('SELECT id, name, display_name, description, created_at FROM collections WHERE is_active = 1 ORDER BY created_at DESC')
     const { results } = await stmt.all()
-    
+
+    // Fetch field counts for all collections
+    const fieldCountStmt = db.prepare('SELECT collection_id, COUNT(*) as count FROM content_fields GROUP BY collection_id')
+    const { results: fieldCountResults } = await fieldCountStmt.all()
+    const fieldCounts = new Map((fieldCountResults || []).map((row: any) => [String(row.collection_id), Number(row.count)]))
+
     const collections: Collection[] = (results || [])
       .filter((row: any) => row && row.id)
       .map((row: any) => {
@@ -171,7 +176,8 @@ adminRoutes.get('/collections', async (c) => {
           display_name: String(row.display_name || ''),
           description: row.description ? String(row.description) : undefined,
           created_at: Number(row.created_at || 0),
-          formattedDate: row.created_at ? new Date(Number(row.created_at)).toLocaleDateString() : 'Unknown'
+          formattedDate: row.created_at ? new Date(Number(row.created_at)).toLocaleDateString() : 'Unknown',
+          field_count: fieldCounts.get(String(row.id)) || 0
         }
       })
     

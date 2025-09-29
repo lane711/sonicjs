@@ -1,26 +1,28 @@
-import { renderLogo } from '../components/logo.template'
-import { HtmlEscapedString } from 'hono/utils/html'
+import { HtmlEscapedString } from "hono/utils/html";
+import { renderLogo } from "../components/logo.template";
 
 export interface AdminLayoutCatalystData {
-  title: string
-  pageTitle?: string
-  currentPath?: string
+  title: string;
+  pageTitle?: string;
+  currentPath?: string;
   user?: {
-    name: string
-    email: string
-    role: string
-  }
-  scripts?: string[]
-  styles?: string[]
-  content: string | HtmlEscapedString
+    name: string;
+    email: string;
+    role: string;
+  };
+  scripts?: string[];
+  styles?: string[];
+  content: string | HtmlEscapedString;
   dynamicMenuItems?: Array<{
-    label: string
-    path: string
-    icon: string
-  }>
+    label: string;
+    path: string;
+    icon: string;
+  }>;
 }
 
-export function renderAdminLayoutCatalyst(data: AdminLayoutCatalystData): string {
+export function renderAdminLayoutCatalyst(
+  data: AdminLayoutCatalystData
+): string {
   return `<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -103,24 +105,45 @@ export function renderAdminLayoutCatalyst(data: AdminLayoutCatalystData): string
   <script src="https://unpkg.com/htmx.org@2.0.3"></script>
   <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
-  ${data.styles ? data.styles.map(style => `<link rel="stylesheet" href="${style}">`).join('\n  ') : ''}
-  ${data.scripts ? data.scripts.map(script => `<script src="${script}"></script>`).join('\n  ') : ''}
+  ${
+    data.styles
+      ? data.styles
+          .map((style) => `<link rel="stylesheet" href="${style}">`)
+          .join("\n  ")
+      : ""
+  }
+  ${
+    data.scripts
+      ? data.scripts
+          .map((script) => `<script src="${script}"></script>`)
+          .join("\n  ")
+      : ""
+  }
 </head>
 <body class="min-h-screen bg-white dark:bg-zinc-900">
   <div class="relative isolate flex min-h-svh w-full max-lg:flex-col lg:bg-zinc-100 dark:lg:bg-zinc-950">
     <!-- Sidebar on desktop -->
     <div class="fixed inset-y-0 left-0 w-64 max-lg:hidden">
-      ${renderCatalystSidebar(data.currentPath, data.user, data.dynamicMenuItems)}
+      ${renderCatalystSidebar(
+        data.currentPath,
+        data.user,
+        data.dynamicMenuItems
+      )}
     </div>
 
     <!-- Mobile sidebar (hidden by default) -->
     <div id="mobile-sidebar-overlay" class="fixed inset-0 bg-black/30 lg:hidden hidden z-40" onclick="closeMobileSidebar()"></div>
     <div id="mobile-sidebar" class="fixed inset-y-0 left-0 w-80 transform -translate-x-full transition-transform duration-300 ease-in-out lg:hidden z-50">
-      ${renderCatalystSidebar(data.currentPath, data.user, data.dynamicMenuItems, true)}
+      ${renderCatalystSidebar(
+        data.currentPath,
+        data.user,
+        data.dynamicMenuItems,
+        true
+      )}
     </div>
 
     <!-- Main content area -->
-    <main class="flex flex-1 flex-col pb-2 lg:min-w-0 lg:pt-2 lg:pr-2 lg:pl-64">
+    <main class="flex flex-1 flex-col pb-2 lg:min-w-0 lg:pr-2 lg:pl-64">
       <!-- Mobile header with menu toggle -->
       <header class="flex items-center px-4 py-2.5 lg:hidden border-b border-zinc-950/5 dark:border-white/5">
         <button onclick="openMobileSidebar()" class="relative flex items-center justify-center rounded-lg p-2 text-zinc-950 hover:bg-zinc-950/5 dark:text-white dark:hover:bg-white/5" aria-label="Open navigation">
@@ -129,7 +152,7 @@ export function renderAdminLayoutCatalyst(data: AdminLayoutCatalystData): string
           </svg>
         </button>
         <div class="ml-4 flex-1">
-          ${renderLogo({ size: 'sm', showText: true, variant: 'white' })}
+          ${renderLogo({ size: "sm", showText: true, variant: "white" })}
         </div>
       </header>
 
@@ -213,112 +236,115 @@ export function renderAdminLayoutCatalyst(data: AdminLayoutCatalystData): string
     }
   </script>
 </body>
-</html>`
+</html>`;
 }
 
 function renderCatalystSidebar(
-  currentPath: string = '',
+  currentPath: string = "",
   user?: any,
   dynamicMenuItems?: Array<{ label: string; path: string; icon: string }>,
   isMobile: boolean = false
 ): string {
   const baseMenuItems = [
     {
-      label: 'Dashboard',
-      path: '/admin',
+      label: "Dashboard",
+      path: "/admin",
       icon: `<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
         <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
-      </svg>`
+      </svg>`,
     },
     {
-      label: 'Content',
-      path: '/admin/content',
-      icon: `<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
-      </svg>`
-    },
-    {
-      label: 'Collections',
-      path: '/admin/collections',
+      label: "Collections",
+      path: "/admin/collections",
       icon: `<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
         <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/>
-      </svg>`
+      </svg>`,
     },
     {
-      label: 'Media',
-      path: '/admin/media',
+      label: "Content",
+      path: "/admin/content",
+      icon: `<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
+      </svg>`,
+    },
+    {
+      label: "Media",
+      path: "/admin/media",
       icon: `<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
         <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
-      </svg>`
+      </svg>`,
     },
     {
-      label: 'Users',
-      path: '/admin/users',
+      label: "Users",
+      path: "/admin/users",
       icon: `<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
         <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
-      </svg>`
+      </svg>`,
     },
     {
-      label: 'Workflow',
-      path: '/admin/workflow/dashboard',
+      label: "Workflow",
+      path: "/admin/workflow/dashboard",
       icon: `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-      </svg>`
+      </svg>`,
     },
     {
-      label: 'Plugins',
-      path: '/admin/plugins',
+      label: "Plugins",
+      path: "/admin/plugins",
       icon: `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-      </svg>`
+      </svg>`,
     },
     {
-      label: 'Design',
-      path: '/admin/design',
+      label: "Design",
+      path: "/admin/design",
       icon: `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.098 19.902a3.75 3.75 0 0 0 5.304 0l6.401-6.402M6.75 21A3.75 3.75 0 0 1 3 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 0 0 3.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008Z"/>
-      </svg>`
+      </svg>`,
     },
     {
-      label: 'Logs',
-      path: '/admin/logs',
+      label: "Logs",
+      path: "/admin/logs",
       icon: `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-      </svg>`
+      </svg>`,
     },
     {
-      label: 'Settings',
-      path: '/admin/settings',
+      label: "Settings",
+      path: "/admin/settings",
       icon: `<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
         <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
-      </svg>`
+      </svg>`,
     },
     {
-      label: 'API Reference',
-      path: '/admin/api-reference',
+      label: "API Reference",
+      path: "/admin/api-reference",
       icon: `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-      </svg>`
+      </svg>`,
     },
     {
-      label: 'Field Types',
-      path: '/admin/field-types',
+      label: "Field Types",
+      path: "/admin/field-types",
       icon: `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-      </svg>`
-    }
-  ]
+      </svg>`,
+    },
+  ];
 
   // Combine base menu items with dynamic menu items
-  const allMenuItems = [...baseMenuItems]
+  const allMenuItems = [...baseMenuItems];
   if (dynamicMenuItems && dynamicMenuItems.length > 0) {
-    const workflowIndex = allMenuItems.findIndex(item => item.path === '/admin/workflow/dashboard')
+    const workflowIndex = allMenuItems.findIndex(
+      (item) => item.path === "/admin/workflow/dashboard"
+    );
     if (workflowIndex !== -1) {
-      allMenuItems.splice(workflowIndex, 0, ...dynamicMenuItems)
+      allMenuItems.splice(workflowIndex, 0, ...dynamicMenuItems);
     }
   }
 
-  const closeButton = isMobile ? `
+  const closeButton = isMobile
+    ? `
     <div class="-mb-3 px-4 pt-3">
       <button onclick="closeMobileSidebar()" class="relative flex w-full items-center gap-3 rounded-lg p-2 text-left text-base/6 font-medium text-zinc-950 hover:bg-zinc-950/5 dark:text-white dark:hover:bg-white/5 sm:text-sm/5" aria-label="Close navigation">
         <svg class="h-5 w-5 shrink-0 fill-zinc-500 dark:fill-zinc-400" viewBox="0 0 20 20">
@@ -327,49 +353,66 @@ function renderCatalystSidebar(
         <span>Close menu</span>
       </button>
     </div>
-  ` : ''
+  `
+    : "";
 
   return `
-    <nav class="flex h-full min-h-0 flex-col bg-white shadow-sm ring-1 ring-zinc-950/5 dark:bg-zinc-900 dark:ring-white/10 ${isMobile ? 'rounded-lg p-2 m-2' : ''}">
+    <nav class="flex h-full min-h-0 flex-col bg-white shadow-sm ring-1 ring-zinc-950/5 dark:bg-zinc-900 dark:ring-white/10 ${
+      isMobile ? "rounded-lg p-2 m-2" : ""
+    }">
       ${closeButton}
 
       <!-- Sidebar Header -->
       <div class="flex flex-col border-b border-zinc-950/5 p-4 dark:border-white/5">
-        ${renderLogo({ size: 'md', showText: true, variant: 'white' })}
+        ${renderLogo({ size: "md", showText: true, variant: "white" })}
       </div>
 
       <!-- Sidebar Body -->
       <div class="flex flex-1 flex-col overflow-y-auto p-4">
         <div class="flex flex-col gap-0.5">
-          ${allMenuItems.map(item => {
-            const isActive = currentPath === item.path || (item.path !== '/admin' && currentPath?.startsWith(item.path))
-            return `
+          ${allMenuItems
+            .map((item) => {
+              const isActive =
+                currentPath === item.path ||
+                (item.path !== "/admin" && currentPath?.startsWith(item.path));
+              return `
               <span class="relative">
-                ${isActive ? `
+                ${
+                  isActive
+                    ? `
                   <span class="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-zinc-950 dark:bg-white"></span>
-                ` : ''}
+                `
+                    : ""
+                }
                 <a
                   href="${item.path}"
                   class="flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-left text-sm/5 font-medium ${
                     isActive
-                      ? 'text-zinc-950 dark:text-white'
-                      : 'text-zinc-950 hover:bg-zinc-950/5 dark:text-white dark:hover:bg-white/5'
+                      ? "text-zinc-950 dark:text-white"
+                      : "text-zinc-950 hover:bg-zinc-950/5 dark:text-white dark:hover:bg-white/5"
                   }"
-                  ${isActive ? 'data-current="true"' : ''}
+                  ${isActive ? 'data-current="true"' : ""}
                 >
-                  <span class="shrink-0 ${isActive ? 'fill-zinc-950 dark:fill-white' : 'fill-zinc-500 dark:fill-zinc-400'}">
+                  <span class="shrink-0 ${
+                    isActive
+                      ? "fill-zinc-950 dark:fill-white"
+                      : "fill-zinc-500 dark:fill-zinc-400"
+                  }">
                     ${item.icon}
                   </span>
                   <span class="truncate">${item.label}</span>
                 </a>
               </span>
-            `
-          }).join('')}
+            `;
+            })
+            .join("")}
         </div>
       </div>
 
       <!-- Sidebar Footer (User) -->
-      ${user ? `
+      ${
+        user
+          ? `
         <div class="flex flex-col border-t border-zinc-950/5 p-4 dark:border-white/5">
           <div class="relative">
             <button
@@ -378,9 +421,17 @@ function renderCatalystSidebar(
               class="flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-left text-sm/5 font-medium text-zinc-950 hover:bg-zinc-950/5 dark:text-white dark:hover:bg-white/5"
             >
               <div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-zinc-950 text-white dark:bg-white dark:text-zinc-950">
-                <span class="text-xs font-semibold">${(user.name || user.email || 'U').charAt(0).toUpperCase()}</span>
+                <span class="text-xs font-semibold">${(
+                  user.name ||
+                  user.email ||
+                  "U"
+                )
+                  .charAt(0)
+                  .toUpperCase()}</span>
               </div>
-              <span class="flex-1 truncate">${user.name || user.email || 'User'}</span>
+              <span class="flex-1 truncate">${
+                user.name || user.email || "User"
+              }</span>
               <svg class="h-4 w-4 shrink-0 fill-zinc-500 dark:fill-zinc-400" viewBox="0 0 20 20">
                 <path d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" />
               </svg>
@@ -390,8 +441,12 @@ function renderCatalystSidebar(
             <div id="userDropdown" class="hidden absolute bottom-full mb-2 left-0 right-0 mx-2 rounded-xl bg-white shadow-lg ring-1 ring-zinc-950/10 dark:bg-zinc-800 dark:ring-white/10 z-50">
               <div class="p-2">
                 <div class="px-3 py-2 border-b border-zinc-950/5 dark:border-white/5">
-                  <p class="text-sm font-medium text-zinc-950 dark:text-white">${user.name || user.email || 'User'}</p>
-                  <p class="text-xs text-zinc-500 dark:text-zinc-400">${user.email || ''}</p>
+                  <p class="text-sm font-medium text-zinc-950 dark:text-white">${
+                    user.name || user.email || "User"
+                  }</p>
+                  <p class="text-xs text-zinc-500 dark:text-zinc-400">${
+                    user.email || ""
+                  }</p>
                 </div>
                 <a href="/admin/profile" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-zinc-950 hover:bg-zinc-950/5 dark:text-white dark:hover:bg-white/5">
                   <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -416,7 +471,9 @@ function renderCatalystSidebar(
             </div>
           </div>
         </div>
-      ` : ''}
+      `
+          : ""
+      }
     </nav>
-  `
+  `;
 }

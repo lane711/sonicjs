@@ -8,6 +8,7 @@ export interface Collection {
   description?: string
   created_at: number
   formattedDate: string
+  field_count?: number
 }
 
 export interface CollectionsListPageData {
@@ -32,10 +33,9 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
         sortType: 'string',
         render: (value, collection) => `
             <div class="flex items-center">
-                <div class="w-8 h-8 bg-zinc-950 dark:bg-white rounded-full mr-3 flex items-center justify-center">
-                    <span class="text-white dark:text-zinc-950 text-sm font-medium">${collection.name.substring(0, 2).toUpperCase()}</span>
-                </div>
-                <div class="text-sm font-medium text-zinc-950 dark:text-white">${collection.name}</div>
+                <span class="inline-flex items-center rounded-md bg-lime-50 dark:bg-lime-500/10 px-2.5 py-1 text-sm font-medium text-lime-700 dark:text-lime-300 ring-1 ring-inset ring-lime-700/10 dark:ring-lime-400/20">
+                  ${collection.name}
+                </span>
             </div>
           `
       },
@@ -53,6 +53,22 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
         render: (value, collection) => collection.description || '<span class="text-zinc-500 dark:text-zinc-400">-</span>'
       },
       {
+        key: 'field_count',
+        label: 'Fields',
+        sortable: true,
+        sortType: 'number',
+        render: (value, collection) => {
+          const count = collection.field_count || 0
+          return `
+            <div class="flex items-center">
+              <span class="inline-flex items-center rounded-md bg-pink-50 dark:bg-pink-500/10 px-2.5 py-1 text-sm font-medium text-pink-700 dark:text-pink-300 ring-1 ring-inset ring-pink-700/10 dark:ring-pink-400/20">
+                ${count} ${count === 1 ? 'field' : 'fields'}
+              </span>
+            </div>
+          `
+        }
+      },
+      {
         key: 'formattedDate',
         label: 'Created',
         sortable: true,
@@ -60,23 +76,16 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
       },
       {
         key: 'actions',
-        label: 'Actions',
+        label: 'Content',
         sortable: false,
         render: (value, collection) => {
           if (!collection || !collection.id) return '<span class="text-zinc-500 dark:text-zinc-400">-</span>'
           return `
             <div class="flex items-center space-x-2">
-              <a href="/admin/collections/${collection.id}" class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
-                <svg class="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
-                </svg>
-                Edit
-              </a>
               <a href="/admin/collections/${collection.name || collection.id}/content" class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors">
-                <svg class="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
-                Content
               </a>
             </div>
           `
@@ -88,9 +97,9 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
   }
 
   const pageContent = `
-    <div class="space-y-6">
+    <div>
       <!-- Header -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
           <h1 class="text-2xl/8 font-semibold text-zinc-950 dark:text-white sm:text-xl/8">Collections</h1>
           <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">Manage your content collections and their schemas</p>
@@ -106,35 +115,42 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
       </div>
 
       <!-- Filters -->
-      <div class="rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10">
-        <div class="px-6 py-4 border-b border-zinc-950/5 dark:border-white/10">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-              <div class="relative">
-                <input
-                  type="text"
-                  placeholder="Search collections..."
-                  class="rounded-lg bg-zinc-50 dark:bg-zinc-800 px-3 py-2 pl-9 text-sm w-64 text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
-                  hx-get="/admin/collections/search"
-                  hx-trigger="keyup changed delay:300ms"
-                  hx-target="#collections-list"
-                >
-                <svg class="absolute left-2.5 top-2.5 h-4 w-4 text-zinc-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                </svg>
+      <div class="relative rounded-xl overflow-hidden mb-6">
+        <!-- Gradient Background -->
+        <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 dark:from-cyan-400/20 dark:via-blue-400/20 dark:to-purple-400/20"></div>
+
+        <div class="relative bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10">
+          <div class="px-6 py-5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-4">
+                <div class="relative group">
+                  <input
+                    type="text"
+                    placeholder="Search collections..."
+                    class="rounded-full bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm px-4 py-2.5 pl-11 text-sm w-72 text-zinc-950 dark:text-white border-2 border-cyan-200/50 dark:border-cyan-700/50 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:bg-white dark:focus:bg-zinc-800 focus:shadow-lg focus:shadow-cyan-500/20 dark:focus:shadow-cyan-400/20 transition-all duration-300"
+                    hx-get="/admin/collections/search"
+                    hx-trigger="keyup changed delay:300ms"
+                    hx-target="#collections-list"
+                  >
+                  <div class="absolute left-3.5 top-2.5 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 dark:from-cyan-300 dark:to-blue-400 opacity-90 group-focus-within:opacity-100 transition-opacity">
+                    <svg class="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="flex items-center gap-x-3">
-              <span class="text-sm/6 text-zinc-500 dark:text-zinc-400">${data.collections.length} ${data.collections.length === 1 ? 'collection' : 'collections'}</span>
-              <button
-                class="inline-flex items-center gap-x-1.5 px-2.5 py-1.5 bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white text-sm rounded-lg ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
-                onclick="location.reload()"
-              >
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                </svg>
-                Refresh
-              </button>
+              <div class="flex items-center gap-x-3">
+                <span class="text-sm/6 font-medium text-zinc-700 dark:text-zinc-300 px-3 py-1.5 rounded-full bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm">${data.collections.length} ${data.collections.length === 1 ? 'collection' : 'collections'}</span>
+                <button
+                  class="inline-flex items-center gap-x-1.5 px-3 py-1.5 bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm text-zinc-950 dark:text-white text-sm font-medium rounded-full ring-1 ring-inset ring-cyan-200/50 dark:ring-cyan-700/50 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 dark:hover:from-cyan-900/30 dark:hover:to-blue-900/30 hover:ring-cyan-300 dark:hover:ring-cyan-600 transition-all duration-200"
+                  onclick="location.reload()"
+                >
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                  </svg>
+                  Refresh
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -166,7 +182,7 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
     </div>
   `
 
-  const layoutData: AdminLayoutData = {
+  const layoutData: AdminLayoutCatalystData = {
     title: 'Collections',
     pageTitle: 'Collections',
     currentPath: '/admin/collections',
@@ -174,5 +190,5 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
     content: pageContent
   }
 
-  return renderAdminLayout(layoutData)
+  return renderAdminLayoutCatalyst(layoutData)
 }

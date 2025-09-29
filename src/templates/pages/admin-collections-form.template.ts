@@ -43,10 +43,8 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
       type: 'text',
       value: data.name || '',
       placeholder: 'blog_posts',
-
       helpText: 'Lowercase letters, numbers, and underscores only',
-
-      className: isEdit ? 'bg-white/5 text-gray-400 cursor-not-allowed' : 'bg-white/10 text-white'
+      className: isEdit ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 cursor-not-allowed' : ''
     },
     {
       name: 'displayName',
@@ -74,7 +72,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
 
   const formData: FormData = {
     id: 'collection-form',
-    ...(isEdit 
+    ...(isEdit
       ? { hxPut: `/admin/collections/${data.id}` }
       : { hxPost: '/admin/collections' }
     ),
@@ -86,9 +84,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
         type: 'submit',
         className: 'btn-primary'
       }
-    ],
-    title: title,
-    description: subtitle
+    ]
   }
 
   const pageContent = `
@@ -142,65 +138,61 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
               display: block;
               font-size: 0.875rem;
               font-weight: 500;
-              color: var(--color-zinc-950);
               margin-bottom: 0.5rem;
               line-height: 1.5rem;
             }
 
-            @media (prefers-color-scheme: dark) {
-              #collection-form .form-label {
-                color: var(--color-white);
-              }
+            .dark #collection-form .form-label {
+              color: white;
+            }
+
+            html:not(.dark) #collection-form .form-label {
+              color: #09090b; /* zinc-950 */
             }
 
             #collection-form .form-input,
             #collection-form .form-textarea {
               width: 100%;
               padding: 0.625rem 0.75rem;
-              background: var(--color-white);
-              border: 1px solid rgb(var(--color-zinc-950) / 0.1);
               border-radius: 0.5rem;
-              color: var(--color-zinc-950);
               font-size: 0.875rem;
               line-height: 1.5rem;
-              box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
               transition: all 0.15s;
             }
 
-            @media (prefers-color-scheme: dark) {
-              #collection-form .form-input,
-              #collection-form .form-textarea {
-                background: var(--color-zinc-900);
-                border-color: rgb(255 255 255 / 0.1);
-                color: var(--color-white);
-              }
+            html:not(.dark) #collection-form .form-input,
+            html:not(.dark) #collection-form .form-textarea {
+              background: white;
+              border: 1px solid rgba(9, 9, 11, 0.1); /* zinc-950/10 */
+              color: #09090b; /* zinc-950 */
+            }
+
+            .dark #collection-form .form-input,
+            .dark #collection-form .form-textarea {
+              background: #18181b; /* zinc-900 */
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              color: white;
             }
 
             #collection-form .form-input:focus,
             #collection-form .form-textarea:focus {
               outline: none;
-              border-color: var(--color-zinc-950);
-              box-shadow: 0 0 0 2px rgb(var(--color-zinc-950) / 0.1);
+              box-shadow: 0 0 0 2px #2563eb; /* blue-600 */
             }
 
-            @media (prefers-color-scheme: dark) {
-              #collection-form .form-input:focus,
-              #collection-form .form-textarea:focus {
-                border-color: var(--color-white);
-                box-shadow: 0 0 0 2px rgb(255 255 255 / 0.1);
-              }
+            .dark #collection-form .form-input:focus,
+            .dark #collection-form .form-textarea:focus {
+              box-shadow: 0 0 0 2px #3b82f6; /* blue-500 */
             }
 
-            #collection-form .form-input::placeholder,
-            #collection-form .form-textarea::placeholder {
-              color: rgb(var(--color-zinc-400));
+            html:not(.dark) #collection-form .form-input::placeholder,
+            html:not(.dark) #collection-form .form-textarea::placeholder {
+              color: #71717a; /* zinc-500 */
             }
 
-            @media (prefers-color-scheme: dark) {
-              #collection-form .form-input::placeholder,
-              #collection-form .form-textarea::placeholder {
-                color: rgb(var(--color-zinc-500));
-              }
+            .dark #collection-form .form-input::placeholder,
+            .dark #collection-form .form-textarea::placeholder {
+              color: #71717a; /* zinc-500 */
             }
 
             #collection-form .btn {
@@ -211,27 +203,37 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
               transition: all 0.15s;
               border: none;
               cursor: pointer;
-              box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             }
 
-            #collection-form .btn-primary {
-              background: var(--color-zinc-950);
+            html:not(.dark) #collection-form .btn-primary {
+              background: #09090b; /* zinc-950 */
               color: white;
             }
 
-            #collection-form .btn-primary:hover {
-              background: var(--color-zinc-800);
+            html:not(.dark) #collection-form .btn-primary:hover {
+              background: #27272a; /* zinc-800 */
             }
 
-            @media (prefers-color-scheme: dark) {
-              #collection-form .btn-primary {
-                background: var(--color-white);
-                color: var(--color-zinc-950);
-              }
+            .dark #collection-form .btn-primary {
+              background: white;
+              color: #09090b; /* zinc-950 */
+            }
 
-              #collection-form .btn-primary:hover {
-                background: var(--color-zinc-100);
-              }
+            .dark #collection-form .btn-primary:hover {
+              background: #f4f4f5; /* zinc-100 */
+            }
+
+            #collection-form .form-help-text {
+              font-size: 0.75rem;
+              margin-top: 0.25rem;
+            }
+
+            html:not(.dark) #collection-form .form-help-text {
+              color: #71717a; /* zinc-500 */
+            }
+
+            .dark #collection-form .form-help-text {
+              color: #a1a1aa; /* zinc-400 */
             }
           </style>
           
@@ -433,11 +435,11 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
           <div class="flex items-center space-x-4">
             <label class="flex items-center">
               <input type="checkbox" id="field-required" name="is_required" value="1" class="mr-2 rounded border-zinc-300 dark:border-zinc-700">
-              <span class="text-sm text-zinc-700 dark:text-zinc-300">Required</span>
+              <span class="text-sm text-zinc-950 dark:text-white">Required</span>
             </label>
             <label class="flex items-center">
               <input type="checkbox" id="field-searchable" name="is_searchable" value="1" class="mr-2 rounded border-zinc-300 dark:border-zinc-700">
-              <span class="text-sm text-zinc-700 dark:text-zinc-300">Searchable</span>
+              <span class="text-sm text-zinc-950 dark:text-white">Searchable</span>
             </label>
           </div>
 

@@ -218,18 +218,18 @@ export function renderFormField(field: FormField): string {
         <div class="flex items-center">
           ${fieldHTML}
         </div>
-        ${field.helpText ? `<p class="text-sm text-gray-4 mt-1 ml-6">${field.helpText}</p>` : ''}
+        ${field.helpText ? `<p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1 ml-6">${field.helpText}</p>` : ''}
       </div>
     `
   }
-  
+
   return `
     <div class="form-group">
       <label for="${fieldId}" class="form-label">
         ${field.label}${field.required ? ' *' : ''}
       </label>
       ${fieldHTML}
-      ${field.helpText ? `<p class="text-sm text-gray-4 mt-1">${field.helpText}</p>` : ''}
+      ${field.helpText ? `<p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">${field.helpText}</p>` : ''}
     </div>
   `
 }
