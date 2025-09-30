@@ -1,4 +1,4 @@
-import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout-v2.template'
+import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
 import { renderMediaGrid, MediaFile, MediaGridData } from '../components/media-grid.template'
 
 export interface FolderStats {
@@ -31,16 +31,16 @@ export interface MediaLibraryPageData {
 
 export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
   const pageContent = `
-    <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
+    <div>
       <!-- Header -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-        <div>
-          <h1 class="text-2xl font-semibold text-zinc-950 dark:text-white">Media Library</h1>
-          <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">Manage your media files and assets</p>
+      <div class="sm:flex sm:items-center sm:justify-between mb-6">
+        <div class="sm:flex-auto">
+          <h1 class="text-2xl/8 font-semibold text-zinc-950 dark:text-white sm:text-xl/8">Media Library</h1>
+          <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">Manage your media files and assets</p>
         </div>
-        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+        <div class="mt-4 sm:mt-0 sm:ml-16 flex gap-x-2">
           <button
-            class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+            class="inline-flex items-center justify-center rounded-lg bg-zinc-950 dark:bg-white px-3.5 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm"
             onclick="document.getElementById('upload-modal').classList.remove('hidden')"
           >
             <svg class="-ml-0.5 mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -58,7 +58,7 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
             <!-- Upload Button -->
             <div>
               <button
-                class="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+                class="w-full rounded-lg bg-zinc-950 dark:bg-white px-4 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm"
                 onclick="document.getElementById('upload-modal').classList.remove('hidden')"
               >
                 Upload Files
@@ -135,7 +135,7 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
                 <div class="flex items-center space-x-2">
                   <label class="text-sm font-medium text-zinc-950 dark:text-white">View:</label>
                   <select
-                    class="rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-500 focus:outline-none transition-colors"
+                    class="rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     onchange="window.location.href = updateUrlParam('view', this.value)"
                   >
                     <option value="grid" ${data.currentView === 'grid' ? 'selected' : ''}>Grid</option>
@@ -143,11 +143,16 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
                   </select>
                 </div>
 
-                <div class="flex items-center space-x-2">
+                <div class="relative group">
+                  <div class="absolute left-3.5 top-2.5 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 dark:from-cyan-300 dark:to-blue-400 opacity-90 group-focus-within:opacity-100 transition-opacity">
+                    <svg class="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                  </div>
                   <input
                     type="text"
                     placeholder="Search files..."
-                    class="rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm w-64 text-zinc-950 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-500 focus:outline-none transition-colors"
+                    class="rounded-full bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm pl-11 pr-4 py-2 text-sm w-72 text-zinc-950 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400 border-2 border-cyan-200/50 dark:border-cyan-700/50 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:shadow-lg focus:shadow-cyan-500/20 dark:focus:shadow-cyan-400/20 transition-all duration-300"
                     hx-get="/admin/media/search"
                     hx-trigger="keyup changed delay:300ms"
                     hx-target="#media-grid"
@@ -162,7 +167,7 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
                 <span class="text-sm text-zinc-500 dark:text-zinc-400">${data.files.length} files</span>
                 <button
                   id="select-all-btn"
-                  class="rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
+                  class="rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
                   onclick="toggleSelectAll()"
                 >
                   Select All
@@ -271,7 +276,7 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
           <!-- Folder Selection -->
           <div>
             <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Upload to folder:</label>
-            <select name="folder" class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-500 focus:outline-none transition-colors">
+            <select name="folder" class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow">
               <option value="uploads">uploads</option>
               <option value="images">images</option>
               <option value="documents">documents</option>
@@ -289,14 +294,14 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
             <button
               type="button"
               onclick="document.getElementById('upload-modal').classList.add('hidden')"
-              class="rounded-lg bg-white dark:bg-zinc-800 px-4 py-2 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
+              class="rounded-lg bg-white dark:bg-zinc-800 px-4 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               id="upload-btn"
-              class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              class="rounded-lg bg-zinc-950 dark:bg-white px-4 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 disabled:opacity-50 transition-colors shadow-sm"
               disabled
             >
               Upload Files
@@ -605,7 +610,7 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
     return `/admin/media?${params.toString()}`
   }
 
-  const layoutData: AdminLayoutData = {
+  const layoutData: AdminLayoutCatalystData = {
     title: 'Media Library',
     pageTitle: 'Media Library',
     currentPath: '/admin/media',
@@ -613,5 +618,5 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
     content: pageContent
   }
 
-  return renderAdminLayout(layoutData)
+  return renderAdminLayoutCatalyst(layoutData)
 }
