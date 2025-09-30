@@ -36,6 +36,46 @@ dark:bg-zinc-800    /* Subtle backgrounds */
 dark:bg-zinc-700    /* Hover states */
 ```
 
+### Accent Colors (Pastel Palette)
+
+These soft, pastel colors are used throughout the dashboard and admin interface for visual interest and to differentiate content types:
+
+```css
+/* Lime/Green - Active states, positive metrics, success */
+bg-lime-50 dark:bg-lime-500/10
+bg-lime-500/10 dark:bg-lime-400/10     /* Badge backgrounds */
+text-lime-600 dark:text-lime-400       /* Positive changes */
+text-lime-700 dark:text-lime-300       /* Badge text */
+bg-lime-500 dark:bg-lime-400           /* Progress bars, indicators */
+
+/* Cyan - Primary accent, links, interactive elements */
+bg-cyan-50 dark:bg-cyan-500/10
+bg-cyan-500/10 dark:bg-cyan-400/10     /* Badge backgrounds */
+text-cyan-600 dark:text-cyan-400       /* Links, accents */
+text-cyan-700 dark:text-cyan-300       /* Badge text */
+bg-cyan-500 dark:bg-cyan-400           /* Progress bars, indicators */
+
+/* Pink - Metrics, counts, special highlights */
+bg-pink-50 dark:bg-pink-500/10
+bg-pink-500/10 dark:bg-pink-400/10     /* Badge backgrounds */
+text-pink-600 dark:text-pink-400       /* Negative changes, alerts */
+text-pink-700 dark:text-pink-300       /* Badge text */
+bg-pink-500 dark:bg-pink-400           /* Progress bars, indicators */
+
+/* Purple - Categories, grouping */
+bg-purple-50 dark:bg-purple-500/10
+text-purple-700 dark:text-purple-300
+
+/* Yellow - Drafts, pending states */
+bg-yellow-50 dark:bg-yellow-500/10
+text-yellow-700 dark:text-yellow-300
+
+/* Amber - Warnings, attention needed */
+bg-amber-50 dark:bg-amber-500/10
+text-amber-700 dark:text-amber-300
+bg-amber-500 dark:bg-amber-400         /* Progress bars, indicators */
+```
+
 ### Semantic Colors
 ```css
 /* Success */

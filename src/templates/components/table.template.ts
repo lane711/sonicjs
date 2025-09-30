@@ -47,8 +47,10 @@ export function renderTable<T = any>(data: TableData<T>): string {
           <thead>
             <tr>
               ${data.selectable ? `
-                <th class="px-4 py-3.5 text-left sm:pl-0">
-                  <input type="checkbox" class="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white focus:ring-offset-0 row-checkbox" id="select-all-${tableId}">
+                <th class="px-4 py-3.5 text-center sm:pl-0">
+                  <div class="flex items-center justify-center">
+                    <input type="checkbox" class="size-4 rounded border border-zinc-950/15 bg-white checked:border-transparent checked:bg-zinc-950 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-zinc-950/20 focus:ring-offset-2 dark:border-white/15 dark:bg-zinc-900 dark:checked:bg-white dark:focus:ring-white/20 row-checkbox" id="select-all-${tableId}">
+                  </div>
                 </th>
               ` : ''}
               ${data.columns.map((column, index) => {
@@ -85,10 +87,12 @@ export function renderTable<T = any>(data: TableData<T>): string {
               const clickableClass = data.rowClickable ? 'cursor-pointer' : ''
               const clickHandler = data.rowClickable && data.rowClickUrl ? `onclick="window.location.href='${data.rowClickUrl(row)}'"` : ''
               return `
-                <tr class="group border-t border-zinc-950/5 dark:border-white/5 hover:bg-gradient-to-r hover:from-cyan-50/50 hover:via-blue-50/30 hover:to-purple-50/50 dark:hover:from-cyan-900/20 dark:hover:via-blue-900/10 dark:hover:to-purple-900/20 hover:shadow-sm hover:shadow-cyan-500/5 dark:hover:shadow-cyan-400/5 hover:border-l-2 hover:border-l-cyan-500 dark:hover:border-l-cyan-400 transition-all duration-300 ${clickableClass}" ${clickHandler}>
+                <tr class="group border-t border-zinc-950/5 dark:border-white/5 hover:bg-gradient-to-r hover:from-cyan-50/50 hover:via-blue-50/30 hover:to-purple-50/50 dark:hover:from-cyan-900/20 dark:hover:via-blue-900/10 dark:hover:to-purple-900/20 hover:shadow-sm hover:shadow-cyan-500/5 dark:hover:shadow-cyan-400/5 transition-all duration-300 ${clickableClass}" ${clickHandler}>
                   ${data.selectable ? `
                     <td class="px-4 py-4 sm:pl-0" onclick="event.stopPropagation()">
-                      <input type="checkbox" class="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white focus:ring-offset-0 row-checkbox" value="${(row as any).id || ''}">
+                      <div class="flex items-center justify-center">
+                        <input type="checkbox" class="size-4 rounded border border-zinc-950/15 bg-white checked:border-transparent checked:bg-zinc-950 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-zinc-950/20 focus:ring-offset-2 dark:border-white/15 dark:bg-zinc-900 dark:checked:bg-white dark:focus:ring-white/20 row-checkbox" value="${(row as any).id || ''}">
+                      </div>
                     </td>
                   ` : ''}
                   ${data.columns.map((column, colIndex) => {

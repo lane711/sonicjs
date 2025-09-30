@@ -135,7 +135,7 @@ export function renderContentListPage(data: ContentListPageData): string {
         <div class="flex space-x-2">
           <button
             class="inline-flex items-center justify-center p-1.5 rounded-lg bg-cyan-50 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 ring-1 ring-inset ring-cyan-600/20 dark:ring-cyan-500/20 hover:bg-cyan-100 dark:hover:bg-cyan-500/20 transition-colors"
-            onclick="window.location.href='/admin/content/${row.id}'"
+            onclick="window.location.href='/admin/content/${row.id}/edit'"
             title="Edit"
           >
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
