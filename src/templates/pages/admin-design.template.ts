@@ -1,4 +1,4 @@
-import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout-v2.template'
+import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
 
 export interface DesignPageData {
   user?: {
@@ -10,21 +10,21 @@ export interface DesignPageData {
 
 export function renderDesignPage(data: DesignPageData): string {
   const pageContent = `
-    <div class="w-full space-y-8 px-4 sm:px-6 lg:px-8 py-8">
+    <div class="space-y-8">
       <!-- Header -->
       <div class="sm:flex sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-2xl font-semibold text-zinc-950 dark:text-white">Catalyst Design System</h1>
-          <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+          <h1 class="text-2xl/8 font-semibold text-zinc-950 dark:text-white sm:text-xl/8">Catalyst Design System</h1>
+          <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">
             A comprehensive showcase of all UI components and design patterns
           </p>
         </div>
-        <div class="mt-4 sm:mt-0">
+        <div class="mt-4 sm:mt-0 flex gap-x-2">
           <a
             href="/docs/design-system"
-            class="inline-flex items-center gap-x-2 rounded-lg bg-zinc-950 dark:bg-white px-4 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors"
+            class="inline-flex items-center gap-x-2 rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-700 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 transition-colors shadow-sm"
           >
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
             Documentation
@@ -46,7 +46,8 @@ export function renderDesignPage(data: DesignPageData): string {
             Quick Nav
           </span>
         </div>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
+          <a href="#modern" class="text-sm font-medium text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 transition-colors">Modern Patterns</a>
           <a href="#typography" class="text-sm font-medium text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Typography</a>
           <a href="#colors" class="text-sm font-medium text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Colors</a>
           <a href="#buttons" class="text-sm font-medium text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Buttons</a>
@@ -55,6 +56,110 @@ export function renderDesignPage(data: DesignPageData): string {
           <a href="#alerts" class="text-sm font-medium text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Alerts</a>
           <a href="#badges" class="text-sm font-medium text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Badges</a>
           <a href="#cards" class="text-sm font-medium text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Cards</a>
+        </div>
+      </div>
+
+      <!-- Modern Patterns Section -->
+      <div id="modern">
+        <h2 class="text-xl font-semibold text-zinc-950 dark:text-white mb-6">Modern UI Patterns</h2>
+
+        <!-- Gradient Filter Bar -->
+        <div class="space-y-6">
+          <div>
+            <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">Gradient Filter Bar</h3>
+            <div class="relative rounded-xl overflow-hidden">
+              <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 dark:from-cyan-400/20 dark:via-blue-400/20 dark:to-purple-400/20"></div>
+              <div class="relative bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10">
+                <div class="px-6 py-5">
+                  <div class="flex items-center gap-x-4">
+                    <div class="relative group flex-1 max-w-sm">
+                      <div class="absolute left-3.5 top-2.5 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 dark:from-cyan-300 dark:to-blue-400 opacity-90 group-focus-within:opacity-100 transition-opacity">
+                        <svg class="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="Search with gradient icon..."
+                        class="w-full rounded-full bg-transparent pl-11 pr-4 py-2 text-sm text-zinc-950 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400 border-2 border-cyan-200/50 dark:border-cyan-700/50 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:shadow-lg focus:shadow-cyan-500/20 dark:focus:shadow-cyan-400/20 transition-all duration-300"
+                      />
+                    </div>
+                    <button class="inline-flex items-center gap-x-1.5 px-3 py-1.5 bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm text-zinc-950 dark:text-white text-sm font-medium rounded-full ring-1 ring-inset ring-cyan-200/50 dark:ring-cyan-700/50 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 dark:hover:from-cyan-900/30 dark:hover:to-blue-900/30 hover:ring-cyan-300 dark:hover:ring-cyan-600 transition-all duration-200">
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                      </svg>
+                      Refresh
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Colored Badges -->
+          <div>
+            <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">Colored Category Badges</h3>
+            <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
+              <div class="flex flex-wrap gap-2">
+                <span class="inline-flex items-center rounded-md bg-lime-50 dark:bg-lime-500/10 px-2.5 py-1 text-sm font-medium text-lime-700 dark:text-lime-300 ring-1 ring-inset ring-lime-700/10 dark:ring-lime-400/20">
+                  Collection Name
+                </span>
+                <span class="inline-flex items-center rounded-md bg-pink-50 dark:bg-pink-500/10 px-2.5 py-1 text-sm font-medium text-pink-700 dark:text-pink-300 ring-1 ring-inset ring-pink-700/10 dark:ring-pink-400/20">
+                  5 fields
+                </span>
+                <span class="inline-flex items-center rounded-md bg-cyan-50 dark:bg-cyan-500/10 px-2.5 py-1 text-sm font-medium text-cyan-700 dark:text-cyan-300 ring-1 ring-inset ring-cyan-700/10 dark:ring-cyan-400/20">
+                  Interactive
+                </span>
+                <span class="inline-flex items-center rounded-md bg-purple-50 dark:bg-purple-500/10 px-2.5 py-1 text-sm font-medium text-purple-700 dark:text-purple-300 ring-1 ring-inset ring-purple-700/10 dark:ring-purple-400/20">
+                  Category
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Enhanced Table Row -->
+          <div>
+            <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">Enhanced Table with Gradient Hover</h3>
+            <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 overflow-hidden">
+              <table class="min-w-full">
+                <thead class="bg-zinc-50 dark:bg-zinc-800/50">
+                  <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Name</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Type</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="group border-t border-zinc-950/5 dark:border-white/5 hover:bg-gradient-to-r hover:from-cyan-50/50 hover:via-blue-50/30 hover:to-purple-50/50 dark:hover:from-cyan-900/20 dark:hover:via-blue-900/10 dark:hover:to-purple-900/20 hover:shadow-sm hover:shadow-cyan-500/5 dark:hover:shadow-cyan-400/5 hover:border-l-2 hover:border-l-cyan-500 dark:hover:border-l-cyan-400 transition-all duration-300">
+                    <td class="px-6 py-4 text-sm font-medium text-zinc-950 dark:text-white">Example Item</td>
+                    <td class="px-6 py-4 text-sm text-zinc-500 dark:text-zinc-400">
+                      <span class="inline-flex items-center rounded-md bg-lime-50 dark:bg-lime-500/10 px-2.5 py-1 text-sm font-medium text-lime-700 dark:text-lime-300 ring-1 ring-inset ring-lime-700/10 dark:ring-lime-400/20">
+                        Collection
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-zinc-500 dark:text-zinc-400">
+                      <span class="inline-flex items-center rounded-md bg-green-50 dark:bg-green-500/10 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-600/20 dark:ring-green-500/20">
+                        Active
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="group border-t border-zinc-950/5 dark:border-white/5 hover:bg-gradient-to-r hover:from-cyan-50/50 hover:via-blue-50/30 hover:to-purple-50/50 dark:hover:from-cyan-900/20 dark:hover:via-blue-900/10 dark:hover:to-purple-900/20 hover:shadow-sm hover:shadow-cyan-500/5 dark:hover:shadow-cyan-400/5 hover:border-l-2 hover:border-l-cyan-500 dark:hover:border-l-cyan-400 transition-all duration-300">
+                    <td class="px-6 py-4 text-sm font-medium text-zinc-950 dark:text-white">Another Item</td>
+                    <td class="px-6 py-4 text-sm text-zinc-500 dark:text-zinc-400">
+                      <span class="inline-flex items-center rounded-md bg-pink-50 dark:bg-pink-500/10 px-2.5 py-1 text-sm font-medium text-pink-700 dark:text-pink-300 ring-1 ring-inset ring-pink-700/10 dark:ring-pink-400/20">
+                        Content
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-zinc-500 dark:text-zinc-400">
+                      <span class="inline-flex items-center rounded-md bg-amber-50 dark:bg-amber-500/10 px-2 py-1 text-xs font-medium text-amber-700 dark:text-amber-400 ring-1 ring-inset ring-amber-600/20 dark:ring-amber-500/20">
+                        Draft
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -501,7 +606,7 @@ export function renderDesignPage(data: DesignPageData): string {
     </div>
   `
 
-  const layoutData: AdminLayoutData = {
+  const layoutData: AdminLayoutCatalystData = {
     title: 'Catalyst Design System',
     pageTitle: 'Design System',
     currentPath: '/admin/design',
@@ -509,5 +614,5 @@ export function renderDesignPage(data: DesignPageData): string {
     content: pageContent
   }
 
-  return renderAdminLayout(layoutData)
+  return renderAdminLayoutCatalyst(layoutData)
 }
