@@ -283,16 +283,34 @@ export class ContentWorkflow {
   // Generate workflow status badge HTML
   static generateStatusBadge(status: ContentStatus): string {
     const statusConfig = {
-      [ContentStatus.DRAFT]: { class: 'bg-gray-100 text-gray-800', text: 'Draft' },
-      [ContentStatus.REVIEW]: { class: 'bg-yellow-100 text-yellow-800', text: 'Under Review' },
-      [ContentStatus.SCHEDULED]: { class: 'bg-blue-100 text-blue-800', text: 'Scheduled' },
-      [ContentStatus.PUBLISHED]: { class: 'bg-green-100 text-green-800', text: 'Published' },
-      [ContentStatus.ARCHIVED]: { class: 'bg-purple-100 text-purple-800', text: 'Archived' },
-      [ContentStatus.DELETED]: { class: 'bg-red-100 text-red-800', text: 'Deleted' }
+      [ContentStatus.DRAFT]: {
+        class: 'bg-zinc-50 dark:bg-zinc-500/10 text-zinc-700 dark:text-zinc-400 ring-1 ring-inset ring-zinc-600/20 dark:ring-zinc-500/20',
+        text: 'Draft'
+      },
+      [ContentStatus.REVIEW]: {
+        class: 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 ring-1 ring-inset ring-amber-600/20 dark:ring-amber-500/20',
+        text: 'Under Review'
+      },
+      [ContentStatus.SCHEDULED]: {
+        class: 'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-600/20 dark:ring-blue-500/20',
+        text: 'Scheduled'
+      },
+      [ContentStatus.PUBLISHED]: {
+        class: 'bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-600/20 dark:ring-green-500/20',
+        text: 'Published'
+      },
+      [ContentStatus.ARCHIVED]: {
+        class: 'bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 ring-1 ring-inset ring-purple-600/20 dark:ring-purple-500/20',
+        text: 'Archived'
+      },
+      [ContentStatus.DELETED]: {
+        class: 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-600/20 dark:ring-red-500/20',
+        text: 'Deleted'
+      }
     }
 
     const config = statusConfig[status]
-    return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.class}">${config.text}</span>`
+    return `<span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${config.class}">${config.text}</span>`
   }
 
   // Generate workflow action buttons HTML
