@@ -129,17 +129,33 @@ adminContentRoutes.get('/', async (c) => {
     
     // Process content items
     const contentItems = (results || []).map((row: any) => {
-      const statusColors: Record<string, string> = {
-        draft: 'bg-gray-500',
-        review: 'bg-yellow-500',
-        scheduled: 'bg-blue-500',
-        published: 'bg-green-500',
-        archived: 'bg-red-500'
+      const statusConfig: Record<string, { class: string; text: string }> = {
+        draft: {
+          class: 'bg-zinc-50 dark:bg-zinc-500/10 text-zinc-700 dark:text-zinc-400 ring-1 ring-inset ring-zinc-600/20 dark:ring-zinc-500/20',
+          text: 'Draft'
+        },
+        review: {
+          class: 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 ring-1 ring-inset ring-amber-600/20 dark:ring-amber-500/20',
+          text: 'Under Review'
+        },
+        scheduled: {
+          class: 'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-600/20 dark:ring-blue-500/20',
+          text: 'Scheduled'
+        },
+        published: {
+          class: 'bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-600/20 dark:ring-green-500/20',
+          text: 'Published'
+        },
+        archived: {
+          class: 'bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 ring-1 ring-inset ring-purple-600/20 dark:ring-purple-500/20',
+          text: 'Archived'
+        }
       }
-      
+
+      const config = statusConfig[row.status] || statusConfig.draft
       const statusBadge = `
-        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[row.status] || 'bg-gray-500'} text-white">
-          ${row.status}
+        <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${config.class}">
+          ${config.text}
         </span>
       `
       
