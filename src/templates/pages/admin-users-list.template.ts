@@ -140,10 +140,25 @@ export function renderUsersListPage(data: UsersListPageData): string {
       sortable: false,
       render: (value: any, row: User) => `
         <div class="flex justify-end space-x-2">
-          <a href="/admin/users/${row.id}" class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg bg-cyan-600 text-white hover:bg-cyan-700 transition-colors">View</a>
+          <button onclick="alert('User details: ${row.email}')" class="inline-flex items-center gap-x-1.5 px-3 py-1.5 text-sm font-medium rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 dark:from-cyan-400 dark:to-blue-400 text-white hover:from-cyan-600 hover:to-blue-600 dark:hover:from-cyan-500 dark:hover:to-blue-500 shadow-sm transition-all duration-200">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Info
+          </button>
           ${row.isActive ?
-            `<button onclick="toggleUserStatus('${row.id}', false)" class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors">Deactivate</button>` :
-            `<button onclick="toggleUserStatus('${row.id}', true)" class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg bg-lime-600 text-white hover:bg-lime-700 transition-colors">Activate</button>`
+            `<button onclick="toggleUserStatus('${row.id}', false)" class="inline-flex items-center gap-x-1.5 px-3 py-1.5 text-sm font-medium rounded-lg bg-gradient-to-r from-red-500 to-pink-500 dark:from-red-400 dark:to-pink-400 text-white hover:from-red-600 hover:to-pink-600 dark:hover:from-red-500 dark:hover:to-pink-500 shadow-sm transition-all duration-200">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+              </svg>
+              Deactivate
+            </button>` :
+            `<button onclick="toggleUserStatus('${row.id}', true)" class="inline-flex items-center gap-x-1.5 px-3 py-1.5 text-sm font-medium rounded-lg bg-gradient-to-r from-lime-500 to-green-500 dark:from-lime-400 dark:to-green-400 text-white hover:from-lime-600 hover:to-green-600 dark:hover:from-lime-500 dark:hover:to-green-500 shadow-sm transition-all duration-200">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              Activate
+            </button>`
           }
         </div>
       `
@@ -155,8 +170,7 @@ export function renderUsersListPage(data: UsersListPageData): string {
     columns,
     rows: data.users,
     selectable: false,
-    rowClickable: true,
-    rowClickUrl: (row: User) => `/admin/users/${row.id}/edit`,
+    rowClickable: false,
     emptyMessage: 'No users found'
   }
 
@@ -188,61 +202,84 @@ export function renderUsersListPage(data: UsersListPageData): string {
       ${data.error ? renderAlert({ type: 'error', message: data.error, dismissible: true }) : ''}
       ${data.success ? renderAlert({ type: 'success', message: data.success, dismissible: true }) : ''}
 
-      <!-- Filters -->
-      <div class="rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6 mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Search</label>
-            <input
-              type="text"
-              placeholder="Search users..."
-              class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
-              hx-get="/admin/users"
-              hx-trigger="keyup changed delay:300ms"
-              hx-target="body"
-              hx-include="[name='role'], [name='status']"
-              name="search"
-            >
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Role</label>
-            <select
-              class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
-              name="role"
-              hx-get="/admin/users"
-              hx-trigger="change"
-              hx-target="body"
-              hx-include="[name='search'], [name='status']"
-            >
-              <option value="">All Roles</option>
-              <option value="admin">Admin</option>
-              <option value="editor">Editor</option>
-              <option value="author">Author</option>
-              <option value="viewer">Viewer</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Status</label>
-            <select
-              class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
-              name="status"
-              hx-get="/admin/users"
-              hx-trigger="change"
-              hx-target="body"
-              hx-include="[name='search'], [name='role']"
-            >
-              <option value="">All Users</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
-          <div class="flex items-end">
-            <button
-              class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-zinc-800 px-4 py-2 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors w-full"
-              onclick="clearFilters()"
-            >
-              Clear Filters
-            </button>
+      <!-- Filters with Gradient Background -->
+      <div class="relative rounded-xl overflow-hidden mb-6">
+        <!-- Gradient Background Layer -->
+        <div class="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-blue-500/10 dark:from-purple-400/20 dark:via-pink-400/20 dark:to-blue-400/20"></div>
+
+        <!-- Content Layer with backdrop blur -->
+        <div class="relative bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10">
+          <div class="px-6 py-5">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <!-- Modern Search Input -->
+              <div>
+                <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Search</label>
+                <div class="relative group">
+                  <input
+                    type="text"
+                    placeholder="Search users..."
+                    class="rounded-full bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm px-4 py-2.5 pl-11 text-sm w-full text-zinc-950 dark:text-white border-2 border-purple-200/50 dark:border-purple-700/50 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-purple-500 dark:focus:border-purple-400 focus:bg-white dark:focus:bg-zinc-800 focus:shadow-lg focus:shadow-purple-500/20 dark:focus:shadow-purple-400/20 transition-all duration-300"
+                    hx-get="/admin/users"
+                    hx-trigger="keyup changed delay:300ms"
+                    hx-target="body"
+                    hx-include="[name='role'], [name='status']"
+                    name="search"
+                  >
+                  <!-- Gradient search icon -->
+                  <div class="absolute left-3.5 top-2.5 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 dark:from-purple-300 dark:to-pink-400 opacity-90 group-focus-within:opacity-100 transition-opacity">
+                    <svg class="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Role</label>
+                <select
+                  class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 transition-shadow"
+                  name="role"
+                  hx-get="/admin/users"
+                  hx-trigger="change"
+                  hx-target="body"
+                  hx-include="[name='search'], [name='status']"
+                >
+                  <option value="">All Roles</option>
+                  <option value="admin">Admin</option>
+                  <option value="editor">Editor</option>
+                  <option value="author">Author</option>
+                  <option value="viewer">Viewer</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Status</label>
+                <select
+                  class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 transition-shadow"
+                  name="status"
+                  hx-get="/admin/users"
+                  hx-trigger="change"
+                  hx-target="body"
+                  hx-include="[name='search'], [name='role']"
+                >
+                  <option value="">All Users</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+
+              <div class="flex items-end">
+                <button
+                  class="inline-flex items-center gap-x-1.5 justify-center px-4 py-2 bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm text-zinc-950 dark:text-white text-sm font-medium rounded-full ring-1 ring-inset ring-purple-200/50 dark:ring-purple-700/50 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 dark:hover:from-purple-900/30 dark:hover:to-pink-900/30 hover:ring-purple-300 dark:hover:ring-purple-600 transition-all duration-200 w-full"
+                  onclick="clearFilters()"
+                >
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                  Clear Filters
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

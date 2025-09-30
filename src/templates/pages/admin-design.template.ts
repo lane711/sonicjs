@@ -52,6 +52,7 @@ export function renderDesignPage(data: DesignPageData): string {
           <a href="#colors" class="text-sm font-medium text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Colors</a>
           <a href="#buttons" class="text-sm font-medium text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Buttons</a>
           <a href="#forms" class="text-sm font-medium text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Forms</a>
+          <a href="#checkboxes" class="text-sm font-medium text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Checkboxes</a>
           <a href="#tables" class="text-sm font-medium text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Tables</a>
           <a href="#alerts" class="text-sm font-medium text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Alerts</a>
           <a href="#badges" class="text-sm font-medium text-zinc-950 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Badges</a>
@@ -361,18 +362,6 @@ export function renderDesignPage(data: DesignPageData): string {
               ></textarea>
             </div>
 
-            <!-- Checkbox -->
-            <div class="flex items-center gap-x-2">
-              <input
-                type="checkbox"
-                id="checkbox-demo"
-                class="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white focus:ring-offset-0"
-              />
-              <label for="checkbox-demo" class="text-sm text-zinc-950 dark:text-white">
-                I agree to the terms and conditions
-              </label>
-            </div>
-
             <!-- Radio -->
             <div>
               <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-3">
@@ -404,6 +393,121 @@ export function renderDesignPage(data: DesignPageData): string {
               </div>
             </div>
           </form>
+        </div>
+      </div>
+
+      <!-- Checkboxes Section -->
+      <div id="checkboxes">
+        <h2 class="text-xl font-semibold text-zinc-950 dark:text-white mb-6">Checkboxes</h2>
+
+        <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-8">
+          <div class="space-y-8">
+            <!-- Simple Checkboxes -->
+            <div>
+              <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">Simple Checkboxes</h3>
+              <fieldset>
+                <legend class="sr-only">Simple Checkboxes</legend>
+                <div class="space-y-3">
+                  <div class="flex gap-3">
+                    <div class="flex h-6 shrink-0 items-center">
+                      <div class="group grid size-4 grid-cols-1">
+                        <input id="checkbox-1" type="checkbox" name="simple" class="col-start-1 row-start-1 appearance-none rounded border border-zinc-950/10 dark:border-white/10 bg-white dark:bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-zinc-950/5 dark:disabled:border-white/5 disabled:bg-zinc-950/10 dark:disabled:bg-white/10 forced-colors:appearance-auto" />
+                        <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-zinc-950/25 dark:group-has-[:disabled]:stroke-white/25">
+                          <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="text-sm/6"><label for="checkbox-1" class="font-medium text-zinc-950 dark:text-white">Default checkbox</label></div>
+                  </div>
+                  <div class="flex gap-3">
+                    <div class="flex h-6 shrink-0 items-center">
+                      <div class="group grid size-4 grid-cols-1">
+                        <input id="checkbox-2" type="checkbox" name="simple" checked class="col-start-1 row-start-1 appearance-none rounded border border-zinc-950/10 dark:border-white/10 bg-white dark:bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-zinc-950/5 dark:disabled:border-white/5 disabled:bg-zinc-950/10 dark:disabled:bg-white/10 forced-colors:appearance-auto" />
+                        <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-zinc-950/25 dark:group-has-[:disabled]:stroke-white/25">
+                          <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="text-sm/6"><label for="checkbox-2" class="font-medium text-zinc-950 dark:text-white">Checked checkbox</label></div>
+                  </div>
+                  <div class="flex gap-3">
+                    <div class="flex h-6 shrink-0 items-center">
+                      <div class="group grid size-4 grid-cols-1">
+                        <input id="checkbox-3" type="checkbox" name="simple" disabled class="col-start-1 row-start-1 appearance-none rounded border border-zinc-950/10 dark:border-white/10 bg-white dark:bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-zinc-950/5 dark:disabled:border-white/5 disabled:bg-zinc-950/10 dark:disabled:bg-white/10 forced-colors:appearance-auto" />
+                        <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-zinc-950/25 dark:group-has-[:disabled]:stroke-white/25">
+                          <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="text-sm/6"><label for="checkbox-3" class="font-medium text-zinc-500 dark:text-zinc-500">Disabled checkbox</label></div>
+                  </div>
+                  <div class="flex gap-3">
+                    <div class="flex h-6 shrink-0 items-center">
+                      <div class="group grid size-4 grid-cols-1">
+                        <input id="checkbox-4" type="checkbox" name="simple" checked disabled class="col-start-1 row-start-1 appearance-none rounded border border-zinc-950/10 dark:border-white/10 bg-white dark:bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-zinc-950/5 dark:disabled:border-white/5 disabled:bg-zinc-950/10 dark:disabled:bg-white/10 forced-colors:appearance-auto" />
+                        <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-zinc-950/25 dark:group-has-[:disabled]:stroke-white/25">
+                          <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="text-sm/6"><label for="checkbox-4" class="font-medium text-zinc-500 dark:text-zinc-500">Disabled & checked</label></div>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+
+            <!-- Checkboxes with Descriptions -->
+            <div>
+              <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">With Descriptions</h3>
+              <fieldset>
+                <legend class="sr-only">Notifications</legend>
+                <div class="space-y-5">
+                  <div class="flex gap-3">
+                    <div class="flex h-6 shrink-0 items-center">
+                      <div class="group grid size-4 grid-cols-1">
+                        <input id="email-notif" type="checkbox" name="notifications" checked aria-describedby="email-desc" class="col-start-1 row-start-1 appearance-none rounded border border-zinc-950/10 dark:border-white/10 bg-white dark:bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-zinc-950/5 dark:disabled:border-white/5 disabled:bg-zinc-950/10 dark:disabled:bg-white/10 forced-colors:appearance-auto" />
+                        <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-zinc-950/25 dark:group-has-[:disabled]:stroke-white/25">
+                          <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="text-sm/6">
+                      <label for="email-notif" class="font-medium text-zinc-950 dark:text-white">Email notifications</label>
+                      <p id="email-desc" class="text-zinc-500 dark:text-zinc-400">Receive email updates about new features and product announcements.</p>
+                    </div>
+                  </div>
+                  <div class="flex gap-3">
+                    <div class="flex h-6 shrink-0 items-center">
+                      <div class="group grid size-4 grid-cols-1">
+                        <input id="marketing" type="checkbox" name="notifications" aria-describedby="marketing-desc" class="col-start-1 row-start-1 appearance-none rounded border border-zinc-950/10 dark:border-white/10 bg-white dark:bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-zinc-950/5 dark:disabled:border-white/5 disabled:bg-zinc-950/10 dark:disabled:bg-white/10 forced-colors:appearance-auto" />
+                        <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-zinc-950/25 dark:group-has-[:disabled]:stroke-white/25">
+                          <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="text-sm/6">
+                      <label for="marketing" class="font-medium text-zinc-950 dark:text-white">Marketing communications</label>
+                      <p id="marketing-desc" class="text-zinc-500 dark:text-zinc-400">Get tips, special offers, and news about our products and services.</p>
+                    </div>
+                  </div>
+                  <div class="flex gap-3">
+                    <div class="flex h-6 shrink-0 items-center">
+                      <div class="group grid size-4 grid-cols-1">
+                        <input id="security" type="checkbox" name="notifications" checked disabled aria-describedby="security-desc" class="col-start-1 row-start-1 appearance-none rounded border border-zinc-950/10 dark:border-white/10 bg-white dark:bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-zinc-950/5 dark:disabled:border-white/5 disabled:bg-zinc-950/10 dark:disabled:bg-white/10 forced-colors:appearance-auto" />
+                        <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-zinc-950/25 dark:group-has-[:disabled]:stroke-white/25">
+                          <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="text-sm/6">
+                      <label for="security" class="font-medium text-zinc-500 dark:text-zinc-500">Security alerts</label>
+                      <p id="security-desc" class="text-zinc-500 dark:text-zinc-400">Important notifications about your account security and privacy.</p>
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          </div>
         </div>
       </div>
 

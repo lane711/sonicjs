@@ -240,18 +240,47 @@ p-4           /* 16px - Small container padding */
 ```
 
 #### Checkbox
-```html
-<div class="flex items-center gap-x-2">
-  <input
-    type="checkbox"
-    id="checkbox-id"
-    class="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white focus:ring-offset-0"
-  />
-  <label for="checkbox-id" class="text-sm text-zinc-950 dark:text-white">
-    Checkbox label
-  </label>
-</div>
+
+**Note**: Checkboxes use the Catalyst UI components with dark mode styling only.
+
+```tsx
+import { Checkbox, CheckboxField, CheckboxGroup } from '@/components/checkbox'
+import { Description, Fieldset, Label, Legend } from '@/components/fieldset'
+import { Text } from '@/components/text'
+
+function Example() {
+  return (
+    <Fieldset>
+      <Legend>Discoverability</Legend>
+      <Text>Decide where your events can be found across the web.</Text>
+      <CheckboxGroup>
+        <CheckboxField>
+          <Checkbox name="discoverability" value="show_on_events_page" defaultChecked />
+          <Label>Show on events page</Label>
+          <Description>Make this event visible on your profile.</Description>
+        </CheckboxField>
+        <CheckboxField>
+          <Checkbox name="discoverability" value="allow_embedding" />
+          <Label>Allow embedding</Label>
+          <Description>Allow others to embed your event details on their own site.</Description>
+        </CheckboxField>
+      </CheckboxGroup>
+    </Fieldset>
+  )
+}
 ```
+
+**Color Options**: The `<Checkbox>` component accepts a `color` prop with the following options:
+- `dark/zinc` (default) - Dark checkbox with zinc colors
+- `dark/white` - Dark checkbox with white check on white background
+- `white`, `dark`, `zinc`, `red`, `orange`, `amber`, `yellow`, `lime`, `green`, `emerald`, `teal`, `cyan`, `sky`, `blue`, `indigo`, `violet`, `purple`, `fuchsia`, `pink`, `rose`
+
+**Key Dark Mode Styles**:
+- Border: `border-white/15` - subtle white border with 15% opacity
+- Background: `bg-white/5` - very subtle white background with 5% opacity
+- Checked state: `checked:bg-white` - solid white background when checked
+- Focus ring: `focus:ring-white/20` - white focus ring with 20% opacity
+- Disabled state: `opacity-50` - 50% opacity when disabled
 
 #### Radio Button
 ```html

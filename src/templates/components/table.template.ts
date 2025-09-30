@@ -49,7 +49,7 @@ export function renderTable<T = any>(data: TableData<T>): string {
               ${data.selectable ? `
                 <th class="px-4 py-3.5 text-center sm:pl-0">
                   <div class="flex items-center justify-center">
-                    <input type="checkbox" class="size-4 rounded border border-zinc-950/15 bg-white checked:border-transparent checked:bg-zinc-950 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-zinc-950/20 focus:ring-offset-2 dark:border-white/15 dark:bg-zinc-900 dark:checked:bg-white dark:focus:ring-white/20 row-checkbox" id="select-all-${tableId}">
+                    <input type="checkbox" class="size-4 rounded border border-white/15 bg-white/5 checked:border-transparent checked:bg-white disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-2 row-checkbox" id="select-all-${tableId}">
                   </div>
                 </th>
               ` : ''}
@@ -91,7 +91,7 @@ export function renderTable<T = any>(data: TableData<T>): string {
                   ${data.selectable ? `
                     <td class="px-4 py-4 sm:pl-0" onclick="event.stopPropagation()">
                       <div class="flex items-center justify-center">
-                        <input type="checkbox" class="size-4 rounded border border-zinc-950/15 bg-white checked:border-transparent checked:bg-zinc-950 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-zinc-950/20 focus:ring-offset-2 dark:border-white/15 dark:bg-zinc-900 dark:checked:bg-white dark:focus:ring-white/20 row-checkbox" value="${(row as any).id || ''}">
+                        <input type="checkbox" class="size-4 rounded border border-white/15 bg-white/5 checked:border-transparent checked:bg-white disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-2 row-checkbox" value="${(row as any).id || ''}">
                       </div>
                     </td>
                   ` : ''}

@@ -183,16 +183,16 @@ export function renderFormField(field: FormField): string {
       
     case 'checkbox':
       fieldHTML = `
-        <input 
-          type="checkbox" 
+        <input
+          type="checkbox"
           id="${fieldId}"
           name="${field.name}"
           value="1"
-          class="rounded ${field.className || ''}" 
+          class="size-4 rounded border border-white/15 bg-white/5 checked:border-transparent checked:bg-white disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-2 ${field.className || ''}"
           ${field.value ? 'checked' : ''}
           ${required}
         >
-        <label for="${fieldId}" class="ml-2 text-sm text-gray-3">${field.label}</label>
+        <label for="${fieldId}" class="ml-2 text-sm text-white">${field.label}</label>
       `
       break
       

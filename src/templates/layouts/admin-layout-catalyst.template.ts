@@ -1,6 +1,121 @@
 import { HtmlEscapedString } from "hono/utils/html";
 import { renderLogo } from "../components/logo.template";
 
+// Catalyst Checkbox Component (HTML implementation)
+export interface CatalystCheckboxProps {
+  id: string;
+  name: string;
+  checked?: boolean;
+  disabled?: boolean;
+  label?: string;
+  description?: string;
+  color?: 'dark/zinc' | 'dark/white' | 'white' | 'dark' | 'zinc' | 'blue' | 'green' | 'red';
+  className?: string;
+}
+
+export function renderCatalystCheckbox(props: CatalystCheckboxProps): string {
+  const {
+    id,
+    name,
+    checked = false,
+    disabled = false,
+    label,
+    description,
+    color = 'dark/zinc',
+    className = ''
+  } = props;
+
+  const colorConfig = {
+    'dark/zinc': { bg: '#18181b', border: '#09090b', check: '#ffffff', darkBg: '#52525b' },
+    'dark/white': { bg: '#18181b', border: '#09090b', check: '#ffffff', darkBg: '#ffffff', darkCheck: '#18181b' },
+    'white': { bg: '#ffffff', border: '#09090b', check: '#18181b' },
+    'dark': { bg: '#18181b', border: '#09090b', check: '#ffffff' },
+    'zinc': { bg: '#52525b', border: '#3f3f46', check: '#ffffff' },
+    'blue': { bg: '#2563eb', border: '#1d4ed8', check: '#ffffff' },
+    'green': { bg: '#16a34a', border: '#15803d', check: '#ffffff' },
+    'red': { bg: '#dc2626', border: '#b91c1c', check: '#ffffff' }
+  };
+
+  const config = colorConfig[color] || colorConfig['dark/zinc'];
+
+  const colorClasses = {
+    'dark/zinc': 'peer-checked:bg-zinc-900 peer-checked:before:bg-zinc-900 dark:peer-checked:bg-zinc-600',
+    'dark/white': 'peer-checked:bg-zinc-900 peer-checked:before:bg-zinc-900 dark:peer-checked:bg-white',
+    'white': 'peer-checked:bg-white peer-checked:before:bg-white',
+    'dark': 'peer-checked:bg-zinc-900 peer-checked:before:bg-zinc-900',
+    'zinc': 'peer-checked:bg-zinc-600 peer-checked:before:bg-zinc-600',
+    'blue': 'peer-checked:bg-blue-600 peer-checked:before:bg-blue-600',
+    'green': 'peer-checked:bg-green-600 peer-checked:before:bg-green-600',
+    'red': 'peer-checked:bg-red-600 peer-checked:before:bg-red-600'
+  };
+
+  const checkColor = color === 'dark/white' ? 'dark:text-zinc-900' : 'text-white';
+
+  const baseClasses = `
+    relative isolate flex w-4 h-4 items-center justify-center rounded-[0.3125rem]
+    before:absolute before:inset-0 before:-z-10 before:rounded-[calc(0.3125rem-1px)] before:bg-white before:shadow-sm
+    dark:before:hidden
+    dark:bg-white/5
+    border border-zinc-950/15 peer-checked:border-transparent
+    dark:border-white/15 dark:peer-checked:border-white/5
+    peer-focus:outline peer-focus:outline-2 peer-focus:outline-offset-2 peer-focus:outline-blue-500
+    peer-disabled:opacity-50
+    peer-disabled:border-zinc-950/25 peer-disabled:bg-zinc-950/5
+    dark:peer-disabled:border-white/20 dark:peer-disabled:bg-white/2.5
+  `.trim().replace(/\s+/g, ' ');
+
+  const checkIconClasses = `
+    w-4 h-4 opacity-0 peer-checked:opacity-100 pointer-events-none
+  `.trim().replace(/\s+/g, ' ');
+
+  if (description) {
+    // Field layout with description
+    return `
+      <div class="grid grid-cols-[1.125rem_1fr] gap-x-4 gap-y-1 sm:grid-cols-[1rem_1fr] ${className}">
+        <div class="col-start-1 row-start-1 mt-0.75 sm:mt-1">
+          <input
+            type="checkbox"
+            id="${id}"
+            name="${name}"
+            ${checked ? 'checked' : ''}
+            ${disabled ? 'disabled' : ''}
+            class="peer sr-only"
+          />
+          <label for="${id}" class="inline-flex cursor-pointer">
+            <span class="${baseClasses} ${colorClasses[color] || colorClasses['dark/zinc']}">
+              <svg class="${checkIconClasses} ${checkColor}" viewBox="0 0 14 14" fill="none" stroke="currentColor">
+                <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </label>
+        </div>
+        ${label ? `<label for="${id}" class="col-start-2 row-start-1 text-sm/6 font-medium text-zinc-950 dark:text-white cursor-pointer">${label}</label>` : ''}
+        ${description ? `<p class="col-start-2 row-start-2 text-sm/6 text-zinc-500 dark:text-zinc-400">${description}</p>` : ''}
+      </div>
+    `;
+  } else {
+    // Simple checkbox with optional label
+    return `
+      <label class="inline-flex items-center gap-3 cursor-pointer ${className}">
+        <input
+          type="checkbox"
+          id="${id}"
+          name="${name}"
+          ${checked ? 'checked' : ''}
+          ${disabled ? 'disabled' : ''}
+          class="peer sr-only"
+        />
+        <span class="${baseClasses} ${colorClasses[color] || colorClasses['dark/zinc']}">
+          <svg class="${checkIconClasses} ${checkColor}" viewBox="0 0 14 14" fill="none" stroke="currentColor">
+            <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        ${label ? `<span class="text-sm/6 font-medium text-zinc-950 dark:text-white">${label}</span>` : ''}
+      </label>
+    `;
+  }
+}
+
 export interface AdminLayoutCatalystData {
   title: string;
   pageTitle?: string;
