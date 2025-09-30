@@ -133,39 +133,18 @@ export function renderContentListPage(data: ContentListPageData): string {
       className: 'text-sm font-medium',
       render: (value, row) => `
         <div class="flex space-x-2">
-          <a
-            href="/admin/content/${row.id}/edit"
-            class="inline-flex items-center px-3 py-1.5 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
-          >
-            Edit
-          </a>
           <button
-            class="inline-flex items-center px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white text-sm font-medium ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
-            hx-get="/admin/content/${row.id}/versions"
-            hx-target="#versions-modal"
+            class="inline-flex items-center justify-center p-1.5 rounded-lg bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-600/20 dark:ring-red-500/20 hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors"
+            hx-delete="/admin/content/${row.id}"
+            hx-confirm="Are you sure you want to delete this content item?"
+            hx-target="#content-list"
+            hx-swap="outerHTML"
+            title="Delete"
           >
-            History
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
           </button>
-          ${row.availableActions.length > 0 ? `
-            <div class="relative inline-block text-left">
-              <button class="inline-flex items-center px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white text-sm font-medium ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors" onclick="toggleDropdown('${row.id}')">
-                Actions ▼
-              </button>
-              <div id="dropdown-${row.id}" class="hidden absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-zinc-900 ring-1 ring-zinc-950/5 dark:ring-white/10 shadow-xl z-10">
-                ${row.availableActions.map((action: string) => `
-                  <button
-                    class="block w-full text-left px-4 py-2 text-sm text-zinc-950 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors first:rounded-t-xl last:rounded-b-xl"
-                    hx-post="/admin/content/${row.id}/workflow"
-                    hx-vals='{"action": "${action}"}'
-                    hx-target="#content-list"
-                    hx-swap="outerHTML"
-                  >
-                    ${action.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                  </button>
-                `).join('')}
-              </div>
-            </div>
-          ` : ''}
         </div>
       `
     }
@@ -219,7 +198,54 @@ export function renderContentListPage(data: ContentListPageData): string {
         </div>
       </div>
       <!-- Filters -->
-      ${renderFilterBar(filterBarData)}
+      <div class="relative rounded-xl overflow-hidden mb-6">
+        <!-- Gradient Background -->
+        <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 dark:from-cyan-400/20 dark:via-blue-400/20 dark:to-purple-400/20"></div>
+
+        <div class="relative bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10">
+          <div class="px-6 py-5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-4">
+                ${filterBarData.filters.map(filter => `
+                  <div>
+                    <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">${filter.label}</label>
+                    <select
+                      name="${filter.name}"
+                      hx-get="/admin/content"
+                      hx-trigger="change"
+                      hx-target="${filter.hxTarget || '#content-list'}"
+                      hx-include="${filter.hxInclude || ''}"
+                      class="rounded-lg bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm px-4 py-2 text-sm min-w-48 text-zinc-950 dark:text-white border-2 border-cyan-200/50 dark:border-cyan-700/50 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:shadow-lg focus:shadow-cyan-500/20 dark:focus:shadow-cyan-400/20 transition-all duration-300"
+                    >
+                      ${filter.options.map(opt => `
+                        <option value="${opt.value}" ${opt.selected ? 'selected' : ''}>${opt.label}</option>
+                      `).join('')}
+                    </select>
+                  </div>
+                `).join('')}
+              </div>
+              <div class="flex items-center gap-x-3">
+                <span class="text-sm/6 font-medium text-zinc-700 dark:text-zinc-300 px-3 py-1.5 rounded-full bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm">${data.totalItems} ${data.totalItems === 1 ? 'item' : 'items'}</span>
+                ${filterBarData.actions.map(action => `
+                  <button
+                    ${action.onclick ? `onclick="${action.onclick}"` : ''}
+                    ${action.hxGet ? `hx-get="${action.hxGet}"` : ''}
+                    ${action.hxTarget ? `hx-target="${action.hxTarget}"` : ''}
+                    class="inline-flex items-center gap-x-1.5 px-3 py-1.5 bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm text-zinc-950 dark:text-white text-sm font-medium rounded-full ring-1 ring-inset ring-cyan-200/50 dark:ring-cyan-700/50 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 dark:hover:from-cyan-900/30 dark:hover:to-blue-900/30 hover:ring-cyan-300 dark:hover:ring-cyan-600 transition-all duration-200"
+                  >
+                    ${action.label === 'Refresh' ? `
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                      </svg>
+                    ` : ''}
+                    ${action.label}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       
       <!-- Content List -->
       <div id="content-list">
@@ -242,28 +268,6 @@ export function renderContentListPage(data: ContentListPageData): string {
         }
       });
       
-      // Dropdown toggle
-      function toggleDropdown(id) {
-        // Close all other dropdowns
-        document.querySelectorAll('[id^="dropdown-"]').forEach(dropdown => {
-          if (dropdown.id !== 'dropdown-' + id) {
-            dropdown.classList.add('hidden');
-          }
-        });
-        
-        // Toggle current dropdown
-        const dropdown = document.getElementById('dropdown-' + id);
-        dropdown.classList.toggle('hidden');
-      }
-      
-      // Close dropdowns when clicking outside
-      document.addEventListener('click', function(event) {
-        if (!event.target.closest('.relative')) {
-          document.querySelectorAll('[id^="dropdown-"]').forEach(dropdown => {
-            dropdown.classList.add('hidden');
-          });
-        }
-      });
     </script>
   `
 
