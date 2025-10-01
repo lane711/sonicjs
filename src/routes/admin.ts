@@ -642,12 +642,15 @@ adminRoutes.get('/users', async (c) => {
       params.push(role)
     }
     
-    if (status === 'active') {
-      conditions.push('is_active = ?')
-      params.push(1)
-    } else if (status === 'inactive') {
+    if (status === 'inactive') {
       conditions.push('is_active = ?')
       params.push(0)
+    } else if (status === 'all') {
+      // Explicitly show all users (no is_active filter)
+    } else {
+      // Default to showing only active users (when status is '' or 'active')
+      conditions.push('is_active = ?')
+      params.push(1)
     }
     
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
@@ -690,6 +693,8 @@ adminRoutes.get('/users', async (c) => {
       currentPage: page,
       totalPages,
       totalUsers,
+      statusFilter: status || 'active',
+      roleFilter: role || '',
       pagination: totalPages > 1 ? {
         currentPage: page,
         totalPages,

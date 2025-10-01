@@ -6,6 +6,7 @@ import { renderAlert } from '../templates/components/alert.template'
 import { AuthManager } from '../middleware/auth'
 import { renderActivityLogsPage, ActivityLogsPageData, ActivityLog } from '../templates/pages/admin-activity-logs.template'
 import { renderUserEditPage, UserEditPageData, UserEditData } from '../templates/pages/admin-user-edit.template'
+import { renderUserNewPage, UserNewPageData } from '../templates/pages/admin-user-new.template'
 
 type Bindings = {
   DB: D1Database
@@ -490,6 +491,146 @@ userRoutes.get('/users', requirePermission('users.read'), async (c) => {
 })
 
 /**
+ * GET /admin/users/new - Show new user creation page (requires users.create permission)
+ */
+userRoutes.get('/users/new', requirePermission('users.create'), async (c) => {
+  const user = c.get('user')
+
+  try {
+    const pageData: UserNewPageData = {
+      roles: ROLES,
+      user: {
+        name: user.email.split('@')[0] || user.email,
+        email: user.email,
+        role: user.role
+      }
+    }
+
+    return c.html(renderUserNewPage(pageData))
+  } catch (error) {
+    console.error('User new page error:', error)
+
+    return c.html(renderAlert({
+      type: 'error',
+      message: 'Failed to load user creation page. Please try again.',
+      dismissible: true
+    }), 500)
+  }
+})
+
+/**
+ * POST /admin/users/new - Create new user (requires users.create permission)
+ */
+userRoutes.post('/users/new', requirePermission('users.create'), async (c) => {
+  const db = c.env.DB
+  const user = c.get('user')
+
+  try {
+    const formData = await c.req.formData()
+
+    const firstName = formData.get('first_name')?.toString()?.trim() || ''
+    const lastName = formData.get('last_name')?.toString()?.trim() || ''
+    const username = formData.get('username')?.toString()?.trim() || ''
+    const email = formData.get('email')?.toString()?.trim() || ''
+    const phone = formData.get('phone')?.toString()?.trim() || null
+    const bio = formData.get('bio')?.toString()?.trim() || null
+    const role = formData.get('role')?.toString() || 'viewer'
+    const password = formData.get('password')?.toString() || ''
+    const confirmPassword = formData.get('confirm_password')?.toString() || ''
+    const isActive = formData.get('is_active') === '1'
+    const emailVerified = formData.get('email_verified') === '1'
+
+    // Validate required fields
+    if (!firstName || !lastName || !username || !email || !password) {
+      return c.html(renderAlert({
+        type: 'error',
+        message: 'First name, last name, username, email, and password are required.',
+        dismissible: true
+      }))
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return c.html(renderAlert({
+        type: 'error',
+        message: 'Please enter a valid email address.',
+        dismissible: true
+      }))
+    }
+
+    // Validate password
+    if (password.length < 8) {
+      return c.html(renderAlert({
+        type: 'error',
+        message: 'Password must be at least 8 characters long.',
+        dismissible: true
+      }))
+    }
+
+    if (password !== confirmPassword) {
+      return c.html(renderAlert({
+        type: 'error',
+        message: 'Passwords do not match.',
+        dismissible: true
+      }))
+    }
+
+    // Check if username/email are already taken
+    const checkStmt = db.prepare(`
+      SELECT id FROM users
+      WHERE username = ? OR email = ?
+    `)
+    const existingUser = await checkStmt.bind(username, email).first()
+
+    if (existingUser) {
+      return c.html(renderAlert({
+        type: 'error',
+        message: 'Username or email is already taken.',
+        dismissible: true
+      }))
+    }
+
+    // Hash password
+    const passwordHash = await AuthManager.hashPassword(password)
+
+    // Create user
+    const userId = globalThis.crypto.randomUUID()
+    const createStmt = db.prepare(`
+      INSERT INTO users (
+        id, email, username, first_name, last_name, phone, bio,
+        password_hash, role, is_active, email_verified, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `)
+
+    await createStmt.bind(
+      userId, email, username, firstName, lastName, phone, bio,
+      passwordHash, role, isActive ? 1 : 0, emailVerified ? 1 : 0,
+      Date.now(), Date.now()
+    ).run()
+
+    // Log the activity
+    await logActivity(
+      db, user.userId, 'user.create', 'users', userId,
+      { email, username, role },
+      c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
+      c.req.header('user-agent')
+    )
+
+    // Redirect to user edit page
+    return c.redirect(`/admin/users/${userId}/edit?success=User created successfully`)
+
+  } catch (error) {
+    console.error('User creation error:', error)
+    return c.html(renderAlert({
+      type: 'error',
+      message: 'Failed to create user. Please try again.',
+      dismissible: true
+    }))
+  }
+})
+
+/**
  * GET /admin/users/:id/edit - Show user edit page (requires users.update permission)
  */
 userRoutes.get('/users/:id/edit', requirePermission('users.update'), async (c) => {
@@ -659,6 +800,10 @@ userRoutes.delete('/users/:id', requirePermission('users.delete'), async (c) => 
   const userId = c.req.param('id')
 
   try {
+    // Get request body to check for hard delete option
+    const body = await c.req.json().catch(() => ({ hardDelete: false }))
+    const hardDelete = body.hardDelete === true
+
     // Prevent self-deletion
     if (userId === user.userId) {
       return c.json({ error: 'You cannot delete your own account' }, 400)
@@ -674,24 +819,45 @@ userRoutes.delete('/users/:id', requirePermission('users.delete'), async (c) => 
       return c.json({ error: 'User not found' }, 404)
     }
 
-    // Delete the user (soft delete by setting is_active = 0)
-    const deleteStmt = db.prepare(`
-      UPDATE users SET is_active = 0, updated_at = ? WHERE id = ?
-    `)
-    await deleteStmt.bind(Date.now(), userId).run()
+    if (hardDelete) {
+      // Hard delete - permanently remove from database
+      const deleteStmt = db.prepare(`
+        DELETE FROM users WHERE id = ?
+      `)
+      await deleteStmt.bind(userId).run()
 
-    // Log the activity
-    await logActivity(
-      db, user.userId, 'user.delete', 'users', userId,
-      { email: userToDelete.email },
-      c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
-      c.req.header('user-agent')
-    )
+      // Log the activity
+      await logActivity(
+        db, user.userId, 'user.hard_delete', 'users', userId,
+        { email: userToDelete.email, permanent: true },
+        c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
+        c.req.header('user-agent')
+      )
 
-    return c.json({
-      success: true,
-      message: 'User deleted successfully'
-    })
+      return c.json({
+        success: true,
+        message: 'User permanently deleted'
+      })
+    } else {
+      // Soft delete - deactivate by setting is_active = 0
+      const deleteStmt = db.prepare(`
+        UPDATE users SET is_active = 0, updated_at = ? WHERE id = ?
+      `)
+      await deleteStmt.bind(Date.now(), userId).run()
+
+      // Log the activity
+      await logActivity(
+        db, user.userId, 'user.soft_delete', 'users', userId,
+        { email: userToDelete.email },
+        c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
+        c.req.header('user-agent')
+      )
+
+      return c.json({
+        success: true,
+        message: 'User deactivated successfully'
+      })
+    }
 
   } catch (error) {
     console.error('User deletion error:', error)

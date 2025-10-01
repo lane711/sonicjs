@@ -26,6 +26,7 @@ export interface UsersListPageData {
   totalPages: number
   totalUsers: number
   statusFilter?: string
+  roleFilter?: string
   error?: string
   success?: string
   user?: {
@@ -306,11 +307,11 @@ export function renderUsersListPage(data: UsersListPageData): string {
                     hx-include="[name='search'], [name='status']"
                     class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-purple-500/30 dark:outline-purple-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-purple-500 dark:focus-visible:outline-purple-400 sm:text-sm/6"
                   >
-                    <option value="">All Roles</option>
-                    <option value="admin">Admin</option>
-                    <option value="editor">Editor</option>
-                    <option value="author">Author</option>
-                    <option value="viewer">Viewer</option>
+                    <option value="" ${!data.roleFilter ? 'selected' : ''}>All Roles</option>
+                    <option value="admin" ${data.roleFilter === 'admin' ? 'selected' : ''}>Admin</option>
+                    <option value="editor" ${data.roleFilter === 'editor' ? 'selected' : ''}>Editor</option>
+                    <option value="author" ${data.roleFilter === 'author' ? 'selected' : ''}>Author</option>
+                    <option value="viewer" ${data.roleFilter === 'viewer' ? 'selected' : ''}>Viewer</option>
                   </select>
                   <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-purple-600 dark:text-purple-400 sm:size-4">
                     <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
@@ -329,9 +330,9 @@ export function renderUsersListPage(data: UsersListPageData): string {
                     hx-include="[name='search'], [name='role']"
                     class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-purple-500/30 dark:outline-purple-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-purple-500 dark:focus-visible:outline-purple-400 sm:text-sm/6"
                   >
-                    <option value="">All Users</option>
-                    <option value="active" ${data.statusFilter === 'active' || !data.statusFilter ? 'selected' : ''}>Active</option>
+                    <option value="active" ${!data.statusFilter || data.statusFilter === 'active' ? 'selected' : ''}>Active</option>
                     <option value="inactive" ${data.statusFilter === 'inactive' ? 'selected' : ''}>Inactive</option>
+                    <option value="all" ${data.statusFilter === 'all' ? 'selected' : ''}>All Users</option>
                   </select>
                   <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-purple-600 dark:text-purple-400 sm:size-4">
                     <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
@@ -339,16 +340,19 @@ export function renderUsersListPage(data: UsersListPageData): string {
                 </div>
               </div>
 
-              <div class="flex items-end">
-                <button
-                  class="inline-flex items-center gap-x-1.5 justify-center px-4 py-2 bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm text-zinc-950 dark:text-white text-sm font-medium rounded-full ring-1 ring-inset ring-purple-200/50 dark:ring-purple-700/50 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 dark:hover:from-purple-900/30 dark:hover:to-pink-900/30 hover:ring-purple-300 dark:hover:ring-purple-600 transition-all duration-200 w-full"
-                  onclick="clearFilters()"
-                >
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                  </svg>
-                  Clear Filters
-                </button>
+              <div>
+                <label class="block text-sm/6 font-medium text-zinc-950 dark:text-white">&nbsp;</label>
+                <div class="mt-2">
+                  <button
+                    class="inline-flex items-center gap-x-1.5 justify-center px-4 py-2 bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm text-zinc-950 dark:text-white text-sm font-medium rounded-full ring-1 ring-inset ring-purple-200/50 dark:ring-purple-700/50 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 dark:hover:from-purple-900/30 dark:hover:to-pink-900/30 hover:ring-purple-300 dark:hover:ring-purple-600 transition-all duration-200 w-full"
+                    onclick="clearFilters()"
+                  >
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    Clear Filters
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -388,10 +392,7 @@ export function renderUsersListPage(data: UsersListPageData): string {
       }
 
       function clearFilters() {
-        document.querySelector('[name="search"]').value = ''
-        document.querySelector('[name="role"]').value = ''
-        document.querySelector('[name="status"]').value = ''
-        htmx.trigger(document.querySelector('[name="search"]'), 'keyup')
+        window.location.href = '/admin/users'
       }
 
       function exportUsers() {
