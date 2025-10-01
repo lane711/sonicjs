@@ -262,14 +262,14 @@ export function adminLayoutV2(data: AdminLayoutData): string {
   <!-- Main container -->
   <div class="relative z-10 min-h-screen">
     <!-- Header -->
-    ${renderTopBar(data.pageTitle, data.user)}
-    
+    ${renderTopBar(data.pageTitle || 'Dashboard', data.user)}
+
     <!-- Main content area -->
     <div class="px-4 sm:px-6 lg:px-8 py-8">
       <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
         <!-- Sidebar -->
         <div class="lg:col-span-1">
-          ${renderSidebar(data.currentPath, data.user, data.dynamicMenuItems)}
+          ${renderSidebar(data.currentPath || '/', data.user, data.dynamicMenuItems)}
         </div>
         
         <!-- Main content -->

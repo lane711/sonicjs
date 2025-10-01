@@ -152,10 +152,10 @@ adminContentRoutes.get('/', async (c) => {
         }
       }
 
-      const config = statusConfig[row.status] || statusConfig.draft
+      const config = statusConfig[row.status as keyof typeof statusConfig] || statusConfig.draft
       const statusBadge = `
-        <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${config.class}">
-          ${config.text}
+        <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${config?.class || ''}">
+          ${config?.text || row.status}
         </span>
       `
       

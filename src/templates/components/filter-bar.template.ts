@@ -2,6 +2,7 @@ export interface FilterOption {
   value: string
   label: string
   selected?: boolean
+  color?: string
 }
 
 export interface Filter {
@@ -18,6 +19,12 @@ export interface FilterBarData {
     onclick?: string
     hxGet?: string
     hxTarget?: string
+  }>
+  bulkActions?: Array<{
+    label: string
+    value: string
+    icon?: string
+    className?: string
   }>
 }
 

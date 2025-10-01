@@ -80,7 +80,11 @@ export function renderContentListPage(data: ContentListPageData): string {
         onclick: 'location.reload()'
       }
     ],
-    bulkActions: true
+    bulkActions: [
+      { label: 'Publish', value: 'publish', icon: 'check-circle' },
+      { label: 'Unpublish', value: 'unpublish', icon: 'x-circle' },
+      { label: 'Delete', value: 'delete', icon: 'trash', className: 'text-pink-600' }
+    ]
   }
 
   // Prepare table data
@@ -356,7 +360,7 @@ export function renderContentListPage(data: ContentListPageData): string {
               </div>
               <div class="flex items-center gap-x-3">
                 <span class="text-sm/6 font-medium text-zinc-700 dark:text-zinc-300 px-3 py-1.5 rounded-full bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm">${data.totalItems} ${data.totalItems === 1 ? 'item' : 'items'}</span>
-                ${filterBarData.actions.map(action => `
+                ${filterBarData.actions?.map(action => `
                   <button
                     ${action.onclick ? `onclick="${action.onclick}"` : ''}
                     ${action.hxGet ? `hx-get="${action.hxGet}"` : ''}
@@ -370,8 +374,8 @@ export function renderContentListPage(data: ContentListPageData): string {
                     ` : ''}
                     ${action.label}
                   </button>
-                `).join('')}
-                ${filterBarData.bulkActions ? `
+                `).join('') || ''}
+                ${filterBarData.bulkActions && filterBarData.bulkActions.length > 0 ? `
                   <div class="relative inline-block" id="bulk-actions-dropdown">
                     <button
                       onclick="toggleBulkActionsDropdown()"

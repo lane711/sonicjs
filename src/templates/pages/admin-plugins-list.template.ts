@@ -543,7 +543,8 @@ function getDefaultPluginIcon(category: string): string {
     `,
   }
 
-  return icons[category.toLowerCase()] || icons['utility']
+  const iconKey = category.toLowerCase() as keyof typeof icons
+  return icons[iconKey] || icons['utility'] || ''
 }
 
 // Mock data generator
