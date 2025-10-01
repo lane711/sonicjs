@@ -159,8 +159,28 @@ adminRoutes.get('/collections', async (c) => {
   try {
     const user = c.get('user')
     const db = c.env.DB
-    const stmt = db.prepare('SELECT id, name, display_name, description, created_at FROM collections WHERE is_active = 1 ORDER BY created_at DESC')
-    const { results } = await stmt.all()
+    const url = new URL(c.req.url)
+    const search = url.searchParams.get('search') || ''
+
+    // Build query based on search
+    let stmt
+    let results
+    if (search) {
+      stmt = db.prepare(`
+        SELECT id, name, display_name, description, created_at
+        FROM collections
+        WHERE is_active = 1
+        AND (name LIKE ? OR display_name LIKE ? OR description LIKE ?)
+        ORDER BY created_at DESC
+      `)
+      const searchParam = `%${search}%`
+      const queryResults = await stmt.bind(searchParam, searchParam, searchParam).all()
+      results = queryResults.results
+    } else {
+      stmt = db.prepare('SELECT id, name, display_name, description, created_at FROM collections WHERE is_active = 1 ORDER BY created_at DESC')
+      const queryResults = await stmt.all()
+      results = queryResults.results
+    }
 
     // Fetch field counts for all collections
     const fieldCountStmt = db.prepare('SELECT collection_id, COUNT(*) as count FROM content_fields GROUP BY collection_id')
@@ -180,16 +200,17 @@ adminRoutes.get('/collections', async (c) => {
           field_count: fieldCounts.get(String(row.id)) || 0
         }
       })
-    
+
     const pageData: CollectionsListPageData = {
       collections,
+      search,
       user: user ? {
         name: user.email,
         email: user.email,
         role: user.role
       } : undefined
     }
-    
+
     return c.html(renderCollectionsListPage(pageData))
   } catch (error) {
     console.error('Error fetching collections:', error)
@@ -695,6 +716,7 @@ adminRoutes.get('/users', async (c) => {
       totalUsers,
       statusFilter: status || 'active',
       roleFilter: role || '',
+      searchFilter: search || '',
       pagination: totalPages > 1 ? {
         currentPage: page,
         totalPages,

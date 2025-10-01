@@ -27,6 +27,7 @@ export interface UsersListPageData {
   totalUsers: number
   statusFilter?: string
   roleFilter?: string
+  searchFilter?: string
   error?: string
   success?: string
   user?: {
@@ -279,13 +280,25 @@ export function renderUsersListPage(data: UsersListPageData): string {
                 <div class="relative group">
                   <input
                     type="text"
+                    name="search"
+                    id="user-search-input"
+                    value="${data.searchFilter || ''}"
                     placeholder="Search users..."
                     class="rounded-full bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm px-4 py-2.5 pl-11 text-sm w-full text-zinc-950 dark:text-white border-2 border-purple-200/50 dark:border-purple-700/50 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-purple-500 dark:focus:border-purple-400 focus:bg-white dark:focus:bg-zinc-800 focus:shadow-lg focus:shadow-purple-500/20 dark:focus:shadow-purple-400/20 transition-all duration-300"
                     hx-get="/admin/users"
                     hx-trigger="keyup changed delay:300ms"
                     hx-target="body"
                     hx-include="[name='role'], [name='status']"
-                    name="search"
+                    hx-on::after-request="
+                      const input = document.getElementById('user-search-input');
+                      if (input && document.activeElement === input) {
+                        const len = input.value.length;
+                        setTimeout(() => {
+                          input.focus();
+                          input.setSelectionRange(len, len);
+                        }, 10);
+                      }
+                    "
                   >
                   <!-- Gradient search icon -->
                   <div class="absolute left-3.5 top-2.5 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 dark:from-purple-300 dark:to-pink-400 opacity-90 group-focus-within:opacity-100 transition-opacity">

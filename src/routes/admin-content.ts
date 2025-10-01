@@ -365,10 +365,10 @@ adminContentRoutes.get('/:id/edit', async (c) => {
     
     const fields = await getCollectionFields(db, content.collection_id)
     const contentData = content.data ? JSON.parse(content.data) : {}
-    
+
     // Check if workflow plugin is active
     const workflowEnabled = await isPluginActive(db, 'workflow')
-    
+
     const formData: ContentFormData = {
       id: content.id,
       title: content.title,
@@ -937,6 +937,186 @@ adminContentRoutes.post('/duplicate', async (c) => {
   } catch (error) {
     console.error('Error duplicating content:', error)
     return c.json({ success: false, error: 'Failed to duplicate content' })
+  }
+})
+
+// Get bulk actions modal
+adminContentRoutes.get('/bulk-actions', async (c) => {
+  const bulkActionsModal = `
+    <div class="fixed inset-0 bg-zinc-950/50 dark:bg-zinc-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onclick="this.remove()">
+      <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-xl ring-1 ring-zinc-950/5 dark:ring-white/10 p-6 max-w-md w-full" onclick="event.stopPropagation()">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-zinc-950 dark:text-white">Bulk Actions</h3>
+          <button onclick="this.closest('.fixed').remove()" class="text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <p class="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
+          Select items from the table below to perform bulk actions.
+        </p>
+        <div class="space-y-2">
+          <button
+            onclick="performBulkAction('publish')"
+            class="w-full inline-flex items-center justify-center gap-x-2 px-4 py-2.5 bg-lime-600 dark:bg-lime-500 text-white rounded-lg hover:bg-lime-700 dark:hover:bg-lime-600 transition-colors"
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            Publish Selected
+          </button>
+          <button
+            onclick="performBulkAction('draft')"
+            class="w-full inline-flex items-center justify-center gap-x-2 px-4 py-2.5 bg-zinc-600 dark:bg-zinc-700 text-white rounded-lg hover:bg-zinc-700 dark:hover:bg-zinc-800 transition-colors"
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+            </svg>
+            Move to Draft
+          </button>
+          <button
+            onclick="performBulkAction('delete')"
+            class="w-full inline-flex items-center justify-center gap-x-2 px-4 py-2.5 bg-red-600 dark:bg-red-500 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-600 transition-colors"
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+            Delete Selected
+          </button>
+        </div>
+      </div>
+    </div>
+    <script>
+      function performBulkAction(action) {
+        const selectedIds = Array.from(document.querySelectorAll('input[type="checkbox"].row-checkbox:checked'))
+          .map(cb => cb.value)
+          .filter(id => id)
+
+        if (selectedIds.length === 0) {
+          alert('Please select at least one item')
+          return
+        }
+
+        const actionText = action === 'publish' ? 'publish' : action === 'draft' ? 'move to draft' : 'delete'
+        const confirmed = confirm(\`Are you sure you want to \${actionText} \${selectedIds.length} item(s)?\`)
+
+        if (!confirmed) return
+
+        fetch('/admin/content/bulk-action', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            action: action,
+            ids: selectedIds
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            document.querySelector('#bulk-actions-modal .fixed').remove()
+            location.reload()
+          } else {
+            alert('Error: ' + (data.error || 'Unknown error'))
+          }
+        })
+        .catch(err => {
+          console.error('Bulk action error:', err)
+          alert('Failed to perform bulk action')
+        })
+      }
+    </script>
+  `
+
+  return c.html(bulkActionsModal)
+})
+
+// Perform bulk action
+adminContentRoutes.post('/bulk-action', async (c) => {
+  try {
+    const user = c.get('user')
+    const body = await c.req.json()
+    const { action, ids } = body
+
+    if (!action || !ids || ids.length === 0) {
+      return c.json({ success: false, error: 'Action and IDs required' })
+    }
+
+    const db = c.env.DB
+    const now = Date.now()
+
+    if (action === 'delete') {
+      // Soft delete by setting status to 'deleted'
+      const placeholders = ids.map(() => '?').join(',')
+      const stmt = db.prepare(`
+        UPDATE content
+        SET status = 'deleted', updated_at = ?
+        WHERE id IN (${placeholders})
+      `)
+      await stmt.bind(now, ...ids).run()
+    } else if (action === 'publish' || action === 'draft') {
+      // Update status
+      const placeholders = ids.map(() => '?').join(',')
+      const publishedAt = action === 'publish' ? now : null
+      const stmt = db.prepare(`
+        UPDATE content
+        SET status = ?, published_at = ?, updated_at = ?
+        WHERE id IN (${placeholders})
+      `)
+      await stmt.bind(action, publishedAt, now, ...ids).run()
+    } else {
+      return c.json({ success: false, error: 'Invalid action' })
+    }
+
+    return c.json({ success: true, count: ids.length })
+  } catch (error) {
+    console.error('Bulk action error:', error)
+    return c.json({ success: false, error: 'Failed to perform bulk action' })
+  }
+})
+
+// Delete content
+adminContentRoutes.delete('/:id', async (c) => {
+  try {
+    const id = c.req.param('id')
+    const db = c.env.DB
+    const user = c.get('user')
+
+    // Check if content exists
+    const contentStmt = db.prepare('SELECT id, title FROM content WHERE id = ?')
+    const content = await contentStmt.bind(id).first() as any
+
+    if (!content) {
+      return c.json({ success: false, error: 'Content not found' }, 404)
+    }
+
+    // Soft delete by setting status to 'deleted'
+    const now = Date.now()
+    const deleteStmt = db.prepare(`
+      UPDATE content
+      SET status = 'deleted', updated_at = ?
+      WHERE id = ?
+    `)
+    await deleteStmt.bind(now, id).run()
+
+    // Return success - let HTMX reload the page
+    return c.html(`
+      <div id="content-list" hx-get="/admin/content?model=${c.req.query('model') || 'post'}" hx-trigger="load" hx-swap="outerHTML">
+        <div class="flex items-center justify-center p-8">
+          <div class="text-center">
+            <svg class="mx-auto h-12 w-12 text-lime-500 dark:text-lime-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">Content deleted successfully. Refreshing...</p>
+          </div>
+        </div>
+      </div>
+    `)
+  } catch (error) {
+    console.error('Delete content error:', error)
+    return c.json({ success: false, error: 'Failed to delete content' }, 500)
   }
 })
 

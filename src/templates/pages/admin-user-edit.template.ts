@@ -258,6 +258,24 @@ export function renderUserEditPage(data: UserEditPageData): string {
           <div class="rounded-xl bg-red-50 dark:bg-red-500/10 shadow-sm ring-1 ring-red-600/20 dark:ring-red-500/20 p-6">
             <h3 class="text-base font-semibold text-red-900 dark:text-red-300 mb-2">Danger Zone</h3>
             <p class="text-sm text-red-700 dark:text-red-400 mb-4">Irreversible and destructive actions</p>
+
+            <div class="flex items-start gap-3 mb-4">
+              <div class="group grid size-4 grid-cols-1 mt-0.5">
+                <input
+                  type="checkbox"
+                  id="hard-delete-checkbox"
+                  class="col-start-1 row-start-1 appearance-none rounded border border-red-300 dark:border-red-700 bg-white dark:bg-red-950/50 checked:border-red-600 checked:bg-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+                />
+                <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white">
+                  <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                </svg>
+              </div>
+              <div>
+                <label for="hard-delete-checkbox" class="text-sm font-medium text-red-900 dark:text-red-300 cursor-pointer">Hard Delete (Permanent)</label>
+                <p class="text-xs text-red-700 dark:text-red-400 mt-0.5">Permanently remove from database. Unchecked performs soft delete (deactivate only).</p>
+              </div>
+            </div>
+
             <button
               onclick="deleteUser('${data.userToEdit.id}')"
               class="w-full inline-flex items-center justify-center rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white hover:bg-red-700 transition-colors"
@@ -274,12 +292,19 @@ export function renderUserEditPage(data: UserEditPageData): string {
 
     <script>
       function deleteUser(userId) {
-        if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+        const hardDelete = document.getElementById('hard-delete-checkbox').checked
+        const deleteType = hardDelete ? 'permanently delete' : 'deactivate'
+        const message = hardDelete
+          ? 'Are you sure you want to PERMANENTLY DELETE this user? This will remove all data from the database and CANNOT be undone!'
+          : 'Are you sure you want to deactivate this user? They will no longer be able to sign in.'
+
+        if (confirm(message)) {
           fetch(\`/admin/users/\${userId}\`, {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',
-            }
+            },
+            body: JSON.stringify({ hardDelete })
           })
           .then(response => response.json())
           .then(data => {

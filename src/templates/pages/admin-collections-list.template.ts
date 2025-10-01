@@ -13,6 +13,7 @@ export interface Collection {
 
 export interface CollectionsListPageData {
   collections: Collection[]
+  search?: string
   user?: {
     name: string
     email: string
@@ -123,21 +124,45 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
           <div class="px-6 py-5">
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-4">
-                <div class="relative group">
-                  <input
-                    type="text"
-                    placeholder="Search collections..."
-                    class="rounded-full bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm px-4 py-2.5 pl-11 text-sm w-72 text-zinc-950 dark:text-white border-2 border-cyan-200/50 dark:border-cyan-700/50 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:bg-white dark:focus:bg-zinc-800 focus:shadow-lg focus:shadow-cyan-500/20 dark:focus:shadow-cyan-400/20 transition-all duration-300"
-                    hx-get="/admin/collections/search"
-                    hx-trigger="keyup changed delay:300ms"
-                    hx-target="#collections-list"
+                <form onsubmit="performSearch(event)" class="flex items-center space-x-2">
+                  <div class="relative group">
+                    <input
+                      id="collections-search"
+                      type="text"
+                      placeholder="Search collections..."
+                      value="${data.search || ''}"
+                      class="rounded-full bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm px-4 py-2.5 pl-11 pr-4 text-sm w-72 text-zinc-950 dark:text-white border-2 border-cyan-200/50 dark:border-cyan-700/50 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:bg-white dark:focus:bg-zinc-800 focus:shadow-lg focus:shadow-cyan-500/20 dark:focus:shadow-cyan-400/20 transition-all duration-300"
+                    >
+                    <div class="absolute left-3.5 top-2.5 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 dark:from-cyan-300 dark:to-blue-400 opacity-90 group-focus-within:opacity-100 transition-opacity">
+                      <svg class="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <button
+                    type="submit"
+                    class="inline-flex items-center gap-x-1.5 px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 dark:from-cyan-400 dark:to-blue-400 text-white text-sm font-medium rounded-full hover:from-cyan-600 hover:to-blue-600 dark:hover:from-cyan-500 dark:hover:to-blue-500 shadow-md hover:shadow-lg transition-all duration-200"
                   >
-                  <div class="absolute left-3.5 top-2.5 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 dark:from-cyan-300 dark:to-blue-400 opacity-90 group-focus-within:opacity-100 transition-opacity">
-                    <svg class="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
-                  </div>
-                </div>
+                    Search
+                  </button>
+                </form>
+                <script>
+                  function performSearch(event) {
+                    event.preventDefault();
+                    const searchInput = document.getElementById('collections-search');
+                    const value = searchInput.value.trim();
+                    const params = new URLSearchParams(window.location.search);
+                    if (value) {
+                      params.set('search', value);
+                    } else {
+                      params.delete('search');
+                    }
+                    window.location.href = window.location.pathname + '?' + params.toString();
+                  }
+                </script>
               </div>
               <div class="flex items-center gap-x-3">
                 <span class="text-sm/6 font-medium text-zinc-700 dark:text-zinc-300 px-3 py-1.5 rounded-full bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm">${data.collections.length} ${data.collections.length === 1 ? 'collection' : 'collections'}</span>

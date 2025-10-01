@@ -1,4 +1,4 @@
-import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout-v2.template'
+import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
 import { renderDynamicField, renderFieldGroup, FieldDefinition } from '../components/dynamic-field.template'
 import { renderAlert } from '../components/alert.template'
 
@@ -44,82 +44,79 @@ export function renderContentFormPage(data: ContentFormData): string {
   const contentFields = data.fields.filter(f => !['title', 'slug', 'content'].includes(f.field_name) && !f.field_name.startsWith('meta_'))
   const metaFields = data.fields.filter(f => f.field_name.startsWith('meta_'))
   
+  // Helper function to get field value - title and slug are stored as columns, others in data JSON
+  const getFieldValue = (fieldName: string) => {
+    if (fieldName === 'title') return data.title || data.data?.[fieldName] || ''
+    if (fieldName === 'slug') return data.slug || data.data?.[fieldName] || ''
+    return data.data?.[fieldName] || ''
+  }
+
   // Render field groups
   const coreFieldsHTML = coreFields
     .sort((a, b) => a.field_order - b.field_order)
     .map(field => renderDynamicField(field, {
-      value: data.data?.[field.field_name] || '',
+      value: getFieldValue(field.field_name),
       errors: data.validationErrors?.[field.field_name] || []
     }))
   
   const contentFieldsHTML = contentFields
     .sort((a, b) => a.field_order - b.field_order)
     .map(field => renderDynamicField(field, {
-      value: data.data?.[field.field_name] || '',
+      value: getFieldValue(field.field_name),
       errors: data.validationErrors?.[field.field_name] || []
     }))
-  
+
   const metaFieldsHTML = metaFields
     .sort((a, b) => a.field_order - b.field_order)
     .map(field => renderDynamicField(field, {
-      value: data.data?.[field.field_name] || '',
+      value: getFieldValue(field.field_name),
       errors: data.validationErrors?.[field.field_name] || []
     }))
 
   const pageContent = `
-    <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
+    <div>
       <!-- Header -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
-          <h1 class="text-2xl font-semibold text-zinc-950 dark:text-white">${title}</h1>
-          <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+          <div class="flex items-center gap-3 mb-2">
+            <a href="/admin/content?collection=${data.collection.id}" class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+            </a>
+            <h1 class="text-2xl/8 font-semibold text-zinc-950 dark:text-white sm:text-xl/8">${isEdit ? 'Edit Content' : 'New Content'}</h1>
+          </div>
+          <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">
             ${data.collection.description || `Manage ${data.collection.display_name.toLowerCase()} content`}
           </p>
         </div>
-        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <a href="/admin/content?collection=${data.collection.id}" class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-zinc-800 px-4 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none flex space-x-3">
+          <button
+            type="submit"
+            form="content-form"
+            name="action"
+            value="save"
+            class="inline-flex items-center justify-center rounded-lg bg-zinc-950 dark:bg-white px-3.5 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm"
+          >
             <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
             </svg>
-            Back to ${data.collection.display_name}
+            ${isEdit ? 'Update' : 'Save'} Content
+          </button>
+          <a
+            href="/admin/content?collection=${data.collection.id}"
+            class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm"
+          >
+            Cancel
           </a>
         </div>
       </div>
 
-      <!-- Breadcrumb -->
-      <nav class="flex mb-6" aria-label="Breadcrumb">
-        <ol class="flex items-center space-x-3">
-          <li>
-            <a href="/admin" class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors">
-              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
-              </svg>
-            </a>
-          </li>
-          <li class="flex items-center">
-            <svg class="h-5 w-5 text-zinc-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-            </svg>
-            <a href="/admin/content" class="text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors">Content</a>
-          </li>
-          <li class="flex items-center">
-            <svg class="h-5 w-5 text-zinc-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-            </svg>
-            <a href="/admin/content?collection=${data.collection.id}" class="text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors">${data.collection.display_name}</a>
-          </li>
-          <li class="flex items-center">
-            <svg class="h-5 w-5 text-zinc-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-            </svg>
-            <span class="text-sm font-medium text-zinc-950 dark:text-white">${isEdit ? 'Edit' : 'New'}</span>
-          </li>
-        </ol>
-      </nav>
-
       <!-- Alert Messages -->
-      ${data.error ? renderAlert({ type: 'error', message: data.error, dismissible: true }) : ''}
-      ${data.success ? renderAlert({ type: 'success', message: data.success, dismissible: true }) : ''}
+      <div id="form-messages">
+        ${data.error ? renderAlert({ type: 'error', message: data.error, dismissible: true }) : ''}
+        ${data.success ? renderAlert({ type: 'success', message: data.success, dismissible: true }) : ''}
+      </div>
 
       <!-- Main Form Container -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -512,7 +509,7 @@ export function renderContentFormPage(data: ContentFormData): string {
     </script>
   `
 
-  const layoutData: AdminLayoutData = {
+  const layoutData: AdminLayoutCatalystData = {
     title: title,
     pageTitle: 'Content Management',
     currentPath: '/admin/content',
@@ -520,5 +517,5 @@ export function renderContentFormPage(data: ContentFormData): string {
     content: pageContent
   }
 
-  return renderAdminLayout(layoutData)
+  return renderAdminLayoutCatalyst(layoutData)
 }

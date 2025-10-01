@@ -1,5 +1,4 @@
 import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
-import { renderForm, FormData, FormField } from '../components/form.template'
 import { renderAlert } from '../components/alert.template'
 
 export interface ContentModel {
@@ -34,197 +33,151 @@ export interface ContentEditPageData {
 export function renderContentEditPage(data: ContentEditPageData): string {
   const { content, models, selectedModel, error, user } = data
 
-  // Create form fields based on the selected model
-  const fields: FormField[] = [
-    {
-      name: 'title',
-      label: 'Title',
-      type: 'text',
-      required: true,
-      value: content.title,
-      placeholder: 'Enter content title'
-    },
-    {
-      name: 'slug',
-      label: 'Slug',
-      type: 'text',
-      required: true,
-      value: content.slug,
-      placeholder: 'enter-url-slug'
-    }
-  ]
-
-  // Add dynamic fields based on model configuration
+  // Build dynamic fields from model configuration
+  let dynamicFieldsHtml = ''
   if (selectedModel?.fields) {
     Object.entries(selectedModel.fields).forEach(([fieldName, fieldConfig]: [string, any]) => {
       const fieldValue = content.data[fieldName] || ''
-      
-      const field: FormField = {
-        name: fieldName,
-        label: fieldConfig.label || fieldName.charAt(0).toUpperCase() + fieldName.slice(1),
-        type: fieldConfig.type === 'rich_text' ? 'rich_text' : 'text',
-        required: fieldConfig.required || false,
-        value: fieldValue,
-        placeholder: fieldConfig.placeholder || `Enter ${fieldName}`
-      }
-      
+      const label = fieldConfig.label || fieldName.charAt(0).toUpperCase() + fieldName.slice(1)
+      const placeholder = fieldConfig.placeholder || `Enter ${fieldName}`
+      const required = fieldConfig.required || false
+
       if (fieldConfig.type === 'textarea' || fieldConfig.type === 'rich_text') {
-        field.type = fieldConfig.type === 'rich_text' ? 'rich_text' : 'textarea'
+        dynamicFieldsHtml += `
+          <div>
+            <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">${label}${required ? ' *' : ''}</label>
+            <textarea
+              name="${fieldName}"
+              rows="4"
+              ${required ? 'required' : ''}
+              placeholder="${placeholder}"
+              class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
+            >${fieldValue}</textarea>
+          </div>
+        `
+      } else {
+        dynamicFieldsHtml += `
+          <div>
+            <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">${label}${required ? ' *' : ''}</label>
+            <input
+              type="text"
+              name="${fieldName}"
+              value="${fieldValue}"
+              ${required ? 'required' : ''}
+              placeholder="${placeholder}"
+              class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
+            />
+          </div>
+        `
       }
-      
-      fields.push(field)
     })
   }
 
-  // Add status field
-  fields.push({
-    name: 'status',
-    label: 'Status',
-    type: 'select',
-    required: true,
-    value: content.status,
-    options: [
-      { value: 'draft', label: 'Draft' },
-      { value: 'review', label: 'In Review' },
-      { value: 'published', label: 'Published' },
-      { value: 'archived', label: 'Archived' }
-    ]
-  })
-
-  const formData: FormData = {
-    id: 'edit-content-form',
-    hxPost: `/admin/content/${content.id}/edit`,
-    hxTarget: '#form-response',
-    fields,
-    submitButtons: [
-      {
-        label: 'Update Content',
-        type: 'submit',
-        className: 'btn-primary'
-      },
-      {
-        label: 'Cancel',
-        type: 'button',
-        className: 'bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm border border-white/20 ml-2',
-        onclick: 'window.history.back()'
-      }
-    ]
-  }
-
   const pageContent = `
-    <div class="min-h-screen py-8">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Header Card -->
-        <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-8 mb-8">
-          <!-- Breadcrumb -->
-          <nav class="flex mb-6" aria-label="Breadcrumb">
-            <ol class="flex items-center space-x-3">
-              <li>
-                <a href="/admin" class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors">
-                  <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
-                  </svg>
-                </a>
-              </li>
-              <li class="flex items-center">
-                <svg class="h-5 w-5 text-zinc-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-                </svg>
-                <a href="/admin/content" class="text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors">Content</a>
-              </li>
-              <li class="flex items-center">
-                <svg class="h-5 w-5 text-zinc-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-                </svg>
-                <span class="text-sm font-medium text-zinc-950 dark:text-white">Edit</span>
-              </li>
-            </ol>
-          </nav>
-
-          <!-- Title Section -->
-          <div>
-            <h1 class="text-4xl font-bold text-zinc-950 dark:text-white mb-3">Edit Content</h1>
-            <p class="text-zinc-500 dark:text-zinc-400 text-lg">Editing: <span class="text-zinc-950 dark:text-white font-medium">${content.title}</span></p>
+    <div>
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <div>
+          <div class="flex items-center gap-3 mb-2">
+            <a href="/admin/content" class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+            </a>
+            <h1 class="text-2xl/8 font-semibold text-zinc-950 dark:text-white sm:text-xl/8">Edit Content</h1>
           </div>
+          <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">Update content details and metadata</p>
         </div>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none flex space-x-3">
+          <button
+            type="submit"
+            form="edit-content-form"
+            class="inline-flex items-center justify-center rounded-lg bg-zinc-950 dark:bg-white px-3.5 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm"
+          >
+            <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            Save Changes
+          </button>
+          <a
+            href="/admin/content"
+            class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm"
+          >
+            Cancel
+          </a>
+        </div>
+      </div>
 
-        ${error ? `
-          <div class="mb-6">
-            ${renderAlert({ type: 'error', message: error })}
-          </div>
-        ` : ''}
+      <!-- Alert Messages -->
+      <div id="form-response">
+        ${error ? renderAlert({ type: 'error', message: error, dismissible: true }) : ''}
+      </div>
 
-        <!-- Form Container -->
-        <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 overflow-hidden">
-          <!-- Form Header -->
-          <div class="px-8 py-6 border-b border-zinc-950/5 dark:border-white/10">
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 rounded-lg bg-blue-600 flex items-center justify-center">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                </svg>
-              </div>
+      <!-- Content Edit Form -->
+      <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-8">
+        <form id="edit-content-form" hx-post="/admin/content/${content.id}/edit" hx-target="#form-response">
+
+          <!-- Basic Information -->
+          <div class="mb-8">
+            <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">Basic Information</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h2 class="text-xl font-semibold text-zinc-950 dark:text-white">Content Details</h2>
-                <p class="text-sm text-zinc-500 dark:text-zinc-400">Fill in the information below to update your content</p>
+                <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Title *</label>
+                <input
+                  type="text"
+                  name="title"
+                  value="${content.title}"
+                  required
+                  placeholder="Enter content title"
+                  class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Slug *</label>
+                <input
+                  type="text"
+                  name="slug"
+                  value="${content.slug}"
+                  required
+                  placeholder="enter-url-slug"
+                  class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
+                />
+              </div>
+
+              <div>
+                <label for="status" class="block text-sm/6 font-medium text-zinc-950 dark:text-white">Status *</label>
+                <div class="mt-2 grid grid-cols-1">
+                  <select
+                    id="status"
+                    name="status"
+                    required
+                    class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-zinc-500/30 dark:outline-zinc-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-500 dark:focus-visible:outline-zinc-400 sm:text-sm/6"
+                  >
+                    <option value="draft" ${content.status === 'draft' ? 'selected' : ''}>Draft</option>
+                    <option value="review" ${content.status === 'review' ? 'selected' : ''}>In Review</option>
+                    <option value="published" ${content.status === 'published' ? 'selected' : ''}>Published</option>
+                    <option value="archived" ${content.status === 'archived' ? 'selected' : ''}>Archived</option>
+                  </select>
+                  <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-zinc-600 dark:text-zinc-400 sm:size-4">
+                    <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
-          
-          <!-- Form Content -->
-          <div class="p-8">
-            <div id="form-response"></div>
-            <style>
-              /* Catalyst form styles */
-              #edit-content-form .form-group {
-                margin-bottom: 1.5rem;
-              }
 
-              #edit-content-form .form-label {
-                display: block;
-                font-size: 0.875rem;
-                font-weight: 500;
-                margin-bottom: 0.5rem;
-              }
-
-              #edit-content-form .form-input,
-              #edit-content-form .form-textarea,
-              #edit-content-form select {
-                width: 100%;
-                padding: 0.75rem 1rem;
-                border-radius: 0.5rem;
-                font-size: 0.875rem;
-                transition: all 0.2s;
-              }
-
-              #edit-content-form .form-input:focus,
-              #edit-content-form .form-textarea:focus,
-              #edit-content-form select:focus {
-                outline: none;
-                box-shadow: 0 0 0 2px rgb(37 99 235);
-              }
-
-              #edit-content-form .btn {
-                padding: 0.75rem 1.5rem;
-                font-weight: 500;
-                border-radius: 0.5rem;
-                transition: all 0.2s;
-                border: none;
-                cursor: pointer;
-              }
-
-              #edit-content-form .btn-primary {
-                background: rgb(37 99 235);
-                color: white;
-              }
-
-              #edit-content-form .btn-primary:hover {
-                background: rgb(29 78 216);
-              }
-            </style>
-            ${renderForm(formData)}
+          <!-- Dynamic Fields -->
+          ${dynamicFieldsHtml ? `
+          <div class="mb-8">
+            <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">Content Fields</h3>
+            <div class="grid grid-cols-1 gap-6">
+              ${dynamicFieldsHtml}
+            </div>
           </div>
-        </div>
+          ` : ''}
+
+        </form>
       </div>
     </div>
   `

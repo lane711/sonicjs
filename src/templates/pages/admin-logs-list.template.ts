@@ -230,7 +230,7 @@ export function renderLogsListPage(data: LogsListPageData) {
               </tr>
             </thead>
             <tbody>
-              ${logs.map(log => html`
+              ${logs.map(log => `
                 <tr class="border-t border-zinc-950/5 dark:border-white/5 hover:bg-gradient-to-r hover:from-cyan-50/50 hover:via-blue-50/30 hover:to-purple-50/50 dark:hover:from-cyan-900/20 dark:hover:via-blue-900/10 dark:hover:to-purple-900/20 hover:shadow-sm hover:shadow-cyan-500/5 dark:hover:shadow-cyan-400/5 transition-all duration-300">
                   <td class="px-4 py-4 whitespace-nowrap sm:pl-6">
                     <span class="inline-flex items-center rounded-md px-2.5 py-1 text-sm font-medium ring-1 ring-inset ${log.levelClass}">
@@ -245,8 +245,8 @@ export function renderLogsListPage(data: LogsListPageData) {
                   <td class="px-4 py-4">
                     <div class="text-sm max-w-md">
                       <div class="truncate text-zinc-950 dark:text-white" title="${log.message}">${log.message}</div>
-                      ${log.url ? html`<div class="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-1">${log.method} ${log.url}</div>` : ''}
-                      ${log.duration ? html`<div class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">${log.formattedDuration}</div>` : ''}
+                      ${log.url ? `<div class="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-1">${log.method} ${log.url}</div>` : ''}
+                      ${log.duration ? `<div class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">${log.formattedDuration}</div>` : ''}
                     </div>
                   </td>
                   <td class="px-4 py-4 whitespace-nowrap text-sm text-zinc-500 dark:text-zinc-400">
@@ -331,7 +331,7 @@ export function renderLogsListPage(data: LogsListPageData) {
                   const page = Math.max(1, Math.min(pagination.totalPages - 9, pagination.currentPage - 5)) + i
                   if (page > pagination.totalPages) return ''
 
-                  return html`
+                  return `
                     <a
                       href="${pagination.baseUrl}?${new URLSearchParams({...filters, page: page.toString()}).toString()}"
                       class="relative inline-flex items-center px-4 py-2 text-sm font-medium ring-1 ring-inset transition-colors ${
@@ -369,7 +369,7 @@ export function renderLogsListPage(data: LogsListPageData) {
     pageTitle: 'System Logs',
     currentPath: '/admin/logs',
     user,
-    content
+    content: content as any
   }
 
   return renderAdminLayoutCatalyst(layoutData)

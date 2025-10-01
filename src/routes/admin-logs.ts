@@ -373,8 +373,8 @@ adminLogsRoutes.post('/search', async (c) => {
         levelClass: getLevelClass(log.level),
         categoryClass: getCategoryClass(log.category)
       }
-      
-      return html`
+
+      return `
         <tr class="hover:bg-gray-50">
           <td class="px-6 py-4 whitespace-nowrap">
             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${formattedLog.levelClass}">
@@ -397,8 +397,8 @@ adminLogsRoutes.post('/search', async (c) => {
         </tr>
       `
     }).join('')
-    
-    return c.html(html`${rows}`)
+
+    return c.html(rows)
   } catch (error) {
     console.error('Error searching logs:', error)
     return c.html(html`<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Error searching logs</td></tr>`)

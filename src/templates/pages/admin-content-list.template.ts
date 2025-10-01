@@ -46,23 +46,19 @@ export function renderContentListPage(data: ContentListPageData): string {
             label: model.displayName,
             selected: data.modelName === model.name
           }))
-        ],
-        hxTarget: '#content-list',
-        hxInclude: '[name="status"]'
+        ]
       },
       {
         name: 'status',
         label: 'Status',
         options: [
-          { value: 'all', label: 'All Status', selected: data.status === 'all', color: 'zinc' },
-          { value: 'draft', label: 'Draft', selected: data.status === 'draft', color: 'cyan' },
-          { value: 'review', label: 'Under Review', selected: data.status === 'review', color: 'lime' },
-          { value: 'scheduled', label: 'Scheduled', selected: data.status === 'scheduled', color: 'pink' },
-          { value: 'published', label: 'Published', selected: data.status === 'published', color: 'purple' },
-          { value: 'archived', label: 'Archived', selected: data.status === 'archived', color: 'amber' }
-        ],
-        hxTarget: '#content-list',
-        hxInclude: '[name="model"]'
+          { value: 'all', label: 'All Status', selected: data.status === 'all' },
+          { value: 'draft', label: 'Draft', selected: data.status === 'draft' },
+          { value: 'review', label: 'Under Review', selected: data.status === 'review' },
+          { value: 'scheduled', label: 'Scheduled', selected: data.status === 'scheduled' },
+          { value: 'published', label: 'Published', selected: data.status === 'published' },
+          { value: 'archived', label: 'Archived', selected: data.status === 'archived' }
+        ]
       }
     ],
     actions: [
@@ -70,14 +66,9 @@ export function renderContentListPage(data: ContentListPageData): string {
         label: 'Refresh',
         className: 'btn-secondary',
         onclick: 'location.reload()'
-      },
-      {
-        label: 'Bulk Actions',
-        className: 'btn-primary',
-        hxGet: '/admin/content/bulk-actions',
-        hxTarget: '#bulk-actions-modal'
       }
-    ]
+    ],
+    bulkActions: true
   }
 
   // Prepare table data
@@ -270,6 +261,58 @@ export function renderContentListPage(data: ContentListPageData): string {
                     ${action.label}
                   </button>
                 `).join('')}
+                ${filterBarData.bulkActions ? `
+                  <div class="relative inline-block" id="bulk-actions-dropdown">
+                    <button
+                      onclick="toggleBulkActionsDropdown()"
+                      class="inline-flex items-center gap-x-1.5 px-3 py-1.5 bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm text-zinc-950 dark:text-white text-sm font-medium rounded-full ring-1 ring-inset ring-cyan-200/50 dark:ring-cyan-700/50 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 dark:hover:from-cyan-900/30 dark:hover:to-blue-900/30 hover:ring-cyan-300 dark:hover:ring-cyan-600 transition-all duration-200"
+                    >
+                      Bulk Actions
+                      <svg viewBox="0 0 20 20" fill="currentColor" class="size-4 text-zinc-500 dark:text-zinc-400">
+                        <path d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
+                      </svg>
+                    </button>
+
+                    <div
+                      id="bulk-actions-menu"
+                      class="hidden absolute right-0 mt-2 w-56 origin-top-right divide-y divide-zinc-200 dark:divide-white/10 rounded-lg bg-white dark:bg-zinc-800 shadow-xl ring-1 ring-zinc-950/5 dark:ring-white/10 z-50 transition-all duration-100 scale-95 opacity-0"
+                      style="transition-behavior: allow-discrete;"
+                    >
+                      <div class="py-1">
+                        <button
+                          onclick="performBulkAction('publish')"
+                          class="group/item flex w-full items-center px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/5 hover:text-zinc-950 dark:hover:text-white transition-colors"
+                        >
+                          <svg viewBox="0 0 20 20" fill="currentColor" class="mr-3 size-5 text-zinc-400 dark:text-zinc-500 group-hover/item:text-zinc-950 dark:group-hover/item:text-white">
+                            <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" />
+                          </svg>
+                          Publish Selected
+                        </button>
+                        <button
+                          onclick="performBulkAction('draft')"
+                          class="group/item flex w-full items-center px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/5 hover:text-zinc-950 dark:hover:text-white transition-colors"
+                        >
+                          <svg viewBox="0 0 20 20" fill="currentColor" class="mr-3 size-5 text-zinc-400 dark:text-zinc-500 group-hover/item:text-zinc-950 dark:group-hover/item:text-white">
+                            <path d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z" />
+                            <path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z" />
+                          </svg>
+                          Move to Draft
+                        </button>
+                      </div>
+                      <div class="py-1">
+                        <button
+                          onclick="performBulkAction('delete')"
+                          class="group/item flex w-full items-center px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                        >
+                          <svg viewBox="0 0 20 20" fill="currentColor" class="mr-3 size-5 text-zinc-400 dark:text-zinc-500 group-hover/item:text-red-600 dark:group-hover/item:text-red-400">
+                            <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" fill-rule="evenodd" />
+                          </svg>
+                          Delete Selected
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ` : ''}
               </div>
             </div>
           </div>
@@ -296,7 +339,84 @@ export function renderContentListPage(data: ContentListPageData): string {
           checkboxes.forEach(cb => cb.checked = e.target.checked);
         }
       });
-      
+
+      // Toggle bulk actions dropdown
+      function toggleBulkActionsDropdown() {
+        const menu = document.getElementById('bulk-actions-menu');
+        const isHidden = menu.classList.contains('hidden');
+
+        if (isHidden) {
+          menu.classList.remove('hidden');
+          setTimeout(() => {
+            menu.classList.remove('scale-95', 'opacity-0');
+            menu.classList.add('scale-100', 'opacity-100');
+          }, 10);
+        } else {
+          menu.classList.remove('scale-100', 'opacity-100');
+          menu.classList.add('scale-95', 'opacity-0');
+          setTimeout(() => {
+            menu.classList.add('hidden');
+          }, 100);
+        }
+      }
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('bulk-actions-dropdown');
+        const menu = document.getElementById('bulk-actions-menu');
+        if (dropdown && menu && !dropdown.contains(e.target)) {
+          menu.classList.remove('scale-100', 'opacity-100');
+          menu.classList.add('scale-95', 'opacity-0');
+          setTimeout(() => {
+            menu.classList.add('hidden');
+          }, 100);
+        }
+      });
+
+      // Perform bulk action
+      function performBulkAction(action) {
+        const selectedIds = Array.from(document.querySelectorAll('input[type="checkbox"].row-checkbox:checked'))
+          .map(cb => cb.value)
+          .filter(id => id);
+
+        if (selectedIds.length === 0) {
+          alert('Please select at least one item');
+          return;
+        }
+
+        const actionText = action === 'publish' ? 'publish' : action === 'draft' ? 'move to draft' : 'delete';
+        const confirmed = confirm(\`Are you sure you want to \${actionText} \${selectedIds.length} item(s)?\`);
+
+        if (!confirmed) return;
+
+        // Close dropdown
+        const menu = document.getElementById('bulk-actions-menu');
+        menu.classList.add('hidden');
+
+        fetch('/admin/content/bulk-action', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            action: action,
+            ids: selectedIds
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            location.reload();
+          } else {
+            alert('Error: ' + (data.error || 'Unknown error'));
+          }
+        })
+        .catch(err => {
+          console.error('Bulk action error:', err);
+          alert('Failed to perform bulk action');
+        });
+      }
+
     </script>
   `
 
