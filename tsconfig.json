@@ -34,6 +34,7 @@
     "src/content/models.ts",
     "src/content/rich-text.ts",
     "src/content/versioning.ts",
-    "src/routes/admin-content.ts"
+    "src/routes/admin-content.ts",
+    "src/components/catalyst/**/*.tsx"
   ]
 }
