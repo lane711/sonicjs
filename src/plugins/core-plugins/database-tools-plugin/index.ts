@@ -14,8 +14,7 @@ export function createDatabaseToolsPlugin(): Plugin {
     author: { name: 'SonicJS', email: 'admin@sonicjs.com' },
     license: 'MIT',
     compatibility: '^1.0.0',
-    dependencies: [],
-    tags: ['database', 'admin', 'tools', 'maintenance']
+    dependencies: []
   })
 
   // Add admin page
@@ -29,8 +28,7 @@ export function createDatabaseToolsPlugin(): Plugin {
   builder.addMenuItem('Database Tools', '/admin/database-tools', {
     icon: 'database',
     order: 60,
-    permissions: ['admin'],
-    category: 'System'
+    permissions: ['admin']
   })
 
   // Add service
@@ -38,13 +36,6 @@ export function createDatabaseToolsPlugin(): Plugin {
     implementation: DatabaseToolsService,
     description: 'Database management and maintenance service',
     singleton: true
-  })
-
-  // Add settings tab
-  builder.addSettingsTab('database-tools', 'Database Tools', {
-    description: 'Database management and maintenance tools',
-    icon: 'database',
-    permissions: ['admin']
   })
 
   return builder.build()

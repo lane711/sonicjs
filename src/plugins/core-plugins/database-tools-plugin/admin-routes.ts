@@ -5,8 +5,16 @@ type Bindings = {
   DB: D1Database
 }
 
+type Variables = {
+  user?: {
+    userId: string
+    email: string
+    role: string
+  }
+}
+
 export function createDatabaseToolsAdminRoutes() {
-  const router = new Hono<{ Bindings: Bindings }>()
+  const router = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
   // Get database statistics
   router.get('/api/stats', async (c) => {
