@@ -129,66 +129,73 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
         <!-- Main Content -->
         <div class="flex-1">
           <!-- Toolbar -->
-          <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-4 mb-6">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-4">
-                <div class="flex items-center space-x-2">
-                  <label class="text-sm font-medium text-zinc-950 dark:text-white">View:</label>
-                  <select
-                    class="rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
-                    onchange="window.location.href = updateUrlParam('view', this.value)"
-                  >
-                    <option value="grid" ${data.currentView === 'grid' ? 'selected' : ''}>Grid</option>
-                    <option value="list" ${data.currentView === 'list' ? 'selected' : ''}>List</option>
-                  </select>
-                </div>
+          <div class="relative rounded-xl overflow-hidden mb-6">
+            <!-- Gradient Background -->
+            <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-pink-500/10 to-purple-500/10 dark:from-cyan-400/20 dark:via-pink-400/20 dark:to-purple-400/20"></div>
 
-                <div class="relative group">
-                  <div class="absolute left-3.5 top-2.5 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 dark:from-cyan-300 dark:to-blue-400 opacity-90 group-focus-within:opacity-100 transition-opacity">
-                    <svg class="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Search files..."
-                    class="rounded-full bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm pl-11 pr-4 py-2 text-sm w-72 text-zinc-950 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400 border-2 border-cyan-200/50 dark:border-cyan-700/50 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:shadow-lg focus:shadow-cyan-500/20 dark:focus:shadow-cyan-400/20 transition-all duration-300"
-                    hx-get="/admin/media/search"
-                    hx-trigger="keyup changed delay:300ms"
-                    hx-target="#media-grid"
-                    hx-include="[name='folder'], [name='type']"
-                  >
-                  <input type="hidden" name="folder" value="${data.currentFolder}">
-                  <input type="hidden" name="type" value="${data.currentType}">
-                </div>
-              </div>
-
-              <div class="flex items-center space-x-2">
-                <span class="text-sm text-zinc-500 dark:text-zinc-400">${data.files.length} files</span>
-                <button
-                  id="select-all-btn"
-                  class="rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
-                  onclick="toggleSelectAll()"
-                >
-                  Select All
-                </button>
-                <div class="relative">
-                  <button
-                    id="bulk-actions-btn"
-                    class="rounded-lg bg-zinc-100 dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-400 dark:text-zinc-600 cursor-not-allowed"
-                    disabled
-                    onclick="toggleBulkActionsDropdown()"
-                  >
-                    Bulk Actions
-                  </button>
-                  <div id="bulk-actions-dropdown" class="hidden absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-zinc-900 ring-1 ring-zinc-950/5 dark:ring-white/10 shadow-xl z-50">
-                    <div class="py-1">
-                      <button
-                        onclick="performBulkDelete()"
-                        class="w-full text-left px-4 py-2 text-sm text-red-700 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
+            <div class="relative bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10">
+              <div class="px-6 py-5">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                      <label class="text-sm font-medium text-zinc-950 dark:text-white">View:</label>
+                      <select
+                        class="rounded-lg bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm px-4 py-2 text-sm text-zinc-950 dark:text-white border-2 border-cyan-200/50 dark:border-cyan-700/50 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:shadow-lg focus:shadow-cyan-500/20 dark:focus:shadow-cyan-400/20 transition-all duration-300"
+                        onchange="window.location.href = updateUrlParam('view', this.value)"
                       >
-                        Delete Selected Files
+                        <option value="grid" ${data.currentView === 'grid' ? 'selected' : ''}>Grid</option>
+                        <option value="list" ${data.currentView === 'list' ? 'selected' : ''}>List</option>
+                      </select>
+                    </div>
+
+                    <div class="relative group">
+                      <div class="absolute left-3.5 top-2.5 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-cyan-400 to-pink-500 dark:from-cyan-300 dark:to-pink-400 opacity-90 group-focus-within:opacity-100 transition-opacity">
+                        <svg class="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="Search files..."
+                        class="rounded-full bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm pl-11 pr-4 py-2 text-sm w-72 text-zinc-950 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400 border-2 border-cyan-200/50 dark:border-cyan-700/50 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:shadow-lg focus:shadow-cyan-500/20 dark:focus:shadow-cyan-400/20 transition-all duration-300"
+                        hx-get="/admin/media/search"
+                        hx-trigger="keyup changed delay:300ms"
+                        hx-target="#media-grid"
+                        hx-include="[name='folder'], [name='type']"
+                      >
+                      <input type="hidden" name="folder" value="${data.currentFolder}">
+                      <input type="hidden" name="type" value="${data.currentType}">
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-x-3">
+                    <span class="text-sm/6 font-medium text-zinc-700 dark:text-zinc-300 px-3 py-1.5 rounded-full bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm">${data.files.length} files</span>
+                    <button
+                      id="select-all-btn"
+                      class="inline-flex items-center gap-x-1.5 px-3 py-1.5 bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm text-zinc-950 dark:text-white text-sm font-medium rounded-full ring-1 ring-inset ring-cyan-200/50 dark:ring-cyan-700/50 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-pink-50 dark:hover:from-cyan-900/30 dark:hover:to-pink-900/30 hover:ring-cyan-300 dark:hover:ring-cyan-600 transition-all duration-200"
+                      onclick="toggleSelectAll()"
+                    >
+                      Select All
+                    </button>
+                    <div class="relative">
+                      <button
+                        id="bulk-actions-btn"
+                        class="inline-flex items-center gap-x-1.5 px-3 py-1.5 bg-zinc-100/60 dark:bg-zinc-800/60 backdrop-blur-sm text-zinc-400 dark:text-zinc-600 text-sm font-medium rounded-full ring-1 ring-inset ring-zinc-200/50 dark:ring-zinc-700/50 cursor-not-allowed"
+                        disabled
+                        onclick="toggleBulkActionsDropdown()"
+                      >
+                        Bulk Actions
                       </button>
+                      <div id="bulk-actions-dropdown" class="hidden absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-zinc-900 ring-1 ring-zinc-950/5 dark:ring-white/10 shadow-xl z-[100]">
+                        <div class="py-1">
+                          <button
+                            onclick="performBulkDelete()"
+                            class="w-full text-left px-4 py-2 text-sm text-red-700 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
+                          >
+                            Delete Selected Files
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -33,7 +33,7 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
         sortType: 'string',
         render: (value, collection) => `
             <div class="flex items-center ml-2">
-                <span class="inline-flex items-center rounded-md bg-lime-50 dark:bg-lime-500/10 px-2.5 py-1 text-sm font-medium text-lime-700 dark:text-lime-300 ring-1 ring-inset ring-lime-700/10 dark:ring-lime-400/20">
+                <span class="inline-flex items-center rounded-md bg-cyan-50 dark:bg-cyan-500/10 px-2.5 py-1 text-sm font-medium text-cyan-700 dark:text-cyan-300 ring-1 ring-inset ring-cyan-700/10 dark:ring-cyan-400/20">
                   ${collection.name}
                 </span>
             </div>

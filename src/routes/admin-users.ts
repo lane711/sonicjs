@@ -5,6 +5,7 @@ import { renderProfilePage, UserProfile, ProfilePageData } from '../templates/pa
 import { renderAlert } from '../templates/components/alert.template'
 import { AuthManager } from '../middleware/auth'
 import { renderActivityLogsPage, ActivityLogsPageData, ActivityLog } from '../templates/pages/admin-activity-logs.template'
+import { renderUserEditPage, UserEditPageData, UserEditData } from '../templates/pages/admin-user-edit.template'
 
 type Bindings = {
   DB: D1Database
@@ -58,6 +59,14 @@ const LANGUAGES = [
   { value: 'ja', label: 'Japanese' },
   { value: 'ko', label: 'Korean' },
   { value: 'zh', label: 'Chinese' }
+]
+
+// Role options for user form
+const ROLES = [
+  { value: 'admin', label: 'Administrator' },
+  { value: 'editor', label: 'Editor' },
+  { value: 'author', label: 'Author' },
+  { value: 'viewer', label: 'Viewer' }
 ]
 
 /**
@@ -477,6 +486,216 @@ userRoutes.get('/users', requirePermission('users.read'), async (c) => {
   } catch (error) {
     console.error('Users list error:', error)
     return c.json({ error: 'Failed to load users' }, 500)
+  }
+})
+
+/**
+ * GET /admin/users/:id/edit - Show user edit page (requires users.update permission)
+ */
+userRoutes.get('/users/:id/edit', requirePermission('users.update'), async (c) => {
+  const db = c.env.DB
+  const user = c.get('user')
+  const userId = c.req.param('id')
+
+  try {
+    // Get user data
+    const userStmt = db.prepare(`
+      SELECT id, email, username, first_name, last_name, phone, bio, avatar_url,
+             role, is_active, email_verified, two_factor_enabled, created_at, last_login_at
+      FROM users
+      WHERE id = ?
+    `)
+
+    const userToEdit = await userStmt.bind(userId).first() as any
+
+    if (!userToEdit) {
+      return c.html(renderAlert({
+        type: 'error',
+        message: 'User not found',
+        dismissible: true
+      }), 404)
+    }
+
+    // Convert to UserEditData interface
+    const editData: UserEditData = {
+      id: userToEdit.id,
+      email: userToEdit.email,
+      username: userToEdit.username || '',
+      firstName: userToEdit.first_name || '',
+      lastName: userToEdit.last_name || '',
+      phone: userToEdit.phone,
+      bio: userToEdit.bio,
+      avatarUrl: userToEdit.avatar_url,
+      role: userToEdit.role,
+      isActive: Boolean(userToEdit.is_active),
+      emailVerified: Boolean(userToEdit.email_verified),
+      twoFactorEnabled: Boolean(userToEdit.two_factor_enabled),
+      createdAt: userToEdit.created_at,
+      lastLoginAt: userToEdit.last_login_at
+    }
+
+    const pageData: UserEditPageData = {
+      userToEdit: editData,
+      roles: ROLES,
+      user: {
+        name: user.email.split('@')[0] || user.email,
+        email: user.email,
+        role: user.role
+      }
+    }
+
+    return c.html(renderUserEditPage(pageData))
+  } catch (error) {
+    console.error('User edit page error:', error)
+
+    return c.html(renderAlert({
+      type: 'error',
+      message: 'Failed to load user. Please try again.',
+      dismissible: true
+    }), 500)
+  }
+})
+
+/**
+ * PUT /admin/users/:id - Update user (requires users.update permission)
+ */
+userRoutes.put('/users/:id', requirePermission('users.update'), async (c) => {
+  const db = c.env.DB
+  const user = c.get('user')
+  const userId = c.req.param('id')
+
+  try {
+    const formData = await c.req.formData()
+
+    const firstName = formData.get('first_name')?.toString()?.trim() || ''
+    const lastName = formData.get('last_name')?.toString()?.trim() || ''
+    const username = formData.get('username')?.toString()?.trim() || ''
+    const email = formData.get('email')?.toString()?.trim() || ''
+    const phone = formData.get('phone')?.toString()?.trim() || null
+    const bio = formData.get('bio')?.toString()?.trim() || null
+    const role = formData.get('role')?.toString() || 'viewer'
+    const isActive = formData.get('is_active') === '1'
+    const emailVerified = formData.get('email_verified') === '1'
+
+    // Validate required fields
+    if (!firstName || !lastName || !username || !email) {
+      return c.html(renderAlert({
+        type: 'error',
+        message: 'First name, last name, username, and email are required.',
+        dismissible: true
+      }))
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return c.html(renderAlert({
+        type: 'error',
+        message: 'Please enter a valid email address.',
+        dismissible: true
+      }))
+    }
+
+    // Check if username/email are taken by another user
+    const checkStmt = db.prepare(`
+      SELECT id FROM users
+      WHERE (username = ? OR email = ?) AND id != ?
+    `)
+    const existingUser = await checkStmt.bind(username, email, userId).first()
+
+    if (existingUser) {
+      return c.html(renderAlert({
+        type: 'error',
+        message: 'Username or email is already taken by another user.',
+        dismissible: true
+      }))
+    }
+
+    // Update user
+    const updateStmt = db.prepare(`
+      UPDATE users SET
+        first_name = ?, last_name = ?, username = ?, email = ?,
+        phone = ?, bio = ?, role = ?, is_active = ?, email_verified = ?,
+        updated_at = ?
+      WHERE id = ?
+    `)
+
+    await updateStmt.bind(
+      firstName, lastName, username, email,
+      phone, bio, role, isActive ? 1 : 0, emailVerified ? 1 : 0,
+      Date.now(), userId
+    ).run()
+
+    // Log the activity
+    await logActivity(
+      db, user.userId, 'user.update', 'users', userId,
+      { fields: ['first_name', 'last_name', 'username', 'email', 'phone', 'bio', 'role', 'is_active', 'email_verified'] },
+      c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
+      c.req.header('user-agent')
+    )
+
+    return c.html(renderAlert({
+      type: 'success',
+      message: 'User updated successfully!',
+      dismissible: true
+    }))
+
+  } catch (error) {
+    console.error('User update error:', error)
+    return c.html(renderAlert({
+      type: 'error',
+      message: 'Failed to update user. Please try again.',
+      dismissible: true
+    }))
+  }
+})
+
+/**
+ * DELETE /admin/users/:id - Delete user (requires users.delete permission)
+ */
+userRoutes.delete('/users/:id', requirePermission('users.delete'), async (c) => {
+  const db = c.env.DB
+  const user = c.get('user')
+  const userId = c.req.param('id')
+
+  try {
+    // Prevent self-deletion
+    if (userId === user.userId) {
+      return c.json({ error: 'You cannot delete your own account' }, 400)
+    }
+
+    // Check if user exists
+    const userStmt = db.prepare(`
+      SELECT id, email FROM users WHERE id = ?
+    `)
+    const userToDelete = await userStmt.bind(userId).first() as any
+
+    if (!userToDelete) {
+      return c.json({ error: 'User not found' }, 404)
+    }
+
+    // Delete the user (soft delete by setting is_active = 0)
+    const deleteStmt = db.prepare(`
+      UPDATE users SET is_active = 0, updated_at = ? WHERE id = ?
+    `)
+    await deleteStmt.bind(Date.now(), userId).run()
+
+    // Log the activity
+    await logActivity(
+      db, user.userId, 'user.delete', 'users', userId,
+      { email: userToDelete.email },
+      c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
+      c.req.header('user-agent')
+    )
+
+    return c.json({
+      success: true,
+      message: 'User deleted successfully'
+    })
+
+  } catch (error) {
+    console.error('User deletion error:', error)
+    return c.json({ error: 'Failed to delete user' }, 500)
   }
 })
 

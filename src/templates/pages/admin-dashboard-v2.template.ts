@@ -51,15 +51,15 @@ export function renderDashboardPage(data: DashboardPageData): string {
     </div>
 
     <!-- Stats Cards -->
-    <dl
+    <div
       id="stats-container"
-      class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4 mb-8"
+      class="mb-8"
       hx-get="/admin/api/stats"
       hx-trigger="load"
       hx-swap="innerHTML"
     >
       ${renderStatsCardsSkeleton()}
-    </dl>
+    </div>
 
     <!-- Dashboard Grid -->
     <div class="grid grid-cols-1 gap-6 xl:grid-cols-3 mb-8">
@@ -115,14 +115,14 @@ export function renderDashboardPageWithDynamicMenu(
       <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">Welcome to your SonicJS AI admin dashboard</p>
     </div>
 
-    <dl id="stats-container" class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4 mb-8" hx-get="/admin/api/stats" hx-trigger="load">
+    <div id="stats-container" class="mb-8" hx-get="/admin/api/stats" hx-trigger="load">
       ${renderStatsCards({
         collections: 0,
         contentItems: 0,
         mediaFiles: 0,
         users: 0,
       })}
-    </dl>
+    </div>
 
     <div class="grid grid-cols-1 gap-6 xl:grid-cols-3 mb-8">
       <!-- Analytics Chart -->
@@ -172,56 +172,79 @@ export function renderStatsCards(stats: DashboardStats): string {
     {
       title: "Total Collections",
       value: stats.collections.toString(),
-      change: "+12.5%",
+      change: "12.5",
       isPositive: true,
     },
     {
       title: "Content Items",
       value: stats.contentItems.toString(),
-      change: "+8.2%",
+      change: "8.2",
       isPositive: true,
     },
     {
       title: "Media Files",
       value: stats.mediaFiles.toString(),
-      change: "+15.3%",
+      change: "15.3",
       isPositive: true,
     },
     {
       title: "Active Users",
       value: stats.users.toString(),
-      change: "-2.4%",
+      change: "2.4",
       isPositive: false,
     },
   ];
 
-  return cards
-    .map(
-      (card) => `
-    <div class="rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
-      <dt class="text-sm/6 font-medium text-zinc-500 dark:text-zinc-400">${card.title}</dt>
-      <dd class="mt-3 flex items-baseline gap-x-2">
-        <span class="text-4xl font-semibold tracking-tight text-zinc-950 dark:text-white">${card.value}</span>
-        <span class="text-sm ${card.isPositive ? 'text-lime-600 dark:text-lime-400' : 'text-pink-600 dark:text-pink-400'}">${card.change}</span>
-      </dd>
+  const cardColors = ['text-cyan-400', 'text-lime-400', 'text-pink-400', 'text-purple-400'];
+
+  return `
+    <div>
+      <h3 class="text-base font-semibold text-zinc-950 dark:text-white">Last 30 days</h3>
+      <dl class="mt-5 grid grid-cols-1 divide-zinc-950/5 dark:divide-white/10 overflow-hidden rounded-lg bg-zinc-800/75 dark:bg-zinc-800/75 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 md:grid-cols-4 md:divide-x md:divide-y-0">
+        ${cards.map((card, index) => `
+          <div class="px-4 py-5 sm:p-6">
+            <dt class="text-base font-normal text-zinc-700 dark:text-zinc-100">${card.title}</dt>
+            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
+              <div class="flex items-baseline text-2xl font-semibold ${cardColors[index]}">
+                ${card.value}
+              </div>
+              <div class="inline-flex items-baseline rounded-full ${card.isPositive ? 'bg-lime-400/10 text-lime-600 dark:text-lime-400' : 'bg-pink-400/10 text-pink-600 dark:text-pink-400'} px-2.5 py-0.5 text-sm font-medium md:mt-2 lg:mt-0">
+                <svg viewBox="0 0 20 20" fill="currentColor" class="-ml-1 mr-0.5 size-5 shrink-0 self-center">
+                  ${card.isPositive
+                    ? '<path d="M10 17a.75.75 0 0 1-.75-.75V5.612L5.29 9.77a.75.75 0 0 1-1.08-1.04l5.25-5.5a.75.75 0 0 1 1.08 0l5.25 5.5a.75.75 0 1 1-1.08 1.04l-3.96-4.158V16.25A.75.75 0 0 1 10 17Z" clip-rule="evenodd" fill-rule="evenodd" />'
+                    : '<path d="M10 3a.75.75 0 0 1 .75.75v10.638l3.96-4.158a.75.75 0 1 1 1.08 1.04l-5.25 5.5a.75.75 0 0 1-1.08 0l-5.25-5.5a.75.75 0 1 1 1.08-1.04l3.96 4.158V3.75A.75.75 0 0 1 10 3Z" clip-rule="evenodd" fill-rule="evenodd" />'
+                  }
+                </svg>
+                <span class="sr-only">${card.isPositive ? 'Increased' : 'Decreased'} by</span>
+                ${card.change}%
+              </div>
+            </dd>
+          </div>
+        `).join('')}
+      </dl>
     </div>
-  `
-    )
-    .join("");
+  `;
 }
 
 function renderStatsCardsSkeleton(): string {
-  return Array(4)
-    .fill(0)
-    .map(
-      () => `
-        <div class="rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6 animate-pulse">
-          <div class="h-4 w-24 bg-zinc-200 dark:bg-zinc-700 rounded mb-3"></div>
-          <div class="h-10 w-20 bg-zinc-200 dark:bg-zinc-700 rounded"></div>
-        </div>
-      `
-    )
-    .join("");
+  return `
+    <div>
+      <div class="h-6 w-32 bg-zinc-200 dark:bg-zinc-700 rounded animate-pulse mb-5"></div>
+      <div class="grid grid-cols-1 divide-zinc-950/5 dark:divide-white/10 overflow-hidden rounded-lg bg-zinc-800/75 dark:bg-zinc-800/75 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 md:grid-cols-4 md:divide-x md:divide-y-0">
+        ${Array(4)
+          .fill(0)
+          .map(
+            () => `
+            <div class="px-4 py-5 sm:p-6 animate-pulse">
+              <div class="h-4 w-24 bg-zinc-200 dark:bg-zinc-700 rounded mb-3"></div>
+              <div class="h-8 w-16 bg-zinc-200 dark:bg-zinc-700 rounded"></div>
+            </div>
+          `
+          )
+          .join("")}
+      </div>
+    </div>
+  `;
 }
 
 function renderAnalyticsChart(): string {
@@ -248,11 +271,104 @@ function renderAnalyticsChart(): string {
       </div>
 
       <div class="px-6 py-6">
-        <div id="chartOne" class="flex h-60 w-full items-center justify-center rounded-lg bg-zinc-50 dark:bg-zinc-800/50">
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">Analytics Chart (Chart.js integration needed)</p>
-        </div>
+        <canvas id="activeUsersChart" class="w-full" style="height: 300px;"></canvas>
       </div>
     </div>
+
+    <script>
+      // Initialize Chart.js for Active Users by Day
+      (function() {
+        const ctx = document.getElementById('activeUsersChart');
+        if (!ctx) return;
+
+        // Generate last 7 days labels
+        const labels = [];
+        const data = [];
+        const today = new Date();
+
+        for (let i = 6; i >= 0; i--) {
+          const date = new Date(today);
+          date.setDate(date.getDate() - i);
+          labels.push(date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }));
+          // Generate sample data (replace with real data later)
+          data.push(Math.floor(Math.random() * 50) + 100);
+        }
+
+        const isDark = document.documentElement.classList.contains('dark');
+
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Active Users',
+              data: data,
+              borderColor: isDark ? 'rgb(34, 211, 238)' : 'rgb(6, 182, 212)',
+              backgroundColor: isDark ? 'rgba(34, 211, 238, 0.1)' : 'rgba(6, 182, 212, 0.1)',
+              borderWidth: 2,
+              fill: true,
+              tension: 0.4,
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              pointBackgroundColor: isDark ? 'rgb(34, 211, 238)' : 'rgb(6, 182, 212)',
+              pointBorderColor: isDark ? 'rgb(17, 24, 39)' : 'rgb(255, 255, 255)',
+              pointBorderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                backgroundColor: isDark ? 'rgb(39, 39, 42)' : 'rgb(255, 255, 255)',
+                titleColor: isDark ? 'rgb(255, 255, 255)' : 'rgb(9, 9, 11)',
+                bodyColor: isDark ? 'rgb(161, 161, 170)' : 'rgb(113, 113, 122)',
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(9, 9, 11, 0.05)',
+                borderWidth: 1,
+                padding: 12,
+                displayColors: false,
+                callbacks: {
+                  label: function(context) {
+                    return 'Active Users: ' + context.parsed.y;
+                  }
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                border: {
+                  display: false
+                },
+                grid: {
+                  color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+                  drawBorder: false
+                },
+                ticks: {
+                  color: isDark ? 'rgb(161, 161, 170)' : 'rgb(113, 113, 122)',
+                  padding: 8
+                }
+              },
+              x: {
+                border: {
+                  display: false
+                },
+                grid: {
+                  display: false
+                },
+                ticks: {
+                  color: isDark ? 'rgb(161, 161, 170)' : 'rgb(113, 113, 122)',
+                  padding: 8
+                }
+              }
+            }
+          }
+        });
+      })();
+    </script>
   `;
 }
 

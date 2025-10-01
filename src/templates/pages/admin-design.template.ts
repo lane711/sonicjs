@@ -202,53 +202,170 @@ export function renderDesignPage(data: DesignPageData): string {
       <div id="colors">
         <h2 class="text-xl font-semibold text-zinc-950 dark:text-white mb-6">Color Palette</h2>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Zinc Scale -->
+        <div class="space-y-6">
+          <!-- Pastel Brand Colors -->
           <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
-            <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">Zinc (Primary)</h3>
-            <div class="space-y-2">
-              <div class="flex items-center gap-x-3">
-                <div class="h-10 w-10 rounded-lg bg-zinc-50 ring-1 ring-inset ring-zinc-950/10"></div>
-                <span class="text-sm text-zinc-950 dark:text-white">zinc-50</span>
+            <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">Pastel Brand Colors (Currently Used)</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <div class="h-20 rounded-lg bg-cyan-400 dark:bg-cyan-400 shadow-sm"></div>
+                <span class="text-xs font-medium text-zinc-950 dark:text-white mt-2 block">cyan-400</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">#22d3ee</span>
               </div>
-              <div class="flex items-center gap-x-3">
-                <div class="h-10 w-10 rounded-lg bg-zinc-100 ring-1 ring-inset ring-zinc-950/10"></div>
-                <span class="text-sm text-zinc-950 dark:text-white">zinc-100</span>
+              <div>
+                <div class="h-20 rounded-lg bg-pink-400 dark:bg-pink-400 shadow-sm"></div>
+                <span class="text-xs font-medium text-zinc-950 dark:text-white mt-2 block">pink-400</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">#f472b6</span>
               </div>
-              <div class="flex items-center gap-x-3">
-                <div class="h-10 w-10 rounded-lg bg-zinc-500"></div>
-                <span class="text-sm text-zinc-950 dark:text-white">zinc-500</span>
+              <div>
+                <div class="h-20 rounded-lg bg-purple-400 dark:bg-purple-400 shadow-sm"></div>
+                <span class="text-xs font-medium text-zinc-950 dark:text-white mt-2 block">purple-400</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">#c084fc</span>
               </div>
-              <div class="flex items-center gap-x-3">
-                <div class="h-10 w-10 rounded-lg bg-zinc-900"></div>
-                <span class="text-sm text-zinc-950 dark:text-white">zinc-900</span>
-              </div>
-              <div class="flex items-center gap-x-3">
-                <div class="h-10 w-10 rounded-lg bg-zinc-950"></div>
-                <span class="text-sm text-zinc-950 dark:text-white">zinc-950</span>
+              <div>
+                <div class="h-20 rounded-lg bg-lime-400 dark:bg-lime-400 shadow-sm"></div>
+                <span class="text-xs font-medium text-zinc-950 dark:text-white mt-2 block">lime-400</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">#a3e635</span>
               </div>
             </div>
           </div>
 
-          <!-- Semantic Colors -->
+          <!-- Full Pastel Palette -->
           <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
-            <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">Semantic Colors</h3>
-            <div class="space-y-2">
-              <div class="flex items-center gap-x-3">
-                <div class="h-10 w-10 rounded-lg bg-blue-500"></div>
-                <span class="text-sm text-zinc-950 dark:text-white">Info - blue-500</span>
+            <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">Complete Pastel Color Set</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              <div>
+                <div class="h-20 rounded-lg bg-cyan-400 shadow-sm"></div>
+                <span class="text-xs font-medium text-zinc-950 dark:text-white mt-2 block">cyan-400</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">#22d3ee</span>
               </div>
-              <div class="flex items-center gap-x-3">
-                <div class="h-10 w-10 rounded-lg bg-green-500"></div>
-                <span class="text-sm text-zinc-950 dark:text-white">Success - green-500</span>
+              <div>
+                <div class="h-20 rounded-lg bg-sky-400 shadow-sm"></div>
+                <span class="text-xs font-medium text-zinc-950 dark:text-white mt-2 block">sky-400</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">#38bdf8</span>
               </div>
-              <div class="flex items-center gap-x-3">
-                <div class="h-10 w-10 rounded-lg bg-amber-500"></div>
-                <span class="text-sm text-zinc-950 dark:text-white">Warning - amber-500</span>
+              <div>
+                <div class="h-20 rounded-lg bg-blue-400 shadow-sm"></div>
+                <span class="text-xs font-medium text-zinc-950 dark:text-white mt-2 block">blue-400</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">#60a5fa</span>
               </div>
-              <div class="flex items-center gap-x-3">
-                <div class="h-10 w-10 rounded-lg bg-red-500"></div>
-                <span class="text-sm text-zinc-950 dark:text-white">Error - red-500</span>
+              <div>
+                <div class="h-20 rounded-lg bg-indigo-400 shadow-sm"></div>
+                <span class="text-xs font-medium text-zinc-950 dark:text-white mt-2 block">indigo-400</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">#818cf8</span>
+              </div>
+              <div>
+                <div class="h-20 rounded-lg bg-purple-400 shadow-sm"></div>
+                <span class="text-xs font-medium text-zinc-950 dark:text-white mt-2 block">purple-400</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">#c084fc</span>
+              </div>
+              <div>
+                <div class="h-20 rounded-lg bg-fuchsia-400 shadow-sm"></div>
+                <span class="text-xs font-medium text-zinc-950 dark:text-white mt-2 block">fuchsia-400</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">#e879f9</span>
+              </div>
+              <div>
+                <div class="h-20 rounded-lg bg-pink-400 shadow-sm"></div>
+                <span class="text-xs font-medium text-zinc-950 dark:text-white mt-2 block">pink-400</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">#f472b6</span>
+              </div>
+              <div>
+                <div class="h-20 rounded-lg bg-rose-400 shadow-sm"></div>
+                <span class="text-xs font-medium text-zinc-950 dark:text-white mt-2 block">rose-400</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">#fb7185</span>
+              </div>
+              <div>
+                <div class="h-20 rounded-lg bg-red-400 shadow-sm"></div>
+                <span class="text-xs font-medium text-zinc-950 dark:text-white mt-2 block">red-400</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">#f87171</span>
+              </div>
+              <div>
+                <div class="h-20 rounded-lg bg-orange-400 shadow-sm"></div>
+                <span class="text-xs font-medium text-zinc-950 dark:text-white mt-2 block">orange-400</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">#fb923c</span>
+              </div>
+              <div>
+                <div class="h-20 rounded-lg bg-amber-400 shadow-sm"></div>
+                <span class="text-xs font-medium text-zinc-950 dark:text-white mt-2 block">amber-400</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">#fbbf24</span>
+              </div>
+              <div>
+                <div class="h-20 rounded-lg bg-yellow-400 shadow-sm"></div>
+                <span class="text-xs font-medium text-zinc-950 dark:text-white mt-2 block">yellow-400</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">#facc15</span>
+              </div>
+              <div>
+                <div class="h-20 rounded-lg bg-lime-400 shadow-sm"></div>
+                <span class="text-xs font-medium text-zinc-950 dark:text-white mt-2 block">lime-400</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">#a3e635</span>
+              </div>
+              <div>
+                <div class="h-20 rounded-lg bg-green-400 shadow-sm"></div>
+                <span class="text-xs font-medium text-zinc-950 dark:text-white mt-2 block">green-400</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">#4ade80</span>
+              </div>
+              <div>
+                <div class="h-20 rounded-lg bg-emerald-400 shadow-sm"></div>
+                <span class="text-xs font-medium text-zinc-950 dark:text-white mt-2 block">emerald-400</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">#34d399</span>
+              </div>
+              <div>
+                <div class="h-20 rounded-lg bg-teal-400 shadow-sm"></div>
+                <span class="text-xs font-medium text-zinc-950 dark:text-white mt-2 block">teal-400</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">#2dd4bf</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Zinc Scale & Semantic Colors -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Zinc Scale -->
+            <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
+              <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">Zinc (Neutral Scale)</h3>
+              <div class="space-y-2">
+                <div class="flex items-center gap-x-3">
+                  <div class="h-10 w-10 rounded-lg bg-zinc-50 ring-1 ring-inset ring-zinc-950/10"></div>
+                  <span class="text-sm text-zinc-950 dark:text-white">zinc-50</span>
+                </div>
+                <div class="flex items-center gap-x-3">
+                  <div class="h-10 w-10 rounded-lg bg-zinc-100 ring-1 ring-inset ring-zinc-950/10"></div>
+                  <span class="text-sm text-zinc-950 dark:text-white">zinc-100</span>
+                </div>
+                <div class="flex items-center gap-x-3">
+                  <div class="h-10 w-10 rounded-lg bg-zinc-500"></div>
+                  <span class="text-sm text-zinc-950 dark:text-white">zinc-500</span>
+                </div>
+                <div class="flex items-center gap-x-3">
+                  <div class="h-10 w-10 rounded-lg bg-zinc-900"></div>
+                  <span class="text-sm text-zinc-950 dark:text-white">zinc-900</span>
+                </div>
+                <div class="flex items-center gap-x-3">
+                  <div class="h-10 w-10 rounded-lg bg-zinc-950"></div>
+                  <span class="text-sm text-zinc-950 dark:text-white">zinc-950</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Semantic Colors -->
+            <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
+              <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">Semantic Colors</h3>
+              <div class="space-y-2">
+                <div class="flex items-center gap-x-3">
+                  <div class="h-10 w-10 rounded-lg bg-blue-500"></div>
+                  <span class="text-sm text-zinc-950 dark:text-white">Info - blue-500</span>
+                </div>
+                <div class="flex items-center gap-x-3">
+                  <div class="h-10 w-10 rounded-lg bg-green-500"></div>
+                  <span class="text-sm text-zinc-950 dark:text-white">Success - green-500</span>
+                </div>
+                <div class="flex items-center gap-x-3">
+                  <div class="h-10 w-10 rounded-lg bg-amber-500"></div>
+                  <span class="text-sm text-zinc-950 dark:text-white">Warning - amber-500</span>
+                </div>
+                <div class="flex items-center gap-x-3">
+                  <div class="h-10 w-10 rounded-lg bg-red-500"></div>
+                  <span class="text-sm text-zinc-950 dark:text-white">Error - red-500</span>
+                </div>
               </div>
             </div>
           </div>

@@ -54,12 +54,12 @@ export function renderContentListPage(data: ContentListPageData): string {
         name: 'status',
         label: 'Status',
         options: [
-          { value: 'all', label: 'All Status', selected: data.status === 'all' },
-          { value: 'draft', label: 'Draft', selected: data.status === 'draft' },
-          { value: 'review', label: 'Under Review', selected: data.status === 'review' },
-          { value: 'scheduled', label: 'Scheduled', selected: data.status === 'scheduled' },
-          { value: 'published', label: 'Published', selected: data.status === 'published' },
-          { value: 'archived', label: 'Archived', selected: data.status === 'archived' }
+          { value: 'all', label: 'All Status', selected: data.status === 'all', color: 'zinc' },
+          { value: 'draft', label: 'Draft', selected: data.status === 'draft', color: 'cyan' },
+          { value: 'review', label: 'Under Review', selected: data.status === 'review', color: 'lime' },
+          { value: 'scheduled', label: 'Scheduled', selected: data.status === 'scheduled', color: 'pink' },
+          { value: 'published', label: 'Published', selected: data.status === 'published', color: 'purple' },
+          { value: 'archived', label: 'Archived', selected: data.status === 'archived', color: 'amber' }
         ],
         hxTarget: '#content-list',
         hxInclude: '[name="model"]'
@@ -215,23 +215,43 @@ export function renderContentListPage(data: ContentListPageData): string {
           <div class="px-6 py-5">
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-4">
-                ${filterBarData.filters.map(filter => `
+                ${filterBarData.filters.map(filter => {
+                  const selectedOption = filter.options.find(opt => opt.selected);
+                  const selectedColor = selectedOption?.color || 'cyan';
+                  const colorMap: Record<string, string> = {
+                    'cyan': 'bg-cyan-400 dark:bg-cyan-400',
+                    'lime': 'bg-lime-400 dark:bg-lime-400',
+                    'pink': 'bg-pink-400 dark:bg-pink-400',
+                    'purple': 'bg-purple-400 dark:bg-purple-400',
+                    'amber': 'bg-amber-400 dark:bg-amber-400',
+                    'zinc': 'bg-zinc-400 dark:bg-zinc-400'
+                  };
+
+                  return `
                   <div>
-                    <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">${filter.label}</label>
-                    <select
-                      name="${filter.name}"
-                      hx-get="/admin/content"
-                      hx-trigger="change"
-                      hx-target="${filter.hxTarget || '#content-list'}"
-                      hx-include="${filter.hxInclude || ''}"
-                      class="rounded-lg bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm px-4 py-2 text-sm min-w-48 text-zinc-950 dark:text-white border-2 border-cyan-200/50 dark:border-cyan-700/50 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:shadow-lg focus:shadow-cyan-500/20 dark:focus:shadow-cyan-400/20 transition-all duration-300"
-                    >
-                      ${filter.options.map(opt => `
-                        <option value="${opt.value}" ${opt.selected ? 'selected' : ''}>${opt.label}</option>
-                      `).join('')}
-                    </select>
+                    <label class="block text-sm/6 font-medium text-zinc-950 dark:text-white">${filter.label}</label>
+                    <div class="mt-2 grid grid-cols-1">
+                      <div class="col-start-1 row-start-1 flex items-center gap-3 pl-3 pr-8 pointer-events-none">
+                        ${filter.name === 'status' ? `<span class="inline-block size-2 shrink-0 rounded-full border border-transparent ${colorMap[selectedColor]}"></span>` : ''}
+                      </div>
+                      <select
+                        name="${filter.name}"
+                        hx-get="/admin/content"
+                        hx-trigger="change"
+                        hx-target="${filter.hxTarget || '#content-list'}"
+                        hx-include="${filter.hxInclude || ''}"
+                        class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 ${filter.name === 'status' ? 'pl-8' : 'pl-3'} pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-cyan-500/30 dark:outline-cyan-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-500 dark:focus-visible:outline-cyan-400 sm:text-sm/6 min-w-48"
+                      >
+                        ${filter.options.map(opt => `
+                          <option value="${opt.value}" ${opt.selected ? 'selected' : ''}>${opt.label}</option>
+                        `).join('')}
+                      </select>
+                      <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-cyan-600 dark:text-cyan-400 sm:size-4">
+                        <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
+                      </svg>
+                    </div>
                   </div>
-                `).join('')}
+                `}).join('')}
               </div>
               <div class="flex items-center gap-x-3">
                 <span class="text-sm/6 font-medium text-zinc-700 dark:text-zinc-300 px-3 py-1.5 rounded-full bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm">${data.totalItems} ${data.totalItems === 1 ? 'item' : 'items'}</span>

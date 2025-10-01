@@ -219,6 +219,7 @@ export function renderAdminLayoutCatalyst(
   <!-- Scripts -->
   <script src="https://unpkg.com/htmx.org@2.0.3"></script>
   <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
   ${
     data.styles
@@ -495,7 +496,7 @@ function renderCatalystSidebar(
                 ${
                   isActive
                     ? `
-                  <span class="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-zinc-950 dark:bg-white"></span>
+                  <span class="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-cyan-500 dark:bg-cyan-400"></span>
                 `
                     : ""
                 }

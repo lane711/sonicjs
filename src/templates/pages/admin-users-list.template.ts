@@ -25,6 +25,7 @@ export interface UsersListPageData {
   currentPage: number
   totalPages: number
   totalUsers: number
+  statusFilter?: string
   error?: string
   success?: string
   user?: {
@@ -140,24 +141,16 @@ export function renderUsersListPage(data: UsersListPageData): string {
       sortable: false,
       render: (value: any, row: User) => `
         <div class="flex justify-end space-x-2">
-          <button onclick="alert('User details: ${row.email}')" class="inline-flex items-center gap-x-1.5 px-3 py-1.5 text-sm font-medium rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 dark:from-cyan-400 dark:to-blue-400 text-white hover:from-cyan-600 hover:to-blue-600 dark:hover:from-cyan-500 dark:hover:to-blue-500 shadow-sm transition-all duration-200">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            Info
-          </button>
           ${row.isActive ?
-            `<button onclick="toggleUserStatus('${row.id}', false)" class="inline-flex items-center gap-x-1.5 px-3 py-1.5 text-sm font-medium rounded-lg bg-gradient-to-r from-red-500 to-pink-500 dark:from-red-400 dark:to-pink-400 text-white hover:from-red-600 hover:to-pink-600 dark:hover:from-red-500 dark:hover:to-pink-500 shadow-sm transition-all duration-200">
+            `<button onclick="toggleUserStatus('${row.id}', false)" title="Deactivate user" class="inline-flex items-center justify-center p-2 text-sm font-medium rounded-lg bg-gradient-to-r from-red-500 to-pink-500 dark:from-red-400 dark:to-pink-400 text-white hover:from-red-600 hover:to-pink-600 dark:hover:from-red-500 dark:hover:to-pink-500 shadow-sm transition-all duration-200">
               <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
               </svg>
-              Deactivate
             </button>` :
-            `<button onclick="toggleUserStatus('${row.id}', true)" class="inline-flex items-center gap-x-1.5 px-3 py-1.5 text-sm font-medium rounded-lg bg-gradient-to-r from-lime-500 to-green-500 dark:from-lime-400 dark:to-green-400 text-white hover:from-lime-600 hover:to-green-600 dark:hover:from-lime-500 dark:hover:to-green-500 shadow-sm transition-all duration-200">
+            `<button onclick="toggleUserStatus('${row.id}', true)" title="Activate user" class="inline-flex items-center justify-center p-2 text-sm font-medium rounded-lg bg-gradient-to-r from-lime-500 to-green-500 dark:from-lime-400 dark:to-green-400 text-white hover:from-lime-600 hover:to-green-600 dark:hover:from-lime-500 dark:hover:to-green-500 shadow-sm transition-all duration-200">
               <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
-              Activate
             </button>`
           }
         </div>
@@ -170,7 +163,8 @@ export function renderUsersListPage(data: UsersListPageData): string {
     columns,
     rows: data.users,
     selectable: false,
-    rowClickable: false,
+    rowClickable: true,
+    rowClickUrl: (row: User) => `/admin/users/${row.id}/edit`,
     emptyMessage: 'No users found'
   }
 
@@ -201,6 +195,73 @@ export function renderUsersListPage(data: UsersListPageData): string {
       <!-- Alert Messages -->
       ${data.error ? renderAlert({ type: 'error', message: data.error, dismissible: true }) : ''}
       ${data.success ? renderAlert({ type: 'success', message: data.success, dismissible: true }) : ''}
+
+      <!-- Stats -->
+      <div class="mb-6">
+        <h3 class="text-base font-semibold text-zinc-950 dark:text-white">User Statistics</h3>
+        <dl class="mt-5 grid grid-cols-1 divide-zinc-950/5 dark:divide-white/10 overflow-hidden rounded-lg bg-zinc-800/75 dark:bg-zinc-800/75 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 md:grid-cols-4 md:divide-x md:divide-y-0">
+          <div class="px-4 py-5 sm:p-6">
+            <dt class="text-base font-normal text-zinc-700 dark:text-zinc-100">Total Users</dt>
+            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
+              <div class="flex items-baseline text-2xl font-semibold text-cyan-400">
+                ${data.totalUsers}
+              </div>
+              <div class="inline-flex items-baseline rounded-full bg-lime-400/10 text-lime-600 dark:text-lime-400 px-2.5 py-0.5 text-sm font-medium md:mt-2 lg:mt-0">
+                <svg viewBox="0 0 20 20" fill="currentColor" class="-ml-1 mr-0.5 size-5 shrink-0 self-center">
+                  <path d="M10 17a.75.75 0 0 1-.75-.75V5.612L5.29 9.77a.75.75 0 0 1-1.08-1.04l5.25-5.5a.75.75 0 0 1 1.08 0l5.25 5.5a.75.75 0 1 1-1.08 1.04l-3.96-4.158V16.25A.75.75 0 0 1 10 17Z" clip-rule="evenodd" fill-rule="evenodd" />
+                </svg>
+                <span class="sr-only">Increased by</span>
+                5.2%
+              </div>
+            </dd>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <dt class="text-base font-normal text-zinc-700 dark:text-zinc-100">Active Users</dt>
+            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
+              <div class="flex items-baseline text-2xl font-semibold text-lime-400">
+                ${data.users.filter(u => u.isActive).length}
+              </div>
+              <div class="inline-flex items-baseline rounded-full bg-lime-400/10 text-lime-600 dark:text-lime-400 px-2.5 py-0.5 text-sm font-medium md:mt-2 lg:mt-0">
+                <svg viewBox="0 0 20 20" fill="currentColor" class="-ml-1 mr-0.5 size-5 shrink-0 self-center">
+                  <path d="M10 17a.75.75 0 0 1-.75-.75V5.612L5.29 9.77a.75.75 0 0 1-1.08-1.04l5.25-5.5a.75.75 0 0 1 1.08 0l5.25 5.5a.75.75 0 1 1-1.08 1.04l-3.96-4.158V16.25A.75.75 0 0 1 10 17Z" clip-rule="evenodd" fill-rule="evenodd" />
+                </svg>
+                <span class="sr-only">Increased by</span>
+                3.1%
+              </div>
+            </dd>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <dt class="text-base font-normal text-zinc-700 dark:text-zinc-100">Administrators</dt>
+            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
+              <div class="flex items-baseline text-2xl font-semibold text-pink-400">
+                ${data.users.filter(u => u.role === 'admin').length}
+              </div>
+              <div class="inline-flex items-baseline rounded-full bg-lime-400/10 text-lime-600 dark:text-lime-400 px-2.5 py-0.5 text-sm font-medium md:mt-2 lg:mt-0">
+                <svg viewBox="0 0 20 20" fill="currentColor" class="-ml-1 mr-0.5 size-5 shrink-0 self-center">
+                  <path d="M10 17a.75.75 0 0 1-.75-.75V5.612L5.29 9.77a.75.75 0 0 1-1.08-1.04l5.25-5.5a.75.75 0 0 1 1.08 0l5.25 5.5a.75.75 0 1 1-1.08 1.04l-3.96-4.158V16.25A.75.75 0 0 1 10 17Z" clip-rule="evenodd" fill-rule="evenodd" />
+                </svg>
+                <span class="sr-only">Increased by</span>
+                1.8%
+              </div>
+            </dd>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <dt class="text-base font-normal text-zinc-700 dark:text-zinc-100">Active This Week</dt>
+            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
+              <div class="flex items-baseline text-2xl font-semibold text-purple-400">
+                ${data.users.filter(u => u.lastLoginAt && u.lastLoginAt > Date.now() - 7 * 24 * 60 * 60 * 1000).length}
+              </div>
+              <div class="inline-flex items-baseline rounded-full bg-pink-400/10 text-pink-600 dark:text-pink-400 px-2.5 py-0.5 text-sm font-medium md:mt-2 lg:mt-0">
+                <svg viewBox="0 0 20 20" fill="currentColor" class="-ml-1 mr-0.5 size-5 shrink-0 self-center">
+                  <path d="M10 3a.75.75 0 0 1 .75.75v10.638l3.96-4.158a.75.75 0 1 1 1.08 1.04l-5.25 5.5a.75.75 0 0 1-1.08 0l-5.25-5.5a.75.75 0 1 1 1.08-1.04l3.96 4.158V3.75A.75.75 0 0 1 10 3Z" clip-rule="evenodd" fill-rule="evenodd" />
+                </svg>
+                <span class="sr-only">Decreased by</span>
+                2.3%
+              </div>
+            </dd>
+          </div>
+        </dl>
+      </div>
 
       <!-- Filters with Gradient Background -->
       <div class="relative rounded-xl overflow-hidden mb-6">
@@ -263,8 +324,8 @@ export function renderUsersListPage(data: UsersListPageData): string {
                   hx-include="[name='search'], [name='role']"
                 >
                   <option value="">All Users</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
+                  <option value="active" ${data.statusFilter === 'active' || !data.statusFilter ? 'selected' : ''}>Active</option>
+                  <option value="inactive" ${data.statusFilter === 'inactive' ? 'selected' : ''}>Inactive</option>
                 </select>
               </div>
 
@@ -289,28 +350,6 @@ export function renderUsersListPage(data: UsersListPageData): string {
 
       <!-- Pagination -->
       ${data.pagination ? renderPagination(data.pagination) : ''}
-
-      <!-- Stats -->
-      <div class="mt-6 rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
-          <div>
-            <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">${data.totalUsers}</div>
-            <div class="text-sm text-zinc-500 dark:text-zinc-400">Total Users</div>
-          </div>
-          <div>
-            <div class="text-2xl font-bold text-lime-600 dark:text-lime-400">${data.users.filter(u => u.isActive).length}</div>
-            <div class="text-sm text-zinc-500 dark:text-zinc-400">Active Users</div>
-          </div>
-          <div>
-            <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">${data.users.filter(u => u.role === 'admin').length}</div>
-            <div class="text-sm text-zinc-500 dark:text-zinc-400">Administrators</div>
-          </div>
-          <div>
-            <div class="text-2xl font-bold text-cyan-600 dark:text-cyan-400">${data.users.filter(u => u.lastLoginAt && u.lastLoginAt > Date.now() - 7 * 24 * 60 * 60 * 1000).length}</div>
-            <div class="text-sm text-zinc-500 dark:text-zinc-400">Active This Week</div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <script>

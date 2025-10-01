@@ -2,6 +2,7 @@ export interface FilterOption {
   value: string
   label: string
   selected?: boolean
+  color?: string
 }
 
 export interface Filter {
