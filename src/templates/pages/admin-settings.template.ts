@@ -641,17 +641,27 @@ function renderGeneralSettings(settings?: GeneralSettings): string {
             </select>
           </div>
           
-          <div class="flex items-center space-x-3">
-            <input 
-              type="checkbox" 
-              id="maintenanceMode"
-              name="maintenanceMode"
-              ${settings?.maintenanceMode ? 'checked' : ''}
-              class="w-4 h-4 text-blue-600 bg-white/10 border-white/20 rounded focus:ring-blue-500"
-            />
-            <label for="maintenanceMode" class="text-sm text-gray-300">
-              Enable maintenance mode
-            </label>
+          <div class="flex gap-3">
+            <div class="flex h-6 shrink-0 items-center">
+              <div class="group grid size-4 grid-cols-1">
+                <input
+                  type="checkbox"
+                  id="maintenanceMode"
+                  name="maintenanceMode"
+                  ${settings?.maintenanceMode ? 'checked' : ''}
+                  class="col-start-1 row-start-1 appearance-none rounded border border-zinc-950/10 dark:border-white/10 bg-white dark:bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 indeterminate:border-indigo-500 indeterminate:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-zinc-950/5 dark:disabled:border-white/5 disabled:bg-zinc-950/10 dark:disabled:bg-white/10 disabled:checked:bg-zinc-950/10 dark:disabled:checked:bg-white/10 forced-colors:appearance-auto"
+                />
+                <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-zinc-950/25 dark:group-has-[:disabled]:stroke-white/25">
+                  <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                  <path d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:indeterminate]:opacity-100" />
+                </svg>
+              </div>
+            </div>
+            <div class="text-sm/6">
+              <label for="maintenanceMode" class="font-medium text-zinc-950 dark:text-white">
+                Enable maintenance mode
+              </label>
+            </div>
           </div>
         </div>
       </div>
@@ -771,18 +781,28 @@ function renderSecuritySettings(settings?: SecuritySettings): string {
       </div>
       
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="space-y-4">
-          <div class="flex items-center space-x-3">
-            <input 
-              type="checkbox" 
-              id="twoFactorEnabled"
-              name="twoFactorEnabled"
-              ${settings?.twoFactorEnabled ? 'checked' : ''}
-              class="w-4 h-4 text-blue-600 bg-white/10 border-white/20 rounded focus:ring-blue-500"
-            />
-            <label for="twoFactorEnabled" class="text-sm text-gray-300">
-              Enable Two-Factor Authentication
-            </label>
+        <div class="space-y-5">
+          <div class="flex gap-3">
+            <div class="flex h-6 shrink-0 items-center">
+              <div class="group grid size-4 grid-cols-1">
+                <input
+                  type="checkbox"
+                  id="twoFactorEnabled"
+                  name="twoFactorEnabled"
+                  ${settings?.twoFactorEnabled ? 'checked' : ''}
+                  class="col-start-1 row-start-1 appearance-none rounded border border-zinc-950/10 dark:border-white/10 bg-white dark:bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 indeterminate:border-indigo-500 indeterminate:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-zinc-950/5 dark:disabled:border-white/5 disabled:bg-zinc-950/10 dark:disabled:bg-white/10 disabled:checked:bg-zinc-950/10 dark:disabled:checked:bg-white/10 forced-colors:appearance-auto"
+                />
+                <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-zinc-950/25 dark:group-has-[:disabled]:stroke-white/25">
+                  <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                  <path d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:indeterminate]:opacity-100" />
+                </svg>
+              </div>
+            </div>
+            <div class="text-sm/6">
+              <label for="twoFactorEnabled" class="font-medium text-zinc-950 dark:text-white">
+                Enable Two-Factor Authentication
+              </label>
+            </div>
           </div>
           
           <div>
@@ -799,36 +819,66 @@ function renderSecuritySettings(settings?: SecuritySettings): string {
           
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">Password Requirements</label>
-            <div class="space-y-2">
-              <div class="flex items-center space-x-3">
-                <input 
-                  type="checkbox" 
-                  id="requireUppercase"
-                  name="requireUppercase"
-                  ${settings?.passwordRequirements?.requireUppercase ? 'checked' : ''}
-                  class="w-4 h-4 text-blue-600 bg-white/10 border-white/20 rounded focus:ring-blue-500"
-                />
-                <label for="requireUppercase" class="text-sm text-gray-300">Require uppercase letters</label>
+            <div class="space-y-3">
+              <div class="flex gap-3">
+                <div class="flex h-6 shrink-0 items-center">
+                  <div class="group grid size-4 grid-cols-1">
+                    <input
+                      type="checkbox"
+                      id="requireUppercase"
+                      name="requireUppercase"
+                      ${settings?.passwordRequirements?.requireUppercase ? 'checked' : ''}
+                      class="col-start-1 row-start-1 appearance-none rounded border border-zinc-950/10 dark:border-white/10 bg-white dark:bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 indeterminate:border-indigo-500 indeterminate:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-zinc-950/5 dark:disabled:border-white/5 disabled:bg-zinc-950/10 dark:disabled:bg-white/10 disabled:checked:bg-zinc-950/10 dark:disabled:checked:bg-white/10 forced-colors:appearance-auto"
+                    />
+                    <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-zinc-950/25 dark:group-has-[:disabled]:stroke-white/25">
+                      <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                      <path d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:indeterminate]:opacity-100" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="text-sm/6">
+                  <label for="requireUppercase" class="font-medium text-zinc-950 dark:text-white">Require uppercase letters</label>
+                </div>
               </div>
-              <div class="flex items-center space-x-3">
-                <input 
-                  type="checkbox" 
-                  id="requireNumbers"
-                  name="requireNumbers"
-                  ${settings?.passwordRequirements?.requireNumbers ? 'checked' : ''}
-                  class="w-4 h-4 text-blue-600 bg-white/10 border-white/20 rounded focus:ring-blue-500"
-                />
-                <label for="requireNumbers" class="text-sm text-gray-300">Require numbers</label>
+              <div class="flex gap-3">
+                <div class="flex h-6 shrink-0 items-center">
+                  <div class="group grid size-4 grid-cols-1">
+                    <input
+                      type="checkbox"
+                      id="requireNumbers"
+                      name="requireNumbers"
+                      ${settings?.passwordRequirements?.requireNumbers ? 'checked' : ''}
+                      class="col-start-1 row-start-1 appearance-none rounded border border-zinc-950/10 dark:border-white/10 bg-white dark:bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 indeterminate:border-indigo-500 indeterminate:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-zinc-950/5 dark:disabled:border-white/5 disabled:bg-zinc-950/10 dark:disabled:bg-white/10 disabled:checked:bg-zinc-950/10 dark:disabled:checked:bg-white/10 forced-colors:appearance-auto"
+                    />
+                    <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-zinc-950/25 dark:group-has-[:disabled]:stroke-white/25">
+                      <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                      <path d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:indeterminate]:opacity-100" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="text-sm/6">
+                  <label for="requireNumbers" class="font-medium text-zinc-950 dark:text-white">Require numbers</label>
+                </div>
               </div>
-              <div class="flex items-center space-x-3">
-                <input 
-                  type="checkbox" 
-                  id="requireSymbols"
-                  name="requireSymbols"
-                  ${settings?.passwordRequirements?.requireSymbols ? 'checked' : ''}
-                  class="w-4 h-4 text-blue-600 bg-white/10 border-white/20 rounded focus:ring-blue-500"
-                />
-                <label for="requireSymbols" class="text-sm text-gray-300">Require symbols</label>
+              <div class="flex gap-3">
+                <div class="flex h-6 shrink-0 items-center">
+                  <div class="group grid size-4 grid-cols-1">
+                    <input
+                      type="checkbox"
+                      id="requireSymbols"
+                      name="requireSymbols"
+                      ${settings?.passwordRequirements?.requireSymbols ? 'checked' : ''}
+                      class="col-start-1 row-start-1 appearance-none rounded border border-zinc-950/10 dark:border-white/10 bg-white dark:bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 indeterminate:border-indigo-500 indeterminate:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-zinc-950/5 dark:disabled:border-white/5 disabled:bg-zinc-950/10 dark:disabled:bg-white/10 disabled:checked:bg-zinc-950/10 dark:disabled:checked:bg-white/10 forced-colors:appearance-auto"
+                    />
+                    <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-zinc-950/25 dark:group-has-[:disabled]:stroke-white/25">
+                      <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                      <path d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:indeterminate]:opacity-100" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="text-sm/6">
+                  <label for="requireSymbols" class="font-medium text-zinc-950 dark:text-white">Require symbols</label>
+                </div>
               </div>
             </div>
           </div>
@@ -875,49 +925,89 @@ function renderNotificationSettings(settings?: NotificationSettings): string {
         <div class="space-y-4">
           <div>
             <h4 class="text-md font-medium text-white mb-3">Email Notifications</h4>
-            <div class="space-y-3">
-              <div class="flex items-center space-x-3">
-                <input 
-                  type="checkbox" 
-                  id="emailNotifications"
-                  name="emailNotifications"
-                  ${settings?.emailNotifications ? 'checked' : ''}
-                  class="w-4 h-4 text-blue-600 bg-white/10 border-white/20 rounded focus:ring-blue-500"
-                />
-                <label for="emailNotifications" class="text-sm text-gray-300">Enable email notifications</label>
+            <div class="space-y-5">
+              <div class="flex gap-3">
+                <div class="flex h-6 shrink-0 items-center">
+                  <div class="group grid size-4 grid-cols-1">
+                    <input
+                      type="checkbox"
+                      id="emailNotifications"
+                      name="emailNotifications"
+                      ${settings?.emailNotifications ? 'checked' : ''}
+                      class="col-start-1 row-start-1 appearance-none rounded border border-zinc-950/10 dark:border-white/10 bg-white dark:bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 indeterminate:border-indigo-500 indeterminate:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-zinc-950/5 dark:disabled:border-white/5 disabled:bg-zinc-950/10 dark:disabled:bg-white/10 disabled:checked:bg-zinc-950/10 dark:disabled:checked:bg-white/10 forced-colors:appearance-auto"
+                    />
+                    <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-zinc-950/25 dark:group-has-[:disabled]:stroke-white/25">
+                      <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                      <path d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:indeterminate]:opacity-100" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="text-sm/6">
+                  <label for="emailNotifications" class="font-medium text-zinc-950 dark:text-white">Enable email notifications</label>
+                </div>
               </div>
-              
-              <div class="flex items-center space-x-3">
-                <input 
-                  type="checkbox" 
-                  id="contentUpdates"
-                  name="contentUpdates"
-                  ${settings?.contentUpdates ? 'checked' : ''}
-                  class="w-4 h-4 text-blue-600 bg-white/10 border-white/20 rounded focus:ring-blue-500"
-                />
-                <label for="contentUpdates" class="text-sm text-gray-300">Content updates</label>
+
+              <div class="flex gap-3">
+                <div class="flex h-6 shrink-0 items-center">
+                  <div class="group grid size-4 grid-cols-1">
+                    <input
+                      type="checkbox"
+                      id="contentUpdates"
+                      name="contentUpdates"
+                      ${settings?.contentUpdates ? 'checked' : ''}
+                      class="col-start-1 row-start-1 appearance-none rounded border border-zinc-950/10 dark:border-white/10 bg-white dark:bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 indeterminate:border-indigo-500 indeterminate:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-zinc-950/5 dark:disabled:border-white/5 disabled:bg-zinc-950/10 dark:disabled:bg-white/10 disabled:checked:bg-zinc-950/10 dark:disabled:checked:bg-white/10 forced-colors:appearance-auto"
+                    />
+                    <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-zinc-950/25 dark:group-has-[:disabled]:stroke-white/25">
+                      <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                      <path d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:indeterminate]:opacity-100" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="text-sm/6">
+                  <label for="contentUpdates" class="font-medium text-zinc-950 dark:text-white">Content updates</label>
+                </div>
               </div>
-              
-              <div class="flex items-center space-x-3">
-                <input 
-                  type="checkbox" 
-                  id="systemAlerts"
-                  name="systemAlerts"
-                  ${settings?.systemAlerts ? 'checked' : ''}
-                  class="w-4 h-4 text-blue-600 bg-white/10 border-white/20 rounded focus:ring-blue-500"
-                />
-                <label for="systemAlerts" class="text-sm text-gray-300">System alerts</label>
+
+              <div class="flex gap-3">
+                <div class="flex h-6 shrink-0 items-center">
+                  <div class="group grid size-4 grid-cols-1">
+                    <input
+                      type="checkbox"
+                      id="systemAlerts"
+                      name="systemAlerts"
+                      ${settings?.systemAlerts ? 'checked' : ''}
+                      class="col-start-1 row-start-1 appearance-none rounded border border-zinc-950/10 dark:border-white/10 bg-white dark:bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 indeterminate:border-indigo-500 indeterminate:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-zinc-950/5 dark:disabled:border-white/5 disabled:bg-zinc-950/10 dark:disabled:bg-white/10 disabled:checked:bg-zinc-950/10 dark:disabled:checked:bg-white/10 forced-colors:appearance-auto"
+                    />
+                    <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-zinc-950/25 dark:group-has-[:disabled]:stroke-white/25">
+                      <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                      <path d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:indeterminate]:opacity-100" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="text-sm/6">
+                  <label for="systemAlerts" class="font-medium text-zinc-950 dark:text-white">System alerts</label>
+                </div>
               </div>
-              
-              <div class="flex items-center space-x-3">
-                <input 
-                  type="checkbox" 
-                  id="userRegistrations"
-                  name="userRegistrations"
-                  ${settings?.userRegistrations ? 'checked' : ''}
-                  class="w-4 h-4 text-blue-600 bg-white/10 border-white/20 rounded focus:ring-blue-500"
-                />
-                <label for="userRegistrations" class="text-sm text-gray-300">New user registrations</label>
+
+              <div class="flex gap-3">
+                <div class="flex h-6 shrink-0 items-center">
+                  <div class="group grid size-4 grid-cols-1">
+                    <input
+                      type="checkbox"
+                      id="userRegistrations"
+                      name="userRegistrations"
+                      ${settings?.userRegistrations ? 'checked' : ''}
+                      class="col-start-1 row-start-1 appearance-none rounded border border-zinc-950/10 dark:border-white/10 bg-white dark:bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 indeterminate:border-indigo-500 indeterminate:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-zinc-950/5 dark:disabled:border-white/5 disabled:bg-zinc-950/10 dark:disabled:bg-white/10 disabled:checked:bg-zinc-950/10 dark:disabled:checked:bg-white/10 forced-colors:appearance-auto"
+                    />
+                    <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-zinc-950/25 dark:group-has-[:disabled]:stroke-white/25">
+                      <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                      <path d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:indeterminate]:opacity-100" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="text-sm/6">
+                  <label for="userRegistrations" class="font-medium text-zinc-950 dark:text-white">New user registrations</label>
+                </div>
               </div>
             </div>
           </div>

@@ -267,20 +267,23 @@ export function renderUserEditPage(data: UserEditPageData): string {
             <h3 class="text-base font-semibold text-red-900 dark:text-red-300 mb-2">Danger Zone</h3>
             <p class="text-sm text-red-700 dark:text-red-400 mb-4">Irreversible and destructive actions</p>
 
-            <div class="flex items-start gap-3 mb-4">
-              <div class="group grid size-4 grid-cols-1 mt-0.5">
-                <input
-                  type="checkbox"
-                  id="hard-delete-checkbox"
-                  class="col-start-1 row-start-1 appearance-none rounded border border-red-300 dark:border-red-700 bg-white dark:bg-red-950/50 checked:border-red-600 checked:bg-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
-                />
-                <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white">
-                  <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
-                </svg>
+            <div class="flex gap-3 mb-4">
+              <div class="flex h-6 shrink-0 items-center">
+                <div class="group grid size-4 grid-cols-1">
+                  <input
+                    type="checkbox"
+                    id="hard-delete-checkbox"
+                    class="col-start-1 row-start-1 appearance-none rounded border border-red-300 dark:border-red-700 bg-white dark:bg-red-950/50 checked:border-red-600 checked:bg-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 disabled:border-red-200 dark:disabled:border-red-900 disabled:bg-red-50 dark:disabled:bg-red-950/30 disabled:checked:bg-red-300 dark:disabled:checked:bg-red-900 forced-colors:appearance-auto"
+                  />
+                  <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-red-950/25 dark:group-has-[:disabled]:stroke-white/25">
+                    <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                    <path d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:indeterminate]:opacity-100" />
+                  </svg>
+                </div>
               </div>
-              <div>
-                <label for="hard-delete-checkbox" class="text-sm font-medium text-red-900 dark:text-red-300 cursor-pointer">Hard Delete (Permanent)</label>
-                <p class="text-xs text-red-700 dark:text-red-400 mt-0.5">Permanently remove from database. Unchecked performs soft delete (deactivate only).</p>
+              <div class="text-sm/6">
+                <label for="hard-delete-checkbox" class="font-medium text-red-900 dark:text-red-300 cursor-pointer">Hard Delete (Permanent)</label>
+                <p class="text-red-700 dark:text-red-400">Permanently remove from database. Unchecked performs soft delete (deactivate only).</p>
               </div>
             </div>
 

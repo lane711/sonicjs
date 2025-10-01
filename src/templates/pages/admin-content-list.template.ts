@@ -34,6 +34,14 @@ export interface ContentListPageData {
 }
 
 export function renderContentListPage(data: ContentListPageData): string {
+  // Build current URL parameters to pass to edit page
+  const urlParams = new URLSearchParams()
+  if (data.modelName && data.modelName !== 'all') urlParams.set('model', data.modelName)
+  if (data.status && data.status !== 'all') urlParams.set('status', data.status)
+  if (data.search) urlParams.set('search', data.search)
+  if (data.page && data.page !== 1) urlParams.set('page', data.page.toString())
+  const currentParams = urlParams.toString()
+
   // Prepare filter bar data
   const filterBarData: FilterBarData = {
     filters: [
@@ -127,7 +135,7 @@ export function renderContentListPage(data: ContentListPageData): string {
         <div class="flex space-x-2">
           <button
             class="inline-flex items-center justify-center p-1.5 rounded-lg bg-cyan-50 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 ring-1 ring-inset ring-cyan-600/20 dark:ring-cyan-500/20 hover:bg-cyan-100 dark:hover:bg-cyan-500/20 transition-colors"
-            onclick="window.location.href='/admin/content/${row.id}/edit'"
+            onclick="window.location.href='/admin/content/${row.id}/edit${currentParams ? `?ref=${encodeURIComponent(currentParams)}` : ''}'"
             title="Edit"
           >
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -157,7 +165,7 @@ export function renderContentListPage(data: ContentListPageData): string {
     rows: data.contentItems,
     selectable: true,
     rowClickable: true,
-    rowClickUrl: (row: ContentItem) => `/admin/content/${row.id}/edit`,
+    rowClickUrl: (row: ContentItem) => `/admin/content/${row.id}/edit${currentParams ? `?ref=${encodeURIComponent(currentParams)}` : ''}`,
     emptyMessage: 'No content found. Create your first content item to get started.'
   }
 

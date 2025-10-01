@@ -197,17 +197,28 @@ export function renderProfilePage(data: ProfilePageData): string {
               <div class="pt-6 border-t border-white/10">
                 <h3 class="text-lg font-semibold text-white mb-4">Notifications</h3>
                 
-                <div class="space-y-3">
-                  <label class="flex items-center">
-                    <input 
-                      type="checkbox" 
-                      name="email_notifications" 
-                      value="1"
-                      ${data.profile.email_notifications ? 'checked' : ''}
-                      class="w-4 h-4 rounded border-white/20 bg-white/10 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800"
-                    >
-                    <span class="ml-3 text-sm text-gray-300">Email notifications</span>
-                  </label>
+                <div class="space-y-5">
+                  <div class="flex gap-3">
+                    <div class="flex h-6 shrink-0 items-center">
+                      <div class="group grid size-4 grid-cols-1">
+                        <input
+                          type="checkbox"
+                          id="email_notifications"
+                          name="email_notifications"
+                          value="1"
+                          ${data.profile.email_notifications ? 'checked' : ''}
+                          class="col-start-1 row-start-1 appearance-none rounded border border-zinc-950/10 dark:border-white/10 bg-white dark:bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 indeterminate:border-indigo-500 indeterminate:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-zinc-950/5 dark:disabled:border-white/5 disabled:bg-zinc-950/10 dark:disabled:bg-white/10 disabled:checked:bg-zinc-950/10 dark:disabled:checked:bg-white/10 forced-colors:appearance-auto"
+                        />
+                        <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-zinc-950/25 dark:group-has-[:disabled]:stroke-white/25">
+                          <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                          <path d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:indeterminate]:opacity-100" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="text-sm/6">
+                      <label for="email_notifications" class="font-medium text-zinc-950 dark:text-white">Email notifications</label>
+                    </div>
+                  </div>
                 </div>
               </div>
 

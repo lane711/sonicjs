@@ -28,6 +28,7 @@ export interface ContentFormData {
   success?: string
   validationErrors?: Record<string, string[]>
   workflowEnabled?: boolean // New flag to indicate if workflow plugin is active
+  referrerParams?: string // URL parameters to preserve filters when returning to list
   user?: {
     name: string
     email: string
@@ -38,7 +39,12 @@ export interface ContentFormData {
 export function renderContentFormPage(data: ContentFormData): string {
   const isEdit = data.isEdit || !!data.id
   const title = isEdit ? `Edit: ${data.title || 'Content'}` : `New ${data.collection.display_name}`
-  
+
+  // Construct back URL with preserved filters
+  const backUrl = data.referrerParams
+    ? `/admin/content?${data.referrerParams}`
+    : `/admin/content?collection=${data.collection.id}`
+
   // Group fields by category
   const coreFields = data.fields.filter(f => ['title', 'slug', 'content'].includes(f.field_name))
   const contentFields = data.fields.filter(f => !['title', 'slug', 'content'].includes(f.field_name) && !f.field_name.startsWith('meta_'))
@@ -84,7 +90,7 @@ export function renderContentFormPage(data: ContentFormData): string {
           </p>
         </div>
         <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <a href="/admin/content?collection=${data.collection.id}" class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm">
+          <a href="${backUrl}" class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm">
             <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
             </svg>
@@ -120,7 +126,7 @@ export function renderContentFormPage(data: ContentFormData): string {
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Main Content Form -->
         <div class="lg:col-span-2">
-          <form 
+          <form
             id="content-form"
             ${isEdit ? `hx-put="/admin/content/${data.id}"` : `hx-post="/admin/content"`}
             hx-target="#form-messages"
@@ -129,6 +135,7 @@ export function renderContentFormPage(data: ContentFormData): string {
           >
             <input type="hidden" name="collection_id" value="${data.collection.id}">
             ${isEdit ? `<input type="hidden" name="id" value="${data.id}">` : ''}
+            ${data.referrerParams ? `<input type="hidden" name="referrer_params" value="${data.referrerParams}">` : ''}
             
             <!-- Core Fields -->
             ${renderFieldGroup('Basic Information', coreFieldsHTML)}
@@ -306,7 +313,7 @@ export function renderContentFormPage(data: ContentFormData): string {
 
         <!-- Action Buttons -->
         <div class="mt-6 pt-6 border-t border-zinc-950/5 dark:border-white/10 flex items-center justify-between">
-          <a href="/admin/content?collection=${data.collection.id}" class="inline-flex items-center justify-center gap-x-1.5 rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm">
+          <a href="${backUrl}" class="inline-flex items-center justify-center gap-x-1.5 rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
             </svg>

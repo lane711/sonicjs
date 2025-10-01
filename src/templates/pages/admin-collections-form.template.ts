@@ -445,15 +445,48 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
             >
           </div>
 
-          <div class="flex items-center space-x-4">
-            <label class="flex items-center">
-              <input type="checkbox" id="field-required" name="is_required" value="1" class="mr-2 rounded border-zinc-300 dark:border-zinc-700">
-              <span class="text-sm text-zinc-950 dark:text-white">Required</span>
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" id="field-searchable" name="is_searchable" value="1" class="mr-2 rounded border-zinc-300 dark:border-zinc-700">
-              <span class="text-sm text-zinc-950 dark:text-white">Searchable</span>
-            </label>
+          <div class="flex items-center space-x-6">
+            <div class="flex gap-3">
+              <div class="flex h-6 shrink-0 items-center">
+                <div class="group grid size-4 grid-cols-1">
+                  <input
+                    type="checkbox"
+                    id="field-required"
+                    name="is_required"
+                    value="1"
+                    class="col-start-1 row-start-1 appearance-none rounded border border-zinc-950/10 dark:border-white/10 bg-white dark:bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 indeterminate:border-indigo-500 indeterminate:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-zinc-950/5 dark:disabled:border-white/5 disabled:bg-zinc-950/10 dark:disabled:bg-white/10 disabled:checked:bg-zinc-950/10 dark:disabled:checked:bg-white/10 forced-colors:appearance-auto"
+                  />
+                  <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-zinc-950/25 dark:group-has-[:disabled]:stroke-white/25">
+                    <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                    <path d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:indeterminate]:opacity-100" />
+                  </svg>
+                </div>
+              </div>
+              <div class="text-sm/6">
+                <label for="field-required" class="font-medium text-zinc-950 dark:text-white">Required</label>
+              </div>
+            </div>
+
+            <div class="flex gap-3">
+              <div class="flex h-6 shrink-0 items-center">
+                <div class="group grid size-4 grid-cols-1">
+                  <input
+                    type="checkbox"
+                    id="field-searchable"
+                    name="is_searchable"
+                    value="1"
+                    class="col-start-1 row-start-1 appearance-none rounded border border-zinc-950/10 dark:border-white/10 bg-white dark:bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 indeterminate:border-indigo-500 indeterminate:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-zinc-950/5 dark:disabled:border-white/5 disabled:bg-zinc-950/10 dark:disabled:bg-white/10 disabled:checked:bg-zinc-950/10 dark:disabled:checked:bg-white/10 forced-colors:appearance-auto"
+                  />
+                  <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-zinc-950/25 dark:group-has-[:disabled]:stroke-white/25">
+                    <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                    <path d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:indeterminate]:opacity-100" />
+                  </svg>
+                </div>
+              </div>
+              <div class="text-sm/6">
+                <label for="field-searchable" class="font-medium text-zinc-950 dark:text-white">Searchable</label>
+              </div>
+            </div>
           </div>
 
           <div id="field-options-container" class="hidden">

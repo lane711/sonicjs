@@ -330,10 +330,14 @@ adminContentRoutes.get('/:id/edit', async (c) => {
     const id = c.req.param('id')
     const user = c.get('user')
     const db = c.env.DB
-    
+    const url = new URL(c.req.url)
+
+    // Capture referrer parameters to preserve filters when returning to list
+    const referrerParams = url.searchParams.get('ref') || ''
+
     // Get content
     const contentStmt = db.prepare(`
-      SELECT c.*, col.id as collection_id, col.name as collection_name, 
+      SELECT c.*, col.id as collection_id, col.name as collection_name,
              col.display_name as collection_display_name, col.description as collection_description,
              col.schema as collection_schema
       FROM content c
@@ -341,7 +345,7 @@ adminContentRoutes.get('/:id/edit', async (c) => {
       WHERE c.id = ?
     `)
     const content = await contentStmt.bind(id).first() as any
-    
+
     if (!content) {
       const formData: ContentFormData = {
         collection: { id: '', name: '', display_name: 'Unknown', schema: {} },
@@ -385,6 +389,7 @@ adminContentRoutes.get('/:id/edit', async (c) => {
       fields,
       isEdit: true,
       workflowEnabled,
+      referrerParams,
       user: user ? {
         name: user.email,
         email: user.email,
@@ -573,10 +578,13 @@ adminContentRoutes.post('/', async (c) => {
     ).run()
     
     // Handle different actions
-    const redirectUrl = action === 'save_and_continue' 
-      ? `/admin/content/${contentId}/edit?success=Content saved successfully!`
-      : `/admin/content?collection=${collectionId}&success=Content created successfully!`
-    
+    const referrerParams = formData.get('referrer_params') as string
+    const redirectUrl = action === 'save_and_continue'
+      ? `/admin/content/${contentId}/edit?success=Content saved successfully!${referrerParams ? `&ref=${encodeURIComponent(referrerParams)}` : ''}`
+      : referrerParams
+        ? `/admin/content?${referrerParams}&success=Content created successfully!`
+        : `/admin/content?collection=${collectionId}&success=Content created successfully!`
+
     // Check if this is an HTMX request
     const isHTMX = c.req.header('HX-Request') === 'true'
     
@@ -772,10 +780,13 @@ adminContentRoutes.put('/:id', async (c) => {
     }
     
     // Handle different actions
-    const redirectUrl = action === 'save_and_continue' 
-      ? `/admin/content/${id}/edit?success=Content updated successfully!`
-      : `/admin/content?collection=${existingContent.collection_id}&success=Content updated successfully!`
-    
+    const referrerParams = formData.get('referrer_params') as string
+    const redirectUrl = action === 'save_and_continue'
+      ? `/admin/content/${id}/edit?success=Content updated successfully!${referrerParams ? `&ref=${encodeURIComponent(referrerParams)}` : ''}`
+      : referrerParams
+        ? `/admin/content?${referrerParams}&success=Content updated successfully!`
+        : `/admin/content?collection=${existingContent.collection_id}&success=Content updated successfully!`
+
     // Check if this is an HTMX request
     const isHTMX = c.req.header('HX-Request') === 'true'
     
