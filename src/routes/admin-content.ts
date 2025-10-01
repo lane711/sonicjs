@@ -198,6 +198,7 @@ adminContentRoutes.get('/', async (c) => {
       modelName,
       status,
       page,
+      search,
       models,
       contentItems,
       totalItems,

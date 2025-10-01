@@ -18,6 +18,7 @@ export interface ContentListPageData {
   modelName: string
   status: string
   page: number
+  search?: string
   models: Array<{
     name: string
     displayName: string
@@ -206,6 +207,87 @@ export function renderContentListPage(data: ContentListPageData): string {
           <div class="px-6 py-5">
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-4">
+                <!-- Search Input -->
+                <div>
+                  <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Search</label>
+                  <form onsubmit="performContentSearch(event)" class="flex items-center space-x-2">
+                    <div class="relative group">
+                      <input
+                        type="text"
+                        name="search"
+                        id="content-search-input"
+                        value="${data.search || ''}"
+                        oninput="toggleContentClearButton()"
+                        placeholder="Search content..."
+                        class="rounded-full bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm px-4 py-2.5 pl-11 pr-10 text-sm w-72 text-zinc-950 dark:text-white border-2 border-cyan-200/50 dark:border-cyan-700/50 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:bg-white dark:focus:bg-zinc-800 focus:shadow-lg focus:shadow-cyan-500/20 dark:focus:shadow-cyan-400/20 transition-all duration-300"
+                      >
+                      <div class="absolute left-3.5 top-2.5 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 dark:from-cyan-300 dark:to-blue-400 opacity-90 group-focus-within:opacity-100 transition-opacity">
+                        <svg class="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                      </div>
+                      <button
+                        type="button"
+                        id="clear-content-search"
+                        onclick="clearContentSearch()"
+                        class="${data.search ? '' : 'hidden'} absolute right-3 top-3 flex items-center justify-center w-5 h-5 rounded-full bg-zinc-400/20 dark:bg-zinc-500/20 hover:bg-zinc-400/30 dark:hover:bg-zinc-500/30 transition-colors"
+                      >
+                        <svg class="h-3 w-3 text-zinc-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                      </button>
+                    </div>
+                    <button
+                      type="submit"
+                      class="inline-flex items-center gap-x-1.5 px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 dark:from-cyan-400 dark:to-blue-400 text-white text-sm font-medium rounded-full hover:from-cyan-600 hover:to-blue-600 dark:hover:from-cyan-500 dark:hover:to-blue-500 shadow-md hover:shadow-lg transition-all duration-200"
+                    >
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                      </svg>
+                      Search
+                    </button>
+                  </form>
+                  <script>
+                    function performContentSearch(event) {
+                      event.preventDefault();
+                      const searchInput = document.getElementById('content-search-input');
+                      const value = searchInput.value.trim();
+                      const params = new URLSearchParams(window.location.search);
+                      if (value) {
+                        params.set('search', value);
+                      } else {
+                        params.delete('search');
+                      }
+                      params.set('page', '1');
+                      window.location.href = window.location.pathname + '?' + params.toString();
+                    }
+
+                    function clearContentSearch() {
+                      const params = new URLSearchParams(window.location.search);
+                      params.delete('search');
+                      params.set('page', '1');
+                      window.location.href = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+                    }
+
+                    function toggleContentClearButton() {
+                      const searchInput = document.getElementById('content-search-input');
+                      const clearButton = document.getElementById('clear-content-search');
+                      if (searchInput.value.trim()) {
+                        clearButton.classList.remove('hidden');
+                      } else {
+                        clearButton.classList.add('hidden');
+                      }
+                    }
+
+                    function updateContentFilters(filterName, filterValue) {
+                      const params = new URLSearchParams(window.location.search);
+                      params.set(filterName, filterValue);
+                      params.set('page', '1');
+                      window.location.href = window.location.pathname + '?' + params.toString();
+                    }
+                  </script>
+                </div>
+
                 ${filterBarData.filters.map(filter => {
                   const selectedOption = filter.options.find(opt => opt.selected);
                   const selectedColor = selectedOption?.color || 'cyan';
@@ -227,10 +309,7 @@ export function renderContentListPage(data: ContentListPageData): string {
                       </div>
                       <select
                         name="${filter.name}"
-                        hx-get="/admin/content"
-                        hx-trigger="change"
-                        hx-target="${filter.hxTarget || '#content-list'}"
-                        hx-include="${filter.hxInclude || ''}"
+                        onchange="updateContentFilters('${filter.name}', this.value)"
                         class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 ${filter.name === 'status' ? 'pl-8' : 'pl-3'} pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-cyan-500/30 dark:outline-cyan-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-500 dark:focus-visible:outline-cyan-400 sm:text-sm/6 min-w-48"
                       >
                         ${filter.options.map(opt => `

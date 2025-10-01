@@ -170,41 +170,49 @@ export function renderUserEditPage(data: UserEditPageData): string {
               <div class="mb-8">
                 <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">Account Status</h3>
                 <div class="space-y-4">
-                  <div class="flex items-center justify-between">
-                    <div>
-                      <label class="text-sm font-medium text-zinc-950 dark:text-white">Account Active</label>
-                      <p class="text-sm text-zinc-500 dark:text-zinc-400">User can sign in and access the system</p>
+                  <div class="flex gap-3">
+                    <div class="flex h-6 shrink-0 items-center">
+                      <div class="group grid size-4 grid-cols-1">
+                        <input
+                          type="checkbox"
+                          id="is_active"
+                          name="is_active"
+                          value="1"
+                          ${data.userToEdit.isActive ? 'checked' : ''}
+                          class="col-start-1 row-start-1 appearance-none rounded border border-zinc-950/10 dark:border-white/10 bg-white dark:bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 indeterminate:border-indigo-500 indeterminate:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-zinc-950/5 dark:disabled:border-white/5 disabled:bg-zinc-950/10 dark:disabled:bg-white/10 disabled:checked:bg-zinc-950/10 dark:disabled:checked:bg-white/10 forced-colors:appearance-auto"
+                        />
+                        <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-zinc-950/25 dark:group-has-[:disabled]:stroke-white/25">
+                          <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                          <path d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:indeterminate]:opacity-100" />
+                        </svg>
+                      </div>
                     </div>
-                    <div class="group grid size-4 grid-cols-1">
-                      <input
-                        type="checkbox"
-                        name="is_active"
-                        value="1"
-                        ${data.userToEdit.isActive ? 'checked' : ''}
-                        class="col-start-1 row-start-1 appearance-none rounded border border-white/10 bg-white/5 checked:border-cyan-500 checked:bg-cyan-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 disabled:border-white/5 disabled:bg-white/10"
-                      />
-                      <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white">
-                        <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
-                      </svg>
+                    <div class="text-sm/6">
+                      <label for="is_active" class="font-medium text-zinc-950 dark:text-white">Account Active</label>
+                      <p class="text-zinc-500 dark:text-zinc-400">User can sign in and access the system</p>
                     </div>
                   </div>
 
-                  <div class="flex items-center justify-between">
-                    <div>
-                      <label class="text-sm font-medium text-zinc-950 dark:text-white">Email Verified</label>
-                      <p class="text-sm text-zinc-500 dark:text-zinc-400">User has verified their email address</p>
+                  <div class="flex gap-3">
+                    <div class="flex h-6 shrink-0 items-center">
+                      <div class="group grid size-4 grid-cols-1">
+                        <input
+                          type="checkbox"
+                          id="email_verified"
+                          name="email_verified"
+                          value="1"
+                          ${data.userToEdit.emailVerified ? 'checked' : ''}
+                          class="col-start-1 row-start-1 appearance-none rounded border border-zinc-950/10 dark:border-white/10 bg-white dark:bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 indeterminate:border-indigo-500 indeterminate:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-zinc-950/5 dark:disabled:border-white/5 disabled:bg-zinc-950/10 dark:disabled:bg-white/10 disabled:checked:bg-zinc-950/10 dark:disabled:checked:bg-white/10 forced-colors:appearance-auto"
+                        />
+                        <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-zinc-950/25 dark:group-has-[:disabled]:stroke-white/25">
+                          <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
+                          <path d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:indeterminate]:opacity-100" />
+                        </svg>
+                      </div>
                     </div>
-                    <div class="group grid size-4 grid-cols-1">
-                      <input
-                        type="checkbox"
-                        name="email_verified"
-                        value="1"
-                        ${data.userToEdit.emailVerified ? 'checked' : ''}
-                        class="col-start-1 row-start-1 appearance-none rounded border border-white/10 bg-white/5 checked:border-cyan-500 checked:bg-cyan-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 disabled:border-white/5 disabled:bg-white/10"
-                      />
-                      <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white">
-                        <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
-                      </svg>
+                    <div class="text-sm/6">
+                      <label for="email_verified" class="font-medium text-zinc-950 dark:text-white">Email Verified</label>
+                      <p class="text-zinc-500 dark:text-zinc-400">User has verified their email address</p>
                     </div>
                   </div>
                 </div>
