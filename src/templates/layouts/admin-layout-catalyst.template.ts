@@ -426,13 +426,6 @@ function renderCatalystSidebar(
       </svg>`,
     },
     {
-      label: "Settings",
-      path: "/admin/settings",
-      icon: `<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
-      </svg>`,
-    },
-    {
       label: "API Reference",
       path: "/admin/api-reference",
       icon: `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -447,6 +440,14 @@ function renderCatalystSidebar(
       </svg>`,
     },
   ];
+
+  const settingsMenuItem = {
+    label: "Settings",
+    path: "/admin/settings",
+    icon: `<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+      <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+    </svg>`,
+  };
 
   // Combine base menu items with dynamic menu items
   const allMenuItems = [...baseMenuItems];
@@ -523,6 +524,44 @@ function renderCatalystSidebar(
             })
             .join("")}
         </div>
+      </div>
+
+      <!-- Settings Menu Item (Bottom) -->
+      <div class="border-t border-zinc-950/5 p-4 dark:border-white/5">
+        ${(() => {
+          const isActive =
+            currentPath === settingsMenuItem.path ||
+            currentPath?.startsWith(settingsMenuItem.path);
+          return `
+            <span class="relative">
+              ${
+                isActive
+                  ? `
+                <span class="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-cyan-500 dark:bg-cyan-400"></span>
+              `
+                  : ""
+              }
+              <a
+                href="${settingsMenuItem.path}"
+                class="flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-left text-sm/5 font-medium ${
+                  isActive
+                    ? "text-zinc-950 dark:text-white"
+                    : "text-zinc-950 hover:bg-zinc-950/5 dark:text-white dark:hover:bg-white/5"
+                }"
+                ${isActive ? 'data-current="true"' : ""}
+              >
+                <span class="shrink-0 ${
+                  isActive
+                    ? "fill-zinc-950 dark:fill-white"
+                    : "fill-zinc-500 dark:fill-zinc-400"
+                }">
+                  ${settingsMenuItem.icon}
+                </span>
+                <span class="truncate">${settingsMenuItem.label}</span>
+              </a>
+            </span>
+          `;
+        })()}
       </div>
 
       <!-- Sidebar Footer (User) -->

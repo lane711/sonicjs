@@ -456,15 +456,20 @@ export function renderDesignPage(data: DesignPageData): string {
 
             <!-- Select -->
             <div>
-              <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">
+              <label for="select-demo" class="block text-sm/6 font-medium text-zinc-950 dark:text-white">
                 Select Dropdown
               </label>
-              <select class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow">
-                <option value="">Choose an option</option>
-                <option value="1">Option 1</option>
-                <option value="2">Option 2</option>
-                <option value="3">Option 3</option>
-              </select>
+              <div class="mt-2 grid grid-cols-1">
+                <select id="select-demo" class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-zinc-500/30 dark:outline-zinc-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-500 dark:focus-visible:outline-zinc-400 sm:text-sm/6">
+                  <option value="">Choose an option</option>
+                  <option value="1">Option 1</option>
+                  <option value="2" selected>Option 2</option>
+                  <option value="3">Option 3</option>
+                </select>
+                <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-zinc-600 dark:text-zinc-400 sm:size-4">
+                  <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
+                </svg>
+              </div>
             </div>
 
             <!-- Textarea -->

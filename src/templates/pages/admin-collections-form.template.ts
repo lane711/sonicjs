@@ -410,22 +410,27 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Field Type</label>
-            <select
-              id="field-type"
-              name="field_type"
-              required
-              class="w-full rounded-lg bg-white dark:bg-zinc-800 px-4 py-3 text-sm text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-500 focus:outline-none transition-colors"
-            >
-              <option value="">Select field type...</option>
-              <option value="text">Text</option>
-              <option value="richtext">Rich Text</option>
-              <option value="number">Number</option>
-              <option value="boolean">Boolean</option>
-              <option value="date">Date</option>
-              <option value="select">Select</option>
-              <option value="media">Media</option>
-            </select>
+            <label for="field-type" class="block text-sm/6 font-medium text-zinc-950 dark:text-white">Field Type</label>
+            <div class="mt-2 grid grid-cols-1">
+              <select
+                id="field-type"
+                name="field_type"
+                required
+                class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-blue-500/30 dark:outline-blue-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blue-500 dark:focus-visible:outline-blue-400 sm:text-sm/6"
+              >
+                <option value="">Select field type...</option>
+                <option value="text">Text</option>
+                <option value="richtext">Rich Text</option>
+                <option value="number">Number</option>
+                <option value="boolean">Boolean</option>
+                <option value="date">Date</option>
+                <option value="select">Select</option>
+                <option value="media">Media</option>
+              </select>
+              <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-blue-600 dark:text-blue-400 sm:size-4">
+                <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
+              </svg>
+            </div>
           </div>
 
           <div>

@@ -1,4 +1,4 @@
-import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout-v2.template'
+import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
 
 export interface APIEndpoint {
   method: string
@@ -57,15 +57,15 @@ export function renderAPIReferencePage(data: APIReferencePageData): string {
   }
 
   const pageContent = `
-    <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
+    <div>
       <!-- Header -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
-          <h1 class="text-2xl font-semibold text-white">API Reference</h1>
-          <p class="mt-2 text-sm text-gray-300">Complete documentation of all available API endpoints</p>
+          <h1 class="text-2xl/8 font-semibold text-zinc-950 dark:text-white sm:text-xl/8">API Reference</h1>
+          <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">Complete documentation of all available API endpoints</p>
         </div>
         <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <a href="/api/" target="_blank" class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/20 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/30 transition-all">
+          <a href="/api/" target="_blank" class="inline-flex items-center justify-center rounded-lg bg-zinc-950 dark:bg-white px-3.5 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm">
             <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
             </svg>
@@ -74,84 +74,129 @@ export function renderAPIReferencePage(data: APIReferencePageData): string {
         </div>
       </div>
 
-      <!-- Overview Stats -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 text-center">
-          <div class="text-2xl font-bold text-blue-400">${data.endpoints.length}</div>
-          <div class="text-sm text-gray-300">Total Endpoints</div>
-        </div>
-        <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 text-center">
-          <div class="text-2xl font-bold text-green-400">${data.endpoints.filter(e => !e.authentication).length}</div>
-          <div class="text-sm text-gray-300">Public Endpoints</div>
-        </div>
-        <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 text-center">
-          <div class="text-2xl font-bold text-yellow-400">${data.endpoints.filter(e => e.authentication).length}</div>
-          <div class="text-sm text-gray-300">Protected Endpoints</div>
-        </div>
-        <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 text-center">
-          <div class="text-2xl font-bold text-purple-400">${Object.keys(endpointsByCategory).length}</div>
-          <div class="text-sm text-gray-300">Categories</div>
-        </div>
+      <!-- Stats -->
+      <div class="mb-6">
+        <h3 class="text-base font-semibold text-zinc-950 dark:text-white">API Statistics</h3>
+        <dl class="mt-5 grid grid-cols-1 divide-zinc-950/5 dark:divide-white/10 overflow-hidden rounded-lg bg-zinc-800/75 dark:bg-zinc-800/75 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 md:grid-cols-4 md:divide-x md:divide-y-0">
+          <div class="px-4 py-5 sm:p-6">
+            <dt class="text-base font-normal text-zinc-700 dark:text-zinc-100">Total Endpoints</dt>
+            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
+              <div class="flex items-baseline text-2xl font-semibold text-cyan-400">
+                ${data.endpoints.length}
+              </div>
+            </dd>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <dt class="text-base font-normal text-zinc-700 dark:text-zinc-100">Public Endpoints</dt>
+            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
+              <div class="flex items-baseline text-2xl font-semibold text-lime-400">
+                ${data.endpoints.filter(e => !e.authentication).length}
+              </div>
+            </dd>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <dt class="text-base font-normal text-zinc-700 dark:text-zinc-100">Protected Endpoints</dt>
+            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
+              <div class="flex items-baseline text-2xl font-semibold text-purple-400">
+                ${data.endpoints.filter(e => e.authentication).length}
+              </div>
+            </dd>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <dt class="text-base font-normal text-zinc-700 dark:text-zinc-100">Categories</dt>
+            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
+              <div class="flex items-baseline text-2xl font-semibold text-pink-400">
+                ${Object.keys(endpointsByCategory).length}
+              </div>
+            </dd>
+          </div>
+        </dl>
       </div>
 
-      <!-- Search and Filter -->
-      <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-white mb-1">Search Endpoints</label>
-            <input 
-              type="text" 
-              id="endpoint-search"
-              placeholder="Search by path or description..."
-              class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors w-full"
-            >
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-white mb-1">Filter by Method</label>
-            <select 
-              id="method-filter"
-              class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white focus:border-blue-400 focus:outline-none transition-colors w-full"
-            >
-              <option value="">All Methods</option>
-              <option value="GET">GET</option>
-              <option value="POST">POST</option>
-              <option value="PUT">PUT</option>
-              <option value="PATCH">PATCH</option>
-              <option value="DELETE">DELETE</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-white mb-1">Filter by Category</label>
-            <select 
-              id="category-filter"
-              class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white focus:border-blue-400 focus:outline-none transition-colors w-full"
-            >
-              <option value="">All Categories</option>
-              ${Object.keys(categoryInfo).map(category => `
-                <option value="${category}">${(categoryInfo as any)[category].title}</option>
-              `).join('')}
-            </select>
+      <!-- Filters -->
+      <div class="relative rounded-xl overflow-hidden mb-6">
+        <!-- Gradient Background -->
+        <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 dark:from-cyan-400/20 dark:via-blue-400/20 dark:to-purple-400/20"></div>
+
+        <div class="relative bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10">
+          <div class="px-6 py-5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-4 flex-1">
+                <div>
+                  <label class="block text-sm/6 font-medium text-zinc-950 dark:text-white">Method</label>
+                  <div class="mt-2 grid grid-cols-1">
+                    <select
+                      id="method-filter"
+                      class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-cyan-500/30 dark:outline-cyan-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-500 dark:focus-visible:outline-cyan-400 sm:text-sm/6 min-w-48"
+                    >
+                      <option value="">All Methods</option>
+                      <option value="GET">GET</option>
+                      <option value="POST">POST</option>
+                      <option value="PUT">PUT</option>
+                      <option value="PATCH">PATCH</option>
+                      <option value="DELETE">DELETE</option>
+                    </select>
+                    <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-cyan-600 dark:text-cyan-400 sm:size-4">
+                      <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm/6 font-medium text-zinc-950 dark:text-white">Category</label>
+                  <div class="mt-2 grid grid-cols-1">
+                    <select
+                      id="category-filter"
+                      class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-cyan-500/30 dark:outline-cyan-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-500 dark:focus-visible:outline-cyan-400 sm:text-sm/6 min-w-48"
+                    >
+                      <option value="">All Categories</option>
+                      ${Object.keys(categoryInfo).map(category => `
+                        <option value="${category}">${(categoryInfo as any)[category].title}</option>
+                      `).join('')}
+                    </select>
+                    <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-cyan-600 dark:text-cyan-400 sm:size-4">
+                      <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="flex-1 max-w-md">
+                  <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Search</label>
+                  <div class="relative group">
+                    <div class="absolute left-3.5 top-2.5 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 dark:from-cyan-300 dark:to-blue-400 opacity-90 group-focus-within:opacity-100 transition-opacity">
+                      <svg class="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      id="endpoint-search"
+                      placeholder="Search by path or description..."
+                      class="rounded-full bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm px-4 py-2.5 pl-11 text-sm w-full text-zinc-950 dark:text-white border-2 border-cyan-200/50 dark:border-cyan-700/50 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:bg-white dark:focus:bg-zinc-800 focus:shadow-lg focus:shadow-cyan-500/20 dark:focus:shadow-cyan-400/20 transition-all duration-300"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- API Categories -->
-      <div class="space-y-8">
+      <div class="space-y-6">
         ${Object.entries(endpointsByCategory).map(([category, endpoints]) => {
           const info = (categoryInfo as any)[category] || { title: category, description: '', icon: '📋' }
           return `
             <div class="api-category" data-category="${category}">
-              <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl overflow-hidden">
+              <div class="rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 overflow-hidden">
                 <!-- Category Header -->
-                <div class="bg-white/5 px-6 py-4 border-b border-white/10">
+                <div class="bg-zinc-50 dark:bg-zinc-800/50 px-6 py-4 border-b border-zinc-950/5 dark:border-white/10">
                   <div class="flex items-center">
                     <span class="text-2xl mr-3">${info.icon}</span>
                     <div>
-                      <h2 class="text-xl font-semibold text-white">${info.title}</h2>
-                      <p class="text-sm text-gray-300">${info.description}</p>
+                      <h2 class="text-lg font-semibold text-zinc-950 dark:text-white">${info.title}</h2>
+                      <p class="text-sm text-zinc-500 dark:text-zinc-400">${info.description}</p>
                     </div>
                     <div class="ml-auto">
-                      <span class="backdrop-blur-sm bg-white/20 px-3 py-1 rounded-xl text-sm text-white">
+                      <span class="inline-flex items-center rounded-md bg-cyan-50 dark:bg-cyan-500/10 px-2.5 py-1 text-sm font-medium text-cyan-700 dark:text-cyan-300 ring-1 ring-inset ring-cyan-700/10 dark:ring-cyan-400/20">
                         ${endpoints.length} endpoint${endpoints.length !== 1 ? 's' : ''}
                       </span>
                     </div>
@@ -160,30 +205,30 @@ export function renderAPIReferencePage(data: APIReferencePageData): string {
 
                 <!-- Endpoints List -->
                 <div class="p-6">
-                  <div class="space-y-4">
+                  <div class="space-y-3">
                     ${endpoints.map(endpoint => `
-                      <div class="api-endpoint backdrop-blur-sm bg-white/5 rounded-xl border border-white/10 p-4 hover:bg-white/10 transition-all" 
-                           data-method="${endpoint.method}" 
-                           data-path="${endpoint.path}" 
+                      <div class="api-endpoint rounded-lg bg-zinc-50 dark:bg-zinc-800/50 ring-1 ring-inset ring-zinc-950/5 dark:ring-white/10 p-4 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                           data-method="${endpoint.method}"
+                           data-path="${endpoint.path}"
                            data-description="${endpoint.description}">
                         <div class="flex items-start justify-between">
                           <div class="flex-1">
-                            <div class="flex items-center mb-2">
-                              <span class="method-badge method-${endpoint.method.toLowerCase()} px-2 py-1 rounded text-xs font-mono font-bold mr-3">
+                            <div class="flex items-center mb-2 flex-wrap gap-2">
+                              <span class="method-badge method-${endpoint.method.toLowerCase()} px-2.5 py-1 rounded-md text-xs font-mono font-bold">
                                 ${endpoint.method}
                               </span>
-                              <code class="text-blue-300 text-sm font-mono">${endpoint.path}</code>
+                              <code class="text-cyan-700 dark:text-cyan-400 text-sm font-mono">${endpoint.path}</code>
                               ${endpoint.authentication ? `
-                                <span class="ml-2 backdrop-blur-sm bg-yellow-500/20 text-yellow-300 px-2 py-0.5 rounded text-xs">
+                                <span class="inline-flex items-center rounded-md bg-amber-50 dark:bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300 ring-1 ring-inset ring-amber-700/10 dark:ring-amber-400/20">
                                   🔒 Auth Required
                                 </span>
                               ` : `
-                                <span class="ml-2 backdrop-blur-sm bg-green-500/20 text-green-300 px-2 py-0.5 rounded text-xs">
+                                <span class="inline-flex items-center rounded-md bg-lime-50 dark:bg-lime-500/10 px-2 py-0.5 text-xs font-medium text-lime-700 dark:text-lime-300 ring-1 ring-inset ring-lime-700/10 dark:ring-lime-400/20">
                                   🌍 Public
                                 </span>
                               `}
                             </div>
-                            <p class="text-gray-300 text-sm">${endpoint.description}</p>
+                            <p class="text-zinc-600 dark:text-zinc-300 text-sm">${endpoint.description}</p>
                           </div>
                         </div>
                       </div>
@@ -197,14 +242,12 @@ export function renderAPIReferencePage(data: APIReferencePageData): string {
       </div>
 
       <!-- No Results Message -->
-      <div id="no-results" class="hidden backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-8 text-center">
-        <div class="text-gray-300">
-          <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <p class="text-lg text-white">No endpoints found</p>
-          <p class="text-sm text-gray-400 mt-1">Try adjusting your search or filter criteria</p>
-        </div>
+      <div id="no-results" class="hidden rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-12 text-center">
+        <svg class="mx-auto h-12 w-12 text-zinc-400 dark:text-zinc-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <h3 class="mt-4 text-base/7 font-semibold text-zinc-950 dark:text-white">No endpoints found</h3>
+        <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">Try adjusting your search or filter criteria</p>
       </div>
     </div>
 
@@ -296,7 +339,7 @@ export function renderAPIReferencePage(data: APIReferencePageData): string {
     </script>
   `
 
-  const layoutData: AdminLayoutData = {
+  const layoutData: AdminLayoutCatalystData = {
     title: 'API Reference',
     pageTitle: 'API Reference',
     currentPath: '/admin/api-reference',
@@ -304,5 +347,5 @@ export function renderAPIReferencePage(data: APIReferencePageData): string {
     content: pageContent
   }
 
-  return renderAdminLayout(layoutData)
+  return renderAdminLayoutCatalyst(layoutData)
 }

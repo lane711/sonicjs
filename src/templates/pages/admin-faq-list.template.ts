@@ -59,38 +59,48 @@ export function renderFAQList(data: FAQListData): string {
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-4 flex-1">
                 <div>
-                  <label for="category" class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Category</label>
-                  <select
-                    name="category"
-                    id="category"
-                    hx-get="/admin/faq"
-                    hx-trigger="change"
-                    hx-target="#faq-list"
-                    hx-include="[name='published'], [name='search']"
-                    class="rounded-lg bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm px-4 py-2 text-sm min-w-48 text-zinc-950 dark:text-white border-2 border-cyan-200/50 dark:border-cyan-700/50 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:shadow-lg focus:shadow-cyan-500/20 dark:focus:shadow-cyan-400/20 transition-all duration-300"
-                  >
-                    <option value="">All Categories</option>
-                    <option value="general">General</option>
-                    <option value="technical">Technical</option>
-                    <option value="billing">Billing</option>
-                    <option value="support">Support</option>
-                  </select>
+                  <label for="category" class="block text-sm/6 font-medium text-zinc-950 dark:text-white">Category</label>
+                  <div class="mt-2 grid grid-cols-1">
+                    <select
+                      name="category"
+                      id="category"
+                      hx-get="/admin/faq"
+                      hx-trigger="change"
+                      hx-target="#faq-list"
+                      hx-include="[name='published'], [name='search']"
+                      class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-cyan-500/30 dark:outline-cyan-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-500 dark:focus-visible:outline-cyan-400 sm:text-sm/6 min-w-48"
+                    >
+                      <option value="">All Categories</option>
+                      <option value="general">General</option>
+                      <option value="technical">Technical</option>
+                      <option value="billing">Billing</option>
+                      <option value="support">Support</option>
+                    </select>
+                    <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-cyan-600 dark:text-cyan-400 sm:size-4">
+                      <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
+                    </svg>
+                  </div>
                 </div>
                 <div>
-                  <label for="published" class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Status</label>
-                  <select
-                    name="published"
-                    id="published"
-                    hx-get="/admin/faq"
-                    hx-trigger="change"
-                    hx-target="#faq-list"
-                    hx-include="[name='category'], [name='search']"
-                    class="rounded-lg bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm px-4 py-2 text-sm min-w-48 text-zinc-950 dark:text-white border-2 border-cyan-200/50 dark:border-cyan-700/50 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:shadow-lg focus:shadow-cyan-500/20 dark:focus:shadow-cyan-400/20 transition-all duration-300"
-                  >
-                    <option value="">All</option>
-                    <option value="true">Published</option>
-                    <option value="false">Draft</option>
-                  </select>
+                  <label for="published" class="block text-sm/6 font-medium text-zinc-950 dark:text-white">Status</label>
+                  <div class="mt-2 grid grid-cols-1">
+                    <select
+                      name="published"
+                      id="published"
+                      hx-get="/admin/faq"
+                      hx-trigger="change"
+                      hx-target="#faq-list"
+                      hx-include="[name='category'], [name='search']"
+                      class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-cyan-500/30 dark:outline-cyan-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-500 dark:focus-visible:outline-cyan-400 sm:text-sm/6 min-w-48"
+                    >
+                      <option value="">All</option>
+                      <option value="true">Published</option>
+                      <option value="false">Draft</option>
+                    </select>
+                    <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-cyan-600 dark:text-cyan-400 sm:size-4">
+                      <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
+                    </svg>
+                  </div>
                 </div>
                 <div class="flex-1 max-w-md">
                   <label for="search" class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Search</label>
