@@ -20,9 +20,9 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
   const { value = '', errors = [], disabled = false, className = '' } = options
   const opts = field.field_options || {}
   const required = field.is_required ? 'required' : ''
-  const baseClasses = `w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/20 transition-all ${className}`
-  const errorClasses = errors.length > 0 ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''
-  
+  const baseClasses = `w-full rounded-lg px-3 py-2 text-sm text-zinc-950 dark:text-white bg-white dark:bg-zinc-800 shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow ${className}`
+  const errorClasses = errors.length > 0 ? 'ring-pink-600 dark:ring-pink-500 focus:ring-pink-600 dark:focus:ring-pink-500' : ''
+
   const fieldId = `field-${field.field_name}`
   const fieldName = field.field_name
   
@@ -35,11 +35,11 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
       
       if (opts.pattern) {
         if (opts.pattern === '^[a-z0-9-]+$' || opts.pattern === '^[a-zA-Z0-9_-]+$') {
-          patternHelp = '<p class="mt-1 text-xs text-gray-400">Use letters, numbers, underscores, and hyphens only</p>'
-          
+          patternHelp = '<p class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Use letters, numbers, underscores, and hyphens only</p>'
+
           // Add auto-slug generation for slug fields
           if (fieldName === 'slug') {
-            patternHelp += '<button type="button" class="mt-1 text-xs text-blue-400 hover:text-blue-300" onclick="generateSlugFromTitle(\'${fieldId}\')">Generate from title</button>'
+            patternHelp += '<button type="button" class="mt-1 text-xs text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300" onclick="generateSlugFromTitle(\'${fieldId}\')">Generate from title</button>'
             autoSlugScript = `
               <script>
                 function generateSlugFromTitle(slugFieldId) {
@@ -72,7 +72,7 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
             `
           }
         } else {
-          patternHelp = '<p class="mt-1 text-xs text-gray-400">Must match required format</p>'
+          patternHelp = '<p class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Must match required format</p>'
         }
       }
       
@@ -296,19 +296,19 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
   }
   
   return `
-    <div class="form-group mb-6">
-      <label for="${fieldId}" class="block text-sm font-medium text-gray-300 mb-2">
+    <div class="form-group">
+      <label for="${fieldId}" class="block text-sm/6 font-medium text-zinc-950 dark:text-white mb-2">
         ${escapeHtml(field.field_label)}
-        ${field.is_required ? '<span class="text-red-400 ml-1">*</span>' : ''}
+        ${field.is_required ? '<span class="text-pink-600 dark:text-pink-400 ml-1">*</span>' : ''}
       </label>
       ${fieldHTML}
       ${errors.length > 0 ? `
-        <div class="mt-2 text-sm text-red-400">
+        <div class="mt-2 text-sm text-pink-600 dark:text-pink-400">
           ${errors.map(error => `<div>${escapeHtml(error)}</div>`).join('')}
         </div>
       ` : ''}
       ${opts.helpText ? `
-        <div class="mt-2 text-sm text-gray-400">
+        <div class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
           ${escapeHtml(opts.helpText)}
         </div>
       ` : ''}
@@ -318,20 +318,20 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
 
 export function renderFieldGroup(title: string, fields: string[], collapsible: boolean = false): string {
   const groupId = title.toLowerCase().replace(/\s+/g, '-')
-  
+
   return `
-    <div class="field-group backdrop-blur-xl bg-white/5 rounded-xl border border-white/10 p-6 mb-6">
-      <div class="field-group-header ${collapsible ? 'cursor-pointer' : ''}" ${collapsible ? `onclick="toggleFieldGroup('${groupId}')"` : ''}>
-        <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+    <div class="field-group rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 mb-6">
+      <div class="field-group-header border-b border-zinc-950/5 dark:border-white/10 px-6 py-4 ${collapsible ? 'cursor-pointer' : ''}" ${collapsible ? `onclick="toggleFieldGroup('${groupId}')"` : ''}>
+        <h3 class="text-base/7 font-semibold text-zinc-950 dark:text-white flex items-center">
           ${escapeHtml(title)}
           ${collapsible ? `
-            <svg id="${groupId}-icon" class="w-5 h-5 ml-2 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg id="${groupId}-icon" class="w-5 h-5 ml-2 transform transition-transform text-zinc-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
             </svg>
           ` : ''}
         </h3>
       </div>
-      <div id="${groupId}-content" class="field-group-content ${collapsible ? 'collapsible' : ''}">
+      <div id="${groupId}-content" class="field-group-content px-6 py-6 space-y-6 ${collapsible ? 'collapsible' : ''}">
         ${fields.join('')}
       </div>
     </div>

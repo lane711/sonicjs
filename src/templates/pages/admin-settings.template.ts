@@ -1,4 +1,4 @@
-import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout-v2.template'
+import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
 
 export interface SettingsPageData {
   user?: {
@@ -94,45 +94,53 @@ export function renderSettingsPage(data: SettingsPageData): string {
   const activeTab = data.activeTab || 'general'
   
   const pageContent = `
-    <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
+    <div>
       <!-- Header -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
-          <h1 class="text-2xl font-semibold text-white">Settings</h1>
-          <p class="mt-2 text-sm text-gray-300">Manage your application settings and preferences</p>
+          <h1 class="text-2xl/8 font-semibold text-zinc-950 dark:text-white sm:text-xl/8">Settings</h1>
+          <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">Manage your application settings and preferences</p>
         </div>
         <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none flex space-x-3">
-          <button 
-            onclick="resetSettings()" 
-            class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/10 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all"
+          <button
+            onclick="resetSettings()"
+            class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm"
           >
+            <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
             Reset to Defaults
           </button>
-          <button 
-            onclick="saveAllSettings()" 
-            class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/20 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/30 transition-all"
+          <button
+            onclick="saveAllSettings()"
+            class="inline-flex items-center justify-center rounded-lg bg-zinc-950 dark:bg-white px-3.5 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm"
           >
+            <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
             Save All Changes
           </button>
         </div>
       </div>
 
       <!-- Settings Navigation Tabs -->
-      <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl overflow-hidden mb-6">
-        <nav class="flex space-x-0" role="tablist">
-          ${renderTabButton('general', 'General', 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z', activeTab)}
-          ${renderTabButton('appearance', 'Appearance', 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z', activeTab)}
-          ${renderTabButton('security', 'Security', 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', activeTab)}
-          ${renderTabButton('notifications', 'Notifications', 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9', activeTab)}
-          ${renderTabButton('storage', 'Storage', 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12', activeTab)}
-          ${renderTabButton('migrations', 'Migrations', 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4', activeTab)}
-          ${renderTabButton('database-tools', 'Database Tools', 'M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01', activeTab)}
-        </nav>
+      <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 mb-6 overflow-hidden">
+        <div class="border-b border-zinc-950/5 dark:border-white/10">
+          <nav class="flex overflow-x-auto" role="tablist">
+            ${renderTabButton('general', 'General', 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z', activeTab)}
+            ${renderTabButton('appearance', 'Appearance', 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z', activeTab)}
+            ${renderTabButton('security', 'Security', 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', activeTab)}
+            ${renderTabButton('notifications', 'Notifications', 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9', activeTab)}
+            ${renderTabButton('storage', 'Storage', 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12', activeTab)}
+            ${renderTabButton('migrations', 'Migrations', 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4', activeTab)}
+            ${renderTabButton('database-tools', 'Database Tools', 'M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01', activeTab)}
+          </nav>
+        </div>
       </div>
 
       <!-- Settings Content -->
-      <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl overflow-hidden">
-        <div id="settings-content" class="p-6">
+      <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10">
+        <div id="settings-content" class="p-8">
           ${renderTabContent(activeTab, data.settings)}
         </div>
       </div>
@@ -146,16 +154,17 @@ export function renderSettingsPage(data: SettingsPageData): string {
         
         // Update tab buttons
         document.querySelectorAll('[data-tab]').forEach(btn => {
-          btn.classList.remove('bg-white/20', 'text-white', 'border-white/20');
-          btn.classList.add('text-gray-300', 'hover:bg-white/10');
+          btn.classList.remove('border-b-2', 'border-zinc-950', 'dark:border-white', 'text-zinc-950', 'dark:text-white');
+          btn.classList.add('border-transparent', 'text-zinc-500', 'dark:text-zinc-400', 'hover:text-zinc-700', 'dark:hover:text-zinc-300');
         });
-        
-        document.querySelector(\`[data-tab="\${tab}"]\`).classList.remove('text-gray-300', 'hover:bg-white/10');
-        document.querySelector(\`[data-tab="\${tab}"]\`).classList.add('bg-white/20', 'text-white', 'border-white/20');
+
+        const activeBtn = document.querySelector(\`[data-tab="\${tab}"]\`);
+        activeBtn.classList.remove('border-transparent', 'text-zinc-500', 'dark:text-zinc-400', 'hover:text-zinc-700', 'dark:hover:text-zinc-300');
+        activeBtn.classList.add('border-b-2', 'border-zinc-950', 'dark:border-white', 'text-zinc-950', 'dark:text-white');
         
         // Load tab content
         const content = document.getElementById('settings-content');
-        content.innerHTML = '<div class="flex items-center justify-center h-32"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div></div>';
+        content.innerHTML = '<div class="flex items-center justify-center h-32"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-zinc-950 dark:border-white"></div></div>';
         
         // Simulate loading (replace with actual HTMX call)
         setTimeout(() => {
@@ -519,7 +528,7 @@ export function renderSettingsPage(data: SettingsPageData): string {
     </script>
   `
 
-  const layoutData: AdminLayoutData = {
+  const layoutData: AdminLayoutCatalystData = {
     title: 'Settings',
     pageTitle: 'Settings',
     currentPath: '/admin/settings',
@@ -527,17 +536,19 @@ export function renderSettingsPage(data: SettingsPageData): string {
     content: pageContent
   }
 
-  return renderAdminLayout(layoutData)
+  return renderAdminLayoutCatalyst(layoutData)
 }
 
 function renderTabButton(tabId: string, label: string, iconPath: string, activeTab: string): string {
   const isActive = activeTab === tabId
-  const baseClasses = 'flex items-center space-x-2 px-6 py-4 text-sm font-medium transition-colors border-b border-white/10'
-  const activeClasses = isActive ? 'bg-white/20 text-white border-white/20' : 'text-gray-300 hover:bg-white/10'
-  
+  const baseClasses = 'flex items-center space-x-2 px-4 py-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap'
+  const activeClasses = isActive
+    ? 'border-zinc-950 dark:border-white text-zinc-950 dark:text-white'
+    : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-700'
+
   return `
-    <button 
-      onclick="switchTab('${tabId}')" 
+    <button
+      onclick="switchTab('${tabId}')"
       data-tab="${tabId}"
       class="${baseClasses} ${activeClasses}"
     >

@@ -76,49 +76,40 @@ export function renderAPIReferencePage(data: APIReferencePageData): string {
 
       <!-- Stats -->
       <div class="mb-6">
-        <h3 class="text-base font-semibold text-zinc-950 dark:text-white">API Statistics</h3>
-        <dl class="mt-5 grid grid-cols-1 divide-zinc-950/5 dark:divide-white/10 overflow-hidden rounded-lg bg-zinc-800/75 dark:bg-zinc-800/75 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 md:grid-cols-4 md:divide-x md:divide-y-0">
-          <div class="px-4 py-5 sm:p-6">
-            <dt class="text-base font-normal text-zinc-700 dark:text-zinc-100">Total Endpoints</dt>
-            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
-              <div class="flex items-baseline text-2xl font-semibold text-cyan-400">
-                ${data.endpoints.length}
-              </div>
+        <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div class="rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 px-6 py-5">
+            <dt class="text-sm/6 font-medium text-zinc-500 dark:text-zinc-400">Total Endpoints</dt>
+            <dd class="mt-2 flex items-baseline gap-x-2">
+              <span class="text-4xl font-semibold tracking-tight text-zinc-950 dark:text-white">${data.endpoints.length}</span>
             </dd>
           </div>
-          <div class="px-4 py-5 sm:p-6">
-            <dt class="text-base font-normal text-zinc-700 dark:text-zinc-100">Public Endpoints</dt>
-            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
-              <div class="flex items-baseline text-2xl font-semibold text-lime-400">
-                ${data.endpoints.filter(e => !e.authentication).length}
-              </div>
+          <div class="rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 px-6 py-5">
+            <dt class="text-sm/6 font-medium text-zinc-500 dark:text-zinc-400">Public Endpoints</dt>
+            <dd class="mt-2 flex items-baseline gap-x-2">
+              <span class="text-4xl font-semibold tracking-tight text-lime-600 dark:text-lime-400">${data.endpoints.filter(e => !e.authentication).length}</span>
             </dd>
           </div>
-          <div class="px-4 py-5 sm:p-6">
-            <dt class="text-base font-normal text-zinc-700 dark:text-zinc-100">Protected Endpoints</dt>
-            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
-              <div class="flex items-baseline text-2xl font-semibold text-purple-400">
-                ${data.endpoints.filter(e => e.authentication).length}
-              </div>
+          <div class="rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 px-6 py-5">
+            <dt class="text-sm/6 font-medium text-zinc-500 dark:text-zinc-400">Protected Endpoints</dt>
+            <dd class="mt-2 flex items-baseline gap-x-2">
+              <span class="text-4xl font-semibold tracking-tight text-amber-600 dark:text-amber-400">${data.endpoints.filter(e => e.authentication).length}</span>
             </dd>
           </div>
-          <div class="px-4 py-5 sm:p-6">
-            <dt class="text-base font-normal text-zinc-700 dark:text-zinc-100">Categories</dt>
-            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
-              <div class="flex items-baseline text-2xl font-semibold text-pink-400">
-                ${Object.keys(endpointsByCategory).length}
-              </div>
+          <div class="rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 px-6 py-5">
+            <dt class="text-sm/6 font-medium text-zinc-500 dark:text-zinc-400">Categories</dt>
+            <dd class="mt-2 flex items-baseline gap-x-2">
+              <span class="text-4xl font-semibold tracking-tight text-cyan-600 dark:text-cyan-400">${Object.keys(endpointsByCategory).length}</span>
             </dd>
           </div>
         </dl>
       </div>
 
       <!-- Filters -->
-      <div class="relative rounded-xl overflow-hidden mb-6">
+      <div class="relative rounded-xl mb-6">
         <!-- Gradient Background -->
-        <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 dark:from-cyan-400/20 dark:via-blue-400/20 dark:to-purple-400/20"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 dark:from-cyan-400/20 dark:via-blue-400/20 dark:to-purple-400/20 rounded-xl"></div>
 
-        <div class="relative bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10">
+        <div class="relative bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 rounded-xl">
           <div class="px-6 py-5">
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-4 flex-1">
@@ -207,28 +198,34 @@ export function renderAPIReferencePage(data: APIReferencePageData): string {
                 <div class="p-6">
                   <div class="space-y-3">
                     ${endpoints.map(endpoint => `
-                      <div class="api-endpoint rounded-lg bg-zinc-50 dark:bg-zinc-800/50 ring-1 ring-inset ring-zinc-950/5 dark:ring-white/10 p-4 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                      <div class="api-endpoint rounded-lg bg-white dark:bg-zinc-800/50 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 p-4 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                            data-method="${endpoint.method}"
                            data-path="${endpoint.path}"
                            data-description="${endpoint.description}">
                         <div class="flex items-start justify-between">
                           <div class="flex-1">
-                            <div class="flex items-center mb-2 flex-wrap gap-2">
-                              <span class="method-badge method-${endpoint.method.toLowerCase()} px-2.5 py-1 rounded-md text-xs font-mono font-bold">
+                            <div class="flex items-center mb-3 flex-wrap gap-2">
+                              <span class="method-badge method-${endpoint.method.toLowerCase()} px-3 py-1 rounded-md text-xs font-mono font-bold uppercase">
                                 ${endpoint.method}
                               </span>
-                              <code class="text-cyan-700 dark:text-cyan-400 text-sm font-mono">${endpoint.path}</code>
+                              <code class="text-cyan-700 dark:text-cyan-300 text-sm font-mono font-medium">${endpoint.path}</code>
                               ${endpoint.authentication ? `
-                                <span class="inline-flex items-center rounded-md bg-amber-50 dark:bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300 ring-1 ring-inset ring-amber-700/10 dark:ring-amber-400/20">
-                                  🔒 Auth Required
+                                <span class="inline-flex items-center rounded-md bg-amber-50 dark:bg-amber-500/10 px-2 py-1 text-xs font-medium text-amber-700 dark:text-amber-300 ring-1 ring-inset ring-amber-700/10 dark:ring-amber-400/20">
+                                  <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                  </svg>
+                                  Auth Required
                                 </span>
                               ` : `
-                                <span class="inline-flex items-center rounded-md bg-lime-50 dark:bg-lime-500/10 px-2 py-0.5 text-xs font-medium text-lime-700 dark:text-lime-300 ring-1 ring-inset ring-lime-700/10 dark:ring-lime-400/20">
-                                  🌍 Public
+                                <span class="inline-flex items-center rounded-md bg-lime-50 dark:bg-lime-500/10 px-2 py-1 text-xs font-medium text-lime-700 dark:text-lime-300 ring-1 ring-inset ring-lime-700/10 dark:ring-lime-400/20">
+                                  <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                  </svg>
+                                  Public
                                 </span>
                               `}
                             </div>
-                            <p class="text-zinc-600 dark:text-zinc-300 text-sm">${endpoint.description}</p>
+                            <p class="text-zinc-600 dark:text-zinc-400 text-sm leading-6">${endpoint.description}</p>
                           </div>
                         </div>
                       </div>
@@ -253,14 +250,29 @@ export function renderAPIReferencePage(data: APIReferencePageData): string {
 
     <style>
       .method-badge {
-        min-width: 50px;
+        min-width: 60px;
         text-align: center;
       }
-      .method-get { background-color: rgba(34, 197, 94, 0.8); color: white; }
-      .method-post { background-color: rgba(59, 130, 246, 0.8); color: white; }
-      .method-put { background-color: rgba(249, 115, 22, 0.8); color: white; }
-      .method-patch { background-color: rgba(168, 85, 247, 0.8); color: white; }
-      .method-delete { background-color: rgba(239, 68, 68, 0.8); color: white; }
+      .method-get {
+        background-color: rgb(34 197 94);
+        color: white;
+      }
+      .method-post {
+        background-color: rgb(59 130 246);
+        color: white;
+      }
+      .method-put {
+        background-color: rgb(251 146 60);
+        color: white;
+      }
+      .method-patch {
+        background-color: rgb(168 85 247);
+        color: white;
+      }
+      .method-delete {
+        background-color: rgb(244 63 94);
+        color: white;
+      }
     </style>
 
     <script>

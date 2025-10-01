@@ -42,6 +42,9 @@ export function renderContentListPage(data: ContentListPageData): string {
   if (data.page && data.page !== 1) urlParams.set('page', data.page.toString())
   const currentParams = urlParams.toString()
 
+  // Check if filters are active (not in default state)
+  const hasActiveFilters = data.modelName !== 'all' || data.status !== 'all' || !!data.search
+
   // Prepare filter bar data
   const filterBarData: FilterBarData = {
     filters: [
@@ -207,11 +210,11 @@ export function renderContentListPage(data: ContentListPageData): string {
         </div>
       </div>
       <!-- Filters -->
-      <div class="relative rounded-xl overflow-hidden mb-6">
+      <div class="relative rounded-xl mb-6">
         <!-- Gradient Background -->
-        <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 dark:from-cyan-400/20 dark:via-blue-400/20 dark:to-purple-400/20"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 dark:from-cyan-400/20 dark:via-blue-400/20 dark:to-purple-400/20 rounded-xl"></div>
 
-        <div class="relative bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10">
+        <div class="relative bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 rounded-xl">
           <div class="px-6 py-5">
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-4">
@@ -293,6 +296,10 @@ export function renderContentListPage(data: ContentListPageData): string {
                       params.set('page', '1');
                       window.location.href = window.location.pathname + '?' + params.toString();
                     }
+
+                    function clearAllFilters() {
+                      window.location.href = window.location.pathname;
+                    }
                   </script>
                 </div>
 
@@ -330,6 +337,22 @@ export function renderContentListPage(data: ContentListPageData): string {
                     </div>
                   </div>
                 `}).join('')}
+
+                <!-- Clear Filters Button -->
+                ${hasActiveFilters ? `
+                  <div>
+                    <label class="block text-sm/6 font-medium text-zinc-950 dark:text-white mb-2">&nbsp;</label>
+                    <button
+                      onclick="clearAllFilters()"
+                      class="inline-flex items-center gap-x-1.5 px-3 py-2 bg-pink-50 dark:bg-pink-500/10 text-pink-700 dark:text-pink-300 text-sm font-medium rounded-md ring-1 ring-inset ring-pink-600/20 dark:ring-pink-500/20 hover:bg-pink-100 dark:hover:bg-pink-500/20 transition-colors"
+                    >
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
+                      Clear Filters
+                    </button>
+                  </div>
+                ` : ''}
               </div>
               <div class="flex items-center gap-x-3">
                 <span class="text-sm/6 font-medium text-zinc-700 dark:text-zinc-300 px-3 py-1.5 rounded-full bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm">${data.totalItems} ${data.totalItems === 1 ? 'item' : 'items'}</span>
@@ -362,7 +385,7 @@ export function renderContentListPage(data: ContentListPageData): string {
 
                     <div
                       id="bulk-actions-menu"
-                      class="hidden absolute right-0 mt-2 w-56 origin-top-right divide-y divide-zinc-200 dark:divide-white/10 rounded-lg bg-white dark:bg-zinc-800 shadow-xl ring-1 ring-zinc-950/5 dark:ring-white/10 z-50 transition-all duration-100 scale-95 opacity-0"
+                      class="hidden absolute right-0 mt-2 w-56 origin-top-right divide-y divide-zinc-200 dark:divide-white/10 rounded-lg bg-white dark:bg-zinc-900 shadow-xl ring-1 ring-zinc-950/5 dark:ring-white/10 z-50 transition-all duration-100 scale-95 opacity-0"
                       style="transition-behavior: allow-discrete;"
                     >
                       <div class="py-1">
