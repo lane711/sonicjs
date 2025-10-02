@@ -398,13 +398,6 @@ function renderCatalystSidebar(
       </svg>`,
     },
     {
-      label: "Workflow",
-      path: "/admin/workflow/dashboard",
-      icon: `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-      </svg>`,
-    },
-    {
       label: "Plugins",
       path: "/admin/plugins",
       icon: `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -452,11 +445,15 @@ function renderCatalystSidebar(
   // Combine base menu items with dynamic menu items
   const allMenuItems = [...baseMenuItems];
   if (dynamicMenuItems && dynamicMenuItems.length > 0) {
-    const workflowIndex = allMenuItems.findIndex(
-      (item) => item.path === "/admin/workflow/dashboard"
+    // Insert dynamic menu items after Users menu item
+    const usersIndex = allMenuItems.findIndex(
+      (item) => item.path === "/admin/users"
     );
-    if (workflowIndex !== -1) {
-      allMenuItems.splice(workflowIndex, 0, ...dynamicMenuItems);
+    if (usersIndex !== -1) {
+      allMenuItems.splice(usersIndex + 1, 0, ...dynamicMenuItems);
+    } else {
+      // Fallback: add to end if Users not found
+      allMenuItems.push(...dynamicMenuItems);
     }
   }
 

@@ -531,13 +531,6 @@ function renderSidebar(currentPath: string, user?: any, dynamicMenuItems?: Array
       </svg>`
     },
     {
-      label: 'Workflow',
-      path: '/admin/workflow/dashboard',
-      icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
-      </svg>`
-    },
-    {
       label: 'Plugins',
       path: '/admin/plugins',
       icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -591,20 +584,15 @@ function renderSidebar(currentPath: string, user?: any, dynamicMenuItems?: Array
 
   // Combine base menu items with dynamic menu items from active plugins
   const allMenuItems = [...baseMenuItems]
-  
-  // Insert dynamic menu items after "Users" and before "Workflow"
+
+  // Insert dynamic menu items after "Users"
   if (dynamicMenuItems && dynamicMenuItems.length > 0) {
-    const workflowIndex = allMenuItems.findIndex(item => item.path === '/admin/workflow/dashboard')
-    if (workflowIndex !== -1) {
-      allMenuItems.splice(workflowIndex, 0, ...dynamicMenuItems)
+    const usersIndex = allMenuItems.findIndex(item => item.path === '/admin/users')
+    if (usersIndex !== -1) {
+      allMenuItems.splice(usersIndex + 1, 0, ...dynamicMenuItems)
     } else {
-      // If Workflow not found, add at the end before settings
-      const settingsIndex = allMenuItems.findIndex(item => item.path === '/admin/settings')
-      if (settingsIndex !== -1) {
-        allMenuItems.splice(settingsIndex, 0, ...dynamicMenuItems)
-      } else {
-        allMenuItems.push(...dynamicMenuItems)
-      }
+      // Fallback: add to end if Users not found
+      allMenuItems.push(...dynamicMenuItems)
     }
   }
 
