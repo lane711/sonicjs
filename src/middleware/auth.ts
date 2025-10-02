@@ -68,12 +68,12 @@ export const requireAuth = () => {
     try {
       // Try to get token from Authorization header
       let token = c.req.header('Authorization')?.replace('Bearer ', '')
-      
+
       // If no header token, try cookie
       if (!token) {
         token = getCookie(c, 'auth_token')
       }
-      
+
       if (!token) {
         // Check if this is a browser request (HTML accept header)
         const acceptHeader = c.req.header('Accept') || ''
@@ -82,8 +82,30 @@ export const requireAuth = () => {
         }
         return c.json({ error: 'Authentication required' }, 401)
       }
-      
-      const payload = await AuthManager.verifyToken(token)
+
+      // Try to get cached token verification from KV
+      const kv = c.env?.KV
+      let payload: JWTPayload | null = null
+
+      if (kv) {
+        const cacheKey = `auth:${token.substring(0, 20)}` // Use token prefix as key
+        const cached = await kv.get(cacheKey, 'json')
+        if (cached) {
+          payload = cached as JWTPayload
+        }
+      }
+
+      // If not cached, verify token
+      if (!payload) {
+        payload = await AuthManager.verifyToken(token)
+
+        // Cache the verified payload for 5 minutes
+        if (payload && kv) {
+          const cacheKey = `auth:${token.substring(0, 20)}`
+          await kv.put(cacheKey, JSON.stringify(payload), { expirationTtl: 300 })
+        }
+      }
+
       if (!payload) {
         // Check if this is a browser request (HTML accept header)
         const acceptHeader = c.req.header('Accept') || ''
@@ -92,10 +114,10 @@ export const requireAuth = () => {
         }
         return c.json({ error: 'Invalid or expired token' }, 401)
       }
-      
+
       // Add user info to context
       c.set('user', payload)
-      
+
       return await next()
     } catch (error) {
       console.error('Auth middleware error:', error)

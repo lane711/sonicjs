@@ -25,6 +25,7 @@ import { requireAuth, requireRole, optionalAuth } from './middleware/auth'
 import { requireActivePlugin } from './middleware/plugin-middleware'
 import { bootstrapMiddleware } from './middleware/bootstrap'
 import { loggingMiddleware, securityLoggingMiddleware, performanceLoggingMiddleware } from './middleware/logging'
+import { compressionMiddleware, securityHeaders, cacheHeaders } from './middleware/performance'
 
 // Define the Cloudflare Workers environment
 type Bindings = {
@@ -64,6 +65,9 @@ app.use('*', performanceLoggingMiddleware(1000)) // Log requests slower than 1 s
 // Middleware
 app.use('*', logger())
 app.use('*', cors())
+// Compression disabled - causes encoding issues
+// app.use('*', compressionMiddleware)
+app.use('*', securityHeaders())
 app.use('/api/*', prettyJSON())
 
 // Static file serving for images
@@ -109,6 +113,8 @@ app.use('/admin/*', async (c, next) => {
   }
 })
 app.use('/admin/*', requireRole(['admin', 'editor']))
+// Add caching for admin pages (60 second cache)
+app.use('/admin/*', cacheHeaders(60))
 app.route('/admin', adminRoutes)
 app.route('/admin/media', adminMediaRoutes)
 app.route('/admin/content', adminContentRoutes)
