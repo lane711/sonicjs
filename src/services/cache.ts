@@ -1,0 +1,421 @@
+/**
+ * Cache Service
+ *
+ * Three-tiered caching implementation:
+ * 1. In-Memory Cache (fastest, region-specific)
+ * 2. Cloudflare KV Cache (fast, global)
+ * 3. Database (fallback, source of truth)
+ */
+
+import { CacheConfig, CacheStats, generateCacheKey } from './cache-config'
+
+/**
+ * Cache entry with metadata
+ */
+interface CacheEntry<T> {
+  data: T
+  timestamp: number
+  expiresAt: number
+  version: string
+}
+
+/**
+ * In-memory cache store
+ */
+class MemoryCache {
+  private cache: Map<string, CacheEntry<any>> = new Map()
+  private maxSize: number = 50 * 1024 * 1024 // 50MB
+  private currentSize: number = 0
+
+  /**
+   * Get item from memory cache
+   */
+  get<T>(key: string): T | null {
+    const entry = this.cache.get(key)
+
+    if (!entry) {
+      return null
+    }
+
+    // Check expiration
+    if (Date.now() > entry.expiresAt) {
+      this.delete(key)
+      return null
+    }
+
+    return entry.data as T
+  }
+
+  /**
+   * Set item in memory cache
+   */
+  set<T>(key: string, value: T, ttl: number, version: string = 'v1'): void {
+    const now = Date.now()
+    const entry: CacheEntry<T> = {
+      data: value,
+      timestamp: now,
+      expiresAt: now + (ttl * 1000),
+      version
+    }
+
+    // Estimate size (rough approximation)
+    const entrySize = JSON.stringify(entry).length * 2 // UTF-16
+
+    // Check if we need to evict
+    if (this.currentSize + entrySize > this.maxSize) {
+      this.evictLRU(entrySize)
+    }
+
+    // Delete old entry if exists
+    if (this.cache.has(key)) {
+      this.delete(key)
+    }
+
+    this.cache.set(key, entry)
+    this.currentSize += entrySize
+  }
+
+  /**
+   * Delete item from memory cache
+   */
+  delete(key: string): boolean {
+    const entry = this.cache.get(key)
+    if (entry) {
+      const entrySize = JSON.stringify(entry).length * 2
+      this.currentSize -= entrySize
+      return this.cache.delete(key)
+    }
+    return false
+  }
+
+  /**
+   * Clear all items from memory cache
+   */
+  clear(): void {
+    this.cache.clear()
+    this.currentSize = 0
+  }
+
+  /**
+   * Get cache statistics
+   */
+  getStats(): { size: number; count: number } {
+    return {
+      size: this.currentSize,
+      count: this.cache.size
+    }
+  }
+
+  /**
+   * Evict least recently used items to make space
+   */
+  private evictLRU(neededSpace: number): void {
+    // Sort by timestamp (oldest first)
+    const entries = Array.from(this.cache.entries()).sort(
+      (a, b) => a[1].timestamp - b[1].timestamp
+    )
+
+    let freedSpace = 0
+    for (const [key, entry] of entries) {
+      if (freedSpace >= neededSpace) break
+
+      const entrySize = JSON.stringify(entry).length * 2
+      this.delete(key)
+      freedSpace += entrySize
+    }
+  }
+
+  /**
+   * Delete items matching a pattern
+   */
+  invalidatePattern(pattern: string): number {
+    const regex = new RegExp(
+      '^' + pattern.replace(/\*/g, '.*').replace(/\?/g, '.') + '$'
+    )
+
+    let count = 0
+    for (const key of this.cache.keys()) {
+      if (regex.test(key)) {
+        this.delete(key)
+        count++
+      }
+    }
+
+    return count
+  }
+}
+
+/**
+ * Main cache service with multi-tier support
+ */
+export class CacheService {
+  private memoryCache: MemoryCache
+  private config: CacheConfig
+  private stats: CacheStats
+
+  constructor(config: CacheConfig) {
+    this.memoryCache = new MemoryCache()
+    this.config = config
+    this.stats = {
+      memoryHits: 0,
+      memoryMisses: 0,
+      kvHits: 0,
+      kvMisses: 0,
+      dbHits: 0,
+      totalRequests: 0,
+      hitRate: 0,
+      memorySize: 0,
+      entryCount: 0
+    }
+  }
+
+  /**
+   * Get value from cache (tries memory first)
+   */
+  async get<T>(key: string): Promise<T | null> {
+    this.stats.totalRequests++
+
+    // Try memory cache first
+    if (this.config.memoryEnabled) {
+      const memoryValue = this.memoryCache.get<T>(key)
+      if (memoryValue !== null) {
+        this.stats.memoryHits++
+        this.updateHitRate()
+        return memoryValue
+      }
+      this.stats.memoryMisses++
+    }
+
+    // KV cache will be added in Phase 2
+    // For now, return null if not in memory
+    this.updateHitRate()
+    return null
+  }
+
+  /**
+   * Set value in cache
+   */
+  async set<T>(
+    key: string,
+    value: T,
+    customConfig?: Partial<CacheConfig>
+  ): Promise<void> {
+    const config = { ...this.config, ...customConfig }
+
+    // Store in memory cache
+    if (config.memoryEnabled) {
+      this.memoryCache.set(key, value, config.ttl, config.version)
+    }
+
+    // KV cache will be added in Phase 2
+  }
+
+  /**
+   * Delete value from cache
+   */
+  async delete(key: string): Promise<void> {
+    // Delete from memory
+    if (this.config.memoryEnabled) {
+      this.memoryCache.delete(key)
+    }
+
+    // KV cache will be added in Phase 2
+  }
+
+  /**
+   * Clear all cache entries for this namespace
+   */
+  async clear(): Promise<void> {
+    if (this.config.memoryEnabled) {
+      this.memoryCache.clear()
+    }
+
+    // Reset stats
+    this.stats = {
+      memoryHits: 0,
+      memoryMisses: 0,
+      kvHits: 0,
+      kvMisses: 0,
+      dbHits: 0,
+      totalRequests: 0,
+      hitRate: 0,
+      memorySize: 0,
+      entryCount: 0
+    }
+  }
+
+  /**
+   * Invalidate cache entries matching a pattern
+   */
+  async invalidate(pattern: string): Promise<number> {
+    let count = 0
+
+    // Invalidate from memory
+    if (this.config.memoryEnabled) {
+      count += this.memoryCache.invalidatePattern(pattern)
+    }
+
+    // KV cache will be added in Phase 2
+
+    return count
+  }
+
+  /**
+   * Get cache statistics
+   */
+  getStats(): CacheStats {
+    const memStats = this.memoryCache.getStats()
+
+    return {
+      ...this.stats,
+      memorySize: memStats.size,
+      entryCount: memStats.count
+    }
+  }
+
+  /**
+   * Update hit rate calculation
+   */
+  private updateHitRate(): void {
+    const totalHits = this.stats.memoryHits + this.stats.kvHits + this.stats.dbHits
+    this.stats.hitRate = this.stats.totalRequests > 0
+      ? (totalHits / this.stats.totalRequests) * 100
+      : 0
+  }
+
+  /**
+   * Generate a cache key using the configured namespace
+   */
+  generateKey(type: string, identifier: string): string {
+    return generateCacheKey(
+      this.config.namespace,
+      type,
+      identifier,
+      this.config.version
+    )
+  }
+
+  /**
+   * Warm cache with multiple entries
+   */
+  async warmCache<T>(entries: Array<{ key: string; value: T }>): Promise<void> {
+    for (const entry of entries) {
+      await this.set(entry.key, entry.value)
+    }
+  }
+
+  /**
+   * Check if a key exists in cache
+   */
+  async has(key: string): Promise<boolean> {
+    const value = await this.get(key)
+    return value !== null
+  }
+
+  /**
+   * Get multiple values at once
+   */
+  async getMany<T>(keys: string[]): Promise<Map<string, T>> {
+    const results = new Map<string, T>()
+
+    for (const key of keys) {
+      const value = await this.get<T>(key)
+      if (value !== null) {
+        results.set(key, value)
+      }
+    }
+
+    return results
+  }
+
+  /**
+   * Set multiple values at once
+   */
+  async setMany<T>(
+    entries: Array<{ key: string; value: T }>,
+    customConfig?: Partial<CacheConfig>
+  ): Promise<void> {
+    for (const entry of entries) {
+      await this.set(entry.key, entry.value, customConfig)
+    }
+  }
+
+  /**
+   * Delete multiple keys at once
+   */
+  async deleteMany(keys: string[]): Promise<void> {
+    for (const key of keys) {
+      await this.delete(key)
+    }
+  }
+
+  /**
+   * Get or set pattern - fetch from cache or compute if not found
+   */
+  async getOrSet<T>(
+    key: string,
+    fetcher: () => Promise<T>,
+    customConfig?: Partial<CacheConfig>
+  ): Promise<T> {
+    // Try to get from cache
+    const cached = await this.get<T>(key)
+    if (cached !== null) {
+      return cached
+    }
+
+    // Fetch from source
+    const value = await fetcher()
+
+    // Store in cache
+    await this.set(key, value, customConfig)
+
+    return value
+  }
+}
+
+/**
+ * Create a cache service instance with configuration
+ */
+export function createCacheService(config: CacheConfig): CacheService {
+  return new CacheService(config)
+}
+
+/**
+ * Global cache instances by namespace (singleton pattern)
+ */
+const cacheInstances = new Map<string, CacheService>()
+
+/**
+ * Get or create a cache service for a namespace
+ */
+export function getCacheService(config: CacheConfig): CacheService {
+  const key = config.namespace
+
+  if (!cacheInstances.has(key)) {
+    cacheInstances.set(key, new CacheService(config))
+  }
+
+  return cacheInstances.get(key)!
+}
+
+/**
+ * Clear all cache instances
+ */
+export async function clearAllCaches(): Promise<void> {
+  for (const cache of cacheInstances.values()) {
+    await cache.clear()
+  }
+}
+
+/**
+ * Get stats from all cache instances
+ */
+export function getAllCacheStats(): Record<string, CacheStats> {
+  const stats: Record<string, CacheStats> = {}
+
+  for (const [namespace, cache] of cacheInstances.entries()) {
+    stats[namespace] = cache.getStats()
+  }
+
+  return stats
+}
