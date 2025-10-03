@@ -122,34 +122,59 @@ adminRoutes.get('/', async (c) => {
 adminRoutes.get('/api/stats', async (c) => {
   try {
     const db = c.env.DB
-    
+
     // Get collections count
-    const collectionsStmt = db.prepare('SELECT COUNT(*) as count FROM collections WHERE is_active = 1')
-    const collectionsResult = await collectionsStmt.first()
-    
-    // Get content count
-    const contentStmt = db.prepare('SELECT COUNT(*) as count FROM content')
-    const contentResult = await contentStmt.first()
-    
-    // Get media count
-    const mediaStmt = db.prepare('SELECT COUNT(*) as count FROM media')
-    const mediaResult = await mediaStmt.first()
-    
-    // Get users count
-    const usersStmt = db.prepare('SELECT COUNT(*) as count FROM users WHERE is_active = 1')
-    const usersResult = await usersStmt.first()
-    
-    const stats: DashboardStats = {
-      collections: (collectionsResult as any)?.count || 0,
-      contentItems: (contentResult as any)?.count || 0,
-      mediaFiles: (mediaResult as any)?.count || 0,
-      users: (usersResult as any)?.count || 0
+    let collectionsCount = 0
+    try {
+      const collectionsStmt = db.prepare('SELECT COUNT(*) as count FROM collections WHERE is_active = 1')
+      const collectionsResult = await collectionsStmt.first()
+      collectionsCount = (collectionsResult as any)?.count || 0
+    } catch (error) {
+      console.error('Error fetching collections count:', error)
     }
-    
+
+    // Get content count
+    let contentCount = 0
+    try {
+      const contentStmt = db.prepare('SELECT COUNT(*) as count FROM content')
+      const contentResult = await contentStmt.first()
+      contentCount = (contentResult as any)?.count || 0
+    } catch (error) {
+      console.error('Error fetching content count:', error)
+    }
+
+    // Get media count
+    let mediaCount = 0
+    try {
+      const mediaStmt = db.prepare('SELECT COUNT(*) as count FROM media')
+      const mediaResult = await mediaStmt.first()
+      mediaCount = (mediaResult as any)?.count || 0
+    } catch (error) {
+      console.error('Error fetching media count:', error)
+      // Media table might not exist yet, that's okay
+    }
+
+    // Get users count
+    let usersCount = 0
+    try {
+      const usersStmt = db.prepare('SELECT COUNT(*) as count FROM users WHERE is_active = 1')
+      const usersResult = await usersStmt.first()
+      usersCount = (usersResult as any)?.count || 0
+    } catch (error) {
+      console.error('Error fetching users count:', error)
+    }
+
+    const stats: DashboardStats = {
+      collections: collectionsCount,
+      contentItems: contentCount,
+      mediaFiles: mediaCount,
+      users: usersCount
+    }
+
     return c.html(renderStatsCards(stats))
   } catch (error) {
     console.error('Error fetching stats:', error)
-    return c.html(html`<p>Error loading statistics</p>`)
+    return c.html(html`<p>Error loading statistics: ${(error as Error).message}</p>`)
   }
 })
 
