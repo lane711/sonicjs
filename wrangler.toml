@@ -24,6 +24,12 @@ database_id = "874cad37-313c-4d71-97fa-ad7184526f5a"
 binding = "MEDIA_BUCKET"
 bucket_name = "sonicjs-media-dev"
 
+# KV Namespace for caching
+[[kv_namespaces]]
+binding = "CACHE_KV"
+id = "placeholder-dev"
+preview_id = "placeholder-preview-dev"
+
 [env.preview]
 name = "sonicjs-ai-preview"
 
@@ -41,6 +47,11 @@ database_id = "874cad37-313c-4d71-97fa-ad7184526f5a"
 binding = "MEDIA_BUCKET"
 bucket_name = "sonicjs-media-preview"
 
+[[env.preview.kv_namespaces]]
+binding = "CACHE_KV"
+id = "placeholder-preview"
+preview_id = "placeholder-preview-preview"
+
 [env.production]
 name = "sonicjs-ai-prod"
 
@@ -55,3 +66,8 @@ database_id = "583c089c-1a4a-477d-9d58-06c07bf7c1d7"
 [[env.production.r2_buckets]]
 binding = "MEDIA_BUCKET"
 bucket_name = "sonicjs-media-prod"
+
+[[env.production.kv_namespaces]]
+binding = "CACHE_KV"
+id = "placeholder-prod"
+preview_id = "placeholder-preview-prod"

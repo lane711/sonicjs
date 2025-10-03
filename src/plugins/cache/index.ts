@@ -138,7 +138,12 @@ export class CachePlugin {
 }
 
 // Export cache services for use by other plugins/routes when cache plugin is active
-export { getCacheService, clearAllCaches, getAllCacheStats } from './services/cache'
+export {
+  getCacheService,
+  clearAllCaches,
+  getAllCacheStats,
+  setGlobalKVNamespace
+} from './services/cache'
 export { CACHE_CONFIGS, getCacheConfig, generateCacheKey } from './services/cache-config'
 export type { CacheConfig, CacheStats } from './services/cache-config'
 

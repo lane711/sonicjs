@@ -5,9 +5,9 @@ Three-tiered caching system for SonicJS that provides automatic caching for cont
 ## Features
 
 - **Three-tier caching architecture**
-  - Tier 1: In-Memory (fastest, region-specific)
-  - Tier 2: Cloudflare KV (fast, global) - *Phase 2*
-  - Tier 3: Database (source of truth)
+  - Tier 1: In-Memory (fastest, region-specific, ~1-2ms)
+  - Tier 2: Cloudflare KV (fast, global, ~5-10ms)
+  - Tier 3: Database (source of truth, ~50-100ms)
 
 - **Automatic cache management**
   - TTL-based expiration
@@ -24,6 +24,35 @@ Three-tiered caching system for SonicJS that provides automatic caching for cont
 ## Installation
 
 The cache plugin is included by default but can be disabled if caching is not needed.
+
+### Setting Up Cloudflare KV (Optional)
+
+To enable Tier 2 (KV) caching, you need to create a KV namespace:
+
+```bash
+# Create KV namespace for development
+wrangler kv:namespace create "CACHE_KV"
+
+# Create KV namespace for production
+wrangler kv:namespace create "CACHE_KV" --env production
+```
+
+Then update your `wrangler.toml` with the namespace IDs:
+
+```toml
+[[kv_namespaces]]
+binding = "CACHE_KV"
+id = "your-namespace-id-from-above"
+preview_id = "your-preview-namespace-id"
+```
+
+Finally, enable KV caching in the plugin settings:
+
+```json
+{
+  "kvEnabled": true
+}
+```
 
 ## Configuration
 
@@ -42,6 +71,9 @@ Configure the cache plugin through the admin interface at `/admin/plugins/cache`
 
 - **memoryEnabled** (boolean): Enable in-memory caching (default: `true`)
 - **kvEnabled** (boolean): Enable Cloudflare KV caching (default: `false`)
+  - Requires KV namespace binding in `wrangler.toml`
+  - Provides global, persistent caching across all edge locations
+  - Recommended for production environments
 - **defaultTTL** (number): Default time-to-live in seconds (default: `3600`)
 - **maxMemorySize** (number): Maximum memory cache size in MB (default: `50`)
 
@@ -161,10 +193,24 @@ The cache system automatically invalidates entries based on events:
 
 Enabling caching can significantly improve performance:
 
-- **Content queries**: 50-100x faster (1-2ms vs 50-100ms)
-- **User authentication**: 10-20x faster
-- **API responses**: Reduced database load
-- **Media metadata**: Faster gallery rendering
+### Memory Cache (Tier 1)
+- **Response time**: 1-2ms
+- **Content queries**: 50-100x faster than database
+- **Best for**: Frequently accessed data in the same region
+- **Limitations**: Region-specific, not persistent across deployments
+
+### KV Cache (Tier 2)
+- **Response time**: 5-10ms
+- **Global reach**: Cached at edge locations worldwide
+- **Persistent**: Survives deployments and restarts
+- **Best for**: Global content distribution
+- **Limitations**: Slightly slower than memory, costs per operation
+
+### Combined (Memory + KV)
+- **First request**: Checks memory → KV → database
+- **Subsequent requests**: Served from memory (fastest)
+- **Cross-region**: Other regions benefit from KV cache
+- **Optimal setup**: Both tiers enabled for best performance
 
 ## When to Disable
 
