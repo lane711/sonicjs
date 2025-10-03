@@ -202,7 +202,6 @@ authRoutes.post('/login',
         .run()
 
       // Invalidate user cache on login
-      const cache = getCacheService(CACHE_CONFIGS.user)
       await cache.delete(cache.generateKey('user', user.id))
       await cache.delete(cache.generateKey('user', `email:${normalizedEmail}`))
 
