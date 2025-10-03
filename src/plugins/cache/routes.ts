@@ -8,6 +8,7 @@ import { Hono } from 'hono'
 import type { Context } from 'hono'
 import { getAllCacheStats, clearAllCaches, getCacheService } from './services/cache.js'
 import { CACHE_CONFIGS } from './services/cache-config.js'
+import { renderCacheDashboard, CacheDashboardData } from '../../templates/pages/admin-cache.template.js'
 
 const app = new Hono()
 
@@ -17,6 +18,7 @@ const app = new Hono()
  */
 app.get('/', async (c: Context) => {
   const stats = getAllCacheStats()
+  const user = c.get('user')
 
   // Calculate totals
   let totalHits = 0
@@ -34,22 +36,25 @@ app.get('/', async (c: Context) => {
   const totalRequests = totalHits + totalMisses
   const overallHitRate = totalRequests > 0 ? (totalHits / totalRequests) * 100 : 0
 
-  return c.json({
-    success: true,
-    data: {
-      stats,
-      totals: {
-        hits: totalHits,
-        misses: totalMisses,
-        requests: totalRequests,
-        hitRate: overallHitRate.toFixed(2),
-        memorySize: totalSize,
-        entryCount: totalEntries
-      },
-      namespaces: Object.keys(stats),
-      timestamp: new Date().toISOString()
-    }
-  })
+  const dashboardData: CacheDashboardData = {
+    stats,
+    totals: {
+      hits: totalHits,
+      misses: totalMisses,
+      requests: totalRequests,
+      hitRate: overallHitRate.toFixed(2),
+      memorySize: totalSize,
+      entryCount: totalEntries
+    },
+    namespaces: Object.keys(stats),
+    user: user ? {
+      name: user.email,
+      email: user.email,
+      role: user.role
+    } : undefined
+  }
+
+  return c.html(renderCacheDashboard(dashboardData))
 })
 
 /**
