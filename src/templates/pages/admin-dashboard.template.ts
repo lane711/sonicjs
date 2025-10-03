@@ -14,6 +14,7 @@ export interface DashboardPageData {
     email: string
     role: string
   }
+  version?: string
 }
 
 export function renderDashboardPage(data: DashboardPageData): string {
@@ -172,6 +173,7 @@ export function renderDashboardPage(data: DashboardPageData): string {
     pageTitle: 'SonicJS AI Admin',
     currentPath: '/admin',
     user: data.user,
+    version: data.version,
     content: pageContent
   }
 
