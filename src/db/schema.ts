@@ -25,6 +25,7 @@ export const collections = sqliteTable('collections', {
   description: text('description'),
   schema: text('schema', { mode: 'json' }).notNull(), // JSON schema definition
   isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  managed: integer('managed', { mode: 'boolean' }).notNull().default(false), // Config-managed collections cannot be edited in UI
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
 });

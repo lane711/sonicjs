@@ -1,6 +1,7 @@
 import { Context, Next } from 'hono'
 import { PluginBootstrapService } from '../services/plugin-bootstrap'
 import { MigrationService } from '../services/migrations'
+import { syncCollections } from '../services/collection-sync'
 
 type Bindings = {
   DB: D1Database
@@ -44,22 +45,31 @@ export function bootstrapMiddleware() {
       const migrationService = new MigrationService(c.env.DB)
       await migrationService.runPendingMigrations()
       
-      // 2. Bootstrap core plugins
+      // 2. Sync collection configurations
+      console.log('[Bootstrap] Syncing collection configurations...')
+      try {
+        await syncCollections(c.env.DB)
+      } catch (error) {
+        console.error('[Bootstrap] Error syncing collections:', error)
+        // Continue bootstrap even if collection sync fails
+      }
+
+      // 3. Bootstrap core plugins
       console.log('[Bootstrap] Bootstrapping core plugins...')
       const bootstrapService = new PluginBootstrapService(c.env.DB)
-      
+
       // Check if bootstrap is needed
       const needsBootstrap = await bootstrapService.isBootstrapNeeded()
       if (needsBootstrap) {
         await bootstrapService.bootstrapCorePlugins()
-        
+
         // Optionally install demo plugins
         // Note: process.env is not available in Cloudflare Workers
         // You can use a KV flag or environment binding to control this
         console.log('[Bootstrap] Installing demo plugins...')
         await bootstrapService.installDemoPlugins()
       }
-      
+
       // Mark bootstrap as complete for this worker instance
       bootstrapComplete = true
       console.log('[Bootstrap] System initialization completed')

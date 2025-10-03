@@ -16,6 +16,13 @@ export interface DatabaseStats {
   totalRows: number
 }
 
+export interface TableData {
+  tableName: string
+  columns: string[]
+  rows: any[]
+  totalRows: number
+}
+
 export class DatabaseToolsService {
   constructor(private db: D1Database) {}
 
@@ -192,6 +199,57 @@ export class DatabaseToolsService {
         success: false,
         message: `Backup failed: ${error}`
       }
+    }
+  }
+
+  /**
+   * Get table data with optional pagination and sorting
+   */
+  async getTableData(
+    tableName: string,
+    limit: number = 100,
+    offset: number = 0,
+    sortColumn?: string,
+    sortDirection: 'asc' | 'desc' = 'asc'
+  ): Promise<TableData> {
+    try {
+      // Validate table name to prevent SQL injection
+      const tables = await this.getTables()
+      if (!tables.includes(tableName)) {
+        throw new Error(`Table ${tableName} not found`)
+      }
+
+      // Get column names
+      const pragmaResult = await this.db.prepare(`PRAGMA table_info(${tableName})`).all()
+      const columns = pragmaResult.results?.map((col: any) => col.name) || []
+
+      // Validate sort column if provided
+      if (sortColumn && !columns.includes(sortColumn)) {
+        sortColumn = undefined
+      }
+
+      // Get total row count
+      const countResult = await this.db.prepare(`SELECT COUNT(*) as count FROM ${tableName}`).first()
+      const totalRows = (countResult?.count as number) || 0
+
+      // Build query with optional sorting
+      let query = `SELECT * FROM ${tableName}`
+      if (sortColumn) {
+        query += ` ORDER BY ${sortColumn} ${sortDirection.toUpperCase()}`
+      }
+      query += ` LIMIT ${limit} OFFSET ${offset}`
+
+      // Get paginated data
+      const dataResult = await this.db.prepare(query).all()
+
+      return {
+        tableName,
+        columns,
+        rows: dataResult.results || [],
+        totalRows
+      }
+    } catch (error) {
+      throw new Error(`Failed to fetch table data: ${error}`)
     }
   }
 

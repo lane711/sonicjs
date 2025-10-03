@@ -9,6 +9,7 @@ export interface Collection {
   created_at: number
   formattedDate: string
   field_count?: number
+  managed?: boolean
 }
 
 export interface CollectionsListPageData {
@@ -33,10 +34,18 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
         sortable: true,
         sortType: 'string',
         render: (value, collection) => `
-            <div class="flex items-center ml-2">
+            <div class="flex items-center gap-2 ml-2">
                 <span class="inline-flex items-center rounded-md bg-cyan-50 dark:bg-cyan-500/10 px-2.5 py-1 text-sm font-medium text-cyan-700 dark:text-cyan-300 ring-1 ring-inset ring-cyan-700/10 dark:ring-cyan-400/20">
                   ${collection.name}
                 </span>
+                ${collection.managed ? `
+                  <span class="inline-flex items-center rounded-md bg-purple-50 dark:bg-purple-500/10 px-2 py-0.5 text-xs font-medium text-purple-700 dark:text-purple-300 ring-1 ring-inset ring-purple-700/10 dark:ring-purple-400/20" title="Config-managed collection (read-only in UI)">
+                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                    </svg>
+                    Config
+                  </span>
+                ` : ''}
             </div>
           `
       },

@@ -193,7 +193,7 @@ adminRoutes.get('/collections', async (c) => {
     let results
     if (search) {
       stmt = db.prepare(`
-        SELECT id, name, display_name, description, created_at
+        SELECT id, name, display_name, description, created_at, managed
         FROM collections
         WHERE is_active = 1
         AND (name LIKE ? OR display_name LIKE ? OR description LIKE ?)
@@ -203,7 +203,7 @@ adminRoutes.get('/collections', async (c) => {
       const queryResults = await stmt.bind(searchParam, searchParam, searchParam).all()
       results = queryResults.results
     } else {
-      stmt = db.prepare('SELECT id, name, display_name, description, created_at FROM collections WHERE is_active = 1 ORDER BY created_at DESC')
+      stmt = db.prepare('SELECT id, name, display_name, description, created_at, managed FROM collections WHERE is_active = 1 ORDER BY created_at DESC')
       const queryResults = await stmt.all()
       results = queryResults.results
     }
@@ -223,7 +223,8 @@ adminRoutes.get('/collections', async (c) => {
           description: row.description ? String(row.description) : undefined,
           created_at: Number(row.created_at || 0),
           formattedDate: row.created_at ? new Date(Number(row.created_at)).toLocaleDateString() : 'Unknown',
-          field_count: fieldCounts.get(String(row.id)) || 0
+          field_count: fieldCounts.get(String(row.id)) || 0,
+          managed: row.managed === 1
         }
       })
 

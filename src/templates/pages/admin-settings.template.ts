@@ -512,16 +512,29 @@ export function renderSettingsPage(data: SettingsPageData): string {
         const totalTablesEl = document.getElementById('total-tables');
         const totalRowsEl = document.getElementById('total-rows');
         const tablesListEl = document.getElementById('tables-list');
-        
+
         if (totalTablesEl) totalTablesEl.textContent = data.tables.length;
         if (totalRowsEl) totalRowsEl.textContent = data.totalRows.toLocaleString();
-        
+
         if (tablesListEl && data.tables && data.tables.length > 0) {
           tablesListEl.innerHTML = data.tables.map(table => \`
-            <div class="flex items-center justify-between py-2 px-3 rounded-lg bg-white/5">
-              <span class="text-white font-medium">\${table.name}</span>
-              <span class="text-gray-400 text-sm">\${table.rowCount.toLocaleString()} rows</span>
-            </div>
+            <a
+              href="/admin/database-tools/tables/\${table.name}"
+              class="flex items-center justify-between py-3 px-4 rounded-lg bg-white dark:bg-white/5 hover:bg-zinc-50 dark:hover:bg-white/10 cursor-pointer transition-colors ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 no-underline"
+            >
+              <div class="flex items-center space-x-3">
+                <svg class="w-5 h-5 text-zinc-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+                <span class="text-zinc-950 dark:text-white font-medium">\${table.name}</span>
+              </div>
+              <div class="flex items-center space-x-3">
+                <span class="text-zinc-500 dark:text-zinc-400 text-sm">\${table.rowCount.toLocaleString()} rows</span>
+                <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </div>
+            </a>
           \`).join('');
         }
       };
@@ -585,39 +598,39 @@ function renderGeneralSettings(settings?: GeneralSettings): string {
   return `
     <div class="space-y-6">
       <div>
-        <h3 class="text-lg font-semibold text-white mb-4">General Settings</h3>
-        <p class="text-gray-300 mb-6">Configure basic application settings and preferences.</p>
+        <h3 class="text-lg/7 font-semibold text-zinc-950 dark:text-white">General Settings</h3>
+        <p class="mt-1 text-sm/6 text-zinc-500 dark:text-zinc-400">Configure basic application settings and preferences.</p>
       </div>
       
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Site Name</label>
-            <input 
-              type="text" 
+            <label class="block text-sm/6 font-medium text-zinc-950 dark:text-white mb-2">Site Name</label>
+            <input
+              type="text"
               name="siteName"
               value="${settings?.siteName || 'SonicJS AI'}"
-              class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full rounded-lg bg-white dark:bg-white/5 px-3 py-2 text-sm/6 text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-500 dark:placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 dark:focus:ring-indigo-400"
               placeholder="Enter site name"
             />
           </div>
-          
+
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Admin Email</label>
-            <input 
-              type="email" 
+            <label class="block text-sm/6 font-medium text-zinc-950 dark:text-white mb-2">Admin Email</label>
+            <input
+              type="email"
               name="adminEmail"
               value="${settings?.adminEmail || 'admin@example.com'}"
-              class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full rounded-lg bg-white dark:bg-white/5 px-3 py-2 text-sm/6 text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-500 dark:placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 dark:focus:ring-indigo-400"
               placeholder="admin@example.com"
             />
           </div>
-          
+
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Timezone</label>
-            <select 
+            <label class="block text-sm/6 font-medium text-zinc-950 dark:text-white mb-2">Timezone</label>
+            <select
               name="timezone"
-              class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full rounded-lg bg-white dark:bg-white/5 px-3 py-2 text-sm/6 text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 dark:focus:ring-indigo-400"
             >
               <option value="UTC" ${settings?.timezone === 'UTC' ? 'selected' : ''}>UTC</option>
               <option value="America/New_York" ${settings?.timezone === 'America/New_York' ? 'selected' : ''}>Eastern Time</option>
@@ -627,23 +640,23 @@ function renderGeneralSettings(settings?: GeneralSettings): string {
             </select>
           </div>
         </div>
-        
+
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Site Description</label>
-            <textarea 
+            <label class="block text-sm/6 font-medium text-zinc-950 dark:text-white mb-2">Site Description</label>
+            <textarea
               name="siteDescription"
               rows="3"
-              class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full rounded-lg bg-white dark:bg-white/5 px-3 py-2 text-sm/6 text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-500 dark:placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 dark:focus:ring-indigo-400"
               placeholder="Describe your site..."
             >${settings?.siteDescription || ''}</textarea>
           </div>
-          
+
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Language</label>
-            <select 
+            <label class="block text-sm/6 font-medium text-zinc-950 dark:text-white mb-2">Language</label>
+            <select
               name="language"
-              class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full rounded-lg bg-white dark:bg-white/5 px-3 py-2 text-sm/6 text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 dark:focus:ring-indigo-400"
             >
               <option value="en" ${settings?.language === 'en' ? 'selected' : ''}>English</option>
               <option value="es" ${settings?.language === 'es' ? 'selected' : ''}>Spanish</option>
@@ -1377,33 +1390,37 @@ function renderDatabaseToolsSettings(settings?: DatabaseToolsSettings): string {
   return `
     <div class="space-y-6">
       <div>
-        <h3 class="text-lg font-semibold text-white mb-4">Database Tools</h3>
-        <p class="text-gray-300 mb-6">Manage database operations including backup, restore, and maintenance.</p>
+        <h3 class="text-lg/7 font-semibold text-zinc-950 dark:text-white">Database Tools</h3>
+        <p class="mt-1 text-sm/6 text-zinc-500 dark:text-zinc-400">Manage database operations including backup, restore, and maintenance.</p>
       </div>
-      
+
       <!-- Database Statistics -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div class="backdrop-blur-md bg-blue-500/20 rounded-lg border border-blue-500/30 p-4">
+        <div class="rounded-lg bg-white dark:bg-white/5 p-6 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-blue-300">Total Tables</p>
-              <p id="total-tables" class="text-2xl font-bold text-white">${settings?.totalTables || '0'}</p>
+              <p class="text-sm/6 font-medium text-zinc-500 dark:text-zinc-400">Total Tables</p>
+              <p id="total-tables" class="mt-2 text-3xl/8 font-semibold text-zinc-950 dark:text-white">${settings?.totalTables || '0'}</p>
             </div>
-            <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-            </svg>
+            <div class="rounded-lg bg-indigo-500/10 p-3">
+              <svg class="w-8 h-8 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+              </svg>
+            </div>
           </div>
         </div>
-        
-        <div class="backdrop-blur-md bg-green-500/20 rounded-lg border border-green-500/30 p-4">
+
+        <div class="rounded-lg bg-white dark:bg-white/5 p-6 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-green-300">Total Rows</p>
-              <p id="total-rows" class="text-2xl font-bold text-white">${settings?.totalRows?.toLocaleString() || '0'}</p>
+              <p class="text-sm/6 font-medium text-zinc-500 dark:text-zinc-400">Total Rows</p>
+              <p id="total-rows" class="mt-2 text-3xl/8 font-semibold text-zinc-950 dark:text-white">${settings?.totalRows?.toLocaleString() || '0'}</p>
             </div>
-            <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
-            </svg>
+            <div class="rounded-lg bg-green-500/10 p-3">
+              <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+              </svg>
+            </div>
           </div>
         </div>
       </div>
@@ -1411,89 +1428,84 @@ function renderDatabaseToolsSettings(settings?: DatabaseToolsSettings): string {
       <!-- Database Operations -->
       <div class="space-y-4">
         <!-- Safe Operations -->
-        <div class="backdrop-blur-md bg-white/10 rounded-lg border border-white/20 p-4">
-          <h4 class="text-lg font-medium text-white mb-4">Safe Operations</h4>
+        <div class="rounded-lg bg-white dark:bg-white/5 p-6 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10">
+          <h4 class="text-base/7 font-semibold text-zinc-950 dark:text-white mb-4">Safe Operations</h4>
           <div class="flex flex-wrap gap-3">
-            <button 
-              onclick="refreshDatabaseStats()" 
-              class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+            <button
+              onclick="refreshDatabaseStats()"
+              class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm"
             >
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
               </svg>
               Refresh Stats
             </button>
-            
-            <button 
-              onclick="createDatabaseBackup()" 
+
+            <button
+              onclick="createDatabaseBackup()"
               id="create-backup-btn"
-              class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
+              class="inline-flex items-center justify-center rounded-lg bg-indigo-600 dark:bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 dark:hover:bg-indigo-400 transition-colors shadow-sm"
             >
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
               </svg>
               Create Backup
             </button>
-            
-            <button 
-              onclick="validateDatabase()" 
-              class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors"
+
+            <button
+              onclick="validateDatabase()"
+              class="inline-flex items-center justify-center rounded-lg bg-green-600 dark:bg-green-500 px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-green-500 dark:hover:bg-green-400 transition-colors shadow-sm"
             >
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
               Validate Database
             </button>
           </div>
         </div>
-        
-        <!-- Danger Zone -->
-        <div class="backdrop-blur-md bg-red-500/10 rounded-lg border border-red-500/20 p-4">
-          <div class="flex items-start space-x-3 mb-4">
-            <svg class="w-6 h-6 text-red-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.268 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+      </div>
+
+      <!-- Tables List -->
+      <div class="rounded-lg bg-white dark:bg-white/5 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 overflow-hidden">
+        <div class="px-6 py-4 border-b border-zinc-950/10 dark:border-white/10">
+          <h4 class="text-base/7 font-semibold text-zinc-950 dark:text-white">Database Tables</h4>
+          <p class="mt-1 text-sm/6 text-zinc-500 dark:text-zinc-400">Click on a table to view its data</p>
+        </div>
+
+        <div id="tables-list" class="p-6 space-y-2">
+          <div class="text-center py-8">
+            <svg class="w-12 h-12 text-zinc-400 dark:text-zinc-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
             </svg>
-            <div>
-              <h4 class="text-lg font-semibold text-red-400 mb-2">⚠️ Danger Zone</h4>
-              <p class="text-gray-300 text-sm mb-4">
-                These operations are destructive and cannot be undone. 
-                <strong>Your admin account will be preserved</strong>, but all other data will be permanently deleted.
-              </p>
-              <div class="space-y-3">
-                <div class="p-3 bg-red-500/20 rounded-lg border border-red-500/30">
-                  <p class="text-red-200 text-sm mb-2">
-                    <strong>Truncate Database:</strong> This will delete ALL content, users (except admin), collections, media, and other data.
-                  </p>
-                  <button 
-                    onclick="truncateDatabase()" 
-                    id="truncate-db-btn"
-                    class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-lg transition-colors"
-                  >
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                    </svg>
-                    Truncate All Data
-                  </button>
-                </div>
-              </div>
-            </div>
+            <p class="text-zinc-500 dark:text-zinc-400">Loading database statistics...</p>
           </div>
         </div>
       </div>
 
-      <!-- Tables List -->
-      <div class="backdrop-blur-md bg-white/10 rounded-lg border border-white/20 overflow-hidden">
-        <div class="px-6 py-4 border-b border-white/10">
-          <h4 class="text-lg font-medium text-white">Database Tables</h4>
-          <p class="text-sm text-gray-300 mt-1">Current tables and row counts</p>
-        </div>
-        
-        <div id="tables-list" class="p-6 space-y-2">
-          <div class="text-center py-8">
-            <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-            </svg>
-            <p class="text-gray-300">Loading database statistics...</p>
+      <!-- Danger Zone -->
+      <div class="rounded-lg bg-red-50 dark:bg-red-950/20 p-6 ring-1 ring-inset ring-red-600/20 dark:ring-red-500/30">
+        <div class="flex items-start space-x-3">
+          <svg class="w-6 h-6 text-red-600 dark:text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.268 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+          </svg>
+          <div class="flex-1">
+            <h4 class="text-base/7 font-semibold text-red-900 dark:text-red-400">Danger Zone</h4>
+            <p class="mt-1 text-sm/6 text-red-700 dark:text-red-300">
+              These operations are destructive and cannot be undone.
+              <strong>Your admin account will be preserved</strong>, but all other data will be permanently deleted.
+            </p>
+            <div class="mt-4">
+              <button
+                onclick="truncateDatabase()"
+                id="truncate-db-btn"
+                class="inline-flex items-center justify-center rounded-lg bg-red-600 dark:bg-red-500 px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-red-500 dark:hover:bg-red-400 transition-colors shadow-sm"
+              >
+                <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                Truncate All Data
+              </button>
+            </div>
           </div>
         </div>
       </div>

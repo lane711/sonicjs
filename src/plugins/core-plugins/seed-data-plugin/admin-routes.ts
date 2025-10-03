@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { SeedDataService } from './services/seed-data-service'
 
-export function createSeedDataAdminRoutes(app: Hono) {
+export function createSeedDataAdminRoutes() {
   const routes = new Hono()
 
   // Get seed data status/info
