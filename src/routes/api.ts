@@ -154,7 +154,21 @@ apiRoutes.get('/', (c) => {
       '/api/content': {
         get: {
           summary: 'Get all content',
-          description: 'Retrieves content items with pagination (limit 50)',
+          description: 'Retrieves content items with pagination (default limit 50, max 100)',
+          parameters: [
+            {
+              name: 'limit',
+              in: 'query',
+              required: false,
+              schema: {
+                type: 'integer',
+                minimum: 1,
+                maximum: 100,
+                default: 50
+              },
+              description: 'Maximum number of items to return'
+            }
+          ],
           responses: {
             '200': {
               description: 'List of content items',
@@ -220,6 +234,18 @@ apiRoutes.get('/', (c) => {
                 type: 'string'
               },
               description: 'Collection name'
+            },
+            {
+              name: 'limit',
+              in: 'query',
+              required: false,
+              schema: {
+                type: 'integer',
+                minimum: 1,
+                maximum: 100,
+                default: 50
+              },
+              description: 'Maximum number of items to return'
             }
           ],
           responses: {
@@ -341,7 +367,8 @@ apiRoutes.get('/collections', async (c) => {
 apiRoutes.get('/content', async (c) => {
   try {
     const db = c.env.DB
-    const stmt = db.prepare('SELECT * FROM content ORDER BY created_at DESC LIMIT 50')
+    const limit = Math.min(parseInt(c.req.query('limit') || '50'), 100)
+    const stmt = db.prepare(`SELECT * FROM content ORDER BY created_at DESC LIMIT ${limit}`)
     const { results } = await stmt.all()
     
     // Transform results to match API spec (camelCase)
@@ -384,7 +411,8 @@ apiRoutes.get('/collections/:collection/content', async (c) => {
     }
     
     // Get content for this collection
-    const contentStmt = db.prepare('SELECT * FROM content WHERE collection_id = ? ORDER BY created_at DESC')
+    const limit = Math.min(parseInt(c.req.query('limit') || '50'), 100)
+    const contentStmt = db.prepare(`SELECT * FROM content WHERE collection_id = ? ORDER BY created_at DESC LIMIT ${limit}`)
     const { results } = await contentStmt.bind(collectionResult.id).all()
     
     // Transform results to match API spec (camelCase)
