@@ -13,6 +13,7 @@ import { adminPluginRoutes } from './admin-plugins'
 import { adminLogsRoutes } from './admin-logs'
 import { MigrationService } from '../services/migrations'
 import { createDatabaseToolsAdminRoutes } from '../plugins/core-plugins/database-tools-plugin/admin-routes'
+import { createSeedDataAdminRoutes } from '../plugins/core-plugins/seed-data-plugin/admin-routes'
 import { getActivePlugins } from '../middleware/plugin-middleware'
 
 type Bindings = {
@@ -836,6 +837,9 @@ adminRoutes.route('/logs', adminLogsRoutes)
 
 // Database tools
 adminRoutes.route('/database-tools', createDatabaseToolsAdminRoutes())
+
+// Seed data
+adminRoutes.route('/seed-data', createSeedDataAdminRoutes())
 
 // Settings page
 adminRoutes.get('/settings', (c) => {

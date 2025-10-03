@@ -10,6 +10,7 @@ export { analyticsPlugin, createAnalyticsPlugin } from './analytics-plugin'
 export { faqPlugin, createFAQPlugin } from './faq-plugin'
 export { demoLoginPlugin } from './demo-login-plugin'
 export { workflowPlugin, createWorkflowPlugin } from './workflow-plugin'
+export { seedDataPlugin, createSeedDataPlugin } from './seed-data-plugin'
 
 // Core plugins array for easy registration
 export const corePlugins = [
@@ -19,7 +20,8 @@ export const corePlugins = [
   'core-faq',
   'demo-login-prefill',
   'workflow-plugin',
-  'cache'
+  'cache',
+  'seed-data'
 ] as const
 
 export type CorePluginNames = typeof corePlugins[number]

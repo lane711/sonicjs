@@ -146,6 +146,17 @@ class MemoryCache {
 }
 
 /**
+ * Cache result with source information
+ */
+export interface CacheResult<T> {
+  data: T | null
+  source: 'memory' | 'kv' | 'miss'
+  hit: boolean
+  timestamp?: number
+  ttl?: number
+}
+
+/**
  * Main cache service with multi-tier support
  */
 export class CacheService {
@@ -212,6 +223,65 @@ export class CacheService {
 
     this.updateHitRate()
     return null
+  }
+
+  /**
+   * Get value from cache with source information
+   */
+  async getWithSource<T>(key: string): Promise<CacheResult<T>> {
+    this.stats.totalRequests++
+
+    // Try memory cache first (Tier 1)
+    if (this.config.memoryEnabled) {
+      const memoryValue = this.memoryCache.get<T>(key)
+      if (memoryValue !== null) {
+        this.stats.memoryHits++
+        this.updateHitRate()
+
+        const entry = await this.getEntry<T>(key)
+        return {
+          data: memoryValue,
+          source: 'memory',
+          hit: true,
+          timestamp: entry?.timestamp,
+          ttl: entry?.ttl
+        }
+      }
+      this.stats.memoryMisses++
+    }
+
+    // Try KV cache (Tier 2)
+    if (this.config.kvEnabled && this.kvNamespace) {
+      try {
+        const kvValue = await this.kvNamespace.get(key, 'json')
+        if (kvValue !== null) {
+          this.stats.kvHits++
+
+          // Populate memory cache for faster subsequent access
+          if (this.config.memoryEnabled) {
+            this.memoryCache.set(key, kvValue as T, this.config.ttl, this.config.version)
+          }
+
+          this.updateHitRate()
+          return {
+            data: kvValue as T,
+            source: 'kv',
+            hit: true
+          }
+        }
+        this.stats.kvMisses++
+      } catch (error) {
+        console.error('KV cache read error:', error)
+        this.stats.kvMisses++
+      }
+    }
+
+    this.updateHitRate()
+    return {
+      data: null,
+      source: 'miss',
+      hit: false
+    }
   }
 
   /**
@@ -430,6 +500,70 @@ export class CacheService {
     await this.set(key, value, customConfig)
 
     return value
+  }
+
+  /**
+   * List all cache keys with metadata
+   */
+  async listKeys(): Promise<Array<{ key: string; size: number; expiresAt: number; age: number }>> {
+    const keys: Array<{ key: string; size: number; expiresAt: number; age: number }> = []
+
+    // Get keys from memory cache
+    if (this.config.memoryEnabled) {
+      const cache = (this.memoryCache as any).cache as Map<string, CacheEntry<any>>
+      for (const [key, entry] of cache.entries()) {
+        const size = JSON.stringify(entry).length * 2
+        const age = Date.now() - entry.timestamp
+        keys.push({
+          key,
+          size,
+          expiresAt: entry.expiresAt,
+          age
+        })
+      }
+    }
+
+    // Sort by age (newest first)
+    return keys.sort((a, b) => a.age - b.age)
+  }
+
+  /**
+   * Get cache entry with full metadata
+   */
+  async getEntry<T>(key: string): Promise<{
+    data: T
+    timestamp: number
+    expiresAt: number
+    ttl: number
+    size: number
+  } | null> {
+    if (!this.config.memoryEnabled) {
+      return null
+    }
+
+    const cache = (this.memoryCache as any).cache as Map<string, CacheEntry<any>>
+    const entry = cache.get(key)
+
+    if (!entry) {
+      return null
+    }
+
+    // Check expiration
+    if (Date.now() > entry.expiresAt) {
+      await this.delete(key)
+      return null
+    }
+
+    const size = JSON.stringify(entry).length * 2
+    const ttl = Math.max(0, entry.expiresAt - Date.now()) / 1000
+
+    return {
+      data: entry.data as T,
+      timestamp: entry.timestamp,
+      expiresAt: entry.expiresAt,
+      ttl,
+      size
+    }
   }
 }
 

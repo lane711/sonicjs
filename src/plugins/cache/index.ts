@@ -8,9 +8,10 @@
  */
 
 import type { Context } from 'hono'
-import type { PluginContext } from '@/types/plugin'
+import type { PluginContext } from '../types.js'
 import { getCacheService, clearAllCaches, getAllCacheStats } from './services/cache.js'
 import { CACHE_CONFIGS } from './services/cache-config.js'
+import { setupCacheInvalidation } from './services/cache-invalidation.js'
 import cacheRoutes from './routes.js'
 
 export class CachePlugin {
@@ -29,7 +30,7 @@ export class CachePlugin {
   async activate(context: PluginContext): Promise<void> {
     this.context = context
 
-    const settings = context.settings || {}
+    const settings = context.config || {}
 
     console.log('✅ Cache plugin activated', {
       memoryEnabled: settings.memoryEnabled ?? true,
@@ -46,6 +47,9 @@ export class CachePlugin {
         ttl: settings.defaultTTL ?? config.ttl
       })
     }
+
+    // Setup event-based cache invalidation
+    setupCacheInvalidation()
   }
 
   /**
@@ -154,6 +158,9 @@ export {
 } from './services/cache'
 export { CACHE_CONFIGS, getCacheConfig, generateCacheKey } from './services/cache-config'
 export type { CacheConfig, CacheStats } from './services/cache-config'
+export { emitEvent, onEvent, getEventBus } from './services/event-bus'
+export { getCacheInvalidationStats, getRecentInvalidations } from './services/cache-invalidation'
+export { warmCommonCaches, warmNamespace, preloadCache } from './services/cache-warming'
 
 // Create and export plugin instance
 const plugin = new CachePlugin()

@@ -7,6 +7,7 @@ import { renderMediaLibraryPage, MediaLibraryPageData, FolderStats, TypeStats } 
 import { renderMediaFileDetails, MediaFileDetailsData } from '../templates/components/media-file-details.template'
 import { MediaFile } from '../templates/components/media-grid.template'
 import { createCDNService } from '../services/cdn'
+import { getCacheService, CACHE_CONFIGS } from '../plugins/cache'
 
 type Bindings = {
   DB: D1Database
@@ -65,7 +66,16 @@ adminMediaRoutes.get('/', async (c) => {
     const offset = (page - 1) * limit
     
     const db = c.env.DB
-    
+
+    // Use cache for media list
+    const cache = getCacheService(CACHE_CONFIGS.media)
+    const cacheKey = cache.generateKey('list', `folder:${folder}_type:${type}_page:${page}`)
+
+    const cachedData = await cache.get<MediaLibraryPageData>(cacheKey)
+    if (cachedData) {
+      return c.html(renderMediaLibraryPage(cachedData))
+    }
+
     // Build query for media files
     let query = 'SELECT * FROM media'
     const params: any[] = []
@@ -169,6 +179,9 @@ adminMediaRoutes.get('/', async (c) => {
         role: user.role
       }
     }
+
+    // Cache the page data
+    await cache.set(cacheKey, pageData)
 
     return c.html(renderMediaLibraryPage(pageData))
   } catch (error) {

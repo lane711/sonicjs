@@ -340,10 +340,34 @@ adminPluginRoutes.post('/install', async (c) => {
           requireConfirmation: true
         }
       })
-      
+
       return c.json({ success: true, plugin: databaseToolsPlugin })
     }
-    
+
+    // Handle Seed Data plugin installation
+    if (body.name === 'seed-data') {
+      const seedDataPlugin = await pluginService.installPlugin({
+        id: 'seed-data',
+        name: 'seed-data',
+        display_name: 'Seed Data',
+        description: 'Generate realistic example users and content for testing and development',
+        version: '1.0.0',
+        author: 'SonicJS Team',
+        category: 'development',
+        icon: '🌱',
+        permissions: ['admin'],
+        dependencies: [],
+        is_core: false,
+        settings: {
+          userCount: 20,
+          contentCount: 200,
+          defaultPassword: 'password123'
+        }
+      })
+
+      return c.json({ success: true, plugin: seedDataPlugin })
+    }
+
     return c.json({ error: 'Plugin not found in registry' }, 404)
   } catch (error) {
     console.error('Error installing plugin:', error)

@@ -346,10 +346,34 @@ apiRoutes.get('/collections', async (c) => {
     const cache = getCacheService(CACHE_CONFIGS.api)
     const cacheKey = cache.generateKey('collections', 'all')
 
-    const cachedData = await cache.get<any>(cacheKey)
-    if (cachedData) {
-      return c.json(cachedData)
+    const cacheResult = await cache.getWithSource<any>(cacheKey)
+    if (cacheResult.hit && cacheResult.data) {
+      // Add cache headers
+      c.header('X-Cache-Status', 'HIT')
+      c.header('X-Cache-Source', cacheResult.source)
+      if (cacheResult.ttl) {
+        c.header('X-Cache-TTL', Math.floor(cacheResult.ttl).toString())
+      }
+
+      // Add cache info to meta
+      const dataWithMeta = {
+        ...cacheResult.data,
+        meta: {
+          ...cacheResult.data.meta,
+          cache: {
+            hit: true,
+            source: cacheResult.source,
+            ttl: cacheResult.ttl ? Math.floor(cacheResult.ttl) : undefined
+          }
+        }
+      }
+
+      return c.json(dataWithMeta)
     }
+
+    // Cache miss - fetch from database
+    c.header('X-Cache-Status', 'MISS')
+    c.header('X-Cache-Source', 'database')
 
     const stmt = db.prepare('SELECT * FROM collections WHERE is_active = 1')
     const { results } = await stmt.all()
@@ -365,7 +389,11 @@ apiRoutes.get('/collections', async (c) => {
       data: transformedResults,
       meta: {
         count: results.length,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        cache: {
+          hit: false,
+          source: 'database'
+        }
       }
     }
 
@@ -389,10 +417,34 @@ apiRoutes.get('/content', async (c) => {
     const cache = getCacheService(CACHE_CONFIGS.api)
     const cacheKey = cache.generateKey('content-list', `limit:${limit}`)
 
-    const cachedData = await cache.get<any>(cacheKey)
-    if (cachedData) {
-      return c.json(cachedData)
+    const cacheResult = await cache.getWithSource<any>(cacheKey)
+    if (cacheResult.hit && cacheResult.data) {
+      // Add cache headers
+      c.header('X-Cache-Status', 'HIT')
+      c.header('X-Cache-Source', cacheResult.source)
+      if (cacheResult.ttl) {
+        c.header('X-Cache-TTL', Math.floor(cacheResult.ttl).toString())
+      }
+
+      // Add cache info to meta
+      const dataWithMeta = {
+        ...cacheResult.data,
+        meta: {
+          ...cacheResult.data.meta,
+          cache: {
+            hit: true,
+            source: cacheResult.source,
+            ttl: cacheResult.ttl ? Math.floor(cacheResult.ttl) : undefined
+          }
+        }
+      }
+
+      return c.json(dataWithMeta)
     }
+
+    // Cache miss - fetch from database
+    c.header('X-Cache-Status', 'MISS')
+    c.header('X-Cache-Source', 'database')
 
     // Fetch from database
     const stmt = db.prepare(`SELECT * FROM content ORDER BY created_at DESC LIMIT ${limit}`)
@@ -414,7 +466,11 @@ apiRoutes.get('/content', async (c) => {
       data: transformedResults,
       meta: {
         count: results.length,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        cache: {
+          hit: false,
+          source: 'database'
+        }
       }
     }
 
@@ -433,20 +489,53 @@ apiRoutes.get('/collections/:collection/content', async (c) => {
   try {
     const collection = c.req.param('collection')
     const db = c.env.DB
-    
+    const limit = Math.min(parseInt(c.req.query('limit') || '50'), 100)
+
+    // Use cache for collection-specific content
+    const cache = getCacheService(CACHE_CONFIGS.api)
+    const cacheKey = cache.generateKey('collection-content', `${collection}:limit:${limit}`)
+
+    const cacheResult = await cache.getWithSource<any>(cacheKey)
+    if (cacheResult.hit && cacheResult.data) {
+      // Add cache headers
+      c.header('X-Cache-Status', 'HIT')
+      c.header('X-Cache-Source', cacheResult.source)
+      if (cacheResult.ttl) {
+        c.header('X-Cache-TTL', Math.floor(cacheResult.ttl).toString())
+      }
+
+      // Add cache info to meta
+      const dataWithMeta = {
+        ...cacheResult.data,
+        meta: {
+          ...cacheResult.data.meta,
+          cache: {
+            hit: true,
+            source: cacheResult.source,
+            ttl: cacheResult.ttl ? Math.floor(cacheResult.ttl) : undefined
+          }
+        }
+      }
+
+      return c.json(dataWithMeta)
+    }
+
+    // Cache miss - fetch from database
+    c.header('X-Cache-Status', 'MISS')
+    c.header('X-Cache-Source', 'database')
+
     // First check if collection exists
     const collectionStmt = db.prepare('SELECT * FROM collections WHERE name = ? AND is_active = 1')
     const collectionResult = await collectionStmt.bind(collection).first()
-    
+
     if (!collectionResult) {
       return c.json({ error: 'Collection not found' }, 404)
     }
-    
+
     // Get content for this collection
-    const limit = Math.min(parseInt(c.req.query('limit') || '50'), 100)
     const contentStmt = db.prepare(`SELECT * FROM content WHERE collection_id = ? ORDER BY created_at DESC LIMIT ${limit}`)
     const { results } = await contentStmt.bind(collectionResult.id).all()
-    
+
     // Transform results to match API spec (camelCase)
     const transformedResults = results.map((row: any) => ({
       id: row.id,
@@ -458,8 +547,8 @@ apiRoutes.get('/collections/:collection/content', async (c) => {
       created_at: row.created_at,
       updated_at: row.updated_at
     }))
-    
-    return c.json({
+
+    const responseData = {
       data: transformedResults,
       meta: {
         collection: {
@@ -467,9 +556,18 @@ apiRoutes.get('/collections/:collection/content', async (c) => {
           schema: (collectionResult as any).schema ? JSON.parse((collectionResult as any).schema) : {}
         },
         count: results.length,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        cache: {
+          hit: false,
+          source: 'database'
+        }
       }
-    })
+    }
+
+    // Cache the response
+    await cache.set(cacheKey, responseData)
+
+    return c.json(responseData)
   } catch (error) {
     console.error('Error fetching content:', error)
     return c.json({ error: 'Failed to fetch content' }, 500)

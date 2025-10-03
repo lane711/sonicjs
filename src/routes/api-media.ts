@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { z } from 'zod'
 import { nanoid } from 'nanoid'
 import { requireAuth } from '../middleware/auth'
+import { getCacheService, CACHE_CONFIGS, emitEvent } from '../plugins/cache'
 
 type Bindings = {
   DB: D1Database
@@ -163,6 +164,9 @@ apiMediaRoutes.post('/upload', async (c) => {
       mediaRecord.uploaded_by,
       mediaRecord.uploaded_at
     ).run()
+
+    // Emit media upload event
+    await emitEvent('media.upload', { id: mediaRecord.id, filename: mediaRecord.filename })
 
     return c.json({
       success: true,
@@ -331,6 +335,11 @@ apiMediaRoutes.post('/upload-multiple', async (c) => {
       }
     }
 
+    // Emit media upload event if any uploads succeeded
+    if (uploadResults.length > 0) {
+      await emitEvent('media.upload', { count: uploadResults.length })
+    }
+
     return c.json({
       success: uploadResults.length > 0,
       uploaded: uploadResults,
@@ -395,10 +404,10 @@ apiMediaRoutes.post('/bulk-delete', async (c) => {
         const deleteStmt = c.env.DB.prepare('UPDATE media SET deleted_at = ? WHERE id = ?')
         await deleteStmt.bind(Math.floor(Date.now() / 1000), fileId).run()
 
-        results.push({ 
-          fileId, 
+        results.push({
+          fileId,
           filename: fileRecord.original_name,
-          success: true 
+          success: true
         })
       } catch (error) {
         errors.push({ 
@@ -407,6 +416,11 @@ apiMediaRoutes.post('/bulk-delete', async (c) => {
           details: error instanceof Error ? error.message : 'Unknown error' 
         })
       }
+    }
+
+    // Emit media delete event if any deletes succeeded
+    if (results.length > 0) {
+      await emitEvent('media.delete', { count: results.length, ids: fileIds })
     }
 
     return c.json({
@@ -455,6 +469,9 @@ apiMediaRoutes.delete('/:id', async (c) => {
     // Soft delete in database
     const deleteStmt = c.env.DB.prepare('UPDATE media SET deleted_at = ? WHERE id = ?')
     await deleteStmt.bind(Math.floor(Date.now() / 1000), fileId).run()
+
+    // Emit media delete event
+    await emitEvent('media.delete', { id: fileId })
 
     return c.json({ success: true, message: 'File deleted successfully' })
   } catch (error) {
@@ -507,6 +524,9 @@ apiMediaRoutes.patch('/:id', async (c) => {
       UPDATE media SET ${updates.join(', ')} WHERE id = ?
     `)
     await updateStmt.bind(...values).run()
+
+    // Emit media update event
+    await emitEvent('media.update', { id: fileId })
 
     return c.json({ success: true, message: 'File updated successfully' })
   } catch (error) {

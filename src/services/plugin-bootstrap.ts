@@ -69,6 +69,23 @@ export class PluginBootstrapService {
         enableValidation: true,
         requireConfirmation: true
       }
+    },
+    {
+      id: 'seed-data',
+      name: 'seed-data',
+      display_name: 'Seed Data',
+      description: 'Generate realistic example users and content for testing and development',
+      version: '1.0.0',
+      author: 'SonicJS Team',
+      category: 'development',
+      icon: '🌱',
+      permissions: ['admin'],
+      dependencies: [],
+      settings: {
+        userCount: 20,
+        contentCount: 200,
+        defaultPassword: 'password123'
+      }
     }
   ]
 

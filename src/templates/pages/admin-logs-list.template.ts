@@ -1,4 +1,3 @@
-import { html } from 'hono/html'
 import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
 
 interface BaseUser {
@@ -57,7 +56,7 @@ export interface LogsListPageData {
 export function renderLogsListPage(data: LogsListPageData) {
   const { logs, pagination, filters, user } = data
 
-  const content = html`
+  const content = `
     <div>
       <div class="sm:flex sm:items-center sm:justify-between mb-6">
         <div class="sm:flex-auto">
@@ -266,7 +265,7 @@ export function renderLogsListPage(data: LogsListPageData) {
           </table>
         </div>
 
-        ${logs.length === 0 ? html`
+        ${logs.length === 0 ? `
           <div class="text-center py-12">
             <svg class="mx-auto h-12 w-12 text-zinc-400 dark:text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -278,29 +277,29 @@ export function renderLogsListPage(data: LogsListPageData) {
       </div>
 
       <!-- Pagination -->
-      ${pagination.totalPages > 1 ? html`
+      ${pagination.totalPages > 1 ? `
         <div class="mt-6 flex items-center justify-between">
           <div class="flex-1 flex justify-between sm:hidden">
-            ${pagination.currentPage > 1 ? html`
+            ${pagination.currentPage > 1 ? `
               <a
                 href="${pagination.baseUrl}?${new URLSearchParams({...filters, page: (pagination.currentPage - 1).toString()}).toString()}"
                 class="relative inline-flex items-center px-4 py-2 rounded-lg bg-white dark:bg-zinc-800 text-sm font-medium text-zinc-950 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-700 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 transition-colors"
               >
                 Previous
               </a>
-            ` : html`
+            ` : `
               <span class="relative inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-zinc-400 dark:text-zinc-600 bg-zinc-100 dark:bg-zinc-800 cursor-not-allowed">
                 Previous
               </span>
             `}
-            ${pagination.currentPage < pagination.totalPages ? html`
+            ${pagination.currentPage < pagination.totalPages ? `
               <a
                 href="${pagination.baseUrl}?${new URLSearchParams({...filters, page: (pagination.currentPage + 1).toString()}).toString()}"
                 class="ml-3 relative inline-flex items-center px-4 py-2 rounded-lg bg-white dark:bg-zinc-800 text-sm font-medium text-zinc-950 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-700 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 transition-colors"
               >
                 Next
               </a>
-            ` : html`
+            ` : `
               <span class="ml-3 relative inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-zinc-400 dark:text-zinc-600 bg-zinc-100 dark:bg-zinc-800 cursor-not-allowed">
                 Next
               </span>
@@ -315,7 +314,7 @@ export function renderLogsListPage(data: LogsListPageData) {
             </div>
             <div>
               <nav class="relative z-0 inline-flex rounded-lg shadow-sm -space-x-px" aria-label="Pagination">
-                ${pagination.currentPage > 1 ? html`
+                ${pagination.currentPage > 1 ? `
                   <a
                     href="${pagination.baseUrl}?${new URLSearchParams({...filters, page: (pagination.currentPage - 1).toString()}).toString()}"
                     class="relative inline-flex items-center px-2 py-2 rounded-l-lg bg-white dark:bg-zinc-800 text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 transition-colors"
@@ -345,7 +344,7 @@ export function renderLogsListPage(data: LogsListPageData) {
                   `
                 }).join('')}
 
-                ${pagination.currentPage < pagination.totalPages ? html`
+                ${pagination.currentPage < pagination.totalPages ? `
                   <a
                     href="${pagination.baseUrl}?${new URLSearchParams({...filters, page: (pagination.currentPage + 1).toString()}).toString()}"
                     class="relative inline-flex items-center px-2 py-2 rounded-r-lg bg-white dark:bg-zinc-800 text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 transition-colors"
@@ -369,7 +368,7 @@ export function renderLogsListPage(data: LogsListPageData) {
     pageTitle: 'System Logs',
     currentPath: '/admin/logs',
     user,
-    content: content as any
+    content
   }
 
   return renderAdminLayoutCatalyst(layoutData)

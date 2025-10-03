@@ -9,6 +9,12 @@ Three-tiered caching system for SonicJS that provides automatic caching for cont
   - Tier 2: Cloudflare KV (fast, global, ~5-10ms)
   - Tier 3: Database (source of truth, ~50-100ms)
 
+- **Cache source tracking** ⭐ NEW
+  - HTTP headers: `X-Cache-Status`, `X-Cache-Source`, `X-Cache-TTL`
+  - Response metadata with cache info
+  - Identify if data came from memory, KV, or database
+  - See [CACHE_SOURCE_TRACKING.md](./CACHE_SOURCE_TRACKING.md) for details
+
 - **Automatic cache management**
   - TTL-based expiration
   - LRU eviction when memory limit reached
@@ -137,6 +143,94 @@ await contentCache.invalidate('content:post:*')
 - **session**: Session data (TTL: 30 minutes, memory-only)
 - **plugin**: Plugin data (TTL: 1 hour)
 - **collection**: Collections/schema (TTL: 2 hours)
+
+## Event-Based Cache Invalidation
+
+The cache plugin includes an event bus system for automatic cache invalidation:
+
+```typescript
+import { emitEvent } from '@/plugins/cache'
+
+// Emit an event to trigger cache invalidation
+await emitEvent('content.update', { id: contentId })
+
+// Events automatically invalidate related caches based on configuration
+```
+
+### Supported Events
+
+- `content.create`, `content.update`, `content.delete`, `content.publish`
+- `user.update`, `user.delete`, `auth.login`, `auth.logout`
+- `media.upload`, `media.delete`, `media.update`
+- `config.update`, `plugin.activate`, `plugin.deactivate`, `plugin.update`
+- `collection.create`, `collection.update`, `collection.delete`
+
+## Cache Browser
+
+Browse and inspect all cached entries via REST API:
+
+```bash
+# List all cache entries
+GET /admin/cache/browser?namespace=content&search=post&sort=size&limit=50
+
+# Get specific cache entry
+GET /admin/cache/browser/content/content:item:abc123:v1
+```
+
+## Advanced Analytics
+
+Get detailed cache analytics and performance metrics:
+
+```bash
+# Get comprehensive analytics
+GET /admin/cache/analytics
+
+# Response includes:
+# - Overall hit/miss rates
+# - DB queries avoided
+# - Time saved (ms and minutes)
+# - Estimated cost savings
+# - Per-namespace analytics
+# - Invalidation statistics
+```
+
+### Analytics Metrics
+
+- **Hit Rate**: Percentage of requests served from cache
+- **DB Queries Avoided**: Number of database queries saved
+- **Time Saved**: Estimated time saved (assumes 48ms per cache hit)
+- **Cost Savings**: Estimated cost savings (assumes $0.50 per million queries)
+- **Efficiency Score**: Cache effectiveness ratio
+
+## Cache Warming
+
+Preload cache with common queries:
+
+```bash
+# Warm all common caches
+POST /admin/cache/warm
+
+# Warm specific namespace with custom data
+POST /admin/cache/warm/content
+{
+  "entries": [
+    { "key": "content:item:123:v1", "value": {...} }
+  ]
+}
+```
+
+### Programmatic Warming
+
+```typescript
+import { warmCommonCaches, preloadCache } from '@/plugins/cache'
+
+// Warm common caches
+const result = await warmCommonCaches(db)
+console.log(`Warmed ${result.warmed} entries`)
+
+// Preload on startup (with logging)
+await preloadCache(db)
+```
 
 ## API Endpoints
 
@@ -287,7 +381,7 @@ const myCache = getCacheService({
 - [x] Performance comparisons
 - [x] Wrangler.toml bindings for all environments
 
-### 🚧 Phase 3: Integration & Features (In Progress)
+### ✅ Phase 3: Integration & Features (Completed)
 - [x] Integrate cache into content routes
   - [x] Cache collection and field lookups
   - [x] Cache individual content items
@@ -308,29 +402,40 @@ const myCache = getCacheService({
     - [x] Clear by namespace
     - [x] Refresh statistics button
     - [x] Color-coded hit rate indicators
-- [ ] Integrate cache into media queries
-- [ ] Integrate cache into API endpoints
-- [ ] Event-based cache invalidation (currently manual)
-- [ ] **Cache Browser** (future enhancement)
-  - [ ] View all cached items by namespace
-  - [ ] Search/filter cache keys
-  - [ ] Inspect individual cache entries (key, value, TTL, size)
-  - [ ] Preview cached content
-  - [ ] Sort by size, age, hits
-- [ ] **Advanced Analytics** (future enhancement)
-  - [ ] Cache size trends over time (line chart)
-  - [ ] Top cached items by access frequency
-  - [ ] Hit rate trends (hourly/daily)
-  - [ ] Cache efficiency score
-  - [ ] Cost savings calculator (DB queries avoided)
-  - [ ] Slowest cache misses
-  - [ ] Most frequently accessed keys
-  - [ ] Cache size warnings
-  - [ ] Pattern invalidation UI with regex builder
-  - [ ] Bulk delete selected items
-  - [ ] Export cache statistics
-- [ ] Cache warming utilities
-- [ ] Cache preloading on startup
+- [x] Integrate cache into media queries
+  - [x] Cache media list queries
+  - [x] Invalidate on upload/delete/update
+- [x] Integrate cache into API endpoints
+  - [x] Cache collections endpoint
+  - [x] Cache content lists
+  - [x] Cache collection-specific content
+- [x] Event-based cache invalidation
+  - [x] Event bus system
+  - [x] Automatic invalidation listeners
+  - [x] Event logging and statistics
+- [x] **Cache Browser**
+  - [x] View all cached items by namespace
+  - [x] Search/filter cache keys
+  - [x] Inspect individual cache entries (key, value, TTL, size)
+  - [x] Sort by size, age, key
+  - [x] REST API endpoints
+- [x] **Advanced Analytics**
+  - [x] Cache efficiency score
+  - [x] Cost savings calculator (DB queries avoided)
+  - [x] Time saved metrics
+  - [x] Per-namespace analytics
+  - [x] Memory and KV hit rate breakdown
+  - [x] Average entry size calculation
+  - [x] Invalidation event tracking
+  - [x] Recent invalidations log
+- [x] Cache warming utilities
+  - [x] Warm common caches (collections, content, media)
+  - [x] Warm specific namespace
+  - [x] REST API endpoints for warming
+- [x] Cache preloading on startup
+  - [x] Preload function
+  - [x] Automatic warming on activation
+  - [x] Exported utilities for custom preloading
 
 ### 📋 Phase 4: Advanced Features (Planned)
 - [ ] **Advanced Analytics**

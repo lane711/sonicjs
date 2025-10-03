@@ -153,10 +153,10 @@ export function parseCacheKey(key: string): {
   }
 
   return {
-    namespace: parts[0],
-    type: parts[1],
-    identifier: parts[2],
-    version: parts[3]
+    namespace: parts[0] || '',
+    type: parts[1] || '',
+    identifier: parts[2] || '',
+    version: parts[3] || ''
   }
 }
 
