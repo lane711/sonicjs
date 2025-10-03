@@ -21,6 +21,8 @@ import { userRoutes } from './routes/admin-users'
 // Workflow routes are loaded dynamically through plugin system
 import { createWorkflowRoutes } from './plugins/available/workflow-plugin/routes'
 import { createWorkflowAdminRoutes } from './plugins/available/workflow-plugin/admin-routes'
+// Cache plugin routes
+import cacheRoutes from './plugins/cache/routes'
 import { requireAuth, requireRole, optionalAuth } from './middleware/auth'
 import { requireActivePlugin } from './middleware/plugin-middleware'
 import { bootstrapMiddleware } from './middleware/bootstrap'
@@ -131,6 +133,9 @@ app.route('/admin/checkboxes', adminCheckboxRoutes)
 app.route('/admin/logs', adminLogsRoutes)
 // app.route('/admin/email', emailRoutes)
 app.route('/admin/users', userRoutes)
+// Cache routes with plugin activation check
+app.use('/admin/cache/*', requireActivePlugin('cache'))
+app.route('/admin/cache', cacheRoutes)
 
 // Root redirect to login
 app.get('/', (c) => {

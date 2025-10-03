@@ -9,11 +9,19 @@
 
 import type { Context } from 'hono'
 import type { PluginContext } from '@/types/plugin'
-import { getCacheService, clearAllCaches, getAllCacheStats } from './services/cache'
-import { CACHE_CONFIGS } from './services/cache-config'
+import { getCacheService, clearAllCaches, getAllCacheStats } from './services/cache.js'
+import { CACHE_CONFIGS } from './services/cache-config.js'
+import cacheRoutes from './routes.js'
 
 export class CachePlugin {
   private context: PluginContext | null = null
+
+  /**
+   * Get plugin routes
+   */
+  getRoutes() {
+    return cacheRoutes
+  }
 
   /**
    * Activate the cache plugin
