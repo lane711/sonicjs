@@ -52,6 +52,9 @@ export function renderLoginPage(data: LoginPageData, demoLoginActive: boolean = 
             ${data.error ? `<div class="mb-6">${renderAlert({ type: 'error', message: data.error })}</div>` : ''}
             ${data.message ? `<div class="mb-6">${renderAlert({ type: 'success', message: data.message })}</div>` : ''}
 
+            <!-- Form Response (HTMX target) -->
+            <div id="form-response" class="mb-6"></div>
+
             <!-- Form -->
             <form
               id="login-form"
@@ -108,8 +111,6 @@ export function renderLoginPage(data: LoginPageData, demoLoginActive: boolean = 
                 <a href="/auth/register" class="font-semibold text-white hover:text-zinc-300 transition-colors">Create one here</a>
               </p>
             </div>
-
-            <div id="form-response"></div>
           </div>
         </div>
       </div>
