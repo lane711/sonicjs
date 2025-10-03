@@ -15,6 +15,7 @@ export interface APIReferencePageData {
     email: string
     role: string
   }
+  version?: string
 }
 
 export function renderAPIReferencePage(data: APIReferencePageData): string {
@@ -345,6 +346,7 @@ export function renderAPIReferencePage(data: APIReferencePageData): string {
     pageTitle: 'API Reference',
     currentPath: '/admin/api-reference',
     user: data.user,
+    version: data.version,
     content: pageContent
   }
 

@@ -31,6 +31,7 @@ export interface PluginsListPageData {
     email: string
     role: string
   }
+  version?: string
 }
 
 export function renderPluginsListPage(data: PluginsListPageData): string {
@@ -375,6 +376,7 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
     pageTitle: 'Plugin Management',
     currentPath: '/admin/plugins',
     user: data.user,
+    version: data.version,
     content: pageContent
   }
 

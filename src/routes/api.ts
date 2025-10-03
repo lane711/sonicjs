@@ -11,7 +11,20 @@ type Bindings = {
   KV: KVNamespace
 }
 
-export const apiRoutes = new Hono<{ Bindings: Bindings }>()
+type Variables = {
+  startTime: number
+}
+
+export const apiRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
+
+// Add timing middleware
+apiRoutes.use('*', async (c, next) => {
+  const startTime = Date.now()
+  c.set('startTime', startTime)
+  await next()
+  const totalTime = Date.now() - startTime
+  c.header('X-Response-Time', `${totalTime}ms`)
+})
 
 // Add CORS middleware
 apiRoutes.use('*', cors({
@@ -19,6 +32,21 @@ apiRoutes.use('*', cors({
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization']
 }))
+
+// Helper function to add timing metadata
+function addTimingMeta(c: any, meta: any = {}, executionStartTime?: number) {
+  const totalTime = Date.now() - c.get('startTime')
+  const executionTime = executionStartTime ? Date.now() - executionStartTime : undefined
+
+  return {
+    ...meta,
+    timing: {
+      total: totalTime,
+      execution: executionTime,
+      unit: 'ms'
+    }
+  }
+}
 
 // OpenAPI specification endpoint
 apiRoutes.get('/', (c) => {
@@ -339,6 +367,8 @@ apiRoutes.get('/health', (c) => {
 
 // Basic collections endpoint
 apiRoutes.get('/collections', async (c) => {
+  const executionStart = Date.now()
+
   try {
     const db = c.env.DB
 
@@ -355,17 +385,17 @@ apiRoutes.get('/collections', async (c) => {
         c.header('X-Cache-TTL', Math.floor(cacheResult.ttl).toString())
       }
 
-      // Add cache info to meta
+      // Add cache info and timing to meta
       const dataWithMeta = {
         ...cacheResult.data,
-        meta: {
+        meta: addTimingMeta(c, {
           ...cacheResult.data.meta,
           cache: {
             hit: true,
             source: cacheResult.source,
             ttl: cacheResult.ttl ? Math.floor(cacheResult.ttl) : undefined
           }
-        }
+        }, executionStart)
       }
 
       return c.json(dataWithMeta)
@@ -387,14 +417,14 @@ apiRoutes.get('/collections', async (c) => {
 
     const responseData = {
       data: transformedResults,
-      meta: {
+      meta: addTimingMeta(c, {
         count: results.length,
         timestamp: new Date().toISOString(),
         cache: {
           hit: false,
           source: 'database'
         }
-      }
+      }, executionStart)
     }
 
     // Cache the response
@@ -409,6 +439,8 @@ apiRoutes.get('/collections', async (c) => {
 
 // Basic content endpoint
 apiRoutes.get('/content', async (c) => {
+  const executionStart = Date.now()
+
   try {
     const db = c.env.DB
     const limit = Math.min(parseInt(c.req.query('limit') || '50'), 100)
@@ -426,17 +458,17 @@ apiRoutes.get('/content', async (c) => {
         c.header('X-Cache-TTL', Math.floor(cacheResult.ttl).toString())
       }
 
-      // Add cache info to meta
+      // Add cache info and timing to meta
       const dataWithMeta = {
         ...cacheResult.data,
-        meta: {
+        meta: addTimingMeta(c, {
           ...cacheResult.data.meta,
           cache: {
             hit: true,
             source: cacheResult.source,
             ttl: cacheResult.ttl ? Math.floor(cacheResult.ttl) : undefined
           }
-        }
+        }, executionStart)
       }
 
       return c.json(dataWithMeta)
@@ -464,14 +496,14 @@ apiRoutes.get('/content', async (c) => {
 
     const responseData = {
       data: transformedResults,
-      meta: {
+      meta: addTimingMeta(c, {
         count: results.length,
         timestamp: new Date().toISOString(),
         cache: {
           hit: false,
           source: 'database'
         }
-      }
+      }, executionStart)
     }
 
     // Cache the response
@@ -486,6 +518,8 @@ apiRoutes.get('/content', async (c) => {
 
 // Legacy collection-specific routes for backward compatibility
 apiRoutes.get('/collections/:collection/content', async (c) => {
+  const executionStart = Date.now()
+
   try {
     const collection = c.req.param('collection')
     const db = c.env.DB
@@ -504,17 +538,17 @@ apiRoutes.get('/collections/:collection/content', async (c) => {
         c.header('X-Cache-TTL', Math.floor(cacheResult.ttl).toString())
       }
 
-      // Add cache info to meta
+      // Add cache info and timing to meta
       const dataWithMeta = {
         ...cacheResult.data,
-        meta: {
+        meta: addTimingMeta(c, {
           ...cacheResult.data.meta,
           cache: {
             hit: true,
             source: cacheResult.source,
             ttl: cacheResult.ttl ? Math.floor(cacheResult.ttl) : undefined
           }
-        }
+        }, executionStart)
       }
 
       return c.json(dataWithMeta)
@@ -550,7 +584,7 @@ apiRoutes.get('/collections/:collection/content', async (c) => {
 
     const responseData = {
       data: transformedResults,
-      meta: {
+      meta: addTimingMeta(c, {
         collection: {
           ...collectionResult,
           schema: (collectionResult as any).schema ? JSON.parse((collectionResult as any).schema) : {}
@@ -561,7 +595,7 @@ apiRoutes.get('/collections/:collection/content', async (c) => {
           hit: false,
           source: 'database'
         }
-      }
+      }, executionStart)
     }
 
     // Cache the response

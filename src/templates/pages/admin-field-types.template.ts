@@ -47,6 +47,7 @@ export interface FieldTypesPageData {
     email: string
     role: string
   }
+  version?: string
 }
 
 export function getFieldTypeDefinitions(): FieldTypeDefinition[] {
@@ -729,6 +730,7 @@ export function renderFieldTypesPage(data: FieldTypesPageData): string {
     pageTitle: 'Field Types Reference',
     currentPath: '/admin/field-types',
     user: data.user,
+    version: data.version,
     content: pageContent
   }
 

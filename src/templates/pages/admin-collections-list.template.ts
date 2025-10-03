@@ -20,6 +20,7 @@ export interface CollectionsListPageData {
     email: string
     role: string
   }
+  version?: string
 }
 
 export function renderCollectionsListPage(data: CollectionsListPageData): string {
@@ -277,6 +278,7 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
     pageTitle: 'Collections',
     currentPath: '/admin/collections',
     user: data.user,
+    version: data.version,
     content: pageContent
   }
 

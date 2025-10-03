@@ -20,6 +20,7 @@ import packageJson from '../../package.json'
 type Bindings = {
   DB: D1Database
   KV: KVNamespace
+  MEDIA_BUCKET: R2Bucket
 }
 
 type Variables = {
@@ -167,17 +168,141 @@ adminRoutes.get('/api/stats', async (c) => {
       console.error('Error fetching users count:', error)
     }
 
+    // Calculate database size
+    let databaseSize = 0
+    try {
+      // Get the total size of all tables in bytes
+      const sizeStmt = db.prepare(`
+        SELECT SUM(pgsize) as total_size
+        FROM dbstat
+      `)
+      const sizeResult = await sizeStmt.first()
+      databaseSize = (sizeResult as any)?.total_size || 0
+    } catch (error) {
+      console.error('Error fetching users count:', error)
+    }
+
     const stats: DashboardStats = {
       collections: collectionsCount,
       contentItems: contentCount,
       mediaFiles: mediaCount,
-      users: usersCount
+      users: usersCount,
+      databaseSize: databaseSize
     }
 
     return c.html(renderStatsCards(stats))
   } catch (error) {
     console.error('Error fetching stats:', error)
     return c.html(html`<p>Error loading statistics: ${(error as Error).message}</p>`)
+  }
+})
+
+// System status endpoint for HTMX
+adminRoutes.get('/api/system-status', async (c) => {
+  try {
+    const db = c.env.DB
+    const kv = c.env.KV
+    const r2 = c.env.MEDIA_BUCKET
+
+    // Check webserver (always operational if we're here)
+    const webserverStatus = 'operational'
+
+    // Check D1 Database
+    let d1Status = 'operational'
+    try {
+      await db.prepare('SELECT 1').first()
+    } catch (error) {
+      console.error('D1 health check failed:', error)
+      d1Status = 'degraded'
+    }
+
+    // Check KV Namespace
+    let kvStatus = 'operational'
+    try {
+      await kv.get('__health_check__')
+    } catch (error) {
+      console.error('KV health check failed:', error)
+      kvStatus = 'degraded'
+    }
+
+    // Check R2 Bucket
+    let r2Status = 'operational'
+    try {
+      await r2.head('__health_check__')
+    } catch (error) {
+      // Head will throw an error if the object doesn't exist, but that's okay
+      // We just want to make sure the bucket is accessible
+      if ((error as any)?.message?.includes('Object Not Found')) {
+        r2Status = 'operational' // Bucket is accessible
+      } else {
+        console.error('R2 health check failed:', error)
+        r2Status = 'degraded'
+      }
+    }
+
+    // Render HTML fragment for HTMX
+    return c.html(html`
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-400">Webserver</p>
+              <p class="text-xs mt-1 font-medium ${webserverStatus === 'operational' ? 'text-green-400' : 'text-red-400'}">
+                ${webserverStatus === 'operational' ? '● Operational' : '● Degraded'}
+              </p>
+            </div>
+            <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-400">D1 Database</p>
+              <p class="text-xs mt-1 font-medium ${d1Status === 'operational' ? 'text-green-400' : 'text-red-400'}">
+                ${d1Status === 'operational' ? '● Operational' : '● Degraded'}
+              </p>
+            </div>
+            <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-400">KV Storage</p>
+              <p class="text-xs mt-1 font-medium ${kvStatus === 'operational' ? 'text-green-400' : 'text-red-400'}">
+                ${kvStatus === 'operational' ? '● Operational' : '● Degraded'}
+              </p>
+            </div>
+            <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-400">R2 Storage</p>
+              <p class="text-xs mt-1 font-medium ${r2Status === 'operational' ? 'text-green-400' : 'text-red-400'}">
+                ${r2Status === 'operational' ? '● Operational' : '● Degraded'}
+              </p>
+            </div>
+            <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    `)
+  } catch (error) {
+    console.error('Error checking system status:', error)
+    return c.html(html`<p class="text-red-400">Error loading system status</p>`)
   }
 })
 
@@ -237,7 +362,8 @@ adminRoutes.get('/collections', async (c) => {
         name: user.email,
         email: user.email,
         role: user.role
-      } : undefined
+      } : undefined,
+      version: `v${packageJson.version}`
     }
 
     return c.html(renderCollectionsListPage(pageData))
@@ -257,9 +383,10 @@ adminRoutes.get('/collections/new', (c) => {
       name: user.email,
       email: user.email,
       role: user.role
-    } : undefined
+    } : undefined,
+    version: `v${packageJson.version}`
   }
-  
+
   return c.html(renderCollectionFormPage(formData))
 })
 
@@ -385,7 +512,8 @@ adminRoutes.get('/collections/:id', async (c) => {
           name: user.email,
           email: user.email,
           role: user.role
-        } : undefined
+        } : undefined,
+        version: `v${packageJson.version}`
       }
       return c.html(renderCollectionFormPage(formData))
     }
@@ -419,9 +547,10 @@ adminRoutes.get('/collections/:id', async (c) => {
         name: user.email,
         email: user.email,
         role: user.role
-      } : undefined
+      } : undefined,
+      version: `v${packageJson.version}`
     }
-    
+
     return c.html(renderCollectionFormPage(formData))
   } catch (error) {
     console.error('Error fetching collection:', error)
@@ -433,7 +562,8 @@ adminRoutes.get('/collections/:id', async (c) => {
         name: user.email,
         email: user.email,
         role: user.role
-      } : undefined
+      } : undefined,
+      version: `v${packageJson.version}`
     }
     return c.html(renderCollectionFormPage(formData))
   }
@@ -759,7 +889,8 @@ adminRoutes.get('/users', async (c) => {
         name: user.email,
         email: user.email,
         role: user.role
-      } : undefined
+      } : undefined,
+      version: `v${packageJson.version}`
     }
     
     return c.html(renderUsersListPage(pageData))
@@ -1210,7 +1341,8 @@ adminRoutes.get('/api-reference', (c) => {
       name: user.email,
       email: user.email,
       role: user.role
-    } : undefined
+    } : undefined,
+    version: `v${packageJson.version}`
   }
 
   return c.html(renderAPIReferencePage(pageData))
@@ -1226,7 +1358,8 @@ adminRoutes.get('/field-types', (c) => {
       name: user.email,
       email: user.email,
       role: user.role
-    } : undefined
+    } : undefined,
+    version: `v${packageJson.version}`
   }
 
   return c.html(renderFieldTypesPage(pageData))

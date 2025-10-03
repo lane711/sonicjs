@@ -28,6 +28,7 @@ export interface CacheDashboardData {
     email: string
     role: string
   }
+  version?: string
 }
 
 export function renderCacheDashboard(data: CacheDashboardData): string {
@@ -206,6 +207,7 @@ export function renderCacheDashboard(data: CacheDashboardData): string {
     pageTitle: 'Cache System',
     currentPath: '/admin/cache',
     user: data.user,
+    version: data.version,
     content: pageContent
   }
 

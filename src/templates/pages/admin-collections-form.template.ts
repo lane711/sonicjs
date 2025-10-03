@@ -27,6 +27,7 @@ export interface CollectionFormData {
     email: string
     role: string
   }
+  version?: string
 }
 
 export function renderCollectionFormPage(data: CollectionFormData): string {
@@ -696,6 +697,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
     pageTitle: 'Collections',
     currentPath: '/admin/collections',
     user: data.user,
+    version: data.version,
     content: pageContent
   }
 

@@ -4,6 +4,7 @@ import { renderPluginsListPage, PluginsListPageData, Plugin } from '../templates
 import { renderPluginSettingsPage, PluginSettingsPageData } from '../templates/pages/admin-plugin-settings.template'
 import { PluginService } from '../services/plugin-service'
 import { PermissionManager } from '../middleware/permissions'
+import packageJson from '../../package.json'
 
 type Bindings = {
   DB: D1Database
@@ -74,9 +75,10 @@ adminPluginRoutes.get('/', async (c) => {
         name: user?.email || 'User',
         email: user?.email || '',
         role: user?.role || 'user'
-      }
+      },
+      version: `v${packageJson.version}`
     }
-    
+
     return c.html(renderPluginsListPage(pageData))
   } catch (error) {
     console.error('Error loading plugins page:', error)

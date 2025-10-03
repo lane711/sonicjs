@@ -27,6 +27,7 @@ export interface MediaLibraryPageData {
     email: string
     role: string
   }
+  version?: string
 }
 
 export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
@@ -622,6 +623,7 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
     pageTitle: 'Media Library',
     currentPath: '/admin/media',
     user: data.user,
+    version: data.version,
     content: pageContent
   }
 

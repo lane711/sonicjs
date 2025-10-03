@@ -28,6 +28,7 @@ export interface ContentEditPageData {
     email: string
     role: string
   }
+  version?: string
 }
 
 export function renderContentEditPage(data: ContentEditPageData): string {
@@ -187,6 +188,7 @@ export function renderContentEditPage(data: ContentEditPageData): string {
     pageTitle: 'Edit Content',
     currentPath: '/admin/content',
     user,
+    version: data.version,
     content: pageContent
   }
 

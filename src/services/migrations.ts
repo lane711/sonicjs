@@ -320,12 +320,9 @@ export class MigrationService {
       throw new Error(`Migration SQL not found for ${migration.id}`)
     }
 
-    // Split SQL into individual statements and execute
-    const statements = migrationSQL
-      .split(';')
-      .map(s => s.trim())
-      .filter(s => s.length > 0 && !s.startsWith('--'))
-    
+    // Split SQL into individual statements, handling triggers properly
+    const statements = this.splitSQLStatements(migrationSQL)
+
     for (const statement of statements) {
       if (statement.trim()) {
         try {
@@ -336,6 +333,52 @@ export class MigrationService {
         }
       }
     }
+  }
+
+  /**
+   * Split SQL into statements, handling CREATE TRIGGER properly
+   */
+  private splitSQLStatements(sql: string): string[] {
+    const statements: string[] = []
+    let current = ''
+    let inTrigger = false
+
+    const lines = sql.split('\n')
+
+    for (const line of lines) {
+      const trimmed = line.trim()
+
+      // Skip comments and empty lines
+      if (trimmed.startsWith('--') || trimmed.length === 0) {
+        continue
+      }
+
+      // Check if we're entering a trigger
+      if (trimmed.toUpperCase().includes('CREATE TRIGGER')) {
+        inTrigger = true
+      }
+
+      current += line + '\n'
+
+      // Check if we're exiting a trigger
+      if (inTrigger && trimmed.toUpperCase() === 'END;') {
+        statements.push(current.trim())
+        current = ''
+        inTrigger = false
+      }
+      // Check for regular statement end (not in trigger)
+      else if (!inTrigger && trimmed.endsWith(';')) {
+        statements.push(current.trim())
+        current = ''
+      }
+    }
+
+    // Add any remaining statement
+    if (current.trim()) {
+      statements.push(current.trim())
+    }
+
+    return statements.filter(s => s.length > 0)
   }
 
   /**
@@ -518,7 +561,7 @@ export class MigrationService {
               '⚡',
               'active',
               TRUE,
-              '["manage:cache", "view:stats"]',
+              '["manage:cache","view:stats"]',
               unixepoch(),
               unixepoch()
           );

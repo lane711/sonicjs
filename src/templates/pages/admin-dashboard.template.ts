@@ -8,6 +8,7 @@ export interface DashboardStats {
   contentItems: number;
   mediaFiles: number;
   users: number;
+  databaseSize?: number; // Size in bytes
   recentActivity?: ActivityItem[];
   analytics?: AnalyticsData;
 }
@@ -100,7 +101,7 @@ export function renderDashboardPage(data: DashboardPageData): string {
       ${renderSystemStatus()}
 
       <!-- Storage Usage -->
-      ${renderStorageUsage()}
+      ${renderStorageUsage(data.stats.databaseSize)}
     </div>
 
     <script>
@@ -178,7 +179,7 @@ export function renderDashboardPageWithDynamicMenu(
       ${renderSystemStatus()}
 
       <!-- Storage Usage -->
-      ${renderStorageUsage()}
+      ${renderStorageUsage(data.stats.databaseSize)}
     </div>
 
     <script>
@@ -537,82 +538,71 @@ function renderQuickActions(): string {
 }
 
 function renderSystemStatus(): string {
-  const statusItems = [
-    {
-      label: "Database",
-      status: "Operational",
-      color: "bg-lime-500 dark:bg-lime-400",
-      textColor: "text-lime-700 dark:text-lime-300",
-    },
-    {
-      label: "File Storage",
-      status: "Operational",
-      color: "bg-lime-500 dark:bg-lime-400",
-      textColor: "text-lime-700 dark:text-lime-300",
-    },
-    {
-      label: "CDN",
-      status: "Operational",
-      color: "bg-lime-500 dark:bg-lime-400",
-      textColor: "text-lime-700 dark:text-lime-300",
-    },
-    {
-      label: "Email Service",
-      status: "Maintenance",
-      color: "bg-amber-500 dark:bg-amber-400",
-      textColor: "text-amber-700 dark:text-amber-300",
-    },
-  ];
-
   return `
     <div class="rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10">
       <div class="border-b border-zinc-950/5 dark:border-white/10 px-6 py-6">
         <h3 class="text-base/7 font-semibold text-zinc-950 dark:text-white">System Status</h3>
       </div>
 
-      <div class="px-6 py-6">
-        <dl class="space-y-4">
-          ${statusItems
-            .map(
-              (item) => `
-            <div class="flex items-center justify-between">
-              <dt class="text-sm/6 text-zinc-500 dark:text-zinc-400">${item.label}</dt>
-              <dd class="flex items-center gap-2">
-                <div class="h-1.5 w-1.5 rounded-full ${item.color}"></div>
-                <span class="text-sm/6 font-medium ${item.textColor}">${item.status}</span>
-              </dd>
+      <div
+        id="system-status-container"
+        class="px-6 py-6"
+        hx-get="/admin/api/system-status"
+        hx-trigger="load, every 30s"
+        hx-swap="innerHTML"
+      >
+        <!-- Loading skeleton -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-pulse">
+          ${Array(4).fill(0).map(() => `
+            <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
+              <div class="h-4 w-20 bg-gray-700 rounded mb-2"></div>
+              <div class="h-3 w-24 bg-gray-700 rounded"></div>
             </div>
-          `
-            )
-            .join("")}
-        </dl>
+          `).join('')}
+        </div>
       </div>
     </div>
   `;
 }
 
-function renderStorageUsage(): string {
+function renderStorageUsage(databaseSizeBytes?: number): string {
+  // Helper to format bytes to human readable
+  const formatBytes = (bytes: number): string => {
+    if (bytes === 0) return '0 B'
+    const k = 1024
+    const sizes = ['B', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`
+  }
+
+  const dbSizeGB = databaseSizeBytes ? databaseSizeBytes / (1024 ** 3) : 0
+  const dbMaxGB = 10
+  const dbPercentage = Math.min((dbSizeGB / dbMaxGB) * 100, 100)
+  const dbUsedFormatted = databaseSizeBytes ? formatBytes(databaseSizeBytes) : 'Unknown'
+
   const storageItems = [
     {
       label: "Database",
-      used: "2.3 GB",
+      used: dbUsedFormatted,
       total: "10 GB",
-      percentage: 23,
-      color: "bg-cyan-500 dark:bg-cyan-400",
+      percentage: dbPercentage,
+      color: dbPercentage > 80 ? "bg-red-500 dark:bg-red-400" : dbPercentage > 60 ? "bg-amber-500 dark:bg-amber-400" : "bg-cyan-500 dark:bg-cyan-400",
     },
     {
       label: "Media Files",
-      used: "4.7 GB",
-      total: "20 GB",
-      percentage: 23.5,
+      used: "N/A",
+      total: "∞",
+      percentage: 0,
       color: "bg-lime-500 dark:bg-lime-400",
+      note: "Stored in R2"
     },
     {
-      label: "Backup",
-      used: "1.2 GB",
-      total: "5 GB",
-      percentage: 24,
-      color: "bg-pink-500 dark:bg-pink-400",
+      label: "Cache (KV)",
+      used: "N/A",
+      total: "∞",
+      percentage: 0,
+      color: "bg-purple-500 dark:bg-purple-400",
+      note: "Unlimited"
     },
   ];
 
@@ -626,15 +616,22 @@ function renderStorageUsage(): string {
         <dl class="space-y-6">
           ${storageItems
             .map(
-              (item) => `
+              (item: any) => `
             <div>
               <div class="flex items-center justify-between mb-2">
-                <dt class="text-sm/6 text-zinc-500 dark:text-zinc-400">${item.label}</dt>
+                <dt class="text-sm/6 text-zinc-500 dark:text-zinc-400">
+                  ${item.label}
+                  ${item.note ? `<span class="ml-2 text-xs text-zinc-400 dark:text-zinc-500">(${item.note})</span>` : ''}
+                </dt>
                 <dd class="text-sm/6 font-medium text-zinc-950 dark:text-white">${item.used} / ${item.total}</dd>
               </div>
-              <div class="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-1.5 overflow-hidden">
-                <div class="${item.color} h-full rounded-full transition-all duration-300" style="width: ${item.percentage}%"></div>
-              </div>
+              ${item.percentage > 0 ? `
+                <div class="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-1.5 overflow-hidden">
+                  <div class="${item.color} h-full rounded-full transition-all duration-300" style="width: ${item.percentage}%"></div>
+                </div>
+              ` : `
+                <div class="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-1.5"></div>
+              `}
             </div>
           `
             )

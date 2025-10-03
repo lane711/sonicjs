@@ -18,6 +18,7 @@ export interface ContentNewPageData {
     email: string
     role: string
   }
+  version?: string
 }
 
 export function renderContentNewPage(data: ContentNewPageData): string {
@@ -51,6 +52,7 @@ export function renderContentNewPage(data: ContentNewPageData): string {
       pageTitle: 'Create New Content',
       currentPath: '/admin/content',
       user: data.user,
+      version: data.version,
       content: pageContent
     }
 
@@ -364,6 +366,7 @@ export function renderContentNewPage(data: ContentNewPageData): string {
     pageTitle: 'Content Management',
     currentPath: '/admin/content',
     user: data.user,
+    version: data.version,
     content: pageContent
   }
 

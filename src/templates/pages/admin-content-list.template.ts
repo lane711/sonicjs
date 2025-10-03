@@ -31,6 +31,7 @@ export interface ContentListPageData {
     email: string
     role: string
   }
+  version?: string
 }
 
 export function renderContentListPage(data: ContentListPageData): string {
@@ -543,6 +544,7 @@ export function renderContentListPage(data: ContentListPageData): string {
     pageTitle: 'Content Management',
     currentPath: '/admin/content',
     user: data.user,
+    version: data.version,
     content: pageContent
   }
 

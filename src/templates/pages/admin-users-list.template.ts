@@ -35,6 +35,7 @@ export interface UsersListPageData {
     email: string
     role: string
   }
+  version?: string
 }
 
 export function renderUsersListPage(data: UsersListPageData): string {
@@ -419,6 +420,7 @@ export function renderUsersListPage(data: UsersListPageData): string {
     pageTitle: 'User Management',
     currentPath: '/admin/users',
     user: data.user,
+    version: data.version,
     content: pageContent
   }
 
