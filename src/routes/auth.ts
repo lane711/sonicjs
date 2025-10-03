@@ -6,6 +6,7 @@ import { html } from 'hono/html'
 import { AuthManager, requireAuth } from '../middleware/auth'
 import { renderLoginPage, LoginPageData } from '../templates/pages/auth-login.template'
 import { renderRegisterPage, RegisterPageData } from '../templates/pages/auth-register.template'
+import { getCacheService, CACHE_CONFIGS } from '../plugins/cache'
 
 type Bindings = {
   DB: D1Database
@@ -158,11 +159,22 @@ authRoutes.post('/login',
       // Normalize email to lowercase
       const normalizedEmail = email.toLowerCase()
       
-      // Find user
-      const user = await db.prepare('SELECT * FROM users WHERE email = ? AND is_active = 1')
-        .bind(normalizedEmail)
-        .first() as any
-      
+      // Find user with caching
+      const cache = getCacheService(CACHE_CONFIGS.user)
+      let user = await cache.get<any>(cache.generateKey('user', `email:${normalizedEmail}`))
+
+      if (!user) {
+        user = await db.prepare('SELECT * FROM users WHERE email = ? AND is_active = 1')
+          .bind(normalizedEmail)
+          .first() as any
+
+        if (user) {
+          // Cache the user for faster subsequent lookups
+          await cache.set(cache.generateKey('user', `email:${normalizedEmail}`), user)
+          await cache.set(cache.generateKey('user', user.id), user)
+        }
+      }
+
       if (!user) {
         return c.json({ error: 'Invalid email or password' }, 401)
       }
@@ -188,7 +200,12 @@ authRoutes.post('/login',
       await db.prepare('UPDATE users SET last_login_at = ? WHERE id = ?')
         .bind(new Date().getTime(), user.id)
         .run()
-      
+
+      // Invalidate user cache on login
+      const cache = getCacheService(CACHE_CONFIGS.user)
+      await cache.delete(cache.generateKey('user', user.id))
+      await cache.delete(cache.generateKey('user', `email:${normalizedEmail}`))
+
       return c.json({
         user: {
           id: user.id,

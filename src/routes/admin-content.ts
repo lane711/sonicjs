@@ -4,6 +4,7 @@ import { renderContentFormPage, ContentFormData } from '../templates/pages/admin
 import { renderContentListPage, ContentListPageData } from '../templates/pages/admin-content-list.template'
 import { renderVersionHistory, VersionHistoryData, ContentVersion } from '../templates/components/version-history.template'
 import { isPluginActive } from '../middleware/plugin-middleware'
+import { getCacheService, CACHE_CONFIGS } from '../plugins/cache'
 
 type Bindings = {
   DB: D1Database
@@ -24,39 +25,53 @@ export const adminContentRoutes = new Hono<{ Bindings: Bindings; Variables: Vari
 
 // Get collection fields
 async function getCollectionFields(db: D1Database, collectionId: string) {
-  const stmt = db.prepare(`
-    SELECT * FROM content_fields 
-    WHERE collection_id = ? 
-    ORDER BY field_order ASC
-  `)
-  const { results } = await stmt.bind(collectionId).all()
-  
-  return (results || []).map((row: any) => ({
-    id: row.id,
-    field_name: row.field_name,
-    field_type: row.field_type,
-    field_label: row.field_label,
-    field_options: row.field_options ? JSON.parse(row.field_options) : {},
-    field_order: row.field_order,
-    is_required: row.is_required === 1,
-    is_searchable: row.is_searchable === 1
-  }))
+  const cache = getCacheService(CACHE_CONFIGS.collection)
+
+  return cache.getOrSet(
+    cache.generateKey('fields', collectionId),
+    async () => {
+      const stmt = db.prepare(`
+        SELECT * FROM content_fields
+        WHERE collection_id = ?
+        ORDER BY field_order ASC
+      `)
+      const { results } = await stmt.bind(collectionId).all()
+
+      return (results || []).map((row: any) => ({
+        id: row.id,
+        field_name: row.field_name,
+        field_type: row.field_type,
+        field_label: row.field_label,
+        field_options: row.field_options ? JSON.parse(row.field_options) : {},
+        field_order: row.field_order,
+        is_required: row.is_required === 1,
+        is_searchable: row.is_searchable === 1
+      }))
+    }
+  )
 }
 
 // Get collection by ID
 async function getCollection(db: D1Database, collectionId: string) {
-  const stmt = db.prepare('SELECT * FROM collections WHERE id = ? AND is_active = 1')
-  const collection = await stmt.bind(collectionId).first() as any
-  
-  if (!collection) return null
-  
-  return {
-    id: collection.id,
-    name: collection.name,
-    display_name: collection.display_name,
-    description: collection.description,
-    schema: collection.schema ? JSON.parse(collection.schema) : {}
-  }
+  const cache = getCacheService(CACHE_CONFIGS.collection)
+
+  return cache.getOrSet(
+    cache.generateKey('collection', collectionId),
+    async () => {
+      const stmt = db.prepare('SELECT * FROM collections WHERE id = ? AND is_active = 1')
+      const collection = await stmt.bind(collectionId).first() as any
+
+      if (!collection) return null
+
+      return {
+        id: collection.id,
+        name: collection.name,
+        display_name: collection.display_name,
+        description: collection.description,
+        schema: collection.schema ? JSON.parse(collection.schema) : {}
+      }
+    }
+  )
 }
 
 // Content list (main page)
@@ -335,16 +350,22 @@ adminContentRoutes.get('/:id/edit', async (c) => {
     // Capture referrer parameters to preserve filters when returning to list
     const referrerParams = url.searchParams.get('ref') || ''
 
-    // Get content
-    const contentStmt = db.prepare(`
-      SELECT c.*, col.id as collection_id, col.name as collection_name,
-             col.display_name as collection_display_name, col.description as collection_description,
-             col.schema as collection_schema
-      FROM content c
-      JOIN collections col ON c.collection_id = col.id
-      WHERE c.id = ?
-    `)
-    const content = await contentStmt.bind(id).first() as any
+    // Get content with caching
+    const cache = getCacheService(CACHE_CONFIGS.content)
+    const content = await cache.getOrSet(
+      cache.generateKey('content', id),
+      async () => {
+        const contentStmt = db.prepare(`
+          SELECT c.*, col.id as collection_id, col.name as collection_name,
+                 col.display_name as collection_display_name, col.description as collection_description,
+                 col.schema as collection_schema
+          FROM content c
+          JOIN collections col ON c.collection_id = col.id
+          WHERE c.id = ?
+        `)
+        return await contentStmt.bind(id).first() as any
+      }
+    )
 
     if (!content) {
       const formData: ContentFormData = {
@@ -545,7 +566,11 @@ adminContentRoutes.post('/', async (c) => {
       now,
       now
     ).run()
-    
+
+    // Invalidate collection content list cache
+    const cache = getCacheService(CACHE_CONFIGS.content)
+    await cache.invalidate(`content:list:${collectionId}:*`)
+
     // Create initial version
     const versionStmt = db.prepare(`
       INSERT INTO content_versions (id, content_id, version, data, author_id, created_at)
@@ -737,7 +762,12 @@ adminContentRoutes.put('/:id', async (c) => {
       now,
       id
     ).run()
-    
+
+    // Invalidate content cache
+    const cache = getCacheService(CACHE_CONFIGS.content)
+    await cache.delete(cache.generateKey('content', id))
+    await cache.invalidate(`content:list:${existingContent.collection_id}:*`)
+
     // Create new version if content changed
     const existingData = JSON.parse(existingContent.data || '{}')
     if (JSON.stringify(existingData) !== JSON.stringify(data)) {
@@ -1082,6 +1112,14 @@ adminContentRoutes.post('/bulk-action', async (c) => {
       return c.json({ success: false, error: 'Invalid action' })
     }
 
+    // Invalidate cache for all affected content items
+    const cache = getCacheService(CACHE_CONFIGS.content)
+    for (const contentId of ids) {
+      await cache.delete(cache.generateKey('content', contentId))
+    }
+    // Also invalidate list caches (they contain content from potentially multiple collections)
+    await cache.invalidate('content:list:*')
+
     return c.json({ success: true, count: ids.length })
   } catch (error) {
     console.error('Bulk action error:', error)
@@ -1112,6 +1150,11 @@ adminContentRoutes.delete('/:id', async (c) => {
       WHERE id = ?
     `)
     await deleteStmt.bind(now, id).run()
+
+    // Invalidate cache
+    const cache = getCacheService(CACHE_CONFIGS.content)
+    await cache.delete(cache.generateKey('content', id))
+    await cache.invalidate('content:list:*')
 
     // Return success - let HTMX reload the page
     return c.html(`
