@@ -443,8 +443,15 @@ authRoutes.post('/login/form', async (c) => {
       .run()
     
     return c.html(html`
-      <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-        Login successful! Redirecting to admin dashboard...
+      <div class="rounded-lg bg-lime-500/10 p-4 ring-1 ring-lime-500/20">
+        <div class="flex items-start gap-x-3">
+          <svg class="h-5 w-5 text-lime-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <div class="flex-1">
+            <p class="text-sm font-medium text-lime-300">Login successful! Redirecting to admin dashboard...</p>
+          </div>
+        </div>
         <script>
           setTimeout(() => {
             window.location.href = '/admin';
