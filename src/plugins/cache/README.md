@@ -244,6 +244,64 @@ const myCache = getCacheService({
 })
 ```
 
+## Development Roadmap
+
+### ✅ Phase 1: In-Memory Cache (Completed)
+- [x] Memory cache with LRU eviction
+- [x] TTL-based expiration
+- [x] Pattern-based invalidation
+- [x] Cache statistics tracking
+- [x] Namespace isolation
+- [x] Version-based cache busting
+- [x] Batch operations (getMany, setMany, deleteMany)
+- [x] getOrSet pattern
+- [x] Comprehensive test suite (40 tests)
+
+### ✅ Phase 2: Cloudflare KV Cache (Completed)
+- [x] KV namespace integration
+- [x] Two-tier caching (Memory → KV)
+- [x] Automatic memory population on KV hits
+- [x] KV pattern invalidation
+- [x] Global KV namespace configuration
+- [x] Updated documentation with KV setup
+- [x] Performance comparisons
+- [x] Wrangler.toml bindings for all environments
+
+### 🚧 Phase 3: Integration & Features (In Progress)
+- [ ] Integrate cache into content routes
+- [ ] Integrate cache into user authentication
+- [ ] Integrate cache into media queries
+- [ ] Integrate cache into API endpoints
+- [ ] Event-based cache invalidation
+- [ ] Admin UI for cache management
+  - [ ] Statistics dashboard
+  - [ ] Clear cache button
+  - [ ] Pattern invalidation UI
+  - [ ] Per-namespace controls
+- [ ] Cache warming utilities
+- [ ] Cache preloading on startup
+
+### 📋 Phase 4: Advanced Features (Planned)
+- [ ] Cache compression for large values
+- [ ] Smart cache prefetching
+- [ ] Cache analytics and insights
+- [ ] A/B testing support
+- [ ] Cache dependency tracking
+- [ ] Distributed cache invalidation
+- [ ] Cache versioning strategy
+- [ ] Performance monitoring dashboard
+- [ ] Cache hit/miss alerts
+- [ ] Automatic cache optimization
+
+### 🔮 Future Considerations
+- [ ] Redis cache tier (optional Tier 2.5)
+- [ ] GraphQL query caching
+- [ ] Edge-side includes (ESI) support
+- [ ] Stale-while-revalidate pattern
+- [ ] Background cache refresh
+- [ ] Cache sharding strategies
+- [ ] Multi-region cache coordination
+
 ## License
 
 MIT
