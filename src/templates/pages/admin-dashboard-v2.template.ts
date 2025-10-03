@@ -41,6 +41,7 @@ export interface DashboardPageData {
     role: string;
   };
   stats?: DashboardStats;
+  version?: string;
 }
 
 export function renderDashboardPage(data: DashboardPageData): string {
@@ -115,6 +116,7 @@ export function renderDashboardPage(data: DashboardPageData): string {
     pageTitle: "Dashboard",
     currentPath: "/admin",
     user: data.user,
+    version: data.version,
     content: pageContent,
   };
 
@@ -192,6 +194,7 @@ export function renderDashboardPageWithDynamicMenu(
     pageTitle: "Dashboard",
     currentPath: "/admin",
     user: data.user,
+    version: data.version,
     content: pageContent,
     dynamicMenuItems,
   };

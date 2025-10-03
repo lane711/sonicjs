@@ -1,9 +1,23 @@
 import { test, expect } from '@playwright/test';
 import { loginAsAdmin, navigateToAdminSection } from './utils/test-helpers';
+import packageJson from '../../package.json';
 
 test.describe('Admin Dashboard', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
+  });
+
+  test('should display correct version from package.json', async ({ page }) => {
+    // The version should be displayed in the layout (usually in the sidebar or footer)
+    const expectedVersion = `v${packageJson.version}`;
+
+    // Look for the version text anywhere in the page (there may be multiple instances)
+    const versionElement = page.getByText(expectedVersion).first();
+    await expect(versionElement).toBeVisible();
+
+    // Make sure it's not showing the old hardcoded version
+    const oldVersion = page.getByText('v0.1.0', { exact: true });
+    await expect(oldVersion).not.toBeVisible();
   });
 
   test('should display admin dashboard with navigation', async ({ page }) => {

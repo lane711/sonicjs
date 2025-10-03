@@ -506,6 +506,21 @@ export class MigrationService {
               '["manage:workflows", "approve:content"]',
               unixepoch(),
               unixepoch()
+          ),
+          (
+              'cache',
+              'cache',
+              'Cache System',
+              'Three-tiered caching system with memory, KV, and database layers',
+              '1.0.0',
+              'SonicJS Team',
+              'performance',
+              '⚡',
+              'active',
+              TRUE,
+              '["manage:cache", "view:stats"]',
+              unixepoch(),
+              unixepoch()
           );
         `
       default:

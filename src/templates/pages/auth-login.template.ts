@@ -149,11 +149,11 @@ export function renderLoginPage(data: LoginPageData, demoLoginActive: boolean = 
               emailInput.value = 'admin@sonicjs.com';
               passwordInput.value = 'admin123';
 
-              // Add visual indication that form is prefilled
+              // Add visual indication that form is prefilled (only if not already present)
               const form = emailInput.closest('form');
-              if (form) {
+              if (form && !form.querySelector('.demo-mode-notice')) {
                 const notice = document.createElement('div');
-                notice.className = 'mb-6 rounded-lg bg-blue-500/10 p-4 ring-1 ring-blue-500/20';
+                notice.className = 'demo-mode-notice mb-6 rounded-lg bg-blue-500/10 p-4 ring-1 ring-blue-500/20';
                 notice.innerHTML = '<div class="flex items-start gap-x-3"><svg class="h-5 w-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><div><h3 class="text-sm font-semibold text-blue-300">Demo Mode</h3><p class="mt-1 text-sm text-blue-400">Login form prefilled with demo credentials</p></div></div>';
                 form.insertBefore(notice, form.firstChild);
               }

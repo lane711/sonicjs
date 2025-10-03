@@ -191,8 +191,11 @@ export function renderContentListPage(data: ContentListPageData): string {
     baseUrl: '/admin/content',
     queryParams: {
       model: data.modelName,
-      status: data.status
-    }
+      status: data.status,
+      ...(data.search ? { search: data.search } : {})
+    },
+    showPageSizeSelector: true,
+    pageSizeOptions: [10, 20, 50, 100]
   }
 
   // Generate page content

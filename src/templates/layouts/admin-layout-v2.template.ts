@@ -539,6 +539,13 @@ function renderSidebar(currentPath: string, user?: any, dynamicMenuItems?: Array
       </svg>`
     },
     {
+      label: 'Cache',
+      path: '/admin/cache',
+      icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+      </svg>`
+    },
+    {
       label: 'Design',
       path: '/admin/design',
       icon: `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
