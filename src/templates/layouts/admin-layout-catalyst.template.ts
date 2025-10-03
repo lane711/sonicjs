@@ -405,6 +405,13 @@ function renderCatalystSidebar(
       </svg>`,
     },
     {
+      label: "Cache",
+      path: "/admin/cache",
+      icon: `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+      </svg>`,
+    },
+    {
       label: "Design",
       path: "/admin/design",
       icon: `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
