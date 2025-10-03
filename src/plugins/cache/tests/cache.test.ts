@@ -11,7 +11,7 @@ import {
   getCacheService,
   clearAllCaches,
   getAllCacheStats
-} from '../services/cache'
+} from '../services/cache.js'
 import {
   CacheConfig,
   CACHE_CONFIGS,
@@ -20,7 +20,7 @@ import {
   parseCacheKey,
   hashQueryParams,
   createCachePattern
-} from '../services/cache-config'
+} from '../services/cache-config.js'
 
 describe('CacheConfig', () => {
   it('should have predefined cache configurations', () => {

@@ -1,0 +1,69 @@
+{
+  "id": "cache",
+  "name": "Cache System",
+  "version": "1.0.0",
+  "description": "Three-tiered caching system with in-memory and KV storage. Provides automatic caching for content, users, media, and API responses with configurable TTL and invalidation patterns.",
+  "author": "SonicJS",
+  "homepage": "https://sonicjs.com/plugins/cache",
+  "repository": "https://github.com/lane711/sonicjs-ai/tree/main/src/plugins/cache",
+  "license": "MIT",
+  "category": "performance",
+  "tags": ["cache", "performance", "optimization", "kv", "memory"],
+  "dependencies": [],
+  "settings": {
+    "memoryEnabled": {
+      "type": "boolean",
+      "label": "Enable In-Memory Cache",
+      "description": "Fast tier-1 caching in memory (region-specific)",
+      "default": true
+    },
+    "kvEnabled": {
+      "type": "boolean",
+      "label": "Enable KV Cache",
+      "description": "Tier-2 caching in Cloudflare KV (global, persistent)",
+      "default": false
+    },
+    "defaultTTL": {
+      "type": "number",
+      "label": "Default TTL (seconds)",
+      "description": "Default time-to-live for cache entries",
+      "default": 3600
+    },
+    "maxMemorySize": {
+      "type": "number",
+      "label": "Max Memory Size (MB)",
+      "description": "Maximum size of in-memory cache in megabytes",
+      "default": 50
+    }
+  },
+  "hooks": {
+    "onActivate": "activate",
+    "onDeactivate": "deactivate",
+    "onConfigure": "configure"
+  },
+  "routes": [
+    {
+      "path": "/admin/cache/stats",
+      "method": "GET",
+      "handler": "getStats",
+      "description": "Get cache statistics"
+    },
+    {
+      "path": "/admin/cache/clear",
+      "method": "POST",
+      "handler": "clearCache",
+      "description": "Clear all cache entries"
+    },
+    {
+      "path": "/admin/cache/invalidate",
+      "method": "POST",
+      "handler": "invalidatePattern",
+      "description": "Invalidate cache entries matching pattern"
+    }
+  ],
+  "permissions": {
+    "cache.view": "View cache statistics",
+    "cache.clear": "Clear cache entries",
+    "cache.invalidate": "Invalidate cache patterns"
+  }
+}

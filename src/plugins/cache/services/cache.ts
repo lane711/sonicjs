@@ -7,7 +7,7 @@
  * 3. Database (fallback, source of truth)
  */
 
-import { CacheConfig, CacheStats, generateCacheKey } from './cache-config'
+import { CacheConfig, CacheStats, generateCacheKey } from './cache-config.js'
 
 /**
  * Cache entry with metadata
