@@ -120,6 +120,7 @@ export interface AdminLayoutCatalystData {
   title: string;
   pageTitle?: string;
   currentPath?: string;
+  version?: string;
   user?: {
     name: string;
     email: string;
@@ -243,7 +244,9 @@ export function renderAdminLayoutCatalyst(
       ${renderCatalystSidebar(
         data.currentPath,
         data.user,
-        data.dynamicMenuItems
+        data.dynamicMenuItems,
+        false,
+        data.version
       )}
     </div>
 
@@ -254,7 +257,8 @@ export function renderAdminLayoutCatalyst(
         data.currentPath,
         data.user,
         data.dynamicMenuItems,
-        true
+        true,
+        data.version
       )}
     </div>
 
@@ -268,7 +272,7 @@ export function renderAdminLayoutCatalyst(
           </svg>
         </button>
         <div class="ml-4 flex-1">
-          ${renderLogo({ size: "sm", showText: true, variant: "white" })}
+          ${renderLogo({ size: "sm", showText: true, variant: "white", version: data.version })}
         </div>
       </header>
 
@@ -359,7 +363,8 @@ function renderCatalystSidebar(
   currentPath: string = "",
   user?: any,
   dynamicMenuItems?: Array<{ label: string; path: string; icon: string }>,
-  isMobile: boolean = false
+  isMobile: boolean = false,
+  version?: string
 ): string {
   const baseMenuItems = [
     {
@@ -485,7 +490,7 @@ function renderCatalystSidebar(
 
       <!-- Sidebar Header -->
       <div class="flex flex-col border-b border-zinc-950/5 p-4 dark:border-white/5">
-        ${renderLogo({ size: "md", showText: true, variant: "white" })}
+        ${renderLogo({ size: "md", showText: true, variant: "white", version })}
       </div>
 
       <!-- Sidebar Body -->

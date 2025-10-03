@@ -16,7 +16,7 @@ export async function loadCollectionConfigs(): Promise<CollectionConfig[]> {
   try {
     // Import all collection files dynamically
     // In production, these will be bundled with the application
-    const modules = import.meta.glob('../collections/*.collection.ts', { eager: true })
+    const modules = (import.meta as any).glob?.('../collections/*.collection.ts', { eager: true }) || {}
 
     for (const [path, module] of Object.entries(modules)) {
       try {
@@ -94,14 +94,14 @@ export async function loadCollectionConfig(name: string): Promise<CollectionConf
  */
 export async function getAvailableCollectionNames(): Promise<string[]> {
   try {
-    const modules = import.meta.glob('../collections/*.collection.ts')
+    const modules = (import.meta as any).glob?.('../collections/*.collection.ts') || {}
     const names: string[] = []
 
     for (const path of Object.keys(modules)) {
       // Extract collection name from path
       // e.g., '../collections/blog-posts.collection.ts' -> 'blog-posts'
       const match = path.match(/\/([^/]+)\.collection\.ts$/)
-      if (match) {
+      if (match && match[1]) {
         names.push(match[1])
       }
     }

@@ -2,6 +2,8 @@ export interface LogoData {
   size?: 'sm' | 'md' | 'lg' | 'xl'
   variant?: 'default' | 'white' | 'dark'
   showText?: boolean
+  showVersion?: boolean
+  version?: string
   className?: string
 }
 
@@ -18,11 +20,13 @@ export function renderLogo(data: LogoData = {}): string {
     size = 'md',
     variant = 'default',
     showText = true,
+    showVersion = true,
+    version = 'v0.1.0',
     className = ''
   } = data
 
   const sizeClass = sizeClasses[size]
-  
+
   // Official SonicJS logo SVG from sonicjs.com
   const logoSvg = `
     <svg class="${sizeClass} ${className}" viewBox="380 1300 2250 400" aria-hidden="true">
@@ -38,13 +42,24 @@ export function renderLogo(data: LogoData = {}): string {
     </svg>
   `
 
+  const versionBadge = showVersion ? `
+    <span class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${
+      variant === 'white'
+        ? 'bg-white/10 text-white/80 ring-white/20'
+        : 'bg-cyan-50 text-cyan-700 ring-cyan-700/10 dark:bg-cyan-500/10 dark:text-cyan-400 dark:ring-cyan-500/20'
+    }">
+      ${version}
+    </span>
+  ` : ''
+
   if (!showText) {
     return logoSvg
   }
-  
+
   return `
-    <div class="flex items-center space-x-3 ${className}">
+    <div class="flex items-center gap-2 ${className}">
       ${logoSvg}
+      ${versionBadge}
     </div>
   `
 }

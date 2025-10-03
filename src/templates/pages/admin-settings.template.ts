@@ -16,6 +16,7 @@ export interface SettingsPageData {
     databaseTools?: DatabaseToolsSettings
   }
   activeTab?: string
+  version?: string
 }
 
 export interface GeneralSettings {
@@ -147,94 +148,17 @@ export function renderSettingsPage(data: SettingsPageData): string {
     </div>
 
     <script>
-      let currentTab = '${activeTab}';
-      
-      function switchTab(tab) {
-        if (currentTab === tab) return;
-        
-        // Update tab buttons
-        document.querySelectorAll('[data-tab]').forEach(btn => {
-          btn.classList.remove('border-b-2', 'border-zinc-950', 'dark:border-white', 'text-zinc-950', 'dark:text-white');
-          btn.classList.add('border-transparent', 'text-zinc-500', 'dark:text-zinc-400', 'hover:text-zinc-700', 'dark:hover:text-zinc-300');
-        });
+      // Initialize tab-specific features on page load
+      const currentTab = '${activeTab}';
 
-        const activeBtn = document.querySelector(\`[data-tab="\${tab}"]\`);
-        activeBtn.classList.remove('border-transparent', 'text-zinc-500', 'dark:text-zinc-400', 'hover:text-zinc-700', 'dark:hover:text-zinc-300');
-        activeBtn.classList.add('border-b-2', 'border-zinc-950', 'dark:border-white', 'text-zinc-950', 'dark:text-white');
-        
-        // Load tab content
-        const content = document.getElementById('settings-content');
-        content.innerHTML = '<div class="flex items-center justify-center h-32"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-zinc-950 dark:border-white"></div></div>';
-        
-        // Simulate loading (replace with actual HTMX call)
-        setTimeout(() => {
-          content.innerHTML = getTabContent(tab);
-          currentTab = tab;
-          
-          // Initialize migrations if switching to migrations tab
-          if (tab === 'migrations') {
-            setTimeout(refreshMigrationStatus, 500);
-          }
-          
-          // Initialize database tools if switching to database tools tab
-          if (tab === 'database-tools') {
-            setTimeout(refreshDatabaseStats, 500);
-          }
-        }, 300);
+      // Auto-load migrations status if on migrations tab
+      if (currentTab === 'migrations') {
+        setTimeout(refreshMigrationStatus, 500);
       }
-      
-      function getTabContent(tab) {
-        // Return content for each tab, handling migrations specially
-        switch(tab) {
-          case 'general':
-            return getGeneralContent();
-          case 'appearance':
-            return getAppearanceContent();
-          case 'security':
-            return getSecurityContent();
-          case 'notifications':
-            return getNotificationsContent();
-          case 'storage':
-            return getStorageContent();
-          case 'migrations':
-            return getMigrationsContent();
-          case 'database-tools':
-            return getDatabaseToolsContent();
-          default:
-            return '<p class="text-gray-300">Content not found</p>';
-        }
-      }
-      
-      function getGeneralContent() {
-        return \`${renderGeneralSettings(data.settings?.general).replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
-      }
-      
-      function getAppearanceContent() {
-        return \`${renderAppearanceSettings(data.settings?.appearance).replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
-      }
-      
-      function getSecurityContent() {
-        return \`${renderSecuritySettings(data.settings?.security).replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
-      }
-      
-      function getNotificationsContent() {
-        return \`${renderNotificationSettings(data.settings?.notifications).replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
-      }
-      
-      function getStorageContent() {
-        return \`${renderStorageSettings(data.settings?.storage).replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
-      }
-      
-      function getMigrationsContent() {
-        // Return migrations content without the embedded script tags
-        const migrationsHTML = \`${renderMigrationSettings(data.settings?.migrations).replace(/<script[^>]*>.*?<\/script>/gs, '').replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
-        return migrationsHTML;
-      }
-      
-      function getDatabaseToolsContent() {
-        // Return database tools content
-        const databaseToolsHTML = \`${renderDatabaseToolsSettings(data.settings?.databaseTools).replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
-        return databaseToolsHTML;
+
+      // Auto-load database stats if on database tools tab
+      if (currentTab === 'database-tools') {
+        setTimeout(refreshDatabaseStats, 500);
       }
       
       function saveAllSettings() {
@@ -546,6 +470,7 @@ export function renderSettingsPage(data: SettingsPageData): string {
     pageTitle: 'Settings',
     currentPath: '/admin/settings',
     user: data.user,
+    version: data.version,
     content: pageContent
   }
 
@@ -554,14 +479,14 @@ export function renderSettingsPage(data: SettingsPageData): string {
 
 function renderTabButton(tabId: string, label: string, iconPath: string, activeTab: string): string {
   const isActive = activeTab === tabId
-  const baseClasses = 'flex items-center space-x-2 px-4 py-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap'
+  const baseClasses = 'flex items-center space-x-2 px-4 py-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap no-underline'
   const activeClasses = isActive
     ? 'border-zinc-950 dark:border-white text-zinc-950 dark:text-white'
     : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-700'
 
   return `
-    <button
-      onclick="switchTab('${tabId}')"
+    <a
+      href="/admin/settings/${tabId}"
       data-tab="${tabId}"
       class="${baseClasses} ${activeClasses}"
     >
@@ -569,7 +494,7 @@ function renderTabButton(tabId: string, label: string, iconPath: string, activeT
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${iconPath}"/>
       </svg>
       <span>${label}</span>
-    </button>
+    </a>
   `
 }
 

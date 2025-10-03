@@ -28,7 +28,7 @@ export function renderDatabaseTablePage(data: DatabaseTablePageData): string {
         <div>
           <div class="flex items-center space-x-3">
             <a
-              href="/admin/settings?tab=database-tools"
+              href="/admin/settings/database-tools"
               class="inline-flex items-center text-sm/6 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
             >
               <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -295,14 +295,14 @@ function generatePageNumbers(currentPage: number, totalPages: number): string {
 }
 
 function escapeHtml(text: string): string {
-  const map: { [key: string]: string } = {
+  const map: Record<string, string> = {
     '&': '&amp;',
     '<': '&lt;',
     '>': '&gt;',
     '"': '&quot;',
     "'": '&#039;'
   }
-  return String(text).replace(/[&<>"']/g, m => map[m])
+  return String(text).replace(/[&<>"']/g, m => map[m] || m)
 }
 
 function formatCellValue(value: any): string {

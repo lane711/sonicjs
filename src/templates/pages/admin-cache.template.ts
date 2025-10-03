@@ -128,6 +128,7 @@ export function renderCacheDashboard(data: CacheDashboardData): string {
             <tbody class="divide-y divide-zinc-950/5 dark:divide-white/10">
               ${data.namespaces.map(namespace => {
                 const stat = data.stats[namespace]
+                if (!stat) return ''
                 return renderNamespaceRow(namespace, stat)
               }).join('')}
             </tbody>

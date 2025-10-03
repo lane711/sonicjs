@@ -7,6 +7,7 @@ import { AuthManager, requireAuth } from '../middleware/auth'
 import { renderLoginPage, LoginPageData } from '../templates/pages/auth-login.template'
 import { renderRegisterPage, RegisterPageData } from '../templates/pages/auth-register.template'
 import { getCacheService, CACHE_CONFIGS } from '../plugins/cache'
+import packageJson from '../../package.json'
 
 type Bindings = {
   DB: D1Database
@@ -32,7 +33,8 @@ authRoutes.get('/login', async (c) => {
   
   const pageData: LoginPageData = {
     error: error || undefined,
-    message: message || undefined
+    message: message || undefined,
+    version: packageJson.version
   }
   
   // Check if demo login plugin is active
@@ -160,7 +162,7 @@ authRoutes.post('/login',
       const normalizedEmail = email.toLowerCase()
       
       // Find user with caching
-      const cache = getCacheService(CACHE_CONFIGS.user)
+      const cache = getCacheService(CACHE_CONFIGS.user!)
       let user = await cache.get<any>(cache.generateKey('user', `email:${normalizedEmail}`))
 
       if (!user) {
@@ -459,20 +461,22 @@ authRoutes.post('/login/form', async (c) => {
       .run()
     
     return c.html(html`
-      <div class="rounded-lg bg-lime-500/10 p-4 ring-1 ring-lime-500/20">
-        <div class="flex items-start gap-x-3">
-          <svg class="h-5 w-5 text-lime-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-          <div class="flex-1">
-            <p class="text-sm font-medium text-lime-300">Login successful! Redirecting to admin dashboard...</p>
+      <div id="form-response">
+        <div class="rounded-lg bg-green-100 dark:bg-lime-500/10 p-4 ring-1 ring-green-400 dark:ring-lime-500/20">
+          <div class="flex items-start gap-x-3">
+            <svg class="h-5 w-5 text-green-600 dark:text-lime-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-green-700 dark:text-lime-300">Login successful! Redirecting to admin dashboard...</p>
+            </div>
           </div>
+          <script>
+            setTimeout(() => {
+              window.location.href = '/admin';
+            }, 2000);
+          </script>
         </div>
-        <script>
-          setTimeout(() => {
-            window.location.href = '/admin';
-          }, 2000);
-        </script>
       </div>
     `)
   } catch (error) {

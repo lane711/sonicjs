@@ -1,8 +1,12 @@
 import { Hono } from 'hono'
 import { SeedDataService } from './services/seed-data-service'
 
+type Bindings = {
+  DB: D1Database
+}
+
 export function createSeedDataAdminRoutes() {
-  const routes = new Hono()
+  const routes = new Hono<{ Bindings: Bindings }>()
 
   // Get seed data status/info
   routes.get('/', async (c) => {
@@ -244,7 +248,7 @@ export function createSeedDataAdminRoutes() {
   // Generate seed data
   routes.post('/generate', async (c) => {
     try {
-      const db = c.get('db')
+      const db = c.env.DB
       const seedService = new SeedDataService(db)
 
       const result = await seedService.seedAll()
@@ -265,7 +269,7 @@ export function createSeedDataAdminRoutes() {
   // Clear seed data
   routes.post('/clear', async (c) => {
     try {
-      const db = c.get('db')
+      const db = c.env.DB
       const seedService = new SeedDataService(db)
 
       await seedService.clearSeedData()

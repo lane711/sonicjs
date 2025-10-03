@@ -210,7 +210,7 @@ export function createDatabaseToolsAdminRoutes() {
 
       const pageData: DatabaseTablePageData = {
         user: {
-          name: user.email.split('@')[0],
+          name: user.email.split('@')[0] || 'Unknown',
           email: user.email,
           role: user.role
         },

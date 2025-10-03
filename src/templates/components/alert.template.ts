@@ -12,7 +12,7 @@ export interface AlertData {
 export function renderAlert(data: AlertData): string {
   const typeClasses = {
     success: 'bg-green-50 dark:bg-green-500/10 border border-green-600/20 dark:border-green-500/20',
-    error: 'bg-red-50 dark:bg-red-500/10 border border-red-600/20 dark:border-red-500/20',
+    error: 'bg-error/10 border border-red-600/20 dark:border-red-500/20',
     warning: 'bg-amber-50 dark:bg-amber-500/10 border border-amber-600/20 dark:border-amber-500/20',
     info: 'bg-blue-50 dark:bg-blue-500/10 border border-blue-600/20 dark:border-blue-500/20'
   }

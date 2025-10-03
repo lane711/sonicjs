@@ -68,7 +68,7 @@ adminMediaRoutes.get('/', async (c) => {
     const db = c.env.DB
 
     // Use cache for media list
-    const cache = getCacheService(CACHE_CONFIGS.media)
+    const cache = getCacheService(CACHE_CONFIGS.media!)
     const cacheKey = cache.generateKey('list', `folder:${folder}_type:${type}_page:${page}`)
 
     const cachedData = await cache.get<MediaLibraryPageData>(cacheKey)

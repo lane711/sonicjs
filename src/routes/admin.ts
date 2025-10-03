@@ -15,6 +15,7 @@ import { MigrationService } from '../services/migrations'
 import { createDatabaseToolsAdminRoutes } from '../plugins/core-plugins/database-tools-plugin/admin-routes'
 import { createSeedDataAdminRoutes } from '../plugins/core-plugins/seed-data-plugin/admin-routes'
 import { getActivePlugins } from '../middleware/plugin-middleware'
+import packageJson from '../../package.json'
 
 type Bindings = {
   DB: D1Database
@@ -842,14 +843,9 @@ adminRoutes.route('/database-tools', createDatabaseToolsAdminRoutes())
 // Seed data
 adminRoutes.route('/seed-data', createSeedDataAdminRoutes())
 
-// Settings page
-adminRoutes.get('/settings', (c) => {
-  const user = c.get('user')
-  const url = new URL(c.req.url)
-  const activeTab = url.searchParams.get('tab') || 'general'
-  
-  // Mock settings data - in a real app, this would come from database
-  const mockSettings = {
+// Helper function to get mock settings data
+function getMockSettings(user: any) {
+  return {
     general: {
       siteName: 'SonicJS AI',
       siteDescription: 'A modern headless CMS powered by AI',
@@ -905,17 +901,122 @@ adminRoutes.get('/settings', (c) => {
       tables: []
     }
   }
-  
+}
+
+// Settings page (redirects to general settings)
+adminRoutes.get('/settings', (c) => {
+  return c.redirect('/admin/settings/general')
+})
+
+// General settings
+adminRoutes.get('/settings/general', (c) => {
+  const user = c.get('user')
   const pageData: SettingsPageData = {
     user: user ? {
       name: user.email,
       email: user.email,
       role: user.role
     } : undefined,
-    settings: mockSettings,
-    activeTab
+    settings: getMockSettings(user),
+    activeTab: 'general',
+    version: `v${packageJson.version}`
   }
-  
+  return c.html(renderSettingsPage(pageData))
+})
+
+// Appearance settings
+adminRoutes.get('/settings/appearance', (c) => {
+  const user = c.get('user')
+  const pageData: SettingsPageData = {
+    user: user ? {
+      name: user.email,
+      email: user.email,
+      role: user.role
+    } : undefined,
+    settings: getMockSettings(user),
+    activeTab: 'appearance',
+    version: `v${packageJson.version}`
+  }
+  return c.html(renderSettingsPage(pageData))
+})
+
+// Security settings
+adminRoutes.get('/settings/security', (c) => {
+  const user = c.get('user')
+  const pageData: SettingsPageData = {
+    user: user ? {
+      name: user.email,
+      email: user.email,
+      role: user.role
+    } : undefined,
+    settings: getMockSettings(user),
+    activeTab: 'security',
+    version: `v${packageJson.version}`
+  }
+  return c.html(renderSettingsPage(pageData))
+})
+
+// Notifications settings
+adminRoutes.get('/settings/notifications', (c) => {
+  const user = c.get('user')
+  const pageData: SettingsPageData = {
+    user: user ? {
+      name: user.email,
+      email: user.email,
+      role: user.role
+    } : undefined,
+    settings: getMockSettings(user),
+    activeTab: 'notifications',
+    version: `v${packageJson.version}`
+  }
+  return c.html(renderSettingsPage(pageData))
+})
+
+// Storage settings
+adminRoutes.get('/settings/storage', (c) => {
+  const user = c.get('user')
+  const pageData: SettingsPageData = {
+    user: user ? {
+      name: user.email,
+      email: user.email,
+      role: user.role
+    } : undefined,
+    settings: getMockSettings(user),
+    activeTab: 'storage',
+    version: `v${packageJson.version}`
+  }
+  return c.html(renderSettingsPage(pageData))
+})
+
+// Migrations settings
+adminRoutes.get('/settings/migrations', (c) => {
+  const user = c.get('user')
+  const pageData: SettingsPageData = {
+    user: user ? {
+      name: user.email,
+      email: user.email,
+      role: user.role
+    } : undefined,
+    settings: getMockSettings(user),
+    activeTab: 'migrations',
+    version: `v${packageJson.version}`
+  }
+  return c.html(renderSettingsPage(pageData))
+})
+
+// Database tools settings
+adminRoutes.get('/settings/database-tools', (c) => {
+  const user = c.get('user')
+  const pageData: SettingsPageData = {
+    user: user ? {
+      name: user.email,
+      email: user.email,
+      role: user.role
+    } : undefined,
+    settings: getMockSettings(user),
+    activeTab: 'database-tools',
+    version: `v${packageJson.version}`
+  }
   return c.html(renderSettingsPage(pageData))
 })
 

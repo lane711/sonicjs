@@ -158,7 +158,7 @@ describe('CacheService - Complex Data Types', () => {
   let cache: CacheService
 
   beforeEach(() => {
-    cache = createCacheService(CACHE_CONFIGS.content)
+    cache = createCacheService(CACHE_CONFIGS.content!)
   })
 
   it('should cache objects', async () => {
@@ -248,7 +248,7 @@ describe('CacheService - Statistics', () => {
   let cache: CacheService
 
   beforeEach(() => {
-    cache = createCacheService(CACHE_CONFIGS.content)
+    cache = createCacheService(CACHE_CONFIGS.content!)
   })
 
   it('should track cache hits', async () => {
@@ -302,7 +302,7 @@ describe('CacheService - Pattern Invalidation', () => {
   let cache: CacheService
 
   beforeEach(() => {
-    cache = createCacheService(CACHE_CONFIGS.content)
+    cache = createCacheService(CACHE_CONFIGS.content!)
   })
 
   it('should invalidate entries matching pattern', async () => {
@@ -346,7 +346,7 @@ describe('CacheService - Batch Operations', () => {
   let cache: CacheService
 
   beforeEach(() => {
-    cache = createCacheService(CACHE_CONFIGS.content)
+    cache = createCacheService(CACHE_CONFIGS.content!)
   })
 
   it('should get multiple values at once', async () => {
@@ -413,7 +413,7 @@ describe('CacheService - Get or Set Pattern', () => {
   let cache: CacheService
 
   beforeEach(() => {
-    cache = createCacheService(CACHE_CONFIGS.content)
+    cache = createCacheService(CACHE_CONFIGS.content!)
   })
 
   it('should fetch and cache value when not found', async () => {
@@ -448,22 +448,22 @@ describe('Global Cache Management', () => {
   })
 
   it('should get singleton cache instance', () => {
-    const cache1 = getCacheService(CACHE_CONFIGS.content)
-    const cache2 = getCacheService(CACHE_CONFIGS.content)
+    const cache1 = getCacheService(CACHE_CONFIGS.content!)
+    const cache2 = getCacheService(CACHE_CONFIGS.content!)
 
     expect(cache1).toBe(cache2) // Same instance
   })
 
   it('should get different instances for different namespaces', () => {
-    const contentCache = getCacheService(CACHE_CONFIGS.content)
-    const userCache = getCacheService(CACHE_CONFIGS.user)
+    const contentCache = getCacheService(CACHE_CONFIGS.content!)
+    const userCache = getCacheService(CACHE_CONFIGS.user!)
 
     expect(contentCache).not.toBe(userCache)
   })
 
   it('should clear all cache instances', async () => {
-    const contentCache = getCacheService(CACHE_CONFIGS.content)
-    const userCache = getCacheService(CACHE_CONFIGS.user)
+    const contentCache = getCacheService(CACHE_CONFIGS.content!)
+    const userCache = getCacheService(CACHE_CONFIGS.user!)
 
     await contentCache.set('content:key', 'value')
     await userCache.set('user:key', 'value')
@@ -478,8 +478,8 @@ describe('Global Cache Management', () => {
   })
 
   it('should get stats from all cache instances', async () => {
-    const contentCache = getCacheService(CACHE_CONFIGS.content)
-    const userCache = getCacheService(CACHE_CONFIGS.user)
+    const contentCache = getCacheService(CACHE_CONFIGS.content!)
+    const userCache = getCacheService(CACHE_CONFIGS.user!)
 
     await contentCache.set('content:key', 'value')
     await userCache.set('user:key', 'value')
@@ -488,7 +488,7 @@ describe('Global Cache Management', () => {
 
     expect(stats.content).toBeDefined()
     expect(stats.user).toBeDefined()
-    expect(stats.content.entryCount).toBe(1)
-    expect(stats.user.entryCount).toBe(1)
+    expect(stats.content!.entryCount).toBe(1)
+    expect(stats.user!.entryCount).toBe(1)
   })
 })

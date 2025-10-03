@@ -25,7 +25,7 @@ export const adminContentRoutes = new Hono<{ Bindings: Bindings; Variables: Vari
 
 // Get collection fields
 async function getCollectionFields(db: D1Database, collectionId: string) {
-  const cache = getCacheService(CACHE_CONFIGS.collection)
+  const cache = getCacheService(CACHE_CONFIGS.collection!)
 
   return cache.getOrSet(
     cache.generateKey('fields', collectionId),
@@ -53,7 +53,7 @@ async function getCollectionFields(db: D1Database, collectionId: string) {
 
 // Get collection by ID
 async function getCollection(db: D1Database, collectionId: string) {
-  const cache = getCacheService(CACHE_CONFIGS.collection)
+  const cache = getCacheService(CACHE_CONFIGS.collection!)
 
   return cache.getOrSet(
     cache.generateKey('collection', collectionId),
@@ -351,7 +351,7 @@ adminContentRoutes.get('/:id/edit', async (c) => {
     const referrerParams = url.searchParams.get('ref') || ''
 
     // Get content with caching
-    const cache = getCacheService(CACHE_CONFIGS.content)
+    const cache = getCacheService(CACHE_CONFIGS.content!)
     const content = await cache.getOrSet(
       cache.generateKey('content', id),
       async () => {
@@ -568,7 +568,7 @@ adminContentRoutes.post('/', async (c) => {
     ).run()
 
     // Invalidate collection content list cache
-    const cache = getCacheService(CACHE_CONFIGS.content)
+    const cache = getCacheService(CACHE_CONFIGS.content!)
     await cache.invalidate(`content:list:${collectionId}:*`)
 
     // Create initial version
@@ -764,7 +764,7 @@ adminContentRoutes.put('/:id', async (c) => {
     ).run()
 
     // Invalidate content cache
-    const cache = getCacheService(CACHE_CONFIGS.content)
+    const cache = getCacheService(CACHE_CONFIGS.content!)
     await cache.delete(cache.generateKey('content', id))
     await cache.invalidate(`content:list:${existingContent.collection_id}:*`)
 
@@ -1113,7 +1113,7 @@ adminContentRoutes.post('/bulk-action', async (c) => {
     }
 
     // Invalidate cache for all affected content items
-    const cache = getCacheService(CACHE_CONFIGS.content)
+    const cache = getCacheService(CACHE_CONFIGS.content!)
     for (const contentId of ids) {
       await cache.delete(cache.generateKey('content', contentId))
     }
@@ -1152,7 +1152,7 @@ adminContentRoutes.delete('/:id', async (c) => {
     await deleteStmt.bind(now, id).run()
 
     // Invalidate cache
-    const cache = getCacheService(CACHE_CONFIGS.content)
+    const cache = getCacheService(CACHE_CONFIGS.content!)
     await cache.delete(cache.generateKey('content', id))
     await cache.invalidate('content:list:*')
 

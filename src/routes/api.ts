@@ -343,7 +343,7 @@ apiRoutes.get('/collections', async (c) => {
     const db = c.env.DB
 
     // Use cache for API collections list
-    const cache = getCacheService(CACHE_CONFIGS.api)
+    const cache = getCacheService(CACHE_CONFIGS.api!)
     const cacheKey = cache.generateKey('collections', 'all')
 
     const cacheResult = await cache.getWithSource<any>(cacheKey)
@@ -414,7 +414,7 @@ apiRoutes.get('/content', async (c) => {
     const limit = Math.min(parseInt(c.req.query('limit') || '50'), 100)
 
     // Use cache for API content list
-    const cache = getCacheService(CACHE_CONFIGS.api)
+    const cache = getCacheService(CACHE_CONFIGS.api!)
     const cacheKey = cache.generateKey('content-list', `limit:${limit}`)
 
     const cacheResult = await cache.getWithSource<any>(cacheKey)
@@ -492,7 +492,7 @@ apiRoutes.get('/collections/:collection/content', async (c) => {
     const limit = Math.min(parseInt(c.req.query('limit') || '50'), 100)
 
     // Use cache for collection-specific content
-    const cache = getCacheService(CACHE_CONFIGS.api)
+    const cache = getCacheService(CACHE_CONFIGS.api!)
     const cacheKey = cache.generateKey('collection-content', `${collection}:limit:${limit}`)
 
     const cacheResult = await cache.getWithSource<any>(cacheKey)

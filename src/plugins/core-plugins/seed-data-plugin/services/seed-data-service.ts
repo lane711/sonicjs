@@ -106,8 +106,8 @@ export class SeedDataService {
     const hashedPassword = 'password123' // TODO: Use actual bcrypt hash
 
     for (let i = 0; i < 20; i++) {
-      const firstName = this.firstNames[Math.floor(Math.random() * this.firstNames.length)]
-      const lastName = this.lastNames[Math.floor(Math.random() * this.lastNames.length)]
+      const firstName = this.firstNames[Math.floor(Math.random() * this.firstNames.length)] || 'John'
+      const lastName = this.lastNames[Math.floor(Math.random() * this.lastNames.length)] || 'Doe'
       const username = `${firstName.toLowerCase()}${lastName.toLowerCase()}${i}`
       const email = `${username}@example.com`
       const createdAt = this.randomDate()
@@ -155,22 +155,22 @@ export class SeedDataService {
 
       // Generate content based on collection type
       if (collection.name === 'blog_posts' || collection.name.includes('blog')) {
-        title = this.blogTitles[Math.floor(Math.random() * this.blogTitles.length)]
+        title = this.blogTitles[Math.floor(Math.random() * this.blogTitles.length)] || 'Untitled Blog Post'
         contentData = {
-          body: this.blogContent[Math.floor(Math.random() * this.blogContent.length)],
+          body: this.blogContent[Math.floor(Math.random() * this.blogContent.length)] || 'Blog content here',
           excerpt: 'A brief introduction to this article that provides an overview of the main topics covered.',
           tags: this.generateTags(),
           featured: Math.random() > 0.7
         }
       } else if (collection.name === 'pages' || collection.name.includes('page')) {
-        title = this.pageTitles[Math.floor(Math.random() * this.pageTitles.length)]
+        title = this.pageTitles[Math.floor(Math.random() * this.pageTitles.length)] || 'Untitled Page'
         contentData = {
           body: 'This is a standard page with important information about our services and policies.',
           template: 'default',
           showInMenu: Math.random() > 0.5
         }
       } else if (collection.name === 'products' || collection.name.includes('product')) {
-        title = this.productTitles[Math.floor(Math.random() * this.productTitles.length)]
+        title = this.productTitles[Math.floor(Math.random() * this.productTitles.length)] || 'Untitled Product'
         contentData = {
           description: 'High-quality product with excellent features and great value for money.',
           price: (Math.random() * 500 + 10).toFixed(2),
