@@ -108,15 +108,16 @@ adminRoutes.use('*', async (c, next) => {
 adminRoutes.get('/', async (c) => {
   const user = c.get('user')
   const dynamicMenuItems = c.get('dynamicMenuItems') || []
-  
+
   const pageData: DashboardPageData = {
     user: user ? {
       name: user.email,
       email: user.email,
       role: user.role
-    } : undefined
+    } : undefined,
+    version: `v${packageJson.version}`
   }
-  
+
   return c.html(renderDashboardPageWithDynamicMenu(pageData, dynamicMenuItems))
 })
 

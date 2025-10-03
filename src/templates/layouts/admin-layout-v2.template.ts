@@ -5,6 +5,7 @@ export interface AdminLayoutData {
   title: string
   pageTitle?: string
   currentPath?: string
+  version?: string
   user?: {
     name: string
     email: string
