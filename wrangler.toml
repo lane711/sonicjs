@@ -38,8 +38,8 @@ bucket_name = "sonicjs-media-dev"
 # KV Namespace for caching
 [[kv_namespaces]]
 binding = "CACHE_KV"
-id = "placeholder-dev"
-preview_id = "placeholder-preview-dev"
+id = "a16f8246fc294d809c90b0fb2df6d363"
+preview_id = "25360861fb2745fab3b1ef2f0f13ffc8"
 
 [env.preview]
 name = "sonicjs-ai-preview"
@@ -60,8 +60,8 @@ bucket_name = "sonicjs-media-preview"
 
 [[env.preview.kv_namespaces]]
 binding = "CACHE_KV"
-id = "placeholder-preview"
-preview_id = "placeholder-preview-preview"
+id = "6fc451bee9bb412ebd1d325723779c9c"
+preview_id = "38c54bd2b55643c097412fa3464c2ddd"
 
 [env.production]
 name = "sonicjs-ai-prod"
@@ -80,5 +80,5 @@ bucket_name = "sonicjs-media-prod"
 
 [[env.production.kv_namespaces]]
 binding = "CACHE_KV"
-id = "placeholder-prod"
-preview_id = "placeholder-preview-prod"
+id = "7171ca98640e43b6b33dbff516a5a6cf"
+preview_id = "aed99543752d438b8051a0b6809ced10"
