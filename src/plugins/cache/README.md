@@ -296,34 +296,39 @@ const myCache = getCacheService({
 - [x] Integrate cache into user authentication
   - [x] Cache user lookups by email and ID
   - [x] Invalidate on login
+- [x] Admin UI for cache management
+  - [x] **Statistics Dashboard** (at `/admin/cache`)
+    - [x] Real-time hit/miss rates by namespace
+    - [x] Overall cache hit rate display
+    - [x] Memory usage visualization
+    - [x] Per-namespace statistics table
+    - [x] Health status indicator
+  - [x] **Cache Management Controls**
+    - [x] Clear all caches button
+    - [x] Clear by namespace
+    - [x] Refresh statistics button
+    - [x] Color-coded hit rate indicators
 - [ ] Integrate cache into media queries
 - [ ] Integrate cache into API endpoints
 - [ ] Event-based cache invalidation (currently manual)
-- [ ] Admin UI for cache management
-  - [ ] **Statistics Dashboard**
-    - [ ] Real-time hit/miss rates by namespace
-    - [ ] Memory usage visualization (pie chart)
-    - [ ] Cache size trends over time (line chart)
-    - [ ] Top cached items by access frequency
-    - [ ] Hit rate trends (hourly/daily)
-  - [ ] **Cache Browser**
-    - [ ] View all cached items by namespace
-    - [ ] Search/filter cache keys
-    - [ ] Inspect individual cache entries (key, value, TTL, size)
-    - [ ] Preview cached content
-    - [ ] Sort by size, age, hits
-  - [ ] **Cache Management Controls**
-    - [ ] Clear all caches button
-    - [ ] Clear by namespace
-    - [ ] Pattern invalidation UI with regex builder
-    - [ ] Bulk delete selected items
-    - [ ] Export cache statistics
-  - [ ] **Analytics & Insights**
-    - [ ] Cache efficiency score
-    - [ ] Cost savings calculator (DB queries avoided)
-    - [ ] Slowest cache misses
-    - [ ] Most frequently accessed keys
-    - [ ] Cache size warnings
+- [ ] **Cache Browser** (future enhancement)
+  - [ ] View all cached items by namespace
+  - [ ] Search/filter cache keys
+  - [ ] Inspect individual cache entries (key, value, TTL, size)
+  - [ ] Preview cached content
+  - [ ] Sort by size, age, hits
+- [ ] **Advanced Analytics** (future enhancement)
+  - [ ] Cache size trends over time (line chart)
+  - [ ] Top cached items by access frequency
+  - [ ] Hit rate trends (hourly/daily)
+  - [ ] Cache efficiency score
+  - [ ] Cost savings calculator (DB queries avoided)
+  - [ ] Slowest cache misses
+  - [ ] Most frequently accessed keys
+  - [ ] Cache size warnings
+  - [ ] Pattern invalidation UI with regex builder
+  - [ ] Bulk delete selected items
+  - [ ] Export cache statistics
 - [ ] Cache warming utilities
 - [ ] Cache preloading on startup
 
