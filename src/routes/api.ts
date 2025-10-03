@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { cors } from 'hono/cors'
 // import { APIGenerator } from '../utils/api-generator'
 import { schemaDefinitions } from '../schemas'
+import { getCacheService, CACHE_CONFIGS } from '../plugins/cache'
 
 type Bindings = {
   DB: D1Database
@@ -340,23 +341,38 @@ apiRoutes.get('/health', (c) => {
 apiRoutes.get('/collections', async (c) => {
   try {
     const db = c.env.DB
+
+    // Use cache for API collections list
+    const cache = getCacheService(CACHE_CONFIGS.api)
+    const cacheKey = cache.generateKey('collections', 'all')
+
+    const cachedData = await cache.get<any>(cacheKey)
+    if (cachedData) {
+      return c.json(cachedData)
+    }
+
     const stmt = db.prepare('SELECT * FROM collections WHERE is_active = 1')
     const { results } = await stmt.all()
-    
+
     // Parse schema and format results
     const transformedResults = results.map((row: any) => ({
       ...row,
       schema: row.schema ? JSON.parse(row.schema) : {},
       is_active: row.is_active // Keep as number (1 or 0)
     }))
-    
-    return c.json({
+
+    const responseData = {
       data: transformedResults,
       meta: {
         count: results.length,
         timestamp: new Date().toISOString()
       }
-    })
+    }
+
+    // Cache the response
+    await cache.set(cacheKey, responseData)
+
+    return c.json(responseData)
   } catch (error) {
     console.error('Error fetching collections:', error)
     return c.json({ error: 'Failed to fetch collections' }, 500)
@@ -368,9 +384,20 @@ apiRoutes.get('/content', async (c) => {
   try {
     const db = c.env.DB
     const limit = Math.min(parseInt(c.req.query('limit') || '50'), 100)
+
+    // Use cache for API content list
+    const cache = getCacheService(CACHE_CONFIGS.api)
+    const cacheKey = cache.generateKey('content-list', `limit:${limit}`)
+
+    const cachedData = await cache.get<any>(cacheKey)
+    if (cachedData) {
+      return c.json(cachedData)
+    }
+
+    // Fetch from database
     const stmt = db.prepare(`SELECT * FROM content ORDER BY created_at DESC LIMIT ${limit}`)
     const { results } = await stmt.all()
-    
+
     // Transform results to match API spec (camelCase)
     const transformedResults = results.map((row: any) => ({
       id: row.id,
@@ -382,14 +409,19 @@ apiRoutes.get('/content', async (c) => {
       created_at: row.created_at,
       updated_at: row.updated_at
     }))
-    
-    return c.json({
+
+    const responseData = {
       data: transformedResults,
       meta: {
         count: results.length,
         timestamp: new Date().toISOString()
       }
-    })
+    }
+
+    // Cache the response
+    await cache.set(cacheKey, responseData)
+
+    return c.json(responseData)
   } catch (error) {
     console.error('Error fetching content:', error)
     return c.json({ error: 'Failed to fetch content' }, 500)
