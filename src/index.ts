@@ -40,6 +40,7 @@ type Bindings = {
   DEFAULT_FROM_EMAIL?: string
   IMAGES_ACCOUNT_ID?: string
   IMAGES_API_TOKEN?: string
+  ENVIRONMENT?: string
 }
 
 type Variables = {

@@ -21,6 +21,7 @@ type Bindings = {
   DB: D1Database
   KV: KVNamespace
   MEDIA_BUCKET: R2Bucket
+  ENVIRONMENT?: string
 }
 
 type Variables = {
