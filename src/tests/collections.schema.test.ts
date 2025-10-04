@@ -185,6 +185,7 @@ describe('Collections Schema Validation', () => {
           description: 'A test collection',
           schema: { type: 'object', properties: {} },
           isActive: true,
+          managed: false,
           createdAt: new Date(),
           updatedAt: new Date()
         }

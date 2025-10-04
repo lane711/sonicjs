@@ -2,6 +2,22 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { Hono } from 'hono'
 import { apiRoutes } from '../routes/api'
+import * as cacheModule from '../plugins/cache'
+
+// Mock the cache service
+vi.mock('../plugins/cache', async () => {
+  const actual = await vi.importActual('../plugins/cache')
+  return {
+    ...actual,
+    getCacheService: vi.fn(() => ({
+      generateKey: vi.fn((prefix: string, key: string) => `${prefix}:${key}`),
+      getWithSource: vi.fn().mockResolvedValue({ hit: false, data: null, source: null, ttl: null }),
+      set: vi.fn().mockResolvedValue(undefined),
+      delete: vi.fn().mockResolvedValue(undefined),
+      clear: vi.fn().mockResolvedValue(undefined)
+    }))
+  }
+})
 
 // Mock environment bindings
 const createMockEnv = () => ({
@@ -265,7 +281,7 @@ describe('API Routes', () => {
       
       expect(res.status).toBe(200)
       expect(mockEnv.DB.prepare).toHaveBeenCalledWith('SELECT * FROM collections WHERE name = ? AND is_active = 1')
-      expect(mockEnv.DB.prepare).toHaveBeenCalledWith('SELECT * FROM content WHERE collection_id = ? ORDER BY created_at DESC')
+      expect(mockEnv.DB.prepare).toHaveBeenCalledWith('SELECT * FROM content WHERE collection_id = ? ORDER BY created_at DESC LIMIT 50')
       
       expect(data.data).toHaveLength(1)
       expect(data.data[0].collectionId).toBe('col1')
