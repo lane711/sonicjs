@@ -642,6 +642,21 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
         }
       });
     </script>
+
+    <!-- Confirmation Dialog for Bulk Delete -->
+    ${renderConfirmationDialog({
+      id: 'media-bulk-delete-confirm',
+      title: 'Delete Selected Files',
+      message: `Are you sure you want to delete ${data.files.length > 0 ? 'the selected files' : 'these files'}? This action cannot be undone and the files will be permanently removed.`,
+      confirmText: 'Delete Files',
+      cancelText: 'Cancel',
+      confirmClass: 'bg-red-500 hover:bg-red-400',
+      iconColor: 'red',
+      onConfirm: 'performBulkDelete()'
+    })}
+
+    <!-- Confirmation Dialog Script -->
+    ${getConfirmationDialogScript()}
   `
 
   function buildPageUrl(page: number, folder: string, type: string): string {

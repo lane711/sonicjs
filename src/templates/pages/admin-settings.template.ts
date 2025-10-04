@@ -1,4 +1,5 @@
 import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
+import { renderConfirmationDialog, getConfirmationDialogScript } from '../components/confirmation-dialog.template'
 
 export interface SettingsPageData {
   user?: {
@@ -189,12 +190,14 @@ export function renderSettingsPage(data: SettingsPageData): string {
       }
       
       function resetSettings() {
-        if (confirm('Are you sure you want to reset all settings to their default values? This action cannot be undone.')) {
-          showNotification('Settings reset to defaults', 'info');
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
-        }
+        showConfirmDialog('reset-settings-confirm');
+      }
+
+      function performResetSettings() {
+        showNotification('Settings reset to defaults', 'info');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       }
       
       // Migration functions
@@ -216,20 +219,23 @@ export function renderSettingsPage(data: SettingsPageData): string {
       window.runPendingMigrations = async function() {
         const btn = document.getElementById('run-migrations-btn');
         if (!btn || btn.disabled) return;
-        
-        if (!confirm('Are you sure you want to run pending migrations? This action cannot be undone.')) {
-          return;
-        }
-        
+
+        showConfirmDialog('run-migrations-confirm');
+      };
+
+      window.performRunMigrations = async function() {
+        const btn = document.getElementById('run-migrations-btn');
+        if (!btn) return;
+
         btn.disabled = true;
         btn.innerHTML = 'Running...';
-        
+
         try {
           const response = await fetch('/admin/api/migrations/run', {
             method: 'POST'
           });
           const result = await response.json();
-          
+
           if (result.success) {
             alert(result.message);
             setTimeout(() => refreshMigrationStatus(), 1000);
@@ -463,6 +469,31 @@ export function renderSettingsPage(data: SettingsPageData): string {
         }
       };
     </script>
+
+    <!-- Confirmation Dialogs -->
+    ${renderConfirmationDialog({
+      id: 'reset-settings-confirm',
+      title: 'Reset Settings',
+      message: 'Are you sure you want to reset all settings to their default values? This action cannot be undone.',
+      confirmText: 'Reset',
+      cancelText: 'Cancel',
+      iconColor: 'yellow',
+      confirmClass: 'bg-yellow-500 hover:bg-yellow-400',
+      onConfirm: 'performResetSettings()'
+    })}
+
+    ${renderConfirmationDialog({
+      id: 'run-migrations-confirm',
+      title: 'Run Migrations',
+      message: 'Are you sure you want to run pending migrations? This action cannot be undone.',
+      confirmText: 'Run Migrations',
+      cancelText: 'Cancel',
+      iconColor: 'blue',
+      confirmClass: 'bg-blue-500 hover:bg-blue-400',
+      onConfirm: 'performRunMigrations()'
+    })}
+
+    ${getConfirmationDialogScript()}
   `
 
   const layoutData: AdminLayoutCatalystData = {
@@ -1204,20 +1235,23 @@ function renderMigrationSettings(settings?: MigrationSettings): string {
         window.runPendingMigrations = async function() {
           const btn = document.getElementById('run-migrations-btn');
           if (!btn || btn.disabled) return;
-          
-          if (!confirm('Are you sure you want to run pending migrations? This action cannot be undone.')) {
-            return;
-          }
-          
+
+          showConfirmDialog('run-migrations-confirm');
+        };
+
+        window.performRunMigrations = async function() {
+          const btn = document.getElementById('run-migrations-btn');
+          if (!btn) return;
+
           btn.disabled = true;
           btn.innerHTML = 'Running...';
-          
+
           try {
             const response = await fetch('/admin/api/migrations/run', {
               method: 'POST'
             });
             const result = await response.json();
-            
+
             if (result.success) {
               alert(result.message);
               setTimeout(() => refreshMigrationStatus(), 1000);

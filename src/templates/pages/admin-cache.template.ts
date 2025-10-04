@@ -1,4 +1,5 @@
 import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
+import { renderConfirmationDialog, getConfirmationDialogScript } from '../components/confirmation-dialog.template'
 
 export interface CacheStats {
   memoryHits: number
@@ -157,10 +158,10 @@ export function renderCacheDashboard(data: CacheDashboardData): string {
       }
 
       async function clearAllCaches() {
-        if (!confirm('Are you sure you want to clear all cache entries? This cannot be undone.')) {
-          return
-        }
+        showConfirmDialog('clear-all-cache-confirm')
+      }
 
+      async function performClearAllCaches() {
         try {
           const response = await fetch('/admin/cache/clear', {
             method: 'POST'
@@ -178,13 +179,18 @@ export function renderCacheDashboard(data: CacheDashboardData): string {
         }
       }
 
+      let namespaceToDelete = null
+
       async function clearNamespaceCache(namespace) {
-        if (!confirm(\`Clear cache for namespace "\${namespace}"?\`)) {
-          return
-        }
+        namespaceToDelete = namespace
+        showConfirmDialog('clear-namespace-cache-confirm')
+      }
+
+      async function performClearNamespaceCache() {
+        if (!namespaceToDelete) return
 
         try {
-          const response = await fetch(\`/admin/cache/clear/\${namespace}\`, {
+          const response = await fetch(\`/admin/cache/clear/\${namespaceToDelete}\`, {
             method: 'POST'
           })
 
@@ -197,9 +203,36 @@ export function renderCacheDashboard(data: CacheDashboardData): string {
           }
         } catch (error) {
           alert('Error clearing cache: ' + error.message)
+        } finally {
+          namespaceToDelete = null
         }
       }
     </script>
+
+    <!-- Confirmation Dialogs -->
+    ${renderConfirmationDialog({
+      id: 'clear-all-cache-confirm',
+      title: 'Clear All Cache',
+      message: 'Are you sure you want to clear all cache entries? This cannot be undone.',
+      confirmText: 'Clear All',
+      cancelText: 'Cancel',
+      iconColor: 'yellow',
+      confirmClass: 'bg-yellow-500 hover:bg-yellow-400',
+      onConfirm: 'performClearAllCaches()'
+    })}
+
+    ${renderConfirmationDialog({
+      id: 'clear-namespace-cache-confirm',
+      title: 'Clear Namespace Cache',
+      message: 'Clear cache for this namespace?',
+      confirmText: 'Clear',
+      cancelText: 'Cancel',
+      iconColor: 'yellow',
+      confirmClass: 'bg-yellow-500 hover:bg-yellow-400',
+      onConfirm: 'performClearNamespaceCache()'
+    })}
+
+    ${getConfirmationDialogScript()}
   `
 
   const layoutData: AdminLayoutCatalystData = {

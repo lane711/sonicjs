@@ -1,4 +1,5 @@
 import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
+import { renderConfirmationDialog, getConfirmationDialogScript } from '../components/confirmation-dialog.template'
 
 export interface Plugin {
   id: string
@@ -303,24 +304,29 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
         }
       }
       
+      let pluginToUninstall = null;
+
       async function uninstallPlugin(pluginId) {
-        if (!confirm('Are you sure you want to uninstall this plugin? This action cannot be undone.')) {
-          return;
-        }
-        
+        pluginToUninstall = pluginId;
+        showConfirmDialog('uninstall-plugin-confirm');
+      }
+
+      async function performUninstallPlugin() {
+        if (!pluginToUninstall) return;
+
         const button = event.target;
-        button.disabled = true;
-        
+        if (button) button.disabled = true;
+
         try {
-          const response = await fetch(\`/admin/plugins/\${pluginId}/uninstall\`, {
+          const response = await fetch(\`/admin/plugins/\${pluginToUninstall}/uninstall\`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             }
           });
-          
+
           const result = await response.json();
-          
+
           if (result.success) {
             showNotification('Plugin uninstalled successfully!', 'success');
             setTimeout(() => location.reload(), 1500);
@@ -329,7 +335,9 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
           }
         } catch (error) {
           showNotification(error.message, 'error');
-          button.disabled = false;
+          if (button) button.disabled = false;
+        } finally {
+          pluginToUninstall = null;
         }
       }
       
@@ -369,6 +377,20 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
         }
       });
     </script>
+
+    <!-- Confirmation Dialogs -->
+    ${renderConfirmationDialog({
+      id: 'uninstall-plugin-confirm',
+      title: 'Uninstall Plugin',
+      message: 'Are you sure you want to uninstall this plugin? This action cannot be undone.',
+      confirmText: 'Uninstall',
+      cancelText: 'Cancel',
+      iconColor: 'red',
+      confirmClass: 'bg-red-500 hover:bg-red-400',
+      onConfirm: 'performUninstallPlugin()'
+    })}
+
+    ${getConfirmationDialogScript()}
   `
 
   const layoutData: AdminLayoutCatalystData = {

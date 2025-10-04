@@ -1,6 +1,7 @@
 import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
 import { renderDynamicField, renderFieldGroup, FieldDefinition } from '../components/dynamic-field.template'
 import { renderAlert } from '../components/alert.template'
+import { renderConfirmationDialog, getConfirmationDialogScript } from '../components/confirmation-dialog.template'
 
 export interface Collection {
   id: string
@@ -354,9 +355,34 @@ export function renderContentFormPage(data: ContentFormData): string {
       </div>
     </div>
 
+    <!-- Confirmation Dialogs -->
+    ${renderConfirmationDialog({
+      id: 'duplicate-content-confirm',
+      title: 'Duplicate Content',
+      message: 'Create a copy of this content?',
+      confirmText: 'Duplicate',
+      cancelText: 'Cancel',
+      iconColor: 'blue',
+      confirmClass: 'bg-blue-500 hover:bg-blue-400',
+      onConfirm: 'performDuplicateContent()'
+    })}
+
+    ${renderConfirmationDialog({
+      id: 'delete-content-confirm',
+      title: 'Delete Content',
+      message: 'Are you sure you want to delete this content? This action cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      iconColor: 'red',
+      confirmClass: 'bg-red-500 hover:bg-red-400',
+      onConfirm: `performDeleteContent('${data.id}')`
+    })}
+
+    ${getConfirmationDialogScript()}
+
     <!-- TinyMCE CDN -->
     <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-    
+
     <!-- Dynamic Field Scripts -->
     <script>
       // Field group toggle
@@ -444,39 +470,43 @@ export function renderContentFormPage(data: ContentFormData): string {
       }
 
       function duplicateContent() {
-        if (confirm('Create a copy of this content?')) {
-          const form = document.getElementById('content-form');
-          const formData = new FormData(form);
-          formData.append('action', 'duplicate');
-          
-          fetch('/admin/content/duplicate', {
-            method: 'POST',
-            body: formData
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              window.location.href = \`/admin/content/\${data.id}/edit\`;
-            } else {
-              alert('Error duplicating content');
-            }
-          });
-        }
+        showConfirmDialog('duplicate-content-confirm');
+      }
+
+      function performDuplicateContent() {
+        const form = document.getElementById('content-form');
+        const formData = new FormData(form);
+        formData.append('action', 'duplicate');
+
+        fetch('/admin/content/duplicate', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            window.location.href = \`/admin/content/\${data.id}/edit\`;
+          } else {
+            alert('Error duplicating content');
+          }
+        });
       }
 
       function deleteContent(contentId) {
-        if (confirm('Are you sure you want to delete this content? This action cannot be undone.')) {
-          fetch(\`/admin/content/\${contentId}\`, {
-            method: 'DELETE'
-          })
-          .then(response => {
-            if (response.ok) {
-              window.location.href = '/admin/content';
-            } else {
-              alert('Error deleting content');
-            }
-          });
-        }
+        showConfirmDialog('delete-content-confirm');
+      }
+
+      function performDeleteContent(contentId) {
+        fetch(\`/admin/content/\${contentId}\`, {
+          method: 'DELETE'
+        })
+        .then(response => {
+          if (response.ok) {
+            window.location.href = '/admin/content';
+          } else {
+            alert('Error deleting content');
+          }
+        });
       }
 
       function showVersionHistory(contentId) {

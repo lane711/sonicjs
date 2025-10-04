@@ -1,6 +1,7 @@
 import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
 import { renderForm, FormData, FormField } from '../components/form.template'
 import { renderAlert } from '../components/alert.template'
+import { renderConfirmationDialog, getConfirmationDialogScript } from '../components/confirmation-dialog.template'
 
 export interface CollectionField {
   id: string
@@ -586,12 +587,17 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
         currentEditingField = null;
       }
 
-      function deleteField(fieldId) {
-        if (!confirm('Are you sure you want to delete this field? This action cannot be undone.')) {
-          return;
-        }
+      let fieldToDelete = null;
 
-        fetch(\`/admin/collections/\${collectionId}/fields/\${fieldId}\`, {
+      function deleteField(fieldId) {
+        fieldToDelete = fieldId;
+        showConfirmDialog('delete-field-confirm');
+      }
+
+      function performDeleteField() {
+        if (!fieldToDelete) return;
+
+        fetch(\`/admin/collections/\${collectionId}/fields/\${fieldToDelete}\`, {
           method: 'DELETE'
         })
         .then(response => response.json())
@@ -605,6 +611,9 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
         .catch(error => {
           console.error('Error:', error);
           alert('Error deleting field');
+        })
+        .finally(() => {
+          fieldToDelete = null;
         });
       }
 
@@ -690,6 +699,20 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
         }
       });
     </script>
+
+    <!-- Confirmation Dialogs -->
+    ${renderConfirmationDialog({
+      id: 'delete-field-confirm',
+      title: 'Delete Field',
+      message: 'Are you sure you want to delete this field? This action cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      iconColor: 'red',
+      confirmClass: 'bg-red-500 hover:bg-red-400',
+      onConfirm: 'performDeleteField()'
+    })}
+
+    ${getConfirmationDialogScript()}
   `
 
   const layoutData: AdminLayoutCatalystData = {

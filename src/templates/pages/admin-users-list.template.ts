@@ -2,6 +2,7 @@ import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/a
 import { renderTable, TableColumn, TableData } from '../components/table.template'
 import { renderPagination, PaginationData } from '../components/pagination.template'
 import { renderAlert } from '../components/alert.template'
+import { renderConfirmationDialog, getConfirmationDialogScript } from '../components/confirmation-dialog.template'
 
 export interface User {
   id: string
@@ -381,28 +382,40 @@ export function renderUsersListPage(data: UsersListPageData): string {
     </div>
 
     <script>
+      let userStatusData = null;
+
       function toggleUserStatus(userId, activate) {
-        if (confirm(\`Are you sure you want to \${activate ? 'activate' : 'deactivate'} this user?\`)) {
-          fetch(\`/admin/users/\${userId}/toggle\`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ active: activate })
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              location.reload()
-            } else {
-              alert('Error updating user status')
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error)
+        userStatusData = { userId, activate };
+        showConfirmDialog('toggle-user-status-confirm');
+      }
+
+      function performToggleUserStatus() {
+        if (!userStatusData) return;
+
+        const { userId, activate } = userStatusData;
+
+        fetch(\`/admin/users/\${userId}/toggle\`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ active: activate })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            location.reload()
+          } else {
             alert('Error updating user status')
-          })
-        }
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error)
+          alert('Error updating user status')
+        })
+        .finally(() => {
+          userStatusData = null;
+        });
       }
 
       function clearFilters() {
@@ -413,6 +426,20 @@ export function renderUsersListPage(data: UsersListPageData): string {
         window.open('/admin/users/export', '_blank')
       }
     </script>
+
+    <!-- Confirmation Dialogs -->
+    ${renderConfirmationDialog({
+      id: 'toggle-user-status-confirm',
+      title: 'Toggle User Status',
+      message: 'Are you sure you want to activate/deactivate this user?',
+      confirmText: 'Confirm',
+      cancelText: 'Cancel',
+      iconColor: 'yellow',
+      confirmClass: 'bg-yellow-500 hover:bg-yellow-400',
+      onConfirm: 'performToggleUserStatus()'
+    })}
+
+    ${getConfirmationDialogScript()}
   `
 
   const layoutData: AdminLayoutCatalystData = {

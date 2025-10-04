@@ -1,5 +1,6 @@
 import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
 import { renderAlert } from '../components/alert.template'
+import { renderConfirmationDialog, getConfirmationDialogScript } from '../components/confirmation-dialog.template'
 
 export interface UserEditData {
   id: string
@@ -302,36 +303,56 @@ export function renderUserEditPage(data: UserEditPageData): string {
     </div>
 
     <script>
-      function deleteUser(userId) {
-        const hardDelete = document.getElementById('hard-delete-checkbox').checked
-        const deleteType = hardDelete ? 'permanently delete' : 'deactivate'
-        const message = hardDelete
-          ? 'Are you sure you want to PERMANENTLY DELETE this user? This will remove all data from the database and CANNOT be undone!'
-          : 'Are you sure you want to deactivate this user? They will no longer be able to sign in.'
+      let userIdToDelete = null;
 
-        if (confirm(message)) {
-          fetch(\`/admin/users/\${userId}\`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ hardDelete })
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              window.location.href = '/admin/users'
-            } else {
-              alert('Error deleting user: ' + (data.error || 'Unknown error'))
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error)
-            alert('Error deleting user')
-          })
-        }
+      function deleteUser(userId) {
+        userIdToDelete = userId;
+        showConfirmDialog('delete-user-confirm');
+      }
+
+      function performDeleteUser() {
+        if (!userIdToDelete) return;
+
+        const hardDelete = document.getElementById('hard-delete-checkbox').checked;
+
+        fetch(\`/admin/users/\${userIdToDelete}\`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ hardDelete })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            window.location.href = '/admin/users'
+          } else {
+            alert('Error deleting user: ' + (data.error || 'Unknown error'))
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error)
+          alert('Error deleting user')
+        })
+        .finally(() => {
+          userIdToDelete = null;
+        });
       }
     </script>
+
+    <!-- Confirmation Dialogs -->
+    ${renderConfirmationDialog({
+      id: 'delete-user-confirm',
+      title: 'Delete User',
+      message: 'Are you sure you want to delete this user? Check the "Hard Delete" option to permanently remove all data from the database. This action cannot be undone!',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      iconColor: 'red',
+      confirmClass: 'bg-red-500 hover:bg-red-400',
+      onConfirm: 'performDeleteUser()'
+    })}
+
+    ${getConfirmationDialogScript()}
   `
 
   const layoutData: AdminLayoutCatalystData = {
