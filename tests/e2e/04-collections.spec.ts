@@ -34,27 +34,31 @@ test.describe('Collections Management', () => {
 
   test('should create a new collection', async ({ page }) => {
     await page.click('a[href="/admin/collections/new"]');
-    
+
     // Wait for collection form to be visible
     await expect(page.locator('#collection-form')).toBeVisible();
-    
+
     // Fill form
     await page.fill('[name="name"]', TEST_DATA.collection.name);
     await page.fill('[name="displayName"]', TEST_DATA.collection.displayName);
     await page.fill('[name="description"]', TEST_DATA.collection.description);
-    
+
     await page.click('button[type="submit"]');
-    
+
     // Wait for form submission - either redirect or stay on form with message
     try {
       await page.waitForURL('/admin/collections', { timeout: 10000 });
-      // If redirected, check for collection in list
-      await expect(page.locator('td').filter({ hasText: TEST_DATA.collection.displayName }).first()).toBeVisible();
     } catch {
-      // If no redirect, check if we're still on form with success message or just navigate manually
+      // If no auto-redirect, navigate manually
       await page.goto('/admin/collections');
-      await expect(page.locator('td').filter({ hasText: TEST_DATA.collection.displayName }).first()).toBeVisible();
     }
+
+    // Click refresh button to ensure cache is cleared and new collection appears
+    await page.click('button:has-text("Refresh")');
+    await page.waitForTimeout(1000); // Wait for refresh to complete
+
+    // Check for collection in list
+    await expect(page.locator('td').filter({ hasText: TEST_DATA.collection.displayName }).first()).toBeVisible({ timeout: 10000 });
   });
 
   test('should validate collection name format', async ({ page }) => {
@@ -140,10 +144,14 @@ test.describe('Collections Management', () => {
       }).first();
     }
     
-    // Wait for the row to be visible and click edit
+    // Refresh to ensure cache is cleared
+    await page.click('button:has-text("Refresh")');
+    await page.waitForTimeout(1000);
+
+    // Wait for the row to be visible and click it (rows are clickable, no Edit link)
     await expect(collectionRow).toBeVisible({ timeout: 10000 });
-    await collectionRow.locator('a').filter({ hasText: 'Edit' }).click();
-    
+    await collectionRow.click();
+
     // Update display name
     await page.fill('[name="displayName"]', 'Updated Test Collection');
     await page.click('button[type="submit"]');
@@ -179,10 +187,14 @@ test.describe('Collections Management', () => {
       }).first();
     }
     
-    // Wait for the row to be visible and click edit
+    // Refresh to ensure cache is cleared
+    await page.click('button:has-text("Refresh")');
+    await page.waitForTimeout(1000);
+
+    // Wait for the row to be visible and click it (rows are clickable)
     await expect(collectionRow).toBeVisible({ timeout: 10000 });
-    await collectionRow.locator('a').filter({ hasText: 'Edit' }).click();
-    
+    await collectionRow.click();
+
     // Set up dialog handler before clicking delete
     page.on('dialog', dialog => dialog.accept());
     
@@ -202,18 +214,24 @@ test.describe('Collections Management', () => {
   test('should show collection actions', async ({ page }) => {
     // Find existing collection row
     const collectionRow = page.getByRole('row', { name: /blog_posts/ });
-    
-    // Should have Edit and Content links
-    await expect(collectionRow.locator('a').filter({ hasText: 'Edit' })).toBeVisible();
-    await expect(collectionRow.locator('a').filter({ hasText: 'Content' })).toBeVisible();
+
+    // Should have Content icon/link (no Edit link - rows are clickable)
+    const contentLink = collectionRow.locator('a[href*="/admin/content?model="]');
+    await expect(contentLink).toBeVisible();
+
+    // Row itself should be clickable for editing
+    await expect(collectionRow).toBeVisible();
   });
 
   test('should navigate to collection content', async ({ page }) => {
     const collectionRow = page.getByRole('row', { name: /blog_posts/ });
-    await collectionRow.locator('a').filter({ hasText: 'Content' }).click();
-    
-    // Should navigate to content page filtered by collection
-    await expect(page).toHaveURL(/\/admin\/collections\/.*\/content/);
+
+    // Click the content icon/button
+    const contentLink = collectionRow.locator('a[href*="/admin/content?model=blog_posts"]');
+    await contentLink.click();
+
+    // Should navigate to content page with model filter
+    await expect(page).toHaveURL(/\/admin\/content\?model=blog_posts/);
   });
 
   test('should test field editing functionality', async ({ page }) => {
@@ -227,8 +245,8 @@ test.describe('Collections Management', () => {
     }).first();
     
     await expect(collectionRow).toBeVisible({ timeout: 10000 });
-    await collectionRow.locator('a').filter({ hasText: 'Edit' }).click();
-    
+    await collectionRow.click(); // Rows are clickable
+
     // Should be on collection edit page
     await expect(page.locator('h1')).toContainText('Edit Collection');
     
