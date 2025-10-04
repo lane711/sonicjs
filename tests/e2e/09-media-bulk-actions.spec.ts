@@ -10,7 +10,7 @@ test.describe('Media Bulk Actions', () => {
     await page.waitForLoadState('networkidle');
 
     // Check if media already exists
-    const existingMedia = await page.locator('input[type="checkbox"][id^="file-"]').count();
+    const existingMedia = await page.locator('input[type="checkbox"].media-checkbox').count();
 
     if (existingMedia < 2) {
       // Upload test files
@@ -62,7 +62,7 @@ test.describe('Media Bulk Actions', () => {
     await page.waitForSelector('.media-grid, .grid', { timeout: 10000 });
 
     // Select the first file
-    const mediaItems = page.locator('input[type="checkbox"][id^="file-"]');
+    const mediaItems = page.locator('input[type="checkbox"].media-checkbox');
     await mediaItems.first().check();
 
     // Wait for bulk actions button to become enabled
@@ -105,7 +105,7 @@ test.describe('Media Bulk Actions', () => {
     await page.goto('/admin/media');
     await page.waitForLoadState('networkidle');
 
-    const mediaItems = page.locator('input[type="checkbox"][id^="file-"]');
+    const mediaItems = page.locator('input[type="checkbox"].media-checkbox');
 
     // Select first 2 items
     await mediaItems.nth(0).check();
@@ -124,11 +124,11 @@ test.describe('Media Bulk Actions', () => {
     await expect(bulkActionsBtn).toContainText('Bulk Actions');
   });
 
-  test('should animate menu open and close', async ({ page }) => {
+  test('should close menu when clicking outside', async ({ page }) => {
     await page.goto('/admin/media');
     await page.waitForLoadState('networkidle');
 
-    const mediaItems = page.locator('input[type="checkbox"][id^="file-"]');
+    const mediaItems = page.locator('input[type="checkbox"].media-checkbox');
 
     // Select a file
     await mediaItems.first().check();
@@ -140,25 +140,18 @@ test.describe('Media Bulk Actions', () => {
     await bulkActionsBtn.click();
     await expect(bulkActionsMenu).toBeVisible();
 
-    // Check for scale-100 and opacity-100 classes (animation completion)
-    await page.waitForTimeout(200); // Wait for animation
-    const menuClasses = await bulkActionsMenu.getAttribute('class');
-    expect(menuClasses).toContain('scale-100');
-    expect(menuClasses).toContain('opacity-100');
+    // Click outside to close menu
+    await page.click('body', { position: { x: 10, y: 10 } });
 
-    // Close menu
-    await bulkActionsBtn.click();
-
-    // After animation, menu should be hidden
-    await page.waitForTimeout(200);
-    await expect(bulkActionsMenu).toBeHidden();
+    // Menu should close
+    await expect(bulkActionsMenu).toBeHidden({ timeout: 2000 });
   });
 
   test('should have proper z-index to avoid overlap', async ({ page }) => {
     await page.goto('/admin/media');
     await page.waitForLoadState('networkidle');
 
-    const mediaItems = page.locator('input[type="checkbox"][id^="file-"]');
+    const mediaItems = page.locator('input[type="checkbox"].media-checkbox');
 
     // Select a file
     await mediaItems.first().check();

@@ -1,5 +1,6 @@
 import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
 import { renderMediaGrid, MediaFile, MediaGridData } from '../components/media-grid.template'
+import { renderConfirmationDialog, getConfirmationDialogScript } from '../components/confirmation-dialog.template'
 
 export interface FolderStats {
   folder: string
@@ -183,7 +184,7 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
                         id="bulk-actions-btn"
                         class="inline-flex items-center gap-x-1.5 px-3 py-1.5 bg-zinc-100/60 dark:bg-zinc-800/60 backdrop-blur-sm text-zinc-400 dark:text-zinc-600 text-sm font-medium rounded-full ring-1 ring-inset ring-zinc-200/50 dark:ring-zinc-700/50 cursor-not-allowed"
                         disabled
-                        onclick="toggleBulkActionsDropdown()"
+                        onclick="event.stopPropagation(); toggleBulkActionsDropdown()"
                       >
                         Bulk Actions
                         <svg viewBox="0 0 20 20" fill="currentColor" class="size-4">
@@ -198,7 +199,7 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
                       >
                         <div class="py-1">
                           <button
-                            onclick="performBulkDelete()"
+                            onclick="confirmBulkDelete()"
                             class="w-full text-left px-4 py-2 text-sm text-red-700 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                           >
                             Delete Selected Files
@@ -421,13 +422,13 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
         }
       }
       
+      function confirmBulkDelete() {
+        if (selectedFiles.size === 0) return;
+        showConfirmDialog('media-bulk-delete-confirm');
+      }
+
       async function performBulkDelete() {
         if (selectedFiles.size === 0) return;
-
-        const fileCount = selectedFiles.size;
-        const confirmed = confirm(\`Are you sure you want to delete \${fileCount} selected file\${fileCount > 1 ? 's' : ''}? This action cannot be undone.\`);
-
-        if (!confirmed) return;
 
         try {
           // Show loading state
