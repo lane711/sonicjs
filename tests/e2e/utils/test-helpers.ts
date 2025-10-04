@@ -482,6 +482,8 @@ export async function isAuthenticated(page: Page): Promise<boolean> {
 export async function logout(page: Page) {
   await page.goto('/auth/logout');
   await page.waitForURL(/\/auth\/login/);
+  // Wait a moment for cookies to be cleared
+  await page.waitForTimeout(500);
 }
 
 /**
