@@ -101,7 +101,7 @@ export function renderDashboardPage(data: DashboardPageData): string {
       ${renderSystemStatus()}
 
       <!-- Storage Usage -->
-      ${renderStorageUsage(data.stats.databaseSize)}
+      ${renderStorageUsage(data.stats?.databaseSize)}
     </div>
 
     <script>
@@ -179,7 +179,7 @@ export function renderDashboardPageWithDynamicMenu(
       ${renderSystemStatus()}
 
       <!-- Storage Usage -->
-      ${renderStorageUsage(data.stats.databaseSize)}
+      ${renderStorageUsage(data.stats?.databaseSize)}
     </div>
 
     <script>

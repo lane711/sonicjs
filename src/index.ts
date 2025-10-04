@@ -137,6 +137,87 @@ app.route('/admin/users', userRoutes)
 app.use('/admin/cache/*', requireActivePlugin('cache'))
 app.route('/admin/cache', cacheRoutes)
 
+// Test cleanup endpoint (unauthenticated, only for development/testing)
+app.post('/test-cleanup', async (c) => {
+  const env = c.env.ENVIRONMENT || 'development'
+
+  // Only allow in development/test environments
+  if (env === 'production') {
+    return c.json({ error: 'Not available in production' }, 403)
+  }
+
+  try {
+    const db = c.env.DB
+    let deletedCount = 0
+
+    // Delete test collections
+    try {
+      const collectionsResult = await db.prepare(`
+        DELETE FROM collections
+        WHERE name LIKE 'test_%'
+           OR name LIKE '%test%'
+           OR name = 'test_collection'
+           OR name = 'test_articles'
+           OR name = 'test_collection_e2e'
+      `).run()
+      deletedCount += collectionsResult.meta.changes || 0
+    } catch (error) {
+      console.error('Error deleting test collections:', error)
+    }
+
+    // Delete test content
+    try {
+      const contentResult = await db.prepare(`
+        DELETE FROM content
+        WHERE title LIKE '%test%'
+           OR title LIKE '%Test%'
+           OR title LIKE '%E2E%'
+           OR slug LIKE '%test%'
+      `).run()
+      deletedCount += contentResult.meta.changes || 0
+    } catch (error) {
+      console.error('Error deleting test content:', error)
+    }
+
+    // Delete test users (preserve admin user)
+    try {
+      const usersResult = await db.prepare(`
+        DELETE FROM users
+        WHERE email NOT LIKE '%admin%'
+          AND (email LIKE '%test%'
+               OR username LIKE '%test%'
+               OR email LIKE '%example.com')
+      `).run()
+      deletedCount += usersResult.meta.changes || 0
+    } catch (error) {
+      console.error('Error deleting test users:', error)
+    }
+
+    // Clean up orphaned content
+    try {
+      const orphanedResult = await db.prepare(`
+        DELETE FROM content
+        WHERE collection_id NOT IN (SELECT id FROM collections WHERE is_active = 1)
+      `).run()
+      deletedCount += orphanedResult.meta.changes || 0
+    } catch (error) {
+      console.error('Error deleting orphaned content:', error)
+    }
+
+    return c.json({
+      success: true,
+      message: 'Test data cleanup completed',
+      deletedCount
+    })
+  } catch (error) {
+    console.error('Error cleaning up test data:', error)
+    return c.json({
+      success: false,
+      message: `Cleanup failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    }, 500)
+  }
+})
+
 // Root redirect to login
 app.get('/', (c) => {
   return c.redirect('/auth/login')

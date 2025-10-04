@@ -1394,6 +1394,118 @@ adminRoutes.post('/populate-dummy-content', async (c) => {
   }
 })
 
+// Test cleanup endpoint (only for development/testing)
+adminRoutes.post('/api/test-cleanup', async (c) => {
+  try {
+    const db = c.env.DB
+    const env = c.env.ENVIRONMENT || 'development'
+
+    // Only allow in development/test environments
+    if (env === 'production') {
+      return c.json({ error: 'Not available in production' }, 403)
+    }
+
+    let deletedCount = 0
+
+    // Delete test collections (those starting with 'test_' or containing 'test' in name)
+    try {
+      const collectionsResult = await db.prepare(`
+        DELETE FROM collections
+        WHERE name LIKE 'test_%'
+           OR name LIKE '%test%'
+           OR name = 'test_collection'
+           OR name = 'test_articles'
+           OR name = 'test_collection_e2e'
+      `).run()
+      deletedCount += collectionsResult.meta.changes || 0
+    } catch (error) {
+      console.error('Error deleting test collections:', error)
+    }
+
+    // Delete test content
+    try {
+      const contentResult = await db.prepare(`
+        DELETE FROM content
+        WHERE title LIKE '%test%'
+           OR title LIKE '%Test%'
+           OR title LIKE '%E2E%'
+           OR slug LIKE '%test%'
+      `).run()
+      deletedCount += contentResult.meta.changes || 0
+    } catch (error) {
+      console.error('Error deleting test content:', error)
+    }
+
+    // Delete test users (preserve admin user)
+    try {
+      const usersResult = await db.prepare(`
+        DELETE FROM users
+        WHERE email NOT LIKE '%admin%'
+          AND (email LIKE '%test%'
+               OR username LIKE '%test%'
+               OR email LIKE '%example.com')
+      `).run()
+      deletedCount += usersResult.meta.changes || 0
+    } catch (error) {
+      console.error('Error deleting test users:', error)
+    }
+
+    // Clean up orphaned content (content without valid collection)
+    try {
+      const orphanedResult = await db.prepare(`
+        DELETE FROM content
+        WHERE collection_id NOT IN (SELECT id FROM collections WHERE is_active = 1)
+      `).run()
+      deletedCount += orphanedResult.meta.changes || 0
+    } catch (error) {
+      console.error('Error deleting orphaned content:', error)
+    }
+
+    return c.json({
+      success: true,
+      message: 'Test data cleanup completed',
+      deletedCount
+    })
+  } catch (error) {
+    console.error('Error cleaning up test data:', error)
+    return c.json({
+      success: false,
+      message: `Cleanup failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    }, 500)
+  }
+})
+
+// Test user cleanup endpoint
+adminRoutes.post('/api/test-cleanup/users', async (c) => {
+  try {
+    const db = c.env.DB
+    const env = c.env.ENVIRONMENT || 'development'
+
+    if (env === 'production') {
+      return c.json({ error: 'Not available in production' }, 403)
+    }
+
+    const result = await db.prepare(`
+      DELETE FROM users
+      WHERE email NOT LIKE '%admin%'
+        AND (email LIKE '%test%'
+             OR username LIKE '%test%'
+             OR email LIKE '%example.com')
+    `).run()
+
+    return c.json({
+      success: true,
+      deletedCount: result.meta.changes || 0
+    })
+  } catch (error) {
+    console.error('Error cleaning up test users:', error)
+    return c.json({
+      success: false,
+      message: `Cleanup failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    }, 500)
+  }
+})
+
 // Mount user management routes
 adminRoutes.route('/', userRoutes)
 // Workflow admin routes are now mounted dynamically through plugin system

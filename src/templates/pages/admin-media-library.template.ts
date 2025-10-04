@@ -178,7 +178,7 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
                     >
                       Select All
                     </button>
-                    <div class="relative">
+                    <div class="relative inline-block" id="bulk-actions-dropdown">
                       <button
                         id="bulk-actions-btn"
                         class="inline-flex items-center gap-x-1.5 px-3 py-1.5 bg-zinc-100/60 dark:bg-zinc-800/60 backdrop-blur-sm text-zinc-400 dark:text-zinc-600 text-sm font-medium rounded-full ring-1 ring-inset ring-zinc-200/50 dark:ring-zinc-700/50 cursor-not-allowed"
@@ -186,12 +186,20 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
                         onclick="toggleBulkActionsDropdown()"
                       >
                         Bulk Actions
+                        <svg viewBox="0 0 20 20" fill="currentColor" class="size-4">
+                          <path d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
+                        </svg>
                       </button>
-                      <div id="bulk-actions-dropdown" class="hidden absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-zinc-900 ring-1 ring-zinc-950/5 dark:ring-white/10 shadow-xl z-[100]">
+
+                      <div
+                        id="bulk-actions-menu"
+                        class="hidden absolute right-0 mt-2 w-56 origin-top-right divide-y divide-zinc-200 dark:divide-white/10 rounded-lg bg-white dark:bg-zinc-900 shadow-xl ring-1 ring-zinc-950/5 dark:ring-white/10 z-50 transition-all duration-100 scale-95 opacity-0"
+                        style="transition-behavior: allow-discrete;"
+                      >
                         <div class="py-1">
                           <button
                             onclick="performBulkDelete()"
-                            class="w-full text-left px-4 py-2 text-sm text-red-700 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
+                            class="w-full text-left px-4 py-2 text-sm text-red-700 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                           >
                             Delete Selected Files
                           </button>
@@ -376,42 +384,63 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
       
       function updateBulkActionsButton() {
         const btn = document.getElementById('bulk-actions-btn');
+        const chevronIcon = btn.querySelector('svg');
+
         if (selectedFiles.size > 0) {
           btn.disabled = false;
-          btn.className = 'rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors';
-          btn.textContent = \`Actions (\${selectedFiles.size})\`;
+          btn.className = 'inline-flex items-center gap-x-1.5 px-3 py-1.5 bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm text-zinc-950 dark:text-white text-sm font-medium rounded-full ring-1 ring-inset ring-cyan-200/50 dark:ring-cyan-700/50 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 dark:hover:from-cyan-900/30 dark:hover:to-blue-900/30 hover:ring-cyan-300 dark:hover:ring-cyan-600 transition-all duration-200';
+          btn.innerHTML = \`Actions (\${selectedFiles.size}) <svg viewBox="0 0 20 20" fill="currentColor" class="size-4"><path d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" /></svg>\`;
         } else {
           btn.disabled = true;
-          btn.className = 'rounded-lg bg-zinc-100 dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-400 dark:text-zinc-600 cursor-not-allowed';
-          btn.textContent = 'Bulk Actions';
-          // Hide dropdown when no files selected
-          document.getElementById('bulk-actions-dropdown').classList.add('hidden');
+          btn.className = 'inline-flex items-center gap-x-1.5 px-3 py-1.5 bg-zinc-100/60 dark:bg-zinc-800/60 backdrop-blur-sm text-zinc-400 dark:text-zinc-600 text-sm font-medium rounded-full ring-1 ring-inset ring-zinc-200/50 dark:ring-zinc-700/50 cursor-not-allowed';
+          btn.innerHTML = \`Bulk Actions <svg viewBox="0 0 20 20" fill="currentColor" class="size-4"><path d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" /></svg>\`;
+          // Hide menu when no files selected
+          const menu = document.getElementById('bulk-actions-menu');
+          menu.classList.remove('scale-100', 'opacity-100');
+          menu.classList.add('scale-95', 'opacity-0', 'hidden');
         }
       }
-      
+
       function toggleBulkActionsDropdown() {
         if (selectedFiles.size === 0) return;
-        const dropdown = document.getElementById('bulk-actions-dropdown');
-        dropdown.classList.toggle('hidden');
+        const menu = document.getElementById('bulk-actions-menu');
+        const isHidden = menu.classList.contains('hidden');
+
+        if (isHidden) {
+          menu.classList.remove('hidden');
+          setTimeout(() => {
+            menu.classList.remove('scale-95', 'opacity-0');
+            menu.classList.add('scale-100', 'opacity-100');
+          }, 10);
+        } else {
+          menu.classList.remove('scale-100', 'opacity-100');
+          menu.classList.add('scale-95', 'opacity-0');
+          setTimeout(() => {
+            menu.classList.add('hidden');
+          }, 100);
+        }
       }
       
       async function performBulkDelete() {
         if (selectedFiles.size === 0) return;
-        
+
         const fileCount = selectedFiles.size;
         const confirmed = confirm(\`Are you sure you want to delete \${fileCount} selected file\${fileCount > 1 ? 's' : ''}? This action cannot be undone.\`);
-        
+
         if (!confirmed) return;
-        
+
         try {
           // Show loading state
           const btn = document.getElementById('bulk-actions-btn');
-          const originalText = btn.textContent;
-          btn.textContent = 'Deleting...';
+          const originalText = btn.innerHTML;
+          btn.innerHTML = 'Deleting...';
           btn.disabled = true;
-          
-          // Hide dropdown
-          document.getElementById('bulk-actions-dropdown').classList.add('hidden');
+
+          // Hide menu
+          const menu = document.getElementById('bulk-actions-menu');
+          menu.classList.remove('scale-100', 'opacity-100');
+          menu.classList.add('scale-95', 'opacity-0');
+          setTimeout(() => menu.classList.add('hidden'), 100);
           
           const response = await fetch('/api/media/bulk-delete', {
             method: 'POST',
@@ -602,9 +631,13 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
       // Close bulk actions dropdown when clicking outside
       document.addEventListener('click', function(e) {
         const dropdown = document.getElementById('bulk-actions-dropdown');
-        const button = document.getElementById('bulk-actions-btn');
-        if (!dropdown.contains(e.target) && !button.contains(e.target)) {
-          dropdown.classList.add('hidden');
+        const menu = document.getElementById('bulk-actions-menu');
+        if (dropdown && menu && !dropdown.contains(e.target)) {
+          menu.classList.remove('scale-100', 'opacity-100');
+          menu.classList.add('scale-95', 'opacity-0');
+          setTimeout(() => {
+            menu.classList.add('hidden');
+          }, 100);
         }
       });
     </script>

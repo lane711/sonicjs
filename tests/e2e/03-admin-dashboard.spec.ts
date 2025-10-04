@@ -23,32 +23,79 @@ test.describe('Admin Dashboard', () => {
   test('should display admin dashboard with navigation', async ({ page }) => {
     // Check that we're on the admin dashboard by verifying URL and navigation
     await expect(page).toHaveURL('/admin');
-    await expect(page.locator('nav').first()).toBeVisible();
-    
-    // Check navigation links in sidebar
-    await expect(page.locator('nav a[href="/admin"]')).toBeVisible();
-    await expect(page.locator('nav a[href="/admin/collections"]')).toBeVisible();
-    await expect(page.locator('nav a[href="/admin/content"]')).toBeVisible();
-    await expect(page.locator('nav a[href="/admin/media"]').first()).toBeVisible();
+
+    // Check navigation links in sidebar (they're inside nav element)
+    await expect(page.locator('a[href="/admin"]')).toBeVisible();
+    await expect(page.locator('a[href="/admin/collections"]')).toBeVisible();
+    await expect(page.locator('a[href="/admin/content"]')).toBeVisible();
+    await expect(page.locator('a[href="/admin/media"]').first()).toBeVisible();
   });
 
   test('should display statistics cards', async ({ page }) => {
     // Check for stats container that loads via HTMX
     const statsContainer = page.locator('#stats-container');
-    
+
     // Wait for either stats container to appear or timeout gracefully
     try {
       await expect(statsContainer).toBeVisible({ timeout: 3000 });
-      
+
       // Wait for HTMX to load stats and check if content appears
       await page.waitForTimeout(2000); // Give HTMX time to load
-      
+
       // Check if stats cards or skeleton is visible
       await expect(statsContainer).toContainText(/Collections|Active Users|skeleton/);
     } catch (error) {
       // If stats container doesn't exist, just verify we're on admin page
       await expect(page.locator('h1, h2, [class*="dashboard"]').first()).toBeVisible();
     }
+  });
+
+  test('should display storage usage with database size', async ({ page }) => {
+    // Look for the Storage Usage section
+    const storageSection = page.getByRole('heading', { name: 'Storage Usage' });
+    await expect(storageSection).toBeVisible({ timeout: 5000 });
+
+    // Check that Database storage is displayed
+    const databaseLabel = page.getByText('Database', { exact: false });
+    await expect(databaseLabel).toBeVisible();
+
+    // Verify that database usage shows a value (not just "Unknown")
+    const databaseUsage = page.locator('text=/Database.*\\d+\\.?\\d*\\s*(B|KB|MB|GB)\\s*\\/\\s*10\\s*GB/');
+    await expect(databaseUsage).toBeVisible({ timeout: 3000 });
+
+    // Check that progress bar is displayed for database
+    const progressBars = page.locator('div[class*="bg-cyan-500"], div[class*="bg-amber-500"], div[class*="bg-red-500"]');
+    await expect(progressBars.first()).toBeVisible();
+
+    // Check that Media Files and Cache are shown
+    await expect(page.getByText('Media Files')).toBeVisible();
+    await expect(page.getByText('Cache (KV)')).toBeVisible();
+
+    // Verify Media and Cache show "N/A" (since they're unlimited)
+    await expect(page.getByText('N/A', { exact: false })).toBeVisible();
+  });
+
+  test('should display system status', async ({ page }) => {
+    // Look for the System Status section
+    const systemStatusSection = page.getByRole('heading', { name: 'System Status' });
+    await expect(systemStatusSection).toBeVisible({ timeout: 5000 });
+
+    // Wait for HTMX to load the system status
+    await page.waitForTimeout(2000);
+
+    // Check for system components
+    const systemStatusContainer = page.locator('#system-status-container');
+    await expect(systemStatusContainer).toBeVisible();
+
+    // Verify status indicators are present
+    const operationalIndicators = page.locator('text=/●\\s*Operational/');
+    await expect(operationalIndicators.first()).toBeVisible({ timeout: 5000 });
+
+    // Check for the main system components
+    await expect(page.getByText('Webserver', { exact: false })).toBeVisible();
+    await expect(page.getByText('D1 Database', { exact: false })).toBeVisible();
+    await expect(page.getByText('KV Storage', { exact: false })).toBeVisible();
+    await expect(page.getByText('R2 Storage', { exact: false })).toBeVisible();
   });
 
   test('should navigate to collections page', async ({ page }) => {

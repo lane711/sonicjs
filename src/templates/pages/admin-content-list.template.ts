@@ -2,6 +2,7 @@ import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/a
 import { renderTable, TableData, TableColumn } from '../components/table.template'
 import { renderFilterBar, FilterBarData } from '../components/filter-bar.template'
 import { renderPagination, PaginationData } from '../components/pagination.template'
+import { renderConfirmationDialog, getConfirmationDialogScript } from '../components/confirmation-dialog.template'
 
 export interface ContentItem {
   id: string
@@ -491,6 +492,10 @@ export function renderContentListPage(data: ContentListPageData): string {
         }
       });
 
+      // Store current bulk action context
+      let currentBulkAction = null;
+      let currentSelectedIds = [];
+
       // Perform bulk action
       function performBulkAction(action) {
         const selectedIds = Array.from(document.querySelectorAll('input[type="checkbox"].row-checkbox:checked'))
@@ -502,10 +507,17 @@ export function renderContentListPage(data: ContentListPageData): string {
           return;
         }
 
-        const actionText = action === 'publish' ? 'publish' : action === 'draft' ? 'move to draft' : 'delete';
-        const confirmed = confirm(\`Are you sure you want to \${actionText} \${selectedIds.length} item(s)?\`);
+        // Store context for confirmation
+        currentBulkAction = action;
+        currentSelectedIds = selectedIds;
 
-        if (!confirmed) return;
+        // Show confirmation dialog
+        showConfirmDialog('bulk-action-confirm');
+      }
+
+      // Execute the bulk action after confirmation
+      function executeBulkAction() {
+        if (!currentBulkAction || currentSelectedIds.length === 0) return;
 
         // Close dropdown
         const menu = document.getElementById('bulk-actions-menu');
@@ -517,8 +529,8 @@ export function renderContentListPage(data: ContentListPageData): string {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            action: action,
-            ids: selectedIds
+            action: currentBulkAction,
+            ids: currentSelectedIds
           })
         })
         .then(res => res.json())
@@ -532,10 +544,45 @@ export function renderContentListPage(data: ContentListPageData): string {
         .catch(err => {
           console.error('Bulk action error:', err);
           alert('Failed to perform bulk action');
+        })
+        .finally(() => {
+          // Clear context
+          currentBulkAction = null;
+          currentSelectedIds = [];
         });
       }
 
+      // Helper to get action text for display
+      function getActionText(action) {
+        const actionCount = currentSelectedIds.length;
+        switch(action) {
+          case 'publish':
+            return \`publish \${actionCount} item\${actionCount > 1 ? 's' : ''}\`;
+          case 'draft':
+            return \`move \${actionCount} item\${actionCount > 1 ? 's' : ''} to draft\`;
+          case 'delete':
+            return \`delete \${actionCount} item\${actionCount > 1 ? 's' : ''}\`;
+          default:
+            return \`perform action on \${actionCount} item\${actionCount > 1 ? 's' : ''}\`;
+        }
+      }
+
     </script>
+
+    <!-- Confirmation Dialog for Bulk Actions -->
+    ${renderConfirmationDialog({
+      id: 'bulk-action-confirm',
+      title: 'Confirm Bulk Action',
+      message: 'Are you sure you want to perform this action? This operation will affect multiple items.',
+      confirmText: 'Confirm',
+      cancelText: 'Cancel',
+      confirmClass: 'bg-blue-500 hover:bg-blue-400',
+      iconColor: 'blue',
+      onConfirm: 'executeBulkAction()'
+    })}
+
+    <!-- Confirmation Dialog Script -->
+    ${getConfirmationDialogScript()}
   `
 
   // Prepare layout data
