@@ -458,19 +458,13 @@ export async function waitForHTMX(page: Page) {
 }
 
 /**
- * Check if user is authenticated
+ * Check if user is authenticated by checking for auth cookie
  */
 export async function isAuthenticated(page: Page): Promise<boolean> {
   try {
-    await page.goto('/admin', { waitUntil: 'networkidle' });
-    // Check if we're still on admin page or redirected to login
-    const currentUrl = page.url();
-    if (currentUrl.includes('/auth/login')) {
-      return false;
-    }
-    // Check for admin navigation sidebar to confirm we're authenticated
-    const nav = page.locator('nav').first();
-    return await nav.isVisible();
+    const cookies = await page.context().cookies();
+    const authCookie = cookies.find(c => c.name === 'auth_token');
+    return !!authCookie;
   } catch {
     return false;
   }

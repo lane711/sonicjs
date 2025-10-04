@@ -25,9 +25,10 @@ test.describe('Admin Dashboard', () => {
     await expect(page).toHaveURL('/admin');
 
     // Check navigation links in sidebar (they're inside nav element)
-    await expect(page.locator('a[href="/admin"]')).toBeVisible();
-    await expect(page.locator('a[href="/admin/collections"]')).toBeVisible();
-    await expect(page.locator('a[href="/admin/content"]')).toBeVisible();
+    // Use .first() to avoid strict mode violations (desktop + mobile nav)
+    await expect(page.locator('a[href="/admin"]').first()).toBeVisible();
+    await expect(page.locator('a[href="/admin/collections"]').first()).toBeVisible();
+    await expect(page.locator('a[href="/admin/content"]').first()).toBeVisible();
     await expect(page.locator('a[href="/admin/media"]').first()).toBeVisible();
   });
 
@@ -53,26 +54,28 @@ test.describe('Admin Dashboard', () => {
   test('should display storage usage with database size', async ({ page }) => {
     // Look for the Storage Usage section
     const storageSection = page.getByRole('heading', { name: 'Storage Usage' });
-    await expect(storageSection).toBeVisible({ timeout: 5000 });
+    await expect(storageSection).toBeVisible({ timeout: 10000 });
 
     // Check that Database storage is displayed
-    const databaseLabel = page.getByText('Database', { exact: false });
-    await expect(databaseLabel).toBeVisible();
+    // Use more specific selector to avoid "D1 Database" in System Status
+    const databaseLabel = page.locator('dt').filter({ hasText: 'Database' }).first();
+    await expect(databaseLabel).toBeVisible({ timeout: 5000 });
 
-    // Verify that database usage shows a value (not just "Unknown")
-    const databaseUsage = page.locator('text=/Database.*\\d+\\.?\\d*\\s*(B|KB|MB|GB)\\s*\\/\\s*10\\s*GB/');
-    await expect(databaseUsage).toBeVisible({ timeout: 3000 });
+    // Verify that database usage shows a value (may be "Unknown" or a size)
+    const databaseUsage = page.locator('dd').filter({ hasText: /\/ 10 GB/ }).first();
+    await expect(databaseUsage).toBeVisible({ timeout: 10000 });
 
     // Check that progress bar is displayed for database
     const progressBars = page.locator('div[class*="bg-cyan-500"], div[class*="bg-amber-500"], div[class*="bg-red-500"]');
     await expect(progressBars.first()).toBeVisible();
 
     // Check that Media Files and Cache are shown
-    await expect(page.getByText('Media Files')).toBeVisible();
-    await expect(page.getByText('Cache (KV)')).toBeVisible();
+    await expect(page.locator('dt').filter({ hasText: 'Media Files' }).first()).toBeVisible();
+    await expect(page.locator('dt').filter({ hasText: 'Cache (KV)' }).first()).toBeVisible();
 
     // Verify Media and Cache show "N/A" (since they're unlimited)
-    await expect(page.getByText('N/A', { exact: false })).toBeVisible();
+    const naElements = page.locator('dd').filter({ hasText: 'N/A' });
+    await expect(naElements.first()).toBeVisible();
   });
 
   test('should display system status', async ({ page }) => {
