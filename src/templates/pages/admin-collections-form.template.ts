@@ -40,6 +40,25 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
 
   const fields: FormField[] = [
     {
+      name: 'displayName',
+      label: 'Display Name',
+      type: 'text',
+      value: data.display_name || '',
+      placeholder: 'Blog Posts',
+      required: true
+    },
+    {
+      name: 'name',
+      label: 'Collection Name',
+      type: 'text',
+      value: data.name || '',
+      placeholder: 'blog_posts',
+      required: true,
+      readonly: isEdit,
+      helpText: isEdit ? 'Collection name cannot be changed' : 'Lowercase letters, numbers, and underscores only',
+      className: isEdit ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 cursor-not-allowed' : ''
+    },
+    {
       name: 'description',
       label: 'Description',
       type: 'textarea',
@@ -53,8 +72,8 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
   const formData: FormData = {
     id: 'collection-form',
     ...(isEdit
-      ? { hxPut: `/admin/collections/${data.id}` }
-      : { hxPost: '/admin/collections' }
+      ? { hxPut: `/admin/collections/${data.id}`, action: `/admin/collections/${data.id}`, method: 'PUT' }
+      : { hxPost: '/admin/collections', action: '/admin/collections' }
     ),
     hxTarget: '#form-messages',
     fields: fields,
@@ -107,36 +126,6 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
           <div id="form-messages"></div>
           ${data.error ? renderAlert({ type: 'error', message: data.error, dismissible: true }) : ''}
           ${data.success ? renderAlert({ type: 'success', message: data.success, dismissible: true }) : ''}
-
-          <!-- Collection Name and Display Name Row -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">
-                Display Name
-              </label>
-              <input
-                type="text"
-                name="displayName"
-                value="${data.display_name || ''}"
-                placeholder="Blog Posts"
-                class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">
-                Collection Name
-              </label>
-              <input
-                type="text"
-                name="name"
-                value="${data.name || ''}"
-                placeholder="blog_posts"
-                ${isEdit ? 'readonly' : ''}
-                class="w-full rounded-lg ${isEdit ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 cursor-not-allowed' : 'bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white'} px-3 py-2 text-sm shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
-              />
-              <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">${isEdit ? 'Collection name cannot be changed' : 'Lowercase letters, numbers, and underscores only'}</p>
-            </div>
-          </div>
 
           <!-- Form Styling -->
           <style>

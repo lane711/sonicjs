@@ -5,6 +5,7 @@ export interface FormField {
   value?: any
   placeholder?: string
   required?: boolean
+  readonly?: boolean
   helpText?: string
   options?: Array<{ value: string; label: string; selected?: boolean }>
   rows?: number
@@ -80,24 +81,26 @@ export function renderForm(data: FormData): string {
 export function renderFormField(field: FormField): string {
   const fieldId = `field-${field.name}`
   const required = field.required ? 'required' : ''
+  const readonly = field.readonly ? 'readonly' : ''
   const placeholder = field.placeholder ? `placeholder="${field.placeholder}"` : ''
-  
+
   let fieldHTML = ''
-  
+
   switch (field.type) {
     case 'text':
     case 'email':
     case 'number':
     case 'date':
       fieldHTML = `
-        <input 
-          type="${field.type === 'date' ? 'datetime-local' : field.type}" 
+        <input
+          type="${field.type === 'date' ? 'datetime-local' : field.type}"
           id="${fieldId}"
-          name="${field.name}" 
+          name="${field.name}"
           value="${field.value || ''}"
-          class="form-input ${field.className || ''}" 
+          class="form-input ${field.className || ''}"
           ${placeholder}
           ${required}
+          ${readonly}
           ${field.validation?.min !== undefined ? `min="${field.validation.min}"` : ''}
           ${field.validation?.max !== undefined ? `max="${field.validation.max}"` : ''}
           ${field.validation?.pattern ? `pattern="${field.validation.pattern}"` : ''}

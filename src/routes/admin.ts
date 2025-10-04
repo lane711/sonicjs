@@ -398,39 +398,58 @@ adminRoutes.post('/collections', async (c) => {
     const name = formData.get('name') as string
     const displayName = formData.get('displayName') as string
     const description = formData.get('description') as string
-    
+
+    // Check if this is an HTMX request
+    const isHtmx = c.req.header('HX-Request') === 'true'
+
     // Basic validation
     if (!name || !displayName) {
-      return c.html(html`
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          Name and display name are required.
-        </div>
-      `)
+      const errorMsg = 'Name and display name are required.'
+      if (isHtmx) {
+        return c.html(html`
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            ${errorMsg}
+          </div>
+        `)
+      } else {
+        // For regular form submission, redirect back with error
+        return c.redirect('/admin/collections/new')
+      }
     }
-    
+
     // Validate name format
     if (!/^[a-z0-9_]+$/.test(name)) {
-      return c.html(html`
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          Collection name must contain only lowercase letters, numbers, and underscores.
-        </div>
-      `)
+      const errorMsg = 'Collection name must contain only lowercase letters, numbers, and underscores.'
+      if (isHtmx) {
+        return c.html(html`
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            ${errorMsg}
+          </div>
+        `)
+      } else {
+        return c.redirect('/admin/collections/new')
+      }
     }
-    
+
     const db = c.env.DB
-    
+
     // Check if collection already exists
     const existingStmt = db.prepare('SELECT id FROM collections WHERE name = ?')
     const existing = await existingStmt.bind(name).first()
-    
+
     if (existing) {
-      return c.html(html`
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          A collection with this name already exists.
-        </div>
-      `)
+      const errorMsg = 'A collection with this name already exists.'
+      if (isHtmx) {
+        return c.html(html`
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            ${errorMsg}
+          </div>
+        `)
+      } else {
+        return c.redirect('/admin/collections/new')
+      }
     }
-    
+
     // Create basic schema for the collection
     const basicSchema = {
       type: "object",
@@ -454,16 +473,16 @@ adminRoutes.post('/collections', async (c) => {
       },
       required: ["title"]
     }
-    
+
     // Create collection
     const collectionId = globalThis.crypto.randomUUID()
     const now = Date.now()
-    
+
     const insertStmt = db.prepare(`
       INSERT INTO collections (id, name, display_name, description, schema, is_active, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `)
-    
+
     await insertStmt.bind(
       collectionId,
       name,
@@ -474,24 +493,43 @@ adminRoutes.post('/collections', async (c) => {
       now,
       now
     ).run()
-    
-    return c.html(html`
-      <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-        Collection created successfully! Redirecting...
-        <script>
-          setTimeout(() => {
-            window.location.href = '/admin/collections';
-          }, 1500);
-        </script>
-      </div>
-    `)
+
+    // Clear cache
+    try {
+      await c.env.KV.delete('cache:collections:all')
+      await c.env.KV.delete(`cache:collection:${name}`)
+    } catch (e) {
+      console.error('Error clearing cache:', e)
+    }
+
+    if (isHtmx) {
+      return c.html(html`
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+          Collection created successfully! Redirecting...
+          <script>
+            setTimeout(() => {
+              window.location.href = '/admin/collections';
+            }, 1500);
+          </script>
+        </div>
+      `)
+    } else {
+      // For regular form submission, redirect to collections list
+      return c.redirect('/admin/collections')
+    }
   } catch (error) {
     console.error('Error creating collection:', error)
-    return c.html(html`
-      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-        Failed to create collection. Please try again.
-      </div>
-    `)
+    const isHtmx = c.req.header('HX-Request') === 'true'
+
+    if (isHtmx) {
+      return c.html(html`
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          Failed to create collection. Please try again.
+        </div>
+      `)
+    } else {
+      return c.redirect('/admin/collections/new')
+    }
   }
 })
 

@@ -379,27 +379,35 @@ export async function createTestCollection(page: Page, collectionData = TEST_DAT
 export async function deleteTestCollection(page: Page, collectionName: string) {
   try {
     await navigateToAdminSection(page, 'collections');
-    
+
     // Check if collection exists
     const collectionRow = page.locator('tr').filter({ hasText: collectionName });
     const isVisible = await collectionRow.isVisible({ timeout: 2000 });
-    
+
     if (!isVisible) {
       // Collection doesn't exist, nothing to delete
       return;
     }
-    
-    // Click edit link
-    await collectionRow.locator('a').filter({ hasText: 'Edit' }).click();
-    
-    // Set up dialog handler before clicking delete
+
+    // Click the row itself (rows are clickable for editing)
+    await collectionRow.click();
+
+    // Wait for edit page to load
+    await page.waitForTimeout(1000);
+
+    // Set up dialog handler before clicking delete (for HTMX hx-confirm)
     page.on('dialog', dialog => dialog.accept());
-    
+
     // Click delete button
     await page.locator('button').filter({ hasText: 'Delete Collection' }).click();
-    
+
     // Wait for redirect back to collections list (shorter timeout for cleanup)
-    await page.waitForURL('/admin/collections', { timeout: 5000 });
+    try {
+      await page.waitForURL('/admin/collections', { timeout: 5000 });
+    } catch {
+      // If didn't redirect, navigate manually
+      await page.goto('/admin/collections');
+    }
   } catch (error) {
     // If deletion fails, just continue - this is cleanup, don't log noise
     // Silent failure for cleanup operations
