@@ -86,6 +86,24 @@ export class PluginBootstrapService {
         contentCount: 200,
         defaultPassword: 'password123'
       }
+    },
+    {
+      id: 'core-cache',
+      name: 'core-cache',
+      display_name: 'Cache System',
+      description: 'Three-tiered caching system with memory, KV, and database layers',
+      version: '1.0.0',
+      author: 'SonicJS Team',
+      category: 'performance',
+      icon: '⚡',
+      permissions: ['manage:cache', 'view:stats'],
+      dependencies: [],
+      settings: {
+        enableMemoryCache: true,
+        enableKVCache: true,
+        enableDatabaseCache: true,
+        defaultTTL: 3600
+      }
     }
   ]
 

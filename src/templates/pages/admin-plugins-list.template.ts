@@ -418,6 +418,10 @@ function renderPluginCard(plugin: Plugin): string {
     error: '<div class="w-2 h-2 bg-red-500 dark:bg-red-400 rounded-full mr-2"></div>'
   }
 
+  // Core system plugins that cannot be deactivated
+  const criticalCorePlugins = ['core-auth', 'core-media']
+  const canToggle = !criticalCorePlugins.includes(plugin.id)
+
   const actionButton = plugin.status === 'active'
     ? `<button onclick="togglePlugin('${plugin.id}', 'deactivate')" class="bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">Deactivate</button>`
     : `<button onclick="togglePlugin('${plugin.id}', 'activate')" class="bg-lime-600 dark:bg-lime-700 hover:bg-lime-700 dark:hover:bg-lime-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">Activate</button>`
@@ -484,7 +488,7 @@ function renderPluginCard(plugin: Plugin): string {
 
       <div class="flex items-center justify-between">
         <div class="flex gap-2">
-          ${!plugin.isCore ? actionButton : ''}
+          ${canToggle ? actionButton : ''}
           <button onclick="openPluginSettings('${plugin.id}')" class="bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">
             Settings
           </button>
