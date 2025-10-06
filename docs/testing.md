@@ -1,18 +1,22 @@
 # Testing Guide
 
-SonicJS AI includes comprehensive testing strategies covering unit tests, integration tests, and end-to-end testing. This guide covers all testing approaches, tools, and best practices.
+SonicJS AI includes comprehensive testing strategies covering unit tests and end-to-end testing with Playwright. This guide covers all testing approaches, tools, and best practices used in the project.
 
 ## Table of Contents
 
 - [Overview](#overview)
 - [Testing Stack](#testing-stack)
-- [Unit Testing](#unit-testing)
-- [Integration Testing](#integration-testing)
-- [End-to-End Testing](#end-to-end-testing)
-- [Test Data Management](#test-data-management)
-- [Testing Patterns](#testing-patterns)
+- [Setup and Installation](#setup-and-installation)
+- [Unit Testing with Vitest](#unit-testing-with-vitest)
+- [End-to-End Testing with Playwright](#end-to-end-testing-with-playwright)
+- [Test Organization](#test-organization)
+- [Running Tests](#running-tests)
+- [Coverage Reporting](#coverage-reporting)
+- [Testing Plugins](#testing-plugins)
+- [Testing Middleware and Routes](#testing-middleware-and-routes)
+- [Testing Database Operations](#testing-database-operations)
+- [Test Helpers and Utilities](#test-helpers-and-utilities)
 - [CI/CD Integration](#cicd-integration)
-- [Performance Testing](#performance-testing)
 - [Best Practices](#best-practices)
 - [Troubleshooting](#troubleshooting)
 
@@ -20,82 +24,315 @@ SonicJS AI includes comprehensive testing strategies covering unit tests, integr
 
 ### Testing Philosophy
 
-SonicJS AI follows a testing pyramid approach:
+SonicJS AI follows a comprehensive testing approach:
 
-- **Unit Tests (70%)** - Fast, isolated tests for individual functions
-- **Integration Tests (20%)** - API endpoints and component interactions
-- **E2E Tests (10%)** - Critical user journeys and workflows
+- **Unit Tests** - Fast, isolated tests for individual functions and services
+- **End-to-End Tests** - Browser-based tests for critical user journeys and workflows
 
 ### Test Coverage Goals
 
-- **Minimum 80%** code coverage for core business logic
-- **100%** coverage for critical authentication and security functions
-- **All API endpoints** have integration tests
-- **Key user workflows** have E2E test coverage
+- **70%** minimum code coverage for core business logic
+- **All API endpoints** have E2E test coverage
+- **Key user workflows** have comprehensive test coverage
+- **Plugin functionality** is thoroughly tested
 
 ## Testing Stack
 
 ### Core Testing Tools
 
-| Tool | Purpose | Usage |
-|------|---------|-------|
-| **Vitest** | Unit & Integration Testing | Fast, Vite-native test runner |
-| **Playwright** | End-to-End Testing | Cross-browser automation |
-| **MSW** | API Mocking | Mock external services |
-| **@testing-library** | Component Testing | User-centric testing utilities |
-| **Supertest** | HTTP Testing | API endpoint testing |
+| Tool | Purpose | Version |
+|------|---------|---------|
+| **Vitest** | Unit Testing | 2.1.8 |
+| **Playwright** | End-to-End Testing | 1.53.1 |
+| **@vitest/coverage-v8** | Code Coverage | 2.1.9 |
 
-### Test Environment Setup
+### Why These Tools?
+
+- **Vitest**: Fast, Vite-native test runner with excellent TypeScript support
+- **Playwright**: Reliable cross-browser testing with powerful debugging capabilities
+- **Coverage-v8**: Fast, accurate code coverage using V8's built-in coverage
+
+## Setup and Installation
+
+### Prerequisites
 
 ```bash
-# Install testing dependencies
-npm install -D vitest playwright @playwright/test
-npm install -D @testing-library/dom @testing-library/user-event
-npm install -D msw supertest
+# Install dependencies
+npm install
+
+# Install Playwright browsers (first time only)
+npx playwright install
 ```
 
 ### Configuration Files
 
-#### Vitest Configuration
+The project includes pre-configured test setups:
+
+- `/Users/lane/Dev/refs/sonicjs-ai/vitest.config.ts` - Vitest configuration
+- `/Users/lane/Dev/refs/sonicjs-ai/playwright.config.ts` - Playwright configuration
+- `/Users/lane/Dev/refs/sonicjs-ai/tests/e2e/utils/test-helpers.ts` - Shared test utilities
+
+## Unit Testing with Vitest
+
+### Vitest Configuration
 
 ```typescript
 // vitest.config.ts
 import { defineConfig } from 'vitest/config'
-import path from 'path'
 
 export default defineConfig({
   test: {
     globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./tests/setup.ts'],
+    environment: 'node',
+    include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    exclude: ['node_modules', 'dist', '.next'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
+      include: ['src/**/*.{js,ts}'],
       exclude: [
-        'node_modules/',
-        'tests/',
-        '**/*.d.ts',
-        '**/*.config.*'
+        'src/**/*.{test,spec}.{js,ts}',
+        'src/**/*.d.ts',
+        'src/cli/**',
+        'src/scripts/**',
+        'src/templates/**'
       ],
       thresholds: {
         global: {
-          branches: 80,
-          functions: 80,
-          lines: 80,
-          statements: 80
+          branches: 70,
+          functions: 70,
+          lines: 70,
+          statements: 70
         }
       }
     }
   },
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src')
-    }
-  }
 })
 ```
 
-#### Playwright Configuration
+### Real-World Unit Test Example: Cache Plugin
+
+From `/Users/lane/Dev/refs/sonicjs-ai/src/plugins/cache/tests/cache.test.ts`:
+
+```typescript
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import {
+  CacheService,
+  createCacheService,
+  getCacheService,
+  clearAllCaches,
+  getAllCacheStats
+} from '../services/cache.js'
+import {
+  CACHE_CONFIGS,
+  getCacheConfig,
+  generateCacheKey,
+  parseCacheKey,
+  hashQueryParams,
+  createCachePattern
+} from '../services/cache-config.js'
+
+describe('CacheConfig', () => {
+  it('should have predefined cache configurations', () => {
+    expect(CACHE_CONFIGS.content).toBeDefined()
+    expect(CACHE_CONFIGS.user).toBeDefined()
+    expect(CACHE_CONFIGS.config).toBeDefined()
+    expect(CACHE_CONFIGS.media).toBeDefined()
+  })
+
+  it('should generate cache key with correct format', () => {
+    const key = generateCacheKey('content', 'post', '123', 'v1')
+    expect(key).toBe('content:post:123:v1')
+  })
+
+  it('should parse cache key correctly', () => {
+    const key = 'content:post:123:v1'
+    const parsed = parseCacheKey(key)
+
+    expect(parsed).toBeDefined()
+    expect(parsed?.namespace).toBe('content')
+    expect(parsed?.type).toBe('post')
+    expect(parsed?.identifier).toBe('123')
+    expect(parsed?.version).toBe('v1')
+  })
+
+  it('should hash query parameters consistently', () => {
+    const params1 = { limit: 10, offset: 0, sort: 'asc' }
+    const params2 = { offset: 0, limit: 10, sort: 'asc' }
+
+    const hash1 = hashQueryParams(params1)
+    const hash2 = hashQueryParams(params2)
+
+    expect(hash1).toBe(hash2) // Order shouldn't matter
+  })
+})
+
+describe('CacheService - Basic Operations', () => {
+  let cache: CacheService
+
+  beforeEach(() => {
+    const config = {
+      ttl: 60,
+      kvEnabled: false,
+      memoryEnabled: true,
+      namespace: 'test',
+      invalidateOn: [],
+      version: 'v1'
+    }
+    cache = createCacheService(config)
+  })
+
+  it('should set and get value from cache', async () => {
+    await cache.set('test:key', 'value')
+    const result = await cache.get('test:key')
+
+    expect(result).toBe('value')
+  })
+
+  it('should return null for non-existent key', async () => {
+    const result = await cache.get('non-existent')
+    expect(result).toBeNull()
+  })
+
+  it('should delete value from cache', async () => {
+    await cache.set('test:key', 'value')
+    await cache.delete('test:key')
+
+    const result = await cache.get('test:key')
+    expect(result).toBeNull()
+  })
+})
+
+describe('CacheService - TTL and Expiration', () => {
+  let cache: CacheService
+
+  beforeEach(() => {
+    const config = {
+      ttl: 1, // 1 second TTL for testing
+      kvEnabled: false,
+      memoryEnabled: true,
+      namespace: 'test',
+      invalidateOn: [],
+      version: 'v1'
+    }
+    cache = createCacheService(config)
+  })
+
+  it('should expire entries after TTL', async () => {
+    await cache.set('test:key', 'value')
+
+    // Wait for expiration
+    await new Promise(resolve => setTimeout(resolve, 1100))
+
+    const result = await cache.get('test:key')
+    expect(result).toBeNull()
+  })
+
+  it('should allow custom TTL per entry', async () => {
+    await cache.set('test:key', 'value', { ttl: 10 }) // 10 second TTL
+
+    // Entry should still be there after 1 second
+    await new Promise(resolve => setTimeout(resolve, 1100))
+
+    const result = await cache.get('test:key')
+    expect(result).toBe('value')
+  })
+})
+
+describe('CacheService - Pattern Invalidation', () => {
+  let cache: CacheService
+
+  beforeEach(() => {
+    cache = createCacheService(CACHE_CONFIGS.content!)
+  })
+
+  it('should invalidate entries matching pattern', async () => {
+    await cache.set('content:post:1', 'value1')
+    await cache.set('content:post:2', 'value2')
+    await cache.set('content:page:1', 'value3')
+
+    const count = await cache.invalidate('content:post:*')
+
+    expect(count).toBe(2)
+
+    const post1 = await cache.get('content:post:1')
+    const post2 = await cache.get('content:post:2')
+    const page1 = await cache.get('content:page:1')
+
+    expect(post1).toBeNull()
+    expect(post2).toBeNull()
+    expect(page1).toBe('value3') // Should not be invalidated
+  })
+})
+
+describe('Global Cache Management', () => {
+  it('should get singleton cache instance', () => {
+    const cache1 = getCacheService(CACHE_CONFIGS.content!)
+    const cache2 = getCacheService(CACHE_CONFIGS.content!)
+
+    expect(cache1).toBe(cache2) // Same instance
+  })
+
+  it('should clear all cache instances', async () => {
+    const contentCache = getCacheService(CACHE_CONFIGS.content!)
+    const userCache = getCacheService(CACHE_CONFIGS.user!)
+
+    await contentCache.set('content:key', 'value')
+    await userCache.set('user:key', 'value')
+
+    await clearAllCaches()
+
+    const contentValue = await contentCache.get('content:key')
+    const userValue = await userCache.get('user:key')
+
+    expect(contentValue).toBeNull()
+    expect(userValue).toBeNull()
+  })
+})
+```
+
+### Unit Testing Patterns
+
+#### Testing with Mocks
+
+```typescript
+import { vi } from 'vitest'
+
+describe('Service with Dependencies', () => {
+  it('should not call fetcher when value is cached', async () => {
+    await cache.set('test:key', 'cached-value')
+
+    const fetcher = vi.fn(async () => 'fetched-value')
+    const result = await cache.getOrSet('test:key', fetcher)
+
+    expect(result).toBe('cached-value')
+    expect(fetcher).not.toHaveBeenCalled()
+  })
+})
+```
+
+#### Testing Async Operations
+
+```typescript
+it('should fetch and cache value when not found', async () => {
+  let fetchCount = 0
+  const fetcher = async () => {
+    fetchCount++
+    return 'fetched-value'
+  }
+
+  const result1 = await cache.getOrSet('test:key', fetcher)
+  const result2 = await cache.getOrSet('test:key', fetcher)
+
+  expect(result1).toBe('fetched-value')
+  expect(result2).toBe('fetched-value')
+  expect(fetchCount).toBe(1) // Fetcher should only be called once
+})
+```
+
+## End-to-End Testing with Playwright
+
+### Playwright Configuration
 
 ```typescript
 // playwright.config.ts
@@ -108,975 +345,793 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
+  globalSetup: require.resolve('./tests/e2e/global-setup.ts'),
+  globalTeardown: require.resolve('./tests/e2e/global-teardown.ts'),
   use: {
     baseURL: 'http://localhost:8787',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure'
+    video: 'retain-on-failure',
   },
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] }
+      use: { ...devices['Desktop Chrome'] },
     },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] }
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] }
-    },
-    {
-      name: 'mobile-chrome',
-      use: { ...devices['Pixel 5'] }
-    }
   ],
   webServer: {
     command: 'npm run dev',
     url: 'http://localhost:8787',
-    reuseExistingServer: !process.env.CI
-  }
-})
-```
-
-## Unit Testing
-
-### Testing Utilities and Helpers
-
-```typescript
-// tests/utils/test-helpers.ts
-import { vi } from 'vitest'
-
-// Mock database
-export const mockDB = {
-  prepare: vi.fn().mockReturnValue({
-    bind: vi.fn().mockReturnValue({
-      all: vi.fn().mockResolvedValue({ results: [] }),
-      first: vi.fn().mockResolvedValue(null),
-      run: vi.fn().mockResolvedValue({ success: true })
-    })
-  })
-}
-
-// Mock environment
-export const mockEnv = {
-  DB: mockDB,
-  KV: {
-    get: vi.fn(),
-    put: vi.fn(),
-    delete: vi.fn()
+    reuseExistingServer: !process.env.CI,
+    timeout: 120 * 1000,
   },
-  MEDIA_BUCKET: {
-    get: vi.fn(),
-    put: vi.fn(),
-    delete: vi.fn()
-  }
-}
-
-// Mock user context
-export const mockUser = {
-  userId: 'test-user-id',
-  email: 'test@example.com',
-  role: 'admin',
-  exp: Date.now() / 1000 + 3600,
-  iat: Date.now() / 1000
-}
-
-// Mock request helper
-export const createMockRequest = (
-  method: string,
-  url: string,
-  body?: any,
-  headers?: Record<string, string>
-) => {
-  return new Request(url, {
-    method,
-    body: body ? JSON.stringify(body) : undefined,
-    headers: {
-      'Content-Type': 'application/json',
-      ...headers
-    }
-  })
-}
-```
-
-### Authentication Testing
-
-```typescript
-// tests/unit/auth.test.ts
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { verifyToken, generateToken } from '@/utils/jwt'
-import { hashPassword, verifyPassword } from '@/utils/password'
-
-describe('Authentication', () => {
-  describe('JWT Token Management', () => {
-    it('should generate valid JWT token', async () => {
-      const payload = { userId: '123', email: 'test@example.com', role: 'user' }
-      const token = await generateToken(payload)
-      
-      expect(token).toBeDefined()
-      expect(typeof token).toBe('string')
-      expect(token.split('.')).toHaveLength(3) // JWT has 3 parts
-    })
-
-    it('should verify valid JWT token', async () => {
-      const payload = { userId: '123', email: 'test@example.com', role: 'user' }
-      const token = await generateToken(payload)
-      
-      const decoded = await verifyToken(token)
-      
-      expect(decoded.userId).toBe(payload.userId)
-      expect(decoded.email).toBe(payload.email)
-      expect(decoded.role).toBe(payload.role)
-    })
-
-    it('should reject invalid JWT token', async () => {
-      const invalidToken = 'invalid.token.here'
-      
-      await expect(verifyToken(invalidToken)).rejects.toThrow()
-    })
-
-    it('should reject expired JWT token', async () => {
-      // Mock expired token
-      const expiredPayload = { 
-        userId: '123', 
-        email: 'test@example.com', 
-        role: 'user',
-        exp: Math.floor(Date.now() / 1000) - 3600 // 1 hour ago
-      }
-      const expiredToken = await generateToken(expiredPayload)
-      
-      await expect(verifyToken(expiredToken)).rejects.toThrow('Token expired')
-    })
-  })
-
-  describe('Password Hashing', () => {
-    it('should hash password securely', async () => {
-      const password = 'testPassword123'
-      const hash = await hashPassword(password)
-      
-      expect(hash).toBeDefined()
-      expect(hash).not.toBe(password)
-      expect(hash.startsWith('$2b$')).toBe(true)
-    })
-
-    it('should verify correct password', async () => {
-      const password = 'testPassword123'
-      const hash = await hashPassword(password)
-      
-      const isValid = await verifyPassword(password, hash)
-      expect(isValid).toBe(true)
-    })
-
-    it('should reject incorrect password', async () => {
-      const password = 'testPassword123'
-      const wrongPassword = 'wrongPassword456'
-      const hash = await hashPassword(password)
-      
-      const isValid = await verifyPassword(wrongPassword, hash)
-      expect(isValid).toBe(false)
-    })
-  })
 })
 ```
 
-### Content Management Testing
+### Health Check Tests
+
+From `/Users/lane/Dev/refs/sonicjs-ai/tests/e2e/01-health.spec.ts`:
 
 ```typescript
-// tests/unit/content.test.ts
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { ContentModelManager } from '@/content/models'
-import { ContentWorkflow } from '@/plugins/core-plugins/workflow-plugin/services/content-workflow'
-
-describe('Content Management', () => {
-  let modelManager: ContentModelManager
-  
-  beforeEach(() => {
-    modelManager = new ContentModelManager()
-  })
-
-  describe('ContentModelManager', () => {
-    it('should register content model', () => {
-      const model = {
-        name: 'test-model',
-        displayName: 'Test Model',
-        fields: {
-          title: { type: 'text', required: true },
-          content: { type: 'rich_text' }
-        }
-      }
-      
-      modelManager.registerModel(model)
-      const registered = modelManager.getModel('test-model')
-      
-      expect(registered).toEqual(model)
-    })
-
-    it('should validate model schema', () => {
-      const invalidModel = {
-        name: '', // Empty name should fail
-        displayName: 'Test',
-        fields: {}
-      }
-      
-      expect(() => modelManager.registerModel(invalidModel)).toThrow()
-    })
-
-    it('should get all registered models', () => {
-      const model1 = { name: 'model1', displayName: 'Model 1', fields: {} }
-      const model2 = { name: 'model2', displayName: 'Model 2', fields: {} }
-      
-      modelManager.registerModel(model1)
-      modelManager.registerModel(model2)
-      
-      const allModels = modelManager.getAllModels()
-      expect(allModels).toHaveLength(2)
-      expect(allModels.find(m => m.name === 'model1')).toEqual(model1)
-      expect(allModels.find(m => m.name === 'model2')).toEqual(model2)
-    })
-  })
-
-  describe('ContentWorkflow', () => {
-    it('should generate correct status badge', () => {
-      expect(ContentWorkflow.generateStatusBadge('draft')).toContain('draft')
-      expect(ContentWorkflow.generateStatusBadge('published')).toContain('published')
-      expect(ContentWorkflow.generateStatusBadge('archived')).toContain('archived')
-    })
-
-    it('should return available actions for admin', () => {
-      const actions = ContentWorkflow.getAvailableActions('draft', 'admin', false)
-      
-      expect(actions).toContain('edit')
-      expect(actions).toContain('publish')
-      expect(actions).toContain('delete')
-    })
-
-    it('should limit actions for non-owners', () => {
-      const actions = ContentWorkflow.getAvailableActions('draft', 'author', false)
-      
-      expect(actions).not.toContain('delete')
-      expect(actions.length).toBeLessThan(3)
-    })
-  })
-})
-```
-
-### Database Testing
-
-```typescript
-// tests/unit/database.test.ts
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { createDatabase } from '@/db'
-import { users, content } from '@/db/schema'
-import { eq } from 'drizzle-orm'
-
-// Mock D1 database
-const mockD1 = {
-  prepare: vi.fn(),
-  batch: vi.fn(),
-  dump: vi.fn(),
-  exec: vi.fn()
-}
-
-describe('Database Operations', () => {
-  let db: any
-  
-  beforeEach(() => {
-    vi.clearAllMocks()
-    db = createDatabase(mockD1 as any)
-  })
-
-  it('should create user record', async () => {
-    const userData = {
-      id: 'user-123',
-      email: 'test@example.com',
-      passwordHash: 'hashed-password',
-      firstName: 'John',
-      lastName: 'Doe',
-      role: 'user' as const
-    }
-
-    // Mock successful insert
-    mockD1.prepare.mockReturnValue({
-      bind: vi.fn().mockReturnValue({
-        run: vi.fn().mockResolvedValue({ success: true })
-      })
-    })
-
-    await expect(
-      db.insert(users).values(userData)
-    ).resolves.not.toThrow()
-  })
-
-  it('should query user by email', async () => {
-    const mockUser = {
-      id: 'user-123',
-      email: 'test@example.com',
-      role: 'user'
-    }
-
-    // Mock successful query
-    mockD1.prepare.mockReturnValue({
-      bind: vi.fn().mockReturnValue({
-        first: vi.fn().mockResolvedValue(mockUser)
-      })
-    })
-
-    const result = await db.select()
-      .from(users)
-      .where(eq(users.email, 'test@example.com'))
-      .limit(1)
-
-    expect(result).toEqual(mockUser)
-  })
-
-  it('should handle database errors gracefully', async () => {
-    // Mock database error
-    mockD1.prepare.mockReturnValue({
-      bind: vi.fn().mockReturnValue({
-        run: vi.fn().mockRejectedValue(new Error('Database error'))
-      })
-    })
-
-    await expect(
-      db.insert(users).values({ email: 'test@example.com' })
-    ).rejects.toThrow('Database error')
-  })
-})
-```
-
-## Integration Testing
-
-### API Endpoint Testing
-
-```typescript
-// tests/integration/api.test.ts
-import { describe, it, expect, beforeAll, afterAll } from 'vitest'
-import { app } from '@/index'
-import { mockEnv, mockUser } from '../utils/test-helpers'
-
-describe('API Integration Tests', () => {
-  describe('Authentication Endpoints', () => {
-    it('should login with valid credentials', async () => {
-      const response = await app.request('/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'admin@example.com',
-          password: 'correctPassword'
-        })
-      }, mockEnv)
-
-      expect(response.status).toBe(200)
-      
-      const data = await response.json()
-      expect(data.token).toBeDefined()
-      expect(data.user.email).toBe('admin@example.com')
-    })
-
-    it('should reject invalid credentials', async () => {
-      const response = await app.request('/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'admin@example.com',
-          password: 'wrongPassword'
-        })
-      }, mockEnv)
-
-      expect(response.status).toBe(401)
-      
-      const data = await response.json()
-      expect(data.error).toBeDefined()
-    })
-
-    it('should require authentication for protected routes', async () => {
-      const response = await app.request('/admin/users', {
-        method: 'GET'
-      }, mockEnv)
-
-      expect(response.status).toBe(401)
-    })
-
-    it('should allow access with valid token', async () => {
-      const token = 'valid-jwt-token'
-      
-      const response = await app.request('/admin/users', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      }, mockEnv)
-
-      // Should not be 401 (assuming token is valid)
-      expect(response.status).not.toBe(401)
-    })
-  })
-
-  describe('Content API', () => {
-    it('should create content', async () => {
-      const contentData = {
-        title: 'Test Article',
-        slug: 'test-article',
-        content: 'This is test content'
-      }
-
-      const response = await app.request('/api/content', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer valid-token'
-        },
-        body: JSON.stringify(contentData)
-      }, mockEnv)
-
-      expect(response.status).toBe(201)
-      
-      const data = await response.json()
-      expect(data.title).toBe(contentData.title)
-      expect(data.id).toBeDefined()
-    })
-
-    it('should get content list', async () => {
-      const response = await app.request('/api/content', {
-        method: 'GET'
-      }, mockEnv)
-
-      expect(response.status).toBe(200)
-      
-      const data = await response.json()
-      expect(Array.isArray(data.data)).toBe(true)
-      expect(data.meta).toBeDefined()
-    })
-
-    it('should update content', async () => {
-      const contentId = 'content-123'
-      const updateData = {
-        title: 'Updated Title',
-        content: 'Updated content'
-      }
-
-      const response = await app.request(`/api/content/${contentId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer valid-token'
-        },
-        body: JSON.stringify(updateData)
-      }, mockEnv)
-
-      expect(response.status).toBe(200)
-    })
-
-    it('should delete content', async () => {
-      const contentId = 'content-123'
-
-      const response = await app.request(`/api/content/${contentId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': 'Bearer valid-token'
-        }
-      }, mockEnv)
-
-      expect(response.status).toBe(200)
-    })
-  })
-
-  describe('Media API', () => {
-    it('should upload media file', async () => {
-      const formData = new FormData()
-      formData.append('files', new File(['test'], 'test.jpg', { type: 'image/jpeg' }))
-      formData.append('folder', 'uploads')
-
-      const response = await app.request('/media/upload', {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer valid-token'
-        },
-        body: formData
-      }, mockEnv)
-
-      expect(response.status).toBe(200)
-      
-      const data = await response.json()
-      expect(data.results).toBeDefined()
-      expect(data.results[0].success).toBe(true)
-    })
-
-    it('should get media list', async () => {
-      const response = await app.request('/media', {
-        method: 'GET'
-      }, mockEnv)
-
-      expect(response.status).toBe(200)
-      
-      const data = await response.json()
-      expect(data.data).toBeDefined()
-      expect(Array.isArray(data.data)).toBe(true)
-    })
-  })
-})
-```
-
-### Template Integration Testing
-
-```typescript
-// tests/integration/templates.test.ts
-import { describe, it, expect } from 'vitest'
-import { renderAdminLayout } from '@/templates/layouts/admin-layout.template'
-import { renderButton } from '@/templates/components/button.template'
-
-describe('Template Integration', () => {
-  it('should render admin layout with content', () => {
-    const layoutData = {
-      title: 'Test Page',
-      content: '<div>Test Content</div>',
-      currentPath: '/admin',
-      user: {
-        name: 'Test User',
-        email: 'test@example.com',
-        role: 'admin'
-      }
-    }
-
-    const html = renderAdminLayout(layoutData)
-    
-    expect(html).toContain('<!DOCTYPE html>')
-    expect(html).toContain('Test Page')
-    expect(html).toContain('Test Content')
-    expect(html).toContain('Test User')
-  })
-
-  it('should render button with HTMX attributes', () => {
-    const buttonData = {
-      label: 'Submit',
-      type: 'submit' as const,
-      hxPost: '/api/submit',
-      hxTarget: '#result'
-    }
-
-    const html = renderButton(buttonData)
-    
-    expect(html).toContain('type="submit"')
-    expect(html).toContain('hx-post="/api/submit"')
-    expect(html).toContain('hx-target="#result"')
-    expect(html).toContain('Submit')
-  })
-
-  it('should handle missing data gracefully', () => {
-    const minimalData = {
-      label: 'Click Me'
-    }
-
-    const html = renderButton(minimalData)
-    
-    expect(html).toContain('Click Me')
-    expect(html).toContain('type="button"') // Default type
-    expect(html).not.toContain('hx-post') // Should not include undefined attributes
-  })
-})
-```
-
-## End-to-End Testing
-
-### Authentication Flow Tests
-
-```typescript
-// tests/e2e/auth.spec.ts
 import { test, expect } from '@playwright/test'
+import { checkAPIHealth } from './utils/test-helpers'
 
-test.describe('Authentication Flow', () => {
-  test('should login successfully', async ({ page }) => {
-    await page.goto('/auth/login')
-    
-    // Fill login form
-    await page.fill('[name="email"]', 'admin@example.com')
-    await page.fill('[name="password"]', 'adminPassword')
-    
-    // Submit form
-    await page.click('[type="submit"]')
-    
-    // Should redirect to admin dashboard
-    await expect(page).toHaveURL('/admin')
-    await expect(page.locator('h1')).toContainText('Dashboard')
+test.describe('Health Checks', () => {
+  test('API health endpoint should return running status', async ({ page }) => {
+    const health = await checkAPIHealth(page)
+
+    expect(health).toHaveProperty('name', 'SonicJS AI')
+    expect(health).toHaveProperty('version', '0.1.0')
+    expect(health).toHaveProperty('status', 'running')
+    expect(health).toHaveProperty('timestamp')
   })
 
-  test('should show error for invalid credentials', async ({ page }) => {
-    await page.goto('/auth/login')
-    
-    await page.fill('[name="email"]', 'admin@example.com')
-    await page.fill('[name="password"]', 'wrongPassword')
-    await page.click('[type="submit"]')
-    
-    // Should show error message
-    await expect(page.locator('.alert-error')).toBeVisible()
-    await expect(page.locator('.alert-error')).toContainText('Invalid credentials')
-  })
+  test('Home page should redirect to login', async ({ page }) => {
+    const response = await page.goto('/')
+    expect(response?.status()).toBe(200)
 
-  test('should logout successfully', async ({ page }) => {
-    // Login first
-    await page.goto('/auth/login')
-    await page.fill('[name="email"]', 'admin@example.com')
-    await page.fill('[name="password"]', 'adminPassword')
-    await page.click('[type="submit"]')
-    
-    // Logout
-    await page.click('[href="/auth/logout"]')
-    
     // Should redirect to login page
-    await expect(page).toHaveURL('/auth/login')
+    await page.waitForURL(/\/auth\/login/)
+
+    // Verify we're on the login page
+    expect(page.url()).toContain('/auth/login')
+    await expect(page.locator('h2')).toContainText('Welcome Back')
+  })
+
+  test('Admin routes should require authentication', async ({ page }) => {
+    // Try to access admin without auth
+    await page.goto('/admin')
+
+    // Should redirect to login
+    await page.waitForURL(/\/auth\/login/)
+
+    // Verify error message is shown
+    await expect(page.locator('.bg-error\\/10')).toContainText(
+      'Please login to access the admin area'
+    )
+  })
+
+  test('404 routes should return not found', async ({ page }) => {
+    const response = await page.goto('/nonexistent-route')
+    expect(response?.status()).toBe(404)
+  })
+})
+```
+
+### Authentication Tests
+
+From `/Users/lane/Dev/refs/sonicjs-ai/tests/e2e/02-authentication.spec.ts`:
+
+```typescript
+import { test, expect } from '@playwright/test'
+import { loginAsAdmin, logout, isAuthenticated, ADMIN_CREDENTIALS } from './utils/test-helpers'
+
+test.describe('Authentication', () => {
+  test.beforeEach(async ({ page }) => {
+    await logout(page)
+  })
+
+  test('should display login form', async ({ page }) => {
+    await page.goto('/auth/login')
+
+    await expect(page.locator('h2')).toContainText('Welcome Back')
+    await expect(page.locator('[name="email"]')).toBeVisible()
+    await expect(page.locator('[name="password"]')).toBeVisible()
+    await expect(page.locator('button[type="submit"]')).toBeVisible()
+  })
+
+  test('should login successfully with valid credentials', async ({ page }) => {
+    await loginAsAdmin(page)
+
+    // Should be on admin dashboard
+    await expect(page).toHaveURL('/admin')
+    await expect(page.locator('nav').first()).toBeVisible()
+  })
+
+  test('should show error with invalid credentials', async ({ page }) => {
+    await page.goto('/auth/login')
+
+    await page.fill('[name="email"]', 'invalid@email.com')
+    await page.fill('[name="password"]', 'wrongpassword')
+    await page.click('button[type="submit"]')
+
+    // Should show error message
+    await expect(page.locator('.error, .bg-red-100')).toBeVisible()
+  })
+
+  test('should protect admin routes from unauthenticated access', async ({ page }) => {
+    const adminRoutes = [
+      '/admin',
+      '/admin/collections',
+      '/admin/content',
+      '/admin/media',
+      '/admin/users'
+    ]
+
+    for (const route of adminRoutes) {
+      await page.goto(route)
+      await page.waitForURL(/\/auth\/login/)
+      await expect(page.locator('h2')).toContainText('Welcome Back')
+    }
+  })
+
+  test('should maintain session across page reloads', async ({ page }) => {
+    await loginAsAdmin(page)
+
+    await page.reload()
+
+    // Should still be authenticated
+    await expect(page).toHaveURL('/admin')
+    await expect(await isAuthenticated(page)).toBe(true)
   })
 })
 ```
 
 ### Content Management Tests
 
+From `/Users/lane/Dev/refs/sonicjs-ai/tests/e2e/05-content.spec.ts`:
+
 ```typescript
-// tests/e2e/content.spec.ts
 import { test, expect } from '@playwright/test'
+import {
+  loginAsAdmin,
+  navigateToAdminSection,
+  waitForHTMX,
+  ensureTestContentExists
+} from './utils/test-helpers'
 
 test.describe('Content Management', () => {
   test.beforeEach(async ({ page }) => {
-    // Login before each test
-    await page.goto('/auth/login')
-    await page.fill('[name="email"]', 'admin@example.com')
-    await page.fill('[name="password"]', 'adminPassword')
-    await page.click('[type="submit"]')
+    await loginAsAdmin(page)
+    await ensureTestContentExists(page)
+    await navigateToAdminSection(page, 'content')
   })
 
-  test('should create new content', async ({ page }) => {
-    await page.goto('/admin/content')
-    
-    // Click new content button
-    await page.click('text=New Content')
-    
-    // Fill content form
-    await page.fill('[name="title"]', 'Test Article')
-    await page.fill('[name="slug"]', 'test-article')
-    await page.selectOption('[name="status"]', 'published')
-    
-    // Fill rich text content (assuming EasyMDE is loaded)
-    await page.waitForSelector('.CodeMirror')
-    await page.click('.CodeMirror')
-    await page.keyboard.type('This is the article content.')
-    
-    // Submit form
-    await page.click('[type="submit"]')
-    
-    // Should redirect to content list
-    await expect(page).toHaveURL('/admin/content')
-    await expect(page.locator('text=Test Article')).toBeVisible()
+  test('should display content list', async ({ page }) => {
+    await expect(page.locator('h1').first()).toContainText('Content Management')
+
+    // Should have filter dropdowns
+    await expect(page.locator('select[name="model"]')).toBeVisible()
+    await expect(page.locator('select[name="status"]')).toBeVisible()
   })
 
-  test('should edit existing content', async ({ page }) => {
-    await page.goto('/admin/content')
-    
-    // Click edit button on first content item
-    await page.click('[data-testid="edit-content-btn"]:first-child')
-    
-    // Update title
-    await page.fill('[name="title"]', 'Updated Title')
-    
-    // Submit changes
-    await page.click('[type="submit"]')
-    
-    // Should show success message
-    await expect(page.locator('.alert-success')).toBeVisible()
-    await expect(page.locator('text=Updated Title')).toBeVisible()
+  test('should filter content by status', async ({ page }) => {
+    // Filter by published status
+    await page.selectOption('select[name="status"]', 'published')
+
+    // Wait for HTMX to update the content
+    await waitForHTMX(page)
+
+    const table = page.locator('table')
+    const hasTable = await table.count() > 0
+
+    if (hasTable) {
+      const publishedRows = page.locator('tr').filter({ hasText: 'published' })
+      const rowCount = await publishedRows.count()
+      expect(rowCount).toBeGreaterThanOrEqual(0)
+    }
   })
 
-  test('should delete content', async ({ page }) => {
-    await page.goto('/admin/content')
-    
-    // Click delete button and confirm
-    page.on('dialog', dialog => dialog.accept())
-    await page.click('[data-testid="delete-content-btn"]:first-child')
-    
-    // Content should be removed from list
-    await expect(page.locator('[data-testid="content-item"]:first-child')).not.toBeVisible()
+  test('should navigate to new content form', async ({ page }) => {
+    await page.click('a[href="/admin/content/new"]')
+
+    await page.waitForURL('/admin/content/new', { timeout: 10000 })
+
+    // Should show collection selection page
+    await expect(page.locator('h1')).toContainText('Create New Content')
+    await expect(page.locator('text=Select a collection to create content in:')).toBeVisible()
+
+    // Should have at least one collection to select
+    const collectionLinks = page.locator('a[href^="/admin/content/new?collection="]')
+    const count = await collectionLinks.count()
+    expect(count).toBeGreaterThan(0)
   })
 })
 ```
 
 ### Media Management Tests
 
+From `/Users/lane/Dev/refs/sonicjs-ai/tests/e2e/06-media.spec.ts`:
+
 ```typescript
-// tests/e2e/media.spec.ts
 import { test, expect } from '@playwright/test'
-import path from 'path'
+import { loginAsAdmin, navigateToAdminSection } from './utils/test-helpers'
 
 test.describe('Media Management', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/auth/login')
-    await page.fill('[name="email"]', 'admin@example.com')
-    await page.fill('[name="password"]', 'adminPassword')
-    await page.click('[type="submit"]')
+    await loginAsAdmin(page)
+    await navigateToAdminSection(page, 'media')
   })
 
-  test('should upload media file', async ({ page }) => {
-    await page.goto('/admin/media')
-    
-    // Open upload modal
-    await page.click('text=Upload Files')
-    
-    // Upload file
-    const filePath = path.join(__dirname, '../fixtures/test-image.jpg')
-    await page.setInputFiles('[name="files"]', filePath)
-    
-    // Submit upload
-    await page.click('text=Upload Files')
-    
-    // Should show success message
-    await expect(page.locator('.alert-success')).toBeVisible()
-    
-    // File should appear in media grid
-    await expect(page.locator('[data-testid="media-item"]')).toBeVisible()
+  test('should display media library', async ({ page }) => {
+    await expect(page.locator('h1')).toContainText('Media Library')
+    await expect(page.locator('button').filter({ hasText: 'Upload Files' }).first())
+      .toBeVisible()
   })
 
-  test('should filter media by type', async ({ page }) => {
-    await page.goto('/admin/media')
-    
-    // Click images filter
-    await page.click('text=Images')
-    
-    // URL should update with filter
-    await expect(page).toHaveURL('/admin/media?type=images')
-    
-    // Only image files should be visible
-    const mediaItems = page.locator('[data-testid="media-item"]')
-    await expect(mediaItems.first()).toBeVisible()
-  })
+  test('should handle file upload', async ({ page }) => {
+    await page.locator('button').filter({ hasText: 'Upload Files' }).first().click()
 
-  test('should search media files', async ({ page }) => {
-    await page.goto('/admin/media')
-    
-    // Type in search box
-    await page.fill('[placeholder="Search files..."]', 'test')
-    
-    // Results should filter
-    await page.waitForTimeout(500) // Wait for debounce
-    await expect(page.locator('[data-testid="media-item"]')).toHaveCount(1)
-  })
-})
-```
+    // Create a small test image file
+    const testImageBuffer = Buffer.from([
+      0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01,
+      // ... (truncated for brevity)
+    ])
 
-## Test Data Management
-
-### Fixtures and Factories
-
-```typescript
-// tests/fixtures/users.ts
-export const createUserFixture = (overrides = {}) => ({
-  id: 'user-123',
-  email: 'test@example.com',
-  passwordHash: '$2b$12$hashed-password',
-  firstName: 'John',
-  lastName: 'Doe',
-  role: 'user',
-  isActive: true,
-  emailVerified: true,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-  ...overrides
-})
-
-export const createAdminUser = () => createUserFixture({
-  email: 'admin@example.com',
-  role: 'admin'
-})
-
-// tests/fixtures/content.ts
-export const createContentFixture = (overrides = {}) => ({
-  id: 'content-123',
-  title: 'Test Article',
-  slug: 'test-article',
-  collectionId: 'blog-posts',
-  status: 'published',
-  data: JSON.stringify({
-    content: 'This is test content',
-    excerpt: 'Test excerpt'
-  }),
-  authorId: 'user-123',
-  publishedAt: new Date().toISOString(),
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-  ...overrides
-})
-
-// tests/fixtures/media.ts
-export const createMediaFixture = (overrides = {}) => ({
-  id: 'media-123',
-  filename: 'test-image.jpg',
-  originalName: 'test-image.jpg',
-  mimeType: 'image/jpeg',
-  size: 1024,
-  width: 800,
-  height: 600,
-  folder: 'uploads',
-  r2Key: 'uploads/test-image.jpg',
-  publicUrl: 'https://example.com/test-image.jpg',
-  uploadedBy: 'user-123',
-  uploadedAt: new Date().toISOString(),
-  ...overrides
-})
-```
-
-### Database Seeding for Tests
-
-```typescript
-// tests/utils/database-seeder.ts
-import { mockDB } from './test-helpers'
-import { createUserFixture, createContentFixture } from '../fixtures'
-
-export class DatabaseSeeder {
-  static async seed() {
-    // Seed users
-    const adminUser = createUserFixture({
-      id: 'admin-123',
-      email: 'admin@example.com',
-      role: 'admin'
+    await page.setInputFiles('#file-input', {
+      name: 'test-image.jpg',
+      mimeType: 'image/jpeg',
+      buffer: testImageBuffer
     })
-    
-    const editorUser = createUserFixture({
-      id: 'editor-123',
-      email: 'editor@example.com',
-      role: 'editor'
+
+    await page.locator('button[type="submit"]').click()
+
+    // Should show upload success
+    await expect(page.locator('#upload-results'))
+      .toContainText('Successfully uploaded', { timeout: 10000 })
+  })
+
+  test('should validate file types', async ({ page }) => {
+    await page.locator('button').filter({ hasText: 'Upload Files' }).first().click()
+
+    // Try to upload an invalid file type
+    await page.setInputFiles('#file-input', {
+      name: 'test.exe',
+      mimeType: 'application/octet-stream',
+      buffer: Buffer.from('fake executable')
     })
-    
-    // Mock database responses
-    mockDB.prepare.mockReturnValue({
-      bind: vi.fn().mockReturnValue({
-        all: vi.fn().mockResolvedValue({ 
-          results: [adminUser, editorUser] 
-        }),
-        first: vi.fn().mockImplementation((email) => {
-          if (email === 'admin@example.com') return adminUser
-          if (email === 'editor@example.com') return editorUser
-          return null
-        }),
-        run: vi.fn().mockResolvedValue({ success: true })
-      })
-    })
-  }
-  
-  static async cleanup() {
-    // Reset all mocks
-    vi.clearAllMocks()
-  }
-}
-```
 
-## Testing Patterns
+    await page.locator('button[type="submit"]').click()
 
-### Page Object Model for E2E Tests
-
-```typescript
-// tests/e2e/pages/LoginPage.ts
-import { Page, expect } from '@playwright/test'
-
-export class LoginPage {
-  constructor(private page: Page) {}
-
-  async goto() {
-    await this.page.goto('/auth/login')
-  }
-
-  async fillEmail(email: string) {
-    await this.page.fill('[name="email"]', email)
-  }
-
-  async fillPassword(password: string) {
-    await this.page.fill('[name="password"]', password)
-  }
-
-  async submit() {
-    await this.page.click('[type="submit"]')
-  }
-
-  async login(email: string, password: string) {
-    await this.fillEmail(email)
-    await this.fillPassword(password)
-    await this.submit()
-  }
-
-  async expectErrorMessage(message: string) {
-    await expect(this.page.locator('.alert-error')).toContainText(message)
-  }
-
-  async expectSuccessfulLogin() {
-    await expect(this.page).toHaveURL('/admin')
-  }
-}
-
-// Usage in tests
-test('should login successfully', async ({ page }) => {
-  const loginPage = new LoginPage(page)
-  
-  await loginPage.goto()
-  await loginPage.login('admin@example.com', 'password')
-  await loginPage.expectSuccessfulLogin()
+    // Should show validation error
+    await expect(page.locator('#upload-results'))
+      .toContainText('Unsupported file type')
+  })
 })
 ```
 
-### Test Utilities for API Testing
+### API Testing with Playwright
+
+From `/Users/lane/Dev/refs/sonicjs-ai/tests/e2e/07-api.spec.ts`:
 
 ```typescript
-// tests/utils/api-helpers.ts
-export class APITestHelper {
-  constructor(private app: any, private env: any) {}
+import { test, expect } from '@playwright/test'
 
-  async authenticate(email: string, password: string) {
-    const response = await this.app.request('/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    }, this.env)
+test.describe('API Endpoints', () => {
+  test('should return health check', async ({ request }) => {
+    const response = await request.get('/health')
+
+    expect(response.ok()).toBeTruthy()
+
+    const health = await response.json()
+    expect(health).toHaveProperty('name', 'SonicJS AI')
+    expect(health).toHaveProperty('version', '0.1.0')
+    expect(health).toHaveProperty('status', 'running')
+  })
+
+  test('should return OpenAPI spec', async ({ request }) => {
+    const response = await request.get('/api')
+
+    expect(response.ok()).toBeTruthy()
+
+    const spec = await response.json()
+    expect(spec).toHaveProperty('openapi')
+    expect(spec).toHaveProperty('info')
+    expect(spec).toHaveProperty('paths')
+  })
+
+  test('should handle CORS for API endpoints', async ({ request }) => {
+    const response = await request.get('/api', {
+      headers: {
+        'Origin': 'http://localhost:3000'
+      }
+    })
+
+    expect(response.ok()).toBeTruthy()
+
+    const corsHeader = response.headers()['access-control-allow-origin']
+    expect(corsHeader).toBeDefined()
+  })
+
+  test('should validate request methods', async ({ request }) => {
+    // Test unsupported method
+    const response = await request.patch('/health')
+
+    // Should return method not allowed or not found
+    expect([404, 405]).toContain(response.status())
+  })
+})
+```
+
+### Collections API Tests
+
+From `/Users/lane/Dev/refs/sonicjs-ai/tests/e2e/08-collections-api.spec.ts`:
+
+```typescript
+import { test, expect } from '@playwright/test'
+
+test.describe('Collections API', () => {
+  test('should return all active collections', async ({ request }) => {
+    const response = await request.get('/api/collections')
+
+    expect(response.ok()).toBeTruthy()
+    expect(response.status()).toBe(200)
 
     const data = await response.json()
-    return data.token
-  }
 
-  async authenticatedRequest(
-    method: string,
-    path: string,
-    token: string,
-    body?: any
-  ) {
-    return await this.app.request(path, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: body ? JSON.stringify(body) : undefined
-    }, this.env)
-  }
+    // Verify response structure
+    expect(data).toHaveProperty('data')
+    expect(data).toHaveProperty('meta')
+    expect(data.meta).toHaveProperty('count')
+    expect(data.meta).toHaveProperty('timestamp')
 
-  async createContent(token: string, contentData: any) {
-    return await this.authenticatedRequest(
-      'POST',
-      '/api/content',
-      token,
-      contentData
-    )
-  }
+    // Verify data is an array
+    expect(Array.isArray(data.data)).toBeTruthy()
 
-  async getContent(id?: string) {
-    const path = id ? `/api/content/${id}` : '/api/content'
-    return await this.app.request(path, {
-      method: 'GET'
-    }, this.env)
+    // Should contain at least the default blog_posts collection
+    expect(data.data.length).toBeGreaterThan(0)
+
+    // Meta count should match data length
+    expect(data.meta.count).toBe(data.data.length)
+  })
+
+  test('should handle SQL injection attempts safely', async ({ request }) => {
+    const sqlInjectionAttempts = [
+      "'; DROP TABLE collections; --",
+      "' OR '1'='1",
+      "'; SELECT * FROM users; --",
+    ]
+
+    for (const injection of sqlInjectionAttempts) {
+      const response = await request.get(
+        `/api/collections/${encodeURIComponent(injection)}/content`
+      )
+
+      // Should safely return 404, not expose database errors
+      expect(response.status()).toBe(404)
+
+      const data = await response.json()
+      expect(data.error).toBe('Collection not found')
+
+      // Should not expose SQL error messages
+      expect(data.error).not.toContain('SQL')
+      expect(data.error).not.toContain('database')
+    }
+  })
+
+  test('should respond within reasonable time', async ({ request }) => {
+    const startTime = Date.now()
+    const response = await request.get('/api/collections')
+    const endTime = Date.now()
+
+    expect(response.ok()).toBeTruthy()
+
+    // Should respond within 2 seconds
+    const responseTime = endTime - startTime
+    expect(responseTime).toBeLessThan(2000)
+  })
+})
+```
+
+### Plugin Tests
+
+From `/Users/lane/Dev/refs/sonicjs-ai/tests/e2e/15-plugins.spec.ts`:
+
+```typescript
+import { test, expect } from '@playwright/test'
+import { loginAsAdmin } from './utils/test-helpers'
+
+test.describe('Plugin Management', () => {
+  test.beforeEach(async ({ page }) => {
+    await loginAsAdmin(page)
+  })
+
+  test('should access plugins page and show basic UI', async ({ page }) => {
+    await page.goto('/admin/plugins')
+
+    // Check page title
+    await expect(page.locator('h1')).toContainText('Plugins')
+
+    // Check for install plugin button
+    await expect(page.locator('button:has-text("Install Plugin")')).toBeVisible()
+
+    // Check for at least one plugin card
+    await expect(page.locator('.plugin-card').first()).toBeVisible()
+  })
+
+  test('should show plugin stats', async ({ page }) => {
+    await page.goto('/admin/plugins')
+
+    // Check for stats cards
+    await expect(page.locator('text=Total Plugins').first()).toBeVisible()
+
+    const statsCards = page.locator('div')
+      .filter({ hasText: 'Total Plugins' })
+      .locator('p.text-white.text-2xl')
+    await expect(statsCards.first()).toBeVisible()
+  })
+
+  test('should toggle plugin status', async ({ page }) => {
+    await page.goto('/admin/plugins')
+
+    const pluginCards = page.locator('.plugin-card')
+    const count = await pluginCards.count()
+
+    for (let i = 0; i < Math.min(count, 3); i++) {
+      const card = pluginCards.nth(i)
+      const activateBtn = card.locator('button:has-text("Activate")')
+      const deactivateBtn = card.locator('button:has-text("Deactivate")')
+
+      const hasActivate = await activateBtn.count()
+
+      if (hasActivate > 0) {
+        await activateBtn.click()
+
+        // Wait for status change
+        await expect(card.locator('.status-badge'))
+          .toContainText('Active', { timeout: 5000 })
+        break
+      }
+    }
+  })
+})
+```
+
+## Test Organization
+
+### Directory Structure
+
+```
+/Users/lane/Dev/refs/sonicjs-ai/
+├── tests/
+│   └── e2e/                           # End-to-end tests
+│       ├── 01-health.spec.ts          # Health check tests
+│       ├── 02-authentication.spec.ts  # Auth flow tests
+│       ├── 03-admin-dashboard.spec.ts # Dashboard tests
+│       ├── 04-collections.spec.ts     # Collection tests
+│       ├── 05-content.spec.ts         # Content management tests
+│       ├── 06-media.spec.ts           # Media upload tests
+│       ├── 07-api.spec.ts             # API endpoint tests
+│       ├── 08-collections-api.spec.ts # Collections API tests
+│       ├── 15-plugins.spec.ts         # Plugin tests
+│       └── utils/
+│           └── test-helpers.ts        # Shared test utilities
+├── src/
+│   └── plugins/
+│       └── cache/
+│           └── tests/
+│               └── cache.test.ts      # Unit tests for cache plugin
+├── vitest.config.ts                   # Vitest configuration
+└── playwright.config.ts               # Playwright configuration
+```
+
+### Test Naming Convention
+
+- **Unit tests**: `*.test.ts` or `*.spec.ts`
+- **E2E tests**: `##-feature.spec.ts` (numbered for execution order)
+
+## Running Tests
+
+### Unit Tests
+
+```bash
+# Run all unit tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run with coverage
+npm run test:cov
+
+# Run with coverage in watch mode
+npm run test:cov:watch
+
+# Run with coverage and UI
+npm run test:cov:ui
+```
+
+### E2E Tests
+
+```bash
+# Run all E2E tests
+npm run test:e2e
+
+# Run E2E tests with UI mode
+npm run test:e2e:ui
+
+# Run specific test file
+npx playwright test tests/e2e/02-authentication.spec.ts
+
+# Run tests in headed mode (see browser)
+npx playwright test --headed
+
+# Run tests in debug mode
+npx playwright test --debug
+```
+
+### Running Specific Tests
+
+```bash
+# Run single test file
+npx vitest src/plugins/cache/tests/cache.test.ts
+
+# Run tests matching pattern
+npx vitest --grep "CacheService"
+
+# Run E2E tests for specific feature
+npx playwright test tests/e2e/05-content.spec.ts
+```
+
+## Coverage Reporting
+
+### Viewing Coverage Reports
+
+```bash
+# Generate coverage report
+npm run test:cov
+
+# Coverage files are generated in:
+# - coverage/index.html (HTML report)
+# - coverage/coverage-final.json (JSON report)
+```
+
+### Coverage Thresholds
+
+The project enforces minimum coverage thresholds:
+
+```typescript
+thresholds: {
+  global: {
+    branches: 70,
+    functions: 70,
+    lines: 70,
+    statements: 70
   }
 }
+```
+
+### Coverage Exclusions
+
+The following directories are excluded from coverage:
+
+- Test files (`**/*.{test,spec}.{js,ts}`)
+- Type definitions (`**/*.d.ts`)
+- CLI tools (`src/cli/**`)
+- Scripts (`src/scripts/**`)
+- Templates (`src/templates/**`)
+
+## Testing Plugins
+
+### Plugin Structure
+
+Plugins include their own test files:
+
+```
+src/plugins/cache/
+├── services/
+│   ├── cache.ts
+│   └── cache-config.ts
+└── tests/
+    └── cache.test.ts
+```
+
+### Example Plugin Test
+
+```typescript
+describe('CacheService - Batch Operations', () => {
+  let cache: CacheService
+
+  beforeEach(() => {
+    cache = createCacheService(CACHE_CONFIGS.content!)
+  })
+
+  it('should get multiple values at once', async () => {
+    await cache.set('key1', 'value1')
+    await cache.set('key2', 'value2')
+    await cache.set('key3', 'value3')
+
+    const results = await cache.getMany(['key1', 'key2', 'key3', 'key4'])
+
+    expect(results.size).toBe(3)
+    expect(results.get('key1')).toBe('value1')
+    expect(results.get('key2')).toBe('value2')
+    expect(results.has('key4')).toBe(false)
+  })
+
+  it('should set multiple values at once', async () => {
+    await cache.setMany([
+      { key: 'key1', value: 'value1' },
+      { key: 'key2', value: 'value2' },
+      { key: 'key3', value: 'value3' }
+    ])
+
+    const value1 = await cache.get('key1')
+    const value2 = await cache.get('key2')
+
+    expect(value1).toBe('value1')
+    expect(value2).toBe('value2')
+  })
+})
+```
+
+## Testing Middleware and Routes
+
+### API Route Testing
+
+Use Playwright's `request` fixture for API testing:
+
+```typescript
+test('should require authentication for admin API', async ({ request }) => {
+  const response = await request.get('/admin/api/collections')
+
+  // Should redirect to login or return 401
+  expect([401, 302, 200]).toContain(response.status())
+})
+
+test('should handle large requests gracefully', async ({ request }) => {
+  const largeData = 'x'.repeat(10000)
+
+  const response = await request.post('/admin/api/collections', {
+    data: {
+      name: 'large_test',
+      displayName: 'Large Test Collection',
+      description: largeData
+    }
+  })
+
+  // Should handle gracefully
+  expect([200, 201, 400, 401, 413, 422]).toContain(response.status())
+})
+```
+
+## Testing Database Operations
+
+### Testing with Mock Data
+
+Database operations are tested through E2E tests:
+
+```typescript
+test('should ensure collection IDs are consistent', async ({ request }) => {
+  const collectionsResponse = await request.get('/api/collections')
+  const collectionsData = await collectionsResponse.json()
+
+  const contentResponse = await request.get('/api/content')
+  const contentData = await contentResponse.json()
+
+  // All content items should reference valid collection IDs
+  const collectionIds = collectionsData.data.map((c: any) => c.id)
+
+  contentData.data.forEach((content: any) => {
+    if (content.collectionId) {
+      expect(collectionIds).toContain(content.collectionId)
+    }
+  })
+})
+```
+
+## Test Helpers and Utilities
+
+### Location
+
+`/Users/lane/Dev/refs/sonicjs-ai/tests/e2e/utils/test-helpers.ts`
+
+### Common Test Helpers
+
+```typescript
+// Authentication
+export const ADMIN_CREDENTIALS = {
+  email: 'admin@sonicjs.com',
+  password: 'admin123'
+}
+
+export async function loginAsAdmin(page: Page) {
+  await ensureAdminUserExists(page)
+
+  await page.goto('/auth/login')
+  await page.fill('[name="email"]', ADMIN_CREDENTIALS.email)
+  await page.fill('[name="password"]', ADMIN_CREDENTIALS.password)
+  await page.click('button[type="submit"]')
+
+  await expect(page.locator('#form-response .bg-green-100')).toBeVisible()
+  await page.waitForURL('/admin', { timeout: 15000 })
+}
+
+// Navigation
+export async function navigateToAdminSection(
+  page: Page,
+  section: 'collections' | 'content' | 'media' | 'users'
+) {
+  await page.click(`a[href="/admin/${section}"]`)
+  await page.waitForURL(`/admin/${section}`)
+}
+
+// HTMX Support
+export async function waitForHTMX(page: Page) {
+  try {
+    await page.waitForLoadState('networkidle', { timeout: 5000 })
+  } catch {
+    await page.waitForTimeout(1000)
+  }
+}
+
+// API Health Check
+export async function checkAPIHealth(page: Page) {
+  const response = await page.request.get('/health')
+  expect(response.ok()).toBeTruthy()
+  const health = await response.json()
+  expect(health.status).toBe('running')
+  return health
+}
+
+// Test Data Creation
+export async function createTestContent(page: Page, contentData?: {
+  title: string
+  slug: string
+  content: string
+}) {
+  const data = contentData || {
+    title: 'Test Content',
+    slug: 'test-content',
+    content: 'This is test content for E2E testing.'
+  }
+
+  await page.goto('/admin/content/new')
+
+  const collectionLinks = page.locator('a[href*="/admin/content/new?collection="]')
+  await collectionLinks.first().click()
+
+  await page.fill('input[name="title"]', data.title)
+  await page.fill('input[name="slug"]', data.slug)
+  await page.fill('textarea[name="content"]', data.content)
+
+  await page.click('button[type="submit"]')
+  await page.waitForTimeout(2000)
+}
+```
+
+### Using Test Helpers
+
+```typescript
+import { loginAsAdmin, navigateToAdminSection, waitForHTMX } from './utils/test-helpers'
+
+test('my test', async ({ page }) => {
+  await loginAsAdmin(page)
+  await navigateToAdminSection(page, 'content')
+
+  // Perform actions...
+  await page.selectOption('select[name="status"]', 'published')
+  await waitForHTMX(page)
+
+  // Assertions...
+})
 ```
 
 ## CI/CD Integration
 
-### GitHub Actions Configuration
+### GitHub Actions Example
 
 ```yaml
-# .github/workflows/test.yml
 name: Test Suite
 
 on:
@@ -1090,59 +1145,42 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Run unit tests
-        run: npm run test:unit
-      
+        run: npm run test:cov
+
       - name: Upload coverage
         uses: codecov/codecov-action@v3
-
-  integration-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'npm'
-      
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Run integration tests
-        run: npm run test:integration
 
   e2e-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Install Playwright
         run: npx playwright install --with-deps
-      
+
       - name: Run E2E tests
         run: npm run test:e2e
-      
+
       - name: Upload test results
         uses: actions/upload-artifact@v3
         if: always()
@@ -1151,239 +1189,267 @@ jobs:
           path: playwright-report/
 ```
 
-### Test Scripts in package.json
-
-```json
-{
-  "scripts": {
-    "test": "npm run test:unit && npm run test:integration",
-    "test:unit": "vitest run --coverage",
-    "test:integration": "vitest run tests/integration",
-    "test:e2e": "playwright test",
-    "test:watch": "vitest",
-    "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage && open coverage/index.html"
-  }
-}
-```
-
-## Performance Testing
-
-### Load Testing with Artillery
-
-```yaml
-# artillery/load-test.yml
-config:
-  target: 'http://localhost:8787'
-  phases:
-    - duration: 60
-      arrivalRate: 5
-    - duration: 120
-      arrivalRate: 10
-    - duration: 60
-      arrivalRate: 15
-
-scenarios:
-  - name: "Content API Load Test"
-    weight: 70
-    flow:
-      - get:
-          url: "/api/content"
-      - think: 2
-      - get:
-          url: "/api/content/{{ $randomString() }}"
-
-  - name: "Authentication Load Test"
-    weight: 30
-    flow:
-      - post:
-          url: "/auth/login"
-          json:
-            email: "test@example.com"
-            password: "password"
-      - think: 1
-      - get:
-          url: "/admin"
-          headers:
-            Authorization: "Bearer {{ token }}"
-```
-
-### Performance Test Runner
-
-```bash
-# Install Artillery
-npm install -g artillery
-
-# Run load tests
-artillery run artillery/load-test.yml
-
-# Generate report
-artillery run artillery/load-test.yml --output report.json
-artillery report report.json
-```
-
 ## Best Practices
 
 ### 1. Test Organization
 
-```
-tests/
-├── unit/                 # Fast, isolated tests
-│   ├── auth/
-│   ├── content/
-│   └── utils/
-├── integration/          # API and component tests
-│   ├── api/
-│   └── templates/
-├── e2e/                  # End-to-end tests
-│   ├── auth.spec.ts
-│   ├── content.spec.ts
-│   └── media.spec.ts
-├── fixtures/             # Test data
-├── utils/                # Test helpers
-└── setup.ts              # Global test setup
-```
-
-### 2. Test Naming Conventions
+- **Keep tests close to code**: Unit tests live alongside the code they test
+- **Logical grouping**: Use `describe` blocks to organize related tests
+- **Clear naming**: Test names should describe what is being tested and expected outcome
 
 ```typescript
-// Good: Descriptive test names
-describe('User Authentication', () => {
-  it('should generate JWT token for valid user', () => {})
-  it('should reject expired JWT tokens', () => {})
-  it('should hash passwords securely', () => {})
-})
+describe('CacheService - Pattern Invalidation', () => {
+  it('should invalidate entries matching pattern', async () => {
+    // Test implementation
+  })
 
-// Bad: Vague test names
-describe('Auth', () => {
-  it('works', () => {})
-  it('fails', () => {})
+  it('should not invalidate entries that do not match pattern', async () => {
+    // Test implementation
+  })
 })
 ```
 
-### 3. Test Data Isolation
+### 2. Test Independence
+
+- Each test should be independent and not rely on other tests
+- Use `beforeEach` to set up fresh state
+- Clean up after tests when necessary
 
 ```typescript
-// Use factories for consistent test data
-const createUser = (overrides = {}) => ({
-  id: crypto.randomUUID(),
-  email: `test-${Date.now()}@example.com`,
-  ...defaultUserData,
-  ...overrides
-})
+describe('My Feature', () => {
+  beforeEach(() => {
+    // Set up fresh state for each test
+    cache = createCacheService(config)
+  })
 
-// Avoid shared test data
-const sharedUser = { id: 'user-1' } // Bad
-const user1 = createUser() // Good
-const user2 = createUser() // Good
+  afterEach(async () => {
+    // Clean up if needed
+    await cache.clear()
+  })
+})
 ```
 
-### 4. Async Testing
+### 3. Async Testing
+
+- Always use `async/await` for asynchronous operations
+- Don't forget to `await` promises in tests
 
 ```typescript
-// Proper async/await usage
-it('should create user', async () => {
-  const userData = createUser()
-  const result = await createUser(userData)
-  expect(result.id).toBeDefined()
+// Good
+it('should fetch data', async () => {
+  const result = await fetchData()
+  expect(result).toBeDefined()
 })
 
-// Avoid missing await
-it('should create user', () => {
-  const userData = createUser()
-  const result = createUser(userData) // Missing await
-  expect(result.id).toBeDefined() // Will fail
+// Bad - missing await
+it('should fetch data', async () => {
+  const result = fetchData() // Missing await!
+  expect(result).toBeDefined() // Will fail
+})
+```
+
+### 4. Playwright Best Practices
+
+- **Use test helpers**: Create reusable functions for common operations
+- **Wait for elements**: Use Playwright's built-in waiting mechanisms
+- **Avoid fixed timeouts**: Prefer `waitForSelector` over `waitForTimeout`
+- **Handle HTMX**: Use the `waitForHTMX` helper for dynamic updates
+
+```typescript
+// Good - wait for specific condition
+await expect(page.locator('.success-message')).toBeVisible()
+
+// Avoid - arbitrary timeout
+await page.waitForTimeout(5000)
+```
+
+### 5. Test Data Management
+
+- Use fixtures and factories for consistent test data
+- Don't hard-code IDs or timestamps
+- Clean up test data after tests
+
+```typescript
+// Use helper to create test data
+const TEST_DATA = {
+  collection: {
+    name: 'test_collection',
+    displayName: 'Test Collection',
+    description: 'Test collection for E2E testing'
+  }
+}
+
+// Clean up after tests
+test.afterAll(async ({ page }) => {
+  await deleteTestCollection(page, TEST_DATA.collection.name)
+})
+```
+
+### 6. Error Handling
+
+- Test both success and failure cases
+- Verify error messages and status codes
+- Ensure graceful degradation
+
+```typescript
+test('should validate file types', async ({ page }) => {
+  // Upload invalid file
+  await page.setInputFiles('#file-input', {
+    name: 'test.exe',
+    mimeType: 'application/octet-stream',
+    buffer: Buffer.from('fake executable')
+  })
+
+  await page.click('button[type="submit"]')
+
+  // Verify error is shown
+  await expect(page.locator('#upload-results'))
+    .toContainText('Unsupported file type')
 })
 ```
 
 ## Troubleshooting
 
-### Common Test Issues
+### Common Issues
 
-#### 1. Mock Setup Problems
+#### 1. Tests Timing Out
+
+**Problem**: E2E tests timeout waiting for elements
+
+**Solution**: Increase timeout or improve element selectors
 
 ```typescript
-// Problem: Mocks not properly reset between tests
-beforeEach(() => {
-  vi.clearAllMocks() // Clear mock call history
-  vi.resetAllMocks() // Reset mock implementations
-})
+// Increase timeout for specific assertion
+await expect(page.locator('.slow-loading'))
+  .toBeVisible({ timeout: 10000 })
 
-// Problem: Mock not matching expected interface
-const mockDB = {
-  prepare: vi.fn().mockImplementation(() => ({
-    bind: vi.fn().mockImplementation(() => ({
-      all: vi.fn(),
-      first: vi.fn(),
-      run: vi.fn()
-    }))
-  }))
-} as unknown as D1Database
+// Or increase global timeout in config
+use: {
+  timeout: 60000, // 60 seconds
+}
 ```
 
-#### 2. Timing Issues in E2E Tests
+#### 2. Flaky Tests
+
+**Problem**: Tests pass sometimes but fail randomly
+
+**Solutions**:
+- Use Playwright's auto-waiting features
+- Avoid race conditions
+- Use `waitForLoadState` for network requests
 
 ```typescript
-// Use waitFor patterns
-await page.waitForSelector('[data-testid="content-loaded"]')
+// Wait for network to be idle
 await page.waitForLoadState('networkidle')
 
-// Avoid fixed timeouts
-await page.waitForTimeout(1000) // Bad
-await expect(page.locator('.success')).toBeVisible() // Good
+// Wait for specific request
+await page.waitForResponse(resp =>
+  resp.url().includes('/api/content') && resp.status() === 200
+)
 ```
 
-#### 3. Environment Setup Issues
+#### 3. Coverage Not Meeting Thresholds
 
-```typescript
-// Ensure proper test environment
-if (process.env.NODE_ENV !== 'test') {
-  throw new Error('Tests must run in test environment')
-}
+**Problem**: Coverage reports below 70%
 
-// Use test-specific configurations
-const config = process.env.NODE_ENV === 'test' 
-  ? testConfig 
-  : productionConfig
-```
-
-### Debugging Test Failures
+**Solutions**:
+- Add tests for uncovered branches
+- Review coverage report: `coverage/index.html`
+- Identify untested code paths
 
 ```bash
-# Run specific test file
-npm run test auth.test.ts
-
-# Run tests in watch mode
-npm run test:watch
-
-# Debug with verbose output
-npm run test -- --reporter=verbose
-
-# Run E2E tests with debug mode
-npm run test:e2e -- --debug
-
-# Generate test coverage report
-npm run test:coverage
+# Generate coverage and open report
+npm run test:cov
+open coverage/index.html  # macOS
 ```
 
-### Performance Debugging
+#### 4. Playwright Browser Issues
+
+**Problem**: Playwright can't find browsers
+
+**Solution**: Reinstall Playwright browsers
+
+```bash
+npx playwright install --with-deps
+```
+
+#### 5. HTMX Dynamic Content
+
+**Problem**: Tests fail because HTMX updates aren't complete
+
+**Solution**: Use the `waitForHTMX` helper
 
 ```typescript
-// Profile slow tests
-const start = performance.now()
-await slowOperation()
-const end = performance.now()
-console.log(`Operation took ${end - start}ms`)
+import { waitForHTMX } from './utils/test-helpers'
 
-// Use test timeouts appropriately
-it('should complete quickly', async () => {
-  // Set 5 second timeout
-}, 5000)
+await page.selectOption('select[name="status"]', 'published')
+await waitForHTMX(page)  // Wait for HTMX to update DOM
 ```
 
-## Related Documentation
+### Debugging Tests
 
-- [Getting Started](getting-started.md) - Setting up the development environment
-- [Authentication](authentication.md) - Testing authentication flows
+#### Playwright Debugging
+
+```bash
+# Run in debug mode with inspector
+npx playwright test --debug
+
+# Run headed to see browser
+npx playwright test --headed
+
+# Run with slow motion
+npx playwright test --headed --slow-mo=1000
+```
+
+#### Vitest Debugging
+
+```bash
+# Run in watch mode
+npm run test:watch
+
+# Run with UI
+npm run test:cov:ui
+
+# Run single test file
+npx vitest src/plugins/cache/tests/cache.test.ts
+```
+
+### Test Artifacts
+
+Playwright saves artifacts on failure:
+
+- **Screenshots**: `test-results/*/test-failed-1.png`
+- **Videos**: `test-results/*/video.webm`
+- **Traces**: `test-results/*/trace.zip`
+
+View trace files:
+
+```bash
+npx playwright show-trace test-results/*/trace.zip
+```
+
+## Additional Resources
+
+### Documentation
+
+- [Vitest Documentation](https://vitest.dev/)
+- [Playwright Documentation](https://playwright.dev/)
+- [Playwright Best Practices](https://playwright.dev/docs/best-practices)
+
+### Related Documentation
+
 - [API Reference](api-reference.md) - API endpoint specifications
-- [Deployment](deployment.md) - Testing in production environments
+- [Plugin Development](plugin-development.md) - Creating and testing plugins
+- [Contributing](contributing.md) - Contribution guidelines
+
+## Summary
+
+SonicJS AI uses a comprehensive testing strategy combining:
+
+- **Vitest** for fast, isolated unit tests
+- **Playwright** for reliable end-to-end testing
+- **Real test examples** from the actual codebase
+- **Shared utilities** for consistent test patterns
+- **CI/CD integration** for automated testing
+
+Follow the patterns and examples in this guide to write effective tests for your features and ensure the quality of the SonicJS AI platform.
