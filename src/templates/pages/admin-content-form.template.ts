@@ -35,6 +35,7 @@ export interface ContentFormData {
     email: string
     role: string
   }
+  version?: string
 }
 
 export function renderContentFormPage(data: ContentFormData): string {
@@ -570,7 +571,8 @@ export function renderContentFormPage(data: ContentFormData): string {
     pageTitle: 'Content Management',
     currentPath: '/admin/content',
     user: data.user,
-    content: pageContent
+    content: pageContent,
+    version: data.version
   }
 
   return renderAdminLayoutCatalyst(layoutData)
