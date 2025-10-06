@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { renderDesignPage, DesignPageData } from '../../templates/pages/admin-design.template'
-import packageJson from '../../../package.json'
+import { APP_VERSION } from '../../index'
 
 type Bindings = {
   DB: D1Database
@@ -26,7 +26,7 @@ designRoutes.get('/', (c) => {
       email: user.email,
       role: user.role
     } : undefined,
-    version: `v${packageJson.version}`
+    version: APP_VERSION
   }
 
   return c.html(renderDesignPage(pageData))

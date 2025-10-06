@@ -15,7 +15,7 @@ import { MigrationService } from '../services/migrations'
 import { createDatabaseToolsAdminRoutes } from '../plugins/core-plugins/database-tools-plugin/admin-routes'
 import { createSeedDataAdminRoutes } from '../plugins/core-plugins/seed-data-plugin/admin-routes'
 import { getActivePlugins } from '../middleware/plugin-middleware'
-import packageJson from '../../package.json'
+import { APP_VERSION } from '../index'
 
 type Bindings = {
   DB: D1Database
@@ -117,7 +117,7 @@ adminRoutes.get('/', async (c) => {
       email: user.email,
       role: user.role
     } : undefined,
-    version: `v${packageJson.version}`
+    version: APP_VERSION
   }
 
   return c.html(renderDashboardPageWithDynamicMenu(pageData, dynamicMenuItems))
@@ -598,7 +598,7 @@ adminRoutes.get('/collections', async (c) => {
         email: user.email,
         role: user.role
       } : undefined,
-      version: `v${packageJson.version}`
+      version: APP_VERSION
     }
 
     return c.html(renderCollectionsListPage(pageData))
@@ -619,7 +619,7 @@ adminRoutes.get('/collections/new', (c) => {
       email: user.email,
       role: user.role
     } : undefined,
-    version: `v${packageJson.version}`
+    version: APP_VERSION
   }
 
   return c.html(renderCollectionFormPage(formData))
@@ -786,7 +786,7 @@ adminRoutes.get('/collections/:id', async (c) => {
           email: user.email,
           role: user.role
         } : undefined,
-        version: `v${packageJson.version}`
+        version: APP_VERSION
       }
       return c.html(renderCollectionFormPage(formData))
     }
@@ -821,7 +821,7 @@ adminRoutes.get('/collections/:id', async (c) => {
         email: user.email,
         role: user.role
       } : undefined,
-      version: `v${packageJson.version}`
+      version: APP_VERSION
     }
 
     return c.html(renderCollectionFormPage(formData))
@@ -836,7 +836,7 @@ adminRoutes.get('/collections/:id', async (c) => {
         email: user.email,
         role: user.role
       } : undefined,
-      version: `v${packageJson.version}`
+      version: APP_VERSION
     }
     return c.html(renderCollectionFormPage(formData))
   }
@@ -1163,7 +1163,7 @@ adminRoutes.get('/users', async (c) => {
         email: user.email,
         role: user.role
       } : undefined,
-      version: `v${packageJson.version}`
+      version: APP_VERSION
     }
     
     return c.html(renderUsersListPage(pageData))
@@ -1324,7 +1324,7 @@ adminRoutes.get('/settings/general', (c) => {
     } : undefined,
     settings: getMockSettings(user),
     activeTab: 'general',
-    version: `v${packageJson.version}`
+    version: APP_VERSION
   }
   return c.html(renderSettingsPage(pageData))
 })
@@ -1340,7 +1340,7 @@ adminRoutes.get('/settings/appearance', (c) => {
     } : undefined,
     settings: getMockSettings(user),
     activeTab: 'appearance',
-    version: `v${packageJson.version}`
+    version: APP_VERSION
   }
   return c.html(renderSettingsPage(pageData))
 })
@@ -1356,7 +1356,7 @@ adminRoutes.get('/settings/security', (c) => {
     } : undefined,
     settings: getMockSettings(user),
     activeTab: 'security',
-    version: `v${packageJson.version}`
+    version: APP_VERSION
   }
   return c.html(renderSettingsPage(pageData))
 })
@@ -1372,7 +1372,7 @@ adminRoutes.get('/settings/notifications', (c) => {
     } : undefined,
     settings: getMockSettings(user),
     activeTab: 'notifications',
-    version: `v${packageJson.version}`
+    version: APP_VERSION
   }
   return c.html(renderSettingsPage(pageData))
 })
@@ -1388,7 +1388,7 @@ adminRoutes.get('/settings/storage', (c) => {
     } : undefined,
     settings: getMockSettings(user),
     activeTab: 'storage',
-    version: `v${packageJson.version}`
+    version: APP_VERSION
   }
   return c.html(renderSettingsPage(pageData))
 })
@@ -1404,7 +1404,7 @@ adminRoutes.get('/settings/migrations', (c) => {
     } : undefined,
     settings: getMockSettings(user),
     activeTab: 'migrations',
-    version: `v${packageJson.version}`
+    version: APP_VERSION
   }
   return c.html(renderSettingsPage(pageData))
 })
@@ -1420,7 +1420,7 @@ adminRoutes.get('/settings/database-tools', (c) => {
     } : undefined,
     settings: getMockSettings(user),
     activeTab: 'database-tools',
-    version: `v${packageJson.version}`
+    version: APP_VERSION
   }
   return c.html(renderSettingsPage(pageData))
 })
@@ -1615,7 +1615,7 @@ adminRoutes.get('/api-reference', (c) => {
       email: user.email,
       role: user.role
     } : undefined,
-    version: `v${packageJson.version}`
+    version: APP_VERSION
   }
 
   return c.html(renderAPIReferencePage(pageData))
@@ -1632,7 +1632,7 @@ adminRoutes.get('/field-types', (c) => {
       email: user.email,
       role: user.role
     } : undefined,
-    version: `v${packageJson.version}`
+    version: APP_VERSION
   }
 
   return c.html(renderFieldTypesPage(pageData))
