@@ -254,7 +254,7 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
               statusBadge.className = 'status-badge inline-flex items-center rounded-md px-2.5 py-1 text-sm font-medium ring-1 ring-inset bg-lime-50 dark:bg-lime-500/10 text-lime-700 dark:text-lime-300 ring-lime-700/10 dark:ring-lime-400/20';
               statusBadge.innerHTML = '<div class="w-2 h-2 bg-lime-500 dark:bg-lime-400 rounded-full mr-2"></div>Active';
               // Update card border to green
-              card.className = 'plugin-card rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-2 ring-lime-500/50 dark:ring-lime-400/50 p-6 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all';
+              card.className = 'plugin-card rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-[3px] ring-lime-500 dark:ring-lime-400 p-6 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all';
               // Update button
               button.textContent = 'Deactivate';
               button.onclick = () => togglePlugin(pluginId, 'deactivate');
@@ -264,7 +264,7 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
               statusBadge.className = 'status-badge inline-flex items-center rounded-md px-2.5 py-1 text-sm font-medium ring-1 ring-inset bg-zinc-50 dark:bg-zinc-500/10 text-zinc-700 dark:text-zinc-400 ring-zinc-700/10 dark:ring-zinc-400/20';
               statusBadge.innerHTML = '<div class="w-2 h-2 bg-zinc-500 dark:bg-zinc-400 rounded-full mr-2"></div>Inactive';
               // Update card border to pink
-              card.className = 'plugin-card rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-2 ring-pink-500/50 dark:ring-pink-400/50 p-6 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all';
+              card.className = 'plugin-card rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-[3px] ring-pink-500 dark:ring-pink-400 p-6 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all';
               // Update button
               button.textContent = 'Activate';
               button.onclick = () => togglePlugin(pluginId, 'activate');
@@ -428,9 +428,9 @@ function renderPluginCard(plugin: Plugin): string {
 
   // Border colors based on status
   const borderColors = {
-    active: 'ring-2 ring-lime-500/50 dark:ring-lime-400/50',
-    inactive: 'ring-2 ring-pink-500/50 dark:ring-pink-400/50',
-    error: 'ring-2 ring-red-500/50 dark:ring-red-400/50'
+    active: 'ring-[3px] ring-lime-500 dark:ring-lime-400',
+    inactive: 'ring-[3px] ring-pink-500 dark:ring-pink-400',
+    error: 'ring-[3px] ring-red-500 dark:ring-red-400'
   }
 
   // Core system plugins that cannot be deactivated
