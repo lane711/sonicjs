@@ -7,7 +7,7 @@ import { AuthManager, requireAuth } from '../middleware/auth'
 import { renderLoginPage, LoginPageData } from '../templates/pages/auth-login.template'
 import { renderRegisterPage, RegisterPageData } from '../templates/pages/auth-register.template'
 import { getCacheService, CACHE_CONFIGS } from '../plugins/cache'
-import packageJson from '../../package.json'
+import { APP_VERSION } from '../index'
 
 type Bindings = {
   DB: D1Database
@@ -34,7 +34,7 @@ authRoutes.get('/login', async (c) => {
   const pageData: LoginPageData = {
     error: error || undefined,
     message: message || undefined,
-    version: packageJson.version
+    version: APP_VERSION
   }
   
   // Check if demo login plugin is active

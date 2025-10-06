@@ -151,20 +151,34 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
                     </div>
 
                     <div class="relative group">
-                      <div class="absolute left-3.5 top-2.5 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-cyan-400 to-pink-500 dark:from-cyan-300 dark:to-pink-400 opacity-90 group-focus-within:opacity-100 transition-opacity">
-                        <svg class="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                      </div>
                       <input
                         type="text"
+                        id="media-search-input"
+                        name="search"
                         placeholder="Search files..."
-                        class="rounded-full bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm pl-11 pr-4 py-2 text-sm w-72 text-zinc-950 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400 border-2 border-cyan-200/50 dark:border-cyan-700/50 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:shadow-lg focus:shadow-cyan-500/20 dark:focus:shadow-cyan-400/20 transition-all duration-300"
+                        oninput="toggleMediaClearButton()"
+                        class="rounded-full bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm px-4 py-2.5 pl-11 pr-10 text-sm w-72 text-zinc-950 dark:text-white border-2 border-cyan-200/50 dark:border-cyan-700/50 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:bg-white dark:focus:bg-zinc-800 focus:shadow-lg focus:shadow-cyan-500/20 dark:focus:shadow-cyan-400/20 transition-all duration-300"
                         hx-get="/admin/media/search"
                         hx-trigger="keyup changed delay:300ms"
                         hx-target="#media-grid"
                         hx-include="[name='folder'], [name='type']"
                       >
+                      <div class="absolute left-3.5 top-2.5 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 dark:from-cyan-300 dark:to-blue-400 opacity-90 group-focus-within:opacity-100 transition-opacity">
+                        <svg class="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                      </div>
+                      <button
+                        type="button"
+                        id="clear-media-search"
+                        class="hidden absolute right-3 top-2.5 p-0.5 rounded-full bg-zinc-200/80 dark:bg-zinc-700/80 hover:bg-zinc-300 dark:hover:bg-zinc-600 transition-colors"
+                        onclick="clearMediaSearch()"
+                        title="Clear search"
+                      >
+                        <svg class="h-3.5 w-3.5 text-zinc-600 dark:text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                      </button>
                       <input type="hidden" name="folder" value="${data.currentFolder}">
                       <input type="hidden" name="type" value="${data.currentType}">
                     </div>
@@ -621,7 +635,32 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
           console.error('Failed to copy: ', err);
         });
       }
-      
+
+      // Toggle clear button visibility
+      function toggleMediaClearButton() {
+        const searchInput = document.getElementById('media-search-input');
+        const clearButton = document.getElementById('clear-media-search');
+        if (searchInput.value.trim()) {
+          clearButton.classList.remove('hidden');
+        } else {
+          clearButton.classList.add('hidden');
+        }
+      }
+
+      // Clear search input
+      function clearMediaSearch() {
+        const searchInput = document.getElementById('media-search-input');
+        searchInput.value = '';
+        toggleMediaClearButton();
+        // Trigger htmx to refresh the grid
+        htmx.trigger(searchInput, 'keyup');
+      }
+
+      // Initialize clear button visibility on page load
+      document.addEventListener('DOMContentLoaded', function() {
+        toggleMediaClearButton();
+      });
+
       // Close modal when clicking outside
       document.getElementById('file-modal').addEventListener('click', function(e) {
         if (e.target === this) {

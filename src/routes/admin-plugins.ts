@@ -4,7 +4,7 @@ import { renderPluginsListPage, PluginsListPageData, Plugin } from '../templates
 import { renderPluginSettingsPage, PluginSettingsPageData } from '../templates/pages/admin-plugin-settings.template'
 import { PluginService } from '../services/plugin-service'
 import { PermissionManager } from '../middleware/permissions'
-import packageJson from '../../package.json'
+import { APP_VERSION } from '../index'
 
 type Bindings = {
   DB: D1Database
@@ -76,7 +76,7 @@ adminPluginRoutes.get('/', async (c) => {
         email: user?.email || '',
         role: user?.role || 'user'
       },
-      version: `v${packageJson.version}`
+      version: APP_VERSION
     }
 
     return c.html(renderPluginsListPage(pageData))

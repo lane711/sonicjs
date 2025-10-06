@@ -248,21 +248,29 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
             // Update UI
             const card = button.closest('.plugin-card');
             const statusBadge = card.querySelector('.status-badge');
-            
+
             if (action === 'activate') {
-              statusBadge.className = 'status-badge inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-900/50 text-green-300 border border-green-600/30';
-              statusBadge.innerHTML = '<div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>Active';
+              // Update status badge
+              statusBadge.className = 'status-badge inline-flex items-center rounded-md px-2.5 py-1 text-sm font-medium ring-1 ring-inset bg-lime-50 dark:bg-lime-500/10 text-lime-700 dark:text-lime-300 ring-lime-700/10 dark:ring-lime-400/20';
+              statusBadge.innerHTML = '<div class="w-2 h-2 bg-lime-500 dark:bg-lime-400 rounded-full mr-2"></div>Active';
+              // Update card border to green
+              card.className = 'plugin-card rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-[3px] ring-lime-500 dark:ring-lime-400 p-6 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all';
+              // Update button
               button.textContent = 'Deactivate';
               button.onclick = () => togglePlugin(pluginId, 'deactivate');
-              button.className = 'bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors';
+              button.className = 'bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors';
             } else {
-              statusBadge.className = 'status-badge inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-800/50 text-gray-400 border border-gray-600/30';
-              statusBadge.innerHTML = '<div class="w-2 h-2 bg-gray-500 rounded-full mr-2"></div>Inactive';
+              // Update status badge
+              statusBadge.className = 'status-badge inline-flex items-center rounded-md px-2.5 py-1 text-sm font-medium ring-1 ring-inset bg-zinc-50 dark:bg-zinc-500/10 text-zinc-700 dark:text-zinc-400 ring-zinc-700/10 dark:ring-zinc-400/20';
+              statusBadge.innerHTML = '<div class="w-2 h-2 bg-zinc-500 dark:bg-zinc-400 rounded-full mr-2"></div>Inactive';
+              // Update card border to pink
+              card.className = 'plugin-card rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-[3px] ring-pink-500 dark:ring-pink-400 p-6 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all';
+              // Update button
               button.textContent = 'Activate';
               button.onclick = () => togglePlugin(pluginId, 'activate');
-              button.className = 'bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors';
+              button.className = 'bg-lime-600 dark:bg-lime-700 hover:bg-lime-700 dark:hover:bg-lime-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors';
             }
-            
+
             showNotification(\`Plugin \${action}d successfully\`, 'success');
           } else {
             throw new Error(result.error || \`Failed to \${action} plugin\`);
@@ -418,6 +426,13 @@ function renderPluginCard(plugin: Plugin): string {
     error: '<div class="w-2 h-2 bg-red-500 dark:bg-red-400 rounded-full mr-2"></div>'
   }
 
+  // Border colors based on status
+  const borderColors = {
+    active: 'ring-[3px] ring-lime-500 dark:ring-lime-400',
+    inactive: 'ring-[3px] ring-pink-500 dark:ring-pink-400',
+    error: 'ring-[3px] ring-red-500 dark:ring-red-400'
+  }
+
   // Core system plugins that cannot be deactivated
   const criticalCorePlugins = ['core-auth', 'core-media']
   const canToggle = !criticalCorePlugins.includes(plugin.id)
@@ -427,7 +442,7 @@ function renderPluginCard(plugin: Plugin): string {
     : `<button onclick="togglePlugin('${plugin.id}', 'activate')" class="bg-lime-600 dark:bg-lime-700 hover:bg-lime-700 dark:hover:bg-lime-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">Activate</button>`
 
   return `
-    <div class="plugin-card rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+    <div class="plugin-card rounded-xl bg-white dark:bg-zinc-900 shadow-sm ${borderColors[plugin.status]} p-6 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all">
       <div class="flex items-start justify-between mb-4">
         <div class="flex items-center gap-3">
           <div class="w-12 h-12 rounded-lg flex items-center justify-center ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 bg-zinc-50 dark:bg-zinc-800">

@@ -7,6 +7,7 @@ import { AuthManager } from '../middleware/auth'
 import { renderActivityLogsPage, ActivityLogsPageData, ActivityLog } from '../templates/pages/admin-activity-logs.template'
 import { renderUserEditPage, UserEditPageData, UserEditData } from '../templates/pages/admin-user-edit.template'
 import { renderUserNewPage, UserNewPageData } from '../templates/pages/admin-user-new.template'
+import { sanitizeInput } from '../utils/sanitize'
 
 type Bindings = {
   DB: D1Database
@@ -153,23 +154,24 @@ userRoutes.put('/profile', async (c) => {
 
   try {
     const formData = await c.req.formData()
-    
-    const firstName = formData.get('first_name')?.toString()?.trim() || ''
-    const lastName = formData.get('last_name')?.toString()?.trim() || ''
-    const username = formData.get('username')?.toString()?.trim() || ''
-    const email = formData.get('email')?.toString()?.trim() || ''
-    const phone = formData.get('phone')?.toString()?.trim() || null
-    const bio = formData.get('bio')?.toString()?.trim() || null
+
+    // Sanitize all user inputs to prevent XSS attacks
+    const firstName = sanitizeInput(formData.get('first_name')?.toString())
+    const lastName = sanitizeInput(formData.get('last_name')?.toString())
+    const username = sanitizeInput(formData.get('username')?.toString())
+    const email = formData.get('email')?.toString()?.trim().toLowerCase() || ''
+    const phone = sanitizeInput(formData.get('phone')?.toString()) || null
+    const bio = sanitizeInput(formData.get('bio')?.toString()) || null
     const timezone = formData.get('timezone')?.toString() || 'UTC'
     const language = formData.get('language')?.toString() || 'en'
     const emailNotifications = formData.get('email_notifications') === '1'
 
     // Validate required fields
     if (!firstName || !lastName || !username || !email) {
-      return c.html(renderAlert({ 
-        type: 'error', 
+      return c.html(renderAlert({
+        type: 'error',
         message: 'First name, last name, username, and email are required.',
-        dismissible: true 
+        dismissible: true
       }))
     }
 
@@ -528,12 +530,13 @@ userRoutes.post('/users/new', requirePermission('users.create'), async (c) => {
   try {
     const formData = await c.req.formData()
 
-    const firstName = formData.get('first_name')?.toString()?.trim() || ''
-    const lastName = formData.get('last_name')?.toString()?.trim() || ''
-    const username = formData.get('username')?.toString()?.trim() || ''
-    const email = formData.get('email')?.toString()?.trim() || ''
-    const phone = formData.get('phone')?.toString()?.trim() || null
-    const bio = formData.get('bio')?.toString()?.trim() || null
+    // Sanitize all user inputs to prevent XSS attacks
+    const firstName = sanitizeInput(formData.get('first_name')?.toString())
+    const lastName = sanitizeInput(formData.get('last_name')?.toString())
+    const username = sanitizeInput(formData.get('username')?.toString())
+    const email = formData.get('email')?.toString()?.trim().toLowerCase() || ''
+    const phone = sanitizeInput(formData.get('phone')?.toString()) || null
+    const bio = sanitizeInput(formData.get('bio')?.toString()) || null
     const role = formData.get('role')?.toString() || 'viewer'
     const password = formData.get('password')?.toString() || ''
     const confirmPassword = formData.get('confirm_password')?.toString() || ''
@@ -708,12 +711,13 @@ userRoutes.put('/users/:id', requirePermission('users.update'), async (c) => {
   try {
     const formData = await c.req.formData()
 
-    const firstName = formData.get('first_name')?.toString()?.trim() || ''
-    const lastName = formData.get('last_name')?.toString()?.trim() || ''
-    const username = formData.get('username')?.toString()?.trim() || ''
-    const email = formData.get('email')?.toString()?.trim() || ''
-    const phone = formData.get('phone')?.toString()?.trim() || null
-    const bio = formData.get('bio')?.toString()?.trim() || null
+    // Sanitize all user inputs to prevent XSS attacks
+    const firstName = sanitizeInput(formData.get('first_name')?.toString())
+    const lastName = sanitizeInput(formData.get('last_name')?.toString())
+    const username = sanitizeInput(formData.get('username')?.toString())
+    const email = formData.get('email')?.toString()?.trim().toLowerCase() || ''
+    const phone = sanitizeInput(formData.get('phone')?.toString()) || null
+    const bio = sanitizeInput(formData.get('bio')?.toString()) || null
     const role = formData.get('role')?.toString() || 'viewer'
     const isActive = formData.get('is_active') === '1'
     const emailVerified = formData.get('email_verified') === '1'
@@ -874,11 +878,12 @@ userRoutes.post('/invite-user', requirePermission('users.create'), async (c) => 
 
   try {
     const formData = await c.req.formData()
-    
-    const email = formData.get('email')?.toString()?.trim() || ''
+
+    // Sanitize all user inputs to prevent XSS attacks
+    const email = formData.get('email')?.toString()?.trim().toLowerCase() || ''
     const role = formData.get('role')?.toString()?.trim() || 'viewer'
-    const firstName = formData.get('first_name')?.toString()?.trim() || ''
-    const lastName = formData.get('last_name')?.toString()?.trim() || ''
+    const firstName = sanitizeInput(formData.get('first_name')?.toString())
+    const lastName = sanitizeInput(formData.get('last_name')?.toString())
 
     // Validate input
     if (!email || !firstName || !lastName) {

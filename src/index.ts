@@ -31,6 +31,10 @@ import { requireActivePlugin } from './middleware/plugin-middleware'
 import { bootstrapMiddleware } from './middleware/bootstrap'
 import { loggingMiddleware, securityLoggingMiddleware, performanceLoggingMiddleware } from './middleware/logging'
 import { compressionMiddleware, securityHeaders, cacheHeaders } from './middleware/performance'
+import packageJson from '../package.json'
+
+// Store app version globally at startup
+export const APP_VERSION = `v${packageJson.version}`
 
 // Define the Cloudflare Workers environment
 type Bindings = {

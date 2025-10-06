@@ -8,7 +8,7 @@ import { renderMediaFileDetails, MediaFileDetailsData } from '../templates/compo
 import { MediaFile } from '../templates/components/media-grid.template'
 import { createCDNService } from '../services/cdn'
 import { getCacheService, CACHE_CONFIGS } from '../plugins/cache'
-import packageJson from '../../package.json'
+import { APP_VERSION } from '../index'
 
 type Bindings = {
   DB: D1Database
@@ -179,7 +179,7 @@ adminMediaRoutes.get('/', async (c) => {
         email: user.email,
         role: user.role
       },
-      version: `v${packageJson.version}`
+      version: APP_VERSION
     }
 
     // Cache the page data
