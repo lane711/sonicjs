@@ -532,7 +532,7 @@ adminRoutes.get('/api/system-status', async (c) => {
 
     return c.html(html`
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        ${statusCards}
+        ${raw(statusCards)}
       </div>
     `)
   } catch (error) {
