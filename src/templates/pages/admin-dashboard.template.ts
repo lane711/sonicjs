@@ -93,8 +93,14 @@ export function renderDashboardPage(data: DashboardPageData): string {
       </div>
 
       <!-- Recent Activity -->
-      <div class="xl:col-span-1">
-        ${renderRecentActivity()}
+      <div
+        class="xl:col-span-1"
+        id="recent-activity-container"
+        hx-get="/admin/api/recent-activity"
+        hx-trigger="load"
+        hx-swap="innerHTML"
+      >
+        ${renderRecentActivitySkeleton()}
       </div>
     </div>
 
@@ -172,8 +178,14 @@ export function renderDashboardPageWithDynamicMenu(
       </div>
 
       <!-- Recent Activity -->
-      <div class="xl:col-span-1">
-        ${renderRecentActivity()}
+      <div
+        class="xl:col-span-1"
+        id="recent-activity-container"
+        hx-get="/admin/api/recent-activity"
+        hx-trigger="load"
+        hx-swap="innerHTML"
+      >
+        ${renderRecentActivitySkeleton()}
       </div>
     </div>
 
@@ -414,36 +426,111 @@ function renderAnalyticsChart(): string {
   `;
 }
 
-function renderRecentActivity(): string {
-  const activities = [
-    {
-      type: "content",
-      description: "New blog post published",
-      user: "John Doe",
-      time: "2 minutes ago",
-      initials: "JD",
-      bgColor: "bg-lime-500/10 dark:bg-lime-400/10",
-      textColor: "text-lime-700 dark:text-lime-300",
-    },
-    {
-      type: "media",
-      description: "Image uploaded to gallery",
-      user: "Jane Smith",
-      time: "5 minutes ago",
-      initials: "JS",
-      bgColor: "bg-cyan-500/10 dark:bg-cyan-400/10",
-      textColor: "text-cyan-700 dark:text-cyan-300",
-    },
-    {
-      type: "user",
-      description: "New user account created",
-      user: "Mike Wilson",
-      time: "10 minutes ago",
-      initials: "MW",
-      bgColor: "bg-pink-500/10 dark:bg-pink-400/10",
-      textColor: "text-pink-700 dark:text-pink-300",
-    },
-  ];
+export function renderRecentActivitySkeleton(): string {
+  return `
+    <div class="rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 animate-pulse">
+      <div class="border-b border-zinc-950/5 dark:border-white/10 px-6 py-6">
+        <div class="h-5 w-32 bg-zinc-200 dark:bg-zinc-700 rounded"></div>
+      </div>
+      <div class="px-6 py-6">
+        <div class="space-y-6">
+          ${Array(3).fill(0).map(() => `
+            <div class="flex gap-x-4">
+              <div class="h-10 w-10 rounded-full bg-zinc-200 dark:bg-zinc-700"></div>
+              <div class="flex-auto space-y-2">
+                <div class="h-4 w-48 bg-zinc-200 dark:bg-zinc-700 rounded"></div>
+                <div class="h-3 w-32 bg-zinc-200 dark:bg-zinc-700 rounded"></div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `
+}
+
+export function renderRecentActivity(activities?: ActivityItem[]): string {
+  // Helper to get user initials
+  const getInitials = (user: string): string => {
+    const parts = user.split(' ').filter(p => p.length > 0)
+    if (parts.length >= 2) {
+      return (parts[0]![0] + parts[1]![0]).toUpperCase()
+    }
+    return user.substring(0, 2).toUpperCase()
+  }
+
+  // Helper to get relative time
+  const getRelativeTime = (timestamp: string): string => {
+    const date = new Date(timestamp)
+    const now = new Date()
+    const diffMs = now.getTime() - date.getTime()
+    const diffMins = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMins / 60)
+    const diffDays = Math.floor(diffHours / 24)
+
+    if (diffMins < 1) return 'just now'
+    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
+    return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
+  }
+
+  // Helper to get color classes based on activity type
+  const getColorClasses = (type: string): { bgColor: string; textColor: string } => {
+    switch (type) {
+      case 'content':
+        return {
+          bgColor: 'bg-lime-500/10 dark:bg-lime-400/10',
+          textColor: 'text-lime-700 dark:text-lime-300'
+        }
+      case 'media':
+        return {
+          bgColor: 'bg-cyan-500/10 dark:bg-cyan-400/10',
+          textColor: 'text-cyan-700 dark:text-cyan-300'
+        }
+      case 'user':
+        return {
+          bgColor: 'bg-pink-500/10 dark:bg-pink-400/10',
+          textColor: 'text-pink-700 dark:text-pink-300'
+        }
+      case 'collection':
+        return {
+          bgColor: 'bg-purple-500/10 dark:bg-purple-400/10',
+          textColor: 'text-purple-700 dark:text-purple-300'
+        }
+      default:
+        return {
+          bgColor: 'bg-gray-500/10 dark:bg-gray-400/10',
+          textColor: 'text-gray-700 dark:text-gray-300'
+        }
+    }
+  }
+
+  // Format activities with colors and times
+  const formattedActivities = (activities || []).map(activity => {
+    const colors = getColorClasses(activity.type)
+    return {
+      ...activity,
+      initials: getInitials(activity.user),
+      time: getRelativeTime(activity.timestamp),
+      ...colors
+    }
+  })
+
+  // If no activities, show empty state
+  if (formattedActivities.length === 0) {
+    formattedActivities.push({
+      type: 'content' as const,
+      description: 'No recent activity',
+      user: 'System',
+      time: '',
+      initials: 'SY',
+      bgColor: 'bg-gray-500/10 dark:bg-gray-400/10',
+      textColor: 'text-gray-700 dark:text-gray-300',
+      id: '0',
+      action: '',
+      timestamp: new Date().toISOString()
+    })
+  }
 
   return `
     <div class="rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10">
@@ -458,7 +545,7 @@ function renderRecentActivity(): string {
 
       <div class="px-6 py-6">
         <ul role="list" class="space-y-6">
-          ${activities
+          ${formattedActivities
             .map(
               (activity) => `
             <li class="relative flex gap-x-4">

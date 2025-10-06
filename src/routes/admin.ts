@@ -183,18 +183,225 @@ adminRoutes.get('/api/stats', async (c) => {
       console.error('Error fetching users count:', error)
     }
 
+    // Get recent activity
+    const recentActivity: any[] = []
+
+    try {
+      // Get recent content updates (last 5)
+      const contentStmt = db.prepare(`
+        SELECT c.id, c.title, c.updated_at, u.email, u.first_name, u.last_name
+        FROM content c
+        LEFT JOIN users u ON c.created_by = u.id
+        ORDER BY c.updated_at DESC
+        LIMIT 5
+      `)
+      const { results: contentResults } = await contentStmt.all()
+
+      contentResults?.forEach((row: any) => {
+        const userName = row.first_name && row.last_name
+          ? `${row.first_name} ${row.last_name}`
+          : row.email || 'Unknown'
+
+        recentActivity.push({
+          id: row.id,
+          type: 'content',
+          action: 'updated',
+          description: `Content "${row.title}" updated`,
+          timestamp: new Date(Number(row.updated_at)).toISOString(),
+          user: userName
+        })
+      })
+    } catch (error) {
+      console.error('Error fetching recent content activity:', error)
+    }
+
+    try {
+      // Get recent user registrations (last 3)
+      const usersStmt = db.prepare(`
+        SELECT id, email, first_name, last_name, created_at
+        FROM users
+        ORDER BY created_at DESC
+        LIMIT 3
+      `)
+      const { results: usersResults } = await usersStmt.all()
+
+      usersResults?.forEach((row: any) => {
+        const userName = row.first_name && row.last_name
+          ? `${row.first_name} ${row.last_name}`
+          : row.email || 'Unknown'
+
+        recentActivity.push({
+          id: row.id,
+          type: 'user',
+          action: 'registered',
+          description: `New user account created`,
+          timestamp: new Date(Number(row.created_at)).toISOString(),
+          user: userName
+        })
+      })
+    } catch (error) {
+      console.error('Error fetching recent user activity:', error)
+    }
+
+    try {
+      // Get recent media uploads (last 3)
+      const mediaStmt = db.prepare(`
+        SELECT m.id, m.filename, m.created_at, u.email, u.first_name, u.last_name
+        FROM media m
+        LEFT JOIN users u ON m.uploaded_by = u.id
+        WHERE m.deleted_at IS NULL
+        ORDER BY m.created_at DESC
+        LIMIT 3
+      `)
+      const { results: mediaResults } = await mediaStmt.all()
+
+      mediaResults?.forEach((row: any) => {
+        const userName = row.first_name && row.last_name
+          ? `${row.first_name} ${row.last_name}`
+          : row.email || 'Unknown'
+
+        recentActivity.push({
+          id: row.id,
+          type: 'media',
+          action: 'uploaded',
+          description: `Image "${row.filename}" uploaded`,
+          timestamp: new Date(Number(row.created_at)).toISOString(),
+          user: userName
+        })
+      })
+    } catch (error) {
+      console.error('Error fetching recent media activity:', error)
+      // Media table might not exist yet
+    }
+
+    // Sort all activities by timestamp (most recent first) and limit to 5
+    recentActivity.sort((a, b) =>
+      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    )
+    const limitedActivity = recentActivity.slice(0, 5)
+
     const stats: DashboardStats = {
       collections: collectionsCount,
       contentItems: contentCount,
       mediaFiles: mediaCount,
       users: usersCount,
-      databaseSize: databaseSize
+      databaseSize: databaseSize,
+      recentActivity: limitedActivity
     }
 
     return c.html(renderStatsCards(stats))
   } catch (error) {
     console.error('Error fetching stats:', error)
     return c.html(html`<p>Error loading statistics: ${(error as Error).message}</p>`)
+  }
+})
+
+// Recent activity endpoint for HTMX
+adminRoutes.get('/admin/api/recent-activity', async (c) => {
+  try {
+    const db = c.env.DB
+    const recentActivity: any[] = []
+
+    try {
+      // Get recent content updates (last 5)
+      const contentStmt = db.prepare(`
+        SELECT c.id, c.title, c.updated_at, u.email, u.first_name, u.last_name
+        FROM content c
+        LEFT JOIN users u ON c.created_by = u.id
+        ORDER BY c.updated_at DESC
+        LIMIT 5
+      `)
+      const { results: contentResults } = await contentStmt.all()
+
+      contentResults?.forEach((row: any) => {
+        const userName = row.first_name && row.last_name
+          ? `${row.first_name} ${row.last_name}`
+          : row.email || 'Unknown'
+
+        recentActivity.push({
+          id: row.id,
+          type: 'content',
+          action: 'updated',
+          description: `Content "${row.title}" updated`,
+          timestamp: new Date(Number(row.updated_at)).toISOString(),
+          user: userName
+        })
+      })
+    } catch (error) {
+      console.error('Error fetching recent content activity:', error)
+    }
+
+    try {
+      // Get recent user registrations (last 3)
+      const usersStmt = db.prepare(`
+        SELECT id, email, first_name, last_name, created_at
+        FROM users
+        ORDER BY created_at DESC
+        LIMIT 3
+      `)
+      const { results: usersResults } = await usersStmt.all()
+
+      usersResults?.forEach((row: any) => {
+        const userName = row.first_name && row.last_name
+          ? `${row.first_name} ${row.last_name}`
+          : row.email || 'Unknown'
+
+        recentActivity.push({
+          id: row.id,
+          type: 'user',
+          action: 'registered',
+          description: `New user account created`,
+          timestamp: new Date(Number(row.created_at)).toISOString(),
+          user: userName
+        })
+      })
+    } catch (error) {
+      console.error('Error fetching recent user activity:', error)
+    }
+
+    try {
+      // Get recent media uploads (last 3)
+      const mediaStmt = db.prepare(`
+        SELECT m.id, m.filename, m.created_at, u.email, u.first_name, u.last_name
+        FROM media m
+        LEFT JOIN users u ON m.uploaded_by = u.id
+        WHERE m.deleted_at IS NULL
+        ORDER BY m.created_at DESC
+        LIMIT 3
+      `)
+      const { results: mediaResults } = await mediaStmt.all()
+
+      mediaResults?.forEach((row: any) => {
+        const userName = row.first_name && row.last_name
+          ? `${row.first_name} ${row.last_name}`
+          : row.email || 'Unknown'
+
+        recentActivity.push({
+          id: row.id,
+          type: 'media',
+          action: 'uploaded',
+          description: `Image "${row.filename}" uploaded`,
+          timestamp: new Date(Number(row.created_at)).toISOString(),
+          user: userName
+        })
+      })
+    } catch (error) {
+      console.error('Error fetching recent media activity:', error)
+      // Media table might not exist yet
+    }
+
+    // Sort all activities by timestamp (most recent first) and limit to 5
+    recentActivity.sort((a, b) =>
+      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    )
+    const limitedActivity = recentActivity.slice(0, 5)
+
+    // Import and render the activity component
+    const { renderRecentActivity } = await import('../templates/pages/admin-dashboard.template')
+    return c.html(renderRecentActivity(limitedActivity))
+  } catch (error) {
+    console.error('Error fetching recent activity:', error)
+    return c.html(html`<p class="text-red-400">Error loading recent activity</p>`)
   }
 })
 
