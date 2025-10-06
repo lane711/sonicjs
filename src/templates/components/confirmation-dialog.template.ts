@@ -57,7 +57,7 @@ export function renderConfirmationDialog(options: ConfirmationDialogOptions): st
                 onclick="${onConfirm}; document.getElementById('${id}').close()"
                 command="close"
                 commandfor="${id}"
-                class="inline-flex w-full justify-center rounded-md ${confirmClass} px-3 py-2 text-sm font-semibold text-white sm:ml-3 sm:w-auto"
+                class="confirm-button inline-flex w-full justify-center rounded-md ${confirmClass} px-3 py-2 text-sm font-semibold text-white sm:ml-3 sm:w-auto"
               >
                 ${confirmText}
               </button>

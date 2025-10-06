@@ -512,8 +512,52 @@ export function renderContentListPage(data: ContentListPageData): string {
         currentBulkAction = action;
         currentSelectedIds = selectedIds;
 
+        // Update dialog content based on action
+        updateDialogContent(action, selectedIds.length);
+
         // Show confirmation dialog
         showConfirmDialog('bulk-action-confirm');
+      }
+
+      // Update dialog content dynamically
+      function updateDialogContent(action, count) {
+        const dialog = document.getElementById('bulk-action-confirm');
+        const titleEl = dialog.querySelector('h3');
+        const messageEl = dialog.querySelector('p');
+        const confirmBtn = dialog.querySelector('.confirm-button');
+
+        let title, message, btnText, btnClass;
+
+        switch(action) {
+          case 'delete':
+            title = 'Confirm Bulk Delete';
+            message = `Are you sure you want to delete ${count} selected item${count > 1 ? 's' : ''}? This action cannot be undone.`;
+            btnText = 'Delete';
+            btnClass = 'bg-red-500 hover:bg-red-400';
+            break;
+          case 'publish':
+            title = 'Confirm Bulk Publish';
+            message = `Are you sure you want to publish ${count} selected item${count > 1 ? 's' : ''}? They will become publicly visible.`;
+            btnText = 'Publish';
+            btnClass = 'bg-green-500 hover:bg-green-400';
+            break;
+          case 'draft':
+            title = 'Confirm Bulk Draft';
+            message = `Are you sure you want to move ${count} selected item${count > 1 ? 's' : ''} to draft status? They will be unpublished.`;
+            btnText = 'Move to Draft';
+            btnClass = 'bg-blue-500 hover:bg-blue-400';
+            break;
+          default:
+            title = 'Confirm Bulk Action';
+            message = `Are you sure you want to perform this action on ${count} selected item${count > 1 ? 's' : ''}?`;
+            btnText = 'Confirm';
+            btnClass = 'bg-blue-500 hover:bg-blue-400';
+        }
+
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+        confirmBtn.textContent = btnText;
+        confirmBtn.className = confirmBtn.className.replace(/bg-\w+-\d+\s+hover:bg-\w+-\d+/, btnClass);
       }
 
       // Execute the bulk action after confirmation
