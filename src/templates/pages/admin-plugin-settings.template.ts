@@ -286,20 +286,20 @@ function renderToggleButton(plugin: any): string {
 
 function renderSettingsTab(plugin: any): string {
   const settings = plugin.settings || {}
-  
+
   return `
     <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6">
       <h2 class="text-xl font-semibold text-white mb-4">Plugin Settings</h2>
-      
+
       <form id="settings-form" class="space-y-6">
-        ${Object.keys(settings).length > 0 ? renderSettingsFields(settings) : renderNoSettings()}
-        
+        ${Object.keys(settings).length > 0 ? renderSettingsFields(settings) : renderNoSettings(plugin)}
+
         ${Object.keys(settings).length > 0 ? `
         <div class="flex items-center justify-end pt-6 border-t border-white/10">
-          <button 
-            type="button" 
+          <button
+            type="button"
             id="save-button"
-            onclick="saveSettings()" 
+            onclick="saveSettings()"
             class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
           >
             Save Settings
@@ -359,7 +359,29 @@ function renderSettingsFields(settings: PluginSettings): string {
   }).join('')
 }
 
-function renderNoSettings(): string {
+function renderNoSettings(plugin: any): string {
+  // Special handling for seed-data plugin
+  if (plugin.id === 'seed-data' || plugin.name === 'seed-data') {
+    return `
+      <div class="text-center py-8">
+        <svg class="w-16 h-16 text-green-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+        </svg>
+        <h3 class="text-lg font-medium text-gray-300 mb-2">Seed Data Generator</h3>
+        <p class="text-gray-400 mb-6">Generate realistic example data for testing and development.</p>
+        <a
+          href="/admin/seed-data"
+          class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Generate Seed Data
+        </a>
+      </div>
+    `
+  }
+
   return `
     <div class="text-center py-8">
       <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
