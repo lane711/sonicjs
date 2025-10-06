@@ -69,8 +69,12 @@ app.use('*', performanceLoggingMiddleware(1000)) // Log requests slower than 1 s
 
 // Metrics tracking middleware - track requests for real-time analytics
 app.use('*', async (c, next) => {
-  const { metricsTracker } = await import('./utils/metrics')
-  metricsTracker.recordRequest()
+  const path = c.req.path
+  // Don't track the metrics endpoint itself to avoid inflating stats
+  if (!path.includes('/api/metrics')) {
+    const { metricsTracker } = await import('./utils/metrics')
+    metricsTracker.recordRequest()
+  }
   await next()
 })
 
