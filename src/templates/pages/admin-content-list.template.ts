@@ -101,7 +101,7 @@ export function renderContentListPage(data: ContentListPageData): string {
         <div class="flex items-center">
           <div>
             <div class="text-sm font-medium text-zinc-950 dark:text-white">
-              <a href="/admin/content/${row.id}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">${row.title}</a>
+              <a href="/content/${row.id}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">${row.title}</a>
             </div>
             <div class="text-sm text-zinc-500 dark:text-zinc-400">${row.slug}</div>
           </div>

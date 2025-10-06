@@ -269,6 +269,19 @@ export class PluginBootstrapService {
           demoEmail: 'admin@sonicjs.com',
           demoPassword: 'admin123'
         }
+      },
+      {
+        id: 'design',
+        name: 'design',
+        display_name: 'Design System',
+        description: 'Design system management including themes, components, and UI customization',
+        version: '1.0.0',
+        author: 'SonicJS Team',
+        category: 'customization',
+        icon: '🎨',
+        permissions: ['manage:design', 'admin'],
+        dependencies: [],
+        settings: {}
       }
     ]
 
