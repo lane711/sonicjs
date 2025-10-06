@@ -8,6 +8,7 @@ import { adminRoutes } from './routes/admin'
 import { adminContentRoutes } from './routes/admin-content'
 import adminFAQRoutes from './routes/admin-faq'
 import adminTestimonialsRoutes from './routes/admin-testimonials'
+import adminCodeExamplesRoutes from './routes/admin-code-examples'
 // Design plugin routes
 import { designRoutes } from './plugins/design/routes'
 import { adminCheckboxRoutes } from './routes/admin-checkboxes'
@@ -69,9 +70,14 @@ app.use('*', performanceLoggingMiddleware(1000)) // Log requests slower than 1 s
 
 // Metrics tracking middleware - track requests for real-time analytics
 app.use('*', async (c, next) => {
+  // Don't track polling endpoints to avoid noise and feedback loops
   const path = c.req.path
-  // Don't track the metrics endpoint itself to avoid inflating stats
-  if (!path.includes('/api/metrics')) {
+  const shouldTrack = !path.includes('/admin/api/metrics') &&
+                      !path.includes('/admin/api/stats') &&
+                      !path.includes('/admin/api/recent-activity') &&
+                      !path.includes('/admin/api/system-status')
+
+  if (shouldTrack) {
     const { metricsTracker } = await import('./utils/metrics')
     metricsTracker.recordRequest()
   }
@@ -79,7 +85,13 @@ app.use('*', async (c, next) => {
 })
 
 // Middleware
-app.use('*', logger())
+app.use('*', async (c, next) => {
+  // Skip logger for high-frequency endpoints
+  if (c.req.path.includes('/admin/api/metrics')) {
+    return next()
+  }
+  return logger()(c, next)
+})
 app.use('*', cors())
 // Compression disabled - causes encoding issues
 // app.use('*', compressionMiddleware)
@@ -140,6 +152,9 @@ app.route('/admin/faq', adminFAQRoutes)
 // Testimonials routes with plugin activation check
 app.use('/admin/testimonials/*', requireActivePlugin('testimonials'))
 app.route('/admin/testimonials', adminTestimonialsRoutes)
+// Code Examples routes with plugin activation check
+app.use('/admin/code-examples/*', requireActivePlugin('code-examples'))
+app.route('/admin/code-examples', adminCodeExamplesRoutes)
 // Workflow routes with plugin activation check
 app.use('/admin/workflow/*', requireActivePlugin('workflow'))
 app.route('/admin/workflow', createWorkflowAdminRoutes())
