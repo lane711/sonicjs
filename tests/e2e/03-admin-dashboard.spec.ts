@@ -127,10 +127,85 @@ test.describe('Admin Dashboard', () => {
     // Test any quick action buttons on dashboard
     const quickActions = page.locator('.quick-action, .btn-primary');
     const count = await quickActions.count();
-    
+
     if (count > 0) {
       // Verify first quick action is clickable
       await expect(quickActions.first()).toBeVisible();
     }
+  });
+
+  test('should display recent activity section with real data', async ({ page }) => {
+    // Look for the Recent Activity section
+    const recentActivitySection = page.getByRole('heading', { name: 'Recent Activity' });
+    await expect(recentActivitySection).toBeVisible({ timeout: 5000 });
+
+    // Wait for HTMX to load the recent activity data
+    const recentActivityContainer = page.locator('#recent-activity-container');
+    await expect(recentActivityContainer).toBeVisible();
+
+    // Wait for the skeleton to be replaced by actual content
+    await page.waitForTimeout(2000);
+
+    // Check that activity items are displayed (either real activities or "No recent activity")
+    const activityList = page.locator('#recent-activity-container ul[role="list"]');
+    await expect(activityList).toBeVisible({ timeout: 5000 });
+
+    // Check for either activity items or empty state
+    const activityItems = page.locator('#recent-activity-container li');
+    const activityCount = await activityItems.count();
+
+    if (activityCount > 0) {
+      // Verify activity items have the expected structure
+      const firstActivity = activityItems.first();
+
+      // Check for user initials circle
+      await expect(firstActivity.locator('div[class*="rounded-full"]')).toBeVisible();
+
+      // Check for activity description
+      await expect(firstActivity.locator('p').first()).toBeVisible();
+
+      // Verify different activity types are color-coded
+      const coloredElements = page.locator('#recent-activity-container [class*="bg-lime-"], [class*="bg-cyan-"], [class*="bg-pink-"], [class*="bg-purple-"], [class*="bg-gray-"]');
+      await expect(coloredElements.first()).toBeVisible();
+    } else {
+      // Empty state should show "No recent activity"
+      await expect(page.getByText('No recent activity')).toBeVisible();
+    }
+
+    // Verify the "View all" button exists
+    const viewAllButton = page.getByRole('button', { name: 'View all' });
+    await expect(viewAllButton).toBeVisible();
+  });
+
+  test('should load recent activity via HTMX endpoint', async ({ page }) => {
+    // Intercept the HTMX request to the recent activity endpoint
+    const responsePromise = page.waitForResponse(
+      response => response.url().includes('/admin/api/recent-activity') && response.status() === 200,
+      { timeout: 10000 }
+    );
+
+    // Navigate to dashboard (which triggers HTMX load)
+    await page.goto('/admin');
+
+    // Wait for the response
+    const response = await responsePromise;
+    expect(response.status()).toBe(200);
+
+    // Verify response contains HTML content
+    const contentType = response.headers()['content-type'];
+    expect(contentType).toContain('text/html');
+
+    // Wait for content to be injected
+    await page.waitForTimeout(1000);
+
+    // Verify activity container has been populated
+    const recentActivityContainer = page.locator('#recent-activity-container');
+    const containerContent = await recentActivityContainer.innerHTML();
+
+    // Should not contain the skeleton anymore
+    expect(containerContent).not.toContain('animate-pulse');
+
+    // Should contain either activity list or empty state
+    expect(containerContent).toMatch(/ul role="list"|No recent activity/);
   });
 }); 

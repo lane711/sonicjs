@@ -8,6 +8,7 @@ export { authPlugin, createAuthPlugin } from './auth-plugin'
 export { mediaPlugin, createMediaPlugin } from './media-plugin'
 export { analyticsPlugin, createAnalyticsPlugin } from './analytics-plugin'
 export { faqPlugin, createFAQPlugin } from './faq-plugin'
+export { testimonialsPlugin, createTestimonialPlugin } from './testimonials-plugin'
 export { demoLoginPlugin } from './demo-login-plugin'
 export { workflowPlugin, createWorkflowPlugin } from './workflow-plugin'
 export { seedDataPlugin, createSeedDataPlugin } from './seed-data-plugin'
@@ -18,6 +19,7 @@ export const corePlugins = [
   'core-media',
   'core-analytics',
   'core-faq',
+  'testimonials-plugin',
   'demo-login-prefill',
   'workflow-plugin',
   'cache',

@@ -7,6 +7,7 @@ import { apiRoutes } from './routes/api'
 import { adminRoutes } from './routes/admin'
 import { adminContentRoutes } from './routes/admin-content'
 import adminFAQRoutes from './routes/admin-faq'
+import adminTestimonialsRoutes from './routes/admin-testimonials'
 // Design plugin routes
 import { designRoutes } from './plugins/design/routes'
 import { adminCheckboxRoutes } from './routes/admin-checkboxes'
@@ -125,6 +126,9 @@ app.route('/admin/content', adminContentRoutes)
 // FAQ routes with plugin activation check
 app.use('/admin/faq/*', requireActivePlugin('faq'))
 app.route('/admin/faq', adminFAQRoutes)
+// Testimonials routes with plugin activation check
+app.use('/admin/testimonials/*', requireActivePlugin('testimonials'))
+app.route('/admin/testimonials', adminTestimonialsRoutes)
 // Workflow routes with plugin activation check
 app.use('/admin/workflow/*', requireActivePlugin('workflow'))
 app.route('/admin/workflow', createWorkflowAdminRoutes())

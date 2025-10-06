@@ -148,56 +148,40 @@ export function renderTestimonialsList(data: TestimonialsListData): string {
           rowClickable: true,
           rowClickUrl: (row: any) => `/admin/testimonials/${row.id}`,
           columns: [
-            {
-              header: 'Author',
-              accessor: 'author_name',
-              cell: (value: string, row: any) => {
-                const rating = row.rating ? '⭐'.repeat(row.rating) : ''
-                return `
-                  <div class="flex flex-col">
-                    <div class="font-medium text-zinc-950 dark:text-white">${value}</div>
-                    ${row.author_title || row.author_company ? `
-                      <div class="text-xs text-zinc-500 dark:text-zinc-400">
-                        ${[row.author_title, row.author_company].filter(Boolean).join(' · ')}
-                      </div>
-                    ` : ''}
-                    ${rating ? `<div class="text-xs mt-1">${rating}</div>` : ''}
-                  </div>
-                `
-              }
-            },
-            {
-              header: 'Testimonial',
-              accessor: 'testimonial_text',
-              cell: (value: string) => {
-                const truncated = value.length > 100 ? value.substring(0, 100) + '...' : value
-                return `<div class="text-sm text-zinc-700 dark:text-zinc-300 max-w-md">${truncated}</div>`
-              }
-            },
-            {
-              header: 'Status',
-              accessor: 'isPublished',
-              cell: (value: number) => {
-                return value
-                  ? '<span class="inline-flex items-center rounded-md bg-green-50 dark:bg-green-500/10 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-600/20 dark:ring-green-500/20">Published</span>'
-                  : '<span class="inline-flex items-center rounded-md bg-zinc-50 dark:bg-zinc-500/10 px-2 py-1 text-xs font-medium text-zinc-600 dark:text-zinc-400 ring-1 ring-inset ring-zinc-500/20 dark:ring-zinc-500/20">Draft</span>'
-              }
-            },
-            {
-              header: 'Sort Order',
-              accessor: 'sortOrder',
-              cell: (value: number) => `<div class="text-sm text-zinc-700 dark:text-zinc-300">${value}</div>`
-            },
-            {
-              header: 'Created',
-              accessor: 'created_at',
-              cell: (value: number) => {
-                const date = new Date(value * 1000)
-                return `<div class="text-sm text-zinc-500 dark:text-zinc-400">${date.toLocaleDateString()}</div>`
-              }
-            }
+            { key: 'author', label: 'Author', sortable: true, sortType: 'string' },
+            { key: 'testimonial', label: 'Testimonial', sortable: false },
+            { key: 'status', label: 'Status', sortable: true, sortType: 'boolean' },
+            { key: 'sortOrder', label: 'Order', sortable: true, sortType: 'number' },
+            { key: 'created_at', label: 'Created', sortable: true, sortType: 'date' }
           ],
-          data: testimonials
+          rows: testimonials.map(testimonial => {
+            const rating = testimonial.rating ? '⭐'.repeat(testimonial.rating) : ''
+            const truncated = testimonial.testimonial_text.length > 100
+              ? testimonial.testimonial_text.substring(0, 100) + '...'
+              : testimonial.testimonial_text
+
+            return {
+              id: testimonial.id,
+              author: `
+                <div class="flex flex-col">
+                  <div class="font-medium text-zinc-950 dark:text-white">${testimonial.author_name}</div>
+                  ${testimonial.author_title || testimonial.author_company ? `
+                    <div class="text-xs text-zinc-500 dark:text-zinc-400">
+                      ${[testimonial.author_title, testimonial.author_company].filter(Boolean).join(' · ')}
+                    </div>
+                  ` : ''}
+                  ${rating ? `<div class="text-xs mt-1">${rating}</div>` : ''}
+                </div>
+              `,
+              testimonial: `<div class="text-sm text-zinc-700 dark:text-zinc-300 max-w-md">${truncated}</div>`,
+              status: testimonial.isPublished
+                ? '<span class="inline-flex items-center rounded-md bg-green-50 dark:bg-green-500/10 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-600/20 dark:ring-green-500/20">Published</span>'
+                : '<span class="inline-flex items-center rounded-md bg-zinc-50 dark:bg-zinc-500/10 px-2 py-1 text-xs font-medium text-zinc-600 dark:text-zinc-400 ring-1 ring-inset ring-zinc-500/20 dark:ring-zinc-500/20">Draft</span>',
+              sortOrder: testimonial.sortOrder.toString(),
+              created_at: new Date(testimonial.created_at * 1000).toLocaleDateString()
+            }
+          }),
+          selectable: true
         }) : `
           <div class="text-center py-12 bg-white dark:bg-zinc-900 rounded-lg shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10">
             <svg class="mx-auto h-12 w-12 text-zinc-400 dark:text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -220,6 +204,10 @@ export function renderTestimonialsList(data: TestimonialsListData): string {
       ${totalPages > 1 ? renderPagination({
         currentPage,
         totalPages,
+        totalItems: totalCount,
+        itemsPerPage: 20,
+        startItem: (currentPage - 1) * 20 + 1,
+        endItem: Math.min(currentPage * 20, totalCount),
         baseUrl: '/admin/testimonials'
       }) : ''}
     </div>

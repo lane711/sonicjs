@@ -297,7 +297,7 @@ adminRoutes.get('/api/stats', async (c) => {
 })
 
 // Recent activity endpoint for HTMX
-adminRoutes.get('/admin/api/recent-activity', async (c) => {
+adminRoutes.get('/api/recent-activity', async (c) => {
   try {
     const db = c.env.DB
     const recentActivity: any[] = []
@@ -448,64 +448,67 @@ adminRoutes.get('/api/system-status', async (c) => {
       }
     }
 
-    // Render HTML fragment for HTMX
+    // Define service configurations with gradient colors
+    const services = [
+      {
+        name: 'Webserver',
+        status: webserverStatus,
+        gradient: 'from-blue-500/20 to-cyan-500/20',
+        darkGradient: 'dark:from-blue-500/10 dark:to-cyan-500/10',
+        iconPath: 'M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01'
+      },
+      {
+        name: 'D1 Database',
+        status: d1Status,
+        gradient: 'from-purple-500/20 to-pink-500/20',
+        darkGradient: 'dark:from-purple-500/10 dark:to-pink-500/10',
+        iconPath: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4'
+      },
+      {
+        name: 'KV Storage',
+        status: kvStatus,
+        gradient: 'from-amber-500/20 to-orange-500/20',
+        darkGradient: 'dark:from-amber-500/10 dark:to-orange-500/10',
+        iconPath: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'
+      },
+      {
+        name: 'R2 Storage',
+        status: r2Status,
+        gradient: 'from-lime-500/20 to-emerald-500/20',
+        darkGradient: 'dark:from-lime-500/10 dark:to-emerald-500/10',
+        iconPath: 'M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z'
+      }
+    ]
+
+    // Render HTML fragment for HTMX with new creative design
+    const statusCards = services.map(service => `
+      <div class="relative group">
+        <div class="absolute inset-0 bg-gradient-to-br ${service.gradient} ${service.darkGradient} rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div class="relative bg-zinc-50 dark:bg-zinc-800/50 rounded-xl p-5 border border-zinc-200/50 dark:border-zinc-700/50 transition-all duration-300">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <p class="text-sm font-medium text-zinc-700 dark:text-zinc-300">${service.name}</p>
+              <div class="flex items-center gap-2 mt-2">
+                <div class="h-2 w-2 rounded-full ${service.status === 'operational' ? 'bg-lime-500 animate-pulse' : 'bg-red-500'} shadow-lg ${service.status === 'operational' ? 'shadow-lime-500/50' : 'shadow-red-500/50'}"></div>
+                <span class="text-xs font-semibold ${service.status === 'operational' ? 'text-lime-600 dark:text-lime-400' : 'text-red-600 dark:text-red-400'}">
+                  ${service.status === 'operational' ? 'Operational' : 'Degraded'}
+                </span>
+              </div>
+            </div>
+            <div class="relative">
+              <div class="absolute inset-0 bg-gradient-to-br ${service.gradient} ${service.darkGradient} rounded-lg blur opacity-50"></div>
+              <svg class="relative w-10 h-10 text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${service.iconPath}"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join('')
+
     return c.html(html`
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-gray-400">Webserver</p>
-              <p class="text-xs mt-1 font-medium ${webserverStatus === 'operational' ? 'text-green-400' : 'text-red-400'}">
-                ${webserverStatus === 'operational' ? '● Operational' : '● Degraded'}
-              </p>
-            </div>
-            <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
-            </svg>
-          </div>
-        </div>
-
-        <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-gray-400">D1 Database</p>
-              <p class="text-xs mt-1 font-medium ${d1Status === 'operational' ? 'text-green-400' : 'text-red-400'}">
-                ${d1Status === 'operational' ? '● Operational' : '● Degraded'}
-              </p>
-            </div>
-            <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/>
-            </svg>
-          </div>
-        </div>
-
-        <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-gray-400">KV Storage</p>
-              <p class="text-xs mt-1 font-medium ${kvStatus === 'operational' ? 'text-green-400' : 'text-red-400'}">
-                ${kvStatus === 'operational' ? '● Operational' : '● Degraded'}
-              </p>
-            </div>
-            <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-            </svg>
-          </div>
-        </div>
-
-        <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-gray-400">R2 Storage</p>
-              <p class="text-xs mt-1 font-medium ${r2Status === 'operational' ? 'text-green-400' : 'text-red-400'}">
-                ${r2Status === 'operational' ? '● Operational' : '● Degraded'}
-              </p>
-            </div>
-            <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
-            </svg>
-          </div>
-        </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        ${statusCards}
       </div>
     `)
   } catch (error) {

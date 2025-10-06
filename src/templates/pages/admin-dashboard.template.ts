@@ -632,29 +632,56 @@ function renderQuickActions(): string {
 
 function renderSystemStatus(): string {
   return `
-    <div class="rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10">
+    <div class="rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 overflow-hidden">
       <div class="border-b border-zinc-950/5 dark:border-white/10 px-6 py-6">
-        <h3 class="text-base/7 font-semibold text-zinc-950 dark:text-white">System Status</h3>
+        <div class="flex items-center justify-between">
+          <h3 class="text-base/7 font-semibold text-zinc-950 dark:text-white">System Health</h3>
+          <div class="flex items-center gap-2">
+            <div class="h-2 w-2 rounded-full bg-lime-500 animate-pulse"></div>
+            <span class="text-xs text-zinc-500 dark:text-zinc-400">Live</span>
+          </div>
+        </div>
       </div>
 
       <div
         id="system-status-container"
-        class="px-6 py-6"
+        class="p-6"
         hx-get="/admin/api/system-status"
         hx-trigger="load, every 30s"
         hx-swap="innerHTML"
       >
-        <!-- Loading skeleton -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-pulse">
-          ${Array(4).fill(0).map(() => `
-            <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
-              <div class="h-4 w-20 bg-gray-700 rounded mb-2"></div>
-              <div class="h-3 w-24 bg-gray-700 rounded"></div>
+        <!-- Loading skeleton with gradient -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          ${[
+            { color: 'from-blue-500/20 to-cyan-500/20', darkColor: 'dark:from-blue-500/10 dark:to-cyan-500/10' },
+            { color: 'from-purple-500/20 to-pink-500/20', darkColor: 'dark:from-purple-500/10 dark:to-pink-500/10' },
+            { color: 'from-amber-500/20 to-orange-500/20', darkColor: 'dark:from-amber-500/10 dark:to-orange-500/10' },
+            { color: 'from-lime-500/20 to-emerald-500/20', darkColor: 'dark:from-lime-500/10 dark:to-emerald-500/10' }
+          ].map((gradient, i) => `
+            <div class="relative group">
+              <div class="absolute inset-0 bg-gradient-to-br ${gradient.color} ${gradient.darkColor} rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div class="relative bg-zinc-50 dark:bg-zinc-800/50 rounded-xl p-5 border border-zinc-200/50 dark:border-zinc-700/50 animate-pulse">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="h-4 w-24 bg-zinc-200 dark:bg-zinc-700 rounded"></div>
+                  <div class="h-6 w-6 bg-zinc-200 dark:bg-zinc-700 rounded-full"></div>
+                </div>
+                <div class="h-3 w-20 bg-zinc-200 dark:bg-zinc-700 rounded"></div>
+              </div>
             </div>
           `).join('')}
         </div>
       </div>
     </div>
+
+    <style>
+      @keyframes ping-slow {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+      .animate-ping-slow {
+        animation: ping-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+    </style>
   `;
 }
 
