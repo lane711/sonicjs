@@ -7,7 +7,8 @@ import { apiRoutes } from './routes/api'
 import { adminRoutes } from './routes/admin'
 import { adminContentRoutes } from './routes/admin-content'
 import adminFAQRoutes from './routes/admin-faq'
-import { adminDesignRoutes } from './routes/admin-design'
+// Design plugin routes
+import { designRoutes } from './plugins/design/routes'
 import { adminCheckboxRoutes } from './routes/admin-checkboxes'
 import { adminLogsRoutes } from './routes/admin-logs'
 import { docsRoutes } from './routes/docs'
@@ -129,7 +130,9 @@ app.use('/admin/workflow/*', requireActivePlugin('workflow'))
 app.route('/admin/workflow', createWorkflowAdminRoutes())
 app.use('/api/workflow/*', requireActivePlugin('workflow'))
 app.route('/api/workflow', createWorkflowRoutes())
-app.route('/admin/design', adminDesignRoutes)
+// Design routes with plugin activation check
+app.use('/admin/design/*', requireActivePlugin('design'))
+app.route('/admin/design', designRoutes)
 app.route('/admin/checkboxes', adminCheckboxRoutes)
 app.route('/admin/logs', adminLogsRoutes)
 // app.route('/admin/email', emailRoutes)

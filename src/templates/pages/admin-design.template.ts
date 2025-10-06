@@ -6,6 +6,7 @@ export interface DesignPageData {
     email: string
     role: string
   }
+  version?: string
 }
 
 export function renderDesignPage(data: DesignPageData): string {
@@ -837,6 +838,7 @@ export function renderDesignPage(data: DesignPageData): string {
     pageTitle: 'Design System',
     currentPath: '/admin/design',
     user: data.user,
+    version: data.version,
     content: pageContent
   }
 
