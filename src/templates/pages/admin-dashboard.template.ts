@@ -307,63 +307,65 @@ function renderAnalyticsChart(): string {
       <div class="border-b border-zinc-950/5 dark:border-white/10 px-6 py-6">
         <div class="flex flex-wrap items-start justify-between gap-3 sm:flex-nowrap">
           <div>
-            <h3 class="text-base/7 font-semibold text-zinc-950 dark:text-white">Analytics Overview</h3>
-            <p class="mt-1 text-sm/6 text-zinc-500 dark:text-zinc-400">Last 7 days activity</p>
+            <h3 class="text-base/7 font-semibold text-zinc-950 dark:text-white">Real-Time Analytics</h3>
+            <p class="mt-1 text-sm/6 text-zinc-500 dark:text-zinc-400">Requests per second (live)</p>
           </div>
-          <div class="inline-flex gap-1 rounded-lg bg-zinc-950/5 dark:bg-white/5 p-1">
-            <button class="rounded-md bg-white dark:bg-zinc-800 px-2.5 py-1.5 text-xs/5 font-medium text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10">
-              Day
-            </button>
-            <button class="px-2.5 py-1.5 text-xs/5 font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors">
-              Week
-            </button>
-            <button class="px-2.5 py-1.5 text-xs/5 font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors">
-              Month
-            </button>
+          <div class="flex items-center gap-2">
+            <div class="h-2 w-2 rounded-full bg-lime-500 animate-pulse"></div>
+            <span class="text-xs text-zinc-500 dark:text-zinc-400">Live</span>
           </div>
+        </div>
+        <div class="mt-4 flex items-baseline gap-2">
+          <span id="current-rps" class="text-4xl font-bold text-cyan-500 dark:text-cyan-400">0</span>
+          <span class="text-sm text-zinc-500 dark:text-zinc-400">req/s</span>
         </div>
       </div>
 
       <div class="px-6 py-6">
-        <canvas id="activeUsersChart" class="w-full" style="height: 300px;"></canvas>
+        <canvas id="requestsChart" class="w-full" style="height: 300px;"></canvas>
       </div>
+
+      <!-- Hidden div to trigger HTMX polling -->
+      <div
+        hx-get="/admin/api/metrics"
+        hx-trigger="every 1s"
+        hx-swap="none"
+        style="display: none;"
+      ></div>
     </div>
 
     <script>
-      // Initialize Chart.js for Active Users by Day
+      // Initialize Chart.js for Real-time Requests
       (function() {
-        const ctx = document.getElementById('activeUsersChart');
+        const ctx = document.getElementById('requestsChart');
         if (!ctx) return;
 
-        // Generate last 7 days labels
+        // Initialize with last 60 seconds of data (1 data point per second)
+        const maxDataPoints = 60;
         const labels = [];
         const data = [];
-        const today = new Date();
 
-        for (let i = 6; i >= 0; i--) {
-          const date = new Date(today);
-          date.setDate(date.getDate() - i);
-          labels.push(date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }));
-          // Generate sample data (replace with real data later)
-          data.push(Math.floor(Math.random() * 50) + 100);
+        for (let i = maxDataPoints - 1; i >= 0; i--) {
+          labels.push(\`-\${i}s\`);
+          data.push(0);
         }
 
         const isDark = document.documentElement.classList.contains('dark');
 
-        new Chart(ctx, {
+        const chart = new Chart(ctx, {
           type: 'line',
           data: {
             labels: labels,
             datasets: [{
-              label: 'Active Users',
+              label: 'Requests/sec',
               data: data,
               borderColor: isDark ? 'rgb(34, 211, 238)' : 'rgb(6, 182, 212)',
               backgroundColor: isDark ? 'rgba(34, 211, 238, 0.1)' : 'rgba(6, 182, 212, 0.1)',
               borderWidth: 2,
               fill: true,
               tension: 0.4,
-              pointRadius: 4,
-              pointHoverRadius: 6,
+              pointRadius: 0,
+              pointHoverRadius: 4,
               pointBackgroundColor: isDark ? 'rgb(34, 211, 238)' : 'rgb(6, 182, 212)',
               pointBorderColor: isDark ? 'rgb(17, 24, 39)' : 'rgb(255, 255, 255)',
               pointBorderWidth: 2
@@ -386,7 +388,7 @@ function renderAnalyticsChart(): string {
                 displayColors: false,
                 callbacks: {
                   label: function(context) {
-                    return 'Active Users: ' + context.parsed.y;
+                    return 'Requests/sec: ' + context.parsed.y.toFixed(2);
                   }
                 }
               }
@@ -403,7 +405,10 @@ function renderAnalyticsChart(): string {
                 },
                 ticks: {
                   color: isDark ? 'rgb(161, 161, 170)' : 'rgb(113, 113, 122)',
-                  padding: 8
+                  padding: 8,
+                  callback: function(value) {
+                    return value.toFixed(1);
+                  }
                 }
               },
               x: {
@@ -415,9 +420,34 @@ function renderAnalyticsChart(): string {
                 },
                 ticks: {
                   color: isDark ? 'rgb(161, 161, 170)' : 'rgb(113, 113, 122)',
-                  padding: 8
+                  padding: 8,
+                  maxTicksLimit: 6
                 }
               }
+            }
+          }
+        });
+
+        // Listen for metrics updates from HTMX
+        window.addEventListener('htmx:afterRequest', function(event) {
+          if (event.detail.pathInfo.requestPath === '/admin/api/metrics') {
+            try {
+              const metrics = JSON.parse(event.detail.xhr.responseText);
+
+              // Update current RPS display
+              const rpsElement = document.getElementById('current-rps');
+              if (rpsElement) {
+                rpsElement.textContent = metrics.requestsPerSecond.toFixed(2);
+              }
+
+              // Add new data point to chart
+              chart.data.labels.shift();
+              chart.data.labels.push('now');
+              chart.data.datasets[0].data.shift();
+              chart.data.datasets[0].data.push(metrics.requestsPerSecond);
+              chart.update('none'); // Update without animation for smoother real-time updates
+            } catch (e) {
+              console.error('Error updating metrics:', e);
             }
           }
         });
