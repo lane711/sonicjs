@@ -19,7 +19,10 @@
     "db:migrate:prod": "wrangler d1 migrations apply DB --env production",
     "db:studio": "drizzle-kit studio",
     "sync-collections": "tsx scripts/sync-collections.ts",
-    "sonicjs": "tsx src/cli/index.ts"
+    "sonicjs": "tsx src/cli/index.ts",
+    "prepare": "husky",
+    "type-check": "tsc --noEmit",
+    "lint": "npm run type-check"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
@@ -44,10 +47,17 @@
     "@types/node": "^20.19.1",
     "@types/semver": "^7.7.0",
     "@vitest/coverage-v8": "^2.1.9",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.3",
     "playwright": "^1.53.1",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
     "vitest": "^2.1.8",
     "wrangler": "^4.20.5"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "tsc --noEmit"
+    ]
   }
 }

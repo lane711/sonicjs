@@ -20,6 +20,7 @@ type Variables = {
     exp: number
     iat: number
   }
+  appVersion?: string
 }
 
 export const adminContentRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()

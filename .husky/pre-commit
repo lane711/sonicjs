@@ -1,0 +1,5 @@
+echo "Running type checks..."
+npm run type-check
+
+echo "Running unit tests..."
+npm test

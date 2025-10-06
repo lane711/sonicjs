@@ -5,15 +5,17 @@
       "name": "Debug Wrangler Dev Server",
       "type": "node",
       "request": "launch",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "wrangler",
+        "dev",
+        "--local",
+        "--inspector-port=9229"
+      ],
       "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "outputCapture": "std",
-      "env": {
-        "NODE_OPTIONS": "--inspect"
-      }
+      "port": 9229
     },
     {
       "name": "Debug Current Test File",

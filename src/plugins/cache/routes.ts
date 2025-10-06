@@ -11,7 +11,6 @@ import { CACHE_CONFIGS, parseCacheKey } from './services/cache-config.js'
 import { getRecentInvalidations, getCacheInvalidationStats } from './services/cache-invalidation.js'
 import { warmCommonCaches, warmNamespace } from './services/cache-warming.js'
 import { renderCacheDashboard, CacheDashboardData } from '../../templates/pages/admin-cache.template.js'
-import { APP_VERSION } from '../../index'
 
 const app = new Hono()
 
@@ -55,7 +54,7 @@ app.get('/', async (c: Context) => {
       email: user.email,
       role: user.role
     } : undefined,
-    version: APP_VERSION
+    version: c.get('appVersion')
   }
 
   return c.html(renderCacheDashboard(dashboardData))
