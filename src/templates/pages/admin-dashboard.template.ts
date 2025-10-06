@@ -484,7 +484,9 @@ export function renderRecentActivity(activities?: ActivityItem[]): string {
   const getInitials = (user: string): string => {
     const parts = user.split(' ').filter(p => p.length > 0)
     if (parts.length >= 2) {
-      return (parts[0]![0] + parts[1]![0]).toUpperCase()
+      const first = parts[0]?.[0] || ''
+      const second = parts[1]?.[0] || ''
+      return (first + second).toUpperCase()
     }
     return user.substring(0, 2).toUpperCase()
   }
