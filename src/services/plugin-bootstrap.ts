@@ -135,19 +135,17 @@ export class PluginBootstrapService {
       const existingPlugin = await this.pluginService.getPlugin(plugin.id)
       
       if (existingPlugin) {
-        console.log(`[PluginBootstrap] Plugin already installed: ${plugin.display_name}`)
-        
+        console.log(`[PluginBootstrap] Plugin already installed: ${plugin.display_name} (status: ${existingPlugin.status})`)
+
         // Update plugin if version changed
         if (existingPlugin.version !== plugin.version) {
           console.log(`[PluginBootstrap] Updating plugin version: ${plugin.display_name} from ${existingPlugin.version} to ${plugin.version}`)
           await this.updatePlugin(plugin)
         }
-        
-        // Activate core plugins by default
-        if (plugin.name.startsWith('core-') && existingPlugin.status !== 'active') {
-          console.log(`[PluginBootstrap] Activating core plugin: ${plugin.display_name}`)
-          await this.pluginService.activatePlugin(plugin.id)
-        }
+
+        // Only auto-activate on first install, respect user's activation state on subsequent boots
+        // This preserves the activation state across server restarts
+        // Core plugins (with core- prefix) are activated on first install in the else block below
       } else {
         // Install the plugin
         console.log(`[PluginBootstrap] Installing plugin: ${plugin.display_name}`)
