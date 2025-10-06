@@ -313,7 +313,8 @@ export function renderUserEditPage(data: UserEditPageData): string {
       function performDeleteUser() {
         if (!userIdToDelete) return;
 
-        const hardDelete = document.getElementById('hard-delete-checkbox').checked;
+        const checkbox = document.getElementById('hard-delete-checkbox');
+        const hardDelete = checkbox ? checkbox.checked : false;
 
         fetch(\`/admin/users/\${userIdToDelete}\`, {
           method: 'DELETE',
