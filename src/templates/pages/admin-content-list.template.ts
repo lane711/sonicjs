@@ -531,25 +531,25 @@ export function renderContentListPage(data: ContentListPageData): string {
         switch(action) {
           case 'delete':
             title = 'Confirm Bulk Delete';
-            message = `Are you sure you want to delete ${count} selected item${count > 1 ? 's' : ''}? This action cannot be undone.`;
+            message = 'Are you sure you want to delete ' + count + ' selected item' + (count > 1 ? 's' : '') + '? This action cannot be undone.';
             btnText = 'Delete';
             btnClass = 'bg-red-500 hover:bg-red-400';
             break;
           case 'publish':
             title = 'Confirm Bulk Publish';
-            message = `Are you sure you want to publish ${count} selected item${count > 1 ? 's' : ''}? They will become publicly visible.`;
+            message = 'Are you sure you want to publish ' + count + ' selected item' + (count > 1 ? 's' : '') + '? They will become publicly visible.';
             btnText = 'Publish';
             btnClass = 'bg-green-500 hover:bg-green-400';
             break;
           case 'draft':
             title = 'Confirm Bulk Draft';
-            message = `Are you sure you want to move ${count} selected item${count > 1 ? 's' : ''} to draft status? They will be unpublished.`;
+            message = 'Are you sure you want to move ' + count + ' selected item' + (count > 1 ? 's' : '') + ' to draft status? They will be unpublished.';
             btnText = 'Move to Draft';
             btnClass = 'bg-blue-500 hover:bg-blue-400';
             break;
           default:
             title = 'Confirm Bulk Action';
-            message = `Are you sure you want to perform this action on ${count} selected item${count > 1 ? 's' : ''}?`;
+            message = 'Are you sure you want to perform this action on ' + count + ' selected item' + (count > 1 ? 's' : '') + '?';
             btnText = 'Confirm';
             btnClass = 'bg-blue-500 hover:bg-blue-400';
         }
