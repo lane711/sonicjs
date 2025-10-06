@@ -101,22 +101,29 @@ adminContentRoutes.get('/', async (c) => {
     // Build where conditions
     const conditions: string[] = []
     const params: any[] = []
-    
+
+    // Always filter out deleted content unless specifically requested
+    if (status !== 'deleted') {
+      conditions.push("c.status != 'deleted'")
+    }
+
     if (search) {
       conditions.push('(c.title LIKE ? OR c.slug LIKE ?)')
       params.push(`%${search}%`, `%${search}%`)
     }
-    
+
     if (modelName !== 'all') {
       conditions.push('col.name = ?')
       params.push(modelName)
     }
-    
-    if (status !== 'all') {
+
+    if (status !== 'all' && status !== 'deleted') {
       conditions.push('c.status = ?')
       params.push(status)
+    } else if (status === 'deleted') {
+      conditions.push("c.status = 'deleted'")
     }
-    
+
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
     
     // Get total count
@@ -165,6 +172,10 @@ adminContentRoutes.get('/', async (c) => {
         archived: {
           class: 'bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 ring-1 ring-inset ring-purple-600/20 dark:ring-purple-500/20',
           text: 'Archived'
+        },
+        deleted: {
+          class: 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-600/20 dark:ring-red-500/20',
+          text: 'Deleted'
         }
       }
 

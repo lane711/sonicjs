@@ -71,7 +71,8 @@ export function renderContentListPage(data: ContentListPageData): string {
           { value: 'review', label: 'Under Review', selected: data.status === 'review' },
           { value: 'scheduled', label: 'Scheduled', selected: data.status === 'scheduled' },
           { value: 'published', label: 'Published', selected: data.status === 'published' },
-          { value: 'archived', label: 'Archived', selected: data.status === 'archived' }
+          { value: 'archived', label: 'Archived', selected: data.status === 'archived' },
+          { value: 'deleted', label: 'Deleted', selected: data.status === 'deleted' }
         ]
       }
     ],
