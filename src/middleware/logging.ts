@@ -24,7 +24,7 @@ export function loggingMiddleware() {
   return async (c: Context<{ Bindings: Bindings; Variables: Variables }>, next: Next) => {
     const startTime = Date.now()
     const requestId = globalThis.crypto.randomUUID()
-    
+
     // Set request context
     c.set('requestId', requestId)
     c.set('startTime', startTime)
@@ -32,30 +32,35 @@ export function loggingMiddleware() {
     try {
       const logger = getLogger(c.env.DB)
       const user = c.get('user')
-      
+
       // Extract request information
       const method = c.req.method
       const url = c.req.url
       const userAgent = c.req.header('user-agent') || ''
-      const ipAddress = c.req.header('cf-connecting-ip') || 
-                       c.req.header('x-forwarded-for') || 
-                       c.req.header('x-real-ip') || 
+      const ipAddress = c.req.header('cf-connecting-ip') ||
+                       c.req.header('x-forwarded-for') ||
+                       c.req.header('x-real-ip') ||
                        'unknown'
 
       // Continue with request processing
       await next()
-      
+
       const duration = Date.now() - startTime
       const status = c.res.status
 
+      // Skip logging for high-frequency endpoints to reduce noise
+      const skipLogging = url.includes('/admin/api/metrics')
+
       // Log the request
-      await logger.logRequest(method, url, status, duration, {
-        userId: user?.userId,
-        requestId,
-        ipAddress,
-        userAgent,
-        source: 'http-middleware'
-      })
+      if (!skipLogging) {
+        await logger.logRequest(method, url, status, duration, {
+          userId: user?.userId,
+          requestId,
+          ipAddress,
+          userAgent,
+          source: 'http-middleware'
+        })
+      }
 
       // Log errors if status >= 400
       if (status >= 400) {
@@ -273,8 +278,8 @@ export function securityLoggingMiddleware() {
         })
       }
 
-      // Log admin access
-      if (url.includes('/admin/') && status < 400) {
+      // Log admin access (skip high-frequency endpoints)
+      if (url.includes('/admin/') && status < 400 && !url.includes('/admin/api/metrics')) {
         await logger.logSecurity('Admin area access', 'low', {
           userId: user?.userId,
           requestId,

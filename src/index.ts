@@ -85,7 +85,13 @@ app.use('*', async (c, next) => {
 })
 
 // Middleware
-app.use('*', logger())
+app.use('*', async (c, next) => {
+  // Skip logger for high-frequency endpoints
+  if (c.req.path.includes('/admin/api/metrics')) {
+    return next()
+  }
+  return logger()(c, next)
+})
 app.use('*', cors())
 // Compression disabled - causes encoding issues
 // app.use('*', compressionMiddleware)
