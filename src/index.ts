@@ -67,6 +67,13 @@ app.use('*', loggingMiddleware())
 app.use('*', securityLoggingMiddleware())
 app.use('*', performanceLoggingMiddleware(1000)) // Log requests slower than 1 second
 
+// Metrics tracking middleware - track requests for real-time analytics
+app.use('*', async (c, next) => {
+  const { metricsTracker } = await import('./utils/metrics')
+  metricsTracker.recordRequest()
+  await next()
+})
+
 // Middleware
 app.use('*', logger())
 app.use('*', cors())

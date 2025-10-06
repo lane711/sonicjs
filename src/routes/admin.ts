@@ -296,6 +296,30 @@ adminRoutes.get('/api/stats', async (c) => {
   }
 })
 
+// Metrics endpoint for real-time analytics
+adminRoutes.get('/api/metrics', async (c) => {
+  try {
+    const { metricsTracker } = await import('../utils/metrics')
+
+    const metrics = {
+      requestsPerSecond: metricsTracker.getRequestsPerSecond(),
+      averageRPS: metricsTracker.getAverageRPS(),
+      totalRequests: metricsTracker.getTotalRequests(),
+      timestamp: Date.now()
+    }
+
+    return c.json(metrics)
+  } catch (error) {
+    console.error('Error fetching metrics:', error)
+    return c.json({
+      requestsPerSecond: 0,
+      averageRPS: 0,
+      totalRequests: 0,
+      timestamp: Date.now()
+    })
+  }
+})
+
 // Recent activity endpoint for HTMX
 adminRoutes.get('/api/recent-activity', async (c) => {
   try {
