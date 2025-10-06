@@ -1,9 +1,7 @@
-import { eq } from 'drizzle-orm'
-import { users, content, collections } from '../../../../db/schema'
-// import bcrypt from 'bcryptjs' // TODO: Install bcryptjs or use alternative
+import type { D1Database } from '@cloudflare/workers-types'
 
 export class SeedDataService {
-  constructor(private db: any) {}
+  constructor(private db: D1Database) {}
 
   // First names for generating realistic users
   private firstNames = [
@@ -100,54 +98,69 @@ export class SeedDataService {
   }
 
   // Create 20 example users
-  async createUsers(): Promise<void> {
+  async createUsers(): Promise<number> {
     const roles = ['admin', 'editor', 'author', 'viewer']
     // const hashedPassword = await bcrypt.hash('password123', 10)
     const hashedPassword = 'password123' // TODO: Use actual bcrypt hash
 
+    let count = 0
     for (let i = 0; i < 20; i++) {
       const firstName = this.firstNames[Math.floor(Math.random() * this.firstNames.length)] || 'John'
       const lastName = this.lastNames[Math.floor(Math.random() * this.lastNames.length)] || 'Doe'
       const username = `${firstName.toLowerCase()}${lastName.toLowerCase()}${i}`
       const email = `${username}@example.com`
       const createdAt = this.randomDate()
+      const createdAtTimestamp = Math.floor(createdAt.getTime() / 1000)
 
-      await this.db.insert(users).values({
-        id: this.generateId(),
+      const stmt = this.db.prepare(`
+        INSERT INTO users (id, email, username, first_name, last_name, password_hash, role, is_active, last_login_at, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `)
+
+      await stmt.bind(
+        this.generateId(),
         email,
         username,
         firstName,
         lastName,
-        passwordHash: hashedPassword,
-        role: roles[Math.floor(Math.random() * roles.length)],
-        isActive: Math.random() > 0.1, // 90% active
-        lastLoginAt: Math.random() > 0.3 ? Math.floor(createdAt.getTime() / 1000) : null,
-        createdAt: Math.floor(createdAt.getTime() / 1000),
-        updatedAt: Math.floor(createdAt.getTime() / 1000),
-      })
+        hashedPassword,
+        roles[Math.floor(Math.random() * roles.length)],
+        Math.random() > 0.1 ? 1 : 0, // 90% active
+        Math.random() > 0.3 ? createdAtTimestamp : null,
+        createdAtTimestamp,
+        createdAtTimestamp
+      ).run()
+
+      count++
     }
+
+    return count
   }
 
   // Create 200 content items across different types
-  async createContent(): Promise<void> {
+  async createContent(): Promise<number> {
     // Get all users and collections
-    const allUsers = await this.db.select().from(users)
-    const allCollections = await this.db.select().from(collections)
+    const usersStmt = this.db.prepare('SELECT * FROM users')
+    const { results: allUsers } = await usersStmt.all()
 
-    if (allUsers.length === 0) {
+    const collectionsStmt = this.db.prepare('SELECT * FROM collections')
+    const { results: allCollections } = await collectionsStmt.all()
+
+    if (!allUsers || allUsers.length === 0) {
       throw new Error('No users found. Please create users first.')
     }
 
-    if (allCollections.length === 0) {
+    if (!allCollections || allCollections.length === 0) {
       throw new Error('No collections found. Please create collections first.')
     }
 
     const statuses = ['draft', 'published', 'archived']
 
     // Create 200 content items
+    let count = 0
     for (let i = 0; i < 200; i++) {
-      const collection = allCollections[Math.floor(Math.random() * allCollections.length)]
-      const author = allUsers[Math.floor(Math.random() * allUsers.length)]
+      const collection: any = allCollections[Math.floor(Math.random() * allCollections.length)]
+      const author: any = allUsers[Math.floor(Math.random() * allUsers.length)]
       const status = statuses[Math.floor(Math.random() * statuses.length)]
 
       let title: string
@@ -180,7 +193,7 @@ export class SeedDataService {
         }
       } else {
         // Generic content
-        title = `${collection.displayName} Item ${i + 1}`
+        title = `${collection.display_name || collection.name} Item ${i + 1}`
         contentData = {
           description: 'This is a sample content item with generic data.',
           value: Math.floor(Math.random() * 1000)
@@ -189,21 +202,31 @@ export class SeedDataService {
 
       const slug = `${this.generateSlug(title)}-${i}`
       const createdAt = this.randomDate()
-      const publishedAt = status === 'published' ? createdAt : null
+      const createdAtTimestamp = Math.floor(createdAt.getTime() / 1000)
+      const publishedAtTimestamp = status === 'published' ? createdAtTimestamp : null
 
-      await this.db.insert(content).values({
-        id: this.generateId(),
-        collectionId: collection.id,
+      const stmt = this.db.prepare(`
+        INSERT INTO content (id, collection_id, slug, title, data, status, published_at, author_id, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `)
+
+      await stmt.bind(
+        this.generateId(),
+        collection.id,
         slug,
-        title: `${title} ${i}`,
-        data: contentData,
+        `${title} ${i}`,
+        JSON.stringify(contentData),
         status,
-        publishedAt,
-        authorId: author.id,
-        createdAt,
-        updatedAt: createdAt,
-      })
+        publishedAtTimestamp,
+        author.id,
+        createdAtTimestamp,
+        createdAtTimestamp
+      ).run()
+
+      count++
     }
+
+    return count
   }
 
   // Generate random tags for blog posts
@@ -221,26 +244,25 @@ export class SeedDataService {
 
   // Seed all data
   async seedAll(): Promise<{ users: number; content: number }> {
-    await this.createUsers()
-    await this.createContent()
-
-    const userCount = await this.db.select().from(users)
-    const contentCount = await this.db.select().from(content)
+    const userCount = await this.createUsers()
+    const contentCount = await this.createContent()
 
     return {
-      users: userCount.length,
-      content: contentCount.length
+      users: userCount,
+      content: contentCount
     }
   }
 
   // Clear all seed data (optional cleanup method)
   async clearSeedData(): Promise<void> {
     // Delete content first (due to foreign key constraints)
-    await this.db.delete(content)
+    const deleteContentStmt = this.db.prepare('DELETE FROM content')
+    await deleteContentStmt.run()
 
     // Delete users (but keep the admin user if it exists)
-    await this.db.delete(users).where(
-      eq(users.email, 'admin@example.com') // Keep admin
+    const deleteUsersStmt = this.db.prepare(
+      "DELETE FROM users WHERE email != 'admin@sonicjs.com'"
     )
+    await deleteUsersStmt.run()
   }
 }
