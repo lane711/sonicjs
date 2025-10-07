@@ -65,10 +65,9 @@ type Variables = {
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
-// Set app version globally
-const appVersion = '2.0.0-alpha.4' // Update this when releasing new versions
+// Set app version globally from package.json
 app.use('*', async (c, next) => {
-  c.set('appVersion', appVersion)
+  c.set('appVersion', APP_VERSION)
   await next()
 })
 
@@ -142,6 +141,38 @@ app.route('/content', contentRoutes)
 // Media API routes (require auth for uploads)
 app.use('/media/*', requireAuth())
 app.route('/media', mediaRoutes)
+
+// Public media file serving (no auth required for viewing uploaded files)
+app.get('/files/*', async (c) => {
+  try {
+    const r2Key = c.req.path.replace('/files/', '')
+
+    if (!r2Key) {
+      return c.notFound()
+    }
+
+    // Get file from R2
+    const object = await c.env.MEDIA_BUCKET.get(r2Key)
+
+    if (!object) {
+      return c.notFound()
+    }
+
+    // Set appropriate headers
+    const headers = new Headers()
+    object.httpMetadata?.contentType && headers.set('Content-Type', object.httpMetadata.contentType)
+    object.httpMetadata?.contentDisposition && headers.set('Content-Disposition', object.httpMetadata.contentDisposition)
+    headers.set('Cache-Control', 'public, max-age=31536000') // 1 year cache
+    headers.set('Access-Control-Allow-Origin', '*')
+
+    return new Response(object.body, {
+      headers
+    })
+  } catch (error) {
+    console.error('Error serving file:', error)
+    return c.notFound()
+  }
+})
 
 // Admin routes require authentication and admin/editor role
 app.use('/admin/*', async (c, next) => {

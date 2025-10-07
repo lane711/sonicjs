@@ -144,8 +144,8 @@ adminMediaRoutes.get('/', async (c) => {
       original_name: row.original_name,
       mime_type: row.mime_type,
       size: row.size,
-      public_url: `/admin/media/file/${row.r2_key}`,
-      thumbnail_url: row.mime_type.startsWith('image/') ? `/admin/media/file/${row.r2_key}` : undefined,
+      public_url: `/files/${row.r2_key}`,
+      thumbnail_url: row.mime_type.startsWith('image/') ? `/files/${row.r2_key}` : undefined,
       alt: row.alt,
       caption: row.caption,
       tags: row.tags ? JSON.parse(row.tags) : [],
@@ -245,8 +245,8 @@ adminMediaRoutes.get('/search', async (c) => {
     
     const mediaFiles = results.map((row: any) => ({
       ...row,
-      public_url: `/admin/media/file/${row.r2_key}`,
-      thumbnail_url: row.mime_type.startsWith('image/') ? `/admin/media/file/${row.r2_key}` : undefined,
+      public_url: `/files/${row.r2_key}`,
+      thumbnail_url: row.mime_type.startsWith('image/') ? `/files/${row.r2_key}` : undefined,
       tags: row.tags ? JSON.parse(row.tags) : [],
       uploadedAt: new Date(row.uploaded_at).toLocaleDateString(),
       fileSize: formatFileSize(row.size),
@@ -283,8 +283,8 @@ adminMediaRoutes.get('/:id/details', async (c) => {
       original_name: result.original_name,
       mime_type: result.mime_type,
       size: result.size,
-      public_url: `/admin/media/file/${result.r2_key}`,
-      thumbnail_url: result.mime_type.startsWith('image/') ? `/admin/media/file/${result.r2_key}` : undefined,
+      public_url: `/files/${result.r2_key}`,
+      thumbnail_url: result.mime_type.startsWith('image/') ? `/files/${result.r2_key}` : undefined,
       alt: result.alt,
       caption: result.caption,
       tags: result.tags ? JSON.parse(result.tags) : [],
@@ -386,8 +386,8 @@ adminMediaRoutes.post('/upload', async (c) => {
           }
         }
 
-        // Generate URLs - use local serving route for development
-        const publicUrl = `/admin/media/file/${r2Key}`
+        // Generate URLs - use public serving route
+        const publicUrl = `/files/${r2Key}`
         const thumbnailUrl = file.type.startsWith('image/') ? publicUrl : undefined
 
         // Save to database

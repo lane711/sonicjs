@@ -148,12 +148,14 @@ adminRoutes.get('/api/stats', async (c) => {
       console.error('Error fetching content count:', error)
     }
 
-    // Get media count
+    // Get media count and total size
     let mediaCount = 0
+    let mediaSize = 0
     try {
-      const mediaStmt = db.prepare('SELECT COUNT(*) as count FROM media')
+      const mediaStmt = db.prepare('SELECT COUNT(*) as count, COALESCE(SUM(size), 0) as total_size FROM media WHERE deleted_at IS NULL')
       const mediaResult = await mediaStmt.first()
       mediaCount = (mediaResult as any)?.count || 0
+      mediaSize = (mediaResult as any)?.total_size || 0
     } catch (error) {
       console.error('Error fetching media count:', error)
       // Media table might not exist yet, that's okay
@@ -302,6 +304,7 @@ adminRoutes.get('/api/stats', async (c) => {
       mediaFiles: mediaCount,
       users: usersCount,
       databaseSize: databaseSize,
+      mediaSize: mediaSize,
       recentActivity: limitedActivity
     }
 
@@ -545,9 +548,8 @@ adminRoutes.get('/api/system-status', async (c) => {
             <div>
               <p class="text-sm font-medium text-zinc-700 dark:text-zinc-300">${service.name}</p>
               <div class="flex items-center gap-2 mt-2">
-                <div class="h-2 w-2 rounded-full ${service.status === 'operational' ? 'bg-lime-500 animate-pulse' : 'bg-red-500'} shadow-lg ${service.status === 'operational' ? 'shadow-lime-500/50' : 'shadow-red-500/50'}"></div>
                 <span class="text-xs font-semibold ${service.status === 'operational' ? 'text-lime-600 dark:text-lime-400' : 'text-red-600 dark:text-red-400'}">
-                  ${service.status === 'operational' ? 'Operational' : 'Degraded'}
+                  ● ${service.status === 'operational' ? 'Operational' : 'Degraded'}
                 </span>
               </div>
             </div>
