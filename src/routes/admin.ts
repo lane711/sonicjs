@@ -19,7 +19,7 @@ import { getActivePlugins } from '../middleware/plugin-middleware'
 
 type Bindings = {
   DB: D1Database
-  KV: KVNamespace
+  CACHE_KV: KVNamespace
   MEDIA_BUCKET: R2Bucket
   ENVIRONMENT?: string
 }
@@ -466,7 +466,7 @@ adminRoutes.get('/api/recent-activity', async (c) => {
 adminRoutes.get('/api/system-status', async (c) => {
   try {
     const db = c.env.DB
-    const kv = c.env.KV
+    const kv = c.env.CACHE_KV
     const r2 = c.env.MEDIA_BUCKET
 
     // Check webserver (always operational if we're here)
@@ -763,8 +763,8 @@ adminRoutes.post('/collections', async (c) => {
 
     // Clear cache
     try {
-      await c.env.KV.delete('cache:collections:all')
-      await c.env.KV.delete(`cache:collection:${name}`)
+      await c.env.CACHE_KV.delete('cache:collections:all')
+      await c.env.CACHE_KV.delete(`cache:collection:${name}`)
     } catch (e) {
       console.error('Error clearing cache:', e)
     }
