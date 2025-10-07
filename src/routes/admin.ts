@@ -15,7 +15,6 @@ import { MigrationService } from '../services/migrations'
 import { createDatabaseToolsAdminRoutes } from '../plugins/core-plugins/database-tools-plugin/admin-routes'
 import { createSeedDataAdminRoutes } from '../plugins/core-plugins/seed-data-plugin/admin-routes'
 import { getActivePlugins } from '../middleware/plugin-middleware'
-// APP_VERSION removed - use c.get('appVersion') instead
 
 type Bindings = {
   DB: D1Database

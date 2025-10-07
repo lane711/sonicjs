@@ -8,7 +8,6 @@ import { renderMediaFileDetails, MediaFileDetailsData } from '../templates/compo
 import { MediaFile } from '../templates/components/media-grid.template'
 import { createCDNService } from '../services/cdn'
 import { getCacheService, CACHE_CONFIGS } from '../plugins/cache'
-// APP_VERSION removed - use c.get('appVersion') instead
 
 type Bindings = {
   DB: D1Database

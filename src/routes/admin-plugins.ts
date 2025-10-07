@@ -4,7 +4,6 @@ import { renderPluginsListPage, PluginsListPageData, Plugin } from '../templates
 import { renderPluginSettingsPage, PluginSettingsPageData } from '../templates/pages/admin-plugin-settings.template'
 import { PluginService } from '../services/plugin-service'
 import { PermissionManager } from '../middleware/permissions'
-// APP_VERSION removed - use c.get('appVersion') instead
 
 type Bindings = {
   DB: D1Database

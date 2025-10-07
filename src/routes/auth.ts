@@ -7,7 +7,6 @@ import { AuthManager, requireAuth } from '../middleware/auth'
 import { renderLoginPage, LoginPageData } from '../templates/pages/auth-login.template'
 import { renderRegisterPage, RegisterPageData } from '../templates/pages/auth-register.template'
 import { getCacheService, CACHE_CONFIGS } from '../plugins/cache'
-// APP_VERSION removed - use c.get('appVersion') instead
 
 type Bindings = {
   DB: D1Database

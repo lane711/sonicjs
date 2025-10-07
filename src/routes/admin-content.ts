@@ -5,7 +5,6 @@ import { renderContentListPage, ContentListPageData } from '../templates/pages/a
 import { renderVersionHistory, VersionHistoryData, ContentVersion } from '../templates/components/version-history.template'
 import { isPluginActive } from '../middleware/plugin-middleware'
 import { getCacheService, CACHE_CONFIGS } from '../plugins/cache'
-// APP_VERSION removed - use c.get('appVersion') instead
 
 type Bindings = {
   DB: D1Database

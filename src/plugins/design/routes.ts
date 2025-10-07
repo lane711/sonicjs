@@ -1,6 +1,5 @@
 import { Hono } from 'hono'
 import { renderDesignPage, DesignPageData } from '../../templates/pages/admin-design.template'
-// APP_VERSION removed - use c.get('appVersion') instead
 
 type Bindings = {
   DB: D1Database
