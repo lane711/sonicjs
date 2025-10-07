@@ -35,7 +35,7 @@ import { compressionMiddleware, securityHeaders, cacheHeaders } from './middlewa
 // Define the Cloudflare Workers environment
 type Bindings = {
   DB: D1Database
-  KV: KVNamespace
+  CACHE_KV: KVNamespace
   MEDIA_BUCKET: R2Bucket
   ASSETS: Fetcher
   EMAIL_QUEUE?: Queue
