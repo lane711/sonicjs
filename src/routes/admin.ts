@@ -315,6 +315,41 @@ adminRoutes.get('/api/stats', async (c) => {
   }
 })
 
+// Storage usage endpoint
+adminRoutes.get('/api/storage', async (c) => {
+  try {
+    const db = c.env.DB
+
+    // Get database size (page_count * page_size)
+    let databaseSize = 0
+    try {
+      const pageSizeResult = await db.prepare('PRAGMA page_size').first()
+      const pageCountResult = await db.prepare('PRAGMA page_count').first()
+      const pageSize = (pageSizeResult as any)?.page_size || 0
+      const pageCount = (pageCountResult as any)?.page_count || 0
+      databaseSize = pageSize * pageCount
+    } catch (error) {
+      console.error('Error fetching database size:', error)
+    }
+
+    // Get media total size
+    let mediaSize = 0
+    try {
+      const mediaStmt = db.prepare('SELECT COALESCE(SUM(size), 0) as total_size FROM media WHERE deleted_at IS NULL')
+      const mediaResult = await mediaStmt.first()
+      mediaSize = (mediaResult as any)?.total_size || 0
+    } catch (error) {
+      console.error('Error fetching media size:', error)
+    }
+
+    const { renderStorageUsage } = await import('../templates/pages/admin-dashboard.template')
+    return c.html(renderStorageUsage(databaseSize, mediaSize))
+  } catch (error) {
+    console.error('Error fetching storage usage:', error)
+    return c.html(html`<p>Error loading storage usage</p>`)
+  }
+})
+
 // Metrics endpoint for real-time analytics
 adminRoutes.get('/api/metrics', async (c) => {
   try {

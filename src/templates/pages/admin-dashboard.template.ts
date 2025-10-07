@@ -9,6 +9,7 @@ export interface DashboardStats {
   mediaFiles: number;
   users: number;
   databaseSize?: number; // Size in bytes
+  mediaSize?: number; // Total size of all media files in bytes
   recentActivity?: ActivityItem[];
   analytics?: AnalyticsData;
 }
@@ -113,7 +114,9 @@ export function renderDashboardPage(data: DashboardPageData): string {
       ${renderSystemStatus()}
 
       <!-- Storage Usage -->
-      ${renderStorageUsage(data.stats?.databaseSize)}
+      <div id="storage-usage-container" hx-get="/admin/api/storage" hx-trigger="load" hx-swap="innerHTML">
+        ${renderStorageUsage()}
+      </div>
     </div>
 
     <script>
@@ -197,7 +200,9 @@ export function renderDashboardPageWithDynamicMenu(
       ${renderSystemStatus()}
 
       <!-- Storage Usage -->
-      ${renderStorageUsage(data.stats?.databaseSize)}
+      <div id="storage-usage-container" hx-get="/admin/api/storage" hx-trigger="load" hx-swap="innerHTML">
+        ${renderStorageUsage()}
+      </div>
     </div>
 
     <script>
@@ -667,7 +672,7 @@ function renderSystemStatus(): string {
     <div class="rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 overflow-hidden">
       <div class="border-b border-zinc-950/5 dark:border-white/10 px-6 py-6">
         <div class="flex items-center justify-between">
-          <h3 class="text-base/7 font-semibold text-zinc-950 dark:text-white">System Health</h3>
+          <h3 class="text-base/7 font-semibold text-zinc-950 dark:text-white">System Status</h3>
           <div class="flex items-center gap-2">
             <div class="h-2 w-2 rounded-full bg-lime-500 animate-pulse"></div>
             <span class="text-xs text-zinc-500 dark:text-zinc-400">Live</span>
@@ -717,7 +722,7 @@ function renderSystemStatus(): string {
   `;
 }
 
-function renderStorageUsage(databaseSizeBytes?: number): string {
+export function renderStorageUsage(databaseSizeBytes?: number, mediaSizeBytes?: number): string {
   // Helper to format bytes to human readable
   const formatBytes = (bytes: number): string => {
     if (bytes === 0) return '0 B'
@@ -729,8 +734,12 @@ function renderStorageUsage(databaseSizeBytes?: number): string {
 
   const dbSizeGB = databaseSizeBytes ? databaseSizeBytes / (1024 ** 3) : 0
   const dbMaxGB = 10
-  const dbPercentage = Math.min((dbSizeGB / dbMaxGB) * 100, 100)
+  const dbPercentageRaw = (dbSizeGB / dbMaxGB) * 100
+  // Ensure minimum 0.5% visibility for progress bar, max 100%
+  const dbPercentage = Math.min(Math.max(dbPercentageRaw, 0.5), 100)
   const dbUsedFormatted = databaseSizeBytes ? formatBytes(databaseSizeBytes) : 'Unknown'
+
+  const mediaUsedFormatted = mediaSizeBytes ? formatBytes(mediaSizeBytes) : '0 B'
 
   const storageItems = [
     {
@@ -742,7 +751,7 @@ function renderStorageUsage(databaseSizeBytes?: number): string {
     },
     {
       label: "Media Files",
-      used: "N/A",
+      used: mediaUsedFormatted,
       total: "∞",
       percentage: 0,
       color: "bg-lime-500 dark:bg-lime-400",
@@ -777,13 +786,9 @@ function renderStorageUsage(databaseSizeBytes?: number): string {
                 </dt>
                 <dd class="text-sm/6 font-medium text-zinc-950 dark:text-white">${item.used} / ${item.total}</dd>
               </div>
-              ${item.percentage > 0 ? `
-                <div class="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-1.5 overflow-hidden">
-                  <div class="${item.color} h-full rounded-full transition-all duration-300" style="width: ${item.percentage}%"></div>
-                </div>
-              ` : `
-                <div class="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-1.5"></div>
-              `}
+              <div class="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-1.5 overflow-hidden">
+                <div class="${item.color} h-full rounded-full transition-all duration-300" style="width: ${item.percentage}%"></div>
+              </div>
             </div>
           `
             )
