@@ -272,7 +272,7 @@ export function renderAdminLayoutCatalyst(
           </svg>
         </button>
         <div class="ml-4 flex-1">
-          ${renderLogo({ size: "sm", showText: true, variant: "white", version: data.version })}
+          ${renderLogo({ size: "sm", showText: true, variant: "white", version: data.version, href: "/admin" })}
         </div>
       </header>
 
@@ -490,7 +490,7 @@ function renderCatalystSidebar(
 
       <!-- Sidebar Header -->
       <div class="flex flex-col border-b border-zinc-950/5 p-4 dark:border-white/5">
-        ${renderLogo({ size: "md", showText: true, variant: "white", version })}
+        ${renderLogo({ size: "md", showText: true, variant: "white", version, href: "/admin" })}
       </div>
 
       <!-- Sidebar Body -->

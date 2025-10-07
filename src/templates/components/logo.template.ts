@@ -5,6 +5,7 @@ export interface LogoData {
   showVersion?: boolean
   version?: string
   className?: string
+  href?: string // Optional link URL
 }
 
 const sizeClasses = {
@@ -22,7 +23,8 @@ export function renderLogo(data: LogoData = {}): string {
     showText = true,
     showVersion = true,
     version = 'v0.1.0',
-    className = ''
+    className = '',
+    href
   } = data
 
   const sizeClass = sizeClasses[size]
@@ -52,14 +54,17 @@ export function renderLogo(data: LogoData = {}): string {
     </span>
   ` : ''
 
-  if (!showText) {
-    return logoSvg
-  }
-
-  return `
+  const logoContent = showText ? `
     <div class="flex items-center gap-2 ${className}">
       ${logoSvg}
       ${versionBadge}
     </div>
-  `
+  ` : logoSvg
+
+  // Wrap in link if href is provided
+  if (href) {
+    return `<a href="${href}" class="inline-block hover:opacity-80 transition-opacity">${logoContent}</a>`
+  }
+
+  return logoContent
 }
