@@ -97,8 +97,14 @@ app.use('*', async (c, next) => {
 
 // Middleware
 app.use('*', async (c, next) => {
-  // Skip logger for high-frequency endpoints
-  if (c.req.path.includes('/admin/api/metrics')) {
+  // Skip logger for high-frequency endpoints to reduce noise
+  const path = c.req.path
+  const skipLogger = path.includes('/admin/api/metrics') ||
+                     path.includes('/admin/api/stats') ||
+                     path.includes('/admin/api/recent-activity') ||
+                     path.includes('/admin/api/system-status')
+
+  if (skipLogger) {
     return next()
   }
   return logger()(c, next)
