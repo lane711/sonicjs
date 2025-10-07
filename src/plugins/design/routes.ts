@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { renderDesignPage, DesignPageData } from '../../templates/pages/admin-design.template'
-import { APP_VERSION } from '../../index'
+// APP_VERSION removed - use c.get('appVersion') instead
 
 type Bindings = {
   DB: D1Database
@@ -13,6 +13,7 @@ type Variables = {
     email: string
     role: string
   }
+  appVersion?: string
 }
 
 export const designRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
@@ -26,7 +27,7 @@ designRoutes.get('/', (c) => {
       email: user.email,
       role: user.role
     } : undefined,
-    version: APP_VERSION
+    version: c.get('appVersion')
   }
 
   return c.html(renderDesignPage(pageData))

@@ -4,7 +4,7 @@ import { renderPluginsListPage, PluginsListPageData, Plugin } from '../templates
 import { renderPluginSettingsPage, PluginSettingsPageData } from '../templates/pages/admin-plugin-settings.template'
 import { PluginService } from '../services/plugin-service'
 import { PermissionManager } from '../middleware/permissions'
-import { APP_VERSION } from '../index'
+// APP_VERSION removed - use c.get('appVersion') instead
 
 type Bindings = {
   DB: D1Database
@@ -19,6 +19,7 @@ type Variables = {
     exp: number
     iat: number
   }
+  appVersion?: string
 }
 
 export const adminPluginRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
@@ -76,7 +77,7 @@ adminPluginRoutes.get('/', async (c) => {
         email: user?.email || '',
         role: user?.role || 'user'
       },
-      version: APP_VERSION
+      version: c.get('appVersion')
     }
 
     return c.html(renderPluginsListPage(pageData))

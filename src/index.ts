@@ -33,8 +33,8 @@ import { loggingMiddleware, securityLoggingMiddleware, performanceLoggingMiddlew
 import { compressionMiddleware, securityHeaders, cacheHeaders } from './middleware/performance'
 import packageJson from '../package.json'
 
-// Store app version globally at startup
-export const APP_VERSION = `v${packageJson.version}`
+// Store app version globally at startup (not exported to avoid Wrangler treating it as a binding)
+const APP_VERSION = `v${packageJson.version}`
 
 // Define the Cloudflare Workers environment
 type Bindings = {

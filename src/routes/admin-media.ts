@@ -8,7 +8,7 @@ import { renderMediaFileDetails, MediaFileDetailsData } from '../templates/compo
 import { MediaFile } from '../templates/components/media-grid.template'
 import { createCDNService } from '../services/cdn'
 import { getCacheService, CACHE_CONFIGS } from '../plugins/cache'
-import { APP_VERSION } from '../index'
+// APP_VERSION removed - use c.get('appVersion') instead
 
 type Bindings = {
   DB: D1Database
@@ -27,6 +27,7 @@ type Variables = {
     exp: number
     iat: number
   }
+  appVersion?: string
 }
 
 // File validation schema
@@ -179,7 +180,7 @@ adminMediaRoutes.get('/', async (c) => {
         email: user.email,
         role: user.role
       },
-      version: APP_VERSION
+      version: c.get('appVersion')
     }
 
     // Cache the page data

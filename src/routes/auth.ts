@@ -7,7 +7,7 @@ import { AuthManager, requireAuth } from '../middleware/auth'
 import { renderLoginPage, LoginPageData } from '../templates/pages/auth-login.template'
 import { renderRegisterPage, RegisterPageData } from '../templates/pages/auth-register.template'
 import { getCacheService, CACHE_CONFIGS } from '../plugins/cache'
-import { APP_VERSION } from '../index'
+// APP_VERSION removed - use c.get('appVersion') instead
 
 type Bindings = {
   DB: D1Database
@@ -22,6 +22,7 @@ type Variables = {
     exp: number
     iat: number
   }
+  appVersion?: string
 }
 
 export const authRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
@@ -34,7 +35,7 @@ authRoutes.get('/login', async (c) => {
   const pageData: LoginPageData = {
     error: error || undefined,
     message: message || undefined,
-    version: APP_VERSION
+    version: c.get('appVersion')
   }
   
   // Check if demo login plugin is active

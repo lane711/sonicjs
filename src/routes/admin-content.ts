@@ -5,7 +5,7 @@ import { renderContentListPage, ContentListPageData } from '../templates/pages/a
 import { renderVersionHistory, VersionHistoryData, ContentVersion } from '../templates/components/version-history.template'
 import { isPluginActive } from '../middleware/plugin-middleware'
 import { getCacheService, CACHE_CONFIGS } from '../plugins/cache'
-import { APP_VERSION } from '../index'
+// APP_VERSION removed - use c.get('appVersion') instead
 
 type Bindings = {
   DB: D1Database
@@ -236,7 +236,7 @@ adminContentRoutes.get('/', async (c) => {
         email: user.email,
         role: user.role
       } : undefined,
-      version: APP_VERSION
+      version: c.get('appVersion')
     }
 
     return c.html(renderContentListPage(pageData))
