@@ -50,16 +50,12 @@ async function getDynamicMenuItems(db: D1Database): Promise<Array<{
   icon: string
 }>> {
   try {
-    console.log('getDynamicMenuItems: Starting to fetch active plugins')
     const activePlugins = await getActivePlugins(db)
-    console.log('getDynamicMenuItems: Active plugins found:', activePlugins)
     const menuItems: Array<{ label: string; path: string; icon: string }> = []
-    
+
     for (const plugin of activePlugins) {
-      console.log('getDynamicMenuItems: Processing plugin:', plugin.name)
       // Add menu items for plugins that have admin interfaces
       if (plugin.name === 'faq') {
-        console.log('getDynamicMenuItems: Adding FAQ menu item')
         menuItems.push({
           label: 'FAQ',
           path: '/admin/faq',
@@ -68,9 +64,8 @@ async function getDynamicMenuItems(db: D1Database): Promise<Array<{
           </svg>`
         })
       }
-      
+
       if (plugin.name === 'workflow') {
-        console.log('getDynamicMenuItems: Adding Workflow menu item')
         menuItems.push({
           label: 'Workflow',
           path: '/admin/workflow',
@@ -79,11 +74,10 @@ async function getDynamicMenuItems(db: D1Database): Promise<Array<{
           </svg>`
         })
       }
-      
+
       // Add more plugin-specific menu items here as needed
     }
-    
-    console.log('getDynamicMenuItems: Final menu items:', menuItems)
+
     return menuItems
   } catch (error) {
     console.error('Error getting dynamic menu items:', error)
@@ -185,118 +179,73 @@ adminRoutes.get('/api/stats', async (c) => {
       console.error('Error fetching users count:', error)
     }
 
-    // Get recent activity
-    const recentActivity: any[] = []
-
+    // Get recent activity from activity_logs table
+    let recentActivity: any[] = []
     try {
-      // Get recent content changes (created, updated, deleted - last 5)
-      const contentStmt = db.prepare(`
-        SELECT c.id, c.title, c.status, c.created_at, c.updated_at, u.email, u.first_name, u.last_name
-        FROM content c
-        LEFT JOIN users u ON c.created_by = u.id
-        ORDER BY c.updated_at DESC
+      const activityStmt = db.prepare(`
+        SELECT
+          a.id,
+          a.action,
+          a.resource_type,
+          a.details,
+          a.created_at,
+          u.email,
+          u.first_name,
+          u.last_name
+        FROM activity_logs a
+        LEFT JOIN users u ON a.user_id = u.id
+        WHERE a.resource_type IN ('content', 'collections', 'users', 'media')
+        ORDER BY a.created_at DESC
         LIMIT 5
       `)
-      const { results: contentResults } = await contentStmt.all()
 
-      contentResults?.forEach((row: any) => {
+      const { results } = await activityStmt.all()
+
+      recentActivity = results?.map((row: any) => {
         const userName = row.first_name && row.last_name
           ? `${row.first_name} ${row.last_name}`
-          : row.email || 'Unknown'
+          : row.email || 'System'
 
-        // Determine if this was created, updated, or deleted
-        // If created_at and updated_at are within 1 second, it's a new creation
-        const isNewlyCreated = Math.abs(Number(row.created_at) - Number(row.updated_at)) < 1000
-        const isDeleted = row.status === 'deleted'
-
-        let action = 'updated'
-        let description = `Content "${row.title}" updated`
-
-        if (isDeleted) {
-          action = 'deleted'
-          description = `Content "${row.title}" deleted`
-        } else if (isNewlyCreated) {
-          action = 'created'
-          description = `Content "${row.title}" created`
+        let details: any = {}
+        try {
+          details = row.details ? JSON.parse(row.details) : {}
+        } catch (e) {
+          console.error('Error parsing activity details:', e)
         }
 
-        recentActivity.push({
+        // Format based on action type
+        let type = row.resource_type
+        let action = 'activity'
+        let description = row.action.replace(/\./g, ' ')
+
+        if (row.action.includes('created')) {
+          action = 'created'
+          description = `Created ${type} "${details.title || details.name || details.display_name || details.filename || 'item'}"`
+        } else if (row.action.includes('updated')) {
+          action = 'updated'
+          description = `Updated ${type} "${details.title || details.name || details.display_name || 'item'}"`
+        } else if (row.action.includes('deleted')) {
+          action = 'deleted'
+          description = `Deleted ${type} "${details.title || details.name || details.display_name || details.filename || 'item'}"`
+        } else if (row.action.includes('uploaded')) {
+          action = 'uploaded'
+          description = `Uploaded "${details.filename || 'file'}"`
+        }
+
+        return {
           id: row.id,
-          type: 'content',
+          type: type,
           action: action,
           description: description,
-          timestamp: new Date(Number(row.updated_at)).toISOString(),
-          user: userName
-        })
-      })
-    } catch (error) {
-      console.error('Error fetching recent content activity:', error)
-    }
-
-    try {
-      // Get recent user registrations (last 3)
-      const usersStmt = db.prepare(`
-        SELECT id, email, first_name, last_name, created_at
-        FROM users
-        ORDER BY created_at DESC
-        LIMIT 3
-      `)
-      const { results: usersResults } = await usersStmt.all()
-
-      usersResults?.forEach((row: any) => {
-        const userName = row.first_name && row.last_name
-          ? `${row.first_name} ${row.last_name}`
-          : row.email || 'Unknown'
-
-        recentActivity.push({
-          id: row.id,
-          type: 'user',
-          action: 'registered',
-          description: `New user account created`,
           timestamp: new Date(Number(row.created_at)).toISOString(),
           user: userName
-        })
-      })
+        }
+      }) || []
     } catch (error) {
-      console.error('Error fetching recent user activity:', error)
+      console.error('Error fetching recent activity:', error)
     }
 
-    try {
-      // Get recent media uploads (last 3)
-      const mediaStmt = db.prepare(`
-        SELECT m.id, m.filename, m.created_at, u.email, u.first_name, u.last_name
-        FROM media m
-        LEFT JOIN users u ON m.uploaded_by = u.id
-        WHERE m.deleted_at IS NULL
-        ORDER BY m.created_at DESC
-        LIMIT 3
-      `)
-      const { results: mediaResults } = await mediaStmt.all()
-
-      mediaResults?.forEach((row: any) => {
-        const userName = row.first_name && row.last_name
-          ? `${row.first_name} ${row.last_name}`
-          : row.email || 'Unknown'
-
-        recentActivity.push({
-          id: row.id,
-          type: 'media',
-          action: 'uploaded',
-          description: `Image "${row.filename}" uploaded`,
-          timestamp: new Date(Number(row.created_at)).toISOString(),
-          user: userName
-        })
-      })
-    } catch (error) {
-      console.error('Error fetching recent media activity:', error)
-      // Media table might not exist yet
-    }
-
-    // Sort all activities by timestamp (most recent first) and limit to 5
-    recentActivity.sort((a, b) =>
-      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-    )
-    const limitedActivity = recentActivity.slice(0, 5)
+    const limitedActivity = recentActivity
 
     const stats: DashboardStats = {
       collections: collectionsCount,
@@ -378,121 +327,115 @@ adminRoutes.get('/api/metrics', async (c) => {
 adminRoutes.get('/api/recent-activity', async (c) => {
   try {
     const db = c.env.DB
-    const recentActivity: any[] = []
 
-    try {
-      // Get recent content changes (created, updated, deleted - last 5)
-      const contentStmt = db.prepare(`
-        SELECT c.id, c.title, c.status, c.created_at, c.updated_at, u.email, u.first_name, u.last_name
-        FROM content c
-        LEFT JOIN users u ON c.created_by = u.id
-        ORDER BY c.updated_at DESC
-        LIMIT 5
-      `)
-      const { results: contentResults } = await contentStmt.all()
+    // Get recent activities from activity_logs table
+    const activityStmt = db.prepare(`
+      SELECT
+        a.id,
+        a.action,
+        a.resource_type,
+        a.resource_id,
+        a.details,
+        a.created_at,
+        u.email,
+        u.first_name,
+        u.last_name
+      FROM activity_logs a
+      LEFT JOIN users u ON a.user_id = u.id
+      WHERE a.resource_type IN ('content', 'collections', 'users', 'media')
+      ORDER BY a.created_at DESC
+      LIMIT 10
+    `)
 
-      contentResults?.forEach((row: any) => {
-        const userName = row.first_name && row.last_name
-          ? `${row.first_name} ${row.last_name}`
-          : row.email || 'Unknown'
+    const { results } = await activityStmt.all()
 
-        // Determine if this was created, updated, or deleted
-        // If created_at and updated_at are within 1 second, it's a new creation
-        const isNewlyCreated = Math.abs(Number(row.created_at) - Number(row.updated_at)) < 1000
-        const isDeleted = row.status === 'deleted'
+    const recentActivity = results?.map((row: any) => {
+      const userName = row.first_name && row.last_name
+        ? `${row.first_name} ${row.last_name}`
+        : row.email || 'System'
 
-        let action = 'updated'
-        let description = `Content "${row.title}" updated`
+      let details: any = {}
+      try {
+        details = row.details ? JSON.parse(row.details) : {}
+      } catch (e) {
+        console.error('Error parsing activity details:', e)
+      }
 
-        if (isDeleted) {
-          action = 'deleted'
-          description = `Content "${row.title}" deleted`
-        } else if (isNewlyCreated) {
-          action = 'created'
-          description = `Content "${row.title}" created`
-        }
+      // Format description based on action type
+      let description = ''
+      let type = row.resource_type
+      let action = 'activity'
 
-        recentActivity.push({
-          id: row.id,
-          type: 'content',
-          action: action,
-          description: description,
-          timestamp: new Date(Number(row.updated_at)).toISOString(),
-          user: userName
-        })
-      })
-    } catch (error) {
-      console.error('Error fetching recent content activity:', error)
-    }
+      // Content actions
+      if (row.action === 'content.created') {
+        action = 'created'
+        description = `Created content "${details.title || 'Untitled'}"`
+      } else if (row.action === 'content.updated') {
+        action = 'updated'
+        description = `Updated content "${details.title || 'Untitled'}"`
+      } else if (row.action === 'content.deleted') {
+        action = 'deleted'
+        description = `Deleted content "${details.title || 'Untitled'}"`
+      } else if (row.action === 'content.published') {
+        action = 'published'
+        description = `Published content "${details.title || 'Untitled'}"`
+      }
+      // Collection actions
+      else if (row.action === 'collection.created') {
+        action = 'created'
+        type = 'collection'
+        description = `Created collection "${details.name || details.display_name || 'Untitled'}"`
+      } else if (row.action === 'collection.updated') {
+        action = 'updated'
+        type = 'collection'
+        description = `Updated collection "${details.name || details.display_name || 'Untitled'}"`
+      } else if (row.action === 'collection.deleted') {
+        action = 'deleted'
+        type = 'collection'
+        description = `Deleted collection "${details.name || details.display_name || 'Untitled'}"`
+      }
+      // User actions
+      else if (row.action === 'user.created' || row.action === 'user.registered') {
+        action = 'registered'
+        type = 'user'
+        description = `New user account created`
+      } else if (row.action === 'user.updated') {
+        action = 'updated'
+        type = 'user'
+        description = `User profile updated`
+      } else if (row.action === 'user.soft_delete' || row.action === 'user.hard_delete') {
+        action = 'deleted'
+        type = 'user'
+        description = `User account ${row.action === 'user.hard_delete' ? 'permanently ' : ''}deleted`
+      }
+      // Media actions
+      else if (row.action === 'media.uploaded') {
+        action = 'uploaded'
+        type = 'media'
+        description = `Uploaded "${details.filename || 'file'}"`
+      } else if (row.action === 'media.deleted') {
+        action = 'deleted'
+        type = 'media'
+        description = `Deleted "${details.filename || 'file'}"`
+      }
+      // Generic fallback
+      else {
+        description = row.action.replace(/\./g, ' ')
+      }
 
-    try {
-      // Get recent user registrations (last 3)
-      const usersStmt = db.prepare(`
-        SELECT id, email, first_name, last_name, created_at
-        FROM users
-        ORDER BY created_at DESC
-        LIMIT 3
-      `)
-      const { results: usersResults } = await usersStmt.all()
-
-      usersResults?.forEach((row: any) => {
-        const userName = row.first_name && row.last_name
-          ? `${row.first_name} ${row.last_name}`
-          : row.email || 'Unknown'
-
-        recentActivity.push({
-          id: row.id,
-          type: 'user',
-          action: 'registered',
-          description: `New user account created`,
-          timestamp: new Date(Number(row.created_at)).toISOString(),
-          user: userName
-        })
-      })
-    } catch (error) {
-      console.error('Error fetching recent user activity:', error)
-    }
-
-    try {
-      // Get recent media uploads (last 3)
-      const mediaStmt = db.prepare(`
-        SELECT m.id, m.filename, m.created_at, u.email, u.first_name, u.last_name
-        FROM media m
-        LEFT JOIN users u ON m.uploaded_by = u.id
-        WHERE m.deleted_at IS NULL
-        ORDER BY m.created_at DESC
-        LIMIT 3
-      `)
-      const { results: mediaResults } = await mediaStmt.all()
-
-      mediaResults?.forEach((row: any) => {
-        const userName = row.first_name && row.last_name
-          ? `${row.first_name} ${row.last_name}`
-          : row.email || 'Unknown'
-
-        recentActivity.push({
-          id: row.id,
-          type: 'media',
-          action: 'uploaded',
-          description: `Image "${row.filename}" uploaded`,
-          timestamp: new Date(Number(row.created_at)).toISOString(),
-          user: userName
-        })
-      })
-    } catch (error) {
-      console.error('Error fetching recent media activity:', error)
-      // Media table might not exist yet
-    }
-
-    // Sort all activities by timestamp (most recent first) and limit to 5
-    recentActivity.sort((a, b) =>
-      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-    )
-    const limitedActivity = recentActivity.slice(0, 5)
+      return {
+        id: row.id,
+        type: type,
+        action: action,
+        description: description,
+        timestamp: new Date(Number(row.created_at)).toISOString(),
+        user: userName
+      }
+    }).slice(0, 5) || []
 
     // Import and render the activity component
     const { renderRecentActivity } = await import('../templates/pages/admin-dashboard.template')
-    return c.html(renderRecentActivity(limitedActivity))
+    return c.html(renderRecentActivity(recentActivity))
   } catch (error) {
     console.error('Error fetching recent activity:', error)
     return c.html(html`<p class="text-red-400">Error loading recent activity</p>`)
