@@ -1,6 +1,6 @@
 {
   "name": "sonicjs-ai",
-  "version": "2.0.0-alpha.5",
+  "version": "2.0.0-alpha.6",
   "private": true,
   "scripts": {
     "dev": "wrangler dev 2>&1 | grep -v '/admin/api/metrics'",

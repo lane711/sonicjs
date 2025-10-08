@@ -115,21 +115,21 @@ test.describe('Content Management', () => {
   test('should display content actions', async ({ page }) => {
     // Check if there's a table with content
     const table = page.locator('table');
-    
+
     if (await table.count() > 0) {
       // Find any content row in the table
       const contentRows = page.locator('tbody tr');
-      
+
       if (await contentRows.count() > 0) {
         // Check the first content row for action buttons
         const firstRow = contentRows.first();
-        // Should have Edit link/button
-        await expect(firstRow.locator('a').filter({ hasText: 'Edit' })).toBeVisible();
-        // Should have History button
-        await expect(firstRow.locator('button').filter({ hasText: 'History' })).toBeVisible();
+        // Should have Edit button (with title attribute)
+        await expect(firstRow.locator('button[title="Edit"]')).toBeVisible();
+        // Should have Delete button
+        await expect(firstRow.locator('button[title="Delete"]')).toBeVisible();
       }
     }
-    
+
     // Verify page functionality regardless
     await expect(page.locator('h1').first()).toContainText('Content Management');
   });

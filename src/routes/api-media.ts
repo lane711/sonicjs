@@ -439,6 +439,141 @@ apiMediaRoutes.post('/bulk-delete', async (c) => {
   }
 })
 
+// Bulk move files to folder
+apiMediaRoutes.post('/bulk-move', async (c) => {
+  try {
+    const user = c.get('user')
+    const body = await c.req.json()
+    const fileIds = body.fileIds as string[]
+    const targetFolder = body.folder as string
+
+    if (!fileIds || !Array.isArray(fileIds) || fileIds.length === 0) {
+      return c.json({ error: 'No file IDs provided' }, 400)
+    }
+
+    if (!targetFolder || typeof targetFolder !== 'string') {
+      return c.json({ error: 'No target folder provided' }, 400)
+    }
+
+    // Limit bulk operations to prevent abuse
+    if (fileIds.length > 50) {
+      return c.json({ error: 'Too many files selected. Maximum 50 files per operation.' }, 400)
+    }
+
+    const results = []
+    const errors = []
+
+    for (const fileId of fileIds) {
+      try {
+        // Get file record
+        const stmt = c.env.DB.prepare('SELECT * FROM media WHERE id = ? AND deleted_at IS NULL')
+        const fileRecord = await stmt.bind(fileId).first() as any
+
+        if (!fileRecord) {
+          errors.push({ fileId, error: 'File not found' })
+          continue
+        }
+
+        // Check permissions (only allow move by uploader or admin)
+        if (fileRecord.uploaded_by !== user.userId && user.role !== 'admin') {
+          errors.push({ fileId, error: 'Permission denied' })
+          continue
+        }
+
+        // Skip if already in target folder
+        if (fileRecord.folder === targetFolder) {
+          results.push({
+            fileId,
+            filename: fileRecord.original_name,
+            success: true,
+            skipped: true
+          })
+          continue
+        }
+
+        // Generate new R2 key with new folder
+        const oldR2Key = fileRecord.r2_key
+        const filename = oldR2Key.split('/').pop() || fileRecord.filename
+        const newR2Key = `${targetFolder}/${filename}`
+
+        // Copy file to new location in R2
+        try {
+          const object = await c.env.MEDIA_BUCKET.get(oldR2Key)
+          if (!object) {
+            errors.push({ fileId, error: 'File not found in storage' })
+            continue
+          }
+
+          await c.env.MEDIA_BUCKET.put(newR2Key, object.body, {
+            httpMetadata: object.httpMetadata,
+            customMetadata: {
+              ...object.customMetadata,
+              movedBy: user.userId,
+              movedAt: new Date().toISOString()
+            }
+          })
+
+          // Delete old file from R2
+          await c.env.MEDIA_BUCKET.delete(oldR2Key)
+        } catch (error) {
+          console.warn(`Failed to move file in R2 for file ${fileId}:`, error)
+          errors.push({ fileId, error: 'Failed to move file in storage' })
+          continue
+        }
+
+        // Update database with new folder and R2 key
+        const bucketName = c.env.BUCKET_NAME || 'sonicjs-media-dev'
+        const newPublicUrl = `https://pub-${bucketName}.r2.dev/${newR2Key}`
+
+        const updateStmt = c.env.DB.prepare(`
+          UPDATE media
+          SET folder = ?, r2_key = ?, public_url = ?, updated_at = ?
+          WHERE id = ?
+        `)
+        await updateStmt.bind(
+          targetFolder,
+          newR2Key,
+          newPublicUrl,
+          Math.floor(Date.now() / 1000),
+          fileId
+        ).run()
+
+        results.push({
+          fileId,
+          filename: fileRecord.original_name,
+          success: true,
+          skipped: false
+        })
+      } catch (error) {
+        errors.push({
+          fileId,
+          error: 'Move failed',
+          details: error instanceof Error ? error.message : 'Unknown error'
+        })
+      }
+    }
+
+    // Emit media move event if any moves succeeded
+    if (results.length > 0) {
+      await emitEvent('media.move', { count: results.length, targetFolder, ids: fileIds })
+    }
+
+    return c.json({
+      success: results.length > 0,
+      moved: results,
+      errors: errors,
+      summary: {
+        total: fileIds.length,
+        successful: results.length,
+        failed: errors.length
+      }
+    })
+  } catch (error) {
+    console.error('Bulk move error:', error)
+    return c.json({ error: 'Bulk move failed' }, 500)
+  }
+})
+
 // Delete file
 apiMediaRoutes.delete('/:id', async (c) => {
   try {

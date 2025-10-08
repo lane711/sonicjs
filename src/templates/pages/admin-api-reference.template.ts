@@ -331,7 +331,7 @@ export function renderAPIReferencePage(data: APIReferencePageData): string {
           navigator.clipboard.writeText(path).then(() => {
             // Show temporary notification
             const notification = document.createElement('div');
-            notification.className = 'fixed top-4 right-4 rounded-lg bg-lime-500/90 backdrop-blur-sm px-4 py-3 shadow-lg ring-1 ring-lime-600/20 z-50';
+            notification.className = 'fixed top-4 right-4 rounded-lg bg-lime-500 px-4 py-3 shadow-lg ring-1 ring-lime-600/20 z-50';
             notification.innerHTML = '<div class="flex items-center gap-x-2"><svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p class="text-sm font-medium text-white">Path copied to clipboard!</p></div>';
             document.body.appendChild(notification);
             setTimeout(() => document.body.removeChild(notification), 2000);

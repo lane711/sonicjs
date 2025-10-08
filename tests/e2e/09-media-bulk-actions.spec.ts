@@ -73,9 +73,25 @@ test.describe('Media Bulk Actions', () => {
     // Click bulk actions button
     await bulkActionsBtn.click();
 
-    // Wait for menu to appear
+    // Wait for menu to appear and for animation to complete
     const bulkActionsMenu = page.locator('#bulk-actions-menu');
-    await expect(bulkActionsMenu).toBeVisible({ timeout: 2000 });
+
+    // Wait for the menu to become visible (hidden class removed and visible)
+    await page.waitForFunction(() => {
+      const menu = document.getElementById('bulk-actions-menu');
+      if (!menu) return false;
+      const classes = menu.className;
+      return !classes.includes('hidden') && classes.includes('scale-100') && classes.includes('opacity-100');
+    }, { timeout: 2000 });
+
+    // Verify menu is actually visible using Playwright's visibility check
+    await expect(bulkActionsMenu).toBeVisible();
+
+    // Verify menu has proper visibility classes
+    const menuClasses = await bulkActionsMenu.getAttribute('class');
+    expect(menuClasses).toContain('scale-100');
+    expect(menuClasses).toContain('opacity-100');
+    expect(menuClasses).not.toContain('hidden');
 
     // Check that menu is properly positioned and not cut off
     const menuBox = await bulkActionsMenu.boundingBox();
@@ -88,11 +104,63 @@ test.describe('Media Bulk Actions', () => {
       expect(menuBox.y).toBeGreaterThanOrEqual(0);
       expect(menuBox.x + menuBox.width).toBeLessThanOrEqual(viewportSize.width);
       expect(menuBox.y + menuBox.height).toBeLessThanOrEqual(viewportSize.height);
+
+      // Verify menu has reasonable dimensions (not collapsed)
+      expect(menuBox.width).toBeGreaterThan(100); // Menu should be at least 100px wide
+      expect(menuBox.height).toBeGreaterThan(30); // Menu should be at least 30px tall (enough for button)
     }
 
-    // Verify menu contains delete option
-    const deleteButton = bulkActionsMenu.locator('button:has-text("Delete")');
-    await expect(deleteButton).toBeVisible();
+    // Verify ALL menu items are visible and clickable
+    const menuItems = [
+      { text: 'Move to Folder', selector: 'button:has-text("Move to Folder")' },
+      { text: 'Delete Selected Files', selector: 'button:has-text("Delete Selected Files")' }
+    ];
+
+    for (const item of menuItems) {
+      const button = bulkActionsMenu.locator(item.selector);
+
+      // Check button exists and is visible
+      await expect(button).toBeVisible();
+
+      // Verify button is fully visible (not cut off)
+      const buttonBox = await button.boundingBox();
+      expect(buttonBox).not.toBeNull();
+
+      if (buttonBox && viewportSize) {
+        // Button should be fully within viewport
+        expect(buttonBox.x).toBeGreaterThanOrEqual(0);
+        expect(buttonBox.y).toBeGreaterThanOrEqual(0);
+        expect(buttonBox.x + buttonBox.width).toBeLessThanOrEqual(viewportSize.width);
+        expect(buttonBox.y + buttonBox.height).toBeLessThanOrEqual(viewportSize.height);
+
+        // Button should have reasonable dimensions (not collapsed)
+        expect(buttonBox.width).toBeGreaterThan(50);
+        expect(buttonBox.height).toBeGreaterThan(20);
+      }
+
+      // Verify button is clickable by checking it's not covered
+      const clickableInfo = await button.evaluate((el) => {
+        const rect = el.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const elementAtPoint = document.elementFromPoint(centerX, centerY);
+        return {
+          isClickable: el === elementAtPoint || el.contains(elementAtPoint),
+          buttonText: el.textContent?.trim(),
+          elementAtPoint: elementAtPoint?.tagName + (elementAtPoint?.className ? '.' + elementAtPoint.className.split(' ').join('.') : ''),
+          zIndex: window.getComputedStyle(el).zIndex,
+          parentZIndex: window.getComputedStyle(el.parentElement || el).zIndex
+        };
+      });
+
+      // If not clickable, log which element is blocking it
+      if (!clickableInfo.isClickable) {
+        console.log(`Button "${item.text}" is blocked by: ${clickableInfo.elementAtPoint}`);
+        console.log(`Button z-index: ${clickableInfo.zIndex}, Parent z-index: ${clickableInfo.parentZIndex}`);
+      }
+
+      expect(clickableInfo.isClickable).toBeTruthy();
+    }
 
     // Click outside to close menu
     await page.click('body', { position: { x: 10, y: 10 } });

@@ -198,7 +198,7 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
                     >
                       Select All
                     </button>
-                    <div class="relative inline-block" id="bulk-actions-dropdown">
+                    <div class="relative inline-block z-50" id="bulk-actions-dropdown">
                       <button
                         id="bulk-actions-btn"
                         class="inline-flex items-center gap-x-1.5 px-3 py-1.5 bg-zinc-100/60 dark:bg-zinc-800/60 backdrop-blur-sm text-zinc-400 dark:text-zinc-600 text-sm font-medium rounded-full ring-1 ring-inset ring-zinc-200/50 dark:ring-zinc-700/50 cursor-not-allowed"
@@ -216,6 +216,14 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
                         class="hidden absolute right-0 mt-2 w-56 origin-top-right divide-y divide-zinc-200 dark:divide-white/10 rounded-lg bg-white dark:bg-zinc-900 shadow-xl ring-1 ring-zinc-950/5 dark:ring-white/10 z-50 transition-all duration-100 scale-95 opacity-0"
                         style="transition-behavior: allow-discrete;"
                       >
+                        <div class="py-1">
+                          <button
+                            onclick="openMoveToFolderModal()"
+                            class="w-full text-left px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                          >
+                            Move to Folder
+                          </button>
+                        </div>
                         <div class="py-1">
                           <button
                             onclick="confirmBulkDelete()"
@@ -356,6 +364,47 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
         <!-- Content loaded via HTMX -->
       </div>
     </div>
+
+    <!-- Move to Folder Modal -->
+    <div id="move-to-folder-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+      <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-xl ring-1 ring-zinc-950/5 dark:ring-white/10 p-6 w-full max-w-md">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold text-zinc-950 dark:text-white">Move to Folder</h3>
+          <button onclick="closeMoveToFolderModal()" class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <p class="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
+          Select a folder to move <span id="move-file-count" class="font-medium text-zinc-950 dark:text-white">0</span> selected file(s) to:
+        </p>
+
+        <div class="space-y-2 mb-6">
+          ${data.folders.length > 0 ? data.folders.map(folder => `
+            <button
+              onclick="performBulkMove('${folder.folder}')"
+              class="w-full text-left px-4 py-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-950 dark:text-white transition-colors ring-1 ring-inset ring-zinc-200 dark:ring-zinc-700"
+            >
+              <div class="flex items-center justify-between">
+                <span class="font-medium">${folder.folder}</span>
+                <span class="text-sm text-zinc-500 dark:text-zinc-400">${folder.count} files</span>
+              </div>
+            </button>
+          `).join('') : '<p class="text-sm text-zinc-500 dark:text-zinc-400 text-center py-4">No folders available</p>'}
+        </div>
+
+        <div class="flex justify-end space-x-2">
+          <button
+            onclick="closeMoveToFolderModal()"
+            class="rounded-lg bg-white dark:bg-zinc-800 px-4 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
     
     <style>
       .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
@@ -410,10 +459,13 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
           btn.disabled = false;
           btn.className = 'inline-flex items-center gap-x-1.5 px-3 py-1.5 bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm text-zinc-950 dark:text-white text-sm font-medium rounded-full ring-1 ring-inset ring-cyan-200/50 dark:ring-cyan-700/50 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 dark:hover:from-cyan-900/30 dark:hover:to-blue-900/30 hover:ring-cyan-300 dark:hover:ring-cyan-600 transition-all duration-200';
           btn.innerHTML = \`Actions (\${selectedFiles.size}) <svg viewBox="0 0 20 20" fill="currentColor" class="size-4"><path d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" /></svg>\`;
+          // Re-attach onclick handler after innerHTML update
+          btn.onclick = toggleBulkActionsDropdown;
         } else {
           btn.disabled = true;
           btn.className = 'inline-flex items-center gap-x-1.5 px-3 py-1.5 bg-zinc-100/60 dark:bg-zinc-800/60 backdrop-blur-sm text-zinc-400 dark:text-zinc-600 text-sm font-medium rounded-full ring-1 ring-inset ring-zinc-200/50 dark:ring-zinc-700/50 cursor-not-allowed';
           btn.innerHTML = \`Bulk Actions <svg viewBox="0 0 20 20" fill="currentColor" class="size-4"><path d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" /></svg>\`;
+          btn.onclick = null; // Remove handler when disabled
           // Hide menu when no files selected
           const menu = document.getElementById('bulk-actions-menu');
           menu.classList.remove('scale-100', 'opacity-100');
@@ -508,6 +560,70 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
         }
       }
       
+      function openMoveToFolderModal() {
+        if (selectedFiles.size === 0) return;
+
+        // Update file count in modal
+        document.getElementById('move-file-count').textContent = selectedFiles.size.toString();
+
+        // Show modal
+        document.getElementById('move-to-folder-modal').classList.remove('hidden');
+
+        // Hide bulk actions menu
+        const menu = document.getElementById('bulk-actions-menu');
+        menu.classList.remove('scale-100', 'opacity-100');
+        menu.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => menu.classList.add('hidden'), 100);
+      }
+
+      function closeMoveToFolderModal() {
+        document.getElementById('move-to-folder-modal').classList.add('hidden');
+      }
+
+      async function performBulkMove(targetFolder) {
+        if (selectedFiles.size === 0) return;
+
+        try {
+          // Show loading state
+          closeMoveToFolderModal();
+          const btn = document.getElementById('bulk-actions-btn');
+          const originalText = btn.innerHTML;
+          btn.innerHTML = 'Moving...';
+          btn.disabled = true;
+
+          const response = await fetch('/api/media/bulk-move', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              fileIds: Array.from(selectedFiles),
+              folder: targetFolder
+            })
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            // Show success notification
+            const movedCount = result.summary.successful;
+            showNotification(\`Successfully moved \${movedCount} file\${movedCount > 1 ? 's' : ''} to \${targetFolder}\`, 'success');
+
+            // Reload the page to show updated file locations
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          } else {
+            showNotification('Failed to move files', 'error');
+            updateBulkActionsButton();
+          }
+        } catch (error) {
+          console.error('Bulk move error:', error);
+          showNotification('An error occurred while moving files', 'error');
+          updateBulkActionsButton();
+        }
+      }
+
       function showNotification(message, type = 'info') {
         const notification = document.createElement('div');
         const bgColor = type === 'success' ? 'bg-green-600' :
