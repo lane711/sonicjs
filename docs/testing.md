@@ -31,10 +31,21 @@ SonicJS AI follows a comprehensive testing approach:
 
 ### Test Coverage Goals
 
-- **70%** minimum code coverage for core business logic
+- **90%** minimum code coverage for core business logic
 - **All API endpoints** have E2E test coverage
 - **Key user workflows** have comprehensive test coverage
 - **Plugin functionality** is thoroughly tested
+
+### Current Coverage Status
+
+As of the latest test run:
+- **Overall Coverage**: 90.86%
+- **Total Tests**: 684 passing
+- **Test Files**: 26 test files
+- **Statements**: 90.86%
+- **Branches**: 90.34%
+- **Functions**: 96.23%
+- **Lines**: 90.86%
 
 ## Testing Stack
 
@@ -99,10 +110,10 @@ export default defineConfig({
       ],
       thresholds: {
         global: {
-          branches: 70,
-          functions: 70,
-          lines: 70,
-          statements: 70
+          branches: 90,
+          functions: 90,
+          lines: 90,
+          statements: 90
         }
       }
     }
@@ -903,13 +914,21 @@ The project enforces minimum coverage thresholds:
 ```typescript
 thresholds: {
   global: {
-    branches: 70,
-    functions: 70,
-    lines: 70,
-    statements: 70
+    branches: 90,
+    functions: 90,
+    lines: 90,
+    statements: 90
   }
 }
 ```
+
+**Recent Coverage Improvements:**
+
+The project recently increased coverage from 87% to over 90% by adding comprehensive tests for:
+- Media storage operations (`src/media/storage.ts` - 92.96%)
+- Image optimization (`src/media/images.ts` - 91.74%)
+- Cache plugin functionality (`src/plugins/cache/` - extensive coverage)
+- Core services (CDN, notifications, scheduler, workflow - all >93%)
 
 ### Coverage Exclusions
 
@@ -1350,17 +1369,22 @@ await page.waitForResponse(resp =>
 
 #### 3. Coverage Not Meeting Thresholds
 
-**Problem**: Coverage reports below 70%
+**Problem**: Coverage reports below 90%
 
 **Solutions**:
 - Add tests for uncovered branches
 - Review coverage report: `coverage/index.html`
 - Identify untested code paths
+- Focus on business logic in `src/services`, `src/media`, and `src/content`
+- Infrastructure code (routes, templates, middleware) is excluded from coverage
 
 ```bash
 # Generate coverage and open report
 npm run test:cov
 open coverage/index.html  # macOS
+
+# View detailed coverage by file
+npm run test:cov | grep -A 30 "Coverage report"
 ```
 
 #### 4. Playwright Browser Issues

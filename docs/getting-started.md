@@ -47,7 +47,7 @@ npm run db:migrate
 npm run dev
 ```
 
-Your SonicJS instance will be available at **http://localhost:8787**
+Your SonicJS instance will be available at **<http://localhost:8787>**
 
 ## Development Setup
 
@@ -65,6 +65,7 @@ npm install
 ```
 
 This will install all required dependencies including:
+
 - **Hono** - Ultra-fast web framework
 - **Drizzle ORM** - Type-safe database queries
 - **Wrangler** - Cloudflare Workers CLI
@@ -82,6 +83,7 @@ npm run db:migrate
 ```
 
 This command applies all database migrations and creates the initial schema including:
+
 - User authentication tables
 - Content and collections
 - Media library
@@ -134,6 +136,7 @@ id = "your-kv-id"
 ```
 
 **Key Bindings:**
+
 - **DB** - D1 Database for all data storage
 - **MEDIA_BUCKET** - R2 bucket for media files
 - **CACHE_KV** - KV namespace for caching layer
@@ -154,9 +157,9 @@ npm run dev
    - Installs demo plugins (workflow, FAQ, demo-login)
 
 2. **Server Ready:**
-   - Admin interface: http://localhost:8787/admin
-   - API documentation: http://localhost:8787/api
-   - Health check: http://localhost:8787/health
+   - Admin interface: <http://localhost:8787/admin>
+   - API documentation: <http://localhost:8787/api>
+   - Health check: <http://localhost:8787/health>
 
 ## Project Structure
 
@@ -214,30 +217,36 @@ sonicjs-ai/
 ### Key Directories Explained
 
 **`src/middleware/`** - Request processing pipeline:
+
 - Bootstrap → Logging → Auth → Permissions → Routes
 
 **`src/routes/`** - Route handlers organized by domain:
+
 - Public routes (content, auth)
 - Admin routes (dashboard, management)
 - API routes (RESTful endpoints)
 
 **`src/services/`** - Business logic layer:
+
 - Database operations
 - Plugin management
 - Collection handling
 - Logging and monitoring
 
 **`src/templates/`** - HTMX-powered templates:
+
 - Layouts with navigation/sidebar
 - Page templates for admin UI
 - Reusable components
 
 **`src/plugins/`** - Extensibility system:
+
 - Core plugin architecture
 - Built-in core plugins
 - Optional/demo plugins
 
 **`src/collections/`** - Content type definitions:
+
 - TypeScript-based schemas
 - Auto-synced to database
 - Type-safe content modeling
@@ -254,6 +263,7 @@ SonicJS runs on Cloudflare's edge network using **V8 isolates** (not containers)
 - **Zero DevOps** (no servers to manage)
 
 **Bindings provide access to:**
+
 - **D1** - Edge-native SQLite database
 - **KV** - Global key-value store
 - **R2** - S3-compatible object storage
@@ -264,6 +274,7 @@ SonicJS runs on Cloudflare's edge network using **V8 isolates** (not containers)
 SonicJS is built on a powerful plugin architecture:
 
 **Core Plugins** (auto-installed):
+
 - `core-auth` - Authentication & user management
 - `core-media` - Media upload & R2 storage
 - `core-cache` - Three-tiered caching system
@@ -271,11 +282,13 @@ SonicJS is built on a powerful plugin architecture:
 - `seed-data` - Test data generation
 
 **Demo Plugins** (optional):
+
 - `workflow` - Content workflow & scheduling
 - `faq-plugin` - FAQ management
 - `demo-login-plugin` - Pre-filled login credentials
 
 **Plugin Lifecycle:**
+
 ```typescript
 // Plugins can hook into application events
 install() -> activate() -> [running] -> deactivate() -> uninstall()
@@ -306,6 +319,7 @@ export const blogPostsCollection: CollectionConfig = {
 ```
 
 **Automatic Syncing:**
+
 - Collections are TypeScript files in `src/collections/`
 - Automatically synced to database on startup
 - Type-safe content operations
@@ -315,21 +329,25 @@ export const blogPostsCollection: CollectionConfig = {
 SonicJS implements intelligent caching across three tiers:
 
 **Tier 1: In-Memory Cache**
+
 - Fastest access (< 1ms)
 - 50MB size limit per worker
 - LRU eviction policy
 
 **Tier 2: Cloudflare KV**
+
 - Global distribution
 - Eventually consistent
 - 5-60 minute TTLs
 
 **Tier 3: D1 Database**
+
 - Source of truth
 - Strong consistency
 - Full query capabilities
 
 **Cache Flow:**
+
 ```
 Request → Memory → KV → Database → Populate KV → Populate Memory → Response
 ```
@@ -337,11 +355,13 @@ Request → Memory → KV → Database → Populate KV → Populate Memory → R
 ### 5. Authentication & Authorization
 
 **JWT-based Authentication:**
+
 - 24-hour token expiration
 - Cookie and header support
 - KV-based token caching (5-min TTL)
 
 **Role-Based Access Control (RBAC):**
+
 ```typescript
 // Require authentication
 requireAuth()
@@ -357,6 +377,7 @@ optionalAuth()
 ```
 
 **User Roles:**
+
 - `admin` - Full system access
 - `editor` - Content management
 - `author` - Content creation
@@ -366,10 +387,11 @@ optionalAuth()
 
 ### 1. Access the Admin Dashboard
 
-Navigate to **http://localhost:8787/admin**
+Navigate to **<http://localhost:8787/admin>**
 
 **Default Credentials** (if seed data is loaded):
-- Email: admin@sonicjs.com
+
+- Email: <admin@sonicjs.com>
 - Password: admin123
 
 **Note:** The `demo-login-plugin` auto-fills these credentials in development.
@@ -379,11 +401,13 @@ Navigate to **http://localhost:8787/admin**
 The admin interface provides:
 
 **System Overview:**
+
 - Real-time health checks (D1, KV, R2, Webserver)
 - Recent activity feed
 - Quick actions
 
 **Content Management:**
+
 - Create/edit/delete content
 - Collection-based organization
 - Rich text editing with TinyMCE
@@ -391,6 +415,7 @@ The admin interface provides:
 - Workflow states (draft, review, published)
 
 **Media Library:**
+
 - Drag-and-drop upload
 - R2 bucket storage
 - Cloudflare Images optimization
@@ -398,18 +423,21 @@ The admin interface provides:
 - Bulk operations
 
 **User Management:**
+
 - User accounts and roles
 - Permission assignment
 - Activity logging
 - API token generation
 
 **Plugin Management:**
+
 - Install/activate/deactivate plugins
 - Plugin settings configuration
 - Dependency management
 - Activity monitoring
 
 **Cache Dashboard:**
+
 - Real-time statistics
 - Hit rate monitoring
 - Manual invalidation
@@ -472,6 +500,7 @@ curl -X POST http://localhost:8787/media/upload \
 ```
 
 **Supported Formats:**
+
 - Images: JPG, PNG, GIF, WebP, SVG
 - Documents: PDF, DOC, DOCX
 - Videos: MP4, WebM
@@ -480,7 +509,7 @@ curl -X POST http://localhost:8787/media/upload \
 ### 5. Explore the API
 
 **API Documentation:**
-Visit **http://localhost:8787/api** for interactive OpenAPI docs.
+Visit **<http://localhost:8787/api>** for interactive OpenAPI docs.
 
 **Key Endpoints:**
 
@@ -505,6 +534,7 @@ GET /api/content?search=keyword
 ```
 
 **Response Format:**
+
 ```json
 {
   "data": [...],
@@ -648,6 +678,7 @@ npm run sync-collections
 **Error:** `Error: no such table: users`
 
 **Solution:**
+
 ```bash
 # Run migrations
 npm run db:migrate
@@ -663,6 +694,7 @@ wrangler d1 migrations list DB --local
 **Error:** `Error: listen EADDRINUSE: address already in use :::8787`
 
 **Solution:**
+
 ```bash
 # Find and kill the process using port 8787
 lsof -ti:8787 | xargs kill -9
@@ -679,6 +711,7 @@ lsof -ti:8787 | xargs kill -9
 **Error:** `Cannot find module 'hono'`
 
 **Solution:**
+
 ```bash
 # Clear and reinstall dependencies
 rm -rf node_modules package-lock.json
@@ -753,6 +786,7 @@ wrangler r2 bucket info sonicjs-media-dev
 **Error:** `Type 'D1Database' is not assignable to...`
 
 **Solution:**
+
 ```bash
 # Update Cloudflare Workers types
 npm install --save-dev @cloudflare/workers-types@latest
@@ -786,6 +820,7 @@ compatibility_date = "2024-06-01"
 **Hot Reload Issues:**
 
 If changes aren't reflected:
+
 1. Stop dev server (Ctrl+C)
 2. Clear Wrangler cache: `rm -rf .wrangler`
 3. Restart: `npm run dev`
@@ -793,6 +828,7 @@ If changes aren't reflected:
 **Database Schema Changes:**
 
 When modifying the database schema:
+
 1. Update migration files in `migrations/`
 2. Run `npm run db:migrate`
 3. Update TypeScript types if needed
@@ -801,6 +837,7 @@ When modifying the database schema:
 **Collection Changes:**
 
 When modifying collections:
+
 1. Edit collection file in `src/collections/`
 2. Run `npm run sync-collections`
 3. Or restart dev server (auto-syncs)
@@ -808,6 +845,7 @@ When modifying collections:
 **Plugin Development:**
 
 When creating new plugins:
+
 1. Add plugin to appropriate directory
 2. Register in plugin registry
 3. Create manifest.json

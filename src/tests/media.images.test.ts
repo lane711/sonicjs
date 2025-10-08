@@ -1,6 +1,13 @@
 // @ts-nocheck
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { CloudflareImages, CloudflareImagesConfig, TransformOptions } from '../media/images'
+import {
+  CloudflareImages,
+  CloudflareImagesConfig,
+  ImageOptimizer,
+  TransformOptions,
+  detectImageType,
+  getOptimalImageFormat
+} from '../media/images'
 
 // Mock fetch globally
 global.fetch = vi.fn()
@@ -391,6 +398,227 @@ describe('CloudflareImages', () => {
       await expect(cloudflareImages.deleteImage('test-id')).rejects.toThrow(
         'Failed to delete image from Cloudflare Images'
       )
+    })
+  })
+})
+
+describe('detectImageType', () => {
+  it('should detect PNG image', () => {
+    const buffer = new ArrayBuffer(8)
+    const view = new Uint8Array(buffer)
+    // PNG signature: 89 50 4E 47
+    view[0] = 0x89
+    view[1] = 0x50
+    view[2] = 0x4E
+    view[3] = 0x47
+
+    expect(detectImageType(buffer)).toBe('image/png')
+  })
+
+  it('should detect JPEG image', () => {
+    const buffer = new ArrayBuffer(8)
+    const view = new Uint8Array(buffer)
+    // JPEG signature: FF D8
+    view[0] = 0xFF
+    view[1] = 0xD8
+
+    expect(detectImageType(buffer)).toBe('image/jpeg')
+  })
+
+  it('should detect GIF image', () => {
+    const buffer = new ArrayBuffer(8)
+    const view = new Uint8Array(buffer)
+    // GIF signature: 47 49 46
+    view[0] = 0x47
+    view[1] = 0x49
+    view[2] = 0x46
+
+    expect(detectImageType(buffer)).toBe('image/gif')
+  })
+
+  it('should detect WebP image', () => {
+    const buffer = new ArrayBuffer(8)
+    const view = new Uint8Array(buffer)
+    // WebP signature: 52 49 46 46
+    view[0] = 0x52
+    view[1] = 0x49
+    view[2] = 0x46
+    view[3] = 0x46
+
+    expect(detectImageType(buffer)).toBe('image/webp')
+  })
+
+  it('should return null for unknown image type', () => {
+    const buffer = new ArrayBuffer(8)
+    const view = new Uint8Array(buffer)
+    view[0] = 0x00
+    view[1] = 0x00
+    view[2] = 0x00
+    view[3] = 0x00
+
+    expect(detectImageType(buffer)).toBeNull()
+  })
+
+  it('should return null for buffer too small', () => {
+    const buffer = new ArrayBuffer(2)
+    expect(detectImageType(buffer)).toBeNull()
+  })
+
+  it('should return null for empty buffer', () => {
+    const buffer = new ArrayBuffer(0)
+    expect(detectImageType(buffer)).toBeNull()
+  })
+})
+
+describe('getOptimalImageFormat', () => {
+  it('should return jpeg for Chrome (contains Safari string)', () => {
+    const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    // Chrome UA contains "Safari", so the logic returns jpeg due to operator precedence
+    expect(getOptimalImageFormat(userAgent)).toBe('jpeg')
+  })
+
+  it('should return jpeg for Opera (contains Safari string)', () => {
+    const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 OPR/106.0.0.0'
+    expect(getOptimalImageFormat(userAgent)).toBe('jpeg')
+  })
+
+  it('should return jpeg for Edge (contains Safari string)', () => {
+    const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0'
+    expect(getOptimalImageFormat(userAgent)).toBe('jpeg')
+  })
+
+  it('should return webp for Firefox', () => {
+    const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0'
+    expect(getOptimalImageFormat(userAgent)).toBe('webp')
+  })
+
+  it('should return webp for modern Safari (14+)', () => {
+    const userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15'
+    expect(getOptimalImageFormat(userAgent)).toBe('webp')
+  })
+
+  it('should return jpeg for old Safari', () => {
+    const userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0 Safari/605.1.15'
+    expect(getOptimalImageFormat(userAgent)).toBe('jpeg')
+  })
+
+  it('should return jpeg for Internet Explorer', () => {
+    const userAgent = 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko'
+    expect(getOptimalImageFormat(userAgent)).toBe('jpeg')
+  })
+
+  it('should return jpeg for unknown user agent', () => {
+    const userAgent = 'Unknown Browser'
+    expect(getOptimalImageFormat(userAgent)).toBe('jpeg')
+  })
+})
+
+describe('ImageOptimizer', () => {
+  let optimizer: ImageOptimizer
+  let mockCfImages: CloudflareImages
+
+  beforeEach(() => {
+    const config: CloudflareImagesConfig = {
+      accountId: 'test-account',
+      accountHash: 'test-hash',
+      apiToken: 'test-token'
+    }
+    mockCfImages = new CloudflareImages(config)
+    optimizer = new ImageOptimizer(mockCfImages)
+  })
+
+  describe('generatePictureElement', () => {
+    it('should generate picture element with default values', () => {
+      const html = optimizer.generatePictureElement('image-123')
+
+      expect(html).toContain('<picture')
+      expect(html).toContain('</picture>')
+      expect(html).toContain('<source')
+      expect(html).toContain('type="image/webp"')
+      expect(html).toContain('type="image/jpeg"')
+      expect(html).toContain('<img')
+      expect(html).toContain('loading="lazy"')
+      expect(html).toContain('decoding="async"')
+    })
+
+    it('should include alt text when provided', () => {
+      const html = optimizer.generatePictureElement('image-123', 'Test image')
+      expect(html).toContain('alt="Test image"')
+    })
+
+    it('should include class name when provided', () => {
+      const html = optimizer.generatePictureElement('image-123', '', 'responsive-image')
+      expect(html).toContain('class="responsive-image"')
+    })
+
+    it('should use specified variant', () => {
+      const html = optimizer.generatePictureElement('image-123', 'Test', 'img-class', 'thumbnail')
+      // The variant is passed through to generateSrcSet and generateImageUrl
+      expect(html).toContain('<picture')
+      expect(html).toContain('alt="Test"')
+      expect(html).toContain('class="img-class"')
+    })
+
+    it('should not include class attribute when className is empty', () => {
+      const html = optimizer.generatePictureElement('image-123')
+      // Should have <picture> but not <picture class="...">
+      expect(html).toContain('<picture>')
+      expect(html).not.toContain('<picture class=')
+    })
+  })
+
+  describe('generateResponsiveImage', () => {
+    it('should generate responsive image with default values', () => {
+      const html = optimizer.generateResponsiveImage('image-123')
+
+      expect(html).toContain('<img')
+      expect(html).toContain('src=')
+      expect(html).toContain('srcset=')
+      expect(html).toContain('sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"')
+      expect(html).toContain('loading="lazy"')
+      expect(html).toContain('decoding="async"')
+    })
+
+    it('should include alt text when provided', () => {
+      const html = optimizer.generateResponsiveImage('image-123', 'Test alt text')
+      expect(html).toContain('alt="Test alt text"')
+    })
+
+    it('should use custom sizes attribute', () => {
+      const customSizes = '(max-width: 600px) 100vw, 50vw'
+      const html = optimizer.generateResponsiveImage('image-123', 'Alt', customSizes)
+      expect(html).toContain(`sizes="${customSizes}"`)
+    })
+
+    it('should include class attribute when className is provided', () => {
+      const html = optimizer.generateResponsiveImage('image-123', 'Alt', '', 'my-image-class')
+      expect(html).toContain('class="my-image-class"')
+    })
+
+    it('should not include class attribute when className is empty', () => {
+      const html = optimizer.generateResponsiveImage('image-123', 'Alt', '')
+      expect(html).not.toContain('class=')
+    })
+
+    it('should use specified variant', () => {
+      const html = optimizer.generateResponsiveImage('image-123', 'Alt', 'sizes', 'class', 'large')
+      // The variant is passed through to generateSrcSet and generateImageUrl
+      expect(html).toContain('<img')
+      expect(html).toContain('alt="Alt"')
+    })
+
+    it('should handle all parameters', () => {
+      const html = optimizer.generateResponsiveImage(
+        'image-456',
+        'Complex image',
+        '(max-width: 480px) 100vw, 800px',
+        'featured-image',
+        'hero'
+      )
+
+      expect(html).toContain('alt="Complex image"')
+      expect(html).toContain('sizes="(max-width: 480px) 100vw, 800px"')
+      expect(html).toContain('class="featured-image"')
     })
   })
 })

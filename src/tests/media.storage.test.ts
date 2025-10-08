@@ -10,6 +10,7 @@ import {
   getFileCategory,
   formatFileSize,
   getMediaConfigByType,
+  generateThumbnail,
   MEDIA_CONFIG,
   MEDIA_FOLDERS,
   SUPPORTED_FILE_TYPES
@@ -549,6 +550,14 @@ describe('CloudflareImagesManager', () => {
       expect(result.success).toBe(false)
       expect(result.error).toBe('Delete failed')
     })
+
+    it('should handle network errors during delete', async () => {
+      fetchMock.mockRejectedValue(new Error('Network error'))
+
+      const result = await manager.deleteImage('image-123')
+      expect(result.success).toBe(false)
+      expect(result.error).toBe('Network error')
+    })
   })
 
   describe('generateImageUrl', () => {
@@ -617,5 +626,258 @@ describe('SUPPORTED_FILE_TYPES', () => {
 
   it('should define supported audio types', () => {
     expect(SUPPORTED_FILE_TYPES.audio).toContain('audio/mpeg')
+  })
+})
+
+describe('generateThumbnail', () => {
+  // Mock browser APIs that aren't available in Node
+  let mockCanvas: any
+  let mockContext: any
+  let mockImage: any
+  let originalCreateElement: any
+  let originalImage: any
+  let originalURL: any
+
+  beforeEach(() => {
+    // Mock canvas context
+    mockContext = {
+      drawImage: vi.fn()
+    }
+
+    // Mock canvas
+    mockCanvas = {
+      width: 0,
+      height: 0,
+      getContext: vi.fn().mockReturnValue(mockContext),
+      toBlob: vi.fn()
+    }
+
+    // Mock Image constructor
+    mockImage = {
+      width: 0,
+      height: 0,
+      src: '',
+      onload: null,
+      onerror: null
+    }
+
+    // Mock document.createElement
+    originalCreateElement = global.document?.createElement
+    if (!global.document) {
+      global.document = {} as any
+    }
+    global.document.createElement = vi.fn().mockReturnValue(mockCanvas)
+
+    // Mock Image constructor
+    originalImage = global.Image
+    global.Image = vi.fn().mockImplementation(() => mockImage)
+
+    // Mock URL.createObjectURL
+    originalURL = global.URL
+    global.URL = {
+      createObjectURL: vi.fn().mockReturnValue('blob:mock-url')
+    } as any
+  })
+
+  afterEach(() => {
+    // Restore original implementations
+    if (originalCreateElement) {
+      global.document.createElement = originalCreateElement
+    }
+    if (originalImage) {
+      global.Image = originalImage
+    }
+    if (originalURL) {
+      global.URL = originalURL
+    }
+  })
+
+  it('should return null for non-image files', async () => {
+    const file = new File(['content'], 'test.pdf', { type: 'application/pdf' })
+    const result = await generateThumbnail(file)
+    expect(result).toBeNull()
+  })
+
+  it('should generate thumbnail for image file (landscape)', async () => {
+    const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' })
+    const mockBlob = new Blob(['thumbnail'], { type: 'image/jpeg' })
+
+    // Simulate image loading with landscape dimensions
+    const promise = generateThumbnail(file, 300, 300)
+
+    // Trigger image load
+    mockImage.width = 800
+    mockImage.height = 600
+    mockImage.onload()
+
+    // Trigger toBlob callback
+    expect(mockCanvas.toBlob).toHaveBeenCalled()
+    const toBlobCallback = mockCanvas.toBlob.mock.calls[0][0]
+    toBlobCallback(mockBlob)
+
+    const result = await promise
+    expect(result).toBe(mockBlob)
+  })
+
+  it('should generate thumbnail for image file (portrait)', async () => {
+    const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' })
+    const mockBlob = new Blob(['thumbnail'], { type: 'image/jpeg' })
+
+    // Simulate image loading with portrait dimensions
+    const promise = generateThumbnail(file, 300, 300)
+
+    // Trigger image load with portrait orientation
+    mockImage.width = 600
+    mockImage.height = 800
+    mockImage.onload()
+
+    // Trigger toBlob callback
+    const toBlobCallback = mockCanvas.toBlob.mock.calls[0][0]
+    toBlobCallback(mockBlob)
+
+    const result = await promise
+    expect(result).toBe(mockBlob)
+  })
+
+  it('should handle image load errors', async () => {
+    const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' })
+
+    // Simulate image loading
+    const promise = generateThumbnail(file)
+
+    // Trigger image error
+    mockImage.onerror()
+
+    const result = await promise
+    expect(result).toBeNull()
+  })
+
+  it('should handle null blob from toBlob', async () => {
+    const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' })
+
+    // Simulate image loading
+    const promise = generateThumbnail(file)
+
+    // Trigger image load
+    mockImage.width = 800
+    mockImage.height = 600
+    mockImage.onload()
+
+    // Trigger toBlob callback with null
+    const toBlobCallback = mockCanvas.toBlob.mock.calls[0][0]
+    toBlobCallback(null)
+
+    const result = await promise
+    expect(result).toBeNull()
+  })
+
+  it('should scale down large landscape images', async () => {
+    const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' })
+    const mockBlob = new Blob(['thumbnail'], { type: 'image/jpeg' })
+
+    const promise = generateThumbnail(file, 300, 300)
+
+    // Large landscape image
+    mockImage.width = 1920
+    mockImage.height = 1080
+    mockImage.onload()
+
+    const toBlobCallback = mockCanvas.toBlob.mock.calls[0][0]
+    toBlobCallback(mockBlob)
+
+    await promise
+
+    // Check that canvas was resized (width should be 300, height proportional)
+    expect(mockCanvas.width).toBe(300)
+    expect(mockCanvas.height).toBeCloseTo(168.75, 0)
+  })
+
+  it('should scale down large portrait images', async () => {
+    const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' })
+    const mockBlob = new Blob(['thumbnail'], { type: 'image/jpeg' })
+
+    const promise = generateThumbnail(file, 300, 300)
+
+    // Large portrait image
+    mockImage.width = 1080
+    mockImage.height = 1920
+    mockImage.onload()
+
+    const toBlobCallback = mockCanvas.toBlob.mock.calls[0][0]
+    toBlobCallback(mockBlob)
+
+    await promise
+
+    // Check that canvas was resized (height should be 300, width proportional)
+    expect(mockCanvas.height).toBe(300)
+    expect(mockCanvas.width).toBeCloseTo(168.75, 0)
+  })
+
+  it('should handle images smaller than max dimensions', async () => {
+    const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' })
+    const mockBlob = new Blob(['thumbnail'], { type: 'image/jpeg' })
+
+    const promise = generateThumbnail(file, 300, 300)
+
+    // Small image that doesn't need resizing
+    mockImage.width = 200
+    mockImage.height = 150
+    mockImage.onload()
+
+    const toBlobCallback = mockCanvas.toBlob.mock.calls[0][0]
+    toBlobCallback(mockBlob)
+
+    await promise
+
+    // Should keep original dimensions
+    expect(mockCanvas.width).toBe(200)
+    expect(mockCanvas.height).toBe(150)
+  })
+
+  it('should use canvas context to draw image', async () => {
+    const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' })
+    const mockBlob = new Blob(['thumbnail'], { type: 'image/jpeg' })
+
+    const promise = generateThumbnail(file, 300, 300)
+
+    mockImage.width = 800
+    mockImage.height = 600
+    mockImage.onload()
+
+    const toBlobCallback = mockCanvas.toBlob.mock.calls[0][0]
+    toBlobCallback(mockBlob)
+
+    await promise
+
+    // Verify drawImage was called
+    expect(mockContext.drawImage).toHaveBeenCalledWith(
+      mockImage,
+      0,
+      0,
+      300,
+      225
+    )
+  })
+
+  it('should handle missing canvas context', async () => {
+    const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' })
+    const mockBlob = new Blob(['thumbnail'], { type: 'image/jpeg' })
+
+    // Mock canvas with null context
+    mockCanvas.getContext = vi.fn().mockReturnValue(null)
+
+    const promise = generateThumbnail(file, 300, 300)
+
+    mockImage.width = 800
+    mockImage.height = 600
+    mockImage.onload()
+
+    const toBlobCallback = mockCanvas.toBlob.mock.calls[0][0]
+    toBlobCallback(mockBlob)
+
+    await promise
+
+    // Should not call drawImage when context is null
+    expect(mockContext.drawImage).not.toHaveBeenCalled()
   })
 })
