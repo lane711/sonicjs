@@ -5,6 +5,7 @@ import { cors } from 'hono/cors'
 // import { APIGenerator } from '../utils/api-generator'
 import { schemaDefinitions } from '../schemas'
 import { getCacheService, CACHE_CONFIGS } from '../plugins/cache'
+import { QueryFilterBuilder, QueryFilter } from '../utils/query-filter'
 
 type Bindings = {
   DB: D1Database
@@ -437,17 +438,38 @@ apiRoutes.get('/collections', async (c) => {
   }
 })
 
-// Basic content endpoint
+// Basic content endpoint with advanced filtering
 apiRoutes.get('/content', async (c) => {
   const executionStart = Date.now()
 
   try {
     const db = c.env.DB
-    const limit = Math.min(parseInt(c.req.query('limit') || '50'), 100)
+    const queryParams = c.req.query()
 
-    // Use cache for API content list
+    // Parse filter from query parameters
+    const filter: QueryFilter = QueryFilterBuilder.parseFromQuery(queryParams)
+
+    // Set default limit if not provided
+    if (!filter.limit) {
+      filter.limit = 50
+    }
+    filter.limit = Math.min(filter.limit, 1000) // Max 1000
+
+    // Build SQL query from filter
+    const builder = new QueryFilterBuilder()
+    const queryResult = builder.build('content', filter)
+
+    // Check for query building errors
+    if (queryResult.errors.length > 0) {
+      return c.json({
+        error: 'Invalid filter parameters',
+        details: queryResult.errors
+      }, 400)
+    }
+
+    // Generate cache key based on query
     const cache = getCacheService(CACHE_CONFIGS.api!)
-    const cacheKey = cache.generateKey('content-list', `limit:${limit}`)
+    const cacheKey = cache.generateKey('content-filtered', JSON.stringify({ filter, query: queryResult.sql }))
 
     const cacheResult = await cache.getWithSource<any>(cacheKey)
     if (cacheResult.hit && cacheResult.data) {
@@ -478,9 +500,13 @@ apiRoutes.get('/content', async (c) => {
     c.header('X-Cache-Status', 'MISS')
     c.header('X-Cache-Source', 'database')
 
-    // Fetch from database
-    const stmt = db.prepare(`SELECT * FROM content ORDER BY created_at DESC LIMIT ${limit}`)
-    const { results } = await stmt.all()
+    // Execute query with parameters
+    const stmt = db.prepare(queryResult.sql)
+    const boundStmt = queryResult.params.length > 0
+      ? stmt.bind(...queryResult.params)
+      : stmt
+
+    const { results } = await boundStmt.all()
 
     // Transform results to match API spec (camelCase)
     const transformedResults = results.map((row: any) => ({
@@ -499,6 +525,11 @@ apiRoutes.get('/content', async (c) => {
       meta: addTimingMeta(c, {
         count: results.length,
         timestamp: new Date().toISOString(),
+        filter: filter,
+        query: {
+          sql: queryResult.sql,
+          params: queryResult.params
+        },
         cache: {
           hit: false,
           source: 'database'
@@ -512,22 +543,70 @@ apiRoutes.get('/content', async (c) => {
     return c.json(responseData)
   } catch (error) {
     console.error('Error fetching content:', error)
-    return c.json({ error: 'Failed to fetch content' }, 500)
+    return c.json({
+      error: 'Failed to fetch content',
+      details: error instanceof Error ? error.message : String(error)
+    }, 500)
   }
 })
 
-// Legacy collection-specific routes for backward compatibility
+// Collection-specific routes with advanced filtering
 apiRoutes.get('/collections/:collection/content', async (c) => {
   const executionStart = Date.now()
 
   try {
     const collection = c.req.param('collection')
     const db = c.env.DB
-    const limit = Math.min(parseInt(c.req.query('limit') || '50'), 100)
+    const queryParams = c.req.query()
 
-    // Use cache for collection-specific content
+    // First check if collection exists
+    const collectionStmt = db.prepare('SELECT * FROM collections WHERE name = ? AND is_active = 1')
+    const collectionResult = await collectionStmt.bind(collection).first()
+
+    if (!collectionResult) {
+      return c.json({ error: 'Collection not found' }, 404)
+    }
+
+    // Parse filter from query parameters
+    const filter: QueryFilter = QueryFilterBuilder.parseFromQuery(queryParams)
+
+    // Add collection_id filter to where clause
+    if (!filter.where) {
+      filter.where = { and: [] }
+    }
+
+    if (!filter.where.and) {
+      filter.where.and = []
+    }
+
+    // Add collection filter
+    filter.where.and.push({
+      field: 'collection_id',
+      operator: 'equals',
+      value: collectionResult.id
+    })
+
+    // Set default limit if not provided
+    if (!filter.limit) {
+      filter.limit = 50
+    }
+    filter.limit = Math.min(filter.limit, 1000)
+
+    // Build SQL query from filter
+    const builder = new QueryFilterBuilder()
+    const queryResult = builder.build('content', filter)
+
+    // Check for query building errors
+    if (queryResult.errors.length > 0) {
+      return c.json({
+        error: 'Invalid filter parameters',
+        details: queryResult.errors
+      }, 400)
+    }
+
+    // Generate cache key
     const cache = getCacheService(CACHE_CONFIGS.api!)
-    const cacheKey = cache.generateKey('collection-content', `${collection}:limit:${limit}`)
+    const cacheKey = cache.generateKey('collection-content-filtered', `${collection}:${JSON.stringify({ filter, query: queryResult.sql })}`)
 
     const cacheResult = await cache.getWithSource<any>(cacheKey)
     if (cacheResult.hit && cacheResult.data) {
@@ -558,17 +637,13 @@ apiRoutes.get('/collections/:collection/content', async (c) => {
     c.header('X-Cache-Status', 'MISS')
     c.header('X-Cache-Source', 'database')
 
-    // First check if collection exists
-    const collectionStmt = db.prepare('SELECT * FROM collections WHERE name = ? AND is_active = 1')
-    const collectionResult = await collectionStmt.bind(collection).first()
+    // Execute query with parameters
+    const stmt = db.prepare(queryResult.sql)
+    const boundStmt = queryResult.params.length > 0
+      ? stmt.bind(...queryResult.params)
+      : stmt
 
-    if (!collectionResult) {
-      return c.json({ error: 'Collection not found' }, 404)
-    }
-
-    // Get content for this collection
-    const contentStmt = db.prepare(`SELECT * FROM content WHERE collection_id = ? ORDER BY created_at DESC LIMIT ${limit}`)
-    const { results } = await contentStmt.bind(collectionResult.id).all()
+    const { results } = await boundStmt.all()
 
     // Transform results to match API spec (camelCase)
     const transformedResults = results.map((row: any) => ({
@@ -591,6 +666,11 @@ apiRoutes.get('/collections/:collection/content', async (c) => {
         },
         count: results.length,
         timestamp: new Date().toISOString(),
+        filter: filter,
+        query: {
+          sql: queryResult.sql,
+          params: queryResult.params
+        },
         cache: {
           hit: false,
           source: 'database'
@@ -604,6 +684,9 @@ apiRoutes.get('/collections/:collection/content', async (c) => {
     return c.json(responseData)
   } catch (error) {
     console.error('Error fetching content:', error)
-    return c.json({ error: 'Failed to fetch content' }, 500)
+    return c.json({
+      error: 'Failed to fetch content',
+      details: error instanceof Error ? error.message : String(error)
+    }, 500)
   }
 })

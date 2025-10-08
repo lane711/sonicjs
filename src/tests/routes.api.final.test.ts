@@ -132,6 +132,7 @@ describe('API Routes - Final Working Tests', () => {
       ]
 
       const mockPrepare = vi.fn().mockReturnValue({
+        bind: vi.fn().mockReturnThis(),
         all: vi.fn().mockResolvedValue({ results: mockResults })
       })
       

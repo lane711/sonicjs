@@ -197,8 +197,8 @@ describe('API Routes', () => {
       const data = await res.json()
       
       expect(res.status).toBe(200)
-      expect(mockEnv.DB.prepare).toHaveBeenCalledWith('SELECT * FROM content ORDER BY created_at DESC LIMIT 50')
-      
+      expect(mockEnv.DB.prepare).toHaveBeenCalledWith('SELECT * FROM content LIMIT ?')
+
       expect(data.data).toHaveLength(2)
       expect(data.data[0].collectionId).toBe('col1') // camelCase transformation
       expect(data.data[0].data).toEqual({ content: 'Hello world' }) // JSON parsing
@@ -281,7 +281,7 @@ describe('API Routes', () => {
       
       expect(res.status).toBe(200)
       expect(mockEnv.DB.prepare).toHaveBeenCalledWith('SELECT * FROM collections WHERE name = ? AND is_active = 1')
-      expect(mockEnv.DB.prepare).toHaveBeenCalledWith('SELECT * FROM content WHERE collection_id = ? ORDER BY created_at DESC LIMIT 50')
+      expect(mockEnv.DB.prepare).toHaveBeenCalledWith('SELECT * FROM content WHERE (collection_id = ?) LIMIT ?')
       
       expect(data.data).toHaveLength(1)
       expect(data.data[0].collectionId).toBe('col1')
