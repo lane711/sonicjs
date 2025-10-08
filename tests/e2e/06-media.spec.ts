@@ -114,10 +114,10 @@ test.describe('Media Management', () => {
   test('should close upload modal', async ({ page }) => {
     // Click the first Upload Files button (the one in the sidebar)
     await page.locator('button').filter({ hasText: 'Upload Files' }).first().click();
-    
-    // Close modal using the Cancel button
-    await page.locator('button').filter({ hasText: 'Cancel' }).click();
-    
+
+    // Close modal using the Cancel button within the upload modal
+    await page.locator('#upload-modal button').filter({ hasText: 'Cancel' }).click();
+
     await expect(page.locator('#upload-modal')).not.toBeVisible();
   });
 
@@ -136,9 +136,71 @@ test.describe('Media Management', () => {
     // If no media files exist, should show appropriate message
     const mediaGrid = page.locator('#media-grid');
     const mediaItems = page.locator('.media-item');
-    
+
     if (await mediaItems.count() === 0) {
       await expect(page.getByText('No media files')).toBeVisible();
+    }
+  });
+
+  test('should display media list view correctly', async ({ page }) => {
+    // Verify media grid is visible
+    const mediaGrid = page.locator('#media-grid');
+    await expect(mediaGrid).toBeVisible();
+
+    // Check if media items are rendered
+    const mediaItems = page.locator('.media-item');
+    const itemCount = await mediaItems.count();
+
+    if (itemCount > 0) {
+      // Verify first item has expected elements
+      const firstItem = mediaItems.first();
+
+      // Should have an image or file icon (check if either exists)
+      const hasImage = await firstItem.locator('img').count() > 0;
+      const hasSvg = await firstItem.locator('svg').count() > 0;
+      expect(hasImage || hasSvg).toBeTruthy();
+
+      // Should be clickable
+      await expect(firstItem).toBeVisible();
+
+      // Test list view toggle if available
+      const viewToggle = page.locator('button[data-view="list"], button:has-text("List View")');
+      if (await viewToggle.count() > 0) {
+        await viewToggle.click();
+        await page.waitForTimeout(500);
+
+        // Verify list view is active
+        const listItems = page.locator('.media-list-item, [data-view-type="list"] .media-item');
+        if (await listItems.count() > 0) {
+          await expect(listItems.first()).toBeVisible();
+        }
+      }
+    } else {
+      // If no items, that's also valid - should show empty state
+      await expect(page.getByText(/No media files|Upload your first file/i)).toBeVisible();
+    }
+  });
+
+  test('should handle media pagination', async ({ page }) => {
+    // Check if pagination controls exist
+    const nextButton = page.locator('button:has-text("Next"), a:has-text("Next"), [aria-label="Next page"]');
+    const prevButton = page.locator('button:has-text("Previous"), a:has-text("Previous"), [aria-label="Previous page"]');
+
+    if (await nextButton.count() > 0) {
+      const isEnabled = await nextButton.isEnabled().catch(() => false);
+
+      if (isEnabled) {
+        // Get current media items
+        const initialItems = await page.locator('.media-item').count();
+
+        // Click next page
+        await nextButton.click();
+        await page.waitForTimeout(1000);
+
+        // Should still have media items (count may change based on available items)
+        const newItems = await page.locator('.media-item').count();
+        expect(newItems).toBeGreaterThan(0);
+      }
     }
   });
 }); 

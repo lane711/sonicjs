@@ -12,7 +12,7 @@ async function globalTeardown(config: FullConfig) {
 
   try {
     // Get the base URL from the config
-    const baseURL = config.projects[0].use.baseURL || 'http://localhost:8788';
+    const baseURL = config.projects[0].use.baseURL || 'http://localhost:8787';
 
     // Call the cleanup endpoint (public, no auth required)
     const response = await page.request.post(`${baseURL}/test-cleanup`, {

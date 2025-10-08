@@ -203,7 +203,7 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
                         id="bulk-actions-btn"
                         class="inline-flex items-center gap-x-1.5 px-3 py-1.5 bg-zinc-100/60 dark:bg-zinc-800/60 backdrop-blur-sm text-zinc-400 dark:text-zinc-600 text-sm font-medium rounded-full ring-1 ring-inset ring-zinc-200/50 dark:ring-zinc-700/50 cursor-not-allowed"
                         disabled
-                        onclick="event.stopPropagation(); toggleBulkActionsDropdown()"
+                        onclick="toggleBulkActionsDropdown()"
                       >
                         Bulk Actions
                         <svg viewBox="0 0 20 20" fill="currentColor" class="size-4">

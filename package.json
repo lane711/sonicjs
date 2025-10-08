@@ -3,7 +3,7 @@
   "version": "2.0.0-alpha.5",
   "private": true,
   "scripts": {
-    "dev": "wrangler dev",
+    "dev": "wrangler dev 2>&1 | grep -v '/admin/api/metrics'",
     "build": "tsc && wrangler deploy --dry-run",
     "predeploy": "npm test && npm run build",
     "deploy": "wrangler deploy",

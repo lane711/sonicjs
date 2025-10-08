@@ -269,14 +269,12 @@ adminRoutes.get('/api/storage', async (c) => {
   try {
     const db = c.env.DB
 
-    // Get database size (page_count * page_size)
+    // Get database size from D1Result metadata
     let databaseSize = 0
     try {
-      const pageSizeResult = await db.prepare('PRAGMA page_size').first()
-      const pageCountResult = await db.prepare('PRAGMA page_count').first()
-      const pageSize = (pageSizeResult as any)?.page_size || 0
-      const pageCount = (pageCountResult as any)?.page_count || 0
-      databaseSize = pageSize * pageCount
+      // Run a lightweight query to get database size from meta.size_after
+      const result = await db.prepare('SELECT 1').run()
+      databaseSize = (result as any)?.meta?.size_after || 0
     } catch (error) {
       console.error('Error fetching database size:', error)
     }

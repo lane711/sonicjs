@@ -3,6 +3,9 @@ main = "src/index.ts"
 compatibility_date = "2024-06-01"
 compatibility_flags = ["nodejs_compat"]
 
+[dev]
+port = 8787
+
 [build]
 command = ""
 

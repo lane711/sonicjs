@@ -446,10 +446,17 @@ function renderAnalyticsChart(): string {
               }
 
               // Add new data point to chart
-              chart.data.labels.shift();
-              chart.data.labels.push('now');
               chart.data.datasets[0].data.shift();
               chart.data.datasets[0].data.push(metrics.requestsPerSecond);
+
+              // Regenerate labels to maintain -60s to now format
+              const newLabels = [];
+              for (let i = maxDataPoints - 1; i >= 1; i--) {
+                newLabels.push(\`-\${i}s\`);
+              }
+              newLabels.push('now');
+              chart.data.labels = newLabels;
+
               chart.update('none'); // Update without animation for smoother real-time updates
             } catch (e) {
               console.error('Error updating metrics:', e);
