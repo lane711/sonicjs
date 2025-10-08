@@ -149,7 +149,7 @@ export function renderContentListPage(data: ContentListPageData): string {
             title="Edit"
           >
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
             </svg>
           </button>
           <button
@@ -384,11 +384,13 @@ export function renderContentListPage(data: ContentListPageData): string {
                 ${filterBarData.bulkActions && filterBarData.bulkActions.length > 0 ? `
                   <div class="relative inline-block" id="bulk-actions-dropdown">
                     <button
+                      id="bulk-actions-btn"
                       onclick="toggleBulkActionsDropdown()"
-                      class="inline-flex items-center gap-x-1.5 px-3 py-1.5 bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm text-zinc-950 dark:text-white text-sm font-medium rounded-full ring-1 ring-inset ring-cyan-200/50 dark:ring-cyan-700/50 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 dark:hover:from-cyan-900/30 dark:hover:to-blue-900/30 hover:ring-cyan-300 dark:hover:ring-cyan-600 transition-all duration-200"
+                      class="inline-flex items-center gap-x-1.5 px-3 py-1.5 bg-zinc-100/60 dark:bg-zinc-800/60 backdrop-blur-sm text-zinc-400 dark:text-zinc-600 text-sm font-medium rounded-full ring-1 ring-inset ring-zinc-200/50 dark:ring-zinc-700/50 cursor-not-allowed"
+                      disabled
                     >
                       Bulk Actions
-                      <svg viewBox="0 0 20 20" fill="currentColor" class="size-4 text-zinc-500 dark:text-zinc-400">
+                      <svg viewBox="0 0 20 20" fill="currentColor" class="size-4">
                         <path d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
                       </svg>
                     </button>
@@ -452,16 +454,52 @@ export function renderContentListPage(data: ContentListPageData): string {
     <div id="versions-modal"></div>
     
     <script>
+      // Update bulk actions button state
+      function updateBulkActionsButton() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"].row-checkbox');
+        const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+        const btn = document.getElementById('bulk-actions-btn');
+        const menu = document.getElementById('bulk-actions-menu');
+
+        if (!btn) return;
+
+        if (checkedCount > 0) {
+          btn.disabled = false;
+          btn.className = 'inline-flex items-center gap-x-1.5 px-3 py-1.5 bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm text-zinc-950 dark:text-white text-sm font-medium rounded-full ring-1 ring-inset ring-cyan-200/50 dark:ring-cyan-700/50 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 dark:hover:from-cyan-900/30 dark:hover:to-blue-900/30 hover:ring-cyan-300 dark:hover:ring-cyan-600 transition-all duration-200';
+        } else {
+          btn.disabled = true;
+          btn.className = 'inline-flex items-center gap-x-1.5 px-3 py-1.5 bg-zinc-100/60 dark:bg-zinc-800/60 backdrop-blur-sm text-zinc-400 dark:text-zinc-600 text-sm font-medium rounded-full ring-1 ring-inset ring-zinc-200/50 dark:ring-zinc-700/50 cursor-not-allowed';
+          // Hide menu when no items selected
+          if (menu) {
+            menu.classList.remove('scale-100', 'opacity-100');
+            menu.classList.add('scale-95', 'opacity-0', 'hidden');
+          }
+        }
+      }
+
       // Select all functionality
       document.addEventListener('change', function(e) {
         if (e.target.id === 'select-all') {
           const checkboxes = document.querySelectorAll('.row-checkbox');
           checkboxes.forEach(cb => cb.checked = e.target.checked);
+          updateBulkActionsButton();
+        } else if (e.target.classList.contains('row-checkbox')) {
+          updateBulkActionsButton();
         }
+      });
+
+      // Initialize button state on page load
+      document.addEventListener('DOMContentLoaded', function() {
+        updateBulkActionsButton();
       });
 
       // Toggle bulk actions dropdown
       function toggleBulkActionsDropdown() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"].row-checkbox');
+        const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+
+        if (checkedCount === 0) return;
+
         const menu = document.getElementById('bulk-actions-menu');
         const isHidden = menu.classList.contains('hidden');
 

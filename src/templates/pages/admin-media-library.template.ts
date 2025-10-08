@@ -1,34 +1,40 @@
-import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
-import { renderMediaGrid, MediaFile, MediaGridData } from '../components/media-grid.template'
-import { renderConfirmationDialog, getConfirmationDialogScript } from '../components/confirmation-dialog.template'
+import {
+  getConfirmationDialogScript,
+  renderConfirmationDialog,
+} from "../components/confirmation-dialog.template";
+import { MediaFile, renderMediaGrid } from "../components/media-grid.template";
+import {
+  AdminLayoutCatalystData,
+  renderAdminLayoutCatalyst,
+} from "../layouts/admin-layout-catalyst.template";
 
 export interface FolderStats {
-  folder: string
-  count: number
-  totalSize: number
+  folder: string;
+  count: number;
+  totalSize: number;
 }
 
 export interface TypeStats {
-  type: string
-  count: number
+  type: string;
+  count: number;
 }
 
 export interface MediaLibraryPageData {
-  files: MediaFile[]
-  folders: FolderStats[]
-  types: TypeStats[]
-  currentFolder: string
-  currentType: string
-  currentView: 'grid' | 'list'
-  currentPage: number
-  totalFiles: number
-  hasNextPage: boolean
+  files: MediaFile[];
+  folders: FolderStats[];
+  types: TypeStats[];
+  currentFolder: string;
+  currentType: string;
+  currentView: "grid" | "list";
+  currentPage: number;
+  totalFiles: number;
+  hasNextPage: boolean;
   user?: {
-    name: string
-    email: string
-    role: string
-  }
-  version?: string
+    name: string;
+    email: string;
+    role: string;
+  };
+  version?: string;
 }
 
 export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
@@ -73,18 +79,30 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
               <ul class="space-y-1">
                 <li>
                   <a href="/admin/media?folder=all"
-                     class="block px-3 py-2 text-sm rounded-lg transition-colors ${data.currentFolder === 'all' ? 'bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-medium' : 'text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50'}">
+                     class="block px-3 py-2 text-sm rounded-lg transition-colors ${
+                       data.currentFolder === "all"
+                         ? "bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-medium"
+                         : "text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                     }">
                     All Files (${data.totalFiles})
                   </a>
                 </li>
-                ${data.folders.map(folder => `
+                ${data.folders
+                  .map(
+                    (folder) => `
                   <li>
                     <a href="/admin/media?folder=${folder.folder}"
-                       class="block px-3 py-2 text-sm rounded-lg transition-colors ${data.currentFolder === folder.folder ? 'bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-medium' : 'text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50'}">
+                       class="block px-3 py-2 text-sm rounded-lg transition-colors ${
+                         data.currentFolder === folder.folder
+                           ? "bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-medium"
+                           : "text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                       }">
                       ${folder.folder} (${folder.count})
                     </a>
                   </li>
-                `).join('')}
+                `
+                  )
+                  .join("")}
               </ul>
             </div>
 
@@ -94,18 +112,32 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
               <ul class="space-y-1">
                 <li>
                   <a href="/admin/media?type=all"
-                     class="block px-3 py-2 text-sm rounded-lg transition-colors ${data.currentType === 'all' ? 'bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-medium' : 'text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50'}">
+                     class="block px-3 py-2 text-sm rounded-lg transition-colors ${
+                       data.currentType === "all"
+                         ? "bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-medium"
+                         : "text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                     }">
                     All Types
                   </a>
                 </li>
-                ${data.types.map(type => `
+                ${data.types
+                  .map(
+                    (type) => `
                   <li>
                     <a href="/admin/media?type=${type.type}"
-                       class="block px-3 py-2 text-sm rounded-lg transition-colors ${data.currentType === type.type ? 'bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-medium' : 'text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50'}">
-                      ${type.type.charAt(0).toUpperCase() + type.type.slice(1)} (${type.count})
+                       class="block px-3 py-2 text-sm rounded-lg transition-colors ${
+                         data.currentType === type.type
+                           ? "bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-medium"
+                           : "text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                       }">
+                      ${
+                        type.type.charAt(0).toUpperCase() + type.type.slice(1)
+                      } (${type.count})
                     </a>
                   </li>
-                `).join('')}
+                `
+                  )
+                  .join("")}
               </ul>
             </div>
 
@@ -131,11 +163,11 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
         <!-- Main Content -->
         <div class="flex-1">
           <!-- Toolbar -->
-          <div class="relative rounded-xl overflow-hidden mb-6">
+          <div class="relative rounded-xl mb-6 z-10">
             <!-- Gradient Background -->
             <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-pink-500/10 to-purple-500/10 dark:from-cyan-400/20 dark:via-pink-400/20 dark:to-purple-400/20"></div>
 
-            <div class="relative bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10">
+            <div class="relative bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10">
               <div class="px-6 py-5">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center space-x-4">
@@ -146,8 +178,12 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
                           class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-cyan-500/30 dark:outline-cyan-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-500 dark:focus-visible:outline-cyan-400 sm:text-sm/6 min-w-32"
                           onchange="window.location.href = updateUrlParam('view', this.value)"
                         >
-                          <option value="grid" ${data.currentView === 'grid' ? 'selected' : ''}>Grid</option>
-                          <option value="list" ${data.currentView === 'list' ? 'selected' : ''}>List</option>
+                          <option value="grid" ${
+                            data.currentView === "grid" ? "selected" : ""
+                          }>Grid</option>
+                          <option value="list" ${
+                            data.currentView === "list" ? "selected" : ""
+                          }>List</option>
                         </select>
                         <svg class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-zinc-500 dark:text-zinc-400 sm:size-4" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
                           <path fill-rule="evenodd" d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
@@ -184,13 +220,19 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
                           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                       </button>
-                      <input type="hidden" name="folder" value="${data.currentFolder}">
-                      <input type="hidden" name="type" value="${data.currentType}">
+                      <input type="hidden" name="folder" value="${
+                        data.currentFolder
+                      }">
+                      <input type="hidden" name="type" value="${
+                        data.currentType
+                      }">
                     </div>
                   </div>
 
                   <div class="flex items-center gap-x-3">
-                    <span class="text-sm/6 font-medium text-zinc-700 dark:text-zinc-300 px-3 py-1.5 rounded-full bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm">${data.files.length} files</span>
+                    <span class="text-sm/6 font-medium text-zinc-700 dark:text-zinc-300 px-3 py-1.5 rounded-full bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm">${
+                      data.files.length
+                    } files</span>
                     <button
                       id="select-all-btn"
                       class="inline-flex items-center gap-x-1.5 px-3 py-1.5 bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm text-zinc-950 dark:text-white text-sm font-medium rounded-full ring-1 ring-inset ring-cyan-200/50 dark:ring-cyan-700/50 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-pink-50 dark:hover:from-cyan-900/30 dark:hover:to-pink-900/30 hover:ring-cyan-300 dark:hover:ring-cyan-600 transition-all duration-200"
@@ -198,12 +240,12 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
                     >
                       Select All
                     </button>
-                    <div class="relative inline-block z-50" id="bulk-actions-dropdown">
+                    <div class="relative inline-block" id="bulk-actions-dropdown">
                       <button
                         id="bulk-actions-btn"
+                        onclick="toggleBulkActionsDropdown()"
                         class="inline-flex items-center gap-x-1.5 px-3 py-1.5 bg-zinc-100/60 dark:bg-zinc-800/60 backdrop-blur-sm text-zinc-400 dark:text-zinc-600 text-sm font-medium rounded-full ring-1 ring-inset ring-zinc-200/50 dark:ring-zinc-700/50 cursor-not-allowed"
                         disabled
-                        onclick="toggleBulkActionsDropdown()"
                       >
                         Bulk Actions
                         <svg viewBox="0 0 20 20" fill="currentColor" class="size-4">
@@ -213,8 +255,8 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
 
                       <div
                         id="bulk-actions-menu"
-                        class="hidden absolute right-0 mt-2 w-56 origin-top-right divide-y divide-zinc-200 dark:divide-white/10 rounded-lg bg-white dark:bg-zinc-900 shadow-xl ring-1 ring-zinc-950/5 dark:ring-white/10 z-50 transition-all duration-100 scale-95 opacity-0"
-                        style="transition-behavior: allow-discrete;"
+                        class="hidden absolute right-0 mt-2 w-56 origin-top-right divide-y divide-zinc-200 dark:divide-white/10 rounded-lg bg-white dark:bg-zinc-900 shadow-xl ring-1 ring-zinc-950/5 dark:ring-white/10 transition-all duration-100 scale-95 opacity-0"
+                        style="transition-behavior: allow-discrete; z-index: 9999;"
                       >
                         <div class="py-1">
                           <button
@@ -246,28 +288,47 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
               files: data.files,
               viewMode: data.currentView,
               selectable: true,
-              emptyMessage: 'No media files found. Upload your first file to get started.'
+              emptyMessage:
+                "No media files found. Upload your first file to get started.",
             })}
           </div>
           
           <!-- Pagination -->
-          ${data.hasNextPage ? `
+          ${
+            data.hasNextPage
+              ? `
             <div class="mt-6 flex justify-center">
               <div class="flex space-x-2">
-                ${data.currentPage > 1 ? `
-                  <a href="${buildPageUrl(data.currentPage - 1, data.currentFolder, data.currentType)}"
+                ${
+                  data.currentPage > 1
+                    ? `
+                  <a href="${buildPageUrl(
+                    data.currentPage - 1,
+                    data.currentFolder,
+                    data.currentType
+                  )}"
                      class="rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
                     Previous
                   </a>
-                ` : ''}
-                <span class="px-3 py-2 text-sm text-zinc-500 dark:text-zinc-400">Page ${data.currentPage}</span>
-                <a href="${buildPageUrl(data.currentPage + 1, data.currentFolder, data.currentType)}"
+                `
+                    : ""
+                }
+                <span class="px-3 py-2 text-sm text-zinc-500 dark:text-zinc-400">Page ${
+                  data.currentPage
+                }</span>
+                <a href="${buildPageUrl(
+                  data.currentPage + 1,
+                  data.currentFolder,
+                  data.currentType
+                )}"
                    class="rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
                   Next
                 </a>
               </div>
             </div>
-          ` : ''}
+          `
+              : ""
+          }
         </div>
       </div>
     </div>
@@ -382,7 +443,11 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
         </p>
 
         <div class="space-y-2 mb-6">
-          ${data.folders.length > 0 ? data.folders.map(folder => `
+          ${
+            data.folders.length > 0
+              ? data.folders
+                  .map(
+                    (folder) => `
             <button
               onclick="performBulkMove('${folder.folder}')"
               class="w-full text-left px-4 py-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-950 dark:text-white transition-colors ring-1 ring-inset ring-zinc-200 dark:ring-zinc-700"
@@ -392,7 +457,11 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
                 <span class="text-sm text-zinc-500 dark:text-zinc-400">${folder.count} files</span>
               </div>
             </button>
-          `).join('') : '<p class="text-sm text-zinc-500 dark:text-zinc-400 text-center py-4">No folders available</p>'}
+          `
+                  )
+                  .join("")
+              : '<p class="text-sm text-zinc-500 dark:text-zinc-400 text-center py-4">No folders available</p>'
+          }
         </div>
 
         <div class="flex justify-end space-x-2">
@@ -474,7 +543,6 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
       }
 
       function toggleBulkActionsDropdown() {
-        if (selectedFiles.size === 0) return;
         const menu = document.getElementById('bulk-actions-menu');
         const isHidden = menu.classList.contains('hidden');
 
@@ -805,36 +873,38 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
 
     <!-- Confirmation Dialog for Bulk Delete -->
     ${renderConfirmationDialog({
-      id: 'media-bulk-delete-confirm',
-      title: 'Delete Selected Files',
-      message: `Are you sure you want to delete ${data.files.length > 0 ? 'the selected files' : 'these files'}? This action cannot be undone and the files will be permanently removed.`,
-      confirmText: 'Delete Files',
-      cancelText: 'Cancel',
-      confirmClass: 'bg-red-500 hover:bg-red-400',
-      iconColor: 'red',
-      onConfirm: 'performBulkDelete()'
+      id: "media-bulk-delete-confirm",
+      title: "Delete Selected Files",
+      message: `Are you sure you want to delete ${
+        data.files.length > 0 ? "the selected files" : "these files"
+      }? This action cannot be undone and the files will be permanently removed.`,
+      confirmText: "Delete Files",
+      cancelText: "Cancel",
+      confirmClass: "bg-red-500 hover:bg-red-400",
+      iconColor: "red",
+      onConfirm: "performBulkDelete()",
     })}
 
     <!-- Confirmation Dialog Script -->
     ${getConfirmationDialogScript()}
-  `
+  `;
 
   function buildPageUrl(page: number, folder: string, type: string): string {
-    const params = new URLSearchParams()
-    params.set('page', page.toString())
-    if (folder !== 'all') params.set('folder', folder)
-    if (type !== 'all') params.set('type', type)
-    return `/admin/media?${params.toString()}`
+    const params = new URLSearchParams();
+    params.set("page", page.toString());
+    if (folder !== "all") params.set("folder", folder);
+    if (type !== "all") params.set("type", type);
+    return `/admin/media?${params.toString()}`;
   }
 
   const layoutData: AdminLayoutCatalystData = {
-    title: 'Media Library',
-    pageTitle: 'Media Library',
-    currentPath: '/admin/media',
+    title: "Media Library",
+    pageTitle: "Media Library",
+    currentPath: "/admin/media",
     user: data.user,
     version: data.version,
-    content: pageContent
-  }
+    content: pageContent,
+  };
 
-  return renderAdminLayoutCatalyst(layoutData)
+  return renderAdminLayoutCatalyst(layoutData);
 }
