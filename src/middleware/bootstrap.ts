@@ -62,12 +62,6 @@ export function bootstrapMiddleware() {
       const needsBootstrap = await bootstrapService.isBootstrapNeeded();
       if (needsBootstrap) {
         await bootstrapService.bootstrapCorePlugins();
-
-        // Optionally install demo plugins
-        // Note: process.env is not available in Cloudflare Workers
-        // You can use a KV flag or environment binding to control this
-        console.log("[Bootstrap] Installing demo plugins...");
-        await bootstrapService.installDemoPlugins();
       }
 
       // Mark bootstrap as complete for this worker instance
