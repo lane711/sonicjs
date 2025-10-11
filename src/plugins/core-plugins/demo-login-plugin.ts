@@ -67,7 +67,7 @@ const loginPrefillHook: HookHandler = async (data: any, context: any) => {
 }
 
 const demoLoginPlugin: Plugin = PluginBuilder.create({
-  name: 'demo-login-prefill',
+  name: 'demo-login-plugin',
   version: '1.0.0',
   description: 'Prefills login form with demo credentials for easy site demonstration',
   author: {

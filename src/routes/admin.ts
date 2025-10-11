@@ -42,6 +42,30 @@ type Variables = {
 export const adminRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
 /**
+ * Icon mapping for common plugin types
+ */
+const PLUGIN_ICON_MAP: Record<string, string> = {
+  'faq': `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+  </svg>`,
+  'workflow': `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+  </svg>`,
+  'cache': `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+  </svg>`,
+  'design': `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.098 19.902a3.75 3.75 0 0 0 5.304 0l6.401-6.402M6.75 21A3.75 3.75 0 0 1 3 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 0 0 3.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008Z"/>
+  </svg>`,
+  'analytics': `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 00-2-2m0 0a2 2 0 012-2h2a2 2 0 012 2m0 0v6a2 2 0 002 2h2a2 2 0 002-2v-6a2 2 0 00-2-2h-2a2 2 0 00-2 2z" />
+  </svg>`,
+  'default': `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+  </svg>`
+}
+
+/**
  * Helper function to get dynamic menu items from active plugins
  */
 async function getDynamicMenuItems(db: D1Database): Promise<Array<{
@@ -54,28 +78,27 @@ async function getDynamicMenuItems(db: D1Database): Promise<Array<{
     const menuItems: Array<{ label: string; path: string; icon: string }> = []
 
     for (const plugin of activePlugins) {
-      // Add menu items for plugins that have admin interfaces
-      if (plugin.name === 'faq') {
+      // Check if plugin has admin UI (common patterns)
+      const hasAdminUI = plugin.settings?.hasAdminUI ||
+                        plugin.name === 'faq' ||
+                        plugin.name === 'workflow' ||
+                        plugin.name === 'cache' ||
+                        plugin.name === 'design' ||
+                        plugin.name === 'analytics'
+
+      if (hasAdminUI) {
+        const pluginName = plugin.name
+        const displayName = plugin.display_name || pluginName.charAt(0).toUpperCase() + pluginName.slice(1)
+        const path = `/admin/${pluginName}`
+        const pluginIcon = typeof plugin.icon === 'string' ? plugin.icon : undefined
+        const icon = pluginIcon ?? PLUGIN_ICON_MAP[pluginName] ?? PLUGIN_ICON_MAP['default']
+
         menuItems.push({
-          label: 'FAQ',
-          path: '/admin/faq',
-          icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>`
+          label: displayName,
+          path: path,
+          icon: icon
         })
       }
-
-      if (plugin.name === 'workflow') {
-        menuItems.push({
-          label: 'Workflow',
-          path: '/admin/workflow',
-          icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-          </svg>`
-        })
-      }
-
-      // Add more plugin-specific menu items here as needed
     }
 
     return menuItems

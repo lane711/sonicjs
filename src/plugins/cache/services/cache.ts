@@ -391,6 +391,13 @@ export class CacheService {
   }
 
   /**
+   * Invalidate cache entries matching a pattern (alias for invalidate)
+   */
+  async invalidatePattern(pattern: string): Promise<number> {
+    return this.invalidate(pattern)
+  }
+
+  /**
    * Get cache statistics
    */
   getStats(): CacheStats {

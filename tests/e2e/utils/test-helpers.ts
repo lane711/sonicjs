@@ -357,13 +357,13 @@ export async function navigateToAdminSection(page: Page, section: 'collections' 
 export async function createTestCollection(page: Page, collectionData = TEST_DATA.collection) {
   await navigateToAdminSection(page, 'collections');
   await page.click('a[href="/admin/collections/new"]');
-  
+
   await page.fill('[name="name"]', collectionData.name);
   await page.fill('[name="displayName"]', collectionData.displayName);
   await page.fill('[name="description"]', collectionData.description);
-  
+
   await page.click('button[type="submit"]');
-  
+
   // Wait for form submission - either redirect or manually navigate
   try {
     await page.waitForURL('/admin/collections', { timeout: 10000 });
@@ -371,6 +371,9 @@ export async function createTestCollection(page: Page, collectionData = TEST_DAT
     // If no automatic redirect, navigate manually
     await page.goto('/admin/collections');
   }
+
+  // Wait for database write and any caching to settle
+  await page.waitForTimeout(2000);
 }
 
 /**

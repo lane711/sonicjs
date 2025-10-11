@@ -6,6 +6,7 @@ import { cors } from 'hono/cors'
 import { schemaDefinitions } from '../schemas'
 import { getCacheService, CACHE_CONFIGS } from '../plugins/cache'
 import { QueryFilterBuilder, QueryFilter } from '../utils/query-filter'
+import { isPluginActive } from '../middleware/plugin-middleware'
 
 type Bindings = {
   DB: D1Database
@@ -14,6 +15,7 @@ type Bindings = {
 
 type Variables = {
   startTime: number
+  cacheEnabled?: boolean
 }
 
 export const apiRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
@@ -25,6 +27,13 @@ apiRoutes.use('*', async (c, next) => {
   await next()
   const totalTime = Date.now() - startTime
   c.header('X-Response-Time', `${totalTime}ms`)
+})
+
+// Check if cache plugin is active
+apiRoutes.use('*', async (c, next) => {
+  const cacheEnabled = await isPluginActive(c.env.DB, 'core-cache')
+  c.set('cacheEnabled', cacheEnabled)
+  await next()
 })
 
 // Add CORS middleware
@@ -372,34 +381,36 @@ apiRoutes.get('/collections', async (c) => {
 
   try {
     const db = c.env.DB
-
-    // Use cache for API collections list
+    const cacheEnabled = c.get('cacheEnabled')
     const cache = getCacheService(CACHE_CONFIGS.api!)
     const cacheKey = cache.generateKey('collections', 'all')
 
-    const cacheResult = await cache.getWithSource<any>(cacheKey)
-    if (cacheResult.hit && cacheResult.data) {
-      // Add cache headers
-      c.header('X-Cache-Status', 'HIT')
-      c.header('X-Cache-Source', cacheResult.source)
-      if (cacheResult.ttl) {
-        c.header('X-Cache-TTL', Math.floor(cacheResult.ttl).toString())
-      }
+    // Use cache only if cache plugin is active
+    if (cacheEnabled) {
+      const cacheResult = await cache.getWithSource<any>(cacheKey)
+      if (cacheResult.hit && cacheResult.data) {
+        // Add cache headers
+        c.header('X-Cache-Status', 'HIT')
+        c.header('X-Cache-Source', cacheResult.source)
+        if (cacheResult.ttl) {
+          c.header('X-Cache-TTL', Math.floor(cacheResult.ttl).toString())
+        }
 
-      // Add cache info and timing to meta
-      const dataWithMeta = {
-        ...cacheResult.data,
-        meta: addTimingMeta(c, {
-          ...cacheResult.data.meta,
-          cache: {
-            hit: true,
-            source: cacheResult.source,
-            ttl: cacheResult.ttl ? Math.floor(cacheResult.ttl) : undefined
-          }
-        }, executionStart)
-      }
+        // Add cache info and timing to meta
+        const dataWithMeta = {
+          ...cacheResult.data,
+          meta: addTimingMeta(c, {
+            ...cacheResult.data.meta,
+            cache: {
+              hit: true,
+              source: cacheResult.source,
+              ttl: cacheResult.ttl ? Math.floor(cacheResult.ttl) : undefined
+            }
+          }, executionStart)
+        }
 
-      return c.json(dataWithMeta)
+        return c.json(dataWithMeta)
+      }
     }
 
     // Cache miss - fetch from database
@@ -428,8 +439,10 @@ apiRoutes.get('/collections', async (c) => {
       }, executionStart)
     }
 
-    // Cache the response
-    await cache.set(cacheKey, responseData)
+    // Cache the response only if cache plugin is enabled
+    if (cacheEnabled) {
+      await cache.set(cacheKey, responseData)
+    }
 
     return c.json(responseData)
   } catch (error) {
@@ -467,33 +480,36 @@ apiRoutes.get('/content', async (c) => {
       }, 400)
     }
 
-    // Generate cache key based on query
+    // Only use cache if cache plugin is active
+    const cacheEnabled = c.get('cacheEnabled')
     const cache = getCacheService(CACHE_CONFIGS.api!)
     const cacheKey = cache.generateKey('content-filtered', JSON.stringify({ filter, query: queryResult.sql }))
 
-    const cacheResult = await cache.getWithSource<any>(cacheKey)
-    if (cacheResult.hit && cacheResult.data) {
-      // Add cache headers
-      c.header('X-Cache-Status', 'HIT')
-      c.header('X-Cache-Source', cacheResult.source)
-      if (cacheResult.ttl) {
-        c.header('X-Cache-TTL', Math.floor(cacheResult.ttl).toString())
-      }
+    if (cacheEnabled) {
+      const cacheResult = await cache.getWithSource<any>(cacheKey)
+      if (cacheResult.hit && cacheResult.data) {
+        // Add cache headers
+        c.header('X-Cache-Status', 'HIT')
+        c.header('X-Cache-Source', cacheResult.source)
+        if (cacheResult.ttl) {
+          c.header('X-Cache-TTL', Math.floor(cacheResult.ttl).toString())
+        }
 
-      // Add cache info and timing to meta
-      const dataWithMeta = {
-        ...cacheResult.data,
-        meta: addTimingMeta(c, {
-          ...cacheResult.data.meta,
-          cache: {
-            hit: true,
-            source: cacheResult.source,
-            ttl: cacheResult.ttl ? Math.floor(cacheResult.ttl) : undefined
-          }
-        }, executionStart)
-      }
+        // Add cache info and timing to meta
+        const dataWithMeta = {
+          ...cacheResult.data,
+          meta: addTimingMeta(c, {
+            ...cacheResult.data.meta,
+            cache: {
+              hit: true,
+              source: cacheResult.source,
+              ttl: cacheResult.ttl ? Math.floor(cacheResult.ttl) : undefined
+            }
+          }, executionStart)
+        }
 
-      return c.json(dataWithMeta)
+        return c.json(dataWithMeta)
+      }
     }
 
     // Cache miss - fetch from database
@@ -537,8 +553,10 @@ apiRoutes.get('/content', async (c) => {
       }, executionStart)
     }
 
-    // Cache the response
-    await cache.set(cacheKey, responseData)
+    // Cache the response only if cache is enabled
+    if (cacheEnabled) {
+      await cache.set(cacheKey, responseData)
+    }
 
     return c.json(responseData)
   } catch (error) {
@@ -605,32 +623,36 @@ apiRoutes.get('/collections/:collection/content', async (c) => {
     }
 
     // Generate cache key
+    const cacheEnabled = c.get('cacheEnabled')
     const cache = getCacheService(CACHE_CONFIGS.api!)
     const cacheKey = cache.generateKey('collection-content-filtered', `${collection}:${JSON.stringify({ filter, query: queryResult.sql })}`)
 
-    const cacheResult = await cache.getWithSource<any>(cacheKey)
-    if (cacheResult.hit && cacheResult.data) {
-      // Add cache headers
-      c.header('X-Cache-Status', 'HIT')
-      c.header('X-Cache-Source', cacheResult.source)
-      if (cacheResult.ttl) {
-        c.header('X-Cache-TTL', Math.floor(cacheResult.ttl).toString())
-      }
+    // Only check cache if plugin is enabled
+    if (cacheEnabled) {
+      const cacheResult = await cache.getWithSource<any>(cacheKey)
+      if (cacheResult.hit && cacheResult.data) {
+        // Add cache headers
+        c.header('X-Cache-Status', 'HIT')
+        c.header('X-Cache-Source', cacheResult.source)
+        if (cacheResult.ttl) {
+          c.header('X-Cache-TTL', Math.floor(cacheResult.ttl).toString())
+        }
 
-      // Add cache info and timing to meta
-      const dataWithMeta = {
-        ...cacheResult.data,
-        meta: addTimingMeta(c, {
-          ...cacheResult.data.meta,
-          cache: {
-            hit: true,
-            source: cacheResult.source,
-            ttl: cacheResult.ttl ? Math.floor(cacheResult.ttl) : undefined
-          }
-        }, executionStart)
-      }
+        // Add cache info and timing to meta
+        const dataWithMeta = {
+          ...cacheResult.data,
+          meta: addTimingMeta(c, {
+            ...cacheResult.data.meta,
+            cache: {
+              hit: true,
+              source: cacheResult.source,
+              ttl: cacheResult.ttl ? Math.floor(cacheResult.ttl) : undefined
+            }
+          }, executionStart)
+        }
 
-      return c.json(dataWithMeta)
+        return c.json(dataWithMeta)
+      }
     }
 
     // Cache miss - fetch from database
@@ -678,8 +700,10 @@ apiRoutes.get('/collections/:collection/content', async (c) => {
       }, executionStart)
     }
 
-    // Cache the response
-    await cache.set(cacheKey, responseData)
+    // Cache the response only if cache plugin is enabled
+    if (cacheEnabled) {
+      await cache.set(cacheKey, responseData)
+    }
 
     return c.json(responseData)
   } catch (error) {

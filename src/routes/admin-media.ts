@@ -70,7 +70,7 @@ adminMediaRoutes.get('/', async (c) => {
 
     // Use cache for media list
     const cache = getCacheService(CACHE_CONFIGS.media!)
-    const cacheKey = cache.generateKey('list', `folder:${folder}_type:${type}_page:${page}`)
+    const cacheKey = cache.generateKey('list', `folder:${folder}_type:${type}_page:${page}_view:${view}`)
 
     const cachedData = await cache.get<MediaLibraryPageData>(cacheKey)
     if (cachedData) {
@@ -430,6 +430,17 @@ adminMediaRoutes.post('/upload', async (c) => {
       }
     }
 
+    // Invalidate media cache after successful uploads
+    if (uploadResults.length > 0) {
+      try {
+        const cache = getCacheService(CACHE_CONFIGS.media!)
+        await cache.invalidatePattern('list:*')
+        console.info(`Invalidated media cache after uploading ${uploadResults.length} file(s)`)
+      } catch (error) {
+        console.error('Failed to invalidate media cache:', error)
+      }
+    }
+
     // Return HTMX response with results
     return c.html(html`
       ${uploadResults.length > 0 ? html`
@@ -547,6 +558,15 @@ adminMediaRoutes.put('/:id', async (c) => {
       fileId
     ).run()
 
+    // Invalidate media cache after update
+    try {
+      const cache = getCacheService(CACHE_CONFIGS.media!)
+      await cache.invalidatePattern('list:*')
+      console.info(`Invalidated media cache after updating file: ${fileId}`)
+    } catch (error) {
+      console.error('Failed to invalidate media cache:', error)
+    }
+
     return c.html(html`
       <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
         File updated successfully
@@ -606,6 +626,15 @@ adminMediaRoutes.delete('/:id', async (c) => {
     // Soft delete in database
     const deleteStmt = c.env.DB.prepare('UPDATE media SET deleted_at = ? WHERE id = ?')
     await deleteStmt.bind(Math.floor(Date.now() / 1000), fileId).run()
+
+    // Invalidate media cache after deletion
+    try {
+      const cache = getCacheService(CACHE_CONFIGS.media!)
+      await cache.invalidatePattern('list:*')
+      console.info(`Invalidated media cache after deleting file: ${fileId}`)
+    } catch (error) {
+      console.error('Failed to invalidate media cache:', error)
+    }
 
     // Return HTMX response that redirects to media library
     return c.html(html`

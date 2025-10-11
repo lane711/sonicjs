@@ -145,7 +145,9 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
             <div>
               <h3 class="text-sm font-medium text-zinc-950 dark:text-white mb-3">Quick Actions</h3>
               <div class="space-y-2">
-                <button class="w-full text-left px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50 rounded-lg transition-colors">
+                <button
+                  onclick="openCreateFolderModal()"
+                  class="w-full text-left px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50 rounded-lg transition-colors">
                   Create Folder
                 </button>
                 <button
@@ -261,16 +263,22 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
                         <div class="py-1">
                           <button
                             onclick="openMoveToFolderModal()"
-                            class="w-full text-left px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                            class="group/item flex w-full items-center px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/5 hover:text-zinc-950 dark:hover:text-white transition-colors"
                           >
+                            <svg viewBox="0 0 20 20" fill="currentColor" class="mr-3 size-5 text-zinc-400 dark:text-zinc-500 group-hover/item:text-zinc-950 dark:group-hover/item:text-white">
+                              <path d="M2 6a2 2 0 0 1 2-2h5.532a2 2 0 0 1 1.536.72l1.9 2.28a1 1 0 0 0 .768.36H17a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6Z" />
+                            </svg>
                             Move to Folder
                           </button>
                         </div>
                         <div class="py-1">
                           <button
                             onclick="confirmBulkDelete()"
-                            class="w-full text-left px-4 py-2 text-sm text-red-700 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                            class="group/item flex w-full items-center px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                           >
+                            <svg viewBox="0 0 20 20" fill="currentColor" class="mr-3 size-5 text-zinc-400 dark:text-zinc-500 group-hover/item:text-red-600 dark:group-hover/item:text-red-400">
+                              <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" fill-rule="evenodd" />
+                            </svg>
                             Delete Selected Files
                           </button>
                         </div>
@@ -474,7 +482,58 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
         </div>
       </div>
     </div>
-    
+
+    <!-- Create Folder Modal -->
+    <div id="create-folder-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+      <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-xl ring-1 ring-zinc-950/5 dark:ring-white/10 p-6 w-full max-w-md">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold text-zinc-950 dark:text-white">Create New Folder</h3>
+          <button onclick="closeCreateFolderModal()" aria-label="Close" class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <form onsubmit="createNewFolder(event)" class="space-y-4">
+          <div>
+            <label for="folder-name" class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">
+              Folder Name
+            </label>
+            <input
+              type="text"
+              id="folder-name"
+              name="folderName"
+              placeholder="e.g., images, documents"
+              required
+              pattern="[a-z0-9-_]+"
+              title="Only lowercase letters, numbers, hyphens, and underscores allowed"
+              class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-400 transition-shadow"
+            >
+            <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+              Use lowercase letters, numbers, hyphens, and underscores only
+            </p>
+          </div>
+
+          <div class="flex justify-end space-x-2">
+            <button
+              type="button"
+              onclick="closeCreateFolderModal()"
+              class="rounded-lg bg-white dark:bg-zinc-800 px-4 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="rounded-lg bg-zinc-950 dark:bg-white px-4 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm"
+            >
+              Create Folder
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <style>
       .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
       .media-item { position: relative; border-radius: 8px; overflow: hidden; transition: transform 0.2s; }
@@ -646,6 +705,63 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
 
       function closeMoveToFolderModal() {
         document.getElementById('move-to-folder-modal').classList.add('hidden');
+      }
+
+      function openCreateFolderModal() {
+        document.getElementById('create-folder-modal').classList.remove('hidden');
+        // Clear and focus the input
+        const input = document.getElementById('folder-name');
+        input.value = '';
+        setTimeout(() => input.focus(), 100);
+      }
+
+      function closeCreateFolderModal() {
+        document.getElementById('create-folder-modal').classList.add('hidden');
+      }
+
+      async function createNewFolder(event) {
+        event.preventDefault();
+
+        const folderName = document.getElementById('folder-name').value.trim();
+
+        if (!folderName) {
+          showNotification('Please enter a folder name', 'error');
+          return;
+        }
+
+        // Validate folder name format
+        const folderPattern = /^[a-z0-9-_]+$/;
+        if (!folderPattern.test(folderName)) {
+          showNotification('Folder name can only contain lowercase letters, numbers, hyphens, and underscores', 'error');
+          return;
+        }
+
+        try {
+          const response = await fetch('/api/media/create-folder', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ folderName })
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            showNotification(\`Folder "\${folderName}" created successfully\`, 'success');
+            closeCreateFolderModal();
+
+            // Reload the page to show the new folder
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          } else {
+            showNotification(result.error || 'Failed to create folder', 'error');
+          }
+        } catch (error) {
+          console.error('Create folder error:', error);
+          showNotification('An error occurred while creating the folder', 'error');
+        }
       }
 
       async function performBulkMove(targetFolder) {

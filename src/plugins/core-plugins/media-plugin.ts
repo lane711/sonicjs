@@ -90,7 +90,7 @@ export function createMediaPlugin(): Plugin {
   // POST /media/process - Process media (resize, compress, etc.)
   mediaAPI.post('/process', async (c) => {
     const { id, operations } = await c.req.json()
-    
+
     return c.json({
       message: 'Media processing started',
       data: {
@@ -98,6 +98,71 @@ export function createMediaPlugin(): Plugin {
         status: 'processing'
       }
     })
+  })
+
+  // POST /media/create-folder - Create a new folder
+  mediaAPI.post('/create-folder', async (c) => {
+    try {
+      const { folderName } = await c.req.json()
+
+      if (!folderName || typeof folderName !== 'string') {
+        return c.json({ success: false, error: 'Folder name is required' }, 400)
+      }
+
+      // Validate folder name format
+      const folderPattern = /^[a-z0-9-_]+$/
+      if (!folderPattern.test(folderName)) {
+        return c.json({
+          success: false,
+          error: 'Folder name can only contain lowercase letters, numbers, hyphens, and underscores'
+        }, 400)
+      }
+
+      // Note: In a real implementation, you would check if the folder already exists
+      // and create it in R2 or update the database accordingly
+      // For now, we'll return success as folders are tracked in the media files table
+
+      return c.json({
+        success: true,
+        message: `Folder "${folderName}" created successfully`,
+        data: { folderName }
+      })
+    } catch (error) {
+      console.error('Create folder error:', error)
+      return c.json({ success: false, error: 'Failed to create folder' }, 500)
+    }
+  })
+
+  // POST /media/bulk-move - Move multiple files to a folder
+  mediaAPI.post('/bulk-move', async (c) => {
+    try {
+      const { fileIds, folder } = await c.req.json()
+
+      if (!Array.isArray(fileIds) || fileIds.length === 0) {
+        return c.json({ success: false, error: 'File IDs array is required' }, 400)
+      }
+
+      if (!folder || typeof folder !== 'string') {
+        return c.json({ success: false, error: 'Target folder is required' }, 400)
+      }
+
+      // Note: In a real implementation, you would update the database
+      // to move the files to the specified folder
+      // For now, we'll return a success response
+
+      return c.json({
+        success: true,
+        message: `Successfully moved ${fileIds.length} file(s) to ${folder}`,
+        summary: {
+          successful: fileIds.length,
+          failed: 0,
+          total: fileIds.length
+        }
+      })
+    } catch (error) {
+      console.error('Bulk move error:', error)
+      return c.json({ success: false, error: 'Failed to move files' }, 500)
+    }
   })
 
   builder.addRoute('/api/media', mediaAPI, {

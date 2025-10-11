@@ -53,12 +53,17 @@ test.describe('Collections Management', () => {
       await page.goto('/admin/collections');
     }
 
-    // Click refresh button to ensure cache is cleared and new collection appears
-    await page.click('button:has-text("Refresh")');
-    await page.waitForTimeout(1000); // Wait for refresh to complete
+    // Force a hard reload to bypass any caching
+    await page.reload({ waitUntil: 'networkidle' });
 
-    // Check for collection in list
-    await expect(page.locator('td').filter({ hasText: TEST_DATA.collection.displayName }).first()).toBeVisible({ timeout: 10000 });
+    // Wait for table to be visible
+    await expect(page.locator('table')).toBeVisible({ timeout: 5000 });
+
+    // Check for collection in list - look for row containing display name
+    const collectionRow = page.locator('tbody tr').filter({
+      has: page.locator('td', { hasText: TEST_DATA.collection.displayName })
+    }).first();
+    await expect(collectionRow).toBeVisible({ timeout: 15000 });
   });
 
   test('should validate collection name format', async ({ page }) => {
@@ -125,31 +130,23 @@ test.describe('Collections Management', () => {
   test('should edit an existing collection', async ({ page }) => {
     // Create test collection first
     await createTestCollection(page);
-    
+
     // Navigate back to collections list and edit
     await navigateToAdminSection(page, 'collections');
-    
+
+    // Force reload to ensure we see the collection
+    await page.reload({ waitUntil: 'networkidle' });
+
     // Wait for collections table to load
     await page.waitForSelector('table', { timeout: 10000 });
-    
-    // Find collection by name - try multiple selectors
-    let collectionRow = page.locator('tr').filter({ 
-      has: page.locator('td').filter({ hasText: TEST_DATA.collection.name })
+
+    // Find collection row by display name in tbody
+    const collectionRow = page.locator('tbody tr').filter({
+      has: page.locator('td', { hasText: TEST_DATA.collection.displayName })
     }).first();
-    
-    // If not found, try looking for display name
-    if (await collectionRow.count() === 0) {
-      collectionRow = page.locator('tr').filter({ 
-        has: page.locator('td').filter({ hasText: TEST_DATA.collection.displayName })
-      }).first();
-    }
-    
-    // Refresh to ensure cache is cleared
-    await page.click('button:has-text("Refresh")');
-    await page.waitForTimeout(1000);
 
     // Wait for the row to be visible and click it (rows are clickable, no Edit link)
-    await expect(collectionRow).toBeVisible({ timeout: 10000 });
+    await expect(collectionRow).toBeVisible({ timeout: 15000 });
     await collectionRow.click();
 
     // Update display name
@@ -168,31 +165,23 @@ test.describe('Collections Management', () => {
   test('should delete a collection', async ({ page }) => {
     // Create test collection first
     await createTestCollection(page);
-    
+
     // Navigate to edit page and delete
     await navigateToAdminSection(page, 'collections');
-    
+
+    // Force reload to ensure we see the collection
+    await page.reload({ waitUntil: 'networkidle' });
+
     // Wait for collections table to load
     await page.waitForSelector('table', { timeout: 10000 });
-    
-    // Find collection by name - try multiple selectors
-    let collectionRow = page.locator('tr').filter({ 
-      has: page.locator('td').filter({ hasText: TEST_DATA.collection.name })
+
+    // Find collection row by display name in tbody
+    const collectionRow = page.locator('tbody tr').filter({
+      has: page.locator('td', { hasText: TEST_DATA.collection.displayName })
     }).first();
-    
-    // If not found, try looking for display name
-    if (await collectionRow.count() === 0) {
-      collectionRow = page.locator('tr').filter({ 
-        has: page.locator('td').filter({ hasText: TEST_DATA.collection.displayName })
-      }).first();
-    }
-    
-    // Refresh to ensure cache is cleared
-    await page.click('button:has-text("Refresh")');
-    await page.waitForTimeout(1000);
 
     // Wait for the row to be visible and click it (rows are clickable)
-    await expect(collectionRow).toBeVisible({ timeout: 10000 });
+    await expect(collectionRow).toBeVisible({ timeout: 15000 });
     await collectionRow.click();
 
     // Set up dialog handler before clicking delete

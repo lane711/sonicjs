@@ -13,19 +13,20 @@ export { codeExamplesPlugin, createCodeExamplesPlugin } from './code-examples-pl
 export { demoLoginPlugin } from './demo-login-plugin'
 export { workflowPlugin, createWorkflowPlugin } from './workflow-plugin'
 export { seedDataPlugin, createSeedDataPlugin } from './seed-data-plugin'
+export { databaseToolsPlugin } from './database-tools-plugin'
 
 // Core plugins array for easy registration
 export const corePlugins = [
   'core-auth',
   'core-media',
   'core-analytics',
-  'core-faq',
+  'faq-plugin',
   'testimonials-plugin',
   'code-examples-plugin',
-  'demo-login-prefill',
+  'demo-login-plugin',
   'workflow-plugin',
-  'cache',
-  'seed-data'
+  'seed-data',
+  'database-tools'
 ] as const
 
 export type CorePluginNames = typeof corePlugins[number]
