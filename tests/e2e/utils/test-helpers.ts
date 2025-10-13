@@ -398,8 +398,8 @@ export async function deleteTestCollection(page: Page, collectionName: string) {
     // Wait for edit page to load
     await page.waitForTimeout(1000);
 
-    // Set up dialog handler before clicking delete (for HTMX hx-confirm)
-    page.on('dialog', dialog => dialog.accept());
+    // Set up dialog handler before clicking delete (use once to avoid handler accumulation)
+    page.once('dialog', dialog => dialog.accept());
 
     // Click delete button
     await page.locator('button').filter({ hasText: 'Delete Collection' }).click();

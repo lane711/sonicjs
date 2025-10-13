@@ -2,7 +2,10 @@ import { test, expect } from '@playwright/test';
 import { loginAsAdmin, navigateToAdminSection, createTestCollection, deleteTestCollection, TEST_DATA } from './utils/test-helpers';
 
 test.describe('Collections Management', () => {
-    test.beforeEach(async ({ page }) => {
+  // Run tests sequentially to avoid database conflicts
+  test.describe.configure({ mode: 'serial' });
+
+  test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
     await navigateToAdminSection(page, 'collections');
   });
@@ -11,10 +14,11 @@ test.describe('Collections Management', () => {
     // Only clean up if the test might have created a collection
     const needsCleanup = [
       'should create a new collection',
-      'should prevent duplicate collection names', 
-      'should edit an existing collection'
+      'should prevent duplicate collection names',
+      'should edit an existing collection',
+      'should delete a collection'
     ].some(name => testInfo.title.includes(name));
-    
+
     if (needsCleanup) {
       try {
         await deleteTestCollection(page, TEST_DATA.collection.name);
@@ -140,9 +144,9 @@ test.describe('Collections Management', () => {
     // Wait for collections table to load
     await page.waitForSelector('table', { timeout: 10000 });
 
-    // Find collection row by display name in tbody
+    // Find collection row by collection name (unique identifier) in tbody
     const collectionRow = page.locator('tbody tr').filter({
-      has: page.locator('td', { hasText: TEST_DATA.collection.displayName })
+      has: page.locator('td', { hasText: TEST_DATA.collection.name })
     }).first();
 
     // Wait for the row to be visible and click it (rows are clickable, no Edit link)
@@ -175,18 +179,18 @@ test.describe('Collections Management', () => {
     // Wait for collections table to load
     await page.waitForSelector('table', { timeout: 10000 });
 
-    // Find collection row by display name in tbody
+    // Find collection row by collection name (unique identifier) in tbody
     const collectionRow = page.locator('tbody tr').filter({
-      has: page.locator('td', { hasText: TEST_DATA.collection.displayName })
+      has: page.locator('td', { hasText: TEST_DATA.collection.name })
     }).first();
 
     // Wait for the row to be visible and click it (rows are clickable)
     await expect(collectionRow).toBeVisible({ timeout: 15000 });
     await collectionRow.click();
 
-    // Set up dialog handler before clicking delete
-    page.on('dialog', dialog => dialog.accept());
-    
+    // Set up dialog handler before clicking delete (use once to avoid handler accumulation)
+    page.once('dialog', dialog => dialog.accept());
+
     await page.locator('button').filter({ hasText: 'Delete Collection' }).click();
     
     // Should redirect to collections list  
