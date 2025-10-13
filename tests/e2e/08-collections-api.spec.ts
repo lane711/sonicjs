@@ -166,14 +166,14 @@ test.describe('Collections API', () => {
 
     test('should handle empty collections gracefully', async ({ request }) => {
       // Test with existing empty collection instead of creating one
-      const response = await request.get('/api/collections/page/content');
-      
+      const response = await request.get('/api/collections/pages/content');
+
       expect(response.ok()).toBeTruthy();
-      
+
       const data = await response.json();
       expect(Array.isArray(data.data)).toBeTruthy();
       expect(data.meta.count).toBe(data.data.length);
-      expect(data.meta.collection.name).toBe('page');
+      expect(data.meta.collection.name).toBe('pages');
     });
   });
 
