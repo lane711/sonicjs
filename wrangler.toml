@@ -5,6 +5,7 @@ compatibility_flags = ["nodejs_compat"]
 
 [dev]
 port = 8787
+persist_to = ".wrangler/state/v3"
 
 [build]
 command = ""

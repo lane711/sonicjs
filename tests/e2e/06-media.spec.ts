@@ -50,7 +50,7 @@ test.describe('Media Management', () => {
       buffer: testImageBuffer
     });
 
-    await page.locator('#upload-modal button[type="submit"]').click();
+    await page.locator('#upload-modal button#upload-btn').click();
     
     // Should show upload success
     await expect(page.locator('#upload-results')).toContainText('Successfully uploaded', { timeout: 10000 });
@@ -67,7 +67,7 @@ test.describe('Media Management', () => {
       buffer: Buffer.from('fake executable')
     });
 
-    await page.locator('#upload-modal button[type="submit"]').click();
+    await page.locator('#upload-modal button#upload-btn').click();
     
     // Should show validation error
     await expect(page.locator('#upload-results')).toContainText('Unsupported file type');
