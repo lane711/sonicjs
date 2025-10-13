@@ -2,18 +2,7 @@ import { test, expect } from '@playwright/test';
 import { loginAsAdmin } from './utils/test-helpers';
 
 test.describe('User XSS Prevention', () => {
-  test.beforeEach(async ({ page }) => {
-    await loginAsAdmin(page);
-  });
-
-  test('should prevent XSS in user creation via API', async ({ request }) => {
-    // Login first to get auth token
-    const loginResponse = await request.post('/auth/login', {
-      data: {
-        email: 'admin@sonicjs.com',
-        password: 'admin123'
-      }
-
+  test('should prevent XSS in user creation via API', async ({ page }) => {
     // Set up a flag to detect if any alert() is triggered
     let alertTriggered = false;
     page.on('dialog', async (dialog) => {
@@ -85,14 +74,7 @@ test.describe('User XSS Prevention', () => {
   });
 
 
-  test('should sanitize user data in database', async ({ request }) => {
-    // Login to get auth token
-    const loginResponse = await request.post('/auth/login', {
-      data: {
-        email: 'admin@sonicjs.com',
-        password: 'admin123'
-      }
-
+  test('should sanitize user data in database', async ({ page }) => {
     // Set up a flag to detect if any alert() is triggered
     let alertTriggered = false;
     page.on('dialog', async (dialog) => {
