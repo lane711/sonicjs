@@ -176,8 +176,13 @@ describe('API Routes - Final Working Tests', () => {
         }
       ]
 
-      // Mock D1 chaining pattern
+      // Mock D1 chaining pattern (including isPluginActive middleware call)
       const mockPrepare = vi.fn()
+        .mockReturnValueOnce({
+          bind: vi.fn().mockReturnValue({
+            first: vi.fn().mockResolvedValue(null) // isPluginActive returns null (cache disabled)
+          })
+        })
         .mockReturnValueOnce({
           bind: vi.fn().mockReturnValue({
             first: vi.fn().mockResolvedValue(mockCollection)
@@ -188,7 +193,7 @@ describe('API Routes - Final Working Tests', () => {
             all: vi.fn().mockResolvedValue({ results: mockContent })
           })
         })
-      
+
       const testEnv = {
         ...mockEnv,
         DB: { prepare: mockPrepare }
@@ -200,7 +205,7 @@ describe('API Routes - Final Working Tests', () => {
       const req = new Request('https://test.com/collections/blog_posts/content')
       const res = await app.fetch(req, testEnv)
       const data = await res.json()
-      
+
       expect(res.status).toBe(200)
       expect(data.data).toHaveLength(1)
       expect(data.meta.collection.name).toBe('blog_posts')

@@ -263,8 +263,13 @@ describe('API Routes', () => {
         }
       ]
 
-      // Mock the chained database calls
+      // Mock the chained database calls (including isPluginActive middleware call)
       mockEnv.DB.prepare
+        .mockReturnValueOnce({
+          bind: vi.fn().mockReturnValue({
+            first: vi.fn().mockResolvedValue(null) // isPluginActive returns null (cache disabled)
+          })
+        })
         .mockReturnValueOnce({
           bind: vi.fn().mockReturnValue({
             first: vi.fn().mockResolvedValue(mockCollection)
@@ -278,11 +283,12 @@ describe('API Routes', () => {
 
       const res = await app.fetch(new Request('https://test.com/collections/blog_posts/content'), mockEnv)
       const data = await res.json()
-      
+
       expect(res.status).toBe(200)
+      expect(mockEnv.DB.prepare).toHaveBeenCalledWith('SELECT id FROM plugins WHERE name = ? AND status = ?')
       expect(mockEnv.DB.prepare).toHaveBeenCalledWith('SELECT * FROM collections WHERE name = ? AND is_active = 1')
       expect(mockEnv.DB.prepare).toHaveBeenCalledWith('SELECT * FROM content WHERE (collection_id = ?) LIMIT ?')
-      
+
       expect(data.data).toHaveLength(1)
       expect(data.data[0].collectionId).toBe('col1')
       expect(data.meta.collection.name).toBe('blog_posts')
@@ -342,6 +348,11 @@ describe('API Routes', () => {
       mockEnv.DB.prepare
         .mockReturnValueOnce({
           bind: vi.fn().mockReturnValue({
+            first: vi.fn().mockResolvedValue(null) // isPluginActive returns null (cache disabled)
+          })
+        })
+        .mockReturnValueOnce({
+          bind: vi.fn().mockReturnValue({
             first: vi.fn().mockResolvedValue(mockCollection)
           })
         })
@@ -353,7 +364,7 @@ describe('API Routes', () => {
 
       const res = await app.fetch(new Request('https://test.com/collections/test_collection/content'), mockEnv)
       const data = await res.json()
-      
+
       expect(res.status).toBe(200)
       expect(data.meta.collection.schema).toEqual({})
     })
