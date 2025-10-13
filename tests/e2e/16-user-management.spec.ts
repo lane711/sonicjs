@@ -56,6 +56,22 @@ test.describe('User Management - Hard Delete', () => {
         'Authorization': `Bearer ${authToken}`
       }
     });
+
+    // Debug: log the response if it's not OK
+    if (!checkResponse.ok()) {
+      console.error('GET user request details:');
+      console.error('  URL:', `/admin/users/${userId}`);
+      console.error('  Status:', checkResponse.status());
+      console.error('  Status Text:', checkResponse.statusText());
+      try {
+        const errorData = await checkResponse.json();
+        console.error('  Response:', JSON.stringify(errorData));
+      } catch (e) {
+        const responseText = await checkResponse.text();
+        console.error('  Response (text):', responseText.substring(0, 500));
+      }
+    }
+
     expect(checkResponse.ok()).toBeTruthy();
 
     const checkData = await checkResponse.json();
@@ -146,6 +162,13 @@ test.describe('User Management - Hard Delete', () => {
         'Authorization': `Bearer ${authToken}`
       }
     });
+
+    // Debug: log the response if it's not OK
+    if (!checkResponse.ok()) {
+      const errorData = await checkResponse.json();
+      console.error('GET user failed (default delete):', checkResponse.status(), errorData);
+    }
+
     expect(checkResponse.ok()).toBeTruthy();
 
     const checkData = await checkResponse.json();

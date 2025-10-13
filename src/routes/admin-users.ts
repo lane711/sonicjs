@@ -634,6 +634,68 @@ userRoutes.post('/users/new', requirePermission('users.create'), async (c) => {
 })
 
 /**
+ * GET /admin/users/:id - Get user by ID (requires users.read permission)
+ * Note: This endpoint returns users regardless of is_active status for admin purposes
+ */
+userRoutes.get('/users/:id', requirePermission('users.read'), async (c) => {
+  // Check if this is actually the edit route
+  if (c.req.path.endsWith('/edit')) {
+    return c.notFound()
+  }
+
+  const db = c.env.DB
+  const user = c.get('user')
+  const userId = c.req.param('id')
+
+  try {
+    // Get user data (including inactive users for admin access)
+    const userStmt = db.prepare(`
+      SELECT id, email, username, first_name, last_name, phone, bio, avatar_url,
+             role, is_active, email_verified, two_factor_enabled, created_at, last_login_at
+      FROM users
+      WHERE id = ?
+    `)
+
+    const userRecord = await userStmt.bind(userId).first() as any
+
+    if (!userRecord) {
+      return c.json({ error: 'User not found' }, 404)
+    }
+
+    // Log the activity
+    await logActivity(
+      db, user.userId, 'user.view', 'users', userId,
+      null,
+      c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
+      c.req.header('user-agent')
+    )
+
+    return c.json({
+      user: {
+        id: userRecord.id,
+        email: userRecord.email,
+        username: userRecord.username,
+        first_name: userRecord.first_name,
+        last_name: userRecord.last_name,
+        phone: userRecord.phone,
+        bio: userRecord.bio,
+        avatar_url: userRecord.avatar_url,
+        role: userRecord.role,
+        is_active: userRecord.is_active,
+        email_verified: userRecord.email_verified,
+        two_factor_enabled: userRecord.two_factor_enabled,
+        created_at: userRecord.created_at,
+        last_login_at: userRecord.last_login_at
+      }
+    })
+
+  } catch (error) {
+    console.error('User fetch error:', error)
+    return c.json({ error: 'Failed to fetch user' }, 500)
+  }
+})
+
+/**
  * GET /admin/users/:id/edit - Show user edit page (requires users.update permission)
  */
 userRoutes.get('/users/:id/edit', requirePermission('users.update'), async (c) => {

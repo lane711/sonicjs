@@ -215,7 +215,7 @@ app.route('/admin/design', designRoutes)
 app.route('/admin/checkboxes', adminCheckboxRoutes)
 app.route('/admin/logs', adminLogsRoutes)
 // app.route('/admin/email', emailRoutes)
-app.route('/admin/users', userRoutes)
+// User routes are now mounted within adminRoutes (see admin.ts)
 // Cache routes with plugin activation check
 app.use('/admin/cache/*', requireActivePlugin('cache'))
 app.route('/admin/cache', cacheRoutes)

@@ -1098,175 +1098,15 @@ adminRoutes.post('/collections/:collectionId/fields/reorder', async (c) => {
   }
 })
 
-// Users management routes
-adminRoutes.get('/users', async (c) => {
-  try {
-    const user = c.get('user')
-    const db = c.env.DB
-    const url = new URL(c.req.url)
-    
-    // Get query parameters
-    const page = parseInt(url.searchParams.get('page') || '1')
-    const limit = parseInt(url.searchParams.get('limit') || '20')
-    const search = url.searchParams.get('search') || ''
-    const role = url.searchParams.get('role') || ''
-    const status = url.searchParams.get('status') || ''
-    const offset = (page - 1) * limit
-    
-    // Build where conditions
-    const conditions: string[] = []
-    const params: any[] = []
-    
-    if (search) {
-      conditions.push('(email LIKE ? OR username LIKE ? OR first_name LIKE ? OR last_name LIKE ?)')
-      const searchParam = `%${search}%`
-      params.push(searchParam, searchParam, searchParam, searchParam)
-    }
-    
-    if (role) {
-      conditions.push('role = ?')
-      params.push(role)
-    }
-    
-    if (status === 'inactive') {
-      conditions.push('is_active = ?')
-      params.push(0)
-    } else if (status === 'all') {
-      // Explicitly show all users (no is_active filter)
-    } else {
-      // Default to showing only active users (when status is '' or 'active')
-      conditions.push('is_active = ?')
-      params.push(1)
-    }
-    
-    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
-    
-    // Get total count
-    const countStmt = db.prepare(`SELECT COUNT(*) as count FROM users ${whereClause}`)
-    const countResult = await countStmt.bind(...params).first() as any
-    const totalUsers = countResult?.count || 0
-    const totalPages = Math.ceil(totalUsers / limit)
-    
-    // Get users
-    const usersStmt = db.prepare(`
-      SELECT id, email, username, first_name, last_name, role, avatar, is_active, 
-             last_login_at, created_at, updated_at
-      FROM users 
-      ${whereClause}
-      ORDER BY created_at DESC 
-      LIMIT ? OFFSET ?
-    `)
-    const { results } = await usersStmt.bind(...params, limit, offset).all()
-    
-    const users = (results || []).map((u: any) => ({
-      id: u.id,
-      email: u.email,
-      username: u.username,
-      firstName: u.first_name,
-      lastName: u.last_name,
-      role: u.role,
-      avatar: u.avatar,
-      isActive: u.is_active === 1,
-      lastLoginAt: u.last_login_at,
-      createdAt: u.created_at,
-      updatedAt: u.updated_at
-    }))
-    
-    const { renderUsersListPage } = await import('../templates/pages/admin-users-list.template')
-    
-    const pageData = {
-      users,
-      currentPage: page,
-      totalPages,
-      totalUsers,
-      statusFilter: status || 'active',
-      roleFilter: role || '',
-      searchFilter: search || '',
-      pagination: totalPages > 1 ? {
-        currentPage: page,
-        totalPages,
-        totalItems: totalUsers,
-        itemsPerPage: limit,
-        startItem: offset + 1,
-        endItem: Math.min(offset + limit, totalUsers),
-        baseUrl: '/admin/users'
-      } : undefined,
-      user: user ? {
-        name: user.email,
-        email: user.email,
-        role: user.role
-      } : undefined,
-      version: c.get('appVersion')
-    }
-    
-    return c.html(renderUsersListPage(pageData))
-  } catch (error) {
-    console.error('Error fetching users:', error)
-    return c.html(`<p>Error loading users: ${error}</p>`)
-  }
-})
+// Mount user management routes FIRST so they take precedence
+console.log('[INFO] About to mount user routes at /')
+adminRoutes.route('/', userRoutes)
+console.log('[INFO] User routes mounted at /')
 
-// Toggle user status
-adminRoutes.post('/users/:id/toggle', async (c) => {
-  try {
-    const id = c.req.param('id')
-    const body = await c.req.json()
-    const active = body.active
-    
-    const db = c.env.DB
-    const updateStmt = db.prepare('UPDATE users SET is_active = ?, updated_at = ? WHERE id = ?')
-    await updateStmt.bind(active ? 1 : 0, Date.now(), id).run()
-    
-    return c.json({ success: true })
-  } catch (error) {
-    console.error('Error toggling user status:', error)
-    return c.json({ success: false, error: 'Failed to update user status' })
-  }
-})
-
-// Export users
-adminRoutes.get('/users/export', async (c) => {
-  try {
-    const db = c.env.DB
-    const stmt = db.prepare(`
-      SELECT email, username, first_name, last_name, role, is_active, 
-             last_login_at, created_at, updated_at
-      FROM users 
-      ORDER BY created_at DESC
-    `)
-    const { results } = await stmt.all()
-    
-    // Convert to CSV
-    const headers = ['Email', 'Username', 'First Name', 'Last Name', 'Role', 'Active', 'Last Login', 'Created', 'Updated']
-    const csvRows = [headers.join(',')]
-    
-    results?.forEach((user: any) => {
-      const row = [
-        user.email,
-        user.username,
-        user.first_name,
-        user.last_name,
-        user.role,
-        user.is_active ? 'Yes' : 'No',
-        user.last_login_at ? new Date(user.last_login_at).toISOString() : '',
-        new Date(user.created_at).toISOString(),
-        new Date(user.updated_at).toISOString()
-      ]
-      csvRows.push(row.join(','))
-    })
-    
-    const csv = csvRows.join('\n')
-    
-    return new Response(csv, {
-      headers: {
-        'Content-Type': 'text/csv',
-        'Content-Disposition': 'attachment; filename="users-export.csv"'
-      }
-    })
-  } catch (error) {
-    console.error('Error exporting users:', error)
-    return c.json({ error: 'Failed to export users' }, 500)
-  }
+// Debug logging for all admin routes (AFTER mounting userRoutes)
+adminRoutes.use('*', async (c, next) => {
+  console.log('[DEBUG admin.ts POST-MOUNT] Request:', c.req.method, c.req.path)
+  await next()
 })
 
 // Plugins management
@@ -1812,8 +1652,13 @@ adminRoutes.post('/api/test-cleanup/users', async (c) => {
   }
 })
 
-// Mount user management routes
-adminRoutes.route('/', userRoutes)
+// User management routes already mounted earlier (line ~1102)
 // Workflow admin routes are now mounted dynamically through plugin system
+
+// Catch-all 404 handler for debugging
+adminRoutes.notFound((c) => {
+  console.error('[404] Path not found:', c.req.method, c.req.path)
+  return c.json({ error: 'Not Found', status: 404, path: c.req.path }, 404)
+})
 
 export default adminRoutes
