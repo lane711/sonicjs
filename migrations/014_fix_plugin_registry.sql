@@ -80,7 +80,7 @@ INSERT OR IGNORE INTO plugins (
     'SonicJS Team',
     'system',
     '🗄️',
-    'inactive',
+    'active',
     FALSE,
     '["manage:database", "admin"]',
     unixepoch(),
