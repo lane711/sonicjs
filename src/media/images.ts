@@ -59,7 +59,7 @@ export class CloudflareImages {
   ): Promise<{ id: string; filename: string; uploaded: string; variants: string[] }> {
     try {
       const formData = new FormData()
-      const blob = new Blob([imageData])
+      const blob = new Blob([imageData as BlobPart])
       formData.append('file', blob)
       
       if (options.id) {

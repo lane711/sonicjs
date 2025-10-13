@@ -159,7 +159,7 @@ describe('sanitizeObject', () => {
 
   it('should handle fields that do not exist', () => {
     const obj = { name: 'John' }
-    const sanitized = sanitizeObject(obj, ['name', 'nonexistent' as any])
+    const sanitized = sanitizeObject(obj, ['name', 'nonexistent' as any]) as any
 
     expect(sanitized.name).toBe('John')
     expect(sanitized.nonexistent).toBeUndefined()

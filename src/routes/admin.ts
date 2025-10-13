@@ -91,12 +91,12 @@ async function getDynamicMenuItems(db: D1Database): Promise<Array<{
         const displayName = plugin.display_name || pluginName.charAt(0).toUpperCase() + pluginName.slice(1)
         const path = `/admin/${pluginName}`
         const pluginIcon = typeof plugin.icon === 'string' ? plugin.icon : undefined
-        const icon = pluginIcon ?? PLUGIN_ICON_MAP[pluginName] ?? PLUGIN_ICON_MAP['default']
+        const icon = (pluginIcon ?? PLUGIN_ICON_MAP[pluginName] ?? PLUGIN_ICON_MAP['default']) as string
 
         menuItems.push({
           label: displayName,
           path: path,
-          icon: icon
+          icon
         })
       }
     }

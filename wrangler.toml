@@ -9,14 +9,6 @@ port = 8787
 [build]
 command = ""
 
-[build.upload]
-format = "modules"
-
-[[build.upload.rules]]
-type = "CompiledWasm"
-globs = ["**/*.wasm"]
-fallthrough = true
-
 # Static assets
 [assets]
 directory = "./public"
