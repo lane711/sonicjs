@@ -34,13 +34,100 @@ export class PluginService {
   constructor(private db: D1Database) {}
 
   async getAllPlugins(): Promise<PluginData[]> {
+    // Ensure core plugins exist (auto-install if missing)
+    await this.ensureCorePluginsExist()
+
     const stmt = this.db.prepare(`
-      SELECT * FROM plugins 
+      SELECT * FROM plugins
       ORDER BY is_core DESC, display_name ASC
     `)
-    
+
     const { results } = await stmt.all()
     return (results || []).map(this.mapPluginFromDb)
+  }
+
+  private async ensureCorePluginsExist(): Promise<void> {
+    try {
+      // Check if any core plugins exist
+      const checkStmt = this.db.prepare('SELECT COUNT(*) as count FROM plugins WHERE is_core = TRUE')
+      const result = await checkStmt.first() as any
+
+      if (result && result.count > 0) {
+        // Core plugins already exist
+        return
+      }
+
+      // Install core plugins
+      const corePlugins = [
+        {
+          id: 'core-auth',
+          name: 'core-auth',
+          display_name: 'Authentication System',
+          description: 'Core authentication and user management system',
+          version: '1.0.0',
+          author: 'SonicJS Team',
+          category: 'security',
+          icon: '🔐',
+          is_core: true,
+          permissions: ['manage:users', 'manage:roles', 'manage:permissions']
+        },
+        {
+          id: 'core-media',
+          name: 'core-media',
+          display_name: 'Media Manager',
+          description: 'Core media upload and management system',
+          version: '1.0.0',
+          author: 'SonicJS Team',
+          category: 'media',
+          icon: '📸',
+          is_core: true,
+          permissions: ['manage:media', 'upload:files']
+        },
+        {
+          id: 'core-workflow',
+          name: 'core-workflow',
+          display_name: 'Workflow Engine',
+          description: 'Content workflow and approval system',
+          version: '1.0.0',
+          author: 'SonicJS Team',
+          category: 'content',
+          icon: '🔄',
+          is_core: true,
+          permissions: ['manage:workflows', 'approve:content']
+        },
+        {
+          id: 'cache',
+          name: 'cache',
+          display_name: 'Cache System',
+          description: 'Three-tiered caching system with memory, KV, and database layers',
+          version: '1.0.0',
+          author: 'SonicJS Team',
+          category: 'performance',
+          icon: '⚡',
+          is_core: true,
+          permissions: ['manage:cache', 'view:stats']
+        },
+        {
+          id: 'design',
+          name: 'design-plugin',
+          display_name: 'Design System',
+          description: 'Design system management including themes, components, and UI customization',
+          version: '1.0.0',
+          author: 'SonicJS',
+          category: 'ui',
+          icon: '🎨',
+          is_core: true,
+          permissions: ['design.view', 'design.edit']
+        }
+      ]
+
+      for (const plugin of corePlugins) {
+        await this.installPlugin(plugin)
+      }
+    } catch (error) {
+      console.error('Error ensuring core plugins exist:', error)
+      // Don't throw - just log the error and continue
+    }
   }
 
   async getPlugin(pluginId: string): Promise<PluginData | null> {

@@ -44,12 +44,12 @@ test.describe('Plugin Management', () => {
 
   test('should show plugin stats', async ({ page }) => {
     await page.goto(`${BASE_URL}/admin/plugins`)
-    
+
     // Check for stats cards (at least total plugins)
     await expect(page.locator('text=Total Plugins').first()).toBeVisible()
-    
-    // Look for plugin count in stats cards, be more specific
-    const statsCards = page.locator('div').filter({ hasText: 'Total Plugins' }).locator('p.text-white.text-2xl')
+
+    // Look for plugin count in stats cards - the number is in a div with text-2xl class
+    const statsCards = page.locator('div').filter({ hasText: 'Total Plugins' }).locator('div.text-2xl')
     await expect(statsCards.first()).toBeVisible()
   })
 

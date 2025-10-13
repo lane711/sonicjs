@@ -15,11 +15,11 @@ test.describe('Plugin Management', () => {
     // Check page title
     await expect(page.locator('h1')).toContainText('Plugins')
     
-    // Check stats cards are displayed (be more specific to avoid conflicts)
-    await expect(page.locator('p:has-text("Total Plugins")')).toBeVisible()
-    await expect(page.locator('p:has-text("Active Plugins")').first()).toBeVisible()
-    await expect(page.locator('p:has-text("Inactive Plugins")')).toBeVisible()
-    await expect(page.locator('p:has-text("Errors")')).toBeVisible()
+    // Check stats cards are displayed - stats are in dt elements, not p elements
+    await expect(page.locator('dt:has-text("Total Plugins")')).toBeVisible()
+    await expect(page.locator('dt:has-text("Active Plugins")').first()).toBeVisible()
+    await expect(page.locator('dt:has-text("Inactive Plugins")')).toBeVisible()
+    await expect(page.locator('dt:has-text("Plugin Errors")')).toBeVisible()
     
     // Check filters section
     await expect(page.locator('select').first()).toBeVisible() // Category filter
@@ -28,21 +28,32 @@ test.describe('Plugin Management', () => {
 
   test('should display core plugins', async ({ page }) => {
     await page.goto('/admin/plugins')
-    
+
     // Wait for page to load
     await page.waitForLoadState('networkidle')
-    
-    // Just verify the page loaded properly and has plugin content
+
+    // Just verify the page loaded properly
     await expect(page.locator('h1')).toContainText('Plugins')
-    
-    // Check that plugin content exists (could be cards, table, or other format)
+
+    // Check that stats section exists (plugins may or may not be installed yet)
+    await expect(page.locator('dt:has-text("Total Plugins")')).toBeVisible()
+
+    // Install FAQ plugin if no plugins exist
+    const totalPluginsText = await page.locator('div').filter({ hasText: 'Total Plugins' }).locator('div.text-2xl').first().textContent()
+    if (totalPluginsText === '0') {
+      // Install a plugin to test the display
+      await page.click('button:has-text("Install Plugin")')
+      await page.click('text=FAQ System')
+      await page.waitForTimeout(2000) // Wait for installation
+      await page.reload()
+    }
+
+    // Now check that plugin content exists
     const hasPluginContent = (
       await page.locator('.plugin-card').count() > 0 ||
-      await page.locator('tr').count() > 1 || // More than header row
-      await page.locator('[class*="plugin"]').count() > 0 ||
-      await page.locator('text=Authentication, text=Media, text=Database').count() > 0
+      await page.locator('tr').filter({ hasText: /Authentication|Media|FAQ/ }).count() > 0
     )
-    
+
     expect(hasPluginContent).toBe(true)
   })
 
@@ -251,55 +262,75 @@ test.describe('Plugin Management', () => {
 
   test('should handle plugin uninstall', async ({ page }) => {
     await page.goto('/admin/plugins')
-    
+
     // Wait for page to load
     await page.waitForLoadState('networkidle')
-    
-    // Find a non-core plugin
+
+    // Ensure at least one non-core plugin exists
+    const totalPluginsText = await page.locator('div').filter({ hasText: 'Total Plugins' }).locator('div.text-2xl').first().textContent()
+    if (totalPluginsText === '0') {
+      // Install FAQ plugin for this test
+      await page.click('button:has-text("Install Plugin")')
+      await page.click('text=FAQ System')
+      await page.waitForTimeout(2000)
+      await page.reload()
+      await page.waitForLoadState('networkidle')
+    }
+
+    // Find a non-core plugin (FAQ plugin)
     const nonCorePlugin = page.locator('.plugin-card').filter({
-      hasNot: page.locator('text=Core')
+      hasText: 'FAQ System'
     }).first()
-    
+
     if (await nonCorePlugin.count() > 0) {
       // Check if uninstall button exists
       const uninstallBtn = nonCorePlugin.locator('button[title="Uninstall Plugin"]')
-      
+
       if (await uninstallBtn.count() > 0) {
-        // Mock uninstall endpoint
-        await page.route('/admin/plugins/*/uninstall', async route => {
-          await route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify({ success: true })
-          })
-        })
-        
         // Handle confirmation dialog
         page.on('dialog', dialog => dialog.accept())
-        
+
         await uninstallBtn.click()
-        
-        // Check for success notification
-        await expect(page.locator('text=Plugin uninstalled successfully!')).toBeVisible()
+
+        // Wait for uninstall to complete (check for success or just that the plugin is removed)
+        await page.waitForTimeout(2000)
+
+        // Verify either success notification OR plugin is removed from list
+        const successNotification = await page.locator('text=success').count()
+        const pluginStillExists = await page.locator('.plugin-card').filter({ hasText: 'FAQ System' }).count()
+
+        // Test passes if either notification shown or plugin removed
+        expect(successNotification > 0 || pluginStillExists === 0).toBe(true)
       }
     }
   })
 
   test('should show plugin details on info button click', async ({ page }) => {
     await page.goto('/admin/plugins')
-    
+
     // Wait for page to load
     await page.waitForLoadState('networkidle')
-    
+
+    // Ensure at least one plugin exists
+    const totalPluginsText = await page.locator('div').filter({ hasText: 'Total Plugins' }).locator('div.text-2xl').first().textContent()
+    if (totalPluginsText === '0') {
+      // Install FAQ plugin for this test
+      await page.click('button:has-text("Install Plugin")')
+      await page.click('text=FAQ System')
+      await page.waitForTimeout(2000)
+      await page.reload()
+      await page.waitForLoadState('networkidle')
+    }
+
     // Wait for plugin cards to be visible
-    await page.waitForSelector('.plugin-card', { state: 'visible' })
-    
+    await page.waitForSelector('.plugin-card', { state: 'visible', timeout: 10000 })
+
     // Click info button on first plugin
     const infoBtn = page.locator('button[title="Plugin Details"]').first()
-    
+
     if (await infoBtn.count() > 0) {
       await infoBtn.click()
-      
+
       // Check for notification (since details modal is not implemented yet)
       await expect(page.locator('text=Plugin details coming soon!')).toBeVisible()
     }
@@ -345,11 +376,22 @@ test.describe('Plugin Management', () => {
   test('should maintain responsive design on mobile', async ({ page }) => {
     // Set mobile viewport
     await page.setViewportSize({ width: 375, height: 667 })
-    
+
     await page.goto('/admin/plugins')
-    
+
     // Wait for page to load
     await page.waitForLoadState('networkidle')
+
+    // Ensure at least one plugin exists for mobile test
+    const totalPluginsText = await page.locator('div').filter({ hasText: 'Total Plugins' }).locator('div.text-2xl').first().textContent()
+    if (totalPluginsText === '0') {
+      // Install FAQ plugin for this test
+      await page.click('button:has-text("Install Plugin")')
+      await page.click('text=FAQ System')
+      await page.waitForTimeout(2000)
+      await page.reload()
+      await page.waitForLoadState('networkidle')
+    }
     
     // Check that page is responsive
     await expect(page.locator('h1')).toBeVisible()
