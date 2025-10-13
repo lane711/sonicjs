@@ -2,128 +2,135 @@ import { test, expect } from '@playwright/test';
 import { loginAsAdmin } from './utils/test-helpers';
 
 test.describe('User XSS Prevention', () => {
-  test.beforeEach(async ({ page }) => {
-    await loginAsAdmin(page);
-  });
-
-  test('should prevent XSS in user creation via API', async ({ request }) => {
-    // Login first to get auth token
-    const loginResponse = await request.post('/auth/login', {
-      data: {
-        email: 'admin@example.com',
-        password: 'admin123'
-      }
+  test('should prevent XSS in user creation via API', async ({ page }) => {
+    // Set up a flag to detect if any alert() is triggered
+    let alertTriggered = false;
+    page.on('dialog', async (dialog) => {
+      alertTriggered = true;
+      await dialog.dismiss();
     });
 
-    expect(loginResponse.ok()).toBeTruthy();
-    const { token } = await loginResponse.json();
+    // Login first
+    await loginAsAdmin(page);
 
-    // Attempt to create user with XSS payloads via API
+    // Navigate to user creation page
+    await page.goto('/admin/users/new');
+
+    // Fill form with XSS payloads
+    const timestamp = Date.now();
     const xssPayloads = {
-      first_name: '<script>alert("XSS")</script>',
-      last_name: '"><img src=x onerror=alert("XSS")>',
-      username: `xsstest${Date.now()}`,
-      email: `xsstest${Date.now()}@example.com`,
+      firstName: '<script>alert("XSS")</script>',
+      lastName: '"><img src=x onerror=alert("XSS")>',
+      username: `xsstest${timestamp}`,
+      email: `xsstest${timestamp}@example.com`,
       phone: '<script>alert("phone")</script>',
-      bio: '"><script>alert("bio")</script><script>',
-      role: 'viewer',
-      password: 'SecurePassword123!',
-      confirm_password: 'SecurePassword123!',
-      is_active: '1',
-      email_verified: '1'
+      bio: '"><script>alert("bio")</script><script>'
     };
 
-    // Create user via API
-    const createResponse = await request.post('/admin/users/new', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      form: xssPayloads
-    });
+    await page.fill('input[name="first_name"]', xssPayloads.firstName);
+    await page.fill('input[name="last_name"]', xssPayloads.lastName);
+    await page.fill('input[name="username"]', xssPayloads.username);
+    await page.fill('input[name="email"]', xssPayloads.email);
+    await page.fill('input[name="phone"]', xssPayloads.phone);
+    await page.fill('textarea[name="bio"]', xssPayloads.bio);
+    await page.selectOption('select[name="role"]', 'viewer');
+    await page.fill('input[name="password"]', 'SecurePassword123!');
+    await page.fill('input[name="confirm_password"]', 'SecurePassword123!');
 
-    // The request should succeed (user created) or return validation error
-    // Either way, we want to verify XSS payloads are sanitized
+    // Submit the form
+    await page.click('button[type="submit"]');
 
-    if (createResponse.status() === 302 || createResponse.ok()) {
-      // User was created successfully
-      // Get the redirect location to find the user ID
-      const location = createResponse.headers()['location'];
+    // Wait for response
+    await page.waitForTimeout(2000);
 
-      if (location && location.includes('/admin/users/')) {
-        const userId = location.match(/\/admin\/users\/([^/]+)\/edit/)?.[1];
+    // Check if we're redirected to users list or edit page
+    const currentUrl = page.url();
+    expect(currentUrl).toContain('/admin/users');
 
-        if (userId) {
-          // Fetch the user data to verify sanitization
-          const userResponse = await request.get(`/admin/users/${userId}/edit`, {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
+    // Wait for page to fully load
+    await page.waitForLoadState('networkidle');
 
-          const userHtml = await userResponse.text();
+    // CRITICAL: Verify no JavaScript execution occurred
+    expect(alertTriggered).toBe(false);
 
-          // Verify that dangerous HTML tags are escaped
-          expect(userHtml).not.toContain('<script>alert');
-          expect(userHtml).not.toContain('onerror=alert');
-          expect(userHtml).not.toContain('<img src=x');
+    // Get the page HTML to check if dangerous content is properly escaped
+    const pageHtml = await page.content();
 
-          // The sanitized content should have escaped HTML entities
-          const hasEscapedContent =
-            userHtml.includes('&lt;script&gt;') ||
-            userHtml.includes('&lt;img') ||
-            !userHtml.match(/<script>.*alert/i);
+    // Extract just the form section to check user data
+    const formSection = pageHtml.match(/<form[\s\S]*?<\/form>/gi)?.join('') || '';
 
-          expect(hasEscapedContent).toBe(true);
-        }
-      }
-    }
+    // Check for unescaped dangerous HTML in attribute values
+    expect(formSection).not.toMatch(/value="[^"]*<script[^>]*>/i);
+    expect(formSection).not.toMatch(/value="[^"]*<\/script>/i);
+    expect(formSection).not.toMatch(/value="[^"]*"[^>]*onerror=/i);
+    expect(formSection).not.toMatch(/value="[^"]*<img[^>]*onerror=/i);
+
+    // Verify content IS properly escaped (contains HTML entities)
+    expect(formSection).toMatch(/&(lt|gt|quot|amp);/);
+
+    console.log('✓ XSS payloads properly escaped - found HTML entities in form values');
+
+    console.log('✓ XSS payloads were successfully sanitized in user creation');
   });
 
-  test('should sanitize user data in database', async ({ request }) => {
-    // Login to get auth token
-    const loginResponse = await request.post('/auth/login', {
-      data: {
-        email: 'admin@example.com',
-        password: 'admin123'
-      }
+  test('should sanitize user data in database', async ({ page }) => {
+    // Set up a flag to detect if any alert() is triggered
+    let alertTriggered = false;
+    page.on('dialog', async (dialog) => {
+      alertTriggered = true;
+      await dialog.dismiss();
     });
 
-    expect(loginResponse.ok()).toBeTruthy();
-    const { token } = await loginResponse.json();
+    // Login first
+    await loginAsAdmin(page);
+
+    // Navigate to user creation page
+    await page.goto('/admin/users/new');
 
     // Create user with XSS payloads
     const timestamp = Date.now();
-    const xssPayloads = {
-      first_name: '<script>alert("test")</script>',
-      last_name: `XSSTest${timestamp}`,
-      username: `xsstest_db_${timestamp}`,
-      email: `xsstest_db_${timestamp}@example.com`,
-      phone: '"><img src=x onerror=alert(1)>',
-      bio: '<iframe src="javascript:alert(\'XSS\')">',
-      role: 'viewer',
-      password: 'SecurePassword123!',
-      confirm_password: 'SecurePassword123!',
-      is_active: '1'
-    };
+    await page.fill('input[name="first_name"]', '<script>alert("test")</script>');
+    await page.fill('input[name="last_name"]', `XSSTest${timestamp}`);
+    await page.fill('input[name="username"]', `xsstest_db_${timestamp}`);
+    await page.fill('input[name="email"]', `xsstest_db_${timestamp}@example.com`);
+    await page.fill('input[name="phone"]', '"><img src=x onerror=alert(1)>');
+    await page.fill('textarea[name="bio"]', '<iframe src="javascript:alert(\'XSS\')">');
+    await page.selectOption('select[name="role"]', 'viewer');
+    await page.fill('input[name="password"]', 'SecurePassword123!');
+    await page.fill('input[name="confirm_password"]', 'SecurePassword123!');
 
-    const createResponse = await request.post('/admin/users/new', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      form: xssPayloads
-    });
+    // Submit the form
+    await page.click('button[type="submit"]');
 
-    // Verify user was created and XSS was prevented
-    if (createResponse.status() === 302) {
-      const location = createResponse.headers()['location'];
-      expect(location).toBeTruthy();
+    // Wait for response
+    await page.waitForTimeout(2000);
 
-      // The payloads should have been sanitized
-      // Verify by checking the database directly or via API that
-      // dangerous characters were escaped
-      console.log('User created successfully, XSS payloads were sanitized');
-    }
+    // Verify user was created and redirected
+    const currentUrl = page.url();
+    expect(currentUrl).toContain('/admin/users');
+
+    // Wait for page to fully load
+    await page.waitForLoadState('networkidle');
+
+    // CRITICAL: Verify no JavaScript execution occurred
+    expect(alertTriggered).toBe(false);
+
+    // Get the page HTML source to check proper escaping
+    const pageHtml = await page.content();
+
+    // Extract just the form section to check user data
+    const formSection = pageHtml.match(/<form[\s\S]*?<\/form>/gi)?.join('') || '';
+
+    // Check for unescaped dangerous HTML in attribute values
+    expect(formSection).not.toMatch(/value="[^"]*<script[^>]*>/i);
+    expect(formSection).not.toMatch(/value="[^"]*<\/script>/i);
+    expect(formSection).not.toMatch(/value="[^"]*"[^>]*onerror=/i);
+    expect(formSection).not.toMatch(/value="[^"]*<img[^>]*onerror=/i);
+    expect(formSection).not.toMatch(/value="[^"]*<iframe[^>]*src=["']javascript:/i);
+
+    // Verify content IS properly escaped (contains HTML entities)
+    expect(formSection).toMatch(/&(lt|gt|quot|amp);/);
+
+    console.log('✓ User created successfully, XSS payloads were sanitized in database');
   });
 });

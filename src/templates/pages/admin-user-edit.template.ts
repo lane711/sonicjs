@@ -1,6 +1,7 @@
 import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
 import { renderAlert } from '../components/alert.template'
 import { renderConfirmationDialog, getConfirmationDialogScript } from '../components/confirmation-dialog.template'
+import { escapeHtml } from '../../utils/sanitize'
 
 export interface UserEditData {
   id: string
@@ -89,7 +90,7 @@ export function renderUserEditPage(data: UserEditPageData): string {
                     <input
                       type="text"
                       name="first_name"
-                      value="${data.userToEdit.firstName || ''}"
+                      value="${escapeHtml(data.userToEdit.firstName || '')}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -100,7 +101,7 @@ export function renderUserEditPage(data: UserEditPageData): string {
                     <input
                       type="text"
                       name="last_name"
-                      value="${data.userToEdit.lastName || ''}"
+                      value="${escapeHtml(data.userToEdit.lastName || '')}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -111,7 +112,7 @@ export function renderUserEditPage(data: UserEditPageData): string {
                     <input
                       type="text"
                       name="username"
-                      value="${data.userToEdit.username || ''}"
+                      value="${escapeHtml(data.userToEdit.username || '')}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -122,7 +123,7 @@ export function renderUserEditPage(data: UserEditPageData): string {
                     <input
                       type="email"
                       name="email"
-                      value="${data.userToEdit.email || ''}"
+                      value="${escapeHtml(data.userToEdit.email || '')}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -133,7 +134,7 @@ export function renderUserEditPage(data: UserEditPageData): string {
                     <input
                       type="tel"
                       name="phone"
-                      value="${data.userToEdit.phone || ''}"
+                      value="${escapeHtml(data.userToEdit.phone || '')}"
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
                   </div>
@@ -147,7 +148,7 @@ export function renderUserEditPage(data: UserEditPageData): string {
                         class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-zinc-500/30 dark:outline-zinc-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-500 dark:focus-visible:outline-zinc-400 sm:text-sm/6"
                       >
                         ${data.roles.map(role => `
-                          <option value="${role.value}" ${data.userToEdit.role === role.value ? 'selected' : ''}>${role.label}</option>
+                          <option value="${escapeHtml(role.value)}" ${data.userToEdit.role === role.value ? 'selected' : ''}>${escapeHtml(role.label)}</option>
                         `).join('')}
                       </select>
                       <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-zinc-600 dark:text-zinc-400 sm:size-4">
@@ -163,7 +164,7 @@ export function renderUserEditPage(data: UserEditPageData): string {
                     name="bio"
                     rows="3"
                     class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
-                  >${data.userToEdit.bio || ''}</textarea>
+                  >${escapeHtml(data.userToEdit.bio || '')}</textarea>
                 </div>
               </div>
 

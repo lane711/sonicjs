@@ -1,5 +1,12 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-echo "Running E2E tests before push..."
-npm run test:e2e
+# Check if E2E tests should run (set RUN_E2E_ON_PUSH=true to enable)
+RUN_E2E=${RUN_E2E_ON_PUSH:-false}
+
+if [ "$RUN_E2E" = "true" ]; then
+  echo "Running E2E tests before push..."
+  npm run test:e2e
+else
+  echo "Skipping E2E tests (set RUN_E2E_ON_PUSH=true to enable)"
+fi

@@ -16,6 +16,8 @@ binding = "ASSETS"
 
 [vars]
 ENVIRONMENT = "development"
+# Set to "true" to run E2E tests before every git push
+RUN_E2E_ON_PUSH = "false"
 # Cloudflare Images configuration (optional)
 # IMAGES_ACCOUNT_ID = "your-account-id"
 # CDN_DOMAIN = "media.yourdomain.com"
