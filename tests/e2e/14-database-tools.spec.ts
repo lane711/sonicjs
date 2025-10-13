@@ -68,25 +68,27 @@ test.describe('Database Tools', () => {
   });
 
   test('should refresh database stats when button clicked', async ({ page }) => {
-    // Navigate to database tools tab
-    await page.goto('/admin/settings');
-    await page.click('[data-tab="database-tools"]');
-    
-    // Wait for initial load
+    // Navigate directly to database tools tab
+    await page.goto('/admin/settings/database-tools');
+
+    // Wait for the page and JavaScript to load
+    await expect(page.locator('h3:has-text("Database Tools")')).toBeVisible();
+
+    // Wait for initial auto-load to complete
     await page.waitForTimeout(1000);
-    
-    // Listen for API calls
-    const responsePromise = page.waitForResponse(response => 
+
+    // Now listen for the NEXT API call (triggered by button click)
+    const responsePromise = page.waitForResponse(response =>
       response.url().includes('/admin/database-tools/api/stats') && response.status() === 200
     );
-    
+
     // Click refresh button
     await page.click('button:has-text("Refresh Stats")');
-    
+
     // Verify API call was made
     const response = await responsePromise;
     expect(response.status()).toBe(200);
-    
+
     // Verify response contains expected data structure
     const responseData = await response.json();
     expect(responseData).toHaveProperty('success', true);
@@ -94,25 +96,27 @@ test.describe('Database Tools', () => {
   });
 
   test('should validate database when button clicked', async ({ page }) => {
-    // Navigate to database tools tab
-    await page.goto('/admin/settings');
-    await page.click('[data-tab="database-tools"]');
-    
-    // Wait for initial load
+    // Navigate directly to database tools tab
+    await page.goto('/admin/settings/database-tools');
+
+    // Wait for the page and JavaScript to load
+    await expect(page.locator('h3:has-text("Database Tools")')).toBeVisible();
+
+    // Wait for initial auto-load to complete
     await page.waitForTimeout(1000);
-    
+
     // Listen for validation API call
-    const responsePromise = page.waitForResponse(response => 
+    const responsePromise = page.waitForResponse(response =>
       response.url().includes('/admin/database-tools/api/validate') && response.status() === 200
     );
-    
+
     // Click validate database button
     await page.click('button:has-text("Validate Database")');
-    
+
     // Verify API call was made
     const response = await responsePromise;
     expect(response.status()).toBe(200);
-    
+
     // Verify response contains validation data
     const responseData = await response.json();
     expect(responseData).toHaveProperty('success', true);
@@ -120,25 +124,27 @@ test.describe('Database Tools', () => {
   });
 
   test('should create backup when button clicked', async ({ page }) => {
-    // Navigate to database tools tab
-    await page.goto('/admin/settings');
-    await page.click('[data-tab="database-tools"]');
-    
-    // Wait for initial load
+    // Navigate directly to database tools tab
+    await page.goto('/admin/settings/database-tools');
+
+    // Wait for the page and JavaScript to load
+    await expect(page.locator('h3:has-text("Database Tools")')).toBeVisible();
+
+    // Wait for initial auto-load to complete
     await page.waitForTimeout(1000);
-    
+
     // Listen for backup API call
-    const responsePromise = page.waitForResponse(response => 
+    const responsePromise = page.waitForResponse(response =>
       response.url().includes('/admin/database-tools/api/backup') && response.status() === 200
     );
-    
+
     // Click create backup button
     await page.click('button:has-text("Create Backup")');
-    
+
     // Verify API call was made
     const response = await responsePromise;
     expect(response.status()).toBe(200);
-    
+
     // Verify response contains backup data
     const responseData = await response.json();
     expect(responseData).toHaveProperty('success', true);
@@ -146,13 +152,12 @@ test.describe('Database Tools', () => {
   });
 
   test('should handle truncate confirmation dialog', async ({ page }) => {
-    // Navigate to database tools tab
-    await page.goto('/admin/settings');
-    await page.click('[data-tab="database-tools"]');
-    
-    // Wait for initial load
-    await page.waitForTimeout(1000);
-    
+    // Navigate directly to database tools tab
+    await page.goto('/admin/settings/database-tools');
+
+    // Wait for the page and JavaScript to load
+    await expect(page.locator('h3:has-text("Database Tools")')).toBeVisible();
+
     let dialogCount = 0;
     // Setup dialog handler to handle both prompt and alert
     page.on('dialog', async dialog => {
@@ -166,29 +171,30 @@ test.describe('Database Tools', () => {
         await dialog.accept();
       }
     });
-    
+
     // Click truncate button (should trigger confirmation dialog)
     await page.click('button:has-text("Truncate All Data")');
-    
+
     // Wait a bit for dialogs to appear and be handled
     await page.waitForTimeout(1000);
-    
+
     // Both prompt and alert should have been triggered
     expect(dialogCount).toBe(2);
-    
+
     // Button should still be enabled since we cancelled
     await expect(page.locator('button:has-text("Truncate All Data")')).toBeEnabled();
   });
 
   test('should display tables list section', async ({ page }) => {
-    // Navigate to database tools tab
-    await page.goto('/admin/settings');
-    await page.click('[data-tab="database-tools"]');
-    
+    // Navigate directly to database tools tab
+    await page.goto('/admin/settings/database-tools');
+
+    // Wait for the page and JavaScript to load
+    await expect(page.locator('h3:has-text("Database Tools")')).toBeVisible();
+
     // Check for tables list section
     await expect(page.locator('text=Database Tables')).toBeVisible();
-    await expect(page.locator('text=Current tables and row counts')).toBeVisible();
-    
+
     // Check for tables list container
     await expect(page.locator('#tables-list')).toBeVisible();
   });

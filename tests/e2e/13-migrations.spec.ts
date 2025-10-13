@@ -142,26 +142,28 @@ test.describe('Admin Migrations Page', () => {
   });
 
   test('should handle run pending migrations with confirmation', async ({ page }) => {
-    // Navigate to migrations tab
-    await page.goto('/admin/settings');
-    await page.click('[data-tab="migrations"]');
-    
-    // Wait for initial load
+    // Navigate directly to migrations tab
+    await page.goto('/admin/settings/migrations');
+
+    // Wait for the page and JavaScript to load
+    await expect(page.locator('h3:has-text("Database Migrations")')).toBeVisible();
+
+    // Wait for migration status to load
     await page.waitForTimeout(1000);
-    
+
     // Setup dialog handler to cancel the confirmation
     page.on('dialog', async dialog => {
       expect(dialog.message()).toContain('Are you sure you want to run pending migrations');
       await dialog.dismiss();
     });
-    
+
     // Click run pending button (should trigger confirmation dialog)
     await page.click('button:has-text("Run Pending")');
-    
+
     // If the button is disabled (no pending migrations), skip this test
     const runButton = page.locator('button:has-text("Run Pending")');
     const isDisabled = await runButton.isDisabled();
-    
+
     if (!isDisabled) {
       // The dialog should have been triggered and dismissed
       // Button should still be enabled since we cancelled

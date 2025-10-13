@@ -152,16 +152,6 @@ export function renderSettingsPage(data: SettingsPageData): string {
       // Initialize tab-specific features on page load
       const currentTab = '${activeTab}';
 
-      // Auto-load migrations status if on migrations tab
-      if (currentTab === 'migrations') {
-        setTimeout(refreshMigrationStatus, 500);
-      }
-
-      // Auto-load database stats if on database tools tab
-      if (currentTab === 'database-tools') {
-        setTimeout(refreshDatabaseStats, 500);
-      }
-      
       function saveAllSettings() {
         // Collect all form data
         const formData = new FormData();
@@ -238,7 +228,7 @@ export function renderSettingsPage(data: SettingsPageData): string {
 
           if (result.success) {
             alert(result.message);
-            setTimeout(() => refreshMigrationStatus(), 1000);
+            setTimeout(() => window.refreshMigrationStatus(), 1000);
           } else {
             alert(result.error || 'Failed to run migrations');
           }
@@ -323,7 +313,7 @@ export function renderSettingsPage(data: SettingsPageData): string {
       // Auto-load migrations when switching to that tab
       function initializeMigrations() {
         if (currentTab === 'migrations') {
-          setTimeout(refreshMigrationStatus, 500);
+          setTimeout(window.refreshMigrationStatus, 500);
         }
       }
       
@@ -358,7 +348,7 @@ export function renderSettingsPage(data: SettingsPageData): string {
           
           if (result.success) {
             alert(result.message);
-            setTimeout(() => refreshDatabaseStats(), 1000);
+            setTimeout(() => window.refreshDatabaseStats(), 1000);
           } else {
             alert(result.error || 'Failed to create backup');
           }
@@ -404,7 +394,7 @@ export function renderSettingsPage(data: SettingsPageData): string {
           if (result.success) {
             alert(result.message + '\\n\\nTables cleared: ' + result.data.tablesCleared.join(', '));
             setTimeout(() => {
-              refreshDatabaseStats();
+              window.refreshDatabaseStats();
               // Optionally reload page to refresh all data
               window.location.reload();
             }, 2000);
@@ -468,6 +458,15 @@ export function renderSettingsPage(data: SettingsPageData): string {
           \`).join('');
         }
       };
+
+      // Auto-load tab-specific data after all functions are defined
+      if (currentTab === 'migrations') {
+        setTimeout(window.refreshMigrationStatus, 500);
+      }
+
+      if (currentTab === 'database-tools') {
+        setTimeout(window.refreshDatabaseStats, 500);
+      }
     </script>
 
     <!-- Confirmation Dialogs -->
@@ -1164,7 +1163,7 @@ function renderMigrationSettings(settings?: MigrationSettings): string {
       <!-- Migration Actions -->
       <div class="flex items-center space-x-4 mb-6">
         <button 
-          onclick="refreshMigrationStatus()" 
+          onclick="window.refreshMigrationStatus()"
           class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
         >
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1174,7 +1173,7 @@ function renderMigrationSettings(settings?: MigrationSettings): string {
         </button>
         
         <button 
-          onclick="runPendingMigrations()" 
+          onclick="window.runPendingMigrations()"
           id="run-migrations-btn"
           class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
           ${(settings?.pendingMigrations || 0) === 0 ? 'disabled' : ''}
@@ -1186,7 +1185,7 @@ function renderMigrationSettings(settings?: MigrationSettings): string {
         </button>
 
         <button 
-          onclick="validateSchema()" 
+          onclick="window.validateSchema()" 
           class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors"
         >
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1254,7 +1253,7 @@ function renderMigrationSettings(settings?: MigrationSettings): string {
 
             if (result.success) {
               alert(result.message);
-              setTimeout(() => refreshMigrationStatus(), 1000);
+              setTimeout(() => window.refreshMigrationStatus(), 1000);
             } else {
               alert(result.error || 'Failed to run migrations');
             }
@@ -1391,7 +1390,7 @@ function renderDatabaseToolsSettings(settings?: DatabaseToolsSettings): string {
           <h4 class="text-base/7 font-semibold text-zinc-950 dark:text-white mb-4">Safe Operations</h4>
           <div class="flex flex-wrap gap-3">
             <button
-              onclick="refreshDatabaseStats()"
+              onclick="window.refreshDatabaseStats()"
               class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm"
             >
               <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1401,7 +1400,7 @@ function renderDatabaseToolsSettings(settings?: DatabaseToolsSettings): string {
             </button>
 
             <button
-              onclick="createDatabaseBackup()"
+              onclick="window.createDatabaseBackup()"
               id="create-backup-btn"
               class="inline-flex items-center justify-center rounded-lg bg-indigo-600 dark:bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 dark:hover:bg-indigo-400 transition-colors shadow-sm"
             >
@@ -1412,7 +1411,7 @@ function renderDatabaseToolsSettings(settings?: DatabaseToolsSettings): string {
             </button>
 
             <button
-              onclick="validateDatabase()"
+              onclick="window.validateDatabase()"
               class="inline-flex items-center justify-center rounded-lg bg-green-600 dark:bg-green-500 px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-green-500 dark:hover:bg-green-400 transition-colors shadow-sm"
             >
               <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1455,7 +1454,7 @@ function renderDatabaseToolsSettings(settings?: DatabaseToolsSettings): string {
             </p>
             <div class="mt-4">
               <button
-                onclick="truncateDatabase()"
+                onclick="window.truncateDatabase()"
                 id="truncate-db-btn"
                 class="inline-flex items-center justify-center rounded-lg bg-red-600 dark:bg-red-500 px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-red-500 dark:hover:bg-red-400 transition-colors shadow-sm"
               >
