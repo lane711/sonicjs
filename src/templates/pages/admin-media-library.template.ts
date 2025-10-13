@@ -751,10 +751,10 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
             showNotification(\`Folder "\${folderName}" created successfully\`, 'success');
             closeCreateFolderModal();
 
-            // Reload the page to show the new folder
+            // Reload the page to show the new folder (delay to allow notification to show)
             setTimeout(() => {
               window.location.reload();
-            }, 1000);
+            }, 2000);
           } else {
             showNotification(result.error || 'Failed to create folder', 'error');
           }

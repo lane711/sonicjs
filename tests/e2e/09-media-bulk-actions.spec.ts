@@ -41,7 +41,7 @@ test.describe('Media Bulk Actions', () => {
         { name: 'test-bulk-2.jpg', mimeType: 'image/jpeg', buffer: testImageBuffer }
       ]);
 
-      await page.locator('button[type="submit"]').click();
+      await page.locator('#upload-modal button[type="submit"]').click();
       await expect(page.locator('#upload-results')).toContainText('Successfully uploaded', { timeout: 10000 });
 
       // Close modal - use Cancel button or X button

@@ -105,9 +105,9 @@ test.describe('Media Create Folder', () => {
     const submitBtn = modal.locator('button[type="submit"]');
     await submitBtn.click();
 
-    // Wait for success and verify notification appears
-    const notification = page.locator('#notification-container >> text=/created successfully/i');
-    await expect(notification).toBeVisible({ timeout: 5000 });
+    // Wait for success and verify notification appears (within animation time)
+    const notification = page.getByText(/created successfully/i);
+    await expect(notification).toBeVisible({ timeout: 1500 });
 
     // Verify modal closes after success
     await expect(modal).not.toBeVisible({ timeout: 3000 });
@@ -176,9 +176,9 @@ test.describe('Media Create Folder', () => {
     await folderInput.fill(folderName);
     await folderInput.press('Enter');
 
-    // Wait for success and verify notification
-    const notification = page.locator('#notification-container >> text=/created successfully/i');
-    await expect(notification).toBeVisible({ timeout: 5000 });
+    // Wait for success and verify notification (within animation time)
+    const notification = page.getByText(/created successfully/i);
+    await expect(notification).toBeVisible({ timeout: 1500 });
   });
 
   test('should clear input when reopening modal after successful creation', async ({ page }) => {

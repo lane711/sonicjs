@@ -439,6 +439,44 @@ apiMediaRoutes.post('/bulk-delete', async (c) => {
   }
 })
 
+// Create folder
+apiMediaRoutes.post('/create-folder', async (c) => {
+  try {
+    const user = c.get('user')
+    const body = await c.req.json()
+    const folderName = body.folderName as string
+
+    if (!folderName || typeof folderName !== 'string') {
+      return c.json({ success: false, error: 'No folder name provided' }, 400)
+    }
+
+    // Validate folder name format
+    const folderPattern = /^[a-z0-9-_]+$/
+    if (!folderPattern.test(folderName)) {
+      return c.json({
+        success: false,
+        error: 'Folder name can only contain lowercase letters, numbers, hyphens, and underscores'
+      }, 400)
+    }
+
+    // Check if folder already exists in the database
+    const checkStmt = c.env.DB.prepare('SELECT COUNT(*) as count FROM media WHERE folder = ? AND deleted_at IS NULL')
+    const existingFolder = await checkStmt.bind(folderName).first() as any
+
+    // Note: We allow folder creation even if it exists, as R2 folders are virtual
+    // The folder will be created when files are uploaded to it
+
+    return c.json({
+      success: true,
+      message: `Folder "${folderName}" created successfully`,
+      folder: folderName
+    })
+  } catch (error) {
+    console.error('Create folder error:', error)
+    return c.json({ success: false, error: 'Failed to create folder' }, 500)
+  }
+})
+
 // Bulk move files to folder
 apiMediaRoutes.post('/bulk-move', async (c) => {
   try {

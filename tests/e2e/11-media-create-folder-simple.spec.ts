@@ -25,14 +25,8 @@ test.describe('Media Create Folder - Core Functionality', () => {
     // Submit
     await page.locator('#create-folder-modal button[type="submit"]').click();
 
-    // Wait for success notification
-    await page.waitForTimeout(1500);
-
-    // Check that the folder was created (notification should appear or page reloads)
-    const hasNotification = await page.locator('#notification-container').isVisible();
-    const hasReloaded = await page.url();
-
-    // Either notification appeared or page is reloading/reloaded
-    expect(hasNotification || hasReloaded.includes('/admin/media')).toBeTruthy();
+    // Wait for success notification (within animation time)
+    const notification = page.getByText(/created successfully/i);
+    await expect(notification).toBeVisible({ timeout: 1500 });
   });
 });

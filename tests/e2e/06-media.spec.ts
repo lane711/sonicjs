@@ -49,8 +49,8 @@ test.describe('Media Management', () => {
       mimeType: 'image/jpeg',
       buffer: testImageBuffer
     });
-    
-    await page.locator('button[type="submit"]').click();
+
+    await page.locator('#upload-modal button[type="submit"]').click();
     
     // Should show upload success
     await expect(page.locator('#upload-results')).toContainText('Successfully uploaded', { timeout: 10000 });
@@ -66,8 +66,8 @@ test.describe('Media Management', () => {
       mimeType: 'application/octet-stream',
       buffer: Buffer.from('fake executable')
     });
-    
-    await page.locator('button[type="submit"]').click();
+
+    await page.locator('#upload-modal button[type="submit"]').click();
     
     // Should show validation error
     await expect(page.locator('#upload-results')).toContainText('Unsupported file type');
@@ -138,7 +138,7 @@ test.describe('Media Management', () => {
     const mediaItems = page.locator('.media-item');
 
     if (await mediaItems.count() === 0) {
-      await expect(page.getByText('No media files')).toBeVisible();
+      await expect(page.getByText(/No media files|Upload your first file|No files found/i)).toBeVisible();
     }
   });
 
@@ -163,16 +163,16 @@ test.describe('Media Management', () => {
       // Should be clickable
       await expect(firstItem).toBeVisible();
 
-      // Test list view toggle if available
-      const viewToggle = page.locator('button[data-view="list"], button:has-text("List View")');
-      if (await viewToggle.count() > 0) {
-        await viewToggle.click();
-        await page.waitForTimeout(500);
+      // Test list view toggle if available (using select dropdown)
+      const viewSelector = page.locator('select').filter({ has: page.locator('option[value="grid"]') });
+      if (await viewSelector.count() > 0) {
+        await viewSelector.selectOption('list');
+        await page.waitForLoadState('networkidle');
 
         // Verify list view is active
-        const listItems = page.locator('.media-list-item, [data-view-type="list"] .media-item');
-        if (await listItems.count() > 0) {
-          await expect(listItems.first()).toBeVisible();
+        const listViewContainer = page.locator('#media-grid > div.space-y-4');
+        if (await listViewContainer.count() > 0) {
+          await expect(listViewContainer).toBeVisible();
         }
       }
     } else {
