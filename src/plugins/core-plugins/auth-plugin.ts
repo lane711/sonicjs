@@ -11,7 +11,7 @@ import { Plugin, HOOKS } from '../types'
 export function createAuthPlugin(): Plugin {
   const builder = PluginBuilder.create({
     name: 'core-auth',
-    version: '1.0.0',
+    version: '1.0.0-beta.1',
     description: 'Core authentication and authorization plugin'
   })
 

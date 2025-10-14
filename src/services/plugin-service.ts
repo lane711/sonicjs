@@ -1,5 +1,6 @@
 import type { D1Database } from '@cloudflare/workers-types'
 import { Plugin, PluginStatus } from '../plugins/types'
+import { PLUGIN_REGISTRY, CORE_PLUGIN_IDS } from '../plugins/plugin-registry'
 
 export interface PluginData {
   id: string
@@ -57,77 +58,57 @@ export class PluginService {
         return
       }
 
-      // Install core plugins
-      const corePlugins = [
-        {
-          id: 'core-auth',
-          name: 'core-auth',
-          display_name: 'Authentication System',
-          description: 'Core authentication and user management system',
-          version: '1.0.0',
-          author: 'SonicJS Team',
-          category: 'security',
-          icon: '🔐',
-          is_core: true,
-          permissions: ['manage:users', 'manage:roles', 'manage:permissions']
-        },
-        {
-          id: 'core-media',
-          name: 'core-media',
-          display_name: 'Media Manager',
-          description: 'Core media upload and management system',
-          version: '1.0.0',
-          author: 'SonicJS Team',
-          category: 'media',
-          icon: '📸',
-          is_core: true,
-          permissions: ['manage:media', 'upload:files']
-        },
-        {
-          id: 'core-workflow',
-          name: 'core-workflow',
-          display_name: 'Workflow Engine',
-          description: 'Content workflow and approval system',
-          version: '1.0.0',
-          author: 'SonicJS Team',
-          category: 'content',
-          icon: '🔄',
-          is_core: true,
-          permissions: ['manage:workflows', 'approve:content']
-        },
-        {
-          id: 'core-cache',
-          name: 'core-cache',
-          display_name: 'Cache System',
-          description: 'Three-tiered caching system with memory, KV, and database layers',
-          version: '1.0.0',
-          author: 'SonicJS Team',
-          category: 'performance',
-          icon: '⚡',
-          is_core: true,
-          permissions: ['manage:cache', 'view:stats']
-        },
-        {
-          id: 'design',
-          name: 'design-plugin',
-          display_name: 'Design System',
-          description: 'Design system management including themes, components, and UI customization',
-          version: '1.0.0',
-          author: 'SonicJS',
-          category: 'ui',
-          icon: '🎨',
-          is_core: true,
-          permissions: ['design.view', 'design.edit']
-        }
-      ]
+      // Install core plugins from the auto-generated registry
+      console.log(`Installing ${CORE_PLUGIN_IDS.length} core plugins from registry...`)
 
-      for (const plugin of corePlugins) {
-        await this.installPlugin(plugin)
+      for (const pluginId of CORE_PLUGIN_IDS) {
+        const manifest = PLUGIN_REGISTRY[pluginId]
+        if (!manifest) {
+          console.warn(`Warning: Plugin ${pluginId} not found in registry`)
+          continue
+        }
+
+        // Map manifest to PluginData format
+        const pluginData = {
+          id: manifest.id,
+          name: manifest.id, // Use ID as name for consistency
+          display_name: manifest.name,
+          description: manifest.description,
+          version: manifest.version,
+          author: manifest.author,
+          category: manifest.category,
+          icon: this.getCategoryIcon(manifest.category),
+          is_core: true,
+          permissions: manifest.permissions ? Object.keys(manifest.permissions) : [],
+          dependencies: manifest.dependencies || [],
+          settings: manifest.settings || {}
+        }
+
+        await this.installPlugin(pluginData)
       }
+
+      console.log('Core plugins installation complete')
     } catch (error) {
       console.error('Error ensuring core plugins exist:', error)
       // Don't throw - just log the error and continue
     }
+  }
+
+  /**
+   * Get an appropriate icon for a plugin category
+   */
+  private getCategoryIcon(category: string): string {
+    const icons: Record<string, string> = {
+      'security': '🔐',
+      'media': '📸',
+      'content': '📝',
+      'performance': '⚡',
+      'ui': '🎨',
+      'analytics': '📊',
+      'development': '🛠️',
+      'utilities': '🔧'
+    }
+    return icons[category] || '🔌'
   }
 
   async getPlugin(pluginId: string): Promise<PluginData | null> {

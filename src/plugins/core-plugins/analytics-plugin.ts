@@ -12,7 +12,7 @@ import { Plugin, HOOKS } from '../types'
 export function createAnalyticsPlugin(): Plugin {
   const builder = PluginBuilder.create({
     name: 'core-analytics',
-    version: '1.0.0',
+    version: '1.0.0-beta.1',
     description: 'Core analytics tracking and reporting plugin'
   })
 

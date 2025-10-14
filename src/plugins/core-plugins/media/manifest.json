@@ -1,0 +1,54 @@
+{
+  "id": "core-media",
+  "name": "Media Manager",
+  "version": "1.0.0-beta.1",
+  "description": "Core media upload and management system with support for images, videos, and documents. Includes automatic optimization, thumbnail generation, and cloud storage integration",
+  "author": "SonicJS Team",
+  "homepage": "https://sonicjs.com/plugins/core-media",
+  "repository": "https://github.com/lane711/sonicjs-ai/tree/main/src/plugins/core-plugins",
+  "license": "MIT",
+  "category": "media",
+  "tags": ["media", "uploads", "images", "files", "storage", "r2"],
+  "dependencies": [],
+  "settings": {
+    "maxFileSize": {
+      "type": "number",
+      "label": "Max File Size (MB)",
+      "description": "Maximum upload file size in megabytes",
+      "default": 10
+    },
+    "allowedFileTypes": {
+      "type": "string",
+      "label": "Allowed File Types",
+      "description": "Comma-separated list of allowed extensions (e.g., jpg,png,pdf)",
+      "default": "jpg,jpeg,png,gif,webp,pdf,mp4,mp3"
+    },
+    "autoOptimize": {
+      "type": "boolean",
+      "label": "Auto-Optimize Images",
+      "description": "Automatically optimize images on upload",
+      "default": true
+    },
+    "generateThumbnails": {
+      "type": "boolean",
+      "label": "Generate Thumbnails",
+      "description": "Automatically generate thumbnails for images",
+      "default": true
+    }
+  },
+  "hooks": {
+    "onActivate": "activate",
+    "onDeactivate": "deactivate"
+  },
+  "routes": [],
+  "permissions": {
+    "manage:media": "Manage media library",
+    "upload:files": "Upload files"
+  },
+  "adminMenu": {
+    "label": "Media",
+    "icon": "image",
+    "path": "/admin/media",
+    "order": 30
+  }
+}

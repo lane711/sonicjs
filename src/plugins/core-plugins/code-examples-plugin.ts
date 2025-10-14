@@ -277,7 +277,7 @@ codeExampleAPIRoutes.delete('/:id', async (c) => {
 export function createCodeExamplesPlugin(): Plugin {
   const builder = PluginBuilder.create({
     name: 'code-examples-plugin',
-    version: '1.0.0',
+    version: '1.0.0-beta.1',
     description: 'Code examples and snippets management plugin'
   })
 

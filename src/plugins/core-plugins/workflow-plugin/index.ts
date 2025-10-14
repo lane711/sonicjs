@@ -17,7 +17,7 @@ import { renderScheduledContent as scheduledContentTemplate } from './templates/
 export function createWorkflowPlugin(): Plugin {
   const builder = PluginBuilder.create({
     name: 'workflow-plugin',
-    version: '1.0.0',
+    version: '1.0.0-beta.1',
     description: 'Content workflow management with approval chains, scheduling, and automation'
   })
 

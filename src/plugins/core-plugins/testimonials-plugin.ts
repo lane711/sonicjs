@@ -264,7 +264,7 @@ testimonialAPIRoutes.delete('/:id', async (c) => {
 export function createTestimonialPlugin(): Plugin {
   const builder = PluginBuilder.create({
     name: 'testimonials-plugin',
-    version: '1.0.0',
+    version: '1.0.0-beta.1',
     description: 'Customer testimonials management plugin'
   })
 

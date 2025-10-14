@@ -6,7 +6,7 @@ import { SeedDataService } from './services/seed-data-service'
 export function createSeedDataPlugin(): Plugin {
   const builder = PluginBuilder.create({
     name: 'seed-data',
-    version: '1.0.0',
+    version: '1.0.0-beta.1',
     description: 'Generate realistic example users and content for testing and development'
   })
 

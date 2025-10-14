@@ -1,0 +1,43 @@
+{
+  "id": "core-auth",
+  "name": "Authentication System",
+  "version": "1.0.0-beta.1",
+  "description": "Core authentication and user management system with role-based access control, session management, and security features",
+  "author": "SonicJS Team",
+  "homepage": "https://sonicjs.com/plugins/core-auth",
+  "repository": "https://github.com/lane711/sonicjs-ai/tree/main/src/plugins/core-plugins",
+  "license": "MIT",
+  "category": "security",
+  "tags": ["auth", "authentication", "users", "security", "rbac", "sessions"],
+  "dependencies": [],
+  "settings": {
+    "sessionTimeout": {
+      "type": "number",
+      "label": "Session Timeout (minutes)",
+      "description": "Auto-logout after this many minutes of inactivity",
+      "default": 60
+    },
+    "maxLoginAttempts": {
+      "type": "number",
+      "label": "Max Login Attempts",
+      "description": "Lock account after this many failed login attempts",
+      "default": 5
+    },
+    "requireStrongPasswords": {
+      "type": "boolean",
+      "label": "Require Strong Passwords",
+      "description": "Enforce password complexity requirements",
+      "default": true
+    }
+  },
+  "hooks": {
+    "onActivate": "activate",
+    "onDeactivate": "deactivate"
+  },
+  "routes": [],
+  "permissions": {
+    "manage:users": "Manage users and accounts",
+    "manage:roles": "Manage user roles",
+    "manage:permissions": "Manage permission settings"
+  }
+}

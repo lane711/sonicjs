@@ -257,7 +257,7 @@ faqAPIRoutes.delete('/:id', async (c) => {
 export function createFAQPlugin(): Plugin {
   const builder = PluginBuilder.create({
     name: 'faq-plugin',
-    version: '1.0.0',
+    version: '1.0.0-beta.1',
     description: 'Frequently Asked Questions management plugin'
   })
 

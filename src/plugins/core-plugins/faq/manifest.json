@@ -1,0 +1,22 @@
+{
+  "id": "faq-plugin",
+  "name": "FAQ Manager",
+  "version": "1.0.0-beta.1",
+  "description": "Frequently Asked Questions management plugin with categorization, search, and display templates",
+  "author": "SonicJS Team",
+  "homepage": "https://sonicjs.com/plugins/faq",
+  "repository": "https://github.com/lane711/sonicjs-ai/tree/main/src/plugins/core-plugins",
+  "license": "MIT",
+  "category": "content",
+  "tags": ["faq", "questions", "answers", "help", "support"],
+  "dependencies": [],
+  "settings": {},
+  "hooks": {
+    "onActivate": "activate",
+    "onDeactivate": "deactivate"
+  },
+  "routes": [],
+  "permissions": {
+    "faq:manage": "Manage FAQ content"
+  }
+}

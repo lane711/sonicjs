@@ -3,7 +3,8 @@
   "version": "2.0.0-alpha.8",
   "private": true,
   "scripts": {
-    "dev": "wrangler dev 2>&1 | grep -v '/admin/api/metrics'",
+    "dev": "npm run plugins:generate && wrangler dev 2>&1 | grep -v '/admin/api/metrics'",
+    "prebuild": "npm run plugins:generate",
     "build": "tsc && wrangler deploy --dry-run",
     "predeploy": "npm test && npm run build",
     "deploy": "wrangler deploy",
@@ -18,6 +19,8 @@
     "db:migrate": "wrangler d1 migrations apply DB --local",
     "db:migrate:prod": "wrangler d1 migrations apply DB --env production",
     "db:studio": "drizzle-kit studio",
+    "plugins:generate": "node scripts/generate-plugin-registry.mjs",
+    "plugins:watch": "nodemon --watch 'src/plugins/**/manifest.json' --exec 'npm run plugins:generate'",
     "sync-collections": "tsx scripts/sync-collections.ts",
     "sonicjs": "tsx src/cli/index.ts",
     "prepare": "husky",

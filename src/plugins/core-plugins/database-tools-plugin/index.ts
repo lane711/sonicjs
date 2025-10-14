@@ -6,7 +6,7 @@ import { DatabaseToolsService } from './services/database-service'
 export function createDatabaseToolsPlugin(): Plugin {
   const builder = PluginBuilder.create({
     name: 'database-tools',
-    version: '1.0.0',
+    version: '1.0.0-beta.1',
     description: 'Database management tools including truncate, backup, and validation'
   })
 

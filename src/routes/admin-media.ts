@@ -196,6 +196,130 @@ adminMediaRoutes.get('/', async (c) => {
   }
 })
 
+// Media selector endpoint (HTMX endpoint for content form media selection)
+adminMediaRoutes.get('/selector', async (c) => {
+  try {
+    const { searchParams } = new URL(c.req.url)
+    const search = searchParams.get('search') || ''
+    const db = c.env.DB
+
+    // Build search query
+    let query = 'SELECT * FROM media WHERE deleted_at IS NULL'
+    const params: any[] = []
+
+    if (search.trim()) {
+      query += ' AND (filename LIKE ? OR original_name LIKE ? OR alt LIKE ?)'
+      const searchTerm = `%${search}%`
+      params.push(searchTerm, searchTerm, searchTerm)
+    }
+
+    query += ' ORDER BY uploaded_at DESC LIMIT 24'
+
+    const stmt = db.prepare(query)
+    const { results } = await stmt.bind(...params).all()
+
+    const mediaFiles = results.map((row: any) => ({
+      id: row.id,
+      filename: row.filename,
+      original_name: row.original_name,
+      mime_type: row.mime_type,
+      size: row.size,
+      public_url: `/files/${row.r2_key}`,
+      thumbnail_url: row.mime_type.startsWith('image/') ? `/files/${row.r2_key}` : undefined,
+      alt: row.alt,
+      tags: row.tags ? JSON.parse(row.tags) : [],
+      uploaded_at: row.uploaded_at,
+      fileSize: formatFileSize(row.size),
+      uploadedAt: new Date(row.uploaded_at).toLocaleDateString(),
+      isImage: row.mime_type.startsWith('image/'),
+      isVideo: row.mime_type.startsWith('video/'),
+      isDocument: !row.mime_type.startsWith('image/') && !row.mime_type.startsWith('video/')
+    }))
+
+    // Render media selector grid
+    return c.html(html`
+      <div class="mb-4">
+        <input
+          type="search"
+          id="media-selector-search"
+          placeholder="Search files..."
+          class="w-full rounded-lg bg-white dark:bg-zinc-800 px-4 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
+          hx-get="/admin/media/selector"
+          hx-trigger="keyup changed delay:300ms"
+          hx-target="#media-selector-grid"
+          hx-include="[name='search']"
+        >
+      </div>
+
+      <div id="media-selector-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-96 overflow-y-auto">
+        ${raw(mediaFiles.map(file => `
+          <div
+            class="relative group cursor-pointer rounded-lg overflow-hidden bg-zinc-50 dark:bg-zinc-800 shadow-sm hover:shadow-md transition-shadow"
+            data-media-id="${file.id}"
+          >
+            <div class="aspect-square relative">
+              ${file.isImage ? `
+                <img
+                  src="${file.public_url}"
+                  alt="${file.alt || file.filename}"
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                >
+              ` : file.isVideo ? `
+                <video
+                  src="${file.public_url}"
+                  class="w-full h-full object-cover"
+                  muted
+                ></video>
+              ` : `
+                <div class="w-full h-full flex items-center justify-center bg-zinc-100 dark:bg-zinc-700">
+                  <div class="text-center">
+                    <svg class="w-12 h-12 mx-auto text-zinc-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <span class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">${file.filename.split('.').pop()?.toUpperCase()}</span>
+                  </div>
+                </div>
+              `}
+
+              <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <button
+                  type="button"
+                  onclick="selectMediaFile('${file.id}', '${file.public_url.replace(/'/g, "\\'")}', '${file.filename.replace(/'/g, "\\'")}')"
+                  class="px-4 py-2 bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white rounded-lg font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                >
+                  Select
+                </button>
+              </div>
+            </div>
+
+            <div class="p-2">
+              <p class="text-xs text-zinc-700 dark:text-zinc-300 truncate" title="${file.original_name}">
+                ${file.original_name}
+              </p>
+              <p class="text-xs text-zinc-500 dark:text-zinc-400">
+                ${file.fileSize}
+              </p>
+            </div>
+          </div>
+        `).join(''))}
+      </div>
+
+      ${mediaFiles.length === 0 ? html`
+        <div class="text-center py-12 text-zinc-500 dark:text-zinc-400">
+          <svg class="mx-auto h-12 w-12 text-zinc-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+          <p class="mt-2">No media files found</p>
+        </div>
+      ` : ''}
+    `)
+  } catch (error) {
+    console.error('Error loading media selector:', error)
+    return c.html(html`<div class="text-red-500 dark:text-red-400">Error loading media files</div>`)
+  }
+})
+
 // Search media files (HTMX endpoint)
 adminMediaRoutes.get('/search', async (c) => {
   try {
