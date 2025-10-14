@@ -234,10 +234,10 @@ adminPluginRoutes.post('/install', async (c) => {
           questionsPerPage: 10
         }
       })
-      
+
       return c.json({ success: true, plugin: faqPlugin })
     }
-    
+
     // Handle Demo Login plugin installation
     if (body.name === 'demo-login-plugin') {
       const demoPlugin = await pluginService.installPlugin({
@@ -245,7 +245,7 @@ adminPluginRoutes.post('/install', async (c) => {
         name: 'demo-login-plugin',
         display_name: 'Demo Login Prefill',
         description: 'Prefills login form with demo credentials (admin@sonicjs.com/admin123) for easy site demonstration',
-        version: '1.0.0',
+        version: '1.0.0-beta.1',
         author: 'SonicJS',
         category: 'demo',
         icon: '🎯',
@@ -257,7 +257,7 @@ adminPluginRoutes.post('/install', async (c) => {
           demoPassword: 'admin123'
         }
       })
-      
+
       return c.json({ success: true, plugin: demoPlugin })
     }
 
@@ -268,7 +268,7 @@ adminPluginRoutes.post('/install', async (c) => {
         name: 'core-auth',
         display_name: 'Authentication System',
         description: 'Core authentication and user management system',
-        version: '1.0.0',
+        version: '1.0.0-beta.1',
         author: 'SonicJS Team',
         category: 'security',
         icon: '🔐',
@@ -277,7 +277,7 @@ adminPluginRoutes.post('/install', async (c) => {
         is_core: true,
         settings: {}
       })
-      
+
       return c.json({ success: true, plugin: authPlugin })
     }
 
@@ -288,7 +288,7 @@ adminPluginRoutes.post('/install', async (c) => {
         name: 'core-media',
         display_name: 'Media Manager',
         description: 'Core media upload and management system',
-        version: '1.0.0',
+        version: '1.0.0-beta.1',
         author: 'SonicJS Team',
         category: 'media',
         icon: '📸',
@@ -297,7 +297,7 @@ adminPluginRoutes.post('/install', async (c) => {
         is_core: true,
         settings: {}
       })
-      
+
       return c.json({ success: true, plugin: mediaPlugin })
     }
 
@@ -308,7 +308,7 @@ adminPluginRoutes.post('/install', async (c) => {
         name: 'core-workflow',
         display_name: 'Workflow Engine',
         description: 'Content workflow and approval system',
-        version: '1.0.0',
+        version: '1.0.0-beta.1',
         author: 'SonicJS Team',
         category: 'content',
         icon: '🔄',
@@ -317,7 +317,7 @@ adminPluginRoutes.post('/install', async (c) => {
         is_core: true,
         settings: {}
       })
-      
+
       return c.json({ success: true, plugin: workflowPlugin })
     }
 
@@ -328,7 +328,7 @@ adminPluginRoutes.post('/install', async (c) => {
         name: 'database-tools',
         display_name: 'Database Tools',
         description: 'Database management tools including truncate, backup, and validation',
-        version: '1.0.0',
+        version: '1.0.0-beta.1',
         author: 'SonicJS Team',
         category: 'system',
         icon: '🗄️',
@@ -353,7 +353,7 @@ adminPluginRoutes.post('/install', async (c) => {
         name: 'seed-data',
         display_name: 'Seed Data',
         description: 'Generate realistic example users and content for testing and development',
-        version: '1.0.0',
+        version: '1.0.0-beta.1',
         author: 'SonicJS Team',
         category: 'development',
         icon: '🌱',
