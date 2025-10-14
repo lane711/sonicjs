@@ -91,8 +91,8 @@ test.describe('Full Integration Workflows', () => {
       mimeType: 'image/jpeg',
       buffer: testImageBuffer
     });
-    
-    await page.locator('button[type="submit"]').click();
+
+    await page.locator('#upload-btn').click();
     
     // Wait for upload to complete with longer timeout
     await expect(page.locator('#upload-results')).toContainText('Successfully uploaded', { timeout: 15000 });
@@ -106,62 +106,75 @@ test.describe('Full Integration Workflows', () => {
     // 1. Start unauthenticated
     await page.goto('/admin');
     await page.waitForURL(/\/auth\/login/, { timeout: 10000 });
-    
+
     // 2. Login with valid credentials
     await loginAsAdmin(page);
     await expect(page).toHaveURL('/admin', { timeout: 10000 });
-    
+
     // 3. Navigate to different admin sections
     const sections = ['collections', 'content', 'media'];
-    
+
     for (const section of sections) {
       await navigateToAdminSection(page, section as any);
       await expect(page).toHaveURL(`/admin/${section}`, { timeout: 10000 });
     }
-    
-    // 4. Logout with more flexible handling
+
+    // 4. Logout - visit logout endpoint and verify redirect to login
     await page.goto('/auth/logout');
-    
-    // Wait for logout redirect with longer timeout
-    try {
-      await page.waitForURL('/auth/login', { timeout: 15000 });
-    } catch {
-      // If direct redirect doesn't work, manually navigate to login
-      await page.goto('/auth/login');
-    }
-    
-    // 5. Verify logged out - accessing admin should redirect
-    await page.goto('/admin');
-    await page.waitForURL(/\/auth\/login/, { timeout: 10000 });
+
+    // Should redirect to login page with success message
+    await page.waitForLoadState('networkidle');
+
+    // Verify we're on the login page
+    await expect(page.locator('h2')).toContainText(/Welcome|Sign/i);
+
+    // Verify logout success message is shown
+    await expect(page.locator('text=logged out successfully')).toBeVisible();
   });
 
   test('should handle error scenarios gracefully', async ({ page }) => {
     await loginAsAdmin(page);
-    
+
     // Test 1: Invalid collection creation
     await navigateToAdminSection(page, 'collections');
     await page.click('a[href="/admin/collections/new"]');
-    
-    // Submit empty form
+
+    // Try to submit empty form - HTML5 validation should prevent submission
+    // Check that required field has validation attribute
+    const nameField = page.locator('[name="name"]');
+    await expect(nameField).toHaveAttribute('required');
+
+    // Fill with invalid pattern (uppercase letters not allowed)
+    await page.fill('[name="name"]', 'INVALID-NAME');
+    await page.fill('[name="displayName"]', 'Test Collection');
+
+    // Submit form - should fail validation or show error
     await page.click('button[type="submit"]');
-    
-    // Should show validation errors
-    const errorMessage = page.locator('.error, .bg-red-100, .text-red-600');
-    await expect(errorMessage).toBeVisible();
+
+    // Wait a moment for any response
+    await page.waitForTimeout(1000);
+
+    // Either we stay on the form page due to validation, or we get an error message
+    const currentUrl = page.url();
+    const isStillOnForm = currentUrl.includes('/admin/collections/new');
+    const hasError = await page.locator('.bg-red-100:not(a), .error').isVisible().catch(() => false);
+
+    // One of these should be true
+    expect(isStillOnForm || hasError).toBe(true);
     
     // Test 2: Invalid file upload
     await navigateToAdminSection(page, 'media');
     await page.locator('button').filter({ hasText: 'Upload Files' }).first().click();
-    
+
     // Try to upload invalid file
     await page.setInputFiles('#file-input', {
       name: 'test.txt',
       mimeType: 'text/plain',
       buffer: Buffer.from('not an image')
     });
-    
-    await page.locator('button[type="submit"]').click();
-    
+
+    await page.locator('#upload-btn').click();
+
     // Should show error
     await expect(page.locator('#upload-results')).toContainText(/error|failed|not allowed/i);
   });

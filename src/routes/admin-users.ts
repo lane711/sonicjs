@@ -7,6 +7,7 @@ import { AuthManager } from '../middleware/auth'
 import { renderActivityLogsPage, ActivityLogsPageData, ActivityLog } from '../templates/pages/admin-activity-logs.template'
 import { renderUserEditPage, UserEditPageData, UserEditData } from '../templates/pages/admin-user-edit.template'
 import { renderUserNewPage, UserNewPageData } from '../templates/pages/admin-user-new.template'
+import { renderUsersListPage, UsersListPageData, User } from '../templates/pages/admin-users-list.template'
 import { sanitizeInput } from '../utils/sanitize'
 
 type Bindings = {
@@ -426,6 +427,7 @@ userRoutes.post('/profile/password', async (c) => {
 
 /**
  * GET /admin/users - List all users (requires users.read permission)
+ * Returns HTML for browser requests and JSON for API requests
  */
 userRoutes.get('/users', requirePermission('users.read'), async (c) => {
   const db = c.env.DB
@@ -436,11 +438,23 @@ userRoutes.get('/users', requirePermission('users.read'), async (c) => {
     const page = parseInt(c.req.query('page') || '1')
     const limit = parseInt(c.req.query('limit') || '20')
     const search = c.req.query('search') || ''
+    const roleFilter = c.req.query('role') || ''
+    const statusFilter = c.req.query('status') || 'active'
     const offset = (page - 1) * limit
 
     // Build search query
-    let whereClause = 'WHERE u.is_active = 1'
+    let whereClause = ''
     let params: any[] = []
+
+    // Handle status filter
+    if (statusFilter === 'active') {
+      whereClause = 'WHERE u.is_active = 1'
+    } else if (statusFilter === 'inactive') {
+      whereClause = 'WHERE u.is_active = 0'
+    } else {
+      // 'all' - no filter
+      whereClause = 'WHERE 1=1'
+    }
 
     if (search) {
       whereClause += ' AND (u.first_name LIKE ? OR u.last_name LIKE ? OR u.email LIKE ? OR u.username LIKE ?)'
@@ -448,18 +462,23 @@ userRoutes.get('/users', requirePermission('users.read'), async (c) => {
       params.push(searchParam, searchParam, searchParam, searchParam)
     }
 
+    if (roleFilter) {
+      whereClause += ' AND u.role = ?'
+      params.push(roleFilter)
+    }
+
     // Get users
     const usersStmt = db.prepare(`
-      SELECT u.id, u.email, u.username, u.first_name, u.last_name, 
-             u.role, u.avatar_url, u.created_at, u.last_login_at,
-             u.email_verified, u.two_factor_enabled
+      SELECT u.id, u.email, u.username, u.first_name, u.last_name,
+             u.role, u.avatar_url, u.created_at, u.last_login_at, u.updated_at,
+             u.email_verified, u.two_factor_enabled, u.is_active
       FROM users u
       ${whereClause}
       ORDER BY u.created_at DESC
       LIMIT ? OFFSET ?
     `)
 
-    const { results: users } = await usersStmt.bind(...params, limit, offset).all()
+    const { results: usersData } = await usersStmt.bind(...params, limit, offset).all()
 
     // Get total count
     const countStmt = db.prepare(`
@@ -476,19 +495,81 @@ userRoutes.get('/users', requirePermission('users.read'), async (c) => {
       c.req.header('user-agent')
     )
 
-    return c.json({
-      users: users || [],
+    // Check if this is an API request (accept header contains 'application/json')
+    const acceptHeader = c.req.header('accept') || ''
+    const isApiRequest = acceptHeader.includes('application/json')
+
+    if (isApiRequest) {
+      // Return JSON for API requests
+      return c.json({
+        users: usersData || [],
+        pagination: {
+          page,
+          limit,
+          total: totalUsers,
+          pages: Math.ceil(totalUsers / limit)
+        }
+      })
+    }
+
+    // Return HTML for browser requests
+    const users: User[] = (usersData || []).map((u: any) => ({
+      id: u.id,
+      email: u.email,
+      username: u.username || '',
+      firstName: u.first_name || '',
+      lastName: u.last_name || '',
+      role: u.role,
+      avatar: u.avatar_url,
+      isActive: Boolean(u.is_active),
+      lastLoginAt: u.last_login_at,
+      createdAt: u.created_at,
+      updatedAt: u.updated_at,
+      formattedLastLogin: u.last_login_at ? new Date(u.last_login_at).toLocaleDateString() : undefined,
+      formattedCreatedAt: new Date(u.created_at).toLocaleDateString()
+    }))
+
+    const pageData: UsersListPageData = {
+      users,
+      currentPage: page,
+      totalPages: Math.ceil(totalUsers / limit),
+      totalUsers,
+      searchFilter: search,
+      roleFilter,
+      statusFilter,
       pagination: {
-        page,
-        limit,
-        total: totalUsers,
-        pages: Math.ceil(totalUsers / limit)
+        currentPage: page,
+        totalPages: Math.ceil(totalUsers / limit),
+        totalItems: totalUsers,
+        itemsPerPage: limit,
+        startItem: offset + 1,
+        endItem: Math.min(offset + limit, totalUsers),
+        baseUrl: '/admin/users'
+      },
+      user: {
+        name: user.email.split('@')[0] || user.email,
+        email: user.email,
+        role: user.role
       }
-    })
+    }
+
+    return c.html(renderUsersListPage(pageData))
 
   } catch (error) {
     console.error('Users list error:', error)
-    return c.json({ error: 'Failed to load users' }, 500)
+
+    const acceptHeader = c.req.header('accept') || ''
+    const isApiRequest = acceptHeader.includes('application/json')
+
+    if (isApiRequest) {
+      return c.json({ error: 'Failed to load users' }, 500)
+    }
+
+    return c.html(renderAlert({
+      type: 'error',
+      message: 'Failed to load users. Please try again.',
+      dismissible: true
+    }), 500)
   }
 })
 
