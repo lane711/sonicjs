@@ -401,26 +401,120 @@ export function renderContentFormPage(data: ContentFormData): string {
       }
 
       // Media field functions
+      let currentMediaFieldId = null;
+
       function openMediaSelector(fieldId) {
+        currentMediaFieldId = fieldId;
+        // Store the original value in case user cancels
+        const originalValue = document.getElementById(fieldId)?.value || '';
+
         // Open media library modal
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50';
+        modal.id = 'media-selector-modal';
         modal.innerHTML = \`
           <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-xl ring-1 ring-zinc-950/5 dark:ring-white/10 p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <h3 class="text-lg font-semibold text-zinc-950 dark:text-white mb-4">Select Media</h3>
             <div id="media-grid-container" hx-get="/admin/media/selector" hx-trigger="load"></div>
             <div class="mt-4 flex justify-end space-x-2">
-              <button onclick="this.closest('.fixed').remove()" class="rounded-lg bg-white dark:bg-zinc-800 px-4 py-2 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">Cancel</button>
+              <button
+                onclick="cancelMediaSelection('\${fieldId}', '\${originalValue}')"
+                class="rounded-lg bg-white dark:bg-zinc-800 px-4 py-2 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
+                Cancel
+              </button>
+              <button
+                onclick="closeMediaSelector()"
+                class="rounded-lg bg-zinc-950 dark:bg-white px-4 py-2 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors">
+                OK
+              </button>
             </div>
           </div>
         \`;
         document.body.appendChild(modal);
+        // Trigger HTMX for the modal content
+        if (window.htmx) {
+          htmx.process(modal);
+        }
+      }
+
+      function closeMediaSelector() {
+        const modal = document.getElementById('media-selector-modal');
+        if (modal) {
+          modal.remove();
+        }
+        currentMediaFieldId = null;
+      }
+
+      function cancelMediaSelection(fieldId, originalValue) {
+        // Restore original value
+        const hiddenInput = document.getElementById(fieldId);
+        if (hiddenInput) {
+          hiddenInput.value = originalValue;
+        }
+
+        // If original value was empty, hide the preview and show select button
+        if (!originalValue) {
+          const preview = document.getElementById(fieldId + '-preview');
+          if (preview) {
+            preview.classList.add('hidden');
+          }
+        }
+
+        // Close modal
+        closeMediaSelector();
       }
 
       function clearMediaField(fieldId) {
         document.getElementById(fieldId).value = '';
         document.getElementById(fieldId + '-preview').classList.add('hidden');
       }
+
+      // Global function called by media selector buttons
+      window.selectMediaFile = function(mediaId, mediaUrl, filename) {
+        if (!currentMediaFieldId) {
+          console.error('No field ID set for media selection');
+          return;
+        }
+
+        const fieldId = currentMediaFieldId;
+
+        // Set the hidden input value to the media URL (not ID)
+        const hiddenInput = document.getElementById(fieldId);
+        if (hiddenInput) {
+          hiddenInput.value = mediaUrl;
+        }
+
+        // Update the preview
+        const preview = document.getElementById(fieldId + '-preview');
+        if (preview) {
+          preview.innerHTML = \`<img src="\${mediaUrl}" alt="\${filename}" class="w-32 h-32 object-cover rounded-lg border border-white/20">\`;
+          preview.classList.remove('hidden');
+        }
+
+        // Show the remove button by finding the media actions container and updating it
+        const mediaField = hiddenInput?.closest('.media-field-container');
+        if (mediaField) {
+          const actionsDiv = mediaField.querySelector('.media-actions');
+          if (actionsDiv && !actionsDiv.querySelector('button:has-text("Remove")')) {
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.onclick = () => clearMediaField(fieldId);
+            removeBtn.className = 'inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all';
+            removeBtn.textContent = 'Remove';
+            actionsDiv.appendChild(removeBtn);
+          }
+        }
+
+        // DON'T close the modal - let user click OK button
+        // Visual feedback: highlight the selected item
+        document.querySelectorAll('#media-selector-grid [data-media-id]').forEach(el => {
+          el.classList.remove('ring-2', 'ring-lime-500', 'dark:ring-lime-400');
+        });
+        const selectedItem = document.querySelector(\`#media-selector-grid [data-media-id="\${mediaId}"]\`);
+        if (selectedItem) {
+          selectedItem.classList.add('ring-2', 'ring-lime-500', 'dark:ring-lime-400');
+        }
+      };
 
       function setMediaField(fieldId, mediaUrl) {
         document.getElementById(fieldId).value = mediaUrl;

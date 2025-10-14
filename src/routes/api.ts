@@ -459,6 +459,29 @@ apiRoutes.get('/content', async (c) => {
     const db = c.env.DB
     const queryParams = c.req.query()
 
+    // Handle collection parameter - convert collection name to collection_id
+    if (queryParams.collection) {
+      const collectionName = queryParams.collection
+      const collectionStmt = db.prepare('SELECT id FROM collections WHERE name = ? AND is_active = 1')
+      const collectionResult = await collectionStmt.bind(collectionName).first()
+
+      if (collectionResult) {
+        // Replace 'collection' param with 'collection_id' for the filter builder
+        queryParams.collection_id = (collectionResult as any).id
+        delete queryParams.collection
+      } else {
+        // Collection not found - return empty result
+        return c.json({
+          data: [],
+          meta: addTimingMeta(c, {
+            count: 0,
+            timestamp: new Date().toISOString(),
+            message: `Collection '${collectionName}' not found`
+          }, executionStart)
+        })
+      }
+    }
+
     // Parse filter from query parameters
     const filter: QueryFilter = QueryFilterBuilder.parseFromQuery(queryParams)
 

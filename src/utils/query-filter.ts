@@ -377,6 +377,31 @@ export class QueryFilterBuilder {
       }
     }
 
+    // Initialize where clause if not present
+    if (!filter.where) {
+      filter.where = { and: [] }
+    }
+    if (!filter.where.and) {
+      filter.where.and = []
+    }
+
+    // Parse simple field filters (status, collection_id, etc.)
+    // These are convenience parameters that get converted to WHERE conditions
+    const simpleFieldMappings: Record<string, string> = {
+      'status': 'status',
+      'collection_id': 'collection_id'
+    }
+
+    for (const [queryParam, dbField] of Object.entries(simpleFieldMappings)) {
+      if (query[queryParam]) {
+        filter.where.and.push({
+          field: dbField,
+          operator: 'equals',
+          value: query[queryParam]
+        })
+      }
+    }
+
     // Parse limit
     if (query.limit) {
       filter.limit = Math.min(parseInt(query.limit), 1000) // Max 1000
