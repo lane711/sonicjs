@@ -155,12 +155,12 @@ apiMediaRoutes.post('/upload', async (c) => {
       mediaRecord.original_name,
       mediaRecord.mime_type,
       mediaRecord.size,
-      mediaRecord.width,
-      mediaRecord.height,
+      mediaRecord.width ?? null,
+      mediaRecord.height ?? null,
       mediaRecord.folder,
       mediaRecord.r2_key,
       mediaRecord.public_url,
-      mediaRecord.thumbnail_url,
+      mediaRecord.thumbnail_url ?? null,
       mediaRecord.uploaded_by,
       mediaRecord.uploaded_at
     ).run()
@@ -304,12 +304,12 @@ apiMediaRoutes.post('/upload-multiple', async (c) => {
           mediaRecord.original_name,
           mediaRecord.mime_type,
           mediaRecord.size,
-          mediaRecord.width,
-          mediaRecord.height,
+          mediaRecord.width ?? null,
+          mediaRecord.height ?? null,
           mediaRecord.folder,
           mediaRecord.r2_key,
           mediaRecord.public_url,
-          mediaRecord.thumbnail_url,
+          mediaRecord.thumbnail_url ?? null,
           mediaRecord.uploaded_by,
           mediaRecord.uploaded_at
         ).run()
@@ -377,12 +377,24 @@ apiMediaRoutes.post('/bulk-delete', async (c) => {
 
     for (const fileId of fileIds) {
       try {
-        // Get file record
-        const stmt = c.env.DB.prepare('SELECT * FROM media WHERE id = ? AND deleted_at IS NULL')
+        // Get file record (including already deleted files to check if they exist at all)
+        const stmt = c.env.DB.prepare('SELECT * FROM media WHERE id = ?')
         const fileRecord = await stmt.bind(fileId).first() as any
-        
+
         if (!fileRecord) {
           errors.push({ fileId, error: 'File not found' })
+          continue
+        }
+
+        // Skip if already deleted (treat as success)
+        if (fileRecord.deleted_at !== null) {
+          console.log(`File ${fileId} already deleted, skipping`)
+          results.push({
+            fileId,
+            filename: fileRecord.original_name,
+            success: true,
+            alreadyDeleted: true
+          })
           continue
         }
 
@@ -410,10 +422,10 @@ apiMediaRoutes.post('/bulk-delete', async (c) => {
           success: true
         })
       } catch (error) {
-        errors.push({ 
-          fileId, 
-          error: 'Delete failed', 
-          details: error instanceof Error ? error.message : 'Unknown error' 
+        errors.push({
+          fileId,
+          error: 'Delete failed',
+          details: error instanceof Error ? error.message : 'Unknown error'
         })
       }
     }

@@ -1,5 +1,5 @@
 {
-  "id": "cache",
+  "id": "core-cache",
   "name": "Cache System",
   "version": "1.0.0-alpha.1",
   "description": "Three-tiered caching system with in-memory and KV storage. Provides automatic caching for content, users, media, and API responses with configurable TTL and invalidation patterns.",

@@ -242,7 +242,7 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
                     >
                       Select All
                     </button>
-                    <div class="relative inline-block" id="bulk-actions-dropdown">
+                    <div class="relative inline-block z-50" id="bulk-actions-dropdown">
                       <button
                         id="bulk-actions-btn"
                         onclick="toggleBulkActionsDropdown()"
@@ -257,8 +257,8 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
 
                       <div
                         id="bulk-actions-menu"
-                        class="hidden absolute right-0 mt-2 w-56 origin-top-right divide-y divide-zinc-200 dark:divide-white/10 rounded-lg bg-white dark:bg-zinc-900 shadow-xl ring-1 ring-zinc-950/5 dark:ring-white/10 transition-all duration-100 scale-95 opacity-0"
-                        style="transition-behavior: allow-discrete; z-index: 9999;"
+                        class="hidden absolute right-0 mt-2 w-56 origin-top-right divide-y divide-zinc-200 dark:divide-white/10 rounded-lg bg-white dark:bg-zinc-900 shadow-xl ring-1 ring-zinc-950/5 dark:ring-white/10 transition-all duration-100 scale-95 opacity-0 z-50"
+                        style="transition-behavior: allow-discrete;"
                       >
                         <div class="py-1">
                           <button

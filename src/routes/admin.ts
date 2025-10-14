@@ -188,18 +188,14 @@ adminRoutes.get('/api/stats', async (c) => {
       console.error('Error fetching users count:', error)
     }
 
-    // Calculate database size
+    // Calculate database size from D1 metadata
     let databaseSize = 0
     try {
-      // Get the total size of all tables in bytes
-      const sizeStmt = db.prepare(`
-        SELECT SUM(pgsize) as total_size
-        FROM dbstat
-      `)
-      const sizeResult = await sizeStmt.first()
-      databaseSize = (sizeResult as any)?.total_size || 0
+      // Run a lightweight query to get database size from meta.size_after
+      const result = await db.prepare('SELECT 1').run()
+      databaseSize = (result as any)?.meta?.size_after || 0
     } catch (error) {
-      console.error('Error fetching users count:', error)
+      console.error('Error fetching database size:', error)
     }
 
     // Get recent activity from activity_logs table
@@ -1568,18 +1564,94 @@ adminRoutes.post('/api/test-cleanup', async (c) => {
       console.error('Error deleting test collections:', error)
     }
 
-    // Delete test content
+    // Get test content IDs first
+    let testContentIds: string[] = []
     try {
-      const contentResult = await db.prepare(`
-        DELETE FROM content
+      const testContent = await db.prepare(`
+        SELECT id FROM content
         WHERE title LIKE '%test%'
            OR title LIKE '%Test%'
            OR title LIKE '%E2E%'
            OR slug LIKE '%test%'
-      `).run()
-      deletedCount += contentResult.meta.changes || 0
+      `).all()
+      testContentIds = (testContent.results || []).map((row: any) => row.id)
     } catch (error) {
-      console.error('Error deleting test content:', error)
+      console.error('Error finding test content:', error)
+    }
+
+    // Delete dependent records first if we have test content
+    if (testContentIds.length > 0) {
+      const idList = testContentIds.map(id => `'${id}'`).join(',')
+
+      // Delete content_versions
+      try {
+        await db.prepare(`DELETE FROM content_versions WHERE content_id IN (${idList})`).run()
+      } catch (error) {
+        console.error('Error deleting content_versions:', error)
+      }
+
+      // Delete workflow_history
+      try {
+        await db.prepare(`DELETE FROM workflow_history WHERE content_id IN (${idList})`).run()
+      } catch (error) {
+        console.error('Error deleting workflow_history:', error)
+      }
+
+      // Delete content_relationships
+      try {
+        await db.prepare(`DELETE FROM content_relationships WHERE source_content_id IN (${idList}) OR target_content_id IN (${idList})`).run()
+      } catch (error) {
+        console.error('Error deleting content_relationships:', error)
+      }
+
+      // Delete content_workflow_status
+      try {
+        await db.prepare(`DELETE FROM content_workflow_status WHERE content_id IN (${idList})`).run()
+      } catch (error) {
+        console.error('Error deleting content_workflow_status:', error)
+      }
+
+      // Delete content_workflow_transitions
+      try {
+        await db.prepare(`DELETE FROM content_workflow_transitions WHERE content_id IN (${idList})`).run()
+      } catch (error) {
+        console.error('Error deleting content_workflow_transitions:', error)
+      }
+
+      // Delete content_approval_requests
+      try {
+        await db.prepare(`DELETE FROM content_approval_requests WHERE content_id IN (${idList})`).run()
+      } catch (error) {
+        console.error('Error deleting content_approval_requests:', error)
+      }
+
+      // Delete content_version_history
+      try {
+        await db.prepare(`DELETE FROM content_version_history WHERE content_id IN (${idList})`).run()
+      } catch (error) {
+        console.error('Error deleting content_version_history:', error)
+      }
+
+      // Delete content_drafts
+      try {
+        await db.prepare(`DELETE FROM content_drafts WHERE content_id IN (${idList})`).run()
+      } catch (error) {
+        console.error('Error deleting content_drafts:', error)
+      }
+
+      // Now delete test content
+      try {
+        const contentResult = await db.prepare(`
+          DELETE FROM content
+          WHERE title LIKE '%test%'
+             OR title LIKE '%Test%'
+             OR title LIKE '%E2E%'
+             OR slug LIKE '%test%'
+        `).run()
+        deletedCount += contentResult.meta.changes || 0
+      } catch (error) {
+        console.error('Error deleting test content:', error)
+      }
     }
 
     // Delete test users (preserve admin user)

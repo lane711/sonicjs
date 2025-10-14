@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid'
 import { requireAuth, requireRole } from '../middleware/auth'
 import { renderMediaLibraryPage, MediaLibraryPageData, FolderStats, TypeStats } from '../templates/pages/admin-media-library.template'
 import { renderMediaFileDetails, MediaFileDetailsData } from '../templates/components/media-file-details.template'
-import { MediaFile } from '../templates/components/media-grid.template'
+import { MediaFile, renderMediaFileCard } from '../templates/components/media-grid.template'
 import { createCDNService } from '../services/cdn'
 import { getCacheService, CACHE_CONFIGS } from '../plugins/cache'
 
@@ -63,18 +63,22 @@ adminMediaRoutes.get('/', async (c) => {
     const type = searchParams.get('type') || 'all'
     const view = searchParams.get('view') || 'grid'
     const page = parseInt(searchParams.get('page') || '1')
+    const cacheBust = searchParams.get('t') // Cache-busting parameter
     const limit = 24
     const offset = (page - 1) * limit
-    
+
     const db = c.env.DB
 
-    // Use cache for media list
+    // Use cache for media list, but skip if cache-busting parameter is present
     const cache = getCacheService(CACHE_CONFIGS.media!)
     const cacheKey = cache.generateKey('list', `folder:${folder}_type:${type}_page:${page}_view:${view}`)
 
-    const cachedData = await cache.get<MediaLibraryPageData>(cacheKey)
-    if (cachedData) {
-      return c.html(renderMediaLibraryPage(cachedData))
+    let cachedData
+    if (!cacheBust) {
+      cachedData = await cache.get<MediaLibraryPageData>(cacheKey)
+      if (cachedData) {
+        return c.html(renderMediaLibraryPage(cachedData))
+      }
     }
 
     // Build query for media files
@@ -441,6 +445,38 @@ adminMediaRoutes.post('/upload', async (c) => {
       }
     }
 
+    // Fetch updated media list to include in response
+    let mediaGridHTML = ''
+    if (uploadResults.length > 0) {
+      try {
+        const folder = formData.get('folder') as string || 'uploads'
+        const query = 'SELECT * FROM media WHERE deleted_at IS NULL ORDER BY uploaded_at DESC LIMIT 24'
+        const stmt = c.env.DB.prepare(query)
+        const { results } = await stmt.all()
+
+        const mediaFiles = results.map((row: any) => ({
+          id: row.id,
+          filename: row.filename,
+          original_name: row.original_name,
+          mime_type: row.mime_type,
+          size: row.size,
+          public_url: `/files/${row.r2_key}`,
+          thumbnail_url: row.mime_type.startsWith('image/') ? `/files/${row.r2_key}` : undefined,
+          tags: row.tags ? JSON.parse(row.tags) : [],
+          uploaded_at: row.uploaded_at,
+          fileSize: formatFileSize(row.size),
+          uploadedAt: new Date(row.uploaded_at).toLocaleDateString(),
+          isImage: row.mime_type.startsWith('image/'),
+          isVideo: row.mime_type.startsWith('video/'),
+          isDocument: !row.mime_type.startsWith('image/') && !row.mime_type.startsWith('video/')
+        }))
+
+        mediaGridHTML = mediaFiles.map(file => renderMediaFileCard(file, 'grid', true)).join('')
+      } catch (error) {
+        console.error('Error fetching updated media list:', error)
+      }
+    }
+
     // Return HTMX response with results
     return c.html(html`
       ${uploadResults.length > 0 ? html`
@@ -448,7 +484,7 @@ adminMediaRoutes.post('/upload', async (c) => {
           Successfully uploaded ${uploadResults.length} file${uploadResults.length > 1 ? 's' : ''}
         </div>
       ` : ''}
-      
+
       ${errors.length > 0 ? html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           <p class="font-medium">Upload errors:</p>
@@ -459,15 +495,16 @@ adminMediaRoutes.post('/upload', async (c) => {
           </ul>
         </div>
       ` : ''}
-      
-      <script>
-        // Refresh the media grid after upload
-        if (${uploadResults.length} > 0) {
+
+      ${uploadResults.length > 0 ? html`
+        <script>
+          // Close modal and refresh page after successful upload with cache busting
           setTimeout(() => {
-            window.location.reload();
-          }, 2000);
-        }
-      </script>
+            document.getElementById('upload-modal').classList.add('hidden');
+            window.location.href = '/admin/media?t=' + Date.now();
+          }, 1500);
+        </script>
+      ` : ''}
     `)
   } catch (error) {
     console.error('Upload error:', error)

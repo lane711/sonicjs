@@ -96,8 +96,8 @@ export class PluginService {
           permissions: ['manage:workflows', 'approve:content']
         },
         {
-          id: 'cache',
-          name: 'cache',
+          id: 'core-cache',
+          name: 'core-cache',
           display_name: 'Cache System',
           description: 'Three-tiered caching system with memory, KV, and database layers',
           version: '1.0.0',
