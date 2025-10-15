@@ -1,4 +1,6 @@
 import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout-v2.template'
+import { renderAuthSettingsForm } from '../components/auth-settings-form.template'
+import type { AuthSettings } from '../../services/auth-validation'
 
 export interface PluginSettings {
   [key: string]: any
@@ -183,28 +185,72 @@ export function renderPluginSettingsPage(data: PluginSettingsPageData): string {
       async function saveSettings() {
         const form = document.getElementById('settings-form');
         const formData = new FormData(form);
-        const settings = {};
-        
-        for (let [key, value] of formData.entries()) {
-          if (key.startsWith('setting_')) {
-            const settingKey = key.replace('setting_', '');
-            
-            // Handle different input types
+        const isAuthPlugin = '${plugin.id}' === 'core-auth';
+        let settings = {};
+
+        if (isAuthPlugin) {
+          // Handle nested auth settings structure
+          settings = {
+            requiredFields: {},
+            validation: {
+              passwordRequirements: {}
+            },
+            registration: {}
+          };
+
+          for (let [key, value] of formData.entries()) {
             const input = form.querySelector(\`[name="\${key}"]\`);
-            if (input.type === 'checkbox') {
-              settings[settingKey] = input.checked;
-            } else if (input.type === 'number') {
-              settings[settingKey] = parseInt(value) || 0;
-            } else {
-              settings[settingKey] = value;
+            const fieldValue = input.type === 'checkbox' ? input.checked :
+                             input.type === 'number' ? parseInt(value) || 0 : value;
+
+            // Parse nested field names like "requiredFields_email_required"
+            if (key.startsWith('requiredFields_')) {
+              const parts = key.replace('requiredFields_', '').split('_');
+              const fieldName = parts[0];
+              const propName = parts[1];
+
+              if (!settings.requiredFields[fieldName]) {
+                settings.requiredFields[fieldName] = { type: 'text', label: '' };
+              }
+              settings.requiredFields[fieldName][propName] = fieldValue;
+            } else if (key.startsWith('validation_passwordRequirements_')) {
+              const propName = key.replace('validation_passwordRequirements_', '');
+              settings.validation.passwordRequirements[propName] = fieldValue;
+            } else if (key.startsWith('validation_')) {
+              const propName = key.replace('validation_', '');
+              // Invert the allowDuplicateUsernames logic
+              if (propName === 'allowDuplicateUsernames') {
+                settings.validation[propName] = !fieldValue;
+              } else {
+                settings.validation[propName] = fieldValue;
+              }
+            } else if (key.startsWith('registration_')) {
+              const propName = key.replace('registration_', '');
+              settings.registration[propName] = fieldValue;
+            }
+          }
+        } else {
+          // Handle regular plugin settings
+          for (let [key, value] of formData.entries()) {
+            if (key.startsWith('setting_')) {
+              const settingKey = key.replace('setting_', '');
+
+              const input = form.querySelector(\`[name="\${key}"]\`);
+              if (input.type === 'checkbox') {
+                settings[settingKey] = input.checked;
+              } else if (input.type === 'number') {
+                settings[settingKey] = parseInt(value) || 0;
+              } else {
+                settings[settingKey] = value;
+              }
             }
           }
         }
-        
+
         const saveButton = document.getElementById('save-button');
         saveButton.disabled = true;
         saveButton.textContent = 'Saving...';
-        
+
         try {
           const response = await fetch(\`/admin/plugins/${plugin.id}/settings\`, {
             method: 'POST',
@@ -213,11 +259,13 @@ export function renderPluginSettingsPage(data: PluginSettingsPageData): string {
             },
             body: JSON.stringify(settings)
           });
-          
+
           const result = await response.json();
-          
+
           if (result.success) {
             showNotification('Settings saved successfully', 'success');
+            // Reload page after 1 second to show updated settings
+            setTimeout(() => location.reload(), 1000);
           } else {
             throw new Error(result.error || 'Failed to save settings');
           }
@@ -287,6 +335,7 @@ function renderToggleButton(plugin: any): string {
 function renderSettingsTab(plugin: any): string {
   const settings = plugin.settings || {}
   const isSeedDataPlugin = plugin.id === 'seed-data' || plugin.name === 'seed-data'
+  const isAuthPlugin = plugin.id === 'core-auth' || plugin.name === 'core-auth'
 
   return `
     ${isSeedDataPlugin ? `
@@ -311,10 +360,20 @@ function renderSettingsTab(plugin: any): string {
     ` : ''}
 
     <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6">
-      <h2 class="text-xl font-semibold text-white mb-4">Plugin Settings</h2>
+      ${isAuthPlugin ? `
+        <h2 class="text-xl font-semibold text-white mb-4">Authentication Settings</h2>
+        <p class="text-gray-400 mb-6">Configure user registration fields and validation rules.</p>
+      ` : `
+        <h2 class="text-xl font-semibold text-white mb-4">Plugin Settings</h2>
+      `}
 
       <form id="settings-form" class="space-y-6">
-        ${Object.keys(settings).length > 0 ? renderSettingsFields(settings) : renderNoSettings(plugin)}
+        ${isAuthPlugin && Object.keys(settings).length > 0
+          ? renderAuthSettingsForm(settings as AuthSettings)
+          : Object.keys(settings).length > 0
+            ? renderSettingsFields(settings)
+            : renderNoSettings(plugin)
+        }
 
         ${Object.keys(settings).length > 0 ? `
         <div class="flex items-center justify-end pt-6 border-t border-white/10">

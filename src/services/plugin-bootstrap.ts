@@ -37,7 +37,30 @@ export class PluginBootstrapService {
       icon: "🔐",
       permissions: ["manage:users", "manage:roles", "manage:permissions"],
       dependencies: [],
-      settings: {},
+      settings: {
+        requiredFields: {
+          email: { required: true, minLength: 5, label: "Email", type: "email" },
+          password: { required: true, minLength: 8, label: "Password", type: "password" },
+          username: { required: true, minLength: 3, label: "Username", type: "text" },
+          firstName: { required: true, minLength: 1, label: "First Name", type: "text" },
+          lastName: { required: true, minLength: 1, label: "Last Name", type: "text" },
+        },
+        validation: {
+          emailFormat: true,
+          allowDuplicateUsernames: false,
+          passwordRequirements: {
+            requireUppercase: false,
+            requireLowercase: false,
+            requireNumbers: false,
+            requireSpecialChars: false,
+          },
+        },
+        registration: {
+          enabled: true,
+          requireEmailVerification: false,
+          defaultRole: "viewer",
+        },
+      },
     },
     {
       id: "core-media",
@@ -150,6 +173,14 @@ export class PluginBootstrapService {
             `[PluginBootstrap] Updating plugin version: ${plugin.display_name} from ${existingPlugin.version} to ${plugin.version}`
           );
           await this.updatePlugin(plugin);
+        }
+
+        // ALWAYS ensure core-auth is active (critical for system functionality)
+        if (plugin.id === 'core-auth' && existingPlugin.status !== 'active') {
+          console.log(
+            `[PluginBootstrap] Core-auth plugin is inactive, activating it now...`
+          );
+          await this.pluginService.activatePlugin(plugin.id);
         }
 
         // Only auto-activate on first install, respect user's activation state on subsequent boots

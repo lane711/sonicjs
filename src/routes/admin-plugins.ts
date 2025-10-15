@@ -4,6 +4,7 @@ import { renderPluginsListPage, PluginsListPageData, Plugin } from '../templates
 import { renderPluginSettingsPage, PluginSettingsPageData } from '../templates/pages/admin-plugin-settings.template'
 import { PluginService } from '../services/plugin-service'
 import { PermissionManager } from '../middleware/permissions'
+import { authValidationService } from '../services/auth-validation'
 
 type Bindings = {
   DB: D1Database
@@ -407,17 +408,23 @@ adminPluginRoutes.post('/:id/settings', async (c) => {
     const user = c.get('user')
     const db = c.env.DB
     const pluginId = c.req.param('id')
-    
+
     // Temporarily skip permission check for admin users
     if (user?.role !== 'admin') {
       return c.json({ error: 'Access denied' }, 403)
     }
-    
+
     const settings = await c.req.json()
-    
+
     const pluginService = new PluginService(db)
     await pluginService.updatePluginSettings(pluginId, settings)
-    
+
+    // Clear auth validation cache if updating core-auth plugin
+    if (pluginId === 'core-auth') {
+      authValidationService.clearCache()
+      console.log('[AuthSettings] Cache cleared after updating authentication settings')
+    }
+
     return c.json({ success: true })
   } catch (error) {
     console.error('Error updating plugin settings:', error)

@@ -212,12 +212,26 @@ Use Postman Collection Runner to:
 }
 ```
 
-**Required fields:**
-- `email` (valid email format)
+**Default Required Fields:**
+- `email` (valid email format, minimum 5 characters)
 - `password` (minimum 8 characters)
 - `username` (minimum 3 characters)
-- `firstName` (required)
-- `lastName` (required)
+- `firstName` (minimum 1 character)
+- `lastName` (minimum 1 character)
+
+**Note:** Registration field requirements are **configurable** in the Authentication System plugin settings. Administrators can:
+- Make any field optional/required
+- Adjust minimum length requirements
+- Add password complexity requirements (uppercase, lowercase, numbers, special characters)
+- Configure default user roles
+
+To configure these settings:
+1. Navigate to **Admin > Plugins**
+2. Click on **Authentication System** plugin
+3. Go to **Settings** tab
+4. Adjust field requirements as needed
+
+Fields marked as optional in settings can be omitted from registration requests.
 
 ### Upload Media
 Uses `multipart/form-data`:

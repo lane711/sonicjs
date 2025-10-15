@@ -7,6 +7,7 @@ import { AuthManager, requireAuth } from '../middleware/auth'
 import { renderLoginPage, LoginPageData } from '../templates/pages/auth-login.template'
 import { renderRegisterPage, RegisterPageData } from '../templates/pages/auth-register.template'
 import { getCacheService, CACHE_CONFIGS } from '../plugins/cache'
+import { authValidationService } from '../services/auth-validation'
 
 type Bindings = {
   DB: D1Database
@@ -80,11 +81,33 @@ const loginSchema = z.object({
 
 // Register new user
 authRoutes.post('/register',
-  zValidator('json', registerSchema),
   async (c) => {
     try {
-      const { email, password, username, firstName, lastName } = c.req.valid('json')
       const db = c.env.DB
+      const requestData = await c.req.json()
+
+      // Build and validate using dynamic schema
+      const validationSchema = await authValidationService.buildRegistrationSchema(db)
+      const validationResult = await validationSchema.safeParseAsync(requestData)
+
+      if (!validationResult.success) {
+        return c.json({
+          error: 'Validation failed',
+          details: validationResult.error.errors.map(e => e.message)
+        }, 400)
+      }
+
+      const validatedData = validationResult.data
+
+      // Get auth settings to determine required fields
+      const authSettings = await authValidationService.getAuthSettings(db)
+
+      // Extract fields with defaults for optional ones
+      const email = validatedData.email
+      const password = validatedData.password
+      const username = validatedData.username || authValidationService.generateDefaultValue('username', validatedData)
+      const firstName = validatedData.firstName || authValidationService.generateDefaultValue('firstName', validatedData)
+      const lastName = validatedData.lastName || authValidationService.generateDefaultValue('lastName', validatedData)
       
       // Normalize email to lowercase
       const normalizedEmail = email.toLowerCase()
@@ -306,20 +329,25 @@ authRoutes.post('/refresh', requireAuth(), async (c) => {
 // Form-based registration handler (for HTML forms)
 authRoutes.post('/register/form', async (c) => {
   try {
+    const db = c.env.DB
     const formData = await c.req.formData()
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
-    const username = formData.get('username') as string
-    const firstName = formData.get('firstName') as string
-    const lastName = formData.get('lastName') as string
+
+    // Extract form data
+    const requestData = {
+      email: formData.get('email') as string,
+      password: formData.get('password') as string,
+      username: formData.get('username') as string,
+      firstName: formData.get('firstName') as string,
+      lastName: formData.get('lastName') as string,
+    }
 
     // Normalize email to lowercase
-    const normalizedEmail = email.toLowerCase()
+    const normalizedEmail = requestData.email?.toLowerCase()
+    requestData.email = normalizedEmail
 
-    // Validate the data
-    const validation = registerSchema.safeParse({
-      email: normalizedEmail, password, username, firstName, lastName
-    })
+    // Build and validate using dynamic schema
+    const validationSchema = await authValidationService.buildRegistrationSchema(db)
+    const validation = await validationSchema.safeParseAsync(requestData)
 
     if (!validation.success) {
       return c.html(html`
@@ -329,7 +357,14 @@ authRoutes.post('/register/form', async (c) => {
       `)
     }
 
-    const db = c.env.DB
+    const validatedData = validation.data
+
+    // Extract fields with defaults for optional ones
+    const email = validatedData.email
+    const password = validatedData.password
+    const username = validatedData.username || authValidationService.generateDefaultValue('username', validatedData)
+    const firstName = validatedData.firstName || authValidationService.generateDefaultValue('firstName', validatedData)
+    const lastName = validatedData.lastName || authValidationService.generateDefaultValue('lastName', validatedData)
     
     // Check if user already exists
     const existingUser = await db.prepare('SELECT id FROM users WHERE email = ? OR username = ?')
